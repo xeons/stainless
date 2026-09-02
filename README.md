@@ -548,6 +548,10 @@ Stainless would have to be GPLv3 as well. With it:
 The copyleft is on the compiler, not on what you build with it — the same
 arrangement GCC uses for `libgcc`.
 
-> The exception wording was drafted for this project rather than copied from a
-> published instrument. See the note at the top of
-> [LICENSE.RUNTIME](LICENSE.RUNTIME).
+The exception is modelled closely on the
+[GNU GCC Runtime Library Exception 3.1](https://www.gnu.org/licenses/gcc-exception-3.1.html),
+using the same structure and terms of art, but it is a grant made by this
+project rather than that document: the GCC text conditions its grant on an
+"Eligible Compilation Process" defined in terms of GCC, and may not be
+modified. It has not been reviewed by a lawyer — see the note at the top of
+[LICENSE.RUNTIME](LICENSE.RUNTIME).

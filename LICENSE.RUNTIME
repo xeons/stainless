@@ -1,70 +1,109 @@
-                  Stainless Runtime Library Exception
-                            Version 1.0
+                  STAINLESS RUNTIME LIBRARY EXCEPTION
 
-An additional permission under section 7 of the GNU General Public
-License, version 3, granted by the copyright holders of Stainless.
+                       Version 1.0, 2 September 2026
 
-NOTE ON THIS TEXT
------------------
+  Copyright (C) 2026 Brandon Scott
 
-This wording was drafted for Stainless rather than copied from an
-existing instrument. It follows the same shape and intent as the GNU GCC
-Runtime Library Exception, version 3.1, which serves the same purpose for
-GCC, and which you may wish to read alongside it:
+  Everyone is permitted to copy and distribute verbatim copies of this
+  license document, but changing it is not allowed.
 
-    https://www.gnu.org/licenses/gcc-exception-3.1.html
+This Stainless Runtime Library Exception ("Exception") is an additional
+permission under section 7 of the GNU General Public License, version 3
+("GPLv3"). It applies to a given file (the "Runtime Library") that bears a
+notice placed by the copyright holder of the file stating that the file is
+governed by GPLv3 along with this Exception.
 
-If the licensing of this project matters commercially to you, have this
-text reviewed by someone qualified, or replace it with a published
-instrument such as the GCC Runtime Library Exception.
-
-
-0. DEFINITIONS
---------------
-
-"Stainless" means the compiler and associated tooling in this repository.
-
-"Runtime Library" means the files in the runtime/ and stdlib/ directories
-of this repository, together with any object code or other compiled form
-of them that Stainless places into, or links with, the code it produces.
-
-"Independent Module" means source code that is neither part of the
-Runtime Library nor derived from it.
-
-"Target Code" means output produced by Stainless from one or more
-Independent Modules, together with any part of the Runtime Library that
-Stainless included in, or linked with, that output.
-
-"Eligible Compilation Process" means a process that produces Target Code
-from Independent Modules using Stainless, or using other software
-licensed under the GNU General Public License version 3 or a licence
-compatible with it.
+When you use Stainless to compile a program, Stainless combines portions of
+its runtime library and standard library with the compiled program. The
+purpose of this Exception is to allow compilation of non-GPL (including
+proprietary) programs to use, in this way, the files covered by this
+Exception.
 
 
-1. GRANT OF ADDITIONAL PERMISSION
----------------------------------
+  ON THE RELATIONSHIP TO THE GCC RUNTIME LIBRARY EXCEPTION
 
-You have permission to propagate Target Code, and to convey it under
-terms of your choosing, even where doing so would otherwise be restricted
-by the GNU General Public License, provided that all of the Target Code
-was produced by an Eligible Compilation Process.
+  This document is modelled closely on the GNU GCC Runtime Library
+  Exception, version 3.1, published by the Free Software Foundation:
 
-This permission attaches to the Runtime Library only. It does not extend
-to Stainless itself, nor to any modified version of the Runtime Library:
-conveying either of those remains subject to the GNU General Public
-License, version 3, in full.
+      https://www.gnu.org/licenses/gcc-exception-3.1.html
+
+  It is not that document, and is not published by or endorsed by the
+  FSF. The GCC exception could not be used directly here: its grant is
+  conditional on an "Eligible Compilation Process", which it defines in
+  terms of GCC specifically, and it may not be modified. What follows is
+  therefore a grant made by the copyright holder of Stainless, following
+  the same structure and using the same terms of art so that its effect
+  is easy to compare against the original.
+
+  This wording has not been reviewed by a lawyer. If the licensing of
+  this project matters commercially to you, satisfy yourself of its
+  effect before relying on it.
 
 
-2. WHAT THIS MEANS IN PRACTICE
-------------------------------
+0. Definitions.
 
-Compiling your own program with Stainless does not place your program
-under the GNU General Public License. You may licence what you write
-however you wish, and distribute it in binary form, even though the
-Stainless runtime is linked into it.
+A file is an "Independent Module" if it either requires the Runtime Library
+for execution after a Compilation Process, or makes use of an interface
+provided by the Runtime Library, but is not otherwise based on the Runtime
+Library.
 
-Modifying Stainless, or modifying the Runtime Library, and distributing
-the result to others does place obligations on you: the modified source
-must be made available under the GNU General Public License, version 3.
+"Stainless" means a version of the Stainless compiler and its accompanying
+tooling, with or without modifications, governed by version 3 (or a
+specified later version) of the GNU General Public License with the option
+of using any subsequent versions published by the FSF.
 
-In short, the copyleft is on the compiler, not on what you build with it.
+"GPL-compatible Software" is software whose conditions of propagation,
+modification and use would permit combination with Stainless in accord with
+the license of Stainless.
+
+"Target Code" refers to output from any compiler for a real or virtual
+target processor architecture, in executable form or suitable for input to
+an assembler, loader, linker and/or execution phase. Notwithstanding that,
+Target Code does not include data in any format that is used as a compiler
+intermediate representation, or used for producing a compiler intermediate
+representation. In particular, the LLVM intermediate representation that
+Stainless emits, whether as text or in any other form, is not Target Code.
+
+The "Compilation Process" transforms code entirely represented in
+non-intermediate languages designed for human-written code into Target
+Code. Thus, for example, use of source code generators and preprocessors
+need not be considered part of the Compilation Process, since the
+Compilation Process can be understood as starting with the output of the
+generators or preprocessors.
+
+A Compilation Process is "Eligible" if it is done using Stainless, alone or
+with other GPL-compatible software, or if it is done without using any work
+based on Stainless. For example, using non-GPL-compatible software to
+optimize any Stainless or LLVM intermediate representations would not
+qualify as an Eligible Compilation Process.
+
+
+1. Grant of Additional Permission.
+
+You have permission to propagate a work of Target Code formed by combining
+the Runtime Library with Independent Modules, even if such propagation would
+otherwise violate the terms of GPLv3, provided that all Target Code was
+generated by Eligible Compilation Processes. You may then convey such a
+combination under terms of your choice, consistent with the licensing of the
+Independent Modules.
+
+
+2. No Weakening of Stainless Copyleft.
+
+The availability of this Exception does not imply any general presumption
+that third-party software is unaffected by the copyleft requirements of the
+license of Stainless.
+
+
+3. In practice.
+
+This section is a summary and grants nothing beyond the above.
+
+Compiling your own program with Stainless does not place that program under
+the GNU General Public License. You may license what you write however you
+wish, and distribute it in binary form, even though the Stainless runtime
+and standard library are compiled into it.
+
+Modifying Stainless itself, or modifying the Runtime Library, and
+distributing the result to others does carry the full obligations of the
+GNU General Public License, version 3.
