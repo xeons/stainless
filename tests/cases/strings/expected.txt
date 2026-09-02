@@ -1,0 +1,12 @@
+Hello, World!
+bytes=5 points=5
+utf8=12 points=10 utf16=10
+eq=1 ne=1
+cstring=World
+Wor
+empty=1
+Hello, Ada
+Ada
+~Person Ada
+after scope
+0,1,2,

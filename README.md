@@ -48,7 +48,8 @@ runtime is [one 80-line C file](runtime/stainless_rt.c).
 
 **4. C/C++ ABI compatible.** A Stainless `struct` *is* a C struct, byte for byte.
 `extern "C"` calls into C and `export "C"` exposes functions back, with no
-bindings, marshalling, or generated glue.
+bindings, marshalling, or generated glue. Even `String` hands its bytes to C
+without a copy.
 
 ---
 
@@ -97,6 +98,42 @@ export "C" Point sl_scale(Point p, double factor) {
 }
 ```
 
+### Text
+
+One string type. `String` is immutable, reference counted, and always UTF-8 —
+no `AnsiString`/`UnicodeString` split, and no implicit transcoding anywhere.
+
+```csharp
+import Standard.Console;
+
+String greeting = "Hello";
+String message  = greeting + ", " + "Stainless" + "!";
+
+Console.WriteLine(message);
+Console.WriteLine(Text.FromInteger(message.ByteLength()));
+
+bool matched = message == "Hello, Stainless!";   // compares by value
+```
+
+The bytes live inline, right after the object header, and are always NUL
+terminated. So length is O(1), and handing text to C copies nothing:
+
+```csharp
+extern "C" int puts(byte* text);
+
+puts(message.ToPointer());     // zero copy
+puts("literals too");          // and a literal never allocates at all
+```
+
+A literal is emitted as a static constant with an *immortal* reference count,
+which `retain` and `release` skip — so `"Hello"` costs nothing at run time.
+Wide platform APIs get an explicit conversion, never an implicit one:
+
+```csharp
+var wide = message.ToUtf16();                  // owned, NUL terminated, ARC'd
+MessageBoxW(0, wide.ToPointer(), null, 0);
+```
+
 | | `struct` | `class` |
 |---|---|---|
 | Storage | value, inline | heap |
@@ -122,7 +159,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 19 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 23 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -216,15 +253,23 @@ Everything below is covered by [the test suite](tests/cases).
 - `if` / `while` / `for` / `break` / `continue` / `return`, recursion
 - Full operator set with C# precedence, short-circuit `&&` and `||`
 - `var`, `const`, explicit locals, compound assignment
+- `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
+  `ToPointer()`, `ToUtf16()`, and literals that never allocate
+- `Standard.Text` (imported everywhere) and `Standard.Console`
 - Raw pointers, `sizeof`, casts, `new`, `this`
+- Integer literals that fit convert implicitly, as in C#
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
 
 Being straight about the edges, roughly in the order they are worth adding:
 
-- **No arrays, no `string` type.** A string literal is a `byte*` to static
-  UTF-8. Indexing works on pointers only.
+- **No arrays.** Indexing works on pointers only. `String` covers text, but
+  there is no `T[]` yet, and no `StringBuilder` — repeated concatenation is
+  O(n^2).
+- **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
+  formatting; `Substring` counts bytes, not characters, so it can slice a
+  multi-byte character in half.
 - **No flow narrowing for `C?`.** Optionals can be stored, compared to `null`,
   and unwrapped with an explicit cast, but `if (x != null)` does not yet make
   `x` usable as non-optional. `weak` has the same gap, though the runtime side

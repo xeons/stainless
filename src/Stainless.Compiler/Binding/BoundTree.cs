@@ -30,6 +30,13 @@ public enum ConversionKind
     BoolToInteger,
     NullToReference,    // null literal adopting an optional/pointer type
     ReferenceToOptional, // C -> C?
+
+    /// <summary>
+    /// A string literal used where a <c>byte*</c> is expected. Safe only for a
+    /// literal, whose bytes are static and NUL-terminated; a String held in a
+    /// variable must go through ToPointer(), where the lifetime is visible.
+    /// </summary>
+    StringLiteralToPointer,
 }
 
 // ---------------------------------------------------------------- expressions

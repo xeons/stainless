@@ -23,6 +23,7 @@ public sealed class BoundProgram
 /// </summary>
 public sealed class Binder(DiagnosticBag diagnostics)
 {
+    private readonly Builtins _builtins = new();
     private readonly Dictionary<string, ModuleSymbol> _modules = new(StringComparer.Ordinal);
     private readonly List<(ModuleSymbol Module, CompilationUnitSyntax Unit)> _units = [];
     private readonly List<BoundFunction> _functions = [];
@@ -36,6 +37,8 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
     public BoundProgram Bind(IReadOnlyList<CompilationUnitSyntax> units)
     {
+        _builtins.RegisterInto(_modules);
+
         DeclareModules(units);      // pass 1: every module exists
         DeclareTypes();             // pass 2: every type name exists
         ResolveImports();           // pass 3: every module can see its imports
@@ -77,6 +80,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
             }
 
             var module = new ModuleSymbol(name) { Syntax = unit };
+            _builtins.AutoImportInto(module);
             _modules[name] = module;
             _units.Add((module, unit));
         }
@@ -115,7 +119,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
                     };
 
                 module.Types[declaration.Name] = type;
-                if (type is ClassTypeSymbol classType) _classes.Add(classType);
+                if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
             }
         }
     }
@@ -715,7 +719,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
         TokenKind.TrueKeyword or TokenKind.FalseKeyword =>
             new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Bool, syntax.Value),
         TokenKind.StringLiteral => new BoundStringLiteral(
-            syntax.Span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), (string)syntax.Value!),
+            syntax.Span, _builtins.String, (string)syntax.Value!),
         TokenKind.NullKeyword => new BoundNullLiteral(syntax.Span, NullType.Instance),
         _ => new BoundErrorExpression(syntax.Span),
     };
@@ -893,6 +897,37 @@ public sealed class Binder(DiagnosticBag diagnostics)
             right.Type is PrimitiveTypeSymbol { IsInteger: true })
         {
             return new BoundBinary(span, left.Type, left, op, PromoteToInt(right));
+        }
+
+        // Strings compare by value and concatenate with '+'. Both lower to a
+        // runtime call, so neither is a special case anywhere downstream.
+        if (_builtins.IsString(left.Type) && _builtins.IsString(right.Type))
+        {
+            if (op == BoundBinaryOp.Add)
+                return new BoundCall(span, _builtins.StringConcat, receiver: null, [left, right]);
+
+            if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual)
+            {
+                var comparison = new BoundCall(
+                    span, _builtins.StringEquals, receiver: null, [left, right]);
+
+                return op == BoundBinaryOp.Equal
+                    ? comparison
+                    : new BoundUnary(span, PrimitiveTypeSymbol.Bool, BoundUnaryOp.LogicalNot, comparison);
+            }
+
+            diagnostics.Error("SL0291", span,
+                $"operator '{token.FixedText()}' cannot be applied to strings");
+            return new BoundErrorExpression(span);
+        }
+
+        if (_builtins.IsString(left.Type) != _builtins.IsString(right.Type))
+        {
+            var other = _builtins.IsString(left.Type) ? right.Type : left.Type;
+            diagnostics.Error("SL0292", span,
+                $"cannot apply '{token.FixedText()}' to 'String' and '{other.Name}'; " +
+                "convert it first, for example with Standard.Text.FromInteger");
+            return new BoundErrorExpression(span);
         }
 
         // Reference and pointer equality.
@@ -1403,6 +1438,20 @@ public sealed class Binder(DiagnosticBag diagnostics)
     /// <summary>C's default argument promotions: float widens to double, small ints to int.</summary>
     private BoundExpression PromoteVariadic(BoundExpression argument)
     {
+        // A C variadic function has no declared parameter type to convert
+        // against, so the String-to-bytes decision has to be made here instead.
+        if (argument is BoundStringLiteral)
+            return new BoundConversion(argument.Span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte),
+                argument, ConversionKind.StringLiteralToPointer);
+
+        if (_builtins.IsString(argument.Type))
+        {
+            diagnostics.Error("SL0294", argument.Span,
+                "pass ToPointer() when giving a String to a C variadic function such as printf; " +
+                "the String itself is an object, not a byte pointer");
+            return new BoundErrorExpression(argument.Span);
+        }
+
         if (argument.Type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Float })
             return new BoundConversion(
                 argument.Span, PrimitiveTypeSymbol.Double, argument, ConversionKind.FloatResize);
@@ -1413,6 +1462,47 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 argument.Span, PrimitiveTypeSymbol.Int, argument, ConversionKind.IntegerWiden);
 
         return argument;
+    }
+
+    /// <summary>
+    /// Explains why one argument does not fit, preferring the specific advice
+    /// over the generic type mismatch when there is some.
+    /// </summary>
+    private void ReportArgumentMismatch(
+        string name, int index, BoundExpression argument, TypeSymbol target)
+    {
+        if (_builtins.IsString(argument.Type) && IsBytePointer(target))
+        {
+            diagnostics.Error("SL0293", argument.Span,
+                $"argument {index + 1} of '{name}' expects 'byte*'; a String does not convert to " +
+                "one on its own. Call ToPointer() to hand its bytes to C, and keep the String " +
+                "alive for as long as C holds the pointer");
+            return;
+        }
+
+        diagnostics.Error("SL0262", argument.Span,
+            $"argument {index + 1} of '{name}' expects '{target.Name}', " +
+            $"but '{argument.Type.Name}' was given");
+    }
+
+    /// <summary>
+    /// Whether <paramref name="argument"/> can be passed where
+    /// <paramref name="target"/> is expected. This is expression-aware, not just
+    /// type-aware: a string literal converts to <c>byte*</c> and a String
+    /// variable does not, and overload resolution has to agree with
+    /// <see cref="BindConversion"/> about that.
+    /// </summary>
+    private bool IsImplicitlyConvertible(BoundExpression argument, TypeSymbol target)
+    {
+        if (IsBytePointer(target))
+        {
+            if (argument is BoundStringLiteral) return true;
+            if (_builtins.IsString(argument.Type)) return false;
+        }
+
+        if (ConstantFits(argument, target)) return true;
+
+        return ClassifyConversion(argument.Type, target, explicitCast: false) is not null;
     }
 
     private FunctionSymbol? ResolveOverload(
@@ -1426,7 +1516,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
             var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
             for (int i = 0; i < parameters.Count; i++)
-                if (ClassifyConversion(arguments[i].Type, parameters[i].Type, explicitCast: false) is null)
+                if (!IsImplicitlyConvertible(arguments[i], parameters[i].Type))
                     return false;
 
             return true;
@@ -1451,10 +1541,8 @@ public sealed class Binder(DiagnosticBag diagnostics)
                             $"argument{(expected == 1 ? "" : "s")}, but {arguments.Count} were given");
                     else
                         for (int i = 0; i < parameters.Count; i++)
-                            if (ClassifyConversion(arguments[i].Type, parameters[i].Type, false) is null)
-                                diagnostics.Error("SL0262", arguments[i].Span,
-                                    $"argument {i + 1} of '{name}' expects '{parameters[i].Type.Name}', " +
-                                    $"but '{arguments[i].Type.Name}' was given");
+                            if (!IsImplicitlyConvertible(arguments[i], parameters[i].Type))
+                                ReportArgumentMismatch(name, i, arguments[i], parameters[i].Type);
                     return null;
                 }
 
@@ -1484,6 +1572,25 @@ public sealed class Binder(DiagnosticBag diagnostics)
     {
         if (expression.Type.IsError() || target.IsError()) return expression;
 
+        // A string literal may be handed straight to C: its bytes are static and
+        // NUL-terminated, so there is no lifetime to get wrong. A String held in
+        // a variable is a different matter, and must go through ToPointer().
+        if (expression is BoundStringLiteral literal && IsBytePointer(target))
+            return new BoundConversion(span, target, literal, ConversionKind.StringLiteralToPointer);
+
+        // A literal that fits simply adopts the target type; there is nothing to
+        // convert at run time.
+        if (ConstantFits(expression, target))
+            return new BoundLiteral(span, target, ((BoundLiteral)expression).Value);
+
+        if (_builtins.IsString(expression.Type) && IsBytePointer(target))
+        {
+            diagnostics.Error("SL0293", span,
+                "a String does not convert to 'byte*' on its own; call ToPointer() to hand its " +
+                "bytes to C, and keep the String alive for as long as C holds the pointer");
+            return new BoundErrorExpression(span);
+        }
+
         var kind = ClassifyConversion(expression.Type, target, explicitCast: false);
         if (kind is null)
         {
@@ -1507,6 +1614,29 @@ public sealed class Binder(DiagnosticBag diagnostics)
     /// Returns how to get from <paramref name="from"/> to <paramref name="to"/>,
     /// or null when no such conversion exists.
     /// </summary>
+    /// <summary>
+    /// Whether an integer literal fits the target type exactly, as in C#, where
+    /// <c>byte b = 200;</c> and <c>nuint n = 5;</c> need no cast because the
+    /// compiler can see the value. Only a literal qualifies: anything computed
+    /// still needs an explicit cast.
+    /// </summary>
+    private static bool ConstantFits(BoundExpression expression, TypeSymbol target)
+    {
+        if (expression is not BoundLiteral { Value: ulong value }) return false;
+        if (expression.Type is not PrimitiveTypeSymbol { IsInteger: true }) return false;
+        if (target is not PrimitiveTypeSymbol { IsInteger: true } integer) return false;
+
+        ulong maximum = integer.Size >= 8
+            ? (integer.IsSigned ? long.MaxValue : ulong.MaxValue)
+            : (1UL << (integer.Bits - (integer.IsSigned ? 1 : 0))) - 1;
+
+        return value <= maximum;
+    }
+
+    /// <summary>True for <c>byte*</c>, the shape C expects for text.</summary>
+    private static bool IsBytePointer(TypeSymbol type) =>
+        type is PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } };
+
     private ConversionKind? ClassifyConversion(TypeSymbol from, TypeSymbol to, bool explicitCast)
     {
         if (from.Equals(to)) return ConversionKind.Identity;

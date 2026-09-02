@@ -43,10 +43,17 @@ public sealed class FunctionSymbol
     /// <summary>Where the declaration came from, for diagnostics.</summary>
     public required Source.SourceSpan Span { get; init; }
 
+    /// <summary>
+    /// For built-ins: the exact symbol implemented in the runtime. Set, it
+    /// bypasses mangling entirely, so <c>String.ByteLength</c> lowers straight
+    /// to <c>sl_string_byte_length</c>.
+    /// </summary>
+    public string? RuntimeSymbol { get; init; }
+
     private string? _mangledName;
 
     /// <summary>The symbol name the linker sees. See docs/abi.md.</summary>
-    public string MangledName => _mangledName ??= Mangler.Mangle(this);
+    public string MangledName => _mangledName ??= RuntimeSymbol ?? Mangler.Mangle(this);
 
     public bool HasBody => Body is not null;
 

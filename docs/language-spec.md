@@ -27,8 +27,8 @@ of a collector, a linker instead of an assembly loader.
 ```csharp
 module App.Math;          // optional; inferred from path if omitted
 
-import Std.IO;            // brings Std.IO's public members into scope
-import Std.IO as Term;    // aliased
+import Standard.Console;              // brings its public members into scope
+import Standard.Console as Terminal;  // aliased
 ```
 
 A module is exactly one source file. A file with no `module` declaration takes
@@ -121,7 +121,108 @@ a count of 1.
 | `C?` | optional strong reference, may be null |
 | `weak C?` | non-owning reference; becomes null when the object dies |
 
-## 3. Functions and members
+## 3. Text
+
+Stainless has exactly one string type. `String` is immutable, reference
+counted, and always UTF-8.
+
+There is deliberately no second encoding-flavoured string type. The
+`AnsiString`/`UnicodeString` split that Delphi and Free Pascal carry exists to
+serve Win32's parallel `A` and `W` APIs, and it charges for that with implicit
+conversions that narrow lossily and transcode invisibly. Stainless keeps one
+representation and makes every crossing explicit instead.
+
+```csharp
+String greeting = "Hello";          // a literal is a String
+String subject  = "Stainless";
+
+String message = greeting + ", " + subject + "!";
+bool   matched = message == "Hello, Stainless!";   // compares by value, not identity
+```
+
+### 3.1 Representation
+
+A `String` is an ordinary reference counted object whose bytes live inline,
+immediately after the object header, with a trailing NUL:
+
+```
+offset 0   strong      : nuint          the usual ARC header
+offset 8   weak        : nuint
+offset 16  type        : TypeInfo*
+offset 24  byteLength  : nuint          not counting the NUL
+offset 32  bytes       : byte[n + 1]    UTF-8, NUL terminated
+```
+
+Three things follow from that shape:
+
+- **Length is O(1).** Nothing ever scans for a terminator.
+- **Reaching C copies nothing.** `ToPointer()` is `this + 32`.
+- **Literals never allocate.** The compiler emits them as static constants with
+  an *immortal* reference count, which `retain` and `release` skip entirely.
+
+Because a `String` owns a reference count, it cannot live in a `struct` —
+structs are copied as raw bytes, which is what keeps them C-compatible.
+
+### 3.2 Members
+
+| Member | Result | Cost |
+|---|---|---|
+| `a + b` | `String` | allocates and copies |
+| `a == b`, `a != b` | `bool` | compares bytes, not identity |
+| `ByteLength()` | `nuint` | O(1) |
+| `CodePointCount()` | `nuint` | O(n) |
+| `IsEmpty()` | `bool` | O(1) |
+| `Substring(start, length)` | `String` | byte offsets, clamped to the end |
+| `ToPointer()` | `byte*` | O(1), no copy |
+| `ToUtf16()` | `Utf16String` | allocates and transcodes |
+
+`Standard.Text` is imported into every module automatically, since a literal
+produces a `String` whether the program asked for one or not. It also provides
+`FromInteger`, `FromDouble`, `FromBytes` and `FromNullTerminated`.
+
+`Standard.Console` is *not* automatic and provides `Write`, `WriteLine` and
+`WriteError`.
+
+### 3.3 Reaching C
+
+`ToPointer()` returns the interior `byte*`, valid for as long as the `String`
+is alive:
+
+```csharp
+extern "C" int puts(byte* text);
+
+String name = "Ada" + " Lovelace";
+puts(name.ToPointer());
+```
+
+A `String` never converts to `byte*` implicitly, because the conversion hands
+out a pointer whose lifetime the compiler can no longer see. A *literal* is the
+exception, and passes straight through, since its bytes are static:
+
+```csharp
+puts("this is fine");                       // literal: static bytes
+printf("%s\n", name.ToPointer());   // variable: say so explicitly
+```
+
+Two things worth knowing: a `String` may contain interior NULs, in which case C
+sees a truncated view; and `Substring` counts bytes, so slicing mid-character
+is possible.
+
+### 3.4 UTF-16 for platform APIs
+
+`Utf16String` exists so that wide platform APIs can be called. Nothing converts
+to it implicitly.
+
+```csharp
+extern "C" int MessageBoxW(nuint window, ushort* text, ushort* caption, uint kind);
+
+var wide = message.ToUtf16();       // owned, NUL terminated, released by ARC
+MessageBoxW(0, wide.ToPointer(), null, 0);
+```
+
+It offers `UnitCount()` and `ToPointer()`, which returns `ushort*`.
+
+## 4. Functions and members
 
 ```csharp
 public int Add(int a, int b) { return a + b; }
@@ -132,7 +233,7 @@ void NoReturn() { }
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
 
-## 4. C interoperability
+## 5. C interoperability
 
 ```csharp
 extern "C" int puts(byte* s);
@@ -151,7 +252,7 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
-## 5. Statements and expressions
+## 6. Statements and expressions
 
 ```csharp
 int x = 10;             // explicitly typed local
@@ -172,5 +273,8 @@ There are no implicit narrowing conversions. Widening integer conversions and
 `int` -> `float`/`double` are implicit, as in C#; everything else needs a
 cast: `(byte)x`.
 
-A string literal has type `byte*` and points at NUL-terminated UTF-8 storage
-with static lifetime, so it passes straight to a C function.
+An integer literal converts implicitly to any integer type that can hold its
+value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
+anything computed still does.
+
+A string literal has type `String`; see section 3.

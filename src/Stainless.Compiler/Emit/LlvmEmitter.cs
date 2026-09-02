@@ -28,7 +28,8 @@ public sealed class LlvmEmitter
 {
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
-    private readonly Dictionary<string, string> _stringLiterals = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _byteConstants = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _stringObjects = new(StringComparer.Ordinal);
     private readonly Dictionary<LocalSymbol, string> _slots = [];
     private readonly Dictionary<ParameterSymbol, string> _parameterSlots = [];
 
@@ -87,22 +88,15 @@ public sealed class LlvmEmitter
             .OfType<StructTypeSymbol>()
             .ToList();
 
-        var classes = program.Classes;
-        if (structs.Count == 0 && classes.Count == 0) return;
-
         foreach (var structType in structs)
         {
             string fields = string.Join(", ", structType.Fields.Select(f => LlvmTypeOf(f.Type)));
             _module.AppendLine($"{StructName(structType)} = type {{ {(fields.Length == 0 ? "i8" : fields)} }}");
         }
 
-        // The header a class instance is prefixed with: strong, weak, TypeInfo*.
-        if (classes.Count > 0)
-        {
-            _module.AppendLine("%SlObjectHeader = type { i64, i64, ptr }");
-            _module.AppendLine("%SlTypeInfo = type { i64, ptr, ptr }");
-        }
-
+        // The header every reference type is prefixed with: strong, weak, TypeInfo*.
+        _module.AppendLine("%SlObjectHeader = type { i64, i64, ptr }");
+        _module.AppendLine("%SlTypeInfo = type { i64, ptr, ptr }");
         _module.AppendLine();
     }
 
@@ -114,6 +108,8 @@ public sealed class LlvmEmitter
         _module.AppendLine("declare void @sl_weak_retain(ptr)");
         _module.AppendLine("declare void @sl_weak_release(ptr)");
         _module.AppendLine("declare ptr @sl_weak_load(ptr)");
+        _module.AppendLine("@sl_string_type_info = external constant %SlTypeInfo");
+        _module.AppendLine("@sl_utf16_string_type_info = external constant %SlTypeInfo");
         _module.AppendLine("declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
         _module.AppendLine();
     }
@@ -149,7 +145,7 @@ public sealed class LlvmEmitter
     {
         foreach (var classType in program.Classes)
         {
-            string nameConstant = InternString(classType.QualifiedName);
+            string nameConstant = InternBytes(classType.QualifiedName);
             _module.AppendLine(
                 $"@{Mangler.TypeInfoSymbol(classType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, ptr {nameConstant} }}");
@@ -160,34 +156,69 @@ public sealed class LlvmEmitter
 
     private void StringConstants()
     {
-        if (_stringLiterals.Count == 0) return;
+        if (_byteConstants.Count == 0 && _stringObjects.Count == 0) return;
 
         _module.AppendLine();
-        foreach (var (text, name) in _stringLiterals)
+
+        foreach (var (text, name) in _byteConstants)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
-            var escaped = new StringBuilder();
-            foreach (byte b in bytes)
-            {
-                // LLVM string constants take printable ASCII literally and everything
-                // else as \XX, with backslash and quote always escaped.
-                if (b is >= 0x20 and < 0x7F && b != (byte)'"' && b != (byte)'\\')
-                    escaped.Append((char)b);
-                else
-                    escaped.Append('\\').Append(b.ToString("X2", CultureInfo.InvariantCulture));
-            }
-            escaped.Append("\\00");
+            _module.AppendLine(
+                $"{name} = private unnamed_addr constant " +
+                $"[{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\"");
+        }
+
+        // A string literal is a complete String object in static storage, laid
+        // out exactly as sl_string_new would build one on the heap. Its strong
+        // count is the immortal sentinel, so retain and release skip it and the
+        // literal costs no allocation and no reference traffic at run time.
+        foreach (var (text, name) in _stringObjects)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            string layout = $"{{ i64, i64, ptr, i64, [{bytes.Length + 1} x i8] }}";
 
             _module.AppendLine(
-                $"{name} = private unnamed_addr constant [{bytes.Length + 1} x i8] c\"{escaped}\"");
+                $"{name} = private unnamed_addr constant {layout} " +
+                $"{{ i64 {ImmortalRefCount}, i64 {ImmortalRefCount}, ptr @sl_string_type_info, " +
+                $"i64 {bytes.Length}, [{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\" }}, align 8");
         }
     }
 
-    private string InternString(string text)
+    /// <summary>Matches SL_IMMORTAL in the runtime: a count that is never touched.</summary>
+    private const string ImmortalRefCount = "-1";
+
+    /// <summary>
+    /// LLVM takes printable ASCII literally and everything else as \XX, with
+    /// the quote and backslash always escaped. A trailing NUL is always added.
+    /// </summary>
+    private static string EscapeBytes(byte[] bytes)
     {
-        if (_stringLiterals.TryGetValue(text, out var existing)) return existing;
-        string name = $"@.str.{_stringLiterals.Count}";
-        _stringLiterals[text] = name;
+        var escaped = new StringBuilder();
+        foreach (byte b in bytes)
+        {
+            if (b is >= 0x20 and < 0x7F && b != (byte)'"' && b != (byte)'\\')
+                escaped.Append((char)b);
+            else
+                escaped.Append('\\').Append(b.ToString("X2", CultureInfo.InvariantCulture));
+        }
+        return escaped.Append("\\00").ToString();
+    }
+
+    /// <summary>A bare NUL-terminated byte array, for C strings and TypeInfo names.</summary>
+    private string InternBytes(string text)
+    {
+        if (_byteConstants.TryGetValue(text, out var existing)) return existing;
+        string name = $"@.bytes.{_byteConstants.Count}";
+        _byteConstants[text] = name;
+        return name;
+    }
+
+    /// <summary>A static String object that a String-typed expression can refer to.</summary>
+    private string InternStringObject(string text)
+    {
+        if (_stringObjects.TryGetValue(text, out var existing)) return existing;
+        string name = $"@.strobj.{_stringObjects.Count}";
+        _stringObjects[text] = name;
         return name;
     }
 
@@ -733,7 +764,8 @@ public sealed class LlvmEmitter
         switch (expression)
         {
             case BoundLiteral literal: return EmitLiteral(literal);
-            case BoundStringLiteral text: return new Val(InternString(text.Value), "ptr", text.Type);
+            case BoundStringLiteral text:
+                return new Val(InternStringObject(text.Value), "ptr", text.Type);
             case BoundNullLiteral nullLiteral: return new Val("null", "ptr", nullLiteral.Type);
             case BoundConstantAccess constant: return EmitConstant(constant);
             case BoundSizeof sizeofExpression:
@@ -803,7 +835,7 @@ public sealed class LlvmEmitter
             char character => ((int)character).ToString(CultureInfo.InvariantCulture),
             double number => FormatDouble(number),
             ulong number => FormatInteger(number, constant.Type),
-            string s => InternString(s),
+            string s => InternBytes(s),
             _ => "0",
         };
         return new Val(text, llvmType, constant.Type);
@@ -933,6 +965,12 @@ public sealed class LlvmEmitter
             case ConversionKind.PointerCast:
             case ConversionKind.NullToReference:
                 return new Val(operand.Ref, to, conversion.Type);
+
+            case ConversionKind.StringLiteralToPointer:
+                // Point at a plain byte array rather than into the object, so no
+                // offset arithmetic is needed and the constant stays shareable.
+                return new Val(
+                    InternBytes(((BoundStringLiteral)conversion.Operand).Value), "ptr", conversion.Type);
 
             case ConversionKind.ReferenceToOptional:
                 // A weak reference must be proven live before it can be used strongly.

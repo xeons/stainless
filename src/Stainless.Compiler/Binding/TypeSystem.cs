@@ -180,6 +180,13 @@ public sealed class StructTypeSymbol : NamedTypeSymbol
 
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
+    /// <summary>
+    /// True for a class the runtime implements, such as <c>String</c>. The
+    /// compiler emits no TypeInfo or destroy hook for these, because the
+    /// runtime already defines them.
+    /// </summary>
+    public bool IsIntrinsic { get; init; }
+
     /// <summary>strong count, weak count, TypeInfo pointer. See docs/abi.md.</summary>
     public const int HeaderSize = 24;
 

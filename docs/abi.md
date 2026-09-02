@@ -40,6 +40,34 @@ Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in
 ownership.
 
+### 2.1 Immortal objects
+
+A strong count of `SIZE_MAX` marks an object the compiler placed in static
+storage. `sl_retain` and `sl_release` return immediately for such objects, so a
+statically allocated instance costs neither an allocation nor any reference
+traffic. String literals are emitted this way.
+
+### 2.2 String layout
+
+`Standard.Text.String` is a reference counted object whose bytes follow the
+header inline, always NUL terminated:
+
+```
+offset 0   strong      : size_t         SIZE_MAX for a literal
+offset 8   weak        : size_t
+offset 16  type        : TypeInfo*      &sl_string_type_info
+offset 24  byteLength  : size_t         not counting the NUL
+offset 32  bytes       : uint8_t[n + 1] UTF-8
+```
+
+The trailing NUL is what makes `ToPointer()` free rather than a copy: the
+pointer it returns is `object + 32`, which is a valid `const char *` for any C
+function that stops at a NUL. `Utf16String` has the same shape with
+`uint16_t` units.
+
+The compiler emits no `TypeInfo` or destroy hook for these two types; the
+runtime defines `sl_string_type_info` and `sl_utf16_string_type_info` itself.
+
 ## 3. Calling convention
 
 | Declaration | Symbol name | Convention |
