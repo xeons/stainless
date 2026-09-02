@@ -1,8 +1,8 @@
 // samples/shop/src/Shop/Pricing.sl
 //
-// This file IS the module `Shop.Pricing` -- one file, one module, always.
-// The name below is optional here: because the build passes `src` as the root,
-// the path src/Shop/Pricing.sl would have inferred `Shop.Pricing` anyway.
+// This file joins the module `Shop.Pricing`. The name is stated here, never
+// inferred from the path -- so moving this file changes nothing, and several
+// files may name the same module and merge into it.
 module Shop.Pricing;
 
 // `public` is the only thing that controls what other modules can see.

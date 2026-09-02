@@ -231,7 +231,6 @@ internal static class Program
         {
             SourcePaths = sources.Sources,
             NativeInputs = sources.NativeInputs,
-            InferredModules = sources.InferredModules,
             OutputPath = output,
             IntermediateDirectory = objectDirectory,
             OptimizationLevel = optimization,

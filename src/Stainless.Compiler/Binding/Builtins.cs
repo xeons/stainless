@@ -139,15 +139,15 @@ public sealed class Builtins
     }
 
     /// <summary>
-    /// Standard.Text is visible everywhere without an import, because string
+    /// Standard.Text is visible in every file without an import, because string
     /// literals produce a <c>String</c> whether the program asked for one or not.
     /// Standard.Console is not: printing is a choice.
     /// </summary>
-    public void AutoImportInto(ModuleSymbol module)
+    public void AutoImportInto(FileScope scope)
     {
-        if (module == Text || module == Console) return;
-        module.Imports[TextModuleName] = Text;
-        module.Imports["Text"] = Text;
+        if (scope.Module == Text || scope.Module == Console) return;
+        scope.Imports[TextModuleName] = Text;
+        scope.Imports["Text"] = Text;
     }
 
     private FunctionSymbol Method(

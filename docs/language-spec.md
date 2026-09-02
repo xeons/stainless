@@ -24,51 +24,72 @@ of a collector, a linker instead of an assembly loader.
 
 ## 1. Modules
 
-### 1.1 One file is one module
+Modules work like C# namespaces, with one addition: an unmarked declaration is
+private to its module, so a module is also the unit of encapsulation.
 
-Always. There is no way to spread a module across files, and no way to put two
-modules in one file. That single rule is what lets header files go away: a
-module's public surface is computed from its own source, so nothing has to be
-declared twice.
+### 1.1 Every file names its module
 
 ```csharp
 module Shop.Catalog;
 ```
 
-The declaration is optional. Without it, the name comes from the file's path
-below the **package root** — the directory named on the command line:
+This is required — a file that does not say which module it belongs to is an
+error. The name is never inferred from the file's path:
 
 ```
-stainless build src
-
-  src/Program.sl              ->  Program
-  src/Shop/Pricing.sl         ->  Shop.Pricing
-  src/Shop/Deep/Helper.sl     ->  Shop.Deep.Helper
+error[SL0332]: this file does not say which module it belongs to; start it with
+a declaration such as 'module App.Thing;'
 ```
 
-The file name is the last segment, since the file *is* the module. A file named
-directly on the command line has no root, so it takes just its own name.
+The compiler never looks at where a file sits. Folders are a convention for
+people, so moving a file cannot change what its code means, and the same
+sources compile identically however the build is invoked.
 
-> Dots do not nest. `Shop.Pricing` and `Shop` are unrelated names that happen to
-> share a prefix; importing `Shop` would not reach `Shop.Pricing`, and there is
+> Dots do not nest. `Shop.Catalog` and `Shop` are unrelated names that happen to
+> share a prefix; importing `Shop` would not reach `Shop.Catalog`, and there is
 > no such thing as a parent module.
 
-### 1.2 `public` is the whole of visibility
+### 1.2 A module may span files
 
-A declaration is private to its module unless marked `public`:
+Several files may name the same module and merge into it:
 
 ```csharp
-public struct Money { public long Cents; }   // other modules may use this
-public Money Cents(long amount) { ... }      // and this
+// Catalog/Books.sl
+module Shop.Catalog;
 
-long Doubled(long value) { ... }             // this module only
+public class Book { ... }
+String Decorate(String text) { ... }        // not public
+
+// Catalog/Subscriptions.sl
+module Shop.Catalog;
+
+public class Subscription {
+    public String Label() { return Decorate(name); }   // sees it; same module
+}
 ```
 
-Field and method visibility works the same way, and `public` on a member is
-what lets another module touch it. There is nothing else — no `internal`, no
-friend declarations, no export lists.
+Nothing is imported between them, and order does not matter: they are one
+module that happens to be written in two places.
 
-### 1.3 `import` adds names; it never grants access
+This does not compromise the no-header property, which comes from resolving
+every name in the program before checking any body — not from any one-file
+rule.
+
+### 1.3 `public` is the whole of visibility
+
+| Declaration | Visible to |
+|---|---|
+| `public class Book` | its module, and anything that can name the module |
+| `class Book` | its module only, across all of the module's files |
+
+That second row is C#'s `internal`, with the module playing the part of the
+assembly. There is nothing else — no friend declarations, no export lists, and
+no file-level privacy (C# only gained `file` in version 11).
+
+Members follow the same rule: a field or method needs `public` for another
+module to touch it.
+
+### 1.4 `import` adds names; it never grants access
 
 ```csharp
 import Shop.Pricing;
@@ -93,7 +114,11 @@ var boxed = new Shop.Bundles.Bundle("Starter set", 2);
 An import is therefore a convenience for shortening names, not a permission
 check. What you may touch is decided entirely by `public`.
 
-### 1.4 Aliases
+**Imports are per file, not per module**, exactly as `using` is in C#. Two files
+of one module may import different things, and adding an import to one of them
+cannot quietly change how the other resolves a name.
+
+### 1.5 Aliases
 
 ```csharp
 import Shop.Pricing as Money;
@@ -105,7 +130,7 @@ An alias *adds* a way to name the module. It does not remove the others, so
 bare names and the full name still work after aliasing — unlike C#, where
 `using X = A.B;` replaces unqualified access rather than adding to it.
 
-### 1.5 Ambiguity
+### 1.6 Ambiguity
 
 If two imported modules both export a type called `Buffer`, using it bare is an
 error rather than a silent pick:
@@ -117,14 +142,14 @@ qualify it with its module name
 
 Qualify it, or alias one of the modules.
 
-### 1.6 What is automatic
+### 1.7 What is automatic
 
-`Standard.Text` is imported into every module without being asked for, because
-a string literal produces a `String` whether the program mentioned one or not.
+`Standard.Text` is imported into every file without being asked for, because a
+string literal produces a `String` whether the program mentioned one or not.
 That is the only automatic import: `Standard.Console` and everything else must
 be requested.
 
-### 1.7 Order never matters
+### 1.8 Order never matters
 
 Not within a file, and not across them. The compiler resolves every name in the
 program before checking any body, so these are all fine:
@@ -138,8 +163,7 @@ int Later() { return 0; }
 ```
 
 A module may be compiled before the module it depends on, and files may be
-given to the compiler in any order. Two files declaring the same module name is
-an error; a module importing itself is a warning.
+given to the compiler in any order.
 
 ## 2. Types
 

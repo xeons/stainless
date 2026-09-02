@@ -14,13 +14,6 @@ public sealed record CompilationOptions
     /// platform C ABI, these need no wrapper, binding or marshalling layer.
     /// </summary>
     public IReadOnlyList<string> NativeInputs { get; init; } = [];
-
-    /// <summary>
-    /// Module names derived from where each file sits, keyed by full path. A
-    /// file that declares its own <c>module</c> ignores this.
-    /// </summary>
-    public IReadOnlyDictionary<string, string> InferredModules { get; init; } =
-        new Dictionary<string, string>();
     public string? OutputPath { get; init; }
     public string? IntermediateDirectory { get; init; }
     public int OptimizationLevel { get; init; } = 2;
@@ -53,9 +46,6 @@ public sealed record SourceSet
     public required IReadOnlyList<string> Sources { get; init; }
     public required IReadOnlyList<string> NativeInputs { get; init; }
 
-    /// <summary>Module names derived from each file's path, keyed by full path.</summary>
-    public required IReadOnlyDictionary<string, string> InferredModules { get; init; }
-
     public required IReadOnlyList<string> Errors { get; init; }
 }
 
@@ -74,20 +64,16 @@ public sealed class Compilation
         NativeExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Expands directories into their .sl files, separates native inputs, and
-    /// derives a module name for each file from where it sits.
+    /// Expands directories into their .sl files and separates native inputs.
     ///
-    /// A directory given on the command line is that file's package root, so
-    /// <c>src/Shop/Catalog.sl</c> under <c>src</c> becomes <c>Shop.Catalog</c>.
-    /// That is what keeps two files called <c>Utils.sl</c> in different folders
-    /// from claiming the same module.
+    /// Where a file sits has no bearing on which module it joins; that is stated
+    /// in the file. Folders are for people, not for the compiler.
     /// </summary>
     public static SourceSet CollectSourceFiles(IEnumerable<string> paths)
     {
         var files = new List<string>();
         var nativeInputs = new List<string>();
         var errors = new List<string>();
-        var inferred = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (string path in paths)
         {
@@ -100,10 +86,8 @@ public sealed class Compilation
 
             if (Directory.Exists(path))
             {
-                string root = Path.GetFullPath(path);
-
                 var all = Directory
-                    .EnumerateFiles(root, "*", SearchOption.AllDirectories)
+                    .EnumerateFiles(Path.GetFullPath(path), "*", SearchOption.AllDirectories)
                     .Select(Path.GetFullPath)
                     .OrderBy(p => p, StringComparer.Ordinal)
                     .ToList();
@@ -116,11 +100,7 @@ public sealed class Compilation
                 if (found.Count == 0)
                     errors.Add($"no {SourceExtension} files were found under '{path}'");
 
-                foreach (string file in found)
-                {
-                    files.Add(file);
-                    if (ModuleNameFor(root, file) is { } name) inferred[file] = name;
-                }
+                files.AddRange(found);
 
                 // C sources sitting beside the Stainless ones belong to the same
                 // program; a directory would otherwise drop them silently.
@@ -128,7 +108,6 @@ public sealed class Compilation
             }
             else if (File.Exists(path))
             {
-                // A file named on its own has no root, so only its own name applies.
                 files.Add(Path.GetFullPath(path));
             }
             else
@@ -144,30 +123,9 @@ public sealed class Compilation
                 .Where(f => !IsBuildArtifact(f))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList(),
-            InferredModules = inferred,
             Errors = errors,
         };
     }
-
-    /// <summary>
-    /// Turns a path below <paramref name="root"/> into a dotted module name, or
-    /// null when a folder is not a usable identifier.
-    /// </summary>
-    private static string? ModuleNameFor(string root, string file)
-    {
-        string relative = Path.GetRelativePath(root, Path.ChangeExtension(file, null));
-        var segments = relative.Split(
-            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
-            StringSplitOptions.RemoveEmptyEntries);
-
-        if (segments.Length == 0 || segments.Any(s => !IsIdentifier(s))) return null;
-        return string.Join('.', segments);
-    }
-
-    private static bool IsIdentifier(string text) =>
-        text.Length > 0 &&
-        (char.IsLetter(text[0]) || text[0] == '_') &&
-        text.All(c => char.IsLetterOrDigit(c) || c == '_');
 
     /// <summary>
     /// True for files a previous build produced. Without this, scanning a directory
@@ -204,8 +162,7 @@ public sealed class Compilation
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- bind --------------------------------------------------------
-        var program = new Binder(diagnostics, requireEntryPoint: !options.Shared,
-            inferredModules: options.InferredModules).Bind(units);
+        var program = new Binder(diagnostics, requireEntryPoint: !options.Shared).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         if (program.EntryPoint is null && !options.EmitIrOnly && !options.Shared)

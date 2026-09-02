@@ -57,6 +57,12 @@ public sealed class FunctionSymbol
     /// </summary>
     public IReadOnlyList<TypeSymbol> TypeArguments { get; init; } = [];
 
+    /// <summary>
+    /// The file this was declared in. A module may span files with different
+    /// imports, so a body must be bound against its own file's view.
+    /// </summary>
+    public FileScope? Scope { get; init; }
+
     private string? _mangledName;
 
     /// <summary>The symbol name the linker sees. See docs/abi.md.</summary>
@@ -92,10 +98,11 @@ public sealed class ConstantSymbol(string name, TypeSymbol type, object? value)
 /// node and a list of parameter names, and no resolved members at all.
 /// </summary>
 public sealed class GenericTypeTemplate(
-    string name, ModuleSymbol module, TypeDeclSyntax declaration)
+    string name, FileScope scope, TypeDeclSyntax declaration)
 {
     public string Name { get; } = name;
-    public ModuleSymbol Module { get; } = module;
+    public FileScope Scope { get; } = scope;
+    public ModuleSymbol Module => Scope.Module;
     public TypeDeclSyntax Declaration { get; } = declaration;
     public IReadOnlyList<string> Parameters => Declaration.TypeParameters;
     public bool IsPublic => Declaration.Modifiers.HasFlag(Modifiers.Public);
@@ -104,10 +111,11 @@ public sealed class GenericTypeTemplate(
 }
 
 public sealed class GenericFunctionTemplate(
-    string name, ModuleSymbol module, FunctionDeclSyntax declaration)
+    string name, FileScope scope, FunctionDeclSyntax declaration)
 {
     public string Name { get; } = name;
-    public ModuleSymbol Module { get; } = module;
+    public FileScope Scope { get; } = scope;
+    public ModuleSymbol Module => Scope.Module;
     public FunctionDeclSyntax Declaration { get; } = declaration;
     public IReadOnlyList<string> Parameters => Declaration.TypeParameters;
     public bool IsPublic => Declaration.Modifiers.HasFlag(Modifiers.Public);
@@ -127,13 +135,26 @@ public sealed class ModuleSymbol(string name)
     public List<FunctionSymbol> Functions { get; } = [];
     public Dictionary<string, ConstantSymbol> Constants { get; } = new(StringComparer.Ordinal);
 
-    /// <summary>Modules whose public members are visible here, keyed by the name used to reach them.</summary>
-    public Dictionary<string, ModuleSymbol> Imports { get; } = new(StringComparer.Ordinal);
-
-    public CompilationUnitSyntax? Syntax { get; set; }
-
     public IEnumerable<FunctionSymbol> FindFunctions(string name) =>
         Functions.Where(f => f.Name == name && f.ContainingType is null);
 
     public override string ToString() => Name;
+}
+
+/// <summary>
+/// One source file's view of the program: the module its declarations join,
+/// plus the imports written in that file.
+///
+/// Imports are per-file rather than per-module, as in C#. A module may be split
+/// across several files, and adding an import to one of them must not quietly
+/// change how a sibling resolves names.
+/// </summary>
+public sealed class FileScope(ModuleSymbol module)
+{
+    public ModuleSymbol Module { get; } = module;
+
+    /// <summary>Modules reachable from this file, keyed by the name used to reach them.</summary>
+    public Dictionary<string, ModuleSymbol> Imports { get; } = new(StringComparer.Ordinal);
+
+    public override string ToString() => Module.Name;
 }

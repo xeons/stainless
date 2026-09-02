@@ -32,18 +32,11 @@ public sealed class BoundProgram
 /// False when building a library, which has no <c>Main</c> and must not be
 /// warned about one.
 /// </param>
-/// <param name="inferredModules">
-/// Module names derived from each file's path, for files that do not declare
-/// one themselves.
-/// </param>
-public sealed class Binder(
-    DiagnosticBag diagnostics,
-    bool requireEntryPoint = true,
-    IReadOnlyDictionary<string, string>? inferredModules = null)
+public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = true)
 {
     private readonly Builtins _builtins = new();
     private readonly Dictionary<string, ModuleSymbol> _modules = new(StringComparer.Ordinal);
-    private readonly List<(ModuleSymbol Module, CompilationUnitSyntax Unit)> _units = [];
+    private readonly List<(FileScope Scope, CompilationUnitSyntax Unit)> _units = [];
     private readonly List<BoundFunction> _functions = [];
     private readonly List<ClassTypeSymbol> _classes = [];
     private readonly List<InterfaceTypeSymbol> _interfaces = [];
@@ -65,11 +58,14 @@ public sealed class Binder(
 
     /// <summary>The type arguments in force while binding inside an instantiation.</summary>
     private Dictionary<string, TypeSymbol> _substitution = new(StringComparer.Ordinal);
-    private readonly Dictionary<NamedTypeSymbol, TypeDeclSyntax> _typeSyntax = [];
+    private readonly Dictionary<NamedTypeSymbol, (TypeDeclSyntax Declaration, FileScope Scope)> _typeSyntax = [];
 
     // Per-function binding state.
     private FunctionSymbol? _currentFunction;
-    private ModuleSymbol? _currentModule;
+
+    /// <summary>The file being bound. Imports are per-file, so this is the unit of lookup.</summary>
+    private FileScope? _currentScope;
+    private ModuleSymbol? _currentModule => _currentScope?.Module;
     private readonly List<Dictionary<string, LocalSymbol>> _scopes = [];
     private int _loopDepth;
 
@@ -123,42 +119,38 @@ public sealed class Binder(
     {
         foreach (var unit in units)
         {
-            string name = unit.ModuleName?.Text ?? InferModuleName(unit.File.Path);
-
-            if (_modules.TryGetValue(name, out var existing))
+            if (unit.ModuleName is null)
             {
-                diagnostics.Error("SL0200", unit.ModuleName?.Span ?? unit.Span,
-                    $"module '{name}' is already declared in {existing.Syntax?.File.Path}; " +
-                    "one module is exactly one file");
+                diagnostics.Error("SL0332", new SourceSpan(unit.File, 0, 0),
+                    "this file does not say which module it belongs to; " +
+                    "start it with a declaration such as 'module App.Thing;'");
                 continue;
             }
 
-            var module = new ModuleSymbol(name) { Syntax = unit };
-            _builtins.AutoImportInto(module);
-            _modules[name] = module;
-            _units.Add((module, unit));
+            string name = unit.ModuleName.Text;
+
+            // Several files may declare the same module and merge into it, as C#
+            // namespaces do. Each still gets its own scope, because imports are
+            // written per file.
+            if (!_modules.TryGetValue(name, out var module))
+            {
+                module = new ModuleSymbol(name);
+                _modules[name] = module;
+            }
+
+            var scope = new FileScope(module);
+            _builtins.AutoImportInto(scope);
+            _units.Add((scope, unit));
         }
-    }
-
-    /// <summary>
-    /// The module name for a file that does not declare one: its path below the
-    /// package root, or just its own name when it was compiled on its own.
-    /// </summary>
-    private string InferModuleName(string path)
-    {
-        if (inferredModules is not null &&
-            inferredModules.TryGetValue(Path.GetFullPath(path), out var fromPath))
-            return fromPath;
-
-        return Path.GetFileNameWithoutExtension(path);
     }
 
     // ============================================================ pass 2
 
     private void DeclareTypes()
     {
-        foreach (var (module, unit) in _units)
+        foreach (var (scope, unit) in _units)
         {
+            var module = scope.Module;
             foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
             {
                 if (module.Types.ContainsKey(declaration.Name) ||
@@ -178,7 +170,7 @@ public sealed class Binder(
                             $"'{declaration.Name}' is already declared in module '{module.Name}'");
                     else
                         module.GenericTypes[declaration.Name] =
-                            new GenericTypeTemplate(declaration.Name, module, declaration);
+                            new GenericTypeTemplate(declaration.Name, scope, declaration);
                     continue;
                 }
 
@@ -206,7 +198,7 @@ public sealed class Binder(
                 };
 
                 module.Types[declaration.Name] = type;
-                _typeSyntax[type] = declaration;
+                _typeSyntax[type] = (declaration, scope);
 
                 if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
                 if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
@@ -218,7 +210,7 @@ public sealed class Binder(
 
     private void ResolveImports()
     {
-        foreach (var (module, unit) in _units)
+        foreach (var (scope, unit) in _units)
         {
             foreach (var import in unit.Imports)
             {
@@ -229,18 +221,19 @@ public sealed class Binder(
                     continue;
                 }
 
-                if (target == module)
+                if (target == scope.Module)
                 {
-                    diagnostics.Warning("SL0203", import.Span, "a module cannot import itself");
+                    diagnostics.Warning("SL0203", import.Span,
+                        "a file does not need to import its own module");
                     continue;
                 }
 
                 string key = import.Alias ?? import.Name.Last;
-                module.Imports[key] = target;
+                scope.Imports[key] = target;
 
                 // The full dotted name always works too, so `import A.B;` lets you
                 // write both `B.Thing` and `A.B.Thing`.
-                module.Imports[import.Name.Text] = target;
+                scope.Imports[import.Name.Text] = target;
             }
         }
     }
@@ -249,9 +242,10 @@ public sealed class Binder(
 
     private void DeclareMembers()
     {
-        foreach (var (module, unit) in _units)
+        foreach (var (scope, unit) in _units)
         {
-            _currentModule = module;
+            _currentScope = scope;
+            var module = scope.Module;
 
             foreach (var declaration in unit.Declarations)
             {
@@ -260,19 +254,19 @@ public sealed class Binder(
                     case FunctionDeclSyntax function:
                         if (function.TypeParameters.Count > 0)
                             module.GenericFunctions.Add(
-                                new GenericFunctionTemplate(function.Name, module, function));
+                                new GenericFunctionTemplate(function.Name, scope, function));
                         else
-                            DeclareFunction(module, containingType: null, function);
+                            DeclareFunction(scope, containingType: null, function);
                         break;
 
                     case TypeDeclSyntax typeDecl:
                         // Templates wait; their members depend on type arguments.
                         if (typeDecl.TypeParameters.Count == 0)
-                            DeclareTypeMembers(module, typeDecl, module.Types[typeDecl.Name]);
+                            DeclareTypeMembers(scope, typeDecl, module.Types[typeDecl.Name]);
                         break;
 
                     case GlobalConstDeclSyntax constant:
-                        DeclareGlobalConstant(module, constant);
+                        DeclareGlobalConstant(scope, constant);
                         break;
 
                     case FieldDeclSyntax field:
@@ -284,12 +278,13 @@ public sealed class Binder(
             }
         }
 
-        _currentModule = null;
+        _currentScope = null;
     }
 
     private void DeclareTypeMembers(
-        ModuleSymbol module, TypeDeclSyntax declaration, NamedTypeSymbol type)
+        FileScope scope, TypeDeclSyntax declaration, NamedTypeSymbol type)
     {
+        var module = scope.Module;
         var classType = type as ClassTypeSymbol;
 
         foreach (var member in declaration.Members)
@@ -316,7 +311,7 @@ public sealed class Binder(
                         diagnostics.Error("SL0206", field.Span,
                             "field initializers are not supported yet; assign the field in a constructor");
 
-                    var fieldType = ResolveType(field.Type, module);
+                    var fieldType = ResolveType(field.Type, scope);
 
                     // A struct is a plain C value: it is copied without any hook, so it
                     // cannot own a reference count. Keeping that rule is what lets a
@@ -342,7 +337,7 @@ public sealed class Binder(
                             "make the enclosing type generic instead");
                         break;
                     }
-                    DeclareFunction(module, type, method);
+                    DeclareFunction(scope, type, method);
                     break;
 
                 case ConstructorDeclSyntax constructor:
@@ -363,10 +358,11 @@ public sealed class Binder(
                         ContainingType = type,
                         Body = constructor.Body,
                         Span = constructor.Span,
+                        Scope = scope,
                         IsPublic = constructor.Modifiers.HasFlag(Modifiers.Public),
                     };
                     symbol.Parameters.Add(new ParameterSymbol("this", classType, 0) { IsThis = true });
-                    AddParameters(symbol, constructor.Parameters, module);
+                    AddParameters(symbol, constructor.Parameters, scope);
                     classType.Constructors.Add(symbol);
                     break;
                 }
@@ -395,6 +391,7 @@ public sealed class Binder(
                         ContainingType = type,
                         Body = destructor.Body,
                         Span = destructor.Span,
+                        Scope = scope,
                     };
                     symbol.Parameters.Add(new ParameterSymbol("this", classType, 0) { IsThis = true });
                     classType.Destructor = symbol;
@@ -404,9 +401,10 @@ public sealed class Binder(
         }
     }
 
-    private void DeclareFunction(ModuleSymbol module, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
+    private void DeclareFunction(FileScope scope, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
     {
-        var returnType = ResolveType(declaration.ReturnType, module);
+        var module = scope.Module;
+        var returnType = ResolveType(declaration.ReturnType, scope);
 
         var symbol = new FunctionSymbol
         {
@@ -423,6 +421,7 @@ public sealed class Binder(
             IsVariadic = declaration.IsVariadic,
             Body = declaration.Body,
             Span = declaration.Span,
+            Scope = scope,
         };
 
         if (containingType is not null)
@@ -434,7 +433,7 @@ public sealed class Binder(
             symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
         }
 
-        AddParameters(symbol, declaration.Parameters, module);
+        AddParameters(symbol, declaration.Parameters, scope);
 
         if (containingType is InterfaceTypeSymbol)
         {
@@ -462,7 +461,7 @@ public sealed class Binder(
         module.Functions.Add(symbol);
     }
 
-    private void AddParameters(FunctionSymbol symbol, IReadOnlyList<ParameterSyntax> parameters, ModuleSymbol module)
+    private void AddParameters(FunctionSymbol symbol, IReadOnlyList<ParameterSyntax> parameters, FileScope scope)
     {
         foreach (var parameter in parameters)
         {
@@ -473,7 +472,7 @@ public sealed class Binder(
                 continue;
             }
 
-            var type = ResolveType(parameter.Type, module);
+            var type = ResolveType(parameter.Type, scope);
             if (type.IsVoid())
                 diagnostics.Error("SL0213", parameter.Span,
                     $"parameter '{parameter.Name}' cannot have type 'void'");
@@ -482,8 +481,9 @@ public sealed class Binder(
         }
     }
 
-    private void DeclareGlobalConstant(ModuleSymbol module, GlobalConstDeclSyntax declaration)
+    private void DeclareGlobalConstant(FileScope scope, GlobalConstDeclSyntax declaration)
     {
+        var module = scope.Module;
         if (module.Constants.ContainsKey(declaration.Name))
         {
             diagnostics.Error("SL0214", declaration.Span,
@@ -495,7 +495,7 @@ public sealed class Binder(
         object? value = null;
         TypeSymbol type = declaration.Type is null
             ? PrimitiveTypeSymbol.Int
-            : ResolveType(declaration.Type, module);
+            : ResolveType(declaration.Type, scope);
 
         if (declaration.Value is LiteralSyntax literal)
         {
@@ -532,12 +532,12 @@ public sealed class Binder(
     /// </summary>
     private void ResolveInterfaces()
     {
-        foreach (var (type, declaration) in _typeSyntax)
-            ResolveImplements(type, declaration, _modules[type.ModuleName]);
+        foreach (var (type, entry) in _typeSyntax)
+            ResolveImplements(type, entry.Declaration, entry.Scope);
     }
 
     private void ResolveImplements(
-        NamedTypeSymbol type, TypeDeclSyntax declaration, ModuleSymbol module)
+        NamedTypeSymbol type, TypeDeclSyntax declaration, FileScope scope)
     {
         {
             if (declaration.Implements.Count == 0) return;
@@ -554,7 +554,7 @@ public sealed class Binder(
 
             foreach (var implemented in declaration.Implements)
             {
-                var resolved = ResolveType(implemented, module);
+                var resolved = ResolveType(implemented, scope);
                 if (resolved.IsError()) continue;
 
                 if (resolved is not InterfaceTypeSymbol interfaceType)
@@ -676,12 +676,10 @@ public sealed class Binder(
         {
             var (function, substitution) = _pending.Dequeue();
             _substitution = substitution;
-            _currentModule = _modules[function.ModuleName];
             BindFunctionBody(function);
         }
 
         _substitution = previous;
-        _currentModule = null;
     }
 
     // ============================================================ generics
@@ -744,15 +742,18 @@ public sealed class Binder(
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
         var previousSubstitution = _substitution;
-        var previousModule = _currentModule;
+        var previousScope = _currentScope;
         _substitution = substitution;
-        _currentModule = template.Module;
+
+        // A template is bound with the imports of the file that declared it, not
+        // those of the file asking for this instantiation.
+        _currentScope = template.Scope;
 
         VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
-            template.Module, $"'{template.Name}'", span);
+            template.Scope, $"'{template.Name}'", span);
 
-        DeclareTypeMembers(template.Module, declaration, type);
-        ResolveImplements(type, declaration, template.Module);
+        DeclareTypeMembers(template.Scope, declaration, type);
+        ResolveImplements(type, declaration, template.Scope);
         ComputeLayout(type, []);
 
         // Every body this instantiation owns is bound later, under this same
@@ -769,7 +770,7 @@ public sealed class Binder(
         }
 
         _substitution = previousSubstitution;
-        _currentModule = previousModule;
+        _currentScope = previousScope;
         return type;
     }
 
@@ -793,33 +794,34 @@ public sealed class Binder(
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
         var previousSubstitution = _substitution;
-        var previousModule = _currentModule;
+        var previousScope = _currentScope;
         _substitution = substitution;
-        _currentModule = template.Module;
+        _currentScope = template.Scope;
 
         var declaration = template.Declaration;
 
         VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
-            template.Module, $"'{template.Name}'", span);
+            template.Scope, $"'{template.Name}'", span);
 
         var symbol = new FunctionSymbol
         {
             Name = template.Name,
             ModuleName = template.Module.Name,
-            ReturnType = ResolveType(declaration.ReturnType, template.Module),
+            ReturnType = ResolveType(declaration.ReturnType, template.Scope),
             Linkage = LinkageKind.Stainless,
             IsPublic = template.IsPublic,
             Body = declaration.Body,
             Span = declaration.Span,
             TypeArguments = arguments.ToList(),
+            Scope = template.Scope,
         };
-        AddParameters(symbol, declaration.Parameters, template.Module);
+        AddParameters(symbol, declaration.Parameters, template.Scope);
 
         _instantiatedFunctions[key] = symbol;
         _pending.Enqueue((symbol, substitution));
 
         _substitution = previousSubstitution;
-        _currentModule = previousModule;
+        _currentScope = previousScope;
         return symbol;
     }
 
@@ -837,7 +839,7 @@ public sealed class Binder(
         IReadOnlyList<WhereClauseSyntax> clauses,
         IReadOnlyList<string> parameters,
         Dictionary<string, TypeSymbol> substitution,
-        ModuleSymbol module,
+        FileScope scope,
         string owner,
         SourceSpan span)
     {
@@ -854,7 +856,7 @@ public sealed class Binder(
             foreach (var constraintSyntax in clause.Constraints)
             {
                 // Resolved under the substitution, so `where T : Comparer<U>` works.
-                var constraint = ResolveType(constraintSyntax, module);
+                var constraint = ResolveType(constraintSyntax, scope);
                 if (constraint.IsError()) continue;
 
                 if (constraint is not InterfaceTypeSymbol required)
@@ -926,10 +928,10 @@ public sealed class Binder(
 
     private void BindBodies()
     {
-        foreach (var (module, _) in _units)
+        // Walked by module rather than by file, because a module may span files
+        // and each function already remembers which one it came from.
+        foreach (var module in _modules.Values.ToList())
         {
-            _currentModule = module;
-
             // Snapshotted: binding a body can instantiate a generic, which adds
             // to exactly these collections while we are walking them.
             foreach (var function in module.Functions.Where(f => f.HasBody).ToList())
@@ -942,13 +944,16 @@ public sealed class Binder(
             }
         }
 
-        _currentModule = null;
+        _currentScope = null;
     }
 
     private void BindFunctionBody(FunctionSymbol function)
     {
         if (function.Body is null) return;
         if (!_boundFunctions.Add(function)) return;
+
+        // Bound against the imports of the file it was written in.
+        if (function.Scope is not null) _currentScope = function.Scope;
 
         _currentFunction = function;
         _scopes.Clear();
@@ -1072,7 +1077,7 @@ public sealed class Binder(
         }
         else
         {
-            type = ResolveType(syntax.Type, _currentModule!);
+            type = ResolveType(syntax.Type, _currentScope!);
             if (syntax.Initializer is not null)
                 initializer = BindConversion(BindExpression(syntax.Initializer), type, syntax.Initializer.Span);
         }
@@ -1258,7 +1263,7 @@ public sealed class Binder(
             if (_currentModule!.Constants.TryGetValue(name, out var constant))
                 return new BoundConstantAccess(syntax.Span, constant);
 
-            foreach (var import in _currentModule.Imports.Values.Distinct())
+            foreach (var import in _currentScope!.Imports.Values.Distinct())
                 if (import.Constants.TryGetValue(name, out var imported) && imported.IsPublic)
                     return new BoundConstantAccess(syntax.Span, imported);
         }
@@ -1613,13 +1618,13 @@ public sealed class Binder(
 
     private BoundExpression BindSizeof(SizeofSyntax syntax)
     {
-        var measured = ResolveType(syntax.Type, _currentModule!);
+        var measured = ResolveType(syntax.Type, _currentScope!);
         return new BoundSizeof(syntax.Span, PrimitiveTypeSymbol.NUInt, measured);
     }
 
     private BoundExpression BindCast(CastSyntax syntax)
     {
-        var targetType = ResolveType(syntax.Type, _currentModule!);
+        var targetType = ResolveType(syntax.Type, _currentScope!);
         var operand = BindExpression(syntax.Operand);
         if (operand.Type.IsError() || targetType.IsError())
             return new BoundErrorExpression(syntax.Span);
@@ -1639,7 +1644,7 @@ public sealed class Binder(
 
     private BoundExpression BindNew(NewSyntax syntax)
     {
-        var type = ResolveType(syntax.Type, _currentModule!);
+        var type = ResolveType(syntax.Type, _currentScope!);
         if (type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (type is not ClassTypeSymbol classType)
@@ -1708,13 +1713,13 @@ public sealed class Binder(
         if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
 
         string name = string.Join('.', parts);
-        if (_currentModule!.Imports.TryGetValue(name, out var module)) return module;
+        if (_currentScope!.Imports.TryGetValue(name, out var module)) return module;
         return _modules.TryGetValue(name, out module) ? module : null;
     }
 
     private BoundExpression BindNewArray(NewArraySyntax syntax)
     {
-        var element = ResolveType(syntax.ElementType, _currentModule!);
+        var element = ResolveType(syntax.ElementType, _currentScope!);
         var length = BindExpression(syntax.Length);
 
         if (element.IsError() || length.Type.IsError()) return new BoundErrorExpression(syntax.Span);
@@ -1917,7 +1922,7 @@ public sealed class Binder(
             var local = _currentModule!.FindFunctions(name.Parts[0]).ToList();
             if (local.Count > 0) return local;
 
-            return _currentModule.Imports.Values.Distinct()
+            return _currentScope!.Imports.Values.Distinct()
                 .SelectMany(m => m.FindFunctions(name.Parts[0]))
                 .Where(f => f.IsPublic)
                 .ToList();
@@ -1925,7 +1930,7 @@ public sealed class Binder(
 
         // Qualified: everything before the last part names a module.
         string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
-        if (_currentModule!.Imports.TryGetValue(moduleName, out var module) ||
+        if (_currentScope!.Imports.TryGetValue(moduleName, out var module) ||
             _modules.TryGetValue(moduleName, out module))
         {
             bool sameModule = module == _currentModule;
@@ -2283,13 +2288,13 @@ public sealed class Binder(
         return array;
     }
 
-    private TypeSymbol ResolveType(TypeSyntax syntax, ModuleSymbol module)
+    private TypeSymbol ResolveType(TypeSyntax syntax, FileScope scope)
     {
         switch (syntax)
         {
             case ArrayTypeSyntax array:
             {
-                var element = ResolveType(array.Element, module);
+                var element = ResolveType(array.Element, scope);
                 if (element.IsError()) return element;
                 if (element.IsVoid())
                 {
@@ -2304,7 +2309,7 @@ public sealed class Binder(
 
             case PointerTypeSyntax pointer:
             {
-                var element = ResolveType(pointer.Element, module);
+                var element = ResolveType(pointer.Element, scope);
                 if (element.IsError()) return element;
                 if (element is NamedTypeSymbol { IsReferenceType: true })
                 {
@@ -2318,7 +2323,7 @@ public sealed class Binder(
 
             case NullableTypeSyntax nullable:
             {
-                var element = ResolveType(nullable.Element, module);
+                var element = ResolveType(nullable.Element, scope);
                 if (element.IsError()) return element;
                 if (element is not NamedTypeSymbol { IsReferenceType: true } referenceType)
                 {
@@ -2332,7 +2337,7 @@ public sealed class Binder(
 
             case WeakTypeSyntax weak:
             {
-                var element = ResolveType(weak.Element, module);
+                var element = ResolveType(weak.Element, scope);
                 if (element.IsError()) return element;
 
                 var referenced = element.AsReference();
@@ -2346,15 +2351,16 @@ public sealed class Binder(
             }
 
             case NamedTypeSyntax named:
-                return ResolveNamedType(named, module);
+                return ResolveNamedType(named, scope);
 
             default:
                 return ErrorTypeSymbol.Instance;
         }
     }
 
-    private TypeSymbol ResolveNamedType(NamedTypeSyntax syntax, ModuleSymbol module)
+    private TypeSymbol ResolveNamedType(NamedTypeSyntax syntax, FileScope scope)
     {
+        var module = scope.Module;
         var parts = syntax.Name.Parts;
 
         // A bare name may be a type parameter of the instantiation being bound.
@@ -2363,7 +2369,7 @@ public sealed class Binder(
             return substituted;
 
         if (syntax.TypeArguments.Count > 0)
-            return ResolveConstructedType(syntax, module);
+            return ResolveConstructedType(syntax, scope);
 
         if (parts.Count == 1)
         {
@@ -2378,7 +2384,7 @@ public sealed class Binder(
                 return ErrorTypeSymbol.Instance;
             }
 
-            var visible = module.Imports.Values.Distinct()
+            var visible = scope.Imports.Values.Distinct()
                 .Where(imported => imported.Types.TryGetValue(parts[0], out var t) && t.IsPublic)
                 .Select(imported => imported.Types[parts[0]])
                 .Distinct()
@@ -2397,7 +2403,7 @@ public sealed class Binder(
         else
         {
             string moduleName = string.Join('.', parts.Take(parts.Count - 1));
-            if (module.Imports.TryGetValue(moduleName, out var target) ||
+            if (scope.Imports.TryGetValue(moduleName, out var target) ||
                 _modules.TryGetValue(moduleName, out target))
             {
                 if (target.Types.TryGetValue(parts[^1], out var type))
@@ -2424,12 +2430,13 @@ public sealed class Binder(
     }
 
     /// <summary>Resolves <c>Box&lt;int&gt;</c> by finding the template and instantiating it.</summary>
-    private TypeSymbol ResolveConstructedType(NamedTypeSyntax syntax, ModuleSymbol module)
+    private TypeSymbol ResolveConstructedType(NamedTypeSyntax syntax, FileScope scope)
     {
-        var arguments = syntax.TypeArguments.Select(a => ResolveType(a, module)).ToList();
+        var module = scope.Module;
+        var arguments = syntax.TypeArguments.Select(a => ResolveType(a, scope)).ToList();
         if (arguments.Any(a => a.IsError())) return ErrorTypeSymbol.Instance;
 
-        var template = FindGenericType(syntax.Name, module);
+        var template = FindGenericType(syntax.Name, scope);
         if (template is null)
         {
             diagnostics.Error("SL0326", syntax.Span,
@@ -2440,19 +2447,20 @@ public sealed class Binder(
         return Instantiate(template, arguments, syntax.Span);
     }
 
-    private GenericTypeTemplate? FindGenericType(QualifiedName name, ModuleSymbol module)
+    private GenericTypeTemplate? FindGenericType(QualifiedName name, FileScope scope)
     {
+        var module = scope.Module;
         if (name.Parts.Count == 1)
         {
             if (module.GenericTypes.TryGetValue(name.Parts[0], out var local)) return local;
 
-            return module.Imports.Values.Distinct()
+            return scope.Imports.Values.Distinct()
                 .Select(m => m.GenericTypes.TryGetValue(name.Parts[0], out var t) && t.IsPublic ? t : null)
                 .FirstOrDefault(t => t is not null);
         }
 
         string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
-        if (module.Imports.TryGetValue(moduleName, out var target) ||
+        if (scope.Imports.TryGetValue(moduleName, out var target) ||
             _modules.TryGetValue(moduleName, out target))
         {
             if (target.GenericTypes.TryGetValue(name.Last, out var found) &&
@@ -2471,14 +2479,14 @@ public sealed class Binder(
             var local = _currentModule!.GenericFunctions.Where(f => f.Name == name.Parts[0]).ToList();
             if (local.Count > 0) return local;
 
-            return _currentModule.Imports.Values.Distinct()
+            return _currentScope!.Imports.Values.Distinct()
                 .SelectMany(m => m.GenericFunctions)
                 .Where(f => f.Name == name.Parts[0] && f.IsPublic)
                 .ToList();
         }
 
         string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
-        if (_currentModule!.Imports.TryGetValue(moduleName, out var target) ||
+        if (_currentScope!.Imports.TryGetValue(moduleName, out var target) ||
             _modules.TryGetValue(moduleName, out target))
         {
             bool sameModule = target == _currentModule;
