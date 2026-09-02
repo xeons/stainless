@@ -1,0 +1,9 @@
+total=26
+doubled=52
+firstOdd=5
+alpha
+beta
+listTotal=60
+ticks=321
+pairs=16
+done

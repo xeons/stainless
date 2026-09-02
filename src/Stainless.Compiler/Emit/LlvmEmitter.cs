@@ -60,6 +60,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     private bool _blockTerminated;
     private string? _sretSlot;
     private string _currentBlock = "entry";
+    private bool _hasStatics;
     private ArgInfo _returnInfo = new(PassStyle.Direct, "void", PrimitiveTypeSymbol.Void);
 
     /// <summary>Owned locals per lexical scope, released on the way out.</summary>
@@ -79,8 +80,17 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         ExternalDeclarations(program);
         TypeInfos(program);
 
+        _hasStatics = program.Statics.Count > 0;
+        StaticStorage(program);
+
         foreach (var function in program.Functions)
             EmitFunction(function);
+
+        EmitStaticInitializer(program);
+
+        // After the functions, because a thunk clobbers the per-function state
+        // the one that asked for it is still using.
+        EmitThunks();
 
         foreach (var classType in program.Classes)
             EmitDestroyThunk(classType);
@@ -154,6 +164,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         Declare("sl_alloc", "declare ptr @sl_alloc(ptr)");
         Declare("sl_retain", "declare void @sl_retain(ptr)");
         Declare("sl_release", "declare void @sl_release(ptr)");
+        Declare("sl_make_immortal", "declare void @sl_make_immortal(ptr)");
         Declare("sl_weak_retain", "declare void @sl_weak_retain(ptr)");
         Declare("sl_weak_release", "declare void @sl_weak_release(ptr)");
         Declare("sl_weak_load", "declare ptr @sl_weak_load(ptr)");
@@ -163,6 +174,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
         Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
         Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
+        ConcurrencyDeclarations();
         _module.AppendLine();
     }
 
@@ -536,6 +548,15 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             _ => "i64",
         },
         StructTypeSymbol structType => StructName(structType),
+
+        // A delegate is a bare function pointer, which is what makes it the
+        // same value a C function pointer is.
+        DelegateTypeSymbol => "ptr",
+
+        // An enum is its underlying integer, which is what makes it the same
+        // bytes as the C enum it lines up with.
+        EnumTypeSymbol enumType => LlvmTypeOf(enumType.UnderlyingType),
+
         _ => "ptr",     // pointers, class references, optionals and weak references
     };
 
@@ -710,6 +731,350 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _module.AppendLine();
     }
 
+
+    // ============================================================ concurrency
+
+    /// <summary>
+    /// The scope a `spawn` submits to: the innermost enclosing `parallel`.
+    /// It is defined before the block it governs, so it dominates every spawn
+    /// inside and needs no slot of its own.
+    /// </summary>
+    private string? _currentScope;
+
+    private readonly List<PendingThunk> _thunks = [];
+    private int _nextThunk;
+
+    private abstract record PendingThunk(string Name);
+
+    private sealed record SpawnThunk(
+        string Name,
+        string BlockType,
+        IReadOnlyList<LocalSymbol> Fields,
+        BoundCall Call,
+        TypeSymbol? TargetType) : PendingThunk(Name);
+
+    private sealed record RangeThunk(
+        string Name,
+        string CaptureType,
+        BoundParallelFor Loop) : PendingThunk(Name);
+
+    private void ConcurrencyDeclarations()
+    {
+        Declare("sl_scope_begin", "declare ptr @sl_scope_begin()");
+        Declare("sl_scope_submit", "declare void @sl_scope_submit(ptr, ptr, ptr)");
+        Declare("sl_scope_end", "declare void @sl_scope_end(ptr)");
+        Declare("sl_parallel_range", "declare void @sl_parallel_range(ptr, i64, ptr, ptr)");
+        Declare("malloc", "declare ptr @malloc(i64)");
+        Declare("free", "declare void @free(ptr)");
+    }
+
+    /// <summary>The type a value takes inside a marshalling block.</summary>
+    private static string FieldTypeOf(TypeSymbol type) =>
+        type is StructTypeSymbol structType ? StructName(structType) : LlvmTypeOf(type);
+
+    /// <summary>The size of an LLVM type, without hard-coding a layout.</summary>
+    private string SizeOfType(string llvmType)
+    {
+        string past = Emit("ptr", $"getelementptr {llvmType}, ptr null, i32 1");
+        return Emit("i64", $"ptrtoint ptr {past} to i64");
+    }
+
+    private void EmitParallel(BoundParallel statement)
+    {
+        string scope = Emit("ptr", "call ptr @sl_scope_begin()");
+
+        string? enclosing = _currentScope;
+        _currentScope = scope;
+        EmitStatement(statement.Body);
+        _currentScope = enclosing;
+
+        // The join. Nothing spawned inside is still running past this point,
+        // which is what lets a job borrow the frame it was spawned from.
+        Line($"call void @sl_scope_end(ptr {scope})");
+    }
+
+    /// <summary>
+    /// Queues one call.
+    ///
+    /// The arguments are evaluated here, by the parent, and copied into a heap
+    /// block the worker unpacks. Heap rather than stack because a spawn in a
+    /// loop needs one block per iteration, and an alloca would be a single slot
+    /// every job shared.
+    /// </summary>
+    private void EmitSpawn(BoundSpawn statement)
+    {
+        if (_currentScope is null) return;      // the binder already reported it
+
+        var call = statement.Call;
+
+        var sources = new List<BoundExpression>();
+        if (call.Receiver is not null) sources.Add(call.Receiver);
+        sources.AddRange(call.Arguments);
+
+        // One synthetic local per field, so the thunk can emit an ordinary call
+        // over them and reuse every rule about argument passing.
+        var fields = sources
+            .Select((source, index) => new LocalSymbol($"spawn.{index}", source.Type, false))
+            .ToList();
+
+        var fieldTypes = sources.Select(s => FieldTypeOf(s.Type)).ToList();
+        if (statement.Target is not null) fieldTypes.Add("ptr");
+
+        string blockType = "{ " + string.Join(", ", fieldTypes) + " }";
+
+        string size = SizeOfType(blockType);
+        string block = Emit("ptr", $"call ptr @malloc(i64 {size})");
+
+        for (int i = 0; i < sources.Count; i++)
+        {
+            var value = EmitExpression(sources[i]);
+            string field = Emit("ptr",
+                $"getelementptr inbounds {blockType}, ptr {block}, i32 0, i32 {i}");
+
+            if (sources[i].Type is StructTypeSymbol structType)
+                MemCopy(field, value.Ref, structType.Size);
+            else
+                Line($"store {value.LlvmType} {value.Ref}, ptr {field}");
+        }
+
+        // Where the result lands. The address is taken now, by the parent, so
+        // `spawn totals[i] = ...` means this iteration's element.
+        if (statement.Target is not null)
+        {
+            string destination = EmitAddress(statement.Target);
+            string field = Emit("ptr",
+                $"getelementptr inbounds {blockType}, ptr {block}, i32 0, i32 {sources.Count}");
+            Line($"store ptr {destination}, ptr {field}");
+        }
+
+        string name = $"_SLspawn.{_nextThunk++}";
+        var receiverSlot = call.Receiver is null ? null : fields[0];
+        var argumentSlots = fields.Skip(call.Receiver is null ? 0 : 1).ToList();
+
+        var thunkCall = new BoundCall(
+            call.Span, call.Function,
+            receiverSlot is null ? null : new BoundLocalAccess(call.Span, receiverSlot),
+            [.. argumentSlots.Select(slot => (BoundExpression)new BoundLocalAccess(call.Span, slot))]);
+
+        _thunks.Add(new SpawnThunk(name, blockType, fields, thunkCall, statement.Target?.Type));
+
+        Line($"call void @sl_scope_submit(ptr {_currentScope}, ptr @{name}, ptr {block})");
+    }
+
+    private void EmitSpawnThunk(SpawnThunk thunk)
+    {
+        ResetFunctionState();
+        _module.AppendLine($"define internal void @{thunk.Name}(ptr %block) {{");
+        _body.Clear();
+        _blockTerminated = false;
+
+        PushScope();
+
+        for (int i = 0; i < thunk.Fields.Count; i++)
+            _slots[thunk.Fields[i]] = Emit("ptr",
+                $"getelementptr inbounds {thunk.BlockType}, ptr %block, i32 0, i32 {i}");
+
+        var result = EmitCall(thunk.Call);
+
+        if (thunk.TargetType is not null)
+        {
+            string field = Emit("ptr",
+                $"getelementptr inbounds {thunk.BlockType}, ptr %block, i32 0, i32 {thunk.Fields.Count}");
+            string destination = Emit("ptr", $"load ptr, ptr {field}");
+            StoreInto(destination, result, thunk.TargetType);
+        }
+
+        FlushTemporaries();
+        Line("call void @free(ptr %block)");
+        Terminator("ret void");
+
+        PopScopeWithoutRelease();
+
+        _module.AppendLine("entry:");
+        _module.Append(_entryAllocas);
+        _module.Append(_body);
+        _module.AppendLine("}");
+        _module.AppendLine();
+    }
+
+    /// <summary>
+    /// A counted loop, split across the pool.
+    ///
+    /// The trip count is worked out here, once, and handed to the runtime with
+    /// the body as a range job. Everything the body reads from the enclosing
+    /// frame is captured by address, so the chunks share the parent's storage
+    /// rather than a copy -- which is what makes writing through a captured
+    /// array work, and why writing to a captured variable is rejected.
+    /// </summary>
+    private void EmitParallelFor(BoundParallelFor statement)
+    {
+        string start = WidenToLong(statement.Start);
+        string limit = WidenToLong(statement.Limit);
+        string stride = WidenToLong(statement.Stride);
+
+        // An inclusive bound is one more iteration; then round the span up so a
+        // partial final step still runs.
+        string bound = statement.Inclusive
+            ? Emit("i64", $"add i64 {limit}, 1")
+            : limit;
+
+        string span = Emit("i64", $"sub i64 {bound}, {start}");
+        string biased = Emit("i64", $"add i64 {span}, {stride}");
+        string less = Emit("i64", $"sub i64 {biased}, 1");
+        string divided = Emit("i64", $"sdiv i64 {less}, {stride}");
+        string positive = Emit("i1", $"icmp sgt i64 {span}, 0");
+        string count = Emit("i64", $"select i1 {positive}, i64 {divided}, i64 0");
+
+        var captures = statement.Captures;
+        var captureTypes = captures.Select(_ => "ptr").ToList();
+        captureTypes.Add("i64");        // the loop variable's first value
+        captureTypes.Add("i64");        // its stride
+
+        string captureType = "{ " + string.Join(", ", captureTypes) + " }";
+
+        // The scope is joined before this returns, so the block may live on the
+        // parent's stack.
+        string capture = Alloca(captureType, "capture");
+
+        for (int i = 0; i < captures.Count; i++)
+        {
+            string address = captures[i] switch
+            {
+                LocalSymbol local => _slots[local],
+                ParameterSymbol parameter => _parameterSlots[parameter],
+                _ => "null",
+            };
+
+            string field = Emit("ptr",
+                $"getelementptr inbounds {captureType}, ptr {capture}, i32 0, i32 {i}");
+            Line($"store ptr {address}, ptr {field}");
+        }
+
+        string startField = Emit("ptr",
+            $"getelementptr inbounds {captureType}, ptr {capture}, i32 0, i32 {captures.Count}");
+        Line($"store i64 {start}, ptr {startField}");
+
+        string strideField = Emit("ptr",
+            $"getelementptr inbounds {captureType}, ptr {capture}, i32 0, i32 {captures.Count + 1}");
+        Line($"store i64 {stride}, ptr {strideField}");
+
+        string name = $"_SLrange.{_nextThunk++}";
+        _thunks.Add(new RangeThunk(name, captureType, statement));
+
+        string scope = Emit("ptr", "call ptr @sl_scope_begin()");
+        Line($"call void @sl_parallel_range(ptr {scope}, i64 {count}, ptr @{name}, ptr {capture})");
+        Line($"call void @sl_scope_end(ptr {scope})");
+    }
+
+    /// <summary>Evaluates an integer expression as an i64, signed or not as its type says.</summary>
+    private string WidenToLong(BoundExpression expression)
+    {
+        var value = EmitExpression(expression);
+        if (value.LlvmType == "i64") return value.Ref;
+
+        string instruction = IsSigned(expression.Type) ? "sext" : "zext";
+        return Emit("i64", $"{instruction} {value.LlvmType} {value.Ref} to i64");
+    }
+
+    private void EmitRangeThunk(RangeThunk thunk)
+    {
+        var loop = thunk.Loop;
+
+        ResetFunctionState();
+        _module.AppendLine(
+            $"define internal void @{thunk.Name}(ptr %capture, i64 %start, i64 %end) {{");
+        _body.Clear();
+        _blockTerminated = false;
+
+        PushScope();
+
+        // Each captured variable is reached through the address the parent
+        // stored, so the body emits exactly as it would have in place.
+        for (int i = 0; i < loop.Captures.Count; i++)
+        {
+            string field = Emit("ptr",
+                $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {i}");
+            string address = Emit("ptr", $"load ptr, ptr {field}");
+
+            switch (loop.Captures[i])
+            {
+                case LocalSymbol local: _slots[local] = address; break;
+                case ParameterSymbol parameter: _parameterSlots[parameter] = address; break;
+            }
+        }
+
+        string firstField = Emit("ptr",
+            $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {loop.Captures.Count}");
+        string first = Emit("i64", $"load i64, ptr {firstField}");
+
+        string strideField = Emit("ptr",
+            $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {loop.Captures.Count + 1}");
+        string stride = Emit("i64", $"load i64, ptr {strideField}");
+
+        // The loop variable belongs to this chunk, not to the parent.
+        string variableType = LlvmTypeOf(loop.Variable.Type);
+        string variableSlot = Alloca(variableType, loop.Variable.Name);
+        _slots[loop.Variable] = variableSlot;
+
+        string index = Alloca("i64", "chunk");
+        Line($"store i64 %start, ptr {index}");
+
+        string conditionLabel = NextLabel("chunk.cond");
+        string bodyLabel = NextLabel("chunk.body");
+        string endLabel = NextLabel("chunk.end");
+
+        Terminator($"br label %{conditionLabel}");
+
+        Label(conditionLabel);
+        string current = Emit("i64", $"load i64, ptr {index}");
+        string more = Emit("i1", $"icmp ult i64 {current}, %end");
+        Terminator($"br i1 {more}, label %{bodyLabel}, label %{endLabel}");
+
+        Label(bodyLabel);
+        string scaled = Emit("i64", $"mul i64 {current}, {stride}");
+        string value = Emit("i64", $"add i64 {first}, {scaled}");
+        string narrowed = variableType == "i64"
+            ? value
+            : Emit(variableType, $"trunc i64 {value} to {variableType}");
+        Line($"store {variableType} {narrowed}, ptr {variableSlot}");
+
+        EmitStatement(loop.Body);
+
+        if (!_blockTerminated)
+        {
+            string next = Emit("i64", $"add i64 {current}, 1");
+            Line($"store i64 {next}, ptr {index}");
+            Terminator($"br label %{conditionLabel}");
+        }
+
+        Label(endLabel);
+        Terminator("ret void");
+
+        PopScopeWithoutRelease();
+
+        _module.AppendLine("entry:");
+        _module.Append(_entryAllocas);
+        _module.Append(_body);
+        _module.AppendLine("}");
+        _module.AppendLine();
+    }
+
+    /// <summary>
+    /// Emits every thunk the program asked for. A thunk body may spawn again, so
+    /// this drains rather than iterates.
+    /// </summary>
+    private void EmitThunks()
+    {
+        for (int i = 0; i < _thunks.Count; i++)
+        {
+            switch (_thunks[i])
+            {
+                case SpawnThunk spawn: EmitSpawnThunk(spawn); break;
+                case RangeThunk range: EmitRangeThunk(range); break;
+            }
+        }
+    }
+
     private void ResetFunctionState()
     {
         _entryAllocas.Clear();
@@ -719,6 +1084,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _currentBlock = "entry";
         _slots.Clear();
         _parameterSlots.Clear();
+        _currentScope = null;
         _scopes.Clear();
         _pendingReleases.Clear();
         _loops.Clear();
@@ -731,6 +1097,10 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         "float" or "double" => "0.0",
         "ptr" => "null",
         "void" => "",
+
+        // An aggregate has no integer zero; LLVM spells it this way.
+        _ when llvmType.StartsWith('%') => "zeroinitializer",
+
         _ => "0",
     };
 
@@ -829,11 +1199,108 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     /// The real <c>main</c>. It exists so that a Stainless <c>Main</c> can be a
     /// normal mangled function while the linker still finds a C entry point.
     /// </summary>
+    // ============================================================ statics
+
+    private static string StaticName(StaticSymbol symbol) =>
+        "_SLstatic_" + Mangler.SymbolSafe(symbol.QualifiedName);
+
+    /// <summary>
+    /// One zeroed global per static. They are written once, by the initializer
+    /// below, before anything else runs.
+    /// </summary>
+    private void StaticStorage(BoundProgram program)
+    {
+        if (program.Statics.Count == 0) return;
+
+        foreach (var symbol in program.Statics)
+        {
+            string llvmType = LlvmTypeOf(symbol.Type);
+            _module.AppendLine(
+                $"@{StaticName(symbol)} = internal global {llvmType} {ZeroOf(llvmType)}, " +
+                $"align {AlignOf(llvmType)}");
+        }
+
+        _module.AppendLine();
+    }
+
+    private Val EmitStaticAccess(BoundStaticAccess access)
+    {
+        // A struct is handled by address everywhere else, so it is here too.
+        if (access.Type is StructTypeSymbol)
+            return new Val("@" + StaticName(access.Static), "ptr", access.Type);
+
+        string llvmType = LlvmTypeOf(access.Type);
+        return new Val(
+            Emit(llvmType, $"load {llvmType}, ptr @{StaticName(access.Static)}"),
+            llvmType, access.Type);
+    }
+
+    /// <summary>
+    /// Runs every static initializer, in the order the binder worked out.
+    ///
+    /// There is no lazy guard and no once-flag: the whole program was compiled
+    /// together, so the dependency graph was known and sorted at compile time.
+    /// A reference is made immortal as it is stored, which is what removes the
+    /// last reference traffic from a value every thread can see.
+    /// </summary>
+    private void EmitStaticInitializer(BoundProgram program)
+    {
+        if (program.Statics.Count == 0) return;
+
+        ResetFunctionState();
+        _module.AppendLine($"define internal void @{StaticInitializerName}() {{");
+        _body.Clear();
+        _blockTerminated = false;
+
+        PushScope();
+
+        foreach (var symbol in program.Statics)
+        {
+            if (symbol.Initializer is null) continue;
+
+            var value = EmitExpression(symbol.Initializer);
+            string slot = "@" + StaticName(symbol);
+
+            if (symbol.Type is StructTypeSymbol structType)
+            {
+                MemCopy(slot, value.Ref, structType.Size);
+            }
+            else
+            {
+                Line($"store {value.LlvmType} {value.Ref}, ptr {slot}");
+
+                // Immortal, so retain and release skip it for the rest of the
+                // program: a value that lives to process exit has no reference
+                // traffic, and therefore none to race over.
+                if (symbol.Type.NeedsArc())
+                    Line($"call void @sl_make_immortal(ptr {value.Ref})");
+            }
+
+            // The initializer's own temporaries go now; the static holds its
+            // value outright, and an immortal one cannot be released anyway.
+            FlushTemporaries();
+        }
+
+        Terminator("ret void");
+        PopScopeWithoutRelease();
+
+        _module.AppendLine("entry:");
+        _module.Append(_entryAllocas);
+        _module.Append(_body);
+        _module.AppendLine("}");
+        _module.AppendLine();
+    }
+
+    private const string StaticInitializerName = "_SLstatics";
+
     private void EmitEntryPoint(FunctionSymbol entry)
     {
         _nextTemp = 0;
         _module.AppendLine("define i32 @main() {");
         _module.AppendLine("entry:");
+
+        // Statics first, in dependency order, before any user code runs.
+        if (_hasStatics) _module.AppendLine($"  call void @{StaticInitializerName}()");
 
         if (entry.ReturnType.IsVoid())
         {
@@ -927,6 +1394,9 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             case BoundIf ifStatement: EmitIf(ifStatement); break;
             case BoundWhile whileStatement: EmitWhile(whileStatement); break;
             case BoundFor forStatement: EmitFor(forStatement); break;
+            case BoundParallel parallel: EmitParallel(parallel); break;
+            case BoundParallelFor parallelFor: EmitParallelFor(parallelFor); break;
+            case BoundSpawn spawn: EmitSpawn(spawn); break;
             case BoundReturn returnStatement: EmitReturn(returnStatement); break;
             case BoundBreak: EmitJump(isBreak: true); break;
             case BoundContinue: EmitJump(isBreak: false); break;
@@ -1132,6 +1602,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
                 return new Val(InternStringObject(text.Value), "ptr", text.Type);
             case BoundNullLiteral nullLiteral: return new Val("null", "ptr", nullLiteral.Type);
             case BoundConstantAccess constant: return EmitConstant(constant);
+            case BoundStaticAccess shared: return EmitStaticAccess(shared);
             case BoundSizeof sizeofExpression:
                 return new Val(sizeofExpression.MeasuredType.Size.ToString(), "i64", sizeofExpression.Type);
 
@@ -1145,9 +1616,14 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             case BoundConversion conversion: return EmitConversion(conversion);
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
+            case BoundConditional conditional: return EmitConditional(conditional);
+            case BoundFunctionReference reference:
+                return new Val("@" + reference.Function.MangledName, "ptr", reference.Type);
+            case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
             case BoundAssignment assignment: return EmitAssignment(assignment);
             case BoundCall call: return EmitCall(call);
             case BoundNew newExpression: return EmitNew(newExpression);
+            case BoundClosure closure: return EmitClosure(closure);
             case BoundNewArray newArray: return EmitNewArray(newArray);
             case BoundArrayLength length: return EmitArrayLength(length);
             case BoundTypeof typeofExpression: return EmitTypeof(typeofExpression);
@@ -1213,6 +1689,9 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     {
         switch (expression)
         {
+            case BoundStaticAccess shared:
+                return "@" + StaticName(shared.Static);
+
             case BoundLocalAccess local:
                 return _slots[local.Local];
 
@@ -1505,6 +1984,60 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         return new Val(result, "i1", PrimitiveTypeSymbol.Bool);
     }
 
+    /// <summary>
+    /// <c>a ? b : c</c>. Like the short-circuit operators this is branches and a
+    /// phi, because only the chosen arm may run.
+    /// </summary>
+    private Val EmitConditional(BoundConditional expression)
+    {
+        string trueLabel = NextLabel("cond.true");
+        string falseLabel = NextLabel("cond.false");
+        string endLabel = NextLabel("cond.end");
+
+        var condition = EmitExpression(expression.Condition);
+        Terminator($"br i1 {condition.Ref}, label %{trueLabel}, label %{falseLabel}");
+
+        Label(trueLabel);
+        var whenTrue = EmitArm(expression.WhenTrue);
+        string trueBlock = CurrentBlockLabel();
+        Terminator($"br label %{endLabel}");
+
+        Label(falseLabel);
+        var whenFalse = EmitArm(expression.WhenFalse);
+        string falseBlock = CurrentBlockLabel();
+        Terminator($"br label %{endLabel}");
+
+        Label(endLabel);
+        string llvmType = whenTrue.LlvmType;
+        string result = Emit(llvmType,
+            $"phi {llvmType} [ {whenTrue.Ref}, %{trueBlock} ], [ {whenFalse.Ref}, %{falseBlock} ]");
+
+        // The arms each left a +1 reference; the merged one is now the temporary.
+        if (expression.Type.NeedsArc()) TrackTemporary(result, expression.Type);
+
+        return new Val(result, llvmType, expression.Type);
+    }
+
+    /// <summary>
+    /// Emits one arm of a conditional so that it leaves exactly one owned
+    /// reference behind and no temporaries of its own.
+    ///
+    /// Anything the arm allocated has to be released inside the arm's own block,
+    /// since the merge is also reached when the arm never ran and a release
+    /// there would not be dominated by its definition. Retaining first means the
+    /// surviving value is independent of whatever the flush destroys.
+    /// </summary>
+    private Val EmitArm(BoundExpression arm)
+    {
+        int mark = _pendingReleases.Count;
+        var value = EmitExpression(arm);
+
+        if (arm.Type.NeedsArc()) Line($"call void @sl_retain(ptr {value.Ref})");
+        FlushTemporaries(mark);
+
+        return value;
+    }
+
     private string CurrentBlockLabel() => _currentBlock;
 
     private Val EmitNew(BoundNew expression)
@@ -1526,7 +2059,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         if (expression.Constructor is not null)
         {
             var arguments = new List<string> { $"ptr {instance}" };
-            AppendArguments(expression.Constructor, expression.Arguments, arguments);
+            AppendArguments(expression.Arguments, arguments);
             Line($"call void @{expression.Constructor.MangledName}({string.Join(", ", arguments)})");
         }
 
@@ -1562,6 +2095,36 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         string methodSlot = Emit("ptr", $"getelementptr inbounds ptr, ptr {vtable}, i64 {slot}");
         return Emit("ptr", $"load ptr, ptr {methodSlot}");
+    }
+
+    /// <summary>
+    /// Builds a closure: allocate the generated class, then copy each captured
+    /// value into its field.
+    ///
+    /// Capture is by value, so a captured reference is retained here and
+    /// released by the class's destroy hook -- which the emitter already writes
+    /// for every class. The closure therefore owns what it captured and may
+    /// outlive the scope that made it.
+    /// </summary>
+    private Val EmitClosure(BoundClosure closure)
+    {
+        var type = closure.ClosureType;
+
+        string instance = Emit("ptr",
+            $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(type)})");
+
+        foreach (var (field, value) in closure.Captures)
+        {
+            var captured = EmitExpression(value);
+            string address = Emit("ptr",
+                $"getelementptr inbounds i8, ptr {instance}, i64 " +
+                $"{ClassTypeSymbol.HeaderSize + field.Offset}");
+
+            StoreInto(address, captured, field.Type);
+        }
+
+        TrackTemporary(instance, type);
+        return new Val(instance, "ptr", closure.Type);
     }
 
     private Val EmitNewArray(BoundNewArray expression)
@@ -1626,6 +2189,52 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             $"getelementptr inbounds {LlvmTypeOf(arrayType.Element)}, ptr {data}, i64 {widened}");
     }
 
+    /// <summary>
+    /// A call through a delegate. The only difference from a direct call is that
+    /// the target is a loaded pointer rather than a symbol, so the signature has
+    /// to be written out for LLVM to know how to call it.
+    /// </summary>
+    private Val EmitIndirectCall(BoundIndirectCall call)
+    {
+        var delegateType = call.DelegateType;
+        var returnInfo = Win64Abi.ClassifyReturn(delegateType.ReturnType, LlvmTypeOf);
+
+        // Resolved before the arguments, so an argument that is itself a call
+        // cannot disturb the target this one loaded.
+        var target = EmitExpression(call.Target);
+
+        var arguments = new List<string>();
+        string? sretSlot = null;
+
+        if (returnInfo.Style == PassStyle.Indirect)
+        {
+            var structType = (StructTypeSymbol)delegateType.ReturnType;
+            sretSlot = Alloca(StructName(structType), "call.sret");
+            arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
+        }
+
+        AppendArguments(call.Arguments, arguments);
+
+        string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+        string invocation = $"call {signature} {target.Ref}({string.Join(", ", arguments)})";
+
+        if (returnInfo.Style == PassStyle.Indirect)
+        {
+            Line(invocation);
+            return new Val(sretSlot!, "ptr", delegateType.ReturnType);
+        }
+
+        if (delegateType.ReturnType.IsVoid())
+        {
+            Line(invocation);
+            return Val.Void;
+        }
+
+        var result = new Val(Emit(signature, invocation), signature, delegateType.ReturnType);
+        if (delegateType.ReturnType.NeedsArc()) TrackTemporary(result.Ref, delegateType.ReturnType);
+        return result;
+    }
+
     private Val EmitCall(BoundCall call)
     {
         var function = call.Function;
@@ -1656,7 +2265,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
                 virtualTarget = LoadInterfaceMethod(receiver.Ref, function);
         }
 
-        AppendArguments(function, call.Arguments, arguments);
+        AppendArguments(call.Arguments, arguments);
 
         string signature = function.IsVariadic
             ? $"{(returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType)} " +
@@ -1709,8 +2318,13 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         return string.Join(", ", parts);
     }
 
+    /// <summary>
+    /// Lowers each argument to its ABI form. The callee is not needed: every
+    /// argument was already converted to the parameter's type during binding, so
+    /// the expression's own type is the one the ABI classifies.
+    /// </summary>
     private void AppendArguments(
-        FunctionSymbol function, IReadOnlyList<BoundExpression> expressions, List<string> arguments)
+        IReadOnlyList<BoundExpression> expressions, List<string> arguments)
     {
         for (int i = 0; i < expressions.Count; i++)
         {

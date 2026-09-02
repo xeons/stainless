@@ -66,8 +66,8 @@ clang. Startup cost is a C program's startup cost.
 
 **3. ARC, not GC.** `class` types are reference counted and destroyed
 deterministically. No collector, no pauses, no tracing thread — the entire
-runtime is [seven small C files](runtime/): reference counting, text, UTF-16,
-a string builder, arrays, reflection metadata, and console output.
+runtime is [eight small C files](runtime/): reference counting, text, UTF-16,
+a string builder, arrays, reflection metadata, console output, and threads.
 
 **4. C/C++ ABI compatible.** A Stainless `struct` *is* a C struct, byte for byte.
 `extern "C"` calls into C and `export "C"` exposes functions back, with no
@@ -292,8 +292,9 @@ Primitive names and sizes match C# exactly: `sbyte short int long nint`,
 Pointers are `T*`, optional class references are `C?`, and `weak C?` breaks
 cycles.
 
-Full details: **[docs/language-spec.md](docs/language-spec.md)** and
-**[docs/abi.md](docs/abi.md)**.
+Full details: **[docs/language-spec.md](docs/language-spec.md)**,
+**[docs/abi.md](docs/abi.md)** and, for where threading is going,
+**[docs/concurrency.md](docs/concurrency.md)**.
 
 ---
 
@@ -449,19 +450,43 @@ Everything below is covered by [the test suite](tests/cases).
 - `extern "C"` and `export "C"`, including variadics and structs by value in
   both directions
 - Win64 struct ABI: register coercion, `byval`, `sret`
-- `if` / `while` / `for` / `break` / `continue` / `return`, recursion
-- Full operator set with C# precedence, short-circuit `&&` and `||`
+- `if` / `while` / `for` / `foreach` / `break` / `continue` / `return`, recursion
+- `parallel { spawn f(x); }` — a fork-join scope whose closing brace waits, so
+  a job writes its result straight into the parent's local; and `parallel for`,
+  which splits a counted loop across the pool
+- `static readonly` module storage, initialized before `Main` in an order the
+  compiler computes from the dependency graph — no lazy guard, and a compile
+  error on a cycle. There is no `static` without `readonly`
+- A checked rule for what may cross a thread: plain data, a `String`, a
+  `[Shared]` type, or an array of plain data. Anything else is rejected at the
+  `spawn`, the `parallel for` capture, or the static that would share it
+- Full operator set with C# precedence, short-circuit `&&` and `||`, and the
+  conditional `a ? b : c`
 - `var`, `const`, explicit locals, compound assignment
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
 - `T[]`: counted arrays, always bounds checked, elements released with the array
-- Generics: generic classes, interfaces and functions, monomorphized, with
+- Generics: generic classes, interfaces, functions and methods, monomorphized, with
   inference at call sites and interface constraints (`where T : IComparable<T>`)
+- `enum`, strongly typed: a distinct type over an integer that never converts
+  implicitly in either direction, with an optional underlying type
+  (`enum Level : byte`)
+- `delegate`: a named function pointer, one word, C ABI compatible in both
+  directions, and storable in a `struct`
+- Lambdas and closures: `value => value * factor` becomes a generated class
+  implementing a single-method interface, capturing **by value** so it may
+  outlive the scope that built it; a non-capturing one becomes a `delegate`
+- `foreach` over arrays and over anything with a `GetEnumerator()`, plus
+  `IEnumerable<T>` / `IEnumerator<T>` in `Standard.Collections`
 - Interfaces: several per class, dynamic dispatch, checked at compile time, and
   extending one another with free conversion to the base
 - `Standard.Collections`: `IComparable<T>`, `IEquatable<T>`, `IReadOnlyList<T>`,
-  `IList<T>`, `List<T>`, and `Sort`/`Largest`/`Smallest`/`IndexOf`
+  `IList<T>`, `IEnumerable<T>`, `IEnumerator<T>`, `List<T>`, and
+  `Sort`/`Largest`/`Smallest`/`IndexOf`
 - `StringBuilder`: mutable text with amortised O(1) appends
+- `Standard.Threading`: `Mutex<T>` and its `Guard<T>` (the lock owns what it
+  guards, and a destructor releases it), `AtomicLong`, `AtomicBool`, and
+  `TaskScope` for running `Job` delegates on the pool
 - `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
 - Raw pointers, `sizeof`, `typeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#
@@ -484,10 +509,16 @@ Being straight about the edges, roughly in the order they are worth adding:
   kind constraints, no `new()`.
 - **Type arguments cannot be written at a call.** `Pick<int>(...)` is rejected,
   because `<` in expression position is ambiguous with less-than; inference
-  reads argument types only.
-- **No generic methods**, only generic types and generic free functions.
-- **No `foreach`, `switch`, or `enum`.** Iterating a list means an index and a
-  `for`; there is no pattern matching and no enumerated type.
+  reads argument types only. That holds for generic methods too, and an
+  interface method cannot be generic at all, since dispatch gives it one slot.
+- **No `switch` and no pattern matching.** `enum` exists, but selecting on one
+  means a chain of `if`s.
+- **A lambda needs something to be.** It is typed by what it is assigned to, so
+  `var f = x => x;` has nothing to infer from. Capture is by value only, and a
+  capturing lambda cannot become a `delegate` — a function pointer has nowhere
+  to keep what was captured.
+- **No flags enums.** Bitwise operators are rejected on an enum, because
+  nothing yet says that an enum is a set rather than a choice.
 - **No exceptions or error type.** A failure aborts through the runtime; there
   is no way to recover from one.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
@@ -506,7 +537,19 @@ Being straight about the edges, roughly in the order they are worth adding:
   overload).
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a
   +0/+1 dataflow pass would remove most of it.
-- **Non-atomic reference counts.** Single-threaded only.
+- **Two thread-safety gaps remain, and both are about lifetimes.** What crosses
+  a thread is now checked by type, so an unsynchronized class cannot reach a
+  second thread at all. What is still unchecked is how long a borrowed thing
+  lives: a `Guard` can outlive the lock it proves, and a job could store an
+  array it was only lent. `[Shared]` is also an assertion rather than a proof,
+  the same bargain as Rust's `unsafe impl Sync`. Reference counts stay
+  non-atomic by design — see [docs/concurrency.md](docs/concurrency.md).
+- **No cancellation beyond a shared flag.** An `AtomicBool` a job polls is the
+  whole story; a `parallel` block always joins, and always will. See §9 of the
+  concurrency notes for what is worth adding and what never will be.
+- **Statics are module-level only**, and a `--shared` library cannot have one:
+  there is no entry point to initialize it from. No `static` members on a type,
+  and no per-thread storage.
 - **Win64 only** for struct passing; the SysV classifier is not written.
 - **Whole-program compilation.** Modules make separate compilation possible, but
   the driver does not do it yet, so a Stainless library cannot be consumed by
@@ -519,7 +562,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 ## Repository layout
 
 ```
-docs/                  language specification and ABI
+docs/                  language specification, ABI, concurrency design
 runtime/               the runtime, split by feature, embedded in the compiler
 stdlib/                the standard library written in Stainless, also embedded
 samples/               example programs

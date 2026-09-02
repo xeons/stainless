@@ -91,6 +91,35 @@ public sealed class FunctionSymbol
         $"({string.Join(", ", Parameters.Where(p => !p.IsThis))})";
 }
 
+/// <summary>
+/// Module-level storage, initialized once before <c>Main</c> runs.
+///
+/// Unlike a <see cref="ConstantSymbol"/> this has an address and a real
+/// initializer, so the order the initializers run in matters. Because Stainless
+/// compiles the whole program at once, that order is computed rather than
+/// guessed: see the topological sort in the binder.
+/// </summary>
+public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName)
+{
+    public string Name { get; } = name;
+    public TypeSymbol Type { get; } = type;
+    public string ModuleName { get; } = moduleName;
+    public bool IsPublic { get; init; }
+
+    public required Source.SourceSpan Span { get; init; }
+
+    /// <summary>The initializer, bound in pass 8 like any other body.</summary>
+    public BoundExpression? Initializer { get; set; }
+
+    /// <summary>The statics this one's initializer reads, for ordering.</summary>
+    public List<StaticSymbol> DependsOn { get; } = [];
+
+    public string QualifiedName =>
+        string.IsNullOrEmpty(ModuleName) ? Name : ModuleName + "." + Name;
+
+    public override string ToString() => $"{Type.Name} {QualifiedName}";
+}
+
 /// <summary>A module-level <c>const</c>, folded to a value at bind time.</summary>
 public sealed class ConstantSymbol(string name, TypeSymbol type, object? value)
 {
@@ -136,6 +165,19 @@ public sealed class GenericFunctionTemplate(
     public IReadOnlyList<string> Parameters => Declaration.TypeParameters;
     public bool IsPublic => Declaration.Modifiers.HasFlag(Modifiers.Public);
 
+    /// <summary>The type this is a method of, or null for a free function.</summary>
+    public NamedTypeSymbol? ContainingType { get; init; }
+
+    /// <summary>
+    /// The type arguments already in force where this template was declared.
+    ///
+    /// A generic method inside a generic class sees two sets of parameters: the
+    /// class's, fixed when the class was instantiated, and its own, inferred at
+    /// each call. This holds the first so the second can be merged onto it.
+    /// </summary>
+    public IReadOnlyDictionary<string, TypeSymbol> OuterSubstitution { get; init; } =
+        new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+
     public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
 }
 
@@ -150,6 +192,7 @@ public sealed class ModuleSymbol(string name)
     public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];
     public Dictionary<string, ConstantSymbol> Constants { get; } = new(StringComparer.Ordinal);
+    public Dictionary<string, StaticSymbol> Statics { get; } = new(StringComparer.Ordinal);
 
     public IEnumerable<FunctionSymbol> FindFunctions(string name) =>
         Functions.Where(f => f.Name == name && f.ContainingType is null);

@@ -168,8 +168,17 @@ public sealed class Parser
                   TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword))
             return [ParseTypeDeclaration(start, modifiers, attributes)];
 
+        if (At(TokenKind.EnumKeyword))
+            return [ParseEnumDeclaration(start, modifiers, attributes)];
+
+        if (At(TokenKind.DelegateKeyword))
+            return [ParseDelegateDeclaration(start, modifiers)];
+
         if (At(TokenKind.Tilde) && enclosingType is not null)
             return [ParseDestructor(start, enclosingType)];
+
+        if (At(TokenKind.StaticKeyword))
+            return [ParseStaticDeclaration(start, modifiers)];
 
         if (modifiers.HasFlag(Modifiers.Const))
             return [ParseGlobalConst(start, modifiers)];
@@ -313,6 +322,81 @@ public sealed class Parser
         return new TypeDeclSyntax(
             SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
             implements, members, attributes);
+    }
+
+    /// <summary>
+    /// <c>enum Level : byte { Low, High = 9 }</c>. The underlying type defaults
+    /// to <c>int</c>; a member without a value continues from the one before it.
+    /// </summary>
+    private Declaration ParseEnumDeclaration(
+        int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes)
+    {
+        Expect(TokenKind.EnumKeyword);
+        string name = ExpectIdentifier();
+
+        TypeSyntax? underlying = Match(TokenKind.Colon) ? ParseType() : null;
+
+        Expect(TokenKind.OpenBrace);
+
+        var members = new List<EnumMemberSyntax>();
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int memberStart = _pos;
+            string memberName = ExpectIdentifier();
+            ExpressionSyntax? value = Match(TokenKind.Equals) ? ParseExpression() : null;
+            members.Add(new EnumMemberSyntax(SpanFrom(memberStart), memberName, value));
+
+            if (!Match(TokenKind.Comma)) break;
+        }
+
+        Expect(TokenKind.CloseBrace);
+
+        return new EnumDeclSyntax(
+            SpanFrom(start), modifiers, name, underlying, members, attributes);
+    }
+
+    /// <summary>
+    /// <c>delegate int Comparison(int a, int b);</c>. The parameter names are
+    /// documentation only, exactly as in a C prototype.
+    /// </summary>
+    private Declaration ParseDelegateDeclaration(int start, Modifiers modifiers)
+    {
+        Expect(TokenKind.DelegateKeyword);
+        var returnType = ParseType();
+        string name = ExpectIdentifier();
+        var parameters = ParseParameterList(out bool variadic);
+
+        if (variadic)
+            _diagnostics.Error("SL0358", SpanFrom(start),
+                $"delegate '{name}' cannot be variadic; there is no way to call one safely");
+
+        Expect(TokenKind.Semicolon);
+        return new DelegateDeclSyntax(SpanFrom(start), modifiers, name, returnType, parameters);
+    }
+
+    /// <summary>
+    /// <c>static readonly T Name = value;</c>. The type is written out, as a C#
+    /// field's is; <c>var</c> infers for locals only.
+    /// </summary>
+    private Declaration ParseStaticDeclaration(int start, Modifiers modifiers)
+    {
+        Expect(TokenKind.StaticKeyword);
+
+        if (!Match(TokenKind.ReadonlyKeyword))
+        {
+            _diagnostics.Error("SL0376", SpanFrom(start),
+                "a 'static' must be 'readonly'; there is no mutable global in Stainless, " +
+                "because nothing would synchronize it. Hold the mutable part in a type " +
+                "that says how it is safe, as in 'static readonly AtomicLong Count = ...'");
+        }
+
+        var type = ParseType();
+        string name = ExpectIdentifier();
+        Expect(TokenKind.Equals);
+        var value = ParseExpression();
+        Expect(TokenKind.Semicolon);
+
+        return new StaticDeclSyntax(SpanFrom(start), modifiers, type, name, value);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)
@@ -488,7 +572,7 @@ public sealed class Parser
         do { arguments.Add(ParseType()); }
         while (Match(TokenKind.Comma));
 
-        Expect(TokenKind.Greater);
+        ExpectTypeArgumentEnd();
         return arguments;
     }
 
@@ -518,6 +602,33 @@ public sealed class Parser
         return clauses;
     }
 
+    /// <summary>
+    /// Consumes the <c>&gt;</c> that closes a type argument list, splitting a
+    /// <c>&gt;&gt;</c> in half when it finds one.
+    ///
+    /// The lexer cannot tell the two apart: in <c>List&lt;Box&lt;int&gt;&gt;</c>
+    /// the last two characters are one shift operator by every rule it knows.
+    /// Only the parser knows a type argument list is open, so it is the parser
+    /// that puts the second <c>&gt;</c> back.
+    /// </summary>
+    private void ExpectTypeArgumentEnd()
+    {
+        if (!At(TokenKind.GreaterGreater))
+        {
+            Expect(TokenKind.Greater);
+            return;
+        }
+
+        var shift = _tokens[_pos];
+        var span = shift.Span;
+
+        // Put back the half this list did not need, so the enclosing one closes.
+        _tokens[_pos] = new Token(
+            TokenKind.Greater,
+            new SourceSpan(span.File, span.Start + 1, span.End),
+            ">");
+    }
+
     /// <summary>Parses <c>&lt;T, U&gt;</c> in a declaration.</summary>
     private List<string> ParseTypeParameterList()
     {
@@ -527,7 +638,7 @@ public sealed class Parser
         do { parameters.Add(ExpectIdentifier()); }
         while (Match(TokenKind.Comma));
 
-        Expect(TokenKind.Greater);
+        ExpectTypeArgumentEnd();
         return parameters;
     }
 
@@ -593,6 +704,64 @@ public sealed class Parser
 
                 var body = ParseStatement();
                 return new ForSyntax(SpanFrom(start), initializer, condition, step, body);
+            }
+
+            case TokenKind.ParallelKeyword:
+            {
+                Advance();
+
+                // `parallel for (...)` splits a counted loop; `parallel { }` is
+                // a scope that `spawn` queues work on.
+                if (At(TokenKind.ForKeyword))
+                {
+                    Advance();
+                    Expect(TokenKind.OpenParen);
+
+                    var loopInit = ParseSimpleStatement(requireSemicolon: true);
+                    var loopCondition = ParseExpression();
+                    Expect(TokenKind.Semicolon);
+                    var loopStep = ParseExpression();
+                    Expect(TokenKind.CloseParen);
+
+                    return new ParallelForSyntax(
+                        SpanFrom(start), loopInit, loopCondition, loopStep, ParseStatement());
+                }
+
+                return new ParallelSyntax(SpanFrom(start), ParseBlock());
+            }
+
+            case TokenKind.SpawnKeyword:
+            {
+                Advance();
+
+                var spawned = ParseExpression();
+                Expect(TokenKind.Semicolon);
+
+                // `spawn x = f()` parses as an assignment; split it back apart so
+                // the call and the place its result lands stay separate.
+                if (spawned is AssignmentSyntax { Operator: TokenKind.Equals } assignment)
+                    return new SpawnSyntax(SpanFrom(start), assignment.Target, assignment.Value);
+
+                return new SpawnSyntax(SpanFrom(start), null, spawned);
+            }
+
+            case TokenKind.ForeachKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+
+                // `foreach (var x in xs)` infers; anything else names a type.
+                TypeSyntax? elementType = null;
+                if (At(TokenKind.VarKeyword)) Advance();
+                else elementType = ParseType();
+
+                string name = ExpectIdentifier();
+                Expect(TokenKind.InKeyword);
+                var collection = ParseExpression();
+                Expect(TokenKind.CloseParen);
+
+                var loopBody = ParseStatement();
+                return new ForEachSyntax(SpanFrom(start), elementType, name, collection, loopBody);
             }
 
             case TokenKind.ReturnKeyword:
@@ -702,7 +871,12 @@ public sealed class Parser
     private ExpressionSyntax ParseAssignment()
     {
         int start = _pos;
-        var left = ParseBinary(1);
+
+        // A lambda binds looser than anything else, so it is recognised before
+        // the operator chain rather than inside it.
+        if (TryParseLambda() is { } lambda) return lambda;
+
+        var left = ParseConditional();
 
         if (AtAny(AssignmentOperators))
         {
@@ -712,6 +886,95 @@ public sealed class Parser
         }
 
         return left;
+    }
+
+    /// <summary>
+    /// <c>a ? b : c</c>, binding looser than every binary operator and tighter
+    /// than assignment. The false arm recurses, so <c>a ? b : c ? d : e</c>
+    /// groups to the right as it does in C.
+    /// </summary>
+    /// <summary>
+    /// Recognises <c>a =&gt; ...</c>, <c>(a, b) =&gt; ...</c> and
+    /// <c>(int a) =&gt; ...</c>, or returns null having consumed nothing.
+    ///
+    /// The parenthesised forms need speculation, because up to the arrow they
+    /// are indistinguishable from a parenthesised expression or a cast.
+    /// </summary>
+    private ExpressionSyntax? TryParseLambda()
+    {
+        int start = _pos;
+
+        // The one form that needs no lookahead past a single token.
+        if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.EqualsGreater)
+        {
+            var single = new LambdaParameterSyntax(SpanFrom(_pos), null, Advance().Text);
+            Advance();
+            return FinishLambda(start, [single]);
+        }
+
+        if (!At(TokenKind.OpenParen)) return null;
+        if (!Speculate(TryParseLambdaParameters, out var parameters) || parameters is null) return null;
+
+        return FinishLambda(start, parameters);
+    }
+
+    private sealed record LambdaHead(List<LambdaParameterSyntax> Parameters);
+
+    private List<LambdaParameterSyntax>? TryParseLambdaParameters()
+    {
+        Expect(TokenKind.OpenParen);
+
+        var parameters = new List<LambdaParameterSyntax>();
+
+        if (!At(TokenKind.CloseParen))
+        {
+            do
+            {
+                int parameterStart = _pos;
+
+                // `(a, b)` names only; `(int a, int b)` names types too. A bare
+                // identifier followed by ',' or ')' is a name.
+                TypeSyntax? type = null;
+                if (!(At(TokenKind.Identifier) &&
+                      (Peek(1).Kind is TokenKind.Comma or TokenKind.CloseParen)))
+                    type = ParseType();
+
+                if (!At(TokenKind.Identifier)) return null;
+                string name = Advance().Text;
+
+                parameters.Add(new LambdaParameterSyntax(SpanFrom(parameterStart), type, name));
+            }
+            while (Match(TokenKind.Comma));
+        }
+
+        if (!Match(TokenKind.CloseParen)) return null;
+        if (!Match(TokenKind.EqualsGreater)) return null;
+
+        return parameters;
+    }
+
+    private ExpressionSyntax FinishLambda(int start, List<LambdaParameterSyntax> parameters)
+    {
+        if (At(TokenKind.OpenBrace))
+            return new LambdaSyntax(SpanFrom(start), parameters, null, ParseBlock());
+
+        return new LambdaSyntax(SpanFrom(start), parameters, ParseExpression(), null);
+    }
+
+    private ExpressionSyntax ParseConditional()
+    {
+        int start = _pos;
+        var condition = ParseBinary(1);
+
+        if (!At(TokenKind.Question)) return condition;
+        Advance();
+
+        // The true arm is delimited by ':', so a full expression is unambiguous.
+        var whenTrue = ParseExpression();
+        Expect(TokenKind.Colon);
+        var whenFalse = ParseAssignment();
+
+        return new ConditionalSyntax(SpanFrom(start), condition, whenTrue, whenFalse);
     }
 
     private ExpressionSyntax ParseBinary(int minPrecedence)

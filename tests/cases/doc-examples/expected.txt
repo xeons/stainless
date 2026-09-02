@@ -1,0 +1,10 @@
+recorded=1
+delegate=42
+closure=21
+adder=15
+enum=1
+severe=11
+found=42
+statics=20 40 41
+pixels=225
+done

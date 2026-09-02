@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include "library.h"
 
+static int bump(int value) { return value + 3; }
+
 int main(void)
 {
     printf("add=%d\n", Add(40, 2));

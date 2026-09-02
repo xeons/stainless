@@ -1,0 +1,8 @@
+base=20 doubled=40 total=41
+ratio=1.5
+hello
+origin=3,4
+hits=64
+guarded=64
+after=2064
+done

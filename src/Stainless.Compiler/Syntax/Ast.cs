@@ -143,6 +143,34 @@ public sealed record AttributeSyntax(
     QualifiedName Name,
     IReadOnlyList<ExpressionSyntax> Arguments) : SyntaxNode(Span);
 
+/// <summary>
+/// <c>delegate int Comparison(int a, int b);</c> — a named function pointer
+/// type. It is one pointer with the platform C calling convention, so it is the
+/// same value a C function pointer is.
+/// </summary>
+public sealed record DelegateDeclSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    string Name,
+    TypeSyntax ReturnType,
+    IReadOnlyList<ParameterSyntax> Parameters) : Declaration(Span, Modifiers);
+
+/// <summary>One <c>enum</c> member, with the constant it was given if any.</summary>
+public sealed record EnumMemberSyntax(SourceSpan Span, string Name, ExpressionSyntax? Value)
+    : SyntaxNode(Span);
+
+/// <summary>
+/// <c>enum Color { Red, Green }</c>, optionally over a chosen integer type as in
+/// <c>enum Level : byte { ... }</c>.
+/// </summary>
+public sealed record EnumDeclSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    string Name,
+    TypeSyntax? UnderlyingType,
+    IReadOnlyList<EnumMemberSyntax> Members,
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
+
 public enum TypeDeclKind { Struct, Class, Interface, Attribute }
 
 public sealed record TypeDeclSyntax(
@@ -155,6 +183,21 @@ public sealed record TypeDeclSyntax(
     IReadOnlyList<TypeSyntax> Implements,
     IReadOnlyList<Declaration> Members,
     IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
+
+/// <summary>
+/// <c>public static readonly List&lt;String&gt; Registry = ...;</c> — module-level
+/// storage, initialized once before <c>Main</c>.
+///
+/// There is no <c>static</c> without <c>readonly</c>: a plainly mutable global
+/// is shared state that nothing synchronizes, and that is the bug this language
+/// would rather not have. Mutation goes through a type that says how it is safe.
+/// </summary>
+public sealed record StaticDeclSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    TypeSyntax Type,
+    string Name,
+    ExpressionSyntax Value) : Declaration(Span, Modifiers);
 
 /// <summary>A module-level <c>const</c>.</summary>
 public sealed record GlobalConstDeclSyntax(
@@ -208,6 +251,46 @@ public sealed record ForSyntax(
     ExpressionSyntax? Condition,
     ExpressionSyntax? Step,
     StatementSyntax Body) : StatementSyntax(Span);
+
+/// <summary>
+/// <c>foreach (T item in collection) body</c>. A null <see cref="Type"/> means
+/// <c>var</c>, and the element type comes from the collection.
+/// </summary>
+public sealed record ForEachSyntax(
+    SourceSpan Span,
+    TypeSyntax? Type,
+    string Name,
+    ExpressionSyntax Collection,
+    StatementSyntax Body) : StatementSyntax(Span);
+
+/// <summary>
+/// <c>parallel { ... }</c> — a fork-join scope. Every <c>spawn</c> inside it has
+/// finished by the closing brace, which is what lets a job borrow the enclosing
+/// function's locals.
+/// </summary>
+public sealed record ParallelSyntax(SourceSpan Span, BlockSyntax Body) : StatementSyntax(Span);
+
+/// <summary>
+/// <c>parallel for (int i = 0; i &lt; n; i = i + 1) { ... }</c> — the loop's
+/// iterations split into chunks across the pool. It opens and joins its own
+/// scope, so it needs no enclosing <c>parallel</c>.
+/// </summary>
+public sealed record ParallelForSyntax(
+    SourceSpan Span,
+    StatementSyntax Initializer,
+    ExpressionSyntax Condition,
+    ExpressionSyntax Step,
+    StatementSyntax Body) : StatementSyntax(Span);
+
+/// <summary>
+/// <c>spawn f(x);</c> or <c>spawn result = f(x);</c> — queues a call on the
+/// enclosing <c>parallel</c> scope. The assignment happens on the worker, into
+/// storage the parent still owns.
+/// </summary>
+public sealed record SpawnSyntax(
+    SourceSpan Span,
+    ExpressionSyntax? Target,
+    ExpressionSyntax Call) : StatementSyntax(Span);
 
 public sealed record ReturnSyntax(SourceSpan Span, ExpressionSyntax? Value) : StatementSyntax(Span);
 
@@ -268,6 +351,35 @@ public sealed record NewArraySyntax(
     SourceSpan Span,
     TypeSyntax ElementType,
     ExpressionSyntax Length) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>condition ? whenTrue : whenFalse</c>. Both arms must reach a common type,
+/// and only the chosen one is evaluated.
+/// </summary>
+public sealed record ConditionalSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Condition,
+    ExpressionSyntax WhenTrue,
+    ExpressionSyntax WhenFalse) : ExpressionSyntax(Span);
+
+/// <summary>
+/// One lambda parameter. A null <see cref="Type"/> means it is taken from the
+/// interface or delegate the lambda is being converted to.
+/// </summary>
+public sealed record LambdaParameterSyntax(SourceSpan Span, TypeSyntax? Type, string Name)
+    : SyntaxNode(Span);
+
+/// <summary>
+/// <c>(int a, int b) => a + b</c> — a lambda.
+///
+/// It has no type of its own: what it becomes is decided by what it is assigned
+/// to, which is also where its parameter types come from when they are omitted.
+/// </summary>
+public sealed record LambdaSyntax(
+    SourceSpan Span,
+    IReadOnlyList<LambdaParameterSyntax> Parameters,
+    ExpressionSyntax? Expression,
+    BlockSyntax? Block) : ExpressionSyntax(Span);
 
 public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);

@@ -51,6 +51,21 @@ void sl_object_init(void *pointer, const SlTypeInfo *type)
     object->type   = type;
 }
 
+void sl_make_immortal(void *pointer)
+{
+    SlObject *object = (SlObject *)pointer;
+    if (object == NULL) return;
+
+    /*
+     * Already immortal is the common case, not an edge one: a string literal
+     * lives in read-only storage, so storing the marker again would fault
+     * rather than be harmless.
+     */
+    if (object->strong == SL_IMMORTAL) return;
+
+    object->strong = SL_IMMORTAL;
+}
+
 void *sl_alloc(const SlTypeInfo *type)
 {
     SlObject *object = (SlObject *)calloc(1, type->size);

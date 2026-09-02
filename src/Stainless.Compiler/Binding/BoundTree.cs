@@ -101,6 +101,13 @@ public sealed class BoundParameterAccess(SourceSpan span, ParameterSymbol parame
     public override bool IsLValue => true;
 }
 
+/// <summary>Reads module-level storage. Never an lvalue: a static is readonly.</summary>
+public sealed class BoundStaticAccess(SourceSpan span, StaticSymbol symbol)
+    : BoundExpression(span, symbol.Type)
+{
+    public StaticSymbol Static { get; } = symbol;
+}
+
 public sealed class BoundConstantAccess(SourceSpan span, ConstantSymbol constant)
     : BoundExpression(span, constant.Type)
 {
@@ -154,6 +161,85 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 {
     public BoundExpression Target { get; } = target;
     public BoundExpression Value { get; } = value;
+}
+
+/// <summary>
+/// <c>condition ? whenTrue : whenFalse</c>. Kept as a node rather than lowered
+/// to an <c>if</c>, because only the chosen arm may be evaluated and the result
+/// is a value, not a statement.
+/// </summary>
+public sealed class BoundConditional(
+    SourceSpan span, TypeSymbol type,
+    BoundExpression condition, BoundExpression whenTrue, BoundExpression whenFalse)
+    : BoundExpression(span, type)
+{
+    public BoundExpression Condition { get; } = condition;
+    public BoundExpression WhenTrue { get; } = whenTrue;
+    public BoundExpression WhenFalse { get; } = whenFalse;
+}
+
+/// <summary>
+/// A bare function name before it is known which delegate it is becoming. It is
+/// never emitted: binding either converts it to a delegate or reports that it
+/// could not.
+/// </summary>
+public sealed class BoundFunctionGroup(
+    SourceSpan span, TypeSymbol type, string name, IReadOnlyList<FunctionSymbol> candidates)
+    : BoundExpression(span, type)
+{
+    public string Name { get; } = name;
+    public IReadOnlyList<FunctionSymbol> Candidates { get; } = candidates;
+}
+
+/// <summary>
+/// A lambda before it is known what it becomes. Like a function name it has no
+/// type of its own, and binding either converts it or reports that it could not.
+/// </summary>
+public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaSyntax syntax)
+    : BoundExpression(span, type)
+{
+    public Syntax.LambdaSyntax Syntax { get; } = syntax;
+}
+
+/// <summary>
+/// Creates a closure: an instance of a compiler-generated class that implements
+/// the target interface, with one field per captured value.
+///
+/// Capture is **by value**, taken when the closure is made. A captured
+/// reference is retained into the field and released when the closure dies, so
+/// a closure may outlive the scope that built it without any lifetime question
+/// arising.
+/// </summary>
+public sealed class BoundClosure(
+    SourceSpan span,
+    TypeSymbol type,
+    ClassTypeSymbol closureType,
+    IReadOnlyList<(FieldSymbol Field, BoundExpression Value)> captures)
+    : BoundExpression(span, type)
+{
+    public ClassTypeSymbol ClosureType { get; } = closureType;
+    public IReadOnlyList<(FieldSymbol Field, BoundExpression Value)> Captures { get; } = captures;
+}
+
+/// <summary>A function's address, typed as a delegate.</summary>
+public sealed class BoundFunctionReference(
+    SourceSpan span, TypeSymbol type, FunctionSymbol function)
+    : BoundExpression(span, type)
+{
+    public FunctionSymbol Function { get; } = function;
+}
+
+/// <summary>A call through a delegate rather than to a known symbol.</summary>
+public sealed class BoundIndirectCall(
+    SourceSpan span,
+    DelegateTypeSymbol delegateType,
+    BoundExpression target,
+    IReadOnlyList<BoundExpression> arguments)
+    : BoundExpression(span, delegateType.ReturnType)
+{
+    public DelegateTypeSymbol DelegateType { get; } = delegateType;
+    public BoundExpression Target { get; } = target;
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
 }
 
 public sealed class BoundConversion(
@@ -303,6 +389,67 @@ public sealed class BoundFor(
 
     /// <summary>A local declared by the initializer, scoped to the loop.</summary>
     public List<LocalSymbol> Locals { get; } = [];
+}
+
+/// <summary>
+/// A fork-join scope. The emitter opens a runtime scope before the body and
+/// joins it after, so nothing spawned inside can outlive the block.
+/// </summary>
+public sealed class BoundParallel(SourceSpan span, BoundStatement body) : BoundStatement(span)
+{
+    public BoundStatement Body { get; } = body;
+}
+
+/// <summary>
+/// One queued call. The arguments are evaluated by the parent at the point the
+/// <c>spawn</c> is written, then copied into a block the worker unpacks, so a
+/// spawn in a loop sees that iteration's values rather than the last.
+/// </summary>
+public sealed class BoundSpawn(
+    SourceSpan span,
+    BoundExpression? target,
+    BoundCall call) : BoundStatement(span)
+{
+    /// <summary>Where the result is stored, or null when it is discarded.</summary>
+    public BoundExpression? Target { get; } = target;
+
+    public BoundCall Call { get; } = call;
+}
+
+/// <summary>
+/// A counted loop whose iterations are split across the pool.
+///
+/// The trip count is computed once, up front, from the recognised
+/// <c>start</c>/<c>limit</c>/<c>stride</c> form: a general C-style <c>for</c>
+/// cannot be chunked, because there is no way to know how many times it runs.
+/// </summary>
+public sealed class BoundParallelFor(
+    SourceSpan span,
+    LocalSymbol variable,
+    BoundExpression start,
+    BoundExpression limit,
+    BoundExpression stride,
+    bool inclusive,
+    BoundStatement body,
+    IReadOnlyList<object> captures) : BoundStatement(span)
+{
+    /// <summary>The loop variable, private to each chunk.</summary>
+    public LocalSymbol Variable { get; } = variable;
+
+    public BoundExpression Start { get; } = start;
+    public BoundExpression Limit { get; } = limit;
+    public BoundExpression Stride { get; } = stride;
+
+    /// <summary>True when the condition was <c>&lt;=</c> rather than <c>&lt;</c>.</summary>
+    public bool Inclusive { get; } = inclusive;
+
+    public BoundStatement Body { get; } = body;
+
+    /// <summary>
+    /// The enclosing locals and parameters the body reads, captured by address.
+    /// Each is a <see cref="LocalSymbol"/> or a <see cref="ParameterSymbol"/>.
+    /// </summary>
+    public IReadOnlyList<object> Captures { get; } = captures;
 }
 
 public sealed class BoundReturn(SourceSpan span, BoundExpression? value) : BoundStatement(span)

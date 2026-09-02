@@ -1,0 +1,12 @@
+double=42
+square=49
+twice=5
+twiceSquare=81
+picked=42
+report=99
+isNull=1
+isNotNull=1
+pipeline=36
+cApply=101
+cSum=14
+done

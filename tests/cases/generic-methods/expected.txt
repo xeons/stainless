@@ -1,0 +1,10 @@
+int=10
+intB=20
+yes
+count=3
+wordCount=5
+bigger=500
+middle=2
+outer
+taken=7
+done

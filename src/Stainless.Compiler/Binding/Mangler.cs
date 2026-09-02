@@ -117,6 +117,16 @@ public static class Mangler
                 AppendIdentifier(sb, Sanitize(structType.QualifiedName));
                 break;
 
+            case EnumTypeSymbol enumType:
+                sb.Append('E');
+                AppendIdentifier(sb, Sanitize(enumType.QualifiedName));
+                break;
+
+            case DelegateTypeSymbol delegateType:
+                sb.Append('D');
+                AppendIdentifier(sb, Sanitize(delegateType.QualifiedName));
+                break;
+
             default:
                 sb.Append('v');
                 break;

@@ -1,0 +1,10 @@
+max=9
+min=3
+wide=1
+guard=-1
+high
+middle
+low
+first
+fresh
+done

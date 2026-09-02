@@ -1,0 +1,6 @@
+total=42
+deep=9
+six=42
+five=7
+guarded=2
+done

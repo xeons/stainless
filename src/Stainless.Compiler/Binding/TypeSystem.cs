@@ -200,6 +200,12 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public List<FunctionSymbol> Methods { get; } = [];
 
     /// <summary>
+    /// Methods with type parameters of their own. They stay templates until a
+    /// call says what those parameters are, the same way a generic type does.
+    /// </summary>
+    public List<GenericFunctionTemplate> GenericMethods { get; } = [];
+
+    /// <summary>
     /// For a class, the interfaces it implements. For an interface, the ones it
     /// extends. Both are the same relation, so both live here.
     /// </summary>
@@ -281,6 +287,75 @@ public sealed class AttributeTypeSymbol : NamedTypeSymbol
 {
     public override int Size => 0;
     public override int Alignment => 1;
+}
+
+/// <summary>
+/// A <c>delegate</c>: a named function pointer, and nothing more.
+///
+/// It is one pointer using the platform C calling convention, so it is exactly
+/// a C function pointer and crosses <c>extern "C"</c> in both directions with
+/// no glue. That also means it captures nothing: it refers to a function, not
+/// to a function plus an environment. Closures need a heap object to hold what
+/// they captured and are a separate feature.
+/// </summary>
+public sealed class DelegateTypeSymbol : NamedTypeSymbol
+{
+    public TypeSymbol ReturnType { get; set; } = PrimitiveTypeSymbol.Void;
+
+    /// <summary>The signature's parameters. Never includes a receiver.</summary>
+    public List<ParameterSymbol> Signature { get; } = [];
+
+    public override int Size => 8;
+    public override int Alignment => 8;
+
+    /// <summary>True when <paramref name="function"/> can be stored in this delegate.</summary>
+    public bool Accepts(FunctionSymbol function)
+    {
+        if (function.IsVariadic) return false;
+
+        var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
+        if (parameters.Count != Signature.Count) return false;
+        if (!function.ReturnType.Equals(ReturnType)) return false;
+
+        return !parameters.Where((p, i) => !p.Type.Equals(Signature[i].Type)).Any();
+    }
+
+    public string SignatureText =>
+        $"{ReturnType.Name}({string.Join(", ", Signature.Select(p => p.Type.Name))})";
+}
+
+/// <summary>One named constant of an <c>enum</c>.</summary>
+public sealed class EnumMemberSymbol(string name, EnumTypeSymbol declaringEnum, ulong value)
+{
+    public string Name { get; } = name;
+    public EnumTypeSymbol DeclaringEnum { get; } = declaringEnum;
+
+    /// <summary>The constant, stored as raw bits of the underlying type.</summary>
+    public ulong Value { get; } = value;
+
+    public override string ToString() => $"{DeclaringEnum.Name}.{Name}";
+}
+
+/// <summary>
+/// An <c>enum</c>: a distinct type over an integer, and distinct is the point.
+/// It never converts to or from a number implicitly, so an enum cannot be
+/// mistaken for the count it happens to be represented by. An explicit cast in
+/// either direction is still available for interop and serialization.
+///
+/// Representation is exactly the underlying type, so a Stainless enum is the
+/// same bytes as the C enum or integer it corresponds to.
+/// </summary>
+public sealed class EnumTypeSymbol : NamedTypeSymbol
+{
+    public PrimitiveTypeSymbol UnderlyingType { get; set; } = PrimitiveTypeSymbol.Int;
+
+    public List<EnumMemberSymbol> Members { get; } = [];
+
+    public override int Size => UnderlyingType.Size;
+    public override int Alignment => UnderlyingType.Alignment;
+
+    public EnumMemberSymbol? FindMember(string name) =>
+        Members.FirstOrDefault(m => m.Name == name);
 }
 
 public sealed class StructTypeSymbol : NamedTypeSymbol

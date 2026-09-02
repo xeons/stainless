@@ -1,0 +1,9 @@
+halves=4950
+squares=140
+n0n1n2n3
+accumulated=55
+shaded=332834500
+hits=5
+guard=1
+grid=448
+done

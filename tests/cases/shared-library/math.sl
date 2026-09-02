@@ -22,6 +22,20 @@ export "C" Point Scale(Point p, double by) {
 
 export "C" int SumPair(Pair p) { return p.A + p.B; }
 
+// An enum crosses as its underlying integer, and the header restates the
+// constants so C can name them.
+public enum Unit : int { Metres, Feet }
+
+export "C" double Convert(double value, Unit unit) {
+    if (unit == Unit.Feet) { return value * 3.28084; }
+    return value;
+}
+
+// A delegate crosses as a plain C function pointer, so C can pass one in.
+public delegate int Adjust(int value);
+
+export "C" int ApplyTwice(Adjust f, int value) { return f(f(value)); }
+
 // Visible to other Stainless modules, absent from the export table.
 public int Helper() { return 1; }
 

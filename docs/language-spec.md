@@ -297,6 +297,145 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
+### 2.7 `enum` — a distinct type over an integer
+
+```csharp
+public enum Color { Red, Green, Blue }
+public enum Level : byte { Low = 1, Warning = 10, Severe, Fatal = 200 }
+```
+
+Members number from zero unless given a value, and a member without one
+continues from the member before it, so `Severe` above is 11. The underlying
+type is `int` unless another integer type is named, and the representation is
+*exactly* that type — a Stainless enum is the same bytes as the C enum or
+integer it lines up with, and crosses `extern "C"` with no conversion.
+
+**An enum never converts implicitly, in either direction.**
+
+```csharp
+int n = Color.Red;          // rejected
+Color c = 0;                // rejected
+int n = (int)Color.Red;     // fine
+Color c = (Color)raw;       // fine
+```
+
+This is the whole reason to declare one. C# spells the type but then lets it
+decay to its number at the first opportunity, so a `Level` and a `byte` end up
+interchangeable and the type stops carrying meaning. Here it does not decay,
+and the cast is where you say you meant it — which is also where a reader
+looks when something went wrong.
+
+The cost is real and worth stating: array indexing, serialization, and C
+interop all need that cast written out. That is the trade, made deliberately.
+
+Enums compare and do not compute:
+
+```csharp
+if (level >= Level.Warning) { ... }     // fine; a severity is ordered
+var mixed = Color.Red + Color.Green;    // rejected; colours do not add
+```
+
+Comparison is allowed because an ordered enum — a severity, a log level — is
+the common case, and `level >= Level.Warning` is what people write. Arithmetic
+is not, because adding two colours means nothing. Bit flags would need a way to
+say that an enum is a set rather than a choice, and there is no such marker yet.
+
+### 2.8 `delegate` — a named function pointer
+
+```csharp
+public delegate int Transform(int value);
+
+int Double(int value) { return value * 2; }
+
+Transform t = Double;
+int result = t(21);                     // 42
+```
+
+A delegate is **one pointer** with the platform C calling convention — the same
+value a C function pointer is, and nothing more. It crosses `extern "C"` in
+both directions with no glue:
+
+```c
+typedef int (*Transform)(int value);
+int c_apply(Transform f, int value) { return f(value); }
+```
+
+Because it holds no reference count it may live in a `struct`, unlike every
+other indirection in the language. A `--shared` build writes the matching
+`typedef` into the generated header.
+
+Which overload a bare name refers to is decided by the delegate it is stored
+in, since that is the only context a name on its own has:
+
+```csharp
+int  Pick(int value)    { return value + 1; }
+double Pick(double value) { return value + 1.0; }
+
+Transform picked = Pick;      // the int one
+```
+
+`null` is a delegate's null function pointer, and compares as you would expect:
+
+```csharp
+Transform none = null;
+if (none == null) { ... }
+```
+
+**A delegate captures nothing.** It refers to a function, not to a function
+plus an environment. A lambda that captures becomes a closure instead — see
+§2.9 — and only a non-capturing one can be a delegate, because there is nowhere
+in a single pointer to keep what was captured.
+
+### 2.9 Lambdas and closures
+
+A lambda has no type of its own. What it becomes is decided by what it is
+assigned to: an **interface with exactly one method**, or a **delegate**.
+
+```csharp
+public interface ITransform { int Apply(int value); }
+
+int factor = 3;
+
+ITransform scale = (int value) => value * factor;   // a closure
+ITransform shift = value => value + factor;         // parameter type inferred
+ITransform back  = (int value) => { return value - factor; };
+
+Transform plain = (int value) => value * 2;         // captures nothing: a delegate
+```
+
+Converting to an interface generates a class implementing it, with one field per
+captured value — the same shape C# uses for delegates and Rust for `Fn`. It is
+an ordinary class, so it is reference counted, it lives in a `List<T>` like
+anything else, and its destructor releases what it captured.
+
+**Capture is by value, taken when the closure is made.**
+
+```csharp
+int factor = 3;
+ITransform scale = value => value * factor;
+
+factor = 100;
+scale.Apply(7);         // still 21: the closure copied 3
+```
+
+That is C++'s `[=]` and Rust's `move`, not C#'s capture-by-reference. It costs a
+copy and buys the thing that matters: a closure may outlive the scope that built
+it, with no lifetime question to answer.
+
+```csharp
+ITransform MakeAdder(int amount) {
+    return value => value + amount;     // fine; `amount` was copied
+}
+```
+
+Parameter types may be written or left out; left out, they come from the target,
+which is the only thing that knows them. A lambda with no target is an error —
+`var f = x => x;` has nothing to infer from.
+
+A closure is a class, so it may not cross a thread boundary unless it is marked
+`[Shared]` (§9.4). That is the correct answer rather than an oversight: a
+closure holds captured state, and nothing synchronizes it.
+
 ## 3. Text
 
 Stainless has exactly one string type. `String` is immutable, reference
@@ -528,13 +667,29 @@ as in `class Money : IComparable<Money>`), generic functions with inference,
 interface constraints, generic types nested in one another (`List<Box<int>>`),
 and self-referential templates such as `class Node<T> { Node<T>? next; }`.
 
+**Generic methods** are supported too, including inside a generic type, where
+the enclosing type's arguments are already fixed and only the method's own are
+inferred:
+
+```csharp
+public class Pair<A> {
+    A left;
+    public A KeepLeft<B>(B other) { return left; }
+}
+
+var pair = new Pair<String>("outer");
+pair.KeepLeft(7);           // A is String already; B is inferred as int
+```
+
 Not yet:
 
 - **Type arguments are inferred, never written, at a call.** `Pick<int>(...)`
   is not accepted, because `<` in expression position is ambiguous with
   less-than. Inference reads only the argument types, so a type parameter used
-  solely in the return type cannot be determined.
-- **No generic methods**, only generic types and generic free functions.
+  solely in the return type cannot be determined. This applies to generic
+  methods exactly as it does to generic functions.
+- **An interface method cannot be generic.** Dispatch gives a method one vtable
+  slot, and a generic method has a body per instantiation.
 
 ### 4.5 A worked example
 
@@ -580,13 +735,60 @@ nothing by itself.
 | `Standard.Console` | `Write`, `WriteLine`, `WriteError` | on request |
 | `Standard.Collections` | interfaces below, and `List<T>` | on request |
 
-### 5.2 Interfaces are named with a leading I
+### 5.2 `Standard.Threading`
+
+Locks, atomics and a job pool, over the runtime in
+[runtime/thread.c](../runtime/thread.c). It needed no new syntax: generic
+classes carry the lock, destructors release it, and `delegate` carries the work.
+
+```csharp
+import Standard.Collections;
+import Standard.Threading;
+
+static readonly Mutex<List<String>> Registry =
+    new Mutex<List<String>>(new List<String>());
+
+void Record(String name) {
+    var guard = Registry.Lock();
+    guard.Value().Add(name);
+}                                   // ~Guard() unlocks, including on a return
+```
+
+The mutex **owns what it guards**, so there is no way to reach the value
+without holding the lock and no way to forget which lock guards what. `lock
+(obj) { }` was rejected for the opposite reason: it would put a lock word in
+every object header and charge every single-threaded program for it.
+
+`AtomicLong` and `AtomicBool` are sequentially consistent counters and flags.
+They are concrete rather than `Atomic<T>` because atomics are not generic — that
+would need a constraint saying `T` is an integer, and Stainless constrains by
+interface only.
+
+`TaskScope` runs `Job` delegates on the pool and joins them:
+
+```csharp
+var scope = new TaskScope();
+scope.Run(Work, (byte*)shared);
+scope.Join();                       // ~TaskScope() joins too, as a backstop
+```
+
+**Two things this is not.** A job takes a `byte*` and casts it back, so nothing
+checks what crosses a thread; and keeping a `Guard` alive is a discipline, not a
+guarantee. See [concurrency.md](concurrency.md) for the model these are aiming
+at and which parts of it the compiler does not yet enforce.
+
+Unlike `Standard.Collections`, this module is not free when unused: `AtomicLong`,
+`AtomicBool` and `TaskScope` are ordinary classes, not templates, so their code
+is emitted whether or not a program mentions them. It costs about half a
+kilobyte.
+
+### 5.3 Interfaces are named with a leading I
 
 `IComparable<T>`, `IReadOnlyList<T>`, `IWritable` — the C# convention, and the
 one the standard library follows. It is a convention, not a rule the compiler
 enforces.
 
-### 5.3 `Standard.Collections`
+### 5.4 `Standard.Collections`
 
 ```csharp
 public interface IEquatable<T>     { bool EqualTo(T other); }
@@ -629,7 +831,7 @@ Largest(prices);                    // and works on any IReadOnlyList
 `IReadOnlyList<T>`, so they accept a mutable list without being able to change
 it.
 
-### 5.4 Interfaces may extend interfaces
+### 5.5 Interfaces may extend interfaces
 
 ```csharp
 public interface IWritable : IReadable { void Write(String text); }
@@ -865,7 +1067,13 @@ return y;
 ```
 
 Operators, by descending precedence: unary `- ! ~ * &` · `* / %` · `+ -` ·
-`<< >>` · `< <= > >=` · `== !=` · `&` · `^` · `|` · `&&` · `||` · assignment.
+`<< >>` · `< <= > >=` · `== !=` · `&` · `^` · `|` · `&&` · `||` ·
+`?:` · assignment.
+
+The conditional `a ? b : c` evaluates only the arm it selects, and groups to
+the right, so `a ? b : c ? d : e` reads as `a ? b : (c ? d : e)`. Its arms must
+meet at one type: the same type, a common numeric type, or one that the other
+converts to implicitly.
 
 Conditions must be `bool`; there is no implicit int-to-bool conversion.
 There are no implicit narrowing conversions. Widening integer conversions and
@@ -877,3 +1085,168 @@ value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
 anything computed still does.
 
 A string literal has type `String`; see section 3.
+
+### 9.1 `parallel`, `spawn` and `parallel for`
+
+```csharp
+int left  = 0;
+int right = 0;
+
+parallel {
+    spawn left  = Sum(values, 0, half);
+    spawn right = Sum(values, half, count);
+}                       // every spawned job has finished here
+
+return left + right;
+```
+
+`parallel` opens a fork-join scope and its closing brace waits for everything
+`spawn` queued inside. There is no `Task` type and no `await`: the brace **is**
+the synchronization, so a job writes its result into a local the parent still
+owns. That is sound because the parent cannot leave the block before the join,
+which is also why a job may borrow the frame it was spawned from rather than
+copying everything it needs.
+
+A `spawn` may appear anywhere inside the block, including in a loop, and each
+one gets its own copy of the arguments:
+
+```csharp
+parallel {
+    for (int i = 0; i < 8; i = i + 1) {
+        spawn squares[i] = Square(i);
+    }
+}
+```
+
+`parallel for` splits a counted loop across the pool instead:
+
+```csharp
+parallel for (int i = 0; i < pixels.Length; i = i + 1) {
+    pixels[i] = Shade(pixels[i]);
+}
+```
+
+The loop has to be counted — `i = start`, `i < limit` or `i <= limit`, and
+`i = i + stride` with a positive literal stride — because the iteration space is
+divided before the body runs and a general C-style `for` has no trip count.
+
+Three rules are enforced, each for the same reason:
+
+| Rejected | Because |
+|---|---|
+| `return`, `break` or `continue` out of a `parallel` block | it would skip the join and leave jobs running against a dead frame |
+| `spawn f(new Buffer())` | arguments are borrowed, and a temporary dies at the end of the statement, before the job runs |
+| assigning an outside variable in a `parallel for` body | every chunk would race on one slot; write through a captured array, or accumulate into an `AtomicLong` |
+
+What is **not** checked is everything else: nothing yet stops a job from sharing
+a mutable object with the thread that spawned it. See
+[concurrency.md](concurrency.md) for the model that is being aimed at, and
+which parts of it the compiler enforces today.
+
+### 9.2 `static readonly`
+
+```csharp
+public static readonly int Base = 20;
+public static readonly String Greeting = "hello";
+public static readonly AtomicLong Hits = new AtomicLong(0);
+```
+
+Module-level storage, initialized once before `Main`. **There is no `static`
+without `readonly`.** A plainly mutable global is shared state that nothing
+synchronizes, so the language does not have one; mutation goes through a type
+that says how it is safe, and `static int Counter = 0;` is an error that says so.
+
+Which types are allowed is the rule in §9.4: plain data, a `String`, or a class
+marked `[Shared]`. `static readonly List<int>` is rejected, and the error points
+at `Mutex<T>`.
+
+**Order is computed, not guessed.** An initializer may read another static, and
+the compiler sorts them so nothing runs before what it reads:
+
+```csharp
+static readonly int Total   = Doubled + 1;      // written first
+static readonly int Doubled = Base * 2;
+static readonly int Base    = 20;               // runs first
+```
+
+C++ cannot do this and calls the result a fiasco. Swift avoids it by making
+every static lazy and paying a guard check on every access — a check that has to
+become atomic the moment threads exist. Stainless compiles the whole program at
+once, so it simply reads the dependency graph: no guard, no per-access cost, and
+a **compile error** on a cycle rather than a zero at run time.
+
+A static reference is made immortal as it is stored, so it is never destroyed
+and never has its count touched again. There is no teardown, which sidesteps
+C++'s static *destruction* order problem as well.
+
+A `--shared` library has no entry point to initialize statics from, so a static
+in one is an error rather than a silently zeroed global.
+
+### 9.3 `foreach`
+
+```csharp
+foreach (int n in numbers) { total = total + n; }
+foreach (var item in list) { Console.WriteLine(item.Name()); }
+```
+
+An **array** iterates by index, with no allocation and no dispatch. Anything
+else is asked for a `GetEnumerator()`, found **by name rather than by
+interface**, so a type can be iterated without `Standard.Collections` appearing
+anywhere in the program:
+
+```csharp
+class Countdown {
+    public CountdownCursor GetEnumerator() { return new CountdownCursor(3); }
+}
+
+class CountdownCursor {
+    public bool MoveNext() { ... }
+    public int Current() { ... }
+}
+```
+
+`Current()` is a method rather than a property, because Stainless has no
+properties. `Standard.Collections` names the shape as `IEnumerable<T>` and
+`IEnumerator<T>` so that a sequence can be passed around, and `List<T>`
+implements both — but `foreach` does not require them.
+
+The collection is evaluated once, and the loop variable is declared inside the
+loop, so a managed element is released at the end of each iteration rather than
+piling up until the loop ends. `break` and `continue` behave as in any other
+loop; `continue` advances the enumerator.
+
+### 9.4 What may cross a thread boundary
+
+Checked wherever a value can reach a second thread: a `spawn` argument or
+receiver, a `parallel for` capture, and a `static readonly`.
+
+| Allowed | Why it is safe |
+|---|---|
+| plain data — primitives, enums, pointers, delegates, `struct` | there is no reference count to race over |
+| `String` | immutable, and its bytes live inside the object |
+| a class marked `[Shared]` | the author asserts it synchronizes itself |
+| `T[]` where `T` is plain data | a job borrows it without retaining it |
+
+Everything else is rejected. Reference counts are not atomic, so two threads
+retaining one object is a race nothing would report — which is why this is a
+rule rather than a warning.
+
+`[Shared]` lives in `Standard.Threading` and is an **assertion, not a proof**:
+
+```csharp
+[Shared]
+class Accumulator {
+    AtomicLong total;
+    public void Contribute(int amount) { total.Add(amount); }
+}
+```
+
+Put it on a type whose state lives behind a lock or an atomic, and nowhere else.
+`Mutex<T>`, `AtomicLong` and `AtomicBool` carry it; `Guard<T>` and `TaskScope`
+do not, because both belong to one thread. It is the same bargain Rust's
+`unsafe impl Sync` makes, and the only place in this design where a human
+promise stands in for a check.
+
+Two gaps remain, and both are about lifetimes rather than types: a `Guard` can
+outlive the lock it proves, and a job could store an array it was only lent.
+Neither is closed yet; see [concurrency.md](concurrency.md).

@@ -39,13 +39,13 @@ public static class CHeaderWriter
             .OrderBy(f => f.Name, StringComparer.Ordinal)
             .ToList();
 
-        // Only the structs an export actually mentions, in an order C accepts.
-        var structs = new List<StructTypeSymbol>();
-        var seen = new HashSet<StructTypeSymbol>();
+        // Only the named types an export actually mentions, in an order C accepts.
+        var named = new List<NamedTypeSymbol>();
+        var seen = new HashSet<NamedTypeSymbol>();
         foreach (var function in exports)
         {
-            Collect(function.ReturnType, structs, seen);
-            foreach (var parameter in function.Parameters) Collect(parameter.Type, structs, seen);
+            Collect(function.ReturnType, named, seen);
+            foreach (var parameter in function.Parameters) Collect(parameter.Type, named, seen);
         }
 
         string guard = GuardName(headerPath);
@@ -70,12 +70,41 @@ public static class CHeaderWriter
         sb.AppendLine("#endif");
         sb.AppendLine();
 
-        foreach (var structType in structs)
+        foreach (var type in named)
         {
-            sb.AppendLine($"typedef struct {CName(structType)} {{");
-            foreach (var field in structType.Fields)
-                sb.AppendLine($"    {Declarator(field.Type, field.Name)};");
-            sb.AppendLine($"}} {CName(structType)};");
+            switch (type)
+            {
+                case StructTypeSymbol structType:
+                    sb.AppendLine($"typedef struct {CName(structType)} {{");
+                    foreach (var field in structType.Fields)
+                        sb.AppendLine($"    {Declarator(field.Type, field.Name)};");
+                    sb.AppendLine($"}} {CName(structType)};");
+                    break;
+
+                // A C enum has an implementation-defined width, so the constants
+                // and the type are declared separately: the constants as an
+                // anonymous enum, the type as the integer Stainless actually uses.
+                case EnumTypeSymbol enumType:
+                    sb.AppendLine($"typedef {TypeName(enumType.UnderlyingType)} {CName(enumType)};");
+                    if (enumType.Members.Count > 0)
+                    {
+                        sb.AppendLine("enum {");
+                        foreach (var member in enumType.Members)
+                            sb.AppendLine($"    {CName(enumType)}_{member.Name} = {member.Value},");
+                        sb.AppendLine("};");
+                    }
+                    break;
+
+                case DelegateTypeSymbol delegateType:
+                    var signature = delegateType.Signature.Count == 0
+                        ? "void"
+                        : string.Join(", ", delegateType.Signature.Select(p => Declarator(p.Type, p.Name)));
+                    sb.AppendLine(
+                        $"typedef {TypeName(delegateType.ReturnType)} " +
+                        $"(*{CName(delegateType)})({signature});");
+                    break;
+            }
+
             sb.AppendLine();
         }
 
@@ -107,15 +136,29 @@ public static class CHeaderWriter
         return sb.ToString();
     }
 
-    /// <summary>Gathers structs depth first, so a nested one is declared before its user.</summary>
+    /// <summary>
+    /// Gathers the named types an export mentions, depth first, so anything a
+    /// declaration depends on is written before the declaration itself.
+    /// </summary>
     private static void Collect(
-        TypeSymbol type, List<StructTypeSymbol> ordered, HashSet<StructTypeSymbol> seen)
+        TypeSymbol type, List<NamedTypeSymbol> ordered, HashSet<NamedTypeSymbol> seen)
     {
         switch (type)
         {
             case StructTypeSymbol structType when seen.Add(structType):
                 foreach (var field in structType.Fields) Collect(field.Type, ordered, seen);
                 ordered.Add(structType);
+                break;
+
+            case EnumTypeSymbol enumType when seen.Add(enumType):
+                ordered.Add(enumType);
+                break;
+
+            case DelegateTypeSymbol delegateType when seen.Add(delegateType):
+                Collect(delegateType.ReturnType, ordered, seen);
+                foreach (var parameter in delegateType.Signature)
+                    Collect(parameter.Type, ordered, seen);
+                ordered.Add(delegateType);
                 break;
 
             case PointerTypeSymbol pointer:
@@ -160,6 +203,11 @@ public static class CHeaderWriter
 
         PointerTypeSymbol pointer => TypeName(pointer.Element) + "*",
         StructTypeSymbol structType => CName(structType),
+
+        // An enum is its underlying integer, and a delegate is a function
+        // pointer; both are typedef'd above, so the name is enough here.
+        EnumTypeSymbol enumType => CName(enumType),
+        DelegateTypeSymbol delegateType => CName(delegateType),
 
         // A managed reference has no C spelling. It crosses as an opaque handle,
         // which the caller must not free or dereference.

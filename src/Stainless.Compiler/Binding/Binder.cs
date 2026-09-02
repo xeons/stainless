@@ -34,6 +34,9 @@ public sealed class BoundProgram
     public required IReadOnlyList<string> RuntimeFactories { get; init; }
     public required IReadOnlyList<FunctionSymbol> ExternalFunctions { get; init; }
     public FunctionSymbol? EntryPoint { get; init; }
+
+    /// <summary>Module-level storage, in the order its initializers must run.</summary>
+    public required IReadOnlyList<StaticSymbol> Statics { get; init; }
 }
 
 /// <summary>
@@ -75,6 +78,22 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// <summary>The type arguments in force while binding inside an instantiation.</summary>
     private Dictionary<string, TypeSymbol> _substitution = new(StringComparer.Ordinal);
     private readonly Dictionary<NamedTypeSymbol, (TypeDeclSyntax Declaration, FileScope Scope)> _typeSyntax = [];
+    private readonly Dictionary<EnumTypeSymbol, (EnumDeclSyntax Declaration, FileScope Scope)> _enumSyntax = [];
+    private readonly Dictionary<DelegateTypeSymbol, (DelegateDeclSyntax Declaration, FileScope Scope)> _delegateSyntax = [];
+    private readonly Dictionary<StaticSymbol, (StaticDeclSyntax Declaration, FileScope Scope)> _staticSyntax = [];
+    private List<StaticSymbol> _staticOrder = [];
+
+    /// <summary>
+    /// Numbers the hidden locals a lowering introduces. A '$' cannot appear in a
+    /// source identifier, and the counter keeps nested lowerings of the same
+    /// construct from colliding with one another.
+    /// </summary>
+    private int _synthetic;
+
+    /// <summary>How many 'parallel' scopes enclose what is being bound.</summary>
+    private int _parallelDepth;
+
+    private string SyntheticName(string hint) => $"${hint}.{_synthetic++}";
 
     // Per-function binding state.
     private FunctionSymbol? _currentFunction;
@@ -97,7 +116,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         ResolveAttributes();        // pass 6: attributes fold to constants
         ComputeLayouts();           // pass 7: every value type has a size
         BindBodies();               // pass 8: only now is any code checked
-        DrainPending();             // pass 9: bodies of everything instantiated along the way
+        BindStatics();              // pass 9: static initializers, then their order
+        DrainPending();             // pass 10: bodies of everything instantiated along the way
 
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.
@@ -127,6 +147,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 .ToList(),
             ExternalFunctions = external,
             EntryPoint = requireEntryPoint ? FindEntryPoint() : null,
+            Statics = _staticOrder,
         };
     }
 
@@ -226,6 +247,48 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
                 if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
             }
+
+            foreach (var declaration in unit.Declarations.OfType<DelegateDeclSyntax>())
+            {
+                if (module.Types.ContainsKey(declaration.Name) ||
+                    module.GenericTypes.ContainsKey(declaration.Name))
+                {
+                    diagnostics.Error("SL0201", declaration.Span,
+                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                    continue;
+                }
+
+                var delegateType = new DelegateTypeSymbol
+                {
+                    SimpleName = declaration.Name,
+                    ModuleName = module.Name,
+                    IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+                };
+
+                module.Types[declaration.Name] = delegateType;
+                _delegateSyntax[delegateType] = (declaration, scope);
+            }
+
+            foreach (var declaration in unit.Declarations.OfType<EnumDeclSyntax>())
+            {
+                if (module.Types.ContainsKey(declaration.Name) ||
+                    module.GenericTypes.ContainsKey(declaration.Name))
+                {
+                    diagnostics.Error("SL0201", declaration.Span,
+                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                    continue;
+                }
+
+                var enumType = new EnumTypeSymbol
+                {
+                    SimpleName = declaration.Name,
+                    ModuleName = module.Name,
+                    IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+                };
+
+                module.Types[declaration.Name] = enumType;
+                _enumSyntax[enumType] = (declaration, scope);
+            }
         }
     }
 
@@ -288,6 +351,20 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                             DeclareTypeMembers(scope, typeDecl, module.Types[typeDecl.Name]);
                         break;
 
+                    case StaticDeclSyntax staticDecl:
+                        DeclareStatic(scope, staticDecl);
+                        break;
+
+                    case DelegateDeclSyntax delegateDecl:
+                        DeclareDelegateSignature(
+                            (DelegateTypeSymbol)module.Types[delegateDecl.Name], delegateDecl, scope);
+                        break;
+
+                    case EnumDeclSyntax enumDecl:
+                        DeclareEnumMembers(
+                            (EnumTypeSymbol)module.Types[enumDecl.Name], enumDecl, scope);
+                        break;
+
                     case GlobalConstDeclSyntax constant:
                         DeclareGlobalConstant(scope, constant);
                         break;
@@ -302,6 +379,100 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         }
 
         _currentScope = null;
+    }
+
+    /// <summary>
+    /// Resolves a delegate's return and parameter types. The names are kept for
+    /// diagnostics and for the generated C header; nothing else reads them.
+    /// </summary>
+    private void DeclareDelegateSignature(
+        DelegateTypeSymbol type, DelegateDeclSyntax declaration, FileScope scope)
+    {
+        type.ReturnType = ResolveType(declaration.ReturnType, scope);
+
+        for (int i = 0; i < declaration.Parameters.Count; i++)
+        {
+            var parameter = declaration.Parameters[i];
+            var parameterType = ResolveType(parameter.Type, scope);
+
+            if (parameterType.IsVoid())
+            {
+                diagnostics.Error("SL0359", parameter.Span,
+                    $"parameter '{parameter.Name}' of delegate '{type.Name}' cannot be 'void'");
+                parameterType = ErrorTypeSymbol.Instance;
+            }
+
+            type.Signature.Add(new ParameterSymbol(parameter.Name, parameterType, i));
+        }
+    }
+
+    /// <summary>
+    /// Resolves an enum's underlying type and folds its members to constants.
+    ///
+    /// A member without a value continues from the previous one, starting at
+    /// zero, as in C and C#. The values are checked against the underlying type
+    /// here so that a too-large constant is reported at the enum, not at a use.
+    /// </summary>
+    private void DeclareEnumMembers(EnumTypeSymbol type, EnumDeclSyntax declaration, FileScope scope)
+    {
+        if (declaration.UnderlyingType is not null)
+        {
+            var underlying = ResolveType(declaration.UnderlyingType, scope);
+            if (underlying is PrimitiveTypeSymbol { IsInteger: true } integer)
+            {
+                type.UnderlyingType = integer;
+            }
+            else if (!underlying.IsError())
+            {
+                diagnostics.Error("SL0350", declaration.UnderlyingType.Span,
+                    $"an enum must be built on an integer type, but '{underlying.Name}' is not one");
+            }
+        }
+
+        ulong next = 0;
+
+        foreach (var member in declaration.Members)
+        {
+            if (type.FindMember(member.Name) is not null)
+            {
+                diagnostics.Error("SL0351", member.Span,
+                    $"'{type.Name}' already has a member named '{member.Name}'");
+                continue;
+            }
+
+            ulong value = next;
+
+            if (member.Value is not null)
+            {
+                if (FoldEnumValue(member.Value, type.UnderlyingType) is { } folded)
+                    value = folded;
+                else
+                    diagnostics.Error("SL0352", member.Value.Span,
+                        $"the value of '{type.Name}.{member.Name}' must be an integer constant");
+            }
+
+            type.Members.Add(new EnumMemberSymbol(member.Name, type, value));
+            next = value + 1;
+        }
+    }
+
+    /// <summary>An enum member's constant: an integer literal, optionally negated.</summary>
+    private ulong? FoldEnumValue(ExpressionSyntax syntax, PrimitiveTypeSymbol underlying)
+    {
+        bool negate = false;
+
+        while (syntax is UnarySyntax { Operator: TokenKind.Minus or TokenKind.Plus } unary)
+        {
+            if (unary.Operator == TokenKind.Minus) negate = !negate;
+            syntax = unary.Operand;
+        }
+
+        if (syntax is not LiteralSyntax { Kind: TokenKind.IntLiteral, Value: ulong raw }) return null;
+
+        ulong value = negate ? unchecked((ulong)-(long)raw) : raw;
+
+        // Keep only the bits the underlying type actually has.
+        return underlying.Size >= 8 ? value : value & ((1UL << underlying.Bits) - 1);
     }
 
     private void DeclareTypeMembers(
@@ -363,9 +534,26 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 case FunctionDeclSyntax method:
                     if (method.TypeParameters.Count > 0)
                     {
-                        diagnostics.Error("SL0322", method.Span,
-                            $"'{method.Name}' is a generic method, which is not supported yet; " +
-                            "make the enclosing type generic instead");
+                        if (type is InterfaceTypeSymbol)
+                        {
+                            // A vtable has one slot per method, and a generic
+                            // method has as many bodies as it has instantiations.
+                            diagnostics.Error("SL0322", method.Span,
+                                $"'{method.Name}' is generic, and an interface method cannot be; " +
+                                "dispatch needs one entry per method, and a generic one has " +
+                                "a body per instantiation");
+                            break;
+                        }
+
+                        // The substitution in force is the enclosing type's, if it
+                        // is itself an instantiation; the method's own parameters
+                        // are merged onto it at each call.
+                        type.GenericMethods.Add(new GenericFunctionTemplate(method.Name, scope, method)
+                        {
+                            ContainingType = type,
+                            OuterSubstitution = new Dictionary<string, TypeSymbol>(
+                                _substitution, StringComparer.Ordinal),
+                        });
                         break;
                     }
                     DeclareFunction(scope, type, method);
@@ -924,6 +1112,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
             template.Scope, $"'{template.Name}'", span);
 
+        // Attributes come from the template, because pass 6 only walks types it
+        // found in source and an instantiation is made later than that. Without
+        // this a [Shared] or [Reflect] on a generic would be silently dropped
+        // from every instantiation of it.
+        BindAttributes(declaration.Attributes, type.Attributes, template.Scope, type.Name);
+
+        if (ReflectAttribute is { } reflect && type.Attributes.Any(a => a.Type == reflect) &&
+            type is ClassTypeSymbol or StructTypeSymbol)
+            type.IsReflected = true;
+
         DeclareTypeMembers(template.Scope, declaration, type);
         ResolveImplements(type, declaration, template.Scope);
         ComputeLayout(type, []);
@@ -959,10 +1157,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return null;
         }
 
-        string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
+        string owner = template.ContainingType is null
+            ? template.Module.Name
+            : template.ContainingType.QualifiedName;
+
+        string key = InstantiationKey(owner + "." + template.Name, arguments);
         if (_instantiatedFunctions.TryGetValue(key, out var existing)) return existing;
 
-        var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        // The enclosing type's arguments first, then the method's own on top.
+        var substitution = new Dictionary<string, TypeSymbol>(
+            template.OuterSubstitution, StringComparer.Ordinal);
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
 
         var previousSubstitution = _substitution;
@@ -981,12 +1185,24 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             ModuleName = template.Module.Name,
             ReturnType = ResolveType(declaration.ReturnType, template.Scope),
             Linkage = LinkageKind.Stainless,
+            Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
+            ContainingType = template.ContainingType,
             IsPublic = template.IsPublic,
             Body = declaration.Body,
             Span = declaration.Span,
             TypeArguments = arguments.ToList(),
             Scope = template.Scope,
         };
+
+        if (template.ContainingType is { } containing)
+        {
+            // A method receives its instance: classes by reference, structs by pointer.
+            TypeSymbol thisType = containing is ClassTypeSymbol reference
+                ? reference
+                : new PointerTypeSymbol(containing);
+            symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
+        }
+
         AddParameters(symbol, declaration.Parameters, template.Scope);
 
         _instantiatedFunctions[key] = symbol;
@@ -1137,7 +1353,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         {
             // Snapshotted: binding a body can instantiate a generic, which adds
             // to exactly these collections while we are walking them.
-            foreach (var function in module.Functions.Where(f => f.HasBody).ToList())
+            //
+            // A method of an instantiated generic is skipped: it is queued with
+            // the substitution that gives its type parameters meaning, and
+            // binding it here would be binding it without one. That only shows
+            // up when the instantiation happened before this pass -- from a
+            // field's type, or a static's -- because anything instantiated
+            // during it lands outside the snapshot.
+            foreach (var function in module.Functions
+                         .Where(f => f.HasBody && f.ContainingType?.Template is null)
+                         .ToList())
                 BindFunctionBody(function);
 
             foreach (var type in module.Types.Values.OfType<ClassTypeSymbol>().ToList())
@@ -1246,6 +1471,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         IfSyntax ifStatement => BindIf(ifStatement),
         WhileSyntax whileStatement => BindWhile(whileStatement),
         ForSyntax forStatement => BindFor(forStatement),
+        ForEachSyntax forEach => BindForEach(forEach),
+        ParallelSyntax parallel => BindParallel(parallel),
+        ParallelForSyntax parallelFor => BindParallelFor(parallelFor),
+        SpawnSyntax spawn => BindSpawn(spawn),
         ReturnSyntax returnStatement => BindReturn(returnStatement),
         BreakSyntax breakStatement => BindBreak(breakStatement),
         ContinueSyntax continueStatement => BindContinue(continueStatement),
@@ -1293,7 +1522,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         var expression = BindExpression(syntax.Expression);
 
-        bool hasEffect = expression is BoundAssignment or BoundCall or BoundNew or BoundErrorExpression;
+        bool hasEffect = expression is BoundAssignment or BoundCall or BoundIndirectCall
+                                    or BoundNew or BoundErrorExpression;
         if (!hasEffect)
             diagnostics.Warning("SL0222", syntax.Span,
                 "this expression has no effect; its result is discarded");
@@ -1337,8 +1567,895 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         return result;
     }
 
+    /// <summary>
+    /// <c>foreach</c>, lowered here rather than in the emitter.
+    ///
+    /// An array iterates by index, which costs no allocation and no dispatch.
+    /// Anything else is asked for a <c>GetEnumerator()</c>, found by name rather
+    /// than by interface, so a type can be iterable without Standard.Collections
+    /// appearing anywhere in the program.
+    ///
+    /// The collection is evaluated once into a hidden local, which fixes the
+    /// semantics and keeps the object alive for the whole loop. Its name starts
+    /// with '$' so no source identifier can collide with it, and is numbered so
+    /// that nested loops do not collide with each other.
+    /// </summary>
+    private BoundStatement BindForEach(ForEachSyntax syntax)
+    {
+        PushScope();
+
+        var collection = BindExpression(syntax.Collection);
+        var statements = new List<BoundStatement>();
+        var outer = new BoundBlock(syntax.Span, statements);
+
+        if (collection.Type.IsError())
+        {
+            PopScope();
+            return outer;
+        }
+
+        var sequence = DeclareLocal(
+            SyntheticName("sequence"), collection.Type, isConst: false, syntax.Collection.Span);
+        statements.Add(new BoundLocalDeclaration(syntax.Collection.Span, sequence, collection));
+        outer.Locals.Add(sequence);
+
+        if (collection.Type is ArrayTypeSymbol array)
+            statements.Add(BuildArrayLoop(syntax, sequence, array));
+        else if (BuildEnumeratorLoop(syntax, sequence, outer, statements) is { } loop)
+            statements.Add(loop);
+
+        PopScope();
+        return outer;
+    }
+
+    /// <summary>The array fast path: an ordinary indexed <c>for</c>.</summary>
+    private BoundStatement BuildArrayLoop(
+        ForEachSyntax syntax, LocalSymbol sequence, ArrayTypeSymbol array)
+    {
+        PushScope();
+
+        var index = DeclareLocal(
+            SyntheticName("index"), PrimitiveTypeSymbol.NUInt, isConst: false, syntax.Span);
+        var initializer = new BoundLocalDeclaration(syntax.Span, index,
+            new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.NUInt, 0UL));
+
+        var condition = new BoundBinary(syntax.Span, PrimitiveTypeSymbol.Bool,
+            new BoundLocalAccess(syntax.Span, index),
+            BoundBinaryOp.Less,
+            new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt,
+                new BoundLocalAccess(syntax.Span, sequence)));
+
+        var step = new BoundAssignment(syntax.Span,
+            new BoundLocalAccess(syntax.Span, index),
+            new BoundBinary(syntax.Span, PrimitiveTypeSymbol.NUInt,
+                new BoundLocalAccess(syntax.Span, index),
+                BoundBinaryOp.Add,
+                new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.NUInt, 1UL)));
+
+        var element = new BoundIndex(syntax.Span, array.Element,
+            new BoundLocalAccess(syntax.Span, sequence),
+            new BoundLocalAccess(syntax.Span, index));
+
+        var body = BindForEachBody(syntax, element);
+
+        var loop = new BoundFor(syntax.Span, initializer, condition, step, body);
+        loop.Locals.Add(index);
+
+        PopScope();
+        return loop;
+    }
+
+    /// <summary>
+    /// The general path: <c>while ($e.MoveNext()) { var x = $e.Current(); ... }</c>.
+    /// Putting MoveNext in the condition is what makes <c>continue</c> advance the
+    /// enumerator rather than spin on the same element.
+    /// </summary>
+    private BoundStatement? BuildEnumeratorLoop(
+        ForEachSyntax syntax, LocalSymbol sequence, BoundBlock outer, List<BoundStatement> statements)
+    {
+        if (sequence.Type is not NamedTypeSymbol source ||
+            source.FindMethod("GetEnumerator") is not { } getEnumerator ||
+            getEnumerator.Parameters.Count(p => !p.IsThis) != 0)
+        {
+            diagnostics.Error("SL0356", syntax.Collection.Span,
+                $"'{sequence.Type.Name}' cannot be iterated; it is not an array and has no " +
+                "'GetEnumerator()' method taking no arguments");
+            return null;
+        }
+
+        if (getEnumerator.ReturnType is not NamedTypeSymbol enumerator ||
+            enumerator.FindMethod("MoveNext") is not { } moveNext ||
+            !moveNext.ReturnType.IsBool() ||
+            moveNext.Parameters.Count(p => !p.IsThis) != 0 ||
+            enumerator.FindMethod("Current") is not { } current ||
+            current.Parameters.Count(p => !p.IsThis) != 0 ||
+            current.ReturnType.IsVoid())
+        {
+            diagnostics.Error("SL0357", syntax.Collection.Span,
+                $"'{sequence.Type.Name}.GetEnumerator()' returns '{getEnumerator.ReturnType.Name}', " +
+                "which is not an enumerator; that needs a 'bool MoveNext()' and a 'Current()' " +
+                "returning the element");
+            return null;
+        }
+
+        var handle = DeclareLocal(
+            SyntheticName("enumerator"), getEnumerator.ReturnType, isConst: false, syntax.Span);
+        statements.Add(new BoundLocalDeclaration(syntax.Span, handle,
+            new BoundCall(syntax.Span, getEnumerator,
+                new BoundLocalAccess(syntax.Span, sequence), [])));
+        outer.Locals.Add(handle);
+
+        var condition = new BoundCall(syntax.Span, moveNext,
+            new BoundLocalAccess(syntax.Span, handle), []);
+
+        var element = new BoundCall(syntax.Span, current,
+            new BoundLocalAccess(syntax.Span, handle), []);
+
+        return new BoundWhile(syntax.Span, condition, BindForEachBody(syntax, element));
+    }
+
+    /// <summary>
+    /// Declares the loop variable from the element expression, then binds the body
+    /// around it. The variable lives inside the loop, so a managed element is
+    /// released at the end of each iteration rather than at the end of the loop.
+    /// </summary>
+    private BoundStatement BindForEachBody(ForEachSyntax syntax, BoundExpression element)
+    {
+        PushScope();
+
+        var type = syntax.Type is null
+            ? element.Type
+            : ResolveType(syntax.Type, _currentScope!);
+
+        var value = syntax.Type is null
+            ? element
+            : BindConversion(element, type, syntax.Collection.Span);
+
+        var variable = DeclareLocal(syntax.Name, type, isConst: false, syntax.Span);
+
+        var statements = new List<BoundStatement>
+        {
+            new BoundLocalDeclaration(syntax.Span, variable, value),
+        };
+
+        var block = new BoundBlock(syntax.Span, statements);
+        block.Locals.Add(variable);
+
+        _loopDepth++;
+        statements.Add(BindStatement(syntax.Body));
+        _loopDepth--;
+
+        PopScope();
+        return block;
+    }
+
+    /// <summary>
+    /// <c>parallel { ... }</c>. The scope is opened before the body and joined
+    /// after it, so a job cannot outlive the block -- which is what makes it
+    /// safe for a job to borrow the enclosing function's locals.
+    ///
+    /// Jumping out of the block would skip the join and leave jobs running with
+    /// references to a dead frame, so `return`, `break` and `continue` may not
+    /// cross the boundary.
+    /// </summary>
+    private BoundStatement BindParallel(ParallelSyntax syntax)
+    {
+        int enclosingLoops = _loopDepth;
+        _loopDepth = 0;
+        _parallelDepth++;
+
+        var body = BindBlock(syntax.Body);
+
+        _parallelDepth--;
+        _loopDepth = enclosingLoops;
+
+        return new BoundParallel(syntax.Span, body);
+    }
+
+    private BoundStatement BindSpawn(SpawnSyntax syntax)
+    {
+        if (_parallelDepth == 0)
+        {
+            diagnostics.Error("SL0364", syntax.Span,
+                "'spawn' needs an enclosing 'parallel' block; it is that block's " +
+                "closing brace that waits for the work");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        var call = BindExpression(syntax.Call);
+        if (call.Type.IsError()) return new BoundBlock(syntax.Span, []);
+
+        // Only a direct call, so the arguments are known values the parent can
+        // copy. A delegate would be callable too, but its target is a value that
+        // has to be marshalled as well, and that can wait.
+        if (call is not BoundCall spawned)
+        {
+            diagnostics.Error("SL0365", syntax.Call.Span,
+                "'spawn' takes a function or method call; there is nothing else " +
+                "for a worker thread to run");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        if (!CheckSpawnArguments(spawned)) return new BoundBlock(syntax.Span, []);
+
+        if (syntax.Target is null)
+            return new BoundSpawn(syntax.Span, null, spawned);
+
+        var target = BindExpression(syntax.Target);
+        if (target.Type.IsError()) return new BoundBlock(syntax.Span, []);
+
+        if (!target.IsLValue)
+        {
+            diagnostics.Error("SL0366", syntax.Target.Span,
+                "a spawned result must be stored in a variable, field or element; " +
+                "the worker writes it there while the parent waits");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        if (spawned.Type.IsVoid())
+        {
+            diagnostics.Error("SL0367", syntax.Span,
+                $"'{spawned.Function.Name}' returns nothing, so there is no result to store");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        // The conversion has to be settled here: the worker stores into the
+        // parent's slot, so the value must already have that slot's type.
+        var converted = BindConversion(spawned, target.Type, syntax.Span);
+        if (converted is not BoundCall matched)
+        {
+            diagnostics.Error("SL0368", syntax.Span,
+                $"'{spawned.Function.Name}' returns '{spawned.Type.Name}', which needs a " +
+                $"conversion to '{target.Type.Name}'; assign it after the 'parallel' block instead");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        return new BoundSpawn(syntax.Span, target, matched);
+    }
+
+    /// <summary>
+    /// <c>parallel for</c>. The iteration space is computed once and split into
+    /// chunks, so the loop has to be a counted one: <c>i = start</c>,
+    /// <c>i &lt; limit</c>, <c>i = i + stride</c>. A general C-style <c>for</c>
+    /// has no trip count to divide.
+    /// </summary>
+    private BoundStatement BindParallelFor(ParallelForSyntax syntax)
+    {
+        PushScope();
+
+        int enclosingLoops = _loopDepth;
+        _loopDepth = 0;
+        _parallelDepth++;
+
+        var result = BindParallelForCore(syntax);
+
+        _parallelDepth--;
+        _loopDepth = enclosingLoops;
+
+        PopScope();
+        return result;
+    }
+
+    private BoundStatement BindParallelForCore(ParallelForSyntax syntax)
+    {
+        var initializer = BindStatement(syntax.Initializer);
+
+        if (initializer is not BoundLocalDeclaration { Initializer: { } start } declaration ||
+            declaration.Local.Type is not PrimitiveTypeSymbol { IsInteger: true })
+        {
+            diagnostics.Error("SL0369", syntax.Initializer.Span,
+                "a 'parallel for' must start by declaring an integer loop variable, " +
+                "as in 'parallel for (int i = 0; ...)'");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        var variable = declaration.Local;
+
+        var condition = BindExpression(syntax.Condition);
+        if (condition is not BoundBinary
+            {
+                Operator: BoundBinaryOp.Less or BoundBinaryOp.LessEqual,
+            } test ||
+            Underlying(test.Left) is not BoundLocalAccess counted || counted.Local != variable)
+        {
+            diagnostics.Error("SL0370", syntax.Condition.Span,
+                $"a 'parallel for' condition must be '{variable.Name} < limit' or " +
+                $"'{variable.Name} <= limit'; the loop is split before it runs, so its " +
+                "trip count has to be known up front");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        var step = BindExpression(syntax.Step);
+        if (step is not BoundAssignment
+            {
+                Target: BoundLocalAccess stepped,
+                Value: BoundBinary { Operator: BoundBinaryOp.Add } increment,
+            } ||
+            stepped.Local != variable ||
+            Underlying(increment.Left) is not BoundLocalAccess { } from || from.Local != variable)
+        {
+            diagnostics.Error("SL0371", syntax.Step.Span,
+                $"a 'parallel for' step must be '{variable.Name} = {variable.Name} + stride' " +
+                $"or '{variable.Name} += stride'");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        // A non-constant stride could be zero or negative, and either makes the
+        // trip count meaningless. A literal can simply be checked.
+        if (Underlying(increment.Right) is not BoundLiteral { Value: ulong raw } || raw == 0)
+        {
+            diagnostics.Error("SL0372", syntax.Step.Span,
+                "the stride of a 'parallel for' must be a positive integer literal, " +
+                "because the iteration space is divided before the loop runs");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        var body = BindStatement(syntax.Body);
+
+        var walker = new CaptureWalker(variable);
+        walker.Visit(body);
+
+        foreach (var capture in walker.Captures)
+        {
+            var (captureType, captureName) = capture switch
+            {
+                LocalSymbol local => (local.Type, local.Name),
+                ParameterSymbol parameter => (parameter.Type, parameter.Name),
+                _ => (ErrorTypeSymbol.Instance as TypeSymbol, "?"),
+            };
+
+            if (!IsSendable(captureType))
+                ReportNotSendable(captureType, syntax.Span,
+                    $"'{captureName}', which every chunk of this loop reads,");
+        }
+
+        foreach (var (symbol, span, name) in walker.Assignments)
+        {
+            diagnostics.Error("SL0373", span,
+                $"'{name}' is declared outside this 'parallel for', so assigning to it " +
+                "races between chunks; accumulate into an AtomicLong, or into a " +
+                "distinct element per iteration");
+        }
+
+        return new BoundParallelFor(
+            syntax.Span, variable, start, test.Right, increment.Right,
+            test.Operator == BoundBinaryOp.LessEqual, body, walker.Captures);
+    }
+
+    /// <summary>
+    /// A spawned call's arguments are borrowed, exactly as any call's are: the
+    /// parent keeps them alive, and no reference count crosses a thread.
+    ///
+    /// That only works if the parent still holds them when the job runs. A value
+    /// created in the argument list is owned by nothing once the statement ends,
+    /// and the job would find it destroyed, so it has to be named first.
+    /// </summary>
+    private bool CheckSpawnArguments(BoundCall call)
+    {
+        bool ok = true;
+
+        if (call.Receiver is { } receiver)
+        {
+            if (receiver.Type.NeedsArc() && !IsHeldElsewhere(receiver))
+            {
+                diagnostics.Error("SL0375", receiver.Span,
+                    "the receiver of a spawned call must be held in a variable or field; " +
+                    "a job borrows what it is given, and a temporary is gone before it runs");
+                ok = false;
+            }
+            else if (!IsSendable(receiver.Type))
+            {
+                ReportNotSendable(receiver.Type, receiver.Span, "the receiver of this spawned call");
+                ok = false;
+            }
+        }
+
+        foreach (var argument in call.Arguments)
+        {
+            if (argument.Type.NeedsArc() && !IsHeldElsewhere(argument))
+            {
+                diagnostics.Error("SL0375", argument.Span,
+                    $"a spawned call borrows its arguments, so this '{argument.Type.Name}' must be " +
+                    "held in a variable or field first; a temporary is destroyed at the end of " +
+                    "this statement, before the job runs");
+                ok = false;
+                continue;
+            }
+
+            // The parent keeps hold of what it lends, so both threads can reach it.
+            if (!IsSendable(argument.Type))
+            {
+                ReportNotSendable(argument.Type, argument.Span, "this argument to a spawned call");
+                ok = false;
+            }
+        }
+
+        return ok;
+    }
+
+    /// <summary>
+    /// True when something other than this expression owns the value: a variable,
+    /// a field, an element, or a literal, which is immortal.
+    /// </summary>
+    private static bool IsHeldElsewhere(BoundExpression expression) => expression switch
+    {
+        BoundConversion conversion => IsHeldElsewhere(conversion.Operand),
+        BoundStringLiteral or BoundNullLiteral => true,
+        BoundLocalAccess or BoundParameterAccess or BoundThis => true,
+        BoundFieldAccess or BoundIndex or BoundDereference => true,
+        _ => false,
+    };
+
+    /// <summary>
+    /// The storage an lvalue ultimately names, looking through field access and
+    /// indexing. A write to <c>Config.Limits[0]</c> is a write to <c>Config</c>.
+    /// </summary>
+    private static BoundExpression BaseOf(BoundExpression expression) => expression switch
+    {
+        BoundFieldAccess { Receiver: { } receiver } => BaseOf(receiver),
+        BoundIndex index => BaseOf(index.Target),
+        BoundConversion conversion => BaseOf(conversion.Operand),
+        _ => expression,
+    };
+
+    /// <summary>Strips conversions, so a widened loop variable still matches.</summary>
+    private static BoundExpression Underlying(BoundExpression expression) =>
+        expression is BoundConversion conversion ? Underlying(conversion.Operand) : expression;
+
+
+    // ============================================================ sendability
+
+    /// <summary>
+    /// Whether a value of this type may be reached by more than one thread.
+    ///
+    /// This is the rule the whole concurrency model rests on, and it is narrow
+    /// on purpose. Reference counts are not atomic, so anything two threads can
+    /// both retain is a race that nothing would report. Three cases are safe:
+    ///
+    ///   plain data       no reference count exists to race over
+    ///   String           immutable, and its bytes live inside the object
+    ///   [Shared]         the author has said the type synchronizes internally
+    ///
+    /// An array of plain data is included as a fourth, and it is the one that is
+    /// pragmatic rather than proven: a job borrows the array without retaining
+    /// it, which is sound as far as it goes, but nothing yet stops the job from
+    /// storing it somewhere and retaining it then. It earns its place because
+    /// data parallelism is the point of `parallel for`, and rejecting it would
+    /// leave the feature with nothing to iterate.
+    /// </summary>
+    private bool IsSendable(TypeSymbol type) => type switch
+    {
+        PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol => true,
+
+        // A struct cannot hold a reference, so it is bytes and nothing else.
+        StructTypeSymbol => true,
+
+        ArrayTypeSymbol array => IsPlainData(array.Element),
+
+        _ when _builtins.IsString(type) => true,
+
+        NamedTypeSymbol named => IsShared(named),
+
+        OptionalTypeSymbol optional => IsSendable(optional.Element),
+
+        _ => false,
+    };
+
+    private bool IsPlainData(TypeSymbol type) =>
+        type is PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol
+             or DelegateTypeSymbol or StructTypeSymbol;
+
+    /// <summary>True when the type carries <c>[Shared]</c>.</summary>
+    private static bool IsShared(NamedTypeSymbol type) =>
+        type.Attributes.Any(a => a.Type.SimpleName == "Shared");
+
+    /// <summary>
+    /// Reports a value that would be reachable from two threads at once.
+    /// The message names the three ways out, because the fix is never obvious
+    /// from the rule alone.
+    /// </summary>
+    private void ReportNotSendable(TypeSymbol type, SourceSpan span, string what)
+    {
+        diagnostics.Error("SL0377", span,
+            $"{what} is '{type.Name}', which more than one thread would reach. " +
+            "Reference counts are not atomic, so this is a race the runtime cannot " +
+            "detect. Pass plain data or a String, guard it with 'Mutex<T>', or mark " +
+            $"'{type.Name}' with [Shared] if it already synchronizes itself");
+    }
+
+
+    // ============================================================ statics
+
+    private void DeclareStatic(FileScope scope, StaticDeclSyntax declaration)
+    {
+        var module = scope.Module;
+
+        if (module.Statics.ContainsKey(declaration.Name) ||
+            module.Constants.ContainsKey(declaration.Name))
+        {
+            diagnostics.Error("SL0214", declaration.Span,
+                $"'{declaration.Name}' is already declared in module '{module.Name}'");
+            return;
+        }
+
+        var type = ResolveType(declaration.Type, scope);
+
+        module.Statics[declaration.Name] = new StaticSymbol(declaration.Name, type, module.Name)
+        {
+            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            Span = declaration.Span,
+        };
+
+        _staticSyntax[module.Statics[declaration.Name]] = (declaration, scope);
+    }
+
+    /// <summary>
+    /// Binds every static's initializer, then decides what order they run in.
+    ///
+    /// C++ cannot do this and calls the result a fiasco; Swift avoids it by
+    /// making every static lazy and paying a guard check on every access, which
+    /// has to become atomic the moment threads exist. Stainless compiles the
+    /// whole program at once, so it can simply look at the dependency graph and
+    /// sort it -- no guard, no per-access cost, and a compile error rather than
+    /// a runtime mystery when the graph has a cycle.
+    /// </summary>
+    private void BindStatics()
+    {
+        foreach (var (symbol, (declaration, scope)) in _staticSyntax)
+        {
+            _currentScope = scope;
+            _currentFunction = null;
+
+            var value = BindConversion(
+                BindExpression(declaration.Value), symbol.Type, declaration.Value.Span);
+            symbol.Initializer = value;
+
+            // A static outlives every thread, so whatever it holds is reachable
+            // from all of them at once.
+            if (!IsSendable(symbol.Type))
+                ReportNotSendable(symbol.Type, declaration.Span, $"static '{symbol.Name}'");
+        }
+
+        _currentScope = null;
+
+        foreach (var (symbol, _) in _staticSyntax)
+            CollectStaticDependencies(symbol, symbol.Initializer);
+
+        _staticOrder = SortStatics();
+    }
+
+    private static void CollectStaticDependencies(StaticSymbol owner, BoundExpression? expression)
+    {
+        var walker = new StaticReferenceWalker();
+        walker.Visit(expression);
+
+        foreach (var referenced in walker.Found)
+            if (referenced != owner && !owner.DependsOn.Contains(referenced))
+                owner.DependsOn.Add(referenced);
+    }
+
+    /// <summary>
+    /// Orders the statics so that nothing runs before what it reads. A cycle is
+    /// reported here rather than left to produce a zero at run time.
+    /// </summary>
+    private List<StaticSymbol> SortStatics()
+    {
+        var ordered = new List<StaticSymbol>();
+        var done = new HashSet<StaticSymbol>();
+        var onStack = new HashSet<StaticSymbol>();
+
+        void Visit(StaticSymbol symbol)
+        {
+            if (done.Contains(symbol)) return;
+
+            if (!onStack.Add(symbol))
+            {
+                diagnostics.Error("SL0378", symbol.Span,
+                    $"the initializer of '{symbol.QualifiedName}' depends on itself, " +
+                    "directly or through another static; there is no order that would " +
+                    "give it a value before it is read");
+                return;
+            }
+
+            foreach (var dependency in symbol.DependsOn) Visit(dependency);
+
+            onStack.Remove(symbol);
+            if (done.Add(symbol)) ordered.Add(symbol);
+        }
+
+        foreach (var symbol in _staticSyntax.Keys) Visit(symbol);
+        return ordered;
+    }
+
+
+    // ============================================================ closures
+
+    /// <summary>
+    /// What a lambda body can see of the scope it was written in, and where the
+    /// values it reaches for end up.
+    /// </summary>
+    private sealed class ClosureContext
+    {
+        /// <summary>The generated class, or null for a lambda becoming a delegate.</summary>
+        public ClassTypeSymbol? Type { get; init; }
+        public ParameterSymbol? This { get; init; }
+
+        /// <summary>The scope chain in force where the lambda was written.</summary>
+        public required List<Dictionary<string, LocalSymbol>> OuterScopes { get; init; }
+        public required FunctionSymbol? OuterFunction { get; init; }
+
+        public Dictionary<string, FieldSymbol> Captured { get; } = new(StringComparer.Ordinal);
+        public List<(FieldSymbol Field, BoundExpression Value)> Captures { get; } = [];
+    }
+
+    private readonly List<ClosureContext> _closures = [];
+    private int _closureCount;
+
+    /// <summary>
+    /// Resolves a name a lambda body used but did not declare, by capturing it.
+    ///
+    /// The value is read in the scope the lambda was written in and copied into
+    /// a field, so the closure owns what it captured rather than pointing at a
+    /// frame that may be gone. Nested lambdas capture through one another: the
+    /// inner one captures from the outer one's field, which the outer one
+    /// captured in turn.
+    /// </summary>
+    private BoundExpression? TryCapture(string name, SourceSpan span) =>
+        _closures.Count == 0 ? null : CaptureFrom(_closures.Count - 1, name, span);
+
+    private BoundExpression? CaptureFrom(int index, string name, SourceSpan span)
+    {
+        var closure = _closures[index];
+
+        if (closure.Captured.TryGetValue(name, out var already))
+            return new BoundFieldAccess(
+                span, new BoundThis(span, closure.Type!, closure.This!), already);
+
+        var outer = ResolveOutside(index, name, span);
+        if (outer is null) return null;
+
+        if (closure.Type is null)
+        {
+            diagnostics.Error("SL0381", span,
+                $"this lambda reads '{name}' from around it, so it cannot become a delegate; " +
+                "a delegate is a bare function pointer with nowhere to keep what was " +
+                "captured. Convert it to a single-method interface instead");
+            return new BoundErrorExpression(span);
+        }
+
+        if (outer.Type.IsVoid() || outer.Type.IsError()) return new BoundErrorExpression(span);
+
+        var field = new FieldSymbol(name, outer.Type, closure.Type, closure.Type.Fields.Count);
+        closure.Type.Fields.Add(field);
+        closure.Captured[name] = field;
+        closure.Captures.Add((field, outer));
+
+        return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
+    }
+
+    /// <summary>Reads a name in the context the closure at <paramref name="index"/> was written in.</summary>
+    private BoundExpression? ResolveOutside(int index, string name, SourceSpan span)
+    {
+        var closure = _closures[index];
+
+        for (int i = closure.OuterScopes.Count - 1; i >= 0; i--)
+            if (closure.OuterScopes[i].TryGetValue(name, out var local))
+                return new BoundLocalAccess(span, local);
+
+        if (closure.OuterFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis)
+            is { } parameter)
+            return new BoundParameterAccess(span, parameter);
+
+        // The lambda that encloses this one may be able to reach it.
+        return index > 0 ? CaptureFrom(index - 1, name, span) : null;
+    }
+
+    /// <summary>
+    /// Turns a lambda into whatever it is being assigned to: an instance of a
+    /// generated class for a single-method interface, or a plain function for a
+    /// delegate. A delegate cannot capture, because it is one pointer.
+    /// </summary>
+    private BoundExpression BindLambda(BoundLambda lambda, TypeSymbol target, SourceSpan span)
+    {
+        var syntax = lambda.Syntax;
+
+        if (target is DelegateTypeSymbol asDelegate)
+            return BindLambdaAsFunction(syntax, asDelegate, span);
+
+        if (target is InterfaceTypeSymbol asInterface && SingleMethodOf(asInterface) is { } method)
+            return BindLambdaAsClosure(syntax, asInterface, method, span);
+
+        diagnostics.Error("SL0382", span,
+            $"a lambda becomes a delegate or an interface with exactly one method, " +
+            $"and '{target.Name}' is neither");
+        return new BoundErrorExpression(span);
+    }
+
+    /// <summary>The lone method of a functional interface, or null if it is not one.</summary>
+    private static FunctionSymbol? SingleMethodOf(InterfaceTypeSymbol type) =>
+        type.Methods.Count == 1 && type.Interfaces.Count == 0 ? type.Methods[0] : null;
+
+    private BoundExpression BindLambdaAsClosure(
+        LambdaSyntax syntax, InterfaceTypeSymbol target, FunctionSymbol method, SourceSpan span)
+    {
+        var wanted = method.Parameters.Where(p => !p.IsThis).ToList();
+        if (!CheckLambdaArity(syntax, wanted.Count, target.Name, span)) return new BoundErrorExpression(span);
+
+        var closureType = new ClassTypeSymbol
+        {
+            SimpleName = $"Closure.{_closureCount++}",
+            ModuleName = _currentModule!.Name,
+        };
+        closureType.Interfaces.Add(target);
+
+        var symbol = new FunctionSymbol
+        {
+            Name = method.Name,
+            ModuleName = closureType.ModuleName,
+            ReturnType = method.ReturnType,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.Method,
+            ContainingType = closureType,
+            IsPublic = true,
+            Span = syntax.Span,
+            Scope = _currentScope,
+        };
+
+        var self = new ParameterSymbol("this", closureType, 0) { IsThis = true };
+        symbol.Parameters.Add(self);
+        AddLambdaParameters(symbol, syntax, wanted);
+
+        closureType.Methods.Add(symbol);
+
+        var context = new ClosureContext
+        {
+            Type = closureType,
+            This = self,
+            OuterScopes = [.. _scopes],
+            OuterFunction = _currentFunction,
+        };
+
+        var body = BindLambdaBody(syntax, symbol, context);
+
+        // The fields are known only now, so the layout waits for the body.
+        ComputeLayout(closureType, []);
+        _classes.Add(closureType);
+        _functions.Add(new BoundFunction(symbol, body));
+
+        return new BoundClosure(span, target, closureType, context.Captures);
+    }
+
+    private BoundExpression BindLambdaAsFunction(
+        LambdaSyntax syntax, DelegateTypeSymbol target, SourceSpan span)
+    {
+        if (!CheckLambdaArity(syntax, target.Signature.Count, target.Name, span))
+            return new BoundErrorExpression(span);
+
+        var symbol = new FunctionSymbol
+        {
+            Name = $"Lambda.{_closureCount++}",
+            ModuleName = _currentModule!.Name,
+            ReturnType = target.ReturnType,
+            Linkage = LinkageKind.Stainless,
+            IsPublic = false,
+            Span = syntax.Span,
+            Scope = _currentScope,
+        };
+
+        AddLambdaParameters(symbol, syntax, target.Signature);
+
+        var context = new ClosureContext
+        {
+            OuterScopes = [.. _scopes],
+            OuterFunction = _currentFunction,
+        };
+
+        var body = BindLambdaBody(syntax, symbol, context);
+        _functions.Add(new BoundFunction(symbol, body));
+
+        return new BoundFunctionReference(span, target, symbol);
+    }
+
+    private bool CheckLambdaArity(LambdaSyntax syntax, int wanted, string target, SourceSpan span)
+    {
+        if (syntax.Parameters.Count == wanted) return true;
+
+        diagnostics.Error("SL0383", span,
+            $"'{target}' takes {wanted} argument{(wanted == 1 ? "" : "s")}, " +
+            $"but this lambda declares {syntax.Parameters.Count}");
+        return false;
+    }
+
+    /// <summary>
+    /// Gives the generated function its parameters. A lambda may write their
+    /// types or leave them out; left out, they come from the target, which is
+    /// the only thing that knows them.
+    /// </summary>
+    private void AddLambdaParameters(
+        FunctionSymbol symbol, LambdaSyntax syntax, IReadOnlyList<ParameterSymbol> wanted)
+    {
+        for (int i = 0; i < syntax.Parameters.Count && i < wanted.Count; i++)
+        {
+            var declared = syntax.Parameters[i];
+            var type = wanted[i].Type;
+
+            if (declared.Type is not null)
+            {
+                var written = ResolveType(declared.Type, _currentScope!);
+                if (!written.IsError() && !written.Equals(type))
+                    diagnostics.Error("SL0384", declared.Span,
+                        $"parameter '{declared.Name}' is '{written.Name}', but the target " +
+                        $"expects '{type.Name}'");
+            }
+
+            symbol.Parameters.Add(new ParameterSymbol(declared.Name, type, symbol.Parameters.Count));
+        }
+    }
+
+    /// <summary>
+    /// Binds the body against the generated function rather than the enclosing
+    /// one. The scope chain is put aside rather than extended, so a name from
+    /// outside is reached by capturing it and not by accident.
+    /// </summary>
+    private BoundBlock BindLambdaBody(
+        LambdaSyntax syntax, FunctionSymbol symbol, ClosureContext context)
+    {
+        var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
+        var savedFunction = _currentFunction;
+        int savedLoops = _loopDepth;
+        int savedParallel = _parallelDepth;
+
+        _scopes.Clear();
+        _currentFunction = symbol;
+        _loopDepth = 0;
+        _parallelDepth = 0;
+        _closures.Add(context);
+
+        PushScope();
+
+        BoundBlock body;
+        if (syntax.Block is not null)
+        {
+            body = BindBlock(syntax.Block);
+        }
+        else
+        {
+            // An expression body returns, unless the target returns nothing.
+            var value = BindExpression(syntax.Expression!);
+            BoundStatement statement = symbol.ReturnType.IsVoid()
+                ? new BoundExpressionStatement(syntax.Expression!.Span, value)
+                : new BoundReturn(syntax.Expression!.Span,
+                    BindConversion(value, symbol.ReturnType, syntax.Expression!.Span));
+
+            body = new BoundBlock(syntax.Span, [statement]);
+        }
+
+        PopScope();
+
+        if (!symbol.ReturnType.IsVoid() && !AlwaysReturns(body))
+            diagnostics.Error("SL0217", syntax.Span,
+                $"not all paths through this lambda return a value of type '{symbol.ReturnType.Name}'");
+
+        _closures.RemoveAt(_closures.Count - 1);
+        _scopes.Clear();
+        _scopes.AddRange(savedScopes);
+        _currentFunction = savedFunction;
+        _loopDepth = savedLoops;
+        _parallelDepth = savedParallel;
+
+        return body;
+    }
+
     private BoundStatement BindReturn(ReturnSyntax syntax)
     {
+        if (_parallelDepth > 0)
+        {
+            diagnostics.Error("SL0374", syntax.Span,
+                "'return' cannot leave a 'parallel' block; the join at its closing brace " +
+                "would be skipped and the jobs left running against a dead frame");
+            return new BoundReturn(syntax.Span, null);
+        }
+
         var expected = _currentFunction?.ReturnType ?? PrimitiveTypeSymbol.Void;
 
         if (syntax.Value is null)
@@ -1399,6 +2516,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         IndexSyntax index => BindIndex(index),
         NewSyntax newExpression => BindNew(newExpression),
         NewArraySyntax newArray => BindNewArray(newArray),
+        ConditionalSyntax conditional => BindConditional(conditional),
+        LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
         TypeofSyntax typeofExpression => BindTypeof(typeofExpression),
@@ -1467,10 +2586,29 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             if (_currentModule!.Constants.TryGetValue(name, out var constant))
                 return new BoundConstantAccess(syntax.Span, constant);
 
+            if (_currentModule.Statics.TryGetValue(name, out var moduleStatic))
+                return new BoundStaticAccess(syntax.Span, moduleStatic);
+
             foreach (var import in _currentScope!.Imports.Values.Distinct())
+            {
                 if (import.Constants.TryGetValue(name, out var imported) && imported.IsPublic)
                     return new BoundConstantAccess(syntax.Span, imported);
+
+                if (import.Statics.TryGetValue(name, out var importedStatic) && importedStatic.IsPublic)
+                    return new BoundStaticAccess(syntax.Span, importedStatic);
+            }
         }
+
+        // Not declared here, so a lambda body reaches outward and captures it.
+        if (parts.Count == 1 && TryCapture(parts[0], syntax.Span) is { } captured)
+            return captured;
+
+        // A bare function name is a value only once it is known which delegate
+        // it is becoming, so it stays a group until a conversion resolves it.
+        var functions = ResolveFunctionCandidates(syntax.Name);
+        if (functions.Count > 0)
+            return new BoundFunctionGroup(
+                syntax.Span, FunctionGroupType.Instance, syntax.Name.Text, functions);
 
         diagnostics.Error("SL0229", syntax.Span, $"'{syntax.Name.Text}' is not defined");
         return new BoundErrorExpression(syntax.Span);
@@ -1624,6 +2762,35 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(span);
         }
 
+        // Enums compare with each other and with nothing else. Comparison is
+        // allowed as well as equality, because an ordered enum -- a severity, a
+        // log level -- is the common case and `level >= Level.Warning` is what
+        // people write. Arithmetic is not: adding two colours means nothing.
+        if (left.Type is EnumTypeSymbol || right.Type is EnumTypeSymbol)
+        {
+            bool comparison = op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual
+                or BoundBinaryOp.Less or BoundBinaryOp.LessEqual
+                or BoundBinaryOp.Greater or BoundBinaryOp.GreaterEqual;
+
+            if (!left.Type.Equals(right.Type))
+            {
+                diagnostics.Error("SL0353", span,
+                    $"'{left.Type.Name}' and '{right.Type.Name}' are different types and do not " +
+                    "compare; an enum converts only through an explicit cast");
+                return new BoundErrorExpression(span);
+            }
+
+            if (!comparison)
+            {
+                diagnostics.Error("SL0354", span,
+                    $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}'; " +
+                    "an enum supports comparison, not arithmetic");
+                return new BoundErrorExpression(span);
+            }
+
+            return new BoundBinary(span, PrimitiveTypeSymbol.Bool, left, op, right);
+        }
+
         // Reference and pointer equality.
         if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual &&
             IsReferenceLike(left.Type) && IsReferenceLike(right.Type))
@@ -1699,7 +2866,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
     private static bool IsReferenceLike(TypeSymbol type) =>
         type is PointerTypeSymbol or ClassTypeSymbol or InterfaceTypeSymbol
-            or OptionalTypeSymbol or WeakTypeSymbol or NullType;
+            or OptionalTypeSymbol or WeakTypeSymbol or NullType or DelegateTypeSymbol;
 
     private (BoundExpression, BoundExpression) UnifyReferences(
         BoundExpression left, BoundExpression right, SourceSpan span)
@@ -1747,6 +2914,64 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         return true;
     }
 
+    /// <summary>
+    /// <c>a ? b : c</c>. The arms must meet at one type: the same type, a common
+    /// numeric type, or one that the other converts to implicitly.
+    /// </summary>
+    private BoundExpression BindConditional(ConditionalSyntax syntax)
+    {
+        var condition = BindCondition(syntax.Condition);
+        var whenTrue = BindExpression(syntax.WhenTrue);
+        var whenFalse = BindExpression(syntax.WhenFalse);
+
+        if (whenTrue.Type.IsError() || whenFalse.Type.IsError())
+            return new BoundErrorExpression(syntax.Span);
+
+        if (whenTrue.Type.IsVoid() || whenFalse.Type.IsVoid())
+        {
+            diagnostics.Error("SL0348", syntax.Span,
+                "a conditional expression must produce a value, but an arm is 'void'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var type = CommonArmType(whenTrue, whenFalse);
+        if (type is null)
+        {
+            diagnostics.Error("SL0349", syntax.Span,
+                $"the arms of a conditional have no common type: one is " +
+                $"'{whenTrue.Type.Name}', the other '{whenFalse.Type.Name}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundConditional(
+            syntax.Span, type,
+            condition,
+            BindConversion(whenTrue, type, syntax.WhenTrue.Span),
+            BindConversion(whenFalse, type, syntax.WhenFalse.Span));
+    }
+
+    /// <summary>The type both arms of a conditional reach, or null if they do not.</summary>
+    private TypeSymbol? CommonArmType(BoundExpression left, BoundExpression right)
+    {
+        if (left.Type.Equals(right.Type)) return left.Type;
+
+        // `flag ? obj : null` is an optional, which is what the null was reaching for.
+        if (left is BoundNullLiteral && right.Type.IsReferenceType) return new OptionalTypeSymbol(right.Type);
+        if (right is BoundNullLiteral && left.Type.IsReferenceType) return new OptionalTypeSymbol(left.Type);
+
+        if (left.Type is PrimitiveTypeSymbol { IsNumeric: true } leftNumber &&
+            right.Type is PrimitiveTypeSymbol { IsNumeric: true } rightNumber &&
+            TryFindCommonType(leftNumber, rightNumber, out var common))
+            return common;
+
+        // Otherwise one arm must already be assignable to the other, which is
+        // what covers C -> C?, C -> I and an integer literal adopting a width.
+        if (IsImplicitlyConvertible(right, left.Type)) return left.Type;
+        if (IsImplicitlyConvertible(left, right.Type)) return right.Type;
+
+        return null;
+    }
+
     private BoundExpression BindAssignment(AssignmentSyntax syntax)
     {
         var target = BindExpression(syntax.Target);
@@ -1754,6 +2979,15 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         if (target.Type.IsError() || value.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
+
+        if (BaseOf(target) is BoundStaticAccess owner)
+        {
+            diagnostics.Error("SL0379", syntax.Target.Span,
+                $"'{owner.Static.Name}' is a static, and every static is readonly; " +
+                "the value it holds is shared by every thread, so nothing may write it " +
+                "after it is initialized");
+            return new BoundErrorExpression(syntax.Span);
+        }
 
         if (!target.IsLValue)
         {
@@ -1868,7 +3102,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(syntax.Span);
         }
 
-        return kind == ConversionKind.Identity
+        return kind == ConversionKind.Identity && operand.Type.Equals(targetType)
             ? operand
             : new BoundConversion(syntax.Span, targetType, operand, kind.Value);
     }
@@ -1948,6 +3182,46 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         return _modules.TryGetValue(name, out module) ? module : null;
     }
 
+    /// <summary>
+    /// Resolves a member-access target to an enum type, or null when it names a
+    /// value. Like <see cref="ResolveModulePrefix"/> a local of the same name
+    /// wins, so an enum called <c>Level</c> never shadows a variable.
+    /// </summary>
+    private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target)
+    {
+        if (FlattenName(target) is not { } parts) return null;
+
+        if (LookupLocal(parts[0]) is not null) return null;
+        if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
+        if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
+
+        // Either a bare name in this module, or one qualified by its module.
+        if (parts.Count == 1)
+        {
+            if (_currentScope!.Module.Types.TryGetValue(parts[0], out var local))
+                return local as EnumTypeSymbol;
+
+            var visible = _currentScope.Imports.Values.Distinct()
+                .Select(m => m.Types.TryGetValue(parts[0], out var t) && t.IsPublic ? t : null)
+                .OfType<EnumTypeSymbol>()
+                .Distinct()
+                .ToList();
+
+            return visible.Count == 1 ? visible[0] : null;
+        }
+
+        string moduleName = string.Join('.', parts.Take(parts.Count - 1));
+        ModuleSymbol? module =
+            _currentScope!.Imports.TryGetValue(moduleName, out var imported) ? imported
+            : _modules.TryGetValue(moduleName, out var known) ? known
+            : null;
+
+        if (module is null) return null;
+        return module.Types.TryGetValue(parts[^1], out var candidate) && candidate.IsPublic
+            ? candidate as EnumTypeSymbol
+            : null;
+    }
+
     private BoundExpression BindNewArray(NewArraySyntax syntax)
     {
         var element = ResolveType(syntax.ElementType, _currentScope!);
@@ -1980,8 +3254,22 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             if (importedModule.Constants.TryGetValue(syntax.Member, out var constant) && constant.IsPublic)
                 return new BoundConstantAccess(syntax.Span, constant);
 
+            if (importedModule.Statics.TryGetValue(syntax.Member, out var shared) && shared.IsPublic)
+                return new BoundStaticAccess(syntax.Span, shared);
+
             diagnostics.Error("SL0246", syntax.Span,
                 $"module '{importedModule.Name}' has no public member named '{syntax.Member}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // `Color.Red` names a constant of an enum type, not a member of a value.
+        if (ResolveEnumPrefix(syntax.Target) is { } enumType)
+        {
+            if (enumType.FindMember(syntax.Member) is { } member)
+                return new BoundLiteral(syntax.Span, enumType, member.Value);
+
+            diagnostics.Error("SL0355", syntax.Span,
+                $"enum '{enumType.Name}' has no member named '{syntax.Member}'");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -2069,6 +3357,11 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return BindFunctionCall(syntax, visible, member.Member, arguments);
         }
 
+        // A local, parameter or field holding a delegate is called indirectly,
+        // and shadows any function of the same name -- the value is nearer.
+        if (BindDelegateTarget(syntax.Callee) is { } indirect)
+            return BuildIndirectCall(syntax, indirect, arguments);
+
         if (syntax.Callee is NameSyntax callee)
         {
             var candidates = ResolveFunctionCandidates(callee.Name);
@@ -2086,12 +3379,84 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                     return BuildCall(syntax, method, receiver, arguments);
             }
 
+            if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing)
+            {
+                var generics = enclosing.GenericMethods.Where(m => m.Name == callee.Name.Text).ToList();
+                if (generics.Count > 0)
+                {
+                    var instantiated = InferAndInstantiate(generics, syntax, arguments);
+                    if (instantiated is null) return new BoundErrorExpression(syntax.Span);
+
+                    var receiver = BindImplicitThis(callee.Span);
+                    if (receiver is not null)
+                        return BuildCall(syntax, instantiated, receiver, arguments);
+                }
+            }
+
             diagnostics.Error("SL0252", callee.Span, $"no function named '{callee.Name.Text}' is in scope");
             return new BoundErrorExpression(syntax.Span);
         }
 
         diagnostics.Error("SL0253", syntax.Span, "this expression is not callable");
         return new BoundErrorExpression(syntax.Span);
+    }
+
+    /// <summary>
+    /// Binds a bare callee that names a value of delegate type, or returns null
+    /// when it does not name one. Nothing is bound unless it really resolves to
+    /// a delegate, so an ordinary call is never disturbed by this.
+    /// </summary>
+    private BoundExpression? BindDelegateTarget(ExpressionSyntax callee)
+    {
+        switch (callee)
+        {
+            case NameSyntax { Name.Parts.Count: 1 } name:
+            {
+                string text = name.Name.Parts[0];
+
+                if (LookupLocal(text) is { Type: DelegateTypeSymbol } local)
+                    return new BoundLocalAccess(name.Span, local);
+
+                if (_currentFunction?.Parameters.FirstOrDefault(
+                        p => p.Name == text && !p.IsThis) is { Type: DelegateTypeSymbol } parameter)
+                    return new BoundParameterAccess(name.Span, parameter);
+
+                if (_currentFunction?.ContainingType?.FindField(text) is { Type: DelegateTypeSymbol } field)
+                {
+                    var receiver = BindImplicitThis(name.Span);
+                    if (receiver is not null) return new BoundFieldAccess(name.Span, receiver, field);
+                }
+
+                return null;
+            }
+
+            // `receiver.field(...)` is handled by BindMethodCall instead, which
+            // has already bound the receiver and so cannot bind it twice.
+            default:
+                return null;
+        }
+    }
+
+    private BoundExpression BuildIndirectCall(
+        CallSyntax syntax, BoundExpression target, List<BoundExpression> arguments)
+    {
+        var delegateType = (DelegateTypeSymbol)target.Type;
+
+        if (arguments.Count != delegateType.Signature.Count)
+        {
+            diagnostics.Error("SL0363", syntax.Span,
+                $"delegate '{delegateType.Name}' is '{delegateType.SignatureText}' and takes " +
+                $"{delegateType.Signature.Count} argument{(delegateType.Signature.Count == 1 ? "" : "s")}, " +
+                $"but {arguments.Count} were given");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var converted = new List<BoundExpression>(arguments.Count);
+        for (int i = 0; i < arguments.Count; i++)
+            converted.Add(BindConversion(
+                arguments[i], delegateType.Signature[i].Type, syntax.Arguments[i].Span));
+
+        return new BoundIndirectCall(syntax.Span, delegateType, target, converted);
     }
 
     private BoundExpression BindMethodCall(
@@ -2117,8 +3482,27 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // A field holding a delegate is called through, not dispatched to. It is
+        // checked before methods so that the field's own name is what is called;
+        // a method of the same name would be a different thing entirely.
+        if (namedType.FindField(member.Member) is { Type: DelegateTypeSymbol } callable)
+        {
+            if (!callable.IsPublic && namedType.ModuleName != _currentModule!.Name)
+            {
+                diagnostics.Error("SL0249", member.Span,
+                    $"'{namedType.Name}.{member.Member}' is not public");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return BuildIndirectCall(
+                syntax, new BoundFieldAccess(member.Span, receiver, callable), arguments);
+        }
+
         if (namedType.FindMethod(member.Member) is not { } method)
         {
+            if (TryBindGenericMethodCall(syntax, member, namedType, receiver, arguments) is { } generic)
+                return generic;
+
             diagnostics.Error("SL0256", member.Span,
                 $"'{namedType.Name}' has no method named '{member.Member}'");
             return new BoundErrorExpression(syntax.Span);
@@ -2273,6 +3657,21 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// </summary>
     private bool IsImplicitlyConvertible(BoundExpression argument, TypeSymbol target)
     {
+        // A bare function name fits a delegate when one of its overloads has
+        // that exact signature. The delegate is the only context a bare name
+        // has, which is also how the overload gets chosen.
+        if (argument is BoundFunctionGroup group)
+            return target is DelegateTypeSymbol wanted && group.Candidates.Any(wanted.Accepts);
+
+        if (argument is BoundLambda lambda)
+            return target switch
+            {
+                DelegateTypeSymbol signature => signature.Signature.Count == lambda.Syntax.Parameters.Count,
+                InterfaceTypeSymbol functional => SingleMethodOf(functional) is { } only &&
+                    only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count,
+                _ => false,
+            };
+
         if (IsBytePointer(target))
         {
             if (argument is BoundStringLiteral) return true;
@@ -2357,6 +3756,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         if (expression is BoundStringLiteral literal && IsBytePointer(target))
             return new BoundConversion(span, target, literal, ConversionKind.StringLiteralToPointer);
 
+        // A function name becomes a delegate by naming the overload that matches.
+        if (expression is BoundFunctionGroup group)
+            return BindFunctionReference(group, target, span);
+
+        // A lambda has no type until it is told what to be.
+        if (expression is BoundLambda lambda)
+            return BindLambda(lambda, target, span);
+
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
         if (ConstantFits(expression, target))
@@ -2381,12 +3788,50 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(span);
         }
 
-        if (kind == ConversionKind.Identity) return expression;
+        // An identity conversion still has to be recorded when the types differ,
+        // as between an enum and its underlying integer: same bits, different type.
+        if (kind == ConversionKind.Identity && expression.Type.Equals(target)) return expression;
 
         // Null adopts the target type rather than being converted at runtime.
         if (expression is BoundNullLiteral) return new BoundNullLiteral(span, target);
 
         return new BoundConversion(span, target, expression, kind.Value);
+    }
+
+    /// <summary>
+    /// Resolves a bare function name against the delegate it is being stored in.
+    /// Overloads are separated by the signature the delegate asks for, which is
+    /// the only context a bare name has.
+    /// </summary>
+    private BoundExpression BindFunctionReference(
+        BoundFunctionGroup group, TypeSymbol target, SourceSpan span)
+    {
+        if (target is not DelegateTypeSymbol wanted)
+        {
+            diagnostics.Error("SL0360", span,
+                $"'{group.Name}' is a function; it converts to a delegate type, " +
+                $"and '{target.Name}' is not one");
+            return new BoundErrorExpression(span);
+        }
+
+        var matches = group.Candidates.Where(wanted.Accepts).ToList();
+
+        if (matches.Count == 0)
+        {
+            diagnostics.Error("SL0361", span,
+                $"no overload of '{group.Name}' matches delegate '{wanted.Name}', " +
+                $"which is '{wanted.SignatureText}'");
+            return new BoundErrorExpression(span);
+        }
+
+        if (matches.Count > 1)
+        {
+            diagnostics.Error("SL0362", span,
+                $"'{group.Name}' is ambiguous for delegate '{wanted.Name}'");
+            return new BoundErrorExpression(span);
+        }
+
+        return new BoundFunctionReference(span, wanted, matches[0]);
     }
 
     /// <summary>
@@ -2420,9 +3865,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         if (from.Equals(to)) return ConversionKind.Identity;
 
-        // null literal -> any nullable representation
+        // null literal -> any nullable representation. A delegate is a raw
+        // function pointer, so a null one is exactly C's null callback.
         if (from is NullType)
-            return to is PointerTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol
+            return to is PointerTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol or DelegateTypeSymbol
                 ? ConversionKind.NullToReference
                 : null;
 
@@ -2470,11 +3916,37 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             to is PointerTypeSymbol)
             return explicitCast ? ConversionKind.PointerCast : null;
 
+        // And back again, which is what lets a C callback recover the object it
+        // was given as context. Nothing checks that the pointer really points at
+        // one of these, so the cast is an assertion by the programmer -- the same
+        // bargain the other direction already makes.
+        if (from is PointerTypeSymbol &&
+            to is NamedTypeSymbol { IsReferenceType: true } or ArrayTypeSymbol)
+            return explicitCast ? ConversionKind.PointerCast : null;
+
         if (from is PointerTypeSymbol && to is PrimitiveTypeSymbol { IsInteger: true, Size: 8 })
             return explicitCast ? ConversionKind.PointerToInteger : null;
 
         if (from is PrimitiveTypeSymbol { IsInteger: true, Size: 8 } && to is PointerTypeSymbol)
             return explicitCast ? ConversionKind.IntegerToPointer : null;
+
+        // An enum never converts implicitly, in either direction. That is the
+        // whole point of declaring one: a Level is not a byte that happens to be
+        // small, and a byte is not a Level. An explicit cast is still available,
+        // which is what interop and serialization need.
+        if (from is EnumTypeSymbol || to is EnumTypeSymbol)
+        {
+            if (!explicitCast) return null;
+
+            var fromCore = from is EnumTypeSymbol fromEnum ? fromEnum.UnderlyingType : from;
+            var toCore = to is EnumTypeSymbol toEnum ? toEnum.UnderlyingType : to;
+
+            if (fromCore is not PrimitiveTypeSymbol { IsInteger: true } ||
+                toCore is not PrimitiveTypeSymbol { IsInteger: true })
+                return null;
+
+            return ClassifyConversion(fromCore, toCore, explicitCast: true);
+        }
 
         if (from is not PrimitiveTypeSymbol source || to is not PrimitiveTypeSymbol target) return null;
         if (source.Kind == PrimitiveKind.Void || target.Kind == PrimitiveKind.Void) return null;
@@ -2750,12 +4222,32 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         var candidates = FindGenericFunctions(name);
         if (candidates.Count == 0) return null;
 
+        var function = InferAndInstantiate(candidates, syntax, arguments);
+        return function is null
+            ? new BoundErrorExpression(syntax.Span)
+            : BuildCall(syntax, function, receiver: null, arguments);
+    }
+
+    /// <summary>
+    /// Chooses a template, infers its type arguments from the values passed, and
+    /// instantiates it. Shared by generic free functions and generic methods,
+    /// which differ only in whether a receiver comes along.
+    /// </summary>
+    private FunctionSymbol? InferAndInstantiate(
+        IReadOnlyList<GenericFunctionTemplate> candidates,
+        CallSyntax syntax,
+        List<BoundExpression> arguments)
+    {
         // Only arity distinguishes candidates for now; inference does the rest.
         var template = candidates.FirstOrDefault(c => c.Declaration.Parameters.Count == arguments.Count)
                        ?? candidates[0];
 
         var parameters = template.Parameters.ToHashSet(StringComparer.Ordinal);
         var inferred = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+
+        // An enclosing type's parameters are already fixed, so they are given
+        // rather than inferred; only the method's own have to be worked out.
+        foreach (var (name, type) in template.OuterSubstitution) inferred.TryAdd(name, type);
 
         int shared = Math.Min(arguments.Count, template.Declaration.Parameters.Count);
         for (int i = 0; i < shared; i++)
@@ -2769,14 +4261,40 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
                 $"for '{template.Name}' from these arguments; " +
                 "Stainless infers type arguments only from the values passed");
-            return new BoundErrorExpression(syntax.Span);
+            return null;
         }
 
         var typeArguments = template.Parameters.Select(p => inferred[p]).ToList();
-        var function = InstantiateFunction(template, typeArguments, syntax.Span);
+        return InstantiateFunction(template, typeArguments, syntax.Span);
+    }
+
+    /// <summary>
+    /// A generic method reached through a receiver. It stays a template until the
+    /// arguments say what its type parameters are, so it cannot be found by the
+    /// ordinary method lookup.
+    /// </summary>
+    private BoundExpression? TryBindGenericMethodCall(
+        CallSyntax syntax, MemberAccessSyntax member, NamedTypeSymbol type,
+        BoundExpression receiver, List<BoundExpression> arguments)
+    {
+        var candidates = type.GenericMethods.Where(m => m.Name == member.Member).ToList();
+        if (candidates.Count == 0) return null;
+
+        if (!candidates[0].IsPublic && type.ModuleName != _currentModule!.Name)
+        {
+            diagnostics.Error("SL0257", member.Span, $"'{type.Name}.{member.Member}' is not public");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var function = InferAndInstantiate(candidates, syntax, arguments);
         if (function is null) return new BoundErrorExpression(syntax.Span);
 
-        return BuildCall(syntax, function, receiver: null, arguments);
+        // A struct method takes its receiver by pointer, as everywhere else.
+        var self = type is StructTypeSymbol
+            ? new BoundAddressOf(member.Span, new PointerTypeSymbol(type), receiver)
+            : receiver;
+
+        return BuildCall(syntax, function, self, arguments);
     }
 
     private static PrimitiveTypeSymbol PrimitiveFor(TokenKind keyword) => keyword switch
@@ -2835,6 +4353,225 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 /// The type of the <c>null</c> literal before it adopts a target type. It never
 /// appears in a declaration, only briefly during binding.
 /// </summary>
+
+
+/// <summary>Finds the statics an initializer reads, so they can be ordered first.</summary>
+internal sealed class StaticReferenceWalker
+{
+    public HashSet<StaticSymbol> Found { get; } = [];
+
+    public void Visit(BoundExpression? expression)
+    {
+        switch (expression)
+        {
+            case null: return;
+
+            case BoundStaticAccess access: Found.Add(access.Static); break;
+
+            case BoundFieldAccess field: Visit(field.Receiver); break;
+
+            case BoundCall call:
+                Visit(call.Receiver);
+                foreach (var argument in call.Arguments) Visit(argument);
+                break;
+
+            case BoundIndirectCall call:
+                Visit(call.Target);
+                foreach (var argument in call.Arguments) Visit(argument);
+                break;
+
+            case BoundUnary unary: Visit(unary.Operand); break;
+            case BoundBinary binary: Visit(binary.Left); Visit(binary.Right); break;
+
+            case BoundConditional conditional:
+                Visit(conditional.Condition);
+                Visit(conditional.WhenTrue);
+                Visit(conditional.WhenFalse);
+                break;
+
+            case BoundAssignment assignment: Visit(assignment.Target); Visit(assignment.Value); break;
+            case BoundConversion conversion: Visit(conversion.Operand); break;
+
+            case BoundNew created:
+                foreach (var argument in created.Arguments) Visit(argument);
+                break;
+
+            case BoundDereference dereference: Visit(dereference.Operand); break;
+            case BoundAddressOf address: Visit(address.Operand); break;
+            case BoundNewArray array: Visit(array.Length); break;
+            case BoundArrayLength length: Visit(length.Array); break;
+            case BoundIndex index: Visit(index.Target); Visit(index.Index); break;
+        }
+    }
+}
+
+/// <summary>
+/// Finds what a <c>parallel for</c> body reaches outside itself.
+///
+/// Anything declared within the body belongs to one iteration and is ignored.
+/// Everything else is captured by address, so the chunks share the parent's
+/// storage rather than a copy — which is the point for an array being written
+/// through, and a race for a variable being assigned. Assignments are collected
+/// separately so the binder can reject exactly those.
+/// </summary>
+internal sealed class CaptureWalker(LocalSymbol loopVariable)
+{
+    private readonly HashSet<object> _declared = [loopVariable];
+    private readonly HashSet<object> _seen = [];
+    private readonly List<object> _captures = [];
+
+    public IReadOnlyList<object> Captures => _captures;
+
+    public List<(object Symbol, SourceSpan Span, string Name)> Assignments { get; } = [];
+
+    private void Capture(object symbol)
+    {
+        if (_declared.Contains(symbol) || !_seen.Add(symbol)) return;
+        _captures.Add(symbol);
+    }
+
+    private void Assigned(BoundExpression target)
+    {
+        switch (target)
+        {
+            case BoundLocalAccess local when !_declared.Contains(local.Local):
+                Assignments.Add((local.Local, local.Span, local.Local.Name));
+                break;
+
+            case BoundParameterAccess parameter when !_declared.Contains(parameter.Parameter):
+                Assignments.Add((parameter.Parameter, parameter.Span, parameter.Parameter.Name));
+                break;
+        }
+    }
+
+    public void Visit(BoundStatement? statement)
+    {
+        switch (statement)
+        {
+            case null: return;
+
+            case BoundBlock block:
+                foreach (var inner in block.Statements) Visit(inner);
+                break;
+
+            case BoundLocalDeclaration declaration:
+                _declared.Add(declaration.Local);
+                Visit(declaration.Initializer);
+                break;
+
+            case BoundExpressionStatement expression: Visit(expression.Expression); break;
+
+            case BoundIf branch:
+                Visit(branch.Condition); Visit(branch.Then); Visit(branch.Else);
+                break;
+
+            case BoundWhile loop:
+                Visit(loop.Condition); Visit(loop.Body);
+                break;
+
+            case BoundFor loop:
+                foreach (var local in loop.Locals) _declared.Add(local);
+                Visit(loop.Initializer); Visit(loop.Condition); Visit(loop.Step); Visit(loop.Body);
+                break;
+
+            case BoundParallel nested: Visit(nested.Body); break;
+
+            case BoundSpawn spawn:
+                Visit(spawn.Target); Visit(spawn.Call);
+                break;
+
+            case BoundParallelFor nested:
+                _declared.Add(nested.Variable);
+                Visit(nested.Start); Visit(nested.Limit); Visit(nested.Stride); Visit(nested.Body);
+                break;
+
+            case BoundReturn returned: Visit(returned.Value); break;
+        }
+    }
+
+    public void Visit(BoundExpression? expression)
+    {
+        switch (expression)
+        {
+            case null: return;
+
+            case BoundLocalAccess local: Capture(local.Local); break;
+            case BoundParameterAccess parameter: Capture(parameter.Parameter); break;
+            case BoundThis self: Capture(self.Parameter); break;
+
+            case BoundFieldAccess field: Visit(field.Receiver); break;
+
+            case BoundCall call:
+                Visit(call.Receiver);
+                foreach (var argument in call.Arguments) Visit(argument);
+                break;
+
+            case BoundIndirectCall call:
+                Visit(call.Target);
+                foreach (var argument in call.Arguments) Visit(argument);
+                break;
+
+            case BoundUnary unary: Visit(unary.Operand); break;
+
+            case BoundBinary binary:
+                Visit(binary.Left); Visit(binary.Right);
+                break;
+
+            case BoundConditional conditional:
+                Visit(conditional.Condition);
+                Visit(conditional.WhenTrue);
+                Visit(conditional.WhenFalse);
+                break;
+
+            case BoundAssignment assignment:
+                Assigned(assignment.Target);
+                Visit(assignment.Target); Visit(assignment.Value);
+                break;
+
+            case BoundConversion conversion: Visit(conversion.Operand); break;
+
+            case BoundNew created:
+                foreach (var argument in created.Arguments) Visit(argument);
+                break;
+
+            case BoundDereference dereference: Visit(dereference.Operand); break;
+            case BoundAddressOf address: Visit(address.Operand); break;
+            case BoundNewArray array: Visit(array.Length); break;
+            case BoundArrayLength length: Visit(length.Array); break;
+
+            case BoundIndex index:
+                Visit(index.Target); Visit(index.Index);
+                break;
+        }
+    }
+}
+
+/// <summary>
+/// The type of a lambda before something tells it what to be. It never reaches
+/// the emitter: a conversion either resolves it or reports an error.
+/// </summary>
+public sealed class LambdaType : TypeSymbol
+{
+    public static readonly LambdaType Instance = new();
+    private LambdaType() { }
+    public override string Name => "lambda";
+    public override int Size => 8;
+    public override int Alignment => 8;
+}
+
+/// <summary>
+/// The type of a bare function name before a delegate gives it one. It never
+/// reaches the emitter: a conversion either resolves it or reports an error.
+/// </summary>
+public sealed class FunctionGroupType : TypeSymbol
+{
+    public static readonly FunctionGroupType Instance = new();
+    private FunctionGroupType() { }
+    public override string Name => "function";
+    public override int Size => 8;
+    public override int Alignment => 8;
+}
+
 public sealed class NullType : TypeSymbol
 {
     public static readonly NullType Instance = new();

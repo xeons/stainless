@@ -45,6 +45,43 @@ public interface IComparable<T> {
     int CompareTo(T other);
 }
 
+// -------------------------------------------------------------- enumeration
+
+/// A cursor over a sequence. `MoveNext` advances and reports whether there was
+/// anything to advance to; `Current` returns what it landed on.
+///
+/// `foreach` does not require this interface -- it looks for the methods by
+/// name, so any type with a `GetEnumerator()` can be iterated. Naming the shape
+/// is still worth doing, because it lets a sequence be passed around.
+public interface IEnumerator<T> {
+    bool MoveNext();
+    T Current();
+}
+
+public interface IEnumerable<T> {
+    IEnumerator<T> GetEnumerator();
+}
+
+/// Walks anything that can be counted and indexed, so one enumerator serves
+/// every list rather than each list writing its own.
+public class ListEnumerator<T> : IEnumerator<T> {
+    IReadOnlyList<T> source;
+    nuint next;
+
+    public ListEnumerator(IReadOnlyList<T> items) {
+        source = items;
+        next = 0;
+    }
+
+    public bool MoveNext() {
+        if (next >= source.Count()) { return false; }
+        next = next + 1;
+        return true;
+    }
+
+    public T Current() { return source.At(next - 1); }
+}
+
 // ------------------------------------------------------------------- lists
 
 public interface IReadOnlyList<T> {
@@ -62,7 +99,7 @@ public interface IList<T> : IReadOnlyList<T> {
 }
 
 /// A growable list backed by a single array, doubling when it fills.
-public class List<T> : IList<T> {
+public class List<T> : IList<T>, IEnumerable<T> {
     T[] items;
     nuint count;
 
@@ -93,6 +130,8 @@ public class List<T> : IList<T> {
         if (index >= count) { sl_array_bounds_fail(index, count); }
         items[index] = item;
     }
+
+    public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(this); }
 
     /// Drops every item. The backing array is replaced rather than merely
     /// forgotten, so any references it held are released now instead of

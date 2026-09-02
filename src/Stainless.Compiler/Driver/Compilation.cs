@@ -224,6 +224,14 @@ public sealed class Compilation
                 "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
                 "export table");
 
+        // Static initializers run from the entry point, and a library has none.
+        // Better to say so than to hand back a library whose statics are zero.
+        if (options.Shared && program.Statics.Count > 0)
+            diagnostics.Error("SL0380", program.Statics[0].Span,
+                $"'{program.Statics[0].Name}' is a static, and a --shared library has no entry " +
+                "point to initialize one from; hold the value behind an exported function " +
+                "instead, or build this module into an executable");
+
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- emit --------------------------------------------------------

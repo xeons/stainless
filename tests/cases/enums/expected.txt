@@ -1,0 +1,9 @@
+green=1
+blue=1
+red=0 green=1 blue=2
+low=1 warning=10 severe=11 fatal=200
+size=1
+atLeastWarning=1
+belowFatal=1
+roundTrip=1
+done

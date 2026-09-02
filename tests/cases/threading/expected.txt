@@ -1,0 +1,12 @@
+workers>0=1
+guarded=32000
+counted=32000
+tryWhenFree=1
+flagStart=0
+flagWon=0
+flagNow=1
+casOk=1
+casNo=0
+casValue=20
+shared=42
+done

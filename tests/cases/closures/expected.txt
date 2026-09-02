@@ -1,0 +1,12 @@
+scale=21 shift=13 back=7
+unchanged=21
+adder=15
+chained=6
+plain=42
+nested=30
+before
+held
+leaving
+~Tag(held)
+after
+done
