@@ -524,14 +524,14 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 return;
             }
 
-            foreach (var name in declaration.Implements)
+            foreach (var implemented in declaration.Implements)
             {
-                var resolved = ResolveNamedType(new NamedTypeSyntax(name.Span, name), module);
+                var resolved = ResolveType(implemented, module);
                 if (resolved.IsError()) continue;
 
                 if (resolved is not InterfaceTypeSymbol interfaceType)
                 {
-                    diagnostics.Error("SL0303", name.Span,
+                    diagnostics.Error("SL0303", implemented.Span,
                         $"'{resolved.Name}' is not an interface, so '{classType.Name}' cannot " +
                         "implement it; Stainless has no class inheritance");
                     continue;
@@ -539,13 +539,13 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
                 if (classType.Interfaces.Contains(interfaceType))
                 {
-                    diagnostics.Warning("SL0304", name.Span,
+                    diagnostics.Warning("SL0304", implemented.Span,
                         $"'{classType.Name}' already lists '{interfaceType.Name}'");
                     continue;
                 }
 
                 classType.Interfaces.Add(interfaceType);
-                VerifyImplements(classType, interfaceType, name.Span);
+                VerifyImplements(classType, interfaceType, implemented.Span);
             }
         }
 
@@ -720,6 +720,9 @@ public sealed class Binder(DiagnosticBag diagnostics)
         _substitution = substitution;
         _currentModule = template.Module;
 
+        VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
+            template.Module, $"'{template.Name}'", span);
+
         DeclareTypeMembers(template.Module, declaration, type);
         ResolveImplements(type, declaration, template.Module);
         ComputeLayout(type, []);
@@ -767,6 +770,10 @@ public sealed class Binder(DiagnosticBag diagnostics)
         _currentModule = template.Module;
 
         var declaration = template.Declaration;
+
+        VerifyConstraints(declaration.Constraints, template.Parameters, substitution,
+            template.Module, $"'{template.Name}'", span);
+
         var symbol = new FunctionSymbol
         {
             Name = template.Name,
@@ -787,6 +794,73 @@ public sealed class Binder(DiagnosticBag diagnostics)
         _currentModule = previousModule;
         return symbol;
     }
+
+    /// <summary>
+    /// Checks each <c>where</c> clause against the type arguments actually
+    /// supplied.
+    ///
+    /// Because Stainless monomorphizes, a template's body is checked per
+    /// instantiation rather than once against its constraints. A constraint is
+    /// therefore a promise verified here, at the use site, where it can name the
+    /// offending type -- rather than a Rust-style contract the body is checked
+    /// against. See docs/language-spec.md for what that means in practice.
+    /// </summary>
+    private void VerifyConstraints(
+        IReadOnlyList<WhereClauseSyntax> clauses,
+        IReadOnlyList<string> parameters,
+        Dictionary<string, TypeSymbol> substitution,
+        ModuleSymbol module,
+        string owner,
+        SourceSpan span)
+    {
+        foreach (var clause in clauses)
+        {
+            if (!substitution.TryGetValue(clause.TypeParameter, out var argument))
+            {
+                diagnostics.Error("SL0330", clause.Span,
+                    $"'{clause.TypeParameter}' is not a type parameter of {owner}; " +
+                    $"it declares {string.Join(", ", parameters.Select(p => "'" + p + "'"))}");
+                continue;
+            }
+
+            foreach (var constraintSyntax in clause.Constraints)
+            {
+                // Resolved under the substitution, so `where T : Comparer<U>` works.
+                var constraint = ResolveType(constraintSyntax, module);
+                if (constraint.IsError()) continue;
+
+                if (constraint is not InterfaceTypeSymbol required)
+                {
+                    diagnostics.Error("SL0329", constraintSyntax.Span,
+                        $"'{constraint.Name}' is not an interface, so it cannot constrain " +
+                        $"'{clause.TypeParameter}'; Stainless constrains type parameters by " +
+                        "interface only");
+                    continue;
+                }
+
+                if (Satisfies(argument, required)) continue;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{clause.TypeParameter}' in {owner} " +
+                    $"because it does not implement '{required.Name}'" +
+                    (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
+                        ? $"; it implements " +
+                          string.Join(", ", implementer.Interfaces.Select(i => "'" + i.Name + "'"))
+                        : ""));
+            }
+        }
+    }
+
+    /// <summary>
+    /// True when <paramref name="argument"/> meets an interface constraint: a
+    /// class that implements it, or the interface itself.
+    /// </summary>
+    private static bool Satisfies(TypeSymbol argument, InterfaceTypeSymbol required) => argument switch
+    {
+        ClassTypeSymbol implementer => implementer.Interfaces.Contains(required),
+        InterfaceTypeSymbol self => self.Equals(required),
+        _ => false,
+    };
 
     /// <summary>
     /// Matches a declared parameter type against an argument's actual type to

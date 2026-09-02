@@ -155,6 +155,24 @@ Generics **monomorphize**: `Box<int>` and `Box<String>` are two separate types
 with no boxing and no indirection, so `Box<int>` stores a bare `int`. Type
 arguments on a call are inferred from the values passed.
 
+Type parameters can be constrained by interface, including F-bounded ones:
+
+```csharp
+public interface Comparable<T> { int CompareTo(T other); }
+
+public class Money : Comparable<Money> { ... }
+
+T Largest<T>(T[] values) where T : Comparable<T> { ... }
+public class Ranked<T> where T : Comparable<T>, Describable { ... }
+```
+
+A violated constraint is caught where the generic is instantiated:
+
+```
+error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
+implement 'Describable'; it implements 'Comparable<Half>'
+```
+
 ### Interfaces
 
 ```csharp
@@ -204,7 +222,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 35 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 39 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -302,7 +320,7 @@ Everything below is covered by [the test suite](tests/cases).
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
 - `T[]`: counted arrays, always bounds checked, elements released with the array
 - Generics: generic classes, interfaces and functions, monomorphized, with
-  inference at call sites
+  inference at call sites and interface constraints (`where T : Comparable<T>`)
 - `StringBuilder`: mutable text with amortised O(1) appends
 - `interface`: multiple implementation, dynamic dispatch, checked at compile time
 - `Standard.Text` (imported everywhere) and `Standard.Console`
@@ -314,9 +332,13 @@ Everything below is covered by [the test suite](tests/cases).
 
 Being straight about the edges, roughly in the order they are worth adding:
 
-- **No generic constraints.** There is no `where T : Shape`, so an error
-  inside a template surfaces at the instantiation rather than the declaration,
-  and an unused template is never checked at all.
+- **Constraints are checked at the instantiation, not the declaration.**
+  `where T : Shape` is verified where the generic is used, but the body is
+  still checked per instantiation, so an unused template is never checked and
+  a mistake inside one is reported against its use. Definition-site checking
+  would need constraints on operators too, which is a larger step.
+- **Only interfaces constrain.** No `where T : SomeClass`, no `class`/`struct`
+  kind constraints, no `new()`.
 - **Type arguments cannot be written at a call.** `Pick<int>(...)` is rejected,
   because `<` in expression position is ambiguous with less-than; inference
   reads argument types only.

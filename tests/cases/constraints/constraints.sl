@@ -1,0 +1,94 @@
+module Constraints;
+
+import Standard.Console;
+
+public interface Comparable<T> {
+    int CompareTo(T other);
+}
+
+public interface Describable {
+    String Describe();
+}
+
+public class Money : Comparable<Money>, Describable {
+    int cents;
+
+    public Money(int amount) { cents = amount; }
+    public int Cents() { return cents; }
+
+    public int CompareTo(Money other) {
+        if (cents < other.Cents()) { return -1; }
+        if (cents > other.Cents()) { return 1; }
+        return 0;
+    }
+
+    public String Describe() { return Text.FromInteger(cents) + "c"; }
+}
+
+public class Tag : Comparable<Tag>, Describable {
+    String name;
+
+    public Tag(String value) { name = value; }
+    public String Name() { return name; }
+
+    public int CompareTo(Tag other) {
+        if (name == other.Name()) { return 0; }
+        return 1;
+    }
+
+    public String Describe() { return name; }
+}
+
+// F-bounded: T must be comparable to itself.
+T Largest<T>(T[] values) where T : Comparable<T> {
+    var best = values[0];
+    for (nuint i = 1; i < values.Length; i = i + 1) {
+        if (values[i].CompareTo(best) > 0) { best = values[i]; }
+    }
+    return best;
+}
+
+// Two constraints on one parameter, on a generic class.
+public class Ranked<T> where T : Comparable<T>, Describable {
+    T[] items;
+    nuint count;
+
+    public Ranked(nuint capacity) {
+        items = new T[capacity];
+        count = 0;
+    }
+
+    public void Add(T item) {
+        items[count] = item;
+        count = count + 1;
+    }
+
+    public String BestDescription() {
+        var best = items[0];
+        for (nuint i = 1; i < count; i = i + 1) {
+            if (items[i].CompareTo(best) > 0) { best = items[i]; }
+        }
+        return best.Describe();
+    }
+}
+
+int Main() {
+    var prices = new Money[3];
+    prices[0] = new Money(250);
+    prices[1] = new Money(999);
+    prices[2] = new Money(125);
+    Console.WriteLine("largest=" + Largest(prices).Describe());
+
+    var ranked = new Ranked<Money>(3);
+    ranked.Add(new Money(10));
+    ranked.Add(new Money(70));
+    ranked.Add(new Money(40));
+    Console.WriteLine("best=" + ranked.BestDescription());
+
+    // The same template, a different type argument.
+    var tags = new Ranked<Tag>(2);
+    tags.Add(new Tag("alpha"));
+    tags.Add(new Tag("beta"));
+    Console.WriteLine("tag=" + tags.BestDescription());
+    return 0;
+}

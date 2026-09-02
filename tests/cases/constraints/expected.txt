@@ -1,0 +1,3 @@
+largest=999c
+best=70c
+tag=beta

@@ -352,24 +352,76 @@ instantiates it, so a mistake inside a generic that nobody uses goes unreported,
 and errors are reported against the instantiation. Each distinct instantiation
 is separate code.
 
-### 4.2 What is and is not supported
+### 4.2 Constraints
 
-Supported: generic classes, generic interfaces, generic functions with
-inference, generic types nested in one another (`List<Box<int>>`), and
-self-referential templates such as `class Node<T> { Node<T>? next; }`.
+A `where` clause says which interfaces a type argument must implement. It goes
+after the parameter list and after any base list, as in C#:
+
+```csharp
+public interface Comparable<T> {
+    int CompareTo(T other);
+}
+
+T Largest<T>(T[] values) where T : Comparable<T> {
+    var best = values[0];
+    for (nuint i = 1; i < values.Length; i = i + 1) {
+        if (values[i].CompareTo(best) > 0) { best = values[i]; }
+    }
+    return best;
+}
+```
+
+`where T : Comparable<T>` is F-bounded — T must be comparable *to itself* —
+which is how comparison avoids needing a downcast. A parameter may carry several
+constraints, and a declaration several clauses:
+
+```csharp
+public class Ranked<T> where T : Comparable<T>, Describable { ... }
+
+public class Table<K, V> where K : Comparable<K> where V : Describable { ... }
+```
+
+Only interfaces constrain. There is no `where T : SomeClass`, no `class` or
+`struct` kind constraint, and no `new()` constraint.
+
+### 4.3 What a constraint does, and does not, do
+
+A constraint is **verified where the generic is instantiated**, and the error
+names the type, the parameter and the missing interface:
+
+```
+error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
+implement 'Describable'; it implements 'Comparable<Half>'
+```
+
+It does **not** cause the template body to be checked once against the
+constraint, the way Rust and Swift do. Because Stainless monomorphizes, bodies
+are still checked per instantiation, so a template nobody uses is never checked
+at all, and a mistake inside one is reported against the instantiation rather
+than the declaration.
+
+The reason is that definition-site checking is all or nothing. It would require
+that an unconstrained `T` support *nothing* — no `+`, no `<`, no indexing — and
+so it would need constraints on operators as well as on methods, which is a
+larger design step than adding `where`. What `where` buys today is a precise
+error at the use site and a signature that states its requirements.
+
+### 4.4 What is and is not supported
+
+Supported: generic classes, generic interfaces (including implementing them,
+as in `class Money : Comparable<Money>`), generic functions with inference,
+interface constraints, generic types nested in one another (`List<Box<int>>`),
+and self-referential templates such as `class Node<T> { Node<T>? next; }`.
 
 Not yet:
 
-- **No constraints.** There is no `where T : Shape`, so a template may only use
-  operations that happen to work for whatever it is instantiated with; if they
-  do not, the error appears at the instantiation.
 - **Type arguments are inferred, never written, at a call.** `Pick<int>(...)`
   is not accepted, because `<` in expression position is ambiguous with
   less-than. Inference reads only the argument types, so a type parameter used
   solely in the return type cannot be determined.
 - **No generic methods**, only generic types and generic free functions.
 
-### 4.3 A worked example
+### 4.5 A worked example
 
 ```csharp
 public class List<T> {

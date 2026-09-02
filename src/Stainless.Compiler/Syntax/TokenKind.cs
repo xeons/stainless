@@ -14,7 +14,7 @@ public enum TokenKind
     // Statement keywords
     IfKeyword, ElseKeyword, WhileKeyword, ForKeyword,
     ReturnKeyword, BreakKeyword, ContinueKeyword,
-    VarKeyword, ConstKeyword,
+    VarKeyword, ConstKeyword, WhereKeyword,
 
     // Expression keywords
     NewKeyword, DeleteKeyword, NullKeyword, TrueKeyword, FalseKeyword,
@@ -68,6 +68,7 @@ public static class TokenKindExtensions
         TokenKind.ContinueKeyword => "continue",
         TokenKind.VarKeyword => "var",
         TokenKind.ConstKeyword => "const",
+        TokenKind.WhereKeyword => "where",
         TokenKind.NewKeyword => "new",
         TokenKind.DeleteKeyword => "delete",
         TokenKind.NullKeyword => "null",

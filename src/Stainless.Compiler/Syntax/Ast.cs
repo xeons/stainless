@@ -78,6 +78,7 @@ public sealed record FunctionDeclSyntax(
     TypeSyntax ReturnType,
     string Name,
     IReadOnlyList<string> TypeParameters,
+    IReadOnlyList<WhereClauseSyntax> Constraints,
     IReadOnlyList<ParameterSyntax> Parameters,
     bool IsVariadic,
     BlockSyntax? Body) : Declaration(Span, Modifiers);
@@ -101,6 +102,15 @@ public sealed record DestructorDeclSyntax(
     string TypeName,
     BlockSyntax Body) : Declaration(Span, Modifiers.None);
 
+/// <summary>
+/// <c>where T : Shape, Named</c> — the interfaces a type argument must
+/// implement. Verified when the generic is instantiated.
+/// </summary>
+public sealed record WhereClauseSyntax(
+    SourceSpan Span,
+    string TypeParameter,
+    IReadOnlyList<TypeSyntax> Constraints) : SyntaxNode(Span);
+
 public enum TypeDeclKind { Struct, Class, Interface }
 
 public sealed record TypeDeclSyntax(
@@ -109,7 +119,8 @@ public sealed record TypeDeclSyntax(
     TypeDeclKind Kind,
     string Name,
     IReadOnlyList<string> TypeParameters,
-    IReadOnlyList<QualifiedName> Implements,
+    IReadOnlyList<WhereClauseSyntax> Constraints,
+    IReadOnlyList<TypeSyntax> Implements,
     IReadOnlyList<Declaration> Members) : Declaration(Span, Modifiers);
 
 /// <summary>A module-level <c>const</c>.</summary>

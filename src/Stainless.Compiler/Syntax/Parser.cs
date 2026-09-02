@@ -239,14 +239,16 @@ public sealed class Parser
         string name = ExpectIdentifier();
         var typeParameters = ParseTypeParameterList();
 
-        // `class Circle : Shape, Printable` -- a list of interfaces, as in C#.
-        var implements = new List<QualifiedName>();
+        // `class Circle : Shape, Comparable<Circle>` -- a list of interfaces,
+        // which may themselves be generic, so these are full types not bare names.
+        var implements = new List<TypeSyntax>();
         if (Match(TokenKind.Colon))
         {
-            do { implements.Add(ParseQualifiedName()); }
+            do { implements.Add(ParseType()); }
             while (Match(TokenKind.Comma));
         }
 
+        var constraints = ParseWhereClauses();
         Expect(TokenKind.OpenBrace);
 
         var members = new List<Declaration>();
@@ -258,8 +260,13 @@ public sealed class Parser
         }
         Expect(TokenKind.CloseBrace);
 
+        if (constraints.Count > 0 && typeParameters.Count == 0)
+            _diagnostics.Error("SL0331", SpanFrom(start),
+                $"'{name}' is not generic, so it cannot have a 'where' clause");
+
         return new TypeDeclSyntax(
-            SpanFrom(start), modifiers, kind, name, typeParameters, implements, members);
+            SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
+            implements, members);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)
@@ -304,9 +311,15 @@ public sealed class Parser
         if (At(TokenKind.OpenParen))
         {
             var parameters = ParseParameterList(out bool isVariadic);
+            var constraints = ParseWhereClauses();
+
             BlockSyntax? body = null;
             if (At(TokenKind.OpenBrace)) body = ParseBlock();
             else Expect(TokenKind.Semicolon);
+
+            if (constraints.Count > 0 && typeParameters.Count == 0)
+                _diagnostics.Error("SL0331", SpanFrom(start),
+                    $"'{name}' is not generic, so it cannot have a 'where' clause");
 
             if (linkage == LinkageKind.ExternC && body is not null)
                 _diagnostics.Error("SL0105", SpanFrom(start),
@@ -314,7 +327,7 @@ public sealed class Parser
 
             return new FunctionDeclSyntax(
                 SpanFrom(start), modifiers, linkage, returnType, name, typeParameters,
-                parameters, isVariadic, body);
+                constraints, parameters, isVariadic, body);
         }
 
         if (typeParameters.Count > 0)
@@ -428,6 +441,32 @@ public sealed class Parser
 
         Expect(TokenKind.Greater);
         return arguments;
+    }
+
+    /// <summary>
+    /// Parses any number of <c>where T : Shape, Named</c> clauses. They follow
+    /// the base list and precede the body, as in C#.
+    /// </summary>
+    private List<WhereClauseSyntax> ParseWhereClauses()
+    {
+        var clauses = new List<WhereClauseSyntax>();
+
+        while (At(TokenKind.WhereKeyword))
+        {
+            int start = _pos;
+            Advance();
+
+            string parameter = ExpectIdentifier();
+            Expect(TokenKind.Colon);
+
+            var constraints = new List<TypeSyntax>();
+            do { constraints.Add(ParseType()); }
+            while (Match(TokenKind.Comma));
+
+            clauses.Add(new WhereClauseSyntax(SpanFrom(start), parameter, constraints));
+        }
+
+        return clauses;
     }
 
     /// <summary>Parses <c>&lt;T, U&gt;</c> in a declaration.</summary>
