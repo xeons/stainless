@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Stainless.Compiler/Stainless.Compiler.csproj" />
+  <Project Path="src/Stainless.Cli/Stainless.Cli.csproj" />
+  <Project Path="tests/Stainless.Tests/Stainless.Tests.csproj" />
+</Solution>

@@ -1,0 +1,231 @@
+using System.Diagnostics;
+using Stainless.Driver;
+
+namespace Stainless.Tests;
+
+/// <summary>
+/// The Stainless end-to-end test runner.
+///
+/// Each test is a directory under tests/cases containing the .sl (and optionally
+/// .c) files that make up one program, plus exactly one expectation file:
+///
+///   expected.txt   the program must compile, run, and print this
+///   errors.txt     the program must fail to compile with these diagnostic codes
+///
+/// Testing through the real driver rather than through unit seams means every
+/// pass -- lexer, binder, emitter, LLVM and the linker -- is covered by every case.
+/// </summary>
+internal static class Program
+{
+    private static int Main(string[] args)
+    {
+        string root = FindCasesDirectory();
+        if (root.Length == 0)
+        {
+            Console.Error.WriteLine("error: could not locate tests/cases");
+            return 2;
+        }
+
+        string? filter = args.FirstOrDefault(a => !a.StartsWith('-'));
+        bool verbose = args.Contains("-v") || args.Contains("--verbose");
+
+        var cases = Directory.EnumerateDirectories(root)
+            .Where(d => filter is null ||
+                        Path.GetFileName(d).Contains(filter, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(d => d, StringComparer.Ordinal)
+            .ToList();
+
+        if (cases.Count == 0)
+        {
+            Console.Error.WriteLine($"error: no test cases found in {root}");
+            return 2;
+        }
+
+        string workDirectory = Path.Combine(Path.GetTempPath(), "stainless-tests");
+        Directory.CreateDirectory(workDirectory);
+
+        int passed = 0;
+        var failures = new List<(string Name, string Detail)>();
+        var stopwatch = Stopwatch.StartNew();
+
+        foreach (string directory in cases)
+        {
+            string name = Path.GetFileName(directory);
+            var (ok, detail) = RunCase(directory, workDirectory);
+
+            if (ok)
+            {
+                passed++;
+                Console.WriteLine($"  \u001b[32mpass\u001b[0m  {name}");
+                if (verbose && detail.Length > 0) Console.WriteLine(Indent(detail));
+            }
+            else
+            {
+                failures.Add((name, detail));
+                Console.WriteLine($"  \u001b[31mFAIL\u001b[0m  {name}");
+            }
+        }
+
+        stopwatch.Stop();
+        Console.WriteLine();
+
+        foreach (var (name, detail) in failures)
+        {
+            Console.WriteLine($"\u001b[31m{name}\u001b[0m");
+            Console.WriteLine(Indent(detail));
+            Console.WriteLine();
+        }
+
+        string summary = failures.Count == 0
+            ? $"\u001b[32mall {passed} tests passed\u001b[0m in {stopwatch.ElapsedMilliseconds} ms"
+            : $"\u001b[31m{failures.Count} failed\u001b[0m, {passed} passed in {stopwatch.ElapsedMilliseconds} ms";
+        Console.WriteLine(summary);
+
+        return failures.Count == 0 ? 0 : 1;
+    }
+
+    private static (bool Ok, string Detail) RunCase(string directory, string workDirectory)
+    {
+        var sources = Directory.EnumerateFiles(directory, "*.sl")
+            .OrderBy(p => p, StringComparer.Ordinal).ToList();
+        var natives = Directory.EnumerateFiles(directory, "*.c")
+            .OrderBy(p => p, StringComparer.Ordinal).ToList();
+
+        if (sources.Count == 0) return (false, "the case directory contains no .sl files");
+
+        string name = Path.GetFileName(directory);
+        string expectedOutputPath = Path.Combine(directory, "expected.txt");
+        string expectedErrorsPath = Path.Combine(directory, "errors.txt");
+
+        bool expectsFailure = File.Exists(expectedErrorsPath);
+        if (!expectsFailure && !File.Exists(expectedOutputPath))
+            return (false, "the case has neither expected.txt nor errors.txt");
+
+        string caseWork = Path.Combine(workDirectory, name);
+        Directory.CreateDirectory(caseWork);
+
+        var options = new CompilationOptions
+        {
+            SourcePaths = sources,
+            NativeInputs = natives,
+            OutputPath = Path.Combine(caseWork, name + ".exe"),
+            IntermediateDirectory = Path.Combine(caseWork, "obj"),
+            OptimizationLevel = 1,
+        };
+
+        CompilationResult result;
+        try
+        {
+            result = new Compilation().Compile(options);
+        }
+        catch (Exception e)
+        {
+            return (false, $"the compiler threw {e.GetType().Name}: {e.Message}\n{e.StackTrace}");
+        }
+
+        // --- compile-failure cases ---------------------------------------
+        if (expectsFailure)
+        {
+            var wanted = File.ReadAllLines(expectedErrorsPath)
+                .Select(l => l.Trim())
+                .Where(l => l.Length > 0 && !l.StartsWith('#'))
+                .ToList();
+
+            if (result.Success)
+                return (false, $"expected compilation to fail with {string.Join(", ", wanted)}, " +
+                               "but it succeeded");
+
+            var actual = result.Diagnostics
+                .Where(d => d.Severity == Source.Severity.Error)
+                .Select(d => d.Code)
+                .ToList();
+
+            var missing = wanted.Where(w => !actual.Contains(w)).ToList();
+            if (missing.Count > 0)
+                return (false,
+                    $"expected error(s) {string.Join(", ", missing)}\n" +
+                    $"but got        {(actual.Count == 0 ? "(none)" : string.Join(", ", actual))}\n\n" +
+                    string.Join("\n", result.Diagnostics.Select(d => d.Render(color: false))));
+
+            return (true, string.Join(", ", actual));
+        }
+
+        // --- run cases ---------------------------------------------------
+        if (!result.Success)
+        {
+            string detail = result.DriverError
+                ?? string.Join("\n", result.Diagnostics.Select(d => d.Render(color: false)));
+            return (false, "compilation failed:\n" + detail);
+        }
+
+        string expected = Normalize(File.ReadAllText(expectedOutputPath));
+        var (exitCode, output) = Execute(result.OutputPath!);
+        string actualOutput = Normalize(output);
+
+        if (actualOutput != expected)
+            return (false, Diff(expected, actualOutput));
+
+        if (exitCode != 0)
+            return (false, $"the program exited with code {exitCode}");
+
+        return (true, $"{actualOutput.Split('\n').Length} line(s) matched");
+    }
+
+    private static (int ExitCode, string Output) Execute(string executablePath)
+    {
+        var startInfo = new ProcessStartInfo(executablePath)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+
+        using var process = Process.Start(startInfo)!;
+        string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+
+        if (!process.WaitForExit(20_000))
+        {
+            process.Kill(entireProcessTree: true);
+            return (-1, output + "\n[the program did not finish within 20 seconds]");
+        }
+
+        return (process.ExitCode, output);
+    }
+
+    private static string Normalize(string text) =>
+        text.Replace("\r\n", "\n").TrimEnd('\n');
+
+    private static string Diff(string expected, string actual)
+    {
+        string[] expectedLines = expected.Split('\n');
+        string[] actualLines = actual.Split('\n');
+        var report = new List<string> { "output did not match:" };
+
+        for (int i = 0; i < Math.Max(expectedLines.Length, actualLines.Length); i++)
+        {
+            string e = i < expectedLines.Length ? expectedLines[i] : "<missing>";
+            string a = i < actualLines.Length ? actualLines[i] : "<missing>";
+            if (e == a) { report.Add($"    {e}"); continue; }
+            report.Add($"  - {e}");
+            report.Add($"  + {a}");
+        }
+
+        return string.Join("\n", report);
+    }
+
+    private static string Indent(string text) =>
+        string.Join("\n", text.Split('\n').Select(l => "        " + l));
+
+    /// <summary>Walks up from the binary to find the repository's tests/cases directory.</summary>
+    private static string FindCasesDirectory()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            string candidate = Path.Combine(directory.FullName, "tests", "cases");
+            if (Directory.Exists(candidate)) return candidate;
+            directory = directory.Parent;
+        }
+        return "";
+    }
+}

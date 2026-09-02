@@ -1,0 +1,11 @@
+# .NET build output
+bin/
+obj/
+
+# Stainless build output
+*.exe
+*.ll
+*.o
+*.obj
+*.pdb
+*.ilk

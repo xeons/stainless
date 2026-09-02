@@ -1,0 +1,5 @@
+start
+value=42
+leaving
+~Counter(42)
+done

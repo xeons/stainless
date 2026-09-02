@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Stainless</RootNamespace>
+  </PropertyGroup>
+
+  <!-- The ARC runtime ships inside the compiler so the CLI can emit and build it
+       from wherever it is installed, with no separate file to keep in sync. -->
+  <ItemGroup>
+    <EmbeddedResource Include="../../runtime/stainless_rt.c" LogicalName="Stainless.Runtime.stainless_rt.c" />
+  </ItemGroup>
+</Project>

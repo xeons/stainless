@@ -1,0 +1,4 @@
+dot=11
+len2=25
+total=4
+scaled=6

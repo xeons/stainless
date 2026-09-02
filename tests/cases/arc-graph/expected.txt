@@ -1,0 +1,13 @@
+build
+head=1
+scope end
+~Node(1)
+~Node(2)
+released
+iter 100
+~Node(100)
+iter 101
+~Node(101)
+iter 102
+~Node(102)
+loop done
