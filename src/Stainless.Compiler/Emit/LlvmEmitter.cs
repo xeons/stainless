@@ -24,7 +24,11 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 /// is then readable, diffable and testable, and the compiler has no native
 /// dependency of its own.
 /// </summary>
-public sealed class LlvmEmitter
+/// <param name="forSharedLibrary">
+/// When true, <c>export "C"</c> functions are marked <c>dllexport</c> so they
+/// reach a Windows DLL's export table, and no C <c>main</c> is emitted.
+/// </param>
+public sealed class LlvmEmitter(bool forSharedLibrary = false)
 {
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
@@ -70,7 +74,7 @@ public sealed class LlvmEmitter
 
         InterfaceTables(program);
 
-        if (program.EntryPoint is not null)
+        if (program.EntryPoint is not null && !forSharedLibrary)
             EmitEntryPoint(program.EntryPoint);
 
         StringConstants();
@@ -440,8 +444,17 @@ public sealed class LlvmEmitter
         string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
         string linkage = symbol.Linkage == LinkageKind.ExportC || symbol.IsPublic ? "" : "internal ";
 
+        // Windows exports only what a binary marks, so a library's declared API
+        // has to say so here. Elsewhere default visibility already exports it.
+        string storage = forSharedLibrary
+                         && symbol.Linkage == LinkageKind.ExportC
+                         && OperatingSystem.IsWindows()
+            ? "dllexport "
+            : "";
+
         _module.AppendLine(
-            $"define {linkage}{returnType} @{symbol.MangledName}({string.Join(", ", declaredParameters)}) {{");
+            $"define {linkage}{storage}{returnType} @{symbol.MangledName}" +
+            $"({string.Join(", ", declaredParameters)}) {{");
         _body.Clear();
         _blockTerminated = false;
 

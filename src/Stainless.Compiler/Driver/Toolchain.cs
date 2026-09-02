@@ -146,11 +146,17 @@ public sealed class Toolchain
         IReadOnlyList<string> runtimeObjects,
         IReadOnlyList<string> nativeInputs,
         string outputPath,
-        int optimizationLevel)
+        int optimizationLevel,
+        bool shared = false)
     {
         List<string> arguments = [irPath];
         arguments.AddRange(runtimeObjects);
         arguments.AddRange(nativeInputs);
+
+        // A shared library has no entry point; the linker also emits the import
+        // library beside the DLL on Windows.
+        if (shared) arguments.Add("-shared");
+
         arguments.AddRange([
             $"-O{optimizationLevel}",
             "-o", outputPath,
@@ -159,6 +165,10 @@ public sealed class Toolchain
 
         return Run(ClangPath, arguments);
     }
+
+    /// <summary>The conventional shared-library extension for this platform.</summary>
+    public static string SharedLibraryExtension =>
+        OperatingSystem.IsWindows() ? ".dll" : OperatingSystem.IsMacOS() ? ".dylib" : ".so";
 
     public static ToolResult Run(string executable, IReadOnlyList<string> arguments)
     {

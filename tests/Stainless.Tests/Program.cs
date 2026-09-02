@@ -12,6 +12,10 @@ namespace Stainless.Tests;
 ///   expected.txt   the program must compile, run, and print this
 ///   errors.txt     the program must fail to compile with these diagnostic codes
 ///
+/// A case containing shared.txt is built as a shared library with a generated
+/// header named library.h, and its .c files are then compiled against it. That
+/// exercises the export table and the C header rather than just the compiler.
+///
 /// Testing through the real driver rather than through unit seams means every
 /// pass -- lexer, binder, emitter, LLVM and the linker -- is covered by every case.
 /// </summary>
@@ -104,13 +108,19 @@ internal static class Program
         string caseWork = Path.Combine(workDirectory, name);
         Directory.CreateDirectory(caseWork);
 
+        bool shared = File.Exists(Path.Combine(directory, "shared.txt"));
+
         var options = new CompilationOptions
         {
             SourcePaths = sources,
-            NativeInputs = natives,
-            OutputPath = Path.Combine(caseWork, name + ".exe"),
+            // A shared case compiles its C separately, against the built library.
+            NativeInputs = shared ? [] : natives,
+            OutputPath = Path.Combine(
+                caseWork, name + (shared ? Toolchain.SharedLibraryExtension : ".exe")),
             IntermediateDirectory = Path.Combine(caseWork, "obj"),
             OptimizationLevel = 1,
+            Shared = shared,
+            HeaderPath = shared ? Path.Combine(caseWork, "library.h") : null,
         };
 
         CompilationResult result;
@@ -158,8 +168,17 @@ internal static class Program
             return (false, "compilation failed:\n" + detail);
         }
 
+        // A library is exercised through a C consumer, not run directly.
+        string executable = result.OutputPath!;
+        if (shared)
+        {
+            var built = BuildConsumer(caseWork, name, result.OutputPath!, natives);
+            if (built.Error is not null) return (false, built.Error);
+            executable = built.Path!;
+        }
+
         string expected = Normalize(File.ReadAllText(expectedOutputPath));
-        var (exitCode, output) = Execute(result.OutputPath!);
+        var (exitCode, output) = Execute(executable);
         string actualOutput = Normalize(output);
 
         if (actualOutput != expected)
@@ -169,6 +188,34 @@ internal static class Program
             return (false, $"the program exited with code {exitCode}");
 
         return (true, $"{actualOutput.Split('\n').Length} line(s) matched");
+    }
+
+    /// <summary>
+    /// Compiles the case's C files against the library just built, exactly as a
+    /// real consumer would: the generated header on the include path, and the
+    /// import library on the link line.
+    /// </summary>
+    private static (string? Path, string? Error) BuildConsumer(
+        string caseWork, string name, string libraryPath, IReadOnlyList<string> natives)
+    {
+        if (natives.Count == 0)
+            return (null, "a shared case needs a .c consumer to exercise the library");
+
+        var toolchain = Toolchain.Locate(out string error);
+        if (toolchain is null) return (null, error);
+
+        string consumer = Path.Combine(caseWork, name + "-consumer.exe");
+        List<string> arguments = [.. natives, "-I", caseWork];
+
+        // On Windows the linker wants the import library beside the DLL.
+        string importLibrary = Path.ChangeExtension(libraryPath, ".lib");
+        arguments.Add(File.Exists(importLibrary) ? importLibrary : libraryPath);
+        arguments.AddRange(["-O1", "-o", consumer]);
+
+        var result = Toolchain.Run(toolchain.ClangPath, arguments);
+        return result.Success
+            ? (consumer, null)
+            : (null, "the C consumer failed to build:\n" + result.StandardError.TrimEnd());
     }
 
     private static (int ExitCode, string Output) Execute(string executablePath)

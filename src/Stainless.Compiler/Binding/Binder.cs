@@ -28,7 +28,11 @@ public sealed class BoundProgram
 /// before any body is checked, which is exactly the guarantee a header file
 /// exists to fake in C and C++.
 /// </summary>
-public sealed class Binder(DiagnosticBag diagnostics)
+/// <param name="requireEntryPoint">
+/// False when building a library, which has no <c>Main</c> and must not be
+/// warned about one.
+/// </param>
+public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = true)
 {
     private readonly Builtins _builtins = new();
     private readonly Dictionary<string, ModuleSymbol> _modules = new(StringComparer.Ordinal);
@@ -95,7 +99,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 .Order(StringComparer.Ordinal)
                 .ToList(),
             ExternalFunctions = external,
-            EntryPoint = FindEntryPoint(),
+            EntryPoint = requireEntryPoint ? FindEntryPoint() : null,
         };
     }
 

@@ -17,6 +17,12 @@ public sealed record CompilationOptions
     public string? OutputPath { get; init; }
     public string? IntermediateDirectory { get; init; }
     public int OptimizationLevel { get; init; } = 2;
+
+    /// <summary>Build a shared library rather than an executable.</summary>
+    public bool Shared { get; init; }
+
+    /// <summary>Where to write a C header for the exported surface, if anywhere.</summary>
+    public string? HeaderPath { get; init; }
     public bool KeepIntermediates { get; init; }
     public bool EmitIrOnly { get; init; }
 }
@@ -28,6 +34,7 @@ public sealed record CompilationResult
     public string? OutputPath { get; init; }
     public string? IrPath { get; init; }
     public string? Ir { get; init; }
+    public string? HeaderPath { get; init; }
 
     /// <summary>A failure outside the source program: a missing tool, unreadable file, bad IR.</summary>
     public string? DriverError { get; init; }
@@ -141,19 +148,26 @@ public sealed class Compilation
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- bind --------------------------------------------------------
-        var program = new Binder(diagnostics).Bind(units);
+        var program = new Binder(diagnostics, requireEntryPoint: !options.Shared).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
-        if (program.EntryPoint is null && !options.EmitIrOnly)
+        if (program.EntryPoint is null && !options.EmitIrOnly && !options.Shared)
             diagnostics.Error("SL0290", units[0].Span,
-                "no entry point was found; declare 'int Main()' in one of the compiled modules");
+                "no entry point was found; declare 'int Main()' in one of the compiled modules, " +
+                "or pass --shared to build a library instead");
+
+        if (options.Shared && !program.Modules.SelectMany(m => m.Functions)
+                .Any(f => f.Linkage == LinkageKind.ExportC))
+            diagnostics.Warning("SL0291", units[0].Span,
+                "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
+                "export table");
 
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- emit --------------------------------------------------------
-        string ir = new LlvmEmitter().Emit(program);
+        string ir = new LlvmEmitter(forSharedLibrary: options.Shared).Emit(program);
 
-        string output = options.OutputPath ?? DefaultOutputPath(options.SourcePaths[0]);
+        string output = options.OutputPath ?? DefaultOutputPath(options.SourcePaths[0], options.Shared);
         string intermediate = options.IntermediateDirectory
             ?? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(output)) ?? ".", "obj");
 
@@ -186,7 +200,8 @@ public sealed class Compilation
         }
 
         var link = toolchain.Link(
-            irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel);
+            irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel,
+            options.Shared);
         if (!link.Success)
             return Failure($"the native toolchain rejected the generated IR:\n{link.StandardError.TrimEnd()}\n" +
                            $"The IR is at {irPath}; this is a compiler bug, not a bug in your program.");
@@ -198,6 +213,16 @@ public sealed class Compilation
             irPath = "";
         }
 
+        // The header restates what the ABI already guarantees, so it is written
+        // from the same symbols the emitter used.
+        string? headerPath = null;
+        if (options.HeaderPath is not null)
+        {
+            headerPath = Path.GetFullPath(options.HeaderPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(headerPath) ?? ".");
+            File.WriteAllText(headerPath, CHeaderWriter.Write(program, headerPath));
+        }
+
         return new CompilationResult
         {
             Success = true,
@@ -205,6 +230,7 @@ public sealed class Compilation
             OutputPath = output,
             IrPath = irPath.Length == 0 ? null : irPath,
             Ir = ir,
+            HeaderPath = headerPath,
         };
     }
 
@@ -213,11 +239,14 @@ public sealed class Compilation
         try { File.Delete(path); } catch (IOException) { /* leaving a stale file is harmless */ }
     }
 
-    private static string DefaultOutputPath(string firstSource)
+    private static string DefaultOutputPath(string firstSource, bool shared)
     {
         string name = Path.GetFileNameWithoutExtension(firstSource);
         string directory = Path.GetDirectoryName(Path.GetFullPath(firstSource)) ?? ".";
-        return Path.Combine(directory, name + (OperatingSystem.IsWindows() ? ".exe" : ""));
+        string extension = shared
+            ? Toolchain.SharedLibraryExtension
+            : OperatingSystem.IsWindows() ? ".exe" : "";
+        return Path.Combine(directory, name + extension);
     }
 
     private static CompilationResult Failed(DiagnosticBag diagnostics) =>

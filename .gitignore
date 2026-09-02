@@ -9,3 +9,12 @@ obj/
 *.obj
 *.pdb
 *.ilk
+
+# Stainless library output
+*.dll
+*.lib
+*.so
+*.dylib
+
+# Sample build output, including generated headers
+samples/**/build/

@@ -479,6 +479,72 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
+### 6.1 Building a shared library
+
+```
+stainless build src --shared -o build/math.dll --header build/math.h
+```
+
+produces `math.dll`, the import library `math.lib`, and a C header. A
+`--shared` build needs no `Main`.
+
+**The export table is exactly the `export "C"` functions.** Nothing else is
+reachable from outside, and that is the only control there is:
+
+| Declaration | In the library |
+|---|---|
+| `export "C" int Add(int, int)` | exported, unmangled, as `Add` |
+| `public int Helper()` | visible to other Stainless modules, **not** exported |
+| `int Secret()` | module-private |
+
+`public` deliberately does not export. It answers a different question — which
+modules may see this — and a library's surface should be stated once,
+deliberately, rather than falling out of visibility rules.
+
+The generated header restates what the ABI already guarantees:
+
+```c
+typedef struct Library_Math_Point { double X; double Y; } Library_Math_Point;
+
+int32_t            Add(int32_t a, int32_t b);
+Library_Math_Point Scale(Library_Math_Point p, double by);
+```
+
+so a consumer is an ordinary C program:
+
+```c
+#include "math.h"
+int main(void) { return Add(40, 2) == 42 ? 0 : 1; }
+```
+
+```
+clang consumer.c build/math.lib -o consumer.exe
+```
+
+### 6.2 What may cross a library boundary
+
+Plain C values — primitives, pointers and `struct`s — cross freely. That is the
+ABI guarantee, and it holds across a DLL exactly as it does within one binary.
+
+**Managed objects are a different matter.** A `String`, class instance or array
+carries a reference count, and each binary that links Stainless gets its own
+copy of the runtime. An object allocated inside the library and released by the
+caller therefore crosses two copies of `malloc` and `free`. It happens to work
+when both sides are built by the same toolchain against the same C runtime, but
+it is not something to rely on.
+
+The rule is: **hand C types across a library boundary, and keep managed objects
+on one side of it.** A managed reference appears in a generated header as
+`void*` for that reason — it is a handle to pass back in, not something to
+dereference or free.
+
+Lifting that restriction means shipping the Stainless runtime as its own shared
+library, so both sides count against the same allocator. That is not done yet.
+
+Neither is the other direction: a Stainless library consumed by *Stainless*.
+Importing a module from a compiled binary needs module metadata that does not
+exist, since compilation is whole-program today.
+
 ## 7. Statements and expressions
 
 ```csharp

@@ -222,7 +222,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 39 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 40 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -235,7 +235,9 @@ stainless build <paths...>     compile to a native executable
 stainless run   <paths...>     compile, then run it
 stainless emit-ir <paths...>   print the generated LLVM IR
 
-  -o, --out <path>   output executable
+  -o, --out <path>   output file
+  --shared           build a shared library instead of an executable
+  --header <path>    write a C header for the exported surface
   -O<0-3>            optimization level (default -O2)
   --keep             keep the generated .ll
 ```
@@ -247,6 +249,48 @@ to the linker:
 ```
 stainless run samples/interop/interop.sl samples/interop/native.c
 ```
+
+### Building a library
+
+```
+stainless build src --shared -o build/math.dll --header build/math.h
+```
+
+produces the DLL, its import library, and a C header. A `--shared` build needs
+no `Main`, and **the export table is exactly the `export "C"` functions**:
+
+```csharp
+export "C" int Add(int a, int b) { return a + b; }   // exported
+
+public int Helper() { return 1; }                    // other modules only
+int Secret()        { return 2; }                    // module-private
+```
+
+```
+$ llvm-readobj --coff-exports build/math.dll
+Name: Add
+```
+
+`public` deliberately does not export: it answers a different question — which
+modules may see this — and a library's surface should be stated once rather
+than falling out of visibility rules.
+
+Consuming it is ordinary C, because the header restates what the ABI already
+guarantees:
+
+```c
+#include "math.h"
+int main(void) { return Add(40, 2) == 42 ? 0 : 1; }
+```
+
+```
+clang consumer.c build/math.lib -o consumer.exe
+```
+
+One caveat worth knowing: plain C values cross a library boundary freely, but a
+`String`, class or array carries a reference count, and each binary links its
+own copy of the runtime. Pass C types across the boundary and keep managed
+objects on one side of it.
 
 ---
 
@@ -326,6 +370,8 @@ Everything below is covered by [the test suite](tests/cases).
 - `Standard.Text` (imported everywhere) and `Standard.Console`
 - Raw pointers, `sizeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#
+- Shared libraries: `--shared` with a generated C header, and an export table
+  containing exactly the `export "C"` functions
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
@@ -360,7 +406,10 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Non-atomic reference counts.** Single-threaded only.
 - **Win64 only** for struct passing; the SysV classifier is not written.
 - **Whole-program compilation.** Modules make separate compilation possible, but
-  the driver does not do it yet.
+  the driver does not do it yet, so a Stainless library cannot be consumed by
+  Stainless — only by C.
+- **The runtime is linked statically into every binary.** Managed objects
+  therefore should not cross a shared-library boundary; C types are fine.
 - `Main` takes no arguments. Field initializers are rejected — assign in a
   constructor. `delete` is reserved but unused.
 

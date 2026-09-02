@@ -62,16 +62,25 @@ internal static class Program
               because Stainless already speaks the platform C ABI.
 
             OPTIONS
-              -o, --out <path>     output executable (default: after the first source)
+              -o, --out <path>     output file (default: after the first source)
+              --shared             build a shared library instead of an executable
+              --header <path>      write a C header for the exported surface
               -O<0-3>              optimization level (default: -O2)
-              --keep               keep the generated .ll next to the executable
+              --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
               -h, --help           show this message
               -v, --version        show the version
 
+            LIBRARIES
+              A '--shared' build needs no Main. Its export table contains exactly
+              the functions marked 'export "C"'; everything else stays internal,
+              including 'public' declarations, which are visible only to other
+              Stainless modules.
+
             EXAMPLES
               stainless run samples/hello.sl
               stainless build src -o build/app.exe -O3
+              stainless build src --shared -o build/math.dll --header build/math.h
               stainless emit-ir samples/hello.sl
             """);
     }
@@ -90,7 +99,16 @@ internal static class Program
         if (!Report(result)) return 1;
 
         Success($"built {Relative(result.OutputPath!)} in {stopwatch.ElapsedMilliseconds} ms");
+        if (result.HeaderPath is not null)
+            Console.WriteLine($"  header: {Relative(result.HeaderPath)}");
         if (result.IrPath is not null) Console.WriteLine($"  IR: {Relative(result.IrPath)}");
+
+        if (options.Shared)
+        {
+            // Running a library is meaningless; say so rather than failing oddly.
+            if (run) Error("a shared library cannot be run");
+            return run ? 1 : 0;
+        }
 
         if (!run) return 0;
 
@@ -138,6 +156,8 @@ internal static class Program
         string? objectDirectory = null;
         int optimization = 2;
         bool keep = false;
+        bool shared = false;
+        string? header = null;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -157,6 +177,15 @@ internal static class Program
 
                 case "--keep":
                     keep = true;
+                    continue;
+
+                case "--shared":
+                    shared = true;
+                    continue;
+
+                case "--header":
+                    if (++i >= args.Length) { Error("'--header' needs a path"); return false; }
+                    header = args[i];
                     continue;
 
                 case "--":
@@ -206,7 +235,14 @@ internal static class Program
             IntermediateDirectory = objectDirectory,
             OptimizationLevel = optimization,
             KeepIntermediates = keep,
+            Shared = shared,
+            HeaderPath = header,
         };
+
+        if (header is not null && !shared)
+            Console.Error.WriteLine(
+                "note: '--header' describes an exported surface, which only a '--shared' build has");
+
         return true;
     }
 
