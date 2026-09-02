@@ -1,8 +1,16 @@
 # Stainless Language Specification (v0.1 draft)
 
-Stainless is a systems language with C++'s performance model and C#'s syntax.
+> **An extreme rough draft.** This describes an experiment rather than a settled
+> design; anything here may change, and several sections describe behaviour that
+> was arrived at by trying it rather than by deciding it in advance.
 
-**Design pillars**
+Stainless reaches for the performance of C and C++ with the flexibility of a
+higher-level language, by combining ideas that do not usually appear together:
+C#'s syntax and namespaces, C's layout and ABI, Swift's reference counting,
+monomorphized generics as in C++ and Rust, and reflection as static tables in
+the binary as in Swift and Go.
+
+**The four ideas it is built around**
 
 1. **No header files.** Declarations are order-independent within and across
    modules; the compiler resolves the whole program graph before checking any

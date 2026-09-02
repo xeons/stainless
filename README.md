@@ -1,6 +1,19 @@
 # Stainless
 
-A systems programming language with **C++'s performance model and C#'s syntax**.
+> **An extreme rough draft.** Stainless is an experiment, not a product.
+> Nothing here is stable, plenty is missing, and the parts that work were
+> reached by trying things rather than by planning them. Vibe coded with Claude.
+
+A systems language reaching for **the performance of C and C++ with the
+flexibility of something higher level**.
+
+It is a deliberate mongrel. The syntax, namespaces and attributes come from C#;
+the value semantics, layout and ABI from C and C++; reference counting and the
+borrowed-parameter convention from Swift; monomorphized generics from C++ and
+Rust; runtime metadata as plain tables in the binary from Swift and Go. Where
+those ideas disagree, the choice is written down in the docs along with the
+reason, because the interesting part of the experiment is which combinations
+hold together.
 
 ```csharp
 module Hello;
@@ -24,7 +37,7 @@ That is a real native executable. No VM, no JIT, no assembly loader, no GC.
 
 ---
 
-## The four pillars
+## The four ideas it is built around
 
 **1. No header files.** Declarations are order-independent within *and across*
 modules, so there are no include guards, no forward declarations, no ODR
