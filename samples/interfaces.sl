@@ -2,16 +2,16 @@ module Interfaces;
 
 import Standard.Console;
 
-public interface Shape {
+public interface IShape {
     double Area();
     String Describe();
 }
 
-public interface Named {
+public interface INamed {
     String Name();
 }
 
-public class Circle : Shape, Named {
+public class Circle : IShape, INamed {
     double radius;
 
     public Circle(double r) { radius = r; }
@@ -22,7 +22,7 @@ public class Circle : Shape, Named {
     public String Name() { return "Circle"; }
 }
 
-public class Rectangle : Shape {
+public class Rectangle : IShape {
     double width;
     double height;
 
@@ -33,9 +33,9 @@ public class Rectangle : Shape {
 }
 
 // Dispatch happens through the interface, not the concrete class.
-double TotalArea(Shape a, Shape b) { return a.Area() + b.Area(); }
+double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
 
-void Report(Shape s) {
+void Report(IShape s) {
     var line = new StringBuilder();
     line.Append("  ");
     line.Append(s.Describe());
@@ -45,15 +45,15 @@ void Report(Shape s) {
 }
 
 int Main() {
-    Shape circle = new Circle(2.0);
-    Shape box    = new Rectangle(3.0, 4.0);
+    IShape circle = new Circle(2.0);
+    IShape box    = new Rectangle(3.0, 4.0);
 
     Report(circle);
     Report(box);
     Console.WriteLine("total = " + Text.FromDouble(TotalArea(circle, box)));
 
     // A class may implement several interfaces; each gets its own vtable.
-    Named named = new Circle(1.0);
+    INamed named = new Circle(1.0);
     Console.WriteLine("named = " + named.Name());
 
     // StringBuilder makes repeated appending linear instead of quadratic.

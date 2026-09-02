@@ -1,8 +1,8 @@
 module Bad;
 
-public interface Shape { double Area(); }
+public interface IShape { double Area(); }
 
-public class Holder<T> where U : Shape { T item; }
+public class Holder<T> where U : IShape { T item; }
 
 int Main() {
     Holder<int> h;

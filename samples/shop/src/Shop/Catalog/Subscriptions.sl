@@ -1,6 +1,6 @@
 // samples/shop/src/Shop/Catalog/Subscriptions.sl
 //
-// The second half of `Shop.Catalog`. It needs no import to reach Book, Priced
+// The second half of `Shop.Catalog`. It needs no import to reach Book, IPriced
 // or Decorate: they are already in this module.
 //
 // It DOES need its own `import Shop.Pricing`, because imports are written per
@@ -9,7 +9,7 @@ module Shop.Catalog;
 
 import Shop.Pricing;
 
-public class Subscription : Priced {
+public class Subscription : IPriced {
     String name;
     Money monthly;
     int months;

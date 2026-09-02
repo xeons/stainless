@@ -40,6 +40,31 @@ public sealed record CompilationResult
     public string? DriverError { get; init; }
 }
 
+/// <summary>
+/// The parts of the standard library that are written in Stainless and shipped
+/// inside the compiler.
+/// </summary>
+public static class StandardLibrary
+{
+    private const string Prefix = "Stainless.Library.";
+
+    public static IEnumerable<(string Name, string Text)> Sources()
+    {
+        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+        foreach (string resource in assembly.GetManifestResourceNames().Order(StringComparer.Ordinal))
+        {
+            if (!resource.StartsWith(Prefix, StringComparison.Ordinal)) continue;
+
+            using var stream = assembly.GetManifestResourceStream(resource);
+            if (stream is null) continue;
+
+            using var reader = new StreamReader(stream);
+            yield return ("<standard>/" + resource[Prefix.Length..], reader.ReadToEnd());
+        }
+    }
+}
+
 /// <summary>What a set of command-line paths expanded to.</summary>
 public sealed record SourceSet
 {
@@ -144,6 +169,13 @@ public sealed class Compilation
 
         // --- parse -------------------------------------------------------
         var units = new List<CompilationUnitSyntax>();
+
+        // The standard library is ordinary Stainless, compiled with the program
+        // rather than linked against it. Generics and unused types emit nothing,
+        // so a program that ignores it pays nothing for it.
+        foreach (var (name, text) in StandardLibrary.Sources())
+            units.Add(new Parser(new SourceText(name, text), diagnostics).ParseCompilationUnit());
+
         foreach (string path in options.SourcePaths)
         {
             SourceText source;

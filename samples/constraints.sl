@@ -1,17 +1,13 @@
 module Constraints;
 
 import Standard.Console;
+import Standard.Collections;    // IComparable<T> lives here
 
-// A generic interface, so comparing needs no downcast.
-public interface Comparable<T> {
-    int CompareTo(T other);
-}
-
-public interface Describable {
+public interface IDescribable {
     String Describe();
 }
 
-public class Money : Comparable<Money>, Describable {
+public class Money : IComparable<Money>, IDescribable {
     int cents;
 
     public Money(int amount) { cents = amount; }
@@ -26,8 +22,8 @@ public class Money : Comparable<Money>, Describable {
     public String Describe() { return Text.FromInteger(cents) + "c"; }
 }
 
-// `where T : Comparable<T>` is F-bounded: T must be comparable to itself.
-T Largest<T>(T[] values) where T : Comparable<T> {
+// `where T : IComparable<T>` is F-bounded: T must be comparable to itself.
+T Largest<T>(T[] values) where T : IComparable<T> {
     var best = values[0];
     for (nuint i = 1; i < values.Length; i = i + 1) {
         if (values[i].CompareTo(best) > 0) { best = values[i]; }
@@ -36,7 +32,7 @@ T Largest<T>(T[] values) where T : Comparable<T> {
 }
 
 // Two constraints on one parameter.
-public class Ranked<T> where T : Comparable<T>, Describable {
+public class Ranked<T> where T : IComparable<T>, IDescribable {
     T[] items;
     nuint count;
 

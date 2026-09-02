@@ -231,12 +231,12 @@ a count of 1.
 ### 2.5 `interface` — a contract, dispatched dynamically
 
 ```csharp
-public interface Shape {
+public interface IShape {
     double Area();
     String Describe();
 }
 
-public class Circle : Shape {
+public class Circle : IShape {
     double radius;
 
     public Circle(double r) { radius = r; }
@@ -245,7 +245,7 @@ public class Circle : Shape {
     public String Describe() { return "circle"; }
 }
 
-double TotalArea(Shape a, Shape b) { return a.Area() + b.Area(); }
+double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
 ```
 
 An interface declares method signatures and nothing else: no fields, no
@@ -257,9 +257,9 @@ method matching each signature exactly. Conversion from the class to the
 interface is implicit and free.
 
 An interface reference **is an ordinary object pointer** — the vtable is
-reached through the object rather than carried alongside it. So `Shape?`,
-`weak Shape?`, ARC and the calling convention all behave exactly as they do for
-a class, and passing a `Shape` costs the same as passing any reference.
+reached through the object rather than carried alongside it. So `IShape?`,
+`weak IShape?`, ARC and the calling convention all behave exactly as they do for
+a class, and passing a `IShape` costs the same as passing any reference.
 
 A `struct` cannot implement an interface: an interface reference is counted,
 and a struct is a plain C value with nowhere to keep a count.
@@ -287,7 +287,7 @@ unsigned value and fails the same test. Going out of range aborts with the
 index and the length rather than corrupting memory.
 
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
-and `Shape[]` (references, each retained). `T[][]` is an array of arrays.
+and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
 ## 3. Text
 
@@ -465,11 +465,11 @@ A `where` clause says which interfaces a type argument must implement. It goes
 after the parameter list and after any base list, as in C#:
 
 ```csharp
-public interface Comparable<T> {
+public interface IComparable<T> {
     int CompareTo(T other);
 }
 
-T Largest<T>(T[] values) where T : Comparable<T> {
+T Largest<T>(T[] values) where T : IComparable<T> {
     var best = values[0];
     for (nuint i = 1; i < values.Length; i = i + 1) {
         if (values[i].CompareTo(best) > 0) { best = values[i]; }
@@ -478,14 +478,14 @@ T Largest<T>(T[] values) where T : Comparable<T> {
 }
 ```
 
-`where T : Comparable<T>` is F-bounded — T must be comparable *to itself* —
+`where T : IComparable<T>` is F-bounded — T must be comparable *to itself* —
 which is how comparison avoids needing a downcast. A parameter may carry several
 constraints, and a declaration several clauses:
 
 ```csharp
-public class Ranked<T> where T : Comparable<T>, Describable { ... }
+public class Ranked<T> where T : IComparable<T>, IDescribable { ... }
 
-public class Table<K, V> where K : Comparable<K> where V : Describable { ... }
+public class Table<K, V> where K : IComparable<K> where V : IDescribable { ... }
 ```
 
 Only interfaces constrain. There is no `where T : SomeClass`, no `class` or
@@ -498,7 +498,7 @@ names the type, the parameter and the missing interface:
 
 ```
 error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
-implement 'Describable'; it implements 'Comparable<Half>'
+implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
 
 It does **not** cause the template body to be checked once against the
@@ -516,7 +516,7 @@ error at the use site and a signature that states its requirements.
 ### 4.4 What is and is not supported
 
 Supported: generic classes, generic interfaces (including implementing them,
-as in `class Money : Comparable<Money>`), generic functions with inference,
+as in `class Money : IComparable<Money>`), generic functions with inference,
 interface constraints, generic types nested in one another (`List<Box<int>>`),
 and self-referential templates such as `class Node<T> { Node<T>? next; }`.
 
@@ -556,7 +556,83 @@ public class List<T> {
 }
 ```
 
-## 5. Functions and members
+## 5. The standard library
+
+### 5.1 What ships, and how
+
+`Standard.Text` is built into the compiler, because `String` and
+`StringBuilder` need runtime support. Everything else is ordinary Stainless
+compiled alongside your program, which means a generic that nobody instantiates
+and a type that nobody names emit no code at all — importing a module costs
+nothing by itself.
+
+| Module | Contents | Imported |
+|---|---|---|
+| `Standard.Text` | `String`, `StringBuilder`, `Utf16String`, conversions | automatically |
+| `Standard.Console` | `Write`, `WriteLine`, `WriteError` | on request |
+| `Standard.Collections` | interfaces below, and `List<T>` | on request |
+
+### 5.2 Interfaces are named with a leading I
+
+`IComparable<T>`, `IReadOnlyList<T>`, `IWritable` — the C# convention, and the
+one the standard library follows. It is a convention, not a rule the compiler
+enforces.
+
+### 5.3 `Standard.Collections`
+
+```csharp
+public interface IEquatable<T>     { bool EqualTo(T other); }
+public interface IComparable<T>    { int CompareTo(T other); }
+
+public interface IReadOnlyList<T>  { nuint Count(); T At(nuint index); }
+
+public interface IList<T> : IReadOnlyList<T> {
+    void Add(T item);
+    void Set(nuint index, T item);
+    void Clear();
+}
+```
+
+`CompareTo` returns a negative number, zero, or a positive number when the
+value orders before, with, or after the argument.
+
+`List<T>` implements `IList<T>` over a single array that doubles when it fills.
+Alongside the interfaces are `Largest`, `Smallest`, `IndexOf` and `Sort`, each
+constrained to what it actually needs:
+
+```csharp
+import Standard.Collections;
+
+public class Money : IComparable<Money>, IEquatable<Money> {
+    int cents;
+    public int CompareTo(Money other) { ... }
+    public bool EqualTo(Money other)  { ... }
+}
+
+var prices = new List<Money>();
+prices.Add(new Money(250));
+prices.Add(new Money(40));
+
+Sort(prices);                       // needs IComparable<Money>
+Largest(prices);                    // and works on any IReadOnlyList
+```
+
+`Sort` takes an `IList<T>`; `Largest`, `Smallest` and `IndexOf` take an
+`IReadOnlyList<T>`, so they accept a mutable list without being able to change
+it.
+
+### 5.4 Interfaces may extend interfaces
+
+```csharp
+public interface IWritable : IReadable { void Write(String text); }
+```
+
+An `IWritable` answers `IReadable`'s methods and converts to it for free: a
+reference is a plain pointer either way, and a class implementing the derived
+interface carries a dispatch table for both. Implementing `IWritable` therefore
+obliges a class to implement `IReadable` as well, and the compiler checks it.
+
+## 6. Functions and members
 
 ```csharp
 public int Add(int a, int b) { return a + b; }
@@ -567,7 +643,7 @@ void NoReturn() { }
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
 
-## 6. C interoperability
+## 7. C interoperability
 
 ```csharp
 extern "C" int puts(byte* s);
@@ -586,7 +662,7 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
-### 6.1 Building a shared library
+### 7.1 Building a shared library
 
 ```
 stainless build src --shared -o build/math.dll --header build/math.h
@@ -628,7 +704,7 @@ int main(void) { return Add(40, 2) == 42 ? 0 : 1; }
 clang consumer.c build/math.lib -o consumer.exe
 ```
 
-### 6.2 What may cross a library boundary
+### 7.2 What may cross a library boundary
 
 Plain C values — primitives, pointers and `struct`s — cross freely. That is the
 ABI guarantee, and it holds across a DLL exactly as it does within one binary.
@@ -652,7 +728,7 @@ Neither is the other direction: a Stainless library consumed by *Stainless*.
 Importing a module from a compiled binary needs module metadata that does not
 exist, since compilation is whole-program today.
 
-## 7. Statements and expressions
+## 8. Statements and expressions
 
 ```csharp
 int x = 10;             // explicitly typed local

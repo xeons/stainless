@@ -110,27 +110,40 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _module.AppendLine();
     }
 
+    /// <summary>
+    /// Symbols this module has already declared. The standard library declares
+    /// some runtime entry points itself with <c>extern "C"</c>, and LLVM rejects
+    /// a second declaration of the same name.
+    /// </summary>
+    private readonly HashSet<string> _declared = new(StringComparer.Ordinal);
+
+    private void Declare(string name, string signature)
+    {
+        if (!_declared.Add(name)) return;
+        _module.AppendLine(signature);
+    }
+
     private void RuntimeDeclarations()
     {
-        _module.AppendLine("declare ptr @sl_alloc(ptr)");
-        _module.AppendLine("declare void @sl_retain(ptr)");
-        _module.AppendLine("declare void @sl_release(ptr)");
-        _module.AppendLine("declare void @sl_weak_retain(ptr)");
-        _module.AppendLine("declare void @sl_weak_release(ptr)");
-        _module.AppendLine("declare ptr @sl_weak_load(ptr)");
-        _module.AppendLine("@sl_string_type_info = external constant %SlTypeInfo");
-        _module.AppendLine("@sl_utf16_string_type_info = external constant %SlTypeInfo");
-        _module.AppendLine("@sl_string_builder_type_info = external constant %SlTypeInfo");
-        _module.AppendLine("declare ptr @sl_array_alloc(ptr, i64, i64)");
-        _module.AppendLine("declare void @sl_array_bounds_fail(i64, i64)");
-        _module.AppendLine("declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
+        Declare("sl_alloc", "declare ptr @sl_alloc(ptr)");
+        Declare("sl_retain", "declare void @sl_retain(ptr)");
+        Declare("sl_release", "declare void @sl_release(ptr)");
+        Declare("sl_weak_retain", "declare void @sl_weak_retain(ptr)");
+        Declare("sl_weak_release", "declare void @sl_weak_release(ptr)");
+        Declare("sl_weak_load", "declare ptr @sl_weak_load(ptr)");
+        Declare("sl_string_type_info", "@sl_string_type_info = external constant %SlTypeInfo");
+        Declare("sl_utf16_string_type_info", "@sl_utf16_string_type_info = external constant %SlTypeInfo");
+        Declare("sl_string_builder_type_info", "@sl_string_builder_type_info = external constant %SlTypeInfo");
+        Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
+        Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
+        Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
         _module.AppendLine();
     }
 
     private void FactoryDeclarations(BoundProgram program)
     {
         foreach (string factory in program.RuntimeFactories)
-            _module.AppendLine($"declare ptr @{factory}()");
+            Declare(factory, $"declare ptr @{factory}()");
 
         if (program.RuntimeFactories.Count > 0) _module.AppendLine();
     }
@@ -156,7 +169,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             if (function.IsVariadic) parts.Add("...");
 
             string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
-            _module.AppendLine($"declare {returnType} @{function.MangledName}({string.Join(", ", parts)})");
+            Declare(function.MangledName,
+                $"declare {returnType} @{function.MangledName}({string.Join(", ", parts)})");
         }
 
         if (program.ExternalFunctions.Count > 0) _module.AppendLine();
@@ -688,13 +702,17 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     private void TrackTemporary(string reference, TypeSymbol type) =>
         _pendingReleases.Add((reference, type));
 
-    private void FlushTemporaries()
+    private void FlushTemporaries(int from = 0)
     {
-        foreach (var (reference, type) in _pendingReleases)
+        for (int i = from; i < _pendingReleases.Count; i++)
+        {
+            var (reference, type) = _pendingReleases[i];
             Line(type is WeakTypeSymbol
                 ? $"call void @sl_weak_release(ptr {reference})"
                 : $"call void @sl_release(ptr {reference})");
-        _pendingReleases.Clear();
+        }
+
+        _pendingReleases.RemoveRange(from, _pendingReleases.Count - from);
     }
 
     /// <summary>
@@ -1280,7 +1298,15 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             : $"br i1 {left.Ref}, label %{endLabel}, label %{rightLabel}");
 
         Label(rightLabel);
+
+        // Anything the right operand allocates is released here, at the end of
+        // its own block. Deferring it to the merge would emit a release the
+        // defining instruction does not dominate, since the merge is also
+        // reached when the right operand never ran.
+        int mark = _pendingReleases.Count;
         var right = EmitExpression(binary.Right);
+        FlushTemporaries(mark);
+
         string rightBlock = CurrentBlockLabel();
         Terminator($"br label %{endLabel}");
 
@@ -1415,16 +1441,19 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
         }
 
-        _virtualTarget = null;
+        // Held locally, not in a field: an argument may itself be an interface
+        // call, and a field would let the inner call overwrite this one's target.
+        string? virtualTarget = null;
+
         if (call.Receiver is not null)
         {
             var receiver = EmitExpression(call.Receiver);
             arguments.Add($"ptr {receiver.Ref}");
 
-            // Resolve the target before the arguments, so its loads cannot be
-            // interleaved with argument evaluation that might reassign the slot.
+            // Resolved before the arguments so the load reads the receiver as it
+            // was, whatever the arguments go on to do.
             if (function.ContainingType is InterfaceTypeSymbol)
-                _virtualTarget = LoadInterfaceMethod(receiver.Ref, function);
+                virtualTarget = LoadInterfaceMethod(receiver.Ref, function);
         }
 
         AppendArguments(function, call.Arguments, arguments);
@@ -1436,9 +1465,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         // An interface method is reached through the object; everything else is
         // a direct call to a known symbol.
-        string target = function.ContainingType is InterfaceTypeSymbol
-            ? _virtualTarget!
-            : "@" + function.MangledName;
+        string target = virtualTarget ?? "@" + function.MangledName;
 
         string invocation =
             $"call {signature} {target}({string.Join(", ", arguments)})";
@@ -1472,9 +1499,6 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         return new Val(result, returnInfo.LlvmType, function.ReturnType);
     }
-
-    /// <summary>The loaded function pointer for the interface call being emitted.</summary>
-    private string? _virtualTarget;
 
     private static string VariadicSignature(FunctionSymbol function)
     {

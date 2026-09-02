@@ -7,12 +7,12 @@ module Shop.Catalog;
 
 import Shop.Pricing;
 
-public interface Priced {
+public interface IPriced {
     Money Price();
     String Label();
 }
 
-public class Book : Priced {
+public class Book : IPriced {
     String title;
     Money price;
 

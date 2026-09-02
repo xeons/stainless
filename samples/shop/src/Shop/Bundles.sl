@@ -6,18 +6,18 @@ import Shop.Pricing;
 
 // A class in this module implementing an interface declared in another one.
 // Nothing had to be exported or forward declared to make that work.
-public class Bundle : Priced {
+public class Bundle : IPriced {
     String name;
-    Priced[] items;          // an array of interface references
+    IPriced[] items;          // an array of interface references
     nuint count;
 
     public Bundle(String label, nuint capacity) {
         name = label;
-        items = new Priced[capacity];
+        items = new IPriced[capacity];
         count = 0;
     }
 
-    public void Include(Priced item) {
+    public void Include(IPriced item) {
         items[count] = item;
         count = count + 1;
     }

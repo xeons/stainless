@@ -532,7 +532,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// </summary>
     private void ResolveInterfaces()
     {
-        foreach (var (type, entry) in _typeSyntax)
+        foreach (var (type, entry) in _typeSyntax.Where(e => e.Key is InterfaceTypeSymbol))
+            ResolveImplements(type, entry.Declaration, entry.Scope);
+
+        foreach (var (type, entry) in _typeSyntax.Where(e => e.Key is not InterfaceTypeSymbol))
             ResolveImplements(type, entry.Declaration, entry.Scope);
     }
 
@@ -542,13 +545,11 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         {
             if (declaration.Implements.Count == 0) return;
 
-            if (type is not ClassTypeSymbol classType)
+            if (type is StructTypeSymbol)
             {
                 diagnostics.Error("SL0302", declaration.Span,
-                    type is StructTypeSymbol
-                        ? $"struct '{type.Name}' cannot implement an interface; an interface " +
-                          "reference is a counted pointer, and structs are plain C values"
-                        : $"interface '{type.Name}' cannot extend another interface yet");
+                    $"struct '{type.Name}' cannot implement an interface; an interface " +
+                    "reference is a counted pointer, and structs are plain C values");
                 return;
             }
 
@@ -560,20 +561,32 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 if (resolved is not InterfaceTypeSymbol interfaceType)
                 {
                     diagnostics.Error("SL0303", implemented.Span,
-                        $"'{resolved.Name}' is not an interface, so '{classType.Name}' cannot " +
-                        "implement it; Stainless has no class inheritance");
+                        $"'{resolved.Name}' is not an interface, so '{type.Name}' cannot " +
+                        (type is InterfaceTypeSymbol ? "extend" : "implement") +
+                        " it; Stainless has no class inheritance");
                     continue;
                 }
 
-                if (classType.Interfaces.Contains(interfaceType))
+                if (type.Interfaces.Contains(interfaceType))
                 {
                     diagnostics.Warning("SL0304", implemented.Span,
-                        $"'{classType.Name}' already lists '{interfaceType.Name}'");
+                        $"'{type.Name}' already lists '{interfaceType.Name}'");
                     continue;
                 }
 
-                classType.Interfaces.Add(interfaceType);
-                VerifyImplements(classType, interfaceType, implemented.Span);
+                if (interfaceType == type || interfaceType.AllInterfaces().Contains(type))
+                {
+                    diagnostics.Error("SL0333", implemented.Span,
+                        $"'{type.Name}' and '{interfaceType.Name}' extend each other");
+                    continue;
+                }
+
+                type.Interfaces.Add(interfaceType);
+
+                // Only a class has to supply implementations. An interface
+                // extending another merely widens its own contract.
+                if (type is ClassTypeSymbol classType)
+                    VerifyImplements(classType, interfaceType, implemented.Span);
             }
         }
 
@@ -582,6 +595,15 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private void VerifyImplements(
         ClassTypeSymbol classType, InterfaceTypeSymbol interfaceType, SourceSpan span)
     {
+        // Implementing IList also means implementing IReadOnlyList, and the
+        // object needs a dispatch table for each.
+        foreach (var inherited in interfaceType.AllInterfaces())
+        {
+            if (classType.Interfaces.Contains(inherited)) continue;
+            classType.Interfaces.Add(inherited);
+            VerifyImplements(classType, inherited, span);
+        }
+
         foreach (var required in interfaceType.Methods)
         {
             var found = classType.FindMethod(required.Name);
@@ -721,14 +743,17 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             TypeDeclKind.Class => new ClassTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+                Template = template, TypeArguments = arguments,
             },
             TypeDeclKind.Interface => new InterfaceTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+                Template = template, TypeArguments = arguments,
             },
             _ => new StructTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+                Template = template, TypeArguments = arguments,
             },
         };
 
@@ -887,8 +912,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// </summary>
     private static bool Satisfies(TypeSymbol argument, InterfaceTypeSymbol required) => argument switch
     {
-        ClassTypeSymbol implementer => implementer.Interfaces.Contains(required),
-        InterfaceTypeSymbol self => self.Equals(required),
+        ClassTypeSymbol implementer => implementer.AllInterfaces().Contains(required),
+        InterfaceTypeSymbol self => self.Equals(required) || self.AllInterfaces().Contains(required),
         _ => false,
     };
 
@@ -897,11 +922,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// discover what each type parameter must be. Structural and deliberately
     /// simple: it looks through arrays and pointers, and stops at anything else.
     /// </summary>
-    private static void Infer(
+    private void Infer(
         TypeSyntax pattern,
         TypeSymbol actual,
         IReadOnlySet<string> parameters,
-        Dictionary<string, TypeSymbol> inferred)
+        Dictionary<string, TypeSymbol> inferred,
+        FileScope scope)
     {
         switch (pattern)
         {
@@ -911,17 +937,47 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 break;
 
             case ArrayTypeSyntax array when actual is ArrayTypeSymbol actualArray:
-                Infer(array.Element, actualArray.Element, parameters, inferred);
+                Infer(array.Element, actualArray.Element, parameters, inferred, scope);
                 break;
 
             case PointerTypeSyntax pointer when actual is PointerTypeSymbol actualPointer:
-                Infer(pointer.Element, actualPointer.Element, parameters, inferred);
+                Infer(pointer.Element, actualPointer.Element, parameters, inferred, scope);
                 break;
 
             case NullableTypeSyntax nullable when actual is OptionalTypeSymbol actualOptional:
-                Infer(nullable.Element, actualOptional.Element, parameters, inferred);
+                Infer(nullable.Element, actualOptional.Element, parameters, inferred, scope);
                 break;
+
+            // `IReadOnlyList<T>` against a `List<Money>`: find the instantiation
+            // of the same template on the argument or among its interfaces, then
+            // line the arguments up.
+            case NamedTypeSyntax { TypeArguments.Count: > 0 } constructed:
+            {
+                var template = FindGenericType(constructed.Name, scope);
+                if (template is null) break;
+
+                foreach (var candidate in InferenceCandidates(actual))
+                {
+                    if (!ReferenceEquals(candidate.Template, template)) continue;
+                    if (candidate.TypeArguments.Count != constructed.TypeArguments.Count) continue;
+
+                    for (int i = 0; i < candidate.TypeArguments.Count; i++)
+                        Infer(constructed.TypeArguments[i], candidate.TypeArguments[i],
+                            parameters, inferred, scope);
+                    return;
+                }
+                break;
+            }
         }
+    }
+
+    /// <summary>An argument's own type, then every interface it carries.</summary>
+    private static IEnumerable<NamedTypeSymbol> InferenceCandidates(TypeSymbol actual)
+    {
+        if (actual is not NamedTypeSymbol named) yield break;
+
+        yield return named;
+        foreach (var interfaceType in named.AllInterfaces()) yield return interfaceType;
     }
 
     // ============================================================ pass 7
@@ -2202,10 +2258,11 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 ? ConversionKind.NullToReference
                 : null;
 
-        // A class converts to any interface it implements. Because an interface
-        // reference is the same pointer, this costs nothing at run time.
-        if (from is ClassTypeSymbol implementer && to is InterfaceTypeSymbol wanted)
-            return implementer.Interfaces.Contains(wanted) ? ConversionKind.ClassToInterface : null;
+        // A class converts to any interface it implements, and an interface to
+        // any it extends. Because a reference is the same pointer either way,
+        // this costs nothing at run time.
+        if (from is NamedTypeSymbol { IsReferenceType: true } source2 && to is InterfaceTypeSymbol wanted)
+            return source2.AllInterfaces().Contains(wanted) ? ConversionKind.ClassToInterface : null;
 
         if (from is ClassTypeSymbol optionalImplementer &&
             to is OptionalTypeSymbol { Element: InterfaceTypeSymbol optionalWanted })
@@ -2517,7 +2574,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         int shared = Math.Min(arguments.Count, template.Declaration.Parameters.Count);
         for (int i = 0; i < shared; i++)
-            Infer(template.Declaration.Parameters[i].Type, arguments[i].Type, parameters, inferred);
+            Infer(template.Declaration.Parameters[i].Type, arguments[i].Type,
+                parameters, inferred, template.Scope);
 
         var missing = template.Parameters.Where(p => !inferred.ContainsKey(p)).ToList();
         if (missing.Count > 0)

@@ -23,7 +23,7 @@ public class Register<T> {
     }
 }
 
-public Money Total(Register<Priced> register) {
+public Money Total(Register<IPriced> register) {
     var sum = Cents(0);
     for (nuint i = 0; i < register.Count(); i = i + 1) {
         sum = Add(sum, register.At(i).Price());

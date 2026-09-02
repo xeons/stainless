@@ -14,7 +14,7 @@ import Shop.Pricing as Money;
 // reaches it, because qualification names the module directly.
 
 int Main() {
-    var register = new Register<Priced>(4);
+    var register = new Register<IPriced>(4);
 
     // `Book` and `Subscription` come from Shop.Catalog, unqualified.
     register.Add(new Book("The Annotated Turing", Money.Cents(3499)));

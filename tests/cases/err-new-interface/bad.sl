@@ -1,8 +1,8 @@
 module Bad;
 
-public interface Shape { double Area(); }
+public interface IShape { double Area(); }
 
 int Main() {
-    Shape s = new Shape();
+    IShape s = new IShape();
     return 0;
 }

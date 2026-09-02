@@ -167,41 +167,41 @@ arguments on a call are inferred from the values passed.
 Type parameters can be constrained by interface, including F-bounded ones:
 
 ```csharp
-public interface Comparable<T> { int CompareTo(T other); }
+public interface IComparable<T> { int CompareTo(T other); }
 
-public class Money : Comparable<Money> { ... }
+public class Money : IComparable<Money> { ... }
 
-T Largest<T>(T[] values) where T : Comparable<T> { ... }
-public class Ranked<T> where T : Comparable<T>, Describable { ... }
+T Largest<T>(T[] values) where T : IComparable<T> { ... }
+public class Ranked<T> where T : IComparable<T>, IDescribable { ... }
 ```
 
 A violated constraint is caught where the generic is instantiated:
 
 ```
 error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
-implement 'Describable'; it implements 'Comparable<Half>'
+implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
 
 ### Interfaces
 
 ```csharp
-public interface Shape {
+public interface IShape {
     double Area();
     String Describe();
 }
 
-public class Circle : Shape {
+public class Circle : IShape {
     double radius;
     public Circle(double r) { radius = r; }
     public double Area() { return 3.14159 * radius * radius; }
     public String Describe() { return "circle"; }
 }
 
-double TotalArea(Shape a, Shape b) { return a.Area() + b.Area(); }
+double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
 ```
 
 An interface reference **is an ordinary object pointer** — the vtable is reached
-through the object rather than carried beside it. So `Shape?`, `weak Shape?`,
+through the object rather than carried beside it. So `IShape?`, `weak IShape?`,
 ARC and the calling convention all behave exactly as they do for a class, and a
 class can implement any number of interfaces at no per-object cost. Dispatch is
 four constant-offset loads with no search and no branch.
@@ -373,7 +373,10 @@ Everything below is covered by [the test suite](tests/cases).
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
 - `T[]`: counted arrays, always bounds checked, elements released with the array
 - Generics: generic classes, interfaces and functions, monomorphized, with
-  inference at call sites and interface constraints (`where T : Comparable<T>`)
+  inference at call sites and interface constraints (`where T : IComparable<T>`)
+- Interfaces extending interfaces, with free conversion to the base
+- `Standard.Collections`: `IComparable<T>`, `IEquatable<T>`, `IReadOnlyList<T>`,
+  `IList<T>`, `List<T>`, and `Sort`/`Largest`/`Smallest`/`IndexOf`
 - `StringBuilder`: mutable text with amortised O(1) appends
 - `interface`: multiple implementation, dynamic dispatch, checked at compile time
 - `Standard.Text` (imported everywhere) and `Standard.Console`
@@ -388,7 +391,7 @@ Everything below is covered by [the test suite](tests/cases).
 Being straight about the edges, roughly in the order they are worth adding:
 
 - **Constraints are checked at the instantiation, not the declaration.**
-  `where T : Shape` is verified where the generic is used, but the body is
+  `where T : IShape` is verified where the generic is used, but the body is
   still checked per instantiation, so an unused template is never checked and
   a mistake inside one is reported against its use. Definition-site checking
   would need constraints on operators too, which is a larger step.
@@ -405,9 +408,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   and unwrapped with an explicit cast, but `if (x != null)` does not yet make
   `x` usable as non-optional. `weak` has the same gap, though the runtime side
   is fully implemented.
-- **No class inheritance and no generics.** Interfaces exist, but they do not
-  extend one another, and there is no downcast from an interface back to a
-  class.
+- **No class inheritance.** Interfaces extend one another, but classes do not,
+  and there is no downcast from an interface back to a class.
+- **No reflection or attributes**, so a serializer cannot walk a type's fields.
 - **No overloading by parameter type on methods** (module-level functions do
   overload).
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a
@@ -427,6 +430,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 ```
 docs/                  language specification and ABI
 runtime/               the runtime, split by feature, embedded in the compiler
+stdlib/                the standard library written in Stainless, also embedded
 samples/               example programs
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command

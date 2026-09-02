@@ -1,8 +1,8 @@
 module Bad;
 
-public interface Shape { double Area(); }
+public interface IShape { double Area(); }
 
-public class Square : Shape {
+public class Square : IShape {
     public int Area() { return 1; }     // wrong return type
 }
 

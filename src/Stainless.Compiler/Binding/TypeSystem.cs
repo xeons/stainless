@@ -172,6 +172,36 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public List<FieldSymbol> Fields { get; } = [];
     public List<FunctionSymbol> Methods { get; } = [];
 
+    /// <summary>
+    /// For a class, the interfaces it implements. For an interface, the ones it
+    /// extends. Both are the same relation, so both live here.
+    /// </summary>
+    public List<InterfaceTypeSymbol> Interfaces { get; } = [];
+
+    /// <summary>
+    /// For an instantiated generic, the template it came from and the arguments
+    /// it was built with. Inference reads these to match a pattern such as
+    /// <c>IReadOnlyList&lt;T&gt;</c> against a concrete <c>List&lt;Money&gt;</c>.
+    /// </summary>
+    public GenericTypeTemplate? Template { get; init; }
+    public IReadOnlyList<TypeSymbol> TypeArguments { get; init; } = [];
+
+    /// <summary>This type's interfaces, and theirs, without duplicates.</summary>
+    public IEnumerable<InterfaceTypeSymbol> AllInterfaces()
+    {
+        var seen = new HashSet<InterfaceTypeSymbol>();
+        var pending = new Stack<InterfaceTypeSymbol>(Interfaces);
+
+        while (pending.Count > 0)
+        {
+            var current = pending.Pop();
+            if (!seen.Add(current)) continue;
+
+            yield return current;
+            foreach (var inherited in current.Interfaces) pending.Push(inherited);
+        }
+    }
+
     /// <summary>Fully qualified: <c>App.Math.Vector</c>.</summary>
     public string QualifiedName =>
         string.IsNullOrEmpty(ModuleName) ? SimpleName : ModuleName + "." + SimpleName;
@@ -194,7 +224,15 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public int FieldsAlignment => _alignment;
 
     public FieldSymbol? FindField(string name) => Fields.FirstOrDefault(f => f.Name == name);
-    public FunctionSymbol? FindMethod(string name) => Methods.FirstOrDefault(m => m.Name == name);
+
+    /// <summary>
+    /// Finds a method on this type or, for an interface, on one it extends. The
+    /// result keeps its own <c>ContainingType</c>, so a call through
+    /// <c>IList</c> to a method declared on <c>IReadOnlyList</c> dispatches
+    /// through the latter's table, which the object also carries.
+    /// </summary>
+    public virtual FunctionSymbol? FindMethod(string name) =>
+        Methods.FirstOrDefault(m => m.Name == name);
 }
 
 public sealed class StructTypeSymbol : NamedTypeSymbol
@@ -222,13 +260,15 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
 
     /// <summary>Position of a method in this interface's vtable.</summary>
     public int SlotOf(FunctionSymbol method) => Methods.IndexOf(method);
+
+    /// <summary>Also searches extended interfaces, nearest first.</summary>
+    public override FunctionSymbol? FindMethod(string name) =>
+        Methods.FirstOrDefault(m => m.Name == name)
+        ?? AllInterfaces().Select(i => i.FindMethod(name)).FirstOrDefault(m => m is not null);
 }
 
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
-    /// <summary>Interfaces this class declares, in source order.</summary>
-    public List<InterfaceTypeSymbol> Interfaces { get; } = [];
-
     /// <summary>
     /// For a runtime-provided class, the C function that constructs one. When
     /// set, <c>new</c> calls it rather than allocating and running a constructor.
