@@ -217,11 +217,11 @@ internal static class Program
             return false;
         }
 
-        var files = Compilation.CollectSourceFiles(paths, out var nativeInputs, out var errors);
-        foreach (string error in errors) Error(error);
-        if (errors.Count > 0) return false;
+        var sources = Compilation.CollectSourceFiles(paths);
+        foreach (string error in sources.Errors) Error(error);
+        if (sources.Errors.Count > 0) return false;
 
-        if (files.Count == 0)
+        if (sources.Sources.Count == 0)
         {
             Error("no .sl source files were found");
             return false;
@@ -229,8 +229,9 @@ internal static class Program
 
         options = new CompilationOptions
         {
-            SourcePaths = files,
-            NativeInputs = nativeInputs,
+            SourcePaths = sources.Sources,
+            NativeInputs = sources.NativeInputs,
+            InferredModules = sources.InferredModules,
             OutputPath = output,
             IntermediateDirectory = objectDirectory,
             OptimizationLevel = optimization,

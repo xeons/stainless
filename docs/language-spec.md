@@ -24,39 +24,122 @@ of a collector, a linker instead of an assembly loader.
 
 ## 1. Modules
 
-```csharp
-module App.Math;          // optional; inferred from path if omitted
+### 1.1 One file is one module
 
-import Standard.Console;              // brings its public members into scope
-import Standard.Console as Terminal;  // aliased
-```
-
-A module is exactly one source file. A file with no `module` declaration takes
-its module name from its path relative to the package root
-(`src/App/Math.sl` -> `App.Math`).
-
-> Stainless says `module`, not `namespace`, because the two differ: a C#
-> namespace may span any number of files, while a Stainless module *is* a
-> file. That one-to-one rule is what lets the compiler retire header files.
-
-Top-level declarations are private to their module unless marked `public`:
+Always. There is no way to spread a module across files, and no way to put two
+modules in one file. That single rule is what lets header files go away: a
+module's public surface is computed from its own source, so nothing has to be
+declared twice.
 
 ```csharp
-public double Area(double r) { return 3.14159 * r * r; }
-double Helper() { return 1; }        // module-private
+module Shop.Catalog;
 ```
 
-Because there are no headers, `public` is the *only* thing that controls
-visibility, and a module's public surface is derived from its own source.
-Order never matters:
+The declaration is optional. Without it, the name comes from the file's path
+below the **package root** — the directory named on the command line:
+
+```
+stainless build src
+
+  src/Program.sl              ->  Program
+  src/Shop/Pricing.sl         ->  Shop.Pricing
+  src/Shop/Deep/Helper.sl     ->  Shop.Deep.Helper
+```
+
+The file name is the last segment, since the file *is* the module. A file named
+directly on the command line has no root, so it takes just its own name.
+
+> Dots do not nest. `Shop.Pricing` and `Shop` are unrelated names that happen to
+> share a prefix; importing `Shop` would not reach `Shop.Pricing`, and there is
+> no such thing as a parent module.
+
+### 1.2 `public` is the whole of visibility
+
+A declaration is private to its module unless marked `public`:
+
+```csharp
+public struct Money { public long Cents; }   // other modules may use this
+public Money Cents(long amount) { ... }      // and this
+
+long Doubled(long value) { ... }             // this module only
+```
+
+Field and method visibility works the same way, and `public` on a member is
+what lets another module touch it. There is nothing else — no `internal`, no
+friend declarations, no export lists.
+
+### 1.3 `import` adds names; it never grants access
+
+```csharp
+import Shop.Pricing;
+```
+
+After that line, every **public** member of `Shop.Pricing` can be named three
+ways:
+
+| Form | Example |
+|---|---|
+| bare | `Money`, `Cents(500)` |
+| by last segment | `Pricing.Money`, `Pricing.Cents(500)` |
+| fully qualified | `Shop.Pricing.Money`, `Shop.Pricing.Cents(500)` |
+
+**The fully qualified form needs no import at all.** Qualification names the
+module directly, so this is legal in a file that imports nothing:
+
+```csharp
+var boxed = new Shop.Bundles.Bundle("Starter set", 2);
+```
+
+An import is therefore a convenience for shortening names, not a permission
+check. What you may touch is decided entirely by `public`.
+
+### 1.4 Aliases
+
+```csharp
+import Shop.Pricing as Money;
+
+Money.Format(total)
+```
+
+An alias *adds* a way to name the module. It does not remove the others, so
+bare names and the full name still work after aliasing — unlike C#, where
+`using X = A.B;` replaces unqualified access rather than adding to it.
+
+### 1.5 Ambiguity
+
+If two imported modules both export a type called `Buffer`, using it bare is an
+error rather than a silent pick:
+
+```
+error[SL0273]: 'Buffer' is ambiguous between 'Net.Buffer' and 'Disk.Buffer';
+qualify it with its module name
+```
+
+Qualify it, or alias one of the modules.
+
+### 1.6 What is automatic
+
+`Standard.Text` is imported into every module without being asked for, because
+a string literal produces a `String` whether the program mentioned one or not.
+That is the only automatic import: `Standard.Console` and everything else must
+be requested.
+
+### 1.7 Order never matters
+
+Not within a file, and not across them. The compiler resolves every name in the
+program before checking any body, so these are all fine:
 
 ```csharp
 int Main() {
-    return Later();     // fine: Later is declared below
+    return Later();          // declared below
 }
 
 int Later() { return 0; }
 ```
+
+A module may be compiled before the module it depends on, and files may be
+given to the compiler in any order. Two files declaring the same module name is
+an error; a module importing itself is a warning.
 
 ## 2. Types
 

@@ -14,6 +14,13 @@ public sealed record CompilationOptions
     /// platform C ABI, these need no wrapper, binding or marshalling layer.
     /// </summary>
     public IReadOnlyList<string> NativeInputs { get; init; } = [];
+
+    /// <summary>
+    /// Module names derived from where each file sits, keyed by full path. A
+    /// file that declares its own <c>module</c> ignores this.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> InferredModules { get; init; } =
+        new Dictionary<string, string>();
     public string? OutputPath { get; init; }
     public string? IntermediateDirectory { get; init; }
     public int OptimizationLevel { get; init; } = 2;
@@ -40,6 +47,18 @@ public sealed record CompilationResult
     public string? DriverError { get; init; }
 }
 
+/// <summary>What a set of command-line paths expanded to.</summary>
+public sealed record SourceSet
+{
+    public required IReadOnlyList<string> Sources { get; init; }
+    public required IReadOnlyList<string> NativeInputs { get; init; }
+
+    /// <summary>Module names derived from each file's path, keyed by full path.</summary>
+    public required IReadOnlyDictionary<string, string> InferredModules { get; init; }
+
+    public required IReadOnlyList<string> Errors { get; init; }
+}
+
 /// <summary>
 /// The front-to-back pipeline: source files in, native executable out.
 /// </summary>
@@ -56,14 +75,19 @@ public sealed class Compilation
 
     /// <summary>
     /// Expands directories into their .sl files, separates native inputs, and
-    /// rejects anything unreadable.
+    /// derives a module name for each file from where it sits.
+    ///
+    /// A directory given on the command line is that file's package root, so
+    /// <c>src/Shop/Catalog.sl</c> under <c>src</c> becomes <c>Shop.Catalog</c>.
+    /// That is what keeps two files called <c>Utils.sl</c> in different folders
+    /// from claiming the same module.
     /// </summary>
-    public static List<string> CollectSourceFiles(
-        IEnumerable<string> paths, out List<string> nativeInputs, out List<string> errors)
+    public static SourceSet CollectSourceFiles(IEnumerable<string> paths)
     {
         var files = new List<string>();
-        nativeInputs = [];
-        errors = [];
+        var nativeInputs = new List<string>();
+        var errors = new List<string>();
+        var inferred = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (string path in paths)
         {
@@ -76,8 +100,11 @@ public sealed class Compilation
 
             if (Directory.Exists(path))
             {
+                string root = Path.GetFullPath(path);
+
                 var all = Directory
-                    .EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                    .EnumerateFiles(root, "*", SearchOption.AllDirectories)
+                    .Select(Path.GetFullPath)
                     .OrderBy(p => p, StringComparer.Ordinal)
                     .ToList();
 
@@ -89,7 +116,11 @@ public sealed class Compilation
                 if (found.Count == 0)
                     errors.Add($"no {SourceExtension} files were found under '{path}'");
 
-                files.AddRange(found);
+                foreach (string file in found)
+                {
+                    files.Add(file);
+                    if (ModuleNameFor(root, file) is { } name) inferred[file] = name;
+                }
 
                 // C sources sitting beside the Stainless ones belong to the same
                 // program; a directory would otherwise drop them silently.
@@ -97,6 +128,7 @@ public sealed class Compilation
             }
             else if (File.Exists(path))
             {
+                // A file named on its own has no root, so only its own name applies.
                 files.Add(Path.GetFullPath(path));
             }
             else
@@ -105,13 +137,37 @@ public sealed class Compilation
             }
         }
 
-        nativeInputs = nativeInputs
-            .Where(f => !IsBuildArtifact(f))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        return files.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        return new SourceSet
+        {
+            Sources = files.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+            NativeInputs = nativeInputs
+                .Where(f => !IsBuildArtifact(f))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList(),
+            InferredModules = inferred,
+            Errors = errors,
+        };
     }
+
+    /// <summary>
+    /// Turns a path below <paramref name="root"/> into a dotted module name, or
+    /// null when a folder is not a usable identifier.
+    /// </summary>
+    private static string? ModuleNameFor(string root, string file)
+    {
+        string relative = Path.GetRelativePath(root, Path.ChangeExtension(file, null));
+        var segments = relative.Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries);
+
+        if (segments.Length == 0 || segments.Any(s => !IsIdentifier(s))) return null;
+        return string.Join('.', segments);
+    }
+
+    private static bool IsIdentifier(string text) =>
+        text.Length > 0 &&
+        (char.IsLetter(text[0]) || text[0] == '_') &&
+        text.All(c => char.IsLetterOrDigit(c) || c == '_');
 
     /// <summary>
     /// True for files a previous build produced. Without this, scanning a directory
@@ -148,7 +204,8 @@ public sealed class Compilation
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- bind --------------------------------------------------------
-        var program = new Binder(diagnostics, requireEntryPoint: !options.Shared).Bind(units);
+        var program = new Binder(diagnostics, requireEntryPoint: !options.Shared,
+            inferredModules: options.InferredModules).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         if (program.EntryPoint is null && !options.EmitIrOnly && !options.Shared)
@@ -167,7 +224,8 @@ public sealed class Compilation
         // --- emit --------------------------------------------------------
         string ir = new LlvmEmitter(forSharedLibrary: options.Shared).Emit(program);
 
-        string output = options.OutputPath ?? DefaultOutputPath(options.SourcePaths[0], options.Shared);
+        string output = options.OutputPath
+            ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
         string intermediate = options.IntermediateDirectory
             ?? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(output)) ?? ".", "obj");
 
@@ -239,14 +297,45 @@ public sealed class Compilation
         try { File.Delete(path); } catch (IOException) { /* leaving a stale file is harmless */ }
     }
 
-    private static string DefaultOutputPath(string firstSource, bool shared)
+    /// <summary>
+    /// Where the output goes when nothing was asked for: named after the module
+    /// holding <c>Main</c>, in the directory the sources share. Naming it after
+    /// whichever file happened to sort first was surprising for a directory
+    /// build, where that file is rarely the interesting one.
+    /// </summary>
+    private static string DefaultOutputPath(
+        BoundProgram program, IReadOnlyList<string> sources, bool shared)
     {
-        string name = Path.GetFileNameWithoutExtension(firstSource);
-        string directory = Path.GetDirectoryName(Path.GetFullPath(firstSource)) ?? ".";
+        string name = program.EntryPoint is not null
+            ? program.EntryPoint.ModuleName.Split('.')[^1]
+            : Path.GetFileNameWithoutExtension(sources[0]);
+
         string extension = shared
             ? Toolchain.SharedLibraryExtension
             : OperatingSystem.IsWindows() ? ".exe" : "";
-        return Path.Combine(directory, name + extension);
+
+        return Path.Combine(CommonDirectory(sources), name + extension);
+    }
+
+    /// <summary>The deepest directory containing every source file.</summary>
+    private static string CommonDirectory(IReadOnlyList<string> sources)
+    {
+        var directories = sources
+            .Select(s => Path.GetDirectoryName(Path.GetFullPath(s)) ?? ".")
+            .ToList();
+
+        string common = directories[0];
+        foreach (string directory in directories.Skip(1))
+        {
+            while (!directory.StartsWith(common, StringComparison.OrdinalIgnoreCase))
+            {
+                var parent = Directory.GetParent(common);
+                if (parent is null) return directories[0];
+                common = parent.FullName;
+            }
+        }
+
+        return common;
     }
 
     private static CompilationResult Failed(DiagnosticBag diagnostics) =>

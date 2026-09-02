@@ -39,6 +39,12 @@ int Main() {
 int Later() { return 0; }
 ```
 
+A module's name comes from its path below the directory you build, so
+`src/Shop/Catalog.sl` is `Shop.Catalog`. `public` decides what other modules may
+touch; `import` only shortens names, since a fully qualified name reaches any
+public member without one. See [§1 of the spec](docs/language-spec.md) and
+[samples/shop](samples/shop) for a worked multi-file example.
+
 **2. Native code via LLVM.** The compiler emits textual LLVM IR and hands it to
 clang. Startup cost is a C program's startup cost.
 
@@ -222,7 +228,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 40 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 41 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever

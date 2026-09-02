@@ -1,0 +1,5 @@
+  The Annotated Turing = $34.99
+  Journal x12 = $60
+  Starter set (2 items) = $120
+total = $214.99
+twice = $429.98

@@ -32,7 +32,14 @@ public sealed class BoundProgram
 /// False when building a library, which has no <c>Main</c> and must not be
 /// warned about one.
 /// </param>
-public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = true)
+/// <param name="inferredModules">
+/// Module names derived from each file's path, for files that do not declare
+/// one themselves.
+/// </param>
+public sealed class Binder(
+    DiagnosticBag diagnostics,
+    bool requireEntryPoint = true,
+    IReadOnlyDictionary<string, string>? inferredModules = null)
 {
     private readonly Builtins _builtins = new();
     private readonly Dictionary<string, ModuleSymbol> _modules = new(StringComparer.Ordinal);
@@ -45,6 +52,13 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
     private readonly Dictionary<string, NamedTypeSymbol> _instantiatedTypes = new(StringComparer.Ordinal);
     private readonly Dictionary<string, FunctionSymbol> _instantiatedFunctions = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Bodies already bound. An instantiated method is reachable both through its
+    /// module's function list and through the pending queue, so without this it
+    /// would be bound twice and emitted twice.
+    /// </summary>
+    private readonly HashSet<FunctionSymbol> _boundFunctions = [];
 
     /// <summary>Bodies awaiting binding, with the substitution they belong to.</summary>
     private readonly Queue<(FunctionSymbol Function, Dictionary<string, TypeSymbol> Substitution)> _pending = new();
@@ -126,8 +140,18 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         }
     }
 
-    private static string InferModuleName(string path) =>
-        Path.GetFileNameWithoutExtension(path);
+    /// <summary>
+    /// The module name for a file that does not declare one: its path below the
+    /// package root, or just its own name when it was compiled on its own.
+    /// </summary>
+    private string InferModuleName(string path)
+    {
+        if (inferredModules is not null &&
+            inferredModules.TryGetValue(Path.GetFullPath(path), out var fromPath))
+            return fromPath;
+
+        return Path.GetFileNameWithoutExtension(path);
+    }
 
     // ============================================================ pass 2
 
@@ -924,6 +948,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private void BindFunctionBody(FunctionSymbol function)
     {
         if (function.Body is null) return;
+        if (!_boundFunctions.Add(function)) return;
 
         _currentFunction = function;
         _scopes.Clear();
