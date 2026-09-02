@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // The same module, written in a second file. No import between them.
 module Shop.Catalog;
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // samples/shop/src/Shop/Catalog/Books.sl
 //
 // One of TWO files that make up `Shop.Catalog`. The module is named here, in

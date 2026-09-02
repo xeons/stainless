@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // samples/shop/src/Shop/Inventory.sl  ->  module Shop.Inventory
 module Shop.Inventory;
 

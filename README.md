@@ -548,6 +548,13 @@ Stainless would have to be GPLv3 as well. With it:
 The copyleft is on the compiler, not on what you build with it — the same
 arrangement GCC uses for `libgcc`.
 
+The example programs in [samples/](samples/) and the test programs in
+[tests/cases/](tests/cases/) are [Zero-Clause BSD](samples/LICENSE) instead, which asks for nothing at all: no
+attribution, no notice, no copyleft. They exist to be copied, and the runtime
+exception would not have covered that — it permits combining the *runtime* with
+your code, whereas lifting a sample means copying GPL'd source into your own
+program.
+
 The exception is modelled closely on the
 [GNU GCC Runtime Library Exception 3.1](https://www.gnu.org/licenses/gcc-exception-3.1.html),
 using the same structure and terms of art, but it is a grant made by this

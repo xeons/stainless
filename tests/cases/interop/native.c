@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 #include <stdio.h>
 
 typedef struct Point { double X; double Y; } Point;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // samples/shop/src/Shop/Pricing.sl
 //
 // This file joins the module `Shop.Pricing`. The name is stated here, never

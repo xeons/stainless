@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /* Plain C. No Stainless header exists, because Stainless has no headers --
    these declarations are the ordinary C ones you would write for any library. */
 #include <stdio.h>

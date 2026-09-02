@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Bad;
 
 public interface IComparable<T> { int CompareTo(T other); }

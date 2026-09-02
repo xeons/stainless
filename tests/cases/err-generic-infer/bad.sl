@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Bad;
 
 // T appears only in the return type, so nothing can pin it down.

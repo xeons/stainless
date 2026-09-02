@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Bad;
 
 int Pick(bool flag) {

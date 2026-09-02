@@ -1,0 +1,28 @@
+Stainless example programs
+SPDX-License-Identifier: 0BSD
+
+The programs in this directory are under the Zero-Clause BSD licence, not
+the GNU General Public License that covers the rest of Stainless.
+
+They exist to be copied. The runtime library exception in
+../LICENSE.RUNTIME does not help here: it permits combining the *runtime*
+with your own code, whereas lifting a sample means copying its source, and
+a GPL'd source file would carry its licence into whatever you pasted it
+into. Zero-Clause BSD asks for nothing at all -- no attribution, no notice,
+no copyleft -- so a snippet taken from here stays yours.
+
+The same applies to the test programs in ../tests/cases/, several of which
+are copies of these samples; it would be odd for one file to carry two
+licences depending on which directory it sits in.
+
+Nothing else changes. Stainless itself remains under the GPLv3
+(../LICENSE), and its runtime library under the GPLv3 with the additional
+permission in ../LICENSE.RUNTIME.
+
+--------------------------------------------------------------------------
+
+Copyright (C) 2026 by Brandon Scott
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.

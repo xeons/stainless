@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Counter;
 
 extern "C" int printf(byte* format, ...);

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /* An ordinary C program, built against the generated header. */
 #include <stdio.h>
 #include "library.h"

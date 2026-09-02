@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Text.Demo;
 
 import Standard.Console;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // samples/shop/src/Shop/Bundles.sl  ->  module Shop.Bundles
 module Shop.Bundles;
 

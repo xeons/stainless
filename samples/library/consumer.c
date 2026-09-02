@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /*
  * An ordinary C program. It knows nothing about Stainless.
  *

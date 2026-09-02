@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // samples/shop/src/Shop/Catalog/Subscriptions.sl
 //
 // The second half of `Shop.Catalog`. It needs no import to reach Book, IPriced

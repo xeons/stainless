@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Stress;
 
 extern "C" int printf(byte* format, ...);

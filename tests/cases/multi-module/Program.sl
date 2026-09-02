@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 // samples/shop/src/Program.sl  ->  module Program
 //
 // Sits directly under the root, so its inferred name has no dots.

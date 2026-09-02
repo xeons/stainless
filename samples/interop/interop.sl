@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Interop;
 
 // Ordinary C declarations. No binding layer, no marshalling, no header.

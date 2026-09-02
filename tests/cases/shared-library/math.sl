@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 module Library.Math;
 
 public struct Point {
