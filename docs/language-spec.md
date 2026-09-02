@@ -4,10 +4,10 @@ Stainless is a systems language with C++'s performance model and C#'s syntax.
 
 **Design pillars**
 
-1. **No header files.** One file is one module. Declarations are order-independent
-   within and across modules; the compiler resolves the whole program graph before
-   checking any body. There is no preprocessor, no `#include`, no include guards,
-   no forward declarations, no ODR.
+1. **No header files.** Declarations are order-independent within and across
+   modules; the compiler resolves the whole program graph before checking any
+   body. There is no preprocessor, no `#include`, no include guards, no forward
+   declarations, no ODR.
 2. **Native code via LLVM.** No VM, no JIT, no runtime startup cost beyond a
    small ARC runtime.
 3. **ARC, not GC.** Reference types are reference-counted and destroyed

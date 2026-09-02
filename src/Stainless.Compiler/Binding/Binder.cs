@@ -79,9 +79,9 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         DeclareMembers();           // pass 4: every signature and field type is resolved
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
         ResolveAttributes();        // pass 6: attributes fold to constants
-        ComputeLayouts();           // pass 6: every value type has a size
-        BindBodies();               // pass 7: only now is any code checked
-        DrainPending();             // pass 8: bodies of everything instantiated along the way
+        ComputeLayouts();           // pass 7: every value type has a size
+        BindBodies();               // pass 8: only now is any code checked
+        DrainPending();             // pass 9: bodies of everything instantiated along the way
 
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.

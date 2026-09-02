@@ -15,7 +15,7 @@ int Main() {
 
 ```
 $ stainless run samples/hello.sl
-ok: built samples\hello.exe in 146 ms
+ok: built samples\Hello.exe in 146 ms
 
 Hello from Stainless.
 ```
@@ -26,10 +26,10 @@ That is a real native executable. No VM, no JIT, no assembly loader, no GC.
 
 ## The four pillars
 
-**1. No header files.** One file is one module. Declarations are order-independent
-within *and across* modules, so there are no include guards, no forward
-declarations, no ODR violations, and no preprocessor. A module's public surface
-is derived from its own source — the thing a header file exists to fake.
+**1. No header files.** Declarations are order-independent within *and across*
+modules, so there are no include guards, no forward declarations, no ODR
+violations, and no preprocessor. Every name in the program is resolved before
+any body is checked — the thing a header file exists to fake.
 
 ```csharp
 int Main() {
@@ -53,8 +53,8 @@ clang. Startup cost is a C program's startup cost.
 
 **3. ARC, not GC.** `class` types are reference counted and destroyed
 deterministically. No collector, no pauses, no tracing thread — the entire
-runtime is [six small C files](runtime/): reference counting, text, UTF-16,
-a string builder, arrays, and console output.
+runtime is [seven small C files](runtime/): reference counting, text, UTF-16,
+a string builder, arrays, reflection metadata, and console output.
 
 **4. C/C++ ABI compatible.** A Stainless `struct` *is* a C struct, byte for byte.
 `extern "C"` calls into C and `export "C"` exposes functions back, with no
@@ -150,14 +150,13 @@ MessageBoxW(0, wide.ToPointer(), null, 0);
 var numbers = new int[5];
 numbers[2] = 9;                     // bounds checked, unsigned compare
 
-public class List<T> {
-    T[] items;
-    nuint count;
-    public void Add(T item) { ... }
-    public T At(nuint index) { return items[index]; }
+public class Box<T> {
+    T value;
+    public Box(T initial) { value = initial; }
+    public T Get() { return value; }
 }
 
-var names = new List<String>();     // a real type, compiled for String
+var boxed = new Box<String>("text");    // a real type, compiled for String
 ```
 
 Generics **monomorphize**: `Box<int>` and `Box<String>` are two separate types
@@ -181,6 +180,29 @@ A violated constraint is caught where the generic is instantiated:
 error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
 implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
+
+### Collections
+
+`Standard.Collections` is written in Stainless and compiled with your program,
+so importing it costs nothing until you instantiate something:
+
+```csharp
+import Standard.Collections;
+
+public class Money : IComparable<Money>, IEquatable<Money> {
+    public int  CompareTo(Money other) { ... }
+    public bool EqualTo(Money other)   { ... }
+}
+
+var prices = new List<Money>();
+prices.Add(new Money(250));
+
+Sort(prices);              // where T : IComparable<T>
+Largest(prices);           // takes an IReadOnlyList<T>, so it cannot mutate
+```
+
+`IList<T>` extends `IReadOnlyList<T>`, and interfaces are named with a leading
+`I` as in C#.
 
 ### Attributes and reflection
 
@@ -269,7 +291,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 43 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 48 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -313,6 +335,8 @@ public int Helper() { return 1; }                    // other modules only
 int Secret()        { return 2; }                    // module-private
 ```
 
+That library's export table holds exactly one name:
+
 ```
 $ llvm-readobj --coff-exports build/math.dll
 Name: Add
@@ -349,10 +373,13 @@ objects on one side of it.
       v   Lexer -> Parser                       one file at a time, no #include
    syntax trees
       |
-      v   Binder, in six whole-program passes:
-      |     1. declare modules       4. resolve signatures and field types
-      |     2. declare types         5. compute C-compatible layouts
-      |     3. resolve imports       6. check bodies
+      v   Binder, in nine whole-program passes:
+      |     1. declare modules        6. fold attributes to constants
+      |     2. declare types          7. compute C-compatible layouts
+      |     3. resolve imports        8. check bodies
+      |     4. resolve signatures     9. check whatever those instantiated
+      |        and field types
+      |     5. check that classes implement what they claim
       |
       |   Nothing may depend on declaration order, so every name in the
       |   program is known before any body is checked. That single rule is
@@ -371,12 +398,15 @@ objects on one side of it.
 |---|---|
 | [Syntax/Lexer.cs](src/Stainless.Compiler/Syntax/Lexer.cs) | tokens; no preprocessor |
 | [Syntax/Parser.cs](src/Stainless.Compiler/Syntax/Parser.cs) | recursive descent + precedence climbing |
-| [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the six passes, type checking, conversions |
+| [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the nine passes, type checking, conversions, generic instantiation |
 | [Binding/TypeSystem.cs](src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
+| [Binding/Builtins.cs](src/Stainless.Compiler/Binding/Builtins.cs) | `String`, `StringBuilder` and the rest of `Standard.Text` |
 | [Binding/Mangler.cs](src/Stainless.Compiler/Binding/Mangler.cs) | symbol names |
 | [Emit/Win64Abi.cs](src/Stainless.Compiler/Emit/Win64Abi.cs) | struct passing: register, `byval`, or `sret` |
-| [Emit/LlvmEmitter.cs](src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, plus retain/release insertion |
+| [Emit/LlvmEmitter.cs](src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, retain/release insertion, metadata tables |
+| [Emit/CHeaderWriter.cs](src/Stainless.Compiler/Emit/CHeaderWriter.cs) | the C header for a shared library |
 | [runtime/](runtime/) | the whole runtime, split by feature |
+| [stdlib/](stdlib/) | the standard library, written in Stainless |
 
 ### Why textual IR
 
@@ -397,7 +427,9 @@ retains the new value *before* releasing the old, so self-assignment is safe.
 
 Everything below is covered by [the test suite](tests/cases).
 
-- Modules, imports, aliases, `public` visibility, full order independence
+- Modules like C# namespaces: several files may share one, imports are per file,
+  `public` exports and an unmarked declaration is module-wide
+- Aliases, qualified names without an import, full order independence
 - `struct` with fields and methods; exact C layout; value copy semantics
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
@@ -412,13 +444,13 @@ Everything below is covered by [the test suite](tests/cases).
 - `T[]`: counted arrays, always bounds checked, elements released with the array
 - Generics: generic classes, interfaces and functions, monomorphized, with
   inference at call sites and interface constraints (`where T : IComparable<T>`)
-- Interfaces extending interfaces, with free conversion to the base
+- Interfaces: several per class, dynamic dispatch, checked at compile time, and
+  extending one another with free conversion to the base
 - `Standard.Collections`: `IComparable<T>`, `IEquatable<T>`, `IReadOnlyList<T>`,
   `IList<T>`, `List<T>`, and `Sort`/`Largest`/`Smallest`/`IndexOf`
 - `StringBuilder`: mutable text with amortised O(1) appends
-- `interface`: multiple implementation, dynamic dispatch, checked at compile time
-- `Standard.Text` (imported everywhere) and `Standard.Console`
-- Raw pointers, `sizeof`, casts, `new`, `this`
+- `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
+- Raw pointers, `sizeof`, `typeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#
 - Shared libraries: `--shared` with a generated C header, and an export table
   containing exactly the `export "C"` functions
@@ -441,6 +473,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   because `<` in expression position is ambiguous with less-than; inference
   reads argument types only.
 - **No generic methods**, only generic types and generic free functions.
+- **No `foreach`, `switch`, or `enum`.** Iterating a list means an index and a
+  `for`; there is no pattern matching and no enumerated type.
+- **No exceptions or error type.** A failure aborts through the runtime; there
+  is no way to recover from one.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
   formatting; `Substring` counts bytes, not characters, so it can slice a
   multi-byte character in half.
