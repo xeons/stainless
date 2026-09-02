@@ -55,6 +55,7 @@ public sealed class LlvmEmitter
         Header();
         StructTypes(program);
         RuntimeDeclarations();
+        FactoryDeclarations(program);
         ExternalDeclarations(program);
         TypeInfos(program);
 
@@ -63,6 +64,8 @@ public sealed class LlvmEmitter
 
         foreach (var classType in program.Classes)
             EmitDestroyThunk(classType);
+
+        InterfaceTables(program);
 
         if (program.EntryPoint is not null)
             EmitEntryPoint(program.EntryPoint);
@@ -96,7 +99,7 @@ public sealed class LlvmEmitter
 
         // The header every reference type is prefixed with: strong, weak, TypeInfo*.
         _module.AppendLine("%SlObjectHeader = type { i64, i64, ptr }");
-        _module.AppendLine("%SlTypeInfo = type { i64, ptr, ptr }");
+        _module.AppendLine("%SlTypeInfo = type { i64, ptr, ptr, ptr }");
         _module.AppendLine();
     }
 
@@ -110,8 +113,17 @@ public sealed class LlvmEmitter
         _module.AppendLine("declare ptr @sl_weak_load(ptr)");
         _module.AppendLine("@sl_string_type_info = external constant %SlTypeInfo");
         _module.AppendLine("@sl_utf16_string_type_info = external constant %SlTypeInfo");
+        _module.AppendLine("@sl_string_builder_type_info = external constant %SlTypeInfo");
         _module.AppendLine("declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
         _module.AppendLine();
+    }
+
+    private void FactoryDeclarations(BoundProgram program)
+    {
+        foreach (string factory in program.RuntimeFactories)
+            _module.AppendLine($"declare ptr @{factory}()");
+
+        if (program.RuntimeFactories.Count > 0) _module.AppendLine();
     }
 
     private void ExternalDeclarations(BoundProgram program)
@@ -143,15 +155,74 @@ public sealed class LlvmEmitter
 
     private void TypeInfos(BoundProgram program)
     {
+        _interfaceCount = program.Interfaces.Count;
+
         foreach (var classType in program.Classes)
         {
             string nameConstant = InternBytes(classType.QualifiedName);
+            string tables = classType.Interfaces.Count > 0
+                ? "@" + InterfaceTableName(classType)
+                : "null";
+
             _module.AppendLine(
                 $"@{Mangler.TypeInfoSymbol(classType)} = internal constant %SlTypeInfo " +
-                $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, ptr {nameConstant} }}");
+                $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
+                $"ptr {nameConstant}, ptr {tables} }}");
         }
 
         if (program.Classes.Count > 0) _module.AppendLine();
+    }
+
+    /// <summary>Total interfaces in the program; the width of every dispatch table.</summary>
+    private int _interfaceCount;
+
+    private static string InterfaceTableName(ClassTypeSymbol type) =>
+        "_SLitab_" + type.QualifiedName.Replace('.', '_');
+
+    private static string VTableName(ClassTypeSymbol type, InterfaceTypeSymbol iface) =>
+        "_SLvt_" + type.QualifiedName.Replace('.', '_') + "_" + iface.QualifiedName.Replace('.', '_');
+
+    /// <summary>
+    /// Emits, for every class that implements something, one vtable per
+    /// interface plus a table indexed by interface id.
+    ///
+    /// Ids are assigned across the whole program, so the table is indexed
+    /// directly and a dispatch never searches. The cost is one pointer per
+    /// interface per implementing class, which is a few hundred bytes in a
+    /// realistic program.
+    /// </summary>
+    private void InterfaceTables(BoundProgram program)
+    {
+        var implementers = program.Classes.Where(c => c.Interfaces.Count > 0).ToList();
+        if (implementers.Count == 0) return;
+
+        _module.AppendLine();
+        foreach (var classType in implementers)
+        {
+            foreach (var interfaceType in classType.Interfaces)
+            {
+                var slots = interfaceType.Methods
+                    .Select(required => classType.FindMethod(required.Name))
+                    .Select(found => found is null ? "ptr null" : $"ptr @{found.MangledName}")
+                    .ToList();
+
+                string body = slots.Count == 0 ? "ptr null" : string.Join(", ", slots);
+                int width = Math.Max(1, slots.Count);
+
+                _module.AppendLine(
+                    $"@{VTableName(classType, interfaceType)} = internal constant " +
+                    $"[{width} x ptr] [{body}]");
+            }
+
+            var entries = new string[Math.Max(1, _interfaceCount)];
+            Array.Fill(entries, "ptr null");
+            foreach (var interfaceType in classType.Interfaces)
+                entries[interfaceType.Id] = $"ptr @{VTableName(classType, interfaceType)}";
+
+            _module.AppendLine(
+                $"@{InterfaceTableName(classType)} = internal constant " +
+                $"[{entries.Length} x ptr] [{string.Join(", ", entries)}]");
+        }
     }
 
     private void StringConstants()
@@ -447,7 +518,7 @@ public sealed class LlvmEmitter
 
         foreach (var field in classType.Fields)
         {
-            if (field.Type is not (ClassTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol)) continue;
+            if (!field.Type.IsManagedSlot()) continue;
 
             string address = ClassFieldAddress("%obj", field);
             string value = Emit("ptr", $"load ptr, ptr {address}");
@@ -497,8 +568,7 @@ public sealed class LlvmEmitter
 
     private void TrackOwnedLocal(string slot, TypeSymbol type)
     {
-        if (type is ClassTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol)
-            _scopes[^1].Add((slot, type));
+        if (type.IsManagedSlot()) _scopes[^1].Add((slot, type));
     }
 
     /// <summary>Releases every owned local from the innermost scope down to <paramref name="depth"/>.</summary>
@@ -584,7 +654,7 @@ public sealed class LlvmEmitter
         string slot = Alloca(llvmType, local.Name);
         _slots[local] = slot;
 
-        if (local.Type is ClassTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol)
+        if (local.Type.IsManagedSlot())
         {
             // Owned slots start null so the first assignment's release is a no-op.
             Line($"store ptr null, ptr {slot}");
@@ -716,7 +786,7 @@ public sealed class LlvmEmitter
         var value = EmitExpression(statement.Value);
 
         // A returned reference is handed to the caller at +1.
-        if (value.Type is ClassTypeSymbol or OptionalTypeSymbol)
+        if (value.Type.NeedsArc())
             Line($"call void @sl_retain(ptr {value.Ref})");
 
         if (value.Type is StructTypeSymbol structType)
@@ -936,7 +1006,7 @@ public sealed class LlvmEmitter
             return;
         }
 
-        if (targetType is ClassTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol)
+        if (targetType.IsManagedSlot())
         {
             StoreManaged(slot, value.Ref, targetType);
             return;
@@ -964,6 +1034,9 @@ public sealed class LlvmEmitter
             case ConversionKind.Identity:
             case ConversionKind.PointerCast:
             case ConversionKind.NullToReference:
+            case ConversionKind.ClassToInterface:
+                // An interface reference is the very same pointer; the vtable is
+                // reached through the object's TypeInfo, not carried alongside it.
                 return new Val(operand.Ref, to, conversion.Type);
 
             case ConversionKind.StringLiteralToPointer:
@@ -1130,6 +1203,16 @@ public sealed class LlvmEmitter
     private Val EmitNew(BoundNew expression)
     {
         var classType = expression.ClassType;
+
+        // A runtime-provided class builds itself; sl_alloc knows nothing of its
+        // variable-sized or externally managed storage.
+        if (classType.RuntimeFactory is not null)
+        {
+            string built = Emit("ptr", $"call ptr @{classType.RuntimeFactory}()");
+            TrackTemporary(built, classType);
+            return new Val(built, "ptr", classType);
+        }
+
         string instance = Emit("ptr",
             $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
 
@@ -1143,6 +1226,35 @@ public sealed class LlvmEmitter
         // sl_alloc already returns +1; the statement scope releases it.
         TrackTemporary(instance, classType);
         return new Val(instance, "ptr", classType);
+    }
+
+    /// <summary>
+    /// Loads the implementation of an interface method for whatever object the
+    /// receiver actually is:
+    ///
+    ///   object -> TypeInfo -> interface table -> vtable -> slot
+    ///
+    /// Four loads and an indirect call, all constant-offset, with no search and
+    /// no branch. It is one load more than a C++ virtual call, which is the
+    /// price of leaving the object header alone.
+    /// </summary>
+    private string LoadInterfaceMethod(string receiver, FunctionSymbol method)
+    {
+        var interfaceType = (InterfaceTypeSymbol)method.ContainingType!;
+        int slot = interfaceType.SlotOf(method);
+
+        string typeSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {receiver}, i64 16");
+        string typeInfo = Emit("ptr", $"load ptr, ptr {typeSlot}");
+
+        string tablesSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {typeInfo}, i64 24");
+        string tables = Emit("ptr", $"load ptr, ptr {tablesSlot}");
+
+        string vtableSlot = Emit("ptr",
+            $"getelementptr inbounds ptr, ptr {tables}, i64 {interfaceType.Id}");
+        string vtable = Emit("ptr", $"load ptr, ptr {vtableSlot}");
+
+        string methodSlot = Emit("ptr", $"getelementptr inbounds ptr, ptr {vtable}, i64 {slot}");
+        return Emit("ptr", $"load ptr, ptr {methodSlot}");
     }
 
     private Val EmitCall(BoundCall call)
@@ -1160,10 +1272,16 @@ public sealed class LlvmEmitter
             arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
         }
 
+        _virtualTarget = null;
         if (call.Receiver is not null)
         {
             var receiver = EmitExpression(call.Receiver);
             arguments.Add($"ptr {receiver.Ref}");
+
+            // Resolve the target before the arguments, so its loads cannot be
+            // interleaved with argument evaluation that might reassign the slot.
+            if (function.ContainingType is InterfaceTypeSymbol)
+                _virtualTarget = LoadInterfaceMethod(receiver.Ref, function);
         }
 
         AppendArguments(function, call.Arguments, arguments);
@@ -1173,8 +1291,14 @@ public sealed class LlvmEmitter
               $"({VariadicSignature(function)})"
             : returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
 
+        // An interface method is reached through the object; everything else is
+        // a direct call to a known symbol.
+        string target = function.ContainingType is InterfaceTypeSymbol
+            ? _virtualTarget!
+            : "@" + function.MangledName;
+
         string invocation =
-            $"call {signature} @{function.MangledName}({string.Join(", ", arguments)})";
+            $"call {signature} {target}({string.Join(", ", arguments)})";
 
         if (returnInfo.Style == PassStyle.Indirect)
         {
@@ -1200,11 +1324,14 @@ public sealed class LlvmEmitter
         }
 
         // A returned reference arrives at +1 and is dropped when the statement ends.
-        if (function.ReturnType is ClassTypeSymbol or OptionalTypeSymbol)
+        if (function.ReturnType.NeedsArc())
             TrackTemporary(result, function.ReturnType);
 
         return new Val(result, returnInfo.LlvmType, function.ReturnType);
     }
+
+    /// <summary>The loaded function pointer for the interface call being emitted.</summary>
+    private string? _virtualTarget;
 
     private static string VariadicSignature(FunctionSymbol function)
     {

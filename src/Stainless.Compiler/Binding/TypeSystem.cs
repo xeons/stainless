@@ -25,6 +25,9 @@ public abstract class TypeSymbol
     /// <summary>True for types managed by ARC, i.e. class references.</summary>
     public virtual bool IsManaged => false;
 
+    /// <summary>True for a class or interface: something a reference can point at.</summary>
+    public virtual bool IsReferenceType => false;
+
     public override string ToString() => Name;
 }
 
@@ -96,10 +99,10 @@ public sealed class PointerTypeSymbol(TypeSymbol element) : TypeSymbol
     public override int GetHashCode() => HashCode.Combine("ptr", Element);
 }
 
-/// <summary><c>C?</c>: an optional class reference. Same representation, may be null.</summary>
-public sealed class OptionalTypeSymbol(ClassTypeSymbol element) : TypeSymbol
+/// <summary><c>C?</c>: an optional reference. Same representation, may be null.</summary>
+public sealed class OptionalTypeSymbol(NamedTypeSymbol element) : TypeSymbol
 {
-    public ClassTypeSymbol Element { get; } = element;
+    public NamedTypeSymbol Element { get; } = element;
     public override string Name => Element.Name + "?";
     public override int Size => 8;
     public override int Alignment => 8;
@@ -111,9 +114,9 @@ public sealed class OptionalTypeSymbol(ClassTypeSymbol element) : TypeSymbol
 }
 
 /// <summary><c>weak C?</c>: a non-owning reference that reads as null once the object dies.</summary>
-public sealed class WeakTypeSymbol(ClassTypeSymbol element) : TypeSymbol
+public sealed class WeakTypeSymbol(NamedTypeSymbol element) : TypeSymbol
 {
-    public ClassTypeSymbol Element { get; } = element;
+    public NamedTypeSymbol Element { get; } = element;
     public override string Name => "weak " + Element.Name + "?";
     public override int Size => 8;
     public override int Alignment => 8;
@@ -178,8 +181,40 @@ public sealed class StructTypeSymbol : NamedTypeSymbol
     public override int Alignment => FieldsAlignment;
 }
 
+/// <summary>
+/// An <c>interface</c>: a set of method signatures and nothing else. An
+/// interface reference is a plain object pointer, exactly like a class
+/// reference, so ARC, optionals, weak references and the calling convention all
+/// apply unchanged. Dispatch goes through the object's TypeInfo; see
+/// <see cref="Emit.LlvmEmitter"/> and docs/abi.md.
+/// </summary>
+public sealed class InterfaceTypeSymbol : NamedTypeSymbol
+{
+    public override int Size => 8;
+    public override int Alignment => 8;
+    public override bool IsManaged => true;
+    public override bool IsReferenceType => true;
+
+    /// <summary>Program-wide index, used to key the per-class dispatch table.</summary>
+    public int Id { get; internal set; } = -1;
+
+    /// <summary>Position of a method in this interface's vtable.</summary>
+    public int SlotOf(FunctionSymbol method) => Methods.IndexOf(method);
+}
+
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
+    /// <summary>Interfaces this class declares, in source order.</summary>
+    public List<InterfaceTypeSymbol> Interfaces { get; } = [];
+
+    /// <summary>
+    /// For a runtime-provided class, the C function that constructs one. When
+    /// set, <c>new</c> calls it rather than allocating and running a constructor.
+    /// </summary>
+    public string? RuntimeFactory { get; init; }
+
+    public override bool IsReferenceType => true;
+
     /// <summary>
     /// True for a class the runtime implements, such as <c>String</c>. The
     /// compiler emits no TypeInfo or destroy hook for these, because the
@@ -206,16 +241,27 @@ public static class TypeExtensions
 {
     /// <summary>True when values of this type participate in retain/release.</summary>
     public static bool NeedsArc(this TypeSymbol type) =>
-        type is ClassTypeSymbol or OptionalTypeSymbol;
+        type is ClassTypeSymbol or InterfaceTypeSymbol or OptionalTypeSymbol;
 
-    /// <summary>The class a reference type points at, or null.</summary>
-    public static ClassTypeSymbol? AsClass(this TypeSymbol type) => type switch
+    /// <summary>
+    /// True for any slot the emitter must maintain a count in: a strong
+    /// reference, an optional one, or a weak one.
+    /// </summary>
+    public static bool IsManagedSlot(this TypeSymbol type) =>
+        type.NeedsArc() || type is WeakTypeSymbol;
+
+    /// <summary>The declared type a reference points at, or null.</summary>
+    public static NamedTypeSymbol? AsReference(this TypeSymbol type) => type switch
     {
         ClassTypeSymbol c => c,
+        InterfaceTypeSymbol i => i,
         OptionalTypeSymbol o => o.Element,
         WeakTypeSymbol w => w.Element,
         _ => null,
     };
+
+    /// <summary>The class a reference type points at, or null for an interface.</summary>
+    public static ClassTypeSymbol? AsClass(this TypeSymbol type) => type.AsReference() as ClassTypeSymbol;
 
     public static bool IsVoid(this TypeSymbol type) =>
         type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Void };

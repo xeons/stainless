@@ -81,6 +81,11 @@ public static class Mangler
                 AppendIdentifier(sb, Sanitize(classType.QualifiedName));
                 break;
 
+            case InterfaceTypeSymbol interfaceType:
+                sb.Append('I');
+                AppendIdentifier(sb, Sanitize(interfaceType.QualifiedName));
+                break;
+
             case StructTypeSymbol structType:
                 sb.Append('S');
                 AppendIdentifier(sb, Sanitize(structType.QualifiedName));

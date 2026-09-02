@@ -1,0 +1,7 @@
+empty=true
+0,1,2,3,4,
+length=10
+0,1,2,3,4,
+tail1.5
+cleared=true
+snapshot kept 18 bytes

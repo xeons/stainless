@@ -134,13 +134,37 @@ var wide = message.ToUtf16();                  // owned, NUL terminated, ARC'd
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
-| | `struct` | `class` |
-|---|---|---|
-| Storage | value, inline | heap |
-| Assignment | copies bytes | copies the reference, retains |
-| Lifetime | scope | reference count reaches zero |
-| Destructor | no | yes, `~Name()` |
-| C compatible | **yes, bit-identical** | pointer-compatible only |
+### Interfaces
+
+```csharp
+public interface Shape {
+    double Area();
+    String Describe();
+}
+
+public class Circle : Shape {
+    double radius;
+    public Circle(double r) { radius = r; }
+    public double Area() { return 3.14159 * radius * radius; }
+    public String Describe() { return "circle"; }
+}
+
+double TotalArea(Shape a, Shape b) { return a.Area() + b.Area(); }
+```
+
+An interface reference **is an ordinary object pointer** — the vtable is reached
+through the object rather than carried beside it. So `Shape?`, `weak Shape?`,
+ARC and the calling convention all behave exactly as they do for a class, and a
+class can implement any number of interfaces at no per-object cost. Dispatch is
+four constant-offset loads with no search and no branch.
+
+| | `struct` | `class` | `interface` |
+|---|---|---|---|
+| Storage | value, inline | heap | a reference to one |
+| Assignment | copies bytes | copies the reference, retains | same as class |
+| Lifetime | scope | reference count reaches zero | same as class |
+| Destructor | no | yes, `~Name()` | n/a |
+| C compatible | **yes, bit-identical** | pointer-compatible only | pointer-compatible only |
 
 Primitive names and sizes match C# exactly: `sbyte short int long nint`,
 `byte ushort uint ulong nuint`, `float double`, `bool`, `char`, `void`.
@@ -159,7 +183,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 23 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 29 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -255,6 +279,8 @@ Everything below is covered by [the test suite](tests/cases).
 - `var`, `const`, explicit locals, compound assignment
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
+- `StringBuilder`: mutable text with amortised O(1) appends
+- `interface`: multiple implementation, dynamic dispatch, checked at compile time
 - `Standard.Text` (imported everywhere) and `Standard.Console`
 - Raw pointers, `sizeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#
@@ -264,9 +290,7 @@ Everything below is covered by [the test suite](tests/cases).
 
 Being straight about the edges, roughly in the order they are worth adding:
 
-- **No arrays.** Indexing works on pointers only. `String` covers text, but
-  there is no `T[]` yet, and no `StringBuilder` — repeated concatenation is
-  O(n^2).
+- **No arrays.** Indexing works on pointers only.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
   formatting; `Substring` counts bytes, not characters, so it can slice a
   multi-byte character in half.
@@ -274,7 +298,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   and unwrapped with an explicit cast, but `if (x != null)` does not yet make
   `x` usable as non-optional. `weak` has the same gap, though the runtime side
   is fully implemented.
-- **No inheritance, interfaces, or generics.**
+- **No class inheritance and no generics.** Interfaces exist, but they do not
+  extend one another, and there is no downcast from an interface back to a
+  class.
 - **No overloading by parameter type on methods** (module-level functions do
   overload).
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a

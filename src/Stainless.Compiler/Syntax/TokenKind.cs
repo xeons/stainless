@@ -8,7 +8,7 @@ public enum TokenKind
     // Declaration keywords
     ModuleKeyword, ImportKeyword, AsKeyword,
     PublicKeyword, PrivateKeyword,
-    ClassKeyword, StructKeyword,
+    ClassKeyword, StructKeyword, InterfaceKeyword,
     ExternKeyword, ExportKeyword,
 
     // Statement keywords
@@ -56,6 +56,7 @@ public static class TokenKindExtensions
         TokenKind.PrivateKeyword => "private",
         TokenKind.ClassKeyword => "class",
         TokenKind.StructKeyword => "struct",
+        TokenKind.InterfaceKeyword => "interface",
         TokenKind.ExternKeyword => "extern",
         TokenKind.ExportKeyword => "export",
         TokenKind.IfKeyword => "if",

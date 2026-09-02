@@ -9,6 +9,10 @@ public sealed class BoundProgram
     public required IReadOnlyList<ModuleSymbol> Modules { get; init; }
     public required IReadOnlyList<BoundFunction> Functions { get; init; }
     public required IReadOnlyList<ClassTypeSymbol> Classes { get; init; }
+    public required IReadOnlyList<InterfaceTypeSymbol> Interfaces { get; init; }
+
+    /// <summary>Runtime constructors for intrinsic classes, needing a declaration in the IR.</summary>
+    public required IReadOnlyList<string> RuntimeFactories { get; init; }
     public required IReadOnlyList<FunctionSymbol> ExternalFunctions { get; init; }
     public FunctionSymbol? EntryPoint { get; init; }
 }
@@ -28,6 +32,8 @@ public sealed class Binder(DiagnosticBag diagnostics)
     private readonly List<(ModuleSymbol Module, CompilationUnitSyntax Unit)> _units = [];
     private readonly List<BoundFunction> _functions = [];
     private readonly List<ClassTypeSymbol> _classes = [];
+    private readonly List<InterfaceTypeSymbol> _interfaces = [];
+    private readonly Dictionary<NamedTypeSymbol, TypeDeclSyntax> _typeSyntax = [];
 
     // Per-function binding state.
     private FunctionSymbol? _currentFunction;
@@ -43,8 +49,9 @@ public sealed class Binder(DiagnosticBag diagnostics)
         DeclareTypes();             // pass 2: every type name exists
         ResolveImports();           // pass 3: every module can see its imports
         DeclareMembers();           // pass 4: every signature and field type is resolved
-        ComputeLayouts();           // pass 5: every value type has a size
-        BindBodies();               // pass 6: only now is any code checked
+        ResolveInterfaces();        // pass 5: every class satisfies what it claims
+        ComputeLayouts();           // pass 6: every value type has a size
+        BindBodies();               // pass 7: only now is any code checked
 
         var external = _modules.Values
             .SelectMany(m => m.Functions)
@@ -58,6 +65,15 @@ public sealed class Binder(DiagnosticBag diagnostics)
             Modules = _modules.Values.ToList(),
             Functions = _functions,
             Classes = _classes,
+            Interfaces = _interfaces,
+            RuntimeFactories = _modules.Values
+                .SelectMany(m => m.Types.Values)
+                .OfType<ClassTypeSymbol>()
+                .Select(c => c.RuntimeFactory)
+                .OfType<string>()
+                .Distinct(StringComparer.Ordinal)
+                .Order(StringComparer.Ordinal)
+                .ToList(),
             ExternalFunctions = external,
             EntryPoint = FindEntryPoint(),
         };
@@ -104,22 +120,34 @@ public sealed class Binder(DiagnosticBag diagnostics)
                     continue;
                 }
 
-                NamedTypeSymbol type = declaration.Kind == TypeDeclKind.Class
-                    ? new ClassTypeSymbol
+                bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
+                NamedTypeSymbol type = declaration.Kind switch
+                {
+                    TypeDeclKind.Class => new ClassTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
-                        IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
-                    }
-                    : new StructTypeSymbol
+                        IsPublic = isPublic,
+                    },
+                    TypeDeclKind.Interface => new InterfaceTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
-                        IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
-                    };
+                        IsPublic = isPublic,
+                    },
+                    _ => new StructTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = isPublic,
+                    },
+                };
 
                 module.Types[declaration.Name] = type;
+                _typeSyntax[type] = declaration;
+
                 if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
+                if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
             }
         }
     }
@@ -198,6 +226,14 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
         foreach (var member in declaration.Members)
         {
+            if (type is InterfaceTypeSymbol && member is not FunctionDeclSyntax)
+            {
+                diagnostics.Error("SL0300", member.Span,
+                    $"interface '{type.Name}' may only declare methods; " +
+                    "it has no state, no constructor and no destructor");
+                continue;
+            }
+
             switch (member)
             {
                 case FieldDeclSyntax field:
@@ -305,7 +341,10 @@ public sealed class Binder(DiagnosticBag diagnostics)
             Linkage = declaration.Linkage,
             Kind = containingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = containingType,
-            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            // Every interface member is part of the contract, so it is public
+            // whether or not the programmer wrote the word.
+            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public)
+                       || containingType is InterfaceTypeSymbol,
             IsVariadic = declaration.IsVariadic,
             Body = declaration.Body,
             Span = declaration.Span,
@@ -322,10 +361,19 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
         AddParameters(symbol, declaration.Parameters, module);
 
-        if (declaration.Linkage != LinkageKind.ExternC && declaration.Body is null)
+        if (containingType is InterfaceTypeSymbol)
+        {
+            if (declaration.Body is not null)
+                diagnostics.Error("SL0301", declaration.Span,
+                    $"'{declaration.Name}' is an interface method and cannot have a body; " +
+                    "interfaces declare signatures only");
+        }
+        else if (declaration.Linkage != LinkageKind.ExternC && declaration.Body is null)
+        {
             diagnostics.Error("SL0210", declaration.Span,
                 $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
                 "because declaration order never matters");
+        }
 
         if (containingType is not null)
         {
@@ -400,6 +448,102 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
     // ============================================================ pass 5
 
+    /// <summary>
+    /// Resolves each class's declared interfaces and checks that it really
+    /// implements them, then numbers the interfaces for dispatch.
+    ///
+    /// Ids are assigned across the whole program, which is what lets a class's
+    /// dispatch table be indexed directly instead of searched.
+    /// </summary>
+    private void ResolveInterfaces()
+    {
+        foreach (var (type, declaration) in _typeSyntax)
+        {
+            if (declaration.Implements.Count == 0) continue;
+
+            var module = _modules[type.ModuleName];
+
+            if (type is not ClassTypeSymbol classType)
+            {
+                diagnostics.Error("SL0302", declaration.Span,
+                    type is StructTypeSymbol
+                        ? $"struct '{type.Name}' cannot implement an interface; an interface " +
+                          "reference is a counted pointer, and structs are plain C values"
+                        : $"interface '{type.Name}' cannot extend another interface yet");
+                continue;
+            }
+
+            foreach (var name in declaration.Implements)
+            {
+                var resolved = ResolveNamedType(new NamedTypeSyntax(name.Span, name), module);
+                if (resolved.IsError()) continue;
+
+                if (resolved is not InterfaceTypeSymbol interfaceType)
+                {
+                    diagnostics.Error("SL0303", name.Span,
+                        $"'{resolved.Name}' is not an interface, so '{classType.Name}' cannot " +
+                        "implement it; Stainless has no class inheritance");
+                    continue;
+                }
+
+                if (classType.Interfaces.Contains(interfaceType))
+                {
+                    diagnostics.Warning("SL0304", name.Span,
+                        $"'{classType.Name}' already lists '{interfaceType.Name}'");
+                    continue;
+                }
+
+                classType.Interfaces.Add(interfaceType);
+                VerifyImplements(classType, interfaceType, name.Span);
+            }
+        }
+
+        for (int id = 0; id < _interfaces.Count; id++)
+            _interfaces[id].Id = id;
+    }
+
+    private void VerifyImplements(
+        ClassTypeSymbol classType, InterfaceTypeSymbol interfaceType, SourceSpan span)
+    {
+        foreach (var required in interfaceType.Methods)
+        {
+            var found = classType.FindMethod(required.Name);
+
+            if (found is null)
+            {
+                diagnostics.Error("SL0305", span,
+                    $"'{classType.Name}' does not implement '{interfaceType.Name}.{required.Name}'; " +
+                    $"add 'public {required.ReturnType.Name} {required.Name}(" +
+                    string.Join(", ", required.Parameters.Where(p => !p.IsThis)
+                        .Select(p => p.Type.Name + " " + p.Name)) + ")'");
+                continue;
+            }
+
+            if (!found.IsPublic)
+            {
+                diagnostics.Error("SL0306", found.Span,
+                    $"'{classType.Name}.{found.Name}' implements " +
+                    $"'{interfaceType.Name}.{required.Name}' and must therefore be public");
+            }
+
+            var wanted = required.Parameters.Where(p => !p.IsThis).Select(p => p.Type).ToList();
+            var actual = found.Parameters.Where(p => !p.IsThis).Select(p => p.Type).ToList();
+
+            if (!found.ReturnType.Equals(required.ReturnType) ||
+                wanted.Count != actual.Count ||
+                !wanted.Zip(actual).All(pair => pair.First.Equals(pair.Second)))
+            {
+                diagnostics.Error("SL0307", found.Span,
+                    $"'{classType.Name}.{found.Name}' does not match " +
+                    $"'{interfaceType.Name}.{required.Name}'; expected " +
+                    $"'{required.ReturnType.Name} {required.Name}(" +
+                    string.Join(", ", wanted.Select(t => t.Name)) + ")'");
+            }
+        }
+    }
+
+    // ============================================================ pass 6
+
     private void ComputeLayouts()
     {
         var inProgress = new HashSet<NamedTypeSymbol>();
@@ -441,7 +585,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
         inProgress.Remove(type);
     }
 
-    // ============================================================ pass 6
+    // ============================================================ pass 7
 
     private void BindBodies()
     {
@@ -1004,8 +1148,8 @@ public sealed class Binder(DiagnosticBag diagnostics)
     }
 
     private static bool IsReferenceLike(TypeSymbol type) =>
-        type is PointerTypeSymbol or ClassTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol
-            or NullType;
+        type is PointerTypeSymbol or ClassTypeSymbol or InterfaceTypeSymbol
+            or OptionalTypeSymbol or WeakTypeSymbol or NullType;
 
     private (BoundExpression, BoundExpression) UnifyReferences(
         BoundExpression left, BoundExpression right, SourceSpan span)
@@ -1154,10 +1298,23 @@ public sealed class Binder(DiagnosticBag diagnostics)
         {
             diagnostics.Error("SL0244", syntax.Span,
                 $"'{type.Name}' is not a class; only classes are heap allocated. " +
-                (type is StructTypeSymbol
-                    ? "Declare a struct as a plain value instead."
-                    : "Use a pointer and an allocator for raw memory."));
+                type switch
+                {
+                    StructTypeSymbol => "Declare a struct as a plain value instead.",
+                    InterfaceTypeSymbol => "An interface has no implementation to construct; " +
+                                           "create a class that implements it.",
+                    _ => "Use a pointer and an allocator for raw memory.",
+                });
             return new BoundErrorExpression(syntax.Span);
+        }
+
+        // A runtime-provided class is built by its factory, not by sl_alloc.
+        if (classType.RuntimeFactory is not null)
+        {
+            if (syntax.Arguments.Count > 0)
+                diagnostics.Error("SL0308", syntax.Span,
+                    $"'new {classType.Name}()' takes no arguments");
+            return new BoundNew(syntax.Span, classType, constructor: null, []);
         }
 
         var arguments = syntax.Arguments.Select(BindExpression).ToList();
@@ -1647,16 +1804,32 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 ? ConversionKind.NullToReference
                 : null;
 
+        // A class converts to any interface it implements. Because an interface
+        // reference is the same pointer, this costs nothing at run time.
+        if (from is ClassTypeSymbol implementer && to is InterfaceTypeSymbol wanted)
+            return implementer.Interfaces.Contains(wanted) ? ConversionKind.ClassToInterface : null;
+
+        if (from is ClassTypeSymbol optionalImplementer &&
+            to is OptionalTypeSymbol { Element: InterfaceTypeSymbol optionalWanted })
+            return optionalImplementer.Interfaces.Contains(optionalWanted)
+                ? ConversionKind.ClassToInterface
+                : null;
+
         // C -> C?  and  weak C? -> C? are reference identities at runtime.
         if (from is ClassTypeSymbol fromClass && to is OptionalTypeSymbol toOptional)
             return fromClass.Equals(toOptional.Element) ? ConversionKind.ReferenceToOptional : null;
+
+        if (from is InterfaceTypeSymbol fromInterface && to is OptionalTypeSymbol toOptionalInterface)
+            return fromInterface.Equals(toOptionalInterface.Element)
+                ? ConversionKind.ReferenceToOptional
+                : null;
 
         if (from is WeakTypeSymbol fromWeak && to is OptionalTypeSymbol weakTarget)
             return fromWeak.Element.Equals(weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;
 
         // C? -> C discards a null check, so it must be explicit.
-        if (from is OptionalTypeSymbol fromOptional && to is ClassTypeSymbol toClass)
-            return explicitCast && fromOptional.Element.Equals(toClass)
+        if (from is OptionalTypeSymbol fromOptional && to is NamedTypeSymbol { IsReferenceType: true })
+            return explicitCast && fromOptional.Element.Equals(to)
                 ? ConversionKind.PointerCast
                 : null;
 
@@ -1715,11 +1888,11 @@ public sealed class Binder(DiagnosticBag diagnostics)
             {
                 var element = ResolveType(pointer.Element, module);
                 if (element.IsError()) return element;
-                if (element is ClassTypeSymbol)
+                if (element is NamedTypeSymbol { IsReferenceType: true })
                 {
                     diagnostics.Error("SL0270", syntax.Span,
-                        $"'{element.Name}' is a class, so '{element.Name}*' is not allowed; " +
-                        "a class reference is already a managed pointer");
+                        $"'{element.Name}' is a reference type, so '{element.Name}*' is not " +
+                        "allowed; it is already a managed pointer");
                     return ErrorTypeSymbol.Instance;
                 }
                 return new PointerTypeSymbol(element);
@@ -1729,14 +1902,14 @@ public sealed class Binder(DiagnosticBag diagnostics)
             {
                 var element = ResolveType(nullable.Element, module);
                 if (element.IsError()) return element;
-                if (element is not ClassTypeSymbol classType)
+                if (element is not NamedTypeSymbol { IsReferenceType: true } referenceType)
                 {
                     diagnostics.Error("SL0271", syntax.Span,
-                        $"'{element.Name}?' is not valid; only class references can be optional " +
-                        $"(a '{element.Name}' is a value and is never null)");
+                        $"'{element.Name}?' is not valid; only class and interface references can " +
+                        $"be optional (a '{element.Name}' is a value and is never null)");
                     return ErrorTypeSymbol.Instance;
                 }
-                return new OptionalTypeSymbol(classType);
+                return new OptionalTypeSymbol(referenceType);
             }
 
             case WeakTypeSyntax weak:
@@ -1744,14 +1917,14 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 var element = ResolveType(weak.Element, module);
                 if (element.IsError()) return element;
 
-                var classType = element.AsClass();
-                if (classType is null)
+                var referenced = element.AsReference();
+                if (referenced is null)
                 {
                     diagnostics.Error("SL0272", syntax.Span,
-                        $"'weak' requires a class reference, but '{element.Name}' is not one");
+                        $"'weak' requires a class or interface reference, but '{element.Name}' is not one");
                     return ErrorTypeSymbol.Instance;
                 }
-                return new WeakTypeSymbol(classType);
+                return new WeakTypeSymbol(referenced);
             }
 
             case NamedTypeSyntax named:

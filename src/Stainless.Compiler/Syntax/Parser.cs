@@ -147,7 +147,7 @@ public sealed class Parser
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
             return ParseLinkageDeclaration(start, modifiers);
 
-        if (At(TokenKind.ClassKeyword) || At(TokenKind.StructKeyword))
+        if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword, TokenKind.InterfaceKeyword))
             return [ParseTypeDeclaration(start, modifiers)];
 
         if (At(TokenKind.Tilde) && enclosingType is not null)
@@ -229,9 +229,23 @@ public sealed class Parser
 
     private Declaration ParseTypeDeclaration(int start, Modifiers modifiers)
     {
-        var kind = At(TokenKind.ClassKeyword) ? TypeDeclKind.Class : TypeDeclKind.Struct;
+        var kind = Current.Kind switch
+        {
+            TokenKind.ClassKeyword => TypeDeclKind.Class,
+            TokenKind.InterfaceKeyword => TypeDeclKind.Interface,
+            _ => TypeDeclKind.Struct,
+        };
         Advance();
         string name = ExpectIdentifier();
+
+        // `class Circle : Shape, Printable` -- a list of interfaces, as in C#.
+        var implements = new List<QualifiedName>();
+        if (Match(TokenKind.Colon))
+        {
+            do { implements.Add(ParseQualifiedName()); }
+            while (Match(TokenKind.Comma));
+        }
+
         Expect(TokenKind.OpenBrace);
 
         var members = new List<Declaration>();
@@ -243,7 +257,7 @@ public sealed class Parser
         }
         Expect(TokenKind.CloseBrace);
 
-        return new TypeDeclSyntax(SpanFrom(start), modifiers, kind, name, members);
+        return new TypeDeclSyntax(SpanFrom(start), modifiers, kind, name, implements, members);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)

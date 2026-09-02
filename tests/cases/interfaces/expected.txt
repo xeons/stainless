@@ -1,0 +1,8 @@
+circle:2 area=16
+rect:12 area=12
+total=28
+named=Circle
+null=true
+set=true
+~Circle
+~Circle

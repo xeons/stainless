@@ -33,7 +33,12 @@ A class reference is a pointer to **offset 0** (the header). The header is
 24 bytes on 64-bit targets. `TypeInfo` is a static, per-class constant:
 
 ```c
-struct TypeInfo { size_t size; void (*destroy)(void* obj); const char* name; };
+struct TypeInfo {
+    size_t              size;
+    void              (*destroy)(void* obj);
+    const char         *name;
+    const void *const  *interfaces;   /* indexed by interface id; may be NULL */
+};
 ```
 
 Because a class reference is a plain pointer, it can cross the C boundary as
@@ -68,6 +73,32 @@ function that stops at a NUL. `Utf16String` has the same shape with
 The compiler emits no `TypeInfo` or destroy hook for these two types; the
 runtime defines `sl_string_type_info` and `sl_utf16_string_type_info` itself.
 
+### 2.3 Interface dispatch
+
+An interface reference is a plain object pointer, identical in every way to a
+class reference. Nothing is carried alongside it, so ARC, optionals, weak
+references and the calling convention need no special case.
+
+The implementation is found through the object instead:
+
+```
+object ──+16──▶ TypeInfo ──+24──▶ interfaces ──[id]──▶ vtable ──[slot]──▶ function
+```
+
+Interface ids are assigned across the whole program, so `interfaces` is a flat
+array indexed directly: a dispatch is four constant-offset loads and an
+indirect call, with no search and no branch. It is one load more than a C++
+virtual call, which is the price of leaving the object header at 24 bytes and
+letting a class implement any number of interfaces at no per-object cost.
+
+The compiler emits, per implementing class, one vtable per interface plus the
+`interfaces` array; a class implementing none stores `NULL`.
+
+```llvm
+@_SLvt_App_Circle_App_Shape = internal constant [2 x ptr] [ptr @..Area.., ptr @..Describe..]
+@_SLitab_App_Circle         = internal constant [2 x ptr] [ptr @_SLvt_App_Circle_App_Shape, ptr null]
+```
+
 ## 3. Calling convention
 
 | Declaration | Symbol name | Convention |
@@ -87,7 +118,8 @@ that friction.
 mangled  := "_SL" path params "E" ret
 path     := (len ident)+                    ; module segments, then the name
 params   := type* | "v"                     ; "v" when there are none
-type     := prim | "P" type | "C" len ident | "S" len ident
+type     := prim | "P" type | "C" len ident | "S" len ident | "I" len ident
+          | "O" type | "W" type          ; optional, weak
 prim     := a  sbyte    s  short    i  int      l  long
           | h  byte     t  ushort   j  uint     m  ulong
           | n  nint     y  nuint    f  float    d  double

@@ -22,6 +22,7 @@ public sealed class Builtins
 
     public ClassTypeSymbol String { get; }
     public ClassTypeSymbol Utf16String { get; }
+    public ClassTypeSymbol StringBuilder { get; }
 
     public FunctionSymbol StringConcat { get; }
     public FunctionSymbol StringEquals { get; }
@@ -55,8 +56,21 @@ public sealed class Builtins
         };
         Utf16String.SetLayout(0, 8);
 
+        // Mutable text. Its bytes are a separate growable allocation, so `new`
+        // goes through a runtime factory rather than the usual sl_alloc.
+        StringBuilder = new ClassTypeSymbol
+        {
+            SimpleName = "StringBuilder",
+            ModuleName = TextModuleName,
+            IsPublic = true,
+            IsIntrinsic = true,
+            RuntimeFactory = "sl_string_builder_new",
+        };
+        StringBuilder.SetLayout(0, 8);
+
         Text.Types[String.SimpleName] = String;
         Text.Types[Utf16String.SimpleName] = Utf16String;
+        Text.Types[StringBuilder.SimpleName] = StringBuilder;
 
         // --- String methods ------------------------------------------------
         Method(String, "ByteLength", PrimitiveTypeSymbol.NUInt, "sl_string_byte_length");
@@ -71,11 +85,28 @@ public sealed class Builtins
         Method(Utf16String, "UnitCount", PrimitiveTypeSymbol.NUInt, "sl_utf16_unit_count");
         Method(Utf16String, "ToPointer", UShortPointer, "sl_utf16_pointer");
 
+        // --- StringBuilder methods ------------------------------------------
+        Method(StringBuilder, "Append", PrimitiveTypeSymbol.Void, "sl_string_builder_append",
+            ("text", String));
+        Method(StringBuilder, "AppendLine", PrimitiveTypeSymbol.Void, "sl_string_builder_append_line",
+            ("text", String));
+        Method(StringBuilder, "AppendInteger", PrimitiveTypeSymbol.Void,
+            "sl_string_builder_append_integer", ("value", PrimitiveTypeSymbol.Long));
+        Method(StringBuilder, "AppendDouble", PrimitiveTypeSymbol.Void,
+            "sl_string_builder_append_double", ("value", PrimitiveTypeSymbol.Double));
+        Method(StringBuilder, "ByteLength", PrimitiveTypeSymbol.NUInt,
+            "sl_string_builder_byte_length");
+        Method(StringBuilder, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_builder_is_empty");
+        Method(StringBuilder, "Clear", PrimitiveTypeSymbol.Void, "sl_string_builder_clear");
+        Method(StringBuilder, "ToText", String, "sl_string_builder_to_string");
+
         // --- Standard.Text free functions -----------------------------------
         Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.Long));
         Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.NUInt));
+        Function(Text, "FromBool", String, "sl_string_from_bool",
+            ("value", PrimitiveTypeSymbol.Bool));
         Function(Text, "FromDouble", String, "sl_string_from_double",
             ("value", PrimitiveTypeSymbol.Double));
         Function(Text, "FromBytes", String, "sl_string_from_bytes",
@@ -126,8 +157,7 @@ public sealed class Builtins
         string runtimeSymbol,
         params (string Name, TypeSymbol Type)[] parameters)
     {
-        var symbol = Declare(owner.ModuleName == TextModuleName ? Text : Console,
-            name, returnType, runtimeSymbol, owner, parameters);
+        var symbol = Declare(Text, name, returnType, runtimeSymbol, owner, parameters);
         owner.Methods.Add(symbol);
         return symbol;
     }

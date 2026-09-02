@@ -15,9 +15,16 @@
 #include <string.h>
 
 typedef struct SlTypeInfo {
-    size_t       size;          /* header + fields, in bytes            */
-    void       (*destroy)(void *);
-    const char  *name;
+    size_t              size;   /* header + fields, in bytes            */
+    void              (*destroy)(void *);
+    const char         *name;
+    const void *const  *interfaces;
+    /*
+     * interfaces[id] is the vtable this type provides for the interface with
+     * that id, or NULL. Interface ids are assigned across the whole program, so
+     * the array is directly indexed and a dispatch never searches. The compiler
+     * builds these; NULL means the type implements none.
+     */
 } SlTypeInfo;
 
 typedef struct SlObject {
@@ -119,7 +126,7 @@ typedef struct SlString {
 static void sl_string_destroy(void *object) { (void)object; }
 
 const SlTypeInfo sl_string_type_info = {
-    sizeof(SlString), sl_string_destroy, "Standard.Text.String"
+    sizeof(SlString), sl_string_destroy, "Standard.Text.String", NULL
 };
 
 static uint8_t *sl_string_data(SlString *string)
@@ -225,6 +232,12 @@ void *sl_string_from_integer(long long value)
     return sl_string_from_bytes((const uint8_t *)buffer, (size_t)(written < 0 ? 0 : written));
 }
 
+void *sl_string_from_bool(_Bool value)
+{
+    return value ? sl_string_from_bytes((const uint8_t *)"true", 4)
+                 : sl_string_from_bytes((const uint8_t *)"false", 5);
+}
+
 void *sl_string_from_double(double value)
 {
     char buffer[64];
@@ -247,7 +260,7 @@ typedef struct SlUtf16String {
 static void sl_utf16_string_destroy(void *object) { (void)object; }
 
 const SlTypeInfo sl_utf16_string_type_info = {
-    sizeof(SlUtf16String), sl_utf16_string_destroy, "Standard.Text.Utf16String"
+    sizeof(SlUtf16String), sl_utf16_string_destroy, "Standard.Text.Utf16String", NULL
 };
 
 static uint16_t *sl_utf16_data(SlUtf16String *string)
@@ -333,6 +346,115 @@ const uint16_t *sl_utf16_pointer(void *pointer)
 size_t sl_utf16_unit_count(void *pointer)
 {
     return ((SlUtf16String *)pointer)->unitCount;
+}
+
+/* ----------------------------------------------------------- StringBuilder */
+
+/*
+ * The mutable counterpart to String. Unlike String, the bytes are a separate
+ * growable allocation, because the object must outlive any particular capacity.
+ * Appending is amortised O(1), which is the whole reason this type exists:
+ * building text by repeated String concatenation is O(n^2).
+ */
+typedef struct SlStringBuilder {
+    SlObject  base;
+    uint8_t  *bytes;
+    size_t    length;
+    size_t    capacity;
+} SlStringBuilder;
+
+static void sl_string_builder_destroy(void *object)
+{
+    free(((SlStringBuilder *)object)->bytes);
+}
+
+const SlTypeInfo sl_string_builder_type_info = {
+    sizeof(SlStringBuilder), sl_string_builder_destroy, "Standard.Text.StringBuilder", NULL
+};
+
+void *sl_string_builder_new(void)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)calloc(1, sizeof(SlStringBuilder));
+    if (builder == NULL) abort();
+
+    builder->base.strong = 1;
+    builder->base.weak   = 1;
+    builder->base.type   = &sl_string_builder_type_info;
+    return builder;
+}
+
+static void sl_string_builder_reserve(SlStringBuilder *builder, size_t extra)
+{
+    if (builder->length + extra <= builder->capacity) return;
+
+    size_t capacity = builder->capacity == 0 ? 32 : builder->capacity;
+    while (capacity < builder->length + extra) capacity *= 2;
+
+    uint8_t *bytes = (uint8_t *)realloc(builder->bytes, capacity);
+    if (bytes == NULL) abort();
+
+    builder->bytes    = bytes;
+    builder->capacity = capacity;
+}
+
+void sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t byteLength)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)pointer;
+    if (byteLength == 0 || data == NULL) return;
+
+    sl_string_builder_reserve(builder, byteLength);
+    memcpy(builder->bytes + builder->length, data, byteLength);
+    builder->length += byteLength;
+}
+
+void sl_string_builder_append(void *pointer, void *stringPointer)
+{
+    SlString *string = (SlString *)stringPointer;
+    if (string == NULL) return;
+    sl_string_builder_append_bytes(pointer, sl_string_data(string), string->byteLength);
+}
+
+void sl_string_builder_append_line(void *pointer, void *stringPointer)
+{
+    static const uint8_t newline = (uint8_t)'\n';
+    sl_string_builder_append(pointer, stringPointer);
+    sl_string_builder_append_bytes(pointer, &newline, 1);
+}
+
+void sl_string_builder_append_integer(void *pointer, long long value)
+{
+    char buffer[32];
+    int  written = snprintf(buffer, sizeof buffer, "%lld", value);
+    if (written > 0) sl_string_builder_append_bytes(pointer, (const uint8_t *)buffer, (size_t)written);
+}
+
+void sl_string_builder_append_double(void *pointer, double value)
+{
+    char buffer[64];
+    int  written = snprintf(buffer, sizeof buffer, "%g", value);
+    if (written > 0) sl_string_builder_append_bytes(pointer, (const uint8_t *)buffer, (size_t)written);
+}
+
+size_t sl_string_builder_byte_length(void *pointer)
+{
+    return ((SlStringBuilder *)pointer)->length;
+}
+
+_Bool sl_string_builder_is_empty(void *pointer)
+{
+    return ((SlStringBuilder *)pointer)->length == 0;
+}
+
+void sl_string_builder_clear(void *pointer)
+{
+    ((SlStringBuilder *)pointer)->length = 0;
+}
+
+/* Snapshots the builder; the builder stays usable afterwards. */
+void *sl_string_builder_to_string(void *pointer)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)pointer;
+    return sl_string_from_bytes(builder->bytes, builder->length);
 }
 
 /* ----------------------------------------------------------------- Console */

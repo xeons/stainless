@@ -30,6 +30,7 @@ public enum ConversionKind
     BoolToInteger,
     NullToReference,    // null literal adopting an optional/pointer type
     ReferenceToOptional, // C -> C?
+    ClassToInterface,   // C -> I; the same pointer, since dispatch goes via TypeInfo
 
     /// <summary>
     /// A string literal used where a <c>byte*</c> is expected. Safe only for a

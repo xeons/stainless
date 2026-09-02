@@ -121,6 +121,46 @@ a count of 1.
 | `C?` | optional strong reference, may be null |
 | `weak C?` | non-owning reference; becomes null when the object dies |
 
+### 2.5 `interface` — a contract, dispatched dynamically
+
+```csharp
+public interface Shape {
+    double Area();
+    String Describe();
+}
+
+public class Circle : Shape {
+    double radius;
+
+    public Circle(double r) { radius = r; }
+
+    public double Area() { return 3.14159 * radius * radius; }
+    public String Describe() { return "circle"; }
+}
+
+double TotalArea(Shape a, Shape b) { return a.Area() + b.Area(); }
+```
+
+An interface declares method signatures and nothing else: no fields, no
+constructor, no destructor, no bodies. Every member is public whether or not
+the word is written, since the whole point is the contract.
+
+A class lists the interfaces it implements after `:`, and must supply a public
+method matching each signature exactly. Conversion from the class to the
+interface is implicit and free.
+
+An interface reference **is an ordinary object pointer** — the vtable is
+reached through the object rather than carried alongside it. So `Shape?`,
+`weak Shape?`, ARC and the calling convention all behave exactly as they do for
+a class, and passing a `Shape` costs the same as passing any reference.
+
+A `struct` cannot implement an interface: an interface reference is counted,
+and a struct is a plain C value with nowhere to keep a count.
+
+Dispatch is four constant-offset loads with no search and no branch — see
+[abi.md](abi.md) for the tables. There is no class inheritance, no interface
+inheritance, and no downcasting from an interface back to a class.
+
 ## 3. Text
 
 Stainless has exactly one string type. `String` is immutable, reference
@@ -178,7 +218,8 @@ structs are copied as raw bytes, which is what keeps them C-compatible.
 
 `Standard.Text` is imported into every module automatically, since a literal
 produces a `String` whether the program asked for one or not. It also provides
-`FromInteger`, `FromDouble`, `FromBytes` and `FromNullTerminated`.
+`FromInteger`, `FromDouble`, `FromBool`, `FromBytes` and `FromNullTerminated`,
+plus `StringBuilder`.
 
 `Standard.Console` is *not* automatic and provides `Write`, `WriteLine` and
 `WriteError`.
@@ -221,6 +262,32 @@ MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
 It offers `UnitCount()` and `ToPointer()`, which returns `ushort*`.
+
+### 3.5 StringBuilder
+
+`String` is immutable, so building text by repeated concatenation is O(n^2).
+`StringBuilder` is the mutable counterpart, with amortised O(1) appends:
+
+```csharp
+var builder = new StringBuilder();
+for (int i = 0; i < 5; i = i + 1) {
+    builder.AppendInteger(i);
+    builder.Append(",");
+}
+Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
+```
+
+| Member | Result |
+|---|---|
+| `Append(String)` | `void` |
+| `AppendLine(String)` | `void`, adds a newline |
+| `AppendInteger(long)`, `AppendDouble(double)` | `void` |
+| `ByteLength()`, `IsEmpty()` | `nuint`, `bool` |
+| `Clear()` | `void`, keeps the capacity |
+| `ToText()` | `String`, a snapshot; the builder stays usable |
+
+Unlike `String`, its bytes are a separate growable allocation, so it is not
+NUL-terminated and has no `ToPointer()`. Call `ToText().ToPointer()` to reach C.
 
 ## 4. Functions and members
 

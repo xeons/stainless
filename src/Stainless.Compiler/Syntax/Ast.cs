@@ -88,13 +88,14 @@ public sealed record DestructorDeclSyntax(
     string TypeName,
     BlockSyntax Body) : Declaration(Span, Modifiers.None);
 
-public enum TypeDeclKind { Struct, Class }
+public enum TypeDeclKind { Struct, Class, Interface }
 
 public sealed record TypeDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,
     TypeDeclKind Kind,
     string Name,
+    IReadOnlyList<QualifiedName> Implements,
     IReadOnlyList<Declaration> Members) : Declaration(Span, Modifiers);
 
 /// <summary>A module-level <c>const</c>.</summary>
