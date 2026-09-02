@@ -44,7 +44,8 @@ clang. Startup cost is a C program's startup cost.
 
 **3. ARC, not GC.** `class` types are reference counted and destroyed
 deterministically. No collector, no pauses, no tracing thread — the entire
-runtime is [one 80-line C file](runtime/stainless_rt.c).
+runtime is [six small C files](runtime/): reference counting, text, UTF-16,
+a string builder, arrays, and console output.
 
 **4. C/C++ ABI compatible.** A Stainless `struct` *is* a C struct, byte for byte.
 `extern "C"` calls into C and `export "C"` exposes functions back, with no
@@ -134,6 +135,26 @@ var wide = message.ToUtf16();                  // owned, NUL terminated, ARC'd
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
+### Arrays and generics
+
+```csharp
+var numbers = new int[5];
+numbers[2] = 9;                     // bounds checked, unsigned compare
+
+public class List<T> {
+    T[] items;
+    nuint count;
+    public void Add(T item) { ... }
+    public T At(nuint index) { return items[index]; }
+}
+
+var names = new List<String>();     // a real type, compiled for String
+```
+
+Generics **monomorphize**: `Box<int>` and `Box<String>` are two separate types
+with no boxing and no indirection, so `Box<int>` stores a bare `int`. Type
+arguments on a call are inferred from the values passed.
+
 ### Interfaces
 
 ```csharp
@@ -183,7 +204,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 29 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 35 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -246,7 +267,7 @@ stainless run samples/interop/interop.sl samples/interop/native.c
 | [Binding/Mangler.cs](src/Stainless.Compiler/Binding/Mangler.cs) | symbol names |
 | [Emit/Win64Abi.cs](src/Stainless.Compiler/Emit/Win64Abi.cs) | struct passing: register, `byval`, or `sret` |
 | [Emit/LlvmEmitter.cs](src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, plus retain/release insertion |
-| [runtime/stainless_rt.c](runtime/stainless_rt.c) | the whole runtime |
+| [runtime/](runtime/) | the whole runtime, split by feature |
 
 ### Why textual IR
 
@@ -279,6 +300,9 @@ Everything below is covered by [the test suite](tests/cases).
 - `var`, `const`, explicit locals, compound assignment
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
+- `T[]`: counted arrays, always bounds checked, elements released with the array
+- Generics: generic classes, interfaces and functions, monomorphized, with
+  inference at call sites
 - `StringBuilder`: mutable text with amortised O(1) appends
 - `interface`: multiple implementation, dynamic dispatch, checked at compile time
 - `Standard.Text` (imported everywhere) and `Standard.Console`
@@ -290,7 +314,13 @@ Everything below is covered by [the test suite](tests/cases).
 
 Being straight about the edges, roughly in the order they are worth adding:
 
-- **No arrays.** Indexing works on pointers only.
+- **No generic constraints.** There is no `where T : Shape`, so an error
+  inside a template surfaces at the instantiation rather than the declaration,
+  and an unused template is never checked at all.
+- **Type arguments cannot be written at a call.** `Pick<int>(...)` is rejected,
+  because `<` in expression position is ambiguous with less-than; inference
+  reads argument types only.
+- **No generic methods**, only generic types and generic free functions.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
   formatting; `Substring` counts bytes, not characters, so it can slice a
   multi-byte character in half.
@@ -316,7 +346,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 
 ```
 docs/                  language specification and ABI
-runtime/               the ARC runtime (one C file, embedded in the compiler)
+runtime/               the runtime, split by feature, embedded in the compiler
 samples/               example programs
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command

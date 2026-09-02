@@ -237,6 +237,7 @@ public sealed class Parser
         };
         Advance();
         string name = ExpectIdentifier();
+        var typeParameters = ParseTypeParameterList();
 
         // `class Circle : Shape, Printable` -- a list of interfaces, as in C#.
         var implements = new List<QualifiedName>();
@@ -257,7 +258,8 @@ public sealed class Parser
         }
         Expect(TokenKind.CloseBrace);
 
-        return new TypeDeclSyntax(SpanFrom(start), modifiers, kind, name, implements, members);
+        return new TypeDeclSyntax(
+            SpanFrom(start), modifiers, kind, name, typeParameters, implements, members);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)
@@ -295,6 +297,10 @@ public sealed class Parser
         var returnType = ParseType();
         string name = ExpectIdentifier();
 
+        // `T Max<T>(T a, T b)`. Only a function may be generic, so the list is
+        // accepted here and rejected below if no parameter list follows.
+        var typeParameters = At(TokenKind.Less) ? ParseTypeParameterList() : [];
+
         if (At(TokenKind.OpenParen))
         {
             var parameters = ParseParameterList(out bool isVariadic);
@@ -307,8 +313,13 @@ public sealed class Parser
                     $"'extern \"C\"' declares an external function, so '{name}' must not have a body; use 'export \"C\"' to define one");
 
             return new FunctionDeclSyntax(
-                SpanFrom(start), modifiers, linkage, returnType, name, parameters, isVariadic, body);
+                SpanFrom(start), modifiers, linkage, returnType, name, typeParameters,
+                parameters, isVariadic, body);
         }
+
+        if (typeParameters.Count > 0)
+            _diagnostics.Error("SL0320", SpanFrom(start),
+                $"'{name}' is a field and cannot have type parameters");
 
         ExpressionSyntax? initializer = Match(TokenKind.Equals) ? ParseExpression() : null;
         Expect(TokenKind.Semicolon);
@@ -377,17 +388,59 @@ public sealed class Parser
         else
         {
             var name = ParseQualifiedName();
-            type = new NamedTypeSyntax(SpanFrom(start), name);
+            var arguments = ParseTypeArgumentList();
+            type = new NamedTypeSyntax(SpanFrom(start), name, arguments);
         }
 
         while (true)
         {
             if (Match(TokenKind.Star)) { type = new PointerTypeSyntax(SpanFrom(start), type); continue; }
             if (Match(TokenKind.Question)) { type = new NullableTypeSyntax(SpanFrom(start), type); continue; }
+
+            // Only empty brackets are part of a type. `new int[10]` keeps its
+            // length expression for the caller to read.
+            if (At(TokenKind.OpenBracket) && Peek(1).Kind == TokenKind.CloseBracket)
+            {
+                Advance();
+                Advance();
+                type = new ArrayTypeSyntax(SpanFrom(start), type);
+                continue;
+            }
+
             break;
         }
 
         return type;
+    }
+
+    /// <summary>
+    /// Parses <c>&lt;int, String&gt;</c> after a type name. In type position a
+    /// '&lt;' can only begin type arguments, so no lookahead is needed here; in
+    /// expression position the caller speculates instead.
+    /// </summary>
+    private List<TypeSyntax> ParseTypeArgumentList()
+    {
+        var arguments = new List<TypeSyntax>();
+        if (!Match(TokenKind.Less)) return arguments;
+
+        do { arguments.Add(ParseType()); }
+        while (Match(TokenKind.Comma));
+
+        Expect(TokenKind.Greater);
+        return arguments;
+    }
+
+    /// <summary>Parses <c>&lt;T, U&gt;</c> in a declaration.</summary>
+    private List<string> ParseTypeParameterList()
+    {
+        var parameters = new List<string>();
+        if (!Match(TokenKind.Less)) return parameters;
+
+        do { parameters.Add(ExpectIdentifier()); }
+        while (Match(TokenKind.Comma));
+
+        Expect(TokenKind.Greater);
+        return parameters;
     }
 
     // ------------------------------------------------------------ statements
@@ -682,6 +735,17 @@ public sealed class Parser
             {
                 Advance();
                 var type = ParseType();
+
+                // `new T[n]`: ParseType stopped at the bracket because a length
+                // follows rather than a closing bracket.
+                if (At(TokenKind.OpenBracket))
+                {
+                    Advance();
+                    var length = ParseExpression();
+                    Expect(TokenKind.CloseBracket);
+                    return new NewArraySyntax(SpanFrom(start), type, length);
+                }
+
                 var arguments = At(TokenKind.OpenParen) ? ParseArgumentList() : [];
                 return new NewSyntax(SpanFrom(start), type, arguments);
             }

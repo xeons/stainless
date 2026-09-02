@@ -21,11 +21,23 @@ public abstract record TypeSyntax(SourceSpan Span) : SyntaxNode(Span);
 /// <summary>A built-in type keyword: <c>int</c>, <c>double</c>, <c>void</c>, …</summary>
 public sealed record PrimitiveTypeSyntax(SourceSpan Span, TokenKind Keyword) : TypeSyntax(Span);
 
-/// <summary>A user-declared type referenced by name.</summary>
-public sealed record NamedTypeSyntax(SourceSpan Span, QualifiedName Name) : TypeSyntax(Span);
+/// <summary>
+/// A user-declared type referenced by name, with type arguments when the type
+/// is generic: <c>Box</c>, <c>Box&lt;int&gt;</c>, <c>Pair&lt;int, String&gt;</c>.
+/// </summary>
+public sealed record NamedTypeSyntax(
+    SourceSpan Span,
+    QualifiedName Name,
+    IReadOnlyList<TypeSyntax> TypeArguments) : TypeSyntax(Span)
+{
+    public NamedTypeSyntax(SourceSpan span, QualifiedName name) : this(span, name, []) { }
+}
 
 /// <summary><c>T*</c> — a raw, unmanaged, C-compatible pointer.</summary>
 public sealed record PointerTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
+
+/// <summary><c>T[]</c> — a counted array of T.</summary>
+public sealed record ArrayTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
 /// <summary><c>T?</c> — an optional class reference.</summary>
 public sealed record NullableTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
@@ -65,6 +77,7 @@ public sealed record FunctionDeclSyntax(
     LinkageKind Linkage,
     TypeSyntax ReturnType,
     string Name,
+    IReadOnlyList<string> TypeParameters,
     IReadOnlyList<ParameterSyntax> Parameters,
     bool IsVariadic,
     BlockSyntax? Body) : Declaration(Span, Modifiers);
@@ -95,6 +108,7 @@ public sealed record TypeDeclSyntax(
     Modifiers Modifiers,
     TypeDeclKind Kind,
     string Name,
+    IReadOnlyList<string> TypeParameters,
     IReadOnlyList<QualifiedName> Implements,
     IReadOnlyList<Declaration> Members) : Declaration(Span, Modifiers);
 
@@ -204,6 +218,12 @@ public sealed record NewSyntax(
     SourceSpan Span,
     TypeSyntax Type,
     IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span);
+
+/// <summary><c>new T[n]</c> — allocates a zeroed array of n elements.</summary>
+public sealed record NewArraySyntax(
+    SourceSpan Span,
+    TypeSyntax ElementType,
+    ExpressionSyntax Length) : ExpressionSyntax(Span);
 
 public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);

@@ -65,6 +65,9 @@ public sealed class LlvmEmitter
         foreach (var classType in program.Classes)
             EmitDestroyThunk(classType);
 
+        foreach (var arrayType in program.Arrays)
+            EmitArrayDestroyThunk(arrayType);
+
         InterfaceTables(program);
 
         if (program.EntryPoint is not null)
@@ -114,6 +117,8 @@ public sealed class LlvmEmitter
         _module.AppendLine("@sl_string_type_info = external constant %SlTypeInfo");
         _module.AppendLine("@sl_utf16_string_type_info = external constant %SlTypeInfo");
         _module.AppendLine("@sl_string_builder_type_info = external constant %SlTypeInfo");
+        _module.AppendLine("declare ptr @sl_array_alloc(ptr, i64, i64)");
+        _module.AppendLine("declare void @sl_array_bounds_fail(i64, i64)");
         _module.AppendLine("declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
         _module.AppendLine();
     }
@@ -170,17 +175,34 @@ public sealed class LlvmEmitter
                 $"ptr {nameConstant}, ptr {tables} }}");
         }
 
-        if (program.Classes.Count > 0) _module.AppendLine();
+        // One TypeInfo per array type. The element type is not recorded at run
+        // time; instead each destroy hook already knows how to walk its elements,
+        // which keeps the array header the same 32 bytes whatever it holds.
+        foreach (var arrayType in program.Arrays)
+        {
+            string nameConstant = InternBytes(arrayType.Name);
+            _module.AppendLine(
+                $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
+                $"{{ i64 {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
+                $"ptr {nameConstant}, ptr null }}");
+        }
+
+        if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
     }
+
+    private static string ArraySuffix(ArrayTypeSymbol type) => Mangler.SymbolSafe(type.Name);
+
+    private static string ArrayTypeInfoName(ArrayTypeSymbol type) => "_SLti_array_" + ArraySuffix(type);
+    private static string ArrayDestroyName(ArrayTypeSymbol type) => "_SLdestroy_array_" + ArraySuffix(type);
 
     /// <summary>Total interfaces in the program; the width of every dispatch table.</summary>
     private int _interfaceCount;
 
     private static string InterfaceTableName(ClassTypeSymbol type) =>
-        "_SLitab_" + type.QualifiedName.Replace('.', '_');
+        "_SLitab_" + Mangler.SymbolSafe(type.QualifiedName);
 
     private static string VTableName(ClassTypeSymbol type, InterfaceTypeSymbol iface) =>
-        "_SLvt_" + type.QualifiedName.Replace('.', '_') + "_" + iface.QualifiedName.Replace('.', '_');
+        "_SLvt_" + Mangler.SymbolSafe(type.QualifiedName) + "_" + Mangler.SymbolSafe(iface.QualifiedName);
 
     /// <summary>
     /// Emits, for every class that implements something, one vtable per
@@ -313,10 +335,10 @@ public sealed class LlvmEmitter
     };
 
     private static string StructName(StructTypeSymbol type) =>
-        "%struct." + type.QualifiedName.Replace('.', '_');
+        "%struct." + Mangler.SymbolSafe(type.QualifiedName);
 
     private static string DestroyName(ClassTypeSymbol type) =>
-        "_SLdestroy_" + type.QualifiedName.Replace('.', '_');
+        "_SLdestroy_" + Mangler.SymbolSafe(type.QualifiedName);
 
     private static bool IsSigned(TypeSymbol type) =>
         type is PrimitiveTypeSymbol { IsSigned: true };
@@ -525,6 +547,60 @@ public sealed class LlvmEmitter
             Line(field.Type is WeakTypeSymbol
                 ? $"call void @sl_weak_release(ptr {value})"
                 : $"call void @sl_release(ptr {value})");
+        }
+
+        Terminator("ret void");
+        _module.AppendLine("entry:");
+        _module.Append(_entryAllocas);
+        _module.Append(_body);
+        _module.AppendLine("}");
+        _module.AppendLine();
+    }
+
+    /// <summary>
+    /// Releases an array's elements. For an array of values this is empty and
+    /// the optimiser deletes the call; for an array of references it is a loop.
+    /// </summary>
+    private void EmitArrayDestroyThunk(ArrayTypeSymbol arrayType)
+    {
+        ResetFunctionState();
+        _module.AppendLine($"define internal void @{ArrayDestroyName(arrayType)}(ptr %obj) {{");
+        _body.Clear();
+        _blockTerminated = false;
+
+        if (arrayType.Element.IsManagedSlot())
+        {
+            bool weak = arrayType.Element is WeakTypeSymbol;
+            string elementType = LlvmTypeOf(arrayType.Element);
+
+            string lengthSlot = Emit("ptr", "getelementptr inbounds i8, ptr %obj, i64 24");
+            string length = Emit("i64", $"load i64, ptr {lengthSlot}");
+            string data = Emit("ptr",
+                $"getelementptr inbounds i8, ptr %obj, i64 {ArrayTypeSymbol.HeaderSize}");
+
+            string counter = Alloca("i64", "i");
+            Line($"store i64 0, ptr {counter}");
+
+            string conditionLabel = NextLabel("free.cond");
+            string bodyLabel = NextLabel("free.body");
+            string endLabel = NextLabel("free.end");
+
+            Terminator($"br label %{conditionLabel}");
+            Label(conditionLabel);
+            string index = Emit("i64", $"load i64, ptr {counter}");
+            string more = Emit("i1", $"icmp ult i64 {index}, {length}");
+            Terminator($"br i1 {more}, label %{bodyLabel}, label %{endLabel}");
+
+            Label(bodyLabel);
+            string slot = Emit("ptr",
+                $"getelementptr inbounds {elementType}, ptr {data}, i64 {index}");
+            string element = Emit("ptr", $"load ptr, ptr {slot}");
+            Line($"call void @{(weak ? "sl_weak_release" : "sl_release")}(ptr {element})");
+            string next = Emit("i64", $"add i64 {index}, 1");
+            Line($"store i64 {next}, ptr {counter}");
+            Terminator($"br label %{conditionLabel}");
+
+            Label(endLabel);
         }
 
         Terminator("ret void");
@@ -854,6 +930,8 @@ public sealed class LlvmEmitter
             case BoundAssignment assignment: return EmitAssignment(assignment);
             case BoundCall call: return EmitCall(call);
             case BoundNew newExpression: return EmitNew(newExpression);
+            case BoundNewArray newArray: return EmitNewArray(newArray);
+            case BoundArrayLength length: return EmitArrayLength(length);
 
             default:
                 return new Val("0", "i32", PrimitiveTypeSymbol.Int);
@@ -936,6 +1014,8 @@ public sealed class LlvmEmitter
 
             case BoundIndex index:
             {
+                if (index.Target.Type is ArrayTypeSymbol) return EmitArrayElementAddress(index);
+
                 var target = EmitExpression(index.Target);
                 var offset = EmitExpression(index.Index);
                 string elementType = LlvmTypeOf(index.Type);
@@ -1255,6 +1335,56 @@ public sealed class LlvmEmitter
 
         string methodSlot = Emit("ptr", $"getelementptr inbounds ptr, ptr {vtable}, i64 {slot}");
         return Emit("ptr", $"load ptr, ptr {methodSlot}");
+    }
+
+    private Val EmitNewArray(BoundNewArray expression)
+    {
+        var arrayType = expression.ArrayType;
+        var length = EmitExpression(expression.Length);
+
+        string array = Emit("ptr",
+            $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
+            $"i64 {length.Ref}, i64 {arrayType.Element.Size})");
+
+        TrackTemporary(array, arrayType);
+        return new Val(array, "ptr", arrayType);
+    }
+
+    private Val EmitArrayLength(BoundArrayLength expression)
+    {
+        var array = EmitExpression(expression.Array);
+        string slot = Emit("ptr", $"getelementptr inbounds i8, ptr {array.Ref}, i64 24");
+        return new Val(Emit("i64", $"load i64, ptr {slot}"), "i64", expression.Type);
+    }
+
+    /// <summary>
+    /// Computes the address of <c>array[index]</c>, trapping first if the index
+    /// is out of range. The index is unsigned, so one compare covers both ends.
+    /// </summary>
+    private string EmitArrayElementAddress(BoundIndex index)
+    {
+        var arrayType = (ArrayTypeSymbol)index.Target.Type;
+        var array = EmitExpression(index.Target);
+        var offset = EmitExpression(index.Index);
+
+        string widened = WidenIndex(offset);
+        string lengthSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {array.Ref}, i64 24");
+        string length = Emit("i64", $"load i64, ptr {lengthSlot}");
+        string inRange = Emit("i1", $"icmp ult i64 {widened}, {length}");
+
+        string okLabel = NextLabel("bounds.ok");
+        string failLabel = NextLabel("bounds.fail");
+        Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
+
+        Label(failLabel);
+        Line($"call void @sl_array_bounds_fail(i64 {widened}, i64 {length})");
+        Terminator("unreachable");
+
+        Label(okLabel);
+        string data = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {array.Ref}, i64 {ArrayTypeSymbol.HeaderSize}");
+        return Emit("ptr",
+            $"getelementptr inbounds {LlvmTypeOf(arrayType.Element)}, ptr {data}, i64 {widened}");
     }
 
     private Val EmitCall(BoundCall call)

@@ -73,7 +73,22 @@ function that stops at a NUL. `Utf16String` has the same shape with
 The compiler emits no `TypeInfo` or destroy hook for these two types; the
 runtime defines `sl_string_type_info` and `sl_utf16_string_type_info` itself.
 
-### 2.3 Interface dispatch
+### 2.3 Array layout
+
+An array is the same kind of object, with its elements inline after a length:
+
+```
+offset 0   strong / 8 weak / 16 type
+offset 24  length              element count, not bytes
+offset 32  elements[length]
+```
+
+The element type is deliberately not recorded. The compiler emits one TypeInfo
+per array type, and that type's destroy hook already knows whether its elements
+are counted and how to walk them — so `int[]` gets an empty hook the optimiser
+deletes, and `String[]` gets a release loop.
+
+### 2.4 Interface dispatch
 
 An interface reference is a plain object pointer, identical in every way to a
 class reference. Nothing is carried alongside it, so ARC, optionals, weak

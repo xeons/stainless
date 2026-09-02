@@ -65,42 +65,76 @@ public sealed class Toolchain
         }
     }
 
+    private const string RuntimeResourcePrefix = "Stainless.Runtime.";
+
     /// <summary>
-    /// Writes the ARC runtime out of the compiler's own resources and compiles it
-    /// to an object file, reusing the result when it is already current.
+    /// Writes the runtime out of the compiler's own resources and compiles each
+    /// translation unit, reusing object files whose source has not changed.
+    ///
+    /// The runtime ships as several files split by feature rather than one blob,
+    /// so a change to, say, the array code does not force the string code to be
+    /// rebuilt, and each unit stays small enough to read in one sitting.
     /// </summary>
-    public string BuildRuntime(string objectDirectory)
+    public IReadOnlyList<string> BuildRuntime(string objectDirectory)
     {
         Directory.CreateDirectory(objectDirectory);
 
-        string source = Path.Combine(objectDirectory, "stainless_rt.c");
-        string objectFile = Path.Combine(objectDirectory, "stainless_rt.o");
+        var sources = ReadEmbeddedRuntime();
+        if (sources.Count == 0)
+            throw new InvalidOperationException("the runtime is missing from the compiler assembly");
 
-        string text = ReadEmbeddedRuntime();
-        bool sourceChanged = !File.Exists(source) || File.ReadAllText(source) != text;
-        if (sourceChanged) File.WriteAllText(source, text);
+        // A header change invalidates every object file, since any unit may include it.
+        bool headersChanged = false;
+        foreach (var (name, text) in sources.Where(s => s.Key.EndsWith(".h", StringComparison.Ordinal)))
+            headersChanged |= WriteIfChanged(Path.Combine(objectDirectory, name), text);
 
-        if (!sourceChanged && File.Exists(objectFile)) return objectFile;
+        var objectFiles = new List<string>();
 
-        var result = Run(ClangPath, ["-c", source, "-O2", "-o", objectFile]);
-        if (!result.Success)
-            throw new InvalidOperationException(
-                $"failed to compile the Stainless runtime:\n{result.StandardError}");
+        foreach (var (name, text) in sources
+                     .Where(s => s.Key.EndsWith(".c", StringComparison.Ordinal))
+                     .OrderBy(s => s.Key, StringComparer.Ordinal))
+        {
+            string source = Path.Combine(objectDirectory, name);
+            string objectFile = Path.ChangeExtension(source, ".o");
+            objectFiles.Add(objectFile);
 
-        return objectFile;
+            bool changed = WriteIfChanged(source, text);
+            if (!changed && !headersChanged && File.Exists(objectFile)) continue;
+
+            var result = Run(ClangPath, ["-c", source, "-O2", "-o", objectFile]);
+            if (!result.Success)
+                throw new InvalidOperationException(
+                    $"failed to compile the Stainless runtime ({name}):\n{result.StandardError}");
+        }
+
+        return objectFiles;
     }
 
-    private static string ReadEmbeddedRuntime()
+    /// <summary>Writes the file only when it differs, and reports whether it did.</summary>
+    private static bool WriteIfChanged(string path, string text)
+    {
+        if (File.Exists(path) && File.ReadAllText(path) == text) return false;
+        File.WriteAllText(path, text);
+        return true;
+    }
+
+    private static Dictionary<string, string> ReadEmbeddedRuntime()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        const string name = "Stainless.Runtime.stainless_rt.c";
+        var sources = new Dictionary<string, string>(StringComparer.Ordinal);
 
-        using var stream = assembly.GetManifestResourceStream(name)
-            ?? throw new InvalidOperationException(
-                $"the runtime source '{name}' is missing from the compiler assembly");
+        foreach (string resource in assembly.GetManifestResourceNames())
+        {
+            if (!resource.StartsWith(RuntimeResourcePrefix, StringComparison.Ordinal)) continue;
 
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
+            using var stream = assembly.GetManifestResourceStream(resource);
+            if (stream is null) continue;
+
+            using var reader = new StreamReader(stream);
+            sources[resource[RuntimeResourcePrefix.Length..]] = reader.ReadToEnd();
+        }
+
+        return sources;
     }
 
     /// <summary>
@@ -109,12 +143,13 @@ public sealed class Toolchain
     /// </summary>
     public ToolResult Link(
         string irPath,
-        string runtimeObject,
+        IReadOnlyList<string> runtimeObjects,
         IReadOnlyList<string> nativeInputs,
         string outputPath,
         int optimizationLevel)
     {
-        List<string> arguments = [irPath, runtimeObject];
+        List<string> arguments = [irPath];
+        arguments.AddRange(runtimeObjects);
         arguments.AddRange(nativeInputs);
         arguments.AddRange([
             $"-O{optimizationLevel}",

@@ -1,0 +1,8 @@
+int=42
+str=boxed
+node=7
+count=3
+items=abc
+pick=20
+pickstr=first
+countof=4

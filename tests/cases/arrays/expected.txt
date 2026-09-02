@@ -1,0 +1,9 @@
+length=5
+sum=30
+zeroed=0
+flags=false,true
+ids=3
+dropping array
+~Tracker 1
+~Tracker 2
+done

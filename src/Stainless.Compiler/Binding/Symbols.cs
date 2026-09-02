@@ -50,6 +50,13 @@ public sealed class FunctionSymbol
     /// </summary>
     public string? RuntimeSymbol { get; init; }
 
+    /// <summary>
+    /// The type arguments this function was instantiated with. They take part in
+    /// mangling, so <c>Max&lt;int&gt;</c> and <c>Max&lt;double&gt;</c> stay
+    /// distinct symbols even when the parameters alone would not tell them apart.
+    /// </summary>
+    public IReadOnlyList<TypeSymbol> TypeArguments { get; init; } = [];
+
     private string? _mangledName;
 
     /// <summary>The symbol name the linker sees. See docs/abi.md.</summary>
@@ -76,11 +83,47 @@ public sealed class ConstantSymbol(string name, TypeSymbol type, object? value)
 /// needs no headers: a module's public surface is computed from its own source,
 /// then consumed directly by importers.
 /// </summary>
+/// <summary>
+/// A generic declaration, kept as syntax rather than symbols.
+///
+/// Stainless monomorphizes: nothing about a template is checked until it is
+/// instantiated, at which point it becomes an ordinary type or function with
+/// the type arguments substituted in. That is why the template holds a syntax
+/// node and a list of parameter names, and no resolved members at all.
+/// </summary>
+public sealed class GenericTypeTemplate(
+    string name, ModuleSymbol module, TypeDeclSyntax declaration)
+{
+    public string Name { get; } = name;
+    public ModuleSymbol Module { get; } = module;
+    public TypeDeclSyntax Declaration { get; } = declaration;
+    public IReadOnlyList<string> Parameters => Declaration.TypeParameters;
+    public bool IsPublic => Declaration.Modifiers.HasFlag(Modifiers.Public);
+
+    public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
+}
+
+public sealed class GenericFunctionTemplate(
+    string name, ModuleSymbol module, FunctionDeclSyntax declaration)
+{
+    public string Name { get; } = name;
+    public ModuleSymbol Module { get; } = module;
+    public FunctionDeclSyntax Declaration { get; } = declaration;
+    public IReadOnlyList<string> Parameters => Declaration.TypeParameters;
+    public bool IsPublic => Declaration.Modifiers.HasFlag(Modifiers.Public);
+
+    public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
+}
+
 public sealed class ModuleSymbol(string name)
 {
     public string Name { get; } = name;
 
     public Dictionary<string, NamedTypeSymbol> Types { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Generic declarations, awaiting instantiation.</summary>
+    public Dictionary<string, GenericTypeTemplate> GenericTypes { get; } = new(StringComparer.Ordinal);
+    public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];
     public Dictionary<string, ConstantSymbol> Constants { get; } = new(StringComparer.Ordinal);
 

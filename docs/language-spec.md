@@ -161,6 +161,27 @@ Dispatch is four constant-offset loads with no search and no branch — see
 [abi.md](abi.md) for the tables. There is no class inheritance, no interface
 inheritance, and no downcasting from an interface back to a class.
 
+### 2.6 `T[]` — a counted array
+
+```csharp
+var numbers = new int[5];
+for (int i = 0; i < (int)numbers.Length; i = i + 1) {
+    numbers[i] = i * i;
+}
+```
+
+An array is a reference counted object, like a class: `numbers.Length` is O(1),
+assignment shares rather than copies, and the elements are released when the
+array dies. A new array is always zeroed.
+
+**Every index is bounds checked.** The index is compared unsigned against the
+length, so one compare covers both ends — a negative index becomes a very large
+unsigned value and fails the same test. Going out of range aborts with the
+index and the length rather than corrupting memory.
+
+Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
+and `Shape[]` (references, each retained). `T[][]` is an array of arrays.
+
 ## 3. Text
 
 Stainless has exactly one string type. `String` is immutable, reference
@@ -289,7 +310,94 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 Unlike `String`, its bytes are a separate growable allocation, so it is not
 NUL-terminated and has no `ToPointer()`. Call `ToText().ToPointer()` to reach C.
 
-## 4. Functions and members
+## 4. Generics
+
+```csharp
+public class Box<T> {
+    T value;
+
+    public Box(T initial) { value = initial; }
+
+    public T Get() { return value; }
+    public void Set(T next) { value = next; }
+}
+
+var number = new Box<int>(41);      // T is int
+var text   = new Box<String>("hi"); // T is String
+```
+
+Functions may be generic too, and their type arguments are **inferred from the
+arguments passed**:
+
+```csharp
+T Pick<T>(T a, T b, bool first) {
+    if (first) { return a; }
+    return b;
+}
+
+Pick(10, 20, false);            // T is int
+Pick("left", "right", true);    // T is String
+```
+
+### 4.1 Monomorphization
+
+Stainless **monomorphizes**: `Box<int>` and `Box<String>` are two real types,
+compiled separately, with no boxing and no indirection. `Box<int>` stores a
+bare `int`, and a `T` parameter of a value type is passed exactly as that value
+type would be. This is the C++ and Rust model rather than Java's, and it is
+what lets generics keep the performance promise the rest of the language makes.
+
+The price is the usual one. A template is not checked until something
+instantiates it, so a mistake inside a generic that nobody uses goes unreported,
+and errors are reported against the instantiation. Each distinct instantiation
+is separate code.
+
+### 4.2 What is and is not supported
+
+Supported: generic classes, generic interfaces, generic functions with
+inference, generic types nested in one another (`List<Box<int>>`), and
+self-referential templates such as `class Node<T> { Node<T>? next; }`.
+
+Not yet:
+
+- **No constraints.** There is no `where T : Shape`, so a template may only use
+  operations that happen to work for whatever it is instantiated with; if they
+  do not, the error appears at the instantiation.
+- **Type arguments are inferred, never written, at a call.** `Pick<int>(...)`
+  is not accepted, because `<` in expression position is ambiguous with
+  less-than. Inference reads only the argument types, so a type parameter used
+  solely in the return type cannot be determined.
+- **No generic methods**, only generic types and generic free functions.
+
+### 4.3 A worked example
+
+```csharp
+public class List<T> {
+    T[] items;
+    nuint count;
+
+    public List() {
+        items = new T[2];
+        count = 0;
+    }
+
+    public nuint Count() { return count; }
+
+    public void Add(T item) {
+        if (count == items.Length) {
+            var bigger = new T[count * 2];
+            for (nuint i = 0; i < count; i = i + 1) { bigger[i] = items[i]; }
+            items = bigger;
+        }
+        items[count] = item;
+        count = count + 1;
+    }
+
+    public T At(nuint index) { return items[index]; }
+}
+```
+
+## 5. Functions and members
 
 ```csharp
 public int Add(int a, int b) { return a + b; }
@@ -300,7 +408,7 @@ void NoReturn() { }
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
 
-## 5. C interoperability
+## 6. C interoperability
 
 ```csharp
 extern "C" int puts(byte* s);
@@ -319,7 +427,7 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
-## 6. Statements and expressions
+## 7. Statements and expressions
 
 ```csharp
 int x = 10;             // explicitly typed local

@@ -99,10 +99,32 @@ public sealed class PointerTypeSymbol(TypeSymbol element) : TypeSymbol
     public override int GetHashCode() => HashCode.Combine("ptr", Element);
 }
 
-/// <summary><c>C?</c>: an optional reference. Same representation, may be null.</summary>
-public sealed class OptionalTypeSymbol(NamedTypeSymbol element) : TypeSymbol
+/// <summary>
+/// <c>T[]</c>: a counted array. Like a class it is a reference counted object,
+/// so ARC, optionals and the calling convention apply unchanged; its elements
+/// live inline after a length, the same shape String uses for its bytes.
+/// </summary>
+public sealed class ArrayTypeSymbol(TypeSymbol element) : TypeSymbol
 {
-    public NamedTypeSymbol Element { get; } = element;
+    /// <summary>strong, weak, TypeInfo*, length. Elements start here.</summary>
+    public const int HeaderSize = 32;
+
+    public TypeSymbol Element { get; } = element;
+    public override string Name => Element.Name + "[]";
+    public override int Size => 8;
+    public override int Alignment => 8;
+    public override bool IsManaged => true;
+    public override bool IsReferenceType => true;
+
+    public override bool Equals(object? obj) =>
+        obj is ArrayTypeSymbol other && Element.Equals(other.Element);
+    public override int GetHashCode() => HashCode.Combine("array", Element);
+}
+
+/// <summary><c>C?</c>: an optional reference. Same representation, may be null.</summary>
+public sealed class OptionalTypeSymbol(TypeSymbol element) : TypeSymbol
+{
+    public TypeSymbol Element { get; } = element;
     public override string Name => Element.Name + "?";
     public override int Size => 8;
     public override int Alignment => 8;
@@ -114,9 +136,9 @@ public sealed class OptionalTypeSymbol(NamedTypeSymbol element) : TypeSymbol
 }
 
 /// <summary><c>weak C?</c>: a non-owning reference that reads as null once the object dies.</summary>
-public sealed class WeakTypeSymbol(NamedTypeSymbol element) : TypeSymbol
+public sealed class WeakTypeSymbol(TypeSymbol element) : TypeSymbol
 {
-    public NamedTypeSymbol Element { get; } = element;
+    public TypeSymbol Element { get; } = element;
     public override string Name => "weak " + Element.Name + "?";
     public override int Size => 8;
     public override int Alignment => 8;
@@ -241,7 +263,7 @@ public static class TypeExtensions
 {
     /// <summary>True when values of this type participate in retain/release.</summary>
     public static bool NeedsArc(this TypeSymbol type) =>
-        type is ClassTypeSymbol or InterfaceTypeSymbol or OptionalTypeSymbol;
+        type.IsReferenceType || type is OptionalTypeSymbol;
 
     /// <summary>
     /// True for any slot the emitter must maintain a count in: a strong
@@ -250,13 +272,12 @@ public static class TypeExtensions
     public static bool IsManagedSlot(this TypeSymbol type) =>
         type.NeedsArc() || type is WeakTypeSymbol;
 
-    /// <summary>The declared type a reference points at, or null.</summary>
-    public static NamedTypeSymbol? AsReference(this TypeSymbol type) => type switch
+    /// <summary>The type a reference points at, or null.</summary>
+    public static TypeSymbol? AsReference(this TypeSymbol type) => type switch
     {
-        ClassTypeSymbol c => c,
-        InterfaceTypeSymbol i => i,
         OptionalTypeSymbol o => o.Element,
         WeakTypeSymbol w => w.Element,
+        _ when type.IsReferenceType => type,
         _ => null,
     };
 

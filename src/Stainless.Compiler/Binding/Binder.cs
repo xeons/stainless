@@ -11,6 +11,9 @@ public sealed class BoundProgram
     public required IReadOnlyList<ClassTypeSymbol> Classes { get; init; }
     public required IReadOnlyList<InterfaceTypeSymbol> Interfaces { get; init; }
 
+    /// <summary>Every distinct array type used, each needing its own TypeInfo.</summary>
+    public required IReadOnlyList<ArrayTypeSymbol> Arrays { get; init; }
+
     /// <summary>Runtime constructors for intrinsic classes, needing a declaration in the IR.</summary>
     public required IReadOnlyList<string> RuntimeFactories { get; init; }
     public required IReadOnlyList<FunctionSymbol> ExternalFunctions { get; init; }
@@ -33,6 +36,17 @@ public sealed class Binder(DiagnosticBag diagnostics)
     private readonly List<BoundFunction> _functions = [];
     private readonly List<ClassTypeSymbol> _classes = [];
     private readonly List<InterfaceTypeSymbol> _interfaces = [];
+    private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
+
+    /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
+    private readonly Dictionary<string, NamedTypeSymbol> _instantiatedTypes = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, FunctionSymbol> _instantiatedFunctions = new(StringComparer.Ordinal);
+
+    /// <summary>Bodies awaiting binding, with the substitution they belong to.</summary>
+    private readonly Queue<(FunctionSymbol Function, Dictionary<string, TypeSymbol> Substitution)> _pending = new();
+
+    /// <summary>The type arguments in force while binding inside an instantiation.</summary>
+    private Dictionary<string, TypeSymbol> _substitution = new(StringComparer.Ordinal);
     private readonly Dictionary<NamedTypeSymbol, TypeDeclSyntax> _typeSyntax = [];
 
     // Per-function binding state.
@@ -52,6 +66,11 @@ public sealed class Binder(DiagnosticBag diagnostics)
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
         ComputeLayouts();           // pass 6: every value type has a size
         BindBodies();               // pass 7: only now is any code checked
+        DrainPending();             // pass 8: bodies of everything instantiated along the way
+
+        // Interface ids are assigned last, because instantiating a generic can
+        // introduce a new interface at any point up to here.
+        for (int id = 0; id < _interfaces.Count; id++) _interfaces[id].Id = id;
 
         var external = _modules.Values
             .SelectMany(m => m.Functions)
@@ -66,6 +85,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
             Functions = _functions,
             Classes = _classes,
             Interfaces = _interfaces,
+            Arrays = _arrays.Values.ToList(),
             RuntimeFactories = _modules.Values
                 .SelectMany(m => m.Types.Values)
                 .OfType<ClassTypeSymbol>()
@@ -113,10 +133,24 @@ public sealed class Binder(DiagnosticBag diagnostics)
         {
             foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
             {
-                if (module.Types.ContainsKey(declaration.Name))
+                if (module.Types.ContainsKey(declaration.Name) ||
+                    module.GenericTypes.ContainsKey(declaration.Name))
                 {
                     diagnostics.Error("SL0201", declaration.Span,
                         $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                    continue;
+                }
+
+                // A generic declaration is a template, not a type. Nothing about it
+                // is checked until something instantiates it.
+                if (declaration.TypeParameters.Count > 0)
+                {
+                    if (module.GenericTypes.ContainsKey(declaration.Name))
+                        diagnostics.Error("SL0321", declaration.Span,
+                            $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                    else
+                        module.GenericTypes[declaration.Name] =
+                            new GenericTypeTemplate(declaration.Name, module, declaration);
                     continue;
                 }
 
@@ -196,11 +230,17 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 switch (declaration)
                 {
                     case FunctionDeclSyntax function:
-                        DeclareFunction(module, containingType: null, function);
+                        if (function.TypeParameters.Count > 0)
+                            module.GenericFunctions.Add(
+                                new GenericFunctionTemplate(function.Name, module, function));
+                        else
+                            DeclareFunction(module, containingType: null, function);
                         break;
 
                     case TypeDeclSyntax typeDecl:
-                        DeclareTypeMembers(module, typeDecl);
+                        // Templates wait; their members depend on type arguments.
+                        if (typeDecl.TypeParameters.Count == 0)
+                            DeclareTypeMembers(module, typeDecl, module.Types[typeDecl.Name]);
                         break;
 
                     case GlobalConstDeclSyntax constant:
@@ -219,9 +259,9 @@ public sealed class Binder(DiagnosticBag diagnostics)
         _currentModule = null;
     }
 
-    private void DeclareTypeMembers(ModuleSymbol module, TypeDeclSyntax declaration)
+    private void DeclareTypeMembers(
+        ModuleSymbol module, TypeDeclSyntax declaration, NamedTypeSymbol type)
     {
-        var type = module.Types[declaration.Name];
         var classType = type as ClassTypeSymbol;
 
         foreach (var member in declaration.Members)
@@ -267,6 +307,13 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 }
 
                 case FunctionDeclSyntax method:
+                    if (method.TypeParameters.Count > 0)
+                    {
+                        diagnostics.Error("SL0322", method.Span,
+                            $"'{method.Name}' is a generic method, which is not supported yet; " +
+                            "make the enclosing type generic instead");
+                        break;
+                    }
                     DeclareFunction(module, type, method);
                     break;
 
@@ -458,10 +505,14 @@ public sealed class Binder(DiagnosticBag diagnostics)
     private void ResolveInterfaces()
     {
         foreach (var (type, declaration) in _typeSyntax)
-        {
-            if (declaration.Implements.Count == 0) continue;
+            ResolveImplements(type, declaration, _modules[type.ModuleName]);
+    }
 
-            var module = _modules[type.ModuleName];
+    private void ResolveImplements(
+        NamedTypeSymbol type, TypeDeclSyntax declaration, ModuleSymbol module)
+    {
+        {
+            if (declaration.Implements.Count == 0) return;
 
             if (type is not ClassTypeSymbol classType)
             {
@@ -470,7 +521,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
                         ? $"struct '{type.Name}' cannot implement an interface; an interface " +
                           "reference is a counted pointer, and structs are plain C values"
                         : $"interface '{type.Name}' cannot extend another interface yet");
-                continue;
+                return;
             }
 
             foreach (var name in declaration.Implements)
@@ -498,8 +549,6 @@ public sealed class Binder(DiagnosticBag diagnostics)
             }
         }
 
-        for (int id = 0; id < _interfaces.Count; id++)
-            _interfaces[id].Id = id;
     }
 
     private void VerifyImplements(
@@ -585,6 +634,192 @@ public sealed class Binder(DiagnosticBag diagnostics)
         inProgress.Remove(type);
     }
 
+    // ============================================================ pass 8
+
+    /// <summary>
+    /// Binds the bodies produced by instantiation. Each one may instantiate more
+    /// generics, so the queue is drained rather than iterated once.
+    /// </summary>
+    private void DrainPending()
+    {
+        var previous = _substitution;
+
+        while (_pending.Count > 0)
+        {
+            var (function, substitution) = _pending.Dequeue();
+            _substitution = substitution;
+            _currentModule = _modules[function.ModuleName];
+            BindFunctionBody(function);
+        }
+
+        _substitution = previous;
+        _currentModule = null;
+    }
+
+    // ============================================================ generics
+
+    private static string InstantiationKey(string name, IReadOnlyList<TypeSymbol> arguments) =>
+        name + "<" + string.Join(",", arguments.Select(a => a.Name)) + ">";
+
+    /// <summary>
+    /// Produces the concrete type for <c>Box&lt;int&gt;</c>, building it the
+    /// first time it is asked for.
+    ///
+    /// Stainless monomorphizes, so this is where a template stops being syntax:
+    /// members are declared, interfaces resolved and the layout computed exactly
+    /// as they would be for a hand-written type, with the type arguments
+    /// substituted in. Bodies are queued rather than bound here, because an
+    /// instantiation can be requested from inside another one.
+    /// </summary>
+    private NamedTypeSymbol Instantiate(
+        GenericTypeTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)
+    {
+        if (arguments.Count != template.Parameters.Count)
+        {
+            diagnostics.Error("SL0323", span,
+                $"'{template.Name}' takes {template.Parameters.Count} type " +
+                $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
+                $"but {arguments.Count} were given");
+            return new StructTypeSymbol { SimpleName = template.Name, ModuleName = template.Module.Name };
+        }
+
+        string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
+        if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
+
+        var declaration = template.Declaration;
+        string displayName = template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">";
+        bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
+
+        NamedTypeSymbol type = declaration.Kind switch
+        {
+            TypeDeclKind.Class => new ClassTypeSymbol
+            {
+                SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+            },
+            TypeDeclKind.Interface => new InterfaceTypeSymbol
+            {
+                SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+            },
+            _ => new StructTypeSymbol
+            {
+                SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+            },
+        };
+
+        // Registered before its members are declared, so a self-referential
+        // template such as `class Node<T> { Node<T>? next; }` terminates.
+        _instantiatedTypes[key] = type;
+        if (type is ClassTypeSymbol instantiatedClass) _classes.Add(instantiatedClass);
+        if (type is InterfaceTypeSymbol instantiatedInterface) _interfaces.Add(instantiatedInterface);
+
+        var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
+
+        var previousSubstitution = _substitution;
+        var previousModule = _currentModule;
+        _substitution = substitution;
+        _currentModule = template.Module;
+
+        DeclareTypeMembers(template.Module, declaration, type);
+        ResolveImplements(type, declaration, template.Module);
+        ComputeLayout(type, []);
+
+        // Every body this instantiation owns is bound later, under this same
+        // substitution.
+        foreach (var method in type.Methods.Where(m => m.HasBody))
+            _pending.Enqueue((method, substitution));
+
+        if (type is ClassTypeSymbol withMembers)
+        {
+            foreach (var constructor in withMembers.Constructors)
+                _pending.Enqueue((constructor, substitution));
+            if (withMembers.Destructor is not null)
+                _pending.Enqueue((withMembers.Destructor, substitution));
+        }
+
+        _substitution = previousSubstitution;
+        _currentModule = previousModule;
+        return type;
+    }
+
+    /// <summary>Produces the concrete function for a generic call such as <c>Max(1, 2)</c>.</summary>
+    private FunctionSymbol? InstantiateFunction(
+        GenericFunctionTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)
+    {
+        if (arguments.Count != template.Parameters.Count)
+        {
+            diagnostics.Error("SL0324", span,
+                $"'{template.Name}' takes {template.Parameters.Count} type " +
+                $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
+                $"but {arguments.Count} were inferred");
+            return null;
+        }
+
+        string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
+        if (_instantiatedFunctions.TryGetValue(key, out var existing)) return existing;
+
+        var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
+
+        var previousSubstitution = _substitution;
+        var previousModule = _currentModule;
+        _substitution = substitution;
+        _currentModule = template.Module;
+
+        var declaration = template.Declaration;
+        var symbol = new FunctionSymbol
+        {
+            Name = template.Name,
+            ModuleName = template.Module.Name,
+            ReturnType = ResolveType(declaration.ReturnType, template.Module),
+            Linkage = LinkageKind.Stainless,
+            IsPublic = template.IsPublic,
+            Body = declaration.Body,
+            Span = declaration.Span,
+            TypeArguments = arguments.ToList(),
+        };
+        AddParameters(symbol, declaration.Parameters, template.Module);
+
+        _instantiatedFunctions[key] = symbol;
+        _pending.Enqueue((symbol, substitution));
+
+        _substitution = previousSubstitution;
+        _currentModule = previousModule;
+        return symbol;
+    }
+
+    /// <summary>
+    /// Matches a declared parameter type against an argument's actual type to
+    /// discover what each type parameter must be. Structural and deliberately
+    /// simple: it looks through arrays and pointers, and stops at anything else.
+    /// </summary>
+    private static void Infer(
+        TypeSyntax pattern,
+        TypeSymbol actual,
+        IReadOnlySet<string> parameters,
+        Dictionary<string, TypeSymbol> inferred)
+    {
+        switch (pattern)
+        {
+            case NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } name
+                when parameters.Contains(name.Name.Parts[0]):
+                inferred.TryAdd(name.Name.Parts[0], actual);
+                break;
+
+            case ArrayTypeSyntax array when actual is ArrayTypeSymbol actualArray:
+                Infer(array.Element, actualArray.Element, parameters, inferred);
+                break;
+
+            case PointerTypeSyntax pointer when actual is PointerTypeSymbol actualPointer:
+                Infer(pointer.Element, actualPointer.Element, parameters, inferred);
+                break;
+
+            case NullableTypeSyntax nullable when actual is OptionalTypeSymbol actualOptional:
+                Infer(nullable.Element, actualOptional.Element, parameters, inferred);
+                break;
+        }
+    }
+
     // ============================================================ pass 7
 
     private void BindBodies()
@@ -593,12 +828,14 @@ public sealed class Binder(DiagnosticBag diagnostics)
         {
             _currentModule = module;
 
-            foreach (var function in module.Functions.Where(f => f.HasBody))
+            // Snapshotted: binding a body can instantiate a generic, which adds
+            // to exactly these collections while we are walking them.
+            foreach (var function in module.Functions.Where(f => f.HasBody).ToList())
                 BindFunctionBody(function);
 
-            foreach (var type in module.Types.Values.OfType<ClassTypeSymbol>())
+            foreach (var type in module.Types.Values.OfType<ClassTypeSymbol>().ToList())
             {
-                foreach (var constructor in type.Constructors) BindFunctionBody(constructor);
+                foreach (var constructor in type.Constructors.ToList()) BindFunctionBody(constructor);
                 if (type.Destructor is not null) BindFunctionBody(type.Destructor);
             }
         }
@@ -850,6 +1087,7 @@ public sealed class Binder(DiagnosticBag diagnostics)
         MemberAccessSyntax member => BindMemberAccess(member),
         IndexSyntax index => BindIndex(index),
         NewSyntax newExpression => BindNew(newExpression),
+        NewArraySyntax newArray => BindNewArray(newArray),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
         _ => new BoundErrorExpression(syntax.Span),
@@ -1246,10 +1484,10 @@ public sealed class Binder(DiagnosticBag diagnostics)
         if (target.Type.IsError() || index.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
 
-        if (target.Type is not PointerTypeSymbol pointer)
+        if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol))
         {
             diagnostics.Error("SL0241", syntax.Span,
-                $"cannot index '{target.Type.Name}'; only pointers support indexing");
+                $"cannot index '{target.Type.Name}'; only arrays and pointers support indexing");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1260,6 +1498,13 @@ public sealed class Binder(DiagnosticBag diagnostics)
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // Any integer indexes an array, as in C#. A negative one sign-extends to
+        // a very large unsigned value, so the single unsigned bounds compare in
+        // the emitter catches it without a second check.
+        if (target.Type is ArrayTypeSymbol array)
+            return new BoundIndex(syntax.Span, array.Element, target, PromoteToInt(index));
+
+        var pointer = (PointerTypeSymbol)target.Type;
         return new BoundIndex(syntax.Span, pointer.Element, target, PromoteToInt(index));
     }
 
@@ -1364,6 +1609,30 @@ public sealed class Binder(DiagnosticBag diagnostics)
         return _modules.TryGetValue(name, out module) ? module : null;
     }
 
+    private BoundExpression BindNewArray(NewArraySyntax syntax)
+    {
+        var element = ResolveType(syntax.ElementType, _currentModule!);
+        var length = BindExpression(syntax.Length);
+
+        if (element.IsError() || length.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (element.IsVoid())
+        {
+            diagnostics.Error("SL0311", syntax.Span, "there is no array of 'void'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (length.Type is not PrimitiveTypeSymbol { IsInteger: true })
+        {
+            diagnostics.Error("SL0312", syntax.Length.Span,
+                $"an array length must be an integer, but this is '{length.Type.Name}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundNewArray(syntax.Span, ArrayOf(element),
+            BindConversion(length, PrimitiveTypeSymbol.NUInt, syntax.Length.Span));
+    }
+
     private BoundExpression BindMemberAccess(MemberAccessSyntax syntax)
     {
         // `Module.Member` is a qualified name, not a value access.
@@ -1379,6 +1648,18 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
         var receiver = BindExpression(syntax.Target);
         if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // An array's only member is its length, which lives in the header.
+        if (receiver.Type is ArrayTypeSymbol)
+        {
+            if (syntax.Member == "Length")
+                return new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt, receiver);
+
+            diagnostics.Error("SL0313", syntax.Span,
+                $"'{receiver.Type.Name}' has no member named '{syntax.Member}'; " +
+                "an array has only 'Length'");
+            return new BoundErrorExpression(syntax.Span);
+        }
 
         // `p.field` on a pointer to a struct means `(*p).field`, as in C's `->`.
         if (receiver.Type is PointerTypeSymbol { Element: NamedTypeSymbol } pointer)
@@ -1439,6 +1720,13 @@ public sealed class Binder(DiagnosticBag diagnostics)
                 .Where(f => sameModule || f.IsPublic)
                 .ToList();
 
+            if (visible.Count > 0)
+                return BindFunctionCall(syntax, visible, member.Member, arguments);
+
+            var qualified = new QualifiedName(member.Span,
+                [.. FlattenName(member.Target)!, member.Member]);
+            if (TryBindGenericCall(syntax, qualified, arguments) is { } generic) return generic;
+
             return BindFunctionCall(syntax, visible, member.Member, arguments);
         }
 
@@ -1447,6 +1735,8 @@ public sealed class Binder(DiagnosticBag diagnostics)
             var candidates = ResolveFunctionCandidates(callee.Name);
             if (candidates.Count > 0)
                 return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
+
+            if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic) return generic;
 
             // A method of the enclosing type, called without a receiver.
             if (_currentFunction?.ContainingType?.FindMethod(callee.Name.Text) is { } method &&
@@ -1877,10 +2167,35 @@ public sealed class Binder(DiagnosticBag diagnostics)
 
     // ------------------------------------------------------------ type resolution
 
+    /// <summary>
+    /// Returns the single symbol for <c>T[]</c>, creating it on first use. One
+    /// symbol per element type means one TypeInfo and one destroy hook, however
+    /// many places mention the array.
+    /// </summary>
+    private ArrayTypeSymbol ArrayOf(TypeSymbol element)
+    {
+        if (_arrays.TryGetValue(element, out var existing)) return existing;
+        var array = new ArrayTypeSymbol(element);
+        _arrays[element] = array;
+        return array;
+    }
+
     private TypeSymbol ResolveType(TypeSyntax syntax, ModuleSymbol module)
     {
         switch (syntax)
         {
+            case ArrayTypeSyntax array:
+            {
+                var element = ResolveType(array.Element, module);
+                if (element.IsError()) return element;
+                if (element.IsVoid())
+                {
+                    diagnostics.Error("SL0310", syntax.Span, "there is no array of 'void'");
+                    return ErrorTypeSymbol.Instance;
+                }
+                return ArrayOf(element);
+            }
+
             case PrimitiveTypeSyntax primitive:
                 return PrimitiveFor(primitive.Keyword);
 
@@ -1939,9 +2254,26 @@ public sealed class Binder(DiagnosticBag diagnostics)
     {
         var parts = syntax.Name.Parts;
 
+        // A bare name may be a type parameter of the instantiation being bound.
+        if (parts.Count == 1 && syntax.TypeArguments.Count == 0 &&
+            _substitution.TryGetValue(parts[0], out var substituted))
+            return substituted;
+
+        if (syntax.TypeArguments.Count > 0)
+            return ResolveConstructedType(syntax, module);
+
         if (parts.Count == 1)
         {
             if (module.Types.TryGetValue(parts[0], out var local)) return local;
+
+            // Naming a generic without arguments is a common slip; say so plainly.
+            if (module.GenericTypes.TryGetValue(parts[0], out var template))
+            {
+                diagnostics.Error("SL0325", syntax.Span,
+                    $"'{template.Name}' is generic and needs type arguments, " +
+                    $"as in '{template.Name}<{string.Join(", ", template.Parameters)}>'");
+                return ErrorTypeSymbol.Instance;
+            }
 
             var visible = module.Imports.Values.Distinct()
                 .Where(imported => imported.Types.TryGetValue(parts[0], out var t) && t.IsPublic)
@@ -1986,6 +2318,111 @@ public sealed class Binder(DiagnosticBag diagnostics)
             $"the type '{syntax.Name.Text}' was not found; " +
             "check the spelling, or add an 'import' for the module that declares it");
         return ErrorTypeSymbol.Instance;
+    }
+
+    /// <summary>Resolves <c>Box&lt;int&gt;</c> by finding the template and instantiating it.</summary>
+    private TypeSymbol ResolveConstructedType(NamedTypeSyntax syntax, ModuleSymbol module)
+    {
+        var arguments = syntax.TypeArguments.Select(a => ResolveType(a, module)).ToList();
+        if (arguments.Any(a => a.IsError())) return ErrorTypeSymbol.Instance;
+
+        var template = FindGenericType(syntax.Name, module);
+        if (template is null)
+        {
+            diagnostics.Error("SL0326", syntax.Span,
+                $"no generic type named '{syntax.Name.Text}' is in scope");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        return Instantiate(template, arguments, syntax.Span);
+    }
+
+    private GenericTypeTemplate? FindGenericType(QualifiedName name, ModuleSymbol module)
+    {
+        if (name.Parts.Count == 1)
+        {
+            if (module.GenericTypes.TryGetValue(name.Parts[0], out var local)) return local;
+
+            return module.Imports.Values.Distinct()
+                .Select(m => m.GenericTypes.TryGetValue(name.Parts[0], out var t) && t.IsPublic ? t : null)
+                .FirstOrDefault(t => t is not null);
+        }
+
+        string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
+        if (module.Imports.TryGetValue(moduleName, out var target) ||
+            _modules.TryGetValue(moduleName, out target))
+        {
+            if (target.GenericTypes.TryGetValue(name.Last, out var found) &&
+                (target == module || found.IsPublic))
+                return found;
+        }
+
+        return null;
+    }
+
+    /// <summary>Finds a generic function template visible from the current module.</summary>
+    private List<GenericFunctionTemplate> FindGenericFunctions(QualifiedName name)
+    {
+        if (name.Parts.Count == 1)
+        {
+            var local = _currentModule!.GenericFunctions.Where(f => f.Name == name.Parts[0]).ToList();
+            if (local.Count > 0) return local;
+
+            return _currentModule.Imports.Values.Distinct()
+                .SelectMany(m => m.GenericFunctions)
+                .Where(f => f.Name == name.Parts[0] && f.IsPublic)
+                .ToList();
+        }
+
+        string moduleName = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
+        if (_currentModule!.Imports.TryGetValue(moduleName, out var target) ||
+            _modules.TryGetValue(moduleName, out target))
+        {
+            bool sameModule = target == _currentModule;
+            return target.GenericFunctions
+                .Where(f => f.Name == name.Last && (sameModule || f.IsPublic))
+                .ToList();
+        }
+
+        return [];
+    }
+
+    /// <summary>
+    /// Binds a call to a generic function by inferring its type arguments from
+    /// the arguments actually passed, then instantiating it.
+    /// </summary>
+    private BoundExpression? TryBindGenericCall(
+        CallSyntax syntax, QualifiedName name, List<BoundExpression> arguments)
+    {
+        var candidates = FindGenericFunctions(name);
+        if (candidates.Count == 0) return null;
+
+        // Only arity distinguishes candidates for now; inference does the rest.
+        var template = candidates.FirstOrDefault(c => c.Declaration.Parameters.Count == arguments.Count)
+                       ?? candidates[0];
+
+        var parameters = template.Parameters.ToHashSet(StringComparer.Ordinal);
+        var inferred = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+
+        int shared = Math.Min(arguments.Count, template.Declaration.Parameters.Count);
+        for (int i = 0; i < shared; i++)
+            Infer(template.Declaration.Parameters[i].Type, arguments[i].Type, parameters, inferred);
+
+        var missing = template.Parameters.Where(p => !inferred.ContainsKey(p)).ToList();
+        if (missing.Count > 0)
+        {
+            diagnostics.Error("SL0327", syntax.Span,
+                $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
+                $"for '{template.Name}' from these arguments; " +
+                "Stainless infers type arguments only from the values passed");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var typeArguments = template.Parameters.Select(p => inferred[p]).ToList();
+        var function = InstantiateFunction(template, typeArguments, syntax.Span);
+        if (function is null) return new BoundErrorExpression(syntax.Span);
+
+        return BuildCall(syntax, function, receiver: null, arguments);
     }
 
     private static PrimitiveTypeSymbol PrimitiveFor(TokenKind keyword) => keyword switch

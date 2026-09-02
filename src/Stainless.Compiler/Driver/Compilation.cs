@@ -175,10 +175,10 @@ public sealed class Compilation
         var toolchain = Toolchain.Locate(out string toolchainError);
         if (toolchain is null) return Failure(toolchainError);
 
-        string runtimeObject;
+        IReadOnlyList<string> runtimeObjects;
         try
         {
-            runtimeObject = toolchain.BuildRuntime(intermediate);
+            runtimeObjects = toolchain.BuildRuntime(intermediate);
         }
         catch (Exception e) when (e is InvalidOperationException or IOException)
         {
@@ -186,7 +186,7 @@ public sealed class Compilation
         }
 
         var link = toolchain.Link(
-            irPath, runtimeObject, options.NativeInputs, output, options.OptimizationLevel);
+            irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel);
         if (!link.Success)
             return Failure($"the native toolchain rejected the generated IR:\n{link.StandardError.TrimEnd()}\n" +
                            $"The IR is at {irPath}; this is a compiler bug, not a bug in your program.");

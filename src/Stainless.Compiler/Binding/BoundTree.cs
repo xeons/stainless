@@ -176,6 +176,21 @@ public sealed class BoundAddressOf(SourceSpan span, TypeSymbol type, BoundExpres
     public BoundExpression Operand { get; } = operand;
 }
 
+/// <summary>Allocates a zeroed array of <paramref name="Length"/> elements; yields +1.</summary>
+public sealed class BoundNewArray(SourceSpan span, ArrayTypeSymbol type, BoundExpression length)
+    : BoundExpression(span, type)
+{
+    public ArrayTypeSymbol ArrayType { get; } = type;
+    public BoundExpression Length { get; } = length;
+}
+
+/// <summary><c>array.Length</c>, read straight out of the object header.</summary>
+public sealed class BoundArrayLength(SourceSpan span, TypeSymbol type, BoundExpression array)
+    : BoundExpression(span, type)
+{
+    public BoundExpression Array { get; } = array;
+}
+
 /// <summary><c>p[i]</c>, which is pointer arithmetic exactly as in C.</summary>
 public sealed class BoundIndex(
     SourceSpan span, TypeSymbol type, BoundExpression target, BoundExpression index)

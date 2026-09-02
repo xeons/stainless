@@ -22,8 +22,10 @@ public static class Mangler
         foreach (string segment in function.ModuleName.Split('.', StringSplitOptions.RemoveEmptyEntries))
             AppendIdentifier(sb, segment);
 
+        // An instantiated generic's simple name is `Box<int>`, which a linker
+        // symbol may not contain.
         if (function.ContainingType is not null)
-            AppendIdentifier(sb, function.ContainingType.SimpleName);
+            AppendIdentifier(sb, SymbolSafe(function.ContainingType.SimpleName));
 
         AppendIdentifier(sb, function.Kind switch
         {
@@ -31,6 +33,14 @@ public static class Mangler
             FunctionKind.Destructor => "dtor",
             _ => function.Name,
         });
+
+        // An instantiated generic carries its type arguments, so two
+        // instantiations never collide even when their parameters match.
+        if (function.TypeArguments.Count > 0)
+        {
+            sb.Append('G').Append(function.TypeArguments.Count);
+            foreach (var argument in function.TypeArguments) AppendType(sb, argument);
+        }
 
         var valueParameters = function.Parameters.Where(p => !p.IsThis).ToList();
         if (valueParameters.Count == 0) sb.Append('v');
@@ -116,5 +126,13 @@ public static class Mangler
         _ => 'v',
     };
 
-    private static string Sanitize(string qualifiedName) => qualifiedName.Replace('.', '_');
+    /// <summary>
+    /// Reduces a name to what a linker symbol may contain. Instantiated generics
+    /// arrive here as <c>App.Box&lt;int&gt;</c>, arrays as <c>int[]</c>, and both
+    /// the mangler and the emitter must agree on the result.
+    /// </summary>
+    public static string SymbolSafe(string name) =>
+        new(name.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
+
+    private static string Sanitize(string qualifiedName) => SymbolSafe(qualifiedName);
 }
