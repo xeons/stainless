@@ -88,7 +88,14 @@ public sealed record FieldDeclSyntax(
     Modifiers Modifiers,
     TypeSyntax Type,
     string Name,
-    ExpressionSyntax? Initializer) : Declaration(Span, Modifiers);
+    ExpressionSyntax? Initializer,
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers)
+{
+    public FieldDeclSyntax(
+        SourceSpan span, Modifiers modifiers, TypeSyntax type, string name,
+        ExpressionSyntax? initializer)
+        : this(span, modifiers, type, name, initializer, []) { }
+}
 
 public sealed record ConstructorDeclSyntax(
     SourceSpan Span,
@@ -111,7 +118,16 @@ public sealed record WhereClauseSyntax(
     string TypeParameter,
     IReadOnlyList<TypeSyntax> Constraints) : SyntaxNode(Span);
 
-public enum TypeDeclKind { Struct, Class, Interface }
+/// <summary>
+/// An attribute applied to a declaration: <c>[JsonName("id")]</c>. Arguments
+/// must be constants, because the values are written into the binary.
+/// </summary>
+public sealed record AttributeSyntax(
+    SourceSpan Span,
+    QualifiedName Name,
+    IReadOnlyList<ExpressionSyntax> Arguments) : SyntaxNode(Span);
+
+public enum TypeDeclKind { Struct, Class, Interface, Attribute }
 
 public sealed record TypeDeclSyntax(
     SourceSpan Span,
@@ -121,7 +137,8 @@ public sealed record TypeDeclSyntax(
     IReadOnlyList<string> TypeParameters,
     IReadOnlyList<WhereClauseSyntax> Constraints,
     IReadOnlyList<TypeSyntax> Implements,
-    IReadOnlyList<Declaration> Members) : Declaration(Span, Modifiers);
+    IReadOnlyList<Declaration> Members,
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
 
 /// <summary>A module-level <c>const</c>.</summary>
 public sealed record GlobalConstDeclSyntax(
@@ -240,3 +257,6 @@ public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSynt
     : ExpressionSyntax(Span);
 
 public sealed record SizeofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+
+/// <summary><c>typeof(T)</c> — the reflection handle for a type, resolved at compile time.</summary>
+public sealed record TypeofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);

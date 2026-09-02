@@ -207,6 +207,16 @@ public sealed class BoundSizeof(SourceSpan span, TypeSymbol type, TypeSymbol mea
     public TypeSymbol MeasuredType { get; } = measuredType;
 }
 
+/// <summary>
+/// <c>typeof(T)</c>: a handle to T's static metadata. It is a constant, so this
+/// costs one pointer and no work at run time.
+/// </summary>
+public sealed class BoundTypeof(SourceSpan span, TypeSymbol type, NamedTypeSymbol measuredType)
+    : BoundExpression(span, type)
+{
+    public NamedTypeSymbol MeasuredType { get; } = measuredType;
+}
+
 public sealed class BoundThis(SourceSpan span, TypeSymbol type, ParameterSymbol parameter)
     : BoundExpression(span, type)
 {

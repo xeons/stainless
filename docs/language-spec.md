@@ -632,7 +632,122 @@ reference is a plain pointer either way, and a class implementing the derived
 interface carries a dispatch table for both. Implementing `IWritable` therefore
 obliges a class to implement `IReadable` as well, and the compiler checks it.
 
-## 6. Functions and members
+## 6. Attributes and reflection
+
+Reflection in a natively compiled language is not a virtual machine feature. It
+is **tables in the binary**: the compiler writes down a type's fields, and a
+library reads them. Swift and Go work the same way. The only cost is size, and
+only for types that ask.
+
+### 6.1 Attributes
+
+An attribute is its own kind of declaration, holding fields and nothing else:
+
+```csharp
+public attribute JsonName { String Name; }
+public attribute JsonIgnore { }
+```
+
+It is written in brackets before a declaration, with **constant** arguments —
+they are stored in the binary, not evaluated:
+
+```csharp
+[JsonName("full_name")] public String Name;
+```
+
+Attributes go on classes, structs and fields. An attribute type is never a
+value: it cannot be instantiated, named as a type, or passed around.
+
+### 6.2 `[Reflect]` opts a type in
+
+```csharp
+[Reflect]
+public class Person {
+    [JsonName("full_name")] public String Name;
+    [JsonName("age")]       public int    Years;
+    [JsonIgnore]            public int    Internal;
+}
+```
+
+Only a type marked `[Reflect]` carries field metadata. Everything else emits
+nothing at all, and `typeof` on it is an error:
+
+```
+error[SL0346]: 'Plain' carries no metadata, so 'typeof' cannot name it; mark
+its declaration '[Reflect]'
+```
+
+### 6.3 `typeof` and `Standard.Reflection`
+
+`typeof(T)` yields a `Type` — a one-pointer handle to static data, so it costs
+a constant and no work:
+
+```csharp
+import Standard.Reflection;
+
+var type = typeof(Person);
+type.Name();                       // "App.Person"
+type.FieldCount();
+
+var field = type.FieldAt(0);
+field.Name();                      // "Name"
+field.Offset();                    // 24, past the object header
+field.Kind();                      // KindString
+field.Has("JsonName");
+field.Get("JsonName").AsText(0);   // "full_name"
+```
+
+Values are read from an instance by offset. That needs the object as a raw
+pointer, which is an explicit cast — the result is uncounted, so the reference
+must outlive it:
+
+```csharp
+var raw = (byte*)person;
+ReadText(raw, field);
+ReadInteger(raw, field);
+ReadDouble(raw, field);
+ReadBool(raw, field);
+```
+
+### 6.4 A serializer, written once
+
+Because `T` is concrete by the time a generic is compiled, `typeof(T)` inside
+one is still a constant:
+
+```csharp
+public String ToJson<T>(T value) {
+    var type = typeof(T);
+    var text = new StringBuilder();
+    ...
+    for (nuint i = 0; i < type.FieldCount(); i = i + 1) {
+        var field = type.FieldAt(i);
+        if (field.Has("JsonIgnore")) { continue; }
+        ...
+    }
+}
+```
+
+See [samples/json.sl](../samples/json.sl) for the whole thing.
+
+### 6.5 What is emitted
+
+A reflected type's `TypeInfo` gains four entries — a field count and table, and
+an attribute count and table — and each `SlFieldInfo` records a name, offset,
+kind, nested type and its own attributes. All of it is `const`, so it lands in
+read-only data and is shared, never allocated. See [abi.md](abi.md).
+
+A struct has no object header, so its metadata is reachable only through
+`typeof`, never from an instance.
+
+### 6.6 What is not there yet
+
+- **No writing.** Fields can be read, not set, so a deserializer cannot be
+  written yet.
+- **No construction.** There is no way to make an instance from a `Type`.
+- **No method or interface metadata** — fields only.
+- **No enumeration of types**: `typeof` needs the type named at compile time.
+
+## 7. Functions and members
 
 ```csharp
 public int Add(int a, int b) { return a + b; }
@@ -643,7 +758,7 @@ void NoReturn() { }
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
 
-## 7. C interoperability
+## 8. C interoperability
 
 ```csharp
 extern "C" int puts(byte* s);
@@ -662,7 +777,7 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
-### 7.1 Building a shared library
+### 8.1 Building a shared library
 
 ```
 stainless build src --shared -o build/math.dll --header build/math.h
@@ -704,7 +819,7 @@ int main(void) { return Add(40, 2) == 42 ? 0 : 1; }
 clang consumer.c build/math.lib -o consumer.exe
 ```
 
-### 7.2 What may cross a library boundary
+### 8.2 What may cross a library boundary
 
 Plain C values — primitives, pointers and `struct`s — cross freely. That is the
 ABI guarantee, and it holds across a DLL exactly as it does within one binary.
@@ -728,7 +843,7 @@ Neither is the other direction: a Stainless library consumed by *Stainless*.
 Importing a module from a compiled binary needs module metadata that does not
 exist, since compilation is whole-program today.
 
-## 8. Statements and expressions
+## 9. Statements and expressions
 
 ```csharp
 int x = 10;             // explicitly typed local

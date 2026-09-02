@@ -182,6 +182,44 @@ error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
 implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
 
+### Attributes and reflection
+
+Reflection is not a managed-language feature — it is **tables in the binary**,
+the way Swift and Go do it. A type carries field metadata only when it asks:
+
+```csharp
+public attribute JsonName { String Name; }
+public attribute JsonIgnore { }
+
+[Reflect]
+public class Person {
+    [JsonName("full_name")] public String Name;
+    [JsonName("age")]       public int    Years;
+    [JsonIgnore]            public int    Internal;
+}
+```
+
+`typeof(T)` is a constant handle to that data, so one serializer covers every
+reflected type:
+
+```csharp
+public String ToJson<T>(T value) {
+    var type = typeof(T);
+    for (nuint i = 0; i < type.FieldCount(); i = i + 1) {
+        var field = type.FieldAt(i);
+        if (field.Has("JsonIgnore")) { continue; }
+        ...
+    }
+}
+```
+
+```
+{"full_name":"Ada Lovelace","age":36,"Active":true,"Rating":9.5}
+```
+
+Attribute arguments must be constants, since they are written into the binary.
+Types without `[Reflect]` emit nothing, and `typeof` on them is an error.
+
 ### Interfaces
 
 ```csharp
@@ -384,6 +422,8 @@ Everything below is covered by [the test suite](tests/cases).
 - Integer literals that fit convert implicitly, as in C#
 - Shared libraries: `--shared` with a generated C header, and an export table
   containing exactly the `export "C"` functions
+- Attributes and opt-in reflection: field names, offsets, kinds and attribute
+  values readable at run time, from `const` tables in the binary
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
@@ -410,7 +450,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   is fully implemented.
 - **No class inheritance.** Interfaces extend one another, but classes do not,
   and there is no downcast from an interface back to a class.
-- **No reflection or attributes**, so a serializer cannot walk a type's fields.
+- **Reflection reads but does not write.** Fields can be read from an instance,
+  not set, so a deserializer cannot be written yet; nor can an instance be made
+  from a `Type`. Methods and interfaces carry no metadata — fields only.
 - **No overloading by parameter type on methods** (module-level functions do
   overload).
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a

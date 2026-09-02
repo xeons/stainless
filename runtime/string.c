@@ -18,7 +18,7 @@
 static void sl_string_destroy(void *object) { (void)object; }
 
 const SlTypeInfo sl_string_type_info = {
-    sizeof(SlString), sl_string_destroy, "Standard.Text.String", NULL
+    sizeof(SlString), sl_string_destroy, "Standard.Text.String", NULL, 0, NULL, 0, NULL
 };
 
 uint8_t *sl_string_data(SlString *string)

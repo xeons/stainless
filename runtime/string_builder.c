@@ -19,7 +19,8 @@ static void sl_string_builder_destroy(void *object)
 }
 
 const SlTypeInfo sl_string_builder_type_info = {
-    sizeof(SlStringBuilder), sl_string_builder_destroy, "Standard.Text.StringBuilder", NULL
+    sizeof(SlStringBuilder), sl_string_builder_destroy, "Standard.Text.StringBuilder", NULL,
+    0, NULL, 0, NULL
 };
 
 void *sl_string_builder_new(void)

@@ -8,7 +8,7 @@ public enum TokenKind
     // Declaration keywords
     ModuleKeyword, ImportKeyword, AsKeyword,
     PublicKeyword, PrivateKeyword,
-    ClassKeyword, StructKeyword, InterfaceKeyword,
+    ClassKeyword, StructKeyword, InterfaceKeyword, AttributeKeyword,
     ExternKeyword, ExportKeyword,
 
     // Statement keywords
@@ -18,7 +18,7 @@ public enum TokenKind
 
     // Expression keywords
     NewKeyword, DeleteKeyword, NullKeyword, TrueKeyword, FalseKeyword,
-    SizeofKeyword, ThisKeyword, WeakKeyword,
+    SizeofKeyword, TypeofKeyword, ThisKeyword, WeakKeyword,
 
     // Primitive type keywords
     VoidKeyword, BoolKeyword, CharKeyword,
@@ -57,6 +57,7 @@ public static class TokenKindExtensions
         TokenKind.ClassKeyword => "class",
         TokenKind.StructKeyword => "struct",
         TokenKind.InterfaceKeyword => "interface",
+        TokenKind.AttributeKeyword => "attribute",
         TokenKind.ExternKeyword => "extern",
         TokenKind.ExportKeyword => "export",
         TokenKind.IfKeyword => "if",
@@ -75,6 +76,7 @@ public static class TokenKindExtensions
         TokenKind.TrueKeyword => "true",
         TokenKind.FalseKeyword => "false",
         TokenKind.SizeofKeyword => "sizeof",
+        TokenKind.TypeofKeyword => "typeof",
         TokenKind.ThisKeyword => "this",
         TokenKind.WeakKeyword => "weak",
         TokenKind.VoidKeyword => "void",

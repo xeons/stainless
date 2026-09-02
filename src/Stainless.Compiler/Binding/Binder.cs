@@ -78,6 +78,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         ResolveImports();           // pass 3: every module can see its imports
         DeclareMembers();           // pass 4: every signature and field type is resolved
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
+        ResolveAttributes();        // pass 6: attributes fold to constants
         ComputeLayouts();           // pass 6: every value type has a size
         BindBodies();               // pass 7: only now is any code checked
         DrainPending();             // pass 8: bodies of everything instantiated along the way
@@ -189,6 +190,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                     },
+                    TypeDeclKind.Attribute => new AttributeTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = isPublic,
+                    },
                     _ => new StructTypeSymbol
                     {
                         SimpleName = declaration.Name,
@@ -289,6 +296,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         foreach (var member in declaration.Members)
         {
+            if (type is AttributeTypeSymbol && member is not FieldDeclSyntax)
+            {
+                diagnostics.Error("SL0340", member.Span,
+                    $"attribute '{type.Name}' may only declare fields; " +
+                    "it is compile-time data, not a type with behaviour");
+                continue;
+            }
+
             if (type is InterfaceTypeSymbol && member is not FunctionDeclSyntax)
             {
                 diagnostics.Error("SL0300", member.Span,
@@ -590,6 +605,122 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             }
         }
 
+    }
+
+    /// <summary>The <c>[Reflect]</c> marker, found in Standard.Reflection.</summary>
+    private AttributeTypeSymbol? ReflectAttribute =>
+        _modules.TryGetValue("Standard.Reflection", out var module) &&
+        module.Types.TryGetValue("Reflect", out var found)
+            ? found as AttributeTypeSymbol
+            : null;
+
+    /// <summary>The struct <c>typeof</c> produces, also from Standard.Reflection.</summary>
+    private StructTypeSymbol? TypeHandle =>
+        _modules.TryGetValue("Standard.Reflection", out var module) &&
+        module.Types.TryGetValue("Type", out var found)
+            ? found as StructTypeSymbol
+            : null;
+
+    /// <summary>
+    /// Binds every applied attribute once all types are known. Arguments must be
+    /// constants, since the values are written into the binary rather than
+    /// evaluated.
+    /// </summary>
+    private void ResolveAttributes()
+    {
+        var reflect = ReflectAttribute;
+
+        foreach (var (type, entry) in _typeSyntax)
+        {
+            BindAttributes(entry.Declaration.Attributes, type.Attributes, entry.Scope, type.Name);
+
+            if (reflect is not null && type.Attributes.Any(a => a.Type == reflect))
+            {
+                if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
+                else
+                    diagnostics.Error("SL0341", entry.Declaration.Span,
+                        $"'[Reflect]' applies to a class or a struct; '{type.Name}' is neither");
+            }
+
+            foreach (var member in entry.Declaration.Members.OfType<FieldDeclSyntax>())
+            {
+                if (member.Attributes.Count == 0) continue;
+                if (type.FindField(member.Name) is not { } field) continue;
+
+                BindAttributes(member.Attributes, field.Attributes, entry.Scope,
+                    type.Name + "." + field.Name);
+            }
+        }
+    }
+
+    private void BindAttributes(
+        IReadOnlyList<AttributeSyntax> syntax,
+        List<AppliedAttribute> applied,
+        FileScope scope,
+        string owner)
+    {
+        foreach (var attribute in syntax)
+        {
+            var resolved = ResolveNamedType(
+                new NamedTypeSyntax(attribute.Span, attribute.Name), scope);
+            if (resolved.IsError()) continue;
+
+            if (resolved is not AttributeTypeSymbol attributeType)
+            {
+                diagnostics.Error("SL0342", attribute.Span,
+                    $"'{resolved.Name}' is not an attribute, so it cannot be written on {owner}");
+                continue;
+            }
+
+            if (attribute.Arguments.Count != attributeType.Fields.Count)
+            {
+                diagnostics.Error("SL0343", attribute.Span,
+                    $"'{attributeType.Name}' takes {attributeType.Fields.Count} " +
+                    $"argument{(attributeType.Fields.Count == 1 ? "" : "s")}, " +
+                    $"but {attribute.Arguments.Count} were given");
+                continue;
+            }
+
+            var values = new List<object?>();
+            bool ok = true;
+
+            for (int i = 0; i < attribute.Arguments.Count; i++)
+            {
+                var expected = attributeType.Fields[i].Type;
+                var value = ConstantValue(attribute.Arguments[i], expected);
+
+                if (value is null)
+                {
+                    diagnostics.Error("SL0344", attribute.Arguments[i].Span,
+                        $"argument {i + 1} of '{attributeType.Name}' must be a constant " +
+                        $"'{expected.Name}'; attribute values are written into the binary");
+                    ok = false;
+                    break;
+                }
+
+                values.Add(value);
+            }
+
+            if (ok) applied.Add(new AppliedAttribute(attributeType, values));
+        }
+    }
+
+    /// <summary>Folds a literal to the value an attribute field will hold, or null.</summary>
+    private object? ConstantValue(ExpressionSyntax syntax, TypeSymbol expected)
+    {
+        if (syntax is not LiteralSyntax literal) return null;
+
+        if (literal.Kind == TokenKind.StringLiteral)
+            return _builtins.IsString(expected) ? literal.Value : null;
+
+        return (literal.Kind, expected) switch
+        {
+            (TokenKind.IntLiteral, PrimitiveTypeSymbol { IsInteger: true }) => literal.Value,
+            (TokenKind.FloatLiteral, PrimitiveTypeSymbol { IsFloat: true }) => literal.Value,
+            (TokenKind.TrueKeyword or TokenKind.FalseKeyword,
+                PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool }) => literal.Value,
+            _ => null,
+        };
     }
 
     private void VerifyImplements(
@@ -1254,6 +1385,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         NewArraySyntax newArray => BindNewArray(newArray),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
+        TypeofSyntax typeofExpression => BindTypeof(typeofExpression),
         _ => new BoundErrorExpression(syntax.Span),
     };
 
@@ -1678,6 +1810,33 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         return new BoundSizeof(syntax.Span, PrimitiveTypeSymbol.NUInt, measured);
     }
 
+    /// <summary>
+    /// <c>typeof(T)</c>. The result is a handle to metadata the compiler laid
+    /// down for T, so T must have been marked [Reflect].
+    /// </summary>
+    private BoundExpression BindTypeof(TypeofSyntax syntax)
+    {
+        var measured = ResolveType(syntax.Type, _currentScope!);
+        if (measured.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (TypeHandle is not { } handle)
+        {
+            diagnostics.Error("SL0347", syntax.Span,
+                "'typeof' needs Standard.Reflection, which is not part of this compilation");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (measured is not NamedTypeSymbol { IsReflected: true } reflected)
+        {
+            diagnostics.Error("SL0346", syntax.Span,
+                $"'{measured.Name}' carries no metadata, so 'typeof' cannot name it; " +
+                "mark its declaration '[Reflect]'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundTypeof(syntax.Span, handle, reflected);
+    }
+
     private BoundExpression BindCast(CastSyntax syntax)
     {
         var targetType = ResolveType(syntax.Type, _currentScope!);
@@ -1955,18 +2114,11 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // A struct method takes its receiver by pointer, so the receiver must be storage.
+        // A struct method takes its receiver by pointer. A temporary is fine: the
+        // emitter puts it in a slot first, and anything the method writes back is
+        // discarded, exactly as it is in C#.
         if (namedType is StructTypeSymbol)
-        {
-            if (!receiver.IsLValue)
-            {
-                diagnostics.Error("SL0258", member.Span,
-                    $"cannot call '{member.Member}' on a temporary '{namedType.Name}'; " +
-                    "assign it to a variable first");
-                return new BoundErrorExpression(syntax.Span);
-            }
             receiver = new BoundAddressOf(member.Span, new PointerTypeSymbol(namedType), receiver);
-        }
 
         return BuildCall(syntax, method, receiver, arguments);
     }
@@ -2295,6 +2447,13 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return explicitCast || toBytePointer ? ConversionKind.PointerCast : null;
         }
 
+        // A reference to a raw pointer, explicitly. Reflection needs it to read an
+        // instance by field offset; the result is uncounted, so keep the
+        // reference alive for as long as the pointer is used.
+        if (from is NamedTypeSymbol { IsReferenceType: true } or ArrayTypeSymbol &&
+            to is PointerTypeSymbol)
+            return explicitCast ? ConversionKind.PointerCast : null;
+
         if (from is PointerTypeSymbol && to is PrimitiveTypeSymbol { IsInteger: true, Size: 8 })
             return explicitCast ? ConversionKind.PointerToInteger : null;
 
@@ -2408,7 +2567,17 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             }
 
             case NamedTypeSyntax named:
-                return ResolveNamedType(named, scope);
+            {
+                var resolved = ResolveNamedType(named, scope);
+                if (resolved is AttributeTypeSymbol)
+                {
+                    diagnostics.Error("SL0345", syntax.Span,
+                        $"'{resolved.Name}' is an attribute and cannot be used as a type; " +
+                        $"write it as '[{resolved.Name}]' on a declaration instead");
+                    return ErrorTypeSymbol.Instance;
+                }
+                return resolved;
+            }
 
             default:
                 return ErrorTypeSymbol.Instance;

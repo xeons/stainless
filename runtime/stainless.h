@@ -17,7 +17,47 @@
 
 /* ---------------------------------------------------------------- objects */
 
-typedef struct SlTypeInfo {
+/* ------------------------------------------------------------- reflection */
+
+/*
+ * What a field or attribute value holds. Kept in step with FieldKind in the
+ * compiler and with Standard.Reflection.
+ */
+enum SlKind {
+    SL_KIND_NONE = 0,
+    SL_KIND_BOOL, SL_KIND_CHAR,
+    SL_KIND_SBYTE, SL_KIND_SHORT, SL_KIND_INT, SL_KIND_LONG, SL_KIND_NINT,
+    SL_KIND_BYTE, SL_KIND_USHORT, SL_KIND_UINT, SL_KIND_ULONG, SL_KIND_NUINT,
+    SL_KIND_FLOAT, SL_KIND_DOUBLE,
+    SL_KIND_POINTER, SL_KIND_STRING,
+    SL_KIND_CLASS, SL_KIND_INTERFACE, SL_KIND_STRUCT, SL_KIND_ARRAY
+};
+
+/* An attribute argument. Constants only, so this is all a value can be. */
+typedef struct SlAttributeValue {
+    uint32_t    kind;
+    int64_t     number;     /* the integer, or a double's bits */
+    const char *text;
+} SlAttributeValue;
+
+typedef struct SlAttribute {
+    const char             *name;
+    size_t                  valueCount;
+    const SlAttributeValue *values;
+} SlAttribute;
+
+typedef struct SlTypeInfo SlTypeInfo;
+
+typedef struct SlFieldInfo {
+    const char        *name;
+    size_t             offset;      /* from the start of the object or value */
+    uint32_t           kind;
+    const SlTypeInfo  *type;        /* for aggregates; NULL for primitives */
+    size_t             attributeCount;
+    const SlAttribute *attributes;
+} SlFieldInfo;
+
+struct SlTypeInfo {
     size_t              size;   /* header + fields, in bytes            */
     void              (*destroy)(void *);
     const char         *name;
@@ -28,7 +68,16 @@ typedef struct SlTypeInfo {
      * the array is directly indexed and a dispatch never searches. The compiler
      * builds these; NULL means the type implements none.
      */
-} SlTypeInfo;
+
+    /*
+     * Field metadata, emitted only for a type marked [Reflect]. Everything else
+     * carries a count of zero and pays nothing.
+     */
+    size_t              fieldCount;
+    const SlFieldInfo  *fields;
+    size_t              attributeCount;
+    const SlAttribute  *attributes;
+};
 
 typedef struct SlObject {
     size_t              strong;
@@ -144,6 +193,34 @@ size_t sl_array_length(void *pointer);
 
 /* Reports an out-of-range index and aborts. Never returns. */
 void   sl_array_bounds_fail(size_t index, size_t length);
+
+/* ------------------------------------------------------------- reflection */
+
+const char        *sl_type_name(const void *type);
+size_t             sl_type_size(const void *type);
+size_t             sl_type_field_count(const void *type);
+const void        *sl_type_field(const void *type, size_t index);
+size_t             sl_type_attribute_count(const void *type);
+const void        *sl_type_attribute(const void *type, size_t index);
+
+const char        *sl_field_name(const void *field);
+size_t             sl_field_offset(const void *field);
+uint32_t           sl_field_kind(const void *field);
+const void        *sl_field_type(const void *field);
+size_t             sl_field_attribute_count(const void *field);
+const void        *sl_field_attribute(const void *field, size_t index);
+
+const char        *sl_attribute_name(const void *attribute);
+size_t             sl_attribute_value_count(const void *attribute);
+uint32_t           sl_attribute_value_kind(const void *attribute, size_t index);
+int64_t            sl_attribute_value_number(const void *attribute, size_t index);
+const char        *sl_attribute_value_text(const void *attribute, size_t index);
+
+/* Reading a field out of an instance, by its recorded offset. */
+int64_t  sl_read_integer(const void *instance, const void *field);
+double   sl_read_double(const void *instance, const void *field);
+_Bool    sl_read_bool(const void *instance, const void *field);
+void    *sl_read_reference(const void *instance, const void *field);
 
 /* ---------------------------------------------------------------- Console */
 

@@ -148,8 +148,19 @@ public sealed class WeakTypeSymbol(TypeSymbol element) : TypeSymbol
     public override int GetHashCode() => HashCode.Combine("weak", Element);
 }
 
+/// <summary>
+/// One attribute as applied to a declaration: which attribute, and the constant
+/// arguments it was given. Both go into the binary when the owner is reflected.
+/// </summary>
+public sealed record AppliedAttribute(
+    AttributeTypeSymbol Type,
+    IReadOnlyList<object?> Values);
+
 public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol containingType, int index)
 {
+    /// <summary>Attributes written on this field.</summary>
+    public List<AppliedAttribute> Attributes { get; } = [];
+
     public string Name { get; } = name;
     public TypeSymbol Type { get; } = type;
     public NamedTypeSymbol ContainingType { get; } = containingType;
@@ -177,6 +188,16 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// extends. Both are the same relation, so both live here.
     /// </summary>
     public List<InterfaceTypeSymbol> Interfaces { get; } = [];
+
+    /// <summary>Attributes written on this type.</summary>
+    public List<AppliedAttribute> Attributes { get; } = [];
+
+    /// <summary>
+    /// True when the type was marked [Reflect] and so carries field metadata in
+    /// the binary. Nothing else does, which is why reflection costs nothing
+    /// unless it is asked for.
+    /// </summary>
+    public bool IsReflected { get; set; }
 
     /// <summary>
     /// For an instantiated generic, the template it came from and the arguments
@@ -233,6 +254,17 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// </summary>
     public virtual FunctionSymbol? FindMethod(string name) =>
         Methods.FirstOrDefault(m => m.Name == name);
+}
+
+/// <summary>
+/// An <c>attribute</c> declaration. It has fields but no methods and is never a
+/// value: it exists purely to be written on other declarations, so keeping it a
+/// separate kind stops it drifting into runtime code.
+/// </summary>
+public sealed class AttributeTypeSymbol : NamedTypeSymbol
+{
+    public override int Size => 0;
+    public override int Alignment => 1;
 }
 
 public sealed class StructTypeSymbol : NamedTypeSymbol

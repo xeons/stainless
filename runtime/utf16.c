@@ -13,7 +13,7 @@
 static void sl_utf16_string_destroy(void *object) { (void)object; }
 
 const SlTypeInfo sl_utf16_string_type_info = {
-    sizeof(SlUtf16String), sl_utf16_string_destroy, "Standard.Text.Utf16String", NULL
+    sizeof(SlUtf16String), sl_utf16_string_destroy, "Standard.Text.Utf16String", NULL, 0, NULL, 0, NULL
 };
 
 static uint16_t *sl_utf16_data(SlUtf16String *string)

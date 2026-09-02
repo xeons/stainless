@@ -38,8 +38,26 @@ struct TypeInfo {
     void              (*destroy)(void* obj);
     const char         *name;
     const void *const  *interfaces;   /* indexed by interface id; may be NULL */
+
+    size_t              fieldCount;   /* zero unless the type is [Reflect] */
+    const SlFieldInfo  *fields;
+    size_t              attributeCount;
+    const SlAttribute  *attributes;
+};
+
+struct SlFieldInfo {
+    const char        *name;
+    size_t             offset;        /* from the start of the object or value */
+    uint32_t           kind;
+    const SlTypeInfo  *type;          /* for aggregates; NULL for primitives */
+    size_t             attributeCount;
+    const SlAttribute *attributes;
 };
 ```
+
+The last four entries are why reflection needs no runtime: a `[Reflect]` type's
+fields are `const` tables the linker places in read-only data, and reading one
+is address arithmetic. A type without the marker carries four zeroes.
 
 Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in

@@ -142,13 +142,15 @@ public sealed class Parser
     private List<Declaration> ParseDeclaration(string? enclosingType)
     {
         int start = _pos;
+        var attributes = ParseAttributeLists();
         var modifiers = ParseModifiers();
 
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
             return ParseLinkageDeclaration(start, modifiers);
 
-        if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword, TokenKind.InterfaceKeyword))
-            return [ParseTypeDeclaration(start, modifiers)];
+        if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword,
+                  TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword))
+            return [ParseTypeDeclaration(start, modifiers, attributes)];
 
         if (At(TokenKind.Tilde) && enclosingType is not null)
             return [ParseDestructor(start, enclosingType)];
@@ -167,7 +169,33 @@ public sealed class Parser
             return [new ConstructorDeclSyntax(SpanFrom(start), modifiers, enclosingType, ctorParams, ctorBody)];
         }
 
-        return [ParseFunctionOrField(start, modifiers, LinkageKind.Stainless)];
+        return [ParseFunctionOrField(start, modifiers, LinkageKind.Stainless, attributes)];
+    }
+
+    /// <summary>
+    /// Parses any number of <c>[Name(args)]</c> groups, each of which may list
+    /// several attributes separated by commas.
+    /// </summary>
+    private List<AttributeSyntax> ParseAttributeLists()
+    {
+        var attributes = new List<AttributeSyntax>();
+
+        while (At(TokenKind.OpenBracket))
+        {
+            Advance();
+            do
+            {
+                int start = _pos;
+                var name = ParseQualifiedName();
+                var arguments = At(TokenKind.OpenParen) ? ParseArgumentList() : [];
+                attributes.Add(new AttributeSyntax(SpanFrom(start), name, arguments));
+            }
+            while (Match(TokenKind.Comma));
+
+            Expect(TokenKind.CloseBracket);
+        }
+
+        return attributes;
     }
 
     private Modifiers ParseModifiers()
@@ -227,12 +255,14 @@ public sealed class Parser
         return [ParseFunctionOrField(start, singleModifiers, linkage)];
     }
 
-    private Declaration ParseTypeDeclaration(int start, Modifiers modifiers)
+    private Declaration ParseTypeDeclaration(
+        int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes)
     {
         var kind = Current.Kind switch
         {
             TokenKind.ClassKeyword => TypeDeclKind.Class,
             TokenKind.InterfaceKeyword => TypeDeclKind.Interface,
+            TokenKind.AttributeKeyword => TypeDeclKind.Attribute,
             _ => TypeDeclKind.Struct,
         };
         Advance();
@@ -266,7 +296,7 @@ public sealed class Parser
 
         return new TypeDeclSyntax(
             SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
-            implements, members);
+            implements, members, attributes);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)
@@ -299,7 +329,9 @@ public sealed class Parser
     /// Both start `Type Name`; a following '(' makes it a function, otherwise
     /// it is a field. This is the C#/C++ shape, minus any header ambiguity.
     /// </summary>
-    private Declaration ParseFunctionOrField(int start, Modifiers modifiers, LinkageKind linkage)
+    private Declaration ParseFunctionOrField(
+        int start, Modifiers modifiers, LinkageKind linkage,
+        IReadOnlyList<AttributeSyntax>? attributes = null)
     {
         var returnType = ParseType();
         string name = ExpectIdentifier();
@@ -336,7 +368,8 @@ public sealed class Parser
 
         ExpressionSyntax? initializer = Match(TokenKind.Equals) ? ParseExpression() : null;
         Expect(TokenKind.Semicolon);
-        return new FieldDeclSyntax(SpanFrom(start), modifiers, returnType, name, initializer);
+        return new FieldDeclSyntax(
+            SpanFrom(start), modifiers, returnType, name, initializer, attributes ?? []);
     }
 
     private List<ParameterSyntax> ParseParameterList(out bool isVariadic)
@@ -798,6 +831,15 @@ public sealed class Parser
                 return new SizeofSyntax(SpanFrom(start), type);
             }
 
+            case TokenKind.TypeofKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+                var type = ParseType();
+                Expect(TokenKind.CloseParen);
+                return new TypeofSyntax(SpanFrom(start), type);
+            }
+
             case TokenKind.OpenParen:
             {
                 // `(Type)operand` is a cast; anything else in parentheses is grouping.
@@ -856,6 +898,7 @@ public sealed class Parser
             TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
             TokenKind.StringLiteral, TokenKind.CharLiteral, TokenKind.OpenParen,
             TokenKind.ThisKeyword, TokenKind.NewKeyword, TokenKind.SizeofKeyword,
+            TokenKind.TypeofKeyword,
             TokenKind.TrueKeyword, TokenKind.FalseKeyword, TokenKind.NullKeyword,
             TokenKind.Bang, TokenKind.Tilde);
 
