@@ -528,3 +528,26 @@ src/Stainless.Cli      the `stainless` command
 tests/cases/           one directory per end-to-end test
 tests/Stainless.Tests  the test runner
 ```
+
+## License
+
+Stainless is free software under the
+[GNU General Public License, version 3](LICENSE).
+
+The runtime library — everything in [runtime/](runtime/) and
+[stdlib/](stdlib/) — is GPLv3 **with an additional permission**
+([LICENSE.RUNTIME](LICENSE.RUNTIME)). It is compiled into every binary the
+compiler produces, so without that permission every program anyone wrote in
+Stainless would have to be GPLv3 as well. With it:
+
+- **What you write in Stainless is yours.** Licence it however you like, and
+  ship it closed if you want to.
+- **Changes to the compiler or the runtime are not.** Fork it, modify it and
+  distribute the result, and the source goes with it under GPLv3.
+
+The copyleft is on the compiler, not on what you build with it — the same
+arrangement GCC uses for `libgcc`.
+
+> The exception wording was drafted for this project rather than copied from a
+> published instrument. See the note at the top of
+> [LICENSE.RUNTIME](LICENSE.RUNTIME).

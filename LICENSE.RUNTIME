@@ -1,0 +1,70 @@
+                  Stainless Runtime Library Exception
+                            Version 1.0
+
+An additional permission under section 7 of the GNU General Public
+License, version 3, granted by the copyright holders of Stainless.
+
+NOTE ON THIS TEXT
+-----------------
+
+This wording was drafted for Stainless rather than copied from an
+existing instrument. It follows the same shape and intent as the GNU GCC
+Runtime Library Exception, version 3.1, which serves the same purpose for
+GCC, and which you may wish to read alongside it:
+
+    https://www.gnu.org/licenses/gcc-exception-3.1.html
+
+If the licensing of this project matters commercially to you, have this
+text reviewed by someone qualified, or replace it with a published
+instrument such as the GCC Runtime Library Exception.
+
+
+0. DEFINITIONS
+--------------
+
+"Stainless" means the compiler and associated tooling in this repository.
+
+"Runtime Library" means the files in the runtime/ and stdlib/ directories
+of this repository, together with any object code or other compiled form
+of them that Stainless places into, or links with, the code it produces.
+
+"Independent Module" means source code that is neither part of the
+Runtime Library nor derived from it.
+
+"Target Code" means output produced by Stainless from one or more
+Independent Modules, together with any part of the Runtime Library that
+Stainless included in, or linked with, that output.
+
+"Eligible Compilation Process" means a process that produces Target Code
+from Independent Modules using Stainless, or using other software
+licensed under the GNU General Public License version 3 or a licence
+compatible with it.
+
+
+1. GRANT OF ADDITIONAL PERMISSION
+---------------------------------
+
+You have permission to propagate Target Code, and to convey it under
+terms of your choosing, even where doing so would otherwise be restricted
+by the GNU General Public License, provided that all of the Target Code
+was produced by an Eligible Compilation Process.
+
+This permission attaches to the Runtime Library only. It does not extend
+to Stainless itself, nor to any modified version of the Runtime Library:
+conveying either of those remains subject to the GNU General Public
+License, version 3, in full.
+
+
+2. WHAT THIS MEANS IN PRACTICE
+------------------------------
+
+Compiling your own program with Stainless does not place your program
+under the GNU General Public License. You may licence what you write
+however you wish, and distribute it in binary form, even though the
+Stainless runtime is linked into it.
+
+Modifying Stainless, or modifying the Runtime Library, and distributing
+the result to others does place obligations on you: the modified source
+must be made available under the GNU General Public License, version 3.
+
+In short, the copyleft is on the compiler, not on what you build with it.
