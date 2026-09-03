@@ -20,11 +20,12 @@ the binary as in Swift and Go.
    small ARC runtime.
 3. **ARC, not GC.** Reference types are reference-counted and destroyed
    deterministically. No collector, no pauses, no tracing thread.
-4. **C ABI compatible.** `struct` types use the platform C layout,
+4. **C and C++ ABI compatible.** `struct` types use the platform C layout,
    `extern "C"` functions use the platform calling convention, and Stainless
-   functions are callable from C. Interop needs no marshalling layer. The
-   boundary is C in both directions: there is no C++ linkage, and no way to
-   import or export a C++ class.
+   functions are callable from C. Interop needs no marshalling layer.
+   `extern "C++"` and `export "C++"` do the same for C++ free functions, by
+   mangling a signature the way the target's compiler does. A C++ *class*
+   cannot be named yet.
 
 If you write C#, you can read Stainless on sight. The differences are all
 about what happens underneath: values instead of objects, refcounts instead
@@ -1545,7 +1546,7 @@ automatic or written makes no difference to the caller.
   constructor.
 - **Not indexed.** There is no `this[i]`.
 
-## 8. C interoperability
+## 8. Interoperability and libraries
 
 ```csharp
 extern "C" int puts(byte* s);

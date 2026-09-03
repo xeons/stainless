@@ -402,16 +402,18 @@ stainless build <paths...>     compile to a native executable
 stainless run   <paths...>     compile, then run it
 stainless emit-ir <paths...>   print the generated LLVM IR
 
-  -o, --out <path>   output file
-  --shared           build a shared library instead of an executable
-  --header <path>    write a C header for the exported surface
-  -O<0-3>            optimization level (default -O2)
-  --keep             keep the generated .ll
+  -o, --out <path>       output file
+  --shared               build a shared library instead of an executable
+  --header <path>        write a C header for the exported surface
+  --metadata <path>      write module metadata for a Stainless consumer
+  -r, --reference <path> bind against a library's module metadata
+  -O<0-3>                optimization level (default -O2)
+  --keep                 keep the generated .ll
 ```
 
 Paths may be `.sl` files or directories (searched recursively), in any order.
-C sources and object files can be listed alongside them and are passed straight
-to the linker:
+C and C++ sources and object files can be listed alongside them and are passed
+straight to the linker:
 
 ```
 stainless run samples/interop/interop.sl samples/interop/native.c
@@ -458,8 +460,42 @@ clang consumer.c build/math.lib -o consumer.exe
 
 One caveat worth knowing: plain C values cross a library boundary freely, but a
 `String`, class or array carries a reference count, and each binary links its
-own copy of the runtime. Pass C types across the boundary and keep managed
+own copy of the runtime. Pass C types across a *C* boundary and keep managed
 objects on one side of it.
+
+### A library for Stainless
+
+A Stainless consumer is a different matter, because both sides are Stainless and
+the compiler can describe one to the other:
+
+```
+stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
+stainless build app.sl --reference build/shapes.slmod build/shapes.lib -o app.exe
+```
+
+The `.slmod` is generated from the same bound program the library was compiled
+from, so it cannot drift from it. The consumer then writes ordinary Stainless
+against a module it has no source for:
+
+```csharp
+import Library.Shapes;
+
+var counter = new Counter("clicks", tally);
+counter.Step = 3;
+counter.Bump();
+Console.WriteLine(counter.Describe());
+```
+
+Classes cross with their fields, properties, methods, constructors and
+destructors, and so do structs, enums and free functions. Reference counting
+reaches across too: the object is allocated through the library's own TypeInfo,
+so it is destroyed by the destructor the library compiled for its layout, when
+the consumer drops the last reference.
+
+Generics and classes implementing interfaces do not cross, and the compiler says
+so where the library is built rather than leaving the consumer to find a public
+type missing. See [§8.4 of the spec](docs/language-spec.md) for why each is a
+decision about the language rather than a gap in the metadata.
 
 ---
 
@@ -471,13 +507,17 @@ objects on one side of it.
       v   Lexer -> Parser                       one file at a time, no #include
    syntax trees
       |
-      v   Binder, in ten whole-program passes:
-      |     1. declare modules        6. fold attributes to constants
-      |     2. declare types          7. compute C-compatible layouts
-      |     3. resolve imports        8. check bodies
-      |     4. resolve signatures     9. order and check static initializers
-      |        and field types       10. check whatever those instantiated
+      v   Binder, in eleven whole-program passes:
+      |     1. declare modules        7. compute C-compatible layouts
+      |     2. declare types          8. check what crosses a language boundary
+      |     3. resolve imports        9. check bodies
+      |     4. resolve signatures    10. order and check static initializers
+      |        and field types       11. check whatever those instantiated
       |     5. check that classes implement what they claim
+      |     6. fold attributes to constants
+      |
+      |   A referenced library's declarations are loaded before pass 1, so a
+      |   module from a binary is named exactly like one from source.
       |
       |   Nothing may depend on declaration order, so every name in the
       |   program is known before any body is checked. That single rule is
@@ -496,13 +536,17 @@ objects on one side of it.
 |---|---|
 | [Syntax/Lexer.cs](src/Stainless.Compiler/Syntax/Lexer.cs) | tokens; no preprocessor |
 | [Syntax/Parser.cs](src/Stainless.Compiler/Syntax/Parser.cs) | recursive descent + precedence climbing |
-| [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the ten passes, type checking, conversions, generic instantiation |
+| [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes, type checking, conversions, generic instantiation |
 | [Binding/TypeSystem.cs](src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
 | [Binding/Builtins.cs](src/Stainless.Compiler/Binding/Builtins.cs) | `String`, `StringBuilder`, `[Flags]`, and the ordering and hashing a primitive gets for free |
 | [Binding/Mangler.cs](src/Stainless.Compiler/Binding/Mangler.cs) | symbol names |
+| [Binding/CppMangler.cs](src/Stainless.Compiler/Binding/CppMangler.cs) | C++ symbol names, in the Itanium and Microsoft schemes |
+| [Binding/MetadataLoader.cs](src/Stainless.Compiler/Binding/MetadataLoader.cs) | symbols for a referenced library, from its metadata |
 | [Emit/Win64Abi.cs](src/Stainless.Compiler/Emit/Win64Abi.cs) | struct passing: register, `byval`, or `sret` |
 | [Emit/LlvmEmitter.cs](src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, retain/release insertion, metadata tables |
 | [Emit/CHeaderWriter.cs](src/Stainless.Compiler/Emit/CHeaderWriter.cs) | the C header for a shared library |
+| [Emit/MetadataWriter.cs](src/Stainless.Compiler/Emit/MetadataWriter.cs) | the module metadata a Stainless consumer binds against |
+| [Driver/ModuleMetadata.cs](src/Stainless.Compiler/Driver/ModuleMetadata.cs) | what that metadata contains, and how it is read back |
 | [runtime/](runtime/) | the whole runtime, split by feature |
 | [stdlib/](stdlib/) | the standard library, written in Stainless |
 
@@ -734,11 +778,17 @@ Being straight about the edges, roughly in the order they are worth adding:
   there is no entry point to initialize it from. No `static` members on a type,
   and no per-thread storage.
 - **Win64 only** for struct passing; the SysV classifier is not written.
-- **Whole-program compilation.** Modules make separate compilation possible, but
-  the driver does not do it yet, so a Stainless library cannot be consumed by
-  Stainless — only by C.
-- **The runtime is linked statically into every binary.** Managed objects
-  therefore should not cross a shared-library boundary; C types are fine.
+- **A library's surface is narrower than a module's.** `--metadata` lets a
+  Stainless library be consumed by Stainless, but a generic and a class that
+  implements an interface both stay behind: a template emits nothing until it is
+  instantiated, and a dispatch table is indexed by an id assigned across a whole
+  program. Both are reported where the library is built, and both need a
+  decision about the language rather than more metadata.
+- **The runtime is linked statically into every binary.** Each side of a library
+  boundary therefore has its own allocator and its own C stdio buffer, so output
+  written from inside a library does not interleave with its consumer's in the
+  order it was written. Shipping the runtime as its own shared library would
+  close both, and is the next thing worth doing about libraries.
 - `Main` takes no arguments. Field initializers are rejected — assign in a
   constructor. `delete` is reserved but unused.
 

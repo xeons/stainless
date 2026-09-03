@@ -521,3 +521,22 @@ Order of work, each step useful on its own:
 7. ~~Closures (§2.3).~~ Done, though not as sugar over step 3: `spawn` never
    needed them. A lambda becomes a closure for a single-method interface, or a
    plain function pointer for a delegate when it captures nothing.
+8. ~~Atomic reference counts.~~ Done, and not the way §10 proposed — see the
+   note there. Every count is atomic rather than only a `[Shared]` type's,
+   because `Mutex<List<T>>` guards a List and a List is not `[Shared]`. The
+   remaining gaps are the two lifetime ones, which no counting scheme touches.
+
+What is still open, in the order it is worth doing:
+
+1. **The +0/+1 dataflow pass.** A retain/release pair around a borrow is
+   redundant, and since the counts became atomic each redundant pair costs about
+   5.7ns rather than about 1.2ns. This was a nicety and is now the obvious next
+   piece of work.
+2. **Lifetimes.** A `Guard` can outlive the lock it proves (§4.2), and a job can
+   retain a plain-data array it was only lent (§1.3). Both are questions about
+   how long a borrowed thing lives, which sendability — a rule about types —
+   cannot answer.
+3. **The runtime as a shared library.** Each binary links its own copy, so two
+   sides of a library boundary have separate allocators and separate stdio
+   buffers. That is visible today as output from a library not interleaving with
+   its consumer's in the order it was written.

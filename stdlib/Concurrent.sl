@@ -25,13 +25,16 @@
 // field, and never lets a reference to it out. That last part is not a style
 // choice, it is the correctness argument:
 //
-// **Reference counts are not atomic.** A lock protects what it guards; it does
-// not protect the *count* of the thing it guards. So the moment a guarded
-// object is handed back to a caller -- retained on the way out, released on the
-// way in -- two threads are doing a read-modify-write on one counter with no
-// synchronization, and the count drifts down until the object is freed while
-// still in use. Keeping it in a field avoids that entirely: reading a field to
-// call a method on it borrows, and borrowing touches no count.
+// **A caller who keeps what it was lent outlives the lock.** A lock protects
+// what it guards for as long as it is held, and nothing stops a caller storing
+// the object it was handed and using it after the guard is gone. Keeping the
+// collection in a field avoids that entirely: reading a field to call a method
+// on it borrows, and a borrow that never leaves cannot outlive anything.
+//
+// This began as a stronger argument still, because reference counts were not
+// atomic and handing an object out of a lock corrupted its count. Counts are
+// atomic now, so that half is closed; the lifetime half is not, and it is the
+// half this design was already the answer to.
 //
 // So these types lock a raw mutex directly rather than using `Mutex<T>` from
 // Standard.Threading, whose `Guard.Value()` is exactly the hand-out that

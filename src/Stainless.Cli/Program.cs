@@ -95,10 +95,18 @@ internal static class Program
               including 'public' declarations, which are visible only to other
               Stainless modules.
 
+              Adding '--metadata' says the consumer will be Stainless rather than
+              C, and widens the table to the public declarations that metadata
+              describes. The consumer then passes '--reference' and links the
+              library, and writes ordinary Stainless against a module it has no
+              source for.
+
             EXAMPLES
               stainless run samples/hello.sl
               stainless build src -o build/app.exe -O3
               stainless build src --shared -o build/math.dll --header build/math.h
+              stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
+              stainless build app.sl -r build/shapes.slmod build/shapes.lib -o app.exe
               stainless emit-ir samples/hello.sl
             """);
     }

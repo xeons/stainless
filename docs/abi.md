@@ -163,6 +163,8 @@ The compiler emits, per implementing class, one vtable per interface plus the
 | `int Add(int, int)` in module `App.Math` | `_SL3App4Math3AddiiEi` | platform C |
 | `extern "C" int puts(byte*)` | `puts` | platform C |
 | `export "C" int sl_add(int, int)` | `sl_add` | platform C |
+| `extern "C++" int add(int, int)` | `_Z3addii` or `?add@@YAHHH@Z` | platform C |
+| `export "C++" double shapes::Area(double)` | `_ZN6shapes4AreaEd` or `?Area@shapes@@YANN@Z` | platform C |
 
 Every function uses the platform C calling convention. The mangling scheme
 distinguishes *names* only, never argument passing, so any Stainless function
@@ -206,6 +208,37 @@ An instantiated generic carries its type arguments, so `Box<int>` and
 not tell their methods apart. A class's simple name arrives here as
 `Box<int>`, which a linker symbol may not contain, so every non-alphanumeric
 character in a qualified name becomes `_`.
+
+### C++ names
+
+C++ has no ABI of its own. The platform specifies how C-shaped things work and
+says nothing about mangling, vtables or unwinding, so the compilers filled it in
+separately and two schemes resulted: Itanium's, used by gcc and clang, and
+Microsoft's, used by MSVC and by clang when it targets MSVC. They agree on
+nothing — not the prefix, not the order of the qualifiers, not whether the
+return type is encoded, not how a repeated type is abbreviated.
+
+| Declaration | Itanium | Microsoft |
+|---|---|---|
+| `int add(int, int)` | `_Z3addii` | `?add@@YAHHH@Z` |
+| `void nothing()` | `_Z7nothingv` | `?nothing@@YAXXZ` |
+| `int deref(int*, int*)` | `_Z5derefPiS_` | `?deref@@YAHPEAH0@Z` |
+| `geometry::area(double, double)` | `_ZN8geometry4areaEdd` | `?area@geometry@@YANNN@Z` |
+| `geometry::mix(int*, double*, int*)` | `_ZN8geometry3mixEPiPdS0_` | `?mix@geometry@@YAHPEAHPEAN0@Z` |
+
+Two details are worth stating because they are the ones easy to get wrong.
+Itanium counts each *enclosing namespace* as a substitution candidate before any
+parameter, which is why the repeated `int*` in the last row is `S0_` and not
+`S_` — the namespace took `S_`, and the same function at global scope would use
+`S_`. And a Stainless `long` is a fixed 64 bits, which is C++'s `long long`
+rather than its `long`: C++'s `long` is 32 bits on Windows.
+
+Both schemes are checked against clang rather than against a reading of the
+specification. `STAINLESS_CPP_ABI` forces one, so the scheme a host does not use
+can still be compared with what a real compiler emits for the same declarations.
+
+A C++ mangled name is mostly characters an LLVM identifier may not contain, so
+every function symbol is quoted in the IR when it needs to be.
 
 ## 4. Static storage
 
@@ -253,3 +286,59 @@ choice Swift makes, because it eliminates most retain/release traffic:
 - **Fields are owned.** Assigning to a field retains the new value and releases
   the old, in that order, so self-assignment is safe. The same order applies to
   a whole struct assigned over another.
+
+## 6. Across a library boundary
+
+A `--shared` build produces a library, and what may cross into it depends on who
+is on the other side.
+
+**A C or C++ consumer** gets plain values: primitives, pointers, and structs of
+plain data. Those are the ABI guarantee and they hold across a DLL exactly as
+they hold inside one binary. A managed reference appears in the generated header
+as `void*` — a handle to pass back in, not something to dereference or free —
+and a struct that holds a reference is refused at the boundary outright
+(SL0284), because the other side would copy its bytes and leave the count
+behind.
+
+**A Stainless consumer** is a different matter, because the compiler can
+describe one side to the other. `--metadata` writes a `.slmod` describing the
+library's public surface — layouts, field offsets, signatures, and linker names
+— and `--reference` binds another compilation against it. Classes then cross
+with their fields, properties, methods, constructors and destructors.
+
+What makes that sound rather than merely linkable is where the TypeInfo comes
+from. A class is allocated with `sl_alloc(TypeInfo*)`, and the consumer uses the
+*library's* table, imported by name:
+
+```llvm
+@_SLtiLibrary_Shapes_Counter = external dllimport constant %SlTypeInfo
+```
+
+so the object carries the destroy hook the library compiled for the layout the
+library chose. Rebuilding a table on the consumer's side would produce an object
+whose destructor came from one compilation and whose fields were laid out by
+another. Reference counting then works unchanged: `sl_retain` and `sl_release`
+only touch the header, and the destructor reached through TypeInfo is the right
+one whichever binary calls it.
+
+Windows needs `dllimport` on that declaration specifically because it is data. A
+function the linker can reach through a generated thunk; a constant it cannot,
+because the address has to come from the import address table.
+
+**Two things do not cross**, and neither is a gap in the metadata format:
+
+- a **generic**, because a template emits nothing until it is instantiated, and
+  a consumer holding only the binary has nothing to instantiate;
+- a **class implementing an interface**, because a dispatch table is indexed by
+  an interface id assigned across a whole program (§2.5), and a library and its
+  consumer are two different programs. Closing it means either ids that are
+  stable across compilations — which the dense directly-indexed table exists to
+  avoid — or registering tables when the library loads.
+
+Both are reported where the library is built, as SL0419 and SL0420.
+
+**The runtime is still linked statically into each binary.** Both sides
+therefore have their own allocator and their own C stdio buffer, so text written
+inside a library and text written by its consumer do not interleave in the order
+they were written. Shipping the runtime as its own shared library would close
+both, and is not done.

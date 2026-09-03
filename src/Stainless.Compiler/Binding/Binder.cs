@@ -145,7 +145,9 @@ public sealed class Binder(
         _builtins.RegisterInto(_modules);
 
         // A referenced library's declarations come first, so a source file can
-        // name them exactly as it names anything else.
+        // name them exactly as it names anything else. This runs before pass 1
+        // rather than as one of them: it declares rather than resolves, and a
+        // program with no references skips it entirely.
         if (references is { Count: > 0 })
         {
             var loader = new MetadataLoader(diagnostics);
@@ -162,10 +164,10 @@ public sealed class Binder(
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
         ResolveAttributes();        // pass 6: attributes fold to constants
         ComputeLayouts();           // pass 7: every value type has a size
-        ValidateLinkageSignatures();// pass 7a: no counted reference crosses a C boundary
-        BindBodies();               // pass 8: only now is any code checked
-        BindStatics();              // pass 9: static initializers, then their order
-        DrainPending();             // pass 10: bodies of everything instantiated along the way
+        ValidateLinkageSignatures();// pass 8: no counted reference crosses a language boundary
+        BindBodies();               // pass 9: only now is any code checked
+        BindStatics();              // pass 10: static initializers, then their order
+        DrainPending();             // pass 11: bodies of everything instantiated along the way
 
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.

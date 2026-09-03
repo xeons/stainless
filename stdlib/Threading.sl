@@ -28,8 +28,9 @@
 // yet enforce.
 //
 // The one rule that matters most: threads share plain data and frozen data,
-// and move ownership of everything else. Reference counts are not atomic, and
-// nothing here makes them atomic.
+// and move ownership of everything else. Reference counts are atomic, so
+// sharing an object no longer corrupts its count; what the rule protects is
+// the object's *contents*, which nothing synchronizes on its behalf.
 module Standard.Threading;
 
 extern "C" {
@@ -61,8 +62,8 @@ extern "C" {
 /// It is an assertion by the author, not something the compiler checks: it says
 /// that every operation on this type synchronizes itself, so two threads
 /// reaching it cannot corrupt it. Without it a class may not cross a thread
-/// boundary at all, because reference counts are not atomic and nothing would
-/// report the race.
+/// boundary at all: reference counts are atomic, but nothing synchronizes the
+/// fields behind them, and a race there is one nothing would report.
 ///
 /// Put it on a type whose state lives behind a lock or an atomic, and nowhere
 /// else. `Mutex`, `AtomicLong` and `AtomicBool` carry it because that is what
