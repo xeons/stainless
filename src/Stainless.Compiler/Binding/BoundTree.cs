@@ -46,6 +46,14 @@ public enum ConversionKind
     BoolToInteger,
     NullToReference,    // null literal adopting an optional/pointer type
     ReferenceToOptional, // C -> C?
+
+    /// <summary>
+    /// <c>C</c> or <c>C?</c> -> <c>weak C?</c>. The pointer is unchanged; what
+    /// differs is the slot it lands in, which counts weakly rather than
+    /// strongly. That is the whole of what a weak reference is, and it is why
+    /// this conversion emits nothing.
+    /// </summary>
+    ReferenceToWeak,
     ClassToInterface,   // C -> I; the same pointer, since dispatch goes via TypeInfo
 
     /// <summary>
@@ -216,6 +224,23 @@ public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaS
     : BoundExpression(span, type)
 {
     public Syntax.LambdaSyntax Syntax { get; } = syntax;
+}
+
+/// <summary>
+/// A finished <c>Ok(x)</c> or <c>Fail(e)</c>: the <c>Result</c> struct it builds,
+/// with the payload already converted to the field it is stored in.
+///
+/// The type is the instantiated <c>Result&lt;T, E&gt;</c>, which is why this node
+/// only ever exists after a conversion has said which one.
+/// </summary>
+public sealed class BoundResultConstruction(
+    SourceSpan span, TypeSymbol type, bool succeeded, BoundExpression payload)
+    : BoundExpression(span, type)
+{
+    /// <summary>True for <c>Ok</c>, false for <c>Fail</c>.</summary>
+    public bool Succeeded { get; } = succeeded;
+
+    public BoundExpression Payload { get; } = payload;
 }
 
 /// <summary>

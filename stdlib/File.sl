@@ -85,14 +85,14 @@ public FileStream OpenAppend(String path) {
 // ------------------------------------------------------------------ reading
 
 /// The whole file as bytes.
-public Result<byte[]> ReadAllBytes(String path) {
+public Result<byte[], IOError> ReadAllBytes(String path) {
     var file = OpenRead(path);
-    if (!file.IsOpen()) { return new Result<byte[]>(false, new byte[0], file.Error()); }
+    if (!file.IsOpen()) { return Fail(file.Error()); }
 
     long size = file.Length();
     if (size < 0) {
         file.Close();
-        return new Result<byte[]>(false, new byte[0], IOError.Unknown);
+        return Fail(IOError.Unknown);
     }
 
     var data = new byte[(nuint)size];
@@ -100,32 +100,32 @@ public Result<byte[]> ReadAllBytes(String path) {
     var failure = file.Error();
     file.Close();
 
-    if (failure != IOError.None) { return new Result<byte[]>(false, new byte[0], failure); }
+    if (failure != IOError.None) { return Fail(failure); }
 
     // A short read is not an error, but the array has to match what arrived.
-    if (got == (nuint)size) { return new Result<byte[]>(true, data, IOError.None); }
+    if (got == (nuint)size) { return Ok(data); }
 
     var exact = new byte[got];
     for (nuint i = 0; i < got; i = i + 1) { exact[i] = data[i]; }
-    return new Result<byte[]>(true, exact, IOError.None);
+    return Ok(exact);
 }
 
 /// The whole file as text, read as UTF-8.
-public Result<String> ReadAllText(String path) {
+public Result<String, IOError> ReadAllText(String path) {
     var raw = ReadAllBytes(path);
-    if (!raw.Ok) { return new Result<String>(false, "", raw.Error); }
-    if (raw.Value.Length == 0) { return new Result<String>(true, "", IOError.None); }
+    if (!raw.Ok) { return Fail(raw.Error); }
+    if (raw.Value.Length == 0) { return Ok(""); }
 
-    return new Result<String>(true, Text.FromBytes(&raw.Value[0], raw.Value.Length), IOError.None);
+    return Ok(Text.FromBytes(&raw.Value[0], raw.Value.Length));
 }
 
 /// The file's lines, with either line ending accepted and a trailing newline
 /// producing no final empty line.
-public Result<List<String>> ReadAllLines(String path) {
+public Result<List<String>, IOError> ReadAllLines(String path) {
     var text = ReadAllText(path);
-    if (!text.Ok) { return new Result<List<String>>(false, new List<String>(), text.Error); }
+    if (!text.Ok) { return Fail(text.Error); }
 
-    return new Result<List<String>>(true, IO.SplitLines(text.Value), IOError.None);
+    return Ok(IO.SplitLines(text.Value));
 }
 
 // ------------------------------------------------------------------ writing

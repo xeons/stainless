@@ -73,12 +73,15 @@ Checked, as of step 6, at the three places a value can reach another thread: a
 
 | Allowed | Why it is safe |
 |---|---|
-| plain data — primitives, enums, pointers, delegates, `struct` | there is no reference count to race over |
+| plain data — primitives, enums, pointers, delegates, and a `struct` of the same | there is no reference count to race over |
 | `String` | immutable, and its bytes live inside the object |
 | a class marked `[Shared]` | the author asserts it synchronizes itself |
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
-Everything else is rejected, and the error names all three ways out.
+Everything else is rejected, and the error names all three ways out. A `struct`
+that holds a reference is rejected with everything else: copying one retains
+what it holds, and a retain two threads can both perform is the race this rule
+exists to stop.
 
 The fourth row is the pragmatic one, and worth being honest about: borrowing
 without retaining is sound as far as it goes, but nothing yet stops a job from

@@ -29,6 +29,17 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
     /// <summary>True for the implicit receiver of a method, constructor or destructor.</summary>
     public bool IsThis { get; init; }
 
+    /// <summary>
+    /// True when the body writes to this parameter, or to something inside it.
+    ///
+    /// A parameter is borrowed, so ordinarily it owns nothing and costs no
+    /// reference traffic. Writing to one breaks that: the release of what was
+    /// there would fall on a reference the caller still owns. So a parameter
+    /// that is written to is retained on entry and released on exit, becoming
+    /// the private copy the write already assumed it was.
+    /// </summary>
+    public bool IsAssigned { get; set; }
+
     public override string ToString() => $"{Type.Name} {Name}";
 }
 
@@ -52,6 +63,18 @@ public sealed class FunctionSymbol
     public bool IsVariadic { get; init; }
 
     public List<ParameterSymbol> Parameters { get; } = [];
+
+    /// <summary>
+    /// The declared parameter types, without the implicit receiver. This is
+    /// what distinguishes one overload from another, and what an interface
+    /// requirement is matched against.
+    /// </summary>
+    public IEnumerable<TypeSymbol> ParameterTypes =>
+        Parameters.Where(p => !p.IsThis).Select(p => p.Type);
+
+    /// <summary>True when this takes exactly these parameter types.</summary>
+    public bool Accepts(IReadOnlyList<TypeSymbol> parameters) =>
+        ParameterTypes.SequenceEqual(parameters);
 
     /// <summary>The body to bind, or null for an <c>extern "C"</c> declaration.</summary>
     public BlockSyntax? Body { get; init; }

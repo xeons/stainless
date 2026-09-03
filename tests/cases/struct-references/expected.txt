@@ -1,0 +1,28 @@
+-- copy
++1
+shared 1
+-1
+-- reassign
++2
++3
+-2
+holding 3
+-3
+-- self
++4
+intact 4
+-4
+-- class field
++5
+bagged 5
+-5
+-- array
++6
++7
+stored 7
+-6
+-7
+-- discarded
++8
+-8
+done

@@ -60,6 +60,112 @@ String Roundtrip() {
     return buffer.ToText() + " / " + reason + " / " + Path.FileName("x/y/notes.txt");
 }
 
+// --- spec 2.6 / 7.1 overloading, and one class implementing two interfaces -
+interface IEq<T> { bool Same(T other); }
+
+class Both : IEq<int>, IEq<String> {
+    public bool Same(int other)    { return other == 7; }
+    public bool Same(String other) { return other == "seven"; }
+}
+
+class Printer {
+    public String Show(int n)    { return "int"; }
+    public String Show(String s) { return "text"; }
+    public String Show(double d) { return "double"; }
+}
+
+String Overloads() {
+    var both = new Both();
+    IEq<int> asNumber = both;
+    IEq<String> asText = both;
+
+    var printer = new Printer();
+    return printer.Show(1) + " " + printer.Show("x") + " " + printer.Show(2.5)
+        + " " + (asNumber.Same(7) && asText.Same("seven") ? "both" : "neither");
+}
+
+// --- spec 2.10 a lambda reaching its object -------------------------------
+class Scaler {
+    public int Factor;
+    public Scaler(int factor) { Factor = factor; }
+
+    int Triple(int n) { return n * 3; }
+
+    public ITransform ByField()  { return value => value * Factor; }
+    public ITransform ByThis()   { return value => value * this.Factor; }
+    public ITransform ByMethod() { return value => Triple(value); }
+}
+
+// --- spec 2.4 weak breaks a cycle -----------------------------------------
+class Kid {
+    public weak Guardian? Owner;
+}
+
+class Guardian {
+    public Kid? Child;
+}
+
+String Cycles() {
+    var guardian = new Guardian();
+    var kid = new Kid();
+    guardian.Child = kid;
+    kid.Owner = guardian;
+
+    Guardian? back = kid.Owner;
+    return back == null ? "lost" : "linked";
+}
+
+// --- spec 9 arithmetic C leaves undefined ---------------------------------
+int Forty() { return 40; }
+
+String Defined() {
+    return Text.FromInteger(1 << Forty())          // 1 << (40 & 31)
+        + ":" + Text.FromInteger(1 << 30);
+}
+
+// --- spec 2.5 Result ------------------------------------------------------
+enum Why { None = 0, TooSmall = 1, TooBig = 2 }
+
+Result<int, Why> Doubled(int n) {
+    if (n < 0) { return Fail(Why.TooSmall); }
+    return Ok(n * 2);
+}
+
+// The early return, and the proof it leaves behind.
+Result<String, Why> Described(int n) {
+    var doubled = Doubled(n);
+    if (!doubled.Ok) { return Fail(doubled.Error); }
+    return Ok("got " + Text.FromInteger(doubled.Value));
+}
+
+String Results() {
+    var good = Described(21);
+    var bad = Described(-1);
+
+    // A declared local is a target the same way a return type is.
+    Result<int, Why> held = Ok(4);
+
+    return (good.Ok ? good.Value : "none")
+        + " / " + Text.FromInteger(bad.Ok ? 0 : (int)bad.Error)
+        + " / " + Text.FromInteger(Doubled(-9).ValueOr(8080))
+        + " / " + Text.FromInteger(held.ValueOr(0));
+}
+
+// --- spec 2.2 a struct that holds a reference -----------------------------
+struct Holder {
+    public String Text;
+    public int Tag;
+}
+
+String Held() {
+    Holder one;
+    one.Text = "owned";
+    one.Tag = 3;
+
+    var two = one;                 // the copy retains what it holds
+    return two.Text + Text.FromInteger(two.Tag);
+}
+
 // --- spec 5.4 collections -------------------------------------------------
 String Roster() {
     var ages = new Dictionary<String, int>();
@@ -199,6 +305,15 @@ int Main() {
     printf("switch=%s %s\n", Name(Level.Severe).ToPointer(), Name(Level.Fatal).ToPointer());
     printf("roster=%s\n", Roster().ToPointer());
     printf("io=%s\n", Roundtrip().ToPointer());
+    printf("result=%s\n", Results().ToPointer());
+    printf("held=%s\n", Held().ToPointer());
+
+    var scaler = new Scaler(3);
+    printf("capture=%d %d %d\n",
+        scaler.ByField().Apply(7), scaler.ByThis().Apply(7), scaler.ByMethod().Apply(7));
+    printf("cycle=%s\n", Cycles().ToPointer());
+    printf("defined=%s\n", Defined().ToPointer());
+    printf("overloads=%s\n", Overloads().ToPointer());
     printf("intrinsic=%d %d\n", 3.CompareTo(5), "apple".CompareTo("banana"));
 
     var counted = new int[4];

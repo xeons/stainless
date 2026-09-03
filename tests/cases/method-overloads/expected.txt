@@ -1,0 +1,13 @@
+int:yes
+int:no
+text:yes
+text:no
+via-int:yes
+via-text:yes
+via-text:no
+int 3
+text x
+double 2.5
+int 1/int 2
+25
+12

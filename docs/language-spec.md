@@ -20,9 +20,11 @@ the binary as in Swift and Go.
    small ARC runtime.
 3. **ARC, not GC.** Reference types are reference-counted and destroyed
    deterministically. No collector, no pauses, no tracing thread.
-4. **C/C++ ABI compatible.** `struct` types use the platform C layout,
+4. **C ABI compatible.** `struct` types use the platform C layout,
    `extern "C"` functions use the platform calling convention, and Stainless
-   functions are callable from C. Interop needs no marshalling layer.
+   functions are callable from C. Interop needs no marshalling layer. The
+   boundary is C in both directions: there is no C++ linkage, and no way to
+   import or export a C++ class.
 
 If you write C#, you can read Stainless on sight. The differences are all
 about what happens underneath: values instead of objects, refcounts instead
@@ -201,8 +203,40 @@ public struct Point {
 ```
 
 Structs are values: copied on assignment, passed per the platform C ABI, laid
-out with C field order and padding. A Stainless `struct` and the corresponding
-C `struct` are the same bytes, always. Structs are **not** reference counted.
+out with C field order and padding. A struct of plain data and the
+corresponding C `struct` are the same bytes, and copying one is a `memcpy` and
+nothing else. A struct with no fields occupies **one** byte rather than none,
+as it does in C++ and Rust, so that `sizeof` and the emitted layout agree about
+where the field after it begins.
+
+**A struct may also hold a reference**, and `Result<T, E>` is the reason it may:
+
+```csharp
+public struct Holder {
+    public String Text;
+    public int Tag;
+}
+```
+
+Copying such a struct retains what it holds, and dropping one releases it —
+whether it is a local going out of scope, a field of a class being destroyed,
+or an element of an array. That is Swift's model, and it is what lets a value
+type own something.
+
+What it costs is the C guarantee, and only for the structs that use it. Such a
+struct is still laid out as C would lay it out, but it can no longer be handed
+*to* C, because a C caller would copy the bytes and leave the count behind. The
+compiler stops it at the boundary:
+
+```
+error[SL0284]: 'Holder' holds a reference, so parameter 'h' cannot cross
+extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
+plain data, or a raw pointer
+```
+
+For the same reason such a struct may not cross a thread: two threads copying
+it would each retain, and retain is not atomic. A struct of plain data is
+unaffected by both rules, and pays for neither.
 
 ### 2.3 `class` — reference type, ARC managed
 
@@ -239,7 +273,124 @@ a count of 1.
 | `C?` | optional strong reference, may be null |
 | `weak C?` | non-owning reference; becomes null when the object dies |
 
-### 2.5 `interface` — a contract, dispatched dynamically
+A `weak C?` is assigned like any other reference — `child.Owner = parent;` —
+and the slot's type is what makes the store count weakly. Reading one yields a
+`C?` through a runtime check, so a weak reference to a dead object reads as
+`null` rather than as a pointer into freed memory.
+
+**This is the only way to break a cycle.** ARC cannot collect one, so two
+objects that refer to each other strongly leak, with neither destructor ever
+running. Making one direction weak is the whole of the answer, and it is why
+the conversion is implicit: there is no second option to choose between.
+
+```csharp
+class Child {
+    public weak Parent? Owner;      // up, weakly
+}
+
+class Parent {
+    public Child? Kid;              // down, strongly
+}
+```
+
+A lambda that captures `this` holds its object strongly, so an object that
+stores its own closure is such a cycle; see §2.10.
+
+### 2.5 `Result<T, E>` — how a function fails
+
+Stainless does not unwind. There is no `throw`, no stack unwinding and no
+`catch`, and there will not be: unwinding needs metadata on every frame and a
+personality routine, and a failure that travels invisibly through code that
+never mentioned it is the opposite of what the rest of the language does.
+
+A function that can fail says so in its return type instead:
+
+```csharp
+Result<Config, IOError> Load(String path) {
+    var text = File.ReadAllText(path);
+    if (!text.Ok) { return Fail(text.Error); }
+    return Ok(Parse(text.Value));
+}
+```
+
+`Result<T, E>` is a struct, so a call that succeeds allocates nothing. It is
+declared in `Standard`, which is imported everywhere, so it needs no import.
+
+**`Ok` and `Fail` take their type from where they are going.** Neither can be
+written with type arguments — type arguments cannot be written at a call at all
+(§4.4) — and one value could not say what both of them are: `Ok(4)` fixes `T`
+and says nothing about `E`. So the compiler reads the type being returned or
+assigned into, exactly as it does for a lambda:
+
+```csharp
+Result<int, Why> Doubled(int n) {
+    if (n < 0) { return Fail(Why.TooSmall); }   // E from the return type
+    return Ok(n * 2);                           // T from the return type
+}
+
+Result<int, Why> held = Ok(4);                  // and from a declared local
+var loose = Ok(4);                              // error[SL0287]: nothing to infer from
+```
+
+For the same reason a module-level function may not be named `Ok` or `Fail`
+(SL0414). A *method* still may.
+
+**`Value` and `Error` are readable only where it is known which one is there.**
+This is what makes a Result different from a pair of fields that happen to sit
+together, and it is checked rather than trusted:
+
+```csharp
+var read = File.ReadAllText(path);
+read.Value                     // error[SL0286]: nothing has established that
+                               // 'read' succeeded
+```
+
+The proof can come from any of these:
+
+| Shape | What it proves |
+|---|---|
+| `if (r.Ok) { … } else { … }` | `Value` in the first arm, `Error` in the second |
+| `if (!r.Ok) { return …; }` | `Value` for the whole rest of the block |
+| `r.Ok ? r.Value : f(r.Error)` | each arm, under its own branch |
+| `if (a.Ok && b.Ok)` | both, inside the branch |
+
+The early return is the one most code is written around, and it is why
+`AlwaysExits` matters here: a branch that always leaves proves its opposite for
+everything after it.
+
+```csharp
+var raw = File.ReadAllBytes(path);
+if (!raw.Ok) { return Fail(raw.Error); }
+use(raw.Value);                              // proved by the line above
+```
+
+Anything that could have changed the Result takes the proof away again — an
+assignment to it, and, inside a loop, an assignment anywhere in the body:
+
+```csharp
+var r = Get();
+if (!r.Ok) { return 0; }
+r = Get();
+return r.Value;               // error[SL0286]: the proof was about the old value
+```
+
+**What is not narrowed.** Only a Result held in a local or a parameter can
+carry a proof, because that is the only thing a check can be *about*; a field
+or a call result is refused with SL0285, and putting it in a local first is
+both the fix and what the code wanted to say. A caller with a sensible default
+needs no proof at all:
+
+```csharp
+int port = ParsePort(text).ValueOr(8080);
+```
+
+**What this is not.** A Result is for a failure a caller can do something
+about. A bounds violation, a division by zero or a null dereference is a
+mistake in the program rather than an outcome of it, and those still abort
+through the runtime: threading a Result through every array index would make
+every program worse to read in exchange for nothing.
+
+### 2.6 `interface` — a contract, dispatched dynamically
 
 ```csharp
 public interface IShape {
@@ -284,7 +435,25 @@ Dispatch is four constant-offset loads with no search and no branch — see
 [abi.md](abi.md) for the tables. There is no class inheritance, no interface
 inheritance, and no downcasting from an interface back to a class.
 
-### 2.6 `T[]` — a counted array
+**A class may implement two instantiations of one generic interface**, because
+each interface it implements gets its own table:
+
+```csharp
+public interface IEq<T> { bool Same(T other); }
+
+public class Both : IEq<int>, IEq<String> {
+    public bool Same(int other)    { ... }
+    public bool Same(String other) { ... }
+}
+```
+
+The two methods share a name and are told apart by their parameters (§7.1).
+`IEq<int>`'s table takes the first and `IEq<String>`'s the second, so a call
+through either reference reaches the right one, and a call on `Both` itself
+picks by argument type. What may *not* be overloaded is a method of one
+interface, since that is one slot.
+
+### 2.7 `T[]` — a counted array
 
 ```csharp
 var numbers = new int[5];
@@ -305,7 +474,7 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
-### 2.7 `enum` — a distinct type over an integer
+### 2.8 `enum` — a distinct type over an integer
 
 ```csharp
 public enum Color { Red, Green, Blue }
@@ -375,7 +544,7 @@ no methods, so this is the language spelling the test rather than a call.
 into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
 belong to.
 
-### 2.8 `delegate` — a named function pointer
+### 2.9 `delegate` — a named function pointer
 
 ```csharp
 public delegate int Transform(int value);
@@ -418,10 +587,10 @@ if (none == null) { ... }
 
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
-§2.9 — and only a non-capturing one can be a delegate, because there is nowhere
+§2.10 — and only a non-capturing one can be a delegate, because there is nowhere
 in a single pointer to keep what was captured.
 
-### 2.9 Lambdas and closures
+### 2.10 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
 assigned to: an **interface with exactly one method**, or a **delegate**.
@@ -462,6 +631,31 @@ ITransform MakeAdder(int amount) {
     return value => value + amount;     // fine; `amount` was copied
 }
 ```
+
+**A lambda written in a method can reach its object.** A field, a property,
+`this` itself, and a method called without a receiver all resolve, and each is
+captured by the same by-value rule as a local:
+
+```csharp
+class Scaler {
+    public int Factor;
+
+    int Triple(int n) { return n * 3; }
+
+    public ITransform ByField()  { return value => value * Factor; }
+    public ITransform ByThis()   { return value => value * this.Factor; }
+    public ITransform ByMethod() { return value => Triple(value); }
+}
+```
+
+`this` inside a lambda means the object the lambda was written in, never the
+closure the compiler generated for it. A member read is captured as a value, so
+`ByField` copies what `Factor` said when the closure was made; a method call
+captures the object, because the call needs one.
+
+**Capturing `this` keeps the object alive**, which makes an object that stores
+its own closure a reference cycle. ARC cannot collect one, so break it with a
+`weak` reference (§2.4) exactly as you would any other.
 
 Parameter types may be written or left out; left out, they come from the target,
 which is the only thing that knows them. A lambda with no target is an error —
@@ -785,11 +979,11 @@ linker cannot drop them either. Compiling with `-ffunction-sections` and
 | `Standard.Threading` | `Mutex<T>`, atomics, the job pool | on request |
 | `Standard.Math` | arithmetic that is not an operator | on request |
 | `Standard.Reflection` | `[Reflect]`, `typeof`, the field tables | on request |
-| `Standard.IO` | streams, `IOError`, `Result<T>` | on request |
+| `Standard.IO` | streams and `IOError` | on request |
 | `Standard.File` | whole-file operations | on request |
 | `Standard.Directory` | making, removing and listing | on request |
 | `Standard.Path` | taking paths apart, textually | on request |
-| `Standard` | `[Flags]`, and other markers the language itself reads | automatically |
+| `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
 ### 5.2 `Standard.Threading`
 
@@ -1044,20 +1238,19 @@ Stainless has no static classes, so what C# spells `File.ReadAllText` is a
 module-qualified call to a module-level function. That is the mapping
 throughout: a module is the static class.
 
-**How failure is reported.** There are no exceptions, and an optional cannot
-yet be unwrapped, so neither usual answer is available. What is left is to
-return the outcome as a value, in one of three shapes:
+**How failure is reported.** Stainless does not unwind (§2.5), so the outcome
+comes back as a value, in one of three shapes:
 
 | Shape | Used by | Reads as |
 |---|---|---|
-| `Result<T>` | anything that produces a value | `if (r.Ok) { r.Value }` |
+| `Result<T, IOError>` | anything that produces a value | `if (r.Ok) { r.Value }` |
 | `IOError` | anything that does not | `if (File.Delete(p) != IOError.None)` |
 | the stream's own `Error()` | streams | checked after a loop, not each step |
 
 Three shapes rather than one is deliberate: a single shape makes the common
-cases read worse than the rare one. **`Value` on a failed `Result<T>` is the
-empty value of its type** — an empty String, an empty array — and never null,
-so reading it by mistake is wrong rather than fatal.
+cases read worse than the rare one. There is no failed value to read by
+mistake — `Value` does not compile until the check has happened — and a caller
+that would rather carry on writes `read.ValueOr("")`.
 
 **Streams.** `IStream` is `Read`/`Write`/`Seek`/`Length`/`Position`/`Flush`/
 `Close` plus `CanRead`/`CanWrite`/`CanSeek`. `FileStream` and `MemoryStream`
@@ -1238,6 +1431,34 @@ void NoReturn() { }
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
 
+**Overloading is by parameter type**, for methods as much as for free
+functions. A return type alone does not distinguish two of them, because a call
+does not always say what it wants back:
+
+```csharp
+class Printer {
+    public String Show(int n)    { return "int"; }
+    public String Show(String s) { return "text"; }
+    public String Show(double d) { return "double"; }
+}
+```
+
+Which one a call means is decided from the arguments, exactly as it is for a
+module-level function: a call that fits none is SL0263 and one that fits
+several equally is SL0264.
+
+**An interface method may not be overloaded.** An interface gives each of its
+methods a dispatch slot by position, so two of a name in one interface would be
+a call the receiver could not resolve:
+
+```
+error[SL0416]: 'IBad' already declares 'Same'; an interface method may not be
+overloaded, because dispatch gives each one a single slot
+```
+
+A *class* implementing two interfaces whose methods share a name is a different
+matter, and it works — see §2.6.
+
 ### 7.2 Properties
 
 ```csharp
@@ -1345,6 +1566,32 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
+**`"C"` is the only linkage there is.** The convention string is checked, and
+anything else is rejected:
+
+```
+error[SL0102]: unsupported linkage convention "C++"; only "C" is supported
+```
+
+There is no C++ linkage in either direction. A C++ class cannot be imported —
+that would need name mangling for two incompatible ABIs, a vtable layout to
+match, and an answer for constructors, destructors and exceptions crossing the
+boundary — and none is exported, since `export "C"` is the whole export table
+and it is unmangled by definition. Reaching C++ means what it means from C: a
+shim of `extern "C"` functions over an opaque handle, with the C++ side keeping
+its own types to itself.
+
+**What a signature may carry.** Plain C values — primitives, pointers, and
+structs of plain data — cross freely. A struct that holds a reference does not,
+in either direction, because C would copy its bytes and leave the count behind
+(§2.2):
+
+```
+error[SL0284]: 'Holder' holds a reference, so parameter 'h' cannot cross
+extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
+plain data, or a raw pointer
+```
+
 ### 8.1 Building a shared library
 
 ```
@@ -1445,6 +1692,29 @@ value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
 anything computed still does.
 
 A string literal has type `String`; see section 3.
+
+**The arithmetic C leaves undefined.** C compiles these to whatever falls out,
+and an optimiser is entitled to assume they never happen — which is worse than
+a wrong answer, because it can delete the code around them. Stainless defines
+all three:
+
+| Expression | C | Stainless |
+|---|---|---|
+| `1 << 40` on an `int` | undefined | `1 << (40 & 31)` = 256, as in C# |
+| `x / 0` | undefined | aborts, the way an out-of-range index does |
+| `int.Smallest / -1` | undefined | aborts; the result is not representable |
+
+A shift count is reduced modulo the operand's width, which costs one `and` and
+matches what a C# reader expects. Division is checked where the divisor is not
+already known: a constant divisor is checked at compile time instead, and
+`10 / 0` is an error rather than a program that runs.
+
+```
+error[SL0415]: division by zero
+```
+
+Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
+unchecked, and is defined rather than undefined.
 
 ### 9.1 `switch`
 
@@ -1636,14 +1906,16 @@ receiver, a `parallel for` capture, and a `static readonly`.
 
 | Allowed | Why it is safe |
 |---|---|
-| plain data — primitives, enums, pointers, delegates, `struct` | there is no reference count to race over |
+| plain data — primitives, enums, pointers, delegates, and a `struct` of the same | there is no reference count to race over |
 | `String` | immutable, and its bytes live inside the object |
 | a class marked `[Shared]` | the author asserts it synchronizes itself |
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
 Everything else is rejected. Reference counts are not atomic, so two threads
 retaining one object is a race nothing would report — which is why this is a
-rule rather than a warning.
+rule rather than a warning. That is also why a `struct` holding a reference is
+not in the first row: copying one retains what it holds (§2.2), so it is not
+plain data however it is laid out.
 
 `[Shared]` lives in `Standard.Threading` and is an **assertion, not a proof**:
 

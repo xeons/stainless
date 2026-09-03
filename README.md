@@ -70,10 +70,12 @@ runtime is [ten small C files](runtime/): reference counting, text, UTF-16, a
 string builder, arrays, reflection metadata, console output, threads, ordering
 and hashing, and files.
 
-**4. C/C++ ABI compatible.** A Stainless `struct` *is* a C struct, byte for byte.
-`extern "C"` calls into C and `export "C"` exposes functions back, with no
+**4. C ABI compatible.** A `struct` of plain data *is* a C struct, byte for
+byte. `extern "C"` calls into C and `export "C"` exposes functions back, with no
 bindings, marshalling, or generated glue. Even `String` hands its bytes to C
-without a copy.
+without a copy. A struct that holds a reference is counted rather than copied
+raw, and the compiler stops that one at the boundary. C++ classes are not
+importable or exportable: the boundary is C, in both directions.
 
 ---
 
@@ -121,6 +123,34 @@ export "C" Point sl_scale(Point p, double factor) {
     return result;
 }
 ```
+
+### Failure
+
+There is no `throw` and no unwinding. A function that can fail says so in its
+return type, and the compiler will not let the answer be read before the
+question is asked.
+
+```csharp
+Result<Config, IOError> Load(String path) {
+    var text = File.ReadAllText(path);
+    if (!text.Ok) { return Fail(text.Error); }     // now the rest holds a value
+    return Ok(Parse(text.Value));
+}
+```
+
+`Result<T, E>` is a struct, so a call that succeeds allocates nothing. `Ok` and
+`Fail` are written without type arguments and take their type from where they
+are going, the way a lambda takes its type from what it is assigned to. Reading
+`Value` before checking `Ok` is a compile error rather than a wrong answer:
+
+```
+error[SL0286]: 'read.Value' is not readable here, because nothing has
+established that 'read' succeeded; check 'if (read.Ok)' first, or use
+'read.ValueOr(...)'
+```
+
+The check can be an `if`, an early return, a ternary arm, or an `&&`. A caller
+that would rather carry on writes `ValueOr(fallback)` and needs no check at all.
 
 ### Text
 
@@ -357,7 +387,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 104 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 114 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -486,6 +516,9 @@ Stainless uses **borrowed parameters and owned returns**, the same choice Swift
 makes, because it removes most retain/release traffic: passing a reference to a
 function costs nothing. Locals and fields own their references; assigning to one
 retains the new value *before* releasing the old, so self-assignment is safe.
+A parameter the body *writes to* is the one exception — it is retained on entry
+and released on exit, because otherwise its store would release a reference the
+caller still owns.
 
 ---
 
@@ -496,7 +529,17 @@ Everything below is covered by [the test suite](tests/cases).
 - Modules like C# namespaces: several files may share one, imports are per file,
   `public` exports and an unmarked declaration is module-wide
 - Aliases, qualified names without an import, full order independence
-- `struct` with fields and methods; exact C layout; value copy semantics
+- `struct` with fields and methods; exact C layout; value copy semantics. A
+  struct may hold a reference, and copying one then retains what it holds — the
+  cost is that it is no longer a value C can be handed, which the compiler
+  checks at every `extern "C"` and `export "C"`
+- `Result<T, E>`: the language's answer to an exception. A struct, so a call
+  that succeeds allocates nothing; `Ok(x)` and `Fail(e)` are written without
+  type arguments and take their type from what they are returned or assigned
+  into, the way a lambda does. `Value` and `Error` are readable only where the
+  compiler has already seen which one is there — after `if (r.Ok)`, in the arm
+  of a ternary, or after an early `if (!r.Ok) { return ...; }` — and
+  `ValueOr(fallback)` needs no proof because it supplies one
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
 - Properties, on classes, structs and interfaces: `{ get; set; }` with a
@@ -522,7 +565,12 @@ Everything below is covered by [the test suite](tests/cases).
   `[Shared]` type, or an array of plain data. Anything else is rejected at the
   `spawn`, the `parallel for` capture, or the static that would share it
 - Full operator set with C# precedence, short-circuit `&&` and `||`, and the
-  conditional `a ? b : c`
+  conditional `a ? b : c`. The arithmetic C leaves undefined is defined here:
+  a shift count is reduced modulo the operand's width as in C#, so `1 << 40` is
+  256 rather than garbage, and an integer division by zero — or the one signed
+  division that overflows — aborts the way an out-of-range index does, rather
+  than being folded to whatever the optimiser likes. A divisor that is zero at
+  compile time is an error instead
 - `var`, `const`, explicit locals, compound assignment
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
@@ -539,11 +587,22 @@ Everything below is covered by [the test suite](tests/cases).
   directions, and storable in a `struct`
 - Lambdas and closures: `value => value * factor` becomes a generated class
   implementing a single-method interface, capturing **by value** so it may
-  outlive the scope that built it; a non-capturing one becomes a `delegate`
+  outlive the scope that built it; a non-capturing one becomes a `delegate`. A
+  lambda written in a method reaches its object too — a field, a property,
+  `this`, or a method called without a receiver — and captures what it reads by
+  the same rule
+- `weak C?`: assignable, so a reference cycle can be broken. A weak reference
+  costs the object nothing while it lives and reads back as `null` once it is
+  gone, rather than as a pointer into freed memory
 - `foreach` over arrays and over anything with a `GetEnumerator()`, plus
   `IEnumerable<T>` / `IEnumerator<T>` in `Standard.Collections`
 - Interfaces: several per class, dynamic dispatch, checked at compile time, and
-  extending one another with free conversion to the base
+  extending one another with free conversion to the base. A class may implement
+  two instantiations of one generic interface — `IEq<int>` and `IEq<String>` —
+  because each interface has its own dispatch table and the overloads land in
+  different slots
+- Overloading by parameter type, on methods as well as module-level functions;
+  a return type alone does not distinguish two of them
 - `Standard.Collections`: `List<T>`, `Dictionary<K, V>`, `HashSet<T>`,
   `Queue<T>`, `Stack<T>`, `LinkedList<T>` and `SortedList<K, V>`, plus
   `IComparable<T>`, `IEquatable<T>`, `IHashable`, `IReadOnlyList<T>`,
@@ -570,9 +629,8 @@ Everything below is covered by [the test suite](tests/cases).
 - `Standard.IO`, `Standard.File`, `Standard.Directory`, `Standard.Path`:
   `IStream` with `FileStream` and `MemoryStream`, whole-file reads and writes,
   directory listing, and textual path handling. Failure is a returned value —
-  a `Result<T>` whose `Value` is empty rather than null, or an `IOError` — since
-  there are no exceptions and an optional cannot yet be unwrapped. Paths are
-  UTF-8 and are widened to UTF-16 before they reach Windows
+  a `Result<T, IOError>`, or a bare `IOError` where nothing is produced. Paths
+  are UTF-8 and are widened to UTF-16 before they reach Windows
 - `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
 - Raw pointers, `sizeof`, `typeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#
@@ -603,39 +661,42 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **A lambda needs something to be.** It is typed by what it is assigned to, so
   `var f = x => x;` has nothing to infer from. Capture is by value only, and a
   capturing lambda cannot become a `delegate` — a function pointer has nowhere
-  to keep what was captured.
-- **No exceptions or error type.** A failure aborts through the runtime; there
-  is no way to recover from one.
+  to keep what was captured. A lambda that captures `this` keeps its object
+  alive, so an object holding its own closure is a cycle; `weak` is how that is
+  broken.
+- **Narrowing is for `Result` only.** The compiler tracks which half of a
+  `Result` is present through `if`, `!`, `&&`, `||`, a ternary and an early
+  return, and only for one held in a local or a parameter. It does not yet do
+  the same for `C?`, so an optional still cannot be unwrapped by testing it.
+  The two want the same machinery and the second is the obvious next step.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
   formatting; `Substring` counts bytes, not characters, so it can slice a
   multi-byte character in half.
 - **No flow narrowing for `C?`.** Optionals can be stored, compared to `null`,
   and unwrapped with an explicit cast, but `if (x != null)` does not yet make
-  `x` usable as non-optional. This is the single most limiting gap: it is why
-  I/O returns a `Result<T>` rather than an optional, and why `LinkedList<T>`
-  links by index — a structure that walks `next` cannot be written at all.
-- **`weak` cannot be assigned.** A `weak C?` field can be declared and compared
-  to null, and the runtime side is complete, but there is no `C` → `weak C?`
-  conversion, so even `owner = other;` is rejected. Nothing can be stored in a
-  weak reference today.
+  `x` usable as non-optional. It is why `LinkedList<T>` links by index — a
+  structure that walks `next` cannot be written at all.
 - **No class inheritance.** Interfaces extend one another, but classes do not,
   and there is no downcast from an interface back to a class.
 - **Reflection reads but does not write.** Fields can be read from an instance,
   not set, so a deserializer cannot be written yet; nor can an instance be made
   from a `Type`. Methods and interfaces carry no metadata — fields only.
-- **No overloading by parameter type on methods** (module-level functions do
-  overload).
+- **An interface method may not be overloaded.** Dispatch gives each one a
+  single slot, so two of a name in one interface would be a call the receiver
+  could not resolve. Methods on classes and structs overload freely, and a
+  class may implement two interfaces whose methods share a name.
 - **A property is not an indexer, and not initialized where it is declared.**
   There is no `this[i]`, and `{ get; set; } = 5;` is rejected for the same
   reason a field initializer is. `p.X += 1` also needs a receiver that is a
   plain load, since the getter and the setter each evaluate it.
-- **Nothing prunes dead code.** Every stdlib module is compiled with your
-  program whether or not it is imported, and only generics are free — an
-  uninstantiated template emits nothing, but a non-generic function or class is
-  emitted either way. A hello-world binary carries 228 stdlib functions it
-  never calls and weighs 290 KB. Building the IR with `-ffunction-sections` and
-  linking with `/OPT:REF` brings that to 213 KB without any compiler change; a
-  reachability pass from `Main` would take out the rest.
+- **The compiler prunes no dead code; the linker does.** Every stdlib module is
+  compiled with your program whether or not it is imported, and only generics
+  are free — an uninstantiated template emits nothing, but a non-generic
+  function or class is emitted either way. What saves it is that everything is
+  emitted into its own section and the linker discards what nothing reached,
+  which takes hello-world from 290 KB to 124 KB. The IR is still the full size,
+  so compile time still pays for all of it; a reachability pass from `Main`
+  would fix that and is the real answer.
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a
   +0/+1 dataflow pass would remove most of it.
 - **`Mutex<T>` is unsound when `T` is a class shared between threads.**

@@ -43,6 +43,21 @@ void sl_fail(const char *message)
     abort();
 }
 
+/*
+ * The two integer divisions LLVM calls undefined. Left unguarded the optimiser
+ * is entitled to fold the whole expression to anything at all, which is how a
+ * division by zero comes to return a number and let the program carry on.
+ */
+void sl_divide_by_zero(void)
+{
+    sl_fail("integer division by zero");
+}
+
+void sl_divide_overflow(void)
+{
+    sl_fail("integer division overflows: the smallest value divided by -1");
+}
+
 void sl_object_init(void *pointer, const SlTypeInfo *type)
 {
     SlObject *object = (SlObject *)pointer;

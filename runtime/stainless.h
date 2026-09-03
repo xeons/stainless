@@ -139,6 +139,10 @@ void  sl_make_immortal(void *pointer);
 /* Reports a fatal runtime condition and aborts. Never returns. */
 void  sl_fail(const char *message);
 
+/* The integer divisions LLVM leaves undefined. Neither returns. */
+void  sl_divide_by_zero(void);
+void  sl_divide_overflow(void);
+
 /* ----------------------------------------------------------------- String */
 
 /*

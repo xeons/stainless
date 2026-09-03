@@ -1,0 +1,10 @@
+linked
+-parent 1
+-child 2
+scope left
+alive: present
+-parent 4
+dead: null
+cleared
+-parent 5
+-child 3

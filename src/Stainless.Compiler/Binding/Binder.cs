@@ -27,6 +27,13 @@ public sealed class BoundProgram
     public required IReadOnlyList<ClassTypeSymbol> Classes { get; init; }
     public required IReadOnlyList<InterfaceTypeSymbol> Interfaces { get; init; }
 
+    /// <summary>
+    /// Every struct type the program uses: those declared in a module, and the
+    /// instantiations of a generic one. An instantiation belongs to no module's
+    /// type table, so without this the IR would name a type nothing defined.
+    /// </summary>
+    public required IReadOnlyList<StructTypeSymbol> Structs { get; init; }
+
     /// <summary>Every distinct array type used, each needing its own TypeInfo.</summary>
     public required IReadOnlyList<ArrayTypeSymbol> Arrays { get; init; }
 
@@ -59,6 +66,21 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private readonly List<BoundFunction> _functions = [];
     private readonly List<ClassTypeSymbol> _classes = [];
     private readonly List<InterfaceTypeSymbol> _interfaces = [];
+    private readonly List<StructTypeSymbol> _structs = [];
+
+    /// <summary>
+    /// <c>Standard.Result</c>, found once the standard library has been declared.
+    /// Held by identity rather than by name so a user type also called Result is
+    /// an ordinary struct with no special rules.
+    /// </summary>
+    private GenericTypeTemplate? _resultTemplate;
+
+    /// <summary>
+    /// What the compiler has proved about each Result in scope. A fact is put
+    /// here by a condition that tested one, and taken away by anything that
+    /// could have changed it.
+    /// </summary>
+    private Dictionary<object, ResultFact> _resultFacts = [];
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
 
     /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
@@ -117,11 +139,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         DeclareModules(units);      // pass 1: every module exists
         DeclareTypes();             // pass 2: every type name exists
+        _resultTemplate = _modules.TryGetValue(Builtins.StandardModuleName, out var standard)
+            && standard.GenericTypes.TryGetValue("Result", out var result) ? result : null;
         ResolveImports();           // pass 3: every module can see its imports
         DeclareMembers();           // pass 4: every signature and field type is resolved
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
         ResolveAttributes();        // pass 6: attributes fold to constants
         ComputeLayouts();           // pass 7: every value type has a size
+        ValidateLinkageSignatures();// pass 7a: no counted reference crosses a C boundary
         BindBodies();               // pass 8: only now is any code checked
         BindStatics();              // pass 9: static initializers, then their order
         DrainPending();             // pass 10: bodies of everything instantiated along the way
@@ -143,6 +168,11 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             Functions = _functions,
             Classes = _classes,
             Interfaces = _interfaces,
+            Structs = _modules.Values
+                .SelectMany(m => m.Types.Values)
+                .OfType<StructTypeSymbol>()
+                .Concat(_structs)
+                .ToList(),
             Arrays = _arrays.Values.ToList(),
             RuntimeFactories = _modules.Values
                 .SelectMany(m => m.Types.Values)
@@ -529,14 +559,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
                     var fieldType = ResolveType(field.Type, scope);
 
-                    // A struct is a plain C value: it is copied without any hook, so it
-                    // cannot own a reference count. Keeping that rule is what lets a
-                    // Stainless struct stay bit-identical to a C struct.
-                    if (type is StructTypeSymbol && (fieldType.NeedsArc() || fieldType is WeakTypeSymbol))
-                        diagnostics.Error("SL0283", field.Span,
-                            $"struct '{type.Name}' cannot hold '{fieldType.Name}', because structs are " +
-                            "copied as raw bytes and cannot maintain a reference count; " +
-                            $"make '{type.Name}' a class, or store a raw pointer instead");
+                    // A struct holding a reference is allowed, and copying one
+                    // then retains what it holds. What it costs is the C
+                    // guarantee: such a struct is no longer bytes a C function
+                    // could be handed, which ValidateLinkageSignature enforces.
 
                     type.Fields.Add(new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
                     {
@@ -729,17 +755,6 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         FieldSymbol? backing = null;
         if (wantsStorage)
         {
-            // The same rule a plain field obeys, for the same reason: a struct is
-            // copied as raw bytes and has nowhere to keep a reference count.
-            if (type is StructTypeSymbol &&
-                (propertyType.NeedsArc() || propertyType is WeakTypeSymbol))
-            {
-                diagnostics.Error("SL0283", declaration.Span,
-                    $"struct '{type.Name}' cannot hold '{propertyType.Name}', and the automatic " +
-                    $"property '{declaration.Name}' would make it; structs are copied as raw " +
-                    "bytes and cannot maintain a reference count");
-            }
-
             // Named after the property, because that is what the storage is. It
             // is hidden from lookup, so nothing can reach past the accessors.
             backing = new FieldSymbol(declaration.Name, propertyType, type, type.Fields.Count)
@@ -878,16 +893,75 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 "because declaration order never matters");
         }
 
+        if (containingType is null && declaration.Name is OkName or FailName)
+            diagnostics.Error("SL0414", declaration.Span,
+                $"a module-level function cannot be named '{declaration.Name}': the language " +
+                "uses that name to build a Result, and a call would be ambiguous. A method " +
+                "of a type may still be called this");
+
         if (containingType is not null)
         {
-            if (containingType.FindMethod(declaration.Name) is not null)
+            var signature = symbol.ParameterTypes.ToList();
+
+            if (containingType.Methods.Any(m => m.Name == declaration.Name && m.Accepts(signature)))
                 diagnostics.Error("SL0211", declaration.Span,
-                    $"'{containingType.Name}' already declares a method named '{declaration.Name}'; " +
-                    "overloading is not supported yet");
+                    $"'{containingType.Name}' already declares a method '{declaration.Name}' " +
+                    "taking these parameter types; overloads must differ in their parameters, " +
+                    "and a return type alone does not distinguish two methods");
+
+            // An interface gives each of its methods a dispatch slot by
+            // position, so two of the same name in one interface would be a
+            // call the receiver could not resolve.
+            else if (containingType is InterfaceTypeSymbol &&
+                     containingType.Methods.Any(m => m.Name == declaration.Name))
+                diagnostics.Error("SL0416", declaration.Span,
+                    $"'{containingType.Name}' already declares '{declaration.Name}'; an interface " +
+                    "method may not be overloaded, because dispatch gives each one a single slot. " +
+                    "A class may still implement two interfaces whose methods share a name");
+
             containingType.Methods.Add(symbol);
         }
 
         module.Functions.Add(symbol);
+    }
+
+    /// <summary>
+    /// Refuses a C signature that would hand a counted reference across the
+    /// boundary inside a struct.
+    ///
+    /// A struct of plain data is still a C struct, byte for byte, and crosses
+    /// freely in both directions. One that holds a reference is not: copying it
+    /// retains what it holds, and C has no way to perform that copy — it would
+    /// memcpy the bytes and leave the count behind. The same reasoning already
+    /// keeps a bare <c>String</c> out of a C signature; this closes the gap a
+    /// struct could otherwise smuggle one through.
+    /// </summary>
+    private void ValidateLinkageSignatures()
+    {
+        foreach (var symbol in _modules.Values.SelectMany(m => m.Functions))
+        {
+            if (symbol.Linkage is not (LinkageKind.ExternC or LinkageKind.ExportC)) continue;
+
+            string how = symbol.Linkage == LinkageKind.ExternC ? "extern \"C\"" : "export \"C\"";
+
+            if (symbol.ReturnType is StructTypeSymbol { } returned && returned.CarriesReferences())
+                diagnostics.Error("SL0284", symbol.Span,
+                    $"'{returned.Name}' holds a reference, so it cannot be returned across " +
+                    $"{how}; C would copy its bytes and leave the count behind. Return a " +
+                    "struct of plain data, or a raw pointer");
+
+            foreach (var parameter in symbol.Parameters)
+            {
+                if (parameter.Type is not StructTypeSymbol { } passed ||
+                    !passed.CarriesReferences())
+                    continue;
+
+                diagnostics.Error("SL0284", symbol.Span,
+                    $"'{passed.Name}' holds a reference, so parameter '{parameter.Name}' " +
+                    $"cannot cross {how}; C would copy its bytes and leave the count behind. " +
+                    "Pass a struct of plain data, or a raw pointer");
+            }
+        }
     }
 
     private void AddParameters(FunctionSymbol symbol, IReadOnlyList<ParameterSyntax> parameters, FileScope scope)
@@ -1175,7 +1249,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         foreach (var required in interfaceType.Methods)
         {
-            var found = classType.FindMethod(required.Name);
+            var found = classType.FindImplementation(required);
 
             // A missing property is one mistake, not two: the getter reports it
             // and the setter stays quiet.
@@ -1261,7 +1335,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             alignment = Math.Max(alignment, fieldAlignment);
         }
 
-        type.SetLayout(TypeExtensions.AlignTo(offset, alignment), alignment);
+        // A struct with no fields still takes a byte, because the emitter gives
+        // it one: LLVM has no zero-sized named struct, so a fieldless struct is
+        // emitted as `type { i8 }`. If the binder disagreed, every copy of a
+        // struct containing one would move the wrong number of bytes and read
+        // its own padding. C++ and Rust settle it the same way.
+        int size = type is StructTypeSymbol && type.Fields.Count == 0
+            ? 1
+            : TypeExtensions.AlignTo(offset, alignment);
+
+        type.SetLayout(size, alignment);
         inProgress.Remove(type);
     }
 
@@ -1343,6 +1426,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         _instantiatedTypes[key] = type;
         if (type is ClassTypeSymbol instantiatedClass) _classes.Add(instantiatedClass);
         if (type is InterfaceTypeSymbol instantiatedInterface) _interfaces.Add(instantiatedInterface);
+        if (type is StructTypeSymbol instantiatedStruct) _structs.Add(instantiatedStruct);
 
         var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
@@ -1672,6 +1756,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         _scopes.Clear();
         _loopDepth = 0;
         _switchDepth = 0;
+        _resultFacts = [];
 
         PushScope();
         var body = BindBlock(function.Body);
@@ -1709,6 +1794,204 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         _functions.Add(new BoundFunction(accessor, new BoundBlock(span, [statement])));
     }
+
+    // ============================================================ Result
+
+    /// <summary>What is known about one Result at a point in the program.</summary>
+    private enum ResultFact { Succeeded, Failed }
+
+    /// <summary>The names <c>Ok(x)</c> and <c>Fail(e)</c>, which the language owns.</summary>
+    private const string OkName = "Ok";
+    private const string FailName = "Fail";
+
+    /// <summary>The storage behind <c>Ok</c>, <c>Value</c> and <c>Error</c>.</summary>
+    private const string ResultOkField = "ok";
+    private const string ResultValueField = "value";
+    private const string ResultErrorField = "error";
+
+    /// <summary>True for an instantiation of <c>Standard.Result</c>.</summary>
+    private bool IsResult(TypeSymbol type) =>
+        _resultTemplate is not null &&
+        type is StructTypeSymbol { Template: { } template } &&
+        ReferenceEquals(template, _resultTemplate);
+
+    /// <summary>
+    /// The declaration a narrowed fact can be attached to.
+    ///
+    /// Only a plain local or parameter qualifies. A field or a call result is
+    /// refused for the reason a compound assignment refuses a computed receiver:
+    /// the compiler would be proving something about one evaluation and letting
+    /// it be read from another. Putting the Result in a local first is the fix,
+    /// and it is what the code wants to say anyway.
+    /// </summary>
+    private static object? NarrowableSubject(BoundExpression expression) => expression switch
+    {
+        BoundLocalAccess local => local.Local,
+        BoundParameterAccess parameter => parameter.Parameter,
+        _ => null,
+    };
+
+    /// <summary>Forgets what was known about a Result, because something may have changed it.</summary>
+    private void InvalidateResultFact(BoundExpression target)
+    {
+        // Writing a field of a Result changes it just as assigning the whole
+        // thing does, so the subject is looked for through field accesses too.
+        for (BoundExpression? current = target; current is not null;
+             current = (current as BoundFieldAccess)?.Receiver)
+        {
+            if (NarrowableSubject(current) is not { } subject) continue;
+
+            _resultFacts.Remove(subject);
+            return;
+        }
+    }
+
+    /// <summary>
+    /// What a condition proves when it is true, and what it proves when it is
+    /// false.
+    ///
+    /// Only the shapes a Result is actually tested with are read: <c>r.Ok</c>,
+    /// its negation, and the two short-circuit operators. Anything else proves
+    /// nothing, which costs a diagnostic rather than soundness.
+    /// </summary>
+    private (Dictionary<object, ResultFact> WhenTrue, Dictionary<object, ResultFact> WhenFalse)
+        ConditionFacts(BoundExpression condition)
+    {
+        switch (condition)
+        {
+            case BoundFieldAccess { Receiver: { } target } flag
+                when flag.Field.Name == ResultOkField && IsResult(target.Type) &&
+                     NarrowableSubject(target) is { } subject:
+                return (
+                    new Dictionary<object, ResultFact> { [subject] = ResultFact.Succeeded },
+                    new Dictionary<object, ResultFact> { [subject] = ResultFact.Failed });
+
+            case BoundUnary { Operator: BoundUnaryOp.LogicalNot } negation:
+            {
+                var (whenTrue, whenFalse) = ConditionFacts(negation.Operand);
+                return (whenFalse, whenTrue);
+            }
+
+            // `a && b` proves both only when it is true; either could be the
+            // false one, so falsehood proves nothing. `a || b` is the mirror.
+            case BoundBinary { Operator: BoundBinaryOp.LogicalAnd } and:
+            {
+                var left = ConditionFacts(and.Left);
+                var right = ConditionFacts(and.Right);
+                return (Merge(left.WhenTrue, right.WhenTrue), []);
+            }
+
+            case BoundBinary { Operator: BoundBinaryOp.LogicalOr } or:
+            {
+                var left = ConditionFacts(or.Left);
+                var right = ConditionFacts(or.Right);
+                return ([], Merge(left.WhenFalse, right.WhenFalse));
+            }
+
+            default:
+                return ([], []);
+        }
+    }
+
+    private static Dictionary<object, ResultFact> Merge(
+        Dictionary<object, ResultFact> first, Dictionary<object, ResultFact> second)
+    {
+        var merged = new Dictionary<object, ResultFact>(first);
+        foreach (var (key, value) in second) merged[key] = value;
+        return merged;
+    }
+
+    private Dictionary<object, ResultFact> SnapshotFacts() => new(_resultFacts);
+
+    private void ApplyFacts(Dictionary<object, ResultFact> facts)
+    {
+        foreach (var (key, value) in facts) _resultFacts[key] = value;
+    }
+
+    /// <summary>
+    /// Drops every fact about a name the given statement assigns to.
+    ///
+    /// A loop body runs more than once, so a fact proved by its condition on the
+    /// way in says nothing about the second time round if the body reassigned
+    /// the Result. Matching on the name rather than the symbol makes this
+    /// over-eager under shadowing, which loses a narrowing and never invents one.
+    /// </summary>
+    private void InvalidateAssignedIn(Syntax.StatementSyntax body)
+    {
+        var assigned = new HashSet<string>(StringComparer.Ordinal);
+        CollectAssignedNames(body, assigned);
+        if (assigned.Count == 0) return;
+
+        foreach (var subject in _resultFacts.Keys.ToList())
+        {
+            string name = subject switch
+            {
+                LocalSymbol local => local.Name,
+                ParameterSymbol parameter => parameter.Name,
+                _ => "",
+            };
+
+            if (assigned.Contains(name)) _resultFacts.Remove(subject);
+        }
+    }
+
+    private static void CollectAssignedNames(Syntax.SyntaxNode? node, HashSet<string> names)
+    {
+        if (node is null) return;
+
+        if (node is Syntax.AssignmentSyntax assignment && RootName(assignment.Target) is { } assigned)
+            names.Add(assigned);
+
+        foreach (var child in ChildNodes(node)) CollectAssignedNames(child, names);
+    }
+
+    private static readonly Dictionary<Type, System.Reflection.PropertyInfo[]> ChildProperties = [];
+
+    /// <summary>
+    /// The syntax nodes one node holds, found by reflection.
+    ///
+    /// The AST is a set of records with no common child accessor, and writing a
+    /// visitor over all of them to answer one question about loops would be more
+    /// code than the question is worth. This walks the record's own properties
+    /// instead, so a new node kind is covered the day it is added.
+    /// </summary>
+    private static IEnumerable<Syntax.SyntaxNode> ChildNodes(Syntax.SyntaxNode node)
+    {
+        var type = node.GetType();
+        if (!ChildProperties.TryGetValue(type, out var properties))
+        {
+            properties = type.GetProperties()
+                .Where(p => p.GetIndexParameters().Length == 0 &&
+                            (typeof(Syntax.SyntaxNode).IsAssignableFrom(p.PropertyType) ||
+                             typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType)))
+                .ToArray();
+            ChildProperties[type] = properties;
+        }
+
+        foreach (var property in properties)
+        {
+            object? value = property.GetValue(node);
+
+            if (value is Syntax.SyntaxNode child)
+            {
+                yield return child;
+            }
+            else if (value is System.Collections.IEnumerable sequence and not string)
+            {
+                foreach (object? item in sequence)
+                    if (item is Syntax.SyntaxNode listed) yield return listed;
+            }
+        }
+    }
+
+    /// <summary>The identifier an assignment target is rooted at, if it is rooted at one.</summary>
+    private static string? RootName(Syntax.ExpressionSyntax expression) => expression switch
+    {
+        Syntax.NameSyntax name when name.Name.Parts.Count == 1 => name.Name.Parts[0],
+        Syntax.MemberAccessSyntax member => RootName(member.Target),
+        Syntax.IndexSyntax index => RootName(index.Target),
+        _ => null,
+    };
 
     /// <summary>Conservative reachability check: does this statement always return?</summary>
     private static bool AlwaysReturns(BoundStatement statement) => statement switch
@@ -1827,6 +2110,15 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                         "cannot infer a type from an expression of type 'void'");
                     type = ErrorTypeSymbol.Instance;
                 }
+                else if (type is ResultDraftType)
+                {
+                    diagnostics.Error("SL0287", syntax.Initializer.Span,
+                        $"'{syntax.Name}' cannot be a 'var': one value does not say what both " +
+                        "of a Result's type arguments are, so write the type out — " +
+                        $"'Result<T, E> {syntax.Name} = ...' — or return this directly from a " +
+                        "function that declares it");
+                    type = ErrorTypeSymbol.Instance;
+                }
             }
         }
         else
@@ -1856,17 +2148,50 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private BoundStatement BindIf(IfSyntax syntax)
     {
         var condition = BindCondition(syntax.Condition);
+        var (whenTrue, whenFalse) = ConditionFacts(condition);
+
+        var entry = SnapshotFacts();
+
+        ApplyFacts(whenTrue);
         var then = BindStatement(syntax.Then);
+
+        _resultFacts = new Dictionary<object, ResultFact>(entry);
+        ApplyFacts(whenFalse);
         var otherwise = syntax.Else is null ? null : BindStatement(syntax.Else);
+
+        _resultFacts = entry;
+
+        // A branch that always leaves proves its opposite for everything after
+        // the `if`. This is what makes the early return read the way it should:
+        // `if (!read.Ok) { return Fail(read.Error); }` and the rest of the
+        // function is holding a value.
+        bool thenExits = AlwaysExits(then);
+        bool elseExits = otherwise is not null && AlwaysExits(otherwise);
+
+        if (thenExits && !elseExits) ApplyFacts(whenFalse);
+        else if (elseExits && !thenExits) ApplyFacts(whenTrue);
+
         return new BoundIf(syntax.Span, condition, then, otherwise);
     }
 
     private BoundStatement BindWhile(WhileSyntax syntax)
     {
         var condition = BindCondition(syntax.Condition);
+
+        // A loop body runs again, so anything it assigns to is unknown inside it
+        // however the loop was entered.
+        if (_resultFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+
+        var entry = SnapshotFacts();
+        ApplyFacts(ConditionFacts(condition).WhenTrue);
+
         _loopDepth++;
         var body = BindStatement(syntax.Body);
         _loopDepth--;
+
+        // Nothing the condition proved survives the loop: it is also left by
+        // failing that same condition.
+        _resultFacts = entry;
         return new BoundWhile(syntax.Span, condition, body);
     }
 
@@ -1878,9 +2203,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         var condition = syntax.Condition is null ? null : BindCondition(syntax.Condition);
         var step = syntax.Step is null ? null : BindExpression(syntax.Step);
 
+        // The same rule a `while` obeys: what the body assigns to is unknown
+        // inside it, and the condition proves nothing after it.
+        if (_resultFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        var entry = SnapshotFacts();
+        if (condition is not null) ApplyFacts(ConditionFacts(condition).WhenTrue);
+
         _loopDepth++;
         var body = BindStatement(syntax.Body);
         _loopDepth--;
+        _resultFacts = entry;
 
         var result = new BoundFor(syntax.Span, initializer, condition, step, body);
         if (initializer is BoundLocalDeclaration declaration) result.Locals.Add(declaration.Local);
@@ -2024,6 +2356,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private BoundStatement BindForEachBody(ForEachSyntax syntax, BoundExpression element)
     {
         PushScope();
+        if (_resultFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
 
         var type = syntax.Type is null
             ? element.Type
@@ -2318,6 +2651,31 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// The storage an lvalue ultimately names, looking through field access and
     /// indexing. A write to <c>Config.Limits[0]</c> is a write to <c>Config</c>.
     /// </summary>
+    /// <summary>
+    /// The parameter an assignment writes into, when the write lands in the
+    /// parameter's own storage rather than through a reference it holds.
+    ///
+    /// <c>p = x</c> and, for a struct parameter, <c>p.field = x</c> both change
+    /// the callee's private copy, and that copy must therefore own what it
+    /// holds. <c>p[i] = x</c> and a write through a class field are a different
+    /// thing entirely: they reach the caller's object, which is the whole point
+    /// of passing it, and the parameter is still borrowed.
+    /// </summary>
+    private static ParameterSymbol? WrittenParameter(BoundExpression target) => target switch
+    {
+        BoundParameterAccess parameter => parameter.Parameter,
+
+        BoundFieldAccess { Receiver: { } receiver } when receiver.Type is StructTypeSymbol =>
+            WrittenParameter(receiver),
+
+        // A struct's setter is called through the receiver's address, and any
+        // address of a struct is a way to write into it.
+        BoundAddressOf { Operand: { } operand } when operand.Type is StructTypeSymbol =>
+            WrittenParameter(operand),
+
+        _ => null,
+    };
+
     private static BoundExpression BaseOf(BoundExpression expression) => expression switch
     {
         BoundFieldAccess { Receiver: { } receiver } => BaseOf(receiver),
@@ -2359,8 +2717,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol => true,
 
-        // A struct cannot hold a reference, so it is bytes and nothing else.
-        StructTypeSymbol => true,
+        // A struct is safe exactly when it is bytes and nothing else. One that
+        // holds a reference is copied by retaining it, and a retain two threads
+        // can both perform is the race this rule exists to stop.
+        StructTypeSymbol structType => !structType.CarriesReferences(),
 
         ArrayTypeSymbol array => IsPlainData(array.Element),
 
@@ -2374,8 +2734,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     };
 
     private bool IsPlainData(TypeSymbol type) =>
-        type is PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol
-             or DelegateTypeSymbol or StructTypeSymbol;
+        type is PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol
+        || (type is StructTypeSymbol structType && !structType.CarriesReferences());
 
     /// <summary>True when the type carries <c>[Shared]</c>.</summary>
     private static bool IsShared(NamedTypeSymbol type) =>
@@ -2587,8 +2947,99 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundParameterAccess(span, parameter);
 
         // The lambda that encloses this one may be able to reach it.
-        return index > 0 ? CaptureFrom(index - 1, name, span) : null;
+        if (index > 0) return CaptureFrom(index - 1, name, span);
+
+        // Otherwise it may be a member of the object the lambda was written
+        // inside. Reading it here rather than in the lambda body is what makes
+        // it a capture: the value is copied into a field, so the closure holds
+        // the member's value and not a route back to the object.
+        return MemberOfEnclosingThis(closure, name, span);
     }
+
+    /// <summary>
+    /// <c>this.name</c> in the context the outermost lambda was written in, or
+    /// null if there is no <c>this</c> there or it has no such member.
+    /// </summary>
+    private BoundExpression? MemberOfEnclosingThis(
+        ClosureContext closure, string name, SourceSpan span)
+    {
+        if (EnclosingThis(closure, span) is not { } receiver) return null;
+        if (receiver.Type is not NamedTypeSymbol owner) return null;
+
+        if (owner.FindProperty(name) is { } property)
+            return BindPropertyRead(span, receiver, property);
+
+        return owner.FindField(name) is { } field
+            ? new BoundFieldAccess(span, receiver, field)
+            : null;
+    }
+
+    /// <summary>
+    /// A method of the type the outermost lambda was written inside, which a
+    /// bare call in a lambda body may mean.
+    /// </summary>
+    private List<FunctionSymbol> MethodsOfEnclosingThis(string name) =>
+        _closures.Count == 0
+            ? []
+            : _closures[0].OuterFunction?.ContainingType?.FindMethods(name).ToList() ?? [];
+
+    /// <summary>The receiver of the method a lambda was written inside, if it had one.</summary>
+    private static BoundExpression? EnclosingThis(ClosureContext closure, SourceSpan span) =>
+        closure.OuterFunction?.Parameters.FirstOrDefault(p => p.IsThis) is { } self
+            ? Receiver(span, self)
+            : null;
+
+    /// <summary>
+    /// <c>this</c> written inside a lambda, which means the object the lambda
+    /// appears in rather than the closure the compiler generated for it.
+    ///
+    /// It is captured by value under a name no field can collide with, since
+    /// <c>this</c> is a keyword. Capturing it rather than pointing at the
+    /// enclosing frame is the same rule every other capture obeys.
+    /// </summary>
+    private BoundExpression CaptureThis(int index, SourceSpan span)
+    {
+        var closure = _closures[index];
+
+        if (closure.Captured.TryGetValue(ThisCaptureName, out var already))
+            return new BoundFieldAccess(
+                span, new BoundThis(span, closure.Type!, closure.This!), already);
+
+        var outer = index > 0 ? CaptureThis(index - 1, span) : EnclosingThis(closure, span);
+
+        if (outer is null)
+        {
+            diagnostics.Error("SL0228", span,
+                "'this' is only valid inside a method, constructor or destructor");
+            return new BoundErrorExpression(span);
+        }
+
+        if (outer.Type.IsError()) return new BoundErrorExpression(span);
+
+        if (closure.Type is null)
+        {
+            diagnostics.Error("SL0381", span,
+                "this lambda reads 'this' from around it, so it cannot become a delegate; " +
+                "a delegate is a bare function pointer with nowhere to keep what was " +
+                "captured. Convert it to a single-method interface instead");
+            return new BoundErrorExpression(span);
+        }
+
+        var field = new FieldSymbol(
+            ThisCaptureName, outer.Type, closure.Type, closure.Type.Fields.Count);
+        closure.Type.Fields.Add(field);
+        closure.Captured[ThisCaptureName] = field;
+        closure.Captures.Add((field, outer));
+
+        return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
+    }
+
+    /// <summary>
+    /// The closure field a captured <c>this</c> lands in. It is spelled as the
+    /// keyword deliberately: no source identifier can be this, so nothing the
+    /// programmer writes can collide with it.
+    /// </summary>
+    private const string ThisCaptureName = "this";
 
     /// <summary>
     /// Turns a lambda into whatever it is being assigned to: an instance of a
@@ -3038,6 +3489,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
     private BoundExpression BindThis(ThisSyntax syntax)
     {
+        // Inside a lambda, `this` is the object the lambda was written in. The
+        // generated closure also has a `this`, and letting the keyword mean
+        // that one silently rebound the programmer's word to a type they never
+        // wrote.
+        if (_closures.Count > 0) return CaptureThis(_closures.Count - 1, syntax.Span);
+
         var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
         if (parameter is null)
         {
@@ -3323,6 +3780,28 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(span);
         }
 
+        // A divisor that is zero at compile time is always a mistake, and there
+        // is no reason to make the program run before saying so. A divisor that
+        // is only zero sometimes is guarded in the emitted code instead.
+        if (op is BoundBinaryOp.Divide or BoundBinaryOp.Remainder &&
+            leftPrimitive.IsInteger && rightPrimitive.IsInteger &&
+            FoldSwitchLabel(right) is 0)
+        {
+            diagnostics.Error("SL0415", span,
+                op == BoundBinaryOp.Divide
+                    ? "division by zero"
+                    : "the remainder of a division by zero");
+
+            // Carry on with a value of the type this would have had, so the
+            // expression around it reports nothing further: one mistake should
+            // produce one message. It is wrapped rather than left a bare
+            // literal, because a literal would take part in overload resolution
+            // as a literal does and could be ambiguous where the division was not.
+            var recovered = PromoteToInt(left).Type;
+            return new BoundConversion(span, recovered,
+                new BoundLiteral(span, recovered, 0UL), ConversionKind.Identity);
+        }
+
         // Shifts keep the left type; only the left operand promotes.
         if (op is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight)
         {
@@ -3331,8 +3810,20 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 diagnostics.Error("SL0235", span, "shift operators require integer operands");
                 return new BoundErrorExpression(span);
             }
+            // The result is the left operand's type, and the count is brought to
+            // that same type. LLVM requires both operands of a shift to match,
+            // so a count of a different width produced invalid IR; narrowing it
+            // loses nothing, because the emitter reduces it modulo the width.
             var shifted = PromoteToInt(left);
-            return new BoundBinary(span, shifted.Type, shifted, op, PromoteToInt(right));
+            var count = PromoteToInt(right);
+
+            if (!count.Type.Equals(shifted.Type))
+                count = new BoundConversion(span, shifted.Type, count,
+                    count.Type.Size < shifted.Type.Size
+                        ? ConversionKind.IntegerWiden
+                        : ConversionKind.IntegerNarrow);
+
+            return new BoundBinary(span, shifted.Type, shifted, op, count);
         }
 
         bool isComparison = op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual
@@ -3437,8 +3928,21 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private BoundExpression BindConditional(ConditionalSyntax syntax)
     {
         var condition = BindCondition(syntax.Condition);
+
+        // Each arm runs only when the condition chose it, so each is bound
+        // knowing what that choice proved. `r.Ok ? r.Value : Describe(r.Error)`
+        // is the shape this exists for.
+        var (proves, disproves) = ConditionFacts(condition);
+        var entry = SnapshotFacts();
+
+        ApplyFacts(proves);
         var whenTrue = BindExpression(syntax.WhenTrue);
+
+        _resultFacts = new Dictionary<object, ResultFact>(entry);
+        ApplyFacts(disproves);
         var whenFalse = BindExpression(syntax.WhenFalse);
+
+        _resultFacts = entry;
 
         if (whenTrue.Type.IsError() || whenFalse.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
@@ -3528,6 +4032,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
         }
 
+        // Whatever was proved about this Result was proved about the value it
+        // held a moment ago.
+        InvalidateResultFact(target);
+
+        // Writing into a parameter's own storage makes it owned; see
+        // ParameterSymbol.IsAssigned.
+        if (WrittenParameter(target) is { } written) written.IsAssigned = true;
+
         return new BoundAssignment(syntax.Span, target, BindConversion(value, target.Type, syntax.Value.Span));
     }
 
@@ -3580,6 +4092,13 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         AssignmentSyntax syntax, BoundCall read, PropertySymbol property)
     {
         var receiver = read.Receiver!;
+
+        // A struct's setter writes into the receiver's own storage, so this is
+        // a write to the parameter exactly as `p.field = x` is.
+        if (WrittenParameter(receiver) is { } mutated) mutated.IsAssigned = true;
+
+        InvalidateResultFact(receiver);
+
         var value = BindExpression(syntax.Value);
         if (value.Type.IsError() || property.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
@@ -3972,6 +4491,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // A Result's three readers are the compiler's, not the library's: `Ok`
+        // is always allowed, and `Value` and `Error` are allowed only where it
+        // is known which one of them means anything.
+        if (IsResult(receiver.Type))
+            return BindResultRead(syntax, receiver, (StructTypeSymbol)receiver.Type);
+
         // Properties come first: an automatic one has a field of the same name,
         // and reaching that field directly would skip the accessor and, through
         // an interface, skip dispatch with it.
@@ -4002,9 +4527,137 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         return new BoundErrorExpression(syntax.Span);
     }
 
+    /// <summary>
+    /// <c>r.Ok</c>, <c>r.Value</c> and <c>r.Error</c>.
+    ///
+    /// The storage is module-private and this reads it directly, so the three
+    /// names cost a field load and no call. What <c>Value</c> and <c>Error</c>
+    /// additionally cost is a proof: each is readable only where the compiler
+    /// has already seen the other case ruled out, which is what makes a Result
+    /// different from a pair of fields that happen to sit together.
+    /// </summary>
+    /// <summary>
+    /// <c>Ok(x)</c> or <c>Fail(e)</c>, held as a draft until something says which
+    /// Result it is.
+    /// </summary>
+    private BoundExpression BindResultDraft(
+        CallSyntax syntax, string name, List<BoundExpression> arguments)
+    {
+        if (_resultTemplate is null)
+        {
+            diagnostics.Error("SL0288", syntax.Span,
+                $"'{name}' builds a Result, and 'Standard.Result' is not available");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (arguments.Count != 1)
+        {
+            diagnostics.Error("SL0289", syntax.Span,
+                $"'{name}' takes exactly one argument: " +
+                (name == OkName ? "the value produced" : "why the operation failed"));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundResultDraft(syntax.Span, name == OkName, arguments[0]);
+    }
+
+    /// <summary>
+    /// Settles a draft against the Result it is becoming, converting the payload
+    /// to whichever of T and E it belongs in.
+    /// </summary>
+    private BoundExpression BindResultSettle(
+        BoundResultDraft draft, TypeSymbol target, SourceSpan span)
+    {
+        if (!IsResult(target))
+        {
+            diagnostics.Error("SL0413", span,
+                $"'{(draft.Succeeded ? OkName : FailName)}' builds a Result, but " +
+                $"'{target.Name}' is expected here");
+            return new BoundErrorExpression(span);
+        }
+
+        var result = (StructTypeSymbol)target;
+        var payloadType = result.TypeArguments[draft.Succeeded ? 0 : 1];
+        var payload = BindConversion(draft.Payload, payloadType, draft.Payload.Span);
+
+        return new BoundResultConstruction(span, target, draft.Succeeded, payload);
+    }
+
+    private BoundExpression BindResultRead(
+        MemberAccessSyntax syntax, BoundExpression receiver, StructTypeSymbol result)
+    {
+        string wanted = syntax.Member switch
+        {
+            OkName => ResultOkField,
+            "Value" => ResultValueField,
+            "Error" => ResultErrorField,
+            _ => "",
+        };
+
+        if (wanted.Length == 0)
+        {
+            if (result.FindMethod(syntax.Member) is not null)
+            {
+                diagnostics.Error("SL0250", syntax.Span,
+                    $"'{result.Name}.{syntax.Member}' is a method; call it with '()'");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            diagnostics.Error("SL0251", syntax.Span,
+                $"'{result.Name}' has no member named '{syntax.Member}'; a Result has " +
+                "'Ok', 'Value', 'Error' and 'ValueOr'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var field = result.FindStorage(wanted);
+        if (field is null) return new BoundErrorExpression(syntax.Span);
+
+        if (wanted == ResultOkField) return new BoundFieldAccess(syntax.Span, receiver, field);
+
+        bool wantsValue = wanted == ResultValueField;
+        var subject = NarrowableSubject(receiver);
+
+        if (subject is null)
+        {
+            diagnostics.Error("SL0285", syntax.Span,
+                $"'{syntax.Member}' can only be read from a Result held in a local or a " +
+                "parameter, because that is the only thing a check can be about; assign " +
+                "this to one first, then check its 'Ok'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var known = _resultFacts.TryGetValue(subject, out var fact) ? fact : (ResultFact?)null;
+        var required = wantsValue ? ResultFact.Succeeded : ResultFact.Failed;
+
+        if (known != required)
+        {
+            string name = subject switch
+            {
+                LocalSymbol local => local.Name,
+                ParameterSymbol parameter => parameter.Name,
+                _ => "it",
+            };
+
+            diagnostics.Error("SL0286", syntax.Span,
+                known is null
+                    ? $"'{name}.{syntax.Member}' is not readable here, because nothing has " +
+                      $"established that '{name}' {(wantsValue ? "succeeded" : "failed")}; " +
+                      $"check 'if ({(wantsValue ? "" : "!")}{name}.Ok)' first, or use " +
+                      (wantsValue ? $"'{name}.ValueOr(...)'" : "'Ok' to decide")
+                    : $"'{name}' is known to have {(known == ResultFact.Succeeded ? "succeeded" : "failed")} " +
+                      $"here, so '{syntax.Member}' is the wrong half to read");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundFieldAccess(syntax.Span, receiver, field);
+    }
+
     private BoundExpression BindCall(CallSyntax syntax)
     {
         var arguments = syntax.Arguments.Select(BindExpression).ToList();
+
+        if (syntax.Callee is NameSyntax { Name.Parts: [OkName or FailName] } constructor)
+            return BindResultDraft(syntax, constructor.Name.Parts[0], arguments);
 
         // `receiver.Method(args)`, unless the receiver is really a module path.
         if (syntax.Callee is MemberAccessSyntax member)
@@ -4041,12 +4694,18 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic) return generic;
 
             // A method of the enclosing type, called without a receiver.
-            if (_currentFunction?.ContainingType?.FindMethod(callee.Name.Text) is { } method &&
-                callee.Name.Parts.Count == 1)
+            if (callee.Name.Parts.Count == 1 &&
+                _currentFunction?.ContainingType?.FindMethods(callee.Name.Text).ToList() is
+                    { Count: > 0 } own)
             {
                 var receiver = BindImplicitThis(callee.Span);
                 if (receiver is not null)
-                    return BuildCall(syntax, method, receiver, arguments);
+                {
+                    var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text);
+                    return method is null
+                        ? new BoundErrorExpression(syntax.Span)
+                        : BuildCall(syntax, method, receiver, arguments);
+                }
             }
 
             if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing)
@@ -4061,6 +4720,21 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                     if (receiver is not null)
                         return BuildCall(syntax, instantiated, receiver, arguments);
                 }
+            }
+
+            // Inside a lambda, a bare name may be a method of the object the
+            // lambda was written in. That object is captured, and the call then
+            // goes through the capture like any other member.
+            if (callee.Name.Parts.Count == 1 && _closures.Count > 0 &&
+                MethodsOfEnclosingThis(callee.Name.Text) is { Count: > 0 } outerMethods)
+            {
+                var outerMethod =
+                    ResolveOverload(outerMethods, arguments, callee.Span, callee.Name.Text);
+                if (outerMethod is null) return new BoundErrorExpression(syntax.Span);
+
+                var captured = CaptureThis(_closures.Count - 1, callee.Span);
+                if (captured.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+                return BuildCall(syntax, outerMethod, captured, arguments);
             }
 
             diagnostics.Error("SL0252", callee.Span, $"no function named '{callee.Name.Text}' is in scope");
@@ -4193,7 +4867,9 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 syntax, new BoundFieldAccess(member.Span, receiver, callable), arguments);
         }
 
-        if (namedType.FindMethod(member.Member) is not { } method)
+        var overloads = namedType.FindMethods(member.Member).ToList();
+
+        if (overloads.Count == 0)
         {
             if (TryBindGenericMethodCall(syntax, member, namedType, receiver, arguments) is { } generic)
                 return generic;
@@ -4202,6 +4878,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 $"'{namedType.Name}' has no method named '{member.Member}'");
             return new BoundErrorExpression(syntax.Span);
         }
+
+        // Which overload is decided by the arguments, the same way a call to a
+        // module-level function is.
+        var method = overloads.Count == 1
+            ? overloads[0]
+            : ResolveOverload(overloads, arguments, member.Span, $"{namedType.Name}.{member.Member}");
+
+        if (method is null) return new BoundErrorExpression(syntax.Span);
 
         // The accessors are real methods, but they are the lowering rather than
         // the language: naming one directly is naming an implementation detail.
@@ -4601,6 +5285,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         if (expression is BoundLambda lambda)
             return BindLambda(lambda, target, span);
 
+        // Nor has `Ok(x)`, for the same reason and by the same route.
+        if (expression is BoundResultDraft draft)
+            return BindResultSettle(draft, target, span);
+
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
         if (ConstantFits(expression, target))
@@ -4732,6 +5420,20 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         if (from is WeakTypeSymbol fromWeak && to is OptionalTypeSymbol weakTarget)
             return fromWeak.Element.Equals(weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;
+
+        // C -> weak C?  and  C? -> weak C?. This is the only way to break a
+        // reference cycle, since ARC cannot collect one, so it is implicit: the
+        // weak slot already says what is meant, and requiring a cast as well
+        // would put punctuation between the programmer and the one escape hatch
+        // they have.
+        if (to is WeakTypeSymbol toWeak)
+        {
+            var referenced = from is OptionalTypeSymbol weakSource ? weakSource.Element : from;
+            return referenced is NamedTypeSymbol { IsReferenceType: true } &&
+                   referenced.Equals(toWeak.Element)
+                ? ConversionKind.ReferenceToWeak
+                : null;
+        }
 
         // C? -> C discards a null check, so it must be explicit.
         if (from is OptionalTypeSymbol fromOptional && to is NamedTypeSymbol { IsReferenceType: true })
@@ -5405,6 +6107,33 @@ public sealed class LambdaType : TypeSymbol
     public override string Name => "lambda";
     public override int Size => 8;
     public override int Alignment => 8;
+}
+
+/// <summary>
+/// The type of <c>Ok(x)</c> or <c>Fail(e)</c> before something says which
+/// <c>Result</c> it is.
+///
+/// One value cannot say what both of a Result's type arguments are -- <c>Ok(4)</c>
+/// knows T and nothing about E -- and type arguments cannot be written at a call.
+/// So construction is target-typed, exactly as a lambda is, and this is the
+/// placeholder that carries the pieces until a conversion resolves it. It never
+/// reaches the emitter.
+/// </summary>
+public sealed class ResultDraftType : TypeSymbol
+{
+    public static readonly ResultDraftType Instance = new();
+    private ResultDraftType() { }
+    public override string Name => "Ok(...) or Fail(...)";
+    public override int Size => 0;
+    public override int Alignment => 1;
+}
+
+/// <summary>An <c>Ok(x)</c> or <c>Fail(e)</c> awaiting the Result type it belongs to.</summary>
+public sealed class BoundResultDraft(SourceSpan span, bool succeeded, BoundExpression payload)
+    : BoundExpression(span, ResultDraftType.Instance)
+{
+    public bool Succeeded { get; } = succeeded;
+    public BoundExpression Payload { get; } = payload;
 }
 
 /// <summary>

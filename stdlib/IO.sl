@@ -21,14 +21,12 @@
 
 // Streams, and the vocabulary the rest of the I/O modules share.
 //
-// **How failure is reported.** Stainless has no exceptions, and an optional
-// cannot yet be unwrapped, so neither of the two usual answers is available.
-// What is left is to return the outcome as a value:
+// **How failure is reported.** Stainless does not unwind, so an operation that
+// can fail says so in its return type:
 //
-//   - An operation that produces something returns a `Result<T>`: whether it
-//     worked, what it produced, and why it did not. `Value` on a failed result
-//     is the empty value of its type -- an empty String, an empty array -- and
-//     never null, so reading it by mistake is wrong rather than fatal.
+//   - An operation that produces something returns `Result<T, IOError>`, the
+//     language's own type. `Value` is unreadable until the compiler has seen
+//     `Ok` checked, so there is no failed result to read by mistake.
 //   - An operation that produces nothing returns an `IOError` directly, and
 //     `IOError.None` is success.
 //   - A stream carries its last error instead, because a stream is used in a
@@ -83,23 +81,6 @@ public String Describe(IOError error) {
         case IOError.EndOfFile:      return "the end of the file";
         case IOError.Closed:         return "the stream is closed";
         default:                     return "it failed for an unknown reason";
-    }
-}
-
-// ----------------------------------------------------------------- results
-
-/// What an operation produced, and whether it worked.
-///
-/// `Value` is the empty value of its type when `Ok` is false. Check `Ok`.
-public class Result<T> {
-    public bool Ok { get; }
-    public T Value { get; }
-    public IOError Error { get; }
-
-    public Result(bool ok, T value, IOError error) {
-        Ok = ok;
-        Value = value;
-        Error = error;
     }
 }
 
@@ -379,7 +360,7 @@ public class MemoryStream : IStream {
 // ------------------------------------------------------------------ helpers
 
 /// Reads a stream to its end.
-public Result<byte[]> ReadToEnd(IStream stream) {
+public Result<byte[], IOError> ReadToEnd(IStream stream) {
     var collected = new MemoryStream();
     var buffer = new byte[4096];
 
@@ -390,17 +371,17 @@ public Result<byte[]> ReadToEnd(IStream stream) {
     }
 
     var failure = stream.Error();
-    if (failure != IOError.None) { return new Result<byte[]>(false, new byte[0], failure); }
-    return new Result<byte[]>(true, collected.ToArray(), IOError.None);
+    if (failure != IOError.None) { return Fail(failure); }
+    return Ok(collected.ToArray());
 }
 
 /// Reads a stream to its end and reads the bytes as UTF-8.
-public Result<String> ReadTextToEnd(IStream stream) {
+public Result<String, IOError> ReadTextToEnd(IStream stream) {
     var raw = ReadToEnd(stream);
-    if (!raw.Ok) { return new Result<String>(false, "", raw.Error); }
+    if (!raw.Ok) { return Fail(raw.Error); }
 
-    if (raw.Value.Length == 0) { return new Result<String>(true, "", IOError.None); }
-    return new Result<String>(true, Text.FromBytes(&raw.Value[0], raw.Value.Length), IOError.None);
+    if (raw.Value.Length == 0) { return Ok(""); }
+    return Ok(Text.FromBytes(&raw.Value[0], raw.Value.Length));
 }
 
 /// Splits text into lines, accepting either line ending and dropping a final

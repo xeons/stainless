@@ -302,6 +302,35 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// </summary>
     public virtual FunctionSymbol? FindMethod(string name) =>
         Methods.FirstOrDefault(m => m.Name == name);
+
+    /// <summary>
+    /// Every method of this name. Methods overload, so a name alone does not
+    /// name one: a call picks by argument types, and an interface requirement
+    /// picks by parameter types.
+    /// </summary>
+    public virtual IEnumerable<FunctionSymbol> FindMethods(string name) =>
+        Methods.Where(m => m.Name == name);
+
+    /// <summary>
+    /// The method that implements an interface requirement, or null.
+    ///
+    /// A class may implement two instantiations of one generic interface —
+    /// <c>IEquatable&lt;int&gt;</c> and <c>IEquatable&lt;String&gt;</c> — and
+    /// then two methods share a name and differ only in parameters. Each
+    /// interface has its own dispatch table, so this is what decides which
+    /// method goes in which slot.
+    /// </summary>
+    public FunctionSymbol? FindImplementation(FunctionSymbol required)
+    {
+        var wanted = required.ParameterTypes.ToList();
+        var overloads = FindMethods(required.Name).ToList();
+
+        // Falling back to a lone candidate is deliberate: when only one method
+        // could have been meant, the mismatch is the useful diagnostic, and
+        // "does not implement" would hide it.
+        return overloads.FirstOrDefault(m => m.Accepts(wanted))
+            ?? (overloads.Count == 1 ? overloads[0] : null);
+    }
 }
 
 /// <summary>
@@ -415,6 +444,29 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
         Methods.FirstOrDefault(m => m.Name == name)
         ?? AllInterfaces().Select(i => i.FindMethod(name)).FirstOrDefault(m => m is not null);
 
+    /// <summary>
+    /// Also searches extended interfaces, nearest first.
+    ///
+    /// An interface that restates a method it inherits declares the same
+    /// signature twice, and a call would then have two candidates it could not
+    /// tell apart. The nearest declaration wins, which is what naming a method
+    /// through the derived interface has always meant.
+    /// </summary>
+    public override IEnumerable<FunctionSymbol> FindMethods(string name)
+    {
+        var seen = new List<FunctionSymbol>();
+
+        foreach (var candidate in Methods.Where(m => m.Name == name)
+                     .Concat(AllInterfaces().SelectMany(i => i.Methods.Where(m => m.Name == name))))
+        {
+            var signature = candidate.ParameterTypes.ToList();
+            if (seen.Any(m => m.Accepts(signature))) continue;
+
+            seen.Add(candidate);
+            yield return candidate;
+        }
+    }
+
     /// <summary>Also searches extended interfaces, nearest first.</summary>
     public override PropertySymbol? FindProperty(string name) =>
         Properties.FirstOrDefault(p => p.Name == name)
@@ -465,6 +517,24 @@ public static class TypeExtensions
     /// </summary>
     public static bool IsManagedSlot(this TypeSymbol type) =>
         type.NeedsArc() || type is WeakTypeSymbol;
+
+    /// <summary>
+    /// True when a value of this type contains references the emitter must
+    /// count: either because it is one, or because it is a struct with a field
+    /// that is.
+    ///
+    /// A struct of plain data answers false, which is what keeps it free: it is
+    /// copied as raw bytes, exactly as C would, with no reference traffic at
+    /// all. Only a struct that actually holds a reference pays for one, and it
+    /// is then no longer a type that may cross <c>extern "C"</c>.
+    ///
+    /// The recursion terminates because a struct may not contain itself; that
+    /// cycle is rejected during layout (SL0216).
+    /// </summary>
+    public static bool CarriesReferences(this TypeSymbol type) =>
+        type.IsManagedSlot() ||
+        (type is StructTypeSymbol structType &&
+         structType.Fields.Any(field => field.Type.CarriesReferences()));
 
     /// <summary>The type a reference points at, or null.</summary>
     public static TypeSymbol? AsReference(this TypeSymbol type) => type switch

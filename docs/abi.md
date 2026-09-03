@@ -229,9 +229,20 @@ choice Swift makes, because it eliminates most retain/release traffic:
 - **Parameters are borrowed.** The caller guarantees the argument stays alive
   for the duration of the call. The callee does not retain on entry or release
   on exit. Passing a reference costs nothing.
+- **Except a parameter the body writes to**, which is retained on entry and
+  released on exit. The exception is forced: `p = other;` releases what the
+  slot held, and what it held is the caller's, so a borrowed parameter that is
+  assigned to would free an object the caller still owns and leak the one it
+  was given. Writing to a parameter makes it the private copy the write already
+  treated it as. Writing *through* one — `p[i] = x`, or a field of a class it
+  refers to — reaches the caller's object rather than the parameter, and is
+  still borrowed.
 - **Returns are owned (+1).** A function returning a class reference transfers
-  a +1 count to the caller, which is responsible for releasing it.
+  a +1 count to the caller, which is responsible for releasing it. A struct
+  holding references is returned the same way, field by field.
 - **Locals are owned.** Storing into a local retains; the local is released at
-  scope exit, including on every early return.
+  scope exit, including on every early return. A struct local owns whatever is
+  inside it, and copying one retains each reference it holds.
 - **Fields are owned.** Assigning to a field retains the new value and releases
-  the old, in that order, so self-assignment is safe.
+  the old, in that order, so self-assignment is safe. The same order applies to
+  a whole struct assigned over another.

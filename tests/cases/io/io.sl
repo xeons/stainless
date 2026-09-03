@@ -28,10 +28,14 @@ void Wipe(String root) {
     if (!Directory.Exists(root)) { return; }
 
     var files = Directory.AllFiles(root);
-    for (nuint i = 0; i < files.Value.Count(); i = i + 1) { File.Delete(files.Value.At(i)); }
+    if (files.Ok) {
+        for (nuint i = 0; i < files.Value.Count(); i = i + 1) { File.Delete(files.Value.At(i)); }
+    }
 
     var nested = Directory.Directories(root);
-    for (nuint i = 0; i < nested.Value.Count(); i = i + 1) { Directory.Delete(nested.Value.At(i)); }
+    if (nested.Ok) {
+        for (nuint i = 0; i < nested.Value.Count(); i = i + 1) { Directory.Delete(nested.Value.At(i)); }
+    }
 
     Directory.Delete(root);
 }
@@ -92,24 +96,32 @@ int Main() {
         File.Exists(notes) ? 1 : 0, File.Size(notes));
 
     var text = File.ReadAllText(notes);
-    printf("read=%d bytes=%llu\n", text.Ok ? 1 : 0, text.Value.ByteLength());
+    printf("read=%d bytes=%llu\n", text.Ok ? 1 : 0, text.Ok ? text.Value.ByteLength() : 0);
 
     var lines = File.ReadAllLines(notes);
-    printf("lines=%llu first=%s last=%s\n",
-        lines.Value.Count(), lines.Value.At(0).ToPointer(),
-        lines.Value.At(lines.Value.Count() - 1).ToPointer());
+    if (lines.Ok) {
+        printf("lines=%llu first=%s last=%s\n",
+            lines.Value.Count(), lines.Value.At(0).ToPointer(),
+            lines.Value.At(lines.Value.Count() - 1).ToPointer());
+    }
 
     File.AppendText(notes, "line three\n");
-    printf("appended=%llu\n", File.ReadAllLines(notes).Value.Count());
+    var appended = File.ReadAllLines(notes);
+    if (appended.Ok) { printf("appended=%llu\n", appended.Value.Count()); }
 
     var raw = File.ReadAllBytes(notes);
-    printf("bytes=%d %llu\n", raw.Ok ? 1 : 0, raw.Value.Length);
+    printf("bytes=%d %llu\n", raw.Ok ? 1 : 0, raw.Ok ? raw.Value.Length : 0);
 
-    // A missing file is an ordinary outcome and says why.
+    // A missing file is an ordinary outcome and says why. Its Error is readable
+    // only because the check proved there is one.
     var missing = File.ReadAllText(Path.Join(root, "nope.txt"));
-    printf("missing=%d reason=%s\n",
-        missing.Ok ? 1 : 0, IO.Describe(missing.Error).ToPointer());
-    printf("missing-value=%llu\n", missing.Value.ByteLength());
+    if (!missing.Ok) {
+        printf("missing=0 reason=%s\n", IO.Describe(missing.Error).ToPointer());
+    }
+
+    // There is no failed value to read by mistake; a caller that wants to carry
+    // on supplies its own.
+    printf("missing-value=%llu\n", missing.ValueOr("").ByteLength());
 
     // --------------------------------------------------------- file stream
     var stream = File.OpenRead(notes);
@@ -127,7 +139,8 @@ int Main() {
     var whole = IO.ReadTextToEnd(stream);
     stream.Close();
     printf("whole=%d bytes=%llu after-close=%llu\n",
-        whole.Ok ? 1 : 0, whole.Value.ByteLength(), stream.Read(head, 0, (nuint)4));
+        whole.Ok ? 1 : 0, whole.Ok ? whole.Value.ByteLength() : 0,
+        stream.Read(head, 0, (nuint)4));
     printf("closed-error=%s\n", IO.Describe(stream.Error()).ToPointer());
 
     // Opening something that is not there fails without a null to unwrap.
@@ -139,8 +152,8 @@ int Main() {
     var written = File.Create(Path.Join(root, "stream.txt"));
     written.WriteText("via a stream");
     written.Close();
-    printf("round-trip=%s\n",
-        File.ReadAllText(Path.Join(root, "stream.txt")).Value.ToPointer());
+    var back = File.ReadAllText(Path.Join(root, "stream.txt"));
+    if (back.Ok) { printf("round-trip=%s\n", back.Value.ToPointer()); }
 
     // --------------------------------------------------------- directories
     File.WriteAllText(Path.Join(root, "nested", "deep.txt"), "deep");
@@ -149,19 +162,26 @@ int Main() {
     lineList.Add("beta");
     File.WriteAllLines(Path.Join(root, "list.txt"), lineList);
 
-    printf("entries=%llu files=%llu dirs=%llu all-files=%llu\n",
-        Directory.Entries(root).Value.Count(),
-        Directory.Files(root).Value.Count(),
-        Directory.Directories(root).Value.Count(),
-        Directory.AllFiles(root).Value.Count());
+    var entries = Directory.Entries(root);
+    var files = Directory.Files(root);
+    var dirs = Directory.Directories(root);
+    var everything = Directory.AllFiles(root);
+    if (entries.Ok && files.Ok && dirs.Ok && everything.Ok) {
+        printf("entries=%llu files=%llu dirs=%llu all-files=%llu\n",
+            entries.Value.Count(), files.Value.Count(),
+            dirs.Value.Count(), everything.Value.Count());
+    }
 
     var listed = File.ReadAllLines(Path.Join(root, "list.txt"));
-    printf("written-lines=%llu %s\n",
-        listed.Value.Count(), listed.Value.At(1).ToPointer());
+    if (listed.Ok) {
+        printf("written-lines=%llu %s\n",
+            listed.Value.Count(), listed.Value.At(1).ToPointer());
+    }
 
     var nowhere = Directory.Entries(Path.Join(root, "no-such"));
-    printf("no-dir=%d reason=%s\n",
-        nowhere.Ok ? 1 : 0, IO.Describe(nowhere.Error).ToPointer());
+    if (!nowhere.Ok) {
+        printf("no-dir=0 reason=%s\n", IO.Describe(nowhere.Error).ToPointer());
+    }
 
     // Copy and rename.
     File.Copy(notes, Path.Join(root, "copy.txt"));

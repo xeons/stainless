@@ -37,6 +37,32 @@ public sealed class Toolchain
 
     private Toolchain(string clangPath) => ClangPath = clangPath;
 
+    private string? _targetTriple;
+
+    /// <summary>
+    /// The triple clang builds for, asked once and remembered. It decides which
+    /// spelling of "discard unreferenced sections" the linker understands, and
+    /// clang is the only thing that actually knows.
+    /// </summary>
+    private string TargetTriple =>
+        _targetTriple ??= Run(ClangPath, ["-print-target-triple"]) is { Success: true } probe
+            ? probe.StandardOutput.Trim()
+            : "";
+
+    /// <summary>
+    /// The linker argument that drops sections nothing referenced.
+    ///
+    /// Nothing prunes dead code in the compiler yet, so every stdlib function is
+    /// emitted whether or not a program calls it. Splitting each into its own
+    /// section lets the linker do what the compiler has not: it takes about a
+    /// quarter off a hello-world binary, and costs a flag.
+    /// </summary>
+    private string DeadStripArgument =>
+        TargetTriple.Contains("windows-msvc", StringComparison.Ordinal) ? "-Wl,/OPT:REF"
+        : TargetTriple.Contains("apple", StringComparison.Ordinal) ||
+          TargetTriple.Contains("darwin", StringComparison.Ordinal) ? "-Wl,-dead_strip"
+        : "-Wl,--gc-sections";
+
     /// <summary>Returns the toolchain, or null with an explanation if clang is missing.</summary>
     public static Toolchain? Locate(out string error)
     {
@@ -117,7 +143,8 @@ public sealed class Toolchain
             bool changed = WriteIfChanged(source, text);
             if (!changed && !headersChanged && File.Exists(objectFile)) continue;
 
-            var result = Run(ClangPath, ["-c", source, "-O2", "-o", objectFile]);
+            var result = Run(ClangPath,
+                ["-c", source, "-O2", "-ffunction-sections", "-fdata-sections", "-o", objectFile]);
             if (!result.Success)
                 throw new InvalidOperationException(
                     $"failed to compile the Stainless runtime ({name}):\n{result.StandardError}");
@@ -177,6 +204,13 @@ public sealed class Toolchain
             $"-O{optimizationLevel}",
             "-o", outputPath,
             "-Wno-override-module",     // the triple is intentionally left to clang
+
+            // One section per function and per datum, then let the linker drop
+            // the ones nothing reached. A library keeps its exports either way:
+            // they are roots, which is what being exported means.
+            "-ffunction-sections",
+            "-fdata-sections",
+            DeadStripArgument,
         ]);
 
         return Run(ClangPath, arguments);

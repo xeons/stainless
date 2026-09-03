@@ -1,0 +1,8 @@
+got 42
+no: 1
+no: 2
+why 1
+-1
+sum 20
+got 100
+done

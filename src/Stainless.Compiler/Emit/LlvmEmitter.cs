@@ -134,10 +134,10 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
     private void StructTypes(BoundProgram program)
     {
-        var structs = program.Modules
-            .SelectMany(m => m.Types.Values)
-            .OfType<StructTypeSymbol>()
-            .ToList();
+        // Declared structs and instantiated generic ones both, which is why this
+        // reads the program's list rather than walking the module type tables:
+        // `Pair<int>` is in no module's table.
+        var structs = program.Structs.Distinct().ToList();
 
         foreach (var structType in structs)
         {
@@ -181,6 +181,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         Declare("sl_string_builder_type_info", "@sl_string_builder_type_info = external constant %SlTypeInfo");
         Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
         Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
+        Declare("sl_divide_by_zero", "declare void @sl_divide_by_zero()");
+        Declare("sl_divide_overflow", "declare void @sl_divide_overflow()");
         Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
         ConcurrencyDeclarations();
         _module.AppendLine();
@@ -448,8 +450,11 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         {
             foreach (var interfaceType in classType.Interfaces)
             {
+                // By parameter types, not by name: a class implementing both
+                // IEquatable<int> and IEquatable<String> has two methods called
+                // Same, and each interface's table takes the one that fits it.
                 var slots = interfaceType.Methods
-                    .Select(required => classType.FindMethod(required.Name))
+                    .Select(classType.FindImplementation)
                     .Select(found => found is null ? "ptr null" : $"ptr @{found.MangledName}")
                     .ToList();
 
@@ -703,6 +708,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             {
                 // byval already points at a private copy owned by this call.
                 _parameterSlots[parameter] = incoming;
+                AdoptWrittenParameter(parameter, incoming);
                 continue;
             }
 
@@ -711,12 +717,14 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
                 string slot = Alloca(LlvmTypeOf(parameter.Type), parameter.Name);
                 Line($"store {info.LlvmType} {incoming}, ptr {slot}");
                 _parameterSlots[parameter] = slot;
+                AdoptWrittenParameter(parameter, slot);
                 continue;
             }
 
             string plain = Alloca(info.LlvmType, parameter.Name);
             Line($"store {info.LlvmType} {incoming}, ptr {plain}");
             _parameterSlots[parameter] = plain;
+            AdoptWrittenParameter(parameter, plain);
         }
 
         EmitStatement(function.Body);
@@ -1136,9 +1144,18 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         foreach (var field in classType.Fields)
         {
-            if (!field.Type.IsManagedSlot()) continue;
+            if (!field.Type.CarriesReferences()) continue;
 
             string address = ClassFieldAddress("%obj", field);
+
+            // A struct field owns whatever is inside it, so the drop reaches in
+            // rather than stopping at the field.
+            if (field.Type is StructTypeSymbol structField)
+            {
+                ReleaseFieldsAt(address, structField);
+                continue;
+            }
+
             string value = Emit("ptr", $"load ptr, ptr {address}");
             Line(field.Type is WeakTypeSymbol
                 ? $"call void @sl_weak_release(ptr {value})"
@@ -1164,7 +1181,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _body.Clear();
         _blockTerminated = false;
 
-        if (arrayType.Element.IsManagedSlot())
+        if (arrayType.Element.CarriesReferences())
         {
             bool weak = arrayType.Element is WeakTypeSymbol;
             string elementType = LlvmTypeOf(arrayType.Element);
@@ -1190,8 +1207,16 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             Label(bodyLabel);
             string slot = Emit("ptr",
                 $"getelementptr inbounds {elementType}, ptr {data}, i64 {index}");
-            string element = Emit("ptr", $"load ptr, ptr {slot}");
-            Line($"call void @{(weak ? "sl_weak_release" : "sl_release")}(ptr {element})");
+
+            if (arrayType.Element is StructTypeSymbol elementStruct)
+            {
+                ReleaseFieldsAt(slot, elementStruct);
+            }
+            else
+            {
+                string element = Emit("ptr", $"load ptr, ptr {slot}");
+                Line($"call void @{(weak ? "sl_weak_release" : "sl_release")}(ptr {element})");
+            }
             string next = Emit("i64", $"add i64 {index}, 1");
             Line($"store i64 {next}, ptr {counter}");
             Terminator($"br label %{conditionLabel}");
@@ -1275,6 +1300,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
             if (symbol.Type is StructTypeSymbol structType)
             {
+                // Nothing to make immortal: a static must be sendable, and a
+                // struct holding a reference is not, so this is plain bytes.
                 MemCopy(slot, value.Ref, structType.Size);
             }
             else
@@ -1301,6 +1328,31 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _module.Append(_body);
         _module.AppendLine("}");
         _module.AppendLine();
+    }
+
+    /// <summary>
+    /// Takes ownership of a parameter the body writes to.
+    ///
+    /// Borrowing is what makes a call cheap, and it holds for every parameter
+    /// that is only read. One that is written to cannot be borrowed: the store
+    /// releases what the slot held, and what it held is the caller's. Retaining
+    /// on entry and releasing on exit turns the slot into the private copy the
+    /// write already treated it as, and costs nothing anywhere else.
+    /// </summary>
+    private void AdoptWrittenParameter(ParameterSymbol parameter, string slot)
+    {
+        if (!parameter.IsAssigned || !parameter.Type.CarriesReferences()) return;
+
+        if (parameter.Type is StructTypeSymbol structType) RetainFieldsAt(slot, structType);
+        else
+        {
+            string held = Emit("ptr", $"load ptr, ptr {slot}");
+            Line(parameter.Type is WeakTypeSymbol
+                ? $"call void @sl_weak_retain(ptr {held})"
+                : $"call void @sl_retain(ptr {held})");
+        }
+
+        TrackOwnedLocal(slot, parameter.Type);
     }
 
     private const string StaticInitializerName = "_SLstatics";
@@ -1337,7 +1389,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
     private void TrackOwnedLocal(string slot, TypeSymbol type)
     {
-        if (type.IsManagedSlot()) _scopes[^1].Add((slot, type));
+        if (type.CarriesReferences()) _scopes[^1].Add((slot, type));
     }
 
     /// <summary>Releases every owned local from the innermost scope down to <paramref name="depth"/>.</summary>
@@ -1345,22 +1397,78 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     {
         for (int i = _scopes.Count - 1; i >= depth; i--)
             foreach (var (slot, type) in Enumerable.Reverse(_scopes[i]))
-            {
-                string value = Emit("ptr", $"load ptr, ptr {slot}");
-                Line(type is WeakTypeSymbol
-                    ? $"call void @sl_weak_release(ptr {value})"
-                    : $"call void @sl_release(ptr {value})");
-            }
+                ReleaseSlot(slot, type);
     }
 
     private void ReleaseCurrentScope()
     {
         foreach (var (slot, type) in Enumerable.Reverse(_scopes[^1]))
+            ReleaseSlot(slot, type);
+    }
+
+    /// <summary>
+    /// Drops what a storage slot owns: the reference it holds, or, for a struct,
+    /// every reference inside it.
+    /// </summary>
+    private void ReleaseSlot(string slot, TypeSymbol type)
+    {
+        if (type is StructTypeSymbol structType)
+        {
+            ReleaseFieldsAt(slot, structType);
+            return;
+        }
+
+        string value = Emit("ptr", $"load ptr, ptr {slot}");
+        Line(type is WeakTypeSymbol
+            ? $"call void @sl_weak_release(ptr {value})"
+            : $"call void @sl_release(ptr {value})");
+    }
+
+    /// <summary>
+    /// Retains every reference inside the struct at <paramref name="address"/>,
+    /// recursing through struct fields.
+    ///
+    /// This is what a struct copy costs once it holds a reference. It is the
+    /// price of lifting the old rule that a struct was always raw bytes, and it
+    /// is charged only to structs that actually hold one — a struct of plain
+    /// data still copies with a memcpy and nothing else.
+    /// </summary>
+    private void RetainFieldsAt(string address, StructTypeSymbol structType) =>
+        WalkReferences(address, structType, (slot, type) =>
+        {
+            string value = Emit("ptr", $"load ptr, ptr {slot}");
+            Line(type is WeakTypeSymbol
+                ? $"call void @sl_weak_retain(ptr {value})"
+                : $"call void @sl_retain(ptr {value})");
+        });
+
+    /// <summary>Releases every reference inside the struct at <paramref name="address"/>.</summary>
+    private void ReleaseFieldsAt(string address, StructTypeSymbol structType) =>
+        WalkReferences(address, structType, (slot, type) =>
         {
             string value = Emit("ptr", $"load ptr, ptr {slot}");
             Line(type is WeakTypeSymbol
                 ? $"call void @sl_weak_release(ptr {value})"
                 : $"call void @sl_release(ptr {value})");
+        });
+
+    /// <summary>
+    /// Visits the address of every counted reference inside a struct value,
+    /// descending into struct fields so a nested one is not missed.
+    /// </summary>
+    private void WalkReferences(
+        string address, StructTypeSymbol structType, Action<string, TypeSymbol> visit)
+    {
+        foreach (var field in structType.Fields)
+        {
+            if (!field.Type.CarriesReferences()) continue;
+
+            string slot = Emit("ptr",
+                $"getelementptr inbounds {StructName(structType)}, ptr {address}, " +
+                $"i32 0, i32 {field.Index}");
+
+            if (field.Type is StructTypeSymbol nested) WalkReferences(slot, nested, visit);
+            else visit(slot, field.Type);
         }
     }
 
@@ -1373,6 +1481,15 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         for (int i = from; i < _pendingReleases.Count; i++)
         {
             var (reference, type) = _pendingReleases[i];
+
+            // A struct temporary is held by address, so what is dropped is what
+            // lies inside it rather than the pointer itself.
+            if (type is StructTypeSymbol structType)
+            {
+                ReleaseFieldsAt(reference, structType);
+                continue;
+            }
+
             Line(type is WeakTypeSymbol
                 ? $"call void @sl_weak_release(ptr {reference})"
                 : $"call void @sl_release(ptr {reference})");
@@ -1437,13 +1554,20 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             Line($"store ptr null, ptr {slot}");
             TrackOwnedLocal(slot, local.Type);
         }
+        else if (local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
+        {
+            // The same reason, one level down: the references inside start null
+            // so the first assignment releases nothing.
+            Line($"store {StructName(owning)} zeroinitializer, ptr {slot}");
+            TrackOwnedLocal(slot, local.Type);
+        }
 
         if (declaration.Initializer is not null)
         {
             var value = EmitExpression(declaration.Initializer);
             StoreInto(slot, value, local.Type);
         }
-        else if (local.Type is StructTypeSymbol structType)
+        else if (local.Type is StructTypeSymbol structType && !structType.CarriesReferences())
         {
             Line($"store {StructName(structType)} zeroinitializer, ptr {slot}");
         }
@@ -1637,6 +1761,10 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         if (value.Type is StructTypeSymbol structType)
         {
+            // The same +1, field by field: the caller receives a copy that owns
+            // what it holds, and this frame is about to release its own.
+            if (structType.CarriesReferences()) RetainFieldsAt(value.Ref, structType);
+
             if (_sretSlot is not null)
             {
                 MemCopy(_sretSlot, value.Ref, structType.Size);
@@ -1710,6 +1838,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             case BoundNewArray newArray: return EmitNewArray(newArray);
             case BoundArrayLength length: return EmitArrayLength(length);
             case BoundTypeof typeofExpression: return EmitTypeof(typeofExpression);
+            case BoundResultConstruction result: return EmitResultConstruction(result);
 
             default:
                 return new Val("0", "i32", PrimitiveTypeSymbol.Int);
@@ -1866,6 +1995,14 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     {
         if (targetType is StructTypeSymbol structType)
         {
+            // Retain before release, for the reason StoreManaged does it: a
+            // struct assigned to itself must not destroy what it is copying.
+            if (structType.CarriesReferences())
+            {
+                RetainFieldsAt(value.Ref, structType);
+                ReleaseFieldsAt(slot, structType);
+            }
+
             MemCopy(slot, value.Ref, structType.Size);
             return;
         }
@@ -1928,6 +2065,11 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             case ConversionKind.PointerCast:
             case ConversionKind.NullToReference:
             case ConversionKind.ClassToInterface:
+
+            // Storing is what makes a reference weak: the slot's type sends the
+            // store through sl_weak_retain instead of sl_retain. The value
+            // itself is the same pointer either way.
+            case ConversionKind.ReferenceToWeak:
                 // An interface reference is the very same pointer; the vtable is
                 // reached through the object's TypeInfo, not carried alongside it.
                 return new Val(operand.Ref, to, conversion.Type);
@@ -2062,9 +2204,100 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             _ => signed ? "ashr" : "lshr",
         };
 
+        // Floating point division by zero is defined and produces an infinity;
+        // integer division by zero is not, and neither is the one signed case
+        // that overflows.
+        if (!isFloat && binary.Operator is BoundBinaryOp.Divide or BoundBinaryOp.Remainder &&
+            !IsSafeDivisor(binary.Right))
+            GuardDivision(type, left.Ref, right.Ref, signed);
+
+        string operand = binary.Operator is BoundBinaryOp.ShiftLeft or BoundBinaryOp.ShiftRight
+            ? MaskShiftCount(type, right.Ref)
+            : right.Ref;
+
         return new Val(
-            Emit(type, $"{opcode} {type} {left.Ref}, {right.Ref}"), type, binary.Type);
+            Emit(type, $"{opcode} {type} {left.Ref}, {operand}"), type, binary.Type);
     }
+
+    /// <summary>
+    /// True for a divisor that cannot be zero and cannot make a division
+    /// overflow, so the guard would be branches the optimiser only deletes again.
+    ///
+    /// A constant divisor is the overwhelmingly common case — <c>n / 2</c>,
+    /// <c>i % 16</c> — and skipping it keeps the emitted IR the size it was.
+    /// </summary>
+    private static bool IsSafeDivisor(BoundExpression divisor) =>
+        divisor is BoundLiteral { Value: ulong value } && value != 0
+        && value != unchecked((ulong)-1);
+
+    /// <summary>
+    /// Traps on the integer divisions LLVM leaves undefined.
+    ///
+    /// Undefined is not "whatever the hardware does": the optimiser may fold an
+    /// expression containing one to any value it likes, which is how <c>10 /
+    /// Zero()</c> came to print a number and exit successfully. A language that
+    /// bounds-checks every index should not quietly return nonsense here, so
+    /// this is the same shape as the bounds check — compare, branch, abort.
+    /// </summary>
+    private void GuardDivision(string type, string dividend, string divisor, bool signed)
+    {
+        string zeroLabel = NextLabel("div.zero");
+        string liveLabel = NextLabel("div.live");
+
+        string byZero = Emit("i1", $"icmp eq {type} {divisor}, 0");
+        Terminator($"br i1 {byZero}, label %{zeroLabel}, label %{liveLabel}");
+
+        Label(zeroLabel);
+        Line("call void @sl_divide_by_zero()");
+        Terminator("unreachable");
+
+        Label(liveLabel);
+        if (!signed) return;
+
+        // The one remaining undefined case: the most negative value divided by
+        // -1 has no representable result.
+        string overflowLabel = NextLabel("div.overflow");
+        string okLabel = NextLabel("div.ok");
+
+        string atMinimum = Emit("i1", $"icmp eq {type} {dividend}, {SmallestOf(type)}");
+        string byNegativeOne = Emit("i1", $"icmp eq {type} {divisor}, -1");
+        string overflows = Emit("i1", $"and i1 {atMinimum}, {byNegativeOne}");
+        Terminator($"br i1 {overflows}, label %{overflowLabel}, label %{okLabel}");
+
+        Label(overflowLabel);
+        Line("call void @sl_divide_overflow()");
+        Terminator("unreachable");
+
+        Label(okLabel);
+    }
+
+    /// <summary>
+    /// Reduces a shift count modulo the operand's width, which is what C# does.
+    ///
+    /// LLVM leaves a count at or past the width undefined, so <c>1 &lt;&lt; 40</c>
+    /// on an <c>int</c> produced garbage rather than the 256 a C# reader
+    /// expects. One <c>and</c> makes it defined, and costs nothing the hardware
+    /// was not doing anyway.
+    /// </summary>
+    private string MaskShiftCount(string type, string count) =>
+        Emit(type, $"and {type} {count}, {WidthOf(type) - 1}");
+
+    private static int WidthOf(string llvmType) => llvmType switch
+    {
+        "i8" => 8,
+        "i16" => 16,
+        "i64" => 64,
+        _ => 32,
+    };
+
+    /// <summary>The most negative value of a signed integer type, as LLVM spells it.</summary>
+    private static string SmallestOf(string llvmType) => llvmType switch
+    {
+        "i8" => "-128",
+        "i16" => "-32768",
+        "i64" => "-9223372036854775808",
+        _ => "-2147483648",
+    };
 
     /// <summary>
     /// <c>&amp;&amp;</c> and <c>||</c> must not evaluate the right operand unless
@@ -2132,7 +2365,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             $"phi {llvmType} [ {whenTrue.Ref}, %{trueBlock} ], [ {whenFalse.Ref}, %{falseBlock} ]");
 
         // The arms each left a +1 reference; the merged one is now the temporary.
-        if (expression.Type.NeedsArc()) TrackTemporary(result, expression.Type);
+        if (expression.Type.NeedsArc() || expression.Type.CarriesReferences())
+            TrackTemporary(result, expression.Type);
 
         return new Val(result, llvmType, expression.Type);
     }
@@ -2152,6 +2386,9 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         var value = EmitExpression(arm);
 
         if (arm.Type.NeedsArc()) Line($"call void @sl_retain(ptr {value.Ref})");
+        else if (arm.Type is StructTypeSymbol structArm && structArm.CarriesReferences())
+            RetainFieldsAt(value.Ref, structArm);
+
         FlushTemporaries(mark);
 
         return value;
@@ -2401,6 +2638,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         if (returnInfo.Style == PassStyle.Indirect)
         {
             Line(invocation);
+            if (function.ReturnType.CarriesReferences())
+                TrackTemporary(sretSlot!, function.ReturnType);
             return new Val(sretSlot!, "ptr", function.ReturnType);
         }
 
@@ -2418,6 +2657,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             var structType = (StructTypeSymbol)function.ReturnType;
             string slot = Alloca(StructName(structType), "call.result");
             Line($"store {returnInfo.LlvmType} {result}, ptr {slot}");
+            if (structType.CarriesReferences()) TrackTemporary(slot, structType);
             return new Val(slot, "ptr", function.ReturnType);
         }
 
@@ -2426,6 +2666,36 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             TrackTemporary(result, function.ReturnType);
 
         return new Val(result, returnInfo.LlvmType, function.ReturnType);
+    }
+
+    /// <summary>
+    /// Builds an <c>Ok(x)</c> or <c>Fail(e)</c>: a zeroed Result with its flag
+    /// set and the payload stored in whichever half it belongs to.
+    ///
+    /// Zeroing first is what lets the payload go in through the ordinary owning
+    /// store: the half being written starts null, so its release is a no-op, and
+    /// the half not being written stays null for the drop that eventually comes.
+    /// The finished struct is a +1 temporary, exactly like one returned by a call.
+    /// </summary>
+    private Val EmitResultConstruction(BoundResultConstruction expression)
+    {
+        var result = (StructTypeSymbol)expression.Type;
+        string slot = Alloca(StructName(result), expression.Succeeded ? "ok" : "fail");
+        Line($"store {StructName(result)} zeroinitializer, ptr {slot}");
+
+        var flag = result.FindStorage("ok")!;
+        Line($"store i1 {(expression.Succeeded ? "true" : "false")}, ptr " +
+             $"{Emit("ptr", $"getelementptr inbounds {StructName(result)}, ptr {slot}, " +
+                            $"i32 0, i32 {flag.Index}")}");
+
+        var field = result.FindStorage(expression.Succeeded ? "value" : "error")!;
+        string address = Emit("ptr",
+            $"getelementptr inbounds {StructName(result)}, ptr {slot}, i32 0, i32 {field.Index}");
+
+        StoreInto(address, EmitExpression(expression.Payload), field.Type);
+
+        if (result.CarriesReferences()) TrackTemporary(slot, result);
+        return new Val(slot, "ptr", result);
     }
 
     private static string VariadicSignature(FunctionSymbol function)

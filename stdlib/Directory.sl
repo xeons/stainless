@@ -85,13 +85,13 @@ public class Entry {
 }
 
 /// Everything directly inside, files and directories both, not recursively.
-public Result<List<Entry>> Entries(String path) {
+public Result<List<Entry>, IOError> Entries(String path) {
     var found = new List<Entry>();
 
     var cursor = sl_directory_open(path.ToPointer());
     if (cursor == null) {
         var why = Exists(path) ? IOError.AccessDenied : IOError.NotFound;
-        return new Result<List<Entry>>(false, found, why);
+        return Fail(why);
     }
 
     bool isDirectory = false;
@@ -106,38 +106,38 @@ public Result<List<Entry>> Entries(String path) {
     }
 
     sl_directory_close(cursor);
-    return new Result<List<Entry>>(true, found, IOError.None);
+    return Ok(found);
 }
 
 /// The full paths of the files directly inside.
-public Result<List<String>> Files(String path) {
+public Result<List<String>, IOError> Files(String path) {
     var all = Entries(path);
-    if (!all.Ok) { return new Result<List<String>>(false, new List<String>(), all.Error); }
+    if (!all.Ok) { return Fail(all.Error); }
 
     var paths = new List<String>();
     foreach (var entry in all.Value) {
         if (!entry.IsDirectory) { paths.Add(entry.Path); }
     }
-    return new Result<List<String>>(true, paths, IOError.None);
+    return Ok(paths);
 }
 
 /// The full paths of the directories directly inside.
-public Result<List<String>> Directories(String path) {
+public Result<List<String>, IOError> Directories(String path) {
     var all = Entries(path);
-    if (!all.Ok) { return new Result<List<String>>(false, new List<String>(), all.Error); }
+    if (!all.Ok) { return Fail(all.Error); }
 
     var paths = new List<String>();
     foreach (var entry in all.Value) {
         if (entry.IsDirectory) { paths.Add(entry.Path); }
     }
-    return new Result<List<String>>(true, paths, IOError.None);
+    return Ok(paths);
 }
 
 /// Every file underneath, at any depth.
 ///
 /// Written as a worklist rather than a recursion so that a deep tree cannot
 /// run the stack out.
-public Result<List<String>> AllFiles(String path) {
+public Result<List<String>, IOError> AllFiles(String path) {
     var paths = new List<String>();
 
     var pending = new Queue<String>();
@@ -146,7 +146,7 @@ public Result<List<String>> AllFiles(String path) {
     while (!pending.IsEmpty()) {
         var here = pending.Dequeue();
         var listed = Entries(here);
-        if (!listed.Ok) { return new Result<List<String>>(false, paths, listed.Error); }
+        if (!listed.Ok) { return Fail(listed.Error); }
 
         foreach (var entry in listed.Value) {
             if (entry.IsDirectory) { pending.Enqueue(entry.Path); }
@@ -154,5 +154,5 @@ public Result<List<String>> AllFiles(String path) {
         }
     }
 
-    return new Result<List<String>>(true, paths, IOError.None);
+    return Ok(paths);
 }
