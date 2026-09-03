@@ -1,0 +1,17 @@
+roots=1.4142 3.0000 pow=1024.0
+hypot=5.0 exp=1.0000 log=10.0 3.0
+rounding=-2.0 -1.0 3.0 -2.0
+remainder=-1.0
+abs=3.5 4 5
+sign=-1 1 0
+minmax=3 9 1.5 2.5
+clamp=10 0 0.5
+special=1 1 1 0
+trig=0.0000 1.0000 0.7854
+angles=180.0 3.1416
+lerp=2.50 near=1 0
+divisors=6 12 4
+bits=8 63 3
+powers=1 0 128 1
+constants=3.14159 6.28319 2.71828
+done

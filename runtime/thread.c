@@ -112,6 +112,28 @@ void sl_mutex_free(void *mutex)
     free(mutex);
 }
 
+/*
+ * The same pair for a condition variable, so that Stainless can own one. A
+ * condition is a value the caller has to find room for, and Stainless has no
+ * way to make room for an opaque struct; a handle it can hold in a byte* does.
+ */
+void *sl_condition_new(void)
+{
+    SlCondition *condition = (SlCondition *)calloc(1, sizeof(SlCondition));
+    if (condition == NULL) sl_fail("out of memory");
+
+    sl_condition_init(condition);
+    return condition;
+}
+
+void sl_condition_free(void *condition)
+{
+    if (condition == NULL) return;
+
+    sl_condition_destroy((SlCondition *)condition);
+    free(condition);
+}
+
 void sl_mutex_lock(SlMutex *mutex)
 {
 #ifdef _WIN32

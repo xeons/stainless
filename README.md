@@ -541,6 +541,14 @@ Everything below is covered by [the test suite](tests/cases).
 - `Standard.Threading`: `Mutex<T>` and its `Guard<T>` (the lock owns what it
   guards, and a destructor releases it), `AtomicLong`, `AtomicBool`, and
   `TaskScope` for running `Job` delegates on the pool
+- `Standard.Math`: the C library's floating point, plus `Abs`/`Min`/`Max`/
+  `Clamp`/`Sign` overloaded across `int`, `long`, `nuint` and `double`,
+  `IsNaN`/`IsInfinite`/`IsFinite`, `GreatestCommonDivisor`, and the bit
+  functions. A module is a scope, so `Math.Sqrt(x)` needs no static class
+- `Standard.Concurrent`: `ConcurrentQueue<T>`, `ConcurrentStack<T>`,
+  `ConcurrentDictionary<K, V>` and a blocking `Channel<T>`. Each owns its
+  collection in a field and never hands out a reference to it, because a lock
+  protects what it guards and not the reference *count* of what it guards
 - `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
 - Raw pointers, `sizeof`, `typeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#

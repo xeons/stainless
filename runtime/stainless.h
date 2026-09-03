@@ -311,6 +311,9 @@ void  sl_mutex_lock(SlMutex *mutex);
 _Bool sl_mutex_try_lock(SlMutex *mutex);
 void  sl_mutex_unlock(SlMutex *mutex);
 
+void *sl_condition_new(void);
+void  sl_condition_free(void *condition);
+
 void  sl_condition_init(SlCondition *condition);
 void  sl_condition_destroy(SlCondition *condition);
 void  sl_condition_wait(SlCondition *condition, SlMutex *mutex);

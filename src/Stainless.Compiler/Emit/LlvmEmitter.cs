@@ -2032,7 +2032,11 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         string? comparison = binary.Operator switch
         {
             BoundBinaryOp.Equal => isFloat ? "fcmp oeq" : "icmp eq",
-            BoundBinaryOp.NotEqual => isFloat ? "fcmp one" : "icmp ne",
+
+            // 'une', not 'one': IEEE says a NaN is unequal to everything
+            // including itself, and an ordered compare would answer false to
+            // exactly that. `x != x` is how NaN is detected.
+            BoundBinaryOp.NotEqual => isFloat ? "fcmp une" : "icmp ne",
             BoundBinaryOp.Less => isFloat ? "fcmp olt" : signed ? "icmp slt" : "icmp ult",
             BoundBinaryOp.LessEqual => isFloat ? "fcmp ole" : signed ? "icmp sle" : "icmp ule",
             BoundBinaryOp.Greater => isFloat ? "fcmp ogt" : signed ? "icmp sgt" : "icmp ugt",

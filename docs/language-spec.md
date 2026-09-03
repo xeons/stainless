@@ -768,7 +768,12 @@ nothing by itself.
 |---|---|---|
 | `Standard.Text` | `String`, `StringBuilder`, `Utf16String`, conversions | automatically |
 | `Standard.Console` | `Write`, `WriteLine`, `WriteError` | on request |
-| `Standard.Collections` | interfaces below, and `List<T>` | on request |
+| `Standard.Collections` | the interfaces below, and every container | on request |
+| `Standard.Concurrent` | the containers several threads may share | on request |
+| `Standard.Threading` | `Mutex<T>`, atomics, the job pool | on request |
+| `Standard.Math` | arithmetic that is not an operator | on request |
+| `Standard.Reflection` | `[Reflect]`, `typeof`, the field tables | on request |
+| `Standard` | `[Flags]`, and other markers the language itself reads | automatically |
 
 ### 5.2 `Standard.Threading`
 
@@ -931,7 +936,70 @@ Largest(prices);                    // and works on any IReadOnlyList
 `IReadOnlyList<T>`, so they accept a mutable list without being able to change
 it.
 
-### 5.5 Interfaces may extend interfaces
+### 5.5 `Standard.Math`
+
+```csharp
+import Standard.Math;
+
+Math.Sqrt(2.0);
+Math.Clamp(x, 0, 10);
+Math.GreatestCommonDivisor(48, 18);
+```
+
+A module is a scope, so this needs no static class to live in: `Math.Sqrt(x)`
+is a module-qualified call. The floating-point functions are the C library's,
+declared and called directly — there is no wrapper layer and no conversion,
+because a Stainless `double` *is* a C `double`.
+
+`Abs`, `Min`, `Max`, `Clamp` and `Sign` are overloaded across `int`, `long`,
+`nuint` and `double`, resolved by argument type. Alongside them are the usual
+transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinite`/
+`IsFinite`, `Lerp` and `Near`, the integer `GreatestCommonDivisor` and
+`DivideCeiling`, and the bit functions `PopCount`, `LeadingZeros`,
+`TrailingZeros`, `IsPowerOfTwo` and `NextPowerOfTwo`.
+
+`Round` takes halves away from zero, which is C's rule rather than the banker's
+rounding C# uses by default.
+
+### 5.6 `Standard.Concurrent`
+
+```csharp
+import Standard.Concurrent;
+
+var work = new ConcurrentQueue<int>();
+parallel {
+    spawn Fill(work, 0, 500);
+    spawn Fill(work, 500, 1000);
+}
+
+var got = work.TryDequeue();
+if (got.Ok) { use(got.Value); }
+```
+
+`ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<K, V>` and
+`Channel<T>`, each `[Shared]` and each safe for several threads at once.
+
+Every operation that can fail returns a `Taken<T>` — whether there was
+anything, and what it was — rather than answering in two calls. There is no
+`Peek` and then `Dequeue`, because between the two another thread may have
+taken it. `DequeueOr(fallback)` is the same answer without the allocation.
+
+`Channel<T>` is the producer-consumer hand-off: `Take` **blocks** until
+something arrives or the channel is closed, and `Close` wakes every waiter.
+What was already sent is still delivered; once it is drained, every `Take`
+returns at once with `Ok` false.
+
+**Each of these owns an ordinary collection in a field and never hands out a
+reference to it**, and that is a correctness requirement rather than a style
+choice. Reference counts are not atomic: a lock protects what it guards, not
+the *count* of the thing it guards, so an object returned out of a lock is
+retained and released by several threads at once and its count drifts down
+until it is freed while still in use. Reading a field to call a method on it
+borrows, and borrowing touches no count. See the note on `Mutex<T>` in
+[concurrency.md](concurrency.md), which has the same hazard and is why nothing
+here is built on it.
+
+### 5.7 Interfaces may extend interfaces
 
 ```csharp
 public interface IWritable : IReadable { void Write(String text); }

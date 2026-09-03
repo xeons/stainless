@@ -1,0 +1,11 @@
+queued=4000
+drained=7998000 empty=1 again=0
+fallback=-1
+stacked=499500 empty=1 or=-7
+mapped=2000 at777=1554
+add=1 dup=0
+get=1 2468 absent=0
+remove=1 gone=0 keys=2000
+channel=180300 items=600 closed=1
+after-close=0 drained=0
+done

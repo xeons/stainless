@@ -435,11 +435,32 @@ before `Main`, and §1.3's sendability rule is checked wherever a value can reac
 a second thread. An unsynchronized class can no longer cross a thread boundary
 at all.
 
-All seven steps are done. Two things are still open, and both are named where
-they live: a `Guard` can outlive its lock (§4.2), and a job could retain a
-plain-data array it was only lent (§1.3). Both are lifetime questions rather
-than type questions, and neither is closed by anything built so far — closing
-them is the next piece of work, not a step in this plan.
+All seven steps are done. Three things are still open.
+
+**The one that matters most, found while building Standard.Concurrent:**
+`Mutex<T>` is unsound when `T` is a class and the mutex is used from more than
+one thread. `Guard.Value()` returns the guarded object, which retains it, and
+dropping the result releases it — so two threads locking *in turn* still do an
+unsynchronized read-modify-write on that object's reference count. The lock
+protects the contents; nothing protects the count. It drifts down and the
+object is destroyed while the mutex still holds it. A four-thread test destroys
+it hundreds of times in a second.
+
+`Mutex<long>` is fine, because a plain value is never retained — which is why
+the existing test never showed this. So is any design that keeps the shared
+object in a field and never hands it out, because reading a field to call a
+method on it borrows, and borrowing touches no count. Every container in
+Standard.Concurrent is built that way, and none of them uses `Mutex<T>`.
+
+Closing it properly means **atomic reference counts for `[Shared]` types**.
+That is affordable in the spirit of §1: only a type that opts into sharing pays,
+and every single-threaded program keeps exactly what it has today. It is a
+decision about the ARC model rather than a bug in the library, and it is not
+made here.
+
+The two already known: a `Guard` can outlive its lock (§4.2), and a job could
+retain a plain-data array it was only lent (§1.3). Both are lifetime questions
+rather than type questions, and neither is closed by anything built so far.
 
 Order of work, each step useful on its own:
 
