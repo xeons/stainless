@@ -44,7 +44,7 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 /// When true, <c>export "C"</c> functions are marked <c>dllexport</c> so they
 /// reach a Windows DLL's export table, and no C <c>main</c> is emitted.
 /// </param>
-public sealed class LlvmEmitter(bool forSharedLibrary = false)
+public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainlessConsumers = false)
 {
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
@@ -228,6 +228,25 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     {
         _interfaceCount = program.Interfaces.Count;
 
+        // A class from a referenced library keeps its table in that library.
+        // Rebuilding one here would give an object a destructor compiled on this
+        // side, which is not the one its fields were laid out for. Such a class
+        // is not in program.Classes at all, for the same reason: nothing about it
+        // is emitted except the name.
+        foreach (string imported in program.Modules
+                     .SelectMany(m => m.Types.Values)
+                     .OfType<ClassTypeSymbol>()
+                     .Select(c => c.ExternalTypeInfo)
+                     .OfType<string>()
+                     .Distinct(StringComparer.Ordinal)
+                     .Order(StringComparer.Ordinal))
+            // Windows needs dllimport on data. A function the linker can reach
+            // through a generated thunk; a constant it cannot, because the
+            // address has to come from the import address table.
+            _module.AppendLine(OperatingSystem.IsWindows()
+                ? $"@{imported} = external dllimport constant %SlTypeInfo"
+                : $"@{imported} = external constant %SlTypeInfo");
+
         foreach (var classType in program.Classes)
         {
             string nameConstant = InternBytes(classType.QualifiedName);
@@ -235,8 +254,14 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
                 ? "@" + InterfaceTableName(classType)
                 : "null";
 
+            // A library's public classes are allocated through this table by
+            // whoever consumes them, so it has to leave the binary.
+            string visibility = forSharedLibrary && forStainlessConsumers && classType.IsPublic
+                ? OperatingSystem.IsWindows() ? "dllexport constant" : "constant"
+                : "internal constant";
+
             _module.AppendLine(
-                $"@{Mangler.TypeInfoSymbol(classType)} = internal constant %SlTypeInfo " +
+                $"@{Mangler.TypeInfoSymbol(classType)} = {visibility} %SlTypeInfo " +
                 $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)} }}");
         }
@@ -681,7 +706,17 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _nextTemp = 0;
 
         string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
-        bool exported = symbol.Linkage is LinkageKind.ExportC or LinkageKind.ExportCpp;
+        // `public` deliberately does not export: it says which modules may see
+        // this, and a C library's surface is stated once with `export "C"`.
+        // Asking for module metadata says something different — that another
+        // Stainless compilation will bind against this — and that surface is
+        // exactly the public declarations the metadata describes.
+        bool exported = symbol.Linkage is LinkageKind.ExportC or LinkageKind.ExportCpp
+            || (forStainlessConsumers && symbol.Linkage == LinkageKind.Stainless
+                && !symbol.IsExternal
+                && (symbol.IsPublic || symbol.Kind == FunctionKind.Constructor)
+                && symbol.ContainingType is null or { IsPublic: true }
+                && symbol.TypeArguments.Count == 0);
         string linkage = exported || symbol.IsPublic ? "" : "internal ";
 
         // Windows exports only what a binary marks, so a library's declared API

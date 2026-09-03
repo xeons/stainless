@@ -1707,9 +1707,60 @@ dereference or free.
 Lifting that restriction means shipping the Stainless runtime as its own shared
 library, so both sides count against the same allocator. That is not done yet.
 
-Neither is the other direction: a Stainless library consumed by *Stainless*.
-Importing a module from a compiled binary needs module metadata that does not
-exist, since compilation is whole-program today.
+### 8.4 A Stainless library consumed by Stainless
+
+Stainless has no headers, and inside one compilation it needs none: every
+declaration is visible because every file is compiled together. A library is
+where that stops. The consumer is a separate compilation with no access to the
+source, so something has to carry what the source would have said.
+
+```
+stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
+stainless build app.sl --reference build/shapes.slmod build/shapes.lib -o app.exe
+```
+
+The `.slmod` is generated, never edited, and cannot drift from the library
+because it is written from the same bound program. It describes the public
+surface: layouts, field offsets, signatures, and the linker names to call.
+
+```csharp
+import Library.Shapes;                  // a module this compilation has no source for
+
+int Main() {
+    var counter = new Counter("clicks", tally);
+    counter.Step = 3;                   // properties, fields and methods all work
+    counter.Bump();
+    Console.WriteLine(counter.Describe());
+    return 0;
+}
+```
+
+**Reference counting reaches across.** A class is allocated through the
+library's own TypeInfo, so the object gets the destructor the library compiled
+for it, and the consumer's `release` runs it at the right moment.
+
+**`public` still does not export.** It answers which modules may see a
+declaration, and a C library's surface is stated once with `export "C"`. Asking
+for `--metadata` says something different — that another Stainless compilation
+will bind against this — and that surface is exactly the public declarations the
+metadata describes.
+
+**What does not cross, and why.** Both are consequences of the language
+compiling a whole program at once, and the compiler says so where the library is
+built rather than leaving the consumer to find a public type mysteriously
+missing:
+
+| | |
+|---|---|
+| a generic (SL0419) | a template emits nothing until it is instantiated, so a consumer with only the binary has nothing to instantiate. A generic crosses as source |
+| a class implementing an interface (SL0420) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
+
+**One thing to know about output.** Each binary links its own copy of the
+runtime, so each has its own C stdio buffer. Text written from inside a library
+and text written by its consumer do not interleave in the order they were
+written unless something flushes. Shipping the runtime as its own shared library
+would fix that, and would also put both sides on one allocator; that is still
+not done.
 
 ## 9. Statements and expressions
 

@@ -39,6 +39,17 @@ public sealed record CompilationOptions
 
     /// <summary>Where to write a C header for the exported surface, if anywhere.</summary>
     public string? HeaderPath { get; init; }
+
+    /// <summary>
+    /// Where to write the module metadata another Stainless compilation binds
+    /// against. The C header and this describe the same library to two
+    /// different audiences.
+    /// </summary>
+    public string? MetadataPath { get; init; }
+
+    /// <summary>Metadata files describing libraries this program links against.</summary>
+    public IReadOnlyList<string> References { get; init; } = [];
+
     public bool KeepIntermediates { get; init; }
     public bool EmitIrOnly { get; init; }
 }
@@ -51,6 +62,7 @@ public sealed record CompilationResult
     public string? IrPath { get; init; }
     public string? Ir { get; init; }
     public string? HeaderPath { get; init; }
+    public string? MetadataPath { get; init; }
 
     /// <summary>A failure outside the source program: a missing tool, unreadable file, bad IR.</summary>
     public string? DriverError { get; init; }
@@ -192,6 +204,10 @@ public sealed class Compilation
         foreach (var (name, text) in StandardLibrary.Sources())
             units.Add(new Parser(new SourceText(name, text), diagnostics).ParseCompilationUnit());
 
+        // Everything after this point is the program's own, which is what a
+        // library's metadata describes.
+        int standardUnits = units.Count;
+
         foreach (string path in options.SourcePaths)
         {
             SourceText source;
@@ -210,7 +226,16 @@ public sealed class Compilation
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- bind --------------------------------------------------------
-        var program = new Binder(diagnostics, requireEntryPoint: !options.Shared).Bind(units);
+        var references = new List<ModuleMetadata>();
+        foreach (string path in options.References)
+        {
+            var metadata = ModuleMetadata.Read(path, out string referenceError);
+            if (metadata is null) return Failure(referenceError);
+            references.Add(metadata);
+        }
+
+        var program = new Binder(
+            diagnostics, requireEntryPoint: !options.Shared, references: references).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         if (program.EntryPoint is null && !options.EmitIrOnly && !options.Shared)
@@ -218,7 +243,10 @@ public sealed class Compilation
                 "no entry point was found; declare 'int Main()' in one of the compiled modules, " +
                 "or pass --shared to build a library instead");
 
-        if (options.Shared && !program.Modules.SelectMany(m => m.Functions)
+        // A library built for Stainless consumers exports its public surface
+        // through the metadata, so it is not silent even with no export "C".
+        if (options.Shared && options.MetadataPath is null &&
+            !program.Modules.SelectMany(m => m.Functions)
                 .Any(f => f.Linkage == LinkageKind.ExportC))
             diagnostics.Warning("SL0291", units[0].Span,
                 "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
@@ -235,7 +263,9 @@ public sealed class Compilation
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- emit --------------------------------------------------------
-        string ir = new LlvmEmitter(forSharedLibrary: options.Shared).Emit(program);
+        string ir = new LlvmEmitter(
+            forSharedLibrary: options.Shared,
+            forStainlessConsumers: options.MetadataPath is not null).Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
@@ -287,6 +317,22 @@ public sealed class Compilation
         // The header restates what the ABI already guarantees, so it is written
         // from the same symbols the emitter used.
         string? headerPath = null;
+        string? metadataPath = null;
+        if (options.MetadataPath is not null)
+        {
+            metadataPath = Path.GetFullPath(options.MetadataPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(metadataPath) ?? ".");
+            var ownModules = units
+                .Skip(standardUnits)
+                .Select(u => u.ModuleName?.Text)
+                .OfType<string>()
+                .ToHashSet(StringComparer.Ordinal);
+
+            File.WriteAllText(metadataPath,
+                MetadataWriter.Write(program, Path.GetFileName(output), ownModules, diagnostics)
+                    .ToJson());
+        }
+
         if (options.HeaderPath is not null)
         {
             headerPath = Path.GetFullPath(options.HeaderPath);
@@ -302,6 +348,7 @@ public sealed class Compilation
             IrPath = irPath.Length == 0 ? null : irPath,
             Ir = ir,
             HeaderPath = headerPath,
+            MetadataPath = metadataPath,
         };
     }
 

@@ -1,0 +1,8 @@
+clicks:6
+6
+3
+clicks
+0
+destroyed=1
+1
+14

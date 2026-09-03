@@ -389,7 +389,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 118 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 119 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -646,6 +646,13 @@ Everything below is covered by [the test suite](tests/cases).
 - Integer literals that fit convert implicitly, as in C#
 - Shared libraries: `--shared` with a generated C header, and an export table
   containing exactly the `export "C"` functions
+- Stainless libraries consumed by Stainless: `--metadata` writes a `.slmod`
+  describing a library's public surface, and `--reference` binds another
+  compilation against it. Classes cross with their fields, properties, methods,
+  constructors and destructors; so do structs, enums and free functions, and
+  reference counting reaches across, because an object is allocated through the
+  library's own TypeInfo. Generics and classes implementing interfaces do not
+  cross, and the compiler says so where the library is built
 - Attributes and opt-in reflection: field names, offsets, kinds and attribute
   values readable at run time, from `const` tables in the binary
 - Diagnostics with source excerpts and caret runs

@@ -490,6 +490,13 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// </summary>
     public bool IsIntrinsic { get; init; }
 
+    /// <summary>
+    /// For a class from a referenced library, the TypeInfo symbol to allocate
+    /// through. The table lives in the library, so an object made here still
+    /// gets the destructor the library compiled.
+    /// </summary>
+    public string? ExternalTypeInfo { get; init; }
+
     /// <summary>strong count, weak count, TypeInfo pointer. See docs/abi.md.</summary>
     public const int HeaderSize = 24;
 

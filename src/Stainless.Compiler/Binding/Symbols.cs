@@ -103,7 +103,7 @@ public sealed class FunctionSymbol
     public FileScope? Scope { get; init; }
 
     /// <summary>The property this is the getter or setter of, or null.</summary>
-    public PropertySymbol? Accessor { get; init; }
+    public PropertySymbol? Accessor { get; set; }
 
     /// <summary>
     /// True when the body is the compiler's rather than the programmer's: the
@@ -128,6 +128,19 @@ public sealed class FunctionSymbol
     /// demand the way a Stainless name is.
     /// </summary>
     public string? ForeignName { get; set; }
+
+    /// <summary>
+    /// True for a function this program calls but does not contain: it came
+    /// from a referenced library's metadata, so it is declared to the emitter
+    /// and never defined by it.
+    /// </summary>
+    public bool IsExternal { get; init; }
+
+    /// <summary>
+    /// The property this accessor belongs to, as the metadata named it. The
+    /// property symbol itself is rebuilt from the accessor pair afterwards.
+    /// </summary>
+    public string? MetadataAccessor { get; init; }
 
     public string MangledName =>
         _mangledName ??= ForeignName ?? RuntimeSymbol ?? Mangler.Mangle(this);

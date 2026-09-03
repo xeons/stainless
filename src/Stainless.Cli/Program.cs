@@ -81,6 +81,8 @@ internal static class Program
               -o, --out <path>     output file (default: after the first source)
               --shared             build a shared library instead of an executable
               --header <path>      write a C header for the exported surface
+              --metadata <path>    write module metadata for a Stainless consumer
+              --reference <path>   bind against a library's module metadata
               -O<0-3>              optimization level (default: -O2)
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
@@ -117,6 +119,9 @@ internal static class Program
         Success($"built {Relative(result.OutputPath!)} in {stopwatch.ElapsedMilliseconds} ms");
         if (result.HeaderPath is not null)
             Console.WriteLine($"  header: {Relative(result.HeaderPath)}");
+
+        if (result.MetadataPath is not null)
+            Console.WriteLine($"  metadata: {Relative(result.MetadataPath)}");
         if (result.IrPath is not null) Console.WriteLine($"  IR: {Relative(result.IrPath)}");
 
         if (options.Shared)
@@ -174,6 +179,8 @@ internal static class Program
         bool keep = false;
         bool shared = false;
         string? header = null;
+        string? metadata = null;
+        var references = new List<string>();
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -197,6 +204,16 @@ internal static class Program
 
                 case "--shared":
                     shared = true;
+                    continue;
+
+                case "--metadata":
+                    if (++i >= args.Length) { Error("'--metadata' needs a path"); return false; }
+                    metadata = args[i];
+                    continue;
+
+                case "--reference" or "-r":
+                    if (++i >= args.Length) { Error("'--reference' needs a path"); return false; }
+                    references.Add(args[i]);
                     continue;
 
                 case "--header":
@@ -253,7 +270,14 @@ internal static class Program
             KeepIntermediates = keep,
             Shared = shared,
             HeaderPath = header,
+            MetadataPath = metadata,
+            References = references,
         };
+
+        if (metadata is not null && !shared)
+            Console.Error.WriteLine(
+                "note: '--metadata' describes a library's surface, which only a '--shared' " +
+                "build has");
 
         if (header is not null && !shared)
             Console.Error.WriteLine(

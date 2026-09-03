@@ -59,7 +59,10 @@ public sealed class BoundProgram
 /// warned about one.
 /// </param>
 public sealed class Binder(
-    DiagnosticBag diagnostics, bool requireEntryPoint = true, CppAbi? cppAbi = null)
+    DiagnosticBag diagnostics,
+    bool requireEntryPoint = true,
+    CppAbi? cppAbi = null,
+    IReadOnlyList<Driver.ModuleMetadata>? references = null)
 {
     private readonly Builtins _builtins = new();
 
@@ -141,6 +144,15 @@ public sealed class Binder(
     {
         _builtins.RegisterInto(_modules);
 
+        // A referenced library's declarations come first, so a source file can
+        // name them exactly as it names anything else.
+        if (references is { Count: > 0 })
+        {
+            var loader = new MetadataLoader(diagnostics);
+            loader.RegisterIntrinsics(_modules.Values);
+            loader.Load(references, _modules);
+        }
+
         DeclareModules(units);      // pass 1: every module exists
         DeclareTypes();             // pass 2: every type name exists
         _resultTemplate = _modules.TryGetValue(Builtins.StandardModuleName, out var standard)
@@ -161,7 +173,7 @@ public sealed class Binder(
 
         var external = _modules.Values
             .SelectMany(m => m.Functions)
-            .Where(f => f.Linkage.IsImport())
+            .Where(f => f.Linkage.IsImport() || f.IsExternal)
             .GroupBy(f => f.MangledName)
             .Select(g => g.First())
             .ToList();

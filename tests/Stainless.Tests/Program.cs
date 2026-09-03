@@ -128,11 +128,50 @@ internal static class Program
 
         bool shared = File.Exists(Path.Combine(directory, "shared.txt"));
 
+        // A `library/` subdirectory is built first, as a Stainless library with
+        // module metadata, and the case's own sources are then compiled against
+        // it. That is the two-compilation shape the metadata exists for, and the
+        // only way to test it is to actually perform both.
+        string libraryDirectory = Path.Combine(directory, "library");
+        string? referencePath = null;
+        string? importLibrary = null;
+
+        if (Directory.Exists(libraryDirectory))
+        {
+            var librarySources = Directory.EnumerateFiles(libraryDirectory, "*.sl")
+                .OrderBy(p => p, StringComparer.Ordinal).ToList();
+
+            string libraryOutput =
+                Path.Combine(caseWork, name + "-library" + Toolchain.SharedLibraryExtension);
+            referencePath = Path.Combine(caseWork, name + ".slmod");
+
+            var libraryResult = new Compilation().Compile(new CompilationOptions
+            {
+                SourcePaths = librarySources,
+                OutputPath = libraryOutput,
+                IntermediateDirectory = Path.Combine(caseWork, "obj-library"),
+                OptimizationLevel = 1,
+                Shared = true,
+                MetadataPath = referencePath,
+            });
+
+            if (!libraryResult.Success)
+                return (false, "the library failed to build:\n" +
+                               (libraryResult.DriverError ?? string.Join("\n",
+                                   libraryResult.Diagnostics.Select(d => d.Render(color: false)))));
+
+            string beside = Path.ChangeExtension(libraryOutput, ".lib");
+            importLibrary = File.Exists(beside) ? beside : libraryOutput;
+        }
+
         var options = new CompilationOptions
         {
             SourcePaths = sources,
             // A shared case compiles its C separately, against the built library.
-            NativeInputs = shared ? [] : natives,
+            NativeInputs = shared
+                ? []
+                : importLibrary is null ? natives : [.. natives, importLibrary],
+            References = referencePath is null ? [] : [referencePath],
             OutputPath = Path.Combine(
                 caseWork, name + (shared ? Toolchain.SharedLibraryExtension : ".exe")),
             IntermediateDirectory = Path.Combine(caseWork, "obj"),
