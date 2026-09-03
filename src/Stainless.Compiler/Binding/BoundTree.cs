@@ -164,6 +164,23 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 }
 
 /// <summary>
+/// Writes a property.
+///
+/// A property read is simply a <see cref="BoundCall"/> to the getter, so it
+/// needs no node of its own. A write needs one only because an assignment
+/// yields the value it stored and a setter returns nothing: the emitter has to
+/// hold on to the value it just passed.
+/// </summary>
+public sealed class BoundPropertyAssignment(
+    SourceSpan span, BoundExpression receiver, PropertySymbol property, BoundExpression value)
+    : BoundExpression(span, property.Type)
+{
+    public BoundExpression Receiver { get; } = receiver;
+    public PropertySymbol Property { get; } = property;
+    public BoundExpression Value { get; } = value;
+}
+
+/// <summary>
 /// <c>condition ? whenTrue : whenFalse</c>. Kept as a node rather than lowered
 /// to an <c>if</c>, because only the chosen arm may be evaluated and the result
 /// is a value, not a statement.

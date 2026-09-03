@@ -18,6 +18,10 @@ public class Person {
                             public bool   Active;
                             public double Rating;
     [JsonIgnore]            public int    Internal;
+
+    // A property's backing field is ordinary storage, so a reflected type sees
+    // it under the property's own name and carries the annotation with it.
+    [JsonName("city")]      public String City { get; set; }
 }
 
 [Reflect]
@@ -77,6 +81,7 @@ int Main() {
     person.Active = true;
     person.Rating = 9.5;
     person.Internal = 999;
+    person.City = "London";
 
     Console.WriteLine(ToJson(person));
 

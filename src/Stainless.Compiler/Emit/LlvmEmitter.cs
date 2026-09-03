@@ -1621,6 +1621,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
                 return new Val("@" + reference.Function.MangledName, "ptr", reference.Type);
             case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
             case BoundAssignment assignment: return EmitAssignment(assignment);
+            case BoundPropertyAssignment written: return EmitPropertyAssignment(written);
             case BoundCall call: return EmitCall(call);
             case BoundNew newExpression: return EmitNew(newExpression);
             case BoundClosure closure: return EmitClosure(closure);
@@ -1798,6 +1799,35 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         var value = EmitExpression(assignment.Value);
         string address = EmitAddress(assignment.Target);
         StoreInto(address, value, assignment.Target.Type);
+        return value;
+    }
+
+    /// <summary>
+    /// Calls a setter, then hands back the value it was given.
+    ///
+    /// A setter returns nothing, but an assignment is an expression whose value
+    /// is what was stored — so the value is emitted here rather than inside a
+    /// call that would swallow it. Dispatch is resolved before the value for the
+    /// reason <see cref="EmitCall"/> resolves it before the arguments: the
+    /// value's own code must not be able to change which object is written.
+    /// </summary>
+    private Val EmitPropertyAssignment(BoundPropertyAssignment assignment)
+    {
+        var setter = assignment.Property.Setter!;
+
+        var receiver = EmitExpression(assignment.Receiver);
+        string? virtualTarget = setter.ContainingType is InterfaceTypeSymbol
+            ? LoadInterfaceMethod(receiver.Ref, setter)
+            : null;
+
+        var value = EmitExpression(assignment.Value);
+
+        var arguments = new List<string> { $"ptr {receiver.Ref}" };
+        AppendArgument(value, assignment.Value.Type, arguments);
+
+        Line($"call void {virtualTarget ?? "@" + setter.MangledName}" +
+             $"({string.Join(", ", arguments)})");
+
         return value;
     }
 
@@ -2327,29 +2357,30 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         IReadOnlyList<BoundExpression> expressions, List<string> arguments)
     {
         for (int i = 0; i < expressions.Count; i++)
+            AppendArgument(EmitExpression(expressions[i]), expressions[i].Type, arguments);
+    }
+
+    /// <summary>Lowers one already-emitted value to its ABI form.</summary>
+    private void AppendArgument(Val value, TypeSymbol type, List<string> arguments)
+    {
+        if (type is StructTypeSymbol structType)
         {
-            var value = EmitExpression(expressions[i]);
-            var type = expressions[i].Type;
-
-            if (type is StructTypeSymbol structType)
+            var info = Win64Abi.ClassifyArgument(structType, LlvmTypeOf);
+            if (info.Style == PassStyle.Indirect)
             {
-                var info = Win64Abi.ClassifyArgument(structType, LlvmTypeOf);
-                if (info.Style == PassStyle.Indirect)
-                {
-                    // Win64 passes a pointer to a copy the caller owns.
-                    string copy = Alloca(StructName(structType), "arg.copy");
-                    MemCopy(copy, value.Ref, structType.Size);
-                    arguments.Add($"ptr byval({StructName(structType)}) {copy}");
-                }
-                else
-                {
-                    string coerced = Emit(info.LlvmType, $"load {info.LlvmType}, ptr {value.Ref}");
-                    arguments.Add($"{info.LlvmType} {coerced}");
-                }
-                continue;
+                // Win64 passes a pointer to a copy the caller owns.
+                string copy = Alloca(StructName(structType), "arg.copy");
+                MemCopy(copy, value.Ref, structType.Size);
+                arguments.Add($"ptr byval({StructName(structType)}) {copy}");
             }
-
-            arguments.Add($"{value.LlvmType} {value.Ref}");
+            else
+            {
+                string coerced = Emit(info.LlvmType, $"load {info.LlvmType}, ptr {value.Ref}");
+                arguments.Add($"{info.LlvmType} {coerced}");
+            }
+            return;
         }
+
+        arguments.Add($"{value.LlvmType} {value.Ref}");
     }
 }

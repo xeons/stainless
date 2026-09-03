@@ -1,0 +1,24 @@
+name=Ada id=7 rank=1
+label=Ada#7
+renamed=Grace rank=4
+compound=20
+visits=2
+dispatch name=Grace rank=42
+c=100 f=212 k=373
+after f=212: c=100
+after k=300: c=27
+rect=5x4 area=20
+cell=15 text=boxed
+boxed=6
+held=1 first=Grace#7
+chained=9 9
+replacing
+~Tag(first)
+replaced=second
+~Slot
+~Tag(second)
+scope left
+delegate=42 20
+closure=101
+done
+~Person(Grace)

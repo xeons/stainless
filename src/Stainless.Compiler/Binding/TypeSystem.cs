@@ -183,6 +183,13 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public int Index { get; } = index;
     public bool IsPublic { get; init; }
 
+    /// <summary>
+    /// True for the hidden storage of an automatic property. It is laid out,
+    /// destroyed and reflected exactly like any other field; it simply has no
+    /// name the source can reach, because the property is that name.
+    /// </summary>
+    public bool IsBackingField { get; init; }
+
     /// <summary>Byte offset from the start of the value (structs) or of the fields area (classes).</summary>
     public int Offset { get; internal set; }
 
@@ -198,6 +205,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
 
     public List<FieldSymbol> Fields { get; } = [];
     public List<FunctionSymbol> Methods { get; } = [];
+
+    /// <summary>
+    /// Properties, whose accessors also appear in <see cref="Methods"/>. This
+    /// list is what makes <c>x.Name</c> resolve; the methods are what makes it
+    /// dispatch.
+    /// </summary>
+    public List<PropertySymbol> Properties { get; } = [];
 
     /// <summary>
     /// Methods with type parameters of their own. They stay templates until a
@@ -266,7 +280,19 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public int FieldsSize => _size;
     public int FieldsAlignment => _alignment;
 
-    public FieldSymbol? FindField(string name) => Fields.FirstOrDefault(f => f.Name == name);
+    /// <summary>
+    /// A field the source may name. A property's backing field is deliberately
+    /// not one: reaching it directly would bypass the accessors, and on an
+    /// interface implementation that would bypass dispatch as well.
+    /// </summary>
+    public FieldSymbol? FindField(string name) =>
+        Fields.FirstOrDefault(f => f.Name == name && !f.IsBackingField);
+
+    /// <summary>Any field at all, hidden storage included. Used for name clashes.</summary>
+    public FieldSymbol? FindStorage(string name) => Fields.FirstOrDefault(f => f.Name == name);
+
+    public virtual PropertySymbol? FindProperty(string name) =>
+        Properties.FirstOrDefault(p => p.Name == name);
 
     /// <summary>
     /// Finds a method on this type or, for an interface, on one it extends. The
@@ -388,6 +414,11 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
     public override FunctionSymbol? FindMethod(string name) =>
         Methods.FirstOrDefault(m => m.Name == name)
         ?? AllInterfaces().Select(i => i.FindMethod(name)).FirstOrDefault(m => m is not null);
+
+    /// <summary>Also searches extended interfaces, nearest first.</summary>
+    public override PropertySymbol? FindProperty(string name) =>
+        Properties.FirstOrDefault(p => p.Name == name)
+        ?? AllInterfaces().Select(i => i.FindProperty(name)).FirstOrDefault(p => p is not null);
 }
 
 public sealed class ClassTypeSymbol : NamedTypeSymbol

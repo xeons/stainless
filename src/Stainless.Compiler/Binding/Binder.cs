@@ -374,6 +374,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                             $"'{field.Name}' is a module-level variable; only 'const' values are " +
                             "allowed at module scope");
                         break;
+
+                    case PropertyDeclSyntax property:
+                        diagnostics.Error("SL0400", property.Span,
+                            $"'{property.Name}' is a property, and a property belongs to a type; " +
+                            "a module has no instance for its accessors to read");
+                        break;
                 }
             }
         }
@@ -491,10 +497,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 continue;
             }
 
-            if (type is InterfaceTypeSymbol && member is not FunctionDeclSyntax)
+            if (type is InterfaceTypeSymbol && member is not (FunctionDeclSyntax or PropertyDeclSyntax))
             {
                 diagnostics.Error("SL0300", member.Span,
-                    $"interface '{type.Name}' may only declare methods; " +
+                    $"interface '{type.Name}' may only declare methods and properties; " +
                     "it has no state, no constructor and no destructor");
                 continue;
             }
@@ -503,10 +509,11 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             {
                 case FieldDeclSyntax field:
                 {
-                    if (type.FindField(field.Name) is not null)
+                    if (type.FindStorage(field.Name) is not null ||
+                        type.FindProperty(field.Name) is not null)
                     {
                         diagnostics.Error("SL0205", field.Span,
-                            $"'{type.Name}' already declares a field named '{field.Name}'");
+                            $"'{type.Name}' already declares a member named '{field.Name}'");
                         break;
                     }
                     if (field.Initializer is not null)
@@ -557,6 +564,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                         break;
                     }
                     DeclareFunction(scope, type, method);
+                    break;
+
+                case PropertyDeclSyntax property:
+                    DeclareProperty(scope, type, property);
                     break;
 
                 case ConstructorDeclSyntax constructor:
@@ -618,6 +629,198 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Declares a property: the pair of methods it really is, and the hidden
+    /// field it keeps its value in when it asked for one.
+    ///
+    /// Everything downstream sees methods and a field. That is what makes a
+    /// property free: it dispatches through an interface, crosses a generic
+    /// instantiation and lands in a vtable without any of those knowing it is
+    /// not an ordinary method.
+    /// </summary>
+    private void DeclareProperty(
+        FileScope scope, NamedTypeSymbol type, PropertyDeclSyntax declaration)
+    {
+        if (type.FindStorage(declaration.Name) is not null ||
+            type.FindProperty(declaration.Name) is not null)
+        {
+            diagnostics.Error("SL0386", declaration.Span,
+                $"'{type.Name}' already declares a member named '{declaration.Name}'");
+            return;
+        }
+
+        var propertyType = ResolveType(declaration.Type, scope);
+        if (propertyType.IsVoid())
+        {
+            diagnostics.Error("SL0387", declaration.Span,
+                $"property '{type.Name}.{declaration.Name}' cannot have type 'void'; " +
+                "a property is a value, and 'void' is the absence of one");
+            propertyType = ErrorTypeSymbol.Instance;
+        }
+
+        var getter = declaration.Accessors.FirstOrDefault(a => a.IsGetter);
+        var setter = declaration.Accessors.FirstOrDefault(a => !a.IsGetter);
+
+        if (declaration.Accessors.Count > 2 || declaration.Accessors.Count(a => a.IsGetter) > 1)
+        {
+            diagnostics.Error("SL0388", declaration.Span,
+                $"property '{type.Name}.{declaration.Name}' declares the same accessor twice");
+            return;
+        }
+
+        if (getter is null)
+        {
+            // A value that can only be written is a method, and reads better as
+            // one. Allowing the shape would only disguise that.
+            diagnostics.Error("SL0389", declaration.Span,
+                setter is null
+                    ? $"property '{type.Name}.{declaration.Name}' declares no accessor; write 'get;'"
+                    : $"property '{type.Name}.{declaration.Name}' has a setter but no getter; " +
+                      "something that can only be written is a method, not a property");
+            return;
+        }
+
+        bool isInterface = type is InterfaceTypeSymbol;
+        bool wantsStorage = false;
+
+        if (isInterface)
+        {
+            foreach (var accessor in declaration.Accessors.Where(a => a.Body is not null))
+                diagnostics.Error("SL0392", accessor.Span,
+                    $"'{type.Name}.{declaration.Name}' is an interface property, so its " +
+                    $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
+                    "interfaces declare signatures only");
+        }
+        else
+        {
+            bool getterIsAuto = getter.Body is null;
+
+            // Half a hidden field is not a thing: an automatic accessor and a
+            // written one would have to agree about storage nothing can name.
+            if (setter is not null && (setter.Body is null) != getterIsAuto)
+            {
+                diagnostics.Error("SL0391", declaration.Span,
+                    $"property '{type.Name}.{declaration.Name}' mixes an automatic accessor " +
+                    "with a written one; either both are automatic, or both have bodies and " +
+                    "name storage the type already declares");
+                return;
+            }
+
+            wantsStorage = getterIsAuto;
+
+            // A struct has no constructor, so a get-only automatic property on
+            // one has no moment at which it could ever be given a value.
+            if (wantsStorage && setter is null && type is StructTypeSymbol)
+                diagnostics.Error("SL0401", declaration.Span,
+                    $"'{type.Name}.{declaration.Name}' could never be assigned: it is automatic " +
+                    "and has no setter, and a struct has no constructor to fill it in; add " +
+                    "'set;', or give it a body that computes the value");
+        }
+
+        FieldSymbol? backing = null;
+        if (wantsStorage)
+        {
+            // The same rule a plain field obeys, for the same reason: a struct is
+            // copied as raw bytes and has nowhere to keep a reference count.
+            if (type is StructTypeSymbol &&
+                (propertyType.NeedsArc() || propertyType is WeakTypeSymbol))
+            {
+                diagnostics.Error("SL0283", declaration.Span,
+                    $"struct '{type.Name}' cannot hold '{propertyType.Name}', and the automatic " +
+                    $"property '{declaration.Name}' would make it; structs are copied as raw " +
+                    "bytes and cannot maintain a reference count");
+            }
+
+            // Named after the property, because that is what the storage is. It
+            // is hidden from lookup, so nothing can reach past the accessors.
+            backing = new FieldSymbol(declaration.Name, propertyType, type, type.Fields.Count)
+            {
+                IsBackingField = true,
+            };
+            type.Fields.Add(backing);
+        }
+
+        var property = new PropertySymbol
+        {
+            Name = declaration.Name,
+            Type = propertyType,
+            ContainingType = type,
+            Span = declaration.Span,
+            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface,
+            BackingField = backing,
+        };
+
+        property.Getter = DeclareAccessor(scope, type, property, getter, isSetter: false);
+        if (setter is not null)
+            property.Setter = DeclareAccessor(scope, type, property, setter, isSetter: true);
+
+        type.Properties.Add(property);
+    }
+
+    /// <summary>
+    /// Declares one accessor as the method it is: <c>get_Name</c> returning the
+    /// property type, or <c>set_Name</c> taking one parameter called
+    /// <c>value</c> — which is why <c>value</c> resolves inside a setter with no
+    /// special case anywhere in name lookup.
+    /// </summary>
+    private FunctionSymbol? DeclareAccessor(
+        FileScope scope, NamedTypeSymbol type, PropertySymbol property,
+        AccessorSyntax accessor, bool isSetter)
+    {
+        string role = isSetter ? "setter" : "getter";
+        string name = (isSetter ? "set_" : "get_") + property.Name;
+
+        if (type.FindMethod(name) is not null)
+        {
+            diagnostics.Error("SL0393", accessor.Span,
+                $"'{type.Name}' already declares a method named '{name}', which is the name " +
+                $"the {role} of property '{property.Name}' has to use");
+            return null;
+        }
+
+        // A setter may be narrowed; a getter may not. The getter is what the
+        // property's visibility means, so letting it differ would only make the
+        // word 'public' on the property itself a lie.
+        bool isPublic = property.IsPublic;
+        if (accessor.Modifiers.HasFlag(Modifiers.Private))
+        {
+            if (isSetter) isPublic = false;
+            else
+                diagnostics.Error("SL0394", accessor.Span,
+                    $"the getter of '{type.Name}.{property.Name}' is what makes the property " +
+                    "public or not, so it cannot be narrowed on its own; write the property " +
+                    "itself without 'public', or narrow the setter instead");
+        }
+
+        var symbol = new FunctionSymbol
+        {
+            Name = name,
+            ModuleName = scope.Module.Name,
+            ReturnType = isSetter ? PrimitiveTypeSymbol.Void : property.Type,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.Method,
+            ContainingType = type,
+            IsPublic = isPublic,
+            Body = accessor.Body,
+            Span = accessor.Span,
+            Scope = scope,
+            Accessor = property,
+            IsAutoAccessor = accessor.Body is null && type is not InterfaceTypeSymbol,
+        };
+
+        TypeSymbol thisType = type is ClassTypeSymbol reference
+            ? reference
+            : new PointerTypeSymbol(type);
+        symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
+
+        if (isSetter)
+            symbol.Parameters.Add(new ParameterSymbol("value", property.Type, 1));
+
+        type.Methods.Add(symbol);
+        scope.Module.Functions.Add(symbol);
+        return symbol;
     }
 
     private void DeclareFunction(FileScope scope, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
@@ -854,6 +1057,19 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 BindAttributes(member.Attributes, field.Attributes, entry.Scope,
                     type.Name + "." + field.Name);
             }
+
+            // An attribute on an automatic property lands on its backing field
+            // too, so a reflected type reports the storage the way it was
+            // annotated rather than losing the annotation to the lowering.
+            foreach (var member in entry.Declaration.Members.OfType<PropertyDeclSyntax>())
+            {
+                if (member.Attributes.Count == 0) continue;
+                if (type.FindProperty(member.Name) is not { } property) continue;
+
+                BindAttributes(member.Attributes, property.Attributes, entry.Scope,
+                    type.Name + "." + property.Name);
+                property.BackingField?.Attributes.AddRange(property.Attributes);
+            }
         }
     }
 
@@ -943,13 +1159,25 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         {
             var found = classType.FindMethod(required.Name);
 
+            // A missing property is one mistake, not two: the getter reports it
+            // and the setter stays quiet.
+            if (found is null && required.Accessor is { Getter: not null } missing &&
+                required != missing.Getter && classType.FindProperty(missing.Name) is null)
+                continue;
+
             if (found is null)
             {
+                // A missing accessor is a missing property as far as the source
+                // is concerned, so say so in the shape it was written in.
                 diagnostics.Error("SL0305", span,
-                    $"'{classType.Name}' does not implement '{interfaceType.Name}.{required.Name}'; " +
-                    $"add 'public {required.ReturnType.Name} {required.Name}(" +
-                    string.Join(", ", required.Parameters.Where(p => !p.IsThis)
-                        .Select(p => p.Type.Name + " " + p.Name)) + ")'");
+                    required.Accessor is { } declared
+                        ? $"'{classType.Name}' does not implement property " +
+                          $"'{interfaceType.Name}.{declared.Name}'; add 'public {declared.Type.Name} " +
+                          $"{declared.Name} {{ get;{(declared.Setter is null ? "" : " set;")} }}'"
+                        : $"'{classType.Name}' does not implement '{interfaceType.Name}.{required.Name}'; " +
+                          $"add 'public {required.ReturnType.Name} {required.Name}(" +
+                          string.Join(", ", required.Parameters.Where(p => !p.IsThis)
+                              .Select(p => p.Type.Name + " " + p.Name)) + ")'");
                 continue;
             }
 
@@ -1377,6 +1605,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
     private void BindFunctionBody(FunctionSymbol function)
     {
+        if (function.IsAutoAccessor) { BindAutoAccessor(function); return; }
         if (function.Body is null) return;
         if (!_boundFunctions.Add(function)) return;
 
@@ -1397,6 +1626,31 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         _functions.Add(new BoundFunction(function, body));
         _currentFunction = null;
+    }
+
+    /// <summary>
+    /// Supplies the body of an automatic accessor, which has no syntax to bind.
+    ///
+    /// The getter returns the hidden field and the setter stores into it, and
+    /// that is the entire meaning of <c>{ get; set; }</c>. Building the bound
+    /// nodes directly rather than synthesising source keeps the backing field
+    /// unnameable: there is no point at which a name has to resolve to it.
+    /// </summary>
+    private void BindAutoAccessor(FunctionSymbol accessor)
+    {
+        if (!_boundFunctions.Add(accessor)) return;
+        if (accessor.Accessor?.BackingField is not { } field) return;
+
+        var span = accessor.Span;
+        var receiver = Receiver(span, accessor.Parameters[0]);
+        var storage = new BoundFieldAccess(span, receiver, field);
+
+        BoundStatement statement = accessor.ReturnType.IsVoid()
+            ? new BoundExpressionStatement(span, new BoundAssignment(
+                span, storage, new BoundParameterAccess(span, accessor.Parameters[1])))
+            : new BoundReturn(span, storage);
+
+        _functions.Add(new BoundFunction(accessor, new BoundBlock(span, [statement])));
     }
 
     /// <summary>Conservative reachability check: does this statement always return?</summary>
@@ -1522,8 +1776,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         var expression = BindExpression(syntax.Expression);
 
-        bool hasEffect = expression is BoundAssignment or BoundCall or BoundIndirectCall
-                                    or BoundNew or BoundErrorExpression;
+        bool hasEffect = expression is BoundAssignment or BoundPropertyAssignment or BoundCall
+                                    or BoundIndirectCall or BoundNew or BoundErrorExpression;
         if (!hasEffect)
             diagnostics.Warning("SL0222", syntax.Span,
                 "this expression has no effect; its result is discarded");
@@ -1995,6 +2249,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         BoundFieldAccess { Receiver: { } receiver } => BaseOf(receiver),
         BoundIndex index => BaseOf(index.Target),
         BoundConversion conversion => BaseOf(conversion.Operand),
+
+        // A struct receiver is passed by address, so the address of a thing is
+        // still that thing as far as ownership goes.
+        BoundAddressOf address => BaseOf(address.Operand),
         _ => expression,
     };
 
@@ -2576,7 +2834,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             if (_currentFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
                 return new BoundParameterAccess(syntax.Span, parameter);
 
-            // An unqualified field name inside a method means `this.field`.
+            // An unqualified member name inside a method means `this.member`.
+            if (_currentFunction?.ContainingType?.FindProperty(name) is { } ownProperty)
+            {
+                var receiver = BindImplicitThis(syntax.Span);
+                if (receiver is not null)
+                    return BindPropertyRead(syntax.Span, receiver, ownProperty);
+            }
+
             if (_currentFunction?.ContainingType?.FindField(name) is { } field)
             {
                 var receiver = BindImplicitThis(syntax.Span);
@@ -2975,6 +3240,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private BoundExpression BindAssignment(AssignmentSyntax syntax)
     {
         var target = BindExpression(syntax.Target);
+
+        // The target was bound as a read, which is what proves it is a property
+        // and, usefully, has already bound the receiver exactly once.
+        if (target is BoundCall { Function.Accessor: { } property } read)
+            return BindPropertyAssignment(syntax, read, property);
+
         var value = BindExpression(syntax.Value);
 
         if (target.Type.IsError() || value.Type.IsError())
@@ -3001,26 +3272,159 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         // Compound assignment desugars to `target = target op value`.
         if (syntax.Operator != TokenKind.Equals)
         {
-            var (op, token) = syntax.Operator switch
-            {
-                TokenKind.PlusEquals => (BoundBinaryOp.Add, TokenKind.Plus),
-                TokenKind.MinusEquals => (BoundBinaryOp.Subtract, TokenKind.Minus),
-                TokenKind.StarEquals => (BoundBinaryOp.Multiply, TokenKind.Star),
-                TokenKind.SlashEquals => (BoundBinaryOp.Divide, TokenKind.Slash),
-                TokenKind.PercentEquals => (BoundBinaryOp.Remainder, TokenKind.Percent),
-                TokenKind.AmpEquals => (BoundBinaryOp.BitAnd, TokenKind.Amp),
-                TokenKind.PipeEquals => (BoundBinaryOp.BitOr, TokenKind.Pipe),
-                TokenKind.CaretEquals => (BoundBinaryOp.BitXor, TokenKind.Caret),
-                TokenKind.LessLessEquals => (BoundBinaryOp.ShiftLeft, TokenKind.LessLess),
-                _ => (BoundBinaryOp.ShiftRight, TokenKind.GreaterGreater),
-            };
-
+            var (op, token) = CompoundOperator(syntax.Operator);
             value = BindBinaryOperation(syntax.Span, target, op, value, token);
             if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
         }
 
         return new BoundAssignment(syntax.Span, target, BindConversion(value, target.Type, syntax.Value.Span));
     }
+
+    /// <summary>The operation behind a compound assignment, and the token to blame.</summary>
+    private static (BoundBinaryOp Op, TokenKind Token) CompoundOperator(TokenKind kind) => kind switch
+    {
+        TokenKind.PlusEquals => (BoundBinaryOp.Add, TokenKind.Plus),
+        TokenKind.MinusEquals => (BoundBinaryOp.Subtract, TokenKind.Minus),
+        TokenKind.StarEquals => (BoundBinaryOp.Multiply, TokenKind.Star),
+        TokenKind.SlashEquals => (BoundBinaryOp.Divide, TokenKind.Slash),
+        TokenKind.PercentEquals => (BoundBinaryOp.Remainder, TokenKind.Percent),
+        TokenKind.AmpEquals => (BoundBinaryOp.BitAnd, TokenKind.Amp),
+        TokenKind.PipeEquals => (BoundBinaryOp.BitOr, TokenKind.Pipe),
+        TokenKind.CaretEquals => (BoundBinaryOp.BitXor, TokenKind.Caret),
+        TokenKind.LessLessEquals => (BoundBinaryOp.ShiftLeft, TokenKind.LessLess),
+        _ => (BoundBinaryOp.ShiftRight, TokenKind.GreaterGreater),
+    };
+
+    /// <summary>
+    /// Reads a property: a call to its getter, and nothing more. Everything
+    /// downstream — ARC, interface dispatch, the calling convention — then sees
+    /// an ordinary call and needs to know nothing about properties.
+    /// </summary>
+    private BoundExpression BindPropertyRead(
+        SourceSpan span, BoundExpression receiver, PropertySymbol property)
+    {
+        if (property.Getter is not { } getter) return new BoundErrorExpression(span);
+
+        if (!getter.IsPublic && property.ContainingType.ModuleName != _currentModule!.Name)
+        {
+            diagnostics.Error("SL0249", span,
+                $"'{property.ContainingType.Name}.{property.Name}' is not public");
+            return new BoundErrorExpression(span);
+        }
+
+        // A struct accessor takes its receiver by pointer, exactly as a struct
+        // method does.
+        if (property.ContainingType is StructTypeSymbol structType)
+            receiver = new BoundAddressOf(span, new PointerTypeSymbol(structType), receiver);
+
+        return new BoundCall(span, getter, receiver, []);
+    }
+
+    /// <summary>
+    /// Writes a property. The setter is an ordinary method, so this is a call;
+    /// the node exists only so the assignment can still yield the value it
+    /// stored, which a setter's own <c>void</c> return cannot.
+    /// </summary>
+    private BoundExpression BindPropertyAssignment(
+        AssignmentSyntax syntax, BoundCall read, PropertySymbol property)
+    {
+        var receiver = read.Receiver!;
+        var value = BindExpression(syntax.Value);
+        if (value.Type.IsError() || property.Type.IsError())
+            return new BoundErrorExpression(syntax.Span);
+
+        if (property.Setter is not { } setter)
+        {
+            // A get-only automatic property is still storage, and the type's own
+            // constructor is where storage gets filled in.
+            if (property.BackingField is { } backing && syntax.Operator == TokenKind.Equals &&
+                _currentFunction is { Kind: FunctionKind.Constructor } ctor &&
+                ctor.ContainingType == property.ContainingType)
+            {
+                var storage = new BoundFieldAccess(syntax.Target.Span, receiver, backing);
+                return new BoundAssignment(syntax.Span, storage,
+                    BindConversion(value, property.Type, syntax.Value.Span));
+            }
+
+            diagnostics.Error("SL0395", syntax.Target.Span,
+                $"'{property.ContainingType.Name}.{property.Name}' has no setter" +
+                (property.ContainingType is InterfaceTypeSymbol
+                    ? ", so the contract does not offer one; declare it 'get; set;'"
+                    : property.BackingField is null
+                        ? "; it is computed, so there is nothing to write"
+                        : "; add 'set;', or assign it in a constructor of " +
+                          $"'{property.ContainingType.Name}'"));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (!setter.IsPublic && property.ContainingType.ModuleName != _currentModule!.Name)
+        {
+            diagnostics.Error("SL0396", syntax.Target.Span,
+                $"'{property.ContainingType.Name}.{property.Name}' can be read from anywhere " +
+                "but only written inside its own module");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // A struct's setter writes the receiver's own storage, so a static one is
+        // the very case SL0379 exists for. A class's setter writes the object
+        // rather than the static, which the sendability rules already govern.
+        if (property.ContainingType is StructTypeSymbol &&
+            BaseOf(receiver) is BoundStaticAccess owner)
+        {
+            diagnostics.Error("SL0379", syntax.Target.Span,
+                $"'{owner.Static.Name}' is a static, and every static is readonly; " +
+                "the value it holds is shared by every thread, so nothing may write it " +
+                "after it is initialized");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // A struct's setter writes through a pointer, so a temporary receiver
+        // would be written and then thrown away.
+        if (property.ContainingType is StructTypeSymbol &&
+            receiver is BoundAddressOf { Operand: var target } && !IsRepeatable(target))
+        {
+            diagnostics.Error("SL0399", syntax.Target.Span,
+                $"'{property.ContainingType.Name}.{property.Name}' is being set on a temporary " +
+                "struct, so the write would be discarded; assign to a variable first");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (syntax.Operator != TokenKind.Equals)
+        {
+            // `p.X += 1` reads through the getter and writes through the setter,
+            // so the receiver is evaluated twice. Requiring it to be a plain load
+            // is what makes that harmless.
+            if (!IsRepeatable(receiver))
+            {
+                diagnostics.Error("SL0397", syntax.Target.Span,
+                    $"'{property.ContainingType.Name}.{property.Name}' is a property, so this " +
+                    "would call the getter and the setter on separately evaluated receivers; " +
+                    "put the receiver in a variable first");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            var (op, token) = CompoundOperator(syntax.Operator);
+            value = BindBinaryOperation(syntax.Span, read, op, value, token);
+            if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundPropertyAssignment(syntax.Span, receiver, property,
+            BindConversion(value, property.Type, syntax.Value.Span));
+    }
+
+    /// <summary>
+    /// True when evaluating this expression again has no consequences: it names
+    /// storage and reads it, rather than doing anything.
+    /// </summary>
+    private static bool IsRepeatable(BoundExpression expression) => expression switch
+    {
+        BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
+        BoundFieldAccess field => field.Receiver is null || IsRepeatable(field.Receiver),
+        BoundDereference dereference => IsRepeatable(dereference.Operand),
+        BoundAddressOf address => IsRepeatable(address.Operand),
+        BoundConversion conversion => IsRepeatable(conversion.Operand),
+        _ => false,
+    };
 
     private BoundExpression BindIndex(IndexSyntax syntax)
     {
@@ -3176,6 +3580,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         if (LookupLocal(parts[0]) is not null) return null;
         if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
         if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
+        if (_currentFunction?.ContainingType?.FindProperty(parts[0]) is not null) return null;
 
         string name = string.Join('.', parts);
         if (_currentScope!.Imports.TryGetValue(name, out var module)) return module;
@@ -3194,6 +3599,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         if (LookupLocal(parts[0]) is not null) return null;
         if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
         if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
+        if (_currentFunction?.ContainingType?.FindProperty(parts[0]) is not null) return null;
 
         // Either a bare name in this module, or one qualified by its module.
         if (parts.Count == 1)
@@ -3308,6 +3714,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // Properties come first: an automatic one has a field of the same name,
+        // and reaching that field directly would skip the accessor and, through
+        // an interface, skip dispatch with it.
+        if (namedType.FindProperty(syntax.Member) is { } property)
+            return BindPropertyRead(syntax.Span, receiver, property);
+
         if (namedType.FindField(syntax.Member) is { } field)
         {
             if (!field.IsPublic && namedType.ModuleName != _currentModule!.Name)
@@ -3421,6 +3833,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                         p => p.Name == text && !p.IsThis) is { Type: DelegateTypeSymbol } parameter)
                     return new BoundParameterAccess(name.Span, parameter);
 
+                if (_currentFunction?.ContainingType?.FindProperty(text)
+                        is { Type: DelegateTypeSymbol } property)
+                {
+                    var receiver = BindImplicitThis(name.Span);
+                    if (receiver is not null)
+                        return BindPropertyRead(name.Span, receiver, property);
+                }
+
                 if (_currentFunction?.ContainingType?.FindField(text) is { Type: DelegateTypeSymbol } field)
                 {
                     var receiver = BindImplicitThis(name.Span);
@@ -3485,6 +3905,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         // A field holding a delegate is called through, not dispatched to. It is
         // checked before methods so that the field's own name is what is called;
         // a method of the same name would be a different thing entirely.
+        if (namedType.FindProperty(member.Member) is { Type: DelegateTypeSymbol } callableProperty)
+        {
+            var read = BindPropertyRead(member.Span, receiver, callableProperty);
+            return read.Type.IsError()
+                ? new BoundErrorExpression(syntax.Span)
+                : BuildIndirectCall(syntax, read, arguments);
+        }
+
         if (namedType.FindField(member.Member) is { Type: DelegateTypeSymbol } callable)
         {
             if (!callable.IsPublic && namedType.ModuleName != _currentModule!.Name)
@@ -3505,6 +3933,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
             diagnostics.Error("SL0256", member.Span,
                 $"'{namedType.Name}' has no method named '{member.Member}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // The accessors are real methods, but they are the lowering rather than
+        // the language: naming one directly is naming an implementation detail.
+        if (method.Accessor is { } accessed)
+        {
+            diagnostics.Error("SL0398", member.Span,
+                $"'{member.Member}' is the {(method.ReturnType.IsVoid() ? "setter" : "getter")} of " +
+                $"property '{namedType.Name}.{accessed.Name}'; use the property itself");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -4390,6 +4828,11 @@ internal sealed class StaticReferenceWalker
                 break;
 
             case BoundAssignment assignment: Visit(assignment.Target); Visit(assignment.Value); break;
+
+            case BoundPropertyAssignment written:
+                Visit(written.Receiver); Visit(written.Value);
+                break;
+
             case BoundConversion conversion: Visit(conversion.Operand); break;
 
             case BoundNew created:
@@ -4526,6 +4969,12 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
             case BoundAssignment assignment:
                 Assigned(assignment.Target);
                 Visit(assignment.Target); Visit(assignment.Value);
+                break;
+
+            // A property write goes through a method, so it changes the object
+            // rather than the captured variable naming it; only the reads count.
+            case BoundPropertyAssignment written:
+                Visit(written.Receiver); Visit(written.Value);
                 break;
 
             case BoundConversion conversion: Visit(conversion.Operand); break;

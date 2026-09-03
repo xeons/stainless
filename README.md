@@ -255,12 +255,46 @@ public String ToJson<T>(T value) {
 Attribute arguments must be constants, since they are written into the binary.
 Types without `[Reflect]` emit nothing, and `typeof` on them is an error.
 
+### Properties
+
+```csharp
+public class Person {
+    public String Name { get; set; }         // automatic: the compiler owns the storage
+    public int Visits { get; private set; }  // read anywhere, write in this module
+    public int Id { get; }                   // set by a constructor, then fixed
+
+    public String Label => Name + "#" + Text.FromInteger(Id);   // computed
+
+    public Person(String name, int id) { Name = name; Id = id; Visits = 0; }
+    public void Visit() { Visits = Visits + 1; }
+}
+```
+
+A property is **a pair of methods that reads like a field**, and that is the
+whole implementation: `get_Name` and `set_Name` are ordinary methods, so a
+property costs nothing new in the ABI, dispatches through an interface the way
+a method does, and comes out of a generic instantiation with everything else.
+Written bare, `{ get; set; }` also generates the field to keep the value in —
+laid out, destroyed and reflected like any other, but with no name the source
+can reach, because the property is that name.
+
+Written out, an accessor names storage the type already has, with a block body
+or `=>` and an expression:
+
+```csharp
+public int Fahrenheit {
+    get { return celsius * 9 / 5 + 32; }
+    set { celsius = (value - 32) * 5 / 9; }
+}
+```
+
 ### Interfaces
 
 ```csharp
 public interface IShape {
     double Area();
     String Describe();
+    String Name { get; }        // one vtable slot per accessor
 }
 
 public class Circle : IShape {
@@ -268,6 +302,7 @@ public class Circle : IShape {
     public Circle(double r) { radius = r; }
     public double Area() { return 3.14159 * radius * radius; }
     public String Describe() { return "circle"; }
+    public String Name { get; set; }
 }
 
 double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
@@ -447,6 +482,11 @@ Everything below is covered by [the test suite](tests/cases).
 - `struct` with fields and methods; exact C layout; value copy semantics
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
+- Properties, on classes, structs and interfaces: `{ get; set; }` with a
+  compiler-generated backing field, `{ get; private set; }`, get-only ones a
+  constructor fills in, and written accessors with block or `=>` bodies. They
+  lower to a pair of ordinary methods, so an interface property dispatches like
+  any other member
 - `extern "C"` and `export "C"`, including variadics and structs by value in
   both directions
 - Win64 struct ABI: register coercion, `byval`, `sret`
@@ -535,6 +575,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   from a `Type`. Methods and interfaces carry no metadata — fields only.
 - **No overloading by parameter type on methods** (module-level functions do
   overload).
+- **A property is not an indexer, and not initialized where it is declared.**
+  There is no `this[i]`, and `{ get; set; } = 5;` is rejected for the same
+  reason a field initializer is. `p.X += 1` also needs a receiver that is a
+  plain load, since the getter and the setter each evaluate it.
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a
   +0/+1 dataflow pass would remove most of it.
 - **Two thread-safety gaps remain, and both are about lifetimes.** What crosses

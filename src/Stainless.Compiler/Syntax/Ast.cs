@@ -113,6 +113,34 @@ public sealed record FieldDeclSyntax(
         : this(span, modifiers, type, name, initializer, []) { }
 }
 
+/// <summary>
+/// One accessor of a property.
+///
+/// A null <see cref="Body"/> is <c>get;</c> written bare. On a class or struct
+/// that asks for the compiler-generated backing field; on an interface it is
+/// the whole declaration, because an interface has no bodies at all.
+/// </summary>
+public sealed record AccessorSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    bool IsGetter,
+    BlockSyntax? Body) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>public int Age { get; private set; }</c> — a property.
+///
+/// A property is a pair of methods that reads like a field. Written bare it
+/// also owns a hidden field to keep the value in; written with bodies it owns
+/// no storage at all and names whatever the type already has.
+/// </summary>
+public sealed record PropertyDeclSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    TypeSyntax Type,
+    string Name,
+    IReadOnlyList<AccessorSyntax> Accessors,
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
+
 public sealed record ConstructorDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,

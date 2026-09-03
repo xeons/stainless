@@ -1,2 +1,2 @@
-{"full_name":"Ada Lovelace","age":36,"Active":true,"Rating":9.5}
+{"full_name":"Ada Lovelace","age":36,"Active":true,"Rating":9.5,"city":"London"}
 Json.Point has 2 fields, 16 bytes

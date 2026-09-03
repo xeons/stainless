@@ -218,9 +218,12 @@ public class Buffer {
 
     ~Buffer() { Free(data); }        // destructor, runs at refcount 0
 
-    public nuint Length() { return length; }
+    public nuint Length { get { return length; } }
 }
 ```
+
+Members are fields, methods, properties (§7.2), one destructor and any number
+of constructors.
 
 A class value is a pointer to a heap object preceded by an object header
 (see [abi.md](abi.md)). Assignment copies the *reference* and retains it.
@@ -242,6 +245,7 @@ a count of 1.
 public interface IShape {
     double Area();
     String Describe();
+    String Name { get; }
 }
 
 public class Circle : IShape {
@@ -251,18 +255,22 @@ public class Circle : IShape {
 
     public double Area() { return 3.14159 * radius * radius; }
     public String Describe() { return "circle"; }
+    public String Name { get; set; }
 }
 
 double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
 ```
 
-An interface declares method signatures and nothing else: no fields, no
-constructor, no destructor, no bodies. Every member is public whether or not
-the word is written, since the whole point is the contract.
+An interface declares method and property signatures and nothing else: no
+fields, no constructor, no destructor, no bodies. Every member is public
+whether or not the word is written, since the whole point is the contract.
 
 A class lists the interfaces it implements after `:`, and must supply a public
-method matching each signature exactly. Conversion from the class to the
-interface is implicit and free.
+member matching each signature exactly. A property is a pair of methods
+(§7.2), so an interface property is one vtable slot per accessor and a class
+satisfies it with a property of its own; a field of the right name does not,
+because a field is not a call. Conversion from the class to the interface is
+implicit and free.
 
 An interface reference **is an ordinary object pointer** — the vtable is
 reached through the object rather than carried alongside it. So `IShape?`,
@@ -959,6 +967,8 @@ A struct has no object header, so its metadata is reachable only through
 
 ## 7. Functions and members
 
+### 7.1 Functions
+
 ```csharp
 public int Add(int a, int b) { return a + b; }
 
@@ -967,6 +977,94 @@ void NoReturn() { }
 
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
+
+### 7.2 Properties
+
+```csharp
+public class Person {
+    public String Name { get; set; }         // automatic: the compiler owns the storage
+    public int Visits { get; private set; }  // read anywhere, write in this module
+    public int Id { get; }                   // set by a constructor, then fixed
+
+    public String Label => Name + "#" + Text.FromInteger(Id);   // computed
+}
+```
+
+A property is **a pair of methods that reads like a field**. `person.Name`
+calls the getter, `person.Name = "Ada"` calls the setter, and that is the whole
+of it: the accessors are ordinary methods. So a property costs nothing new in
+the ABI, dispatches through an interface the way a method does, and comes out
+of a generic instantiation with everything else.
+
+**An automatic property owns storage.** Written bare, `{ get; set; }` makes the
+compiler generate a field of the property's type together with the two
+accessors that read and write it. That field is laid out, destroyed and
+reflected exactly like any other; it simply has no name the source can use,
+because the property is that name.
+
+**Written accessors own nothing.**
+
+```csharp
+public class Thermostat {
+    int celsius;
+
+    public int Fahrenheit {
+        get { return celsius * 9 / 5 + 32; }
+        set { celsius = (value - 32) * 5 / 9; }
+    }
+
+    public int Kelvin {
+        get => celsius + 273;
+        set => celsius = value - 273;
+    }
+}
+```
+
+A setter's parameter is called `value` because that is what it is: an ordinary
+parameter of an ordinary method, found by ordinary name lookup. Either form of
+body works — a block, or `=>` and one expression — and `T Name => expression;`
+with no braces at all is a property with only a getter.
+
+**What may be narrowed, and what may not**
+
+| Written | Getter | Setter |
+|---|---|---|
+| `public int X { get; set; }` | public | public |
+| `public int X { get; private set; }` | public | this module only |
+| `int X { get; set; }` | this module only | this module only |
+
+There is no `private get`. The getter is what the word `public` on the property
+means, so letting the two disagree would only make the declaration lie.
+
+**A get-only automatic property is still storage.** `public int Id { get; }` may
+be assigned in a constructor of the class that declares it, and nowhere else —
+the rule C# arrived at, for the reason C# arrived at it. A *computed* get-only
+property has nothing to assign to at all, and the error says so.
+
+**On an interface**
+
+```csharp
+public interface INamed {
+    String Name { get; }
+    int Rank { get; set; }
+}
+```
+
+Accessors and no bodies, exactly as an interface method is a signature and no
+body. A class implements it with a property of its own; whether that property is
+automatic or written makes no difference to the caller.
+
+**What a property is not**
+
+- **Not a field.** `get_Name` and `set_Name` exist as symbols, and naming one
+  directly is an error: they are the lowering, not the language.
+- **Not free of evaluation order.** `p.X += 1` calls the getter and then the
+  setter, so the receiver is evaluated twice. A receiver that is not a plain
+  load — `Make().X += 1` — is rejected rather than quietly evaluated twice.
+- **Not initialized at the declaration.** `public int X { get; set; } = 5;` is
+  not supported, for the same reason a field initializer is not: assign it in a
+  constructor.
+- **Not indexed.** There is no `this[i]`.
 
 ## 8. C interoperability
 

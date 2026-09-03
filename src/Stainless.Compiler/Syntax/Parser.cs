@@ -462,6 +462,17 @@ public sealed class Parser
                 constraints, parameters, isVariadic, body);
         }
 
+        // `Type Name {` and `Type Name =>` are the two ways a property starts.
+        // Neither can be anything else here, because a field ends at '=' or ';'.
+        if (At(TokenKind.OpenBrace) || At(TokenKind.EqualsGreater))
+        {
+            if (typeParameters.Count > 0)
+                _diagnostics.Error("SL0320", SpanFrom(start),
+                    $"'{name}' is a property and cannot have type parameters");
+
+            return ParseProperty(start, modifiers, returnType, name, attributes ?? []);
+        }
+
         if (typeParameters.Count > 0)
             _diagnostics.Error("SL0320", SpanFrom(start),
                 $"'{name}' is a field and cannot have type parameters");
@@ -470,6 +481,82 @@ public sealed class Parser
         Expect(TokenKind.Semicolon);
         return new FieldDeclSyntax(
             SpanFrom(start), modifiers, returnType, name, initializer, attributes ?? []);
+    }
+
+    /// <summary>
+    /// The accessor list of a property, or the single expression that stands in
+    /// for one: <c>int Area =&gt; width * height;</c> is <c>{ get { return ...; } }</c>.
+    /// </summary>
+    private Declaration ParseProperty(
+        int start, Modifiers modifiers, TypeSyntax type, string name,
+        IReadOnlyList<AttributeSyntax> attributes)
+    {
+        var accessors = new List<AccessorSyntax>();
+
+        if (Match(TokenKind.EqualsGreater))
+        {
+            accessors.Add(new AccessorSyntax(
+                SpanFrom(start), Modifiers.None, IsGetter: true, ParseArrowBody(isGetter: true)));
+            Expect(TokenKind.Semicolon);
+            return new PropertyDeclSyntax(
+                SpanFrom(start), modifiers, type, name, accessors, attributes);
+        }
+
+        Expect(TokenKind.OpenBrace);
+
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int before = _pos;
+            int accessorStart = _pos;
+            var accessorModifiers = ParseModifiers();
+
+            // 'get' and 'set' stay ordinary identifiers everywhere else in the
+            // language, so they are recognised by text rather than reserved.
+            if (!(At(TokenKind.Identifier) && Current.Text is "get" or "set"))
+            {
+                _diagnostics.Error("SL0385", Current.Span,
+                    $"expected 'get' or 'set' in property '{name}'");
+                if (_pos == before) Advance();
+                continue;
+            }
+
+            bool isGetter = Advance().Text == "get";
+
+            // A block body stands on its own; a bare accessor and an arrow body
+            // are both statements and end at a semicolon.
+            if (At(TokenKind.OpenBrace))
+            {
+                accessors.Add(new AccessorSyntax(
+                    SpanFrom(accessorStart), accessorModifiers, isGetter, ParseBlock()));
+                continue;
+            }
+
+            var body = Match(TokenKind.EqualsGreater) ? ParseArrowBody(isGetter) : null;
+            Expect(TokenKind.Semicolon);
+
+            accessors.Add(new AccessorSyntax(
+                SpanFrom(accessorStart), accessorModifiers, isGetter, body));
+        }
+
+        Expect(TokenKind.CloseBrace);
+        return new PropertyDeclSyntax(SpanFrom(start), modifiers, type, name, accessors, attributes);
+    }
+
+    /// <summary>
+    /// The body behind <c>=&gt;</c>: an expression a getter returns, or one a
+    /// setter simply evaluates.
+    /// </summary>
+    private BlockSyntax ParseArrowBody(bool isGetter)
+    {
+        int start = _pos;
+        var expression = ParseExpression();
+        var span = SpanFrom(start);
+
+        StatementSyntax statement = isGetter
+            ? new ReturnSyntax(span, expression)
+            : new ExpressionStatementSyntax(span, expression);
+
+        return new BlockSyntax(span, [statement]);
     }
 
     private List<ParameterSyntax> ParseParameterList(out bool isVariadic)

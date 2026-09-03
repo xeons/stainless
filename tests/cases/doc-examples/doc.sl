@@ -46,6 +46,39 @@ int Search(int[] data, int from, int upto, AtomicBool stop) {
     return -1;
 }
 
+// --- spec 7.2 properties --------------------------------------------------
+public interface INamed {
+    String Name { get; }
+    int Rank { get; set; }
+}
+
+public class Person : INamed {
+    public String Name { get; set; }         // automatic: the compiler owns the storage
+    public int Visits { get; private set; }  // read anywhere, write in this module
+    public int Id { get; }                   // set by a constructor, then fixed
+    public int Rank { get; set; }
+
+    public String Label => Name + "#" + Text.FromInteger(Id);   // computed
+
+    public Person(String name, int id) { Name = name; Id = id; Visits = 0; Rank = 0; }
+}
+
+public class Thermostat {
+    int celsius;
+
+    public Thermostat(int c) { celsius = c; }
+
+    public int Fahrenheit {
+        get { return celsius * 9 / 5 + 32; }
+        set { celsius = (value - 32) * 5 / 9; }
+    }
+
+    public int Kelvin {
+        get => celsius + 273;
+        set => celsius = value - 273;
+    }
+}
+
 // --- spec 9.2 statics, out of order --------------------------------------
 static readonly int Total   = Doubled + 1;
 static readonly int Doubled = Base * 2;
@@ -81,6 +114,15 @@ int Main() {
     printf("found=%d\n", hitLeft + hitRight + 1);
 
     printf("statics=%d %d %d\n", Base, Doubled, Total);
+
+    var person = new Person("Ada", 7);
+    person.Rank += 3;
+    INamed named = person;
+    printf("property=%s %d\n", person.Label.ToPointer(), named.Rank);
+
+    var thermostat = new Thermostat(0);
+    thermostat.Fahrenheit = 212;
+    printf("thermostat=%d %d\n", thermostat.Fahrenheit, thermostat.Kelvin);
 
     var pixels = new int[16];
     parallel for (int i = 0; i < 16; i = i + 1) { pixels[i] = i * i; }

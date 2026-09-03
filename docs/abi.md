@@ -85,6 +85,13 @@ field per captured value and one method implementing the interface it was
 converted to. It therefore uses the object header above, the interface dispatch
 of §2.4, and the ownership rules of §4, with nothing added.
 
+A **property** is a pair of ordinary methods named `get_Name` and `set_Name`,
+mangled and dispatched like any other. An automatic one also has a field, laid
+out at the position the property was declared in and named after it, so a type's
+layout is the same whether a member was written as a field or as a property.
+There is no property record anywhere in the binary and no metadata describing
+one: what the linker sees is two methods and a field.
+
 ### 2.3 String layout
 
 `Standard.Text.String` is a reference counted object whose bytes follow the

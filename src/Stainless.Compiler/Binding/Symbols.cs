@@ -79,16 +79,58 @@ public sealed class FunctionSymbol
     /// </summary>
     public FileScope? Scope { get; init; }
 
+    /// <summary>The property this is the getter or setter of, or null.</summary>
+    public PropertySymbol? Accessor { get; init; }
+
+    /// <summary>
+    /// True when the body is the compiler's rather than the programmer's: the
+    /// <c>get;</c> and <c>set;</c> of an automatic property, which read and
+    /// write the hidden field and do nothing else.
+    /// </summary>
+    public bool IsAutoAccessor { get; init; }
+
     private string? _mangledName;
 
     /// <summary>The symbol name the linker sees. See docs/abi.md.</summary>
     public string MangledName => _mangledName ??= RuntimeSymbol ?? Mangler.Mangle(this);
 
-    public bool HasBody => Body is not null;
+    public bool HasBody => Body is not null || IsAutoAccessor;
 
     public override string ToString() =>
         $"{ReturnType.Name} {(ContainingType is null ? "" : ContainingType.Name + ".")}{Name}" +
         $"({string.Join(", ", Parameters.Where(p => !p.IsThis))})";
+}
+
+/// <summary>
+/// A property: field-shaped syntax over a pair of methods.
+///
+/// The getter and setter are ordinary <see cref="FunctionSymbol"/>s, which is
+/// the whole trick. A property therefore costs nothing new in the ABI, occupies
+/// vtable slots like any other method when an interface declares it, and needs
+/// no support at all in the emitter. Only an automatic property owns storage,
+/// and that storage is an ordinary field the source cannot name.
+/// </summary>
+public sealed class PropertySymbol
+{
+    public required string Name { get; init; }
+    public required TypeSymbol Type { get; init; }
+    public required NamedTypeSymbol ContainingType { get; init; }
+    public required Source.SourceSpan Span { get; init; }
+    public bool IsPublic { get; init; }
+
+    public FunctionSymbol? Getter { get; set; }
+    public FunctionSymbol? Setter { get; set; }
+
+    /// <summary>The generated storage of an automatic property; null otherwise.</summary>
+    public FieldSymbol? BackingField { get; set; }
+
+    /// <summary>Attributes written on the property, shared with its backing field.</summary>
+    public List<AppliedAttribute> Attributes { get; } = [];
+
+    /// <summary>True when the compiler supplies both the storage and the accessors.</summary>
+    public bool IsAuto => BackingField is not null;
+
+    public override string ToString() => $"{ContainingType.Name}.{Name}";
 }
 
 /// <summary>
