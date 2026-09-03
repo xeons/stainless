@@ -29,7 +29,9 @@ public static class Mangler
 {
     public static string Mangle(FunctionSymbol function)
     {
-        // C linkage means "use exactly this name" in both directions.
+        // C linkage means "use exactly this name" in both directions. A C++
+        // name is mangled by CppMangler and stamped on the symbol, so it never
+        // reaches here.
         if (function.Linkage is LinkageKind.ExternC or LinkageKind.ExportC)
             return function.Name;
 

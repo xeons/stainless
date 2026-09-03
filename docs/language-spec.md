@@ -1564,20 +1564,14 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
-**`"C"` is the only linkage there is.** The convention string is checked, and
+**`"C"` and `"C++"` are the conventions there are.** The string is checked, and
 anything else is rejected:
 
 ```
-error[SL0102]: unsupported linkage convention "C++"; only "C" is supported
+error[SL0102]: unsupported linkage convention "Rust"; "C" and "C++" are supported
 ```
 
-There is no C++ linkage in either direction. A C++ class cannot be imported —
-that would need name mangling for two incompatible ABIs, a vtable layout to
-match, and an answer for constructors, destructors and exceptions crossing the
-boundary — and none is exported, since `export "C"` is the whole export table
-and it is unmangled by definition. Reaching C++ means what it means from C: a
-shim of `extern "C"` functions over an opaque handle, with the C++ side keeping
-its own types to itself.
+C++ linkage is §8.1.
 
 **What a signature may carry.** Plain C values — primitives, pointers, and
 structs of plain data — cross freely. A struct that holds a reference does not,
@@ -1590,7 +1584,68 @@ extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
 plain data, or a raw pointer
 ```
 
-### 8.1 Building a shared library
+### 8.1 C++ linkage
+
+A C++ function is reached by mangling its signature the way the target's
+compiler does, with no shim and no `extern "C"` on either side:
+
+```csharp
+extern "C++" int cpp_add(int a, int b);
+extern "C++" double geometry::area(double w, double h);
+
+export "C++" int Doubled(int n) { return n * 2; }
+export "C++" double shapes::Perimeter(double w, double h) { return 2.0 * (w + h); }
+```
+
+A namespace is written on the declaration with `::`. It decides the linker name
+and nothing else: the function joins the module it was declared in, so it is
+called by its plain name — `area(3.0, 4.0)`, not `geometry.area(...)`. An
+`export "C++"` with no namespace written takes the module's, because a module is
+what Stainless calls a namespace, so `Doubled` above is `Interop::Doubled`.
+
+**There are two C++ ABIs and they share nothing.** C++ has none of its own: the
+platform specifies how C-shaped things work and says nothing about mangling,
+vtables or unwinding, so the compilers each filled it in. gcc and clang use the
+Itanium scheme; MSVC, and clang when it targets MSVC, use Microsoft's. The two
+disagree about the prefix, the order of the qualifiers, whether the return type
+is encoded at all, and how a repeated type is abbreviated:
+
+| Declaration | Itanium | Microsoft |
+|---|---|---|
+| `int add(int, int)` | `_Z3addii` | `?add@@YAHHH@Z` |
+| `void nothing()` | `_Z7nothingv` | `?nothing@@YAXXZ` |
+| `int deref(int*, int*)` | `_Z5derefPiS_` | `?deref@@YAHPEAH0@Z` |
+| `geometry::area(double, double)` | `_ZN8geometry4areaEdd` | `?area@geometry@@YANNN@Z` |
+| `geometry::mix(int*, double*, int*)` | `_ZN8geometry3mixEPiPdS0_` | `?mix@geometry@@YAHPEAHPEAN0@Z` |
+
+The compiler emits whichever the target uses, and `STAINLESS_CPP_ABI` overrides
+the choice so that the scheme a host does not use can still be checked against a
+real compiler.
+
+Both schemes are stable, which is what makes this worth writing: Itanium has
+been for far longer, and Microsoft's since Visual Studio 2015, whose v140
+through v143 toolsets interoperate. What is *not* stable is the standard
+library, whose types and templates are where the churn actually lives — which is
+why nothing here touches them.
+
+**How the fixed-width types map.** Stainless integers have exact sizes and C++'s
+do not, so `long` is spelled as whatever is 64 bits on the target:
+
+| Stainless | C++ |
+|---|---|
+| `sbyte` `byte` `short` `ushort` `int` `uint` | `signed char` `unsigned char` `short` `unsigned short` `int` `unsigned int` |
+| `long` `ulong` | `long long` `unsigned long long` — C++'s `long` is 32-bit on Windows |
+| `nint` `nuint` | pointer-sized: `long` on Itanium, `__int64` on Microsoft |
+| `char` | `char`; it is one byte, not UTF-16 |
+| `bool` `float` `double` | `bool` `float` `double` |
+
+**What is not there yet.** Free functions only. A C++ *class* cannot be named,
+which is what would need object layout, vtable layout, and an answer for
+constructors, destructors and exceptions crossing a boundary Stainless does not
+unwind through. Templates are not addressed and will not be by mangling alone: a
+template has no symbol until something instantiates it.
+
+### 8.2 Building a shared library
 
 ```
 stainless build src --shared -o build/math.dll --header build/math.h
@@ -1632,7 +1687,7 @@ int main(void) { return Add(40, 2) == 42 ? 0 : 1; }
 clang consumer.c build/math.lib -o consumer.exe
 ```
 
-### 8.2 What may cross a library boundary
+### 8.3 What may cross a library boundary
 
 Plain C values — primitives, pointers and `struct`s — cross freely. That is the
 ABI guarantee, and it holds across a DLL exactly as it does within one binary.

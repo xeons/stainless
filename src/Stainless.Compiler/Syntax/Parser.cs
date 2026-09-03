@@ -241,15 +241,18 @@ public sealed class Parser
     private List<Declaration> ParseLinkageDeclaration(int start, Modifiers modifiers)
     {
         bool isExtern = At(TokenKind.ExternKeyword);
+        bool isCpp = false;
         Advance();
 
         // The convention string is required and, for now, must be "C".
         if (At(TokenKind.StringLiteral))
         {
             string convention = (string)(Advance().Value ?? "");
-            if (convention != "C")
+            if (convention is not ("C" or "C++"))
                 _diagnostics.Error("SL0102", SpanFrom(start),
-                    $"unsupported linkage convention \"{convention}\"; only \"C\" is supported");
+                    $"unsupported linkage convention \"{convention}\"; \"C\" and \"C++\" are supported");
+
+            isCpp = convention == "C++";
         }
         else
         {
@@ -257,7 +260,13 @@ public sealed class Parser
                 $"expected a linkage convention string such as \"C\" after '{(isExtern ? "extern" : "export")}'");
         }
 
-        var linkage = isExtern ? LinkageKind.ExternC : LinkageKind.ExportC;
+        var linkage = (isExtern, isCpp) switch
+        {
+            (true, false) => LinkageKind.ExternC,
+            (true, true) => LinkageKind.ExternCpp,
+            (false, false) => LinkageKind.ExportC,
+            _ => LinkageKind.ExportCpp,
+        };
 
         // Block form: extern "C" { ... }
         if (Match(TokenKind.OpenBrace))
@@ -436,6 +445,17 @@ public sealed class Parser
         var returnType = ParseType();
         string name = ExpectIdentifier();
 
+        // `int geometry::Area(int, int)`. Only a C++ declaration may be
+        // qualified, because only C++ has a namespace to name.
+        var enclosing = new List<string>();
+        while (linkage.IsCpp() && At(TokenKind.Colon) && Peek(1).Kind == TokenKind.Colon)
+        {
+            Advance();
+            Advance();
+            enclosing.Add(name);
+            name = ExpectIdentifier();
+        }
+
         // `T Max<T>(T a, T b)`. Only a function may be generic, so the list is
         // accepted here and rejected below if no parameter list follows.
         var typeParameters = At(TokenKind.Less) ? ParseTypeParameterList() : [];
@@ -453,13 +473,17 @@ public sealed class Parser
                 _diagnostics.Error("SL0331", SpanFrom(start),
                     $"'{name}' is not generic, so it cannot have a 'where' clause");
 
-            if (linkage == LinkageKind.ExternC && body is not null)
+            if (linkage.IsImport() && body is not null)
+            {
+                string how = linkage == LinkageKind.ExternC ? "C" : "C++";
                 _diagnostics.Error("SL0105", SpanFrom(start),
-                    $"'extern \"C\"' declares an external function, so '{name}' must not have a body; use 'export \"C\"' to define one");
+                    $"'extern \"{how}\"' declares an external function, so '{name}' must not " +
+                    $"have a body; use 'export \"{how}\"' to define one");
+            }
 
             return new FunctionDeclSyntax(
                 SpanFrom(start), modifiers, linkage, returnType, name, typeParameters,
-                constraints, parameters, isVariadic, body);
+                constraints, parameters, isVariadic, body) { Namespace = enclosing };
         }
 
         // `Type Name {` and `Type Name =>` are the two ways a property starts.

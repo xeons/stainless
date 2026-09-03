@@ -23,7 +23,7 @@ namespace Stainless.Tests;
 /// The Stainless end-to-end test runner.
 ///
 /// Each test is a directory under tests/cases containing the .sl (and optionally
-/// .c) files that make up one program, plus exactly one expectation file:
+/// .c or .cpp) files that make up one program, plus exactly one expectation file:
 ///
 ///   expected.txt   the program must compile, run, and print this
 ///   errors.txt     the program must fail to compile with these diagnostic codes
@@ -108,7 +108,9 @@ internal static class Program
     {
         var sources = Directory.EnumerateFiles(directory, "*.sl")
             .OrderBy(p => p, StringComparer.Ordinal).ToList();
+        // C and C++ both, so a case can link against either language.
         var natives = Directory.EnumerateFiles(directory, "*.c")
+            .Concat(Directory.EnumerateFiles(directory, "*.cpp"))
             .OrderBy(p => p, StringComparer.Ordinal).ToList();
 
         if (sources.Count == 0) return (false, "the case directory contains no .sl files");

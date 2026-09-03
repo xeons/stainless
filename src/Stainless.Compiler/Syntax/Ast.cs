@@ -81,6 +81,25 @@ public enum LinkageKind
     ExternC,
     /// <summary>Defined here but emitted unmangled so C can call it.</summary>
     ExportC,
+
+    /// <summary>Declared elsewhere in C++; imported by its mangled name.</summary>
+    ExternCpp,
+
+    /// <summary>Defined here but mangled the C++ way so C++ can call it.</summary>
+    ExportCpp,
+}
+
+/// <summary>Whether a linkage kind names something outside this program.</summary>
+public static class LinkageKinds
+{
+    public static bool IsImport(this LinkageKind linkage) =>
+        linkage is LinkageKind.ExternC or LinkageKind.ExternCpp;
+
+    public static bool IsCpp(this LinkageKind linkage) =>
+        linkage is LinkageKind.ExternCpp or LinkageKind.ExportCpp;
+
+    /// <summary>True when the name crosses to another language and is not mangled by us.</summary>
+    public static bool IsForeign(this LinkageKind linkage) => linkage != LinkageKind.Stainless;
 }
 
 public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : SyntaxNode(Span);
@@ -97,7 +116,15 @@ public sealed record FunctionDeclSyntax(
     IReadOnlyList<WhereClauseSyntax> Constraints,
     IReadOnlyList<ParameterSyntax> Parameters,
     bool IsVariadic,
-    BlockSyntax? Body) : Declaration(Span, Modifiers);
+    BlockSyntax? Body) : Declaration(Span, Modifiers)
+{
+    /// <summary>
+    /// The enclosing C++ namespace, outermost first, from a name written as
+    /// <c>geometry::inner::Name</c>. Empty for global scope, and for everything
+    /// that is not C++.
+    /// </summary>
+    public IReadOnlyList<string> Namespace { get; init; } = [];
+}
 
 public sealed record FieldDeclSyntax(
     SourceSpan Span,

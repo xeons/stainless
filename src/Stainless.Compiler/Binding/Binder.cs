@@ -58,9 +58,13 @@ public sealed class BoundProgram
 /// False when building a library, which has no <c>Main</c> and must not be
 /// warned about one.
 /// </param>
-public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = true)
+public sealed class Binder(
+    DiagnosticBag diagnostics, bool requireEntryPoint = true, CppAbi? cppAbi = null)
 {
     private readonly Builtins _builtins = new();
+
+    /// <summary>The C++ ABI names are mangled for, defaulting to the host's.</summary>
+    private readonly CppAbi _cppAbi = cppAbi ?? CppMangler.HostAbi;
     private readonly Dictionary<string, ModuleSymbol> _modules = new(StringComparer.Ordinal);
     private readonly List<(FileScope Scope, CompilationUnitSyntax Unit)> _units = [];
     private readonly List<BoundFunction> _functions = [];
@@ -157,7 +161,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         var external = _modules.Values
             .SelectMany(m => m.Functions)
-            .Where(f => f.Linkage == LinkageKind.ExternC)
+            .Where(f => f.Linkage.IsImport())
             .GroupBy(f => f.MangledName)
             .Select(g => g.First())
             .ToList();
@@ -879,6 +883,22 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
         AddParameters(symbol, declaration.Parameters, scope);
 
+        if (declaration.Linkage.IsCpp())
+        {
+            // A C++ name encodes its parameters, so it can only be built once
+            // they are known. `export "C++"` with no namespace written takes the
+            // module's, because a module is what Stainless calls a namespace.
+            symbol.CppNamespace = declaration.Namespace.Count > 0
+                ? declaration.Namespace
+                : declaration.Linkage == LinkageKind.ExportCpp
+                    ? module.Name.Split('.', StringSplitOptions.RemoveEmptyEntries)
+                    : [];
+
+            symbol.ForeignName = CppMangler.Mangle(
+                _cppAbi, symbol.CppNamespace, symbol.Name, symbol.ReturnType,
+                symbol.ParameterTypes.ToList());
+        }
+
         if (containingType is InterfaceTypeSymbol)
         {
             if (declaration.Body is not null)
@@ -886,7 +906,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                     $"'{declaration.Name}' is an interface method and cannot have a body; " +
                     "interfaces declare signatures only");
         }
-        else if (declaration.Linkage != LinkageKind.ExternC && declaration.Body is null)
+        else if (!declaration.Linkage.IsImport() && declaration.Body is null)
         {
             diagnostics.Error("SL0210", declaration.Span,
                 $"'{declaration.Name}' has no body; Stainless has no forward declarations, " +
@@ -940,9 +960,15 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         foreach (var symbol in _modules.Values.SelectMany(m => m.Functions))
         {
-            if (symbol.Linkage is not (LinkageKind.ExternC or LinkageKind.ExportC)) continue;
+            if (!symbol.Linkage.IsForeign()) continue;
 
-            string how = symbol.Linkage == LinkageKind.ExternC ? "extern \"C\"" : "export \"C\"";
+            string how = symbol.Linkage switch
+            {
+                LinkageKind.ExternC => "extern \"C\"",
+                LinkageKind.ExportC => "export \"C\"",
+                LinkageKind.ExternCpp => "extern \"C++\"",
+                _ => "export \"C++\"",
+            };
 
             if (symbol.ReturnType is StructTypeSymbol { } returned && returned.CarriesReferences())
                 diagnostics.Error("SL0284", symbol.Span,

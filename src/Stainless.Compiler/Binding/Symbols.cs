@@ -115,7 +115,22 @@ public sealed class FunctionSymbol
     private string? _mangledName;
 
     /// <summary>The symbol name the linker sees. See docs/abi.md.</summary>
-    public string MangledName => _mangledName ??= RuntimeSymbol ?? Mangler.Mangle(this);
+    /// <summary>
+    /// The enclosing C++ namespace, for a declaration with C++ linkage.
+    /// </summary>
+    public IReadOnlyList<string> CppNamespace { get; set; } = [];
+
+    /// <summary>
+    /// The linker name, when something other than this compiler decides it.
+    ///
+    /// A C++ name is mangled by a scheme that depends on the target, so it is
+    /// computed once the ABI is known and stamped here rather than derived on
+    /// demand the way a Stainless name is.
+    /// </summary>
+    public string? ForeignName { get; set; }
+
+    public string MangledName =>
+        _mangledName ??= ForeignName ?? RuntimeSymbol ?? Mangler.Mangle(this);
 
     public bool HasBody => Body is not null || IsAutoAccessor;
 

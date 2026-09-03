@@ -70,12 +70,14 @@ runtime is [ten small C files](runtime/): reference counting, text, UTF-16, a
 string builder, arrays, reflection metadata, console output, threads, ordering
 and hashing, and files.
 
-**4. C ABI compatible.** A `struct` of plain data *is* a C struct, byte for
-byte. `extern "C"` calls into C and `export "C"` exposes functions back, with no
-bindings, marshalling, or generated glue. Even `String` hands its bytes to C
-without a copy. A struct that holds a reference is counted rather than copied
-raw, and the compiler stops that one at the boundary. C++ classes are not
-importable or exportable: the boundary is C, in both directions.
+**4. C and C++ ABI compatible.** A `struct` of plain data *is* a C struct, byte
+for byte. `extern "C"` calls into C and `export "C"` exposes functions back,
+with no bindings, marshalling, or generated glue. Even `String` hands its bytes
+to C without a copy. `extern "C++"` and `export "C++"` do the same for C++ free
+functions, by mangling their signatures the way the target's compiler does —
+Itanium for gcc and clang, Microsoft's for MSVC. A struct that holds a reference
+is counted rather than copied raw, and the compiler stops that one at either
+boundary.
 
 ---
 
@@ -387,7 +389,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 115 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 118 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -549,6 +551,14 @@ Everything below is covered by [the test suite](tests/cases).
   any other member
 - `extern "C"` and `export "C"`, including variadics and structs by value in
   both directions
+- `extern "C++"` and `export "C++"` for free functions, in both directions and
+  with no shim between: the signature is mangled the way the target's compiler
+  mangles it, in the Itanium scheme for gcc and clang or Microsoft's for MSVC.
+  A namespace is written on the declaration — `extern "C++" double
+  geometry::Area(double, double)` — and decides the linker name and nothing
+  else. Both schemes are checked against clang's own output for the same
+  signatures. C++ *classes* are not reachable yet; that needs object and vtable
+  layout, and an answer for exceptions crossing a boundary nothing unwinds
 - Win64 struct ABI: register coercion, `byval`, `sret`
 - `if` / `while` / `for` / `foreach` / `break` / `continue` / `return`, recursion
 - `switch` over integers, `char`, `bool`, enums and `String`, with stacked

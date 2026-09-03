@@ -218,7 +218,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
             string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
             Declare(function.MangledName,
-                $"declare {returnType} @{function.MangledName}({string.Join(", ", parts)})");
+                $"declare {returnType} {Symbol(function)}({string.Join(", ", parts)})");
         }
 
         if (program.ExternalFunctions.Count > 0) _module.AppendLine();
@@ -455,7 +455,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
                 // Same, and each interface's table takes the one that fits it.
                 var slots = interfaceType.Methods
                     .Select(classType.FindImplementation)
-                    .Select(found => found is null ? "ptr null" : $"ptr @{found.MangledName}")
+                    .Select(found => found is null ? "ptr null" : $"ptr {Symbol(found)}")
                     .ToList();
 
                 string body = slots.Count == 0 ? "ptr null" : string.Join(", ", slots);
@@ -681,18 +681,19 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _nextTemp = 0;
 
         string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
-        string linkage = symbol.Linkage == LinkageKind.ExportC || symbol.IsPublic ? "" : "internal ";
+        bool exported = symbol.Linkage is LinkageKind.ExportC or LinkageKind.ExportCpp;
+        string linkage = exported || symbol.IsPublic ? "" : "internal ";
 
         // Windows exports only what a binary marks, so a library's declared API
         // has to say so here. Elsewhere default visibility already exports it.
         string storage = forSharedLibrary
-                         && symbol.Linkage == LinkageKind.ExportC
+                         && exported
                          && OperatingSystem.IsWindows()
             ? "dllexport "
             : "";
 
         _module.AppendLine(
-            $"define {linkage}{storage}{returnType} @{symbol.MangledName}" +
+            $"define {linkage}{storage}{returnType} {Symbol(symbol)}" +
             $"({string.Join(", ", declaredParameters)}) {{");
         _body.Clear();
         _blockTerminated = false;
@@ -1124,6 +1125,26 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _ => "0",
     };
 
+    /// <summary>
+    /// A function's symbol as the IR must spell it.
+    ///
+    /// LLVM identifiers accept only <c>[-a-zA-Z$._0-9]</c> unquoted, and a C++
+    /// mangled name is mostly other characters in either scheme —
+    /// <c>?add@@YAHHH@Z</c> and <c>_ZN8geometry4areaEdd</c> respectively, of
+    /// which only the second happens to fit.
+    /// </summary>
+    private static string Symbol(FunctionSymbol function) => Symbol(function.MangledName);
+
+    /// <summary>
+    /// Quoting is enough on its own: a quoted LLVM name escapes only as
+    /// <c>\xx</c> hex pairs, and neither mangling scheme can produce a quote or
+    /// a backslash to need one.
+    /// </summary>
+    private static string Symbol(string mangled) =>
+        mangled.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '$' or '.' or '_')
+            ? "@" + mangled
+            : "@\"" + mangled + "\"";
+
     private static string SanitizeIdentifier(string name) =>
         new(name.Select(c => char.IsLetterOrDigit(c) || c == '_' || c == '.' ? c : '_').ToArray());
 
@@ -1140,7 +1161,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         _blockTerminated = false;
 
         if (classType.Destructor is not null)
-            Line($"call void @{classType.Destructor.MangledName}(ptr %obj)");
+            Line($"call void {Symbol(classType.Destructor)}(ptr %obj)");
 
         foreach (var field in classType.Fields)
         {
@@ -1368,12 +1389,12 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         if (entry.ReturnType.IsVoid())
         {
-            _module.AppendLine($"  call void @{entry.MangledName}()");
+            _module.AppendLine($"  call void {Symbol(entry)}()");
             _module.AppendLine("  ret i32 0");
         }
         else
         {
-            _module.AppendLine($"  %0 = call i32 @{entry.MangledName}()");
+            _module.AppendLine($"  %0 = call i32 {Symbol(entry)}()");
             _module.AppendLine("  ret i32 %0");
         }
 
@@ -1828,7 +1849,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             case BoundBinary binary: return EmitBinary(binary);
             case BoundConditional conditional: return EmitConditional(conditional);
             case BoundFunctionReference reference:
-                return new Val("@" + reference.Function.MangledName, "ptr", reference.Type);
+                return new Val(Symbol(reference.Function), "ptr", reference.Type);
             case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
             case BoundAssignment assignment: return EmitAssignment(assignment);
             case BoundPropertyAssignment written: return EmitPropertyAssignment(written);
@@ -2047,7 +2068,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         var arguments = new List<string> { $"ptr {receiver.Ref}" };
         AppendArgument(value, assignment.Value.Type, arguments);
 
-        Line($"call void {virtualTarget ?? "@" + setter.MangledName}" +
+        Line($"call void {virtualTarget ?? Symbol(setter)}" +
              $"({string.Join(", ", arguments)})");
 
         return value;
@@ -2416,7 +2437,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         {
             var arguments = new List<string> { $"ptr {instance}" };
             AppendArguments(expression.Arguments, arguments);
-            Line($"call void @{expression.Constructor.MangledName}({string.Join(", ", arguments)})");
+            Line($"call void {Symbol(expression.Constructor)}({string.Join(", ", arguments)})");
         }
 
         // sl_alloc already returns +1; the statement scope releases it.
@@ -2630,7 +2651,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         // An interface method is reached through the object; everything else is
         // a direct call to a known symbol.
-        string target = virtualTarget ?? "@" + function.MangledName;
+        string target = virtualTarget ?? Symbol(function);
 
         string invocation =
             $"call {signature} {target}({string.Join(", ", arguments)})";
