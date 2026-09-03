@@ -10,6 +10,8 @@ property=Ada#7 3
 thermostat=212 373
 flags=1 1 7
 switch=severe fatal
+roster=36:259:abc
+intrinsic=-1 -1
 sections=312
 pixels=225
 done

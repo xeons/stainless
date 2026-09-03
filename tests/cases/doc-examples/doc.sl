@@ -46,6 +46,29 @@ int Search(int[] data, int from, int upto, AtomicBool stop) {
     return -1;
 }
 
+// --- spec 5.4 collections -------------------------------------------------
+String Roster() {
+    var ages = new Dictionary<String, int>();
+    ages.Set("ada", 36);
+
+    var numbers = new List<int>();
+    numbers.Add(9); numbers.Add(2); numbers.Add(5);
+    Sort(numbers);
+
+    var line = new LinkedList<String>();
+    var first = line.AddLast("a");
+    line.AddLast("c");
+    line.InsertAfter(first, "b");
+
+    var text = new StringBuilder();
+    text.AppendInteger(ages.Get("ada"));
+    text.Append(":");
+    for (nuint i = 0; i < numbers.Count(); i = i + 1) { text.AppendInteger(numbers.At(i)); }
+    text.Append(":");
+    for (nint at = line.First(); at >= 0; at = line.After(at)) { text.Append(line.ValueAt(at)); }
+    return text.ToText();
+}
+
 // --- spec 2.7 flags enums -------------------------------------------------
 [Flags]
 public enum Access : byte {
@@ -160,6 +183,8 @@ int Main() {
         mode.HasFlag(Access.Read) ? 1 : 0, (int)readOnly, (int)mode);
 
     printf("switch=%s %s\n", Name(Level.Severe).ToPointer(), Name(Level.Fatal).ToPointer());
+    printf("roster=%s\n", Roster().ToPointer());
+    printf("intrinsic=%d %d\n", 3.CompareTo(5), "apple".CompareTo("banana"));
 
     var counted = new int[4];
     counted[0] = 5;

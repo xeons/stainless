@@ -1,0 +1,15 @@
+sorted=4 4 17 30
+index=2 largest=30 smallest=4
+words=apple fig pear
+longest=pear
+compare=-1 1 0
+equal=1 0
+text=-1 1
+signed=-1 unsigned=-1
+doubles=-1 1 0
+enum=1 -1 1
+hash=1 0 0
+misc=-1 -1
+money=125 250 hashes=1
+digests=1 1
+done

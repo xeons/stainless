@@ -1519,12 +1519,50 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// True when <paramref name="argument"/> meets an interface constraint: a
     /// class that implements it, or the interface itself.
     /// </summary>
-    private static bool Satisfies(TypeSymbol argument, InterfaceTypeSymbol required) => argument switch
+    private bool Satisfies(TypeSymbol argument, InterfaceTypeSymbol required) => argument switch
     {
-        ClassTypeSymbol implementer => implementer.AllInterfaces().Contains(required),
+        ClassTypeSymbol implementer =>
+            implementer.AllInterfaces().Contains(required) ||
+            SatisfiesIntrinsically(argument, required),
         InterfaceTypeSymbol self => self.Equals(required) || self.AllInterfaces().Contains(required),
-        _ => false,
+        _ => SatisfiesIntrinsically(argument, required),
     };
+
+    /// <summary>
+    /// The three interfaces a primitive, an enum or a String implements without
+    /// saying so.
+    ///
+    /// None of them can carry a declaration: a primitive is not a class, an
+    /// enum is its integer, and String belongs to the runtime. But they are
+    /// exactly the types people use as keys and sort by, so a rule that
+    /// excluded them would exclude the point of having constraints. The binder
+    /// recognises the members instead — see
+    /// <see cref="TryBindIntrinsicMember"/> — and this is the matching answer
+    /// at the constraint.
+    /// </summary>
+    private bool SatisfiesIntrinsically(TypeSymbol argument, InterfaceTypeSymbol required)
+    {
+        if (!HasIntrinsicMembers(argument)) return false;
+        if (required.ModuleName != "Standard.Collections") return false;
+
+        // IHashable takes no type argument; the other two are about this type.
+        if (required.Template is null)
+            return required.SimpleName == "IHashable";
+
+        return required.Template.Name is "IEquatable" or "IComparable"
+               && required.TypeArguments.Count == 1
+               && required.TypeArguments[0].Equals(argument);
+    }
+
+    /// <summary>
+    /// True for the types whose ordering, equality and hashing the compiler
+    /// supplies. Deliberately not pointers: two pointers being equal is a
+    /// question about addresses rather than about values, and a program that
+    /// means it can say so with a cast.
+    /// </summary>
+    private bool HasIntrinsicMembers(TypeSymbol type) =>
+        type is PrimitiveTypeSymbol { Kind: not PrimitiveKind.Void } or EnumTypeSymbol
+        || _builtins.IsString(type);
 
     /// <summary>
     /// Matches a declared parameter type against an argument's actual type to
@@ -4121,6 +4159,9 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         if (receiver.Type is EnumTypeSymbol flagsEnum && member.Member == "HasFlag")
             return BindHasFlag(syntax, member, receiver, flagsEnum, arguments);
 
+        if (TryBindIntrinsicMember(syntax, member, receiver, arguments) is { } intrinsic)
+            return intrinsic;
+
         if (receiver.Type is not NamedTypeSymbol namedType)
         {
             diagnostics.Error("SL0255", member.Span,
@@ -4232,6 +4273,91 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         var masked = new BoundBinary(syntax.Span, enumType, receiver, BoundBinaryOp.BitAnd, flag);
         return new BoundBinary(
             syntax.Span, PrimitiveTypeSymbol.Bool, masked, BoundBinaryOp.Equal, flag);
+    }
+
+    /// <summary>
+    /// Binds <c>CompareTo</c>, <c>EqualTo</c> and <c>HashCode</c> on a type that
+    /// implements them without saying so, or returns null when this is an
+    /// ordinary call.
+    ///
+    /// Each lowers to something that already exists: equality to the <c>==</c>
+    /// the binder knows for that type, and the other two to a runtime call. A
+    /// declared member always wins, because this runs only after lookup on a
+    /// named type has failed.
+    /// </summary>
+    private BoundExpression? TryBindIntrinsicMember(
+        CallSyntax syntax, MemberAccessSyntax member, BoundExpression receiver,
+        List<BoundExpression> arguments)
+    {
+        var type = receiver.Type;
+        if (!HasIntrinsicMembers(type)) return null;
+        if (type is NamedTypeSymbol named && named.FindMethod(member.Member) is not null) return null;
+
+        int wanted = member.Member == "HashCode" ? 0 : 1;
+        if (member.Member is not ("CompareTo" or "EqualTo" or "HashCode")) return null;
+
+        if (arguments.Count != wanted)
+        {
+            diagnostics.Error("SL0412", syntax.Span,
+                $"'{type.Name}.{member.Member}' takes {wanted} " +
+                $"argument{(wanted == 1 ? "" : "s")}, but {arguments.Count} were given");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (member.Member == "HashCode")
+            return new BoundCall(syntax.Span, HashFor(type), null, [Widen(receiver, HashFor(type))]);
+
+        var other = BindConversion(arguments[0], type, syntax.Arguments[0].Span);
+        if (other.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // Equality is the operator, which already knows how to compare a String
+        // and how to compare an enum.
+        if (member.Member == "EqualTo")
+            return BindBinaryOperation(
+                syntax.Span, receiver, BoundBinaryOp.Equal, other, TokenKind.EqualsEquals);
+
+        var compare = CompareFor(type);
+        return new BoundCall(
+            syntax.Span, compare, null, [Widen(receiver, compare), Widen(other, compare)]);
+    }
+
+    /// <summary>The runtime comparison that orders values of this type.</summary>
+    private FunctionSymbol CompareFor(TypeSymbol type) => type switch
+    {
+        _ when _builtins.IsString(type) => _builtins.CompareText,
+        PrimitiveTypeSymbol { IsFloat: true } => _builtins.CompareDouble,
+        PrimitiveTypeSymbol { IsSigned: true } => _builtins.CompareLong,
+        EnumTypeSymbol { UnderlyingType.IsSigned: true } => _builtins.CompareLong,
+        _ => _builtins.CompareULong,
+    };
+
+    private FunctionSymbol HashFor(TypeSymbol type) => type switch
+    {
+        _ when _builtins.IsString(type) => _builtins.HashText,
+        PrimitiveTypeSymbol { IsFloat: true } => _builtins.HashDouble,
+        _ => _builtins.HashInteger,
+    };
+
+    /// <summary>
+    /// Widens a value to the parameter the runtime call takes. Written directly
+    /// rather than through <see cref="BindConversion"/> because an enum does not
+    /// convert implicitly to its integer, and here the compiler is the one
+    /// asking rather than the programmer.
+    /// </summary>
+    private BoundExpression Widen(BoundExpression value, FunctionSymbol target)
+    {
+        var wanted = target.Parameters[0].Type;
+        if (value.Type.Equals(wanted)) return value;
+        if (_builtins.IsString(value.Type)) return value;
+
+        var kind = value.Type switch
+        {
+            PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool } => ConversionKind.BoolToInteger,
+            PrimitiveTypeSymbol { IsFloat: true } => ConversionKind.FloatResize,
+            _ => ConversionKind.IntegerWiden,
+        };
+
+        return new BoundConversion(value.Span, wanted, value, kind);
     }
 
     private List<FunctionSymbol> ResolveFunctionCandidates(QualifiedName name)

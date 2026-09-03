@@ -828,6 +828,7 @@ enforces.
 ```csharp
 public interface IEquatable<T>     { bool EqualTo(T other); }
 public interface IComparable<T>    { int CompareTo(T other); }
+public interface IHashable         { nuint HashCode(); }
 
 public interface IReadOnlyList<T>  { nuint Count(); T At(nuint index); }
 
@@ -841,8 +842,72 @@ public interface IList<T> : IReadOnlyList<T> {
 `CompareTo` returns a negative number, zero, or a positive number when the
 value orders before, with, or after the argument.
 
-`List<T>` implements `IList<T>` over a single array that doubles when it fills.
-Alongside the interfaces are `Largest`, `Smallest`, `IndexOf` and `Sort`, each
+**A primitive, an enum and a String implement all three without saying so.**
+None of them can carry a declaration — a primitive is not a class, an enum is
+its integer, and `String` belongs to the runtime — but they are exactly the
+types people sort by and use as keys, so a rule that excluded them would
+exclude the point of having constraints. The compiler recognises `CompareTo`,
+`EqualTo` and `HashCode` on those types and lowers each to a comparison or a
+runtime call:
+
+```csharp
+var numbers = new List<int>();
+Sort(numbers);                          // int satisfies IComparable<int>
+
+var ages = new Dictionary<String, int>();
+ages.Set("ada", 36);                    // String satisfies IEquatable + IHashable
+
+3.CompareTo(5);                         // -1
+"apple".CompareTo("banana");            // -1, by bytes, which for UTF-8 is by code point
+```
+
+A class still says what it implements, and a declared member always wins over
+the built-in one.
+
+**The containers**
+
+| Type | Backed by | Notes |
+|---|---|---|
+| `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>` |
+| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>` |
+| `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
+| `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
+| `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
+| `LinkedList<T>` | an index pool | handles, not references — see below |
+| `SortedList<K, V>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
+
+Every one of them is array-backed, which for the last two is not the usual
+choice. It is the right one here: ARC cannot collect a cycle, so a doubly
+linked list of objects would leak unless every back-link were weak, and a weak
+reference is not usable without a way to prove it is still there. Links as
+indices into a pool have neither problem.
+
+`Dictionary` and `HashSet` probe linearly and **shift the following cluster
+back on removal rather than leaving a tombstone**, so a table that is added to
+and removed from for a long time does not slowly fill with markers that only a
+rehash could clear.
+
+`LinkedList<T>` names each node with a **handle**: a `nint` that stays valid
+until that node is removed, and is `-1` for "no node". Handles are what make
+the middle of the list reachable in constant time, which is the only reason to
+choose it over a `List<T>`:
+
+```csharp
+var line = new LinkedList<String>();
+var first = line.AddLast("a");
+line.AddLast("c");
+line.InsertAfter(first, "b");
+
+for (nint at = line.First(); at >= 0; at = line.After(at)) {
+    Console.WriteLine(line.ValueAt(at));
+}
+```
+
+Asking a container for something it does not have — `Get` with an absent key,
+`Dequeue` on an empty queue — aborts, the same way an out-of-range index does.
+Use `GetOr`, `ContainsKey` or `IsEmpty` where a miss is an ordinary outcome.
+
+Alongside the containers are `Largest`, `Smallest`, `IndexOf` and `Sort`, each
 constrained to what it actually needs:
 
 ```csharp

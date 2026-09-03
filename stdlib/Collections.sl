@@ -45,6 +45,24 @@ public interface IComparable<T> {
     int CompareTo(T other);
 }
 
+/// A value that can be a key in a hash table.
+///
+/// Two values that are `EqualTo` each other must return the same `HashCode`;
+/// two that are not may still collide, and the table handles it. A type that
+/// implements this should implement `IEquatable<T>` as well, since a hash on
+/// its own only narrows the search.
+public interface IHashable {
+    nuint HashCode();
+}
+
+// **A primitive, an enum and a String implement all three without saying so.**
+// None of them can carry a declaration -- a primitive is not a class, an enum
+// is its integer, and String belongs to the runtime -- but they are exactly the
+// types people sort by and use as keys. The compiler recognises `CompareTo`,
+// `EqualTo` and `HashCode` on them and lowers each to a comparison or a runtime
+// call, so `Sort(numbers)` works on a `List<int>` and `Dictionary<String, V>`
+// needs nothing extra.
+
 // -------------------------------------------------------------- enumeration
 
 /// A cursor over a sequence. `MoveNext` advances and reports whether there was

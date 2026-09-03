@@ -58,6 +58,23 @@ public sealed class Builtins
     public FunctionSymbol StringConcat { get; }
     public FunctionSymbol StringEquals { get; }
 
+    /// <summary>
+    /// Ordering and hashing for the types that cannot implement an interface.
+    ///
+    /// A primitive is not a class, so <c>int</c> cannot be declared to
+    /// implement <c>IComparable&lt;int&gt;</c>. The binder recognises
+    /// <c>CompareTo</c> and <c>HashCode</c> on one anyway and lowers each to
+    /// one of these, which is what lets <c>Sort(numbers)</c> work on a
+    /// <c>List&lt;int&gt;</c> without the language growing operator constraints.
+    /// </summary>
+    public FunctionSymbol CompareLong { get; }
+    public FunctionSymbol CompareULong { get; }
+    public FunctionSymbol CompareDouble { get; }
+    public FunctionSymbol CompareText { get; }
+    public FunctionSymbol HashInteger { get; }
+    public FunctionSymbol HashDouble { get; }
+    public FunctionSymbol HashText { get; }
+
     private static readonly SourceText BuiltinSource = new("<builtin>", "");
     private static readonly SourceSpan BuiltinSpan = new(BuiltinSource, 0, 0);
 
@@ -161,6 +178,25 @@ public sealed class Builtins
         StringEquals = Function(Text, "Equals", PrimitiveTypeSymbol.Bool, "sl_string_equals",
             ("left", String), ("right", String));
 
+        // --- ordering and hashing --------------------------------------------
+        // Hidden: they live in the auto-imported Standard module but are not
+        // public, so nothing can name them and the emitter still declares them.
+        CompareLong = Hidden("CompareLong", PrimitiveTypeSymbol.Int, "sl_compare_long",
+            ("left", PrimitiveTypeSymbol.Long), ("right", PrimitiveTypeSymbol.Long));
+        CompareULong = Hidden("CompareULong", PrimitiveTypeSymbol.Int, "sl_compare_ulong",
+            ("left", PrimitiveTypeSymbol.ULong), ("right", PrimitiveTypeSymbol.ULong));
+        CompareDouble = Hidden("CompareDouble", PrimitiveTypeSymbol.Int, "sl_compare_double",
+            ("left", PrimitiveTypeSymbol.Double), ("right", PrimitiveTypeSymbol.Double));
+        CompareText = Hidden("CompareText", PrimitiveTypeSymbol.Int, "sl_string_compare",
+            ("left", String), ("right", String));
+
+        HashInteger = Hidden("HashInteger", PrimitiveTypeSymbol.NUInt, "sl_hash_integer",
+            ("value", PrimitiveTypeSymbol.ULong));
+        HashDouble = Hidden("HashDouble", PrimitiveTypeSymbol.NUInt, "sl_hash_double",
+            ("value", PrimitiveTypeSymbol.Double));
+        HashText = Hidden("HashText", PrimitiveTypeSymbol.NUInt, "sl_string_hash",
+            ("value", String));
+
         // --- Standard.Console ------------------------------------------------
         Function(Console, "Write", PrimitiveTypeSymbol.Void, "sl_console_write",
             ("text", String));
@@ -205,6 +241,21 @@ public sealed class Builtins
         return symbol;
     }
 
+    /// <summary>
+    /// A runtime function the binder calls but no source can name: it goes into
+    /// the module so the emitter declares it, and is not public so lookup skips
+    /// it.
+    /// </summary>
+    private FunctionSymbol Hidden(
+        string name,
+        TypeSymbol returnType,
+        string runtimeSymbol,
+        params (string Name, TypeSymbol Type)[] parameters)
+    {
+        var symbol = Declare(Standard, name, returnType, runtimeSymbol, null, parameters, isPublic: false);
+        return symbol;
+    }
+
     private FunctionSymbol Function(
         ModuleSymbol module,
         string name,
@@ -219,7 +270,8 @@ public sealed class Builtins
         TypeSymbol returnType,
         string runtimeSymbol,
         NamedTypeSymbol? containingType,
-        (string Name, TypeSymbol Type)[] parameters)
+        (string Name, TypeSymbol Type)[] parameters,
+        bool isPublic = true)
     {
         var symbol = new FunctionSymbol
         {
@@ -230,7 +282,7 @@ public sealed class Builtins
             RuntimeSymbol = runtimeSymbol,
             Kind = containingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = containingType,
-            IsPublic = true,
+            IsPublic = isPublic,
             Span = BuiltinSpan,
         };
 

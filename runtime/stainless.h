@@ -171,6 +171,23 @@ void  *sl_string_concat(void *left, void *right);
 _Bool  sl_string_equals(void *left, void *right);
 void  *sl_string_substring(void *pointer, size_t start, size_t length);
 
+/* ------------------------------------------------- ordering and hashing */
+
+/*
+ * What a primitive, an enum or a String uses in place of implementing
+ * IComparable and IHashable, which it cannot: the compiler recognises
+ * CompareTo and HashCode on those types and lowers them to these. See
+ * hashing.c.
+ */
+int32_t sl_compare_long(int64_t left, int64_t right);
+int32_t sl_compare_ulong(uint64_t left, uint64_t right);
+int32_t sl_compare_double(double left, double right);
+int32_t sl_string_compare(void *left, void *right);
+
+size_t sl_hash_integer(uint64_t value);
+size_t sl_hash_double(double value);
+size_t sl_string_hash(void *pointer);
+
 /* ------------------------------------------------------------ Utf16String */
 
 typedef struct SlUtf16String {

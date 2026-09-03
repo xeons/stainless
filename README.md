@@ -527,9 +527,16 @@ Everything below is covered by [the test suite](tests/cases).
   `IEnumerable<T>` / `IEnumerator<T>` in `Standard.Collections`
 - Interfaces: several per class, dynamic dispatch, checked at compile time, and
   extending one another with free conversion to the base
-- `Standard.Collections`: `IComparable<T>`, `IEquatable<T>`, `IReadOnlyList<T>`,
-  `IList<T>`, `IEnumerable<T>`, `IEnumerator<T>`, `List<T>`, and
-  `Sort`/`Largest`/`Smallest`/`IndexOf`
+- `Standard.Collections`: `List<T>`, `Dictionary<K, V>`, `HashSet<T>`,
+  `Queue<T>`, `Stack<T>`, `LinkedList<T>` and `SortedList<K, V>`, plus
+  `IComparable<T>`, `IEquatable<T>`, `IHashable`, `IReadOnlyList<T>`,
+  `IList<T>`, `IEnumerable<T>`, `IEnumerator<T>` and
+  `Sort`/`Largest`/`Smallest`/`IndexOf`. Every container is array-backed —
+  ARC cannot collect a cycle, so the linked list links by index rather than by
+  reference
+- Primitives, enums and `String` satisfy `IComparable<T>`, `IEquatable<T>` and
+  `IHashable` without declaring it, so `Sort(numbers)` works on a `List<int>`
+  and `Dictionary<String, V>` needs nothing extra
 - `StringBuilder`: mutable text with amortised O(1) appends
 - `Standard.Threading`: `Mutex<T>` and its `Guard<T>` (the lock owns what it
   guards, and a destructor releases it), `AtomicLong`, `AtomicBool`, and

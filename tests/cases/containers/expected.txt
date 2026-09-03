@@ -1,0 +1,34 @@
+dict=3 ada=36 absent=-1
+has=1 0
+replaced=37 count=3
+add=1 dup=0
+remove=1 gone=0 left=3
+grown=200 capacity=512 at150=22500
+keys-sum=19900 listed=200
+halved=100 survivors=100 evens=0
+enum-key=red class-key=700
+set=1 0 1
+union=4
+intersect=2 a=1 b=0
+except=1
+queue=20 peek=0 take=0 1
+drained=189 empty=1
+stack=3 top=c pop=c b
+chain=abcd reversed=dcba count=4
+removed=a d left=1
+  chain c
+  chain recycled
+sorted=3 apple=9
+  apple=9
+  fig=2
+  pear=3
+drop=1 still=1 absent=-1
+ordered=1 26 50 of 50
+lifetime
+dropping
+~Tag(one)
+~Tag(stacked)
+dropped
+~Tag(two)
+scope left
+done
