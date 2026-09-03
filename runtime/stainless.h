@@ -316,12 +316,11 @@ void sl_console_write_error(void *pointer);
 
 /*
  * See docs/concurrency.md for the model these primitives exist to serve.
- * Nothing here is reachable from Stainless yet: this is the layer the language
- * surface will be built on, not the surface.
  *
- * Reference counts remain non-atomic, and that stays correct because no two
- * threads ever touch one object. The scope handoff below is what supplies the
- * barrier that makes it so.
+ * Reference counts are atomic (arc.c), so an object two threads reach keeps an
+ * accurate count. What is still checked by the compiler rather than the runtime
+ * is whether an object may be reached by two threads at all, which is a
+ * question about races on its contents.
  *
  * The lock and condition types are opaque storage sized for the largest
  * platform primitive (glibc's pthread_mutex_t at 40 bytes, pthread_cond_t at

@@ -223,6 +223,13 @@ in one is rejected at compile time rather than left zeroed.
 
 ## 5. Ownership convention
 
+Both counts are **atomic** — a relaxed increment, an acquire/release decrement,
+and a compare-exchange loop in `sl_weak_load`. That is the same choice Swift
+makes, and for the same reason: an object reachable from two threads has its
+count touched by both, and no rule about what may be *shared* prevents a
+reference escaping a lock. It costs about 5.7ns per retain/release pair, which
+makes removing redundant pairs worth considerably more than it used to be.
+
 Stainless follows a **borrowed-parameter / owned-return** convention, the same
 choice Swift makes, because it eliminates most retain/release traffic:
 

@@ -387,7 +387,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 114 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 115 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -697,19 +697,13 @@ Being straight about the edges, roughly in the order they are worth adding:
   which takes hello-world from 290 KB to 124 KB. The IR is still the full size,
   so compile time still pays for all of it; a reachability pass from `Main`
   would fix that and is the real answer.
-- **Unoptimized ARC.** Retain/release traffic is correct but redundant; a
-  +0/+1 dataflow pass would remove most of it.
-- **`Mutex<T>` is unsound when `T` is a class shared between threads.**
-  `Guard.Value()` returns the guarded object, which retains it, and dropping
-  the result releases it — so two threads locking *in turn* still perform an
-  unsynchronized read-modify-write on that object's reference count. The lock
-  protects the contents; nothing protects the count, and it drifts down until
-  the object is freed while still held. `Mutex<long>` and other plain values
-  are unaffected. Closing it means atomic reference counts for `[Shared]`
-  types, which is a change to the ARC model rather than to the library. Every
-  container in `Standard.Concurrent` keeps its collection in a field and never
-  hands it out, which is why none of them is built on `Mutex<T>`.
-- **Two further thread-safety gaps, both about lifetimes.** What crosses a
+- **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct
+  but redundant, and since the counts became atomic each redundant pair costs
+  about 5.7ns rather than about 1.2ns. A loop that does nothing but ARC traffic
+  runs roughly 3x slower than it did. The +0/+1 dataflow pass that removes the
+  pair around a borrow was a nicety before and is the obvious next piece of work
+  now.
+- **The remaining thread-safety gaps are about lifetimes.** What crosses a
   thread is checked by type, so an unsynchronized class cannot reach a second
   thread at all. What is unchecked is how long a borrowed thing lives: a
   `Guard` can outlive the lock it proves, and a job could store an array it was

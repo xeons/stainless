@@ -234,9 +234,10 @@ extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
 plain data, or a raw pointer
 ```
 
-For the same reason such a struct may not cross a thread: two threads copying
-it would each retain, and retain is not atomic. A struct of plain data is
-unaffected by both rules, and pays for neither.
+Crossing a thread is a separate question, and the answer follows the fields: a
+struct holding only primitives and `String`s crosses freely, and one holding a
+`List<T>` does not, because that is what holding a `List<T>` means either way
+(§9.5). A struct of plain data is unaffected by both rules and pays for neither.
 
 ### 2.3 `class` — reference type, ARC managed
 
@@ -1009,19 +1010,17 @@ without holding the lock and no way to forget which lock guards what. `lock
 (obj) { }` was rejected for the opposite reason: it would put a lock word in
 every object header and charge every single-threaded program for it.
 
-> **`Mutex<T>` is unsound when `T` is a class and the mutex is used from more
-> than one thread**, which the example above would be if `Record` were called
-> from two. `Value()` returns the guarded object, which retains it, and dropping
-> the result releases it — so two threads locking *in turn* still perform an
-> unsynchronized read-modify-write on that object's reference count. The lock
-> protects the contents; nothing protects the count, and it drifts down until
-> the object is freed while the mutex still holds it.
->
-> `Mutex<long>` and other plain values are unaffected, because a plain value is
-> never retained. For a shared *object*, keep it in a field and never hand it
-> out — which is what every container in §5.6 does, and why none of them is
-> built on this type. Closing it properly means atomic reference counts for
-> `[Shared]` types; see [concurrency.md](concurrency.md).
+**What `Value()` still does not promise.** It hands out what the lock protects,
+and nothing stops the caller keeping it after the guard has gone. That is a
+lifetime question, and Stainless does not answer it yet; C# has the same hole
+and Rust closes it with lifetimes.
+
+It used to be worse than a discipline. `Value()` retains what it returns and the
+caller releases it, usually outside the lock, so two threads performed an
+unsynchronized read-modify-write on the count — it drifted down and the object
+was freed while the mutex still held it. Reference counts are atomic now, which
+closes that half; see [concurrency.md](concurrency.md) §10 for why the narrower
+fix of "atomic counts for `[Shared]` types" would not have.
 
 `AtomicLong` and `AtomicBool` are sequentially consistent counters and flags.
 They are concrete rather than `Atomic<T>` because atomics are not generic — that
@@ -1214,14 +1213,13 @@ What was already sent is still delivered; once it is drained, every `Take`
 returns at once with `Ok` false.
 
 **Each of these owns an ordinary collection in a field and never hands out a
-reference to it**, and that is a correctness requirement rather than a style
-choice. Reference counts are not atomic: a lock protects what it guards, not
-the *count* of the thing it guards, so an object returned out of a lock is
-retained and released by several threads at once and its count drifts down
-until it is freed while still in use. Reading a field to call a method on it
-borrows, and borrowing touches no count. See the note on `Mutex<T>` in
-[concurrency.md](concurrency.md), which has the same hazard and is why nothing
-here is built on it.
+reference to it.** That began as a correctness requirement: reference counts
+were not atomic, so an object returned out of a lock was retained and released
+by several threads at once and its count drifted down until it was freed while
+still in use. Counts are atomic now and the hazard is gone, but the shape is
+still the right one — reading a field to call a method on it borrows, and a
+container that never hands its collection out cannot be used wrongly by a caller
+who keeps what it lent.
 
 ### 5.7 `Standard.IO`, `File`, `Directory` and `Path`
 
@@ -1911,11 +1909,13 @@ receiver, a `parallel for` capture, and a `static readonly`.
 | a class marked `[Shared]` | the author asserts it synchronizes itself |
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
-Everything else is rejected. Reference counts are not atomic, so two threads
-retaining one object is a race nothing would report — which is why this is a
-rule rather than a warning. That is also why a `struct` holding a reference is
-not in the first row: copying one retains what it holds (§2.2), so it is not
-plain data however it is laid out.
+Everything else is rejected, and this is a rule rather than a warning. Counting
+is not what it protects: reference counts are atomic, so sharing an object no
+longer corrupts its count. What nothing synchronizes is the object's *contents*,
+and two threads writing one field is a race no counting scheme could have saved.
+
+A `struct` is as safe as what is inside it, so one holding only primitives and
+`String`s crosses freely and one holding a `List<T>` does not.
 
 `[Shared]` lives in `Standard.Threading` and is an **assertion, not a proof**:
 

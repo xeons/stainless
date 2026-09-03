@@ -2698,11 +2698,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// <summary>
     /// Whether a value of this type may be reached by more than one thread.
     ///
-    /// This is the rule the whole concurrency model rests on, and it is narrow
-    /// on purpose. Reference counts are not atomic, so anything two threads can
-    /// both retain is a race that nothing would report. Three cases are safe:
+    /// Reference counts are atomic, so sharing an object no longer corrupts its
+    /// count. What is left is the harder half: nothing synchronizes the object's
+    /// *contents*, and two threads writing the same field is a race no count
+    /// could have saved. Three cases are safe:
     ///
-    ///   plain data       no reference count exists to race over
+    ///   plain data       there is no shared mutable state; a value is copied
     ///   String           immutable, and its bytes live inside the object
     ///   [Shared]         the author has said the type synchronizes internally
     ///
@@ -2717,10 +2718,10 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol => true,
 
-        // A struct is safe exactly when it is bytes and nothing else. One that
-        // holds a reference is copied by retaining it, and a retain two threads
-        // can both perform is the race this rule exists to stop.
-        StructTypeSymbol structType => !structType.CarriesReferences(),
+        // A struct is as safe as the things inside it. Copying one retains what
+        // it holds, and that is sound now that counts are atomic, so a struct of
+        // primitives and Strings crosses as freely as its parts would.
+        StructTypeSymbol structType => structType.Fields.All(f => IsSendable(f.Type)),
 
         ArrayTypeSymbol array => IsPlainData(array.Element),
 

@@ -92,20 +92,12 @@ public attribute Shared { }
 /// closes it when the analysis in step 6 of docs/concurrency.md lands, and not
 /// before. Until then this is a discipline, not a guarantee.
 ///
-/// **Unsound when `T` is a class, and used from more than one thread.**
-/// Returning the guarded object from `Value()` retains it, and dropping the
-/// result releases it -- so two threads locking in turn still perform an
-/// unsynchronized read-modify-write on that object's reference count. The lock
-/// protects the contents; nothing protects the count. It drifts down, and the
-/// object is eventually destroyed while the mutex still holds it.
-///
-/// `Mutex<long>` and other plain values are unaffected, because a plain value
-/// is never retained. For a shared *object*, keep it in a field and never hand
-/// it out -- which is what every container in Standard.Concurrent does, and why
-/// none of them is built on this type.
-///
-/// Closing this properly means atomic reference counts for `[Shared]` types.
-/// That is a decision about the ARC model rather than a bug in this file.
+/// It used to be unsound for a class `T`: `Value()` retains what it hands out
+/// and the caller releases it, often outside the lock, so two threads performed
+/// an unsynchronized read-modify-write on that object's count. The count drifted
+/// down and the object was freed while the mutex still held it. Reference counts
+/// are atomic now, which closes that; what remains is the lifetime hole above,
+/// which is about how long a borrowed thing lives rather than about counting.
 [Shared]
 public class Mutex<T> {
     T value;

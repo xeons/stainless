@@ -16,6 +16,22 @@ plain data, they share types that synchronize themselves, and they move
 ownership of everything else. Reference counts stay non-atomic because no two
 threads ever touch one, and as of step 6 that is checked rather than trusted.
 
+> **The premise above did not hold, and the counts are atomic now.** `Mutex<T>`
+> is the counter-example, found after this was written and detailed in §10: a
+> reference handed out of a lock is retained inside it and released outside it,
+> so two threads do touch one count, and it drifts until the object is freed
+> while still in use. The obvious narrowing — atomic counts for `[Shared]` types
+> only — does not close it either, because `Mutex<List<T>>` guards a List and a
+> List is not `[Shared]`; what would have to be atomic is everything reachable
+> from a shared type.
+>
+> So all counts are atomic, measured at about 5.7ns per retain/release pair over
+> the plain version, and roughly 3x on a program that does nothing but ARC
+> traffic. Most of that traffic should not exist: retain/release around a borrow
+> is redundant, and the +0/+1 pass that removes it is now the thing worth
+> building. **Everything below about what may cross a thread still stands** — it
+> is about races on an object's *contents*, which no counting scheme fixes.
+
 ---
 
 ## 1. The three sharing classes
@@ -272,10 +288,12 @@ The lock is tied to the data it protects, so there is no way to reach the list
 without holding the lock, and no way to forget which lock guards what. Unlocking
 is a destructor, so ARC already does it — including on an early `return`.
 
-> **And this example is unsound if `Record` is called from two threads**, for a
-> reason that only turned up when Standard.Concurrent was built on it. See §10:
-> `guard.Value()` retains the list, and that count is not atomic. Everything in
-> this section is right about the *lock*; it is wrong about the *count*.
+> **This example was unsound if `Record` was called from two threads**, for a
+> reason that only turned up when Standard.Concurrent was built on it: See §10:
+> `guard.Value()` retains the list, and that count was not atomic. Everything in
+> this section was right about the *lock* and wrong about the *count*. Counts
+> are atomic now, so the example is sound as written; the lifetime hole above,
+> which is about how long the borrow lives, is untouched by that.
 
 The notable thing about this design is that **it needs no new language surface**.
 Generic classes, destructors and interfaces all exist. Only the runtime
@@ -467,6 +485,21 @@ That is affordable in the spirit of §1: only a type that opts into sharing pays
 and every single-threaded program keeps exactly what it has today. It is a
 decision about the ARC model rather than a bug in the library, and it is not
 made here.
+
+> **Done, and not the way this paragraph proposed.** `[Shared]`-only atomics
+> does not close it: `Mutex<List<String>>` is the spec's own example, the
+> `Mutex` is `[Shared]` and the `List` inside it is not, and it is the List's
+> count that races. Soundness would need everything reachable from a `[Shared]`
+> type to be atomic, which in any program where the question arises is most of
+> the heap — and the type can be laundered anyway, since a job takes its
+> argument as a `byte*`.
+>
+> So every count is atomic. Reproduced first: sixteen threads returning
+> `guard.Value()` out of the lock crashed about one run in six, and does not in
+> twenty-five since. Measured: 1.45ns to 7.11ns per retain/release pair in
+> isolation, and 110ms to 320ms on a loop that does nothing else. The bill lands
+> on redundant traffic the compiler should not emit, which makes the +0/+1 pass
+> the next thing worth building rather than a nicety.
 
 The two already known: a `Guard` can outlive its lock (§4.2), and a job could
 retain a plain-data array it was only lent (§1.3). Both are lifetime questions
