@@ -66,8 +66,9 @@ clang. Startup cost is a C program's startup cost.
 
 **3. ARC, not GC.** `class` types are reference counted and destroyed
 deterministically. No collector, no pauses, no tracing thread — the entire
-runtime is [eight small C files](runtime/): reference counting, text, UTF-16,
-a string builder, arrays, reflection metadata, console output, and threads.
+runtime is [ten small C files](runtime/): reference counting, text, UTF-16, a
+string builder, arrays, reflection metadata, console output, threads, ordering
+and hashing, and files.
 
 **4. C/C++ ABI compatible.** A Stainless `struct` *is* a C struct, byte for byte.
 `extern "C"` calls into C and `export "C"` exposes functions back, with no
@@ -196,8 +197,9 @@ implement 'IDescribable'; it implements 'IComparable<Half>'
 
 ### Collections
 
-`Standard.Collections` is written in Stainless and compiled with your program,
-so importing it costs nothing until you instantiate something:
+`Standard.Collections` is written in Stainless and compiled with your program.
+A generic costs nothing until you instantiate it; a non-generic declaration is
+emitted either way — see the note on dead code below.
 
 ```csharp
 import Standard.Collections;
@@ -212,6 +214,19 @@ prices.Add(new Money(250));
 
 Sort(prices);              // where T : IComparable<T>
 Largest(prices);           // takes an IReadOnlyList<T>, so it cannot mutate
+```
+
+`List<T>`, `Dictionary<K, V>`, `HashSet<T>`, `Queue<T>`, `Stack<T>`,
+`LinkedList<T>` and `SortedList<K, V>`. A primitive, an enum and a `String`
+satisfy `IComparable<T>`, `IEquatable<T>` and `IHashable` without declaring it,
+which is what lets them be keys and be sorted:
+
+```csharp
+var ages = new Dictionary<String, int>();
+ages.Set("ada", 36);
+
+var numbers = new List<int>();
+Sort(numbers);
 ```
 
 `IList<T>` extends `IReadOnlyList<T>`, and interfaces are named with a leading
@@ -230,6 +245,8 @@ public attribute JsonIgnore { }
 public class Person {
     [JsonName("full_name")] public String Name;
     [JsonName("age")]       public int    Years;
+                            public bool   Active;
+                            public double Rating;
     [JsonIgnore]            public int    Internal;
 }
 ```
@@ -340,7 +357,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 48 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 104 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -422,12 +439,12 @@ objects on one side of it.
       v   Lexer -> Parser                       one file at a time, no #include
    syntax trees
       |
-      v   Binder, in nine whole-program passes:
+      v   Binder, in ten whole-program passes:
       |     1. declare modules        6. fold attributes to constants
       |     2. declare types          7. compute C-compatible layouts
       |     3. resolve imports        8. check bodies
-      |     4. resolve signatures     9. check whatever those instantiated
-      |        and field types
+      |     4. resolve signatures     9. order and check static initializers
+      |        and field types       10. check whatever those instantiated
       |     5. check that classes implement what they claim
       |
       |   Nothing may depend on declaration order, so every name in the
@@ -447,9 +464,9 @@ objects on one side of it.
 |---|---|
 | [Syntax/Lexer.cs](src/Stainless.Compiler/Syntax/Lexer.cs) | tokens; no preprocessor |
 | [Syntax/Parser.cs](src/Stainless.Compiler/Syntax/Parser.cs) | recursive descent + precedence climbing |
-| [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the nine passes, type checking, conversions, generic instantiation |
+| [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the ten passes, type checking, conversions, generic instantiation |
 | [Binding/TypeSystem.cs](src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
-| [Binding/Builtins.cs](src/Stainless.Compiler/Binding/Builtins.cs) | `String`, `StringBuilder` and the rest of `Standard.Text` |
+| [Binding/Builtins.cs](src/Stainless.Compiler/Binding/Builtins.cs) | `String`, `StringBuilder`, `[Flags]`, and the ordering and hashing a primitive gets for free |
 | [Binding/Mangler.cs](src/Stainless.Compiler/Binding/Mangler.cs) | symbol names |
 | [Emit/Win64Abi.cs](src/Stainless.Compiler/Emit/Win64Abi.cs) | struct passing: register, `byval`, or `sret` |
 | [Emit/LlvmEmitter.cs](src/Stainless.Compiler/Emit/LlvmEmitter.cs) | IR, retain/release insertion, metadata tables |
@@ -540,7 +557,8 @@ Everything below is covered by [the test suite](tests/cases).
 - `StringBuilder`: mutable text with amortised O(1) appends
 - `Standard.Threading`: `Mutex<T>` and its `Guard<T>` (the lock owns what it
   guards, and a destructor releases it), `AtomicLong`, `AtomicBool`, and
-  `TaskScope` for running `Job` delegates on the pool
+  `TaskScope` for running `Job` delegates on the pool. **`Mutex<T>` is sound
+  only for a plain `T`** — see the thread-safety note below
 - `Standard.Math`: the C library's floating point, plus `Abs`/`Min`/`Max`/
   `Clamp`/`Sign` overloaded across `int`, `long`, `nuint` and `double`,
   `IsNaN`/`IsInfinite`/`IsFinite`, `GreatestCommonDivisor`, and the bit
@@ -593,8 +611,13 @@ Being straight about the edges, roughly in the order they are worth adding:
   multi-byte character in half.
 - **No flow narrowing for `C?`.** Optionals can be stored, compared to `null`,
   and unwrapped with an explicit cast, but `if (x != null)` does not yet make
-  `x` usable as non-optional. `weak` has the same gap, though the runtime side
-  is fully implemented.
+  `x` usable as non-optional. This is the single most limiting gap: it is why
+  I/O returns a `Result<T>` rather than an optional, and why `LinkedList<T>`
+  links by index — a structure that walks `next` cannot be written at all.
+- **`weak` cannot be assigned.** A `weak C?` field can be declared and compared
+  to null, and the runtime side is complete, but there is no `C` → `weak C?`
+  conversion, so even `owner = other;` is rejected. Nothing can be stored in a
+  weak reference today.
 - **No class inheritance.** Interfaces extend one another, but classes do not,
   and there is no downcast from an interface back to a class.
 - **Reflection reads but does not write.** Fields can be read from an instance,
@@ -606,15 +629,32 @@ Being straight about the edges, roughly in the order they are worth adding:
   There is no `this[i]`, and `{ get; set; } = 5;` is rejected for the same
   reason a field initializer is. `p.X += 1` also needs a receiver that is a
   plain load, since the getter and the setter each evaluate it.
+- **Nothing prunes dead code.** Every stdlib module is compiled with your
+  program whether or not it is imported, and only generics are free — an
+  uninstantiated template emits nothing, but a non-generic function or class is
+  emitted either way. A hello-world binary carries 228 stdlib functions it
+  never calls and weighs 290 KB. Building the IR with `-ffunction-sections` and
+  linking with `/OPT:REF` brings that to 213 KB without any compiler change; a
+  reachability pass from `Main` would take out the rest.
 - **Unoptimized ARC.** Retain/release traffic is correct but redundant; a
   +0/+1 dataflow pass would remove most of it.
-- **Two thread-safety gaps remain, and both are about lifetimes.** What crosses
-  a thread is now checked by type, so an unsynchronized class cannot reach a
-  second thread at all. What is still unchecked is how long a borrowed thing
-  lives: a `Guard` can outlive the lock it proves, and a job could store an
-  array it was only lent. `[Shared]` is also an assertion rather than a proof,
-  the same bargain as Rust's `unsafe impl Sync`. Reference counts stay
-  non-atomic by design — see [docs/concurrency.md](docs/concurrency.md).
+- **`Mutex<T>` is unsound when `T` is a class shared between threads.**
+  `Guard.Value()` returns the guarded object, which retains it, and dropping
+  the result releases it — so two threads locking *in turn* still perform an
+  unsynchronized read-modify-write on that object's reference count. The lock
+  protects the contents; nothing protects the count, and it drifts down until
+  the object is freed while still held. `Mutex<long>` and other plain values
+  are unaffected. Closing it means atomic reference counts for `[Shared]`
+  types, which is a change to the ARC model rather than to the library. Every
+  container in `Standard.Concurrent` keeps its collection in a field and never
+  hands it out, which is why none of them is built on `Mutex<T>`.
+- **Two further thread-safety gaps, both about lifetimes.** What crosses a
+  thread is checked by type, so an unsynchronized class cannot reach a second
+  thread at all. What is unchecked is how long a borrowed thing lives: a
+  `Guard` can outlive the lock it proves, and a job could store an array it was
+  only lent. `[Shared]` is also an assertion rather than a proof, the same
+  bargain as Rust's `unsafe impl Sync`. See
+  [docs/concurrency.md](docs/concurrency.md).
 - **No cancellation beyond a shared flag.** An `AtomicBool` a job polls is the
   whole story; a `parallel` block always joins, and always will. See §9 of the
   concurrency notes for what is worth adding and what never will be.

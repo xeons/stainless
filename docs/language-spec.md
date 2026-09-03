@@ -760,9 +760,21 @@ public class List<T> {
 
 `Standard.Text` is built into the compiler, because `String` and
 `StringBuilder` need runtime support. Everything else is ordinary Stainless
-compiled alongside your program, which means a generic that nobody instantiates
-and a type that nobody names emit no code at all — importing a module costs
-nothing by itself.
+compiled alongside your program.
+
+**A generic that nobody instantiates costs nothing**, because there is nothing
+to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
+`Mutex<T>`, every container and every concurrent one.
+
+**A non-generic function or class is emitted whether or not it is used**, and
+that is a real cost the compiler should not be charging: every stdlib module is
+compiled with your program whether you import it or not, so a hello-world
+binary today carries 228 stdlib functions it never calls — 56 from
+`Standard.Math`, 52 from `Standard.IO`, and so on. Nothing prunes them: there
+is no reachability pass, and the emitted module is one object file, so the
+linker cannot drop them either. Compiling with `-ffunction-sections` and
+`/OPT:REF` recovers about a quarter of the binary, and a reachability pass from
+`Main` would recover the rest. Neither is done.
 
 | Module | Contents | Imported |
 |---|---|---|
@@ -803,6 +815,20 @@ without holding the lock and no way to forget which lock guards what. `lock
 (obj) { }` was rejected for the opposite reason: it would put a lock word in
 every object header and charge every single-threaded program for it.
 
+> **`Mutex<T>` is unsound when `T` is a class and the mutex is used from more
+> than one thread**, which the example above would be if `Record` were called
+> from two. `Value()` returns the guarded object, which retains it, and dropping
+> the result releases it — so two threads locking *in turn* still perform an
+> unsynchronized read-modify-write on that object's reference count. The lock
+> protects the contents; nothing protects the count, and it drifts down until
+> the object is freed while the mutex still holds it.
+>
+> `Mutex<long>` and other plain values are unaffected, because a plain value is
+> never retained. For a shared *object*, keep it in a field and never hand it
+> out — which is what every container in §5.6 does, and why none of them is
+> built on this type. Closing it properly means atomic reference counts for
+> `[Shared]` types; see [concurrency.md](concurrency.md).
+
 `AtomicLong` and `AtomicBool` are sequentially consistent counters and flags.
 They are concrete rather than `Atomic<T>` because atomics are not generic — that
 would need a constraint saying `T` is an integer, and Stainless constrains by
@@ -816,15 +842,15 @@ scope.Run(Work, (byte*)shared);
 scope.Join();                       // ~TaskScope() joins too, as a backstop
 ```
 
-**Two things this is not.** A job takes a `byte*` and casts it back, so nothing
-checks what crosses a thread; and keeping a `Guard` alive is a discipline, not a
-guarantee. See [concurrency.md](concurrency.md) for the model these are aiming
+**Two things this is not.** A `TaskScope` job takes a `byte*` and casts it back,
+so nothing checks what crosses that particular boundary — unlike `spawn`, where
+§9.5 applies; and keeping a `Guard` alive is a discipline, not a guarantee. See [concurrency.md](concurrency.md) for the model these are aiming
 at and which parts of it the compiler does not yet enforce.
 
-Unlike `Standard.Collections`, this module is not free when unused: `AtomicLong`,
-`AtomicBool` and `TaskScope` are ordinary classes, not templates, so their code
-is emitted whether or not a program mentions them. It costs about half a
-kilobyte.
+This module is not free when unused: `AtomicLong`, `AtomicBool` and `TaskScope`
+are ordinary classes rather than templates, so their code is emitted whether or
+not a program mentions them. That is true of every non-generic declaration in
+the standard library, and §5.1 says what it costs and why nothing prunes it.
 
 ### 5.3 Interfaces are named with a leading I
 
@@ -1395,6 +1421,8 @@ const int Limit = 64;   // compile-time constant
 if (y > 10) { ... } else { ... }
 while (y > 0) { y = y - 1; }
 for (int i = 0; i < 10; i = i + 1) { ... }
+foreach (int n in numbers) { ... }
+switch (y) { case 0: return 0; default: break; }
 return y;
 ```
 
@@ -1523,10 +1551,11 @@ Three rules are enforced, each for the same reason:
 | `spawn f(new Buffer())` | arguments are borrowed, and a temporary dies at the end of the statement, before the job runs |
 | assigning an outside variable in a `parallel for` body | every chunk would race on one slot; write through a captured array, or accumulate into an `AtomicLong` |
 
-What is **not** checked is everything else: nothing yet stops a job from sharing
-a mutable object with the thread that spawned it. See
-[concurrency.md](concurrency.md) for the model that is being aimed at, and
-which parts of it the compiler enforces today.
+*What* may cross into a job is checked separately, by type, and is the rule in
+§9.5: plain data, a `String`, a `[Shared]` class, or an array of plain data.
+What is still unchecked is how long a borrowed thing lives — see
+[concurrency.md](concurrency.md) for the model being aimed at and which parts
+of it the compiler enforces today.
 
 ### 9.3 `static readonly`
 
@@ -1632,6 +1661,8 @@ do not, because both belong to one thread. It is the same bargain Rust's
 `unsafe impl Sync` makes, and the only place in this design where a human
 promise stands in for a check.
 
-Two gaps remain, and both are about lifetimes rather than types: a `Guard` can
+Three gaps remain. Two are about lifetimes rather than types: a `Guard` can
 outlive the lock it proves, and a job could store an array it was only lent.
-Neither is closed yet; see [concurrency.md](concurrency.md).
+The third is not about either — `Mutex<T>` races on the reference count of what
+it guards whenever that is a class (§5.2). None is closed yet; see
+[concurrency.md](concurrency.md).

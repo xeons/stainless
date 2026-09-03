@@ -172,11 +172,20 @@ that friction.
 ### Name mangling grammar
 
 ```
-mangled  := "_SL" path params "E" ret
+mangled  := "_SL" path targs? params "z"? "E" ret
 path     := (len ident)+                    ; module segments, then the name
+targs    := "G" count type+                 ; an instantiated generic's arguments
 params   := type* | "v"                     ; "v" when there are none
-type     := prim | "P" type | "C" len ident | "S" len ident | "I" len ident
-          | "O" type | "W" type          ; optional, weak
+type     := prim
+          | "P" type                        ; pointer
+          | "A" type                        ; array
+          | "O" type                        ; optional
+          | "W" type                        ; weak
+          | "C" len ident                   ; class
+          | "S" len ident                   ; struct
+          | "I" len ident                   ; interface
+          | "E" len ident                   ; enum
+          | "D" len ident                   ; delegate
 prim     := a  sbyte    s  short    i  int      l  long
           | h  byte     t  ushort   j  uint     m  ulong
           | n  nint     y  nuint    f  float    d  double
@@ -184,7 +193,19 @@ prim     := a  sbyte    s  short    i  int      l  long
 ```
 
 `len` is the decimal length of the identifier that follows, so the grammar
-needs no separators: `App.Math.Add` becomes `3App4Math3Add`.
+needs no separators: `App.Math.Add` becomes `3App4Math3Add`. A constructor is
+named `4ctor` and a destructor `4dtor`. A variadic function has `z` before the
+terminator.
+
+`E` is both the enum prefix and the terminator before the return type, and the
+two never collide: an enum is always followed by a decimal length, and the
+terminator is always followed by a type code, which is never a digit.
+
+An instantiated generic carries its type arguments, so `Box<int>` and
+`Box<String>` produce different symbols even where the parameters alone would
+not tell their methods apart. A class's simple name arrives here as
+`Box<int>`, which a linker symbol may not contain, so every non-alphanumeric
+character in a qualified name becomes `_`.
 
 ## 4. Static storage
 

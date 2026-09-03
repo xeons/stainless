@@ -269,6 +269,11 @@ The lock is tied to the data it protects, so there is no way to reach the list
 without holding the lock, and no way to forget which lock guards what. Unlocking
 is a destructor, so ARC already does it — including on an early `return`.
 
+> **And this example is unsound if `Record` is called from two threads**, for a
+> reason that only turned up when Standard.Concurrent was built on it. See §10:
+> `guard.Value()` retains the list, and that count is not atomic. Everything in
+> this section is right about the *lock*; it is wrong about the *count*.
+
 The notable thing about this design is that **it needs no new language surface**.
 Generic classes, destructors and interfaces all exist. Only the runtime
 primitives in §5 are missing. Locking can therefore ship before closures, before
@@ -303,9 +308,11 @@ platform — Win32 today, pthreads behind the same interface, matching the
 | condition | `CONDITION_VARIABLE` | `pthread_cond_t` |
 | atomics | clang `__atomic_*` builtins | same |
 
-A mutex is also available on the heap, as `sl_mutex_new` / `sl_mutex_free`,
-because a Stainless class cannot embed an `SlMutex`: its size is a platform
-detail the language is never told.
+A mutex is also available on the heap, as `sl_mutex_new` / `sl_mutex_free`, and
+a condition variable as `sl_condition_new` / `sl_condition_free`, because a
+Stainless class cannot embed either: their sizes are platform details the
+language is never told. A class holds the handle in a `byte*` instead, which is
+how `Channel<T>` waits.
 
 `SRWLOCK` is chosen over `CRITICAL_SECTION`: it is pointer-sized, needs no
 initialization or destruction call, and is faster uncontended. It is not
