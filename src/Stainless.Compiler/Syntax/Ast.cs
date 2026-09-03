@@ -320,6 +320,29 @@ public sealed record SpawnSyntax(
     ExpressionSyntax? Target,
     ExpressionSyntax Call) : StatementSyntax(Span);
 
+/// <summary>
+/// One labelled section of a <c>switch</c>. Several labels may stack onto one
+/// body, and <c>default</c> is one of them — spelled as a flag rather than an
+/// expression, because it matches by position rather than by value.
+/// </summary>
+public sealed record SwitchSectionSyntax(
+    SourceSpan Span,
+    IReadOnlyList<ExpressionSyntax> Labels,
+    bool HasDefault,
+    IReadOnlyList<StatementSyntax> Statements) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>switch (value) { case 1: ... break; default: ... break; }</c>.
+///
+/// Sections do not fall through: each one has to end by leaving, as in C#. The
+/// gain is that the reader never has to check whether a missing <c>break</c>
+/// was deliberate.
+/// </summary>
+public sealed record SwitchSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Value,
+    IReadOnlyList<SwitchSectionSyntax> Sections) : StatementSyntax(Span);
+
 public sealed record ReturnSyntax(SourceSpan Span, ExpressionSyntax? Value) : StatementSyntax(Span);
 
 public sealed record BreakSyntax(SourceSpan Span) : StatementSyntax(Span);

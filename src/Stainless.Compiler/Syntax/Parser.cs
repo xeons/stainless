@@ -851,6 +851,9 @@ public sealed class Parser
                 return new ForEachSyntax(SpanFrom(start), elementType, name, collection, loopBody);
             }
 
+            case TokenKind.SwitchKeyword:
+                return ParseSwitch(start);
+
             case TokenKind.ReturnKeyword:
             {
                 Advance();
@@ -879,6 +882,60 @@ public sealed class Parser
     }
 
     /// <summary>A local declaration or an expression statement.</summary>
+    /// <summary>
+    /// <c>switch (value) { case ...: ... }</c>. Labels stack: every <c>case</c>
+    /// and <c>default</c> written before the first statement belongs to the
+    /// same section, which is how <c>case 1: case 2:</c> shares one body.
+    /// </summary>
+    private StatementSyntax ParseSwitch(int start)
+    {
+        Expect(TokenKind.SwitchKeyword);
+        Expect(TokenKind.OpenParen);
+        var value = ParseExpression();
+        Expect(TokenKind.CloseParen);
+        Expect(TokenKind.OpenBrace);
+
+        var sections = new List<SwitchSectionSyntax>();
+
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int sectionStart = _pos;
+            var labels = new List<ExpressionSyntax>();
+            bool hasDefault = false;
+
+            while (AtAny(TokenKind.CaseKeyword, TokenKind.DefaultKeyword))
+            {
+                if (Match(TokenKind.DefaultKeyword)) hasDefault = true;
+                else { Advance(); labels.Add(ParseExpression()); }
+                Expect(TokenKind.Colon);
+            }
+
+            if (labels.Count == 0 && !hasDefault)
+            {
+                _diagnostics.Error("SL0402", Current.Span,
+                    "expected 'case' or 'default'; every statement in a switch belongs to a " +
+                    "labelled section");
+                Advance();
+                continue;
+            }
+
+            var statements = new List<StatementSyntax>();
+            while (!AtAny(TokenKind.CaseKeyword, TokenKind.DefaultKeyword,
+                          TokenKind.CloseBrace, TokenKind.EndOfFile))
+            {
+                int before = _pos;
+                statements.Add(ParseStatement());
+                if (_pos == before) Advance();
+            }
+
+            sections.Add(new SwitchSectionSyntax(
+                SpanFrom(sectionStart), labels, hasDefault, statements));
+        }
+
+        Expect(TokenKind.CloseBrace);
+        return new SwitchSyntax(SpanFrom(start), value, sections);
+    }
+
     private StatementSyntax ParseSimpleStatement(bool requireSemicolon)
     {
         int start = _pos;

@@ -8,5 +8,8 @@ found=42
 statics=20 40 41
 property=Ada#7 3
 thermostat=212 373
+flags=1 1 7
+switch=severe fatal
+sections=312
 pixels=225
 done

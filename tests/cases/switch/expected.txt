@@ -1,0 +1,8 @@
+levels=low warning severe fatal
+parity=even odd big
+rank=1 2 3
+count=312
+nested=012| other
+char=second
+flag=yes
+done

@@ -345,8 +345,35 @@ var mixed = Color.Red + Color.Green;    // rejected; colours do not add
 
 Comparison is allowed because an ordered enum — a severity, a log level — is
 the common case, and `level >= Level.Warning` is what people write. Arithmetic
-is not, because adding two colours means nothing. Bit flags would need a way to
-say that an enum is a set rather than a choice, and there is no such marker yet.
+is not, because adding two colours means nothing.
+
+**`[Flags]` says the members are bits rather than alternatives.**
+
+```csharp
+[Flags]
+public enum Access : byte {
+    None = 0, Read = 1, Write = 2, Execute = 4, All = 7,
+}
+
+var mode = Access.Read | Access.Write;
+var readOnly = mode & ~Access.Write;
+mode ^= Access.Execute;
+
+if (mode.HasFlag(Access.Read)) { ... }
+```
+
+`|`, `&`, `^` and `~` are available on a `[Flags]` enum and on no other, and
+they produce that same enum rather than its number — so a set of flags stays as
+strongly typed as a single one. On an enum without the marker they are rejected,
+and the error suggests the marker.
+
+`HasFlag(f)` is `(value & f) == f` written out, which is why it means *all* the
+named bits and not any of them. It is the one member an enum has: enums declare
+no methods, so this is the language spelling the test rather than a call.
+
+`[Flags]` needs no import. It is a rule about enums rather than a library to opt
+into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
+belong to.
 
 ### 2.8 `delegate` — a named function pointer
 
@@ -441,7 +468,7 @@ which is the only thing that knows them. A lambda with no target is an error —
 `var f = x => x;` has nothing to infer from.
 
 A closure is a class, so it may not cross a thread boundary unless it is marked
-`[Shared]` (§9.4). That is the correct answer rather than an oversight: a
+`[Shared]` (§9.5). That is the correct answer rather than an oversight: a
 closure holds captured state, and nothing synchronizes it.
 
 ## 3. Text
@@ -1184,7 +1211,60 @@ anything computed still does.
 
 A string literal has type `String`; see section 3.
 
-### 9.1 `parallel`, `spawn` and `parallel for`
+### 9.1 `switch`
+
+```csharp
+switch (level) {
+    case Level.Low:     return "low";
+    case Level.Warning: return "warning";
+    case Level.Severe:  return "severe";
+    default:            return "fatal";
+}
+```
+
+The value may be an integer, a `char`, a `bool`, an enum or a `String`; every
+label must be a constant of that type, and no two may name the same value.
+An enum, integer, char or bool switch becomes one LLVM `switch` instruction,
+which decides for itself whether a jump table beats a chain of comparisons.
+A `String` switch compares in order against the runtime's string equality.
+
+**Sections do not fall through.** Each one has to end by leaving — `break`,
+`return` or `continue` — and running off the end is an error rather than a
+silent jump into the next section. Values that share a body stack their labels:
+
+```csharp
+case 0:
+case 2:
+case 4:
+    return "even";
+```
+
+**`break` belongs to the switch, `continue` passes through it.** A `continue`
+written inside a switch inside a loop continues the loop, as in C#; a `break`
+leaves the switch and not the loop. With no enclosing loop, `continue` in a
+switch has nothing to continue and is rejected.
+
+```csharp
+for (nuint i = 0; i < values.Length; i = i + 1) {
+    switch (values[i]) {
+        case -1: continue;      // next iteration, skipping the rest of the body
+        case 0:  break;         // out of the switch, into the rest of the body
+        default: total = total + values[i]; break;
+    }
+    total = total + 100;
+}
+```
+
+A `default` is optional; without one, a value that matches nothing simply falls
+past the whole statement. There is no exhaustiveness requirement on an enum, and
+no `goto case`. Each section has its own scope, so two sections may declare the
+same local name — which C# does not allow, having put the whole switch in one
+scope.
+
+There is no `switch` *expression* and no pattern matching; this is the C#
+statement, and only that.
+
+### 9.2 `parallel`, `spawn` and `parallel for`
 
 ```csharp
 int left  = 0;
@@ -1241,7 +1321,7 @@ a mutable object with the thread that spawned it. See
 [concurrency.md](concurrency.md) for the model that is being aimed at, and
 which parts of it the compiler enforces today.
 
-### 9.2 `static readonly`
+### 9.3 `static readonly`
 
 ```csharp
 public static readonly int Base = 20;
@@ -1254,7 +1334,7 @@ without `readonly`.** A plainly mutable global is shared state that nothing
 synchronizes, so the language does not have one; mutation goes through a type
 that says how it is safe, and `static int Counter = 0;` is an error that says so.
 
-Which types are allowed is the rule in §9.4: plain data, a `String`, or a class
+Which types are allowed is the rule in §9.5: plain data, a `String`, or a class
 marked `[Shared]`. `static readonly List<int>` is rejected, and the error points
 at `Mutex<T>`.
 
@@ -1280,7 +1360,7 @@ C++'s static *destruction* order problem as well.
 A `--shared` library has no entry point to initialize statics from, so a static
 in one is an error rather than a silently zeroed global.
 
-### 9.3 `foreach`
+### 9.4 `foreach`
 
 ```csharp
 foreach (int n in numbers) { total = total + n; }
@@ -1313,7 +1393,7 @@ loop, so a managed element is released at the end of each iteration rather than
 piling up until the loop ends. `break` and `continue` behave as in any other
 loop; `continue` advances the enumerator.
 
-### 9.4 What may cross a thread boundary
+### 9.5 What may cross a thread boundary
 
 Checked wherever a value can reach a second thread: a `spawn` argument or
 receiver, a `parallel for` capture, and a `static readonly`.

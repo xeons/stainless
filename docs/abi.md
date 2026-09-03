@@ -74,7 +74,9 @@ traffic. String literals are emitted this way.
 
 An **enum** is exactly its underlying integer — `int` unless another is named.
 There is no wrapper and no tag, which is what lets it line up with the C enum
-or integer it corresponds to.
+or integer it corresponds to. `[Flags]` changes what the compiler will let you
+write and nothing about the bytes, so a flags enum is the same integer a C
+bitmask is.
 
 A **delegate** is one pointer using the platform C calling convention: it *is*
 a C function pointer, and a generated header declares it as one. It carries no

@@ -30,6 +30,7 @@ public enum TokenKind
 
     // Statement keywords
     IfKeyword, ElseKeyword, WhileKeyword, ForKeyword, ForeachKeyword, InKeyword,
+    SwitchKeyword, CaseKeyword, DefaultKeyword,
     ParallelKeyword, SpawnKeyword,
     ReturnKeyword, BreakKeyword, ContinueKeyword,
     VarKeyword, ConstKeyword, WhereKeyword, StaticKeyword, ReadonlyKeyword,
@@ -86,6 +87,9 @@ public static class TokenKindExtensions
         TokenKind.ForKeyword => "for",
         TokenKind.ForeachKeyword => "foreach",
         TokenKind.InKeyword => "in",
+        TokenKind.SwitchKeyword => "switch",
+        TokenKind.CaseKeyword => "case",
+        TokenKind.DefaultKeyword => "default",
         TokenKind.ParallelKeyword => "parallel",
         TokenKind.SpawnKeyword => "spawn",
         TokenKind.ReturnKeyword => "return",

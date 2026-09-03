@@ -104,6 +104,13 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private readonly List<Dictionary<string, LocalSymbol>> _scopes = [];
     private int _loopDepth;
 
+    /// <summary>
+    /// How many <c>switch</c> statements enclose what is being bound. Separate
+    /// from the loop depth because a switch is a target for <c>break</c> but not
+    /// for <c>continue</c>, which passes straight through it to the loop.
+    /// </summary>
+    private int _switchDepth;
+
     public BoundProgram Bind(IReadOnlyList<CompilationUnitSyntax> units)
     {
         _builtins.RegisterInto(_modules);
@@ -1037,6 +1044,17 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     {
         var reflect = ReflectAttribute;
 
+        // Enums live in their own table, and until [Flags] there was nothing an
+        // attribute on one could mean -- so they were silently dropped.
+        foreach (var (type, entry) in _enumSyntax)
+            BindAttributes(entry.Declaration.Attributes, type.Attributes, entry.Scope, type.Name);
+
+        foreach (var (type, entry) in _typeSyntax)
+            if (entry.Declaration.Attributes.Count > 0 &&
+                entry.Declaration.Attributes.Any(a => a.Name.Last == "Flags"))
+                diagnostics.Error("SL0411", entry.Declaration.Span,
+                    $"'[Flags]' says an enum's members combine as bits; '{type.Name}' is not an enum");
+
         foreach (var (type, entry) in _typeSyntax)
         {
             BindAttributes(entry.Declaration.Attributes, type.Attributes, entry.Scope, type.Name);
@@ -1615,6 +1633,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         _currentFunction = function;
         _scopes.Clear();
         _loopDepth = 0;
+        _switchDepth = 0;
 
         PushScope();
         var body = BindBlock(function.Body);
@@ -1663,12 +1682,22 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         // `while (true)` without a break never falls through.
         BoundWhile { Condition: BoundLiteral { Value: true } } loop => !ContainsBreak(loop.Body),
         BoundFor { Condition: null } loop => !ContainsBreak(loop.Body),
+
+        // Every arm returns and no value escapes them, so nothing reaches the
+        // statement after the switch.
+        BoundSwitch chosen =>
+            chosen.Sections.Any(s => s.IsDefault) &&
+            chosen.Sections.All(s => AlwaysReturns(s.Body)),
+
         _ => false,
     };
 
     private static bool ContainsBreak(BoundStatement statement) => statement switch
     {
         BoundBreak => true,
+
+        // A break inside a nested switch belongs to that switch, not to us.
+        BoundSwitch => false,
         BoundBlock block => block.Statements.Any(ContainsBreak),
         BoundIf ifStatement => ContainsBreak(ifStatement.Then) ||
                                (ifStatement.Else is not null && ContainsBreak(ifStatement.Else)),
@@ -1730,6 +1759,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         ParallelForSyntax parallelFor => BindParallelFor(parallelFor),
         SpawnSyntax spawn => BindSpawn(spawn),
         ReturnSyntax returnStatement => BindReturn(returnStatement),
+        SwitchSyntax switchStatement => BindSwitch(switchStatement),
         BreakSyntax breakStatement => BindBreak(breakStatement),
         ContinueSyntax continueStatement => BindContinue(continueStatement),
         _ => new BoundBlock(syntax.Span, []),
@@ -1995,13 +2025,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     private BoundStatement BindParallel(ParallelSyntax syntax)
     {
         int enclosingLoops = _loopDepth;
+        int enclosingSwitches = _switchDepth;
         _loopDepth = 0;
+        _switchDepth = 0;
         _parallelDepth++;
 
         var body = BindBlock(syntax.Body);
 
         _parallelDepth--;
         _loopDepth = enclosingLoops;
+        _switchDepth = enclosingSwitches;
 
         return new BoundParallel(syntax.Span, body);
     }
@@ -2078,13 +2111,16 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         PushScope();
 
         int enclosingLoops = _loopDepth;
+        int enclosingSwitches = _switchDepth;
         _loopDepth = 0;
+        _switchDepth = 0;
         _parallelDepth++;
 
         var result = BindParallelForCore(syntax);
 
         _parallelDepth--;
         _loopDepth = enclosingLoops;
+        _switchDepth = enclosingSwitches;
 
         PopScope();
         return result;
@@ -2306,6 +2342,14 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     /// <summary>True when the type carries <c>[Shared]</c>.</summary>
     private static bool IsShared(NamedTypeSymbol type) =>
         type.Attributes.Any(a => a.Type.SimpleName == "Shared");
+
+    /// <summary>
+    /// True for an enum marked <c>[Flags]</c>: a set of bits rather than a
+    /// choice among alternatives, and so something <c>|</c> can combine.
+    /// </summary>
+    private bool IsFlags(TypeSymbol type) =>
+        type is EnumTypeSymbol enumType &&
+        enumType.Attributes.Any(a => a.Type == _builtins.Flags);
 
     /// <summary>
     /// Reports a value that would be reachable from two threads at once.
@@ -2661,11 +2705,13 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
         var savedFunction = _currentFunction;
         int savedLoops = _loopDepth;
+        int savedSwitches = _switchDepth;
         int savedParallel = _parallelDepth;
 
         _scopes.Clear();
         _currentFunction = symbol;
         _loopDepth = 0;
+        _switchDepth = 0;
         _parallelDepth = 0;
         _closures.Add(context);
 
@@ -2699,10 +2745,166 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
         _scopes.AddRange(savedScopes);
         _currentFunction = savedFunction;
         _loopDepth = savedLoops;
+        _switchDepth = savedSwitches;
         _parallelDepth = savedParallel;
 
         return body;
     }
+
+    /// <summary>
+    /// Binds a switch: one governing value, and sections whose labels are
+    /// constants of its type.
+    ///
+    /// A reference-typed governor is spilled into a hidden local first. The
+    /// comparisons span several basic blocks, and a local is owned storage the
+    /// ordinary scope machinery releases on every path out — including a
+    /// <c>return</c> from the middle of a section.
+    /// </summary>
+    private BoundStatement BindSwitch(SwitchSyntax syntax)
+    {
+        var value = BindExpression(syntax.Value);
+        if (value.Type.IsError()) return new BoundBlock(syntax.Span, []);
+
+        bool onText = _builtins.IsString(value.Type);
+        bool onOrdinal = value.Type is PrimitiveTypeSymbol { IsInteger: true } or EnumTypeSymbol
+                         || value.Type.IsBool();
+
+        if (!onText && !onOrdinal)
+        {
+            diagnostics.Error("SL0403", syntax.Value.Span,
+                $"'{value.Type.Name}' cannot be switched on; a switch needs a value with " +
+                "constant labels, so it takes an integer, 'char', 'bool', an enum or a String");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        // The value is compared in one block and used in several, so a String
+        // has to outlive the comparison chain. A local does that for free.
+        BoundLocalDeclaration? spill = null;
+        if (value.Type.NeedsArc())
+        {
+            var held = DeclareLocal(
+                SyntheticName("switch"), value.Type, isConst: true, syntax.Value.Span);
+            spill = new BoundLocalDeclaration(syntax.Value.Span, held, value);
+            value = new BoundLocalAccess(syntax.Value.Span, held);
+        }
+
+        var sections = new List<BoundSwitchSection>();
+        var seenOrdinals = new Dictionary<ulong, SourceSpan>();
+        var seenText = new Dictionary<string, SourceSpan>(StringComparer.Ordinal);
+        bool sawDefault = false;
+
+        _switchDepth++;
+
+        foreach (var section in syntax.Sections)
+        {
+            var labels = new List<BoundExpression>();
+
+            foreach (var label in section.Labels)
+            {
+                var bound = BindConversion(BindExpression(label), value.Type, label.Span);
+                if (bound.Type.IsError()) continue;
+
+                if (onText)
+                {
+                    if (Underlying(bound) is not BoundStringLiteral text)
+                    {
+                        diagnostics.Error("SL0404", label.Span,
+                            "a 'case' label must be a constant, and this is not a string literal");
+                        continue;
+                    }
+
+                    if (!seenText.TryAdd(text.Value, label.Span))
+                        diagnostics.Error("SL0405", label.Span,
+                            $"this switch already has a case for \"{text.Value}\"");
+                    else
+                        labels.Add(text);
+
+                    continue;
+                }
+
+                if (FoldSwitchLabel(bound) is not { } bits)
+                {
+                    diagnostics.Error("SL0404", label.Span,
+                        $"a 'case' label must be a constant of type '{value.Type.Name}', " +
+                        "and this is not one");
+                    continue;
+                }
+
+                if (!seenOrdinals.TryAdd(bits, label.Span))
+                    diagnostics.Error("SL0405", label.Span,
+                        "this switch already has a case for that value");
+                else
+                    // The folded value, not the expression it was written as:
+                    // `case -1:` is a negation, and an LLVM switch arm has to
+                    // be a constant rather than an instruction.
+                    labels.Add(new BoundLiteral(label.Span, value.Type, bits));
+            }
+
+            if (section.HasDefault)
+            {
+                if (sawDefault)
+                    diagnostics.Error("SL0406", section.Span,
+                        "this switch already has a 'default' section");
+                sawDefault = true;
+            }
+
+            PushScope();
+            var body = new BoundBlock(section.Span,
+                section.Statements.Select(BindStatement).ToList());
+            PopScope();
+
+            // No fall-through, as in C#. A section that runs off its end is
+            // almost always a forgotten 'break', and the reader of one that
+            // meant it has no way to tell.
+            if (!AlwaysExits(body))
+                diagnostics.Error("SL0407", section.Span,
+                    "a switch section must not run off its end; finish it with 'break', " +
+                    "'return' or 'continue'. Stack the labels instead, as in " +
+                    "'case 1: case 2:', when two values share a body");
+
+            sections.Add(new BoundSwitchSection(
+                section.Span, labels, section.HasDefault, body));
+        }
+
+        _switchDepth--;
+
+        BoundStatement result = new BoundSwitch(syntax.Span, value, sections);
+        return spill is null
+            ? result
+            : new BoundBlock(syntax.Span, [spill, result]);
+    }
+
+    /// <summary>
+    /// The raw bits of a constant switch label, or null when it is not one.
+    /// Negative literals arrive as a negation of a positive one, which is why
+    /// this looks through a unary minus rather than only at literals.
+    /// </summary>
+    private static ulong? FoldSwitchLabel(BoundExpression expression) => Underlying(expression) switch
+    {
+        BoundLiteral { Value: ulong bits } => bits,
+        BoundLiteral { Value: bool flag } => flag ? 1UL : 0UL,
+        BoundLiteral { Value: char character } => character,
+        BoundUnary { Operator: BoundUnaryOp.Negate, Operand: var operand }
+            when FoldSwitchLabel(operand) is { } magnitude => unchecked((ulong)-(long)magnitude),
+        BoundConstantAccess { Constant.Value: ulong bits } => bits,
+        BoundConstantAccess { Constant.Value: bool flag } => flag ? 1UL : 0UL,
+        BoundConstantAccess { Constant.Value: char character } => character,
+        _ => null,
+    };
+
+    /// <summary>
+    /// Whether a statement always leaves the section it is in. Wider than
+    /// <see cref="AlwaysReturns"/> by exactly <c>break</c> and <c>continue</c>,
+    /// and it stops at a loop, whose own <c>break</c> lands after the loop
+    /// rather than out of the section.
+    /// </summary>
+    private static bool AlwaysExits(BoundStatement statement) => statement switch
+    {
+        BoundBreak or BoundContinue => true,
+        BoundBlock block => block.Statements.Any(AlwaysExits),
+        BoundIf { Else: not null } branch => AlwaysExits(branch.Then) && AlwaysExits(branch.Else),
+        _ => AlwaysReturns(statement),
+    };
 
     private BoundStatement BindReturn(ReturnSyntax syntax)
     {
@@ -2737,8 +2939,9 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
 
     private BoundStatement BindBreak(BreakSyntax syntax)
     {
-        if (_loopDepth == 0)
-            diagnostics.Error("SL0225", syntax.Span, "'break' is only valid inside a loop");
+        if (_loopDepth == 0 && _switchDepth == 0)
+            diagnostics.Error("SL0225", syntax.Span,
+                "'break' is only valid inside a loop or a switch");
         return new BoundBreak(syntax.Span);
     }
 
@@ -2924,7 +3127,7 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 operand.Type is PrimitiveTypeSymbol { IsNumeric: true }),
             TokenKind.Bang => (BoundUnaryOp.LogicalNot, operand.Type.IsBool()),
             TokenKind.Tilde => (BoundUnaryOp.BitwiseNot,
-                operand.Type is PrimitiveTypeSymbol { IsInteger: true }),
+                operand.Type is PrimitiveTypeSymbol { IsInteger: true } || IsFlags(operand.Type)),
             _ => (BoundUnaryOp.Negate, false),
         };
 
@@ -3037,6 +3240,8 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 or BoundBinaryOp.Less or BoundBinaryOp.LessEqual
                 or BoundBinaryOp.Greater or BoundBinaryOp.GreaterEqual;
 
+            bool bitwise = op is BoundBinaryOp.BitAnd or BoundBinaryOp.BitOr or BoundBinaryOp.BitXor;
+
             if (!left.Type.Equals(right.Type))
             {
                 diagnostics.Error("SL0353", span,
@@ -3045,11 +3250,19 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
                 return new BoundErrorExpression(span);
             }
 
+            // A set of bits combines; a choice among alternatives does not. The
+            // attribute is what says which one this enum is.
+            if (bitwise && IsFlags(left.Type))
+                return new BoundBinary(span, left.Type, left, op, right);
+
             if (!comparison)
             {
                 diagnostics.Error("SL0354", span,
                     $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}'; " +
-                    "an enum supports comparison, not arithmetic");
+                    (bitwise
+                        ? $"'{left.Type.Name}' is a choice among alternatives, not a set of bits. " +
+                          "Mark it '[Flags]' if its members are meant to combine"
+                        : "an enum supports comparison, not arithmetic"));
                 return new BoundErrorExpression(span);
             }
 
@@ -3413,16 +3626,23 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
     }
 
     /// <summary>
-    /// True when evaluating this expression again has no consequences: it names
-    /// storage and reads it, rather than doing anything.
+    /// True when evaluating this expression again has no consequences: it reads
+    /// storage or computes from constants, rather than doing anything.
+    ///
+    /// A call is deliberately absent, which is what makes this useful: it is
+    /// exactly the question a lowering has to ask before naming its operand
+    /// twice.
     /// </summary>
     private static bool IsRepeatable(BoundExpression expression) => expression switch
     {
+        BoundLiteral or BoundStringLiteral or BoundNullLiteral or BoundConstantAccess => true,
         BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
         BoundFieldAccess field => field.Receiver is null || IsRepeatable(field.Receiver),
         BoundDereference dereference => IsRepeatable(dereference.Operand),
         BoundAddressOf address => IsRepeatable(address.Operand),
         BoundConversion conversion => IsRepeatable(conversion.Operand),
+        BoundUnary unary => IsRepeatable(unary.Operand),
+        BoundBinary binary => IsRepeatable(binary.Left) && IsRepeatable(binary.Right),
         _ => false,
     };
 
@@ -3895,6 +4115,12 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // An enum has no methods, so `HasFlag` is the language spelling the test
+        // out rather than a member being called: it becomes `(value & f) == f`,
+        // which is the same thing written by hand and costs the same.
+        if (receiver.Type is EnumTypeSymbol flagsEnum && member.Member == "HasFlag")
+            return BindHasFlag(syntax, member, receiver, flagsEnum, arguments);
+
         if (receiver.Type is not NamedTypeSymbol namedType)
         {
             diagnostics.Error("SL0255", member.Span,
@@ -3959,6 +4185,53 @@ public sealed class Binder(DiagnosticBag diagnostics, bool requireEntryPoint = t
             receiver = new BoundAddressOf(member.Span, new PointerTypeSymbol(namedType), receiver);
 
         return BuildCall(syntax, method, receiver, arguments);
+    }
+
+    /// <summary>
+    /// Lowers <c>value.HasFlag(f)</c> to <c>(value &amp; f) == f</c>.
+    ///
+    /// The flag is named twice by the lowering, so it has to be something that
+    /// can be read twice. In practice it is always a member of the enum.
+    /// </summary>
+    private BoundExpression BindHasFlag(
+        CallSyntax syntax, MemberAccessSyntax member, BoundExpression receiver,
+        EnumTypeSymbol enumType, List<BoundExpression> arguments)
+    {
+        if (!IsFlags(enumType))
+        {
+            diagnostics.Error("SL0408", member.Span,
+                $"'{enumType.Name}' is a choice among alternatives, so it holds one value " +
+                "rather than a set of them; mark it '[Flags]' if its members are meant to combine");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (arguments.Count != 1)
+        {
+            diagnostics.Error("SL0409", syntax.Span,
+                $"'HasFlag' takes one '{enumType.Name}', but {arguments.Count} arguments were given");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var flag = arguments[0];
+        if (!flag.Type.Equals(enumType))
+        {
+            if (!flag.Type.IsError())
+                diagnostics.Error("SL0409", syntax.Arguments[0].Span,
+                    $"'HasFlag' takes one '{enumType.Name}', but this is '{flag.Type.Name}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (!IsRepeatable(flag))
+        {
+            diagnostics.Error("SL0410", syntax.Arguments[0].Span,
+                "the flag is tested against itself, so it is read twice; " +
+                "put this in a variable first");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var masked = new BoundBinary(syntax.Span, enumType, receiver, BoundBinaryOp.BitAnd, flag);
+        return new BoundBinary(
+            syntax.Span, PrimitiveTypeSymbol.Bool, masked, BoundBinaryOp.Equal, flag);
     }
 
     private List<FunctionSymbol> ResolveFunctionCandidates(QualifiedName name)

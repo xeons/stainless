@@ -46,6 +46,35 @@ int Search(int[] data, int from, int upto, AtomicBool stop) {
     return -1;
 }
 
+// --- spec 2.7 flags enums -------------------------------------------------
+[Flags]
+public enum Access : byte {
+    None = 0, Read = 1, Write = 2, Execute = 4, All = 7,
+}
+
+// --- spec 9.1 switch ------------------------------------------------------
+String Name(Level level) {
+    switch (level) {
+        case Level.Low:     return "low";
+        case Level.Warning: return "warning";
+        case Level.Severe:  return "severe";
+        default:            return "fatal";
+    }
+}
+
+int SkipAndStop(int[] values) {
+    int total = 0;
+    for (nuint i = 0; i < values.Length; i = i + 1) {
+        switch (values[i]) {
+            case -1: continue;
+            case 0:  break;
+            default: total = total + values[i]; break;
+        }
+        total = total + 100;
+    }
+    return total;
+}
+
 // --- spec 7.2 properties --------------------------------------------------
 public interface INamed {
     String Name { get; }
@@ -123,6 +152,21 @@ int Main() {
     var thermostat = new Thermostat(0);
     thermostat.Fahrenheit = 212;
     printf("thermostat=%d %d\n", thermostat.Fahrenheit, thermostat.Kelvin);
+
+    var mode = Access.Read | Access.Write;
+    var readOnly = mode & ~Access.Write;
+    mode ^= Access.Execute;
+    printf("flags=%d %d %d\n",
+        mode.HasFlag(Access.Read) ? 1 : 0, (int)readOnly, (int)mode);
+
+    printf("switch=%s %s\n", Name(Level.Severe).ToPointer(), Name(Level.Fatal).ToPointer());
+
+    var counted = new int[4];
+    counted[0] = 5;
+    counted[1] = -1;
+    counted[2] = 0;
+    counted[3] = 7;
+    printf("sections=%d\n", SkipAndStop(counted));
 
     var pixels = new int[16];
     parallel for (int i = 0; i < 16; i = i + 1) { pixels[i] = i * i; }

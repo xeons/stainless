@@ -469,6 +469,35 @@ public sealed class BoundParallelFor(
     public IReadOnlyList<object> Captures { get; } = captures;
 }
 
+/// <summary>
+/// One arm of a switch: the constants that reach it, and what it runs. The
+/// labels are folded literals, so the emitter can put them straight into an
+/// LLVM <c>switch</c> without evaluating anything.
+/// </summary>
+public sealed class BoundSwitchSection(
+    SourceSpan span, IReadOnlyList<BoundExpression> labels, bool isDefault, BoundStatement body)
+{
+    public SourceSpan Span { get; } = span;
+    public IReadOnlyList<BoundExpression> Labels { get; } = labels;
+    public bool IsDefault { get; } = isDefault;
+    public BoundStatement Body { get; } = body;
+}
+
+/// <summary>
+/// A switch. Kept in the bound tree rather than lowered to a chain of ifs for
+/// two reasons: an integer switch becomes one LLVM <c>switch</c>, which decides
+/// for itself whether a jump table beats comparisons; and <c>break</c> has to
+/// mean this construct rather than an enclosing loop, which a lowering to ifs
+/// would lose.
+/// </summary>
+public sealed class BoundSwitch(
+    SourceSpan span, BoundExpression value, IReadOnlyList<BoundSwitchSection> sections)
+    : BoundStatement(span)
+{
+    public BoundExpression Value { get; } = value;
+    public IReadOnlyList<BoundSwitchSection> Sections { get; } = sections;
+}
+
 public sealed class BoundReturn(SourceSpan span, BoundExpression? value) : BoundStatement(span)
 {
     public BoundExpression? Value { get; } = value;

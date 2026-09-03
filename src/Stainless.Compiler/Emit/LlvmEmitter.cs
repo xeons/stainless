@@ -69,7 +69,15 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     /// <summary>+1 values produced mid-statement, released once the statement completes.</summary>
     private readonly List<(string Ref, TypeSymbol Type)> _pendingReleases = [];
 
-    private readonly List<(string BreakLabel, string ContinueLabel, int ScopeDepth)> _loops = [];
+    /// <summary>
+    /// Where <c>break</c> and <c>continue</c> go, and how many scopes each has
+    /// to unwind on the way. They are tracked separately because a switch is a
+    /// target for one and not the other: a <c>continue</c> written inside a
+    /// switch belongs to the enclosing loop, and must release the switch's
+    /// scopes as it leaves.
+    /// </summary>
+    private readonly List<(string BreakLabel, int BreakDepth,
+                           string ContinueLabel, int ContinueDepth)> _loops = [];
 
     public string Emit(BoundProgram program)
     {
@@ -566,8 +574,12 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     private static string DestroyName(ClassTypeSymbol type) =>
         "_SLdestroy_" + Mangler.SymbolSafe(type.QualifiedName);
 
-    private static bool IsSigned(TypeSymbol type) =>
-        type is PrimitiveTypeSymbol { IsSigned: true };
+    private static bool IsSigned(TypeSymbol type) => type switch
+    {
+        // An enum orders and shifts as the integer it is represented by.
+        EnumTypeSymbol enumType => enumType.UnderlyingType.IsSigned,
+        _ => type is PrimitiveTypeSymbol { IsSigned: true },
+    };
 
     // ============================================================ instruction helpers
 
@@ -1394,6 +1406,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
             case BoundIf ifStatement: EmitIf(ifStatement); break;
             case BoundWhile whileStatement: EmitWhile(whileStatement); break;
             case BoundFor forStatement: EmitFor(forStatement); break;
+            case BoundSwitch switchStatement: EmitSwitch(switchStatement); break;
             case BoundParallel parallel: EmitParallel(parallel); break;
             case BoundParallelFor parallelFor: EmitParallelFor(parallelFor); break;
             case BoundSpawn spawn: EmitSpawn(spawn); break;
@@ -1483,7 +1496,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         Terminator($"br i1 {condition.Ref}, label %{bodyLabel}, label %{endLabel}");
 
         Label(bodyLabel);
-        _loops.Add((endLabel, conditionLabel, _scopes.Count));
+        _loops.Add((endLabel, _scopes.Count, conditionLabel, _scopes.Count));
         EmitStatement(statement.Body);
         _loops.RemoveAt(_loops.Count - 1);
         if (!_blockTerminated) Terminator($"br label %{conditionLabel}");
@@ -1517,7 +1530,7 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
         Label(bodyLabel);
         // `continue` jumps to the step, not the condition, so the loop still advances.
-        _loops.Add((endLabel, stepLabel, _scopes.Count));
+        _loops.Add((endLabel, _scopes.Count, stepLabel, _scopes.Count));
         EmitStatement(statement.Body);
         _loops.RemoveAt(_loops.Count - 1);
         if (!_blockTerminated) Terminator($"br label %{stepLabel}");
@@ -1533,6 +1546,75 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
         Label(endLabel);
         if (!_blockTerminated) ReleaseCurrentScope();
         PopScopeWithoutRelease();
+    }
+
+    /// <summary>
+    /// Emits a switch: one dispatch, then the sections.
+    ///
+    /// An ordinal switch becomes a single LLVM <c>switch</c>, which is what
+    /// makes a jump table possible — LLVM decides between one and a chain of
+    /// comparisons from the density of the labels, which is a better judge than
+    /// this compiler would be. A String switch has no such instruction and
+    /// becomes a chain of calls to the runtime's comparison.
+    /// </summary>
+    private void EmitSwitch(BoundSwitch statement)
+    {
+        var value = EmitExpression(statement.Value);
+        FlushTemporaries();
+
+        string endLabel = NextLabel("switch.end");
+        var bodies = statement.Sections.Select(_ => NextLabel("switch.section")).ToList();
+
+        int defaultIndex = statement.Sections.ToList().FindIndex(s => s.IsDefault);
+        string defaultLabel = defaultIndex < 0 ? endLabel : bodies[defaultIndex];
+
+        // A reference governor was spilled into a local by the binder, so it is
+        // alive across every one of these blocks.
+        if (statement.Value.Type.NeedsArc())
+        {
+            for (int i = 0; i < statement.Sections.Count; i++)
+                foreach (var label in statement.Sections[i].Labels)
+                {
+                    var text = EmitExpression(label);
+                    string same = Emit("i1",
+                        $"call i1 @sl_string_equals(ptr {value.Ref}, ptr {text.Ref})");
+                    string next = NextLabel("switch.test");
+                    Terminator($"br i1 {same}, label %{bodies[i]}, label %{next}");
+                    Label(next);
+                }
+
+            Terminator($"br label %{defaultLabel}");
+        }
+        else
+        {
+            var arms = new List<string>();
+            for (int i = 0; i < statement.Sections.Count; i++)
+                foreach (var label in statement.Sections[i].Labels)
+                {
+                    var constant = EmitExpression(label);
+                    arms.Add($"{constant.LlvmType} {constant.Ref}, label %{bodies[i]}");
+                }
+
+            Terminator($"switch {value.LlvmType} {value.Ref}, label %{defaultLabel} " +
+                       $"[ {string.Join(" ", arms)} ]");
+        }
+
+        // `break` lands after the switch; `continue` still belongs to whatever
+        // loop encloses it, and unwinds to that loop's depth.
+        string continueLabel = _loops.Count > 0 ? _loops[^1].ContinueLabel : endLabel;
+        int continueDepth = _loops.Count > 0 ? _loops[^1].ContinueDepth : _scopes.Count;
+        _loops.Add((endLabel, _scopes.Count, continueLabel, continueDepth));
+
+        foreach (var (section, label) in statement.Sections.Zip(bodies))
+        {
+            Label(label);
+            EmitStatement(section.Body);
+            if (!_blockTerminated) Terminator($"br label %{endLabel}");
+        }
+
+        _loops.RemoveAt(_loops.Count - 1);
+
+        Label(endLabel);
     }
 
     private void EmitReturn(BoundReturn statement)
@@ -1585,10 +1667,10 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
     private void EmitJump(bool isBreak)
     {
         if (_loops.Count == 0) return;
-        var (breakLabel, continueLabel, depth) = _loops[^1];
+        var frame = _loops[^1];
         FlushTemporaries();
-        ReleaseScopes(depth);
-        Terminator($"br label %{(isBreak ? breakLabel : continueLabel)}");
+        ReleaseScopes(isBreak ? frame.BreakDepth : frame.ContinueDepth);
+        Terminator($"br label %{(isBreak ? frame.BreakLabel : frame.ContinueLabel)}");
     }
 
     // ============================================================ expressions
@@ -1650,6 +1732,9 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false)
 
     private static string FormatInteger(ulong value, TypeSymbol type)
     {
+        // An enum is its underlying integer, and is spelled as one.
+        if (type is EnumTypeSymbol enumType) type = enumType.UnderlyingType;
+
         // LLVM wants the signed two's-complement spelling for signed types.
         if (type is PrimitiveTypeSymbol { IsSigned: true, Size: var size })
         {

@@ -1,0 +1,11 @@
+mode=rw
+all=rwx none=-
+readonly=r
+toggled=rwx back=rw
+built=x
+has-rw=1 has-all=0
+style=5 bold=1 italic=0
+switch=read
+raw=5
+colour=1
+done

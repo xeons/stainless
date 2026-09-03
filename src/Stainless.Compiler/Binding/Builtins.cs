@@ -33,8 +33,23 @@ public sealed class Builtins
     public const string TextModuleName = "Standard.Text";
     public const string ConsoleModuleName = "Standard.Console";
 
+    /// <summary>
+    /// Markers the language itself understands, rather than a library feature
+    /// to opt into. It is auto-imported, because needing an import to say
+    /// <c>[Flags]</c> would make a rule about enums look like a dependency.
+    /// </summary>
+    public const string StandardModuleName = "Standard";
+
     public ModuleSymbol Text { get; }
     public ModuleSymbol Console { get; }
+    public ModuleSymbol Standard { get; }
+
+    /// <summary>
+    /// <c>[Flags]</c>: the enum is a set of bits rather than a choice among
+    /// alternatives, which is what makes <c>|</c>, <c>&amp;</c>, <c>^</c> and
+    /// <c>~</c> meaningful on it.
+    /// </summary>
+    public AttributeTypeSymbol Flags { get; }
 
     public ClassTypeSymbol String { get; }
     public ClassTypeSymbol Utf16String { get; }
@@ -53,6 +68,16 @@ public sealed class Builtins
     {
         Text = new ModuleSymbol(TextModuleName);
         Console = new ModuleSymbol(ConsoleModuleName);
+        Standard = new ModuleSymbol(StandardModuleName);
+
+        Flags = new AttributeTypeSymbol
+        {
+            SimpleName = "Flags",
+            ModuleName = StandardModuleName,
+            IsPublic = true,
+        };
+        Flags.SetLayout(0, 1);
+        Standard.Types[Flags.SimpleName] = Flags;
 
         String = new ClassTypeSymbol
         {
@@ -152,6 +177,7 @@ public sealed class Builtins
     {
         modules[Text.Name] = Text;
         modules[Console.Name] = Console;
+        modules[Standard.Name] = Standard;
     }
 
     /// <summary>
@@ -164,6 +190,7 @@ public sealed class Builtins
         if (scope.Module == Text || scope.Module == Console) return;
         scope.Imports[TextModuleName] = Text;
         scope.Imports["Text"] = Text;
+        scope.Imports[StandardModuleName] = Standard;
     }
 
     private FunctionSymbol Method(

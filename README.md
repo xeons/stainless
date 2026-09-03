@@ -491,6 +491,10 @@ Everything below is covered by [the test suite](tests/cases).
   both directions
 - Win64 struct ABI: register coercion, `byval`, `sret`
 - `if` / `while` / `for` / `foreach` / `break` / `continue` / `return`, recursion
+- `switch` over integers, `char`, `bool`, enums and `String`, with stacked
+  labels and no fall-through. An ordinal switch is one LLVM `switch`, so a jump
+  table is LLVM's decision rather than the programmer's; `break` belongs to the
+  switch while `continue` passes through it to the enclosing loop
 - `parallel { spawn f(x); }` — a fork-join scope whose closing brace waits, so
   a job writes its result straight into the parent's local; and `parallel for`,
   which splits a counted loop across the pool
@@ -511,6 +515,9 @@ Everything below is covered by [the test suite](tests/cases).
 - `enum`, strongly typed: a distinct type over an integer that never converts
   implicitly in either direction, with an optional underlying type
   (`enum Level : byte`)
+- `[Flags]` enums: `|`, `&`, `^` and `~` on an enum whose members are bits,
+  producing that same enum rather than its number, plus `HasFlag`. The marker
+  needs no import, because it is a rule about enums rather than a library
 - `delegate`: a named function pointer, one word, C ABI compatible in both
   directions, and storable in a `struct`
 - Lambdas and closures: `value => value * factor` becomes a generated class
@@ -551,14 +558,13 @@ Being straight about the edges, roughly in the order they are worth adding:
   because `<` in expression position is ambiguous with less-than; inference
   reads argument types only. That holds for generic methods too, and an
   interface method cannot be generic at all, since dispatch gives it one slot.
-- **No `switch` and no pattern matching.** `enum` exists, but selecting on one
-  means a chain of `if`s.
+- **No pattern matching, and no `switch` expression.** `switch` is the C#
+  statement and only that: constant labels, no `goto case`, no exhaustiveness
+  requirement on enums.
 - **A lambda needs something to be.** It is typed by what it is assigned to, so
   `var f = x => x;` has nothing to infer from. Capture is by value only, and a
   capturing lambda cannot become a `delegate` — a function pointer has nowhere
   to keep what was captured.
-- **No flags enums.** Bitwise operators are rejected on an enum, because
-  nothing yet says that an enum is a set rather than a choice.
 - **No exceptions or error type.** A failure aborts through the runtime; there
   is no way to recover from one.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
