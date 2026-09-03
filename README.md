@@ -549,6 +549,12 @@ Everything below is covered by [the test suite](tests/cases).
   `ConcurrentDictionary<K, V>` and a blocking `Channel<T>`. Each owns its
   collection in a field and never hands out a reference to it, because a lock
   protects what it guards and not the reference *count* of what it guards
+- `Standard.IO`, `Standard.File`, `Standard.Directory`, `Standard.Path`:
+  `IStream` with `FileStream` and `MemoryStream`, whole-file reads and writes,
+  directory listing, and textual path handling. Failure is a returned value —
+  a `Result<T>` whose `Value` is empty rather than null, or an `IOError` — since
+  there are no exceptions and an optional cannot yet be unwrapped. Paths are
+  UTF-8 and are widened to UTF-16 before they reach Windows
 - `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
 - Raw pointers, `sizeof`, `typeof`, casts, `new`, `this`
 - Integer literals that fit convert implicitly, as in C#

@@ -10,6 +10,9 @@ module Doc;
 import Standard.Collections;
 import Standard.Threading;
 import Standard.Console;
+import Standard.IO;
+import Standard.File;
+import Standard.Path;
 
 extern "C" int printf(byte* format, ...);
 
@@ -44,6 +47,17 @@ int Search(int[] data, int from, int upto, AtomicBool stop) {
         if (data[i] == 42) { stop.Store(true); return i; }
     }
     return -1;
+}
+
+// --- spec 5.7 IO ----------------------------------------------------------
+String Roundtrip() {
+    var buffer = new MemoryStream();
+    buffer.WriteText("via a stream");
+
+    var read = File.ReadAllText("no-such-file-anywhere.txt");
+    var reason = read.Ok ? read.Value : IO.Describe(read.Error);
+
+    return buffer.ToText() + " / " + reason + " / " + Path.FileName("x/y/notes.txt");
 }
 
 // --- spec 5.4 collections -------------------------------------------------
@@ -184,6 +198,7 @@ int Main() {
 
     printf("switch=%s %s\n", Name(Level.Severe).ToPointer(), Name(Level.Fatal).ToPointer());
     printf("roster=%s\n", Roster().ToPointer());
+    printf("io=%s\n", Roundtrip().ToPointer());
     printf("intrinsic=%d %d\n", 3.CompareTo(5), "apple".CompareTo("banana"));
 
     var counted = new int[4];

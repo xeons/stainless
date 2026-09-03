@@ -92,6 +92,11 @@ public static class Mangler
                 AppendType(sb, pointer.Element);
                 break;
 
+            case ArrayTypeSymbol array:
+                sb.Append('A');
+                AppendType(sb, array.Element);
+                break;
+
             case OptionalTypeSymbol optional:
                 sb.Append('O');
                 AppendType(sb, optional.Element);

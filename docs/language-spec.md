@@ -773,6 +773,10 @@ nothing by itself.
 | `Standard.Threading` | `Mutex<T>`, atomics, the job pool | on request |
 | `Standard.Math` | arithmetic that is not an operator | on request |
 | `Standard.Reflection` | `[Reflect]`, `typeof`, the field tables | on request |
+| `Standard.IO` | streams, `IOError`, `Result<T>` | on request |
+| `Standard.File` | whole-file operations | on request |
+| `Standard.Directory` | making, removing and listing | on request |
+| `Standard.Path` | taking paths apart, textually | on request |
 | `Standard` | `[Flags]`, and other markers the language itself reads | automatically |
 
 ### 5.2 `Standard.Threading`
@@ -999,7 +1003,77 @@ borrows, and borrowing touches no count. See the note on `Mutex<T>` in
 [concurrency.md](concurrency.md), which has the same hazard and is why nothing
 here is built on it.
 
-### 5.7 Interfaces may extend interfaces
+### 5.7 `Standard.IO`, `File`, `Directory` and `Path`
+
+```csharp
+import Standard.File;
+import Standard.IO;
+
+var read = File.ReadAllText("config.json");
+if (read.Ok) { use(read.Value); }
+else         { Console.WriteError(IO.Describe(read.Error)); }
+```
+
+Stainless has no static classes, so what C# spells `File.ReadAllText` is a
+module-qualified call to a module-level function. That is the mapping
+throughout: a module is the static class.
+
+**How failure is reported.** There are no exceptions, and an optional cannot
+yet be unwrapped, so neither usual answer is available. What is left is to
+return the outcome as a value, in one of three shapes:
+
+| Shape | Used by | Reads as |
+|---|---|---|
+| `Result<T>` | anything that produces a value | `if (r.Ok) { r.Value }` |
+| `IOError` | anything that does not | `if (File.Delete(p) != IOError.None)` |
+| the stream's own `Error()` | streams | checked after a loop, not each step |
+
+Three shapes rather than one is deliberate: a single shape makes the common
+cases read worse than the rare one. **`Value` on a failed `Result<T>` is the
+empty value of its type** — an empty String, an empty array — and never null,
+so reading it by mistake is wrong rather than fatal.
+
+**Streams.** `IStream` is `Read`/`Write`/`Seek`/`Length`/`Position`/`Flush`/
+`Close` plus `CanRead`/`CanWrite`/`CanSeek`. `FileStream` and `MemoryStream`
+implement it.
+
+```csharp
+var file = File.OpenRead("data.bin");
+if (file.IsOpen()) {
+    var whole = IO.ReadToEnd(file);
+    file.Close();
+}
+```
+
+A `FileStream`'s construction *is* the open, so one always exists and
+`IsOpen()` says whether it holds a file — which avoids handing back a null the
+caller could not unwrap. Closing is also the destructor's job, so a stream that
+goes out of scope releases its handle either way.
+
+Opening takes a `FileMode` (`Open`, `Create`, `Append`) and a `[Flags]`
+`FileAccess` (`Read`, `Write`, `ReadWrite`).
+
+**`File`** has `Exists`, `Size`, `Modified`, `Delete`, `Rename`, `Copy`, the
+openers, and the whole-file pairs `ReadAllText`/`WriteAllText`,
+`ReadAllBytes`/`WriteAllBytes`, `ReadAllLines`/`WriteAllLines`, and
+`AppendText`.
+
+**`Directory`** has `Exists`, `Create`, `CreateAll`, `Delete`, and the listings
+`Entries`, `Files`, `Directories` and `AllFiles`. Listings return full paths
+rather than bare names, in the platform's order.
+
+**`Path`** is purely textual and touches no disk: `Join`, `FileName`,
+`DirectoryName`, `Extension`, `WithoutExtension`, `WithExtension`, `IsRooted`
+and `Split`. Both `/` and `\` are accepted when reading a path apart, because
+Windows accepts both and a path from a config file may use either.
+
+**Paths are UTF-8, and stay correct.** A Stainless `String` is already UTF-8,
+and on Windows the runtime widens every path to UTF-16 before it reaches the
+operating system — the narrow CRT entry points would read those bytes in the
+active code page, which works by accident for ASCII and fails for everything
+else.
+
+### 5.8 Interfaces may extend interfaces
 
 ```csharp
 public interface IWritable : IReadable { void Write(String text); }

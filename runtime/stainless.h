@@ -171,6 +171,36 @@ void  *sl_string_concat(void *left, void *right);
 _Bool  sl_string_equals(void *left, void *right);
 void  *sl_string_substring(void *pointer, size_t start, size_t length);
 
+/* ------------------------------------------------------ files and paths */
+
+/*
+ * See io.c. Paths arrive as UTF-8 and are widened before they reach the
+ * operating system; errors come back as the small stable enum Standard.IO
+ * declares, rather than as errno.
+ */
+void   *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *error);
+void    sl_file_close(void *handle);
+size_t  sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error);
+size_t  sl_file_write(void *handle, const uint8_t *buffer, size_t count, int32_t *error);
+int64_t sl_file_seek(void *handle, int64_t offset, int32_t origin, int32_t *error);
+int64_t sl_file_position(void *handle);
+int64_t sl_file_length(void *handle);
+void    sl_file_flush(void *handle);
+
+_Bool   sl_path_exists(const uint8_t *path);
+_Bool   sl_path_is_directory(const uint8_t *path);
+int64_t sl_path_size(const uint8_t *path);
+int64_t sl_path_modified(const uint8_t *path);
+
+int32_t sl_file_delete(const uint8_t *path);
+int32_t sl_file_rename(const uint8_t *from, const uint8_t *to);
+int32_t sl_directory_create(const uint8_t *path);
+int32_t sl_directory_delete(const uint8_t *path);
+
+void          *sl_directory_open(const uint8_t *path);
+const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory);
+void           sl_directory_close(void *handle);
+
 /* ------------------------------------------------- ordering and hashing */
 
 /*
