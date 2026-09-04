@@ -1,0 +1,11 @@
+# Line endings are LF, everywhere, on every platform.
+#
+# This repository was mixed for a long time -- 309 files CRLF, 180 LF, and one
+# that was both -- which made every editor that "helpfully" normalised a file
+# produce a diff of the whole thing. `eol=lf` settles it in the index and in
+# the working tree, so a checkout on Windows gets LF too and nothing has an
+# opinion to express.
+#
+# `text=auto` still detects a binary by content and leaves it alone, so nothing
+# added later needs a rule of its own unless git guesses wrong about it.
+* text=auto eol=lf
