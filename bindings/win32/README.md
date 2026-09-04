@@ -5,12 +5,14 @@ which one you are looking at:
 
 | Name | What it is |
 |---|---|
+| `Win32.Handles` | **a header name**: the handle types, which belong to no one DLL — `windef.h` |
 | `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
 The raw layer is 259 entry points, 460 constants and 27 structs, unions, enums
-and delegates across six libraries; the twelve convenience modules add 145
-functions and 7 types on top. Nothing is generated and nothing is marshalled: a
+and delegates across six libraries, plus the 12 handle types and the 17 names
+they go by; the twelve convenience modules add 145 functions and 7 types on
+top. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
 `delegate`, which is a bare function pointer Windows calls directly. A binding
 is a declaration, not a wrapper.
@@ -22,6 +24,7 @@ user's filesystem is entitled to contain.
 
 ```
 bindings/win32/api/
+  Handles.sl     module Win32.Handles;    HWND, HDC, HKEY and the rest
   Kernel32.sl    module Win32.Kernel32;   errors, handles, files, memory,
                                           modules, environment, the system,
                                           processes, the console, time
@@ -34,7 +37,49 @@ bindings/win32/api/
 
 One module per DLL, so there is never a question about where something lives or
 which `-l` it wants. The console and the clock are in `Kernel32` because that is
-the DLL that exports them, whatever else they look like.
+the DLL that exports them, whatever else they look like. `Handles` is the one
+exception and is not a DLL: `HWND` belongs to no single library, which is why
+Windows keeps it in `windef.h` rather than in a per-DLL header.
+
+### The handle types
+
+Windows declares a handle as `DECLARE_HANDLE(HWND)` — a struct nothing ever
+defines, and a pointer to it. The struct exists purely so that `HWND` and `HDC`
+are different types. `Win32.Handles` says the same thing:
+
+```csharp
+public struct HWND__;
+public struct HDC__;
+
+public using HWND = HWND__*;
+public using HDC  = HDC__*;
+```
+
+So a device context handed to something that wants a window is caught, rather
+than being one `void*` passed to another:
+
+```
+error[SL0262]: argument 1 of 'ShowWindow' expects 'HWND__*', but 'HDC__*' was given
+```
+
+**It costs nothing.** None of those types is laid out, emitted, or present at
+run time; what crosses the boundary is the same pointer it always was.
+
+Where Windows says two names are one type, so does this — `HCURSOR` is `HICON`,
+`HMODULE` is `HINSTANCE`, and `HGLOBAL` and `HLOCAL` are both `HANDLE`, exactly
+as `windef.h` has it. `HGDIOBJ` is the odd one: Windows spells it `void*` so
+that every pen, brush, font and bitmap converts to it and `SelectObject` can
+take all of them. Here that role belongs to `byte*`, the one pointer type every
+other converts to, so `HGDIOBJ` is that — same reason, same effect.
+
+`HGDIOBJ` therefore takes any pointer, which means `SelectObject`,
+`DeleteObject` and `GetObjectW` are the three entry points these types do not
+help with. C accepts the same mistake for the same reason, and
+[tests/cases/err-win32-handles](../../tests/cases/err-win32-handles) says so
+where it lists what *is* caught.
+
+A `void*` that is left is a `void*` in Windows too: a buffer, an address, a
+reserved word, or a pointer to a struct these bindings do not declare.
 
 **Importing the whole raw layer is free and needs no `-l` at all.** A
 declaration nothing calls is not a reference, so the linker never looks for it:
@@ -149,7 +194,7 @@ A `delegate` captures nothing, so a `WNDPROC` is an ordinary module-level
 function and per-window state goes where Win32 has always kept it:
 
 ```csharp
-long Procedure(void* window, uint message, ulong wParam, long lParam) {
+long Procedure(HWND window, uint message, ulong wParam, long lParam) {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
     if (message == WmDestroy) { PostQuitMessage(0); return 0; }
     return DefWindowProcW(window, message, wParam, lParam);

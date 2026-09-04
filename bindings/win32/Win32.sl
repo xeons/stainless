@@ -37,6 +37,7 @@ module Win32;
 #if WINDOWS
 
 import Win32.Kernel32;
+import Win32.Handles;
 
 extern "C" {
     void* malloc(nuint size);
@@ -91,7 +92,7 @@ public String LastErrorMessage() { return Describe(GetLastError()); }
 ///
 /// Which of the two a given function uses is not guessable — `CreateFileW`
 /// returns the first, `CreateWindowExW` the second — so this covers both.
-public bool IsInvalid(void* handle) { return handle == null || handle == InvalidHandle(); }
+public bool IsInvalid(HANDLE handle) { return handle == null || handle == InvalidHandle(); }
 
 // --------------------------------------------------------------------- BOOL
 

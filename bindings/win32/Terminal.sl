@@ -44,10 +44,11 @@ module Win32.Terminal;
 
 import Win32;
 import Win32.Kernel32;
+import Win32.Handles;
 
-public void* Output() { return GetStdHandle(StdOutput); }
-public void* Input()  { return GetStdHandle(StdInput); }
-public void* Error()  { return GetStdHandle(StdError); }
+public HANDLE Output() { return GetStdHandle(StdOutput); }
+public HANDLE Input()  { return GetStdHandle(StdInput); }
+public HANDLE Error()  { return GetStdHandle(StdError); }
 
 /// Grey on black: what a console starts as, and what a program that changed the
 /// colour should put back rather than leaving its own behind.
@@ -59,7 +60,7 @@ public const uint DefaultAttributes = 0x0007u;
 /// it took. It is off by default, and a program that writes colour codes
 /// without asking for this prints them as text.
 public bool EnableAnsi() {
-    void* handle = Output();
+    HANDLE handle = Output();
     uint mode = 0u;
     if (!Win32.Succeeded(GetConsoleMode(handle, &mode))) { return false; }
     return Win32.Succeeded(
@@ -76,7 +77,7 @@ public bool UseUtf8() {
 /// Turns off line editing and echo, so that `ReadKey` sees a key the moment it
 /// is pressed. The previous mode is returned, to be put back.
 public uint EnableRawInput() {
-    void* handle = Input();
+    HANDLE handle = Input();
     uint mode = 0u;
     if (!Win32.Succeeded(GetConsoleMode(handle, &mode))) { return 0u; }
 
@@ -151,7 +152,7 @@ public String Title() {
 
 /// Shows or hides the cursor, keeping whatever size it had.
 public bool ShowCursor(bool visible) {
-    void* handle = Output();
+    HANDLE handle = Output();
     CursorInfo info;
     if (!Win32.Succeeded(GetConsoleCursorInfo(handle, &info))) { return false; }
     info.Visible = visible ? 1 : 0;
@@ -161,7 +162,7 @@ public bool ShowCursor(bool visible) {
 /// Blanks the whole buffer and puts the cursor back at the top left, which is
 /// what `cls` does and what no single API call does.
 public bool Clear() {
-    void* handle = Output();
+    HANDLE handle = Output();
     ScreenBufferInfo info;
     if (!Win32.Succeeded(GetConsoleScreenBufferInfo(handle, &info))) { return false; }
 
@@ -184,7 +185,7 @@ public bool Clear() {
 /// Returns 0 for a key that produces no character — an arrow, a function key —
 /// and the caller that cares reads the whole record instead.
 public ushort ReadKey() {
-    void* handle = Input();
+    HANDLE handle = Input();
     InputRecord record;
     uint read = 0u;
 
@@ -200,7 +201,7 @@ public ushort ReadKey() {
 /// The whole record for the next key press, for a caller that needs the virtual
 /// key code or the modifier state rather than a character.
 public KeyEvent ReadKeyEvent() {
-    void* handle = Input();
+    HANDLE handle = Input();
     InputRecord record;
     uint read = 0u;
 
@@ -229,7 +230,7 @@ public KeyEvent ReadKeyEvent() {
 /// resized. Anything that is not a press is dropped until a press is at the
 /// front or the queue is empty.
 public bool KeyAvailable() {
-    void* handle = Input();
+    HANDLE handle = Input();
     InputRecord record;
 
     while (true) {

@@ -35,24 +35,25 @@ module Win32.Files;
 
 import Win32;
 import Win32.Kernel32;
+import Win32.Handles;
 import Standard.Collections;
 
 /// Opens or creates a file, taking the path as text.
 ///
 /// Returns `InvalidHandle()` on failure — not null — and the reason is in
 /// `Win32.LastError()`. `Win32.IsInvalid` covers both conventions.
-public void* Open(String path, uint access, uint shareMode, uint disposition) {
+public HANDLE Open(String path, uint access, uint shareMode, uint disposition) {
     return CreateFileW(path.ToUtf16().ToPointer(), access, shareMode, null,
                        disposition, FileAttributeNormal, null);
 }
 
 /// Opens an existing file for reading, sharing it with other readers.
-public void* OpenRead(String path) {
+public HANDLE OpenRead(String path) {
     return Open(path, GenericRead, FileShareRead, OpenExisting);
 }
 
 /// Creates a file, or replaces what is there.
-public void* Create(String path) {
+public HANDLE Create(String path) {
     return Open(path, GenericWrite, 0u, CreateAlways);
 }
 
@@ -118,13 +119,13 @@ public bool IsSelfOrParent(ref FindData data) {
 /// Begins a directory walk. `pattern` is a path with wildcards — `C:\dir\*` —
 /// not a directory. Returns `InvalidHandle()` when nothing matches, with
 /// `ErrorFileNotFound`.
-public void* FindFirst(String pattern, ref FindData data) {
+public HANDLE FindFirst(String pattern, ref FindData data) {
     return FindFirstFileW(pattern.ToUtf16().ToPointer(), &data);
 }
 
 /// The next entry, or false at the end — where `Win32.LastError()` is
 /// `ErrorNoMoreFiles` rather than a real failure.
-public bool FindNext(void* find, ref FindData data) {
+public bool FindNext(HANDLE find, ref FindData data) {
     return Win32.Succeeded(FindNextFileW(find, &data));
 }
 
@@ -136,7 +137,7 @@ public List<String> Entries(String directory) {
     var names = new List<String>();
     FindData data;
 
-    void* find = FindFirst(directory + "\\*", ref data);
+    HANDLE find = FindFirst(directory + "\\*", ref data);
     if (Win32.IsInvalid(find)) { return names; }
 
     // FindFirstFileW has already produced the first entry, so this reads

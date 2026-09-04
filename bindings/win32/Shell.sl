@@ -36,22 +36,23 @@ module Win32.Shell;
 import Win32;
 import Win32.Shell32;
 import Win32.User32;
+import Win32.Handles;
 
 /// `ShellExecuteW` returns a fake `HINSTANCE` that is an error code when it is
 /// 32 or less. Anything above that means it worked.
-public bool Started(void* result) { return (nuint)result > ShellExecuteThreshold; }
+public bool Started(HINSTANCE result) { return (nuint)result > ShellExecuteThreshold; }
 
 /// Opens a file, a folder or a URL with whatever the user has associated with
 /// it — the same thing double-clicking would do.
 public bool Launch(String target) {
-    void* result = ShellExecuteW(null, "open".ToUtf16().ToPointer(),
+    HINSTANCE result = ShellExecuteW(null, "open".ToUtf16().ToPointer(),
                                  target.ToUtf16().ToPointer(), null, null, SwShowNormal);
     return Started(result);
 }
 
 /// Opens a folder in Explorer.
 public bool Browse(String directory) {
-    void* result = ShellExecuteW(null, "explore".ToUtf16().ToPointer(),
+    HINSTANCE result = ShellExecuteW(null, "explore".ToUtf16().ToPointer(),
                                  directory.ToUtf16().ToPointer(), null, null, SwShowNormal);
     return Started(result);
 }
@@ -59,7 +60,7 @@ public bool Browse(String directory) {
 /// Runs a program, elevated. Windows shows the consent prompt; a user who
 /// refuses is a `false` here and not an error worth explaining.
 public bool RunElevated(String program, String arguments) {
-    void* result = ShellExecuteW(null, "runas".ToUtf16().ToPointer(),
+    HINSTANCE result = ShellExecuteW(null, "runas".ToUtf16().ToPointer(),
                                  program.ToUtf16().ToPointer(),
                                  arguments.ToUtf16().ToPointer(), null, SwShowNormal);
     return Started(result);

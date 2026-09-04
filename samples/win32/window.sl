@@ -33,11 +33,12 @@ import Win32.User32;
 import Win32.Ui;
 import Win32.Gdi32;
 import Win32.Drawing;
+import Win32.Handles;
+import Win32.Kernel32;
 
 extern "C" {
     void* malloc(nuint size);
     void  free(void* block);
-    void* GetModuleHandleW(ushort* name);
 }
 
 /// Everything this window remembers between messages.
@@ -50,7 +51,7 @@ public struct State {
 
 // ------------------------------------------------------------ the procedure
 
-long Procedure(void* window, uint message, ulong wParam, long lParam) {
+long Procedure(HWND window, uint message, ulong wParam, long lParam) {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
 
     if (message == WmDestroy) {
@@ -95,9 +96,9 @@ long Procedure(void* window, uint message, ulong wParam, long lParam) {
 
 // --------------------------------------------------------------- the drawing
 
-void Paint(void* window, State* state) {
+void Paint(HWND window, State* state) {
     PaintStruct paint;
-    void* dc = BeginPaint(window, &paint);
+    HDC dc = BeginPaint(window, &paint);
 
     Rect client = ClientRect(window);
 
@@ -116,11 +117,11 @@ void Paint(void* window, State* state) {
     EndPaint(window, &paint);
 }
 
-void DrawCrosshair(void* dc, Rect client, State* state) {
+void DrawCrosshair(HDC dc, Rect client, State* state) {
     if (state == null || !(*state).Tracking) { return; }
 
-    void* pen = CreatePen(PenSolid, 1, Colour(60u, 70u, 90u));
-    void* previousPen = SelectObject(dc, pen);
+    HPEN pen = CreatePen(PenSolid, 1, Colour(60u, 70u, 90u));
+    HGDIOBJ previousPen = SelectObject(dc, pen);
 
     MoveToEx(dc, 0, (*state).CursorY, null);
     LineTo(dc, Width(client), (*state).CursorY);
@@ -132,8 +133,8 @@ void DrawCrosshair(void* dc, Rect client, State* state) {
 
     // A circle that grows with the click count, so a click is visible.
     int radius = 12 + (*state).Clicks * 3;
-    void* brush = CreateSolidBrush(Colour(90u, 160u, 240u));
-    void* previousBrush = SelectObject(dc, brush);
+    HBRUSH brush = CreateSolidBrush(Colour(90u, 160u, 240u));
+    HGDIOBJ previousBrush = SelectObject(dc, brush);
 
     Ellipse(dc, (*state).CursorX - radius, (*state).CursorY - radius,
                 (*state).CursorX + radius, (*state).CursorY + radius);
@@ -142,9 +143,9 @@ void DrawCrosshair(void* dc, Rect client, State* state) {
     DeleteObject(brush);
 }
 
-void DrawLabels(void* dc, State* state) {
-    void* font = CreateFont("Segoe UI", 18, FontNormal, false);
-    void* previousFont = SelectObject(dc, font);
+void DrawLabels(HDC dc, State* state) {
+    HFONT font = CreateFont("Segoe UI", 18, FontNormal, false);
+    HGDIOBJ previousFont = SelectObject(dc, font);
 
     SetBkMode(dc, TransparentBackground);
     SetTextColor(dc, Colour(220u, 224u, 232u));
@@ -165,7 +166,7 @@ void DrawLabels(void* dc, State* state) {
 // ------------------------------------------------------------------- startup
 
 int Main() {
-    void* instance = GetModuleHandleW(null);
+    HMODULE instance = GetModuleHandleW(null);
 
     var windowClass = NewWindowClass();
     windowClass.Style = ClassStyleHorizontalRedraw | ClassStyleVerticalRedraw;
@@ -184,7 +185,7 @@ int Main() {
     Rect wanted = Rectangle(0, 0, 640, 400);
     Rect outer = AdjustForFrame(wanted, WsOverlappedWindow, 0u);
 
-    void* window = CreateWindow("StainlessWindow", "Stainless on Win32",
+    HWND window = CreateWindow("StainlessWindow", "Stainless on Win32",
                                 WsOverlappedWindow, UseDefault, UseDefault,
                                 Width(outer), Height(outer), instance);
     if (window == null) {

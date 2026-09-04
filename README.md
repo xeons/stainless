@@ -719,8 +719,8 @@ than every program that compiles it repeating `-l` on the command line.
 ### The Win32 API
 
 [bindings/win32](bindings/win32) is what all of the above adds up to: 259
-Windows entry points, 460 constants and 27 structs, unions, enums and delegates,
-with 145 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
+Windows entry points, 460 constants, 27 structs, unions, enums and delegates and
+the 12 handle types, with 145 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
 Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
 `delegate`, which is the bare function pointer Windows calls.
 
@@ -730,7 +730,7 @@ the declarations**, spelled as Windows spells them:
 ```csharp
 import Win32.User32;
 
-long Procedure(void* window, uint message, ulong wParam, long lParam) {
+long Procedure(HWND window, uint message, ulong wParam, long lParam) {
     if (message == WmDestroy) { PostQuitMessage(0); return 0; }
     return DefWindowProcW(window, message, wParam, lParam);
 }
@@ -1197,7 +1197,8 @@ Everything below is covered by [the test suite](tests/cases).
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
 - [bindings/win32](bindings/win32): the Windows API — 259 entry points, 460
-  constants and 27 structs, unions, enums and delegates — as declarations
+  constants, 27 structs, unions, enums and delegates and 12 handle types — as
+  declarations
   rather than a marshalling layer, in two layers a module name apart:
   `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
   Source a program compiles rather than part of the standard library, because

@@ -38,6 +38,7 @@ module Win32.Registry;
 
 import Win32;
 import Win32.AdvApi32;
+import Win32.Handles;
 
 /// Why a registry operation did not produce a value.
 public enum RegistryError : uint {
@@ -70,21 +71,21 @@ public RegistryError Classify(int code) {
 /// The handle must be closed with `Close`. `root` is one of `Win32.AdvApi32`'s
 /// predefined keys, and `path` is relative to it:
 /// `Open(LocalMachine(), "SOFTWARE\\...", KeyRead)`.
-public Result<void*, RegistryError> Open(void* root, String path, uint access) {
-    void* key = null;
+public Result<HKEY, RegistryError> Open(HKEY root, String path, uint access) {
+    HKEY key = null;
     int code = RegOpenKeyExW(root, path.ToUtf16().ToPointer(), 0u, access, &key);
     if (code != 0) { return Fail(Classify(code)); }
     return Ok(key);
 }
 
 /// Opens a key for reading, which is what most callers want.
-public Result<void*, RegistryError> OpenRead(void* root, String path) {
+public Result<HKEY, RegistryError> OpenRead(HKEY root, String path) {
     return Open(root, path, KeyRead);
 }
 
 /// Opens a key, creating it and every missing parent if it is not there.
-public Result<void*, RegistryError> Create(void* root, String path, uint access) {
-    void* key = null;
+public Result<HKEY, RegistryError> Create(HKEY root, String path, uint access) {
+    HKEY key = null;
     uint disposition = 0u;
     int code = RegCreateKeyExW(root, path.ToUtf16().ToPointer(), 0u, null, 0u,
                                access, null, &key, &disposition);
@@ -92,7 +93,7 @@ public Result<void*, RegistryError> Create(void* root, String path, uint access)
     return Ok(key);
 }
 
-public bool Close(void* key) { return RegCloseKey(key) == 0; }
+public bool Close(HKEY key) { return RegCloseKey(key) == 0; }
 
 // ================================================================== reading
 
@@ -101,7 +102,7 @@ public bool Close(void* key) { return RegCloseKey(key) == 0; }
 /// `REG_SZ` and `REG_EXPAND_SZ` both read as strings; an expandable one is
 /// returned with its `%VARIABLES%` still in it, and `Win32.Environment.Expand`
 /// is what fills them in.
-public Result<String, RegistryError> ReadString(void* key, String name) {
+public Result<String, RegistryError> ReadString(HKEY key, String name) {
     var buffer = new ByteBuffer(8192u);
     uint size = buffer.Capacity();
     uint kind = 0u;
@@ -117,7 +118,7 @@ public Result<String, RegistryError> ReadString(void* key, String name) {
 }
 
 /// A `REG_DWORD`.
-public Result<uint, RegistryError> ReadUInt(void* key, String name) {
+public Result<uint, RegistryError> ReadUInt(HKEY key, String name) {
     var buffer = new ByteBuffer(8u);
     uint size = 4u;
     uint kind = 0u;
@@ -131,7 +132,7 @@ public Result<uint, RegistryError> ReadUInt(void* key, String name) {
 }
 
 /// A `REG_QWORD`.
-public Result<ulong, RegistryError> ReadULong(void* key, String name) {
+public Result<ulong, RegistryError> ReadULong(HKEY key, String name) {
     var buffer = new ByteBuffer(16u);
     uint size = 8u;
     uint kind = 0u;
@@ -147,7 +148,7 @@ public Result<ulong, RegistryError> ReadULong(void* key, String name) {
 // ================================================================== writing
 
 /// Writes a `REG_SZ`. The size Windows wants includes the terminator, in bytes.
-public RegistryError WriteString(void* key, String name, String value) {
+public RegistryError WriteString(HKEY key, String name, String value) {
     var wide = value.ToUtf16();
     uint bytes = (uint)((wide.UnitCount() + 1u) * 2u);
     int code = RegSetValueExW(key, name.ToUtf16().ToPointer(), 0u, KindString,
@@ -156,7 +157,7 @@ public RegistryError WriteString(void* key, String name, String value) {
 }
 
 /// Writes a `REG_DWORD`.
-public RegistryError WriteUInt(void* key, String name, uint value) {
+public RegistryError WriteUInt(HKEY key, String name, uint value) {
     uint stored = value;
     int code = RegSetValueExW(key, name.ToUtf16().ToPointer(), 0u, KindUInt,
                               (byte*)&stored, 4u);
@@ -164,7 +165,7 @@ public RegistryError WriteUInt(void* key, String name, uint value) {
 }
 
 /// Removes a value from a key.
-public RegistryError DeleteValue(void* key, String name) {
+public RegistryError DeleteValue(HKEY key, String name) {
     return Classify(RegDeleteValueW(key, name.ToUtf16().ToPointer()));
 }
 
@@ -174,7 +175,7 @@ public RegistryError DeleteValue(void* key, String name) {
 ///
 /// A registry key name is at most 255 characters, which is why the buffer is
 /// that size and no thought is given to it being too small.
-public String SubKey(void* key, uint index) {
+public String SubKey(HKEY key, uint index) {
     var buffer = new WideBuffer(256u);
     uint size = (uint)(buffer.Capacity() + 1u);
 
@@ -185,7 +186,7 @@ public String SubKey(void* key, uint index) {
 }
 
 /// The name of the `index`th value, or an empty string past the end.
-public String ValueName(void* key, uint index) {
+public String ValueName(HKEY key, uint index) {
     var buffer = new WideBuffer(16384u);
     uint size = (uint)(buffer.Capacity() + 1u);
 
@@ -202,7 +203,7 @@ public struct KeyCounts {
     public uint Values;
 }
 
-public KeyCounts Counts(void* key) {
+public KeyCounts Counts(HKEY key) {
     KeyCounts counts;
     counts.SubKeys = 0u;
     counts.Values = 0u;

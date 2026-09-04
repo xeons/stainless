@@ -32,8 +32,8 @@
 // put it there again:
 //
 // ```csharp
-// void* pen = CreatePen(PenSolid, 2, Colour(255u, 0u, 0u));
-// void* previous = SelectObject(dc, pen);
+// HPEN pen = CreatePen(PenSolid, 2, Colour(255u, 0u, 0u));
+// HGDIOBJ previous = SelectObject(dc, pen);
 // // ... draw ...
 // SelectObject(dc, previous);
 // DeleteObject(pen);
@@ -53,6 +53,7 @@ module Win32.Drawing;
 import Win32;
 import Win32.Gdi32;
 import Win32.User32;
+import Win32.Handles;
 
 // =================================================================== colour
 
@@ -77,20 +78,20 @@ public const uint BlueInk  = 0xFF0000u;
 /// A font at a given pixel height. Negative heights mean "character height"
 /// rather than "cell height", which is what a caller thinking in point sizes
 /// wants; this takes the height as written and does not negate it.
-public void* CreateFont(String face, int height, int weight, bool italic) {
+public HFONT CreateFont(String face, int height, int weight, bool italic) {
     return CreateFontW(height, 0, 0, 0, weight, (uint)(italic ? 1 : 0), 0u, 0u,
                        DefaultCharSet, 0u, 0u, ClearTypeQuality, DefaultPitch,
                        face.ToUtf16().ToPointer());
 }
 
 /// Draws text at a point, with the current font, colour and alignment.
-public bool DrawTextAt(void* dc, int x, int y, String text) {
+public bool DrawTextAt(HDC dc, int x, int y, String text) {
     var wide = text.ToUtf16();
     return Win32.Succeeded(TextOutW(dc, x, y, wide.ToPointer(), (int)wide.UnitCount()));
 }
 
 /// How wide and tall the text would be in the device context's current font.
-public Size MeasureText(void* dc, String text) {
+public Size MeasureText(HDC dc, String text) {
     var wide = text.ToUtf16();
     Size size;
     size.Width = 0;
@@ -107,12 +108,12 @@ public Size MeasureText(void* dc, String text) {
 /// The caller owns all of it and must call `DestroyOffScreen`, which puts back
 /// what was there and then deletes both in the order GDI requires.
 public struct OffScreen {
-    public void* Dc;
-    public void* Bitmap;
-    public void* Previous;
+    public HDC     Dc;
+    public HBITMAP Bitmap;
+    public HGDIOBJ Previous;
 }
 
-public OffScreen CreateOffScreen(void* dc, int width, int height) {
+public OffScreen CreateOffScreen(HDC dc, int width, int height) {
     OffScreen buffer;
     buffer.Dc = CreateCompatibleDC(dc);
     buffer.Bitmap = CreateCompatibleBitmap(dc, width, height);
@@ -130,8 +131,8 @@ public void DestroyOffScreen(OffScreen buffer) {
 ///
 /// Convenient rather than fast: a caller filling many rectangles in the same
 /// colour should make one brush and keep it.
-public bool Fill(void* dc, Rect* rectangle, uint colour) {
-    void* brush = CreateSolidBrush(colour);
+public bool Fill(HDC dc, Rect* rectangle, uint colour) {
+    HBRUSH brush = CreateSolidBrush(colour);
     bool filled = Win32.Succeeded(FillRect(dc, rectangle, brush));
     DeleteObject(brush);
     return filled;

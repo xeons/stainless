@@ -80,18 +80,6 @@ is versioning, which is the real question and a larger one.
 
 ## Interop, in the order writing the Win32 bindings wanted them
 
-### Give the Win32 bindings their handle types
-
-[bindings/win32](bindings/win32) still spells `HANDLE`, `HWND`, `HDC`, `HKEY`,
-`HMENU`, `HBRUSH` and the rest as `void*` -- 346 of them across eighteen files.
-That is now a choice rather than a limitation: opaque struct types and aliases
-exist, and `window` and `device` could be told apart at no run-time cost.
-
-It wants doing carefully rather than quickly, because not every `void*` there is
-a handle. `CreateWindowExW` takes a parent, a menu, an instance **and** a
-`parameter`, and only the first three are handles; the fourth is C's `LPVOID`
-and should stay one. A pass that converted by name would get that wrong.
-
 ### An enum that crosses `extern "C"`
 
 A `[Flags] enum : uint` will not pass to a `uint` parameter without a cast,

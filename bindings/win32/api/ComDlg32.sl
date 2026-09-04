@@ -26,6 +26,8 @@
 // which names it with a pragma.
 module Win32.ComDlg32;
 
+import Win32.Handles;
+
 #if WINDOWS
 
 /// `OPENFILENAMEW`. `sizeof` is 152, and `Size` must be set to it.
@@ -35,29 +37,29 @@ module Win32.ComDlg32;
 /// in a double NUL, which no Stainless string can hold —
 /// `Win32.Dialogs.BuildFilter` assembles one.
 public struct OpenFileName {
-    public uint    Size;
-    public void*   Owner;
-    public void*   Instance;
-    public ushort* Filter;
-    public ushort* CustomFilter;
-    public uint    CustomFilterMax;
-    public uint    FilterIndex;
-    public ushort* File;
-    public uint    FileMax;
-    public ushort* FileTitle;
-    public uint    FileTitleMax;
-    public ushort* InitialDirectory;
-    public ushort* Title;
-    public uint    Flags;
-    public ushort  FileOffset;
-    public ushort  ExtensionOffset;
-    public ushort* DefaultExtension;
-    public long    CustomData;
-    public void*   Hook;
-    public ushort* TemplateName;
-    public void*   Reserved1;
-    public uint    Reserved2;
-    public uint    FlagsEx;
+    public uint      Size;
+    public HWND      Owner;
+    public HINSTANCE Instance;
+    public ushort*   Filter;
+    public ushort*   CustomFilter;
+    public uint      CustomFilterMax;
+    public uint      FilterIndex;
+    public ushort*   File;
+    public uint      FileMax;
+    public ushort*   FileTitle;
+    public uint      FileTitleMax;
+    public ushort*   InitialDirectory;
+    public ushort*   Title;
+    public uint      Flags;
+    public ushort    FileOffset;
+    public ushort    ExtensionOffset;
+    public ushort*   DefaultExtension;
+    public long      CustomData;
+    public void*     Hook;
+    public ushort*   TemplateName;
+    public void*     Reserved1;
+    public uint      Reserved2;
+    public uint      FlagsEx;
 }
 
 public const uint OfnReadOnly           = 0x00000001u;

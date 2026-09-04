@@ -30,15 +30,17 @@
 // layout and `IUnknown`, and is not bound.
 module Win32.Shell32;
 
+import Win32.Handles;
+
 #if WINDOWS
 
 public extern "C" {
-    void* ShellExecuteW(void* owner, ushort* verb, ushort* file,
-                        ushort* parameters, ushort* directory, int show);
-    uint  SHGetFolderPathW(void* owner, int folder, void* token, uint flags, ushort* path);
-    uint  DragQueryFileW(void* drop, uint index, ushort* buffer, uint size);
-    void  DragFinish(void* drop);
-    void  DragAcceptFiles(void* window, int accept);
+    HINSTANCE ShellExecuteW(HWND owner, ushort* verb, ushort* file,
+                            ushort* parameters, ushort* directory, int show);
+    uint      SHGetFolderPathW(HWND owner, int folder, HANDLE token, uint flags, ushort* path);
+    uint      DragQueryFileW(HDROP drop, uint index, ushort* buffer, uint size);
+    void      DragFinish(HDROP drop);
+    void      DragAcceptFiles(HWND window, int accept);
 }
 
 /// `ShellExecuteW` returns a fake `HINSTANCE` that is an error code when it is

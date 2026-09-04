@@ -29,6 +29,7 @@ module Win32.Machine;
 
 import Win32;
 import Win32.Kernel32;
+import Win32.Handles;
 
 // =================================================================== system
 
@@ -96,12 +97,12 @@ public bool ReleasePages(void* at) {
 /// export name is bytes in the file rather than text — which is why its
 /// declaration takes a `byte*` and a Stainless string literal reaches it
 /// directly.
-public void* LoadLibrary(String name) {
+public HMODULE LoadLibrary(String name) {
     return LoadLibraryW(name.ToUtf16().ToPointer());
 }
 
 /// The full path of the running .exe, or of a loaded DLL when given its handle.
-public String ModulePath(void* library) {
+public String ModulePath(HMODULE library) {
     var buffer = new WideBuffer(32768u);
     uint units = GetModuleFileNameW(library, buffer.Pointer(), buffer.Capacity());
     if (units == 0u) { return ""; }

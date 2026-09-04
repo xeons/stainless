@@ -1,0 +1,2 @@
+# Only the raw layer: a mix-up is caught before anything is linked.
+bindings/win32/api

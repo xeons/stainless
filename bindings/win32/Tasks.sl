@@ -33,6 +33,7 @@ module Win32.Tasks;
 
 import Win32;
 import Win32.Kernel32;
+import Win32.Handles;
 
 /// A `SECURITY_ATTRIBUTES` that says only "the child may inherit this handle".
 public SecurityAttributes Inheritable() {
@@ -72,7 +73,7 @@ public StartupInfo NewStartupInfo() {
 /// A process handle becomes signalled when the process exits, a thread's when
 /// the thread does, and an event's when it is set — which is why one function
 /// covers all three.
-public bool Wait(void* handle, uint milliseconds) {
+public bool Wait(HANDLE handle, uint milliseconds) {
     return WaitForSingleObject(handle, milliseconds) == WaitObject0;
 }
 
@@ -110,8 +111,8 @@ public Completed Run(String commandLine, String workingDirectory) {
     // Both ends must be inheritable for the child to receive one.
     var security = Inheritable();
 
-    void* readEnd = null;
-    void* writeEnd = null;
+    HANDLE readEnd = null;
+    HANDLE writeEnd = null;
     if (!Win32.Succeeded(CreatePipe(&readEnd, &writeEnd, &security, 0u))) {
         return completed;
     }
@@ -163,7 +164,7 @@ public Completed Run(String commandLine, String workingDirectory) {
 /// The child's output is bytes, and this treats them as UTF-8 — which is right
 /// for a program that says so and wrong for one still writing the OEM code
 /// page. `Win32.Terminal.UseUtf8` is what a child of this program would call.
-public String ReadAll(void* pipe) {
+public String ReadAll(HANDLE pipe) {
     var text = new StringBuilder();
     var chunk = new ByteBuffer(4096u);
 

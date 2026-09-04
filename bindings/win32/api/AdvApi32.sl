@@ -31,33 +31,35 @@
 // is the layer that turns it into a `Result`.
 module Win32.AdvApi32;
 
+import Win32.Handles;
+
 #if WINDOWS
 
 import Win32.Kernel32;
 
 public extern "C" {
-    int RegOpenKeyExW(void* key, ushort* path, uint options, uint access, void** result);
-    int RegCreateKeyExW(void* key, ushort* path, uint reserved, ushort* windowClass,
+    int RegOpenKeyExW(HKEY key, ushort* path, uint options, uint access, HKEY* result);
+    int RegCreateKeyExW(HKEY key, ushort* path, uint reserved, ushort* windowClass,
                         uint options, uint access, SecurityAttributes* security,
-                        void** result, uint* disposition);
-    int RegCloseKey(void* key);
-    int RegQueryValueExW(void* key, ushort* name, uint* reserved, uint* kind,
+                        HKEY* result, uint* disposition);
+    int RegCloseKey(HKEY key);
+    int RegQueryValueExW(HKEY key, ushort* name, uint* reserved, uint* kind,
                          byte* data, uint* size);
-    int RegSetValueExW(void* key, ushort* name, uint reserved, uint kind,
+    int RegSetValueExW(HKEY key, ushort* name, uint reserved, uint kind,
                        byte* data, uint size);
-    int RegDeleteValueW(void* key, ushort* name);
-    int RegDeleteKeyW(void* key, ushort* path);
-    int RegEnumKeyExW(void* key, uint index, ushort* name, uint* nameSize,
+    int RegDeleteValueW(HKEY key, ushort* name);
+    int RegDeleteKeyW(HKEY key, ushort* path);
+    int RegEnumKeyExW(HKEY key, uint index, ushort* name, uint* nameSize,
                       uint* reserved, ushort* windowClass, uint* classSize,
                       FileTime* lastWrite);
-    int RegEnumValueW(void* key, uint index, ushort* name, uint* nameSize,
+    int RegEnumValueW(HKEY key, uint index, ushort* name, uint* nameSize,
                       uint* reserved, uint* kind, byte* data, uint* dataSize);
-    int RegQueryInfoKeyW(void* key, ushort* windowClass, uint* classSize,
+    int RegQueryInfoKeyW(HKEY key, ushort* windowClass, uint* classSize,
                          uint* reserved, uint* subkeys, uint* maxSubkeyLength,
                          uint* maxClassLength, uint* values, uint* maxValueNameLength,
                          uint* maxValueLength, uint* securityDescriptor,
                          FileTime* lastWrite);
-    int RegFlushKey(void* key);
+    int RegFlushKey(HKEY key);
 
     int GetUserNameW(ushort* buffer, uint* size);
 }
@@ -66,12 +68,12 @@ public extern "C" {
 
 /// The predefined keys. They are pointer-shaped constants rather than handles
 /// anything opened, so they are never closed — and functions rather than
-/// `const`, because Stainless has no `const void*`.
-public void* ClassesRoot()   { return (void*)(nuint)0x80000000u; }
-public void* CurrentUser()   { return (void*)(nuint)0x80000001u; }
-public void* LocalMachine()  { return (void*)(nuint)0x80000002u; }
-public void* Users()         { return (void*)(nuint)0x80000003u; }
-public void* CurrentConfig() { return (void*)(nuint)0x80000005u; }
+/// `const`, because Stainless has no `const` pointer.
+public HKEY ClassesRoot()   { return (HKEY)(nuint)0x80000000u; }
+public HKEY CurrentUser()   { return (HKEY)(nuint)0x80000001u; }
+public HKEY LocalMachine()  { return (HKEY)(nuint)0x80000002u; }
+public HKEY Users()         { return (HKEY)(nuint)0x80000003u; }
+public HKEY CurrentConfig() { return (HKEY)(nuint)0x80000005u; }
 
 // =================================================================== access
 

@@ -7,4 +7,6 @@ comdlg32: 524288
 HKLM is not null:      true
 IDC_ARROW is not null: true
 INVALID_HANDLE is -1:  true
+a handle is one pointer: true
+and they start null:     true
 a real call works:     true

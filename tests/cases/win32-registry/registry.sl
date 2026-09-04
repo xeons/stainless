@@ -14,6 +14,7 @@ module Win32Registry;
 import Standard.Console;
 import Win32;
 import Win32.AdvApi32;
+import Win32.Handles;
 import Win32.Registry;
 
 static readonly String CurrentVersion = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
@@ -50,7 +51,7 @@ int Main() {
             return 1;
 
         case Ok held:
-            void* key = held.Value;
+            HKEY key = held.Value;
 
             // ProductName is a REG_SZ on every Windows. Its text differs, so
             // only its shape is checked.

@@ -9,6 +9,7 @@ import Standard.Console;
 import Standard.Collections;
 import Win32;
 import Win32.Kernel32;
+import Win32.Handles;
 import Win32.Environment;
 import Win32.Files;
 import Win32.Machine;
@@ -80,7 +81,7 @@ int Main() {
     Console.WriteLine("offsetof(FileName) = " + Text.FromInteger(offsetof(FindData, FileName)));
 
     FindData data;
-    void* find = Files.FindFirst(directory + "\\alpha.txt", ref data);
+    HANDLE find = Files.FindFirst(directory + "\\alpha.txt", ref data);
     Console.WriteLine("alpha found: " + Text.FromBool(!Win32.IsInvalid(find)));
     Console.WriteLine("  name: " + Files.NameOf(ref data));
     Console.WriteLine("  size: " + Text.FromInteger((long)Files.SizeOf(ref data)));
@@ -91,7 +92,7 @@ int Main() {
 
     // A pattern nothing matches is InvalidHandle with ERROR_FILE_NOT_FOUND
     // rather than an empty walk.
-    void* missing = Files.FindFirst(directory + "\\*.nothing", ref data);
+    HANDLE missing = Files.FindFirst(directory + "\\*.nothing", ref data);
     Console.WriteLine("no match is invalid: " + Text.FromBool(Win32.IsInvalid(missing)));
     Console.WriteLine("  because: " + Text.FromBool(Win32.LastError() == ErrorFileNotFound));
 
@@ -125,7 +126,7 @@ int Main() {
 /// Creates an empty file, through the binding rather than through Standard.File,
 /// so that CreateFileW and CloseHandle are what is being tested.
 void Touch(String path) {
-    void* file = Files.Open(path, GenericWrite, 0u, CreateAlways);
+    HANDLE file = Files.Open(path, GenericWrite, 0u, CreateAlways);
     if (!Win32.IsInvalid(file)) { CloseHandle(file); }
 }
 

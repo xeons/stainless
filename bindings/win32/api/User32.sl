@@ -36,6 +36,8 @@
 // goes where Win32 has always put it: `SetWindowLongPtrW` with `GwlpUserData`.
 module Win32.User32;
 
+import Win32.Handles;
+
 #if WINDOWS
 
 // ================================================================= geometry
@@ -63,7 +65,7 @@ public struct Rect {
 
 /// `MSG`. `sizeof` is 48, as it is in C.
 public struct Msg {
-    public void* Window;
+    public HWND  Window;
     public uint  Message;
     public ulong WParam;
     public long  LParam;
@@ -76,13 +78,13 @@ public struct Msg {
 /// `LRESULT` and `LPARAM` are signed pointer-width, `WPARAM` unsigned
 /// pointer-width. They are written `long` and `ulong` here because Windows is
 /// 64-bit; a 32-bit target would want `nint` and `nuint`.
-public delegate long WindowProcedure(void* window, uint message, ulong wParam, long lParam);
+public delegate long WindowProcedure(HWND window, uint message, ulong wParam, long lParam);
 
 /// `WNDENUMPROC`: return zero to stop the walk, non-zero to continue.
-public delegate int WindowEnumerator(void* window, long parameter);
+public delegate int WindowEnumerator(HWND window, long parameter);
 
 /// `TIMERPROC`, for a `SetTimer` that calls back rather than posting `WM_TIMER`.
-public delegate void TimerProcedure(void* window, uint message, ulong id, uint ticks);
+public delegate void TimerProcedure(HWND window, uint message, ulong id, uint ticks);
 
 public const uint WmNull             = 0x0000u;
 public const uint WmCreate           = 0x0001u;
@@ -132,14 +134,14 @@ public const uint PeekNoRemove = 0x0000u;
 public const uint PeekRemove   = 0x0001u;
 
 public extern "C" {
-    int  GetMessageW(Msg* message, void* window, uint first, uint last);
-    int  PeekMessageW(Msg* message, void* window, uint first, uint last, uint remove);
+    int  GetMessageW(Msg* message, HWND window, uint first, uint last);
+    int  PeekMessageW(Msg* message, HWND window, uint first, uint last, uint remove);
     int  TranslateMessage(Msg* message);
     long DispatchMessageW(Msg* message);
     void PostQuitMessage(int code);
-    long DefWindowProcW(void* window, uint message, ulong wParam, long lParam);
-    long SendMessageW(void* window, uint message, ulong wParam, long lParam);
-    int  PostMessageW(void* window, uint message, ulong wParam, long lParam);
+    long DefWindowProcW(HWND window, uint message, ulong wParam, long lParam);
+    long SendMessageW(HWND window, uint message, ulong wParam, long lParam);
+    int  PostMessageW(HWND window, uint message, ulong wParam, long lParam);
     int  PostThreadMessageW(uint thread, uint message, ulong wParam, long lParam);
     int  MessageBeep(uint kind);
 }
@@ -154,13 +156,13 @@ public struct WindowClass {
     public WindowProcedure Procedure;
     public int             ClassExtra;
     public int             WindowExtra;
-    public void*           Instance;
-    public void*           Icon;
-    public void*           Cursor;
-    public void*           Background;
+    public HINSTANCE       Instance;
+    public HICON           Icon;
+    public HCURSOR         Cursor;
+    public HBRUSH          Background;
     public ushort*         MenuName;
     public ushort*         ClassName;
-    public void*           SmallIcon;
+    public HICON           SmallIcon;
 }
 
 public const uint ClassStyleVerticalRedraw   = 0x0001u;
@@ -175,49 +177,49 @@ public const uint ClassStyleDropShadow       = 0x00020000u;
 
 public extern "C" {
     ushort RegisterClassExW(WindowClass* windowClass);
-    int    UnregisterClassW(ushort* name, void* instance);
-    int    GetClassInfoExW(void* instance, ushort* name, WindowClass* windowClass);
+    int    UnregisterClassW(ushort* name, HINSTANCE instance);
+    int    GetClassInfoExW(HINSTANCE instance, ushort* name, WindowClass* windowClass);
 }
 
 // ================================================================== windows
 
 public extern "C" {
-    void* CreateWindowExW(uint extendedStyle, ushort* className, ushort* windowName,
-                          uint style, int x, int y, int width, int height,
-                          void* parent, void* menu, void* instance, void* parameter);
-    int   DestroyWindow(void* window);
-    int   ShowWindow(void* window, int command);
-    int   UpdateWindow(void* window);
-    int   MoveWindow(void* window, int x, int y, int width, int height, int repaint);
-    int   SetWindowPos(void* window, void* insertAfter, int x, int y,
-                       int width, int height, uint flags);
-    int   GetClientRect(void* window, Rect* rectangle);
-    int   GetWindowRect(void* window, Rect* rectangle);
-    int   AdjustWindowRectEx(Rect* rectangle, uint style, int hasMenu, uint extendedStyle);
-    void* GetParent(void* window);
-    void* SetParent(void* child, void* parent);
-    void* FindWindowW(ushort* className, ushort* windowName);
-    void* GetForegroundWindow();
-    int   SetForegroundWindow(void* window);
-    void* GetFocus();
-    void* SetFocus(void* window);
-    void* GetDesktopWindow();
-    int   IsWindow(void* window);
-    int   IsWindowVisible(void* window);
-    int   IsIconic(void* window);
-    int   IsZoomed(void* window);
-    int   EnumWindows(WindowEnumerator callback, long parameter);
-    int   EnumChildWindows(void* parent, WindowEnumerator callback, long parameter);
-    long  GetWindowLongPtrW(void* window, int index);
-    long  SetWindowLongPtrW(void* window, int index, long value);
-    uint  GetWindowThreadProcessId(void* window, uint* processId);
+    HWND CreateWindowExW(uint extendedStyle, ushort* className, ushort* windowName,
+                         uint style, int x, int y, int width, int height,
+                         HWND parent, HMENU menu, HINSTANCE instance, void* parameter);
+    int  DestroyWindow(HWND window);
+    int  ShowWindow(HWND window, int command);
+    int  UpdateWindow(HWND window);
+    int  MoveWindow(HWND window, int x, int y, int width, int height, int repaint);
+    int  SetWindowPos(HWND window, HWND insertAfter, int x, int y,
+                      int width, int height, uint flags);
+    int  GetClientRect(HWND window, Rect* rectangle);
+    int  GetWindowRect(HWND window, Rect* rectangle);
+    int  AdjustWindowRectEx(Rect* rectangle, uint style, int hasMenu, uint extendedStyle);
+    HWND GetParent(HWND window);
+    HWND SetParent(HWND child, HWND parent);
+    HWND FindWindowW(ushort* className, ushort* windowName);
+    HWND GetForegroundWindow();
+    int  SetForegroundWindow(HWND window);
+    HWND GetFocus();
+    HWND SetFocus(HWND window);
+    HWND GetDesktopWindow();
+    int  IsWindow(HWND window);
+    int  IsWindowVisible(HWND window);
+    int  IsIconic(HWND window);
+    int  IsZoomed(HWND window);
+    int  EnumWindows(WindowEnumerator callback, long parameter);
+    int  EnumChildWindows(HWND parent, WindowEnumerator callback, long parameter);
+    long GetWindowLongPtrW(HWND window, int index);
+    long SetWindowLongPtrW(HWND window, int index, long value);
+    uint GetWindowThreadProcessId(HWND window, uint* processId);
 
-    int   SetWindowTextW(void* window, ushort* text);
-    int   GetWindowTextW(void* window, ushort* buffer, int size);
-    int   GetWindowTextLengthW(void* window);
+    int  SetWindowTextW(HWND window, ushort* text);
+    int  GetWindowTextW(HWND window, ushort* buffer, int size);
+    int  GetWindowTextLengthW(HWND window);
 
-    int   InvalidateRect(void* window, Rect* rectangle, int erase);
-    int   ValidateRect(void* window, Rect* rectangle);
+    int  InvalidateRect(HWND window, Rect* rectangle, int erase);
+    int  ValidateRect(HWND window, Rect* rectangle);
 }
 
 public const uint WsOverlapped       = 0x00000000u;
@@ -301,31 +303,31 @@ public const int GwlExtendedStyle = -20;
 /// offset before it are the ones C computes. Nothing should read them — they
 /// are reserved to Windows.
 public struct PaintStruct {
-    public void* Dc;
-    public int   Erase;
-    public Rect  Paint;
-    public int   Restore;
-    public int   IncrementalUpdate;
-    public uint  Reserved0;
-    public uint  Reserved1;
-    public uint  Reserved2;
-    public uint  Reserved3;
-    public uint  Reserved4;
-    public uint  Reserved5;
-    public uint  Reserved6;
-    public uint  Reserved7;
+    public HDC  Dc;
+    public int  Erase;
+    public Rect Paint;
+    public int  Restore;
+    public int  IncrementalUpdate;
+    public uint Reserved0;
+    public uint Reserved1;
+    public uint Reserved2;
+    public uint Reserved3;
+    public uint Reserved4;
+    public uint Reserved5;
+    public uint Reserved6;
+    public uint Reserved7;
 }
 
 public extern "C" {
-    void* BeginPaint(void* window, PaintStruct* paint);
-    int   EndPaint(void* window, PaintStruct* paint);
-    void* GetDC(void* window);
-    void* GetWindowDC(void* window);
-    int   ReleaseDC(void* window, void* dc);
-    int   FillRect(void* dc, Rect* rectangle, void* brush);
-    int   FrameRect(void* dc, Rect* rectangle, void* brush);
-    int   InvertRect(void* dc, Rect* rectangle);
-    int   DrawTextW(void* dc, ushort* text, int length, Rect* rectangle, uint format);
+    HDC BeginPaint(HWND window, PaintStruct* paint);
+    int EndPaint(HWND window, PaintStruct* paint);
+    HDC GetDC(HWND window);
+    HDC GetWindowDC(HWND window);
+    int ReleaseDC(HWND window, HDC dc);
+    int FillRect(HDC dc, Rect* rectangle, HBRUSH brush);
+    int FrameRect(HDC dc, Rect* rectangle, HBRUSH brush);
+    int InvertRect(HDC dc, Rect* rectangle);
+    int DrawTextW(HDC dc, ushort* text, int length, Rect* rectangle, uint format);
 }
 
 public const uint DtLeft           = 0x00000000u;
@@ -341,7 +343,7 @@ public const uint DtCalculateOnly  = 0x00000400u;
 // ============================================================== message box
 
 public extern "C" {
-    int MessageBoxW(void* owner, ushort* text, ushort* caption, uint style);
+    int MessageBoxW(HWND owner, ushort* text, ushort* caption, uint style);
 }
 
 public const uint MbOk               = 0x00000000u;
@@ -378,15 +380,15 @@ public const int IdNo     = 7;
 // =================================================================== cursor
 
 public extern "C" {
-    int   GetCursorPos(Point* point);
-    int   SetCursorPos(int x, int y);
-    void* LoadCursorW(void* instance, ushort* name);
-    void* SetCursor(void* cursor);
-    int   ShowCursor(int show);
-    int   ScreenToClient(void* window, Point* point);
-    int   ClientToScreen(void* window, Point* point);
-    void* SetCapture(void* window);
-    int   ReleaseCapture();
+    int     GetCursorPos(Point* point);
+    int     SetCursorPos(int x, int y);
+    HCURSOR LoadCursorW(HINSTANCE instance, ushort* name);
+    HCURSOR SetCursor(HCURSOR cursor);
+    int     ShowCursor(int show);
+    int     ScreenToClient(HWND window, Point* point);
+    int     ClientToScreen(HWND window, Point* point);
+    HWND    SetCapture(HWND window);
+    int     ReleaseCapture();
 }
 
 /// The standard cursors, passed to `LoadCursorW` with a null instance. They are
@@ -450,12 +452,12 @@ public const int VkRightControl = 0xA3;
 // ================================================================ clipboard
 
 public extern "C" {
-    int   OpenClipboard(void* owner);
-    int   CloseClipboard();
-    int   EmptyClipboard();
-    void* GetClipboardData(uint format);
-    void* SetClipboardData(uint format, void* handle);
-    int   IsClipboardFormatAvailable(uint format);
+    int    OpenClipboard(HWND owner);
+    int    CloseClipboard();
+    int    EmptyClipboard();
+    HANDLE GetClipboardData(uint format);
+    HANDLE SetClipboardData(uint format, HANDLE handle);
+    int    IsClipboardFormatAvailable(uint format);
 }
 
 public const uint ClipboardText        = 1u;
@@ -466,8 +468,8 @@ public const uint ClipboardHDrop       = 15u;
 // =================================================================== timers
 
 public extern "C" {
-    ulong SetTimer(void* window, ulong id, uint milliseconds, TimerProcedure callback);
-    int   KillTimer(void* window, ulong id);
+    ulong SetTimer(HWND window, ulong id, uint milliseconds, TimerProcedure callback);
+    int   KillTimer(HWND window, ulong id);
 }
 
 // ================================================================== metrics
@@ -475,9 +477,9 @@ public extern "C" {
 public extern "C" {
     int   GetSystemMetrics(int index);
     int   SystemParametersInfoW(uint action, uint parameter, void* value, uint winIni);
-    void* LoadIconW(void* instance, ushort* name);
+    HICON LoadIconW(HINSTANCE instance, ushort* name);
     int   SetProcessDPIAware();
-    uint  GetDpiForWindow(void* window);
+    uint  GetDpiForWindow(HWND window);
 }
 
 public const int SmScreenWidth            = 0;

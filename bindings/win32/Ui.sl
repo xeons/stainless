@@ -40,6 +40,7 @@ module Win32.Ui;
 import Win32;
 import Win32.User32;
 import Win32.Kernel32;
+import Win32.Handles;
 
 // ================================================================= geometry
 
@@ -127,14 +128,14 @@ public WindowClass NewWindowClass() {
 
 /// Creates an ordinary top-level window. The declaration is right there when a
 /// caller needs an extended style, a parent or a menu.
-public void* CreateWindow(String className, String title, uint style,
-                          int x, int y, int width, int height, void* instance) {
+public HWND CreateWindow(String className, String title, uint style,
+                          int x, int y, int width, int height, HINSTANCE instance) {
     return CreateWindowExW(0u, className.ToUtf16().ToPointer(), title.ToUtf16().ToPointer(),
                            style, x, y, width, height, null, null, instance, null);
 }
 
 /// The window's title, or a control's text.
-public String WindowText(void* window) {
+public String WindowText(HWND window) {
     int length = GetWindowTextLengthW(window);
     if (length <= 0) { return ""; }
 
@@ -144,20 +145,20 @@ public String WindowText(void* window) {
     return buffer.Text((uint)units);
 }
 
-public bool SetWindowText(void* window, String text) {
+public bool SetWindowText(HWND window, String text) {
     return Win32.Succeeded(SetWindowTextW(window, text.ToUtf16().ToPointer()));
 }
 
 /// The client area, whose left and top are always zero — it is a size wearing
 /// the shape of a rectangle.
-public Rect ClientRect(void* window) {
+public Rect ClientRect(HWND window) {
     Rect rectangle;
     GetClientRect(window, &rectangle);
     return rectangle;
 }
 
 /// The window's outer rectangle in screen coordinates, frame included.
-public Rect WindowRect(void* window) {
+public Rect WindowRect(HWND window) {
     Rect rectangle;
     GetWindowRect(window, &rectangle);
     return rectangle;
@@ -172,20 +173,20 @@ public Rect AdjustForFrame(Rect client, uint style, uint extendedStyle) {
 }
 
 /// Marks the whole window as needing repainting, which produces a `WM_PAINT`.
-public bool Invalidate(void* window, bool erase) {
+public bool Invalidate(HWND window, bool erase) {
     return Win32.Succeeded(InvalidateRect(window, null, erase ? 1 : 0));
 }
 
 /// Draws text into a rectangle. `-1` for the length means "up to the NUL",
 /// which is what a Stainless string widened for the call always has.
-public int DrawText(void* dc, String text, Rect* rectangle, uint format) {
+public int DrawText(HDC dc, String text, Rect* rectangle, uint format) {
     return DrawTextW(dc, text.ToUtf16().ToPointer(), -1, rectangle, format);
 }
 
 // ============================================================== message box
 
 /// Shows a message box and returns the `Id...` of the button pressed.
-public int MessageBox(void* owner, String text, String caption, uint style) {
+public int MessageBox(HWND owner, String text, String caption, uint style) {
     return MessageBoxW(owner, text.ToUtf16().ToPointer(),
                        caption.ToUtf16().ToPointer(), style);
 }
@@ -235,7 +236,7 @@ public String ClipboardString() {
     if (!IsClipboardAvailable()) { return ""; }
     if (!Win32.Succeeded(OpenClipboard(null))) { return ""; }
 
-    void* handle = GetClipboardData(ClipboardUnicodeText);
+    HANDLE handle = GetClipboardData(ClipboardUnicodeText);
     if (handle == null) {
         CloseClipboard();
         return "";
@@ -256,7 +257,7 @@ public bool SetClipboardString(String text) {
     var wide = text.ToUtf16();
     nuint bytes = (wide.UnitCount() + 1u) * 2u;
 
-    void* block = GlobalAlloc(GlobalMoveable, bytes);
+    HGLOBAL block = GlobalAlloc(GlobalMoveable, bytes);
     if (block == null) { return false; }
 
     void* locked = GlobalLock(block);

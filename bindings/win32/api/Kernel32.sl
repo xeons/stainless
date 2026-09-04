@@ -30,6 +30,8 @@
 // Windows program already links.
 module Win32.Kernel32;
 
+import Win32.Handles;
+
 #if WINDOWS
 
 // =================================================================== errors
@@ -72,11 +74,11 @@ public const uint ErrorIoPending          = 997u;
 // ================================================================== handles
 
 public extern "C" {
-    int CloseHandle(void* handle);
-    int DuplicateHandle(void* sourceProcess, void* source, void* targetProcess,
-                        void** target, uint access, int inheritable, uint options);
-    int SetHandleInformation(void* handle, uint mask, uint flags);
-    int GetHandleInformation(void* handle, uint* flags);
+    int CloseHandle(HANDLE handle);
+    int DuplicateHandle(HANDLE sourceProcess, HANDLE source, HANDLE targetProcess,
+                        HANDLE* target, uint access, int inheritable, uint options);
+    int SetHandleInformation(HANDLE handle, uint mask, uint flags);
+    int GetHandleInformation(HANDLE handle, uint* flags);
 }
 
 public const uint HandleFlagInherit        = 0x00000001u;
@@ -88,8 +90,8 @@ public const uint DuplicateSameAccess      = 0x00000002u;
 ///
 /// Which of the two a failing call returns is per-function and not guessable —
 /// `CreateFileW` returns this one, `CreateFileMappingW` returns null. A
-/// function rather than a `const` because Stainless has no `const void*`.
-public void* InvalidHandle() { return (void*)(nuint)0xFFFFFFFFFFFFFFFFu; }
+/// function rather than a `const` because Stainless has no `const` pointer.
+public HANDLE InvalidHandle() { return (HANDLE)(nuint)0xFFFFFFFFFFFFFFFFu; }
 
 /// `SECURITY_ATTRIBUTES`. Pass `null` where a call takes one and the default
 /// will do, which is almost everywhere.
@@ -102,37 +104,37 @@ public struct SecurityAttributes {
 // ==================================================================== files
 
 public extern "C" {
-    void* CreateFileW(ushort* name, uint access, uint shareMode,
-                      SecurityAttributes* security, uint disposition,
-                      uint flags, void* template);
-    int   ReadFile(void* file, void* buffer, uint toRead, uint* read, void* overlapped);
-    int   WriteFile(void* file, void* buffer, uint toWrite, uint* written, void* overlapped);
-    int   FlushFileBuffers(void* file);
-    int   SetFilePointerEx(void* file, long distance, long* newPosition, uint origin);
-    int   GetFileSizeEx(void* file, long* size);
-    int   SetEndOfFile(void* file);
+    HANDLE CreateFileW(ushort* name, uint access, uint shareMode,
+                       SecurityAttributes* security, uint disposition,
+                       uint flags, HANDLE template);
+    int    ReadFile(HANDLE file, void* buffer, uint toRead, uint* read, void* overlapped);
+    int    WriteFile(HANDLE file, void* buffer, uint toWrite, uint* written, void* overlapped);
+    int    FlushFileBuffers(HANDLE file);
+    int    SetFilePointerEx(HANDLE file, long distance, long* newPosition, uint origin);
+    int    GetFileSizeEx(HANDLE file, long* size);
+    int    SetEndOfFile(HANDLE file);
 
-    int   DeleteFileW(ushort* name);
-    int   CopyFileW(ushort* from, ushort* to, int failIfExists);
-    int   MoveFileExW(ushort* from, ushort* to, uint flags);
-    int   CreateDirectoryW(ushort* path, SecurityAttributes* security);
-    int   RemoveDirectoryW(ushort* path);
-    uint  GetFileAttributesW(ushort* path);
-    int   SetFileAttributesW(ushort* path, uint attributes);
+    int    DeleteFileW(ushort* name);
+    int    CopyFileW(ushort* from, ushort* to, int failIfExists);
+    int    MoveFileExW(ushort* from, ushort* to, uint flags);
+    int    CreateDirectoryW(ushort* path, SecurityAttributes* security);
+    int    RemoveDirectoryW(ushort* path);
+    uint   GetFileAttributesW(ushort* path);
+    int    SetFileAttributesW(ushort* path, uint attributes);
 
-    uint  GetFullPathNameW(ushort* name, uint size, ushort* buffer, ushort** filePart);
-    uint  GetTempPathW(uint size, ushort* buffer);
-    uint  GetTempFileNameW(ushort* path, ushort* prefix, uint unique, ushort* buffer);
-    uint  GetLongPathNameW(ushort* shortPath, ushort* buffer, uint size);
-    uint  GetShortPathNameW(ushort* longPath, ushort* buffer, uint size);
+    uint   GetFullPathNameW(ushort* name, uint size, ushort* buffer, ushort** filePart);
+    uint   GetTempPathW(uint size, ushort* buffer);
+    uint   GetTempFileNameW(ushort* path, ushort* prefix, uint unique, ushort* buffer);
+    uint   GetLongPathNameW(ushort* shortPath, ushort* buffer, uint size);
+    uint   GetShortPathNameW(ushort* longPath, ushort* buffer, uint size);
 
-    void* FindFirstFileW(ushort* pattern, FindData* data);
-    int   FindNextFileW(void* find, FindData* data);
-    int   FindClose(void* find);
+    HANDLE FindFirstFileW(ushort* pattern, FindData* data);
+    int    FindNextFileW(HANDLE find, FindData* data);
+    int    FindClose(HANDLE find);
 
-    int   CreatePipe(void** read, void** write, SecurityAttributes* security, uint size);
-    int   PeekNamedPipe(void* pipe, void* buffer, uint size, uint* read,
-                        uint* available, uint* left);
+    int    CreatePipe(HANDLE* read, HANDLE* write, SecurityAttributes* security, uint size);
+    int    PeekNamedPipe(HANDLE pipe, void* buffer, uint size, uint* read,
+                         uint* available, uint* left);
 }
 
 /// The generic access rights. The specific ones exist too, but a program that
@@ -198,37 +200,37 @@ public const int MaxPath = 260;
 /// are laid out inside it, so the name is at offset 44 and the struct is the
 /// width Windows expects to fill. `Win32.Files.FindData` reads them as text.
 public struct FindData {
-    public uint             Attributes;
-    public FileTime         Created;
-    public FileTime         Accessed;
-    public FileTime         Written;
-    public uint             FileSizeHigh;
-    public uint             FileSizeLow;
-    public uint             Reserved0;
-    public uint             Reserved1;
-    public ushort[MaxPath]  FileName;
-    public ushort[14]       AlternateName;
+    public uint            Attributes;
+    public FileTime        Created;
+    public FileTime        Accessed;
+    public FileTime        Written;
+    public uint            FileSizeHigh;
+    public uint            FileSizeLow;
+    public uint            Reserved0;
+    public uint            Reserved1;
+    public ushort[MaxPath] FileName;
+    public ushort[14]      AlternateName;
 }
 
 // =================================================================== memory
 
 public extern "C" {
-    void* VirtualAlloc(void* at, nuint size, uint type, uint protect);
-    int   VirtualFree(void* at, nuint size, uint type);
-    int   VirtualProtect(void* at, nuint size, uint protect, uint* previous);
+    void*   VirtualAlloc(void* at, nuint size, uint type, uint protect);
+    int     VirtualFree(void* at, nuint size, uint type);
+    int     VirtualProtect(void* at, nuint size, uint protect, uint* previous);
 
-    void* GetProcessHeap();
-    void* HeapAlloc(void* heap, uint flags, nuint size);
-    void* HeapReAlloc(void* heap, uint flags, void* block, nuint size);
-    int   HeapFree(void* heap, uint flags, void* block);
-    nuint HeapSize(void* heap, uint flags, void* block);
+    HANDLE  GetProcessHeap();
+    void*   HeapAlloc(HANDLE heap, uint flags, nuint size);
+    void*   HeapReAlloc(HANDLE heap, uint flags, void* block, nuint size);
+    int     HeapFree(HANDLE heap, uint flags, void* block);
+    nuint   HeapSize(HANDLE heap, uint flags, void* block);
 
-    void* LocalAlloc(uint flags, nuint size);
-    void* LocalFree(void* block);
-    void* GlobalAlloc(uint flags, nuint size);
-    void* GlobalLock(void* block);
-    int   GlobalUnlock(void* block);
-    void* GlobalFree(void* block);
+    HLOCAL  LocalAlloc(uint flags, nuint size);
+    HLOCAL  LocalFree(HLOCAL block);
+    HGLOBAL GlobalAlloc(uint flags, nuint size);
+    void*   GlobalLock(HGLOBAL block);
+    int     GlobalUnlock(HGLOBAL block);
+    HGLOBAL GlobalFree(HGLOBAL block);
 }
 
 public const uint MemCommit   = 0x00001000u;
@@ -258,12 +260,12 @@ public const uint GlobalZeroInit = 0x0040u;
 // ================================================================== modules
 
 public extern "C" {
-    void* LoadLibraryW(ushort* name);
-    void* LoadLibraryExW(ushort* name, void* reserved, uint flags);
-    int   FreeLibrary(void* library);
-    void* GetProcAddress(void* library, byte* name);
-    void* GetModuleHandleW(ushort* name);
-    uint  GetModuleFileNameW(void* library, ushort* buffer, uint size);
+    HMODULE LoadLibraryW(ushort* name);
+    HMODULE LoadLibraryExW(ushort* name, HANDLE reserved, uint flags);
+    int     FreeLibrary(HMODULE library);
+    void*   GetProcAddress(HMODULE library, byte* name);
+    HMODULE GetModuleHandleW(ushort* name);
+    uint    GetModuleFileNameW(HMODULE library, ushort* buffer, uint size);
 }
 
 public const uint LoadLibraryAsDataFile      = 0x00000002u;
@@ -357,41 +359,41 @@ public struct StartupInfo {
     public ushort  ShowWindow;
     public ushort  Reserved2;
     public byte*   Reserved3;
-    public void*   StandardInput;
-    public void*   StandardOutput;
-    public void*   StandardError;
+    public HANDLE  StandardInput;
+    public HANDLE  StandardOutput;
+    public HANDLE  StandardError;
 }
 
 /// `PROCESS_INFORMATION`. Both handles belong to the caller and both must be
 /// closed, including the thread handle nobody wants.
 public struct ProcessInformation {
-    public void* Process;
-    public void* Thread;
-    public uint  ProcessId;
-    public uint  ThreadId;
+    public HANDLE Process;
+    public HANDLE Thread;
+    public uint   ProcessId;
+    public uint   ThreadId;
 }
 
 public extern "C" {
-    int   CreateProcessW(ushort* application, ushort* commandLine,
-                         SecurityAttributes* processSecurity,
-                         SecurityAttributes* threadSecurity,
-                         int inheritHandles, uint flags, void* environment,
-                         ushort* currentDirectory,
-                         StartupInfo* startup, ProcessInformation* information);
-    void* GetCurrentProcess();
-    uint  GetCurrentProcessId();
-    void* GetCurrentThread();
-    uint  GetCurrentThreadId();
-    void  ExitProcess(uint code);
-    void  Sleep(uint milliseconds);
-    uint  SleepEx(uint milliseconds, int alertable);
-    uint  WaitForSingleObject(void* handle, uint milliseconds);
-    uint  WaitForMultipleObjects(uint count, void** handles, int all, uint milliseconds);
-    void* OpenProcess(uint access, int inheritable, uint processId);
-    int   GetExitCodeProcess(void* process, uint* code);
-    int   TerminateProcess(void* process, uint code);
-    int   SetPriorityClass(void* process, uint priority);
-    uint  GetPriorityClass(void* process);
+    int    CreateProcessW(ushort* application, ushort* commandLine,
+                          SecurityAttributes* processSecurity,
+                          SecurityAttributes* threadSecurity,
+                          int inheritHandles, uint flags, void* environment,
+                          ushort* currentDirectory,
+                          StartupInfo* startup, ProcessInformation* information);
+    HANDLE GetCurrentProcess();
+    uint   GetCurrentProcessId();
+    HANDLE GetCurrentThread();
+    uint   GetCurrentThreadId();
+    void   ExitProcess(uint code);
+    void   Sleep(uint milliseconds);
+    uint   SleepEx(uint milliseconds, int alertable);
+    uint   WaitForSingleObject(HANDLE handle, uint milliseconds);
+    uint   WaitForMultipleObjects(uint count, HANDLE* handles, int all, uint milliseconds);
+    HANDLE OpenProcess(uint access, int inheritable, uint processId);
+    int    GetExitCodeProcess(HANDLE process, uint* code);
+    int    TerminateProcess(HANDLE process, uint code);
+    int    SetPriorityClass(HANDLE process, uint priority);
+    uint   GetPriorityClass(HANDLE process);
 }
 
 public const uint StartFlagUseShowWindow = 0x00000001u;
@@ -498,38 +500,38 @@ public struct InputRecord {
 }
 
 public extern "C" {
-    void* GetStdHandle(uint which);
-    int   SetStdHandle(uint which, void* handle);
-    int   GetConsoleMode(void* handle, uint* mode);
-    int   SetConsoleMode(void* handle, uint mode);
-    uint  GetConsoleOutputCP();
-    int   SetConsoleOutputCP(uint codePage);
-    int   SetConsoleCP(uint codePage);
-    int   AllocConsole();
-    int   FreeConsole();
-    int   AttachConsole(uint processId);
-    void* GetConsoleWindow();
+    HANDLE GetStdHandle(uint which);
+    int    SetStdHandle(uint which, HANDLE handle);
+    int    GetConsoleMode(HANDLE handle, uint* mode);
+    int    SetConsoleMode(HANDLE handle, uint mode);
+    uint   GetConsoleOutputCP();
+    int    SetConsoleOutputCP(uint codePage);
+    int    SetConsoleCP(uint codePage);
+    int    AllocConsole();
+    int    FreeConsole();
+    int    AttachConsole(uint processId);
+    HWND   GetConsoleWindow();
 
-    int  GetConsoleScreenBufferInfo(void* handle, ScreenBufferInfo* info);
-    int  SetConsoleCursorPosition(void* handle, Coord position);
-    int  SetConsoleTextAttribute(void* handle, ushort attributes);
-    int  SetConsoleTitleW(ushort* title);
-    uint GetConsoleTitleW(ushort* buffer, uint size);
-    int  GetConsoleCursorInfo(void* handle, CursorInfo* info);
-    int  SetConsoleCursorInfo(void* handle, CursorInfo* info);
-    int  FillConsoleOutputCharacterW(void* handle, ushort character, uint length,
-                                     Coord at, uint* written);
-    int  FillConsoleOutputAttribute(void* handle, ushort attributes, uint length,
-                                    Coord at, uint* written);
-    int  WriteConsoleW(void* handle, ushort* text, uint units, uint* written, void* reserved);
-    int  ReadConsoleW(void* handle, ushort* buffer, uint units, uint* read, void* control);
-    int  SetConsoleScreenBufferSize(void* handle, Coord size);
-    int  SetConsoleWindowInfo(void* handle, int absolute, SmallRect* window);
+    int    GetConsoleScreenBufferInfo(HANDLE handle, ScreenBufferInfo* info);
+    int    SetConsoleCursorPosition(HANDLE handle, Coord position);
+    int    SetConsoleTextAttribute(HANDLE handle, ushort attributes);
+    int    SetConsoleTitleW(ushort* title);
+    uint   GetConsoleTitleW(ushort* buffer, uint size);
+    int    GetConsoleCursorInfo(HANDLE handle, CursorInfo* info);
+    int    SetConsoleCursorInfo(HANDLE handle, CursorInfo* info);
+    int    FillConsoleOutputCharacterW(HANDLE handle, ushort character, uint length,
+                                       Coord at, uint* written);
+    int    FillConsoleOutputAttribute(HANDLE handle, ushort attributes, uint length,
+                                      Coord at, uint* written);
+    int    WriteConsoleW(HANDLE handle, ushort* text, uint units, uint* written, void* reserved);
+    int    ReadConsoleW(HANDLE handle, ushort* buffer, uint units, uint* read, void* control);
+    int    SetConsoleScreenBufferSize(HANDLE handle, Coord size);
+    int    SetConsoleWindowInfo(HANDLE handle, int absolute, SmallRect* window);
 
-    int  ReadConsoleInputW(void* handle, InputRecord* records, uint count, uint* read);
-    int  PeekConsoleInputW(void* handle, InputRecord* records, uint count, uint* read);
-    int  GetNumberOfConsoleInputEvents(void* handle, uint* count);
-    int  FlushConsoleInputBuffer(void* handle);
+    int    ReadConsoleInputW(HANDLE handle, InputRecord* records, uint count, uint* read);
+    int    PeekConsoleInputW(HANDLE handle, InputRecord* records, uint count, uint* read);
+    int    GetNumberOfConsoleInputEvents(HANDLE handle, uint* count);
+    int    FlushConsoleInputBuffer(HANDLE handle);
 }
 
 /// `GetStdHandle`'s argument: -10, -11 and -12 as the header defines them.

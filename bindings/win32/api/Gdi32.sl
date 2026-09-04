@@ -35,6 +35,8 @@
 // deleted at all.
 module Win32.Gdi32;
 
+import Win32.Handles;
+
 #if WINDOWS
 
 import Win32.User32;
@@ -42,17 +44,17 @@ import Win32.User32;
 // ================================================================== objects
 
 public extern "C" {
-    void* CreatePen(int style, int width, uint colour);
-    void* CreateSolidBrush(uint colour);
-    void* CreateHatchBrush(int style, uint colour);
-    void* CreateFontW(int height, int width, int escapement, int orientation,
-                      int weight, uint italic, uint underline, uint strikeOut,
-                      uint charSet, uint precision, uint clipPrecision,
-                      uint quality, uint pitchAndFamily, ushort* face);
-    void* GetStockObject(int index);
-    void* SelectObject(void* dc, void* object);
-    int   DeleteObject(void* object);
-    int   GetObjectW(void* object, int size, void* buffer);
+    HPEN    CreatePen(int style, int width, uint colour);
+    HBRUSH  CreateSolidBrush(uint colour);
+    HBRUSH  CreateHatchBrush(int style, uint colour);
+    HFONT   CreateFontW(int height, int width, int escapement, int orientation,
+                        int weight, uint italic, uint underline, uint strikeOut,
+                        uint charSet, uint precision, uint clipPrecision,
+                        uint quality, uint pitchAndFamily, ushort* face);
+    HGDIOBJ GetStockObject(int index);
+    HGDIOBJ SelectObject(HDC dc, HGDIOBJ object);
+    int     DeleteObject(HGDIOBJ object);
+    int     GetObjectW(HGDIOBJ object, int size, void* buffer);
 }
 
 public const int PenSolid       = 0;
@@ -100,23 +102,23 @@ public const uint DefaultPitch     = 0u;
 // ================================================================== drawing
 
 public extern "C" {
-    int  MoveToEx(void* dc, int x, int y, Point* previous);
-    int  LineTo(void* dc, int x, int y);
-    int  Rectangle(void* dc, int left, int top, int right, int bottom);
-    int  Ellipse(void* dc, int left, int top, int right, int bottom);
-    int  RoundRect(void* dc, int left, int top, int right, int bottom,
+    int  MoveToEx(HDC dc, int x, int y, Point* previous);
+    int  LineTo(HDC dc, int x, int y);
+    int  Rectangle(HDC dc, int left, int top, int right, int bottom);
+    int  Ellipse(HDC dc, int left, int top, int right, int bottom);
+    int  RoundRect(HDC dc, int left, int top, int right, int bottom,
                    int cornerWidth, int cornerHeight);
-    int  Polygon(void* dc, Point* points, int count);
-    int  Polyline(void* dc, Point* points, int count);
-    int  Arc(void* dc, int left, int top, int right, int bottom,
+    int  Polygon(HDC dc, Point* points, int count);
+    int  Polyline(HDC dc, Point* points, int count);
+    int  Arc(HDC dc, int left, int top, int right, int bottom,
              int startX, int startY, int endX, int endY);
-    uint SetPixel(void* dc, int x, int y, uint colour);
-    uint GetPixel(void* dc, int x, int y);
-    int  PatBlt(void* dc, int x, int y, int width, int height, uint operation);
-    int  BitBlt(void* target, int x, int y, int width, int height,
-                void* source, int sourceX, int sourceY, uint operation);
-    int  StretchBlt(void* target, int x, int y, int width, int height,
-                    void* source, int sourceX, int sourceY,
+    uint SetPixel(HDC dc, int x, int y, uint colour);
+    uint GetPixel(HDC dc, int x, int y);
+    int  PatBlt(HDC dc, int x, int y, int width, int height, uint operation);
+    int  BitBlt(HDC target, int x, int y, int width, int height,
+                HDC source, int sourceX, int sourceY, uint operation);
+    int  StretchBlt(HDC target, int x, int y, int width, int height,
+                    HDC source, int sourceX, int sourceY,
                     int sourceWidth, int sourceHeight, uint operation);
 }
 
@@ -133,13 +135,13 @@ public const uint PatCopy    = 0x00F00021u;
 // ===================================================================== text
 
 public extern "C" {
-    int  TextOutW(void* dc, int x, int y, ushort* text, int length);
-    int  GetTextExtentPoint32W(void* dc, ushort* text, int length, Size* size);
-    uint SetTextColor(void* dc, uint colour);
-    uint GetTextColor(void* dc);
-    uint SetBkColor(void* dc, uint colour);
-    int  SetBkMode(void* dc, int mode);
-    uint SetTextAlign(void* dc, uint align);
+    int  TextOutW(HDC dc, int x, int y, ushort* text, int length);
+    int  GetTextExtentPoint32W(HDC dc, ushort* text, int length, Size* size);
+    uint SetTextColor(HDC dc, uint colour);
+    uint GetTextColor(HDC dc);
+    uint SetBkColor(HDC dc, uint colour);
+    int  SetBkMode(HDC dc, int mode);
+    uint SetTextAlign(HDC dc, uint align);
 }
 
 /// `SetBkMode`. `Transparent` is what a caller drawing text over a picture
@@ -157,12 +159,12 @@ public const uint TextAlignBaseline = 24u;
 // ================================================================== bitmaps
 
 public extern "C" {
-    void* CreateCompatibleDC(void* dc);
-    void* CreateCompatibleBitmap(void* dc, int width, int height);
-    int   DeleteDC(void* dc);
-    int   GetDeviceCaps(void* dc, int index);
-    int   SaveDC(void* dc);
-    int   RestoreDC(void* dc, int state);
+    HDC     CreateCompatibleDC(HDC dc);
+    HBITMAP CreateCompatibleBitmap(HDC dc, int width, int height);
+    int     DeleteDC(HDC dc);
+    int     GetDeviceCaps(HDC dc, int index);
+    int     SaveDC(HDC dc);
+    int     RestoreDC(HDC dc, int state);
 }
 
 public const int DeviceCapsHorizontalPixels = 8;

@@ -35,6 +35,7 @@ module Win32.Dialogs;
 
 import Win32;
 import Win32.ComDlg32;
+import Win32.Handles;
 
 /// Builds the NUL-separated filter list `OPENFILENAMEW` wants.
 ///
@@ -99,7 +100,7 @@ public OpenFileName NewOpenFileName() {
 
 /// Shows the open dialog and returns the chosen path, or an empty string if
 /// the user cancelled.
-public String AskToOpen(void* owner, String title, String[] filterPairs) {
+public String AskToOpen(HWND owner, String title, String[] filterPairs) {
     var filter = BuildFilter(filterPairs);
     var chosen = new WideBuffer(32768u);
 
@@ -117,7 +118,7 @@ public String AskToOpen(void* owner, String title, String[] filterPairs) {
 }
 
 /// Shows the save dialog and returns the chosen path, or an empty string.
-public String AskToSave(void* owner, String title, String[] filterPairs,
+public String AskToSave(HWND owner, String title, String[] filterPairs,
                         String defaultExtension) {
     var filter = BuildFilter(filterPairs);
     var chosen = new WideBuffer(32768u);
