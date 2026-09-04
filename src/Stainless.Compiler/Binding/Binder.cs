@@ -28,6 +28,12 @@ public sealed class BoundProgram
     public required IReadOnlyList<InterfaceTypeSymbol> Interfaces { get; init; }
 
     /// <summary>
+    /// Every com interface the program mentions, so the emitter can write out
+    /// the IID each one folded to and the vtables that point at it.
+    /// </summary>
+    public required IReadOnlyList<ComInterfaceTypeSymbol> ComInterfaces { get; init; }
+
+    /// <summary>
     /// Every struct type the program uses: those declared in a module, and the
     /// instantiations of a generic one. An instantiation belongs to no module's
     /// type table, so without this the IR would name a type nothing defined.
@@ -181,6 +187,7 @@ public sealed class Binder(
             Functions = _functions,
             Classes = _classes,
             Interfaces = _interfaces,
+            ComInterfaces = _comInterfaces,
             Structs = _modules.Values
                 .SelectMany(m => m.Types.Values)
                 .OfType<StructTypeSymbol>()
@@ -269,9 +276,23 @@ public sealed class Binder(
                 }
 
                 bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
+                bool isCom = declaration.Modifiers.HasFlag(Modifiers.Com);
+
                 NamedTypeSymbol type = declaration.Kind switch
                 {
                     TypeDeclKind.Class => new ClassTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = isPublic,
+                        Span = declaration.Span,
+                    },
+
+                    // `com interface` is its own symbol rather than a flag on
+                    // the ordinary one: the two are different things in memory,
+                    // and sharing a symbol would mean every dispatch, every
+                    // conversion and every retain asking which it was.
+                    TypeDeclKind.Interface when isCom => new ComInterfaceTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
@@ -324,6 +345,7 @@ public sealed class Binder(
 
                 if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
                 if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
+                if (type is ComInterfaceTypeSymbol comInterface) _comInterfaces.Add(comInterface);
             }
 
             foreach (var declaration in unit.Declarations.OfType<AliasDeclSyntax>())
@@ -480,6 +502,15 @@ public sealed class Binder(
     {
         bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
         bool isSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed);
+
+        if (declaration.Modifiers.HasFlag(Modifiers.Com))
+        {
+            if (type is ClassTypeSymbol comClass) comClass.IsCom = true;
+            else if (type is not ComInterfaceTypeSymbol)
+                diagnostics.Error("SL0528", declaration.Span,
+                    $"'com' goes before 'interface' or 'class', and '{type.Name}' is neither; " +
+                    "a COM reference points at a vtable pointer, and only those two have one");
+        }
 
         if (type is not ClassTypeSymbol classType)
         {
@@ -871,7 +902,7 @@ public sealed class Binder(
                 continue;
             }
 
-            if (type is InterfaceTypeSymbol && member is not (FunctionDeclSyntax or PropertyDeclSyntax))
+            if (type.IsContract && member is not (FunctionDeclSyntax or PropertyDeclSyntax))
             {
                 diagnostics.Error("SL0300", member.Span,
                     $"interface '{type.Name}' may only declare methods and properties; " +
@@ -929,7 +960,7 @@ public sealed class Binder(
                 case FunctionDeclSyntax method:
                     if (method.TypeParameters.Count > 0)
                     {
-                        if (type is InterfaceTypeSymbol)
+                        if (type.IsContract)
                         {
                             // A vtable has one slot per method, and a generic
                             // method has as many bodies as it has instantiations.
@@ -1080,7 +1111,7 @@ public sealed class Binder(
             return;
         }
 
-        bool isInterface = type is InterfaceTypeSymbol;
+        bool isInterface = type.IsContract;
         bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
         bool wantsStorage = false;
 
@@ -1212,7 +1243,7 @@ public sealed class Binder(
             Scope = scope,
             Accessor = property,
             IsAutoAccessor = accessor.Body is null
-                             && type is not InterfaceTypeSymbol
+                             && !type.IsContract
                              && !modifiers.HasFlag(Modifiers.Abstract),
         };
 
@@ -1245,7 +1276,7 @@ public sealed class Binder(
             // Every interface member is part of the contract, so it is public
             // whether or not the programmer wrote the word.
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public)
-                       || containingType is InterfaceTypeSymbol,
+                       || containingType is { IsContract: true },
             IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
             IsVirtual = declaration.Modifiers.HasFlag(Modifiers.Virtual)
                         || declaration.Modifiers.HasFlag(Modifiers.Override)
@@ -1297,7 +1328,7 @@ public sealed class Binder(
         if (Dispatchable(declaration.Modifiers) is { } dispatch &&
             containingType is not ClassTypeSymbol)
             diagnostics.Error("SL0519", declaration.Span,
-                containingType is InterfaceTypeSymbol
+                containingType is { IsContract: true }
                     ? $"'{declaration.Name}' is an interface method, so '{dispatch}' says nothing " +
                       "new: every interface method is dispatched already"
                     : containingType is null
@@ -1319,7 +1350,7 @@ public sealed class Binder(
                 $"'{declaration.Name}' is both 'virtual' and 'override'; an override is " +
                 "dispatched because what it replaces was");
 
-        if (containingType is InterfaceTypeSymbol)
+        if (containingType is { IsContract: true })
         {
             if (declaration.Body is not null)
                 diagnostics.Error("SL0301", declaration.Span,
@@ -1360,7 +1391,7 @@ public sealed class Binder(
             // An interface gives each of its methods a dispatch slot by
             // position, so two of the same name in one interface would be a
             // call the receiver could not resolve.
-            else if (containingType is InterfaceTypeSymbol &&
+            else if (containingType.IsContract &&
                      containingType.Methods.Any(m => m.Name == declaration.Name))
                 diagnostics.Error("SL0416", declaration.Span,
                     $"'{containingType.Name}' already declares '{declaration.Name}'; an interface " +
@@ -1600,12 +1631,18 @@ public sealed class Binder(
     /// </summary>
     private void ResolveInterfaces()
     {
-        foreach (var (type, entry) in _typeSyntax.Where(e => e.Key is InterfaceTypeSymbol))
+        foreach (var (type, entry) in _typeSyntax.Where(e => e.Key.IsContract))
             ResolveImplements(type, entry.Declaration, entry.Scope);
 
-        foreach (var (type, entry) in _typeSyntax.Where(e => e.Key is not InterfaceTypeSymbol))
+        foreach (var (type, entry) in _typeSyntax.Where(e => !e.Key.IsContract))
             ResolveImplements(type, entry.Declaration, entry.Scope);
     }
+
+    /// <summary>
+    /// Every com interface in the program, so the emitter can write out the
+    /// IID constants and the vtables that mention them.
+    /// </summary>
+    private readonly List<ComInterfaceTypeSymbol> _comInterfaces = [];
 
     /// <summary>Types whose bases and interfaces are settled.</summary>
     private readonly HashSet<NamedTypeSymbol> _inheritanceDone = [];
@@ -1650,11 +1687,31 @@ public sealed class Binder(
                     continue;
                 }
 
+                // A com interface in the list. For a com interface it is the
+                // one base; for a com class it is one more tear-off.
+                if (resolved is ComInterfaceTypeSymbol comInterface)
+                {
+                    BindComInterface(type, classType, comInterface, written.Span);
+                    continue;
+                }
+
                 if (resolved is not InterfaceTypeSymbol interfaceType)
                 {
                     diagnostics.Error("SL0303", written.Span,
                         $"'{resolved.Name}' is not an interface, so '{type.Name}' cannot " +
-                        (type is InterfaceTypeSymbol ? "extend" : "implement") + " it");
+                        (type.IsContract ? "extend" : "implement") + " it");
+                    continue;
+                }
+
+                // A com interface extends com interfaces only. Its vtable is one
+                // flat array with IUnknown at the front, and a Stainless
+                // interface is not reached through a vtable pointer at all.
+                if (type is ComInterfaceTypeSymbol)
+                {
+                    diagnostics.Error("SL0529", written.Span,
+                        $"'{type.Name}' is a com interface and '{interfaceType.Name}' is not; " +
+                        "a COM vtable is one array with IUnknown at the front, and a Stainless " +
+                        "interface is reached through the object header instead");
                     continue;
                 }
 
@@ -1685,8 +1742,184 @@ public sealed class Binder(
         // first `virtual` in its own family.
         if (classType is not null) ResolveVirtuals(classType, declaration);
 
+        if (type is ComInterfaceTypeSymbol comType) ResolveComSlots(comType, declaration);
+        if (classType is { IsCom: true }) ResolveComClass(classType, declaration);
+
         _inheritanceInProgress.Remove(type);
         _inheritanceDone.Add(type);
+    }
+
+    /// <summary>
+    /// A com interface named in a <c>:</c> list.
+    ///
+    /// For a com interface it is the single base, whose slots come first. For a
+    /// com class it is one more interface to present, and therefore one more
+    /// tear-off in the object.
+    /// </summary>
+    private void BindComInterface(
+        NamedTypeSymbol type, ClassTypeSymbol? classType,
+        ComInterfaceTypeSymbol comInterface, SourceSpan span)
+    {
+        if (type is ComInterfaceTypeSymbol derived)
+        {
+            if (derived.BaseInterface is not null)
+            {
+                diagnostics.Error("SL0530", span,
+                    $"'{derived.Name}' already extends '{derived.BaseInterface.Name}', so it " +
+                    $"cannot also extend '{comInterface.Name}'. A COM vtable is one array and a " +
+                    "reference is one pointer to it, so there is room for one chain and not two");
+                return;
+            }
+
+            if (comInterface == derived || comInterface.DerivesFrom(derived))
+            {
+                diagnostics.Error("SL0531", span,
+                    comInterface == derived
+                        ? $"'{derived.Name}' cannot extend itself"
+                        : $"'{derived.Name}' and '{comInterface.Name}' extend each other, so " +
+                          "neither has a vtable");
+                return;
+            }
+
+            // The base's slots have to be numbered before this one's can follow
+            // them, and a com interface declared later in the file is resolved
+            // no differently from one declared earlier.
+            if (_typeSyntax.TryGetValue(comInterface, out var entry))
+                ResolveImplements(comInterface, entry.Declaration, entry.Scope);
+
+            derived.BaseInterface = comInterface;
+            return;
+        }
+
+        if (classType is null)
+        {
+            diagnostics.Error("SL0532", span,
+                $"'{type.Name}' cannot present '{comInterface.Name}': a com interface is laid " +
+                "out inside the object that presents it, and only a class has an object");
+            return;
+        }
+
+        if (!classType.IsCom)
+        {
+            diagnostics.Error("SL0533", span,
+                $"'{classType.Name}' implements the com interface '{comInterface.Name}', so it " +
+                $"must be declared 'com class {classType.Name}'. A COM reference points at a " +
+                "vtable pointer, and an ordinary class has no room for one");
+            return;
+        }
+
+        if (classType.ComInterfaces.Contains(comInterface))
+        {
+            diagnostics.Warning("SL0304", span,
+                $"'{classType.Name}' already lists '{comInterface.Name}'");
+            return;
+        }
+
+        classType.ComInterfaces.Add(comInterface);
+    }
+
+    /// <summary>
+    /// Numbers a com interface's vtable: IUnknown's three, then everything
+    /// inherited, then its own declarations in the order they were written.
+    ///
+    /// Root-down, exactly as a class's table is numbered, and for the same
+    /// reason: a slot number belongs to the declaration rather than to the
+    /// reference it is reached through, which is what lets a derived reference
+    /// be used as a base one with no conversion at all.
+    /// </summary>
+    private void ResolveComSlots(ComInterfaceTypeSymbol type, TypeDeclSyntax declaration)
+    {
+        // Nothing extends nothing: a root com interface still starts with
+        // IUnknown, because every COM vtable does and ARC calls two of its
+        // slots.
+        type.BaseInterface ??= _builtins.Unknown == type ? null : _builtins.Unknown;
+
+        if (type.BaseInterface is { } baseInterface)
+            type.VirtualTable.AddRange(baseInterface.VirtualTable);
+
+        // A slot number is all that makes a call dispatch; `IsVirtual` records
+        // that the word was written, and on a com interface method it never is.
+        foreach (var method in type.Methods)
+        {
+            method.VirtualSlot = type.VirtualTable.Count;
+            type.VirtualTable.Add(method);
+        }
+
+        if (type.VirtualTable.Count > ComInterfaceTypeSymbol.UnknownSlots) return;
+        if (type == _builtins.Unknown) return;
+
+        diagnostics.Warning("SL0534", declaration.Span,
+            $"'{type.Name}' declares no methods, so it is IUnknown under another name; " +
+            "give it members or use 'IUnknown' directly");
+    }
+
+    /// <summary>
+    /// Checks a com class against the interfaces it presents, and reserves the
+    /// tear-offs it needs.
+    /// </summary>
+    private void ResolveComClass(ClassTypeSymbol classType, TypeDeclSyntax declaration)
+    {
+        if (classType.ComInterfaces.Count == 0)
+        {
+            diagnostics.Error("SL0535", classType.Span ?? declaration.Span,
+                $"'{classType.Name}' is a com class and presents no com interface, so nothing " +
+                "outside could ever hold one. List at least one after ':'");
+            return;
+        }
+
+        if (classType.BaseClass is not null)
+            diagnostics.Error("SL0536", classType.Span ?? declaration.Span,
+                $"'{classType.Name}' is a com class and derives from " +
+                $"'{classType.BaseClass.Name}'; the two cannot be combined yet, because the " +
+                "tear-offs sit after the fields and a derived class adds fields after those");
+
+        // Every interface a presented one extends is also presented: a caller
+        // holding IFileDialog may hand it on as the IUnknown it extends, and
+        // QueryInterface has to answer for both.
+        foreach (var presented in classType.ComInterfaces.ToList())
+        foreach (var inherited in presented.SelfAndBases().Skip(1))
+        {
+            if (inherited == _builtins.Unknown) continue;
+            if (classType.ComInterfaces.Contains(inherited)) continue;
+            classType.ComInterfaces.Add(inherited);
+        }
+
+        foreach (var presented in classType.ComInterfaces)
+            VerifyPresents(classType, presented, declaration.Span);
+    }
+
+    /// <summary>
+    /// Every method of a presented com interface has a public method on the
+    /// class with exactly that signature.
+    ///
+    /// IUnknown's three are the compiler's, not the programmer's: they are the
+    /// same three functions for every com class, they have to agree with the
+    /// tear-off layout, and a hand-written AddRef would put the object's count
+    /// and ARC's out of step.
+    /// </summary>
+    private void VerifyPresents(
+        ClassTypeSymbol classType, ComInterfaceTypeSymbol comInterface, SourceSpan span)
+    {
+        foreach (var required in comInterface.Methods)
+        {
+            if (required.ContainingType == _builtins.Unknown) continue;
+
+            var found = classType.FindImplementation(required);
+            if (found is null)
+            {
+                diagnostics.Error("SL0305", span,
+                    $"'{classType.Name}' does not implement '{comInterface.Name}.{required.Name}'; " +
+                    $"add 'public {required.ReturnType.Name} {required.Name}(" +
+                    string.Join(", ", required.Parameters.Where(p => !p.IsThis)
+                        .Select(p => p.Type.Name + " " + p.Name)) + ")'");
+                continue;
+            }
+
+            if (!found.IsPublic)
+                diagnostics.Error("SL0306", found.Span,
+                    $"'{classType.Name}.{found.Name}' implements " +
+                    $"'{comInterface.Name}.{required.Name}' and must therefore be public");
+        }
     }
 
     /// <summary>
@@ -1969,7 +2202,8 @@ public sealed class Binder(
 
         foreach (var (type, entry) in _typeSyntax)
         {
-            BindAttributes(entry.Declaration.Attributes, type.Attributes, entry.Scope, type.Name);
+            var written = BindGuid(type, entry.Declaration);
+            BindAttributes(written, type.Attributes, entry.Scope, type.Name);
 
             if (reflect is not null && type.Attributes.Any(a => a.Type == reflect))
             {
@@ -2017,6 +2251,61 @@ public sealed class Binder(
                 property.BackingField?.Attributes.AddRange(property.Attributes);
             }
         }
+    }
+
+    /// <summary>
+    /// Reads <c>[Guid("...")]</c> off a com interface and returns the
+    /// attributes that are left for the ordinary machinery.
+    ///
+    /// The string is parsed here rather than at run time, so a malformed one is
+    /// a compile error and the binary carries sixteen bytes.
+    /// </summary>
+    private IReadOnlyList<AttributeSyntax> BindGuid(
+        NamedTypeSymbol type, TypeDeclSyntax declaration)
+    {
+        var guids = declaration.Attributes.Where(a => a.Name.Last == "Guid").ToList();
+        if (guids.Count == 0)
+        {
+            // Without one the interface has no identity, so nothing can ask an
+            // object for it and a cast to it could never be answered.
+            if (type is ComInterfaceTypeSymbol needsOne && needsOne != _builtins.Unknown)
+                diagnostics.Error("SL0537", declaration.Span,
+                    $"'{type.Name}' is a com interface and has no '[Guid(\"...\")]'. An IID is " +
+                    "how QueryInterface names an interface, so without one nothing could ever " +
+                    "ask an object for this one");
+            return declaration.Attributes;
+        }
+
+        if (type is not ComInterfaceTypeSymbol comInterface)
+        {
+            diagnostics.Error("SL0538", guids[0].Span,
+                $"'[Guid]' names a COM interface, and '{type.Name}' is not one; write it on a " +
+                "'com interface' declaration");
+            return declaration.Attributes.Except(guids).ToList();
+        }
+
+        if (guids.Count > 1)
+            diagnostics.Error("SL0539", guids[1].Span,
+                $"'{type.Name}' has more than one '[Guid]', and an interface has one identity");
+
+        var only = guids[0];
+        if (only.Arguments.Count != 1 ||
+            ConstantValue(only.Arguments[0], _builtins.String) is not string text)
+        {
+            diagnostics.Error("SL0540", only.Span,
+                "'[Guid]' takes one string literal, as in " +
+                "'[Guid(\"42f85136-db7e-439c-85f1-e4075d135fc8\")]'");
+            return declaration.Attributes.Except(guids).ToList();
+        }
+
+        if (!Guid.TryParseExact(text, "D", out var parsed))
+            diagnostics.Error("SL0541", only.Arguments[0].Span,
+                $"'{text}' is not a GUID; the form is eight hex digits, three groups of four, " +
+                "then twelve, separated by hyphens");
+        else
+            comInterface.Iid = parsed;
+
+        return declaration.Attributes.Except(guids).ToList();
     }
 
     private void BindAttributes(
@@ -5058,6 +5347,7 @@ public sealed class Binder(
         AlignofSyntax alignofExpression => BindAlignof(alignofExpression),
         OffsetofSyntax offsetofExpression => BindOffsetof(offsetofExpression),
         TypeofSyntax typeofExpression => BindTypeof(typeofExpression),
+        IidofSyntax iidofExpression => BindIidof(iidofExpression),
         _ => new BoundErrorExpression(syntax.Span),
     };
 
@@ -5190,6 +5480,34 @@ public sealed class Binder(
                 $"'is' asks what an object really is, and '{value.Type.Name}' is not a reference " +
                 "to one");
             return new BoundErrorExpression(syntax.Span);
+        }
+
+        // A COM object answers for itself, so the only pairing the compiler
+        // can rule out is one where neither side is COM at all: a Stainless
+        // reference has no QueryInterface to ask, and a COM one has no header
+        // to walk.
+        if (wanted is ComInterfaceTypeSymbol || subject is ComInterfaceTypeSymbol)
+        {
+            if (wanted is not ComInterfaceTypeSymbol asked)
+            {
+                diagnostics.Error("SL0518", syntax.Span,
+                    $"'{subject.Name}' is a com interface and '{wanted.Name}' is not; all a COM " +
+                    "reference can be asked is QueryInterface, and that names com interfaces");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            if (subject is not ComInterfaceTypeSymbol && subject is not ClassTypeSymbol { IsCom: true })
+            {
+                diagnostics.Error("SL0518", syntax.Span,
+                    $"'{subject.Name}' is not a COM reference, so there is no QueryInterface to " +
+                    $"ask it whether it is a '{asked.Name}'");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            // Deliberately no "always true" warning for the upward case. A
+            // class's base chain is the compiler's; an object's answer is its
+            // own, and even IUnknown -> IUnknown is a call it may refuse.
+            return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, asked);
         }
 
         // Two classes in different families: no object is ever both.
@@ -6219,6 +6537,23 @@ public sealed class Binder(
         }
 
         return new BoundTypeof(syntax.Span, handle, reflected);
+    }
+
+    private BoundExpression BindIidof(IidofSyntax syntax)
+    {
+        var named = ResolveType(syntax.Type, _currentScope!);
+        if (named.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (named is not ComInterfaceTypeSymbol comInterface)
+        {
+            diagnostics.Error("SL0542", syntax.Span,
+                $"'{named.Name}' is not a com interface, so it has no IID; 'iidof' names the " +
+                "'[Guid]' written on a 'com interface' declaration");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundIidof(
+            syntax.Span, new PointerTypeSymbol(_builtins.Guid), comInterface);
     }
 
     private BoundExpression BindCast(CastSyntax syntax)
@@ -8045,6 +8380,33 @@ public sealed class Binder(
                 : null;
         }
 
+        // A pointer COM wrote through a void**, taken into ARC's care. The
+        // other direction is an ordinary pointer cast, and byte* is the
+        // language's void*, so it needs no rule of its own.
+        if (from is PointerTypeSymbol && to is ComInterfaceTypeSymbol)
+            return explicitCast ? ConversionKind.ComAdopt : null;
+
+        if (from is ComInterfaceTypeSymbol && to is PointerTypeSymbol)
+            return explicitCast || IsBytePointer(to) ? ConversionKind.PointerCast : null;
+
+        // Between com interfaces the vtable is the prefix rather than the
+        // object, so a derived reference already satisfies the base and the
+        // other direction is a QueryInterface.
+        if (from is ComInterfaceTypeSymbol fromCom && to is ComInterfaceTypeSymbol toCom)
+        {
+            if (fromCom.DerivesFrom(toCom)) return ConversionKind.ComUpcast;
+            return explicitCast ? ConversionKind.ComQuery : null;
+        }
+
+        // A com class, as one of the interfaces it presents. Not free: what the
+        // caller gets is the tear-off's address, which is inside the object.
+        if (from is ClassTypeSymbol { IsCom: true } presenting &&
+            to is ComInterfaceTypeSymbol presented)
+            return presenting.ComInterfaces.Contains(presented) ||
+                   presented == _builtins.Unknown
+                ? ConversionKind.ComTearOff
+                : null;
+
         // A class converts to any interface it implements, and an interface to
         // any it extends. Because a reference is the same pointer either way,
         // this costs nothing at run time.
@@ -8075,6 +8437,20 @@ public sealed class Binder(
             return fromInterface.Equals(toOptionalInterface.Element)
                 ? ConversionKind.ReferenceToOptional
                 : null;
+
+        // I -> I?, and IDerived -> IBase?, both of which are the same pointer.
+        if (from is ComInterfaceTypeSymbol fromComReference &&
+            to is OptionalTypeSymbol { Element: ComInterfaceTypeSymbol wantedCom } &&
+            fromComReference.DerivesFrom(wantedCom))
+            return ConversionKind.ReferenceToOptional;
+
+        // A com class straight to an optional interface, which is the two
+        // conversions above at once and still one add.
+        if (from is ClassTypeSymbol { IsCom: true } presentingOptional &&
+            to is OptionalTypeSymbol { Element: ComInterfaceTypeSymbol optionalPresented } &&
+            (presentingOptional.ComInterfaces.Contains(optionalPresented) ||
+             optionalPresented == _builtins.Unknown))
+            return ConversionKind.ComTearOff;
 
         if (from is WeakTypeSymbol fromWeak && to is OptionalTypeSymbol weakTarget)
             return fromWeak.Element.Equals(weakTarget.Element) ? ConversionKind.ReferenceToOptional : null;

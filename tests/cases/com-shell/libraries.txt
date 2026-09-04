@@ -1,0 +1,4 @@
+# CoInitializeEx and CoTaskMemFree live in one, SHCreateItemFromParsingName
+# in the other.
+ole32
+shell32

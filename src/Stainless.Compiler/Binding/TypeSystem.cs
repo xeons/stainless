@@ -44,6 +44,17 @@ public abstract class TypeSymbol
     /// <summary>True for a class or interface: something a reference can point at.</summary>
     public virtual bool IsReferenceType => false;
 
+    /// <summary>
+    /// True for an <c>interface</c> or a <c>com interface</c>: a type that
+    /// declares signatures and holds nothing.
+    ///
+    /// The two are laid out differently and counted differently, and neither
+    /// has fields, a constructor, a destructor, member bodies, private members
+    /// or overloads -- one slot per method is what rules the last one out. Every
+    /// check about those is about this, and not about which kind it is.
+    /// </summary>
+    public virtual bool IsContract => false;
+
     public override string ToString() => Name;
 }
 
@@ -689,6 +700,7 @@ public sealed class VariantTypeSymbol : StructTypeSymbol
 /// </summary>
 public sealed class InterfaceTypeSymbol : NamedTypeSymbol
 {
+    public override bool IsContract => true;
     public override int Size => 8;
     public override int Alignment => 8;
     public override bool IsManaged => true;
@@ -734,6 +746,99 @@ public sealed class InterfaceTypeSymbol : NamedTypeSymbol
         ?? AllInterfaces().Select(i => i.FindProperty(name)).FirstOrDefault(p => p is not null);
 }
 
+/// <summary>
+/// <c>com interface IFoo : IUnknown</c>: a COM interface.
+///
+/// This is not <see cref="InterfaceTypeSymbol"/> with a flag on it. The two
+/// are different things in memory, and every difference follows from where the
+/// reference points:
+///
+/// <list type="bullet">
+/// <item>A Stainless interface reference points at the object header, and the
+/// vtable is reached through it -- <c>obj+16</c> to the TypeInfo, <c>+24</c> to
+/// the interface tables, then the interface's id and the method's slot. Four
+/// loads, and it needs the object to have been allocated by the runtime.</item>
+/// <item>A COM interface reference points at the vtable pointer itself, which
+/// is field zero of whatever the object is. Two loads, and it needs nothing of
+/// the object at all.</item>
+/// </list>
+///
+/// So a com interface can name something another language allocated, which is
+/// the point, and cannot carry a Stainless object header, which is the cost.
+/// Reference counting goes through <c>IUnknown</c>'s AddRef and Release rather
+/// than through <c>sl_retain</c>, and ARC drives them: see docs/com.md.
+/// </summary>
+public sealed class ComInterfaceTypeSymbol : NamedTypeSymbol
+{
+    /// <summary>QueryInterface, AddRef, Release: every COM vtable starts here.</summary>
+    public const int UnknownSlots = 3;
+
+    public override bool IsContract => true;
+
+    /// <summary>A reference is one pointer, to the object's vtable pointer.</summary>
+    public override int Size => 8;
+    public override int Alignment => 8;
+
+    /// <summary>
+    /// Counted, so ARC applies -- but through AddRef and Release rather than
+    /// through sl_retain, which is what <c>NeedsComArc</c> tells the emitter.
+    /// </summary>
+    public override bool IsManaged => true;
+    public override bool IsReferenceType => true;
+
+    /// <summary>
+    /// The interface this one extends, or null for <c>IUnknown</c> itself.
+    ///
+    /// Single, and not a list: a COM vtable is one array, a derived interface's
+    /// slots come after its base's, and two bases would mean two vtables and
+    /// therefore two pointers where the ABI has room for one.
+    /// </summary>
+    public ComInterfaceTypeSymbol? BaseInterface { get; set; }
+
+    /// <summary>
+    /// The IID, from <c>[Guid("...")]</c>. Null until pass 6 folds it, and an
+    /// interface that never got one cannot be asked for by QueryInterface.
+    /// </summary>
+    public Guid? Iid { get; set; }
+
+    /// <summary>
+    /// Every method in slot order: the base's table, then this interface's own
+    /// declarations in the order they were written.
+    ///
+    /// Filled in pass 5 and emitted verbatim. Root-down numbering is what makes
+    /// a derived reference usable as a base one with no conversion, exactly as
+    /// it does for class inheritance.
+    /// </summary>
+    public List<FunctionSymbol> VirtualTable { get; } = [];
+
+    /// <summary>This interface, then the one it extends, and so on to IUnknown.</summary>
+    public IEnumerable<ComInterfaceTypeSymbol> SelfAndBases()
+    {
+        for (var current = this; current is not null; current = current.BaseInterface)
+            yield return current;
+    }
+
+    /// <summary>True when <paramref name="other"/> is this interface or one it extends.</summary>
+    public bool DerivesFrom(ComInterfaceTypeSymbol other) => SelfAndBases().Contains(other);
+
+    /// <summary>Position of a method in the vtable, or -1.</summary>
+    public int SlotOf(FunctionSymbol method) => VirtualTable.IndexOf(method);
+
+    // A derived interface's members are its own and its base's, nearest first,
+    // which is the same rule a derived class follows.
+
+    public override FunctionSymbol? FindMethod(string name) =>
+        SelfAndBases().Select(i => i.Methods.FirstOrDefault(m => m.Name == name))
+            .FirstOrDefault(m => m is not null);
+
+    public override IEnumerable<FunctionSymbol> FindMethods(string name) =>
+        SelfAndBases().SelectMany(i => i.Methods.Where(m => m.Name == name));
+
+    public override PropertySymbol? FindProperty(string name) =>
+        SelfAndBases().Select(i => i.Properties.FirstOrDefault(p => p.Name == name))
+            .FirstOrDefault(p => p is not null);
+}
+
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
     /// <summary>
@@ -766,8 +871,26 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     public override int Alignment => 8;
     public override bool IsManaged => true;
 
-    /// <summary>Total heap allocation: header plus fields, the base's included.</summary>
-    public int InstanceSize => HeaderSize + FieldsSize;
+    /// <summary>
+    /// Where a com class's tear-offs begin: after the header and the fields,
+    /// rounded up so each vtable pointer is aligned.
+    /// </summary>
+    public int TearOffsStart => (HeaderSize + FieldsSize + 7) & ~7;
+
+    /// <summary>A vtable pointer and the distance back to the object.</summary>
+    public const int TearOffSize = 16;
+
+    /// <summary>Where the tear-off for one presented interface sits.</summary>
+    public int TearOffOffset(ComInterfaceTypeSymbol presented) =>
+        TearOffsStart + ComInterfaces.IndexOf(presented) * TearOffSize;
+
+    /// <summary>
+    /// Total heap allocation: header, fields (the base's included), and, for a
+    /// com class, one tear-off per interface it presents.
+    /// </summary>
+    public int InstanceSize => IsCom && ComInterfaces.Count > 0
+        ? TearOffsStart + ComInterfaces.Count * TearOffSize
+        : HeaderSize + FieldsSize;
 
     public List<FunctionSymbol> Constructors { get; } = [];
     public FunctionSymbol? Destructor { get; set; }
@@ -782,6 +905,21 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// all three at once; see TODO.md.
     /// </summary>
     public ClassTypeSymbol? BaseClass { get; set; }
+
+    /// <summary>
+    /// Declared <c>com class</c>: an ordinary Stainless object, reference
+    /// counted and destroyed as usual, that also presents COM vtables so other
+    /// languages can hold it.
+    ///
+    /// The header and fields are unchanged. What is added is one tear-off per
+    /// implemented interface, laid out after the fields, each holding a vtable
+    /// pointer and its own distance back to the object -- which is how a
+    /// Release arriving through any of them finds the header.
+    /// </summary>
+    public bool IsCom { get; set; }
+
+    /// <summary>The com interfaces this class presents, in tear-off order.</summary>
+    public List<ComInterfaceTypeSymbol> ComInterfaces { get; } = [];
 
     /// <summary>Declared <c>abstract</c>: <c>new</c> refuses it.</summary>
     public bool IsAbstract { get; set; }

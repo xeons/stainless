@@ -93,6 +93,14 @@ public enum Modifiers
     /// <summary>May be overridden: the call goes through the object's vtable.</summary>
     Virtual = 1 << 4,
 
+    /// <summary>
+    /// On an interface or a class, one laid out the way COM lays them out: the
+    /// reference points at a vtable pointer rather than at an object header,
+    /// and lifetime runs through <c>IUnknown</c> rather than through
+    /// <c>sl_retain</c>. See docs/com.md.
+    /// </summary>
+    Com = 1 << 8,
+
     /// <summary>Replaces an inherited <c>virtual</c> or <c>abstract</c> member.</summary>
     Override = 1 << 5,
 
@@ -647,3 +655,6 @@ public sealed record OffsetofSyntax(
 
 /// <summary><c>typeof(T)</c> — the reflection handle for a type, resolved at compile time.</summary>
 public sealed record TypeofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+
+/// <summary><c>iidof(IFoo)</c>: a com interface's IID, as a <c>Guid*</c>.</summary>
+public sealed record IidofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);

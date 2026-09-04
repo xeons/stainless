@@ -232,9 +232,12 @@ the same for the parts with no window.
 
 ## What is not bound
 
-- **COM**, and so everything reached through it: the shell's newer interfaces,
-  Direct2D, WIC, `SHGetKnownFolderPath`. That needs vtable layout and `IUnknown`,
-  which is a project rather than a binding.
+- **COM interfaces**, though not for want of a language feature: `com
+  interface` exists (§8.5 of the spec) and
+  [tests/cases/com-shell](../../tests/cases/com-shell) calls `IShellItem`
+  through it. What is missing here is the declarations —  the shell's newer
+  interfaces, Direct2D, WIC, `SHGetKnownFolderPath` — which is a binding rather
+  than a project now.
 - **Winsock**, GDI+, DirectX, the Common Controls, WMI, the event log.
 - **32-bit Windows.** `LRESULT` and `LPARAM` are written `long` and `WPARAM`
   `ulong` because Windows is 64-bit; a 32-bit target would want `nint`/`nuint`.

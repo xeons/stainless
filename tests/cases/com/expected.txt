@@ -1,0 +1,21 @@
+greet 3 -> 3
+shout   -> 3
+greet 2 -> 5
+Greeter:
+  is ILoudGreeter true
+  is IAbsent      false
+  shout           5
+Quiet:
+  is ILoudGreeter false
+  is IAbsent      false
+made:
+  greet 5 -> 5
+  greet 1 -> 6
+  still alive -> 6
+  dropping:
+greeter destroyed
+  dropped
+iidof is stable: true
+iidof data1: 1787767828
+end of Main
+greeter destroyed

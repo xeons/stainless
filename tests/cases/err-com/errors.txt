@@ -1,0 +1,26 @@
+# 'com' before something that is not an interface or a class
+SL0528
+# a com interface extending a Stainless one
+SL0529
+# a com interface with two bases
+SL0530
+# a com class deriving from a class
+SL0536
+# a com interface with no [Guid]
+SL0537
+# [Guid] on something that is not a com interface
+SL0538
+# more than one [Guid]
+SL0539
+# a [Guid] that is not a GUID
+SL0541
+# iidof on something with no IID
+SL0542
+# an ordinary class implementing a com interface
+SL0533
+# a com class presenting nothing
+SL0535
+# a com class missing a method of an interface it presents
+SL0305
+# an interface that adds nothing to IUnknown
+SL0534

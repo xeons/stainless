@@ -48,6 +48,11 @@ no-op on x64 — one convention, and only `__vectorcall` differs — but it is t
 whole story on x86, where `__stdcall` is what Win32 uses and the name is
 decorated with the argument-byte count.
 
+Not a prerequisite for anything, COM included: every pointer and `nint` in the
+compiler is eight bytes and [abi.md](docs/abi.md) is written for x86-64, so
+there is no 32-bit target for the distinction to matter on. It becomes real the
+day one is added, and not before.
+
 Worth doing *with* the SysV classifier rather than before it, since both are
 "the calling convention is not a given" and the code that decides one should
 decide the other.
@@ -88,12 +93,30 @@ which is why [bindings/win32](bindings/win32) spells 460 constants as bare
 its underlying type in interop position would let a binding be typed without a
 cast on every line.
 
-### COM
+### COM activation
 
-Not the C++ object model — a COM interface is binary-identical to a pointer to
-a vtable pointer, so this needs only a struct of `delegate`s and `IUnknown`
-discipline. It is what stands between the bindings and `SHGetKnownFolderPath`,
-Direct2D, WIC and the modern shell.
+`com interface` and `com class` exist (spec §8.5), so calling COM and being
+called as COM both work, on every platform — the binary contract is a pointer
+to a vtable pointer and needs no operating system.
+
+What is missing is the Windows half, and it is missing on purpose so far:
+`CoCreateInstance` and the registry, class factories, apartments, marshalling,
+proxies and stubs, `IDispatch`. A program declares what it needs `extern "C"`,
+which is what [tests/cases/com-shell](tests/cases/com-shell) does for
+`SHCreateItemFromParsingName` in six lines.
+
+Two things would be worth building on top:
+
+- **The Windows declarations.** `SHGetKnownFolderPath`, `IFileDialog`, WIC,
+  Direct2D. A binding now rather than a project — the language part is done.
+- **Registry-free activation**, and portably. A table of factories linked into
+  the process, plus `dlopen`/`LoadLibrary` of a module exporting
+  `DllGetClassObject`, falling through to the real `CoCreateInstance` on
+  Windows so one source reaches the actual shell. In-process and free-threaded
+  only, stated as a limit rather than discovered as one: the value is in the
+  interface discipline, and XPCOM is what pretending otherwise looks like.
+
+*Touches:* `bindings/win32`, `runtime/com.c`.
 
 ---
 

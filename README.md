@@ -1344,10 +1344,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   (SL0486, SL0491). The first is the same question a union cannot answer; the
   second is because C decays an array parameter to a pointer and Stainless has
   no decay, so `ref T[N]` is the spelling that lines up.
-- **No COM**, and so nothing reached through it: `SHGetKnownFolderPath`,
-  Direct2D, WIC, the modern shell. A COM interface is binary-identical to a
-  pointer to a vtable pointer, so this needs no C++ object model — only
-  `IUnknown` discipline and a struct of `delegate`s.
+- **No COM activation.** `com interface` and `com class` are in the language
+  (§8.5) and work on every platform, because a COM interface is a pointer to a
+  vtable pointer and nothing else. What is absent is the Windows half:
+  `CoCreateInstance`, the registry, class factories, apartments, marshalling,
+  `IDispatch`. A program declares those `extern "C"` like any other API.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
   Stainless library be consumed by Stainless, but a generic, a class that
   implements an interface, a variant and a slice all stay behind: a template

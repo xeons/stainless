@@ -86,6 +86,47 @@ public enum ConversionKind
     /// variable must go through ToPointer(), where the lifetime is visible.
     /// </summary>
     StringLiteralToPointer,
+
+    /// <summary>
+    /// <c>IDerived</c> -> <c>IBase</c>, between com interfaces. Emits nothing:
+    /// a COM vtable begins with its base's slots, so the same pointer already
+    /// satisfies the base's contract. It is the same property that makes a
+    /// class <see cref="Upcast"/> free, arrived at from the other direction --
+    /// there the object is a prefix, here the table is.
+    /// </summary>
+    ComUpcast,
+
+    /// <summary>
+    /// <c>IBase</c> -> <c>IDerived</c>, explicit and checked: a QueryInterface,
+    /// and a program that ends if the object does not answer.
+    ///
+    /// Unlike a class <see cref="Downcast"/> this is not a walk over something
+    /// the compiler laid out. The object decides, at run time, in code that may
+    /// not be ours -- so a com cast is a call, and its answer is a reference the
+    /// caller owns.
+    /// </summary>
+    ComQuery,
+
+    /// <summary>
+    /// <c>byte*</c> -> a com interface, explicit: adopting a reference that COM
+    /// activation wrote through a <c>void**</c>.
+    ///
+    /// Unchecked, because a raw pointer says nothing about what is behind it,
+    /// and the language has no better answer to offer -- this is the boundary
+    /// where an object made elsewhere enters ARC's care. The pointer is
+    /// unchanged; what the conversion does is start counting it.
+    /// </summary>
+    ComAdopt,
+
+    /// <summary>
+    /// A <c>com class</c> -> one of the com interfaces it presents.
+    ///
+    /// The one conversion here that is not free. A COM pointer must point at a
+    /// vtable pointer, so what the caller gets is the address of the tear-off
+    /// inside the object rather than the object itself: one add, at a constant
+    /// offset the layout fixed.
+    /// </summary>
+    ComTearOff,
 }
 
 // ---------------------------------------------------------------- expressions
@@ -484,6 +525,18 @@ public sealed class BoundTypeof(SourceSpan span, TypeSymbol type, NamedTypeSymbo
     : BoundExpression(span, type)
 {
     public NamedTypeSymbol MeasuredType { get; } = measuredType;
+}
+
+/// <summary>
+/// <c>iidof(IFoo)</c>. The address of a 16-byte constant in static storage, so
+/// this costs nothing at run time and the same expression twice is the same
+/// pointer.
+/// </summary>
+public sealed class BoundIidof(
+    SourceSpan span, TypeSymbol type, ComInterfaceTypeSymbol named)
+    : BoundExpression(span, type)
+{
+    public ComInterfaceTypeSymbol Named { get; } = named;
 }
 
 public sealed class BoundThis(SourceSpan span, TypeSymbol type, ParameterSymbol parameter)

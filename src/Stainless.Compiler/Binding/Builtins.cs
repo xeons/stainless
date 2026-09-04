@@ -34,6 +34,15 @@ public sealed class Builtins
     public const string ConsoleModuleName = "Standard.Console";
 
     /// <summary>
+    /// Where <c>Guid</c> and <c>IUnknown</c> live.
+    ///
+    /// Not auto-imported: a program that never says <c>com</c> should not have
+    /// two more names in scope, and one that does is already writing an import
+    /// for the bindings it is calling.
+    /// </summary>
+    public const string ComModuleName = "Standard.Com";
+
+    /// <summary>
     /// Markers the language itself understands, rather than a library feature
     /// to opt into. It is auto-imported, because needing an import to say
     /// <c>[Flags]</c> would make a rule about enums look like a dependency.
@@ -43,6 +52,25 @@ public sealed class Builtins
     public ModuleSymbol Text { get; }
     public ModuleSymbol Console { get; }
     public ModuleSymbol Standard { get; }
+    public ModuleSymbol Com { get; }
+
+    /// <summary>
+    /// <c>Guid</c>: 16 bytes, laid out as every existing COM header lays one
+    /// out, so a <c>Guid*</c> passed to a C function is the <c>GUID*</c> it
+    /// expects.
+    /// </summary>
+    public StructTypeSymbol Guid { get; }
+
+    /// <summary>
+    /// <c>IUnknown</c>: the root of every com interface, and the reason ARC can
+    /// drive COM at all.
+    ///
+    /// Its three methods occupy slots 0, 1 and 2 of every COM vtable there has
+    /// ever been. A com interface that names no base extends this one, so those
+    /// slots are always where they are and <c>sl_com_retain</c> can call the
+    /// second without knowing anything else about the object.
+    /// </summary>
+    public ComInterfaceTypeSymbol Unknown { get; }
 
     /// <summary>
     /// <c>[Flags]</c>: the enum is a set of bits rather than a choice among
@@ -106,6 +134,7 @@ public sealed class Builtins
         Text = new ModuleSymbol(TextModuleName);
         Console = new ModuleSymbol(ConsoleModuleName);
         Standard = new ModuleSymbol(StandardModuleName);
+        Com = new ModuleSymbol(ComModuleName);
 
         Flags = new AttributeTypeSymbol
         {
@@ -201,6 +230,57 @@ public sealed class Builtins
         Method(StringBuilder, "Clear", PrimitiveTypeSymbol.Void, "sl_string_builder_clear");
         Method(StringBuilder, "ToText", String, "sl_string_builder_to_string");
 
+        // --- Standard.Com ----------------------------------------------------
+        //
+        // Guid is a plain struct with C's layout: a 32-bit field, two 16-bit
+        // ones and eight bytes, which is what every COM header and every
+        // registry entry agrees a GUID is.
+        Guid = new StructTypeSymbol
+        {
+            SimpleName = "Guid",
+            ModuleName = ComModuleName,
+            IsPublic = true,
+        };
+        Guid.Fields.Add(new FieldSymbol("Data1", PrimitiveTypeSymbol.UInt, Guid, 0)
+            { IsPublic = true });
+        Guid.Fields.Add(new FieldSymbol("Data2", PrimitiveTypeSymbol.UShort, Guid, 4)
+            { IsPublic = true });
+        Guid.Fields.Add(new FieldSymbol("Data3", PrimitiveTypeSymbol.UShort, Guid, 6)
+            { IsPublic = true });
+        Guid.Fields.Add(new FieldSymbol(
+            "Data4", new FixedArrayTypeSymbol(PrimitiveTypeSymbol.Byte, 8), Guid, 8)
+            { IsPublic = true });
+        Guid.SetLayout(16, 4);
+        Com.Types[Guid.SimpleName] = Guid;
+
+        // IUnknown, whose three methods are slots 0, 1 and 2 of every COM
+        // vtable. They are declared here rather than in source because the
+        // compiler emits calls to the last two itself, at every place ARC
+        // touches a COM reference.
+        Unknown = new ComInterfaceTypeSymbol
+        {
+            SimpleName = "IUnknown",
+            ModuleName = ComModuleName,
+            IsPublic = true,
+        };
+        Com.Types[Unknown.SimpleName] = Unknown;
+
+        // The IID is fixed, and has been since 1993.
+        Unknown.Iid = new System.Guid("00000000-0000-0000-C000-000000000046");
+
+        var guidPointer = new PointerTypeSymbol(Guid);
+        var bytePointerPointer = new PointerTypeSymbol(BytePointer);
+
+        ComMethod(Unknown, 0, "QueryInterface", PrimitiveTypeSymbol.Int,
+            ("iid", guidPointer), ("result", bytePointerPointer));
+
+        // AddRef and Release are declared so the slots exist and are not
+        // public, because ARC owns the count. Calling one by hand would put
+        // the compiler's bookkeeping and the object's out of step, and there
+        // is nothing a program can do with the result that ARC has not done.
+        ComMethod(Unknown, 1, "AddRef", PrimitiveTypeSymbol.UInt, isPublic: false);
+        ComMethod(Unknown, 2, "Release", PrimitiveTypeSymbol.UInt, isPublic: false);
+
         // --- Standard.Text free functions -----------------------------------
         Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.Long));
@@ -265,6 +345,7 @@ public sealed class Builtins
         modules[Text.Name] = Text;
         modules[Console.Name] = Console;
         modules[Standard.Name] = Standard;
+        modules[Com.Name] = Com;
     }
 
     /// <summary>
@@ -304,6 +385,52 @@ public sealed class Builtins
         params (string Name, TypeSymbol Type)[] parameters)
     {
         var symbol = Declare(Standard, name, returnType, runtimeSymbol, null, parameters, isPublic: false);
+        return symbol;
+    }
+
+    /// <summary>
+    /// One method of a built-in com interface, at a fixed vtable slot.
+    ///
+    /// It has no runtime symbol: the call goes through the object's vtable, and
+    /// which body it reaches is the object's business rather than ours.
+    /// </summary>
+    private static FunctionSymbol ComMethod(
+        ComInterfaceTypeSymbol owner,
+        int slot,
+        string name,
+        TypeSymbol returnType,
+        params (string Name, TypeSymbol Type)[] parameters) =>
+        ComMethod(owner, slot, name, returnType, true, parameters);
+
+    private static FunctionSymbol ComMethod(
+        ComInterfaceTypeSymbol owner,
+        int slot,
+        string name,
+        TypeSymbol returnType,
+        bool isPublic,
+        params (string Name, TypeSymbol Type)[] parameters)
+    {
+        var symbol = new FunctionSymbol
+        {
+            Name = name,
+            ModuleName = owner.ModuleName,
+            ReturnType = returnType,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.Method,
+            ContainingType = owner,
+            IsPublic = isPublic,
+            IsVirtual = true,
+            Span = BuiltinSpan,
+            VirtualSlot = slot,
+        };
+
+        symbol.Parameters.Add(new ParameterSymbol("this", owner, 0) { IsThis = true });
+        foreach (var (parameterName, parameterType) in parameters)
+            symbol.Parameters.Add(
+                new ParameterSymbol(parameterName, parameterType, symbol.Parameters.Count));
+
+        owner.Methods.Add(symbol);
+        owner.VirtualTable.Add(symbol);
         return symbol;
     }
 

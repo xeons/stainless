@@ -27,6 +27,7 @@ public enum TokenKind
     ProtectedKeyword,
     PublicKeyword, PrivateKeyword,
     ClassKeyword, StructKeyword, InterfaceKeyword, AttributeKeyword, EnumKeyword,
+    ComKeyword,
     VariantKeyword, UnionKeyword, DelegateKeyword,
     ExternKeyword, ExportKeyword,
 
@@ -41,7 +42,7 @@ public enum TokenKind
     // Expression keywords
     NewKeyword, DeleteKeyword, NullKeyword, TrueKeyword, FalseKeyword,
     SizeofKeyword, AlignofKeyword, OffsetofKeyword,
-    TypeofKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
+    TypeofKeyword, IidofKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
 
     // Primitive type keywords
     VoidKeyword, BoolKeyword, CharKeyword, Char16Keyword, Char32Keyword,
@@ -86,6 +87,7 @@ public static class TokenKindExtensions
         TokenKind.ClassKeyword => "class",
         TokenKind.StructKeyword => "struct",
         TokenKind.InterfaceKeyword => "interface",
+        TokenKind.ComKeyword => "com",
         TokenKind.AttributeKeyword => "attribute",
         TokenKind.EnumKeyword => "enum",
         TokenKind.VariantKeyword => "variant",
@@ -122,6 +124,7 @@ public static class TokenKindExtensions
         TokenKind.AlignofKeyword => "alignof",
         TokenKind.OffsetofKeyword => "offsetof",
         TokenKind.TypeofKeyword => "typeof",
+        TokenKind.IidofKeyword => "iidof",
         TokenKind.ThisKeyword => "this",
         TokenKind.BaseKeyword => "base",
         TokenKind.IsKeyword => "is",

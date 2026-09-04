@@ -262,6 +262,11 @@ public sealed class Parser
                 case TokenKind.OverrideKeyword: modifiers |= Modifiers.Override; Advance(); break;
                 case TokenKind.AbstractKeyword: modifiers |= Modifiers.Abstract; Advance(); break;
                 case TokenKind.SealedKeyword: modifiers |= Modifiers.Sealed; Advance(); break;
+
+                // `com` reads as a modifier and means a different kind of
+                // declaration; only `interface` and `class` may follow it,
+                // which ParseTypeDeclaration checks.
+                case TokenKind.ComKeyword: modifiers |= Modifiers.Com; Advance(); break;
                 default: return modifiers;
             }
         }
@@ -1603,6 +1608,15 @@ public sealed class Parser
                 var type = ParseType();
                 Expect(TokenKind.CloseParen);
                 return new TypeofSyntax(SpanFrom(start), type);
+            }
+
+            case TokenKind.IidofKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+                var type = ParseType();
+                Expect(TokenKind.CloseParen);
+                return new IidofSyntax(SpanFrom(start), type);
             }
 
             case TokenKind.OpenParen:

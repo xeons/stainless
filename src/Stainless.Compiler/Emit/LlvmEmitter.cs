@@ -142,6 +142,7 @@ public sealed class LlvmEmitter(
             EmitVariantArcThunks(variant);
 
         InterfaceTables(program);
+        ComTables(program);
 
         if (program.EntryPoint is not null && !forSharedLibrary)
             EmitEntryPoint(program.EntryPoint);
@@ -236,11 +237,11 @@ public sealed class LlvmEmitter(
         // The header every reference type is prefixed with: strong, weak, TypeInfo*.
         _module.AppendLine("%SlObjectHeader = type { i64, i64, ptr }");
         // size, destroy, name, interfaces, fieldCount, fields, attributeCount,
-        // attributes, base, vtable. The last two are appended rather than
-        // inserted so that every offset the emitter already hard-codes -- the
-        // interface table at 24, above all -- goes on meaning what it meant.
+        // attributes, base, vtable, com. The last three are appended rather
+        // than inserted so that every offset the emitter already hard-codes --
+        // the interface table at 24, above all -- goes on meaning what it meant.
         _module.AppendLine(
-            "%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr, ptr, ptr }");
+            "%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr, ptr, ptr, ptr }");
         _module.AppendLine("%SlFieldInfo = type { ptr, i64, i32, ptr, i64, ptr }");
         _module.AppendLine("%SlAttribute = type { ptr, i64, ptr }");
         _module.AppendLine("%SlAttributeValue = type { i32, i64, ptr }");
@@ -286,6 +287,15 @@ public sealed class LlvmEmitter(
         Declare("sl_is_instance", "declare i32 @sl_is_instance(ptr, ptr)");
         Declare("sl_implements", "declare i32 @sl_implements(ptr, i64)");
         Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr)");
+        Declare("sl_com_retain", "declare void @sl_com_retain(ptr)");
+        Declare("sl_com_release", "declare void @sl_com_release(ptr)");
+        Declare("sl_com_query", "declare ptr @sl_com_query(ptr, ptr)");
+        Declare("sl_com_is", "declare i32 @sl_com_is(ptr, ptr)");
+        Declare("sl_com_cast_failed", "declare void @sl_com_cast_failed(ptr, ptr)");
+        Declare("sl_com_object_query",
+            "declare i32 @sl_com_object_query(ptr, ptr, ptr)");
+        Declare("sl_com_object_add_ref", "declare i32 @sl_com_object_add_ref(ptr)");
+        Declare("sl_com_object_release", "declare i32 @sl_com_object_release(ptr)");
         Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
         Declare("sl_slice_bounds_fail", "declare void @sl_slice_bounds_fail(i64, i64, i64)");
         Declare("sl_divide_by_zero", "declare void @sl_divide_by_zero()");
@@ -395,11 +405,18 @@ public sealed class LlvmEmitter(
                 ? "@" + VirtualTableName(classType)
                 : "null";
 
+            // A com class's tear-offs: which interface each one answers for and
+            // where in the object it sits, which is what the generated
+            // QueryInterface scans and what its AddRef subtracts.
+            string comLayout = classType.IsCom && classType.ComInterfaces.Count > 0
+                ? "@" + ComLayoutName(classType)
+                : "null";
+
             _module.AppendLine(
                 $"@{Mangler.TypeInfoSymbol(classType)} = {visibility} %SlTypeInfo " +
                 $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
-                $"ptr {baseInfo}, ptr {vtable} }}");
+                $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout} }}");
         }
 
         // One TypeInfo per array type. The element type is not recorded at run
@@ -412,7 +429,7 @@ public sealed class LlvmEmitter(
                 $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
                 $"ptr {nameConstant}, ptr null, i64 0, ptr null, i64 0, ptr null, " +
-                "ptr null, ptr null }");
+                "ptr null, ptr null, ptr null }");
         }
 
         foreach (var structType in program.Modules
@@ -426,7 +443,7 @@ public sealed class LlvmEmitter(
             _module.AppendLine(
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
-                $"{Metadata(structType, 0)}, ptr null, ptr null }}");
+                $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null }}");
         }
 
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
@@ -641,6 +658,19 @@ public sealed class LlvmEmitter(
     private static string InterfaceTableName(ClassTypeSymbol type) =>
         "_SLitab_" + Mangler.SymbolSafe(type.QualifiedName);
 
+    /// <summary>The table of tear-offs a com class presents, keyed by IID.</summary>
+    private static string ComLayoutName(ClassTypeSymbol type) =>
+        "_SLcom_" + Mangler.SymbolSafe(type.QualifiedName);
+
+    /// <summary>One com interface's vtable, as implemented by one class.</summary>
+    private static string ComVTableName(ClassTypeSymbol type, ComInterfaceTypeSymbol iface) =>
+        "_SLcomvt_" + Mangler.SymbolSafe(type.QualifiedName) + "_" +
+        Mangler.SymbolSafe(iface.QualifiedName);
+
+    /// <summary>The 16-byte constant an interface's [Guid] folded to.</summary>
+    private static string IidName(ComInterfaceTypeSymbol iface) =>
+        "_SLiid_" + Mangler.SymbolSafe(iface.QualifiedName);
+
     private static string VTableName(ClassTypeSymbol type, InterfaceTypeSymbol iface) =>
         "_SLvt_" + Mangler.SymbolSafe(type.QualifiedName) + "_" + Mangler.SymbolSafe(iface.QualifiedName);
 
@@ -688,6 +718,191 @@ public sealed class LlvmEmitter(
                 $"@{InterfaceTableName(classType)} = internal constant " +
                 $"[{entries.Length} x ptr] [{string.Join(", ", entries)}]");
         }
+    }
+
+    /// <summary>
+    /// Everything COM needs in static storage: an IID per interface, a vtable
+    /// per (class, interface) pair, and one table per class saying which
+    /// tear-off answers for which IID.
+    /// </summary>
+    private void ComTables(BoundProgram program)
+    {
+        var comClasses = program.Classes.Where(c => c.IsCom && c.ComInterfaces.Count > 0).ToList();
+        var used = program.ComInterfaces
+            .Concat(comClasses.SelectMany(c => c.ComInterfaces))
+            .Distinct()
+            .ToList();
+
+        if (used.Count == 0 && comClasses.Count == 0) return;
+
+        _module.AppendLine();
+
+        // --- one IID per interface ---------------------------------------
+        //
+        // Laid out as a GUID is laid out and not as sixteen bytes in order: the
+        // first three fields are little-endian integers on the wire as well as
+        // in memory, which is why 00000000-0000-0000-C000-000000000046 reads
+        // the way it does in a header and the way it does here.
+        foreach (var comInterface in used.Where(i => i.Iid is not null))
+        {
+            var (a, b, c, tail) = GuidParts(comInterface.Iid!.Value);
+            _module.AppendLine(
+                $"@{IidName(comInterface)} = internal constant " +
+                $"{{ i32, i16, i16, [8 x i8] }} " +
+                $"{{ i32 {a}, i16 {b}, i16 {c}, [8 x i8] c\"{RawBytes(tail)}\" }}");
+        }
+
+        if (comClasses.Count == 0) return;
+
+        // --- a vtable per class, per interface ----------------------------
+        foreach (var classType in comClasses)
+        {
+            foreach (var presented in classType.ComInterfaces)
+            {
+                foreach (var required in presented.VirtualTable)
+                {
+                    if (required.ContainingType is ComInterfaceTypeSymbol { SimpleName: "IUnknown" })
+                        continue;
+                    EmitComAdjustor(classType, presented, required);
+                }
+
+                var slots = presented.VirtualTable
+                    .Select(required => ComSlotBody(classType, presented, required))
+                    .ToList();
+
+                _module.AppendLine(
+                    $"@{ComVTableName(classType, presented)} = internal constant " +
+                    $"[{slots.Count} x ptr] [{string.Join(", ", slots)}]");
+            }
+
+            var entries = classType.ComInterfaces
+                .Select(presented =>
+                    $"{{ ptr, i64 }} {{ ptr @{IidName(presented)}, " +
+                    $"i64 {classType.TearOffOffset(presented)} }}")
+                .ToList();
+
+            _module.AppendLine(
+                $"@{ComLayoutName(classType)}_entries = internal constant " +
+                $"[{entries.Count} x {{ ptr, i64 }}] [{string.Join(", ", entries)}]");
+
+            _module.AppendLine(
+                $"@{ComLayoutName(classType)} = internal constant {{ i64, ptr }} " +
+                $"{{ i64 {entries.Count}, ptr @{ComLayoutName(classType)}_entries }}");
+        }
+    }
+
+    /// <summary>
+    /// What goes in one vtable slot.
+    ///
+    /// IUnknown's three are the runtime's, the same three functions for every
+    /// com class: they only need the tear-off's own offset, and it is stored
+    /// beside them rather than compiled in.
+    /// </summary>
+    private string ComSlotBody(
+        ClassTypeSymbol classType, ComInterfaceTypeSymbol presented, FunctionSymbol required)
+    {
+        if (required.ContainingType is ComInterfaceTypeSymbol { SimpleName: "IUnknown" })
+            return required.VirtualSlot switch
+            {
+                0 => "ptr @sl_com_object_query",
+                1 => "ptr @sl_com_object_add_ref",
+                _ => "ptr @sl_com_object_release",
+            };
+
+        var found = classType.FindImplementation(required);
+        if (found is null) return "ptr null";
+
+        // Keyed by the table this slot is in. A derived interface inherits a
+        // method's slot but has its own tear-off, so the two tables need two
+        // thunks for the one method, subtracting two different distances.
+        return $"ptr @{AdjustorName(classType, presented, required.VirtualSlot)}";
+    }
+
+    private static string AdjustorName(
+        ClassTypeSymbol type, ComInterfaceTypeSymbol presented, int slot) =>
+        "_SLadj_" + Mangler.SymbolSafe(type.QualifiedName) + "_" +
+        Mangler.SymbolSafe(presented.QualifiedName) + "_" + slot;
+
+    /// <summary>
+    /// Emits the thunk one vtable slot points at.
+    ///
+    /// It takes what COM passes -- the tear-off's address -- steps back to the
+    /// object, and tail-calls the method with everything else untouched. The
+    /// distance is a constant of the layout, so the whole body is one
+    /// getelementptr and one call, and the call is a tail call, so the thunk
+    /// leaves no frame behind.
+    ///
+    /// The parameters are forwarded by name and never inspected, which is what
+    /// keeps this independent of how any of them are passed: a struct going by
+    /// hidden pointer arrives as a pointer here too, and is handed straight on.
+    /// </summary>
+    private void EmitComAdjustor(
+        ClassTypeSymbol classType, ComInterfaceTypeSymbol presented, FunctionSymbol required)
+    {
+        var target = classType.FindImplementation(required);
+        if (target is null) return;
+
+        var returnInfo = Win64Abi.ClassifyReturn(target.ReturnType, LlvmTypeOf);
+        string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+
+        var declared = new List<string>();
+        var forwarded = new List<string>();
+
+        if (returnInfo.Style == PassStyle.Indirect)
+        {
+            string sret = $"ptr sret({StructName((StructTypeSymbol)target.ReturnType)}) %sret";
+            declared.Add(sret);
+            forwarded.Add(sret);
+        }
+
+        // The receiver, which is the one argument the thunk changes.
+        declared.Add("ptr %self");
+
+        foreach (var parameter in target.Parameters.Where(p => !p.IsThis))
+        {
+            var info = ClassifyParameter(parameter);
+            string name = "%a" + parameter.Index;
+            string spelled = info.Style == PassStyle.Indirect
+                ? $"ptr byval({StructName((StructTypeSymbol)parameter.Type)}) {name}"
+                : $"{info.LlvmType} {name}";
+
+            declared.Add(spelled);
+            forwarded.Add(spelled);
+        }
+
+        int offset = classType.TearOffOffset(presented);
+        string name2 = AdjustorName(classType, presented, required.VirtualSlot);
+
+        _module.AppendLine(
+            $"define internal {returnType} @{name2}({string.Join(", ", declared)}) {{");
+        _module.AppendLine(
+            $"  %obj = getelementptr inbounds i8, ptr %self, i64 -{offset}");
+
+        forwarded.Insert(returnInfo.Style == PassStyle.Indirect ? 1 : 0, "ptr %obj");
+        string call = $"call {returnType} {Symbol(target)}({string.Join(", ", forwarded)})";
+
+        if (returnType == "void")
+        {
+            _module.AppendLine($"  {call}");
+            _module.AppendLine("  ret void");
+        }
+        else
+        {
+            _module.AppendLine($"  %r = {call}");
+            _module.AppendLine($"  ret {returnType} %r");
+        }
+
+        _module.AppendLine("}");
+    }
+
+    /// <summary>A GUID split the way its first three fields are stored.</summary>
+    private static (uint A, ushort B, ushort C, byte[] Tail) GuidParts(Guid value)
+    {
+        byte[] bytes = value.ToByteArray();          // already little-endian for a, b and c
+        return (BitConverter.ToUInt32(bytes, 0),
+                BitConverter.ToUInt16(bytes, 4),
+                BitConverter.ToUInt16(bytes, 6),
+                bytes[8..]);
     }
 
     private void StringConstants()
@@ -778,7 +993,16 @@ public sealed class LlvmEmitter(
     /// LLVM takes printable ASCII literally and everything else as \XX, with
     /// the quote and backslash always escaped. A trailing NUL is always added.
     /// </summary>
-    private static string EscapeBytes(byte[] bytes)
+    private static string EscapeBytes(byte[] bytes) => RawBytes(bytes) + "\\00";
+
+    /// <summary>
+    /// The bytes as LLVM spells them, with nothing added.
+    ///
+    /// <see cref="EscapeBytes"/> terminates what it writes, because every
+    /// caller but one is emitting a C string. The exception is a GUID, which
+    /// is sixteen bytes and not text.
+    /// </summary>
+    private static string RawBytes(byte[] bytes)
     {
         var escaped = new StringBuilder();
         foreach (byte b in bytes)
@@ -788,7 +1012,7 @@ public sealed class LlvmEmitter(
             else
                 escaped.Append('\\').Append(b.ToString("X2", CultureInfo.InvariantCulture));
         }
-        return escaped.Append("\\00").ToString();
+        return escaped.ToString();
     }
 
     /// <summary>A bare NUL-terminated byte array, for C strings and TypeInfo names.</summary>
@@ -1527,9 +1751,7 @@ public sealed class LlvmEmitter(
             }
 
             string value = Emit("ptr", $"load ptr, ptr {address}");
-            Line(field.Type is WeakTypeSymbol
-                ? $"call void @sl_weak_release(ptr {value})"
-                : $"call void @sl_release(ptr {value})");
+            Release(value, field.Type);
         }
 
         // The base last, so the object is taken apart from the outside in: a
@@ -1592,7 +1814,7 @@ public sealed class LlvmEmitter(
             else
             {
                 string element = Emit("ptr", $"load ptr, ptr {slot}");
-                Line($"call void @{(weak ? "sl_weak_release" : "sl_release")}(ptr {element})");
+                Release(element, arrayType.Element);
             }
             string next = Emit("i64", $"add i64 {index}, 1");
             Line($"store i64 {next}, ptr {counter}");
@@ -1724,9 +1946,7 @@ public sealed class LlvmEmitter(
         else
         {
             string held = Emit("ptr", $"load ptr, ptr {slot}");
-            Line(parameter.Type is WeakTypeSymbol
-                ? $"call void @sl_weak_retain(ptr {held})"
-                : $"call void @sl_retain(ptr {held})");
+            Retain(held, parameter.Type);
         }
 
         TrackOwnedLocal(slot, parameter.Type);
@@ -1796,9 +2016,7 @@ public sealed class LlvmEmitter(
         }
 
         string value = Emit("ptr", $"load ptr, ptr {slot}");
-        Line(type is WeakTypeSymbol
-            ? $"call void @sl_weak_release(ptr {value})"
-            : $"call void @sl_release(ptr {value})");
+        Release(value, type);
     }
 
     /// <summary>
@@ -1820,9 +2038,7 @@ public sealed class LlvmEmitter(
             }
 
             string value = Emit("ptr", $"load ptr, ptr {slot}");
-            Line(type is WeakTypeSymbol
-                ? $"call void @sl_weak_retain(ptr {value})"
-                : $"call void @sl_retain(ptr {value})");
+            Retain(value, type);
         });
 
     /// <summary>Releases every reference inside the struct at <paramref name="address"/>.</summary>
@@ -1836,9 +2052,7 @@ public sealed class LlvmEmitter(
             }
 
             string value = Emit("ptr", $"load ptr, ptr {slot}");
-            Line(type is WeakTypeSymbol
-                ? $"call void @sl_weak_release(ptr {value})"
-                : $"call void @sl_release(ptr {value})");
+            Release(value, type);
         });
 
     /// <summary>
@@ -1958,13 +2172,42 @@ public sealed class LlvmEmitter(
                 continue;
             }
 
-            Line(type is WeakTypeSymbol
-                ? $"call void @sl_weak_release(ptr {reference})"
-                : $"call void @sl_release(ptr {reference})");
+            Release(reference, type);
         }
 
         _pendingReleases.RemoveRange(from, _pendingReleases.Count - from);
     }
+
+    /// <summary>
+    /// True when a slot of this type is counted by COM rather than by the
+    /// runtime's own header. An optional one still is: <c>IFoo?</c> is the same
+    /// pointer, allowed to be null.
+    /// </summary>
+    private static bool IsComReference(TypeSymbol type) =>
+        type is ComInterfaceTypeSymbol or OptionalTypeSymbol { Element: ComInterfaceTypeSymbol };
+
+    /// <summary>
+    /// The runtime function that adds a reference to a value of this type.
+    ///
+    /// Three kinds of counting, one decision. A COM reference goes through the
+    /// object's own AddRef -- sl_com_retain is a null test and an indirect call,
+    /// in one place rather than emitted at every site.
+    /// </summary>
+    private static string RetainOf(TypeSymbol type) =>
+        type is WeakTypeSymbol ? "sl_weak_retain"
+        : IsComReference(type) ? "sl_com_retain"
+        : "sl_retain";
+
+    private static string ReleaseOf(TypeSymbol type) =>
+        type is WeakTypeSymbol ? "sl_weak_release"
+        : IsComReference(type) ? "sl_com_release"
+        : "sl_release";
+
+    private void Retain(string value, TypeSymbol type) =>
+        Line($"call void @{RetainOf(type)}(ptr {value})");
+
+    private void Release(string value, TypeSymbol type) =>
+        Line($"call void @{ReleaseOf(type)}(ptr {value})");
 
     /// <summary>
     /// Stores into an owning slot: retain the new value, release the old one, in
@@ -1972,10 +2215,9 @@ public sealed class LlvmEmitter(
     /// </summary>
     private void StoreManaged(string slot, string value, TypeSymbol type)
     {
-        bool weak = type is WeakTypeSymbol;
-        Line($"call void @{(weak ? "sl_weak_retain" : "sl_retain")}(ptr {value})");
+        Retain(value, type);
         string old = Emit("ptr", $"load ptr, ptr {slot}");
-        Line($"call void @{(weak ? "sl_weak_release" : "sl_release")}(ptr {old})");
+        Release(old, type);
         Line($"store ptr {value}, ptr {slot}");
     }
 
@@ -2279,7 +2521,7 @@ public sealed class LlvmEmitter(
 
         // A returned reference is handed to the caller at +1.
         if (value.Type.NeedsArc())
-            Line($"call void @sl_retain(ptr {value.Ref})");
+            Retain(value.Ref, value.Type);
 
         if (value.Type is StructTypeSymbol structType)
         {
@@ -2376,6 +2618,12 @@ public sealed class LlvmEmitter(
             case BoundArrayLength length: return EmitArrayLength(length);
             case BoundSlice slice: return EmitSlice(slice);
             case BoundTypeof typeofExpression: return EmitTypeof(typeofExpression);
+
+            // A constant in static storage, so this is its address and
+            // nothing else: no load, no call, and two mentions of one
+            // interface are the same pointer.
+            case BoundIidof iidof:
+                return new Val("@" + IidName(iidof.Named), "ptr", iidof.Type);
             case BoundVariantConstruction built: return EmitVariantConstruction(built);
             case BoundVariantTest test: return EmitVariantTest(test);
             case BoundVariantPayload payload: return EmitVariantPayload(payload);
@@ -2728,7 +2976,8 @@ public sealed class LlvmEmitter(
         // setter the object really has.
         var receiver = EmitExpression(assignment.Receiver);
         string? virtualTarget =
-            setter.ContainingType is InterfaceTypeSymbol ? LoadInterfaceMethod(receiver.Ref, setter)
+            setter.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiver.Ref, setter)
+            : setter.ContainingType is InterfaceTypeSymbol ? LoadInterfaceMethod(receiver.Ref, setter)
             : setter.IsDispatched ? LoadVirtualMethod(receiver.Ref, setter)
             : null;
 
@@ -2754,11 +3003,20 @@ public sealed class LlvmEmitter(
     {
         var value = EmitExpression(test.Value);
 
-        string answer = test.Tested is InterfaceTypeSymbol interfaceType
-            ? Emit("i32", $"call i32 @sl_implements(ptr {value.Ref}, i64 {interfaceType.Id})")
-            : Emit("i32",
+        string answer = test.Tested switch
+        {
+            // The object is asked, and it answers at +1 -- which sl_com_is
+            // drops again, because the question was a bool.
+            ComInterfaceTypeSymbol comInterface => Emit("i32",
+                $"call i32 @sl_com_is(ptr {value.Ref}, ptr @{IidName(comInterface)})"),
+
+            InterfaceTypeSymbol interfaceType => Emit("i32",
+                $"call i32 @sl_implements(ptr {value.Ref}, i64 {interfaceType.Id})"),
+
+            _ => Emit("i32",
                 $"call i32 @sl_is_instance(ptr {value.Ref}, " +
-                $"ptr @{Mangler.TypeInfoSymbol((ClassTypeSymbol)test.Tested)})");
+                $"ptr @{Mangler.TypeInfoSymbol((ClassTypeSymbol)test.Tested)})"),
+        };
 
         return new Val(Emit("i1", $"icmp ne i32 {answer}, 0"), "i1", test.Type);
     }
@@ -2815,6 +3073,77 @@ public sealed class LlvmEmitter(
                 return new Val(operand.Ref, to, conversion.Type);
             }
 
+            // The pointer is unchanged; what changes is that ARC now owns
+            // it. Tracked as a temporary, so the +1 COM handed over is dropped
+            // at the end of the statement and what a variable keeps is the
+            // reference its own store retained.
+            case ConversionKind.ComAdopt:
+                TrackTemporary(operand.Ref, conversion.Type);
+                return new Val(operand.Ref, to, conversion.Type);
+
+            // A COM vtable begins with its base's slots, so a derived
+            // reference already answers the base's calls at the same address.
+            // The class Upcast above is the same property seen from the object
+            // side rather than the table side.
+            case ConversionKind.ComUpcast:
+                return new Val(operand.Ref, to, conversion.Type);
+
+            // The address of the tear-off inside the object. One add, at an
+            // offset the layout fixed -- the only COM conversion that is not
+            // free, and it is not free because a COM pointer has to point at a
+            // vtable pointer and a Stainless object starts with its header.
+            case ConversionKind.ComTearOff:
+            {
+                var owner = (ClassTypeSymbol)conversion.Operand.Type;
+                var presented = conversion.Type switch
+                {
+                    OptionalTypeSymbol optional => (ComInterfaceTypeSymbol)optional.Element,
+                    var direct => (ComInterfaceTypeSymbol)direct,
+                };
+
+                // IUnknown is not in the list, and every com object answers to
+                // it; the first tear-off is the canonical one, which is what
+                // makes two IUnknown pointers to one object compare equal.
+                int offset = owner.ComInterfaces.Contains(presented)
+                    ? owner.TearOffOffset(presented)
+                    : owner.TearOffsStart;
+
+                return new Val(
+                    Emit("ptr", $"getelementptr inbounds i8, ptr {operand.Ref}, i64 {offset}"),
+                    to, conversion.Type);
+            }
+
+            // Downwards between com interfaces the answer is not the
+            // compiler's: the object decides, in code that may not be ours. So
+            // this is a QueryInterface, and what comes back is a reference the
+            // caller owns rather than the pointer that went in.
+            case ConversionKind.ComQuery:
+            {
+                var wanted = (ComInterfaceTypeSymbol)conversion.Type;
+
+                string found = Emit("ptr",
+                    $"call ptr @sl_com_query(ptr {operand.Ref}, ptr @{IidName(wanted)})");
+                string held = Emit("i1", $"icmp ne ptr {found}, null");
+
+                string good = NextLabel("qi.ok");
+                string bad = NextLabel("qi.bad");
+
+                Terminator($"br i1 {held}, label %{good}, label %{bad}");
+
+                Label(bad);
+                Line($"call void @sl_com_cast_failed(" +
+                     $"ptr {InternBytes(conversion.Operand.Type.Name)}, " +
+                     $"ptr {InternBytes(wanted.QualifiedName)})");
+                Terminator("unreachable");
+
+                Label(good);
+
+                // QueryInterface answered at +1, so this is a temporary the
+                // statement scope drops like any other.
+                TrackTemporary(found, conversion.Type);
+                return new Val(found, to, conversion.Type);
+            }
+
             // The whole of an array, as a slice of it: offset zero, and the
             // length the array already knows. The array is retained into the
             // slice's field like anything a struct holds.
@@ -2831,7 +3160,7 @@ public sealed class LlvmEmitter(
                 Line($"store ptr {operand.Ref}, ptr {SliceField(slot, type, 0)}");
                 Line($"store i64 0, ptr {SliceField(slot, type, 1)}");
                 Line($"store i64 {length}, ptr {SliceField(slot, type, 2)}");
-                Line($"call void @sl_retain(ptr {operand.Ref})");
+                Retain(operand.Ref, operand.Type);
 
                 TrackTemporary(slot, type);
                 return new Val(slot, "ptr", type);
@@ -3148,7 +3477,7 @@ public sealed class LlvmEmitter(
         int mark = _pendingReleases.Count;
         var value = EmitExpression(arm);
 
-        if (arm.Type.NeedsArc()) Line($"call void @sl_retain(ptr {value.Ref})");
+        if (arm.Type.NeedsArc()) Retain(value.Ref, arm.Type);
         else if (arm.Type is StructTypeSymbol structArm && structArm.CarriesReferences())
             RetainFieldsAt(value.Ref, structArm);
 
@@ -3175,6 +3504,8 @@ public sealed class LlvmEmitter(
         string instance = Emit("ptr",
             $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
 
+        InitializeTearOffs(instance, classType);
+
         if (expression.Constructor is not null)
         {
             var arguments = new List<string> { $"ptr {instance}" };
@@ -3185,6 +3516,35 @@ public sealed class LlvmEmitter(
         // sl_alloc already returns +1; the statement scope releases it.
         TrackTemporary(instance, classType);
         return new Val(instance, "ptr", classType);
+    }
+
+    /// <summary>
+    /// Writes a com class's tear-offs into a freshly allocated object.
+    ///
+    /// One per interface it presents, each a vtable pointer followed by its own
+    /// distance back to the start of the object. The distance is what lets a
+    /// Release arriving through any of them find the header: the pointer COM
+    /// holds is the tear-off's address, not the object's, and subtracting is
+    /// cheaper than the adjustor thunks C++ generates for the same problem.
+    ///
+    /// sl_alloc has already zeroed the memory, so nothing else needs writing.
+    /// </summary>
+    private void InitializeTearOffs(string instance, ClassTypeSymbol classType)
+    {
+        if (!classType.IsCom || classType.ComInterfaces.Count == 0) return;
+
+        foreach (var presented in classType.ComInterfaces)
+        {
+            int offset = classType.TearOffOffset(presented);
+
+            string tearOff = Emit("ptr",
+                $"getelementptr inbounds i8, ptr {instance}, i64 {offset}");
+            Line($"store ptr @{ComVTableName(classType, presented)}, ptr {tearOff}");
+
+            string ownerSlot = Emit("ptr",
+                $"getelementptr inbounds i8, ptr {tearOff}, i64 8");
+            Line($"store i64 {offset}, ptr {ownerSlot}");
+        }
     }
 
     /// <summary>
@@ -3222,6 +3582,28 @@ public sealed class LlvmEmitter(
     /// no branch. It is one load more than a C++ virtual call, which is the
     /// price of leaving the object header alone.
     /// </summary>
+    /// <summary>
+    /// Loads a COM method: the reference points at the vtable pointer, so the
+    /// whole of it is a load and an index.
+    ///
+    ///   this -> [0] = vtable -> [slot]
+    ///
+    /// Two loads, against four for a Stainless interface, which has to reach
+    /// the object's TypeInfo and then its table of tables. That is not a COM
+    /// virtue so much as the consequence of giving up the object header: a COM
+    /// pointer knows how to call and nothing else, and cannot be retained,
+    /// compared or reflected on without asking the object first.
+    /// </summary>
+    private string LoadComMethod(string receiver, FunctionSymbol method)
+    {
+        int slot = method.VirtualSlot;
+
+        string vtable = Emit("ptr", $"load ptr, ptr {receiver}");
+        string methodSlot = Emit("ptr",
+            $"getelementptr inbounds ptr, ptr {vtable}, i64 {slot}");
+        return Emit("ptr", $"load ptr, ptr {methodSlot}");
+    }
+
     private string LoadInterfaceMethod(string receiver, FunctionSymbol method)
     {
         var interfaceType = (InterfaceTypeSymbol)method.ContainingType!;
@@ -3523,7 +3905,9 @@ public sealed class LlvmEmitter(
 
             // Resolved before the arguments so the load reads the receiver as it
             // was, whatever the arguments go on to do.
-            if (function.ContainingType is InterfaceTypeSymbol)
+            if (function.ContainingType is ComInterfaceTypeSymbol)
+                virtualTarget = LoadComMethod(receiver.Ref, function);
+            else if (function.ContainingType is InterfaceTypeSymbol)
                 virtualTarget = LoadInterfaceMethod(receiver.Ref, function);
             else if (function.IsDispatched && !call.IsNonVirtual)
                 virtualTarget = LoadVirtualMethod(receiver.Ref, function);

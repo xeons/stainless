@@ -143,6 +143,7 @@ struct TypeInfo {
 
     const SlTypeInfo   *base;         /* the class derived from; NULL if none  */
     const void *const  *vtable;       /* virtual methods by slot; may be NULL  */
+    const void         *com;          /* SlComLayout for a com class; else NULL */
 };
 
 struct SlFieldInfo {
@@ -160,9 +161,10 @@ type's fields are `const` tables the linker places in read-only data, and
 reading one is address arithmetic. A type without the marker carries four
 zeroes.
 
-`base` and `vtable` are **appended** rather than inserted, so every offset the
-compiler hard-codes — `interfaces` at 24, above all — goes on meaning what it
-meant. `base` sits at offset 64 and `vtable` at 72.
+`base`, `vtable` and `com` are **appended** rather than inserted, so every
+offset the compiler hard-codes — `interfaces` at 24, above all — goes on
+meaning what it meant. `base` sits at offset 64, `vtable` at 72 and `com` at
+80.
 
 Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in
@@ -446,6 +448,123 @@ The compiler emits, per implementing class, one vtable per interface plus the
 @_SLvt_App_Circle_App_Shape = internal constant [2 x ptr] [ptr @..Area.., ptr @..Describe..]
 @_SLitab_App_Circle         = internal constant [2 x ptr] [ptr @_SLvt_App_Circle_App_Shape, ptr null]
 ```
+
+### 2.9 COM
+
+A COM interface reference is **not** an object pointer. It points at a vtable
+pointer:
+
+```
+   IFoo ref ---> +----------------------+
+                 | vtable               | ---> +--------------------+
+                 +----------------------+   0  | QueryInterface     |
+                                              8 | AddRef             |
+                                             16 | Release            |
+                                             24 | the interface's... |
+                                                +--------------------+
+```
+
+A call is therefore two loads and an indirect call:
+
+```
+   %vtable = load ptr, ptr %this
+   %slot   = getelementptr inbounds ptr, ptr %vtable, i64 <n>
+   %fn     = load ptr, ptr %slot
+   call ... %fn(ptr %this, ...)
+```
+
+against four loads for a Stainless interface, which reaches the object's
+TypeInfo and then its table of tables. That is not COM being better designed:
+it is the consequence of the reference carrying no object header, so the same
+pointer cannot be retained by the runtime, reflected on, or compared for
+identity.
+
+Slots are numbered **root down**, IUnknown's three first, so a derived
+interface's table is its base's with its own methods appended and a derived
+reference already satisfies the base — the table-side twin of §2.0's rule about
+objects.
+
+### 2.9.1 A com class
+
+A `com class` is an ordinary object with tear-offs after its fields:
+
+```
+   offset 0    strong
+          8    weak
+         16    TypeInfo*
+         24    fields...
+          T    tear-off 0:  vtable*, ownerOffset  (16 bytes)
+       T+16    tear-off 1:  vtable*, ownerOffset
+```
+
+`T` is the fields' end rounded up to 8. Converting the class to one of its
+interfaces yields the address of that interface's tear-off — one add, and the
+only COM conversion that is not free.
+
+`ownerOffset` is the tear-off's own distance from the object's start, and it is
+what makes several interfaces possible. A COM pointer has to point at a vtable
+pointer, so an object presenting three has three distinct addresses, and a
+`Release` arriving through any of them must find the one header: it subtracts.
+The three IUnknown slots are runtime functions (`sl_com_object_query`,
+`sl_com_object_add_ref`, `sl_com_object_release`) shared by every com class,
+which is why they can be shared — they read the distance rather than knowing
+it.
+
+Every other slot holds an **adjustor thunk**, one per (class, interface,
+slot). This is `com class Greeter : ILoudGreeter` from
+[tests/cases/com](../tests/cases/com), whose tear-offs land at 32 and 48:
+
+```llvm
+@_SLcomvt_Com_Greeter_Com_ILoudGreeter = internal constant [5 x ptr]
+    [ptr @sl_com_object_query, ptr @sl_com_object_add_ref,
+     ptr @sl_com_object_release,
+     ptr @_SLadj_Com_Greeter_Com_ILoudGreeter_3,
+     ptr @_SLadj_Com_Greeter_Com_ILoudGreeter_4]
+
+@_SLcomvt_Com_Greeter_Com_IGreeter = internal constant [4 x ptr]
+    [ptr @sl_com_object_query, ptr @sl_com_object_add_ref,
+     ptr @sl_com_object_release,
+     ptr @_SLadj_Com_Greeter_Com_IGreeter_3]
+
+define internal i32 @_SLadj_Com_Greeter_Com_ILoudGreeter_3(ptr %self, i32 %a1) {
+  %obj = getelementptr inbounds i8, ptr %self, i64 -32
+  %r = call i32 @_SL3Com7Greeter5GreetiEi(ptr %obj, i32 %a1)
+  ret i32 %r
+}
+
+define internal i32 @_SLadj_Com_Greeter_Com_IGreeter_3(ptr %self, i32 %a1) {
+  %obj = getelementptr inbounds i8, ptr %self, i64 -48
+  %r = call i32 @_SL3Com7Greeter5GreetiEi(ptr %obj, i32 %a1)
+  ret i32 %r
+}
+```
+
+The class's own method takes the object, because it is also called directly.
+C++ emits the same thunks for the same reason. Note the two thunks for the one
+`Greet`: `ILoudGreeter` inherits the slot but has its own tear-off, so the
+distance back differs and the tables cannot share an entry.
+
+`TypeInfo.com` points at the table QueryInterface scans:
+
+```c
+typedef struct SlComEntry { const SlGuid *iid; size_t offset; } SlComEntry;
+typedef struct SlComLayout { size_t count; const SlComEntry *entries; } SlComLayout;
+```
+
+```llvm
+@_SLcom_Com_Greeter_entries = internal constant [2 x { ptr, i64 }]
+    [{ ptr, i64 } { ptr @_SLiid_Com_ILoudGreeter, i64 32 },
+     { ptr, i64 } { ptr @_SLiid_Com_IGreeter,     i64 48 }]
+```
+
+A linear scan, because QueryInterface is called when a reference changes hands
+rather than in a loop. `IUnknown` is answered by the first entry's tear-off
+whatever its IID, so two IUnknown pointers to one object compare equal — which
+COM requires and which object identity is built on.
+
+**Nothing in any of this is Windows-specific**, and `runtime/com.c` has no
+`#ifdef` in it. The Windows part of COM is activation, and activation is not in
+the language.
 
 ## 3. Calling convention
 

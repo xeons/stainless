@@ -2676,7 +2676,129 @@ and a library and a consumer that disagree are refused — two runtimes is exact
 the failure this closes, and it would otherwise be a silent one. See
 [abi.md](abi.md) §6.1.
 
-### 8.5 Linking a platform library
+### 8.5 COM
+
+COM is a calling convention, not a Windows service. An interface reference
+points at a vtable pointer, and slots 0, 1 and 2 of that vtable are always
+`QueryInterface`, `AddRef` and `Release`. None of that needs an operating
+system — it is a pointer, an array of function pointers, and the platform C
+calling convention — which is why `com` works on Linux and macOS as well.
+What is Windows about COM is *activation*: `CoCreateInstance`, the registry,
+apartments, marshalling. None of that is in the language.
+
+```csharp
+[Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
+public com interface IShellItem {
+    int BindToHandler(byte* bindContext, Guid* handler, Guid* iid, byte** result);
+    int GetParent(byte** parent);
+    int GetDisplayName(uint kind, char16** name);
+    int GetAttributes(uint mask, uint* attributes);
+    int Compare(byte* other, uint hint, int* order);
+}
+```
+
+**A `com interface` is not an `interface`.** The two are different objects in
+memory, and every difference follows from where the reference points:
+
+| | reference points at | dispatch | needs |
+|---|---|---|---|
+| `interface` | the object header | `obj+16` → TypeInfo → `+24` → tables → `[id]` → `[slot]`, 4 loads | an object the runtime allocated |
+| `com interface` | the vtable pointer | `this` → `[0]` → `[slot]`, 2 loads | nothing at all |
+
+So a com interface can name an object another language made, which is the
+point, and carries no Stainless header, which is the cost: it cannot be
+compared for identity, reflected on, or held `weak`.
+
+**Every com interface extends `IUnknown`**, written or not, so a declaration's
+own first method is slot 3. Extension is **single**: a COM vtable is one array
+and a reference is one pointer to it, so there is room for one chain (SL0530).
+A derived interface's table is its base's with its own methods appended, which
+is what makes an upcast free — the same property that makes a class upcast free
+(§2.4.1), arrived at from the table side rather than the object side.
+
+`[Guid("...")]` is required (SL0537) and is understood by the compiler rather
+than stored as metadata: an IID is the interface's identity, not something a
+library reads back. `iidof(IShellItem)` is its address as a `Guid*`, which is
+what activation and `QueryInterface` take.
+
+#### ARC drives AddRef and Release
+
+This is the reason `com` is in the language rather than being a struct of
+`delegate`s. Mismatched `Release` is COM's defining bug, and the compiler
+already knows where every reference is born, copied and dropped — so it emits
+the calls:
+
+```csharp
+IShellItem Parent(IShellItem item) {
+    byte* raw = null;
+    if (item.GetParent(&raw) < 0) { ... }
+    return (IShellItem)raw;             // adopts; nothing else to write
+}
+```
+
+A cast from a raw pointer is how a reference that activation wrote through a
+`void**` enters ARC's care. It is unchecked — a `byte*` says nothing about what
+is behind it — and it *adopts*: the +1 the factory handed over becomes the one
+the caller holds, and the release is emitted at the end of the scope.
+
+#### `is` and a cast are `QueryInterface`
+
+```csharp
+if (item is IShellItem2) {
+    IShellItem2 richer = (IShellItem2)item;
+    ...
+}
+```
+
+Unlike a class downcast, the compiler cannot answer this from anything it laid
+out: the object decides, at run time, in code that may not be ours. So `is` is
+a call, and it is worth writing even upwards — there is no "always true"
+warning here, because even that answer is the object's. A cast that the object
+refuses ends the program, the same as a failed class downcast.
+
+#### `com class`: being a COM object
+
+```csharp
+public com class Greeter : ILoudGreeter {
+    int count;
+    public int Greet(int times) { count = count + times; return count; }
+    public int Shout() { return count; }
+}
+```
+
+An ordinary Stainless object — header, fields, destructor, ARC — that also
+presents COM vtables. `QueryInterface`, `AddRef` and `Release` are the
+compiler's and not the programmer's: they are the same three functions for
+every com class, and a hand-written `AddRef` would put the object's count and
+ARC's out of step.
+
+The object carries one **tear-off** per interface it presents, laid out after
+the fields: a vtable pointer and the distance back to the object. The distance
+is what makes several interfaces possible at all — a COM pointer must point at
+a vtable pointer, so an object presenting three has three addresses, and a
+`Release` arriving through any of them has to find the one header. Each vtable
+slot holds a one-instruction adjustor thunk that subtracts and tail-calls; C++
+generates the same thing for the same reason.
+
+Converting a com class to one of its interfaces is therefore the one COM
+conversion that is not free: one add, at a constant offset.
+
+#### What is not there
+
+- **Activation.** No `CoCreateInstance` wrapper, no registry, no class
+  factories, no apartments, no marshalling, no proxies or stubs, no
+  `IDispatch`. A program that wants those declares them `extern "C"` like any
+  other Windows API, which is what [tests/cases/com-shell](../tests/cases/com-shell)
+  does.
+- **A com class cannot derive from a class** (SL0536): the tear-offs sit after
+  the fields, and a derived class adds fields after those.
+- **x64 and ARM64 only**, like the rest of the language. On x86 every COM
+  method is `__stdcall` and the name carries a byte count; on x64 there is one
+  calling convention and the question does not arise.
+- **No `[Guid]` on a class**, so a com class has a layout and no CLSID. It is
+  reached by being handed out, not by being asked for.
+
+### 8.6 Linking a platform library
 
 Object files, static archives and import libraries can be listed among the
 source paths, and are handed to the linker as they are. A library the linker can
@@ -3128,7 +3250,7 @@ the programmer's business, and inferring it from an optimisation level would be
 a rule nobody asked for.
 
 `#pragma` is the one directive that is not about choosing a branch; it is
-covered in §8.5.
+covered in §8.6.
 
 A whole file may be guarded, which is how a platform binding is written:
 [bindings/win32](../bindings/win32) declares its `module` and then wraps

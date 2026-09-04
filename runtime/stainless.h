@@ -151,6 +151,15 @@ struct SlTypeInfo {
      * interface call, which has an id to look up first.
      */
     const void *const  *vtable;
+
+    /*
+     * For a `com class`, the tear-offs it presents: which interface each one
+     * is for and how far into the object it sits. NULL for everything else.
+     * Appended after `vtable` for the same reason `base` and `vtable` were
+     * appended after `attributes` -- every offset already issued keeps meaning
+     * what it meant, so a library compiled before this still reads correctly.
+     */
+    const void         *com;
 };
 
 typedef struct SlObject {
@@ -211,6 +220,92 @@ SL_API int   sl_implements(const void *object, size_t interfaceId);
  * is the question the programmer is about to ask. Never returns.
  */
 SL_API void  sl_cast_failed(const void *object, const char *wanted);
+
+/* -------------------------------------------------------------------- COM */
+
+/*
+ * COM is a calling convention, not a Windows service.
+ *
+ * An interface reference points at a vtable pointer, and slots 0, 1 and 2 of
+ * that vtable are always QueryInterface, AddRef and Release. Nothing in that
+ * needs an operating system, which is why com.c has no #ifdef in it: the
+ * Windows part of COM is activation, and activation is not here.
+ */
+
+/* 16 bytes, laid out as Windows lays a GUID out, which is what a wire format
+   and every existing header agree on. */
+typedef struct SlGuid {
+    uint32_t data1;
+    uint16_t data2;
+    uint16_t data3;
+    uint8_t  data4[8];
+} SlGuid;
+
+typedef struct SlComObject SlComObject;
+
+/* The three slots every COM vtable starts with. A longer vtable is this
+   followed by the interface's own methods, which is why a derived interface
+   reference is usable as a base one with no conversion at all. */
+typedef struct SlComVtable {
+    int32_t  (*QueryInterface)(void *self, const SlGuid *iid, void **result);
+    uint32_t (*AddRef)(void *self);
+    uint32_t (*Release)(void *self);
+} SlComVtable;
+
+struct SlComObject {
+    const SlComVtable *vtable;
+};
+
+/* HRESULT, to the extent this needs one: negative is failure. */
+#define SL_COM_S_OK          ((int32_t)0)
+#define SL_COM_E_NOINTERFACE ((int32_t)0x80004002)
+#define SL_COM_E_POINTER     ((int32_t)0x80004003)
+
+/*
+ * What a `com class` puts in its object, once per interface it presents: the
+ * vtable, and the distance back to the object's own header.
+ *
+ * The distance is what makes multiple interfaces work. A COM pointer must
+ * point at a vtable pointer, so an object presenting three interfaces has
+ * three of them at three addresses, and a Release arriving through any of them
+ * has to find the one header. C++ generates adjustor thunks for this; storing
+ * the offset beside each vtable pointer costs one word and no code.
+ */
+typedef struct SlComTearOff {
+    const SlComVtable *vtable;
+    size_t             ownerOffset;
+} SlComTearOff;
+
+typedef struct SlComEntry {
+    const SlGuid *iid;
+    size_t        offset;       /* of the tear-off, from the object's start */
+} SlComEntry;
+
+typedef struct SlComLayout {
+    size_t            count;
+    const SlComEntry *entries;
+} SlComLayout;
+
+SL_API extern const SlGuid sl_iid_unknown;
+
+/* ARC for a COM reference: AddRef and Release, with the null test in one
+   place rather than at every site the compiler would otherwise emit it. */
+SL_API void  sl_com_retain(void *pointer);
+SL_API void  sl_com_release(void *pointer);
+
+/* QueryInterface. sl_com_query returns an owned reference or NULL; sl_com_is
+   asks and drops what it was given. */
+SL_API void *sl_com_query(void *pointer, const SlGuid *iid);
+SL_API int   sl_com_is(void *pointer, const SlGuid *iid);
+SL_API void  sl_com_cast_failed(const char *from, const char *to);
+
+SL_API int   sl_guid_equals(const SlGuid *left, const SlGuid *right);
+
+/* The IUnknown a `com class` gets for free. Every generated vtable puts these
+   three in slots 0 to 2, so the object's own methods start at slot 3. */
+SL_API int32_t  sl_com_object_query(void *self, const SlGuid *iid, void **result);
+SL_API uint32_t sl_com_object_add_ref(void *self);
+SL_API uint32_t sl_com_object_release(void *self);
 
 /* ----------------------------------------------------------------- String */
 
