@@ -45,10 +45,22 @@ decided by the type, not by an annotation.
 | **Owned graph** | `class` instances, `String`, `T[]` | **moved**; one owner at a time | non-atomic, as today |
 | **Frozen** | immortal, and immutable in its own right | shared freely by everyone | none — retain/release are no-ops |
 
-The first row is free because of a decision already made:
-[a `struct` cannot hold a managed reference](../tests/cases/err-struct-holds-class/).
-A struct is raw bytes, so it is *always* safe to hand to another thread. That
-bright line already exists and cost nothing to draw.
+The first row is free because of a decision already made: a `struct` cannot hold
+a managed reference. A struct is raw bytes, so it is *always* safe to hand to
+another thread. That bright line already exists and cost nothing to draw.
+
+> **Two of the three rows above have since moved.** A struct *may* hold a
+> reference now — `Result<T, E>` is one, and copying such a struct retains what
+> it holds ([tests/cases/struct-references](../tests/cases/struct-references/)).
+> So the first row is no longer free by construction, and sendability follows a
+> struct's fields rather than its kind: one of primitives and Strings crosses,
+> one holding a `List<T>` does not. What a struct still cannot do is cross
+> `extern "C"` while holding a reference, which is
+> [SL0284](../tests/cases/err-struct-crosses-c/).
+>
+> And "non-atomic, as today" in the second row is the premise corrected at the
+> top of this file: every count is atomic. The row is left as written because
+> the rest of §1 reasons from it, and §1.1 is the reasoning.
 
 ### 1.1 Why non-atomic counts survive this
 

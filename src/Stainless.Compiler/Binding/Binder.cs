@@ -1446,7 +1446,7 @@ public sealed class Binder(
                 diagnostics.Error("SL0343", attribute.Span,
                     $"'{attributeType.Name}' takes {attributeType.Fields.Count} " +
                     $"argument{(attributeType.Fields.Count == 1 ? "" : "s")}, " +
-                    $"but {attribute.Arguments.Count} were given");
+                    $"but {Given(attribute.Arguments.Count)}");
                 continue;
             }
 
@@ -1956,7 +1956,7 @@ public sealed class Binder(
             diagnostics.Error("SL0323", span,
                 $"'{template.Name}' takes {template.Parameters.Count} type " +
                 $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
-                $"but {arguments.Count} were given");
+                $"but {Given(arguments.Count)}");
             return new StructTypeSymbol { SimpleName = template.Name, ModuleName = template.Module.Name };
         }
 
@@ -5584,7 +5584,7 @@ public sealed class Binder(
         {
             diagnostics.Error("SL0289", span,
                 $"'{variant.Name}.{variantCase.Name}' carries {Counted(fields.Count, "field")}, " +
-                $"but {arguments.Count} " + (arguments.Count == 1 ? "was" : "were") + " given; " +
+                $"but {Given(arguments.Count)}; " +
                 $"it is written '{variantCase.Signature}'");
             return new BoundErrorExpression(span);
         }
@@ -5696,6 +5696,9 @@ public sealed class Binder(
 
     private static string Counted(int count, string noun) =>
         count == 1 ? "1 " + noun : $"{count} {noun}s";
+
+    /// <summary>"1 was given" / "3 were given", so the verb agrees with the count.</summary>
+    private static string Given(int count) => count == 1 ? "1 was given" : $"{count} were given";
 
     private BoundExpression BindCall(CallSyntax syntax)
     {
@@ -5939,7 +5942,7 @@ public sealed class Binder(
             diagnostics.Error("SL0363", syntax.Span,
                 $"delegate '{delegateType.Name}' is '{delegateType.SignatureText}' and takes " +
                 $"{delegateType.Signature.Count} argument{(delegateType.Signature.Count == 1 ? "" : "s")}, " +
-                $"but {arguments.Count} were given");
+                $"but {Given(arguments.Count)}");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -6083,7 +6086,7 @@ public sealed class Binder(
         if (arguments.Count != 1)
         {
             diagnostics.Error("SL0409", syntax.Span,
-                $"'HasFlag' takes one '{enumType.Name}', but {arguments.Count} arguments were given");
+                $"'HasFlag' takes one '{enumType.Name}', but {Given(arguments.Count)}");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -6134,7 +6137,7 @@ public sealed class Binder(
         {
             diagnostics.Error("SL0412", syntax.Span,
                 $"'{type.Name}.{member.Member}' takes {wanted} " +
-                $"argument{(wanted == 1 ? "" : "s")}, but {arguments.Count} were given");
+                $"argument{(wanted == 1 ? "" : "s")}, but {Given(arguments.Count)}");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -6244,7 +6247,7 @@ public sealed class Binder(
         {
             diagnostics.Error("SL0260", syntax.Span,
                 $"'{function.Name}' takes {expected}{(function.IsVariadic ? " or more" : "")} " +
-                $"argument{(expected == 1 ? "" : "s")}, but {arguments.Count} were given");
+                $"argument{(expected == 1 ? "" : "s")}, but {Given(arguments.Count)}");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -6497,7 +6500,7 @@ public sealed class Binder(
                     if (only.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
                         diagnostics.Error("SL0261", span,
                             $"'{name}' takes {expected}{(only.IsVariadic ? " or more" : "")} " +
-                            $"argument{(expected == 1 ? "" : "s")}, but {arguments.Count} were given");
+                            $"argument{(expected == 1 ? "" : "s")}, but {Given(arguments.Count)}");
                     else
                         for (int i = 0; i < parameters.Count; i++)
                             if (!ArgumentFits(arguments[i], parameters[i]))
@@ -7104,6 +7107,11 @@ public sealed class Binder(
         Dictionary<string, TypeSymbol>? firstFailure = null;
         GenericFunctionTemplate? failed = null;
 
+        // A candidate whose parameters were all worked out and which still would
+        // not take the arguments. It is the better thing to report: the reader
+        // has an argument that does not fit, not a type nobody could name.
+        (GenericFunctionTemplate Template, Dictionary<string, TypeSymbol> Inferred)? nearMiss = null;
+
         foreach (var candidate in viable)
         {
             var names = candidate.Parameters.ToHashSet(StringComparer.Ordinal);
@@ -7127,6 +7135,8 @@ public sealed class Binder(
 
             if (Accepts(candidate, inferred, arguments))
                 fitting.Add((candidate, candidate.Parameters.Select(p => inferred[p]).ToList()));
+            else
+                nearMiss ??= (candidate, inferred);
         }
 
         if (fitting.Count == 1)
@@ -7142,16 +7152,21 @@ public sealed class Binder(
             return null;
         }
 
+        // Everything was worked out and an argument still did not fit: say which.
+        if (nearMiss is { } near)
+        {
+            Accepts(near.Template, near.Inferred, arguments, report: near.Template.Name);
+            return null;
+        }
+
         var template = failed ?? viable[0];
         var reported = firstFailure ?? new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
         var missing = template.Parameters.Where(p => !reported.ContainsKey(p)).ToList();
 
         diagnostics.Error("SL0327", syntax.Span,
-            missing.Count > 0
-                ? $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
-                  $"for '{template.Name}' from these arguments; " +
-                  "Stainless infers type arguments only from the values passed"
-                : $"no '{template.Name}' accepts these arguments");
+            $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
+            $"for '{template.Name}' from these arguments; " +
+            "Stainless infers type arguments only from the values passed");
         return null;
     }
 
@@ -7166,7 +7181,8 @@ public sealed class Binder(
     private bool Accepts(
         GenericFunctionTemplate template,
         Dictionary<string, TypeSymbol> inferred,
-        List<BoundExpression> arguments)
+        List<BoundExpression> arguments,
+        string? report = null)
     {
         var previous = _substitution;
         _substitution = inferred;
@@ -7177,7 +7193,10 @@ public sealed class Binder(
             {
                 var wanted = ResolveType(template.Declaration.Parameters[i].Type, template.Scope);
                 if (wanted.IsError()) return false;
-                if (!IsImplicitlyConvertible(arguments[i], wanted)) return false;
+                if (IsImplicitlyConvertible(arguments[i], wanted)) continue;
+
+                if (report is not null) ReportArgumentMismatch(report, i, arguments[i], wanted);
+                return false;
             }
 
             return true;

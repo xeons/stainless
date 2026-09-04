@@ -174,164 +174,6 @@ array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
 
-### Bit-fields
-
-A field may be some of the bits of its type.
-
-```csharp
-public struct Header {
-    public uint Version : 4;
-    public uint Kind    : 4;
-    public uint Length  : 24;
-}
-```
-
-Which bits it gets is the target's decision, and the two C ABIs genuinely
-disagree — `struct { int a : 1; byte b : 1; }` is four bytes to gcc and eight to
-MSVC. Both rules are implemented, chosen the way the C++ mangler chooses a
-scheme, and every size in the test suite was read off clang built for the
-matching target. `--abi microsoft|itanium` picks one; the default is the host's.
-
-A signed bit-field sign-extends from its own width, so a three-bit `int` holding
-7 reads back as -1. A bit-field has no address, so it cannot be passed by `ref`.
-
-### Unions
-
-C's, and here for the reason `extern "C"` is here: a great many headers describe
-a value that is one of several things and record the choice somewhere else.
-
-```csharp
-public union Word {
-    public int Signed;
-    public uint Unsigned;
-    public float Real;
-}
-
-Word word;
-word.Signed = -1;
-word.Unsigned          // 4294967295: the same four bytes, read differently
-```
-
-Every member is at offset zero, and the size and alignment are the ones C
-computes. **No member may hold a counted reference** — which one is live is
-exactly what a union does not record, so a copy could not know what to retain.
-That is the question a union cannot be asked, and it is why `variant` exists:
-a variant records the case and will not let you read another.
-
-### Layout control
-
-A struct is laid out by the platform C rules; two markers change them.
-
-```csharp
-[Packed]
-public struct Wire {          // 6 bytes, not 12: no padding anywhere
-    public byte Tag;
-    public int Value;
-    public byte Trailer;
-}
-
-[Align(16)]
-public struct Wide {          // always on a 16-byte boundary
-    public double X;
-    public double Y;
-}
-```
-
-`[Packed]` is what an on-disk header or a wire format looks like; `[Align(N)]`
-raises the alignment and never lowers it, as C's `alignas` does. They combine.
-N is capped at 16, which is what `malloc` guarantees for anything the type ends
-up inside.
-
-A generated C header states both, and a test compares every size, alignment and
-field offset against what the target's C compiler makes of that header.
-
-### Conditional compilation
-
-Directives, as in C#: no macros, no textual substitution, no `#include`.
-
-```csharp
-#if WINDOWS
-extern "C" void* VirtualAlloc(void* at, nuint size, uint type, uint protect);
-#elif UNIX
-extern "C" void* mmap(void* at, nuint size, int prot, int flags, int fd, long offset);
-#else
-#error this platform has no page allocator here
-#endif
-```
-
-A branch that is not taken is never lexed, so it need not parse — a platform you
-have never built on is text until the day you do. `WINDOWS`, `LINUX`, `MACOS`,
-`UNIX`, `X64`, `ARM64` and `STAINLESS` are defined for you; everything else
-comes from `-D`:
-
-```
-stainless build src -D FASTMATH
-```
-
-### Slices
-
-A slice names part of an array, as a value. The bounds are half-open, and
-either end may be left out.
-
-```csharp
-var numbers = new int[6];
-
-int[:] all    = numbers;          // an array is a slice of the whole of itself
-int[:] middle = numbers[1:4];     // elements 1, 2 and 3
-int[:] tail   = numbers[3:];      // to the end
-
-Sort(numbers[2:5]);               // three of them, in place, nothing copied
-```
-
-It is a view rather than a copy: writing through one writes the array it came
-from, `Length` is the slice's own, and an index is checked against that. Slicing
-a slice narrows it instead of nesting, so a slice is one indirection deep
-however many times it has been cut.
-
-Three words — the array, where it starts, how far it runs — and it holds the
-array the way any struct field holds a reference. **A slice cannot dangle**: what
-it points into is alive for as long as it is.
-
-```csharp
-Trace[:] Middle() {
-    var traces = new Trace[3];
-    ...
-    return traces[1:2];           // the array outlives the function
-}
-```
-
-That is the trade. A slice costs a reference count per copy and is not a value C
-can be handed. What it buys is that there are no lifetimes to explain.
-
-### Passing by reference
-
-A parameter is a copy unless it says otherwise. `ref` passes the caller's
-storage and may write it; `in` passes the same storage and promises not to.
-
-```csharp
-void Bump(ref int n) { n = n + 1; }
-double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
-
-int count = 1;
-Bump(ref count);              // count is 2
-LengthSquared(origin);        // no copy, and origin cannot change
-```
-
-`ref` is written at the call too, because a reader should be able to see that
-the value may come back changed. A `ref` argument has to name storage and is not
-converted on the way in - the callee writes back through it, and a converted
-copy would have nowhere to put the result.
-
-Both are exactly a `T*` at the ABI, so they cross a language boundary with
-nothing in between:
-
-```csharp
-extern "C" double modf(double value, ref double integral);
-
-double whole = 0.0;
-double fraction = modf(3.75, ref whole);      // 3 and 0.75
-```
-
 ### Failure
 
 There is no `throw` and no unwinding. A function that can fail says so in its
@@ -437,6 +279,41 @@ error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
 implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
 
+### Slices
+
+A slice names part of an array, as a value. The bounds are half-open, and
+either end may be left out.
+
+```csharp
+var numbers = new int[6];
+
+int[:] all    = numbers;          // an array is a slice of the whole of itself
+int[:] middle = numbers[1:4];     // elements 1, 2 and 3
+int[:] tail   = numbers[3:];      // to the end
+
+Sort(numbers[2:5]);               // three of them, in place, nothing copied
+```
+
+It is a view rather than a copy: writing through one writes the array it came
+from, `Length` is the slice's own, and an index is checked against that. Slicing
+a slice narrows it instead of nesting, so a slice is one indirection deep
+however many times it has been cut.
+
+Three words — the array, where it starts, how far it runs — and it holds the
+array the way any struct field holds a reference. **A slice cannot dangle**: what
+it points into is alive for as long as it is.
+
+```csharp
+Trace[:] Middle() {
+    var traces = new Trace[3];
+    ...
+    return traces[1:2];           // the array outlives the function
+}
+```
+
+That is the trade. A slice costs a reference count per copy and is not a value C
+can be handed. What it buys is that there are no lifetimes to explain.
+
 ### Collections
 
 `Standard.Collections` is written in Stainless and compiled with your program.
@@ -473,6 +350,35 @@ Sort(numbers);
 
 `IList<T>` extends `IReadOnlyList<T>`, and interfaces are named with a leading
 `I` as in C#.
+
+### Passing by reference
+
+A parameter is a copy unless it says otherwise. `ref` passes the caller's
+storage and may write it; `in` passes the same storage and promises not to.
+
+```csharp
+void Bump(ref int n) { n = n + 1; }
+double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
+
+int count = 1;
+Bump(ref count);              // count is 2
+LengthSquared(origin);        // no copy, and origin cannot change
+```
+
+`ref` is written at the call too, because a reader should be able to see that
+the value may come back changed. A `ref` argument has to name storage and is not
+converted on the way in - the callee writes back through it, and a converted
+copy would have nowhere to put the result.
+
+Both are exactly a `T*` at the ABI, so they cross a language boundary with
+nothing in between:
+
+```csharp
+extern "C" double modf(double value, ref double integral);
+
+double whole = 0.0;
+double fraction = modf(3.75, ref whole);      // 3 and 0.75
+```
 
 ### Attributes and reflection
 
@@ -586,6 +492,102 @@ Primitive names and sizes match C# exactly: `sbyte short int long nint`,
 Pointers are `T*`, optional class references are `C?`, and `weak C?` breaks
 cycles.
 
+### Layout control
+
+A struct is laid out by the platform C rules; two markers change them.
+
+```csharp
+[Packed]
+public struct Wire {          // 6 bytes, not 12: no padding anywhere
+    public byte Tag;
+    public int Value;
+    public byte Trailer;
+}
+
+[Align(16)]
+public struct Wide {          // always on a 16-byte boundary
+    public double X;
+    public double Y;
+}
+```
+
+`[Packed]` is what an on-disk header or a wire format looks like; `[Align(N)]`
+raises the alignment and never lowers it, as C's `alignas` does. They combine.
+N is capped at 16, which is what `malloc` guarantees for anything the type ends
+up inside.
+
+A generated C header states both, and a test compares every size, alignment and
+field offset against what the target's C compiler makes of that header.
+
+### Bit-fields
+
+A field may be some of the bits of its type.
+
+```csharp
+public struct Header {
+    public uint Version : 4;
+    public uint Kind    : 4;
+    public uint Length  : 24;
+}
+```
+
+Which bits it gets is the target's decision, and the two C ABIs genuinely
+disagree — `struct { int a : 1; byte b : 1; }` is four bytes to gcc and eight to
+MSVC. Both rules are implemented, chosen the way the C++ mangler chooses a
+scheme, and every size in the test suite was read off clang built for the
+matching target. `--abi microsoft|itanium` picks one; the default is the host's.
+It reaches name mangling and bit-fields and nothing else — struct passing is
+Win64 either way, so this is not a cross-compilation.
+
+A signed bit-field sign-extends from its own width, so a three-bit `int` holding
+7 reads back as -1. A bit-field has no address, so it cannot be passed by `ref`.
+
+### Unions
+
+C's, and here for the reason `extern "C"` is here: a great many headers describe
+a value that is one of several things and record the choice somewhere else.
+
+```csharp
+public union Word {
+    public int Signed;
+    public uint Unsigned;
+    public float Real;
+}
+
+Word word;
+word.Signed = -1;
+word.Unsigned          // 4294967295: the same four bytes, read differently
+```
+
+Every member is at offset zero, and the size and alignment are the ones C
+computes. **No member may hold a counted reference** — which one is live is
+exactly what a union does not record, so a copy could not know what to retain.
+That is the question a union cannot be asked, and it is why `variant` exists:
+a variant records the case and will not let you read another.
+
+### Conditional compilation
+
+Directives, as in C#: no macros, no textual substitution, no `#include`.
+
+```csharp
+#if WINDOWS
+extern "C" void* VirtualAlloc(void* at, nuint size, uint type, uint protect);
+#elif UNIX
+extern "C" void* mmap(void* at, nuint size, int prot, int flags, int fd, long offset);
+#else
+#error this platform has no page allocator here
+#endif
+```
+
+A branch that is not taken is never lexed, so it need not parse — a platform you
+have never built on is text until the day you do. `WINDOWS`, `LINUX`, `MACOS`,
+`UNIX`, `X64`, `ARM64` and `STAINLESS` are defined for you; everything else
+comes from `-D`:
+
+```
+stainless build src -D FASTMATH
+```
+
 Full details: **[docs/language-spec.md](docs/language-spec.md)**,
 **[docs/abi.md](docs/abi.md)** and, for where threading is going,
 **[docs/concurrency.md](docs/concurrency.md)**.
@@ -620,7 +622,8 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   -O<0-3>                optimization level (default -O2)
   -g                     describe the program to a debugger
   -D <name>              define a symbol for '#if' to test
-  --abi <microsoft|itanium>  which C and C++ ABI to agree with
+  --abi <microsoft|itanium>  which C and C++ ABI to agree with (names and
+                         bit-fields; struct passing is Win64 either way)
   --keep                 keep the generated .ll
 ```
 
@@ -747,7 +750,7 @@ decision about the language rather than a gap in the metadata.
 
 | Component | Role |
 |---|---|
-| [Syntax/Lexer.cs](src/Stainless.Compiler/Syntax/Lexer.cs) | tokens; no preprocessor |
+| [Syntax/Lexer.cs](src/Stainless.Compiler/Syntax/Lexer.cs) | tokens, and `#if` deciding which of them exist |
 | [Syntax/Parser.cs](src/Stainless.Compiler/Syntax/Parser.cs) | recursive descent + precedence climbing |
 | [Binding/Binder.cs](src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes, type checking, conversions, generic instantiation |
 | [Binding/TypeSystem.cs](src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
@@ -1077,11 +1080,14 @@ Being straight about the edges, roughly in the order they are worth adding:
   and no per-thread storage.
 - **Win64 only** for struct passing; the SysV classifier is not written.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
-  Stainless library be consumed by Stainless, but a generic and a class that
-  implements an interface both stay behind: a template emits nothing until it is
-  instantiated, and a dispatch table is indexed by an id assigned across a whole
-  program. Both are reported where the library is built, and both need a
-  decision about the language rather than more metadata.
+  Stainless library be consumed by Stainless, but a generic, a class that
+  implements an interface, a variant and a slice all stay behind: a template
+  emits nothing until it is instantiated, a dispatch table is indexed by an id
+  assigned across a whole program, a variant's cases are not a layout, and a
+  slice is a type the compiler builds rather than one the source declared.
+  Anything reaching one of those through a field or a signature is reported too
+  (SL0419, SL0420, SL0441, SL0477), all of them where the library is built
+  rather than where the consumer trips over them.
 - **The runtime is linked statically into every binary.** Each side of a library
   boundary therefore has its own allocator and its own C stdio buffer, so output
   written from inside a library does not interleave with its consumer's in the

@@ -51,6 +51,11 @@ Both are implemented and both are checked against clang built for the matching
 target. `--abi microsoft|itanium` selects one; the default is the host's, and it
 governs C++ name mangling as well.
 
+**`--abi` does not select a calling convention.** Struct passing is Win64
+whichever ABI is named, because the SysV classifier is not written (§3). Naming
+Itanium on Windows therefore gives Itanium bit-fields and Win64 argument
+passing: self-consistent within one program, and not a cross-compilation.
+
 A struct containing bit-fields is emitted as bytes — `%struct.Header = type
 { [4 x i8] }` — because its fields do not line up with LLVM's when several share
 a unit. Every field of such a struct is then reached by its byte offset rather
@@ -335,7 +340,7 @@ distinguishes *names* only, never argument passing, so any Stainless function
 can be called from C given the mangled symbol — and `export "C"` removes even
 that friction.
 
-### Name mangling grammar
+### 3.1 Name mangling grammar
 
 ```
 mangled  := "_SL" path targs? params "z"? "E" ret
@@ -373,7 +378,7 @@ not tell their methods apart. A class's simple name arrives here as
 `Box<int>`, which a linker symbol may not contain, so every non-alphanumeric
 character in a qualified name becomes `_`.
 
-### C++ names
+### 3.2 C++ names
 
 C++ has no ABI of its own. The platform specifies how C-shaped things work and
 says nothing about mangling, vtables or unwinding, so the compilers filled it in
@@ -404,7 +409,7 @@ can still be compared with what a real compiler emits for the same declarations.
 A C++ mangled name is mostly characters an LLVM identifier may not contain, so
 every function symbol is quoted in the IR when it needs to be.
 
-### 3.1 `ref` and `in` parameters
+### 3.3 `ref` and `in` parameters
 
 A `ref T` or `in T` parameter is one pointer, and the classifier is not
 consulted for it: there is nothing to classify, and a struct that would

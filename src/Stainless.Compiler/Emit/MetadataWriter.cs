@@ -130,12 +130,82 @@ public static class MetadataWriter
             .Select(Describe)
             .ToList();
 
+        // Whatever is described has to be describable all the way down. A
+        // field or a signature naming something the metadata left out would
+        // reach the consumer as a name it cannot resolve, which is the failure
+        // the warnings above exist to move to this side of the boundary.
+        if (diagnostics is not null) CheckDescribable(types, functions, diagnostics, program);
+
         return new ModuleMetadata
         {
             Library = library,
             Types = types,
             Functions = functions,
         };
+    }
+
+    /// <summary>
+    /// Reports any part of the described surface that names a type the metadata
+    /// does not carry.
+    ///
+    /// The names are compared as text on purpose: text is what crosses, and a
+    /// name that does not round-trip is exactly what the consumer would fail on.
+    /// </summary>
+    private static void CheckDescribable(
+        List<MetadataType> types,
+        List<MetadataFunction> functions,
+        DiagnosticBag diagnostics,
+        BoundProgram program)
+    {
+        var known = types.Select(t => t.Module + "." + t.Name).ToHashSet(StringComparer.Ordinal);
+        var spans = program.Modules
+            .SelectMany(m => m.Types.Values)
+            .Where(t => t.Span is not null)
+            .GroupBy(t => t.QualifiedName, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.First().Span!.Value, StringComparer.Ordinal);
+
+        var reported = new HashSet<string>(StringComparer.Ordinal);
+
+        void Check(string owner, string what, string written)
+        {
+            string bare = written.TrimStart();
+            if (bare.StartsWith("weak ", StringComparison.Ordinal)) bare = bare["weak ".Length..];
+            bare = bare.TrimEnd('?', '*');
+            while (bare.EndsWith("[]", StringComparison.Ordinal)) bare = bare[..^2];
+
+            if (MetadataTypeNames.Read(bare, _ => null) is not null) return;   // a primitive
+            if (known.Contains(bare)) return;
+            if (!reported.Add(owner + "/" + bare)) return;
+
+            diagnostics.Warning("SL0477",
+                spans.TryGetValue(owner, out var at) ? at : default,
+                $"'{owner}' is described in this library's metadata and {what} is " +
+                $"'{written}', which is not. A consumer would read a name it cannot resolve; " +
+                "keep it out of the public surface, or let it cross as source");
+        }
+
+        foreach (var type in types)
+        {
+            string owner = type.Module + "." + type.Name;
+
+            foreach (var field in type.Fields)
+                Check(owner, $"its field '{field.Name}'", field.Type);
+
+            foreach (var method in type.Methods)
+            {
+                Check(owner, $"what '{method.Name}' returns", method.Returns);
+                foreach (var parameter in method.Parameters)
+                    Check(owner, $"'{method.Name}' takes '{parameter.Name}', which", parameter.Type);
+            }
+        }
+
+        foreach (var function in functions)
+        {
+            string owner = function.Module + "." + function.Name;
+            Check(owner, "what it returns", function.Returns);
+            foreach (var parameter in function.Parameters)
+                Check(owner, $"it takes '{parameter.Name}', which", parameter.Type);
+        }
     }
 
     /// <summary>

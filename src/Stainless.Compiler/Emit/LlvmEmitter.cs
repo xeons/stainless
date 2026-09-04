@@ -3054,11 +3054,9 @@ public sealed class LlvmEmitter(
 
         if (expression.Target.Type is SliceTypeSymbol inner)
         {
-            var arrayField = type.ArrayField;
             array = Emit("ptr", $"load ptr, ptr {SliceField(source.Ref, inner, 0)}");
             baseOffset = Emit("i64", $"load i64, ptr {SliceField(source.Ref, inner, 1)}");
             sourceLength = SliceLength(source.Ref, inner);
-            _ = arrayField;
         }
         else
         {

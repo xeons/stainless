@@ -87,8 +87,9 @@ internal static class Program
               -g                   describe the program to a debugger
               -D <name>            define a symbol for '#if' to test
               --abi <microsoft|itanium>
-                                   which C and C++ ABI to agree with
-                                   (default: the host's)
+                                   which C and C++ ABI to agree with, for name
+                                   mangling and bit-field layout (default: the
+                                   host's). Struct passing is Win64 either way
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
               -h, --help           show this message

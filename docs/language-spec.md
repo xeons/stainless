@@ -14,8 +14,10 @@ the binary as in Swift and Go.
 
 1. **No header files.** Declarations are order-independent within and across
    modules; the compiler resolves the whole program graph before checking any
-   body. There is no preprocessor, no `#include`, no include guards, no forward
-   declarations, no ODR.
+   body. There is no `#include`, no macro, no include guards, no forward
+   declarations, no ODR. `#if` and its relatives do exist, as in C# (§10):
+   choosing between two platforms is a different question from finding a
+   declaration.
 2. **Native code via LLVM.** No VM, no JIT, no runtime startup cost beyond a
    small ARC runtime.
 3. **ARC, not GC.** Reference types are reference-counted and destroyed
@@ -155,10 +157,19 @@ Qualify it, or alias one of the modules.
 
 ### 1.7 What is automatic
 
-`Standard.Text` is imported into every file without being asked for, because a
-string literal produces a `String` whether the program mentioned one or not.
-That is the only automatic import: `Standard.Console` and everything else must
-be requested.
+Two modules are imported into every file without being asked for.
+
+`Standard.Text`, because a string literal produces a `String` whether the
+program mentioned one or not.
+
+`Standard`, because what lives there is the language's own vocabulary rather
+than a library: `Result<T, E>` (§2.8) and the markers `[Flags]`, `[Packed]` and
+`[Align]`, each of which is a rule about a declaration rather than a dependency
+on one. Requiring an import for them would make a rule look like a library.
+
+Everything else is requested. `Standard.Console` is not automatic — printing is
+a choice — and neither is `Standard.Reflection`, so `[Reflect]` needs an import
+like any other name.
 
 ### 1.8 Order never matters
 
@@ -317,7 +328,9 @@ type's size changes, and Itanium packs straight across and starts a new unit
 only when a field would cross a boundary of its own type. Both rules are
 implemented, chosen the way the C++ mangler chooses a scheme, and every size in
 the test suite was read off clang built for the matching target. `--abi` picks
-one explicitly; the default is the host's.
+one explicitly; the default is the host's. It reaches names and bit-fields and
+nothing else — struct passing is Win64 either way, so `--abi` is not a
+cross-compilation.
 
 **A bit-field has no address** (SL0443), for the reason C refuses `&s.flags`.
 It cannot be passed by `ref` and cannot be pointed at.
@@ -1224,6 +1237,13 @@ Supported: generic classes, generic interfaces (including implementing them,
 as in `class Money : IComparable<Money>`), generic functions with inference,
 interface constraints, generic types nested in one another (`List<Box<int>>`),
 and self-referential templates such as `class Node<T> { Node<T>? next; }`.
+
+**Generic functions overload on the shape of their parameters.** Two templates
+may share a name, and a call tries each one of the right arity, keeping those
+that both infer and would accept the arguments; two survivors is an ambiguity
+(SL0453) and none is the inference error. `Standard.Collections` has both
+`Sort<T>(T[:])` and `Sort<T>(IList<T>)`, and `Sort(numbers)` and `Sort(list)`
+each reach the right one.
 
 **Generic methods** are supported too, including inside a generic type, where
 the enclosing type's arguments are already fixed and only the method's own are
@@ -2141,6 +2161,14 @@ missing:
 |---|---|
 | a generic (SL0419) | a template emits nothing until it is instantiated, so a consumer with only the binary has nothing to instantiate. A generic crosses as source |
 | a class implementing an interface (SL0420) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
+| a variant (SL0441) | its cases are what a consumer would switch on, and the metadata carries layouts rather than cases |
+| a slice, `T[:]` | it is a type the compiler builds on demand rather than one the source declared, so there is no name for a consumer to resolve |
+
+**And anything reaching one of those through a field or a signature** is reported
+the same way (SL0477). A public struct with a variant field would otherwise be
+described happily, and the consumer would be the one to find that the field's
+type is a name nothing can resolve — which is precisely the failure these
+warnings exist to move to this side of the boundary.
 
 **One thing to know about output.** Each binary links its own copy of the
 runtime, so each has its own C stdio buffer. Text written from inside a library

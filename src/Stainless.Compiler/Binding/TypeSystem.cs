@@ -505,10 +505,6 @@ public sealed class SliceTypeSymbol : StructTypeSymbol
     public const string OffsetFieldName = "$offset";
     public const string LengthFieldName = "$length";
 
-    public FieldSymbol ArrayField => Fields[0];
-    public FieldSymbol OffsetField => Fields[1];
-    public FieldSymbol LengthField => Fields[2];
-
     public override string Name => Element.Name + "[:]";
 }
 
@@ -577,7 +573,7 @@ public sealed class VariantTypeSymbol : StructTypeSymbol
     /// <summary>The filler that reserves the payload area, or null when no case carries one.</summary>
     public StructTypeSymbol? PayloadStorage { get; set; }
 
-    public FieldSymbol TagField => Fields[0];
+    /// <summary>The payload field, or null when no case carries anything.</summary>
     public FieldSymbol? PayloadField => PayloadStorage is null ? null : Fields[1];
 
     public VariantCaseSymbol? FindCase(string name) =>

@@ -77,6 +77,12 @@ public sealed record CompilationOptions
     /// a boundary: how a C++ name is mangled, and how bit-fields are packed into
     /// storage units. The two ABIs differ on the second in ordinary cases, not
     /// only in corners.
+    ///
+    /// It does not decide how a struct is passed in registers. That is Win64
+    /// whichever ABI is named, because the SysV classifier is not written -- so
+    /// naming Itanium on Windows gives Itanium bit-fields and Win64 argument
+    /// passing, which is self-consistent within one program and not a
+    /// cross-compilation.
     /// </summary>
     public Binding.CppAbi? CppAbi { get; init; }
 }
@@ -316,7 +322,7 @@ public sealed class Compilation
         if (options.Shared && options.MetadataPath is null &&
             !program.Modules.SelectMany(m => m.Functions)
                 .Any(f => f.Linkage == LinkageKind.ExportC))
-            diagnostics.Warning("SL0291", programSpan,
+            diagnostics.Warning("SL0476", programSpan,
                 "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
                 "export table");
 
