@@ -10,7 +10,7 @@ public struct NotConstant { public int[Size()] Values; }        // SL0487
 public struct Empty { public int[0] Values; }                   // SL0488
 
 // There is no array of 'void', for the same reason there is no array of it.
-public struct OfVoid { public void[4] Values; }                 // SL0485
+public struct OfVoid { public void[4] Values; }                 // SL0310
 
 // A value has to stay addressable. This is far past any real struct, and
 // exists so a typo is a diagnostic rather than a nonsensical size.

@@ -20,6 +20,37 @@ namespace Stainless.Source;
 
 public enum Severity { Error, Warning, Note }
 
+/// <summary>
+/// Codes that were used once and are not to be used again.
+///
+/// A code is a handle for a rule, so a rule has exactly one and a code means
+/// exactly one thing. These were second handles for a rule that already had
+/// one: each produced a message a reader could not tell from the surviving
+/// code's, which makes it a duplicate rather than a distinction. They are
+/// listed rather than reused, because a number that meant something else in an
+/// older build should not quietly come to mean this.
+///
+///   SL0214, SL0321  -> SL0201   'X' is already declared in module 'Y'
+///   SL0386          -> SL0205   'X' already declares a member named 'Y'
+///   SL0251          -> SL0247   'X' has no member named 'Y'
+///   SL0237          -> SL0234   operator 'X' cannot be applied to these
+///   SL0256          -> SL0255   'X' has no method named 'Y'
+///   SL0259          -> SL0252   no function named 'X' is in scope
+///   SL0261          -> SL0260   'X' takes N arguments, but M were given
+///   SL0311, SL0485  -> SL0310   there is no array of 'void'
+///
+/// The numbering has always had gaps -- the ranges are banded by pass -- so
+/// these leave no hole worth closing.
+/// </summary>
+public static class RetiredDiagnostics
+{
+    public static readonly IReadOnlySet<string> Codes = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "SL0214", "SL0237", "SL0251", "SL0256", "SL0259",
+        "SL0261", "SL0311", "SL0321", "SL0386", "SL0485",
+    };
+}
+
 public sealed record Diagnostic(Severity Severity, string Code, string Message, SourceSpan Span)
 {
     /// <summary>Renders a diagnostic with a source excerpt and a caret run under the span.</summary>
@@ -73,10 +104,29 @@ public sealed class DiagnosticBag
     public bool HasErrors => _items.Any(d => d.Severity == Severity.Error);
     public int ErrorCount => _items.Count(d => d.Severity == Severity.Error);
 
-    public void Error(string code, SourceSpan span, string message) =>
+    public void Error(string code, SourceSpan span, string message)
+    {
+        Fresh(code);
         _items.Add(new Diagnostic(Severity.Error, code, message, span));
-    public void Warning(string code, SourceSpan span, string message) =>
+    }
+
+    public void Warning(string code, SourceSpan span, string message)
+    {
+        Fresh(code);
         _items.Add(new Diagnostic(Severity.Warning, code, message, span));
+    }
+
+    /// <summary>
+    /// Catches a retired code being brought back. It is a debug assertion
+    /// because a released compiler should not pay for it, and the whole test
+    /// suite runs against a debug build -- so anything that reintroduces one
+    /// fails there rather than shipping.
+    /// </summary>
+    [System.Diagnostics.Conditional("DEBUG")]
+    private static void Fresh(string code) =>
+        System.Diagnostics.Debug.Assert(
+            !RetiredDiagnostics.Codes.Contains(code),
+            $"{code} was retired; see RetiredDiagnostics for what replaced it");
 
     public void AddRange(DiagnosticBag other) => _items.AddRange(other._items);
 

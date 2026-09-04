@@ -260,7 +260,7 @@ public sealed class Binder(
                             $"'{declaration.Name}' has no body, so it has nothing for a type " +
                             "parameter to appear in");
                     else if (module.GenericTypes.ContainsKey(declaration.Name))
-                        diagnostics.Error("SL0321", declaration.Span,
+                        diagnostics.Error("SL0201", declaration.Span,
                             $"'{declaration.Name}' is already declared in module '{module.Name}'");
                     else
                         module.GenericTypes[declaration.Name] =
@@ -1044,7 +1044,7 @@ public sealed class Binder(
         if (type.FindStorage(declaration.Name) is not null ||
             type.FindProperty(declaration.Name) is not null)
         {
-            diagnostics.Error("SL0386", declaration.Span,
+            diagnostics.Error("SL0205", declaration.Span,
                 $"'{type.Name}' already declares a member named '{declaration.Name}'");
             return;
         }
@@ -1468,7 +1468,7 @@ public sealed class Binder(
         var module = scope.Module;
         if (module.Constants.ContainsKey(declaration.Name))
         {
-            diagnostics.Error("SL0214", declaration.Span,
+            diagnostics.Error("SL0201", declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
             return;
         }
@@ -4181,7 +4181,7 @@ public sealed class Binder(
         if (module.Statics.ContainsKey(declaration.Name) ||
             module.Constants.ContainsKey(declaration.Name))
         {
-            diagnostics.Error("SL0214", declaration.Span,
+            diagnostics.Error("SL0201", declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
             return;
         }
@@ -5544,7 +5544,7 @@ public sealed class Binder(
 
         if (!leftPrimitive.IsNumeric || !rightPrimitive.IsNumeric)
         {
-            diagnostics.Error("SL0237", span,
+            diagnostics.Error("SL0234", span,
                 $"operator '{token.FixedText()}' cannot be applied to '{left.Type.Name}' and '{right.Type.Name}'");
             return new BoundErrorExpression(span);
         }
@@ -6042,7 +6042,7 @@ public sealed class Binder(
 
         if (element.IsVoid())
         {
-            diagnostics.Error("SL0485", syntax.Span, "there is no array of 'void'");
+            diagnostics.Error("SL0310", syntax.Span, "there is no array of 'void'");
             return ErrorTypeSymbol.Instance;
         }
 
@@ -6479,7 +6479,7 @@ public sealed class Binder(
 
         if (element.IsVoid())
         {
-            diagnostics.Error("SL0311", syntax.Span, "there is no array of 'void'");
+            diagnostics.Error("SL0310", syntax.Span, "there is no array of 'void'");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -6630,7 +6630,7 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        diagnostics.Error("SL0251", syntax.Span,
+        diagnostics.Error("SL0247", syntax.Span,
             $"'{namedType.Name}' has no member named '{syntax.Member}'");
         return new BoundErrorExpression(syntax.Span);
     }
@@ -6896,7 +6896,7 @@ public sealed class Binder(
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            diagnostics.Error("SL0251", syntax.Span,
+            diagnostics.Error("SL0247", syntax.Span,
                 $"'{variant.Name}' has no case or field named '{syntax.Member}'; its cases are " +
                 Listed(variant.Cases.Select(c => c.Signature)));
             return new BoundErrorExpression(syntax.Span);
@@ -7315,7 +7315,7 @@ public sealed class Binder(
             if (TryBindGenericMethodCall(syntax, member, namedType, receiver, arguments) is { } generic)
                 return generic;
 
-            diagnostics.Error("SL0256", member.Span,
+            diagnostics.Error("SL0255", member.Span,
                 $"'{namedType.Name}' has no method named '{member.Member}'");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -7517,7 +7517,7 @@ public sealed class Binder(
     {
         if (candidates.Count == 0)
         {
-            diagnostics.Error("SL0259", syntax.Span, $"no function named '{name}' is in scope");
+            diagnostics.Error("SL0252", syntax.Span, $"no function named '{name}' is in scope");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -7790,7 +7790,7 @@ public sealed class Binder(
                     int expected = parameters.Count;
 
                     if (only.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
-                        diagnostics.Error("SL0261", span,
+                        diagnostics.Error("SL0260", span,
                             $"'{name}' takes {expected}{(only.IsVariadic ? " or more" : "")} " +
                             $"argument{(expected == 1 ? "" : "s")}, but {Given(arguments.Count)}");
                     else

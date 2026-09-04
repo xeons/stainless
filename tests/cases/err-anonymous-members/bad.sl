@@ -18,6 +18,6 @@ int Main() {
     a.Value = 1;                    // SL0492
 
     Plain p;
-    p.Missing = 2;                  // SL0251
+    p.Missing = 2;                  // SL0247
     return 0;
 }
