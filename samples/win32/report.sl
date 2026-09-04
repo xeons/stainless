@@ -2,23 +2,27 @@
 //
 // What Windows will tell you about itself, through the bindings.
 //
-//   stainless run samples/win32/report.sl bindings/win32/Core.sl \
-//       bindings/win32/Kernel.sl bindings/win32/Terminal.sl \
-//       bindings/win32/Time.sl bindings/win32/Registry.sl \
-//       bindings/win32/Process.sl -l advapi32
+//   stainless run samples/win32/report.sl bindings/win32 \
+//       -l advapi32 -l user32 -l gdi32 -l shell32 -l comdlg32
 //
-// Only `Win32.Registry` needs a library; the rest is kernel32, which every
-// Windows program already links.
+// The whole binding directory this time, which is the easy way in and wants
+// every library: compiling a wrapper is what makes its library necessary, and
+// the directory has one for each. Naming only the modules this uses would need
+// just '-l advapi32', because everything else here is kernel32.
 module Report;
 
 import Standard.Console;
 import Standard.Collections;
 import Win32;
-import Win32.Kernel;
+import Win32.AdvApi32;
+import Win32.Kernel32;
+import Win32.Environment;
+import Win32.Files;
+import Win32.Machine;
 import Win32.Terminal;
-import Win32.Time;
+import Win32.Clock;
 import Win32.Registry;
-import Win32.Process;
+import Win32.Tasks;
 
 // ANSI, which the console understands once EnableAnsi has been called and which
 // is inert text when it has not — so this degrades rather than breaking.
@@ -47,7 +51,7 @@ static readonly String CurrentVersion =
 /// A string value from HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion,
 /// or a dash.
 String Version(String name) {
-    var opened = Registry.OpenRead(Registry.LocalMachine(), CurrentVersion);
+    var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened) {
         case Fail why: return "-";
         case Ok held:
@@ -62,7 +66,7 @@ String Version(String name) {
 /// build revision needs its own reader: it is a number, and its neighbours are
 /// strings.
 String VersionNumber(String name) {
-    var opened = Registry.OpenRead(Registry.LocalMachine(), CurrentVersion);
+    var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened) {
         case Fail why: return "-";
         case Ok held:
@@ -80,28 +84,28 @@ int Main() {
     Row("edition", Version("ProductName"));
     Row("build", Version("CurrentBuild") + "." + VersionNumber("UBR"));
     Row("installed", Version("InstallationType"));
-    Row("uptime", Text.FromInteger((long)(Time.Uptime() / 3600000u)) + " hours");
-    Row("local time", Time.Format(Time.Now()));
-    Row("utc", Time.Format(Time.UtcNow()));
+    Row("uptime", Text.FromInteger((long)(Clock.Uptime() / 3600000u)) + " hours");
+    Row("local time", Clock.Format(Clock.Now()));
+    Row("utc", Clock.Format(Clock.UtcNow()));
 
     Heading("Machine");
-    var system = Kernel.NativeSystem();
-    Row("name", Kernel.ComputerName());
+    var system = Machine.NativeInfo();
+    Row("name", Environment.ComputerName());
     Row("processors", Text.FromInteger((long)system.ProcessorCount));
-    Row("architecture", Architecture(system.Processor.Split.Architecture));
+    Row("architecture", Machine.ArchitectureName(system.Processor.Split.Architecture));
     Row("page size", Text.FromInteger((long)system.PageSize) + " bytes");
 
-    var memory = Kernel.Memory();
+    var memory = Machine.Memory();
     Row("memory", Megabytes(memory.TotalPhysical) + " total, "
         + Megabytes(memory.AvailablePhysical) + " free ("
         + Text.FromInteger((long)memory.MemoryLoad) + "% used)");
 
     Heading("This process");
-    Row("executable", Kernel.ExecutablePath());
-    Row("directory", Kernel.CurrentDirectory());
-    Row("user", Kernel.Expand("%USERNAME%"));
-    Row("temp", Kernel.TempPath());
-    Row("command", Kernel.CommandLine());
+    Row("executable", Machine.ExecutablePath());
+    Row("directory", Environment.CurrentDirectory());
+    Row("user", Environment.Expand("%USERNAME%"));
+    Row("temp", Files.TempPath());
+    Row("command", Environment.CommandLine());
 
     Heading("Console");
     var size = Terminal.WindowSize();
@@ -111,24 +115,16 @@ int Main() {
     Swatch();
 
     Heading("A child process");
-    var ran = Process.Run("cmd.exe /c ver", "");
+    var ran = Tasks.Run("cmd.exe /c ver", "");
     Row("started", Text.FromBool(ran.Started));
     Row("exit code", Text.FromInteger((long)ran.ExitCode));
     Row("said", Trimmed(ran.Output));
 
     Heading("The system directory");
-    var names = Kernel.Entries(Kernel.SystemDirectory());
+    var names = Files.Entries(Environment.SystemDirectory());
     Row("entries", Text.FromInteger((long)names.Count()));
     Console.WriteLine("");
     return 0;
-}
-
-String Architecture(ushort code) {
-    if (code == ProcessorArchitectureX64)   { return "x64"; }
-    if (code == ProcessorArchitectureArm64) { return "arm64"; }
-    if (code == ProcessorArchitectureX86)   { return "x86"; }
-    if (code == ProcessorArchitectureArm)   { return "arm"; }
-    return "unknown (" + Text.FromInteger((long)code) + ")";
 }
 
 String Megabytes(ulong bytes) {
@@ -140,7 +136,7 @@ String Megabytes(ulong bytes) {
 /// something even on a console where EnableAnsi failed.
 void Swatch() {
     for (uint i = 0u; i < 8u; i = (uint)(i + 1u)) {
-        Terminal.SetColour(i | Terminal.ForegroundIntense);
+        Terminal.SetColour(i | Kernel32.ForegroundIntense);
         Console.Write("##");
     }
     Terminal.SetColour(Terminal.DefaultAttributes);

@@ -1,0 +1,3 @@
+# Only the raw layer. No libraries.txt: the point of this case is that it
+# needs none.
+bindings/win32/api

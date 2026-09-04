@@ -601,16 +601,17 @@ stainless build src -D FASTMATH
 
 ### The Win32 API
 
-[bindings/win32](bindings/win32) is what all of the above adds up to: nine
-modules covering about 300 Windows entry points, 460 constants and 36 structs,
-unions, enums and delegates. There is no marshalling layer and nothing is
-generated — a `WNDCLASSEXW` is a Stainless `struct` whose `sizeof` is 80 as it
-is in C, and a `WNDPROC` is a `delegate`, which is the bare function pointer
-Windows calls.
+[bindings/win32](bindings/win32) is what all of the above adds up to: 259
+Windows entry points, 468 constants and 28 structs, unions, enums and delegates,
+with 141 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
+Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
+`delegate`, which is the bare function pointer Windows calls.
+
+It comes in two layers, and the module name says which is which. **A DLL name is
+the declarations**, spelled as Windows spells them:
 
 ```csharp
-import Win32;
-import Win32.User;
+import Win32.User32;
 
 long Procedure(void* window, uint message, ulong wParam, long lParam) {
     if (message == WmDestroy) { PostQuitMessage(0); return 0; }
@@ -618,11 +619,24 @@ long Procedure(void* window, uint message, ulong wParam, long lParam) {
 }
 ```
 
-They are source you compile with your program rather than part of the standard
-library, because compiling a binding is what makes its library necessary:
+**A task name is the conveniences** built on those — the message loop, the
+directory walk, the registry as a `Result`, the buffer a wide API writes into:
+
+```csharp
+import Win32.Ui;
+
+int code = RunMessageLoop();
+```
+
+Both are source you compile with your program rather than part of the standard
+library, because compiling a *wrapper* is what makes its library necessary — an
+undefined symbol is an error before the dead-strip that would have removed it.
+The raw layer has no such cost, and links with nothing named at all:
 
 ```
-stainless build app.sl bindings/win32/Core.sl bindings/win32/User.sl -l user32
+stainless build app.sl bindings/win32/api                        # free
+stainless build gui.sl bindings/win32 -l user32 -l gdi32 \
+    -l advapi32 -l shell32 -l comdlg32                           # with the conveniences
 ```
 
 Every file is `#if WINDOWS`, so elsewhere the modules exist and are empty rather
@@ -643,7 +657,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 145 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 146 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -682,8 +696,10 @@ A library the linker can find for itself is named with `-l` rather than by path,
 which is how a platform library is reached:
 
 ```
-stainless run samples/win32/window.sl bindings/win32/Core.sl \
-    bindings/win32/User.sl bindings/win32/Gdi.sl -l user32 -l gdi32
+stainless run samples/win32/window.sl bindings/win32/api/Kernel32.sl \
+    bindings/win32/api/User32.sl bindings/win32/api/Gdi32.sl \
+    bindings/win32/Win32.sl bindings/win32/Ui.sl bindings/win32/Drawing.sl \
+    -l user32 -l gdi32
 ```
 
 ### Building a library
@@ -1019,11 +1035,13 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
-- [bindings/win32](bindings/win32): the Windows API in nine modules — about 300
-  entry points, 460 constants and 36 structs, unions, enums and delegates — as
-  declarations rather than a marshalling layer. Source a program compiles rather
-  than part of the standard library, because compiling a binding is what makes
-  its library necessary
+- [bindings/win32](bindings/win32): the Windows API — 259 entry points, 468
+  constants and 28 structs, unions, enums and delegates — as declarations
+  rather than a marshalling layer, in two layers a module name apart:
+  `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
+  Source a program compiles rather than part of the standard library, because
+  compiling a wrapper is what makes its library necessary; the raw layer needs
+  no library at all
 - Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
   `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
   condition grammar. A branch that is not taken is never lexed, so it need not

@@ -2227,7 +2227,7 @@ source paths, and are handed to the linker as they are. A library the linker can
 find for itself is named with `-l` instead:
 
 ```
-stainless build gui.sl bindings/win32/Core.sl bindings/win32/User.sl -l user32
+stainless build gui.sl bindings/win32/api/User32.sl bindings/win32/Ui.sl -l user32
 ```
 
 `-l user32` reaches the Windows SDK's `user32.lib` through the linker's own
@@ -2240,7 +2240,9 @@ the function referring to it, so compiling a module full of `extern "C"`
 declarations does not cost anything, but compiling a *wrapper* that calls one
 makes its library necessary whether or not the program ever reaches it. That is
 why [bindings/win32](../bindings/win32) is source a program chooses to compile
-rather than part of the standard library, which is compiled into everything.
+rather than part of the standard library, which is compiled into everything --
+and why it keeps its declarations in `Win32.<Dll>` modules apart from the
+conveniences, so that importing the whole Windows API can stay free.
 
 A linker failure says which of the two it is:
 

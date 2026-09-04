@@ -3,15 +3,23 @@
 // A real Win32 window: a class, a window procedure, a message loop, and
 // double-buffered GDI painting.
 //
-//   stainless run samples/win32/window.sl bindings/win32/Core.sl //       bindings/win32/User.sl bindings/win32/Gdi.sl -l user32 -l gdi32
+//   stainless run samples/win32/window.sl \
+//       bindings/win32/api/Kernel32.sl bindings/win32/api/User32.sl \
+//       bindings/win32/api/Gdi32.sl bindings/win32/Win32.sl \
+//       bindings/win32/Ui.sl bindings/win32/Drawing.sl -l user32 -l gdi32
 //
-// Naming the three modules it uses rather than the whole `bindings/win32`
-// directory, because compiling a binding is what makes its library necessary:
-// the directory would want '-l advapi32 -l shell32 -l comdlg32' as well.
+// Naming the modules it uses rather than the whole `bindings/win32` directory,
+// because compiling a binding is what makes its library necessary: the
+// directory would want '-l advapi32 -l shell32 -l comdlg32' as well.
 //
-// The window procedure is an ordinary module-level function. Windows calls it
-// directly, because a Stainless `delegate` is a C function pointer and nothing
-// more — there is no thunk, no marshalling and no registration step.
+// `Win32.User32` and `Win32.Gdi32` are the declarations, spelled as Windows
+// spells them. `Win32.Ui` and `Win32.Drawing` are the conveniences on top: the
+// message loop, the client rectangle, the off-screen buffer.
+//
+// The window procedure is in neither, because there is nothing to wrap. It is
+// an ordinary module-level function that Windows calls directly, since a
+// Stainless `delegate` is a C function pointer and nothing more — no thunk, no
+// marshalling and no registration step.
 //
 // A delegate captures nothing, so per-window state lives where Win32 has always
 // kept it: a block whose address is stored in the window with
@@ -21,8 +29,10 @@ module Window;
 
 import Standard.Console;
 import Win32;
-import Win32.User;
-import Win32.Gdi;
+import Win32.User32;
+import Win32.Ui;
+import Win32.Gdi32;
+import Win32.Drawing;
 
 extern "C" {
     void* malloc(nuint size);
@@ -59,10 +69,11 @@ long Procedure(void* window, uint message, ulong wParam, long lParam) {
     if (message == WmEraseBackground) { return 1; }
 
     if (message == WmMouseMove && state != null) {
-        // Both coordinates are packed into one LPARAM, low word first, and
-        // both are signed: a drag can leave the window to the left.
-        (*state).CursorX = (int)(short)(lParam & 0xFFFF);
-        (*state).CursorY = (int)(short)((lParam >> 16) & 0xFFFF);
+        // Both coordinates are packed into one LPARAM, low word first, and both
+        // are signed: a drag can leave the window to the left.
+        Point at = PointOf(lParam);
+        (*state).CursorX = at.X;
+        (*state).CursorY = at.Y;
         (*state).Tracking = true;
         Invalidate(window, false);
         return 0;
@@ -94,9 +105,7 @@ void Paint(void* window, State* state) {
     // so the window never shows a half-finished frame.
     var buffer = CreateOffScreen(dc, Width(client), Height(client));
 
-    void* background = CreateSolidBrush(Colour(24u, 26u, 32u));
-    FillRect(buffer.Dc, &client, background);
-    DeleteObject(background);
+    Fill(buffer.Dc, &client, Colour(24u, 26u, 32u));
 
     DrawCrosshair(buffer.Dc, client, state);
     DrawLabels(buffer.Dc, state);

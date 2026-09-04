@@ -7,12 +7,9 @@
 module Win32Layout;
 
 import Standard.Console;
-import Win32.User;
-import Win32.Kernel;
-import Win32.Terminal;
-import Win32.Time;
-import Win32.Process;
-import Win32.Shell;
+import Win32.Kernel32;
+import Win32.User32;
+import Win32.ComDlg32;
 
 void Check(String name, nuint measured, nuint wanted) {
     Console.WriteLine((measured == wanted ? "ok   " : "WRONG ") + name

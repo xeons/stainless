@@ -21,68 +21,39 @@
 
 // The Windows console: colours, the cursor, the screen buffer and raw input.
 //
-// This is kernel32, so it needs no `-l`.
+// A convenience layer over `Win32.Kernel32`, which is where the console
+// declarations live — they are kernel32 exports, whatever else they look like.
+// Nothing here needs a `-l`.
 //
 // `Standard.Console` writes text and is what a program should use for that.
-// This module is for the things that are not writing text: turning on ANSI
-// escape handling, moving the cursor, reading a key without waiting for a line,
-// and asking how wide the window is.
+// This is for the things that are not writing text: turning on ANSI escape
+// handling, moving the cursor, reading a key without waiting for a line, and
+// asking how wide the window is.
 //
 // It is called `Terminal` rather than `Console` on purpose. A module is reached
-// by its last name segment, so a `Win32.Console` would shadow `Standard.Console`
-// in every file that imported it — and a program doing console work is exactly
-// the program that also wants to print.
+// by its last name segment, so a `Win32.Console` would shadow
+// `Standard.Console` in every file that imported it — and a program doing
+// console work is exactly the program that also wants to print.
+//
+// **Every call here fails when the output is redirected**, because a pipe is
+// not a console. That is the right answer rather than a problem to work around:
+// a program writing colour codes into a file should not.
 module Win32.Terminal;
 
 #if WINDOWS
 
 import Win32;
-
-// ================================================================== handles
-
-public extern "C" {
-    void* GetStdHandle(uint which);
-    int   SetStdHandle(uint which, void* handle);
-    int   GetConsoleMode(void* handle, uint* mode);
-    int   SetConsoleMode(void* handle, uint mode);
-    uint  GetConsoleOutputCP();
-    int   SetConsoleOutputCP(uint codePage);
-    int   SetConsoleCP(uint codePage);
-    int   AllocConsole();
-    int   FreeConsole();
-    int   AttachConsole(uint processId);
-    void* GetConsoleWindow();
-}
-
-/// `GetStdHandle`'s argument. They are negative numbers cast to `uint`, which
-/// is how the header defines them.
-public const uint StdInput  = 0xFFFFFFF6u;   // -10
-public const uint StdOutput = 0xFFFFFFF5u;   // -11
-public const uint StdError  = 0xFFFFFFF4u;   // -12
-
-/// Input modes.
-public const uint EnableProcessedInput   = 0x0001u;
-public const uint EnableLineInput        = 0x0002u;
-public const uint EnableEchoInput        = 0x0004u;
-public const uint EnableWindowInput      = 0x0008u;
-public const uint EnableMouseInput       = 0x0010u;
-public const uint EnableInsertMode       = 0x0020u;
-public const uint EnableQuickEditMode    = 0x0040u;
-public const uint EnableVirtualTerminalInput = 0x0200u;
-
-/// Output modes. `EnableVirtualTerminalProcessing` is the one that makes ANSI
-/// escape sequences work, and it is off by default on a fresh console.
-public const uint EnableProcessedOutput  = 0x0001u;
-public const uint EnableWrapAtEol        = 0x0002u;
-public const uint EnableVirtualTerminalProcessing = 0x0004u;
-public const uint DisableNewlineAutoReturn = 0x0008u;
-
-/// UTF-8, which is what a Stainless `String` already is.
-public const uint CodePageUtf8 = 65001u;
+import Win32.Kernel32;
 
 public void* Output() { return GetStdHandle(StdOutput); }
 public void* Input()  { return GetStdHandle(StdInput); }
 public void* Error()  { return GetStdHandle(StdError); }
+
+/// Grey on black: what a console starts as, and what a program that changed the
+/// colour should put back rather than leaving its own behind.
+public const uint DefaultAttributes = 0x0007u;
+
+// ===================================================================== modes
 
 /// Turns on ANSI escape handling for the console's output, and answers whether
 /// it took. It is off by default, and a program that writes colour codes
@@ -102,79 +73,26 @@ public bool UseUtf8() {
         && Win32.Succeeded(SetConsoleCP(CodePageUtf8));
 }
 
-// =========================================================== screen buffer
+/// Turns off line editing and echo, so that `ReadKey` sees a key the moment it
+/// is pressed. The previous mode is returned, to be put back.
+public uint EnableRawInput() {
+    void* handle = Input();
+    uint mode = 0u;
+    if (!Win32.Succeeded(GetConsoleMode(handle, &mode))) { return 0u; }
 
-/// `COORD`: two `short`s, and the reason the console cannot address a buffer
-/// wider than 32767.
-public struct Coord {
-    public short X;
-    public short Y;
+    SetConsoleMode(handle, mode & ~(EnableLineInput | EnableEchoInput));
+    return mode;
 }
 
-/// `SMALL_RECT`, whose edges are *inclusive*, unlike a `RECT`.
-public struct SmallRect {
-    public short Left;
-    public short Top;
-    public short Right;
-    public short Bottom;
+/// Puts back a mode `EnableRawInput` returned.
+public bool RestoreInput(uint mode) {
+    return Win32.Succeeded(SetConsoleMode(Input(), mode));
 }
 
-/// `CONSOLE_SCREEN_BUFFER_INFO`. `sizeof` is 22.
-public struct ScreenBufferInfo {
-    public Coord     Size;
-    public Coord     CursorPosition;
-    public ushort    Attributes;
-    public SmallRect Window;
-    public Coord     MaximumWindowSize;
-}
-
-/// `CONSOLE_CURSOR_INFO`.
-public struct CursorInfo {
-    public uint Size;
-    public int  Visible;
-}
-
-public extern "C" {
-    int GetConsoleScreenBufferInfo(void* handle, ScreenBufferInfo* info);
-    int SetConsoleCursorPosition(void* handle, Coord position);
-    int SetConsoleTextAttribute(void* handle, ushort attributes);
-    int SetConsoleTitleW(ushort* title);
-    uint GetConsoleTitleW(ushort* buffer, uint size);
-    int GetConsoleCursorInfo(void* handle, CursorInfo* info);
-    int SetConsoleCursorInfo(void* handle, CursorInfo* info);
-    int FillConsoleOutputCharacterW(void* handle, ushort character, uint length,
-                                    Coord at, uint* written);
-    int FillConsoleOutputAttribute(void* handle, ushort attributes, uint length,
-                                   Coord at, uint* written);
-    int WriteConsoleW(void* handle, ushort* text, uint units, uint* written, void* reserved);
-    int ReadConsoleW(void* handle, ushort* buffer, uint units, uint* read, void* control);
-    int SetConsoleScreenBufferSize(void* handle, Coord size);
-    int SetConsoleWindowInfo(void* handle, int absolute, SmallRect* window);
-}
-
-/// Character attributes. Foreground and background are each three bits and an
-/// intensity, so a colour is an `or` of up to four of these.
-///
-/// They are `uint` although the field is a `ushort`, because `|` on two narrow
-/// integers widens — `ForegroundRed | ForegroundIntense` would be an `int` and
-/// every use would need a cast back. `SetColour` narrows once, here.
-public const uint ForegroundBlue      = 0x0001u;
-public const uint ForegroundGreen     = 0x0002u;
-public const uint ForegroundRed       = 0x0004u;
-public const uint ForegroundIntense   = 0x0008u;
-public const uint BackgroundBlue      = 0x0010u;
-public const uint BackgroundGreen     = 0x0020u;
-public const uint BackgroundRed       = 0x0040u;
-public const uint BackgroundIntense   = 0x0080u;
-public const uint ReverseVideo        = 0x4000u;
-public const uint Underscore          = 0x8000u;
-
-/// Grey on black: what a console starts as, and what a program that changed the
-/// colour should put back rather than leaving its own behind.
-public const uint DefaultAttributes = 0x0007u;
+// ============================================================= screen buffer
 
 /// How big the window is, in characters — not how big the buffer is, which is
-/// usually taller.
+/// usually taller. Zero by zero when the output is not a console.
 public Coord WindowSize() {
     ScreenBufferInfo info;
     Coord size;
@@ -209,9 +127,16 @@ public bool SetCursorPosition(short x, short y) {
 }
 
 /// Sets the colour of everything written after this point.
+///
+/// The attributes are `uint` although the field is a `ushort`, because `|` on
+/// two narrow integers widens — `ForegroundRed | ForegroundIntense` would be an
+/// `int` and every use would need a cast back. This narrows once, here.
 public bool SetColour(uint attributes) {
     return Win32.Succeeded(SetConsoleTextAttribute(Output(), (ushort)attributes));
 }
+
+/// The colour a console starts with.
+public bool ResetColour() { return SetColour(DefaultAttributes); }
 
 public bool SetTitle(String title) {
     return Win32.Succeeded(SetConsoleTitleW(title.ToUtf16().ToPointer()));
@@ -253,69 +178,6 @@ public bool Clear() {
 
 // ================================================================ raw input
 
-/// `KEY_EVENT_RECORD`'s character, which the header makes a union of a wide and
-/// an ANSI character. Only the wide half is ever read here.
-public union Character {
-    public ushort Unicode;
-    public byte   Ansi;
-}
-
-/// `KEY_EVENT_RECORD`.
-public struct KeyEvent {
-    public int    KeyDown;
-    public ushort RepeatCount;
-    public ushort VirtualKeyCode;
-    public ushort VirtualScanCode;
-    public Character Char;
-    public uint   ControlKeyState;
-}
-
-/// `MOUSE_EVENT_RECORD`.
-public struct MouseEvent {
-    public Coord Position;
-    public uint  ButtonState;
-    public uint  ControlKeyState;
-    public uint  Flags;
-}
-
-/// The `INPUT_RECORD` payload, which the `EventType` says how to read. This is
-/// a `union` and not a `variant` for exactly the reason unions exist: the tag
-/// lives outside it, in the record.
-public union InputEvent {
-    public KeyEvent   Key;
-    public MouseEvent Mouse;
-    public Coord      BufferSize;
-}
-
-/// `INPUT_RECORD`. `sizeof` is 20.
-public struct InputRecord {
-    public ushort     EventType;
-    public InputEvent Event;
-}
-
-public const ushort KeyEventType         = 0x0001u;
-public const ushort MouseEventType       = 0x0002u;
-public const ushort WindowBufferSizeEvent = 0x0004u;
-public const ushort MenuEventType        = 0x0008u;
-public const ushort FocusEventType       = 0x0010u;
-
-/// `ControlKeyState` bits.
-public const uint RightAltPressed  = 0x0001u;
-public const uint LeftAltPressed   = 0x0002u;
-public const uint RightCtrlPressed = 0x0004u;
-public const uint LeftCtrlPressed  = 0x0008u;
-public const uint ShiftPressed     = 0x0010u;
-public const uint NumLockOn        = 0x0020u;
-public const uint ScrollLockOn     = 0x0040u;
-public const uint CapsLockOn       = 0x0080u;
-
-public extern "C" {
-    int ReadConsoleInputW(void* handle, InputRecord* records, uint count, uint* read);
-    int PeekConsoleInputW(void* handle, InputRecord* records, uint count, uint* read);
-    int GetNumberOfConsoleInputEvents(void* handle, uint* count);
-    int FlushConsoleInputBuffer(void* handle);
-}
-
 /// Waits for one key press and returns its character, with no line editing and
 /// no echo. Key *releases* are skipped, so this returns once per press.
 ///
@@ -332,6 +194,30 @@ public ushort ReadKey() {
         if (record.EventType != KeyEventType) { continue; }
         if (record.Event.Key.KeyDown == 0) { continue; }
         return record.Event.Key.Char.Unicode;
+    }
+}
+
+/// The whole record for the next key press, for a caller that needs the virtual
+/// key code or the modifier state rather than a character.
+public KeyEvent ReadKeyEvent() {
+    void* handle = Input();
+    InputRecord record;
+    uint read = 0u;
+
+    while (true) {
+        if (!Win32.Succeeded(ReadConsoleInputW(handle, &record, 1u, &read)) || read == 0u) {
+            KeyEvent nothing;
+            nothing.KeyDown = 0;
+            nothing.RepeatCount = 0u;
+            nothing.VirtualKeyCode = 0u;
+            nothing.VirtualScanCode = 0u;
+            nothing.Char.Unicode = 0u;
+            nothing.ControlKeyState = 0u;
+            return nothing;
+        }
+        if (record.EventType != KeyEventType) { continue; }
+        if (record.Event.Key.KeyDown == 0) { continue; }
+        return record.Event.Key;
     }
 }
 

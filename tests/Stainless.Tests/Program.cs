@@ -187,8 +187,11 @@ internal static class Program
         foreach (string extra in Lines(directory, "sources.txt"))
         {
             string path = Path.Combine(RepositoryRoot(), extra);
+            // Recursively, as the CLI searches a directory given on the
+            // command line -- bindings/win32 has its raw layer in a subdirectory.
             if (Directory.Exists(path))
-                sources.AddRange(Directory.EnumerateFiles(path, "*.sl")
+                sources.AddRange(Directory
+                    .EnumerateFiles(path, "*.sl", SearchOption.AllDirectories)
                     .OrderBy(f => f, StringComparer.Ordinal));
             else
                 sources.Add(path);

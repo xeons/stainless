@@ -13,6 +13,7 @@ module Win32Registry;
 
 import Standard.Console;
 import Win32;
+import Win32.AdvApi32;
 import Win32.Registry;
 
 static readonly String CurrentVersion = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
@@ -30,7 +31,7 @@ String Why(RegistryError error) {
 
 int Main() {
     // --- a key that is not there --------------------------------------------
-    var missing = Registry.OpenRead(Registry.LocalMachine(), "SOFTWARE\\NoSuchKeyHere");
+    var missing = Registry.OpenRead(AdvApi32.LocalMachine(), "SOFTWARE\\NoSuchKeyHere");
     switch (missing) {
         case Ok found:
             Console.WriteLine("WRONG: a key that should not exist opened");
@@ -42,7 +43,7 @@ int Main() {
     }
 
     // --- a key that is -------------------------------------------------------
-    var opened = Registry.OpenRead(Registry.LocalMachine(), CurrentVersion);
+    var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
     switch (opened) {
         case Fail why:
             Console.WriteLine("WRONG: could not open CurrentVersion: " + Why(why.Error));
@@ -105,7 +106,7 @@ int Main() {
     // path is resolved before the rights are, so the mask is not what decides
     // this. Whether HKLM itself opens for writing depends on whether the test
     // is running elevated, which is why that is not what is asked.
-    var writable = Registry.Open(Registry.LocalMachine(), "SOFTWARE\\NoSuchKeyHere", KeyWrite);
+    var writable = Registry.Open(AdvApi32.LocalMachine(), "SOFTWARE\\NoSuchKeyHere", KeyWrite);
     switch (writable) {
         case Ok key:
             Console.WriteLine("WRONG: a key that should not exist opened for writing");
@@ -119,7 +120,7 @@ int Main() {
 
     // HKEY_CURRENT_USER is always openable by the user running the program, and
     // opening it reads nothing and changes nothing.
-    var mine = Registry.OpenRead(Registry.CurrentUser(), "Software");
+    var mine = Registry.OpenRead(AdvApi32.CurrentUser(), "Software");
     switch (mine) {
         case Ok key:
             Console.WriteLine("HKCU\\Software opens: true");

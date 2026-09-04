@@ -1,69 +1,128 @@
 # Win32 bindings
 
-The Windows API, declared in Stainless. Nine modules, about 300 entry points,
-460 constants and 36 structs, unions, enums and delegates.
+The Windows API in two layers, both under `Win32.`, and the module name says
+which one you are looking at:
 
-There is no marshalling layer here and there is nothing generated. Stainless
-already speaks the platform C ABI, so a `WNDCLASSEXW` is a Stainless `struct`
-with the same fields in the same order — `sizeof` returns 80, as it does in C —
-and a `WNDPROC` is a `delegate`, which is a bare function pointer Windows calls
-directly. A binding is a declaration, not a wrapper.
+| Name | What it is |
+|---|---|
+| `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
+| `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
-What the modules add on top of the declarations is the handful of places where
-saying it in Stainless is genuinely better than saying it in C: **text**, which
-crosses as UTF-8 and has to be widened; **lifetime**, which a destructor can
-hold; and **failure**, which a `Result` can make unignorable.
+The raw layer is 259 entry points, 468 constants and 28 structs, unions, enums
+and delegates across six libraries; the twelve convenience modules add 141
+functions and 8 types on top. Nothing is generated and nothing is marshalled: a
+`WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
+`delegate`, which is a bare function pointer Windows calls directly. A binding
+is a declaration, not a wrapper.
 
 Only the wide (`...W`) entry points are bound. The ANSI ones lose characters a
 user's filesystem is entitled to contain.
 
+## The raw layer
+
+```
+bindings/win32/api/
+  Kernel32.sl    module Win32.Kernel32;   errors, handles, files, memory,
+                                          modules, environment, the system,
+                                          processes, the console, time
+  User32.sl      module Win32.User32;     windows, messages, input, clipboard
+  Gdi32.sl       module Win32.Gdi32;      device contexts, pens, brushes, fonts
+  AdvApi32.sl    module Win32.AdvApi32;   the registry
+  Shell32.sl     module Win32.Shell32;    ShellExecuteW, known folders
+  ComDlg32.sl    module Win32.ComDlg32;   the open and save dialogs
+```
+
+One module per DLL, so there is never a question about where something lives or
+which `-l` it wants. The console and the clock are in `Kernel32` because that is
+the DLL that exports them, whatever else they look like.
+
+**Importing the whole raw layer is free and needs no `-l` at all.** A
+declaration nothing calls is not a reference, so the linker never looks for it:
+
+```
+stainless build app.sl bindings/win32/api
+```
+
+`tests/cases/win32-raw` is that, as a test — it imports all six modules and
+links with no libraries named.
+
+The only function bodies in the raw layer are the handful of constants that are
+pointer-shaped and so cannot be written as `const`: `InvalidHandle()`,
+`LocalMachine()`, `CursorArrow()` and their neighbours. Everything else is a
+declaration, a type or a constant.
+
+## The conveniences
+
+```
+bindings/win32/
+  Win32.sl         module Win32;              BOOL, handles, error text, buffers
+  Files.sl         module Win32.Files;        paths, attributes, directory walks
+  Environment.sl   module Win32.Environment;  variables, command line, directories
+  Machine.sl       module Win32.Machine;      system info, memory, pages, DLLs
+  Terminal.sl      module Win32.Terminal;     console modes, colours, raw keys
+  Clock.sl         module Win32.Clock;        SYSTEMTIME, FILETIME, Stopwatch
+  Tasks.sl         module Win32.Tasks;        child processes and pipes
+  Ui.sl            module Win32.Ui;           message loop, windows, clipboard
+  Drawing.sl       module Win32.Drawing;      COLORREF, fonts, double buffering
+  Registry.sl      module Win32.Registry;     keys and values, as a Result
+  Shell.sl         module Win32.Shell;        opening things, known folders
+  Dialogs.sl       module Win32.Dialogs;      the file dialogs
+```
+
+These exist only where saying it in Stainless is genuinely better than saying it
+in C: **text**, which crosses as UTF-8 and has to be widened; **lifetime**,
+which a destructor can hold; and **failure**, which a `Result` can make
+unignorable. Nothing here hides the API — everything Windows declares is
+`public` in the raw layer and reachable by its real name.
+
+Which library each wants:
+
+| Module | `-l` |
+|---|---|
+| `Win32`, `Win32.Files`, `Win32.Environment`, `Win32.Machine`, `Win32.Terminal`, `Win32.Clock`, `Win32.Tasks` | — |
+| `Win32.Ui` | `user32` |
+| `Win32.Drawing` | `gdi32` (and `user32`) |
+| `Win32.Registry` | `advapi32` |
+| `Win32.Shell` | `shell32` |
+| `Win32.Dialogs` | `comdlg32` (and `user32`) |
+
+The first row needs none: kernel32 is pulled in by the C runtime every Windows
+program already links.
+
 ## Using them
 
-The bindings are **not** part of the standard library. They are source you
-compile with your program:
+Name the modules you use:
 
 ```
-stainless build app.sl bindings/win32/Core.sl bindings/win32/User.sl -l user32
+stainless build gui.sl bindings/win32/api/Kernel32.sl bindings/win32/api/User32.sl \
+    bindings/win32/Win32.sl bindings/win32/Ui.sl -l user32
 ```
 
-Name the modules you use rather than the whole directory. Compiling a binding is
-what makes its library necessary — an undefined symbol is an error before the
-dead-strip that would have removed it — so `bindings/win32` as a whole wants
-every `-l` in the table below, whether or not the program calls into them.
+or take the whole directory and name every library:
 
-That is also why these are not in `stdlib/`, which is compiled into every
+```
+stainless build app.sl bindings/win32 -l user32 -l gdi32 -l advapi32 \
+    -l shell32 -l comdlg32
+```
+
+Compiling a wrapper is what makes its library necessary — an undefined symbol is
+an error before the dead-strip that would have removed it — so the second form
+wants them all whether or not the program calls into them.
+
+That is also why none of this is in `stdlib/`, which is compiled into every
 program: a `CreateWindowExW` in there would make every Stainless program on
 every platform need `user32.lib`.
-
-| Module | Library | What is in it |
-|---|---|---|
-| `Win32` | — | handles, `BOOL`, error text, `WideBuffer`, `ByteBuffer` |
-| `Win32.Kernel` | — | files, directories, memory, DLLs, environment, processes |
-| `Win32.Terminal` | — | console modes, colours, the cursor, raw key input |
-| `Win32.Time` | — | `SYSTEMTIME`, `FILETIME`, the performance counter, `Stopwatch` |
-| `Win32.Process` | — | `CreateProcessW`, pipes, running a command and reading it |
-| `Win32.User` | `user32` | windows, messages, painting, input, the clipboard |
-| `Win32.Gdi` | `gdi32` | device contexts, pens, brushes, fonts, `BitBlt` |
-| `Win32.Registry` | `advapi32` | keys and values, with `Result` |
-| `Win32.Shell` | `shell32`, `comdlg32` | `ShellExecuteW`, known folders, file dialogs |
-
-The first five need no `-l`: kernel32 is pulled in by the C runtime every
-Windows program already links.
 
 Every file is wrapped in `#if WINDOWS`, so on Linux or macOS these modules exist
 and are empty rather than failing to build. A cross-platform program can import
 them unconditionally and guard its own uses.
 
-## What the wrappers are for
-
-Everything Windows declares is `public extern "C"` and reachable by its real
-name, so nothing here hides the API. The extra functions exist where the raw
-call is awkward from Stainless:
+## What the conveniences are for
 
 **Text in both directions.** A `String` is UTF-8 and a `...W` function wants
 UTF-16, so a call is `path.ToUtf16().ToPointer()` going out. Coming back is the
-harder half — a wide API writes into a buffer the caller owns — so `WideBuffer`
-owns one and frees it in its destructor:
+harder half — a wide API writes into a buffer the caller owns — so
+`Win32.WideBuffer` owns one and frees it in its destructor:
 
 ```csharp
 var buffer = new WideBuffer(32768u);
@@ -71,14 +130,14 @@ uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity());
 String path = buffer.Text(units);
 ```
 
-`Kernel.ExecutablePath()` is that, once, with a name.
+`Machine.ExecutablePath()` is that, once, with a name.
 
 **The failure conventions**, which are three and are not interchangeable.
 `CreateFileW` returns `INVALID_HANDLE_VALUE`; `CreateWindowExW` returns null;
 `RegOpenKeyExW` returns the error code itself and never touches
 `GetLastError`. `Win32.IsInvalid` covers the first two, `Win32.Succeeded` reads
-a `BOOL`, and the registry's wrappers return a `Result` so that a value that was
-never read cannot be used.
+a `BOOL`, and `Win32.Registry` returns a `Result` so that a value that was never
+read cannot be used.
 
 **`Win32.LastErrorMessage()`**, which is `FormatMessageW` into a buffer with the
 trailing CR LF trimmed — the thing every program writes once.
@@ -96,31 +155,40 @@ long Procedure(void* window, uint message, ulong wParam, long lParam) {
 }
 ```
 
-`samples/win32/window.sl` is a working window built this way, with a class, a
-message loop, double-buffered GDI painting and keyboard handling.
+It is in neither layer, because there is nothing to wrap.
+[samples/win32/window.sl](../../samples/win32/window.sl) is a working window
+built this way, with a class, a message loop, double-buffered GDI painting and
+keyboard handling. [samples/win32/report.sl](../../samples/win32/report.sl) is
+the same for the parts with no window.
 
 ## Things to know
 
 - **`uint` arithmetic widens to `long`.** `a | b` on two `uint`s is a `uint`,
   but `a - b` is a `long` and needs a cast back. The console's colour constants
-  are `uint` rather than `ushort` for this reason: `ushort | ushort` is an `int`,
-  and every use would otherwise need a cast.
+  are `uint` rather than the `ushort` the field takes for this reason:
+  `ushort | ushort` is an `int`, and a flag set that cannot be or-ed together is
+  not usable. `Terminal.SetColour` narrows once.
 - **There is no `->`.** `(*state).Clicks`, not `state->Clicks`.
 - **GDI ownership is not enforced and cannot be.** Every object `Create...`
   returns must be selected out of its device context before `DeleteObject`, and
   a stock object from `GetStockObject` must never be deleted at all.
+  `Drawing.OffScreen` is the one place that pairing is done for you.
 - **`CreateProcessW` may write to the command line it is given**, so it cannot
-  be a literal. `Process.Run` copies into a `WideBuffer` first; a caller using
-  the raw entry point has to do the same.
+  be a literal. `Tasks.Run` copies with `Win32.Copy` first; a caller using the
+  declaration directly has to do the same.
+- **`Win32.Terminal`, not `Win32.Console`.** A module is reached by its last name
+  segment, so a `Win32.Console` would shadow `Standard.Console` in every file
+  that imported it.
 
 ## What is not bound
 
 - **Anything needing an inline fixed-size array field**, which Stainless does
-  not have. `WIN32_FIND_DATAW` ends in two `WCHAR` arrays, so `Kernel.FindData`
-  owns the 592 bytes as a block and reads the fields at the offsets the header
-  gives — a class with accessors rather than a struct with fields. `LOGFONTW` is
-  the same shape and is not bound; `CreateFontW` takes the face name as a
-  pointer and is.
+  not have. `WIN32_FIND_DATAW` ends in two `WCHAR` arrays, so `Win32.Kernel32`
+  records its size and field offsets as constants and `Win32.Files.FindData`
+  owns the 592 bytes and reads them — a class with accessors rather than a
+  struct with fields, because a struct with the wrong size would be handed to
+  Windows to overrun. `LOGFONTW` is the same shape and is not bound;
+  `CreateFontW` takes the face name as a pointer and is.
 - **COM**, and so everything reached through it: the shell's newer interfaces,
   Direct2D, WIC, `SHGetKnownFolderPath`. That needs vtable layout and `IUnknown`,
   which is a project rather than a binding.

@@ -1,0 +1,10 @@
+kernel32: 2147483648
+user32:   13565952
+gdi32:    13369376
+advapi32: 131097
+shell32:  26
+comdlg32: 524288
+HKLM is not null:      true
+IDC_ARROW is not null: true
+INVALID_HANDLE is -1:  true
+a real call works:     true
