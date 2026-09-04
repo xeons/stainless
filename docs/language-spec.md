@@ -420,6 +420,18 @@ public sealed class Square : Polygon {
 | `sealed` | nothing may derive from it | on an `override`, nothing may override further |
 | `protected` | — | this class and anything deriving from it |
 
+A property takes the same words, and they belong to the pair: its accessors are
+the methods, so an `abstract` property declares two abstract accessors and an
+`override` one replaces both. A setter dispatches for the same reason a getter
+does.
+
+```csharp
+public abstract class Node {
+    public abstract int    Weight { get; }
+    public abstract String Tag    { get; set; }
+}
+```
+
 **One base, not several.** A class reference points at the object header and the
 fields follow it, so with a single base the base subobject starts at the same
 address as the derived object. An upcast is therefore free — no instructions at
@@ -461,6 +473,28 @@ of the same name taking different ones is a new method and needs no word.
 **Constructors are not inherited.** A class that declares none is built by the
 nearest constructor up the chain that takes no arguments, and a class with no
 such constructor to reach says so where it is declared rather than at each `new`.
+
+**`this(...)` delegates to another constructor of the same class**, again as the
+first statement. The one it delegates to builds the base, so no base
+construction is inserted alongside it — inserting one would build the base twice
+and the second pass would overwrite what the first had set. A ring of
+constructors that delegate to each other never builds anything, and is refused:
+
+```csharp
+public class Pair {
+    int a;
+    int b;
+
+    Pair(int x, int y) { a = x; b = y; }
+    Pair(int both)     { this(both, both); }
+    Pair()             { this(0); }
+}
+```
+
+```
+error[SL0521]: the constructors of 'Ring' delegate to each other in a ring, so
+none of them ever builds anything
+```
 
 **Destructors chain, derived first**, so a derived destructor may read what its
 base still holds. Interfaces are inherited too, and an override takes the slot,

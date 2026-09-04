@@ -62,6 +62,27 @@ public class Unsaid : Shape {                         // SL0517
     public override double Area() { return 0.0; }
 }
 
+/// Constructors that delegate to each other and so never build anything.
+public class Ring {
+    Ring(int a) { this(); }                           // SL0521
+    Ring() { this(1); }
+}
+
+public class Selfish {
+    Selfish(int a) { this(a); }                       // SL0521
+}
+
+public class Misplaced {
+    int held;
+
+    Misplaced(int a) { held = a; }
+
+    Misplaced() {
+        held = 0;
+        this(1);                                      // SL0516
+    }
+}
+
 int Main() {
     // An abstract class exists to be derived from; there is no such object.
     Shape none = new Shape(1);                        // SL0514

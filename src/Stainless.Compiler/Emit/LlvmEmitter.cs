@@ -2638,9 +2638,13 @@ public sealed class LlvmEmitter(
     {
         var setter = assignment.Property.Setter!;
 
+        // A setter dispatches for the same reasons a getter does: it is an
+        // ordinary method, and `Node.Label = x` on a `Leaf` has to reach the
+        // setter the object really has.
         var receiver = EmitExpression(assignment.Receiver);
-        string? virtualTarget = setter.ContainingType is InterfaceTypeSymbol
-            ? LoadInterfaceMethod(receiver.Ref, setter)
+        string? virtualTarget =
+            setter.ContainingType is InterfaceTypeSymbol ? LoadInterfaceMethod(receiver.Ref, setter)
+            : setter.IsDispatched ? LoadVirtualMethod(receiver.Ref, setter)
             : null;
 
         var value = EmitExpression(assignment.Value);

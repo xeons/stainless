@@ -161,6 +161,7 @@ public sealed class Binder(
         BindBodies();               // pass 9: only now is any code checked
         BindStatics();              // pass 10: static initializers, then their order
         DrainPending();             // pass 11: bodies of everything instantiated along the way
+        CheckConstructorDelegation();
 
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.
@@ -2845,7 +2846,10 @@ public sealed class Binder(
         // every other appearance is refused where it stands.
         _constructorChain = function.Kind == FunctionKind.Constructor
             ? function.Body.Statements.FirstOrDefault() is
-                ExpressionStatementSyntax { Expression: CallSyntax { Callee: BaseSyntax } head }
+                ExpressionStatementSyntax
+                {
+                    Expression: CallSyntax { Callee: BaseSyntax or ThisSyntax } head
+                }
                 ? head
                 : null
             : null;
@@ -2960,6 +2964,79 @@ public sealed class Binder(
 
         _boundExplicitChain = true;
         return BuildCall(syntax, chosen, receiver, arguments, nonVirtual: true);
+    }
+
+    /// <summary>
+    /// <c>this(args)</c> at the head of a constructor: run another of this
+    /// class's own constructors over the same object first.
+    ///
+    /// The one it delegates to builds the base, so no base chain is inserted
+    /// here -- inserting one would construct the base twice, and the second
+    /// pass would overwrite whatever the first had set.
+    /// </summary>
+    private BoundExpression BindThisConstruction(CallSyntax syntax, List<BoundExpression> arguments)
+    {
+        if (!ReferenceEquals(syntax, _constructorChain))
+        {
+            diagnostics.Error("SL0516", syntax.Span,
+                _currentFunction?.Kind == FunctionKind.Constructor
+                    ? "'this(...)' has to be the first statement of the constructor: it is what " +
+                      "builds the object, and a body that had already run would be overwritten " +
+                      "by it"
+                    : "'this(...)' runs another constructor of this class, so it belongs at the " +
+                      "head of a constructor and nowhere else");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var classType = (ClassTypeSymbol)_currentFunction!.ContainingType!;
+
+        var chosen = ResolveOverload(
+            classType.Constructors, arguments, syntax.Span, $"this {classType.Name}");
+        if (chosen is null) return new BoundErrorExpression(syntax.Span);
+
+        if (chosen == _currentFunction)
+        {
+            diagnostics.Error("SL0521", syntax.Span,
+                $"this constructor of '{classType.Name}' delegates to itself");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        _delegated[_currentFunction] = chosen;
+
+        var self = new BoundThis(syntax.Span, classType, _currentFunction.Parameters[0]);
+
+        _boundExplicitChain = true;
+        return BuildCall(syntax, chosen, self, arguments, nonVirtual: true);
+    }
+
+    /// <summary>Which constructor each delegating one runs, for the cycle check.</summary>
+    private readonly Dictionary<FunctionSymbol, FunctionSymbol> _delegated = [];
+
+    /// <summary>
+    /// Refuses a ring of constructors that delegate to each other.
+    ///
+    /// Each one is legal on its own and the ring never builds anything, so this
+    /// cannot be seen from a single body -- it is checked once every body has
+    /// said where it delegates.
+    /// </summary>
+    private void CheckConstructorDelegation()
+    {
+        foreach (var start in _delegated.Keys)
+        {
+            var seen = new HashSet<FunctionSymbol> { start };
+
+            for (var current = _delegated[start];
+                 _delegated.TryGetValue(current, out var next);
+                 current = next)
+            {
+                if (seen.Add(current)) continue;
+
+                diagnostics.Error("SL0521", start.Span,
+                    $"the constructors of '{start.ContainingType!.Name}' delegate to each other " +
+                    "in a ring, so none of them ever builds anything");
+                break;
+            }
+        }
     }
 
     /// <summary>
@@ -6778,8 +6855,10 @@ public sealed class Binder(
     {
         var arguments = syntax.Arguments.Select(BindArgument).ToList();
 
-        // `base(...)` is the base constructor, not a member of anything.
+        // `base(...)` is the base constructor and `this(...)` another of this
+        // class's own; neither is a member of anything.
         if (syntax.Callee is BaseSyntax) return BindBaseConstruction(syntax, arguments);
+        if (syntax.Callee is ThisSyntax) return BindThisConstruction(syntax, arguments);
 
         // A bare `Ok(x)` builds a variant rather than calling anything. It has
         // to be decided here, before the name is looked up, because a draft has

@@ -510,10 +510,15 @@ at the same address as the derived object. An upcast emits nothing, reference
 identity stays pointer identity, and `sl_retain` goes on taking the object's own
 address. With two bases none of those would hold.
 
-Constructors chain — explicitly with `base(...)` or implicitly to the one taking
-no arguments — and destructors chain the other way, derived first, so a derived
-destructor can still read what its base holds. `base.M()` is not dispatched,
-which is the only way an override can reach what it replaced.
+Constructors chain — explicitly with `base(...)`, implicitly to the one taking no
+arguments, or sideways with `this(...)` to another constructor of the same class
+— and destructors chain the other way, derived first, so a derived destructor can
+still read what its base holds. `base.M()` is not dispatched, which is the only
+way an override can reach what it replaced.
+
+Properties take the same words, since their accessors are the methods: an
+`abstract` property declares two abstract accessors and a setter dispatches
+exactly as a getter does.
 
 Hiding is refused: a method with the same name and parameters as one it inherits
 must say `override`, and what it overrides must be `virtual` or `abstract`. C#

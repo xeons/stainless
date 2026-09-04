@@ -117,6 +117,49 @@ public class Pixel : Dot {
     public override String Name() { return "pixel"; }
 }
 
+/// An abstract property is a pair of abstract accessors, and both dispatch --
+/// a setter for the same reason a getter does.
+public abstract class Node {
+    public abstract int    Weight { get; }
+    public abstract String Tag    { get; set; }
+
+    public String Summary() { return Tag + "=" + Text.FromInteger(Weight); }
+}
+
+public class Twig : Node {
+    String held;
+
+    Twig() { held = "twig"; }
+
+    public override int Weight { get { return 1; } }
+
+    public override String Tag {
+        get { return held; }
+        set { held = value; }
+    }
+}
+
+/// `this(...)` runs another of this class's own constructors first. The one it
+/// delegates to builds the base, so the base is built once and not twice.
+public class Built : Shape {
+    public int Steps;
+
+    Built(int howMany, int steps) {
+        base(howMany);
+        Steps = steps;
+    }
+
+    Built(int steps) { this(2, steps); }
+
+    Built() {
+        this(5);
+        Steps = Steps + 100;
+    }
+
+    public override double Area() { return 0.0; }
+    public override String Name() { return "built"; }
+}
+
 /// Three deep, with a destructor at every level and a reference held at two of
 /// them, so what a drop runs and in which order is the whole of what it shows.
 public class Held {
@@ -215,6 +258,18 @@ int Main() {
     Counter doubling = new Doubling(21);
     Console.WriteLine("counter " + Text.FromInteger(plain.Value)
         + ", doubling " + Text.FromInteger(doubling.Value));
+
+    // --- abstract properties, both halves dispatching -----------------------
+    Node node = new Twig();
+    Console.WriteLine("node: " + node.Summary());
+    node.Tag = "renamed";
+    Console.WriteLine("renamed: " + node.Summary());
+
+    // --- this(...) delegation, and the base built exactly once ---------------
+    Built once = new Built();
+    Console.WriteLine("delegated: sides " + Text.FromInteger(once.Sides())
+        + ", steps " + Text.FromInteger(once.Steps)
+        + ", name " + once.Name());
 
     // --- an array of the base, holding three different classes --------------
     Shape[] every = new Shape[3];

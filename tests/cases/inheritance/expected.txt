@@ -12,6 +12,9 @@ dot sides: 1
 point sides: 1, name dot
 pixel sides: 1, shade 9, name pixel
 counter 21, doubling 42
+node: twig=1
+renamed: renamed=1
+delegated: sides 2, steps 105, name built
 total area: 46
 dropping a Leaf:
   made one
