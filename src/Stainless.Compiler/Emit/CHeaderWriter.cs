@@ -70,6 +70,18 @@ public static class CHeaderWriter
         sb.AppendLine("#endif");
         sb.AppendLine();
 
+        // [Align(N)] has no portable spelling, and the two that exist go in the
+        // same place: after the `struct` keyword, where both compilers take it.
+        if (named.Any(t => t is StructTypeSymbol { RequestedAlignment: not null }))
+        {
+            sb.AppendLine("#if defined(_MSC_VER)");
+            sb.AppendLine("#define SL_ALIGN(n) __declspec(align(n))");
+            sb.AppendLine("#else");
+            sb.AppendLine("#define SL_ALIGN(n) __attribute__((aligned(n)))");
+            sb.AppendLine("#endif");
+            sb.AppendLine();
+        }
+
         foreach (var type in named)
         {
             switch (type)
@@ -99,11 +111,24 @@ public static class CHeaderWriter
                     break;
 
                 case StructTypeSymbol structType:
-                    sb.AppendLine($"typedef struct {CName(structType)} {{");
+                {
+                    // `#pragma pack` rather than an attribute: it is the one
+                    // spelling MSVC, gcc and clang all take, and it says the
+                    // same thing to each of them.
+                    if (structType.IsPacked) sb.AppendLine("#pragma pack(push, 1)");
+
+                    string aligned = structType.RequestedAlignment is { } bytes
+                        ? $"SL_ALIGN({bytes}) "
+                        : "";
+
+                    sb.AppendLine($"typedef struct {aligned}{CName(structType)} {{");
                     foreach (var field in structType.Fields)
                         sb.AppendLine($"    {Declarator(field.Type, field.Name)};");
                     sb.AppendLine($"}} {CName(structType)};");
+
+                    if (structType.IsPacked) sb.AppendLine("#pragma pack(pop)");
                     break;
+                }
 
                 // A C enum has an implementation-defined width, so the constants
                 // and the type are declared separately: the constants as an

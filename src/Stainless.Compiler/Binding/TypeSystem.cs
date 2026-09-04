@@ -236,6 +236,19 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public List<AppliedAttribute> Attributes { get; } = [];
 
     /// <summary>
+    /// True when the type was marked <c>[Packed]</c>: laid out with no padding
+    /// between fields and none at the end, and aligned to one byte unless
+    /// <c>[Align]</c> says otherwise.
+    /// </summary>
+    public bool IsPacked { get; set; }
+
+    /// <summary>
+    /// The alignment <c>[Align(N)]</c> asked for, or null. It raises the
+    /// natural one and never lowers it, so the two are combined with a max.
+    /// </summary>
+    public int? RequestedAlignment { get; set; }
+
+    /// <summary>
     /// True when the type was marked [Reflect] and so carries field metadata in
     /// the binary. Nothing else does, which is why reflection costs nothing
     /// unless it is asked for.

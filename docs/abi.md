@@ -11,6 +11,24 @@ same rules (on Win64: by hidden pointer, since it exceeds 8 bytes).
 This is a hard guarantee, not a best effort. It is also why `struct` is not
 reference counted: adding a header would break it.
 
+### 1.1 `[Packed]` and `[Align]`
+
+`[Packed]` lays a struct out with no padding between fields and none at the end,
+and gives it an alignment of one. `[Align(N)]` raises the alignment to N, which
+must be a power of two and at most 16 — `max_align_t`, and so what `malloc`
+guarantees for anything the type ends up inside. The two combine.
+
+In the IR a packed struct is spelled `<{ }>`, which is how LLVM is told to put
+the fields where the C rules with no padding put them; without it LLVM would
+insert its own and every offset after the first would disagree with the one the
+binder computed. Alignment is not part of an LLVM struct type at all, so it is
+stated at each `alloca` and each global instead.
+
+A generated C header writes `#pragma pack(push, 1)` around a packed struct and
+`__declspec(align(n))` or `__attribute__((aligned(n)))` — behind an `SL_ALIGN`
+macro — for an aligned one. Both spellings go after the `struct` keyword, which
+is the one position MSVC, gcc and clang all accept.
+
 ## 2. Object header (class instances)
 
 Reference types are heap blocks laid out as:
@@ -111,7 +129,7 @@ size is the widest case's, rounded up to that alignment, so `Circle(double)` and
 
 Every case's fields are read from the one payload address, each through a struct
 of that case's own fields. That is what overlapping means here, and it is why
-nothing may read a payload without the tag having been checked (§2.5 of the
+nothing may read a payload without the tag having been checked (§2.6 of the
 language spec): the bytes are real for exactly one case at a time.
 
 **The tag is one byte, so a variant is capped at 255 cases** (SL0432). A variant

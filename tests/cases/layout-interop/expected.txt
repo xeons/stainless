@@ -1,0 +1,6 @@
+sizes=12 6 16 8
+aligns=4 1 16 4
+plain=0 4 8
+wire=0 1 5
+read=123456 9 2.5
+agree=yes

@@ -56,6 +56,13 @@ public sealed class LlvmEmitter(
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
     private readonly Dictionary<string, string> _byteConstants = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// What each named struct type must be aligned to. LLVM struct types carry
+    /// no alignment of their own, so an alloca or a global has to say it, and
+    /// those know only the type's name.
+    /// </summary>
+    private readonly Dictionary<string, int> _structAlignment = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _stringObjects = new(StringComparer.Ordinal);
     private readonly Dictionary<LocalSymbol, string> _slots = [];
     private readonly Dictionary<ParameterSymbol, string> _parameterSlots = [];
@@ -170,7 +177,20 @@ public sealed class LlvmEmitter(
         foreach (var structType in structs)
         {
             string fields = string.Join(", ", structType.Fields.Select(f => LlvmTypeOf(f.Type)));
-            _module.AppendLine($"{StructName(structType)} = type {{ {(fields.Length == 0 ? "i8" : fields)} }}");
+            if (fields.Length == 0) fields = "i8";
+
+            // A packed struct is spelled `<{ }>`, which is how LLVM is told to
+            // put the fields where the C rules with no padding put them. Without
+            // it LLVM would insert its own and every offset after the first
+            // would disagree with the one the binder computed.
+            _module.AppendLine(structType.IsPacked
+                ? $"{StructName(structType)} = type <{{ {fields} }}>"
+                : $"{StructName(structType)} = type {{ {fields} }}");
+
+            // Alignment is not part of an LLVM struct type; it is stated at each
+            // alloca and each global. So it is remembered here, by name, for the
+            // places that have only the name to go on.
+            if (structType.Alignment > 1) _structAlignment[StructName(structType)] = structType.Alignment;
         }
 
         // The header every reference type is prefixed with: strong, weak, TypeInfo*.
@@ -718,11 +738,13 @@ public sealed class LlvmEmitter(
         return name;
     }
 
-    private static int AlignOf(string llvmType) => llvmType switch
+    private int AlignOf(string llvmType) => llvmType switch
     {
         "i1" or "i8" => 1,
         "i16" => 2,
         "i32" or "float" => 4,
+        _ when llvmType.StartsWith('%') =>
+            _structAlignment.TryGetValue(llvmType, out int declared) ? declared : 1,
         _ => 8,
     };
 

@@ -240,7 +240,61 @@ struct holding only primitives and `String`s crosses freely, and one holding a
 `List<T>` does not, because that is what holding a `List<T>` means either way
 (§9.5). A struct of plain data is unaffected by both rules and pays for neither.
 
-### 2.3 `class` — reference type, ARC managed
+### 2.3 `[Packed]` and `[Align]`
+
+A struct is laid out by the platform C rules, and two markers change them. Both
+are rules about layout rather than library features, so neither needs an import,
+exactly as `[Flags]` does not.
+
+```csharp
+public struct Plain {          // 12 bytes: 1, three of padding, 4, 1, three more
+    public byte Tag;
+    public int Value;
+    public byte Trailer;
+}
+
+[Packed]
+public struct Wire {           // 6 bytes: no padding anywhere
+    public byte Tag;
+    public int Value;
+    public byte Trailer;
+}
+
+[Align(16)]
+public struct Wide {           // 16 bytes, and always on a 16-byte boundary
+    public double X;
+    public double Y;
+}
+```
+
+**`[Packed]`** puts each field where the one before it ended and leaves no
+padding at the end either, and the type then asks nothing of its own address.
+It is what an on-disk header or a wire format looks like.
+
+**`[Align(N)]`** raises the alignment and never lowers it, the way C's `alignas`
+does. N must be a power of two.
+
+The two combine: `[Packed] [Align(4)]` means nothing padded inside, and the
+whole of it on a four-byte boundary.
+
+**N is capped at 16.** That is `max_align_t` — what `malloc` guarantees — and a
+class holding a more-aligned field would be handed memory that does not honour
+it. A local could be aligned further and a heap object could too, once the
+runtime allocates by a type's alignment as well as by its size; until then a
+stated limit is better than a rule that holds in some places and not others
+(SL0466).
+
+Both apply to a `struct` and to nothing else. A class's fields sit behind an
+object header the compiler owns, and a variant's payload area is not a field the
+source arranged, so neither is a layout the programmer is choosing (SL0463,
+SL0464).
+
+A generated C header states both — `#pragma pack(push, 1)` around a packed
+struct, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
+macro for an aligned one — and a test compares every size, alignment and field
+offset against what the target's C compiler makes of it.
+
+### 2.4 `class` — reference type, ARC managed
 
 ```csharp
 public class Buffer {
@@ -266,7 +320,7 @@ A class value is a pointer to a heap object preceded by an object header
 `new Buffer(64)` allocates, runs the constructor, and yields a reference with
 a count of 1.
 
-### 2.4 Pointers and nullability
+### 2.5 Pointers and nullability
 
 | Syntax | Meaning |
 |---|---|
@@ -296,9 +350,9 @@ class Parent {
 ```
 
 A lambda that captures `this` holds its object strongly, so an object that
-stores its own closure is such a cycle; see §2.12.
+stores its own closure is such a cycle; see §2.13.
 
-### 2.5 `variant` — a value that is one of several things
+### 2.6 `variant` — a value that is one of several things
 
 A `variant` is the choice between its cases. Each case has a name and the fields
 it carries, and a value is exactly one of them and says which.
@@ -358,7 +412,7 @@ negation, `&&`, `||`, a ternary, an early return — and it is taken away again 
 anything that could have changed the value. A variant with exactly two cases
 narrows on a false test as well as a true one, which is why `if (!r.Ok)` proves
 `Fail`. Only a variant held in a local or a parameter can carry a proof (SL0285),
-for the reason given in §2.6.
+for the reason given in §2.7.
 
 **Switching over one** covers the cases rather than constant values, and needs
 no `default` once they are all there:
@@ -409,7 +463,7 @@ variant's cases are what a consumer would switch on), and carry `[Reflect]`
 (SL0442 — the field tables would describe the tag and the payload, which are not
 fields the program has).
 
-### 2.6 `Result<T, E>` — how a function fails
+### 2.7 `Result<T, E>` — how a function fails
 
 Stainless does not unwind. There is no `throw`, no stack unwinding and no
 `catch`, and there will not be: unwinding needs metadata on every frame and a
@@ -426,7 +480,7 @@ Result<Config, IOError> Load(String path) {
 }
 ```
 
-**`Result<T, E>` is an ordinary variant** (§2.5), declared in `Standard`, which
+**`Result<T, E>` is an ordinary variant** (§2.6), declared in `Standard`, which
 is imported everywhere:
 
 ```csharp
@@ -461,7 +515,7 @@ var loose = Ok(4);                              // error[SL0287]: nothing to inf
 ```
 
 For the same reason a module-level function may not be named `Ok` or `Fail`
-(SL0414) — the general rule for any variant's case, §2.5. A *method* still may.
+(SL0414) — the general rule for any variant's case, §2.6. A *method* still may.
 
 **`Value` and `Error` are readable only where it is known which one is there.**
 This is the general rule for a variant's payload, and it is what makes a Result
@@ -519,7 +573,7 @@ mistake in the program rather than an outcome of it, and those still abort
 through the runtime: threading a Result through every array index would make
 every program worse to read in exchange for nothing.
 
-### 2.7 `interface` — a contract, dispatched dynamically
+### 2.8 `interface` — a contract, dispatched dynamically
 
 ```csharp
 public interface IShape {
@@ -582,7 +636,7 @@ through either reference reaches the right one, and a call on `Both` itself
 picks by argument type. What may *not* be overloaded is a method of one
 interface, since that is one slot.
 
-### 2.8 `T[]` — a counted array
+### 2.9 `T[]` — a counted array
 
 ```csharp
 var numbers = new int[5];
@@ -603,7 +657,7 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
-### 2.9 `T[:]` — part of an array
+### 2.10 `T[:]` — part of an array
 
 A slice names part of an array, as a value.
 
@@ -660,7 +714,7 @@ Sort(numbers);                // the whole of it
 Sort(numbers[2:5]);           // three of them, in place, nothing copied
 ```
 
-### 2.10 `enum` — a distinct type over an integer
+### 2.11 `enum` — a distinct type over an integer
 
 ```csharp
 public enum Color { Red, Green, Blue }
@@ -730,7 +784,7 @@ no methods, so this is the language spelling the test rather than a call.
 into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
 belong to.
 
-### 2.11 `delegate` — a named function pointer
+### 2.12 `delegate` — a named function pointer
 
 ```csharp
 public delegate int Transform(int value);
@@ -773,10 +827,10 @@ if (none == null) { ... }
 
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
-§2.12 — and only a non-capturing one can be a delegate, because there is nowhere
+§2.13 — and only a non-capturing one can be a delegate, because there is nowhere
 in a single pointer to keep what was captured.
 
-### 2.12 Lambdas and closures
+### 2.13 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
 assigned to: an **interface with exactly one method**, or a **delegate**.
@@ -841,7 +895,7 @@ captures the object, because the call needs one.
 
 **Capturing `this` keeps the object alive**, which makes an object that stores
 its own closure a reference cycle. ARC cannot collect one, so break it with a
-`weak` reference (§2.4) exactly as you would any other.
+`weak` reference (§2.5) exactly as you would any other.
 
 Parameter types may be written or left out; left out, they come from the target,
 which is the only thing that knows them. A lambda with no target is an error —
@@ -1421,7 +1475,7 @@ Stainless has no static classes, so what C# spells `File.ReadAllText` is a
 module-qualified call to a module-level function. That is the mapping
 throughout: a module is the static class.
 
-**How failure is reported.** Stainless does not unwind (§2.6), so the outcome
+**How failure is reported.** Stainless does not unwind (§2.7), so the outcome
 comes back as a value, in one of three shapes:
 
 | Shape | Used by | Reads as |
@@ -1640,7 +1694,7 @@ overloaded, because dispatch gives each one a single slot
 ```
 
 A *class* implementing two interfaces whose methods share a name is a different
-matter, and it works — see §2.7.
+matter, and it works — see §2.8.
 
 ### 7.2 `ref` and `in` parameters
 
@@ -2082,7 +2136,7 @@ one LLVM `switch` instruction, which decides for itself whether a jump table
 beats a chain of comparisons. A `String` switch compares in order against the
 runtime's string equality.
 
-**A switch over a variant names cases rather than values** (§2.5). It is the one
+**A switch over a variant names cases rather than values** (§2.6). It is the one
 kind that may be exhaustive, and then needs no `default`; it is also the one
 where a label may bind what the case carries.
 

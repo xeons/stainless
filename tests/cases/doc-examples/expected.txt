@@ -21,6 +21,7 @@ overloads=int text double both
 intrinsic=-1 -1
 sections=312
 pixels=225
+layout=6:16
 where=a platform
 slices=3:3:1 100 3 4 5 6 
 byref=2:25:3:0.75

@@ -1314,6 +1314,8 @@ public sealed class Binder(
                         $"'[Reflect]' applies to a class or a struct; '{type.Name}' is neither");
             }
 
+            ReadLayoutAttributes(type, entry.Declaration.Span);
+
             foreach (var member in entry.Declaration.Members.OfType<FieldDeclSyntax>())
             {
                 if (member.Attributes.Count == 0) continue;
@@ -1480,6 +1482,65 @@ public sealed class Binder(
         (parameter.Mode == ParameterMode.Ref ? "ref " :
          parameter.Mode == ParameterMode.In ? "in " : "") + parameter.Type.Name;
 
+    /// <summary>
+    /// Reads <c>[Packed]</c> and <c>[Align(N)]</c> onto a type, before pass 7
+    /// lays it out.
+    ///
+    /// The cap is what the allocator can promise. <c>malloc</c> guarantees
+    /// <c>max_align_t</c>, which is 16 on every target here, and a class holding
+    /// an over-aligned field would be handed memory that does not honour it. A
+    /// local could be aligned further, and a heap object could too once the
+    /// runtime allocates by a type's alignment rather than by its size -- but
+    /// half a rule is worse than a stated limit.
+    /// </summary>
+    private void ReadLayoutAttributes(NamedTypeSymbol type, SourceSpan span)
+    {
+        const int MaxAlignment = 16;
+
+        if (type.Attributes.Any(a => a.Type == _builtins.Packed))
+        {
+            if (type is StructTypeSymbol and not VariantTypeSymbol) type.IsPacked = true;
+            else
+                diagnostics.Error("SL0463", span,
+                    $"'[Packed]' lays out a struct with no padding, and '{type.Name}' is " +
+                    (type is VariantTypeSymbol
+                        ? "a variant, whose payload area is not a field the source arranged"
+                        : "not a struct"));
+        }
+
+        if (type.Attributes.FirstOrDefault(a => a.Type == _builtins.Align) is not { } align) return;
+
+        if (type is not StructTypeSymbol || type is VariantTypeSymbol)
+        {
+            diagnostics.Error("SL0464", span,
+                $"'[Align]' applies to a struct; '{type.Name}' is not one");
+            return;
+        }
+
+        int requested = align.Values.Count > 0 && align.Values[0] is { } value
+            ? Convert.ToInt32(value, System.Globalization.CultureInfo.InvariantCulture)
+            : 0;
+
+        if (requested <= 0 || (requested & (requested - 1)) != 0)
+        {
+            diagnostics.Error("SL0465", span,
+                $"'[Align({requested})]' is not an alignment; it must be a power of two");
+            return;
+        }
+
+        if (requested > MaxAlignment)
+        {
+            diagnostics.Error("SL0466", span,
+                $"'[Align({requested})]' is more than the {MaxAlignment} bytes the allocator " +
+                "guarantees, so an object holding one of these would not honour it. " +
+                $"{MaxAlignment} is the most that can be promised until the runtime allocates " +
+                "by alignment as well as by size");
+            return;
+        }
+
+        type.RequestedAlignment = requested;
+    }
+
     // ============================================================ pass 6
 
     private void ComputeLayouts()
@@ -1516,12 +1577,20 @@ public sealed class Binder(
             if (field.Type is StructTypeSymbol nested)
                 ComputeLayout(nested, inProgress);
 
-            int fieldAlignment = Math.Max(1, field.Type.Alignment);
+            // Packed means no padding anywhere: a field lands where the one
+            // before it ended, and the type asks nothing of its own address.
+            int fieldAlignment = type.IsPacked ? 1 : Math.Max(1, field.Type.Alignment);
             offset = TypeExtensions.AlignTo(offset, fieldAlignment);
             field.Offset = offset;
             offset += field.Type.Size;
             alignment = Math.Max(alignment, fieldAlignment);
         }
+
+        // [Align(N)] raises and never lowers, as alignas does -- including over
+        // [Packed], so the two together mean "no padding inside, but put the
+        // whole of it on an N-byte boundary".
+        if (type.RequestedAlignment is { } requested)
+            alignment = Math.Max(alignment, requested);
 
         // A struct with no fields still takes a byte, because the emitter gives
         // it one: LLVM has no zero-sized named struct, so a fieldless struct is

@@ -342,6 +342,19 @@ String Where() { return "a platform"; }
 #error this platform is not one of the ones this file knows
 #endif
 
+
+// --- README "Layout control" / spec 2.3 -----------------------------------
+[Packed]
+public struct Wire { public byte Tag; public int Value; public byte Trailer; }
+
+[Align(16)]
+public struct Wide { public double X; public double Y; }
+
+String Layouts() {
+    return Text.FromInteger((int)sizeof(Wire)) + ":" +
+           Text.FromInteger((int)sizeof(Wide));
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -414,6 +427,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("layout=%s\n", Layouts().ToPointer());
     printf("where=%s\n", Where().ToPointer());
     printf("slices=%s\n", Slicing().ToPointer());
     printf("byref=%s\n", ByReference().ToPointer());

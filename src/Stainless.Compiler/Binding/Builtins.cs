@@ -51,6 +51,19 @@ public sealed class Builtins
     /// </summary>
     public AttributeTypeSymbol Flags { get; }
 
+    /// <summary>
+    /// <c>[Packed]</c>: lay this type out with no padding at all, and give it an
+    /// alignment of one. It is a rule about layout rather than a library
+    /// feature, so it needs no import, exactly as <c>[Flags]</c> does not.
+    /// </summary>
+    public AttributeTypeSymbol Packed { get; }
+
+    /// <summary>
+    /// <c>[Align(N)]</c>: give this type an alignment of at least N. It raises
+    /// and never lowers, the way C's <c>alignas</c> does.
+    /// </summary>
+    public AttributeTypeSymbol Align { get; }
+
     public ClassTypeSymbol String { get; }
     public ClassTypeSymbol Utf16String { get; }
     public ClassTypeSymbol StringBuilder { get; }
@@ -95,6 +108,28 @@ public sealed class Builtins
         };
         Flags.SetLayout(0, 1);
         Standard.Types[Flags.SimpleName] = Flags;
+
+        Packed = new AttributeTypeSymbol
+        {
+            SimpleName = "Packed",
+            ModuleName = StandardModuleName,
+            IsPublic = true,
+        };
+        Packed.SetLayout(0, 1);
+        Standard.Types[Packed.SimpleName] = Packed;
+
+        Align = new AttributeTypeSymbol
+        {
+            SimpleName = "Align",
+            ModuleName = StandardModuleName,
+            IsPublic = true,
+        };
+        Align.Fields.Add(new FieldSymbol("Bytes", PrimitiveTypeSymbol.Int, Align, 0)
+        {
+            IsPublic = true,
+        });
+        Align.SetLayout(4, 4);
+        Standard.Types[Align.SimpleName] = Align;
 
         String = new ClassTypeSymbol
         {

@@ -174,6 +174,33 @@ array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
 
+### Layout control
+
+A struct is laid out by the platform C rules; two markers change them.
+
+```csharp
+[Packed]
+public struct Wire {          // 6 bytes, not 12: no padding anywhere
+    public byte Tag;
+    public int Value;
+    public byte Trailer;
+}
+
+[Align(16)]
+public struct Wide {          // always on a 16-byte boundary
+    public double X;
+    public double Y;
+}
+```
+
+`[Packed]` is what an on-disk header or a wire format looks like; `[Align(N)]`
+raises the alignment and never lowers it, as C's `alignas` does. They combine.
+N is capped at 16, which is what `malloc` guarantees for anything the type ends
+up inside.
+
+A generated C header states both, and a test compares every size, alignment and
+field offset against what the target's C compiler makes of that header.
+
 ### Conditional compilation
 
 Directives, as in C#: no macros, no textual substitution, no `#include`.
@@ -528,7 +555,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 131 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 133 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -716,6 +743,12 @@ Everything below is covered by [the test suite](tests/cases).
 - Modules like C# namespaces: several files may share one, imports are per file,
   `public` exports and an unmarked declaration is module-wide
 - Aliases, qualified names without an import, full order independence
+- `[Packed]` and `[Align(N)]`: no padding at all, and a raised alignment. Both
+  are rules about layout rather than library features, so neither needs an
+  import; they combine, N is a power of two capped at 16, and both apply to a
+  `struct` and nothing else. The generated C header states them with
+  `#pragma pack` and an `SL_ALIGN` macro, and the sizes, alignments and offsets
+  are checked against the target's own C compiler
 - `struct` with fields and methods; exact C layout; value copy semantics. A
   struct may hold a reference, and copying one then retains what it holds — the
   cost is that it is no longer a value C can be handed, which the compiler
@@ -913,6 +946,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   `switch`, and only for one held in a local or a parameter. It does not yet do
   the same for `C?`, so an optional still cannot be unwrapped by testing it.
   The two want the same machinery and the second is the obvious next step.
+- **`[Align(N)]` stops at 16.** `malloc` guarantees `max_align_t` and nothing
+  more, so a class holding a more-aligned field would be handed memory that did
+  not honour it. Lifting the cap means allocating by a type's alignment as well
+  as by its size, which the runtime does not do yet. There is also no alignment
+  on a single field, only on a whole type.
 - **A slice is owning, and there is no borrowed one.** It retains the array it
   came from, which is what makes it impossible to dangle and also what makes it
   cost a reference count per copy and keep a large array alive for a small view
