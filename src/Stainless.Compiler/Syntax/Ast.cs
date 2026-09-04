@@ -171,6 +171,14 @@ public sealed record FieldDeclSyntax(
     /// <summary><c>int flags : 3;</c> — how many bits, or null for a whole field.</summary>
     public ExpressionSyntax? BitWidth { get; init; }
 
+    /// <summary>
+    /// True for the field a nameless <c>struct { }</c> or <c>union { }</c>
+    /// member becomes. The field is real and holds the layout; the name is
+    /// generated and unwritable, and lookup reaches through it so that the
+    /// members inside read as if they were the parent's own.
+    /// </summary>
+    public bool IsAnonymous { get; init; }
+
     public FieldDeclSyntax(
         SourceSpan span, Modifiers modifiers, TypeSyntax type, string name,
         ExpressionSyntax? initializer)

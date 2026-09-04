@@ -56,6 +56,10 @@ public MemoryStatus Memory() {
 }
 
 /// `x64`, `arm64`, `x86`, `arm`, or the number for anything else.
+///
+/// `Info().Architecture` is where the number comes from: `SYSTEM_INFO`'s first
+/// word is a nameless union in the header and here, so the field reads directly
+/// off the struct rather than through a name Windows never gave it.
 public String ArchitectureName(ushort code) {
     if (code == ProcessorArchitectureX64)   { return "x64"; }
     if (code == ProcessorArchitectureArm64) { return "arm64"; }

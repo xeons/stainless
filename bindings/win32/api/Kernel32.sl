@@ -288,21 +288,18 @@ public extern "C" {
 
 // =================================================================== system
 
-/// `SYSTEM_INFO`'s leading union is a historical accident the header still
+/// `SYSTEM_INFO`. Its leading union is a historical accident the header still
 /// carries: the whole word was `dwOemId` on Windows NT, and is now an
-/// architecture and a reserved half.
-public struct ProcessorId {
-    public ushort Architecture;
-    public ushort Reserved;
-}
-
-public union OemId {
-    public uint        Whole;
-    public ProcessorId Split;
-}
-
+/// architecture and a reserved half. Both are nameless in the header, so both
+/// are nameless here — `info.Architecture` reads the way C reads it.
 public struct SystemInfo {
-    public OemId  Processor;
+    public union {
+        public uint OemId;
+        public struct {
+            public ushort Architecture;
+            public ushort Reserved;
+        }
+    }
     public uint   PageSize;
     public void*  MinimumApplicationAddress;
     public void*  MaximumApplicationAddress;

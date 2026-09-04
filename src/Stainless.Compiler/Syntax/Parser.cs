@@ -171,7 +171,16 @@ public sealed class Parser
         if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword,
                   TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword,
                   TokenKind.VariantKeyword, TokenKind.UnionKeyword))
-            return [ParseTypeDeclaration(start, modifiers, attributes)];
+        {
+            var hoisted = new List<Declaration>();
+            var declared = ParseTypeDeclaration(start, modifiers, attributes, hoisted);
+
+            // The type first, then the anonymous members lifted out of it.
+            // Order does not matter to the binder, and this reads better in a
+            // dump of the tree.
+            hoisted.Insert(0, declared);
+            return hoisted;
+        }
 
         if (At(TokenKind.EnumKeyword))
             return [ParseEnumDeclaration(start, modifiers, attributes)];
@@ -298,8 +307,18 @@ public sealed class Parser
         return [ParseFunctionOrField(start, singleModifiers, linkage)];
     }
 
-    private Declaration ParseTypeDeclaration(
-        int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes)
+    /// <summary>
+    /// A type declaration.
+    ///
+    /// A nameless <c>struct { }</c> or <c>union { }</c> member has no name to be
+    /// declared under, so one is generated and the type is lifted into
+    /// <paramref name="hoisted"/> to be declared beside its parent. The parent
+    /// keeps an ordinary field of it, marked anonymous, which is what carries
+    /// the layout; only name lookup knows the difference.
+    /// </summary>
+    private TypeDeclSyntax ParseTypeDeclaration(
+        int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes,
+        List<Declaration> hoisted, string? generatedName = null)
     {
         var kind = Current.Kind switch
         {
@@ -311,8 +330,10 @@ public sealed class Parser
             _ => TypeDeclKind.Struct,
         };
         Advance();
-        string name = ExpectIdentifier();
-        var typeParameters = ParseTypeParameterList();
+
+        // A nameless member has no identifier to read; its name was made for it.
+        string name = generatedName ?? ExpectIdentifier();
+        var typeParameters = generatedName is null ? ParseTypeParameterList() : [];
 
         // `class Circle : Shape, Comparable<Circle>` -- a list of interfaces,
         // which may themselves be generic, so these are full types not bare names.
@@ -329,9 +350,22 @@ public sealed class Parser
         var members = new List<Declaration>();
         var cases = new List<VariantCaseSyntax>();
 
+        int anonymous = 0;
+
         while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
         {
             int before = _pos;
+
+            // `struct {` or `union {` with nothing between the keyword and the
+            // brace is a member without a name, as in C. An access modifier may
+            // come first, which C has no place for and Stainless does.
+            if (AtAnonymousMember())
+            {
+                var memberModifiers = ParseModifiers();
+                members.Add(
+                    ParseAnonymousMember(name, anonymous++, memberModifiers, hoisted));
+                continue;
+            }
 
             // Inside a variant, `Name(...)` and `Name;` are cases. Nothing else
             // in a member position has that shape: a method writes its return
@@ -361,6 +395,50 @@ public sealed class Parser
         return new TypeDeclSyntax(
             SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
             implements, members, attributes) { Cases = cases };
+    }
+
+    /// <summary>
+    /// A nameless <c>struct { }</c> or <c>union { }</c> member.
+    ///
+    /// The generated names carry a <c>$</c>, which no source identifier may, so
+    /// neither the type nor the field can be written or collided with.
+    /// </summary>
+    /// <summary>
+    /// True when the next member is a nameless <c>struct { }</c> or
+    /// <c>union { }</c>, looking past any access modifier in front of it.
+    /// </summary>
+    private bool AtAnonymousMember()
+    {
+        int at = 0;
+        while (Peek(at).Kind is TokenKind.PublicKeyword or TokenKind.PrivateKeyword) at++;
+
+        return Peek(at).Kind is TokenKind.StructKeyword or TokenKind.UnionKeyword &&
+               Peek(at + 1).Kind == TokenKind.OpenBrace;
+    }
+
+    private FieldDeclSyntax ParseAnonymousMember(
+        string owner, int index, Modifiers modifiers, List<Declaration> hoisted)
+    {
+        int start = _pos;
+
+        // ParseTypeDeclaration reads the kind from the keyword it is sitting on,
+        // so `struct` and `union` both arrive here and neither needs saying twice.
+        string typeName = $"{owner}$anon{index}";
+        var declaration =
+            ParseTypeDeclaration(start, Modifiers.Public, [], hoisted, typeName);
+
+        hoisted.Add(declaration);
+
+        // C ends the member with a semicolon; ParseTypeDeclaration does not
+        // consume one, so an optional one is taken here.
+        Match(TokenKind.Semicolon);
+
+        var span = SpanFrom(start);
+        var type = new NamedTypeSyntax(span, new QualifiedName(span, [typeName]), []);
+        return new FieldDeclSyntax(span, modifiers, type, $"${index}", null, [])
+        {
+            IsAnonymous = true,
+        };
     }
 
     /// <summary><c>Circle(double radius);</c> or <c>Empty;</c>.</summary>

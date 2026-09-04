@@ -252,6 +252,21 @@ An inline array crosses `extern "C"` only behind a `ref` or `in`, which is
 array parameter to a pointer and Stainless has no decay: the two would disagree
 about the ABI silently.
 
+### 2.4.2 Nameless members
+
+A nameless `struct` or `union` member is laid out as an ordinary member of its
+kind -- a nameless union overlaps, a nameless struct runs in order -- so the
+offsets are the ones C computes and nothing about the ABI is special. What is
+generated is a type to hold it and a field to be it, both named with a `$` no
+source identifier may contain, so neither can be written nor collided with.
+
+Name lookup then reaches through such a field, breadth-first, and builds one
+field access per level. Nothing survives to run time: `info.Architecture` is the
+same constant-offset load it would be if the field had been declared directly.
+
+A generated C header writes the member back as a nameless one, and gives the
+generated type no typedef of its own.
+
 ### 2.5 Slice layout
 
 A `T[:]` is three words, and a struct like any other:

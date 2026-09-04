@@ -92,7 +92,7 @@ int Main() {
     var system = Machine.NativeInfo();
     Row("name", Environment.ComputerName());
     Row("processors", Text.FromInteger((long)system.ProcessorCount));
-    Row("architecture", Machine.ArchitectureName(system.Processor.Split.Architecture));
+    Row("architecture", Machine.ArchitectureName(system.Architecture));
     Row("page size", Text.FromInteger((long)system.PageSize) + " bytes");
 
     var memory = Machine.Memory();

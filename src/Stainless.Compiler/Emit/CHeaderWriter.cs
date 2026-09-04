@@ -84,6 +84,10 @@ public static class CHeaderWriter
 
         foreach (var type in named)
         {
+            // The type a nameless member became is written inside its parent,
+            // where the source wrote it, so it gets no typedef of its own.
+            if (AnonymousMembers.IsGenerated(type)) continue;
+
             switch (type)
             {
                 // A variant is a tag and enough bytes for the widest case. Its
@@ -121,8 +125,7 @@ public static class CHeaderWriter
                         : "";
 
                     sb.AppendLine($"typedef union {unionAlign}{CName(union)} {{");
-                    foreach (var member in union.Fields)
-                        sb.AppendLine($"    {Declarator(member.Type, member.Name)};");
+                    WriteFields(sb, union, "    ");
                     sb.AppendLine($"}} {CName(union)};");
 
                     if (union.IsPacked) sb.AppendLine("#pragma pack(pop)");
@@ -141,9 +144,7 @@ public static class CHeaderWriter
                         : "";
 
                     sb.AppendLine($"typedef struct {aligned}{CName(structType)} {{");
-                    foreach (var field in structType.Fields)
-                        sb.AppendLine($"    {Declarator(field.Type, field.Name)}" +
-                                      (field.BitWidth is { } bits ? $" : {bits}" : "") + ";");
+                    WriteFields(sb, structType, "    ");
                     sb.AppendLine($"}} {CName(structType)};");
 
                     if (structType.IsPacked) sb.AppendLine("#pragma pack(pop)");
@@ -256,6 +257,31 @@ public static class CHeaderWriter
     private static string CName(NamedTypeSymbol type) => Mangler.SymbolSafe(type.QualifiedName);
 
     /// <summary>A C declaration of <paramref name="name"/> with the given type.</summary>
+    /// <summary>
+    /// The members of a struct or union, one per line.
+    ///
+    /// A field that came from a nameless <c>struct { }</c> or <c>union { }</c>
+    /// is written back as one, nested where it was written: C11 has anonymous
+    /// members, so the header can say exactly what the source said rather than
+    /// naming something the source did not.
+    /// </summary>
+    private static void WriteFields(StringBuilder sb, NamedTypeSymbol type, string indent)
+    {
+        foreach (var field in type.Fields)
+        {
+            if (field.IsAnonymous && field.Type is NamedTypeSymbol inner)
+            {
+                sb.AppendLine($"{indent}{(inner is UnionTypeSymbol ? "union" : "struct")} {{");
+                WriteFields(sb, inner, indent + "    ");
+                sb.AppendLine($"{indent}}};");
+                continue;
+            }
+
+            sb.AppendLine($"{indent}{Declarator(field.Type, field.Name)}" +
+                          (field.BitWidth is { } bits ? $" : {bits}" : "") + ";");
+        }
+    }
+
     /// <summary>
     /// A field or parameter as C declares it.
     ///

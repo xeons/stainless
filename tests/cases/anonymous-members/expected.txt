@@ -1,0 +1,11 @@
+sizeof(SystemInfo) = 16
+offsetof(PageSize) = 4
+sizeof(LargeInteger) = 8
+alignof(LargeInteger) = 8
+sizeof(Layers) = 12
+architecture: 9
+page size: 4096
+the whole word sees it: true
+quad: 4294967301
+rebuilt: true
+depth 1, middle 2, byte 3, int 3

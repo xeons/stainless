@@ -762,6 +762,7 @@ public sealed class Binder(
                     var declared = new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
                     {
                         IsPublic = field.Modifiers.HasFlag(Modifiers.Public),
+                        IsAnonymous = field.IsAnonymous,
                     };
 
                     if (field.BitWidth is not null)
@@ -5710,6 +5711,12 @@ public sealed class Binder(
             return new BoundFieldAccess(syntax.Span, receiver, field);
         }
 
+        // A member of a nameless struct or union reads as the parent's own, so
+        // what is built is the chain of field accesses that reaches it. The
+        // layout already put it where C would; this is only the name.
+        if (ReachThroughAnonymous(syntax.Span, receiver, namedType, syntax.Member) is { } reached)
+            return reached;
+
         if (namedType.FindMethod(syntax.Member) is not null)
         {
             // Methods are only reachable through a call, which BindCall handles.
@@ -5721,6 +5728,60 @@ public sealed class Binder(
         diagnostics.Error("SL0251", syntax.Span,
             $"'{namedType.Name}' has no member named '{syntax.Member}'");
         return new BoundErrorExpression(syntax.Span);
+    }
+
+    /// <summary>
+    /// Finds <paramref name="member"/> inside this type's nameless members, and
+    /// returns the access that reaches it -- one field access per level.
+    ///
+    /// The search is breadth-first so that the shallowest match wins, which is
+    /// the rule C uses and the only one that keeps an outer name from being
+    /// shadowed by a deeper one.
+    /// </summary>
+    private BoundExpression? ReachThroughAnonymous(
+        SourceSpan span, BoundExpression receiver, NamedTypeSymbol type, string member)
+    {
+        var level = new List<(BoundExpression Access, NamedTypeSymbol Type)> { (receiver, type) };
+
+        while (level.Count > 0)
+        {
+            var next = new List<(BoundExpression Access, NamedTypeSymbol Type)>();
+
+            var found = new List<(BoundExpression Access, NamedTypeSymbol Owner)>();
+
+            foreach (var (access, current) in level)
+            {
+                foreach (var anonymous in current.Fields.Where(f => f.IsAnonymous))
+                {
+                    if (anonymous.Type is not NamedTypeSymbol inner) continue;
+
+                    var reached = new BoundFieldAccess(span, access, anonymous);
+                    if (inner.FindField(member) is { } field)
+                        found.Add((new BoundFieldAccess(span, reached, field), inner));
+
+                    next.Add((reached, inner));
+                }
+            }
+
+            // Two nameless members at the same depth both offering the name is
+            // a question with no answer, so it is asked rather than guessed.
+            if (found.Count > 1)
+            {
+                // The generated names are deliberately unwritable, so naming
+                // them here would point at something the reader cannot use.
+                diagnostics.Error("SL0492", span,
+                    $"'{member}' is ambiguous: {Counted(found.Count, "nameless member")} " +
+                    $"of '{type.Name}' declare{(found.Count == 1 ? "s" : "")} it. Give one of " +
+                    "them a name, so that the one you mean can be said");
+                return new BoundErrorExpression(span);
+            }
+
+            if (found.Count == 1) return found[0].Access;
+
+            level = next;
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -102,9 +102,10 @@ int Main() {
     var info = Machine.Info();
     Console.WriteLine("at least one processor: " + Text.FromBool(info.ProcessorCount >= 1u));
     Console.WriteLine("pages are 4K: " + Text.FromBool(info.PageSize == 4096u));
-    Console.WriteLine("the union reads both ways: "
-        + Text.FromBool((info.Processor.Whole & 0xFFFFu)
-                        == (uint)info.Processor.Split.Architecture));
+    // SYSTEM_INFO's first word is a nameless union of a whole DWORD and two
+    // halves, so both names reach the same bytes -- as they do in C.
+    Console.WriteLine("the nameless union reads both ways: "
+        + Text.FromBool((info.OemId & 0xFFFFu) == (uint)info.Architecture));
 
     var memory = Machine.Memory();
     Console.WriteLine("some memory is free: " + Text.FromBool(memory.AvailablePhysical > 0u));

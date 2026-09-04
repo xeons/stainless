@@ -201,6 +201,25 @@ public sealed record AppliedAttribute(
     AttributeTypeSymbol Type,
     IReadOnlyList<object?> Values);
 
+public static class AnonymousMembers
+{
+    /// <summary>
+    /// The infix the parser gives the type a nameless <c>struct { }</c> or
+    /// <c>union { }</c> member becomes. It carries a <c>$</c>, which no source
+    /// identifier may, so nothing a program wrote can be mistaken for one.
+    /// </summary>
+    public const string Infix = "$anon";
+
+    /// <summary>
+    /// True for such a type. It is reachable only through the field it became,
+    /// so nothing that describes a program's surface -- a C header, module
+    /// metadata -- should name it.
+    /// </summary>
+    public static bool IsGenerated(TypeSymbol type) =>
+        type is NamedTypeSymbol named &&
+        named.SimpleName.Contains(Infix, StringComparison.Ordinal);
+}
+
 public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol containingType, int index)
 {
     /// <summary>Attributes written on this field.</summary>
@@ -218,6 +237,14 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     /// name the source can reach, because the property is that name.
     /// </summary>
     public bool IsBackingField { get; init; }
+
+    /// <summary>
+    /// True for the field a nameless <c>struct { }</c> or <c>union { }</c>
+    /// member became. It is laid out like any other field -- that is what makes
+    /// the offsets C's -- but its name is generated, and a member of the type
+    /// inside is reached as though it belonged to the type outside.
+    /// </summary>
+    public bool IsAnonymous { get; init; }
 
     /// <summary>Byte offset from the start of the value (structs) or of the fields area (classes).</summary>
     public int Offset { get; internal set; }

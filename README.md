@@ -570,6 +570,24 @@ word.Signed = -1;
 word.Unsigned          // 4294967295: the same four bytes, read differently
 ```
 
+A member may also have no name, which is how the Windows headers write
+`SYSTEM_INFO` and `LARGE_INTEGER`. Its members are then reached as though they
+belonged to the type outside, so an access path matches the one the header
+documents:
+
+```csharp
+public struct SystemInfo {
+    public union {
+        public uint OemId;
+        public struct { public ushort Architecture; public ushort Reserved; }
+    }
+    public uint PageSize;
+}
+
+info.Architecture       // the low half of the first word
+info.OemId              // the whole of it
+```
+
 Every member is at offset zero, and the size and alignment are the ones C
 computes. **No member may hold a counted reference** — which one is live is
 exactly what a union does not record, so a copy could not know what to retain.
@@ -664,7 +682,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 150 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 152 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
