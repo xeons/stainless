@@ -595,8 +595,11 @@ public sealed class LlvmEmitter(
     /// <summary>Total interfaces in the program; the width of every dispatch table.</summary>
     private int _interfaceCount;
 
-    /// <summary>Byte offsets of the two trailing fields of an SlTypeInfo.</summary>
-    private const int BaseFieldOffset = 64;
+    /// <summary>
+    /// Where the vtable sits in an SlTypeInfo. The `base` pointer is beside it
+    /// at 64 and has no constant here, because nothing emitted reads it: a
+    /// downcast asks `sl_is_instance`, which walks the chain in C.
+    /// </summary>
     private const int VirtualTableOffset = 72;
 
     private static string VirtualTableName(ClassTypeSymbol type) =>

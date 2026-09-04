@@ -203,7 +203,7 @@ through an optional is one question rather than two. A cast that does not hold
 calls `sl_cast_failed`, which names what the object really is and aborts —
 there being no exception for it to throw.
 
-### 2.0.1 Virtual dispatch
+#### 2.0.1 Virtual dispatch
 
 ```
 object ──+16──▶ TypeInfo ──+72──▶ vtable ──[slot]──▶ function

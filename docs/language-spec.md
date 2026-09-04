@@ -833,7 +833,7 @@ a union is a plain C value (SL0302). `[Packed]` and `[Align]` apply to one as
 they do to a struct. A generated C header writes it as a C `union`, member for
 member.
 
-### 2.7.1 Nameless members
+#### 2.7.1 Nameless members
 
 A `struct` or `union` member may have no name, in which case its members are
 reached as though they belonged to the type that holds it. This is C's, and the
@@ -1713,13 +1713,17 @@ to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
 
 **A non-generic function or class is emitted whether or not it is used**, and
 that is a real cost the compiler should not be charging: every stdlib module is
-compiled with your program whether you import it or not, so a hello-world
-binary today carries 228 stdlib functions it never calls — 56 from
-`Standard.Math`, 52 from `Standard.IO`, and so on. Nothing prunes them: there
-is no reachability pass, and the emitted module is one object file, so the
-linker cannot drop them either. Compiling with `-ffunction-sections` and
-`/OPT:REF` recovers about a quarter of the binary, and a reachability pass from
-`Main` would recover the rest. Neither is done.
+compiled with your program whether you import it or not. A hello-world emits
+216 standard-library functions, and 167 of them are unreachable from `Main` —
+56 from `Standard.Math`, 52 across the `Standard.IO` family, 24 from
+`Standard.Reflection`, and so on. Nothing in the compiler prunes them: there is
+no reachability pass.
+
+What saves it is the linker. Every function and datum goes in a section of its
+own and the linker drops the ones nothing reached, which takes a hello-world
+from 276 KB to 124 KB — more than half. The IR is still the full size, so
+compile time still pays for all of it, and a reachability pass from `Main`
+would fix that. It is not done.
 
 | Module | Contents | Imported |
 |---|---|---|

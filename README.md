@@ -718,9 +718,9 @@ than every program that compiles it repeating `-l` on the command line.
 
 ### The Win32 API
 
-[bindings/win32](bindings/win32) is what all of the above adds up to: 259
+[bindings/win32](bindings/win32) is what all of the above adds up to: 261
 Windows entry points, 460 constants, 27 structs, unions, enums and delegates and
-the 12 handle types, with 145 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
+the 12 handle types, with 146 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
 Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
 `delegate`, which is the bare function pointer Windows calls.
 
@@ -774,7 +774,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 153 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 170 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -1196,7 +1196,7 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
-- [bindings/win32](bindings/win32): the Windows API — 259 entry points, 460
+- [bindings/win32](bindings/win32): the Windows API — 261 entry points, 460
   constants, 27 structs, unions, enums and delegates and 12 handle types — as
   declarations
   rather than a marshalling layer, in two layers a module name apart:
@@ -1295,9 +1295,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   are free — an uninstantiated template emits nothing, but a non-generic
   function or class is emitted either way. What saves it is that everything is
   emitted into its own section and the linker discards what nothing reached,
-  which takes hello-world from 290 KB to 124 KB. The IR is still the full size,
-  so compile time still pays for all of it; a reachability pass from `Main`
-  would fix that and is the real answer.
+  which takes hello-world from 276 KB to 124 KB. A hello-world emits 216
+  standard-library functions and 167 of them are unreachable from `Main`. The
+  IR is still the full size, so compile time still pays for all of it; a
+  reachability pass from `Main` would fix that and is the real answer.
 - **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct
   but redundant, and since the counts became atomic each redundant pair costs
   about 5.7ns rather than about 1.2ns. A loop that does nothing but ARC traffic

@@ -9,9 +9,9 @@ which one you are looking at:
 | `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
-The raw layer is 259 entry points, 460 constants and 27 structs, unions, enums
+The raw layer is 261 entry points, 460 constants and 27 structs, unions, enums
 and delegates across six libraries, plus the 12 handle types and the 17 names
-they go by; the twelve convenience modules add 145 functions and 7 types on
+they go by; the twelve convenience modules add 146 functions and 7 types on
 top. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
 `delegate`, which is a bare function pointer Windows calls directly. A binding

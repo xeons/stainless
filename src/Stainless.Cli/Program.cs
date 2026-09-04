@@ -99,9 +99,9 @@ internal static class Program
                                    library boundary has nothing to gain and a file
                                    to carry
               -O<0-3>              optimization level (default: -O2)
-              -g                   describe the program to a debugger
-              -D <name>            define a symbol for '#if' to test
-              -l <name>            link a library the linker finds by name
+              -g, --debug          describe the program to a debugger
+              -D, --define <name>  define a symbol for '#if' to test
+              -l, --library <name> link a library the linker finds by name
               --abi <microsoft|itanium>
                                    which C and C++ ABI to agree with, for name
                                    mangling and bit-field layout (default: the
