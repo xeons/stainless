@@ -19,7 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// shell32.dll. **Link with `-l shell32`.**
+// shell32.dll.
+//
+// Declarations cost nothing, so this module needs no library on its own; a
+// program that *calls* one of them wants `-l shell32`, or `Win32.Shell`, which
+// names it with a pragma.
 //
 // Only the flat entry points are here. Everything shell32 exposes through COM —
 // which is most of what is new, `SHGetKnownFolderPath` included — needs vtable

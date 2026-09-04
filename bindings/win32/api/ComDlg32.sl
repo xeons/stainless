@@ -19,7 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// comdlg32.dll: the common dialogs. **Link with `-l comdlg32`.**
+// comdlg32.dll: the common dialogs.
+//
+// Declarations cost nothing, so this module needs no library on its own; a
+// program that *calls* one of them wants `-l comdlg32`, or `Win32.Dialogs`,
+// which names it with a pragma.
 module Win32.ComDlg32;
 
 #if WINDOWS

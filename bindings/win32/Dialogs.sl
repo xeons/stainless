@@ -21,12 +21,17 @@
 
 // The open and save dialogs.
 //
-// A convenience layer over `Win32.ComDlg32`. **Link with `-l comdlg32`** and
-// `-l user32`, since a dialog needs an owner window even when that owner is
-// null.
+// A convenience layer over `Win32.ComDlg32`. It names comdlg32 and user32
+// itself with a pragma — a dialog needs an owner window even when that owner is
+// null — so a program compiling it needs no `-l`.
 module Win32.Dialogs;
 
 #if WINDOWS
+
+// The library this module needs, so that a program compiling it does not
+// have to repeat the name on its own command line.
+#pragma comment(lib, "comdlg32")
+#pragma comment(lib, "user32")
 
 import Win32;
 import Win32.ComDlg32;

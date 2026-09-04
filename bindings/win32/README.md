@@ -95,19 +95,20 @@ Name the modules you use:
 
 ```
 stainless build gui.sl bindings/win32/api/Kernel32.sl bindings/win32/api/User32.sl \
-    bindings/win32/Win32.sl bindings/win32/Ui.sl -l user32
+    bindings/win32/Win32.sl bindings/win32/Ui.sl
 ```
 
-or take the whole directory and name every library:
+or take the whole directory:
 
 ```
-stainless build app.sl bindings/win32 -l user32 -l gdi32 -l advapi32 \
-    -l shell32 -l comdlg32
+stainless build app.sl bindings/win32
 ```
 
-Compiling a wrapper is what makes its library necessary — an undefined symbol is
-an error before the dead-strip that would have removed it — so the second form
-wants them all whether or not the program calls into them.
+Neither needs a `-l`, because each convenience module names its own library with
+`#pragma comment(lib, "...")`. Compiling a wrapper is still what makes that
+library necessary — an undefined symbol is an error before the dead-strip that
+would have removed it — so the second form links all five whether or not the
+program calls into them. Naming only what you use is how to avoid that.
 
 That is also why none of this is in `stdlib/`, which is compiled into every
 program: a `CreateWindowExW` in there would make every Stainless program on

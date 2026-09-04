@@ -28,6 +28,7 @@ public sealed class Parser
 {
     private readonly List<Token> _tokens;
     private readonly SourceText _source;
+    private readonly Lexer _lexer;
     private DiagnosticBag _diagnostics;
     private int _pos;
 
@@ -36,7 +37,8 @@ public sealed class Parser
     {
         _source = source;
         _diagnostics = diagnostics;
-        _tokens = new Lexer(source, diagnostics, symbols).Tokenize();
+        _lexer = new Lexer(source, diagnostics, symbols);
+        _tokens = _lexer.Tokenize();
     }
 
     // ------------------------------------------------------------ token helpers
@@ -135,7 +137,8 @@ public sealed class Parser
             if (_pos == before) Advance();          // guarantee progress on malformed input
         }
 
-        return new CompilationUnitSyntax(SpanFrom(start), _source, moduleName, imports, declarations);
+        return new CompilationUnitSyntax(
+            SpanFrom(start), _source, moduleName, imports, declarations, _lexer.Libraries);
     }
 
     private QualifiedName ParseQualifiedName()
@@ -1406,6 +1409,28 @@ public sealed class Parser
                 return new SizeofSyntax(SpanFrom(start), type);
             }
 
+            case TokenKind.AlignofKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+                var type = ParseType();
+                Expect(TokenKind.CloseParen);
+                return new AlignofSyntax(SpanFrom(start), type);
+            }
+
+            case TokenKind.OffsetofKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+                var type = ParseType();
+                Expect(TokenKind.Comma);
+
+                var field = Current;
+                Expect(TokenKind.Identifier);
+                Expect(TokenKind.CloseParen);
+                return new OffsetofSyntax(SpanFrom(start), type, field.Text, field.Span);
+            }
+
             case TokenKind.TypeofKeyword:
             {
                 Advance();
@@ -1473,6 +1498,7 @@ public sealed class Parser
             TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
             TokenKind.StringLiteral, TokenKind.CharLiteral, TokenKind.OpenParen,
             TokenKind.ThisKeyword, TokenKind.NewKeyword, TokenKind.SizeofKeyword,
+            TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,
             TokenKind.TypeofKeyword,
             TokenKind.TrueKeyword, TokenKind.FalseKeyword, TokenKind.NullKeyword,
             TokenKind.Bang, TokenKind.Tilde);

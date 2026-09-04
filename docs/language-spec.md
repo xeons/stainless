@@ -2250,6 +2250,20 @@ stainless build gui.sl bindings/win32/api/User32.sl bindings/win32/Ui.sl -l user
 search path, rather than through whichever SDK version happens to be installed.
 The spelling is the one every C toolchain takes, `-l name` or `-lname`.
 
+**A file can name its own library**, which is usually better: the module that
+calls into user32 is the one that knows it needs user32, and saying so there
+stops every program that compiles it from repeating the name.
+
+```csharp
+#pragma comment(lib, "user32")
+```
+
+This is MSVC's spelling, and it is the only pragma Stainless has. Both
+`"user32"` and `"user32.lib"` are accepted — the linker wants the first and a C
+programmer will type the second. A pragma inside a branch `#if` did not take
+means nothing, as a declaration there would. The names are gathered from every
+file and merged with any `-l`, so linking a library twice is not an error.
+
 **A library is needed by the code that is compiled, not by the code that runs.**
 An undefined symbol is an error before the dead-strip that would have removed
 the function referring to it, so compiling a module full of `extern "C"`
@@ -2284,6 +2298,22 @@ foreach (int n in numbers) { ... }
 switch (y) { case 0: return 0; default: break; }
 return y;
 ```
+
+Three operators answer what C's answer, which is how a binding checks itself
+against a header:
+
+```csharp
+sizeof(Msg)                 // 48, as C computes it
+alignof(Msg)                // 8
+offsetof(Msg, LParam)       // 24
+```
+
+`sizeof` and `alignof` take a type; `offsetof` takes a type and one of its
+fields. A bit-field has no byte offset of its own, so `offsetof` refuses one
+(SL0482), as C does. On a **class** the offset counts from the start of the
+allocation rather than from the first field, because a class reference points
+at the object header (§2 of [abi.md](abi.md)) — so the number is what to add to
+the reference you are holding.
 
 Operators, by descending precedence: unary `- ! ~ * &` · `* / %` · `+ -` ·
 `<< >>` · `< <= > >=` · `== !=` · `&` · `^` · `|` · `&&` · `||` ·
@@ -2656,6 +2686,9 @@ stainless build src -D FASTMATH -D TELEMETRY
 There is deliberately no `DEBUG` among the built-ins. What it ought to mean is
 the programmer's business, and inferring it from an optimisation level would be
 a rule nobody asked for.
+
+`#pragma` is the one directive that is not about choosing a branch; it is
+covered in §8.5.
 
 A whole file may be guarded, which is how a platform binding is written:
 [bindings/win32](../bindings/win32) declares its `module` and then wraps

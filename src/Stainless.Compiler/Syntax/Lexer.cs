@@ -57,6 +57,13 @@ public sealed class Lexer(
     /// </summary>
     private bool _sawToken;
 
+    /// <summary>
+    /// Libraries this file asked to link, from <c>#pragma comment(lib, "...")</c>.
+    /// They reach the driver through the compilation unit, and from there the
+    /// linker, exactly as a <c>-l</c> on the command line would.
+    /// </summary>
+    public List<string> Libraries { get; } = [];
+
     private bool Skipping => _conditions.Any(c => !c.Active);
 
     private char Current => Peek(0);
@@ -280,13 +287,61 @@ public sealed class Lexer(
             case "endregion":
                 return;
 
+            case "pragma":
+                Pragma(argument, span);
+                return;
+
             default:
                 diagnostics.Error("SL0460", span,
                     $"'#{name}' is not a directive. Stainless has '#if', '#elif', '#else', " +
-                    "'#endif', '#define', '#undef', '#error', '#warning', '#region' and " +
-                    "'#endregion' -- and no macros, because a name always means itself");
+                    "'#endif', '#define', '#undef', '#error', '#warning', '#region', " +
+                    "'#endregion' and '#pragma' -- and no macros, because a name always " +
+                    "means itself");
                 return;
         }
+    }
+
+    /// <summary>
+    /// <c>#pragma comment(lib, "user32")</c>: the file names a library it needs,
+    /// rather than every program that compiles it repeating <c>-l user32</c>.
+    /// This is MSVC's spelling, and it is the only pragma there is.
+    /// </summary>
+    private void Pragma(string argument, SourceSpan span)
+    {
+        const string Prefix = "comment(lib,";
+
+        string text = argument.Replace(" ", "").Replace("\t", "");
+        if (!text.StartsWith(Prefix, StringComparison.Ordinal) ||
+            !text.EndsWith(")", StringComparison.Ordinal))
+        {
+            diagnostics.Error("SL0483", span,
+                "the only pragma is '#pragma comment(lib, \"name\")', which names a " +
+                "library to link");
+            return;
+        }
+
+        string name = text[Prefix.Length..^1];
+        if (name.Length < 2 || name[0] != '"' || name[^1] != '"')
+        {
+            diagnostics.Error("SL0484", span,
+                "the library name in '#pragma comment(lib, ...)' must be quoted");
+            return;
+        }
+
+        name = name[1..^1];
+
+        // MSVC is normally written with the extension and the linker is not, so
+        // both spellings are accepted and one of them reaches the command line.
+        if (name.EndsWith(".lib", StringComparison.OrdinalIgnoreCase)) name = name[..^4];
+
+        if (name.Length == 0)
+        {
+            diagnostics.Error("SL0484", span,
+                "'#pragma comment(lib, ...)' names no library");
+            return;
+        }
+
+        if (!Libraries.Contains(name, StringComparer.Ordinal)) Libraries.Add(name);
     }
 
     /// <summary>Checks that a directive closing a branch has one to close.</summary>

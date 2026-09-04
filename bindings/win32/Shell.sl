@@ -22,10 +22,16 @@
 // Opening things the way the user would, and the folders Windows keeps for
 // them.
 //
-// A convenience layer over `Win32.Shell32`. **Link with `-l shell32`.**
+// A convenience layer over `Win32.Shell32`. It names shell32 itself with a
+// pragma, so a program compiling it needs no `-l`.
 module Win32.Shell;
 
 #if WINDOWS
+
+// The library this module needs, so that a program compiling it does not
+// have to repeat the name on its own command line.
+#pragma comment(lib, "shell32")
+#pragma comment(lib, "user32")
 
 import Win32;
 import Win32.Shell32;

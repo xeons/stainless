@@ -21,7 +21,8 @@
 
 // The registry, as values that cannot be read before they are checked.
 //
-// A convenience layer over `Win32.AdvApi32`. **Link with `-l advapi32`.**
+// A convenience layer over `Win32.AdvApi32`. It names advapi32 itself with a
+// pragma, so a program compiling it needs no `-l`.
 //
 // Every `Reg...` function returns its error code rather than setting
 // `GetLastError`, so this is the one part of Win32 whose failures were already
@@ -30,6 +31,10 @@
 module Win32.Registry;
 
 #if WINDOWS
+
+// The library this module needs, so that a program compiling it does not
+// have to repeat the name on its own command line.
+#pragma comment(lib, "advapi32")
 
 import Win32;
 import Win32.AdvApi32;

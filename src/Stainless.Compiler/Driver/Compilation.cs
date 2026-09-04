@@ -413,9 +413,18 @@ public sealed class Compilation
             return Failure(e.Message);
         }
 
+        // What the command line asked for, plus what the sources asked for with
+        // '#pragma comment(lib, ...)'. A binding knows which library it needs;
+        // repeating that on every command line is the thing the pragma removes.
+        var libraries = new List<string>(options.Libraries);
+        foreach (var unit in units)
+            foreach (string library in unit.Libraries)
+                if (!libraries.Contains(library, StringComparer.Ordinal))
+                    libraries.Add(library);
+
         var link = toolchain.Link(
             irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel,
-            options.Shared, options.Debug, options.Libraries);
+            options.Shared, options.Debug, libraries);
         if (!link.Success) return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath));
 
         // Debug info points at the .ll only for the runtime's C, but a build that

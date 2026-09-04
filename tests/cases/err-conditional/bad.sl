@@ -16,7 +16,14 @@ module Bad;
 
 #endif
 
+// The one thing a C programmer will reach for, and the one Stainless will never
+// have: a name always means itself, so there is nothing to include.
+#include "windows.h"
+
+// The only pragma is the one that names a library.
 #pragma once
+#pragma comment(lib, user32)
+#pragma comment(lib, "")
 
 #if
 #endif

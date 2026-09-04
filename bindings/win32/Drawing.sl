@@ -21,8 +21,9 @@
 
 // Drawing into a device context.
 //
-// A convenience layer over `Win32.Gdi32`. **Link with `-l gdi32`** (and
-// `-l user32`, since a device context comes from a window).
+// A convenience layer over `Win32.Gdi32`. It names gdi32 and user32 itself
+// with a pragma — a device context comes from a window — so a program
+// compiling it needs no `-l`.
 //
 // GDI's ownership rule is the thing to get right, and nothing here can enforce
 // it: every object `Create...` returns must be selected *out* of the device
@@ -43,6 +44,11 @@
 module Win32.Drawing;
 
 #if WINDOWS
+
+// The library this module needs, so that a program compiling it does not
+// have to repeat the name on its own command line.
+#pragma comment(lib, "gdi32")
+#pragma comment(lib, "user32")
 
 import Win32;
 import Win32.Gdi32;

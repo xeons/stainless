@@ -4336,6 +4336,8 @@ public sealed class Binder(
         LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
+        AlignofSyntax alignofExpression => BindAlignof(alignofExpression),
+        OffsetofSyntax offsetofExpression => BindOffsetof(offsetofExpression),
         TypeofSyntax typeofExpression => BindTypeof(typeofExpression),
         _ => new BoundErrorExpression(syntax.Span),
     };
@@ -5183,6 +5185,50 @@ public sealed class Binder(
     {
         var measured = ResolveType(syntax.Type, _currentScope!);
         return new BoundSizeof(syntax.Span, PrimitiveTypeSymbol.NUInt, measured);
+    }
+
+    private BoundExpression BindAlignof(AlignofSyntax syntax)
+    {
+        var measured = ResolveType(syntax.Type, _currentScope!);
+        return new BoundAlignof(syntax.Span, PrimitiveTypeSymbol.NUInt, measured);
+    }
+
+    /// <summary>
+    /// <c>offsetof(T, Field)</c>, which is C's, and answers the same number for
+    /// a struct. For a class it counts from the start of the allocation, so the
+    /// result is what to add to the reference you hold -- a class reference
+    /// points at the object header, and the fields follow it.
+    /// </summary>
+    private BoundExpression BindOffsetof(OffsetofSyntax syntax)
+    {
+        var owner = ResolveType(syntax.Type, _currentScope!);
+        if (owner.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (owner is not NamedTypeSymbol named || owner is InterfaceTypeSymbol)
+        {
+            diagnostics.Error("SL0480", syntax.Type.Span,
+                $"'offsetof' needs a struct, union, variant or class, and " +
+                $"'{owner.Name}' is none of those");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var field = named.Fields.FirstOrDefault(f => f.Name == syntax.Field);
+        if (field is null)
+        {
+            diagnostics.Error("SL0481", syntax.FieldSpan,
+                $"'{named.Name}' has no field named '{syntax.Field}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (field.IsBitField)
+        {
+            diagnostics.Error("SL0482", syntax.FieldSpan,
+                $"'{named.Name}.{field.Name}' is a bit-field, which has no byte " +
+                "offset of its own; C refuses this too");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundOffsetof(syntax.Span, PrimitiveTypeSymbol.NUInt, named, field);
     }
 
     /// <summary>

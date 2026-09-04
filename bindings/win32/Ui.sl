@@ -22,7 +22,8 @@
 // Windows, messages, input and the clipboard.
 //
 // A convenience layer over `Win32.User32`, which is where the declarations are.
-// **Link with `-l user32`.**
+// It names user32 itself with a pragma, so a program compiling it needs no
+// `-l`.
 //
 // The window procedure stays in the raw layer, because there is nothing to
 // wrap: `WNDPROC` is a plain C function pointer, which is exactly what a
@@ -31,6 +32,10 @@
 module Win32.Ui;
 
 #if WINDOWS
+
+// The library this module needs, so that a program compiling it does not
+// have to repeat the name on its own command line.
+#pragma comment(lib, "user32")
 
 import Win32;
 import Win32.User32;

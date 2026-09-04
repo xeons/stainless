@@ -317,7 +317,8 @@ public sealed record CompilationUnitSyntax(
     SourceText File,
     QualifiedName? ModuleName,
     IReadOnlyList<ImportSyntax> Imports,
-    IReadOnlyList<Declaration> Declarations) : SyntaxNode(Span);
+    IReadOnlyList<Declaration> Declarations,
+    IReadOnlyList<string> Libraries) : SyntaxNode(Span);
 
 // ---------------------------------------------------------------- statements
 
@@ -535,6 +536,14 @@ public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSynt
     : ExpressionSyntax(Span);
 
 public sealed record SizeofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+
+/// <summary><c>alignof(T)</c>: the alignment C would compute for T.</summary>
+public sealed record AlignofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+
+/// <summary><c>offsetof(T, Field)</c>: where a field sits inside its type.</summary>
+public sealed record OffsetofSyntax(
+    SourceSpan Span, TypeSyntax Type, string Field, SourceSpan FieldSpan)
+    : ExpressionSyntax(Span);
 
 /// <summary><c>typeof(T)</c> — the reflection handle for a type, resolved at compile time.</summary>
 public sealed record TypeofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);

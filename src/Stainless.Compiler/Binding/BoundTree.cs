@@ -415,6 +415,26 @@ public sealed class BoundSizeof(SourceSpan span, TypeSymbol type, TypeSymbol mea
     public TypeSymbol MeasuredType { get; } = measuredType;
 }
 
+/// <summary><c>alignof(T)</c>. Like sizeof, the type is kept and read at emit
+/// time, because layout is settled in a later pass than binding.</summary>
+public sealed class BoundAlignof(SourceSpan span, TypeSymbol type, TypeSymbol measuredType)
+    : BoundExpression(span, type)
+{
+    public TypeSymbol MeasuredType { get; } = measuredType;
+}
+
+/// <summary>
+/// <c>offsetof(T, Field)</c>. The field symbol is kept rather than its offset,
+/// for the same reason: the number is not known until layout has run.
+/// </summary>
+public sealed class BoundOffsetof(
+    SourceSpan span, TypeSymbol type, NamedTypeSymbol owner, FieldSymbol field)
+    : BoundExpression(span, type)
+{
+    public NamedTypeSymbol Owner { get; } = owner;
+    public FieldSymbol Field { get; } = field;
+}
+
 /// <summary>
 /// <c>typeof(T)</c>: a handle to T's static metadata. It is a constant, so this
 /// costs one pointer and no work at run time.

@@ -599,6 +599,13 @@ comes from `-D`:
 stainless build src -D FASTMATH
 ```
 
+There is one pragma, and it is MSVC's: a file names a library it needs, rather
+than every program that compiles it repeating `-l` on the command line.
+
+```csharp
+#pragma comment(lib, "user32")
+```
+
 ### The Win32 API
 
 [bindings/win32](bindings/win32) is what all of the above adds up to: 259
@@ -657,7 +664,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 146 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 148 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -679,6 +686,8 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   -g                     describe the program to a debugger
   -D <name>              define a symbol for '#if' to test
   -l <name>              link a library the linker finds by name
+                         (a source file can name one itself, with
+                          '#pragma comment(lib, "user32")')
   --abi <microsoft|itanium>  which C and C++ ABI to agree with (names and
                          bit-fields; struct passing is Win64 either way)
   --keep                 keep the generated .ll
@@ -1015,7 +1024,10 @@ Everything below is covered by [the test suite](tests/cases).
   a `Result<T, IOError>`, or a bare `IOError` where nothing is produced. Paths
   are UTF-8 and are widened to UTF-16 before they reach Windows
 - `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
-- Raw pointers, `sizeof`, `typeof`, casts, `new`, `this`
+- Raw pointers, `sizeof`, `alignof`, `offsetof`, `typeof`, casts, `new`, `this`.
+  The three layout questions answer exactly what C's do, which is how a binding
+  checks itself against a header; `offsetof` on a class counts from the
+  allocation, so the number is what to add to the reference you hold
 - Integer literals that fit convert implicitly, as in C#
 - Shared libraries: `--shared` with a generated C header, and an export table
   containing exactly the `export "C"` functions
@@ -1044,7 +1056,8 @@ Everything below is covered by [the test suite](tests/cases).
   no library at all
 - Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
   `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
-  condition grammar. A branch that is not taken is never lexed, so it need not
+  condition grammar, plus `#pragma comment(lib, "...")` so a file can name the
+  library it needs. A branch that is not taken is never lexed, so it need not
   parse. `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD`, `UNIX`, `X64`, `ARM64`, `X86`,
   `ARM` and `STAINLESS` describe the target; `-D` adds the rest. No macros and
   no `#include`: a name always means itself

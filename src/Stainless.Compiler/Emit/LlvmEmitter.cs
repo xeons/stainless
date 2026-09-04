@@ -2182,6 +2182,20 @@ public sealed class LlvmEmitter(
             case BoundSizeof sizeofExpression:
                 return new Val(sizeofExpression.MeasuredType.Size.ToString(), "i64", sizeofExpression.Type);
 
+            case BoundAlignof alignofExpression:
+                return new Val(
+                    alignofExpression.MeasuredType.Alignment.ToString(), "i64",
+                    alignofExpression.Type);
+
+            // A class field's stored offset is relative to the fields area, and
+            // the header sits in front of it, so the number a caller can add to
+            // the reference it holds is the sum.
+            case BoundOffsetof offsetofExpression:
+                return new Val(
+                    (offsetofExpression.Field.Offset + (offsetofExpression.Owner is ClassTypeSymbol
+                        ? ClassTypeSymbol.HeaderSize : 0)).ToString(),
+                    "i64", offsetofExpression.Type);
+
             case BoundLocalAccess or BoundParameterAccess or BoundThis
                  or BoundFieldAccess or BoundDereference or BoundIndex:
                 return LoadFrom(expression);

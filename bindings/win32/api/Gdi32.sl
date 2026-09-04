@@ -19,7 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// gdi32.dll, declared and nothing else. **Link with `-l gdi32`.**
+// gdi32.dll, declared and nothing else.
+//
+// Declarations cost nothing, so this module needs no library on its own; a
+// program that *calls* one of them wants `-l gdi32`, or `Win32.Drawing`, which
+// names it with a pragma.
 //
 // It imports `Win32.User32` for `POINT` and `SIZE`, which are windef.h types
 // declared there.

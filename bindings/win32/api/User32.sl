@@ -19,7 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// user32.dll, declared and nothing else. **Link with `-l user32`.**
+// user32.dll, declared and nothing else.
+//
+// Declarations cost nothing, so this module needs no library on its own; a
+// program that *calls* one of them wants `-l user32`, or `Win32.Ui`, which
+// names it with a pragma.
 //
 // `POINT`, `SIZE` and `RECT` live here rather than in a module of their own.
 // They are windef.h types, but user32 is where they appear in every signature,
