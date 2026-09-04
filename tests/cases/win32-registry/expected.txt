@@ -1,0 +1,13 @@
+a missing key fails with: not found
+ProductName is a non-empty string: true
+and it begins with 'Windows': true
+reading a string as a number fails: true
+a missing value fails with: not found
+it has subkeys: true
+it has values: true
+the first value has a name: true
+the first subkey has a name: true
+one past the end is empty: true
+closed: true
+a missing key is missing whatever is asked of it: not found
+HKCU\Software opens: true

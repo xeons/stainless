@@ -1,0 +1,6 @@
+# Compiling a binding is what makes its library necessary.
+user32
+gdi32
+advapi32
+shell32
+comdlg32

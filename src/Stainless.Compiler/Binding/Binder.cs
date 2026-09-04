@@ -1229,15 +1229,23 @@ public sealed class Binder(
             return;
         }
 
-        // Module constants must fold at compile time, so only literals are allowed for now.
+        // Module constants must fold at compile time, so only literals are allowed
+        // for now -- and a negated one, which the parser sees as a unary minus
+        // over a literal rather than as a literal. A C header is full of them.
         object? value = null;
         TypeSymbol type = declaration.Type is null
             ? PrimitiveTypeSymbol.Int
             : ResolveType(declaration.Type, scope);
 
-        if (declaration.Value is LiteralSyntax literal)
+        if (ConstantLiteral(declaration.Value) is { } literal)
         {
-            value = literal.Value;
+            bool negated = Negated(declaration.Value);
+            value = negated ? Negate(literal.Value) : literal.Value;
+
+            if (negated && value is null)
+                diagnostics.Error("SL0215", declaration.Value.Span,
+                    "only a number can be negated");
+
             if (declaration.Type is null)
                 type = literal.Kind switch
                 {
@@ -1246,6 +1254,10 @@ public sealed class Binder(
                     TokenKind.CharLiteral => PrimitiveTypeSymbol.Char,
                     _ => PrimitiveTypeSymbol.Int,
                 };
+            else if (!Suits(literal.Kind, type))
+                diagnostics.Error("SL0479", declaration.Value.Span,
+                    $"'{declaration.Name}' is declared '{type.Name}', and " +
+                    $"{literal.Kind.Describe()} is not one");
         }
         else
         {
@@ -1253,11 +1265,79 @@ public sealed class Binder(
                 "a module-level 'const' must be initialized with a literal");
         }
 
+        // A constant is a value inlined at every use, so it has to be something
+        // that fits in one. A String is a counted object, and inlining a pointer
+        // to its bytes would produce something that looks like a String, passes
+        // every check, and is not one -- which is worse than not compiling.
+        if (type is not (PrimitiveTypeSymbol or EnumTypeSymbol) && !type.IsError())
+        {
+            diagnostics.Error("SL0478", declaration.Span,
+                $"a 'const' holds a number, a bool, a char or an enum, and " +
+                $"'{type.Name}' is none of those. Write " +
+                $"'static readonly {type.Name} {declaration.Name} = ...' instead, " +
+                "which has storage rather than being inlined");
+
+            // Registered anyway, so that every use of it does not then report
+            // an undefined name on top of the one real error.
+        }
+
         module.Constants[declaration.Name] = new ConstantSymbol(declaration.Name, type, value)
         {
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
         };
     }
+
+    /// <summary>
+    /// Whether a literal of this kind can be the value of a constant of this type.
+    ///
+    /// Without this a mistyped constant is not an error but a zero, which is
+    /// the worst of the three possible outcomes: it compiles, it runs, and the
+    /// number it stands for is wrong everywhere it was used.
+    /// </summary>
+    private static bool Suits(TokenKind kind, TypeSymbol type)
+    {
+        if (type.IsError()) return true;
+        var underlying = type is EnumTypeSymbol enumType ? enumType.UnderlyingType : type;
+
+        return kind switch
+        {
+            // A character is a byte-wide integer, so it suits both -- which is
+            // the same latitude C# gives `const int Newline = '\n';`.
+            TokenKind.IntLiteral or TokenKind.CharLiteral =>
+                underlying is PrimitiveTypeSymbol { IsInteger: true }
+                    or PrimitiveTypeSymbol { Kind: PrimitiveKind.Char },
+            TokenKind.FloatLiteral => underlying is PrimitiveTypeSymbol { IsFloat: true },
+            TokenKind.TrueKeyword or TokenKind.FalseKeyword =>
+                underlying is PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool },
+            _ => false,
+        };
+    }
+
+    /// <summary>The literal a constant initializer is, looking through one minus.</summary>
+    private static LiteralSyntax? ConstantLiteral(ExpressionSyntax value) => value switch
+    {
+        LiteralSyntax literal => literal,
+        UnarySyntax { Operator: TokenKind.Minus, Operand: LiteralSyntax literal } => literal,
+        _ => null,
+    };
+
+    private static bool Negated(ExpressionSyntax value) =>
+        value is UnarySyntax { Operator: TokenKind.Minus };
+
+    /// <summary>
+    /// Negates a literal's value, or null when it is not a number.
+    ///
+    /// An integer literal is held as a <c>ulong</c> whatever it will end up
+    /// being, so the negation is two's complement and stays a <c>ulong</c>. That
+    /// is the same shape the emitter already narrows to the constant's declared
+    /// width, so -21 as an <c>int</c> comes out as -21 and not as 2^64 - 21.
+    /// </summary>
+    private static object? Negate(object? value) => value switch
+    {
+        ulong number => unchecked(0UL - number),
+        double number => -number,
+        _ => null,
+    };
 
     // ============================================================ pass 5
 

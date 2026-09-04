@@ -30,6 +30,14 @@ public sealed record CompilationOptions
     /// platform C ABI, these need no wrapper, binding or marshalling layer.
     /// </summary>
     public IReadOnlyList<string> NativeInputs { get; init; } = [];
+
+    /// <summary>
+    /// Libraries to link by name rather than by path, from <c>-l</c>. The linker
+    /// finds them on its own search path, which is how a platform's own import
+    /// libraries are reached: <c>-l user32</c> rather than the full path into
+    /// whichever Windows SDK happens to be installed.
+    /// </summary>
+    public IReadOnlyList<string> Libraries { get; init; } = [];
     public string? OutputPath { get; init; }
     public string? IntermediateDirectory { get; init; }
     public int OptimizationLevel { get; init; } = 2;
@@ -99,6 +107,31 @@ public sealed record CompilationResult
 
     /// <summary>A failure outside the source program: a missing tool, unreadable file, bad IR.</summary>
     public string? DriverError { get; init; }
+}
+
+/// <summary>Turns a linker failure into an explanation of who has to fix it.</summary>
+internal static class LinkDiagnosis
+{
+    /// <summary>
+    /// An undefined symbol is normally the program's own doing: an <c>extern "C"</c>
+    /// declaration whose library nothing linked. Saying "compiler bug" there sends
+    /// the reader to the wrong place, so that claim is kept for the case where the
+    /// toolchain objected to something the compiler itself wrote.
+    /// </summary>
+    public static string Explain(string linkerOutput, string irPath) =>
+        Undefined(linkerOutput)
+            ? "the linker could not find everything the program refers to:\n" + linkerOutput +
+              "\nA name declared 'extern \"C\"' has to come from somewhere. Link what defines " +
+              "it:\n'-l <name>' for a library the linker can find on its own, or its path as " +
+              "an\nordinary input."
+            : "the native toolchain rejected the generated IR:\n" + linkerOutput +
+              $"\nThe IR is at {irPath}; this is a compiler bug, not a bug in your program.";
+
+    /// <summary>How the three linkers Stainless drives each spell it.</summary>
+    private static bool Undefined(string output) =>
+        output.Contains("undefined symbol", StringComparison.OrdinalIgnoreCase) ||
+        output.Contains("undefined reference", StringComparison.OrdinalIgnoreCase) ||
+        output.Contains("unresolved external symbol", StringComparison.OrdinalIgnoreCase);
 }
 
 /// <summary>
@@ -382,10 +415,8 @@ public sealed class Compilation
 
         var link = toolchain.Link(
             irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel,
-            options.Shared, options.Debug);
-        if (!link.Success)
-            return Failure($"the native toolchain rejected the generated IR:\n{link.StandardError.TrimEnd()}\n" +
-                           $"The IR is at {irPath}; this is a compiler bug, not a bug in your program.");
+            options.Shared, options.Debug, options.Libraries);
+        if (!link.Success) return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath));
 
         // Debug info points at the .ll only for the runtime's C, but a build that
         // asked to be debuggable should keep what it described either way.

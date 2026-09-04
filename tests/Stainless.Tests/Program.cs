@@ -40,6 +40,15 @@ namespace Stainless.Tests;
 /// header named library.h, and its .c files are then compiled against it. That
 /// exercises the export table and the C header rather than just the compiler.
 ///
+/// A case containing sources.txt is compiled together with the paths that file
+/// names, each relative to the repository root, and one containing libraries.txt
+/// links the libraries it names with -l. Between them they are how a case is
+/// written against bindings/ rather than only against the standard library.
+///
+/// A case containing platform.txt runs only on the platform it names -- windows,
+/// linux or macos -- and is reported as skipped elsewhere. Only a case that
+/// cannot mean anything on another platform should have one.
+///
 /// Testing through the real driver rather than through unit seams means every
 /// pass -- lexer, binder, emitter, LLVM and the linker -- is covered by every case.
 /// </summary>
@@ -73,12 +82,21 @@ internal static class Program
         Directory.CreateDirectory(workDirectory);
 
         int passed = 0;
+        int skipped = 0;
         var failures = new List<(string Name, string Detail)>();
         var stopwatch = Stopwatch.StartNew();
 
         foreach (string directory in cases)
         {
             string name = Path.GetFileName(directory);
+
+            if (SkipReason(directory) is { } reason)
+            {
+                skipped++;
+                Console.WriteLine($"  \u001b[33mskip\u001b[0m  {name}  ({reason})");
+                continue;
+            }
+
             var (ok, detail) = RunCase(directory, workDirectory);
 
             if (ok)
@@ -105,12 +123,50 @@ internal static class Program
         }
 
         string summary = failures.Count == 0
-            ? $"\u001b[32mall {passed} tests passed\u001b[0m in {stopwatch.ElapsedMilliseconds} ms"
-            : $"\u001b[31m{failures.Count} failed\u001b[0m, {passed} passed in {stopwatch.ElapsedMilliseconds} ms";
+            ? $"\u001b[32mall {passed} tests passed\u001b[0m{Skipped(skipped)} in {stopwatch.ElapsedMilliseconds} ms"
+            : $"\u001b[31m{failures.Count} failed\u001b[0m, {passed} passed{Skipped(skipped)} in {stopwatch.ElapsedMilliseconds} ms";
         Console.WriteLine(summary);
 
         return failures.Count == 0 ? 0 : 1;
     }
+
+    /// <summary>Why this case is not being run here, or null when it is.</summary>
+    private static string? SkipReason(string directory)
+    {
+        string path = Path.Combine(directory, "platform.txt");
+        if (!File.Exists(path)) return null;
+
+        string wanted = File.ReadAllText(path).Trim().ToLowerInvariant();
+        bool here = wanted switch
+        {
+            "windows" => OperatingSystem.IsWindows(),
+            "linux" => OperatingSystem.IsLinux(),
+            "macos" => OperatingSystem.IsMacOS(),
+            var other => throw new InvalidOperationException($"unknown platform '{other}'"),
+        };
+
+        return here ? null : $"{wanted} only";
+    }
+
+    private static string Skipped(int count) => count == 0 ? "" : $", {count} skipped";
+
+    /// <summary>
+    /// A marker file's lines, trimmed, without blanks or # comments. A missing
+    /// file is an empty list: every marker read this way is optional.
+    /// </summary>
+    private static List<string> Lines(string directory, string fileName)
+    {
+        string path = Path.Combine(directory, fileName);
+        if (!File.Exists(path)) return [];
+
+        return [.. File.ReadAllLines(path)
+            .Select(line => line.Trim())
+            .Where(line => line.Length > 0 && !line.StartsWith('#'))];
+    }
+
+    /// <summary>The repository root, which is the directory tests/cases sits under.</summary>
+    private static string RepositoryRoot() =>
+        Path.GetDirectoryName(Path.GetDirectoryName(FindCasesDirectory()))!;
 
     private static (bool Ok, string Detail) RunCase(string directory, string workDirectory)
     {
@@ -124,6 +180,22 @@ internal static class Program
         if (sources.Count == 0) return (false, "the case directory contains no .sl files");
 
         string name = Path.GetFileName(directory);
+
+        // Sources from outside the case, named relative to the repository root.
+        // This is how a case is written against bindings/, which is not compiled
+        // into every program the way the standard library is.
+        foreach (string extra in Lines(directory, "sources.txt"))
+        {
+            string path = Path.Combine(RepositoryRoot(), extra);
+            if (Directory.Exists(path))
+                sources.AddRange(Directory.EnumerateFiles(path, "*.sl")
+                    .OrderBy(f => f, StringComparer.Ordinal));
+            else
+                sources.Add(path);
+        }
+
+        var libraries = Lines(directory, "libraries.txt");
+
         string expectedOutputPath = Path.Combine(directory, "expected.txt");
         string expectedErrorsPath = Path.Combine(directory, "errors.txt");
 
@@ -151,13 +223,7 @@ internal static class Program
             }
             : null;
 
-        string definesPath = Path.Combine(directory, "defines.txt");
-        var defines = File.Exists(definesPath)
-            ? File.ReadAllLines(definesPath)
-                .Select(l => l.Trim())
-                .Where(l => l.Length > 0 && !l.StartsWith('#'))
-                .ToList()
-            : [];
+        var defines = Lines(directory, "defines.txt");
 
         // A `library/` subdirectory is built first, as a Stainless library with
         // module metadata, and the case's own sources are then compiled against
@@ -214,6 +280,7 @@ internal static class Program
             OptimizationLevel = debug ? 0 : 1,
             Debug = debug,
             Defines = defines,
+            Libraries = libraries,
             CppAbi = abi,
         };
 

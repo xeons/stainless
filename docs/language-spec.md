@@ -1107,7 +1107,32 @@ var wide = message.ToUtf16();       // owned, NUL terminated, released by ARC
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
-It offers `UnitCount()` and `ToPointer()`, which returns `ushort*`.
+It offers `UnitCount()`, `ToPointer()`, which returns `ushort*`, and `ToText()`,
+which transcodes back.
+
+The return direction usually is not a `Utf16String` at all, because a wide API
+answers by writing into a buffer the caller owns rather than by producing an
+object. Two free functions take that shape directly:
+
+```csharp
+GetCurrentDirectoryW(capacity, buffer);
+String here = Text.FromUtf16(buffer, units);        // a pointer and a length
+String also = Text.FromNullTerminatedUtf16(buffer); // up to the first NUL
+```
+
+| Direction | Call | Cost |
+|---|---|---|
+| UTF-8 to UTF-16 | `text.ToUtf16()` | one allocation, two passes |
+| UTF-16 to UTF-8 | `wide.ToText()` | one allocation, two passes |
+| a buffer to UTF-8 | `Text.FromUtf16(units, count)` | one allocation, two passes |
+| a buffer to UTF-8 | `Text.FromNullTerminatedUtf16(units)` | as above, plus the scan |
+
+**Anything malformed becomes U+FFFD** in both directions, rather than being
+rejected or passed through. That is not politeness: a `String` is UTF-8 by
+invariant and everything downstream relies on it, and what a wide API hands back
+is whatever was in the filesystem or on the clipboard — an unpaired surrogate is
+a real thing to receive. A null pointer reads as the empty string, because a
+wide call that failed leaves the caller holding one.
 
 ### 3.5 StringBuilder
 
@@ -1971,6 +1996,24 @@ with an unmangled name so C and C++ can call it:
 export "C" int stainless_add(int a, int b) { return a + b; }
 ```
 
+**A declaration joins the module it was written in**, as an ordinary member,
+and so is private to that module unless it says `public`. That is what a binding
+library is made of: a module of `public extern "C"` declarations is one another
+module can call by the real names, with no forwarding layer in between.
+
+```csharp
+public extern "C" {
+    int   GetSystemMetrics(int index);
+    void* CreateWindowExW(uint extendedStyle, ushort* className, /* ... */);
+}
+```
+
+A modifier written before the block belongs to every declaration in it, which is
+the point of writing one there; `public` may also be written on a single member
+inside. Two modules may declare the same C function, because a declaration names
+a symbol rather than defining one — but only one of them should make it
+`public`, or a file importing both has an ambiguous name.
+
 **`"C"` and `"C++"` are the conventions there are.** The string is checked, and
 anything else is rejected:
 
@@ -2177,6 +2220,38 @@ written unless something flushes. Shipping the runtime as its own shared library
 would fix that, and would also put both sides on one allocator; that is still
 not done.
 
+### 8.5 Linking a platform library
+
+Object files, static archives and import libraries can be listed among the
+source paths, and are handed to the linker as they are. A library the linker can
+find for itself is named with `-l` instead:
+
+```
+stainless build gui.sl bindings/win32/Core.sl bindings/win32/User.sl -l user32
+```
+
+`-l user32` reaches the Windows SDK's `user32.lib` through the linker's own
+search path, rather than through whichever SDK version happens to be installed.
+The spelling is the one every C toolchain takes, `-l name` or `-lname`.
+
+**A library is needed by the code that is compiled, not by the code that runs.**
+An undefined symbol is an error before the dead-strip that would have removed
+the function referring to it, so compiling a module full of `extern "C"`
+declarations does not cost anything, but compiling a *wrapper* that calls one
+makes its library necessary whether or not the program ever reaches it. That is
+why [bindings/win32](../bindings/win32) is source a program chooses to compile
+rather than part of the standard library, which is compiled into everything.
+
+A linker failure says which of the two it is:
+
+```
+error: the linker could not find everything the program refers to:
+lld-link: error: undefined symbol: GetSystemMetrics
+A name declared 'extern "C"' has to come from somewhere. Link what defines it:
+'-l <name>' for a library the linker can find on its own, or its path as an
+ordinary input.
+```
+
 ## 9. Statements and expressions
 
 ```csharp
@@ -2363,7 +2438,34 @@ What is still unchecked is how long a borrowed thing lives — see
 [concurrency.md](concurrency.md) for the model being aimed at and which parts
 of it the compiler enforces today.
 
-### 9.3 `static readonly`
+### 9.3 `const` and `static readonly`
+
+A `const` is a compile-time value inlined at every use, so it holds what fits in
+one: a number, a `bool`, a `char` or an enum member. Its initializer is a
+literal, or a negated one — `const int GwlpUserData = -21;` — since a C header
+is full of those.
+
+A `String` is not one of them. It is a counted object, and inlining a pointer to
+its bytes would produce something that looks like a `String`, passes every check
+and is not one, so it is refused with the alternative:
+
+```
+error[SL0478]: a 'const' holds a number, a bool, a char or an enum, and 'String'
+is none of those. Write 'static readonly String Greeting = ...' instead, which
+has storage rather than being inlined
+```
+
+The literal has to suit the declared type, because the alternative is not an
+error but a zero — one that compiles, runs, and is wrong everywhere the constant
+was used:
+
+```
+error[SL0479]: 'Mask' is declared 'int', and a floating-point literal is not one
+```
+
+A character literal suits an integer, as it does in C#, so
+`const int Newline = '
+';` is fine.
 
 ```csharp
 public static readonly int Base = 20;
@@ -2536,3 +2638,9 @@ stainless build src -D FASTMATH -D TELEMETRY
 There is deliberately no `DEBUG` among the built-ins. What it ought to mean is
 the programmer's business, and inferring it from an optimisation level would be
 a rule nobody asked for.
+
+A whole file may be guarded, which is how a platform binding is written:
+[bindings/win32](../bindings/win32) declares its `module` and then wraps
+everything else in `#if WINDOWS`, so on any other platform those modules exist
+and are empty rather than failing to build. A program that imports one and
+guards its own uses compiles everywhere.

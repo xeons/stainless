@@ -77,6 +77,10 @@ internal static class Program
               too; they are handed to the native linker. No bindings are needed,
               because Stainless already speaks the platform C ABI.
 
+              A library the linker can find for itself is named with '-l'
+              instead of by path: '-l user32' rather than the full path into
+              whichever Windows SDK happens to be installed.
+
             OPTIONS
               -o, --out <path>     output file (default: after the first source)
               --shared             build a shared library instead of an executable
@@ -86,6 +90,7 @@ internal static class Program
               -O<0-3>              optimization level (default: -O2)
               -g                   describe the program to a debugger
               -D <name>            define a symbol for '#if' to test
+              -l <name>            link a library the linker finds by name
               --abi <microsoft|itanium>
                                    which C and C++ ABI to agree with, for name
                                    mangling and bit-field layout (default: the
@@ -113,6 +118,7 @@ internal static class Program
               stainless build src --shared -o build/math.dll --header build/math.h
               stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
               stainless build app.sl -r build/shapes.slmod build/shapes.lib -o app.exe
+              stainless build gui.sl -l user32 -l gdi32 -o gui.exe
               stainless emit-ir samples/hello.sl
             """);
     }
@@ -148,17 +154,32 @@ internal static class Program
         if (!run) return 0;
 
         Console.WriteLine();
-        var process = Process.Start(new ProcessStartInfo(result.OutputPath!)
-        {
-            UseShellExecute = false,
-            ArgumentList = { },
-        });
+
+        // The full path, because Windows resolves a bare name against PATH
+        // rather than against the working directory -- so 'run -o app.exe'
+        // would look for an app.exe anywhere but the one just built.
+        string program = Path.GetFullPath(result.OutputPath!);
 
         foreach (string argument in programArguments) _ = argument;   // reserved for Main(args)
 
+        Process? process;
+        try
+        {
+            process = Process.Start(new ProcessStartInfo(program)
+            {
+                UseShellExecute = false,
+                ArgumentList = { },
+            });
+        }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or IOException)
+        {
+            Error($"could not start {Relative(program)}: {e.Message}");
+            return 1;
+        }
+
         if (process is null)
         {
-            Error($"could not start {result.OutputPath}");
+            Error($"could not start {Relative(program)}");
             return 1;
         }
 
@@ -199,6 +220,7 @@ internal static class Program
         string? header = null;
         string? metadata = null;
         var references = new List<string>();
+        var libraries = new List<string>();
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -240,6 +262,11 @@ internal static class Program
                     }
                     continue;
 
+                case "-l" or "--library":
+                    if (++i >= args.Length) { Error("'-l' needs a library name"); return false; }
+                    libraries.Add(args[i]);
+                    continue;
+
                 case "--keep":
                     keep = true;
                     continue;
@@ -277,6 +304,12 @@ internal static class Program
                 continue;
             }
 
+            if (argument.Length > 2 && argument.StartsWith("-l", StringComparison.Ordinal))
+            {
+                libraries.Add(argument[2..]);
+                continue;
+            }
+
             if (argument.StartsWith('-'))
             {
                 Error($"unknown option '{argument}'");
@@ -307,6 +340,7 @@ internal static class Program
         {
             SourcePaths = sources.Sources,
             NativeInputs = sources.NativeInputs,
+            Libraries = libraries,
             OutputPath = output,
             IntermediateDirectory = objectDirectory,
             OptimizationLevel = optimization,

@@ -242,6 +242,17 @@ var wide = message.ToUtf16();                  // owned, NUL terminated, ARC'd
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
+The way back matters as much, because a wide API answers by writing into a
+buffer the caller owns rather than by returning an object:
+
+```csharp
+GetCurrentDirectoryW(capacity, buffer);
+String here = Text.FromUtf16(buffer, units);   // or FromNullTerminatedUtf16
+```
+
+Both directions replace anything malformed with U+FFFD, so a `String` is always
+valid UTF-8 no matter what the filesystem or the clipboard held.
+
 ### Arrays and generics
 
 ```csharp
@@ -588,6 +599,37 @@ comes from `-D`:
 stainless build src -D FASTMATH
 ```
 
+### The Win32 API
+
+[bindings/win32](bindings/win32) is what all of the above adds up to: nine
+modules covering about 300 Windows entry points, 460 constants and 36 structs,
+unions, enums and delegates. There is no marshalling layer and nothing is
+generated — a `WNDCLASSEXW` is a Stainless `struct` whose `sizeof` is 80 as it
+is in C, and a `WNDPROC` is a `delegate`, which is the bare function pointer
+Windows calls.
+
+```csharp
+import Win32;
+import Win32.User;
+
+long Procedure(void* window, uint message, ulong wParam, long lParam) {
+    if (message == WmDestroy) { PostQuitMessage(0); return 0; }
+    return DefWindowProcW(window, message, wParam, lParam);
+}
+```
+
+They are source you compile with your program rather than part of the standard
+library, because compiling a binding is what makes its library necessary:
+
+```
+stainless build app.sl bindings/win32/Core.sl bindings/win32/User.sl -l user32
+```
+
+Every file is `#if WINDOWS`, so elsewhere the modules exist and are empty rather
+than failing to build. [samples/win32/window.sl](samples/win32/window.sl) is a
+working window — class, message loop, double-buffered GDI painting, keyboard —
+and [bindings/win32/README.md](bindings/win32/README.md) is the guide.
+
 Full details: **[docs/language-spec.md](docs/language-spec.md)**,
 **[docs/abi.md](docs/abi.md)** and, for where threading is going,
 **[docs/concurrency.md](docs/concurrency.md)**.
@@ -601,7 +643,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 139 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 145 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -622,6 +664,7 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   -O<0-3>                optimization level (default -O2)
   -g                     describe the program to a debugger
   -D <name>              define a symbol for '#if' to test
+  -l <name>              link a library the linker finds by name
   --abi <microsoft|itanium>  which C and C++ ABI to agree with (names and
                          bit-fields; struct passing is Win64 either way)
   --keep                 keep the generated .ll
@@ -633,6 +676,14 @@ straight to the linker:
 
 ```
 stainless run samples/interop/interop.sl samples/interop/native.c
+```
+
+A library the linker can find for itself is named with `-l` rather than by path,
+which is how a platform library is reached:
+
+```
+stainless run samples/win32/window.sl bindings/win32/Core.sl \
+    bindings/win32/User.sl bindings/win32/Gdi.sl -l user32 -l gdi32
 ```
 
 ### Building a library
@@ -870,7 +921,10 @@ Everything below is covered by [the test suite](tests/cases).
   compile time is an error instead
 - `var`, `const`, explicit locals, compound assignment
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
-  `ToPointer()`, `ToUtf16()`, and literals that never allocate
+  `ToPointer()`, `ToUtf16()`, and literals that never allocate. UTF-16 converts
+  back with `ToText()` or, from a buffer a platform API filled, with
+  `Text.FromUtf16`; anything malformed becomes U+FFFD in both directions, so a
+  `String` is UTF-8 by invariant
 - `T[]`: counted arrays, always bounds checked, elements released with the array
 - `T[:]`: slices. `a[1:4]`, `a[3:]`, `a[:2]` and `a[:]` over an array or another
   slice, with half-open bounds; three words, so nothing allocates. A view rather
@@ -965,6 +1019,11 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
+- [bindings/win32](bindings/win32): the Windows API in nine modules — about 300
+  entry points, 460 constants and 36 structs, unions, enums and delegates — as
+  declarations rather than a marshalling layer. Source a program compiles rather
+  than part of the standard library, because compiling a binding is what makes
+  its library necessary
 - Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
   `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
   condition grammar. A branch that is not taken is never lexed, so it need not
@@ -1105,6 +1164,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 docs/                  language specification, ABI, concurrency design
 runtime/               the runtime, split by feature, embedded in the compiler
 stdlib/                the standard library written in Stainless, also embedded
+bindings/win32/        the Windows API, compiled only by a program that asks
 samples/               example programs
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command
@@ -1117,8 +1177,8 @@ tests/Stainless.Tests  the test runner
 Stainless is free software under the
 [GNU General Public License, version 3](LICENSE).
 
-The runtime library — everything in [runtime/](runtime/) and
-[stdlib/](stdlib/) — is GPLv3 **with an additional permission**
+The runtime library — everything in [runtime/](runtime/), [stdlib/](stdlib/)
+and [bindings/](bindings/) — is GPLv3 **with an additional permission**
 ([LICENSE.RUNTIME](LICENSE.RUNTIME)). It is compiled into every binary the
 compiler produces, so without that permission every program anyone wrote in
 Stainless would have to be GPLv3 as well. With it:

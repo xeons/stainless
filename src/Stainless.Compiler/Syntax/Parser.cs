@@ -271,6 +271,10 @@ public sealed class Parser
         };
 
         // Block form: extern "C" { ... }
+        //
+        // A modifier written on the block belongs to every declaration in it,
+        // which is the whole reason to write one there: a binding module that
+        // re-exports two hundred entry points should say 'public' once.
         if (Match(TokenKind.OpenBrace))
         {
             var members = new List<Declaration>();
@@ -278,7 +282,7 @@ public sealed class Parser
             {
                 int before = _pos;
                 int memberStart = _pos;
-                var memberModifiers = ParseModifiers();
+                var memberModifiers = modifiers | ParseModifiers();
                 members.Add(ParseFunctionOrField(memberStart, memberModifiers, linkage));
                 if (_pos == before) Advance();
             }

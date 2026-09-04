@@ -1,0 +1,40 @@
+set: true
+read back identical: true
+value: héllo 日本 🌍
+expanded: [héllo 日本 🌍]
+cleared: true
+gone: true
+code 2: The system cannot find the file specified.
+code 5: Access is denied.
+an impossible code has no message: true
+0 is failure: true
+1 is success: true
+null is invalid: true
+-1 is invalid: true
+the exe exists: true
+the exe is not a directory: true
+nothing is at C:\no\such\place: true
+the system directory is one: true
+normalised: C:\one\three\four.txt
+the temp path ends in a separator: true
+made: true
+found 3:
+  alpha.txt
+  béta.txt
+  日本.txt
+alpha found: true
+  name: alpha.txt
+  size: 0
+  is a directory: false
+  written after 1601: true
+no match is invalid: true
+  because: true
+removed: true
+at least one processor: true
+pages are 4K: true
+the union reads both ways: true
+some memory is free: true
+load is a percentage: true
+allocated: true
+readable: true
+released: true

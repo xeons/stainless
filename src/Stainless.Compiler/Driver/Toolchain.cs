@@ -190,8 +190,9 @@ public sealed class Toolchain
     }
 
     /// <summary>
-    /// Compiles the emitted IR and links it against the runtime and any C sources,
-    /// object files or libraries the program asked for.
+    /// Compiles the emitted IR and links it against the runtime, any C sources,
+    /// object files or libraries the program named by path, and any it named by
+    /// name for the linker to find.
     /// </summary>
     public ToolResult Link(
         string irPath,
@@ -200,11 +201,18 @@ public sealed class Toolchain
         string outputPath,
         int optimizationLevel,
         bool shared = false,
-        bool debug = false)
+        bool debug = false,
+        IReadOnlyList<string>? libraries = null)
     {
         List<string> arguments = [irPath];
         arguments.AddRange(runtimeObjects);
         arguments.AddRange(nativeInputs);
+
+        // Named libraries come after the objects that reference them, because a
+        // static archive is searched once, in order, on every platform that
+        // matters. clang spells this the same way on Windows, where -luser32
+        // reaches the Windows SDK's user32.lib through the linker's own paths.
+        foreach (string library in libraries ?? []) arguments.Add("-l" + library);
 
         // A shared library has no entry point; the linker also emits the import
         // library beside the DLL on Windows.

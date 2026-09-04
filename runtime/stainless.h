@@ -234,6 +234,9 @@ extern const SlTypeInfo sl_utf16_string_type_info;
 void           *sl_string_to_utf16(void *pointer);
 const uint16_t *sl_utf16_pointer(void *pointer);
 size_t          sl_utf16_unit_count(void *pointer);
+void           *sl_string_from_utf16(const uint16_t *units, size_t unitCount);
+void           *sl_string_from_null_terminated_utf16(const uint16_t *units);
+void           *sl_utf16_to_string(void *pointer);
 
 /* ---------------------------------------------------------- StringBuilder */
 

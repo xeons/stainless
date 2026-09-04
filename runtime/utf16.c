@@ -24,9 +24,10 @@
 /*
  * Utf16String: the same shape as String, holding UTF-16 code units.
  *
- * It exists only so that platform APIs expecting wide text can be called.
- * Nothing converts to it implicitly, which is the whole point: transcoding is
- * a cost, and a cost should be visible in the source.
+ * It exists only so that platform APIs expecting wide text can be called, and
+ * so that what one of them writes back can be read. Nothing converts to it
+ * implicitly, which is the whole point: transcoding is a cost, and a cost
+ * should be visible in the source.
  */
 
 #include "stainless.h"
@@ -120,4 +121,98 @@ const uint16_t *sl_utf16_pointer(void *pointer)
 size_t sl_utf16_unit_count(void *pointer)
 {
     return ((SlUtf16String *)pointer)->unitCount;
+}
+
+/* ------------------------------------------------------------ UTF-16 to UTF-8 */
+
+/*
+ * Decodes one UTF-16 scalar, replacing anything malformed with U+FFFD.
+ *
+ * A Windows API hands back whatever is in the filesystem or on the clipboard,
+ * which is not always well-formed UTF-16: an unpaired surrogate is a real thing
+ * to receive. Replacing it keeps the invariant that a String is valid UTF-8,
+ * which everything downstream relies on.
+ */
+static uint32_t sl_utf16_next(const uint16_t *units, size_t count, size_t *index)
+{
+    uint16_t lead = units[(*index)++];
+
+    if (lead < 0xD800 || lead > 0xDFFF) return lead;
+    if (lead >= 0xDC00)                 return 0xFFFD;   /* a trail with no lead */
+    if (*index >= count)                return 0xFFFD;   /* a lead at the end */
+
+    uint16_t trail = units[*index];
+    if (trail < 0xDC00 || trail > 0xDFFF) return 0xFFFD;
+
+    (*index)++;
+    return 0x10000 + (((uint32_t)(lead - 0xD800)) << 10) + (uint32_t)(trail - 0xDC00);
+}
+
+/* How many UTF-8 bytes a scalar takes. */
+static size_t sl_utf8_width(uint32_t scalar)
+{
+    if (scalar < 0x80)    return 1;
+    if (scalar < 0x800)   return 2;
+    if (scalar < 0x10000) return 3;
+    return 4;
+}
+
+/* Writes one scalar as UTF-8 and returns how many bytes it took. */
+static size_t sl_utf8_write(uint8_t *output, uint32_t scalar)
+{
+    if (scalar < 0x80) {
+        output[0] = (uint8_t)scalar;
+        return 1;
+    }
+    if (scalar < 0x800) {
+        output[0] = (uint8_t)(0xC0 | (scalar >> 6));
+        output[1] = (uint8_t)(0x80 | (scalar & 0x3F));
+        return 2;
+    }
+    if (scalar < 0x10000) {
+        output[0] = (uint8_t)(0xE0 | (scalar >> 12));
+        output[1] = (uint8_t)(0x80 | ((scalar >> 6) & 0x3F));
+        output[2] = (uint8_t)(0x80 | (scalar & 0x3F));
+        return 3;
+    }
+    output[0] = (uint8_t)(0xF0 | (scalar >> 18));
+    output[1] = (uint8_t)(0x80 | ((scalar >> 12) & 0x3F));
+    output[2] = (uint8_t)(0x80 | ((scalar >> 6) & 0x3F));
+    output[3] = (uint8_t)(0x80 | (scalar & 0x3F));
+    return 4;
+}
+
+void *sl_string_from_utf16(const uint16_t *units, size_t unitCount)
+{
+    if (units == NULL) return sl_string_new(0);
+
+    /* One pass to size the result, a second to fill it, as the other direction. */
+    size_t bytes = 0;
+    for (size_t i = 0; i < unitCount; )
+        bytes += sl_utf8_width(sl_utf16_next(units, unitCount, &i));
+
+    SlString *result = sl_string_new(bytes);
+    uint8_t  *output = sl_string_data(result);
+
+    size_t written = 0;
+    for (size_t i = 0; i < unitCount; )
+        written += sl_utf8_write(output + written, sl_utf16_next(units, unitCount, &i));
+
+    return result;
+}
+
+void *sl_string_from_null_terminated_utf16(const uint16_t *units)
+{
+    if (units == NULL) return sl_string_new(0);
+
+    size_t count = 0;
+    while (units[count] != 0) count++;
+
+    return sl_string_from_utf16(units, count);
+}
+
+void *sl_utf16_to_string(void *pointer)
+{
+    SlUtf16String *string = (SlUtf16String *)pointer;
+    return sl_string_from_utf16(sl_utf16_data(string), string->unitCount);
 }

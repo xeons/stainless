@@ -1,0 +1,13 @@
+unix epoch in ticks: 116444736000000000
+matches the constant: true
+as unix seconds: 0
+formatted: 2026-09-03 21:47:12
+round trip: 2026-09-03 21:47:12
+unix seconds: 1788472032
+and back: 2026-09-03 21:47:12
+halves rejoin: true
+padded: 2001-02-03 04:05:06
+month 13 is refused: true
+frequency is positive: true
+counter does not go backwards: true
+a fresh stopwatch reads under a second: true

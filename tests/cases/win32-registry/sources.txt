@@ -1,0 +1,2 @@
+# The binding modules this case is written against.
+bindings/win32

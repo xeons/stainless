@@ -177,6 +177,7 @@ public sealed class Builtins
         // --- Utf16String methods -------------------------------------------
         Method(Utf16String, "UnitCount", PrimitiveTypeSymbol.NUInt, "sl_utf16_unit_count");
         Method(Utf16String, "ToPointer", UShortPointer, "sl_utf16_pointer");
+        Method(Utf16String, "ToText", String, "sl_utf16_to_string");
 
         // --- StringBuilder methods ------------------------------------------
         Method(StringBuilder, "Append", PrimitiveTypeSymbol.Void, "sl_string_builder_append",
@@ -206,6 +207,14 @@ public sealed class Builtins
             ("data", BytePointer), ("byteLength", PrimitiveTypeSymbol.NUInt));
         Function(Text, "FromNullTerminated", String, "sl_string_from_null_terminated",
             ("text", BytePointer));
+
+        // The way back from a platform that speaks UTF-16. A wide API writes into
+        // a buffer the caller owns, so what comes back is a pointer and a length
+        // rather than a Utf16String, and the pair is what these two take.
+        Function(Text, "FromUtf16", String, "sl_string_from_utf16",
+            ("units", UShortPointer), ("unitCount", PrimitiveTypeSymbol.NUInt));
+        Function(Text, "FromNullTerminatedUtf16", String,
+            "sl_string_from_null_terminated_utf16", ("units", UShortPointer));
 
         // Operators. These are resolved by the binder, not written by hand.
         StringConcat = Function(Text, "Concat", String, "sl_string_concat",

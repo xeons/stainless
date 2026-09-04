@@ -1,0 +1,10 @@
+5 units  ascii
+5 units  héllo
+3 units  日本語
+8 units  🌍 earth
+0 units  
+mixed: é 日 🌍
+mixed: é 日 🌍
+[mixed]
+5 bytes from a lone surrogate
+[]
