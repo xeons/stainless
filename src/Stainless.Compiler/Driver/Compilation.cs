@@ -52,6 +52,16 @@ public sealed record CompilationOptions
 
     public bool KeepIntermediates { get; init; }
     public bool EmitIrOnly { get; init; }
+
+    /// <summary>
+    /// Describe the program to a debugger: line tables, function names, and the
+    /// name, type and stack slot of every local and parameter.
+    ///
+    /// It also writes the standard library's sources out beside the object
+    /// files, because they are compiled from inside the compiler's own assembly
+    /// and a debugger cannot step into a file that is not on disk.
+    /// </summary>
+    public bool Debug { get; init; }
 }
 
 public sealed record CompilationResult
@@ -201,8 +211,40 @@ public sealed class Compilation
         // The standard library is ordinary Stainless, compiled with the program
         // rather than linked against it. Generics and unused types emit nothing,
         // so a program that ignores it pays nothing for it.
+        // Fixed before anything is parsed, because with debug info on the
+        // standard library is written here and parsed from disk rather than from
+        // the compiler's own resources: a debugger cannot step into a file that
+        // does not exist. `List.Add` is as much a place to stop as anything in
+        // the program, and it is written in Stainless like the rest.
+        string intermediate = IntermediateDirectory(options);
+        string? librarySources = options.Debug ? Path.Combine(intermediate, "stdlib") : null;
+
+        if (librarySources is not null)
+        {
+            try
+            {
+                Directory.CreateDirectory(librarySources);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                return Failure($"could not write the standard library's sources to " +
+                               $"'{librarySources}' for debugging: {e.Message}");
+            }
+        }
+
         foreach (var (name, text) in StandardLibrary.Sources())
-            units.Add(new Parser(new SourceText(name, text), diagnostics).ParseCompilationUnit());
+        {
+            string path = name;
+
+            if (librarySources is not null)
+            {
+                path = Path.Combine(librarySources, Path.GetFileName(name));
+                if (!File.Exists(path) || File.ReadAllText(path) != text)
+                    File.WriteAllText(path, text);
+            }
+
+            units.Add(new Parser(new SourceText(path, text), diagnostics).ParseCompilationUnit());
+        }
 
         // Everything after this point is the program's own, which is what a
         // library's metadata describes.
@@ -238,8 +280,13 @@ public sealed class Compilation
             diagnostics, requireEntryPoint: !options.Shared, references: references).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
+        // Against the program's own first file rather than units[0], which is
+        // the standard library's: neither of these is about a place in the
+        // source, and pointing at a file nobody wrote reads as a compiler bug.
+        var programSpan = units[standardUnits < units.Count ? standardUnits : 0].Span;
+
         if (program.EntryPoint is null && !options.EmitIrOnly && !options.Shared)
-            diagnostics.Error("SL0290", units[0].Span,
+            diagnostics.Error("SL0290", programSpan,
                 "no entry point was found; declare 'int Main()' in one of the compiled modules, " +
                 "or pass --shared to build a library instead");
 
@@ -248,7 +295,7 @@ public sealed class Compilation
         if (options.Shared && options.MetadataPath is null &&
             !program.Modules.SelectMany(m => m.Functions)
                 .Any(f => f.Linkage == LinkageKind.ExportC))
-            diagnostics.Warning("SL0291", units[0].Span,
+            diagnostics.Warning("SL0291", programSpan,
                 "this library exports nothing; mark a function 'export \"C\"' to add it to the " +
                 "export table");
 
@@ -263,14 +310,20 @@ public sealed class Compilation
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // --- emit --------------------------------------------------------
+        var debug = options.Debug
+            ? new DebugInfo(
+                units[^1].Span.File,
+                "Stainless " + typeof(Compilation).Assembly.GetName().Version?.ToString(3),
+                codeView: OperatingSystem.IsWindows())
+            : null;
+
         string ir = new LlvmEmitter(
             forSharedLibrary: options.Shared,
-            forStainlessConsumers: options.MetadataPath is not null).Emit(program);
+            forStainlessConsumers: options.MetadataPath is not null,
+            debug: debug).Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
-        string intermediate = options.IntermediateDirectory
-            ?? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(output)) ?? ".", "obj");
 
         Directory.CreateDirectory(intermediate);
         string irPath = Path.Combine(intermediate,
@@ -293,7 +346,7 @@ public sealed class Compilation
         IReadOnlyList<string> runtimeObjects;
         try
         {
-            runtimeObjects = toolchain.BuildRuntime(intermediate);
+            runtimeObjects = toolchain.BuildRuntime(intermediate, options.Debug);
         }
         catch (Exception e) when (e is InvalidOperationException or IOException)
         {
@@ -302,12 +355,14 @@ public sealed class Compilation
 
         var link = toolchain.Link(
             irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel,
-            options.Shared);
+            options.Shared, options.Debug);
         if (!link.Success)
             return Failure($"the native toolchain rejected the generated IR:\n{link.StandardError.TrimEnd()}\n" +
                            $"The IR is at {irPath}; this is a compiler bug, not a bug in your program.");
 
-        if (!options.KeepIntermediates)
+        // Debug info points at the .ll only for the runtime's C, but a build that
+        // asked to be debuggable should keep what it described either way.
+        if (!options.KeepIntermediates && !options.Debug)
         {
             // The runtime object is worth caching; the IR is not, unless asked for.
             TryDelete(irPath);
@@ -356,6 +411,21 @@ public sealed class Compilation
     {
         try { File.Delete(path); } catch (IOException) { /* leaving a stale file is harmless */ }
     }
+
+    /// <summary>
+    /// Where object files, the generated IR and the runtime's sources go.
+    ///
+    /// It is derived from the options alone rather than from the output path,
+    /// because a debug build needs it before the program has been bound and so
+    /// before the default output name is known.
+    /// </summary>
+    private static string IntermediateDirectory(CompilationOptions options) =>
+        options.IntermediateDirectory
+        ?? Path.Combine(
+            options.OutputPath is { } given
+                ? Path.GetDirectoryName(Path.GetFullPath(given)) ?? "."
+                : CommonDirectory(options.SourcePaths),
+            "obj");
 
     /// <summary>
     /// Where the output goes when nothing was asked for: named after the module

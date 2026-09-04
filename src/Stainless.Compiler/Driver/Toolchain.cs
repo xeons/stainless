@@ -117,7 +117,7 @@ public sealed class Toolchain
     /// so a change to, say, the array code does not force the string code to be
     /// rebuilt, and each unit stays small enough to read in one sitting.
     /// </summary>
-    public IReadOnlyList<string> BuildRuntime(string objectDirectory)
+    public IReadOnlyList<string> BuildRuntime(string objectDirectory, bool debug = false)
     {
         Directory.CreateDirectory(objectDirectory);
 
@@ -137,14 +137,23 @@ public sealed class Toolchain
                      .OrderBy(s => s.Key, StringComparer.Ordinal))
         {
             string source = Path.Combine(objectDirectory, name);
-            string objectFile = Path.ChangeExtension(source, ".o");
+
+            // A debug object is a different object, so it gets a different name.
+            // Sharing one would hand whichever build ran second the other's.
+            string objectFile = Path.ChangeExtension(source, debug ? ".g.o" : ".o");
             objectFiles.Add(objectFile);
 
             bool changed = WriteIfChanged(source, text);
             if (!changed && !headersChanged && File.Exists(objectFile)) continue;
 
-            var result = Run(ClangPath,
-                ["-c", source, "-O2", "-ffunction-sections", "-fdata-sections", "-o", objectFile]);
+            List<string> arguments =
+                ["-c", source, "-ffunction-sections", "-fdata-sections", "-o", objectFile];
+
+            // -O0 alongside -g, because a runtime compiled at -O2 has had the
+            // frames a debugger wants to show inlined away.
+            arguments.InsertRange(2, debug ? ["-O0", "-g"] : ["-O2"]);
+
+            var result = Run(ClangPath, arguments);
             if (!result.Success)
                 throw new InvalidOperationException(
                     $"failed to compile the Stainless runtime ({name}):\n{result.StandardError}");
@@ -190,7 +199,8 @@ public sealed class Toolchain
         IReadOnlyList<string> nativeInputs,
         string outputPath,
         int optimizationLevel,
-        bool shared = false)
+        bool shared = false,
+        bool debug = false)
     {
         List<string> arguments = [irPath];
         arguments.AddRange(runtimeObjects);
@@ -199,6 +209,11 @@ public sealed class Toolchain
         // A shared library has no entry point; the linker also emits the import
         // library beside the DLL on Windows.
         if (shared) arguments.Add("-shared");
+
+        // -g here is not about the IR, which already carries its own description.
+        // It tells clang to keep it through to the binary, and on Windows to ask
+        // the linker for the .pdb the debugger actually reads.
+        if (debug) arguments.Add("-g");
 
         arguments.AddRange([
             $"-O{optimizationLevel}",

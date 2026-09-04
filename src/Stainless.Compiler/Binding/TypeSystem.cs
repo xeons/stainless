@@ -203,6 +203,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public required string ModuleName { get; init; }
     public bool IsPublic { get; init; }
 
+    /// <summary>
+    /// Where the declaration was written, or null for one this compilation did
+    /// not see the source of: a built-in such as <c>String</c>, or a type read
+    /// back from a referenced library's metadata.
+    /// </summary>
+    public Source.SourceSpan? Span { get; init; }
+
     public List<FieldSymbol> Fields { get; } = [];
     public List<FunctionSymbol> Methods { get; } = [];
 

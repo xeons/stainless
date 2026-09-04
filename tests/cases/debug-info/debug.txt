@@ -1,0 +1,38 @@
+# Fragments that must appear in the generated IR. Node numbers are deliberately
+# left out of each line, so adding a type somewhere else does not break this.
+
+# The compile unit, and a function described by its linkage name.
+distinct !DICompileUnit(language: DW_LANG_C_plus_plus
+!DISubprogram(name: "Main", linkageName: "_SL5Debug4MainvEi"
+!DISubprogram(name: "Node.Doubled"
+
+# Locals and parameters, with the position that orders a frame's arguments.
+!DILocalVariable(name: "origin"
+!DILocalVariable(name: "scaled"
+!DILocalVariable(name: "values", arg: 1
+!DILocalVariable(name: "this", arg: 1
+
+# A struct: laid out by value, so its second field sits at 64 bits.
+!DICompositeType(tag: DW_TAG_structure_type, name: "Debug.Point"
+!DIDerivedType(tag: DW_TAG_member, name: "Y"
+
+# A class: the object header comes first, so the first field is at 192 bits.
+!DICompositeType(tag: DW_TAG_structure_type, name: "Debug.Node"
+!DIDerivedType(tag: DW_TAG_member, name: "__header"
+!DIDerivedType(tag: DW_TAG_member, name: "Value"
+
+# An enum carries its members and its underlying type.
+!DICompositeType(tag: DW_TAG_enumeration_type, name: "Debug.Level"
+!DIEnumerator(name: "Loud", value: 7)
+!DIBasicType(name: "byte", size: 8, encoding: DW_ATE_unsigned)
+
+# An array knows where its length is; the elements after it have no static bound.
+!DICompositeType(tag: DW_TAG_structure_type, name: "int[]"
+!DIDerivedType(tag: DW_TAG_member, name: "length"
+
+# Each instantiation of a generic is its own type, named as it was written.
+!DICompositeType(tag: DW_TAG_structure_type, name: "Debug.Box<int>"
+!DICompositeType(tag: DW_TAG_structure_type, name: "Debug.Box<String>"
+
+# Instructions carry locations, and a variable is tied to its slot.
+call void @llvm.dbg.declare(

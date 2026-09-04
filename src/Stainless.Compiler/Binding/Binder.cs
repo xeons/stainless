@@ -275,24 +275,28 @@ public sealed class Binder(
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
                         IsPublic = isPublic,
+                        Span = declaration.Span,
                     },
                     TypeDeclKind.Interface => new InterfaceTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
                         IsPublic = isPublic,
+                        Span = declaration.Span,
                     },
                     TypeDeclKind.Attribute => new AttributeTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
                         IsPublic = isPublic,
+                        Span = declaration.Span,
                     },
                     _ => new StructTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
                         IsPublic = isPublic,
+                        Span = declaration.Span,
                     },
                 };
 
@@ -318,6 +322,7 @@ public sealed class Binder(
                     SimpleName = declaration.Name,
                     ModuleName = module.Name,
                     IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+                    Span = declaration.Span,
                 };
 
                 module.Types[declaration.Name] = delegateType;
@@ -339,6 +344,7 @@ public sealed class Binder(
                     SimpleName = declaration.Name,
                     ModuleName = module.Name,
                     IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+                    Span = declaration.Span,
                 };
 
                 module.Types[declaration.Name] = enumType;
@@ -1447,17 +1453,17 @@ public sealed class Binder(
             TypeDeclKind.Class => new ClassTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
-                Template = template, TypeArguments = arguments,
+                Template = template, TypeArguments = arguments, Span = declaration.Span,
             },
             TypeDeclKind.Interface => new InterfaceTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
-                Template = template, TypeArguments = arguments,
+                Template = template, TypeArguments = arguments, Span = declaration.Span,
             },
             _ => new StructTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
-                Template = template, TypeArguments = arguments,
+                Template = template, TypeArguments = arguments, Span = declaration.Span,
             },
         };
 
@@ -3117,6 +3123,7 @@ public sealed class Binder(
         {
             SimpleName = $"Closure.{_closureCount++}",
             ModuleName = _currentModule!.Name,
+            Span = span,
         };
         closureType.Interfaces.Add(target);
 

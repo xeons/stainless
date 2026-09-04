@@ -44,7 +44,14 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 /// When true, <c>export "C"</c> functions are marked <c>dllexport</c> so they
 /// reach a Windows DLL's export table, and no C <c>main</c> is emitted.
 /// </param>
-public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainlessConsumers = false)
+/// <param name="debug">
+/// The debug metadata graph to describe this program into, or null to emit no
+/// debug information at all. When it is present every instruction carries a
+/// source location, which is what a debugger, a profiler and a stack trace all
+/// read; when it is absent nothing about the output changes.
+/// </param>
+public sealed class LlvmEmitter(
+    bool forSharedLibrary = false, bool forStainlessConsumers = false, DebugInfo? debug = null)
 {
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
@@ -62,6 +69,15 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
     private string _currentBlock = "entry";
     private bool _hasStatics;
     private ArgInfo _returnInfo = new(PassStyle.Direct, "void", PrimitiveTypeSymbol.Void);
+
+    /// <summary>
+    /// The function being described, and the point in it the next instruction
+    /// belongs to. Both are null while emitting something the programmer did not
+    /// write — a thunk, a destructor hook, the static initializer — which is
+    /// exactly the right answer for those: they have no source to step to.
+    /// </summary>
+    private int? _debugScope;
+    private int? _debugLocation;
 
     /// <summary>Owned locals per lexical scope, released on the way out.</summary>
     private readonly List<List<(string Slot, TypeSymbol Type)>> _scopes = [];
@@ -117,6 +133,14 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
         {
             _module.AppendLine();
             _module.Append(_metadata);
+        }
+
+        // Last, because a node is created the first time something refers to it
+        // and the functions above are what refer to most of them.
+        if (debug is not null)
+        {
+            _module.AppendLine();
+            _module.Append(debug.Render());
         }
 
         return _module.ToString();
@@ -184,6 +208,11 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
         Declare("sl_divide_by_zero", "declare void @sl_divide_by_zero()");
         Declare("sl_divide_overflow", "declare void @sl_divide_overflow()");
         Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
+
+        // Up here rather than at its first use: a declaration goes straight into
+        // the module, and the first use is inside an open function body.
+        if (debug is not null)
+            Declare("llvm.dbg.declare", "declare void @llvm.dbg.declare(metadata, metadata, metadata)");
         ConcurrencyDeclarations();
         _module.AppendLine();
     }
@@ -616,16 +645,27 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
     private string NextTemp() => "%" + _nextTemp++;
     private string NextLabel(string hint) => $"{hint}.{_nextLabel++}";
 
+    /// <summary>
+    /// The <c>!dbg</c> suffix every instruction in a described function carries.
+    ///
+    /// Attaching it here rather than at each call site is what keeps debug info
+    /// from spreading through the emitter: this is the one place an instruction
+    /// is written. It also satisfies LLVM's rule that a call inside a function
+    /// with debug info must have a location, without having to know which of the
+    /// lines below happens to be a call.
+    /// </summary>
+    private string Dbg => _debugLocation is { } id ? $", !dbg !{id}" : "";
+
     private void Line(string text)
     {
         if (_blockTerminated) return;       // unreachable code after a terminator
-        _body.Append("  ").AppendLine(text);
+        _body.Append("  ").Append(text).AppendLine(Dbg);
     }
 
     private void Terminator(string text)
     {
         if (_blockTerminated) return;
-        _body.Append("  ").AppendLine(text);
+        _body.Append("  ").Append(text).AppendLine(Dbg);
         _blockTerminated = true;
     }
 
@@ -665,6 +705,18 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
         "i32" or "float" => 4,
         _ => 8,
     };
+
+    /// <summary>
+    /// Ties a stack slot to the name and type the source gave it, so a debugger
+    /// can print the variable rather than the address.
+    /// </summary>
+    private void DeclareVariable(string slot, int variable)
+    {
+        if (debug is null || _debugScope is null) return;
+
+        Line($"call void @llvm.dbg.declare(metadata ptr {slot}, metadata !{variable}, " +
+             "metadata !DIExpression())");
+    }
 
     private void MemCopy(string destination, string source, int size)
     {
@@ -727,9 +779,15 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
             ? "dllexport "
             : "";
 
+        _debugScope = debug?.Subprogram(symbol, symbol.MangledName);
+        _debugLocation = _debugScope is { } opening && debug is not null
+            ? debug.Location(symbol.Span, opening)
+            : null;
+
         _module.AppendLine(
             $"define {linkage}{storage}{returnType} {Symbol(symbol)}" +
-            $"({string.Join(", ", declaredParameters)}) {{");
+            $"({string.Join(", ", declaredParameters)})" +
+            (_debugScope is { } attached ? $" !dbg !{attached}" : "") + " {");
         _body.Clear();
         _blockTerminated = false;
 
@@ -763,6 +821,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
             AdoptWrittenParameter(parameter, plain);
         }
 
+        DescribeParameters(symbol);
+
         EmitStatement(function.Body);
 
         // Fall off the end: void returns implicitly, everything else was already
@@ -787,6 +847,28 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
         _module.AppendLine();
     }
 
+
+    /// <summary>
+    /// Names the parameters for a debugger, in the order they were written.
+    ///
+    /// A parameter has no span of its own, so all of them sit on the line the
+    /// function was declared on. That is where a debugger shows arguments
+    /// anyway: on entry, before the body has run.
+    /// </summary>
+    private void DescribeParameters(FunctionSymbol symbol)
+    {
+        if (debug is null || _debugScope is not { } scope) return;
+
+        int index = 0;
+        foreach (var parameter in symbol.Parameters)
+        {
+            if (!_parameterSlots.TryGetValue(parameter, out string? slot)) { index++; continue; }
+
+            DeclareVariable(slot, debug.Parameter(
+                parameter.IsThis ? "this" : parameter.Name,
+                parameter.Type, symbol.Span, scope, index++));
+        }
+    }
 
     // ============================================================ concurrency
 
@@ -1146,6 +1228,8 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
         _loops.Clear();
         _sretSlot = null;
         _blockTerminated = false;
+        _debugScope = null;
+        _debugLocation = null;
     }
 
     private static string ZeroOf(string llvmType) => llvmType switch
@@ -1571,6 +1655,12 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
 
     private void EmitStatement(BoundStatement statement)
     {
+        // One location per statement is the granularity a line table wants: an
+        // expression spanning several lines still belongs to the statement a
+        // debugger stops on, and stepping through sub-expressions would be noise.
+        if (debug is not null && _debugScope is { } scope)
+            _debugLocation = debug.Location(statement.Span, scope);
+
         switch (statement)
         {
             case BoundBlock block: EmitBlock(block); break;
@@ -1603,6 +1693,10 @@ public sealed class LlvmEmitter(bool forSharedLibrary = false, bool forStainless
         string llvmType = LlvmTypeOf(local.Type);
         string slot = Alloca(llvmType, local.Name);
         _slots[local] = slot;
+
+        if (debug is not null && _debugScope is { } scope)
+            DeclareVariable(slot, debug.LocalVariable(
+                local.Name, local.Type, declaration.Span, scope));
 
         if (local.Type.IsManagedSlot())
         {

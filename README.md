@@ -389,7 +389,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 119 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 120 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -408,6 +408,7 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   --metadata <path>      write module metadata for a Stainless consumer
   -r, --reference <path> bind against a library's module metadata
   -O<0-3>                optimization level (default -O2)
+  -g                     describe the program to a debugger
   --keep                 keep the generated .ll
 ```
 
@@ -699,6 +700,13 @@ Everything below is covered by [the test suite](tests/cases).
   cross, and the compiler says so where the library is built
 - Attributes and opt-in reflection: field names, offsets, kinds and attribute
   values readable at run time, from `const` tables in the binary
+- `-g`: debug information, in CodeView on Windows and DWARF elsewhere. Every
+  instruction carries a source location, every function is named as it was
+  written and as the linker sees it, and every local and parameter is described
+  with its type and its stack slot. The standard library is written to
+  `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
+  `List.Add` and into `sl_retain` names real files and real lines rather than
+  addresses. See [§7 of the ABI notes](docs/abi.md)
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
@@ -774,6 +782,12 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **No cancellation beyond a shared flag.** An `AtomicBool` a job polls is the
   whole story; a `parallel` block always joins, and always will. See §9 of the
   concurrency notes for what is worth adding and what never will be.
+- **Debug information describes data, not sequences.** `-g` covers functions,
+  locations, locals, parameters, structs, class bodies and enums. It does not
+  describe an array's or a `String`'s elements — DWARF wants a static bound and
+  there is none — and it puts every local in the function's scope rather than in
+  the block it was declared in, so a debugger will show one that is not in scope
+  yet. Neither is a lie about a value; both are less than a C compiler emits.
 - **Statics are module-level only**, and a `--shared` library cannot have one:
   there is no entry point to initialize it from. No `static` members on a type,
   and no per-thread storage.

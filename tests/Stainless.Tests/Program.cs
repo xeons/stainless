@@ -28,6 +28,11 @@ namespace Stainless.Tests;
 ///   expected.txt   the program must compile, run, and print this
 ///   errors.txt     the program must fail to compile with these diagnostic codes
 ///
+/// A case containing debug.txt is additionally built with debug information, and
+/// every line of that file must appear somewhere in the generated IR. Linking at
+/// all is most of the test: clang runs LLVM's verifier over the metadata, so a
+/// malformed description fails the build rather than producing a quiet lie.
+///
 /// A case containing shared.txt is built as a shared library with a generated
 /// header named library.h, and its .c files are then compiled against it. That
 /// exercises the export table and the C header rather than just the compiler.
@@ -128,6 +133,9 @@ internal static class Program
 
         bool shared = File.Exists(Path.Combine(directory, "shared.txt"));
 
+        string debugPath = Path.Combine(directory, "debug.txt");
+        bool debug = File.Exists(debugPath);
+
         // A `library/` subdirectory is built first, as a Stainless library with
         // module metadata, and the case's own sources are then compiled against
         // it. That is the two-compilation shape the metadata exists for, and the
@@ -175,9 +183,13 @@ internal static class Program
             OutputPath = Path.Combine(
                 caseWork, name + (shared ? Toolchain.SharedLibraryExtension : ".exe")),
             IntermediateDirectory = Path.Combine(caseWork, "obj"),
-            OptimizationLevel = 1,
             Shared = shared,
             HeaderPath = shared ? Path.Combine(caseWork, "library.h") : null,
+
+            // -O0 alongside it: the point of a debug case is the description of
+            // the code as written, and the optimiser rewrites what it describes.
+            OptimizationLevel = debug ? 0 : 1,
+            Debug = debug,
         };
 
         CompilationResult result;
@@ -232,6 +244,22 @@ internal static class Program
             var built = BuildConsumer(caseWork, name, result.OutputPath!, natives);
             if (built.Error is not null) return (false, built.Error);
             executable = built.Path!;
+        }
+
+        if (debug)
+        {
+            var wanted = File.ReadAllLines(debugPath)
+                .Select(l => l.Trim())
+                .Where(l => l.Length > 0 && !l.StartsWith('#'))
+                .ToList();
+
+            var absent = wanted
+                .Where(w => result.Ir?.Contains(w, StringComparison.Ordinal) != true)
+                .ToList();
+
+            if (absent.Count > 0)
+                return (false, "the debug metadata is missing:" + Environment.NewLine + "  " +
+                               string.Join(Environment.NewLine + "  ", absent));
         }
 
         string expected = Normalize(File.ReadAllText(expectedOutputPath));

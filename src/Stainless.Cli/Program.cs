@@ -84,6 +84,7 @@ internal static class Program
               --metadata <path>    write module metadata for a Stainless consumer
               --reference <path>   bind against a library's module metadata
               -O<0-3>              optimization level (default: -O2)
+              -g                   describe the program to a debugger
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
               -h, --help           show this message
@@ -184,7 +185,9 @@ internal static class Program
         string? output = null;
         string? objectDirectory = null;
         int optimization = 2;
+        bool optimizationGiven = false;
         bool keep = false;
+        bool debug = false;
         bool shared = false;
         string? header = null;
         string? metadata = null;
@@ -204,6 +207,10 @@ internal static class Program
                 case "--obj":
                     if (++i >= args.Length) { Error("'--obj' needs a directory"); return false; }
                     objectDirectory = args[i];
+                    continue;
+
+                case "-g" or "--debug":
+                    debug = true;
                     continue;
 
                 case "--keep":
@@ -239,6 +246,7 @@ internal static class Program
                 char.IsDigit(argument[2]))
             {
                 optimization = argument[2] - '0';
+                optimizationGiven = true;
                 continue;
             }
 
@@ -276,11 +284,20 @@ internal static class Program
             IntermediateDirectory = objectDirectory,
             OptimizationLevel = optimization,
             KeepIntermediates = keep,
+            Debug = debug,
             Shared = shared,
             HeaderPath = header,
             MetadataPath = metadata,
             References = references,
         };
+
+        // -O2 is the default rather than a choice, and stepping through code the
+        // optimiser has rearranged is the usual first surprise. Say so once, and
+        // leave an explicit -O alone: asking for both is a legitimate thing to do.
+        if (debug && optimization > 0 && !optimizationGiven)
+            Console.Error.WriteLine(
+                $"note: building at -O{optimization} with -g; pass -O0 to step through the " +
+                "code as it was written");
 
         if (metadata is not null && !shared)
             Console.Error.WriteLine(

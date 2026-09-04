@@ -342,3 +342,60 @@ therefore have their own allocator and their own C stdio buffer, so text written
 inside a library and text written by its consumer do not interleave in the order
 they were written. Shipping the runtime as its own shared library would close
 both, and is not done.
+
+
+## 7. Debug information
+
+`-g` describes the program to a debugger. Nothing about the code changes; the
+description is metadata attached to it, and a build without `-g` emits none of
+it at all.
+
+It is written as ordinary LLVM debug metadata, so the format is whatever the
+target uses: CodeView and a `.pdb` on Windows, DWARF elsewhere. The compiler
+emits a `DICompileUnit` per program and, hanging off it:
+
+| Node | What it describes |
+|---|---|
+| `DISubprogram` | one function, by source name and by linker name |
+| `DILocation` | one point in the source, attached to every instruction |
+| `DILocalVariable` | a local or a parameter, with its type and its stack slot |
+| `DIBasicType` | a primitive, with the signedness a debugger prints it by |
+| `DICompositeType` | a struct, a class body, or an enum with its members |
+| `DIDerivedType` | a field at its offset, or a pointer to something |
+
+A function's name is what the source called it — `Circle.Area`, not
+`_SL6Circle4AreavEd` — and its `linkageName` is the mangled symbol, so a
+debugger can match a frame to a source line either way. Locations sit at
+statement granularity: an expression spread over four lines belongs to the
+statement a debugger stops on.
+
+**A class body includes its header.** A field's offset is measured from the
+start of the fields area (§2), and DWARF wants it measured from the start of the
+allocation, so the 24 bytes in front are described as a member named `__header`
+and every field offset is shifted past it. Without it a debugger reads every
+field of every object 24 bytes early.
+
+**Optional, weak and strong references share one description.** `C`, `C?` and
+`weak C?` are the same machine value; what separates them is what the compiler
+will let you write, and DWARF has no way to say that. A weak reference therefore
+prints as the pointer it is, including after the object it named has died —
+`sl_weak_load` is what makes it read as null, and a debugger does not call it.
+
+**An array knows where its length is and not how long it is.** `T[]` is
+described as the object header, then the `length` field at offset 24. The
+elements live inline after that, and DWARF can only express an array whose bound
+it knows statically, so they are left undescribed rather than described wrongly.
+`String` is the same shape and the same story. Reading either means taking the
+address and the length and going from there.
+
+**The standard library is written out to be stepped into.** It is compiled from
+inside the compiler's own assembly, so with `-g` the driver writes its sources to
+`obj/stdlib/` first and parses them from there. Otherwise every frame in
+`List.Add` would name a file that does not exist. The runtime's C is compiled
+`-O0 -g` for the same reason, so `sl_retain` and `sl_release` are steppable
+frames rather than addresses.
+
+**`-O2` is still the default.** Debug information survives optimization, but the
+code it describes has been rearranged, and stepping through it is confusing in
+the ordinary way. The driver says so once and builds what was asked for; `-O0`
+is the flag for stepping through code as it was written.
