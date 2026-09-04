@@ -213,6 +213,8 @@ public static class MetadataWriter
         Offset = field.Offset,
         IsPublic = field.IsPublic,
         IsBackingField = field.IsBackingField,
+        BitWidth = field.BitWidth,
+        BitOffset = field.BitOffset,
     };
 
     private static MetadataFunction Describe(FunctionSymbol function) => new()

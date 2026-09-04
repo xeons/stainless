@@ -181,6 +181,18 @@ public sealed class LlvmEmitter(
             // integers of the alignment as it takes to cover the widest member
             // -- and every member is read from the union's own address, which is
             // where all of them start.
+            // A struct with bit-fields is storage too. Its fields do not line up
+            // with LLVM's, because several of them share one, so there is nothing
+            // to describe field by field; every access is a byte offset instead.
+            if (structType is not UnionTypeSymbol && HasBitFields(structType))
+            {
+                _module.AppendLine(
+                    $"{StructName(structType)} = type {{ [{Math.Max(1, structType.Size)} x i8] }}");
+                if (structType.Alignment > 1)
+                    _structAlignment[StructName(structType)] = structType.Alignment;
+                continue;
+            }
+
             if (structType is UnionTypeSymbol union)
             {
                 int element = Math.Max(1, union.Alignment);
@@ -1695,9 +1707,7 @@ public sealed class LlvmEmitter(
         {
             if (!field.Type.CarriesReferences()) continue;
 
-            string slot = Emit("ptr",
-                $"getelementptr inbounds {StructName(structType)}, ptr {address}, " +
-                $"i32 0, i32 {field.Index}");
+            string slot = StructFieldAddress(address, structType, field);
 
             if (field.Type is VariantTypeSymbol nestedVariant) visit(slot, nestedVariant);
             else if (field.Type is StructTypeSymbol nested) WalkReferences(slot, nested, visit);
@@ -2331,15 +2341,107 @@ public sealed class LlvmEmitter(
             ? throw new InvalidOperationException("struct field access needs a receiver")
             : EmitAddress(access.Receiver);
 
-        // Every member of a union is at offset zero, so there is nothing to
-        // index: the union's address is the member's address, and the member's
-        // own type is what decides how much of it is read.
-        if (field.ContainingType is UnionTypeSymbol) return baseAddress;
-
-        var structType = (StructTypeSymbol)field.ContainingType;
-        return Emit("ptr",
-            $"getelementptr inbounds {StructName(structType)}, ptr {baseAddress}, i32 0, i32 {field.Index}");
+        return StructFieldAddress(baseAddress, (StructTypeSymbol)field.ContainingType, field);
     }
+
+    /// <summary>True for a struct whose LLVM type is bytes rather than fields.</summary>
+    private static bool HasBitFields(StructTypeSymbol type) => type.Fields.Any(f => f.IsBitField);
+
+    /// <summary>
+    /// Where a field of a value type lives.
+    ///
+    /// A union's member is at the union's own address, because all of them are.
+    /// A struct with bit-fields has no LLVM fields to index, so its members are
+    /// reached by the byte offset the layout gave them. Everything else is the
+    /// structural index, which is what lets LLVM see through the access.
+    /// </summary>
+    private string StructFieldAddress(string baseAddress, StructTypeSymbol owner, FieldSymbol field)
+    {
+        if (owner is UnionTypeSymbol) return baseAddress;
+
+        if (HasBitFields(owner))
+            return field.Offset == 0
+                ? baseAddress
+                : Emit("ptr", $"getelementptr inbounds i8, ptr {baseAddress}, i64 {field.Offset}");
+
+        return Emit("ptr",
+            $"getelementptr inbounds {StructName(owner)}, ptr {baseAddress}, i32 0, i32 {field.Index}");
+    }
+
+    // ============================================================ bit-fields
+
+    /// <summary>
+    /// Reads a bit-field: load the storage unit it sits in, move its bits down,
+    /// and widen them back to the declared type.
+    ///
+    /// A signed one is shifted left and then arithmetic-shifted right, which
+    /// sign-extends from the field's own width rather than the unit's -- a
+    /// three-bit signed field holding 7 is -1.
+    /// </summary>
+    private Val LoadBitField(BoundFieldAccess access)
+    {
+        var field = access.Field;
+        int width = field.BitWidth!.Value;
+        int bits = field.Type.Size * 8;
+        string unit = $"i{bits}";
+
+        string address = EmitFieldAddress(access);
+        string loaded = Emit(unit, $"load {unit}, ptr {address}, align {field.Type.Size}");
+
+        string value;
+        if (IsSigned(field.Type))
+        {
+            string high = Emit(unit, $"shl {unit} {loaded}, {bits - field.BitOffset - width}");
+            value = Emit(unit, $"ashr {unit} {high}, {bits - width}");
+        }
+        else
+        {
+            string low = field.BitOffset == 0
+                ? loaded
+                : Emit(unit, $"lshr {unit} {loaded}, {field.BitOffset}");
+            value = Emit(unit, $"and {unit} {low}, {Mask(width)}");
+        }
+
+        // A bool is one bit to LLVM whatever it is to the layout.
+        string declared = LlvmTypeOf(field.Type);
+        if (declared != unit) value = Emit(declared, $"trunc {unit} {value} to {declared}");
+
+        return new Val(value, declared, field.Type);
+    }
+
+    /// <summary>
+    /// Writes a bit-field: read the unit, clear the field's bits, put the new
+    /// ones in, write it back. Bits outside the field are untouched, which is
+    /// what makes two fields sharing a unit independent.
+    /// </summary>
+    private void StoreBitField(BoundFieldAccess access, Val value)
+    {
+        var field = access.Field;
+        int width = field.BitWidth!.Value;
+        int bits = field.Type.Size * 8;
+        string unit = $"i{bits}";
+
+        string address = EmitFieldAddress(access);
+        string loaded = Emit(unit, $"load {unit}, ptr {address}, align {field.Type.Size}");
+
+        string widened = value.LlvmType == unit
+            ? value.Ref
+            : Emit(unit, $"zext {value.LlvmType} {value.Ref} to {unit}");
+
+        string kept = Emit(unit, $"and {unit} {loaded}, {~(Mask(width) << field.BitOffset) & MaskAll(bits)}");
+        string trimmed = Emit(unit, $"and {unit} {widened}, {Mask(width)}");
+        string placed = field.BitOffset == 0
+            ? trimmed
+            : Emit(unit, $"shl {unit} {trimmed}, {field.BitOffset}");
+
+        Line($"store {unit} {Emit(unit, $"or {unit} {kept}, {placed}")}, ptr {address}, " +
+             $"align {field.Type.Size}");
+    }
+
+    /// <summary>The low <paramref name="width"/> bits set, as LLVM writes a constant.</summary>
+    private static long Mask(int width) => width >= 64 ? -1L : (1L << width) - 1;
+
+    private static long MaskAll(int bits) => bits >= 64 ? -1L : (1L << bits) - 1;
 
     private string ClassFieldAddress(string objectRef, FieldSymbol field) =>
         Emit("ptr",
@@ -2347,6 +2449,11 @@ public sealed class LlvmEmitter(
 
     private Val LoadFrom(BoundExpression expression)
     {
+        // A bit-field is not at an address of its own; it is some of the bits of
+        // one, so reading it is more than a load.
+        if (expression is BoundFieldAccess { Field.IsBitField: true } bitField)
+            return LoadBitField(bitField);
+
         // A struct is represented by its address, so there is nothing to load.
         if (expression.Type is StructTypeSymbol)
             return new Val(EmitAddress(expression), "ptr", expression.Type);
@@ -2384,6 +2491,15 @@ public sealed class LlvmEmitter(
     private Val EmitAssignment(BoundAssignment assignment)
     {
         var value = EmitExpression(assignment.Value);
+
+        // A bit-field shares its storage unit with its neighbours, so writing it
+        // is a read, a splice and a write rather than a store.
+        if (assignment.Target is BoundFieldAccess { Field.IsBitField: true } bitField)
+        {
+            StoreBitField(bitField, value);
+            return value;
+        }
+
         string address = EmitAddress(assignment.Target);
         StoreInto(address, value, assignment.Target.Type);
         return value;

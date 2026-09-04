@@ -544,10 +544,17 @@ public sealed class Parser
             _diagnostics.Error("SL0320", SpanFrom(start),
                 $"'{name}' is a field and cannot have type parameters");
 
+        // `int flags : 3;` — a field that is some of the bits of one. Nothing
+        // else can follow a field's name with a colon, so no lookahead is needed.
+        ExpressionSyntax? bits = Match(TokenKind.Colon) ? ParseExpression() : null;
+
         ExpressionSyntax? initializer = Match(TokenKind.Equals) ? ParseExpression() : null;
         Expect(TokenKind.Semicolon);
         return new FieldDeclSyntax(
-            SpanFrom(start), modifiers, returnType, name, initializer, attributes ?? []);
+            SpanFrom(start), modifiers, returnType, name, initializer, attributes ?? [])
+        {
+            BitWidth = bits,
+        };
     }
 
     /// <summary>

@@ -294,6 +294,44 @@ struct, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
 macro for an aligned one — and a test compares every size, alignment and field
 offset against what the target's C compiler makes of it.
 
+#### Bit-fields
+
+A field may be some of the bits of its type rather than all of them.
+
+```csharp
+public struct Header {
+    public uint Version : 4;
+    public uint Kind    : 4;
+    public uint Length  : 24;
+}
+```
+
+The width is a constant between one and the number of bits the declared type
+has. A signed bit-field sign-extends from its own width, so a three-bit `int`
+holding 7 reads back as -1 — which is what C does, warning and all.
+
+**Which bits a field gets is the target's decision, and the two C ABIs
+disagree.** For `struct { int a : 1; byte b : 1; }` gcc gives four bytes and
+MSVC gives eight: Microsoft opens a new storage unit whenever the declared
+type's size changes, and Itanium packs straight across and starts a new unit
+only when a field would cross a boundary of its own type. Both rules are
+implemented, chosen the way the C++ mangler chooses a scheme, and every size in
+the test suite was read off clang built for the matching target. `--abi` picks
+one explicitly; the default is the host's.
+
+**A bit-field has no address** (SL0443), for the reason C refuses `&s.flags`.
+It cannot be passed by `ref` and cannot be pointed at.
+
+Reading one is a load of the storage unit, a shift and a mask; writing one is a
+read, a splice and a write, so the neighbours sharing the unit are untouched.
+
+Not here yet: the zero-width field that closes a storage unit (SL0473), and
+unnamed padding fields. `[Packed]` together with bit-fields is refused (SL0470)
+rather than guessed, because gcc packs the bits and MSVC keeps the unit and
+there is nothing yet to say which this language means. `[Reflect]` is refused on
+a type with bit-fields (SL0475), because the field tables describe a byte offset
+and a bit-field has not got one.
+
 ### 2.4 `class` — reference type, ARC managed
 
 ```csharp

@@ -69,6 +69,16 @@ public sealed record CompilationOptions
     /// what machine it is being built for.
     /// </summary>
     public IReadOnlyList<string> Defines { get; init; } = [];
+
+    /// <summary>
+    /// Which C and C++ ABI to agree with, or null for the host's.
+    ///
+    /// It decides two things that must match the compiler on the other side of
+    /// a boundary: how a C++ name is mangled, and how bit-fields are packed into
+    /// storage units. The two ABIs differ on the second in ordinary cases, not
+    /// only in corners.
+    /// </summary>
+    public Binding.CppAbi? CppAbi { get; init; }
 }
 
 public sealed record CompilationResult
@@ -287,7 +297,8 @@ public sealed class Compilation
         }
 
         var program = new Binder(
-            diagnostics, requireEntryPoint: !options.Shared, references: references).Bind(units);
+            diagnostics, requireEntryPoint: !options.Shared, references: references,
+            cppAbi: options.CppAbi).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
         // Against the program's own first file rather than units[0], which is

@@ -370,6 +370,27 @@ String Reinterpret() {
            Text.FromInteger((int)(word.Unsigned / 1000000));
 }
 
+
+// --- README "Bit-fields" / spec 2.2 ---------------------------------------
+public struct PacketHeader {
+    public uint Version : 4;
+    public uint Kind    : 4;
+    public uint Length  : 24;
+}
+
+String Bits() {
+    PacketHeader header;
+    header.Version = 3;
+    header.Kind = 9;
+    header.Length = 1000000;
+    header.Kind = header.Kind + (uint)1;
+
+    return Text.FromInteger((int)header.Version) + ":" +
+           Text.FromInteger((int)header.Kind) + ":" +
+           Text.FromInteger((int)header.Length) + ":" +
+           Text.FromInteger((int)sizeof(PacketHeader));
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -442,6 +463,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("bits=%s\n", Bits().ToPointer());
     printf("union=%s\n", Reinterpret().ToPointer());
     printf("layout=%s\n", Layouts().ToPointer());
     printf("where=%s\n", Where().ToPointer());

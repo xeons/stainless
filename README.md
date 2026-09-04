@@ -174,6 +174,27 @@ array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
 
+### Bit-fields
+
+A field may be some of the bits of its type.
+
+```csharp
+public struct Header {
+    public uint Version : 4;
+    public uint Kind    : 4;
+    public uint Length  : 24;
+}
+```
+
+Which bits it gets is the target's decision, and the two C ABIs genuinely
+disagree — `struct { int a : 1; byte b : 1; }` is four bytes to gcc and eight to
+MSVC. Both rules are implemented, chosen the way the C++ mangler chooses a
+scheme, and every size in the test suite was read off clang built for the
+matching target. `--abi microsoft|itanium` picks one; the default is the host's.
+
+A signed bit-field sign-extends from its own width, so a three-bit `int` holding
+7 reads back as -1. A bit-field has no address, so it cannot be passed by `ref`.
+
 ### Unions
 
 C's, and here for the reason `extern "C"` is here: a great many headers describe
@@ -578,7 +599,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 135 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 139 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -599,6 +620,7 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   -O<0-3>                optimization level (default -O2)
   -g                     describe the program to a debugger
   -D <name>              define a symbol for '#if' to test
+  --abi <microsoft|itanium>  which C and C++ ABI to agree with
   --keep                 keep the generated .ll
 ```
 
@@ -766,6 +788,12 @@ Everything below is covered by [the test suite](tests/cases).
 - Modules like C# namespaces: several files may share one, imports are per file,
   `public` exports and an unmarked declaration is module-wide
 - Aliases, qualified names without an import, full order independence
+- Bit-fields: `public uint Kind : 4;` in a struct or a union, with the width a
+  constant from one to the width of the declared type. Both C ABIs are
+  implemented — Microsoft opens a new storage unit when the declared type's size
+  changes, Itanium packs across — and `--abi` chooses, defaulting to the host's.
+  A signed field sign-extends from its own width; writing one leaves its
+  neighbours alone; one has no address, so no `ref` to it
 - `[Packed]` and `[Align(N)]`: no padding at all, and a raised alignment. Both
   are rules about layout rather than library features, so neither needs an
   import; they combine, N is a power of two capped at 16, and both apply to a
@@ -973,6 +1001,12 @@ Being straight about the edges, roughly in the order they are worth adding:
   `switch`, and only for one held in a local or a parameter. It does not yet do
   the same for `C?`, so an optional still cannot be unwrapped by testing it.
   The two want the same machinery and the second is the obvious next step.
+- **No zero-width or unnamed bit-fields.** C's `int : 0;` closes a storage unit
+  and `int : 3;` pads without naming anything; neither is written (SL0473).
+  `[Packed]` together with bit-fields is refused rather than guessed (SL0470),
+  because gcc packs the bits and MSVC keeps the unit and nothing here yet says
+  which this language means. `[Reflect]` is refused on a type with bit-fields
+  (SL0475): the field tables describe a byte offset, and a bit-field has none.
 - **`[Align(N)]` stops at 16.** `malloc` guarantees `max_align_t` and nothing
   more, so a class holding a more-aligned field would be handed memory that did
   not honour it. Lifting the cap means allocating by a type's alignment as well

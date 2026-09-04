@@ -160,6 +160,9 @@ public sealed record FieldDeclSyntax(
     ExpressionSyntax? Initializer,
     IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers)
 {
+    /// <summary><c>int flags : 3;</c> — how many bits, or null for a whole field.</summary>
+    public ExpressionSyntax? BitWidth { get; init; }
+
     public FieldDeclSyntax(
         SourceSpan span, Modifiers modifiers, TypeSyntax type, string name,
         ExpressionSyntax? initializer)

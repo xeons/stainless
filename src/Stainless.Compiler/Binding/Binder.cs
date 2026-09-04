@@ -652,6 +652,65 @@ public sealed class Binder(
         });
     }
 
+    /// <summary>
+    /// The width of a bit-field, checked against what may be one.
+    ///
+    /// A bit-field is storage measured in bits rather than bytes, so what may
+    /// have one is what the target's C compiler will give one: an integer or a
+    /// bool. The width has to be a constant, because the layout of everything
+    /// after it depends on the number.
+    /// </summary>
+    private int? BindBitWidth(
+        FieldDeclSyntax field, TypeSymbol fieldType, NamedTypeSymbol owner, FileScope scope)
+    {
+        if (owner is not StructTypeSymbol || owner is VariantTypeSymbol)
+        {
+            diagnostics.Error("SL0469", field.Span,
+                $"'{owner.Name}.{field.Name}' is a bit-field, and only a struct or a union has " +
+                "those; a class lays its fields out behind a header the compiler owns");
+            return null;
+        }
+
+        bool usable = fieldType is PrimitiveTypeSymbol { IsInteger: true } or
+                                   PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool };
+
+        if (!usable)
+        {
+            diagnostics.Error("SL0471", field.Span,
+                $"'{fieldType.Name}' cannot be a bit-field; a bit-field is some of the bits of " +
+                "an integer or a bool");
+            return null;
+        }
+
+        if (ConstantValue(field.BitWidth!, PrimitiveTypeSymbol.Int) is not { } value)
+        {
+            diagnostics.Error("SL0472", field.BitWidth!.Span,
+                "a bit-field's width must be a constant; the layout of everything after it " +
+                "depends on the number");
+            return null;
+        }
+
+        long width = Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture);
+        int capacity = fieldType.Size * 8;
+
+        if (width <= 0)
+        {
+            diagnostics.Error("SL0473", field.BitWidth!.Span,
+                $"a bit-field is at least one bit wide, and '{field.Name}' asks for {width}. " +
+                "C's zero-width field, which closes a storage unit, is not written yet");
+            return null;
+        }
+
+        if (width > capacity)
+        {
+            diagnostics.Error("SL0474", field.BitWidth!.Span,
+                $"'{field.Name}' asks for {width} bits, and '{fieldType.Name}' has {capacity}");
+            return null;
+        }
+
+        return (int)width;
+    }
+
     private void DeclareTypeMembers(
         FileScope scope, TypeDeclSyntax declaration, NamedTypeSymbol type)
     {
@@ -700,10 +759,15 @@ public sealed class Binder(
                     // guarantee: such a struct is no longer bytes a C function
                     // could be handed, which ValidateLinkageSignature enforces.
 
-                    type.Fields.Add(new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
+                    var declared = new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
                     {
                         IsPublic = field.Modifiers.HasFlag(Modifiers.Public),
-                    });
+                    };
+
+                    if (field.BitWidth is not null)
+                        declared.BitWidth = BindBitWidth(field, fieldType, type, scope);
+
+                    type.Fields.Add(declared);
                     break;
                 }
 
@@ -1321,6 +1385,11 @@ public sealed class Binder(
                         $"'[Reflect]' emits a type's fields, and the fields of variant " +
                         $"'{type.Name}' are a tag and a payload the source cannot name. What " +
                         "a reader would want is its cases, and those are not described yet");
+                else if (type.Fields.Any(f => f.IsBitField))
+                    diagnostics.Error("SL0475", entry.Declaration.Span,
+                        $"'[Reflect]' describes a field by its byte offset, and '{type.Name}' " +
+                        "has bit-fields, which have not got one. Reflecting them means saying " +
+                        "where in a byte they start, and the tables do not");
                 else if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
                 else
                     diagnostics.Error("SL0341", entry.Declaration.Span,
@@ -1623,6 +1692,7 @@ public sealed class Binder(
                     ComputeLayout(nestedMember, inProgress);
 
                 member.Offset = 0;
+                member.BitOffset = 0;
                 widest = Math.Max(widest, member.Type.Size);
                 strictest = Math.Max(strictest, Math.Max(1, member.Type.Alignment));
             }
@@ -1631,6 +1701,13 @@ public sealed class Binder(
             if (union.RequestedAlignment is { } wanted) strictest = Math.Max(strictest, wanted);
 
             union.SetLayout(Math.Max(1, TypeExtensions.AlignTo(widest, strictest)), strictest);
+            inProgress.Remove(type);
+            return;
+        }
+
+        if (type.Fields.Any(f => f.IsBitField))
+        {
+            LayOutWithBitFields(type, inProgress);
             inProgress.Remove(type);
             return;
         }
@@ -1668,6 +1745,134 @@ public sealed class Binder(
 
         type.SetLayout(size, alignment);
         inProgress.Remove(type);
+    }
+
+    /// <summary>
+    /// Lays out a struct that has bit-fields in it.
+    ///
+    /// The two C ABIs genuinely disagree here, and not in a corner: for
+    /// <c>struct { int a : 1; char b : 1; }</c> gcc gives four bytes and MSVC
+    /// gives eight. So there are two algorithms, chosen the way the C++ mangler
+    /// chooses a scheme, and both are checked against what the target's own
+    /// compiler makes of the same declaration.
+    ///
+    /// **Itanium** packs to the bit and starts a new storage unit only when a
+    /// field would cross a boundary of its own declared type. A three-bit
+    /// <c>int</c> followed by a four-bit <c>short</c> share one word.
+    ///
+    /// **Microsoft** keeps a current storage unit of one declared type's size,
+    /// and opens a new one whenever the next field will not fit *or* is declared
+    /// with a type of a different size. The same two fields land in a four-byte
+    /// unit and a two-byte one.
+    /// </summary>
+    private void LayOutWithBitFields(NamedTypeSymbol type, HashSet<NamedTypeSymbol> inProgress)
+    {
+        // Checked here rather than where the width was read, because [Packed] is
+        // not known until attributes have been folded and that is a pass later.
+        if (type.IsPacked)
+            diagnostics.Error("SL0470", type.Span ?? default,
+                $"'{type.Name}' is '[Packed]' and has bit-fields, and the two together mean " +
+                "different things to different C compilers -- gcc packs the bits and MSVC keeps " +
+                "the storage unit. Until one of them is chosen and checked against it, this is " +
+                "refused rather than guessed");
+
+        foreach (var nested in type.Fields.Select(f => f.Type).OfType<StructTypeSymbol>())
+            ComputeLayout(nested, inProgress);
+
+        int alignment = 1;
+        foreach (var field in type.Fields)
+            alignment = Math.Max(alignment, Math.Max(1, field.Type.Alignment));
+
+        if (type.RequestedAlignment is { } wanted) alignment = Math.Max(alignment, wanted);
+
+        int size = _cppAbi == CppAbi.Microsoft
+            ? LayOutMicrosoftBitFields(type)
+            : LayOutItaniumBitFields(type);
+
+        type.SetLayout(Math.Max(1, TypeExtensions.AlignTo(size, alignment)), alignment);
+    }
+
+    /// <summary>
+    /// gcc and clang: allocate at the next free bit, and move to the next
+    /// boundary of the declared type only when the field would straddle one.
+    /// </summary>
+    private static int LayOutItaniumBitFields(NamedTypeSymbol type)
+    {
+        long bit = 0;
+
+        foreach (var field in type.Fields)
+        {
+            if (field.BitWidth is not { } width)
+            {
+                // An ordinary field closes whatever was being filled and takes
+                // its own alignment from the byte it lands on.
+                int at = TypeExtensions.AlignTo(
+                    (int)((bit + 7) / 8), Math.Max(1, field.Type.Alignment));
+                field.Offset = at;
+                field.BitOffset = 0;
+                bit = (long)(at + field.Type.Size) * 8;
+                continue;
+            }
+
+            long unit = (long)field.Type.Size * 8;
+
+            // A bit-field must sit inside one storage unit of its own type. If
+            // it would cross the boundary, it starts at the next one.
+            if (bit / unit != (bit + width - 1) / unit)
+                bit = (bit + unit - 1) / unit * unit;
+
+            long start = bit / unit * unit;
+            field.Offset = (int)(start / 8);
+            field.BitOffset = (int)(bit - start);
+            bit += width;
+        }
+
+        return (int)((bit + 7) / 8);
+    }
+
+    /// <summary>
+    /// MSVC: keep a storage unit of one declared type's size, and open a new one
+    /// when the next field does not fit or is declared with a different size.
+    /// </summary>
+    private static int LayOutMicrosoftBitFields(NamedTypeSymbol type)
+    {
+        int offset = 0;             // where the next thing goes
+        int unitAt = -1;            // byte offset of the open storage unit
+        int unitSize = 0;           // its size, from the type that opened it
+        int unitUsed = 0;           // bits of it spoken for
+
+        foreach (var field in type.Fields)
+        {
+            if (field.BitWidth is not { } width)
+            {
+                // An ordinary field closes the unit outright.
+                unitAt = -1;
+                offset = TypeExtensions.AlignTo(offset, Math.Max(1, field.Type.Alignment));
+                field.Offset = offset;
+                field.BitOffset = 0;
+                offset += field.Type.Size;
+                continue;
+            }
+
+            int size = field.Type.Size;
+
+            bool fits = unitAt >= 0 && size == unitSize && unitUsed + width <= size * 8;
+
+            if (!fits)
+            {
+                offset = TypeExtensions.AlignTo(offset, Math.Max(1, field.Type.Alignment));
+                unitAt = offset;
+                unitSize = size;
+                unitUsed = 0;
+                offset += size;
+            }
+
+            field.Offset = unitAt;
+            field.BitOffset = unitUsed;
+            unitUsed += width;
+        }
+
+        return offset;
     }
 
     /// <summary>
@@ -5659,6 +5864,10 @@ public sealed class Binder(
     /// <summary>True for an expression that names storage rather than a value.</summary>
     private static bool IsAddressable(BoundExpression expression) => expression switch
     {
+        // A bit-field is some of the bits of a byte, and there is no pointer to
+        // that. It is why C refuses `&s.flags` too.
+        BoundFieldAccess { Field.IsBitField: true } => false,
+
         BoundLocalAccess or BoundParameterAccess or BoundThis
             or BoundFieldAccess or BoundIndex or BoundDereference or BoundStaticAccess => true,
         _ => false,

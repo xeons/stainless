@@ -193,6 +193,22 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     /// <summary>Byte offset from the start of the value (structs) or of the fields area (classes).</summary>
     public int Offset { get; internal set; }
 
+    /// <summary>
+    /// How many bits this field is, or null when it is the whole of its type.
+    ///
+    /// A bit-field is read and written through the storage unit it sits in,
+    /// which starts at <see cref="Offset"/> and is <see cref="Type"/>-sized;
+    /// <see cref="BitOffset"/> says where in that unit it begins. Which bits a
+    /// unit holds is decided by the target's C rules, and those differ between
+    /// Microsoft's compilers and everyone else's — see the layout pass.
+    /// </summary>
+    public int? BitWidth { get; internal set; }
+
+    /// <summary>Where in its storage unit a bit-field starts, counted from the low bit.</summary>
+    public int BitOffset { get; internal set; }
+
+    public bool IsBitField => BitWidth is not null;
+
     public override string ToString() => $"{ContainingType.Name}.{Name}";
 }
 

@@ -143,6 +143,8 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
                 IsPublic = field.IsPublic,
                 IsBackingField = field.IsBackingField,
                 Offset = field.Offset,
+                BitWidth = field.BitWidth,
+                BitOffset = field.BitOffset,
             });
         }
 

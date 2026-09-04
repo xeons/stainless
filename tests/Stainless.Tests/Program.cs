@@ -28,7 +28,8 @@ namespace Stainless.Tests;
 ///   expected.txt   the program must compile, run, and print this
 ///   errors.txt     the program must fail to compile with these diagnostic codes
 ///
-/// A case containing defines.txt is built with each of its lines passed as -D.
+/// A case containing defines.txt is built with each of its lines passed as -D,
+/// and one containing abi.txt is built for the ABI that file names.
 ///
 /// A case containing debug.txt is additionally built with debug information, and
 /// every line of that file must appear somewhere in the generated IR. Linking at
@@ -140,6 +141,16 @@ internal static class Program
 
         // A case containing defines.txt is built with each of its lines passed
         // as -D, which is the only way to exercise a build flag end to end.
+        string abiPath = Path.Combine(directory, "abi.txt");
+        Binding.CppAbi? abi = File.Exists(abiPath)
+            ? File.ReadAllText(abiPath).Trim().ToLowerInvariant() switch
+            {
+                "itanium" => Binding.CppAbi.Itanium,
+                "microsoft" => Binding.CppAbi.Microsoft,
+                var other => throw new InvalidOperationException($"unknown abi '{other}'"),
+            }
+            : null;
+
         string definesPath = Path.Combine(directory, "defines.txt");
         var defines = File.Exists(definesPath)
             ? File.ReadAllLines(definesPath)
@@ -203,6 +214,7 @@ internal static class Program
             OptimizationLevel = debug ? 0 : 1,
             Debug = debug,
             Defines = defines,
+            CppAbi = abi,
         };
 
         CompilationResult result;

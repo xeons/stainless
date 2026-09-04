@@ -142,7 +142,8 @@ public static class CHeaderWriter
 
                     sb.AppendLine($"typedef struct {aligned}{CName(structType)} {{");
                     foreach (var field in structType.Fields)
-                        sb.AppendLine($"    {Declarator(field.Type, field.Name)};");
+                        sb.AppendLine($"    {Declarator(field.Type, field.Name)}" +
+                                      (field.BitWidth is { } bits ? $" : {bits}" : "") + ";");
                     sb.AppendLine($"}} {CName(structType)};");
 
                     if (structType.IsPacked) sb.AppendLine("#pragma pack(pop)");

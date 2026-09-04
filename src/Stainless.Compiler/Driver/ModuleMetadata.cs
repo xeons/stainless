@@ -129,6 +129,14 @@ public sealed record MetadataField
 
     /// <summary>True for the storage behind a property, which is not nameable.</summary>
     public bool IsBackingField { get; init; }
+
+    /// <summary>
+    /// For a bit-field, how wide it is and where in its storage unit it starts.
+    /// Both have to cross: a consumer that knew only the byte offset would read
+    /// the whole unit and get its neighbours with it.
+    /// </summary>
+    public int? BitWidth { get; init; }
+    public int BitOffset { get; init; }
 }
 
 public sealed record MetadataEnumMember

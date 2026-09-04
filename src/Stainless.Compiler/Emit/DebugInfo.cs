@@ -388,6 +388,21 @@ public sealed class DebugInfo
         // the name that reads it, so it needs no special treatment here.
         foreach (var field in type.Fields)
         {
+            // A bit-field is described in bits: how many it is, where in the
+            // whole value it begins, and -- in extraData -- where the storage
+            // unit it shares begins. DWARF needs the third to know which bytes
+            // a debugger must load before shifting.
+            if (field.BitWidth is { } width)
+            {
+                int start = (headerBytes + field.Offset) * 8;
+                members.Add(Add(
+                    $"!DIDerivedType(tag: DW_TAG_member, name: {Quote(field.Name)}, {where}" +
+                    $"baseType: !{Type(field.Type)}, size: {width}, " +
+                    $"offset: {start + field.BitOffset}, flags: DIFlagBitField, " +
+                    $"extraData: i64 {start})"));
+                continue;
+            }
+
             members.Add(Add(
                 $"!DIDerivedType(tag: DW_TAG_member, name: {Quote(field.Name)}, {where}" +
                 $"baseType: !{Type(field.Type)}, size: {field.Type.Size * 8}, " +

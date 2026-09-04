@@ -29,6 +29,44 @@ A generated C header writes `#pragma pack(push, 1)` around a packed struct and
 macro — for an aligned one. Both spellings go after the `struct` keyword, which
 is the one position MSVC, gcc and clang all accept.
 
+### 1.2 Bit-fields
+
+A bit-field is stored in a unit of its declared type, and which unit is the
+target's decision. The two C ABIs disagree, and not only in corners:
+
+| Declared | Microsoft | Itanium |
+|---|---|---|
+| `int a : 1; byte b : 1;` | 8 | 4 |
+| `int a : 3; short b : 4;` | 8 | 4 |
+| `int a : 30; int b : 4;` | 8 | 8 |
+| `uint a : 3; uint b : 5; uint c : 24;` | 4 | 4 |
+
+**Microsoft** keeps one open storage unit, sized by the type that opened it, and
+starts a new one when the next field will not fit *or* is declared with a type of
+a different size. **Itanium** allocates at the next free bit and moves to the
+next boundary of the declared type only when the field would straddle one. An
+ordinary field closes whatever was being filled, under both.
+
+Both are implemented and both are checked against clang built for the matching
+target. `--abi microsoft|itanium` selects one; the default is the host's, and it
+governs C++ name mangling as well.
+
+A struct containing bit-fields is emitted as bytes — `%struct.Header = type
+{ [4 x i8] }` — because its fields do not line up with LLVM's when several share
+a unit. Every field of such a struct is then reached by its byte offset rather
+than by a structural index.
+
+Reading a bit-field is a load of the unit, a shift and a mask; a signed one is
+shifted left and arithmetic-shifted right so it sign-extends from its own width
+rather than the unit's. Writing is a load, a splice and a store, which is what
+leaves the neighbours sharing the unit alone. A bit-field has no address, so it
+cannot be passed by `ref`.
+
+In DWARF a bit-field is a member with `DIFlagBitField`, a `size` in bits, an
+`offset` in bits from the start of the value, and `extraData` giving the start of
+the storage unit — the third being what a debugger needs to know which bytes to
+load before shifting.
+
 ## 2. Object header (class instances)
 
 Reference types are heap blocks laid out as:

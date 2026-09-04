@@ -86,6 +86,9 @@ internal static class Program
               -O<0-3>              optimization level (default: -O2)
               -g                   describe the program to a debugger
               -D <name>            define a symbol for '#if' to test
+              --abi <microsoft|itanium>
+                                   which C and C++ ABI to agree with
+                                   (default: the host's)
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
               -h, --help           show this message
@@ -190,6 +193,7 @@ internal static class Program
         bool keep = false;
         bool debug = false;
         var defines = new List<string>();
+        Stainless.Binding.CppAbi? abi = null;
         bool shared = false;
         string? header = null;
         string? metadata = null;
@@ -218,6 +222,21 @@ internal static class Program
                 case "-D" or "--define":
                     if (++i >= args.Length) { Error("'-D' needs a name"); return false; }
                     defines.Add(args[i]);
+                    continue;
+
+                case "--abi":
+                    if (++i >= args.Length) { Error("'--abi' needs a name"); return false; }
+                    abi = args[i].ToLowerInvariant() switch
+                    {
+                        "microsoft" or "msvc" => Stainless.Binding.CppAbi.Microsoft,
+                        "itanium" or "gnu" or "gcc" => Stainless.Binding.CppAbi.Itanium,
+                        _ => null,
+                    };
+                    if (abi is null)
+                    {
+                        Error($"'{args[i]}' is not an ABI; it is 'microsoft' or 'itanium'");
+                        return false;
+                    }
                     continue;
 
                 case "--keep":
@@ -293,6 +312,7 @@ internal static class Program
             KeepIntermediates = keep,
             Debug = debug,
             Defines = defines,
+            CppAbi = abi,
             Shared = shared,
             HeaderPath = header,
             MetadataPath = metadata,
