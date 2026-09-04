@@ -717,8 +717,24 @@ A `struct` cannot implement an interface: an interface reference is counted,
 and a struct is a plain C value with nowhere to keep a count.
 
 Dispatch is four constant-offset loads with no search and no branch — see
-[abi.md](abi.md) for the tables. There is no class inheritance, no interface
-inheritance, and no downcasting from an interface back to a class.
+[abi.md](abi.md) for the tables. There is no class inheritance and no
+downcasting from an interface back to a class.
+
+**Interfaces do extend one another**, though, and a class implementing the
+derived one implements the base too:
+
+```csharp
+public interface IShape { double Area(); }
+public interface INamed : IShape { String Name(); }
+
+public class Circle : INamed { ... }        // must supply Area and Name
+
+INamed named = new Circle(2.0);
+IShape shape = named;                       // free, and no conversion is emitted
+```
+
+The base's table is built for the class alongside the derived one, so a call
+through either reference is the same four loads.
 
 **A class may implement two instantiations of one generic interface**, because
 each interface it implements gets its own table:
