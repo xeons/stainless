@@ -1,0 +1,9 @@
+app: one
+  library: two
+app: three
+  library: four
+app: holding held
+  library: dropping held
+app: dropped
+app: left/right is 10 bytes
+app: library agrees: true

@@ -73,8 +73,8 @@ What stands in the way is that the derived class's dispatch table is built by
 *this* compilation from a layout compiled by *that* one, so the two have to agree
 about the base's slot count and its destroy hook for ever after. The slots cross
 already; what does not is a rule about which changes to a library are compatible.
-Worth doing after [shipping the runtime as a shared library](#ship-the-runtime-as-a-shared-library),
-which is the other half of the same question.
+One runtime is no longer the obstacle -- both sides share it -- so what is left
+is versioning, which is the real question and a larger one.
 
 ---
 
@@ -133,15 +133,6 @@ and needs a lifetime story the language does not have.
 ---
 
 ## Runtime and libraries
-
-### Ship the runtime as a shared library
-
-The runtime is linked statically into every binary, so each side of a library
-boundary has its own allocator and its own C stdio buffer. Two consequences,
-both real: a managed object cannot safely cross a library boundary, and output
-written inside a library does not interleave with its consumer's in the order it
-was written. This closes both, and is the next thing worth doing about
-libraries.
 
 ### `String` has a thin API
 

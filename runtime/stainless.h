@@ -38,6 +38,36 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/*
+ * Whether a name leaves this library, and how a consumer reaches it.
+ *
+ * The runtime is built once as a shared library and linked by everything --
+ * a program, and any Stainless library that program loads. That is what makes
+ * one allocator, one set of reference counts and one stdio buffer serve all of
+ * them: with a copy statically linked into each, an object made on one side of
+ * a library boundary and released on the other would be counted twice, and the
+ * `TypeInfo` a `String` carries would not be the one the other side compares
+ * against.
+ *
+ * Windows needs the import side stated as well as the export side, because a
+ * data symbol -- `sl_string_type_info`, above all -- is reached through the
+ * import address table and the compiler has to know to emit that. Elsewhere
+ * only the export side matters, and stating it lets everything else be hidden.
+ */
+#if defined(_WIN32)
+#  if defined(STAINLESS_RUNTIME_BUILD)
+#    define SL_API __declspec(dllexport)
+#  elif defined(STAINLESS_RUNTIME_SHARED)
+#    define SL_API __declspec(dllimport)
+#  else
+#    define SL_API
+#  endif
+#elif defined(STAINLESS_RUNTIME_BUILD)
+#  define SL_API __attribute__((visibility("default")))
+#else
+#  define SL_API
+#endif
+
 /* ---------------------------------------------------------------- objects */
 
 /* ------------------------------------------------------------- reflection */
@@ -132,15 +162,15 @@ typedef struct SlObject {
 #define SL_IMMORTAL ((size_t)-1)
 
 /* arc.c */
-void *sl_alloc(const SlTypeInfo *type);
-void  sl_retain(void *pointer);
-void  sl_release(void *pointer);
-void  sl_weak_retain(void *pointer);
-void  sl_weak_release(void *pointer);
-void *sl_weak_load(void *pointer);
+SL_API void *sl_alloc(const SlTypeInfo *type);
+SL_API void  sl_retain(void *pointer);
+SL_API void  sl_release(void *pointer);
+SL_API void  sl_weak_retain(void *pointer);
+SL_API void  sl_weak_release(void *pointer);
+SL_API void *sl_weak_load(void *pointer);
 
 /* Initialises a header the runtime allocated itself, outside sl_alloc. */
-void  sl_object_init(void *pointer, const SlTypeInfo *type);
+SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);
 
 /*
  * Marks an object immortal, so retain and release skip it for the rest of the
@@ -150,14 +180,14 @@ void  sl_object_init(void *pointer, const SlTypeInfo *type);
  * It does not make the object's contents immutable, which is why the compiler
  * only permits it for values that are immutable already.
  */
-void  sl_make_immortal(void *pointer);
+SL_API void  sl_make_immortal(void *pointer);
 
 /* Reports a fatal runtime condition and aborts. Never returns. */
-void  sl_fail(const char *message);
+SL_API void  sl_fail(const char *message);
 
 /* The integer divisions LLVM leaves undefined. Neither returns. */
-void  sl_divide_by_zero(void);
-void  sl_divide_overflow(void);
+SL_API void  sl_divide_by_zero(void);
+SL_API void  sl_divide_overflow(void);
 
 /* ----------------------------------------------------------- inheritance */
 
@@ -166,16 +196,16 @@ void  sl_divide_overflow(void);
  * nothing's instance, which is what makes a cast from an optional a single
  * check rather than two.
  */
-int   sl_is_instance(const void *object, const SlTypeInfo *type);
+SL_API int   sl_is_instance(const void *object, const SlTypeInfo *type);
 
 /* Whether `object`'s class supplies a dispatch table for that interface id. */
-int   sl_implements(const void *object, size_t interfaceId);
+SL_API int   sl_implements(const void *object, size_t interfaceId);
 
 /*
  * A checked downcast that did not hold. Names what the object really is, which
  * is the question the programmer is about to ask. Never returns.
  */
-void  sl_cast_failed(const void *object, const char *wanted);
+SL_API void  sl_cast_failed(const void *object, const char *wanted);
 
 /* ----------------------------------------------------------------- String */
 
@@ -189,25 +219,25 @@ typedef struct SlString {
     size_t   byteLength;
 } SlString;
 
-extern const SlTypeInfo sl_string_type_info;
+SL_API extern const SlTypeInfo sl_string_type_info;
 
 /* Shared with utf16.c, string_builder.c and console.c. */
-uint8_t  *sl_string_data(SlString *string);
-SlString *sl_string_new(size_t byteLength);
+SL_API uint8_t  *sl_string_data(SlString *string);
+SL_API SlString *sl_string_new(size_t byteLength);
 
-void  *sl_string_from_bytes(const uint8_t *data, size_t byteLength);
-void  *sl_string_from_null_terminated(const char *text);
-void  *sl_string_from_integer(long long value);
-void  *sl_string_from_double(double value);
-void  *sl_string_from_bool(_Bool value);
+SL_API void  *sl_string_from_bytes(const uint8_t *data, size_t byteLength);
+SL_API void  *sl_string_from_null_terminated(const char *text);
+SL_API void  *sl_string_from_integer(long long value);
+SL_API void  *sl_string_from_double(double value);
+SL_API void  *sl_string_from_bool(_Bool value);
 
-const uint8_t *sl_string_pointer(void *pointer);
-size_t sl_string_byte_length(void *pointer);
-_Bool  sl_string_is_empty(void *pointer);
-size_t sl_string_code_point_count(void *pointer);
-void  *sl_string_concat(void *left, void *right);
-_Bool  sl_string_equals(void *left, void *right);
-void  *sl_string_substring(void *pointer, size_t start, size_t length);
+SL_API const uint8_t *sl_string_pointer(void *pointer);
+SL_API size_t sl_string_byte_length(void *pointer);
+SL_API _Bool  sl_string_is_empty(void *pointer);
+SL_API size_t sl_string_code_point_count(void *pointer);
+SL_API void  *sl_string_concat(void *left, void *right);
+SL_API _Bool  sl_string_equals(void *left, void *right);
+SL_API void  *sl_string_substring(void *pointer, size_t start, size_t length);
 
 /* ------------------------------------------------------ files and paths */
 
@@ -216,28 +246,28 @@ void  *sl_string_substring(void *pointer, size_t start, size_t length);
  * operating system; errors come back as the small stable enum Standard.IO
  * declares, rather than as errno.
  */
-void   *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *error);
-void    sl_file_close(void *handle);
-size_t  sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error);
-size_t  sl_file_write(void *handle, const uint8_t *buffer, size_t count, int32_t *error);
-int64_t sl_file_seek(void *handle, int64_t offset, int32_t origin, int32_t *error);
-int64_t sl_file_position(void *handle);
-int64_t sl_file_length(void *handle);
-void    sl_file_flush(void *handle);
+SL_API void   *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *error);
+SL_API void    sl_file_close(void *handle);
+SL_API size_t  sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error);
+SL_API size_t  sl_file_write(void *handle, const uint8_t *buffer, size_t count, int32_t *error);
+SL_API int64_t sl_file_seek(void *handle, int64_t offset, int32_t origin, int32_t *error);
+SL_API int64_t sl_file_position(void *handle);
+SL_API int64_t sl_file_length(void *handle);
+SL_API void    sl_file_flush(void *handle);
 
-_Bool   sl_path_exists(const uint8_t *path);
-_Bool   sl_path_is_directory(const uint8_t *path);
-int64_t sl_path_size(const uint8_t *path);
-int64_t sl_path_modified(const uint8_t *path);
+SL_API _Bool   sl_path_exists(const uint8_t *path);
+SL_API _Bool   sl_path_is_directory(const uint8_t *path);
+SL_API int64_t sl_path_size(const uint8_t *path);
+SL_API int64_t sl_path_modified(const uint8_t *path);
 
-int32_t sl_file_delete(const uint8_t *path);
-int32_t sl_file_rename(const uint8_t *from, const uint8_t *to);
-int32_t sl_directory_create(const uint8_t *path);
-int32_t sl_directory_delete(const uint8_t *path);
+SL_API int32_t sl_file_delete(const uint8_t *path);
+SL_API int32_t sl_file_rename(const uint8_t *from, const uint8_t *to);
+SL_API int32_t sl_directory_create(const uint8_t *path);
+SL_API int32_t sl_directory_delete(const uint8_t *path);
 
-void          *sl_directory_open(const uint8_t *path);
-const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory);
-void           sl_directory_close(void *handle);
+SL_API void          *sl_directory_open(const uint8_t *path);
+SL_API const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory);
+SL_API void           sl_directory_close(void *handle);
 
 /* ------------------------------------------------- ordering and hashing */
 
@@ -247,14 +277,14 @@ void           sl_directory_close(void *handle);
  * CompareTo and HashCode on those types and lowers them to these. See
  * hashing.c.
  */
-int32_t sl_compare_long(int64_t left, int64_t right);
-int32_t sl_compare_ulong(uint64_t left, uint64_t right);
-int32_t sl_compare_double(double left, double right);
-int32_t sl_string_compare(void *left, void *right);
+SL_API int32_t sl_compare_long(int64_t left, int64_t right);
+SL_API int32_t sl_compare_ulong(uint64_t left, uint64_t right);
+SL_API int32_t sl_compare_double(double left, double right);
+SL_API int32_t sl_string_compare(void *left, void *right);
 
-size_t sl_hash_integer(uint64_t value);
-size_t sl_hash_double(double value);
-size_t sl_string_hash(void *pointer);
+SL_API size_t sl_hash_integer(uint64_t value);
+SL_API size_t sl_hash_double(double value);
+SL_API size_t sl_string_hash(void *pointer);
 
 /* ------------------------------------------------------------ Utf16String */
 
@@ -263,14 +293,14 @@ typedef struct SlUtf16String {
     size_t   unitCount;
 } SlUtf16String;
 
-extern const SlTypeInfo sl_utf16_string_type_info;
+SL_API extern const SlTypeInfo sl_utf16_string_type_info;
 
-void           *sl_string_to_utf16(void *pointer);
-const uint16_t *sl_utf16_pointer(void *pointer);
-size_t          sl_utf16_unit_count(void *pointer);
-void           *sl_string_from_utf16(const uint16_t *units, size_t unitCount);
-void           *sl_string_from_null_terminated_utf16(const uint16_t *units);
-void           *sl_utf16_to_string(void *pointer);
+SL_API void           *sl_string_to_utf16(void *pointer);
+SL_API const uint16_t *sl_utf16_pointer(void *pointer);
+SL_API size_t          sl_utf16_unit_count(void *pointer);
+SL_API void           *sl_string_from_utf16(const uint16_t *units, size_t unitCount);
+SL_API void           *sl_string_from_null_terminated_utf16(const uint16_t *units);
+SL_API void           *sl_utf16_to_string(void *pointer);
 
 /* ---------------------------------------------------------- StringBuilder */
 
@@ -281,18 +311,18 @@ typedef struct SlStringBuilder {
     size_t    capacity;
 } SlStringBuilder;
 
-extern const SlTypeInfo sl_string_builder_type_info;
+SL_API extern const SlTypeInfo sl_string_builder_type_info;
 
-void  *sl_string_builder_new(void);
-void   sl_string_builder_append(void *pointer, void *stringPointer);
-void   sl_string_builder_append_line(void *pointer, void *stringPointer);
-void   sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t byteLength);
-void   sl_string_builder_append_integer(void *pointer, long long value);
-void   sl_string_builder_append_double(void *pointer, double value);
-size_t sl_string_builder_byte_length(void *pointer);
-_Bool  sl_string_builder_is_empty(void *pointer);
-void   sl_string_builder_clear(void *pointer);
-void  *sl_string_builder_to_string(void *pointer);
+SL_API void  *sl_string_builder_new(void);
+SL_API void   sl_string_builder_append(void *pointer, void *stringPointer);
+SL_API void   sl_string_builder_append_line(void *pointer, void *stringPointer);
+SL_API void   sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t byteLength);
+SL_API void   sl_string_builder_append_integer(void *pointer, long long value);
+SL_API void   sl_string_builder_append_double(void *pointer, double value);
+SL_API size_t sl_string_builder_byte_length(void *pointer);
+SL_API _Bool  sl_string_builder_is_empty(void *pointer);
+SL_API void   sl_string_builder_clear(void *pointer);
+SL_API void  *sl_string_builder_to_string(void *pointer);
 
 /* ------------------------------------------------------------------ Array */
 
@@ -309,46 +339,46 @@ typedef struct SlArray {
     size_t   length;
 } SlArray;
 
-void  *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize);
-size_t sl_array_length(void *pointer);
+SL_API void  *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize);
+SL_API size_t sl_array_length(void *pointer);
 
 /* Reports an out-of-range index and aborts. Never returns. */
-void   sl_array_bounds_fail(size_t index, size_t length);
-void   sl_slice_bounds_fail(size_t from, size_t to, size_t length);
+SL_API void   sl_array_bounds_fail(size_t index, size_t length);
+SL_API void   sl_slice_bounds_fail(size_t from, size_t to, size_t length);
 
 /* ------------------------------------------------------------- reflection */
 
-const char        *sl_type_name(const void *type);
-size_t             sl_type_size(const void *type);
-size_t             sl_type_field_count(const void *type);
-const void        *sl_type_field(const void *type, size_t index);
-size_t             sl_type_attribute_count(const void *type);
-const void        *sl_type_attribute(const void *type, size_t index);
+SL_API const char        *sl_type_name(const void *type);
+SL_API size_t             sl_type_size(const void *type);
+SL_API size_t             sl_type_field_count(const void *type);
+SL_API const void        *sl_type_field(const void *type, size_t index);
+SL_API size_t             sl_type_attribute_count(const void *type);
+SL_API const void        *sl_type_attribute(const void *type, size_t index);
 
-const char        *sl_field_name(const void *field);
-size_t             sl_field_offset(const void *field);
-uint32_t           sl_field_kind(const void *field);
-const void        *sl_field_type(const void *field);
-size_t             sl_field_attribute_count(const void *field);
-const void        *sl_field_attribute(const void *field, size_t index);
+SL_API const char        *sl_field_name(const void *field);
+SL_API size_t             sl_field_offset(const void *field);
+SL_API uint32_t           sl_field_kind(const void *field);
+SL_API const void        *sl_field_type(const void *field);
+SL_API size_t             sl_field_attribute_count(const void *field);
+SL_API const void        *sl_field_attribute(const void *field, size_t index);
 
-const char        *sl_attribute_name(const void *attribute);
-size_t             sl_attribute_value_count(const void *attribute);
-uint32_t           sl_attribute_value_kind(const void *attribute, size_t index);
-int64_t            sl_attribute_value_number(const void *attribute, size_t index);
-const char        *sl_attribute_value_text(const void *attribute, size_t index);
+SL_API const char        *sl_attribute_name(const void *attribute);
+SL_API size_t             sl_attribute_value_count(const void *attribute);
+SL_API uint32_t           sl_attribute_value_kind(const void *attribute, size_t index);
+SL_API int64_t            sl_attribute_value_number(const void *attribute, size_t index);
+SL_API const char        *sl_attribute_value_text(const void *attribute, size_t index);
 
 /* Reading a field out of an instance, by its recorded offset. */
-int64_t  sl_read_integer(const void *instance, const void *field);
-double   sl_read_double(const void *instance, const void *field);
-_Bool    sl_read_bool(const void *instance, const void *field);
-void    *sl_read_reference(const void *instance, const void *field);
+SL_API int64_t  sl_read_integer(const void *instance, const void *field);
+SL_API double   sl_read_double(const void *instance, const void *field);
+SL_API _Bool    sl_read_bool(const void *instance, const void *field);
+SL_API void    *sl_read_reference(const void *instance, const void *field);
 
 /* ---------------------------------------------------------------- Console */
 
-void sl_console_write(void *pointer);
-void sl_console_write_line(void *pointer);
-void sl_console_write_error(void *pointer);
+SL_API void sl_console_write(void *pointer);
+SL_API void sl_console_write_line(void *pointer);
+SL_API void sl_console_write_error(void *pointer);
 
 /* -------------------------------------------------------------- threading */
 
@@ -368,43 +398,43 @@ void sl_console_write_error(void *pointer);
 typedef struct SlMutex     { void *opaque[5]; } SlMutex;
 typedef struct SlCondition { void *opaque[6]; } SlCondition;
 
-void  sl_mutex_init(SlMutex *mutex);
-void  sl_mutex_destroy(SlMutex *mutex);
+SL_API void  sl_mutex_init(SlMutex *mutex);
+SL_API void  sl_mutex_destroy(SlMutex *mutex);
 
 /*
  * A mutex on the heap, initialised and ready. Stainless reaches locking
  * through these: a class cannot embed an SlMutex, because its size is a
  * platform detail the language is not told.
  */
-void *sl_mutex_new(void);
-void  sl_mutex_free(void *mutex);
-void  sl_mutex_lock(SlMutex *mutex);
-_Bool sl_mutex_try_lock(SlMutex *mutex);
-void  sl_mutex_unlock(SlMutex *mutex);
+SL_API void *sl_mutex_new(void);
+SL_API void  sl_mutex_free(void *mutex);
+SL_API void  sl_mutex_lock(SlMutex *mutex);
+SL_API _Bool sl_mutex_try_lock(SlMutex *mutex);
+SL_API void  sl_mutex_unlock(SlMutex *mutex);
 
-void *sl_condition_new(void);
-void  sl_condition_free(void *condition);
+SL_API void *sl_condition_new(void);
+SL_API void  sl_condition_free(void *condition);
 
-void  sl_condition_init(SlCondition *condition);
-void  sl_condition_destroy(SlCondition *condition);
-void  sl_condition_wait(SlCondition *condition, SlMutex *mutex);
-void  sl_condition_signal(SlCondition *condition);
-void  sl_condition_broadcast(SlCondition *condition);
+SL_API void  sl_condition_init(SlCondition *condition);
+SL_API void  sl_condition_destroy(SlCondition *condition);
+SL_API void  sl_condition_wait(SlCondition *condition, SlMutex *mutex);
+SL_API void  sl_condition_signal(SlCondition *condition);
+SL_API void  sl_condition_broadcast(SlCondition *condition);
 
 /* Sequentially consistent. The language exposes these as Atomic<T>. */
-long long sl_atomic_load(const long long *cell);
-void      sl_atomic_store(long long *cell, long long value);
-long long sl_atomic_add(long long *cell, long long delta);
-long long sl_atomic_exchange(long long *cell, long long value);
-_Bool     sl_atomic_compare_exchange(long long *cell, long long *expected, long long desired);
+SL_API long long sl_atomic_load(const long long *cell);
+SL_API void      sl_atomic_store(long long *cell, long long value);
+SL_API long long sl_atomic_add(long long *cell, long long delta);
+SL_API long long sl_atomic_exchange(long long *cell, long long value);
+SL_API _Bool     sl_atomic_compare_exchange(long long *cell, long long *expected, long long desired);
 
 typedef struct SlThread SlThread;
 
-SlThread *sl_thread_start(void (*entry)(void *), void *argument);
-void      sl_thread_join(SlThread *thread);
-void      sl_thread_yield(void);
-size_t    sl_thread_current_id(void);
-size_t    sl_cpu_count(void);
+SL_API SlThread *sl_thread_start(void (*entry)(void *), void *argument);
+SL_API void      sl_thread_join(SlThread *thread);
+SL_API void      sl_thread_yield(void);
+SL_API size_t    sl_thread_current_id(void);
+SL_API size_t    sl_cpu_count(void);
 
 /* --------------------------------------------------------------- the pool */
 
@@ -418,13 +448,13 @@ typedef struct SlScope SlScope;
 
 /* Starts the shared pool. Passing 0 sizes it from the CPU count. Optional --
  * a scope starts the pool itself on first use. */
-void   sl_pool_start(size_t workers);
-void   sl_pool_shutdown(void);
-size_t sl_pool_worker_count(void);
+SL_API void   sl_pool_start(size_t workers);
+SL_API void   sl_pool_shutdown(void);
+SL_API size_t sl_pool_worker_count(void);
 
-SlScope *sl_scope_begin(void);
-void     sl_scope_submit(SlScope *scope, SlJob job, void *argument);
-void     sl_scope_end(SlScope *scope);
+SL_API SlScope *sl_scope_begin(void);
+SL_API void     sl_scope_submit(SlScope *scope, SlJob job, void *argument);
+SL_API void     sl_scope_end(SlScope *scope);
 
 /*
  * A job over half-open index range [start, end). What `parallel for` compiles
@@ -440,6 +470,6 @@ typedef void (*SlRangeJob)(void *capture, size_t start, size_t end);
  * is a performance question rather than a correctness one -- the right place
  * to change it later is one C function.
  */
-void sl_parallel_range(SlScope *scope, size_t count, SlRangeJob job, void *capture);
+SL_API void sl_parallel_range(SlScope *scope, size_t count, SlRangeJob job, void *capture);
 
 #endif /* STAINLESS_RUNTIME_H */

@@ -25,6 +25,14 @@ public sealed record ToolResult(int ExitCode, string StandardOutput, string Stan
 }
 
 /// <summary>
+/// The runtime built as one shared library: the file itself, and what a link
+/// line should name to use it. On Windows those differ -- a link line names the
+/// import library and the loader finds the DLL -- and everywhere else they are
+/// the same file.
+/// </summary>
+public sealed record SharedRuntime(string Library, string LinkInput);
+
+/// <summary>
 /// Locates the native toolchain and drives it.
 ///
 /// Stainless emits textual LLVM IR, so the only external tool it needs is one
@@ -117,7 +125,8 @@ public sealed class Toolchain
     /// so a change to, say, the array code does not force the string code to be
     /// rebuilt, and each unit stays small enough to read in one sitting.
     /// </summary>
-    public IReadOnlyList<string> BuildRuntime(string objectDirectory, bool debug = false)
+    public IReadOnlyList<string> BuildRuntime(
+        string objectDirectory, bool debug = false, bool shared = false)
     {
         Directory.CreateDirectory(objectDirectory);
 
@@ -140,7 +149,10 @@ public sealed class Toolchain
 
             // A debug object is a different object, so it gets a different name.
             // Sharing one would hand whichever build ran second the other's.
-            string objectFile = Path.ChangeExtension(source, debug ? ".g.o" : ".o");
+            // A shared one differs again: it is compiled position-independent
+            // and with its exports marked, and neither is true of the other.
+            string suffix = (shared ? ".so" : "") + (debug ? ".g" : "") + ".o";
+            string objectFile = Path.ChangeExtension(source, suffix);
             objectFiles.Add(objectFile);
 
             bool changed = WriteIfChanged(source, text);
@@ -148,6 +160,20 @@ public sealed class Toolchain
 
             List<string> arguments =
                 ["-c", source, "-ffunction-sections", "-fdata-sections", "-o", objectFile];
+
+            if (shared)
+            {
+                // Everything the runtime means to export says so in the header.
+                // Hiding the rest keeps the library's surface the one documented
+                // rather than every symbol that happened to have external
+                // linkage, and lets the linker resolve the rest internally.
+                arguments.Add("-DSTAINLESS_RUNTIME_BUILD");
+
+                // Windows relocates a DLL at load time and rejects the flag;
+                // everywhere else a shared object has to be built for it.
+                if (!OperatingSystem.IsWindows())
+                    arguments.AddRange(["-fPIC", "-fvisibility=hidden"]);
+            }
 
             // -O0 alongside -g, because a runtime compiled at -O2 has had the
             // frames a debugger wants to show inlined away.
@@ -160,6 +186,61 @@ public sealed class Toolchain
         }
 
         return objectFiles;
+    }
+
+    /// <summary>The file name the runtime is built under.</summary>
+    public const string RuntimeName = "stainless-rt";
+
+    /// <summary>
+    /// Builds the runtime as one shared library, and returns what a link line
+    /// should name to use it.
+    ///
+    /// On Windows that is the import library beside the DLL; everywhere else it
+    /// is the shared object itself, which the linker reads directly. Both are
+    /// rebuilt only when an input is newer, because every build in a session
+    /// asks for this and the answer is almost always the same one.
+    /// </summary>
+    public SharedRuntime BuildSharedRuntime(string objectDirectory, bool debug = false)
+    {
+        var objects = BuildRuntime(objectDirectory, debug, shared: true);
+
+        string library = Path.Combine(objectDirectory,
+            (OperatingSystem.IsWindows() ? "" : "lib") + RuntimeName +
+            (debug ? "-g" : "") + SharedLibraryExtension);
+
+        // The import library is what a Windows link line names, and the linker
+        // writes it beside the DLL rather than being told where to put it.
+        string linkInput = OperatingSystem.IsWindows()
+            ? Path.ChangeExtension(library, ".lib")
+            : library;
+
+        if (IsUpToDate(library, objects) && File.Exists(linkInput))
+            return new SharedRuntime(library, linkInput);
+
+        List<string> arguments = [.. objects, "-shared", "-o", library];
+        if (debug) arguments.Add("-g");
+
+        // A shared library resolves everything it needs at link time on Windows
+        // and would happily leave a hole elsewhere; saying so keeps a mistake in
+        // the runtime from turning into a missing symbol in someone's program.
+        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsMacOS())
+            arguments.Add("-Wl,--no-undefined");
+
+        var result = Run(ClangPath, arguments);
+        if (!result.Success)
+            throw new InvalidOperationException(
+                $"failed to link the Stainless runtime:\n{result.StandardError}");
+
+        return new SharedRuntime(library, linkInput);
+    }
+
+    /// <summary>True when <paramref name="output"/> is newer than every input.</summary>
+    private static bool IsUpToDate(string output, IEnumerable<string> inputs)
+    {
+        if (!File.Exists(output)) return false;
+
+        var built = File.GetLastWriteTimeUtc(output);
+        return inputs.All(i => File.Exists(i) && File.GetLastWriteTimeUtc(i) <= built);
     }
 
     /// <summary>Writes the file only when it differs, and reports whether it did.</summary>
@@ -202,10 +283,18 @@ public sealed class Toolchain
         int optimizationLevel,
         bool shared = false,
         bool debug = false,
-        IReadOnlyList<string>? libraries = null)
+        IReadOnlyList<string>? libraries = null,
+        SharedRuntime? sharedRuntime = null)
     {
         List<string> arguments = [irPath];
-        arguments.AddRange(runtimeObjects);
+
+        // One or the other: the runtime is either compiled into this binary or
+        // reached in the one library everything shares. Both at once would be
+        // two allocators and two sets of counts, which is the whole thing the
+        // shared build exists to prevent.
+        if (sharedRuntime is not null) arguments.Add(sharedRuntime.LinkInput);
+        else arguments.AddRange(runtimeObjects);
+
         arguments.AddRange(nativeInputs);
 
         // Named libraries come after the objects that reference them, because a
@@ -222,6 +311,14 @@ public sealed class Toolchain
         // It tells clang to keep it through to the binary, and on Windows to ask
         // the linker for the .pdb the debugger actually reads.
         if (debug) arguments.Add("-g");
+
+        // The runtime sits beside whatever loaded it, so that is where a
+        // binary is told to look. Windows searches its own directory already;
+        // ELF and Mach-O have to be asked, and each spells it differently.
+        if (sharedRuntime is not null && !OperatingSystem.IsWindows())
+            arguments.Add(OperatingSystem.IsMacOS()
+                ? "-Wl,-rpath,@loader_path"
+                : "-Wl,-rpath,$ORIGIN");
 
         arguments.AddRange([
             $"-O{optimizationLevel}",

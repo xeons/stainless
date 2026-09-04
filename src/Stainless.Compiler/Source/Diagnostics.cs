@@ -25,7 +25,6 @@ public sealed record Diagnostic(Severity Severity, string Code, string Message, 
     /// <summary>Renders a diagnostic with a source excerpt and a caret run under the span.</summary>
     public string Render(bool color = true)
     {
-        var (line, col) = Span.File.GetLineColumn(Span.Start);
         string sevText = Severity switch
         {
             Severity.Error => "error",
@@ -43,6 +42,13 @@ public sealed record Diagnostic(Severity Severity, string Code, string Message, 
 
         var sb = new StringBuilder();
         sb.Append($"{C(sevColor)}{sevText}[{Code}]{C(reset)}{C(bold)}: {Message}{C(reset)}\n");
+
+        // Something with no source of its own -- a type read back from a
+        // library's metadata, say -- has no file to excerpt, and the message is
+        // the whole of what can be said about it.
+        if (Span.File is null) return sb.ToString();
+
+        var (line, col) = Span.File.GetLineColumn(Span.Start);
 
         string lineNo = line.ToString();
         string pad = new(' ', lineNo.Length);
@@ -74,9 +80,15 @@ public sealed class DiagnosticBag
 
     public void AddRange(DiagnosticBag other) => _items.AddRange(other._items);
 
-    /// <summary>Errors first, then by file and position, so output reads top-to-bottom.</summary>
+    /// <summary>
+    /// Errors first, then by file and position, so output reads top-to-bottom.
+    ///
+    /// A diagnostic about something with no source of its own -- a type read
+    /// back from a library's metadata, say -- has no file, and sorts before the
+    /// ones that do rather than bringing the compiler down.
+    /// </summary>
     public IEnumerable<Diagnostic> Sorted() => _items
         .OrderBy(d => d.Severity)
-        .ThenBy(d => d.Span.File.Path, StringComparer.Ordinal)
+        .ThenBy(d => d.Span.File?.Path ?? "", StringComparer.Ordinal)
         .ThenBy(d => d.Span.Start);
 }

@@ -894,6 +894,12 @@ reaches across too: the object is allocated through the library's own TypeInfo,
 so it is destroyed by the destructor the library compiled for its layout, when
 the consumer drops the last reference.
 
+**Both sides link one runtime**, which is what makes that count one count. They
+share an allocator and a C stdio buffer as well, so what a library prints
+interleaves with its consumer's output in the order the two of them wrote it.
+The compiler builds `stainless-rt` once and copies it beside each binary, so
+`build/` ends up holding it next to the library and the program.
+
 Generics and classes implementing interfaces do not cross, and the compiler says
 so where the library is built rather than leaving the consumer to find a public
 type missing. See [§8.4 of the spec](docs/language-spec.md) for why each is a
@@ -1121,6 +1127,14 @@ Everything below is covered by [the test suite](tests/cases).
   gone, rather than as a pointer into freed memory
 - `foreach` over arrays and over anything with a `GetEnumerator()`, plus
   `IEnumerable<T>` / `IEnumerator<T>` in `Standard.Collections`
+- One runtime where two Stainless binaries meet: a program and the libraries it
+  loads reach the same allocator, the same reference counts and the same stdio
+  buffer, so an object made on one side and dropped on the other is counted once
+  and output interleaves in the order it was written. It is a shared library
+  built once and copied beside what uses it; a program with no such boundary
+  keeps the copy compiled into it and stays a single file. `--runtime` overrides
+  the choice, and a mismatch across a boundary is refused rather than left to
+  misbehave
 - Interfaces: several per class, dynamic dispatch, checked at compile time,
   inherited by a derived class along with everything else, and extending one
   another with free conversion to the base. A class may implement
@@ -1341,11 +1355,12 @@ Being straight about the edges, roughly in the order they are worth adding:
   Anything reaching one of those through a field or a signature is reported too
   (SL0419, SL0420, SL0441, SL0477), all of them where the library is built
   rather than where the consumer trips over them.
-- **The runtime is linked statically into every binary.** Each side of a library
-  boundary therefore has its own allocator and its own C stdio buffer, so output
-  written from inside a library does not interleave with its consumer's in the
-  order it was written. Shipping the runtime as its own shared library would
-  close both, and is the next thing worth doing about libraries.
+- **The shared runtime is a file to carry.** Where two Stainless binaries meet
+  the runtime is one shared library, which is what puts them on one allocator
+  and one stdio buffer — and it then has to sit beside them. The compiler copies
+  it there, but a binary moved on its own will not find it. A program with no
+  library boundary keeps the copy compiled in and stays standalone, which is
+  what the default is about.
 - **No `out`, no `ref` locals and no `ref` returns.** `out` would need
   definite-assignment analysis to be worth having over `ref`; the other two
   would need a lifetime story the language does not have.

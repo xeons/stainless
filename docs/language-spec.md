@@ -2604,12 +2604,18 @@ described happily, and the consumer would be the one to find that the field's
 type is a name nothing can resolve — which is precisely the failure these
 warnings exist to move to this side of the boundary.
 
-**One thing to know about output.** Each binary links its own copy of the
-runtime, so each has its own C stdio buffer. Text written from inside a library
-and text written by its consumer do not interleave in the order they were
-written unless something flushes. Shipping the runtime as its own shared library
-would fix that, and would also put both sides on one allocator; that is still
-not done.
+**Both sides share one runtime.** A library built with `--metadata` and a
+program built with `--reference` link the same `stainless-rt` shared library
+rather than each compiling in a copy, so there is one allocator, one set of
+reference counts and one C stdio buffer: an object made on one side and dropped
+on the other is counted once, and output interleaves in the order it was
+written. The compiler puts the runtime beside what it built.
+
+A program with no library boundary keeps the copy compiled into it and stays a
+single file, which is the default. `--runtime shared|static` says so explicitly,
+and a library and a consumer that disagree are refused — two runtimes is exactly
+the failure this closes, and it would otherwise be a silent one. See
+[abi.md](abi.md) §6.1.
 
 ### 8.5 Linking a platform library
 

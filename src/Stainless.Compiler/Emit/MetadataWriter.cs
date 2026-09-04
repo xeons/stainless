@@ -60,7 +60,8 @@ public static class MetadataWriter
         BoundProgram program,
         string library,
         IReadOnlySet<string> ownModules,
-        DiagnosticBag? diagnostics = null)
+        DiagnosticBag? diagnostics = null,
+        bool sharedRuntime = false)
     {
         var types = new List<MetadataType>();
 
@@ -152,11 +153,13 @@ public static class MetadataWriter
         // field or a signature naming something the metadata left out would
         // reach the consumer as a name it cannot resolve, which is the failure
         // the warnings above exist to move to this side of the boundary.
-        if (diagnostics is not null) CheckDescribable(types, functions, diagnostics, program);
+        if (diagnostics is not null)
+            CheckDescribable(types, functions, diagnostics, program, ownModules);
 
         return new ModuleMetadata
         {
             Library = library,
+            SharedRuntime = sharedRuntime,
             Types = types,
             Functions = functions,
         };
@@ -173,14 +176,37 @@ public static class MetadataWriter
         List<MetadataType> types,
         List<MetadataFunction> functions,
         DiagnosticBag diagnostics,
-        BoundProgram program)
+        BoundProgram program,
+        IReadOnlySet<string> ownModules)
     {
         var known = types.Select(t => t.Module + "." + t.Name).ToHashSet(StringComparer.Ordinal);
+
+        // A type this library did not declare is one the consumer reaches the
+        // same way this compilation did: the standard library is compiled into
+        // every program, and a referenced library has to be referenced by both
+        // sides anyway. Describing those here would be declaring them twice.
+        // What is genuinely unresolvable is an instantiated generic, whose name
+        // is not something a consumer can write and whose template is not in the
+        // binary -- and those are not in any module's table, so they are not
+        // added here.
+        foreach (var type in program.Modules
+                     .Where(m => !ownModules.Contains(m.Name))
+                     .SelectMany(m => m.Types.Values))
+            known.Add(type.QualifiedName);
+
         var spans = program.Modules
             .SelectMany(m => m.Types.Values)
             .Where(t => t.Span is not null)
             .GroupBy(t => t.QualifiedName, StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.First().Span!.Value, StringComparer.Ordinal);
+
+        // A free function is not a type, and a warning without a place to point
+        // at is one a reader cannot act on.
+        foreach (var function in program.Modules
+                     .Where(m => ownModules.Contains(m.Name))
+                     .SelectMany(m => m.Functions)
+                     .Where(f => f.ContainingType is null))
+            spans.TryAdd(function.ModuleName + "." + function.Name, function.Span);
 
         var reported = new HashSet<string>(StringComparer.Ordinal);
 

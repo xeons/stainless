@@ -90,6 +90,14 @@ internal static class Program
               --header <path>      write a C header for the exported surface
               --metadata <path>    write module metadata for a Stainless consumer
               --reference <path>   bind against a library's module metadata
+              --runtime <shared|static>
+                                   whether the runtime is one shared library or a
+                                   copy in this binary. The default is shared where
+                                   two Stainless binaries meet -- a '--metadata'
+                                   build or a '--reference' one -- and static
+                                   everywhere else, because a program with no
+                                   library boundary has nothing to gain and a file
+                                   to carry
               -O<0-3>              optimization level (default: -O2)
               -g                   describe the program to a debugger
               -D <name>            define a symbol for '#if' to test
@@ -223,6 +231,7 @@ internal static class Program
         string? header = null;
         string? metadata = null;
         var references = new List<string>();
+        bool? sharedRuntime = null;
         var libraries = new List<string>();
 
         for (int i = 0; i < args.Length; i++)
@@ -286,6 +295,18 @@ internal static class Program
                 case "--reference" or "-r":
                     if (++i >= args.Length) { Error("'--reference' needs a path"); return false; }
                     references.Add(args[i]);
+                    continue;
+
+                case "--runtime":
+                    if (++i >= args.Length) { Error("'--runtime' needs 'shared' or 'static'"); return false; }
+                    switch (args[i])
+                    {
+                        case "shared": sharedRuntime = true; break;
+                        case "static": sharedRuntime = false; break;
+                        default:
+                            Error($"unknown runtime '{args[i]}'; it is 'shared' or 'static'");
+                            return false;
+                    }
                     continue;
 
                 case "--header":
@@ -355,6 +376,7 @@ internal static class Program
             HeaderPath = header,
             MetadataPath = metadata,
             References = references,
+            SharedRuntime = sharedRuntime,
         };
 
         // -O2 is the default rather than a choice, and stepping through code the

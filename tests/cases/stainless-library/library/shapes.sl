@@ -11,10 +11,11 @@ public struct Point {
     public double Y;
 }
 
-// Something the consumer can watch, so a destructor running is observable
-// without printing from this side. Output from a library goes through that
-// binary's own copy of the C runtime and so its own stdout buffer, which is
-// why the two do not interleave predictably.
+// Something the consumer can watch, so a destructor running is observable as a
+// value rather than as a line of output. Both sides now share one runtime and
+// so one stdio buffer -- `shared-runtime` is the case that pins that -- and this
+// one keeps watching a counter, because a count the consumer reads back proves
+// the reference reached zero rather than that something printed.
 public class Tally {
     public int Destroyed { get; set; }
 }

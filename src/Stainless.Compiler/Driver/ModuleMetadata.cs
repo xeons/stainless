@@ -37,6 +37,17 @@ namespace Stainless.Driver;
 public sealed record ModuleMetadata
 {
     /// <summary>
+    /// Whether this library reaches the runtime in one shared library or has a
+    /// copy compiled into it.
+    ///
+    /// Both sides of a boundary must answer the same, or there are two
+    /// allocators and two sets of reference counts again -- which is the bug the
+    /// shared runtime exists to close, and would be a silent one. The consumer
+    /// checks this and refuses a mismatch.
+    /// </summary>
+    public bool SharedRuntime { get; init; }
+
+    /// <summary>
     /// Bumped whenever the shape below changes. A consumer refuses a version it
     /// does not know rather than reading fields that have moved.
     /// </summary>

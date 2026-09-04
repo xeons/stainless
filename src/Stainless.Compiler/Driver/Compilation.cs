@@ -58,6 +58,31 @@ public sealed record CompilationOptions
     /// <summary>Metadata files describing libraries this program links against.</summary>
     public IReadOnlyList<string> References { get; init; } = [];
 
+    /// <summary>
+    /// Whether the runtime is one shared library everything links, or a copy
+    /// compiled into this binary. Null asks for whichever the build needs.
+    ///
+    /// It matters only where two Stainless binaries meet. A copy each means two
+    /// allocators, two sets of reference counts and two stdio buffers: an object
+    /// made on one side and released on the other is counted twice, the
+    /// <c>TypeInfo</c> a <c>String</c> carries is not the one the other side
+    /// compares against, and output written in a library does not interleave
+    /// with its consumer's. One shared runtime closes all three.
+    ///
+    /// A program with no such boundary has nothing to gain and a file to carry,
+    /// so it keeps the copy. <see cref="NeedsSharedRuntime"/> is that rule.
+    /// </summary>
+    public bool? SharedRuntime { get; init; }
+
+    /// <summary>
+    /// True when this build has a Stainless library boundary in it: either it is
+    /// producing metadata for a Stainless consumer, or it is binding against
+    /// some. A C consumer does not count -- it has no runtime of its own for a
+    /// second copy to disagree with.
+    /// </summary>
+    public bool NeedsSharedRuntime =>
+        SharedRuntime ?? (MetadataPath is not null || References.Count > 0);
+
     public bool KeepIntermediates { get; init; }
     public bool EmitIrOnly { get; init; }
 
@@ -332,6 +357,20 @@ public sealed class Compilation
         {
             var metadata = ModuleMetadata.Read(path, out string referenceError);
             if (metadata is null) return Failure(referenceError);
+
+            // Both sides of a boundary have to reach the same runtime, or there
+            // are two allocators and two sets of counts and nothing says so.
+            // The default agrees on its own -- a '--metadata' build and a
+            // '--reference' one both share -- so this only catches an override.
+            if (metadata.SharedRuntime != options.NeedsSharedRuntime)
+                return Failure(
+                    $"'{metadata.Library}' was built with a " +
+                    $"{(metadata.SharedRuntime ? "shared" : "static")} runtime and this program " +
+                    $"is being built with a {(options.NeedsSharedRuntime ? "shared" : "static")} " +
+                    "one. Two runtimes means two allocators and two sets of reference counts, so " +
+                    "an object could not cross between them; build both with the same " +
+                    "'--runtime'.");
+
             references.Add(metadata);
         }
 
@@ -380,7 +419,8 @@ public sealed class Compilation
         string ir = new LlvmEmitter(
             forSharedLibrary: options.Shared,
             forStainlessConsumers: options.MetadataPath is not null,
-            debug: debug).Emit(program);
+            debug: debug,
+            sharedRuntime: options.NeedsSharedRuntime).Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
@@ -403,10 +443,14 @@ public sealed class Compilation
         var toolchain = Toolchain.Locate(out string toolchainError);
         if (toolchain is null) return Failure(toolchainError);
 
-        IReadOnlyList<string> runtimeObjects;
+        IReadOnlyList<string> runtimeObjects = [];
+        SharedRuntime? sharedRuntime = null;
         try
         {
-            runtimeObjects = toolchain.BuildRuntime(intermediate, options.Debug);
+            if (options.NeedsSharedRuntime)
+                sharedRuntime = toolchain.BuildSharedRuntime(intermediate, options.Debug);
+            else
+                runtimeObjects = toolchain.BuildRuntime(intermediate, options.Debug);
         }
         catch (Exception e) when (e is InvalidOperationException or IOException)
         {
@@ -424,8 +468,15 @@ public sealed class Compilation
 
         var link = toolchain.Link(
             irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel,
-            options.Shared, options.Debug, libraries);
+            options.Shared, options.Debug, libraries, sharedRuntime);
         if (!link.Success) return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath));
+
+        // The loader looks beside the binary, so that is where the runtime goes.
+        // Both a program and a Stainless library need it there, and they are
+        // usually the same directory -- copying twice is copying the same file.
+        if (sharedRuntime is not null &&
+            CopyRuntimeBeside(sharedRuntime.Library, output) is { } copyError)
+            return Failure(copyError);
 
         // Debug info points at the .ll only for the runtime's C, but a build that
         // asked to be debuggable should keep what it described either way.
@@ -451,7 +502,9 @@ public sealed class Compilation
                 .ToHashSet(StringComparer.Ordinal);
 
             File.WriteAllText(metadataPath,
-                MetadataWriter.Write(program, Path.GetFileName(output), ownModules, diagnostics)
+                MetadataWriter.Write(
+                        program, Path.GetFileName(output), ownModules, diagnostics,
+                        options.NeedsSharedRuntime)
                     .ToJson());
         }
 
@@ -508,6 +561,35 @@ public sealed class Compilation
 
         foreach (string defined in options.Defines) symbols.Add(defined);
         return symbols;
+    }
+
+    /// <summary>
+    /// Puts the runtime shared library next to what was just built, unless it
+    /// is already there. Returns null on success, or what went wrong.
+    /// </summary>
+    private static string? CopyRuntimeBeside(string library, string output)
+    {
+        try
+        {
+            string directory = Path.GetDirectoryName(Path.GetFullPath(output)) ?? ".";
+            string destination = Path.Combine(directory, Path.GetFileName(library));
+
+            if (Path.GetFullPath(library) == Path.GetFullPath(destination)) return null;
+
+            // Only when it would differ: a rebuild that changed nothing should
+            // not keep replacing a file something else may have open.
+            if (File.Exists(destination) &&
+                File.GetLastWriteTimeUtc(destination) >= File.GetLastWriteTimeUtc(library))
+                return null;
+
+            Directory.CreateDirectory(directory);
+            File.Copy(library, destination, overwrite: true);
+            return null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return $"could not put the Stainless runtime beside the output: {e.Message}";
+        }
     }
 
     /// <summary>

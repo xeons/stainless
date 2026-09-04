@@ -50,8 +50,15 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 /// source location, which is what a debugger, a profiler and a stack trace all
 /// read; when it is absent nothing about the output changes.
 /// </param>
+/// <param name="sharedRuntime">
+/// When true the runtime is one shared library rather than a copy compiled into
+/// this binary, and Windows needs its data symbols declared <c>dllimport</c>:
+/// a function the linker can reach through a generated thunk, and a constant it
+/// cannot, because the address has to come from the import address table.
+/// </param>
 public sealed class LlvmEmitter(
-    bool forSharedLibrary = false, bool forStainlessConsumers = false, DebugInfo? debug = null)
+    bool forSharedLibrary = false, bool forStainlessConsumers = false,
+    DebugInfo? debug = null, bool sharedRuntime = false)
 {
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
@@ -262,9 +269,19 @@ public sealed class LlvmEmitter(
         Declare("sl_weak_retain", "declare void @sl_weak_retain(ptr)");
         Declare("sl_weak_release", "declare void @sl_weak_release(ptr)");
         Declare("sl_weak_load", "declare ptr @sl_weak_load(ptr)");
-        Declare("sl_string_type_info", "@sl_string_type_info = external constant %SlTypeInfo");
-        Declare("sl_utf16_string_type_info", "@sl_utf16_string_type_info = external constant %SlTypeInfo");
-        Declare("sl_string_builder_type_info", "@sl_string_builder_type_info = external constant %SlTypeInfo");
+        // The runtime's own tables. When it is a shared library on Windows
+        // these are reached through the import address table, and only the
+        // declaration can say so.
+        string runtimeConstant = sharedRuntime && OperatingSystem.IsWindows()
+            ? "external dllimport constant"
+            : "external constant";
+
+        Declare("sl_string_type_info",
+            $"@sl_string_type_info = {runtimeConstant} %SlTypeInfo");
+        Declare("sl_utf16_string_type_info",
+            $"@sl_utf16_string_type_info = {runtimeConstant} %SlTypeInfo");
+        Declare("sl_string_builder_type_info",
+            $"@sl_string_builder_type_info = {runtimeConstant} %SlTypeInfo");
         Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
         Declare("sl_is_instance", "declare i32 @sl_is_instance(ptr, ptr)");
         Declare("sl_implements", "declare i32 @sl_implements(ptr, i64)");
@@ -681,16 +698,67 @@ public sealed class LlvmEmitter(
         // out exactly as sl_string_new would build one on the heap. Its strong
         // count is the immortal sentinel, so retain and release skip it and the
         // literal costs no allocation and no reference traffic at run time.
+        // Windows cannot put the address of an imported datum in a static
+        // initializer -- it is not known until the loader has filled in the
+        // import table -- so with a shared runtime the field is left null and
+        // written once at startup, and the literal has to be writable to be
+        // written to. Everywhere else the loader relocates it and the literal
+        // stays where a constant belongs.
+        bool bindAtStartup = sharedRuntime && OperatingSystem.IsWindows();
+
+        string storage = bindAtStartup ? "private unnamed_addr global" : "private unnamed_addr constant";
+        string typeField = bindAtStartup ? "ptr null" : "ptr @sl_string_type_info";
+
         foreach (var (text, name) in _stringObjects)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
             string layout = $"{{ i64, i64, ptr, i64, [{bytes.Length + 1} x i8] }}";
 
             _module.AppendLine(
-                $"{name} = private unnamed_addr constant {layout} " +
-                $"{{ i64 {ImmortalRefCount}, i64 {ImmortalRefCount}, ptr @sl_string_type_info, " +
+                $"{name} = {storage} {layout} " +
+                $"{{ i64 {ImmortalRefCount}, i64 {ImmortalRefCount}, {typeField}, " +
                 $"i64 {bytes.Length}, [{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\" }}, align 8");
         }
+
+        if (bindAtStartup && _stringObjects.Count > 0) BindLiteralsAtStartup();
+    }
+
+    /// <summary>
+    /// Emits the startup pass that gives every string literal its type.
+    ///
+    /// It is registered in <c>llvm.global_ctors</c>, which both PE and ELF
+    /// honour, so it runs before <c>main</c> in a program and on load in a
+    /// library -- and before any static initializer, which may itself hold a
+    /// literal. There is one table for every literal in the module and it runs
+    /// once, so the cost is a store per literal at startup and nothing at all
+    /// afterwards.
+    /// </summary>
+    private void BindLiteralsAtStartup()
+    {
+        const string name = "_SLbind_literals";
+
+        _module.AppendLine();
+        _module.AppendLine($"define internal void @{name}() {{");
+        _module.AppendLine("entry:");
+
+        int slot = 0;
+        foreach (var (_, literal) in _stringObjects)
+        {
+            // Offset 16 is the header's type field; see docs/abi.md.
+            _module.AppendLine(
+                $"  %{slot} = getelementptr inbounds i8, ptr {literal}, i64 16");
+            _module.AppendLine($"  store ptr @sl_string_type_info, ptr %{slot}, align 8");
+            slot++;
+        }
+
+        _module.AppendLine("  ret void");
+        _module.AppendLine("}");
+        _module.AppendLine();
+
+        // Priority 0: ahead of anything else that asked to run at startup.
+        _module.AppendLine(
+            "@llvm.global_ctors = appending global [1 x { i32, ptr, ptr }] " +
+            $"[{{ i32, ptr, ptr }} {{ i32 0, ptr @{name}, ptr null }}]");
     }
 
     /// <summary>Matches SL_IMMORTAL in the runtime: a count that is never touched.</summary>

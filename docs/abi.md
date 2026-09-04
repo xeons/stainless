@@ -652,11 +652,39 @@ because the address has to come from the import address table.
 
 Both are reported where the library is built, as SL0419 and SL0420.
 
-**The runtime is still linked statically into each binary.** Both sides
-therefore have their own allocator and their own C stdio buffer, so text written
-inside a library and text written by its consumer do not interleave in the order
-they were written. Shipping the runtime as its own shared library would close
-both, and is not done.
+### 6.1 One runtime
+
+Where two Stainless binaries meet, the runtime is **one shared library** that
+both link: `stainless-rt.dll`, `libstainless-rt.so` or `libstainless-rt.dylib`,
+built once and copied beside what uses it.
+
+That is what makes the boundary work at all. With a copy compiled into each
+side there are two allocators and two sets of reference counts, so an object
+made on one side and released on the other is counted twice; and two C stdio
+buffers, so text written inside a library does not interleave with its
+consumer's in the order it was written. One runtime closes both.
+
+It is chosen by the shape of the build rather than by a flag: a `--metadata`
+build and a `--reference` one share, and everything else keeps the copy compiled
+in and stays a single file. `--runtime shared|static` overrides that, and the
+metadata records which was used — a library and a consumer that disagree are
+refused rather than left to misbehave.
+
+The runtime's exported surface is stated in `stainless.h` with `SL_API`:
+`__declspec(dllexport)` when building it, `__declspec(dllimport)` when a
+Stainless binary links it, and `__attribute__((visibility("default")))` on ELF,
+where everything else is then hidden.
+
+**One thing Windows cannot do**, and the only place the choice is visible in the
+generated IR: the address of an imported datum is not known until the loader has
+filled in the import table, so it cannot appear in a static initializer. A
+string literal is a complete `String` object in static storage (§2.6) whose
+header points at `sl_string_type_info`, which is exactly that. So with a shared
+runtime on Windows the field is left null, the literal is emitted writable, and
+a function registered in `llvm.global_ctors` writes the pointer in once at
+startup — before `main` in a program and on load in a library, and before any
+static initializer, which may itself hold a literal. Elsewhere the loader
+relocates it and the literal stays in read-only data.
 
 
 ## 7. Debug information
