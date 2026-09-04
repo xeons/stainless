@@ -493,7 +493,18 @@ public sealed record CallSyntax(
 public sealed record MemberAccessSyntax(
     SourceSpan Span,
     ExpressionSyntax Target,
-    string Member) : ExpressionSyntax(Span);
+    string Member) : ExpressionSyntax(Span)
+{
+    /// <summary>
+    /// True when this was written <c>p->m</c> rather than <c>p.m</c>.
+    ///
+    /// Both reach through a pointer, and have since before the arrow existed;
+    /// the difference is what they refuse. A <c>-&gt;</c> insists there was a
+    /// pointer to follow, so writing one over a value is caught rather than
+    /// quietly meaning the same thing.
+    /// </summary>
+    public bool ThroughPointer { get; init; }
+}
 
 /// <summary>
 /// <c>a[from:to]</c>, and the three shorter forms it has. Either end may be

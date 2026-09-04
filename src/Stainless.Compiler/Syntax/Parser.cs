@@ -203,8 +203,15 @@ public sealed class Parser
             Peek(1).Kind == TokenKind.OpenParen)
         {
             Advance();
-            var ctorParams = ParseParameterList(out _);
+            var ctorParams = ParseParameterList(out bool ctorVariadic);
             var ctorBody = ParseBlock();
+
+            if (ctorVariadic)
+                _diagnostics.Error("SL0493", SpanFrom(start),
+                    $"'{enclosingType}' cannot have a variadic constructor; '...' may only " +
+                    "be written on an 'extern \"C\"' declaration, because there is no " +
+                    "'va_list' to read the extra arguments with");
+
             return [new ConstructorDeclSyntax(SpanFrom(start), modifiers, enclosingType, ctorParams, ctorBody)];
         }
 
@@ -608,6 +615,18 @@ public sealed class Parser
                     $"'extern \"{how}\"' declares an external function, so '{name}' must not " +
                     $"have a body; use 'export \"{how}\"' to define one");
             }
+
+            // Calling a C variadic is fine; being one is not. Nothing in the
+            // language can read the extra arguments -- there is no 'va_list' --
+            // so the definition would ignore them, while the header written for
+            // it promises the variadic convention and a caller obeying that
+            // leaves its floating-point arguments where the callee never looks.
+            // Refusing the declaration is the only honest answer available.
+            if (isVariadic && !linkage.IsImport())
+                _diagnostics.Error("SL0493", SpanFrom(start),
+                    $"'{name}' cannot be variadic; '...' may only be written on an " +
+                    "'extern \"C\"' declaration, because there is no 'va_list' to read " +
+                    "the extra arguments with. Take an array, a slice, or a count and a pointer");
 
             return new FunctionDeclSyntax(
                 SpanFrom(start), modifiers, linkage, returnType, name, typeParameters,
@@ -1377,11 +1396,13 @@ public sealed class Parser
 
         while (true)
         {
-            if (At(TokenKind.Dot))
+            if (AtAny(TokenKind.Dot, TokenKind.MinusGreater))
             {
+                bool arrow = At(TokenKind.MinusGreater);
                 Advance();
                 string member = ExpectIdentifier();
-                expression = new MemberAccessSyntax(SpanFrom(start), expression, member);
+                expression = new MemberAccessSyntax(SpanFrom(start), expression, member)
+                    { ThroughPointer = arrow };
                 continue;
             }
 

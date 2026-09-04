@@ -14,25 +14,6 @@ no "why" is one that should be deleted rather than done.
 
 These are wrong rather than missing, and should go first.
 
-### A variadic `export "C"` silently drops the `...`
-
-```
-generated header:  int32_t sl_log(uint8_t* format, ...);
-generated IR:      define i32 @sl_log(ptr %arg.format)
-```
-
-The header promises a variadic function and the definition is not one. A caller
-following that header uses the variadic convention — which on Win64 requires
-floating-point arguments duplicated into the integer registers, and on SysV
-requires `al` to carry the vector-register count. Integer and pointer arguments
-survive; floats do not, silently.
-
-There is no `va_list` to read them with anyway, so the fix is almost certainly
-to **reject** `...` on an `export`, not to emit a variadic definition. Calling a
-C variadic is fine and unaffected.
-
-*Touches:* `Parser.ParseLinkageDeclaration`, `CHeaderWriter`.
-
 ### Nested type declarations are parsed and then discarded
 
 ```csharp
@@ -130,12 +111,6 @@ which is why [bindings/win32](bindings/win32) spells 460 constants as bare
 `const uint` rather than as the typed sets they are. Letting an enum widen to
 its underlying type in interop position would let a binding be typed without a
 cast on every line.
-
-### `->`
-
-`(*state).Field` is every line of code that walks a struct pointer, and a
-window procedure is nothing else. One token in the lexer and a desugar in the
-parser.
 
 ### COM
 

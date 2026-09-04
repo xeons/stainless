@@ -403,6 +403,23 @@ class Parent {
 A lambda that captures `this` holds its object strongly, so an object that
 stores its own closure is such a cycle; see §2.14.
 
+**`p->m` and `p.m`.** Both reach through a pointer, and always have. They differ
+only in what they refuse: an arrow says a pointer was expected, so writing one
+over a value is reported rather than quietly meaning the same thing.
+
+```csharp
+int Sum(Point* p) {
+    return p->X + p->Y;             // and `p.X` means exactly this
+}
+```
+
+```
+error[SL0494]: 'Point' is not a pointer, so '->' does not apply to it; write '.X'
+```
+
+A module, a variant and an enum are names rather than values, so none of them is
+reachable through an arrow.
+
 ### 2.6 `variant` — a value that is one of several things
 
 A `variant` is the choice between its cases. Each case has a name and the fields
@@ -2122,6 +2139,20 @@ the point of writing one there; `public` may also be written on a single member
 inside. Two modules may declare the same C function, because a declaration names
 a symbol rather than defining one — but only one of them should make it
 `public`, or a file importing both has an ambiguous name.
+
+**A `...` may be called and not written.** `printf` is bound with one and works;
+a function this program *defines* may not have one, whatever its linkage. Nothing
+in the language reads the extra arguments -- there is no `va_list` -- so the
+definition would ignore them while the generated header promised the variadic
+convention, which on Win64 wants floating-point arguments duplicated into the
+integer registers and on SysV wants `al` to carry a vector-register count. The
+integer arguments would survive and the floating-point ones would not, silently.
+
+```
+error[SL0493]: 'log_line' cannot be variadic; '...' may only be written on an
+'extern "C"' declaration, because there is no 'va_list' to read the extra
+arguments with. Take an array, a slice, or a count and a pointer
+```
 
 **`"C"` and `"C++"` are the conventions there are.** The string is checked, and
 anything else is rejected:

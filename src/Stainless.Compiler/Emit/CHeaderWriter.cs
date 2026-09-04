@@ -191,7 +191,9 @@ public static class CHeaderWriter
                 .Select(Declarator)
                 .ToList();
 
-            if (function.IsVariadic) parameters.Add("...");
+            // No '...' here: an exported function cannot be variadic (SL0493),
+            // precisely so that this header never promises a convention the
+            // definition does not use.
             string list = parameters.Count == 0 ? "void" : string.Join(", ", parameters);
 
             sb.AppendLine($"{TypeName(function.ReturnType)} {function.Name}({list});");

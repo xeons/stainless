@@ -5596,8 +5596,10 @@ public sealed class Binder(
 
     private BoundExpression BindMemberAccess(MemberAccessSyntax syntax)
     {
-        // `Module.Member` is a qualified name, not a value access.
-        if (ResolveModulePrefix(syntax.Target) is { } importedModule)
+        // `Module.Member` is a qualified name, not a value access. A module,
+        // a variant and an enum are all names, so `->` reaches none of them:
+        // there is nothing there to be pointed at.
+        if (!syntax.ThroughPointer && ResolveModulePrefix(syntax.Target) is { } importedModule)
         {
             if (importedModule.Constants.TryGetValue(syntax.Member, out var constant) && constant.IsPublic)
                 return new BoundConstantAccess(syntax.Span, constant);
@@ -5612,7 +5614,7 @@ public sealed class Binder(
 
         // `Shape.Empty` builds a variant whose case carries nothing. One that
         // does carry something is a call, and BindCall handles it.
-        if (ResolveVariantPrefix(syntax.Target) is { } variantType)
+        if (!syntax.ThroughPointer && ResolveVariantPrefix(syntax.Target) is { } variantType)
         {
             if (variantType.FindCase(syntax.Member) is not { } named)
             {
@@ -5626,7 +5628,7 @@ public sealed class Binder(
         }
 
         // `Color.Red` names a constant of an enum type, not a member of a value.
-        if (ResolveEnumPrefix(syntax.Target) is { } enumType)
+        if (!syntax.ThroughPointer && ResolveEnumPrefix(syntax.Target) is { } enumType)
         {
             if (enumType.FindMember(syntax.Member) is { } member)
                 return new BoundLiteral(syntax.Span, enumType, member.Value);
@@ -5669,9 +5671,9 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // `p.field` on a pointer to a struct means `(*p).field`, as in C's `->`.
-        if (receiver.Type is PointerTypeSymbol { Element: NamedTypeSymbol } pointer)
-            receiver = new BoundDereference(syntax.Span, pointer.Element, receiver);
+        if (ReachThroughPointer(syntax, receiver) is not { } reachedThrough)
+            return new BoundErrorExpression(syntax.Span);
+        receiver = reachedThrough;
 
         if (receiver.Type is not NamedTypeSymbol && receiver.Type.AsClass() is null)
         {
@@ -5728,6 +5730,34 @@ public sealed class Binder(
         diagnostics.Error("SL0251", syntax.Span,
             $"'{namedType.Name}' has no member named '{syntax.Member}'");
         return new BoundErrorExpression(syntax.Span);
+    }
+
+    /// <summary>
+    /// Applies <c>.</c> and <c>-&gt;</c> to a receiver that may be a pointer.
+    ///
+    /// Both spellings dereference, which is why <c>p.field</c> has always meant
+    /// <c>(*p).field</c>. They differ only in what they refuse: an arrow says
+    /// the programmer expected a pointer, so finding a value there is a mistake
+    /// worth reporting rather than a spelling to accept.
+    ///
+    /// Returns null when it has reported one.
+    /// </summary>
+    private BoundExpression? ReachThroughPointer(
+        MemberAccessSyntax syntax, BoundExpression receiver)
+    {
+        if (receiver.Type is PointerTypeSymbol { Element: NamedTypeSymbol } pointer)
+            return new BoundDereference(syntax.Span, pointer.Element, receiver);
+
+        if (!syntax.ThroughPointer) return receiver;
+
+        diagnostics.Error("SL0494", syntax.Span,
+            receiver.Type is PointerTypeSymbol pointed
+                ? $"'{pointed.Name}' points at '{pointed.Element.Name}', which has no members, " +
+                  $"so '->{syntax.Member}' reaches nothing"
+                : $"'{receiver.Type.Name}' is not a pointer, so '->' does not apply to it; " +
+                  $"write '.{syntax.Member}'");
+
+        return null;
     }
 
     /// <summary>
@@ -6307,8 +6337,9 @@ public sealed class Binder(
         var receiver = BindExpression(member.Target);
         if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
-        if (receiver.Type is PointerTypeSymbol { Element: NamedTypeSymbol } pointer)
-            receiver = new BoundDereference(member.Span, pointer.Element, receiver);
+        if (ReachThroughPointer(member, receiver) is not { } reachedThrough)
+            return new BoundErrorExpression(syntax.Span);
+        receiver = reachedThrough;
 
         if (receiver.Type is OptionalTypeSymbol or WeakTypeSymbol)
         {

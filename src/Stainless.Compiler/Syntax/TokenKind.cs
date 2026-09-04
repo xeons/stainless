@@ -56,7 +56,7 @@ public enum TokenKind
     Less, LessEquals, Greater, GreaterEquals,
     Plus, Minus, Star, Slash, Percent,
     Amp, AmpAmp, Pipe, PipePipe, Caret,
-    LessLess, GreaterGreater, EqualsGreater,
+    LessLess, GreaterGreater, EqualsGreater, MinusGreater,
 
     // Compound assignment
     PlusEquals, MinusEquals, StarEquals, SlashEquals, PercentEquals,
@@ -164,6 +164,7 @@ public static class TokenKindExtensions
         TokenKind.LessLess => "<<",
         TokenKind.GreaterGreater => ">>",
         TokenKind.EqualsGreater => "=>",
+        TokenKind.MinusGreater => "->",
         TokenKind.PlusEquals => "+=",
         TokenKind.MinusEquals => "-=",
         TokenKind.StarEquals => "*=",

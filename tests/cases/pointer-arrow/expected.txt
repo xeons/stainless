@@ -1,0 +1,5 @@
+sum: 7
+bumped: 10
+count: 15
+origin x: 8
+dot: 15, arrow: 15

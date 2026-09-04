@@ -1206,8 +1206,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   to a `uint` parameter without a cast, which is why
   [bindings/win32](bindings/win32) spells 460 constants as bare `const uint`
   rather than as the typed sets they are.
-- **There is no `->`.** `(*state).Field`, not `state->Field`, which is every
-  line of code that walks a struct pointer.
 - **An inline array holds plain data only** and cannot be passed by value
   (SL0486, SL0491). The first is the same question a union cannot answer; the
   second is because C decays an array parameter to a pointer and Stainless has
