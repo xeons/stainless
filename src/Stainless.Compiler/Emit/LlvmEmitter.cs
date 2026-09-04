@@ -209,6 +209,7 @@ public sealed class LlvmEmitter(
         Declare("sl_string_builder_type_info", "@sl_string_builder_type_info = external constant %SlTypeInfo");
         Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
         Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
+        Declare("sl_slice_bounds_fail", "declare void @sl_slice_bounds_fail(i64, i64, i64)");
         Declare("sl_divide_by_zero", "declare void @sl_divide_by_zero()");
         Declare("sl_divide_overflow", "declare void @sl_divide_overflow()");
         Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
@@ -2154,6 +2155,7 @@ public sealed class LlvmEmitter(
             case BoundClosure closure: return EmitClosure(closure);
             case BoundNewArray newArray: return EmitNewArray(newArray);
             case BoundArrayLength length: return EmitArrayLength(length);
+            case BoundSlice slice: return EmitSlice(slice);
             case BoundTypeof typeofExpression: return EmitTypeof(typeofExpression);
             case BoundVariantConstruction built: return EmitVariantConstruction(built);
             case BoundVariantTest test: return EmitVariantTest(test);
@@ -2247,6 +2249,7 @@ public sealed class LlvmEmitter(
             case BoundIndex index:
             {
                 if (index.Target.Type is ArrayTypeSymbol) return EmitArrayElementAddress(index);
+                if (index.Target.Type is SliceTypeSymbol) return EmitSliceElementAddress(index);
 
                 var target = EmitExpression(index.Target);
                 var offset = EmitExpression(index.Index);
@@ -2392,6 +2395,28 @@ public sealed class LlvmEmitter(
                 // An interface reference is the very same pointer; the vtable is
                 // reached through the object's TypeInfo, not carried alongside it.
                 return new Val(operand.Ref, to, conversion.Type);
+
+            // The whole of an array, as a slice of it: offset zero, and the
+            // length the array already knows. The array is retained into the
+            // slice's field like anything a struct holds.
+            case ConversionKind.ArrayToSlice:
+            {
+                var type = (SliceTypeSymbol)conversion.Type;
+                string slot = Alloca(StructName(type), "whole");
+
+                string lengthSlot = Emit("ptr",
+                    $"getelementptr inbounds i8, ptr {operand.Ref}, " +
+                    $"i64 {ArrayTypeSymbol.HeaderSize - 8}");
+                string length = Emit("i64", $"load i64, ptr {lengthSlot}");
+
+                Line($"store ptr {operand.Ref}, ptr {SliceField(slot, type, 0)}");
+                Line($"store i64 0, ptr {SliceField(slot, type, 1)}");
+                Line($"store i64 {length}, ptr {SliceField(slot, type, 2)}");
+                Line($"call void @sl_retain(ptr {operand.Ref})");
+
+                TrackTemporary(slot, type);
+                return new Val(slot, "ptr", type);
+            }
 
             case ConversionKind.StringLiteralToPointer:
                 // Point at a plain byte array rather than into the object, so no
@@ -2829,8 +2854,14 @@ public sealed class LlvmEmitter(
 
     private Val EmitArrayLength(BoundArrayLength expression)
     {
-        var array = EmitExpression(expression.Array);
-        string slot = Emit("ptr", $"getelementptr inbounds i8, ptr {array.Ref}, i64 24");
+        var source = EmitExpression(expression.Array);
+
+        // A slice carries its own length; an array's is in the header.
+        if (expression.Array.Type is SliceTypeSymbol slice)
+            return new Val(SliceLength(source.Ref, slice), "i64", expression.Type);
+
+        string slot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {source.Ref}, i64 {ArrayTypeSymbol.HeaderSize - 8}");
         return new Val(Emit("i64", $"load i64, ptr {slot}"), "i64", expression.Type);
     }
 
@@ -2838,6 +2869,120 @@ public sealed class LlvmEmitter(
     /// Computes the address of <c>array[index]</c>, trapping first if the index
     /// is out of range. The index is unsigned, so one compare covers both ends.
     /// </summary>
+    // ============================================================ slices
+
+    /// <summary>The address of one of a slice's three fields.</summary>
+    private string SliceField(string slice, SliceTypeSymbol type, int index) =>
+        Emit("ptr", $"getelementptr inbounds {StructName(type)}, ptr {slice}, i32 0, i32 {index}");
+
+    private string SliceLength(string slice, SliceTypeSymbol type) =>
+        Emit("i64", $"load i64, ptr {SliceField(slice, type, 2)}");
+
+    /// <summary>
+    /// <c>a[from:to]</c>: the array this names, the offset into it, and how far
+    /// it runs.
+    ///
+    /// Slicing a slice narrows rather than nests, so the array stored is the one
+    /// underneath either way and the offsets add. That keeps a slice one
+    /// indirection deep however many times it has been cut.
+    /// </summary>
+    private Val EmitSlice(BoundSlice expression)
+    {
+        var type = (SliceTypeSymbol)expression.Type;
+        var source = EmitExpression(expression.Target);
+
+        string array, baseOffset, sourceLength;
+
+        if (expression.Target.Type is SliceTypeSymbol inner)
+        {
+            var arrayField = type.ArrayField;
+            array = Emit("ptr", $"load ptr, ptr {SliceField(source.Ref, inner, 0)}");
+            baseOffset = Emit("i64", $"load i64, ptr {SliceField(source.Ref, inner, 1)}");
+            sourceLength = SliceLength(source.Ref, inner);
+            _ = arrayField;
+        }
+        else
+        {
+            array = source.Ref;
+            baseOffset = "0";
+            string lengthSlot = Emit("ptr",
+                $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize - 8}");
+            sourceLength = Emit("i64", $"load i64, ptr {lengthSlot}");
+        }
+
+        string from = expression.Start is null
+            ? "0"
+            : WidenIndex(EmitExpression(expression.Start));
+
+        string to = expression.End is null
+            ? sourceLength
+            : WidenIndex(EmitExpression(expression.End));
+
+        // from <= to <= length, in one branch: an unsigned compare catches a
+        // negative bound too, because it sign-extends to something enormous.
+        string ordered = Emit("i1", $"icmp ule i64 {from}, {to}");
+        string within = Emit("i1", $"icmp ule i64 {to}, {sourceLength}");
+        string valid = Emit("i1", $"and i1 {ordered}, {within}");
+
+        string okLabel = NextLabel("slice.ok");
+        string failLabel = NextLabel("slice.fail");
+        Terminator($"br i1 {valid}, label %{okLabel}, label %{failLabel}");
+
+        Label(failLabel);
+        Line($"call void @sl_slice_bounds_fail(i64 {from}, i64 {to}, i64 {sourceLength})");
+        Terminator("unreachable");
+
+        Label(okLabel);
+
+        string slot = Alloca(StructName(type), "slice");
+        Line($"store ptr {array}, ptr {SliceField(slot, type, 0)}");
+        Line($"store i64 {Emit("i64", $"add i64 {baseOffset}, {from}")}, " +
+             $"ptr {SliceField(slot, type, 1)}");
+        Line($"store i64 {Emit("i64", $"sub i64 {to}, {from}")}, " +
+             $"ptr {SliceField(slot, type, 2)}");
+
+        // The array is retained into the slice's field, exactly as a struct
+        // field retains what it holds; the slice is then a +1 temporary.
+        Line($"call void @sl_retain(ptr {array})");
+        TrackTemporary(slot, type);
+
+        return new Val(slot, "ptr", type);
+    }
+
+    /// <summary>
+    /// The address of one element of a slice: the array's data, then past the
+    /// slice's own offset. The bound checked is the slice's length, not the
+    /// array's, which is the whole point of having one.
+    /// </summary>
+    private string EmitSliceElementAddress(BoundIndex index)
+    {
+        var type = (SliceTypeSymbol)index.Target.Type;
+        var slice = EmitExpression(index.Target);
+        var offset = EmitExpression(index.Index);
+
+        string widened = WidenIndex(offset);
+        string length = SliceLength(slice.Ref, type);
+        string inRange = Emit("i1", $"icmp ult i64 {widened}, {length}");
+
+        string okLabel = NextLabel("bounds.ok");
+        string failLabel = NextLabel("bounds.fail");
+        Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
+
+        Label(failLabel);
+        Line($"call void @sl_array_bounds_fail(i64 {widened}, i64 {length})");
+        Terminator("unreachable");
+
+        Label(okLabel);
+        string array = Emit("ptr", $"load ptr, ptr {SliceField(slice.Ref, type, 0)}");
+        string start = Emit("i64", $"load i64, ptr {SliceField(slice.Ref, type, 1)}");
+        string data = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
+
+        return Emit("ptr",
+            $"getelementptr inbounds {LlvmTypeOf(type.Element)}, ptr {data}, " +
+            $"i64 {Emit("i64", $"add i64 {start}, {widened}")}");
+    }
+
     private string EmitArrayElementAddress(BoundIndex index)
     {
         var arrayType = (ArrayTypeSymbol)index.Target.Type;

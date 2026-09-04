@@ -296,7 +296,7 @@ class Parent {
 ```
 
 A lambda that captures `this` holds its object strongly, so an object that
-stores its own closure is such a cycle; see §2.11.
+stores its own closure is such a cycle; see §2.12.
 
 ### 2.5 `variant` — a value that is one of several things
 
@@ -603,7 +603,64 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
-### 2.9 `enum` — a distinct type over an integer
+### 2.9 `T[:]` — part of an array
+
+A slice names part of an array, as a value.
+
+```csharp
+var numbers = new int[6];
+
+int[:] all    = numbers;          // an array is a slice of the whole of itself
+int[:] middle = numbers[1:4];     // elements 1, 2 and 3
+int[:] tail   = numbers[3:];      // to the end
+int[:] head   = numbers[:2];      // from the beginning
+```
+
+The bounds are half-open, as everywhere: `numbers[1:4]` has three elements.
+Either end may be left out and means the beginning or the length.
+
+**A slice is a view, not a copy.** Writing through one writes the array it came
+from, and `Length` is the slice's own rather than the array's — which is also
+what an index is checked against:
+
+```csharp
+middle[0] = 100;              // numbers[1] is now 100
+middle[3]                     // aborts: index 3, length 3
+```
+
+**Slicing a slice narrows it** rather than nesting: the result names the same
+array, further in. So a slice is one indirection deep however many times it has
+been cut.
+
+**It is three words** — the array, where it starts, how far it runs — and it is a
+struct, so it copies, is passed and is returned like one. It holds the array the
+way any struct field holds a reference: **a slice cannot dangle**, because what
+it points into is alive for as long as it is.
+
+```csharp
+Trace[:] Middle() {
+    var traces = new Trace[3];
+    ...
+    return traces[1:2];       // the array outlives the function
+}
+```
+
+That is the trade. A slice costs a reference count per copy and is not a value C
+can be handed (SL0284, as for any struct holding a reference). What it buys is
+that there are no lifetimes to explain: a slice is safe by the same rule
+everything else here is safe by.
+
+**An array converts to a slice implicitly**, because a slice of everything is
+what an array already is; the other direction does not, because a slice is
+generally of less than the whole. `foreach` walks a slice as it walks an array,
+and `Standard.Collections` has `Sort` and `Reverse` over one:
+
+```csharp
+Sort(numbers);                // the whole of it
+Sort(numbers[2:5]);           // three of them, in place, nothing copied
+```
+
+### 2.10 `enum` — a distinct type over an integer
 
 ```csharp
 public enum Color { Red, Green, Blue }
@@ -673,7 +730,7 @@ no methods, so this is the language spelling the test rather than a call.
 into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
 belong to.
 
-### 2.10 `delegate` — a named function pointer
+### 2.11 `delegate` — a named function pointer
 
 ```csharp
 public delegate int Transform(int value);
@@ -716,10 +773,10 @@ if (none == null) { ... }
 
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
-§2.11 — and only a non-capturing one can be a delegate, because there is nowhere
+§2.12 — and only a non-capturing one can be a delegate, because there is nowhere
 in a single pointer to keep what was captured.
 
-### 2.11 Lambdas and closures
+### 2.12 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
 assigned to: an **interface with exactly one method**, or a **delegate**.

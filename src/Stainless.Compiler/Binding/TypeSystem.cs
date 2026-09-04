@@ -434,6 +434,36 @@ public class StructTypeSymbol : NamedTypeSymbol
 }
 
 /// <summary>
+/// <c>T[:]</c>: part of an array, as a value.
+///
+/// Three words -- the array, where in it this starts, and how many elements it
+/// runs for -- and it is a struct, in the type system as at runtime. So it
+/// copies, is passed, is returned and is laid out by everything that already
+/// knew how to do those to a struct, and it holds the array the way any struct
+/// field holds a reference: retained on a copy, released on a drop. A slice
+/// cannot dangle, because what it points into is alive for as long as it is.
+///
+/// What that costs is a reference count per copy, and being a value C cannot be
+/// handed. What it buys is that there are no lifetimes to explain: a slice is
+/// safe by the same rule everything else here is safe by.
+/// </summary>
+public sealed class SliceTypeSymbol : StructTypeSymbol
+{
+    public required TypeSymbol Element { get; init; }
+
+    /// <summary>The three fields, which the source cannot name.</summary>
+    public const string ArrayFieldName = "$array";
+    public const string OffsetFieldName = "$offset";
+    public const string LengthFieldName = "$length";
+
+    public FieldSymbol ArrayField => Fields[0];
+    public FieldSymbol OffsetField => Fields[1];
+    public FieldSymbol LengthField => Fields[2];
+
+    public override string Name => Element.Name + "[:]";
+}
+
+/// <summary>
 /// One case of a <c>variant</c>: a name, a tag, and the fields it carries.
 ///
 /// The fields live in a struct of their own rather than on the case, so

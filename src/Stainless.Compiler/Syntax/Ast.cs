@@ -55,6 +55,9 @@ public sealed record PointerTypeSyntax(SourceSpan Span, TypeSyntax Element) : Ty
 /// <summary><c>T[]</c> — a counted array of T.</summary>
 public sealed record ArrayTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
+/// <summary><c>T[:]</c> - part of an array, named as a value of its own.</summary>
+public sealed record SliceTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
+
 /// <summary><c>T?</c> — an optional class reference.</summary>
 public sealed record NullableTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
@@ -471,6 +474,16 @@ public sealed record MemberAccessSyntax(
     SourceSpan Span,
     ExpressionSyntax Target,
     string Member) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>a[from:to]</c>, and the three shorter forms it has. Either end may be
+/// left out, and means the beginning or the end of what is being sliced.
+/// </summary>
+public sealed record SliceSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Target,
+    ExpressionSyntax? Start,
+    ExpressionSyntax? End) : ExpressionSyntax(Span);
 
 public sealed record IndexSyntax(SourceSpan Span, ExpressionSyntax Target, ExpressionSyntax Index)
     : ExpressionSyntax(Span);

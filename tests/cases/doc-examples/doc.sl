@@ -310,6 +310,28 @@ String ByReference() {
            ":" + Text.FromDouble(whole) + ":" + Text.FromDouble(fraction);
 }
 
+
+// --- README "Slices" / spec 2.9 -------------------------------------------
+String Slicing() {
+    var numbers = new int[6];
+    for (nuint i = 0; i < numbers.Length; i = i + 1) { numbers[i] = (int)i + 1; }
+
+    int[:] all    = numbers;
+    int[:] middle = numbers[1:4];
+    int[:] tail   = numbers[3:];
+
+    Sort(numbers[2:5]);
+
+    // A view, not a copy: writing through one writes the array.
+    middle[0] = 100;
+
+    String text = "";
+    foreach (int v in all) { text = text + Text.FromInteger(v) + " "; }
+
+    return Text.FromInteger((int)middle.Length) + ":" +
+           Text.FromInteger((int)tail.Length) + ":" + text;
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -382,6 +404,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("slices=%s\n", Slicing().ToPointer());
     printf("byref=%s\n", ByReference().ToPointer());
     printf("shapes=%s\n", Shapes().ToPointer());
     printf("done\n");

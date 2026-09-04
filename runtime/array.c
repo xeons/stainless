@@ -62,3 +62,23 @@ void sl_array_bounds_fail(size_t index, size_t length)
              "index %zu is outside the bounds of an array of length %zu", index, length);
     sl_fail(buffer);
 }
+
+
+/*
+ * A slice's two bounds are wrong in two different ways, and saying which one it
+ * was costs a comparison here and nothing at all where it did not happen.
+ */
+void sl_slice_bounds_fail(size_t from, size_t to, size_t length)
+{
+    char buffer[160];
+
+    if (from > to)
+        snprintf(buffer, sizeof buffer,
+                 "a slice from %zu to %zu runs backwards", from, to);
+    else
+        snprintf(buffer, sizeof buffer,
+                 "a slice from %zu to %zu is outside the bounds of a length of %zu",
+                 from, to, length);
+
+    sl_fail(buffer);
+}

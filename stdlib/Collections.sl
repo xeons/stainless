@@ -199,6 +199,41 @@ public nuint IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T
     return items.Count();
 }
 
+/// Orders part of an array in place, smallest first.
+///
+/// An array converts to a slice of the whole of itself, so `Sort(numbers)`
+/// reaches this and `Sort(numbers[2:5])` orders three of them and leaves the
+/// rest alone. Nothing is copied either way: a slice is a view.
+public void Sort<T>(T[:] items) where T : IComparable<T> {
+    for (nuint i = 1; i < items.Length; i = i + 1) {
+        var current = items[i];
+        var j = i;
+
+        while (j > 0 && items[j - 1].CompareTo(current) > 0) {
+            items[j] = items[j - 1];
+            j = j - 1;
+        }
+
+        items[j] = current;
+    }
+}
+
+/// Reverses part of an array in place.
+public void Reverse<T>(T[:] items) {
+    if (items.Length < 2) { return; }
+
+    nuint low = 0;
+    nuint high = items.Length - 1;
+
+    while (low < high) {
+        var swap = items[low];
+        items[low] = items[high];
+        items[high] = swap;
+        low = low + 1;
+        high = high - 1;
+    }
+}
+
 /// Orders a list in place, smallest first. Insertion sort: short and stable,
 /// which matters more than asymptotics until there is a reason to measure.
 public void Sort<T>(IList<T> items) where T : IComparable<T> {

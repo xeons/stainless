@@ -277,6 +277,7 @@ size_t sl_array_length(void *pointer);
 
 /* Reports an out-of-range index and aborts. Never returns. */
 void   sl_array_bounds_fail(size_t index, size_t length);
+void   sl_slice_bounds_fail(size_t from, size_t to, size_t length);
 
 /* ------------------------------------------------------------- reflection */
 

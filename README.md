@@ -172,6 +172,41 @@ array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
 
+### Slices
+
+A slice names part of an array, as a value. The bounds are half-open, and
+either end may be left out.
+
+```csharp
+var numbers = new int[6];
+
+int[:] all    = numbers;          // an array is a slice of the whole of itself
+int[:] middle = numbers[1:4];     // elements 1, 2 and 3
+int[:] tail   = numbers[3:];      // to the end
+
+Sort(numbers[2:5]);               // three of them, in place, nothing copied
+```
+
+It is a view rather than a copy: writing through one writes the array it came
+from, `Length` is the slice's own, and an index is checked against that. Slicing
+a slice narrows it instead of nesting, so a slice is one indirection deep
+however many times it has been cut.
+
+Three words — the array, where it starts, how far it runs — and it holds the
+array the way any struct field holds a reference. **A slice cannot dangle**: what
+it points into is alive for as long as it is.
+
+```csharp
+Trace[:] Middle() {
+    var traces = new Trace[3];
+    ...
+    return traces[1:2];           // the array outlives the function
+}
+```
+
+That is the trade. A slice costs a reference count per copy and is not a value C
+can be handed. What it buys is that there are no lifetimes to explain.
+
 ### Passing by reference
 
 A parameter is a copy unless it says otherwise. `ref` passes the caller's
@@ -468,7 +503,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 126 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 129 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -720,6 +755,13 @@ Everything below is covered by [the test suite](tests/cases).
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate
 - `T[]`: counted arrays, always bounds checked, elements released with the array
+- `T[:]`: slices. `a[1:4]`, `a[3:]`, `a[:2]` and `a[:]` over an array or another
+  slice, with half-open bounds; three words, so nothing allocates. A view rather
+  than a copy — writing through one writes the array, and an index is checked
+  against the slice's own length. Slicing a slice narrows it rather than nesting.
+  It holds the array it came from, so it cannot dangle: what it points into is
+  alive for as long as it is. An array converts to a slice of the whole of
+  itself implicitly, and `foreach` walks one like an array
 - Generics: generic classes, interfaces, functions and methods, monomorphized, with
   inference at call sites and interface constraints (`where T : IComparable<T>`)
 - `enum`, strongly typed: a distinct type over an integer that never converts
@@ -760,7 +802,8 @@ Everything below is covered by [the test suite](tests/cases).
   `Queue<T>`, `Stack<T>`, `LinkedList<T>` and `SortedList<K, V>`, plus
   `IComparable<T>`, `IEquatable<T>`, `IHashable`, `IReadOnlyList<T>`,
   `IList<T>`, `IEnumerable<T>`, `IEnumerator<T>` and
-  `Sort`/`Largest`/`Smallest`/`IndexOf`. Every container is array-backed —
+  `Sort`/`Largest`/`Smallest`/`IndexOf`, plus `Sort` and `Reverse` over a
+  `T[:]`. Every container is array-backed —
   ARC cannot collect a cycle, so the linked list links by index rather than by
   reference
 - Primitives, enums and `String` satisfy `IComparable<T>`, `IEquatable<T>` and
@@ -838,6 +881,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   `switch`, and only for one held in a local or a parameter. It does not yet do
   the same for `C?`, so an optional still cannot be unwrapped by testing it.
   The two want the same machinery and the second is the obvious next step.
+- **A slice is owning, and there is no borrowed one.** It retains the array it
+  came from, which is what makes it impossible to dangle and also what makes it
+  cost a reference count per copy and keep a large array alive for a small view
+  of it. A raw `(pointer, length)` view would do neither, and would need a
+  lifetime story the language does not have.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
   formatting; `Substring` counts bytes, not characters, so it can slice a
   multi-byte character in half.

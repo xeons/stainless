@@ -82,6 +82,7 @@ public sealed class Binder(
     /// </summary>
     private Dictionary<object, VariantCaseSymbol> _variantFacts = [];
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
+    private readonly Dictionary<TypeSymbol, SliceTypeSymbol> _slices = [];
 
     /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
     private readonly Dictionary<string, NamedTypeSymbol> _instantiatedTypes = new(StringComparer.Ordinal);
@@ -1721,7 +1722,12 @@ public sealed class Binder(
             ? template.Module.Name
             : template.ContainingType.QualifiedName;
 
-        string key = InstantiationKey(owner + "." + template.Name, arguments);
+        // The declaration's position is in the key because functions overload and
+        // templates do too: `Sort<T>(T[:])` and `Sort<T>(IList<T>)` are two
+        // templates of one name, and instantiating both at `int` must give two
+        // functions rather than whichever was asked for first.
+        string key = InstantiationKey(
+            owner + "." + template.Name + "@" + template.Declaration.Span.Start, arguments);
         if (_instantiatedFunctions.TryGetValue(key, out var existing)) return existing;
 
         // The enclosing type's arguments first, then the method's own on top.
@@ -1899,6 +1905,17 @@ public sealed class Binder(
 
             case ArrayTypeSyntax array when actual is ArrayTypeSymbol actualArray:
                 Infer(array.Element, actualArray.Element, parameters, inferred, scope);
+                break;
+
+            // `T[:]` matches a slice, and an array too: an array converts to a
+            // slice of the whole of itself, so `Sort(numbers)` should infer T
+            // from the array rather than refuse to look at it.
+            case SliceTypeSyntax slice when actual is SliceTypeSymbol actualSlice:
+                Infer(slice.Element, actualSlice.Element, parameters, inferred, scope);
+                break;
+
+            case SliceTypeSyntax slice when actual is ArrayTypeSymbol whole:
+                Infer(slice.Element, whole.Element, parameters, inferred, scope);
                 break;
 
             case PointerTypeSyntax pointer when actual is PointerTypeSymbol actualPointer:
@@ -2480,7 +2497,9 @@ public sealed class Binder(
         outer.Locals.Add(sequence);
 
         if (collection.Type is ArrayTypeSymbol array)
-            statements.Add(BuildArrayLoop(syntax, sequence, array));
+            statements.Add(BuildArrayLoop(syntax, sequence, array.Element));
+        else if (collection.Type is SliceTypeSymbol slice)
+            statements.Add(BuildArrayLoop(syntax, sequence, slice.Element));
         else if (BuildEnumeratorLoop(syntax, sequence, outer, statements) is { } loop)
             statements.Add(loop);
 
@@ -2490,7 +2509,7 @@ public sealed class Binder(
 
     /// <summary>The array fast path: an ordinary indexed <c>for</c>.</summary>
     private BoundStatement BuildArrayLoop(
-        ForEachSyntax syntax, LocalSymbol sequence, ArrayTypeSymbol array)
+        ForEachSyntax syntax, LocalSymbol sequence, TypeSymbol element)
     {
         PushScope();
 
@@ -2512,11 +2531,11 @@ public sealed class Binder(
                 BoundBinaryOp.Add,
                 new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.NUInt, 1UL)));
 
-        var element = new BoundIndex(syntax.Span, array.Element,
+        var item = new BoundIndex(syntax.Span, element,
             new BoundLocalAccess(syntax.Span, sequence),
             new BoundLocalAccess(syntax.Span, index));
 
-        var body = BindForEachBody(syntax, element);
+        var body = BindForEachBody(syntax, item);
 
         var loop = new BoundFor(syntax.Span, initializer, condition, step, body);
         loop.Locals.Add(index);
@@ -3885,6 +3904,7 @@ public sealed class Binder(
         AssignmentSyntax assignment => BindAssignment(assignment),
         CallSyntax call => BindCall(call),
         MemberAccessSyntax member => BindMemberAccess(member),
+        SliceSyntax slice => BindSlice(slice),
         IndexSyntax index => BindIndex(index),
         NewSyntax newExpression => BindNew(newExpression),
         NewArraySyntax newArray => BindNewArray(newArray),
@@ -4652,10 +4672,11 @@ public sealed class Binder(
         if (target.Type.IsError() || index.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
 
-        if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol))
+        if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol))
         {
             diagnostics.Error("SL0241", syntax.Span,
-                $"cannot index '{target.Type.Name}'; only arrays and pointers support indexing");
+                $"cannot index '{target.Type.Name}'; only arrays, slices and pointers support " +
+                "indexing");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -4672,8 +4693,66 @@ public sealed class Binder(
         if (target.Type is ArrayTypeSymbol array)
             return new BoundIndex(syntax.Span, array.Element, target, PromoteToInt(index));
 
+        if (target.Type is SliceTypeSymbol slice)
+            return new BoundIndex(syntax.Span, slice.Element, target, PromoteToInt(index));
+
         var pointer = (PointerTypeSymbol)target.Type;
         return new BoundIndex(syntax.Span, pointer.Element, target, PromoteToInt(index));
+    }
+
+    /// <summary>
+    /// <c>a[from:to]</c> over an array or another slice.
+    ///
+    /// Slicing a slice narrows it rather than nesting: the result names the same
+    /// array, further in. So there is one indirection however many times a slice
+    /// has been cut, and the array underneath is kept alive by whichever slices
+    /// still name it.
+    /// </summary>
+    private BoundExpression BindSlice(SliceSyntax syntax)
+    {
+        var target = BindExpression(syntax.Target);
+        if (target.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        var element = target.Type switch
+        {
+            ArrayTypeSymbol array => array.Element,
+            SliceTypeSymbol slice => slice.Element,
+            _ => null,
+        };
+
+        if (element is null)
+        {
+            diagnostics.Error("SL0452", syntax.Span,
+                $"cannot slice '{target.Type.Name}'; slicing takes part of an array or of " +
+                "another slice");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var start = BindBound(syntax.Start);
+        var end = BindBound(syntax.End);
+
+        if (start?.Type.IsError() == true || end?.Type.IsError() == true)
+            return new BoundErrorExpression(syntax.Span);
+
+        return new BoundSlice(syntax.Span, SliceOf(element), target, start, end);
+    }
+
+    /// <summary>One end of a slice, or null where the source left it out.</summary>
+    private BoundExpression? BindBound(ExpressionSyntax? syntax)
+    {
+        if (syntax is null) return null;
+
+        var bound = BindExpression(syntax);
+        if (bound.Type.IsError()) return bound;
+
+        if (bound.Type is not PrimitiveTypeSymbol { IsInteger: true })
+        {
+            diagnostics.Error("SL0242", syntax.Span,
+                $"a slice bound must be an integer, but this is '{bound.Type.Name}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return BindConversion(bound, PrimitiveTypeSymbol.NUInt, syntax.Span);
     }
 
     private BoundExpression BindSizeof(SizeofSyntax syntax)
@@ -4954,15 +5033,18 @@ public sealed class Binder(
         var receiver = BindExpression(syntax.Target);
         if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
-        // An array's only member is its length, which lives in the header.
-        if (receiver.Type is ArrayTypeSymbol)
+        // An array's only member is its length, which lives in the header; a
+        // slice's is the one it carries, and it answers to the same name.
+        if (receiver.Type is ArrayTypeSymbol or SliceTypeSymbol)
         {
             if (syntax.Member == "Length")
                 return new BoundArrayLength(syntax.Span, PrimitiveTypeSymbol.NUInt, receiver);
 
             diagnostics.Error("SL0313", syntax.Span,
                 $"'{receiver.Type.Name}' has no member named '{syntax.Member}'; " +
-                "an array has only 'Length'");
+                (receiver.Type is SliceTypeSymbol
+                    ? "a slice has only 'Length', and is indexed and sliced further"
+                    : "an array has only 'Length'"));
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -5313,7 +5395,7 @@ public sealed class Binder(
                 .Where(f => sameModule || f.IsPublic)
                 .ToList();
 
-            if (visible.Count > 0)
+            if (visible.Any(f => AcceptsArguments(f, arguments)))
                 return BindFunctionCall(syntax, visible, member.Member, arguments);
 
             var qualified = new QualifiedName(member.Span,
@@ -5331,10 +5413,19 @@ public sealed class Binder(
         if (syntax.Callee is NameSyntax callee)
         {
             var candidates = ResolveFunctionCandidates(callee.Name);
-            if (candidates.Count > 0)
+
+            // An instantiation of a generic is an ordinary function with an
+            // ordinary name, so it turns up here beside everything else. It must
+            // not shadow the template it came from: `Sort(list)` instantiating
+            // `Sort<Money>` cannot be what a later `Sort(numbers[2:5])` resolves
+            // to. So the templates are tried whenever nothing already built fits.
+            if (candidates.Any(c => AcceptsArguments(c, arguments)))
                 return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
 
             if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic) return generic;
+
+            if (candidates.Count > 0)
+                return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
 
             // A method of the enclosing type, called without a receiver.
             if (callee.Name.Parts.Count == 1 &&
@@ -6022,22 +6113,25 @@ public sealed class Binder(
         ReportArgumentMismatch(name, index, argument, parameter.Type);
     }
 
+    /// <summary>Whether one candidate could take these arguments.</summary>
+    private bool AcceptsArguments(FunctionSymbol candidate, List<BoundExpression> arguments)
+    {
+        int expected = candidate.Parameters.Count(p => !p.IsThis);
+        if (candidate.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
+            return false;
+
+        var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        for (int i = 0; i < parameters.Count; i++)
+            if (!ArgumentFits(arguments[i], parameters[i]))
+                return false;
+
+        return true;
+    }
+
     private FunctionSymbol? ResolveOverload(
         IReadOnlyList<FunctionSymbol> candidates, List<BoundExpression> arguments, SourceSpan span, string name)
     {
-        var viable = candidates.Where(candidate =>
-        {
-            int expected = candidate.Parameters.Count(p => !p.IsThis);
-            if (candidate.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
-                return false;
-
-            var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
-            for (int i = 0; i < parameters.Count; i++)
-                if (!ArgumentFits(arguments[i], parameters[i]))
-                    return false;
-
-            return true;
-        }).ToList();
+        var viable = candidates.Where(c => AcceptsArguments(c, arguments)).ToList();
 
         switch (viable.Count)
         {
@@ -6215,6 +6309,10 @@ public sealed class Binder(
                 ? ConversionKind.NullToReference
                 : null;
 
+        // The whole of an array, as a slice of it.
+        if (from is ArrayTypeSymbol whole && to is SliceTypeSymbol asSlice)
+            return whole.Element.Equals(asSlice.Element) ? ConversionKind.ArrayToSlice : null;
+
         // A class converts to any interface it implements, and an interface to
         // any it extends. Because a reference is the same pointer either way,
         // this costs nothing at run time.
@@ -6349,10 +6447,58 @@ public sealed class Binder(
         return array;
     }
 
+    /// <summary>
+    /// <c>T[:]</c>, built once per element type.
+    ///
+    /// The three fields are hidden storage: a slice is reached through indexing
+    /// and Length, and naming the array it came from would let a caller keep the
+    /// whole of it alive on purpose and by accident alike.
+    /// </summary>
+    private SliceTypeSymbol SliceOf(TypeSymbol element)
+    {
+        if (_slices.TryGetValue(element, out var existing)) return existing;
+
+        var slice = new SliceTypeSymbol
+        {
+            Element = element,
+            SimpleName = element.Name + "[:]",
+            ModuleName = Builtins.StandardModuleName,
+        };
+
+        slice.Fields.Add(new FieldSymbol(
+            SliceTypeSymbol.ArrayFieldName, ArrayOf(element), slice, 0) { IsBackingField = true });
+        slice.Fields.Add(new FieldSymbol(
+            SliceTypeSymbol.OffsetFieldName, PrimitiveTypeSymbol.NUInt, slice, 1)
+            { IsBackingField = true });
+        slice.Fields.Add(new FieldSymbol(
+            SliceTypeSymbol.LengthFieldName, PrimitiveTypeSymbol.NUInt, slice, 2)
+            { IsBackingField = true });
+
+        _slices[element] = slice;
+        _structs.Add(slice);
+        ComputeLayout(slice, []);
+        return slice;
+    }
+
     private TypeSymbol ResolveType(TypeSyntax syntax, FileScope scope)
     {
         switch (syntax)
         {
+            case SliceTypeSyntax sliceSyntax:
+            {
+                var element = ResolveType(sliceSyntax.Element, scope);
+                if (element.IsError()) return element;
+
+                if (element.IsVoid())
+                {
+                    diagnostics.Error("SL0451", sliceSyntax.Span,
+                        "there is no slice of 'void'");
+                    return ErrorTypeSymbol.Instance;
+                }
+
+                return SliceOf(element);
+            }
+
             case ArrayTypeSyntax array:
             {
                 var element = ResolveType(array.Element, scope);
@@ -6595,34 +6741,103 @@ public sealed class Binder(
         CallSyntax syntax,
         List<BoundExpression> arguments)
     {
-        // Only arity distinguishes candidates for now; inference does the rest.
-        var template = candidates.FirstOrDefault(c => c.Declaration.Parameters.Count == arguments.Count)
-                       ?? candidates[0];
+        var viable = candidates
+            .Where(c => c.Declaration.Parameters.Count == arguments.Count)
+            .ToList();
 
-        var parameters = template.Parameters.ToHashSet(StringComparer.Ordinal);
-        var inferred = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        if (viable.Count == 0) viable = [candidates[0]];
 
-        // An enclosing type's parameters are already fixed, so they are given
-        // rather than inferred; only the method's own have to be worked out.
-        foreach (var (name, type) in template.OuterSubstitution) inferred.TryAdd(name, type);
+        // Every candidate of the right arity is tried, and one that infers but
+        // then would not accept the arguments is not a candidate. Two templates
+        // may take one argument and differ in its shape -- `Sort(T[:])` and
+        // `Sort(IList<T>)` do -- and picking the first would make the second
+        // unreachable.
+        var fitting = new List<(GenericFunctionTemplate Template, List<TypeSymbol> Arguments)>();
+        Dictionary<string, TypeSymbol>? firstFailure = null;
+        GenericFunctionTemplate? failed = null;
 
-        int shared = Math.Min(arguments.Count, template.Declaration.Parameters.Count);
-        for (int i = 0; i < shared; i++)
-            Infer(template.Declaration.Parameters[i].Type, arguments[i].Type,
-                parameters, inferred, template.Scope);
-
-        var missing = template.Parameters.Where(p => !inferred.ContainsKey(p)).ToList();
-        if (missing.Count > 0)
+        foreach (var candidate in viable)
         {
-            diagnostics.Error("SL0327", syntax.Span,
-                $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
-                $"for '{template.Name}' from these arguments; " +
-                "Stainless infers type arguments only from the values passed");
+            var names = candidate.Parameters.ToHashSet(StringComparer.Ordinal);
+            var inferred = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+
+            // An enclosing type's parameters are already fixed, so they are
+            // given rather than inferred; only the method's own are worked out.
+            foreach (var (name, type) in candidate.OuterSubstitution) inferred.TryAdd(name, type);
+
+            int shared = Math.Min(arguments.Count, candidate.Declaration.Parameters.Count);
+            for (int i = 0; i < shared; i++)
+                Infer(candidate.Declaration.Parameters[i].Type, arguments[i].Type,
+                    names, inferred, candidate.Scope);
+
+            if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
+            {
+                firstFailure ??= inferred;
+                failed ??= candidate;
+                continue;
+            }
+
+            if (Accepts(candidate, inferred, arguments))
+                fitting.Add((candidate, candidate.Parameters.Select(p => inferred[p]).ToList()));
+        }
+
+        if (fitting.Count == 1)
+            return InstantiateFunction(fitting[0].Template, fitting[0].Arguments, syntax.Span);
+
+        if (fitting.Count > 1)
+        {
+            diagnostics.Error("SL0453", syntax.Span,
+                $"'{candidates[0].Name}' is ambiguous here: " +
+                string.Join(" and ", fitting.Select(f =>
+                    $"'{f.Template.Name}<{string.Join(", ", f.Arguments.Select(a => a.Name))}>'")) +
+                " both accept these arguments");
             return null;
         }
 
-        var typeArguments = template.Parameters.Select(p => inferred[p]).ToList();
-        return InstantiateFunction(template, typeArguments, syntax.Span);
+        var template = failed ?? viable[0];
+        var reported = firstFailure ?? new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        var missing = template.Parameters.Where(p => !reported.ContainsKey(p)).ToList();
+
+        diagnostics.Error("SL0327", syntax.Span,
+            missing.Count > 0
+                ? $"cannot infer {string.Join(" and ", missing.Select(m => "'" + m + "'"))} " +
+                  $"for '{template.Name}' from these arguments; " +
+                  "Stainless infers type arguments only from the values passed"
+                : $"no '{template.Name}' accepts these arguments");
+        return null;
+    }
+
+    /// <summary>
+    /// Whether a template, with its parameters worked out, would take the
+    /// arguments given.
+    ///
+    /// The parameter types are resolved under the inferred substitution rather
+    /// than by instantiating: instantiating queues a body to be bound, and a
+    /// candidate that loses should not leave one behind.
+    /// </summary>
+    private bool Accepts(
+        GenericFunctionTemplate template,
+        Dictionary<string, TypeSymbol> inferred,
+        List<BoundExpression> arguments)
+    {
+        var previous = _substitution;
+        _substitution = inferred;
+
+        try
+        {
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                var wanted = ResolveType(template.Declaration.Parameters[i].Type, template.Scope);
+                if (wanted.IsError()) return false;
+                if (!IsImplicitlyConvertible(arguments[i], wanted)) return false;
+            }
+
+            return true;
+        }
+        finally
+        {
+            _substitution = previous;
+        }
     }
 
     /// <summary>

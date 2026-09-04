@@ -57,6 +57,13 @@ public enum ConversionKind
     ClassToInterface,   // C -> I; the same pointer, since dispatch goes via TypeInfo
 
     /// <summary>
+    /// <c>T[]</c> -> <c>T[:]</c>: the whole array, as a slice of it. Implicit,
+    /// because a slice of everything is what an array already is and asking for
+    /// a cast would put punctuation in front of every call that takes one.
+    /// </summary>
+    ArrayToSlice,
+
+    /// <summary>
     /// A string literal used where a <c>byte*</c> is expected. Safe only for a
     /// literal, whose bytes are static and NUL-terminated; a String held in a
     /// variable must go through ToPointer(), where the lifetime is visible.
@@ -370,6 +377,22 @@ public sealed class BoundNewArray(SourceSpan span, ArrayTypeSymbol type, BoundEx
 }
 
 /// <summary><c>array.Length</c>, read straight out of the object header.</summary>
+/// <summary>
+/// <c>a[from:to]</c>. Either end may be absent, and the emitter reads the
+/// beginning or the length of what is being sliced in its place.
+/// </summary>
+public sealed class BoundSlice(
+    SourceSpan span,
+    SliceTypeSymbol type,
+    BoundExpression target,
+    BoundExpression? start,
+    BoundExpression? end) : BoundExpression(span, type)
+{
+    public BoundExpression Target { get; } = target;
+    public BoundExpression? Start { get; } = start;
+    public BoundExpression? End { get; } = end;
+}
+
 public sealed class BoundArrayLength(SourceSpan span, TypeSymbol type, BoundExpression array)
     : BoundExpression(span, type)
 {

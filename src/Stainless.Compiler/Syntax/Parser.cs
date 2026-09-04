@@ -710,6 +710,18 @@ public sealed class Parser
                 continue;
             }
 
+            // `T[:]` is the slice of one. Nothing else can follow an open
+            // bracket with a colon, so this needs no lookahead beyond it.
+            if (At(TokenKind.OpenBracket) && Peek(1).Kind == TokenKind.Colon &&
+                Peek(2).Kind == TokenKind.CloseBracket)
+            {
+                Advance();
+                Advance();
+                Advance();
+                type = new SliceTypeSyntax(SpanFrom(start), type);
+                continue;
+            }
+
             break;
         }
 
@@ -1271,9 +1283,34 @@ public sealed class Parser
             if (At(TokenKind.OpenBracket))
             {
                 Advance();
-                var index = ParseExpression();
+
+                // `a[:]`, `a[i:]`, `a[:j]` and `a[i:j]` all slice; `a[i]`
+                // indexes. The colon is what tells them apart, and a ternary
+                // inside the brackets has already consumed its own by the time
+                // this looks -- so any colon left here is this one.
+                ExpressionSyntax? first =
+                    AtAny(TokenKind.Colon, TokenKind.CloseBracket) ? null : ParseExpression();
+
+                if (Match(TokenKind.Colon))
+                {
+                    ExpressionSyntax? last =
+                        At(TokenKind.CloseBracket) ? null : ParseExpression();
+                    Expect(TokenKind.CloseBracket);
+                    expression = new SliceSyntax(SpanFrom(start), expression, first, last);
+                    continue;
+                }
+
                 Expect(TokenKind.CloseBracket);
-                expression = new IndexSyntax(SpanFrom(start), expression, index);
+
+                if (first is null)
+                {
+                    _diagnostics.Error("SL0450", SpanFrom(start),
+                        "an index is missing; write 'a[i]' to read one element, or 'a[i:j]' " +
+                        "to take a slice");
+                    continue;
+                }
+
+                expression = new IndexSyntax(SpanFrom(start), expression, first);
                 continue;
             }
 
