@@ -137,6 +137,35 @@ public sealed class ArrayTypeSymbol(TypeSymbol element) : TypeSymbol
     public override int GetHashCode() => HashCode.Combine("array", Element);
 }
 
+/// <summary>
+/// <c>T[N]</c>: N elements laid out end to end, inside whatever contains them.
+///
+/// This is C's array and not C#'s. A <see cref="ArrayTypeSymbol"/> is a
+/// reference to a counted heap object; this one <em>is</em> its elements, so a
+/// struct holding one is exactly as wide as the C struct it mirrors and
+/// <c>sizeof</c> includes every element.
+/// </summary>
+public sealed class FixedArrayTypeSymbol(TypeSymbol element, int length) : TypeSymbol
+{
+    public TypeSymbol Element { get; } = element;
+
+    /// <summary>How many elements. Always at least one.</summary>
+    public int Length { get; } = length;
+
+    public override string Name => $"{Element.Name}[{Length}]";
+
+    /// <summary>Every element, with no header and no padding between them.</summary>
+    public override int Size => Element.Size * Length;
+
+    /// <summary>An array is aligned as its element is, which is C's rule.</summary>
+    public override int Alignment => Element.Alignment;
+
+    public override bool Equals(object? obj) =>
+        obj is FixedArrayTypeSymbol other &&
+        Element.Equals(other.Element) && Length == other.Length;
+    public override int GetHashCode() => HashCode.Combine("fixed", Element, Length);
+}
+
 /// <summary><c>C?</c>: an optional reference. Same representation, may be null.</summary>
 public sealed class OptionalTypeSymbol(TypeSymbol element) : TypeSymbol
 {

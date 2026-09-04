@@ -22,6 +22,8 @@ found 3:
   alpha.txt
   béta.txt
   日本.txt
+sizeof(FindData) = 592
+offsetof(FileName) = 44
 alpha found: true
   name: alpha.txt
   size: 0

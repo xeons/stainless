@@ -664,7 +664,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 148 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 150 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -951,6 +951,11 @@ Everything below is covered by [the test suite](tests/cases).
   `Text.FromUtf16`; anything malformed becomes U+FFFD in both directions, so a
   `String` is UTF-8 by invariant
 - `T[]`: counted arrays, always bounds checked, elements released with the array
+- `T[N]`: an inline fixed-size array, which is C's and not C#'s — it *is* its
+  elements rather than a reference to them, so a struct holding one is exactly
+  as wide as the C struct it mirrors. The length is part of the type, so
+  `.Length` is a constant and an out-of-range constant index is a compile error
+  rather than an abort. `WIN32_FIND_DATAW` is 592 bytes here as it is there
 - `T[:]`: slices. `a[1:4]`, `a[3:]`, `a[:2]` and `a[:]` over an array or another
   slice, with half-open bounds; three words, so nothing allocates. A view rather
   than a copy — writing through one writes the array, and an index is checked

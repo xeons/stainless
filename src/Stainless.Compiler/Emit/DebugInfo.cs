@@ -267,6 +267,21 @@ public sealed class DebugInfo
             case VariantTypeSymbol variant:
                 return _types[type] = VariantType(variant);
 
+            // An inline array is DWARF's own array type: elements laid out end
+            // to end, with the count in a subrange. This is the one array shape
+            // a debugger can already print without being told anything.
+            case FixedArrayTypeSymbol inline:
+            {
+                int id = Reserve();
+                _types[type] = id;
+                int range = Add($"!DISubrange(count: {inline.Length})");
+                Fill(id,
+                    $"!DICompositeType(tag: DW_TAG_array_type, " +
+                    $"baseType: !{Type(inline.Element)}, size: {(long)inline.Size * 8}, " +
+                    $"align: {inline.Alignment * 8}, elements: !{Add($"!{{!{range}}}")})");
+                return id;
+            }
+
             case StructTypeSymbol structType:
                 return _types[type] = Composite(structType, structType.Size, headerBytes: 0);
 

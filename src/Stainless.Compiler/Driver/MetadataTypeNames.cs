@@ -34,6 +34,7 @@ public static class MetadataTypeNames
         PrimitiveTypeSymbol primitive => primitive.Name,
         PointerTypeSymbol pointer => Write(pointer.Element) + "*",
         ArrayTypeSymbol array => Write(array.Element) + "[]",
+        FixedArrayTypeSymbol inline => $"{Write(inline.Element)}[{inline.Length}]",
         OptionalTypeSymbol optional => Write(optional.Element) + "?",
         WeakTypeSymbol weak => "weak " + Write(weak.Element) + "?",
         NamedTypeSymbol named => named.QualifiedName,
@@ -60,6 +61,15 @@ public static class MetadataTypeNames
 
         if (name.EndsWith("[]", StringComparison.Ordinal))
             return Read(name[..^2], lookup) is { } element ? new ArrayTypeSymbol(element) : null;
+
+        // `T[N]`: the length is part of the type, so it has to survive the trip.
+        if (name.EndsWith(']') && name.LastIndexOf('[') is var open && open > 0 &&
+            int.TryParse(name[(open + 1)..^1], out int length) && length > 0)
+        {
+            return Read(name[..open], lookup) is { } element
+                ? new FixedArrayTypeSymbol(element, length)
+                : null;
+        }
 
         if (name.EndsWith('*'))
             return Read(name[..^1], lookup) is { } pointee ? new PointerTypeSymbol(pointee) : null;

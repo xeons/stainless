@@ -1,0 +1,16 @@
+sizeof(FindData) = 592
+alignof(FindData) = 4
+offsetof(FileName) = 44
+offsetof(AlternateName) = 564
+sizeof(Matrix) = 72
+alignof(Matrix) = 8
+sizeof(Grid) = 24
+FileName.Length = 260
+AlternateName.Length = 14
+name: hi
+total: 72
+original 0, copy 99
+counters: 1 8
+grid[1][2] = 7
+outer length 2, inner length 3
+heap array length 10, last 3

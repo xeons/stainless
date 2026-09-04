@@ -775,6 +775,57 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
+### 2.10.1 `T[N]` — an inline array
+
+```csharp
+public struct FindData {
+    public uint            Attributes;
+    public ushort[260]     FileName;
+    public ushort[14]      AlternateName;
+}                                       // sizeof is 592, as it is in C
+```
+
+**This is C's array, and C# has nothing like it.** A `T[]` is a reference to a
+counted heap object; a `T[N]` *is* its elements, laid out inside whatever
+contains them. So a struct holding one is exactly as wide as the C struct it
+mirrors, `sizeof` includes every element, and copying the struct copies the
+array with it.
+
+The length is written in the type rather than after the name — `ushort[260]
+FileName`, not C's `ushort FileName[260]` — because Stainless writes the type
+first everywhere else, and because it puts `T[N]` in a series with `T[]` and
+`T[:]` rather than off to one side. A generated C header writes C's order,
+outermost length first: `int[3][2]` here is `int32_t x[2][3]` there.
+
+Because the length is part of the type it is known without a value to ask:
+
+```csharp
+int[4] counters;
+counters.Length         // 4, a constant, not a load
+counters[9]             // error[SL0490], at compile time
+counters[variable]      // bounds checked, against a constant
+```
+
+A length must be an integer literal or a `const` holding one (SL0487) and at
+least 1 (SL0488).
+
+**An inline array may not hold a counted reference** (SL0486): every copy of
+whatever held it would have to retain each element, which is the question a
+union cannot answer either. `T[]` is one counted object rather than N of them.
+
+**An inline array may not be a parameter by value** (SL0491). C decays an array
+parameter to a pointer and Stainless has no decay, so passing one by value
+would be both a silent copy of every element and a different ABI from the C it
+is meant to match. `ref T[N]` is the one that lines up — it is `T (*)[N]` on
+both sides:
+
+```csharp
+double Total(ref Matrix matrix) { ... }
+```
+
+`new T[n]` is unaffected and still builds a counted heap array: under `new`, a
+length in brackets is the count rather than part of the type.
+
 ### 2.11 `T[:]` — part of an array
 
 A slice names part of an array, as a value.

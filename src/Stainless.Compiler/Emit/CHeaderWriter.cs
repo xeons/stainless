@@ -256,7 +256,19 @@ public static class CHeaderWriter
     private static string CName(NamedTypeSymbol type) => Mangler.SymbolSafe(type.QualifiedName);
 
     /// <summary>A C declaration of <paramref name="name"/> with the given type.</summary>
-    private static string Declarator(TypeSymbol type, string name) => $"{TypeName(type)} {name}";
+    /// <summary>
+    /// A field or parameter as C declares it.
+    ///
+    /// C writes an array's length after the name rather than after the type, and
+    /// nested lengths outermost-first, so `int[3][2]` here is `int32_t x[2][3]`
+    /// there. Threading the name through the recursion is what gets that order
+    /// right without a second pass.
+    /// </summary>
+    private static string Declarator(TypeSymbol type, string name) => type switch
+    {
+        FixedArrayTypeSymbol inline => Declarator(inline.Element, $"{name}[{inline.Length}]"),
+        _ => $"{TypeName(type)} {name}",
+    };
 
     /// <summary>
     /// A parameter as C sees it. A <c>ref T</c> is a <c>T*</c> and an <c>in T</c>

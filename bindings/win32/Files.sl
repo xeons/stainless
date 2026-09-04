@@ -37,12 +37,6 @@ import Win32;
 import Win32.Kernel32;
 import Standard.Collections;
 
-extern "C" {
-    void* malloc(nuint size);
-    void  free(void* block);
-    void  sl_fail(byte* message);
-}
-
 /// Opens or creates a file, taking the path as text.
 ///
 /// Returns `InvalidHandle()` on failure — not null — and the reason is in
@@ -97,76 +91,41 @@ public String TempPath() {
 
 // ============================================================ directory walk
 
-/// One entry from a directory walk.
+/// The name a walk found, as text rather than as 260 UTF-16 units.
 ///
-/// `WIN32_FIND_DATAW` ends in two inline `WCHAR` arrays, and Stainless has no
-/// inline fixed-size array field, so this owns the 592 bytes as a block and
-/// reads the fields out of it at the offsets `Win32.Kernel32` records. That is
-/// why this is a class with accessors rather than a `struct` with fields: the
-/// struct could not be declared with the right size, and one with the wrong
-/// size would be handed to Windows to overrun.
-public class FindData {
-    void* block;
+/// `Win32.Kernel32.FindData` is the struct itself, with the fields Windows
+/// fills in; these read the parts of it that want converting.
+public String NameOf(ref FindData data) {
+    return Text.FromNullTerminatedUtf16(&data.FileName[0]);
+}
 
-    public FindData() {
-        block = malloc(FindDataSize);
-        if (block == null) { sl_fail("out of memory allocating a WIN32_FIND_DATAW"); }
-    }
+/// The two size halves joined the way the header intends them to be.
+public ulong SizeOf(ref FindData data) {
+    return ((ulong)data.FileSizeHigh << 32) | (ulong)data.FileSizeLow;
+}
 
-    ~FindData() { free(block); }
+public bool IsDirectory(ref FindData data) {
+    return (data.Attributes & FileAttributeDirectory) != 0u;
+}
 
-    /// The block itself, to hand to `FindFirstFileW` or `FindNextFileW`.
-    public void* Pointer() { return block; }
-
-    public uint Attributes() { return *(uint*)((byte*)block + FindDataAttributes); }
-
-    /// The three `FILETIME`s, as 100-nanosecond ticks since 1601.
-    /// `Win32.Clock.ToCalendar` turns one into a date.
-    public ulong Created()  { return ReadFileTime(FindDataCreationTime); }
-    public ulong Accessed() { return ReadFileTime(FindDataLastAccessTime); }
-    public ulong Written()  { return ReadFileTime(FindDataLastWriteTime); }
-
-    /// The two size halves joined the way the header intends them to be.
-    public ulong Size() {
-        ulong high = (ulong)(*(uint*)((byte*)block + FindDataFileSizeHigh));
-        ulong low  = (ulong)(*(uint*)((byte*)block + FindDataFileSizeLow));
-        return (high << 32) | low;
-    }
-
-    /// `cFileName`: the name alone, never a path.
-    public String Name() {
-        return Text.FromNullTerminatedUtf16((ushort*)((byte*)block + FindDataFileName));
-    }
-
-    public bool IsDirectory() { return (Attributes() & FileAttributeDirectory) != 0u; }
-
-    /// True for `.` and `..`, which a directory walk always sees first and
-    /// which almost no caller wants.
-    public bool IsSelfOrParent() {
-        var name = Name();
-        return name == "." || name == "..";
-    }
-
-    /// A `FILETIME` is two 32-bit halves and is not 8-aligned inside this
-    /// struct, so it is read as halves rather than as one `ulong`.
-    ulong ReadFileTime(nuint offset) {
-        ulong low  = (ulong)(*(uint*)((byte*)block + offset));
-        ulong high = (ulong)(*(uint*)((byte*)block + offset + 4u));
-        return (high << 32) | low;
-    }
+/// True for `.` and `..`, which a directory walk always sees first and which
+/// almost no caller wants.
+public bool IsSelfOrParent(ref FindData data) {
+    var name = NameOf(ref data);
+    return name == "." || name == "..";
 }
 
 /// Begins a directory walk. `pattern` is a path with wildcards — `C:\dir\*` —
 /// not a directory. Returns `InvalidHandle()` when nothing matches, with
 /// `ErrorFileNotFound`.
-public void* FindFirst(String pattern, FindData data) {
-    return FindFirstFileW(pattern.ToUtf16().ToPointer(), data.Pointer());
+public void* FindFirst(String pattern, ref FindData data) {
+    return FindFirstFileW(pattern.ToUtf16().ToPointer(), &data);
 }
 
 /// The next entry, or false at the end — where `Win32.LastError()` is
 /// `ErrorNoMoreFiles` rather than a real failure.
-public bool FindNext(void* find, FindData data) {
-    return Win32.Succeeded(FindNextFileW(find, data.Pointer()));
+public bool FindNext(void* find, ref FindData data) {
+    return Win32.Succeeded(FindNextFileW(find, &data));
 }
 
 /// Every name in a directory, without `.` and `..`.
@@ -175,17 +134,17 @@ public bool FindNext(void* find, FindData data) {
 /// list rather than a cursor. It returns names, not paths.
 public List<String> Entries(String directory) {
     var names = new List<String>();
-    var data = new FindData();
+    FindData data;
 
-    void* find = FindFirst(directory + "\\*", data);
+    void* find = FindFirst(directory + "\\*", ref data);
     if (Win32.IsInvalid(find)) { return names; }
 
     // FindFirstFileW has already produced the first entry, so this reads
     // before it advances rather than after.
     bool more = true;
     while (more) {
-        if (!data.IsSelfOrParent()) { names.Add(data.Name()); }
-        more = FindNext(find, data);
+        if (!IsSelfOrParent(ref data)) { names.Add(NameOf(ref data)); }
+        more = FindNext(find, ref data);
     }
 
     FindClose(find);

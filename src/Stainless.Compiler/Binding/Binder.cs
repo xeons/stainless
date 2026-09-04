@@ -1211,6 +1211,16 @@ public sealed class Binder(
                 diagnostics.Error("SL0213", parameter.Span,
                     $"parameter '{parameter.Name}' cannot have type 'void'");
 
+            // C decays an array parameter to a pointer and Stainless has no
+            // decay, so passing one by value would be a silent copy of every
+            // element *and* a different ABI from the C it is meant to match.
+            // `ref` is the one that lines up: it is `T (*)[N]` on both sides.
+            if (type is FixedArrayTypeSymbol && parameter.Mode == ParameterMode.Value)
+                diagnostics.Error("SL0491", parameter.Span,
+                    $"parameter '{parameter.Name}' cannot be '{type.Name}' by value; C " +
+                    "passes an array as a pointer and copying every element here would " +
+                    $"be neither. Write 'ref {type.Name}' or 'in {type.Name}'");
+
             symbol.Parameters.Add(
                 new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count)
                 {
@@ -5098,7 +5108,8 @@ public sealed class Binder(
         if (target.Type.IsError() || index.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
 
-        if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol))
+        if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol
+                                or FixedArrayTypeSymbol))
         {
             diagnostics.Error("SL0241", syntax.Span,
                 $"cannot index '{target.Type.Name}'; only arrays, slices and pointers support " +
@@ -5116,6 +5127,24 @@ public sealed class Binder(
         // Any integer indexes an array, as in C#. A negative one sign-extends to
         // a very large unsigned value, so the single unsigned bounds compare in
         // the emitter catches it without a second check.
+        // An inline array's length is part of its type, so a constant index can
+        // be answered now rather than at run time. That is strictly better than
+        // what `T[]` can do, and it is the whole reason the length is in the
+        // type: the check is free and the failure is a compile error.
+        if (target.Type is FixedArrayTypeSymbol inline)
+        {
+            if (FoldSwitchLabel(index) is { } constant &&
+                constant <= long.MaxValue && (long)constant >= inline.Length)
+            {
+                diagnostics.Error("SL0490", syntax.Index.Span,
+                    $"index {constant} is past the end of '{inline.Name}', which has " +
+                    $"{Counted(inline.Length, "element")}");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return new BoundIndex(syntax.Span, inline.Element, target, PromoteToInt(index));
+        }
+
         if (target.Type is ArrayTypeSymbol array)
             return new BoundIndex(syntax.Span, array.Element, target, PromoteToInt(index));
 
@@ -5179,6 +5208,112 @@ public sealed class Binder(
         }
 
         return BindConversion(bound, PrimitiveTypeSymbol.NUInt, syntax.Span);
+    }
+
+    /// <summary>
+    /// <c>T[N]</c>. The length has to be known now, because it is part of the
+    /// type and the type decides a layout -- so it is a literal or a constant
+    /// and nothing else.
+    /// </summary>
+    private TypeSymbol ResolveFixedArray(FixedArrayTypeSyntax syntax, FileScope scope)
+    {
+        var element = ResolveType(syntax.Element, scope);
+        if (element.IsError()) return element;
+
+        if (element.IsVoid())
+        {
+            diagnostics.Error("SL0485", syntax.Span, "there is no array of 'void'");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        // A counted reference in an inline array would have to be retained
+        // element by element on every copy of whatever holds it. That is the
+        // same question a union cannot answer, and the answer here is the same
+        // one for now: plain data.
+        if (element.CarriesReferences())
+        {
+            diagnostics.Error("SL0486", syntax.Span,
+                $"an inline array cannot hold '{element.Name}', because it holds a " +
+                "counted reference and every copy of the array would have to retain " +
+                $"each element. Use '{element.Name}[]', which is one counted object " +
+                "rather than N of them");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        if (ConstantLength(syntax.Length, scope) is not { } length)
+        {
+            diagnostics.Error("SL0487", syntax.Length.Span,
+                "the length of an inline array must be a constant, because it is " +
+                "part of the type: an integer literal, or a 'const' holding one");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        if (length <= 0)
+        {
+            diagnostics.Error("SL0488", syntax.Length.Span,
+                $"an inline array needs at least one element, and this asks for {length}");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        // The product has to stay addressable. This is far past any real struct
+        // and exists so that a typo produces a diagnostic rather than a
+        // nonsensical size.
+        long bytes = (long)element.Size * length;
+        if (bytes > int.MaxValue)
+        {
+            diagnostics.Error("SL0489", syntax.Length.Span,
+                $"'{element.Name}[{length}]' would be {bytes} bytes, which is more " +
+                "than a value can be");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        return new FixedArrayTypeSymbol(element, (int)length);
+    }
+
+    /// <summary>
+    /// The value of an inline array's length: an integer literal, or a name that
+    /// reaches a constant holding one.
+    /// </summary>
+    private long? ConstantLength(ExpressionSyntax syntax, FileScope scope)
+    {
+        switch (syntax)
+        {
+            case LiteralSyntax { Kind: TokenKind.IntLiteral, Value: ulong number }:
+                return number > long.MaxValue ? null : (long)number;
+
+            case NameSyntax name when name.Name.Parts.Count == 1:
+                return LookUpConstant(scope.Module, name.Name.Parts[0], scope);
+
+            case MemberAccessSyntax { Target: NameSyntax target } member
+                when target.Name.Parts.Count == 1 &&
+                     scope.Imports.TryGetValue(target.Name.Parts[0], out var imported):
+                return LookUpConstant(imported, member.Member, scope, requirePublic: true);
+
+            default:
+                return null;
+        }
+    }
+
+    private long? LookUpConstant(
+        ModuleSymbol module, string name, FileScope scope, bool requirePublic = false)
+    {
+        if (!module.Constants.TryGetValue(name, out var constant))
+        {
+            foreach (var imported in scope.Imports.Values)
+                if (imported.Constants.TryGetValue(name, out var candidate) && candidate.IsPublic)
+                {
+                    constant = candidate;
+                    break;
+                }
+
+            if (constant is null) return null;
+        }
+        else if (requirePublic && !constant.IsPublic)
+        {
+            return null;
+        }
+
+        return constant.Value is ulong number && number <= long.MaxValue ? (long)number : null;
     }
 
     private BoundExpression BindSizeof(SizeofSyntax syntax)
@@ -5502,6 +5637,21 @@ public sealed class Binder(
 
         var receiver = BindExpression(syntax.Target);
         if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // An inline array's length was written in its type, so it is a constant
+        // rather than a load -- and, unlike the other two, it never had to be
+        // stored anywhere.
+        if (receiver.Type is FixedArrayTypeSymbol inline)
+        {
+            if (syntax.Member == "Length")
+                return new BoundLiteral(
+                    syntax.Span, PrimitiveTypeSymbol.NUInt, (ulong)inline.Length);
+
+            diagnostics.Error("SL0313", syntax.Span,
+                $"'{inline.Name}' has no member named '{syntax.Member}'; " +
+                "an inline array has only 'Length', and is indexed");
+            return new BoundErrorExpression(syntax.Span);
+        }
 
         // An array's only member is its length, which lives in the header; a
         // slice's is the one it carries, and it answers to the same name.
@@ -6987,6 +7137,9 @@ public sealed class Binder(
                 }
                 return ArrayOf(element);
             }
+
+            case FixedArrayTypeSyntax fixedArray:
+                return ResolveFixedArray(fixedArray, scope);
 
             case PrimitiveTypeSyntax primitive:
                 return PrimitiveFor(primitive.Keyword);

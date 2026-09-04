@@ -177,19 +177,16 @@ the same for the parts with no window.
 - **`CreateProcessW` may write to the command line it is given**, so it cannot
   be a literal. `Tasks.Run` copies with `Win32.Copy` first; a caller using the
   declaration directly has to do the same.
+- **An inline array cannot be passed by value.** `WIN32_FIND_DATAW` is a
+  `struct` with the two `WCHAR` arrays the header gives it, so it is a plain
+  local — but C decays an array parameter to a pointer, and copying 592 bytes
+  would be neither that nor cheap, so `Win32.Files` takes it `ref`.
 - **`Win32.Terminal`, not `Win32.Console`.** A module is reached by its last name
   segment, so a `Win32.Console` would shadow `Standard.Console` in every file
   that imported it.
 
 ## What is not bound
 
-- **Anything needing an inline fixed-size array field**, which Stainless does
-  not have. `WIN32_FIND_DATAW` ends in two `WCHAR` arrays, so `Win32.Kernel32`
-  records its size and field offsets as constants and `Win32.Files.FindData`
-  owns the 592 bytes and reads them — a class with accessors rather than a
-  struct with fields, because a struct with the wrong size would be handed to
-  Windows to overrun. `LOGFONTW` is the same shape and is not bound;
-  `CreateFontW` takes the face name as a pointer and is.
 - **COM**, and so everything reached through it: the shell's newer interfaces,
   Direct2D, WIC, `SHGetKnownFolderPath`. That needs vtable layout and `IUnknown`,
   which is a project rather than a binding.

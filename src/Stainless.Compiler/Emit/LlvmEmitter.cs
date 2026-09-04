@@ -683,6 +683,10 @@ public sealed class LlvmEmitter(
         },
         StructTypeSymbol structType => StructName(structType),
 
+        // An inline array is its elements, so LLVM is told exactly that. This
+        // is what makes a struct holding one the width the C struct is.
+        FixedArrayTypeSymbol inline => $"[{inline.Length} x {LlvmTypeOf(inline.Element)}]",
+
         // A delegate is a bare function pointer, which is what makes it the
         // same value a C function pointer is.
         DelegateTypeSymbol => "ptr",
@@ -2312,6 +2316,8 @@ public sealed class LlvmEmitter(
             {
                 if (index.Target.Type is ArrayTypeSymbol) return EmitArrayElementAddress(index);
                 if (index.Target.Type is SliceTypeSymbol) return EmitSliceElementAddress(index);
+                if (index.Target.Type is FixedArrayTypeSymbol inline)
+                    return EmitInlineElementAddress(index, inline);
 
                 var target = EmitExpression(index.Target);
                 var offset = EmitExpression(index.Index);
@@ -2331,6 +2337,38 @@ public sealed class LlvmEmitter(
                 return slot;
             }
         }
+    }
+
+    /// <summary>
+    /// The address of one element of an inline array.
+    ///
+    /// The array has no header and no indirection -- it is laid out where it was
+    /// written -- so this is the array's own address plus the index, and the
+    /// bounds check compares against a number that was in the type.
+    /// </summary>
+    private string EmitInlineElementAddress(BoundIndex index, FixedArrayTypeSymbol inline)
+    {
+        string array = EmitAddress(index.Target);
+        var offset = EmitExpression(index.Index);
+        string widened = WidenIndex(offset);
+
+        // One unsigned compare covers both ends, as it does for an array: a
+        // negative index sign-extends to a very large unsigned value. The length
+        // is a constant here rather than a load, because it was in the type.
+        string length = inline.Length.ToString();
+        string inRange = Emit("i1", $"icmp ult i64 {widened}, {length}");
+
+        string okLabel = NextLabel("bounds.ok");
+        string failLabel = NextLabel("bounds.fail");
+        Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
+
+        Label(failLabel);
+        Line($"call void @sl_array_bounds_fail(i64 {widened}, i64 {length})");
+        Terminator("unreachable");
+
+        Label(okLabel);
+        return Emit("ptr",
+            $"getelementptr inbounds {LlvmTypeOf(inline)}, ptr {array}, i64 0, i64 {widened}");
     }
 
     private string WidenIndex(Val index)

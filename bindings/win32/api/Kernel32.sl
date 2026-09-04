@@ -126,8 +126,8 @@ public extern "C" {
     uint  GetLongPathNameW(ushort* shortPath, ushort* buffer, uint size);
     uint  GetShortPathNameW(ushort* longPath, ushort* buffer, uint size);
 
-    void* FindFirstFileW(ushort* pattern, void* data);
-    int   FindNextFileW(void* find, void* data);
+    void* FindFirstFileW(ushort* pattern, FindData* data);
+    int   FindNextFileW(void* find, FindData* data);
     int   FindClose(void* find);
 
     int   CreatePipe(void** read, void** write, SecurityAttributes* security, uint size);
@@ -189,21 +189,26 @@ public const uint MoveFileReplaceExisting = 0x00000001u;
 public const uint MoveFileCopyAllowed     = 0x00000002u;
 public const uint MoveFileWriteThrough    = 0x00000008u;
 
-/// The byte offsets of `WIN32_FIND_DATAW`'s fields, and its size.
+/// `MAX_PATH`, and the length of the name a directory walk hands back.
+public const int MaxPath = 260;
+
+/// `WIN32_FIND_DATAW`. `sizeof` is 592, as it is in C.
 ///
-/// It is not declared as a struct because it ends in two inline `WCHAR` arrays
-/// and Stainless has no inline fixed-size array field. A struct with the wrong
-/// size would be handed to Windows to overrun, so it is not written at all;
-/// `Win32.Files.FindData` owns the block and reads it at these offsets.
-public const nuint FindDataSize             = 592u;
-public const nuint FindDataAttributes       = 0u;
-public const nuint FindDataCreationTime     = 4u;
-public const nuint FindDataLastAccessTime   = 12u;
-public const nuint FindDataLastWriteTime    = 20u;
-public const nuint FindDataFileSizeHigh     = 28u;
-public const nuint FindDataFileSizeLow      = 32u;
-public const nuint FindDataFileName         = 44u;
-public const nuint FindDataAlternateName    = 564u;
+/// The two trailing `WCHAR` arrays are what this struct is really about: they
+/// are laid out inside it, so the name is at offset 44 and the struct is the
+/// width Windows expects to fill. `Win32.Files.FindData` reads them as text.
+public struct FindData {
+    public uint             Attributes;
+    public FileTime         Created;
+    public FileTime         Accessed;
+    public FileTime         Written;
+    public uint             FileSizeHigh;
+    public uint             FileSizeLow;
+    public uint             Reserved0;
+    public uint             Reserved1;
+    public ushort[MaxPath]  FileName;
+    public ushort[14]       AlternateName;
+}
 
 // =================================================================== memory
 

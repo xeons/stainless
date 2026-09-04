@@ -688,13 +688,21 @@ public sealed class Parser
     private bool AtTypeStart() =>
         AtAny(PrimitiveKeywords) || At(TokenKind.Identifier) || At(TokenKind.WeakKeyword);
 
-    private TypeSyntax ParseType()
+    /// <summary>
+    /// A type.
+    ///
+    /// <paramref name="allowFixedLength"/> is false only under <c>new</c>, where
+    /// <c>new int[10]</c> has to stay "ten ints on the heap" rather than becoming
+    /// the fixed-array type <c>int[10]</c>. Everywhere else a length in brackets
+    /// is part of the type.
+    /// </summary>
+    private TypeSyntax ParseType(bool allowFixedLength = true)
     {
         int start = _pos;
 
         if (Match(TokenKind.WeakKeyword))
         {
-            var inner = ParseType();
+            var inner = ParseType(allowFixedLength);
             return new WeakTypeSyntax(SpanFrom(start), inner);
         }
 
@@ -716,13 +724,23 @@ public sealed class Parser
             if (Match(TokenKind.Star)) { type = new PointerTypeSyntax(SpanFrom(start), type); continue; }
             if (Match(TokenKind.Question)) { type = new NullableTypeSyntax(SpanFrom(start), type); continue; }
 
-            // Only empty brackets are part of a type. `new int[10]` keeps its
-            // length expression for the caller to read.
             if (At(TokenKind.OpenBracket) && Peek(1).Kind == TokenKind.CloseBracket)
             {
                 Advance();
                 Advance();
                 type = new ArrayTypeSyntax(SpanFrom(start), type);
+                continue;
+            }
+
+            // `T[N]` is N of them, laid out here. Under `new` this is left
+            // alone, so that `new int[10]` keeps its length for the caller.
+            if (allowFixedLength && At(TokenKind.OpenBracket) &&
+                Peek(1).Kind != TokenKind.CloseBracket && Peek(1).Kind != TokenKind.Colon)
+            {
+                Advance();
+                var length = ParseExpression();
+                Expect(TokenKind.CloseBracket);
+                type = new FixedArrayTypeSyntax(SpanFrom(start), type, length);
                 continue;
             }
 
@@ -1384,7 +1402,7 @@ public sealed class Parser
             case TokenKind.NewKeyword:
             {
                 Advance();
-                var type = ParseType();
+                var type = ParseType(allowFixedLength: false);
 
                 // `new T[n]`: ParseType stopped at the bracket because a length
                 // follows rather than a closing bracket.
@@ -1482,6 +1500,10 @@ public sealed class Parser
         }
     }
 
+    /// <summary>What a type is under any number of fixed-length brackets.</summary>
+    private static TypeSyntax Core(TypeSyntax type) =>
+        type is FixedArrayTypeSyntax fixedArray ? Core(fixedArray.Element) : type;
+
     private TypeSyntax? TryParseCastHead()
     {
         Expect(TokenKind.OpenParen);
@@ -1492,8 +1514,10 @@ public sealed class Parser
         Advance();
 
         // `(x)` and `(x) + 1` must stay expressions. A bare name in parentheses
-        // only reads as a cast when what follows can only begin an operand.
-        bool typeIsUnambiguous = type is not NamedTypeSyntax;
+        // only reads as a cast when what follows can only begin an operand --
+        // and `(a[4])` is the same problem wearing brackets, since it is an
+        // index as readily as it is a fixed-array type.
+        bool typeIsUnambiguous = Core(type) is not NamedTypeSyntax;
         bool operandFollows = AtAny(
             TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
             TokenKind.StringLiteral, TokenKind.CharLiteral, TokenKind.OpenParen,

@@ -231,6 +231,27 @@ to index.
 No member may hold a counted reference, and that is a rule about what a union
 can answer rather than one added for safety — see §2.7 of the language spec.
 
+### 2.4.1 Inline array layout
+
+`T[N]` is N elements end to end, with no header, no length and no padding
+between them:
+
+```
+size      = sizeof(T) * N
+alignment = alignof(T)
+```
+
+That is C's rule exactly, which is the point: a struct with a `ushort[260]`
+field is the same bytes as the C struct with `WCHAR cFileName[260]`, and
+`WIN32_FIND_DATAW` comes out 592 bytes with its name at offset 44 on both
+sides. LLVM is told `[N x T]`, so the element type is visible to the optimiser
+rather than hidden behind a byte count.
+
+An inline array crosses `extern "C"` only behind a `ref` or `in`, which is
+`T (*)[N]` in C. Passing one by value is refused (SL0491), because C decays an
+array parameter to a pointer and Stainless has no decay: the two would disagree
+about the ABI silently.
+
 ### 2.5 Slice layout
 
 A `T[:]` is three words, and a struct like any other:

@@ -58,6 +58,14 @@ public sealed record ArrayTypeSyntax(SourceSpan Span, TypeSyntax Element) : Type
 /// <summary><c>T[:]</c> - part of an array, named as a value of its own.</summary>
 public sealed record SliceTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
+/// <summary>
+/// <c>T[N]</c>: an inline fixed-size array, laid out where it is written rather
+/// than pointed at. The length is an expression so that a named constant can be
+/// used; it is folded when the type is resolved.
+/// </summary>
+public sealed record FixedArrayTypeSyntax(
+    SourceSpan Span, TypeSyntax Element, ExpressionSyntax Length) : TypeSyntax(Span);
+
 /// <summary><c>T?</c> — an optional class reference.</summary>
 public sealed record NullableTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 

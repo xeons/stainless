@@ -12,6 +12,7 @@ import Win32.Kernel32;
 import Win32.Environment;
 import Win32.Files;
 import Win32.Machine;
+import Win32.Clock;
 
 int Main() {
     // --- text out and back ------------------------------------------------
@@ -73,19 +74,24 @@ int Main() {
     Console.WriteLine("found " + Text.FromInteger((long)names.Count()) + ":");
     foreach (String name in names) { Console.WriteLine("  " + name); }
 
-    // The walk skips . and .., so the count is the number of files.
-    var data = new FindData();
-    void* find = Files.FindFirst(directory + "\\alpha.txt", data);
+    // WIN32_FIND_DATAW is a struct with the two inline WCHAR arrays the header
+    // gives it, so this is a plain local: 592 bytes, no allocation.
+    Console.WriteLine("sizeof(FindData) = " + Text.FromInteger(sizeof(FindData)));
+    Console.WriteLine("offsetof(FileName) = " + Text.FromInteger(offsetof(FindData, FileName)));
+
+    FindData data;
+    void* find = Files.FindFirst(directory + "\\alpha.txt", ref data);
     Console.WriteLine("alpha found: " + Text.FromBool(!Win32.IsInvalid(find)));
-    Console.WriteLine("  name: " + data.Name());
-    Console.WriteLine("  size: " + Text.FromInteger((long)data.Size()));
-    Console.WriteLine("  is a directory: " + Text.FromBool(data.IsDirectory()));
-    Console.WriteLine("  written after 1601: " + Text.FromBool(data.Written() > 0u));
+    Console.WriteLine("  name: " + Files.NameOf(ref data));
+    Console.WriteLine("  size: " + Text.FromInteger((long)Files.SizeOf(ref data)));
+    Console.WriteLine("  is a directory: " + Text.FromBool(Files.IsDirectory(ref data)));
+    Console.WriteLine("  written after 1601: "
+        + Text.FromBool(Clock.Ticks(data.Written) > 0u));
     FindClose(find);
 
     // A pattern nothing matches is InvalidHandle with ERROR_FILE_NOT_FOUND
     // rather than an empty walk.
-    void* missing = Files.FindFirst(directory + "\\*.nothing", data);
+    void* missing = Files.FindFirst(directory + "\\*.nothing", ref data);
     Console.WriteLine("no match is invalid: " + Text.FromBool(Win32.IsInvalid(missing)));
     Console.WriteLine("  because: " + Text.FromBool(Win32.LastError() == ErrorFileNotFound));
 
