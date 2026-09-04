@@ -160,4 +160,11 @@ public sealed record MetadataParameter
 {
     public required string Name { get; init; }
     public required string Type { get; init; }
+
+    /// <summary>
+    /// How it is passed. It is part of the signature rather than a note about
+    /// it: a consumer that called a 'ref int' by value would hand the callee an
+    /// integer where it expects the address of one.
+    /// </summary>
+    public Syntax.ParameterMode Mode { get; init; } = Syntax.ParameterMode.Value;
 }

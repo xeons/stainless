@@ -122,7 +122,7 @@ public static class CHeaderWriter
                 case DelegateTypeSymbol delegateType:
                     var signature = delegateType.Signature.Count == 0
                         ? "void"
-                        : string.Join(", ", delegateType.Signature.Select(p => Declarator(p.Type, p.Name)));
+                        : string.Join(", ", delegateType.Signature.Select(Declarator));
                     sb.AppendLine(
                         $"typedef {TypeName(delegateType.ReturnType)} " +
                         $"(*{CName(delegateType)})({signature});");
@@ -142,7 +142,7 @@ public static class CHeaderWriter
         {
             var parameters = function.Parameters
                 .Where(p => !p.IsThis)
-                .Select(p => Declarator(p.Type, p.Name))
+                .Select(Declarator)
                 .ToList();
 
             if (function.IsVariadic) parameters.Add("...");
@@ -207,6 +207,19 @@ public static class CHeaderWriter
 
     /// <summary>A C declaration of <paramref name="name"/> with the given type.</summary>
     private static string Declarator(TypeSymbol type, string name) => $"{TypeName(type)} {name}";
+
+    /// <summary>
+    /// A parameter as C sees it. A <c>ref T</c> is a <c>T*</c> and an <c>in T</c>
+    /// a <c>const T*</c>, which is not a translation so much as a restatement:
+    /// that is exactly what the two are at the ABI, and the <c>const</c> says in
+    /// C what the mode says here.
+    /// </summary>
+    private static string Declarator(ParameterSymbol parameter) => parameter.Mode switch
+    {
+        ParameterMode.Ref => $"{TypeName(parameter.Type)}* {parameter.Name}",
+        ParameterMode.In => $"const {TypeName(parameter.Type)}* {parameter.Name}",
+        _ => Declarator(parameter.Type, parameter.Name),
+    };
 
     private static string TypeName(TypeSymbol type) => type switch
     {

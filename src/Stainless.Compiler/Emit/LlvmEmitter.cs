@@ -229,6 +229,21 @@ public sealed class LlvmEmitter(
         if (program.RuntimeFactories.Count > 0) _module.AppendLine();
     }
 
+    /// <summary>
+    /// How one parameter is passed.
+    ///
+    /// A <c>ref</c> or <c>in</c> parameter is the caller's storage, so it is a
+    /// pointer and the classifier is not consulted: there is nothing to
+    /// classify, and a struct that would have gone <c>byval</c> must not be
+    /// copied on the way in. That is the whole of the ABI change, and it makes
+    /// such a parameter exactly a <c>T*</c> — which is why one crosses
+    /// <c>extern "C"</c> with nothing in between.
+    /// </summary>
+    private static ArgInfo ClassifyParameter(ParameterSymbol parameter) =>
+        parameter.IsByReference
+            ? new ArgInfo(PassStyle.Direct, "ptr", parameter.Type)
+            : Win64Abi.ClassifyArgument(parameter.Type, LlvmTypeOf);
+
     private void ExternalDeclarations(BoundProgram program)
     {
         foreach (var function in program.ExternalFunctions)
@@ -241,7 +256,7 @@ public sealed class LlvmEmitter(
 
             foreach (var parameter in function.Parameters)
             {
-                var info = Win64Abi.ClassifyArgument(parameter.Type, LlvmTypeOf);
+                var info = ClassifyParameter(parameter);
                 parts.Add(info.Style == PassStyle.Indirect
                     ? $"ptr byval({StructName((StructTypeSymbol)parameter.Type)})"
                     : info.LlvmType);
@@ -736,7 +751,7 @@ public sealed class LlvmEmitter(
 
         var returnInfo = Win64Abi.ClassifyReturn(symbol.ReturnType, LlvmTypeOf);
         var parameterInfos = symbol.Parameters
-            .Select(p => (Parameter: p, Info: Win64Abi.ClassifyArgument(p.Type, LlvmTypeOf)))
+            .Select(p => (Parameter: p, Info: ClassifyParameter(p)))
             .ToList();
 
         var declaredParameters = new List<string>();
@@ -801,6 +816,17 @@ public sealed class LlvmEmitter(
         foreach (var (parameter, info) in parameterInfos)
         {
             string incoming = incomingNames[parameter];
+
+            // The caller's storage, so there is nothing to copy and nothing to
+            // own: reads and writes go straight through the pointer, which is
+            // already the shape every other parameter's slot has. A `ref` is
+            // deliberately not adopted the way a written value parameter is —
+            // writing to the caller's variable is the point of it.
+            if (parameter.IsByReference)
+            {
+                _parameterSlots[parameter] = incoming;
+                continue;
+            }
 
             if (info.Style == PassStyle.Indirect)
             {
@@ -3057,7 +3083,7 @@ public sealed class LlvmEmitter(
     private static string VariadicSignature(FunctionSymbol function)
     {
         var parts = function.Parameters
-            .Select(p => Win64Abi.ClassifyArgument(p.Type, LlvmTypeOf).LlvmType)
+            .Select(p => ClassifyParameter(p).LlvmType)
             .ToList();
         parts.Add("...");
         return string.Join(", ", parts);

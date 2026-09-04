@@ -34,6 +34,7 @@ public enum TokenKind
     ParallelKeyword, SpawnKeyword,
     ReturnKeyword, BreakKeyword, ContinueKeyword,
     VarKeyword, ConstKeyword, WhereKeyword, StaticKeyword, ReadonlyKeyword,
+    RefKeyword,
 
     // Expression keywords
     NewKeyword, DeleteKeyword, NullKeyword, TrueKeyword, FalseKeyword,
@@ -98,6 +99,7 @@ public static class TokenKindExtensions
         TokenKind.ContinueKeyword => "continue",
         TokenKind.VarKeyword => "var",
         TokenKind.ConstKeyword => "const",
+        TokenKind.RefKeyword => "ref",
         TokenKind.StaticKeyword => "static",
         TokenKind.ReadonlyKeyword => "readonly",
         TokenKind.WhereKeyword => "where",

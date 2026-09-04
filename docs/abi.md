@@ -293,6 +293,30 @@ can still be compared with what a real compiler emits for the same declarations.
 A C++ mangled name is mostly characters an LLVM identifier may not contain, so
 every function symbol is quoted in the IR when it needs to be.
 
+### 3.1 `ref` and `in` parameters
+
+A `ref T` or `in T` parameter is one pointer, and the classifier is not
+consulted for it: there is nothing to classify, and a struct that would
+otherwise go `byval` must not be copied on the way in — copying it is exactly
+what the mode exists to avoid.
+
+So a `ref T` is a `T*`, in both directions:
+
+```
+  void Bump(ref int n)        ->  define void @Bump(ptr %arg.n)
+  Bump(ref count)             ->  call void @Bump(ptr %count.s0)
+```
+
+Inside the callee the incoming pointer *is* the parameter's slot. Every
+parameter already lives behind a pointer — the emitter gives each one a stack
+slot so it can be assigned like a local — so a by-reference parameter is the
+case where that slot is the caller's rather than a copy of it, and reading and
+writing it need no new code at all.
+
+A C header writes the two as `T*` and `const T*`. A C++ name mangles the first
+as a pointer rather than as a C++ reference, because an address is what crosses
+and `T*` is what C++ calls that.
+
 ## 4. Static storage
 
 A `static readonly` becomes one zeroed global per declaration. A single

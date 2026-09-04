@@ -234,7 +234,10 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             }
 
             symbol.Parameters.Add(
-                new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count));
+                new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count)
+                {
+                    Mode = parameter.Mode,
+                });
         }
 
         return symbol;

@@ -467,7 +467,10 @@ public sealed class Binder(
                 parameterType = ErrorTypeSymbol.Instance;
             }
 
-            type.Signature.Add(new ParameterSymbol(parameter.Name, parameterType, i));
+            type.Signature.Add(new ParameterSymbol(parameter.Name, parameterType, i)
+            {
+                Mode = parameter.Mode,
+            });
         }
     }
 
@@ -1014,9 +1017,17 @@ public sealed class Binder(
                     ? module.Name.Split('.', StringSplitOptions.RemoveEmptyEntries)
                     : [];
 
+            // A `ref T` is a `T*`, so it mangles as one. C++ has a reference
+            // type of its own that mangles differently, and this is not it: what
+            // crosses is an address, which is what a C++ `T*` is too.
             symbol.ForeignName = CppMangler.Mangle(
                 _cppAbi, symbol.CppNamespace, symbol.Name, symbol.ReturnType,
-                symbol.ParameterTypes.ToList());
+                symbol.Parameters
+                    .Where(p => !p.IsThis)
+                    .Select(p => p.IsByReference
+                        ? new PointerTypeSymbol(p.Type)
+                        : p.Type)
+                    .ToList());
         }
 
         if (containingType is InterfaceTypeSymbol)
@@ -1127,7 +1138,11 @@ public sealed class Binder(
                 diagnostics.Error("SL0213", parameter.Span,
                     $"parameter '{parameter.Name}' cannot have type 'void'");
 
-            symbol.Parameters.Add(new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count));
+            symbol.Parameters.Add(
+                new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count)
+                {
+                    Mode = parameter.Mode,
+                });
         }
     }
 
@@ -1437,21 +1452,32 @@ public sealed class Binder(
                     $"'{interfaceType.Name}.{required.Name}' and must therefore be public");
             }
 
-            var wanted = required.Parameters.Where(p => !p.IsThis).Select(p => p.Type).ToList();
-            var actual = found.Parameters.Where(p => !p.IsThis).Select(p => p.Type).ToList();
+            var wanted = required.Parameters.Where(p => !p.IsThis).ToList();
+            var actual = found.Parameters.Where(p => !p.IsThis).ToList();
 
+            // The mode is part of the match, not decoration on it. A method
+            // taking an int cannot stand in for one taking a ref int: the two
+            // are passed differently, and the vtable slot would hold a function
+            // the caller is about to hand a pointer to.
             if (!found.ReturnType.Equals(required.ReturnType) ||
                 wanted.Count != actual.Count ||
-                !wanted.Zip(actual).All(pair => pair.First.Equals(pair.Second)))
+                !wanted.Zip(actual).All(pair =>
+                    pair.First.Type.Equals(pair.Second.Type) &&
+                    pair.First.Mode == pair.Second.Mode))
             {
                 diagnostics.Error("SL0307", found.Span,
                     $"'{classType.Name}.{found.Name}' does not match " +
                     $"'{interfaceType.Name}.{required.Name}'; expected " +
                     $"'{required.ReturnType.Name} {required.Name}(" +
-                    string.Join(", ", wanted.Select(t => t.Name)) + ")'");
+                    string.Join(", ", wanted.Select(Spelled)) + ")'");
             }
         }
     }
+
+    /// <summary>A parameter as the source writes it, mode included.</summary>
+    private static string Spelled(ParameterSymbol parameter) =>
+        (parameter.Mode == ParameterMode.Ref ? "ref " :
+         parameter.Mode == ParameterMode.In ? "in " : "") + parameter.Type.Name;
 
     // ============================================================ pass 6
 
@@ -2794,6 +2820,20 @@ public sealed class Binder(
     private bool CheckSpawnArguments(BoundCall call)
     {
         bool ok = true;
+
+        // A `ref` hands a job the address of the parent's variable, and two jobs
+        // given the same one race on it with nothing to say they may. The
+        // parallel block does keep the frame alive, so this is a rule about
+        // sharing rather than about lifetime -- and it is the same rule
+        // everything else crossing a thread already obeys.
+        foreach (var parameter in call.Function.Parameters.Where(p => p.IsByReference))
+        {
+            diagnostics.Error("SL0449", call.Span,
+                $"'{call.Function.Name}' takes '{Spelled(parameter)} {parameter.Name}', and a " +
+                "spawned call would hand a job the address of the caller's storage; two jobs " +
+                "given the same one would race on it. Pass a copy, or guard it with 'Mutex<T>'");
+            ok = false;
+        }
 
         if (call.Receiver is { } receiver)
         {
@@ -4403,6 +4443,19 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // An `in` parameter is the caller's storage, and the promise not to
+        // write it is the only thing separating it from a `ref`. Reaching a
+        // field of one is the same write one level down, so the base is what is
+        // asked rather than the target itself.
+        if (BaseOf(target) is BoundParameterAccess { Parameter.Mode: ParameterMode.In } borrowed)
+        {
+            diagnostics.Error("SL0448", syntax.Target.Span,
+                $"'{borrowed.Parameter.Name}' is an 'in' parameter, which is the caller's " +
+                "storage and promises not to be written; take it as 'ref' if it should be, or " +
+                "copy it into a local first");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (!target.IsLValue)
         {
             diagnostics.Error("SL0240", syntax.Target.Span,
@@ -5220,7 +5273,7 @@ public sealed class Binder(
 
     private BoundExpression BindCall(CallSyntax syntax)
     {
-        var arguments = syntax.Arguments.Select(BindExpression).ToList();
+        var arguments = syntax.Arguments.Select(BindArgument).ToList();
 
         // A bare `Ok(x)` builds a variant rather than calling anything. It has
         // to be decided here, before the name is looked up, because a draft has
@@ -5336,6 +5389,64 @@ public sealed class Binder(
     }
 
     /// <summary>
+    /// One argument, which may be written <c>ref x</c>.
+    ///
+    /// A <c>ref</c> argument is bound to the address of what it names, so what
+    /// reaches the callee is a pointer and nothing in the emitter has to learn a
+    /// new way to pass one. What it costs is a check that there is an address to
+    /// take: a local, a parameter, a field, an array element or a dereference
+    /// has one, and a call result or a literal does not.
+    /// </summary>
+    private BoundExpression BindArgument(ExpressionSyntax syntax)
+    {
+        if (syntax is not RefArgumentSyntax reference) return BindExpression(syntax);
+
+        var target = BindExpression(reference.Value);
+        if (target.Type.IsError()) return target;
+
+        if (!IsAddressable(target))
+        {
+            diagnostics.Error("SL0443", reference.Span,
+                "'ref' passes the storage this names rather than a copy of it, and this " +
+                "expression has no storage to pass; put it in a local first");
+            return new BoundErrorExpression(reference.Span);
+        }
+
+        if (IsReadOnlyTarget(target) is { } why)
+        {
+            diagnostics.Error("SL0444", reference.Span,
+                $"'ref' lets the callee write to this, and {why}");
+            return new BoundErrorExpression(reference.Span);
+        }
+
+        return new BoundAddressOf(
+            reference.Span, new PointerTypeSymbol(target.Type), target)
+        {
+            FromRefKeyword = true,
+        };
+    }
+
+    /// <summary>True for an expression that names storage rather than a value.</summary>
+    private static bool IsAddressable(BoundExpression expression) => expression switch
+    {
+        BoundLocalAccess or BoundParameterAccess or BoundThis
+            or BoundFieldAccess or BoundIndex or BoundDereference or BoundStaticAccess => true,
+        _ => false,
+    };
+
+    /// <summary>Why this storage may not be written, or null when it may.</summary>
+    private static string? IsReadOnlyTarget(BoundExpression expression) => expression switch
+    {
+        BoundLocalAccess { Local.IsConst: true } local =>
+            $"'{local.Local.Name}' is a 'const'",
+        BoundParameterAccess { Parameter.Mode: ParameterMode.In } parameter =>
+            $"'{parameter.Parameter.Name}' is an 'in' parameter, which promises not to be written",
+        BoundStaticAccess held =>
+            $"'{held.Static.Name}' is a 'static readonly'",
+        _ => null,
+    };
+
+    /// <summary>
     /// Binds a bare callee that names a value of delegate type, or returns null
     /// when it does not name one. Nothing is bound unless it really resolves to
     /// a delegate, so an ordinary call is never disturbed by this.
@@ -5395,8 +5506,18 @@ public sealed class Binder(
 
         var converted = new List<BoundExpression>(arguments.Count);
         for (int i = 0; i < arguments.Count; i++)
-            converted.Add(BindConversion(
-                arguments[i], delegateType.Signature[i].Type, syntax.Arguments[i].Span));
+        {
+            var parameter = delegateType.Signature[i];
+            var span = syntax.Arguments[i].Span;
+
+            if (!ArgumentFits(arguments[i], parameter))
+            {
+                ReportArgumentMode(delegateType.Name, i, arguments[i], parameter);
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            converted.Add(ConvertArgument(arguments[i], parameter, span));
+        }
 
         return new BoundIndirectCall(syntax.Span, delegateType, target, converted);
     }
@@ -5701,12 +5822,39 @@ public sealed class Binder(
         for (int i = 0; i < arguments.Count; i++)
         {
             var span = i < syntax.Count ? syntax[i].Span : arguments[i].Span;
-            result.Add(i < parameters.Count
-                ? BindConversion(arguments[i], parameters[i].Type, span)
-                : PromoteVariadic(arguments[i]));       // C varargs default promotions
+
+            if (i >= parameters.Count)
+            {
+                result.Add(PromoteVariadic(arguments[i]));   // C varargs promotions
+                continue;
+            }
+
+            result.Add(ConvertArgument(arguments[i], parameters[i], span));
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// One argument, converted for the parameter it is going to.
+    ///
+    /// A <c>ref</c> argument is already the address the callee wants and is
+    /// deliberately not converted: the callee writes back through it, and a
+    /// conversion would leave the result nowhere to go. An <c>in</c> argument is
+    /// converted like a value one and then has its address taken here, because
+    /// nothing at the call site said to; a value with no storage of its own gets
+    /// a temporary, which lives as long as the frame does.
+    /// </summary>
+    private BoundExpression ConvertArgument(
+        BoundExpression argument, ParameterSymbol parameter, SourceSpan span)
+    {
+        if (parameter.Mode == ParameterMode.Ref) return argument;
+
+        var value = BindConversion(argument, parameter.Type, span);
+
+        return parameter.Mode == ParameterMode.In && !value.Type.IsError()
+            ? new BoundAddressOf(span, new PointerTypeSymbol(parameter.Type), value)
+            : value;
     }
 
     /// <summary>C's default argument promotions: float widens to double, small ints to int.</summary>
@@ -5803,6 +5951,77 @@ public sealed class Binder(
         return ClassifyConversion(argument.Type, target, explicitCast: false) is not null;
     }
 
+    /// <summary>
+    /// Whether an argument may be given to a parameter, mode and all.
+    ///
+    /// A <c>ref</c> parameter takes only an argument that said <c>ref</c>, and
+    /// takes it at exactly its own type: the callee writes back through it, so
+    /// a conversion on the way in would be a write to something the caller never
+    /// named. An <c>in</c> parameter converts like a value one, because what it
+    /// receives may be a temporary and a temporary may be converted.
+    /// </summary>
+    private bool ArgumentFits(BoundExpression argument, ParameterSymbol parameter)
+    {
+        // Already reported. Saying the mode is wrong as well would bury the
+        // diagnostic that actually explains what happened.
+        if (argument.Type.IsError()) return true;
+
+        bool given = argument is BoundAddressOf { FromRefKeyword: true };
+
+        if (parameter.Mode == ParameterMode.Ref)
+            return given &&
+                   ((BoundAddressOf)argument).Operand.Type.Equals(parameter.Type);
+
+        return !given && IsImplicitlyConvertible(argument, parameter.Type);
+    }
+
+    /// <summary>
+    /// Reports why an argument did not fit: the mode first, because a type
+    /// mismatch reported against a 'ref' that should not be there reads as a
+    /// puzzle rather than a mistake.
+    /// </summary>
+    private void ReportArgumentMode(
+        string name, int index, BoundExpression argument, ParameterSymbol parameter)
+    {
+        bool given = argument is BoundAddressOf { FromRefKeyword: true };
+
+        if (parameter.Mode == ParameterMode.Ref && !given)
+        {
+            diagnostics.Error("SL0445", argument.Span,
+                $"argument {index + 1} of '{name}' is 'ref {parameter.Type.Name} " +
+                $"{parameter.Name}', so the call must say so too: write " +
+                "'ref' before it");
+            return;
+        }
+
+        if (parameter.Mode != ParameterMode.Ref && given)
+        {
+            diagnostics.Error("SL0446", argument.Span,
+                $"argument {index + 1} of '{name}' is " +
+                (parameter.Mode == ParameterMode.In
+                    ? $"'in {parameter.Type.Name} {parameter.Name}', which the callee promises " +
+                      "not to write, so it is not passed with 'ref'"
+                    : $"'{parameter.Type.Name} {parameter.Name}', which is passed by value; " +
+                      "drop the 'ref'"));
+            return;
+        }
+
+        var actual = argument is BoundAddressOf { FromRefKeyword: true, Operand: { } inner }
+            ? inner
+            : argument;
+
+        if (parameter.Mode == ParameterMode.Ref)
+        {
+            diagnostics.Error("SL0447", argument.Span,
+                $"argument {index + 1} of '{name}' is 'ref {parameter.Type.Name}', and this is " +
+                $"'{actual.Type.Name}'. A 'ref' argument is not converted, because the callee " +
+                "writes back through it and there would be nowhere for the result to go");
+            return;
+        }
+
+        ReportArgumentMismatch(name, index, argument, parameter.Type);
+    }
+
     private FunctionSymbol? ResolveOverload(
         IReadOnlyList<FunctionSymbol> candidates, List<BoundExpression> arguments, SourceSpan span, string name)
     {
@@ -5814,7 +6033,7 @@ public sealed class Binder(
 
             var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
             for (int i = 0; i < parameters.Count; i++)
-                if (!IsImplicitlyConvertible(arguments[i], parameters[i].Type))
+                if (!ArgumentFits(arguments[i], parameters[i]))
                     return false;
 
             return true;
@@ -5839,8 +6058,8 @@ public sealed class Binder(
                             $"argument{(expected == 1 ? "" : "s")}, but {arguments.Count} were given");
                     else
                         for (int i = 0; i < parameters.Count; i++)
-                            if (!IsImplicitlyConvertible(arguments[i], parameters[i].Type))
-                                ReportArgumentMismatch(name, i, arguments[i], parameters[i].Type);
+                            if (!ArgumentFits(arguments[i], parameters[i]))
+                                ReportArgumentMode(name, i, arguments[i], parameters[i]);
                     return null;
                 }
 

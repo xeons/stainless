@@ -641,9 +641,14 @@ public sealed class Parser
             }
 
             int paramStart = _pos;
+
+            var mode = ParameterMode.Value;
+            if (Match(TokenKind.RefKeyword)) mode = ParameterMode.Ref;
+            else if (Match(TokenKind.InKeyword)) mode = ParameterMode.In;
+
             var type = ParseType();
             string name = ExpectIdentifier();
-            parameters.Add(new ParameterSyntax(SpanFrom(paramStart), type, name));
+            parameters.Add(new ParameterSyntax(SpanFrom(paramStart), type, name, mode));
 
             if (!Match(TokenKind.Comma)) break;
         }
@@ -1284,7 +1289,15 @@ public sealed class Parser
         Expect(TokenKind.OpenParen);
         while (!At(TokenKind.CloseParen) && !At(TokenKind.EndOfFile))
         {
-            arguments.Add(ParseExpression());
+            int start = _pos;
+
+            // `ref x` is written at the call too. `in` is not: it promises the
+            // callee will not write, which changes nothing the caller must see.
+            if (Match(TokenKind.RefKeyword))
+                arguments.Add(new RefArgumentSyntax(SpanFrom(start), ParseExpression()));
+            else
+                arguments.Add(ParseExpression());
+
             if (!Match(TokenKind.Comma)) break;
         }
         Expect(TokenKind.CloseParen);

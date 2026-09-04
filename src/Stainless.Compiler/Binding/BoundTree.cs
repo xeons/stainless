@@ -351,6 +351,14 @@ public sealed class BoundAddressOf(SourceSpan span, TypeSymbol type, BoundExpres
     : BoundExpression(span, type)
 {
     public BoundExpression Operand { get; } = operand;
+
+    /// <summary>
+    /// True when the source wrote <c>ref x</c> at a call, rather than the
+    /// binder taking an address of its own accord. Overload resolution reads it:
+    /// a <c>ref</c> parameter takes only an argument that said <c>ref</c>, and no
+    /// other parameter takes one that did.
+    /// </summary>
+    public bool FromRefKeyword { get; init; }
 }
 
 /// <summary>Allocates a zeroed array of <paramref name="Length"/> elements; yields +1.</summary>

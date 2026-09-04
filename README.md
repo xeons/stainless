@@ -172,6 +172,35 @@ array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
 
+### Passing by reference
+
+A parameter is a copy unless it says otherwise. `ref` passes the caller's
+storage and may write it; `in` passes the same storage and promises not to.
+
+```csharp
+void Bump(ref int n) { n = n + 1; }
+double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
+
+int count = 1;
+Bump(ref count);              // count is 2
+LengthSquared(origin);        // no copy, and origin cannot change
+```
+
+`ref` is written at the call too, because a reader should be able to see that
+the value may come back changed. A `ref` argument has to name storage and is not
+converted on the way in - the callee writes back through it, and a converted
+copy would have nowhere to put the result.
+
+Both are exactly a `T*` at the ABI, so they cross a language boundary with
+nothing in between:
+
+```csharp
+extern "C" double modf(double value, ref double integral);
+
+double whole = 0.0;
+double fraction = modf(3.75, ref whole);      // 3 and 0.75
+```
+
 ### Failure
 
 There is no `throw` and no unwinding. A function that can fail says so in its
@@ -439,7 +468,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 124 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 126 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -699,6 +728,14 @@ Everything below is covered by [the test suite](tests/cases).
 - `[Flags]` enums: `|`, `&`, `^` and `~` on an enum whose members are bits,
   producing that same enum rather than its number, plus `HasFlag`. The marker
   needs no import, because it is a rule about enums rather than a library
+- `ref` and `in` parameters: the caller's storage rather than a copy of it,
+  writable through the first and not the second. `ref` is written at the call
+  as well as the declaration; a `ref` argument must name storage and is not
+  converted; writing to an `in`, or passing one on as a `ref`, is refused. The
+  mode is part of a signature, so overloads may not differ only in it and a
+  class does not implement `ref int` with `int`. Both are a `T*` at the ABI, so
+  `extern "C" double modf(double, ref double)` needs no shim, and a generated
+  header writes them `T*` and `const T*`
 - `delegate`: a named function pointer, one word, C ABI compatible in both
   directions, and storable in a `struct`
 - Lambdas and closures: `value => value * factor` becomes a generated class
@@ -871,6 +908,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   written from inside a library does not interleave with its consumer's in the
   order it was written. Shipping the runtime as its own shared library would
   close both, and is the next thing worth doing about libraries.
+- **No `out`, no `ref` locals and no `ref` returns.** `out` would need
+  definite-assignment analysis to be worth having over `ref`; the other two
+  would need a lifetime story the language does not have.
 - `Main` takes no arguments. Field initializers are rejected — assign in a
   constructor. `delete` is reserved but unused.
 

@@ -379,11 +379,18 @@ public sealed class DelegateTypeSymbol : NamedTypeSymbol
         if (parameters.Count != Signature.Count) return false;
         if (!function.ReturnType.Equals(ReturnType)) return false;
 
-        return !parameters.Where((p, i) => !p.Type.Equals(Signature[i].Type)).Any();
+        // The mode is part of the signature: a 'ref int' and an 'int' are
+        // passed differently and mean different things to the caller.
+        return !parameters.Where(
+            (p, i) => !p.Type.Equals(Signature[i].Type) || p.Mode != Signature[i].Mode).Any();
     }
 
     public string SignatureText =>
-        $"{ReturnType.Name}({string.Join(", ", Signature.Select(p => p.Type.Name))})";
+        $"{ReturnType.Name}({string.Join(", ", Signature.Select(Spelled))})";
+
+    private static string Spelled(ParameterSymbol parameter) =>
+        (parameter.Mode == Syntax.ParameterMode.Ref ? "ref " :
+         parameter.Mode == Syntax.ParameterMode.In ? "in " : "") + parameter.Type.Name;
 }
 
 /// <summary>One named constant of an <c>enum</c>.</summary>

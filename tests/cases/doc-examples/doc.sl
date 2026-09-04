@@ -286,6 +286,30 @@ String Shapes() {
            ":" + Text.FromInteger((int)sizeof(Shape));
 }
 
+
+// --- README "Passing by reference" / spec 7.2 -----------------------------
+public struct Origin { public double X; public double Y; }
+
+void Bump(ref int n) { n = n + 1; }
+double LengthSquared(in Origin p) { return p.X * p.X + p.Y * p.Y; }
+
+extern "C" double modf(double value, ref double integral);
+
+String ByReference() {
+    int count = 1;
+    Bump(ref count);
+
+    Origin origin;
+    origin.X = 3.0;
+    origin.Y = 4.0;
+
+    double whole = 0.0;
+    double fraction = modf(3.75, ref whole);
+
+    return Text.FromInteger(count) + ":" + Text.FromDouble(LengthSquared(origin)) +
+           ":" + Text.FromDouble(whole) + ":" + Text.FromDouble(fraction);
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -358,6 +382,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("byref=%s\n", ByReference().ToPointer());
     printf("shapes=%s\n", Shapes().ToPointer());
     printf("done\n");
     return 0;

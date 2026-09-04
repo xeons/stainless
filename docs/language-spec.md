@@ -258,7 +258,7 @@ public class Buffer {
 }
 ```
 
-Members are fields, methods, properties (§7.2), one destructor and any number
+Members are fields, methods, properties (§7.3), one destructor and any number
 of constructors.
 
 A class value is a pointer to a heap object preceded by an object header
@@ -547,7 +547,7 @@ whether or not the word is written, since the whole point is the contract.
 
 A class lists the interfaces it implements after `:`, and must supply a public
 member matching each signature exactly. A property is a pair of methods
-(§7.2), so an interface property is one vtable slot per accessor and a class
+(§7.3), so an interface property is one vtable slot per accessor and a class
 satisfies it with a property of its own; a field of the right name does not,
 because a field is not a call. Conversion from the class to the interface is
 implicit and free.
@@ -1585,7 +1585,66 @@ overloaded, because dispatch gives each one a single slot
 A *class* implementing two interfaces whose methods share a name is a different
 matter, and it works — see §2.7.
 
-### 7.2 Properties
+### 7.2 `ref` and `in` parameters
+
+A parameter is a copy unless it says otherwise. `ref` and `in` say otherwise:
+both pass the caller's storage rather than a copy of it, and the difference
+between them is whether the callee may write to it.
+
+```csharp
+void Bump(ref int n) { n = n + 1; }
+double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
+
+int count = 1;
+Bump(ref count);              // count is 2
+LengthSquared(origin);        // no copy, and origin cannot change
+```
+
+**`ref` is written at the call as well as the declaration** (SL0445). A reader
+of the line should be able to see that the value may come back changed, and
+there is nothing else on it that would say so. `in` is not written at the call:
+it promises the opposite, and a promise not to change anything needs no warning.
+
+**A `ref` argument must name storage** — a local, a parameter, a field, an array
+element or a dereference. A call result or a literal has no storage to pass
+(SL0443), and a `const` local or a `static readonly` has storage that may not be
+written (SL0444). An `in` argument needs no such thing: a value with nowhere to
+live is given a temporary, which lasts as long as the frame.
+
+**A `ref` argument is not converted.** `Bump(ref d)` where `d` is a `double` is
+an error (SL0447) rather than a widening, because the callee writes back through
+the pointer and a converted copy would have nowhere to put the result. An `in`
+argument converts like a value one, because what it receives may be that
+temporary.
+
+**Writing to an `in` is refused** (SL0448), including through one of its fields.
+Passing one on as a `ref` is refused for the same reason (SL0444).
+
+**The mode is part of a signature.** Two overloads may not differ only in it
+(SL0211), a class does not implement `void Adjust(ref int)` with `void
+Adjust(int)` (SL0307), and a delegate's signature carries it. A spawned call may
+not take one at all (SL0449): it would hand a job the address of the caller's
+variable, and two jobs given the same one would race.
+
+**At the ABI a `ref T` is exactly a `T*`**, which is what lets one cross a
+language boundary with nothing in between:
+
+```csharp
+extern "C" double modf(double value, ref double integral);
+
+double whole = 0.0;
+double fraction = modf(3.75, ref whole);      // whole is 3, fraction is 0.75
+```
+
+A generated C header writes `ref T` as `T*` and `in T` as `const T*`. C++ names
+mangle the same way, so `export "C++" void geometry::scale(ref double f, int n)`
+is the symbol a C++ `void geometry::scale(double*, int)` calls.
+
+**What is not here.** No `out`: it would need definite-assignment analysis to be
+worth having over `ref`. No `ref` locals and no `ref` returns, which would need
+a lifetime story the language does not have.
+
+### 7.3 Properties
 
 ```csharp
 public class Person {

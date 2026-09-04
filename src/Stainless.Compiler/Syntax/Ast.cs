@@ -104,7 +104,30 @@ public static class LinkageKinds
 
 public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : SyntaxNode(Span);
 
-public sealed record ParameterSyntax(SourceSpan Span, TypeSyntax Type, string Name) : SyntaxNode(Span);
+/// <summary>
+/// How a parameter is passed.
+///
+/// <c>Value</c> is a copy, and is everything the language had. <c>Ref</c> and
+/// <c>In</c> both pass the caller's storage rather than a copy of it; the
+/// difference is that the callee may write through a <c>ref</c> and may not
+/// write through an <c>in</c>. Both are exactly a <c>T*</c> at the ABI, which
+/// is why they cross <c>extern "C"</c> with nothing in between.
+/// </summary>
+public enum ParameterMode { Value, Ref, In }
+
+public sealed record ParameterSyntax(
+    SourceSpan Span,
+    TypeSyntax Type,
+    string Name,
+    ParameterMode Mode = ParameterMode.Value) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>ref x</c> at a call. Written at the call as well as the declaration,
+/// because a caller reading the line should be able to see that the value may
+/// come back changed.
+/// </summary>
+public sealed record RefArgumentSyntax(SourceSpan Span, ExpressionSyntax Value)
+    : ExpressionSyntax(Span);
 
 public sealed record FunctionDeclSyntax(
     SourceSpan Span,

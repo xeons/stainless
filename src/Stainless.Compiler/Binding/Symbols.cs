@@ -26,6 +26,17 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
     public TypeSymbol Type { get; } = type;
     public int Index { get; } = index;
 
+    /// <summary>
+    /// Whether the caller's storage is passed rather than a copy of it. A
+    /// <c>ref</c> or <c>in</c> parameter is one pointer at the ABI, and inside
+    /// the callee it is the caller's variable: reading it reads that, and
+    /// writing through a <c>ref</c> writes that.
+    /// </summary>
+    public Syntax.ParameterMode Mode { get; init; } = Syntax.ParameterMode.Value;
+
+    /// <summary>True when this is passed by address rather than by value.</summary>
+    public bool IsByReference => Mode != Syntax.ParameterMode.Value;
+
     /// <summary>True for the implicit receiver of a method, constructor or destructor.</summary>
     public bool IsThis { get; init; }
 
@@ -40,7 +51,9 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
     /// </summary>
     public bool IsAssigned { get; set; }
 
-    public override string ToString() => $"{Type.Name} {Name}";
+    public override string ToString() =>
+        (Mode == Syntax.ParameterMode.Ref ? "ref " :
+         Mode == Syntax.ParameterMode.In ? "in " : "") + $"{Type.Name} {Name}";
 }
 
 public sealed class LocalSymbol(string name, TypeSymbol type, bool isConst)

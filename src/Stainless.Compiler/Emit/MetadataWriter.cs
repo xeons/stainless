@@ -226,6 +226,7 @@ public static class MetadataWriter
             {
                 Name = p.Name,
                 Type = MetadataTypeNames.Write(p.Type),
+                Mode = p.Mode,
             })
             .ToList(),
     };
