@@ -174,6 +174,29 @@ array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
 
+### Unions
+
+C's, and here for the reason `extern "C"` is here: a great many headers describe
+a value that is one of several things and record the choice somewhere else.
+
+```csharp
+public union Word {
+    public int Signed;
+    public uint Unsigned;
+    public float Real;
+}
+
+Word word;
+word.Signed = -1;
+word.Unsigned          // 4294967295: the same four bytes, read differently
+```
+
+Every member is at offset zero, and the size and alignment are the ones C
+computes. **No member may hold a counted reference** — which one is live is
+exactly what a union does not record, so a copy could not know what to retain.
+That is the question a union cannot be asked, and it is why `variant` exists:
+a variant records the case and will not let you read another.
+
 ### Layout control
 
 A struct is laid out by the platform C rules; two markers change them.
@@ -555,7 +578,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 133 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 135 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -753,6 +776,10 @@ Everything below is covered by [the test suite](tests/cases).
   struct may hold a reference, and copying one then retains what it holds — the
   cost is that it is no longer a value C can be handed, which the compiler
   checks at every `extern "C"` and `export "C"`
+- `union`: C's, every member at offset zero, with the size and alignment C
+  computes. No member may hold a counted reference, because a union does not
+  record which one is live. `[Packed]` and `[Align]` apply as they do to a
+  struct, and a generated C header writes it as a C `union`, member for member
 - `variant`: a value that is exactly one of its cases and says which. A tag
   plus the widest case's payload, with the cases overlapping, so nothing
   allocates and the size is the maximum rather than the sum. Cases carry named

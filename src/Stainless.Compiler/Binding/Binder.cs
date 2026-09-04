@@ -156,6 +156,7 @@ public sealed class Binder(
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
         ResolveAttributes();        // pass 6: attributes fold to constants
         ComputeLayouts();           // pass 7: every value type has a size
+        CheckUnions();              //         and a union counts nothing
         ValidateLinkageSignatures();// pass 8: no counted reference crosses a language boundary
         BindBodies();               // pass 9: only now is any code checked
         BindStatics();              // pass 10: static initializers, then their order
@@ -284,6 +285,13 @@ public sealed class Binder(
                         Span = declaration.Span,
                     },
                     TypeDeclKind.Variant => new VariantTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = isPublic,
+                        Span = declaration.Span,
+                    },
+                    TypeDeclKind.Union => new UnionTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
@@ -1213,7 +1221,12 @@ public sealed class Binder(
 
             if (type is StructTypeSymbol)
             {
-                string kind = type is VariantTypeSymbol ? "variant" : "struct";
+                string kind = type switch
+                {
+                    VariantTypeSymbol => "variant",
+                    UnionTypeSymbol => "union",
+                    _ => "struct",
+                };
                 diagnostics.Error("SL0302", declaration.Span,
                     $"{kind} '{type.Name}' cannot implement an interface; an interface " +
                     "reference is a counted pointer, and a " + kind + " is a plain C value");
@@ -1541,6 +1554,33 @@ public sealed class Binder(
         type.RequestedAlignment = requested;
     }
 
+    /// <summary>
+    /// Checks that nothing in a union is counted.
+    ///
+    /// A union does not record which member is live, so a copy would not know
+    /// what to retain and a drop would not know what to release. Every other
+    /// value type in the language answers both questions from its type alone;
+    /// this is the one that cannot, which is why the reference is refused rather
+    /// than the counting made conditional.
+    /// </summary>
+    private void CheckUnions()
+    {
+        foreach (var union in _modules.Values.SelectMany(m => m.Types.Values).OfType<UnionTypeSymbol>())
+        {
+            if (union.Fields.Count == 0)
+                diagnostics.Error("SL0467", union.Span ?? default,
+                    $"union '{union.Name}' has no members; a union is the choice between its " +
+                    "members, so one with none has no values at all");
+
+            foreach (var member in union.Fields.Where(f => f.Type.CarriesReferences()))
+                diagnostics.Error("SL0468", union.Span ?? default,
+                    $"'{union.Name}.{member.Name}' is '{member.Type.Name}', which holds a " +
+                    "counted reference, and a union does not record which member is the live " +
+                    "one -- so a copy could not know what to retain. Hold the reference beside " +
+                    "the union, or use a 'variant', which does record it");
+        }
+    }
+
     // ============================================================ pass 6
 
     private void ComputeLayouts()
@@ -1569,6 +1609,31 @@ public sealed class Binder(
         // A variant's payload field has no size until every case has one, so
         // the filler is built here, immediately before the fields are walked.
         if (type is VariantTypeSymbol variant) SizePayloadStorage(variant, inProgress);
+
+        // Every member of a union starts where the union does; its size is the
+        // widest of them. That is the whole of the layout, and it is why a union
+        // records nothing about which member is the live one.
+        if (type is UnionTypeSymbol union)
+        {
+            int widest = 0, strictest = 1;
+
+            foreach (var member in union.Fields)
+            {
+                if (member.Type is StructTypeSymbol nestedMember)
+                    ComputeLayout(nestedMember, inProgress);
+
+                member.Offset = 0;
+                widest = Math.Max(widest, member.Type.Size);
+                strictest = Math.Max(strictest, Math.Max(1, member.Type.Alignment));
+            }
+
+            if (union.IsPacked) strictest = 1;
+            if (union.RequestedAlignment is { } wanted) strictest = Math.Max(strictest, wanted);
+
+            union.SetLayout(Math.Max(1, TypeExtensions.AlignTo(widest, strictest)), strictest);
+            inProgress.Remove(type);
+            return;
+        }
 
         int offset = 0, alignment = 1;
         foreach (var field in type.Fields)
@@ -1710,6 +1775,11 @@ public sealed class Binder(
                 Template = template, TypeArguments = arguments, Span = declaration.Span,
             },
             TypeDeclKind.Variant => new VariantTypeSymbol
+            {
+                SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+                Template = template, TypeArguments = arguments, Span = declaration.Span,
+            },
+            TypeDeclKind.Union => new UnionTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
                 Template = template, TypeArguments = arguments, Span = declaration.Span,

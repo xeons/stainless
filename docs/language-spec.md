@@ -350,7 +350,7 @@ class Parent {
 ```
 
 A lambda that captures `this` holds its object strongly, so an object that
-stores its own closure is such a cycle; see §2.13.
+stores its own closure is such a cycle; see §2.14.
 
 ### 2.6 `variant` — a value that is one of several things
 
@@ -412,7 +412,7 @@ negation, `&&`, `||`, a ternary, an early return — and it is taken away again 
 anything that could have changed the value. A variant with exactly two cases
 narrows on a false test as well as a true one, which is why `if (!r.Ok)` proves
 `Fail`. Only a variant held in a local or a parameter can carry a proof (SL0285),
-for the reason given in §2.7.
+for the reason given in §2.8.
 
 **Switching over one** covers the cases rather than constant values, and needs
 no `default` once they are all there:
@@ -463,7 +463,58 @@ variant's cases are what a consumer would switch on), and carry `[Reflect]`
 (SL0442 — the field tables would describe the tag and the payload, which are not
 fields the program has).
 
-### 2.7 `Result<T, E>` — how a function fails
+### 2.7 `union` — every member at offset zero
+
+A `union` is C's, and it is here for the reason `extern "C"` is here. A great
+many C headers describe a value that is one of several things and record the
+choice somewhere else — a tag in the enclosing struct, a length, a protocol —
+and none of them can be bound without a type of this shape.
+
+```csharp
+public union Word {
+    public int Signed;
+    public uint Unsigned;
+    public float Real;
+}
+
+Word word;
+word.Signed = -1;
+word.Unsigned          // 4294967295: the same four bytes, read differently
+```
+
+Every member starts where the union does. Its size is the widest member rounded
+up to its alignment, and its alignment is the strictest of them — the same
+arithmetic C does, and checked against the target's own compiler.
+
+**A union is the untagged half of what a `variant` is** (§2.6). A variant knows
+which case is present and will not let you read another; a union knows nothing
+and will let you read any of them. Reach for a variant unless a C header is
+telling you what shape to be.
+
+**No member may hold a counted reference** (SL0468) — nor a struct that holds
+one, at any depth. Which member is live is exactly what a union does not record,
+so a copy could not know what to retain and a drop could not know what to
+release. That is not a restriction added for safety; it is the question a union
+cannot be asked. Hold the reference beside the union, or use a variant.
+
+The usual C shape — a tag and a union together — works as it reads:
+
+```csharp
+public enum Kind : int { AsInt = 0, AsReal = 1 }
+
+public struct Tagged {
+    public Kind Which;
+    public Word Value;
+}
+```
+
+A union has no constructor and no destructor, as a struct has neither, and it
+implements no interface, because an interface reference is a counted pointer and
+a union is a plain C value (SL0302). `[Packed]` and `[Align]` apply to one as
+they do to a struct. A generated C header writes it as a C `union`, member for
+member.
+
+### 2.8 `Result<T, E>` — how a function fails
 
 Stainless does not unwind. There is no `throw`, no stack unwinding and no
 `catch`, and there will not be: unwinding needs metadata on every frame and a
@@ -573,7 +624,7 @@ mistake in the program rather than an outcome of it, and those still abort
 through the runtime: threading a Result through every array index would make
 every program worse to read in exchange for nothing.
 
-### 2.8 `interface` — a contract, dispatched dynamically
+### 2.9 `interface` — a contract, dispatched dynamically
 
 ```csharp
 public interface IShape {
@@ -636,7 +687,7 @@ through either reference reaches the right one, and a call on `Both` itself
 picks by argument type. What may *not* be overloaded is a method of one
 interface, since that is one slot.
 
-### 2.9 `T[]` — a counted array
+### 2.10 `T[]` — a counted array
 
 ```csharp
 var numbers = new int[5];
@@ -657,7 +708,7 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
-### 2.10 `T[:]` — part of an array
+### 2.11 `T[:]` — part of an array
 
 A slice names part of an array, as a value.
 
@@ -714,7 +765,7 @@ Sort(numbers);                // the whole of it
 Sort(numbers[2:5]);           // three of them, in place, nothing copied
 ```
 
-### 2.11 `enum` — a distinct type over an integer
+### 2.12 `enum` — a distinct type over an integer
 
 ```csharp
 public enum Color { Red, Green, Blue }
@@ -784,7 +835,7 @@ no methods, so this is the language spelling the test rather than a call.
 into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
 belong to.
 
-### 2.12 `delegate` — a named function pointer
+### 2.13 `delegate` — a named function pointer
 
 ```csharp
 public delegate int Transform(int value);
@@ -827,10 +878,10 @@ if (none == null) { ... }
 
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
-§2.13 — and only a non-capturing one can be a delegate, because there is nowhere
+§2.14 — and only a non-capturing one can be a delegate, because there is nowhere
 in a single pointer to keep what was captured.
 
-### 2.13 Lambdas and closures
+### 2.14 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
 assigned to: an **interface with exactly one method**, or a **delegate**.
@@ -1475,7 +1526,7 @@ Stainless has no static classes, so what C# spells `File.ReadAllText` is a
 module-qualified call to a module-level function. That is the mapping
 throughout: a module is the static class.
 
-**How failure is reported.** Stainless does not unwind (§2.7), so the outcome
+**How failure is reported.** Stainless does not unwind (§2.8), so the outcome
 comes back as a value, in one of three shapes:
 
 | Shape | Used by | Reads as |
@@ -1694,7 +1745,7 @@ overloaded, because dispatch gives each one a single slot
 ```
 
 A *class* implementing two interfaces whose methods share a name is a different
-matter, and it works — see §2.8.
+matter, and it works — see §2.9.
 
 ### 7.2 `ref` and `in` parameters
 

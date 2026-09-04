@@ -92,7 +92,7 @@ public sealed record ModuleMetadata
 }
 
 /// <summary>What kind of declaration a metadata entry describes.</summary>
-public enum MetadataKind { Class, Struct, Enum }
+public enum MetadataKind { Class, Struct, Enum, Union }
 
 public sealed record MetadataType
 {

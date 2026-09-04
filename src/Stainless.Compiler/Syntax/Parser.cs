@@ -167,7 +167,7 @@ public sealed class Parser
 
         if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword,
                   TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword,
-                  TokenKind.VariantKeyword))
+                  TokenKind.VariantKeyword, TokenKind.UnionKeyword))
             return [ParseTypeDeclaration(start, modifiers, attributes)];
 
         if (At(TokenKind.EnumKeyword))
@@ -300,6 +300,7 @@ public sealed class Parser
             TokenKind.InterfaceKeyword => TypeDeclKind.Interface,
             TokenKind.AttributeKeyword => TypeDeclKind.Attribute,
             TokenKind.VariantKeyword => TypeDeclKind.Variant,
+            TokenKind.UnionKeyword => TypeDeclKind.Union,
             _ => TypeDeclKind.Struct,
         };
         Advance();

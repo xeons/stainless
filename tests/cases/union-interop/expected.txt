@@ -1,0 +1,7 @@
+sizes=4 8 8
+agree=1 1 1
+unsigned=4294967295
+bits=1065353216
+pairB=9
+tagged=42
+made=2.5 1075838976

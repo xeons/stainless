@@ -110,6 +110,25 @@ public static class CHeaderWriter
                     sb.AppendLine($"}} {CName(variant)};");
                     break;
 
+                // A union is a union: C has the shape already, and every
+                // member is where Stainless put it, which is offset zero.
+                case UnionTypeSymbol union:
+                {
+                    if (union.IsPacked) sb.AppendLine("#pragma pack(push, 1)");
+
+                    string unionAlign = union.RequestedAlignment is { } unionBytes
+                        ? $"SL_ALIGN({unionBytes}) "
+                        : "";
+
+                    sb.AppendLine($"typedef union {unionAlign}{CName(union)} {{");
+                    foreach (var member in union.Fields)
+                        sb.AppendLine($"    {Declarator(member.Type, member.Name)};");
+                    sb.AppendLine($"}} {CName(union)};");
+
+                    if (union.IsPacked) sb.AppendLine("#pragma pack(pop)");
+                    break;
+                }
+
                 case StructTypeSymbol structType:
                 {
                     // `#pragma pack` rather than an attribute: it is the one
@@ -198,6 +217,11 @@ public static class CHeaderWriter
                 ordered.Add(variant);
                 break;
 
+            case UnionTypeSymbol union when seen.Add(union):
+                foreach (var member in union.Fields) Collect(member.Type, ordered, seen);
+                ordered.Add(union);
+                break;
+
             case StructTypeSymbol structType when seen.Add(structType):
                 foreach (var field in structType.Fields) Collect(field.Type, ordered, seen);
                 ordered.Add(structType);
@@ -269,6 +293,7 @@ public static class CHeaderWriter
 
         PointerTypeSymbol pointer => TypeName(pointer.Element) + "*",
         VariantTypeSymbol variant => CName(variant),
+        UnionTypeSymbol union => CName(union),
         StructTypeSymbol structType => CName(structType),
 
         // An enum is its underlying integer, and a delegate is a function

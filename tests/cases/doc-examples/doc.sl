@@ -355,6 +355,21 @@ String Layouts() {
            Text.FromInteger((int)sizeof(Wide));
 }
 
+
+// --- README "Unions" / spec 2.7 -------------------------------------------
+public union Word {
+    public int Signed;
+    public uint Unsigned;
+    public float Real;
+}
+
+String Reinterpret() {
+    Word word;
+    word.Signed = -1;
+    return Text.FromInteger((int)sizeof(Word)) + ":" +
+           Text.FromInteger((int)(word.Unsigned / 1000000));
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -427,6 +442,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("union=%s\n", Reinterpret().ToPointer());
     printf("layout=%s\n", Layouts().ToPointer());
     printf("where=%s\n", Where().ToPointer());
     printf("slices=%s\n", Slicing().ToPointer());

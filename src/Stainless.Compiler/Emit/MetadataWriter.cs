@@ -96,6 +96,10 @@ public static class MetadataWriter
                         "crosses a library boundary as source, not as a binary");
                     break;
 
+                case UnionTypeSymbol union:
+                    types.Add(Describe(union) with { Kind = MetadataKind.Union });
+                    break;
+
                 case StructTypeSymbol structType:
                     types.Add(Describe(structType));
                     break;

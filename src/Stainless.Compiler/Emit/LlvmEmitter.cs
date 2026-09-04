@@ -176,6 +176,21 @@ public sealed class LlvmEmitter(
 
         foreach (var structType in structs)
         {
+            // A union's members overlap, and LLVM has no union type. What it is
+            // given is storage of the right size and alignment -- as many
+            // integers of the alignment as it takes to cover the widest member
+            // -- and every member is read from the union's own address, which is
+            // where all of them start.
+            if (structType is UnionTypeSymbol union)
+            {
+                int element = Math.Max(1, union.Alignment);
+                int count = Math.Max(1, union.Size / element);
+                _module.AppendLine(
+                    $"{StructName(union)} = type {{ [{count} x i{element * 8}] }}");
+                if (union.Alignment > 1) _structAlignment[StructName(union)] = union.Alignment;
+                continue;
+            }
+
             string fields = string.Join(", ", structType.Fields.Select(f => LlvmTypeOf(f.Type)));
             if (fields.Length == 0) fields = "i8";
 
@@ -668,7 +683,8 @@ public sealed class LlvmEmitter(
     };
 
     private static string StructName(StructTypeSymbol type) =>
-        "%struct." + Mangler.SymbolSafe(type.QualifiedName);
+        (type is UnionTypeSymbol ? "%union." : "%struct.") +
+        Mangler.SymbolSafe(type.QualifiedName);
 
     private static string DestroyName(ClassTypeSymbol type) =>
         "_SLdestroy_" + Mangler.SymbolSafe(type.QualifiedName);
@@ -2314,6 +2330,11 @@ public sealed class LlvmEmitter(
         string baseAddress = access.Receiver is null
             ? throw new InvalidOperationException("struct field access needs a receiver")
             : EmitAddress(access.Receiver);
+
+        // Every member of a union is at offset zero, so there is nothing to
+        // index: the union's address is the member's address, and the member's
+        // own type is what decides how much of it is read.
+        if (field.ContainingType is UnionTypeSymbol) return baseAddress;
 
         var structType = (StructTypeSymbol)field.ContainingType;
         return Emit("ptr",

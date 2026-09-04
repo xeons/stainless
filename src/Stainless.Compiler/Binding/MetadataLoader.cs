@@ -70,6 +70,13 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
                     SimpleName = name, ModuleName = described.Module, IsPublic = true,
                     ExternalTypeInfo = described.TypeInfoSymbol,
                 },
+                MetadataKind.Union => new UnionTypeSymbol
+                {
+                    SimpleName = described.Name,
+                    ModuleName = described.Module,
+                    IsPublic = true,
+                },
+
                 MetadataKind.Struct => new StructTypeSymbol
                 {
                     SimpleName = name, ModuleName = described.Module, IsPublic = true,

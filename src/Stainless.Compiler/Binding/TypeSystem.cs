@@ -447,6 +447,26 @@ public class StructTypeSymbol : NamedTypeSymbol
 }
 
 /// <summary>
+/// A <c>union</c>: every member at offset zero, as in C.
+///
+/// It exists for the same reason <c>extern "C"</c> does. A great many C headers
+/// describe a value that is one of several things and say which somewhere else
+/// -- a tag in the enclosing struct, a length, a protocol -- and none of them
+/// can be bound without a type of this shape. It is the untagged half of what a
+/// <c>variant</c> does: a variant knows which member is there and will not let
+/// you read another, and a union knows nothing and will let you read any of
+/// them.
+///
+/// **No member may hold a counted reference.** Which one is live is exactly
+/// what a union does not record, so a copy could not know what to retain and a
+/// drop could not know what to release. That is not a restriction added for
+/// safety; it is the thing a union cannot be asked.
+/// </summary>
+public sealed class UnionTypeSymbol : StructTypeSymbol
+{
+}
+
+/// <summary>
 /// <c>T[:]</c>: part of an array, as a value.
 ///
 /// Three words -- the array, where in it this starts, and how many elements it

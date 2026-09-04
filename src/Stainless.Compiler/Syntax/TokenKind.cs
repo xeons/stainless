@@ -25,7 +25,7 @@ public enum TokenKind
     ModuleKeyword, ImportKeyword, AsKeyword,
     PublicKeyword, PrivateKeyword,
     ClassKeyword, StructKeyword, InterfaceKeyword, AttributeKeyword, EnumKeyword,
-    VariantKeyword, DelegateKeyword,
+    VariantKeyword, UnionKeyword, DelegateKeyword,
     ExternKeyword, ExportKeyword,
 
     // Statement keywords
@@ -80,6 +80,7 @@ public static class TokenKindExtensions
         TokenKind.AttributeKeyword => "attribute",
         TokenKind.EnumKeyword => "enum",
         TokenKind.VariantKeyword => "variant",
+        TokenKind.UnionKeyword => "union",
         TokenKind.DelegateKeyword => "delegate",
         TokenKind.ExternKeyword => "extern",
         TokenKind.ExportKeyword => "export",

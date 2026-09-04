@@ -252,7 +252,7 @@ public sealed record EnumDeclSyntax(
     IReadOnlyList<EnumMemberSyntax> Members,
     IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
 
-public enum TypeDeclKind { Struct, Class, Interface, Attribute, Variant }
+public enum TypeDeclKind { Struct, Class, Interface, Attribute, Variant, Union }
 
 /// <summary>
 /// One case of a <c>variant</c>: <c>Circle(double radius);</c>, or
