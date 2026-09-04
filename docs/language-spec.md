@@ -149,6 +149,32 @@ An alias *adds* a way to name the module. It does not remove the others, so
 bare names and the full name still work after aliasing — unlike C#, where
 `using X = A.B;` replaces unqualified access rather than adding to it.
 
+**A type gets one with `using`**, which is free here because `import` took the
+job C# gives that word:
+
+```csharp
+public using Handle = void*;
+public using Count  = nuint;
+public using Status = Result;       // an alias may name another
+```
+
+An alias **is** the type it names. There is no wrapper, no conversion and
+nothing at run time: a `Count` is a `nuint` and a `nuint` is a `Count`, and a
+diagnostic names the underlying type because that is the type there is. What it
+buys is a signature that says what it is for.
+
+It is a module-level declaration, like a type, and `public` makes it visible to
+importers the same way. An alias inside a type is refused (SL0525): a module is
+what this language has instead of a namespace, and that is where a name lives.
+
+A ring of aliases names no type, and is refused whether or not anything uses it:
+
+```
+error[SL0522]: 'Ring' is defined in terms of itself, so it names no type
+```
+
+**Distinctness comes from the type, not the alias** — see §2.2.1.
+
 ### 1.6 Ambiguity
 
 If two imported modules both export a type called `Buffer`, using it bare is an
@@ -256,6 +282,65 @@ Crossing a thread is a separate question, and the answer follows the fields: a
 struct holding only primitives and `String`s crosses freely, and one holding a
 `List<T>` does not, because that is what holding a `List<T>` means either way
 (§9.5). A struct of plain data is unaffected by both rules and pays for neither.
+
+#### 2.2.1 `struct HWND__;` — a type declared and not laid out
+
+A `struct` written with no body at all is C's incomplete type: declared here,
+laid out somewhere else, and never completed. The only thing that can be done
+with one is point at it.
+
+```csharp
+public struct HWND__;
+public struct HDC__;
+
+public using HWND = HWND__*;
+public using HDC  = HDC__*;
+```
+
+That is C's own idiom, and it is the reason both features want doing together.
+`HWND__*` and `HDC__*` are different types because they point at different
+things, so passing one where the other belongs is caught:
+
+```
+error[SL0262]: argument 1 of 'Width' expects 'HWND__*', but 'HDC__*' was given
+```
+
+It costs nothing. Neither type is ever laid out, emitted, or present at run
+time; what crosses is a pointer, exactly as `void*` did. The tag is spelled
+`HWND__` for the same reason C spells it that way: it is the name a diagnostic
+will show.
+
+**A value of one cannot exist**, which is checked at the single point every
+written type passes through — a field, a local, a parameter, a return type, an
+array element, a `sizeof` and a generic argument all arrive there:
+
+```
+error[SL0524]: 'HWND__' is declared without a body, so its size is not known
+here and there is no value of it to have; write 'HWND__*', which is what an
+incomplete type is for
+```
+
+Only a `struct` may be written this way (SL0523). A class is reached through a
+pointer this compiler has to lay out; a union and a variant are nothing but
+their contents; and a generic one has nothing for a type parameter to appear in.
+
+**It is not a forward declaration.** Stainless has none, because declaration
+order never matters: a type is either complete or opaque for the whole program,
+and a second declaration of the same name is the ordinary duplicate (SL0201).
+
+A generated C header says exactly what the source said — the tag declared and
+never defined, and the alias as the typedef it is:
+
+```c
+struct App_HWND__;
+typedef struct App_HWND__* App_HWND;
+
+int32_t Width(struct App_HWND__* window);
+```
+
+Signatures spell the underlying type: the header states the ABI, and an alias is
+a name rather than a type. The typedef is there so C can spell a handle the way
+the Stainless source does.
 
 ### 2.3 `[Packed]` and `[Align]`
 

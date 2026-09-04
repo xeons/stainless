@@ -109,6 +109,21 @@ public enum Modifiers
     Sealed = 1 << 7,
 }
 
+/// <summary>
+/// <c>using Handle = void*;</c>: a second name for a type.
+///
+/// The word is free here because <c>import</c> took the job C# gives it, and it
+/// means what a C# programmer expects it to mean. The alias is exactly the type
+/// it names -- there is no wrapper and no conversion -- so what it buys is that
+/// a signature says what it is for. Distinctness comes from the type it names
+/// being distinct, which is what an opaque struct is for.
+/// </summary>
+public sealed record AliasDeclSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    string Name,
+    TypeSyntax Target) : Declaration(Span, Modifiers);
+
 /// <summary>How a declaration crosses the language boundary.</summary>
 public enum LinkageKind
 {
@@ -312,6 +327,12 @@ public sealed record VariantCaseSyntax(
     string Name,
     IReadOnlyList<ParameterSyntax> Parameters) : SyntaxNode(Span);
 
+/// <summary>
+/// A type declaration. <c>IsOpaque</c> marks one written <c>struct HWND__;</c>,
+/// with no body at all: a type whose layout is declared somewhere else and is
+/// never known here. It is C's incomplete type, and the only thing that can be
+/// done with one is point at it.
+/// </summary>
 public sealed record TypeDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,
@@ -325,6 +346,9 @@ public sealed record TypeDeclSyntax(
 {
     /// <summary>A variant's cases; empty for every other kind of declaration.</summary>
     public IReadOnlyList<VariantCaseSyntax> Cases { get; init; } = [];
+
+    /// <summary>True for one written with no body at all: <c>struct HWND__;</c>.</summary>
+    public bool IsOpaque { get; init; }
 }
 
 /// <summary>

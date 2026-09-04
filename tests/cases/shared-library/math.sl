@@ -36,6 +36,26 @@ public delegate int Adjust(int value);
 
 export "C" int ApplyTwice(Adjust f, int value) { return f(f(value)); }
 
+// An opaque type and an alias over a pointer to it: C's own idiom for a handle,
+// and the header says exactly that. The type is never laid out on either side,
+// so what crosses is a pointer and nothing else.
+public struct Slot__;
+public using Slot = Slot__*;
+
+public using Count = nuint;
+
+export "C" Slot SlotAt(int* storage, int index) {
+    return (Slot)(&storage[index]);
+}
+
+export "C" int SlotRead(Slot slot) { return *((int*)slot); }
+
+export "C" Count Measure(byte* text) {
+    Count n = (Count)0;
+    while (text[n] != (byte)0) { n = n + (Count)1; }
+    return n;
+}
+
 // Visible to other Stainless modules, absent from the export table.
 public int Helper() { return 1; }
 

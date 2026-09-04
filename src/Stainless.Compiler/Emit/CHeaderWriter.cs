@@ -132,6 +132,14 @@ public static class CHeaderWriter
                     break;
                 }
 
+                // An incomplete type, written as C writes one. There is no
+                // typedef, because the whole point is that nobody here knows
+                // what it holds -- a `typedef struct X { } X;` would hand C a
+                // one-byte struct where the real thing is something else.
+                case StructTypeSymbol { IsOpaque: true } opaque:
+                    sb.AppendLine($"struct {CName(opaque)};");
+                    break;
+
                 case StructTypeSymbol structType:
                 {
                     // `#pragma pack` rather than an attribute: it is the one
@@ -184,6 +192,23 @@ public static class CHeaderWriter
             sb.AppendLine();
         }
 
+        // A public alias, written as the typedef it is. Signatures below still
+        // spell the underlying type, because the header states the ABI and an
+        // alias is a name rather than a type; these are here so C code can say
+        // `App_HWND` where the Stainless source says `HWND`.
+        var aliases = program.Modules
+            .SelectMany(m => m.Aliases.Values)
+            .Where(a => a.IsPublic && a.Target is not null && !a.Target.IsError())
+            .OrderBy(a => a.QualifiedName, StringComparer.Ordinal)
+            .ToList();
+
+        if (aliases.Count > 0)
+        {
+            foreach (var alias in aliases)
+                sb.AppendLine($"typedef {Declarator(alias.Target!, CName(alias))};");
+            sb.AppendLine();
+        }
+
         foreach (var function in exports)
         {
             var parameters = function.Parameters
@@ -226,6 +251,10 @@ public static class CHeaderWriter
                 ordered.Add(union);
                 break;
 
+            case StructTypeSymbol { IsOpaque: true } opaque when seen.Add(opaque):
+                ordered.Add(opaque);
+                break;
+
             case StructTypeSymbol structType when seen.Add(structType):
                 foreach (var field in structType.Fields) Collect(field.Type, ordered, seen);
                 ordered.Add(structType);
@@ -257,6 +286,7 @@ public static class CHeaderWriter
     }
 
     private static string CName(NamedTypeSymbol type) => Mangler.SymbolSafe(type.QualifiedName);
+    private static string CName(AliasSymbol alias) => Mangler.SymbolSafe(alias.QualifiedName);
 
     /// <summary>A C declaration of <paramref name="name"/> with the given type.</summary>
     /// <summary>
@@ -333,6 +363,10 @@ public static class CHeaderWriter
         },
 
         PointerTypeSymbol pointer => TypeName(pointer.Element) + "*",
+
+        // No typedef exists for an incomplete type, so it is named by its tag.
+        StructTypeSymbol { IsOpaque: true } opaque => "struct " + CName(opaque),
+
         VariantTypeSymbol variant => CName(variant),
         UnionTypeSymbol union => CName(union),
         StructTypeSymbol structType => CName(structType),

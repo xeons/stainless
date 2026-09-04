@@ -162,6 +162,7 @@ public sealed class Binder(
         BindStatics();              // pass 10: static initializers, then their order
         DrainPending();             // pass 11: bodies of everything instantiated along the way
         CheckConstructorDelegation();
+        ResolveRemainingAliases();
 
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.
@@ -252,7 +253,13 @@ public sealed class Binder(
                 // is checked until something instantiates it.
                 if (declaration.TypeParameters.Count > 0)
                 {
-                    if (module.GenericTypes.ContainsKey(declaration.Name))
+                    // Read here as well as below, because a generic declaration
+                    // becomes a template and never reaches the code that does.
+                    if (declaration.IsOpaque)
+                        diagnostics.Error("SL0523", declaration.Span,
+                            $"'{declaration.Name}' has no body, so it has nothing for a type " +
+                            "parameter to appear in");
+                    else if (module.GenericTypes.ContainsKey(declaration.Name))
                         diagnostics.Error("SL0321", declaration.Span,
                             $"'{declaration.Name}' is already declared in module '{module.Name}'");
                     else
@@ -310,11 +317,34 @@ public sealed class Binder(
 
                 ReadInheritanceModifiers(type, declaration);
 
+                if (declaration.IsOpaque) DeclareOpaque(type, declaration);
+
                 module.Types[declaration.Name] = type;
                 _typeSyntax[type] = (declaration, scope);
 
                 if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
                 if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
+            }
+
+            foreach (var declaration in unit.Declarations.OfType<AliasDeclSyntax>())
+            {
+                if (module.Types.ContainsKey(declaration.Name) ||
+                    module.GenericTypes.ContainsKey(declaration.Name) ||
+                    module.Aliases.ContainsKey(declaration.Name))
+                {
+                    diagnostics.Error("SL0201", declaration.Span,
+                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                    continue;
+                }
+
+                var alias = new AliasSymbol(declaration.Name, module.Name)
+                {
+                    IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+                    Span = declaration.Span,
+                };
+
+                module.Aliases[declaration.Name] = alias;
+                _aliasSyntax[alias] = (declaration, scope);
             }
 
             foreach (var declaration in unit.Declarations.OfType<DelegateDeclSyntax>())
@@ -361,6 +391,85 @@ public sealed class Binder(
                 _enumSyntax[enumType] = (declaration, scope);
             }
         }
+    }
+
+    private readonly Dictionary<AliasSymbol, (AliasDeclSyntax Declaration, FileScope Scope)>
+        _aliasSyntax = [];
+
+    /// <summary>Aliases being resolved right now; a second visit is a ring.</summary>
+    private readonly HashSet<AliasSymbol> _aliasesInProgress = [];
+
+    /// <summary>
+    /// The type an alias names, resolved the first time something asks.
+    ///
+    /// Deferred rather than done in a pass of its own because an alias may name
+    /// a type declared later in the file, or another alias declared later --
+    /// declaration order never matters here, and this is the cheapest way to
+    /// keep that true.
+    /// </summary>
+    private TypeSymbol ResolveAlias(AliasSymbol alias)
+    {
+        if (alias.Target is { } already) return already;
+
+        if (!_aliasesInProgress.Add(alias))
+        {
+            diagnostics.Error("SL0522", alias.Span,
+                $"'{alias.Name}' is defined in terms of itself, so it names no type");
+            return alias.Target = ErrorTypeSymbol.Instance;
+        }
+
+        var (declaration, scope) = _aliasSyntax[alias];
+        var target = ResolveType(declaration.Target, scope);
+
+        _aliasesInProgress.Remove(alias);
+        return alias.Target = target;
+    }
+
+    /// <summary>
+    /// Resolves every alias nothing happened to use.
+    ///
+    /// An alias is resolved where it is named, so one nothing names would never
+    /// be looked at -- and a ring of them, or one naming a type that is not
+    /// there, would be accepted in silence. Left until the end because
+    /// resolving one can instantiate a generic, and that wants the binder whole.
+    /// </summary>
+    private void ResolveRemainingAliases()
+    {
+        foreach (var alias in _aliasSyntax.Keys.Where(a => a.Target is null).ToList())
+            ResolveAlias(alias);
+    }
+
+    /// <summary>
+    /// Marks a type declared with no body, and refuses the shapes that cannot
+    /// mean anything without one.
+    /// </summary>
+    private void DeclareOpaque(NamedTypeSymbol type, TypeDeclSyntax declaration)
+    {
+        if (type is not StructTypeSymbol structType || type is UnionTypeSymbol or VariantTypeSymbol)
+        {
+            diagnostics.Error("SL0523", declaration.Span,
+                $"'{type.Name}' has no body, and only a 'struct' may be written that way. " +
+                "An incomplete type exists to be pointed at, and " +
+                (type is ClassTypeSymbol
+                    ? "a class is already reached through a pointer this compiler has to lay out"
+                    : "this kind of type is nothing but its contents"));
+            return;
+        }
+
+        if (declaration.TypeParameters.Count > 0)
+        {
+            diagnostics.Error("SL0523", declaration.Span,
+                $"'{type.Name}' has no body, so it has nothing for a type parameter to appear in");
+            return;
+        }
+
+        // An implements list needs no word here: a struct cannot implement an
+        // interface at all (SL0302), body or no body, and that message says why.
+        structType.IsOpaque = true;
+
+        // Nothing will ever lay it out, and everything downstream asks whether a
+        // layout has been computed rather than whether it could be.
+        structType.SetLayout(0, 1);
     }
 
     /// <summary>
@@ -847,6 +956,16 @@ public sealed class Binder(
 
                 case PropertyDeclSyntax property:
                     DeclareProperty(scope, type, property);
+                    break;
+
+                // Only pass 2 declares aliases, and it looks at the top level.
+                // Taking one here and dropping it is the shape of bug this
+                // language keeps finding in itself, so it is refused instead.
+                case AliasDeclSyntax alias:
+                    diagnostics.Error("SL0525", alias.Span,
+                        $"'{alias.Name}' is a type alias inside '{type.Name}'; an alias belongs " +
+                        "to a module, which is what this language has instead of a namespace. " +
+                        "Move it out of the type");
                     break;
 
                 case ConstructorDeclSyntax constructor:
@@ -2863,7 +2982,7 @@ public sealed class Binder(
         if (function.Kind == FunctionKind.Constructor)
             body = WithBaseConstruction(function, body);
 
-        if (!function.ReturnType.IsVoid() && !AlwaysReturns(body))
+        if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && !AlwaysReturns(body))
             diagnostics.Error("SL0217", function.Span,
                 $"not all paths through '{function.Name}' return a value of type '{function.ReturnType.Name}'");
 
@@ -8034,7 +8153,37 @@ public sealed class Binder(
         return slice;
     }
 
+    /// <summary>
+    /// Resolves a written type, and insists it is one a value can be made of.
+    ///
+    /// An opaque type is the single exception, and only directly under a
+    /// pointer: <c>HWND__*</c> is a pointer to something whose layout is
+    /// declared elsewhere, which is the whole of what such a type is for. Doing
+    /// the check here rather than at each use is what makes it complete --
+    /// a field, a local, a parameter, a return type, an array element, a
+    /// <c>sizeof</c> and a generic argument all arrive through this one door.
+    /// </summary>
     private TypeSymbol ResolveType(TypeSyntax syntax, FileScope scope)
+    {
+        var resolved = ResolveTypeCore(syntax, scope);
+
+        if (resolved is StructTypeSymbol { IsOpaque: true } opaque)
+        {
+            diagnostics.Error("SL0524", syntax.Span,
+                $"'{opaque.Name}' is declared without a body, so its size is not known here " +
+                $"and there is no value of it to have; write '{opaque.Name}*', which is what an " +
+                "incomplete type is for");
+            return ErrorTypeSymbol.Instance;
+        }
+
+        return resolved;
+    }
+
+    /// <summary>
+    /// The resolution itself, without the completeness check. Only the pointer
+    /// case calls it directly, which is exactly the exception it is making.
+    /// </summary>
+    private TypeSymbol ResolveTypeCore(TypeSyntax syntax, FileScope scope)
     {
         switch (syntax)
         {
@@ -8073,7 +8222,10 @@ public sealed class Binder(
 
             case PointerTypeSyntax pointer:
             {
-                var element = ResolveType(pointer.Element, scope);
+                // The one place an incomplete type may appear. C says the same,
+                // and for the same reason: a pointer has a size whatever it
+                // points at.
+                var element = ResolveTypeCore(pointer.Element, scope);
                 if (element.IsError()) return element;
                 if (element is NamedTypeSymbol { IsReferenceType: true })
                 {
@@ -8148,6 +8300,7 @@ public sealed class Binder(
         if (parts.Count == 1)
         {
             if (module.Types.TryGetValue(parts[0], out var local)) return local;
+            if (module.Aliases.TryGetValue(parts[0], out var ownAlias)) return ResolveAlias(ownAlias);
 
             // Naming a generic without arguments is a common slip; say so plainly.
             if (module.GenericTypes.TryGetValue(parts[0], out var template))
@@ -8163,6 +8316,27 @@ public sealed class Binder(
                 .Select(imported => imported.Types[parts[0]])
                 .Distinct()
                 .ToList();
+
+            // An imported alias is a name like any other, and is looked for only
+            // when no imported type answered -- a type is the more direct thing.
+            if (visible.Count == 0)
+            {
+                var aliases = scope.Imports.Values.Distinct()
+                    .Where(i => i.Aliases.TryGetValue(parts[0], out var a) && a.IsPublic)
+                    .Select(i => i.Aliases[parts[0]])
+                    .Distinct()
+                    .ToList();
+
+                if (aliases.Count == 1) return ResolveAlias(aliases[0]);
+                if (aliases.Count > 1)
+                {
+                    diagnostics.Error("SL0273", syntax.Span,
+                        $"'{parts[0]}' is ambiguous between " +
+                        string.Join(" and ", aliases.Select(a => $"'{a.QualifiedName}'")) +
+                        "; qualify it with its module name");
+                    return ErrorTypeSymbol.Instance;
+                }
+            }
 
             if (visible.Count == 1) return visible[0];
             if (visible.Count > 1)
@@ -8189,6 +8363,17 @@ public sealed class Binder(
                         return ErrorTypeSymbol.Instance;
                     }
                     return type;
+                }
+
+                if (target.Aliases.TryGetValue(parts[^1], out var qualifiedAlias))
+                {
+                    if (target != module && !qualifiedAlias.IsPublic)
+                    {
+                        diagnostics.Error("SL0274", syntax.Span,
+                            $"'{qualifiedAlias.QualifiedName}' is not public");
+                        return ErrorTypeSymbol.Instance;
+                    }
+                    return ResolveAlias(qualifiedAlias);
                 }
 
                 diagnostics.Error("SL0275", syntax.Span,

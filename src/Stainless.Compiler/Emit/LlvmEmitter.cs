@@ -177,6 +177,11 @@ public sealed class LlvmEmitter(
 
         foreach (var structType in structs)
         {
+            // An opaque type has no layout to state and nothing to state it
+            // for: every use of one is a pointer, and a pointer is `ptr`.
+            // Emitting `{ i8 }` would be a claim about a size nobody knows.
+            if (structType.IsOpaque) continue;
+
             // A union's members overlap, and LLVM has no union type. What it is
             // given is storage of the right size and alignment -- as many
             // integers of the alignment as it takes to cover the widest member

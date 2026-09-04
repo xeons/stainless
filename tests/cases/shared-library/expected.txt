@@ -1,3 +1,6 @@
 add=42
 scale=6,10
 pair=42
+slot=20
+measure=7
+bumped=23

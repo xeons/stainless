@@ -52,11 +52,37 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
         // relation is recorded here and joined up once every name exists.
         var bases = new List<(ClassTypeSymbol Derived, string Base)>();
 
+        // An alias names a type, and the type may be described after it.
+        var aliases = new List<(AliasSymbol Alias, string Target)>();
+
         foreach (var reference in references)
         foreach (var described in reference.Types)
         {
             var module = Module(modules, described.Module);
             string name = described.Name;
+
+            // An alias is a name in its own table, not a type in the type one.
+            if (described.Kind == MetadataKind.Alias)
+            {
+                if (module.Aliases.ContainsKey(name) || module.Types.ContainsKey(name))
+                {
+                    diagnostics.Error("SL0417", ReferencedSpan,
+                        $"'{described.Module}.{name}' is declared both in this program and in " +
+                        $"the referenced library '{reference.Library}'; a referenced type " +
+                        "cannot be redeclared");
+                    continue;
+                }
+
+                var declared = new AliasSymbol(name, described.Module)
+                {
+                    IsPublic = true,
+                    Span = ReferencedSpan,
+                };
+
+                module.Aliases[name] = declared;
+                if (described.AliasTarget is { } target) aliases.Add((declared, target));
+                continue;
+            }
 
             if (module.Types.ContainsKey(name))
             {
@@ -84,6 +110,7 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
                 MetadataKind.Struct => new StructTypeSymbol
                 {
                     SimpleName = name, ModuleName = described.Module, IsPublic = true,
+                    IsOpaque = described.IsOpaque,
                 },
                 _ => new EnumTypeSymbol
                 {
@@ -104,6 +131,9 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             if (_byQualifiedName.TryGetValue(baseName, out var found) &&
                 found is ClassTypeSymbol inheritedFrom)
                 derived.BaseClass = inheritedFrom;
+
+        foreach (var (alias, target) in aliases)
+            alias.Target = Resolve(target) ?? ErrorTypeSymbol.Instance;
 
         foreach (var (described, symbol) in pending) FillMembers(described, symbol, modules);
 

@@ -80,14 +80,6 @@ which is the other half of the same question.
 
 ## Interop, in the order writing the Win32 bindings wanted them
 
-### Type aliases, and opaque struct types
-
-There is no `using Handle = void*;`, so a binding spells `HANDLE`, `HWND`,
-`HDC` and `HKEY` all as `void*` and nothing catches passing one where another
-belongs. A weak alias would fix the readability; a **distinct** alias over an
-opaque struct type — C's `struct HWND__;` — would make the compiler catch the
-mix-up too, at no runtime cost. The two want doing together.
-
 ### An enum that crosses `extern "C"`
 
 A `[Flags] enum : uint` will not pass to a `uint` parameter without a cast,

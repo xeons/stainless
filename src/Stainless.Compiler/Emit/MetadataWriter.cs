@@ -110,6 +110,24 @@ public static class MetadataWriter
             }
         }
 
+        // An alias is a name rather than a type, so it carries only the name it
+        // resolved to. It crosses so that a library's public surface can be
+        // spelled on the other side the way it is spelled here.
+        foreach (var alias in program.Modules
+                     .Where(m => ownModules.Contains(m.Name))
+                     .SelectMany(m => m.Aliases.Values)
+                     .Where(a => a.IsPublic && a.Target is not null && !a.Target.IsError())
+                     .OrderBy(a => a.QualifiedName, StringComparer.Ordinal))
+            types.Add(new MetadataType
+            {
+                Kind = MetadataKind.Alias,
+                Module = alias.ModuleName,
+                Name = alias.Name,
+                Size = 0,
+                Alignment = 1,
+                AliasTarget = MetadataTypeNames.Write(alias.Target!),
+            });
+
         if (diagnostics is not null)
             foreach (var template in program.Modules
                          .Where(m => ownModules.Contains(m.Name))
@@ -260,6 +278,7 @@ public static class MetadataWriter
         Name = type.SimpleName,
         Size = type.FieldsSize,
         Alignment = type.FieldsAlignment,
+        IsOpaque = type.IsOpaque,
         Fields = type.Fields.Select(Describe).ToList(),
         Methods = type.Methods.Where(m => m.IsPublic).Select(Describe).ToList(),
     };

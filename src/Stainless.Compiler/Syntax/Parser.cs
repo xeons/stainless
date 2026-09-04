@@ -182,6 +182,9 @@ public sealed class Parser
             return hoisted;
         }
 
+        if (At(TokenKind.UsingKeyword))
+            return [ParseAliasDeclaration(start, modifiers)];
+
         if (At(TokenKind.EnumKeyword))
             return [ParseEnumDeclaration(start, modifiers, attributes)];
 
@@ -357,6 +360,16 @@ public sealed class Parser
         }
 
         var constraints = ParseWhereClauses();
+
+        // `struct HWND__;` -- a type declared here and laid out somewhere else.
+        // It is C's incomplete type and not a forward declaration: nothing
+        // completes it, which is the point, and the binder says so if a second
+        // declaration tries to.
+        if (Match(TokenKind.Semicolon))
+            return new TypeDeclSyntax(
+                SpanFrom(start), modifiers, kind, name, typeParameters,
+                constraints, implements, [], attributes) { IsOpaque = true };
+
         Expect(TokenKind.OpenBrace);
 
         var members = new List<Declaration>();
@@ -471,6 +484,18 @@ public sealed class Parser
 
         Expect(TokenKind.Semicolon);
         return new VariantCaseSyntax(SpanFrom(start), name, parameters);
+    }
+
+    /// <summary><c>using Handle = void*;</c></summary>
+    private Declaration ParseAliasDeclaration(int start, Modifiers modifiers)
+    {
+        Expect(TokenKind.UsingKeyword);
+        string name = ExpectIdentifier();
+        Expect(TokenKind.Equals);
+        var target = ParseType();
+        Expect(TokenKind.Semicolon);
+
+        return new AliasDeclSyntax(SpanFrom(start), modifiers, name, target);
     }
 
     /// <summary>

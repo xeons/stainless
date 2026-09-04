@@ -22,7 +22,7 @@ public enum TokenKind
     Identifier, IntLiteral, FloatLiteral, StringLiteral, CharLiteral,
 
     // Declaration keywords
-    ModuleKeyword, ImportKeyword, AsKeyword,
+    ModuleKeyword, ImportKeyword, AsKeyword, UsingKeyword,
     VirtualKeyword, OverrideKeyword, AbstractKeyword, SealedKeyword,
     ProtectedKeyword,
     PublicKeyword, PrivateKeyword,
@@ -75,6 +75,7 @@ public static class TokenKindExtensions
         TokenKind.ModuleKeyword => "module",
         TokenKind.ImportKeyword => "import",
         TokenKind.AsKeyword => "as",
+        TokenKind.UsingKeyword => "using",
         TokenKind.VirtualKeyword => "virtual",
         TokenKind.OverrideKeyword => "override",
         TokenKind.AbstractKeyword => "abstract",

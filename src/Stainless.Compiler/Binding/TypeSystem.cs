@@ -519,6 +519,18 @@ public class StructTypeSymbol : NamedTypeSymbol
 {
     public override int Size => FieldsSize;
     public override int Alignment => FieldsAlignment;
+
+    /// <summary>
+    /// True for a type written <c>struct HWND__;</c>: declared here, laid out
+    /// somewhere else, and never completed.
+    ///
+    /// This is C's incomplete type, and it exists so that a binding can have
+    /// handles that are told apart. <c>HWND__*</c> and <c>HDC__*</c> are
+    /// different types because they point at different things, so passing one
+    /// where the other belongs is caught -- and at no cost at all, since neither
+    /// type is ever laid out, emitted, or present at run time.
+    /// </summary>
+    public bool IsOpaque { get; set; }
 }
 
 /// <summary>

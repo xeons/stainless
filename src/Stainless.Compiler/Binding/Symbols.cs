@@ -262,6 +262,35 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     public override string ToString() => $"{Type.Name} {QualifiedName}";
 }
 
+/// <summary>
+/// <c>using Handle = void*;</c>: a name that resolves to a type.
+///
+/// It is deliberately not a <see cref="TypeSymbol"/>. An alias *is* the type it
+/// names -- the same type, not a wrapper around one -- so it lives in name
+/// lookup and nowhere else, and nothing downstream has to know it existed.
+/// Making it a type would mean unwrapping it at every comparison, conversion,
+/// layout and mangling site, for no gain: what a binding actually wants
+/// distinguished is distinguished by pointing at different opaque types.
+///
+/// The target is resolved on first use rather than in a pass of its own,
+/// because an alias may name a type declared later or an alias declared later.
+/// </summary>
+public sealed class AliasSymbol(string name, string moduleName)
+{
+    public string Name { get; } = name;
+    public string ModuleName { get; } = moduleName;
+    public bool IsPublic { get; init; }
+    public required Source.SourceSpan Span { get; init; }
+
+    /// <summary>The type it stands for, once something has asked.</summary>
+    public TypeSymbol? Target { get; set; }
+
+    public string QualifiedName =>
+        string.IsNullOrEmpty(ModuleName) ? Name : ModuleName + "." + Name;
+
+    public override string ToString() => $"using {Name} = {Target?.Name ?? "?"}";
+}
+
 /// <summary>A module-level <c>const</c>, folded to a value at bind time.</summary>
 public sealed class ConstantSymbol(string name, TypeSymbol type, object? value)
 {
@@ -333,6 +362,7 @@ public sealed class ModuleSymbol(string name)
     public Dictionary<string, GenericTypeTemplate> GenericTypes { get; } = new(StringComparer.Ordinal);
     public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];
+    public Dictionary<string, AliasSymbol> Aliases { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, ConstantSymbol> Constants { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, StaticSymbol> Statics { get; } = new(StringComparer.Ordinal);
 

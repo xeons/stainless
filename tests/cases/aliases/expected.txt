@@ -1,0 +1,6 @@
+slot: 7
+status: 0
+none: -1
+weak: 5
+callback: 14
+other: 0

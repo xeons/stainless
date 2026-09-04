@@ -15,5 +15,17 @@ int main(void)
 
     Library_Math_Pair pair = { 20, 22 };
     printf("pair=%d\n", SumPair(pair));
+
+    /*
+     * The handle is opaque here exactly as it is there: the header declares the
+     * tag and never defines it, so C can hold one and pass it back and cannot
+     * look inside. The typedef is the same one the Stainless source writes.
+     */
+    int cells[3] = { 10, 20, 30 };
+    Library_Math_Slot slot = SlotAt(cells, 1);
+    printf("slot=%d\n", SlotRead(slot));
+
+    printf("measure=%d\n", (int)Measure((uint8_t*)"handles"));
+    printf("bumped=%d\n", bump(SlotRead(slot)));
     return 0;
 }

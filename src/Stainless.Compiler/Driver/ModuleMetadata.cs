@@ -92,7 +92,7 @@ public sealed record ModuleMetadata
 }
 
 /// <summary>What kind of declaration a metadata entry describes.</summary>
-public enum MetadataKind { Class, Struct, Enum, Union }
+public enum MetadataKind { Class, Struct, Enum, Union, Alias }
 
 public sealed record MetadataType
 {
@@ -128,6 +128,19 @@ public sealed record MetadataType
     /// relation, and none of them needs anything else about it.
     /// </summary>
     public string? Base { get; init; }
+
+    /// <summary>
+    /// True for a type declared with no body. A consumer may point at one and
+    /// do nothing else with it, which is the same rule its own compilation had.
+    /// </summary>
+    public bool IsOpaque { get; init; }
+
+    /// <summary>
+    /// For <see cref="MetadataKind.Alias"/>, the type it names. Aliases cross
+    /// so that a library's public surface can be spelled on the other side the
+    /// way it is spelled here; the type is the same type either way.
+    /// </summary>
+    public string? AliasTarget { get; init; }
 }
 
 public sealed record MetadataField

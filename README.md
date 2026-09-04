@@ -564,6 +564,37 @@ Primitive names and sizes match C# exactly: `sbyte short int long nint`,
 Pointers are `T*`, optional class references are `C?`, and `weak C?` breaks
 cycles.
 
+### Handles that are told apart
+
+```csharp
+public struct HWND__;               // declared here, laid out somewhere else
+public struct HDC__;
+
+public using HWND = HWND__*;        // C's own idiom, and the reason for both
+public using HDC  = HDC__*;
+public using Count = nuint;         // a weak alias over anything at all
+```
+
+`using X = Y;` gives a type a second name — the word is free because `import`
+took the job C# gives it. An alias **is** the type it names: no wrapper, no
+conversion, nothing at run time.
+
+Distinctness comes from what it names. A `struct` with no body is C's incomplete
+type, so `HWND__*` and `HDC__*` are different types because they point at
+different things:
+
+```
+error[SL0262]: argument 1 of 'Width' expects 'HWND__*', but 'HDC__*' was given
+```
+
+It costs nothing at all — neither type is laid out, emitted, or present at run
+time — and a generated C header says exactly what the source said:
+
+```c
+struct App_HWND__;
+typedef struct App_HWND__* App_HWND;
+```
+
 ### Layout control
 
 A struct is laid out by the platform C rules; two markers change them.
@@ -946,6 +977,15 @@ Everything below is covered by [the test suite](tests/cases).
 - Modules like C# namespaces: several files may share one, imports are per file,
   `public` exports and an unmarked declaration is module-wide
 - Aliases, qualified names without an import, full order independence
+- Type aliases: `using Handle = void*;`, module-level, public or not, naming
+  another alias or a type from another module. An alias is the type it names, so
+  it costs nothing and converts nothing; a ring of them is refused whether or
+  not anything uses it
+- Opaque struct types: `public struct HWND__;`, C's incomplete type, declared
+  here and laid out somewhere else. A value of one cannot exist and a pointer to
+  one is a distinct type, so handles are told apart at no run-time cost at all.
+  The generated C header declares the tag and typedefs the alias, exactly as C
+  would write it by hand
 - Bit-fields: `public uint Kind : 4;` in a struct or a union, with the width a
   constant from one to the width of the declared type. Both C ABIs are
   implemented — Microsoft opens a new storage unit when the declared type's size
@@ -1280,10 +1320,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   cannot be written. On x64 that costs almost nothing — there is one convention
   and only `__vectorcall` differs — but it is the whole story on x86, where
   `__stdcall` is what Win32 uses.
-- **No type aliases.** There is no `using Handle = void*;`, so a binding spells
-  `HANDLE`, `HWND` and `HDC` all as `void*` and nothing catches passing one
-  where another belongs. Opaque struct types would make those distinct at no
-  cost, and the two want doing together.
 - **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
   to a `uint` parameter without a cast, which is why
   [bindings/win32](bindings/win32) spells 460 constants as bare `const uint`
