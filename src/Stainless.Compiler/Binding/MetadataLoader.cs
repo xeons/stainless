@@ -48,6 +48,10 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
     {
         var pending = new List<(MetadataType Metadata, NamedTypeSymbol Symbol)>();
 
+        // A base may be described after the class deriving from it, so the
+        // relation is recorded here and joined up once every name exists.
+        var bases = new List<(ClassTypeSymbol Derived, string Base)>();
+
         foreach (var reference in references)
         foreach (var described in reference.Types)
         {
@@ -88,10 +92,18 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             };
 
             symbol.SetLayout(described.Size, described.Alignment);
+
+            if (described.Base is not null && symbol is ClassTypeSymbol derived)
+                bases.Add((derived, described.Base));
             module.Types[name] = symbol;
             _byQualifiedName[symbol.QualifiedName] = symbol;
             pending.Add((described, symbol));
         }
+
+        foreach (var (derived, baseName) in bases)
+            if (_byQualifiedName.TryGetValue(baseName, out var found) &&
+                found is ClassTypeSymbol inheritedFrom)
+                derived.BaseClass = inheritedFrom;
 
         foreach (var (described, symbol) in pending) FillMembers(described, symbol, modules);
 
@@ -214,6 +226,12 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             ContainingType = containingType,
             IsPublic = true,
             IsVariadic = described.IsVariadic,
+
+            // A virtual method has to stay virtual across the boundary, or a
+            // consumer would call the declaration rather than the object's own
+            // implementation -- the one thing dispatch exists to prevent.
+            IsVirtual = described.VirtualSlot >= 0,
+            VirtualSlot = described.VirtualSlot,
             Span = ReferencedSpan,
 
             // The library decided this name. Re-deriving it would work today and

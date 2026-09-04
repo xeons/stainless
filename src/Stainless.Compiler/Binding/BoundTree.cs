@@ -57,6 +57,23 @@ public enum ConversionKind
     ClassToInterface,   // C -> I; the same pointer, since dispatch goes via TypeInfo
 
     /// <summary>
+    /// <c>Derived</c> -> <c>Base</c>. Emits nothing at all: with single
+    /// inheritance the base subobject is a prefix of the derived one, so the two
+    /// references are the same address. It is the property that keeps reference
+    /// identity equal to pointer identity, and <c>sl_retain</c> taking the
+    /// object's own address.
+    /// </summary>
+    Upcast,
+
+    /// <summary>
+    /// <c>Base</c> -> <c>Derived</c>, explicit and checked. The pointer is
+    /// unchanged; what it costs is a walk up the object's base chain, and a
+    /// program that ends if the object was not one of those. There being no
+    /// exceptions, <c>is</c> is how a cast is asked before it is made.
+    /// </summary>
+    Downcast,
+
+    /// <summary>
     /// <c>T[]</c> -> <c>T[:]</c>: the whole array, as a slice of it. Implicit,
     /// because a slice of everything is what an array already is and asking for
     /// a cast would put punctuation in front of every call that takes one.
@@ -151,6 +168,16 @@ public sealed class BoundCall(
     public FunctionSymbol Function { get; } = function;
     public BoundExpression? Receiver { get; } = receiver;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+
+    /// <summary>
+    /// True when this call names the function rather than asking the object.
+    ///
+    /// It is what <c>base.M()</c> means, and the only way an override can reach
+    /// what it replaced -- through the vtable it would find itself, for ever. A
+    /// constructor chain is the same thing: the base's constructor is the one
+    /// being run, not whichever the object would dispatch to.
+    /// </summary>
+    public bool IsNonVirtual { get; init; }
 }
 
 public sealed class BoundUnary(
@@ -322,6 +349,20 @@ public sealed class BoundIndirectCall(
     public DelegateTypeSymbol DelegateType { get; } = delegateType;
     public BoundExpression Target { get; } = target;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+}
+
+/// <summary>
+/// <c>value is Type</c>. Answers by walking the object's base chain for a class,
+/// or by looking in its dispatch table for an interface -- and by comparing
+/// against null first, since an optional may hold nothing and nothing is not an
+/// instance of anything.
+/// </summary>
+public sealed class BoundTypeTest(
+    SourceSpan span, TypeSymbol type, BoundExpression value, NamedTypeSymbol tested)
+    : BoundExpression(span, type)
+{
+    public BoundExpression Value { get; } = value;
+    public NamedTypeSymbol Tested { get; } = tested;
 }
 
 public sealed class BoundConversion(

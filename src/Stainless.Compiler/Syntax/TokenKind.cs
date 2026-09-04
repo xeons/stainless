@@ -23,6 +23,8 @@ public enum TokenKind
 
     // Declaration keywords
     ModuleKeyword, ImportKeyword, AsKeyword,
+    VirtualKeyword, OverrideKeyword, AbstractKeyword, SealedKeyword,
+    ProtectedKeyword,
     PublicKeyword, PrivateKeyword,
     ClassKeyword, StructKeyword, InterfaceKeyword, AttributeKeyword, EnumKeyword,
     VariantKeyword, UnionKeyword, DelegateKeyword,
@@ -39,7 +41,7 @@ public enum TokenKind
     // Expression keywords
     NewKeyword, DeleteKeyword, NullKeyword, TrueKeyword, FalseKeyword,
     SizeofKeyword, AlignofKeyword, OffsetofKeyword,
-    TypeofKeyword, ThisKeyword, WeakKeyword,
+    TypeofKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
 
     // Primitive type keywords
     VoidKeyword, BoolKeyword, CharKeyword,
@@ -73,6 +75,11 @@ public static class TokenKindExtensions
         TokenKind.ModuleKeyword => "module",
         TokenKind.ImportKeyword => "import",
         TokenKind.AsKeyword => "as",
+        TokenKind.VirtualKeyword => "virtual",
+        TokenKind.OverrideKeyword => "override",
+        TokenKind.AbstractKeyword => "abstract",
+        TokenKind.SealedKeyword => "sealed",
+        TokenKind.ProtectedKeyword => "protected",
         TokenKind.PublicKeyword => "public",
         TokenKind.PrivateKeyword => "private",
         TokenKind.ClassKeyword => "class",
@@ -115,6 +122,8 @@ public static class TokenKindExtensions
         TokenKind.OffsetofKeyword => "offsetof",
         TokenKind.TypeofKeyword => "typeof",
         TokenKind.ThisKeyword => "this",
+        TokenKind.BaseKeyword => "base",
+        TokenKind.IsKeyword => "is",
         TokenKind.WeakKeyword => "weak",
         TokenKind.VoidKeyword => "void",
         TokenKind.BoolKeyword => "bool",

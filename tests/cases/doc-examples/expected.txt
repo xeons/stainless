@@ -28,4 +28,5 @@ where=a platform
 slices=3:3:1 100 3 4 5 6 
 byref=2:25:3:0.75
 shapes=12.5664:12.5664:12:0:24
+inherits=square:9:9:true
 done

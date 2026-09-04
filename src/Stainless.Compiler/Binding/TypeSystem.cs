@@ -231,6 +231,9 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public int Index { get; } = index;
     public bool IsPublic { get; init; }
 
+    /// <summary>Visible to this type and anything deriving from it.</summary>
+    public bool IsProtected { get; init; }
+
     /// <summary>
     /// True for the hidden storage of an automatic property. It is laid out,
     /// destroyed and reflected exactly like any other field; it simply has no
@@ -377,11 +380,11 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// not one: reaching it directly would bypass the accessors, and on an
     /// interface implementation that would bypass dispatch as well.
     /// </summary>
-    public FieldSymbol? FindField(string name) =>
+    public virtual FieldSymbol? FindField(string name) =>
         Fields.FirstOrDefault(f => f.Name == name && !f.IsBackingField);
 
     /// <summary>Any field at all, hidden storage included. Used for name clashes.</summary>
-    public FieldSymbol? FindStorage(string name) => Fields.FirstOrDefault(f => f.Name == name);
+    public virtual FieldSymbol? FindStorage(string name) => Fields.FirstOrDefault(f => f.Name == name);
 
     public virtual PropertySymbol? FindProperty(string name) =>
         Properties.FirstOrDefault(p => p.Name == name);
@@ -737,11 +740,95 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     public override int Alignment => 8;
     public override bool IsManaged => true;
 
-    /// <summary>Total heap allocation: header plus fields.</summary>
+    /// <summary>Total heap allocation: header plus fields, the base's included.</summary>
     public int InstanceSize => HeaderSize + FieldsSize;
 
     public List<FunctionSymbol> Constructors { get; } = [];
     public FunctionSymbol? Destructor { get; set; }
+
+    /// <summary>
+    /// The class this one derives from, or null.
+    ///
+    /// Single inheritance is what keeps the object model intact: the base
+    /// subobject starts where the derived object does, so an upcast is the same
+    /// pointer, reference identity stays pointer identity, and <c>sl_retain</c>
+    /// goes on taking the object's own address. Multiple inheritance would end
+    /// all three at once; see TODO.md.
+    /// </summary>
+    public ClassTypeSymbol? BaseClass { get; set; }
+
+    /// <summary>Declared <c>abstract</c>: <c>new</c> refuses it.</summary>
+    public bool IsAbstract { get; set; }
+
+    /// <summary>Declared <c>sealed</c>: nothing may derive from it.</summary>
+    public bool IsSealed { get; set; }
+
+    /// <summary>
+    /// This class's dispatch table, in slot order: every virtual method it
+    /// inherits, with its overrides in place, then the ones it adds. Filled in
+    /// pass 5, and emitted verbatim.
+    /// </summary>
+    public List<FunctionSymbol> VirtualTable { get; } = [];
+
+    /// <summary>This class, then its base, then its base's base.</summary>
+    public IEnumerable<ClassTypeSymbol> SelfAndBases()
+    {
+        for (var current = this; current is not null; current = current.BaseClass)
+            yield return current;
+    }
+
+    /// <summary>True when <paramref name="other"/> is this class or one it derives from.</summary>
+    public bool DerivesFrom(ClassTypeSymbol other) => SelfAndBases().Contains(other);
+
+    /// <summary>Where this class's own fields begin, after everything it inherited.</summary>
+    public int InheritedFieldsSize => BaseClass?.FieldsSize ?? 0;
+
+    // ------------------------------------------------------------- lookup
+    //
+    // A derived class's members are its own and its base's. Every one of these
+    // searches nearest first, so a name declared here wins over the same name
+    // further up -- which is what naming a member through the derived type has
+    // always meant.
+
+    public override FieldSymbol? FindField(string name) =>
+        SelfAndBases().Select(c => c.Fields
+            .FirstOrDefault(f => f.Name == name && !f.IsBackingField))
+            .FirstOrDefault(f => f is not null);
+
+    public override FieldSymbol? FindStorage(string name) =>
+        SelfAndBases().Select(c => c.Fields.FirstOrDefault(f => f.Name == name))
+            .FirstOrDefault(f => f is not null);
+
+    public override PropertySymbol? FindProperty(string name) =>
+        SelfAndBases().Select(c => c.Properties.FirstOrDefault(p => p.Name == name))
+            .FirstOrDefault(p => p is not null);
+
+    public override FunctionSymbol? FindMethod(string name) =>
+        SelfAndBases().Select(c => c.Methods.FirstOrDefault(m => m.Name == name))
+            .FirstOrDefault(m => m is not null);
+
+    /// <summary>
+    /// Every method of this name, nearest first, with an inherited one dropped
+    /// once a nearer declaration has the same parameters -- which is exactly
+    /// when the nearer one is the override of it.
+    /// </summary>
+    public override IEnumerable<FunctionSymbol> FindMethods(string name)
+    {
+        var seen = new List<FunctionSymbol>();
+
+        foreach (var candidate in SelfAndBases().SelectMany(c => c.Methods.Where(m => m.Name == name)))
+        {
+            var signature = candidate.ParameterTypes.ToList();
+            if (seen.Any(m => m.Accepts(signature))) continue;
+
+            seen.Add(candidate);
+            yield return candidate;
+        }
+    }
+
+    /// <summary>Every field laid out in an instance, base's first, in offset order.</summary>
+    public IEnumerable<FieldSymbol> AllFields() =>
+        SelfAndBases().Reverse().SelectMany(c => c.Fields);
 }
 
 public static class TypeExtensions

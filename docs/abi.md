@@ -140,6 +140,9 @@ struct TypeInfo {
     const SlFieldInfo  *fields;
     size_t              attributeCount;
     const SlAttribute  *attributes;
+
+    const SlTypeInfo   *base;         /* the class derived from; NULL if none  */
+    const void *const  *vtable;       /* virtual methods by slot; may be NULL  */
 };
 
 struct SlFieldInfo {
@@ -152,13 +155,90 @@ struct SlFieldInfo {
 };
 ```
 
-The last four entries are why reflection needs no runtime: a `[Reflect]` type's
-fields are `const` tables the linker places in read-only data, and reading one
-is address arithmetic. A type without the marker carries four zeroes.
+The four reflection entries are why reflection needs no runtime: a `[Reflect]`
+type's fields are `const` tables the linker places in read-only data, and
+reading one is address arithmetic. A type without the marker carries four
+zeroes.
+
+`base` and `vtable` are **appended** rather than inserted, so every offset the
+compiler hard-codes — `interfaces` at 24, above all — goes on meaning what it
+meant. `base` sits at offset 64 and `vtable` at 72.
 
 Because a class reference is a plain pointer, it can cross the C boundary as
 `void*` — but C code must call `sl_retain` / `sl_release` to participate in
 ownership.
+
+### 2.0 Inheritance
+
+A derived class's fields begin where its base's end, so the base subobject is a
+prefix of the derived object and **starts at the same address**:
+
+```
+             Shape                        Circle : Shape
+offset 0   +-------------------+        +-------------------+
+           | strong            |        | strong            |
+offset 8   | weak              |        | weak              |
+offset 16  | type : TypeInfo*  |        | type : TypeInfo*  |
+offset 24  | sides  : int      |        | sides  : int      |  <-- Shape's
+offset 28  | closed : bool     |        | closed : bool     |
+offset 32  +-------------------+        | radius : double   |  <-- Circle's own
+offset 40                               +-------------------+
+```
+
+That single fact is what the whole model rests on. An upcast emits **no
+instructions**: a `Circle` reference already is a `Shape` reference. Reference
+identity stays pointer identity, `sl_retain` and `sl_release` go on taking the
+object's own address, and an inherited method's field offsets are right without
+being recomputed. Multiple inheritance would end all four at once, which is why
+there is one base and not several.
+
+Downwards the answer is not in the type, so it is asked of the object:
+
+```c
+int sl_is_instance(const void *object, const SlTypeInfo *type);
+```
+
+which walks `base` comparing pointers. `NULL` is nothing's instance, so a test
+through an optional is one question rather than two. A cast that does not hold
+calls `sl_cast_failed`, which names what the object really is and aborts —
+there being no exception for it to throw.
+
+### 2.0.1 Virtual dispatch
+
+```
+object ──+16──▶ TypeInfo ──+72──▶ vtable ──[slot]──▶ function
+```
+
+Three constant-offset loads and an indirect call. It is one **fewer** than an
+interface call, which has an interface id to look up on the way, and one more
+than C++, which is the price of leaving the object header at 24 bytes whether
+or not a class has any virtual methods at all.
+
+Slots are numbered per family rather than per program. A class's table starts as
+a copy of its base's, so an inherited method keeps its slot; an `override`
+replaces that entry in place, and a new `virtual` is appended after everything
+inherited. The slot number therefore belongs to the declaration and not to the
+receiver's static type, which is exactly what makes a call through a base
+reference reach whatever the object really is.
+
+```llvm
+@_SLvtable_App_Shape  = internal constant [3 x ptr] [ptr null, ptr @..Describe.., ptr @..Name..]
+@_SLvtable_App_Circle = internal constant [3 x ptr] [ptr @..Circle_Area.., ptr @..Describe.., ptr @..Circle_Name..]
+```
+
+An abstract method's slot is `ptr null` and is unreachable: the class carrying
+it cannot be instantiated, and every concrete class below it has filled the slot
+in. A class with no virtual methods stores `NULL` for the whole table.
+
+**`base.M()` is not dispatched.** It names the function directly, which is the
+only way an override can reach what it replaced — through the vtable it would
+find itself, for ever. A constructor chain is the same: the base's constructor
+is the one that runs, not whichever the object would dispatch to.
+
+**Destructors chain, derived first.** The object's own `destroy` hook runs the
+derived destructor, releases the derived class's fields, and then calls the
+base's hook. Outside in, because a derived destructor may read what the base
+still holds.
 
 ### 2.1 Immortal objects
 
@@ -350,8 +430,14 @@ object ──+16──▶ TypeInfo ──+24──▶ interfaces ──[id]─�
 Interface ids are assigned across the whole program, so `interfaces` is a flat
 array indexed directly: a dispatch is four constant-offset loads and an
 indirect call, with no search and no branch. It is one load more than a C++
-virtual call, which is the price of leaving the object header at 24 bytes and
-letting a class implement any number of interfaces at no per-object cost.
+virtual call and one more than a Stainless virtual call §2.0.1, which is the
+price of leaving the object header at 24 bytes and letting a class implement any
+number of interfaces at no per-object cost.
+
+A derived class inherits its base's interfaces and their tables, and an override
+takes the slot: the entry a derived class supplies for `IShape.Area` is its own
+`Area`, so a call through the interface reaches the same body a virtual call
+would.
 
 The compiler emits, per implementing class, one vtable per interface plus the
 `interfaces` array; a class implementing none stores `NULL`.

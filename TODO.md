@@ -41,35 +41,6 @@ it. Either give `Main` an `String[]` overload or reject `--`.
 
 ## Next
 
-### Class inheritance, the C# model
-
-The one big piece. Single inheritance, `virtual` / `override` / `abstract` /
-`sealed`, `base(...)` constructor chaining, `protected`, and a downcast that
-checks.
-
-The object model already makes the hard part easy: a class reference points at
-the object header and fields follow it, so with **single** inheritance the base
-subobject shares the derived object's address. An upcast is therefore free, and
-`sl_retain` / `sl_release` keep taking the object pointer unchanged. That is
-exactly the property multiple inheritance would destroy, and the reason not to
-want it — see the note at the end of this file.
-
-What it needs:
-
-- a `vtable` pointer appended to `SlTypeInfo`, making a virtual call three
-  loads and an indirect call — the same shape interface dispatch already has,
-  and one load cheaper than it because there is no interface id to index
-- a `base` pointer beside it, so a downcast can walk the chain
-- derived fields laid out after base fields; `InstanceSize` accumulating
-- destructors chaining, derived first
-- interface tables inherited by a derived class
-- `abstract` refused at `new`, `sealed` refused as a base
-- module metadata carrying the base class, and the runtime struct change moving
-  with it
-
-*Touches:* `TypeSystem`, `Binder` passes 2–6, `LlvmEmitter`, `DebugInfo`
-(`DW_TAG_inheritance`), `MetadataWriter`, `runtime/stainless.h`, `runtime/arc.c`.
-
 ### Calling conventions
 
 `__stdcall`, `__fastcall`, `__vectorcall` on `extern` and `export`. Nearly a
@@ -91,6 +62,19 @@ to Linux C is not right yet, whatever `--abi` says. This is the only item on
 this page that is a correctness gap rather than a missing feature.
 
 *Touches:* a new classifier beside `Win64Abi`, and `LlvmEmitter`.
+
+### Deriving across a library boundary
+
+A class from a referenced library can be held, called, tested with `is` and cast
+back to — the base relation and every virtual slot already cross in the metadata
+— but it cannot be derived from (SL0513).
+
+What stands in the way is that the derived class's dispatch table is built by
+*this* compilation from a layout compiled by *that* one, so the two have to agree
+about the base's slot count and its destroy hook for ever after. The slots cross
+already; what does not is a rule about which changes to a library are compatible.
+Worth doing after [shipping the runtime as a shared library](#ship-the-runtime-as-a-shared-library),
+which is the other half of the same question.
 
 ---
 
@@ -131,7 +115,9 @@ same machinery, and does not have it: `if (x != null)` does not make `x` usable
 as non-optional. It is why `LinkedList<T>` links by index — a structure that
 walks `next` cannot be written at all.
 
-This is the highest-value language item that is not inheritance.
+This is the highest-value language item left. It is also what an `as`
+operator is waiting on: `as` produces a `C?`, and until one can be narrowed
+there is nothing to do with the result that `is` plus a cast does not do.
 
 ### Reflection that writes
 
@@ -185,10 +171,12 @@ it from inside a job is the harder half; see
 
 Kept here so the reasoning does not have to be rediscovered.
 
-- **Multiple inheritance.** With it a `Derived*` and a `Base2*` are different
-  addresses, so an upcast becomes pointer arithmetic and reference identity
-  stops being pointer identity. `sl_retain` takes the object pointer and
-  interface references *are* object pointers; both assumptions would go.
+- **Multiple inheritance.** Single inheritance is implemented and rests on the
+  base subobject starting at the derived object's own address. With two bases a
+  `Derived*` and a `Base2*` are different addresses, so an upcast becomes
+  pointer arithmetic and reference identity stops being pointer identity.
+  `sl_retain` takes the object pointer and interface references *are* object
+  pointers; both assumptions would go.
   Virtual inheritance is worse again — base offsets resolved at run time, a
   hidden constructor parameter, and two ABIs that disagree completely about how.
   Interfaces already give multiple types without multiple state.

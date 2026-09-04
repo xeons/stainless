@@ -254,6 +254,11 @@ public sealed class Parser
                 case TokenKind.PublicKeyword: modifiers |= Modifiers.Public; Advance(); break;
                 case TokenKind.PrivateKeyword: modifiers |= Modifiers.Private; Advance(); break;
                 case TokenKind.ConstKeyword: modifiers |= Modifiers.Const; Advance(); break;
+                case TokenKind.ProtectedKeyword: modifiers |= Modifiers.Protected; Advance(); break;
+                case TokenKind.VirtualKeyword: modifiers |= Modifiers.Virtual; Advance(); break;
+                case TokenKind.OverrideKeyword: modifiers |= Modifiers.Override; Advance(); break;
+                case TokenKind.AbstractKeyword: modifiers |= Modifiers.Abstract; Advance(); break;
+                case TokenKind.SealedKeyword: modifiers |= Modifiers.Sealed; Advance(); break;
                 default: return modifiers;
             }
         }
@@ -1238,6 +1243,9 @@ public sealed class Parser
         _ => 0,
     };
 
+    /// <summary>Where <c>is</c> binds: exactly where a relational operator does.</summary>
+    private const int TypeTestPrecedence = 7;
+
     private static readonly TokenKind[] AssignmentOperators =
     [
         TokenKind.Equals,
@@ -1365,6 +1373,16 @@ public sealed class Parser
 
         while (true)
         {
+            // `x is Shape` sits where a comparison does, and takes a type on the
+            // right rather than an expression -- which is the whole reason it is
+            // not an ordinary binary operator.
+            if (At(TokenKind.IsKeyword) && TypeTestPrecedence >= minPrecedence)
+            {
+                Advance();
+                left = new TypeTestSyntax(SpanFrom(start), left, ParseType());
+                continue;
+            }
+
             int precedence = BinaryPrecedence(Current.Kind);
             if (precedence == 0 || precedence < minPrecedence) break;
 
@@ -1498,6 +1516,10 @@ public sealed class Parser
                 Advance();
                 return new ThisSyntax(SpanFrom(start));
 
+            case TokenKind.BaseKeyword:
+                Advance();
+                return new BaseSyntax(SpanFrom(start));
+
             case TokenKind.NewKeyword:
             {
                 Advance();
@@ -1620,7 +1642,8 @@ public sealed class Parser
         bool operandFollows = AtAny(
             TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
             TokenKind.StringLiteral, TokenKind.CharLiteral, TokenKind.OpenParen,
-            TokenKind.ThisKeyword, TokenKind.NewKeyword, TokenKind.SizeofKeyword,
+            TokenKind.ThisKeyword, TokenKind.BaseKeyword, TokenKind.NewKeyword,
+            TokenKind.SizeofKeyword,
             TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,
             TokenKind.TypeofKeyword,
             TokenKind.TrueKeyword, TokenKind.FalseKeyword, TokenKind.NullKeyword,

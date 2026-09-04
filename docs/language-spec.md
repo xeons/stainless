@@ -88,19 +88,25 @@ This does not compromise the no-header property, which comes from resolving
 every name in the program before checking any body — not from any one-file
 rule.
 
-### 1.3 `public` is the whole of visibility
+### 1.3 The module is the unit of visibility
 
 | Declaration | Visible to |
 |---|---|
 | `public class Book` | its module, and anything that can name the module |
 | `class Book` | its module only, across all of the module's files |
+| `protected int pages` | its class, and anything deriving from it, wherever that is |
 
-That second row is C#'s `internal`, with the module playing the part of the
+The second row is C#'s `internal`, with the module playing the part of the
 assembly. There is nothing else — no friend declarations, no export lists, and
 no file-level privacy (C# only gained `file` in version 11).
 
 Members follow the same rule: a field or method needs `public` for another
-module to touch it.
+module to touch it. `protected` (§2.4.1) is the one addition, and
+the only visibility that crosses a module boundary without being public: a base
+class handing something to its derived classes and to nobody else is the whole
+of what the word is for. It adds to module privacy rather than replacing it, so
+a `protected` member is still reachable inside its own module, and a private one
+is not reachable from a derived class in another module however far down.
 
 ### 1.4 `import` adds names; it never grants access
 
@@ -370,6 +376,132 @@ A class value is a pointer to a heap object preceded by an object header
 (see [abi.md](abi.md)). Assignment copies the *reference* and retains it.
 `new Buffer(64)` allocates, runs the constructor, and yields a reference with
 a count of 1.
+
+#### 2.4.1 Inheritance
+
+A class may derive from **one** other class, written first in the list after the
+colon, before any interfaces:
+
+```csharp
+public abstract class Shape : INamed {
+    protected int sides;
+
+    Shape(int howMany) { sides = howMany; }
+
+    public abstract double Area();
+    public virtual String Describe() { return Name() + " of " + Text.FromDouble(Area()); }
+    public virtual String Name() { return "shape"; }
+}
+
+public class Polygon : Shape {
+    protected double width;
+
+    Polygon(int howMany, double w) {
+        base(howMany);                      // first statement, always
+        width = w;
+    }
+
+    public override double Area() { return width * width; }
+    public override String Describe() { return "a " + base.Describe(); }
+}
+
+public sealed class Square : Polygon {
+    Square(double side) { base(4, side); }
+
+    public sealed override String Name() { return "square"; }
+}
+```
+
+| Word | On a class | On a member |
+|---|---|---|
+| `virtual` | — | may be replaced; the call goes through the object |
+| `override` | — | replaces what it inherits |
+| `abstract` | cannot be instantiated | no body; every concrete class below supplies one |
+| `sealed` | nothing may derive from it | on an `override`, nothing may override further |
+| `protected` | — | this class and anything deriving from it |
+
+**One base, not several.** A class reference points at the object header and the
+fields follow it, so with a single base the base subobject starts at the same
+address as the derived object. An upcast is therefore free — no instructions at
+all — reference identity stays pointer identity, and `sl_retain` goes on taking
+the object's own address. Multiple inheritance would end all three at once; see
+[TODO.md](../TODO.md) for the longer argument.
+
+A virtual call is three loads and an indirect call; see
+[abi.md](abi.md) §2.0.1.
+
+**`base` is where to look, not a value.** `base.M()` calls the implementation
+this class replaced, and is not dispatched — through the vtable an override
+would find itself. `base(...)` runs the base constructor, and only as the very
+first statement of a constructor: the base is built before this class's body
+runs, and a body that had already run would be reading fields nothing had set.
+Left out, the base's constructor taking no arguments is called for you, and
+there being none is an error rather than a class that skips it.
+
+```
+error[SL0516]: 'base(...)' has to be the first statement of the constructor
+error[SL0517]: 'Shape' has no constructor that takes no arguments, so 'Circle'
+has to say which one to run: write 'base(...)' as the first statement of its
+constructor
+```
+
+**Hiding is refused.** A method with the same name and parameters as one it
+inherits must say `override`, and what it overrides must be `virtual` or
+`abstract`. C# allows `new` to hide instead; a language with no way to reach the
+hidden member has nothing to say it about.
+
+```
+error[SL0503]: 'Derived.Value' has the same name and parameters as
+'Base.Value'; write 'override' to replace it
+```
+
+An overload is still an overload: the rule is about the parameters, so a method
+of the same name taking different ones is a new method and needs no word.
+
+**Constructors are not inherited.** A class that declares none is built by the
+nearest constructor up the chain that takes no arguments, and a class with no
+such constructor to reach says so where it is declared rather than at each `new`.
+
+**Destructors chain, derived first**, so a derived destructor may read what its
+base still holds. Interfaces are inherited too, and an override takes the slot,
+so a call through an interface reaches the same body a virtual call would.
+
+**A class from a referenced library may be held, called, tested and cast — but
+not derived from.** Its layout is compiled there and its dispatch table would be
+built here (SL0513).
+
+#### 2.4.2 `is`, and casting down
+
+An upcast is implicit and free. Downwards the answer is not in the type, so it
+is asked of the object:
+
+```csharp
+Shape shape = new Square(3.0);
+
+if (shape is Square) {
+    Square square = (Square)shape;      // checked; aborts if it were not one
+    ...
+}
+
+bool named = shape is INamed;           // interfaces too
+```
+
+`is` walks the object's base chain for a class and looks in its dispatch table
+for an interface, and answers false for a null reference — so a test through a
+`C?` asks about null and about the class at once. A cast that does not hold ends
+the program, naming what the object really is; there are no exceptions, and `is`
+is how the question is asked first.
+
+A test that could never be true is a mistake rather than a constant false:
+
+```
+error[SL0518]: no object is both a 'Circle' and a 'Unrelated': neither derives
+from the other
+```
+
+There is no `as`. It would produce a `C?`, and without flow narrowing for
+optionals (see [TODO.md](../TODO.md)) nothing could be done with the result that
+`is` plus a cast does not already do.
 
 ### 2.5 Pointers and nullability
 
@@ -774,8 +906,8 @@ A `struct` cannot implement an interface: an interface reference is counted,
 and a struct is a plain C value with nowhere to keep a count.
 
 Dispatch is four constant-offset loads with no search and no branch — see
-[abi.md](abi.md) for the tables. There is no class inheritance and no
-downcasting from an interface back to a class.
+[abi.md](abi.md) for the tables. An interface reference can be asked what it
+really is, and cast to it, exactly as a class reference can §2.4.2.
 
 **Interfaces do extend one another**, though, and a class implementing the
 derived one implements the base too:

@@ -464,6 +464,62 @@ public int Fahrenheit {
 }
 ```
 
+### Inheritance
+
+```csharp
+public abstract class Shape {
+    protected int sides;
+
+    Shape(int howMany) { sides = howMany; }
+
+    public abstract double Area();
+    public virtual String Name() { return "shape"; }
+}
+
+public class Polygon : Shape {
+    double width;
+
+    Polygon(int howMany, double w) {
+        base(howMany);                  // the first statement, always
+        width = w;
+    }
+
+    public override double Area() { return width * width; }
+    public override String Name() { return "polygon"; }
+}
+
+public sealed class Square : Polygon {
+    Square(double side) { base(4, side); }
+
+    public sealed override String Name() { return "square"; }
+}
+
+Shape shape = new Square(3.0);
+shape.Name();                           // "square" -- three loads and a call
+
+if (shape is Square) {
+    Square square = (Square)shape;      // checked; there is no exception to throw
+}
+```
+
+C#'s model: one base class, any number of interfaces, and `virtual`,
+`override`, `abstract`, `sealed`, `protected` and `base` meaning what they mean
+there. **One base and not several** is what keeps it cheap: a class reference
+points at the object header and the fields follow it, so a base subobject starts
+at the same address as the derived object. An upcast emits nothing, reference
+identity stays pointer identity, and `sl_retain` goes on taking the object's own
+address. With two bases none of those would hold.
+
+Constructors chain — explicitly with `base(...)` or implicitly to the one taking
+no arguments — and destructors chain the other way, derived first, so a derived
+destructor can still read what its base holds. `base.M()` is not dispatched,
+which is the only way an override can reach what it replaced.
+
+Hiding is refused: a method with the same name and parameters as one it inherits
+must say `override`, and what it overrides must be `virtual` or `abstract`. C#
+allows `new` to hide instead; a language with no way to reach the hidden member
+has nothing to say it about.
+
 ### Interfaces
 
 ```csharp
@@ -925,6 +981,16 @@ Everything below is covered by [the test suite](tests/cases).
   `switch` arm — and `ValueOr(fallback)` needs no proof because it supplies one
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
+- Single inheritance, the C# model: `virtual`, `override`, `abstract`,
+  `sealed`, `protected`, `base(...)` chaining and `base.M()`. A virtual call is
+  three constant-offset loads and an indirect call — one fewer than an interface
+  call, because there is no interface id to look up. Fields are laid out after
+  the base's, destructors chain derived-first, interfaces and their tables are
+  inherited, and an upcast emits no instructions at all
+- `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
+  false for null, so a test through a `C?` asks about null and about the class
+  at once; a cast that does not hold names what the object really is and ends
+  the program, there being no exception for it to throw
 - Properties, on classes, structs and interfaces: `{ get; set; }` with a
   compiler-generated backing field, `{ get; private set; }`, get-only ones a
   constructor fills in, and written accessors with block or `=>` bodies. They
@@ -1010,8 +1076,9 @@ Everything below is covered by [the test suite](tests/cases).
   gone, rather than as a pointer into freed memory
 - `foreach` over arrays and over anything with a `GetEnumerator()`, plus
   `IEnumerable<T>` / `IEnumerator<T>` in `Standard.Collections`
-- Interfaces: several per class, dynamic dispatch, checked at compile time, and
-  extending one another with free conversion to the base. A class may implement
+- Interfaces: several per class, dynamic dispatch, checked at compile time,
+  inherited by a derived class along with everything else, and extending one
+  another with free conversion to the base. A class may implement
   two instantiations of one generic interface — `IEq<int>` and `IEq<String>` —
   because each interface has its own dispatch table and the overloads land in
   different slots
@@ -1140,8 +1207,18 @@ Being straight about the edges, roughly in the order they are worth adding:
   and unwrapped with an explicit cast, but `if (x != null)` does not yet make
   `x` usable as non-optional. It is why `LinkedList<T>` links by index — a
   structure that walks `next` cannot be written at all.
-- **No class inheritance.** Interfaces extend one another, but classes do not,
-  and there is no downcast from an interface back to a class.
+- **Inheritance stops at a library boundary.** A class from a referenced
+  library can be held, called, tested with `is` and cast back to — the base
+  relation and every virtual slot cross in the metadata — but it cannot be
+  derived from (SL0513). The layout is compiled there and the derived class's
+  dispatch table would be built here.
+- **There is no `as`, and no covariant return.** `as` would produce a `C?`, and
+  without flow narrowing for optionals nothing could be done with the result
+  that `is` plus a cast does not already do. An override returns exactly what it
+  overrides (SL0502).
+- **Hiding an inherited member is refused, not warned about.** C# has `new` for
+  it; a language with no way to reach the hidden member has nothing to say it
+  about, so the same name and parameters means `override` or nothing (SL0503).
 - **Reflection reads but does not write.** Fields can be read from an instance,
   not set, so a deserializer cannot be written yet; nor can an instance be made
   from a `Type`. Methods and interfaces carry no metadata — fields only.

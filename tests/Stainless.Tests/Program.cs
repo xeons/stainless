@@ -26,7 +26,8 @@ namespace Stainless.Tests;
 /// .c or .cpp) files that make up one program, plus exactly one expectation file:
 ///
 ///   expected.txt   the program must compile, run, and print this
-///   errors.txt     the program must fail to compile with these diagnostic codes
+///   errors.txt     the program must fail to compile, and every diagnostic code
+///                  this file names -- warnings included -- must be reported
 ///
 /// A case containing defines.txt is built with each of its lines passed as -D,
 /// and one containing abi.txt is built for the ABI that file names.
@@ -309,15 +310,15 @@ internal static class Program
                 return (false, $"expected compilation to fail with {string.Join(", ", wanted)}, " +
                                "but it succeeded");
 
-            var actual = result.Diagnostics
-                .Where(d => d.Severity == Source.Severity.Error)
-                .Select(d => d.Code)
-                .ToList();
+            // Warnings count, so that a documented one can be pinned by the
+            // same file rather than going untested. The case must still fail to
+            // compile, which is what tells a warning apart from a passing run.
+            var actual = result.Diagnostics.Select(d => d.Code).ToList();
 
             var missing = wanted.Where(w => !actual.Contains(w)).ToList();
             if (missing.Count > 0)
                 return (false,
-                    $"expected error(s) {string.Join(", ", missing)}\n" +
+                    $"expected diagnostic(s) {string.Join(", ", missing)}\n" +
                     $"but got        {(actual.Count == 0 ? "(none)" : string.Join(", ", actual))}\n\n" +
                     string.Join("\n", result.Diagnostics.Select(d => d.Render(color: false))));
 

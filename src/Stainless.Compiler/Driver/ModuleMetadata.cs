@@ -118,6 +118,16 @@ public sealed record MetadataType
     /// object a destructor from the wrong binary.
     /// </summary>
     public string? TypeInfoSymbol { get; init; }
+
+    /// <summary>
+    /// The qualified name of the class this one derives from, or null.
+    ///
+    /// A consumer cannot derive from a library's class -- the layout is compiled
+    /// there and the dispatch table would be built here -- but it can still hold
+    /// one, upcast it, ask what it is, and cast it back. All four need the
+    /// relation, and none of them needs anything else about it.
+    /// </summary>
+    public string? Base { get; init; }
 }
 
 public sealed record MetadataField
@@ -156,6 +166,15 @@ public sealed record MetadataFunction
 
     public FunctionKind Kind { get; init; } = FunctionKind.Function;
     public bool IsVariadic { get; init; }
+
+    /// <summary>
+    /// The dispatch slot, or -1 for a method called by name.
+    ///
+    /// It has to cross: a consumer that called a virtual method directly would
+    /// reach the declaration rather than the object's own implementation, which
+    /// is the one bug this whole mechanism exists to prevent.
+    /// </summary>
+    public int VirtualSlot { get; init; } = -1;
 
     /// <summary>The property this is an accessor of, if it is one.</summary>
     public string? Accessor { get; init; }

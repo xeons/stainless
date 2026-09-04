@@ -74,6 +74,47 @@ void sl_divide_by_zero(void)
     sl_fail("integer division by zero");
 }
 
+/*
+ * A class is its own type and every one it derives from. The chain is short by
+ * construction -- single inheritance, and nothing generated -- so this is a walk
+ * rather than a table of ancestors, and it costs a compare per level.
+ */
+int sl_is_instance(const void *object, const SlTypeInfo *type)
+{
+    const SlObject *header = (const SlObject *)object;
+    const SlTypeInfo *current;
+
+    if (object == NULL || type == NULL) return 0;
+
+    for (current = header->type; current != NULL; current = current->base)
+        if (current == type) return 1;
+
+    return 0;
+}
+
+int sl_implements(const void *object, size_t interfaceId)
+{
+    const SlObject *header = (const SlObject *)object;
+
+    if (object == NULL) return 0;
+    if (header->type == NULL || header->type->interfaces == NULL) return 0;
+
+    return header->type->interfaces[interfaceId] != NULL;
+}
+
+void sl_cast_failed(const void *object, const char *wanted)
+{
+    const SlObject *header = (const SlObject *)object;
+    const char *actual = "null";
+
+    if (object != NULL && header->type != NULL && header->type->name != NULL)
+        actual = header->type->name;
+
+    fprintf(stderr, "stainless: cast failed: a %s is not a %s\n", actual, wanted);
+    fflush(stderr);
+    abort();
+}
+
 void sl_divide_overflow(void)
 {
     sl_fail("integer division overflows: the smallest value divided by -1");

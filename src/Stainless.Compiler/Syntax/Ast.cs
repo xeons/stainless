@@ -81,6 +81,32 @@ public enum Modifiers
     Public = 1 << 0,
     Private = 1 << 1,
     Const = 1 << 2,
+
+    /// <summary>
+    /// Visible to this type and to anything deriving from it, wherever that is.
+    /// It is the one visibility that crosses a module boundary without being
+    /// public, and it exists because a base class has to be able to hand its
+    /// derived classes something the rest of the program may not touch.
+    /// </summary>
+    Protected = 1 << 3,
+
+    /// <summary>May be overridden: the call goes through the object's vtable.</summary>
+    Virtual = 1 << 4,
+
+    /// <summary>Replaces an inherited <c>virtual</c> or <c>abstract</c> member.</summary>
+    Override = 1 << 5,
+
+    /// <summary>
+    /// On a class, one that cannot be instantiated. On a member, one with no
+    /// body that every concrete derived class must supply.
+    /// </summary>
+    Abstract = 1 << 6,
+
+    /// <summary>
+    /// On a class, one nothing may derive from. On an <c>override</c>, one
+    /// nothing may override further.
+    /// </summary>
+    Sealed = 1 << 7,
 }
 
 /// <summary>How a declaration crosses the language boundary.</summary>
@@ -489,6 +515,29 @@ public sealed record CallSyntax(
     SourceSpan Span,
     ExpressionSyntax Callee,
     IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>base</c>: this object, seen as the class it derives from.
+///
+/// It is never a value on its own. As the target of a call it names the base
+/// implementation and takes the call off the vtable, which is the only way an
+/// override can reach the method it replaced; as the callee of a call it is the
+/// base constructor.
+/// </summary>
+public sealed record BaseSyntax(SourceSpan Span) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>value is Type</c>: whether the object really is one of those.
+///
+/// The right side is a type rather than an expression, which is why this is not
+/// a <see cref="BinarySyntax"/>. It answers for a class by walking the object's
+/// base chain and for an interface by looking in its dispatch table, and it is
+/// how a downcast is made safe -- there being no exception for one to throw.
+/// </summary>
+public sealed record TypeTestSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Value,
+    TypeSyntax Tested) : ExpressionSyntax(Span);
 
 public sealed record MemberAccessSyntax(
     SourceSpan Span,

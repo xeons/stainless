@@ -1,0 +1,6 @@
+rex says woof
+pip says tweet, quietly
+rex on 4 legs
+public wrapper over a private base method: 7
+dog is Quadruped: true
+bird is Quadruped: false

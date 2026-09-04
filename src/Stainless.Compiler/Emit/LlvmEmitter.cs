@@ -110,6 +110,7 @@ public sealed class LlvmEmitter(
         FactoryDeclarations(program);
         ExternalDeclarations(program);
         TypeInfos(program);
+        VirtualTables(program);
 
         _hasStatics = program.Statics.Count > 0;
         StaticStorage(program);
@@ -222,7 +223,12 @@ public sealed class LlvmEmitter(
 
         // The header every reference type is prefixed with: strong, weak, TypeInfo*.
         _module.AppendLine("%SlObjectHeader = type { i64, i64, ptr }");
-        _module.AppendLine("%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr }");
+        // size, destroy, name, interfaces, fieldCount, fields, attributeCount,
+        // attributes, base, vtable. The last two are appended rather than
+        // inserted so that every offset the emitter already hard-codes -- the
+        // interface table at 24, above all -- goes on meaning what it meant.
+        _module.AppendLine(
+            "%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr, ptr, ptr }");
         _module.AppendLine("%SlFieldInfo = type { ptr, i64, i32, ptr, i64, ptr }");
         _module.AppendLine("%SlAttribute = type { ptr, i64, ptr }");
         _module.AppendLine("%SlAttributeValue = type { i32, i64, ptr }");
@@ -255,6 +261,9 @@ public sealed class LlvmEmitter(
         Declare("sl_utf16_string_type_info", "@sl_utf16_string_type_info = external constant %SlTypeInfo");
         Declare("sl_string_builder_type_info", "@sl_string_builder_type_info = external constant %SlTypeInfo");
         Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
+        Declare("sl_is_instance", "declare i32 @sl_is_instance(ptr, ptr)");
+        Declare("sl_implements", "declare i32 @sl_implements(ptr, i64)");
+        Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr)");
         Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
         Declare("sl_slice_bounds_fail", "declare void @sl_slice_bounds_fail(i64, i64, i64)");
         Declare("sl_divide_by_zero", "declare void @sl_divide_by_zero()");
@@ -356,10 +365,19 @@ public sealed class LlvmEmitter(
                 ? OperatingSystem.IsWindows() ? "dllexport constant" : "constant"
                 : "internal constant";
 
+            string baseInfo = classType.BaseClass is { } derivedFrom
+                ? "@" + Mangler.TypeInfoSymbol(derivedFrom)
+                : "null";
+
+            string vtable = classType.VirtualTable.Count > 0
+                ? "@" + VirtualTableName(classType)
+                : "null";
+
             _module.AppendLine(
                 $"@{Mangler.TypeInfoSymbol(classType)} = {visibility} %SlTypeInfo " +
                 $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
-                $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)} }}");
+                $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
+                $"ptr {baseInfo}, ptr {vtable} }}");
         }
 
         // One TypeInfo per array type. The element type is not recorded at run
@@ -371,7 +389,8 @@ public sealed class LlvmEmitter(
             _module.AppendLine(
                 $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
-                $"ptr {nameConstant}, ptr null, i64 0, ptr null, i64 0, ptr null }}");
+                $"ptr {nameConstant}, ptr null, i64 0, ptr null, i64 0, ptr null, " +
+                "ptr null, ptr null }");
         }
 
         foreach (var structType in program.Modules
@@ -385,7 +404,7 @@ public sealed class LlvmEmitter(
             _module.AppendLine(
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
-                $"{Metadata(structType, 0)} }}");
+                $"{Metadata(structType, 0)}, ptr null, ptr null }}");
         }
 
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
@@ -411,14 +430,22 @@ public sealed class LlvmEmitter(
     {
         if (!type.IsReflected) return "i64 0, ptr null, i64 0, ptr null";
 
+        // What an instance holds, not what its class declared: a derived class
+        // reflects everything it inherited too, because that is what is in the
+        // object a deserializer is about to fill in. The offsets are already
+        // absolute, so the base's fields need no adjusting.
+        var reflected = type is ClassTypeSymbol withBase
+            ? withBase.AllFields().ToList()
+            : type.Fields.ToList();
+
         string fields = "null";
-        if (type.Fields.Count > 0)
+        if (reflected.Count > 0)
         {
             // Materialised before the name is taken and before anything is
             // appended: building a row emits its own attribute tables, and
             // StringBuilder's interpolation handler appends as it goes, so a
             // lazy sequence here would nest one constant inside another.
-            var rows = type.Fields.Select(field =>
+            var rows = reflected.Select(field =>
             {
                 string attributes = AttributeTable(field.Attributes);
 
@@ -430,12 +457,12 @@ public sealed class LlvmEmitter(
             string body = string.Join(", ", rows);
             fields = "@" + NextMetadataName("fields");
             _metadata.AppendLine(
-                $"{fields} = internal constant [{type.Fields.Count} x %SlFieldInfo] [{body}]");
+                $"{fields} = internal constant [{reflected.Count} x %SlFieldInfo] [{body}]");
         }
 
         string typeAttributes = AttributeTable(type.Attributes);
 
-        return $"i64 {type.Fields.Count}, ptr {fields}, {typeAttributes}";
+        return $"i64 {reflected.Count}, ptr {fields}, {typeAttributes}";
     }
 
     /// <summary>Emits an attribute table and returns its count-and-pointer pair.</summary>
@@ -545,6 +572,39 @@ public sealed class LlvmEmitter(
 
     /// <summary>Total interfaces in the program; the width of every dispatch table.</summary>
     private int _interfaceCount;
+
+    /// <summary>Byte offsets of the two trailing fields of an SlTypeInfo.</summary>
+    private const int BaseFieldOffset = 64;
+    private const int VirtualTableOffset = 72;
+
+    private static string VirtualTableName(ClassTypeSymbol type) =>
+        "_SLvtable_" + Mangler.SymbolSafe(type.QualifiedName);
+
+    /// <summary>
+    /// Emits one dispatch table per class that has virtual methods.
+    ///
+    /// The binder built the list, inherited entries and all, so this only writes
+    /// it down: slot n holds whatever this class supplies for slot n, whether it
+    /// declared it, overrode it, or inherited it untouched. An abstract entry is
+    /// null and is unreachable -- the class carrying it cannot be instantiated,
+    /// and every concrete class below it has filled the slot in.
+    /// </summary>
+    private void VirtualTables(BoundProgram program)
+    {
+        var dispatching = program.Classes.Where(c => c.VirtualTable.Count > 0).ToList();
+        if (dispatching.Count == 0) return;
+
+        _module.AppendLine();
+        foreach (var classType in dispatching)
+        {
+            var slots = classType.VirtualTable
+                .Select(m => m.IsAbstract ? "ptr null" : $"ptr {Symbol(m)}");
+
+            _module.AppendLine(
+                $"@{VirtualTableName(classType)} = internal constant " +
+                $"[{classType.VirtualTable.Count} x ptr] [{string.Join(", ", slots)}]");
+        }
+    }
 
     private static string InterfaceTableName(ClassTypeSymbol type) =>
         "_SLitab_" + Mangler.SymbolSafe(type.QualifiedName);
@@ -1387,6 +1447,13 @@ public sealed class LlvmEmitter(
                 : $"call void @sl_release(ptr {value})");
         }
 
+        // The base last, so the object is taken apart from the outside in: a
+        // derived destructor may read what the base still holds, and would find
+        // it already released the other way round. It is the same order C++ and
+        // C# use, and for the same reason.
+        if (classType.BaseClass is { } inheritedFrom)
+            Line($"call void @{DestroyName(inheritedFrom)}(ptr %obj)");
+
         Terminator("ret void");
         _module.AppendLine("entry:");
         _module.Append(_entryAllocas);
@@ -2208,6 +2275,7 @@ public sealed class LlvmEmitter(
                 return new Val(EmitAddress(addressOf.Operand), "ptr", addressOf.Type);
 
             case BoundConversion conversion: return EmitConversion(conversion);
+            case BoundTypeTest test: return EmitTypeTest(test);
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
             case BoundConditional conditional: return EmitConditional(conditional);
@@ -2586,6 +2654,26 @@ public sealed class LlvmEmitter(
         return value;
     }
 
+    /// <summary>
+    /// <c>value is Type</c>: one call, and no branch of its own.
+    ///
+    /// A class is a walk up the object's base chain; an interface is a look in
+    /// its dispatch table. Both answer 0 for a null reference, which is what
+    /// makes the test over an optional a single question rather than two.
+    /// </summary>
+    private Val EmitTypeTest(BoundTypeTest test)
+    {
+        var value = EmitExpression(test.Value);
+
+        string answer = test.Tested is InterfaceTypeSymbol interfaceType
+            ? Emit("i32", $"call i32 @sl_implements(ptr {value.Ref}, i64 {interfaceType.Id})")
+            : Emit("i32",
+                $"call i32 @sl_is_instance(ptr {value.Ref}, " +
+                $"ptr @{Mangler.TypeInfoSymbol((ClassTypeSymbol)test.Tested)})");
+
+        return new Val(Emit("i1", $"icmp ne i32 {answer}, 0"), "i1", test.Type);
+    }
+
     private Val EmitConversion(BoundConversion conversion)
     {
         var operand = EmitExpression(conversion.Operand);
@@ -2599,6 +2687,11 @@ public sealed class LlvmEmitter(
             case ConversionKind.NullToReference:
             case ConversionKind.ClassToInterface:
 
+            // A base subobject starts where the object does, so a reference to
+            // the derived class already is a reference to the base one. This is
+            // the whole benefit of single inheritance and the whole of its cost.
+            case ConversionKind.Upcast:
+
             // Storing is what makes a reference weak: the slot's type sends the
             // store through sl_weak_retain instead of sl_retain. The value
             // itself is the same pointer either way.
@@ -2606,6 +2699,32 @@ public sealed class LlvmEmitter(
                 // An interface reference is the very same pointer; the vtable is
                 // reached through the object's TypeInfo, not carried alongside it.
                 return new Val(operand.Ref, to, conversion.Type);
+
+            // Downwards the answer is not in the type, so it is asked of the
+            // object. The pointer that comes back is the one that went in; what
+            // the check buys is that it really points at one of those.
+            case ConversionKind.Downcast:
+            {
+                var wanted = (ClassTypeSymbol)conversion.Type;
+
+                string ok = Emit("i32",
+                    $"call i32 @sl_is_instance(ptr {operand.Ref}, " +
+                    $"ptr @{Mangler.TypeInfoSymbol(wanted)})");
+                string held = Emit("i1", $"icmp ne i32 {ok}, 0");
+
+                string good = NextLabel("cast.ok");
+                string bad = NextLabel("cast.bad");
+
+                Terminator($"br i1 {held}, label %{good}, label %{bad}");
+
+                Label(bad);
+                Line($"call void @sl_cast_failed(ptr {operand.Ref}, " +
+                     $"ptr {InternBytes(wanted.QualifiedName)})");
+                Terminator("unreachable");
+
+                Label(good);
+                return new Val(operand.Ref, to, conversion.Type);
+            }
 
             // The whole of an array, as a slice of it: offset zero, and the
             // length the array already knows. The array is retained into the
@@ -2980,6 +3099,31 @@ public sealed class LlvmEmitter(
     }
 
     /// <summary>
+    /// Loads the implementation of a virtual method for whatever object the
+    /// receiver actually is:
+    ///
+    ///   object -> TypeInfo -> vtable -> slot
+    ///
+    /// Three loads and an indirect call, all at constant offsets. It is one load
+    /// fewer than an interface call, which has an interface id to look up on the
+    /// way, and one more than C++, which is the price of leaving the object
+    /// header at three words whether or not a class has any virtual methods.
+    /// </summary>
+    private string LoadVirtualMethod(string receiver, FunctionSymbol method)
+    {
+        string typeSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {receiver}, i64 16");
+        string typeInfo = Emit("ptr", $"load ptr, ptr {typeSlot}");
+
+        string tableSlot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {typeInfo}, i64 {VirtualTableOffset}");
+        string table = Emit("ptr", $"load ptr, ptr {tableSlot}");
+
+        string methodSlot = Emit("ptr",
+            $"getelementptr inbounds ptr, ptr {table}, i64 {method.VirtualSlot}");
+        return Emit("ptr", $"load ptr, ptr {methodSlot}");
+    }
+
+    /// <summary>
     /// Loads the implementation of an interface method for whatever object the
     /// receiver actually is:
     ///
@@ -3292,6 +3436,8 @@ public sealed class LlvmEmitter(
             // was, whatever the arguments go on to do.
             if (function.ContainingType is InterfaceTypeSymbol)
                 virtualTarget = LoadInterfaceMethod(receiver.Ref, function);
+            else if (function.IsDispatched && !call.IsNonVirtual)
+                virtualTarget = LoadVirtualMethod(receiver.Ref, function);
         }
 
         AppendArguments(call.Arguments, arguments);

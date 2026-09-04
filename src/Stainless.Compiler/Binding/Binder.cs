@@ -307,6 +307,8 @@ public sealed class Binder(
                     },
                 };
 
+                ReadInheritanceModifiers(type, declaration);
+
                 module.Types[declaration.Name] = type;
                 _typeSyntax[type] = (declaration, scope);
 
@@ -358,6 +360,36 @@ public sealed class Binder(
                 _enumSyntax[enumType] = (declaration, scope);
             }
         }
+    }
+
+    /// <summary>
+    /// Reads <c>abstract</c> and <c>sealed</c> onto a type. Both are about
+    /// deriving, so neither means anything on something nothing can derive from.
+    /// </summary>
+    private void ReadInheritanceModifiers(NamedTypeSymbol type, TypeDeclSyntax declaration)
+    {
+        bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
+        bool isSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed);
+
+        if (type is not ClassTypeSymbol classType)
+        {
+            if (isAbstract || isSealed)
+                diagnostics.Error("SL0495", declaration.Span,
+                    $"'{type.Name}' is not a class, so it cannot be " +
+                    $"'{(isAbstract ? "abstract" : "sealed")}'; only a class is derived from");
+            return;
+        }
+
+        if (isAbstract && isSealed)
+        {
+            diagnostics.Error("SL0496", declaration.Span,
+                $"'{type.Name}' cannot be both 'abstract' and 'sealed': the first says it must " +
+                "be derived from and the second says it cannot be");
+            return;
+        }
+
+        classType.IsAbstract = isAbstract;
+        classType.IsSealed = isSealed;
     }
 
     // ============================================================ pass 3
@@ -759,9 +791,21 @@ public sealed class Binder(
                     // guarantee: such a struct is no longer bytes a C function
                     // could be handed, which ValidateLinkageSignature enforces.
 
+                    if (Dispatchable(field.Modifiers) is { } wrongOnAField)
+                        diagnostics.Error("SL0497", field.Span,
+                            $"'{type.Name}.{field.Name}' is a field, so it cannot be " +
+                            $"'{wrongOnAField}'; only a method or a property is dispatched");
+
+                    if (field.Modifiers.HasFlag(Modifiers.Protected) &&
+                        type is not ClassTypeSymbol)
+                        diagnostics.Error("SL0519", field.Span,
+                            $"'{type.Name}.{field.Name}' cannot be 'protected'; the word means " +
+                            "'and anything deriving from this', and only a class is derived from");
+
                     var declared = new FieldSymbol(field.Name, fieldType, type, type.Fields.Count)
                     {
                         IsPublic = field.Modifiers.HasFlag(Modifiers.Public),
+                        IsProtected = field.Modifiers.HasFlag(Modifiers.Protected),
                         IsAnonymous = field.IsAnonymous,
                     };
 
@@ -917,15 +961,20 @@ public sealed class Binder(
         }
 
         bool isInterface = type is InterfaceTypeSymbol;
+        bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
         bool wantsStorage = false;
 
-        if (isInterface)
+        if (isInterface || isAbstract)
         {
             foreach (var accessor in declaration.Accessors.Where(a => a.Body is not null))
                 diagnostics.Error("SL0392", accessor.Span,
-                    $"'{type.Name}.{declaration.Name}' is an interface property, so its " +
-                    $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
-                    "interfaces declare signatures only");
+                    isInterface
+                        ? $"'{type.Name}.{declaration.Name}' is an interface property, so its " +
+                          $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
+                          "interfaces declare signatures only"
+                        : $"'{type.Name}.{declaration.Name}' is abstract, so its " +
+                          $"{(accessor.IsGetter ? "getter" : "setter")} cannot have a body; " +
+                          "a derived class supplies one");
         }
         else
         {
@@ -972,12 +1021,17 @@ public sealed class Binder(
             ContainingType = type,
             Span = declaration.Span,
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface,
+            IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
             BackingField = backing,
         };
 
-        property.Getter = DeclareAccessor(scope, type, property, getter, isSetter: false);
+        // A property's dispatch is its accessors' -- they are the methods, and a
+        // vtable has no notion of a property at all.
+        var accessorModifiers = declaration.Modifiers;
+
+        property.Getter = DeclareAccessor(scope, type, property, getter, false, accessorModifiers);
         if (setter is not null)
-            property.Setter = DeclareAccessor(scope, type, property, setter, isSetter: true);
+            property.Setter = DeclareAccessor(scope, type, property, setter, true, accessorModifiers);
 
         type.Properties.Add(property);
     }
@@ -990,7 +1044,7 @@ public sealed class Binder(
     /// </summary>
     private FunctionSymbol? DeclareAccessor(
         FileScope scope, NamedTypeSymbol type, PropertySymbol property,
-        AccessorSyntax accessor, bool isSetter)
+        AccessorSyntax accessor, bool isSetter, Modifiers modifiers)
     {
         string role = isSetter ? "setter" : "getter";
         string name = (isSetter ? "set_" : "get_") + property.Name;
@@ -1026,11 +1080,20 @@ public sealed class Binder(
             Kind = FunctionKind.Method,
             ContainingType = type,
             IsPublic = isPublic,
+            IsProtected = property.IsProtected,
+            IsVirtual = modifiers.HasFlag(Modifiers.Virtual)
+                        || modifiers.HasFlag(Modifiers.Override)
+                        || modifiers.HasFlag(Modifiers.Abstract),
+            IsOverride = modifiers.HasFlag(Modifiers.Override),
+            IsAbstract = modifiers.HasFlag(Modifiers.Abstract),
+            IsSealed = modifiers.HasFlag(Modifiers.Sealed),
             Body = accessor.Body,
             Span = accessor.Span,
             Scope = scope,
             Accessor = property,
-            IsAutoAccessor = accessor.Body is null && type is not InterfaceTypeSymbol,
+            IsAutoAccessor = accessor.Body is null
+                             && type is not InterfaceTypeSymbol
+                             && !modifiers.HasFlag(Modifiers.Abstract),
         };
 
         TypeSymbol thisType = type is ClassTypeSymbol reference
@@ -1063,6 +1126,13 @@ public sealed class Binder(
             // whether or not the programmer wrote the word.
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public)
                        || containingType is InterfaceTypeSymbol,
+            IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
+            IsVirtual = declaration.Modifiers.HasFlag(Modifiers.Virtual)
+                        || declaration.Modifiers.HasFlag(Modifiers.Override)
+                        || declaration.Modifiers.HasFlag(Modifiers.Abstract),
+            IsOverride = declaration.Modifiers.HasFlag(Modifiers.Override),
+            IsAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract),
+            IsSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed),
             IsVariadic = declaration.IsVariadic,
             Body = declaration.Body,
             Span = declaration.Span,
@@ -1104,12 +1174,44 @@ public sealed class Binder(
                     .ToList());
         }
 
+        if (Dispatchable(declaration.Modifiers) is { } dispatch &&
+            containingType is not ClassTypeSymbol)
+            diagnostics.Error("SL0519", declaration.Span,
+                containingType is InterfaceTypeSymbol
+                    ? $"'{declaration.Name}' is an interface method, so '{dispatch}' says nothing " +
+                      "new: every interface method is dispatched already"
+                    : containingType is null
+                        ? $"'{declaration.Name}' is a module-level function, so it cannot be " +
+                          $"'{dispatch}'; there is no receiver to dispatch on"
+                        : $"'{containingType.Name}' is not a class, so '{declaration.Name}' " +
+                          $"cannot be '{dispatch}'; only a class is derived from");
+
+        if (declaration.Modifiers.HasFlag(Modifiers.Protected) &&
+            containingType is not ClassTypeSymbol)
+            diagnostics.Error("SL0519", declaration.Span,
+                $"'{declaration.Name}' cannot be 'protected'; the word means 'and anything " +
+                "deriving from this', and only a class is derived from");
+
+        // 'override' already says it is dispatched, because what it replaces was.
+        if (declaration.Modifiers.HasFlag(Modifiers.Override) &&
+            declaration.Modifiers.HasFlag(Modifiers.Virtual))
+            diagnostics.Error("SL0507", declaration.Span,
+                $"'{declaration.Name}' is both 'virtual' and 'override'; an override is " +
+                "dispatched because what it replaces was");
+
         if (containingType is InterfaceTypeSymbol)
         {
             if (declaration.Body is not null)
                 diagnostics.Error("SL0301", declaration.Span,
                     $"'{declaration.Name}' is an interface method and cannot have a body; " +
                     "interfaces declare signatures only");
+        }
+        else if (symbol.IsAbstract)
+        {
+            if (declaration.Body is not null)
+                diagnostics.Error("SL0498", declaration.Span,
+                    $"'{declaration.Name}' is abstract, so it cannot have a body; " +
+                    "a derived class supplies one");
         }
         else if (!declaration.Linkage.IsImport() && declaration.Body is null)
         {
@@ -1162,6 +1264,17 @@ public sealed class Binder(
     /// keeps a bare <c>String</c> out of a C signature; this closes the gap a
     /// struct could otherwise smuggle one through.
     /// </summary>
+    /// <summary>
+    /// The dispatch word written on a declaration that cannot be dispatched, or
+    /// null when none was. Reported where the declaration is, so that a
+    /// <c>virtual</c> on a field says so rather than going quiet.
+    /// </summary>
+    private static string? Dispatchable(Modifiers modifiers) =>
+        modifiers.HasFlag(Modifiers.Virtual) ? "virtual"
+        : modifiers.HasFlag(Modifiers.Override) ? "override"
+        : modifiers.HasFlag(Modifiers.Abstract) ? "abstract"
+        : null;
+
     private void ValidateLinkageSignatures()
     {
         foreach (var symbol in _modules.Values.SelectMany(m => m.Functions))
@@ -1353,11 +1466,17 @@ public sealed class Binder(
     // ============================================================ pass 5
 
     /// <summary>
-    /// Resolves each class's declared interfaces and checks that it really
-    /// implements them, then numbers the interfaces for dispatch.
+    /// Resolves what each type derives from -- a base class, interfaces, or both
+    /// -- checks that it really supplies what it claims, and lays out its
+    /// dispatch table.
     ///
-    /// Ids are assigned across the whole program, which is what lets a class's
-    /// dispatch table be indexed directly instead of searched.
+    /// Interfaces go first so that an interface's own <c>extends</c> list is
+    /// settled before any class is measured against it. Classes then resolve
+    /// base-first, by recursion rather than by sorting: a derived class cannot
+    /// inherit a vtable that does not exist yet.
+    ///
+    /// Interface ids are assigned across the whole program, which is what lets a
+    /// class's dispatch table be indexed directly instead of searched.
     /// </summary>
     private void ResolveInterfaces()
     {
@@ -1368,50 +1487,67 @@ public sealed class Binder(
             ResolveImplements(type, entry.Declaration, entry.Scope);
     }
 
+    /// <summary>Types whose bases and interfaces are settled.</summary>
+    private readonly HashSet<NamedTypeSymbol> _inheritanceDone = [];
+
+    /// <summary>Types being settled right now; a second visit is a cycle.</summary>
+    private readonly HashSet<NamedTypeSymbol> _inheritanceInProgress = [];
+
     private void ResolveImplements(
         NamedTypeSymbol type, TypeDeclSyntax declaration, FileScope scope)
     {
+        if (_inheritanceDone.Contains(type)) return;
+        if (!_inheritanceInProgress.Add(type)) return;      // a cycle; the caller reports it
+
+        var classType = type as ClassTypeSymbol;
+
+        if (type is StructTypeSymbol && declaration.Implements.Count > 0)
         {
-            if (declaration.Implements.Count == 0) return;
-
-            if (type is StructTypeSymbol)
+            string kind = type switch
             {
-                string kind = type switch
-                {
-                    VariantTypeSymbol => "variant",
-                    UnionTypeSymbol => "union",
-                    _ => "struct",
-                };
-                diagnostics.Error("SL0302", declaration.Span,
-                    $"{kind} '{type.Name}' cannot implement an interface; an interface " +
-                    "reference is a counted pointer, and a " + kind + " is a plain C value");
-                return;
-            }
-
-            foreach (var implemented in declaration.Implements)
+                VariantTypeSymbol => "variant",
+                UnionTypeSymbol => "union",
+                _ => "struct",
+            };
+            diagnostics.Error("SL0302", declaration.Span,
+                $"{kind} '{type.Name}' cannot implement an interface; an interface " +
+                "reference is a counted pointer, and a " + kind + " is a plain C value");
+        }
+        else
+        {
+            for (int i = 0; i < declaration.Implements.Count; i++)
             {
-                var resolved = ResolveType(implemented, scope);
+                var written = declaration.Implements[i];
+                var resolved = ResolveType(written, scope);
                 if (resolved.IsError()) continue;
+
+                // A class in the list is the base class, and only the first name
+                // may be one -- which is what makes `: Base, IShape` read the way
+                // it does in C# without any lookahead at all.
+                if (resolved is ClassTypeSymbol baseClass)
+                {
+                    BindBaseClass(type, classType, baseClass, written.Span, isFirst: i == 0);
+                    continue;
+                }
 
                 if (resolved is not InterfaceTypeSymbol interfaceType)
                 {
-                    diagnostics.Error("SL0303", implemented.Span,
+                    diagnostics.Error("SL0303", written.Span,
                         $"'{resolved.Name}' is not an interface, so '{type.Name}' cannot " +
-                        (type is InterfaceTypeSymbol ? "extend" : "implement") +
-                        " it; Stainless has no class inheritance");
+                        (type is InterfaceTypeSymbol ? "extend" : "implement") + " it");
                     continue;
                 }
 
                 if (type.Interfaces.Contains(interfaceType))
                 {
-                    diagnostics.Warning("SL0304", implemented.Span,
+                    diagnostics.Warning("SL0304", written.Span,
                         $"'{type.Name}' already lists '{interfaceType.Name}'");
                     continue;
                 }
 
                 if (interfaceType == type || interfaceType.AllInterfaces().Contains(type))
                 {
-                    diagnostics.Error("SL0333", implemented.Span,
+                    diagnostics.Error("SL0333", written.Span,
                         $"'{type.Name}' and '{interfaceType.Name}' extend each other");
                     continue;
                 }
@@ -1420,12 +1556,262 @@ public sealed class Binder(
 
                 // Only a class has to supply implementations. An interface
                 // extending another merely widens its own contract.
-                if (type is ClassTypeSymbol classType)
-                    VerifyImplements(classType, interfaceType, implemented.Span);
+                if (classType is not null)
+                    VerifyImplements(classType, interfaceType, written.Span);
             }
         }
 
+        // Every class gets a table, base or no base: a class may declare the
+        // first `virtual` in its own family.
+        if (classType is not null) ResolveVirtuals(classType, declaration);
+
+        _inheritanceInProgress.Remove(type);
+        _inheritanceDone.Add(type);
     }
+
+    /// <summary>
+    /// Adopts <paramref name="baseClass"/> as the base of <paramref name="classType"/>,
+    /// having first settled the base's own inheritance -- a derived class cannot
+    /// inherit a dispatch table that has not been built.
+    /// </summary>
+    private void BindBaseClass(
+        NamedTypeSymbol type, ClassTypeSymbol? classType,
+        ClassTypeSymbol baseClass, SourceSpan span, bool isFirst)
+    {
+        if (classType is null)
+        {
+            diagnostics.Error("SL0512", span,
+                $"'{type.Name}' is an interface and '{baseClass.Name}' is a class; an interface " +
+                "extends interfaces only, because it has no state to inherit");
+            return;
+        }
+
+        if (classType.BaseClass is not null)
+        {
+            diagnostics.Error("SL0510", span,
+                $"'{classType.Name}' already derives from '{classType.BaseClass.Name}', so it " +
+                $"cannot also derive from '{baseClass.Name}'. With two bases a reference to one " +
+                "of them is a different address from the object itself, and reference identity, " +
+                "free upcasts and 'sl_retain' all rest on those being the same. Interfaces give " +
+                "several types without several states");
+            return;
+        }
+
+        if (!isFirst)
+        {
+            diagnostics.Error("SL0508", span,
+                $"the base class must be written first: '{classType.Name} : {baseClass.Name}, ...'. " +
+                "A class has one base and any number of interfaces, and putting the base at the " +
+                "front is what tells them apart without a keyword");
+            return;
+        }
+
+        if (_inheritanceInProgress.Contains(baseClass))
+        {
+            diagnostics.Error("SL0511", span,
+                baseClass == classType
+                    ? $"'{classType.Name}' cannot derive from itself"
+                    : $"'{classType.Name}' and '{baseClass.Name}' derive from each other, so " +
+                      "neither has a size");
+            return;
+        }
+
+        if (baseClass.IsSealed)
+        {
+            diagnostics.Error("SL0509", span,
+                $"'{baseClass.Name}' is sealed, so nothing may derive from it");
+            return;
+        }
+
+        if (baseClass.IsIntrinsic || baseClass.RuntimeFactory is not null)
+        {
+            diagnostics.Error("SL0513", span,
+                $"'{baseClass.Name}' is provided by the runtime rather than compiled here, so " +
+                "its layout and its destructor are not this compilation's to extend");
+            return;
+        }
+
+        if (baseClass.ExternalTypeInfo is not null)
+        {
+            diagnostics.Error("SL0513", span,
+                $"'{baseClass.Name}' comes from a referenced library, and deriving across a " +
+                "library boundary is not supported: the derived object would carry a dispatch " +
+                "table built here for a layout compiled there");
+            return;
+        }
+
+        // Settle the base before taking anything from it. This is what puts the
+        // whole hierarchy in order without a separate sorting pass.
+        if (_typeSyntax.TryGetValue(baseClass, out var entry))
+            ResolveImplements(baseClass, entry.Declaration, entry.Scope);
+
+        classType.BaseClass = baseClass;
+
+        // Implementing an interface is inherited along with everything else, and
+        // the object needs its dispatch table either way.
+        foreach (var inherited in baseClass.Interfaces)
+            if (!classType.Interfaces.Contains(inherited))
+                classType.Interfaces.Add(inherited);
+    }
+
+    /// <summary>
+    /// Builds a class's dispatch table and checks every word written about
+    /// overriding.
+    ///
+    /// The table starts as a copy of the base's, so an inherited method keeps its
+    /// slot and a call through a base reference reaches whatever the object
+    /// really is. An <c>override</c> replaces the entry in place; a new
+    /// <c>virtual</c> is appended after everything inherited.
+    /// </summary>
+    private void ResolveVirtuals(ClassTypeSymbol classType, TypeDeclSyntax declaration)
+    {
+        if (classType.BaseClass is { } inheritedFrom)
+            classType.VirtualTable.AddRange(inheritedFrom.VirtualTable);
+
+        foreach (var method in classType.Methods)
+        {
+            if (method.IsVirtual && !method.IsPublic && !method.IsProtected)
+                diagnostics.Error("SL0506", method.Span,
+                    $"'{classType.Name}.{Describe(method)}' is dispatched, so it must be " +
+                    "'public' or 'protected': a derived class has to be able to name what it " +
+                    "is replacing");
+
+            if (method.IsSealed && !method.IsOverride)
+                diagnostics.Error("SL0507", method.Span,
+                    $"'{classType.Name}.{Describe(method)}' is 'sealed' and overrides nothing; " +
+                    "the word closes an inherited chain, so it goes with 'override'");
+
+            if (method.IsAbstract && !classType.IsAbstract)
+                diagnostics.Error("SL0505", method.Span,
+                    $"'{classType.Name}.{Describe(method)}' is abstract, so '{classType.Name}' " +
+                    "must be abstract too; a class with a method that has no body cannot be made");
+
+            var signature = method.ParameterTypes.ToList();
+            var inherited = classType.BaseClass?
+                .FindMethods(method.Name)
+                .FirstOrDefault(m => m.Accepts(signature));
+
+            if (method.IsOverride)
+            {
+                if (inherited is null)
+                {
+                    diagnostics.Error("SL0499", method.Span,
+                        classType.BaseClass is null
+                            ? $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
+                              $"'{classType.Name}' derives from nothing"
+                            : $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
+                              $"'{classType.BaseClass.Name}' declares nothing of that name and " +
+                              "those parameters");
+                    continue;
+                }
+
+                if (!inherited.IsVirtual)
+                {
+                    diagnostics.Error("SL0500", method.Span,
+                        $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is not " +
+                        "virtual, so it cannot be overridden; mark it 'virtual' or 'abstract'");
+                    continue;
+                }
+
+                if (inherited.IsSealed)
+                {
+                    diagnostics.Error("SL0501", method.Span,
+                        $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is a sealed " +
+                        "override, so nothing may override it further");
+                    continue;
+                }
+
+                if (!SignaturesAgree(method, inherited))
+                {
+                    diagnostics.Error("SL0502", method.Span,
+                        $"'{classType.Name}.{Describe(method)}' does not match what it overrides; " +
+                        $"expected '{inherited.ReturnType.Name} {inherited.Name}(" +
+                        string.Join(", ", inherited.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
+                        ")'");
+                    continue;
+                }
+
+                method.Overridden = inherited;
+                method.VirtualSlot = inherited.VirtualSlot;
+                classType.VirtualTable[method.VirtualSlot] = method;
+                continue;
+            }
+
+            if (inherited is not null)
+            {
+                // Silent hiding is the one shape C# allows here and this does
+                // not: `new` exists to say "I know", and a language with no way
+                // to reach the hidden member has nothing to say it about.
+                diagnostics.Error("SL0503", method.Span,
+                    $"'{classType.Name}.{Describe(method)}' has the same name and parameters as " +
+                    $"'{inherited.ContainingType!.Name}.{Describe(inherited)}'" +
+                    (inherited.IsVirtual
+                        ? "; write 'override' to replace it"
+                        : ", which is not virtual; rename one of them, or mark the inherited " +
+                          "one 'virtual' and this one 'override'"));
+                continue;
+            }
+
+            if (method.IsVirtual)
+            {
+                method.VirtualSlot = classType.VirtualTable.Count;
+                classType.VirtualTable.Add(method);
+            }
+        }
+
+        if (classType.IsAbstract) return;
+
+        // A class that declares no constructor is built by its base's, and one
+        // with no base constructor it could call is a class nothing can make.
+        // Said here rather than at each `new`, because the declaration is where
+        // the missing constructor goes.
+        if (classType.Constructors.Count == 0 &&
+            !TryImplicitBaseConstructor(classType, out _))
+            diagnostics.Error("SL0517", classType.Span ?? declaration.Span,
+                $"'{classType.Name}' declares no constructor and every constructor of " +
+                $"'{NearestConstructing(classType)!.Name}' takes arguments, so nothing could " +
+                $"ever build one; give '{classType.Name}' a constructor whose first statement " +
+                "is 'base(...)'");
+
+        // A concrete class is one every abstract method of which has a body
+        // somewhere in the chain -- which is exactly the table having no
+        // abstract entry left in it.
+        // One its own declaration left abstract has already been reported
+        // against that declaration, which is where the mistake is.
+        foreach (var missing in classType.VirtualTable
+                     .Where(m => m.IsAbstract && m.ContainingType != classType))
+            diagnostics.Error("SL0504", classType.Span ?? declaration.Span,
+                $"'{classType.Name}' does not implement abstract " +
+                $"'{missing.ContainingType!.Name}.{Describe(missing)}'; add 'public override " +
+                $"{missing.ReturnType.Name} {missing.Name}(" +
+                string.Join(", ", missing.Parameters.Where(p => !p.IsThis)
+                    .Select(p => p.Type.Name + " " + p.Name)) + ")'");
+    }
+
+    /// <summary>
+    /// True when two methods agree on everything a caller can observe: the
+    /// return type, and each parameter's type and mode. The mode is part of it
+    /// because a <c>ref int</c> and an <c>int</c> are passed differently, and the
+    /// slot would then hold a function the caller is about to hand a pointer to.
+    /// </summary>
+    private static bool SignaturesAgree(FunctionSymbol method, FunctionSymbol other)
+    {
+        var mine = method.Parameters.Where(p => !p.IsThis).ToList();
+        var theirs = other.Parameters.Where(p => !p.IsThis).ToList();
+
+        return method.ReturnType.Equals(other.ReturnType) &&
+               mine.Count == theirs.Count &&
+               mine.Zip(theirs).All(pair =>
+                   pair.First.Type.Equals(pair.Second.Type) &&
+                   pair.First.Mode == pair.Second.Mode);
+    }
+
+    /// <summary>
+    /// A method as a diagnostic should name it. An accessor is named by its
+    /// property, because that is the thing the source wrote.
+    /// </summary>
+    private static string Describe(FunctionSymbol method) =>
+        method.Accessor is { } property ? property.Name : method.Name;
 
     /// <summary>The <c>[Reflect]</c> marker, found in Standard.Reflection.</summary>
     private AttributeTypeSymbol? ReflectAttribute =>
@@ -1804,6 +2190,18 @@ public sealed class Binder(
         }
 
         int offset = 0, alignment = 1;
+
+        // A derived class's fields begin where its base's end, so the base
+        // subobject is a prefix of the derived one and starts at the same
+        // address. That is what makes an upcast free, and what makes every
+        // inherited method's field offsets right without recomputing them.
+        if (type is ClassTypeSymbol { BaseClass: { } inheritedFrom })
+        {
+            ComputeLayout(inheritedFrom, inProgress);
+            offset = inheritedFrom.FieldsSize;
+            alignment = Math.Max(alignment, inheritedFrom.FieldsAlignment);
+        }
+
         foreach (var field in type.Fields)
         {
             // Only a struct field forces its type to be laid out first.
@@ -2089,6 +2487,8 @@ public sealed class Binder(
 
         // Registered before its members are declared, so a self-referential
         // template such as `class Node<T> { Node<T>? next; }` terminates.
+        ReadInheritanceModifiers(type, declaration);
+
         _instantiatedTypes[key] = type;
         if (type is ClassTypeSymbol instantiatedClass) _classes.Add(instantiatedClass);
         if (type is InterfaceTypeSymbol instantiatedInterface) _interfaces.Add(instantiatedInterface);
@@ -2440,9 +2840,24 @@ public sealed class Binder(
         _switchDepth = 0;
         _variantFacts = [];
 
+        // `base(...)` is only a statement at the very head of a constructor, so
+        // the one place it may appear is found before anything is bound and
+        // every other appearance is refused where it stands.
+        _constructorChain = function.Kind == FunctionKind.Constructor
+            ? function.Body.Statements.FirstOrDefault() is
+                ExpressionStatementSyntax { Expression: CallSyntax { Callee: BaseSyntax } head }
+                ? head
+                : null
+            : null;
+
         PushScope();
         var body = BindBlock(function.Body);
         PopScope();
+
+        _constructorChain = null;
+
+        if (function.Kind == FunctionKind.Constructor)
+            body = WithBaseConstruction(function, body);
 
         if (!function.ReturnType.IsVoid() && !AlwaysReturns(body))
             diagnostics.Error("SL0217", function.Span,
@@ -2450,6 +2865,101 @@ public sealed class Binder(
 
         _functions.Add(new BoundFunction(function, body));
         _currentFunction = null;
+    }
+
+    /// <summary>
+    /// The one <c>base(...)</c> a constructor may contain, or null. Compared by
+    /// reference, so a second one anywhere else is not it.
+    /// </summary>
+    private CallSyntax? _constructorChain;
+
+    /// <summary>
+    /// Puts the base construction at the head of a constructor when the source
+    /// did not write one.
+    ///
+    /// A base class is constructed before the derived class's body runs, always:
+    /// the derived body may read what the base set up, and nothing else would
+    /// make that safe. Written explicitly, the call is already the first
+    /// statement; left out, it is the base's parameterless constructor, and
+    /// there being none is an error rather than a class that skips it.
+    /// </summary>
+    private BoundBlock WithBaseConstruction(FunctionSymbol constructor, BoundBlock body)
+    {
+        if (constructor.ContainingType is not ClassTypeSymbol classType) return body;
+        if (classType.BaseClass is null) return body;
+
+        // Written out; BindBaseConstruction already put it first.
+        if (_boundExplicitChain) { _boundExplicitChain = false; return body; }
+
+        if (!TryImplicitBaseConstructor(classType, out var chained))
+        {
+            diagnostics.Error("SL0517", constructor.Span,
+                $"'{NearestConstructing(classType)!.Name}' has no constructor that takes no " +
+                $"arguments, so '{classType.Name}' has to say which one to run: write " +
+                "'base(...)' as the first statement of its constructor");
+            return body;
+        }
+
+        if (chained is null) return body;
+
+        var self = new BoundThis(constructor.Span, classType, constructor.Parameters[0]);
+        var call = new BoundCall(constructor.Span, chained,
+            new BoundConversion(constructor.Span, chained.ContainingType!, self, ConversionKind.Upcast),
+            []) { IsNonVirtual = true };
+
+        return new BoundBlock(body.Span,
+            [new BoundExpressionStatement(constructor.Span, call), .. body.Statements]);
+    }
+
+    /// <summary>Set while binding a constructor whose source wrote its own chain.</summary>
+    private bool _boundExplicitChain;
+
+    /// <summary>
+    /// <c>base(args)</c> at the head of a constructor: run the base's
+    /// constructor over this same object, before this one's body.
+    /// </summary>
+    private BoundExpression BindBaseConstruction(CallSyntax syntax, List<BoundExpression> arguments)
+    {
+        if (!ReferenceEquals(syntax, _constructorChain))
+        {
+            diagnostics.Error("SL0516", syntax.Span,
+                _currentFunction?.Kind == FunctionKind.Constructor
+                    ? "'base(...)' has to be the first statement of the constructor: the base " +
+                      "class is built before this class's body runs, and a body that had already " +
+                      "run would be reading fields nothing had set"
+                    : "'base(...)' constructs the base class, so it belongs at the head of a " +
+                      "constructor and nowhere else");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var classType = (ClassTypeSymbol)_currentFunction!.ContainingType!;
+
+        if (classType.BaseClass is not { } baseClass)
+        {
+            diagnostics.Error("SL0515", syntax.Span,
+                $"'{classType.Name}' derives from nothing, so it has no base to construct");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // Past any class that declares no constructor: there is nothing there
+        // to run, and what is above it still has to be built.
+        if (NearestConstructing(classType) is not { } ancestor)
+        {
+            diagnostics.Error("SL0517", syntax.Span,
+                $"nothing '{classType.Name}' derives from declares a constructor, so there is " +
+                "none to call; remove the 'base(...)'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var chosen = ResolveOverload(
+            ancestor.Constructors, arguments, syntax.Span, $"base {ancestor.Name}");
+        if (chosen is null) return new BoundErrorExpression(syntax.Span);
+
+        var self = new BoundThis(syntax.Span, classType, _currentFunction.Parameters[0]);
+        var receiver = new BoundConversion(syntax.Span, ancestor, self, ConversionKind.Upcast);
+
+        _boundExplicitChain = true;
+        return BuildCall(syntax, chosen, receiver, arguments, nonVirtual: true);
     }
 
     /// <summary>
@@ -4334,6 +4844,8 @@ public sealed class Binder(
         LiteralSyntax literal => BindLiteral(literal),
         NameSyntax name => BindName(name),
         ThisSyntax thisExpression => BindThis(thisExpression),
+        BaseSyntax baseExpression => BindBaseValue(baseExpression),
+        TypeTestSyntax typeTest => BindTypeTest(typeTest),
         UnarySyntax unary => BindUnary(unary),
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
@@ -4397,6 +4909,106 @@ public sealed class Binder(
             : self;
     }
 
+    /// <summary>
+    /// <c>base</c> written where a value belongs. It never is one: it is this
+    /// object seen as its base class, which only means anything when a member is
+    /// being looked up on it.
+    /// </summary>
+    private BoundExpression BindBaseValue(BaseSyntax syntax)
+    {
+        diagnostics.Error("SL0515", syntax.Span,
+            "'base' is not a value; it says where to look a member up, so it is only useful " +
+            "as 'base.Member' or, at the head of a constructor, as 'base(...)'");
+        return new BoundErrorExpression(syntax.Span);
+    }
+
+    /// <summary>
+    /// <c>base</c> as the receiver of a member access: this object, typed as the
+    /// class it derives from.
+    ///
+    /// The conversion emits nothing -- the base subobject starts where the
+    /// object does -- so what it changes is only where the name is looked up,
+    /// and that the call it feeds is not dispatched. Both are the point: an
+    /// override reaching its base through the vtable would find itself.
+    /// </summary>
+    private BoundExpression? BindBaseReceiver(SourceSpan span)
+    {
+        if (_currentFunction?.ContainingType is not ClassTypeSymbol here)
+        {
+            diagnostics.Error("SL0515", span,
+                "'base' is only valid inside a class method, constructor or destructor");
+            return null;
+        }
+
+        if (here.BaseClass is not { } baseClass)
+        {
+            diagnostics.Error("SL0515", span,
+                $"'{here.Name}' derives from nothing, so it has no 'base'");
+            return null;
+        }
+
+        if (BindImplicitThis(span) is not { } self) return null;
+        return new BoundConversion(span, baseClass, self, ConversionKind.Upcast);
+    }
+
+    /// <summary>
+    /// <c>value is Type</c>: whether the object really is one of those.
+    ///
+    /// A test that could never be true is a mistake rather than a constant
+    /// false, and one that must be true is a redundancy worth saying so about.
+    /// </summary>
+    private BoundExpression BindTypeTest(TypeTestSyntax syntax)
+    {
+        var value = BindExpression(syntax.Value);
+        var tested = ResolveType(syntax.Tested, _currentScope!);
+        if (value.Type.IsError() || tested.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (tested is not NamedTypeSymbol { IsReferenceType: true } wanted)
+        {
+            diagnostics.Error("SL0518", syntax.Span,
+                $"'{tested.Name}' is not a class or an interface, so 'is' has nothing to ask: " +
+                "every other type is known exactly where it is written");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (value.Type is WeakTypeSymbol)
+        {
+            diagnostics.Error("SL0518", syntax.Span,
+                $"'{value.Type.Name}' may already have died, so what it is cannot be asked " +
+                "directly; read it into a '" + wanted.Name + "?' first, which is the check " +
+                "that makes it safe to look at");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (value.Type.AsReference() is not NamedTypeSymbol subject)
+        {
+            diagnostics.Error("SL0518", syntax.Span,
+                $"'is' asks what an object really is, and '{value.Type.Name}' is not a reference " +
+                "to one");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // Two classes in different families: no object is ever both.
+        if (subject is ClassTypeSymbol subjectClass && wanted is ClassTypeSymbol wantedClass)
+        {
+            if (!subjectClass.DerivesFrom(wantedClass) && !wantedClass.DerivesFrom(subjectClass))
+            {
+                diagnostics.Error("SL0518", syntax.Span,
+                    $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
+                    "neither derives from the other");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            // Upwards, the answer is settled by the type -- except through an
+            // optional, where it still says 'and not null'.
+            if (subjectClass.DerivesFrom(wantedClass) && value.Type is not OptionalTypeSymbol)
+                diagnostics.Warning("SL0520", syntax.Span,
+                    $"every '{subjectClass.Name}' is a '{wantedClass.Name}', so this is always true");
+        }
+
+        return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, wanted);
+    }
+
     private BoundExpression BindName(NameSyntax syntax)
     {
         var parts = syntax.Name.Parts;
@@ -4421,6 +5033,13 @@ public sealed class Binder(
 
             if (_currentFunction?.ContainingType?.FindField(name) is { } field)
             {
+                if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
+                {
+                    diagnostics.Error("SL0249", syntax.Span,
+                        NotVisible(field.ContainingType, name, field.IsProtected));
+                    return new BoundErrorExpression(syntax.Span);
+                }
+
                 var receiver = BindImplicitThis(syntax.Span);
                 if (receiver is not null) return new BoundFieldAccess(syntax.Span, receiver, field);
             }
@@ -4966,10 +5585,10 @@ public sealed class Binder(
     {
         if (property.Getter is not { } getter) return new BoundErrorExpression(span);
 
-        if (!getter.IsPublic && property.ContainingType.ModuleName != _currentModule!.Name)
+        if (!CanReach(getter.IsPublic, getter.IsProtected, property.ContainingType))
         {
             diagnostics.Error("SL0249", span,
-                $"'{property.ContainingType.Name}.{property.Name}' is not public");
+                NotVisible(property.ContainingType, property.Name, getter.IsProtected));
             return new BoundErrorExpression(span);
         }
 
@@ -5025,11 +5644,15 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        if (!setter.IsPublic && property.ContainingType.ModuleName != _currentModule!.Name)
+        if (!CanReach(setter.IsPublic, setter.IsProtected, property.ContainingType))
         {
             diagnostics.Error("SL0396", syntax.Target.Span,
-                $"'{property.ContainingType.Name}.{property.Name}' can be read from anywhere " +
-                "but only written inside its own module");
+                setter.IsProtected
+                    ? $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
+                      $"anywhere but written only by '{property.ContainingType.Name}' and " +
+                      "classes deriving from it"
+                    : $"'{property.ContainingType.Name}.{property.Name}' can be read from " +
+                      "anywhere but only written inside its own module");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -5433,6 +6056,14 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
+        if (classType.IsAbstract)
+        {
+            diagnostics.Error("SL0514", syntax.Span,
+                $"'{classType.Name}' is abstract, so there is no such object to make; " +
+                "it exists to be derived from. Make one of its derived classes instead");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         // A runtime-provided class is built by its factory, not by sl_alloc.
         if (classType.RuntimeFactory is not null)
         {
@@ -5449,7 +6080,13 @@ public sealed class Binder(
             if (arguments.Count > 0)
                 diagnostics.Error("SL0245", syntax.Span,
                     $"'{classType.Name}' has no constructor, so 'new {classType.Name}()' takes no arguments");
-            return new BoundNew(syntax.Span, classType, null, []);
+
+            // Constructors are not inherited, but a class that declares none is
+            // one whose only construction is its base's -- so that is what runs.
+            // A class with no way to run one reported that where it was
+            // declared, so nothing is said again here.
+            TryImplicitBaseConstructor(classType, out var inherited);
+            return new BoundNew(syntax.Span, classType, inherited, []);
         }
 
         var constructor = ResolveOverload(classType.Constructors, arguments, syntax.Span, $"new {classType.Name}");
@@ -5458,6 +6095,73 @@ public sealed class Binder(
         var converted = ConvertArguments(constructor, arguments, syntax.Arguments);
         return new BoundNew(syntax.Span, classType, constructor, converted);
     }
+
+    /// <summary>
+    /// The base constructor a class chains to when it does not say which.
+    ///
+    /// It is the nearest one up the chain, skipping any class that declares no
+    /// constructor at all -- such a class has nothing to run, and its own base
+    /// still does. A class that declares only constructors taking arguments has
+    /// to be named explicitly, because there is no obvious one to pick.
+    /// </summary>
+    private bool TryImplicitBaseConstructor(
+        ClassTypeSymbol classType, out FunctionSymbol? chained)
+    {
+        chained = null;
+
+        // Nothing up the chain declares one, so there is nothing to run and
+        // nothing to complain about.
+        if (NearestConstructing(classType) is not { } ancestor) return true;
+
+        chained = ancestor.Constructors.FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis));
+        return chained is not null;
+    }
+
+    /// <summary>
+    /// The nearest class up the chain that declares a constructor, or null.
+    ///
+    /// A class that declares none has nothing of its own to run, and its base
+    /// still does, so <c>base(...)</c> reaches past it -- which is also what
+    /// C# means by the implicit constructor such a class is given.
+    /// </summary>
+    private static ClassTypeSymbol? NearestConstructing(ClassTypeSymbol classType)
+    {
+        for (var current = classType.BaseClass; current is not null; current = current.BaseClass)
+            if (current.Constructors.Count > 0) return current;
+
+        return null;
+    }
+
+    /// <summary>
+    /// True when the code being bound may reach a <c>protected</c> member of
+    /// <paramref name="owner"/>: it is inside a class that derives from it.
+    /// </summary>
+    private bool CanReachProtected(NamedTypeSymbol owner) =>
+        owner is ClassTypeSymbol ownerClass &&
+        _currentFunction?.ContainingType is ClassTypeSymbol here &&
+        here.DerivesFrom(ownerClass);
+
+    /// <summary>
+    /// Whether a member of <paramref name="owner"/> with this visibility can be
+    /// named from where binding is.
+    ///
+    /// Public is everywhere. Anything else is its module's, which is what
+    /// privacy has always meant here -- a module is the unit of it. Protected
+    /// adds the one exception: a class deriving from the owner may reach it
+    /// wherever that class lives, because a base class handing something to its
+    /// derived classes and to nobody else is the whole of what the word is for.
+    /// </summary>
+    private bool CanReach(bool isPublic, bool isProtected, NamedTypeSymbol owner) =>
+        isPublic
+        || owner.ModuleName == _currentModule!.Name
+        || (isProtected && CanReachProtected(owner));
+
+    /// <summary>How a diagnostic should describe a member that could not be reached.</summary>
+    private static string NotVisible(NamedTypeSymbol owner, string member, bool isProtected) =>
+        isProtected
+            ? $"'{owner.Name}.{member}' is protected, so only '{owner.Name}' and classes " +
+              "deriving from it may name it"
+            : $"'{owner.Name}.{member}' is not public";
 
     /// <summary>
     /// Flattens a chain of member accesses back into a dotted name, so that
@@ -5638,8 +6342,11 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var receiver = BindExpression(syntax.Target);
-        if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        var receiver = syntax.Target is BaseSyntax
+            ? BindBaseReceiver(syntax.Target.Span)
+            : BindExpression(syntax.Target);
+
+        if (receiver is null || receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         // An inline array's length was written in its type, so it is a constant
         // rather than a load -- and, unlike the other two, it never had to be
@@ -5704,10 +6411,10 @@ public sealed class Binder(
 
         if (namedType.FindField(syntax.Member) is { } field)
         {
-            if (!field.IsPublic && namedType.ModuleName != _currentModule!.Name)
+            if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
             {
                 diagnostics.Error("SL0249", syntax.Span,
-                    $"'{namedType.Name}.{syntax.Member}' is not public");
+                    NotVisible(field.ContainingType, syntax.Member, field.IsProtected));
                 return new BoundErrorExpression(syntax.Span);
             }
             return new BoundFieldAccess(syntax.Span, receiver, field);
@@ -6071,6 +6778,9 @@ public sealed class Binder(
     {
         var arguments = syntax.Arguments.Select(BindArgument).ToList();
 
+        // `base(...)` is the base constructor, not a member of anything.
+        if (syntax.Callee is BaseSyntax) return BindBaseConstruction(syntax, arguments);
+
         // A bare `Ok(x)` builds a variant rather than calling anything. It has
         // to be decided here, before the name is looked up, because a draft has
         // no type yet and overload resolution has nothing to resolve against.
@@ -6150,9 +6860,18 @@ public sealed class Binder(
                 if (receiver is not null)
                 {
                     var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text);
-                    return method is null
-                        ? new BoundErrorExpression(syntax.Span)
-                        : BuildCall(syntax, method, receiver, arguments);
+                    if (method is null) return new BoundErrorExpression(syntax.Span);
+
+                    // Inherited, so it may belong to a base in another module.
+                    var owner = method.ContainingType ?? _currentFunction!.ContainingType!;
+                    if (!CanReach(method.IsPublic, method.IsProtected, owner))
+                    {
+                        diagnostics.Error("SL0257", callee.Span,
+                            NotVisible(owner, callee.Name.Text, method.IsProtected));
+                        return new BoundErrorExpression(syntax.Span);
+                    }
+
+                    return BuildCall(syntax, method, receiver, arguments);
                 }
             }
 
@@ -6334,8 +7053,11 @@ public sealed class Binder(
     private BoundExpression BindMethodCall(
         CallSyntax syntax, MemberAccessSyntax member, List<BoundExpression> arguments)
     {
-        var receiver = BindExpression(member.Target);
-        if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        var receiver = member.Target is BaseSyntax
+            ? BindBaseReceiver(member.Target.Span)
+            : BindExpression(member.Target);
+
+        if (receiver is null || receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (ReachThroughPointer(member, receiver) is not { } reachedThrough)
             return new BoundErrorExpression(syntax.Span);
@@ -6377,10 +7099,10 @@ public sealed class Binder(
 
         if (namedType.FindField(member.Member) is { Type: DelegateTypeSymbol } callable)
         {
-            if (!callable.IsPublic && namedType.ModuleName != _currentModule!.Name)
+            if (!CanReach(callable.IsPublic, callable.IsProtected, callable.ContainingType))
             {
                 diagnostics.Error("SL0249", member.Span,
-                    $"'{namedType.Name}.{member.Member}' is not public");
+                    NotVisible(callable.ContainingType, member.Member, callable.IsProtected));
                 return new BoundErrorExpression(syntax.Span);
             }
 
@@ -6418,9 +7140,10 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        if (!method.IsPublic && namedType.ModuleName != _currentModule!.Name)
+        if (!CanReach(method.IsPublic, method.IsProtected, method.ContainingType ?? namedType))
         {
-            diagnostics.Error("SL0257", member.Span, $"'{namedType.Name}.{member.Member}' is not public");
+            diagnostics.Error("SL0257", member.Span,
+                NotVisible(method.ContainingType ?? namedType, member.Member, method.IsProtected));
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -6430,7 +7153,8 @@ public sealed class Binder(
         if (namedType is StructTypeSymbol)
             receiver = new BoundAddressOf(member.Span, new PointerTypeSymbol(namedType), receiver);
 
-        return BuildCall(syntax, method, receiver, arguments);
+        return BuildCall(syntax, method, receiver, arguments,
+            nonVirtual: member.Target is BaseSyntax);
     }
 
     /// <summary>
@@ -6606,7 +7330,8 @@ public sealed class Binder(
     }
 
     private BoundExpression BuildCall(
-        CallSyntax syntax, FunctionSymbol function, BoundExpression? receiver, List<BoundExpression> arguments)
+        CallSyntax syntax, FunctionSymbol function, BoundExpression? receiver,
+        List<BoundExpression> arguments, bool nonVirtual = false)
     {
         int expected = function.Parameters.Count(p => !p.IsThis);
         bool countOk = function.IsVariadic ? arguments.Count >= expected : arguments.Count == expected;
@@ -6620,7 +7345,8 @@ public sealed class Binder(
         }
 
         var converted = ConvertArguments(function, arguments, syntax.Arguments);
-        return new BoundCall(syntax.Span, function, receiver, converted);
+        return new BoundCall(syntax.Span, function, receiver, converted)
+            { IsNonVirtual = nonVirtual };
     }
 
     private List<BoundExpression> ConvertArguments(
@@ -7032,6 +7758,17 @@ public sealed class Binder(
         if (from is ArrayTypeSymbol whole && to is SliceTypeSymbol asSlice)
             return whole.Element.Equals(asSlice.Element) ? ConversionKind.ArrayToSlice : null;
 
+        // A derived class is a base class. With single inheritance the base
+        // subobject starts where the object does, so this is the same pointer
+        // and emits nothing; the other direction is a check.
+        if (from is ClassTypeSymbol fromDerived && to is ClassTypeSymbol toBase)
+        {
+            if (fromDerived.DerivesFrom(toBase)) return ConversionKind.Upcast;
+            return explicitCast && toBase.DerivesFrom(fromDerived)
+                ? ConversionKind.Downcast
+                : null;
+        }
+
         // A class converts to any interface it implements, and an interface to
         // any it extends. Because a reference is the same pointer either way,
         // this costs nothing at run time.
@@ -7044,9 +7781,19 @@ public sealed class Binder(
                 ? ConversionKind.ClassToInterface
                 : null;
 
-        // C -> C?  and  weak C? -> C? are reference identities at runtime.
+        // C -> C?  and  weak C? -> C? are reference identities at runtime, and
+        // so is Derived -> Base?, which is both conversions at once and neither
+        // of them any instructions.
         if (from is ClassTypeSymbol fromClass && to is OptionalTypeSymbol toOptional)
-            return fromClass.Equals(toOptional.Element) ? ConversionKind.ReferenceToOptional : null;
+            return toOptional.Element is ClassTypeSymbol optionalBase && fromClass.DerivesFrom(optionalBase)
+                ? ConversionKind.ReferenceToOptional
+                : null;
+
+        // Derived? -> Base?, for the same reason.
+        if (from is OptionalTypeSymbol { Element: ClassTypeSymbol optionalDerived } &&
+            to is OptionalTypeSymbol { Element: ClassTypeSymbol optionalWantedBase } &&
+            optionalDerived.DerivesFrom(optionalWantedBase))
+            return ConversionKind.Upcast;
 
         if (from is InterfaceTypeSymbol fromInterface && to is OptionalTypeSymbol toOptionalInterface)
             return fromInterface.Equals(toOptionalInterface.Element)
@@ -7072,9 +7819,18 @@ public sealed class Binder(
 
         // C? -> C discards a null check, so it must be explicit.
         if (from is OptionalTypeSymbol fromOptional && to is NamedTypeSymbol { IsReferenceType: true })
-            return explicitCast && fromOptional.Element.Equals(to)
-                ? ConversionKind.PointerCast
+        {
+            if (!explicitCast) return null;
+            if (fromOptional.Element.Equals(to)) return ConversionKind.PointerCast;
+
+            // Derived? -> Base loses the null and nothing else; Base? -> Derived
+            // loses the null and checks what is left.
+            return fromOptional.Element is ClassTypeSymbol optionalSource && to is ClassTypeSymbol castTarget
+                ? optionalSource.DerivesFrom(castTarget) ? ConversionKind.PointerCast
+                  : castTarget.DerivesFrom(optionalSource) ? ConversionKind.Downcast
+                  : null
                 : null;
+        }
 
         if (from is PointerTypeSymbol && to is PointerTypeSymbol)
         {
@@ -7706,6 +8462,7 @@ internal sealed class StaticReferenceWalker
                 break;
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
+            case BoundTypeTest test: Visit(test.Value); break;
 
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);
@@ -7850,6 +8607,7 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 break;
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
+            case BoundTypeTest test: Visit(test.Value); break;
 
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);

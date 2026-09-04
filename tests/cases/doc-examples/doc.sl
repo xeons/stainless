@@ -257,6 +257,47 @@ static readonly int Doubled = Base * 2;
 static readonly int Base    = 20;
 
 
+// --- README "Inheritance" / spec 2.4.1 and 2.4.2 --------------------------
+public abstract class DocShape {
+    protected int sides;
+
+    DocShape(int howMany) { sides = howMany; }
+
+    public abstract double Area();
+    public virtual String Name() { return "shape"; }
+}
+
+public class DocPolygon : DocShape {
+    double width;
+
+    DocPolygon(int howMany, double w) {
+        base(howMany);
+        width = w;
+    }
+
+    public override double Area() { return width * width; }
+    public override String Name() { return "polygon"; }
+}
+
+public sealed class DocSquare : DocPolygon {
+    DocSquare(double side) { base(4, side); }
+
+    public sealed override String Name() { return "square"; }
+}
+
+String Inherits() {
+    DocShape shape = new DocSquare(3.0);
+
+    String answer = shape.Name() + ":" + Text.FromDouble(shape.Area());
+
+    if (shape is DocSquare) {
+        DocSquare square = (DocSquare)shape;
+        answer = answer + ":" + Text.FromDouble(square.Area());
+    }
+
+    return answer + ":" + Text.FromBool(shape is DocPolygon);
+}
+
 // --- README "Variants" / spec 2.5 -----------------------------------------
 public variant Shape {
     Circle(double Radius);
@@ -470,6 +511,7 @@ int Main() {
     printf("slices=%s\n", Slicing().ToPointer());
     printf("byref=%s\n", ByReference().ToPointer());
     printf("shapes=%s\n", Shapes().ToPointer());
+    printf("inherits=%s\n", Inherits().ToPointer());
     printf("done\n");
     return 0;
 }

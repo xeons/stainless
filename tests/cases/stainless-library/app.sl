@@ -30,6 +30,20 @@ int Main() {
     // last reference, and the library's destructor ran when it went.
     Console.WriteLine("destroyed=" + Text.FromInteger(tally.Destroyed));
 
+    // A virtual call across the boundary reaches the object's own
+    // implementation, not the declaration the consumer can see.
+    Note made = MakeUrgent();
+    Console.WriteLine(made.Body());
+    Console.WriteLine(Text.FromInteger(made.Weight()));
+    Console.WriteLine(Text.FromBool(made is Urgent));
+
+    // And one allocated on this side, through the library's own TypeInfo.
+    Note here = new Urgent();
+    Console.WriteLine(here.Body());
+
+    Urgent back = (Urgent)made;
+    Console.WriteLine(back.Body());
+
     Console.WriteLine(Text.FromInteger(KindOf(Kind.Square)));
 
     Point point;

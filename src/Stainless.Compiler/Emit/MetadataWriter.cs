@@ -240,6 +240,7 @@ public static class MetadataWriter
         Size = type.FieldsSize,
         Alignment = type.FieldsAlignment,
         TypeInfoSymbol = Mangler.TypeInfoSymbol(type),
+        Base = type.BaseClass?.QualifiedName,
         Fields = type.Fields.Select(Describe).ToList(),
 
         // Constructors and the destructor are methods as far as a consumer is
@@ -294,6 +295,7 @@ public static class MetadataWriter
         Symbol = function.MangledName,
         Kind = function.Kind,
         IsVariadic = function.IsVariadic,
+        VirtualSlot = function.VirtualSlot,
         Accessor = function.Accessor?.Name,
         Module = function.ContainingType is null ? function.ModuleName : null,
         Parameters = function.Parameters

@@ -294,8 +294,9 @@ public sealed class DebugInfo
             {
                 int id = Reserve();
                 _types[type] = id;
-                int body = Composite(classType, classType.InstanceSize, ClassTypeSymbol.HeaderSize);
-                Fill(id, $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{body}, size: 64)");
+                Fill(id,
+                    $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{Body(classType)}, " +
+                    "size: 64)");
                 return id;
             }
 
@@ -380,6 +381,19 @@ public sealed class DebugInfo
     /// offset is measured from the start of the fields area rather than from the
     /// start of the allocation, and DWARF wants the latter.
     /// </summary>
+    /// <summary>
+    /// The body node of a class: the object, not the reference to it. Cached,
+    /// because a derived class names its base's body and would otherwise emit a
+    /// second copy of it for every class in the family.
+    /// </summary>
+    private int Body(ClassTypeSymbol classType) =>
+        _bodies.TryGetValue(classType, out int found)
+            ? found
+            : _bodies[classType] =
+                Composite(classType, classType.InstanceSize, ClassTypeSymbol.HeaderSize);
+
+    private readonly Dictionary<NamedTypeSymbol, int> _bodies = [];
+
     private int Composite(NamedTypeSymbol type, int size, int headerBytes)
     {
         int id = Reserve();
@@ -387,6 +401,18 @@ public sealed class DebugInfo
 
         string where = Position(type.Span);
         var members = new List<int>();
+
+        // DWARF says a derived type inherits: one member naming the base, at the
+        // offset the base subobject starts at -- which is zero, and is the whole
+        // reason the model is what it is. The base's own node carries its fields
+        // and the object header, so neither is repeated here.
+        if (type is ClassTypeSymbol { BaseClass: { } inheritedFrom })
+        {
+            members.Add(Add(
+                $"!DIDerivedType(tag: DW_TAG_inheritance, baseType: !{Body(inheritedFrom)}, " +
+                "offset: 0)"));
+            headerBytes = 0;
+        }
 
         if (headerBytes > 0)
         {

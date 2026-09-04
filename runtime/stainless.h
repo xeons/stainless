@@ -100,6 +100,22 @@ struct SlTypeInfo {
     const SlFieldInfo  *fields;
     size_t              attributeCount;
     const SlAttribute  *attributes;
+
+    /*
+     * The class this one derives from, or NULL. A downcast walks this chain,
+     * which is the only thing at run time that knows a hierarchy exists: an
+     * upcast is the same pointer and needs nothing.
+     */
+    const SlTypeInfo   *base;
+
+    /*
+     * vtable[slot] is the implementation this class supplies for that slot,
+     * inherited entries included. NULL for a class with no virtual methods.
+     * Slots are assigned per family rather than per program, so a virtual call
+     * is a load of this pointer and an index -- one load fewer than an
+     * interface call, which has an id to look up first.
+     */
+    const void *const  *vtable;
 };
 
 typedef struct SlObject {
@@ -142,6 +158,24 @@ void  sl_fail(const char *message);
 /* The integer divisions LLVM leaves undefined. Neither returns. */
 void  sl_divide_by_zero(void);
 void  sl_divide_overflow(void);
+
+/* ----------------------------------------------------------- inheritance */
+
+/*
+ * Whether `object` is a `type` -- that class or one deriving from it. NULL is
+ * nothing's instance, which is what makes a cast from an optional a single
+ * check rather than two.
+ */
+int   sl_is_instance(const void *object, const SlTypeInfo *type);
+
+/* Whether `object`'s class supplies a dispatch table for that interface id. */
+int   sl_implements(const void *object, size_t interfaceId);
+
+/*
+ * A checked downcast that did not hold. Names what the object really is, which
+ * is the question the programmer is about to ask. Never returns.
+ */
+void  sl_cast_failed(const void *object, const char *wanted);
 
 /* ----------------------------------------------------------------- String */
 

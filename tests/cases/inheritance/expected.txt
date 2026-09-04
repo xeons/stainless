@@ -1,0 +1,23 @@
+a square with 4 sides, area 9, sides 4
+circle with 1 sides, area 12, sides 1
+a polygon with 6 sides, area 25, sides 6
+through the interface: square
+square is Square: true
+square is Polygon: true
+circle is Polygon: false
+circle is INamed: true
+corners: 4
+sides 4, corners 4, area 49
+dot sides: 1
+point sides: 1, name dot
+pixel sides: 1, shade 9, name pixel
+counter 21, doubling 42
+total area: 46
+dropping a Leaf:
+  made one
+  ~Leaf
+  ~Middle
+    ~Held middle
+  ~Root
+    ~Held root
+done

@@ -40,6 +40,23 @@ public class Counter {
     public String Describe() { return Label + ":" + Text.FromInteger(count); }
 }
 
+/// A hierarchy, so that dispatch and the base relation both have to survive
+/// being written to metadata and read back by a separate compilation. A
+/// consumer may not derive from these -- the layout is compiled here and its
+/// dispatch table would be built there -- but it can hold one, call it, ask
+/// what it is, and cast back to it.
+public class Note {
+    public virtual String Body() { return "note"; }
+    public virtual int Weight() { return 1; }
+}
+
+public class Urgent : Note {
+    public override String Body() { return "urgent"; }
+}
+
+/// Made on this side, held as the base on the other.
+public Note MakeUrgent() { return new Urgent(); }
+
 public int KindOf(Kind kind) { return (int)kind; }
 
 public Point Scale(Point p, double by) {

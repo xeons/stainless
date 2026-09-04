@@ -75,6 +75,41 @@ public sealed class FunctionSymbol
     public bool IsPublic { get; init; }
     public bool IsVariadic { get; init; }
 
+    /// <summary>
+    /// Visible to this type and anything deriving from it, wherever that is.
+    /// Never true at the same time as <see cref="IsPublic"/>.
+    /// </summary>
+    public bool IsProtected { get; init; }
+
+    /// <summary>Declared <c>virtual</c>, <c>override</c> or <c>abstract</c>.</summary>
+    public bool IsVirtual { get; init; }
+
+    /// <summary>Declared <c>override</c>: it replaces something inherited.</summary>
+    public bool IsOverride { get; init; }
+
+    /// <summary>Declared <c>abstract</c>: no body, and a derived class must supply one.</summary>
+    public bool IsAbstract { get; init; }
+
+    /// <summary>Declared <c>sealed</c>: an override nothing may override further.</summary>
+    public bool IsSealed { get; init; }
+
+    /// <summary>
+    /// Position in the class's vtable, or -1 for a method reached by name.
+    ///
+    /// Assigned once per class, root downwards, so an override lands in the slot
+    /// it replaces and a new virtual is appended after everything inherited.
+    /// That is what makes a call through a base reference reach the derived
+    /// body: the slot number is a property of the declaration, not of the
+    /// receiver's static type.
+    /// </summary>
+    public int VirtualSlot { get; set; } = -1;
+
+    /// <summary>The inherited method this one replaces, or null.</summary>
+    public FunctionSymbol? Overridden { get; set; }
+
+    /// <summary>True when a call to this goes through the vtable.</summary>
+    public bool IsDispatched => VirtualSlot >= 0;
+
     public List<ParameterSymbol> Parameters { get; } = [];
 
     /// <summary>
@@ -181,6 +216,7 @@ public sealed class PropertySymbol
     public required NamedTypeSymbol ContainingType { get; init; }
     public required Source.SourceSpan Span { get; init; }
     public bool IsPublic { get; init; }
+    public bool IsProtected { get; init; }
 
     public FunctionSymbol? Getter { get; set; }
     public FunctionSymbol? Setter { get; set; }

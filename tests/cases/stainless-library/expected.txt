@@ -4,5 +4,10 @@ clicks:6
 clicks
 0
 destroyed=1
+urgent
+1
+true
+urgent
+urgent
 1
 14
