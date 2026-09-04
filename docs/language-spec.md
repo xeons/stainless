@@ -514,46 +514,6 @@ variant's cases are what a consumer would switch on), and carry `[Reflect]`
 (SL0442 — the field tables would describe the tag and the payload, which are not
 fields the program has).
 
-### 2.6.1 Nameless members
-
-A `struct` or `union` member may have no name, in which case its members are
-reached as though they belonged to the type that holds it. This is C's, and the
-Windows headers lean on it: `SYSTEM_INFO`, `OVERLAPPED` and `LARGE_INTEGER` all
-begin with one.
-
-```csharp
-public struct SystemInfo {
-    public union {
-        public uint OemId;
-        public struct {
-            public ushort Architecture;
-            public ushort Reserved;
-        }
-    }
-    public uint PageSize;
-}
-
-info.Architecture       // reads the low half of the first word
-info.OemId              // reads the whole of it
-info.PageSize           // at offset 4, as in C
-```
-
-The member is real and carries the layout — a nameless `union` overlaps its
-members and a nameless `struct` lays them out in order, exactly as a named one
-would. Only the *name* is missing, and lookup reaches through it.
-
-Lookup is breadth-first, so a name the outer type declares itself wins over one
-further in. Two nameless members at the same depth both declaring it is an
-error rather than a guess:
-
-```
-error[SL0492]: 'Value' is ambiguous: 2 nameless members of 'Ambiguous' declare
-it. Give one of them a name, so that the one you mean can be said
-```
-
-A generated C header writes a nameless member back as one, nested where it was
-written, so the header says what the source said.
-
 ### 2.7 `union` — every member at offset zero
 
 A `union` is C's, and it is here for the reason `extern "C"` is here. A great
@@ -604,6 +564,46 @@ implements no interface, because an interface reference is a counted pointer and
 a union is a plain C value (SL0302). `[Packed]` and `[Align]` apply to one as
 they do to a struct. A generated C header writes it as a C `union`, member for
 member.
+
+### 2.7.1 Nameless members
+
+A `struct` or `union` member may have no name, in which case its members are
+reached as though they belonged to the type that holds it. This is C's, and the
+Windows headers lean on it: `SYSTEM_INFO`, `OVERLAPPED` and `LARGE_INTEGER` all
+begin with one.
+
+```csharp
+public struct SystemInfo {
+    public union {
+        public uint OemId;
+        public struct {
+            public ushort Architecture;
+            public ushort Reserved;
+        }
+    }
+    public uint PageSize;
+}
+
+info.Architecture       // reads the low half of the first word
+info.OemId              // reads the whole of it
+info.PageSize           // at offset 4, as in C
+```
+
+The member is real and carries the layout — a nameless `union` overlaps its
+members and a nameless `struct` lays them out in order, exactly as a named one
+would. Only the *name* is missing, and lookup reaches through it.
+
+Lookup is breadth-first, so a name the outer type declares itself wins over one
+further in. Two nameless members at the same depth both declaring it is an
+error rather than a guess:
+
+```
+error[SL0492]: 'Value' is ambiguous: 2 nameless members of 'Ambiguous' declare
+it. Give one of them a name, so that the one you mean can be said
+```
+
+A generated C header writes a nameless member back as one, nested where it was
+written, so the header says what the source said.
 
 ### 2.8 `Result<T, E>` — how a function fails
 
@@ -794,7 +794,9 @@ through either reference reaches the right one, and a call on `Both` itself
 picks by argument type. What may *not* be overloaded is a method of one
 interface, since that is one slot.
 
-### 2.10 `T[]` — a counted array
+### 2.10 Arrays
+
+#### 2.10.1 `T[]` — a counted array
 
 ```csharp
 var numbers = new int[5];
@@ -815,7 +817,7 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
-### 2.10.1 `T[N]` — an inline array
+#### 2.10.2 `T[N]` — an inline array
 
 ```csharp
 public struct FindData {

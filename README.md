@@ -627,8 +627,8 @@ than every program that compiles it repeating `-l` on the command line.
 ### The Win32 API
 
 [bindings/win32](bindings/win32) is what all of the above adds up to: 259
-Windows entry points, 468 constants and 28 structs, unions, enums and delegates,
-with 141 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
+Windows entry points, 460 constants and 27 structs, unions, enums and delegates,
+with 145 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
 Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
 `delegate`, which is the bare function pointer Windows calls.
 
@@ -682,7 +682,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 152 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 153 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -1070,8 +1070,8 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
-- [bindings/win32](bindings/win32): the Windows API — 259 entry points, 468
-  constants and 28 structs, unions, enums and delegates — as declarations
+- [bindings/win32](bindings/win32): the Windows API — 259 entry points, 460
+  constants and 27 structs, unions, enums and delegates — as declarations
   rather than a marshalling layer, in two layers a module name apart:
   `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
   Source a program compiles rather than part of the standard library, because
@@ -1191,7 +1191,31 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Statics are module-level only**, and a `--shared` library cannot have one:
   there is no entry point to initialize it from. No `static` members on a type,
   and no per-thread storage.
-- **Win64 only** for struct passing; the SysV classifier is not written.
+- **Win64 only** for struct passing; the SysV classifier is not written, so
+  `--abi itanium` reaches name mangling and bit-field packing and not the
+  calling convention.
+- **No calling conventions.** `__stdcall`, `__fastcall` and `__vectorcall`
+  cannot be written. On x64 that costs almost nothing — there is one convention
+  and only `__vectorcall` differs — but it is the whole story on x86, where
+  `__stdcall` is what Win32 uses.
+- **No type aliases.** There is no `using Handle = void*;`, so a binding spells
+  `HANDLE`, `HWND` and `HDC` all as `void*` and nothing catches passing one
+  where another belongs. Opaque struct types would make those distinct at no
+  cost, and the two want doing together.
+- **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
+  to a `uint` parameter without a cast, which is why
+  [bindings/win32](bindings/win32) spells 460 constants as bare `const uint`
+  rather than as the typed sets they are.
+- **There is no `->`.** `(*state).Field`, not `state->Field`, which is every
+  line of code that walks a struct pointer.
+- **An inline array holds plain data only** and cannot be passed by value
+  (SL0486, SL0491). The first is the same question a union cannot answer; the
+  second is because C decays an array parameter to a pointer and Stainless has
+  no decay, so `ref T[N]` is the spelling that lines up.
+- **No COM**, and so nothing reached through it: `SHGetKnownFolderPath`,
+  Direct2D, WIC, the modern shell. A COM interface is binary-identical to a
+  pointer to a vtable pointer, so this needs no C++ object model — only
+  `IUnknown` discipline and a struct of `delegate`s.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
   Stainless library be consumed by Stainless, but a generic, a class that
   implements an interface, a variant and a slice all stay behind: a template
@@ -1209,8 +1233,11 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **No `out`, no `ref` locals and no `ref` returns.** `out` would need
   definite-assignment analysis to be worth having over `ref`; the other two
   would need a lifetime story the language does not have.
-- `Main` takes no arguments. Field initializers are rejected — assign in a
-  constructor. `delete` is reserved but unused.
+- `Main` takes no arguments, and arguments after `--` are accepted and then
+  dropped. Field initializers are rejected — assign in a constructor. `delete`
+  is reserved but unused.
+
+What is being worked on next, and the known bugs, are in **[TODO.md](TODO.md)**.
 
 ## Repository layout
 

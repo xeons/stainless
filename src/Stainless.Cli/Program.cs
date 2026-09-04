@@ -79,7 +79,10 @@ internal static class Program
 
               A library the linker can find for itself is named with '-l'
               instead of by path: '-l user32' rather than the full path into
-              whichever Windows SDK happens to be installed.
+              whichever Windows SDK happens to be installed. A source file can
+              name one itself with '#pragma comment(lib, "user32")', which is
+              usually better: the module that calls into a library is the one
+              that knows it needs it.
 
             OPTIONS
               -o, --out <path>     output file (default: after the first source)

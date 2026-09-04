@@ -72,6 +72,42 @@ In DWARF a bit-field is a member with `DIFlagBitField`, a `size` in bits, an
 the storage unit — the third being what a debugger needs to know which bytes to
 load before shifting.
 
+### 1.3 Inline array layout
+
+`T[N]` is N elements end to end, with no header, no length and no padding
+between them:
+
+```
+size      = sizeof(T) * N
+alignment = alignof(T)
+```
+
+That is C's rule exactly, which is the point: a struct with a `ushort[260]`
+field is the same bytes as the C struct with `WCHAR cFileName[260]`, and
+`WIN32_FIND_DATAW` comes out 592 bytes with its name at offset 44 on both
+sides. LLVM is told `[N x T]`, so the element type is visible to the optimiser
+rather than hidden behind a byte count.
+
+An inline array crosses `extern "C"` only behind a `ref` or `in`, which is
+`T (*)[N]` in C. Passing one by value is refused (SL0491), because C decays an
+array parameter to a pointer and Stainless has no decay: the two would disagree
+about the ABI silently.
+
+### 1.4 Nameless members
+
+A nameless `struct` or `union` member is laid out as an ordinary member of its
+kind -- a nameless union overlaps, a nameless struct runs in order -- so the
+offsets are the ones C computes and nothing about the ABI is special. What is
+generated is a type to hold it and a field to be it, both named with a `$` no
+source identifier may contain, so neither can be written nor collided with.
+
+Name lookup then reaches through such a field, breadth-first, and builds one
+field access per level. Nothing survives to run time: `info.Architecture` is the
+same constant-offset load it would be if the field had been declared directly.
+
+A generated C header writes the member back as a nameless one, and gives the
+generated type no typedef of its own.
+
 ## 2. Object header (class instances)
 
 Reference types are heap blocks laid out as:
@@ -230,42 +266,6 @@ to index.
 
 No member may hold a counted reference, and that is a rule about what a union
 can answer rather than one added for safety — see §2.7 of the language spec.
-
-### 2.4.1 Inline array layout
-
-`T[N]` is N elements end to end, with no header, no length and no padding
-between them:
-
-```
-size      = sizeof(T) * N
-alignment = alignof(T)
-```
-
-That is C's rule exactly, which is the point: a struct with a `ushort[260]`
-field is the same bytes as the C struct with `WCHAR cFileName[260]`, and
-`WIN32_FIND_DATAW` comes out 592 bytes with its name at offset 44 on both
-sides. LLVM is told `[N x T]`, so the element type is visible to the optimiser
-rather than hidden behind a byte count.
-
-An inline array crosses `extern "C"` only behind a `ref` or `in`, which is
-`T (*)[N]` in C. Passing one by value is refused (SL0491), because C decays an
-array parameter to a pointer and Stainless has no decay: the two would disagree
-about the ABI silently.
-
-### 2.4.2 Nameless members
-
-A nameless `struct` or `union` member is laid out as an ordinary member of its
-kind -- a nameless union overlaps, a nameless struct runs in order -- so the
-offsets are the ones C computes and nothing about the ABI is special. What is
-generated is a type to hold it and a field to be it, both named with a `$` no
-source identifier may contain, so neither can be written nor collided with.
-
-Name lookup then reaches through such a field, breadth-first, and builds one
-field access per level. Nothing survives to run time: `info.Architecture` is the
-same constant-offset load it would be if the field had been declared directly.
-
-A generated C header writes the member back as a nameless one, and gives the
-generated type no typedef of its own.
 
 ### 2.5 Slice layout
 
