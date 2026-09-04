@@ -29,6 +29,12 @@ namespace Stainless.Tests;
 ///   errors.txt     the program must fail to compile, and every diagnostic code
 ///                  this file names -- warnings included -- must be reported
 ///
+/// A case containing warnings.txt must additionally report every code that file
+/// names, whether or not the build then fails. It is how a warning is pinned --
+/// what a library's metadata leaves out, above all, which is reported where the
+/// library is built rather than where a consumer trips over it, and so is not
+/// among the diagnostics of the compilation the case is otherwise about.
+///
 /// A case containing defines.txt is built with each of its lines passed as -D,
 /// and one containing abi.txt is built for the ABI that file names.
 ///
@@ -237,6 +243,11 @@ internal static class Program
         string? referencePath = null;
         string? importLibrary = null;
 
+        // A warning about what a library's metadata leaves out is reported where
+        // the library is built, so that build's diagnostics have to be kept for
+        // warnings.txt to be able to name one.
+        IReadOnlyList<Source.Diagnostic> libraryDiagnostics = [];
+
         if (Directory.Exists(libraryDirectory))
         {
             var librarySources = Directory.EnumerateFiles(libraryDirectory, "*.sl")
@@ -255,6 +266,8 @@ internal static class Program
                 Shared = true,
                 MetadataPath = referencePath,
             });
+
+            libraryDiagnostics = libraryResult.Diagnostics;
 
             if (!libraryResult.Success)
                 return (false, "the library failed to build:\n" +
@@ -296,6 +309,27 @@ internal static class Program
         catch (Exception e)
         {
             return (false, $"the compiler threw {e.GetType().Name}: {e.Message}\n{e.StackTrace}");
+        }
+
+        // --- warnings, whether or not the build went on to fail -----------
+        string expectedWarningsPath = Path.Combine(directory, "warnings.txt");
+        if (File.Exists(expectedWarningsPath))
+        {
+            var wanted = File.ReadAllLines(expectedWarningsPath)
+                .Select(l => l.Trim())
+                .Where(l => l.Length > 0 && !l.StartsWith('#'))
+                .ToList();
+
+            var reported = libraryDiagnostics
+                .Select(d => d.Code)
+                .Concat(result.Diagnostics.Select(d => d.Code))
+                .ToList();
+
+            var absent = wanted.Where(w => !reported.Contains(w)).ToList();
+            if (absent.Count > 0)
+                return (false,
+                    $"expected warning(s) {string.Join(", ", absent)}\n" +
+                    $"but got          {(reported.Count == 0 ? "(none)" : string.Join(", ", reported))}");
         }
 
         // --- compile-failure cases ---------------------------------------

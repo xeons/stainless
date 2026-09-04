@@ -246,11 +246,23 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
     private FunctionSymbol Declare(
         MetadataFunction described, string moduleName, NamedTypeSymbol? containingType)
     {
+        // A return type that does not resolve was silently becoming 'void',
+        // which is the one answer that is never right: a call would bind, and
+        // the value it was meant to produce would simply not be there.
+        var returns = Resolve(described.Returns);
+        if (returns is null)
+        {
+            diagnostics.Error("SL0418", ReferencedSpan,
+                $"'{described.Name}' returns a '{described.Returns}', which this program " +
+                "does not know");
+            returns = ErrorTypeSymbol.Instance;
+        }
+
         var symbol = new FunctionSymbol
         {
             Name = described.Name,
             ModuleName = moduleName,
-            ReturnType = Resolve(described.Returns) ?? PrimitiveTypeSymbol.Void,
+            ReturnType = returns,
             Linkage = LinkageKind.Stainless,
             Kind = described.Kind,
             ContainingType = containingType,
