@@ -332,6 +332,16 @@ String Slicing() {
            Text.FromInteger((int)tail.Length) + ":" + text;
 }
 
+
+// --- README "Conditional compilation" / spec 10 ---------------------------
+#if WINDOWS
+String Where() { return "a platform"; }
+#elif UNIX
+String Where() { return "a platform"; }
+#else
+#error this platform is not one of the ones this file knows
+#endif
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -404,6 +414,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("where=%s\n", Where().ToPointer());
     printf("slices=%s\n", Slicing().ToPointer());
     printf("byref=%s\n", ByReference().ToPointer());
     printf("shapes=%s\n", Shapes().ToPointer());

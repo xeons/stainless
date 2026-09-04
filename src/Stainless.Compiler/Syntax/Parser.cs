@@ -31,11 +31,12 @@ public sealed class Parser
     private DiagnosticBag _diagnostics;
     private int _pos;
 
-    public Parser(SourceText source, DiagnosticBag diagnostics)
+    public Parser(
+        SourceText source, DiagnosticBag diagnostics, IReadOnlyCollection<string>? symbols = null)
     {
         _source = source;
         _diagnostics = diagnostics;
-        _tokens = new Lexer(source, diagnostics).Tokenize();
+        _tokens = new Lexer(source, diagnostics, symbols).Tokenize();
     }
 
     // ------------------------------------------------------------ token helpers

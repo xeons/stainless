@@ -21,13 +21,43 @@ using Stainless.Source;
 namespace Stainless.Syntax;
 
 /// <summary>
-/// Turns source text into a token stream. There is no preprocessor: what the
-/// lexer sees is exactly what the programmer wrote.
+/// Turns source text into a token stream.
+///
+/// The only thing between the text and the tokens is conditional compilation,
+/// in the form C# has it: <c>#if</c> and its relatives choose which lines are
+/// lexed at all, and <c>#define</c> names a symbol for them to test. There is no
+/// macro, no textual substitution and no <c>#include</c> -- a name never stands
+/// for anything but itself, and a declaration is still found without a header.
+///
+/// Text inside a branch that is not taken is skipped a line at a time, and only
+/// a directive is looked for in it. So a branch for another platform need not
+/// parse, which is the whole point of choosing at this level rather than later.
 /// </summary>
-public sealed class Lexer(SourceText source, DiagnosticBag diagnostics)
+public sealed class Lexer(
+    SourceText source, DiagnosticBag diagnostics, IReadOnlyCollection<string>? symbols = null)
 {
     private readonly string _text = source.Text;
     private int _pos;
+
+    /// <summary>Symbols <c>#if</c> tests: the build's, plus any <c>#define</c>d here.</summary>
+    private readonly HashSet<string> _symbols =
+        new(symbols ?? [], StringComparer.Ordinal);
+
+    /// <summary>
+    /// One entry per open <c>#if</c>: whether this branch is being taken, and
+    /// whether any branch of the group already has been. The second is what
+    /// makes <c>#elif</c> after a taken branch stay shut.
+    /// </summary>
+    private readonly List<(bool Active, bool Taken, bool SawElse, int Start)> _conditions = [];
+
+    /// <summary>
+    /// True once a real token has been produced. <c>#define</c> and <c>#undef</c>
+    /// must come before that, as in C#: a symbol whose meaning changed halfway
+    /// down a file would make the lines above and below it disagree.
+    /// </summary>
+    private bool _sawToken;
+
+    private bool Skipping => _conditions.Any(c => !c.Active);
 
     private char Current => Peek(0);
     private char Peek(int offset) => _pos + offset < _text.Length ? _text[_pos + offset] : '\0';
@@ -42,6 +72,11 @@ public sealed class Lexer(SourceText source, DiagnosticBag diagnostics)
             if (token.Kind != TokenKind.Bad) tokens.Add(token);
             if (token.Kind == TokenKind.EndOfFile) break;
         }
+
+        foreach (var open in _conditions)
+            diagnostics.Error("SL0454", new SourceSpan(source, open.Start, open.Start + 3),
+                "this '#if' is never closed; add '#endif'");
+
         return tokens;
     }
 
@@ -53,6 +88,7 @@ public sealed class Lexer(SourceText source, DiagnosticBag diagnostics)
         if (_pos >= _text.Length)
             return new Token(TokenKind.EndOfFile, SpanFrom(start), "");
 
+        _sawToken = true;
         char c = Current;
         if (char.IsLetter(c) || c == '_') return LexIdentifierOrKeyword(start);
         if (char.IsAsciiDigit(c)) return LexNumber(start);
@@ -65,6 +101,22 @@ public sealed class Lexer(SourceText source, DiagnosticBag diagnostics)
     {
         while (_pos < _text.Length)
         {
+            // A directive is only a directive at the start of a line, so a '#'
+            // anywhere else is left alone for the punctuation lexer to reject.
+            if (Current == '#' && AtLineStart()) { Directive(); continue; }
+
+            // Inside a branch that was not taken, nothing is lexed: the line is
+            // consumed whole and only the next directive is looked for. Leading
+            // whitespace goes first, because a nested directive is usually
+            // indented and swallowing it would unbalance the group.
+            if (Skipping)
+            {
+                while (_pos < _text.Length && (Current == ' ' || Current == '	')) _pos++;
+                if (_pos < _text.Length && Current == '#') { Directive(); continue; }
+                SkipLine();
+                continue;
+            }
+
             char c = Current;
             if (char.IsWhiteSpace(c)) { _pos++; continue; }
 
@@ -92,6 +144,271 @@ public sealed class Lexer(SourceText source, DiagnosticBag diagnostics)
 
             break;
         }
+    }
+
+    // ============================================================ directives
+
+    /// <summary>True when only whitespace separates this position from a line break.</summary>
+    private bool AtLineStart()
+    {
+        for (int i = _pos - 1; i >= 0; i--)
+        {
+            if (_text[i] == '\n') return true;
+            if (!char.IsWhiteSpace(_text[i])) return false;
+        }
+        return true;
+    }
+
+    private void SkipLine()
+    {
+        while (_pos < _text.Length && Current != '\n') _pos++;
+        if (_pos < _text.Length) _pos++;
+    }
+
+    /// <summary>
+    /// One directive, from its <c>#</c> to the end of the line.
+    ///
+    /// Every one of them is handled even inside a branch that is not being
+    /// taken, because the nesting has to stay balanced either way -- but only
+    /// <c>#if</c> and its relatives do anything there.
+    /// </summary>
+    private void Directive()
+    {
+        int start = _pos;
+        _pos++;                                             // the '#'
+
+        while (_pos < _text.Length && (Current == ' ' || Current == '\t')) _pos++;
+
+        int nameStart = _pos;
+        while (_pos < _text.Length && char.IsLetter(Current)) _pos++;
+        string name = _text[nameStart.._pos];
+
+        int argumentStart = _pos;
+        while (_pos < _text.Length && Current != '\n') _pos++;
+        string argument = _text[argumentStart.._pos].Trim();
+        var span = SpanFrom(start);
+
+        if (_pos < _text.Length) _pos++;                    // the newline
+
+        switch (name)
+        {
+            case "if":
+            {
+                bool taken = !Skipping && Evaluate(argument, span);
+                _conditions.Add((taken, taken, false, start));
+                return;
+            }
+
+            case "elif":
+            {
+                if (!Close(span, "elif")) return;
+
+                var current = _conditions[^1];
+                if (current.SawElse)
+                {
+                    diagnostics.Error("SL0455", span, "'#elif' cannot follow '#else'");
+                    return;
+                }
+
+                bool outer = _conditions.Count < 2 || _conditions[..^1].All(c => c.Active);
+                bool taken = outer && !current.Taken && Evaluate(argument, span);
+                _conditions[^1] = (taken, current.Taken || taken, false, current.Start);
+                return;
+            }
+
+            case "else":
+            {
+                if (!Close(span, "else")) return;
+
+                var current = _conditions[^1];
+                if (current.SawElse)
+                {
+                    diagnostics.Error("SL0455", span, "this '#if' already has an '#else'");
+                    return;
+                }
+
+                bool outer = _conditions.Count < 2 || _conditions[..^1].All(c => c.Active);
+                _conditions[^1] = (outer && !current.Taken, true, true, current.Start);
+                return;
+            }
+
+            case "endif":
+                if (!Close(span, "endif")) return;
+                _conditions.RemoveAt(_conditions.Count - 1);
+                return;
+        }
+
+        // Everything below means nothing inside a branch that is not taken.
+        if (Skipping) return;
+
+        switch (name)
+        {
+            case "define":
+            case "undef":
+                if (_sawToken)
+                {
+                    diagnostics.Error("SL0456", span,
+                        $"'#{name}' must come before the first declaration in the file, as in " +
+                        "C#; a symbol that changed halfway down would make the lines above and " +
+                        "below it disagree");
+                    return;
+                }
+
+                if (!IsSymbol(argument))
+                {
+                    diagnostics.Error("SL0457", span,
+                        $"'#{name}' takes one name, and '{argument}' is not one");
+                    return;
+                }
+
+                if (name == "define") _symbols.Add(argument);
+                else _symbols.Remove(argument);
+                return;
+
+            case "error":
+                diagnostics.Error("SL0458", span,
+                    argument.Length > 0 ? argument : "'#error'");
+                return;
+
+            case "warning":
+                diagnostics.Warning("SL0459", span,
+                    argument.Length > 0 ? argument : "'#warning'");
+                return;
+
+            // Both exist to be folded by an editor and mean nothing here.
+            case "region":
+            case "endregion":
+                return;
+
+            default:
+                diagnostics.Error("SL0460", span,
+                    $"'#{name}' is not a directive. Stainless has '#if', '#elif', '#else', " +
+                    "'#endif', '#define', '#undef', '#error', '#warning', '#region' and " +
+                    "'#endregion' -- and no macros, because a name always means itself");
+                return;
+        }
+    }
+
+    /// <summary>Checks that a directive closing a branch has one to close.</summary>
+    private bool Close(SourceSpan span, string name)
+    {
+        if (_conditions.Count > 0) return true;
+
+        diagnostics.Error("SL0461", span, $"'#{name}' has no '#if' to close");
+        return false;
+    }
+
+    private static bool IsSymbol(string text) =>
+        text.Length > 0 &&
+        (char.IsLetter(text[0]) || text[0] == '_') &&
+        text.All(c => char.IsLetterOrDigit(c) || c == '_');
+
+    // ============================================================ #if expressions
+
+    /// <summary>
+    /// Evaluates the condition of an <c>#if</c>.
+    ///
+    /// The grammar is C#'s and nothing more: a name, <c>true</c>, <c>false</c>,
+    /// <c>!</c>, <c>&amp;&amp;</c>, <c>||</c> and parentheses. A name that was
+    /// never defined is false, exactly as in C# and in C, so a condition may
+    /// test for something this build has never heard of.
+    /// </summary>
+    private bool Evaluate(string text, SourceSpan span)
+    {
+        if (text.Length == 0)
+        {
+            diagnostics.Error("SL0462", span, "this directive needs a condition");
+            return false;
+        }
+
+        int at = 0;
+        bool value = Or(text, ref at, span);
+
+        SkipSpace(text, ref at);
+        if (at < text.Length)
+            diagnostics.Error("SL0462", span,
+                $"'{text[at..]}' is left over after the condition; an '#if' takes names, " +
+                "'!', '&&', '||' and parentheses");
+
+        return value;
+    }
+
+    private bool Or(string text, ref int at, SourceSpan span)
+    {
+        bool left = And(text, ref at, span);
+
+        while (true)
+        {
+            SkipSpace(text, ref at);
+            if (!Take(text, ref at, "||")) return left;
+
+            // Both sides are evaluated: an error in the right one is worth
+            // reporting even when the left has already decided the answer.
+            bool right = And(text, ref at, span);
+            left = left || right;
+        }
+    }
+
+    private bool And(string text, ref int at, SourceSpan span)
+    {
+        bool left = Unary(text, ref at, span);
+
+        while (true)
+        {
+            SkipSpace(text, ref at);
+            if (!Take(text, ref at, "&&")) return left;
+
+            bool right = Unary(text, ref at, span);
+            left = left && right;
+        }
+    }
+
+    private bool Unary(string text, ref int at, SourceSpan span)
+    {
+        SkipSpace(text, ref at);
+
+        if (Take(text, ref at, "!")) return !Unary(text, ref at, span);
+
+        if (Take(text, ref at, "("))
+        {
+            bool inner = Or(text, ref at, span);
+            SkipSpace(text, ref at);
+            if (!Take(text, ref at, ")"))
+                diagnostics.Error("SL0462", span, "a '(' in this condition is never closed");
+            return inner;
+        }
+
+        int start = at;
+        while (at < text.Length && (char.IsLetterOrDigit(text[at]) || text[at] == '_')) at++;
+
+        if (at == start)
+        {
+            diagnostics.Error("SL0462", span,
+                $"expected a name in this condition, found '{text[start..]}'");
+            at = text.Length;
+            return false;
+        }
+
+        string name = text[start..at];
+        return name switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => _symbols.Contains(name),
+        };
+    }
+
+    private static void SkipSpace(string text, ref int at)
+    {
+        while (at < text.Length && char.IsWhiteSpace(text[at])) at++;
+    }
+
+    private static bool Take(string text, ref int at, string token)
+    {
+        SkipSpace(text, ref at);
+        if (!text.AsSpan(at).StartsWith(token)) return false;
+        at += token.Length;
+        return true;
     }
 
     private Token LexIdentifierOrKeyword(int start)

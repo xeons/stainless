@@ -42,8 +42,10 @@ That is a real native executable. No VM, no JIT, no assembly loader, no GC.
 
 **1. No header files.** Declarations are order-independent within *and across*
 modules, so there are no include guards, no forward declarations, no ODR
-violations, and no preprocessor. Every name in the program is resolved before
-any body is checked — the thing a header file exists to fake.
+violations, no `#include` and no macros. Every name in the program is resolved
+before any body is checked — the thing a header file exists to fake. `#if` and
+its relatives do exist, as in C#, because choosing between two platforms is a
+different question from finding a declaration.
 
 ```csharp
 int Main() {
@@ -171,6 +173,29 @@ Reference counting asks the tag too. A case may hold a `String`, a class or an
 array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
 counted, which is what lets them overlap.
+
+### Conditional compilation
+
+Directives, as in C#: no macros, no textual substitution, no `#include`.
+
+```csharp
+#if WINDOWS
+extern "C" void* VirtualAlloc(void* at, nuint size, uint type, uint protect);
+#elif UNIX
+extern "C" void* mmap(void* at, nuint size, int prot, int flags, int fd, long offset);
+#else
+#error this platform has no page allocator here
+#endif
+```
+
+A branch that is not taken is never lexed, so it need not parse — a platform you
+have never built on is text until the day you do. `WINDOWS`, `LINUX`, `MACOS`,
+`UNIX`, `X64`, `ARM64` and `STAINLESS` are defined for you; everything else
+comes from `-D`:
+
+```
+stainless build src -D FASTMATH
+```
 
 ### Slices
 
@@ -503,7 +528,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 129 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 131 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -523,6 +548,7 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   -r, --reference <path> bind against a library's module metadata
   -O<0-3>                optimization level (default -O2)
   -g                     describe the program to a debugger
+  -D <name>              define a symbol for '#if' to test
   --keep                 keep the generated .ll
 ```
 
@@ -848,6 +874,12 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
+- Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
+  `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
+  condition grammar. A branch that is not taken is never lexed, so it need not
+  parse. `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD`, `UNIX`, `X64`, `ARM64`, `X86`,
+  `ARM` and `STAINLESS` describe the target; `-D` adds the rest. No macros and
+  no `#include`: a name always means itself
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet

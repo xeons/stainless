@@ -2300,8 +2300,68 @@ do not, because both belong to one thread. It is the same bargain Rust's
 `unsafe impl Sync` makes, and the only place in this design where a human
 promise stands in for a check.
 
-Three gaps remain. Two are about lifetimes rather than types: a `Guard` can
+Two gaps remain, and both are about lifetimes rather than types: a `Guard` can
 outlive the lock it proves, and a job could store an array it was only lent.
-The third is not about either — `Mutex<T>` races on the reference count of what
-it guards whenever that is a class (§5.2). None is closed yet; see
-[concurrency.md](concurrency.md).
+A third — `Mutex<T>` racing on the reference count of what it guarded — is
+closed, because counts are atomic now (§5.2 and §5 of the ABI notes). See
+[concurrency.md](concurrency.md) for the two that are left.
+
+## 10. Conditional compilation
+
+Some code is only for one platform, and some is only for a build that asked for
+it. Stainless chooses between them the way C# does: with directives, evaluated
+while the file is being read.
+
+```csharp
+#if WINDOWS
+extern "C" void* VirtualAlloc(void* at, nuint size, uint type, uint protect);
+#elif UNIX
+extern "C" void* mmap(void* at, nuint size, int prot, int flags, int fd, long offset);
+#else
+#error this platform has no page allocator here
+#endif
+```
+
+**A branch that is not taken is never lexed.** So it need not parse, need not
+resolve, and cannot be broken by a change made somewhere else — which is the
+whole reason for choosing this early rather than in the binder. A branch for a
+platform you have never built on is text until the day it is compiled.
+
+**There is no macro, no textual substitution and no `#include`.** A name always
+means itself, and a declaration is still found without a header. That is the
+part of "no preprocessor" that mattered; `#if` was never what made C headers
+what they are.
+
+**The directives** are `#if`, `#elif`, `#else`, `#endif`, `#define`, `#undef`,
+`#error`, `#warning`, `#region` and `#endregion`. Anything else is an error
+rather than something to be ignored. A directive must begin its line, and may be
+indented; groups nest.
+
+**A condition** is a name, `true`, `false`, `!`, `&&`, `||` and parentheses — the
+same grammar C# has, minus `==` and `!=`, which nothing needs. **A name nobody
+defined is false**, so a condition may test for something this build has never
+heard of.
+
+**`#define` and `#undef` take one name** and must come before the first
+declaration in the file, as in C#: a symbol whose meaning changed halfway down
+would make the lines above and below it disagree. They affect their own file
+only.
+
+**The symbols that describe the target are always defined:**
+
+| Symbol | When |
+|---|---|
+| `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD` | the operating system |
+| `UNIX` | any of the above but Windows |
+| `X64`, `ARM64`, `X86`, `ARM` | the architecture |
+| `STAINLESS` | always |
+
+Everything else comes from `-D` on the command line:
+
+```
+stainless build src -D FASTMATH -D TELEMETRY
+```
+
+There is deliberately no `DEBUG` among the built-ins. What it ought to mean is
+the programmer's business, and inferring it from an optimisation level would be
+a rule nobody asked for.

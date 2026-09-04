@@ -85,6 +85,7 @@ internal static class Program
               --reference <path>   bind against a library's module metadata
               -O<0-3>              optimization level (default: -O2)
               -g                   describe the program to a debugger
+              -D <name>            define a symbol for '#if' to test
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
               -h, --help           show this message
@@ -188,6 +189,7 @@ internal static class Program
         bool optimizationGiven = false;
         bool keep = false;
         bool debug = false;
+        var defines = new List<string>();
         bool shared = false;
         string? header = null;
         string? metadata = null;
@@ -211,6 +213,11 @@ internal static class Program
 
                 case "-g" or "--debug":
                     debug = true;
+                    continue;
+
+                case "-D" or "--define":
+                    if (++i >= args.Length) { Error("'-D' needs a name"); return false; }
+                    defines.Add(args[i]);
                     continue;
 
                 case "--keep":
@@ -285,6 +292,7 @@ internal static class Program
             OptimizationLevel = optimization,
             KeepIntermediates = keep,
             Debug = debug,
+            Defines = defines,
             Shared = shared,
             HeaderPath = header,
             MetadataPath = metadata,

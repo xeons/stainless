@@ -62,6 +62,13 @@ public sealed record CompilationOptions
     /// and a debugger cannot step into a file that is not on disk.
     /// </summary>
     public bool Debug { get; init; }
+
+    /// <summary>
+    /// Symbols <c>#if</c> tests, from <c>-D</c>. The compiler adds the ones that
+    /// describe the target on top of these, so a program never has to be told
+    /// what machine it is being built for.
+    /// </summary>
+    public IReadOnlyList<string> Defines { get; init; } = [];
 }
 
 public sealed record CompilationResult
@@ -232,6 +239,8 @@ public sealed class Compilation
             }
         }
 
+        var symbols = BuildSymbols(options);
+
         foreach (var (name, text) in StandardLibrary.Sources())
         {
             string path = name;
@@ -243,7 +252,8 @@ public sealed class Compilation
                     File.WriteAllText(path, text);
             }
 
-            units.Add(new Parser(new SourceText(path, text), diagnostics).ParseCompilationUnit());
+            units.Add(new Parser(new SourceText(path, text), diagnostics, symbols)
+                .ParseCompilationUnit());
         }
 
         // Everything after this point is the program's own, which is what a
@@ -262,7 +272,7 @@ public sealed class Compilation
                 return Failure($"could not read '{path}': {e.Message}");
             }
 
-            units.Add(new Parser(source, diagnostics).ParseCompilationUnit());
+            units.Add(new Parser(source, diagnostics, symbols).ParseCompilationUnit());
         }
 
         if (diagnostics.HasErrors) return Failed(diagnostics);
@@ -410,6 +420,37 @@ public sealed class Compilation
     private static void TryDelete(string path)
     {
         try { File.Delete(path); } catch (IOException) { /* leaving a stale file is harmless */ }
+    }
+
+    /// <summary>
+    /// What <c>#if</c> can test: the target's own description, then whatever
+    /// <c>-D</c> added.
+    ///
+    /// The built-in ones are about the machine and nothing else. A name like
+    /// DEBUG is deliberately not among them: what it should mean is the
+    /// programmer's business, and guessing it from an optimisation level would
+    /// be a rule nobody asked for.
+    /// </summary>
+    private static HashSet<string> BuildSymbols(CompilationOptions options)
+    {
+        var symbols = new HashSet<string>(StringComparer.Ordinal) { "STAINLESS" };
+
+        if (OperatingSystem.IsWindows()) symbols.Add("WINDOWS");
+        if (OperatingSystem.IsLinux()) { symbols.Add("LINUX"); symbols.Add("UNIX"); }
+        if (OperatingSystem.IsMacOS()) { symbols.Add("MACOS"); symbols.Add("UNIX"); }
+        if (OperatingSystem.IsFreeBSD()) { symbols.Add("FREEBSD"); symbols.Add("UNIX"); }
+
+        symbols.Add(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture switch
+        {
+            System.Runtime.InteropServices.Architecture.X64 => "X64",
+            System.Runtime.InteropServices.Architecture.Arm64 => "ARM64",
+            System.Runtime.InteropServices.Architecture.X86 => "X86",
+            System.Runtime.InteropServices.Architecture.Arm => "ARM",
+            var other => other.ToString().ToUpperInvariant(),
+        });
+
+        foreach (string defined in options.Defines) symbols.Add(defined);
+        return symbols;
     }
 
     /// <summary>

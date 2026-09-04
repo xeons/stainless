@@ -28,6 +28,8 @@ namespace Stainless.Tests;
 ///   expected.txt   the program must compile, run, and print this
 ///   errors.txt     the program must fail to compile with these diagnostic codes
 ///
+/// A case containing defines.txt is built with each of its lines passed as -D.
+///
 /// A case containing debug.txt is additionally built with debug information, and
 /// every line of that file must appear somewhere in the generated IR. Linking at
 /// all is most of the test: clang runs LLVM's verifier over the metadata, so a
@@ -136,6 +138,16 @@ internal static class Program
         string debugPath = Path.Combine(directory, "debug.txt");
         bool debug = File.Exists(debugPath);
 
+        // A case containing defines.txt is built with each of its lines passed
+        // as -D, which is the only way to exercise a build flag end to end.
+        string definesPath = Path.Combine(directory, "defines.txt");
+        var defines = File.Exists(definesPath)
+            ? File.ReadAllLines(definesPath)
+                .Select(l => l.Trim())
+                .Where(l => l.Length > 0 && !l.StartsWith('#'))
+                .ToList()
+            : [];
+
         // A `library/` subdirectory is built first, as a Stainless library with
         // module metadata, and the case's own sources are then compiled against
         // it. That is the two-compilation shape the metadata exists for, and the
@@ -190,6 +202,7 @@ internal static class Program
             // the code as written, and the optimiser rewrites what it describes.
             OptimizationLevel = debug ? 0 : 1,
             Debug = debug,
+            Defines = defines,
         };
 
         CompilationResult result;
