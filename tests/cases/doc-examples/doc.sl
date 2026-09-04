@@ -256,6 +256,36 @@ static readonly int Total   = Doubled + 1;
 static readonly int Doubled = Base * 2;
 static readonly int Base    = 20;
 
+
+// --- README "Variants" / spec 2.5 -----------------------------------------
+public variant Shape {
+    Circle(double Radius);
+    Rect(double Width, double Height);
+    Empty;
+}
+
+double Area(Shape shape) {
+    switch (shape) {
+        case Circle c: return 3.14159 * c.Radius * c.Radius;
+        case Rect r:   return r.Width * r.Height;
+        case Empty:    return 0.0;
+    }
+}
+
+double Radius(Shape shape) {
+    if (shape.Circle) { return shape.Radius; }
+    return 0.0;
+}
+
+String Shapes() {
+    Shape a = Shape.Circle(2.0);
+    Shape b = Circle(2.0);
+    return Text.FromDouble(Area(a)) + ":" + Text.FromDouble(Area(b)) +
+           ":" + Text.FromDouble(Area(Rect(3.0, 4.0))) +
+           ":" + Text.FromDouble(Radius(Shape.Empty)) +
+           ":" + Text.FromInteger((int)sizeof(Shape));
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -328,6 +358,7 @@ int Main() {
     printf("pixels=%d\n", pixels[15]);
 
     foreach (int p in pixels) { }
+    printf("shapes=%s\n", Shapes().ToPointer());
     printf("done\n");
     return 0;
 }

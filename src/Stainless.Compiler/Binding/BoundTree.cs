@@ -227,20 +227,53 @@ public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaS
 }
 
 /// <summary>
-/// A finished <c>Ok(x)</c> or <c>Fail(e)</c>: the <c>Result</c> struct it builds,
-/// with the payload already converted to the field it is stored in.
+/// A finished <c>Ok(x)</c> or <c>Shape.Circle(2.0)</c>: the variant value it
+/// builds, with each argument already converted to the field it is stored in.
 ///
-/// The type is the instantiated <c>Result&lt;T, E&gt;</c>, which is why this node
-/// only ever exists after a conversion has said which one.
+/// The type is the variant, which is why this node only ever exists after
+/// something has said which variant was meant.
 /// </summary>
-public sealed class BoundResultConstruction(
-    SourceSpan span, TypeSymbol type, bool succeeded, BoundExpression payload)
+public sealed class BoundVariantConstruction(
+    SourceSpan span,
+    TypeSymbol type,
+    VariantCaseSymbol variantCase,
+    IReadOnlyList<BoundExpression> arguments) : BoundExpression(span, type)
+{
+    public VariantCaseSymbol Case { get; } = variantCase;
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+}
+
+/// <summary>
+/// <c>r.Ok</c> — whether a variant is holding a particular case. It is one load
+/// and one comparison, and it is what a narrowing is proved from.
+/// </summary>
+public sealed class BoundVariantTest(
+    SourceSpan span, TypeSymbol type, BoundExpression value, VariantCaseSymbol variantCase)
     : BoundExpression(span, type)
 {
-    /// <summary>True for <c>Ok</c>, false for <c>Fail</c>.</summary>
-    public bool Succeeded { get; } = succeeded;
+    public BoundExpression Value { get; } = value;
+    public VariantCaseSymbol Case { get; } = variantCase;
+}
 
-    public BoundExpression Payload { get; } = payload;
+/// <summary>
+/// One field of a variant's payload, reached through the case it belongs to.
+///
+/// The binder only ever produces this where it has already established that the
+/// case is the one present, so the emitter does not check the tag again.
+/// </summary>
+public sealed class BoundVariantPayload(
+    SourceSpan span, BoundExpression receiver, VariantCaseSymbol variantCase, FieldSymbol? field)
+    : BoundExpression(span, field?.Type ?? variantCase.Payload!)
+{
+    public BoundExpression Receiver { get; } = receiver;
+    public VariantCaseSymbol Case { get; } = variantCase;
+
+    /// <summary>
+    /// The field being read, or null for the whole payload — which is what
+    /// <c>case Circle c:</c> binds, and what makes <c>c</c> an ordinary struct
+    /// value that copies, retains and drops like any other.
+    /// </summary>
+    public FieldSymbol? Field { get; } = field;
 }
 
 /// <summary>
@@ -506,6 +539,20 @@ public sealed class BoundSwitchSection(
     public IReadOnlyList<BoundExpression> Labels { get; } = labels;
     public bool IsDefault { get; } = isDefault;
     public BoundStatement Body { get; } = body;
+
+    /// <summary>
+    /// For a switch over a variant: the cases that reach this section. They take
+    /// the place of <see cref="Labels"/>, which stays empty, because a case is
+    /// a tag rather than a value the switched expression could equal.
+    /// </summary>
+    public IReadOnlyList<VariantCaseSymbol> Cases { get; init; } = [];
+
+    /// <summary>
+    /// The local a matched case's payload is copied into, for <c>case Circle
+    /// c:</c>. Null for <c>case Circle:</c>, which narrows the switched value
+    /// instead and needs no second name for it.
+    /// </summary>
+    public LocalSymbol? Binding { get; init; }
 }
 
 /// <summary>
@@ -521,6 +568,13 @@ public sealed class BoundSwitch(
 {
     public BoundExpression Value { get; } = value;
     public IReadOnlyList<BoundSwitchSection> Sections { get; } = sections;
+
+    /// <summary>
+    /// True when the sections between them cover every case of a variant, so
+    /// nothing can fall past the switch even without a <c>default</c>. It is
+    /// what lets a function end on one and still be seen to return.
+    /// </summary>
+    public bool IsExhaustive { get; init; }
 }
 
 public sealed class BoundReturn(SourceSpan span, BoundExpression? value) : BoundStatement(span)

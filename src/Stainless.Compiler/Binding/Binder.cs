@@ -76,18 +76,11 @@ public sealed class Binder(
     private readonly List<StructTypeSymbol> _structs = [];
 
     /// <summary>
-    /// <c>Standard.Result</c>, found once the standard library has been declared.
-    /// Held by identity rather than by name so a user type also called Result is
-    /// an ordinary struct with no special rules.
-    /// </summary>
-    private GenericTypeTemplate? _resultTemplate;
-
-    /// <summary>
-    /// What the compiler has proved about each Result in scope. A fact is put
+    /// Which case each variant in scope is known to be holding. A fact is put
     /// here by a condition that tested one, and taken away by anything that
     /// could have changed it.
     /// </summary>
-    private Dictionary<object, ResultFact> _resultFacts = [];
+    private Dictionary<object, VariantCaseSymbol> _variantFacts = [];
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
 
     /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
@@ -157,8 +150,6 @@ public sealed class Binder(
 
         DeclareModules(units);      // pass 1: every module exists
         DeclareTypes();             // pass 2: every type name exists
-        _resultTemplate = _modules.TryGetValue(Builtins.StandardModuleName, out var standard)
-            && standard.GenericTypes.TryGetValue("Result", out var result) ? result : null;
         ResolveImports();           // pass 3: every module can see its imports
         DeclareMembers();           // pass 4: every signature and field type is resolved
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
@@ -285,6 +276,13 @@ public sealed class Binder(
                         Span = declaration.Span,
                     },
                     TypeDeclKind.Attribute => new AttributeTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = isPublic,
+                        Span = declaration.Span,
+                    },
+                    TypeDeclKind.Variant => new VariantTypeSymbol
                     {
                         SimpleName = declaration.Name,
                         ModuleName = module.Name,
@@ -542,11 +540,113 @@ public sealed class Binder(
         return underlying.Size >= 8 ? value : value & ((1UL << underlying.Bits) - 1);
     }
 
+    /// <summary>
+    /// Turns a variant's cases into symbols, and gives the variant the two
+    /// fields that represent it.
+    ///
+    /// Each case's parameters become a struct of their own. That struct is an
+    /// ordinary one — laid out, copied, retained and described by the machinery
+    /// that already exists — and the case is a name for it plus a tag. The
+    /// variant itself then has two fields: the tag, and a filler wide enough for
+    /// the largest payload, whose size is not known until every case has been
+    /// laid out and so is settled in pass 7.
+    /// </summary>
+    private void DeclareVariantCases(
+        FileScope scope, TypeDeclSyntax declaration, VariantTypeSymbol variant)
+    {
+        if (declaration.Cases.Count > 255)
+            diagnostics.Error("SL0432", declaration.Span,
+                $"variant '{variant.Name}' has {declaration.Cases.Count} cases; the tag is a " +
+                "byte, so 255 is the limit");
+
+        foreach (var declared in declaration.Cases)
+        {
+            if (variant.FindCase(declared.Name) is not null)
+            {
+                diagnostics.Error("SL0433", declared.Span,
+                    $"variant '{variant.Name}' already has a case named '{declared.Name}'");
+                continue;
+            }
+
+            var caseSymbol = new VariantCaseSymbol
+            {
+                Name = declared.Name,
+                DeclaringVariant = variant,
+                Tag = variant.Cases.Count,
+                Span = declared.Span,
+            };
+
+            if (declared.Parameters.Count > 0)
+            {
+                var payload = new StructTypeSymbol
+                {
+                    // '$' is in no identifier, so this names a type the source
+                    // cannot reach. It is reached through the case instead.
+                    SimpleName = variant.SimpleName + "$" + declared.Name,
+                    ModuleName = variant.ModuleName,
+                    IsPublic = variant.IsPublic,
+                    Span = declared.Span,
+                };
+
+                foreach (var parameter in declared.Parameters)
+                {
+                    if (payload.FindStorage(parameter.Name) is not null)
+                    {
+                        diagnostics.Error("SL0434", parameter.Span,
+                            $"case '{declared.Name}' already carries a field named " +
+                            $"'{parameter.Name}'");
+                        continue;
+                    }
+
+                    payload.Fields.Add(new FieldSymbol(
+                        parameter.Name, ResolveType(parameter.Type, scope),
+                        payload, payload.Fields.Count) { IsPublic = true });
+                }
+
+                _structs.Add(payload);
+                caseSymbol.Payload = payload;
+            }
+
+            variant.Cases.Add(caseSymbol);
+        }
+
+        // The tag first, so a variant with no payload at all is one byte and
+        // reads like an enum. Both fields are hidden storage: the case is the
+        // name for what is in there, and reaching past it would be reading a
+        // payload without the proof that makes it mean anything.
+        variant.Fields.Add(new FieldSymbol(
+            VariantTypeSymbol.TagFieldName, PrimitiveTypeSymbol.Byte, variant, 0)
+        {
+            IsBackingField = true,
+        });
+
+        if (!variant.Cases.Any(c => c.Payload is not null)) return;
+
+        var storage = new StructTypeSymbol
+        {
+            SimpleName = variant.SimpleName + "$payload",
+            ModuleName = variant.ModuleName,
+            IsPublic = variant.IsPublic,
+            Span = declaration.Span,
+        };
+
+        _structs.Add(storage);
+        variant.PayloadStorage = storage;
+
+        variant.Fields.Add(new FieldSymbol(
+            VariantTypeSymbol.PayloadFieldName, storage, variant, 1)
+        {
+            IsBackingField = true,
+        });
+    }
+
     private void DeclareTypeMembers(
         FileScope scope, TypeDeclSyntax declaration, NamedTypeSymbol type)
     {
         var module = scope.Module;
         var classType = type as ClassTypeSymbol;
+
+        if (type is VariantTypeSymbol variant) DeclareVariantCases(scope, declaration, variant);
 
         foreach (var member in declaration.Members)
         {
@@ -933,11 +1033,12 @@ public sealed class Binder(
                 "because declaration order never matters");
         }
 
-        if (containingType is null && declaration.Name is OkName or FailName)
+        if (containingType is null && CaseNamed(scope, declaration.Name) is { } shadowed)
             diagnostics.Error("SL0414", declaration.Span,
-                $"a module-level function cannot be named '{declaration.Name}': the language " +
-                "uses that name to build a Result, and a call would be ambiguous. A method " +
-                "of a type may still be called this");
+                $"a module-level function cannot be named '{declaration.Name}': it is a case of " +
+                $"variant '{shadowed.DeclaringVariant.QualifiedName}', and a bare " +
+                $"'{declaration.Name}(...)' builds one of those. A method of a type may still " +
+                "be called this, because a method is reached through its receiver");
 
         if (containingType is not null)
         {
@@ -1096,9 +1197,10 @@ public sealed class Binder(
 
             if (type is StructTypeSymbol)
             {
+                string kind = type is VariantTypeSymbol ? "variant" : "struct";
                 diagnostics.Error("SL0302", declaration.Span,
-                    $"struct '{type.Name}' cannot implement an interface; an interface " +
-                    "reference is a counted pointer, and structs are plain C values");
+                    $"{kind} '{type.Name}' cannot implement an interface; an interface " +
+                    "reference is a counted pointer, and a " + kind + " is a plain C value");
                 return;
             }
 
@@ -1181,7 +1283,16 @@ public sealed class Binder(
 
             if (reflect is not null && type.Attributes.Any(a => a.Type == reflect))
             {
-                if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
+                // A variant is a struct, so it would pass the test below and emit
+                // its two hidden fields as if they were the programmer's. They
+                // are not, and a variant's shape is its cases, which the field
+                // tables have no way to say.
+                if (type is VariantTypeSymbol)
+                    diagnostics.Error("SL0442", entry.Declaration.Span,
+                        $"'[Reflect]' emits a type's fields, and the fields of variant " +
+                        $"'{type.Name}' are a tag and a payload the source cannot name. What " +
+                        "a reader would want is its cases, and those are not described yet");
+                else if (type is ClassTypeSymbol or StructTypeSymbol) type.IsReflected = true;
                 else
                     diagnostics.Error("SL0341", entry.Declaration.Span,
                         $"'[Reflect]' applies to a class or a struct; '{type.Name}' is neither");
@@ -1367,6 +1478,10 @@ public sealed class Binder(
             return;
         }
 
+        // A variant's payload field has no size until every case has one, so
+        // the filler is built here, immediately before the fields are walked.
+        if (type is VariantTypeSymbol variant) SizePayloadStorage(variant, inProgress);
+
         int offset = 0, alignment = 1;
         foreach (var field in type.Fields)
         {
@@ -1392,6 +1507,44 @@ public sealed class Binder(
 
         type.SetLayout(size, alignment);
         inProgress.Remove(type);
+    }
+
+    /// <summary>
+    /// Gives a variant's payload field exactly the size and alignment the widest
+    /// case needs.
+    ///
+    /// There is no way to say "N bytes, aligned to A" in the type system, so the
+    /// filler says it in fields: as many integers of A bytes as it takes to
+    /// cover the widest payload. LLVM lays that out to the same size and the
+    /// same alignment the C rules give it here, which is what lets a case's
+    /// fields be read straight out of the payload's address.
+    /// </summary>
+    private void SizePayloadStorage(VariantTypeSymbol variant, HashSet<NamedTypeSymbol> inProgress)
+    {
+        if (variant.PayloadStorage is not { } storage || storage.LayoutComputed) return;
+
+        int size = 0, alignment = 1;
+
+        foreach (var payload in variant.Cases.Select(c => c.Payload).OfType<StructTypeSymbol>())
+        {
+            ComputeLayout(payload, inProgress);
+            size = Math.Max(size, payload.Size);
+            alignment = Math.Max(alignment, payload.Alignment);
+        }
+
+        var element = alignment switch
+        {
+            >= 8 => PrimitiveTypeSymbol.ULong,
+            >= 4 => PrimitiveTypeSymbol.UInt,
+            >= 2 => PrimitiveTypeSymbol.UShort,
+            _ => PrimitiveTypeSymbol.Byte,
+        };
+
+        int count = Math.Max(1, (size + element.Size - 1) / element.Size);
+        for (int i = 0; i < count; i++)
+            storage.Fields.Add(new FieldSymbol("e" + i, element, storage, i));
+
+        ComputeLayout(storage, inProgress);
     }
 
     // ============================================================ pass 8
@@ -1460,6 +1613,11 @@ public sealed class Binder(
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
                 Template = template, TypeArguments = arguments, Span = declaration.Span,
             },
+            TypeDeclKind.Variant => new VariantTypeSymbol
+            {
+                SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
+                Template = template, TypeArguments = arguments, Span = declaration.Span,
+            },
             _ => new StructTypeSymbol
             {
                 SimpleName = displayName, ModuleName = template.Module.Name, IsPublic = isPublic,
@@ -1495,7 +1653,7 @@ public sealed class Binder(
         BindAttributes(declaration.Attributes, type.Attributes, template.Scope, type.Name);
 
         if (ReflectAttribute is { } reflect && type.Attributes.Any(a => a.Type == reflect) &&
-            type is ClassTypeSymbol or StructTypeSymbol)
+            type is ClassTypeSymbol or StructTypeSymbol && type is not VariantTypeSymbol)
             type.IsReflected = true;
 
         DeclareTypeMembers(template.Scope, declaration, type);
@@ -1802,7 +1960,7 @@ public sealed class Binder(
         _scopes.Clear();
         _loopDepth = 0;
         _switchDepth = 0;
-        _resultFacts = [];
+        _variantFacts = [];
 
         PushScope();
         var body = BindBlock(function.Body);
@@ -1841,25 +1999,7 @@ public sealed class Binder(
         _functions.Add(new BoundFunction(accessor, new BoundBlock(span, [statement])));
     }
 
-    // ============================================================ Result
-
-    /// <summary>What is known about one Result at a point in the program.</summary>
-    private enum ResultFact { Succeeded, Failed }
-
-    /// <summary>The names <c>Ok(x)</c> and <c>Fail(e)</c>, which the language owns.</summary>
-    private const string OkName = "Ok";
-    private const string FailName = "Fail";
-
-    /// <summary>The storage behind <c>Ok</c>, <c>Value</c> and <c>Error</c>.</summary>
-    private const string ResultOkField = "ok";
-    private const string ResultValueField = "value";
-    private const string ResultErrorField = "error";
-
-    /// <summary>True for an instantiation of <c>Standard.Result</c>.</summary>
-    private bool IsResult(TypeSymbol type) =>
-        _resultTemplate is not null &&
-        type is StructTypeSymbol { Template: { } template } &&
-        ReferenceEquals(template, _resultTemplate);
+    // ============================================================ variants
 
     /// <summary>
     /// The declaration a narrowed fact can be attached to.
@@ -1878,7 +2018,7 @@ public sealed class Binder(
     };
 
     /// <summary>Forgets what was known about a Result, because something may have changed it.</summary>
-    private void InvalidateResultFact(BoundExpression target)
+    private void InvalidateVariantFact(BoundExpression target)
     {
         // Writing a field of a Result changes it just as assigning the whole
         // thing does, so the subject is looked for through field accesses too.
@@ -1887,7 +2027,7 @@ public sealed class Binder(
         {
             if (NarrowableSubject(current) is not { } subject) continue;
 
-            _resultFacts.Remove(subject);
+            _variantFacts.Remove(subject);
             return;
         }
     }
@@ -1896,21 +2036,33 @@ public sealed class Binder(
     /// What a condition proves when it is true, and what it proves when it is
     /// false.
     ///
-    /// Only the shapes a Result is actually tested with are read: <c>r.Ok</c>,
+    /// Only the shapes a variant is actually tested with are read: <c>v.Case</c>,
     /// its negation, and the two short-circuit operators. Anything else proves
     /// nothing, which costs a diagnostic rather than soundness.
+    ///
+    /// A true test proves the case outright. A false one proves a case only when
+    /// there are exactly two, because then ruling one out leaves no choice --
+    /// which is what keeps <c>if (!r.Ok) { ... r.Error ... }</c> working now that
+    /// Result is an ordinary variant.
     /// </summary>
-    private (Dictionary<object, ResultFact> WhenTrue, Dictionary<object, ResultFact> WhenFalse)
+    private (Dictionary<object, VariantCaseSymbol> WhenTrue, Dictionary<object, VariantCaseSymbol> WhenFalse)
         ConditionFacts(BoundExpression condition)
     {
         switch (condition)
         {
-            case BoundFieldAccess { Receiver: { } target } flag
-                when flag.Field.Name == ResultOkField && IsResult(target.Type) &&
-                     NarrowableSubject(target) is { } subject:
-                return (
-                    new Dictionary<object, ResultFact> { [subject] = ResultFact.Succeeded },
-                    new Dictionary<object, ResultFact> { [subject] = ResultFact.Failed });
+            case BoundVariantTest test
+                when NarrowableSubject(test.Value) is { } subject:
+            {
+                var variant = test.Case.DeclaringVariant;
+                var whenTrue = new Dictionary<object, VariantCaseSymbol> { [subject] = test.Case };
+
+                var others = variant.Cases.Where(c => c != test.Case).ToList();
+                var whenFalse = others.Count == 1
+                    ? new Dictionary<object, VariantCaseSymbol> { [subject] = others[0] }
+                    : [];
+
+                return (whenTrue, whenFalse);
+            }
 
             case BoundUnary { Operator: BoundUnaryOp.LogicalNot } negation:
             {
@@ -1939,19 +2091,19 @@ public sealed class Binder(
         }
     }
 
-    private static Dictionary<object, ResultFact> Merge(
-        Dictionary<object, ResultFact> first, Dictionary<object, ResultFact> second)
+    private static Dictionary<object, VariantCaseSymbol> Merge(
+        Dictionary<object, VariantCaseSymbol> first, Dictionary<object, VariantCaseSymbol> second)
     {
-        var merged = new Dictionary<object, ResultFact>(first);
+        var merged = new Dictionary<object, VariantCaseSymbol>(first);
         foreach (var (key, value) in second) merged[key] = value;
         return merged;
     }
 
-    private Dictionary<object, ResultFact> SnapshotFacts() => new(_resultFacts);
+    private Dictionary<object, VariantCaseSymbol> SnapshotFacts() => new(_variantFacts);
 
-    private void ApplyFacts(Dictionary<object, ResultFact> facts)
+    private void ApplyFacts(Dictionary<object, VariantCaseSymbol> facts)
     {
-        foreach (var (key, value) in facts) _resultFacts[key] = value;
+        foreach (var (key, value) in facts) _variantFacts[key] = value;
     }
 
     /// <summary>
@@ -1968,7 +2120,7 @@ public sealed class Binder(
         CollectAssignedNames(body, assigned);
         if (assigned.Count == 0) return;
 
-        foreach (var subject in _resultFacts.Keys.ToList())
+        foreach (var subject in _variantFacts.Keys.ToList())
         {
             string name = subject switch
             {
@@ -1977,7 +2129,7 @@ public sealed class Binder(
                 _ => "",
             };
 
-            if (assigned.Contains(name)) _resultFacts.Remove(subject);
+            if (assigned.Contains(name)) _variantFacts.Remove(subject);
         }
     }
 
@@ -2053,7 +2205,7 @@ public sealed class Binder(
         // Every arm returns and no value escapes them, so nothing reaches the
         // statement after the switch.
         BoundSwitch chosen =>
-            chosen.Sections.Any(s => s.IsDefault) &&
+            (chosen.IsExhaustive || chosen.Sections.Any(s => s.IsDefault)) &&
             chosen.Sections.All(s => AlwaysReturns(s.Body)),
 
         _ => false,
@@ -2156,13 +2308,15 @@ public sealed class Binder(
                         "cannot infer a type from an expression of type 'void'");
                     type = ErrorTypeSymbol.Instance;
                 }
-                else if (type is ResultDraftType)
+                else if (type is VariantDraftType)
                 {
+                    string built = (initializer as BoundVariantDraft)?.Case ?? "a case";
                     diagnostics.Error("SL0287", syntax.Initializer.Span,
-                        $"'{syntax.Name}' cannot be a 'var': one value does not say what both " +
-                        "of a Result's type arguments are, so write the type out — " +
-                        $"'Result<T, E> {syntax.Name} = ...' — or return this directly from a " +
-                        "function that declares it");
+                        $"'{syntax.Name}' cannot be a 'var': '{built}' names a case without " +
+                        "naming its variant, and one value does not say what a variant's type " +
+                        "arguments are. Write the type out, name the variant as in " +
+                        $"'Shape.{built}(...)', or return this directly from a function that " +
+                        "declares it");
                     type = ErrorTypeSymbol.Instance;
                 }
             }
@@ -2201,11 +2355,11 @@ public sealed class Binder(
         ApplyFacts(whenTrue);
         var then = BindStatement(syntax.Then);
 
-        _resultFacts = new Dictionary<object, ResultFact>(entry);
+        _variantFacts = new Dictionary<object, VariantCaseSymbol>(entry);
         ApplyFacts(whenFalse);
         var otherwise = syntax.Else is null ? null : BindStatement(syntax.Else);
 
-        _resultFacts = entry;
+        _variantFacts = entry;
 
         // A branch that always leaves proves its opposite for everything after
         // the `if`. This is what makes the early return read the way it should:
@@ -2226,7 +2380,7 @@ public sealed class Binder(
 
         // A loop body runs again, so anything it assigns to is unknown inside it
         // however the loop was entered.
-        if (_resultFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
 
         var entry = SnapshotFacts();
         ApplyFacts(ConditionFacts(condition).WhenTrue);
@@ -2237,7 +2391,7 @@ public sealed class Binder(
 
         // Nothing the condition proved survives the loop: it is also left by
         // failing that same condition.
-        _resultFacts = entry;
+        _variantFacts = entry;
         return new BoundWhile(syntax.Span, condition, body);
     }
 
@@ -2251,14 +2405,14 @@ public sealed class Binder(
 
         // The same rule a `while` obeys: what the body assigns to is unknown
         // inside it, and the condition proves nothing after it.
-        if (_resultFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
         var entry = SnapshotFacts();
         if (condition is not null) ApplyFacts(ConditionFacts(condition).WhenTrue);
 
         _loopDepth++;
         var body = BindStatement(syntax.Body);
         _loopDepth--;
-        _resultFacts = entry;
+        _variantFacts = entry;
 
         var result = new BoundFor(syntax.Span, initializer, condition, step, body);
         if (initializer is BoundLocalDeclaration declaration) result.Locals.Add(declaration.Local);
@@ -2402,7 +2556,7 @@ public sealed class Binder(
     private BoundStatement BindForEachBody(ForEachSyntax syntax, BoundExpression element)
     {
         PushScope();
-        if (_resultFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
 
         var type = syntax.Type is null
             ? element.Type
@@ -2764,6 +2918,12 @@ public sealed class Binder(
     {
         PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol => true,
 
+        // A variant's own fields are a tag and a blob of bytes, both of them
+        // plain data, so asking them would say yes to a variant holding a List.
+        // What it really holds is whatever its cases hold.
+        VariantTypeSymbol variant =>
+            variant.Cases.SelectMany(c => c.Fields).All(f => IsSendable(f.Type)),
+
         // A struct is as safe as the things inside it. Copying one retains what
         // it holds, and that is sound now that counts are atomic, so a struct of
         // primitives and Strings crosses as freely as its parts would.
@@ -2804,10 +2964,11 @@ public sealed class Binder(
     private void ReportNotSendable(TypeSymbol type, SourceSpan span, string what)
     {
         diagnostics.Error("SL0377", span,
-            $"{what} is '{type.Name}', which more than one thread would reach. " +
-            "Reference counts are not atomic, so this is a race the runtime cannot " +
-            "detect. Pass plain data or a String, guard it with 'Mutex<T>', or mark " +
-            $"'{type.Name}' with [Shared] if it already synchronizes itself");
+            $"{what} is '{type.Name}', which more than one thread would reach, and " +
+            "nothing about it says how two of them may. Counts are atomic, so the " +
+            "reference itself is safe; what is not is the contents. Pass plain data or " +
+            $"a String, guard it with 'Mutex<T>', or mark '{type.Name}' with [Shared] " +
+            "if it already synchronizes itself");
     }
 
 
@@ -3302,6 +3463,14 @@ public sealed class Binder(
         var value = BindExpression(syntax.Value);
         if (value.Type.IsError()) return new BoundBlock(syntax.Span, []);
 
+        if (value.Type is VariantTypeSymbol variant)
+            return BindVariantSwitch(syntax, value, variant);
+
+        foreach (var binding in syntax.Sections.SelectMany(section => section.Bindings))
+            diagnostics.Error("SL0438", binding.Span,
+                $"'case {binding.Case} {binding.Name}' matches a variant's case and binds what " +
+                $"it carries, and '{value.Type.Name}' is not a variant");
+
         bool onText = _builtins.IsString(value.Type);
         bool onOrdinal = value.Type is PrimitiveTypeSymbol { IsInteger: true } or EnumTypeSymbol
                          || value.Type.IsBool();
@@ -3409,6 +3578,171 @@ public sealed class Binder(
         return spill is null
             ? result
             : new BoundBlock(syntax.Span, [spill, result]);
+    }
+
+    /// <summary>
+    /// A switch over a variant: one arm per case, and no default needed once
+    /// they are all there.
+    ///
+    /// This is the other half of the proof that guards a payload. Inside an arm
+    /// the switched value is known to be that case, so its fields are readable
+    /// under their own names; and <c>case Circle c:</c> additionally copies the
+    /// payload into a name of its own, for when the thing switched on was not a
+    /// local to begin with and there is nothing for a narrowing to be about.
+    /// </summary>
+    private BoundStatement BindVariantSwitch(
+        SwitchSyntax syntax, BoundExpression value, VariantTypeSymbol variant)
+    {
+        // Narrowing is about a name, so one is made when there is not one
+        // already. It also gives the value somewhere to live for the length of
+        // the switch, which a variant holding a reference needs anyway.
+        BoundLocalDeclaration? spill = null;
+        if (NarrowableSubject(value) is null)
+        {
+            var held = DeclareLocal(
+                SyntheticName("switch"), variant, isConst: true, syntax.Value.Span);
+            spill = new BoundLocalDeclaration(syntax.Value.Span, held, value);
+            value = new BoundLocalAccess(syntax.Value.Span, held);
+        }
+
+        var subject = NarrowableSubject(value);
+        var sections = new List<BoundSwitchSection>();
+        var covered = new Dictionary<VariantCaseSymbol, SourceSpan>();
+        bool sawDefault = false;
+
+        _switchDepth++;
+
+        foreach (var section in syntax.Sections)
+        {
+            var cases = new List<VariantCaseSymbol>();
+            VariantCaseSymbol? bound = null;
+            string boundName = "";
+            var boundSpan = section.Span;
+
+            // `case Circle:` parses as an expression, because at that point
+            // nothing knows whether Circle is a case or a constant. Here it is
+            // known, so a bare name that names a case is one.
+            foreach (var label in section.Labels)
+            {
+                if (label is NameSyntax { Name.Parts: [var only] } &&
+                    variant.FindCase(only) is { } named)
+                {
+                    if (!covered.TryAdd(named, label.Span))
+                        diagnostics.Error("SL0405", label.Span,
+                            $"this switch already has a case for '{named.Name}'");
+                    else
+                        cases.Add(named);
+
+                    continue;
+                }
+
+                diagnostics.Error("SL0404", label.Span,
+                    $"a 'case' label in a switch over '{variant.Name}' names one of its cases; " +
+                    "they are " + Listed(variant.Cases.Select(c => c.Name)));
+            }
+
+            foreach (var declared in section.Bindings)
+            {
+                if (variant.FindCase(declared.Case) is not { } matched)
+                {
+                    diagnostics.Error("SL0435", declared.Span,
+                        $"variant '{variant.Name}' has no case named '{declared.Case}'; it has " +
+                        Listed(variant.Cases.Select(c => c.Name)));
+                    continue;
+                }
+
+                if (!covered.TryAdd(matched, declared.Span))
+                {
+                    diagnostics.Error("SL0405", declared.Span,
+                        $"this switch already has a case for '{matched.Name}'");
+                    continue;
+                }
+
+                cases.Add(matched);
+
+                if (matched.Payload is null)
+                {
+                    diagnostics.Error("SL0439", declared.Span,
+                        $"case '{matched.Name}' carries nothing, so there is nothing for " +
+                        $"'{declared.Name}' to be; write 'case {matched.Name}:'");
+                    continue;
+                }
+
+                if (bound is not null || cases.Count > 1)
+                {
+                    diagnostics.Error("SL0440", declared.Span,
+                        "only one case may be bound in a section, because each carries " +
+                        "something different; give this case a section of its own");
+                    continue;
+                }
+
+                bound = matched;
+                boundName = declared.Name;
+                boundSpan = declared.Span;
+            }
+
+            if (section.HasDefault)
+            {
+                if (sawDefault)
+                    diagnostics.Error("SL0406", section.Span,
+                        "this switch already has a 'default' section");
+                sawDefault = true;
+            }
+
+            // Inside the arm, the value is that case. One case only: a section
+            // reached by two of them has proved nothing about which.
+            var saved = SnapshotFacts();
+            if (subject is not null && cases.Count == 1) _variantFacts[subject] = cases[0];
+            else if (subject is not null) _variantFacts.Remove(subject);
+
+            PushScope();
+
+            var statements = new List<BoundStatement>();
+            LocalSymbol? binding = null;
+
+            if (bound is not null)
+            {
+                binding = DeclareLocal(boundName, bound.Payload!, isConst: true, boundSpan);
+                statements.Add(new BoundLocalDeclaration(boundSpan, binding,
+                    new BoundVariantPayload(boundSpan, value, bound, null)));
+            }
+
+            statements.AddRange(section.Statements.Select(BindStatement));
+            var body = new BoundBlock(section.Span, statements);
+
+            PopScope();
+            _variantFacts = saved;
+
+            if (!AlwaysExits(body))
+                diagnostics.Error("SL0407", section.Span,
+                    "a switch section must not run off its end; finish it with 'break', " +
+                    "'return' or 'continue'. Stack the labels instead, as in " +
+                    "'case Circle: case Rect:', when two cases share a body");
+
+            sections.Add(new BoundSwitchSection(section.Span, [], section.HasDefault, body)
+            {
+                Cases = cases,
+                Binding = binding,
+            });
+        }
+
+        _switchDepth--;
+
+        var missing = variant.Uncovered(covered.Keys).ToList();
+
+        if (missing.Count > 0 && !sawDefault)
+            diagnostics.Error("SL0436", syntax.Span,
+                $"this switch over '{variant.Name}' does not cover " +
+                Listed(missing.Select(c => "'" + c.Name + "'")) +
+                "; a variant is the choice between its cases, so a switch that leaves one out " +
+                "has no answer for it. Add the case, or a 'default'");
+
+        BoundStatement result = new BoundSwitch(syntax.Span, value, sections)
+        {
+            IsExhaustive = missing.Count == 0,
+        };
+
+        return spill is null ? result : new BoundBlock(syntax.Span, [spill, result]);
     }
 
     /// <summary>
@@ -3620,6 +3954,12 @@ public sealed class Binder(
         if (functions.Count > 0)
             return new BoundFunctionGroup(
                 syntax.Span, FunctionGroupType.Instance, syntax.Name.Text, functions);
+
+        // A case that carries nothing is written without parentheses, so it
+        // reaches here rather than through a call. Last, like every other bare
+        // case name: a local, a parameter, a field and a function all win first.
+        if (parts.Count == 1 && CouldBeVariantCase(parts[0]))
+            return new BoundVariantDraft(syntax.Span, parts[0], []);
 
         diagnostics.Error("SL0229", syntax.Span, $"'{syntax.Name.Text}' is not defined");
         return new BoundErrorExpression(syntax.Span);
@@ -3986,11 +4326,11 @@ public sealed class Binder(
         ApplyFacts(proves);
         var whenTrue = BindExpression(syntax.WhenTrue);
 
-        _resultFacts = new Dictionary<object, ResultFact>(entry);
+        _variantFacts = new Dictionary<object, VariantCaseSymbol>(entry);
         ApplyFacts(disproves);
         var whenFalse = BindExpression(syntax.WhenFalse);
 
-        _resultFacts = entry;
+        _variantFacts = entry;
 
         if (whenTrue.Type.IsError() || whenFalse.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
@@ -4082,7 +4422,7 @@ public sealed class Binder(
 
         // Whatever was proved about this Result was proved about the value it
         // held a moment ago.
-        InvalidateResultFact(target);
+        InvalidateVariantFact(target);
 
         // Writing into a parameter's own storage makes it owned; see
         // ParameterSymbol.IsAssigned.
@@ -4145,7 +4485,7 @@ public sealed class Binder(
         // a write to the parameter exactly as `p.field = x` is.
         if (WrittenParameter(receiver) is { } mutated) mutated.IsAssigned = true;
 
-        InvalidateResultFact(receiver);
+        InvalidateVariantFact(receiver);
 
         var value = BindExpression(syntax.Value);
         if (value.Type.IsError() || property.Type.IsError())
@@ -4417,6 +4757,45 @@ public sealed class Binder(
     /// value. Like <see cref="ResolveModulePrefix"/> a local of the same name
     /// wins, so an enum called <c>Level</c> never shadows a variable.
     /// </summary>
+    /// <summary>
+    /// The variant a <c>Shape.Circle</c> is qualified by, or null.
+    ///
+    /// Only a variant already named as a type, so a generic one is not reachable
+    /// this way: type arguments cannot be written at a call, which is the same
+    /// reason <c>Ok(x)</c> takes its type from where it is going.
+    /// </summary>
+    private VariantTypeSymbol? ResolveVariantPrefix(ExpressionSyntax target)
+    {
+        if (FlattenName(target) is not { } parts) return null;
+
+        // A value of that name is nearer than a type of it, exactly as for an
+        // enum: `shape.Circle` tests a variant, `Shape.Circle` builds one.
+        if (LookupLocal(parts[0]) is not null) return null;
+        if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
+        if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
+        if (_currentFunction?.ContainingType?.FindProperty(parts[0]) is not null) return null;
+
+        if (parts.Count == 1)
+        {
+            if (_currentScope!.Module.Types.TryGetValue(parts[0], out var local))
+                return local as VariantTypeSymbol;
+
+            foreach (var imported in _currentScope.Imports.Values)
+                if (imported.Types.TryGetValue(parts[0], out var found) &&
+                    found is VariantTypeSymbol { IsPublic: true } visible)
+                    return visible;
+
+            return null;
+        }
+
+        string moduleName = string.Join(".", parts.Take(parts.Count - 1));
+        return _modules.TryGetValue(moduleName, out var module) &&
+               module.Types.TryGetValue(parts[^1], out var qualified) &&
+               qualified is VariantTypeSymbol { IsPublic: true } reachable
+            ? reachable
+            : null;
+    }
+
     private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target)
     {
         if (FlattenName(target) is not { } parts) return null;
@@ -4493,6 +4872,21 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // `Shape.Empty` builds a variant whose case carries nothing. One that
+        // does carry something is a call, and BindCall handles it.
+        if (ResolveVariantPrefix(syntax.Target) is { } variantType)
+        {
+            if (variantType.FindCase(syntax.Member) is not { } named)
+            {
+                diagnostics.Error("SL0435", syntax.Span,
+                    $"variant '{variantType.Name}' has no case named '{syntax.Member}'; it has " +
+                    Listed(variantType.Cases.Select(c => c.Name)));
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return BindVariantConstruction(variantType, named, [], syntax.Span);
+        }
+
         // `Color.Red` names a constant of an enum type, not a member of a value.
         if (ResolveEnumPrefix(syntax.Target) is { } enumType)
         {
@@ -4539,11 +4933,10 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // A Result's three readers are the compiler's, not the library's: `Ok`
-        // is always allowed, and `Value` and `Error` are allowed only where it
-        // is known which one of them means anything.
-        if (IsResult(receiver.Type))
-            return BindResultRead(syntax, receiver, (StructTypeSymbol)receiver.Type);
+        // A variant's members are its cases and their payloads, neither of
+        // which is a field the source may reach directly.
+        if (receiver.Type is VariantTypeSymbol variantReceiver)
+            return BindVariantRead(syntax, receiver, variantReceiver);
 
         // Properties come first: an automatic one has a field of the same name,
         // and reaching that field directly would skip the accessor and, through
@@ -4580,132 +4973,281 @@ public sealed class Binder(
     ///
     /// The storage is module-private and this reads it directly, so the three
     /// names cost a field load and no call. What <c>Value</c> and <c>Error</c>
-    /// additionally cost is a proof: each is readable only where the compiler
-    /// has already seen the other case ruled out, which is what makes a Result
-    /// different from a pair of fields that happen to sit together.
+    /// additionally cost is a proof: it is readable only where the compiler has
+    /// already established the case it belongs to, which is what makes a variant
+    /// different from a struct whose fields happen to sit together.
     /// </summary>
     /// <summary>
-    /// <c>Ok(x)</c> or <c>Fail(e)</c>, held as a draft until something says which
-    /// Result it is.
+    /// <c>Ok(x)</c> - a case named without its variant, held as a draft until
+    /// something says which variant was meant.
+    ///
+    /// This is how <c>Ok</c> and <c>Fail</c> have always worked, generalized:
+    /// one value cannot say what a variant's type arguments are, so the case is
+    /// resolved from the type it is being returned or assigned into, the same
+    /// rule a lambda obeys. Functions win a name outright - a bare call is only
+    /// a draft when nothing else answers to it - so a case name costs a program
+    /// nothing it was already using.
     /// </summary>
-    private BoundExpression BindResultDraft(
-        CallSyntax syntax, string name, List<BoundExpression> arguments)
+    private BoundExpression BindVariantDraft(
+        CallSyntax syntax, string name, List<BoundExpression> arguments) =>
+        new BoundVariantDraft(syntax.Span, name, arguments);
+
+    /// <summary>
+    /// The case a name would build if it were written bare in this file, or
+    /// null. It is what SL0414 refuses to let a module-level function shadow.
+    /// </summary>
+    private VariantCaseSymbol? CaseNamed(FileScope scope, string name)
     {
-        if (_resultTemplate is null)
-        {
-            diagnostics.Error("SL0288", syntax.Span,
-                $"'{name}' builds a Result, and 'Standard.Result' is not available");
-            return new BoundErrorExpression(syntax.Span);
-        }
+        var previous = _currentScope;
+        _currentScope = scope;
 
-        if (arguments.Count != 1)
+        try
         {
-            diagnostics.Error("SL0289", syntax.Span,
-                $"'{name}' takes exactly one argument: " +
-                (name == OkName ? "the value produced" : "why the operation failed"));
-            return new BoundErrorExpression(syntax.Span);
-        }
+            var found = VariantsWithCase(name).FirstOrDefault()?.FindCase(name);
+            if (found is not null) return found;
 
-        return new BoundResultDraft(syntax.Span, name == OkName, arguments[0]);
+            // A generic variant has no symbol until it is instantiated, so its
+            // template's cases are read from the syntax -- which is also how
+            // Result's Ok and Fail are found before any Result exists.
+            foreach (var template in VisibleModules().SelectMany(m => m.GenericTypes.Values))
+            {
+                if (template.Declaration.Kind != TypeDeclKind.Variant) continue;
+                if (template.Declaration.Cases.All(c => c.Name != name)) continue;
+
+                return new VariantCaseSymbol
+                {
+                    Name = name,
+                    Tag = 0,
+                    Span = template.Declaration.Span,
+                    DeclaringVariant = new VariantTypeSymbol
+                    {
+                        SimpleName = template.Name,
+                        ModuleName = template.Module.Name,
+                    },
+                };
+            }
+
+            return null;
+        }
+        finally
+        {
+            _currentScope = previous;
+        }
+    }
+
+    /// <summary>Every variant this file can see with a case of that name.</summary>
+    private List<VariantTypeSymbol> VariantsWithCase(string name)
+    {
+        return VisibleModules()
+            .Distinct()
+            .SelectMany(m => m.Types.Values)
+            .OfType<VariantTypeSymbol>()
+            .Where(v => v.FindCase(name) is not null)
+            .Distinct()
+            .ToList();
     }
 
     /// <summary>
-    /// Settles a draft against the Result it is becoming, converting the payload
-    /// to whichever of T and E it belongs in.
+    /// True when a bare <c>Name(...)</c> could be building a variant, which is
+    /// what makes it worth holding as a draft rather than reporting as an
+    /// unknown function.
+    ///
+    /// A generic variant is not in any module's type table until it has been
+    /// instantiated, so its template's cases are read from the syntax. That is
+    /// what keeps <c>Ok(x)</c> working in a program that has not yet named a
+    /// <c>Result&lt;T, E&gt;</c> anywhere.
     /// </summary>
-    private BoundExpression BindResultSettle(
-        BoundResultDraft draft, TypeSymbol target, SourceSpan span)
+    private bool CouldBeVariantCase(string name)
     {
-        if (!IsResult(target))
+        if (VariantsWithCase(name).Count > 0) return true;
+
+        return VisibleModules()
+            .SelectMany(m => m.GenericTypes.Values)
+            .Any(t => t.Declaration.Kind == TypeDeclKind.Variant &&
+                      t.Declaration.Cases.Any(c => c.Name == name));
+    }
+
+    /// <summary>
+    /// Settles a draft against the variant it is becoming, converting each
+    /// argument to the field it is stored in.
+    /// </summary>
+    private BoundExpression BindVariantSettle(
+        BoundVariantDraft draft, TypeSymbol target, SourceSpan span)
+    {
+        if (target is not VariantTypeSymbol variant)
         {
             diagnostics.Error("SL0413", span,
-                $"'{(draft.Succeeded ? OkName : FailName)}' builds a Result, but " +
-                $"'{target.Name}' is expected here");
+                $"'{draft.Case}' names a variant's case, but '{target.Name}' is expected here");
             return new BoundErrorExpression(span);
         }
 
-        var result = (StructTypeSymbol)target;
-        var payloadType = result.TypeArguments[draft.Succeeded ? 0 : 1];
-        var payload = BindConversion(draft.Payload, payloadType, draft.Payload.Span);
+        if (variant.FindCase(draft.Case) is not { } variantCase)
+        {
+            diagnostics.Error("SL0435", span,
+                $"'{variant.Name}' has no case named '{draft.Case}'; it has " +
+                Listed(variant.Cases.Select(c => c.Name)));
+            return new BoundErrorExpression(span);
+        }
 
-        return new BoundResultConstruction(span, target, draft.Succeeded, payload);
+        return BindVariantConstruction(variant, variantCase, draft.Arguments, span);
     }
 
-    private BoundExpression BindResultRead(
-        MemberAccessSyntax syntax, BoundExpression receiver, StructTypeSymbol result)
+    /// <summary>Checks the arguments against a case's fields and builds the value.</summary>
+    private BoundExpression BindVariantConstruction(
+        VariantTypeSymbol variant,
+        VariantCaseSymbol variantCase,
+        IReadOnlyList<BoundExpression> arguments,
+        SourceSpan span)
     {
-        string wanted = syntax.Member switch
-        {
-            OkName => ResultOkField,
-            "Value" => ResultValueField,
-            "Error" => ResultErrorField,
-            _ => "",
-        };
+        var fields = variantCase.Fields;
 
-        if (wanted.Length == 0)
+        if (arguments.Count != fields.Count)
         {
-            if (result.FindMethod(syntax.Member) is not null)
+            diagnostics.Error("SL0289", span,
+                $"'{variant.Name}.{variantCase.Name}' carries {Counted(fields.Count, "field")}, " +
+                $"but {arguments.Count} " + (arguments.Count == 1 ? "was" : "were") + " given; " +
+                $"it is written '{variantCase.Signature}'");
+            return new BoundErrorExpression(span);
+        }
+
+        var converted = arguments
+            .Select((argument, i) => BindConversion(argument, fields[i].Type, argument.Span))
+            .ToList();
+
+        return new BoundVariantConstruction(span, variant, variantCase, converted);
+    }
+
+    /// <summary>
+    /// <c>v.Case</c>, which asks the tag, and <c>v.field</c>, which reads a
+    /// payload once something has said which case is there.
+    ///
+    /// The proof is the whole point. A payload field is storage that only means
+    /// anything when its case is the one present, so reading it without having
+    /// established that is refused rather than answered.
+    /// </summary>
+    private BoundExpression BindVariantRead(
+        MemberAccessSyntax syntax, BoundExpression receiver, VariantTypeSymbol variant)
+    {
+        if (variant.FindCase(syntax.Member) is { } tested)
+            return new BoundVariantTest(
+                syntax.Span, PrimitiveTypeSymbol.Bool, receiver, tested);
+
+        // A variant may carry ordinary members too, and Result's ValueOr is one.
+        if (variant.FindProperty(syntax.Member) is { } property)
+            return BindPropertyRead(syntax.Span, receiver, property);
+
+        var carrying = variant.Cases.Where(c => c.FindField(syntax.Member) is not null).ToList();
+
+        if (carrying.Count == 0)
+        {
+            if (variant.FindMethod(syntax.Member) is not null)
             {
                 diagnostics.Error("SL0250", syntax.Span,
-                    $"'{result.Name}.{syntax.Member}' is a method; call it with '()'");
+                    $"'{variant.Name}.{syntax.Member}' is a method; call it with '()'");
                 return new BoundErrorExpression(syntax.Span);
             }
 
             diagnostics.Error("SL0251", syntax.Span,
-                $"'{result.Name}' has no member named '{syntax.Member}'; a Result has " +
-                "'Ok', 'Value', 'Error' and 'ValueOr'");
+                $"'{variant.Name}' has no case or field named '{syntax.Member}'; its cases are " +
+                Listed(variant.Cases.Select(c => c.Signature)));
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var field = result.FindStorage(wanted);
-        if (field is null) return new BoundErrorExpression(syntax.Span);
-
-        if (wanted == ResultOkField) return new BoundFieldAccess(syntax.Span, receiver, field);
-
-        bool wantsValue = wanted == ResultValueField;
         var subject = NarrowableSubject(receiver);
 
         if (subject is null)
         {
             diagnostics.Error("SL0285", syntax.Span,
-                $"'{syntax.Member}' can only be read from a Result held in a local or a " +
+                $"'{syntax.Member}' can only be read from a variant held in a local or a " +
                 "parameter, because that is the only thing a check can be about; assign " +
-                "this to one first, then check its 'Ok'");
+                "this to one first, then test which case it is");
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var known = _resultFacts.TryGetValue(subject, out var fact) ? fact : (ResultFact?)null;
-        var required = wantsValue ? ResultFact.Succeeded : ResultFact.Failed;
+        var known = _variantFacts.TryGetValue(subject, out var fact) ? fact : null;
+        string name = SubjectName(subject);
 
-        if (known != required)
+        if (known is null)
         {
-            string name = subject switch
-            {
-                LocalSymbol local => local.Name,
-                ParameterSymbol parameter => parameter.Name,
-                _ => "it",
-            };
-
+            var suggestion = carrying[0];
             diagnostics.Error("SL0286", syntax.Span,
-                known is null
-                    ? $"'{name}.{syntax.Member}' is not readable here, because nothing has " +
-                      $"established that '{name}' {(wantsValue ? "succeeded" : "failed")}; " +
-                      $"check 'if ({(wantsValue ? "" : "!")}{name}.Ok)' first, or use " +
-                      (wantsValue ? $"'{name}.ValueOr(...)'" : "'Ok' to decide")
-                    : $"'{name}' is known to have {(known == ResultFact.Succeeded ? "succeeded" : "failed")} " +
-                      $"here, so '{syntax.Member}' is the wrong half to read");
+                $"'{name}.{syntax.Member}' is not readable here, because nothing has " +
+                $"established that '{name}' is '{suggestion.Name}'; " +
+                $"check 'if ({name}.{suggestion.Name})' first, or switch over '{name}'");
             return new BoundErrorExpression(syntax.Span);
         }
 
-        return new BoundFieldAccess(syntax.Span, receiver, field);
+        if (known.FindField(syntax.Member) is not { } field)
+        {
+            diagnostics.Error("SL0286", syntax.Span,
+                $"'{name}' is known to be '{known.Name}' here, and '{known.Signature}' does " +
+                $"not carry '{syntax.Member}'; that field belongs to " +
+                Listed(carrying.Select(c => "'" + c.Name + "'")));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundVariantPayload(syntax.Span, receiver, known, field);
     }
+
+    /// <summary>The modules a name written in the current file resolves against.</summary>
+    private IEnumerable<ModuleSymbol> VisibleModules()
+    {
+        if (_currentScope is null) return [];
+        return _currentScope.Imports.Values.Prepend(_currentScope.Module).Distinct();
+    }
+
+    private static string SubjectName(object subject) => subject switch
+    {
+        LocalSymbol local => local.Name,
+        ParameterSymbol parameter => parameter.Name,
+        _ => "it",
+    };
+
+    /// <summary>"a, b and c" - for a diagnostic that lists what was available.</summary>
+    private static string Listed(IEnumerable<string> items)
+    {
+        var list = items.ToList();
+        return list.Count switch
+        {
+            0 => "nothing",
+            1 => list[0],
+            _ => string.Join(", ", list.Take(list.Count - 1)) + " and " + list[^1],
+        };
+    }
+
+    private static string Counted(int count, string noun) =>
+        count == 1 ? "1 " + noun : $"{count} {noun}s";
 
     private BoundExpression BindCall(CallSyntax syntax)
     {
         var arguments = syntax.Arguments.Select(BindExpression).ToList();
 
-        if (syntax.Callee is NameSyntax { Name.Parts: [OkName or FailName] } constructor)
-            return BindResultDraft(syntax, constructor.Name.Parts[0], arguments);
+        // A bare `Ok(x)` builds a variant rather than calling anything. It has
+        // to be decided here, before the name is looked up, because a draft has
+        // no type yet and overload resolution has nothing to resolve against.
+        // What keeps that unambiguous is SL0414: a module-level function may not
+        // be named after a case of a variant this file can see. A method still
+        // may, and is reached through its receiver.
+        if (syntax.Callee is NameSyntax { Name.Parts: [var bare] } &&
+            LookupLocal(bare) is null && CouldBeVariantCase(bare))
+            return BindVariantDraft(syntax, bare, arguments);
+
+
+        // `Shape.Circle(2.0)` names the variant as well as the case, so it
+        // needs nothing from the surrounding expression to settle it.
+        if (syntax.Callee is MemberAccessSyntax { } named &&
+            ResolveVariantPrefix(named.Target) is { } prefix)
+        {
+            if (prefix.FindCase(named.Member) is not { } prefixCase)
+            {
+                diagnostics.Error("SL0435", named.Span,
+                    $"variant '{prefix.Name}' has no case named '{named.Member}'; it has " +
+                    Listed(prefix.Cases.Select(c => c.Name)));
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return BindVariantConstruction(prefix, prefixCase, arguments, syntax.Span);
+        }
 
         // `receiver.Method(args)`, unless the receiver is really a module path.
         if (syntax.Callee is MemberAccessSyntax member)
@@ -5241,6 +5783,15 @@ public sealed class Binder(
                 _ => false,
             };
 
+        // A bare case name fits a variant with that case, on the same terms a
+        // lambda fits an interface: the parameter is the only thing that says
+        // which variant was meant, and the arity is what can be checked before
+        // the arguments are converted against the fields.
+        if (argument is BoundVariantDraft draft)
+            return target is VariantTypeSymbol variant &&
+                   variant.FindCase(draft.Case) is { } named &&
+                   named.Fields.Count == draft.Arguments.Count;
+
         if (IsBytePointer(target))
         {
             if (argument is BoundStringLiteral) return true;
@@ -5334,8 +5885,8 @@ public sealed class Binder(
             return BindLambda(lambda, target, span);
 
         // Nor has `Ok(x)`, for the same reason and by the same route.
-        if (expression is BoundResultDraft draft)
-            return BindResultSettle(draft, target, span);
+        if (expression is BoundVariantDraft draft)
+            return BindVariantSettle(draft, target, span);
 
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
@@ -6158,30 +6709,30 @@ public sealed class LambdaType : TypeSymbol
 }
 
 /// <summary>
-/// The type of <c>Ok(x)</c> or <c>Fail(e)</c> before something says which
-/// <c>Result</c> it is.
+/// The type of a bare case name before something says which variant it builds.
 ///
-/// One value cannot say what both of a Result's type arguments are -- <c>Ok(4)</c>
-/// knows T and nothing about E -- and type arguments cannot be written at a call.
-/// So construction is target-typed, exactly as a lambda is, and this is the
-/// placeholder that carries the pieces until a conversion resolves it. It never
-/// reaches the emitter.
+/// One value cannot say what a variant's type arguments are -- <c>Ok(4)</c>
+/// knows T and nothing about E -- and type arguments cannot be written at a
+/// call. So construction is target-typed, exactly as a lambda is, and this is
+/// the placeholder that carries the pieces until a conversion resolves it. It
+/// never reaches the emitter.
 /// </summary>
-public sealed class ResultDraftType : TypeSymbol
+public sealed class VariantDraftType : TypeSymbol
 {
-    public static readonly ResultDraftType Instance = new();
-    private ResultDraftType() { }
-    public override string Name => "Ok(...) or Fail(...)";
+    public static readonly VariantDraftType Instance = new();
+    private VariantDraftType() { }
+    public override string Name => "a variant's case";
     public override int Size => 0;
     public override int Alignment => 1;
 }
 
-/// <summary>An <c>Ok(x)</c> or <c>Fail(e)</c> awaiting the Result type it belongs to.</summary>
-public sealed class BoundResultDraft(SourceSpan span, bool succeeded, BoundExpression payload)
-    : BoundExpression(span, ResultDraftType.Instance)
+/// <summary>A <c>Case(...)</c> awaiting the variant type it belongs to.</summary>
+public sealed class BoundVariantDraft(
+    SourceSpan span, string variantCase, IReadOnlyList<BoundExpression> arguments)
+    : BoundExpression(span, VariantDraftType.Instance)
 {
-    public bool Succeeded { get; } = succeeded;
-    public BoundExpression Payload { get; } = payload;
+    public string Case { get; } = variantCase;
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
 }
 
 /// <summary>

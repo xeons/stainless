@@ -296,9 +296,120 @@ class Parent {
 ```
 
 A lambda that captures `this` holds its object strongly, so an object that
-stores its own closure is such a cycle; see §2.10.
+stores its own closure is such a cycle; see §2.11.
 
-### 2.5 `Result<T, E>` — how a function fails
+### 2.5 `variant` — a value that is one of several things
+
+A `variant` is the choice between its cases. Each case has a name and the fields
+it carries, and a value is exactly one of them and says which.
+
+```csharp
+public variant Shape {
+    Circle(double Radius);
+    Rect(double Width, double Height);
+    Empty;
+}
+```
+
+It is a **value type**, laid out as a tag followed by enough storage for the
+widest case (§2 of the ABI notes). Nothing allocates, and the payloads overlap,
+so `Shape` above is 24 bytes — a tag, seven bytes of padding and two doubles —
+rather than the 32 that keeping every case's fields side by side would cost.
+
+**Building one.** A case may be named through its variant, or on its own where
+the surrounding code already says which variant is meant:
+
+```csharp
+Shape a = Shape.Circle(2.0);      // named outright
+Shape b = Circle(2.0);            // the type of 'b' says which variant
+return Rect(3.0, 4.0);            // and so does a return type
+Area(Circle(2.0));                // and so does a parameter
+```
+
+The bare form is the one `Ok` and `Fail` have always used, and it obeys the same
+rule a lambda does: it takes its type from where it is going. It cannot be
+inferred *from*, so `var s = Circle(2.0);` is SL0287. A generic variant can only
+be built this way, because type arguments cannot be written at a call (§4.4).
+
+Because a bare case name resolves before any function of that name would, **a
+module-level function may not be named after a case of a variant its file can
+see** (SL0414). A *method* still may: a method is reached through its receiver,
+and nothing there is ambiguous.
+
+**Asking which case.** `v.Case` is a bool — one load of the tag and one
+comparison:
+
+```csharp
+if (shape.Circle) { ... }
+```
+
+**Reading what a case carries** needs the compiler to have established which
+case is there first. This is the whole point of the type, and it is checked
+rather than trusted:
+
+```csharp
+shape.Radius                  // error[SL0286]: nothing has established that
+                              // 'shape' is 'Circle'
+if (shape.Circle) { shape.Radius }    // fine
+```
+
+The proof comes from the same shapes that narrow anything else — an `if`, its
+negation, `&&`, `||`, a ternary, an early return — and it is taken away again by
+anything that could have changed the value. A variant with exactly two cases
+narrows on a false test as well as a true one, which is why `if (!r.Ok)` proves
+`Fail`. Only a variant held in a local or a parameter can carry a proof (SL0285),
+for the reason given in §2.6.
+
+**Switching over one** covers the cases rather than constant values, and needs
+no `default` once they are all there:
+
+```csharp
+double Area(Shape shape) {
+    switch (shape) {
+        case Circle c: return 3.14159 * c.Radius * c.Radius;
+        case Rect r:   return r.Width * r.Height;
+        case Empty:    return 0.0;
+    }
+}
+```
+
+Leaving a case out without a `default` is an error that names what is missing:
+
+```
+error[SL0436]: this switch over 'Shape' does not cover 'Rect' and 'Empty'; a
+variant is the choice between its cases, so a switch that leaves one out has no
+answer for it. Add the case, or a 'default'
+```
+
+An exhaustive switch is also a way out of a function, so `Area` above needs no
+`return` after it.
+
+`case Circle c:` binds `c` to what the case carries — a struct of that case's
+fields, copied like any other struct value. `case Circle:` binds nothing and
+narrows the switched value instead, so `shape.Radius` is readable in the arm.
+Both are available; the binding is what to reach for when the thing switched on
+was not a name to begin with. Labels stack as they do anywhere else, and a
+section reached by two cases has proved nothing about which, so neither
+narrowing nor a binding is available in it.
+
+**Reference counting asks the tag.** A case may carry a `String`, a class, an
+array — anything a struct field may be. Copying the variant retains what the
+case actually present holds, and dropping it releases the same; the bytes of a
+case that is not there are never counted, which is what lets them overlap at
+all. The cost is a switch on the tag at each copy and each drop, and only for a
+variant some case of which holds a reference. One that holds none is plain
+bytes, and copies with a `memcpy` like any other struct.
+
+**Where a variant may go.** It is a struct, so it goes wherever a struct goes:
+across `extern "C"` if no case holds a reference and not at all if one does
+(SL0284), into an array, into a field, across a thread when everything every
+case carries could cross on its own. Two things it does not do yet: cross a
+library boundary as a binary (SL0441 — the metadata carries layouts, and a
+variant's cases are what a consumer would switch on), and carry `[Reflect]`
+(SL0442 — the field tables would describe the tag and the payload, which are not
+fields the program has).
+
+### 2.6 `Result<T, E>` — how a function fails
 
 Stainless does not unwind. There is no `throw`, no stack unwinding and no
 `catch`, and there will not be: unwinding needs metadata on every frame and a
@@ -315,14 +426,29 @@ Result<Config, IOError> Load(String path) {
 }
 ```
 
-`Result<T, E>` is a struct, so a call that succeeds allocates nothing. It is
-declared in `Standard`, which is imported everywhere, so it needs no import.
+**`Result<T, E>` is an ordinary variant** (§2.5), declared in `Standard`, which
+is imported everywhere:
+
+```csharp
+public variant Result<T, E> {
+    Ok(T Value);
+    Fail(E Error);
+}
+```
+
+Every rule it appears to have is a rule variants have. `Ok` and `Fail` are its
+cases, so `r.Ok` asks the tag; `Value` and `Error` are the fields those cases
+carry, so reading one needs the compiler to know which case is there; and both
+are written without type arguments because a case takes its variant from where
+it is going. Being a variant is also what makes it small: only one case is ever
+present, so a `Result<String, IOError>` is a tag and one pointer rather than a
+flag and both halves. A call that succeeds allocates nothing.
 
 **`Ok` and `Fail` take their type from where they are going.** Neither can be
 written with type arguments — type arguments cannot be written at a call at all
 (§4.4) — and one value could not say what both of them are: `Ok(4)` fixes `T`
-and says nothing about `E`. So the compiler reads the type being returned or
-assigned into, exactly as it does for a lambda:
+and says nothing about `E`. So the compiler reads the type being returned,
+assigned into, or passed as an argument, exactly as it does for a lambda:
 
 ```csharp
 Result<int, Why> Doubled(int n) {
@@ -335,11 +461,11 @@ var loose = Ok(4);                              // error[SL0287]: nothing to inf
 ```
 
 For the same reason a module-level function may not be named `Ok` or `Fail`
-(SL0414). A *method* still may.
+(SL0414) — the general rule for any variant's case, §2.5. A *method* still may.
 
 **`Value` and `Error` are readable only where it is known which one is there.**
-This is what makes a Result different from a pair of fields that happen to sit
-together, and it is checked rather than trusted:
+This is the general rule for a variant's payload, and it is what makes a Result
+different from a pair of fields that happen to sit together:
 
 ```csharp
 var read = File.ReadAllText(path);
@@ -355,6 +481,7 @@ The proof can come from any of these:
 | `if (!r.Ok) { return …; }` | `Value` for the whole rest of the block |
 | `r.Ok ? r.Value : f(r.Error)` | each arm, under its own branch |
 | `if (a.Ok && b.Ok)` | both, inside the branch |
+| `switch (r) { case Ok: … case Fail: … }` | each arm, and no `default` needed |
 
 The early return is the one most code is written around, and it is why
 `AlwaysExits` matters here: a branch that always leaves proves its opposite for
@@ -392,7 +519,7 @@ mistake in the program rather than an outcome of it, and those still abort
 through the runtime: threading a Result through every array index would make
 every program worse to read in exchange for nothing.
 
-### 2.6 `interface` — a contract, dispatched dynamically
+### 2.7 `interface` — a contract, dispatched dynamically
 
 ```csharp
 public interface IShape {
@@ -455,7 +582,7 @@ through either reference reaches the right one, and a call on `Both` itself
 picks by argument type. What may *not* be overloaded is a method of one
 interface, since that is one slot.
 
-### 2.7 `T[]` — a counted array
+### 2.8 `T[]` — a counted array
 
 ```csharp
 var numbers = new int[5];
@@ -476,7 +603,7 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
-### 2.8 `enum` — a distinct type over an integer
+### 2.9 `enum` — a distinct type over an integer
 
 ```csharp
 public enum Color { Red, Green, Blue }
@@ -546,7 +673,7 @@ no methods, so this is the language spelling the test rather than a call.
 into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
 belong to.
 
-### 2.9 `delegate` — a named function pointer
+### 2.10 `delegate` — a named function pointer
 
 ```csharp
 public delegate int Transform(int value);
@@ -589,10 +716,10 @@ if (none == null) { ... }
 
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
-§2.10 — and only a non-capturing one can be a delegate, because there is nowhere
+§2.11 — and only a non-capturing one can be a delegate, because there is nowhere
 in a single pointer to keep what was captured.
 
-### 2.10 Lambdas and closures
+### 2.11 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
 assigned to: an **interface with exactly one method**, or a **delegate**.
@@ -1237,7 +1364,7 @@ Stainless has no static classes, so what C# spells `File.ReadAllText` is a
 module-qualified call to a module-level function. That is the mapping
 throughout: a module is the static class.
 
-**How failure is reported.** Stainless does not unwind (§2.5), so the outcome
+**How failure is reported.** Stainless does not unwind (§2.6), so the outcome
 comes back as a value, in one of three shapes:
 
 | Shape | Used by | Reads as |
@@ -1456,7 +1583,7 @@ overloaded, because dispatch gives each one a single slot
 ```
 
 A *class* implementing two interfaces whose methods share a name is a different
-matter, and it works — see §2.6.
+matter, and it works — see §2.7.
 
 ### 7.2 Properties
 
@@ -1832,11 +1959,26 @@ switch (level) {
 }
 ```
 
-The value may be an integer, a `char`, a `bool`, an enum or a `String`; every
-label must be a constant of that type, and no two may name the same value.
-An enum, integer, char or bool switch becomes one LLVM `switch` instruction,
-which decides for itself whether a jump table beats a chain of comparisons.
-A `String` switch compares in order against the runtime's string equality.
+The value may be an integer, a `char`, a `bool`, an enum, a `String` or a
+variant. For everything but a variant, each label is a constant of that type and
+no two may name the same value. An enum, integer, char or bool switch becomes
+one LLVM `switch` instruction, which decides for itself whether a jump table
+beats a chain of comparisons. A `String` switch compares in order against the
+runtime's string equality.
+
+**A switch over a variant names cases rather than values** (§2.5). It is the one
+kind that may be exhaustive, and then needs no `default`; it is also the one
+where a label may bind what the case carries.
+
+```csharp
+switch (shape) {
+    case Circle c: return c.Radius;     // binds the payload
+    case Rect:     return shape.Width;  // narrows the switched value
+    case Empty:    return 0.0;
+}                                       // no default: every case is covered
+```
+
+The tag is a byte, so this is an LLVM `switch` like an enum's.
 
 **Sections do not fall through.** Each one has to end by leaving — `break`,
 `return` or `continue` — and running off the end is an error rather than a
@@ -1865,14 +2007,16 @@ for (nuint i = 0; i < values.Length; i = i + 1) {
 }
 ```
 
-A `default` is optional; without one, a value that matches nothing simply falls
-past the whole statement. There is no exhaustiveness requirement on an enum, and
-no `goto case`. Each section has its own scope, so two sections may declare the
-same local name — which C# does not allow, having put the whole switch in one
-scope.
+A `default` is optional except over a variant, where leaving a case out without
+one is SL0436. Elsewhere a value that matches nothing falls past the whole
+statement: there is no exhaustiveness requirement on an enum, whose value need
+not be one of its members. There is no `goto case`. Each section has its own
+scope, so two sections may declare the same local name — which C# does not
+allow, having put the whole switch in one scope.
 
-There is no `switch` *expression* and no pattern matching; this is the C#
-statement, and only that.
+There is no `switch` *expression*, and the only pattern is a variant's case:
+no type patterns, no constants inside one, no guards. This is the C# statement
+plus the one thing a variant needs to be readable at all.
 
 ### 9.2 `parallel`, `spawn` and `parallel for`
 

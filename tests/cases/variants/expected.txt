@@ -1,0 +1,38 @@
+12.5664
+12
+0
+circle r=1.5
+rect 2x5
+cornered
+round or nothing
+42
+sizeof Shape=24
+--- references ---
+plain
+marked/marker
+marked/marker
+leaving
+~marker
+left
+--- reassignment ---
+first/first
+~first
+second/second
+~second
+-
+still here
+--- inside other things ---
+boxed/boxed
+temporary
+closing
+~Envelope
+~boxed
+closed
+sizeof Silence-only=1
+--- control flow ---
+3011
+3
+leaf
+5
+odd
+-1

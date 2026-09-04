@@ -165,7 +165,8 @@ public sealed class Parser
             return ParseLinkageDeclaration(start, modifiers);
 
         if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword,
-                  TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword))
+                  TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword,
+                  TokenKind.VariantKeyword))
             return [ParseTypeDeclaration(start, modifiers, attributes)];
 
         if (At(TokenKind.EnumKeyword))
@@ -297,6 +298,7 @@ public sealed class Parser
             TokenKind.ClassKeyword => TypeDeclKind.Class,
             TokenKind.InterfaceKeyword => TypeDeclKind.Interface,
             TokenKind.AttributeKeyword => TypeDeclKind.Attribute,
+            TokenKind.VariantKeyword => TypeDeclKind.Variant,
             _ => TypeDeclKind.Struct,
         };
         Advance();
@@ -316,9 +318,23 @@ public sealed class Parser
         Expect(TokenKind.OpenBrace);
 
         var members = new List<Declaration>();
+        var cases = new List<VariantCaseSyntax>();
+
         while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
         {
             int before = _pos;
+
+            // Inside a variant, `Name(...)` and `Name;` are cases. Nothing else
+            // in a member position has that shape: a method writes its return
+            // type first, a property opens a brace, and a variant has no
+            // constructor, because its cases are how one is built.
+            if (kind == TypeDeclKind.Variant && At(TokenKind.Identifier) &&
+                Peek(1).Kind is TokenKind.OpenParen or TokenKind.Semicolon)
+            {
+                cases.Add(ParseVariantCase());
+                continue;
+            }
+
             members.AddRange(ParseDeclaration(enclosingType: name));
             if (_pos == before) Advance();
         }
@@ -328,9 +344,34 @@ public sealed class Parser
             _diagnostics.Error("SL0331", SpanFrom(start),
                 $"'{name}' is not generic, so it cannot have a 'where' clause");
 
+        if (kind == TypeDeclKind.Variant && cases.Count == 0)
+            _diagnostics.Error("SL0430", SpanFrom(start),
+                $"variant '{name}' has no cases; a variant is the choice between its cases, " +
+                "so one with none has no values at all");
+
         return new TypeDeclSyntax(
             SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
-            implements, members, attributes);
+            implements, members, attributes) { Cases = cases };
+    }
+
+    /// <summary><c>Circle(double radius);</c> or <c>Empty;</c>.</summary>
+    private VariantCaseSyntax ParseVariantCase()
+    {
+        int start = _pos;
+        string name = ExpectIdentifier();
+
+        IReadOnlyList<ParameterSyntax> parameters = [];
+        bool variadic = false;
+
+        if (At(TokenKind.OpenParen)) parameters = ParseParameterList(out variadic);
+
+        if (variadic)
+            _diagnostics.Error("SL0431", SpanFrom(start),
+                $"case '{name}' cannot be variadic; a case's parameters are the fields it " +
+                "carries, and a value has a fixed number of them");
+
+        Expect(TokenKind.Semicolon);
+        return new VariantCaseSyntax(SpanFrom(start), name, parameters);
     }
 
     /// <summary>
@@ -925,16 +966,40 @@ public sealed class Parser
         {
             int sectionStart = _pos;
             var labels = new List<ExpressionSyntax>();
+            var bindings = new List<CaseBindingSyntax>();
             bool hasDefault = false;
 
             while (AtAny(TokenKind.CaseKeyword, TokenKind.DefaultKeyword))
             {
-                if (Match(TokenKind.DefaultKeyword)) hasDefault = true;
-                else { Advance(); labels.Add(ParseExpression()); }
+                if (Match(TokenKind.DefaultKeyword))
+                {
+                    hasDefault = true;
+                }
+                else
+                {
+                    int labelStart = _pos;
+                    Advance();
+
+                    // `case Circle c:` names a variant's case and binds its
+                    // payload. Two identifiers in a row is the whole of the
+                    // test: no expression starts that way.
+                    if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Identifier)
+                    {
+                        string caseName = ExpectIdentifier();
+                        string binding = ExpectIdentifier();
+                        bindings.Add(new CaseBindingSyntax(
+                            SpanFrom(labelStart), caseName, binding));
+                    }
+                    else
+                    {
+                        labels.Add(ParseExpression());
+                    }
+                }
+
                 Expect(TokenKind.Colon);
             }
 
-            if (labels.Count == 0 && !hasDefault)
+            if (labels.Count == 0 && bindings.Count == 0 && !hasDefault)
             {
                 _diagnostics.Error("SL0402", Current.Span,
                     "expected 'case' or 'default'; every statement in a switch belongs to a " +
@@ -953,7 +1018,7 @@ public sealed class Parser
             }
 
             sections.Add(new SwitchSectionSyntax(
-                SpanFrom(sectionStart), labels, hasDefault, statements));
+                SpanFrom(sectionStart), labels, hasDefault, statements) { Bindings = bindings });
         }
 
         Expect(TokenKind.CloseBrace);

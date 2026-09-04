@@ -74,6 +74,30 @@ public static class CHeaderWriter
         {
             switch (type)
             {
+                // A variant is a tag and enough bytes for the widest case. Its
+                // two fields are spelled with a character C has no use for, and
+                // the cases overlap in a way a C struct cannot state, so the
+                // shape is written out rather than the fields copied across.
+                case VariantTypeSymbol variant:
+                    sb.AppendLine($"/* variant {variant.QualifiedName}:");
+                    foreach (var variantCase in variant.Cases)
+                        sb.AppendLine($"     {variantCase.Tag} = {variantCase.Signature}");
+                    sb.AppendLine("   The payload is that case's fields, laid out as a struct.");
+                    sb.AppendLine("   Read it by checking the tag first; there is no other way. */");
+                    sb.AppendLine($"typedef struct {CName(variant)} {{");
+                    sb.AppendLine("    uint8_t tag;");
+                    // As an array of the integer the payload is aligned to,
+                    // rather than of bytes with an alignment attribute: this
+                    // spelling is the same in C and in C++, and the two of them
+                    // do not share one for alignment.
+                    if (variant.PayloadStorage is { Fields.Count: > 0 } storage)
+                    {
+                        sb.AppendLine($"    {TypeName(storage.Fields[0].Type)} " +
+                                      $"payload[{storage.Fields.Count}];");
+                    }
+                    sb.AppendLine($"}} {CName(variant)};");
+                    break;
+
                 case StructTypeSymbol structType:
                     sb.AppendLine($"typedef struct {CName(structType)} {{");
                     foreach (var field in structType.Fields)
@@ -145,6 +169,10 @@ public static class CHeaderWriter
     {
         switch (type)
         {
+            case VariantTypeSymbol variant when seen.Add(variant):
+                ordered.Add(variant);
+                break;
+
             case StructTypeSymbol structType when seen.Add(structType):
                 foreach (var field in structType.Fields) Collect(field.Type, ordered, seen);
                 ordered.Add(structType);
@@ -202,6 +230,7 @@ public static class CHeaderWriter
         },
 
         PointerTypeSymbol pointer => TypeName(pointer.Element) + "*",
+        VariantTypeSymbol variant => CName(variant),
         StructTypeSymbol structType => CName(structType),
 
         // An enum is its underlying integer, and a delegate is a function

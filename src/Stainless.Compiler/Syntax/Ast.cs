@@ -226,7 +226,20 @@ public sealed record EnumDeclSyntax(
     IReadOnlyList<EnumMemberSyntax> Members,
     IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
 
-public enum TypeDeclKind { Struct, Class, Interface, Attribute }
+public enum TypeDeclKind { Struct, Class, Interface, Attribute, Variant }
+
+/// <summary>
+/// One case of a <c>variant</c>: <c>Circle(double radius);</c>, or
+/// <c>Empty;</c> for one that carries nothing.
+///
+/// The parameters are the payload's fields rather than a signature. A case is
+/// how the value is built and how it is matched, so the names are reachable in
+/// both directions and are not documentation the way a delegate's are.
+/// </summary>
+public sealed record VariantCaseSyntax(
+    SourceSpan Span,
+    string Name,
+    IReadOnlyList<ParameterSyntax> Parameters) : SyntaxNode(Span);
 
 public sealed record TypeDeclSyntax(
     SourceSpan Span,
@@ -237,7 +250,11 @@ public sealed record TypeDeclSyntax(
     IReadOnlyList<WhereClauseSyntax> Constraints,
     IReadOnlyList<TypeSyntax> Implements,
     IReadOnlyList<Declaration> Members,
-    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers)
+{
+    /// <summary>A variant's cases; empty for every other kind of declaration.</summary>
+    public IReadOnlyList<VariantCaseSyntax> Cases { get; init; } = [];
+}
 
 /// <summary>
 /// <c>public static readonly List&lt;String&gt; Registry = ...;</c> — module-level
@@ -356,7 +373,23 @@ public sealed record SwitchSectionSyntax(
     SourceSpan Span,
     IReadOnlyList<ExpressionSyntax> Labels,
     bool HasDefault,
-    IReadOnlyList<StatementSyntax> Statements) : SyntaxNode(Span);
+    IReadOnlyList<StatementSyntax> Statements) : SyntaxNode(Span)
+{
+    /// <summary>
+    /// The <c>case Circle c:</c> labels, which name a variant's case and bind
+    /// its payload.
+    ///
+    /// <c>case Circle:</c> without a binding is not here: it parses as an
+    /// ordinary expression label, because at that point nothing knows whether
+    /// <c>Circle</c> is a variant's case or a constant. The binder settles it,
+    /// which is where the switched type is known.
+    /// </summary>
+    public IReadOnlyList<CaseBindingSyntax> Bindings { get; init; } = [];
+}
+
+/// <summary><c>case Circle c:</c> — a variant case, and a name for its payload.</summary>
+public sealed record CaseBindingSyntax(SourceSpan Span, string Case, string Name)
+    : SyntaxNode(Span);
 
 /// <summary>
 /// <c>switch (value) { case 1: ... break; default: ... break; }</c>.

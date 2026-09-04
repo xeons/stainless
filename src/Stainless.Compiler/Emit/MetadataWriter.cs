@@ -84,6 +84,18 @@ public static class MetadataWriter
                     Report(diagnostics, excluded);
                     break;
 
+                // A variant's cases are the whole of what it is, and the
+                // metadata has no way to say them: what would cross is a tag and
+                // a blob of bytes, which the consumer could construct, copy and
+                // never switch on. Better to say so where the library is built.
+                case VariantTypeSymbol variant:
+                    diagnostics?.Warning("SL0441", variant.Span ?? default,
+                        $"'{variant.QualifiedName}' is a variant, so it is not described in " +
+                        "this library's metadata: its cases are what a consumer would switch " +
+                        "on, and the metadata carries layouts rather than cases. A variant " +
+                        "crosses a library boundary as source, not as a binary");
+                    break;
+
                 case StructTypeSymbol structType:
                     types.Add(Describe(structType));
                     break;

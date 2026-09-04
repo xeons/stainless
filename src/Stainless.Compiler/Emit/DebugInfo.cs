@@ -264,6 +264,9 @@ public sealed class DebugInfo
             case EnumTypeSymbol enumType:
                 return _types[type] = EnumerationType(enumType);
 
+            case VariantTypeSymbol variant:
+                return _types[type] = VariantType(variant);
+
             case StructTypeSymbol structType:
                 return _types[type] = Composite(structType, structType.Size, headerBytes: 0);
 
@@ -394,6 +397,51 @@ public sealed class DebugInfo
         Fill(id,
             $"!DICompositeType(tag: DW_TAG_structure_type, name: {Quote(type.QualifiedName)}, " +
             $"{where}size: {size * 8}, align: {type.Alignment * 8}, " +
+            $"elements: !{Tuple(members)})");
+
+        return id;
+    }
+
+    /// <summary>
+    /// A variant: the tag, then every case's payload described at the one offset
+    /// they share.
+    ///
+    /// DWARF 5 has a variant part for exactly this, and LLVM will emit one, but
+    /// what reads it is thin on the ground and there is none at all in CodeView.
+    /// Overlapping members are understood everywhere: a debugger shows all the
+    /// cases, the tag says which of them is real, and nothing has to be taught
+    /// a new shape to get that far.
+    /// </summary>
+    private int VariantType(VariantTypeSymbol variant)
+    {
+        int id = Reserve();
+        _types[variant] = id;
+
+        string where = Position(variant.Span);
+        var members = new List<int>
+        {
+            Add($"!DIDerivedType(tag: DW_TAG_member, name: \"tag\", {where}" +
+                $"baseType: !{Type(PrimitiveTypeSymbol.Byte)}, size: 8, offset: 0)"),
+        };
+
+        if (variant.PayloadField is { } payload)
+        {
+            int offset = payload.Offset * 8;
+
+            foreach (var variantCase in variant.Cases)
+            {
+                if (variantCase.Payload is not { } body) continue;
+
+                members.Add(Add(
+                    $"!DIDerivedType(tag: DW_TAG_member, name: {Quote(variantCase.Name)}, " +
+                    $"{Position(variantCase.Span)}baseType: !{Type(body)}, " +
+                    $"size: {body.Size * 8}, offset: {offset})"));
+            }
+        }
+
+        Fill(id,
+            $"!DICompositeType(tag: DW_TAG_structure_type, name: {Quote(variant.QualifiedName)}, " +
+            $"{where}size: {variant.Size * 8}, align: {variant.Alignment * 8}, " +
             $"elements: !{Tuple(members)})");
 
         return id;

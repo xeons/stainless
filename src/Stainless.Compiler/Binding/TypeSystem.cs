@@ -420,10 +420,97 @@ public sealed class EnumTypeSymbol : NamedTypeSymbol
         Members.FirstOrDefault(m => m.Name == name);
 }
 
-public sealed class StructTypeSymbol : NamedTypeSymbol
+public class StructTypeSymbol : NamedTypeSymbol
 {
     public override int Size => FieldsSize;
     public override int Alignment => FieldsAlignment;
+}
+
+/// <summary>
+/// One case of a <c>variant</c>: a name, a tag, and the fields it carries.
+///
+/// The fields live in a struct of their own rather than on the case, so
+/// everything that already knows how to lay out, copy, retain and describe a
+/// struct works on a payload without being told what a variant is. The case is
+/// then a name for that struct plus the number written in the tag.
+/// </summary>
+public sealed class VariantCaseSymbol
+{
+    public required string Name { get; init; }
+    public required VariantTypeSymbol DeclaringVariant { get; init; }
+
+    /// <summary>The value in the tag field. Assigned in declaration order.</summary>
+    public required int Tag { get; init; }
+
+    public required Source.SourceSpan Span { get; init; }
+
+    /// <summary>The struct holding this case's fields, or null when it carries none.</summary>
+    public StructTypeSymbol? Payload { get; set; }
+
+    public IReadOnlyList<FieldSymbol> Fields => Payload?.Fields ?? [];
+
+    public FieldSymbol? FindField(string name) =>
+        Payload?.Fields.FirstOrDefault(f => f.Name == name);
+
+    /// <summary>How the case reads in a diagnostic: <c>Circle(double radius)</c>.</summary>
+    public string Signature => Fields.Count == 0
+        ? Name
+        : $"{Name}({string.Join(", ", Fields.Select(f => f.Type.Name + " " + f.Name))})";
+
+    public override string ToString() => $"{DeclaringVariant.Name}.{Name}";
+}
+
+/// <summary>
+/// A <c>variant</c>: a value that is exactly one of its cases, and says which.
+///
+/// It is a struct — literally, in the type system — because that is what it is
+/// at runtime: a tag, then enough storage for the largest case, laid out by the
+/// same C rules as everything else. Nothing allocates, and a variant crosses
+/// <c>extern "C"</c> on the same terms as any other struct: freely if no case
+/// holds a reference, and not at all if one does.
+///
+/// Being a struct is also what keeps the change small. Copying, passing,
+/// returning, <c>sizeof</c>, generics and the Win64 classifier all reached
+/// their answers through <see cref="StructTypeSymbol"/> already, and reach the
+/// same ones here. Only two things need to know a variant from a struct: which
+/// member may be read, which is a rule about proof rather than about layout,
+/// and reference counting, which has to ask the tag which case is really there.
+/// </summary>
+public sealed class VariantTypeSymbol : StructTypeSymbol
+{
+    /// <summary>
+    /// The two hidden fields. They are spelled with a character no identifier
+    /// may contain, and marked as backing storage, so the source cannot reach
+    /// past a case to the representation underneath.
+    /// </summary>
+    public const string TagFieldName = "$tag";
+    public const string PayloadFieldName = "$payload";
+
+    public List<VariantCaseSymbol> Cases { get; } = [];
+
+    /// <summary>The filler that reserves the payload area, or null when no case carries one.</summary>
+    public StructTypeSymbol? PayloadStorage { get; set; }
+
+    public FieldSymbol TagField => Fields[0];
+    public FieldSymbol? PayloadField => PayloadStorage is null ? null : Fields[1];
+
+    public VariantCaseSymbol? FindCase(string name) =>
+        Cases.FirstOrDefault(c => c.Name == name);
+
+    /// <summary>
+    /// True when some case holds a counted reference, and so when copying and
+    /// dropping a value of this type has to consult the tag.
+    /// </summary>
+    public bool CasesCarryReferences =>
+        Cases.Any(c => c.Payload is not null && c.Payload.Fields
+            .Any(f => f.Type.CarriesReferences()));
+
+    /// <summary>The cases not covered by <paramref name="covered"/>, in declaration order.</summary>
+    public IEnumerable<VariantCaseSymbol> Uncovered(IEnumerable<VariantCaseSymbol> covered)
+    {
+        var seen = covered.ToHashSet();
+        return Cases.Where(c => !seen.Contains(c));
+    }
 }
 
 /// <summary>
@@ -545,10 +632,14 @@ public static class TypeExtensions
     /// The recursion terminates because a struct may not contain itself; that
     /// cycle is rejected during layout (SL0216).
     /// </summary>
-    public static bool CarriesReferences(this TypeSymbol type) =>
-        type.IsManagedSlot() ||
-        (type is StructTypeSymbol structType &&
-         structType.Fields.Any(field => field.Type.CarriesReferences()));
+    public static bool CarriesReferences(this TypeSymbol type) => type switch
+    {
+        // A variant's own fields are a tag and a blob of bytes, which carry
+        // nothing; what it holds is decided by the case the tag names.
+        VariantTypeSymbol variant => variant.CasesCarryReferences,
+        StructTypeSymbol structType => structType.Fields.Any(f => f.Type.CarriesReferences()),
+        _ => type.IsManagedSlot(),
+    };
 
     /// <summary>The type a reference points at, or null.</summary>
     public static TypeSymbol? AsReference(this TypeSymbol type) => type switch

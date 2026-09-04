@@ -38,28 +38,28 @@ module Standard;
 /// }
 /// ```
 ///
-/// It is a struct, so a call that succeeds allocates nothing. Holding a `T`
-/// that is a reference is what made structs reference-aware; see the note on
-/// SL0284 for what that costs at a C boundary.
+/// It is an ordinary variant, and every rule it appears to have is a rule
+/// variants have. `Ok` and `Fail` are its two cases, so `r.Ok` asks the tag;
+/// `Value` and `Error` are the fields those cases carry, so reading one needs
+/// the compiler to have established which case is there; and both are written
+/// without type arguments because a case takes its variant from where it is
+/// going, the way a lambda takes its type from what it is assigned to.
 ///
-/// `Ok` and `Fail` are not functions here. They are written without type
-/// arguments, which cannot be inferred from one value, so the compiler builds
-/// them from the type they are being returned or assigned into -- the same rule
-/// a lambda obeys. A module-level function may not be named either of them.
-public struct Result<T, E> {
-    // Read through `Ok`, `Value` and `Error`, which the compiler resolves to
-    // these directly. They are storage rather than API: reaching them by name
-    // would be reading `Value` without the check that makes it meaningful.
-    bool ok;
-    T value;
-    E error;
+/// Being a variant is also what makes it small. Only one case is ever present,
+/// so the payloads overlap: a `Result<String, IOError>` is a tag and one
+/// pointer, not a flag and both halves. Nothing allocates either way.
+public variant Result<T, E> {
+    Ok(T Value);
+    Fail(E Error);
 
     /// The value if there is one, and `fallback` if there is not.
     ///
     /// The one reader that needs no proof, because it supplies its own: a
     /// caller with a sensible default has nothing to check.
     public T ValueOr(T fallback) {
-        if (ok) { return value; }
-        return fallback;
+        switch (this) {
+            case Ok ok: return ok.Value;
+            case Fail:  return fallback;
+        }
     }
 }

@@ -10,7 +10,8 @@ flexibility of something higher level**.
 It is a deliberate mongrel. The syntax, namespaces and attributes come from C#;
 the value semantics, layout and ABI from C and C++; reference counting and the
 borrowed-parameter convention from Swift; monomorphized generics from C++ and
-Rust; runtime metadata as plain tables in the binary from Swift and Go. Where
+Rust; variants from the ML family by way of Swift and Rust; runtime metadata as
+plain tables in the binary from Swift and Go. Where
 those ideas disagree, the choice is written down in the docs along with the
 reason, because the interesting part of the experiment is which combinations
 hold together.
@@ -126,6 +127,51 @@ export "C" Point sl_scale(Point p, double factor) {
 }
 ```
 
+### Variants
+
+A `variant` is the choice between its cases. It is a value — a tag and enough
+room for the widest case, with the payloads overlapping — so nothing allocates
+and `Shape` below is 24 bytes rather than 32.
+
+```csharp
+public variant Shape {
+    Circle(double Radius);
+    Rect(double Width, double Height);
+    Empty;
+}
+
+double Area(Shape shape) {
+    switch (shape) {
+        case Circle c: return 3.14159 * c.Radius * c.Radius;
+        case Rect r:   return r.Width * r.Height;
+        case Empty:    return 0.0;
+    }
+}
+```
+
+A switch that covers every case needs no `default`, and is a way out of the
+function — `Area` above needs no `return` after it. Leaving one out says which:
+
+```
+error[SL0436]: this switch over 'Shape' does not cover 'Rect' and 'Empty'; a
+variant is the choice between its cases, so a switch that leaves one out has no
+answer for it. Add the case, or a 'default'
+```
+
+Outside a switch, `shape.Circle` asks the tag and reading a payload needs the
+answer first — the same proof a `Result` has always needed, because that is now
+the same machinery:
+
+```csharp
+if (shape.Circle) { return shape.Radius; }   // fine
+return shape.Radius;                         // error[SL0286]
+```
+
+Reference counting asks the tag too. A case may hold a `String`, a class or an
+array; copying the variant retains what the case actually present holds, and
+dropping it releases the same. The bytes of a case that is not there are never
+counted, which is what lets them overlap.
+
 ### Failure
 
 There is no `throw` and no unwinding. A function that can fail says so in its
@@ -140,19 +186,23 @@ Result<Config, IOError> Load(String path) {
 }
 ```
 
-`Result<T, E>` is a struct, so a call that succeeds allocates nothing. `Ok` and
-`Fail` are written without type arguments and take their type from where they
-are going, the way a lambda takes its type from what it is assigned to. Reading
-`Value` before checking `Ok` is a compile error rather than a wrong answer:
+`Result<T, E>` is an ordinary variant — `Ok(T Value)` and `Fail(E Error)` — and
+every rule it appears to have is a rule variants have. It allocates nothing, and
+only one case is ever present, so a `Result<String, IOError>` is a tag and one
+pointer rather than a flag and both halves. `Ok` and `Fail` are written without
+type arguments and take their type from where they are going, the way a lambda
+takes its type from what it is assigned to. Reading `Value` before checking `Ok`
+is a compile error rather than a wrong answer:
 
 ```
 error[SL0286]: 'read.Value' is not readable here, because nothing has
-established that 'read' succeeded; check 'if (read.Ok)' first, or use
-'read.ValueOr(...)'
+established that 'read' is 'Ok'; check 'if (read.Ok)' first, or switch over
+'read'
 ```
 
-The check can be an `if`, an early return, a ternary arm, or an `&&`. A caller
-that would rather carry on writes `ValueOr(fallback)` and needs no check at all.
+The check can be an `if`, an early return, a ternary arm, an `&&`, or a switch.
+A caller that would rather carry on writes `ValueOr(fallback)` and needs no
+check at all.
 
 ### Text
 
@@ -363,13 +413,13 @@ ARC and the calling convention all behave exactly as they do for a class, and a
 class can implement any number of interfaces at no per-object cost. Dispatch is
 four constant-offset loads with no search and no branch.
 
-| | `struct` | `class` | `interface` |
-|---|---|---|---|
-| Storage | value, inline | heap | a reference to one |
-| Assignment | copies bytes | copies the reference, retains | same as class |
-| Lifetime | scope | reference count reaches zero | same as class |
-| Destructor | no | yes, `~Name()` | n/a |
-| C compatible | **yes, bit-identical** | pointer-compatible only | pointer-compatible only |
+| | `struct` | `variant` | `class` | `interface` |
+|---|---|---|---|---|
+| Storage | value, inline | value, inline | heap | a reference to one |
+| Assignment | copies bytes | copies the live case | copies the reference, retains | same as class |
+| Lifetime | scope | scope | reference count reaches zero | same as class |
+| Destructor | no | no | yes, `~Name()` | n/a |
+| C compatible | **yes, bit-identical** | **yes, tag plus payload** | pointer-compatible only | pointer-compatible only |
 
 Primitive names and sizes match C# exactly: `sbyte short int long nint`,
 `byte ushort uint ulong nuint`, `float double`, `bool`, `char`, `void`.
@@ -389,7 +439,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 120 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 124 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -580,13 +630,24 @@ Everything below is covered by [the test suite](tests/cases).
   struct may hold a reference, and copying one then retains what it holds — the
   cost is that it is no longer a value C can be handed, which the compiler
   checks at every `extern "C"` and `export "C"`
-- `Result<T, E>`: the language's answer to an exception. A struct, so a call
-  that succeeds allocates nothing; `Ok(x)` and `Fail(e)` are written without
-  type arguments and take their type from what they are returned or assigned
-  into, the way a lambda does. `Value` and `Error` are readable only where the
-  compiler has already seen which one is there — after `if (r.Ok)`, in the arm
-  of a ternary, or after an early `if (!r.Ok) { return ...; }` — and
-  `ValueOr(fallback)` needs no proof because it supplies one
+- `variant`: a value that is exactly one of its cases and says which. A tag
+  plus the widest case's payload, with the cases overlapping, so nothing
+  allocates and the size is the maximum rather than the sum. Cases carry named
+  fields; `v.Case` asks the tag; a payload is readable only where the compiler
+  has already established its case. `switch` over one names cases rather than
+  values, binds a payload with `case Circle c:`, needs no `default` once every
+  case is covered, and counts as a way out of the function when it is.
+  Reference counting consults the tag, so a case may hold a `String`, a class
+  or an array and only what is really there is ever counted. Generic variants
+  monomorphize like anything else
+- `Result<T, E>`: the language's answer to an exception, and now an ordinary
+  variant — `Ok(T Value)` and `Fail(E Error)` — with no machinery of its own.
+  A call that succeeds allocates nothing; `Ok(x)` and `Fail(e)` are written
+  without type arguments and take their type from what they are returned or
+  assigned into, the way a lambda does. `Value` and `Error` are readable only
+  where the compiler has already seen which case is there — after `if (r.Ok)`,
+  in the arm of a ternary, after an early `if (!r.Ok) { return ...; }`, or in a
+  `switch` arm — and `ValueOr(fallback)` needs no proof because it supplies one
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
 - Properties, on classes, structs and interfaces: `{ get; set; }` with a
@@ -606,10 +667,10 @@ Everything below is covered by [the test suite](tests/cases).
   layout, and an answer for exceptions crossing a boundary nothing unwinds
 - Win64 struct ABI: register coercion, `byval`, `sret`
 - `if` / `while` / `for` / `foreach` / `break` / `continue` / `return`, recursion
-- `switch` over integers, `char`, `bool`, enums and `String`, with stacked
-  labels and no fall-through. An ordinal switch is one LLVM `switch`, so a jump
-  table is LLVM's decision rather than the programmer's; `break` belongs to the
-  switch while `continue` passes through it to the enclosing loop
+- `switch` over integers, `char`, `bool`, enums, `String` and variants, with
+  stacked labels and no fall-through. An ordinal switch is one LLVM `switch`, so
+  a jump table is LLVM's decision rather than the programmer's; `break` belongs
+  to the switch while `continue` passes through it to the enclosing loop
 - `parallel { spawn f(x); }` — a fork-join scope whose closing brace waits, so
   a job writes its result straight into the parent's local; and `parallel for`,
   which splits a counted loop across the pool
@@ -724,18 +785,20 @@ Being straight about the edges, roughly in the order they are worth adding:
   because `<` in expression position is ambiguous with less-than; inference
   reads argument types only. That holds for generic methods too, and an
   interface method cannot be generic at all, since dispatch gives it one slot.
-- **No pattern matching, and no `switch` expression.** `switch` is the C#
-  statement and only that: constant labels, no `goto case`, no exhaustiveness
-  requirement on enums.
+- **No `switch` expression, and the only pattern is a variant's case.** A
+  switch over a variant covers cases and may bind a payload; everywhere else
+  `switch` is the C# statement and only that. No type patterns, no constants
+  inside a case pattern, no guards, no `goto case`, and no exhaustiveness
+  requirement on an enum, whose value need not be one of its members.
 - **A lambda needs something to be.** It is typed by what it is assigned to, so
   `var f = x => x;` has nothing to infer from. Capture is by value only, and a
   capturing lambda cannot become a `delegate` — a function pointer has nowhere
   to keep what was captured. A lambda that captures `this` keeps its object
   alive, so an object holding its own closure is a cycle; `weak` is how that is
   broken.
-- **Narrowing is for `Result` only.** The compiler tracks which half of a
-  `Result` is present through `if`, `!`, `&&`, `||`, a ternary and an early
-  return, and only for one held in a local or a parameter. It does not yet do
+- **Narrowing is for variants only.** The compiler tracks which case a variant
+  is holding through `if`, `!`, `&&`, `||`, a ternary, an early return and a
+  `switch`, and only for one held in a local or a parameter. It does not yet do
   the same for `C?`, so an optional still cannot be unwrapped by testing it.
   The two want the same machinery and the second is the obvious next step.
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
@@ -788,6 +851,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   there is none — and it puts every local in the function's scope rather than in
   the block it was declared in, so a debugger will show one that is not in scope
   yet. Neither is a lie about a value; both are less than a C compiler emits.
+- **A variant does not cross a library boundary or carry `[Reflect]`.** Both
+  are reported where they are written (SL0441, SL0442) rather than left to be
+  discovered. The metadata describes layouts and the reflection tables describe
+  fields, and a variant's shape is neither — it is its cases, which nothing yet
+  writes down. Its tag is also one byte, so 255 cases is the limit.
 - **Statics are module-level only**, and a `--shared` library cannot have one:
   there is no entry point to initialize it from. No `static` members on a type,
   and no per-thread storage.

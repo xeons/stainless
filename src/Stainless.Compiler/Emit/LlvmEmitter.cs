@@ -122,6 +122,10 @@ public sealed class LlvmEmitter(
         foreach (var arrayType in program.Arrays)
             EmitArrayDestroyThunk(arrayType);
 
+        foreach (var variant in program.Structs.OfType<VariantTypeSymbol>()
+                     .Where(v => v.CarriesReferences()).Distinct())
+            EmitVariantArcThunks(variant);
+
         InterfaceTables(program);
 
         if (program.EntryPoint is not null && !forSharedLibrary)
@@ -1576,6 +1580,12 @@ public sealed class LlvmEmitter(
     private void RetainFieldsAt(string address, StructTypeSymbol structType) =>
         WalkReferences(address, structType, (slot, type) =>
         {
+            if (type is VariantTypeSymbol variant)
+            {
+                Line($"call void @{VariantArcName(variant, retaining: true)}(ptr {slot})");
+                return;
+            }
+
             string value = Emit("ptr", $"load ptr, ptr {slot}");
             Line(type is WeakTypeSymbol
                 ? $"call void @sl_weak_retain(ptr {value})"
@@ -1586,6 +1596,12 @@ public sealed class LlvmEmitter(
     private void ReleaseFieldsAt(string address, StructTypeSymbol structType) =>
         WalkReferences(address, structType, (slot, type) =>
         {
+            if (type is VariantTypeSymbol variant)
+            {
+                Line($"call void @{VariantArcName(variant, retaining: false)}(ptr {slot})");
+                return;
+            }
+
             string value = Emit("ptr", $"load ptr, ptr {slot}");
             Line(type is WeakTypeSymbol
                 ? $"call void @sl_weak_release(ptr {value})"
@@ -1595,10 +1611,21 @@ public sealed class LlvmEmitter(
     /// <summary>
     /// Visits the address of every counted reference inside a struct value,
     /// descending into struct fields so a nested one is not missed.
+    ///
+    /// A variant is handed to the visitor whole rather than walked. Which of
+    /// its references are really there is a question about the tag, and the
+    /// answer is a branch at run time rather than a list at compile time — so
+    /// it goes to a function of its own that the visitor calls.
     /// </summary>
     private void WalkReferences(
         string address, StructTypeSymbol structType, Action<string, TypeSymbol> visit)
     {
+        if (structType is VariantTypeSymbol self)
+        {
+            visit(address, self);
+            return;
+        }
+
         foreach (var field in structType.Fields)
         {
             if (!field.Type.CarriesReferences()) continue;
@@ -1607,8 +1634,78 @@ public sealed class LlvmEmitter(
                 $"getelementptr inbounds {StructName(structType)}, ptr {address}, " +
                 $"i32 0, i32 {field.Index}");
 
-            if (field.Type is StructTypeSymbol nested) WalkReferences(slot, nested, visit);
+            if (field.Type is VariantTypeSymbol nestedVariant) visit(slot, nestedVariant);
+            else if (field.Type is StructTypeSymbol nested) WalkReferences(slot, nested, visit);
             else visit(slot, field.Type);
+        }
+    }
+
+    private static string VariantArcName(VariantTypeSymbol variant, bool retaining) =>
+        (retaining ? "_SLvretain_" : "_SLvrelease_") + Mangler.SymbolSafe(variant.QualifiedName);
+
+    /// <summary>
+    /// The two functions that copy and drop a variant's references.
+    ///
+    /// A struct's references are a list the compiler can write out; a variant's
+    /// are whichever case is in the tag, so this is a switch. Only the case
+    /// actually present is touched, which is the whole reason the payloads may
+    /// overlap: nothing ever retains or releases through the bytes of a case
+    /// that is not there.
+    ///
+    /// A variant no case of which holds a reference gets no function at all,
+    /// because nothing asks for one — <c>CarriesReferences</c> is false for it,
+    /// and it copies as plain bytes like any other struct.
+    /// </summary>
+    private void EmitVariantArcThunks(VariantTypeSymbol variant)
+    {
+        foreach (bool retaining in (bool[])[true, false])
+        {
+            ResetFunctionState();
+            _module.AppendLine(
+                $"define internal void @{VariantArcName(variant, retaining)}(ptr %value) {{");
+            _body.Clear();
+            _blockTerminated = false;
+
+            string tag = Emit("i8",
+                $"load i8, ptr {Emit("ptr", $"getelementptr inbounds {StructName(variant)}, " +
+                                           "ptr %value, i32 0, i32 0")}");
+
+            string endLabel = NextLabel("variant.done");
+            var arms = new List<(VariantCaseSymbol Case, string Label)>();
+
+            foreach (var variantCase in variant.Cases)
+            {
+                if (variantCase.Payload is not { } payload) continue;
+                if (!payload.Fields.Any(f => f.Type.CarriesReferences())) continue;
+
+                arms.Add((variantCase, NextLabel("variant.case")));
+            }
+
+            Terminator($"switch i8 {tag}, label %{endLabel} [ " +
+                       string.Join(" ", arms.Select(a => $"i8 {a.Case.Tag}, label %{a.Label}")) +
+                       " ]");
+
+            foreach (var (variantCase, label) in arms)
+            {
+                Label(label);
+
+                string address = Emit("ptr",
+                    $"getelementptr inbounds {StructName(variant)}, ptr %value, i32 0, i32 1");
+
+                if (retaining) RetainFieldsAt(address, variantCase.Payload!);
+                else ReleaseFieldsAt(address, variantCase.Payload!);
+
+                Terminator($"br label %{endLabel}");
+            }
+
+            Label(endLabel);
+            Terminator("ret void");
+
+            _module.AppendLine("entry:");
+            _module.Append(_entryAllocas);
+            _module.Append(_body);
+            _module.AppendLine("}");
+            _module.AppendLine();
         }
     }
 
@@ -1842,6 +1939,26 @@ public sealed class LlvmEmitter(
         int defaultIndex = statement.Sections.ToList().FindIndex(s => s.IsDefault);
         string defaultLabel = defaultIndex < 0 ? endLabel : bodies[defaultIndex];
 
+        // A switch over a variant asks the tag, which is an ordinary LLVM switch
+        // over a byte -- so a jump table stays LLVM's decision here too.
+        if (statement.Value.Type is VariantTypeSymbol switched)
+        {
+            string tag = Emit("i8",
+                $"load i8, ptr {Emit("ptr", $"getelementptr inbounds {StructName(switched)}, " +
+                                           $"ptr {value.Ref}, i32 0, i32 0")}");
+
+            var caseArms = new List<string>();
+            for (int i = 0; i < statement.Sections.Count; i++)
+                foreach (var matched in statement.Sections[i].Cases)
+                    caseArms.Add($"i8 {matched.Tag}, label %{bodies[i]}");
+
+            Terminator($"switch i8 {tag}, label %{defaultLabel} " +
+                       $"[ {string.Join(" ", caseArms)} ]");
+
+            EmitSwitchBodies(statement, bodies, endLabel);
+            return;
+        }
+
         // A reference governor was spilled into a local by the binder, so it is
         // alive across every one of these blocks.
         if (statement.Value.Type.NeedsArc())
@@ -1875,6 +1992,30 @@ public sealed class LlvmEmitter(
 
         // `break` lands after the switch; `continue` still belongs to whatever
         // loop encloses it, and unwinds to that loop's depth.
+        string continueLabel = _loops.Count > 0 ? _loops[^1].ContinueLabel : endLabel;
+        int continueDepth = _loops.Count > 0 ? _loops[^1].ContinueDepth : _scopes.Count;
+        _loops.Add((endLabel, _scopes.Count, continueLabel, continueDepth));
+
+        foreach (var (section, label) in statement.Sections.Zip(bodies))
+        {
+            Label(label);
+            EmitStatement(section.Body);
+            if (!_blockTerminated) Terminator($"br label %{endLabel}");
+        }
+
+        _loops.RemoveAt(_loops.Count - 1);
+
+        Label(endLabel);
+    }
+
+    /// <summary>
+    /// The sections themselves, once something has branched to them. Shared
+    /// because a variant switch reaches this point by a different route and
+    /// everything after the dispatch is the same.
+    /// </summary>
+    private void EmitSwitchBodies(
+        BoundSwitch statement, IReadOnlyList<string> bodies, string endLabel)
+    {
         string continueLabel = _loops.Count > 0 ? _loops[^1].ContinueLabel : endLabel;
         int continueDepth = _loops.Count > 0 ? _loops[^1].ContinueDepth : _scopes.Count;
         _loops.Add((endLabel, _scopes.Count, continueLabel, continueDepth));
@@ -1988,7 +2129,9 @@ public sealed class LlvmEmitter(
             case BoundNewArray newArray: return EmitNewArray(newArray);
             case BoundArrayLength length: return EmitArrayLength(length);
             case BoundTypeof typeofExpression: return EmitTypeof(typeofExpression);
-            case BoundResultConstruction result: return EmitResultConstruction(result);
+            case BoundVariantConstruction built: return EmitVariantConstruction(built);
+            case BoundVariantTest test: return EmitVariantTest(test);
+            case BoundVariantPayload payload: return EmitVariantPayload(payload);
 
             default:
                 return new Val("0", "i32", PrimitiveTypeSymbol.Int);
@@ -2819,34 +2962,97 @@ public sealed class LlvmEmitter(
     }
 
     /// <summary>
-    /// Builds an <c>Ok(x)</c> or <c>Fail(e)</c>: a zeroed Result with its flag
-    /// set and the payload stored in whichever half it belongs to.
+    /// Builds a variant value: zeroed, its tag set, and each argument stored
+    /// into the field of the case's payload it belongs to.
     ///
-    /// Zeroing first is what lets the payload go in through the ordinary owning
-    /// store: the half being written starts null, so its release is a no-op, and
-    /// the half not being written stays null for the drop that eventually comes.
-    /// The finished struct is a +1 temporary, exactly like one returned by a call.
+    /// Zeroing first is what lets each field go in through the ordinary owning
+    /// store: the slot being written starts null, so its release is a no-op. It
+    /// also settles the bytes of the payload that this case does not use, which
+    /// matters because a variant is copied whole and compared as bytes by
+    /// nobody, but read by a debugger and written to a file by somebody.
+    ///
+    /// The finished value is a +1 temporary, exactly like one returned by a call.
     /// </summary>
-    private Val EmitResultConstruction(BoundResultConstruction expression)
+    private Val EmitVariantConstruction(BoundVariantConstruction expression)
     {
-        var result = (StructTypeSymbol)expression.Type;
-        string slot = Alloca(StructName(result), expression.Succeeded ? "ok" : "fail");
-        Line($"store {StructName(result)} zeroinitializer, ptr {slot}");
+        var variant = (VariantTypeSymbol)expression.Type;
+        string slot = Alloca(StructName(variant), expression.Case.Name);
+        Line($"store {StructName(variant)} zeroinitializer, ptr {slot}");
 
-        var flag = result.FindStorage("ok")!;
-        Line($"store i1 {(expression.Succeeded ? "true" : "false")}, ptr " +
-             $"{Emit("ptr", $"getelementptr inbounds {StructName(result)}, ptr {slot}, " +
-                            $"i32 0, i32 {flag.Index}")}");
+        Line($"store i8 {expression.Case.Tag}, ptr {TagAddress(slot, variant)}");
 
-        var field = result.FindStorage(expression.Succeeded ? "value" : "error")!;
-        string address = Emit("ptr",
-            $"getelementptr inbounds {StructName(result)}, ptr {slot}, i32 0, i32 {field.Index}");
+        if (expression.Case.Payload is { } payload)
+        {
+            string address = PayloadAddress(slot, variant);
 
-        StoreInto(address, EmitExpression(expression.Payload), field.Type);
+            for (int i = 0; i < expression.Arguments.Count; i++)
+            {
+                var field = payload.Fields[i];
+                string target = Emit("ptr",
+                    $"getelementptr inbounds {StructName(payload)}, ptr {address}, " +
+                    $"i32 0, i32 {field.Index}");
 
-        if (result.CarriesReferences()) TrackTemporary(slot, result);
-        return new Val(slot, "ptr", result);
+                StoreInto(target, EmitExpression(expression.Arguments[i]), field.Type);
+            }
+        }
+
+        if (variant.CarriesReferences()) TrackTemporary(slot, variant);
+        return new Val(slot, "ptr", variant);
     }
+
+    /// <summary>
+    /// <c>v.Circle</c> — one load and one comparison. The binder has already
+    /// decided this is a question about the tag rather than a field read.
+    /// </summary>
+    private Val EmitVariantTest(BoundVariantTest expression)
+    {
+        var variant = expression.Case.DeclaringVariant;
+        var value = EmitExpression(expression.Value);
+
+        string tag = Emit("i8", $"load i8, ptr {TagAddress(value.Ref, variant)}");
+        return new Val(
+            Emit("i1", $"icmp eq i8 {tag}, {expression.Case.Tag}"),
+            "i1", PrimitiveTypeSymbol.Bool);
+    }
+
+    /// <summary>
+    /// A payload, or one field of it. No tag is checked: the binder only makes
+    /// this node where it has already established which case is present, and
+    /// checking again would be asking a question whose answer is known.
+    /// </summary>
+    private Val EmitVariantPayload(BoundVariantPayload expression)
+    {
+        var variant = expression.Case.DeclaringVariant;
+        var payload = expression.Case.Payload!;
+        var value = EmitExpression(expression.Receiver);
+
+        string address = PayloadAddress(value.Ref, variant);
+
+        if (expression.Field is not { } field)
+            return new Val(address, "ptr", payload);
+
+        string slot = Emit("ptr",
+            $"getelementptr inbounds {StructName(payload)}, ptr {address}, " +
+            $"i32 0, i32 {field.Index}");
+
+        return field.Type is StructTypeSymbol
+            ? new Val(slot, "ptr", field.Type)
+            : new Val(Emit(LlvmTypeOf(field.Type),
+                $"load {LlvmTypeOf(field.Type)}, ptr {slot}"), LlvmTypeOf(field.Type), field.Type);
+    }
+
+    /// <summary>Where the tag sits: the first field, and so the value's own address.</summary>
+    private string TagAddress(string value, VariantTypeSymbol variant) =>
+        Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, i32 0, i32 0");
+
+    /// <summary>
+    /// Where a variant's payload starts. The tag is the first field and the
+    /// payload the second, so this is a constant offset the C layout already
+    /// decided; every case's fields are then read from it through that case's
+    /// own struct, which is what overlapping them means.
+    /// </summary>
+    private string PayloadAddress(string value, VariantTypeSymbol variant) =>
+        Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, i32 0, i32 1");
 
     private static string VariadicSignature(FunctionSymbol function)
     {
