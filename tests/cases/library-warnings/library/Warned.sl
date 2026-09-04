@@ -5,7 +5,21 @@
 // consumer would only find a public name that will not resolve.
 module Warned;
 
-public interface IShape { double Area(); }
+/// An interface. Dispatch through one is indexed by an id assigned across a
+/// whole program, and a library and its consumer are two programs.
+public interface IShape { double Area(); }      // SL0545
+
+/// A com interface. This one is not about ids: what identifies a COM interface
+/// is its IID and the order of its vtable, and a consumer states both for
+/// itself, exactly as a C header does.
+[Guid("3e5c1a08-7b42-4f96-8d13-c05a2e647b9f")]
+public com interface ICounter { int Value(); }  // SL0543
+
+/// A com class. Its vtables and adjustor thunks are internal symbols of the
+/// library, and a consumer's `new` would have to point at them.
+public com class Counter : ICounter {           // SL0544
+    public int Value() { return 1; }
+}
 
 /// A class implementing an interface. Its dispatch table is indexed by an id
 /// assigned across a whole program, and a library and its consumer are two

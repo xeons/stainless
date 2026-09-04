@@ -85,6 +85,20 @@ public static class MetadataWriter
                     Report(diagnostics, excluded);
                     break;
 
+                // Its vtables and adjustor thunks are internal symbols of this
+                // compilation, and `new` emits the stores that point at them --
+                // in the consumer, where they do not exist. The size in the
+                // metadata would stop at the fields as well, short of the
+                // tear-offs.
+                case ComInterfaceTypeSymbol comInterface:
+                    diagnostics?.Warning("SL0543", comInterface.Span ?? default,
+                        $"'{comInterface.QualifiedName}' is a com interface, so it is not " +
+                        "described in this library's metadata: what identifies one is its IID " +
+                        "and the order of its vtable, and both are things a consumer states for " +
+                        "itself. A com interface crosses as a declaration, the way a C header " +
+                        "crosses, and two declarations of one IID are the same interface");
+                    break;
+
                 // A variant's cases are the whole of what it is, and the
                 // metadata has no way to say them: what would cross is a tag and
                 // a blob of bytes, which the consumer could construct, copy and
@@ -107,6 +121,19 @@ public static class MetadataWriter
 
                 case EnumTypeSymbol enumType:
                     types.Add(Describe(enumType));
+                    break;
+
+                // Already true before COM, and already silent, which is the one
+                // outcome the rest of this is written to avoid: a consumer found
+                // a public type that was somehow not there, and nothing said
+                // why.
+                case InterfaceTypeSymbol interfaceType:
+                    diagnostics?.Warning("SL0545", interfaceType.Span ?? default,
+                        $"'{interfaceType.QualifiedName}' is an interface, so it is not " +
+                        "described in this library's metadata: dispatch through one is indexed " +
+                        "by an id assigned across a whole program, and this library and its " +
+                        "consumer are two programs. An interface crosses a library boundary as " +
+                        "source, not as a binary");
                     break;
             }
         }
@@ -259,7 +286,7 @@ public static class MetadataWriter
     /// is not in the binary at all.
     /// </summary>
     private static bool Crosses(ClassTypeSymbol type) =>
-        type.Template is null && !type.IsIntrinsic && type.Interfaces.Count == 0;
+        type.Template is null && !type.IsIntrinsic && type.Interfaces.Count == 0 && !type.IsCom;
 
     private static void Report(DiagnosticBag? diagnostics, ClassTypeSymbol excluded)
     {
@@ -269,6 +296,16 @@ public static class MetadataWriter
         // once, where it was declared, rather than once per instantiation under
         // a name — `Box<int>` — that no source could have written anyway.
         if (excluded.Template is not null) return;
+
+        if (excluded.IsCom)
+        {
+            diagnostics.Warning("SL0544", Where(excluded),
+                $"'{excluded.QualifiedName}' is a com class, so it is not described in this " +
+                "library's metadata: its vtables and adjustor thunks are internal symbols of " +
+                "this compilation, and a consumer's 'new' would have to point at them. Hand one " +
+                "out through a com interface instead, which is what COM does");
+            return;
+        }
 
         diagnostics.Warning("SL0420", Where(excluded),
             $"'{excluded.QualifiedName}' implements an interface, so it is not described in " +
