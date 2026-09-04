@@ -805,6 +805,7 @@ public sealed class Parser
     private static readonly TokenKind[] PrimitiveKeywords =
     [
         TokenKind.VoidKeyword, TokenKind.BoolKeyword, TokenKind.CharKeyword,
+        TokenKind.Char16Keyword, TokenKind.Char32Keyword,
         TokenKind.SByteKeyword, TokenKind.ShortKeyword, TokenKind.IntKeyword,
         TokenKind.LongKeyword, TokenKind.NIntKeyword,
         TokenKind.ByteKeyword, TokenKind.UShortKeyword, TokenKind.UIntKeyword,

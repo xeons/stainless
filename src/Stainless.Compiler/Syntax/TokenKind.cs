@@ -44,7 +44,7 @@ public enum TokenKind
     TypeofKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
 
     // Primitive type keywords
-    VoidKeyword, BoolKeyword, CharKeyword,
+    VoidKeyword, BoolKeyword, CharKeyword, Char16Keyword, Char32Keyword,
     SByteKeyword, ShortKeyword, IntKeyword, LongKeyword, NIntKeyword,
     ByteKeyword, UShortKeyword, UIntKeyword, ULongKeyword, NUIntKeyword,
     FloatKeyword, DoubleKeyword,
@@ -129,6 +129,8 @@ public static class TokenKindExtensions
         TokenKind.VoidKeyword => "void",
         TokenKind.BoolKeyword => "bool",
         TokenKind.CharKeyword => "char",
+        TokenKind.Char16Keyword => "char16",
+        TokenKind.Char32Keyword => "char32",
         TokenKind.SByteKeyword => "sbyte",
         TokenKind.ShortKeyword => "short",
         TokenKind.IntKeyword => "int",
@@ -200,9 +202,19 @@ public static class TokenKindExtensions
         _ => kind.FixedText() is { } t ? "'" + t + "'" : kind.ToString(),
     };
 
+    /// <summary>
+    /// Every fixed-text token shaped like an identifier, which is what the
+    /// lexer compares a word against.
+    ///
+    /// A digit is allowed after the first character, because 'char16' and
+    /// 'char32' are keywords and a letters-only test would quietly leave them
+    /// out -- lexing them as ordinary names, so 'the type char16 was not
+    /// found' rather than anything about a keyword.
+    /// </summary>
     public static readonly IReadOnlyDictionary<string, TokenKind> Keywords =
         Enum.GetValues<TokenKind>()
             .Select(k => (Kind: k, Text: k.FixedText()))
-            .Where(p => p.Text is not null && p.Text.All(char.IsLetter))
+            .Where(p => p.Text is { Length: > 0 } text &&
+                        char.IsLetter(text[0]) && text.All(char.IsLetterOrDigit))
             .ToDictionary(p => p.Text!, p => p.Kind, StringComparer.Ordinal);
 }

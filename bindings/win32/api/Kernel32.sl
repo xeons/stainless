@@ -40,7 +40,7 @@ public extern "C" {
     uint GetLastError();
     void SetLastError(uint code);
     uint FormatMessageW(uint flags, void* source, uint messageId, uint languageId,
-                        ushort* buffer, uint size, void* arguments);
+                        char16* buffer, uint size, void* arguments);
 }
 
 public const uint FormatMessageFromSystem     = 0x00001000u;
@@ -104,7 +104,7 @@ public struct SecurityAttributes {
 // ==================================================================== files
 
 public extern "C" {
-    HANDLE CreateFileW(ushort* name, uint access, uint shareMode,
+    HANDLE CreateFileW(char16* name, uint access, uint shareMode,
                        SecurityAttributes* security, uint disposition,
                        uint flags, HANDLE template);
     int    ReadFile(HANDLE file, void* buffer, uint toRead, uint* read, void* overlapped);
@@ -114,21 +114,21 @@ public extern "C" {
     int    GetFileSizeEx(HANDLE file, long* size);
     int    SetEndOfFile(HANDLE file);
 
-    int    DeleteFileW(ushort* name);
-    int    CopyFileW(ushort* from, ushort* to, int failIfExists);
-    int    MoveFileExW(ushort* from, ushort* to, uint flags);
-    int    CreateDirectoryW(ushort* path, SecurityAttributes* security);
-    int    RemoveDirectoryW(ushort* path);
-    uint   GetFileAttributesW(ushort* path);
-    int    SetFileAttributesW(ushort* path, uint attributes);
+    int    DeleteFileW(char16* name);
+    int    CopyFileW(char16* from, char16* to, int failIfExists);
+    int    MoveFileExW(char16* from, char16* to, uint flags);
+    int    CreateDirectoryW(char16* path, SecurityAttributes* security);
+    int    RemoveDirectoryW(char16* path);
+    uint   GetFileAttributesW(char16* path);
+    int    SetFileAttributesW(char16* path, uint attributes);
 
-    uint   GetFullPathNameW(ushort* name, uint size, ushort* buffer, ushort** filePart);
-    uint   GetTempPathW(uint size, ushort* buffer);
-    uint   GetTempFileNameW(ushort* path, ushort* prefix, uint unique, ushort* buffer);
-    uint   GetLongPathNameW(ushort* shortPath, ushort* buffer, uint size);
-    uint   GetShortPathNameW(ushort* longPath, ushort* buffer, uint size);
+    uint   GetFullPathNameW(char16* name, uint size, char16* buffer, char16** filePart);
+    uint   GetTempPathW(uint size, char16* buffer);
+    uint   GetTempFileNameW(char16* path, char16* prefix, uint unique, char16* buffer);
+    uint   GetLongPathNameW(char16* shortPath, char16* buffer, uint size);
+    uint   GetShortPathNameW(char16* longPath, char16* buffer, uint size);
 
-    HANDLE FindFirstFileW(ushort* pattern, FindData* data);
+    HANDLE FindFirstFileW(char16* pattern, FindData* data);
     int    FindNextFileW(HANDLE find, FindData* data);
     int    FindClose(HANDLE find);
 
@@ -208,8 +208,8 @@ public struct FindData {
     public uint            FileSizeLow;
     public uint            Reserved0;
     public uint            Reserved1;
-    public ushort[MaxPath] FileName;
-    public ushort[14]      AlternateName;
+    public char16[MaxPath] FileName;
+    public char16[14]      AlternateName;
 }
 
 // =================================================================== memory
@@ -260,12 +260,12 @@ public const uint GlobalZeroInit = 0x0040u;
 // ================================================================== modules
 
 public extern "C" {
-    HMODULE LoadLibraryW(ushort* name);
-    HMODULE LoadLibraryExW(ushort* name, HANDLE reserved, uint flags);
+    HMODULE LoadLibraryW(char16* name);
+    HMODULE LoadLibraryExW(char16* name, HANDLE reserved, uint flags);
     int     FreeLibrary(HMODULE library);
     void*   GetProcAddress(HMODULE library, byte* name);
-    HMODULE GetModuleHandleW(ushort* name);
-    uint    GetModuleFileNameW(HMODULE library, ushort* buffer, uint size);
+    HMODULE GetModuleHandleW(char16* name);
+    uint    GetModuleFileNameW(HMODULE library, char16* buffer, uint size);
 }
 
 public const uint LoadLibraryAsDataFile      = 0x00000002u;
@@ -275,17 +275,17 @@ public const uint LoadLibrarySearchDefaultDirs = 0x00001000u;
 // ============================================================== environment
 
 public extern "C" {
-    uint    GetEnvironmentVariableW(ushort* name, ushort* buffer, uint size);
-    int     SetEnvironmentVariableW(ushort* name, ushort* value);
-    uint    ExpandEnvironmentStringsW(ushort* source, ushort* buffer, uint size);
-    ushort* GetEnvironmentStringsW();
-    int     FreeEnvironmentStringsW(ushort* block);
-    ushort* GetCommandLineW();
-    uint    GetCurrentDirectoryW(uint size, ushort* buffer);
-    int     SetCurrentDirectoryW(ushort* path);
-    uint    GetSystemDirectoryW(ushort* buffer, uint size);
-    uint    GetWindowsDirectoryW(ushort* buffer, uint size);
-    int     GetComputerNameW(ushort* buffer, uint* size);
+    uint    GetEnvironmentVariableW(char16* name, char16* buffer, uint size);
+    int     SetEnvironmentVariableW(char16* name, char16* value);
+    uint    ExpandEnvironmentStringsW(char16* source, char16* buffer, uint size);
+    char16* GetEnvironmentStringsW();
+    int     FreeEnvironmentStringsW(char16* block);
+    char16* GetCommandLineW();
+    uint    GetCurrentDirectoryW(uint size, char16* buffer);
+    int     SetCurrentDirectoryW(char16* path);
+    uint    GetSystemDirectoryW(char16* buffer, uint size);
+    uint    GetWindowsDirectoryW(char16* buffer, uint size);
+    int     GetComputerNameW(char16* buffer, uint* size);
 }
 
 // =================================================================== system
@@ -335,7 +335,7 @@ public extern "C" {
     void GetSystemInfo(SystemInfo* info);
     void GetNativeSystemInfo(SystemInfo* info);
     int  GlobalMemoryStatusEx(MemoryStatus* status);
-    void OutputDebugStringW(ushort* text);
+    void OutputDebugStringW(char16* text);
     int  Beep(uint frequency, uint duration);
     int  IsDebuggerPresent();
 }
@@ -345,9 +345,9 @@ public extern "C" {
 /// `STARTUPINFOW`. `sizeof` is 104, and `Size` must be set to it.
 public struct StartupInfo {
     public uint    Size;
-    public ushort* Reserved;
-    public ushort* Desktop;
-    public ushort* Title;
+    public char16* Reserved;
+    public char16* Desktop;
+    public char16* Title;
     public uint    X;
     public uint    Y;
     public uint    XSize;
@@ -374,11 +374,11 @@ public struct ProcessInformation {
 }
 
 public extern "C" {
-    int    CreateProcessW(ushort* application, ushort* commandLine,
+    int    CreateProcessW(char16* application, char16* commandLine,
                           SecurityAttributes* processSecurity,
                           SecurityAttributes* threadSecurity,
                           int inheritHandles, uint flags, void* environment,
-                          ushort* currentDirectory,
+                          char16* currentDirectory,
                           StartupInfo* startup, ProcessInformation* information);
     HANDLE GetCurrentProcess();
     uint   GetCurrentProcessId();
@@ -515,16 +515,16 @@ public extern "C" {
     int    GetConsoleScreenBufferInfo(HANDLE handle, ScreenBufferInfo* info);
     int    SetConsoleCursorPosition(HANDLE handle, Coord position);
     int    SetConsoleTextAttribute(HANDLE handle, ushort attributes);
-    int    SetConsoleTitleW(ushort* title);
-    uint   GetConsoleTitleW(ushort* buffer, uint size);
+    int    SetConsoleTitleW(char16* title);
+    uint   GetConsoleTitleW(char16* buffer, uint size);
     int    GetConsoleCursorInfo(HANDLE handle, CursorInfo* info);
     int    SetConsoleCursorInfo(HANDLE handle, CursorInfo* info);
     int    FillConsoleOutputCharacterW(HANDLE handle, ushort character, uint length,
                                        Coord at, uint* written);
     int    FillConsoleOutputAttribute(HANDLE handle, ushort attributes, uint length,
                                       Coord at, uint* written);
-    int    WriteConsoleW(HANDLE handle, ushort* text, uint units, uint* written, void* reserved);
-    int    ReadConsoleW(HANDLE handle, ushort* buffer, uint units, uint* read, void* control);
+    int    WriteConsoleW(HANDLE handle, char16* text, uint units, uint* written, void* reserved);
+    int    ReadConsoleW(HANDLE handle, char16* buffer, uint units, uint* read, void* control);
     int    SetConsoleScreenBufferSize(HANDLE handle, Coord size);
     int    SetConsoleWindowInfo(HANDLE handle, int absolute, SmallRect* window);
 

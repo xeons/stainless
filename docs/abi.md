@@ -483,6 +483,7 @@ prim     := a  sbyte    s  short    i  int      l  long
           | h  byte     t  ushort   j  uint     m  ulong
           | n  nint     y  nuint    f  float    d  double
           | b  bool     c  char     v  void
+          | u  char16   U  char32
 ```
 
 `len` is the decimal length of the identifier that follows, so the grammar

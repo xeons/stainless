@@ -18,7 +18,7 @@ namespace Stainless.Binding;
 
 public enum PrimitiveKind
 {
-    Void, Bool, Char,
+    Void, Bool, Char, Char16, Char32,
     SByte, Short, Int, Long, NInt,
     Byte, UShort, UInt, ULong, NUInt,
     Float, Double,
@@ -76,12 +76,26 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
         or PrimitiveKind.Int or PrimitiveKind.Long or PrimitiveKind.NInt;
     public bool IsNumeric => IsInteger || IsFloat;
 
+    /// <summary>
+    /// True for <c>char</c>, <c>char16</c> and <c>char32</c>: the three code
+    /// unit types.
+    ///
+    /// They are integers and behave as such against every other integer, but
+    /// not against each other -- see <c>Binder.ClassifyConversion</c>. A
+    /// <c>char</c> is one eighth of a UTF-8 scalar at worst and a
+    /// <c>char16</c> one half of a UTF-16 one, so widening one to another is a
+    /// re-encoding and never a conversion.
+    /// </summary>
+    public bool IsCodeUnit => Kind is PrimitiveKind.Char or PrimitiveKind.Char16 or PrimitiveKind.Char32;
+
     /// <summary>Bit width used for integer conversions and LLVM types.</summary>
     public int Bits => Size * 8;
 
     public static readonly PrimitiveTypeSymbol Void = new(PrimitiveKind.Void, "void", 0);
     public static readonly PrimitiveTypeSymbol Bool = new(PrimitiveKind.Bool, "bool", 1);
     public static readonly PrimitiveTypeSymbol Char = new(PrimitiveKind.Char, "char", 1);
+    public static readonly PrimitiveTypeSymbol Char16 = new(PrimitiveKind.Char16, "char16", 2);
+    public static readonly PrimitiveTypeSymbol Char32 = new(PrimitiveKind.Char32, "char32", 4);
     public static readonly PrimitiveTypeSymbol SByte = new(PrimitiveKind.SByte, "sbyte", 1);
     public static readonly PrimitiveTypeSymbol Short = new(PrimitiveKind.Short, "short", 2);
     public static readonly PrimitiveTypeSymbol Int = new(PrimitiveKind.Int, "int", 4);
@@ -97,7 +111,7 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
 
     public static readonly IReadOnlyList<PrimitiveTypeSymbol> All =
     [
-        Void, Bool, Char, SByte, Short, Int, Long, NInt,
+        Void, Bool, Char, Char16, Char32, SByte, Short, Int, Long, NInt,
         Byte, UShort, UInt, ULong, NUInt, Float, Double,
     ];
 }

@@ -4954,12 +4954,12 @@ public sealed class Binder(
     {
         BoundLiteral { Value: ulong bits } => bits,
         BoundLiteral { Value: bool flag } => flag ? 1UL : 0UL,
-        BoundLiteral { Value: char character } => character,
+        BoundLiteral { Value: int scalar } => (ulong)scalar,
         BoundUnary { Operator: BoundUnaryOp.Negate, Operand: var operand }
             when FoldSwitchLabel(operand) is { } magnitude => unchecked((ulong)-(long)magnitude),
         BoundConstantAccess { Constant.Value: ulong bits } => bits,
         BoundConstantAccess { Constant.Value: bool flag } => flag ? 1UL : 0UL,
-        BoundConstantAccess { Constant.Value: char character } => character,
+        BoundConstantAccess { Constant.Value: int scalar } => (ulong)scalar,
         _ => null,
     };
 
@@ -5065,7 +5065,15 @@ public sealed class Binder(
     {
         TokenKind.IntLiteral => new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Int, syntax.Value),
         TokenKind.FloatLiteral => new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Double, syntax.Value),
-        TokenKind.CharLiteral => new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Char, syntax.Value),
+        // A character literal is one Unicode scalar. It starts out as the
+        // narrowest code unit type that can hold it whole, and CharacterFits
+        // lets it become a wider one where the context asks for it.
+        TokenKind.CharLiteral => new BoundLiteral(
+            syntax.Span,
+            syntax.Value is int scalar && scalar >= 0x80
+                ? PrimitiveTypeSymbol.Char32
+                : PrimitiveTypeSymbol.Char,
+            syntax.Value),
         TokenKind.TrueKeyword or TokenKind.FalseKeyword =>
             new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Bool, syntax.Value),
         TokenKind.StringLiteral => new BoundStringLiteral(
@@ -7681,6 +7689,7 @@ public sealed class Binder(
         }
 
         if (ConstantFits(argument, target)) return true;
+        if (CharacterFits(argument, target)) return true;
 
         return ClassifyConversion(argument.Type, target, explicitCast: false) is not null;
     }
@@ -7846,7 +7855,7 @@ public sealed class Binder(
 
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
-        if (ConstantFits(expression, target))
+        if (ConstantFits(expression, target) || CharacterFits(expression, target))
             return new BoundLiteral(span, target, ((BoundLiteral)expression).Value);
 
         if (_builtins.IsString(expression.Type) && IsBytePointer(target))
@@ -7860,6 +7869,15 @@ public sealed class Binder(
         var kind = ClassifyConversion(expression.Type, target, explicitCast: false);
         if (kind is null)
         {
+            // Between two code unit types the generic message says what
+            // happened and not why, and the why is the whole rule.
+            if (expression.Type is PrimitiveTypeSymbol { IsCodeUnit: true } fromUnit &&
+                target is PrimitiveTypeSymbol { IsCodeUnit: true } toUnit)
+            {
+                diagnostics.Error("SL0527", span, CodeUnitMessage(expression, fromUnit, toUnit));
+                return new BoundErrorExpression(span);
+            }
+
             string hint = ClassifyConversion(expression.Type, target, explicitCast: true) is not null
                 ? $"; an explicit cast '({target.Name})' would allow it"
                 : "";
@@ -7936,6 +7954,66 @@ public sealed class Binder(
 
         return value <= maximum;
     }
+
+    /// <summary>
+    /// Whether a character literal may simply adopt <paramref name="target"/>.
+    ///
+    /// The literal is a scalar, and each code unit type holds a different range
+    /// of them in a single unit: <c>char</c> is one UTF-8 byte and so stops at
+    /// U+007F, <c>char16</c> is one UTF-16 unit and so stops below the
+    /// surrogates' own range, and <c>char32</c> holds every scalar there is.
+    /// Any other integer takes it as the number it is, which is what makes
+    /// <c>const int Tab = '	';</c> work.
+    /// </summary>
+    private static bool CharacterFits(BoundExpression expression, TypeSymbol target)
+    {
+        if (expression is not BoundLiteral { Value: int scalar }) return false;
+        if (expression.Type is not PrimitiveTypeSymbol { IsCodeUnit: true }) return false;
+        if (target is not PrimitiveTypeSymbol { IsInteger: true } integer) return false;
+
+        return integer.Kind switch
+        {
+            PrimitiveKind.Char => scalar < 0x80,
+            PrimitiveKind.Char16 => scalar < 0x10000,
+            PrimitiveKind.Char32 => true,
+            _ => integer.Size >= 4 ||
+                 scalar <= (1 << (integer.Bits - (integer.IsSigned ? 1 : 0))) - 1,
+        };
+    }
+
+    /// <summary>
+    /// Why one code unit type will not become another.
+    ///
+    /// A character literal that does not fit gets the specific answer, because
+    /// the scalar is known and the count of units it needs is the argument.
+    /// Anything else gets the general one.
+    /// </summary>
+    private static string CodeUnitMessage(
+        BoundExpression expression, PrimitiveTypeSymbol from, PrimitiveTypeSymbol to)
+    {
+        string wider = to.Kind == PrimitiveKind.Char ? "'char16' or 'char32'" : "'char32'";
+
+        if (expression is BoundLiteral { Value: int scalar })
+        {
+            int units = to.Kind switch
+            {
+                PrimitiveKind.Char => Utf8Length(scalar),
+                PrimitiveKind.Char16 => scalar >= 0x10000 ? 2 : 1,
+                _ => 1,
+            };
+            string unitName = to.Kind == PrimitiveKind.Char ? "bytes of UTF-8" : "UTF-16 units";
+
+            return $"U+{scalar:X4} takes {units} {unitName}, so it is not one '{to.Name}'; " +
+                   $"declare it {wider}";
+        }
+
+        return $"'{from.Name}' and '{to.Name}' are different encodings, not different widths " +
+               $"of one, so one does not become the other on its own; a cast '({to.Name})' " +
+               "moves the bits across and re-encodes nothing";
+    }
+
+    private static int Utf8Length(int scalar) =>
+        scalar < 0x80 ? 1 : scalar < 0x800 ? 2 : scalar < 0x10000 ? 3 : 4;
 
     /// <summary>True for <c>byte*</c>, the shape C expects for text.</summary>
     private static bool IsBytePointer(TypeSymbol type) =>
@@ -8091,6 +8169,15 @@ public sealed class Binder(
 
         if (source.IsFloat && target.IsInteger)
             return explicitCast ? ConversionKind.FloatToInt : null;
+
+        // char, char16 and char32 are three encodings, not three widths of one
+        // type. 'e' is one byte of UTF-8, one UTF-16 unit and one scalar; 'e'
+        // with an acute accent is two, one and one; an emoji is four, two and
+        // one. So widening one to another re-encodes nothing and produces a
+        // unit that means something else, which is a bug a cast should have to
+        // spell. Against every other integer they behave as integers.
+        if (source.IsCodeUnit && target.IsCodeUnit && source.Kind != target.Kind && !explicitCast)
+            return null;
 
         if (source.IsInteger && target.IsInteger)
         {
@@ -8632,6 +8719,8 @@ public sealed class Binder(
         TokenKind.VoidKeyword => PrimitiveTypeSymbol.Void,
         TokenKind.BoolKeyword => PrimitiveTypeSymbol.Bool,
         TokenKind.CharKeyword => PrimitiveTypeSymbol.Char,
+        TokenKind.Char16Keyword => PrimitiveTypeSymbol.Char16,
+        TokenKind.Char32Keyword => PrimitiveTypeSymbol.Char32,
         TokenKind.SByteKeyword => PrimitiveTypeSymbol.SByte,
         TokenKind.ShortKeyword => PrimitiveTypeSymbol.Short,
         TokenKind.IntKeyword => PrimitiveTypeSymbol.Int,

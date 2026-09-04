@@ -83,7 +83,12 @@ enum SlKind {
     SL_KIND_BYTE, SL_KIND_USHORT, SL_KIND_UINT, SL_KIND_ULONG, SL_KIND_NUINT,
     SL_KIND_FLOAT, SL_KIND_DOUBLE,
     SL_KIND_POINTER, SL_KIND_STRING,
-    SL_KIND_CLASS, SL_KIND_INTERFACE, SL_KIND_STRUCT, SL_KIND_ARRAY
+    SL_KIND_CLASS, SL_KIND_INTERFACE, SL_KIND_STRUCT, SL_KIND_ARRAY,
+
+    /* Appended rather than placed beside SL_KIND_CHAR: these numbers are
+       written into every compiled library, so the ones already issued
+       cannot move. */
+    SL_KIND_CHAR16, SL_KIND_CHAR32
 };
 
 /* An attribute argument. Constants only, so this is all a value can be. */

@@ -24,8 +24,8 @@ public struct FindData {
     public uint            SizeLow;
     public uint            Reserved0;
     public uint            Reserved1;
-    public ushort[MaxPath] FileName;
-    public ushort[14]      AlternateName;
+    public char16[MaxPath] FileName;
+    public char16[14]      AlternateName;
 }
 
 public struct Matrix { public double[9] Cell; }

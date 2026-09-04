@@ -1,0 +1,2 @@
+# a character literal that needs more than one unit of the type it was given
+SL0527

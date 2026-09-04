@@ -232,8 +232,55 @@ Names and sizes match C# exactly.
 | `nint` `nuint` | pointer | `intptr_t` / `size_t` |
 | `float` `double` | 4/8 | `float` / `double` |
 | `bool` | 1 | `bool` |
-| `char` | 1 | `char` (a UTF-8 code unit, not UTF-16) |
+| `char` | 1 | `char` — one UTF-8 code unit |
+| `char16` | 2 | `char16_t` — one UTF-16 code unit |
+| `char32` | 4 | `char32_t` — one Unicode scalar |
 | `void` | 0 | `void` |
+
+The three code unit types are **three encodings, not three widths of one
+type**, and none of them converts to another without a cast:
+
+```csharp
+char   a = 'A';                 // U+0041, one UTF-8 byte
+char16 e = 'é';                 // U+00E9: two bytes, but one UTF-16 unit
+char32 g = '😀';                // U+1F600: a surrogate pair, so one scalar
+
+char16 wrong = a;               // error: an encoding is not a width
+char16 right = (char16)a;       // allowed, and says so at the call site
+```
+
+```
+error[SL0527]: 'char' and 'char16' are different encodings, not different
+widths of one, so one does not become the other on its own; a cast '(char16)'
+moves the bits across and re-encodes nothing
+```
+
+That is not pedantry. `'é'` is `C3 A9` in UTF-8, `00E9` in UTF-16 and
+`000000E9` as a scalar; widening the first byte of the UTF-8 form to sixteen
+bits gives `00C3`, which is a different character. A conversion that looks free
+and silently re-labels text is the bug the rule exists to stop.
+
+A **character literal is one Unicode scalar**, written directly or as an
+escape, and takes the narrowest of the three that holds it in a single unit:
+
+```csharp
+char16 japan   = '\u65E5';       // four hex digits, up to U+FFFF
+char32 grin    = '\U0001F600';   // eight, which is the only way past U+FFFF
+const int Tab  = '\t';           // still an ordinary integer constant
+```
+
+```
+error[SL0527]: U+00E9 takes 2 bytes of UTF-8, so it is not one 'char';
+declare it 'char16' or 'char32'
+
+error[SL0526]: U+D800 is not a Unicode scalar value, so \u cannot name it;
+scalars stop at U+10FFFF and the surrogate range U+D800 to U+DFFF is reserved
+for UTF-16 pairs
+```
+
+Against **every other integer they behave as integers**: `char16` and `ushort`
+are the same width and convert freely, arithmetic works, and a `switch` takes
+them. It is only each other they refuse.
 
 ### 2.2 `struct` — value type, C layout
 
@@ -1478,14 +1525,21 @@ is possible.
 to it implicitly.
 
 ```csharp
-extern "C" int MessageBoxW(nuint window, ushort* text, ushort* caption, uint kind);
+extern "C" int MessageBoxW(nuint window, char16* text, char16* caption, uint kind);
 
 var wide = message.ToUtf16();       // owned, NUL terminated, released by ARC
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
-It offers `UnitCount()`, `ToPointer()`, which returns `ushort*`, and `ToText()`,
-which transcodes back.
+It offers `UnitCount()`, `ToPointer()`, which returns `char16*`, and
+`ToText()`, which transcodes back.
+
+`char16*` and not `ushort*`: the two are the same width, and a wide API that
+took the second would accept any 16-bit pointer within reach — an array of
+counts, a `short*` off by one field. Naming the units is what makes the wrong
+pointer a compile error, and it is the same move the handle types made against
+`void*` (§2.2.1). A cast still crosses between them where a C header really did
+mean a number.
 
 The return direction usually is not a `Utf16String` at all, because a wide API
 answers by writing into a buffer the caller owns rather than by producing an
@@ -2385,7 +2439,7 @@ module can call by the real names, with no forwarding layer in between.
 ```csharp
 public extern "C" {
     int   GetSystemMetrics(int index);
-    void* CreateWindowExW(uint extendedStyle, ushort* className, /* ... */);
+    void* CreateWindowExW(uint extendedStyle, char16* className, /* ... */);
 }
 ```
 
@@ -2482,6 +2536,7 @@ do not, so `long` is spelled as whatever is 64 bits on the target:
 | `long` `ulong` | `long long` `unsigned long long` — C++'s `long` is 32-bit on Windows |
 | `nint` `nuint` | pointer-sized: `long` on Itanium, `__int64` on Microsoft |
 | `char` | `char`; it is one byte, not UTF-16 |
+| `char16` `char32` | `char16_t` `char32_t` |
 | `bool` `float` `double` | `bool` `float` `double` |
 
 **What is not there yet.** Free functions only. A C++ *class* cannot be named,

@@ -35,10 +35,10 @@ import Win32.Handles;
 #if WINDOWS
 
 public extern "C" {
-    HINSTANCE ShellExecuteW(HWND owner, ushort* verb, ushort* file,
-                            ushort* parameters, ushort* directory, int show);
-    uint      SHGetFolderPathW(HWND owner, int folder, HANDLE token, uint flags, ushort* path);
-    uint      DragQueryFileW(HDROP drop, uint index, ushort* buffer, uint size);
+    HINSTANCE ShellExecuteW(HWND owner, char16* verb, char16* file,
+                            char16* parameters, char16* directory, int show);
+    uint      SHGetFolderPathW(HWND owner, int folder, HANDLE token, uint flags, char16* path);
+    uint      DragQueryFileW(HDROP drop, uint index, char16* buffer, uint size);
     void      DragFinish(HDROP drop);
     void      DragAcceptFiles(HWND window, int accept);
 }

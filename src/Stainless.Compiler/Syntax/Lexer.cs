@@ -582,17 +582,27 @@ public sealed class Lexer(
                 break;
             }
             if (Current == '"') { _pos++; break; }
-            sb.Append(Current == '\\' ? ReadEscape() : _text[_pos++]);
+            if (Current != '\\') { sb.Append(_text[_pos++]); continue; }
+            sb.Append(char.ConvertFromUtf32(ReadEscape()));
         }
         return new Token(TokenKind.StringLiteral, SpanFrom(start), _text[start.._pos], sb.ToString());
     }
 
+    /// <summary>
+    /// One Unicode scalar between quotes, carried as an int.
+    ///
+    /// Not one UTF-16 unit: the source is UTF-8 read into UTF-16, so an
+    /// astral character arrives as a surrogate pair and taking the first half
+    /// would be half a character. Which of char, char16 and char32 the literal
+    /// ends up as is the binder's decision, and depends on which can hold the
+    /// scalar in a single unit.
+    /// </summary>
     private Token LexChar(int start)
     {
         _pos++;                                             // opening quote
-        char value = '\0';
+        int value = 0;
         if (_pos < _text.Length && Current != '\'')
-            value = Current == '\\' ? ReadEscape() : _text[_pos++];
+            value = Current == '\\' ? ReadEscape() : ReadScalar();
 
         if (_pos < _text.Length && Current == '\'') _pos++;
         else diagnostics.Error("SL0007", SpanFrom(start), "unterminated character literal");
@@ -600,7 +610,27 @@ public sealed class Lexer(
         return new Token(TokenKind.CharLiteral, SpanFrom(start), _text[start.._pos], value);
     }
 
-    private char ReadEscape()
+    /// <summary>One scalar of source text, joining a surrogate pair into one.</summary>
+    private int ReadScalar()
+    {
+        char high = _text[_pos++];
+        if (!char.IsHighSurrogate(high) || _pos >= _text.Length ||
+            !char.IsLowSurrogate(_text[_pos]))
+            return high;
+
+        return char.ConvertToUtf32(high, _text[_pos++]);
+    }
+
+    /// <summary>
+    /// The scalar an escape sequence stands for.
+    ///
+    /// <c>\\u</c> takes four hex digits and <c>\\U</c> eight, which is C's
+    /// split and the only way to write a scalar above U+FFFF. Anything outside
+    /// Unicode, a lone surrogate included, is reported and replaced with
+    /// U+FFFD -- the same answer transcoding gives, so a malformed escape and
+    /// malformed input mean the same thing downstream.
+    /// </summary>
+    private int ReadEscape()
     {
         int start = _pos;
         _pos++;                                             // backslash
@@ -622,8 +652,9 @@ public sealed class Lexer(
             case '\'': return '\'';
             case 'x':
             case 'u':
+            case 'U':
             {
-                int want = c == 'x' ? 2 : 4;
+                int want = c switch { 'x' => 2, 'u' => 4, _ => 8 };
                 int value = 0, count = 0;
                 while (count < want && _pos < _text.Length && char.IsAsciiHexDigit(Current))
                 {
@@ -633,7 +664,20 @@ public sealed class Lexer(
                 }
                 if (count == 0)
                     diagnostics.Error("SL0008", SpanFrom(start), $"escape \\{c} needs at least one hex digit");
-                return (char)value;
+
+                // \x is a byte and says nothing about Unicode; the other two
+                // name a scalar, and there are values in that syntax which are
+                // not one.
+                if (c != 'x' && (value > 0x10FFFF || (value >= 0xD800 && value <= 0xDFFF)))
+                {
+                    diagnostics.Error("SL0526", SpanFrom(start),
+                        $"U+{value:X4} is not a Unicode scalar value, so \\{c} cannot name it; " +
+                        "scalars stop at U+10FFFF and the surrogate range U+D800 to U+DFFF is " +
+                        "reserved for UTF-16 pairs");
+                    return 0xFFFD;
+                }
+
+                return value;
             }
             default:
                 diagnostics.Error("SL0009", SpanFrom(start), $"unrecognized escape sequence \\{c}");

@@ -36,7 +36,7 @@ int Main() {
 
     // A lone high surrogate is not valid UTF-16 and must not produce invalid
     // UTF-8. It becomes U+FFFD, which is three bytes.
-    ushort* broken = (ushort*)malloc(6u);
+    char16* broken = (char16*)malloc(6u);
     broken[0] = 0x0041u;      // 'A'
     broken[1] = 0xD800u;      // a lead with no trail
     broken[2] = 0x0042u;      // 'B'

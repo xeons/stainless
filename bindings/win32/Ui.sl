@@ -243,7 +243,7 @@ public String ClipboardString() {
     }
 
     void* locked = GlobalLock(handle);
-    String text = locked == null ? "" : Text.FromNullTerminatedUtf16((ushort*)locked);
+    String text = locked == null ? "" : Text.FromNullTerminatedUtf16((char16*)locked);
     GlobalUnlock(handle);
     CloseClipboard();
     return text;
@@ -266,8 +266,8 @@ public bool SetClipboardString(String text) {
         return false;
     }
 
-    ushort* target = (ushort*)locked;
-    ushort* source = wide.ToPointer();
+    char16* target = (char16*)locked;
+    char16* source = wide.ToPointer();
     for (nuint i = 0u; i < wide.UnitCount(); i = i + 1u) { target[i] = source[i]; }
     target[wide.UnitCount()] = 0u;
     GlobalUnlock(block);

@@ -160,8 +160,8 @@ public struct WindowClass {
     public HICON           Icon;
     public HCURSOR         Cursor;
     public HBRUSH          Background;
-    public ushort*         MenuName;
-    public ushort*         ClassName;
+    public char16*         MenuName;
+    public char16*         ClassName;
     public HICON           SmallIcon;
 }
 
@@ -177,14 +177,14 @@ public const uint ClassStyleDropShadow       = 0x00020000u;
 
 public extern "C" {
     ushort RegisterClassExW(WindowClass* windowClass);
-    int    UnregisterClassW(ushort* name, HINSTANCE instance);
-    int    GetClassInfoExW(HINSTANCE instance, ushort* name, WindowClass* windowClass);
+    int    UnregisterClassW(char16* name, HINSTANCE instance);
+    int    GetClassInfoExW(HINSTANCE instance, char16* name, WindowClass* windowClass);
 }
 
 // ================================================================== windows
 
 public extern "C" {
-    HWND CreateWindowExW(uint extendedStyle, ushort* className, ushort* windowName,
+    HWND CreateWindowExW(uint extendedStyle, char16* className, char16* windowName,
                          uint style, int x, int y, int width, int height,
                          HWND parent, HMENU menu, HINSTANCE instance, void* parameter);
     int  DestroyWindow(HWND window);
@@ -198,7 +198,7 @@ public extern "C" {
     int  AdjustWindowRectEx(Rect* rectangle, uint style, int hasMenu, uint extendedStyle);
     HWND GetParent(HWND window);
     HWND SetParent(HWND child, HWND parent);
-    HWND FindWindowW(ushort* className, ushort* windowName);
+    HWND FindWindowW(char16* className, char16* windowName);
     HWND GetForegroundWindow();
     int  SetForegroundWindow(HWND window);
     HWND GetFocus();
@@ -214,8 +214,8 @@ public extern "C" {
     long SetWindowLongPtrW(HWND window, int index, long value);
     uint GetWindowThreadProcessId(HWND window, uint* processId);
 
-    int  SetWindowTextW(HWND window, ushort* text);
-    int  GetWindowTextW(HWND window, ushort* buffer, int size);
+    int  SetWindowTextW(HWND window, char16* text);
+    int  GetWindowTextW(HWND window, char16* buffer, int size);
     int  GetWindowTextLengthW(HWND window);
 
     int  InvalidateRect(HWND window, Rect* rectangle, int erase);
@@ -327,7 +327,7 @@ public extern "C" {
     int FillRect(HDC dc, Rect* rectangle, HBRUSH brush);
     int FrameRect(HDC dc, Rect* rectangle, HBRUSH brush);
     int InvertRect(HDC dc, Rect* rectangle);
-    int DrawTextW(HDC dc, ushort* text, int length, Rect* rectangle, uint format);
+    int DrawTextW(HDC dc, char16* text, int length, Rect* rectangle, uint format);
 }
 
 public const uint DtLeft           = 0x00000000u;
@@ -343,7 +343,7 @@ public const uint DtCalculateOnly  = 0x00000400u;
 // ============================================================== message box
 
 public extern "C" {
-    int MessageBoxW(HWND owner, ushort* text, ushort* caption, uint style);
+    int MessageBoxW(HWND owner, char16* text, char16* caption, uint style);
 }
 
 public const uint MbOk               = 0x00000000u;
@@ -382,7 +382,7 @@ public const int IdNo     = 7;
 public extern "C" {
     int     GetCursorPos(Point* point);
     int     SetCursorPos(int x, int y);
-    HCURSOR LoadCursorW(HINSTANCE instance, ushort* name);
+    HCURSOR LoadCursorW(HINSTANCE instance, char16* name);
     HCURSOR SetCursor(HCURSOR cursor);
     int     ShowCursor(int show);
     int     ScreenToClient(HWND window, Point* point);
@@ -393,13 +393,13 @@ public extern "C" {
 
 /// The standard cursors, passed to `LoadCursorW` with a null instance. They are
 /// integers pretending to be strings — `MAKEINTRESOURCE` — which is why these
-/// are functions rather than constants: Stainless has no `const ushort*`.
-public ushort* CursorArrow()   { return (ushort*)(nuint)32512u; }
-public ushort* CursorIBeam()   { return (ushort*)(nuint)32513u; }
-public ushort* CursorWait()    { return (ushort*)(nuint)32514u; }
-public ushort* CursorCross()   { return (ushort*)(nuint)32515u; }
-public ushort* CursorSizeAll() { return (ushort*)(nuint)32646u; }
-public ushort* CursorHand()    { return (ushort*)(nuint)32649u; }
+/// are functions rather than constants: Stainless has no `const char16*`.
+public char16* CursorArrow()   { return (char16*)(nuint)32512u; }
+public char16* CursorIBeam()   { return (char16*)(nuint)32513u; }
+public char16* CursorWait()    { return (char16*)(nuint)32514u; }
+public char16* CursorCross()   { return (char16*)(nuint)32515u; }
+public char16* CursorSizeAll() { return (char16*)(nuint)32646u; }
+public char16* CursorHand()    { return (char16*)(nuint)32649u; }
 
 // ================================================================= keyboard
 
@@ -408,7 +408,7 @@ public extern "C" {
     short GetKeyState(int key);
     int   GetKeyboardState(byte* state);
     uint  MapVirtualKeyW(uint code, uint mapping);
-    int   GetKeyNameTextW(long lParam, ushort* buffer, int size);
+    int   GetKeyNameTextW(long lParam, char16* buffer, int size);
     short VkKeyScanW(ushort character);
 }
 
@@ -477,7 +477,7 @@ public extern "C" {
 public extern "C" {
     int   GetSystemMetrics(int index);
     int   SystemParametersInfoW(uint action, uint parameter, void* value, uint winIni);
-    HICON LoadIconW(HINSTANCE instance, ushort* name);
+    HICON LoadIconW(HINSTANCE instance, char16* name);
     int   SetProcessDPIAware();
     uint  GetDpiForWindow(HWND window);
 }
@@ -504,10 +504,10 @@ public const int SmRemoteSession          = 0x1000;
 
 /// The standard icons, passed to `LoadIconW` with a null instance. Also
 /// `MAKEINTRESOURCE` integers, and so also functions.
-public ushort* IconApplication() { return (ushort*)(nuint)32512u; }
-public ushort* IconError()       { return (ushort*)(nuint)32513u; }
-public ushort* IconQuestion()    { return (ushort*)(nuint)32514u; }
-public ushort* IconWarning()     { return (ushort*)(nuint)32515u; }
-public ushort* IconInformation() { return (ushort*)(nuint)32516u; }
+public char16* IconApplication() { return (char16*)(nuint)32512u; }
+public char16* IconError()       { return (char16*)(nuint)32513u; }
+public char16* IconQuestion()    { return (char16*)(nuint)32514u; }
+public char16* IconWarning()     { return (char16*)(nuint)32515u; }
+public char16* IconInformation() { return (char16*)(nuint)32516u; }
 
 #endif

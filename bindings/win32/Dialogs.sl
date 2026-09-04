@@ -52,12 +52,12 @@ public WideBuffer BuildFilter(String[] pairs) {
     }
 
     var buffer = new WideBuffer((uint)units);
-    ushort* target = buffer.Pointer();
+    char16* target = buffer.Pointer();
 
     nuint at = 0u;
     for (nuint i = 0u; i < pairs.Length; i = i + 1u) {
         var wide = pairs[i].ToUtf16();
-        ushort* source = wide.ToPointer();
+        char16* source = wide.ToPointer();
         for (nuint j = 0u; j < wide.UnitCount(); j = j + 1u) {
             target[at] = source[j];
             at = at + 1u;

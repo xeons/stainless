@@ -1,0 +1,2 @@
+# an escape naming something that is not a Unicode scalar value
+SL0526

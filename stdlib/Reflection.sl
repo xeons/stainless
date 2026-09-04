@@ -84,6 +84,8 @@ public const int KindClass     = 17;
 public const int KindInterface = 18;
 public const int KindStruct    = 19;
 public const int KindArray     = 20;
+public const int KindChar16    = 21;
+public const int KindChar32    = 22;
 
 // ---------------------------------------------------------------- attributes
 
@@ -139,8 +141,13 @@ public struct Field {
     }
 
     /// True for a field whose value can be read as a whole number.
+    ///
+    /// The two code unit kinds were added after the numbering was fixed, so
+    /// they sit past KindArray rather than beside KindChar and a range test
+    /// alone no longer reaches them.
     public bool IsInteger() {
         var kind = Kind();
+        if (kind == KindChar16 || kind == KindChar32) { return true; }
         return kind >= KindChar && kind <= KindNUInt;
     }
 

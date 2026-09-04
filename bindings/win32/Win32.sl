@@ -127,14 +127,14 @@ public bool Failed(int result) { return result == 0; }
 /// function that fills it completely without terminating still leaves a
 /// terminator behind for `Text()` to find.
 public class WideBuffer {
-    ushort* units;
+    char16* units;
     uint    capacity;
 
     /// A buffer with room for `unitCount` UTF-16 units, not counting the
     /// terminator. Aborts if the allocation fails, as `new` does everywhere.
     public WideBuffer(uint unitCount) {
         capacity = unitCount;
-        units = (ushort*)malloc(((nuint)unitCount + 1u) * 2u);
+        units = (char16*)malloc(((nuint)unitCount + 1u) * 2u);
         if (units == null) { sl_fail("out of memory allocating a Win32 wide buffer"); }
 
         // Zeroed, so a caller that reads the buffer without checking the
@@ -145,7 +145,7 @@ public class WideBuffer {
     ~WideBuffer() { free((void*)units); }
 
     /// The buffer itself, to hand to a wide API.
-    public ushort* Pointer() { return units; }
+    public char16* Pointer() { return units; }
 
     /// How many units fit, not counting the terminator. This is the number
     /// nearly every wide API wants as its size argument.
@@ -198,7 +198,7 @@ public class ByteBuffer {
 
     /// The bytes as UTF-16 text, up to the first NUL. `REG_SZ` is stored this
     /// way, and Windows counts its length in bytes rather than in units.
-    public String AsText() { return Text.FromNullTerminatedUtf16((ushort*)bytes); }
+    public String AsText() { return Text.FromNullTerminatedUtf16((char16*)bytes); }
 }
 
 /// Copies text into a buffer the caller owns, NUL terminated.
@@ -210,8 +210,8 @@ public WideBuffer Copy(String text) {
     var wide = text.ToUtf16();
     var buffer = new WideBuffer((uint)wide.UnitCount());
 
-    ushort* target = buffer.Pointer();
-    ushort* source = wide.ToPointer();
+    char16* target = buffer.Pointer();
+    char16* source = wide.ToPointer();
     for (nuint i = 0u; i < wide.UnitCount(); i = i + 1u) { target[i] = source[i]; }
     return buffer;
 }

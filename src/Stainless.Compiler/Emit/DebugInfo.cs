@@ -334,6 +334,11 @@ public sealed class DebugInfo
             // 'char', so char is the one that gets the character encoding.
             PrimitiveKind.Char => "DW_ATE_unsigned_char",
 
+            // DWARF 4 added DW_ATE_UTF for exactly these two, and a
+            // debugger uses it to print a code unit as text rather than
+            // as a number.
+            PrimitiveKind.Char16 or PrimitiveKind.Char32 => "DW_ATE_UTF",
+
             _ when primitive.IsFloat => "DW_ATE_float",
             _ when primitive.IsSigned => "DW_ATE_signed",
             _ => "DW_ATE_unsigned",

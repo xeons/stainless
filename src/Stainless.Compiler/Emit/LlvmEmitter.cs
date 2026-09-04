@@ -555,6 +555,11 @@ public sealed class LlvmEmitter(
         Byte, UShort, UInt, ULong, NUInt,
         Float, Double,
         Pointer, String, Class, Interface, Struct, Array,
+
+        // Appended, not slotted in beside Char: the number is what the
+        // runtime and Reflection.sl agree on, so the ones already given
+        // out cannot move.
+        Char16, Char32,
     }
 
     private static FieldKind KindOf(TypeSymbol type) => type switch
@@ -563,6 +568,8 @@ public sealed class LlvmEmitter(
         {
             PrimitiveKind.Bool => FieldKind.Bool,
             PrimitiveKind.Char => FieldKind.Char,
+            PrimitiveKind.Char16 => FieldKind.Char16,
+            PrimitiveKind.Char32 => FieldKind.Char32,
             PrimitiveKind.SByte => FieldKind.SByte,
             PrimitiveKind.Short => FieldKind.Short,
             PrimitiveKind.Int => FieldKind.Int,
@@ -811,8 +818,10 @@ public sealed class LlvmEmitter(
             PrimitiveKind.Void => "void",
             PrimitiveKind.Bool => "i1",
             PrimitiveKind.Char or PrimitiveKind.SByte or PrimitiveKind.Byte => "i8",
-            PrimitiveKind.Short or PrimitiveKind.UShort => "i16",
-            PrimitiveKind.Int or PrimitiveKind.UInt => "i32",
+            PrimitiveKind.Short or PrimitiveKind.UShort
+                or PrimitiveKind.Char16 => "i16",
+            PrimitiveKind.Int or PrimitiveKind.UInt
+                or PrimitiveKind.Char32 => "i32",
             PrimitiveKind.Float => "float",
             PrimitiveKind.Double => "double",
             _ => "i64",
@@ -2382,7 +2391,7 @@ public sealed class LlvmEmitter(
         string text = literal.Value switch
         {
             bool flag => flag ? "true" : "false",
-            char character => ((int)character).ToString(CultureInfo.InvariantCulture),
+            int scalar => scalar.ToString(CultureInfo.InvariantCulture),
             double number => FormatDouble(number),
             ulong number => FormatInteger(number, literal.Type),
             _ => "0",
@@ -2421,7 +2430,7 @@ public sealed class LlvmEmitter(
         string text = constant.Value switch
         {
             bool flag => flag ? "true" : "false",
-            char character => ((int)character).ToString(CultureInfo.InvariantCulture),
+            int scalar => scalar.ToString(CultureInfo.InvariantCulture),
             double number => FormatDouble(number),
             ulong number => FormatInteger(number, constant.Type),
             string s => InternBytes(s),

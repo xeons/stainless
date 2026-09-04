@@ -64,6 +64,16 @@ public static class CHeaderWriter
         sb.AppendLine("#include <stdbool.h>");
         sb.AppendLine("#include <stddef.h>");
         sb.AppendLine("#include <stdint.h>");
+
+        // char16_t and char32_t are keywords in C++ and typedefs in C, and the
+        // C header that defines them is one C++ must not include.
+        if (MentionsWideChar(exports, named))
+        {
+            sb.AppendLine("#ifndef __cplusplus");
+            sb.AppendLine("#include <uchar.h>");
+            sb.AppendLine("#endif");
+        }
+
         sb.AppendLine();
         sb.AppendLine("#ifdef __cplusplus");
         sb.AppendLine("extern \"C\" {");
@@ -237,6 +247,43 @@ public static class CHeaderWriter
     /// Gathers the named types an export mentions, depth first, so anything a
     /// declaration depends on is written before the declaration itself.
     /// </summary>
+    /// <summary>
+    /// Whether char16 or char32 appears anywhere the header will spell out.
+    ///
+    /// <see cref="Collect"/> has already walked every exported signature into
+    /// <paramref name="named"/>, so between the two lists every type the header
+    /// writes is reachable from here without walking the program again.
+    /// </summary>
+    private static bool MentionsWideChar(
+        IReadOnlyList<FunctionSymbol> exports, IReadOnlyList<NamedTypeSymbol> named)
+    {
+        static bool Wide(TypeSymbol type) => Bare(type) is
+            PrimitiveTypeSymbol { Kind: PrimitiveKind.Char16 or PrimitiveKind.Char32 };
+
+        static TypeSymbol Bare(TypeSymbol type) => type switch
+        {
+            PointerTypeSymbol pointer => Bare(pointer.Element),
+            FixedArrayTypeSymbol fixedArray => Bare(fixedArray.Element),
+            _ => type,
+        };
+
+        foreach (var function in exports)
+        {
+            if (Wide(function.ReturnType)) return true;
+            if (function.Parameters.Any(p => Wide(p.Type))) return true;
+        }
+
+        foreach (var type in named)
+        {
+            if (type.Fields.Any(f => Wide(f.Type))) return true;
+            if (type is DelegateTypeSymbol signature &&
+                (Wide(signature.ReturnType) || signature.Signature.Any(p => Wide(p.Type))))
+                return true;
+        }
+
+        return false;
+    }
+
     private static void Collect(
         TypeSymbol type, List<NamedTypeSymbol> ordered, HashSet<NamedTypeSymbol> seen)
     {
@@ -348,6 +395,8 @@ public static class CHeaderWriter
             PrimitiveKind.Void => "void",
             PrimitiveKind.Bool => "bool",
             PrimitiveKind.Char => "char",
+            PrimitiveKind.Char16 => "char16_t",
+            PrimitiveKind.Char32 => "char32_t",
             PrimitiveKind.SByte => "int8_t",
             PrimitiveKind.Short => "int16_t",
             PrimitiveKind.Int => "int32_t",

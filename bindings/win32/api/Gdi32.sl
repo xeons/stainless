@@ -50,7 +50,7 @@ public extern "C" {
     HFONT   CreateFontW(int height, int width, int escapement, int orientation,
                         int weight, uint italic, uint underline, uint strikeOut,
                         uint charSet, uint precision, uint clipPrecision,
-                        uint quality, uint pitchAndFamily, ushort* face);
+                        uint quality, uint pitchAndFamily, char16* face);
     HGDIOBJ GetStockObject(int index);
     HGDIOBJ SelectObject(HDC dc, HGDIOBJ object);
     int     DeleteObject(HGDIOBJ object);
@@ -135,8 +135,8 @@ public const uint PatCopy    = 0x00F00021u;
 // ===================================================================== text
 
 public extern "C" {
-    int  TextOutW(HDC dc, int x, int y, ushort* text, int length);
-    int  GetTextExtentPoint32W(HDC dc, ushort* text, int length, Size* size);
+    int  TextOutW(HDC dc, int x, int y, char16* text, int length);
+    int  GetTextExtentPoint32W(HDC dc, char16* text, int length, Size* size);
     uint SetTextColor(HDC dc, uint colour);
     uint GetTextColor(HDC dc);
     uint SetBkColor(HDC dc, uint colour);

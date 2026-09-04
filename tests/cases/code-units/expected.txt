@@ -1,0 +1,18 @@
+ascii = 65
+accented = 233
+cjk = 26085
+astral = 128512
+escaped16 = 26085
+escaped32 = 128512
+tab = 9
+newline = 10
+sizes 1 2 4
+fromNarrow = 65
+toNarrow = 233
+asNumber = 233
+back = 233
+sum = 66
+buffer: hé!
+first unit = 104
+second unit = 233
+back: héllo 日本

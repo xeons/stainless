@@ -92,7 +92,14 @@ public sealed class Builtins
     private static readonly SourceSpan BuiltinSpan = new(BuiltinSource, 0, 0);
 
     private static readonly PointerTypeSymbol BytePointer = new(PrimitiveTypeSymbol.Byte);
-    private static readonly PointerTypeSymbol UShortPointer = new(PrimitiveTypeSymbol.UShort);
+    /// <summary>
+    /// <c>char16*</c>: what a wide platform API takes and writes into.
+    ///
+    /// It was <c>ushort*</c> until char16 existed, which said the width and not
+    /// what the units were, and so accepted any 16-bit pointer that happened to
+    /// be in reach.
+    /// </summary>
+    private static readonly PointerTypeSymbol Char16Pointer = new(PrimitiveTypeSymbol.Char16);
 
     public Builtins()
     {
@@ -176,7 +183,7 @@ public sealed class Builtins
 
         // --- Utf16String methods -------------------------------------------
         Method(Utf16String, "UnitCount", PrimitiveTypeSymbol.NUInt, "sl_utf16_unit_count");
-        Method(Utf16String, "ToPointer", UShortPointer, "sl_utf16_pointer");
+        Method(Utf16String, "ToPointer", Char16Pointer, "sl_utf16_pointer");
         Method(Utf16String, "ToText", String, "sl_utf16_to_string");
 
         // --- StringBuilder methods ------------------------------------------
@@ -212,9 +219,9 @@ public sealed class Builtins
         // a buffer the caller owns, so what comes back is a pointer and a length
         // rather than a Utf16String, and the pair is what these two take.
         Function(Text, "FromUtf16", String, "sl_string_from_utf16",
-            ("units", UShortPointer), ("unitCount", PrimitiveTypeSymbol.NUInt));
+            ("units", Char16Pointer), ("unitCount", PrimitiveTypeSymbol.NUInt));
         Function(Text, "FromNullTerminatedUtf16", String,
-            "sl_string_from_null_terminated_utf16", ("units", UShortPointer));
+            "sl_string_from_null_terminated_utf16", ("units", Char16Pointer));
 
         // Operators. These are resolved by the binder, not written by hand.
         StringConcat = Function(Text, "Concat", String, "sl_string_concat",

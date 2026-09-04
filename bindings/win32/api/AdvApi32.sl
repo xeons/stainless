@@ -38,30 +38,30 @@ import Win32.Handles;
 import Win32.Kernel32;
 
 public extern "C" {
-    int RegOpenKeyExW(HKEY key, ushort* path, uint options, uint access, HKEY* result);
-    int RegCreateKeyExW(HKEY key, ushort* path, uint reserved, ushort* windowClass,
+    int RegOpenKeyExW(HKEY key, char16* path, uint options, uint access, HKEY* result);
+    int RegCreateKeyExW(HKEY key, char16* path, uint reserved, char16* windowClass,
                         uint options, uint access, SecurityAttributes* security,
                         HKEY* result, uint* disposition);
     int RegCloseKey(HKEY key);
-    int RegQueryValueExW(HKEY key, ushort* name, uint* reserved, uint* kind,
+    int RegQueryValueExW(HKEY key, char16* name, uint* reserved, uint* kind,
                          byte* data, uint* size);
-    int RegSetValueExW(HKEY key, ushort* name, uint reserved, uint kind,
+    int RegSetValueExW(HKEY key, char16* name, uint reserved, uint kind,
                        byte* data, uint size);
-    int RegDeleteValueW(HKEY key, ushort* name);
-    int RegDeleteKeyW(HKEY key, ushort* path);
-    int RegEnumKeyExW(HKEY key, uint index, ushort* name, uint* nameSize,
-                      uint* reserved, ushort* windowClass, uint* classSize,
+    int RegDeleteValueW(HKEY key, char16* name);
+    int RegDeleteKeyW(HKEY key, char16* path);
+    int RegEnumKeyExW(HKEY key, uint index, char16* name, uint* nameSize,
+                      uint* reserved, char16* windowClass, uint* classSize,
                       FileTime* lastWrite);
-    int RegEnumValueW(HKEY key, uint index, ushort* name, uint* nameSize,
+    int RegEnumValueW(HKEY key, uint index, char16* name, uint* nameSize,
                       uint* reserved, uint* kind, byte* data, uint* dataSize);
-    int RegQueryInfoKeyW(HKEY key, ushort* windowClass, uint* classSize,
+    int RegQueryInfoKeyW(HKEY key, char16* windowClass, uint* classSize,
                          uint* reserved, uint* subkeys, uint* maxSubkeyLength,
                          uint* maxClassLength, uint* values, uint* maxValueNameLength,
                          uint* maxValueLength, uint* securityDescriptor,
                          FileTime* lastWrite);
     int RegFlushKey(HKEY key);
 
-    int GetUserNameW(ushort* buffer, uint* size);
+    int GetUserNameW(char16* buffer, uint* size);
 }
 
 // ================================================================= the roots
