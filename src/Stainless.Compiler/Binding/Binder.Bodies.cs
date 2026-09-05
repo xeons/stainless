@@ -504,7 +504,17 @@ public sealed partial class Binder
         foreach (var child in ChildNodes(node)) CollectAssignedNames(child, names);
     }
 
-    private static readonly Dictionary<Type, System.Reflection.PropertyInfo[]> ChildProperties = [];
+    /// <summary>
+    /// Which properties of each node kind hold children, worked out once.
+    ///
+    /// Concurrent because it is the only state in the binder that outlives one
+    /// <see cref="Binder"/>, and a plain dictionary written from two of them at
+    /// once corrupts rather than merely races. The compiler builds one program
+    /// per process today, so nothing in it noticed; the unit tests run classes
+    /// in parallel and did, immediately.
+    /// </summary>
+    private static readonly System.Collections.Concurrent
+        .ConcurrentDictionary<Type, System.Reflection.PropertyInfo[]> ChildProperties = new();
 
     /// <summary>
     /// The syntax nodes one node holds, found by reflection.
@@ -516,16 +526,12 @@ public sealed partial class Binder
     /// </summary>
     private static IEnumerable<Syntax.SyntaxNode> ChildNodes(Syntax.SyntaxNode node)
     {
-        var type = node.GetType();
-        if (!ChildProperties.TryGetValue(type, out var properties))
-        {
-            properties = type.GetProperties()
+        var properties = ChildProperties.GetOrAdd(node.GetType(), static type =>
+            type.GetProperties()
                 .Where(p => p.GetIndexParameters().Length == 0 &&
                             (typeof(Syntax.SyntaxNode).IsAssignableFrom(p.PropertyType) ||
                              typeof(System.Collections.IEnumerable).IsAssignableFrom(p.PropertyType)))
-                .ToArray();
-            ChildProperties[type] = properties;
-        }
+                .ToArray());
 
         foreach (var property in properties)
         {

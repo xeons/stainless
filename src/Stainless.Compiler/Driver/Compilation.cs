@@ -542,7 +542,18 @@ public sealed class Compilation
     /// programmer's business, and guessing it from an optimisation level would
     /// be a rule nobody asked for.
     /// </summary>
-    private static HashSet<string> BuildSymbols(CompilationOptions options)
+    private static HashSet<string> BuildSymbols(CompilationOptions options) =>
+        PlatformSymbols(options.Defines);
+
+    /// <summary>
+    /// What <c>#if</c> can see: the host's platform and architecture, plus
+    /// whatever <c>-D</c> added.
+    ///
+    /// Public because anything that drives the front end directly -- the unit
+    /// tests, above all -- has to lex with the same set the compiler does, and
+    /// a second copy of this list would drift the first time one gained a name.
+    /// </summary>
+    public static HashSet<string> PlatformSymbols(IEnumerable<string> defines)
     {
         var symbols = new HashSet<string>(StringComparer.Ordinal) { "STAINLESS" };
 
@@ -560,7 +571,7 @@ public sealed class Compilation
             var other => other.ToString().ToUpperInvariant(),
         });
 
-        foreach (string defined in options.Defines) symbols.Add(defined);
+        foreach (string defined in defines) symbols.Add(defined);
         return symbols;
     }
 

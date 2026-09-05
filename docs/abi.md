@@ -594,9 +594,11 @@ type     := prim
           | "A" type                        ; array
           | "O" type                        ; optional
           | "W" type                        ; weak
+          | "F" count "_" type             ; fixed-length array
           | "C" len ident                   ; class
           | "S" len ident                   ; struct
           | "I" len ident                   ; interface
+          | "M" len ident                   ; com interface
           | "E" len ident                   ; enum
           | "D" len ident                   ; delegate
 prim     := a  sbyte    s  short    i  int      l  long

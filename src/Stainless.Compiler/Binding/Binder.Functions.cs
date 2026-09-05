@@ -173,17 +173,6 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Refuses a C signature that would hand a counted reference across the
-    /// boundary inside a struct.
-    ///
-    /// A struct of plain data is still a C struct, byte for byte, and crosses
-    /// freely in both directions. One that holds a reference is not: copying it
-    /// retains what it holds, and C has no way to perform that copy — it would
-    /// memcpy the bytes and leave the count behind. The same reasoning already
-    /// keeps a bare <c>String</c> out of a C signature; this closes the gap a
-    /// struct could otherwise smuggle one through.
-    /// </summary>
-    /// <summary>
     /// The dispatch word written on a declaration that cannot be dispatched, or
     /// null when none was. Reported where the declaration is, so that a
     /// <c>virtual</c> on a field says so rather than going quiet.
@@ -194,6 +183,17 @@ public sealed partial class Binder
         : modifiers.HasFlag(Modifiers.Abstract) ? "abstract"
         : null;
 
+    /// <summary>
+    /// Refuses a C signature that would hand a counted reference across the
+    /// boundary inside a struct.
+    ///
+    /// A struct of plain data is still a C struct, byte for byte, and crosses
+    /// freely in both directions. One that holds a reference is not: copying it
+    /// retains what it holds, and C has no way to perform that copy — it would
+    /// memcpy the bytes and leave the count behind. The same reasoning already
+    /// keeps a bare <c>String</c> out of a C signature; this closes the gap a
+    /// struct could otherwise smuggle one through.
+    /// </summary>
     private void ValidateLinkageSignatures()
     {
         foreach (var symbol in _modules.Values.SelectMany(m => m.Functions))

@@ -29,6 +29,32 @@ dropped. Either support nested types or refuse them, but not this.
 
 *Touches:* `Parser.ParseTypeDeclaration`, `Binder` pass 2.
 
+### Two functions with the same signature are not diagnosed
+
+```csharp
+public int F(int a) { return a + 1; }
+public int F(int a) { return a + 2; }    // accepted
+```
+
+Both are declared, both are bound and both are emitted, so the module holds two
+`define`s under one symbol and LLVM is left to object to the redefinition — a
+message about the generated IR, naming a mangled symbol, for a mistake in the
+source. Nothing checks that a module's functions have distinct signatures: an
+interface refuses two methods of the same *name* (SL0416) and a module refuses
+a function and a constant of the same name (SL0201), but overloads are never
+measured against each other.
+
+The check is cheap, because the mangled name already is the signature: two
+functions in a module collide exactly when they mangle alike. What it needs is
+a diagnostic code and something to say about which declaration to point at.
+
+Found by [ManglerTests](tests/Stainless.UnitTests/ManglerTests.cs), which was
+looking for the two type kinds that mangled to nothing — a separate bug, now
+fixed, that made this one reachable from signatures that were genuinely
+different.
+
+*Touches:* `Binder.DeclareFunction`.
+
 ### `stainless run -- args` accepts arguments and drops them
 
 `Main` takes no arguments yet, so everything after `--` is parsed into a list

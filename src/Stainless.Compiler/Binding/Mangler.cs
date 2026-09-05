@@ -119,6 +119,26 @@ public static class Mangler
                 AppendIdentifier(sb, Sanitize(interfaceType.QualifiedName));
                 break;
 
+            // A com interface is not an InterfaceTypeSymbol -- the two have
+            // different dispatch and different references -- so it needs a code
+            // of its own. Without one it fell through to 'v', which is also
+            // what "no parameters" is spelled as, so every com interface
+            // parameter mangled to nothing and two overloads taking different
+            // ones produced the same symbol.
+            case ComInterfaceTypeSymbol comInterface:
+                sb.Append('M');
+                AppendIdentifier(sb, Sanitize(comInterface.QualifiedName));
+                break;
+
+            // Length first, so 'int[3]' and 'int[4]' differ. This also fell
+            // through to 'v'.
+            case FixedArrayTypeSymbol fixedArray:
+                sb.Append('F');
+                sb.Append(fixedArray.Length);
+                sb.Append('_');
+                AppendType(sb, fixedArray.Element);
+                break;
+
             case StructTypeSymbol structType:
                 sb.Append('S');
                 AppendIdentifier(sb, Sanitize(structType.QualifiedName));

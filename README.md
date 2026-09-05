@@ -778,7 +778,14 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 182 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 379 compiler unit tests
 ```
+
+The two suites ask different questions. An end-to-end case compiles, links and
+runs a program, which proves the whole pipeline and takes a fifth of a second;
+a unit test asks the front end alone -- what did the lexer make of this, where
+exactly does this error point, which registers does this struct travel in --
+and takes a millisecond, so it can be asked by the hundred.
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
 `STAINLESS_CLANG` points.

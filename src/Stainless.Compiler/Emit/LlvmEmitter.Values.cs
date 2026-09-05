@@ -30,7 +30,15 @@ public sealed partial class LlvmEmitter
 {
     // ============================================================ types
 
-    private static string LlvmTypeOf(TypeSymbol type) => type switch
+    /// <summary>
+    /// How a type is spelled in IR.
+    ///
+    /// Public because both ABI classifiers take it as an argument, which makes
+    /// it part of their contract rather than an internal detail: anything
+    /// asking one of them what a shape does has to hand it the same speller
+    /// the emitter uses, or it is asking about a different program.
+    /// </summary>
+    public static string LlvmTypeOf(TypeSymbol type) => type switch
     {
         PrimitiveTypeSymbol primitive => primitive.Kind switch
         {
