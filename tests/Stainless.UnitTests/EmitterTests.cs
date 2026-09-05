@@ -363,7 +363,11 @@ public class EmitterTests
     /// <summary>
     /// The two ABIs pack bit-fields differently: Microsoft opens a new storage
     /// unit when the declared type changes size, Itanium packs across. Both are
-    /// emitted from the same source, and the offsets have to differ.
+    /// emitted from the same source, and the sizes have to differ.
+    ///
+    /// Both ABIs are named rather than one being left to the default, which is
+    /// the host's: on Linux the default *is* Itanium, so comparing it against
+    /// Itanium compared a thing with itself and failed for the right reason.
     /// </summary>
     [Fact]
     public void TheTwoAbisPackBitFieldsDifferently()
@@ -378,7 +382,7 @@ public class EmitterTests
             """;
 
         Assert.NotEqual(
-            Front.Struct(source, "Packed").Size,
+            SizeUnder(source, CppAbi.Microsoft),
             SizeUnder(source, CppAbi.Itanium));
     }
 
