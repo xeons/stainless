@@ -196,11 +196,17 @@ public static class SysVAbi
                         offset % field.Type.Alignment != 0)
                         return false;
 
-                    // A bit-field has no type of its own to classify by; its
-                    // storage unit is an integer, which is all that matters.
+                    // A bit-field is classified by its storage unit, which is
+                    // the whole of its declared type and not one byte of it.
+                    // Marking one byte made `{ uint:4; uint:4; uint:24; }` --
+                    // four bytes, and a single storage unit -- travel as an i8,
+                    // so a caller sent the first eight bits of it and the rest
+                    // arrived as zero. The unit is what the emitter loads and
+                    // stores, so it is what has to cross.
                     if (field.IsBitField)
                     {
-                        Mark(Class.Integer, offset, 1, parts, isDouble: false, isPointer: false);
+                        Mark(Class.Integer, offset, Math.Max(1, field.Type.Size), parts,
+                             isDouble: false, isPointer: false);
                         continue;
                     }
 

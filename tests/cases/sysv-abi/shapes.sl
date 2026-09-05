@@ -44,6 +44,16 @@ public struct M8 { public float A; public long B; }
 public struct A3 { public int[3] A; }
 public struct A5 { public sbyte[17] A; }
 
+// Bit-fields, which look like they have nothing to do with eightbytes and do.
+// A bit-field is classified by its storage unit -- the whole of its declared
+// type -- because that is what the emitter loads and stores. Marking one byte
+// of it made B1 travel as an i8 and lose three quarters of itself.
+public struct B1 { public uint A : 4; public uint B : 4; public uint C : 24; }
+public struct B2 { public byte A : 3; public byte B : 5; }
+public struct B3 { public ulong A : 40; public ulong B : 20; }
+public struct B4 { public uint F : 3; public double W; public uint M : 5; }
+public struct B5 { public ushort A : 9; public ushort B : 7; public uint C; }
+
 // Taking one apart: every field read back out of what arrived.
 double TakeI3(I3 v) { return (double)v.A + (double)v.B + (double)v.C; }
 double TakeI5(I5 v) { return (double)v.A + (double)v.B; }
@@ -61,6 +71,18 @@ double TakeM3(M3 v) { return (double)v.A + (double)v.B; }
 double TakeM7(M7 v) { return (double)v.A + (double)v.B; }
 double TakeM8(M8 v) { return (double)v.A + (double)v.B; }
 double TakeA3(A3 v) { return (double)v.A[0] + (double)v.A[1] + (double)v.A[2]; }
+double TakeB1(B1 v) { return (double)v.C; }
+double TakeB2(B2 v) { return (double)v.B; }
+double TakeB3(B3 v) { return (double)v.A; }
+double TakeB4(B4 v) { return v.W + (double)v.M; }
+double TakeB5(B5 v) { return (double)v.C + (double)v.A; }
+
+B1 GiveB1() { B1 v; v.A = 1u; v.B = 2u; v.C = 1000000u; return v; }
+B2 GiveB2() { B2 v; v.A = 1u; v.B = 9u; return v; }
+B3 GiveB3() { B3 v; v.A = 70000u; v.B = 3u; return v; }
+B4 GiveB4() { B4 v; v.F = 1u; v.W = 2.5; v.M = 21u; return v; }
+B5 GiveB5() { B5 v; v.A = 300u; v.B = 4u; v.C = 90000u; return v; }
+
 double TakeA5(A5 v) { return (double)v.A[0] + (double)v.A[16]; }
 
 // And building one, so the return side is exercised too.
@@ -239,5 +261,25 @@ public void Main() {
     line.Clear();
     line.Append("A5  ");
     line.AppendDouble(TakeA5(GiveA5()));
+    Console.WriteLine(line.ToText());
+    line.Clear();
+    line.Append("B1  ");
+    line.AppendDouble(TakeB1(GiveB1()));
+    Console.WriteLine(line.ToText());
+    line.Clear();
+    line.Append("B2  ");
+    line.AppendDouble(TakeB2(GiveB2()));
+    Console.WriteLine(line.ToText());
+    line.Clear();
+    line.Append("B3  ");
+    line.AppendDouble(TakeB3(GiveB3()));
+    Console.WriteLine(line.ToText());
+    line.Clear();
+    line.Append("B4  ");
+    line.AppendDouble(TakeB4(GiveB4()));
+    Console.WriteLine(line.ToText());
+    line.Clear();
+    line.Append("B5  ");
+    line.AppendDouble(TakeB5(GiveB5()));
     Console.WriteLine(line.ToText());
 }

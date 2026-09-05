@@ -451,7 +451,13 @@ public sealed class Compilation
             if (options.NeedsSharedRuntime)
                 sharedRuntime = toolchain.BuildSharedRuntime(intermediate, options.Debug);
             else
-                runtimeObjects = toolchain.BuildRuntime(intermediate, options.Debug);
+                // `options.Shared` and not just the shared-runtime case: an
+                // object linked into a shared library has to be
+                // position-independent, and these were compiled without asking
+                // for that. Windows relocates a DLL at load time and never
+                // noticed; an ELF linker refuses the relocation outright.
+                runtimeObjects = toolchain.BuildRuntime(
+                    intermediate, options.Debug, shared: options.Shared);
         }
         catch (Exception e) when (e is InvalidOperationException or IOException)
         {
@@ -634,7 +640,7 @@ public sealed class Compilation
 
         string extension = shared
             ? Toolchain.SharedLibraryExtension
-            : OperatingSystem.IsWindows() ? ".exe" : "";
+            : Toolchain.ExecutableExtension;
 
         return Path.Combine(CommonDirectory(sources), name + extension);
     }

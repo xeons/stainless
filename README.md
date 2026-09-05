@@ -773,11 +773,12 @@ Full details: **[docs/language-spec.md](docs/language-spec.md)**,
 ## Building the compiler
 
 Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
-[LLVM/clang](https://llvm.org) (`winget install LLVM.LLVM`).
+[LLVM/clang](https://llvm.org) — `winget install LLVM.LLVM` on Windows,
+`apt install clang` on Debian and Ubuntu.
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 189 end-to-end tests (1 Linux-only)
+dotnet run --project tests/Stainless.Tests      # 189 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 389 compiler unit tests
 ```
 
@@ -786,6 +787,18 @@ runs a program, which proves the whole pipeline and takes a fifth of a second;
 a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
+
+**Both Windows and Linux are tested.** 189 cases, of which 9 are Windows-only
+and 1 is Linux-only, so each platform runs 179 or 188 of them and skips the
+rest. A case whose *subject* differs by platform -- `Path.Join` writes a
+different separator, and `\x` is rooted on one and an ordinary name on the
+other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
+having the difference argued away.
+
+macOS is not tested. Nothing in the compiler is Windows-only and the runtime's
+`#ifdef`s have a POSIX branch that Linux exercises, so it is likely close; the
+constants in `bindings/linux` are Linux's and would not port, and that is
+stated where they are.
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
 `STAINLESS_CLANG` points.

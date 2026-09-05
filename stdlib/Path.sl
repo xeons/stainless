@@ -22,12 +22,22 @@
 // Taking paths apart and putting them together.
 //
 // Purely textual: nothing here touches a disk, and none of it asks whether the
-// path exists. Both separators are accepted when reading a path apart, because
-// Windows accepts both and a path that came from a config file or a URL may
-// use either; `Separator` is what gets written when one is joined.
+// path exists.
+//
+// **What counts as a separator is the platform's business, not a preference.**
+// Windows accepts both `\` and `/` everywhere, so both are read apart there and
+// a path from a config file or a URL works either way. Linux and macOS accept
+// only `/` -- and a backslash there is not a separator being generously
+// allowed, it is an ordinary character that a filename may contain. Treating
+// `report\2026.csv` as two parts on Linux is not lenient, it is wrong.
+//
+// So the questions this module answers have different answers on different
+// platforms, and it says which rather than picking one.
 module Standard.Path;
 
 import Standard.Collections;
+
+#if WINDOWS
 
 /// What `Join` writes between two parts.
 public const char Separator = '\\';
@@ -38,6 +48,20 @@ public const char AltSeparator = '/';
 bool IsSeparator(byte value) {
     return value == 92 || value == 47;      // '\' and '/'
 }
+
+#else
+
+/// What `Join` writes between two parts.
+public const char Separator = '/';
+
+/// The same one: there is no second separator outside Windows.
+public const char AltSeparator = '/';
+
+bool IsSeparator(byte value) {
+    return value == 47;                     // '/', and nothing else
+}
+
+#endif
 
 /// The index just past the last separator, or 0 when there is none.
 nuint AfterLastSeparator(String path) {
@@ -66,7 +90,13 @@ public String Join(String left, String right) {
     if (endsWith && startsWith) { return left + right.Substring(1, right.ByteLength() - 1); }
     if (endsWith || startsWith) { return left + right; }
 
-    return left + "\\" + right;
+    return left + SeparatorText() + right;
+}
+
+/// `Separator` as text, since that is what joining needs.
+String SeparatorText() {
+    byte one = (byte)Separator;
+    return Text.FromBytes(&one, 1);
 }
 
 public String Join(String first, String second, String third) {
@@ -120,7 +150,11 @@ public String WithExtension(String path, String with) {
 }
 
 /// True when the path starts at a root, so that joining it onto another would
-/// be a mistake. `/x`, `\x` and `C:\x` are all rooted.
+/// be a mistake.
+///
+/// `/x` is rooted everywhere. `\x` and `C:\x` are rooted on Windows and are
+/// ordinary relative names elsewhere, where a colon and a backslash are both
+/// characters a filename may contain.
 public bool IsRooted(String path) {
     nuint size = path.ByteLength();
     if (size == 0) { return false; }
@@ -128,8 +162,12 @@ public bool IsRooted(String path) {
     var bytes = path.ToPointer();
     if (IsSeparator(bytes[0])) { return true; }
 
+#if WINDOWS
     // A drive letter, as in `C:`.
     return size >= 2 && bytes[1] == 58;
+#else
+    return false;
+#endif
 }
 
 /// The parts, with the separators dropped and empty parts skipped.

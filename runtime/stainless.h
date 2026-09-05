@@ -388,6 +388,13 @@ SL_API size_t  sl_socket_accept(size_t handle, int32_t *error);
 SL_API int32_t sl_socket_connect(size_t handle, const char *host, uint16_t port,
                                  int32_t family, int32_t kind, int32_t *error);
 
+/*
+ * Connecting is what decides the address family, so a client that has only a
+ * name cannot open its socket first. This makes one per candidate address.
+ */
+SL_API size_t sl_socket_open_connected(const char *host, uint16_t port,
+                                       int32_t family, int32_t kind, int32_t *error);
+
 SL_API size_t sl_socket_send(size_t handle, const uint8_t *data, size_t count,
                              int32_t *error);
 SL_API size_t sl_socket_receive(size_t handle, uint8_t *data, size_t count,

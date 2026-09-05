@@ -58,8 +58,18 @@ int Main() {
     Say("bound-host", address.Host);
     SayBool("bound-port", address.Port != 0u);
 
+    // No family named, so `Any`: the name decides. This is the shape that used
+    // to open an AF_UNSPEC socket before resolving -- which Winsock accepts and
+    // Linux does not, so it worked here and hung there.
     var client = new TcpClient("127.0.0.1", address.Port);
     SayBool("connected", client.IsConnected());
+    SayBool("connected-family", client.Underlying().Family() == AddressFamily.Any);
+
+    // And opening one directly with `Any` is an error rather than a guess,
+    // because there is no socket of no family.
+    var nofamily = new Socket(AddressFamily.Any, SocketKind.Stream);
+    SayBool("any-is-not-a-socket", !nofamily.IsOpen());
+    SayBool("any-says-why", nofamily.Error() == SocketError.Invalid);
 
     var accepted = server.Accept();
     SayBool("accepted", accepted.IsConnected());

@@ -62,6 +62,13 @@ namespace Stainless.Tests;
 /// linux or macos -- and is reported as skipped elsewhere. Only a case that
 /// cannot mean anything on another platform should have one.
 ///
+/// A case containing expected.windows.txt, expected.linux.txt or
+/// expected.macos.txt is measured against that instead of expected.txt where it
+/// applies. That is for a case whose subject really does differ -- `Path.Join`
+/// answers differently because a backslash is a separator on one platform and a
+/// filename character on another -- and not for one that merely came out
+/// differently and was easier to accept than to explain.
+///
 /// Testing through the real driver rather than through unit seams means every
 /// pass -- lexer, binder, emitter, LLVM and the linker -- is covered by every case.
 /// </summary>
@@ -144,6 +151,29 @@ internal static class Program
     }
 
     /// <summary>Why this case is not being run here, or null when it is.</summary>
+    /// <summary>
+    /// The expectation to measure against, which may be this platform's.
+    ///
+    /// A case that tests a platform difference cannot have one expectation.
+    /// `Path.Join` really does answer differently on Windows and on Linux --
+    /// a backslash is a separator on one and an ordinary character in a
+    /// filename on the other -- so `expected.linux.txt` beside `expected.txt`
+    /// is the honest way to say so. Neutralising the assertions would delete
+    /// the thing being tested.
+    /// </summary>
+    private static string ExpectedOutputPath(string directory)
+    {
+        string specific = Path.Combine(directory, $"expected.{ThisPlatform}.txt");
+        return File.Exists(specific) ? specific : Path.Combine(directory, "expected.txt");
+    }
+
+    /// <summary>What this platform is called in a file name.</summary>
+    private static string ThisPlatform =>
+        OperatingSystem.IsWindows() ? "windows"
+        : OperatingSystem.IsMacOS() ? "macos"
+        : OperatingSystem.IsLinux() ? "linux"
+        : "unknown";
+
     private static string? SkipReason(string directory)
     {
         string path = Path.Combine(directory, "platform.txt");
@@ -212,7 +242,7 @@ internal static class Program
 
         var libraries = Lines(directory, "libraries.txt");
 
-        string expectedOutputPath = Path.Combine(directory, "expected.txt");
+        string expectedOutputPath = ExpectedOutputPath(directory);
         string expectedErrorsPath = Path.Combine(directory, "errors.txt");
 
         bool expectsFailure = File.Exists(expectedErrorsPath);
@@ -293,7 +323,9 @@ internal static class Program
                 : importLibrary is null ? natives : [.. natives, importLibrary],
             References = referencePath is null ? [] : [referencePath],
             OutputPath = Path.Combine(
-                caseWork, name + (shared ? Toolchain.SharedLibraryExtension : ".exe")),
+                caseWork,
+                name + (shared ? Toolchain.SharedLibraryExtension
+                               : Toolchain.ExecutableExtension)),
             IntermediateDirectory = Path.Combine(caseWork, "obj"),
             Shared = shared,
             HeaderPath = shared ? Path.Combine(caseWork, "library.h") : null,
@@ -418,7 +450,8 @@ internal static class Program
         var toolchain = Toolchain.Locate(out string error);
         if (toolchain is null) return (null, error);
 
-        string consumer = Path.Combine(caseWork, name + "-consumer.exe");
+        string consumer = Path.Combine(
+            caseWork, name + "-consumer" + Toolchain.ExecutableExtension);
         List<string> arguments = [.. natives, "-I", caseWork];
 
         // On Windows the linker wants the import library beside the DLL.

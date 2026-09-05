@@ -1,0 +1,29 @@
+join=a/b a/b a/b
+name=notes.txt dir=x/y
+ext=.txt stem=notes with=x/notes.md
+noext= dotfile=
+rooted=1 0 0 parts=3
+memory=hello world length=11 position=11
+memory-read=5 bytes=hello at=5
+memory-can=111 seek-past=0
+create=0 exists=1
+write=0 is-file=1 size=18
+read=1 bytes=18
+lines=2 first=line one last=line two
+appended=3
+bytes=1 29
+missing=0 reason=no such file or directory
+missing-value=0
+stream=1 read=4 head=line position=4
+can=101 length=29
+whole=1 bytes=29 after-close=0
+closed-error=the stream is closed
+absent-open=0 reason=no such file or directory
+round-trip=via a stream
+entries=4 files=3 dirs=1 all-files=4
+written-lines=2 beta
+no-dir=0 reason=no such file or directory
+copied=29 renamed=0
+moved=1 original-gone=0
+cleaned=0
+done

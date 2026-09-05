@@ -368,32 +368,74 @@ size_t sl_socket_accept(size_t handle, int *error)
 }
 
 /*
- * Connects, trying every address the name resolved to.
+ * Connects a socket that is already open.
  *
- * A host with both an A and an AAAA record where only one route works is the
- * ordinary case rather than the exotic one, so the loop is the whole point:
- * stopping at the first address is how a program works at the author's desk
- * and not on the network it ships to.
+ * Only the first address of the requested family is tried, and that is a real
+ * limitation rather than an oversight: a socket whose connect failed is not
+ * usable for a second attempt, and this function does not own the socket and
+ * so cannot replace it. `sl_socket_open_connected` is the one that tries them
+ * all, because it makes the socket.
  */
 int sl_socket_connect(size_t handle, const char *host, uint16_t port, int family,
                       int kind, int *error)
 {
     struct addrinfo *found = NULL;
-    struct addrinfo *step;
+    int ok;
 
     sl_net_report(error, SL_NET_OK);
     if (!sl_net_lookup(host, port, family, kind, 0, &found, error)) return 0;
 
+    ok = connect((SlNative)handle, found->ai_addr, (SlLength)found->ai_addrlen) == 0;
+    if (!ok) sl_net_failed(error);
+
+    freeaddrinfo(found);
+    return ok;
+}
+
+/*
+ * Opens a socket and connects it, trying every address the name resolved to.
+ *
+ * This is the shape a client wants, and the reason is that **connecting is what
+ * decides the address family**. A caller that has only a name does not know
+ * whether it will end up with IPv4 or IPv6, so it cannot open the socket first
+ * -- and asking for AF_UNSPEC does not help: Winsock quietly hands back an
+ * AF_INET socket and Linux returns EAFNOSUPPORT, which is the more honest of
+ * the two answers.
+ *
+ * So a socket is made per candidate, of that candidate's own family, and
+ * closed again if it does not connect. A host with both an A and an AAAA
+ * record where only one route works is the ordinary case rather than the
+ * exotic one.
+ */
+size_t sl_socket_open_connected(const char *host, uint16_t port, int family,
+                                int kind, int *error)
+{
+    struct addrinfo *found = NULL;
+    struct addrinfo *step;
+
+    sl_net_report(error, SL_NET_OK);
+    if (!sl_net_start(error)) return (size_t)-1;
+    if (!sl_net_lookup(host, port, family, kind, 0, &found, error)) return (size_t)-1;
+
     for (step = found; step != NULL; step = step->ai_next) {
-        if (connect((SlNative)handle, step->ai_addr, (SlLength)step->ai_addrlen) == 0) {
-            freeaddrinfo(found);
-            return 1;
+        SlNative handle = socket(step->ai_family, step->ai_socktype, step->ai_protocol);
+        if (handle == SL_BAD_SOCKET) {
+            sl_net_failed(error);
+            continue;
         }
+
+        if (connect(handle, step->ai_addr, (SlLength)step->ai_addrlen) == 0) {
+            freeaddrinfo(found);
+            sl_net_report(error, SL_NET_OK);
+            return (size_t)handle;
+        }
+
         sl_net_failed(error);
+        sl_close_native(handle);
     }
 
     freeaddrinfo(found);
-    return 0;
+    return (size_t)-1;
 }
 
 /* ------------------------------------------------------------------ transfer */

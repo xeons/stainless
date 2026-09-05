@@ -5,6 +5,9 @@ listening true
 bound-host 127.0.0.1
 bound-port true
 connected true
+connected-family true
+any-is-not-a-socket true
+any-says-why true
 accepted true
 peer-port true
 peer-host true

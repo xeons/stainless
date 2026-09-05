@@ -303,6 +303,14 @@ public sealed class Toolchain
         // reaches the Windows SDK's user32.lib through the linker's own paths.
         foreach (string library in libraries ?? []) arguments.Add("-l" + library);
 
+        // Windows puts the maths and the threads in the C runtime; ELF systems
+        // keep libm separate to this day, and kept libpthread separate until
+        // glibc 2.34. `Standard.Math` declares sqrt and the rest `extern "C"`,
+        // so a program that touches any of them fails to link without this --
+        // and `--as-needed`, which is the default on every distribution that
+        // matters, drops whichever of the two nothing reached.
+        if (!OperatingSystem.IsWindows()) arguments.AddRange(["-lm", "-lpthread"]);
+
         // A shared library has no entry point; the linker also emits the import
         // library beside the DLL on Windows.
         if (shared) arguments.Add("-shared");
@@ -339,6 +347,18 @@ public sealed class Toolchain
     /// <summary>The conventional shared-library extension for this platform.</summary>
     public static string SharedLibraryExtension =>
         OperatingSystem.IsWindows() ? ".dll" : OperatingSystem.IsMacOS() ? ".dylib" : ".so";
+
+    /// <summary>
+    /// The conventional executable extension for this platform, which is
+    /// nothing at all outside Windows.
+    ///
+    /// Here rather than spelled out at each site, because it was spelled out at
+    /// each site and one of them said ".exe" unconditionally -- so every binary
+    /// the test suite built on Linux was called `something.exe`, which runs and
+    /// is still wrong.
+    /// </summary>
+    public static string ExecutableExtension =>
+        OperatingSystem.IsWindows() ? ".exe" : "";
 
     public static ToolResult Run(string executable, IReadOnlyList<string> arguments)
     {

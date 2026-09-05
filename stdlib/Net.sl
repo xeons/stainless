@@ -57,6 +57,8 @@ extern "C" {
     nuint sl_socket_accept(nuint handle, int* error);
     int   sl_socket_connect(nuint handle, byte* host, ushort port, int family,
                             int kind, int* error);
+    nuint sl_socket_open_connected(byte* host, ushort port, int family, int kind,
+                                   int* error);
 
     nuint sl_socket_send(nuint handle, byte* data, nuint count, int* error);
     nuint sl_socket_receive(nuint handle, byte* data, nuint count, int* error);
@@ -120,7 +122,12 @@ public enum SocketError {
 
 /// Which internet protocol.
 public enum AddressFamily {
-    /// Whichever the name resolves to, which is what a client usually wants.
+    /// Whichever the name resolves to.
+    ///
+    /// Only meaningful where a name is being resolved: connecting to one, or
+    /// `Resolve`. There is no socket of no family, so opening one with `Any`
+    /// is `SocketError.Invalid` -- which is what Linux says and Windows
+    /// quietly does not, handing back an IPv4 socket instead.
     Any = 0,
     IPv4 = 4,
     IPv6 = 6,
@@ -242,10 +249,39 @@ public class Socket {
     bool closed;
 
     public Socket(AddressFamily family, SocketKind kind) {
-        int code = 0;
-        handle = sl_socket_open((int)family, (int)kind, &code);
         this.family = family;
         this.kind = kind;
+
+        // There is no socket of no family. `Any` is a question for a resolver,
+        // and is answered by connecting rather than by opening.
+        if (family == AddressFamily.Any) {
+            handle = NoSocket;
+            error = SocketError.Invalid;
+            closed = true;
+            return;
+        }
+
+        int code = 0;
+        handle = sl_socket_open((int)family, (int)kind, &code);
+        error = (SocketError)code;
+        closed = handle == NoSocket;
+    }
+
+    /// A socket that is already connected.
+    ///
+    /// Opening and connecting are one step because connecting is what decides
+    /// the family: a caller with a name does not know whether it will get IPv4
+    /// or IPv6, so it cannot open first. Each address the name resolved to gets
+    /// a socket of its own family, and a socket whose connect failed is closed
+    /// rather than retried -- which is the other reason this cannot be two
+    /// steps.
+    public Socket(String host, ushort port, AddressFamily family, SocketKind kind) {
+        this.family = family;
+        this.kind = kind;
+
+        int code = 0;
+        handle = sl_socket_open_connected(host.ToPointer(), port, (int)family,
+                                          (int)kind, &code);
         error = (SocketError)code;
         closed = handle == NoSocket;
     }
@@ -319,8 +355,12 @@ public class Socket {
         return new Socket(accepted, family, kind);
     }
 
-    /// Connects, trying every address the name resolved to -- a host with both
-    /// an A and an AAAA record where only one route works is the ordinary case.
+    /// Connects a socket that is already open.
+    ///
+    /// Only the first address of this socket's family is tried, because a
+    /// socket whose connect failed cannot be used for a second attempt and
+    /// this one is already made. `new Socket(host, port, family, kind)` is the
+    /// form that tries them all, and the one a client should reach for.
     public SocketError Connect(String host, ushort port) {
         if (closed) { return Note(SocketError.Closed); }
 
@@ -641,9 +681,8 @@ public class TcpClient : IStream {
     }
 
     public TcpClient(String host, ushort port, AddressFamily family) {
-        socket = new Socket(family, SocketKind.Stream);
+        socket = new Socket(host, port, family, SocketKind.Stream);
         finished = false;
-        if (socket.IsOpen()) { socket.Connect(host, port); }
     }
 
     /// Wraps a socket somebody else opened, which is what `Accept` produces.
