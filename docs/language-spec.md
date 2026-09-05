@@ -2894,7 +2894,100 @@ automatic or written makes no difference to the caller.
 - **Not initialized at the declaration.** `public int X { get; set; } = 5;` is
   not supported, for the same reason a field initializer is not: assign it in a
   constructor.
-- **Not indexed.** There is no `this[i]`.
+- **Not indexed, by itself.** `this[i]` is an indexer, which is a property that takes arguments and has a section of its own (§7.5).
+
+### 7.4 Operators
+
+```csharp
+public struct Money {
+    public long Cents;
+
+    public static Money operator +(Money a, Money b) { return Cents(a.Cents + b.Cents); }
+    public static Money operator *(Money a, long by)  { return Cents(a.Cents * by); }
+    public static Money operator *(long by, Money a)  { return Cents(a.Cents * by); }
+
+    public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
+    public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
+}
+```
+
+C#'s shape: **inside the type it is for, `static`, with every operand written
+out**. The last part is the one that earns itself -- `3 * money` needs an
+operator whose left operand is not the declaring type, and a method with an
+implicit receiver could not express it.
+
+An operator becomes an ordinary function named `op_Add`, `op_Equal` and so on,
+which is the same lowering C# uses. Nothing can call that name: the type keeps
+its operators apart from its methods, and an operator is reached by writing it.
+
+**What may be overloaded**
+
+| | |
+|---|---|
+| arithmetic | `+` `-` `*` `/` `%` |
+| bitwise | `&` `\|` `^` `<<` `>>` |
+| comparison | `==` `!=` `<` `>` `<=` `>=` |
+| unary | `-` `!` `~` |
+
+**What may not, and why.** `&&` and `\|\|` short-circuit, and an overload would
+have to evaluate both sides to be called at all -- so overloading them would
+change what the operator *means* rather than what it does (SL0558). `=` is not
+an operator but a store. And the compound forms are not overloaded separately:
+`a += b` is defined as `a = a + b` and picks up whatever `+` does, which is one
+rule where two could disagree.
+
+**The rules**, each of them C#'s and each for a reason that holds here:
+
+- It belongs to a type (SL0560). A module-level one would let a program give
+  somebody else's type a meaning from a distance.
+- **One operand must be that type** (SL0563), so that reading `a + b` says
+  where to look for what it means.
+- It must be `public` (SL0561). An operator only its own module can write is a
+  method with an unusual spelling.
+- A comparison returns `bool` (SL0564), and **the pairs come together**
+  (SL0567): `==` with `!=`, `<` with `>`, `<=` with `>=`. A type that answers
+  one and not the other is a trap, and the missing half fails at a call site
+  far from the declaration that forgot it.
+- An interface declares none. An operator is chosen from the operand types
+  where it is written rather than dispatched, so there is nothing for a
+  contract to promise.
+
+**A declared `==` is asked first**, before the reference comparison a class
+would otherwise get. That is the whole reason to declare one.
+
+### 7.5 Indexers
+
+```csharp
+public class Grid {
+    int[] cells;
+
+    public int this[nuint at] {
+        get { return cells[at]; }
+        set { cells[at] = value; }
+    }
+}
+```
+
+A property that takes arguments, lowered to `get_Item(i)` and
+`set_Item(i, value)` -- again C#'s spelling. `a[i] += 1` reads through the
+getter and writes through the setter, on the same terms as any other property
+(§7.3).
+
+**Overloaded on what it takes**, because `this[nuint]` and `this[String]` are
+different questions:
+
+```csharp
+public String this[nuint at]     { get { ... } set { ... } }
+public bool   this[String named] { get { ... } set { ... } }
+```
+
+**There is no automatic form.** `{ get; set; }` on a property makes the
+compiler find storage; there is nothing to find here, since what an index
+*means* is the whole of what an indexer is for. Both accessors are written, or
+just the getter for a read-only one.
+
+An indexer is inherited like any other member, and works on a struct -- where
+the setter reaches its receiver by pointer, as every struct method does.
 
 ## 8. Interoperability and libraries
 

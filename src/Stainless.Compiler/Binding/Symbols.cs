@@ -221,6 +221,12 @@ public sealed class PropertySymbol
     public FunctionSymbol? Getter { get; set; }
     public FunctionSymbol? Setter { get; set; }
 
+    /// <summary>
+    /// True for <c>this[...]</c>: a property whose accessors take arguments,
+    /// reached by writing <c>a[i]</c> rather than by name.
+    /// </summary>
+    public bool IsIndexer { get; init; }
+
     /// <summary>The generated storage of an automatic property; null otherwise.</summary>
     public FieldSymbol? BackingField { get; set; }
 

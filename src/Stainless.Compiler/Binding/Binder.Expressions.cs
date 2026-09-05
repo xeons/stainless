@@ -567,6 +567,10 @@ public sealed partial class Binder
         var operand = BindExpression(syntax.Operand);
         if (operand.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
+        // A type's own, before anything built in -- the same order as binary.
+        if (FindUnaryOperator(syntax.Span, syntax.Operator, operand) is { } overloaded)
+            return overloaded;
+
         if (syntax.Operator == TokenKind.Plus)
             return operand;
 
@@ -633,6 +637,111 @@ public sealed partial class Binder
         return BindBinaryOperation(syntax.Span, left, op, right, syntax.Operator);
     }
 
+    /// <summary>
+    /// The operator a type declared for this, or null if neither operand's
+    /// type declared one.
+    ///
+    /// Both operands are asked, which is what lets `2 * money` work: the
+    /// declaration lives on Money and is found through the right-hand side.
+    /// </summary>
+    private BoundExpression? FindBinaryOperator(
+        SourceSpan span, TokenKind token, BoundExpression left, BoundExpression right)
+    {
+        if (OperatorNames.For(token) is not { } name) return null;
+
+        var candidates = OperatorsNamed(name, left.Type, right.Type)
+            .Where(o => o.Parameters.Count == 2)
+            .ToList();
+
+        if (candidates.Count == 0) return null;
+
+        var fitting = candidates
+            .Where(o => IsImplicitlyConvertible(left, o.Parameters[0].Type) &&
+                        IsImplicitlyConvertible(right, o.Parameters[1].Type))
+            .ToList();
+
+        if (fitting.Count == 0)
+        {
+            // Declared, and not for these types. Saying which is more use than
+            // "cannot be applied", which is what the caller would say next.
+            diagnostics.Error("SL0565", span,
+                $"no operator '{token.FixedText()}' takes '{left.Type.Name}' and " +
+                $"'{right.Type.Name}'; the ones declared take " +
+                string.Join(" and ", candidates.Select(Operands)));
+            return new BoundErrorExpression(span);
+        }
+
+        if (fitting.Count > 1)
+        {
+            diagnostics.Error("SL0566", span,
+                $"operator '{token.FixedText()}' is ambiguous for '{left.Type.Name}' and " +
+                $"'{right.Type.Name}': " + string.Join(" and ", fitting.Select(Operands)) +
+                " both accept them");
+            return new BoundErrorExpression(span);
+        }
+
+        var chosen = fitting[0];
+        return new BoundCall(span, chosen, receiver: null, [
+            BindConversion(left, chosen.Parameters[0].Type, span),
+            BindConversion(right, chosen.Parameters[1].Type, span),
+        ]);
+    }
+
+    /// <summary>The same, for `-x` and `!x` and `~x`.</summary>
+    private BoundExpression? FindUnaryOperator(
+        SourceSpan span, TokenKind token, BoundExpression operand)
+    {
+        if (OperatorNames.For(token) is not { } name) return null;
+
+        var fitting = OperatorsNamed(name, operand.Type, operand.Type)
+            .Where(o => o.Parameters.Count == 1 &&
+                        IsImplicitlyConvertible(operand, o.Parameters[0].Type))
+            .ToList();
+
+        if (fitting.Count == 0) return null;
+
+        if (fitting.Count > 1)
+        {
+            diagnostics.Error("SL0566", span,
+                $"operator '{token.FixedText()}' is ambiguous for '{operand.Type.Name}'");
+            return new BoundErrorExpression(span);
+        }
+
+        return new BoundCall(span, fitting[0], receiver: null,
+            [BindConversion(operand, fitting[0].Parameters[0].Type, span)]);
+    }
+
+    /// <summary>
+    /// The operators of that name on either operand's type, without repeating
+    /// one when both operands are the same type.
+    /// </summary>
+    private static List<FunctionSymbol> OperatorsNamed(string name, TypeSymbol left, TypeSymbol right)
+    {
+        var found = new List<FunctionSymbol>();
+
+        foreach (var type in new[] { Underlying(left), Underlying(right) })
+        {
+            if (type is not NamedTypeSymbol named) continue;
+
+            foreach (var candidate in named.Operators)
+                if (candidate.Name == name && !found.Contains(candidate))
+                    found.Add(candidate);
+        }
+
+        return found;
+    }
+
+    /// <summary>
+    /// The type whose operators to look at. A `C?` looks at C's, so that a
+    /// narrowed reference and an unnarrowed one behave alike.
+    /// </summary>
+    private static TypeSymbol Underlying(TypeSymbol type) =>
+        type is OptionalTypeSymbol optional ? optional.Element : type;
+
+    /// <summary>An operator's operand types, for a diagnostic.</summary>
+    private static string Operands(FunctionSymbol op) =>
+        "'" + string.Join(", ", op.Parameters.Select(p => p.Type.Name)) + "'";
+
     private BoundExpression BindBinaryOperation(
         SourceSpan span, BoundExpression left, BoundBinaryOp op, BoundExpression right, TokenKind token)
     {
@@ -648,6 +757,13 @@ public sealed partial class Binder
             }
             return new BoundBinary(span, PrimitiveTypeSymbol.Bool, left, op, right);
         }
+
+        // A type's own operator, before anything built in. It comes first so
+        // that a class declaring `==` gets asked rather than being compared by
+        // address behind its back -- which is the whole reason to declare one.
+        // Nothing built in is reachable this way: a primitive, a String and an
+        // array declare no operators, so the lookup fails at once for them.
+        if (FindBinaryOperator(span, token, left, right) is { } overloaded) return overloaded;
 
         // Pointer arithmetic: p + i, p - i.
         if (left.Type is PointerTypeSymbol && op is BoundBinaryOp.Add or BoundBinaryOp.Subtract &&
@@ -1176,8 +1292,14 @@ public sealed partial class Binder
             if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
         }
 
+        // For an indexer, the read that got here already bound and converted
+        // the indices, so they are carried over rather than bound again --
+        // binding twice would evaluate them twice.
         return new BoundPropertyAssignment(syntax.Span, receiver, property,
-            BindConversion(value, property.Type, syntax.Value.Span));
+            BindConversion(value, property.Type, syntax.Value.Span))
+        {
+            Indices = property.IsIndexer ? read.Arguments : [],
+        };
     }
 
     /// <summary>
@@ -1201,6 +1323,62 @@ public sealed partial class Binder
         _ => false,
     };
 
+    /// <summary>
+    /// The accessor of an indexer that takes this index, or null.
+    ///
+    /// Walks the base chain, because an indexer is inherited like any other
+    /// member. Overloaded on the index type, so `this[nuint]` and
+    /// `this[String]` can both be declared and asking with one does not find
+    /// the other.
+    /// </summary>
+    private FunctionSymbol? FindIndexer(NamedTypeSymbol type, BoundExpression index, bool setting)
+    {
+        for (NamedTypeSymbol? at = type; at is not null;
+             at = (at as ClassTypeSymbol)?.BaseClass)
+        {
+            foreach (var property in at.Properties.Where(p => p.IsIndexer))
+            {
+                var accessor = setting ? property.Setter : property.Getter;
+                if (accessor is null) continue;
+
+                // Parameter 0 is `this`; parameter 1 is the index. A setter's
+                // last parameter is `value` and is not one of the indices.
+                var indices = accessor.Parameters.Where(p => !p.IsThis).ToList();
+                if (setting && indices.Count > 0) indices.RemoveAt(indices.Count - 1);
+
+                if (indices.Count == 1 && IsImplicitlyConvertible(index, indices[0].Type))
+                    return accessor;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// <c>a[i]</c> or <c>a[i] = v</c>, as the call it lowers to.
+    /// </summary>
+    private BoundExpression BuildIndexerCall(
+        SourceSpan span, FunctionSymbol accessor, BoundExpression target,
+        BoundExpression index, BoundExpression? value)
+    {
+        var indices = accessor.Parameters.Where(p => !p.IsThis).ToList();
+
+        var arguments = new List<BoundExpression>
+        {
+            BindConversion(index, indices[0].Type, span),
+        };
+
+        if (value is not null)
+            arguments.Add(BindConversion(value, indices[^1].Type, span));
+
+        // A struct's method takes its receiver by pointer, as everywhere else.
+        var receiver = accessor.ContainingType is StructTypeSymbol
+            ? new BoundAddressOf(span, new PointerTypeSymbol(target.Type), target)
+            : target;
+
+        return new BoundCall(span, accessor, receiver, arguments);
+    }
+
     private BoundExpression BindIndex(IndexSyntax syntax)
     {
         var target = BindExpression(syntax.Target);
@@ -1209,12 +1387,19 @@ public sealed partial class Binder
         if (target.Type.IsError() || index.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
 
+        // A type's own indexer. Reached through the getter it lowers to, which
+        // is why nothing here has to know that a property was involved.
+        if (target.Type is NamedTypeSymbol named && FindIndexer(named, index, false) is { } getter)
+            return BuildIndexerCall(syntax.Span, getter, target, index, null);
+
         if (target.Type is not (PointerTypeSymbol or ArrayTypeSymbol or SliceTypeSymbol
                                 or FixedArrayTypeSymbol))
         {
             diagnostics.Error("SL0241", syntax.Span,
-                $"cannot index '{target.Type.Name}'; only arrays, slices and pointers support " +
-                "indexing");
+                target.Type is NamedTypeSymbol subject && subject.Properties.Any(p => p.IsIndexer)
+                    ? $"no indexer on '{target.Type.Name}' takes '{index.Type.Name}'"
+                    : $"cannot index '{target.Type.Name}'; only arrays, slices and pointers " +
+                      "support indexing, and this type declares no 'this[...]'");
             return new BoundErrorExpression(syntax.Span);
         }
 

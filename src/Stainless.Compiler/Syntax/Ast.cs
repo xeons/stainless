@@ -207,6 +207,16 @@ public sealed record FunctionDeclSyntax(
     /// that is not C++.
     /// </summary>
     public IReadOnlyList<string> Namespace { get; init; } = [];
+
+    /// <summary>
+    /// True for <c>static T operator +(...)</c>. The name is already the
+    /// lowered one -- <c>op_Add</c> -- and this is what says it was written as
+    /// an operator rather than called that.
+    /// </summary>
+    public bool IsOperator { get; init; }
+
+    /// <summary>Which operator, for the checks that depend on which.</summary>
+    public TokenKind OperatorToken { get; init; }
 }
 
 public sealed record FieldDeclSyntax(
@@ -260,7 +270,17 @@ public sealed record PropertyDeclSyntax(
     TypeSyntax Type,
     string Name,
     IReadOnlyList<AccessorSyntax> Accessors,
-    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers)
+{
+    /// <summary>
+    /// What goes between the brackets of an indexer, and empty for an ordinary
+    /// property. An indexer is a property that takes arguments, so this is the
+    /// only thing that separates the two.
+    /// </summary>
+    public IReadOnlyList<ParameterSyntax> Indices { get; init; } = [];
+
+    public bool IsIndexer => Indices.Count > 0;
+}
 
 public sealed record ConstructorDeclSyntax(
     SourceSpan Span,

@@ -533,6 +533,39 @@ public sealed partial class Binder
                 }
             }
         }
+
+        CheckOperatorPairs(type);
+    }
+
+    /// <summary>
+    /// An operator that comes in a pair has to be declared with its opposite.
+    ///
+    /// Checked here rather than at the declaration because the other half may
+    /// be written below it. A type that can be asked <c>==</c> and not
+    /// <c>!=</c>, or <c>&lt;</c> and not <c>&gt;</c>, is a trap: the reader
+    /// has no way to know which questions it answers, and the missing one
+    /// fails at a call site far from the declaration that forgot it. C#
+    /// arrived at the same rule for the same reason.
+    /// </summary>
+    private void CheckOperatorPairs(NamedTypeSymbol type)
+    {
+        foreach (var (token, opposite) in OperatorNames.Pairs)
+        {
+            if (OperatorNames.For(token) is not { } name) continue;
+            if (OperatorNames.For(opposite) is not { } otherName) continue;
+
+            foreach (var declared in type.Operators.Where(o => o.Name == name))
+            {
+                var operands = declared.ParameterTypes.ToList();
+
+                if (type.Operators.Any(o => o.Name == otherName && o.Accepts(operands))) continue;
+
+                diagnostics.Error("SL0567", declared.Span,
+                    $"'{type.Name}' declares operator '{token.FixedText()}' for these operands " +
+                    $"and not '{opposite.FixedText()}'; the two come together, because a type " +
+                    "that answers one and not the other is a question nobody can ask twice");
+            }
+        }
     }
 
     /// <summary>
@@ -547,8 +580,12 @@ public sealed partial class Binder
     private void DeclareProperty(
         FileScope scope, NamedTypeSymbol type, PropertyDeclSyntax declaration)
     {
-        if (type.FindStorage(declaration.Name) is not null ||
-            type.FindProperty(declaration.Name) is not null)
+        // An indexer may be overloaded on what it takes -- `this[nuint]` and
+        // `this[String]` are different questions -- so the name alone does not
+        // decide whether one is already declared.
+        if (!declaration.IsIndexer &&
+            (type.FindStorage(declaration.Name) is not null ||
+             type.FindProperty(declaration.Name) is not null))
         {
             diagnostics.Error("SL0205", declaration.Span,
                 $"'{type.Name}' already declares a member named '{declaration.Name}'");
@@ -649,15 +686,18 @@ public sealed partial class Binder
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface,
             IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
             BackingField = backing,
+            IsIndexer = declaration.IsIndexer,
         };
 
         // A property's dispatch is its accessors' -- they are the methods, and a
         // vtable has no notion of a property at all.
         var accessorModifiers = declaration.Modifiers;
 
-        property.Getter = DeclareAccessor(scope, type, property, getter, false, accessorModifiers);
+        property.Getter = DeclareAccessor(
+            scope, type, property, getter, false, accessorModifiers, declaration.Indices);
         if (setter is not null)
-            property.Setter = DeclareAccessor(scope, type, property, setter, true, accessorModifiers);
+            property.Setter = DeclareAccessor(
+                scope, type, property, setter, true, accessorModifiers, declaration.Indices);
 
         type.Properties.Add(property);
     }
@@ -670,16 +710,26 @@ public sealed partial class Binder
     /// </summary>
     private FunctionSymbol? DeclareAccessor(
         FileScope scope, NamedTypeSymbol type, PropertySymbol property,
-        AccessorSyntax accessor, bool isSetter, Modifiers modifiers)
+        AccessorSyntax accessor, bool isSetter, Modifiers modifiers,
+        IReadOnlyList<ParameterSyntax> indices)
     {
         string role = isSetter ? "setter" : "getter";
         string name = (isSetter ? "set_" : "get_") + property.Name;
 
-        if (type.FindMethod(name) is not null)
+        // What this accessor will take, which is what says whether the name is
+        // really taken: an indexer may be overloaded on its index -- `this[nuint]`
+        // and `this[String]` are different questions -- and both lower to
+        // `get_Item`, so the name alone does not decide.
+        var willTake = indices.Select(i => ResolveType(i.Type, scope)).ToList();
+        if (isSetter) willTake.Add(property.Type);
+
+        if (type.Methods.Any(m => m.Name == name && m.Accepts(willTake)))
         {
             diagnostics.Error("SL0393", accessor.Span,
-                $"'{type.Name}' already declares a method named '{name}', which is the name " +
-                $"the {role} of property '{property.Name}' has to use");
+                $"'{type.Name}' already declares a method named '{name}' taking these " +
+                $"parameters, which is what the {role} of " +
+                (property.IsIndexer ? "this indexer" : $"property '{property.Name}'") +
+                " has to use");
             return null;
         }
 
@@ -727,8 +777,15 @@ public sealed partial class Binder
             : new PointerTypeSymbol(type);
         symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
 
+        // An indexer's indices come before `value`, so that a setter reads
+        // `set_Item(i, v)` -- the order the call site writes them in.
+        for (int i = 0; i < indices.Count; i++)
+            symbol.Parameters.Add(new ParameterSymbol(
+                indices[i].Name, willTake[i], symbol.Parameters.Count));
+
         if (isSetter)
-            symbol.Parameters.Add(new ParameterSymbol("value", property.Type, 1));
+            symbol.Parameters.Add(
+                new ParameterSymbol("value", property.Type, symbol.Parameters.Count));
 
         type.Methods.Add(symbol);
         scope.Module.Functions.Add(symbol);

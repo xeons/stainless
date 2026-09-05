@@ -467,9 +467,16 @@ public sealed partial class LlvmEmitter
             : setter.IsDispatched ? LoadVirtualMethod(receiver.Ref, setter)
             : null;
 
+        // An indexer's indices come before `value`, in the order the setter
+        // declares them and the call site wrote them.
+        var indices = assignment.Indices.Select(EmitExpression).ToList();
         var value = EmitExpression(assignment.Value);
 
         var arguments = new List<string> { $"ptr {receiver.Ref}" };
+
+        for (int i = 0; i < indices.Count; i++)
+            AppendArgument(indices[i], assignment.Indices[i].Type, arguments);
+
         AppendArgument(value, assignment.Value.Type, arguments);
 
         Line($"call void {virtualTarget ?? Symbol(setter)}" +

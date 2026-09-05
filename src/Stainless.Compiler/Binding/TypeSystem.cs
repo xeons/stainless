@@ -314,6 +314,18 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public List<FunctionSymbol> Methods { get; } = [];
 
     /// <summary>
+    /// Operators this type declares: <c>public static Money operator +(Money,
+    /// Money)</c>.
+    ///
+    /// Kept apart from <see cref="Methods"/> deliberately. An operator has no
+    /// receiver, so it is not dispatched and needs no vtable slot; and it is
+    /// reached by writing <c>a + b</c> rather than by name, so putting it where
+    /// ordinary lookup would find it would let somebody call <c>op_Add</c>
+    /// directly -- which is the lowering, not the language.
+    /// </summary>
+    public List<FunctionSymbol> Operators { get; } = [];
+
+    /// <summary>
     /// Properties, whose accessors also appear in <see cref="Methods"/>. This
     /// list is what makes <c>x.Name</c> resolve; the methods are what makes it
     /// dispatch.

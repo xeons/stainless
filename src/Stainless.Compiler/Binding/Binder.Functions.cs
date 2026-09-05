@@ -58,7 +58,11 @@ public sealed partial class Binder
             Scope = scope,
         };
 
-        if (containingType is not null)
+        // An operator has no receiver: it is static, and every operand is
+        // written out. That is what makes `2 * money` expressible, since an
+        // operator whose left operand is not the declaring type would have
+        // nothing to hang a `this` off.
+        if (containingType is not null && !declaration.IsOperator)
         {
             // A method receives its instance: classes by reference, structs by pointer.
             TypeSymbol thisType = containingType is ClassTypeSymbol c
@@ -146,6 +150,13 @@ public sealed partial class Binder
                 $"'{declaration.Name}(...)' builds one of those. A method of a type may still " +
                 "be called this, because a method is reached through its receiver");
 
+        if (declaration.IsOperator)
+        {
+            CheckOperator(containingType, symbol, declaration);
+            module.Functions.Add(symbol);
+            return;
+        }
+
         if (containingType is not null)
         {
             var signature = symbol.ParameterTypes.ToList();
@@ -171,6 +182,94 @@ public sealed partial class Binder
 
         module.Functions.Add(symbol);
     }
+
+    /// <summary>
+    /// What an operator declaration has to be, beyond parsing.
+    ///
+    /// Every rule here is C#'s, and each is C#'s for a reason that holds:
+    ///
+    /// <list type="bullet">
+    /// <item>It belongs to a type. A module-level one would let a program add
+    /// an operator to somebody else's type from a distance, which is the thing
+    /// that makes an expression unreadable.</item>
+    /// <item>One operand must be that type, so that reading <c>a + b</c> tells
+    /// you where to look for what it means.</item>
+    /// <item>It must be public. An operator nobody outside can use is a method
+    /// with a strange spelling.</item>
+    /// <item>A comparison returns <c>bool</c>, and the pairs come together:
+    /// a type that can be asked <c>==</c> and not <c>!=</c> is a trap.</item>
+    /// </list>
+    /// </summary>
+    private void CheckOperator(
+        NamedTypeSymbol? containingType, FunctionSymbol symbol, FunctionDeclSyntax declaration)
+    {
+        var token = declaration.OperatorToken;
+        string written = token.FixedText() ?? "?";
+
+        if (containingType is null)
+        {
+            diagnostics.Error("SL0560", declaration.Span,
+                $"operator '{written}' has to be declared inside the type it is for; a " +
+                "module-level one would let a program give somebody else's type a meaning " +
+                "from a distance");
+            return;
+        }
+
+        if (containingType.IsContract)
+        {
+            diagnostics.Error("SL0560", declaration.Span,
+                $"'{containingType.Name}' is an interface, and an operator is not dispatched: " +
+                "it is chosen from the operand types where it is written, so an interface has " +
+                "nothing to promise here");
+            return;
+        }
+
+        if (!declaration.Modifiers.HasFlag(Modifiers.Public))
+            diagnostics.Error("SL0561", declaration.Span,
+                $"operator '{written}' has to be 'public'; an operator only this module could " +
+                "write is a method with an unusual spelling");
+
+        int count = symbol.Parameters.Count;
+        bool unary = OperatorNames.IsUnary(token);
+        bool either = OperatorNames.IsEither(token);
+
+        int wanted = unary ? 1 : 2;
+        if ((unary || !either) && count != wanted)
+            diagnostics.Error("SL0562", declaration.Span,
+                $"operator '{written}' takes {wanted} operand{(wanted == 1 ? "" : "s")}, " +
+                $"and this declares {count}");
+        else if (either && count is not (1 or 2))
+            diagnostics.Error("SL0562", declaration.Span,
+                $"operator '{written}' takes one operand or two, and this declares {count}");
+
+        // One operand has to be the type, so that reading `a + b` says where
+        // to look. Without it, a type could give meaning to `int + int`.
+        if (count > 0 && !symbol.Parameters.Any(p => Mentions(p.Type, containingType)))
+            diagnostics.Error("SL0563", declaration.Span,
+                $"operator '{written}' is declared in '{containingType.Name}', so one of its " +
+                "operands has to be one; an operator over other people's types belongs to " +
+                "neither of them");
+
+        if (OperatorNames.IsComparison(token) && !symbol.ReturnType.IsBool() &&
+            !symbol.ReturnType.IsError())
+            diagnostics.Error("SL0564", declaration.Span,
+                $"operator '{written}' answers a question, so it returns 'bool', not " +
+                $"'{symbol.ReturnType.Name}'");
+
+        var signature = symbol.ParameterTypes.ToList();
+        if (containingType.Operators.Any(o => o.Name == symbol.Name && o.Accepts(signature)))
+            diagnostics.Error("SL0211", declaration.Span,
+                $"'{containingType.Name}' already declares operator '{written}' for these " +
+                "operand types");
+
+        containingType.Operators.Add(symbol);
+    }
+
+    /// <summary>Whether an operand type is the declaring type, or a pointer to it.</summary>
+    private static bool Mentions(TypeSymbol operand, NamedTypeSymbol type) =>
+        ReferenceEquals(operand, type) ||
+        (operand is PointerTypeSymbol pointer && ReferenceEquals(pointer.Element, type)) ||
+        (operand is OptionalTypeSymbol optional && ReferenceEquals(optional.Element, type));
 
     /// <summary>
     /// The dispatch word written on a declaration that cannot be dispatched, or

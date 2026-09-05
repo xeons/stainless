@@ -215,7 +215,9 @@ public sealed class Parser
             return [ParseDestructor(start, enclosingType)];
 
         if (At(TokenKind.StaticKeyword))
-            return [ParseStaticDeclaration(start, modifiers)];
+            return AtOperatorDeclaration()
+                ? [ParseOperatorDeclaration(start, modifiers)]
+                : [ParseStaticDeclaration(start, modifiers)];
 
         if (modifiers.HasFlag(Modifiers.Const))
             return [ParseGlobalConst(start, modifiers)];
@@ -562,6 +564,7 @@ public sealed class Parser
     {
         Expect(TokenKind.DelegateKeyword);
         var returnType = ParseType();
+
         string name = ExpectIdentifier();
         var parameters = ParseParameterList(out bool variadic);
 
@@ -571,6 +574,73 @@ public sealed class Parser
 
         Expect(TokenKind.Semicolon);
         return new DelegateDeclSyntax(SpanFrom(start), modifiers, name, returnType, parameters);
+    }
+
+    /// <summary>
+    /// Whether what follows <c>static</c> is an operator rather than a field.
+    ///
+    /// The return type sits between the two words and may be several tokens
+    /// long -- <c>List&lt;int&gt;</c>, <c>int</c>, a qualified name -- so this
+    /// looks ahead for <c>operator</c> before the parameter list rather than
+    /// trying to parse a type and back out.
+    /// </summary>
+    private bool AtOperatorDeclaration()
+    {
+        for (int at = 1; at < 16; at++)
+        {
+            var kind = Peek(at).Kind;
+            if (kind == TokenKind.OperatorKeyword) return true;
+            if (kind is TokenKind.Equals or TokenKind.Semicolon or TokenKind.OpenParen
+                or TokenKind.OpenBrace or TokenKind.EndOfFile) return false;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// <c>public static Money operator +(Money left, Money right)</c>.
+    ///
+    /// C#'s shape: inside the type it belongs to, static, with every operand
+    /// written out. The last part is what makes <c>2 * money</c> expressible --
+    /// an operator whose left operand is not the declaring type has no
+    /// receiver to hang off, and would be unwritable as a method.
+    ///
+    /// It becomes an ordinary function named <c>op_Add</c> and so on, which is
+    /// the same lowering C# uses. Nothing can call that name: it is registered
+    /// among the type's operators rather than its methods.
+    /// </summary>
+    private Declaration ParseOperatorDeclaration(int start, Modifiers modifiers)
+    {
+        Expect(TokenKind.StaticKeyword);
+
+        var returnType = ParseType();
+        Expect(TokenKind.OperatorKeyword);
+
+        var token = Current;
+        string? name = OperatorNames.For(token.Kind);
+
+        if (name is null)
+        {
+            _diagnostics.Error("SL0558", token.Span,
+                $"'{token.Text}' cannot be overloaded. The operators that can are " +
+                OperatorNames.List);
+            name = "op_Error";
+        }
+
+        Advance();
+
+        var parameters = ParseParameterList(out _);
+        var body = At(TokenKind.OpenBrace) ? ParseBlock() : null;
+
+        if (body is null)
+        {
+            Expect(TokenKind.Semicolon);
+            _diagnostics.Error("SL0559", SpanFrom(start), "an operator needs a body");
+        }
+
+        return new FunctionDeclSyntax(
+            SpanFrom(start), modifiers, LinkageKind.Stainless, returnType, name,
+            [], [], parameters, IsVariadic: false, body)
+        { IsOperator = true, OperatorToken = token.Kind };
     }
 
     /// <summary>
@@ -633,6 +703,14 @@ public sealed class Parser
         IReadOnlyList<AttributeSyntax>? attributes = null)
     {
         var returnType = ParseType();
+
+        // `T this[...]` is an indexer: a property whose accessors take
+        // arguments. It is spelled with `this` because that is what is being
+        // indexed, and because no other name could avoid colliding with a
+        // member somebody wanted to call `Item`.
+        if (At(TokenKind.ThisKeyword) && Peek(1).Kind == TokenKind.OpenBracket)
+            return ParseIndexer(start, modifiers, returnType, attributes ?? []);
+
         string name = ExpectIdentifier();
 
         // `int geometry::Area(int, int)`. Only a C++ declaration may be
@@ -717,6 +795,50 @@ public sealed class Parser
     }
 
     /// <summary>
+    /// <c>public T this[nuint i] { get; set; }</c>.
+    ///
+    /// A property that takes arguments, and lowered like one: to
+    /// <c>get_Item(i)</c> and <c>set_Item(i, value)</c>, which is C#'s
+    /// spelling of the same idea. Nothing can call those names -- they are the
+    /// lowering, reached by writing <c>a[i]</c>.
+    ///
+    /// There is no automatic form. <c>{ get; set; }</c> on a property makes
+    /// the compiler find storage for it, and there is nothing to find here:
+    /// what an index means is the whole of what an indexer is for, so both
+    /// accessors are written.
+    /// </summary>
+    private Declaration ParseIndexer(
+        int start, Modifiers modifiers, TypeSyntax returnType,
+        IReadOnlyList<AttributeSyntax> attributes)
+    {
+        Expect(TokenKind.ThisKeyword);
+        Expect(TokenKind.OpenBracket);
+
+        var parameters = new List<ParameterSyntax>();
+        while (!At(TokenKind.CloseBracket) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+            var type = ParseType();
+            string name = ExpectIdentifier();
+            parameters.Add(new ParameterSyntax(SpanFrom(at), type, name));
+
+            if (!Match(TokenKind.Comma)) break;
+        }
+
+        Expect(TokenKind.CloseBracket);
+
+        if (parameters.Count == 0)
+            _diagnostics.Error("SL0568", SpanFrom(start),
+                "an indexer takes at least one index; `this[]` indexes by nothing");
+
+        var accessors = ParseAccessorList("this[]");
+
+        return new PropertyDeclSyntax(
+            SpanFrom(start), modifiers, returnType, "Item", accessors, attributes)
+        { Indices = parameters };
+    }
+
+    /// <summary>
     /// The accessor list of a property, or the single expression that stands in
     /// for one: <c>int Area =&gt; width * height;</c> is <c>{ get { return ...; } }</c>.
     /// </summary>
@@ -724,17 +846,29 @@ public sealed class Parser
         int start, Modifiers modifiers, TypeSyntax type, string name,
         IReadOnlyList<AttributeSyntax> attributes)
     {
-        var accessors = new List<AccessorSyntax>();
-
+        // `T Name => expression;` is a getter and nothing else. An indexer has
+        // no such form, which is why this is here and not in the shared part.
         if (Match(TokenKind.EqualsGreater))
         {
-            accessors.Add(new AccessorSyntax(
-                SpanFrom(start), Modifiers.None, IsGetter: true, ParseArrowBody(isGetter: true)));
+            var arrow = new List<AccessorSyntax>
+            {
+                new(SpanFrom(start), Modifiers.None, IsGetter: true, ParseArrowBody(isGetter: true)),
+            };
             Expect(TokenKind.Semicolon);
-            return new PropertyDeclSyntax(
-                SpanFrom(start), modifiers, type, name, accessors, attributes);
+            return new PropertyDeclSyntax(SpanFrom(start), modifiers, type, name, arrow, attributes);
         }
 
+        return new PropertyDeclSyntax(
+            SpanFrom(start), modifiers, type, name, ParseAccessorList(name), attributes);
+    }
+
+    /// <summary>
+    /// <c>{ get; set; }</c> and its written-out forms, shared by a property
+    /// and an indexer -- which differ in what precedes this and nothing else.
+    /// </summary>
+    private List<AccessorSyntax> ParseAccessorList(string name)
+    {
+        var accessors = new List<AccessorSyntax>();
         Expect(TokenKind.OpenBrace);
 
         while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
@@ -772,7 +906,7 @@ public sealed class Parser
         }
 
         Expect(TokenKind.CloseBrace);
-        return new PropertyDeclSyntax(SpanFrom(start), modifiers, type, name, accessors, attributes);
+        return accessors;
     }
 
     /// <summary>

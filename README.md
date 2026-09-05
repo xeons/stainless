@@ -481,6 +481,37 @@ public int Fahrenheit {
 }
 ```
 
+### Operators and indexers
+
+```csharp
+public struct Money {
+    public long Cents;
+
+    public static Money operator +(Money a, Money b) { return Cents(a.Cents + b.Cents); }
+    public static Money operator *(long by, Money a) { return Cents(a.Cents * by); }
+
+    public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
+    public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
+}
+
+public class Grid {
+    public int this[nuint at] {
+        get { return cells[at]; }
+        set { cells[at] = value; }
+    }
+}
+```
+
+C#'s shape: inside the type, `static`, every operand written out. That last
+part is what makes `3 * money` expressible -- an operator whose left operand is
+not the declaring type has no receiver to hang off.
+
+`&&` and `||` cannot be overloaded, because they short-circuit and an overload
+would have to evaluate both sides to be called at all. The compound forms are
+not overloaded separately either: `a += b` is `a = a + b` and picks up whatever
+`+` does. `==` and `!=` must be declared together, as must `<`/`>` and
+`<=`/`>=`; a type that answers one and not the other is a trap.
+
 ### Inheritance
 
 ```csharp
@@ -795,7 +826,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 199 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 207 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 497 compiler unit tests
 ```
 
@@ -805,8 +836,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 199 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 189 and Windows 198, each
+**Both Windows and Linux are tested.** 207 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 197 and Windows 206, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1448,10 +1479,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   single slot, so two of a name in one interface would be a call the receiver
   could not resolve. Methods on classes and structs overload freely, and a
   class may implement two interfaces whose methods share a name.
-- **A property is not an indexer, and not initialized where it is declared.**
-  There is no `this[i]`, and `{ get; set; } = 5;` is rejected for the same
-  reason a field initializer is. `p.X += 1` also needs a receiver that is a
-  plain load, since the getter and the setter each evaluate it.
+- **A property is not initialized where it is declared.** `{ get; set; } = 5;`
+  is rejected for the same reason a field initializer is. `p.X += 1` also needs
+  a receiver that is a plain load, since the getter and the setter each
+  evaluate it. An indexer has no automatic form: `{ get; set; }` would have
+  nothing to find storage for.
 - **The compiler prunes no dead code; the linker does.** Every stdlib module is
   compiled with your program whether or not it is imported, and only generics
   are free — an uninstantiated template emits nothing, but a non-generic

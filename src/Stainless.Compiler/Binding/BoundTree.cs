@@ -288,6 +288,13 @@ public sealed class BoundPropertyAssignment(
     public BoundExpression Receiver { get; } = receiver;
     public PropertySymbol Property { get; } = property;
     public BoundExpression Value { get; } = value;
+
+    /// <summary>
+    /// What went between the brackets, for <c>a[i] = v</c>. Empty for an
+    /// ordinary property, which is the only thing separating the two: an
+    /// indexer's setter takes its indices before <c>value</c>.
+    /// </summary>
+    public IReadOnlyList<BoundExpression> Indices { get; init; } = [];
 }
 
 /// <summary>
