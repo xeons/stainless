@@ -199,23 +199,174 @@ public nuint IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T
     return items.Count();
 }
 
+/// Below this many, a merge is not worth its bookkeeping and insertion sort
+/// wins outright. It is also what keeps the merge from recursing to length 1.
+const nuint SmallRun = 16u;
+
 /// Orders part of an array in place, smallest first.
 ///
 /// An array converts to a slice of the whole of itself, so `Sort(numbers)`
 /// reaches this and `Sort(numbers[2:5])` orders three of them and leaves the
 /// rest alone. Nothing is copied either way: a slice is a view.
+///
+/// **Stable, and O(n log n).** Merge sort, bottom-up, with insertion sort for
+/// short runs. Stability is the property worth paying for -- sorting by one
+/// key and then another is how a multi-key order gets built, and it only works
+/// if the second sort leaves equal elements where the first put them. The
+/// price is one scratch array as long as the input; an in-place quicksort
+/// would avoid it and would not be stable.
 public void Sort<T>(T[:] items) where T : IComparable<T> {
-    for (nuint i = 1; i < items.Length; i = i + 1) {
+    if (items.Length < 2u) { return; }
+
+    var scratch = new T[items.Length];
+
+    for (nuint start = 0u; start < items.Length; start += SmallRun) {
+        nuint stop = start + SmallRun;
+        if (stop > items.Length) { stop = items.Length; }
+        InsertionSort(items, start, stop);
+    }
+
+    for (nuint width = SmallRun; width < items.Length; width *= 2u) {
+        for (nuint low = 0u; low + width < items.Length; low += width * 2u) {
+            nuint middle = low + width;
+            nuint high = middle + width;
+            if (high > items.Length) { high = items.Length; }
+            Merge(items, scratch, low, middle, high);
+        }
+    }
+}
+
+/// Orders `[start, stop)` by insertion, which is what a short run wants.
+void InsertionSort<T>(T[:] items, nuint start, nuint stop) where T : IComparable<T> {
+    for (nuint i = start + 1u; i < stop; i += 1u) {
         var current = items[i];
         var j = i;
 
-        while (j > 0 && items[j - 1].CompareTo(current) > 0) {
-            items[j] = items[j - 1];
-            j = j - 1;
+        while (j > start && items[j - 1u].CompareTo(current) > 0) {
+            items[j] = items[j - 1u];
+            j -= 1u;
         }
 
         items[j] = current;
     }
+}
+
+/// Merges the two ordered halves `[low, middle)` and `[middle, high)`.
+///
+/// `>` rather than `>=` when choosing the right half is what makes this
+/// stable: on a tie the left element goes first, and the left element is the
+/// one that was there first.
+void Merge<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
+        where T : IComparable<T> {
+    nuint left = low;
+    nuint right = middle;
+
+    for (nuint at = low; at < high; at += 1u) {
+        if (left < middle && (right >= high || items[left].CompareTo(items[right]) <= 0)) {
+            scratch[at] = items[left];
+            left += 1u;
+        } else {
+            scratch[at] = items[right];
+            right += 1u;
+        }
+    }
+
+    for (nuint at = low; at < high; at += 1u) { items[at] = scratch[at]; }
+}
+
+/// The same, ordered by a comparer rather than by the type itself.
+///
+/// This is the overload that sorts descending, sorts by a field, or sorts a
+/// type that implements nothing at all:
+///
+///     Sort(people, (a, b) => a.Age - b.Age);
+public void Sort<T>(T[:] items, IComparer<T> order) {
+    if (items.Length < 2u) { return; }
+
+    var scratch = new T[items.Length];
+
+    for (nuint start = 0u; start < items.Length; start += SmallRun) {
+        nuint stop = start + SmallRun;
+        if (stop > items.Length) { stop = items.Length; }
+        InsertionSortBy(items, start, stop, order);
+    }
+
+    for (nuint width = SmallRun; width < items.Length; width *= 2u) {
+        for (nuint low = 0u; low + width < items.Length; low += width * 2u) {
+            nuint middle = low + width;
+            nuint high = middle + width;
+            if (high > items.Length) { high = items.Length; }
+            MergeBy(items, scratch, low, middle, high, order);
+        }
+    }
+}
+
+void InsertionSortBy<T>(T[:] items, nuint start, nuint stop, IComparer<T> order) {
+    for (nuint i = start + 1u; i < stop; i += 1u) {
+        var current = items[i];
+        var j = i;
+
+        while (j > start && order.Compare(items[j - 1u], current) > 0) {
+            items[j] = items[j - 1u];
+            j -= 1u;
+        }
+
+        items[j] = current;
+    }
+}
+
+void MergeBy<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
+                IComparer<T> order) {
+    nuint left = low;
+    nuint right = middle;
+
+    for (nuint at = low; at < high; at += 1u) {
+        if (left < middle && (right >= high || order.Compare(items[left], items[right]) <= 0)) {
+            scratch[at] = items[left];
+            left += 1u;
+        } else {
+            scratch[at] = items[right];
+            right += 1u;
+        }
+    }
+
+    for (nuint at = low; at < high; at += 1u) { items[at] = scratch[at]; }
+}
+
+/// Where `wanted` is in an already-ordered slice, or the length when it is not
+/// there -- the same convention `IndexOf` follows, so the two read alike.
+///
+/// Two functions rather than one with a found flag, because the language has
+/// no `out` and a caller that wants the insertion point usually does not want
+/// the search, and the other way round.
+public nuint BinarySearch<T>(T[:] items, T wanted) where T : IComparable<T> {
+    nuint low = 0u;
+    nuint high = items.Length;
+
+    while (low < high) {
+        nuint middle = low + (high - low) / 2u;
+        int order = items[middle].CompareTo(wanted);
+
+        if (order == 0) { return middle; }
+        if (order < 0) { low = middle + 1u; } else { high = middle; }
+    }
+
+    return items.Length;
+}
+
+/// The first index at which `wanted` could be inserted and leave the slice
+/// ordered: the length when it belongs at the end, and the index of the first
+/// equal element when there is one.
+public nuint LowerBound<T>(T[:] items, T wanted) where T : IComparable<T> {
+    nuint low = 0u;
+    nuint high = items.Length;
+
+    while (low < high) {
+        nuint middle = low + (high - low) / 2u;
+        if (items[middle].CompareTo(wanted) < 0) { low = middle + 1u; } else { high = middle; }
+    }
+
+    return low;
 }
 
 /// Reverses part of an array in place.
@@ -234,18 +385,33 @@ public void Reverse<T>(T[:] items) {
     }
 }
 
-/// Orders a list in place, smallest first. Insertion sort: short and stable,
-/// which matters more than asymptotics until there is a reason to measure.
+/// Orders a list in place, smallest first.
+///
+/// Copied into an array, sorted there and copied back, rather than merge-sorted
+/// through the interface. Every `At` and `Set` on an `IList<T>` is a virtual
+/// call, and a sort makes O(n log n) of them; two linear passes to escape that
+/// is the cheaper trade, and it gets the array version's stability for free.
 public void Sort<T>(IList<T> items) where T : IComparable<T> {
-    for (nuint i = 1; i < items.Count(); i = i + 1) {
-        var current = items.At(i);
-        var j = i;
+    nuint count = items.Count();
+    if (count < 2u) { return; }
 
-        while (j > 0 && items.At(j - 1).CompareTo(current) > 0) {
-            items.Set(j, items.At(j - 1));
-            j = j - 1;
-        }
+    var flat = new T[count];
+    for (nuint i = 0u; i < count; i += 1u) { flat[i] = items.At(i); }
 
-        items.Set(j, current);
-    }
+    Sort(flat);
+
+    for (nuint i = 0u; i < count; i += 1u) { items.Set(i, flat[i]); }
+}
+
+/// The same, ordered by a comparer.
+public void Sort<T>(IList<T> items, IComparer<T> order) {
+    nuint count = items.Count();
+    if (count < 2u) { return; }
+
+    var flat = new T[count];
+    for (nuint i = 0u; i < count; i += 1u) { flat[i] = items.At(i); }
+
+    Sort(flat, order);
+
+    for (nuint i = 0u; i < count; i += 1u) { items.Set(i, flat[i]); }
 }

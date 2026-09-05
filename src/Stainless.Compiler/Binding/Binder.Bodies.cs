@@ -682,6 +682,20 @@ public sealed partial class Binder
                         "cannot infer a type from an expression of type 'void'");
                     type = ErrorTypeSymbol.Instance;
                 }
+                else if (type is LambdaType)
+                {
+                    // A lambda has no type of its own -- it becomes whatever it
+                    // is assigned to -- and `var` is the one place with nothing
+                    // to tell it what that is. Without this the declaration
+                    // bound cleanly and emitted `store ptr 0`, which clang
+                    // rejected as a compiler bug rather than as this mistake.
+                    diagnostics.Error("SL0553", syntax.Initializer.Span,
+                        $"'{syntax.Name}' cannot be a 'var': a lambda has no type of its own " +
+                        "and becomes what it is assigned to, so there is nothing here to infer " +
+                        "from. Write the type out -- a delegate, or an interface with exactly " +
+                        "one method");
+                    type = ErrorTypeSymbol.Instance;
+                }
                 else if (type is VariantDraftType)
                 {
                     string built = (initializer as BoundVariantDraft)?.Case ?? "a case";

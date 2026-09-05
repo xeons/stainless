@@ -1,0 +1,48 @@
+doubled  = 10 6
+spelled  <5><3>
+halved   = 2.5
+total    = 28
+run      539173
+odd      = 6
+any>8    = 1
+any>9    = 0
+all>0    = 1
+all>3    = 0
+count<5  = 3
+first>4  = 5
+first>99 = -1
+index>8  = 2
+take3    = 3
+skip4    = 2
+takeAll  = 6
+forEach  = 28
+emptyAll = 1
+emptyAny = 0
+sorted   = 1
+smallest = 0
+largest  = 99
+byAge    Ada Edsger Alan Grace 
+byTeam   Edsger Grace Ada Alan 
+descend  = 9 1
+slice    = 9 6 7 8 5
+list     = 2 8
+listDesc = 8 2
+find30   = 2
+find10   = 0
+find50   = 4
+find35   = 5
+bound35  = 3
+bound0   = 0
+bound99  = 5
+longNames = 2
+upper     ALPHA BE GAMMA 
+anyShort  = 1
+lengths   = 5 2
+queue    123
+wrapped  234
+stack    321
+chain    012
+setCount  = 3
+setTotal  = 29
+sorted   abc
+done

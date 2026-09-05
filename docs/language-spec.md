@@ -1556,7 +1556,7 @@ its own closure a reference cycle. ARC cannot collect one, so break it with a
 
 Parameter types may be written or left out; left out, they come from the target,
 which is the only thing that knows them. A lambda with no target is an error —
-`var f = x => x;` has nothing to infer from.
+`var f = x => x;` has nothing to infer from, and SL0553 says so.
 
 A closure is a class, so it may not cross a thread boundary unless it is marked
 `[Shared]` (§9.5). That is the correct answer rather than an oversight: a
@@ -2013,9 +2013,31 @@ Not yet:
 
 - **Type arguments are inferred, never written, at a call.** `Pick<int>(...)`
   is not accepted, because `<` in expression position is ambiguous with
-  less-than. Inference reads only the argument types, so a type parameter used
-  solely in the return type cannot be determined. This applies to generic
-  methods exactly as it does to generic functions.
+  less-than. A type parameter used solely in the *function's* return type
+  cannot be determined, since nothing passed mentions it. This applies to
+  generic methods exactly as it does to generic functions.
+
+  A parameter that appears only in a **lambda's** result is a different case
+  and does work, because a lambda's body is something to read a type off:
+
+  ```csharp
+  public List<R> Map<T, R>(T[:] items, IFunc<T, R> transform) { ... }
+
+  var spelled = Map(numbers, n => Text.FromInteger((long)n));   // R is String
+  ```
+
+  The order is what makes it possible. `T` comes from `numbers`; that gives the
+  lambda its parameter type; that lets the body be bound; and the body says
+  what `R` is. Each step needs the one before it, so this happens after
+  ordinary inference rather than as part of it, and only for what is left over.
+  It repeats while it is still learning, so one lambda's result may settle
+  another's parameter.
+
+  Two limits, both reported as SL0327 rather than guessed at. A **block-bodied**
+  lambda is not read this way — binding `n => { return n * 2; }` needs the
+  return type that is being worked out — so write it as an expression, or name
+  the type. And the interface's method must mention its type parameters plainly:
+  `R Apply(T)` is read, `List<R> Apply(T)` is left alone.
 - **An interface method cannot be generic.** Dispatch gives a method one vtable
   slot, and a generic method has a body per instantiation.
 
@@ -2215,6 +2237,11 @@ the built-in one.
 | `LinkedList<T>` | an index pool | handles, not references — see below |
 | `SortedList<K, V>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
 
+Every one of them is **walked in place when iterated**. That is worth saying
+because it was not always so: several used to build a whole `List<T>` before
+the first step, which made iterating a queue allocate as much again as the
+queue held.
+
 Every one of them is array-backed, which for the last two is not the usual
 choice. It is the right one here: ARC cannot collect a cycle, so a doubly
 linked list of objects would leak unless every back-link were weak, and a weak
@@ -2270,7 +2297,51 @@ Largest(prices);                    // and works on any IReadOnlyList
 `IReadOnlyList<T>`, so they accept a mutable list without being able to change
 it.
 
-### 5.5 `Standard.Math`
+### 5.5 Doing something to every element
+
+A lambda becomes an interface with exactly one method (§2.14), so the
+combinators need no function type in the language and no special case in the
+compiler — they are ordinary generic functions over ordinary generic
+interfaces.
+
+```csharp
+public interface IFunc<T, R>   { R Apply(T value); }
+public interface IPredicate<T> { bool Test(T value); }
+public interface IAction<T>    { void Run(T value); }
+public interface IFold<A, T>   { A Apply(A total, T value); }
+public interface IComparer<T>  { int Compare(T left, T right); }
+```
+
+```csharp
+var adults = Filter(people, p => p.Age >= 18);
+var names  = Map(adults, p => p.Name);
+long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
+
+Sort(people, (a, b) => a.Age - b.Age);
+```
+
+`Map`, `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `FirstOr`, `IndexWhere`,
+`ForEach`, `Take`, `Skip` and `ToList`, each over a `T[:]` — which an array
+converts to — and over any `IEnumerable<T>`.
+
+**Eager, not lazy.** Every one walks its input to the end and returns a
+`List<T>`, so `Filter` then `Map` builds two lists. Lazy chaining wants
+generators, and there is no `yield` here; a name borrowed from a language that
+has one would imply otherwise.
+
+**Sorting is a stable merge sort**, over a `T[:]` or an `IList<T>`, either by
+`IComparable<T>` or by an `IComparer<T>` given at the call. Stability is the
+property worth the scratch array it costs: sorting by one key and then another
+is how a multi-key order gets built, and that only works if the second sort
+leaves equal elements where the first put them. An in-place quicksort would
+save the allocation and lose that.
+
+`BinarySearch` finds a value in an ordered slice, returning the length when it
+is absent — the convention `IndexOf` already follows. `LowerBound` returns
+where it would go instead. Two functions rather than one with a flag, because
+the language has no `out` and a caller usually wants one answer or the other.
+
+### 5.6 `Standard.Math`
 
 ```csharp
 import Standard.Math;
@@ -2295,7 +2366,7 @@ transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinite`/
 `Round` takes halves away from zero, which is C's rule rather than the banker's
 rounding C# uses by default.
 
-### 5.6 `Standard.Concurrent`
+### 5.7 `Standard.Concurrent`
 
 ```csharp
 import Standard.Concurrent;
@@ -2332,7 +2403,7 @@ still the right one — reading a field to call a method on it borrows, and a
 container that never hands its collection out cannot be used wrongly by a caller
 who keeps what it lent.
 
-### 5.7 `Standard.IO`, `File`, `Directory` and `Path`
+### 5.8 `Standard.IO`, `File`, `Directory` and `Path`
 
 ```csharp
 import Standard.File;
@@ -2401,7 +2472,7 @@ operating system — the narrow CRT entry points would read those bytes in the
 active code page, which works by accident for ASCII and fails for everything
 else.
 
-### 5.8 Interfaces may extend interfaces
+### 5.9 Interfaces may extend interfaces
 
 ```csharp
 public interface IWritable : IReadable { void Write(String text); }

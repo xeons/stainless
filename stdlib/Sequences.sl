@@ -95,7 +95,11 @@ public class Queue<T> : IEnumerable<T> {
         return result;
     }
 
-    public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(ToList()); }
+    /// The item `index` places behind the front, counting from zero. Used by
+    /// the cursor; a queue is not an indexable thing in its own right.
+    T At(nuint index) { return items[(head + index) & (items.Length - 1)]; }
+
+    public IEnumerator<T> GetEnumerator() { return new QueueCursor<T>(this); }
 
     void Grow() {
         var bigger = new T[items.Length * 2];
@@ -161,7 +165,10 @@ public class Stack<T> : IEnumerable<T> {
         return result;
     }
 
-    public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(ToList()); }
+    /// The item `depth` places below the top, counting from zero.
+    T FromTop(nuint depth) { return items[count - 1 - depth]; }
+
+    public IEnumerator<T> GetEnumerator() { return new StackCursor<T>(this); }
 
     void Grow() {
         var bigger = new T[items.Length * 2];
@@ -336,7 +343,13 @@ public class LinkedList<T> : IEnumerable<T> {
         return result;
     }
 
-    public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(ToList()); }
+    /// The three a cursor needs to walk the links. A node is an index into the
+    /// pool, and -1 is the end -- which is why these are nint and not nuint.
+    nint FirstNode() { return head; }
+    nint NodeAfter(nint node) { return next[(nuint)node]; }
+    T NodeValue(nint node) { return items[(nuint)node]; }
+
+    public IEnumerator<T> GetEnumerator() { return new LinkedListCursor<T>(this); }
 
     /// A slot for one more node: a recycled one if there is one, else the next
     /// unused one, growing the pool when it runs out.
@@ -501,12 +514,11 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
         return result;
     }
 
+    /// The entry at a position, in key order. What the cursor walks.
+    Pair<K, V> PairAt(nuint index) { return new Pair<K, V>(keys[index], values[index]); }
+
     public IEnumerator<Pair<K, V>> GetEnumerator() {
-        var pairs = new List<Pair<K, V>>();
-        for (nuint i = 0; i < count; i = i + 1) {
-            pairs.Add(new Pair<K, V>(keys[i], values[i]));
-        }
-        return new ListEnumerator<Pair<K, V>>(pairs);
+        return new SortedListCursor<K, V>(this);
     }
 
     void Grow() {
@@ -521,4 +533,97 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
         keys = biggerKeys;
         values = biggerValues;
     }
+}
+
+/// Walks a queue oldest first, without copying it.
+///
+/// The materialising version this replaced built a whole `List<T>` before the
+/// first `MoveNext`, so iterating a queue allocated as much again as the queue
+/// held. A cursor over the ring costs nothing.
+public class QueueCursor<T> : IEnumerator<T> {
+    Queue<T> source;
+    nuint next;
+
+    public QueueCursor(Queue<T> queue) {
+        source = queue;
+        next = 0;
+    }
+
+    public bool MoveNext() {
+        if (next >= source.Count()) { return false; }
+        next = next + 1;
+        return true;
+    }
+
+    public T Current() { return source.At(next - 1); }
+}
+
+/// Walks a stack top first, matching the order `Pop` would hand things back.
+public class StackCursor<T> : IEnumerator<T> {
+    Stack<T> source;
+    nuint next;
+
+    public StackCursor(Stack<T> stack) {
+        source = stack;
+        next = 0;
+    }
+
+    public bool MoveNext() {
+        if (next >= source.Count()) { return false; }
+        next = next + 1;
+        return true;
+    }
+
+    public T Current() { return source.FromTop(next - 1); }
+}
+
+/// Walks a linked list head first, following the links rather than flattening
+/// them. `At` is O(n) from the head, so a cursor that used it would make
+/// iterating O(n squared); this keeps the node it reached.
+public class LinkedListCursor<T> : IEnumerator<T> {
+    LinkedList<T> source;
+    nint at;
+    bool started;
+
+    public LinkedListCursor(LinkedList<T> list) {
+        source = list;
+        at = -1;
+        started = false;
+    }
+
+    public bool MoveNext() {
+        if (!started) {
+            started = true;
+            at = source.FirstNode();
+        } else if (at >= 0) {
+            at = source.NodeAfter(at);
+        }
+
+        return at >= 0;
+    }
+
+    public T Current() { return source.NodeValue(at); }
+}
+
+/// Walks a sorted list in key order.
+///
+/// One `Pair` is built per step, as the materialising version built one per
+/// entry before the walk began -- the difference is that a loop that stops
+/// early now stops allocating too.
+public class SortedListCursor<K, V> : IEnumerator<Pair<K, V>> where K : IComparable<K> {
+    SortedList<K, V> source;
+    nuint next;
+
+    public SortedListCursor(SortedList<K, V> list) {
+        source = list;
+        next = 0;
+    }
+
+    public bool MoveNext() {
+        if (next >= source.Count()) { return false; }
+        next = next + 1;
+        return true;
+    }
+
+    public Pair<K, V> Current() { return source.PairAt(next - 1); }
 }

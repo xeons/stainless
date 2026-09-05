@@ -104,15 +104,45 @@ public sealed class DiagnosticBag
     public bool HasErrors => _items.Any(d => d.Severity == Severity.Error);
     public int ErrorCount => _items.Count(d => d.Severity == Severity.Error);
 
+    private int _muted;
+
+    /// <summary>
+    /// Drops everything reported until the result is disposed.
+    ///
+    /// For asking a question the answer to which may be "that does not work" --
+    /// binding a lambda's body to find out what it produces, before anything has
+    /// decided that this is the lambda's real target. A complaint from a trial
+    /// like that is not about the program: either the trial is discarded, or the
+    /// real bind happens afterwards and reports properly.
+    ///
+    /// Nested, so a trial inside a trial does not un-mute the outer one.
+    /// </summary>
+    public Mute Muted() => new(this);
+
+    public readonly struct Mute : IDisposable
+    {
+        private readonly DiagnosticBag _bag;
+
+        internal Mute(DiagnosticBag bag)
+        {
+            _bag = bag;
+            bag._muted += 1;
+        }
+
+        public void Dispose() => _bag._muted -= 1;
+    }
+
     public void Error(string code, SourceSpan span, string message)
     {
         Fresh(code);
+        if (_muted > 0) return;
         _items.Add(new Diagnostic(Severity.Error, code, message, span));
     }
 
     public void Warning(string code, SourceSpan span, string message)
     {
         Fresh(code);
+        if (_muted > 0) return;
         _items.Add(new Diagnostic(Severity.Warning, code, message, span));
     }
 

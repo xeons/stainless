@@ -439,6 +439,13 @@ public sealed partial class Binder
                 Infer(candidate.Declaration.Parameters[i].Type, arguments[i].Type,
                     names, inferred, candidate.Scope);
 
+            // A lambda has no type of its own, so the loop above learned nothing
+            // from one. Anything still unknown may yet be readable off a lambda's
+            // result, once the arguments that are values have said what its
+            // parameters are.
+            if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
+                InferFromLambdaResults(candidate, arguments, names, inferred);
+
             if (candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
             {
                 firstFailure ??= inferred;
@@ -481,6 +488,130 @@ public sealed partial class Binder
             $"for '{template.Name}' from these arguments; " +
             "Stainless infers type arguments only from the values passed");
         return null;
+    }
+
+    /// <summary>
+    /// Works out the type parameters that appear only in a lambda's result.
+    ///
+    /// The order matters, and is why this is a second pass rather than part of
+    /// the first. Given <c>Map&lt;T, R&gt;(T[:] items, IFunc&lt;T, R&gt; f)</c> and
+    /// <c>Map(numbers, n =&gt; n * 2)</c>: T comes from <c>numbers</c>, which
+    /// makes the lambda's target <c>IFunc&lt;int, R&gt;</c>, which gives the lambda
+    /// its parameter type, which lets its body be bound, which is what says
+    /// what R is. No step in that chain can be taken earlier.
+    ///
+    /// It loops, because one lambda's result may settle another's parameter,
+    /// and stops as soon as a pass learns nothing -- so a call that genuinely
+    /// cannot be inferred reaches SL0327 rather than spinning.
+    /// </summary>
+    private void InferFromLambdaResults(
+        GenericFunctionTemplate candidate,
+        List<BoundExpression> arguments,
+        HashSet<string> names,
+        Dictionary<string, TypeSymbol> inferred)
+    {
+        int shared = Math.Min(arguments.Count, candidate.Declaration.Parameters.Count);
+
+        bool learned = true;
+        while (learned && candidate.Parameters.Any(p => !inferred.ContainsKey(p)))
+        {
+            learned = false;
+
+            for (int i = 0; i < shared; i++)
+            {
+                if (arguments[i] is not BoundLambda lambda) continue;
+
+                // Read off the interface's *declaration* rather than a resolved
+                // symbol. `IFunc<int, R>` will not resolve at all while R is
+                // unknown -- a constructed type with one unresolved argument is
+                // an error type entire -- and it is exactly that position this
+                // is trying to fill.
+                if (candidate.Declaration.Parameters[i].Type
+                    is not NamedTypeSyntax { TypeArguments.Count: > 0 } written) continue;
+
+                if (FindGenericType(written.Name, candidate.Scope) is not { } template) continue;
+                if (template.Declaration.Kind != TypeDeclKind.Interface) continue;
+                if (template.Parameters.Count != written.TypeArguments.Count) continue;
+
+                var methods = template.Declaration.Members.OfType<FunctionDeclSyntax>().ToList();
+                if (methods.Count != 1) continue;
+
+                var method = methods[0];
+                if (method.Parameters.Count != lambda.Syntax.Parameters.Count) continue;
+
+                // The interface writes its method in terms of its own parameter
+                // names; the use site says what each of those is. `IFunc<A, B>`
+                // declaring `B Apply(A)`, used as `IFunc<T, R>`, makes the
+                // lambda take a T and produce an R.
+                var atUseSite = new Dictionary<string, TypeSyntax>(StringComparer.Ordinal);
+                for (int p = 0; p < template.Parameters.Count; p++)
+                    atUseSite[template.Parameters[p]] = written.TypeArguments[p];
+
+                var result = AsWritten(method.ReturnType, atUseSite);
+
+                // Only worth binding a body to learn something not already known.
+                if (result is not NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } wanted
+                    || !names.Contains(wanted.Name.Parts[0])
+                    || inferred.ContainsKey(wanted.Name.Parts[0])) continue;
+
+                // Every parameter has to be settled before the body can bind.
+                var parameterTypes = ResolveAll(
+                    method.Parameters.Select(p => AsWritten(p.Type, atUseSite)),
+                    candidate.Scope, inferred);
+                if (parameterTypes is null) continue;
+
+                if (ProbeLambdaResult(lambda.Syntax, parameterTypes) is not { } produced) continue;
+
+                inferred[wanted.Name.Parts[0]] = produced;
+                learned = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// An interface's method signature restated in the caller's names: the
+    /// <c>A</c> and <c>B</c> of <c>IFunc&lt;A, B&gt;</c> become whatever was
+    /// written at <c>IFunc&lt;T, R&gt;</c>.
+    ///
+    /// Bare names only. A functional interface whose method mentions its
+    /// parameter inside another type -- <c>List&lt;B&gt; Apply(A)</c> -- is left
+    /// alone rather than half-translated, and falls through to SL0327 saying
+    /// so, which is the honest outcome until something needs otherwise.
+    /// </summary>
+    private static TypeSyntax AsWritten(TypeSyntax declared, Dictionary<string, TypeSyntax> atUseSite) =>
+        declared is NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } name &&
+        atUseSite.TryGetValue(name.Name.Parts[0], out var written)
+            ? written
+            : declared;
+
+    /// <summary>
+    /// Every type resolved under what has been inferred so far, or null if any
+    /// of them still depends on something unknown.
+    /// </summary>
+    private List<TypeSymbol>? ResolveAll(
+        IEnumerable<TypeSyntax> types, FileScope scope, Dictionary<string, TypeSymbol> inferred)
+    {
+        var previous = _substitution;
+        _substitution = inferred;
+
+        try
+        {
+            var resolved = new List<TypeSymbol>();
+            using (diagnostics.Muted())
+            {
+                foreach (var type in types)
+                {
+                    var one = ResolveType(type, scope);
+                    if (one.IsError()) return null;
+                    resolved.Add(one);
+                }
+            }
+            return resolved;
+        }
+        finally
+        {
+            _substitution = previous;
+        }
     }
 
     /// <summary>

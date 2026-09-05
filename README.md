@@ -778,8 +778,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 190 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 453 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 192 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 467 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -788,8 +788,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 190 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 180 and Windows 189, each
+**Both Windows and Linux are tested.** 192 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 182 and Windows 191, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1216,11 +1216,29 @@ Everything below is covered by [the test suite](tests/cases).
 - `Standard.Collections`: `List<T>`, `Dictionary<K, V>`, `HashSet<T>`,
   `Queue<T>`, `Stack<T>`, `LinkedList<T>` and `SortedList<K, V>`, plus
   `IComparable<T>`, `IEquatable<T>`, `IHashable`, `IReadOnlyList<T>`,
-  `IList<T>`, `IEnumerable<T>`, `IEnumerator<T>` and
-  `Sort`/`Largest`/`Smallest`/`IndexOf`, plus `Sort` and `Reverse` over a
-  `T[:]`. Every container is array-backed —
-  ARC cannot collect a cycle, so the linked list links by index rather than by
-  reference
+  `IList<T>`, `IEnumerable<T>` and `IEnumerator<T>`. Every container is
+  array-backed — ARC cannot collect a cycle, so the linked list links by index
+  rather than by reference — and every one of them walks itself when iterated
+  rather than copying into a list first
+- **`Sort` is a stable merge sort**, over a `T[:]` or an `IList<T>`, by
+  `IComparable<T>` or by an `IComparer<T>` you pass. Stability is what lets a
+  multi-key order be built by sorting twice. Alongside it: `Largest`,
+  `Smallest`, `IndexOf`, `Reverse`, `BinarySearch` and `LowerBound`
+- **Combinators**, over an array, a slice or any `IEnumerable<T>`: `Map`,
+  `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `FirstOr`, `IndexWhere`,
+  `ForEach`, `Take`, `Skip` and `ToList`. A lambda becomes a single-method
+  interface, so these need no function type in the language:
+
+  ```csharp
+  var adults = Filter(people, p => p.Age >= 18);
+  var names  = Map(adults, p => p.Name);
+  long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
+
+  Sort(people, (a, b) => a.Age - b.Age);
+  ```
+
+  Eager, not lazy: each returns a `List<T>`, because lazy chaining wants
+  generators and the language has no `yield`
 - Primitives, enums and `String` satisfy `IComparable<T>`, `IEquatable<T>` and
   `IHashable` without declaring it, so `Sort(numbers)` works on a `List<int>`
   and `Dictionary<String, V>` needs nothing extra
@@ -1328,18 +1346,22 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Only interfaces constrain.** No `where T : SomeClass`, no `class`/`struct`
   kind constraints, no `new()`.
 - **Type arguments cannot be written at a call.** `Pick<int>(...)` is rejected,
-  because `<` in expression position is ambiguous with less-than; inference
-  reads argument types only. That holds for generic methods too, and an
-  interface method cannot be generic at all, since dispatch gives it one slot.
+  because `<` in expression position is ambiguous with less-than, so a type
+  parameter that appears only in the function's own return type cannot be
+  worked out. That holds for generic methods too, and an interface method
+  cannot be generic at all, since dispatch gives it one slot. A parameter that
+  appears only in a *lambda's* result is a different case and is inferred, by
+  binding the body once the other arguments have given it its parameter types —
+  which is what makes `Map(numbers, n => n * 2)` work.
 - **No `switch` expression, and the only pattern is a variant's case.** A
   switch over a variant covers cases and may bind a payload; everywhere else
   `switch` is the C# statement and only that. No type patterns, no constants
   inside a case pattern, no guards, no `goto case`, and no exhaustiveness
   requirement on an enum, whose value need not be one of its members.
 - **A lambda needs something to be.** It is typed by what it is assigned to, so
-  `var f = x => x;` has nothing to infer from. Capture is by value only, and a
-  capturing lambda cannot become a `delegate` — a function pointer has nowhere
-  to keep what was captured. A lambda that captures `this` keeps its object
+  `var f = x => x;` has nothing to infer from and is refused (SL0553). Capture
+  is by value only, and a capturing lambda cannot become a `delegate` — a
+  function pointer has nowhere to keep what was captured. A lambda that captures `this` keeps its object
   alive, so an object holding its own closure is a cycle; `weak` is how that is
   broken.
 - **No zero-width or unnamed bit-fields.** C's `int : 0;` closes a storage unit

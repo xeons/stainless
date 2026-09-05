@@ -376,7 +376,13 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
         return result;
     }
 
-    public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(ToList()); }
+    /// The two a cursor needs to walk the table: how many slots there are, and
+    /// what is in one. A set has no index of its own, so neither is public.
+    nuint SlotCount() { return filled.Length; }
+    bool SlotFilled(nuint slot) { return filled[slot]; }
+    T SlotValue(nuint slot) { return items[slot]; }
+
+    public IEnumerator<T> GetEnumerator() { return new HashSetCursor<T>(this); }
 
     void Grow() {
         var oldItems = items;
@@ -395,4 +401,32 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
             count = count + 1;
         }
     }
+}
+
+/// Walks a set's table, skipping the empty slots.
+///
+/// The same shape as `DictionaryEnumerator`, and for the same reason: the
+/// materialising version built a whole `List<T>` before the first `MoveNext`,
+/// so iterating a set allocated as much again as the set held.
+public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashable {
+    HashSet<T> source;
+    nuint at;
+    nuint scanned;
+
+    public HashSetCursor(HashSet<T> set) {
+        source = set;
+        at = 0;
+        scanned = 0;
+    }
+
+    public bool MoveNext() {
+        while (scanned < source.SlotCount()) {
+            at = scanned;
+            scanned = scanned + 1;
+            if (source.SlotFilled(at)) { return true; }
+        }
+        return false;
+    }
+
+    public T Current() { return source.SlotValue(at); }
 }

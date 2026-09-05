@@ -223,6 +223,114 @@ public sealed partial class Binder
     private static FunctionSymbol? SingleMethodOf(InterfaceTypeSymbol type) =>
         type.Methods.Count == 1 && type.Interfaces.Count == 0 ? type.Methods[0] : null;
 
+    /// <summary>
+    /// What a lambda's body would produce, given types for its parameters --
+    /// asked before anything has settled what the lambda is going to become.
+    ///
+    /// This exists for one case, and it is the case that makes `Map` writable:
+    /// a type parameter that appears nowhere but in the result of a lambda.
+    /// `Map&lt;T, R&gt;(T[:], IFunc&lt;T, R&gt;)` can work out T from the array, and then
+    /// nothing else mentions R -- so R has to come from the body, and the body
+    /// cannot be bound until T has given it its parameter types. That ordering
+    /// is the whole of the trick.
+    ///
+    /// Everything it does is undone. Diagnostics are muted, because a failure
+    /// here means "this candidate does not fit" rather than "this program is
+    /// wrong", and the real bind will report properly if there is anything to
+    /// report. Any closure class or function the body generated on the way is
+    /// truncated away, so a trial that is discarded -- or one that runs twice
+    /// while overloads are tried -- leaves nothing behind to emit.
+    ///
+    /// Returns null when the answer cannot be had: a block body, whose result
+    /// is whatever its `return`s agree on and which needs a declared return
+    /// type to bind at all, and anything that fails to bind.
+    /// </summary>
+    private TypeSymbol? ProbeLambdaResult(LambdaSyntax syntax, IReadOnlyList<TypeSymbol> parameterTypes)
+    {
+        if (syntax.Expression is null) return null;
+        if (syntax.Parameters.Count != parameterTypes.Count) return null;
+
+        int classes = _classes.Count;
+        int functions = _functions.Count;
+        int closureCount = _closureCount;
+
+        // A throwaway class to be the closure, so that a body reading something
+        // from around it captures into this rather than being told it cannot
+        // become a delegate. It is never added to _classes and never laid out;
+        // it exists so the capture path has somewhere to put a field.
+        var probeType = new ClassTypeSymbol
+        {
+            SimpleName = $"Probe.{_closureCount++}",
+            ModuleName = _currentModule!.Name,
+            Span = syntax.Span,
+        };
+
+        var probe = new FunctionSymbol
+        {
+            Name = "Apply",
+            ModuleName = probeType.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.Method,
+            ContainingType = probeType,
+            IsPublic = false,
+            Span = syntax.Span,
+            Scope = _currentScope,
+        };
+
+        var self = new ParameterSymbol("this", probeType, 0) { IsThis = true };
+        probe.Parameters.Add(self);
+
+        for (int i = 0; i < syntax.Parameters.Count; i++)
+            probe.Parameters.Add(
+                new ParameterSymbol(syntax.Parameters[i].Name, parameterTypes[i], i + 1));
+
+        var context = new ClosureContext
+        {
+            Type = probeType,
+            This = self,
+            OuterScopes = [.. _scopes],
+            OuterFunction = _currentFunction,
+        };
+
+        var savedScopes = new List<Dictionary<string, LocalSymbol>>(_scopes);
+        var savedFunction = _currentFunction;
+        int savedLoops = _loopDepth;
+        int savedSwitches = _switchDepth;
+        int savedParallel = _parallelDepth;
+
+        _scopes.Clear();
+        _currentFunction = probe;
+        _loopDepth = 0;
+        _switchDepth = 0;
+        _parallelDepth = 0;
+        _closures.Add(context);
+        PushScope();
+
+        TypeSymbol? produced;
+        using (diagnostics.Muted())
+        {
+            var value = BindExpression(syntax.Expression);
+            produced = value.Type.IsError() || value.Type.IsVoid() ? null : value.Type;
+        }
+
+        PopScope();
+        _closures.RemoveAt(_closures.Count - 1);
+        _scopes.Clear();
+        _scopes.AddRange(savedScopes);
+        _currentFunction = savedFunction;
+        _loopDepth = savedLoops;
+        _switchDepth = savedSwitches;
+        _parallelDepth = savedParallel;
+
+        // Whatever the trial built on the way, it does not keep.
+        _classes.RemoveRange(classes, _classes.Count - classes);
+        _functions.RemoveRange(functions, _functions.Count - functions);
+        _closureCount = closureCount;
+
+        return produced;
+    }
+
     private BoundExpression BindLambdaAsClosure(
         LambdaSyntax syntax, InterfaceTypeSymbol target, FunctionSymbol method, SourceSpan span)
     {
