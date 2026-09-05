@@ -295,6 +295,31 @@ public sealed class BoundFunctionGroup(
 /// A lambda before it is known what it becomes. Like a function name it has no
 /// type of its own, and binding either converts it or reports that it could not.
 /// </summary>
+/// <summary>
+/// An array literal whose type nothing has settled yet. Every element is bound,
+/// because they are what a <c>var</c> would infer from; none is converted,
+/// because what to convert them to is not known.
+/// </summary>
+public sealed class BoundArrayDraft(
+    SourceSpan span, TypeSymbol type, IReadOnlyList<BoundExpression> elements)
+    : BoundExpression(span, type)
+{
+    public IReadOnlyList<BoundExpression> Elements { get; } = elements;
+}
+
+/// <summary>
+/// A settled array literal: the array it builds, with every element already
+/// converted to the element type.
+/// </summary>
+public sealed class BoundArrayLiteral(
+    SourceSpan span, TypeSymbol type, TypeSymbol elementType,
+    IReadOnlyList<BoundExpression> elements)
+    : BoundExpression(span, type)
+{
+    public TypeSymbol ElementType { get; } = elementType;
+    public IReadOnlyList<BoundExpression> Elements { get; } = elements;
+}
+
 public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaSyntax syntax)
     : BoundExpression(span, type)
 {

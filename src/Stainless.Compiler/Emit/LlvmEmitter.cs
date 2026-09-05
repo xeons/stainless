@@ -2615,6 +2615,7 @@ public sealed class LlvmEmitter(
             case BoundNew newExpression: return EmitNew(newExpression);
             case BoundClosure closure: return EmitClosure(closure);
             case BoundNewArray newArray: return EmitNewArray(newArray);
+            case BoundArrayLiteral literalArray: return EmitArrayLiteral(literalArray);
             case BoundArrayLength length: return EmitArrayLength(length);
             case BoundSlice slice: return EmitSlice(slice);
             case BoundTypeof typeofExpression: return EmitTypeof(typeofExpression);
@@ -2935,6 +2936,27 @@ public sealed class LlvmEmitter(
         if (targetType.IsManagedSlot())
         {
             StoreManaged(slot, value.Ref, targetType);
+            return;
+        }
+
+        // An inline array is held by address, like a struct, because it is its
+        // elements rather than a reference to them. So the whole of it moves,
+        // and each element that owns something is retained on the way.
+        if (targetType is FixedArrayTypeSymbol inline)
+        {
+            if (inline.Element.CarriesReferences())
+                for (int i = 0; i < inline.Length; i++)
+                {
+                    string source = Emit("ptr",
+                        $"getelementptr inbounds {LlvmTypeOf(inline.Element)}, " +
+                        $"ptr {value.Ref}, i64 {i}");
+                    string target = Emit("ptr",
+                        $"getelementptr inbounds {LlvmTypeOf(inline.Element)}, " +
+                        $"ptr {slot}, i64 {i}");
+                    StoreInto(target, new Val(source, "ptr", inline.Element), inline.Element);
+                }
+            else
+                MemCopy(slot, value.Ref, inline.Size);
             return;
         }
 
@@ -3651,6 +3673,56 @@ public sealed class LlvmEmitter(
 
         TrackTemporary(instance, type);
         return new Val(instance, "ptr", closure.Type);
+    }
+
+    /// <summary>
+    /// An array written out.
+    ///
+    /// The same allocation <c>new T[n]</c> makes, followed by a store per
+    /// element -- at a constant index, so no bounds check is emitted and none
+    /// is needed. Each store owns what it holds, exactly as an assignment into
+    /// an element would, so an array of references retains every one of them.
+    ///
+    /// An inline <c>T[N]</c> allocates nothing: it is a slot, and the elements
+    /// are stored into it where it sits.
+    /// </summary>
+    private Val EmitArrayLiteral(BoundArrayLiteral expression)
+    {
+        string elementType = LlvmTypeOf(expression.ElementType);
+
+        if (expression.Type is FixedArrayTypeSymbol inline)
+        {
+            string slot = Alloca(
+                $"[{inline.Length} x {elementType}]", "array.inline");
+
+            for (int i = 0; i < expression.Elements.Count; i++)
+            {
+                var value = EmitExpression(expression.Elements[i]);
+                string at = Emit("ptr",
+                    $"getelementptr inbounds {elementType}, ptr {slot}, i64 {i}");
+                StoreInto(at, value, expression.ElementType);
+            }
+            return new Val(slot, "ptr", expression.Type);
+        }
+
+        var arrayType = (ArrayTypeSymbol)expression.Type;
+        string array = Emit("ptr",
+            $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
+            $"i64 {expression.Elements.Count}, i64 {arrayType.Element.Size})");
+
+        string data = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
+
+        for (int i = 0; i < expression.Elements.Count; i++)
+        {
+            var value = EmitExpression(expression.Elements[i]);
+            string at = Emit("ptr",
+                $"getelementptr inbounds {elementType}, ptr {data}, i64 {i}");
+            StoreInto(at, value, arrayType.Element);
+        }
+
+        TrackTemporary(array, arrayType);
+        return new Val(array, "ptr", arrayType);
     }
 
     private Val EmitNewArray(BoundNewArray expression)

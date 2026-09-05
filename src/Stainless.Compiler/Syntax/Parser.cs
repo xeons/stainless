@@ -1543,6 +1543,26 @@ public sealed class Parser
                 Advance();
                 return new LiteralSyntax(SpanFrom(start), TokenKind.NullKeyword, null);
 
+            // `[a, b, c]`. Unambiguous here: an attribute list only precedes a
+            // declaration, and an index only follows something to index.
+            case TokenKind.OpenBracket:
+            {
+                Advance();
+                var elements = new List<ExpressionSyntax>();
+
+                while (!At(TokenKind.CloseBracket) && !At(TokenKind.EndOfFile))
+                {
+                    elements.Add(ParseExpression());
+
+                    // A trailing comma is allowed, so a list written one entry
+                    // per line can have every line end the same way.
+                    if (!Match(TokenKind.Comma)) break;
+                }
+
+                Expect(TokenKind.CloseBracket);
+                return new ArrayLiteralSyntax(SpanFrom(start), elements);
+            }
+
             case TokenKind.ThisKeyword:
                 Advance();
                 return new ThisSyntax(SpanFrom(start));

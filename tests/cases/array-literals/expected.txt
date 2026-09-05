@@ -1,0 +1,16 @@
+count 4
+third 3
+mixed 2
+alpha beta gamma 
+one two 
+inline 8
+sum 60
+points 2
+first kept
+empty 0
+build:
+  held 1 2
+  dropping:
+  gone 1
+  gone 2
+  dropped

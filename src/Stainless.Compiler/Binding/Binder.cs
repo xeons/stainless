@@ -3774,6 +3774,13 @@ public sealed class Binder(
             else
             {
                 initializer = BindExpression(syntax.Initializer);
+
+                // `var xs = [1, 2, 3]`. Unlike a lambda or a bare case name, an
+                // array literal carries values, and values have types -- so
+                // there is something to infer from and no need to write it out.
+                if (initializer is BoundArrayDraft loose)
+                    initializer = SettleArrayFromElements(loose);
+
                 type = initializer.Type;
                 if (type.IsVoid())
                 {
@@ -4420,6 +4427,11 @@ public sealed class Binder(
 
         ArrayTypeSymbol array => IsPlainData(array.Element),
 
+        // T[N] is not a reference to anything: it is its elements, laid out
+        // where it is written. So it travels exactly as they do, and a struct
+        // holding one is no more shared than the fields beside it.
+        FixedArrayTypeSymbol inline => IsSendable(inline.Element),
+
         _ when _builtins.IsString(type) => true,
 
         NamedTypeSymbol named => IsShared(named),
@@ -4431,7 +4443,8 @@ public sealed class Binder(
 
     private bool IsPlainData(TypeSymbol type) =>
         type is PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol
-        || (type is StructTypeSymbol structType && !structType.CarriesReferences());
+        || (type is StructTypeSymbol structType && !structType.CarriesReferences())
+        || (type is FixedArrayTypeSymbol inline && IsPlainData(inline.Element));
 
     /// <summary>True when the type carries <c>[Shared]</c>.</summary>
     private static bool IsShared(NamedTypeSymbol type) =>
@@ -5342,6 +5355,7 @@ public sealed class Binder(
         NewArraySyntax newArray => BindNewArray(newArray),
         ConditionalSyntax conditional => BindConditional(conditional),
         LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
+        ArrayLiteralSyntax array => BindArrayLiteral(array),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
         AlignofSyntax alignofExpression => BindAlignof(alignofExpression),
@@ -5371,6 +5385,105 @@ public sealed class Binder(
         TokenKind.NullKeyword => new BoundNullLiteral(syntax.Span, NullType.Instance),
         _ => new BoundErrorExpression(syntax.Span),
     };
+
+    /// <summary>
+    /// Binds the elements and leaves the type open, unless nothing is going to
+    /// close it -- in which case the elements themselves decide.
+    /// </summary>
+    private BoundExpression BindArrayLiteral(ArrayLiteralSyntax syntax)
+    {
+        var elements = syntax.Elements.Select(BindExpression).ToList();
+        if (elements.Any(e => e.Type.IsError())) return new BoundErrorExpression(syntax.Span);
+
+        return new BoundArrayDraft(syntax.Span, ArrayDraftType.Instance, elements);
+    }
+
+    /// <summary>
+    /// Settles an array literal against the type it is going into.
+    ///
+    /// <c>T[]</c> allocates; <c>T[N]</c> must match in length, because an
+    /// inline array is its elements and there is nowhere to put a different
+    /// number of them; <c>T[:]</c> settles as the <c>T[]</c> it is a view of,
+    /// and the ordinary array-to-slice conversion does the rest.
+    /// </summary>
+    private BoundExpression BindArraySettle(
+        BoundArrayDraft draft, TypeSymbol target, SourceSpan span)
+    {
+        if (target is SliceTypeSymbol slice)
+            return BindConversion(
+                BindArraySettle(draft, ArrayOf(slice.Element), span), slice, span);
+
+        TypeSymbol? element = target switch
+        {
+            ArrayTypeSymbol array => array.Element,
+            FixedArrayTypeSymbol inline => inline.Element,
+            _ => null,
+        };
+
+        if (element is null)
+        {
+            diagnostics.Error("SL0546", span,
+                $"'{target.Name}' is not an array, so an array literal cannot become one");
+            return new BoundErrorExpression(span);
+        }
+
+        if (target is FixedArrayTypeSymbol wanted && wanted.Length != draft.Elements.Count)
+        {
+            diagnostics.Error("SL0547", span,
+                $"'{wanted.Name}' holds exactly {wanted.Length} " +
+                $"element{(wanted.Length == 1 ? "" : "s")}, and this literal has " +
+                $"{draft.Elements.Count}; an inline array is its elements, so there is " +
+                "nowhere to keep a different number of them");
+            return new BoundErrorExpression(span);
+        }
+
+        var converted = draft.Elements
+            .Select(e => BindConversion(e, element, e.Span))
+            .ToList();
+
+        return new BoundArrayLiteral(span, target, element, converted);
+    }
+
+    /// <summary>
+    /// The type an array literal takes when nothing else says: the one type
+    /// every element reaches, which is the same question a ternary's two arms
+    /// ask.
+    /// </summary>
+    private BoundExpression SettleArrayFromElements(BoundArrayDraft draft)
+    {
+        if (draft.Elements.Count == 0)
+        {
+            diagnostics.Error("SL0548", draft.Span,
+                "an empty array literal has no element type and nothing here says what it " +
+                "should be; write 'new T[0]', or give the variable a type");
+            return new BoundErrorExpression(draft.Span);
+        }
+
+        var element = draft.Elements[0].Type;
+        for (int i = 1; i < draft.Elements.Count; i++)
+        {
+            var next = draft.Elements[i];
+
+            // Already reaches what the ones before agreed on.
+            if (IsImplicitlyConvertible(next, element)) continue;
+
+            // Or is wider than they are, and they reach it: [1, 2L] is a long[]
+            // for the same reason `flag ? 1 : 2L` is a long.
+            if (draft.Elements.Take(i).All(e => IsImplicitlyConvertible(e, next.Type)))
+            {
+                element = next.Type;
+                continue;
+            }
+
+            diagnostics.Error("SL0549", next.Span,
+                $"this element is '{next.Type.Name}' and the ones before it are " +
+                $"'{element.Name}'; an array holds one type, so either make them agree " +
+                "or give the array a type of its own");
+            return new BoundErrorExpression(draft.Span);
+        }
+
+        return BindArraySettle(draft, ArrayOf(element), draft.Span);
+    }
 
     private BoundExpression BindThis(ThisSyntax syntax)
     {
@@ -7979,6 +8092,15 @@ public sealed class Binder(
             return;
         }
 
+        // "an array literal was given" says nothing a reader did not already
+        // know. Settling it against the parameter reports what is actually
+        // wrong -- an element that does not fit, or a length that does not.
+        if (argument is BoundArrayDraft draft)
+        {
+            BindArraySettle(draft, target, argument.Span);
+            return;
+        }
+
         diagnostics.Error("SL0262", argument.Span,
             $"argument {index + 1} of '{name}' expects '{target.Name}', " +
             $"but '{argument.Type.Name}' was given");
@@ -8005,6 +8127,19 @@ public sealed class Binder(
                 DelegateTypeSymbol signature => signature.Signature.Count == lambda.Syntax.Parameters.Count,
                 InterfaceTypeSymbol functional => SingleMethodOf(functional) is { } only &&
                     only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count,
+                _ => false,
+            };
+
+        if (argument is BoundArrayDraft draft2)
+            return target switch
+            {
+                ArrayTypeSymbol wanted =>
+                    draft2.Elements.All(e => IsImplicitlyConvertible(e, wanted.Element)),
+                FixedArrayTypeSymbol inline =>
+                    inline.Length == draft2.Elements.Count &&
+                    draft2.Elements.All(e => IsImplicitlyConvertible(e, inline.Element)),
+                SliceTypeSymbol slice =>
+                    draft2.Elements.All(e => IsImplicitlyConvertible(e, slice.Element)),
                 _ => false,
             };
 
@@ -8187,6 +8322,10 @@ public sealed class Binder(
         // Nor has `Ok(x)`, for the same reason and by the same route.
         if (expression is BoundVariantDraft draft)
             return BindVariantSettle(draft, target, span);
+
+        // Nor `[a, b, c]`.
+        if (expression is BoundArrayDraft arrayDraft)
+            return BindArraySettle(arrayDraft, target, span);
 
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
@@ -9363,6 +9502,20 @@ public sealed class LambdaType : TypeSymbol
     public static readonly LambdaType Instance = new();
     private LambdaType() { }
     public override string Name => "lambda";
+    public override int Size => 8;
+    public override int Alignment => 8;
+}
+
+/// <summary>
+/// What an array literal is before anything says what it should be. It never
+/// reaches the emitter: either a conversion settles it, or the binder settles
+/// it from its elements, or it is an error.
+/// </summary>
+public sealed class ArrayDraftType : TypeSymbol
+{
+    public static readonly ArrayDraftType Instance = new();
+    private ArrayDraftType() { }
+    public override string Name => "array literal";
     public override int Size => 8;
     public override int Alignment => 8;
 }

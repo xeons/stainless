@@ -1,0 +1,10 @@
+# an empty literal with nothing to give it an element type
+SL0548
+# an inline array whose length does not match
+SL0547
+# elements that reach no common type
+SL0549
+# an element that does not fit the element type it was given
+SL0265
+# a target that is not an array
+SL0546

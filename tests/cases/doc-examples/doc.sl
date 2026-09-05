@@ -432,6 +432,25 @@ String Bits() {
            Text.FromInteger((int)sizeof(PacketHeader));
 }
 
+// --- spec 2.10.1 array literals -------------------------------------------
+int SumSlice(int[:] slice) {
+    int total = 0;
+    for (nuint i = 0u; i < slice.Length; i = i + 1u) { total = total + slice[i]; }
+    return total;
+}
+
+String Literals() {
+    var numbers = [1, 2, 3, 4];
+    String[] names = ["alpha", "beta"];
+    int[3] fixed = [7, 8, 9];
+    var mixed = [1, 2L, 3];
+
+    return Text.FromInteger((long)numbers.Length) + " " + names[1] + " " +
+           Text.FromInteger((long)fixed[2]) + " " +
+           Text.FromInteger(mixed[1]) + " " +
+           Text.FromInteger((long)SumSlice([10, 20, 30]));
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -512,6 +531,7 @@ int Main() {
     printf("byref=%s\n", ByReference().ToPointer());
     printf("shapes=%s\n", Shapes().ToPointer());
     printf("inherits=%s\n", Inherits().ToPointer());
+    printf("literals=%s\n", Literals().ToPointer());
     printf("done\n");
     return 0;
 }

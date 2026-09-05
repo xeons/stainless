@@ -1132,6 +1132,50 @@ index and the length rather than corrupting memory.
 Arrays hold anything: `int[]`, `Point[]` (structs stored inline), `String[]`
 and `IShape[]` (references, each retained). `T[][]` is an array of arrays.
 
+**An array can be written out**, with the same allocation and a store per
+element — at a constant index, so nothing is bounds checked that need not be:
+
+```csharp
+var numbers = [1, 2, 3, 4];             // int[]
+String[] names = ["alpha", "beta"];     // from the declared type
+Show(["one", "two",]);                  // and from a parameter; the comma is fine
+```
+
+**A literal has no type of its own.** What it becomes is decided by where it is
+going, exactly as for a lambda (§2.14) and a bare variant case name (§2.6) — a
+`T[]`, a `T[N]` of matching length, or a `T[:]`:
+
+```csharp
+int[3] fixed = [7, 8, 9];               // an inline array; the length is the type
+int total = Sum([10, 20, 30]);          // a T[:] parameter, through the array
+```
+
+Unlike those two it can also decide for itself, because its elements are values
+and a lambda's body is not. With nothing else to go on the elements settle it,
+widening between themselves the way a ternary's arms do:
+
+```csharp
+var mixed = [1, 2L, 3];                 // long[], as `flag ? 1 : 2L` is a long
+```
+
+An empty one has nothing to settle from and needs to be told:
+
+```
+error[SL0548]: an empty array literal has no element type and nothing here says
+what it should be; write 'new T[0]', or give the variable a type
+
+error[SL0549]: this element is 'String' and the ones before it are 'int'; an
+array holds one type, so either make them agree or give the array a type of its
+own
+
+error[SL0547]: 'int[3]' holds exactly 3 elements, and this literal has 2; an
+inline array is its elements, so there is nowhere to keep a different number of
+them
+```
+
+Elements are stored the way an assignment into an element is, so a literal of
+references retains every one — `[a, b]` outlives the locals `a` and `b`.
+
 #### 2.10.2 `T[N]` — an inline array
 
 ```csharp

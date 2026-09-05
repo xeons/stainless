@@ -605,6 +605,18 @@ public sealed record NewSyntax(
     TypeSyntax Type,
     IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span);
 
+/// <summary>
+/// <c>[a, b, c]</c> — an array written out.
+///
+/// It has no type of its own. What it becomes is decided by where it is going,
+/// the way a lambda and a variant case name are (§2.14, §2.6): a <c>T[]</c>, a
+/// <c>T[N]</c> of matching length, or a <c>T[:]</c>. With nothing to go on, the
+/// elements decide, so <c>var xs = [1, 2, 3];</c> is an <c>int[]</c>.
+/// </summary>
+public sealed record ArrayLiteralSyntax(
+    SourceSpan Span,
+    IReadOnlyList<ExpressionSyntax> Elements) : ExpressionSyntax(Span);
+
 /// <summary><c>new T[n]</c> — allocates a zeroed array of n elements.</summary>
 public sealed record NewArraySyntax(
     SourceSpan Span,
