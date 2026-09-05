@@ -331,11 +331,20 @@ SL_API void  *sl_string_from_integer(long long value);
 SL_API void  *sl_string_from_double(double value);
 SL_API void  *sl_string_from_bool(_Bool value);
 
+/* One code point as the UTF-8 that spells it. Anything that is not one --
+ * past the maximum, or a surrogate -- becomes U+FFFD, so a String's bytes
+ * stay valid UTF-8 by construction. */
+SL_API void  *sl_string_from_char(uint32_t codePoint);
+
 SL_API const uint8_t *sl_string_pointer(void *pointer);
 SL_API size_t sl_string_byte_length(void *pointer);
 SL_API _Bool  sl_string_is_empty(void *pointer);
 SL_API size_t sl_string_code_point_count(void *pointer);
 SL_API void  *sl_string_concat(void *left, void *right);
+
+/* Several strings into one, in a single allocation: what an interpolated
+ * string lowers to. A null part contributes nothing. */
+SL_API void  *sl_string_join(void *const *parts, size_t count);
 SL_API _Bool  sl_string_equals(void *left, void *right);
 SL_API void  *sl_string_substring(void *pointer, size_t start, size_t length);
 

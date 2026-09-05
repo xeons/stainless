@@ -146,6 +146,39 @@ public sealed partial class LlvmEmitter
         return name;
     }
 
+    /// <summary>
+    /// <c>$"a {b} c"</c>: every piece into a stack array, then one call.
+    ///
+    /// One allocation for the result and none for anything in between, which
+    /// is the whole point of the node existing -- the chain of <c>+</c> this
+    /// replaces allocated a String per operator and discarded all but the
+    /// last. The array is an <c>alloca</c>, so the parts themselves cost
+    /// nothing either.
+    /// </summary>
+    private Val EmitInterpolatedString(BoundInterpolatedString expression)
+    {
+        int count = expression.Parts.Count;
+
+        // Nothing to join. The binder folds an all-literal interpolation to a
+        // literal, so this is only the empty `$""`.
+        if (count == 0)
+            return new Val(InternStringObject(""), "ptr", expression.Type);
+
+        string slots = Emit("ptr", $"alloca [{count} x ptr], align 8");
+
+        for (int i = 0; i < count; i++)
+        {
+            var part = EmitExpression(expression.Parts[i]);
+            string at = Emit("ptr",
+                $"getelementptr inbounds [{count} x ptr], ptr {slots}, i64 0, i64 {i}");
+            Line($"store ptr {part.Ref}, ptr {at}");
+        }
+
+        string joined = Emit("ptr", $"call ptr @sl_string_join(ptr {slots}, i64 {count})");
+        TrackTemporary(joined, expression.Type);
+        return new Val(joined, "ptr", expression.Type);
+    }
+
     /// <summary>A static String object that a String-typed expression can refer to.</summary>
     private string InternStringObject(string text)
     {

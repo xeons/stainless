@@ -253,6 +253,23 @@ String here = Text.FromUtf16(buffer, units);   // or FromNullTerminatedUtf16
 Both directions replace anything malformed with U+FFFD, so a `String` is always
 valid UTF-8 no matter what the filesystem or the clipboard held.
 
+### Text
+
+```csharp
+Console.WriteLine($"clicks: {clicks}  at {x}, {y}");
+```
+
+`$"..."` is sugar over the conversions that were already there, and one thing
+that is not sugar: the whole string is joined in **one allocation**, where the
+`+` chain it replaces allocates once per operator and discards all but the
+last. That line emits five `sl_string_concat` calls written the old way and one
+`sl_string_join` written this way.
+
+A hole takes a `String`, a number, a `bool` or a `char32`. Anything else is
+refused rather than given a default -- there is no `ToString` every type owes.
+A `char` is one UTF-8 *code unit* and not a character, so it has to say which it
+means: `(char32)c` for the character, `(long)c` for the number.
+
 ### Arrays and generics
 
 ```csharp
@@ -778,8 +795,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 194 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 468 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 199 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 497 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -788,8 +805,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 194 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 184 and Windows 193, each
+**Both Windows and Linux are tested.** 199 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 189 and Windows 198, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than

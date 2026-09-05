@@ -100,6 +100,8 @@ public sealed class Lexer(
         if (char.IsLetter(c) || c == '_') return LexIdentifierOrKeyword(start);
         if (char.IsAsciiDigit(c)) return LexNumber(start);
         if (c == '"') return LexString(start);
+        if (c == '$' && _pos + 1 < _text.Length && _text[_pos + 1] == '"')
+            return LexInterpolatedString(start);
         if (c == '\'') return LexChar(start);
         return LexPunctuation(start);
     }
@@ -586,6 +588,130 @@ public sealed class Lexer(
             sb.Append(char.ConvertFromUtf32(ReadEscape()));
         }
         return new Token(TokenKind.StringLiteral, SpanFrom(start), _text[start.._pos], sb.ToString());
+    }
+
+    /// <summary>
+    /// <c>$"a {b} c"</c>.
+    ///
+    /// The holes are lexed here, in place, rather than by a second lexer over a
+    /// substring: this one is already walking the text, so every token inside a
+    /// hole gets its real position for free and a diagnostic about one points at
+    /// the source rather than at a copy of it.
+    ///
+    /// The token carries the pieces as its value -- literal text and, for each
+    /// hole, the tokens it lexed -- and the parser turns each of those into an
+    /// expression. Nothing about what a hole may contain is decided here.
+    /// </summary>
+    private Token LexInterpolatedString(int start)
+    {
+        _pos += 2;                                          // the '$' and the quote
+
+        var segments = new List<InterpolationSegment>();
+        var literal = new StringBuilder();
+
+        while (true)
+        {
+            if (_pos >= _text.Length || Current == '\n')
+            {
+                diagnostics.Error("SL0006", SpanFrom(start), "unterminated string literal");
+                break;
+            }
+
+            if (Current == '"') { _pos++; break; }
+
+            // `{{` and `}}` are how a brace is written, as in C#. A lone `}` is
+            // a mistake rather than a literal, because it is far more often the
+            // end of a hole that was never opened.
+            if (Current == '{' && _pos + 1 < _text.Length && _text[_pos + 1] == '{')
+            {
+                literal.Append('{');
+                _pos += 2;
+                continue;
+            }
+
+            if (Current == '}')
+            {
+                if (_pos + 1 < _text.Length && _text[_pos + 1] == '}')
+                {
+                    literal.Append('}');
+                    _pos += 2;
+                    continue;
+                }
+
+                diagnostics.Error("SL0554", SpanFrom(_pos),
+                    "a '}' inside an interpolated string closes nothing; write '}}' for a " +
+                    "literal brace");
+                _pos++;
+                continue;
+            }
+
+            if (Current == '{')
+            {
+                if (literal.Length > 0)
+                {
+                    segments.Add(InterpolationSegment.Text(literal.ToString()));
+                    literal.Clear();
+                }
+
+                segments.Add(LexHole(start));
+                continue;
+            }
+
+            if (Current != '\\') { literal.Append(_text[_pos++]); continue; }
+            literal.Append(char.ConvertFromUtf32(ReadEscape()));
+        }
+
+        if (literal.Length > 0) segments.Add(InterpolationSegment.Text(literal.ToString()));
+
+        return new Token(TokenKind.InterpolatedString, SpanFrom(start), _text[start.._pos], segments);
+    }
+
+    /// <summary>
+    /// The tokens between one hole's braces.
+    ///
+    /// Depth is counted so that a hole may contain braces of its own, and the
+    /// ordinary token loop does the reading -- so a string inside a hole is
+    /// lexed as a string, and a `}` inside one does not end the hole.
+    /// </summary>
+    private InterpolationSegment LexHole(int outerStart)
+    {
+        int openedAt = _pos;
+        _pos++;                                             // the '{'
+
+        var tokens = new List<Token>();
+        int depth = 1;
+
+        while (true)
+        {
+            SkipTrivia();
+
+            if (_pos >= _text.Length)
+            {
+                diagnostics.Error("SL0006", SpanFrom(outerStart), "unterminated string literal");
+                break;
+            }
+
+            if (Current == '}')
+            {
+                depth--;
+                if (depth == 0) { _pos++; break; }
+            }
+            else if (Current == '{')
+            {
+                depth++;
+            }
+
+            var token = Next();
+            if (token.Kind == TokenKind.EndOfFile) break;
+            tokens.Add(token);
+        }
+
+        if (tokens.Count == 0)
+            diagnostics.Error("SL0555", SpanFrom(openedAt),
+                "this interpolation is empty; '{}' has no value to write");
+
+        tokens.Add(new Token(TokenKind.EndOfFile, SpanFrom(_pos), ""));
+        return InterpolationSegment.Hole(tokens);
     }
 
     /// <summary>

@@ -1885,6 +1885,61 @@ gets exactly that one value wrong. And `FromBase64` skips whitespace, because
 base64 in the wild arrives wrapped at 64 or 76 columns and a decoder that
 refused a newline would be useless for the thing it is most often pointed at.
 
+### 3.8 Interpolation
+
+```csharp
+Console.WriteLine($"clicks: {clicks}  at {x}, {y}");
+```
+
+`$"..."` writes the pieces between the braces into the text around them. It is
+sugar over the `Text.From*` conversions that were already there, with one
+difference that is not cosmetic: the whole string is **joined in a single
+allocation**. The `+` chain it replaces calls `sl_string_concat` once per
+operator and throws every result but the last away -- the line above emits five
+calls written that way, and one written this way.
+
+An interpolation with no holes is a literal, and costs what one costs.
+
+**What may go in a hole.** One expression, of a type that has text to write:
+
+| | |
+|---|---|
+| `String` | itself |
+| an integer, signed or unsigned | its digits |
+| `float`, `double` | `Text.FromDouble` |
+| `bool` | `true` or `false` |
+| `char32` | the character it names, not its number |
+
+Anything else is refused (SL0557) rather than given a default. There is no
+`ToString` that every type owes, and inventing one to make this work would be a
+much larger decision than a formatting syntax -- every class would owe an
+implementation, and a default that printed a type name would be worse than
+nothing.
+
+Two refusals are worth the words they take. A **`char` or `char16` is one code
+unit, not a character** (§2.1), so which of the two meanings was wanted has to
+be said: `(char32)c` writes the character, `(long)c` writes the number. And an
+**enum** would have to write its number, because nothing records a member's
+name yet; the error says so rather than printing a `1`.
+
+**Braces.** `{{` and `}}` are how a literal brace is written. A lone `}` closes
+nothing and is refused (SL0554), because it is far more often the end of a hole
+that was never opened. A hole may contain braces of its own -- an index, a
+nested interpolation, a string with braces in it -- and the depth is counted:
+
+```csharp
+$"deep {$"inner {n}"}"          // an interpolation inside a hole
+$"quoted {"has {braces}"}"      // a string inside a hole
+$"{{{n}}}"                      // a literal brace either side of a hole
+```
+
+**An empty hole** names no value (SL0555), and **two expressions in one hole**
+would mean the second was silently dropped (SL0556). Both are errors.
+
+**No format specifiers yet.** `{n:x}` and `{n,8}` are not written; `:` and `,`
+inside a hole are reserved so that adding them later is not a change of
+meaning. Padding and radix are `PadLeft` and `Convert.FromLong` until then.
+
 ## 4. Generics
 
 ```csharp

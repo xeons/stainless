@@ -20,6 +20,7 @@ public enum TokenKind
 {
     // Literals and names
     Identifier, IntLiteral, FloatLiteral, StringLiteral, CharLiteral,
+    InterpolatedString,
 
     // Declaration keywords
     ModuleKeyword, ImportKeyword, AsKeyword, UsingKeyword,
@@ -201,6 +202,7 @@ public static class TokenKindExtensions
         TokenKind.FloatLiteral => "a floating-point literal",
         TokenKind.StringLiteral => "a string literal",
         TokenKind.CharLiteral => "a character literal",
+        TokenKind.InterpolatedString => "an interpolated string",
         TokenKind.EndOfFile => "end of file",
         _ => kind.FixedText() is { } t ? "'" + t + "'" : kind.ToString(),
     };

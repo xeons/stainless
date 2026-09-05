@@ -101,6 +101,80 @@ size_t sl_string_code_point_count(void *pointer)
     return count;
 }
 
+/*
+ * One code point, as the UTF-8 that spells it.
+ *
+ * What `$"{c}"` writes. Printing the number instead would be the wrong answer
+ * in the one place a char is being shown to somebody, and the cast to say
+ * "the number, please" is right there for when it is not.
+ *
+ * A value that is not a code point -- past the maximum, or in the surrogate
+ * range, which UTF-8 must not encode -- becomes U+FFFD. That is the
+ * replacement character's job, and it keeps a String's bytes valid UTF-8 by
+ * construction.
+ */
+void *sl_string_from_char(uint32_t codePoint)
+{
+    if (codePoint > 0x10FFFF || (codePoint >= 0xD800 && codePoint <= 0xDFFF))
+        codePoint = 0xFFFD;
+
+    uint8_t bytes[4];
+    size_t length;
+
+    if (codePoint < 0x80) {
+        bytes[0] = (uint8_t)codePoint;
+        length = 1;
+    } else if (codePoint < 0x800) {
+        bytes[0] = (uint8_t)(0xC0 | (codePoint >> 6));
+        bytes[1] = (uint8_t)(0x80 | (codePoint & 0x3F));
+        length = 2;
+    } else if (codePoint < 0x10000) {
+        bytes[0] = (uint8_t)(0xE0 | (codePoint >> 12));
+        bytes[1] = (uint8_t)(0x80 | ((codePoint >> 6) & 0x3F));
+        bytes[2] = (uint8_t)(0x80 | (codePoint & 0x3F));
+        length = 3;
+    } else {
+        bytes[0] = (uint8_t)(0xF0 | (codePoint >> 18));
+        bytes[1] = (uint8_t)(0x80 | ((codePoint >> 12) & 0x3F));
+        bytes[2] = (uint8_t)(0x80 | ((codePoint >> 6) & 0x3F));
+        bytes[3] = (uint8_t)(0x80 | (codePoint & 0x3F));
+        length = 4;
+    }
+
+    return sl_string_from_bytes(bytes, length);
+}
+
+/*
+ * Several strings into one, in a single allocation.
+ *
+ * What an interpolated string lowers to. Chaining sl_string_concat would
+ * allocate once per operator and throw all but the last away -- five calls and
+ * four dead strings for `$"a{b}c{d}e"` -- so the whole length is measured
+ * first and the bytes copied once.
+ *
+ * A null part contributes nothing, which lets a caller skip a piece it knows
+ * is empty without a special case here.
+ */
+void *sl_string_join(void *const *parts, size_t count)
+{
+    size_t total = 0;
+    for (size_t i = 0; i < count; i += 1)
+        if (parts[i] != NULL) total += ((SlString *)parts[i])->byteLength;
+
+    SlString *joined = sl_string_new(total);
+    uint8_t *at = sl_string_data(joined);
+
+    for (size_t i = 0; i < count; i += 1) {
+        if (parts[i] == NULL) continue;
+
+        SlString *part = (SlString *)parts[i];
+        memcpy(at, sl_string_data(part), part->byteLength);
+        at += part->byteLength;
+    }
+
+    return joined;
+}
+
 void *sl_string_concat(void *leftPointer, void *rightPointer)
 {
     SlString *left  = (SlString *)leftPointer;

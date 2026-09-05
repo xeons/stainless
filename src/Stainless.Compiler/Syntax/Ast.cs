@@ -520,6 +520,18 @@ public abstract record ExpressionSyntax(SourceSpan Span) : SyntaxNode(Span);
 public sealed record LiteralSyntax(SourceSpan Span, TokenKind Kind, object? Value)
     : ExpressionSyntax(Span);
 
+/// <summary>
+/// <c>$"a {b} c"</c>, as alternating literal text and expressions.
+///
+/// A part with a null <c>Value</c> is literal text; one with a null
+/// <c>Literal</c> is a hole. The two alternate but not strictly -- adjacent
+/// holes have no text between them, and a string may start or end with either.
+/// </summary>
+public sealed record InterpolatedStringSyntax(
+    SourceSpan Span, IReadOnlyList<InterpolatedPartSyntax> Parts) : ExpressionSyntax(Span);
+
+public sealed record InterpolatedPartSyntax(string? Literal, ExpressionSyntax? Value);
+
 public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : ExpressionSyntax(Span);
 
 public sealed record ThisSyntax(SourceSpan Span) : ExpressionSyntax(Span);

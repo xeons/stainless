@@ -169,6 +169,21 @@ public sealed class BoundStringLiteral(SourceSpan span, TypeSymbol type, string 
     public string Value { get; } = value;
 }
 
+/// <summary>
+/// <c>$"a {b} c"</c>, as the String-valued pieces it is made of.
+///
+/// Every part is already a String by the time it gets here -- the binder put
+/// the conversion in -- so the emitter's job is only to put them end to end.
+/// It does that in one allocation rather than one per part, which is the
+/// difference between this and the chain of <c>+</c> it replaces.
+/// </summary>
+public sealed class BoundInterpolatedString(
+    SourceSpan span, TypeSymbol type, IReadOnlyList<BoundExpression> parts)
+    : BoundExpression(span, type)
+{
+    public IReadOnlyList<BoundExpression> Parts { get; } = parts;
+}
+
 public sealed class BoundNullLiteral(SourceSpan span, TypeSymbol type)
     : BoundExpression(span, type);
 

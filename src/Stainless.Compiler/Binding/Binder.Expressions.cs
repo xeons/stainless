@@ -45,6 +45,7 @@ public sealed partial class Binder
         NewArraySyntax newArray => BindNewArray(newArray),
         ConditionalSyntax conditional => BindConditional(conditional),
         LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
+        InterpolatedStringSyntax interpolated => BindInterpolatedString(interpolated),
         ArrayLiteralSyntax array => BindArrayLiteral(array),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
@@ -53,6 +54,128 @@ public sealed partial class Binder
         TypeofSyntax typeofExpression => BindTypeof(typeofExpression),
         IidofSyntax iidofExpression => BindIidof(iidofExpression),
         _ => new BoundErrorExpression(syntax.Span),
+    };
+
+    /// <summary>
+    /// <c>$"a {b} c"</c>: the literal pieces as they are, and every hole
+    /// converted to a String.
+    ///
+    /// The conversion is the whole of the design question, and the answer here
+    /// is the narrow one: a String goes through, a primitive uses the
+    /// <c>Text.From*</c> that already exists for it, and anything else is an
+    /// error naming what to write. Stainless has no universal <c>ToString</c>,
+    /// and inventing one to make this work would be a much larger decision
+    /// than a formatting syntax -- every class would owe one, and a default
+    /// that printed a type name would be worse than nothing.
+    /// </summary>
+    private BoundExpression BindInterpolatedString(InterpolatedStringSyntax syntax)
+    {
+        var parts = new List<BoundExpression>();
+        bool literalOnly = true;
+
+        foreach (var part in syntax.Parts)
+        {
+            if (part.Literal is { } text)
+            {
+                if (text.Length > 0)
+                    parts.Add(new BoundStringLiteral(syntax.Span, _builtins.String, text));
+                continue;
+            }
+
+            literalOnly = false;
+
+            var value = BindExpression(part.Value!);
+            parts.Add(AsText(value, part.Value!.Span));
+        }
+
+        // Nothing was interpolated, so this is a string literal with an
+        // awkward spelling and should cost what one costs.
+        if (literalOnly)
+            return new BoundStringLiteral(
+                syntax.Span, _builtins.String,
+                string.Concat(syntax.Parts.Select(p => p.Literal ?? "")));
+
+        return new BoundInterpolatedString(syntax.Span, _builtins.String, parts);
+    }
+
+    /// <summary>One interpolated value as a String, or an error saying why not.</summary>
+    private BoundExpression AsText(BoundExpression value, SourceSpan span)
+    {
+        if (value.Type.IsError()) return value;
+        if (_builtins.IsString(value.Type)) return value;
+
+        // An enum is a distinct type and does not become its integer on its own
+        // (SL0410), and writing the number would rarely be what was wanted
+        // anyway -- the member's name would be, and nothing records those yet.
+        if (value.Type is EnumTypeSymbol enumType)
+        {
+            diagnostics.Error("SL0557", span,
+                $"'{enumType.Name}' is an enum, and an interpolation would have to write its " +
+                "number rather than its name -- nothing records a member's name yet. Cast it, " +
+                "as in '(long)value', or write the name you meant");
+            return new BoundErrorExpression(span);
+        }
+
+        // A code unit is not a character, and the cast that says which is
+        // meant is the same one SL0527 asks for everywhere else.
+        if (value.Type is PrimitiveTypeSymbol
+            { Kind: PrimitiveKind.Char or PrimitiveKind.Char16 } unit)
+        {
+            diagnostics.Error("SL0557", span,
+                $"'{unit.Name}' is one code unit, not a character, so what it should write " +
+                "is not decided: '(char32)' writes the character its value names, and " +
+                "'(long)' writes the number");
+            return new BoundErrorExpression(span);
+        }
+
+        var conversion = TextConversionFor(value.Type);
+        if (conversion is null)
+        {
+            diagnostics.Error("SL0557", span,
+                $"'{value.Type.Name}' has no text to write here. An interpolation takes a " +
+                "String or a number, a bool or a char; anything else needs a conversion " +
+                "written out, because there is no 'ToString' every type owes");
+            return new BoundErrorExpression(span);
+        }
+
+        // The argument is converted first: FromInteger takes a long, and a byte
+        // reaching it has to widen exactly as it would at any other call.
+        var argument = BindConversion(value, conversion.Parameters[0].Type, span);
+        return new BoundCall(span, conversion, receiver: null, [argument]);
+    }
+
+    /// <summary>
+    /// Which <c>Text.From*</c> writes this type.
+    ///
+    /// A char goes through the unsigned side deliberately: it is a code point,
+    /// and printing one as a negative number would be nobody's intent.
+    /// </summary>
+    private FunctionSymbol? TextConversionFor(TypeSymbol type) => type switch
+    {
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool } => _builtins.TextFromBool,
+
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.Float or PrimitiveKind.Double } =>
+            _builtins.TextFromDouble,
+
+        PrimitiveTypeSymbol
+        {
+            Kind: PrimitiveKind.SByte or PrimitiveKind.Short or PrimitiveKind.Int
+                or PrimitiveKind.Long or PrimitiveKind.NInt
+        } => _builtins.TextFromLong,
+
+        // Only char32 is a character. `char` is one UTF-8 code unit and
+        // `char16` one UTF-16 unit, and a unit is not a character -- which is
+        // the distinction SL0527 exists to keep, so this does not quietly
+        // cross it either. See AsText for what those two are told.
+        PrimitiveTypeSymbol { Kind: PrimitiveKind.Char32 } => _builtins.TextFromChar,
+
+        PrimitiveTypeSymbol
+        {
+            Kind: PrimitiveKind.Byte or PrimitiveKind.UShort or PrimitiveKind.UInt
+                or PrimitiveKind.ULong or PrimitiveKind.NUInt
+        } => _builtins.TextFromNUInt,
+
+        _ => null,
     };
 
     private BoundExpression BindLiteral(LiteralSyntax syntax) => syntax.Kind switch

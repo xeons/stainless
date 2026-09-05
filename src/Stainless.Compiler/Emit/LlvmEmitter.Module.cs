@@ -201,6 +201,9 @@ public sealed partial class LlvmEmitter
 
         // The entry point hands the runtime what main() was given, and asks it
         // back as a String[] when Main declared one.
+        // An interpolated string, joined in one allocation.
+        Declare("sl_string_join", "declare noalias ptr @sl_string_join(ptr, i64) nounwind");
+
         Declare("sl_args_set", "declare void @sl_args_set(i32, ptr) nounwind");
         Declare("sl_args_array", "declare noalias ptr @sl_args_array(ptr) nounwind");
 

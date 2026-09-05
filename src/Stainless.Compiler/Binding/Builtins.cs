@@ -97,6 +97,18 @@ public sealed class Builtins
     public ClassTypeSymbol StringBuilder { get; }
 
     public FunctionSymbol StringConcat { get; }
+
+    /// <summary>
+    /// The conversions an interpolated string reaches for. Named rather than
+    /// looked up, because overload resolution would have to pick between the
+    /// long and nuint versions of FromInteger and the binder already knows
+    /// which it means.
+    /// </summary>
+    public FunctionSymbol TextFromLong { get; }
+    public FunctionSymbol TextFromNUInt { get; }
+    public FunctionSymbol TextFromBool { get; }
+    public FunctionSymbol TextFromChar { get; }
+    public FunctionSymbol TextFromDouble { get; }
     public FunctionSymbol StringEquals { get; }
 
     /// <summary>
@@ -297,13 +309,18 @@ public sealed class Builtins
         ComMethod(Unknown, 2, "Release", PrimitiveTypeSymbol.UInt, isPublic: false);
 
         // --- Standard.Text free functions -----------------------------------
-        Function(Text, "FromInteger", String, "sl_string_from_integer",
+        TextFromLong = Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.Long));
-        Function(Text, "FromInteger", String, "sl_string_from_integer",
+        TextFromNUInt = Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.NUInt));
-        Function(Text, "FromBool", String, "sl_string_from_bool",
+        TextFromBool = Function(Text, "FromBool", String, "sl_string_from_bool",
             ("value", PrimitiveTypeSymbol.Bool));
-        Function(Text, "FromDouble", String, "sl_string_from_double",
+
+        // A code point as the character it names, not as its number. `Text.
+        // FromInteger((long)c)` is how to ask for the number.
+        TextFromChar = Function(Text, "FromChar", String, "sl_string_from_char",
+            ("value", PrimitiveTypeSymbol.Char32));
+        TextFromDouble = Function(Text, "FromDouble", String, "sl_string_from_double",
             ("value", PrimitiveTypeSymbol.Double));
         Function(Text, "FromBytes", String, "sl_string_from_bytes",
             ("data", BytePointer), ("byteLength", PrimitiveTypeSymbol.NUInt));

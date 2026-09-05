@@ -36,6 +36,8 @@ public sealed partial class LlvmEmitter
             case BoundLiteral literal: return EmitLiteral(literal);
             case BoundStringLiteral text:
                 return new Val(InternStringObject(text.Value), "ptr", text.Type);
+            case BoundInterpolatedString interpolated:
+                return EmitInterpolatedString(interpolated);
             case BoundNullLiteral nullLiteral: return new Val("null", "ptr", nullLiteral.Type);
             case BoundConstantAccess constant: return EmitConstant(constant);
             case BoundStaticAccess shared: return EmitStaticAccess(shared);

@@ -1,0 +1,32 @@
+no holes at all
+hello Ada
+Ada first
+count 7
+AdaAdaAda
+[]
+empty     = 0
+long 9000000000, nuint 42, byte 200
+double 0.25, bool true, char *
+negative -5, zero 0
+star * is 42
+utf8 e 日 é
+sum 8, product 14, half 3
+call ADA, length 3
+ternary big
+indexed 20, length 3
+member 3 and 4
+nested (3, 4)
+deep inner 7
+quoted has {braces}
+literal { and }
+{7}
+{{double}}
+tab	here, quote " here
+newline in Ada
+second line
+agree     = 1
+clicks: 7 for Ada
+loop <0><1><2><3><4>
+7 clicks
+joined item 1 | item 2 | item 3
+done

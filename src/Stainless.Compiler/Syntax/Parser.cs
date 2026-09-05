@@ -28,7 +28,7 @@ public sealed class Parser
 {
     private readonly List<Token> _tokens;
     private readonly SourceText _source;
-    private readonly Lexer _lexer;
+    private readonly Lexer? _lexer;
     private DiagnosticBag _diagnostics;
     private int _pos;
 
@@ -39,6 +39,24 @@ public sealed class Parser
         _diagnostics = diagnostics;
         _lexer = new Lexer(source, diagnostics, symbols);
         _tokens = _lexer.Tokenize();
+    }
+
+    /// <summary>
+    /// A parser over tokens somebody else lexed: one interpolation's hole.
+    ///
+    /// The tokens came from the same file and carry their real positions, so
+    /// everything this parser reports points where it should.
+    /// </summary>
+    private Parser(SourceText source, DiagnosticBag diagnostics, IReadOnlyList<Token> tokens)
+    {
+        _source = source;
+        _diagnostics = diagnostics;
+        _lexer = null;
+
+        // Copied, because the parser rewrites a `>>` into two `>` in place
+        // when it closes nested type arguments, and the lexer's list is not
+        // this parser's to change.
+        _tokens = [.. tokens];
     }
 
     // ------------------------------------------------------------ token helpers
@@ -137,8 +155,10 @@ public sealed class Parser
             if (_pos == before) Advance();          // guarantee progress on malformed input
         }
 
+        // The lexer is null only for the sub-parser over one interpolation's
+        // hole, and that one parses an expression rather than a file.
         return new CompilationUnitSyntax(
-            SpanFrom(start), _source, moduleName, imports, declarations, _lexer.Libraries);
+            SpanFrom(start), _source, moduleName, imports, declarations, _lexer!.Libraries);
     }
 
     private QualifiedName ParseQualifiedName()
@@ -1523,6 +1543,43 @@ public sealed class Parser
         return arguments;
     }
 
+    /// <summary>
+    /// Each hole parsed as the expression it is, by a parser over the tokens
+    /// the lexer already read for it.
+    ///
+    /// A hole is one expression and nothing more: anything left over after it
+    /// is reported rather than ignored, because `$"{a b}"` is a mistake and
+    /// silently writing `a` would hide it.
+    /// </summary>
+    private ExpressionSyntax ParseInterpolatedString()
+    {
+        int start = _pos;
+        var token = Advance();
+
+        var parts = new List<InterpolatedPartSyntax>();
+
+        foreach (var segment in (IReadOnlyList<InterpolationSegment>)token.Value!)
+        {
+            if (!segment.IsHole)
+            {
+                parts.Add(new InterpolatedPartSyntax(segment.Literal, null));
+                continue;
+            }
+
+            var inner = new Parser(_source, _diagnostics, segment.Tokens!);
+            var value = inner.ParseExpression();
+
+            if (!inner.At(TokenKind.EndOfFile))
+                _diagnostics.Error("SL0556", inner.Current.Span,
+                    $"an interpolation holds one expression, and {inner.Current.Kind.Describe()} " +
+                    "follows this one");
+
+            parts.Add(new InterpolatedPartSyntax(null, value));
+        }
+
+        return new InterpolatedStringSyntax(SpanFrom(start), parts);
+    }
+
     private ExpressionSyntax ParsePrimary()
     {
         int start = _pos;
@@ -1538,6 +1595,9 @@ public sealed class Parser
                 var token = Advance();
                 return new LiteralSyntax(SpanFrom(start), token.Kind, token.Value);
             }
+
+            case TokenKind.InterpolatedString:
+                return ParseInterpolatedString();
 
             case TokenKind.NullKeyword:
                 Advance();
