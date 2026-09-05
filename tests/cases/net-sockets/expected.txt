@@ -1,0 +1,36 @@
+resolve-localhost true
+resolve-literal 127.0.0.1
+resolve-nowhere false
+listening true
+bound-host 127.0.0.1
+bound-port true
+connected true
+accepted true
+peer-port true
+peer-host true
+remote-formatted true
+formatted-v6 [::1]:80
+mirror true
+server-read 13
+server-saw hello, socket
+client-saw and back
+stream-can-read true
+stream-can-write true
+stream-can-seek false
+stream-length -1
+stream-seek false
+after-shutdown 0
+finished true
+closed true
+udp-open true
+udp-port true
+udp-sent 10
+udp-received 10
+udp-text a datagram
+udp-from true
+udp-from-port true
+refused true
+refused-said-why true
+refused-as-io true
+second-listener false
+closed-listener false

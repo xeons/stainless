@@ -369,6 +369,53 @@ SL_API void          *sl_directory_open(const uint8_t *path);
 SL_API const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory);
 SL_API void           sl_directory_close(void *handle);
 
+/* ---------------------------------------------------------------- sockets */
+
+/*
+ * See socket.c. A socket crosses as a size_t because Winsock's INVALID_SOCKET
+ * and a failed POSIX call are both all-ones once widened, so one sentinel does
+ * for both platforms and there is nothing to allocate. Errors come back as the
+ * small stable enum Standard.Net declares.
+ */
+SL_API size_t sl_socket_open(int32_t family, int32_t kind, int32_t *error);
+SL_API void   sl_socket_close(size_t handle);
+SL_API int32_t sl_socket_shutdown(size_t handle, int32_t how, int32_t *error);
+
+SL_API int32_t sl_socket_bind(size_t handle, const char *host, uint16_t port,
+                              int32_t family, int32_t kind, int32_t *error);
+SL_API int32_t sl_socket_listen(size_t handle, int32_t backlog, int32_t *error);
+SL_API size_t  sl_socket_accept(size_t handle, int32_t *error);
+SL_API int32_t sl_socket_connect(size_t handle, const char *host, uint16_t port,
+                                 int32_t family, int32_t kind, int32_t *error);
+
+SL_API size_t sl_socket_send(size_t handle, const uint8_t *data, size_t count,
+                             int32_t *error);
+SL_API size_t sl_socket_receive(size_t handle, uint8_t *data, size_t count,
+                                int32_t *error);
+SL_API size_t sl_socket_send_to(size_t handle, const uint8_t *data, size_t count,
+                                const char *host, uint16_t port, int32_t family,
+                                int32_t *error);
+SL_API size_t sl_socket_receive_from(size_t handle, uint8_t *data, size_t count,
+                                     char *host, size_t hostSize, uint16_t *port,
+                                     int32_t *error);
+
+SL_API int32_t sl_socket_set_blocking(size_t handle, int32_t blocking, int32_t *error);
+SL_API int32_t sl_socket_set_no_delay(size_t handle, int32_t on, int32_t *error);
+SL_API int32_t sl_socket_set_reuse_address(size_t handle, int32_t on, int32_t *error);
+SL_API int32_t sl_socket_set_broadcast(size_t handle, int32_t on, int32_t *error);
+SL_API int32_t sl_socket_set_keep_alive(size_t handle, int32_t on, int32_t *error);
+SL_API int32_t sl_socket_set_timeout(size_t handle, int32_t milliseconds,
+                                     int32_t receiving, int32_t *error);
+
+SL_API int32_t sl_socket_local(size_t handle, char *host, size_t size,
+                               uint16_t *port, int32_t *error);
+SL_API int32_t sl_socket_remote(size_t handle, char *host, size_t size,
+                                uint16_t *port, int32_t *error);
+SL_API int32_t sl_socket_resolve(const char *host, int32_t family, char *out,
+                                 size_t size, int32_t *error);
+SL_API int32_t sl_socket_wait(size_t handle, int32_t forWriting,
+                              int32_t milliseconds, int32_t *error);
+
 /* ------------------------------------------------- ordering and hashing */
 
 /*

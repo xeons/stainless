@@ -720,8 +720,8 @@ than every program that compiles it repeating `-l` on the command line.
 
 ### The Win32 API
 
-[bindings/win32](bindings/win32) is what all of the above adds up to: 273
-Windows entry points, 511 constants, 28 structs, unions, enums and delegates,
+[bindings/win32](bindings/win32) is what all of the above adds up to: 306
+Windows entry points, 628 constants, 40 structs, unions, enums and delegates,
 the 12 handle types and 7 COM interfaces, with 215 convenience functions over
 them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
 Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
@@ -777,7 +777,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 186 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 189 end-to-end tests (1 Linux-only)
 dotnet test tests/Stainless.UnitTests           # 389 compiler unit tests
 ```
 
@@ -1223,6 +1223,12 @@ Everything below is covered by [the test suite](tests/cases).
   directory listing, and textual path handling. Failure is a returned value —
   a `Result<T, IOError>`, or a bare `IOError` where nothing is produced. Paths
   are UTF-8 and are widened to UTF-16 before they reach Windows
+- `Standard.Net`: `TcpListener`, `TcpClient`, `UdpSocket` and the `Socket`
+  underneath them, the same on Windows and Linux. `TcpClient` is an `IStream`,
+  so a reader written against a file works over a connection with nothing
+  changed. Winsock and BSD sockets disagree about the handle, the errors, the
+  close and the startup; all of that is in `runtime/socket.c` and none of it
+  reaches a program
 - `Standard.Encoding`: UTF-8, UTF-16 and UTF-32 in both byte orders, ASCII,
   Latin-1 and Windows-1252, behind an `IEncoding` a program can implement.
   Lossy by default, because `GetString` returns a `String` and a `String` is
@@ -1256,14 +1262,21 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
-- [bindings/win32](bindings/win32): the Windows API — 273 entry points, 511
-  constants, 28 structs, unions, enums and delegates, 12 handle types and 7 COM
+- [bindings/win32](bindings/win32): the Windows API — 306 entry points, 628
+  constants, 40 structs, unions, enums and delegates, 12 handle types and 7 COM
   interfaces — as declarations
   rather than a marshalling layer, in two layers a module name apart:
   `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
   Source a program compiles rather than part of the standard library, because
   compiling a wrapper is what makes its library necessary; the raw layer needs
   no library at all
+- [bindings/linux](bindings/linux): the Linux socket calls, on the same terms.
+  `#if LINUX` and not `#if UNIX`, because the functions are POSIX and the
+  numbers are not — `AF_INET6` is 10 here, 23 on Windows and 30 on macOS — so
+  a file claiming to be POSIX would have to be wrong on two platforms out of
+  three. Both bindings are checked against the real headers by a C file
+  compiled beside the test, which is how a constant in a binding stops being
+  somebody's recollection
 - Conditional compilation: `#if`, `#elif`, `#else`, `#endif`, `#define`,
   `#undef`, `#error`, `#warning`, `#region` and `#endregion`, with C#'s
   condition grammar, plus `#pragma comment(lib, "...")` so a file can name the
@@ -1406,7 +1419,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   `__stdcall` is what Win32 uses.
 - **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
   to a `uint` parameter without a cast, which is why
-  [bindings/win32](bindings/win32) spells 511 constants as bare `const uint`
+  [bindings/win32](bindings/win32) spells 628 constants as bare `const uint`
   rather than as the typed sets they are.
 - **An inline array holds plain data only** and cannot be passed by value
   (SL0486, SL0491). The first is the same question a union cannot answer; the

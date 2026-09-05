@@ -9,8 +9,8 @@ which one you are looking at:
 | `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
-The raw layer is 273 entry points, 511 constants and 28 structs, unions, enums
-and delegates across seven libraries, plus the 12 handle types and the 17 names
+The raw layer is 306 entry points, 628 constants and 40 structs, unions, enums
+and delegates across eight libraries, plus the 12 handle types and the 17 names
 they go by, and 7 COM interfaces; the thirteen convenience modules add 215
 functions and 9 types on top. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
@@ -35,6 +35,8 @@ bindings/win32/api/
   ComDlg32.sl    module Win32.ComDlg32;   the open and save dialogs
   Ole32.sl       module Win32.Ole32;      COM: apartments, activation, HRESULT
   ShellCom.sl    module Win32.ShellCom;   IShellItem, IFileDialog and friends
+  Ws2_32.sl      module Win32.Ws2_32;     Winsock: sockets, addresses, poll,
+                                          getaddrinfo, and WSAStartup
 ```
 
 One module per DLL, so there is never a question about where something lives or

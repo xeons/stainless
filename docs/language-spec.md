@@ -2091,6 +2091,7 @@ from 124 KB to 124 KB.
 | `Standard.Ascii` | what one byte is, when ASCII is the honest answer | on request |
 | `Standard.Encoding` | `IEncoding` and the six encodings (§3.6) | on request |
 | `Standard.Convert` | base64, hex and number parsing (§3.7) | on request |
+| `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` (§8.5) | on request |
 | `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 

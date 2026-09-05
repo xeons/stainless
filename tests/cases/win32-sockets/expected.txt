@@ -1,0 +1,9 @@
+port-chosen true
+accepted true
+sent 11
+received 11
+text raw winsock
+ended 0
+refused true
+refused-code true
+wrong 0
