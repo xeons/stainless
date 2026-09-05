@@ -53,20 +53,12 @@ compiler is eight bytes and [abi.md](docs/abi.md) is written for x86-64, so
 there is no 32-bit target for the distinction to matter on. It becomes real the
 day one is added, and not before.
 
-Worth doing *with* the SysV classifier rather than before it, since both are
-"the calling convention is not a given" and the code that decides one should
-decide the other.
+The struct classifier that used to share this entry is done: `--abi` now picks
+Win64 or System V for argument passing as well as for mangling and bit-fields.
+What is left here is only the conventions a *declaration* can name, which is a
+different question and an x86-only one.
 
 *Touches:* `Parser`, `TypeSystem`, `Mangler`, `LlvmEmitter.ClassifyParameter`.
-
-### The SysV struct classifier
-
-`--abi itanium` reaches name mangling and bit-field packing and **not** how a
-struct is passed in registers, which stays Win64. So passing a struct by value
-to Linux C is not right yet, whatever `--abi` says. This is the only item on
-this page that is a correctness gap rather than a missing feature.
-
-*Touches:* a new classifier beside `Win64Abi`, and `LlvmEmitter`.
 
 ### Deriving across a library boundary
 

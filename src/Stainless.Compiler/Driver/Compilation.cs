@@ -420,7 +420,8 @@ public sealed class Compilation
             forSharedLibrary: options.Shared,
             forStainlessConsumers: options.MetadataPath is not null,
             debug: debug,
-            sharedRuntime: options.NeedsSharedRuntime).Emit(program);
+            sharedRuntime: options.NeedsSharedRuntime,
+            abi: options.CppAbi ?? Binding.CppMangler.HostAbi).Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);

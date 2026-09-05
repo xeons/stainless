@@ -638,9 +638,11 @@ Which bits it gets is the target's decision, and the two C ABIs genuinely
 disagree — `struct { int a : 1; byte b : 1; }` is four bytes to gcc and eight to
 MSVC. Both rules are implemented, chosen the way the C++ mangler chooses a
 scheme, and every size in the test suite was read off clang built for the
-matching target. `--abi microsoft|itanium` picks one; the default is the host's.
-It reaches name mangling and bit-fields and nothing else — struct passing is
-Win64 either way, so this is not a cross-compilation.
+matching target. `--abi microsoft|itanium` picks one; the default is the host's,
+and it reaches name mangling, bit-fields and how a struct is passed — Win64
+asks only how big one is, System V asks what is in it, and
+[§3.4 of the ABI notes](docs/abi.md) has the rules and the shapes they were
+checked against.
 
 A signed bit-field sign-extends from its own width, so a three-bit `int` holding
 7 reads back as -1. A bit-field has no address, so it cannot be passed by `ref`.
@@ -799,8 +801,8 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   -l <name>              link a library the linker finds by name
                          (a source file can name one itself, with
                           '#pragma comment(lib, "user32")')
-  --abi <microsoft|itanium>  which C and C++ ABI to agree with (names and
-                         bit-fields; struct passing is Win64 either way)
+  --abi <microsoft|itanium>  which C and C++ ABI to agree with: names,
+                         bit-fields and how a struct is passed
   --keep                 keep the generated .ll
 ```
 
@@ -1331,9 +1333,6 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Statics are module-level only**, and a `--shared` library cannot have one:
   there is no entry point to initialize it from. No `static` members on a type,
   and no per-thread storage.
-- **Win64 only** for struct passing; the SysV classifier is not written, so
-  `--abi itanium` reaches name mangling and bit-field packing and not the
-  calling convention.
 - **No calling conventions.** `__stdcall`, `__fastcall` and `__vectorcall`
   cannot be written. On x64 that costs almost nothing — there is one convention
   and only `__vectorcall` differs — but it is the whole story on x86, where

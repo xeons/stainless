@@ -1,0 +1,44 @@
+# Every signature below is what the compiler emits under `--abi itanium`,
+# and every one was checked to carry the same registers clang gives the
+# same shape when built for x86_64-pc-linux-gnu. Being one register out is
+# a program that links and then reads an argument nobody passed, which no
+# amount of running it here would show.
+#
+# Take* is the parameter side: a struct in two registers is two
+# parameters. Give* is the return side, where the two are gathered into a
+# struct, because a function has one return and may have many parameters.
+
+define internal double @_SL7SysVAbi6TakeI3S10SysVAbi_I3Ed(i24 %arg.v)
+define internal double @_SL7SysVAbi6TakeI5S10SysVAbi_I5Ed(i64 %arg.v)
+define internal double @_SL7SysVAbi6TakeI9S10SysVAbi_I9Ed(i64 %arg.v.0, i8 %arg.v.1)
+define internal double @_SL7SysVAbi7TakeI12S11SysVAbi_I12Ed(i64 %arg.v.0, i32 %arg.v.1)
+define internal double @_SL7SysVAbi7TakeI16S11SysVAbi_I16Ed(i64 %arg.v.0, i64 %arg.v.1)
+define internal double @_SL7SysVAbi7TakeI17S11SysVAbi_I17Ed(ptr byval(%struct.SysVAbi_I17) %arg.v)
+define internal double @_SL7SysVAbi6TakeF2S10SysVAbi_F2Ed(<2 x float> %arg.v)
+define internal double @_SL7SysVAbi6TakeF3S10SysVAbi_F3Ed(<2 x float> %arg.v.0, float %arg.v.1)
+define internal double @_SL7SysVAbi6TakeD2S10SysVAbi_D2Ed(double %arg.v.0, double %arg.v.1)
+define internal double @_SL7SysVAbi6TakeD3S10SysVAbi_D3Ed(ptr byval(%struct.SysVAbi_D3) %arg.v)
+define internal double @_SL7SysVAbi6TakeM1S10SysVAbi_M1Ed(double %arg.v.0, i32 %arg.v.1)
+define internal double @_SL7SysVAbi6TakeM2S10SysVAbi_M2Ed(i32 %arg.v.0, double %arg.v.1)
+define internal double @_SL7SysVAbi6TakeM3S10SysVAbi_M3Ed(i64 %arg.v)
+define internal double @_SL7SysVAbi6TakeM7S10SysVAbi_M7Ed(i8 %arg.v.0, double %arg.v.1)
+define internal double @_SL7SysVAbi6TakeM8S10SysVAbi_M8Ed(float %arg.v.0, i64 %arg.v.1)
+define internal double @_SL7SysVAbi6TakeA3S10SysVAbi_A3Ed(i64 %arg.v.0, i32 %arg.v.1)
+define internal double @_SL7SysVAbi6TakeA5S10SysVAbi_A5Ed(ptr byval(%struct.SysVAbi_A5) %arg.v)
+define internal i24 @_SL7SysVAbi6GiveI3vES10SysVAbi_I3()
+define internal i64 @_SL7SysVAbi6GiveI5vES10SysVAbi_I5()
+define internal { i64, i8 } @_SL7SysVAbi6GiveI9vES10SysVAbi_I9()
+define internal { i64, i32 } @_SL7SysVAbi7GiveI12vES11SysVAbi_I12()
+define internal { i64, i64 } @_SL7SysVAbi7GiveI16vES11SysVAbi_I16()
+define internal void @_SL7SysVAbi7GiveI17vES11SysVAbi_I17(ptr sret(%struct.SysVAbi_I17) %sret.result)
+define internal <2 x float> @_SL7SysVAbi6GiveF2vES10SysVAbi_F2()
+define internal { <2 x float>, float } @_SL7SysVAbi6GiveF3vES10SysVAbi_F3()
+define internal { double, double } @_SL7SysVAbi6GiveD2vES10SysVAbi_D2()
+define internal void @_SL7SysVAbi6GiveD3vES10SysVAbi_D3(ptr sret(%struct.SysVAbi_D3) %sret.result)
+define internal { double, i32 } @_SL7SysVAbi6GiveM1vES10SysVAbi_M1()
+define internal { i32, double } @_SL7SysVAbi6GiveM2vES10SysVAbi_M2()
+define internal i64 @_SL7SysVAbi6GiveM3vES10SysVAbi_M3()
+define internal { i8, double } @_SL7SysVAbi6GiveM7vES10SysVAbi_M7()
+define internal { float, i64 } @_SL7SysVAbi6GiveM8vES10SysVAbi_M8()
+define internal { i64, i32 } @_SL7SysVAbi6GiveA3vES10SysVAbi_A3()
+define internal void @_SL7SysVAbi6GiveA5vES10SysVAbi_A5(ptr sret(%struct.SysVAbi_A5) %sret.result)

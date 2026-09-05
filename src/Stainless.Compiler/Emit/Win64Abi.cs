@@ -22,13 +22,35 @@ public enum PassStyle
 {
     /// <summary>Passed directly in a register as its natural LLVM type.</summary>
     Direct,
-    /// <summary>A small struct reinterpreted as an integer of the same size.</summary>
-    CoerceToInteger,
+    /// <summary>
+    /// A small struct travelling in registers, as the scalars in
+    /// <see cref="ArgInfo.Pieces"/>.
+    ///
+    /// Win64 always produces exactly one, an integer of the struct's own size.
+    /// SysV produces one or two, and either may be an integer or a float, which
+    /// is why this is a list rather than a type.
+    /// </summary>
+    Coerce,
     /// <summary>A large struct passed as a pointer to a caller-allocated copy.</summary>
     Indirect,
 }
 
-public sealed record ArgInfo(PassStyle Style, string LlvmType, TypeSymbol Type);
+/// <summary>
+/// How one value crosses a call boundary.
+///
+/// <paramref name="LlvmType"/> is what a *return* is spelled as, and what a
+/// single-register parameter is spelled as. A parameter travelling in two
+/// registers is two declared parameters, which is what <see cref="Pieces"/>
+/// says and <see cref="LlvmType"/> cannot.
+/// </summary>
+public sealed record ArgInfo(PassStyle Style, string LlvmType, TypeSymbol Type)
+{
+    /// <summary>
+    /// The registers a coerced struct travels in, in order, each covering the
+    /// eight bytes of the value at that offset. Empty for every other style.
+    /// </summary>
+    public IReadOnlyList<string> Pieces { get; init; } = [];
+}
 
 /// <summary>
 /// Win64 (Microsoft x64) parameter and return classification.
@@ -50,9 +72,11 @@ public static class Win64Abi
         if (type is not StructTypeSymbol)
             return new ArgInfo(PassStyle.Direct, llvmTypeOf(type), type);
 
-        return IsRegisterSizedStruct(type)
-            ? new ArgInfo(PassStyle.CoerceToInteger, $"i{type.Size * 8}", type)
-            : new ArgInfo(PassStyle.Indirect, "ptr", type);
+        if (!IsRegisterSizedStruct(type))
+            return new ArgInfo(PassStyle.Indirect, "ptr", type);
+
+        string coerced = $"i{type.Size * 8}";
+        return new ArgInfo(PassStyle.Coerce, coerced, type) { Pieces = [coerced] };
     }
 
     public static ArgInfo ClassifyReturn(TypeSymbol type, Func<TypeSymbol, string> llvmTypeOf)

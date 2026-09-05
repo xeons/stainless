@@ -103,9 +103,9 @@ internal static class Program
               -D, --define <name>  define a symbol for '#if' to test
               -l, --library <name> link a library the linker finds by name
               --abi <microsoft|itanium>
-                                   which C and C++ ABI to agree with, for name
-                                   mangling and bit-field layout (default: the
-                                   host's). Struct passing is Win64 either way
+                                   which C and C++ ABI to agree with: name
+                                   mangling, bit-field layout and how a struct
+                                   is passed (default: the host's)
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
               -h, --help           show this message

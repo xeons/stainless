@@ -43,6 +43,12 @@ namespace Stainless.Tests;
 /// all is most of the test: clang runs LLVM's verifier over the metadata, so a
 /// malformed description fails the build rather than producing a quiet lie.
 ///
+/// A case containing ir.txt has every line of that file matched against the
+/// generated IR, the same way debug.txt is but without asking for debug
+/// information. It is how a signature is pinned: running a program proves the
+/// two halves of a call agree with each other, and only the text proves they
+/// agree with the C compiler.
+///
 /// A case containing shared.txt is built as a shared library with a generated
 /// header named library.h, and its .c files are then compiled against it. That
 /// exercises the export table and the C header rather than just the compiler.
@@ -376,21 +382,14 @@ internal static class Program
             executable = built.Path!;
         }
 
-        if (debug)
-        {
-            var wanted = File.ReadAllLines(debugPath)
-                .Select(l => l.Trim())
-                .Where(l => l.Length > 0 && !l.StartsWith('#'))
-                .ToList();
+        if (debug && MissingFromIr(debugPath, result.Ir) is { Count: > 0 } absentDebug)
+            return (false, "the debug metadata is missing:" + Environment.NewLine + "  " +
+                           string.Join(Environment.NewLine + "  ", absentDebug));
 
-            var absent = wanted
-                .Where(w => result.Ir?.Contains(w, StringComparison.Ordinal) != true)
-                .ToList();
-
-            if (absent.Count > 0)
-                return (false, "the debug metadata is missing:" + Environment.NewLine + "  " +
-                               string.Join(Environment.NewLine + "  ", absent));
-        }
+        string irPath = Path.Combine(directory, "ir.txt");
+        if (File.Exists(irPath) && MissingFromIr(irPath, result.Ir) is { Count: > 0 } absentIr)
+            return (false, "the generated IR is missing:" + Environment.NewLine + "  " +
+                           string.Join(Environment.NewLine + "  ", absentIr));
 
         string expected = Normalize(File.ReadAllText(expectedOutputPath));
         var (exitCode, output) = Execute(executable);
@@ -453,6 +452,14 @@ internal static class Program
 
         return (process.ExitCode, output);
     }
+
+    /// <summary>The lines of a file that do not appear in the IR.</summary>
+    private static List<string> MissingFromIr(string path, string? ir) =>
+        File.ReadAllLines(path)
+            .Select(l => l.Trim())
+            .Where(l => l.Length > 0 && !l.StartsWith('#'))
+            .Where(l => ir?.Contains(l, StringComparison.Ordinal) != true)
+            .ToList();
 
     private static string Normalize(string text) =>
         text.Replace("\r\n", "\n").TrimEnd('\n');

@@ -1,4 +1,4 @@
-# Stainless ABI (x86-64, Windows / MSVC-compatible)
+# Stainless ABI (x86-64: Win64 and System V)
 
 ## 1. Value layout
 
@@ -6,7 +6,9 @@ Primitives and `struct`s use the **platform C ABI verbatim**. Field order is
 declaration order; alignment and padding follow the C rules for the target.
 A Stainless `struct Point { double X; double Y; }` is bit-identical to the C
 `struct Point { double X; double Y; };` and is passed and returned by the
-same rules (on Win64: by hidden pointer, since it exceeds 8 bytes).
+same rules -- on Win64 by hidden pointer, since it exceeds 8 bytes, and under
+System V in two SSE registers, since both of its eightbytes hold only doubles
+(§3.4).
 
 This is a hard guarantee, not a best effort. It is also why `struct` is not
 reference counted: adding a header would break it.
@@ -51,10 +53,9 @@ Both are implemented and both are checked against clang built for the matching
 target. `--abi microsoft|itanium` selects one; the default is the host's, and it
 governs C++ name mangling as well.
 
-**`--abi` does not select a calling convention.** Struct passing is Win64
-whichever ABI is named, because the SysV classifier is not written (§3). Naming
-Itanium on Windows therefore gives Itanium bit-fields and Win64 argument
-passing: self-consistent within one program, and not a cross-compilation.
+**`--abi` selects the struct convention as well** (§3.1): Microsoft gives
+Win64 and Itanium gives System V AMD64, so naming one gets that ABI's bit-field
+packing, C++ mangling *and* argument passing together.
 
 A struct containing bit-fields is emitted as bytes — `%struct.Header = type
 { [4 x i8] }` — because its fields do not line up with LLVM's when several share
@@ -674,6 +675,59 @@ writing it need no new code at all.
 A C header writes the two as `T*` and `const T*`. A C++ name mangles the first
 as a pointer rather than as a C++ reference, because an address is what crosses
 and `T*` is what C++ calls that.
+
+### 3.4 How a struct is passed
+
+LLVM applies no C ABI of its own — that is a front end's job — so this is where
+Stainless is either C-compatible or not. `--abi` picks which convention, and
+the default is the host's.
+
+**Win64** asks only how big it is. A struct of exactly 1, 2, 4 or 8 bytes goes
+in one integer register as an integer of that width; everything else goes
+`byval`, as a pointer to a copy the caller owns, and comes back `sret`.
+
+**System V AMD64** asks what is *in* it. A value of sixteen bytes or less is cut
+into eightbytes; each eightbyte is classified by the fields that lie in it, and
+that decides which bank of registers it travels in:
+
+| In the eightbyte | Class | Register |
+|---|---|---|
+| only `float` or `double` | SSE | `xmm0`–`xmm7` |
+| anything else, or a mixture | INTEGER | `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9` |
+| a field that is not naturally aligned | MEMORY | none: the stack |
+
+Merging is what makes the mixture case integer, and it is why size predicts
+nothing:
+
+```
+  { double; int; }    ->  (double, i32)     one SSE register and one integer
+  { float;  int; }    ->  (i64)             one integer register, both fields in it
+  { float;  float; }  ->  (<2 x float>)     one SSE register
+  { long;   char; }   ->  (i64, i8)         two integer registers
+  { char; char; char; } -> (i24)            one, sized to what is there
+```
+
+Two further rules, both of which follow from not reading past the object:
+
+- **A register is sized by what it holds**, not by the eightbyte. `{ long;
+  char; }` is sixteen bytes and its second register is an `i8`, because that is
+  all that is there; `{ char; char; char; }` is an `i24`. Where a field is
+  followed by another inside its own eightbyte the register covers what is left
+  of the value instead, which is why `{ int; char; }` is a single `i64`.
+- **A parameter in two registers is two parameters**, and a *return* in two is
+  one LLVM struct. A function has one return and as many parameters as it likes,
+  so the two directions are spelled differently for the same classification.
+
+```
+  void Take(struct M v)   ->  define void @Take(double %v.0, i32 %v.1)
+  struct M Give(void)     ->  define { double, i32 } @Give()
+```
+
+Every shape is checked against clang built for `x86_64-pc-linux-gnu` rather
+than read off the specification: [tests/cases/sysv-abi](../tests/cases/sysv-abi)
+holds the signatures, and its `ir.txt` is what fails if the two ever disagree.
+Running the program proves only that the two halves of a call agree with each
+other, which they would even if both were wrong.
 
 ## 4. Static storage
 

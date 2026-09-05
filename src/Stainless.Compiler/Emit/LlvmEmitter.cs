@@ -58,8 +58,29 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 /// </param>
 public sealed class LlvmEmitter(
     bool forSharedLibrary = false, bool forStainlessConsumers = false,
-    DebugInfo? debug = null, bool sharedRuntime = false)
+    DebugInfo? debug = null, bool sharedRuntime = false,
+    CppAbi abi = CppAbi.Microsoft)
 {
+    /// <summary>
+    /// How a struct crosses a call, which is a property of the target and not
+    /// of the language.
+    ///
+    /// Win64 asks only how big it is; SysV asks what is in it. Both are here
+    /// because `--abi` selects one, and until this existed it selected the
+    /// name mangling and the bit-field packing and left the argument passing
+    /// as Win64 whatever it said -- which made `--abi itanium` produce a
+    /// program that could not call a C library.
+    /// </summary>
+    private ArgInfo ClassifyValue(TypeSymbol type) =>
+        abi == CppAbi.Itanium
+            ? SysVAbi.ClassifyArgument(type, LlvmTypeOf)
+            : Win64Abi.ClassifyArgument(type, LlvmTypeOf);
+
+    private ArgInfo ClassifyResult(TypeSymbol type) =>
+        abi == CppAbi.Itanium
+            ? SysVAbi.ClassifyReturn(type, LlvmTypeOf)
+            : Win64Abi.ClassifyReturn(type, LlvmTypeOf);
+
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
     private readonly Dictionary<string, string> _byteConstants = new(StringComparer.Ordinal);
@@ -328,28 +349,88 @@ public sealed class LlvmEmitter(
     /// such a parameter exactly a <c>T*</c> — which is why one crosses
     /// <c>extern "C"</c> with nothing in between.
     /// </summary>
-    private static ArgInfo ClassifyParameter(ParameterSymbol parameter) =>
+    /// <summary>
+    /// How one parameter is spelled in a declaration: its own type, a pointer
+    /// it is passed behind, or one entry per register it travels in.
+    /// </summary>
+    private IEnumerable<string> Declared(ArgInfo info) =>
+        info.Style switch
+        {
+            PassStyle.Indirect => [$"ptr byval({StructName((StructTypeSymbol)info.Type)})"],
+            PassStyle.Coerce => info.Pieces,
+            _ => [info.LlvmType],
+        };
+
+    /// <summary>
+    /// The address of the eight bytes a coerced struct's <paramref name="index"/>
+    /// register covers.
+    ///
+    /// Each piece is sized to what the value actually occupies there, so this
+    /// plus that size never reaches past the object -- which is why a
+    /// three-byte struct travels as an `i24` and not as an `i32` reading a
+    /// fourth byte that does not exist.
+    /// </summary>
+    /// <summary>
+    /// Reads a struct at <paramref name="address"/> as the value its ABI says
+    /// it returns in: one register, or a struct of the two it uses.
+    /// </summary>
+    private string LoadCoerced(string address, ArgInfo info)
+    {
+        if (info.Pieces.Count <= 1)
+            return Emit(info.LlvmType, $"load {info.LlvmType}, ptr {address}");
+
+        string built = "undef";
+        for (int piece = 0; piece < info.Pieces.Count; piece++)
+        {
+            string spelling = info.Pieces[piece];
+            string loaded = Emit(spelling,
+                $"load {spelling}, ptr {PieceAddress(address, piece)}");
+
+            built = Emit(info.LlvmType,
+                $"insertvalue {info.LlvmType} {built}, {spelling} {loaded}, {piece}");
+        }
+        return built;
+    }
+
+    /// <summary>Writes such a value back into an object, piece by piece.</summary>
+    private void StoreCoerced(string address, string value, ArgInfo info)
+    {
+        if (info.Pieces.Count <= 1)
+        {
+            Line($"store {info.LlvmType} {value}, ptr {address}");
+            return;
+        }
+
+        for (int piece = 0; piece < info.Pieces.Count; piece++)
+        {
+            string spelling = info.Pieces[piece];
+            string part = Emit(spelling, $"extractvalue {info.LlvmType} {value}, {piece}");
+            Line($"store {spelling} {part}, ptr {PieceAddress(address, piece)}");
+        }
+    }
+
+    private string PieceAddress(string address, int index) =>
+        index == 0
+            ? address
+            : Emit("ptr", $"getelementptr inbounds i8, ptr {address}, i64 {index * 8}");
+
+    private ArgInfo ClassifyParameter(ParameterSymbol parameter) =>
         parameter.IsByReference
             ? new ArgInfo(PassStyle.Direct, "ptr", parameter.Type)
-            : Win64Abi.ClassifyArgument(parameter.Type, LlvmTypeOf);
+            : ClassifyValue(parameter.Type);
 
     private void ExternalDeclarations(BoundProgram program)
     {
         foreach (var function in program.ExternalFunctions)
         {
-            var returnInfo = Win64Abi.ClassifyReturn(function.ReturnType, LlvmTypeOf);
+            var returnInfo = ClassifyResult(function.ReturnType);
             var parts = new List<string>();
 
             if (returnInfo.Style == PassStyle.Indirect)
                 parts.Add($"ptr sret({StructName((StructTypeSymbol)function.ReturnType)})");
 
             foreach (var parameter in function.Parameters)
-            {
-                var info = ClassifyParameter(parameter);
-                parts.Add(info.Style == PassStyle.Indirect
-                    ? $"ptr byval({StructName((StructTypeSymbol)parameter.Type)})"
-                    : info.LlvmType);
-            }
+                parts.AddRange(Declared(ClassifyParameter(parameter)));
 
             if (function.IsVariadic) parts.Add("...");
 
@@ -842,7 +923,7 @@ public sealed class LlvmEmitter(
         var target = classType.FindImplementation(required);
         if (target is null) return;
 
-        var returnInfo = Win64Abi.ClassifyReturn(target.ReturnType, LlvmTypeOf);
+        var returnInfo = ClassifyResult(target.ReturnType);
         string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
 
         var declared = new List<string>();
@@ -860,14 +941,16 @@ public sealed class LlvmEmitter(
 
         foreach (var parameter in target.Parameters.Where(p => !p.IsThis))
         {
-            var info = ClassifyParameter(parameter);
-            string name = "%a" + parameter.Index;
-            string spelled = info.Style == PassStyle.Indirect
-                ? $"ptr byval({StructName((StructTypeSymbol)parameter.Type)}) {name}"
-                : $"{info.LlvmType} {name}";
-
-            declared.Add(spelled);
-            forwarded.Add(spelled);
+            // One name per register, so a struct arriving in two is forwarded
+            // as the two it arrived in.
+            int piece = 0;
+            foreach (string spelling in Declared(ClassifyParameter(parameter)))
+            {
+                string named = $"{spelling} %a{parameter.Index}_{piece}";
+                declared.Add(named);
+                forwarded.Add(named);
+                piece++;
+            }
         }
 
         int offset = classType.TearOffOffset(presented);
@@ -1173,7 +1256,7 @@ public sealed class LlvmEmitter(
         var symbol = function.Symbol;
         ResetFunctionState();
 
-        var returnInfo = Win64Abi.ClassifyReturn(symbol.ReturnType, LlvmTypeOf);
+        var returnInfo = ClassifyResult(symbol.ReturnType);
         var parameterInfos = symbol.Parameters
             .Select(p => (Parameter: p, Info: ClassifyParameter(p)))
             .ToList();
@@ -1192,9 +1275,17 @@ public sealed class LlvmEmitter(
         {
             string name = "%arg." + SanitizeIdentifier(parameter.Name);
             incomingNames[parameter] = name;
-            declaredParameters.Add(info.Style == PassStyle.Indirect
-                ? $"ptr byval({StructName((StructTypeSymbol)parameter.Type)}) {name}"
-                : $"{info.LlvmType} {name}");
+
+            var spellings = Declared(info).ToList();
+            if (spellings.Count == 1)
+            {
+                declaredParameters.Add($"{spellings[0]} {name}");
+                continue;
+            }
+
+            // Two registers, two names. The body puts them back together.
+            for (int piece = 0; piece < spellings.Count; piece++)
+                declaredParameters.Add($"{spellings[piece]} {name}.{piece}");
         }
 
         _returnInfo = returnInfo;
@@ -1260,10 +1351,18 @@ public sealed class LlvmEmitter(
                 continue;
             }
 
-            if (info.Style == PassStyle.CoerceToInteger)
+            if (info.Style == PassStyle.Coerce)
             {
+                // Back into one object: each register is stored at the eight
+                // bytes it covered, which is exactly where the fields expect it.
                 string slot = Alloca(LlvmTypeOf(parameter.Type), parameter.Name);
-                Line($"store {info.LlvmType} {incoming}, ptr {slot}");
+
+                for (int piece = 0; piece < info.Pieces.Count; piece++)
+                {
+                    string value = info.Pieces.Count == 1 ? incoming : $"{incoming}.{piece}";
+                    Line($"store {info.Pieces[piece]} {value}, ptr {PieceAddress(slot, piece)}");
+                }
+
                 _parameterSlots[parameter] = slot;
                 AdoptWrittenParameter(parameter, slot);
                 continue;
@@ -2538,8 +2637,9 @@ public sealed class LlvmEmitter(
             }
             else
             {
-                // Register-sized struct: reinterpret the bytes as an integer.
-                string coerced = Emit(returnInfo.LlvmType, $"load {returnInfo.LlvmType}, ptr {value.Ref}");
+                // Register-sized: the bytes, read back as the registers they
+                // travel in.
+                string coerced = LoadCoerced(value.Ref, returnInfo);
                 FlushTemporaries();
                 ReleaseScopes(0);
                 Terminator($"ret {returnInfo.LlvmType} {coerced}");
@@ -3917,7 +4017,7 @@ public sealed class LlvmEmitter(
     private Val EmitIndirectCall(BoundIndirectCall call)
     {
         var delegateType = call.DelegateType;
-        var returnInfo = Win64Abi.ClassifyReturn(delegateType.ReturnType, LlvmTypeOf);
+        var returnInfo = ClassifyResult(delegateType.ReturnType);
 
         // Resolved before the arguments, so an argument that is itself a call
         // cannot disturb the target this one loaded.
@@ -3958,7 +4058,7 @@ public sealed class LlvmEmitter(
     private Val EmitCall(BoundCall call)
     {
         var function = call.Function;
-        var returnInfo = Win64Abi.ClassifyReturn(function.ReturnType, LlvmTypeOf);
+        var returnInfo = ClassifyResult(function.ReturnType);
 
         var arguments = new List<string>();
         string? sretSlot = null;
@@ -4019,12 +4119,12 @@ public sealed class LlvmEmitter(
 
         string result = Emit(returnInfo.LlvmType, invocation);
 
-        if (returnInfo.Style == PassStyle.CoerceToInteger)
+        if (returnInfo.Style == PassStyle.Coerce)
         {
             // Land the register-sized struct back in memory so it has an address.
             var structType = (StructTypeSymbol)function.ReturnType;
             string slot = Alloca(StructName(structType), "call.result");
-            Line($"store {returnInfo.LlvmType} {result}, ptr {slot}");
+            StoreCoerced(slot, result, returnInfo);
             if (structType.CarriesReferences()) TrackTemporary(slot, structType);
             return new Val(slot, "ptr", function.ReturnType);
         }
@@ -4129,10 +4229,10 @@ public sealed class LlvmEmitter(
     private string PayloadAddress(string value, VariantTypeSymbol variant) =>
         Emit("ptr", $"getelementptr inbounds {StructName(variant)}, ptr {value}, i32 0, i32 1");
 
-    private static string VariadicSignature(FunctionSymbol function)
+    private string VariadicSignature(FunctionSymbol function)
     {
         var parts = function.Parameters
-            .Select(p => ClassifyParameter(p).LlvmType)
+            .SelectMany(p => Declared(ClassifyParameter(p)))
             .ToList();
         parts.Add("...");
         return string.Join(", ", parts);
@@ -4155,7 +4255,7 @@ public sealed class LlvmEmitter(
     {
         if (type is StructTypeSymbol structType)
         {
-            var info = Win64Abi.ClassifyArgument(structType, LlvmTypeOf);
+            var info = ClassifyValue(structType);
             if (info.Style == PassStyle.Indirect)
             {
                 // Win64 passes a pointer to a copy the caller owns.
@@ -4165,8 +4265,15 @@ public sealed class LlvmEmitter(
             }
             else
             {
-                string coerced = Emit(info.LlvmType, $"load {info.LlvmType}, ptr {value.Ref}");
-                arguments.Add($"{info.LlvmType} {coerced}");
+                // One argument per register, each read from the eight bytes it
+                // stands for.
+                for (int piece = 0; piece < info.Pieces.Count; piece++)
+                {
+                    string spelling = info.Pieces[piece];
+                    string address = PieceAddress(value.Ref, piece);
+                    arguments.Add(
+                        $"{spelling} {Emit(spelling, $"load {spelling}, ptr {address}")}");
+                }
             }
             return;
         }
