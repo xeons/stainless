@@ -28,7 +28,7 @@
  * Windows that has to become UTF-16 before it reaches the operating system:
  * the narrow CRT entry points interpret bytes in the active code page, so
  * fopen on a UTF-8 path works by accident for ASCII and fails for everything
- * else. Every path here therefore goes through widen() first, and the wide
+ * else. Every path here therefore goes through sl_widen() first, and the wide
  * entry points are used throughout.
  *
  * Errors come back as a small stable enum rather than errno, because errno's
@@ -95,8 +95,14 @@ static void report(int32_t *error, int32_t value)
 
 #ifdef _WIN32
 
-/* UTF-8 to UTF-16, into a buffer the caller frees. NULL on failure. */
-static wchar_t *widen(const char *utf8)
+/*
+ * UTF-8 to UTF-16 and back, into a buffer the caller frees. NULL on failure.
+ *
+ * Shared rather than static: every Windows entry point that takes or returns
+ * text has to do this, and the narrow API is not an option -- it speaks the
+ * active code page, and a String is UTF-8 by definition. env.c uses these too.
+ */
+wchar_t *sl_widen(const char *utf8)
 {
     if (utf8 == NULL) return NULL;
 
@@ -113,9 +119,10 @@ static wchar_t *widen(const char *utf8)
     return wide;
 }
 
-/* And back, for the names a directory listing produces. */
-static char *narrow(const wchar_t *wide)
+char *sl_narrow(const wchar_t *wide)
 {
+    if (wide == NULL) return NULL;
+
     int bytes = WideCharToMultiByte(CP_UTF8, 0, wide, -1, NULL, 0, NULL, NULL);
     if (bytes <= 0) return NULL;
 
@@ -165,7 +172,7 @@ void *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *e
     errno = 0;
 
 #ifdef _WIN32
-    wchar_t *widePath = widen((const char *)path);
+    wchar_t *widePath = sl_widen((const char *)path);
     if (widePath == NULL) {
         report(error, SL_IO_INVALID);
         return NULL;
@@ -305,7 +312,7 @@ void sl_file_flush(void *handle)
 static _Bool stat_path(const uint8_t *path, SL_STAT *out)
 {
 #ifdef _WIN32
-    wchar_t *wide = widen((const char *)path);
+    wchar_t *wide = sl_widen((const char *)path);
     if (wide == NULL) return 0;
 
     _Bool ok = _wstat64(wide, out) == 0;
@@ -353,7 +360,7 @@ int32_t sl_file_delete(const uint8_t *path)
 {
     errno = 0;
 #ifdef _WIN32
-    wchar_t *wide = widen((const char *)path);
+    wchar_t *wide = sl_widen((const char *)path);
     if (wide == NULL) return SL_IO_INVALID;
 
     int result = _wremove(wide);
@@ -368,8 +375,8 @@ int32_t sl_file_rename(const uint8_t *from, const uint8_t *to)
 {
     errno = 0;
 #ifdef _WIN32
-    wchar_t *wideFrom = widen((const char *)from);
-    wchar_t *wideTo = widen((const char *)to);
+    wchar_t *wideFrom = sl_widen((const char *)from);
+    wchar_t *wideTo = sl_widen((const char *)to);
     if (wideFrom == NULL || wideTo == NULL) {
         free(wideFrom);
         free(wideTo);
@@ -389,7 +396,7 @@ int32_t sl_directory_create(const uint8_t *path)
 {
     errno = 0;
 #ifdef _WIN32
-    wchar_t *wide = widen((const char *)path);
+    wchar_t *wide = sl_widen((const char *)path);
     if (wide == NULL) return SL_IO_INVALID;
 
     int result = _wmkdir(wide);
@@ -404,7 +411,7 @@ int32_t sl_directory_delete(const uint8_t *path)
 {
     errno = 0;
 #ifdef _WIN32
-    wchar_t *wide = widen((const char *)path);
+    wchar_t *wide = sl_widen((const char *)path);
     if (wide == NULL) return SL_IO_INVALID;
 
     int result = _wrmdir(wide);
@@ -450,7 +457,7 @@ void *sl_directory_open(const uint8_t *path)
     pattern[length + 1] = '*';
     pattern[length + 2] = '\0';
 
-    wchar_t *wide = widen(pattern);
+    wchar_t *wide = sl_widen(pattern);
     free(pattern);
 
     if (wide == NULL) {
@@ -499,7 +506,7 @@ const uint8_t *sl_directory_next(void *handle, _Bool *isDirectory)
         const wchar_t *found = cursor->entry.cFileName;
         if (wcscmp(found, L".") == 0 || wcscmp(found, L"..") == 0) continue;
 
-        cursor->name = narrow(found);
+        cursor->name = sl_narrow(found);
         if (cursor->name == NULL) continue;
 
         cursor->isDirectory =

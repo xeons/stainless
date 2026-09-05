@@ -29,6 +29,10 @@ namespace Stainless.Tests;
 ///   errors.txt     the program must fail to compile, and every diagnostic code
 ///                  this file names -- warnings included -- must be reported
 ///
+/// A case may also contain args.txt, one command-line argument per line, and
+/// stdin.txt, fed to the program verbatim. Without them a program gets no
+/// arguments and an input that is closed at once.
+///
 /// A case containing warnings.txt must additionally report every code that file
 /// names, whether or not the build then fails. It is how a warning is pinned --
 /// what a library's metadata leaves out, above all, which is reported where the
@@ -424,7 +428,7 @@ internal static class Program
                            string.Join(Environment.NewLine + "  ", absentIr));
 
         string expected = Normalize(File.ReadAllText(expectedOutputPath));
-        var (exitCode, output) = Execute(executable);
+        var (exitCode, output) = Execute(executable, directory);
         string actualOutput = Normalize(output);
 
         if (actualOutput != expected)
@@ -465,16 +469,45 @@ internal static class Program
             : (null, "the C consumer failed to build:\n" + result.StandardError.TrimEnd());
     }
 
-    private static (int ExitCode, string Output) Execute(string executablePath)
+    /// <summary>
+    /// Runs the program, with whatever the case says to give it.
+    ///
+    /// A case may contain <c>args.txt</c>, one argument per line, and
+    /// <c>stdin.txt</c>, fed to the program verbatim. Without them a program
+    /// gets no arguments and an immediately closed input, which is what every
+    /// case did before either existed.
+    /// </summary>
+    private static (int ExitCode, string Output) Execute(string executablePath, string directory)
     {
         var startInfo = new ProcessStartInfo(executablePath)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            RedirectStandardInput = true,
             UseShellExecute = false,
         };
 
+        string argumentsPath = Path.Combine(directory, "args.txt");
+        if (File.Exists(argumentsPath))
+            foreach (string argument in File.ReadAllLines(argumentsPath))
+                if (argument.Length > 0)
+                    startInfo.ArgumentList.Add(argument);
+
         using var process = Process.Start(startInfo)!;
+
+        string inputPath = Path.Combine(directory, "stdin.txt");
+        if (File.Exists(inputPath))
+        {
+            // Newlines normalised, so a case reads the same on both platforms
+            // however the file was checked out.
+            string text = File.ReadAllText(inputPath).Replace("\r\n", "\n");
+            process.StandardInput.Write(text);
+        }
+
+        // Closed either way: a program that reads to end of input would
+        // otherwise wait for one that is never coming.
+        process.StandardInput.Close();
+
         string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
 
         if (!process.WaitForExit(20_000))

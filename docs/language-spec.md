@@ -2341,7 +2341,62 @@ is absent — the convention `IndexOf` already follows. `LowerBound` returns
 where it would go instead. Two functions rather than one with a flag, because
 the language has no `out` and a caller usually wants one answer or the other.
 
-### 5.6 `Standard.Math`
+### 5.6 `Standard.Env`, `Standard.Time` and `Standard.Random`
+
+**A program reads its command line through `Main`.**
+
+```csharp
+int Main(String[] args) {
+    if (args.Length < 1u) { Console.WriteError("usage: wc <file>"); return 2; }
+    ...
+}
+```
+
+`Main` takes either nothing or a `String[]`, and nothing else (SL0282). The
+array holds the arguments only -- the program's own name is `Env.Program()`,
+because it is not one of them and treating it as one is the mistake C's argv
+invites. `Standard.Env` reaches the same list from anywhere, which is for code
+that is nowhere near `Main`; taking the array as a parameter is better where it
+is possible.
+
+`Env` also has variables and the working directory. **An empty value is not
+portable**: Windows defines setting one as removal, so `Set(name, "")` deletes
+the variable there and keeps an empty one on Unix. Treat empty and unset alike,
+which is what `GetOr` does.
+
+**`Standard.Time` keeps two kinds of time apart, because confusing them is the
+usual bug.** An `Instant` is a point on the wall clock and can jump -- a user
+sets it, NTP corrects it, a laptop wakes. A `Duration` is a length, and `Clock`
+reads a **monotonic** counter that only goes forward:
+
+```csharp
+var clock = new Clock();
+DoTheWork();
+Console.WriteLine(Time.FormatDuration(clock.Elapsed()));
+```
+
+Subtracting two `Instant`s to measure something is the thing not to do, and is
+why the timing type is a separate one. Both are structs over a single `long` of
+nanoseconds, so they cost nothing and compare and subtract as the numbers they
+are.
+
+The UTC calendar is computed rather than delegated to `gmtime`, because the
+platforms disagree about the past: Windows refuses a negative `time_t`, so
+every date before 1970 came back empty. Local time still asks the platform,
+which is the only thing that knows the zone rules.
+
+**`Standard.Random` is a class, not a set of functions.** The state has to live
+somewhere; the language has no mutable global to put it in (§9.3); and a hidden
+one shared by every caller is what makes a program impossible to replay. A
+`Random(seed)` repeats exactly, on any machine; a `Random()` is seeded by the
+operating system and does not.
+
+It is **not cryptographic** -- xoshiro256** is fast and its whole future
+follows from its state, which is what makes a seeded run reproducible and what
+makes it unfit for a key. `Random.Bytes` goes straight to the platform's
+source for that.
+
+### 5.7 `Standard.Math`
 
 ```csharp
 import Standard.Math;
@@ -2366,7 +2421,7 @@ transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinite`/
 `Round` takes halves away from zero, which is C's rule rather than the banker's
 rounding C# uses by default.
 
-### 5.7 `Standard.Concurrent`
+### 5.8 `Standard.Concurrent`
 
 ```csharp
 import Standard.Concurrent;
@@ -2403,7 +2458,7 @@ still the right one — reading a field to call a method on it borrows, and a
 container that never hands its collection out cannot be used wrongly by a caller
 who keeps what it lent.
 
-### 5.8 `Standard.IO`, `File`, `Directory` and `Path`
+### 5.9 `Standard.IO`, `File`, `Directory` and `Path`
 
 ```csharp
 import Standard.File;
@@ -2472,7 +2527,7 @@ operating system — the narrow CRT entry points would read those bytes in the
 active code page, which works by accident for ASCII and fails for everything
 else.
 
-### 5.9 Interfaces may extend interfaces
+### 5.10 Interfaces may extend interfaces
 
 ```csharp
 public interface IWritable : IReadable { void Write(String text); }

@@ -171,16 +171,17 @@ internal static class Program
         // would look for an app.exe anywhere but the one just built.
         string program = Path.GetFullPath(result.OutputPath!);
 
-        foreach (string argument in programArguments) _ = argument;   // reserved for Main(args)
-
         Process? process;
         try
         {
-            process = Process.Start(new ProcessStartInfo(program)
-            {
-                UseShellExecute = false,
-                ArgumentList = { },
-            });
+            var start = new ProcessStartInfo(program) { UseShellExecute = false };
+
+            // Everything after `--`, handed over as written. ArgumentList
+            // quotes each one for the platform, so an argument with a space in
+            // it arrives as one argument rather than two.
+            foreach (string argument in programArguments) start.ArgumentList.Add(argument);
+
+            process = Process.Start(start);
         }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or IOException)
         {

@@ -339,6 +339,19 @@ SL_API void  *sl_string_concat(void *left, void *right);
 SL_API _Bool  sl_string_equals(void *left, void *right);
 SL_API void  *sl_string_substring(void *pointer, size_t start, size_t length);
 
+/*
+ * UTF-8 to UTF-16 and back, on Windows only, into a buffer the caller frees.
+ * NULL on failure, and on a NULL argument.
+ *
+ * Every Windows entry point that takes or returns text needs these: a String
+ * is UTF-8 by definition, and the narrow API speaks the active code page, so a
+ * name outside it would arrive as question marks rather than as itself.
+ */
+#ifdef _WIN32
+SL_API wchar_t *sl_widen(const char *utf8);
+SL_API char    *sl_narrow(const wchar_t *wide);
+#endif
+
 /* ------------------------------------------------------ files and paths */
 
 /*
@@ -537,6 +550,82 @@ SL_API void    *sl_read_reference(const void *instance, const void *field);
 SL_API void sl_console_write(void *pointer);
 SL_API void sl_console_write_line(void *pointer);
 SL_API void sl_console_write_error(void *pointer);
+
+/*
+ * One line without its terminator, or NULL at end of input -- a blank line and
+ * no line at all are different answers. Bytes are taken to be UTF-8.
+ */
+SL_API void *sl_console_read_line(void);
+SL_API void *sl_console_read_all(void);
+SL_API _Bool sl_console_at_end(void);
+
+/* ------------------------------------------------------- the environment */
+
+/*
+ * What main() was handed. The entry point stores it before anything else runs;
+ * argv[0] is the program's own name and is not counted among the arguments.
+ */
+SL_API void   sl_args_set(int count, char **values);
+SL_API size_t sl_args_count(void);
+SL_API void  *sl_args_at(size_t index);
+
+/* Every argument as one String[]. The compiler passes the TypeInfo it built
+ * for that array type, because the type tables belong to the program. */
+SL_API void  *sl_args_array(const SlTypeInfo *arrayType);
+SL_API void  *sl_args_program(void);
+
+/* NULL for a variable that is not set, which is not the same as one set to
+ * nothing. Windows goes through the wide API, so a value outside the active
+ * code page survives. */
+SL_API void  *sl_env_get(void *name);
+SL_API _Bool  sl_env_set(void *name, void *value);
+
+/* Every name, newline-separated, as one String -- the runtime has no tidy way
+ * to build an array of references, and splitting is one line of Stainless. */
+SL_API void  *sl_env_names(void);
+
+SL_API void  *sl_env_current_directory(void);
+SL_API _Bool  sl_env_set_current_directory(void *path);
+
+/* ------------------------------------------------------------- the clocks */
+
+/*
+ * Nanoseconds, signed, which makes a difference ordinary subtraction.
+ *
+ * sl_time_now is the wall clock and can jump -- a user sets it, NTP corrects
+ * it, a laptop wakes. Never subtract two readings of it to measure a duration;
+ * sl_time_monotonic is the one that only goes forward, from an arbitrary zero.
+ */
+SL_API long long sl_time_now(void);
+SL_API long long sl_time_monotonic(void);
+
+/*
+ * A moment as year, month (1-12), day, hour, minute, second, nanosecond,
+ * weekday (0 = Sunday) and day of year (1-366) -- nine values, written through
+ * the pointer. Returns whether the platform could name that instant.
+ */
+SL_API _Bool sl_time_parts(long long nanoseconds, _Bool local, long long *parts);
+
+SL_API long long sl_time_from_parts(long long year, long long month, long long day,
+                                    long long hour, long long minute, long long second,
+                                    long long nanosecond, _Bool local);
+
+/* How far ahead of UTC the local zone is at that moment, in seconds. */
+SL_API long long sl_time_zone_offset(long long nanoseconds);
+
+/* ------------------------------------------------------------- entropy */
+
+/*
+ * The platform's cryptographic source: BCryptGenRandom, or getrandom with
+ * /dev/urandom behind it. Reports failure rather than falling back to a clock,
+ * because a caller that wanted unpredictability and silently got the time is
+ * worse off than one told it cannot have any.
+ *
+ * This seeds Standard.Random, which is a fast PRNG and is not itself
+ * cryptographic.
+ */
+SL_API _Bool     sl_random_bytes(void *buffer, size_t length);
+SL_API long long sl_random_seed(void);
 
 /* -------------------------------------------------------------- threading */
 

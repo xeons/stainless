@@ -264,6 +264,29 @@ public class String {
         return this + " ".Repeat(width - size);
     }
 
+    /// The same, padded with something other than a space -- a zero, usually,
+    /// which is what a formatted number wants.
+    ///
+    /// The padding is measured in bytes like everything else here, so a `with`
+    /// of more than one byte pads by whole copies and may fall short of the
+    /// width rather than overshoot it. A single character is the sane case and
+    /// the one to use.
+    public String PadLeft(nuint width, String with) {
+        nuint size = this.ByteLength();
+        nuint unit = with.ByteLength();
+        if (size >= width || unit == 0u) { return this; }
+
+        return with.Repeat((width - size) / unit) + this;
+    }
+
+    public String PadRight(nuint width, String with) {
+        nuint size = this.ByteLength();
+        nuint unit = with.ByteLength();
+        if (size >= width || unit == 0u) { return this; }
+
+        return this + with.Repeat((width - size) / unit);
+    }
+
     // -------------------------------------------------------------- splitting
 
     /// This text cut at every `separator`.

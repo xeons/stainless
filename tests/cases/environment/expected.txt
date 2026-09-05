@@ -1,0 +1,62 @@
+argc      = 3
+  arg     first
+  arg     second argument
+  arg     --flag
+viaEnv    = 3
+agree     = 1
+program   = 1
+setOk     = 1
+readBack  = a value
+has       = 1
+removeOk  = 1
+gone      = 1
+fallback  = <missing>
+emptyOk   = 1
+emptyRead = 0
+names     = 1
+cwd       = 1
+moon      = 1969-07-20T20:17:40Z
+moonUnix  = -14182940
+moonDay   = 0
+moonYday  = 201
+early     = 1960-01-01T00:00:00Z
+earlyUnix = -315619200
+epoch     = 1970-01-01T00:00:00Z
+parsed    = 2026-09-05T14:30:00Z
+malformed = 0
+shortForm = 0
+badMonth  = 0
+feb30     = 0
+feb29leap = 1
+feb29not  = 0
+leap2024  = 1
+leap1900  = 0
+leap2000  = 1
+febLeap   = 29
+febPlain  = 28
+hourSecs  = 3600
+sum       = 3660
+diff      = 3540
+negative  = 1
+format    = 1h01m01.004s
+small     = 0.042s
+negFormat = -1.500s
+apart     = 3600
+thisEra   = 1
+forwards  = 1
+repeats   = 1
+differs   = 1
+inRange   = 1
+allSeen   = 1
+unit      = 1
+between   = 1
+shuffled  = 28
+sameOrder = 1
+entropy   = 1
+line1     = hello from stdin
+line2     = [0 bytes]
+rest      = line three
+line four
+atEnd     = 1
+pastEnd   = 1
+done

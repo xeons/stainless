@@ -778,8 +778,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 192 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 467 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 194 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 468 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -788,8 +788,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 192 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 182 and Windows 191, each
+**Both Windows and Linux are tested.** 194 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 184 and Windows 193, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1261,6 +1261,22 @@ Everything below is covered by [the test suite](tests/cases).
   `ConcurrentDictionary<K, V>` and a blocking `Channel<T>`. Each owns its
   collection in a field and never hands out a reference to it, because a lock
   protects what it guards and not the reference *count* of what it guards
+- `Standard.Env`: the command line, environment variables and the working
+  directory. `Main(String[] args)` is the better way to read the arguments --
+  a function that takes what it needs beats one that goes looking -- and
+  `Env.Arguments()` is for the code that is nowhere near `Main`
+- `Standard.Time`: `Instant` (a point on the wall clock) and `Duration` (a
+  length), both structs over one `long` of nanoseconds, plus `DateTime` for the
+  parts a person reads, ISO 8601 in both directions, and `Clock` over the
+  **monotonic** counter -- which is the only correct way to measure how long
+  something took, because the wall clock can jump mid-measurement. The UTC
+  calendar is computed rather than delegated, so dates before 1970 work on
+  Windows too
+- `Standard.Random`: xoshiro256**, seeded by you for a reproducible run or by
+  the operating system for an unpredictable one. A class rather than free
+  functions, because the state has to live somewhere and a hidden global one
+  is what makes a program impossible to replay. `Random.Bytes` goes straight to
+  the platform's cryptographic source, which is what a key or a token wants
 - `Standard.IO`, `Standard.File`, `Standard.Directory`, `Standard.Path`:
   `IStream` with `FileStream` and `MemoryStream`, whole-file reads and writes,
   directory listing, and textual path handling. Failure is a returned value —
@@ -1519,9 +1535,8 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **No `out`, no `ref` locals and no `ref` returns.** `out` would need
   definite-assignment analysis to be worth having over `ref`; the other two
   would need a lifetime story the language does not have.
-- `Main` takes no arguments, and arguments after `--` are accepted and then
-  dropped. Field initializers are rejected — assign in a constructor. `delete`
-  is reserved but unused.
+- Field initializers are rejected — assign in a constructor. `delete` is
+  reserved but unused.
 
 What is being worked on next, and the known bugs, are in **[TODO.md](TODO.md)**.
 

@@ -117,10 +117,18 @@ public sealed partial class Binder
             diagnostics.Error("SL0281", entry.Span,
                 $"'Main' must return 'int' or 'void', not '{entry.ReturnType.Name}'");
 
-        if (entry.Parameters.Count > 0)
+        // `Main()` or `Main(String[] args)`, and nothing else. The second is
+        // how a program reads its command line; the name of the parameter is
+        // the program's business, the type is not.
+        if (entry.Parameters.Count > 1 ||
+            (entry.Parameters.Count == 1 && !IsStringArray(entry.Parameters[0].Type)))
             diagnostics.Error("SL0282", entry.Span,
-                "'Main' cannot take parameters yet");
+                "'Main' takes either nothing or 'String[]' -- the arguments the " +
+                "program was started with, without the program's own name");
 
         return entry;
     }
+
+    private bool IsStringArray(TypeSymbol type) =>
+        type is ArrayTypeSymbol array && _builtins.IsString(array.Element);
 }

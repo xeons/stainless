@@ -146,24 +146,53 @@ public sealed partial class LlvmEmitter
 
     private const string StaticInitializerName = "_SLstatics";
 
+    /// <summary>
+    /// The C entry point, which calls the program's.
+    ///
+    /// It always takes argc and argv, whether or not <c>Main</c> asked for
+    /// them: the arguments are handed to the runtime either way, so that
+    /// <c>Env.Program()</c> can name the executable in a program that declared
+    /// <c>Main()</c>. An unused parameter costs a register that the call
+    /// already had to leave alone.
+    /// </summary>
     private void EmitEntryPoint(FunctionSymbol entry)
     {
         _nextTemp = 0;
-        _module.AppendLine("define i32 @main() {");
+        _module.AppendLine("define i32 @main(i32 %argc, ptr %argv) {");
         _module.AppendLine("entry:");
+        _module.AppendLine("  call void @sl_args_set(i32 %argc, ptr %argv)");
 
-        // Statics first, in dependency order, before any user code runs.
+        // Statics first, in dependency order, before any user code runs. After
+        // the arguments, so that a static initializer may read them.
         if (_hasStatics) _module.AppendLine($"  call void @{StaticInitializerName}()");
+
+        // `Main(String[] args)`. The runtime builds the array, because the
+        // TypeInfo that says how to destroy it belongs to this module and a
+        // loop in the entry point is the last place to want one.
+        //
+        // Written out rather than through Emit(), which appends to whichever
+        // function body is open and there is none here.
+        string arguments = "";
+        if (entry.Parameters.Count == 1 && entry.Parameters[0].Type is ArrayTypeSymbol array)
+        {
+            _module.AppendLine(
+                $"  %args = call ptr @sl_args_array(ptr @{ArrayTypeInfoName(array)})");
+            arguments = "ptr %args";
+        }
 
         if (entry.ReturnType.IsVoid())
         {
-            _module.AppendLine($"  call void {Symbol(entry)}()");
+            _module.AppendLine($"  call void {Symbol(entry)}({arguments})");
+            if (arguments.Length > 0)
+                _module.AppendLine("  call void @sl_release(ptr %args)");
             _module.AppendLine("  ret i32 0");
         }
         else
         {
-            _module.AppendLine($"  %0 = call i32 {Symbol(entry)}()");
-            _module.AppendLine("  ret i32 %0");
+            _module.AppendLine($"  %code = call i32 {Symbol(entry)}({arguments})");
+            if (arguments.Length > 0)
+                _module.AppendLine("  call void @sl_release(ptr %args)");
+            _module.AppendLine("  ret i32 %code");
         }
 
         _module.AppendLine("}");

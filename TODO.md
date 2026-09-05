@@ -55,16 +55,6 @@ different.
 
 *Touches:* `Binder.DeclareFunction`.
 
-### `stainless run -- args` accepts arguments and drops them
-
-`Main` takes no arguments yet, so everything after `--` is parsed into a list
-that is then discarded. Accepting input and ignoring it is worse than refusing
-it. Either give `Main` an `String[]` overload or reject `--`.
-
-*Touches:* `Program.Build`.
-
----
-
 ## Next
 
 ### Calling conventions

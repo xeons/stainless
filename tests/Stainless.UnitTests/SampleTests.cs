@@ -64,6 +64,7 @@ public class SampleTests
         new("shapes", ["samples/shapes.sl"]),
         new("stress", ["samples/stress.sl"]),
         new("strings", ["samples/strings.sl"]),
+        new("wc", ["samples/wc.sl"]),
         new("interop", ["samples/interop/interop.sl"]),
 
         new("modules", ["samples/modules/App.sl", "samples/modules/Geometry.sl"]),

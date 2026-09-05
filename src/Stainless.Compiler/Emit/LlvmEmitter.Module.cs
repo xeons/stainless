@@ -199,6 +199,11 @@ public sealed partial class LlvmEmitter
         Declare("sl_array_alloc",
             "declare noalias ptr @sl_array_alloc(ptr, i64, i64) nounwind");
 
+        // The entry point hands the runtime what main() was given, and asks it
+        // back as a String[] when Main declared one.
+        Declare("sl_args_set", "declare void @sl_args_set(i32, ptr) nounwind");
+        Declare("sl_args_array", "declare noalias ptr @sl_args_array(ptr) nounwind");
+
         // Reads type tables, which are constants in this module or the
         // runtime's. Neither writes anything.
         Declare("sl_is_instance",

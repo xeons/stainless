@@ -350,6 +350,13 @@ public sealed class Builtins
             ("text", String));
         Function(Console, "WriteError", PrimitiveTypeSymbol.Void, "sl_console_write_error",
             ("text", String));
+
+        // One line without its terminator, and null at end of input -- a blank
+        // line and no line at all are different answers, and a loop that reads
+        // until there is nothing left needs to tell them apart.
+        Function(Console, "ReadLine", new OptionalTypeSymbol(String), "sl_console_read_line");
+        Function(Console, "ReadToEnd", String, "sl_console_read_all");
+        Function(Console, "AtEnd", PrimitiveTypeSymbol.Bool, "sl_console_at_end");
     }
 
     public bool IsString(TypeSymbol type) => ReferenceEquals(type, String);

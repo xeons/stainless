@@ -1,0 +1,4 @@
+hello from stdin
+
+line three
+line four
