@@ -779,7 +779,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 190 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 442 compiler unit tests
+dotnet test tests/Stainless.UnitTests           # 453 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -1400,25 +1400,32 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **The compiler prunes no dead code; the linker does.** Every stdlib module is
   compiled with your program whether or not it is imported, and only generics
   are free — an uninstantiated template emits nothing, but a non-generic
-  function or class is emitted either way. What saves it is that everything is
-  emitted into its own section and the linker discards what nothing reached,
-  which takes hello-world from 337 KB to 124 KB. That hello-world emits 481
-  standard-library functions and reaches *none* of them — it calls `puts` and
-  returns — so the linker is doing all of the work and the compiler none. The
-  IR is still the full size, so compile time still pays for all of it; a
-  reachability pass from `Main` would fix that and is the real answer.
+  function or class is emitted either way. What saves the binary is that
+  everything goes into its own section and the linker discards what nothing
+  reached: hello-world calls `puts` and returns, so it reaches *no* standard
+  library function at all, and the linker throws every one of them away.
 
-  The library has been measured three times now, and the same thing happened
-  each time. Text took it from 216 functions to 370 and the IR from 7,720 lines
-  to 17,071; sockets took it to 481 and 20,471. The stripped binary came out at
-  126,976 bytes on all three occasions — the same number, to the byte. The
-  linker's answer is free and the compiler's lack of one is not.
-- **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct
-  but redundant, and since the counts became atomic each redundant pair costs
-  about 5.7ns rather than about 1.2ns. A loop that does nothing but ARC traffic
-  runs roughly 3x slower than it did. The +0/+1 dataflow pass that removes the
-  pair around a borrow was a nicety before and is the obvious next piece of work
-  now.
+  The compile is what nothing saves. The IR is the full size however little of
+  it is used, so every build pays to emit and optimise the whole library, and
+  each thing added to the library is added to every program that never mentions
+  it. A reachability pass from `Main` is the real answer, and the fact that the
+  stripped binary comes out identical however much the library grows is the
+  measure of how completely the compiler is leaving the job to the linker.
+- **Unoptimized ARC.** Retain/release traffic is correct but redundant, and a
+  redundant pair costs more since the counts became atomic. The +0/+1 dataflow
+  pass that removes the pair around a borrow is the fix.
+
+  Worth knowing how much is actually at stake, because the obvious measurement
+  overstates it. Counting `sl_retain` and `sl_release` in a module is not
+  counting what runs: nearly all of them are in library functions the program
+  never calls, so that number is really about the missing reachability pass
+  above. **A read through a reference already borrows** — `cells[i].Value` in a
+  loop emits no reference counting at all — so what is left to remove is
+  narrower than it looks. The runtime declarations now tell LLVM what is true
+  of each entry point (`sl_retain` touches only the object's header;
+  `sl_release` may run any destructor and so promises nothing; the failure
+  paths do not return), which is worth having for its own sake and measurably
+  changes nothing. Only the +0/+1 pass will.
 - **The remaining thread-safety gaps are about lifetimes.** What crosses a
   thread is checked by type, so an unsynchronized class cannot reach a second
   thread at all. What is unchecked is how long a borrowed thing lives: a

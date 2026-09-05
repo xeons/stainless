@@ -127,15 +127,62 @@ public sealed partial class LlvmEmitter
         _module.AppendLine(signature);
     }
 
+    /// <summary>
+    /// What the optimiser is allowed to assume about a runtime call.
+    ///
+    /// A bare <c>declare</c> is the most pessimistic thing LLVM can be told: a
+    /// call that may unwind, may not return, and may read and write every byte
+    /// the program can reach. Every reference-counting call is therefore a
+    /// barrier -- a load cannot move across one, a loop containing one cannot
+    /// be vectorised -- and hello-world makes 844 of them.
+    ///
+    /// These say what is actually true, and no more than that. Each is read off
+    /// <c>runtime/arc.c</c> rather than assumed, because an attribute that
+    /// overstates is not a missed optimisation but a miscompilation:
+    ///
+    /// <list type="bullet">
+    /// <item><c>nounwind</c> everywhere: the language has no unwinding at all.
+    /// A failure aborts through <c>sl_fail</c>.</item>
+    /// <item><c>memory(argmem: readwrite)</c> only where the body provably
+    /// touches nothing but the header of the object it was handed.</item>
+    /// <item><c>noalias</c> on the allocators, which return fresh
+    /// <c>calloc</c> memory that by definition aliases nothing.</item>
+    /// </list>
+    ///
+    /// The two that look like they belong here and do not:
+    /// <c>sl_release</c> runs <c>type->destroy</c>, an arbitrary user
+    /// destructor that may touch anything and call anything, and the COM pair
+    /// makes an indirect call into foreign code. Giving either a memory clause
+    /// would be wrong, so neither has one.
+    /// </summary>
+    private const string HeaderOnly = "nounwind willreturn memory(argmem: readwrite)";
+
     private void RuntimeDeclarations()
     {
-        Declare("sl_alloc", "declare ptr @sl_alloc(ptr)");
-        Declare("sl_retain", "declare void @sl_retain(ptr)");
-        Declare("sl_release", "declare void @sl_release(ptr)");
-        Declare("sl_make_immortal", "declare void @sl_make_immortal(ptr)");
-        Declare("sl_weak_retain", "declare void @sl_weak_retain(ptr)");
-        Declare("sl_weak_release", "declare void @sl_weak_release(ptr)");
-        Declare("sl_weak_load", "declare ptr @sl_weak_load(ptr)");
+        // Fresh memory from calloc: noalias is what makes it worth saying.
+        // Not `willreturn` -- both abort through sl_fail when they cannot
+        // allocate, and sl_fail does not come back.
+        Declare("sl_alloc", "declare noalias ptr @sl_alloc(ptr) nounwind");
+
+        Declare("sl_retain", $"declare void @sl_retain(ptr) {HeaderOnly}");
+
+        // No memory clause: this is the one that runs a destructor.
+        Declare("sl_release", "declare void @sl_release(ptr) nounwind");
+
+        Declare("sl_make_immortal", $"declare void @sl_make_immortal(ptr) {HeaderOnly}");
+        Declare("sl_weak_retain", $"declare void @sl_weak_retain(ptr) {HeaderOnly}");
+
+        // free() touches the allocator's own bookkeeping, which is reachable
+        // from neither the argument nor a global -- that is what
+        // inaccessiblemem names. It still touches nothing else.
+        Declare("sl_weak_release",
+            "declare void @sl_weak_release(ptr) nounwind willreturn " +
+            "memory(argmem: readwrite, inaccessiblemem: readwrite)");
+
+        // The header and nothing else, but through a compare-exchange loop, so
+        // `willreturn` is left off: it retries until it wins.
+        Declare("sl_weak_load",
+            "declare ptr @sl_weak_load(ptr) nounwind memory(argmem: readwrite)");
         // The runtime's own tables. When it is a shared library on Windows
         // these are reached through the import address table, and only the
         // declaration can say so.
@@ -149,23 +196,40 @@ public sealed partial class LlvmEmitter
             $"@sl_utf16_string_type_info = {runtimeConstant} %SlTypeInfo");
         Declare("sl_string_builder_type_info",
             $"@sl_string_builder_type_info = {runtimeConstant} %SlTypeInfo");
-        Declare("sl_array_alloc", "declare ptr @sl_array_alloc(ptr, i64, i64)");
-        Declare("sl_is_instance", "declare i32 @sl_is_instance(ptr, ptr)");
-        Declare("sl_implements", "declare i32 @sl_implements(ptr, i64)");
-        Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr)");
+        Declare("sl_array_alloc",
+            "declare noalias ptr @sl_array_alloc(ptr, i64, i64) nounwind");
+
+        // Reads type tables, which are constants in this module or the
+        // runtime's. Neither writes anything.
+        Declare("sl_is_instance",
+            "declare i32 @sl_is_instance(ptr, ptr) nounwind willreturn memory(read)");
+        Declare("sl_implements",
+            "declare i32 @sl_implements(ptr, i64) nounwind willreturn memory(read)");
+
+        // Ends the program, so the block after a call to one is unreachable and
+        // LLVM may say so.
+        Declare("sl_cast_failed", "declare void @sl_cast_failed(ptr, ptr) noreturn nounwind");
         Declare("sl_com_retain", "declare void @sl_com_retain(ptr)");
         Declare("sl_com_release", "declare void @sl_com_release(ptr)");
         Declare("sl_com_query", "declare ptr @sl_com_query(ptr, ptr)");
         Declare("sl_com_is", "declare i32 @sl_com_is(ptr, ptr)");
-        Declare("sl_com_cast_failed", "declare void @sl_com_cast_failed(ptr, ptr)");
+        Declare("sl_com_cast_failed",
+            "declare void @sl_com_cast_failed(ptr, ptr) noreturn nounwind");
         Declare("sl_com_object_query",
             "declare i32 @sl_com_object_query(ptr, ptr, ptr)");
         Declare("sl_com_object_add_ref", "declare i32 @sl_com_object_add_ref(ptr)");
         Declare("sl_com_object_release", "declare i32 @sl_com_object_release(ptr)");
-        Declare("sl_array_bounds_fail", "declare void @sl_array_bounds_fail(i64, i64)");
-        Declare("sl_slice_bounds_fail", "declare void @sl_slice_bounds_fail(i64, i64, i64)");
-        Declare("sl_divide_by_zero", "declare void @sl_divide_by_zero()");
-        Declare("sl_divide_overflow", "declare void @sl_divide_overflow()");
+        // Every one of these ends in sl_fail, which ends in abort. Saying so is
+        // what makes a bounds check's failure arm genuinely cold: the success
+        // path stops being a branch that might come back.
+        Declare("sl_array_bounds_fail",
+            "declare void @sl_array_bounds_fail(i64, i64) noreturn nounwind");
+        Declare("sl_slice_bounds_fail",
+            "declare void @sl_slice_bounds_fail(i64, i64, i64) noreturn nounwind");
+        Declare("sl_divide_by_zero",
+            "declare void @sl_divide_by_zero() noreturn nounwind");
+        Declare("sl_divide_overflow",
+            "declare void @sl_divide_overflow() noreturn nounwind");
         Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
 
         // Up here rather than at its first use: a declaration goes straight into

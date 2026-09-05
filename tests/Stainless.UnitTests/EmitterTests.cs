@@ -398,6 +398,9 @@ public class EmitterTests
     /// <summary>
     /// A shared library declares the runtime it calls rather than defining it,
     /// and every declaration is written once however many places call it.
+    ///
+    /// Matched on the symbol rather than the whole prefix: a declaration
+    /// carries attributes now, and this test is about how many there are.
     /// </summary>
     [Fact]
     public void RuntimeFunctionsAreDeclaredOnce()
@@ -409,9 +412,64 @@ public class EmitterTests
             public void G() { var c = new C(); }
             """);
 
-        Assert.Single(Lines(ir, "declare void @sl_retain("));
-        Assert.Single(Lines(ir, "declare ptr @sl_alloc("));
+        Assert.Single(Declarations(ir, "sl_retain"));
+        Assert.Single(Declarations(ir, "sl_alloc"));
     }
+
+    /// <summary>
+    /// What the optimiser is told about the runtime.
+    ///
+    /// A bare <c>declare</c> is the most pessimistic thing LLVM can be handed:
+    /// a call that may unwind, may not return, and may touch every byte the
+    /// program can reach. These say what is true instead -- and the two that
+    /// are deliberately left pessimistic are the point of the test, because
+    /// claiming otherwise about either would be a miscompilation rather than a
+    /// missed optimisation.
+    /// </summary>
+    [Theory]
+    // Provably nothing but the header of the object it was handed.
+    [InlineData("sl_retain", "memory(argmem: readwrite)")]
+    [InlineData("sl_weak_retain", "memory(argmem: readwrite)")]
+    [InlineData("sl_make_immortal", "memory(argmem: readwrite)")]
+    // Fresh calloc memory, so it aliases nothing.
+    [InlineData("sl_alloc", "noalias")]
+    [InlineData("sl_array_alloc", "noalias")]
+    // Reads type tables and writes nothing.
+    [InlineData("sl_is_instance", "memory(read)")]
+    // Ends in sl_fail, which ends in abort.
+    [InlineData("sl_array_bounds_fail", "noreturn")]
+    [InlineData("sl_divide_by_zero", "noreturn")]
+    public void ARuntimeDeclarationSaysWhatIsTrueOfIt(string symbol, string attribute)
+    {
+        string ir = Front.ModuleIr("public class C { }\npublic void F() { var a = new C(); }");
+        Assert.Contains(attribute, Assert.Single(Declarations(ir, symbol)));
+    }
+
+    /// <summary>
+    /// <c>sl_release</c> runs <c>type->destroy</c> -- an arbitrary user
+    /// destructor, which may touch anything and call anything -- so it gets
+    /// <c>nounwind</c> and no memory clause at all. The COM pair makes an
+    /// indirect call into foreign code and gets neither.
+    /// </summary>
+    [Theory]
+    [InlineData("sl_release")]
+    [InlineData("sl_com_release")]
+    [InlineData("sl_com_retain")]
+    public void ACallThatMayRunAnythingClaimsNothingAboutMemory(string symbol)
+    {
+        // Every runtime entry point is declared whether or not this module
+        // reaches it, so one class is enough to get all three.
+        string ir = Front.ModuleIr("public class C { }\npublic void F() { var a = new C(); }");
+
+        Assert.DoesNotContain("memory(", Assert.Single(Declarations(ir, symbol)));
+    }
+
+    /// <summary>Declarations of one runtime symbol, however they are spelled.</summary>
+    private static List<string> Declarations(string ir, string symbol) =>
+        ir.Split('\n')
+            .Where(l => l.StartsWith("declare ", StringComparison.Ordinal) &&
+                        l.Contains("@" + symbol + "(", StringComparison.Ordinal))
+            .ToList();
 
     /// <summary>
     /// The module names no target.

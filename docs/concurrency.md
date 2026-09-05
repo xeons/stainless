@@ -25,12 +25,12 @@ threads ever touch one, and as of step 6 that is checked rather than trusted.
 > List is not `[Shared]`; what would have to be atomic is everything reachable
 > from a shared type.
 >
-> So all counts are atomic, measured at about 5.7ns per retain/release pair over
-> the plain version, and roughly 3x on a program that does nothing but ARC
-> traffic. Most of that traffic should not exist: retain/release around a borrow
-> is redundant, and the +0/+1 pass that removes it is now the thing worth
-> building. **Everything below about what may cross a thread still stands** — it
-> is about races on an object's *contents*, which no counting scheme fixes.
+> So all counts are atomic. An atomic pair costs more than a plain one, and the
+> difference shows up only on a program dominated by reference traffic — which
+> is the argument for the +0/+1 pass that removes the pair around a borrow,
+> since traffic that is not emitted costs nothing at either price.
+> **Everything below about what may cross a thread still stands** — it is about
+> races on an object's *contents*, which no counting scheme fixes.
 
 ---
 
@@ -374,9 +374,9 @@ parallel for (int i = 0; i < pixels.Length; i = i + 1) {
 }
 ```
 
-Implemented, and the first thing here that pays for itself: on 31 workers this
-runs about 18x faster than the same loop written serially, with identical
-results.
+Implemented, and the first thing here that pays for itself: on a machine with
+cores to spare it runs close to an order of magnitude faster than the same loop
+written serially, with identical results.
 
 The loop must be a **counted** one — `i = start`, `i < limit` or `i <= limit`,
 `i = i + stride` with a positive literal stride. A general C-style `for` has no
@@ -521,12 +521,12 @@ made here.
 > the heap — and the type can be laundered anyway, since a job takes its
 > argument as a `byte*`.
 >
-> So every count is atomic. Reproduced first: sixteen threads returning
-> `guard.Value()` out of the lock crashed about one run in six, and does not in
-> twenty-five since. Measured: 1.45ns to 7.11ns per retain/release pair in
-> isolation, and 110ms to 320ms on a loop that does nothing else. The bill lands
-> on redundant traffic the compiler should not emit, which makes the +0/+1 pass
-> the next thing worth building rather than a nicety.
+> So every count is atomic. Reproduced before it was fixed, which is the part
+> worth recording: sixteen threads returning `guard.Value()` out of the lock
+> crashed about one run in six, and has not crashed in the twenty-five runs
+> since. An atomic pair costs more than a plain one, and the bill lands on
+> redundant traffic the compiler should not be emitting — which makes the +0/+1
+> pass the next thing worth building rather than a nicety.
 
 The two already known: a `Guard` can outlive its lock (§4.2), and a job could
 retain a plain-data array it was only lent (§1.3). Both are lifetime questions
@@ -540,7 +540,7 @@ Order of work, each step useful on its own:
    syntax: generic classes, destructors and delegates were enough.
 3. ~~`spawn` / `parallel` with a lexical join (§2).~~ Done. Results land in the
    parent's locals; the closing brace is the synchronization.
-4. ~~`parallel for` over plain data (§6).~~ Done, and about 18x on 31 workers.
+4. ~~`parallel for` over plain data (§6).~~ Done, and it scales.
 5. ~~Statics, tiers 1 and 2, with topological initialization (§3).~~ Done, as
    `static readonly`.
 6. ~~The sendability analysis (§1.3).~~ Done at the three boundaries. It did
@@ -556,9 +556,18 @@ Order of work, each step useful on its own:
 What is still open, in the order it is worth doing:
 
 1. **The +0/+1 dataflow pass.** A retain/release pair around a borrow is
-   redundant, and since the counts became atomic each redundant pair costs about
-   5.7ns rather than about 1.2ns. This was a nicety and is now the obvious next
-   piece of work.
+   redundant, and an atomic pair is dearer than the plain one it replaced. This
+   was a nicety and is now the obvious next piece of work.
+
+   Two things narrow the target, and both are worth knowing before anyone
+   estimates the payoff. **Reading through a reference already borrows** — a
+   field or property read in a loop emits no counting at all — so the
+   redundancy that remains is in handing references *around*, not in using
+   them. And counting `sl_retain`/`sl_release` in a module counts mostly calls
+   in library functions the program never invokes, which is a fact about the
+   missing reachability pass rather than about ARC. The runtime declarations
+   now carry accurate LLVM attributes, which lets the optimiser work around the
+   calls that remain and, measured, changes nothing on its own.
 2. **Lifetimes.** A `Guard` can outlive the lock it proves (§4.2), and a job can
    retain a plain-data array it was only lent (§1.3). Both are questions about
    how long a borrowed thing lives, which sendability — a rule about types —

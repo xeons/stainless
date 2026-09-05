@@ -203,20 +203,25 @@ and needs a lifetime story the language does not have.
 ### A reachability pass from `Main`
 
 The standard library is compiled with every program and nothing prunes it. A
-hello-world that calls `puts` and returns emits **481 standard-library
-functions and reaches none of them**, in 20,471 lines of IR.
+hello-world that calls `puts` and returns emits **every standard-library
+function and reaches none of them**.
 
 What saves the binary is the linker: every function goes in a section of its
-own and the ones nothing reached are dropped, which takes that hello-world from
-337 KB to 124 KB. What nothing saves is the compile, which pays for all of it —
-binding, emitting and then handing clang twice the text it needs.
+own and the ones nothing reached are dropped. What nothing saves is the
+compile, which pays for all of it — binding, emitting, and then handing clang
+several times the text it needs.
 
 Writing the library in Stainless is what made this worth doing rather than
-worth noting, and it has now been measured three times. The text library took
-the count from 216 functions to 370 and the IR from 7,720 lines to 17,071; the
-sockets took it to 481 and 20,471. The stripped binary came out at 126,976
-bytes on every one of the three occasions -- the same number, to the byte, as
-before any of it existed. The end-to-end suite went from 28 seconds to 52.
+worth noting. Every addition since — text, then sockets, then threading — has
+grown what a program that uses none of it must compile, and the stripped binary
+has come out the same size each time. The suite has roughly doubled in wall
+time over those three. The linker's answer is free; the compiler's lack of one
+is what the build is paying for.
+
+It is also the honest explanation for a number that gets quoted about ARC:
+counting `sl_retain`/`sl_release` in a module counts mostly calls in functions
+nothing invokes. Fixing this shrinks that count without touching a single
+instruction the program executes.
 
 The walk is from `Main`, plus every `export "C"`, every static initializer, and
 everything a dispatch table names — a virtual table, an interface table, a COM
