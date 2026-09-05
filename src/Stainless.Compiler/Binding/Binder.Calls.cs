@@ -92,22 +92,16 @@ public sealed partial class Binder
 
         if (syntax.Callee is NameSyntax callee)
         {
-            var candidates = ResolveFunctionCandidates(callee.Name);
-
-            // An instantiation of a generic is an ordinary function with an
-            // ordinary name, so it turns up here beside everything else. It must
-            // not shadow the template it came from: `Sort(list)` instantiating
-            // `Sort<Money>` cannot be what a later `Sort(numbers[2:5])` resolves
-            // to. So the templates are tried whenever nothing already built fits.
-            if (candidates.Any(c => AcceptsArguments(c, arguments)))
-                return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
-
-            if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic) return generic;
-
-            if (candidates.Count > 0)
-                return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
-
             // A method of the enclosing type, called without a receiver.
+            //
+            // First, because inside a type a bare name means that type's
+            // member. It used to be last, which made every public function in
+            // every imported module a chance to take the call instead -- and
+            // `Standard.Text` is imported whether a program asks or not, so a
+            // function added there could quietly capture a method call in code
+            // that had never heard of it. A method that does not accept these
+            // arguments is still an error about the method, not a licence to go
+            // looking for something else with the same name.
             if (callee.Name.Parts.Count == 1 &&
                 _currentFunction?.ContainingType?.FindMethods(callee.Name.Text).ToList() is
                     { Count: > 0 } own)
@@ -130,6 +124,21 @@ public sealed partial class Binder
                     return BuildCall(syntax, method, receiver, arguments);
                 }
             }
+
+            var candidates = ResolveFunctionCandidates(callee.Name);
+
+            // An instantiation of a generic is an ordinary function with an
+            // ordinary name, so it turns up here beside everything else. It must
+            // not shadow the template it came from: `Sort(list)` instantiating
+            // `Sort<Money>` cannot be what a later `Sort(numbers[2:5])` resolves
+            // to. So the templates are tried whenever nothing already built fits.
+            if (candidates.Any(c => AcceptsArguments(c, arguments)))
+                return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
+
+            if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic) return generic;
+
+            if (candidates.Count > 0)
+                return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
 
             if (callee.Name.Parts.Count == 1 && _currentFunction?.ContainingType is { } enclosing)
             {

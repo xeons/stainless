@@ -777,8 +777,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 182 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 379 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 185 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 387 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -1111,6 +1111,22 @@ Everything below is covered by [the test suite](tests/cases).
   back with `ToText()` or, from a buffer a platform API filled, with
   `Text.FromUtf16`; anything malformed becomes U+FFFD in both directions, so a
   `String` is UTF-8 by invariant
+- A string API to go with it: `StartsWith`, `Contains`, `IndexOf`,
+  `LastIndexOf`, `Substring`, `Before`/`After`/`AfterLast`, `Trim`, `Replace`,
+  `Repeat`, `PadLeft`/`PadRight`, `Split`, `SplitLines`, `Join`, `CompareTo`,
+  the ASCII case pair, and `CodePointAt`/`NextCodePoint` for walking the text
+  properly. All of it written in Stainless rather than C, because a type may be
+  declared more than once inside its own module and `String`'s second
+  declaration is `stdlib/Text.sl` — which is also why `Split` can return a
+  `String[]` when the runtime cannot allocate one
+- A type may span declarations, the way a module already spans files. The first
+  says what the type is — its kind, its fields, what it derives from — and a
+  later one adds behaviour and nothing else. No `partial` keyword, because
+  there is nothing for it to prevent
+- `StringBuilder`: appending, reading (`ByteAt`, `IndexOf`) and editing
+  (`Insert`, `Remove`, `Truncate`, `ReplaceAll`). It hands out no pointer,
+  unlike `String`: its bytes move as it grows, so one would dangle at the next
+  append
 - `char`, `char16` and `char32`: one UTF-8 code unit, one UTF-16 code unit and
   one Unicode scalar. Three encodings rather than three widths, so none becomes
   another without a cast, and a character literal is one scalar that takes the
@@ -1207,7 +1223,8 @@ Everything below is covered by [the test suite](tests/cases).
   directory listing, and textual path handling. Failure is a returned value —
   a `Result<T, IOError>`, or a bare `IOError` where nothing is produced. Paths
   are UTF-8 and are widened to UTF-16 before they reach Windows
-- `Standard.Text` (imported everywhere), `Standard.Console`, `Standard.Reflection`
+- `Standard.Text` (imported everywhere), `Standard.Ascii`, `Standard.Console`,
+  `Standard.Reflection`
 - Raw pointers, `sizeof`, `alignof`, `offsetof`, `typeof`, casts, `new`, `this`.
   The three layout questions answer exactly what C's do, which is how a binding
   checks itself against a header; `offsetof` on a class counts from the
@@ -1290,9 +1307,17 @@ Being straight about the edges, roughly in the order they are worth adding:
   cost a reference count per copy and keep a large array alive for a small view
   of it. A raw `(pointer, length)` view would do neither, and would need a
   lifetime story the language does not have.
-- **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
-  formatting; `Substring` counts bytes, not characters, so it can slice a
-  multi-byte character in half.
+- **Case mapping is ASCII only.** `ToUpperAscii` and `ToLowerAscii` map A–Z
+  and leave every other byte alone, and say so in their names. Full Unicode
+  case mapping is a table of several thousand entries with locale exceptions,
+  and the runtime has no room for it yet. There is also no collation: strings
+  order by their bytes, which happens to order by code point and does not
+  resemble any language's idea of alphabetical.
+- **`String` positions are byte offsets.** That is what makes length O(1), and
+  every position the library produces lands on a character boundary because it
+  came from matching whole text. A position a caller invents is its own
+  business: `Substring(1, 1)` on a multi-byte character will slice it in half.
+  `CodePointAt` and `NextCodePoint` are the way to walk the text properly.
 - **Flow narrowing does not reach a field.** `if (x != null)` makes `x` usable
   as a `C` (§2.5), on the same terms a variant is narrowed — but only for a
   local or a parameter, because a field or a call result may be a different
@@ -1326,11 +1351,17 @@ Being straight about the edges, roughly in the order they are worth adding:
   are free — an uninstantiated template emits nothing, but a non-generic
   function or class is emitted either way. What saves it is that everything is
   emitted into its own section and the linker discards what nothing reached,
-  which takes hello-world from 294 KB to 124 KB. That hello-world emits 216
+  which takes hello-world from 300 KB to 124 KB. That hello-world emits 286
   standard-library functions and reaches *none* of them — it calls `puts` and
   returns — so the linker is doing all of the work and the compiler none. The
   IR is still the full size, so compile time still pays for all of it; a
   reachability pass from `Main` would fix that and is the real answer.
+
+  Writing `String`'s API in Stainless made the case for one sharper. It added
+  70 functions to that count and half again as much IR — 7,720 lines to 11,587
+  — for a program that calls none of them, and the stripped binary came out
+  byte for byte the size it was before. The linker's answer was free and the
+  compiler's cost was not.
 - **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct
   but redundant, and since the counts became atomic each redundant pair costs
   about 5.7ns rather than about 1.2ns. A loop that does nothing but ARC traffic

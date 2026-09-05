@@ -1,0 +1,46 @@
+appended count=42 ok=true
+scalars aé€😀
+scalar-bytes 10
+scalar-points 4
+lone-surrogate 65533
+joined one, two, three
+byte-at 104
+index-of 6
+index-missing -1
+contains true
+has-content true
+inserted hello, world
+removed  world
+truncated  wo
+replaced-all 2
+replaced 1 two 1 two
+grow-count 3
+grow aaaaaa
+replaced-first true
+first x+x-x
+set-byte bat
+utf16-units 3
+utf16-empty false
+utf16-unit-at 97
+utf16-point 233
+utf16-round-trip aé€
+pair-units 2
+pair-point 128512
+pair-next 2
+utf16-equals true
+utf16-differs false
+utf16-bytes 4
+utf16-byte-0 97
+utf16-byte-1 0
+digit true
+digit-no false
+letter true
+hex true
+space true
+control true
+upper 65
+lower 97
+hex-value 14
+hex-value-no -1
+hex-digit 98
+hex-digit-upper 66

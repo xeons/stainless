@@ -122,6 +122,58 @@ void sl_string_builder_clear(void *pointer)
     ((SlStringBuilder *)pointer)->length = 0;
 }
 
+/*
+ * Reading and editing what has been built.
+ *
+ * The bytes are a growable allocation that moves, so nothing here hands one
+ * out: a `byte*` into a builder would dangle at the next append, which is the
+ * one thing String's own pointer can never do. A call per byte is the price,
+ * and a builder is not where a program spends its time reading.
+ */
+uint8_t sl_string_builder_byte_at(void *pointer, size_t index)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)pointer;
+    if (index >= builder->length) sl_array_bounds_fail(index, builder->length);
+    return builder->bytes[index];
+}
+
+void sl_string_builder_set_byte_at(void *pointer, size_t index, uint8_t value)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)pointer;
+    if (index >= builder->length) sl_array_bounds_fail(index, builder->length);
+    builder->bytes[index] = value;
+}
+
+/* Inserting at the length is appending, which is why `at == length` is legal. */
+void sl_string_builder_insert(void *pointer, size_t at, void *stringPointer)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)pointer;
+    SlString *string = (SlString *)stringPointer;
+
+    if (string == NULL || string->byteLength == 0) return;
+    if (at > builder->length) sl_array_bounds_fail(at, builder->length + 1);
+
+    size_t count = string->byteLength;
+    sl_string_builder_reserve(builder, count);
+
+    memmove(builder->bytes + at + count, builder->bytes + at, builder->length - at);
+    memcpy(builder->bytes + at, sl_string_data(string), count);
+    builder->length += count;
+}
+
+/* Removing more than is there removes to the end rather than failing. */
+void sl_string_builder_remove(void *pointer, size_t at, size_t count)
+{
+    SlStringBuilder *builder = (SlStringBuilder *)pointer;
+
+    if (at >= builder->length || count == 0) return;
+    if (count > builder->length - at) count = builder->length - at;
+
+    memmove(builder->bytes + at, builder->bytes + at + count,
+            builder->length - at - count);
+    builder->length -= count;
+}
+
 /* Snapshots the builder; the builder stays usable afterwards. */
 void *sl_string_builder_to_string(void *pointer)
 {

@@ -212,9 +212,15 @@ public class BinderTests
 
     // ------------------------------------------------------- declarations
 
+    /// <summary>
+    /// A redeclared name underlines the second one. Not a type: a type may now
+    /// be declared more than once inside its own module, and the second
+    /// declaration adds to the first rather than colliding with it.
+    /// </summary>
     [Fact]
-    public void ADuplicateTypeUnderlinesTheSecond() =>
-        Assert.Equal(("SL0201", "class C { }"), OneInModule("class C { }\nclass C { }"));
+    public void ADuplicateNameUnderlinesTheSecond() =>
+        Assert.Equal(("SL0201", "public const int X = 2;"),
+                     OneInModule("public const int X = 1;\npublic const int X = 2;"));
 
     /// <summary>
     /// A class that claims an interface must supply it, and the diagnostic
@@ -251,6 +257,112 @@ public class BinderTests
     public void PrivateIsPrivateToTheModule() =>
         Assert.Empty(Front.ModuleCodes(
             "class C { private int x; }\npublic int G() { var c = new C(); return c.x; }"));
+
+    // ------------------------------------------- declaring a type more than once
+
+    /// <summary>
+    /// A type may be declared again inside its own module, and the second
+    /// declaration adds to the first.
+    /// </summary>
+    [Fact]
+    public void ASecondDeclarationAddsMembers()
+    {
+        var program = Front.BindModule(
+            """
+            public class Shape { public int Sides; }
+            public class Shape { public int Corners() { return Sides; } }
+            public int Use() { var s = new Shape(); return s.Corners(); }
+            """, out var diagnostics);
+
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.Single(program.Classes, c => c.Name == "Shape");
+    }
+
+    /// <summary>
+    /// Which is what lets the standard library write the rest of `String` in
+    /// Stainless: the compiler creates the symbol, and `stdlib/Text.sl`
+    /// declares it a second time.
+    /// </summary>
+    [Fact]
+    public void StringHasMembersFromBothItsDeclarations()
+    {
+        // ByteLength is intrinsic; Trim is written in Stainless.
+        Assert.Empty(Front.BodyCodes("var n = \"  x \".Trim().ByteLength();"));
+    }
+
+    /// <summary>
+    /// A field in a later declaration would move a layout that has already been
+    /// settled -- and for an intrinsic, settled by the runtime.
+    /// </summary>
+    [Fact]
+    public void ASecondDeclarationMayNotAddAField() =>
+        Assert.Equal(["SL0552"], Front.ModuleCodes(
+            "public class C { public int A; }" +
+            "\npublic class C { public int B; }"));
+
+    /// <summary>
+    /// Nor a base list: pass 5 builds the dispatch tables from the first
+    /// declaration, so one arriving later would arrive after they were built.
+    /// </summary>
+    [Fact]
+    public void ASecondDeclarationMayNotNameABase() =>
+        Assert.Equal(["SL0551"], Front.ModuleCodes(
+            """
+            public interface I { void F(); }
+            public class C { public void F() { } }
+            public class C : I { }
+            """));
+
+    /// <summary>And every declaration must agree about what it is.</summary>
+    [Fact]
+    public void EveryDeclarationMustAgreeAboutTheKind() =>
+        Assert.Equal(["SL0550"], Front.ModuleCodes(
+            "public class C { }\npublic struct C { }"));
+
+    /// <summary>
+    /// A generic is a template rather than a type, and two of them are still
+    /// the ordinary duplicate.
+    /// </summary>
+    [Fact]
+    public void TwoGenericTemplatesAreStillADuplicate() =>
+        Assert.Equal(["SL0201"], Front.ModuleCodes(
+            "public class Box<T> { T v; }" +
+            "\npublic class Box<T> { T w; }"));
+
+    // ---------------------------------------------- a name inside a type
+
+    /// <summary>
+    /// A bare call inside a type means that type's member, even when a module
+    /// in scope has a function of the same name.
+    ///
+    /// It used not to: module functions were resolved first, and
+    /// `Standard.Text` is imported into every module whether a program asks or
+    /// not -- so adding a `Join` to the standard library was enough to capture
+    /// `TaskScope`'s call to its own `Join()`.
+    /// </summary>
+    [Fact]
+    public void AMemberWinsOverAModuleFunctionOfTheSameName() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            public int Helper(int a, int b) { return a + b; }
+            public class C {
+                public int Helper() { return 7; }
+                public int Use() { return Helper(); }
+            }
+            """));
+
+    /// <summary>
+    /// And a module-level function still finds the module-level one, because
+    /// there is no receiver for a member to be found on.
+    /// </summary>
+    [Fact]
+    public void AModuleFunctionStillReachesItsOwnKind() =>
+        Assert.Empty(Front.ModuleCodes(
+            """
+            public int Helper(int a, int b) { return a + b; }
+            public class C { public int Helper() { return 7; } }
+            public int Use() { return Helper(1, 2); }
+            """));
 
     // ------------------------------------------------------------ the program
 

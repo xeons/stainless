@@ -46,7 +46,7 @@ public sealed partial class Binder
 
         if (!inProgress.Add(type))
         {
-            diagnostics.Error("SL0216", default,
+            diagnostics.Error("SL0216", type.Span ?? default,
                 $"struct '{type.QualifiedName}' contains itself, so it has no finite size");
             type.SetLayout(0, 1);
             return;

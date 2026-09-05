@@ -107,6 +107,15 @@ public sealed partial class Binder(
     /// <summary>The type arguments in force while binding inside an instantiation.</summary>
     private Dictionary<string, TypeSymbol> _substitution = new(StringComparer.Ordinal);
     private readonly Dictionary<NamedTypeSymbol, (TypeDeclSyntax Declaration, FileScope Scope)> _typeSyntax = [];
+
+    /// <summary>
+    /// Declarations that add to a type already declared in the same module.
+    ///
+    /// Held by identity rather than by name: the point of the set is to tell
+    /// one <em>declaration</em> from another of the same type, which is what
+    /// decides whether a field in it is allowed.
+    /// </summary>
+    private readonly HashSet<TypeDeclSyntax> _additionalParts = [];
     private readonly Dictionary<EnumTypeSymbol, (EnumDeclSyntax Declaration, FileScope Scope)> _enumSyntax = [];
     private readonly Dictionary<DelegateTypeSymbol, (DelegateDeclSyntax Declaration, FileScope Scope)> _delegateSyntax = [];
     private readonly Dictionary<StaticSymbol, (StaticDeclSyntax Declaration, FileScope Scope)> _staticSyntax = [];

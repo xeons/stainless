@@ -1,0 +1,58 @@
+starts true
+starts-no false
+starts-empty true
+ends true
+ends-no false
+contains true
+contains-no false
+contains-char true
+index 1
+index-from 4
+index-none -1
+last-index 4
+index-char 2
+last-char 5
+index-empty 0
+index-utf8 7
+substring world
+substring-past 
+before key
+after value
+before-none keyvalue
+after-none 
+after-last c
+trim [padded]
+trim-start [padded  ]
+trim-end [  padded]
+trim-none [tight]
+trim-all []
+replace 1 two 1
+replace-grow aaaaaa
+replace-none abc
+repeat ababab
+repeat-zero []
+pad-left [   7]
+pad-right [7   ]
+pad-wide [seven]
+split a|b|c
+split-empty-parts a||b
+split-string a|b|c
+split-none abc
+join-empty []
+lines 3
+lines-joined one|two|three
+upper HELLO, WORLD!
+lower hello, world!
+upper-utf8 HéLLO
+equals-ci true
+equals-ci-no false
+compare-lt -1
+compare-gt 1
+compare-eq 0
+compare-prefix -1
+bytes 6
+points 3
+walked 97 233 8364
+byte-at 97
+to-bytes 3
+to-bytes-first 97

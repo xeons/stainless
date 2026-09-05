@@ -422,6 +422,10 @@ SL_API void   sl_string_builder_append_double(void *pointer, double value);
 SL_API size_t sl_string_builder_byte_length(void *pointer);
 SL_API _Bool  sl_string_builder_is_empty(void *pointer);
 SL_API void   sl_string_builder_clear(void *pointer);
+SL_API uint8_t sl_string_builder_byte_at(void *pointer, size_t index);
+SL_API void   sl_string_builder_set_byte_at(void *pointer, size_t index, uint8_t value);
+SL_API void   sl_string_builder_insert(void *pointer, size_t at, void *stringPointer);
+SL_API void   sl_string_builder_remove(void *pointer, size_t at, size_t count);
 SL_API void  *sl_string_builder_to_string(void *pointer);
 
 /* ------------------------------------------------------------------ Array */

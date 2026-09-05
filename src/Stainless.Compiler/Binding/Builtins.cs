@@ -228,6 +228,21 @@ public sealed class Builtins
             "sl_string_builder_byte_length");
         Method(StringBuilder, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_builder_is_empty");
         Method(StringBuilder, "Clear", PrimitiveTypeSymbol.Void, "sl_string_builder_clear");
+
+        // Reading and editing what is already there. A builder's bytes move as
+        // it grows, so there is no pointer to hand out the way String has one:
+        // these go through the runtime one byte at a time, and the rest of the
+        // API is built on them in stdlib/Text.sl.
+        Method(StringBuilder, "ByteAt", PrimitiveTypeSymbol.Byte, "sl_string_builder_byte_at",
+            ("index", PrimitiveTypeSymbol.NUInt));
+        Method(StringBuilder, "SetByteAt", PrimitiveTypeSymbol.Void,
+            "sl_string_builder_set_byte_at",
+            ("index", PrimitiveTypeSymbol.NUInt), ("value", PrimitiveTypeSymbol.Byte));
+        Method(StringBuilder, "Insert", PrimitiveTypeSymbol.Void, "sl_string_builder_insert",
+            ("at", PrimitiveTypeSymbol.NUInt), ("text", String));
+        Method(StringBuilder, "Remove", PrimitiveTypeSymbol.Void, "sl_string_builder_remove",
+            ("at", PrimitiveTypeSymbol.NUInt), ("count", PrimitiveTypeSymbol.NUInt));
+
         Method(StringBuilder, "ToText", String, "sl_string_builder_to_string");
 
         // --- Standard.Com ----------------------------------------------------

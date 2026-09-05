@@ -88,6 +88,44 @@ This does not compromise the no-header property, which comes from resolving
 every name in the program before checking any body — not from any one-file
 rule.
 
+#### 1.2.1 And so may a type
+
+A type may be declared more than once inside its own module, and the
+declarations are one type:
+
+```csharp
+public class Shape {
+    public int Sides;                       // the shape
+}
+
+public class Shape {
+    public int Corners() { return Sides; }  // and the behaviour
+}
+```
+
+The rule is narrower than C#'s `partial`, and the difference is the point. The
+**first declaration settles what the type is** — its kind, its fields, and what
+it derives from. A later one may add methods and properties and nothing else:
+
+| In a later declaration | |
+|---|---|
+| a method or a property | added |
+| a field | SL0552 — the layout belongs to the declaration that has the fields |
+| a base or interface list | SL0551 — the dispatch tables are built from the first |
+| a different kind | SL0550 — every declaration must agree about what it is |
+
+No `partial` keyword marks either one. There is nothing for it to prevent: a
+second declaration of a name in the same module used to be an error and is now
+this, and a name from *another* module was never reachable to redeclare.
+
+What this exists for is `String`. It is intrinsic — the runtime owns its layout
+and its allocation, and the compiler creates the symbol before any source is
+read — and until this rule existed, every method it had was a C function
+declared in the compiler. Now `Standard.Text` declares `String` a second time
+and writes the rest in Stainless (§3.2). The same door is open to any module for
+its own types, which is why the rule is stated in general terms rather than as a
+concession to the standard library.
+
 ### 1.3 The module is the unit of visibility
 
 | Declaration | Visible to |
@@ -1568,21 +1606,82 @@ structs are copied as raw bytes, which is what keeps them C-compatible.
 
 ### 3.2 Members
 
-| Member | Result | Cost |
+Eight of these are intrinsic — the runtime implements them and the compiler
+declares them. The rest are ordinary Stainless, written in `stdlib/Text.sl` as
+a second declaration of the type (§1.2.1), which is why they can return a
+`String[]` where a C function could not.
+
+| Member | Result | Notes |
 |---|---|---|
 | `a + b` | `String` | allocates and copies |
 | `a == b`, `a != b` | `bool` | compares bytes, not identity |
 | `ByteLength()` | `nuint` | O(1) |
 | `CodePointCount()` | `nuint` | O(n) |
 | `IsEmpty()` | `bool` | O(1) |
-| `Substring(start, length)` | `String` | byte offsets, clamped to the end |
 | `ToPointer()` | `byte*` | O(1), no copy |
 | `ToUtf16()` | `Utf16String` | allocates and transcodes |
+| **testing** | | |
+| `StartsWith(p)`, `EndsWith(s)` | `bool` | an empty argument is always found |
+| `Contains(v)` | `bool` | a `String` or one `char` |
+| **searching** | | |
+| `IndexOf(v)`, `IndexOf(v, from)` | `long` | the byte offset, or `Text.NotFound` |
+| `LastIndexOf(v)` | `long` | as above, from the end |
+| **slicing** | | |
+| `Substring(start)`, `Substring(start, n)` | `String` | byte offsets, clamped to the end |
+| `Before(sep)`, `After(sep)`, `AfterLast(sep)` | `String` | the halves either side of a separator |
+| **trimming** | | |
+| `Trim()`, `TrimStart()`, `TrimEnd()` | `String` | ASCII whitespace |
+| **rebuilding** | | |
+| `Replace(from, to)` | `String` | left to right, non-overlapping |
+| `Repeat(n)`, `PadLeft(w)`, `PadRight(w)` | `String` | padding never truncates |
+| **splitting** | | |
+| `Split(sep)` | `String[]` | a `String` or one `char`; empty parts kept |
+| `SplitLines()` | `String[]` | on `\n` or `\r\n`; a trailing one adds no line |
+| `sep.Join(parts)` | `String` | the inverse of `Split` |
+| **case and order** | | |
+| `ToUpperAscii()`, `ToLowerAscii()` | `String` | see below |
+| `EqualsIgnoreCaseAscii(o)` | `bool` | |
+| `CompareTo(o)` | `int` | ordinal: negative, zero or positive |
+| **characters** | | |
+| `ByteAt(i)` | `byte` | a code unit, not a character |
+| `CodePointAt(i)`, `NextCodePoint(i)` | `char32`, `nuint` | how the text is walked properly |
+| `ToBytes()` | `byte[]` | a copy, because a `String` is immutable |
+
+Two rules run through all of it.
+
+**Positions are byte offsets.** Length is O(1) precisely because nothing counts
+characters. Every position these produce lands on a character boundary anyway,
+because it came from matching whole text — a UTF-8 sequence cannot begin inside
+another one, which is what makes byte-wise search correct on encoded text rather
+than merely fast. A position the *caller* invents is its own business, and
+`CodePointAt` with `NextCodePoint` is the way to walk:
+
+```csharp
+for (nuint at = 0; at < s.ByteLength(); at = s.NextCodePoint(at)) {
+    char32 c = s.CodePointAt(at);
+}
+```
+
+**Case is ASCII, and says so in its name.** Full Unicode case mapping is a table
+of several thousand entries with locale exceptions, and the runtime has no room
+for it yet. `ToUpperAscii` maps A–Z and leaves every other byte alone, which is
+right for identifiers, protocol tokens and file extensions, and visibly wrong
+for prose in most languages. `Standard.Ascii` asks the same questions of one
+byte: `IsDigit`, `IsLetter`, `IsHexDigit`, `IsWhiteSpace`, `ToUpper`, `HexValue`
+and the rest. It is a module of its own, and imported rather than automatic,
+because `IsDigit` is too good a name to take from every program.
 
 `Standard.Text` is imported into every module automatically, since a literal
 produces a `String` whether the program asked for one or not. It also provides
 `FromInteger`, `FromDouble`, `FromBool`, `FromBytes` and `FromNullTerminated`,
 plus `StringBuilder`.
+
+`StringBuilder` appends (`Append`, `AppendLine`, `AppendInteger`,
+`AppendDouble`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
+`Contains`) and edits (`Insert`, `Remove`, `Truncate`, `SetByteAt`,
+`ReplaceFirst`, `ReplaceAll`). Unlike `String` it hands out no pointer: its
+bytes are a growable allocation that moves, so a `byte*` into it would dangle at
+the next append. Reading goes through the runtime a byte at a time instead.
 
 `Standard.Console` is *not* automatic and provides `Write`, `WriteLine` and
 `WriteError`.
@@ -1624,8 +1723,11 @@ var wide = message.ToUtf16();       // owned, NUL terminated, released by ARC
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
-It offers `UnitCount()`, `ToPointer()`, which returns `char16*`, and
-`ToText()`, which transcodes back.
+It offers `UnitCount()`, `IsEmpty()`, `UnitAt(i)`, `CodePointAt(i)` and
+`NextCodePoint(i)` — which join a surrogate pair, so a character outside the
+basic plane reads as one scalar across two units — plus `Equals(other)`,
+`ToBytes()`, which gives the raw little-endian units, `ToPointer()`, which
+returns `char16*`, and `ToText()`, which transcodes back.
 
 `char16*` and not `ushort*`: the two are the same width, and a wide API that
 took the second would accept any 16-bit pointer within reach — an array of
@@ -1861,15 +1963,18 @@ to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
 **A non-generic function or class is emitted whether or not it is used**, and
 that is a real cost the compiler should not be charging: every stdlib module is
 compiled with your program whether you import it or not. A hello-world that
-calls `puts` and returns emits **216 standard-library functions and reaches
-none of them** — 56 from `Standard.Math`, 37 from `Standard.Collections`, 36
-from `Standard.IO`, 24 from `Standard.Reflection`, and so on down. Nothing in
-the compiler prunes them: there is no reachability pass.
+calls `puts` and returns emits **286 standard-library functions and reaches
+none of them** — 56 from `Standard.Text`, 56 from `Standard.Math`, 37 from
+`Standard.Collections`, 36 from `Standard.IO`, 24 from `Standard.Reflection`,
+and so on down. Nothing in the compiler prunes them: there is no reachability
+pass.
 
 What saves it is the linker. Every function and datum goes in a section of its
 own and the linker drops the ones nothing reached, which takes that hello-world
-from 294 KB to 124 KB. The IR is still the full size, so compile time pays for
-all of it, and a reachability pass from `Main` would fix that. It is not done.
+from 300 KB to 124 KB. The IR is still the full size, so compile time pays for
+all of it, and a reachability pass from `Main` would fix that. It is not done —
+and writing `String`'s API in Stainless made the case for one plainer, since
+those 70 extra functions grew the IR by half and the binary not at all.
 
 | Module | Contents | Imported |
 |---|---|---|
@@ -1884,6 +1989,7 @@ all of it, and a reachability pass from `Main` would fix that. It is not done.
 | `Standard.File` | whole-file operations | on request |
 | `Standard.Directory` | making, removing and listing | on request |
 | `Standard.Path` | taking paths apart, textually | on request |
+| `Standard.Ascii` | what one byte is, when ASCII is the honest answer | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` (§8.5) | on request |
 | `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 

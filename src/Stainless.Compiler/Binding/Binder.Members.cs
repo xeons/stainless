@@ -377,6 +377,18 @@ public sealed partial class Binder
             {
                 case FieldDeclSyntax field:
                 {
+                    // A later declaration may add behaviour and not state: the
+                    // layout was settled by the first one, and for an intrinsic
+                    // it was settled by the runtime.
+                    if (_additionalParts.Contains(declaration))
+                    {
+                        diagnostics.Error("SL0552", field.Span,
+                            $"'{type.Name}' is already declared in this module, so this " +
+                            $"declaration may add methods but not the field '{field.Name}'; " +
+                            "the layout belongs to the declaration that has the fields");
+                        break;
+                    }
+
                     if (type.FindStorage(field.Name) is not null ||
                         type.FindProperty(field.Name) is not null)
                     {

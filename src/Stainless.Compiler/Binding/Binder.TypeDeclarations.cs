@@ -37,6 +37,13 @@ public sealed partial class Binder
             var module = scope.Module;
             foreach (var declaration in unit.Declarations.OfType<TypeDeclSyntax>())
             {
+                if (module.Types.TryGetValue(declaration.Name, out var already) &&
+                    declaration.TypeParameters.Count == 0)
+                {
+                    DeclareAdditionalPart(declaration, already);
+                    continue;
+                }
+
                 if (module.Types.ContainsKey(declaration.Name) ||
                     module.GenericTypes.ContainsKey(declaration.Name))
                 {
@@ -321,4 +328,73 @@ public sealed partial class Binder
         classType.IsAbstract = isAbstract;
         classType.IsSealed = isSealed;
     }
+
+    /// <summary>
+    /// A second declaration of a type inside its own module.
+    ///
+    /// A module already spans files, and this lets a type do the same. The
+    /// first declaration settles what the type <em>is</em>: its kind, its
+    /// fields, and what it derives from. A later one may only add behaviour,
+    /// which is a narrower rule than C#'s <c>partial</c> and is deliberate --
+    /// the reason this exists is <c>String</c>, whose layout belongs to the
+    /// runtime and whose methods no longer have to.
+    ///
+    /// The members are declared by pass 4 without any help from here, because
+    /// pass 4 walks declarations and looks each type up by name. All that is
+    /// needed is to stop reporting the name as a duplicate, and to refuse the
+    /// two things a later part may not carry.
+    /// </summary>
+    private void DeclareAdditionalPart(TypeDeclSyntax declaration, NamedTypeSymbol existing)
+    {
+        if (KindOf(existing) != declaration.Kind ||
+            (existing is ComInterfaceTypeSymbol) != declaration.Modifiers.HasFlag(Modifiers.Com))
+        {
+            diagnostics.Error("SL0550", declaration.Span,
+                $"'{declaration.Name}' is already declared in this module as a " +
+                $"{Described(existing)}, so this declaration cannot add to it. A type may be " +
+                "declared more than once inside its own module, but every declaration must " +
+                "agree about what it is");
+            return;
+        }
+
+        // A base list on a later part would mean the dispatch tables were built
+        // before it was read, since pass 5 works from the first declaration.
+        if (declaration.Implements.Count > 0)
+            diagnostics.Error("SL0551", declaration.Span,
+                $"'{declaration.Name}' is already declared in this module, so this declaration " +
+                "may add members but not a base list; write what it derives from on the first " +
+                "declaration");
+
+        if (declaration.IsOpaque)
+            diagnostics.Error("SL0551", declaration.Span,
+                $"'{declaration.Name}' is already declared in this module, so this declaration " +
+                "has nothing to say by having no body");
+
+        _additionalParts.Add(declaration);
+    }
+
+    /// <summary>The kind of declaration a symbol came from, for comparing two.</summary>
+    private static TypeDeclKind KindOf(NamedTypeSymbol type) => type switch
+    {
+        ComInterfaceTypeSymbol => TypeDeclKind.Interface,
+        InterfaceTypeSymbol => TypeDeclKind.Interface,
+        AttributeTypeSymbol => TypeDeclKind.Attribute,
+        VariantTypeSymbol => TypeDeclKind.Variant,
+        UnionTypeSymbol => TypeDeclKind.Union,
+        ClassTypeSymbol => TypeDeclKind.Class,
+        _ => TypeDeclKind.Struct,
+    };
+
+    private static string Described(NamedTypeSymbol type) => type switch
+    {
+        ComInterfaceTypeSymbol => "com interface",
+        InterfaceTypeSymbol => "interface",
+        AttributeTypeSymbol => "attribute",
+        VariantTypeSymbol => "variant",
+        UnionTypeSymbol => "union",
+        ClassTypeSymbol => "class",
+        DelegateTypeSymbol => "delegate",
+        EnumTypeSymbol => "enum",
+        _ => "struct",
+    };
 }
