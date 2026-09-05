@@ -701,6 +701,54 @@ class Parent {
 A lambda that captures `this` holds its object strongly, so an object that
 stores its own closure is such a cycle; see §2.14.
 
+**A checked optional is the thing it holds.** `C?` and `C` are the same
+pointer, so once a check has established that one is not null the compiler lets
+it be used as the other, and nothing is emitted for the conversion:
+
+```csharp
+Node? at = head;
+while (at != null) {
+    Print(at.Value);            // `at` is a Node here
+    at = at.Next;               // and a Node? here, because a check said what
+}                               // it held, not what it may be given next
+```
+
+The proof comes from the same shapes that narrow a variant (§2.6), which is
+the same machinery and the same table:
+
+| Shape | What it proves |
+|---|---|
+| `if (x != null) { … } else { … }` | `x` in the first arm |
+| `if (x == null) { return …; }` | `x` for the whole rest of the block |
+| `x != null ? x.V : d` | in the arm the check chose |
+| `if (x != null && x.Ok())` | on the right of `&&`, and inside the branch |
+| `while (x != null) { … }` | in the body |
+
+**Nothing that could have changed it survives.** An assignment takes the proof
+away, and, inside a loop, an assignment anywhere in the body does:
+
+```csharp
+if (x != null) {
+    x = Next();
+    x.Value                     // error[SL0248]: the proof was about the old value
+}
+```
+
+**Only a name can be narrowed** — a local or a parameter. A field or a call
+result may be a different value by the time it is read, so neither carries a
+proof, and putting it in a local first is both the fix and what the code meant:
+
+```
+error[SL0248]: 'Node?' may be null, and this is not something a check can be
+about: a field or a call result may be a different value by the time it is
+read. Put it in a local, check that against null, and reach 'Value' through it
+```
+
+**A `weak C?` is never narrowed.** It may die between the check and the use,
+which is the whole of what weak means, so no check could establish anything
+about it. Reading it into a strong `C?` is what makes it safe to look at, and
+that read is where the runtime check happens.
+
 **`p->m` and `p.m`.** Both reach through a pointer, and always have. They differ
 only in what they refuse: an arrow says a pointer was expected, so writing one
 over a value is reported rather than quietly meaning the same thing.

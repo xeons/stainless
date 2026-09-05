@@ -108,6 +108,18 @@ public enum ConversionKind
     ComQuery,
 
     /// <summary>
+    /// <c>C?</c> -> <c>C</c>, where a check has established that it is not
+    /// null. Emits nothing: the two are the same pointer, and the whole of the
+    /// difference is what the compiler will let you do with it.
+    ///
+    /// Told apart from <see cref="PointerCast"/>, which is the same move made
+    /// by an explicit cast, because this one has to be undone where the value
+    /// is written rather than read -- a narrowed <c>x</c> is still a <c>C?</c>
+    /// when it is on the left of an assignment.
+    /// </summary>
+    NarrowOptional,
+
+    /// <summary>
     /// <c>byte*</c> -> a com interface, explicit: adopting a reference that COM
     /// activation wrote through a <c>void**</c>.
     ///

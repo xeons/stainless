@@ -3056,6 +3056,10 @@ public sealed class LlvmEmitter(
             case ConversionKind.NullToReference:
             case ConversionKind.ClassToInterface:
 
+            // A checked optional is the same pointer; what a check bought is
+            // the compiler's permission, and permission has no instructions.
+            case ConversionKind.NarrowOptional:
+
             // A base subobject starts where the object does, so a reference to
             // the derived class already is a reference to the base one. This is
             // the whole benefit of single inheritance and the whole of its cost.

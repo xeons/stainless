@@ -1264,19 +1264,20 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **`String` has a thin API.** No `IndexOf`, `Split`, `Trim`, case mapping or
   formatting; `Substring` counts bytes, not characters, so it can slice a
   multi-byte character in half.
-- **No flow narrowing for `C?`.** Optionals can be stored, compared to `null`,
-  and unwrapped with an explicit cast, but `if (x != null)` does not yet make
-  `x` usable as non-optional. It is why `LinkedList<T>` links by index — a
-  structure that walks `next` cannot be written at all.
+- **Flow narrowing does not reach a field.** `if (x != null)` makes `x` usable
+  as a `C` (§2.5), on the same terms a variant is narrowed — but only for a
+  local or a parameter, because a field or a call result may be a different
+  value by the time it is read. `if (node.Next != null) { node.Next.Value }` is
+  refused, and a local is both the fix and what the code meant.
 - **Inheritance stops at a library boundary.** A class from a referenced
   library can be held, called, tested with `is` and cast back to — the base
   relation and every virtual slot cross in the metadata — but it cannot be
   derived from (SL0513). The layout is compiled there and the derived class's
   dispatch table would be built here.
-- **There is no `as`, and no covariant return.** `as` would produce a `C?`, and
-  without flow narrowing for optionals nothing could be done with the result
-  that `is` plus a cast does not already do. An override returns exactly what it
-  overrides (SL0502).
+- **There is no `as`, and no covariant return.** `as` would produce a `C?`,
+  which is now worth having — flow narrowing arrived and `is` plus a cast is
+  two tests where one would do. An override returns exactly what it overrides
+  (SL0502).
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
   about, so the same name and parameters means `override` or nothing (SL0503).

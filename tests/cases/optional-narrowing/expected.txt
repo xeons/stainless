@@ -1,0 +1,12 @@
+walk  1 2 3 
+sum   6
+if    2
+else  none
+chain 3
+tern  3
+arg   6
+reset true
+held  1
+gone  true
+both  3
+miss  true

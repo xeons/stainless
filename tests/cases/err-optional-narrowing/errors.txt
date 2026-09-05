@@ -1,0 +1,4 @@
+# reading an optional that no check has established, in each of the five ways
+# a check fails to reach: reassigned in the branch, reassigned in a loop body,
+# the wrong arm, a weak reference, and something that is not a name at all
+SL0248

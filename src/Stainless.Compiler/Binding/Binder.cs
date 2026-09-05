@@ -86,7 +86,7 @@ public sealed class Binder(
     /// here by a condition that tested one, and taken away by anything that
     /// could have changed it.
     /// </summary>
-    private Dictionary<object, VariantCaseSymbol> _variantFacts = [];
+    private Dictionary<object, Fact> _variantFacts = [];
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
     private readonly Dictionary<TypeSymbol, SliceTypeSymbol> _slices = [];
 
@@ -3475,6 +3475,28 @@ public sealed class Binder(
     // ============================================================ variants
 
     /// <summary>
+    /// What a check established about a local or a parameter.
+    ///
+    /// Two kinds: which case a variant is holding, and that an optional is not
+    /// null. They share one table because the difficulty is never the fact, it
+    /// is its lifetime -- surviving a branch, merging at a join, and being
+    /// forgotten by an assignment or by anything a loop might do -- and that is
+    /// the same work whichever kind it is.
+    /// </summary>
+    private sealed record Fact
+    {
+        /// <summary>The case a variant holds, or null when this is an optional.</summary>
+        public VariantCaseSymbol? Case { get; private init; }
+
+        public static Fact Holding(VariantCaseSymbol held) => new() { Case = held };
+
+        /// <summary>An optional that has been checked and is not null.</summary>
+        public static readonly Fact NotNull = new();
+
+        public bool ProvesNotNull => Case is null;
+    }
+
+    /// <summary>
     /// The declaration a narrowed fact can be attached to.
     ///
     /// Only a plain local or parameter qualifies. A field or a call result is
@@ -3489,6 +3511,30 @@ public sealed class Binder(
         BoundParameterAccess parameter => parameter.Parameter,
         _ => null,
     };
+
+    /// <summary>
+    /// The subject of <c>x != null</c> or <c>null == x</c>, when one side is
+    /// the null literal and the other is a narrowable optional.
+    ///
+    /// A <c>weak C?</c> is deliberately not one. It may die between the check
+    /// and the use, which is the whole of what weak means, and the only safe
+    /// way to look at one is to read it into a strong optional first.
+    /// </summary>
+    private static object? NullComparison(BoundBinary test)
+    {
+        var other = test.Left is BoundNullLiteral ? test.Right
+                  : test.Right is BoundNullLiteral ? test.Left
+                  : null;
+
+        if (other is null) return null;
+
+        // The access may already have been narrowed by an earlier check, in
+        // which case it is not an optional any more and there is nothing to
+        // prove.
+        if (other.Type is not OptionalTypeSymbol) return null;
+
+        return NarrowableSubject(other);
+    }
 
     /// <summary>Forgets what was known about a Result, because something may have changed it.</summary>
     private void InvalidateVariantFact(BoundExpression target)
@@ -3518,7 +3564,7 @@ public sealed class Binder(
     /// which is what keeps <c>if (!r.Ok) { ... r.Error ... }</c> working now that
     /// Result is an ordinary variant.
     /// </summary>
-    private (Dictionary<object, VariantCaseSymbol> WhenTrue, Dictionary<object, VariantCaseSymbol> WhenFalse)
+    private (Dictionary<object, Fact> WhenTrue, Dictionary<object, Fact> WhenFalse)
         ConditionFacts(BoundExpression condition)
     {
         switch (condition)
@@ -3527,14 +3573,29 @@ public sealed class Binder(
                 when NarrowableSubject(test.Value) is { } subject:
             {
                 var variant = test.Case.DeclaringVariant;
-                var whenTrue = new Dictionary<object, VariantCaseSymbol> { [subject] = test.Case };
+                var whenTrue = new Dictionary<object, Fact>
+                    { [subject] = Fact.Holding(test.Case) };
 
                 var others = variant.Cases.Where(c => c != test.Case).ToList();
                 var whenFalse = others.Count == 1
-                    ? new Dictionary<object, VariantCaseSymbol> { [subject] = others[0] }
+                    ? new Dictionary<object, Fact> { [subject] = Fact.Holding(others[0]) }
                     : [];
 
                 return (whenTrue, whenFalse);
+            }
+
+            // `x != null` and `x == null`, in either order. The whole of
+            // what an optional can be asked, and the reason `is` was never the
+            // shape for this: an optional is not a second type to test for, it
+            // is the same type and a null.
+            case BoundBinary { Operator: BoundBinaryOp.Equal or BoundBinaryOp.NotEqual } test
+                when NullComparison(test) is { } checkedSubject:
+            {
+                var proved = new Dictionary<object, Fact> { [checkedSubject] = Fact.NotNull };
+
+                return test.Operator == BoundBinaryOp.NotEqual
+                    ? (proved, [])
+                    : ([], proved);
             }
 
             case BoundUnary { Operator: BoundUnaryOp.LogicalNot } negation:
@@ -3564,17 +3625,17 @@ public sealed class Binder(
         }
     }
 
-    private static Dictionary<object, VariantCaseSymbol> Merge(
-        Dictionary<object, VariantCaseSymbol> first, Dictionary<object, VariantCaseSymbol> second)
+    private static Dictionary<object, Fact> Merge(
+        Dictionary<object, Fact> first, Dictionary<object, Fact> second)
     {
-        var merged = new Dictionary<object, VariantCaseSymbol>(first);
+        var merged = new Dictionary<object, Fact>(first);
         foreach (var (key, value) in second) merged[key] = value;
         return merged;
     }
 
-    private Dictionary<object, VariantCaseSymbol> SnapshotFacts() => new(_variantFacts);
+    private Dictionary<object, Fact> SnapshotFacts() => new(_variantFacts);
 
-    private void ApplyFacts(Dictionary<object, VariantCaseSymbol> facts)
+    private void ApplyFacts(Dictionary<object, Fact> facts)
     {
         foreach (var (key, value) in facts) _variantFacts[key] = value;
     }
@@ -3835,7 +3896,7 @@ public sealed class Binder(
         ApplyFacts(whenTrue);
         var then = BindStatement(syntax.Then);
 
-        _variantFacts = new Dictionary<object, VariantCaseSymbol>(entry);
+        _variantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(whenFalse);
         var otherwise = syntax.Else is null ? null : BindStatement(syntax.Else);
 
@@ -5194,7 +5255,8 @@ public sealed class Binder(
             // Inside the arm, the value is that case. One case only: a section
             // reached by two of them has proved nothing about which.
             var saved = SnapshotFacts();
-            if (subject is not null && cases.Count == 1) _variantFacts[subject] = cases[0];
+            if (subject is not null && cases.Count == 1)
+                _variantFacts[subject] = Fact.Holding(cases[0]);
             else if (subject is not null) _variantFacts.Remove(subject);
 
             PushScope();
@@ -5653,10 +5715,10 @@ public sealed class Binder(
             string name = parts[0];
 
             if (LookupLocal(name) is { } local)
-                return new BoundLocalAccess(syntax.Span, local);
+                return Narrowed(new BoundLocalAccess(syntax.Span, local), local);
 
             if (_currentFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
-                return new BoundParameterAccess(syntax.Span, parameter);
+                return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
             // An unqualified member name inside a method means `this.member`.
             if (_currentFunction?.ContainingType?.FindProperty(name) is { } ownProperty)
@@ -5727,7 +5789,9 @@ public sealed class Binder(
         // `&x` and `*p` are addressing, not arithmetic, so handle them first.
         if (syntax.Operator == TokenKind.Amp)
         {
-            var target = BindExpression(syntax.Operand);
+            // The address of a storage slot, whose type is the slot's rather
+            // than what a check proved is in it at this moment.
+            var target = Widened(BindExpression(syntax.Operand));
             if (!target.IsLValue && !target.Type.IsError())
             {
                 diagnostics.Error("SL0230", syntax.Span, "cannot take the address of a temporary value");
@@ -5782,7 +5846,15 @@ public sealed class Binder(
     private BoundExpression BindBinary(BinarySyntax syntax)
     {
         var left = BindExpression(syntax.Left);
-        var right = BindExpression(syntax.Right);
+
+        // `a && b` evaluates b only when a was true, so b is bound knowing it.
+        // `a || b` evaluates b only when a was false, and knows that instead.
+        // Without this, `x != null && x.Next != null` -- the shape every walk
+        // over a linked structure is written in -- could not be said at all.
+        var right = syntax.Operator is TokenKind.AmpAmp or TokenKind.PipePipe
+            ? BindUnderFacts(syntax.Right, left, whenTrue: syntax.Operator == TokenKind.AmpAmp)
+            : BindExpression(syntax.Right);
+
         if (left.Type.IsError() || right.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         var op = syntax.Operator switch
@@ -6061,6 +6133,23 @@ public sealed class Binder(
     }
 
     /// <summary>
+    /// Binds an expression under what the other side of a short-circuit
+    /// operator established, then puts the facts back.
+    /// </summary>
+    private BoundExpression BindUnderFacts(
+        Syntax.ExpressionSyntax syntax, BoundExpression from, bool whenTrue)
+    {
+        var (proves, disproves) = ConditionFacts(from);
+        var entry = SnapshotFacts();
+
+        ApplyFacts(whenTrue ? proves : disproves);
+        var bound = BindExpression(syntax);
+
+        _variantFacts = entry;
+        return bound;
+    }
+
+    /// <summary>
     /// <c>a ? b : c</c>. The arms must meet at one type: the same type, a common
     /// numeric type, or one that the other converts to implicitly.
     /// </summary>
@@ -6077,7 +6166,7 @@ public sealed class Binder(
         ApplyFacts(proves);
         var whenTrue = BindExpression(syntax.WhenTrue);
 
-        _variantFacts = new Dictionary<object, VariantCaseSymbol>(entry);
+        _variantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(disproves);
         var whenFalse = BindExpression(syntax.WhenFalse);
 
@@ -6133,7 +6222,9 @@ public sealed class Binder(
 
     private BoundExpression BindAssignment(AssignmentSyntax syntax)
     {
-        var target = BindExpression(syntax.Target);
+        // A narrowed optional is still an optional when it is written to: the
+        // check established what it held, not what it may be given next.
+        var target = Widened(BindExpression(syntax.Target));
 
         // The target was bound as a read, which is what proves it is a property
         // and, usefully, has already bound the receiver exactly once.
@@ -7045,8 +7136,30 @@ public sealed class Binder(
 
         if (receiver.Type is OptionalTypeSymbol or WeakTypeSymbol)
         {
-            diagnostics.Error("SL0248", syntax.Span,
-                $"'{receiver.Type.Name}' may be null; check it against null before accessing '{syntax.Member}'");
+            // A weak reference may die between the check and the use, so no
+            // check could establish anything about it. Reading it into a strong
+            // optional is what makes it safe to look at, and is the only way.
+            if (receiver.Type is WeakTypeSymbol weakReceiver)
+                diagnostics.Error("SL0248", syntax.Span,
+                    $"'{receiver.Type.Name}' may already have died, so checking it against " +
+                    $"null would prove nothing about the moment after; read it into a " +
+                    $"'{weakReceiver.Element.Name}?' first, and check that");
+
+            // A check can only be about a name. Narrowing a field would prove
+            // something about one evaluation and let it be read from another,
+            // which is the rule variants already follow (SL0285).
+            else if (NarrowableSubject(receiver) is null)
+                diagnostics.Error("SL0248", syntax.Span,
+                    $"'{receiver.Type.Name}' may be null, and this is not something a check " +
+                    "can be about: a field or a call result may be a different value by the " +
+                    $"time it is read. Put it in a local, check that against null, and reach " +
+                    $"'{syntax.Member}' through it");
+
+            else
+                diagnostics.Error("SL0248", syntax.Span,
+                    $"'{receiver.Type.Name}' may be null; check it against null before " +
+                    $"accessing '{syntax.Member}'");
+
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -7369,7 +7482,7 @@ public sealed class Binder(
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var known = _variantFacts.TryGetValue(subject, out var fact) ? fact : null;
+        var known = _variantFacts.TryGetValue(subject, out var fact) ? fact.Case : null;
         string name = SubjectName(subject);
 
         if (known is null)
@@ -7393,6 +7506,37 @@ public sealed class Binder(
 
         return new BoundVariantPayload(syntax.Span, receiver, known, field);
     }
+
+    /// <summary>
+    /// A read of an optional that has been checked, as the thing it holds.
+    ///
+    /// Applied where the name is bound rather than at each use, so a narrowed
+    /// value is narrowed for everything at once -- a call on it, an argument
+    /// made of it, an assignment from it. The cost is that the three places
+    /// which want the optional back have to say so; see <see cref="Widened"/>.
+    /// </summary>
+    private BoundExpression Narrowed(BoundExpression access, object subject)
+    {
+        if (access.Type is not OptionalTypeSymbol optional) return access;
+        if (!_variantFacts.TryGetValue(subject, out var fact)) return access;
+        if (!fact.ProvesNotNull) return access;
+
+        return new BoundConversion(
+            access.Span, optional.Element, access, ConversionKind.NarrowOptional);
+    }
+
+    /// <summary>
+    /// The optional behind a narrowing, for the places a value is written
+    /// rather than read.
+    ///
+    /// `x = null` is legal inside `if (x != null)`: the check said what x held,
+    /// not what it may hold next. Same for `&x`, whose type is the storage's
+    /// and not the moment's.
+    /// </summary>
+    private static BoundExpression Widened(BoundExpression expression) =>
+        expression is BoundConversion { Kind: ConversionKind.NarrowOptional } narrowed
+            ? narrowed.Operand
+            : expression;
 
     /// <summary>The modules a name written in the current file resolves against.</summary>
     private IEnumerable<ModuleSymbol> VisibleModules()

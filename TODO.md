@@ -137,17 +137,27 @@ shell's half is written. In rough order of what a program actually wants:
 
 ## Language
 
-### Flow narrowing for `C?`
+### An `as` operator
 
-The compiler already tracks which case a variant is holding through `if`, `!`,
-`&&`, `||`, a ternary, an early return and a `switch`. An optional wants the
-same machinery, and does not have it: `if (x != null)` does not make `x` usable
-as non-optional. It is why `LinkedList<T>` links by index — a structure that
-walks `next` cannot be written at all.
+`as` produces a `C?` where a cast produces a `C` or ends the program. Now
+worth having: flow narrowing arrived (§2.5), so the result of one is usable,
+and `if (x is C) { var c = (C)x; }` is two tests where one would do.
 
-This is the highest-value language item left. It is also what an `as`
-operator is waiting on: `as` produces a `C?`, and until one can be narrowed
-there is nothing to do with the result that `is` plus a cast does not do.
+*Touches:* `Parser`, `Binder.BindTypeTest`, `LlvmEmitter.EmitConversion`.
+
+### Narrowing a field
+
+`if (x != null)` narrows a local or a parameter and not `node.Next`, because a
+field or a call result may be a different value by the time it is read — the
+rule variants follow, stated once for both (SL0248, SL0285). A local is the
+fix and usually what the code meant.
+
+What would make it sound for a field is knowing that nothing between the check
+and the use could have written it, which is a real analysis rather than a
+lookup: any call, any `ref`, any store through a pointer takes the proof away.
+Worth doing only if the local turns out to be a genuine irritation in practice.
+
+*Touches:* `Binder.NarrowableSubject`, `Binder.InvalidateVariantFact`.
 
 ### Reflection that writes
 
