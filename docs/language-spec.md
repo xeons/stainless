@@ -1809,7 +1809,7 @@ explicit.
 
 The shape is .NET's, with the static instances replaced by functions: a static
 needs a Sendable type and an initializer that `--shared` has nowhere to run
-(§7.4), so `Encoding.Utf8()` is a call. Everything is behind an interface, so a
+(§9.3), so `Encoding.Utf8()` is a call. Everything is behind an interface, so a
 program may add an encoding of its own.
 
 ```csharp

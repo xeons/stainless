@@ -200,11 +200,43 @@ and needs a lifetime story the language does not have.
 
 ## Runtime and libraries
 
-### `String` has a thin API
+### A reachability pass from `Main`
 
-No `IndexOf`, `Split`, `Trim`, case mapping or formatting, and `Substring`
-counts bytes rather than characters, so it can cut a multi-byte character in
-half.
+The standard library is compiled with every program and nothing prunes it. A
+hello-world that calls `puts` and returns emits **370 standard-library
+functions and reaches none of them**, in 17,071 lines of IR.
+
+What saves the binary is the linker: every function goes in a section of its
+own and the ones nothing reached are dropped, which takes that hello-world from
+318 KB to 124 KB. What nothing saves is the compile, which pays for all of it —
+binding, emitting and then handing clang twice the text it needs.
+
+Writing the text library in Stainless is what made this worth doing rather than
+worth noting. It added 154 functions and 9,351 lines of IR, and the stripped
+binary came out at 126,976 bytes: the same number, to the byte, as before any
+of it existed. The end-to-end suite went from 28 seconds to 42.
+
+The walk is from `Main`, plus every `export "C"`, every static initializer, and
+everything a dispatch table names — a virtual table, an interface table, a COM
+vtable and the reflection metadata are all roots, and a pass that forgot one
+would delete a method that is only ever called through a pointer. That last
+part is the whole difficulty; the walk itself is a worklist.
+
+*Touches:* a new pass between binding and emission, and `LlvmEmitter`'s
+decision about what to write.
+
+### Case mapping beyond ASCII
+
+`ToUpperAscii` and `ToLowerAscii` say what they do. The real thing is a table
+of several thousand entries with locale exceptions -- Turkish dotless i, German
+sharp s uppercasing to two characters, Greek final sigma -- and none of it fits
+in a runtime that is currently 3,000 lines of C. There is also no collation:
+`CompareTo` orders by bytes, which orders by code point and resembles no
+language's idea of alphabetical.
+
+The honest options are to link ICU, to generate the tables from
+UnicodeData.txt, or to keep saying `Ascii` in the name. The third is what is
+happening.
 
 ### Cancellation that skips queued work
 
