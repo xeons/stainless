@@ -124,34 +124,50 @@ int Main() {
     printf("missing-value=%llu\n", missing.ValueOr("").ByteLength());
 
     // --------------------------------------------------------- file stream
-    var stream = File.OpenRead(notes);
-    var head = new byte[4];
-    nuint got = stream.Read(head, 0, (nuint)4);
-    printf("stream=%d read=%llu head=%s position=%lld\n",
-        stream.IsOpen() ? 1 : 0, got,
-        Text.FromBytes(&head[0], got).ToPointer(), stream.Position());
+    //
+    // Opening is a Result, so there is no stream to go on using until the
+    // success case has been named. That is the whole difference from the
+    // `IsOpen()` latch this replaced: the check cannot be walked past.
+    var opened = File.OpenRead(notes);
+    printf("open-ok=%d\n", opened.Ok ? 1 : 0);
 
-    printf("can=%d%d%d length=%lld\n",
-        stream.CanRead() ? 1 : 0, stream.CanWrite() ? 1 : 0, stream.CanSeek() ? 1 : 0,
-        stream.Length());
+    if (opened.Ok) {
+        var stream = opened.Value;
+        var head = new byte[4];
+        nuint got = stream.Read(head, 0, (nuint)4);
+        printf("stream=%d read=%llu head=%s position=%lld\n",
+            stream.IsOpen() ? 1 : 0, got,
+            Text.FromBytes(&head[0], got).ToPointer(), stream.Position());
 
-    stream.Seek(0, SeekOrigin.Start);
-    var whole = IO.ReadTextToEnd(stream);
-    stream.Close();
-    printf("whole=%d bytes=%llu after-close=%llu\n",
-        whole.Ok ? 1 : 0, whole.Ok ? whole.Value.ByteLength() : 0,
-        stream.Read(head, 0, (nuint)4));
-    printf("closed-error=%s\n", IO.Describe(stream.Error()).ToPointer());
+        printf("can=%d%d%d length=%lld\n",
+            stream.CanRead() ? 1 : 0, stream.CanWrite() ? 1 : 0, stream.CanSeek() ? 1 : 0,
+            stream.Length());
 
-    // Opening something that is not there fails without a null to unwrap.
+        stream.Seek(0, SeekOrigin.Start);
+        var whole = IO.ReadTextToEnd(stream);
+        stream.Close();
+        printf("whole=%d bytes=%llu after-close=%llu\n",
+            whole.Ok ? 1 : 0, whole.Ok ? whole.Value.ByteLength() : 0,
+            stream.Read(head, 0, (nuint)4));
+
+        // `IsOpen` and `Error` remain, for what happens after a stream is
+        // open: a read on a closed one is an outcome of the read.
+        printf("closed-error=%s\n", IO.Describe(stream.Error()).ToPointer());
+    }
+
+    // Opening something that is not there is a failure carrying its reason,
+    // and there is no half-made stream to hand back.
     var absent = File.OpenRead(Path.Join(root, "nope.txt"));
-    printf("absent-open=%d reason=%s\n",
-        absent.IsOpen() ? 1 : 0, IO.Describe(absent.Error()).ToPointer());
+    printf("absent-open=%d\n", absent.Ok ? 1 : 0);
+    if (!absent.Ok) { printf("absent-why=%s\n", IO.Describe(absent.Error).ToPointer()); }
 
     // Writing through a stream, then reading it back.
-    var written = File.Create(Path.Join(root, "stream.txt"));
-    written.WriteText("via a stream");
-    written.Close();
+    var made = File.Create(Path.Join(root, "stream.txt"));
+    if (made.Ok) {
+        made.Value.WriteText("via a stream");
+        made.Value.Close();
+    }
+
     var back = File.ReadAllText(Path.Join(root, "stream.txt"));
     if (back.Ok) { printf("round-trip=%s\n", back.Value.ToPointer()); }
 

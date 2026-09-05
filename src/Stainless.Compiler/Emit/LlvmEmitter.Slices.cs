@@ -334,6 +334,48 @@ public sealed partial class LlvmEmitter
     /// <c>v.Circle</c> — one load and one comparison. The binder has already
     /// decided this is a question about the tag rather than a field read.
     /// </summary>
+    /// <summary>
+    /// <c>try e</c>: evaluate once, branch, and either carry on or return.
+    ///
+    /// The failure arm emits an ordinary <c>return</c> statement, which is the
+    /// point of the binder having built one -- reference counts, scope
+    /// releases and an sret struct return are all handled by the code that
+    /// already handles them, rather than by a second copy here that would
+    /// drift.
+    /// </summary>
+    private Val EmitTry(BoundTry expression)
+    {
+        string failLabel = NextLabel("try.fail");
+        string okLabel = NextLabel("try.ok");
+
+        // One slot, so both arms read the same value and the operand runs once.
+        var held = expression.Slot.Type;
+        string slot = Alloca(LlvmTypeOf(held), "try");
+        _slots[expression.Slot] = slot;
+
+        // Blanked first, for the reason a declared local is: an alloca holds
+        // whatever was on the stack, and the store below releases what it is
+        // replacing. Without this it released a Result made of rubbish, which
+        // is exactly as bad as it sounds -- it corrupted the heap and the
+        // program went back round a loop it had already left.
+        if (held.IsManagedSlot()) Line($"store ptr null, ptr {slot}");
+        else if (held is StructTypeSymbol owning && owning.CarriesReferences())
+            Line($"store {StructName(owning)} zeroinitializer, ptr {slot}");
+
+        var value = EmitExpression(expression.Operand);
+        StoreInto(slot, value, held);
+
+        var test = EmitExpression(expression.Test);
+        Terminator($"br i1 {test.Ref}, label %{okLabel}, label %{failLabel}");
+
+        Label(failLabel);
+        EmitStatement(expression.OnFailure);
+        if (!_blockTerminated) Terminator($"br label %{okLabel}");
+
+        Label(okLabel);
+        return EmitExpression(expression.OnSuccess);
+    }
+
     private Val EmitVariantTest(BoundVariantTest expression)
     {
         var variant = expression.Case.DeclaringVariant;

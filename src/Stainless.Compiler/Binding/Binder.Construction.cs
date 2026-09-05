@@ -197,6 +197,16 @@ public sealed partial class Binder
         var constructor = ResolveOverload(classType.Constructors, arguments, syntax.Span, $"new {classType.Name}");
         if (constructor is null) return new BoundErrorExpression(syntax.Span);
 
+        // A constructor's visibility is a visibility like any other, and it was
+        // being ignored: `public` on one meant nothing, so a type could not
+        // insist on being made through a factory. That is the shape a Result-
+        // returning `Open` needs -- without it the factory is advice.
+        if (!CanReach(constructor.IsPublic, constructor.IsProtected, classType))
+            diagnostics.Error("SL0572", syntax.Span,
+                $"'{classType.Name}' has no constructor that can be reached from here; " +
+                "the ones it declares belong to its own module. There is usually a " +
+                "function that makes one and says what went wrong if it could not");
+
         var converted = ConvertArguments(constructor, arguments, syntax.Arguments);
         return new BoundNew(syntax.Span, classType, constructor, converted);
     }

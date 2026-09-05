@@ -1582,6 +1582,16 @@ public sealed class Parser
     private ExpressionSyntax ParseUnary()
     {
         int start = _pos;
+
+        // `try` binds like any other prefix, so `try a + b` is `(try a) + b`
+        // and `try f().x` covers the whole chain. Anything wider is written
+        // with parentheses, which is where a reader would look for it.
+        if (At(TokenKind.TryKeyword))
+        {
+            Advance();
+            return new TrySyntax(SpanFrom(start), ParseUnary());
+        }
+
         if (AtAny(TokenKind.Minus, TokenKind.Plus, TokenKind.Bang, TokenKind.Tilde,
                   TokenKind.Star, TokenKind.Amp))
         {
@@ -1896,6 +1906,7 @@ public sealed class Parser
         bool operandFollows = AtAny(
             TokenKind.Identifier, TokenKind.IntLiteral, TokenKind.FloatLiteral,
             TokenKind.StringLiteral, TokenKind.CharLiteral, TokenKind.OpenParen,
+            TokenKind.TryKeyword,
             TokenKind.ThisKeyword, TokenKind.BaseKeyword, TokenKind.NewKeyword,
             TokenKind.SizeofKeyword,
             TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,

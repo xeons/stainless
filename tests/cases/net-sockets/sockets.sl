@@ -51,8 +51,11 @@ int Main() {
     //
     // Port 0 asks the system to choose, so two copies of this test can run at
     // once and neither has to know a port number in advance.
-    var server = new TcpListener("127.0.0.1", 0u);
-    SayBool("listening", server.IsListening());
+    var opened = Net.Listen("127.0.0.1", 0u);
+    SayBool("listening", opened.Ok);
+    if (!opened.Ok) { return 1; }
+
+    var server = opened.Value;
 
     var address = server.LocalEndPoint();
     Say("bound-host", address.Host);
@@ -61,15 +64,24 @@ int Main() {
     // No family named, so `Any`: the name decides. This is the shape that used
     // to open an AF_UNSPEC socket before resolving -- which Winsock accepts and
     // Linux does not, so it worked here and hung there.
-    var client = new TcpClient("127.0.0.1", address.Port);
-    SayBool("connected", client.IsConnected());
+    var dialled = Net.Connect("127.0.0.1", address.Port);
+    SayBool("connected", dialled.Ok);
+    if (!dialled.Ok) { return 1; }
+
+    var client = dialled.Value;
+
+    // A TcpClient is an IStream, so its `Error()` rounds a SocketError off for
+    // a reader that has never heard of a socket. On a live connection that is
+    // None, which is the case worth pinning now that a failed connect yields
+    // no client to ask.
+    SayBool("client-as-io", client.Error() == IOError.None);
     SayBool("connected-family", client.Underlying().Family() == AddressFamily.Any);
 
     // And opening one directly with `Any` is an error rather than a guess,
     // because there is no socket of no family.
-    var nofamily = new Socket(AddressFamily.Any, SocketKind.Stream);
-    SayBool("any-is-not-a-socket", !nofamily.IsOpen());
-    SayBool("any-says-why", nofamily.Error() == SocketError.Invalid);
+    var nofamily = Net.Open(AddressFamily.Any, SocketKind.Stream);
+    SayBool("any-is-not-a-socket", !nofamily.Ok);
+    SayBool("any-says-why", !nofamily.Ok && nofamily.Error == SocketError.Invalid);
 
     var accepted = server.Accept();
     SayBool("accepted", accepted.IsConnected());
@@ -130,13 +142,19 @@ int Main() {
     // ------------------------------------------------------------------ UDP
     //
     // No handshake, so one socket can talk to itself in a straight line.
-    var listener = new UdpSocket("127.0.0.1", 0u);
+    var bound = Net.Bind("127.0.0.1", 0u);
+    if (!bound.Ok) { return 1; }
+
+    var listener = bound.Value;
     SayBool("udp-open", listener.IsOpen());
 
     var inbox = listener.LocalEndPoint();
     SayBool("udp-port", inbox.Port != 0u);
 
-    var sender = new UdpSocket();
+    var made = Net.Datagram();
+    if (!made.Ok) { return 1; }
+
+    var sender = made.Value;
     nuint sent = sender.SendText("a datagram", "127.0.0.1", inbox.Port);
     SayNumber("udp-sent", (long)sent);
 
@@ -157,26 +175,27 @@ int Main() {
     // gives is its own business -- refused on a machine that answers, timed
     // out or unreachable on one that drops -- so what is checked is that it
     // failed and said something rather than which something it said.
-    var refused = new TcpClient("127.0.0.1", 1u);
-    SayBool("refused", !refused.IsConnected());
-    SayBool("refused-said-why", refused.SocketError() != SocketError.None);
-
-    // And the error rounds off to an IOError for a reader that has never
-    // heard of a socket.
-    SayBool("refused-as-io", refused.Error() != IOError.None);
+    var refused = Net.Connect("127.0.0.1", 1u);
+    SayBool("refused", !refused.Ok);
+    SayBool("refused-said-why", !refused.Ok && refused.Error != SocketError.None);
 
     // Two listeners on one port. The second one fails to bind.
-    var first = new TcpListener("127.0.0.1", 0u);
+    var opening = Net.Listen("127.0.0.1", 0u);
+    if (!opening.Ok) { return 1; }
+
+    var first = opening.Value;
     var taken = first.LocalEndPoint().Port;
-    var second = new TcpListener("127.0.0.1", taken);
-    SayBool("second-listener", second.IsListening());
+    var second = Net.Listen("127.0.0.1", taken);
+    SayBool("second-listener", second.Ok);
 
     first.Close();
-    second.Close();
 
-    // A socket that was never opened answers everything with Closed rather
-    // than doing anything.
-    var dead = new TcpListener("127.0.0.1", taken);
+    // A listener that was closed answers everything with Closed rather than
+    // doing anything. Reopening the port now works, since the first let go.
+    var reopened = Net.Listen("127.0.0.1", taken);
+    if (!reopened.Ok) { return 1; }
+
+    var dead = reopened.Value;
     dead.Close();
     SayBool("closed-listener", dead.IsListening());
 

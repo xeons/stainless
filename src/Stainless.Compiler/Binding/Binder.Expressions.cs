@@ -46,6 +46,7 @@ public sealed partial class Binder
         ConditionalSyntax conditional => BindConditional(conditional),
         LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
         InterpolatedStringSyntax interpolated => BindInterpolatedString(interpolated),
+        TrySyntax attempt => BindTry(attempt),
         ArrayLiteralSyntax array => BindArrayLiteral(array),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
@@ -177,6 +178,97 @@ public sealed partial class Binder
 
         _ => null,
     };
+
+    /// <summary>
+    /// <c>try e</c>: the value, or a return carrying the failure onward.
+    ///
+    /// It exists because the shape it replaces is three lines of ceremony
+    /// around one idea, and the ceremony is why the library reached for a bare
+    /// error enum in half its functions rather than the <c>Result</c> it had.
+    ///
+    ///     var text = ReadAllText(path);
+    ///     if (!text.Ok) { return Fail(text.Error); }
+    ///     return Ok(SplitLines(text.Value));
+    ///
+    ///     return Ok(SplitLines(try ReadAllText(path)));
+    ///
+    /// The failure path is built as a real <c>return</c> of a real
+    /// <c>Fail(...)</c>, so it counts references, releases scopes and returns a
+    /// struct exactly as a written one does. Nothing about it is a special
+    /// case downstream.
+    /// </summary>
+    private BoundExpression BindTry(TrySyntax syntax)
+    {
+        var operand = BindExpression(syntax.Operand);
+        if (operand.Type.IsError()) return operand;
+
+        if (operand.Type is not VariantTypeSymbol source || !IsResult(source))
+        {
+            diagnostics.Error("SL0569", syntax.Operand.Span,
+                $"'try' takes a 'Result', and this is '{operand.Type.Name}'; there is nothing " +
+                "here that could have failed");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // The failure has to go somewhere, and the only place is the caller.
+        if (_currentFunction?.ReturnType is not VariantTypeSymbol target || !IsResult(target))
+        {
+            diagnostics.Error("SL0570", syntax.Span,
+                _currentFunction is null
+                    ? "'try' passes a failure to the caller, so it belongs in a function"
+                    : $"'{_currentFunction.Name}' returns '{_currentFunction.ReturnType.Name}', " +
+                      "so a failure has nowhere to go. A function containing 'try' returns a " +
+                      "'Result'; use 'ValueOr' for a caller that has a sensible default");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var sourceOk = source.FindCase("Ok")!;
+        var sourceFail = source.FindCase("Fail")!;
+        var targetFail = target.FindCase("Fail")!;
+
+        var carried = sourceFail.Fields[0].Type;
+        var wanted = targetFail.Fields[0].Type;
+
+        // Exactly matching, at first. A conversion between two error types is a
+        // decision about what a failure means on the way past, and inventing
+        // one here would make it silently.
+        if (!carried.Equals(wanted))
+        {
+            diagnostics.Error("SL0571", syntax.Span,
+                $"this fails with '{carried.Name}' and '{_currentFunction.Name}' fails with " +
+                $"'{wanted.Name}'. 'try' passes a failure on unchanged, so convert it first: " +
+                "check it and return the failure you mean");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // One slot, read by both paths, so the operand is evaluated once.
+        var slot = new LocalSymbol($"try.{_tryCount++}", source, isConst: true);
+        var held = new BoundLocalAccess(syntax.Span, slot);
+
+        var test = new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, held, sourceOk);
+
+        var failure = new BoundReturn(syntax.Span,
+            new BoundVariantConstruction(syntax.Span, target, targetFail, [
+                new BoundVariantPayload(syntax.Span, held, sourceFail, sourceFail.Fields[0]),
+            ]));
+
+        var success = new BoundVariantPayload(syntax.Span, held, sourceOk, sourceOk.Fields[0]);
+
+        return new BoundTry(syntax.Span, success.Type, slot, operand, test, failure, success);
+    }
+
+    private int _tryCount;
+
+    /// <summary>
+    /// Whether a variant is <c>Result&lt;T, E&gt;</c> -- the one the standard
+    /// library declares, not merely something shaped like it.
+    /// </summary>
+    private bool IsResult(VariantTypeSymbol variant) =>
+        // The template's name, not the instantiation's: SimpleName is the
+        // display name and reads `Result<long, MathError>`.
+        variant.Template is { Name: "Result" } &&
+        variant.FindCase("Ok") is { Fields.Count: 1 } &&
+        variant.FindCase("Fail") is { Fields.Count: 1 };
 
     private BoundExpression BindLiteral(LiteralSyntax syntax) => syntax.Kind switch
     {

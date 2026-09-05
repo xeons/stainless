@@ -148,14 +148,20 @@ public interface IStream {
 
 /// A stream over a file.
 ///
-/// Construction is the open, so a `FileStream` always exists and `IsOpen()`
-/// says whether it holds a file. That avoids handing back a null a caller
-/// cannot unwrap, and puts the reason in `Error()`.
+/// **Made through `File.Open` and its relatives**, which return a
+/// `Result<FileStream, IOError>`. The constructor is not public, and that is
+/// the point: a stream that exists but holds no file is a value a caller can
+/// use and get nothing from, and nothing forces the check that would have
+/// caught it. A Result cannot be read without saying which case it is.
 ///
-///     var file = new FileStream("notes.txt", FileMode.Create, FileAccess.Write);
-///     if (!file.IsOpen()) { Console.WriteError(Describe(file.Error())); }
+///     var file = try File.Create("notes.txt");
 ///
-/// Closing is also the destructor's job, so a stream that goes out of scope
+/// `IsOpen()` remains, because a stream can be closed after it was opened, and
+/// `Error()` remains for a failure that happens during a read or a write --
+/// those are outcomes of an operation rather than of the opening, and there is
+/// nowhere else to put them.
+///
+/// Closing is the destructor's job too, so a stream that goes out of scope
 /// releases its handle whether or not `Close` was called.
 public class FileStream : IStream {
     byte* handle;
@@ -163,6 +169,10 @@ public class FileStream : IStream {
     IOError error;
     bool closed;
 
+    // The constructor stays, and `File.Open` sits beside it returning a
+    // Result. A constructor has to return its type, so it cannot report why an
+    // open failed; the pair is what gives a caller both the short path and the
+    // one whose failure cannot be walked past.
     public FileStream(String path, FileMode mode, FileAccess access) {
         int code = 0;
         handle = sl_file_open(path.ToPointer(), (int)mode, (int)access, &code);

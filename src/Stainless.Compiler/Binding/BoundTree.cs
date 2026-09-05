@@ -378,6 +378,31 @@ public sealed class BoundVariantConstruction(
 }
 
 /// <summary>
+/// <c>try e</c>, as the three pieces the emitter needs.
+///
+/// The operand is evaluated once into <see cref="Slot"/>, which both paths
+/// then read: <see cref="OnFailure"/> is an ordinary <c>return</c> of a
+/// <c>Fail</c> carrying its error, and <see cref="OnSuccess"/> reads its
+/// value. Building the failure path as a real return is what makes it behave
+/// like one -- reference counts, scope releases and a struct return through
+/// sret are all the emitter's existing code, not a second copy of it.
+/// </summary>
+public sealed class BoundTry(
+    SourceSpan span, TypeSymbol type, LocalSymbol slot, BoundExpression operand,
+    BoundExpression test, BoundStatement onFailure, BoundExpression onSuccess)
+    : BoundExpression(span, type)
+{
+    public LocalSymbol Slot { get; } = slot;
+    public BoundExpression Operand { get; } = operand;
+
+    /// <summary>Whether the slot is holding <c>Ok</c>.</summary>
+    public BoundExpression Test { get; } = test;
+
+    public BoundStatement OnFailure { get; } = onFailure;
+    public BoundExpression OnSuccess { get; } = onSuccess;
+}
+
+/// <summary>
 /// <c>r.Ok</c> — whether a variant is holding a particular case. It is one load
 /// and one comparison, and it is what a narrowing is proved from.
 /// </summary>

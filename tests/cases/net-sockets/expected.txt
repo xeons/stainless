@@ -5,6 +5,7 @@ listening true
 bound-host 127.0.0.1
 bound-port true
 connected true
+client-as-io true
 connected-family true
 any-is-not-a-socket true
 any-says-why true
@@ -34,6 +35,5 @@ udp-from true
 udp-from-port true
 refused true
 refused-said-why true
-refused-as-io true
 second-listener false
 closed-listener false

@@ -62,32 +62,38 @@ public IOError Rename(String from, String to) {
 
 // ------------------------------------------------------------------ opening
 
-/// Opens a file. The stream always exists; `IsOpen()` says whether it holds
-/// one, and `Error()` says why not.
-public FileStream Open(String path, FileMode mode, FileAccess access) {
-    return new FileStream(path, mode, access);
+/// Opens a file, or says why it could not be opened.
+///
+///     var file = try File.Open(path, FileMode.Open, FileAccess.Read);
+///
+/// A Result rather than a stream that exists and holds nothing: the second is
+/// a value a caller can go on using, and nothing forces the check that would
+/// have caught it.
+public Result<FileStream, IOError> Open(String path, FileMode mode, FileAccess access) {
+    var stream = new FileStream(path, mode, access);
+    if (!stream.IsOpen()) { return Fail(stream.Error()); }
+    return Ok(stream);
 }
 
-public FileStream OpenRead(String path) {
-    return new FileStream(path, FileMode.Open, FileAccess.Read);
+public Result<FileStream, IOError> OpenRead(String path) {
+    return Open(path, FileMode.Open, FileAccess.Read);
 }
 
 /// Creates the file, or replaces what is there.
-public FileStream Create(String path) {
-    return new FileStream(path, FileMode.Create, FileAccess.Write);
+public Result<FileStream, IOError> Create(String path) {
+    return Open(path, FileMode.Create, FileAccess.Write);
 }
 
 /// Opens for writing at the end, creating the file if it is not there.
-public FileStream OpenAppend(String path) {
-    return new FileStream(path, FileMode.Append, FileAccess.Write);
+public Result<FileStream, IOError> OpenAppend(String path) {
+    return Open(path, FileMode.Append, FileAccess.Write);
 }
 
 // ------------------------------------------------------------------ reading
 
 /// The whole file as bytes.
 public Result<byte[], IOError> ReadAllBytes(String path) {
-    var file = OpenRead(path);
-    if (!file.IsOpen()) { return Fail(file.Error()); }
+    var file = try OpenRead(path);
 
     long size = file.Length();
     if (size < 0) {
@@ -112,28 +118,26 @@ public Result<byte[], IOError> ReadAllBytes(String path) {
 
 /// The whole file as text, read as UTF-8.
 public Result<String, IOError> ReadAllText(String path) {
-    var raw = ReadAllBytes(path);
-    if (!raw.Ok) { return Fail(raw.Error); }
-    if (raw.Value.Length == 0) { return Ok(""); }
+    var raw = try ReadAllBytes(path);
+    if (raw.Length == 0) { return Ok(""); }
 
-    return Ok(Text.FromBytes(&raw.Value[0], raw.Value.Length));
+    return Ok(Text.FromBytes(&raw[0], raw.Length));
 }
 
 /// The file's lines, with either line ending accepted and a trailing newline
 /// producing no final empty line.
 public Result<List<String>, IOError> ReadAllLines(String path) {
-    var text = ReadAllText(path);
-    if (!text.Ok) { return Fail(text.Error); }
-
-    return Ok(IO.SplitLines(text.Value));
+    return Ok(IO.SplitLines(try ReadAllText(path)));
 }
 
 // ------------------------------------------------------------------ writing
 
 /// Replaces the file with `data`, creating it if needed.
 public IOError WriteAllBytes(String path, byte[] data) {
-    var file = Create(path);
-    if (!file.IsOpen()) { return file.Error(); }
+    var opened = Create(path);
+    if (!opened.Ok) { return opened.Error; }
+
+    var file = opened.Value;
 
     file.Write(data, 0, data.Length);
     var failure = file.Error();
@@ -143,8 +147,10 @@ public IOError WriteAllBytes(String path, byte[] data) {
 
 /// Replaces the file with `text`, written as UTF-8.
 public IOError WriteAllText(String path, String text) {
-    var file = Create(path);
-    if (!file.IsOpen()) { return file.Error(); }
+    var opened = Create(path);
+    if (!opened.Ok) { return opened.Error; }
+
+    var file = opened.Value;
 
     file.WriteText(text);
     var failure = file.Error();
@@ -154,8 +160,10 @@ public IOError WriteAllText(String path, String text) {
 
 /// Writes the lines, each followed by a newline.
 public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
-    var file = Create(path);
-    if (!file.IsOpen()) { return file.Error(); }
+    var opened = Create(path);
+    if (!opened.Ok) { return opened.Error; }
+
+    var file = opened.Value;
 
     for (nuint i = 0; i < lines.Count(); i = i + 1) {
         file.WriteText(lines.At(i));
@@ -169,8 +177,10 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
 
 /// Adds `text` to the end, creating the file if it is not there.
 public IOError AppendText(String path, String text) {
-    var file = OpenAppend(path);
-    if (!file.IsOpen()) { return file.Error(); }
+    var opened = OpenAppend(path);
+    if (!opened.Ok) { return opened.Error; }
+
+    var file = opened.Value;
 
     file.WriteText(text);
     var failure = file.Error();

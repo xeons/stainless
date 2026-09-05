@@ -554,6 +554,13 @@ public sealed record InterpolatedPartSyntax(string? Literal, ExpressionSyntax? V
 
 public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : ExpressionSyntax(Span);
 
+/// <summary>
+/// <c>try e</c>: the value if it succeeded, and otherwise a return from the
+/// enclosing function carrying the failure on.
+/// </summary>
+public sealed record TrySyntax(SourceSpan Span, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
+
 public sealed record ThisSyntax(SourceSpan Span) : ExpressionSyntax(Span);
 
 public sealed record UnarySyntax(SourceSpan Span, TokenKind Operator, ExpressionSyntax Operand)

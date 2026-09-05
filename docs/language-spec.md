@@ -738,7 +738,7 @@ class Parent {
 ```
 
 A lambda that captures `this` holds its object strongly, so an object that
-stores its own closure is such a cycle; see §2.14.
+stores its own closure is such a cycle; see §2.15.
 
 **A checked optional is the thing it holds.** `C?` and `C` are the same
 pointer, so once a check has established that one is not null the compiler lets
@@ -1088,7 +1088,7 @@ everything after it.
 ```csharp
 var raw = File.ReadAllBytes(path);
 if (!raw.Ok) { return Fail(raw.Error); }
-use(raw.Value);                              // proved by the line above
+Console.Write(raw.Value);                    // proved by the line above
 ```
 
 Anything that could have changed the Result takes the proof away again — an
@@ -1117,7 +1117,72 @@ mistake in the program rather than an outcome of it, and those still abort
 through the runtime: threading a Result through every array index would make
 every program worse to read in exchange for nothing.
 
-### 2.9 `interface` — a contract, dispatched dynamically
+**`try` passes a failure to the caller.**
+
+```csharp
+public Result<List<String>, IOError> ReadAllLines(String path) {
+    return Ok(IO.SplitLines(try ReadAllText(path)));
+}
+```
+
+`try e` evaluates `e`; on success the expression *is* the value, and on failure
+the enclosing function returns `Fail(e.Error)` at once. It is exactly the two
+lines it replaces -- the named temporary and the early return -- moved to where
+the value is used.
+
+It is spelled `try` and not `?` for a reason worth recording: a postfix `?`
+would sit exactly where the ternary's does, so `f() ? a : b` and `f()?` could
+not be told apart without fragile lookahead. `try` is unambiguous as a prefix,
+and Zig means the same thing by it. There are no exceptions here for it to be
+confused with.
+
+Three rules:
+
+- Only inside a function returning a `Result` (SL0570). There is nowhere else
+  for the failure to go, and aborting instead would be a decision the caller
+  never made. A caller with a sensible default wants `ValueOr`.
+- The operand must be a `Result` (SL0569).
+- **The error types must match** (SL0571). `try` passes a failure on unchanged;
+  converting one error type to another is a decision about what the failure
+  means, and this refuses to make it silently.
+
+It binds like any other prefix, so `try a + b` is `(try a) + b` and
+`try f().x` covers the whole chain. It is an expression, so several may appear
+in one -- `Ok(try P(a) + try P(b))` -- and each returns on its own failure.
+
+### 2.9 How the library reports failure
+
+Two conventions, and the difference between them is whether there is a value.
+
+| The function | reports failure as |
+|---|---|
+| produces a value | `Result<T, E>` |
+| produces nothing | the error enum, with `None` for success |
+
+`File.ReadAllBytes` returns a `Result<byte[], IOError>`; `File.Delete` returns
+an `IOError`. The second is not a lesser form of the first -- `Result<void, E>`
+is not expressible, and would say nothing the enum does not.
+
+**Construction is the awkward case**, because a constructor has to return its
+type and so cannot report why it failed. Every language with checked errors
+answers this with a function -- Rust's `TcpStream::connect`, Go's `net.Dial` --
+and so does this one:
+
+```csharp
+var listener = new TcpListener("0.0.0.0", 80u);   // then check IsListening()
+var listener = try Net.Listen("0.0.0.0", 80u);    // or let it propagate
+```
+
+Both exist. The constructor is the shorter path when a caller is going to check
+anyway; the factory's failure cannot be walked past, because a `Result` has no
+value to read until its case has been named. `File.Open`, `Net.Listen`,
+`Net.Connect`, `Net.Bind` and `Net.Datagram` are the factories.
+
+`IsOpen()` and `Error()` remain on a stream or a socket either way, for what
+happens *after* it is open: a read on a closed stream is an outcome of the
+read, and there is nowhere else to put it.
+
+### 2.10 `interface` — a contract, dispatched dynamically
 
 ```csharp
 public interface IShape {
@@ -1196,7 +1261,7 @@ through either reference reaches the right one, and a call on `Both` itself
 picks by argument type. What may *not* be overloaded is a method of one
 interface, since that is one slot.
 
-### 2.10 Arrays
+### 2.11 Arrays
 
 #### 2.10.1 `T[]` — a counted array
 
@@ -1229,7 +1294,7 @@ Show(["one", "two",]);                  // and from a parameter; the comma is fi
 ```
 
 **A literal has no type of its own.** What it becomes is decided by where it is
-going, exactly as for a lambda (§2.14) and a bare variant case name (§2.6) — a
+going, exactly as for a lambda (§2.15) and a bare variant case name (§2.6) — a
 `T[]`, a `T[N]` of matching length, or a `T[:]`:
 
 ```csharp
@@ -1314,7 +1379,7 @@ double Total(ref Matrix matrix) { ... }
 `new T[n]` is unaffected and still builds a counted heap array: under `new`, a
 length in brackets is the count rather than part of the type.
 
-### 2.11 `T[:]` — part of an array
+### 2.12 `T[:]` — part of an array
 
 A slice names part of an array, as a value.
 
@@ -1371,7 +1436,7 @@ Sort(numbers);                // the whole of it
 Sort(numbers[2:5]);           // three of them, in place, nothing copied
 ```
 
-### 2.12 `enum` — a distinct type over an integer
+### 2.13 `enum` — a distinct type over an integer
 
 ```csharp
 public enum Color { Red, Green, Blue }
@@ -1441,7 +1506,7 @@ no methods, so this is the language spelling the test rather than a call.
 into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
 belong to.
 
-### 2.13 `delegate` — a named function pointer
+### 2.14 `delegate` — a named function pointer
 
 ```csharp
 public delegate int Transform(int value);
@@ -1484,10 +1549,10 @@ if (none == null) { ... }
 
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
-§2.14 — and only a non-capturing one can be a delegate, because there is nowhere
+§2.15 — and only a non-capturing one can be a delegate, because there is nowhere
 in a single pointer to keep what was captured.
 
-### 2.14 Lambdas and closures
+### 2.15 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
 assigned to: an **interface with exactly one method**, or a **delegate**.
@@ -2354,7 +2419,7 @@ it.
 
 ### 5.5 Doing something to every element
 
-A lambda becomes an interface with exactly one method (§2.14), so the
+A lambda becomes an interface with exactly one method (§2.15), so the
 combinators need no function type in the language and no special case in the
 compiler — they are ordinary generic functions over ordinary generic
 interfaces.
@@ -2488,7 +2553,7 @@ parallel {
 }
 
 var got = work.TryDequeue();
-if (got.Ok) { use(got.Value); }
+if (got.Ok) { Console.WriteLine(got.Value); }
 ```
 
 `ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<K, V>` and
@@ -2520,7 +2585,7 @@ import Standard.File;
 import Standard.IO;
 
 var read = File.ReadAllText("config.json");
-if (read.Ok) { use(read.Value); }
+if (read.Ok) { Console.WriteLine(read.Value); }
 else         { Console.WriteError(IO.Describe(read.Error)); }
 ```
 
@@ -2747,7 +2812,7 @@ overloaded, because dispatch gives each one a single slot
 ```
 
 A *class* implementing two interfaces whose methods share a name is a different
-matter, and it works — see §2.9.
+matter, and it works — see §2.10.
 
 ### 7.2 `ref` and `in` parameters
 

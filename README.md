@@ -206,6 +206,27 @@ The check can be an `if`, an early return, a ternary arm, an `&&`, or a switch.
 A caller that would rather carry on writes `ValueOr(fallback)` and needs no
 check at all.
 
+### Failure
+
+```csharp
+public Result<List<String>, IOError> ReadAllLines(String path) {
+    return Ok(IO.SplitLines(try ReadAllText(path)));
+}
+```
+
+`try e` is the value on success, and returns `Fail(e.Error)` from the enclosing
+function on failure -- the named temporary and the early return it replaces,
+moved to where the value is used. It is `try` rather than `?` because a postfix
+`?` would sit exactly where the ternary's does; Zig means the same by the word,
+and there are no exceptions here to confuse it with.
+
+The library reports failure two ways, and the difference is whether there is a
+value: `Result<T, E>` when there is one, the error enum when there is not.
+Construction is the awkward case, since a constructor must return its type and
+cannot say why it failed -- so `File.Open`, `Net.Listen` and `Net.Connect` sit
+beside the constructors and return a `Result` whose failure cannot be walked
+past.
+
 ### Text
 
 One string type. `String` is immutable, reference counted, and always UTF-8 —
@@ -826,7 +847,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 207 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 210 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 497 compiler unit tests
 ```
 
@@ -836,8 +857,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 207 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 197 and Windows 206, each
+**Both Windows and Linux are tested.** 210 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 200 and Windows 209, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than

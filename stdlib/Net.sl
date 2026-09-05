@@ -876,3 +876,109 @@ public class UdpSocket {
         socket.Close();
     }
 }
+
+// ------------------------------------------------------------ opening
+
+// Opening, as a `Result`, beside the constructors rather than instead of them.
+//
+// A constructor has to return its type, so it cannot say why it failed; that is
+// why every language with checked errors puts fallible construction in a
+// function -- Rust's `TcpStream::connect`, Go's `net.Dial`. These are that,
+// and they are module-level because Stainless has no static methods.
+//
+// The constructors stay public and keep their `IsOpen()`/`Error()` pair, which
+// is the shorter path when a caller is going to check anyway. What these add
+// is a failure that cannot be walked past: a Result has no value to read until
+// its case has been named.
+//
+//     var listener = new TcpListener("0.0.0.0", 80u);   // then check IsListening()
+//     var listener = try Net.Listen("0.0.0.0", 80u);    // or let it propagate
+//
+// `IsOpen()` and `Error()` remain useful either way, because a socket can be
+// closed after it was opened and a read or a write can fail on its own. Those
+// are outcomes of an operation rather than of the opening.
+
+/// A socket of a given family and kind, unbound and unconnected.
+public Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind) {
+    var made = new Socket(family, kind);
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+/// A socket already connected to a host and port.
+///
+/// One step because connecting is what decides the family: a caller with a
+/// name does not know whether it will get IPv4 or IPv6, so it cannot open
+/// first.
+public Result<Socket, SocketError> OpenConnected(
+        String host, ushort port, AddressFamily family, SocketKind kind) {
+    var made = new Socket(host, port, family, kind);
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+/// Listens on every address the machine has.
+public Result<TcpListener, SocketError> Listen(ushort port) {
+    var made = new TcpListener(port);
+    if (!made.IsListening()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+/// Listens on one address.
+public Result<TcpListener, SocketError> Listen(String host, ushort port) {
+    var made = new TcpListener(host, port);
+    if (!made.IsListening()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+public Result<TcpListener, SocketError> Listen(
+        String host, ushort port, AddressFamily family, int backlog) {
+    var made = new TcpListener(host, port, family, backlog);
+    if (!made.IsListening()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+/// Connects to a host and port.
+public Result<TcpClient, SocketError> Connect(String host, ushort port) {
+    var made = new TcpClient(host, port);
+    if (!made.IsConnected()) { return Fail(made.SocketError()); }
+    return Ok(made);
+}
+
+public Result<TcpClient, SocketError> Connect(String host, ushort port, AddressFamily family) {
+    var made = new TcpClient(host, port, family);
+    if (!made.IsConnected()) { return Fail(made.SocketError()); }
+    return Ok(made);
+}
+
+/// A datagram socket with no address of its own, for sending.
+public Result<UdpSocket, SocketError> Datagram() {
+    var made = new UdpSocket();
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+public Result<UdpSocket, SocketError> Datagram(AddressFamily family) {
+    var made = new UdpSocket(family);
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+/// A datagram socket bound to a port, for receiving.
+public Result<UdpSocket, SocketError> Bind(ushort port) {
+    var made = new UdpSocket(port);
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+public Result<UdpSocket, SocketError> Bind(String host, ushort port) {
+    var made = new UdpSocket(host, port);
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}
+
+public Result<UdpSocket, SocketError> Bind(String host, ushort port, AddressFamily family) {
+    var made = new UdpSocket(host, port, family);
+    if (!made.IsOpen()) { return Fail(made.Error()); }
+    return Ok(made);
+}

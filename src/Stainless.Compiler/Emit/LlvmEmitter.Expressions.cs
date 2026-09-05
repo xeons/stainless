@@ -92,6 +92,7 @@ public sealed partial class LlvmEmitter
             case BoundVariantConstruction built: return EmitVariantConstruction(built);
             case BoundVariantTest test: return EmitVariantTest(test);
             case BoundVariantPayload payload: return EmitVariantPayload(payload);
+            case BoundTry attempt: return EmitTry(attempt);
 
             default:
                 return new Val("0", "i32", PrimitiveTypeSymbol.Int);
