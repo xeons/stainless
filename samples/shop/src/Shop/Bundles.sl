@@ -20,12 +20,12 @@ public class Bundle : IPriced {
 
     public void Include(IPriced item) {
         items[count] = item;
-        count = count + 1;
+        count += 1;
     }
 
     public Money Price() {
         var total = Cents(0);
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i += 1) {
             // Dynamic dispatch: each element may be a Book, a Subscription,
             // or another Bundle.
             total = Add(total, items[i].Price());

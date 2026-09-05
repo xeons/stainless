@@ -26,7 +26,7 @@ public class Money : IComparable<Money>, IDescribable {
 // `where T : IComparable<T>` is F-bounded: T must be comparable to itself.
 T Largest<T>(T[] values) where T : IComparable<T> {
     var best = values[0];
-    for (nuint i = 1; i < values.Length; i = i + 1) {
+    for (nuint i = 1; i < values.Length; i += 1) {
         if (values[i].CompareTo(best) > 0) { best = values[i]; }
     }
     return best;
@@ -44,12 +44,12 @@ public class Ranked<T> where T : IComparable<T>, IDescribable {
 
     public void Add(T item) {
         items[count] = item;
-        count = count + 1;
+        count += 1;
     }
 
     public String BestDescription() {
         var best = items[0];
-        for (nuint i = 1; i < count; i = i + 1) {
+        for (nuint i = 1; i < count; i += 1) {
             if (items[i].CompareTo(best) > 0) { best = items[i]; }
         }
         return best.Describe();

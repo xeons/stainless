@@ -17,6 +17,6 @@ public class Accumulator {
 
     public Accumulator() { total = 0.0; }
 
-    public void Add(double value) { total = total + value; }
+    public void Add(double value) { total += value; }
     public double Total() { return total; }
 }

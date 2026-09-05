@@ -23,7 +23,7 @@ public class Subscription : IPriced {
 
     public Money Price() {
         var total = Pricing.Cents(0);
-        for (int i = 0; i < months; i = i + 1) { total = Pricing.Add(total, monthly); }
+        for (int i = 0; i < months; i += 1) { total = Pricing.Add(total, monthly); }
         return total;
     }
 

@@ -8,9 +8,7 @@ import Standard.Console;
 
 int Sum(int[] values) {
     var total = 0;
-    for (nuint i = 0u; i < values.Length; i = i + 1u) {
-        total = total + values[i];
-    }
+    foreach (int value in values) { total += value; }
     return total;
 }
 
@@ -18,9 +16,7 @@ int Sum(int[] values) {
 /// as the view does.
 int SumOf(int[:] window) {
     var total = 0;
-    for (nuint i = 0u; i < window.Length; i = i + 1u) {
-        total = total + window[i];
-    }
+    foreach (int value in window) { total += value; }
     return total;
 }
 
@@ -34,7 +30,7 @@ int Main() {
 
     // `new T[n]` when the length is not a literal, and the elements are zero.
     var counted = new int[5];
-    for (nuint i = 0u; i < counted.Length; i = i + 1u) {
+    for (nuint i = 0u; i < counted.Length; i += 1u) {
         counted[i] = (int)(i * i);
     }
     Console.WriteLine("same   = " + Text.FromBool(Sum(counted) == Sum(squares)));

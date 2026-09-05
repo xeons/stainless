@@ -36,7 +36,7 @@ public String ToJson<T>(T value) {
     text.Append("{");
     var first = true;
 
-    for (nuint i = 0; i < type.FieldCount(); i = i + 1) {
+    for (nuint i = 0; i < type.FieldCount(); i += 1) {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore")) { continue; }
 

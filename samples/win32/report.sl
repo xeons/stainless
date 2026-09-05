@@ -36,7 +36,7 @@ void Row(String label, String value) {
 
 String Pad(String text, nuint width) {
     String padded = text;
-    while (padded.ByteLength() < width) { padded = padded + " "; }
+    while (padded.ByteLength() < width) { padded += " "; }
     return padded;
 }
 

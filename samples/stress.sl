@@ -24,18 +24,18 @@ int Main() {
     printf("fib(20)     = %d\n", Fib(20));
 
     var total = 0;
-    for (int i = 0; i < 10; i = i + 1) {
+    for (int i = 0; i < 10; i += 1) {
         if (i == 3) { continue; }
         if (i == 8) { break; }
-        total = total + i;
+        total += i;
     }
     printf("loop total  = %d (0+1+2+4+5+6+7 = 25)\n", total);
 
     var j = 0;
     var doubled = 0;
     while (j < 5) {
-        doubled = doubled + j * 2;
-        j = j + 1;
+        doubled += j * 2;
+        j += 1;
     }
     printf("while total = %d\n", doubled);
     printf("guard(0)    = %d\n", Guard(0));

@@ -20,14 +20,34 @@ public class Register<T> {
 
     public void Add(T item) {
         items[count] = item;
-        count = count + 1;
+        count += 1;
     }
+
+    /// `foreach` finds this by name rather than by interface, so a Register is
+    /// iterable without implementing anything or importing Standard.Collections.
+    public RegisterCursor<T> GetEnumerator() { return new RegisterCursor<T>(this); }
+}
+
+public class RegisterCursor<T> {
+    Register<T> source;
+    nuint next;
+
+    public RegisterCursor(Register<T> register) {
+        source = register;
+        next = 0;
+    }
+
+    public bool MoveNext() {
+        if (next >= source.Count()) { return false; }
+        next += 1;
+        return true;
+    }
+
+    public T Current() { return source.At(next - 1); }
 }
 
 public Money Total(Register<IPriced> register) {
     var sum = Cents(0);
-    for (nuint i = 0; i < register.Count(); i = i + 1) {
-        sum = Add(sum, register.At(i).Price());
-    }
+    foreach (var item in register) { sum = Add(sum, item.Price()); }
     return sum;
 }

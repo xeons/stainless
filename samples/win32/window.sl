@@ -4,7 +4,8 @@
 // double-buffered GDI painting.
 //
 //   stainless run samples/win32/window.sl \
-//       bindings/win32/api/Kernel32.sl bindings/win32/api/User32.sl \
+//       bindings/win32/api/Handles.sl bindings/win32/api/Kernel32.sl \
+//       bindings/win32/api/User32.sl \
 //       bindings/win32/api/Gdi32.sl bindings/win32/Win32.sl \
 //       bindings/win32/Ui.sl bindings/win32/Drawing.sl -l user32 -l gdi32
 //
@@ -54,41 +55,50 @@ public struct State {
 long Procedure(HWND window, uint message, ulong wParam, long lParam) {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
 
-    if (message == WmDestroy) {
-        PostQuitMessage(0);
-        return 0;
-    }
+    switch (message) {
+        case WmDestroy:
+            PostQuitMessage(0);
+            return 0;
 
-    if (message == WmPaint) {
-        Paint(window, state);
-        return 0;
-    }
+        case WmPaint:
+            Paint(window, state);
+            return 0;
 
-    // The background is painted as part of WM_PAINT, into the off-screen
-    // buffer. Saying so here is what stops Windows erasing it first and
-    // flickering once per frame.
-    if (message == WmEraseBackground) { return 1; }
+        // The background is painted as part of WM_PAINT, into the off-screen
+        // buffer. Saying so here is what stops Windows erasing it first and
+        // flickering once per frame.
+        case WmEraseBackground:
+            return 1;
 
-    if (message == WmMouseMove && state != null) {
-        // Both coordinates are packed into one LPARAM, low word first, and both
-        // are signed: a drag can leave the window to the left.
-        Point at = PointOf(lParam);
-        (*state).CursorX = at.X;
-        (*state).CursorY = at.Y;
-        (*state).Tracking = true;
-        Invalidate(window, false);
-        return 0;
-    }
+        case WmMouseMove:
+            if (state != null) {
+                // Both coordinates are packed into one LPARAM, low word first,
+                // and both are signed: a drag can leave the window to the left.
+                Point at = PointOf(lParam);
+                state->CursorX = at.X;
+                state->CursorY = at.Y;
+                state->Tracking = true;
+                Invalidate(window, false);
+                return 0;
+            }
+            break;
 
-    if (message == WmLeftButtonDown && state != null) {
-        (*state).Clicks = (*state).Clicks + 1;
-        Invalidate(window, false);
-        return 0;
-    }
+        case WmLeftButtonDown:
+            if (state != null) {
+                state->Clicks += 1;
+                Invalidate(window, false);
+                return 0;
+            }
+            break;
 
-    if (message == WmKeyDown) {
-        if ((int)wParam == VkEscape) { DestroyWindow(window); }
-        return 0;
+        case WmKeyDown:
+            if ((int)wParam == VkEscape) { DestroyWindow(window); }
+            return 0;
+
+        // Every other message -- and the two above, if one arrives before the
+        // state block is attached -- is Windows' own business.
+        default:
+            break;
     }
 
     return DefWindowProcW(window, message, wParam, lParam);
@@ -118,26 +128,26 @@ void Paint(HWND window, State* state) {
 }
 
 void DrawCrosshair(HDC dc, Rect client, State* state) {
-    if (state == null || !(*state).Tracking) { return; }
+    if (state == null || !state->Tracking) { return; }
 
     HPEN pen = CreatePen(PenSolid, 1, Colour(60u, 70u, 90u));
     HGDIOBJ previousPen = SelectObject(dc, pen);
 
-    MoveToEx(dc, 0, (*state).CursorY, null);
-    LineTo(dc, Width(client), (*state).CursorY);
-    MoveToEx(dc, (*state).CursorX, 0, null);
-    LineTo(dc, (*state).CursorX, Height(client));
+    MoveToEx(dc, 0, state->CursorY, null);
+    LineTo(dc, Width(client), state->CursorY);
+    MoveToEx(dc, state->CursorX, 0, null);
+    LineTo(dc, state->CursorX, Height(client));
 
     SelectObject(dc, previousPen);
     DeleteObject(pen);
 
     // A circle that grows with the click count, so a click is visible.
-    int radius = 12 + (*state).Clicks * 3;
+    int radius = 12 + state->Clicks * 3;
     HBRUSH brush = CreateSolidBrush(Colour(90u, 160u, 240u));
     HGDIOBJ previousBrush = SelectObject(dc, brush);
 
-    Ellipse(dc, (*state).CursorX - radius, (*state).CursorY - radius,
-                (*state).CursorX + radius, (*state).CursorY + radius);
+    Ellipse(dc, state->CursorX - radius, state->CursorY - radius,
+                state->CursorX + radius, state->CursorY + radius);
 
     SelectObject(dc, previousBrush);
     DeleteObject(brush);
@@ -154,9 +164,9 @@ void DrawLabels(HDC dc, State* state) {
 
     if (state != null) {
         DrawTextAt(dc, 16, 40,
-            "clicks: " + Text.FromInteger((long)(*state).Clicks)
-            + "    at " + Text.FromInteger((long)(*state).CursorX)
-            + ", " + Text.FromInteger((long)(*state).CursorY));
+            "clicks: " + Text.FromInteger((long)state->Clicks)
+            + "    at " + Text.FromInteger((long)state->CursorX)
+            + ", " + Text.FromInteger((long)state->CursorY));
     }
 
     SelectObject(dc, previousFont);
@@ -194,10 +204,10 @@ int Main() {
     }
 
     State* state = (State*)malloc(sizeof(State));
-    (*state).Clicks = 0;
-    (*state).CursorX = 0;
-    (*state).CursorY = 0;
-    (*state).Tracking = false;
+    state->Clicks = 0;
+    state->CursorX = 0;
+    state->CursorY = 0;
+    state->Tracking = false;
     SetWindowLongPtrW(window, GwlpUserData, (long)(nuint)state);
 
     ShowWindow(window, SwShowNormal);

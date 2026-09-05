@@ -25,7 +25,7 @@ public class Money : IComparable<Money>, IEquatable<Money> {
 // IList<T> extends IReadOnlyList<T>, so a list passed here can only be read.
 String Describe(IReadOnlyList<Money> prices) {
     var text = new StringBuilder();
-    for (nuint i = 0; i < prices.Count(); i = i + 1) {
+    for (nuint i = 0; i < prices.Count(); i += 1) {
         text.Append(prices.At(i).Show());
         text.Append(" ");
     }

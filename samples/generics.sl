@@ -28,11 +28,11 @@ public class List<T> {
     public void Add(T item) {
         if (count == items.Length) {
             var bigger = new T[count * 2];
-            for (nuint i = 0; i < count; i = i + 1) { bigger[i] = items[i]; }
+            for (nuint i = 0; i < count; i += 1) { bigger[i] = items[i]; }
             items = bigger;
         }
         items[count] = item;
-        count = count + 1;
+        count += 1;
     }
 
     public T At(nuint index) { return items[index]; }
@@ -61,7 +61,7 @@ int Main() {
 
     Console.WriteLine("count      = " + Text.FromInteger(names.Count()));
     var joined = new StringBuilder();
-    for (nuint i = 0; i < names.Count(); i = i + 1) {
+    for (nuint i = 0; i < names.Count(); i += 1) {
         joined.Append(names.At(i));
         joined.Append(" ");
     }

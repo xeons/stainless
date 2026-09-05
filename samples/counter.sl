@@ -15,7 +15,7 @@ class Cell {
     }
 
     public int Get() { return value; }
-    public void Bump() { value = value + 1; }
+    public void Bump() { value += 1; }
 }
 
 int Main() {

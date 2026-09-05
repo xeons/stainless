@@ -245,7 +245,10 @@ function and per-window state goes where Win32 has always kept it:
 ```csharp
 long Procedure(HWND window, uint message, ulong wParam, long lParam) {
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
-    if (message == WmDestroy) { PostQuitMessage(0); return 0; }
+    switch (message) {
+        case WmDestroy: PostQuitMessage(0); return 0;
+        default:        break;
+    }
     return DefWindowProcW(window, message, wParam, lParam);
 }
 ```
