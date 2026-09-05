@@ -1,0 +1,7 @@
+# The conveniences call into all of these.
+ole32
+shell32
+user32
+gdi32
+advapi32
+comdlg32

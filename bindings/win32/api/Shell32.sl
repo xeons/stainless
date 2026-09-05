@@ -25,11 +25,12 @@
 // program that *calls* one of them wants `-l shell32`, or `Win32.Shell`, which
 // names it with a pragma.
 //
-// Only the flat entry points are here. Everything shell32 exposes through COM —
-// which is most of what is new, `SHGetKnownFolderPath` included — needs vtable
-// layout and `IUnknown`, and is not bound.
+// The flat entry points, and the two that take a GUID: `SHGetKnownFolderPath`
+// and `SHCreateItemFromParsingName` are the doors to everything the shell has
+// added since Vista. The interfaces they lead to are in `Win32.ShellCom`.
 module Win32.Shell32;
 
+import Standard.Com;
 import Win32.Handles;
 
 #if WINDOWS
@@ -41,7 +42,40 @@ public extern "C" {
     uint      DragQueryFileW(HDROP drop, uint index, char16* buffer, uint size);
     void      DragFinish(HDROP drop);
     void      DragAcceptFiles(HWND window, int accept);
+
+    // Since Vista. The path comes back in memory the caller frees with
+    // `CoTaskMemFree`, and the folder is named by GUID rather than by the
+    // small integers below -- which is what lets a folder be added without
+    // renumbering anything.
+    int       SHGetKnownFolderPath(Guid* folder, uint flags, HANDLE token,
+                                   char16** path);
+
+    // A path, as the `IShellItem` every modern shell API takes.
+    int       SHCreateItemFromParsingName(char16* path, byte* bindContext,
+                                          Guid* interfaceId, byte** item);
+
+    // The item for a known folder, without going through its path -- which is
+    // the only way to name one that has no path.
+    int       SHCreateItemInKnownFolder(Guid* folder, uint flags, char16* name,
+                                        Guid* interfaceId, byte** item);
+
+    // The shell's own allocator for a `PIDL`, and the one call that frees the
+    // results of the older namespace functions.
+    void      ILFree(byte* list);
 }
+
+/// `SHGetKnownFolderPath` flags.
+
+/// The default: the path as it is now, and a failure if the folder does not
+/// exist.
+public const uint KnownFolderDefault = 0x00000000u;
+
+/// Create the folder if it is registered but not yet made.
+public const uint KnownFolderCreate = 0x00008000u;
+
+/// The path even if the folder is not there, which is what a program that is
+/// about to create it wants.
+public const uint KnownFolderDontVerify = 0x00004000u;
 
 /// `ShellExecuteW` returns a fake `HINSTANCE` that is an error code when it is
 /// 32 or less. Anything above that means it worked.

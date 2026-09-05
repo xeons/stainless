@@ -2827,13 +2827,42 @@ generates the same thing for the same reason.
 Converting a com class to one of its interfaces is therefore the one COM
 conversion that is not free: one add, at a constant offset.
 
+#### Where ARC and COM disagree
+
+Once, and it is worth knowing. ARC releases at the end of a scope;
+`CoUninitialize` is a call in the middle of one. So a reference held in the
+same scope is released *after* the apartment it belongs to is gone, through a
+vtable that is no longer there:
+
+```csharp
+Com.Initialize();
+IFileOpenDialog dialog = ...;
+Com.Uninitialize();                 // the object is still held
+                                    // -> released here, into freed memory
+```
+
+In C both are statements and the programmer orders them. Here one of them is
+emitted, so what orders them is the scope:
+
+```csharp
+Com.Initialize();
+{
+    IFileOpenDialog dialog = ...;   // released when this block ends
+}
+Com.Uninitialize();
+```
+
+This is the cost of the compiler owning the reference count, and it is a small
+one against the class of bug it removes — but it is the one thing a COM
+programmer knows that this does not do for them.
+
 #### What is not there
 
 - **Activation.** No `CoCreateInstance` wrapper, no registry, no class
   factories, no apartments, no marshalling, no proxies or stubs, no
   `IDispatch`. A program that wants those declares them `extern "C"` like any
-  other Windows API, which is what [tests/cases/com-shell](../tests/cases/com-shell)
-  does.
+  other Windows API — which is what [bindings/win32](../bindings/win32) now
+  does for the shell's half.
 - **A com class cannot derive from a class** (SL0536): the tear-offs sit after
   the fields, and a derived class adds fields after those.
 - **x64 and ARM64 only**, like the rest of the language. On x86 every COM

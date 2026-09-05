@@ -93,30 +93,45 @@ which is why [bindings/win32](bindings/win32) spells 460 constants as bare
 its underlying type in interop position would let a binding be typed without a
 cast on every line.
 
-### COM activation
+### Portable COM activation
 
-`com interface` and `com class` exist (spec §8.5), so calling COM and being
-called as COM both work, on every platform — the binary contract is a pointer
-to a vtable pointer and needs no operating system.
+`com interface` and `com class` exist (spec §8.5) and `Win32.Com`,
+`Win32.Ole32` and `Win32.ShellCom` bind Windows' activation over them, so
+calling COM works on Windows and the binary contract works everywhere.
 
-What is missing is the Windows half, and it is missing on purpose so far:
-`CoCreateInstance` and the registry, class factories, apartments, marshalling,
-proxies and stubs, `IDispatch`. A program declares what it needs `extern "C"`,
-which is what [tests/cases/com-shell](tests/cases/com-shell) does for
-`SHCreateItemFromParsingName` in six lines.
+What does not exist anywhere but Windows is *how an object gets made*. The
+piece worth building is small and deliberately not COM's: a table of factories
+linked into the process, plus `dlopen`/`LoadLibrary` of a module exporting
+`DllGetClassObject`, falling through to the real `CoCreateInstance` on Windows
+so one source reaches the actual shell.
 
-Two things would be worth building on top:
+In-process and free-threaded only, stated as a limit rather than discovered as
+one — no apartments, no marshalling, no proxies, no `IDispatch`. The value is
+in the interface discipline, and XPCOM is what pretending otherwise looks
+like.
 
-- **The Windows declarations.** `SHGetKnownFolderPath`, `IFileDialog`, WIC,
-  Direct2D. A binding now rather than a project — the language part is done.
-- **Registry-free activation**, and portably. A table of factories linked into
-  the process, plus `dlopen`/`LoadLibrary` of a module exporting
-  `DllGetClassObject`, falling through to the real `CoCreateInstance` on
-  Windows so one source reaches the actual shell. In-process and free-threaded
-  only, stated as a limit rather than discovered as one: the value is in the
-  interface discipline, and XPCOM is what pretending otherwise looks like.
+The same work is what would let a Stainless `com class` be handed to another
+process, which today it cannot be: it can be written and passed around inside
+one program, and nothing can ask for it by CLSID.
 
-*Touches:* `bindings/win32`, `runtime/com.c`.
+*Touches:* `runtime/com.c`, `bindings/win32/Com.sl`.
+
+### More Windows COM interfaces
+
+A binding rather than a project, now that the language part is done and the
+shell's half is written. In rough order of what a program actually wants:
+
+- **WIC** — `IWICImagingFactory` and four interfaces under it, which is what
+  loading a PNG or a JPEG takes. It pairs with `Win32.Drawing`, which can
+  already put a bitmap on screen and has no way to read one from a file.
+- **`IShellItem2` and the Property System** — the declaration is there for its
+  IID and its first slots; the property methods are not.
+- **`ITaskbarList3`** — progress in the taskbar button, which is thirty lines
+  and very visible.
+- **Direct2D and DirectWrite**, which are large and want a render loop, and are
+  the real test of whether this scales.
+
+*Touches:* `bindings/win32/api`, `bindings/win32`.
 
 ---
 

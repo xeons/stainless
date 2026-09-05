@@ -9,10 +9,10 @@ which one you are looking at:
 | `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
-The raw layer is 261 entry points, 460 constants and 27 structs, unions, enums
-and delegates across six libraries, plus the 12 handle types and the 17 names
-they go by; the twelve convenience modules add 146 functions and 7 types on
-top. Nothing is generated and nothing is marshalled: a
+The raw layer is 273 entry points, 511 constants and 28 structs, unions, enums
+and delegates across seven libraries, plus the 12 handle types and the 17 names
+they go by, and 7 COM interfaces; the thirteen convenience modules add 215
+functions and 9 types on top. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
 `delegate`, which is a bare function pointer Windows calls directly. A binding
 is a declaration, not a wrapper.
@@ -33,13 +33,18 @@ bindings/win32/api/
   AdvApi32.sl    module Win32.AdvApi32;   the registry
   Shell32.sl     module Win32.Shell32;    ShellExecuteW, known folders
   ComDlg32.sl    module Win32.ComDlg32;   the open and save dialogs
+  Ole32.sl       module Win32.Ole32;      COM: apartments, activation, HRESULT
+  ShellCom.sl    module Win32.ShellCom;   IShellItem, IFileDialog and friends
 ```
 
 One module per DLL, so there is never a question about where something lives or
 which `-l` it wants. The console and the clock are in `Kernel32` because that is
-the DLL that exports them, whatever else they look like. `Handles` is the one
-exception and is not a DLL: `HWND` belongs to no single library, which is why
-Windows keeps it in `windef.h` rather than in a per-DLL header.
+the DLL that exports them, whatever else they look like.
+
+Two are not DLLs. `Handles` is the handle types: `HWND` belongs to no single
+library, which is why Windows keeps it in `windef.h`. `ShellCom` is the COM
+interfaces the shell exposes, which likewise belong to no DLL — an interface is
+a contract, and the object behind it comes from wherever activation found it.
 
 ### The handle types
 
@@ -81,6 +86,45 @@ where it lists what *is* caught.
 A `void*` that is left is a `void*` in Windows too: a buffer, an address, a
 reserved word, or a pointer to a struct these bindings do not declare.
 
+### COM
+
+`Win32.ShellCom` declares the shell's interfaces as `com interface`, which is
+the language's own (§8.5 of the spec) and not a wrapper over one:
+
+```csharp
+[Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
+public com interface IShellItem {
+    int BindToHandler(byte* bindContext, Guid* handler, Guid* interfaceId, byte** result);
+    int GetParent(byte** parent);
+    int GetDisplayName(uint kind, char16** name);
+    int GetAttributes(uint mask, uint* attributes);
+    int Compare(byte* other, uint hint, int* order);
+}
+```
+
+**The method order is the vtable.** Nothing in one of these declarations may be
+reordered or left out, because slot 7 has to be slot 7 — which is why several
+methods take a `byte*` for an interface these bindings do not declare. The
+parameter is never passed; the slot has to exist.
+
+**ARC calls AddRef and Release**, so nothing in the conveniences counts a
+reference and nothing there can leak one. The one thing to know is that ARC
+releases at the end of a scope and `CoUninitialize` is a call in the middle of
+one — so an object must go out of scope before the apartment does. `Win32.Com`'s
+`Uninitialize` says so at greater length.
+
+An out-parameter is `byte**` rather than the interface, because that is what
+`void**` is, and the caller adopts what comes back with a cast:
+
+```csharp
+byte* raw = null;
+SHCreateItemFromParsingName(path, null, iidof(IShellItem), &raw);
+IShellItem item = (IShellItem)raw;      // +1 from the shell, released by ARC
+```
+
+`iidof(T)` is the `[Guid]` on the declaration, folded to a constant — C's
+`IID_IShellItem` without the header that had to declare it.
+
 **Importing the whole raw layer is free and needs no `-l` at all.** A
 declaration nothing calls is not a reference, so the linker never looks for it:
 
@@ -110,8 +154,10 @@ bindings/win32/
   Ui.sl            module Win32.Ui;           message loop, windows, clipboard
   Drawing.sl       module Win32.Drawing;      COLORREF, fonts, double buffering
   Registry.sl      module Win32.Registry;     keys and values, as a Result
-  Shell.sl         module Win32.Shell;        opening things, known folders
-  Dialogs.sl       module Win32.Dialogs;      the file dialogs
+  Com.sl           module Win32.Com;          apartments, activation, HRESULT
+  Shell.sl         module Win32.Shell;        opening things, known folders,
+                                              shell items
+  Dialogs.sl       module Win32.Dialogs;      the file dialogs, both generations
 ```
 
 These exist only where saying it in Stainless is genuinely better than saying it
@@ -128,8 +174,9 @@ Which library each wants:
 | `Win32.Ui` | `user32` |
 | `Win32.Drawing` | `gdi32` (and `user32`) |
 | `Win32.Registry` | `advapi32` |
-| `Win32.Shell` | `shell32` |
-| `Win32.Dialogs` | `comdlg32` (and `user32`) |
+| `Win32.Com` | `ole32` |
+| `Win32.Shell` | `shell32` (and `user32`, `ole32`) |
+| `Win32.Dialogs` | `comdlg32` (and `user32`, `ole32`) |
 
 The first row needs none: kernel32 is pulled in by the C runtime every Windows
 program already links.
@@ -232,12 +279,16 @@ the same for the parts with no window.
 
 ## What is not bound
 
-- **COM interfaces**, though not for want of a language feature: `com
-  interface` exists (§8.5 of the spec) and
-  [tests/cases/com-shell](../../tests/cases/com-shell) calls `IShellItem`
-  through it. What is missing here is the declarations —  the shell's newer
-  interfaces, Direct2D, WIC, `SHGetKnownFolderPath` — which is a binding rather
-  than a project now.
+- **COM beyond the shell.** `Win32.Ole32` and `Win32.ShellCom` bind the
+  activation half and the shell's interfaces — `IShellItem`,
+  `IShellItemArray`, `IFileDialog` and both its directions — and `Win32.Com`,
+  `Win32.Shell` and `Win32.Dialogs` are the conveniences over them. What is not
+  here is everything else COM reaches: Direct2D, WIC, the Windows Property
+  System, `ITaskbarList3`, `IDispatch` and automation.
+- **A Stainless object handed *out* as a COM object.** `com class` exists and
+  works (§8.5), so this is a matter of writing the class; what is absent is a
+  class factory and `DllGetClassObject`, which is what would let another
+  process ask for one.
 - **Winsock**, GDI+, DirectX, the Common Controls, WMI, the event log.
 - **32-bit Windows.** `LRESULT` and `LPARAM` are written `long` and `WPARAM`
   `ulong` because Windows is 64-bit; a 32-bit target would want `nint`/`nuint`.

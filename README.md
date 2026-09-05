@@ -718,9 +718,10 @@ than every program that compiles it repeating `-l` on the command line.
 
 ### The Win32 API
 
-[bindings/win32](bindings/win32) is what all of the above adds up to: 261
-Windows entry points, 460 constants, 27 structs, unions, enums and delegates and
-the 12 handle types, with 146 convenience functions over them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
+[bindings/win32](bindings/win32) is what all of the above adds up to: 273
+Windows entry points, 511 constants, 28 structs, unions, enums and delegates,
+the 12 handle types and 7 COM interfaces, with 215 convenience functions over
+them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
 Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
 `delegate`, which is the bare function pointer Windows calls.
 
@@ -1196,9 +1197,9 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
-- [bindings/win32](bindings/win32): the Windows API — 261 entry points, 460
-  constants, 27 structs, unions, enums and delegates and 12 handle types — as
-  declarations
+- [bindings/win32](bindings/win32): the Windows API — 273 entry points, 511
+  constants, 28 structs, unions, enums and delegates, 12 handle types and 7 COM
+  interfaces — as declarations
   rather than a marshalling layer, in two layers a module name apart:
   `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
   Source a program compiles rather than part of the standard library, because
@@ -1338,17 +1339,20 @@ Being straight about the edges, roughly in the order they are worth adding:
   `__stdcall` is what Win32 uses.
 - **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
   to a `uint` parameter without a cast, which is why
-  [bindings/win32](bindings/win32) spells 460 constants as bare `const uint`
+  [bindings/win32](bindings/win32) spells 511 constants as bare `const uint`
   rather than as the typed sets they are.
 - **An inline array holds plain data only** and cannot be passed by value
   (SL0486, SL0491). The first is the same question a union cannot answer; the
   second is because C decays an array parameter to a pointer and Stainless has
   no decay, so `ref T[N]` is the spelling that lines up.
-- **No COM activation.** `com interface` and `com class` are in the language
-  (§8.5) and work on every platform, because a COM interface is a pointer to a
-  vtable pointer and nothing else. What is absent is the Windows half:
-  `CoCreateInstance`, the registry, class factories, apartments, marshalling,
-  `IDispatch`. A program declares those `extern "C"` like any other API.
+- **No portable COM activation.** `com interface` and `com class` are in the
+  language (§8.5) and work on every platform, because a COM interface is a
+  pointer to a vtable pointer and nothing else; `Win32.Com` and `Win32.ShellCom`
+  bind the Windows half, so `CoCreateInstance`, `IShellItem` and `IFileDialog`
+  all work. What is absent is activation anywhere *but* Windows — a class
+  factory, a registry of them, `DllGetClassObject` — and, on Windows, the parts
+  nobody has asked for: apartments beyond `CoInitializeEx`, marshalling,
+  proxies and stubs, `IDispatch`.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
   Stainless library be consumed by Stainless, but a generic, a class that
   implements an interface, a variant and a slice all stay behind: a template

@@ -1,0 +1,24 @@
+downloads  true
+documents  true
+appdata    true
+windows    true
+savedgames true
+guid round trip true
+path matches    true
+is a folder     true
+has a name      true
+has a parent    true
+missing fails   true
+options set     true
+options kept    true
+filename kept   true
+title accepted  true
+folder set      true
+folder kept     true
+filters set     true
+filter index    true
+is IFileDialog  true
+is IModalWindow true
+not a save one  true
+picks folders   true
+done
