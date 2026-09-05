@@ -777,7 +777,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 170 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 182 end-to-end tests
 ```
 
 The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
@@ -1001,6 +1001,11 @@ Everything below is covered by [the test suite](tests/cases).
   changes, Itanium packs across — and `--abi` chooses, defaulting to the host's.
   A signed field sign-extends from its own width; writing one leaves its
   neighbours alone; one has no address, so no `ref` to it
+- Both struct conventions, chosen by the same `--abi`: Win64 asks only how big
+  a struct is, and System V AMD64 asks what is in it — cutting it into
+  eightbytes and passing each in an integer or an SSE register, so
+  `{ double; int; }` takes one of each and `{ float; int; }` takes one. Every
+  shape was checked against clang built for the matching target
 - `[Packed]` and `[Align(N)]`: no padding at all, and a raised alignment. Both
   are rules about layout rather than library features, so neither needs an
   import; they combine, N is a power of two capped at 16, and both apply to a
@@ -1033,6 +1038,11 @@ Everything below is covered by [the test suite](tests/cases).
   where the compiler has already seen which case is there — after `if (r.Ok)`,
   in the arm of a ternary, after an early `if (!r.Ok) { return ...; }`, or in a
   `switch` arm — and `ValueOr(fallback)` needs no proof because it supplies one
+- Flow narrowing, for a variant's case and for `C?` alike: `if (x != null)`
+  makes `x` a `C`, through an `if`, a `!`, `&&`, `||`, a ternary, an early
+  return and a `switch`. Only for a local or a parameter, and never for a
+  `weak C?`, which may die between the check and the use; an assignment takes
+  the proof away, and so does one anywhere in a loop body
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
@@ -1041,6 +1051,12 @@ Everything below is covered by [the test suite](tests/cases).
   call, because there is no interface id to look up. Fields are laid out after
   the base's, destructors chain derived-first, interfaces and their tables are
   inherited, and an upcast emits no instructions at all
+- `com interface` and `com class`: COM's binary contract, which is a pointer
+  to a vtable pointer and needs no operating system, so both work on every
+  platform. ARC drives `AddRef` and `Release`, `is` and a cast are
+  `QueryInterface`, and `[Guid("...")]` folds to a constant `iidof` names. A
+  com class presents vtables from an ordinary object through tear-offs, one per
+  interface, each with the distance back that lets a `Release` find the header
 - `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
   false for null, so a test through a `C?` asks about null and about the class
   at once; a cast that does not hold names what the object really is and ends
@@ -1088,7 +1104,16 @@ Everything below is covered by [the test suite](tests/cases).
   back with `ToText()` or, from a buffer a platform API filled, with
   `Text.FromUtf16`; anything malformed becomes U+FFFD in both directions, so a
   `String` is UTF-8 by invariant
+- `char`, `char16` and `char32`: one UTF-8 code unit, one UTF-16 code unit and
+  one Unicode scalar. Three encodings rather than three widths, so none becomes
+  another without a cast, and a character literal is one scalar that takes the
+  narrowest of the three holding it whole. `Utf16String.ToPointer()` is a
+  `char16*`, which is what makes handing a wide API the wrong 16-bit pointer a
+  compile error
 - `T[]`: counted arrays, always bounds checked, elements released with the array
+- Array literals: `[1, 2, 3]`, taking their type from where they are going — a
+  `T[]`, a `T[N]` of matching length or a `T[:]` — or from their own elements
+  when nothing else says, so `var xs = [1, 2, 3]` needs no type written out
 - `T[N]`: an inline fixed-size array, which is C's and not C#'s — it *is* its
   elements rather than a reference to them, so a struct holding one is exactly
   as wide as the C struct it mirrors. The length is part of the type, so
@@ -1242,11 +1267,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   to keep what was captured. A lambda that captures `this` keeps its object
   alive, so an object holding its own closure is a cycle; `weak` is how that is
   broken.
-- **Narrowing is for variants only.** The compiler tracks which case a variant
-  is holding through `if`, `!`, `&&`, `||`, a ternary, an early return and a
-  `switch`, and only for one held in a local or a parameter. It does not yet do
-  the same for `C?`, so an optional still cannot be unwrapped by testing it.
-  The two want the same machinery and the second is the obvious next step.
 - **No zero-width or unnamed bit-fields.** C's `int : 0;` closes a storage unit
   and `int : 3;` pads without naming anything; neither is written (SL0473).
   `[Packed]` together with bit-fields is refused rather than guessed (SL0470),
@@ -1299,8 +1319,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   are free — an uninstantiated template emits nothing, but a non-generic
   function or class is emitted either way. What saves it is that everything is
   emitted into its own section and the linker discards what nothing reached,
-  which takes hello-world from 276 KB to 124 KB. A hello-world emits 216
-  standard-library functions and 167 of them are unreachable from `Main`. The
+  which takes hello-world from 294 KB to 124 KB. That hello-world emits 216
+  standard-library functions and reaches *none* of them — it calls `puts` and
+  returns — so the linker is doing all of the work and the compiler none. The
   IR is still the full size, so compile time still pays for all of it; a
   reachability pass from `Main` would fix that and is the real answer.
 - **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct

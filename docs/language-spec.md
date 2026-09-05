@@ -466,9 +466,9 @@ type's size changes, and Itanium packs straight across and starts a new unit
 only when a field would cross a boundary of its own type. Both rules are
 implemented, chosen the way the C++ mangler chooses a scheme, and every size in
 the test suite was read off clang built for the matching target. `--abi` picks
-one explicitly; the default is the host's. It reaches names and bit-fields and
-nothing else — struct passing is Win64 either way, so `--abi` is not a
-cross-compilation.
+one explicitly; the default is the host's, and it reaches C++ names, bit-fields
+and how a struct is passed — Win64 asks only how big one is, System V asks what
+is in it. See [abi.md](abi.md) §3.4.
 
 **A bit-field has no address** (SL0443), for the reason C refuses `&s.flags`.
 It cannot be passed by `ref` and cannot be pointed at.
@@ -665,9 +665,10 @@ error[SL0518]: no object is both a 'Circle' and a 'Unrelated': neither derives
 from the other
 ```
 
-There is no `as`. It would produce a `C?`, and without flow narrowing for
-optionals (see [TODO.md](../TODO.md)) nothing could be done with the result that
-`is` plus a cast does not already do.
+There is no `as` yet. It would produce a `C?`, which is now worth having —
+flow narrowing arrived (§2.5), so the result of one would be usable, and
+`if (x is C) { var c = (C)x; }` is two tests where one would do. See
+[TODO.md](../TODO.md).
 
 ### 2.5 Pointers and nullability
 
@@ -1859,17 +1860,16 @@ to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
 
 **A non-generic function or class is emitted whether or not it is used**, and
 that is a real cost the compiler should not be charging: every stdlib module is
-compiled with your program whether you import it or not. A hello-world emits
-216 standard-library functions, and 167 of them are unreachable from `Main` —
-56 from `Standard.Math`, 52 across the `Standard.IO` family, 24 from
-`Standard.Reflection`, and so on. Nothing in the compiler prunes them: there is
-no reachability pass.
+compiled with your program whether you import it or not. A hello-world that
+calls `puts` and returns emits **216 standard-library functions and reaches
+none of them** — 56 from `Standard.Math`, 37 from `Standard.Collections`, 36
+from `Standard.IO`, 24 from `Standard.Reflection`, and so on down. Nothing in
+the compiler prunes them: there is no reachability pass.
 
 What saves it is the linker. Every function and datum goes in a section of its
-own and the linker drops the ones nothing reached, which takes a hello-world
-from 276 KB to 124 KB — more than half. The IR is still the full size, so
-compile time still pays for all of it, and a reachability pass from `Main`
-would fix that. It is not done.
+own and the linker drops the ones nothing reached, which takes that hello-world
+from 294 KB to 124 KB. The IR is still the full size, so compile time pays for
+all of it, and a reachability pass from `Main` would fix that. It is not done.
 
 | Module | Contents | Imported |
 |---|---|---|
@@ -1884,6 +1884,7 @@ would fix that. It is not done.
 | `Standard.File` | whole-file operations | on request |
 | `Standard.Directory` | making, removing and listing | on request |
 | `Standard.Path` | taking paths apart, textually | on request |
+| `Standard.Com` | `Guid` and `IUnknown`, for `com interface` (§8.5) | on request |
 | `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
 ### 5.2 `Standard.Threading`
