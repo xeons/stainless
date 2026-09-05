@@ -565,7 +565,9 @@ COM requires and which object identity is built on.
 
 **Nothing in any of this is Windows-specific**, and `runtime/com.c` has no
 `#ifdef` in it. The Windows part of COM is activation, and activation is not in
-the language.
+the language. That was a claim when it was written and is now a measurement:
+[tests/cases/com](../tests/cases/com) is not marked windows-only and passes on
+Linux, tear-offs, adjustor thunks, QueryInterface and all.
 
 ## 3. Calling convention
 
@@ -709,6 +711,24 @@ nothing:
   { char; char; char; } -> (i24)            one, sized to what is there
 ```
 
+**A bit-field is classified by its storage unit**, which is the whole of its
+declared type rather than the bits it uses. That is what the emitter loads and
+stores -- a `uint : 4` is read by loading four bytes and shifting -- so it is
+what has to cross:
+
+```
+  { uint:4; uint:4; uint:24; }  ->  (i32)   four bytes, one storage unit
+  { byte:3; byte:5; }           ->  (i8)    one byte, and genuinely an i8
+  { ulong:40; ulong:20; }       ->  (i64)
+  { ushort:9; ushort:7; int; }  ->  (i64)   the unit, then the field after it
+  { uint:3; double; uint:5; }   ->  memory  the double does not fit beside them
+```
+
+Marking only the bits a field uses is the mistake to avoid, and it was made:
+the first shape above travelled as an `i8`, so a caller sent the low eight bits
+and the other twenty-four arrived as zero. Win64 never showed it, because Win64
+asks only how big a struct is and four bytes is four bytes.
+
 Two further rules, both of which follow from not reading past the object:
 
 - **A register is sized by what it holds**, not by the eightbyte. `{ long;
@@ -730,6 +750,11 @@ than read off the specification: [tests/cases/sysv-abi](../tests/cases/sysv-abi)
 holds the signatures, and its `ir.txt` is what fails if the two ever disagree.
 Running the program proves only that the two halves of a call agree with each
 other, which they would even if both were wrong.
+
+The case now also *runs* on Linux, where a wrong classification is a wrong
+answer rather than a wrong text — which is how the bit-field mistake above was
+found, by `bitfield-interop` handing a struct to a C function that read it back
+as zero.
 
 ## 4. Static storage
 

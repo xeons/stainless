@@ -203,18 +203,20 @@ and needs a lifetime story the language does not have.
 ### A reachability pass from `Main`
 
 The standard library is compiled with every program and nothing prunes it. A
-hello-world that calls `puts` and returns emits **370 standard-library
-functions and reaches none of them**, in 17,071 lines of IR.
+hello-world that calls `puts` and returns emits **481 standard-library
+functions and reaches none of them**, in 20,471 lines of IR.
 
 What saves the binary is the linker: every function goes in a section of its
 own and the ones nothing reached are dropped, which takes that hello-world from
-318 KB to 124 KB. What nothing saves is the compile, which pays for all of it —
+337 KB to 124 KB. What nothing saves is the compile, which pays for all of it —
 binding, emitting and then handing clang twice the text it needs.
 
-Writing the text library in Stainless is what made this worth doing rather than
-worth noting. It added 154 functions and 9,351 lines of IR, and the stripped
-binary came out at 126,976 bytes: the same number, to the byte, as before any
-of it existed. The end-to-end suite went from 28 seconds to 42.
+Writing the library in Stainless is what made this worth doing rather than
+worth noting, and it has now been measured three times. The text library took
+the count from 216 functions to 370 and the IR from 7,720 lines to 17,071; the
+sockets took it to 481 and 20,471. The stripped binary came out at 126,976
+bytes on every one of the three occasions -- the same number, to the byte, as
+before any of it existed. The end-to-end suite went from 28 seconds to 52.
 
 The walk is from `Main`, plus every `export "C"`, every static initializer, and
 everything a dispatch table names — a virtual table, an interface table, a COM

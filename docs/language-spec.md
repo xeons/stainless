@@ -2062,18 +2062,20 @@ to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
 **A non-generic function or class is emitted whether or not it is used**, and
 that is a real cost the compiler should not be charging: every stdlib module is
 compiled with your program whether you import it or not. A hello-world that
-calls `puts` and returns emits **370 standard-library functions and reaches
-none of them** — 57 from `Standard.Encoding`, 56 from `Standard.Text`, 56 from
-`Standard.Math`, 37 from `Standard.Collections`, 36 from `Standard.IO`, and so
-on down. Nothing in the compiler prunes them: there is no reachability pass.
+calls `puts` and returns emits **481 standard-library functions and reaches
+none of them** — 96 from `Standard.Net`, 57 from `Standard.Encoding`, 56 from
+`Standard.Text`, 56 from `Standard.Math`, 50 from `Standard.Collections`, and
+so on down. Nothing in the compiler prunes them: there is no reachability pass.
 
 What saves it is the linker. Every function and datum goes in a section of its
 own and the linker drops the ones nothing reached, which takes that hello-world
-from 318 KB to 124 KB. The IR is still the full size, so compile time pays for
-all of it, and a reachability pass from `Main` would fix that. It is not done —
-and writing the text library in Stainless made the case for one plainer, since
-those 154 extra functions took the IR from 7,720 lines to 17,071 and the binary
-from 124 KB to 124 KB.
+from 337 KB to 124 KB. The IR is still the full size, so compile time pays for
+all of it, and a reachability pass from `Main` would fix that. It is not done.
+
+The library has been measured three times, and the answer has not moved. 216
+functions became 370 when the text library was written in Stainless and 481
+when the sockets were, and the IR went 7,720 lines to 17,071 to 20,471. The
+stripped binary was 126,976 bytes each time, to the byte.
 
 | Module | Contents | Imported |
 |---|---|---|
@@ -2087,7 +2089,7 @@ from 124 KB to 124 KB.
 | `Standard.IO` | streams and `IOError` | on request |
 | `Standard.File` | whole-file operations | on request |
 | `Standard.Directory` | making, removing and listing | on request |
-| `Standard.Path` | taking paths apart, textually | on request |
+| `Standard.Path` | taking paths apart, by the platform's rules | on request |
 | `Standard.Ascii` | what one byte is, when ASCII is the honest answer | on request |
 | `Standard.Encoding` | `IEncoding` and the six encodings (§3.6) | on request |
 | `Standard.Convert` | base64, hex and number parsing (§3.7) | on request |

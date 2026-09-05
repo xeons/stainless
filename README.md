@@ -788,9 +788,9 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 189 cases, of which 9 are Windows-only
-and 1 is Linux-only, so each platform runs 179 or 188 of them and skips the
-rest. A case whose *subject* differs by platform -- `Path.Join` writes a
+**Both Windows and Linux are tested.** 189 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 179 and Windows 188, each
+skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.
@@ -815,15 +815,21 @@ stainless emit-ir <paths...>   print the generated LLVM IR
   --header <path>        write a C header for the exported surface
   --metadata <path>      write module metadata for a Stainless consumer
   -r, --reference <path> bind against a library's module metadata
+  --runtime <shared|static>
+                         whether the runtime is one shared library or a
+                         copy in this binary. Shared where two Stainless
+                         binaries meet, static everywhere else
   -O<0-3>                optimization level (default -O2)
-  -g                     describe the program to a debugger
-  -D <name>              define a symbol for '#if' to test
-  -l <name>              link a library the linker finds by name
+  -g, --debug            describe the program to a debugger
+  -D, --define <name>    define a symbol for '#if' to test
+  -l, --library <name>   link a library the linker finds by name
                          (a source file can name one itself, with
                           '#pragma comment(lib, "user32")')
   --abi <microsoft|itanium>  which C and C++ ABI to agree with: names,
                          bit-fields and how a struct is passed
   --keep                 keep the generated .ll
+  --obj <dir>            directory for intermediates (default ./obj)
+  -h, --help  -v, --version
 ```
 
 Paths may be `.sl` files or directories (searched recursively), in any order.
@@ -1235,7 +1241,12 @@ Everything below is covered by [the test suite](tests/cases).
   `IStream` with `FileStream` and `MemoryStream`, whole-file reads and writes,
   directory listing, and textual path handling. Failure is a returned value —
   a `Result<T, IOError>`, or a bare `IOError` where nothing is produced. Paths
-  are UTF-8 and are widened to UTF-16 before they reach Windows
+  are UTF-8 and are widened to UTF-16 before they reach Windows.
+  `Standard.Path` answers the platform's questions rather than one platform's:
+  Windows reads both `\` and `/` apart and writes `\`, and everywhere else
+  only `/` is a separator — a backslash there is an ordinary character a
+  filename may contain, so treating `report\2026.csv` as two parts would be
+  wrong rather than lenient
 - `Standard.Net`: `TcpListener`, `TcpClient`, `UdpSocket` and the `Socket`
   underneath them, the same on Windows and Linux. `TcpClient` is an `IStream`,
   so a reader written against a file works over a connection with nothing
@@ -1385,17 +1396,17 @@ Being straight about the edges, roughly in the order they are worth adding:
   are free — an uninstantiated template emits nothing, but a non-generic
   function or class is emitted either way. What saves it is that everything is
   emitted into its own section and the linker discards what nothing reached,
-  which takes hello-world from 318 KB to 124 KB. That hello-world emits 370
+  which takes hello-world from 337 KB to 124 KB. That hello-world emits 481
   standard-library functions and reaches *none* of them — it calls `puts` and
   returns — so the linker is doing all of the work and the compiler none. The
   IR is still the full size, so compile time still pays for all of it; a
   reachability pass from `Main` would fix that and is the real answer.
 
-  Writing the text library in Stainless made the case for one sharper. It added
-  154 functions to that count and took the IR from 7,720 lines to 17,071 — for
-  a program that calls none of them — and the stripped binary came out byte for
-  byte the size it had been before. The linker's answer is free and the
-  compiler's lack of one is not.
+  The library has been measured three times now, and the same thing happened
+  each time. Text took it from 216 functions to 370 and the IR from 7,720 lines
+  to 17,071; sockets took it to 481 and 20,471. The stripped binary came out at
+  126,976 bytes on all three occasions — the same number, to the byte. The
+  linker's answer is free and the compiler's lack of one is not.
 - **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct
   but redundant, and since the counts became atomic each redundant pair costs
   about 5.7ns rather than about 1.2ns. A loop that does nothing but ARC traffic
@@ -1438,6 +1449,15 @@ Being straight about the edges, roughly in the order they are worth adding:
   (SL0486, SL0491). The first is the same question a union cannot answer; the
   second is because C decays an array parameter to a pointer and Stainless has
   no decay, so `ref T[N]` is the spelling that lines up.
+- **Sockets are blocking, and there is no TLS.** `Standard.Net` has one
+  socket's worth of waiting — `WaitToRead`, `WaitToWrite` and a non-blocking
+  mode — and nothing that waits on many at once, so a server that holds a
+  thousand connections wants a thread each. There is no `select` or `epoll`
+  over a set, no async, and nothing encrypted: a program that needs TLS reaches
+  for the platform's own through `extern "C"`. `Socket.Connect` on a socket
+  that is already open tries one address rather than all of them, because a
+  socket whose connect failed cannot be reused and that one is already made —
+  `new Socket(host, port, ...)` is the form that tries each.
 - **No portable COM activation.** `com interface` and `com class` are in the
   language (§8.5) and work on every platform, because a COM interface is a
   pointer to a vtable pointer and nothing else; `Win32.Com` and `Win32.ShellCom`
@@ -1477,11 +1497,13 @@ docs/                  language specification, ABI, concurrency design
 runtime/               the runtime, split by feature, embedded in the compiler
 stdlib/                the standard library written in Stainless, also embedded
 bindings/win32/        the Windows API, compiled only by a program that asks
+bindings/linux/        the Linux system calls, on the same terms
 samples/               example programs
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command
 tests/cases/           one directory per end-to-end test
-tests/Stainless.Tests  the test runner
+tests/Stainless.Tests  the end-to-end runner
+tests/Stainless.UnitTests  the compiler's own tests
 ```
 
 ## License
