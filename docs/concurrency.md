@@ -339,7 +339,17 @@ platform — Win32 today, pthreads behind the same interface, matching the
 | thread | `CreateThread` | `pthread_create` |
 | mutex | `SRWLOCK` | `pthread_mutex_t` |
 | condition | `CONDITION_VARIABLE` | `pthread_cond_t` |
+| timed wait | `SleepConditionVariableSRW` | `pthread_cond_timedwait` |
+| reader/writer | `SRWLOCK`, taken shared | `pthread_rwlock_t` |
+| thread-local | `FlsAlloc` | `pthread_key_create` |
+| sleep | `Sleep` | `nanosleep` |
 | atomics | clang `__atomic_*` builtins | same |
+| spin hint | `pause` / `yield` | same |
+
+Windows FLS rather than TLS for the thread-local slots, because `FlsAlloc`
+takes a callback that runs when a thread ends and `TlsAlloc` has no equivalent.
+Without it an object left in a slot outlives every reference to it, on every
+thread that ever touched the slot.
 
 A mutex is also available on the heap, as `sl_mutex_new` / `sl_mutex_free`, and
 a condition variable as `sl_condition_new` / `sl_condition_free`, because a
@@ -399,14 +409,19 @@ Two obligations the C ABI imposes, neither yet met:
 
 - **Atomically counted shared classes.** The freeable counterpart to freezing.
   Needs a per-class atomic count and a way to spell it.
-- **Async I/O.** The isolation model does not foreclose it. When it arrives, the
-  colour-free option is stackful fibers, not stackless coroutines — but fibers
-  fight the C ABI, since a blocking `extern "C"` call stalls the carrier thread.
-  That is the machinery Go needed years to build, and it is not free.
-- **`RwLock<T>`**, recursive locks, lock-free collections.
+- **Async I/O.** The isolation model does not foreclose it. The colour-free
+  option is stackful fibers, not stackless coroutines -- but fibers fight the C
+  ABI, since a blocking `extern "C"` call stalls the carrier thread. That is the
+  machinery Go needed years to build, and it is not free. §12 works through why
+  the other two mechanisms are not available here at all.
+- ~~**`RwLock<T>`**~~ -- shipped, with `ReadGuard<T>` and `WriteGuard<T>`
+  (§11). Recursive locks and lock-free collections are still deferred, the first
+  deliberately.
 - **Cancellation and failure.** Cancellation works as a shared flag today (§9);
-  what is missing is a reason, and a reason wants an error type, which the
-  language does not have.
+  what is missing is a reason. `Result<T, E>` now exists, so the sentence that
+  used to sit here -- that a reason wants an error type the language does not
+  have -- is no longer the obstacle. What is left is plumbing a scope handle
+  into a job.
 
 ---
 
@@ -458,10 +473,10 @@ scope today. Passing the scope into the thunk would give it one, and then
 either a `Cancel()` on a scope value or a `cancel;` statement valid inside
 `parallel` would express it.
 
-**Saying why.** A cancelled operation usually wants to report a reason, and
-that needs an error type, which the language does not have. Until then a
-cancelled job returns whatever it would have returned, and the flag is the only
-signal.
+**Saying why.** A cancelled operation usually wants to report a reason. That
+needs an error type, and `Result<T, E>` is now one -- so this is a question of
+plumbing rather than of a missing feature. Today a cancelled job returns
+whatever it would have returned, and the flag is the only signal.
 
 ---
 
@@ -552,3 +567,145 @@ What is still open, in the order it is worth doing:
    sides of a library boundary have separate allocators and separate stdio
    buffers. That is visible today as output from a library not interleaving with
    its consumer's in the order it was written.
+
+---
+
+## 11. The classic surface
+
+`parallel` and `spawn` cover the common case with no handle to lose and no join
+to forget. They do not cover everything: a listener that runs for the life of
+the program has no lexical scope to be bracketed by, and a background writer
+draining a queue does not want one. So `Standard.Threading` also carries the
+unstructured set, and it is deliberately second rather than absent.
+
+| | |
+|---|---|
+| `Thread` | one OS thread, started with a `Job` and a `byte*`; `Join`, `Detach`, `IsJoinable` |
+| `Threading.Sleep` / `Yield` / `CurrentId` | the free functions a thread needs about itself |
+| `Monitor<T>` / `MonitorGuard<T>` | a `Mutex<T>` that can be waited on: `Wait`, `WaitFor`, `Pulse`, `PulseAll` |
+| `RwLock<T>` / `ReadGuard<T>` / `WriteGuard<T>` | many readers or one writer, with `TryRead` and `TryWrite` |
+| `Semaphore` | a permit count: `Wait`, `TryWait`, `WaitFor`, `Release`, `ReleaseMany` |
+| `ManualResetEvent` | a latch that stays open until `Reset` |
+| `AutoResetEvent` | a turnstile: one `Set`, one passage |
+| `CountdownEvent` | counts down to zero and opens |
+| `Barrier` | a reusable rendezvous for a fixed number of threads |
+| `AtomicInt` | the 32-bit counter, for a cell shared with C |
+| `AtomicLong.And` / `Or` / `Xor` | bitwise, for a flag set several threads maintain |
+| `SpinWait` | pause, then yield, for a wait shorter than a context switch |
+
+Underneath, [runtime/thread.c](../runtime/thread.c) gained the timed condition
+wait these are built on (`SleepConditionVariableSRW` / `pthread_cond_timedwait`),
+`SlRwLock` (a shared-mode `SRWLOCK`; `pthread_rwlock_t`), thread-local slots
+with a destructor that runs on thread exit (Windows **FLS** rather than TLS,
+because `TlsAlloc` has no such callback), `sl_thread_detach`, `sl_thread_sleep`,
+the 32-bit and pointer atomic sets, and `sl_cpu_pause`.
+
+### 11.1 The ownership rule is the whole difference
+
+A `spawn`ed job **borrows** the frame that spawned it. That is sound for exactly
+one reason: the closing brace cannot be passed until the job has finished, so
+the frame provably outlives it (§2.1).
+
+A `Thread` has no closing brace. Whatever it touches has to outlive it on its
+own — a `[Shared]` object held in a `static readonly`, or a block the thread
+frees itself. Handing it a pointer to a local and returning is a use-after-free,
+and nothing catches it: the argument is a `byte*`, which is the same hole §1.3
+leaves open for `spawn` and the reason step 6's lifetime analysis is still the
+open item.
+
+**The destructor joins.** A `Thread` dropped unjoined blocks where it is
+dropped, which is C++'s `jthread` and the safe default — the alternative is a
+thread still running against storage that has gone. `Detach()` says the other
+thing out loud.
+
+### 11.2 What was not added, and why
+
+**`Volatile.Read` / `Volatile.Write`.** Every atomic here is sequentially
+consistent, so `Volatile.Read` would be `AtomicLong.Load` under a second name
+that suggests a weaker guarantee than it gives. Two spellings for one operation
+is worse than one.
+
+**`ThreadLocal<T>`.** The slots exist in the runtime; the type does not.
+Stainless constrains by interface only — there is no `where T : class` — so a
+generic `ThreadLocal<T>` would accept `ThreadLocal<int>` and have nowhere to put
+the `int`. This is the same reason `AtomicLong` is not `Atomic<T>`. It wants
+either a non-generic pair of types or a constraint the language does not have,
+and neither is worth guessing at before something needs it.
+
+**Recursive locks.** A recursive lock usually means an ownership question went
+unanswered, and neither platform's default primitive is one.
+
+**`Thread.Abort` and anything like it.** §9.2, unchanged: a thread killed
+mid-call leaves destructors unrun and counts wrong.
+
+---
+
+## 12. Async, and why this does not have it
+
+`async`/`await` is two things bolted together (§2): a way to express
+concurrency, and a stackless coroutine transform. Stainless takes the first and
+refuses the second, and the reason is worth writing down properly, because "we
+could add `await` later" is only true for one of the three ways to build it.
+
+### 12.1 The three mechanisms
+
+**A compiler CPS transform.** C# today, Rust, JavaScript, Python. The function
+is split at every suspend point, and locals that live across one become fields
+of a heap object with a state number and a resume method. This is the state
+machine, and it is what makes the colour viral: to suspend, your caller must be
+split too.
+
+**Runtime-built continuations.** .NET's "runtime async" stops the compiler
+emitting state machines; `await` becomes a call to a runtime intrinsic, and the
+JIT gives an async method two entry points, copying live frames into a heap
+continuation chain on suspend. Worth being precise about what it buys: it
+removes the *state machine*, not the *colour* — `async` is still in the
+signature. It needs a JIT and a precise GC stack map, and it works because
+managed code has no raw `&local` escaping into unmanaged code.
+
+**Stackful coroutines.** Go, Java's virtual threads. No transform, no colour,
+and no `await` keyword at all: every task has a real stack and blocking is a
+scheduler yield. Go pays for it with **movable** stacks — grown by copying,
+which needs precise pointer maps and pointer rewriting — and that is exactly
+why a cgo call has to switch to the system stack. Java pays at the same wall
+from the other side: a native frame pins the carrier thread.
+
+Swift is the interesting middle. Its async functions are neither: the compiler
+emits **split functions** whose frames are heap-allocated async contexts, linked
+to the caller's and drawn from a per-task slab, under a calling convention of
+their own. The task's stack is a heap linked list, so it grows on demand with no
+fixed reservation. It is still stackless CPS and still coloured, and a C
+function still cannot call into a suspended one.
+
+### 12.2 What is available here, and what is not
+
+Stainless is AOT, has raw pointers, and honours the C ABI. A caller can take
+`&local` and hand it to C, which decides two of the three:
+
+| | Available? | |
+|---|---|---|
+| Stack copying — Go, .NET runtime async | **No** | a frame cannot move behind a C caller's back, and there is no GC map saying which words are pointers |
+| LLVM `llvm.coro.*` | Yes | `coro-split` builds the machine, as it does for Swift and for clang's C++20 coroutines. The colour comes back with it |
+| Fixed-size fibers — `swapcontext`, Win32 Fibers, boost.context | Yes | no colour, blocking allowed. Costs a stack per task, and a blocking `extern "C"` call pins its carrier |
+
+So the menu is **fibers and no `await`**, or **`await` and the colour back**.
+There is no third door for a language in this position, and the first door is
+the one §8 already points at.
+
+### 12.3 The question that actually decides it
+
+`async`/`await` exists to solve a problem this language does not have. In C# and
+JavaScript the problem is *one thread, or expensive threads, and a great deal of
+I/O*; the fix is either cheap tasks on few threads or cheap threads. Stainless
+has real OS threads and permits blocking, so what is left is only: **how many
+concurrent I/O operations does a program need?**
+
+Thousands, and M:N scheduling is unavoidable — fibers, with the pinning problem
+and the per-task stack. Dozens, and a thread each is correct, simpler, and
+already built. Nothing in `Standard.Net` or `Standard.IO` has needed more than
+dozens yet, and the honest position is that fibers should wait for a program
+that does.
+
+What such a program wants first is not `await`. It is a carrier pool that grows
+when a worker blocks in a syscall — Java's managed blockers, Go's `sysmon`
+handoff — and that needs no language change at all.

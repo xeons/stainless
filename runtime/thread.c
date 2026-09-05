@@ -45,8 +45,10 @@
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #else
+#  include <errno.h>
 #  include <pthread.h>
 #  include <sched.h>
+#  include <time.h>
 #  include <unistd.h>
 #endif
 
@@ -54,9 +56,11 @@
 #ifdef _WIN32
 _Static_assert(sizeof(SRWLOCK) <= sizeof(SlMutex), "SlMutex too small");
 _Static_assert(sizeof(CONDITION_VARIABLE) <= sizeof(SlCondition), "SlCondition too small");
+_Static_assert(sizeof(SRWLOCK) <= sizeof(SlRwLock), "SlRwLock too small");
 #else
 _Static_assert(sizeof(pthread_mutex_t) <= sizeof(SlMutex), "SlMutex too small");
 _Static_assert(sizeof(pthread_cond_t) <= sizeof(SlCondition), "SlCondition too small");
+_Static_assert(sizeof(pthread_rwlock_t) <= sizeof(SlRwLock), "SlRwLock too small");
 #endif
 
 /* ------------------------------------------------------------------ locks */
@@ -207,6 +211,195 @@ void sl_condition_broadcast(SlCondition *condition)
 #endif
 }
 
+_Bool sl_condition_wait_for(SlCondition *condition, SlMutex *mutex,
+                            unsigned long long milliseconds)
+{
+#ifdef _WIN32
+    DWORD span = milliseconds > INFINITE - 1 ? INFINITE - 1 : (DWORD)milliseconds;
+    if (SleepConditionVariableSRW(AS_CONDITION(condition), AS_MUTEX(mutex), span, 0))
+        return 1;
+
+    /*
+     * A spurious wake reports success, so the only failure worth reporting is
+     * the deadline. Anything else would be a programming error here, and
+     * saying "signalled" for it keeps the caller in its re-check loop.
+     */
+    return GetLastError() != ERROR_TIMEOUT;
+#else
+    /*
+     * pthread_cond_timedwait takes an absolute deadline on CLOCK_REALTIME,
+     * which is what a default-initialised condition uses.
+     */
+    struct timespec deadline;
+    clock_gettime(CLOCK_REALTIME, &deadline);
+
+    deadline.tv_sec  += (time_t)(milliseconds / 1000ULL);
+    deadline.tv_nsec += (long)((milliseconds % 1000ULL) * 1000000ULL);
+    if (deadline.tv_nsec >= 1000000000L) {
+        deadline.tv_sec  += 1;
+        deadline.tv_nsec -= 1000000000L;
+    }
+
+    return pthread_cond_timedwait(AS_CONDITION(condition), AS_MUTEX(mutex),
+                                  &deadline) != ETIMEDOUT;
+#endif
+}
+
+/* -------------------------------------------------------- reader/writer */
+
+/*
+ * The same SRWLOCK as a mutex, taken shared instead of exclusive -- Windows
+ * has one primitive for both. POSIX has a separate pthread_rwlock_t, which is
+ * why this is its own type rather than more entry points on SlMutex.
+ */
+
+#ifdef _WIN32
+#  define AS_RWLOCK(l) ((SRWLOCK *)((SlRwLock *)(l))->opaque)
+#else
+#  define AS_RWLOCK(l) ((pthread_rwlock_t *)((SlRwLock *)(l))->opaque)
+#endif
+
+void *sl_rwlock_new(void)
+{
+    SlRwLock *lock = (SlRwLock *)calloc(1, sizeof(SlRwLock));
+    if (lock == NULL) sl_fail("out of memory");
+
+#ifdef _WIN32
+    InitializeSRWLock(AS_RWLOCK(lock));
+#else
+    if (pthread_rwlock_init(AS_RWLOCK(lock), NULL) != 0)
+        sl_fail("could not create a reader/writer lock");
+#endif
+
+    return lock;
+}
+
+void sl_rwlock_free(void *lock)
+{
+    if (lock == NULL) return;
+
+#ifndef _WIN32
+    pthread_rwlock_destroy(AS_RWLOCK(lock));
+#endif
+    free(lock);
+}
+
+void sl_rwlock_read_lock(void *lock)
+{
+#ifdef _WIN32
+    AcquireSRWLockShared(AS_RWLOCK(lock));
+#else
+    pthread_rwlock_rdlock(AS_RWLOCK(lock));
+#endif
+}
+
+_Bool sl_rwlock_try_read_lock(void *lock)
+{
+#ifdef _WIN32
+    return TryAcquireSRWLockShared(AS_RWLOCK(lock)) != 0;
+#else
+    return pthread_rwlock_tryrdlock(AS_RWLOCK(lock)) == 0;
+#endif
+}
+
+void sl_rwlock_read_unlock(void *lock)
+{
+#ifdef _WIN32
+    ReleaseSRWLockShared(AS_RWLOCK(lock));
+#else
+    pthread_rwlock_unlock(AS_RWLOCK(lock));
+#endif
+}
+
+void sl_rwlock_write_lock(void *lock)
+{
+#ifdef _WIN32
+    AcquireSRWLockExclusive(AS_RWLOCK(lock));
+#else
+    pthread_rwlock_wrlock(AS_RWLOCK(lock));
+#endif
+}
+
+_Bool sl_rwlock_try_write_lock(void *lock)
+{
+#ifdef _WIN32
+    return TryAcquireSRWLockExclusive(AS_RWLOCK(lock)) != 0;
+#else
+    return pthread_rwlock_trywrlock(AS_RWLOCK(lock)) == 0;
+#endif
+}
+
+void sl_rwlock_write_unlock(void *lock)
+{
+#ifdef _WIN32
+    ReleaseSRWLockExclusive(AS_RWLOCK(lock));
+#else
+    pthread_rwlock_unlock(AS_RWLOCK(lock));
+#endif
+}
+
+/* ----------------------------------------------------- thread-local slots */
+
+/*
+ * Windows FLS rather than TLS: FlsAlloc takes a callback that runs when a
+ * thread ends, which TlsAlloc has no equivalent for. That callback is the
+ * whole point -- without it an object left in a slot outlives every reference
+ * to it, on every thread that ever touched the slot.
+ */
+
+#ifdef _WIN32
+static void WINAPI tls_release(void *value)
+{
+    sl_release(value);
+}
+#else
+static void tls_release(void *value)
+{
+    sl_release(value);
+}
+#endif
+
+size_t sl_tls_new(_Bool releaseOnExit)
+{
+#ifdef _WIN32
+    DWORD slot = FlsAlloc(releaseOnExit ? tls_release : NULL);
+    if (slot == FLS_OUT_OF_INDEXES) sl_fail("out of thread-local slots");
+    return (size_t)slot;
+#else
+    pthread_key_t key;
+    if (pthread_key_create(&key, releaseOnExit ? tls_release : NULL) != 0)
+        sl_fail("out of thread-local slots");
+    return (size_t)key;
+#endif
+}
+
+void sl_tls_free(size_t slot)
+{
+#ifdef _WIN32
+    FlsFree((DWORD)slot);
+#else
+    pthread_key_delete((pthread_key_t)slot);
+#endif
+}
+
+void *sl_tls_get(size_t slot)
+{
+#ifdef _WIN32
+    return FlsGetValue((DWORD)slot);
+#else
+    return pthread_getspecific((pthread_key_t)slot);
+#endif
+}
+
+void sl_tls_set(size_t slot, void *value)
+{
+#ifdef _WIN32
+    FlsSetValue((DWORD)slot, value);
+#else
+    pthread_setspecific((pthread_key_t)slot, value);
+#endif
+}
+
 /* --------------------------------------------------------------- atomics */
 
 /*
@@ -236,6 +429,79 @@ long long sl_atomic_exchange(long long *cell, long long value)
 }
 
 _Bool sl_atomic_compare_exchange(long long *cell, long long *expected, long long desired)
+{
+    return __atomic_compare_exchange_n(
+        cell, expected, desired, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+}
+
+long long sl_atomic_and(long long *cell, long long mask)
+{
+    return __atomic_and_fetch(cell, mask, __ATOMIC_SEQ_CST);
+}
+
+long long sl_atomic_or(long long *cell, long long mask)
+{
+    return __atomic_or_fetch(cell, mask, __ATOMIC_SEQ_CST);
+}
+
+long long sl_atomic_xor(long long *cell, long long mask)
+{
+    return __atomic_xor_fetch(cell, mask, __ATOMIC_SEQ_CST);
+}
+
+/*
+ * The 32-bit set, for a counter that has to sit in an `int` -- a field shared
+ * with C, usually. A cell of its own would be 64 bits and would not need these.
+ */
+
+int sl_atomic_load32(const int *cell)
+{
+    return __atomic_load_n(cell, __ATOMIC_SEQ_CST);
+}
+
+void sl_atomic_store32(int *cell, int value)
+{
+    __atomic_store_n(cell, value, __ATOMIC_SEQ_CST);
+}
+
+int sl_atomic_add32(int *cell, int delta)
+{
+    return __atomic_add_fetch(cell, delta, __ATOMIC_SEQ_CST);
+}
+
+int sl_atomic_exchange32(int *cell, int value)
+{
+    return __atomic_exchange_n(cell, value, __ATOMIC_SEQ_CST);
+}
+
+_Bool sl_atomic_compare_exchange32(int *cell, int *expected, int desired)
+{
+    return __atomic_compare_exchange_n(
+        cell, expected, desired, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+}
+
+/*
+ * And the pointer set. These move the pointer only: nothing here retains or
+ * releases, so a Stainless object published through one has to be kept alive
+ * by whoever put it there.
+ */
+
+void *sl_atomic_load_pointer(void *const *cell)
+{
+    return __atomic_load_n(cell, __ATOMIC_SEQ_CST);
+}
+
+void sl_atomic_store_pointer(void **cell, void *value)
+{
+    __atomic_store_n(cell, value, __ATOMIC_SEQ_CST);
+}
+
+void *sl_atomic_exchange_pointer(void **cell, void *value)
+{
+    return __atomic_exchange_n(cell, value, __ATOMIC_SEQ_CST);
+}
+
+_Bool sl_atomic_compare_exchange_pointer(void **cell, void **expected, void *desired)
 {
     return __atomic_compare_exchange_n(
         cell, expected, desired, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
@@ -302,12 +568,61 @@ void sl_thread_join(SlThread *thread)
     free(thread);
 }
 
+void sl_thread_detach(SlThread *thread)
+{
+    if (thread == NULL) return;
+
+#ifdef _WIN32
+    CloseHandle(thread->handle);
+#else
+    pthread_detach(thread->handle);
+#endif
+
+    /*
+     * The trampoline reads thread->entry and thread->argument before anything
+     * can detach it -- sl_thread_start returns only after pthread_create or
+     * CreateThread has taken a copy of the pointer, and the running thread
+     * touches the block once at the top. Freeing it here would still be a race
+     * with that first read, so the block is leaked instead: one allocation per
+     * detached thread, which is the price of not having a second handshake.
+     */
+}
+
 void sl_thread_yield(void)
 {
 #ifdef _WIN32
     SwitchToThread();
 #else
     sched_yield();
+#endif
+}
+
+void sl_thread_sleep(unsigned long long milliseconds)
+{
+#ifdef _WIN32
+    while (milliseconds > INFINITE - 1) {
+        Sleep(INFINITE - 1);
+        milliseconds -= INFINITE - 1;
+    }
+    Sleep((DWORD)milliseconds);
+#else
+    struct timespec span;
+    span.tv_sec  = (time_t)(milliseconds / 1000ULL);
+    span.tv_nsec = (long)((milliseconds % 1000ULL) * 1000000ULL);
+
+    /* A signal cuts the sleep short and says how much was left. */
+    while (nanosleep(&span, &span) != 0 && errno == EINTR) { }
+#endif
+}
+
+void sl_cpu_pause(void)
+{
+#if defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86)
+    __builtin_ia32_pause();
+#elif defined(__aarch64__) || defined(__arm__) || defined(_M_ARM64)
+    __asm__ __volatile__("yield" ::: "memory");
+#else
+    /* No hint on this architecture; the spin loop is still correct. */
 #endif
 }
 

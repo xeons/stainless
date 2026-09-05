@@ -579,6 +579,46 @@ SL_API void  sl_condition_wait(SlCondition *condition, SlMutex *mutex);
 SL_API void  sl_condition_signal(SlCondition *condition);
 SL_API void  sl_condition_broadcast(SlCondition *condition);
 
+/*
+ * Waits with a deadline. Returns 1 if the condition was signalled and 0 if the
+ * time ran out -- and a 0 still means the mutex is held, because the caller has
+ * to re-check its predicate either way.
+ */
+SL_API _Bool sl_condition_wait_for(SlCondition *condition, SlMutex *mutex,
+                                   unsigned long long milliseconds);
+
+/*
+ * A reader/writer lock, on the heap like a mutex and for the same reason: its
+ * size is a platform detail the language is not told.
+ *
+ * Neither platform's primitive is upgradeable and neither is recursive, so a
+ * reader that wants to write must let go first. That is the behaviour to want;
+ * an upgrade path is a deadlock waiting for two threads to take it at once.
+ */
+typedef struct SlRwLock { void *opaque[8]; } SlRwLock;
+
+SL_API void *sl_rwlock_new(void);
+SL_API void  sl_rwlock_free(void *lock);
+SL_API void  sl_rwlock_read_lock(void *lock);
+SL_API _Bool sl_rwlock_try_read_lock(void *lock);
+SL_API void  sl_rwlock_read_unlock(void *lock);
+SL_API void  sl_rwlock_write_lock(void *lock);
+SL_API _Bool sl_rwlock_try_write_lock(void *lock);
+SL_API void  sl_rwlock_write_unlock(void *lock);
+
+/*
+ * A thread-local slot, identified by an integer the caller keeps. Every thread
+ * sees its own value and starts at NULL.
+ *
+ * `releaseOnExit` installs sl_release as the slot's destructor, so an object
+ * left in it is let go when its thread ends rather than leaking. Windows FLS
+ * and pthread keys both run that callback; a slot without it is raw storage.
+ */
+SL_API size_t sl_tls_new(_Bool releaseOnExit);
+SL_API void   sl_tls_free(size_t slot);
+SL_API void  *sl_tls_get(size_t slot);
+SL_API void   sl_tls_set(size_t slot, void *value);
+
 /* Sequentially consistent. The language exposes these as Atomic<T>. */
 SL_API long long sl_atomic_load(const long long *cell);
 SL_API void      sl_atomic_store(long long *cell, long long value);
@@ -586,13 +626,41 @@ SL_API long long sl_atomic_add(long long *cell, long long delta);
 SL_API long long sl_atomic_exchange(long long *cell, long long value);
 SL_API _Bool     sl_atomic_compare_exchange(long long *cell, long long *expected, long long desired);
 
+SL_API long long sl_atomic_and(long long *cell, long long mask);
+SL_API long long sl_atomic_or(long long *cell, long long mask);
+SL_API long long sl_atomic_xor(long long *cell, long long mask);
+
+SL_API int   sl_atomic_load32(const int *cell);
+SL_API void  sl_atomic_store32(int *cell, int value);
+SL_API int   sl_atomic_add32(int *cell, int delta);
+SL_API int   sl_atomic_exchange32(int *cell, int value);
+SL_API _Bool sl_atomic_compare_exchange32(int *cell, int *expected, int desired);
+
+SL_API void *sl_atomic_load_pointer(void *const *cell);
+SL_API void  sl_atomic_store_pointer(void **cell, void *value);
+SL_API void *sl_atomic_exchange_pointer(void **cell, void *value);
+SL_API _Bool sl_atomic_compare_exchange_pointer(void **cell, void **expected, void *desired);
+
 typedef struct SlThread SlThread;
 
 SL_API SlThread *sl_thread_start(void (*entry)(void *), void *argument);
 SL_API void      sl_thread_join(SlThread *thread);
+
+/*
+ * Gives up the handle without waiting. The thread keeps running and cleans
+ * itself up; nothing can join it afterwards.
+ */
+SL_API void      sl_thread_detach(SlThread *thread);
 SL_API void      sl_thread_yield(void);
+SL_API void      sl_thread_sleep(unsigned long long milliseconds);
 SL_API size_t    sl_thread_current_id(void);
 SL_API size_t    sl_cpu_count(void);
+
+/*
+ * The CPU's "I am spinning" hint: a few cycles on x86, a yield on ARM, and
+ * nothing anywhere else. It is not a scheduler call and does not sleep.
+ */
+SL_API void      sl_cpu_pause(void);
 
 /* --------------------------------------------------------------- the pool */
 

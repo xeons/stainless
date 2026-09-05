@@ -778,8 +778,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 189 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 407 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 190 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 442 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -788,8 +788,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 189 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 179 and Windows 188, each
+**Both Windows and Linux are tested.** 190 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 180 and Windows 189, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1225,10 +1225,16 @@ Everything below is covered by [the test suite](tests/cases).
   `IHashable` without declaring it, so `Sort(numbers)` works on a `List<int>`
   and `Dictionary<String, V>` needs nothing extra
 - `StringBuilder`: mutable text with amortised O(1) appends
-- `Standard.Threading`: `Mutex<T>` and its `Guard<T>` (the lock owns what it
-  guards, and a destructor releases it), `AtomicLong`, `AtomicBool`, and
-  `TaskScope` for running `Job` delegates on the pool. **`Mutex<T>` is sound
-  only for a plain `T`** — see the thread-safety note below
+- `Standard.Threading`: two layers. The structured one is `Mutex<T>` and its
+  `Guard<T>` (the lock owns what it guards, and a destructor releases it),
+  `Monitor<T>` with `Wait`/`Pulse`, `RwLock<T>` with separate read and write
+  guards, `AtomicLong`/`AtomicInt`/`AtomicBool`, and `TaskScope` for running
+  `Job` delegates on the pool. The unstructured one is `Thread` itself
+  (`Join`, `Detach`, and a destructor that joins), `Semaphore`,
+  `ManualResetEvent`, `AutoResetEvent`, `CountdownEvent`, `Barrier`, `SpinWait`
+  and `Threading.Sleep`/`Yield`/`CurrentId`. A `spawn`ed job may borrow the
+  frame that spawned it; a `Thread` may not, and what it touches has to outlive
+  it — see [docs/concurrency.md](docs/concurrency.md) §11
 - `Standard.Math`: the C library's floating point, plus `Abs`/`Min`/`Max`/
   `Clamp`/`Sign` overloaded across `int`, `long`, `nuint` and `double`,
   `IsNaN`/`IsInfinite`/`IsFinite`, `GreatestCommonDivisor`, and the bit
