@@ -777,8 +777,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 185 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 387 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 186 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 389 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -1223,6 +1223,14 @@ Everything below is covered by [the test suite](tests/cases).
   directory listing, and textual path handling. Failure is a returned value —
   a `Result<T, IOError>`, or a bare `IOError` where nothing is produced. Paths
   are UTF-8 and are widened to UTF-16 before they reach Windows
+- `Standard.Encoding`: UTF-8, UTF-16 and UTF-32 in both byte orders, ASCII,
+  Latin-1 and Windows-1252, behind an `IEncoding` a program can implement.
+  Lossy by default, because `GetString` returns a `String` and a `String` is
+  valid UTF-8 by invariant; `TryGetString` is the strict form and refuses an
+  overlong sequence as well as a malformed one. `Detect` reads a byte order mark
+- `Standard.Convert`: base64 and base64url, hex, and integer and floating-point
+  parsing in any radix from 2 to 36. Everything that can fail returns a
+  `Result`, because there is no exception to throw and no `out` to fill
 - `Standard.Text` (imported everywhere), `Standard.Ascii`, `Standard.Console`,
   `Standard.Reflection`
 - Raw pointers, `sizeof`, `alignof`, `offsetof`, `typeof`, casts, `new`, `this`.
@@ -1351,17 +1359,17 @@ Being straight about the edges, roughly in the order they are worth adding:
   are free — an uninstantiated template emits nothing, but a non-generic
   function or class is emitted either way. What saves it is that everything is
   emitted into its own section and the linker discards what nothing reached,
-  which takes hello-world from 300 KB to 124 KB. That hello-world emits 286
+  which takes hello-world from 318 KB to 124 KB. That hello-world emits 370
   standard-library functions and reaches *none* of them — it calls `puts` and
   returns — so the linker is doing all of the work and the compiler none. The
   IR is still the full size, so compile time still pays for all of it; a
   reachability pass from `Main` would fix that and is the real answer.
 
-  Writing `String`'s API in Stainless made the case for one sharper. It added
-  70 functions to that count and half again as much IR — 7,720 lines to 11,587
-  — for a program that calls none of them, and the stripped binary came out
-  byte for byte the size it was before. The linker's answer was free and the
-  compiler's cost was not.
+  Writing the text library in Stainless made the case for one sharper. It added
+  154 functions to that count and took the IR from 7,720 lines to 17,071 — for
+  a program that calls none of them — and the stripped binary came out byte for
+  byte the size it had been before. The linker's answer is free and the
+  compiler's lack of one is not.
 - **Unoptimized ARC, and it now costs more.** Retain/release traffic is correct
   but redundant, and since the counts became atomic each redundant pair costs
   about 5.7ns rather than about 1.2ns. A loop that does nothing but ARC traffic

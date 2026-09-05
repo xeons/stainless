@@ -1776,15 +1776,114 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 
 | Member | Result |
 |---|---|
-| `Append(String)` | `void` |
-| `AppendLine(String)` | `void`, adds a newline |
+| `Append(String)`, `Append(bool)` | `void` |
+| `AppendLine(String)`, `AppendLine()` | `void`, adds a newline |
 | `AppendInteger(long)`, `AppendDouble(double)` | `void` |
-| `ByteLength()`, `IsEmpty()` | `nuint`, `bool` |
+| `AppendCodePoint(char32)` | `void`, encoded as UTF-8 |
+| `AppendJoined(sep, parts)` | `void` |
+| `ByteLength()`, `IsEmpty()`, `HasContent()` | `nuint`, `bool`, `bool` |
+| `ByteAt(i)`, `SetByteAt(i, b)` | `byte`, `void` |
+| `IndexOf(String)`, `Contains(String)` | `long`, `bool` |
+| `Insert(at, String)`, `Remove(at, n)`, `Truncate(at)` | `void` |
+| `ReplaceFirst(from, to)`, `ReplaceAll(from, to)` | `bool`, `nuint` |
 | `Clear()` | `void`, keeps the capacity |
 | `ToText()` | `String`, a snapshot; the builder stays usable |
 
+There is deliberately no `Append(long)` or `Append(double)`: an integer literal
+converts to both, so the two together would make `Append(42)` ambiguous, which
+is why the two were spelled out in the first place.
+
 Unlike `String`, its bytes are a separate growable allocation, so it is not
 NUL-terminated and has no `ToPointer()`. Call `ToText().ToPointer()` to reach C.
+The same allocation moving as it grows is why reading goes through `ByteAt`
+rather than through a pointer: one taken before an append would be a pointer
+into the previous allocation.
+
+### 3.6 Other encodings
+
+`String` is UTF-8 and there is one string type. That settles what text *is*
+inside a program and says nothing about what arrives from outside one — a file
+written by a Windows editor, a protocol header older than Unicode, a registry
+value in UTF-16. `Standard.Encoding` is the crossing, and every crossing is
+explicit.
+
+The shape is .NET's, with the static instances replaced by functions: a static
+needs a Sendable type and an initializer that `--shared` has nowhere to run
+(§7.4), so `Encoding.Utf8()` is a call. Everything is behind an interface, so a
+program may add an encoding of its own.
+
+```csharp
+import Standard.Encoding;
+
+var bytes = Encoding.Utf16().GetBytes("héllo");    // 10 bytes, little-endian
+var back  = Encoding.Utf16().GetString(bytes);     // "héllo"
+```
+
+| Member of `IEncoding` | Result |
+|---|---|
+| `Name()` | `String`, as IANA spells it |
+| `Preamble()` | `byte[]`, the byte order mark or empty |
+| `GetByteCount(text)` | `nuint` |
+| `GetBytes(text)` | `byte[]` |
+| `GetString(bytes)` | `String` |
+| `TryGetString(bytes)` | `Result<String, EncodingError>` |
+| `CanRepresent(scalar)` | `bool` |
+
+| Encoding | From | Notes |
+|---|---|---|
+| UTF-8 | `Encoding.Utf8()` | what a `String` already is; both directions copy |
+| UTF-16 | `Utf16()`, `Utf16BigEndian()` | |
+| UTF-32 | `Utf32()`, `Utf32BigEndian()` | one scalar per four bytes |
+| US-ASCII | `Ascii()` | |
+| ISO-8859-1 | `Latin1()` | byte *n* is code point *n*; decoding never fails |
+| Windows-1252 | `Windows1252()` | Latin-1 with punctuation at 0x80–0x9F |
+
+**Both directions are lossy by default**, which is the rule the language
+already applies to `ToUtf16` and `Text.FromUtf16`: what cannot be decoded
+becomes U+FFFD, and what cannot be encoded becomes `?`. That is not politeness
+— `GetString` returns a `String`, and a `String` is valid UTF-8 by invariant,
+so there is nothing else it could return. `TryGetString` is the strict form for
+a caller that needs to know rather than to cope, and it refuses an overlong
+UTF-8 sequence as well as a malformed one: two spellings of one character is
+how a filter that checked the bytes gets walked past.
+
+`Encoding.Detect(bytes)` reads a byte order mark and gives back the encoding it
+names, or null. `Encoding.WithoutPreamble(encoding, bytes)` drops the mark.
+
+### 3.7 Conversions
+
+`Standard.Convert` is the other edge: values that arrived as characters, and
+values that have to leave as them.
+
+```csharp
+import Standard.Convert;
+
+var port = Convert.ToInt(text);
+switch (port) {
+    case Ok ok:  Listen(ok.Value); break;
+    case Fail:   Complain(); break;
+}
+```
+
+| | |
+|---|---|
+| `ToLong`, `ToInt`, `ToULong` | `Result<_, ConvertError>`, base 10 or any radix from 2 to 36 |
+| `ToDouble` | `Result<double, ConvertError>` |
+| `FromLong(value, radix)` | `String` — base 10 is `Text.FromInteger` |
+| `ToHex(data)`, `FromHex(text)` | `String`, `Result<byte[], ConvertError>` |
+| `ToBase64(data)`, `ToBase64Url(data)` | `String` |
+| `FromBase64(text)` | `Result<byte[], ConvertError>`, either alphabet |
+
+Everything that can fail returns a `Result`. There is no `Parse` that stops the
+program and no `TryParse` with an out parameter, because the language has
+neither exceptions nor `out`.
+
+Two details worth knowing, because both are where a parser is usually wrong.
+The integer parsers accumulate as *unsigned* so that the most negative `long`,
+whose magnitude does not fit in a `long`, is reachable — a signed accumulator
+gets exactly that one value wrong. And `FromBase64` skips whitespace, because
+base64 in the wild arrives wrapped at 64 or 76 columns and a decoder that
+refused a newline would be useless for the thing it is most often pointed at.
 
 ## 4. Generics
 
@@ -1963,18 +2062,18 @@ to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
 **A non-generic function or class is emitted whether or not it is used**, and
 that is a real cost the compiler should not be charging: every stdlib module is
 compiled with your program whether you import it or not. A hello-world that
-calls `puts` and returns emits **286 standard-library functions and reaches
-none of them** — 56 from `Standard.Text`, 56 from `Standard.Math`, 37 from
-`Standard.Collections`, 36 from `Standard.IO`, 24 from `Standard.Reflection`,
-and so on down. Nothing in the compiler prunes them: there is no reachability
-pass.
+calls `puts` and returns emits **370 standard-library functions and reaches
+none of them** — 57 from `Standard.Encoding`, 56 from `Standard.Text`, 56 from
+`Standard.Math`, 37 from `Standard.Collections`, 36 from `Standard.IO`, and so
+on down. Nothing in the compiler prunes them: there is no reachability pass.
 
 What saves it is the linker. Every function and datum goes in a section of its
 own and the linker drops the ones nothing reached, which takes that hello-world
-from 300 KB to 124 KB. The IR is still the full size, so compile time pays for
+from 318 KB to 124 KB. The IR is still the full size, so compile time pays for
 all of it, and a reachability pass from `Main` would fix that. It is not done —
-and writing `String`'s API in Stainless made the case for one plainer, since
-those 70 extra functions grew the IR by half and the binary not at all.
+and writing the text library in Stainless made the case for one plainer, since
+those 154 extra functions took the IR from 7,720 lines to 17,071 and the binary
+from 124 KB to 124 KB.
 
 | Module | Contents | Imported |
 |---|---|---|
@@ -1990,6 +2089,8 @@ those 70 extra functions grew the IR by half and the binary not at all.
 | `Standard.Directory` | making, removing and listing | on request |
 | `Standard.Path` | taking paths apart, textually | on request |
 | `Standard.Ascii` | what one byte is, when ASCII is the honest answer | on request |
+| `Standard.Encoding` | `IEncoding` and the six encodings (§3.6) | on request |
+| `Standard.Convert` | base64, hex and number parsing (§3.7) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` (§8.5) | on request |
 | `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 

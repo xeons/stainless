@@ -246,6 +246,92 @@ public class EmitterTests
         Assert.Contains("{ i64 -1, i64 -1,", objects[0]);
     }
 
+    // ------------------------------------------------------------ dispatch
+
+    /// <summary>
+    /// An abstract class that implements an interface gets a null slot for the
+    /// method it did not supply, exactly as the virtual table already did.
+    ///
+    /// It used to get a pointer to a symbol nothing defined, so the whole
+    /// program failed at the linker with a message about the generated IR. The
+    /// slot can never be reached: an abstract class has no instances, and a
+    /// derived one fills it in its own table.
+    /// </summary>
+    [Fact]
+    public void AnAbstractImplementationIsANullSlot()
+    {
+        string ir = Front.ModuleIr(
+            """
+            public interface IShape { int Area(); int Sides(); }
+
+            public abstract class Shape : IShape {
+                public abstract int Area();
+                public int Sides() { return 4; }
+            }
+
+            public class Square : Shape {
+                public override int Area() { return 1; }
+            }
+            """);
+
+        string table = Lines(ir, "@_SLvt_Test_Shape_Test_IShape").Single();
+        Assert.Contains("ptr null", table);
+
+        // The derived class supplies it, so its own table has no null.
+        string derived = Lines(ir, "@_SLvt_Test_Square_Test_IShape").Single();
+        Assert.DoesNotContain("ptr null", derived);
+    }
+
+    /// <summary>
+    /// And nothing in the module names a symbol it does not define. This is the
+    /// property the abstract slot broke, stated once for the whole module
+    /// rather than for one table.
+    /// </summary>
+    [Fact]
+    public void EveryInternalSymbolNamedIsDefined()
+    {
+        string ir = Front.ModuleIr(
+            """
+            public interface IShape { int Area(); }
+            public abstract class Shape : IShape { public abstract int Area(); }
+            public class Square : Shape { public override int Area() { return 1; } }
+            """);
+
+        var defined = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string line in AllLines(ir))
+        {
+            if (line.StartsWith("define", StringComparison.Ordinal) ||
+                line.StartsWith("declare", StringComparison.Ordinal))
+            {
+                int at = line.IndexOf('@', StringComparison.Ordinal);
+                if (at >= 0) defined.Add(NameAt(line, at));
+            }
+            else if (line.StartsWith("@", StringComparison.Ordinal))
+            {
+                defined.Add(NameAt(line, 0));
+            }
+        }
+
+        // Every '@name' used in a constant must be one of those.
+        foreach (string line in AllLines(ir))
+        {
+            if (!line.StartsWith("@", StringComparison.Ordinal)) continue;
+
+            for (int at = line.IndexOf('@', 1); at > 0; at = line.IndexOf('@', at + 1))
+                Assert.Contains(NameAt(line, at), defined);
+        }
+    }
+
+    /// <summary>The symbol name beginning at <paramref name="at"/>.</summary>
+    private static string NameAt(string line, int at)
+    {
+        int end = at + 1;
+        while (end < line.Length &&
+               (char.IsLetterOrDigit(line[end]) || line[end] is '_' or '.' or '$'))
+            end++;
+        return line[at..end];
+    }
+
     // ------------------------------------------------------------- guards
 
     /// <summary>
@@ -348,6 +434,9 @@ public class EmitterTests
             count++;
         return count;
     }
+
+    /// <summary>Every line of the IR.</summary>
+    private static string[] AllLines(string ir) => ir.Split('\n');
 
     /// <summary>Every line of the IR that starts with a given prefix.</summary>
     private static List<string> Lines(string ir, string prefix) =>

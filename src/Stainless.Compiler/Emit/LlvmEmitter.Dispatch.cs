@@ -107,9 +107,15 @@ public sealed partial class LlvmEmitter
                 // By parameter types, not by name: a class implementing both
                 // IEquatable<int> and IEquatable<String> has two methods called
                 // Same, and each interface's table takes the one that fits it.
+                // An abstract implementation is a null slot, exactly as it is
+                // in the virtual table: there is no body to point at, and no
+                // instance of this class to reach it through. A derived class
+                // fills the slot in its own table.
                 var slots = interfaceType.Methods
                     .Select(classType.FindImplementation)
-                    .Select(found => found is null ? "ptr null" : $"ptr {Symbol(found)}")
+                    .Select(found => found is null || found.IsAbstract
+                        ? "ptr null"
+                        : $"ptr {Symbol(found)}")
                     .ToList();
 
                 string body = slots.Count == 0 ? "ptr null" : string.Join(", ", slots);

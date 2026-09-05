@@ -1,0 +1,88 @@
+utf8 utf-8 10 true
+utf16 utf-16le 14 true
+utf16be utf-16be 14 true
+utf32 utf-32le 28 true
+utf32be utf-32be 28 true
+latin1 iso-8859-1 5 true
+cp1252 windows-1252 7 true
+ascii us-ascii 5 true
+latin1-lossy iso-8859-1 1 false
+utf16-A-0 65
+utf16-A-1 0
+utf16be-A-0 0
+utf16be-A-1 65
+utf32-count 20
+utf8-count 6
+latin1-count 5
+cp1252-euro 128
+cp1252-back “”
+ascii-can-a true
+ascii-can-e false
+latin1-can-e true
+latin1-can-euro false
+cp1252-can-euro true
+utf8-can-emoji true
+strict-ok true
+strict-short false
+strict-overlong false
+lossy-count 1
+strict-odd false
+latin1-never-fails true
+utf8-bom 3
+latin1-bom 0
+detect-utf8 utf-8
+detect-utf16 utf-16le
+detect-utf32 utf-32le
+detect-none true
+stripped 1
+b64-empty []
+b64-1 Zg==
+b64-2 Zm8=
+b64-3 Zm9v
+b64-text SGVsbG8sIFdvcmxkIQ==
+b64-url -_--
+b64-std +/++
+b64-back Hello, World!
+b64-wrapped Hello, World!
+b64-url-back true
+b64-bad false
+b64-junk false
+hex 000fa5ff
+hex-upper 0FA5
+hex-empty []
+unhex-len 4
+unhex-2 165
+hex-odd false
+hex-junk false
+int 1234
+int-neg -1234
+int-plus 7
+int-min -9223372036854775808
+int-max 9223372036854775807
+hex-num 31
+hex-num-upper 31
+binary 11
+base36 1295
+int-empty false
+int-space false
+int-junk false
+int-overflow false
+int-sign-only false
+int32-overflow false
+int32-min -2147483648
+ulong-max true
+ulong-negative false
+radix-16 ff
+radix-2 1011
+radix-36 zz
+radix-neg -ff
+radix-zero 0
+double 1.5
+double-neg -0.25
+double-int 42
+double-exp 150
+double-negexp 1.5
+double-junk false
+double-empty false
+double-dot false
+double-bad-exp false
