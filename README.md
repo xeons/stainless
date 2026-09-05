@@ -779,7 +779,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 189 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 389 compiler unit tests
+dotnet test tests/Stainless.UnitTests           # 407 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and

@@ -147,17 +147,8 @@ void Swatch() {
 /// and a leading blank line -- which `cmd /c ver` produces -- does not read as
 /// an empty answer.
 String Trimmed(String text) {
-    nuint from = 0u;
-    while (from < text.ByteLength() && IsBreak(text.Substring(from, 1u))) {
-        from = from + 1u;
+    foreach (var line in text.SplitLines()) {
+        if (line.Trim().ByteLength() > 0u) { return line.Trim(); }
     }
-
-    nuint to = from;
-    while (to < text.ByteLength() && !IsBreak(text.Substring(to, 1u))) {
-        to = to + 1u;
-    }
-
-    return text.Substring(from, to - from);
+    return "";
 }
-
-bool IsBreak(String one) { return one == "\r" || one == "\n"; }

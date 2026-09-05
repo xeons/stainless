@@ -120,6 +120,27 @@ public static class Front
     }
 
     /// <summary>
+    /// Binds several files together, as one program.
+    ///
+    /// For anything written on disk rather than in a test: the samples, and the
+    /// bindings they are written against. Each file keeps its own path, so a
+    /// diagnostic points at the file it is about.
+    /// </summary>
+    public static BoundProgram BindFiles(IEnumerable<string> paths,
+                                         out DiagnosticBag diagnostics,
+                                         bool shared = false)
+    {
+        diagnostics = new DiagnosticBag();
+
+        var units = Library.Value.ToList();
+        foreach (string path in paths)
+            units.Add(new Parser(SourceText.FromFile(path), diagnostics, Symbols)
+                .ParseCompilationUnit());
+
+        return new Binder(diagnostics, requireEntryPoint: !shared).Bind(units);
+    }
+
+    /// <summary>
     /// Binds a module body: the <c>module</c> line is supplied, so a test can be
     /// one declaration long.
     /// </summary>
