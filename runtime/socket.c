@@ -43,6 +43,18 @@
  * other's, and a Stainless enum is a value that crosses as itself.
  */
 
+/*
+ * Asked for before any header, because glibc hides getaddrinfo, getnameinfo,
+ * struct addrinfo, AI_PASSIVE, NI_NUMERICHOST and MSG_NOSIGNAL behind it.
+ * The driver compiles the runtime in the compiler's default dialect, which
+ * defines _DEFAULT_SOURCE and so exposes them anyway -- but that makes this
+ * file's correctness a property of a flag nobody passed, and `-std=c11` alone
+ * does not compile it. Saying what it needs is cheaper than finding that out.
+ */
+#ifndef _WIN32
+#  define _GNU_SOURCE 1
+#endif
+
 #include "stainless.h"
 
 #include <stdio.h>
