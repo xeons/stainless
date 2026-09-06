@@ -38,6 +38,7 @@ public enum TokenKind
     ParallelKeyword, SpawnKeyword,
     ReturnKeyword, BreakKeyword, ContinueKeyword,
     VarKeyword, ConstKeyword, WhereKeyword, StaticKeyword, ReadonlyKeyword,
+    ThreadsafeKeyword,
     OperatorKeyword, TryKeyword,
     RefKeyword,
 
@@ -115,6 +116,7 @@ public static class TokenKindExtensions
         TokenKind.ConstKeyword => "const",
         TokenKind.RefKeyword => "ref",
         TokenKind.StaticKeyword => "static",
+        TokenKind.ThreadsafeKeyword => "threadsafe",
         TokenKind.OperatorKeyword => "operator",
         TokenKind.TryKeyword => "try",
         TokenKind.ReadonlyKeyword => "readonly",

@@ -90,19 +90,6 @@ extern "C" {
 
 // ------------------------------------------------------------------ sharing
 
-/// Marks a type as safe for more than one thread to hold at once.
-///
-/// It is an assertion by the author, not something the compiler checks: it says
-/// that every operation on this type synchronizes itself, so two threads
-/// reaching it cannot corrupt it. Without it a class may not cross a thread
-/// boundary at all: reference counts are atomic, but nothing synchronizes the
-/// fields behind them, and a race there is one nothing would report.
-///
-/// Put it on a type whose state lives behind a lock or an atomic, and nowhere
-/// else. `Mutex`, `AtomicLong` and `AtomicBool` carry it because that is what
-/// they are; `Guard` and `TaskScope` do not, because both belong to one thread.
-public attribute Shared { }
-
 // ------------------------------------------------------------------ locking
 
 /// A value and the lock that guards it, as one thing.
@@ -132,8 +119,7 @@ public attribute Shared { }
 /// down and the object was freed while the mutex still held it. Reference counts
 /// are atomic now, which closes that; what remains is the lifetime hole above,
 /// which is about how long a borrowed thing lives rather than about counting.
-[Shared]
-public class Mutex<T> {
+public threadsafe class Mutex<T> {
     T value;
     byte* handle;
 
@@ -199,8 +185,7 @@ public class Guard<T> {
 ///     var held = queue.Lock();
 ///     while (held.Value().IsEmpty()) { held.Wait(); }
 ///     var item = held.Value().Take();
-[Shared]
-public class Monitor<T> {
+public threadsafe class Monitor<T> {
     T value;
     byte* handle;
     byte* signal;
@@ -276,8 +261,7 @@ public class MonitorGuard<T> {
 /// offers it, and neither should: two readers upgrading at once is a deadlock
 /// with no way out. Drop the read guard, take a write guard, and re-check what
 /// you read -- it may have changed in between.
-[Shared]
-public class RwLock<T> {
+public threadsafe class RwLock<T> {
     T value;
     byte* handle;
 
@@ -351,8 +335,7 @@ public class WriteGuard<T> {
 /// It is `long` rather than generic because atomics are not: `Atomic<T>` would
 /// need a constraint saying T is an integer, and Stainless constrains by
 /// interface only. A shared counter wants 64 bits anyway.
-[Shared]
-public class AtomicLong {
+public threadsafe class AtomicLong {
     long cell;
 
     public AtomicLong(long initial) { cell = initial; }
@@ -391,8 +374,7 @@ public class AtomicLong {
 /// shared with C, usually. Prefer `AtomicLong` when the width is your choice:
 /// it is the same speed on any machine this targets and cannot wrap in
 /// practice.
-[Shared]
-public class AtomicInt {
+public threadsafe class AtomicInt {
     int cell;
 
     public AtomicInt(int initial) { cell = initial; }
@@ -417,8 +399,7 @@ public class AtomicInt {
 
 /// A flag several threads may set and read. One-way latches -- "has this
 /// started", "should this stop" -- are what it is for.
-[Shared]
-public class AtomicBool {
+public threadsafe class AtomicBool {
     long cell;
 
     public AtomicBool(bool initial) {
@@ -451,8 +432,7 @@ public class AtomicBool {
 /// thread than locked it, which is occasionally what you want and usually a
 /// sign that `Mutex<T>` was the right answer. Its real use is a limit -- at
 /// most eight downloads at once, at most one writer per file.
-[Shared]
-public class Semaphore {
+public threadsafe class Semaphore {
     long permits;
     byte* handle;
     byte* signal;
@@ -528,8 +508,7 @@ public class Semaphore {
 /// `Wait` returns at once until something calls `Reset`.
 ///
 /// "Is the server up yet" is the shape it fits.
-[Shared]
-public class ManualResetEvent {
+public threadsafe class ManualResetEvent {
     bool open;
     byte* handle;
     byte* signal;
@@ -593,8 +572,7 @@ public class ManualResetEvent {
 /// away -- one signal, one pass, whichever order they happen in. A second
 /// `Set` before anyone waits is *not* remembered, which is the difference
 /// between this and a `Semaphore`.
-[Shared]
-public class AutoResetEvent {
+public threadsafe class AutoResetEvent {
     bool ready;
     byte* handle;
     byte* signal;
@@ -646,8 +624,7 @@ public class AutoResetEvent {
 /// The join half of fork-join, for work that `parallel` cannot bracket --
 /// jobs handed to threads that outlive the function that started them.
 /// Inside a `parallel` block the closing brace already does this.
-[Shared]
-public class CountdownEvent {
+public threadsafe class CountdownEvent {
     long remaining;
     byte* handle;
     byte* signal;
@@ -722,8 +699,7 @@ public class CountdownEvent {
 /// The phase number is what makes it reusable: a thread released from round 3
 /// that loops straight back in cannot be counted into round 3 a second time,
 /// because the number it is waiting on has already moved.
-[Shared]
-public class Barrier {
+public threadsafe class Barrier {
     nuint participants;
     nuint waiting;
     long phase;
@@ -823,7 +799,7 @@ public class TaskScope {
 /// **The ownership rule is different, and it is the whole difference.** A
 /// `spawn`ed job *borrows* the parent's frame, which is sound because the
 /// closing brace cannot be passed until the job has finished. A thread has no
-/// such brace, so whatever it touches has to outlive it: a `[Shared]` object
+/// such brace, so whatever it touches has to outlive it: a `threadsafe` object
 /// held in a `static readonly`, or a block the thread frees itself. Passing a
 /// pointer to a local and returning is a use-after-free the compiler does not
 /// yet catch.

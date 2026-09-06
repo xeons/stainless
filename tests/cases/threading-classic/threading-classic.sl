@@ -3,7 +3,7 @@
 // The unstructured half of Standard.Threading: threads you start yourself, and
 // the things they wait on.
 //
-// Everything a thread touches here is a `static readonly` [Shared] object, and
+// Everything a thread touches here is a `static readonly` `threadsafe` object, and
 // that is not incidental -- it is the ownership rule. A `spawn`ed job borrows
 // the frame that spawned it, which is sound because the closing brace joins
 // before that frame can go; a `Thread` has no such brace, so what it reaches

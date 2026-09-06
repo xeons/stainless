@@ -1210,8 +1210,8 @@ public sealed partial class Binder
             }
             else if (!IsSendable(receiver.Type))
             {
+                // Advice, not a refusal: the spawn still compiles.
                 ReportNotSendable(receiver.Type, receiver.Span, "the receiver of this spawned call");
-                ok = false;
             }
         }
 
@@ -1229,10 +1229,7 @@ public sealed partial class Binder
 
             // The parent keeps hold of what it lends, so both threads can reach it.
             if (!IsSendable(argument.Type))
-            {
                 ReportNotSendable(argument.Type, argument.Span, "this argument to a spawned call");
-                ok = false;
-            }
         }
 
         return ok;

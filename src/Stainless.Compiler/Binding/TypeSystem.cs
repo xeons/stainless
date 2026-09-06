@@ -311,6 +311,16 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public Source.SourceSpan? Span { get; init; }
 
     public List<FieldSymbol> Fields { get; } = [];
+    /// <summary>
+    /// Declared <c>threadsafe</c>: the author says every operation on this type
+    /// synchronizes itself, so more than one thread may hold one at once.
+    ///
+    /// An assertion rather than a proof. Nothing here can check that a lock is
+    /// actually taken, which is why the compiler's answer to a type without it
+    /// is a warning naming what to do rather than a refusal.
+    /// </summary>
+    public bool IsThreadsafe { get; set; }
+
     public List<FunctionSymbol> Methods { get; } = [];
 
     /// <summary>

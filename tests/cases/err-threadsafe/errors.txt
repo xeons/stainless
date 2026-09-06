@@ -1,0 +1,5 @@
+# The three types with no operations to synchronize, then the constraint.
+SL0582
+SL0582
+SL0582
+SL0328

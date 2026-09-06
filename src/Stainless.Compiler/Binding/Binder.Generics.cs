@@ -270,32 +270,147 @@ public sealed partial class Binder
             }
 
             foreach (var constraintSyntax in clause.Constraints)
-            {
-                // Resolved under the substitution, so `where T : Comparer<U>` works.
-                var constraint = ResolveType(constraintSyntax, scope);
-                if (constraint.IsError()) continue;
-
-                if (constraint is not InterfaceTypeSymbol required)
-                {
-                    diagnostics.Error("SL0329", constraintSyntax.Span,
-                        $"'{constraint.Name}' is not an interface, so it cannot constrain " +
-                        $"'{clause.TypeParameter}'; Stainless constrains type parameters by " +
-                        "interface only");
-                    continue;
-                }
-
-                if (Satisfies(argument, required)) continue;
-
-                diagnostics.Error("SL0328", span,
-                    $"'{argument.Name}' cannot be used as '{clause.TypeParameter}' in {owner} " +
-                    $"because it does not implement '{required.Name}'" +
-                    (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
-                        ? $"; it implements " +
-                          string.Join(", ", implementer.Interfaces.Select(i => "'" + i.Name + "'"))
-                        : ""));
-            }
+                VerifyConstraint(constraintSyntax, clause.TypeParameter, argument, scope, owner, span);
         }
     }
+
+    /// <summary>
+    /// One constraint against the type actually supplied.
+    ///
+    /// Each failure names the argument, the parameter and what was wanted,
+    /// because the type argument was chosen somewhere the reader can see and
+    /// the requirement was written somewhere they probably cannot.
+    /// </summary>
+    private void VerifyConstraint(
+        ConstraintSyntax constraint, string parameter, TypeSymbol argument,
+        FileScope scope, string owner, SourceSpan span)
+    {
+        switch (constraint.Kind)
+        {
+            case ConstraintKind.Class:
+                if (IsReferenceType(argument)) return;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'class', and '{argument.Name}' is a " +
+                    $"{KindOf(argument)}: it is copied rather than referenced, and is never null");
+                return;
+
+            case ConstraintKind.Struct:
+                if (IsValueType(argument)) return;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'struct', and '{argument.Name}' is a " +
+                    $"{KindOf(argument)}: it is a counted reference and may be null");
+                return;
+
+            case ConstraintKind.Threadsafe:
+                if (IsSendable(argument)) return;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'threadsafe', and nothing about " +
+                    $"'{argument.Name}' says how two threads may hold it. Declare it " +
+                    "'threadsafe' if it synchronizes itself, or pass a 'Mutex<T>' of it");
+                return;
+
+            case ConstraintKind.New:
+                if (IsDefaultConstructible(argument)) return;
+
+                diagnostics.Error("SL0328", span,
+                    $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
+                    $"'{parameter}' is constrained to 'new()', and " +
+                    (argument is ClassTypeSymbol
+                        ? $"'{argument.Name}' has no public constructor taking no arguments"
+                        : $"'{argument.Name}' is a {KindOf(argument)}: 'new' allocates, and " +
+                          "only a class is allocated"));
+                return;
+        }
+
+        // Resolved under the substitution, so `where T : Comparer<U>` works and
+        // so does `where T : U`, where U is another parameter of the same
+        // template.
+        var required = ResolveType(constraint.Type!, scope);
+        if (required.IsError()) return;
+
+        if (required is InterfaceTypeSymbol contract)
+        {
+            if (Satisfies(argument, contract)) return;
+
+            diagnostics.Error("SL0328", span,
+                $"'{argument.Name}' cannot be used as '{parameter}' in {owner} " +
+                $"because it does not implement '{contract.Name}'" +
+                (argument is ClassTypeSymbol implementer && implementer.Interfaces.Count > 0
+                    ? "; it implements " +
+                      string.Join(", ", implementer.Interfaces.Select(i => "'" + i.Name + "'"))
+                    : ""));
+            return;
+        }
+
+        // A base class, which `where T : U` also reaches when U turned out to
+        // be one. Anything else has no derived types, so a constraint naming it
+        // could only ever be satisfied by itself -- which is a parameter that
+        // did not need to be one.
+        if (required is ClassTypeSymbol baseClass)
+        {
+            if (argument is ClassTypeSymbol derived &&
+                derived.SelfAndBases().Contains(baseClass)) return;
+
+            diagnostics.Error("SL0328", span,
+                $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because it " +
+                $"does not derive from '{baseClass.Name}'");
+            return;
+        }
+
+        diagnostics.Error("SL0329", constraint.Span,
+            $"'{required.Name}' cannot constrain '{parameter}': a constraint is an interface " +
+            "to implement, a class to derive from, 'class', 'struct' or 'new()', and " +
+            $"nothing derives from a {KindOf(required)}");
+    }
+
+    /// <summary>Reference types: what may be null and is reference counted.</summary>
+    private bool IsReferenceType(TypeSymbol type) =>
+        type is ClassTypeSymbol or InterfaceTypeSymbol or ArrayTypeSymbol ||
+        _builtins.IsString(type);
+
+    /// <summary>Value types: what is copied where it is assigned.</summary>
+    private static bool IsValueType(TypeSymbol type) =>
+        type is StructTypeSymbol or PrimitiveTypeSymbol or EnumTypeSymbol
+             or VariantTypeSymbol or FixedArrayTypeSymbol;
+
+    /// <summary>
+    /// What <c>new()</c> asks for: exactly what would let the body write
+    /// <c>new T()</c>.
+    ///
+    /// C# admits a struct here, because there <c>new T()</c> on a value type is
+    /// default-initialization. It is not that here -- <c>new</c> allocates, and
+    /// a struct is declared rather than allocated (SL0244) -- so a struct
+    /// would satisfy a constraint whose whole purpose it then failed.
+    /// </summary>
+    private static bool IsDefaultConstructible(TypeSymbol type) =>
+        type is ClassTypeSymbol declared &&
+        declared.Constructors.Any(c => c.IsPublic && !c.Parameters.Any(p => !p.IsThis));
+
+    /// <summary>The word for what a type is, for a diagnostic that has to say.</summary>
+    private string KindOf(TypeSymbol type) =>
+        _builtins.IsString(type) ? "String"
+        : type switch
+        {
+            ClassTypeSymbol => "class",
+            InterfaceTypeSymbol => "interface",
+
+            // A variant is a struct, so it has to be asked about first.
+            VariantTypeSymbol => "variant",
+            StructTypeSymbol => "struct",
+            EnumTypeSymbol => "enum",
+            PrimitiveTypeSymbol => "primitive",
+            ArrayTypeSymbol => "array",
+            FixedArrayTypeSymbol => "inline array",
+            PointerTypeSymbol => "pointer",
+            DelegateTypeSymbol => "delegate",
+            _ => type.Name,
+        };
 
     /// <summary>
     /// True when <paramref name="argument"/> meets an interface constraint: a

@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-public class Base { int value; }
+public struct Point { public int X; }
 
-// Only interfaces may constrain a type parameter.
-public class Holder<T> where T : Base { T item; }
+// A constraint is something with implementers or something with derived types.
+// A struct has neither, so a parameter constrained to one could only ever be
+// that struct -- which is a parameter that did not need to be one.
+public class Holder<T> where T : Point { T item; }
 
 int Main() {
-    Holder<Base> h;
+    Holder<Point> h;
     return 0;
 }

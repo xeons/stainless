@@ -122,6 +122,13 @@ public enum Modifiers
     /// declaration, <c>static readonly</c> storage.
     /// </summary>
     Static = 1 << 9,
+
+    /// <summary>
+    /// On a type, one whose author says every operation on it synchronizes
+    /// itself, so more than one thread may hold it at once. An assertion, not
+    /// something the compiler can check.
+    /// </summary>
+    Threadsafe = 1 << 10,
 }
 
 /// <summary>
@@ -308,7 +315,44 @@ public sealed record DestructorDeclSyntax(
 public sealed record WhereClauseSyntax(
     SourceSpan Span,
     string TypeParameter,
-    IReadOnlyList<TypeSyntax> Constraints) : SyntaxNode(Span);
+    IReadOnlyList<ConstraintSyntax> Constraints) : SyntaxNode(Span);
+
+/// <summary>What one constraint after the colon demands of a type parameter.</summary>
+public enum ConstraintKind
+{
+    /// <summary>An interface to implement, a class to derive from, or another
+    /// type parameter to be.</summary>
+    Type,
+
+    /// <summary><c>class</c>: a reference type, so it may be null and is counted.</summary>
+    Class,
+
+    /// <summary><c>struct</c>: a value type, so it is copied and never null.</summary>
+    Struct,
+
+    /// <summary><c>new()</c>: something the body may construct with no arguments.</summary>
+    New,
+
+    /// <summary>
+    /// <c>threadsafe</c>: something more than one thread may hold. The one
+    /// constraint that is a hard error where the same fact is only a warning
+    /// at a <c>spawn</c> -- because here a library author has asked for it in
+    /// their own signature, rather than a compiler having guessed.
+    /// </summary>
+    Threadsafe,
+}
+
+/// <summary>
+/// One constraint: <c>IComparable&lt;T&gt;</c>, <c>class</c>, <c>struct</c> or
+/// <c>new()</c>.
+///
+/// A kind rather than four record types, because every consumer switches on
+/// all of them and the payload is at most a type.
+/// </summary>
+public sealed record ConstraintSyntax(
+    SourceSpan Span,
+    ConstraintKind Kind,
+    TypeSyntax? Type) : SyntaxNode(Span);
 
 /// <summary>
 /// An attribute applied to a declaration: <c>[JsonName("id")]</c>. Arguments

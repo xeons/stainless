@@ -118,6 +118,7 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
                 },
             };
 
+            symbol.IsThreadsafe = described.IsThreadsafe;
             symbol.SetLayout(described.Size, described.Alignment);
 
             if (described.Base is not null && symbol is ClassTypeSymbol derived)

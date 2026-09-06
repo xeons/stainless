@@ -7,8 +7,8 @@ from the code, and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           527 pass
-dotnet run --project tests/Stainless.Tests      212 cases, 1 skipped on Windows
+dotnet test tests/Stainless.UnitTests           552 pass
+dotnet run --project tests/Stainless.Tests      215 cases, 1 skipped on Windows
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`, which is worth using --

@@ -118,6 +118,13 @@ public sealed record MetadataType
     public List<MetadataField> Fields { get; init; } = [];
     public List<MetadataFunction> Methods { get; init; } = [];
 
+    /// <summary>
+    /// Declared <c>threadsafe</c>. It has to cross: a consumer deciding whether
+    /// to warn about handing one to a thread is asking about the type, and the
+    /// answer lives with the type rather than with the program using it.
+    /// </summary>
+    public bool IsThreadsafe { get; init; }
+
     /// <summary>The underlying integer of an enum, and its members.</summary>
     public string? Underlying { get; init; }
     public List<MetadataEnumMember> Members { get; init; } = [];

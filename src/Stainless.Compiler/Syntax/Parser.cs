@@ -316,6 +316,8 @@ public sealed class Parser
                 case TokenKind.AbstractKeyword: modifiers |= Modifiers.Abstract; Advance(); break;
                 case TokenKind.SealedKeyword: modifiers |= Modifiers.Sealed; Advance(); break;
                 case TokenKind.StaticKeyword: modifiers |= Modifiers.Static; Advance(); break;
+                case TokenKind.ThreadsafeKeyword:
+                    modifiers |= Modifiers.Threadsafe; Advance(); break;
 
                 // `com` reads as a modifier and means a different kind of
                 // declaration; only `interface` and `class` may follow it,
@@ -1124,14 +1126,91 @@ public sealed class Parser
             string parameter = ExpectIdentifier();
             Expect(TokenKind.Colon);
 
-            var constraints = new List<TypeSyntax>();
-            do { constraints.Add(ParseType()); }
+            var constraints = new List<ConstraintSyntax>();
+            do { constraints.Add(ParseConstraint()); }
             while (Match(TokenKind.Comma));
 
+            CheckConstraintOrder(constraints);
             clauses.Add(new WhereClauseSyntax(SpanFrom(start), parameter, constraints));
         }
 
         return clauses;
+    }
+
+    /// <summary>
+    /// One constraint. Three of the four are keywords, which is why this is not
+    /// simply <see cref="ParseType"/>.
+    /// </summary>
+    private ConstraintSyntax ParseConstraint()
+    {
+        int start = _pos;
+
+        if (Match(TokenKind.ClassKeyword))
+            return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Class, null);
+
+        if (Match(TokenKind.StructKeyword))
+            return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Struct, null);
+
+        if (Match(TokenKind.ThreadsafeKeyword))
+            return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Threadsafe, null);
+
+        // `new()`, with the parentheses C# writes and no parameters in them:
+        // there is nothing else a constructor constraint could ask for, since
+        // a body that wanted arguments would have to know their types.
+        if (Match(TokenKind.NewKeyword))
+        {
+            Expect(TokenKind.OpenParen);
+            if (!At(TokenKind.CloseParen))
+                _diagnostics.Error("SL0579", SpanFrom(start),
+                    "a 'new()' constraint takes no parameters; it says the type can be made " +
+                    "with none, which is the only promise a template could rely on");
+            while (!At(TokenKind.CloseParen) && !At(TokenKind.EndOfFile)) Advance();
+            Expect(TokenKind.CloseParen);
+            return new ConstraintSyntax(SpanFrom(start), ConstraintKind.New, null);
+        }
+
+        return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Type, ParseType());
+    }
+
+    /// <summary>
+    /// C#'s ordering rule, and C#'s reason for it: <c>class</c> or
+    /// <c>struct</c> says what kind of type this is and so comes first, and
+    /// <c>new()</c> is the last thing asked of it. The order carries no
+    /// meaning, but a fixed one means every <c>where</c> reads the same way.
+    /// </summary>
+    private void CheckConstraintOrder(List<ConstraintSyntax> constraints)
+    {
+        // Reported first, because `class, struct` is one mistake and saying
+        // the second word is out of order as well would bury it.
+        bool bothKinds =
+            constraints.Count(c => c.Kind is ConstraintKind.Class or ConstraintKind.Struct) > 1;
+
+        if (bothKinds)
+            _diagnostics.Error("SL0581", constraints[0].Span,
+                "a type parameter is a reference type or a value type, not both");
+
+        for (int i = 0; i < constraints.Count; i++)
+        {
+            var constraint = constraints[i];
+
+            if (!bothKinds &&
+                constraint.Kind is ConstraintKind.Class or ConstraintKind.Struct && i != 0)
+                _diagnostics.Error("SL0580", constraint.Span,
+                    $"'{(constraint.Kind == ConstraintKind.Class ? "class" : "struct")}' says " +
+                    "what kind of type this is, so it comes first in the clause");
+
+            if (constraint.Kind == ConstraintKind.New && i != constraints.Count - 1)
+                _diagnostics.Error("SL0580", constraint.Span,
+                    "'new()' is the last thing asked of a type parameter, so it comes last " +
+                    "in the clause");
+        }
+
+        if (constraints.Count > 1 &&
+            constraints[0].Kind == ConstraintKind.Struct &&
+            constraints.Any(c => c.Kind == ConstraintKind.New))
+            _diagnostics.Error("SL0581", constraints[0].Span,
+                "'struct' and 'new()' contradict each other: 'new' allocates, and only a class " +
+                "is allocated. A struct is declared where it is used");
     }
 
     /// <summary>

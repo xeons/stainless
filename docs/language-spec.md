@@ -1508,8 +1508,7 @@ named bits and not any of them. It is the one member an enum has: enums declare
 no methods, so this is the language spelling the test rather than a call.
 
 `[Flags]` needs no import. It is a rule about enums rather than a library to opt
-into, unlike `[Reflect]` and `[Shared]`, which come with the subsystems they
-belong to.
+into, unlike `[Reflect]`, which comes with the subsystem it belongs to.
 
 ### 2.14 `delegate` — a named function pointer
 
@@ -1628,9 +1627,10 @@ Parameter types may be written or left out; left out, they come from the target,
 which is the only thing that knows them. A lambda with no target is an error —
 `var f = x => x;` has nothing to infer from, and SL0553 says so.
 
-A closure is a class, so it may not cross a thread boundary unless it is marked
-`[Shared]` (§9.5). That is the correct answer rather than an oversight: a
-closure holds captured state, and nothing synchronizes it.
+A closure is a class, so crossing a thread boundary with one warns unless it is
+declared `threadsafe` (§9.5) -- which it cannot be, having no declaration to
+write the word on. That is the right answer rather than an oversight: a closure
+holds captured state, and nothing synchronizes it.
 
 ## 3. Text
 
@@ -2106,11 +2106,41 @@ so it would need constraints on operators as well as on methods, which is a
 larger design step than adding `where`. What `where` buys today is a precise
 error at the use site and a signature that states its requirements.
 
+**What may be written after the colon:**
+
+| | Demands | |
+|---|---|---|
+| `ISomething` | implements that interface | |
+| `SomeClass` | is that class, or derives from it | |
+| `U` | another type parameter of the same template | |
+| `class` | a reference type: counted, and may be null | |
+| `struct` | a value type: copied where it is assigned, never null | |
+| `new()` | a **class** with a public constructor taking no arguments | |
+| `threadsafe` | a type that says more than one thread may hold it (§9.5) | |
+
+Several are separated by commas in one clause, and several clauses by repeating
+`where`. `class` or `struct` comes first and `new()` last (SL0580) — the order
+carries no meaning, but a fixed one means every clause reads the same way.
+A parameter is a reference type or a value type, not both, and `struct`
+contradicts `new()` (SL0581).
+
+**`new()` means a class, unlike C#.** There, `new T()` on a value type is
+default-initialization, so a struct satisfies the constraint. Here `new`
+allocates and a struct is declared where it is used (SL0244), so a struct would
+satisfy a constraint whose only purpose it then failed.
+
+**`threadsafe` is the one constraint that is stricter than the rule it names.**
+Handing an unsynchronized object to a thread is a warning (SL0377), because the
+word is an assertion no compiler can check. Written in a `where` clause it is an
+error — there a library author has asked for it in their own signature, which is
+a different thing from a compiler guessing.
+
 ### 4.4 What is and is not supported
 
 Supported: generic classes, generic interfaces (including implementing them,
 as in `class Money : IComparable<Money>`), generic functions with inference,
-interface constraints, generic types nested in one another (`List<Box<int>>`),
+constraints of every kind in §4.3, generic types nested in one another
+(`List<Box<int>>`),
 and self-referential templates such as `class Node<T> { Node<T>? next; }`.
 
 **Generic functions overload on the shape of their parameters.** Two templates
@@ -2278,7 +2308,7 @@ caller releases it, usually outside the lock, so two threads performed an
 unsynchronized read-modify-write on the count — it drifted down and the object
 was freed while the mutex still held it. Reference counts are atomic now, which
 closes that half; see [concurrency.md](concurrency.md) §10 for why the narrower
-fix of "atomic counts for `[Shared]` types" would not have.
+fix of "atomic counts for `threadsafe` types" would not have.
 
 `AtomicLong` and `AtomicBool` are sequentially consistent counters and flags.
 They are concrete rather than `Atomic<T>` because atomics are not generic — that
@@ -2568,7 +2598,7 @@ if (got.Ok) { Console.WriteLine(got.Value); }
 ```
 
 `ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<K, V>` and
-`Channel<T>`, each `[Shared]` and each safe for several threads at once.
+`Channel<T>`, each `threadsafe` and each safe for several threads at once.
 
 Every operation that can fail returns a `Taken<T>` — whether there was
 anything, and what it was — rather than answering in two calls. There is no
@@ -3782,7 +3812,7 @@ Three rules are enforced, each for the same reason:
 | assigning an outside variable in a `parallel for` body | every chunk would race on one slot; write through a captured array, or accumulate into an `AtomicLong` |
 
 *What* may cross into a job is checked separately, by type, and is the rule in
-§9.5: plain data, a `String`, a `[Shared]` class, or an array of plain data.
+§9.5: plain data, a `String`, a `threadsafe` class, or an array of plain data.
 What is still unchecked is how long a borrowed thing lives — see
 [concurrency.md](concurrency.md) for the model being aimed at and which parts
 of it the compiler enforces today.
@@ -3828,8 +3858,8 @@ synchronizes, so the language does not have one; mutation goes through a type
 that says how it is safe, and `static int Counter = 0;` is an error that says so.
 
 Which types are allowed is the rule in §9.5: plain data, a `String`, or a class
-marked `[Shared]`. `static readonly List<int>` is rejected, and the error points
-at `Mutex<T>`.
+declared `threadsafe`. `static readonly List<int>` is warned about, and the
+warning points at `Mutex<T>`.
 
 **Order is computed, not guessed.** An initializer may read another static, and
 the compiler sorts them so nothing runs before what it reads:
@@ -3895,32 +3925,46 @@ receiver, a `parallel for` capture, and a `static readonly`.
 |---|---|
 | plain data — primitives, enums, pointers, delegates, and a `struct` of the same | there is no reference count to race over |
 | `String` | immutable, and its bytes live inside the object |
-| a class marked `[Shared]` | the author asserts it synchronizes itself |
+| a type declared `threadsafe` | the author asserts it synchronizes itself |
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
-Everything else is rejected, and this is a rule rather than a warning. Counting
-is not what it protects: reference counts are atomic, so sharing an object no
-longer corrupts its count. What nothing synchronizes is the object's *contents*,
-and two threads writing one field is a race no counting scheme could have saved.
+Everything else **warns** (SL0377). Counting is not what the rule protects:
+reference counts are atomic, so sharing an object no longer corrupts its count.
+What nothing synchronizes is the object's *contents*, and two threads writing
+one field is a race no counting scheme could have saved.
 
 A `struct` is as safe as what is inside it, so one holding only primitives and
-`String`s crosses freely and one holding a `List<T>` does not.
+`String`s crosses quietly and one holding a `List<T>` is warned about.
 
-`[Shared]` lives in `Standard.Threading` and is an **assertion, not a proof**:
+`threadsafe` is a word on the declaration, and an **assertion, not a proof**:
 
 ```csharp
-[Shared]
-class Accumulator {
+threadsafe class Accumulator {
     AtomicLong total;
     public void Contribute(int amount) { total.Add(amount); }
 }
 ```
 
-Put it on a type whose state lives behind a lock or an atomic, and nowhere else.
-`Mutex<T>`, `AtomicLong` and `AtomicBool` carry it; `Guard<T>` and `TaskScope`
-do not, because both belong to one thread. It is the same bargain Rust's
-`unsafe impl Sync` makes, and the only place in this design where a human
+Write it on a type whose state lives behind a lock or an atomic, and nowhere
+else. `Mutex<T>`, `AtomicLong` and `AtomicBool` carry it; `Guard<T>` and
+`TaskScope` do not, because both belong to one thread. It is the same bargain
+Rust's `unsafe impl Sync` makes, and the only place in this design where a human
 promise stands in for a check.
+
+**Which is why its absence is a warning.** Whether a type is safe to share is a
+fact about its body, and no compiler reads that off a declaration; a missing
+word is only ever a missing assertion. Refusing on that leaves a programmer who
+knows better with one move available — write the word untruthfully — and a lie
+is worse than a warning in every direction: it is permanent, it is invisible at
+the call site, and it covers the next mistake too.
+
+The one place the same fact is an error is `where T : threadsafe` (§4.3), and
+the difference is who asked: a library author stating a requirement in their own
+signature, rather than a compiler guessing at one.
+
+The word goes on a class, a struct or an interface. A variant, a union, an enum
+and a delegate are refused (SL0582): each is a value with no operations of its
+own, so the word on one would promise nothing.
 
 Two gaps remain, and both are about lifetimes rather than types: a `Guard` can
 outlive the lock it proves, and a job could store an array it was only lent.

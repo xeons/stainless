@@ -39,7 +39,7 @@ public sealed partial class Binder
     ///
     ///   plain data       there is no shared mutable state; a value is copied
     ///   String           immutable, and its bytes live inside the object
-    ///   [Shared]         the author has said the type synchronizes internally
+    ///   threadsafe       the author has said the type synchronizes internally
     ///
     /// An array of plain data is included as a fourth, and it is the one that is
     /// pragmatic rather than proven: a job borrows the array without retaining
@@ -48,7 +48,18 @@ public sealed partial class Binder
     /// data parallelism is the point of `parallel for`, and rejecting it would
     /// leave the feature with nothing to iterate.
     /// </summary>
-    private bool IsSendable(TypeSymbol type) => type switch
+    private bool IsSendable(TypeSymbol type)
+    {
+        // The author's word first. A struct is otherwise judged by its fields,
+        // and one holding a List is refused however carefully the type guards
+        // what it does with it -- which is exactly the case the assertion is
+        // for.
+        if (type is NamedTypeSymbol { IsThreadsafe: true }) return true;
+
+        return Sendable(type);
+    }
+
+    private bool Sendable(TypeSymbol type) => type switch
     {
         PrimitiveTypeSymbol or PointerTypeSymbol or EnumTypeSymbol or DelegateTypeSymbol => true,
 
@@ -72,6 +83,8 @@ public sealed partial class Binder
 
         _ when _builtins.IsString(type) => true,
 
+        // Anything left that a program declared: a class or an interface, whose
+        // safety is an assertion rather than something to compute.
         NamedTypeSymbol named => IsShared(named),
 
         OptionalTypeSymbol optional => IsSendable(optional.Element),
@@ -84,9 +97,8 @@ public sealed partial class Binder
         || (type is StructTypeSymbol structType && !structType.CarriesReferences())
         || (type is FixedArrayTypeSymbol inline && IsPlainData(inline.Element));
 
-    /// <summary>True when the type carries <c>[Shared]</c>.</summary>
-    private static bool IsShared(NamedTypeSymbol type) =>
-        type.Attributes.Any(a => a.Type.SimpleName == "Shared");
+    /// <summary>True when the type was declared <c>threadsafe</c>.</summary>
+    private static bool IsShared(NamedTypeSymbol type) => type.IsThreadsafe;
 
     /// <summary>
     /// True for an enum marked <c>[Flags]</c>: a set of bits rather than a
@@ -97,17 +109,26 @@ public sealed partial class Binder
         enumType.Attributes.Any(a => a.Type == _builtins.Flags);
 
     /// <summary>
-    /// Reports a value that would be reachable from two threads at once.
+    /// Warns about a value that would be reachable from two threads at once.
+    ///
+    /// A warning rather than a refusal, and deliberately. Whether a type is
+    /// safe to share is a fact about its implementation, and no compiler can
+    /// read that off a declaration -- <c>threadsafe</c> is an assertion, so its
+    /// absence is only ever the absence of an assertion. Refusing on that
+    /// leaves a programmer who knows better with nothing to do but lie to the
+    /// compiler, and a lie is worse than a warning: it is permanent, it is
+    /// invisible at the call site, and it covers the next mistake too.
+    ///
     /// The message names the three ways out, because the fix is never obvious
     /// from the rule alone.
     /// </summary>
     private void ReportNotSendable(TypeSymbol type, SourceSpan span, string what)
     {
-        diagnostics.Error("SL0377", span,
+        diagnostics.Warning("SL0377", span,
             $"{what} is '{type.Name}', which more than one thread would reach, and " +
             "nothing about it says how two of them may. Counts are atomic, so the " +
             "reference itself is safe; what is not is the contents. Pass plain data or " +
-            $"a String, guard it with 'Mutex<T>', or mark '{type.Name}' with [Shared] " +
+            $"a String, guard it with 'Mutex<T>', or declare '{type.Name}' 'threadsafe' " +
             "if it already synchronizes itself");
     }
 }

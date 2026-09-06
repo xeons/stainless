@@ -1,3 +1,9 @@
 largest=999c
 best=70c
 tag=beta
+class=woof
+struct=3 7
+new=woof
+base=woof
+related=...!
+threadsafe=4

@@ -183,6 +183,8 @@ public sealed partial class Binder
                     Span = declaration.Span,
                 };
 
+                ClaimThreadsafe(delegateType, declaration.Modifiers, declaration.Span);
+
                 module.Types[declaration.Name] = delegateType;
                 _delegateSyntax[delegateType] = (declaration, scope);
             }
@@ -205,10 +207,38 @@ public sealed partial class Binder
                     Span = declaration.Span,
                 };
 
+                ClaimThreadsafe(enumType, declaration.Modifiers, declaration.Span);
+
                 module.Types[declaration.Name] = enumType;
                 _enumSyntax[enumType] = (declaration, scope);
             }
         }
+    }
+
+    /// <summary>
+    /// Records a <c>threadsafe</c> claim, or says why the type cannot make one.
+    ///
+    /// The word means that operations on the type synchronize themselves, so it
+    /// belongs on something with operations. A variant and a union have none --
+    /// they are a tag and some bytes -- and an enum is its integer, a delegate
+    /// a pointer; all four already cross a thread boundary freely, so the word
+    /// on one would be a promise about nothing.
+    /// </summary>
+    private void ClaimThreadsafe(NamedTypeSymbol type, Modifiers modifiers, SourceSpan span)
+    {
+        if (!modifiers.HasFlag(Modifiers.Threadsafe)) return;
+
+        if (type is VariantTypeSymbol or UnionTypeSymbol or EnumTypeSymbol
+                 or DelegateTypeSymbol or AttributeTypeSymbol)
+        {
+            diagnostics.Error("SL0582", span,
+                $"'{type.Name}' cannot be 'threadsafe': the word says that operations on a " +
+                "type synchronize themselves, and this has none. A class, a struct or an " +
+                "interface may claim it");
+            return;
+        }
+
+        type.IsThreadsafe = true;
     }
 
     private readonly Dictionary<AliasSymbol, (AliasDeclSyntax Declaration, FileScope Scope)>
@@ -298,6 +328,9 @@ public sealed partial class Binder
     {
         bool isAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract);
         bool isSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed);
+
+        if (declaration.Modifiers.HasFlag(Modifiers.Threadsafe))
+            ClaimThreadsafe(type, declaration.Modifiers, declaration.Span);
 
         if (declaration.Modifiers.HasFlag(Modifiers.Com))
         {

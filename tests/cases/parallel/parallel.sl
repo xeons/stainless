@@ -19,10 +19,10 @@ String Label(int value) { return "n" + FromInteger(value); }
 int Shade(int value) { return value * value + 1; }
 
 // Every operation goes through an AtomicLong, so this really does synchronize
-// itself -- which is what [Shared] asserts. Without it the spawn below is
-// rejected, because a class crossing a thread boundary is a race by default.
-[Shared]
-class Accumulator {
+// itself -- which is what `threadsafe` asserts. Without the word the spawn
+// below still compiles and warns, because whether a type is safe to share is a
+// fact about its body that no declaration can prove.
+threadsafe class Accumulator {
     AtomicLong total;
     public Accumulator(AtomicLong cell) { total = cell; }
     public void Contribute(int amount) { total.Add(amount); }

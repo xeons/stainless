@@ -48,7 +48,7 @@
 module Standard.Concurrent;
 
 import Standard.Collections;
-import Standard.Threading;      // for [Shared]
+import Standard.Threading;
 
 extern "C" {
     byte* sl_mutex_new();
@@ -83,8 +83,7 @@ public class Taken<T> {
 // ------------------------------------------------------------------- queue
 
 /// A first-in, first-out queue several threads may use at once.
-[Shared]
-public class ConcurrentQueue<T> {
+public threadsafe class ConcurrentQueue<T> {
     Queue<T> items;
     byte* gate;
     T[] blank;
@@ -157,8 +156,7 @@ public class ConcurrentQueue<T> {
 // ------------------------------------------------------------------- stack
 
 /// A last-in, first-out stack several threads may use at once.
-[Shared]
-public class ConcurrentStack<T> {
+public threadsafe class ConcurrentStack<T> {
     Stack<T> items;
     byte* gate;
     T[] blank;
@@ -223,8 +221,7 @@ public class ConcurrentStack<T> {
 // -------------------------------------------------------------- dictionary
 
 /// A map several threads may use at once.
-[Shared]
-public class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHashable {
+public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHashable {
     Dictionary<K, V> entries;
     byte* gate;
     V[] blank;
@@ -334,8 +331,7 @@ public class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHashable {
 ///     // producer:  channel.Send(line);  ... channel.Close();
 ///     // consumer:  var got = channel.Take();
 ///     //            while (got.Ok) { use(got.Value); got = channel.Take(); }
-[Shared]
-public class Channel<T> {
+public threadsafe class Channel<T> {
     Queue<T> items;
     byte* gate;
     byte* arrived;

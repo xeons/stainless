@@ -20,9 +20,9 @@ threads ever touch one, and as of step 6 that is checked rather than trusted.
 > is the counter-example, found after this was written and detailed in §10: a
 > reference handed out of a lock is retained inside it and released outside it,
 > so two threads do touch one count, and it drifts until the object is freed
-> while still in use. The obvious narrowing — atomic counts for `[Shared]` types
+> while still in use. The obvious narrowing — atomic counts for `threadsafe` types
 > only — does not close it either, because `Mutex<List<T>>` guards a List and a
-> List is not `[Shared]`; what would have to be atomic is everything reachable
+> List is not `threadsafe`; what would have to be atomic is everything reachable
 > from a shared type.
 >
 > So all counts are atomic. An atomic pair costs more than a plain one, and the
@@ -103,13 +103,13 @@ Checked, as of step 6, at the three places a value can reach another thread: a
 |---|---|
 | plain data — primitives, enums, pointers, delegates, and a `struct` of the same | there is no reference count to race over |
 | `String` | immutable, and its bytes live inside the object |
-| a class marked `[Shared]` | the author asserts it synchronizes itself |
+| a type declared `threadsafe` | the author asserts it synchronizes itself |
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
-Everything else is rejected, and the error names all three ways out. A `struct`
-that holds a reference is rejected with everything else: copying one retains
-what it holds, and a retain two threads can both perform is the race this rule
-exists to stop.
+Everything else **warns**, and the warning names all three ways out. A `struct`
+that holds a reference warns with everything else: copying one retains what it
+holds, and a retain two threads can both perform is the race this rule exists to
+notice.
 
 The fourth row is the pragmatic one, and worth being honest about: borrowing
 without retaining is sound as far as it goes, but nothing yet stops a job from
@@ -117,9 +117,19 @@ storing the array somewhere and retaining it then. It earns its place because
 data parallelism is the point of `parallel for`, and rejecting it would leave
 the feature with nothing to iterate.
 
-`[Shared]` is an assertion, not a proof. It is the same bargain Rust's `unsafe
-impl Sync` makes, spelled as an attribute, and it is the only place in this
-design where a human promise stands in for a check.
+`threadsafe` is an assertion, not a proof — the same bargain Rust's `unsafe
+impl Sync` makes, spelled as a word on the declaration.
+
+**Which is why the absence of it is a warning rather than a refusal.** Whether
+a type is safe to share is a fact about its body, and no compiler reads that off
+a declaration; the missing word is only ever a missing assertion. Refusing on
+that leaves a programmer who knows better with one move available — write the
+word untruthfully — and a lie is worse than a warning in every direction: it is
+permanent, it is invisible at the call site, and it covers the next mistake too.
+
+The one place it is an error is `where T : threadsafe`, and the difference is
+who asked. A library author writing it in their own signature is stating a
+requirement; a compiler refusing a `spawn` is guessing at one.
 
 ---
 
@@ -208,7 +218,7 @@ because interfaces with vtables and monomorphized generics already existed.
 
 They are worth having and they are not a concurrency feature. A closure captures
 by value into an ordinary class, so it is a class at a thread boundary like any
-other and needs `[Shared]` to cross one.
+other and needs `threadsafe` to cross one.
 
 ---
 
@@ -231,7 +241,7 @@ Stainless takes the destination without the detour, and writes it as C# would:
 |---|---|---|
 | 0 | `const int Limit = 64;` | compile-time value, no storage |
 | 1 | `static readonly int Base = 20;` | plain data or a `String`; frozen on store |
-| 2 | `static readonly AtomicLong Count = new AtomicLong(0);` | mutable only through a `[Shared]` type |
+| 2 | `static readonly AtomicLong Count = new AtomicLong(0);` | mutable only through a `threadsafe` type |
 | 3 | `threadstatic ...` | per-thread storage; deferred |
 
 **There is no `static` without `readonly`**, and that is the whole design: a
@@ -241,8 +251,8 @@ one, and the error for writing `static` alone says so.
 
 The type rules of §1.3 do the rest. Tier 1 is safe because plain data has no
 reference count and a `String` cannot be written; tier 2 is safe because the
-type says how. A `static readonly List<int>` is rejected, and the error points
-at `Mutex<T>`.
+type says how. A `static readonly List<int>` is warned about, and the warning
+points at `Mutex<T>`.
 
 ### 3.1 Initialization order
 
@@ -507,16 +517,16 @@ object in a field and never hands it out, because reading a field to call a
 method on it borrows, and borrowing touches no count. Every container in
 Standard.Concurrent is built that way, and none of them uses `Mutex<T>`.
 
-Closing it properly means **atomic reference counts for `[Shared]` types**.
+Closing it properly means **atomic reference counts for `threadsafe` types**.
 That is affordable in the spirit of §1: only a type that opts into sharing pays,
 and every single-threaded program keeps exactly what it has today. It is a
 decision about the ARC model rather than a bug in the library, and it is not
 made here.
 
-> **Done, and not the way this paragraph proposed.** `[Shared]`-only atomics
+> **Done, and not the way this paragraph proposed.** `threadsafe`-only atomics
 > does not close it: `Mutex<List<String>>` is the spec's own example, the
-> `Mutex` is `[Shared]` and the `List` inside it is not, and it is the List's
-> count that races. Soundness would need everything reachable from a `[Shared]`
+> `Mutex` is `threadsafe` and the `List` inside it is not, and it is the List's
+> count that races. Soundness would need everything reachable from a `threadsafe`
 > type to be atomic, which in any program where the question arises is most of
 > the heap — and the type can be laundered anyway, since a job takes its
 > argument as a `byte*`.
@@ -549,8 +559,8 @@ Order of work, each step useful on its own:
    needed them. A lambda becomes a closure for a single-method interface, or a
    plain function pointer for a delegate when it captures nothing.
 8. ~~Atomic reference counts.~~ Done, and not the way §10 proposed — see the
-   note there. Every count is atomic rather than only a `[Shared]` type's,
-   because `Mutex<List<T>>` guards a List and a List is not `[Shared]`. The
+   note there. Every count is atomic rather than only a `threadsafe` type's,
+   because `Mutex<List<T>>` guards a List and a List is not `threadsafe`. The
    remaining gaps are the two lifetime ones, which no counting scheme touches.
 
 What is still open, in the order it is worth doing:
@@ -616,7 +626,7 @@ one reason: the closing brace cannot be passed until the job has finished, so
 the frame provably outlives it (§2.1).
 
 A `Thread` has no closing brace. Whatever it touches has to outlive it on its
-own — a `[Shared]` object held in a `static readonly`, or a block the thread
+own — a `threadsafe` object held in a `static readonly`, or a block the thread
 frees itself. Handing it a pointer to a local and returning is a use-after-free,
 and nothing catches it: the argument is a `byte*`, which is the same hole §1.3
 leaves open for `spawn` and the reason step 6's lifetime analysis is still the

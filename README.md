@@ -320,7 +320,16 @@ public class Money : IComparable<Money> { ... }
 
 T Largest<T>(T[] values) where T : IComparable<T> { ... }
 public class Ranked<T> where T : IComparable<T>, IDescribable { ... }
+
+T Fresh<T>(T old) where T : new() { return new T(); }
+T Copied<T>(T value) where T : struct { return value; }
+String Says<T>(T animal) where T : Animal { return animal.Says(); }
+String Both<T, U>(T a, U b) where T : U where U : INamed { return b.Name(); }
 ```
+
+`new()` means a **class** here, unlike C#: `new` allocates, and a struct is
+declared where it is used -- so a struct would satisfy a constraint whose only
+purpose it then failed.
 
 A violated constraint is caught where the generic is instantiated:
 
@@ -876,7 +885,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 210 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 527 compiler unit tests
+dotnet test tests/Stainless.UnitTests           # 552 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -885,7 +894,7 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 212 cases, of which 10 are
+**Both Windows and Linux are tested.** 215 cases, of which 10 are
 Windows-only and 1 is Linux-only, so Linux runs 200 and Windows 209, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
@@ -1215,9 +1224,14 @@ Everything below is covered by [the test suite](tests/cases).
 - `static` methods on a class or a struct: a member with no receiver, reached
   by naming the type. It is what a fallible factory is written as, since it can
   use a private constructor and a constructor cannot report why it failed
-- A checked rule for what may cross a thread: plain data, a `String`, a
-  `[Shared]` type, or an array of plain data. Anything else is rejected at the
-  `spawn`, the `parallel for` capture, or the static that would share it
+- `threadsafe`, a word on a class, struct or interface saying that operations
+  on it synchronize themselves. Anything crossing a thread that is not that,
+  plain data, a `String` or an array of plain data draws a warning at the
+  `spawn`, the `parallel for` capture, or the static that would share it --
+  a warning rather than a refusal, because the word is an assertion no compiler
+  can check, and refusing would leave someone who knows better with nothing to
+  do but write it untruthfully. `where T : threadsafe` is the strict form, and
+  there it is an error, because the library author asked
 - Full operator set with C# precedence, short-circuit `&&` and `||`, and the
   conditional `a ? b : c`. The arithmetic C leaves undefined is defined here:
   a shift count is reduced modulo the operand's width as in C#, so `1 << 40` is
@@ -1269,8 +1283,9 @@ Everything below is covered by [the test suite](tests/cases).
   It holds the array it came from, so it cannot dangle: what it points into is
   alive for as long as it is. An array converts to a slice of the whole of
   itself implicitly, and `foreach` walks one like an array
-- Generics: generic classes, interfaces, functions and methods, monomorphized, with
-  inference at call sites and interface constraints (`where T : IComparable<T>`)
+- Generics: generic classes, interfaces, functions and methods, monomorphized,
+  with inference at call sites and constraints: an interface, a base class,
+  another type parameter, `class`, `struct`, `new()` and `threadsafe`
 - `enum`, strongly typed: a distinct type over an integer that never converts
   implicitly in either direction, with an optional underlying type
   (`enum Level : byte`)
@@ -1462,8 +1477,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   still checked per instantiation, so an unused template is never checked and
   a mistake inside one is reported against its use. Definition-site checking
   would need constraints on operators too, which is a larger step.
-- **Only interfaces constrain.** No `where T : SomeClass`, no `class`/`struct`
-  kind constraints, no `new()`.
 - **Type arguments cannot be written at a call.** `Pick<int>(...)` is rejected,
   because `<` in expression position is ambiguous with less-than, so a type
   parameter that appears only in the function's own return type cannot be
@@ -1568,12 +1581,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   `sl_release` may run any destructor and so promises nothing; the failure
   paths do not return), which is worth having for its own sake and measurably
   changes nothing. Only the +0/+1 pass will.
-- **The remaining thread-safety gaps are about lifetimes.** What crosses a
-  thread is checked by type, so an unsynchronized class cannot reach a second
-  thread at all. What is unchecked is how long a borrowed thing lives: a
-  `Guard` can outlive the lock it proves, and a job could store an array it was
-  only lent. `[Shared]` is also an assertion rather than a proof, the same
-  bargain as Rust's `unsafe impl Sync`. See
+- **Thread safety is advice, not a proof.** What crosses a thread is checked
+  by type and warned about, and `threadsafe` is an assertion -- the same bargain
+  as Rust's `unsafe impl Sync`. What is unchecked entirely is how long a
+  borrowed thing lives: a `Guard` can outlive the lock it proves, and a job
+  could store an array it was only lent. See
   [docs/concurrency.md](docs/concurrency.md).
 - **No cancellation beyond a shared flag.** An `AtomicBool` a job polls is the
   whole story; a `parallel` block always joins, and always will. See §9 of the
