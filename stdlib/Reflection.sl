@@ -97,6 +97,8 @@ extern "C" {
     void   sl_property_set_bool(byte* instance, byte* property, bool value);
     void   sl_property_set_reference(byte* instance, byte* property, byte* value);
 
+    byte*  sl_type_find(byte* name);
+
     byte*  sl_array_data(byte* array);
     nuint  sl_array_length(byte* array);
 
@@ -544,6 +546,27 @@ public void WriteBool(byte* instance, Field field, bool value) {
 /// the other direction. The field ends up owning a copy.
 public void WriteText(byte* instance, Field field, String value) {
     sl_write_text(instance, field.Handle, value.ToPointer(), value.ByteLength());
+}
+
+/// The type of that **qualified** name -- "App.Button", as `Type.Name()`
+/// spells it -- or a handle of null.
+///
+/// This is the one thing in reflection that is a search rather than a
+/// constant, and it exists for the case `typeof` cannot serve: a document
+/// naming the type it wants. Every `[Reflect]` type in the binary is in a
+/// sorted table registered before `Main` runs, and each library the program
+/// loaded contributes its own, so the lookup is a binary search per binary.
+///
+/// **Only reflected types are findable.** A program that could name any type
+/// at run time would be a program whose linker could drop nothing, which is
+/// the trade `[Reflect]` exists to make explicit.
+///
+///     var type = FindType("App.Button");
+///     if (type.Exists()) { byte* made = Make(type); }
+public Type FindType(String name) {
+    Type result;
+    result.Handle = sl_type_find(name.ToPointer());
+    return result;
 }
 
 /// Makes a zeroed instance of a type, for a reader that has a type and no

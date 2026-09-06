@@ -121,6 +121,83 @@ public sealed partial class LlvmEmitter
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
     }
 
+    /// <summary>
+    /// This binary's reflected types, sorted by name, and the startup call
+    /// that links them into the runtime's chain.
+    ///
+    /// Nothing in a compiled binary looks a type up by name -- <c>typeof</c>
+    /// resolves to a constant -- so a document that says "App.Button" has
+    /// nowhere to go without this. The table is emitted per module and
+    /// registered on load, which is what makes it work for a shared library
+    /// as well as a program: each contributes its own block and the runtime
+    /// walks the chain.
+    ///
+    /// **Only [Reflect] types are in it.** A program that could name any type
+    /// at run time would be a program whose linker could drop nothing.
+    /// </summary>
+    private void TypeRegistry(BoundProgram program)
+    {
+        var reflected = new List<(string Name, string Symbol)>();
+
+        foreach (var classType in program.Classes.Where(c => c.IsReflected))
+            reflected.Add((classType.QualifiedName, "@" + Mangler.TypeInfoSymbol(classType)));
+
+        foreach (var structType in program.Modules
+                     .SelectMany(m => m.Types.Values)
+                     .OfType<StructTypeSymbol>()
+                     .Where(t => t.IsReflected))
+            reflected.Add((structType.QualifiedName, "@" + StructTypeInfoName(structType)));
+
+        if (reflected.Count == 0) return;
+
+        // Sorted by UTF-8 bytes, because the search is `strcmp` and that is
+        // what it compares. Ordinal string order would agree for every ASCII
+        // name and disagree above the BMP, which is exactly the kind of
+        // difference that would be found years later by one person.
+        reflected.Sort((left, right) => Utf8Order(left.Name, right.Name));
+
+        string table = "@" + NextMetadataName("typetable");
+        _metadata.AppendLine(
+            $"{table} = internal constant [{reflected.Count} x ptr] " +
+            $"[{string.Join(", ", reflected.Select(t => "ptr " + t.Symbol))}]");
+
+        // `global` rather than `constant`: the runtime writes `next` into it,
+        // which is the only mutable word in the whole reflection ABI.
+        string block = "@" + NextMetadataName("typeblock");
+        _metadata.AppendLine(
+            $"{block} = internal global %SlTypeBlock " +
+            $"{{ i64 {reflected.Count}, ptr {table}, ptr null }}");
+
+        const string name = "_SLregister_types";
+
+        _module.AppendLine();
+        _module.AppendLine($"define internal void @{name}() {{");
+        _module.AppendLine("entry:");
+        _module.AppendLine($"  call void @sl_types_register(ptr {block})");
+        _module.AppendLine("  ret void");
+        _module.AppendLine("}");
+
+        // Priority 1: after the string literals are bound, before anything a
+        // program adds later.
+        _startup.Add((1, name));
+    }
+
+    /// <summary>
+    /// Compares two names as their UTF-8 bytes, which is what <c>strcmp</c>
+    /// will do to them.
+    /// </summary>
+    private static int Utf8Order(string left, string right)
+    {
+        var a = System.Text.Encoding.UTF8.GetBytes(left);
+        var b = System.Text.Encoding.UTF8.GetBytes(right);
+
+        int shared = Math.Min(a.Length, b.Length);
+        for (int i = 0; i < shared; i++)
+            if (a[i] != b[i]) return a[i] < b[i] ? -1 : 1;
+
+        return a.Length.CompareTo(b.Length);
+    }
+
     private static string StructTypeInfoName(StructTypeSymbol type) =>
         "_SLti_struct_" + Mangler.SymbolSafe(type.QualifiedName);
 

@@ -1603,11 +1603,12 @@ Being straight about the edges, roughly in the order they are worth adding:
   is its accessors rather than an offset, so setting one through reflection
   runs the setter — which is what anything whose setter does work needs, and
   what writing an automatic property's storage silently skips.
-  `Field.IsPropertyStorage()` is how the two are told apart. **Methods and
-  interfaces carry no metadata and `typeof` needs the type named at compile
-  time.** That is what stops a serializer filling a `List<T>`: its storage is
-  private and the way in is `Add`, which nothing here can call. An array is
-  described and does round-trip.
+  `Field.IsPropertyStorage()` is how the two are told apart. `FindType` looks
+  a `[Reflect]` type up by its qualified name, so a document can say which type
+  it wants where `typeof` cannot. **Methods and interfaces carry no metadata.**
+  That is what stops a serializer filling a `List<T>`: its storage is private
+  and the way in is `Add`, which nothing here can call. An array is described
+  and does round-trip.
 - **An interface method may not be overloaded.** Dispatch gives each one a
   single slot, so two of a name in one interface would be a call the receiver
   could not resolve. Methods on classes and structs overload freely, and a

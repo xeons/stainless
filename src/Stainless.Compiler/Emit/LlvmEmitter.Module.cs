@@ -113,6 +113,7 @@ public sealed partial class LlvmEmitter
             "%SlFieldInfo = type { ptr, i64, i32, ptr, i64, ptr, i32, ptr, i64, i32 }");
         _module.AppendLine(
             "%SlPropertyInfo = type { ptr, i32, ptr, ptr, ptr, i64, ptr }");
+        _module.AppendLine("%SlTypeBlock = type { i64, ptr, ptr }");
         _module.AppendLine("%SlAttribute = type { ptr, i64, ptr }");
         _module.AppendLine("%SlAttributeValue = type { i32, i64, ptr }");
         _module.AppendLine();
@@ -209,6 +210,11 @@ public sealed partial class LlvmEmitter
         Declare("sl_string_join", "declare noalias ptr @sl_string_join(ptr, i64) nounwind");
 
         Declare("sl_args_set", "declare void @sl_args_set(i32, ptr) nounwind");
+
+        // Links this binary's reflected-type table into the runtime's chain.
+        // Called once, from a module initializer, before anything else runs.
+        Declare("sl_types_register",
+            "declare void @sl_types_register(ptr) nounwind");
         Declare("sl_args_array", "declare noalias ptr @sl_args_array(ptr) nounwind");
 
         // Reads type tables, which are constants in this module or the

@@ -33,6 +33,7 @@
  */
 
 #include "stainless.h"
+#include <string.h>
 
 /* ------------------------------------------------------------------- types */
 
@@ -594,4 +595,57 @@ void sl_property_set_reference(void *instance, const void *property, void *value
         default:
             break;
     }
+}
+
+/* ------------------------------------------------------ finding by name */
+
+/*
+ * The registered blocks, newest first. Written only from module initializers,
+ * which run single-threaded before main, so there is no lock here and no need
+ * of one: by the time a second thread can exist the chain is complete.
+ */
+static SlTypeBlock *sl_type_blocks = NULL;
+
+void sl_types_register(SlTypeBlock *block)
+{
+    if (block == NULL || block->count == 0) return;
+
+    block->next = sl_type_blocks;
+    sl_type_blocks = block;
+}
+
+/*
+ * Binary search within a block, linear across them.
+ *
+ * Each block is sorted by the compiler, and there is one block per binary --
+ * a program plus whatever libraries it loaded -- so the outer walk is over a
+ * handful and the inner over everything.
+ */
+static const SlTypeInfo *sl_block_find(const SlTypeBlock *block, const char *name)
+{
+    size_t low = 0;
+    size_t high = block->count;
+
+    while (low < high) {
+        size_t middle = low + (high - low) / 2;
+        int order = strcmp(block->types[middle]->name, name);
+
+        if (order == 0) return block->types[middle];
+        if (order < 0) low = middle + 1;
+        else           high = middle;
+    }
+
+    return NULL;
+}
+
+const void *sl_type_find(const char *name)
+{
+    if (name == NULL) return NULL;
+
+    for (const SlTypeBlock *block = sl_type_blocks; block != NULL; block = block->next) {
+        const SlTypeInfo *found = sl_block_find(block, name);
+        if (found != NULL) return found;
+    }
+
+    return NULL;
 }

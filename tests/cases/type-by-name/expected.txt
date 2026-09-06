@@ -1,0 +1,15 @@
+found = true
+name = TypeByName.Button
+properties = 3
+qualified-needed = false
+unreflected = false
+nonsense = false
+cross-module = true
+built = true
+left = 40
+caption = OK
+enabled = true
+layouts = 1
+caption-direct = OK
+slider = 2.5
+unbuildable = false

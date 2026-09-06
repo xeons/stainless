@@ -103,9 +103,9 @@ public sealed partial class LlvmEmitter
         _module.AppendLine();
 
         // Priority 0: ahead of anything else that asked to run at startup.
-        _module.AppendLine(
-            "@llvm.global_ctors = appending global [1 x { i32, ptr, ptr }] " +
-            $"[{{ i32, ptr, ptr }} {{ i32 0, ptr @{name}, ptr null }}]");
+        // The table itself is emitted once, at the end, because a module may
+        // define `llvm.global_ctors` only once however many things want in.
+        _startup.Add((0, name));
     }
 
     /// <summary>Matches SL_IMMORTAL in the runtime: a count that is never touched.</summary>

@@ -130,6 +130,17 @@ public sealed partial class LlvmEmitter(
     private readonly List<(string BreakLabel, int BreakDepth,
                            string ContinueLabel, int ContinueDepth)> _loops = [];
 
+    /// <summary>
+    /// What runs before main, lowest priority first.
+    ///
+    /// A module may define <c>llvm.global_ctors</c> only once, so everything
+    /// that wants in records itself here and <see cref="StartupTable"/> emits
+    /// the one array at the end. Two things want in today: binding string
+    /// literals to their type on Windows, and registering this binary's
+    /// reflected types so that one can be found by name.
+    /// </summary>
+    private readonly List<(int Priority, string Name)> _startup = [];
+
     public string Emit(BoundProgram program)
     {
         Header();
@@ -169,6 +180,8 @@ public sealed partial class LlvmEmitter(
             EmitEntryPoint(program.EntryPoint);
 
         StringConstants();
+        TypeRegistry(program);
+        StartupTable();
 
         if (_metadata.Length > 0)
         {
@@ -187,4 +200,21 @@ public sealed partial class LlvmEmitter(
         return _module.ToString();
     }
 
+    /// <summary>
+    /// The one <c>llvm.global_ctors</c>, which both PE and ELF honour: what it
+    /// names runs before <c>main</c> in a program and on load in a library.
+    /// </summary>
+    private void StartupTable()
+    {
+        if (_startup.Count == 0) return;
+
+        var entries = _startup
+            .OrderBy(s => s.Priority)
+            .Select(s => $"{{ i32, ptr, ptr }} {{ i32 {s.Priority}, ptr @{s.Name}, ptr null }}");
+
+        _module.AppendLine();
+        _module.AppendLine(
+            $"@llvm.global_ctors = appending global [{_startup.Count} x {{ i32, ptr, ptr }}] " +
+            $"[{string.Join(", ", entries)}]");
+    }
 }

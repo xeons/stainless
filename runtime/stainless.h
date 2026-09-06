@@ -706,6 +706,38 @@ SL_API void sl_property_set_bool(void *instance, const void *property, _Bool val
  */
 SL_API void sl_property_set_reference(void *instance, const void *property, void *value);
 
+/* --------------------------------------------------- finding a type by name */
+
+/*
+ * One binary's worth of reflected types, sorted by qualified name.
+ *
+ * A document that says "App.Button" has to reach a TypeInfo, and nothing in a
+ * compiled binary looks types up: `typeof` is resolved to a constant. So each
+ * module emits its own block and links it in before main runs, and the runtime
+ * keeps the chain.
+ *
+ * `next` is written by sl_types_register and is the only mutable word in the
+ * whole reflection ABI. The block itself is emitted by the compiler, so
+ * registration allocates nothing and cannot fail -- which matters because it
+ * happens before anything has had a chance to handle a failure.
+ */
+typedef struct SlTypeBlock {
+    size_t                    count;
+    const SlTypeInfo *const  *types;
+    struct SlTypeBlock       *next;
+} SlTypeBlock;
+
+/* Links a block in. Called from a module initializer, before main. */
+SL_API void sl_types_register(SlTypeBlock *block);
+
+/*
+ * The type of that qualified name -- "App.Button" -- or NULL.
+ *
+ * Only types marked [Reflect] are in the chain: a program that could name any
+ * type at run time would be a program whose linker could drop nothing.
+ */
+SL_API const void *sl_type_find(const char *name);
+
 /* Allocates a zeroed instance of a reflected type, for a deserializer. */
 SL_API void *sl_type_make(const void *type);
 

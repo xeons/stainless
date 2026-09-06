@@ -3058,6 +3058,35 @@ setting a property the derived class overrode calls the **base's** setter,
 where `.Left = x` in the language would not. Reflection here reads a table; it
 does not dispatch.
 
+#### 6.4.2 Finding a type by name
+
+`typeof(T)` resolves to a constant, which is what makes reflection free and
+also what stops it serving a document that says which type it wants. That is
+the other direction, and it is a search:
+
+```csharp
+var type = FindType("App.Button");        // the qualified name
+if (type.Exists()) {
+    byte* made = Make(type);
+    SetInteger(made, type.FindProperty("Left"), 40);
+}
+```
+
+Every `[Reflect]` type in a binary is in a table sorted by name, registered
+before `Main` runs, and a library the program loaded contributes its own — so
+the lookup is a binary search per binary and the answer is the same constant
+`typeof` would have produced.
+
+**Only reflected types are findable**, and the name must be the qualified one.
+A program that could name any type at run time would be a program whose linker
+could drop nothing, which is the trade `[Reflect]` exists to make explicit.
+
+Together with §6.4.1 that is enough to build an object graph from data: a
+document names a type, this finds it, `Make` allocates one and the property
+table sets it up. What is still missing is a method — an event handler named
+by a document has nothing to resolve against, because methods carry no
+metadata.
+
 ### 6.5 What is emitted
 
 A reflected type's `TypeInfo` gains six entries — a field count and table, an
