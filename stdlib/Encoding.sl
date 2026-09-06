@@ -161,7 +161,7 @@ public class Utf8Encoding : IEncoding {
 
             if (width == 0 || at + width > bytes.Length || !Continues(bytes, at, width)) {
                 built.AppendCodePoint((char32)0xFFFD);
-                at = at + 1;
+                at++;
                 continue;
             }
 
@@ -220,7 +220,7 @@ public class Utf16Encoding : IEncoding {
         nuint count = wide.UnitCount();
         var bytes = new byte[count * 2];
 
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i++) {
             uint unit = (uint)wide.UnitAt(i);
             if (bigEndian) {
                 bytes[i * 2] = (byte)(unit >> 8);
@@ -403,14 +403,14 @@ public abstract class SingleByteEncoding : IEncoding {
         for (nuint at = 0; at < text.ByteLength(); at = text.NextCodePoint(at)) {
             int written = this.FromScalar(text.CodePointAt(at));
             bytes[out] = written < 0 ? (byte)63 : (byte)written;      // '?'
-            out = out + 1;
+            out++;
         }
         return bytes;
     }
 
     public String GetString(byte[] bytes) {
         var built = new StringBuilder();
-        for (nuint i = 0; i < bytes.Length; i = i + 1) {
+        for (nuint i = 0; i < bytes.Length; i++) {
             built.AppendCodePoint(this.ToScalar(bytes[i]));
         }
         return built.ToText();
@@ -464,7 +464,7 @@ public class Windows1252Encoding : SingleByteEncoding {
         uint value = (uint)scalar;
         if (value < 0x80 || (value >= 0xA0 && value < 0x100)) { return (int)value; }
 
-        for (nuint i = 0; i < 32; i = i + 1) {
+        for (nuint i = 0; i < 32; i++) {
             if (Cp1252High(i) == value) { return (int)(0x80 + i); }
         }
         return -1;
@@ -497,7 +497,7 @@ nuint Utf8Width(byte lead) {
 
 /// Whether the bytes after the lead really are continuation bytes.
 bool Continues(byte[] bytes, nuint at, nuint width) {
-    for (nuint i = 1; i < width; i = i + 1) {
+    for (nuint i = 1; i < width; i++) {
         if ((bytes[at + i] & 0xC0) != 0x80) { return false; }
     }
     return true;
@@ -508,7 +508,7 @@ char32 Utf8Scalar(byte[] bytes, nuint at, nuint width) {
     if (width == 1) { return (char32)(uint)bytes[at]; }
 
     uint scalar = (uint)(bytes[at] & (byte)(0x7F >> (int)width));
-    for (nuint i = 1; i < width; i = i + 1) {
+    for (nuint i = 1; i < width; i++) {
         scalar = (scalar << 6) | (uint)(bytes[at + i] & 0x3F);
     }
     return (char32)scalar;
@@ -531,7 +531,7 @@ bool Overlong(uint scalar, nuint width) {
 /// Whether `bytes` begins with `prefix`.
 bool StartsWith(byte[] bytes, byte[] prefix) {
     if (prefix.Length > bytes.Length) { return false; }
-    for (nuint i = 0; i < prefix.Length; i = i + 1) {
+    for (nuint i = 0; i < prefix.Length; i++) {
         if (bytes[i] != prefix[i]) { return false; }
     }
     return true;
@@ -542,6 +542,6 @@ byte[] Tail(byte[] bytes, nuint at) {
     if (at >= bytes.Length) { return []; }
 
     var rest = new byte[bytes.Length - at];
-    for (nuint i = 0; i < rest.Length; i = i + 1) { rest[i] = bytes[at + i]; }
+    for (nuint i = 0; i < rest.Length; i++) { rest[i] = bytes[at + i]; }
     return rest;
 }

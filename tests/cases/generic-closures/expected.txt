@@ -1,0 +1,10 @@
+kept     3
+words    3
+spelled  4 and 7
+lengths  5 1
+sum      23
+joined   alphabbcdelta
+tally    5 totalling 23
+pipeline 2 totalling 55
+widest   alpha
+equal    true false

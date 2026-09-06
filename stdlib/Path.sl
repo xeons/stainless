@@ -69,7 +69,7 @@ nuint AfterLastSeparator(String path) {
     nuint size = path.ByteLength();
 
     nuint at = 0;
-    for (nuint i = 0; i < size; i = i + 1) {
+    for (nuint i = 0; i < size; i++) {
         if (IsSeparator(bytes[i])) { at = i + 1; }
     }
     return at;
@@ -127,7 +127,7 @@ public String Extension(String path) {
     var bytes = name.ToPointer();
     nuint size = name.ByteLength();
 
-    for (nuint i = size; i > 1; i = i - 1) {
+    for (nuint i = size; i > 1; i--) {
         if (bytes[i - 1] == 46) { return name.Substring(i - 1, size - i + 1); }
     }
     return "";
@@ -146,7 +146,7 @@ public String WithExtension(String path, String with) {
     var stem = Join(DirectoryName(path), WithoutExtension(path));
     if (with.ByteLength() == 0) { return stem; }
     if (with.ToPointer()[0] == 46) { return stem + with; }
-    return stem + "." + with;
+    return $"{stem}.{with}";
 }
 
 /// True when the path starts at a root, so that joining it onto another would
@@ -177,7 +177,7 @@ public List<String> Split(String path) {
     nuint size = path.ByteLength();
 
     nuint start = 0;
-    for (nuint i = 0; i <= size; i = i + 1) {
+    for (nuint i = 0; i <= size; i++) {
         bool boundary = i == size || IsSeparator(bytes[i]);
         if (!boundary) { continue; }
 

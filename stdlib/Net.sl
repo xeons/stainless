@@ -200,9 +200,9 @@ public struct EndPoint {
         // A bare IPv6 address contains colons, so the port needs the brackets
         // that a URL puts round one. IPv4 and a name do not.
         if (Host.Contains(':')) {
-            return "[" + Host + "]:" + Text.FromInteger((long)Port);
+            return $"[{Host}]:{Port}";
         }
-        return Host + ":" + Text.FromInteger((long)Port);
+        return $"{Host}:{Port}";
     }
 }
 
@@ -756,11 +756,11 @@ public class TcpClient : IStream {
             nuint read = socket.Receive(chunk, 0, chunk.Length);
             if (read == 0) { finished = true; break; }
 
-            for (nuint i = 0; i < read; i = i + 1) { built.Add(chunk[i]); }
+            for (nuint i = 0; i < read; i++) { built.Add(chunk[i]); }
         }
 
         var all = new byte[built.Count()];
-        for (nuint i = 0; i < all.Length; i = i + 1) { all[i] = built.At(i); }
+        for (nuint i = 0; i < all.Length; i++) { all[i] = built.At(i); }
         return all;
     }
 

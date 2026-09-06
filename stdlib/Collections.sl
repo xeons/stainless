@@ -95,7 +95,7 @@ public class ListEnumerator<T> : IEnumerator<T> {
 
     public bool MoveNext() {
         if (next >= source.Count()) { return false; }
-        next = next + 1;
+        next++;
         return true;
     }
 
@@ -149,7 +149,7 @@ public class List<T> : IList<T>, IEnumerable<T> {
     public void Add(T item) {
         if (count == items.Length) { Grow(); }
         items[count] = item;
-        count = count + 1;
+        count++;
     }
 
     public void Set(nuint index, T item) {
@@ -166,10 +166,10 @@ public class List<T> : IList<T>, IEnumerable<T> {
         if (count == items.Length) { Grow(); }
 
         // Backwards, so a slot is read before the copy that overwrites it.
-        for (nuint i = count; i > index; i = i - 1u) { items[i] = items[i - 1u]; }
+        for (nuint i = count; i > index; i--) { items[i] = items[i - 1u]; }
 
         items[index] = item;
-        count = count + 1;
+        count++;
     }
 
     /// Removes the item at a position, closing the gap.
@@ -180,9 +180,9 @@ public class List<T> : IList<T>, IEnumerable<T> {
     public void RemoveAt(nuint index) {
         if (index >= count) { sl_array_bounds_fail(index, count); }
 
-        for (nuint i = index; i + 1u < count; i = i + 1u) { items[i] = items[i + 1u]; }
+        for (nuint i = index; i + 1u < count; i++) { items[i] = items[i + 1u]; }
 
-        count = count - 1;
+        count--;
         items[count] = blank[0u];
     }
 
@@ -198,7 +198,7 @@ public class List<T> : IList<T>, IEnumerable<T> {
 
     void Grow() {
         var bigger = new T[items.Length * 2];
-        for (nuint i = 0; i < count; i = i + 1) { bigger[i] = items[i]; }
+        for (nuint i = 0; i < count; i++) { bigger[i] = items[i]; }
         items = bigger;
     }
 }
@@ -210,7 +210,7 @@ public T Largest<T>(IReadOnlyList<T> items) where T : IComparable<T> {
     if (items.Count() == 0) { sl_array_bounds_fail(0, 0); }
 
     var best = items.At(0);
-    for (nuint i = 1; i < items.Count(); i = i + 1) {
+    for (nuint i = 1; i < items.Count(); i++) {
         if (items.At(i).CompareTo(best) > 0) { best = items.At(i); }
     }
     return best;
@@ -221,19 +221,60 @@ public T Smallest<T>(IReadOnlyList<T> items) where T : IComparable<T> {
     if (items.Count() == 0) { sl_array_bounds_fail(0, 0); }
 
     var best = items.At(0);
-    for (nuint i = 1; i < items.Count(); i = i + 1) {
+    for (nuint i = 1; i < items.Count(); i++) {
         if (items.At(i).CompareTo(best) < 0) { best = items.At(i); }
     }
     return best;
 }
 
-/// The index of the first item equal to `wanted`, or the list's length when
-/// there is none.
-public nuint IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T> {
-    for (nuint i = 0; i < items.Count(); i = i + 1) {
-        if (items.At(i).EqualTo(wanted)) { return i; }
+/// Where the first item equal to `wanted` is, if it is there at all.
+///
+///     if (IndexOf(names, "beta") is Some at) { names.RemoveAt(at.Value); }
+///
+/// An `Optional<nuint>` rather than the length standing in for "no": the
+/// sentinel is the thing `Optional<T>` was added to retire, and its own
+/// documentation names this function as the example. `OrderedDictionary.IndexOf`
+/// has always answered this way; now they agree.
+public Optional<nuint> IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T> {
+    for (nuint i = 0; i < items.Count(); i++) {
+        if (items.At(i).EqualTo(wanted)) { return Some(i); }
     }
-    return items.Count();
+    return None;
+}
+
+/// Removes the first item equal to `wanted`, answering whether there was one.
+///
+/// This is `List<T>.Remove` under another name, and it is a free function
+/// rather than a method because it needs `T : IEquatable<T>` and a class
+/// cannot constrain one method's type parameter to something the class itself
+/// does not demand of every element.
+public bool RemoveFirst<T>(List<T> items, T wanted) where T : IEquatable<T> {
+    if (IndexOf(items, wanted) is Some at) {
+        items.RemoveAt(at.Value);
+        return true;
+    }
+    return false;
+}
+
+/// Removes every item the predicate accepts, and answers how many went.
+///
+///     RemoveWhere(handlers, (h) => h == leaving);
+///
+/// A predicate rather than a value, which is what makes it work for a `T` that
+/// implements nothing -- a `closure` is not `IEquatable`, so a list of
+/// callbacks could not be removed from at all before this.
+///
+/// Walked from the end, so an index already passed cannot move.
+public nuint RemoveWhere<T>(List<T> items, Predicate<T> match) {
+    nuint went = 0u;
+    nuint i = items.Count();
+
+    while (i > 0u) {
+        i--;
+        if (match(items.At(i))) { items.RemoveAt(i); went++; }
+    }
+
+    return went;
 }
 
 /// Below this many, a merge is not worth its bookkeeping and insertion sort
@@ -317,7 +358,7 @@ void Merge<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
 /// type that implements nothing at all:
 ///
 ///     Sort(people, (a, b) => a.Age - b.Age);
-public void Sort<T>(T[:] items, IComparer<T> order) {
+public void Sort<T>(T[:] items, Comparer<T> order) {
     if (items.Length < 2u) { return; }
 
     var scratch = new T[items.Length];
@@ -338,12 +379,12 @@ public void Sort<T>(T[:] items, IComparer<T> order) {
     }
 }
 
-void InsertionSortBy<T>(T[:] items, nuint start, nuint stop, IComparer<T> order) {
+void InsertionSortBy<T>(T[:] items, nuint start, nuint stop, Comparer<T> order) {
     for (nuint i = start + 1u; i < stop; i += 1u) {
         var current = items[i];
         var j = i;
 
-        while (j > start && order.Compare(items[j - 1u], current) > 0) {
+        while (j > start && order(items[j - 1u], current) > 0) {
             items[j] = items[j - 1u];
             j -= 1u;
         }
@@ -353,12 +394,12 @@ void InsertionSortBy<T>(T[:] items, nuint start, nuint stop, IComparer<T> order)
 }
 
 void MergeBy<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
-                IComparer<T> order) {
+                Comparer<T> order) {
     nuint left = low;
     nuint right = middle;
 
     for (nuint at = low; at < high; at += 1u) {
-        if (left < middle && (right >= high || order.Compare(items[left], items[right]) <= 0)) {
+        if (left < middle && (right >= high || order(items[left], items[right]) <= 0)) {
             scratch[at] = items[left];
             left += 1u;
         } else {
@@ -417,8 +458,8 @@ public void Reverse<T>(T[:] items) {
         var swap = items[low];
         items[low] = items[high];
         items[high] = swap;
-        low = low + 1;
-        high = high - 1;
+        low++;
+        high--;
     }
 }
 
@@ -441,7 +482,7 @@ public void Sort<T>(IList<T> items) where T : IComparable<T> {
 }
 
 /// The same, ordered by a comparer.
-public void Sort<T>(IList<T> items, IComparer<T> order) {
+public void Sort<T>(IList<T> items, Comparer<T> order) {
     nuint count = items.Count();
     if (count < 2u) { return; }
 
@@ -493,7 +534,7 @@ public class OrderedDictionary<K, V> where K : IEquatable<K> {
     /// than a sentinel, because a position that means "no position" is a rule
     /// every caller has to know and none can be made to.
     public Optional<nuint> IndexOf(K key) {
-        for (nuint i = 0u; i < keys.Count(); i = i + 1u) {
+        for (nuint i = 0u; i < keys.Count(); i++) {
             if (keys.At(i).EqualTo(key)) { return Some(i); }
         }
         return None;

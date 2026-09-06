@@ -108,7 +108,7 @@ public class String {
         var theirs = value.ToPointer();
         byte first = theirs[0];
 
-        for (nuint i = start; i <= size - wanted; i = i + 1) {
+        for (nuint i = start; i <= size - wanted; i++) {
             if (mine[i] == first && Matches(mine + i, theirs, wanted)) { return (long)i; }
         }
         return NotFound;
@@ -125,7 +125,7 @@ public class String {
         var mine = this.ToPointer();
         var theirs = value.ToPointer();
 
-        for (nuint i = size - wanted + 1; i > 0; i = i - 1) {
+        for (nuint i = size - wanted + 1; i > 0; i--) {
             if (Matches(mine + (i - 1), theirs, wanted)) { return (long)(i - 1); }
         }
         return NotFound;
@@ -136,7 +136,7 @@ public class String {
         nuint size = this.ByteLength();
         var mine = this.ToPointer();
 
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             if (mine[i] == value) { return (long)i; }
         }
         return NotFound;
@@ -146,7 +146,7 @@ public class String {
     public long LastIndexOf(char value) {
         var mine = this.ToPointer();
 
-        for (nuint i = this.ByteLength(); i > 0; i = i - 1) {
+        for (nuint i = this.ByteLength(); i > 0; i--) {
             if (mine[i - 1] == value) { return (long)(i - 1); }
         }
         return NotFound;
@@ -246,7 +246,7 @@ public class String {
         if (count == 1) { return this; }
 
         var built = new StringBuilder();
-        for (nuint i = 0; i < count; i = i + 1) { built.Append(this); }
+        for (nuint i = 0; i < count; i++) { built.Append(this); }
         return built.ToText();
     }
 
@@ -305,7 +305,7 @@ public class String {
         while (true) {
             long found = this.IndexOf(separator, at);
             if (found == NotFound) { break; }
-            parts = parts + 1;
+            parts++;
             at = (nuint)found + separator.ByteLength();
         }
 
@@ -317,7 +317,7 @@ public class String {
             long found = this.IndexOf(separator, at);
             result[index] = this.Substring(at, (nuint)found - at);
             at = (nuint)found + separator.ByteLength();
-            index = index + 1;
+            index++;
         }
 
         result[index] = this.Substring(at);
@@ -330,7 +330,7 @@ public class String {
         var mine = this.ToPointer();
 
         nuint parts = 1;
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             if (mine[i] == separator) { parts = parts + 1; }
         }
 
@@ -338,10 +338,10 @@ public class String {
         nuint index = 0;
         nuint start = 0;
 
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             if (mine[i] == separator) {
                 result[index] = this.Substring(start, i - start);
-                index = index + 1;
+                index++;
                 start = i + 1;
             }
         }
@@ -362,7 +362,7 @@ public class String {
         var mine = this.ToPointer();
 
         nuint lines = 1;
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             if (mine[i] == 10 && i + 1 < size) { lines = lines + 1; }
         }
 
@@ -370,13 +370,13 @@ public class String {
         nuint index = 0;
         nuint start = 0;
 
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             if (mine[i] != 10) { continue; }
 
             nuint end = i;
             if (end > start && mine[end - 1] == 13) { end = end - 1; }
             result[index] = this.Substring(start, end - start);
-            index = index + 1;
+            index++;
             start = i + 1;
         }
 
@@ -409,7 +409,7 @@ public class String {
         var mine = this.ToPointer();
         var theirs = other.ToPointer();
 
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             if (LowerByte(mine[i]) != LowerByte(theirs[i])) { return false; }
         }
         return true;
@@ -430,7 +430,7 @@ public class String {
         var mine = this.ToPointer();
         var theirs = other.ToPointer();
 
-        for (nuint i = 0; i < shorter; i = i + 1) {
+        for (nuint i = 0; i < shorter; i++) {
             if (mine[i] != theirs[i]) { return mine[i] < theirs[i] ? -1 : 1; }
         }
 
@@ -463,7 +463,7 @@ public class String {
         if (width == 0 || index + width > size) { return (char32)0xFFFD; }
 
         uint scalar = (uint)(lead & (byte)(0x7F >> (int)width));
-        for (nuint i = 1; i < width; i = i + 1) {
+        for (nuint i = 1; i < width; i++) {
             byte next = mine[index + i];
             if ((next & 0xC0) != 0x80) { return (char32)0xFFFD; }
             scalar = (scalar << 6) | (uint)(next & 0x3F);
@@ -503,7 +503,7 @@ public class String {
         if (parts.Length == 1) { return parts[0]; }
 
         var built = new StringBuilder();
-        for (nuint i = 0; i < parts.Length; i = i + 1) {
+        for (nuint i = 0; i < parts.Length; i++) {
             if (i > 0) { built.Append(this); }
             built.Append(parts[i]);
         }
@@ -521,7 +521,7 @@ public class String {
         var bytes = new byte[size];
         var mine = this.ToPointer();
 
-        for (nuint i = 0; i < size; i = i + 1) { bytes[i] = mine[i]; }
+        for (nuint i = 0; i < size; i++) { bytes[i] = mine[i]; }
         return bytes;
     }
 
@@ -534,14 +534,14 @@ public class String {
         // Nothing to do is the common case, and it costs a scan rather than an
         // allocation to find out.
         bool differs = false;
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             byte mapped = upper ? UpperByte(mine[i]) : LowerByte(mine[i]);
             if (mapped != mine[i]) { differs = true; }
         }
         if (!differs) { return this; }
 
         var bytes = new byte[size];
-        for (nuint i = 0; i < size; i = i + 1) {
+        for (nuint i = 0; i < size; i++) {
             bytes[i] = upper ? UpperByte(mine[i]) : LowerByte(mine[i]);
         }
         return FromBytes(&bytes[0], size);
@@ -609,14 +609,14 @@ public class StringBuilder {
     /// Raw bytes. They are appended as they are, so it is the caller who
     /// decides whether what comes out is text.
     public void AppendBytes(byte[] data) {
-        for (nuint i = 0; i < data.Length; i = i + 1) {
+        for (nuint i = 0; i < data.Length; i++) {
             this.Append(FromBytes(&data[i], 1));
         }
     }
 
     /// `parts` with `separator` between them.
     public void AppendJoined(String separator, String[] parts) {
-        for (nuint i = 0; i < parts.Length; i = i + 1) {
+        for (nuint i = 0; i < parts.Length; i++) {
             if (i > 0) { this.Append(separator); }
             this.Append(parts[i]);
         }
@@ -643,9 +643,9 @@ public class StringBuilder {
 
         var theirs = value.ToPointer();
 
-        for (nuint i = 0; i <= size - wanted; i = i + 1) {
+        for (nuint i = 0; i <= size - wanted; i++) {
             bool same = true;
-            for (nuint j = 0; j < wanted; j = j + 1) {
+            for (nuint j = 0; j < wanted; j++) {
                 if (this.ByteAt(i + j) != theirs[j]) { same = false; }
             }
             if (same) { return (long)i; }
@@ -694,7 +694,7 @@ public class StringBuilder {
             this.Remove((nuint)found, from.ByteLength());
             this.Insert((nuint)found, to);
             at = (nuint)found + to.ByteLength();
-            replaced = replaced + 1;
+            replaced++;
         }
         return replaced;
     }
@@ -708,9 +708,9 @@ public class StringBuilder {
 
         var theirs = value.ToPointer();
 
-        for (nuint i = start; i <= size - wanted; i = i + 1) {
+        for (nuint i = start; i <= size - wanted; i++) {
             bool same = true;
-            for (nuint j = 0; j < wanted; j = j + 1) {
+            for (nuint j = 0; j < wanted; j++) {
                 if (this.ByteAt(i + j) != theirs[j]) { same = false; }
             }
             if (same) { return (long)i; }
@@ -770,7 +770,7 @@ public class Utf16String {
         var mine = this.ToPointer();
         var theirs = other.ToPointer();
 
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i++) {
             if (mine[i] != theirs[i]) { return false; }
         }
         return true;
@@ -783,7 +783,7 @@ public class Utf16String {
         var bytes = new byte[count * 2];
         var units = this.ToPointer();
 
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i++) {
             uint unit = (uint)units[i];
             bytes[i * 2] = (byte)(unit & 0xFF);
             bytes[i * 2 + 1] = (byte)(unit >> 8);
@@ -829,7 +829,7 @@ nuint SequenceWidth(byte lead) {
 
 /// Whether `count` bytes at two addresses are the same.
 bool Matches(byte* left, byte* right, nuint count) {
-    for (nuint i = 0; i < count; i = i + 1) {
+    for (nuint i = 0; i < count; i++) {
         if (left[i] != right[i]) { return false; }
     }
     return true;

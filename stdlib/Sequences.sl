@@ -57,7 +57,7 @@ public class Queue<T> : IEnumerable<T> {
     public void Enqueue(T item) {
         if (count == items.Length) { Grow(); }
         items[(head + count) & (items.Length - 1)] = item;
-        count = count + 1;
+        count++;
     }
 
     /// Removes and returns the oldest item. Aborts when the queue is empty.
@@ -70,7 +70,7 @@ public class Queue<T> : IEnumerable<T> {
         // not when the slot is eventually written over.
         items[head] = blank[0];
         head = (head + 1) & (items.Length - 1);
-        count = count - 1;
+        count--;
         return item;
     }
 
@@ -89,7 +89,7 @@ public class Queue<T> : IEnumerable<T> {
     /// The items, oldest first.
     public List<T> ToList() {
         var result = new List<T>();
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i++) {
             result.Add(items[(head + i) & (items.Length - 1)]);
         }
         return result;
@@ -103,7 +103,7 @@ public class Queue<T> : IEnumerable<T> {
 
     void Grow() {
         var bigger = new T[items.Length * 2];
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i++) {
             bigger[i] = items[(head + i) & (items.Length - 1)];
         }
         items = bigger;
@@ -134,14 +134,14 @@ public class Stack<T> : IEnumerable<T> {
     public void Push(T item) {
         if (count == items.Length) { Grow(); }
         items[count] = item;
-        count = count + 1;
+        count++;
     }
 
     /// Removes and returns the top. Aborts when the stack is empty.
     public T Pop() {
         if (count == 0) { sl_fail("Stack.Pop: the stack is empty"); }
 
-        count = count - 1;
+        count--;
         var item = items[count];
         items[count] = blank[0];
         return item;
@@ -161,7 +161,7 @@ public class Stack<T> : IEnumerable<T> {
     /// The items, top first, which is the order they would be popped in.
     public List<T> ToList() {
         var result = new List<T>();
-        for (nuint i = 0; i < count; i = i + 1) { result.Add(items[count - 1 - i]); }
+        for (nuint i = 0; i < count; i++) { result.Add(items[count - 1 - i]); }
         return result;
     }
 
@@ -172,7 +172,7 @@ public class Stack<T> : IEnumerable<T> {
 
     void Grow() {
         var bigger = new T[items.Length * 2];
-        for (nuint i = 0; i < count; i = i + 1) { bigger[i] = items[i]; }
+        for (nuint i = 0; i < count; i++) { bigger[i] = items[i]; }
         items = bigger;
     }
 }
@@ -254,7 +254,7 @@ public class LinkedList<T> : IEnumerable<T> {
         else { tail = node; }
 
         head = node;
-        count = count + 1;
+        count++;
         return node;
     }
 
@@ -268,7 +268,7 @@ public class LinkedList<T> : IEnumerable<T> {
         else { head = node; }
 
         tail = node;
-        count = count + 1;
+        count++;
         return node;
     }
 
@@ -282,7 +282,7 @@ public class LinkedList<T> : IEnumerable<T> {
         next[(nuint)handle] = node;
         previous[(nuint)after] = node;
 
-        count = count + 1;
+        count++;
         return node;
     }
 
@@ -305,7 +305,7 @@ public class LinkedList<T> : IEnumerable<T> {
         previous[at] = -1;
         next[at] = free;
         free = handle;
-        count = count - 1;
+        count--;
     }
 
     /// Removes and returns the first item. Aborts when the list is empty.
@@ -364,7 +364,7 @@ public class LinkedList<T> : IEnumerable<T> {
         if (used == items.Length) { Grow(); }
 
         nint fresh = (nint)used;
-        used = used + 1;
+        used++;
         items[(nuint)fresh] = item;
         return fresh;
     }
@@ -376,7 +376,7 @@ public class LinkedList<T> : IEnumerable<T> {
         var biggerNext = new nint[size];
         var biggerPrevious = new nint[size];
 
-        for (nuint i = 0; i < used; i = i + 1) {
+        for (nuint i = 0; i < used; i++) {
             biggerItems[i] = items[i];
             biggerNext[i] = next[i];
             biggerPrevious[i] = previous[i];
@@ -466,26 +466,26 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
 
         // Shift the tail up by one. Counted down from the end so that no slot
         // is written before it has been copied.
-        for (nuint i = count; i > slot; i = i - 1) {
+        for (nuint i = count; i > slot; i--) {
             keys[i] = keys[i - 1];
             values[i] = values[i - 1];
         }
 
         keys[slot] = key;
         values[slot] = value;
-        count = count + 1;
+        count++;
     }
 
     public bool Remove(K key) {
         nint at = IndexOfKey(key);
         if (at < 0) { return false; }
 
-        for (nuint i = (nuint)at; i + 1 < count; i = i + 1) {
+        for (nuint i = (nuint)at; i + 1 < count; i++) {
             keys[i] = keys[i + 1];
             values[i] = values[i + 1];
         }
 
-        count = count - 1;
+        count--;
 
         // The vacated slot still refers to the last entry; blanking it releases
         // that reference now rather than at the next insertion.
@@ -504,13 +504,13 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
 
     public List<K> Keys() {
         var result = new List<K>();
-        for (nuint i = 0; i < count; i = i + 1) { result.Add(keys[i]); }
+        for (nuint i = 0; i < count; i++) { result.Add(keys[i]); }
         return result;
     }
 
     public List<V> Values() {
         var result = new List<V>();
-        for (nuint i = 0; i < count; i = i + 1) { result.Add(values[i]); }
+        for (nuint i = 0; i < count; i++) { result.Add(values[i]); }
         return result;
     }
 
@@ -525,7 +525,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
         var biggerKeys = new K[keys.Length * 2];
         var biggerValues = new V[values.Length * 2];
 
-        for (nuint i = 0; i < count; i = i + 1) {
+        for (nuint i = 0; i < count; i++) {
             biggerKeys[i] = keys[i];
             biggerValues[i] = values[i];
         }
@@ -551,7 +551,7 @@ public class QueueCursor<T> : IEnumerator<T> {
 
     public bool MoveNext() {
         if (next >= source.Count()) { return false; }
-        next = next + 1;
+        next++;
         return true;
     }
 
@@ -570,7 +570,7 @@ public class StackCursor<T> : IEnumerator<T> {
 
     public bool MoveNext() {
         if (next >= source.Count()) { return false; }
-        next = next + 1;
+        next++;
         return true;
     }
 
@@ -621,7 +621,7 @@ public class SortedListCursor<K, V> : IEnumerator<Pair<K, V>> where K : ICompara
 
     public bool MoveNext() {
         if (next >= source.Count()) { return false; }
-        next = next + 1;
+        next++;
         return true;
     }
 

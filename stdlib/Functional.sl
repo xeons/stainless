@@ -21,11 +21,17 @@
 
 // Doing something to every element.
 //
-// A lambda takes its type from what it is assigned to, and an interface with
-// exactly one method is one of the three things it may become (§2.15). So these
-// are ordinary generic interfaces, and `Filter(names, n => n.Length() > 3u)`
-// works with no function type in the language and no special case in the
-// compiler.
+// Every one of these takes a `closure` (§2.14.1), which is a method and the
+// object it belongs to. That means both of these work, and mean the same
+// thing:
+//
+//     Filter(names, (n) => n.ByteLength() > 3u);   // a lambda that captures
+//     ForEach(names, report.Add);                  // a method bound to an object
+//
+// The second is what the older shape could not do. These were one-method
+// interfaces until closures could be generic, and an interface needs an object
+// that implements it -- so passing an existing method meant writing a class
+// whose only reason to exist was to carry it.
 //
 // **Eager, not lazy.** Every one of these walks its input to the end and
 // returns a `List<T>`, so `Filter(...)` then `Map(...)` builds two lists. Lazy
@@ -34,9 +40,9 @@
 // name borrowed from a language that does.
 module Standard.Collections;
 
-// The shapes a lambda takes here -- `IFunc`, `IPredicate`, `IAction`, `IFold`
-// and `IComparer` -- are declared in `Standard`, because they are what §2.15
-// says a lambda may become rather than anything to do with collections, and
+// The shapes a lambda takes here -- `Func`, `Predicate`, `Action`, `Fold` and
+// `Comparer` -- are declared in `Standard`, because they are what §2.15 says a
+// lambda may become rather than anything to do with collections, and
 // `Optional.Map` needs them too. They need no import to reach.
 
 // ---------------------------------------------------------- over an array
@@ -44,10 +50,10 @@ module Standard.Collections;
 /// The elements the predicate keeps, in the order they were in.
 ///
 /// An array converts to a slice of the whole of itself, so this takes both.
-public List<T> Filter<T>(T[:] items, IPredicate<T> keep) {
+public List<T> Filter<T>(T[:] items, Predicate<T> keep) {
     var kept = new List<T>();
     foreach (var item in items) {
-        if (keep.Test(item)) { kept.Add(item); }
+        if (keep(item)) { kept.Add(item); }
     }
     return kept;
 }
@@ -59,9 +65,9 @@ public List<T> Filter<T>(T[:] items, IPredicate<T> keep) {
 /// `R` appears nowhere but in the transform's result, so working it out means
 /// binding the lambda's body -- which cannot happen until `T` has given the
 /// lambda its parameter type. The compiler does the two in that order.
-public List<R> Map<T, R>(T[:] items, IFunc<T, R> transform) {
+public List<R> Map<T, R>(T[:] items, Func<T, R> transform) {
     var mapped = new List<R>();
-    foreach (var item in items) { mapped.Add(transform.Apply(item)); }
+    foreach (var item in items) { mapped.Add(transform(item)); }
     return mapped;
 }
 
@@ -69,62 +75,75 @@ public List<R> Map<T, R>(T[:] items, IFunc<T, R> transform) {
 /// result type, so `A` is settled before the lambda is looked at.
 ///
 ///     long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
-public A Reduce<T, A>(T[:] items, A seed, IFold<A, T> combine) {
+public A Reduce<T, A>(T[:] items, A seed, Fold<A, T> combine) {
     var total = seed;
-    foreach (var item in items) { total = combine.Apply(total, item); }
+    foreach (var item in items) { total = combine(total, item); }
     return total;
 }
 
 /// Whether any element satisfies the predicate. Stops at the first that does.
-public bool Any<T>(T[:] items, IPredicate<T> test) {
+public bool Any<T>(T[:] items, Predicate<T> test) {
     foreach (var item in items) {
-        if (test.Test(item)) { return true; }
+        if (test(item)) { return true; }
     }
     return false;
 }
 
 /// Whether every element does. Stops at the first that does not, and is true
 /// of an empty input.
-public bool All<T>(T[:] items, IPredicate<T> test) {
+public bool All<T>(T[:] items, Predicate<T> test) {
     foreach (var item in items) {
-        if (!test.Test(item)) { return false; }
+        if (!test(item)) { return false; }
     }
     return true;
 }
 
 /// How many satisfy the predicate.
-public nuint CountWhere<T>(T[:] items, IPredicate<T> test) {
+public nuint CountWhere<T>(T[:] items, Predicate<T> test) {
     nuint found = 0u;
     foreach (var item in items) {
-        if (test.Test(item)) { found += 1u; }
+        if (test(item)) { found += 1u; }
     }
     return found;
 }
 
 /// The first element satisfying the predicate, or `fallback` if none does.
 ///
-/// A fallback rather than a nullable, because `T` may be a struct and a
-/// `T?` is only ever a reference (§2.5). It is also what the caller usually
-/// has to hand anyway.
-public T FirstOr<T>(T[:] items, IPredicate<T> test, T fallback) {
+/// The reader that needs no check, because it supplies its own answer. `Find`
+/// is the one to reach for when "there was none" is a different outcome rather
+/// than a different value.
+public T FirstOr<T>(T[:] items, Predicate<T> test, T fallback) {
     foreach (var item in items) {
-        if (test.Test(item)) { return item; }
+        if (test(item)) { return item; }
     }
     return fallback;
 }
 
-/// The index of the first element satisfying the predicate, or the length when
-/// none does -- the same convention as `IndexOf`.
-public nuint IndexWhere<T>(T[:] items, IPredicate<T> test) {
-    for (nuint i = 0u; i < items.Length; i += 1u) {
-        if (test.Test(items[i])) { return i; }
+/// The first element satisfying the predicate, if there is one.
+///
+///     if (Find(people, (p) => p.Age > 65) is Some found) { ... }
+///
+/// An `Optional<T>` rather than a fallback: a struct has no null to stand for
+/// "none" (§2.5), and inventing a value that means it is how a caller comes to
+/// treat a real answer as a miss.
+public Optional<T> Find<T>(T[:] items, Predicate<T> test) {
+    foreach (var item in items) {
+        if (test(item)) { return Some(item); }
     }
-    return items.Length;
+    return None;
+}
+
+/// Where the first element satisfying the predicate is, if it is there.
+public Optional<nuint> IndexWhere<T>(T[:] items, Predicate<T> test) {
+    for (nuint i = 0u; i < items.Length; i++) {
+        if (test(items[i])) { return Some(i); }
+    }
+    return None;
 }
 
 /// Runs the action over every element.
-public void ForEach<T>(T[:] items, IAction<T> body) {
-    foreach (var item in items) { body.Run(item); }
+public void ForEach<T>(T[:] items, Action<T> body) {
+    foreach (var item in items) { body(item); }
 }
 
 /// The first `count` elements, or all of them if there are fewer.
@@ -147,57 +166,57 @@ public List<T> Skip<T>(T[:] items, nuint count) {
 /// The same, for anything with a `GetEnumerator()` that names its shape --
 /// `List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
 /// `SortedList<K, V>` all do.
-public List<T> Filter<T>(IEnumerable<T> items, IPredicate<T> keep) {
+public List<T> Filter<T>(IEnumerable<T> items, Predicate<T> keep) {
     var kept = new List<T>();
     foreach (var item in items) {
-        if (keep.Test(item)) { kept.Add(item); }
+        if (keep(item)) { kept.Add(item); }
     }
     return kept;
 }
 
-public List<R> Map<T, R>(IEnumerable<T> items, IFunc<T, R> transform) {
+public List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform) {
     var mapped = new List<R>();
-    foreach (var item in items) { mapped.Add(transform.Apply(item)); }
+    foreach (var item in items) { mapped.Add(transform(item)); }
     return mapped;
 }
 
-public A Reduce<T, A>(IEnumerable<T> items, A seed, IFold<A, T> combine) {
+public A Reduce<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine) {
     var total = seed;
-    foreach (var item in items) { total = combine.Apply(total, item); }
+    foreach (var item in items) { total = combine(total, item); }
     return total;
 }
 
-public bool Any<T>(IEnumerable<T> items, IPredicate<T> test) {
+public bool Any<T>(IEnumerable<T> items, Predicate<T> test) {
     foreach (var item in items) {
-        if (test.Test(item)) { return true; }
+        if (test(item)) { return true; }
     }
     return false;
 }
 
-public bool All<T>(IEnumerable<T> items, IPredicate<T> test) {
+public bool All<T>(IEnumerable<T> items, Predicate<T> test) {
     foreach (var item in items) {
-        if (!test.Test(item)) { return false; }
+        if (!test(item)) { return false; }
     }
     return true;
 }
 
-public nuint CountWhere<T>(IEnumerable<T> items, IPredicate<T> test) {
+public nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test) {
     nuint found = 0u;
     foreach (var item in items) {
-        if (test.Test(item)) { found += 1u; }
+        if (test(item)) { found += 1u; }
     }
     return found;
 }
 
-public T FirstOr<T>(IEnumerable<T> items, IPredicate<T> test, T fallback) {
+public T FirstOr<T>(IEnumerable<T> items, Predicate<T> test, T fallback) {
     foreach (var item in items) {
-        if (test.Test(item)) { return item; }
+        if (test(item)) { return item; }
     }
     return fallback;
 }
 
-public void ForEach<T>(IEnumerable<T> items, IAction<T> body) {
-    foreach (var item in items) { body.Run(item); }
+public void ForEach<T>(IEnumerable<T> items, Action<T> body) {
+    foreach (var item in items) { body(item); }
 }
 
 /// Everything in the sequence, as a list. The one that makes a `Queue` or a

@@ -603,6 +603,7 @@ public sealed class Parser
         var returnType = ParseType();
 
         string name = ExpectIdentifier();
+        var typeParameters = At(TokenKind.Less) ? ParseTypeParameterList() : [];
         var parameters = ParseParameterList(out bool variadic);
 
         string kind = carriesReceiver ? "closure" : "delegate";
@@ -613,7 +614,8 @@ public sealed class Parser
 
         Expect(TokenKind.Semicolon);
         return new DelegateDeclSyntax(
-            SpanFrom(start), modifiers, name, returnType, parameters, carriesReceiver);
+            SpanFrom(start), modifiers, name, returnType, parameters, carriesReceiver,
+            typeParameters);
     }
 
     /// <summary>

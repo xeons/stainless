@@ -168,10 +168,20 @@ public sealed partial class Binder
             foreach (var declaration in unit.Declarations.OfType<DelegateDeclSyntax>())
             {
                 if (module.Types.ContainsKey(declaration.Name) ||
-                    module.GenericTypes.ContainsKey(declaration.Name))
+                    module.GenericTypes.ContainsKey(declaration.Name) ||
+                    module.GenericDelegates.ContainsKey(declaration.Name))
                 {
                     diagnostics.Error("SL0201", declaration.Span,
                         $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                    continue;
+                }
+
+                // A generic one stays a template until something names its type
+                // arguments, exactly as a generic class does.
+                if (declaration.TypeParameters.Count > 0)
+                {
+                    module.GenericDelegates[declaration.Name] =
+                        new GenericDelegateTemplate(declaration.Name, scope, declaration);
                     continue;
                 }
 

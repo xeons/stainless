@@ -1255,8 +1255,9 @@ return fallback;
 | `Filter(p)` | this one if `p` accepts what it holds, else none |
 | `IfPresent(a)` | runs `a` on the value, if there is one |
 
-`Map`, `FlatMap`, `Filter` and `IfPresent` take `IFunc`, `IPredicate` and
-`IAction` (§5.5), so a lambda is what gets written at them:
+`Map`, `FlatMap`, `Filter` and `IfPresent` take `Func`, `Predicate` and
+`Action` (§5.5) — generic closures, so a lambda or a bound method is what gets
+written at them:
 
 ```csharp
 Optional<String> name = index.IndexOf(id).Map(i => people.At(i).Name);
@@ -1742,6 +1743,27 @@ reason a method pointer is a value rather than an object: two mentions of
 - **Not inferrable by `var`** (SL0553), for the reason a bare function name is
   not: `counter.Add` names a method, and which closure type it becomes is what
   the declaration says.
+
+**A closure may be generic**, and a delegate may too:
+
+```csharp
+public closure bool Predicate<T>(T value);
+public closure R    Func<T, R>(T value);
+
+public List<T> Filter<T>(T[:] items, Predicate<T> keep) { ... }
+```
+
+Each set of type arguments makes a real type, the way `Box<int>` does — there
+is simply much less of it to make. A delegate is a signature and nothing else,
+so an instantiation resolves that signature under the substitution and stops;
+there are no members to declare, no interfaces to satisfy, and no layout to
+compute, a delegate being one pointer and a closure always the same two.
+
+This is what `Standard.Collections` is built on. Before it, the only generic
+thing a lambda could become was an interface with one method, and an interface
+needs an *object* that implements it — so `ForEach(lines, report.Note)` was
+unwritable, and the library declared `IFunc`, `IPredicate`, `IAction`, `IFold`
+and `IComparer` to stand in for the five shapes it wanted.
 
 `closure` is a **contextual** keyword, as `event` would have been: it means
 something at the head of a declaration and is an ordinary name everywhere else.
@@ -2350,9 +2372,9 @@ a different thing from a compiler guessing.
 
 Supported: generic classes, generic interfaces (including implementing them,
 as in `class Money : IComparable<Money>`), generic functions with inference,
-constraints of every kind in §4.3, generic types nested in one another
-(`List<Box<int>>`),
-and self-referential templates such as `class Node<T> { Node<T>? next; }`.
+generic delegates and closures (§2.14.1), constraints of every kind in §4.3,
+generic types nested in one another (`List<Box<int>>`), and self-referential
+templates such as `class Node<T> { Node<T>? next; }`.
 
 **Generic functions overload on the shape of their parameters.** Two templates
 may share a name, and a call tries each one of the right arity, keeping those
@@ -2388,7 +2410,7 @@ Not yet:
   and does work, because a lambda's body is something to read a type off:
 
   ```csharp
-  public List<R> Map<T, R>(T[:] items, IFunc<T, R> transform) { ... }
+  public List<R> Map<T, R>(T[:] items, Func<T, R> transform) { ... }
 
   var spelled = Map(numbers, n => Text.FromInteger((long)n));   // R is String
   ```
@@ -2400,11 +2422,15 @@ Not yet:
   It repeats while it is still learning, so one lambda's result may settle
   another's parameter.
 
+  The signature it reads may be a generic closure's — `closure R Func<T, R>(T)`
+  — or a generic interface's single method, which is where this started. They
+  differ only in where the signature is written down.
+
   Two limits, both reported as SL0327 rather than guessed at. A **block-bodied**
   lambda is not read this way — binding `n => { return n * 2; }` needs the
   return type that is being worked out — so write it as an expression, or name
-  the type. And the interface's method must mention its type parameters plainly:
-  `R Apply(T)` is read, `List<R> Apply(T)` is left alone.
+  the type. And the signature must mention its type parameters plainly:
+  `R Func<T, R>(T)` is read, `List<R> Func<T, R>(T)` is left alone.
 - **An interface method cannot be generic.** Dispatch gives a method one vtable
   slot, and a generic method has a body per instantiation.
 
@@ -2682,20 +2708,32 @@ it.
 
 A lambda becomes an interface with exactly one method (§2.15), so the
 combinators need no function type in the language and no special case in the
-compiler — they are ordinary generic functions over ordinary generic
-interfaces.
+compiler — they are ordinary generic functions over ordinary generic closures.
 
 ```csharp
-public interface IFunc<T, R>   { R Apply(T value); }
-public interface IPredicate<T> { bool Test(T value); }
-public interface IAction<T>    { void Run(T value); }
-public interface IFold<A, T>   { A Apply(A total, T value); }
-public interface IComparer<T>  { int Compare(T left, T right); }
+public closure R    Func<T, R>(T value);
+public closure bool Predicate<T>(T value);
+public closure void Action<T>(T value);
+public closure A    Fold<A, T>(A total, T value);
+public closure int  Comparer<T>(T left, T right);
 ```
 
 These five are declared in `Standard` rather than here, so they need no import:
 they are what §2.15 says a lambda may become, rather than anything a collection
 owns, and `Optional.Map` (§2.8.1) wants them too.
+
+**They were one-method interfaces until a closure could be generic**, and the
+difference is not cosmetic. An interface needs an object that implements it, so
+passing a method that already existed meant writing a class whose only purpose
+was to carry it:
+
+```csharp
+ForEach(lines, report.Note);        // a method bound to an object
+ForEach(lines, (l) => count++);     // or a lambda that captures
+```
+
+Both are the same two words (§2.14.1), and neither needs a declaration to hold
+it.
 
 ```csharp
 var adults = Filter(people, p => p.Age >= 18);
@@ -2705,9 +2743,21 @@ long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
 Sort(people, (a, b) => a.Age - b.Age);
 ```
 
-`Map`, `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `FirstOr`, `IndexWhere`,
-`ForEach`, `Take`, `Skip` and `ToList`, each over a `T[:]` — which an array
-converts to — and over any `IEnumerable<T>`.
+`Map`, `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `Find`, `FirstOr`,
+`IndexWhere`, `ForEach`, `Take`, `Skip` and `ToList`, each over a `T[:]` —
+which an array converts to — and over any `IEnumerable<T>`.
+
+**`Find` and `IndexWhere` answer with an `Optional`** (§2.8.1), and so does
+`Collections.IndexOf`: a length standing in for "not there" is the sentinel
+that type exists to retire, and `Optional`'s own documentation names `IndexOf`
+as the example. `FirstOr` is still there for the caller who has a sensible
+default and nothing to check.
+
+`RemoveWhere(list, predicate)` removes every item the predicate accepts.
+A predicate rather than a value, which is what makes it work for a `T` that
+implements nothing: a `closure` is not `IEquatable`, so a list of callbacks
+could not be removed from at all before this. `RemoveFirst(list, value)` is the
+`IEquatable` version beside it.
 
 **Eager, not lazy.** Every one walks its input to the end and returns a
 `List<T>`, so `Filter` then `Map` builds two lists. Lazy chaining wants
@@ -2715,16 +2765,16 @@ generators, and there is no `yield` here; a name borrowed from a language that
 has one would imply otherwise.
 
 **Sorting is a stable merge sort**, over a `T[:]` or an `IList<T>`, either by
-`IComparable<T>` or by an `IComparer<T>` given at the call. Stability is the
+`IComparable<T>` or by a `Comparer<T>` given at the call. Stability is the
 property worth the scratch array it costs: sorting by one key and then another
 is how a multi-key order gets built, and that only works if the second sort
 leaves equal elements where the first put them. An in-place quicksort would
 save the allocation and lose that.
 
 `BinarySearch` finds a value in an ordered slice, returning the length when it
-is absent — the convention `IndexOf` already follows. `LowerBound` returns
-where it would go instead. Two functions rather than one with a flag, because
-the language has no `out` and a caller usually wants one answer or the other.
+is absent. `LowerBound` returns where it would go instead — two functions
+rather than one with a flag, because a caller usually wants one answer or the
+other, and now that `out` exists neither has to pretend otherwise.
 
 ### 5.6 `Standard.Env`, `Standard.Time` and `Standard.Random`
 

@@ -235,7 +235,7 @@ public int PopCount(ulong value) {
     int count = 0;
     while (value != 0) {
         value = value & (value - 1);
-        count = count + 1;
+        count++;
     }
     return count;
 }
@@ -247,7 +247,7 @@ public int LeadingZeros(ulong value) {
     int count = 0;
     while ((value & 0x8000000000000000) == 0) {
         value = value << 1;
-        count = count + 1;
+        count++;
     }
     return count;
 }
@@ -259,7 +259,7 @@ public int TrailingZeros(ulong value) {
     int count = 0;
     while ((value & 1) == 0) {
         value = value >> 1;
-        count = count + 1;
+        count++;
     }
     return count;
 }

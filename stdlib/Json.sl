@@ -272,14 +272,14 @@ JsonValue ParseValue(Cursor cursor) {
 
 JsonValue ParseObject(Cursor cursor) {
     cursor.Skip();                          // past '{'
-    cursor.Depth = cursor.Depth + 1u;
+    cursor.Depth++;
 
     var members = new JsonObject();
 
     SkipSpace(cursor);
     if (cursor.Peek() == (byte)'}') {
         cursor.Skip();
-        cursor.Depth = cursor.Depth - 1u;
+        cursor.Depth--;
         return JsonValue.Object(members);
     }
 
@@ -323,20 +323,20 @@ JsonValue ParseObject(Cursor cursor) {
         break;
     }
 
-    cursor.Depth = cursor.Depth - 1u;
+    cursor.Depth--;
     return JsonValue.Object(members);
 }
 
 JsonValue ParseArray(Cursor cursor) {
     cursor.Skip();                          // past '['
-    cursor.Depth = cursor.Depth + 1u;
+    cursor.Depth++;
 
     var items = new List<JsonValue>();
 
     SkipSpace(cursor);
     if (cursor.Peek() == (byte)']') {
         cursor.Skip();
-        cursor.Depth = cursor.Depth - 1u;
+        cursor.Depth--;
         return JsonValue.Array(items);
     }
 
@@ -363,7 +363,7 @@ JsonValue ParseArray(Cursor cursor) {
         break;
     }
 
-    cursor.Depth = cursor.Depth - 1u;
+    cursor.Depth--;
     return JsonValue.Array(items);
 }
 
@@ -466,7 +466,7 @@ String ParseText(Cursor cursor) {
 uint ParseHex4(Cursor cursor) {
     uint value = 0u;
 
-    for (nuint i = 0u; i < 4u; i = i + 1u) {
+    for (nuint i = 0u; i < 4u; i++) {
         if (cursor.AtEnd()) {
             cursor.Reject(JsonError.BadEscape);
             return 0u;
@@ -574,7 +574,7 @@ JsonValue ParseLiteral(Cursor cursor) {
 bool Matches(Cursor cursor, String word) {
     if (cursor.At + word.ByteLength() > cursor.Text.ByteLength()) { return false; }
 
-    for (nuint i = 0u; i < word.ByteLength(); i = i + 1u) {
+    for (nuint i = 0u; i < word.ByteLength(); i++) {
         if (cursor.Text.ByteAt(cursor.At + i) != word.ByteAt(i)) { return false; }
     }
 
@@ -615,7 +615,7 @@ public String WriteIndented(JsonValue value) {
 
 void Newline(StringBuilder text, nuint depth) {
     text.Append("\n");
-    for (nuint i = 0u; i < depth; i = i + 1u) { text.Append("  "); }
+    for (nuint i = 0u; i < depth; i++) { text.Append("  "); }
 }
 
 void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty) {
@@ -643,7 +643,7 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty) {
             }
 
             text.Append("[");
-            for (nuint i = 0u; i < array.Items.Count(); i = i + 1u) {
+            for (nuint i = 0u; i < array.Items.Count(); i++) {
                 if (i > 0u) { text.Append(","); }
                 if (pretty) { Newline(text, depth + 1u); }
                 WriteInto(text, array.Items.At(i), depth + 1u, pretty);
@@ -659,7 +659,7 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty) {
             }
 
             text.Append("{");
-            for (nuint i = 0u; i < object.Members.Count(); i = i + 1u) {
+            for (nuint i = 0u; i < object.Members.Count(); i++) {
                 if (i > 0u) { text.Append(","); }
                 if (pretty) { Newline(text, depth + 1u); }
 
@@ -698,7 +698,7 @@ void WriteText(StringBuilder text, String value) {
     // whole, and only an escape interrupts.
     nuint run = 0u;
 
-    for (nuint i = 0u; i < value.ByteLength(); i = i + 1u) {
+    for (nuint i = 0u; i < value.ByteLength(); i++) {
         byte c = value.ByteAt(i);
 
         String escaped = "";
@@ -772,7 +772,7 @@ JsonValue ValueOfInstance(byte* instance, Type type) {
 
     var members = new JsonObject();
 
-    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+    for (nuint i = 0u; i < type.FieldCount(); i++) {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore")) { continue; }
 
@@ -859,7 +859,7 @@ JsonValue ValueOfArray(byte* instance, Field field) {
     var items = new List<JsonValue>();
     int kind = field.ElementKind();
 
-    for (nuint i = 0u; i < Reflection.ArrayLength(array); i = i + 1u) {
+    for (nuint i = 0u; i < Reflection.ArrayLength(array); i++) {
         byte* at = Reflection.ElementAt(array, field, i);
 
         if (kind == KindString) {
@@ -916,7 +916,7 @@ public JsonError PopulateFrom<T>(T value, JsonValue document) {
 // constructor has run.
 
 void FillInstance(byte* instance, Type type, JsonObject members) {
-    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+    for (nuint i = 0u; i < type.FieldCount(); i++) {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore")) { continue; }
 
@@ -987,7 +987,7 @@ void FillArray(byte* instance, Field field, JsonValue value) {
     nuint length = Reflection.ArrayLength(array);
     int kind = field.ElementKind();
 
-    for (nuint i = 0u; i < value.Items.Count() && i < length; i = i + 1u) {
+    for (nuint i = 0u; i < value.Items.Count() && i < length; i++) {
         byte* at = Reflection.ElementAt(array, field, i);
         var item = value.Items.At(i);
 

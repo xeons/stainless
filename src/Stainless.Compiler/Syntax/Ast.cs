@@ -416,7 +416,19 @@ public sealed record DelegateDeclSyntax(
     string Name,
     TypeSyntax ReturnType,
     IReadOnlyList<ParameterSyntax> Parameters,
-    bool CarriesReceiver = false) : Declaration(Span, Modifiers);
+    bool CarriesReceiver = false,
+    IReadOnlyList<string>? TypeParameters = null) : Declaration(Span, Modifiers)
+{
+    /// <summary>
+    /// The names in <c>closure R Apply&lt;T, R&gt;(T value);</c>, or empty.
+    ///
+    /// A generic closure is what lets a library take "something to call" over a
+    /// type it does not know -- which is the whole of why
+    /// <c>Standard.Collections</c> had five one-method interfaces before this
+    /// existed.
+    /// </summary>
+    public IReadOnlyList<string> TypeParameters { get; init; } = TypeParameters ?? [];
+}
 
 /// <summary>One <c>enum</c> member, with the constant it was given if any.</summary>
 public sealed record EnumMemberSyntax(SourceSpan Span, string Name, ExpressionSyntax? Value)

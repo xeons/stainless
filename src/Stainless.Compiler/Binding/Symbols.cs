@@ -386,6 +386,28 @@ public sealed class GenericTypeTemplate(
     public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
 }
 
+/// <summary>
+/// A <c>delegate</c> or <c>closure</c> with type parameters of its own.
+///
+/// It is not a <see cref="GenericTypeTemplate"/> because there is no type
+/// declaration behind it: a delegate has a signature and nothing else, so an
+/// instantiation resolves that signature under a substitution rather than
+/// re-running the passes that declare members.
+/// </summary>
+public sealed class GenericDelegateTemplate(
+    string name, FileScope scope, DelegateDeclSyntax declaration)
+{
+    public string Name { get; } = name;
+    public FileScope Scope { get; } = scope;
+    public ModuleSymbol Module => Scope.Module;
+    public DelegateDeclSyntax Declaration { get; } = declaration;
+    public IReadOnlyList<string> Parameters => Declaration.TypeParameters;
+    public bool IsPublic => Declaration.Modifiers.HasFlag(Modifiers.Public);
+    public bool CarriesReceiver => Declaration.CarriesReceiver;
+
+    public override string ToString() => $"{Name}<{string.Join(", ", Parameters)}>";
+}
+
 public sealed class GenericFunctionTemplate(
     string name, FileScope scope, FunctionDeclSyntax declaration)
 {
@@ -419,6 +441,14 @@ public sealed class ModuleSymbol(string name)
     public Dictionary<string, NamedTypeSymbol> Types { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Generic declarations, awaiting instantiation.</summary>
+    /// <summary>
+    /// Generic delegates and closures, kept apart from
+    /// <see cref="GenericTypes"/> because they instantiate differently: there
+    /// is a signature to resolve rather than members to declare.
+    /// </summary>
+    public Dictionary<string, GenericDelegateTemplate> GenericDelegates { get; } =
+        new(StringComparer.Ordinal);
+
     public Dictionary<string, GenericTypeTemplate> GenericTypes { get; } = new(StringComparer.Ordinal);
     public List<GenericFunctionTemplate> GenericFunctions { get; } = [];
     public List<FunctionSymbol> Functions { get; } = [];

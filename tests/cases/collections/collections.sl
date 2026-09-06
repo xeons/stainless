@@ -48,7 +48,10 @@ int Main() {
 
     Console.WriteLine("largest  = " + Largest(prices).Show());
     Console.WriteLine("smallest = " + Smallest(prices).Show());
-    Console.WriteLine("index of 999c = " + Text.FromInteger(IndexOf(prices, new Money(999))));
+    // `IndexOf` answers with an `Optional<nuint>`: a list's length standing in
+    // for "not there" is the sentinel that type exists to retire.
+    Console.WriteLine($"index of 999c = {IndexOf(prices, new Money(999)).ValueOr(99u)}");
+    Console.WriteLine($"index of 1c   = {IndexOf(prices, new Money(1)).IsEmpty()}");
 
     Sort(prices);
     Console.WriteLine("sorted   = " + Describe(prices));

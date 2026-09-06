@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 238 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 239 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 238 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 228 and Windows 237, each
+**Both Windows and Linux are tested.** 239 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 229 and Windows 238, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1387,24 +1387,37 @@ Everything below is covered by [the test suite](tests/cases).
   rather than by reference — and every one of them walks itself when iterated
   rather than copying into a list first
 - **`Sort` is a stable merge sort**, over a `T[:]` or an `IList<T>`, by
-  `IComparable<T>` or by an `IComparer<T>` you pass. Stability is what lets a
+  `IComparable<T>` or by a `Comparer<T>` you pass. Stability is what lets a
   multi-key order be built by sorting twice. Alongside it: `Largest`,
-  `Smallest`, `IndexOf`, `Reverse`, `BinarySearch` and `LowerBound`
+  `Smallest`, `IndexOf`, `RemoveFirst`, `RemoveWhere`, `Reverse`,
+  `BinarySearch` and `LowerBound`
 - **Combinators**, over an array, a slice or any `IEnumerable<T>`: `Map`,
-  `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `FirstOr`, `IndexWhere`,
-  `ForEach`, `Take`, `Skip` and `ToList`. A lambda becomes a single-method
-  interface, so these need no function type in the language:
+  `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `Find`, `FirstOr`,
+  `IndexWhere`, `ForEach`, `Take`, `Skip` and `ToList`. Each takes a generic
+  `closure` — `Func<T, R>`, `Predicate<T>`, `Action<T>`, `Fold<A, T>`,
+  `Comparer<T>` — so a lambda and a method that already exists are the same
+  thing:
 
   ```csharp
   var adults = Filter(people, p => p.Age >= 18);
   var names  = Map(adults, p => p.Name);
   long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
 
+  ForEach(lines, report.Note);        // a method bound to an object
   Sort(people, (a, b) => a.Age - b.Age);
   ```
 
+  These were one-method interfaces until a closure could be generic, and the
+  bound-method line is what that bought: an interface needs an object that
+  implements it, so passing an existing method meant declaring a class whose
+  only purpose was to carry it.
+
   Eager, not lazy: each returns a `List<T>`, because lazy chaining wants
   generators and the language has no `yield`
+- **"Not there" is an `Optional`**, not a sentinel. `IndexOf`, `IndexWhere` and
+  `Find` answer with one, so a length or a magic number never stands in for a
+  miss — which is what `Optional<T>` was added for, and what its own
+  documentation names `IndexOf` as the example of
 - Primitives, enums and `String` satisfy `IComparable<T>`, `IEquatable<T>` and
   `IHashable` without declaring it, so `Sort(numbers)` works on a `List<int>`
   and `Dictionary<String, V>` needs nothing extra

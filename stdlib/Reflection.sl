@@ -187,7 +187,7 @@ public struct Field {
 
     /// True when an attribute of this name is written on the field.
     public bool Has(String name) {
-        for (nuint i = 0; i < AttributeCount(); i = i + 1) {
+        for (nuint i = 0; i < AttributeCount(); i++) {
             if (AttributeAt(i).Name() == name) { return true; }
         }
         return false;
@@ -195,7 +195,7 @@ public struct Field {
 
     /// The named attribute, if it is present. Check Has first.
     public Attribute Get(String name) {
-        for (nuint i = 0; i < AttributeCount(); i = i + 1) {
+        for (nuint i = 0; i < AttributeCount(); i++) {
             var candidate = AttributeAt(i);
             if (candidate.Name() == name) { return candidate; }
         }
@@ -326,7 +326,7 @@ public struct Property {
 
     /// True when an attribute of this name is written on the property.
     public bool Has(String name) {
-        for (nuint i = 0u; i < AttributeCount(); i = i + 1u) {
+        for (nuint i = 0u; i < AttributeCount(); i++) {
             if (AttributeAt(i).Name() == name) { return true; }
         }
         return false;
@@ -432,7 +432,7 @@ public struct Type {
     /// The field of that name, or a handle of null. Names are compared whole,
     /// so a serializer looking up what a document named does one pass.
     public Field FindField(String name) {
-        for (nuint i = 0u; i < FieldCount(); i = i + 1u) {
+        for (nuint i = 0u; i < FieldCount(); i++) {
             var field = FieldAt(i);
             if (field.Name() == name) { return field; }
         }
@@ -444,7 +444,7 @@ public struct Type {
 
     /// True when the type carries an attribute of that name.
     public bool Has(String name) {
-        for (nuint i = 0u; i < AttributeCount(); i = i + 1u) {
+        for (nuint i = 0u; i < AttributeCount(); i++) {
             if (AttributeAt(i).Name() == name) { return true; }
         }
         return false;
@@ -468,7 +468,7 @@ public struct Type {
 
     /// The property of that name, or a handle of null.
     public Property FindProperty(String name) {
-        for (nuint i = 0u; i < PropertyCount(); i = i + 1u) {
+        for (nuint i = 0u; i < PropertyCount(); i++) {
             var property = PropertyAt(i);
             if (property.Name() == name) { return property; }
         }

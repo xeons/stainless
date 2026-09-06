@@ -60,8 +60,13 @@ public sealed partial class Binder
                         break;
 
                     case DelegateDeclSyntax delegateDecl:
-                        DeclareDelegateSignature(
-                            (NamedTypeSymbol)module.Types[delegateDecl.Name], delegateDecl, scope);
+                        // A generic one has no type here to give a signature
+                        // to: each instantiation resolves its own, under the
+                        // substitution that gives its parameters meaning.
+                        if (delegateDecl.TypeParameters.Count == 0 &&
+                            module.Types.TryGetValue(delegateDecl.Name, out var declared))
+                            DeclareDelegateSignature(
+                                (NamedTypeSymbol)declared, delegateDecl, scope);
                         break;
 
                     case EnumDeclSyntax enumDecl:
@@ -101,13 +106,16 @@ public sealed partial class Binder
     /// is the whole of what makes a closure work with machinery none of which
     /// has heard of one.
     /// </summary>
-    private ClosureTypeSymbol NewClosureType(DelegateDeclSyntax declaration, ModuleSymbol module)
+    private ClosureTypeSymbol NewClosureType(
+        DelegateDeclSyntax declaration, ModuleSymbol module,
+        string? displayName = null, IReadOnlyList<TypeSymbol>? typeArguments = null)
     {
         var type = new ClosureTypeSymbol
         {
-            SimpleName = declaration.Name,
+            SimpleName = displayName ?? declaration.Name,
             ModuleName = module.Name,
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            TypeArguments = typeArguments ?? [],
             Span = declaration.Span,
         };
 

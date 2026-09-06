@@ -317,6 +317,11 @@ public sealed partial class Binder
         var arguments = syntax.TypeArguments.Select(a => ResolveType(a, scope)).ToList();
         if (arguments.Any(a => a.IsError())) return ErrorTypeSymbol.Instance;
 
+        // A generic delegate or closure is looked for first, because it is a
+        // template of its own kind and would not be found among the types.
+        if (FindGenericDelegate(syntax.Name, scope) is { } signature)
+            return InstantiateDelegate(signature, arguments, syntax.Span);
+
         var template = FindGenericType(syntax.Name, scope);
         if (template is null)
         {
@@ -326,6 +331,33 @@ public sealed partial class Binder
         }
 
         return Instantiate(template, arguments, syntax.Span);
+    }
+
+    /// <summary>The generic delegate or closure of that name in scope, or null.</summary>
+    private GenericDelegateTemplate? FindGenericDelegate(QualifiedName name, FileScope scope)
+    {
+        var module = scope.Module;
+
+        if (name.Parts.Count == 1)
+        {
+            if (module.GenericDelegates.TryGetValue(name.Parts[0], out var local)) return local;
+
+            return scope.Imports.Values.Distinct()
+                .Select(m => m.GenericDelegates.TryGetValue(name.Parts[0], out var t) && t.IsPublic
+                    ? t : null)
+                .FirstOrDefault(t => t is not null);
+        }
+
+        string owner = string.Join('.', name.Parts.Take(name.Parts.Count - 1));
+        if (scope.Imports.TryGetValue(owner, out var target) ||
+            _modules.TryGetValue(owner, out target))
+        {
+            if (target.GenericDelegates.TryGetValue(name.Last, out var found) &&
+                (target == module || found.IsPublic))
+                return found;
+        }
+
+        return null;
     }
 
     private GenericTypeTemplate? FindGenericType(QualifiedName name, FileScope scope)
@@ -529,25 +561,23 @@ public sealed partial class Binder
                 if (candidate.Declaration.Parameters[i].Type
                     is not NamedTypeSyntax { TypeArguments.Count: > 0 } written) continue;
 
-                if (FindGenericType(written.Name, candidate.Scope) is not { } template) continue;
-                if (template.Declaration.Kind != TypeDeclKind.Interface) continue;
-                if (template.Parameters.Count != written.TypeArguments.Count) continue;
+                // Either a generic closure -- `closure R Transform<T, R>(T)` --
+                // or a generic interface with one method, which is what the
+                // library used before closures could be generic. They differ
+                // only in where the signature is written down.
+                if (Callable(written.Name, candidate.Scope) is not { } shape) continue;
+                if (shape.Names.Count != written.TypeArguments.Count) continue;
+                if (shape.Parameters.Count != lambda.Syntax.Parameters.Count) continue;
 
-                var methods = template.Declaration.Members.OfType<FunctionDeclSyntax>().ToList();
-                if (methods.Count != 1) continue;
-
-                var method = methods[0];
-                if (method.Parameters.Count != lambda.Syntax.Parameters.Count) continue;
-
-                // The interface writes its method in terms of its own parameter
-                // names; the use site says what each of those is. `IFunc<A, B>`
-                // declaring `B Apply(A)`, used as `IFunc<T, R>`, makes the
-                // lambda take a T and produce an R.
+                // The declaration writes its signature in terms of its own
+                // parameter names; the use site says what each of those is.
+                // `Transform<A, B>` declaring `B(A)`, used as `Transform<T, R>`,
+                // makes the lambda take a T and produce an R.
                 var atUseSite = new Dictionary<string, TypeSyntax>(StringComparer.Ordinal);
-                for (int p = 0; p < template.Parameters.Count; p++)
-                    atUseSite[template.Parameters[p]] = written.TypeArguments[p];
+                for (int p = 0; p < shape.Names.Count; p++)
+                    atUseSite[shape.Names[p]] = written.TypeArguments[p];
 
-                var result = AsWritten(method.ReturnType, atUseSite);
+                var result = AsWritten(shape.ReturnType, atUseSite);
 
                 // Only worth binding a body to learn something not already
                 // known. The result may be the parameter itself -- `R Apply(T)`
@@ -557,7 +587,7 @@ public sealed partial class Binder
 
                 // Every parameter has to be settled before the body can bind.
                 var parameterTypes = ResolveAll(
-                    method.Parameters.Select(p => AsWritten(p.Type, atUseSite)),
+                    shape.Parameters.Select(p => AsWritten(p.Type, atUseSite)),
                     candidate.Scope, inferred);
                 if (parameterTypes is null) continue;
 
@@ -572,6 +602,43 @@ public sealed partial class Binder
             }
         }
     }
+
+    /// <summary>
+    /// The signature behind a generic name that a lambda could become: a
+    /// generic closure or delegate, or a generic interface with exactly one
+    /// method. Null for anything else.
+    ///
+    /// Read off the *declaration* rather than a resolved symbol, because
+    /// `Transform&lt;int, R&gt;` will not resolve at all while R is unknown --
+    /// a constructed type with one unresolved argument is an error type entire
+    /// -- and it is exactly that position this is trying to fill.
+    /// </summary>
+    private CallableShape? Callable(QualifiedName name, FileScope scope)
+    {
+        if (FindGenericDelegate(name, scope) is { } signature)
+            return new CallableShape(
+                signature.Parameters,
+                signature.Declaration.ReturnType,
+                signature.Declaration.Parameters);
+
+        if (FindGenericType(name, scope) is not { } template) return null;
+        if (template.Declaration.Kind != TypeDeclKind.Interface) return null;
+
+        var methods = template.Declaration.Members.OfType<FunctionDeclSyntax>().ToList();
+        if (methods.Count != 1) return null;
+
+        return new CallableShape(
+            template.Parameters, methods[0].ReturnType, methods[0].Parameters);
+    }
+
+    /// <summary>
+    /// What a lambda would have to be, written in the declaring template's own
+    /// type parameter names.
+    /// </summary>
+    private sealed record CallableShape(
+        IReadOnlyList<string> Names,
+        TypeSyntax ReturnType,
+        IReadOnlyList<ParameterSyntax> Parameters);
 
     /// <summary>
     /// An interface's method signature restated in the caller's names: the

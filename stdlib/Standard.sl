@@ -66,30 +66,38 @@ public variant Result<T, E> {
 
 // --------------------------------------------------------- shapes of work
 
-// A lambda takes its type from what it is assigned to, and an interface with
-// exactly one method is one of the three things it may become (§2.15). These are
-// the shapes worth naming once: they are what a lambda becomes rather than
-// anything a collection owns, which is why they live here and need no import.
+// What a lambda becomes, named once.
+//
+// These were five one-method interfaces until closures could be generic. The
+// difference is not cosmetic: an interface needs an object that implements it,
+// so `Each(numbers, total.Add)` had to be written as a class whose only reason
+// to exist was to carry one method. A `closure` is a method and the object it
+// belongs to, in two words, so a bound method and a lambda are the same thing
+// and neither needs a declaration to hold it.
+//
+// They live here rather than in `Standard.Collections` because they are what
+// §2.15 says a lambda may become rather than anything a collection owns, and
+// because `Optional<T>` needs them too. Nothing has to import them.
 
 /// Turns a T into an R. The transform half of `Map`.
-public interface IFunc<T, R> { R Apply(T value); }
+public closure R Func<T, R>(T value);
 
 /// Answers a question about a T.
-public interface IPredicate<T> { bool Test(T value); }
+public closure bool Predicate<T>(T value);
 
 /// Does something with a T and returns nothing.
-public interface IAction<T> { void Run(T value); }
+public closure void Action<T>(T value);
 
 /// Folds one T into a running A. Two parameters rather than one, because a
 /// fold is the one shape that carries something along with it.
-public interface IFold<A, T> { A Apply(A total, T value); }
+public closure A Fold<A, T>(A total, T value);
 
 /// Orders two Ts: negative if `left` comes first, positive if `right` does,
 /// zero if neither.
 ///
 /// This is what lets a type be sorted more than one way, and what lets a type
 /// that implements no interface be sorted at all.
-public interface IComparer<T> { int Compare(T left, T right); }
+public closure int Comparer<T>(T left, T right);
 
 // ---------------------------------------------------------- a value, or not
 
@@ -177,28 +185,28 @@ public variant Optional<T> {
     ///
     /// The transform runs only where there is something to run it on, which is
     /// the point: it is the `if` that would otherwise be written by hand.
-    public Optional<R> Map<R>(IFunc<T, R> transform) {
-        if (this is Some held) { return Some(transform.Apply(held.Value)); }
+    public Optional<R> Map<R>(Func<T, R> transform) {
+        if (this is Some held) { return Some(transform(held.Value)); }
         return None;
     }
 
     /// `Map` for a transform that answers with an optional of its own, which
     /// would otherwise nest one inside the other.
-    public Optional<R> FlatMap<R>(IFunc<T, Optional<R>> transform) {
-        if (this is Some held) { return transform.Apply(held.Value); }
+    public Optional<R> FlatMap<R>(Func<T, Optional<R>> transform) {
+        if (this is Some held) { return transform(held.Value); }
         return None;
     }
 
     /// This one when it holds something `keep` accepts, and none otherwise.
-    public Optional<T> Filter(IPredicate<T> keep) {
+    public Optional<T> Filter(Predicate<T> keep) {
         if (this is Some held) {
-            if (keep.Test(held.Value)) { return this; }
+            if (keep(held.Value)) { return this; }
         }
         return None;
     }
 
     /// Runs `action` on the value, if there is one.
-    public void IfPresent(IAction<T> action) {
-        if (this is Some held) { action.Run(held.Value); }
+    public void IfPresent(Action<T> action) {
+        if (this is Some held) { action(held.Value); }
     }
 }

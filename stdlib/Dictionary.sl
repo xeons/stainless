@@ -134,7 +134,7 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         keys[i] = key;
         values[i] = value;
         filled[i] = true;
-        count = count + 1;
+        count++;
     }
 
     /// Adds the key, or reports that it was already there and changes nothing.
@@ -173,7 +173,7 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         keys[i] = noKey[0];
         values[i] = noValue[0];
         filled[i] = false;
-        count = count - 1;
+        count--;
         return true;
     }
 
@@ -188,7 +188,7 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
 
     public List<K> Keys() {
         var result = new List<K>();
-        for (nuint i = 0; i < filled.Length; i = i + 1) {
+        for (nuint i = 0; i < filled.Length; i++) {
             if (filled[i]) { result.Add(keys[i]); }
         }
         return result;
@@ -196,7 +196,7 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
 
     public List<V> Values() {
         var result = new List<V>();
-        for (nuint i = 0; i < filled.Length; i = i + 1) {
+        for (nuint i = 0; i < filled.Length; i++) {
             if (filled[i]) { result.Add(values[i]); }
         }
         return result;
@@ -223,14 +223,14 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         filled = new bool[oldFilled.Length * 2];
         count = 0;
 
-        for (nuint i = 0; i < oldFilled.Length; i = i + 1) {
+        for (nuint i = 0; i < oldFilled.Length; i++) {
             if (!oldFilled[i]) { continue; }
 
             nuint j = Probe(oldKeys[i]);
             keys[j] = oldKeys[i];
             values[j] = oldValues[i];
             filled[j] = true;
-            count = count + 1;
+            count++;
         }
     }
 }
@@ -255,7 +255,7 @@ public class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
     public bool MoveNext() {
         while (scanned < source.Capacity()) {
             at = scanned;
-            scanned = scanned + 1;
+            scanned++;
             if (source.Occupied(at)) { return true; }
         }
         return false;
@@ -313,7 +313,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
 
         items[i] = item;
         filled[i] = true;
-        count = count + 1;
+        count++;
         return true;
     }
 
@@ -339,7 +339,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
 
         items[i] = noItem[0];
         filled[i] = false;
-        count = count - 1;
+        count--;
         return true;
     }
 
@@ -351,26 +351,26 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
 
     /// Adds everything in `other` that is not here already.
     public void UnionWith(IReadOnlyList<T> other) {
-        for (nuint i = 0; i < other.Count(); i = i + 1) { Add(other.At(i)); }
+        for (nuint i = 0; i < other.Count(); i++) { Add(other.At(i)); }
     }
 
     /// Removes everything in `other`.
     public void ExceptWith(IReadOnlyList<T> other) {
-        for (nuint i = 0; i < other.Count(); i = i + 1) { Remove(other.At(i)); }
+        for (nuint i = 0; i < other.Count(); i++) { Remove(other.At(i)); }
     }
 
     /// Keeps only what is also in `other`.
     public void IntersectWith(HashSet<T> other) {
         var doomed = new List<T>();
-        for (nuint i = 0; i < filled.Length; i = i + 1) {
+        for (nuint i = 0; i < filled.Length; i++) {
             if (filled[i] && !other.Contains(items[i])) { doomed.Add(items[i]); }
         }
-        for (nuint i = 0; i < doomed.Count(); i = i + 1) { Remove(doomed.At(i)); }
+        for (nuint i = 0; i < doomed.Count(); i++) { Remove(doomed.At(i)); }
     }
 
     public List<T> ToList() {
         var result = new List<T>();
-        for (nuint i = 0; i < filled.Length; i = i + 1) {
+        for (nuint i = 0; i < filled.Length; i++) {
             if (filled[i]) { result.Add(items[i]); }
         }
         return result;
@@ -392,13 +392,13 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
         filled = new bool[oldFilled.Length * 2];
         count = 0;
 
-        for (nuint i = 0; i < oldFilled.Length; i = i + 1) {
+        for (nuint i = 0; i < oldFilled.Length; i++) {
             if (!oldFilled[i]) { continue; }
 
             nuint j = Probe(oldItems[i]);
             items[j] = oldItems[i];
             filled[j] = true;
-            count = count + 1;
+            count++;
         }
     }
 }
@@ -422,7 +422,7 @@ public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashabl
     public bool MoveNext() {
         while (scanned < source.SlotCount()) {
             at = scanned;
-            scanned = scanned + 1;
+            scanned++;
             if (source.SlotFilled(at)) { return true; }
         }
         return false;

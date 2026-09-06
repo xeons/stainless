@@ -40,20 +40,26 @@ int Main() {
     prices.Add(new Money(40));
     prices.Add(new Money(600));      // grows past the initial capacity of 4
 
-    Console.WriteLine("count    = " + Text.FromInteger(prices.Count()));
-    Console.WriteLine("capacity = " + Text.FromInteger(prices.Capacity()));
+    Console.WriteLine($"count    = {prices.Count()}");
+    Console.WriteLine($"capacity = {prices.Capacity()}");
 
     // A List<Money> is accepted wherever an IReadOnlyList<Money> is wanted.
-    Console.WriteLine("items    = " + Describe(prices));
+    Console.WriteLine($"items    = {Describe(prices)}");
 
-    Console.WriteLine("largest  = " + Largest(prices).Show());
-    Console.WriteLine("smallest = " + Smallest(prices).Show());
-    Console.WriteLine("index of 999c = " + Text.FromInteger(IndexOf(prices, new Money(999))));
+    Console.WriteLine($"largest  = {Largest(prices).Show()}");
+    Console.WriteLine($"smallest = {Smallest(prices).Show()}");
+
+    // `IndexOf` answers with an `Optional<nuint>`. A list's length standing in
+    // for "not there" is exactly the sentinel that type exists to retire.
+    if (IndexOf(prices, new Money(999)) is Some at) {
+        Console.WriteLine($"index of 999c = {at.Value}");
+    }
+    Console.WriteLine($"index of 1c   = {IndexOf(prices, new Money(1)).IsEmpty()}");
 
     Sort(prices);
-    Console.WriteLine("sorted   = " + Describe(prices));
+    Console.WriteLine($"sorted   = {Describe(prices)}");
 
     prices.Clear();
-    Console.WriteLine("cleared  = " + Text.FromBool(prices.IsEmpty()));
+    Console.WriteLine($"cleared  = {prices.IsEmpty()}");
     return 0;
 }

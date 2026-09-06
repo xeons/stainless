@@ -84,7 +84,7 @@ public Result<long, ConvertError> ToLong(String text, uint radix) {
     ulong limit = 9223372036854775807u;
     if (negative) { limit = 9223372036854775808u; }
 
-    for (nuint i = at; i < size; i = i + 1) {
+    for (nuint i = at; i < size; i++) {
         int digit = DigitValue(bytes[i]);
         if (digit < 0 || (uint)digit >= radix) { return Fail(ConvertError.Malformed); }
 
@@ -134,7 +134,7 @@ public Result<ulong, ConvertError> ToULong(String text, uint radix) {
     if (at == size) { return Fail(ConvertError.Empty); }
 
     ulong value = 0;
-    for (nuint i = at; i < size; i = i + 1) {
+    for (nuint i = at; i < size; i++) {
         int digit = DigitValue(bytes[i]);
         if (digit < 0 || (uint)digit >= radix) { return Fail(ConvertError.Malformed); }
 
@@ -171,7 +171,7 @@ public String FromLong(long value, uint radix) {
     if (negative) { built.Append("-"); }
 
     // Written backwards, so read backwards.
-    for (nuint i = digits.ByteLength(); i > 0; i = i - 1) {
+    for (nuint i = digits.ByteLength(); i > 0; i--) {
         var one = digits.ByteAt(i - 1);
         built.Append(FromBytes(&one, 1));
     }
@@ -203,18 +203,18 @@ public Result<double, ConvertError> ToDouble(String text) {
 
     while (at < size && Ascii.IsDigit(bytes[at])) {
         value = value * 10.0 + (double)(int)(bytes[at] - 48);
-        at = at + 1;
-        digits = digits + 1;
+        at++;
+        digits++;
     }
 
     if (at < size && bytes[at] == 46) {              // '.'
-        at = at + 1;
+        at++;
         double scale = 0.1;
         while (at < size && Ascii.IsDigit(bytes[at])) {
             value = value + (double)(int)(bytes[at] - 48) * scale;
             scale = scale * 0.1;
-            at = at + 1;
-            digits = digits + 1;
+            at++;
+            digits++;
         }
     }
 
@@ -222,12 +222,12 @@ public Result<double, ConvertError> ToDouble(String text) {
     if (digits == 0) { return Fail(ConvertError.Malformed); }
 
     if (at < size && (bytes[at] == 101 || bytes[at] == 69)) {     // 'e' or 'E'
-        at = at + 1;
+        at++;
         bool negativeExponent = false;
 
         if (at < size && (bytes[at] == 43 || bytes[at] == 45)) {
             negativeExponent = bytes[at] == 45;
-            at = at + 1;
+            at++;
         }
 
         if (at >= size || !Ascii.IsDigit(bytes[at])) { return Fail(ConvertError.Malformed); }
@@ -235,10 +235,10 @@ public Result<double, ConvertError> ToDouble(String text) {
         int exponent = 0;
         while (at < size && Ascii.IsDigit(bytes[at])) {
             if (exponent < 10000) { exponent = exponent * 10 + (int)(bytes[at] - 48); }
-            at = at + 1;
+            at++;
         }
 
-        for (int i = 0; i < exponent; i = i + 1) {
+        for (int i = 0; i < exponent; i++) {
             if (negativeExponent) { value = value / 10.0; } else { value = value * 10.0; }
         }
     }
@@ -259,7 +259,7 @@ public String ToHex(byte[] data) {
 public String ToHex(byte[] data, bool upper) {
     var built = new StringBuilder();
 
-    for (nuint i = 0; i < data.Length; i = i + 1) {
+    for (nuint i = 0; i < data.Length; i++) {
         int high = (int)(data[i] >> 4);
         int low = (int)(data[i] & 0x0F);
 
@@ -286,7 +286,7 @@ public Result<byte[], ConvertError> FromHex(String text) {
     var bytes = text.ToPointer();
     var data = new byte[size / 2];
 
-    for (nuint i = 0; i < data.Length; i = i + 1) {
+    for (nuint i = 0; i < data.Length; i++) {
         int high = Ascii.HexValue(bytes[i * 2]);
         int low = Ascii.HexValue(bytes[i * 2 + 1]);
         if (high < 0 || low < 0) { return Fail(ConvertError.Malformed); }
@@ -321,11 +321,11 @@ public Result<byte[], ConvertError> FromBase64(String text) {
     // Counted first: four characters become three bytes, and the padding says
     // how many of the last three are real.
     nuint characters = 0;
-    for (nuint i = 0; i < size; i = i + 1) {
+    for (nuint i = 0; i < size; i++) {
         byte one = bytes[i];
         if (Ascii.IsWhiteSpace(one) || one == 61) { continue; }      // '='
         if (Base64Value(one) < 0) { return Fail(ConvertError.Malformed); }
-        characters = characters + 1;
+        characters++;
     }
 
     if (characters % 4 == 1) { return Fail(ConvertError.Malformed); }
@@ -335,12 +335,12 @@ public Result<byte[], ConvertError> FromBase64(String text) {
     nuint held = 0;
     nuint out = 0;
 
-    for (nuint i = 0; i < size; i = i + 1) {
+    for (nuint i = 0; i < size; i++) {
         byte one = bytes[i];
         if (Ascii.IsWhiteSpace(one) || one == 61) { continue; }
 
         accumulator = (accumulator << 6) | (uint)Base64Value(one);
-        held = held + 1;
+        held++;
 
         if (held == 4) {
             data[out] = (byte)(accumulator >> 16);
@@ -395,7 +395,7 @@ String Encode64(byte[] data, bool url, bool pad) {
 
 /// The top `count` six-bit groups of a 24-bit block, as characters.
 void AppendSix(StringBuilder built, uint block, nuint count, bool url) {
-    for (nuint i = 0; i < count; i = i + 1) {
+    for (nuint i = 0; i < count; i++) {
         uint six = (uint)((block >> (int)(18 - i * 6)) & 0x3F);
         var one = Base64Digit(six, url);
         built.Append(FromBytes(&one, 1));

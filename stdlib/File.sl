@@ -87,7 +87,7 @@ public Result<byte[], IOError> ReadAllBytes(String path) {
     if (got == (nuint)size) { return Ok(data); }
 
     var exact = new byte[got];
-    for (nuint i = 0; i < got; i = i + 1) { exact[i] = data[i]; }
+    for (nuint i = 0; i < got; i++) { exact[i] = data[i]; }
     return Ok(exact);
 }
 
@@ -140,7 +140,7 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
 
     var file = opened.Value;
 
-    for (nuint i = 0; i < lines.Count(); i = i + 1) {
+    for (nuint i = 0; i < lines.Count(); i++) {
         file.WriteText(lines.At(i));
         file.WriteText("\n");
     }

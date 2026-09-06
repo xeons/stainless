@@ -308,7 +308,7 @@ public class MemoryStream : IStream {
     /// Starts with a copy of `initial`, positioned at the beginning.
     public MemoryStream(byte[] initial) {
         bytes = new byte[initial.Length + 1];
-        for (nuint i = 0; i < initial.Length; i = i + 1) { bytes[i] = initial[i]; }
+        for (nuint i = 0; i < initial.Length; i++) { bytes[i] = initial[i]; }
         length = initial.Length;
         at = 0;
     }
@@ -323,7 +323,7 @@ public class MemoryStream : IStream {
         nuint available = length - at;
         nuint taking = count < available ? count : available;
 
-        for (nuint i = 0; i < taking; i = i + 1) { buffer[offset + i] = bytes[at + i]; }
+        for (nuint i = 0; i < taking; i++) { buffer[offset + i] = bytes[at + i]; }
         at = at + taking;
         return taking;
     }
@@ -332,7 +332,7 @@ public class MemoryStream : IStream {
         if (offset + count > buffer.Length) { return 0; }
 
         Reserve(at + count);
-        for (nuint i = 0; i < count; i = i + 1) { bytes[at + i] = buffer[offset + i]; }
+        for (nuint i = 0; i < count; i++) { bytes[at + i] = buffer[offset + i]; }
 
         at = at + count;
         if (at > length) { length = at; }
@@ -345,7 +345,7 @@ public class MemoryStream : IStream {
         Reserve(at + size);
 
         var source = text.ToPointer();
-        for (nuint i = 0; i < size; i = i + 1) { bytes[at + i] = source[i]; }
+        for (nuint i = 0; i < size; i++) { bytes[at + i] = source[i]; }
 
         at = at + size;
         if (at > length) { length = at; }
@@ -374,7 +374,7 @@ public class MemoryStream : IStream {
     /// A copy of what has been written, from the start to the high-water mark.
     public byte[] ToArray() {
         var copy = new byte[length];
-        for (nuint i = 0; i < length; i = i + 1) { copy[i] = bytes[i]; }
+        for (nuint i = 0; i < length; i++) { copy[i] = bytes[i]; }
         return copy;
     }
 
@@ -391,7 +391,7 @@ public class MemoryStream : IStream {
         while (size < wanted) { size = size * 2; }
 
         var bigger = new byte[size];
-        for (nuint i = 0; i < length; i = i + 1) { bigger[i] = bytes[i]; }
+        for (nuint i = 0; i < length; i++) { bigger[i] = bytes[i]; }
         bytes = bigger;
     }
 }
@@ -431,7 +431,7 @@ public List<String> SplitLines(String text) {
     nuint size = text.ByteLength();
 
     nuint start = 0;
-    for (nuint i = 0; i < size; i = i + 1) {
+    for (nuint i = 0; i < size; i++) {
         if (bytes[i] != 10) { continue; }
 
         nuint stop = i;

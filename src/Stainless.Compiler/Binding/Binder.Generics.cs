@@ -192,6 +192,69 @@ public sealed partial class Binder
         return type;
     }
 
+    /// <summary>
+    /// Produces the concrete <c>Predicate&lt;int&gt;</c> for a generic delegate
+    /// or closure.
+    ///
+    /// Much smaller than instantiating a type, because there is much less to a
+    /// delegate: a return type and a parameter list, resolved once under the
+    /// substitution. There are no members to declare, no interfaces to satisfy
+    /// and no layout to compute -- a delegate is one pointer and a closure is
+    /// always the same two.
+    /// </summary>
+    private NamedTypeSymbol InstantiateDelegate(
+        GenericDelegateTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)
+    {
+        if (arguments.Count != template.Parameters.Count)
+        {
+            diagnostics.Error("SL0323", span,
+                $"'{template.Name}' takes {template.Parameters.Count} type " +
+                $"argument{(template.Parameters.Count == 1 ? "" : "s")}, " +
+                $"but {Given(arguments.Count)}");
+            return new DelegateTypeSymbol
+                { SimpleName = template.Name, ModuleName = template.Module.Name };
+        }
+
+        string key = InstantiationKey(template.Module.Name + "." + template.Name, arguments);
+        if (_instantiatedTypes.TryGetValue(key, out var existing)) return existing;
+
+        var declaration = template.Declaration;
+        string displayName = template.Name + "<" + string.Join(", ", arguments.Select(a => a.Name)) + ">";
+        bool isPublic = declaration.Modifiers.HasFlag(Modifiers.Public);
+
+        NamedTypeSymbol type = template.CarriesReceiver
+            ? NewClosureType(declaration, template.Module, displayName, arguments)
+            : new DelegateTypeSymbol
+            {
+                SimpleName = displayName,
+                ModuleName = template.Module.Name,
+                IsPublic = isPublic,
+                TypeArguments = arguments,
+                Span = declaration.Span,
+            };
+
+        // Registered before the signature is resolved, so a delegate that
+        // mentions itself -- `closure Predicate<T> Compose<T>(Predicate<T> a)`
+        // -- terminates.
+        _instantiatedTypes[key] = type;
+        if (type is StructTypeSymbol asStruct) _structs.Add(asStruct);
+
+        var substitution = new Dictionary<string, TypeSymbol>(StringComparer.Ordinal);
+        for (int i = 0; i < arguments.Count; i++) substitution[template.Parameters[i]] = arguments[i];
+
+        var previousSubstitution = _substitution;
+        var previousScope = _currentScope;
+
+        _substitution = substitution;
+        _currentScope = template.Scope;
+
+        DeclareDelegateSignature(type, declaration, template.Scope);
+
+        _substitution = previousSubstitution;
+        _currentScope = previousScope;
+        return type;
+    }
+
     /// <summary>Produces the concrete function for a generic call such as <c>Max(1, 2)</c>.</summary>
     private FunctionSymbol? InstantiateFunction(
         GenericFunctionTemplate template, IReadOnlyList<TypeSymbol> arguments, SourceSpan span)

@@ -135,7 +135,7 @@ public class XmlNode {
 
     /// The first child of that name, or null.
     public XmlNode? Child(String name) {
-        for (nuint i = 0u; i < Children.Count(); i = i + 1u) {
+        for (nuint i = 0u; i < Children.Count(); i++) {
             var child = Children.At(i);
             if (child.Name == name) { return child; }
         }
@@ -145,7 +145,7 @@ public class XmlNode {
     /// Every child of that name, in order.
     public List<XmlNode> ChildrenNamed(String name) {
         var found = new List<XmlNode>();
-        for (nuint i = 0u; i < Children.Count(); i = i + 1u) {
+        for (nuint i = 0u; i < Children.Count(); i++) {
             var child = Children.At(i);
             if (child.Name == name) { found.Add(child); }
         }
@@ -201,7 +201,7 @@ class Cursor {
     public bool Take(String word) {
         if (At + word.ByteLength() > Source.ByteLength()) { return false; }
 
-        for (nuint i = 0u; i < word.ByteLength(); i = i + 1u) {
+        for (nuint i = 0u; i < word.ByteLength(); i++) {
             if (Source.ByteAt(At + i) != word.ByteAt(i)) { return false; }
         }
 
@@ -364,7 +364,7 @@ XmlNode ParseElement(Cursor cursor) {
     }
 
     // --- content
-    cursor.Depth = cursor.Depth + 1u;
+    cursor.Depth++;
     var text = new StringBuilder();
 
     while (true) {
@@ -425,7 +425,7 @@ XmlNode ParseElement(Cursor cursor) {
         if (cursor.Failed()) { break; }
     }
 
-    cursor.Depth = cursor.Depth - 1u;
+    cursor.Depth--;
     node.Text = text.ToText();
     return node;
 }
@@ -509,7 +509,7 @@ String ParseCharacterReference(Cursor cursor, uint radix) {
         else { break; }
 
         value = value * radix + digit;
-        digits = digits + 1u;
+        digits++;
         cursor.Skip();
 
         if (digits > 8u) {
@@ -587,13 +587,13 @@ public String WriteDocument(XmlNode node) {
 
 void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty) {
     if (pretty) {
-        for (nuint i = 0u; i < depth; i = i + 1u) { text.Append("  "); }
+        for (nuint i = 0u; i < depth; i++) { text.Append("  "); }
     }
 
     text.Append("<");
     text.Append(node.Name);
 
-    for (nuint i = 0u; i < node.Attributes.Count(); i = i + 1u) {
+    for (nuint i = 0u; i < node.Attributes.Count(); i++) {
         text.Append(" ");
         text.Append(node.Attributes.NameAt(i));
         text.Append("=\"");
@@ -613,14 +613,14 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty) {
     // represent -- see the note on XmlNode.
     WriteEscaped(text, node.Text, false);
 
-    for (nuint i = 0u; i < node.Children.Count(); i = i + 1u) {
+    for (nuint i = 0u; i < node.Children.Count(); i++) {
         if (pretty) { text.Append("\n"); }
         WriteInto(text, node.Children.At(i), depth + 1u, pretty);
     }
 
     if (pretty && node.Children.Count() > 0u) {
         text.Append("\n");
-        for (nuint i = 0u; i < depth; i = i + 1u) { text.Append("  "); }
+        for (nuint i = 0u; i < depth; i++) { text.Append("  "); }
     }
 
     text.Append("</");
@@ -636,7 +636,7 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty) {
 void WriteEscaped(StringBuilder text, String value, bool inAttribute) {
     nuint run = 0u;
 
-    for (nuint i = 0u; i < value.ByteLength(); i = i + 1u) {
+    for (nuint i = 0u; i < value.ByteLength(); i++) {
         byte c = value.ByteAt(i);
         String escaped = "";
 
@@ -697,7 +697,7 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name) {
 
     var text = new StringBuilder();
 
-    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+    for (nuint i = 0u; i < type.FieldCount(); i++) {
         var field = type.FieldAt(i);
         if (field.Has("XmlIgnore")) { continue; }
 
@@ -770,7 +770,7 @@ void AddArray(XmlNode node, byte* instance, Field field, String name) {
 
     int kind = field.ElementKind();
 
-    for (nuint i = 0u; i < Reflection.ArrayLength(array); i = i + 1u) {
+    for (nuint i = 0u; i < Reflection.ArrayLength(array); i++) {
         byte* at = Reflection.ElementAt(array, field, i);
 
         if (kind == KindClass || kind == KindStruct) {
@@ -827,7 +827,7 @@ public XmlError PopulateFrom<T>(T value, XmlNode node) {
 }
 
 void FillInstance(byte* instance, Type type, XmlNode node) {
-    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+    for (nuint i = 0u; i < type.FieldCount(); i++) {
         var field = type.FieldAt(i);
         if (field.Has("XmlIgnore")) { continue; }
 
@@ -882,7 +882,7 @@ void FillArray(byte* instance, Field field, List<XmlNode> found) {
     nuint length = Reflection.ArrayLength(array);
     int kind = field.ElementKind();
 
-    for (nuint i = 0u; i < found.Count() && i < length; i = i + 1u) {
+    for (nuint i = 0u; i < found.Count() && i < length; i++) {
         byte* at = Reflection.ElementAt(array, field, i);
 
         if (kind == KindClass || kind == KindStruct) {

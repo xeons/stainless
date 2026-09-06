@@ -4,5 +4,6 @@ items    = 250c 125c 999c 40c 600c
 largest  = 999c
 smallest = 40c
 index of 999c = 2
+index of 1c   = true
 sorted   = 40c 125c 250c 600c 999c 
 cleared  = true
