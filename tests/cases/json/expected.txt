@@ -1,0 +1,44 @@
+empty-object = {}
+empty-array = []
+scalars = [1,-2,3.5,100,true,false,null]
+nested = {"a":{"b":{"c":[1,[2,[3]]]}}}
+spaces = {"a":1,"b":2}
+escapes = "a\"b\\c/d\te\nf"
+control = "\u0001\u001f"
+astral = "😀"
+lone-surrogate = "�"
+integers = [0,0,42,-42,9007199254740992]
+fractions = [0.5,-0.25,1500]
+trailing = trailing content after the value
+unclosed-object = unexpected character
+unclosed-string = unterminated string
+leading-zero = malformed number
+bare-dot = malformed number
+plus = unexpected character
+bad-escape = bad escape sequence
+bad-literal = expected true, false or null
+empty = unexpected character
+comma-only = unexpected character
+built = {"name":"built by hand","count":3,"items":[true,null]}
+found = built by hand
+missing = (default)
+as-number = 3
+indented =
+{
+  "name": "built by hand",
+  "count": 3,
+  "items": [
+    true,
+    null
+  ]
+}
+serialized = {"Name":"Ada Lovelace","Years":36,"Active":true,"Rating":9.5,"id":1815,"Where":{"City":"London","Country":"England"}}
+populate = no error
+round-tripped = {"Name":"Grace Hopper","Years":85,"Active":false,"Rating":10,"id":1906,"Where":{"City":"New York","Country":"USA"}}
+ignored-kept = 999
+partial = unchanged/1
+not-an-object = the document is not an object
+bad-document = unexpected character
+wrong-types = /5
+deserialized = no error/Alan Turing/41/[]
+unrepresentable = {"Name":"kept"}

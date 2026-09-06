@@ -341,12 +341,15 @@ public class AbiTests
             public double Take(Pair v) { return v.A; }
             """;
 
+        // Qualified by the module, because a fragment alone finds whatever
+        // the standard library happens to call something: `Standard.Xml` has
+        // a `Take` of its own, and it was matching first.
         Assert.Contains(
             "double %arg.v.0, i32 %arg.v.1",
-            Front.Function(Front.ModuleIr(source, CppAbi.Itanium), "4Take"));
+            Front.Function(Front.ModuleIr(source, CppAbi.Itanium), "4Test4Take"));
 
         Assert.Contains(
             "ptr byval(%struct.Test_Pair) %arg.v",
-            Front.Function(Front.ModuleIr(source, CppAbi.Microsoft), "4Take"));
+            Front.Function(Front.ModuleIr(source, CppAbi.Microsoft), "4Test4Take"));
     }
 }

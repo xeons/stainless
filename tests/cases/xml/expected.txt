@@ -1,0 +1,46 @@
+empty = <a/>
+empty-pair = <a/>
+text = <a>hello</a>
+children = <a><b>1</b><c>2</c></a>
+attributes = <a x="1" y="2">t</a>
+nested = <a><b><c><d>deep</d></c></b></a>
+spaces = <a x="1">  t  </a>
+entities = <a>&lt;&gt;&amp;"'</a>
+numeric = <a>AB😀</a>
+in-attribute = <a x="&lt;&amp;&gt;"/>
+comment = <a>t</a>
+declaration = <a/>
+instruction = <a>t</a>
+doctype = <a/>
+cdata = <a>&lt;b&gt;&amp;amp;&lt;/b&gt;</a>
+prefixed = <x:a xmlns:x="urn:z"><x:b/></x:a>
+mismatched = end tag does not match its start tag
+unclosed = the document ended inside an element
+unclosed-tag = unclosed tag
+no-root = no root element
+two-roots = content after the root element
+bad-name = malformed name
+unknown-entity = unknown entity
+unquoted-attribute = unexpected character
+closing-first = unexpected character
+empty-document = no root element
+root-name = config
+attribute = live
+missing-attribute = (default)
+child-text = server
+missing-child = (default)
+named-count = 2
+child-count = 3
+built = <root id="7"><item>a &lt; b &amp; c</item></root>
+document =
+<?xml version="1.0" encoding="UTF-8"?>
+<root id="7">
+  <item>a &lt; b &amp; c</item>
+</root>
+serialized = <settings Environment="production" Version="3"><Name>primary &amp; backup</Name><Enabled>true</Enabled><Threshold>0.75</Threshold><retry-limit>5</retry-limit><Primary><Host>example.com</Host><Port>443</Port></Primary></settings>
+populate = no error
+round-tripped = <settings Environment="staging" Version="9"><Name>read back</Name><Enabled>true</Enabled><Threshold>1.25</Threshold><retry-limit>2</retry-limit><Primary><Host>localhost</Host><Port>80</Port></Primary></settings>
+ignored-kept = 77
+partial = unchanged/true
+wrong-type = 4
+bad-document = the document ended inside an element

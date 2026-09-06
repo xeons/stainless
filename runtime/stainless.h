@@ -554,6 +554,24 @@ SL_API double   sl_read_double(const void *instance, const void *field);
 SL_API _Bool    sl_read_bool(const void *instance, const void *field);
 SL_API void    *sl_read_reference(const void *instance, const void *field);
 
+/*
+ * Writing. Each of these narrows to the field's recorded width, so a caller
+ * that has checked the kind cannot write past the field it named.
+ *
+ * The reference writers are here rather than in the standard library because
+ * they are the only part that has to touch a reference count, and doing it in
+ * C keeps the one place that can get it wrong down to four lines.
+ */
+SL_API void sl_write_integer(void *instance, const void *field, int64_t value);
+SL_API void sl_write_double(void *instance, const void *field, double value);
+SL_API void sl_write_bool(void *instance, const void *field, _Bool value);
+SL_API void sl_write_text(void *instance, const void *field,
+                          const void *bytes, size_t length);
+SL_API void sl_write_reference(void *instance, const void *field, void *value);
+
+/* Allocates a zeroed instance of a reflected type, for a deserializer. */
+SL_API void *sl_type_make(const void *type);
+
 /* ---------------------------------------------------------------- Console */
 
 SL_API void sl_console_write(void *pointer);

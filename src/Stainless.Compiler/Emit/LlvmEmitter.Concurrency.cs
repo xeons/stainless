@@ -398,8 +398,13 @@ public sealed partial class LlvmEmitter
         "ptr" => "null",
         "void" => "",
 
-        // An aggregate has no integer zero; LLVM spells it this way.
-        _ when llvmType.StartsWith('%') => "zeroinitializer",
+        // An aggregate has no integer zero; LLVM spells it this way. A named
+        // one starts with '%'; a literal one -- which is what a struct
+        // returned in registers is coerced to, as in '{ i8, i64 }' -- starts
+        // with a brace or a bracket, and reached the integer case below until
+        // a Result<T, E> small enough to be coerced turned up in the library.
+        _ when llvmType.StartsWith('%') || llvmType.StartsWith('{')
+               || llvmType.StartsWith('[') || llvmType.StartsWith('<') => "zeroinitializer",
 
         _ => "0",
     };

@@ -190,3 +190,95 @@ void *sl_read_reference(const void *instance, const void *field)
 {
     return *(void *const *)sl_field_address(instance, field);
 }
+
+/* ----------------------------------------------------------------- writing */
+
+static void *sl_field_slot(void *instance, const void *field)
+{
+    return (uint8_t *)instance + ((const SlFieldInfo *)field)->offset;
+}
+
+/*
+ * Narrowed to the field's own width, so a value too large for it wraps there
+ * rather than writing over the field beside it. That is C's rule for an
+ * assignment of the same shape, and the alternative -- writing eight bytes
+ * whatever the field is -- would corrupt the object silently.
+ */
+void sl_write_integer(void *instance, const void *field, int64_t value)
+{
+    void *address = sl_field_slot(instance, field);
+
+    switch (((const SlFieldInfo *)field)->kind) {
+        case SL_KIND_SBYTE:  *(int8_t   *)address = (int8_t)value;   break;
+        case SL_KIND_SHORT:  *(int16_t  *)address = (int16_t)value;  break;
+        case SL_KIND_INT:    *(int32_t  *)address = (int32_t)value;  break;
+        case SL_KIND_LONG:
+        case SL_KIND_NINT:   *(int64_t  *)address = value;           break;
+        case SL_KIND_CHAR:
+        case SL_KIND_BYTE:   *(uint8_t  *)address = (uint8_t)value;  break;
+        case SL_KIND_CHAR16:
+        case SL_KIND_USHORT: *(uint16_t *)address = (uint16_t)value; break;
+        case SL_KIND_CHAR32:
+        case SL_KIND_UINT:   *(uint32_t *)address = (uint32_t)value; break;
+        case SL_KIND_ULONG:
+        case SL_KIND_NUINT:  *(uint64_t *)address = (uint64_t)value; break;
+        default:                                                     break;
+    }
+}
+
+void sl_write_double(void *instance, const void *field, double value)
+{
+    void *address = sl_field_slot(instance, field);
+
+    switch (((const SlFieldInfo *)field)->kind) {
+        case SL_KIND_FLOAT:  *(float  *)address = (float)value; break;
+        case SL_KIND_DOUBLE: *(double *)address = value;        break;
+        default:                                                break;
+    }
+}
+
+void sl_write_bool(void *instance, const void *field, _Bool value)
+{
+    if (((const SlFieldInfo *)field)->kind != SL_KIND_BOOL) { return; }
+    *(_Bool *)sl_field_slot(instance, field) = value;
+}
+
+/*
+ * Retain before release, for the reason every owning store in the emitter does
+ * it: writing a field back to itself must not destroy the value on the way.
+ */
+void sl_write_reference(void *instance, const void *field, void *value)
+{
+    void **slot = (void **)sl_field_slot(instance, field);
+
+    sl_retain(value);
+    sl_release(*slot);
+    *slot = value;
+}
+
+/*
+ * The bytes rather than the String, which is what keeps a counted reference out
+ * of this ABI -- the same bargain the read side makes by handing back bytes for
+ * the caller to copy. The String made here is owned by the field, and the
+ * retain inside sl_write_reference is what pays for it, so the +1 this starts
+ * with is released immediately after.
+ */
+void sl_write_text(void *instance, const void *field,
+                   const void *bytes, size_t length)
+{
+    if (((const SlFieldInfo *)field)->kind != SL_KIND_STRING) { return; }
+
+    void *text = sl_string_from_bytes((const uint8_t *)bytes, length);
+    sl_write_reference(instance, field, text);
+    sl_release(text);
+}
+
+/*
+ * A zeroed instance, for a deserializer that has a type and no constructor to
+ * call. Every reference field starts null, so what comes back is only safe to
+ * hand out once the caller has filled the ones that may not be.
+ */
+void *sl_type_make(const void *type)
+{
+    return sl_alloc((const SlTypeInfo *)type);
+}

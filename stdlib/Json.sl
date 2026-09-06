@@ -1,0 +1,955 @@
+// Stainless - an experimental systems language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This file is part of the Stainless runtime library. It is free
+// software: you can redistribute it and/or modify it under the terms of
+// the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any
+// later version.
+//
+// It is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// As an additional permission under section 7 of that License, compiling
+// a program with Stainless does not by itself place that program under
+// the GNU General Public License. See LICENSE.RUNTIME.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// JSON, in two layers.
+//
+// The lower one is a document: `Json.Parse` gives a `JsonValue`, a variant that
+// is exactly one of the six things JSON has, and `Write` puts one back. Nothing
+// about it needs a type, so it handles a document whose shape a program learns
+// at run time -- which is most of them.
+//
+// The upper one maps a document onto a type, through the field tables a
+// `[Reflect]` type carries (§6). `Serialize` reads an object's fields and
+// `Populate` writes them.
+//
+// **Why the mapping fills an object rather than making one.** A constructor is
+// what establishes a type's invariants, and a deserializer that allocated
+// zeroed memory would produce an object whose non-nullable fields were null --
+// a hole in the type system rather than a value. So `Populate` takes an
+// instance the program made, and `Deserialize<T>` calls `new T()` first, which
+// is what `where T : new()` is there to guarantee.
+module Standard.Json;
+
+import Standard.Collections;
+import Standard.Reflection;
+import Standard.Convert;
+
+// ------------------------------------------------------------------- errors
+
+public enum JsonError {
+    None,
+    Unexpected,         // a character that cannot start what is expected here
+    UnterminatedText,   // a string with no closing quote
+    BadEscape,          // a \ followed by something that is not an escape
+    BadNumber,          // digits that are not a JSON number
+    BadLiteral,         // something that started like true, false or null
+    TrailingContent,    // a second value after the first
+    TooDeep,            // nesting past the limit below
+    NotAnObject,        // a document that is not the object a type wants
+    NotReflected,       // a type with no field tables to map onto
+}
+
+public String Describe(JsonError error) {
+    switch (error) {
+        case JsonError.None: return "no error";
+        case JsonError.Unexpected: return "unexpected character";
+        case JsonError.UnterminatedText: return "unterminated string";
+        case JsonError.BadEscape: return "bad escape sequence";
+        case JsonError.BadNumber: return "malformed number";
+        case JsonError.BadLiteral: return "expected true, false or null";
+        case JsonError.TrailingContent: return "trailing content after the value";
+        case JsonError.TooDeep: return "nested too deeply";
+        case JsonError.NotAnObject: return "the document is not an object";
+        case JsonError.NotReflected: return "the type carries no field metadata";
+        default: return "unknown error";
+    }
+}
+
+/// How far in the parser will nest before giving up.
+///
+/// A document is nested by recursion, so the limit is really about the stack.
+/// It exists because a hostile document is one line -- ten thousand `[` -- and
+/// the alternative to a limit is a crash that looks like a compiler bug.
+public const nuint MaxDepth = 128u;
+
+/// What a lookup answers when the name is not there. `nuint` has no negative
+/// to spare, so the largest one stands in -- a collection of that many members
+/// would have exhausted memory long before.
+public const nuint Missing = 18446744073709551615u;
+
+// ------------------------------------------------------------------ objects
+
+/// The members of a JSON object, in the order they were written.
+///
+/// A `Dictionary` would find a name faster and lose the order, and order is
+/// what makes a document read back the way it was written -- which matters for
+/// a file a person edits. Lookup is a scan, which is the right trade at the
+/// size documents actually are; a program holding a large one should build its
+/// own index.
+public class JsonObject {
+    List<String> names;
+    List<JsonValue> values;
+
+    public JsonObject() {
+        names = new List<String>();
+        values = new List<JsonValue>();
+    }
+
+    public nuint Count() { return names.Count(); }
+    public String NameAt(nuint index) { return names.At(index); }
+    public JsonValue ValueAt(nuint index) { return values.At(index); }
+
+    /// Adds a member. A repeated name is kept rather than replaced, because
+    /// that is what the document said; `Find` answers with the first.
+    public void Add(String name, JsonValue value) {
+        names.Add(name);
+        values.Add(value);
+    }
+
+    /// Replaces the value of a name, or adds it.
+    public void Set(String name, JsonValue value) {
+        var at = IndexOf(name);
+        if (at == Missing) { Add(name, value); return; }
+        values.Set(at, value);
+    }
+
+    /// Where a name is, or `Missing` when it is not there.
+    ///
+    /// The one lookup a caller needs: asking whether a name is present and
+    /// then asking for its value walks the members twice, which is what this
+    /// exists to stop.
+    public nuint IndexOf(String name) {
+        for (nuint i = 0u; i < names.Count(); i = i + 1u) {
+            if (names.At(i) == name) { return i; }
+        }
+        return Missing;
+    }
+
+    public bool Has(String name) { return IndexOf(name) != Missing; }
+
+    /// The value of a name, or `Null` when it is not there. A document that
+    /// does not mention a field and one that says `null` are the same thing to
+    /// a reader that has a default already.
+    public JsonValue Find(String name) {
+        var at = IndexOf(name);
+        if (at == Missing) { return JsonValue.Null; }
+        return values.At(at);
+    }
+}
+
+// ------------------------------------------------------------------- values
+
+/// A JSON document, or any part of one.
+///
+/// Exactly the six things the grammar has. A variant rather than a class with
+/// a kind field, so reading the wrong one is a compile error rather than a
+/// null: `case Text t:` is the only way to reach `t.Value`.
+public variant JsonValue {
+    Null;
+    Bool(bool Value);
+    Number(double Value);
+    Text(String Value);
+    Array(List<JsonValue> Items);
+    Object(JsonObject Members);
+}
+
+/// An empty array, ready to add to.
+public JsonValue NewArray() { return JsonValue.Array(new List<JsonValue>()); }
+
+/// An empty object, ready to add to.
+public JsonValue NewObject() { return JsonValue.Object(new JsonObject()); }
+
+/// A whole number as a JSON number, which has only the one numeric type.
+///
+/// Not `FromInteger`: `Standard.Text` is imported everywhere and has one of
+/// those, and two functions of a name reached without a prefix is an ambiguity
+/// at every call rather than at this declaration.
+public JsonValue NumberOf(long value) { return JsonValue.Number((double)value); }
+
+// The readers below answer with a default rather than a failure, because the
+// case has already been established by anyone who cared: a program that wants
+// to know writes `switch`, and one that wants a value with a fallback writes
+// this.
+
+/// The text of a `Text`, or the fallback for anything else.
+public String TextOr(JsonValue value, String fallback) {
+    switch (value) {
+        case Text held: return held.Value;
+        default: return fallback;
+    }
+}
+
+public double NumberOr(JsonValue value, double fallback) {
+    switch (value) {
+        case Number held: return held.Value;
+        default: return fallback;
+    }
+}
+
+public long IntegerOr(JsonValue value, long fallback) {
+    switch (value) {
+        case Number held: return (long)held.Value;
+        default: return fallback;
+    }
+}
+
+public bool BoolOr(JsonValue value, bool fallback) {
+    switch (value) {
+        case Bool held: return held.Value;
+        default: return fallback;
+    }
+}
+
+/// True for the one case that carries nothing.
+public bool IsNull(JsonValue value) {
+    switch (value) {
+        case Null: return true;
+        default: return false;
+    }
+}
+
+/// The members of an `Object`, or an empty one.
+public JsonObject MembersOf(JsonValue value) {
+    switch (value) {
+        case Object held: return held.Members;
+        default: return new JsonObject();
+    }
+}
+
+/// The elements of an `Array`, or an empty list.
+public List<JsonValue> ItemsOf(JsonValue value) {
+    switch (value) {
+        case Array held: return held.Items;
+        default: return new List<JsonValue>();
+    }
+}
+
+// ------------------------------------------------------------------ parsing
+
+/// Where a parser is, which is a byte offset and a reason it stopped.
+///
+/// A class rather than a struct so that every function below shares the one
+/// cursor without `ref` at each call: a recursive descent that has to say
+/// `ref` twenty times reads like plumbing rather than like the grammar it is.
+class Cursor {
+    public String Text;
+    public nuint At;
+    public nuint Depth;
+    public JsonError Failure;
+
+    public Cursor(String text) {
+        Text = text;
+        At = 0u;
+        Depth = 0u;
+        Failure = JsonError.None;
+    }
+
+    public bool Failed() { return Failure != JsonError.None; }
+
+    /// The first reason wins: everything after a failure is noise about the
+    /// same mistake, and the first one is where it was made.
+    public void Reject(JsonError why) {
+        if (Failure == JsonError.None) { Failure = why; }
+    }
+
+    public bool AtEnd() { return At >= Text.ByteLength(); }
+
+    public byte Peek() {
+        if (AtEnd()) { return (byte)0; }
+        return Text.ByteAt(At);
+    }
+
+    public void Skip() { At = At + 1u; }
+}
+
+void SkipSpace(Cursor cursor) {
+    while (!cursor.AtEnd()) {
+        byte c = cursor.Text.ByteAt(cursor.At);
+        if (c != (byte)' ' && c != (byte)'\t' && c != (byte)'\n' && c != (byte)'\r') {
+            return;
+        }
+        cursor.Skip();
+    }
+}
+
+/// Reads one value, whatever it is. The whole grammar is five cases and the
+/// two that recurse.
+JsonValue ParseValue(Cursor cursor) {
+    if (cursor.Failed()) { return JsonValue.Null; }
+
+    if (cursor.Depth > MaxDepth) {
+        cursor.Reject(JsonError.TooDeep);
+        return JsonValue.Null;
+    }
+
+    SkipSpace(cursor);
+
+    if (cursor.AtEnd()) {
+        cursor.Reject(JsonError.Unexpected);
+        return JsonValue.Null;
+    }
+
+    byte c = cursor.Peek();
+
+    if (c == (byte)'{') { return ParseObject(cursor); }
+    if (c == (byte)'[') { return ParseArray(cursor); }
+    if (c == (byte)'"') { return JsonValue.Text(ParseText(cursor)); }
+    if (c == (byte)'t' || c == (byte)'f' || c == (byte)'n') { return ParseLiteral(cursor); }
+    if (c == (byte)'-' || (c >= (byte)'0' && c <= (byte)'9')) { return ParseNumber(cursor); }
+
+    cursor.Reject(JsonError.Unexpected);
+    return JsonValue.Null;
+}
+
+JsonValue ParseObject(Cursor cursor) {
+    cursor.Skip();                          // past '{'
+    cursor.Depth = cursor.Depth + 1u;
+
+    var members = new JsonObject();
+
+    SkipSpace(cursor);
+    if (cursor.Peek() == (byte)'}') {
+        cursor.Skip();
+        cursor.Depth = cursor.Depth - 1u;
+        return JsonValue.Object(members);
+    }
+
+    while (true) {
+        SkipSpace(cursor);
+
+        if (cursor.Peek() != (byte)'"') {
+            cursor.Reject(JsonError.Unexpected);
+            break;
+        }
+
+        var name = ParseText(cursor);
+        if (cursor.Failed()) { break; }
+
+        SkipSpace(cursor);
+        if (cursor.Peek() != (byte)':') {
+            cursor.Reject(JsonError.Unexpected);
+            break;
+        }
+        cursor.Skip();
+
+        var value = ParseValue(cursor);
+        if (cursor.Failed()) { break; }
+
+        members.Add(name, value);
+
+        SkipSpace(cursor);
+        byte next = cursor.Peek();
+
+        if (next == (byte)',') {
+            cursor.Skip();
+            continue;
+        }
+
+        if (next == (byte)'}') {
+            cursor.Skip();
+            break;
+        }
+
+        cursor.Reject(JsonError.Unexpected);
+        break;
+    }
+
+    cursor.Depth = cursor.Depth - 1u;
+    return JsonValue.Object(members);
+}
+
+JsonValue ParseArray(Cursor cursor) {
+    cursor.Skip();                          // past '['
+    cursor.Depth = cursor.Depth + 1u;
+
+    var items = new List<JsonValue>();
+
+    SkipSpace(cursor);
+    if (cursor.Peek() == (byte)']') {
+        cursor.Skip();
+        cursor.Depth = cursor.Depth - 1u;
+        return JsonValue.Array(items);
+    }
+
+    while (true) {
+        var value = ParseValue(cursor);
+        if (cursor.Failed()) { break; }
+
+        items.Add(value);
+
+        SkipSpace(cursor);
+        byte next = cursor.Peek();
+
+        if (next == (byte)',') {
+            cursor.Skip();
+            continue;
+        }
+
+        if (next == (byte)']') {
+            cursor.Skip();
+            break;
+        }
+
+        cursor.Reject(JsonError.Unexpected);
+        break;
+    }
+
+    cursor.Depth = cursor.Depth - 1u;
+    return JsonValue.Array(items);
+}
+
+/// A quoted string with its escapes undone.
+///
+/// `\u` is decoded to a code point and appended as UTF-8, surrogate pairs
+/// joined -- which is the one place JSON's encoding and this language's differ,
+/// since a `String` is UTF-8 by invariant and a lone surrogate is not a
+/// character. An unpaired one becomes U+FFFD, the same answer the rest of the
+/// library gives.
+String ParseText(Cursor cursor) {
+    cursor.Skip();                          // past the opening quote
+
+    var text = new StringBuilder();
+
+    // The stretch since the last escape, appended whole rather than a byte at
+    // a time. A string with no escapes in it is one substring and one append.
+    nuint run = cursor.At;
+
+    while (true) {
+        if (cursor.AtEnd()) {
+            cursor.Reject(JsonError.UnterminatedText);
+            return "";
+        }
+
+        byte c = cursor.Text.ByteAt(cursor.At);
+
+        if (c == (byte)'"') {
+            if (cursor.At > run) {
+                text.Append(cursor.Text.Substring(run, cursor.At - run));
+            }
+            cursor.Skip();
+            return text.ToText();
+        }
+
+        if (c != (byte)'\\') {
+            cursor.Skip();
+            continue;
+        }
+
+        if (cursor.At > run) {
+            text.Append(cursor.Text.Substring(run, cursor.At - run));
+        }
+
+        cursor.Skip();
+        if (cursor.AtEnd()) {
+            cursor.Reject(JsonError.UnterminatedText);
+            return "";
+        }
+
+        byte escape = cursor.Text.ByteAt(cursor.At);
+        cursor.Skip();
+
+        if (escape == (byte)'"') { text.Append("\""); }
+        else if (escape == (byte)'\\') { text.Append("\\"); }
+        else if (escape == (byte)'/') { text.Append("/"); }
+        else if (escape == (byte)'b') { text.Append(Text.FromChar((char32)8u)); }
+        else if (escape == (byte)'f') { text.Append(Text.FromChar((char32)12u)); }
+        else if (escape == (byte)'n') { text.Append("\n"); }
+        else if (escape == (byte)'r') { text.Append("\r"); }
+        else if (escape == (byte)'t') { text.Append("\t"); }
+        else if (escape == (byte)'u') {
+            uint first = ParseHex4(cursor);
+            if (cursor.Failed()) { return ""; }
+
+            uint scalar = first;
+
+            // A high surrogate is half a character; the low half follows it as
+            // a second \u, and together they are one code point.
+            if (first >= 0xD800u && first <= 0xDBFFu) {
+                if (cursor.At + 1u < cursor.Text.ByteLength() &&
+                    cursor.Text.ByteAt(cursor.At) == (byte)'\\' &&
+                    cursor.Text.ByteAt(cursor.At + 1u) == (byte)'u') {
+                    cursor.At = cursor.At + 2u;
+                    uint second = ParseHex4(cursor);
+                    if (cursor.Failed()) { return ""; }
+
+                    if (second >= 0xDC00u && second <= 0xDFFFu) {
+                        scalar = (uint)(0x10000u + ((first - 0xD800u) << 10) + (second - 0xDC00u));
+                    } else {
+                        scalar = 0xFFFDu;
+                    }
+                } else {
+                    scalar = 0xFFFDu;
+                }
+            } else if (first >= 0xDC00u && first <= 0xDFFFu) {
+                scalar = 0xFFFDu;
+            }
+
+            text.Append(Text.FromChar((char32)scalar));
+        } else {
+            cursor.Reject(JsonError.BadEscape);
+            return "";
+        }
+
+        run = cursor.At;
+    }
+}
+
+uint ParseHex4(Cursor cursor) {
+    uint value = 0u;
+
+    for (nuint i = 0u; i < 4u; i = i + 1u) {
+        if (cursor.AtEnd()) {
+            cursor.Reject(JsonError.BadEscape);
+            return 0u;
+        }
+
+        byte c = cursor.Text.ByteAt(cursor.At);
+        uint digit = 0u;
+
+        if (c >= (byte)'0' && c <= (byte)'9') { digit = (uint)(c - (byte)'0'); }
+        else if (c >= (byte)'a' && c <= (byte)'f') { digit = (uint)(c - (byte)'a' + 10); }
+        else if (c >= (byte)'A' && c <= (byte)'F') { digit = (uint)(c - (byte)'A' + 10); }
+        else {
+            cursor.Reject(JsonError.BadEscape);
+            return 0u;
+        }
+
+        value = (value << 4) + digit;
+        cursor.Skip();
+    }
+
+    return value;
+}
+
+/// A JSON number, which is stricter than what a C parser accepts: no leading
+/// `+`, no leading zero, no hex, and a `.` needs a digit on both sides.
+JsonValue ParseNumber(Cursor cursor) {
+    nuint start = cursor.At;
+
+    if (cursor.Peek() == (byte)'-') { cursor.At = cursor.At + 1u; }
+
+    nuint digits = cursor.At;
+    while (!cursor.AtEnd() && IsDigit(cursor.Text.ByteAt(cursor.At))) {
+        cursor.Skip();
+    }
+
+    if (cursor.At == digits) {
+        cursor.Reject(JsonError.BadNumber);
+        return JsonValue.Null;
+    }
+
+    // A leading zero may only be the whole of the integer part.
+    if (cursor.Text.ByteAt(digits) == (byte)'0' && cursor.At - digits > 1u) {
+        cursor.Reject(JsonError.BadNumber);
+        return JsonValue.Null;
+    }
+
+    if (!cursor.AtEnd() && cursor.Text.ByteAt(cursor.At) == (byte)'.') {
+        cursor.Skip();
+        nuint fraction = cursor.At;
+
+        while (!cursor.AtEnd() && IsDigit(cursor.Text.ByteAt(cursor.At))) {
+            cursor.Skip();
+        }
+
+        if (cursor.At == fraction) {
+            cursor.Reject(JsonError.BadNumber);
+            return JsonValue.Null;
+        }
+    }
+
+    if (!cursor.AtEnd()) {
+        byte e = cursor.Text.ByteAt(cursor.At);
+        if (e == (byte)'e' || e == (byte)'E') {
+            cursor.Skip();
+
+            if (!cursor.AtEnd()) {
+                byte sign = cursor.Text.ByteAt(cursor.At);
+                if (sign == (byte)'+' || sign == (byte)'-') { cursor.At = cursor.At + 1u; }
+            }
+
+            nuint exponent = cursor.At;
+            while (!cursor.AtEnd() && IsDigit(cursor.Text.ByteAt(cursor.At))) {
+                cursor.Skip();
+            }
+
+            if (cursor.At == exponent) {
+                cursor.Reject(JsonError.BadNumber);
+                return JsonValue.Null;
+            }
+        }
+    }
+
+    var text = cursor.Text.Substring(start, cursor.At - start);
+    var parsed = Convert.ToDouble(text);
+
+    if (!parsed.Ok) {
+        cursor.Reject(JsonError.BadNumber);
+        return JsonValue.Null;
+    }
+
+    return JsonValue.Number(parsed.Value);
+}
+
+bool IsDigit(byte c) { return c >= (byte)'0' && c <= (byte)'9'; }
+
+JsonValue ParseLiteral(Cursor cursor) {
+    if (Matches(cursor, "true")) { return JsonValue.Bool(true); }
+    if (Matches(cursor, "false")) { return JsonValue.Bool(false); }
+    if (Matches(cursor, "null")) { return JsonValue.Null; }
+
+    cursor.Reject(JsonError.BadLiteral);
+    return JsonValue.Null;
+}
+
+bool Matches(Cursor cursor, String word) {
+    if (cursor.At + word.ByteLength() > cursor.Text.ByteLength()) { return false; }
+
+    for (nuint i = 0u; i < word.ByteLength(); i = i + 1u) {
+        if (cursor.Text.ByteAt(cursor.At + i) != word.ByteAt(i)) { return false; }
+    }
+
+    cursor.At = cursor.At + word.ByteLength();
+    return true;
+}
+
+/// Reads a whole document. Trailing content is an error rather than ignored,
+/// because a document with a second value in it is a document the writer meant
+/// something else by.
+public Result<JsonValue, JsonError> Parse(String text) {
+    var cursor = new Cursor(text);
+
+    var value = ParseValue(cursor);
+    if (cursor.Failed()) { return Fail(cursor.Failure); }
+
+    SkipSpace(cursor);
+    if (!cursor.AtEnd()) { return Fail(JsonError.TrailingContent); }
+
+    return Ok(value);
+}
+
+// ------------------------------------------------------------------ writing
+
+/// The document as text, on one line.
+public String Write(JsonValue value) {
+    var text = new StringBuilder();
+    WriteInto(text, value, 0u, false);
+    return text.ToText();
+}
+
+/// The document as text, indented two spaces a level.
+public String WriteIndented(JsonValue value) {
+    var text = new StringBuilder();
+    WriteInto(text, value, 0u, true);
+    return text.ToText();
+}
+
+void Newline(StringBuilder text, nuint depth) {
+    text.Append("\n");
+    for (nuint i = 0u; i < depth; i = i + 1u) { text.Append("  "); }
+}
+
+void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty) {
+    switch (value) {
+        case Null:
+            text.Append("null");
+            break;
+
+        case Bool flag:
+            text.Append(flag.Value ? "true" : "false");
+            break;
+
+        case Number number:
+            WriteNumber(text, number.Value);
+            break;
+
+        case Text held:
+            WriteText(text, held.Value);
+            break;
+
+        case Array array:
+            if (array.Items.Count() == 0u) {
+                text.Append("[]");
+                break;
+            }
+
+            text.Append("[");
+            for (nuint i = 0u; i < array.Items.Count(); i = i + 1u) {
+                if (i > 0u) { text.Append(","); }
+                if (pretty) { Newline(text, depth + 1u); }
+                WriteInto(text, array.Items.At(i), depth + 1u, pretty);
+            }
+            if (pretty) { Newline(text, depth); }
+            text.Append("]");
+            break;
+
+        case Object object:
+            if (object.Members.Count() == 0u) {
+                text.Append("{}");
+                break;
+            }
+
+            text.Append("{");
+            for (nuint i = 0u; i < object.Members.Count(); i = i + 1u) {
+                if (i > 0u) { text.Append(","); }
+                if (pretty) { Newline(text, depth + 1u); }
+
+                WriteText(text, object.Members.NameAt(i));
+                text.Append(pretty ? ": " : ":");
+                WriteInto(text, object.Members.ValueAt(i), depth + 1u, pretty);
+            }
+            if (pretty) { Newline(text, depth); }
+            text.Append("}");
+            break;
+    }
+}
+
+/// A number, without the trailing `.0` a float formatter would add: JSON has
+/// one numeric type, and a reader that wanted an integer should get one back.
+void WriteNumber(StringBuilder text, double value) {
+    // A whole number small enough to be exact as a double is written as one.
+    if (value == (double)(long)value &&
+        value >= -9007199254740992.0 && value <= 9007199254740992.0) {
+        text.AppendInteger((long)value);
+        return;
+    }
+
+    text.AppendDouble(value);
+}
+
+/// A quoted string with everything JSON requires escaped, and nothing else.
+///
+/// The control characters below 0x20 must be escaped; `"` and `\` must be;
+/// everything above is UTF-8 and passes through, because a JSON document is
+/// UTF-8 and a `String` already is.
+void WriteText(StringBuilder text, String value) {
+    text.Append("\"");
+
+    // As in the reader: the stretch that needs nothing done to it is appended
+    // whole, and only an escape interrupts.
+    nuint run = 0u;
+
+    for (nuint i = 0u; i < value.ByteLength(); i = i + 1u) {
+        byte c = value.ByteAt(i);
+
+        String escaped = "";
+
+        if (c == (byte)'"') { escaped = "\\\""; }
+        else if (c == (byte)'\\') { escaped = "\\\\"; }
+        else if (c == 8u) { escaped = "\\b"; }
+        else if (c == 12u) { escaped = "\\f"; }
+        else if (c == 10u) { escaped = "\\n"; }
+        else if (c == 13u) { escaped = "\\r"; }
+        else if (c == 9u) { escaped = "\\t"; }
+        else if (c < 32u) { escaped = "\\u00" + Nibble((byte)(c >> 4)) + Nibble((byte)(c & 15u)); }
+        else { continue; }
+
+        if (i > run) { text.Append(value.Substring(run, i - run)); }
+        text.Append(escaped);
+        run = i + 1u;
+    }
+
+    if (value.ByteLength() > run) {
+        text.Append(value.Substring(run, value.ByteLength() - run));
+    }
+
+    text.Append("\"");
+}
+
+/// One hex digit, for the `\u00XX` a control character is written as.
+String Nibble(byte value) {
+    if (value < 10u) { return Text.FromChar((char32)((uint)value + 48u)); }
+    return Text.FromChar((char32)((uint)value - 10u + 97u));
+}
+
+// ------------------------------------------------------- mapping onto a type
+
+// The two attributes a field may carry. They are declared here so that a
+// program writing `[JsonName("id")]` needs nothing but this import.
+
+/// The name this field has in the document, when it differs from the field's.
+public attribute JsonName { String Name; }
+
+/// Leaves the field out of the document entirely, in both directions.
+public attribute JsonIgnore { }
+
+/// The document a value would produce, as a `JsonValue`.
+///
+/// Reads the field tables of `[Reflect] T`, walking into a nested class or
+/// struct rather than stopping at it. A field of a kind with no JSON spelling
+/// -- a pointer, a delegate, an array -- is left out rather than guessed at.
+public JsonValue ToValue<T>(T value) {
+    return ValueOfInstance((byte*)value, typeof(T));
+}
+
+/// The document as text.
+public String Serialize<T>(T value) { return Write(ToValue(value)); }
+
+/// The same, indented.
+public String SerializeIndented<T>(T value) { return WriteIndented(ToValue(value)); }
+
+JsonValue ValueOfInstance(byte* instance, Type type) {
+    if (instance == null) { return JsonValue.Null; }
+
+    var members = new JsonObject();
+
+    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+        var field = type.FieldAt(i);
+        if (field.Has("JsonIgnore")) { continue; }
+
+        // A field with no JSON spelling is left out rather than written as
+        // something it is not. See `Represents` for which those are and why.
+        if (!Represents(field)) { continue; }
+
+        members.Add(NameOf(field), ValueOfField(instance, field));
+    }
+
+    return JsonValue.Object(members);
+}
+
+/// Whether this module can write a field, and read it back as what it was.
+///
+/// A number, a bool, a String and a `[Reflect]` object are the whole of it.
+/// **An array or a collection is not**, and that is a gap rather than a
+/// decision: the field tables record that a field is an array and nothing
+/// about its elements, and a `List<T>` is a class whose own fields are its
+/// private storage. Neither can be walked without element metadata the
+/// compiler does not emit yet.
+///
+/// Leaving such a field out is the least wrong of the three answers. Writing
+/// `null` says the value was absent when it was not, and walking a `List`
+/// writes `{}` for a list with things in it -- both of which a reader would
+/// believe.
+bool Represents(Field field) {
+    if (field.IsSimple()) { return true; }
+    return field.IsWalkable();
+}
+
+String NameOf(Field field) {
+    if (field.Has("JsonName")) { return field.Get("JsonName").AsText(0u); }
+    return field.Name();
+}
+
+JsonValue ValueOfField(byte* instance, Field field) {
+    int kind = field.Kind();
+
+    if (kind == KindString) { return JsonValue.Text(Reflection.ReadText(instance, field)); }
+    if (kind == KindBool) { return JsonValue.Bool(Reflection.ReadBool(instance, field)); }
+    if (field.IsFloating()) { return JsonValue.Number(Reflection.ReadDouble(instance, field)); }
+    if (field.IsInteger()) { return NumberOf(Reflection.ReadInteger(instance, field)); }
+
+    if (field.IsWalkable()) {
+        byte* nested = Reflection.ReadAggregate(instance, field);
+        return ValueOfInstance(nested, field.TypeOf());
+    }
+
+    return JsonValue.Null;
+}
+
+/// Fills an object's fields from a document.
+///
+/// The object is the program's, made the ordinary way, so its constructor has
+/// already run and its invariants already hold. A field the document does not
+/// mention is left alone, which is what makes this safe: the value that stays
+/// is the one the constructor chose.
+///
+/// A nested object is filled in place and never replaced, for the same reason.
+/// A document naming a nested object the constructor left null is skipped
+/// rather than allocated into, since nothing here could give the rest of that
+/// object's fields a value.
+public JsonError Populate<T>(T value, String text) {
+    var parsed = Parse(text);
+    if (!parsed.Ok) { return parsed.Error; }
+
+    return PopulateFrom(value, parsed.Value);
+}
+
+/// The same, from a document already parsed.
+public JsonError PopulateFrom<T>(T value, JsonValue document) {
+    var type = typeof(T);
+    if (type.FieldCount() == 0u) { return JsonError.NotReflected; }
+
+    switch (document) {
+        case Object held:
+            FillInstance((byte*)value, type, held.Members);
+            return JsonError.None;
+        default:
+            return JsonError.NotAnObject;
+    }
+}
+
+// There is no `Deserialize<T>(String)` returning a fresh `T`, and it is worth
+// saying why rather than leaving the gap to be noticed. A type argument cannot
+// be written at a call (§4.4) -- `<` in expression position is ambiguous with
+// less-than -- so a function whose only mention of `T` is its return type has
+// nothing to infer from and could never be called. `Populate` takes the object
+// instead, which is the shape that works and also the safer one: the
+// constructor has run.
+
+void FillInstance(byte* instance, Type type, JsonObject members) {
+    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+        var field = type.FieldAt(i);
+        if (field.Has("JsonIgnore")) { continue; }
+
+        if (!Represents(field)) { continue; }
+
+        var at = members.IndexOf(NameOf(field));
+        if (at == Missing) { continue; }
+
+        FillField(instance, field, members.ValueAt(at));
+    }
+}
+
+void FillField(byte* instance, Field field, JsonValue value) {
+    int kind = field.Kind();
+
+    if (kind == KindString) {
+        switch (value) {
+            case Text held: Reflection.WriteText(instance, field, held.Value); break;
+            default: break;
+        }
+        return;
+    }
+
+    if (kind == KindBool) {
+        switch (value) {
+            case Bool held: Reflection.WriteBool(instance, field, held.Value); break;
+            default: break;
+        }
+        return;
+    }
+
+    if (field.IsFloating()) {
+        switch (value) {
+            case Number held: Reflection.WriteDouble(instance, field, held.Value); break;
+            default: break;
+        }
+        return;
+    }
+
+    if (field.IsInteger()) {
+        switch (value) {
+            case Number held: Reflection.WriteInteger(instance, field, (long)held.Value); break;
+            default: break;
+        }
+        return;
+    }
+
+    if (field.IsWalkable()) {
+        byte* nested = Reflection.ReadAggregate(instance, field);
+        if (nested == null) { return; }
+
+        switch (value) {
+            case Object held: FillInstance(nested, field.TypeOf(), held.Members); break;
+            default: break;
+        }
+    }
+}

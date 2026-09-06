@@ -2695,6 +2695,68 @@ operating system — the narrow CRT entry points would read those bytes in the
 active code page, which works by accident for ASCII and fails for everything
 else.
 
+### 5.12 `Standard.Json` and `Standard.Xml`
+
+Both have the same two layers, and the split is the point.
+
+**A document, which needs no type.** `Json.Parse` gives a `JsonValue` — a
+variant that is exactly one of the six things JSON has — and `Xml.Parse` gives
+an `XmlNode`. Reading the wrong case is a compile error rather than a null:
+
+```csharp
+var parsed = try Json.Parse(text);
+
+switch (parsed) {
+    case Object held: Console.WriteLine(Json.TextOr(held.Members.Find("name"), "?")); break;
+    default: break;
+}
+```
+
+**A mapping onto a type**, through the field tables of a `[Reflect]` type
+(§6). `Json.Serialize(value)` reads an object's fields and `Json.Populate`
+writes them, walking into a nested object rather than stopping at it.
+`[JsonName("id")]` renames a field and `[JsonIgnore]` leaves it out; XML has
+`[XmlName]`, `[XmlIgnore]` and `[XmlAttribute]`, which writes a field as an
+attribute rather than as a child element.
+
+**Reading fills an object rather than making one**, and that is the design
+rather than a limitation:
+
+```csharp
+var settings = new Settings();          // the constructor establishes the type
+Json.Populate(settings, text);          // the document overwrites what it names
+```
+
+A constructor is what makes a type's invariants true. A deserializer that
+allocated zeroed memory would hand back an object whose non-nullable fields
+were null — a hole in the type system rather than a value — so the object comes
+from the program and a field the document does not mention keeps what the
+constructor chose. It is also why there is no `Deserialize<T>(text)` returning
+a fresh `T`: a type argument cannot be written at a call (§4.4), so a function
+whose only mention of `T` is its return type could never be called.
+
+A value whose JSON type does not fit its field is **skipped**, not converted:
+`{"Years": "40"}` leaves `Years` alone. Guessing at a conversion is how a
+document silently becomes a different one.
+
+**Arrays and collections are left out**, and this is the mapping's real limit.
+A field of type `T[]` is reported as an array and nothing describes its
+elements; a `List<T>` is a class whose own fields are its private storage, so
+walking it finds nothing. Both are omitted from the document rather than
+written as `null` and `{}` — which is what a reader would have believed. A
+type with a collection in it wants the document layer, where a `JsonValue` says
+exactly what is there. Closing this needs element metadata in the field tables
+(§6.7).
+
+**What XML reads**: elements, attributes, text, CDATA, comments, the five
+predefined entities and numeric character references, and a declaration or
+doctype at the front. **What it does not**: namespaces are not resolved, so
+`<x:name>` is an element whose name is all of `x:name`; and a DTD is skipped
+rather than applied, so an entity a document declares for itself is an error
+rather than a silent nothing. An `XmlNode`'s text is every character run inside
+it joined, which suits the data XML mostly carries and is the wrong model for
+mixed content.
+
 ### 5.10 Interfaces may extend interfaces
 
 ```csharp
@@ -2813,13 +2875,53 @@ read-only data and is shared, never allocated. See [abi.md](abi.md).
 A struct has no object header, so its metadata is reachable only through
 `typeof`, never from an instance.
 
-### 6.6 What is not there yet
+### 6.6 Writing a field
 
-- **No writing.** Fields can be read, not set, so a deserializer cannot be
-  written yet.
-- **No construction.** There is no way to make an instance from a `Type`.
+Reading tells you what an object holds; writing is what a deserializer needs,
+and the two are symmetric:
+
+```csharp
+byte* raw = (byte*)person;
+var type = typeof(Person);
+
+Reflection.WriteText(raw, type.FindField("Name"), "Ada Lovelace");
+Reflection.WriteInteger(raw, type.FindField("Years"), 36);
+```
+
+Each writer **narrows to the field's own width**, so a value too large for it
+wraps there rather than reaching the field beside it — C's rule for an
+assignment of the same shape, and the only one that cannot corrupt an object
+silently. A writer whose kind does not match the field does nothing.
+
+`WriteText` releases what the field held and retains what replaces it, which is
+why it is a runtime call rather than a store: ownership is the runtime's job,
+and the four lines that do it live in one place. The bytes cross rather than
+the `String`, so no counted reference is ever in the ABI — the same bargain
+`ReadText` makes coming back.
+
+**A nested object is reached rather than copied.** `Field.TypeOf()` is the type
+of what a field holds and `ReadAggregate` is its address, so a walk continues
+into a class or a struct without either being typed:
+
+```csharp
+var field = type.FindField("Where");
+byte* nested = Reflection.ReadAggregate(raw, field);
+Reflection.WriteText(nested, field.TypeOf().FindField("City"), "London");
+```
+
+`Reflection.Make(type)` allocates a zeroed instance, for a reader that has a
+type and no constructor to call. **Every reference field starts null**,
+including one whose type says it cannot be — so what comes back is safe to fill
+and unsafe to hand out until it has been. `Standard.Json` does not use it, and
+§5.12 says why.
+
+### 6.7 What is not there yet
+
 - **No method or interface metadata** — fields only.
 - **No enumeration of types**: `typeof` needs the type named at compile time.
+- **No array or collection element metadata.** A field of type `T[]` is
+  reported as `KindArray` and nothing describes its elements, so a serializer
+  cannot walk one.
 
 ## 7. Functions and members
 

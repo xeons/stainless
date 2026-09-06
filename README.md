@@ -903,7 +903,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 216 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 218 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 561 compiler unit tests
 ```
 
@@ -913,8 +913,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 216 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 206 and Windows 215, each
+**Both Windows and Linux are tested.** 218 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 208 and Windows 217, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1434,6 +1434,16 @@ Everything below is covered by [the test suite](tests/cases).
   Lossy by default, because `GetString` returns a `String` and a `String` is
   valid UTF-8 by invariant; `TryGetString` is the strict form and refuses an
   overlong sequence as well as a malformed one. `Detect` reads a byte order mark
+- `Standard.Json` and `Standard.Xml`: each in two layers. A document that needs
+  no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
+  the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping
+  onto a `[Reflect]` type, where `Serialize` reads an object's fields and
+  `Populate` writes them. Reading fills an object the program made rather than
+  allocating one, so a constructor has established the type's invariants before
+  a single field is overwritten, and a field the document does not mention keeps
+  what the constructor chose. Arrays and collections are left out of the
+  mapping: the field tables record that a field is an array and nothing about
+  its elements, so a type holding one wants the document layer
 - `Standard.Convert`: base64 and base64url, hex, and integer and floating-point
   parsing in any radix from 2 to 36. Everything that can fail returns a
   `Result`, because there is no exception to throw and no `out` to fill
@@ -1558,9 +1568,10 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
   about, so the same name and parameters means `override` or nothing (SL0503).
-- **Reflection reads but does not write.** Fields can be read from an instance,
-  not set, so a deserializer cannot be written yet; nor can an instance be made
-  from a `Type`. Methods and interfaces carry no metadata — fields only.
+- **Reflection describes fields and nothing else.** Methods and interfaces
+  carry no metadata, `typeof` needs the type named at compile time, and a field
+  of type `T[]` says only that it is an array — nothing describes its elements,
+  so a serializer cannot walk one.
 - **An interface method may not be overloaded.** Dispatch gives each one a
   single slot, so two of a name in one interface would be a call the receiver
   could not resolve. Methods on classes and structs overload freely, and a
