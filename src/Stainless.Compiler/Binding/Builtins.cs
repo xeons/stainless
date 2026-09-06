@@ -237,13 +237,11 @@ public sealed class Builtins
         Method(StringBuilder, "AppendDouble", PrimitiveTypeSymbol.Void,
             "sl_string_builder_append_double", ("value", PrimitiveTypeSymbol.Double));
 
-        // One byte and one character. A scanner appending what it just looked
-        // at had to go through Text.FromChar and allocate a String per
-        // character, which is what these are here to stop.
+        // One byte. A scanner appending what it just looked at had to build a
+        // one-element array to call AppendBytes with. A whole code point was
+        // already `AppendCodePoint`, in Text.sl.
         Method(StringBuilder, "AppendByte", PrimitiveTypeSymbol.Void,
             "sl_string_builder_append_byte", ("value", PrimitiveTypeSymbol.Byte));
-        Method(StringBuilder, "AppendChar", PrimitiveTypeSymbol.Void,
-            "sl_string_builder_append_char", ("value", PrimitiveTypeSymbol.Char32));
         Method(StringBuilder, "ByteLength", PrimitiveTypeSymbol.NUInt,
             "sl_string_builder_byte_length");
         Method(StringBuilder, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_builder_is_empty");

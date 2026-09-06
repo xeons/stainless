@@ -1150,6 +1150,41 @@ It binds like any other prefix, so `try a + b` is `(try a) + b` and
 `try f().x` covers the whole chain. It is an expression, so several may appear
 in one -- `Ok(try P(a) + try P(b))` -- and each returns on its own failure.
 
+#### 2.8.1 `Option<T>` — a value, or none
+
+`C?` is a nullable reference: the null is the pointer, so it costs nothing and
+the compiler narrows it (§2.5). A **value type has no spare bit to be null
+with**, so `nuint?` is refused (SL0271), and what used to stand in was a magic
+number — a lookup answering with the largest `nuint` there is, and every caller
+agreeing to read that as "not there".
+
+`Option<T>` is that said properly, and it is an ordinary variant:
+
+```csharp
+public variant Option<T> {
+    None;
+    Some(T Value);
+}
+```
+
+So it costs a tag beside the value and nothing else, the payload is readable
+only where the case has been established, and every rule it appears to have is
+a rule variants have:
+
+```csharp
+if (found.Some) { return values.At(found.Value); }
+return fallback;
+```
+
+`HasValue()` and `ValueOr(fallback)` are there for the two readers that need no
+proof because they supply their own.
+
+**It is not a replacement for `C?`.** A nullable reference stays what it is —
+the representation is already free there, and `if (c != null)` narrows without
+a case to name. Two representations behind one `?` was the alternative, and it
+would have meant `T?` being a pointer for a class and a tagged pair for a
+value, across layout, mangling and the ABI classifier.
+
 ### 2.9 How the library reports failure
 
 Two conventions, and the difference between them is whether there is a value.
@@ -1747,7 +1782,7 @@ produces a `String` whether the program asked for one or not. It also provides
 plus `StringBuilder`.
 
 `StringBuilder` appends (`Append`, `AppendLine`, `AppendInteger`,
-`AppendDouble`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
+`AppendDouble`, `AppendByte`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
 `Contains`) and edits (`Insert`, `Remove`, `Truncate`, `SetByteAt`,
 `ReplaceFirst`, `ReplaceAll`). Unlike `String` it hands out no pointer: its
 bytes are a growable allocation that moves, so a `byte*` into it would dangle at
@@ -2428,9 +2463,20 @@ for (nint at = line.First(); at >= 0; at = line.After(at)) {
 }
 ```
 
+`OrderedDictionary<K, V>` keeps the order its keys were added in and finds one
+by scanning rather than hashing. That is the whole difference from
+`Dictionary`, and it is the right trade wherever the order is part of the data
+— a parsed document read back the way it was written, a configuration a person
+edits. It is a scan, so it is for the sizes documents actually are; something
+large enough for O(n) lookup to hurt wants a `Dictionary` beside it as an
+index. `Standard.Json`'s object members and `Standard.Xml`'s attributes are
+both one of these.
+
 Asking a container for something it does not have — `Get` with an absent key,
 `Dequeue` on an empty queue — aborts, the same way an out-of-range index does.
 Use `GetOr`, `ContainsKey` or `IsEmpty` where a miss is an ordinary outcome.
+`OrderedDictionary.IndexOf` answers with an `Option<nuint>` (§2.8.1), which is
+the one that needs no rule to be remembered.
 
 Alongside the containers are `Largest`, `Smallest`, `IndexOf` and `Sort`, each
 constrained to what it actually needs:

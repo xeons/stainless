@@ -903,7 +903,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 219 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 220 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 561 compiler unit tests
 ```
 
@@ -913,8 +913,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 219 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 209 and Windows 218, each
+**Both Windows and Linux are tested.** 220 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 210 and Windows 219, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1447,7 +1447,9 @@ Everything below is covered by [the test suite](tests/cases).
 - `Option<T>`, a variant in `Standard`: a value or none, for the types `T?`
   cannot describe. `C?` is a nullable reference and costs nothing, but a value
   type has no spare bit to be null with — so `nuint?` is refused and this is
-  what `IndexOf` answers with instead of a magic number
+  what `IndexOf` answers with instead of a magic number. Not a second meaning
+  for `?`: a pointer for a class and a tagged pair for a value would have been
+  two representations behind one spelling
 - `OrderedDictionary<K, V>`: a dictionary that keeps the order its keys were
   added in, found by scanning rather than hashing. For wherever the order is
   part of the data — a parsed document read back the way it was written — and

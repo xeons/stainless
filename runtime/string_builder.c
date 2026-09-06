@@ -191,10 +191,3 @@ void sl_string_builder_append_byte(void *pointer, uint8_t value)
     sl_string_builder_append_bytes(pointer, &value, 1);
 }
 
-/* One code point, encoded. */
-void sl_string_builder_append_char(void *pointer, uint32_t codePoint)
-{
-    uint8_t bytes[4];
-    size_t  length = sl_utf8_encode(codePoint, bytes);
-    sl_string_builder_append_bytes(pointer, bytes, length);
-}

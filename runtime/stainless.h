@@ -515,7 +515,6 @@ SL_API void  *sl_string_builder_new(void);
 SL_API void   sl_string_builder_append(void *pointer, void *stringPointer);
 SL_API void   sl_string_builder_append_line(void *pointer, void *stringPointer);
 SL_API void   sl_string_builder_append_byte(void *builder, uint8_t value);
-SL_API void   sl_string_builder_append_char(void *builder, uint32_t codePoint);
 SL_API void   sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t byteLength);
 SL_API void   sl_string_builder_append_integer(void *pointer, long long value);
 SL_API void   sl_string_builder_append_double(void *pointer, double value);

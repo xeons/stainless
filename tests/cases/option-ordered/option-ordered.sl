@@ -106,19 +106,19 @@ public int Main() {
     var text = new StringBuilder();
     text.AppendByte((byte)'a');
     text.AppendByte((byte)'b');
-    text.AppendChar('c');
+    text.AppendCodePoint('c');
 
     // A character above ASCII is more than one byte, which is the whole
-    // reason AppendChar is not AppendByte.
-    text.AppendChar((char32)0x1F600u);
-    text.AppendChar((char32)0xE9u);
+    // reason AppendCodePoint is not AppendByte.
+    text.AppendCodePoint((char32)0x1F600u);
+    text.AppendCodePoint((char32)0xE9u);
 
     Say("appended-text", text.ToText());
     Say("appended-bytes", Text.FromInteger((long)text.ByteLength()));
 
     // Anything that is not a scalar becomes U+FFFD, as everywhere else.
     var bad = new StringBuilder();
-    bad.AppendChar((char32)0xD800u);
+    bad.AppendCodePoint((char32)0xD800u);
     Say("lone-surrogate", bad.ToText());
 
     return 0;

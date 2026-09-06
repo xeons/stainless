@@ -1,0 +1,4 @@
+# A primitive, another primitive and a struct: none of them can be null.
+SL0271
+SL0271
+SL0271
