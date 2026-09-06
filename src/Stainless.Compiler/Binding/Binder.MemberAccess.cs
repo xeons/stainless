@@ -59,6 +59,28 @@ public sealed partial class Binder
             return BindVariantConstruction(variantType, named, [], syntax.Span);
         }
 
+        // `FileStream.Open` without a call is the method itself, waiting for a
+        // delegate to say which overload was meant -- the same thing a bare
+        // function name is.
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } staticOwner &&
+            staticOwner.FindMethods(syntax.Member).ToList() is { Count: > 0 } declared)
+        {
+            var statics = declared.Where(m => m.IsStatic).ToList();
+
+            if (statics.Count > 0)
+                return new BoundFunctionGroup(
+                    syntax.Span, FunctionGroupType.Instance,
+                    $"{staticOwner.SimpleName}.{syntax.Member}", statics);
+
+            if (ResolveModulePrefix(syntax.Target) is null)
+            {
+                diagnostics.Error("SL0576", syntax.Span,
+                    $"'{staticOwner.Name}.{syntax.Member}' is not static, so it needs an " +
+                    "object to be reached through; name one instead of the type");
+                return new BoundErrorExpression(syntax.Span);
+            }
+        }
+
         // `Color.Red` names a constant of an enum type, not a member of a value.
         if (!syntax.ThroughPointer && ResolveEnumPrefix(syntax.Target) is { } enumType)
         {

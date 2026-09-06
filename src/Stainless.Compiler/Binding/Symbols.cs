@@ -94,6 +94,17 @@ public sealed class FunctionSymbol
     public bool IsSealed { get; init; }
 
     /// <summary>
+    /// Declared <c>static</c>: it belongs to the type, not to an instance.
+    ///
+    /// The whole of it is the missing receiver. There is no <c>this</c>
+    /// parameter, so the body cannot reach a field, and a call names the type
+    /// rather than a value. That is what lets a type own the function that
+    /// makes one -- <c>FileStream.Open</c> can report why it failed, where a
+    /// constructor can only leave the object holding nothing.
+    /// </summary>
+    public bool IsStatic { get; init; }
+
+    /// <summary>
     /// Position in the class's vtable, or -1 for a method reached by name.
     ///
     /// Assigned once per class, root downwards, so an override lands in the slot

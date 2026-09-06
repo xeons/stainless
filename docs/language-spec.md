@@ -1166,21 +1166,26 @@ is not expressible, and would say nothing the enum does not.
 **Construction is the awkward case**, because a constructor has to return its
 type and so cannot report why it failed. Every language with checked errors
 answers this with a function -- Rust's `TcpStream::connect`, Go's `net.Dial` --
-and so does this one:
+and so does this one, as a **static method of the type being made** (§7.6):
 
 ```csharp
-var listener = new TcpListener("0.0.0.0", 80u);   // then check IsListening()
-var listener = try Net.Listen("0.0.0.0", 80u);    // or let it propagate
+var listener = try TcpListener.Listen("0.0.0.0", 80u);
 ```
 
-Both exist. The constructor is the shorter path when a caller is going to check
-anyway; the factory's failure cannot be walked past, because a `Result` has no
-value to read until its case has been named. `File.Open`, `Net.Listen`,
-`Net.Connect`, `Net.Bind` and `Net.Datagram` are the factories.
+The constructor is private, and that is what makes this the way in rather than
+merely the recommended way. A static method is inside the type, so it may use a
+constructor nothing outside it can -- which is why the failing shape is gone
+rather than discouraged. There is no way left to obtain a listener that exists
+and is not listening.
 
-`IsOpen()` and `Error()` remain on a stream or a socket either way, for what
-happens *after* it is open: a read on a closed stream is an outcome of the
-read, and there is nowhere else to put it.
+`FileStream.Open`, `Socket.Open`, `TcpListener.Listen`, `TcpClient.Connect`,
+`UdpSocket.Bind` and `UdpSocket.Datagram` are the ones that can fail. Each
+returns a `Result`, whose failure cannot be walked past because it has no value
+to read until its case has been named.
+
+`IsOpen()` and `Error()` remain on a stream or a socket, for what happens
+*after* it is open: a read on a closed stream is an outcome of the read, and
+there is nowhere else to put it.
 
 ### 2.10 `interface` — a contract, dispatched dynamically
 
@@ -2492,13 +2497,19 @@ reads a **monotonic** counter that only goes forward:
 ```csharp
 var clock = new Clock();
 DoTheWork();
-Console.WriteLine(Time.FormatDuration(clock.Elapsed()));
+Console.WriteLine(clock.Elapsed().Format());
 ```
 
 Subtracting two `Instant`s to measure something is the thing not to do, and is
 why the timing type is a separate one. Both are structs over a single `long` of
-nanoseconds, so they cost nothing and compare and subtract as the numbers they
-are.
+nanoseconds, so they cost nothing, and both declare the operators that go with
+that: `hour + minute` is a `Duration`, `later - earlier` is the `Duration`
+between two instants, and `instant + span` is another instant. Adding two
+instants is not defined, because the sum of two dates is not a date.
+
+They are made by naming the unit -- `Duration.FromSeconds(30)`,
+`Instant.FromUtc(...)` -- rather than by a free function, since a bare count of
+nanoseconds at a call site says nothing about which unit was meant.
 
 The UTC calendar is computed rather than delegated to `gmtime`, because the
 platforms disagree about the past: Windows refuses a negative `time_t`, so
@@ -2591,7 +2602,9 @@ else         { Console.WriteError(IO.Describe(read.Error)); }
 
 Stainless has no static classes, so what C# spells `File.ReadAllText` is a
 module-qualified call to a module-level function. That is the mapping
-throughout: a module is the static class.
+throughout: a module is the static class. What lives on a type instead is what
+*makes* one: `FileStream.Open` and its shorthands (§7.6), because a constructor
+cannot report why an open failed.
 
 **How failure is reported.** Stainless does not unwind (§2.8), so the outcome
 comes back as a value, in one of three shapes:
@@ -2612,11 +2625,9 @@ that would rather carry on writes `read.ValueOr("")`.
 implement it.
 
 ```csharp
-var file = File.OpenRead("data.bin");
-if (file.IsOpen()) {
-    var whole = IO.ReadToEnd(file);
-    file.Close();
-}
+var file = try FileStream.OpenRead("data.bin");
+var whole = IO.ReadTextToEnd(file);
+file.Close();
 ```
 
 A `FileStream`'s construction *is* the open, so one always exists and
@@ -3053,6 +3064,63 @@ just the getter for a read-only one.
 
 An indexer is inherited like any other member, and works on a struct -- where
 the setter reaches its receiver by pointer, as every struct method does.
+
+### 7.6 `static` members
+
+A method written `static` belongs to the type rather than to a value of it.
+The whole of the difference is the missing receiver:
+
+```csharp
+public class Small {
+    int value;
+
+    Small(int checked) { value = checked; }        // private
+
+    public static Result<Small, ParseError> Parse(String text) {
+        // ... check, then use the constructor nothing outside can reach
+        return Ok(new Small(total));
+    }
+
+    public int Value() { return value; }
+}
+
+var small = try Small.Parse(text);
+```
+
+There is no `this`, so the body cannot read a field or call a method without
+saying which object it means (SL0228, SL0576). A call names the type; naming a
+value instead is refused, as is naming the type to reach an instance method
+(SL0576). Each of those says which spelling was meant.
+
+Everything else about it is an ordinary method. It overloads by parameters
+alongside the instance methods of the same name -- though two members differing
+only by `static` collide, since the receiver was never part of the signature.
+It may be named without a call, `Type.Name`, and become a delegate. And it may
+use a private constructor, which is what lets a fallible factory close off the
+shape it replaces (§2.9) rather than merely discourage it.
+
+This is also how a **struct** gets a maker at all: a struct has no
+constructors, so before this there was no way to build one in a single
+expression.
+
+What `static` may not be written on:
+
+| | Refused because | |
+|---|---|---|
+| a module-level function | a module has no instance for a function to belong to | SL0573 |
+| an interface member | an interface promises what an *object* can do | SL0574 |
+| `virtual`, `override`, `abstract` | dispatch chooses a body from the object a call arrives on | SL0575 |
+| `protected` | the word is about what a derived object reaches through itself | SL0575 |
+| storage inside a type | a `static readonly` belongs to a module | SL0577 |
+| a type declaration | a module is what this language has instead of a static class | SL0578 |
+
+A static method cannot implement an interface method either, for the reason in
+the table: dispatch arrives on an object, and a static method has nowhere to
+put one.
+
+`static readonly` at module scope is the other thing the word introduces
+(§1). It is unchanged, and must still be `readonly`, because nothing would
+synchronize a mutable global (SL0376).
 
 ## 8. Interoperability and libraries
 

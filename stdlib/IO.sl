@@ -148,18 +148,26 @@ public interface IStream {
 
 /// A stream over a file.
 ///
-/// **Made through `File.Open` and its relatives**, which return a
-/// `Result<FileStream, IOError>`. The constructor is not public, and that is
-/// the point: a stream that exists but holds no file is a value a caller can
-/// use and get nothing from, and nothing forces the check that would have
-/// caught it. A Result cannot be read without saying which case it is.
+/// Made through `FileStream.Open` and its three shorthands, each of which
+/// returns a `Result<FileStream, IOError>`:
 ///
-///     var file = try File.Create("notes.txt");
+///     var file = try FileStream.Create("notes.txt");
+///
+/// The constructor is private, and that is the point. A constructor has to
+/// return its own type, so it cannot say why an open failed -- the best it can
+/// do is hand back a stream holding nothing, which is a value a caller can go
+/// on using while nothing forces the check that would have caught it. A Result
+/// cannot be read without naming which case it is.
+///
+/// The factories are static methods here rather than functions in the module
+/// because that is where a reader looks for how to make one, and because a
+/// static method is inside the type: it can use the private constructor, which
+/// is what lets the failing path be closed off rather than merely discouraged.
 ///
 /// `IsOpen()` remains, because a stream can be closed after it was opened, and
-/// `Error()` remains for a failure that happens during a read or a write --
-/// those are outcomes of an operation rather than of the opening, and there is
-/// nowhere else to put them.
+/// `Error()` remains for a failure during a read or a write -- those are
+/// outcomes of an operation rather than of the opening, and there is nowhere
+/// else to put them.
 ///
 /// Closing is the destructor's job too, so a stream that goes out of scope
 /// releases its handle whether or not `Close` was called.
@@ -169,16 +177,37 @@ public class FileStream : IStream {
     IOError error;
     bool closed;
 
-    // The constructor stays, and `File.Open` sits beside it returning a
-    // Result. A constructor has to return its type, so it cannot report why an
-    // open failed; the pair is what gives a caller both the short path and the
-    // one whose failure cannot be walked past.
-    public FileStream(String path, FileMode mode, FileAccess access) {
+    // Private: the four factories below are the way in, and each of them
+    // reports a failure rather than returning a stream that holds nothing.
+    FileStream(String path, FileMode mode, FileAccess access) {
         int code = 0;
         handle = sl_file_open(path.ToPointer(), (int)mode, (int)access, &code);
         this.access = access;
         error = (IOError)code;
         closed = handle == null;
+    }
+
+    /// Opens a file, or says why it could not be opened.
+    public static Result<FileStream, IOError> Open(
+            String path, FileMode mode, FileAccess access) {
+        var stream = new FileStream(path, mode, access);
+        if (!stream.IsOpen()) { return Fail(stream.Error()); }
+        return Ok(stream);
+    }
+
+    /// Opens an existing file for reading.
+    public static Result<FileStream, IOError> OpenRead(String path) {
+        return Open(path, FileMode.Open, FileAccess.Read);
+    }
+
+    /// Creates the file, or replaces what is there.
+    public static Result<FileStream, IOError> Create(String path) {
+        return Open(path, FileMode.Create, FileAccess.Write);
+    }
+
+    /// Opens for writing at the end, creating the file if it is not there.
+    public static Result<FileStream, IOError> OpenAppend(String path) {
+        return Open(path, FileMode.Append, FileAccess.Write);
     }
 
     ~FileStream() { Close(); }

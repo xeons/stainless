@@ -402,7 +402,11 @@ public sealed partial class Binder
         if (parameter is null)
         {
             diagnostics.Error("SL0228", syntax.Span,
-                "'this' is only valid inside a method, constructor or destructor");
+                _currentFunction is { IsStatic: true } enclosing
+                    ? $"'{enclosing.Name}' is static, so there is no 'this': it belongs to " +
+                      $"'{enclosing.ContainingType!.Name}' rather than to one of them. Take " +
+                      "the object as a parameter, or drop the 'static'"
+                    : "'this' is only valid inside a method, constructor or destructor");
             return new BoundErrorExpression(syntax.Span);
         }
         return Receiver(syntax.Span, parameter);
@@ -564,6 +568,19 @@ public sealed partial class Binder
                 return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
             // An unqualified member name inside a method means `this.member`.
+            // A static method has no `this`, and saying so here is worth more
+            // than letting the name fall through to "is not defined".
+            if (_currentFunction is { IsStatic: true } inStatic &&
+                (inStatic.ContainingType!.FindProperty(name) is not null ||
+                 inStatic.ContainingType.FindField(name) is not null))
+            {
+                diagnostics.Error("SL0576", syntax.Span,
+                    $"'{name}' belongs to an instance of '{inStatic.ContainingType.Name}', and " +
+                    $"'{inStatic.Name}' is static, so there is no instance here. Take one as a " +
+                    "parameter, or drop the 'static'");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
             if (_currentFunction?.ContainingType?.FindProperty(name) is { } ownProperty)
             {
                 var receiver = BindImplicitThis(syntax.Span);

@@ -128,7 +128,7 @@ int Main() {
     // Opening is a Result, so there is no stream to go on using until the
     // success case has been named. That is the whole difference from the
     // `IsOpen()` latch this replaced: the check cannot be walked past.
-    var opened = File.OpenRead(notes);
+    var opened = FileStream.OpenRead(notes);
     printf("open-ok=%d\n", opened.Ok ? 1 : 0);
 
     if (opened.Ok) {
@@ -157,12 +157,12 @@ int Main() {
 
     // Opening something that is not there is a failure carrying its reason,
     // and there is no half-made stream to hand back.
-    var absent = File.OpenRead(Path.Join(root, "nope.txt"));
+    var absent = FileStream.OpenRead(Path.Join(root, "nope.txt"));
     printf("absent-open=%d\n", absent.Ok ? 1 : 0);
     if (!absent.Ok) { printf("absent-why=%s\n", IO.Describe(absent.Error).ToPointer()); }
 
     // Writing through a stream, then reading it back.
-    var made = File.Create(Path.Join(root, "stream.txt"));
+    var made = FileStream.Create(Path.Join(root, "stream.txt"));
     if (made.Ok) {
         made.Value.WriteText("via a stream");
         made.Value.Close();

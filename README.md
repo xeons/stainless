@@ -223,9 +223,10 @@ and there are no exceptions here to confuse it with.
 The library reports failure two ways, and the difference is whether there is a
 value: `Result<T, E>` when there is one, the error enum when there is not.
 Construction is the awkward case, since a constructor must return its type and
-cannot say why it failed -- so `File.Open`, `Net.Listen` and `Net.Connect` sit
-beside the constructors and return a `Result` whose failure cannot be walked
-past.
+cannot say why it failed. So `FileStream.Open`, `TcpListener.Listen` and
+`TcpClient.Connect` are static methods of the types they make, each returning a
+`Result`, and the constructors they replace are private -- a static method is
+inside the type, so it can reach one nothing outside can.
 
 ### Text
 
@@ -501,6 +502,33 @@ public int Fahrenheit {
     set { celsius = (value - 32) * 5 / 9; }
 }
 ```
+
+### Static methods
+
+```csharp
+public class Small {
+    int value;
+
+    Small(int checked) { value = checked; }        // private
+
+    public static Result<Small, ParseError> Parse(String text) { ... }
+}
+
+var small = try Small.Parse(text);
+```
+
+A member of the type rather than of a value of it. The whole of the difference
+is the missing receiver: no `this`, so no field is reachable without saying
+which object is meant, and a call names the type.
+
+It exists for the case above. A constructor has to return its own type, so it
+cannot say why it failed, and the best it could do was hand back an object
+holding nothing -- which is a value a caller can go on using while nothing
+forces the check. A static method is *inside* the type, so it can use a private
+constructor, and that is what turns the discouraged shape into an absent one.
+
+It is also how a struct gets a maker at all, since a struct has no
+constructors.
 
 ### Operators and indexers
 
@@ -848,7 +876,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 210 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 497 compiler unit tests
+dotnet test tests/Stainless.UnitTests           # 527 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -857,7 +885,7 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 210 cases, of which 10 are
+**Both Windows and Linux are tested.** 212 cases, of which 10 are
 Windows-only and 1 is Linux-only, so Linux runs 200 and Windows 209, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
@@ -1182,7 +1210,11 @@ Everything below is covered by [the test suite](tests/cases).
   which splits a counted loop across the pool
 - `static readonly` module storage, initialized before `Main` in an order the
   compiler computes from the dependency graph — no lazy guard, and a compile
-  error on a cycle. There is no `static` without `readonly`
+  error on a cycle. Storage is the only thing that must be `readonly`; the
+  other `static` is a method of a type
+- `static` methods on a class or a struct: a member with no receiver, reached
+  by naming the type. It is what a fallible factory is written as, since it can
+  use a private constructor and a constructor cannot report why it failed
 - A checked rule for what may cross a thread: plain data, a `String`, a
   `[Shared]` type, or an array of plain data. Anything else is rejected at the
   `spawn`, the `parallel for` capture, or the static that would share it
@@ -1335,7 +1367,9 @@ Everything below is covered by [the test suite](tests/cases).
   a function that takes what it needs beats one that goes looking -- and
   `Env.Arguments()` is for the code that is nowhere near `Main`
 - `Standard.Time`: `Instant` (a point on the wall clock) and `Duration` (a
-  length), both structs over one `long` of nanoseconds, plus `DateTime` for the
+  length), both structs over one `long` of nanoseconds that declare the
+  arithmetic to go with it -- `hour + minute`, `later - earlier` -- and are
+  made by naming the unit, `Duration.FromSeconds(30)`. Plus `DateTime` for the
   parts a person reads, ISO 8601 in both directions, and `Clock` over the
   **monotonic** counter -- which is the only correct way to measure how long
   something took, because the wall clock can jump mid-measurement. The UTC
@@ -1555,9 +1589,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   discovered. The metadata describes layouts and the reflection tables describe
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
-- **Statics are module-level only**, and a `--shared` library cannot have one:
-  there is no entry point to initialize it from. No `static` members on a type,
-  and no per-thread storage.
+- **Static *storage* is module-level only**, and a `--shared` library cannot
+  have any: there is no entry point to initialize it from. A type may have
+  static methods, but not static fields, and there is no per-thread storage.
 - **No calling conventions.** `__stdcall`, `__fastcall` and `__vectorcall`
   cannot be written. On x64 that costs almost nothing — there is one convention
   and only `__vectorcall` differs — but it is the whole story on x86, where
@@ -1578,7 +1612,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   for the platform's own through `extern "C"`. `Socket.Connect` on a socket
   that is already open tries one address rather than all of them, because a
   socket whose connect failed cannot be reused and that one is already made —
-  `new Socket(host, port, ...)` is the form that tries each.
+  `Socket.OpenConnected(host, port, ...)` is the form that tries each.
 - **No portable COM activation.** `com interface` and `com class` are in the
   language (§8.5) and work on every platform, because a COM interface is a
   pointer to a vtable pointer and nothing else; `Win32.Com` and `Win32.ShellCom`

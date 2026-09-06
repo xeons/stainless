@@ -377,6 +377,7 @@ public static class MetadataWriter
         Symbol = function.MangledName,
         Kind = function.Kind,
         IsVariadic = function.IsVariadic,
+        IsStatic = function.IsStatic,
         VirtualSlot = function.VirtualSlot,
         Accessor = function.Accessor?.Name,
         Module = function.ContainingType is null ? function.ModuleName : null,

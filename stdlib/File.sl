@@ -60,40 +60,15 @@ public IOError Rename(String from, String to) {
     return (IOError)sl_file_rename(from.ToPointer(), to.ToPointer());
 }
 
-// ------------------------------------------------------------------ opening
-
-/// Opens a file, or says why it could not be opened.
-///
-///     var file = try File.Open(path, FileMode.Open, FileAccess.Read);
-///
-/// A Result rather than a stream that exists and holds nothing: the second is
-/// a value a caller can go on using, and nothing forces the check that would
-/// have caught it.
-public Result<FileStream, IOError> Open(String path, FileMode mode, FileAccess access) {
-    var stream = new FileStream(path, mode, access);
-    if (!stream.IsOpen()) { return Fail(stream.Error()); }
-    return Ok(stream);
-}
-
-public Result<FileStream, IOError> OpenRead(String path) {
-    return Open(path, FileMode.Open, FileAccess.Read);
-}
-
-/// Creates the file, or replaces what is there.
-public Result<FileStream, IOError> Create(String path) {
-    return Open(path, FileMode.Create, FileAccess.Write);
-}
-
-/// Opens for writing at the end, creating the file if it is not there.
-public Result<FileStream, IOError> OpenAppend(String path) {
-    return Open(path, FileMode.Append, FileAccess.Write);
-}
+// Opening a file is `FileStream.Open` and its shorthands, in Standard.IO: it
+// makes a stream, so it belongs to the stream. This module is for the cases
+// where the whole file is the unit of work and no stream outlives the call.
 
 // ------------------------------------------------------------------ reading
 
 /// The whole file as bytes.
 public Result<byte[], IOError> ReadAllBytes(String path) {
-    var file = try OpenRead(path);
+    var file = try FileStream.OpenRead(path);
 
     long size = file.Length();
     if (size < 0) {
@@ -134,7 +109,7 @@ public Result<List<String>, IOError> ReadAllLines(String path) {
 
 /// Replaces the file with `data`, creating it if needed.
 public IOError WriteAllBytes(String path, byte[] data) {
-    var opened = Create(path);
+    var opened = FileStream.Create(path);
     if (!opened.Ok) { return opened.Error; }
 
     var file = opened.Value;
@@ -147,7 +122,7 @@ public IOError WriteAllBytes(String path, byte[] data) {
 
 /// Replaces the file with `text`, written as UTF-8.
 public IOError WriteAllText(String path, String text) {
-    var opened = Create(path);
+    var opened = FileStream.Create(path);
     if (!opened.Ok) { return opened.Error; }
 
     var file = opened.Value;
@@ -160,7 +135,7 @@ public IOError WriteAllText(String path, String text) {
 
 /// Writes the lines, each followed by a newline.
 public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
-    var opened = Create(path);
+    var opened = FileStream.Create(path);
     if (!opened.Ok) { return opened.Error; }
 
     var file = opened.Value;
@@ -177,7 +152,7 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
 
 /// Adds `text` to the end, creating the file if it is not there.
 public IOError AppendText(String path, String text) {
-    var opened = OpenAppend(path);
+    var opened = FileStream.OpenAppend(path);
     if (!opened.Ok) { return opened.Error; }
 
     var file = opened.Value;

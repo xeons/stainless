@@ -186,24 +186,24 @@ const nuint NoSocket = 18446744073709551615u;
 public struct EndPoint {
     public String Host;
     public ushort Port;
-}
 
-/// An endpoint, made in one expression.
-public EndPoint At(String host, ushort port) {
-    EndPoint made;
-    made.Host = host;
-    made.Port = port;
-    return made;
-}
-
-/// An endpoint, written the way one is written.
-public String Format(EndPoint point) {
-    // A bare IPv6 address contains colons, so the port needs the brackets that
-    // a URL puts round one. IPv4 and a name do not.
-    if (point.Host.Contains(':')) {
-        return "[" + point.Host + "]:" + Text.FromInteger((long)point.Port);
+    /// An endpoint, made in one expression.
+    public static EndPoint At(String host, ushort port) {
+        EndPoint made;
+        made.Host = host;
+        made.Port = port;
+        return made;
     }
-    return point.Host + ":" + Text.FromInteger((long)point.Port);
+
+    /// Written the way one is written.
+    public String Format() {
+        // A bare IPv6 address contains colons, so the port needs the brackets
+        // that a URL puts round one. IPv4 and a name do not.
+        if (Host.Contains(':')) {
+            return "[" + Host + "]:" + Text.FromInteger((long)Port);
+        }
+        return Host + ":" + Text.FromInteger((long)Port);
+    }
 }
 
 /// The first address a name resolves to, as text.
@@ -234,13 +234,13 @@ public Result<String, SocketError> Resolve(String host, AddressFamily family) {
 /// for; this is what they are made of, and what is left when none of the three
 /// is the shape of the problem.
 ///
-/// Construction is the open, so a `Socket` always exists and `IsOpen()` says
-/// whether it holds anything -- the same bargain `FileStream` makes, and for
-/// the same reason: a null a caller cannot unwrap is worse than an object that
-/// says why.
+/// Made through `Socket.Open`, which returns a `Result`. A constructor has to
+/// return its own type, so it cannot say why an open failed -- the best it
+/// could do is hand back a socket holding nothing, and nothing then forces the
+/// check that would have caught it.
 ///
-/// Closing is the destructor's job too, so a socket that goes out of scope
-/// gives its handle back whether or not `Close` was called.
+/// Closing is the destructor's job, so a socket that goes out of scope gives
+/// its handle back whether or not `Close` was called.
 public class Socket {
     nuint handle;
     SocketError error;
@@ -248,7 +248,26 @@ public class Socket {
     SocketKind kind;
     bool closed;
 
-    public Socket(AddressFamily family, SocketKind kind) {
+    /// A socket of a given family and kind, unbound and unconnected.
+    public static Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind) {
+        var made = new Socket(family, kind);
+        if (!made.IsOpen()) { return Fail(made.Error()); }
+        return Ok(made);
+    }
+
+    /// A socket already connected to a host and port.
+    ///
+    /// One step, because connecting is what decides the family: a caller with
+    /// a name does not know whether it will get IPv4 or IPv6, so it cannot
+    /// open first.
+    public static Result<Socket, SocketError> OpenConnected(
+            String host, ushort port, AddressFamily family, SocketKind kind) {
+        var made = new Socket(host, port, family, kind);
+        if (!made.IsOpen()) { return Fail(made.Error()); }
+        return Ok(made);
+    }
+
+    Socket(AddressFamily family, SocketKind kind) {
         this.family = family;
         this.kind = kind;
 
@@ -275,7 +294,7 @@ public class Socket {
     /// a socket of its own family, and a socket whose connect failed is closed
     /// rather than retried -- which is the other reason this cannot be two
     /// steps.
-    public Socket(String host, ushort port, AddressFamily family, SocketKind kind) {
+    Socket(String host, ushort port, AddressFamily family, SocketKind kind) {
         this.family = family;
         this.kind = kind;
 
@@ -589,12 +608,12 @@ public class Socket {
 
 /// A socket that accepts connections, and does nothing else.
 ///
-/// Construction opens, binds and listens, because there is no useful state
-/// between those three: a listener that exists and is not listening is a thing
-/// to check for and never a thing to want.
+/// Opening, binding and listening are one step, because there is no useful
+/// state between them: a listener that exists and is not listening is a thing
+/// to check for and never a thing to want. So the step is `Listen`, and it
+/// says which of the three failed.
 ///
-///     var server = new TcpListener(8080u);
-///     if (!server.IsListening()) { Complain(Net.Describe(server.Error())); }
+///     var server = try TcpListener.Listen(8080u);
 ///
 ///     var client = server.Accept();
 ///     while (client.IsConnected()) { ... }
@@ -603,22 +622,30 @@ public class TcpListener {
     bool listening;
 
     /// Listens on every address this machine has.
-    public TcpListener(ushort port) {
-        this("", port, AddressFamily.IPv4, 16);
+    public static Result<TcpListener, SocketError> Listen(ushort port) {
+        return Listen("", port, AddressFamily.IPv4, 16);
     }
 
     /// Listens on one address. `"127.0.0.1"` is the useful one: a service that
     /// only its own machine should reach says so here rather than in a
     /// firewall.
-    public TcpListener(String host, ushort port) {
-        this(host, port, AddressFamily.IPv4, 16);
+    public static Result<TcpListener, SocketError> Listen(String host, ushort port) {
+        return Listen(host, port, AddressFamily.IPv4, 16);
     }
 
-    public TcpListener(String host, ushort port, AddressFamily family, int backlog) {
-        socket = new Socket(family, SocketKind.Stream);
-        listening = false;
+    public static Result<TcpListener, SocketError> Listen(
+            String host, ushort port, AddressFamily family, int backlog) {
+        var opened = Socket.Open(family, SocketKind.Stream);
+        if (!opened.Ok) { return Fail(opened.Error); }
 
-        if (!socket.IsOpen()) { return; }
+        var made = new TcpListener(opened.Value, host, port, backlog);
+        if (!made.IsListening()) { return Fail(made.Error()); }
+        return Ok(made);
+    }
+
+    TcpListener(Socket opened, String host, ushort port, int backlog) {
+        socket = opened;
+        listening = false;
 
         socket.SetReuseAddress(true);
         if (socket.Bind(host, port) != SocketError.None) { return; }
@@ -665,7 +692,7 @@ public class TcpListener {
 /// because a connection has no position to move to -- which is the honest
 /// answer and the one an `IStream` is built to give.
 ///
-///     var client = new TcpClient("example.com", 80u);
+///     var client = try TcpClient.Connect("example.com", 80u);
 ///     client.SendText("GET / HTTP/1.0\r\n\r\n");
 ///
 /// The `IOError` an `IStream` reports is the nearest one to the socket error;
@@ -676,13 +703,16 @@ public class TcpClient : IStream {
     Socket socket;
     bool finished;
 
-    public TcpClient(String host, ushort port) {
-        this(host, port, AddressFamily.Any);
+    /// Connects to a host and port.
+    public static Result<TcpClient, SocketError> Connect(String host, ushort port) {
+        return Connect(host, port, AddressFamily.Any);
     }
 
-    public TcpClient(String host, ushort port, AddressFamily family) {
-        socket = new Socket(host, port, family, SocketKind.Stream);
-        finished = false;
+    public static Result<TcpClient, SocketError> Connect(
+            String host, ushort port, AddressFamily family) {
+        var opened = Socket.OpenConnected(host, port, family, SocketKind.Stream);
+        if (!opened.Ok) { return Fail(opened.Error); }
+        return Ok(new TcpClient(opened.Value));
     }
 
     /// Wraps a socket somebody else opened, which is what `Accept` produces.
@@ -803,8 +833,8 @@ public class TcpClient : IStream {
 /// reliable and has no message boundaries at all. Pretending the first is the
 /// second is how a program comes to assume things about UDP that are not true.
 ///
-///     var socket = new UdpSocket(9000u);
-///     var from = Net.At("", 0u);
+///     var socket = try UdpSocket.Bind(9000u);
+///     var from = EndPoint.At("", 0u);
 ///     var buffer = new byte[1500];
 ///     nuint got = socket.Receive(buffer, ref from);
 public class UdpSocket {
@@ -812,29 +842,42 @@ public class UdpSocket {
     bool ready;
 
     /// A socket that can send and not receive, because nothing bound it.
-    public UdpSocket() {
-        this(AddressFamily.IPv4);
+    public static Result<UdpSocket, SocketError> Datagram() {
+        return Datagram(AddressFamily.IPv4);
     }
 
-    public UdpSocket(AddressFamily family) {
-        socket = new Socket(family, SocketKind.Datagram);
-        ready = socket.IsOpen();
+    public static Result<UdpSocket, SocketError> Datagram(AddressFamily family) {
+        var opened = Socket.Open(family, SocketKind.Datagram);
+        if (!opened.Ok) { return Fail(opened.Error); }
+        return Ok(new UdpSocket(opened.Value));
     }
 
     /// A socket bound to a port, so it can receive. Port 0 asks the system to
     /// choose one, which `LocalEndPoint` will say.
-    public UdpSocket(ushort port) {
-        this("", port, AddressFamily.IPv4);
+    public static Result<UdpSocket, SocketError> Bind(ushort port) {
+        return Bind("", port, AddressFamily.IPv4);
     }
 
     /// The same, on one address rather than all of them.
-    public UdpSocket(String host, ushort port) {
-        this(host, port, AddressFamily.IPv4);
+    public static Result<UdpSocket, SocketError> Bind(String host, ushort port) {
+        return Bind(host, port, AddressFamily.IPv4);
     }
 
-    public UdpSocket(String host, ushort port, AddressFamily family) {
-        socket = new Socket(family, SocketKind.Datagram);
-        ready = socket.IsOpen() && socket.Bind(host, port) == SocketError.None;
+    public static Result<UdpSocket, SocketError> Bind(
+            String host, ushort port, AddressFamily family) {
+        var opened = Socket.Open(family, SocketKind.Datagram);
+        if (!opened.Ok) { return Fail(opened.Error); }
+
+        var bound = opened.Value;
+        var failure = bound.Bind(host, port);
+        if (failure != SocketError.None) { return Fail(failure); }
+
+        return Ok(new UdpSocket(bound));
+    }
+
+    UdpSocket(Socket opened) {
+        socket = opened;
+        ready = opened.IsOpen();
     }
 
     ~UdpSocket() { Close(); }
@@ -848,7 +891,7 @@ public class UdpSocket {
     /// Sends one datagram. The count back is how many bytes went, which for a
     /// datagram is all of them or none.
     public nuint Send(byte[] data, String host, ushort port) {
-        return socket.SendTo(data, At(host, port));
+        return socket.SendTo(data, EndPoint.At(host, port));
     }
 
     public nuint SendText(String text, String host, ushort port) {
@@ -875,110 +918,4 @@ public class UdpSocket {
         ready = false;
         socket.Close();
     }
-}
-
-// ------------------------------------------------------------ opening
-
-// Opening, as a `Result`, beside the constructors rather than instead of them.
-//
-// A constructor has to return its type, so it cannot say why it failed; that is
-// why every language with checked errors puts fallible construction in a
-// function -- Rust's `TcpStream::connect`, Go's `net.Dial`. These are that,
-// and they are module-level because Stainless has no static methods.
-//
-// The constructors stay public and keep their `IsOpen()`/`Error()` pair, which
-// is the shorter path when a caller is going to check anyway. What these add
-// is a failure that cannot be walked past: a Result has no value to read until
-// its case has been named.
-//
-//     var listener = new TcpListener("0.0.0.0", 80u);   // then check IsListening()
-//     var listener = try Net.Listen("0.0.0.0", 80u);    // or let it propagate
-//
-// `IsOpen()` and `Error()` remain useful either way, because a socket can be
-// closed after it was opened and a read or a write can fail on its own. Those
-// are outcomes of an operation rather than of the opening.
-
-/// A socket of a given family and kind, unbound and unconnected.
-public Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind) {
-    var made = new Socket(family, kind);
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-/// A socket already connected to a host and port.
-///
-/// One step because connecting is what decides the family: a caller with a
-/// name does not know whether it will get IPv4 or IPv6, so it cannot open
-/// first.
-public Result<Socket, SocketError> OpenConnected(
-        String host, ushort port, AddressFamily family, SocketKind kind) {
-    var made = new Socket(host, port, family, kind);
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-/// Listens on every address the machine has.
-public Result<TcpListener, SocketError> Listen(ushort port) {
-    var made = new TcpListener(port);
-    if (!made.IsListening()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-/// Listens on one address.
-public Result<TcpListener, SocketError> Listen(String host, ushort port) {
-    var made = new TcpListener(host, port);
-    if (!made.IsListening()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-public Result<TcpListener, SocketError> Listen(
-        String host, ushort port, AddressFamily family, int backlog) {
-    var made = new TcpListener(host, port, family, backlog);
-    if (!made.IsListening()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-/// Connects to a host and port.
-public Result<TcpClient, SocketError> Connect(String host, ushort port) {
-    var made = new TcpClient(host, port);
-    if (!made.IsConnected()) { return Fail(made.SocketError()); }
-    return Ok(made);
-}
-
-public Result<TcpClient, SocketError> Connect(String host, ushort port, AddressFamily family) {
-    var made = new TcpClient(host, port, family);
-    if (!made.IsConnected()) { return Fail(made.SocketError()); }
-    return Ok(made);
-}
-
-/// A datagram socket with no address of its own, for sending.
-public Result<UdpSocket, SocketError> Datagram() {
-    var made = new UdpSocket();
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-public Result<UdpSocket, SocketError> Datagram(AddressFamily family) {
-    var made = new UdpSocket(family);
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-/// A datagram socket bound to a port, for receiving.
-public Result<UdpSocket, SocketError> Bind(ushort port) {
-    var made = new UdpSocket(port);
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-public Result<UdpSocket, SocketError> Bind(String host, ushort port) {
-    var made = new UdpSocket(host, port);
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
-}
-
-public Result<UdpSocket, SocketError> Bind(String host, ushort port, AddressFamily family) {
-    var made = new UdpSocket(host, port, family);
-    if (!made.IsOpen()) { return Fail(made.Error()); }
-    return Ok(made);
 }

@@ -185,6 +185,18 @@ public sealed class Parser
         var attributes = ParseAttributeLists();
         var modifiers = ParseModifiers();
 
+        if (modifiers.HasFlag(Modifiers.Static) && StaticIsAboutNothing() is { } what)
+        {
+            _diagnostics.Error("SL0578", SpanFrom(start),
+                what == "class" || what == "struct"
+                    ? $"a {what} is not 'static'; a module is what this language has instead " +
+                      "of a static class, and every function in one is already reached by " +
+                      "naming the module"
+                    : $"'static' says a member belongs to its type rather than to an object, " +
+                      $"and a {what} has neither");
+            modifiers &= ~Modifiers.Static;
+        }
+
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
             return ParseLinkageDeclaration(start, modifiers);
 
@@ -214,7 +226,7 @@ public sealed class Parser
         if (At(TokenKind.Tilde) && enclosingType is not null)
             return [ParseDestructor(start, enclosingType)];
 
-        if (At(TokenKind.StaticKeyword))
+        if (modifiers.HasFlag(Modifiers.Static))
             return AtOperatorDeclaration()
                 ? [ParseOperatorDeclaration(start, modifiers)]
                 : [ParseStaticDeclaration(start, modifiers)];
@@ -269,6 +281,25 @@ public sealed class Parser
         return attributes;
     }
 
+    /// <summary>
+    /// What is about to be declared, when <c>static</c> could not be about it,
+    /// or null when the word is in a place it might mean something.
+    /// </summary>
+    private string? StaticIsAboutNothing() => Current.Kind switch
+    {
+        TokenKind.ClassKeyword => "class",
+        TokenKind.StructKeyword => "struct",
+        TokenKind.InterfaceKeyword => "interface",
+        TokenKind.VariantKeyword => "variant",
+        TokenKind.UnionKeyword => "union",
+        TokenKind.AttributeKeyword => "attribute",
+        TokenKind.EnumKeyword => "enum",
+        TokenKind.DelegateKeyword => "delegate",
+        TokenKind.UsingKeyword => "type alias",
+        TokenKind.ExternKeyword or TokenKind.ExportKeyword => "foreign declaration",
+        _ => null,
+    };
+
     private Modifiers ParseModifiers()
     {
         var modifiers = Modifiers.None;
@@ -284,6 +315,7 @@ public sealed class Parser
                 case TokenKind.OverrideKeyword: modifiers |= Modifiers.Override; Advance(); break;
                 case TokenKind.AbstractKeyword: modifiers |= Modifiers.Abstract; Advance(); break;
                 case TokenKind.SealedKeyword: modifiers |= Modifiers.Sealed; Advance(); break;
+                case TokenKind.StaticKeyword: modifiers |= Modifiers.Static; Advance(); break;
 
                 // `com` reads as a modifier and means a different kind of
                 // declaration; only `interface` and `class` may follow it,
@@ -577,16 +609,16 @@ public sealed class Parser
     }
 
     /// <summary>
-    /// Whether what follows <c>static</c> is an operator rather than a field.
+    /// Whether what follows the modifiers is an operator rather than a member.
     ///
-    /// The return type sits between the two words and may be several tokens
-    /// long -- <c>List&lt;int&gt;</c>, <c>int</c>, a qualified name -- so this
-    /// looks ahead for <c>operator</c> before the parameter list rather than
-    /// trying to parse a type and back out.
+    /// The return type comes first and may be several tokens long --
+    /// <c>List&lt;int&gt;</c>, <c>int</c>, a qualified name -- so this looks
+    /// ahead for <c>operator</c> before the parameter list rather than trying
+    /// to parse a type and back out.
     /// </summary>
     private bool AtOperatorDeclaration()
     {
-        for (int at = 1; at < 16; at++)
+        for (int at = 0; at < 16; at++)
         {
             var kind = Peek(at).Kind;
             if (kind == TokenKind.OperatorKeyword) return true;
@@ -610,8 +642,6 @@ public sealed class Parser
     /// </summary>
     private Declaration ParseOperatorDeclaration(int start, Modifiers modifiers)
     {
-        Expect(TokenKind.StaticKeyword);
-
         var returnType = ParseType();
         Expect(TokenKind.OperatorKeyword);
 
@@ -644,20 +674,32 @@ public sealed class Parser
     }
 
     /// <summary>
-    /// <c>static readonly T Name = value;</c>. The type is written out, as a C#
-    /// field's is; <c>var</c> infers for locals only.
+    /// <c>static readonly T Name = value;</c>, or <c>static T Name(...)</c>.
+    ///
+    /// The word means the same thing in both: belonging to the enclosing scope
+    /// rather than to an instance. Which one is being written is decided by
+    /// <c>readonly</c>, because storage must have it and a method cannot.
     /// </summary>
     private Declaration ParseStaticDeclaration(int start, Modifiers modifiers)
     {
-        Expect(TokenKind.StaticKeyword);
-
-        if (!Match(TokenKind.ReadonlyKeyword))
+        if (!At(TokenKind.ReadonlyKeyword))
         {
-            _diagnostics.Error("SL0376", SpanFrom(start),
-                "a 'static' must be 'readonly'; there is no mutable global in Stainless, " +
-                "because nothing would synchronize it. Hold the mutable part in a type " +
-                "that says how it is safe, as in 'static readonly AtomicLong Count = ...'");
+            // `static T Name(...)`: a method of the type rather than of an
+            // object of it. Parsed by the ordinary member parser, so a static
+            // method is a method in every respect except the receiver.
+            var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless);
+
+            if (member is not FunctionDeclSyntax)
+                _diagnostics.Error("SL0376", SpanFrom(start),
+                    "a 'static' is either 'readonly' storage or a method; there is no mutable " +
+                    "global in Stainless, because nothing would synchronize it. Hold the mutable " +
+                    "part in a type that says how it is safe, as in " +
+                    "'static readonly AtomicLong Count = ...'");
+
+            return member;
         }
+
+        Expect(TokenKind.ReadonlyKeyword);
 
         var type = ParseType();
         string name = ExpectIdentifier();

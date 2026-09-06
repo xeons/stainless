@@ -192,6 +192,13 @@ public sealed record MetadataFunction
     public bool IsVariadic { get; init; }
 
     /// <summary>
+    /// Whether it belongs to the type rather than to an instance. It has to
+    /// cross: a consumer that thought <c>FileStream.Open</c> took a receiver
+    /// would pass one, and the callee would read it as the first argument.
+    /// </summary>
+    public bool IsStatic { get; init; }
+
+    /// <summary>
     /// The dispatch slot, or -1 for a method called by name.
     ///
     /// It has to cross: a consumer that called a virtual method directly would

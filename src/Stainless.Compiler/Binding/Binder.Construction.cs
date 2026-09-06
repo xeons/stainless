@@ -299,10 +299,7 @@ public sealed partial class Binder
     {
         if (FlattenName(target) is not { } parts) return null;
 
-        if (LookupLocal(parts[0]) is not null) return null;
-        if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
-        if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
-        if (_currentFunction?.ContainingType?.FindProperty(parts[0]) is not null) return null;
+        if (NamesAValue(parts[0])) return null;
 
         string name = string.Join('.', parts);
         if (_currentScope!.Imports.TryGetValue(name, out var module)) return module;
@@ -327,10 +324,7 @@ public sealed partial class Binder
 
         // A value of that name is nearer than a type of it, exactly as for an
         // enum: `shape.Circle` tests a variant, `Shape.Circle` builds one.
-        if (LookupLocal(parts[0]) is not null) return null;
-        if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
-        if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
-        if (_currentFunction?.ContainingType?.FindProperty(parts[0]) is not null) return null;
+        if (NamesAValue(parts[0])) return null;
 
         if (parts.Count == 1)
         {
@@ -353,14 +347,62 @@ public sealed partial class Binder
             : null;
     }
 
+    /// <summary>
+    /// The class or struct a <c>FileStream.Open</c> is qualified by, or null.
+    ///
+    /// Only a type reached by a name that is not already a value: a local
+    /// called <c>Socket</c> wins over the type of that name, exactly as it does
+    /// for an enum or a variant. A generic type is not reachable this way,
+    /// because type arguments cannot be written at a call.
+    /// </summary>
+    private NamedTypeSymbol? ResolveTypePrefix(ExpressionSyntax target)
+    {
+        if (FlattenName(target) is not { } parts) return null;
+        if (NamesAValue(parts[0])) return null;
+
+        if (parts.Count == 1)
+        {
+            if (_currentScope!.Module.Types.TryGetValue(parts[0], out var local))
+                return local as NamedTypeSymbol;
+
+            foreach (var imported in _currentScope.Imports.Values.Distinct())
+                if (imported.Types.TryGetValue(parts[0], out var found) &&
+                    found is NamedTypeSymbol { IsPublic: true } visible)
+                    return visible;
+
+            return null;
+        }
+
+        string moduleName = string.Join('.', parts.Take(parts.Count - 1));
+        ModuleSymbol? module =
+            _currentScope!.Imports.TryGetValue(moduleName, out var imported2) ? imported2
+            : _modules.TryGetValue(moduleName, out var known) ? known
+            : null;
+
+        return module is not null &&
+               module.Types.TryGetValue(parts[^1], out var qualified) &&
+               qualified is NamedTypeSymbol { IsPublic: true } reachable
+            ? reachable
+            : null;
+    }
+
+    /// <summary>
+    /// Whether a name already means storage here. A local, a parameter, a field
+    /// or a property is nearer than any type or module of the same name, which
+    /// is what keeps a variable called <c>Level</c> from being shadowed by an
+    /// enum of that name.
+    /// </summary>
+    private bool NamesAValue(string name) =>
+        LookupLocal(name) is not null ||
+        _currentFunction?.Parameters.Any(p => p.Name == name && !p.IsThis) == true ||
+        _currentFunction?.ContainingType?.FindField(name) is not null ||
+        _currentFunction?.ContainingType?.FindProperty(name) is not null;
+
     private EnumTypeSymbol? ResolveEnumPrefix(ExpressionSyntax target)
     {
         if (FlattenName(target) is not { } parts) return null;
 
-        if (LookupLocal(parts[0]) is not null) return null;
-        if (_currentFunction?.Parameters.Any(p => p.Name == parts[0] && !p.IsThis) == true) return null;
-        if (_currentFunction?.ContainingType?.FindField(parts[0]) is not null) return null;
-        if (_currentFunction?.ContainingType?.FindProperty(parts[0]) is not null) return null;
+        if (NamesAValue(parts[0])) return null;
 
         // Either a bare name in this module, or one qualified by its module.
         if (parts.Count == 1)

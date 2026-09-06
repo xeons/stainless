@@ -64,6 +64,18 @@ public sealed partial class Binder
             return BindVariantConstruction(prefix, prefixCase, arguments, syntax.Span);
         }
 
+        // `FileStream.Open(path)` names a type, not a value: a static method
+        // belongs to the type and has no receiver to be reached through.
+        //
+        // It is tried before the module path, and only when the type really has
+        // a static method of that name, so a module and a type of the same name
+        // each keep what was already theirs.
+        if (syntax.Callee is MemberAccessSyntax { ThroughPointer: false } onType &&
+            ResolveTypePrefix(onType.Target) is { } staticOwner &&
+            staticOwner.FindMethods(onType.Member).ToList() is { Count: > 0 } named2 &&
+            (named2.Any(m => m.IsStatic) || ResolveModulePrefix(onType.Target) is null))
+            return BindStaticCall(syntax, onType, staticOwner, arguments);
+
         // `receiver.Method(args)`, unless the receiver is really a module path.
         if (syntax.Callee is MemberAccessSyntax member)
         {
@@ -106,12 +118,15 @@ public sealed partial class Binder
                 _currentFunction?.ContainingType?.FindMethods(callee.Name.Text).ToList() is
                     { Count: > 0 } own)
             {
-                var receiver = BindImplicitThis(callee.Span);
-                if (receiver is not null)
-                {
-                    var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text);
-                    if (method is null) return new BoundErrorExpression(syntax.Span);
+                var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text);
+                if (method is null) return new BoundErrorExpression(syntax.Span);
 
+                // A static one needs nothing to be called on; an instance one
+                // needs the enclosing `this`, which a static method has not got.
+                var receiver = method.IsStatic ? null : BindImplicitThis(callee.Span);
+
+                if (method.IsStatic || receiver is not null)
+                {
                     // Inherited, so it may belong to a base in another module.
                     var owner = method.ContainingType ?? _currentFunction!.ContainingType!;
                     if (!CanReach(method.IsPublic, method.IsProtected, owner))
@@ -122,6 +137,16 @@ public sealed partial class Binder
                     }
 
                     return BuildCall(syntax, method, receiver, arguments);
+                }
+
+                if (_currentFunction is { IsStatic: true } enclosingStatic)
+                {
+                    diagnostics.Error("SL0576", callee.Span,
+                        $"'{callee.Name.Text}' is an instance method of " +
+                        $"'{enclosingStatic.ContainingType!.Name}', and '{enclosingStatic.Name}' " +
+                        "is static, so there is no object to call it on. Take one as a " +
+                        "parameter, or make this a method");
+                    return new BoundErrorExpression(syntax.Span);
                 }
             }
 
@@ -315,6 +340,48 @@ public sealed partial class Binder
         return new BoundIndirectCall(syntax.Span, delegateType, target, converted);
     }
 
+    /// <summary>
+    /// <c>FileStream.Open(path)</c>: a method of the type, called with no
+    /// receiver.
+    ///
+    /// From here on it is an ordinary direct call -- the same shape a
+    /// module-level function's is -- so nothing downstream has to know that the
+    /// name was qualified by a type rather than by a module.
+    /// </summary>
+    private BoundExpression BindStaticCall(
+        CallSyntax syntax, MemberAccessSyntax member, NamedTypeSymbol type,
+        List<BoundExpression> arguments)
+    {
+        var overloads = type.FindMethods(member.Member).ToList();
+
+        // An instance method reached through the type name is the mistake this
+        // is worth naming: the call is missing the thing it is about.
+        if (overloads.All(m => !m.IsStatic))
+        {
+            diagnostics.Error("SL0576", member.Span,
+                $"'{type.Name}.{member.Member}' is not static, so it needs an object to be " +
+                "called on; name one instead of the type");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var statics = overloads.Where(m => m.IsStatic).ToList();
+
+        var method = statics.Count == 1
+            ? statics[0]
+            : ResolveOverload(statics, arguments, member.Span, $"{type.Name}.{member.Member}");
+
+        if (method is null) return new BoundErrorExpression(syntax.Span);
+
+        if (!CanReach(method.IsPublic, method.IsProtected, method.ContainingType ?? type))
+        {
+            diagnostics.Error("SL0257", member.Span,
+                NotVisible(method.ContainingType ?? type, member.Member, method.IsProtected));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return BuildCall(syntax, method, receiver: null, arguments);
+    }
+
     private BoundExpression BindMethodCall(
         CallSyntax syntax, MemberAccessSyntax member, List<BoundExpression> arguments)
     {
@@ -386,6 +453,19 @@ public sealed partial class Binder
                 $"'{namedType.Name}' has no method named '{member.Member}'");
             return new BoundErrorExpression(syntax.Span);
         }
+
+        // A static method is reached through the type, never through an
+        // object. Allowing both would let a reader think the receiver was
+        // being used for something.
+        if (overloads.All(m => m.IsStatic))
+        {
+            diagnostics.Error("SL0576", member.Span,
+                $"'{namedType.Name}.{member.Member}' is static, so it is called on the type " +
+                $"rather than on a value: write '{namedType.SimpleName}.{member.Member}(...)'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        overloads = overloads.Where(m => !m.IsStatic).ToList();
 
         // Which overload is decided by the arguments, the same way a call to a
         // module-level function is.

@@ -1,0 +1,11 @@
+0        -> 0
+42       -> 42
+999      -> 999
+         -> empty
+12x      -> not a digit
+1000     -> too big
+sum      = 42
+span     = 3 11 8
+empty    = 0
+overload = 8
+delegate = 6

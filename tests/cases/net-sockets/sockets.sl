@@ -51,7 +51,7 @@ int Main() {
     //
     // Port 0 asks the system to choose, so two copies of this test can run at
     // once and neither has to know a port number in advance.
-    var opened = Net.Listen("127.0.0.1", 0u);
+    var opened = TcpListener.Listen("127.0.0.1", 0u);
     SayBool("listening", opened.Ok);
     if (!opened.Ok) { return 1; }
 
@@ -64,7 +64,7 @@ int Main() {
     // No family named, so `Any`: the name decides. This is the shape that used
     // to open an AF_UNSPEC socket before resolving -- which Winsock accepts and
     // Linux does not, so it worked here and hung there.
-    var dialled = Net.Connect("127.0.0.1", address.Port);
+    var dialled = TcpClient.Connect("127.0.0.1", address.Port);
     SayBool("connected", dialled.Ok);
     if (!dialled.Ok) { return 1; }
 
@@ -79,7 +79,7 @@ int Main() {
 
     // And opening one directly with `Any` is an error rather than a guess,
     // because there is no socket of no family.
-    var nofamily = Net.Open(AddressFamily.Any, SocketKind.Stream);
+    var nofamily = Socket.Open(AddressFamily.Any, SocketKind.Stream);
     SayBool("any-is-not-a-socket", !nofamily.Ok);
     SayBool("any-says-why", !nofamily.Ok && nofamily.Error == SocketError.Invalid);
 
@@ -93,11 +93,11 @@ int Main() {
     SayBool("peer-host", there.Host == "127.0.0.1");
     // The text, not the number: an ephemeral port is whatever the system had
     // free, so a test that printed it would print something different tomorrow.
-    SayBool("remote-formatted", Net.Format(there).StartsWith("127.0.0.1:"));
+    SayBool("remote-formatted", there.Format().StartsWith("127.0.0.1:"));
 
     // An IPv6 address goes in brackets, because a bare one already contains
     // colons and the port would be indistinguishable from another group.
-    Say("formatted-v6", Net.Format(Net.At("::1", 80u)));
+    Say("formatted-v6", EndPoint.At("::1", 80u).Format());
 
     var seen = accepted.RemoteEndPoint();
     SayBool("mirror", seen.Port == here.Port);
@@ -142,7 +142,7 @@ int Main() {
     // ------------------------------------------------------------------ UDP
     //
     // No handshake, so one socket can talk to itself in a straight line.
-    var bound = Net.Bind("127.0.0.1", 0u);
+    var bound = UdpSocket.Bind("127.0.0.1", 0u);
     if (!bound.Ok) { return 1; }
 
     var listener = bound.Value;
@@ -151,14 +151,14 @@ int Main() {
     var inbox = listener.LocalEndPoint();
     SayBool("udp-port", inbox.Port != 0u);
 
-    var made = Net.Datagram();
+    var made = UdpSocket.Datagram();
     if (!made.Ok) { return 1; }
 
     var sender = made.Value;
     nuint sent = sender.SendText("a datagram", "127.0.0.1", inbox.Port);
     SayNumber("udp-sent", (long)sent);
 
-    var from = Net.At("", 0u);
+    var from = EndPoint.At("", 0u);
     var packet = new byte[64];
     nuint received = listener.Receive(packet, ref from);
     SayNumber("udp-received", (long)received);
@@ -175,24 +175,24 @@ int Main() {
     // gives is its own business -- refused on a machine that answers, timed
     // out or unreachable on one that drops -- so what is checked is that it
     // failed and said something rather than which something it said.
-    var refused = Net.Connect("127.0.0.1", 1u);
+    var refused = TcpClient.Connect("127.0.0.1", 1u);
     SayBool("refused", !refused.Ok);
     SayBool("refused-said-why", !refused.Ok && refused.Error != SocketError.None);
 
     // Two listeners on one port. The second one fails to bind.
-    var opening = Net.Listen("127.0.0.1", 0u);
+    var opening = TcpListener.Listen("127.0.0.1", 0u);
     if (!opening.Ok) { return 1; }
 
     var first = opening.Value;
     var taken = first.LocalEndPoint().Port;
-    var second = Net.Listen("127.0.0.1", taken);
+    var second = TcpListener.Listen("127.0.0.1", taken);
     SayBool("second-listener", second.Ok);
 
     first.Close();
 
     // A listener that was closed answers everything with Closed rather than
     // doing anything. Reopening the port now works, since the first let go.
-    var reopened = Net.Listen("127.0.0.1", taken);
+    var reopened = TcpListener.Listen("127.0.0.1", taken);
     if (!reopened.Ok) { return 1; }
 
     var dead = reopened.Value;

@@ -7,8 +7,8 @@ from the code, and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           497 pass
-dotnet run --project tests/Stainless.Tests      210 cases, 1 skipped on Windows
+dotnet test tests/Stainless.UnitTests           527 pass
+dotnet run --project tests/Stainless.Tests      212 cases, 1 skipped on Windows
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`, which is worth using --
@@ -44,12 +44,16 @@ than as part of it.
 the same reason SL0527 does. Only `char32` writes a character.
 
 **A constructor cannot report why it failed**, which is why fallible
-construction is a function in every language that checks errors. Stainless has
-no static methods, so those functions are module-level: `File.Open`,
-`Net.Listen`, `Net.Connect`, `Net.Bind`, `Net.Datagram`. The constructors stay
-public beside them -- hiding them was tried and reverted, because a factory can
-only hide a constructor when the two share a module, and `FileStream` and
-`File.Open` do not.
+construction is a function in every language that checks errors. This first
+went in as module-level functions -- `File.Open`, `Net.Listen` -- with the
+constructors left public beside them, because a factory can only hide a
+constructor when the two share a scope and a module-level one does not.
+
+That was the wrong half of the problem to solve. **Static methods** put the
+factory *inside* the type, where it can use a private constructor, so the
+shape it replaces is now absent rather than discouraged: `FileStream.Open`,
+`Socket.Open`, `TcpListener.Listen`, `TcpClient.Connect`, `UdpSocket.Bind`.
+There is no way left to obtain a stream that exists and holds no file.
 
 **Two emitter bugs, both the same shape.** An `alloca` holds whatever was on
 the stack, and `StoreInto` releases what it is replacing -- so a slot that is
@@ -66,7 +70,9 @@ this; `EmitTry` had to learn it, via a heap corruption that made a test loop.
    compiled into programs that never mention it.
 3. **`Standard.Collections` does not use the operators it now could.** `Money`
    in the samples still calls `Money.Add`, and the containers could declare
-   `==` and `<` rather than `IEquatable`/`IComparable` methods. A library pass.
+   `==` and `<` rather than `IEquatable`/`IComparable` methods. `Standard.Time`
+   has had this pass and is what the rest should look like: `hour + minute`,
+   `later - earlier`, and the makers on the types.
 4. **Operator constraints.** `where T : IAddable<T>` still cannot be written;
    an interface may not declare an operator, because an operator is chosen from
    the operand types rather than dispatched. This is also what blocks

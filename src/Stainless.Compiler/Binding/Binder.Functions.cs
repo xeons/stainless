@@ -33,6 +33,8 @@ public sealed partial class Binder
         var module = scope.Module;
         var returnType = ResolveType(declaration.ReturnType, scope);
 
+        bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
+
         var symbol = new FunctionSymbol
         {
             Name = declaration.Name,
@@ -52,6 +54,7 @@ public sealed partial class Binder
             IsOverride = declaration.Modifiers.HasFlag(Modifiers.Override),
             IsAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract),
             IsSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed),
+            IsStatic = isStatic,
             IsVariadic = declaration.IsVariadic,
             Body = declaration.Body,
             Span = declaration.Span,
@@ -61,8 +64,9 @@ public sealed partial class Binder
         // An operator has no receiver: it is static, and every operand is
         // written out. That is what makes `2 * money` expressible, since an
         // operator whose left operand is not the declaring type would have
-        // nothing to hang a `this` off.
-        if (containingType is not null && !declaration.IsOperator)
+        // nothing to hang a `this` off. A static method has none for the same
+        // reason it is called by naming the type: there is no instance.
+        if (containingType is not null && !declaration.IsOperator && !isStatic)
         {
             // A method receives its instance: classes by reference, structs by pointer.
             TypeSymbol thisType = containingType is ClassTypeSymbol c
@@ -108,6 +112,8 @@ public sealed partial class Binder
                           $"'{dispatch}'; there is no receiver to dispatch on"
                         : $"'{containingType.Name}' is not a class, so '{declaration.Name}' " +
                           $"cannot be '{dispatch}'; only a class is derived from");
+
+        if (isStatic) CheckStatic(containingType, declaration);
 
         if (declaration.Modifiers.HasFlag(Modifiers.Protected) &&
             containingType is not ClassTypeSymbol)
@@ -181,6 +187,48 @@ public sealed partial class Binder
         }
 
         module.Functions.Add(symbol);
+    }
+
+    /// <summary>
+    /// What <c>static</c> may be written on.
+    ///
+    /// It belongs to a type and means "no receiver", so every word that is
+    /// about a receiver contradicts it, and at module scope it says nothing
+    /// that was not already true.
+    /// </summary>
+    private void CheckStatic(NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
+    {
+        if (containingType is null)
+        {
+            diagnostics.Error("SL0573", declaration.Span,
+                $"'{declaration.Name}' is already at module scope, so 'static' says nothing " +
+                "new: a module has no instance for a function to belong to. Write the " +
+                "function without the word, or move it into the type it is about");
+            return;
+        }
+
+        if (containingType.IsContract)
+        {
+            diagnostics.Error("SL0574", declaration.Span,
+                $"'{containingType.Name}' is an interface, so '{declaration.Name}' cannot be " +
+                "'static': an interface promises what an object can do, and a static method " +
+                "has no object. Declare it on a type that implements this");
+            return;
+        }
+
+        // Only for a class: on anything else the word was already refused for
+        // the better reason that there is nothing to derive from.
+        if (containingType is ClassTypeSymbol && Dispatchable(declaration.Modifiers) is { } dispatch)
+            diagnostics.Error("SL0575", declaration.Span,
+                $"'{declaration.Name}' cannot be both 'static' and '{dispatch}'; dispatch " +
+                "chooses a body from the object a call arrives on, and a static method has " +
+                "no object");
+
+        if (containingType is ClassTypeSymbol && declaration.Modifiers.HasFlag(Modifiers.Protected))
+            diagnostics.Error("SL0575", declaration.Span,
+                $"'{declaration.Name}' cannot be both 'static' and 'protected'; 'protected' " +
+                "is about what a derived object may reach through itself, and a static " +
+                "method is not reached through an object");
     }
 
     /// <summary>

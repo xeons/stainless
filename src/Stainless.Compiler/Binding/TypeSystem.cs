@@ -455,7 +455,10 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public FunctionSymbol? FindImplementation(FunctionSymbol required)
     {
         var wanted = required.ParameterTypes.ToList();
-        var overloads = FindMethods(required.Name).ToList();
+
+        // A static method cannot implement anything: dispatch arrives on an
+        // object, and a static one has no place to put it.
+        var overloads = FindMethods(required.Name).Where(m => !m.IsStatic).ToList();
 
         // Falling back to a lone candidate is deliberate: when only one method
         // could have been meant, the mismatch is the useful diagnostic, and

@@ -268,6 +268,7 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             ContainingType = containingType,
             IsPublic = true,
             IsVariadic = described.IsVariadic,
+            IsStatic = described.IsStatic,
 
             // A virtual method has to stay virtual across the boundary, or a
             // consumer would call the declaration rather than the object's own
@@ -283,7 +284,7 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             MetadataAccessor = described.Accessor,
         };
 
-        if (containingType is not null)
+        if (containingType is not null && !described.IsStatic)
         {
             TypeSymbol receiver = containingType is ClassTypeSymbol reference
                 ? reference

@@ -501,6 +501,16 @@ public sealed partial class Binder
                     break;
                 }
 
+                // Reached silently before static methods existed, which meant
+                // a `static readonly` written in a type simply vanished.
+                case StaticDeclSyntax shared:
+                    diagnostics.Error("SL0577", shared.Span,
+                        $"'{shared.Name}' is 'static readonly' storage inside '{type.Name}'; " +
+                        "that belongs to a module, which is what this language has instead of " +
+                        "a namespace. A 'static' member of a type is a method. Move it out, or " +
+                        "make it a 'const'");
+                    break;
+
                 case DestructorDeclSyntax destructor:
                 {
                     if (classType is null)

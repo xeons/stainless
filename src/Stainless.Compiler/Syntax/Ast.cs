@@ -115,6 +115,13 @@ public enum Modifiers
     /// nothing may override further.
     /// </summary>
     Sealed = 1 << 7,
+
+    /// <summary>
+    /// On a member, one that belongs to the type rather than to an instance of
+    /// it: no receiver, and so no access to a field. On a module-level
+    /// declaration, <c>static readonly</c> storage.
+    /// </summary>
+    Static = 1 << 9,
 }
 
 /// <summary>

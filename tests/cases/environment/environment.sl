@@ -55,39 +55,39 @@ int Main(String[] args) {
     // ---------------------------------------------------------------- time
 
     // A date the calendar arithmetic can be checked against by hand.
-    var moon = Time.FromUtc(1969, 7, 20, 20, 17, 40);
-    printf("moon      = %s\n", Time.FormatIso(moon).ToPointer());
-    printf("moonUnix  = %lld\n", Time.ToUnixSeconds(moon));
+    var moon = Instant.FromUtc(1969, 7, 20, 20, 17, 40);
+    printf("moon      = %s\n", moon.FormatIso().ToPointer());
+    printf("moonUnix  = %lld\n", moon.ToUnixSeconds());
 
-    var broken = Time.ToUtc(moon);
+    var broken = moon.ToUtc();
     printf("moonDay   = %d\n", broken.DayOfWeek);        // a Sunday
     printf("moonYday  = %d\n", broken.DayOfYear);
 
     // Before the epoch, which is where truncating division goes wrong.
-    var early = Time.FromUtc(1960, 1, 1, 0, 0, 0);
-    printf("early     = %s\n", Time.FormatIso(early).ToPointer());
-    printf("earlyUnix = %lld\n", Time.ToUnixSeconds(early));
+    var early = Instant.FromUtc(1960, 1, 1, 0, 0, 0);
+    printf("early     = %s\n", early.FormatIso().ToPointer());
+    printf("earlyUnix = %lld\n", early.ToUnixSeconds());
 
     // The epoch itself.
-    printf("epoch     = %s\n", Time.FormatIso(Time.Epoch()).ToPointer());
+    printf("epoch     = %s\n", Instant.Epoch().FormatIso().ToPointer());
 
     // Round trip, which is what makes the format worth having.
-    var parsed = Time.ParseIso("2026-09-05T14:30:00Z");
+    var parsed = Instant.ParseIso("2026-09-05T14:30:00Z");
     switch (parsed) {
         case Ok ok:
-            printf("parsed    = %s\n", Time.FormatIso(ok.Value).ToPointer());
+            printf("parsed    = %s\n", ok.Value.FormatIso().ToPointer());
             break;
         case Fail:
             printf("parsed    = failed\n");
             break;
     }
 
-    printf("malformed = %d\n", Time.ParseIso("not a date").Ok);
-    printf("shortForm = %d\n", Time.ParseIso("2026-09-05").Ok);
-    printf("badMonth  = %d\n", Time.ParseIso("2026-13-05T14:30:00Z").Ok);
-    printf("feb30     = %d\n", Time.ParseIso("2026-02-30T00:00:00Z").Ok);
-    printf("feb29leap = %d\n", Time.ParseIso("2024-02-29T00:00:00Z").Ok);
-    printf("feb29not  = %d\n", Time.ParseIso("2026-02-29T00:00:00Z").Ok);
+    printf("malformed = %d\n", Instant.ParseIso("not a date").Ok);
+    printf("shortForm = %d\n", Instant.ParseIso("2026-09-05").Ok);
+    printf("badMonth  = %d\n", Instant.ParseIso("2026-13-05T14:30:00Z").Ok);
+    printf("feb30     = %d\n", Instant.ParseIso("2026-02-30T00:00:00Z").Ok);
+    printf("feb29leap = %d\n", Instant.ParseIso("2024-02-29T00:00:00Z").Ok);
+    printf("feb29not  = %d\n", Instant.ParseIso("2026-02-29T00:00:00Z").Ok);
 
     printf("leap2024  = %d\n", Time.IsLeapYear(2024));
     printf("leap1900  = %d\n", Time.IsLeapYear(1900));
@@ -95,32 +95,33 @@ int Main(String[] args) {
     printf("febLeap   = %d\n", Time.DaysInMonth(2024, 2));
     printf("febPlain  = %d\n", Time.DaysInMonth(2026, 2));
 
-    // Durations, which are ordinary arithmetic on a number of nanoseconds.
-    var hour = Time.FromHours(1);
-    var minute = Time.FromMinutes(1);
+    // Durations, which really are ordinary arithmetic now: the operators
+    // are declared on the struct, so `hour + minute` is the whole of it.
+    var hour = Duration.FromHours(1);
+    var minute = Duration.FromMinutes(1);
 
-    printf("hourSecs  = %lld\n", Time.TotalSeconds(hour));
-    printf("sum       = %lld\n", Time.TotalSeconds(Time.Add(hour, minute)));
-    printf("diff      = %lld\n", Time.TotalSeconds(Time.Subtract(hour, minute)));
-    printf("negative  = %d\n", Time.IsNegative(Time.Subtract(minute, hour)));
-    printf("format    = %s\n", Time.FormatDuration(Time.FromMilliseconds(3661004)).ToPointer());
-    printf("small     = %s\n", Time.FormatDuration(Time.FromMilliseconds(42)).ToPointer());
-    printf("negFormat = %s\n", Time.FormatDuration(Time.FromMilliseconds(-1500)).ToPointer());
+    printf("hourSecs  = %lld\n", hour.TotalSeconds());
+    printf("sum       = %lld\n", (hour + minute).TotalSeconds());
+    printf("diff      = %lld\n", (hour - minute).TotalSeconds());
+    printf("negative  = %d\n", (minute - hour).IsNegative());
+    printf("format    = %s\n", Duration.FromMilliseconds(3661004).Format().ToPointer());
+    printf("small     = %s\n", Duration.FromMilliseconds(42).Format().ToPointer());
+    printf("negFormat = %s\n", Duration.FromMilliseconds(-1500).Format().ToPointer());
 
     // Two instants an hour apart, which is a fact about the arithmetic rather
     // than about the machine's clock.
-    var later = Time.Plus(moon, hour);
-    printf("apart     = %lld\n", Time.TotalSeconds(Time.Since(later, moon)));
+    var later = moon + hour;
+    printf("apart     = %lld\n", (later - moon).TotalSeconds());
 
     // The wall clock is somewhere in this century, and the monotonic one does
     // not go backwards. Neither is a value that can be written down.
-    var now = Time.ToUtc(Time.Now());
+    var now = Instant.Now().ToUtc();
     printf("thisEra   = %d\n", now.Year >= 2020 && now.Year < 2200);
 
     var clock = new Clock();
     var first = clock.Elapsed();
     var second = clock.Elapsed();
-    printf("forwards  = %d\n", Time.Compare(second, first) >= 0);
+    printf("forwards  = %d\n", second >= first);
 
     // -------------------------------------------------------------- random
 
