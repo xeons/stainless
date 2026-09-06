@@ -1550,7 +1550,13 @@ Being straight about the edges, roughly in the order they are worth adding:
   cannot be generic at all, since dispatch gives it one slot. A parameter that
   appears only in a *lambda's* result is a different case and is inferred, by
   binding the body once the other arguments have given it its parameter types —
-  which is what makes `Map(numbers, n => n * 2)` work.
+  which is what makes `Map(numbers, n => n * 2)` work. The same ambiguity is
+  why an instantiation cannot be *named* in expression position either:
+  `new Box<int>(...)` reads, because a type is what is expected after `new`,
+  but `Box<int>.Of(2)` and `Box<int>.Count` do not. A generic type's static
+  members are reachable from inside it and from a value of it, and a maker for
+  one is written as a module-level generic function. Inside the type its own
+  statics are named directly, as they are anywhere else.
 - **No `switch` expression, and the only pattern is a variant's case.** A
   switch over a variant covers cases and may bind a payload; everywhere else
   `switch` is the C# statement and only that. No type patterns, no constants

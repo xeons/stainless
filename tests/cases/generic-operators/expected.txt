@@ -1,0 +1,11 @@
+int      = 5
+minus    = -1
+unary    = -2
+equal    = false
+notEqual = true
+long     = 42
+double   = 0.75
+pair     = 11 22
+counted  = 102 21
+separate = 101
+late     = 101

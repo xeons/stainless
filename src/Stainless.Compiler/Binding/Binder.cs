@@ -128,7 +128,22 @@ public sealed partial class Binder(
     /// a <c>closure</c> is declared the same way and is a struct.
     /// </summary>
     private readonly Dictionary<NamedTypeSymbol, (DelegateDeclSyntax Declaration, FileScope Scope)> _delegateSyntax = [];
-    private readonly Dictionary<StaticSymbol, (StaticDeclSyntax Declaration, FileScope Scope)> _staticSyntax = [];
+    /// <summary>
+    /// Each static's declaration, and the substitution in force where it was
+    /// declared. That last part is what lets a static of <c>Box&lt;int&gt;</c>
+    /// bind an initializer that mentions <c>T</c>: it is bound long after the
+    /// instantiation made it, by which time nothing else remembers what T was.
+    /// </summary>
+    private readonly Dictionary<StaticSymbol,
+        (StaticDeclSyntax Declaration, FileScope Scope,
+         Dictionary<string, TypeSymbol> Substitution)> _staticSyntax = [];
+
+    /// <summary>
+    /// Statics whose initializer has been bound. The table above is added to
+    /// while it is being drained -- instantiating a generic declares its
+    /// statics -- so binding is by difference rather than by one walk.
+    /// </summary>
+    private readonly HashSet<StaticSymbol> _boundStatics = [];
     private List<StaticSymbol> _staticOrder = [];
     private readonly List<FunctionSymbol> _staticConstructors = [];
 
@@ -185,8 +200,9 @@ public sealed partial class Binder(
         CheckUnions();              //         and a union counts nothing
         ValidateLinkageSignatures();// pass 8: no counted reference crosses a language boundary
         BindBodies();               // pass 9: only now is any code checked
-        BindStatics();              // pass 10: static initializers, then their order
-        DrainPending();             // pass 11: bodies of everything instantiated along the way
+        BindStatics();              // pass 10: static initializers
+        DrainPending();             // pass 11: bodies of everything instantiated along the way,
+                                    //          the statics that came with them, and their order
         CheckConstructorDelegation();
         ResolveRemainingAliases();
 

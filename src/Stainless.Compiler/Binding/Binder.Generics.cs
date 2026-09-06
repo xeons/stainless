@@ -39,14 +39,27 @@ public sealed partial class Binder
     {
         var previous = _substitution;
 
-        while (_pending.Count > 0)
+        // The two feed each other. Binding a body can instantiate a generic,
+        // which declares that instantiation's statics; binding a static's
+        // initializer can instantiate one too, which queues more bodies. So
+        // neither is done until both are.
+        while (_pending.Count > 0 || _staticSyntax.Count != _boundStatics.Count)
         {
-            var (function, substitution) = _pending.Dequeue();
-            _substitution = substitution;
-            BindFunctionBody(function);
+            while (_pending.Count > 0)
+            {
+                var (function, substitution) = _pending.Dequeue();
+                _substitution = substitution;
+                BindFunctionBody(function);
+            }
+
+            BindStatics();
         }
 
         _substitution = previous;
+
+        // Only now is the set of statics closed, so this is the first moment at
+        // which the order they run in can be settled.
+        OrderStatics();
     }
 
     // ============================================================ generics
@@ -153,6 +166,18 @@ public sealed partial class Binder
         // substitution.
         foreach (var method in type.Methods.Where(m => m.HasBody))
             _pending.Enqueue((method, substitution));
+
+        // Operators are deliberately not in `Methods` -- they have no receiver
+        // and no dispatch slot -- so they have to be queued by name here. Miss
+        // this and the symbol still exists, `a + b` still binds and mangles,
+        // and the only sign of it is a link error naming the operator.
+        foreach (var declared in type.Operators.Where(o => o.HasBody))
+            _pending.Enqueue((declared, substitution));
+
+        // The same for the one-per-type setup block, which is reached from the
+        // static initialization pass rather than by lookup.
+        if (type.StaticConstructor is { HasBody: true } setup)
+            _pending.Enqueue((setup, substitution));
 
         if (type is ClassTypeSymbol withMembers)
         {

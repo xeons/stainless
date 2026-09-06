@@ -8,7 +8,7 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           563 pass
-dotnet run --project tests/Stainless.Tests      225 cases, 1 skipped on Windows
+dotnet run --project tests/Stainless.Tests      226 cases, 1 skipped on Windows
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
@@ -31,7 +31,8 @@ not been pushed.
 | `3ad68ec` | reflection sees properties, not just their storage |
 | `98db181` | find a reflected type by name |
 | `4fc1dde` | `closure`: a method and the object it belongs to |
-| *(this run)* | the GTK layer moved onto closures; a user-control sample |
+| `b83260a` | the GTK layer moved onto closures; a user-control sample |
+| *(this run)* | generic types get their operators, statics and setup blocks |
 
 ## Findings worth keeping
 
@@ -68,11 +69,39 @@ raising. There is no `internal` or `friend`.
 If events come back, they should be `event C Name;` over a closure type, and
 the 700 lines are in `4fc1dde`'s parent commits to crib from.
 
-**Three compiler bugs found by trying a user's design rather than by testing.**
+**Monomorphization dropped every member that is not a method, and the three
+that were dropped failed in two different ways.** This is the bug the last run
+left open, and looking at it properly found two more beside it.
 
-- **Operators on generic types are never emitted.** `Box<T>` with an
-  `operator+` fails to link, with one instantiation or several. Found while
-  prototyping events as a library type. **Still open.**
+`Instantiate` queued the bodies of `type.Methods`, its constructors and its
+destructor. An **operator** is deliberately not in `Methods` — no receiver, no
+dispatch slot — and neither is the `static Name() { }` **setup block**, which is
+reached from the static-initialization pass rather than by lookup. So both were
+declared, both were called, both mangled, and neither was ever emitted. The
+symptom is a link error naming one mangled symbol, which is why `Box<T>` with an
+`operator+` failed with one instantiation or with several: the count was never
+the variable.
+
+**Statics failed one step further out, and that is the part worth remembering.**
+Their initializers were bound and topologically sorted in pass 10, which had
+already finished by the time pass 11 bound a body that asked for a *new*
+instantiation — so that instantiation's storage was never allocated at all. A
+generic reached only from inside another generic hit this and nothing else did,
+which is why it had never been seen. The passes interleave now: bodies and
+statics feed each other until neither has anything left, and only then is the
+order the initializers run in settled. `_staticSyntax` also carries the
+substitution in force where each static was declared, because an initializer
+that names `T` is bound long after anything else remembers what T was.
+
+The lesson generalizes past this fix: **a member kind that lives outside
+`Methods` is a member kind monomorphization will forget.** The full inventory is
+methods (property accessors included), operators, constructors, the destructor,
+the static setup block, statics, and generic methods — which instantiate
+themselves and are the one kind that was never at risk.
+
+**Two more compiler bugs found by trying a user's design rather than by
+testing.**
+
 - `var d = SomeFunction;` bound cleanly and emitted `store ptr 0`, which clang
   rejected as a compiler bug. The lambda case beside it had been fixed and left
   a comment describing the identical symptom; this was its missing sibling.
@@ -123,25 +152,23 @@ kind of mistake that shows up as a corrupt stack in someone else's code.
 
 ## Next, in the order I would do it
 
-1. **Operators on generic types.** A real bug with a one-line repro, and it
-   blocks any generic value type that wants arithmetic or comparison.
-2. **Method metadata in reflection**, with invoke-by-name. The last piece
+1. **Method metadata in reflection**, with invoke-by-name. The last piece
    before a form file can wire a handler, and the same work would let a
    deserializer fill a `List<T>` — the one shape `Standard.Json` cannot
    represent.
-3. **The component layer.** `samples/gtk/control.sl` is what one control looks
+2. **The component layer.** `samples/gtk/control.sl` is what one control looks
    like by hand; the next step is a `Component`/`Control` base with ownership
    and bounds, and a narrow backend interface with GTK and Win32 behind it.
    Everything it needs exists.
-4. **A reachability pass from `Main`.** Every program compiles the whole
+3. **A reachability pass from `Main`.** Every program compiles the whole
    library. It is the most expensive missing thing and gets worse as the
    library grows.
-5. **The +0/+1 dataflow pass.** Still the acknowledged performance item.
-6. **`List<T>` has no `Remove(T)`.** Its `IndexOf` wants `IEquatable<T>`, which
+4. **The +0/+1 dataflow pass.** Still the acknowledged performance item.
+5. **`List<T>` has no `Remove(T)`.** Its `IndexOf` wants `IEquatable<T>`, which
    a closure is not, so a list of callbacks is removed from by hand.
-7. **`Standard.Collections` does not use the operators it could.** `Money` in
+6. **`Standard.Collections` does not use the operators it could.** `Money` in
    the samples still calls `Money.Add`; `Standard.Time` has had this pass.
-8. Format specifiers in interpolation; the samples cover about half the
+7. Format specifiers in interpolation; the samples cover about half the
    language.
 
 ## Things to know before touching the build
@@ -154,9 +181,16 @@ kind of mistake that shows up as a corrupt stack in someone else's code.
   own assertion; check which is in the text before writing the pattern.
 - `io.open(p, 'wb').write(io.open(p, 'rb').read())` truncates the file before
   reading it — Python evaluates the callee first.
-- **The first `dotnet build` after an rsync onto Linux sometimes dies with
+- **There is no `rsync` on this Windows box.** What works is tar over ssh, and
+  `git ls-files` keeps `bin/` and `obj/` out of it — a stale `obj/` from the
+  other platform is what makes a synced tree fail in confusing ways:
+  ```sh
+  tar -czf /tmp/sync.tgz $(git ls-files) <any-untracked-files>
+  cat /tmp/sync.tgz | ssh brandon@geekom-a7 "mkdir -p ~/stainless-fix && tar -xzf - -C ~/stainless-fix"
+  ```
+- **The first `dotnet build` after a sync onto Linux sometimes dies with
   `Internal CLR error (0x80131506)`.** It is transient: run it again and it is
-  clean. It happened twice this run and neither time was real.
+  clean. It happened twice in an earlier run and neither time was real.
 - `-o /dev/null` does not work for a build on Windows; the linker wants a real
   path.
 - **Windows reserves `COM1`–`COM9` even with an extension**, so a scratch file

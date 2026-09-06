@@ -63,11 +63,64 @@ public sealed partial class Binder
         if (containingType is not null) containingType.Statics.Add(symbol);
         else module.Statics[declaration.Name] = symbol;
 
-        _staticSyntax[symbol] = (declaration, scope);
+        // The substitution is copied rather than referenced: the binder reuses
+        // one dictionary as it walks in and out of instantiations, and this has
+        // to be what T meant here.
+        _staticSyntax[symbol] = (declaration, scope,
+            new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
     }
 
     /// <summary>
-    /// Binds every static's initializer, then decides what order they run in.
+    /// Binds the initializer of every static not yet bound.
+    ///
+    /// Called from pass 10 and again from pass 11, because the set of statics
+    /// is not closed until monomorphization is: instantiating
+    /// <c>Holder&lt;int&gt;</c> declares its statics, and that instantiation
+    /// can be asked for by a body bound after this pass would have run. So the
+    /// table is drained by difference rather than walked once, and
+    /// <see cref="OrderStatics"/> is what happens when it is finally empty.
+    /// </summary>
+    private void BindStatics()
+    {
+        var previousSubstitution = _substitution;
+
+        // Binding one initializer can instantiate a generic and so declare more
+        // statics, which is why this is a loop over what is left rather than a
+        // walk of what was there.
+        while (true)
+        {
+            var waiting = _staticSyntax
+                .Where(entry => !_boundStatics.Contains(entry.Key))
+                .ToList();
+            if (waiting.Count == 0) break;
+
+            foreach (var (symbol, (declaration, scope, substitution)) in waiting)
+            {
+                _boundStatics.Add(symbol);
+
+                _currentScope = scope;
+                _currentFunction = null;
+                _substitution = substitution;
+
+                var value = BindConversion(
+                    BindExpression(declaration.Value), symbol.Type, declaration.Value.Span);
+                symbol.Initializer = value;
+
+                // A static outlives every thread, so whatever it holds is
+                // reachable from all of them at once. Said, not refused: a
+                // program with one thread has no race to have, and the compiler
+                // cannot see which kind it is looking at.
+                if (!IsSendable(symbol.Type))
+                    ReportNotSendable(symbol.Type, declaration.Span, $"static '{symbol.Name}'");
+            }
+        }
+
+        _currentScope = null;
+        _substitution = previousSubstitution;
+    }
+
+    /// <summary>
+    /// Decides what order the initializers run in, once every static is known.
     ///
     /// C++ cannot do this and calls the result a fiasco; Swift avoids it by
     /// making every static lazy and paying a guard check on every access, which
@@ -76,27 +129,8 @@ public sealed partial class Binder
     /// sort it -- no guard, no per-access cost, and a compile error rather than
     /// a runtime mystery when the graph has a cycle.
     /// </summary>
-    private void BindStatics()
+    private void OrderStatics()
     {
-        foreach (var (symbol, (declaration, scope)) in _staticSyntax)
-        {
-            _currentScope = scope;
-            _currentFunction = null;
-
-            var value = BindConversion(
-                BindExpression(declaration.Value), symbol.Type, declaration.Value.Span);
-            symbol.Initializer = value;
-
-            // A static outlives every thread, so whatever it holds is reachable
-            // from all of them at once. Said, not refused: a program with one
-            // thread has no race to have, and the compiler cannot see which
-            // kind it is looking at.
-            if (!IsSendable(symbol.Type))
-                ReportNotSendable(symbol.Type, declaration.Span, $"static '{symbol.Name}'");
-        }
-
-        _currentScope = null;
-
         foreach (var (symbol, _) in _staticSyntax)
             CollectStaticDependencies(symbol, symbol.Initializer);
 

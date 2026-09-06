@@ -2249,6 +2249,20 @@ instantiates it, so a mistake inside a generic that nobody uses goes unreported,
 and errors are reported against the instantiation. Each distinct instantiation
 is separate code.
 
+**Every member goes through this, not only the methods**: an operator, an
+indexer, a property, a constructor, a destructor, a static and the
+`static Name() { }` block are each built once per instantiation, with the type
+arguments substituted in. So a `static int Made` on `Counted<T>` is *two*
+counters once `Counted<int>` and `Counted<long>` both exist, and each
+instantiation's setup block runs against its own — which is C#'s rule and falls
+out of monomorphization rather than being decided separately.
+
+**A type argument list is only written where a type is expected.** `new
+Box<int>(41)` and `Box<int> b;` read, and so does a `Box<int>` field or
+parameter; `Box<int>.Of(41)` does not, because `<` in expression position is
+less-than. A generic type's statics are reachable from inside it, and a maker
+for one is a module-level generic function whose argument infers `T`.
+
 ### 4.2 Constraints
 
 A `where` clause says which interfaces a type argument must implement. It goes
@@ -3496,6 +3510,13 @@ rule where two could disagree.
 
 **A declared `==` is asked first**, before the reference comparison a class
 would otherwise get. That is the whole reason to declare one.
+
+**A generic type may declare operators**, and each instantiation gets its own.
+`Box<T>` with an `operator +` gives `Box<int>` and `Box<long>` a body each,
+with `T` substituted -- the same monomorphization every other member of a
+template goes through. Whether the body is *valid* is decided per
+instantiation, as §4.3 says: `a.Value + b.Value` compiles at `int` and is an
+error at some type with no `+`, reported against the use that asked for it.
 
 ### 7.5 Indexers
 
