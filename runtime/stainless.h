@@ -129,7 +129,48 @@ typedef struct SlFieldInfo {
     uint32_t           elementKind;
     const SlTypeInfo  *elementType;
     size_t             elementSize;
+
+    /*
+     * SL_FIELD_* below. Appended for the same reason the element columns were.
+     *
+     * The bit that matters is SL_FIELD_PROPERTY: an automatic property's
+     * storage is an ordinary field named after the property, so without this a
+     * walk over the field table cannot tell `Left` the storage from `Left` the
+     * property, and writing it goes straight past the setter.
+     */
+    uint32_t           flags;
 } SlFieldInfo;
+
+/* The storage behind an automatic property, rather than a field of its own. */
+#define SL_FIELD_PROPERTY 1u
+
+/*
+ * A property, which is a pair of functions rather than a place.
+ *
+ * This exists because writing a field is not the same as setting a property.
+ * A serializer filling plain data is right to write the storage directly, and
+ * that is what the field table is for; a form loader setting `Left` on a
+ * control is not, because the setter is what re-runs the layout. So the two
+ * are described separately and a caller chooses.
+ *
+ * `getter` and `setter` are the accessors, or NULL where the property does not
+ * have one. Their C signature follows `kind` -- `int32_t (*)(void *)` for an
+ * int, `void (*)(void *, double)` for a double -- and sl_property_get_* below
+ * is where that switch lives, once, so that no caller has to guess.
+ *
+ * Indexers and static properties are deliberately absent: an indexer's
+ * accessors take arguments this cannot supply, and a static one has no
+ * instance to pass.
+ */
+typedef struct SlPropertyInfo {
+    const char        *name;
+    uint32_t           kind;
+    const SlTypeInfo  *type;        /* for aggregates; NULL for primitives */
+    const void        *getter;      /* NULL for a write-only property */
+    const void        *setter;      /* NULL for a read-only one */
+    size_t             attributeCount;
+    const SlAttribute *attributes;
+} SlPropertyInfo;
 
 struct SlTypeInfo {
     size_t              size;   /* header + fields, in bytes            */
@@ -176,6 +217,13 @@ struct SlTypeInfo {
      * what it meant, so a library compiled before this still reads correctly.
      */
     const void         *com;
+
+    /*
+     * Property metadata, emitted alongside the fields for a [Reflect] type.
+     * Appended after `com` on the same terms as everything before it.
+     */
+    size_t                  propertyCount;
+    const SlPropertyInfo   *properties;
 };
 
 typedef struct SlObject {
@@ -613,6 +661,50 @@ SL_API void sl_write_bool(void *instance, const void *field, _Bool value);
 SL_API void sl_write_text(void *instance, const void *field,
                           const void *bytes, size_t length);
 SL_API void sl_write_reference(void *instance, const void *field, void *value);
+
+/* SL_FIELD_* -- whether this field is an automatic property's storage. */
+SL_API uint32_t sl_field_flags(const void *field);
+
+/* ---------------------------------------------------------- properties */
+
+SL_API size_t      sl_type_property_count(const void *type);
+SL_API const void *sl_type_property(const void *type, size_t index);
+
+SL_API const char *sl_property_name(const void *property);
+SL_API uint32_t    sl_property_kind(const void *property);
+SL_API const void *sl_property_type(const void *property);
+SL_API _Bool       sl_property_can_read(const void *property);
+SL_API _Bool       sl_property_can_write(const void *property);
+SL_API size_t      sl_property_attribute_count(const void *property);
+SL_API const void *sl_property_attribute(const void *property, size_t index);
+
+/*
+ * Calling an accessor, which is the whole point of the property table.
+ *
+ * Each of these switches on the property's kind and casts the stored function
+ * pointer to the prototype that kind implies. That switch is the unsafe part
+ * of reflection and it is written once here, rather than at every call site
+ * that would otherwise have to guess -- a getter returning int32_t called
+ * through an int64_t prototype reads four bytes of whatever follows.
+ *
+ * Reading a property whose kind does not match the reader, or one with no
+ * accessor, answers zero rather than calling anything.
+ */
+SL_API int64_t sl_property_get_integer(void *instance, const void *property);
+SL_API double  sl_property_get_double(void *instance, const void *property);
+SL_API _Bool   sl_property_get_bool(void *instance, const void *property);
+SL_API void   *sl_property_get_reference(void *instance, const void *property);
+
+SL_API void sl_property_set_integer(void *instance, const void *property, int64_t value);
+SL_API void sl_property_set_double(void *instance, const void *property, double value);
+SL_API void sl_property_set_bool(void *instance, const void *property, _Bool value);
+
+/*
+ * Setting a reference property. The setter takes ownership of a reference of
+ * its own, so this retains before the call and the caller keeps theirs -- the
+ * same bargain sl_write_reference makes for a field.
+ */
+SL_API void sl_property_set_reference(void *instance, const void *property, void *value);
 
 /* Allocates a zeroed instance of a reflected type, for a deserializer. */
 SL_API void *sl_type_make(const void *type);

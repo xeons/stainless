@@ -1,24 +1,19 @@
-name=Ada id=7 rank=1
-label=Ada#7
-renamed=Grace rank=4
-compound=20
-visits=2
-dispatch name=Grace rank=42
-c=100 f=212 k=373
-after f=212: c=100
-after k=300: c=27
-rect=5x4 area=20
-cell=15 text=boxed
-boxed=6
-held=1 first=Grace#7
-chained=9 9
-replacing
-~Tag(first)
-replaced=second
-~Slot
-~Tag(second)
-scope left
-delegate=42 20
-closure=101
-done
-~Person(Grace)
+properties = 5
+listed = Left:intrw,Name:Stringrw,Right:intr-,Visible:boolrw,Weight:doublerw
+fields = Layouts(field),left(field),name(field),Name(property),Visible(property),Weight(property)
+left = 7
+layouts = 2
+right = 17
+right-writable = false
+right-after = 17
+name = panel one
+name-direct = panel one
+visible = true
+weight = 2.5
+left-after-double = 7
+double-of-int = 0
+missing = false
+panel = Left,Name,Right,Visible,Weight,Depth
+panel-left = 5
+panel-depth = 9
+panel-layouts = 1

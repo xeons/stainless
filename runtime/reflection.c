@@ -394,3 +394,204 @@ void sl_write_at_text(void *address, const void *bytes, size_t length)
     sl_release(*slot);
     *slot = text;
 }
+
+/* ----------------------------------------------------------- properties */
+
+uint32_t sl_field_flags(const void *field)
+{
+    return ((const SlFieldInfo *)field)->flags;
+}
+
+size_t sl_type_property_count(const void *type)
+{
+    return ((const SlTypeInfo *)type)->propertyCount;
+}
+
+const void *sl_type_property(const void *type, size_t index)
+{
+    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    if (index >= info->propertyCount) sl_array_bounds_fail(index, info->propertyCount);
+    return &info->properties[index];
+}
+
+const char *sl_property_name(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->name;
+}
+
+uint32_t sl_property_kind(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->kind;
+}
+
+const void *sl_property_type(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->type;
+}
+
+_Bool sl_property_can_read(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->getter != NULL;
+}
+
+_Bool sl_property_can_write(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->setter != NULL;
+}
+
+size_t sl_property_attribute_count(const void *property)
+{
+    return ((const SlPropertyInfo *)property)->attributeCount;
+}
+
+const void *sl_property_attribute(const void *property, size_t index)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    if (index >= info->attributeCount) sl_array_bounds_fail(index, info->attributeCount);
+    return &info->attributes[index];
+}
+
+/*
+ * The unsafe half of reflection, written once.
+ *
+ * A getter's C prototype follows the property's kind, and calling one through
+ * the wrong prototype is not a mistake anything reports: an int32_t returned
+ * through an int64_t signature carries four bytes of whatever the ABI left in
+ * the upper half. So every cast lives in these six functions and nowhere else.
+ */
+int64_t sl_property_get_integer(void *instance, const void *property)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const void *getter = info->getter;
+    if (getter == NULL) return 0;
+
+    switch (info->kind) {
+        case SL_KIND_SBYTE:  return ((int8_t   (*)(void *))getter)(instance);
+        case SL_KIND_SHORT:  return ((int16_t  (*)(void *))getter)(instance);
+        case SL_KIND_INT:    return ((int32_t  (*)(void *))getter)(instance);
+        case SL_KIND_LONG:
+        case SL_KIND_NINT:   return ((int64_t  (*)(void *))getter)(instance);
+        case SL_KIND_CHAR:
+        case SL_KIND_BYTE:   return ((uint8_t  (*)(void *))getter)(instance);
+        case SL_KIND_CHAR16:
+        case SL_KIND_USHORT: return ((uint16_t (*)(void *))getter)(instance);
+        case SL_KIND_CHAR32:
+        case SL_KIND_UINT:   return ((uint32_t (*)(void *))getter)(instance);
+        case SL_KIND_ULONG:
+        case SL_KIND_NUINT:  return (int64_t)((uint64_t (*)(void *))getter)(instance);
+        default:             return 0;
+    }
+}
+
+double sl_property_get_double(void *instance, const void *property)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const void *getter = info->getter;
+    if (getter == NULL) return 0.0;
+
+    switch (info->kind) {
+        case SL_KIND_FLOAT:  return ((float  (*)(void *))getter)(instance);
+        case SL_KIND_DOUBLE: return ((double (*)(void *))getter)(instance);
+        default:             return 0.0;
+    }
+}
+
+_Bool sl_property_get_bool(void *instance, const void *property)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    if (info->getter == NULL || info->kind != SL_KIND_BOOL) return 0;
+
+    return ((_Bool (*)(void *))info->getter)(instance);
+}
+
+/*
+ * A String, a class, an interface or an array. The reference comes back
+ * borrowed: the getter answered with the object the property holds and did not
+ * add a count, so a caller keeping it must retain it.
+ */
+void *sl_property_get_reference(void *instance, const void *property)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const void *getter = info->getter;
+    if (getter == NULL) return NULL;
+
+    switch (info->kind) {
+        case SL_KIND_STRING:
+        case SL_KIND_CLASS:
+        case SL_KIND_INTERFACE:
+        case SL_KIND_ARRAY:
+        case SL_KIND_POINTER: return ((void *(*)(void *))getter)(instance);
+        default:              return NULL;
+    }
+}
+
+void sl_property_set_integer(void *instance, const void *property, int64_t value)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const void *setter = info->setter;
+    if (setter == NULL) return;
+
+    /* Narrowed to the property's own width, as sl_write_integer is. */
+    switch (info->kind) {
+        case SL_KIND_SBYTE:  ((void (*)(void *, int8_t  ))setter)(instance, (int8_t  )value); break;
+        case SL_KIND_SHORT:  ((void (*)(void *, int16_t ))setter)(instance, (int16_t )value); break;
+        case SL_KIND_INT:    ((void (*)(void *, int32_t ))setter)(instance, (int32_t )value); break;
+        case SL_KIND_LONG:
+        case SL_KIND_NINT:   ((void (*)(void *, int64_t ))setter)(instance, value);           break;
+        case SL_KIND_CHAR:
+        case SL_KIND_BYTE:   ((void (*)(void *, uint8_t ))setter)(instance, (uint8_t )value); break;
+        case SL_KIND_CHAR16:
+        case SL_KIND_USHORT: ((void (*)(void *, uint16_t))setter)(instance, (uint16_t)value); break;
+        case SL_KIND_CHAR32:
+        case SL_KIND_UINT:   ((void (*)(void *, uint32_t))setter)(instance, (uint32_t)value); break;
+        case SL_KIND_ULONG:
+        case SL_KIND_NUINT:  ((void (*)(void *, uint64_t))setter)(instance, (uint64_t)value); break;
+        default:                                                                              break;
+    }
+}
+
+void sl_property_set_double(void *instance, const void *property, double value)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const void *setter = info->setter;
+    if (setter == NULL) return;
+
+    switch (info->kind) {
+        case SL_KIND_FLOAT:  ((void (*)(void *, float ))setter)(instance, (float)value); break;
+        case SL_KIND_DOUBLE: ((void (*)(void *, double))setter)(instance, value);        break;
+        default:                                                                        break;
+    }
+}
+
+void sl_property_set_bool(void *instance, const void *property, _Bool value)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    if (info->setter == NULL || info->kind != SL_KIND_BOOL) return;
+
+    ((void (*)(void *, _Bool))info->setter)(instance, value);
+}
+
+/*
+ * Retained before the call, because a setter takes a reference of its own --
+ * it releases what the property held and keeps what it was given. Without this
+ * the caller's reference would be the one consumed.
+ */
+void sl_property_set_reference(void *instance, const void *property, void *value)
+{
+    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const void *setter = info->setter;
+    if (setter == NULL) return;
+
+    switch (info->kind) {
+        case SL_KIND_STRING:
+        case SL_KIND_CLASS:
+        case SL_KIND_INTERFACE:
+        case SL_KIND_ARRAY:
+            sl_retain(value);
+            ((void (*)(void *, void *))setter)(instance, value);
+            break;
+
+        default:
+            break;
+    }
+}

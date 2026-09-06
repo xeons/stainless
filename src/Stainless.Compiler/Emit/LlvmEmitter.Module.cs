@@ -107,9 +107,12 @@ public sealed partial class LlvmEmitter
         // than inserted so that every offset the emitter already hard-codes --
         // the interface table at 24, above all -- goes on meaning what it meant.
         _module.AppendLine(
-            "%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr, ptr, ptr, ptr }");
+            "%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr, ptr, ptr, ptr, "
+            + "i64, ptr }");
         _module.AppendLine(
-            "%SlFieldInfo = type { ptr, i64, i32, ptr, i64, ptr, i32, ptr, i64 }");
+            "%SlFieldInfo = type { ptr, i64, i32, ptr, i64, ptr, i32, ptr, i64, i32 }");
+        _module.AppendLine(
+            "%SlPropertyInfo = type { ptr, i32, ptr, ptr, ptr, i64, ptr }");
         _module.AppendLine("%SlAttribute = type { ptr, i64, ptr }");
         _module.AppendLine("%SlAttributeValue = type { i32, i64, ptr }");
         _module.AppendLine();

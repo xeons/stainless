@@ -74,6 +74,29 @@ extern "C" {
     byte*  sl_field_element_type(byte* field);
     nuint  sl_field_element_size(byte* field);
 
+    uint   sl_field_flags(byte* field);
+
+    nuint  sl_type_property_count(byte* type);
+    byte*  sl_type_property(byte* type, nuint index);
+
+    byte*  sl_property_name(byte* property);
+    uint   sl_property_kind(byte* property);
+    byte*  sl_property_type(byte* property);
+    bool   sl_property_can_read(byte* property);
+    bool   sl_property_can_write(byte* property);
+    nuint  sl_property_attribute_count(byte* property);
+    byte*  sl_property_attribute(byte* property, nuint index);
+
+    long   sl_property_get_integer(byte* instance, byte* property);
+    double sl_property_get_double(byte* instance, byte* property);
+    bool   sl_property_get_bool(byte* instance, byte* property);
+    byte*  sl_property_get_reference(byte* instance, byte* property);
+
+    void   sl_property_set_integer(byte* instance, byte* property, long value);
+    void   sl_property_set_double(byte* instance, byte* property, double value);
+    void   sl_property_set_bool(byte* instance, byte* property, bool value);
+    void   sl_property_set_reference(byte* instance, byte* property, byte* value);
+
     byte*  sl_array_data(byte* array);
     nuint  sl_array_length(byte* array);
 
@@ -148,6 +171,17 @@ public struct Field {
         result.Handle = sl_field_attribute(Handle, index);
         return result;
     }
+
+    /// True when this field is an automatic property's storage rather than a
+    /// field the type declared.
+    ///
+    /// **It is named after the property**, so without this a walk over the
+    /// field table cannot tell `Left` the storage from `Left` the property,
+    /// and writing it goes straight past the setter. Which one is right
+    /// depends on what is being filled: plain data wants the field, and
+    /// anything whose setter does work -- a control that re-lays-out when it
+    /// moves -- wants `Type.FindProperty` instead.
+    public bool IsPropertyStorage() { return (sl_field_flags(Handle) & 1u) != 0u; }
 
     /// True when an attribute of this name is written on the field.
     public bool Has(String name) {
@@ -238,6 +272,133 @@ public struct Field {
     }
 }
 
+// ---------------------------------------------------------------- properties
+
+/// A property: a name and a pair of functions, rather than a place.
+///
+/// This is the other half of what a type carries, and the difference from a
+/// `Field` is the whole reason it exists. A field is an offset, so writing one
+/// stores bytes. A property is its accessors, so writing one **runs the
+/// setter** -- which is what a control that re-lays-out when it moves needs,
+/// and what a serializer filling plain data does not.
+///
+/// Reading and writing go through `sl_property_*` in the runtime, where the
+/// cast from a stored pointer to the prototype the kind implies lives. That
+/// cast is the unsafe part of reflection and it is written once there.
+///
+/// **Indexers and static properties are not here.** An indexer's accessors
+/// take arguments nothing could supply, and a static one has no instance.
+public struct Property {
+    public byte* Handle;
+
+    public String Name() { return Text.FromNullTerminated(sl_property_name(Handle)); }
+    public int Kind() { return (int)sl_property_kind(Handle); }
+
+    /// True when this handle names a property at all; `FindProperty` answers
+    /// with a null one when there is no such name.
+    public bool Exists() { return Handle != null; }
+
+    /// False for a write-only property, and for one whose getter this build
+    /// did not emit.
+    public bool CanRead() { return sl_property_can_read(Handle); }
+
+    /// False for a read-only property -- `public int Left { get; }` -- which
+    /// is worth checking before a loader decides a document was ignored.
+    public bool CanWrite() { return sl_property_can_write(Handle); }
+
+    /// The type of an aggregate property, for walking into it. A handle of
+    /// null for a primitive.
+    public Type TypeOf() {
+        Type result;
+        result.Handle = sl_property_type(Handle);
+        return result;
+    }
+
+    public nuint AttributeCount() { return sl_property_attribute_count(Handle); }
+
+    public Attribute AttributeAt(nuint index) {
+        Attribute result;
+        result.Handle = sl_property_attribute(Handle, index);
+        return result;
+    }
+
+    /// True when an attribute of this name is written on the property.
+    public bool Has(String name) {
+        for (nuint i = 0u; i < AttributeCount(); i = i + 1u) {
+            if (AttributeAt(i).Name() == name) { return true; }
+        }
+        return false;
+    }
+
+    /// The same three questions a `Field` answers about its kind.
+    public bool IsInteger() {
+        var kind = Kind();
+        if (kind == KindChar16 || kind == KindChar32) { return true; }
+        return kind >= KindChar && kind <= KindNUInt;
+    }
+
+    public bool IsFloating() { return Kind() == KindFloat || Kind() == KindDouble; }
+
+    public bool IsText() { return Kind() == KindString; }
+}
+
+// ------------------------------------------------- reading and writing them
+
+/// Calls the getter. Zero when the property cannot be read, or when its kind
+/// is not a whole number -- rather than reading the wrong four bytes.
+public long GetInteger(byte* instance, Property property) {
+    return sl_property_get_integer(instance, property.Handle);
+}
+
+public double GetDouble(byte* instance, Property property) {
+    return sl_property_get_double(instance, property.Handle);
+}
+
+public bool GetBool(byte* instance, Property property) {
+    return sl_property_get_bool(instance, property.Handle);
+}
+
+/// Calls the getter of a String property. The instance still owns the answer.
+public String GetText(byte* instance, Property property) {
+    var raw = sl_property_get_reference(instance, property.Handle);
+    if (raw == null) { return ""; }
+    return Text.FromNullTerminated(raw + 32);
+}
+
+/// The object a class or interface property holds, for walking into it.
+/// Null where it holds nothing, which a caller has to check.
+public byte* GetAggregate(byte* instance, Property property) {
+    return sl_property_get_reference(instance, property.Handle);
+}
+
+/// Calls the setter, narrowing to the property's own width. Does nothing when
+/// there is no setter, which `CanWrite` is how to find out in advance.
+public void SetInteger(byte* instance, Property property, long value) {
+    sl_property_set_integer(instance, property.Handle, value);
+}
+
+public void SetDouble(byte* instance, Property property, double value) {
+    sl_property_set_double(instance, property.Handle, value);
+}
+
+public void SetBool(byte* instance, Property property, bool value) {
+    sl_property_set_bool(instance, property.Handle, value);
+}
+
+/// Calls the setter of a String property.
+///
+/// The runtime retains before the call, because a setter takes a reference of
+/// its own -- it releases what the property held and keeps what it was given.
+/// So the caller still owns `value` afterwards.
+public void SetText(byte* instance, Property property, String value) {
+    sl_property_set_reference(instance, property.Handle, (byte*)value);
+}
+
+/// Points a class or interface property at an object, on the same terms.
+public void SetAggregate(byte* instance, Property property, byte* value) {
+    sl_property_set_reference(instance, property.Handle, value);
+}
+
 // --------------------------------------------------------------------- types
 
 public struct Type {
@@ -285,6 +446,34 @@ public struct Type {
             if (AttributeAt(i).Name() == name) { return true; }
         }
         return false;
+    }
+
+    /// How many properties the type has, inherited ones included.
+    ///
+    /// A derived class lists everything it inherited, and a virtual property
+    /// it overrode appears once, at the position the base gave it, with the
+    /// **derived** accessors. What that does not do is dispatch: reaching an
+    /// object through `typeof(Base)` and setting a property the derived class
+    /// overrode calls the base's setter, where `.Left = x` in the language
+    /// would not.
+    public nuint PropertyCount() { return sl_type_property_count(Handle); }
+
+    public Property PropertyAt(nuint index) {
+        Property result;
+        result.Handle = sl_type_property(Handle, index);
+        return result;
+    }
+
+    /// The property of that name, or a handle of null.
+    public Property FindProperty(String name) {
+        for (nuint i = 0u; i < PropertyCount(); i = i + 1u) {
+            var property = PropertyAt(i);
+            if (property.Name() == name) { return property; }
+        }
+
+        Property missing;
+        missing.Handle = null;
+        return missing;
     }
 }
 

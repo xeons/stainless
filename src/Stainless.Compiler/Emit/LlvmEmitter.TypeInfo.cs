@@ -86,7 +86,8 @@ public sealed partial class LlvmEmitter
                 $"@{Mangler.TypeInfoSymbol(classType)} = {visibility} %SlTypeInfo " +
                 $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
-                $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout} }}");
+                $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout}, " +
+                $"{PropertyTable(classType)} }}");
         }
 
         // One TypeInfo per array type. The element type is not recorded at run
@@ -99,7 +100,7 @@ public sealed partial class LlvmEmitter
                 $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
                 $"ptr {nameConstant}, ptr null, i64 0, ptr null, i64 0, ptr null, " +
-                "ptr null, ptr null, ptr null }");
+                "ptr null, ptr null, ptr null, i64 0, ptr null }");
         }
 
         foreach (var structType in program.Modules
@@ -113,7 +114,8 @@ public sealed partial class LlvmEmitter
             _module.AppendLine(
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
                 $"{{ i64 {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
-                $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null }}");
+                $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null, " +
+                $"{PropertyTable(structType)} }}");
         }
 
         if (program.Classes.Count > 0 || program.Arrays.Count > 0) _module.AppendLine();
@@ -158,10 +160,16 @@ public sealed partial class LlvmEmitter
             {
                 string attributes = AttributeTable(field.Attributes);
 
+                // SL_FIELD_PROPERTY. An automatic property's storage is a
+                // field named after the property, so this is the only thing
+                // telling a walk over the table that writing it would go
+                // straight past the setter.
+                int flags = field.IsBackingField ? 1 : 0;
+
                 return $"%SlFieldInfo {{ ptr {InternBytes(field.Name)}, " +
                        $"i64 {fieldBase + field.Offset}, i32 {(int)KindOf(field.Type)}, " +
                        $"ptr {NestedTypeInfo(field.Type)}, {attributes}, " +
-                       $"{ElementColumns(field.Type)} }}";
+                       $"{ElementColumns(field.Type)}, i32 {flags} }}";
             }).ToList();
 
             string body = string.Join(", ", rows);
@@ -173,6 +181,75 @@ public sealed partial class LlvmEmitter
         string typeAttributes = AttributeTable(type.Attributes);
 
         return $"i64 {reflected.Count}, ptr {fields}, {typeAttributes}";
+    }
+
+    /// <summary>
+    /// The property table's count-and-pointer pair, or a zero pair.
+    ///
+    /// Properties are described separately from fields because setting one is
+    /// not writing the other. A serializer filling plain data is right to write
+    /// an automatic property's storage directly; a form loader setting a
+    /// control's <c>Left</c> is not, because the setter is what re-runs the
+    /// layout. So both tables are emitted and the caller chooses.
+    ///
+    /// **The accessors recorded are this type's own.** A virtual property
+    /// overridden further down answers correctly, because each class has its
+    /// own table and the most-derived declaration is the one that lands in it;
+    /// what does not happen is dispatch. Reaching an object through
+    /// <c>typeof(Base)</c> and setting a property the derived class overrode
+    /// calls the base's setter, where the language's own <c>.Left = x</c>
+    /// would not.
+    /// </summary>
+    private string PropertyTable(NamedTypeSymbol type)
+    {
+        if (!type.IsReflected) return "i64 0, ptr null";
+
+        // Base first, so that a derived class's override replaces the
+        // declaration it overrides and keeps the position the base gave it.
+        var candidates = type is ClassTypeSymbol withBase
+            ? withBase.SelfAndBases().Reverse().SelectMany(c => c.Properties)
+            : type.Properties;
+
+        var order = new List<string>();
+        var newest = new Dictionary<string, PropertySymbol>(StringComparer.Ordinal);
+
+        foreach (var property in candidates)
+        {
+            // An indexer's accessors take arguments nothing here could supply,
+            // and a static property has no instance to pass one.
+            if (property.IsIndexer) continue;
+            if (property.Getter?.IsStatic == true || property.Setter?.IsStatic == true) continue;
+            if (property.Getter is null && property.Setter is null) continue;
+
+            if (!newest.ContainsKey(property.Name)) order.Add(property.Name);
+            newest[property.Name] = property;
+        }
+
+        if (order.Count == 0) return "i64 0, ptr null";
+
+        // Materialised before anything is appended, for the reason the field
+        // rows are: building a row emits its own attribute table.
+        var rows = order.Select(name =>
+        {
+            var property = newest[name];
+            string attributes = AttributeTable(property.Attributes);
+
+            // Symbol() supplies the '@' and quotes the name when a mangling
+            // needs it, which a C++-linkage accessor does.
+            string getter = property.Getter is { } read ? Symbol(read) : "null";
+            string setter = property.Setter is { } write ? Symbol(write) : "null";
+
+            return $"%SlPropertyInfo {{ ptr {InternBytes(property.Name)}, " +
+                   $"i32 {(int)KindOf(property.Type)}, ptr {NestedTypeInfo(property.Type)}, " +
+                   $"ptr {getter}, ptr {setter}, {attributes} }}";
+        }).ToList();
+
+        string table = "@" + NextMetadataName("properties");
+        _metadata.AppendLine(
+            $"{table} = internal constant [{order.Count} x %SlPropertyInfo] " +
+            $"[{string.Join(", ", rows)}]");
+
+        return $"i64 {order.Count}, ptr {table}";
     }
 
     /// <summary>

@@ -3013,12 +3013,60 @@ public String ToJson<T>(T value) {
 
 See [samples/json.sl](../samples/json.sl) for the whole thing.
 
+#### 6.4.1 Properties, which are not fields
+
+A field is an offset, so writing one stores bytes. **A property is a pair of
+functions, so writing one runs the setter** — and which of those is right
+depends on what is being filled. A serializer filling plain data wants the
+field: it is cheaper and a plain object's setter does nothing a store does
+not. A form loader setting a control's `Left` wants the property, because the
+setter is what re-runs the layout.
+
+So the two are described separately:
+
+```csharp
+var type = typeof(Control);
+type.PropertyCount();
+
+var left = type.FindProperty("Left");
+left.Kind();                       // KindInt
+left.CanRead();                    // true
+left.CanWrite();                   // false for 'int Right { get; }'
+
+SetInteger(raw, left, 42);         // calls the setter
+GetInteger(raw, left);             // calls the getter
+```
+
+with `SetText`, `SetBool`, `SetDouble` and `SetAggregate` beside them, and the
+matching readers. Setting through the wrong one does nothing rather than
+writing the wrong bytes, and so does setting a property with no setter.
+
+**An automatic property's storage is a field named after the property**, which
+is why `Field.IsPropertyStorage()` exists: without it a walk over the field
+table cannot tell `Name` the storage from `Name` the property, and writing it
+goes straight past the accessor. A field the type actually declared answers
+false.
+
+Two things are deliberately absent. An **indexer** has accessors that take
+arguments nothing could supply, and a **static property** has no instance to
+pass. Neither appears in the table.
+
+One limit worth knowing: the accessors recorded are the ones the type itself
+has. A virtual property overridden further down answers correctly through the
+derived type's own table, but reaching an object through `typeof(Base)` and
+setting a property the derived class overrode calls the **base's** setter,
+where `.Left = x` in the language would not. Reflection here reads a table; it
+does not dispatch.
+
 ### 6.5 What is emitted
 
-A reflected type's `TypeInfo` gains four entries — a field count and table, and
-an attribute count and table — and each `SlFieldInfo` records a name, offset,
-kind, nested type and its own attributes. All of it is `const`, so it lands in
-read-only data and is shared, never allocated. See [abi.md](abi.md).
+A reflected type's `TypeInfo` gains six entries — a field count and table, an
+attribute count and table, and a property count and table — and each
+`SlFieldInfo` records a name, offset, kind, nested type, its own attributes and
+a flag saying whether it is property storage. Each `SlPropertyInfo` records a
+name, kind, nested type, its getter and setter, and its attributes. All of it
+is `const`, so it lands in read-only data and is shared, never allocated. See
+[abi.md](abi.md).
 
 A struct has no object header, so its metadata is reachable only through
 `typeof`, never from an instance.

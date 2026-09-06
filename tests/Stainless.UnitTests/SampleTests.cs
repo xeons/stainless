@@ -49,6 +49,9 @@ public class SampleTests
 
         /// <summary>Windows-only, because of what it is written against.</summary>
         public bool WindowsOnly { get; init; }
+
+        /// <summary>Unix-only, for the same reason: the GTK bindings are `#if UNIX`.</summary>
+        public bool UnixOnly { get; init; }
     }
 
     private static readonly Sample[] Samples =
@@ -82,11 +85,18 @@ public class SampleTests
 
         new("win32/report", ["samples/win32/report.sl"]) { WindowsOnly = true },
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
+
+        new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
     ];
 
     /// <summary>The Win32 samples are written against the bindings.</summary>
-    private static string[] Win32Bindings() =>
-        Directory.EnumerateFiles(Path.Combine(Repository.Root, "bindings", "win32"),
+    private static string[] Win32Bindings() => BindingsUnder("win32");
+
+    /// <summary>And the GTK sample against those.</summary>
+    private static string[] GtkBindings() => BindingsUnder("gtk");
+
+    private static string[] BindingsUnder(string directory) =>
+        Directory.EnumerateFiles(Path.Combine(Repository.Root, "bindings", directory),
                                  "*.sl", SearchOption.AllDirectories)
             .OrderBy(p => p, StringComparer.Ordinal)
             .ToArray();
@@ -107,15 +117,18 @@ public class SampleTests
         // A Windows sample is written against `#if WINDOWS`, so on any other
         // platform it is a file of skipped text and binding it proves nothing.
         if (sample.WindowsOnly && !OperatingSystem.IsWindows()) return;
+        if (sample.UnixOnly && OperatingSystem.IsWindows()) return;
 
         var paths = sample.Paths.Select(p => Path.Combine(Repository.Root, p)).ToList();
         if (sample.WindowsOnly) paths.AddRange(Win32Bindings());
+        if (sample.UnixOnly) paths.AddRange(GtkBindings());
 
         Front.BindFiles(paths, out var diagnostics, sample.Shared);
 
         var complaints = diagnostics.Items
             .Where(d => d.Span.File is null ||
-                        d.Span.File.Path.Contains("samples", StringComparison.Ordinal))
+                        d.Span.File.Path.Contains("samples", StringComparison.Ordinal) ||
+                        d.Span.File.Path.Contains("bindings", StringComparison.Ordinal))
             .Select(d => $"{d.Code} {d.Message}")
             .ToList();
 

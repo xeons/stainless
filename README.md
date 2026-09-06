@@ -1599,10 +1599,14 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
   about, so the same name and parameters means `override` or nothing (SL0503).
-- **Reflection describes fields and their elements, and nothing else.**
-  Methods and interfaces carry no metadata and `typeof` needs the type named at
-  compile time. It is what stops a serializer filling a `List<T>`: its storage
-  is private and the way in is `Add`, which nothing here can call. An array is
+- **Reflection describes fields, properties and array elements.** A property
+  is its accessors rather than an offset, so setting one through reflection
+  runs the setter — which is what anything whose setter does work needs, and
+  what writing an automatic property's storage silently skips.
+  `Field.IsPropertyStorage()` is how the two are told apart. **Methods and
+  interfaces carry no metadata and `typeof` needs the type named at compile
+  time.** That is what stops a serializer filling a `List<T>`: its storage is
+  private and the way in is `Add`, which nothing here can call. An array is
   described and does round-trip.
 - **An interface method may not be overloaded.** Dispatch gives each one a
   single slot, so two of a name in one interface would be a call the receiver
