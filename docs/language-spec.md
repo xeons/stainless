@@ -1749,24 +1749,31 @@ something at the head of a declaration and is an ordinary name everywhere else.
 ### 2.15 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is
-assigned to: an **interface with exactly one method**, or a **delegate**.
+assigned to, and there are **three** things it may become: a `closure`
+(§2.14.1), an **interface with exactly one method**, or a **delegate**.
 
 ```csharp
+public closure int Transformer(int value);
 public interface ITransform { int Apply(int value); }
 
 int factor = 3;
 
-ITransform scale = (int value) => value * factor;   // a closure
-ITransform shift = value => value + factor;         // parameter type inferred
-ITransform back  = (int value) => { return value - factor; };
-
-Transform plain = (int value) => value * 2;         // captures nothing: a delegate
+Transformer scale = (int value) => value * factor;  // a closure: the usual one
+ITransform  shift = value => value + factor;        // an interface, also fine
+Transform   plain = (int value) => value * 2;       // captures nothing: a delegate
 ```
 
-Converting to an interface generates a class implementing it, with one field per
-captured value — the same shape C# uses for delegates and Rust for `Fn`. It is
-an ordinary class, so it is reference counted, it lives in a `List<T>` like
-anything else, and its destructor releases what it captured.
+**Reach for the closure.** It is the one that needs no type declared for the
+sake of it, the one a bound method also fits, and the one two of which can be
+compared. An interface target is what to use when the thing being passed is
+genuinely an object with a role — a comparer, a visitor — rather than a
+callback.
+
+All three generate the same class: one field per captured value, the shape C#
+uses for delegates and Rust for `Fn`. It is an ordinary class, so it is
+reference counted, it lives in a `List<T>` like anything else, and its
+destructor releases what it captured. A closure is that object beside the
+address of its method; an interface reference is that object alone.
 
 **Capture is by value, taken when the closure is made.**
 

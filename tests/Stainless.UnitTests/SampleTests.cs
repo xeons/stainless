@@ -87,6 +87,7 @@ public class SampleTests
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
 
         new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
+        new("gtk/control", ["samples/gtk/control.sl"]) { UnixOnly = true },
     ];
 
     /// <summary>The Win32 samples are written against the bindings.</summary>

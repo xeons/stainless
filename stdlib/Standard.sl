@@ -67,7 +67,7 @@ public variant Result<T, E> {
 // --------------------------------------------------------- shapes of work
 
 // A lambda takes its type from what it is assigned to, and an interface with
-// exactly one method is one of the two things it may become (§2.15). These are
+// exactly one method is one of the three things it may become (§2.15). These are
 // the shapes worth naming once: they are what a lambda becomes rather than
 // anything a collection owns, which is why they live here and need no import.
 

@@ -26,7 +26,7 @@
 // region and translated to the widget's corner. GTK 2 emits `expose-event`
 // with a `GdkEventExpose*` and leaves the caller to make a context from the
 // widget's window -- and to destroy it afterwards. A program written against
-// `IPainter` sees neither: it is handed a `Canvas` and the size to paint, and
+// a `Painter` sees neither: it is handed a `Canvas` and the size to paint, and
 // the same routine runs on both.
 //
 // Cairo is a stateful painter rather than a list of shapes: set a colour,
@@ -195,24 +195,22 @@ public class Canvas {
 /// differently -- `gtk_widget_get_allocated_width` against
 /// `gtk_widget_get_allocation` -- and a painter should not have to know which
 /// GTK it is running on.
-public interface IPainter {
-    void Paint(Canvas canvas, int width, int height);
-}
+public closure void Painter(Canvas canvas, int width, int height);
 
-/// The adapter from a signal to a painter. Where the whole version difference
-/// lives, and it is eleven lines.
-class PaintAdapter : IEventHandler {
-    IPainter body;
-
-    public PaintAdapter(IPainter painter) { body = painter; }
-
-    public bool Handle(GtkWidget* sender, gpointer carried) {
+/// The adapter from a raw signal to a painter, which is where the whole
+/// version difference lives -- and it is eleven lines.
+///
+/// A function returning a closure rather than a class implementing an
+/// interface: the lambda it returns captures the painter, which is exactly
+/// what the class's field used to be.
+EventHandler PaintAdapter(Painter body) {
+    return (sender, carried) => {
         #if !GTK2
             // GTK 3 hands over a context that is already clipped and
             // translated, and owns it.
             var canvas = new Canvas((cairo_t*)carried);
-            body.Paint(canvas, gtk_widget_get_allocated_width(sender),
-                               gtk_widget_get_allocated_height(sender));
+            body(canvas, gtk_widget_get_allocated_width(sender),
+                         gtk_widget_get_allocated_height(sender));
         #else
             // GTK 2 hands over the expose event and leaves the context to the
             // caller, which means making one and destroying it here.
@@ -222,14 +220,14 @@ class PaintAdapter : IEventHandler {
             gtk_widget_get_allocation(sender, &area);
 
             var canvas = new Canvas(cr);
-            body.Paint(canvas, area.Width, area.Height);
+            body(canvas, area.Width, area.Height);
 
             cairo_destroy(cr);
         #endif
 
         // True: this widget has painted itself and nothing else should.
         return true;
-    }
+    };
 }
 
 // ============================================================== drawing area
@@ -241,11 +239,11 @@ public class DrawingArea : Widget {
     /// Sets what paints the widget. Connecting a second one replaces nothing
     /// -- GTK runs both, in the order they were connected, and the first to
     /// answer true stops the rest.
-    public void OnPaint(IPainter painter) {
+    public void OnPaint(Painter painter) {
         #if !GTK2
-            ConnectEvent(handle, "draw", new PaintAdapter(painter));
+            ConnectEvent(handle, "draw", PaintAdapter(painter));
         #else
-            ConnectEvent(handle, "expose-event", new PaintAdapter(painter));
+            ConnectEvent(handle, "expose-event", PaintAdapter(painter));
         #endif
     }
 
@@ -294,21 +292,13 @@ public struct Key {
 }
 
 /// What a mouse event runs. True means handled.
-public interface IPointerHandler {
-    bool Fire(Pointer at);
-}
+public closure bool PointerHandler(Pointer at);
 
 /// What a key event runs. True means handled.
-public interface IKeyHandler {
-    bool Fire(Key key);
-}
+public closure bool KeyHandler(Key key);
 
-class PointerAdapter : IEventHandler {
-    IPointerHandler body;
-
-    public PointerAdapter(IPointerHandler handler) { body = handler; }
-
-    public bool Handle(GtkWidget* sender, gpointer carried) {
+EventHandler PointerAdapter(PointerHandler body) {
+    return (sender, carried) => {
         GdkEvent* event = (GdkEvent*)carried;
 
         Pointer at;
@@ -337,16 +327,12 @@ class PointerAdapter : IEventHandler {
         #endif
         at.Button = (int)button;
 
-        return body.Fire(at);
-    }
+        return body(at);
+    };
 }
 
-class KeyAdapter : IEventHandler {
-    IKeyHandler body;
-
-    public KeyAdapter(IKeyHandler handler) { body = handler; }
-
-    public bool Handle(GtkWidget* sender, gpointer carried) {
+EventHandler KeyAdapter(KeyHandler body) {
+    return (sender, carried) => {
         GdkEvent* event = (GdkEvent*)carried;
 
         guint code = 0u;
@@ -367,8 +353,8 @@ class KeyAdapter : IEventHandler {
         key.Control = (state & GDK_CONTROL_MASK) != 0u;
         key.Alt     = (state & GDK_MOD1_MASK) != 0u;
 
-        return body.Fire(key);
-    }
+        return body(key);
+    };
 }
 
 #endif

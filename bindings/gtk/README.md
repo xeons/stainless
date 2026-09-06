@@ -7,7 +7,7 @@ which one you are looking at:
 |---|---|
 | `Gtk.GLib`, `Gtk.GObject`, `Gtk.Gdk`, `Gtk.Cairo` | **a library name**: declarations and nothing else, spelled as the headers spell them |
 | `Gtk.Api`, `Gtk.Api2`, `Gtk.Api3` | **GTK itself**, split into the half both versions share and the two halves they do not |
-| `Gtk` | **the wrapper**: a widget class hierarchy, ARC ownership, events that are lambdas |
+| `Gtk` | **the wrapper**: a widget class hierarchy, ARC ownership, events that are closures |
 | `Gtk.Signals`, `Gtk.Events` | the plumbing that turns a GObject signal into a Stainless call |
 
 Nothing is generated and nothing is marshalled. A `gchar*` is UTF-8 and
@@ -96,21 +96,26 @@ bindings/gtk/
   Signals.sl   module Gtk.Signals;  signals that carry nothing
   Events.sl    module Gtk.Events;   signals that carry a pointer and answer
   Widgets.sl   module Gtk;          the widget classes
-  Drawing.sl   module Gtk;          Canvas, IPainter, DrawingArea, input
+  Drawing.sl   module Gtk;          Canvas, Painter, DrawingArea, input
 ```
 
-**An event is a lambda**:
+**An event is a `closure`** (§2.14.1) — a method and the object it belongs to:
 
 ```csharp
-var button = new Button("Click me");
-button.OnClicked(() => { count = count + 1; label.SetText(Spell(count)); });
+button.OnClicked(this.Save);                      // a method bound to an object
+button.OnClicked(() => { count = count + 1; });   // or a lambda that captures
 ```
 
-A lambda becomes a one-method interface (§2.15), that object is retained by
-hand because C is about to hold the only reference to it, and the matching
-release is the `GClosureNotify` GTK runs after the last emission — whether the
-handler was disconnected or the widget died holding it. That is the whole
-ownership story and it is about twenty lines in `Signals.sl`.
+Both are the same two words. A closure is a *value* and `user_data` is one
+pointer, so it is boxed; the box is retained by hand because C is about to hold
+the only reference to it, and the matching release is the `GClosureNotify` GTK
+runs after the last emission — whether the handler was disconnected or the
+widget died holding it. That is the whole ownership story and it is about
+twenty lines in `Signals.sl`.
+
+There are **no single-method interfaces** anywhere in this binding. The
+adapters that used to sit between a widget's events and the raw dispatchers are
+now lambdas that capture the handler, which is what they always were.
 
 **A wrapper owns one reference to its widget.** The constructor sinks the
 floating reference GTK hands back and the destructor drops it, so a `Window`

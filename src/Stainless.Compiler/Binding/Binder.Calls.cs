@@ -194,6 +194,19 @@ public sealed partial class Binder
                 return BuildCall(syntax, outerMethod, captured, arguments);
             }
 
+            // A closure or delegate captured by the lambda this call is
+            // inside: binding the name is what creates the capture, so it is
+            // tried here rather than in BindDelegateTarget, which runs before
+            // any of the name lookups above.
+            if (_closures.Count > 0)
+            {
+                BoundExpression captured;
+                using (diagnostics.Muted()) captured = BindExpression(callee);
+
+                if (IsCallableValue(captured.Type))
+                    return BuildIndirectCall(syntax, BindExpression(callee), arguments);
+            }
+
             diagnostics.Error("SL0252", callee.Span, $"no function named '{callee.Name.Text}' is in scope");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -477,7 +490,8 @@ public sealed partial class Binder
         // A field holding a delegate is called through, not dispatched to. It is
         // checked before methods so that the field's own name is what is called;
         // a method of the same name would be a different thing entirely.
-        if (namedType.FindProperty(member.Member) is { Type: DelegateTypeSymbol } callableProperty)
+        if (namedType.FindProperty(member.Member) is { } callableProperty &&
+            IsCallableValue(callableProperty.Type))
         {
             var read = BindPropertyRead(member.Span, receiver, callableProperty);
             return read.Type.IsError()
@@ -485,7 +499,7 @@ public sealed partial class Binder
                 : BuildIndirectCall(syntax, read, arguments);
         }
 
-        if (namedType.FindField(member.Member) is { Type: DelegateTypeSymbol } callable)
+        if (namedType.FindField(member.Member) is { } callable && IsCallableValue(callable.Type))
         {
             if (!CanReach(callable.IsPublic, callable.IsProtected, callable.ContainingType))
             {

@@ -41,15 +41,19 @@
 //     toplevel until it is destroyed -- but it does throw away the handle. An
 //     `Application` holds its windows for this reason.
 //
-// **An event is a lambda.** `OnClicked` takes an interface with one method,
-// which is what a lambda becomes (§2.15), so the handler is written where it
-// is connected and captures whatever it needs:
+// **An event is a closure** (§2.14.1): a method and the object it belongs to.
+// So a handler is either a method of whatever cares, bound to it --
+//
+//     button.OnClicked(this.Save);
+//
+// -- or a lambda that captures what it needs:
 //
 //     var count = new Counter();
 //     button.OnClicked(() => { count.Bump(); label.SetText(count.Text()); });
 //
-// The lambda is retained for as long as GTK holds it and released when the
-// widget dies. `Gtk.Signals` is where that happens and why it is leak-free.
+// Both are the same two words, and both keep alive whatever they refer to for
+// as long as GTK holds them. `Gtk.Signals` is where the retain and the matching
+// release live, and why the arrangement is leak-free with no bookkeeping here.
 //
 // **The version difference is hidden here, not passed on.** `new Box(true, 6)`
 // is `gtk_box_new(GTK_ORIENTATION_VERTICAL, 6)` under GTK 3 and
@@ -83,34 +87,19 @@ extern "C" {
 
 // ==================================================================== events
 
-/// What a widget's event runs. A lambda with no parameters becomes one.
-public interface IEvent {
-    void Fire();
-}
+// A widget's events are `closure` types (§2.14.1), so a handler is either a
+// method bound to the object that cares -- `field.OnChanged(this.Revalidate)`
+// -- or a lambda that captures what it needs. Both are the same two words, and
+// both keep alive whatever they refer to for as long as the widget holds them.
+//
+// `Handler` itself comes from `Gtk.Signals`, because that is where the C side
+// of it lives. Only the answering shape is declared here, since the raw layer's
+// version carries the sender and the pointer and almost no handler wants either.
 
 /// An event that can refuse: **true means handled**, and nothing else sees it.
 ///
 /// The one to know is `Window.OnClosing`, where true keeps the window open.
-public interface IQuery {
-    bool Fire();
-}
-
-// The adapters between the two shapes above and the raw dispatchers in
-// `Gtk.Signals`. They exist because a signal handler is given the widget that
-// emitted it and almost no handler wants it -- a lambda captures what it needs
-// instead, which reads better than a parameter nobody uses.
-
-class PlainAdapter : IHandler {
-    IEvent body;
-    public PlainAdapter(IEvent event) { body = event; }
-    public void Handle(GtkWidget* sender) { body.Fire(); }
-}
-
-class QueryAdapter : IEventHandler {
-    IQuery body;
-    public QueryAdapter(IQuery query) { body = query; }
-    public bool Handle(GtkWidget* sender, gpointer carried) { return body.Fire(); }
-}
+public closure bool Question();
 
 // ==================================================================== widget
 
@@ -216,8 +205,8 @@ public class Widget {
     public void Destroy() { gtk_widget_destroy(handle); }
 
     /// Runs when the widget is destroyed.
-    public void OnDestroyed(IEvent handler) {
-        ConnectPlain(handle, "destroy", new PlainAdapter(handler));
+    public void OnDestroyed(Handler handler) {
+        ConnectPlain(handle, "destroy", handler);
     }
 
     // The input events. `Pointer`, `Key` and their handler interfaces are in
@@ -228,20 +217,20 @@ public class Widget {
     // Most other widgets receive the mouse and not the keyboard, and a widget
     // that cannot take focus never sees a key at all.
 
-    public void OnMouseDown(IPointerHandler handler) {
-        ConnectEvent(handle, "button-press-event", new PointerAdapter(handler));
+    public void OnMouseDown(PointerHandler handler) {
+        ConnectEvent(handle, "button-press-event", PointerAdapter(handler));
     }
 
-    public void OnMouseUp(IPointerHandler handler) {
-        ConnectEvent(handle, "button-release-event", new PointerAdapter(handler));
+    public void OnMouseUp(PointerHandler handler) {
+        ConnectEvent(handle, "button-release-event", PointerAdapter(handler));
     }
 
-    public void OnMouseMoved(IPointerHandler handler) {
-        ConnectEvent(handle, "motion-notify-event", new PointerAdapter(handler));
+    public void OnMouseMoved(PointerHandler handler) {
+        ConnectEvent(handle, "motion-notify-event", PointerAdapter(handler));
     }
 
-    public void OnKeyDown(IKeyHandler handler) {
-        ConnectEvent(handle, "key-press-event", new KeyAdapter(handler));
+    public void OnKeyDown(KeyHandler handler) {
+        ConnectEvent(handle, "key-press-event", KeyAdapter(handler));
     }
 }
 
@@ -403,8 +392,10 @@ public class Window : Container {
     /// open**, which is how an "unsaved changes" prompt works:
     ///
     ///     window.OnClosing(() => { return document.IsDirty(); });
-    public void OnClosing(IQuery handler) {
-        ConnectEvent(handle, "delete-event", new QueryAdapter(handler));
+    public void OnClosing(Question handler) {
+        // A lambda is the adapter: it takes the shape the raw layer emits and
+        // drops the two arguments no window-closing handler wants.
+        ConnectEvent(handle, "delete-event", (sender, carried) => { return handler(); });
     }
 }
 
@@ -471,13 +462,13 @@ public class Entry : Widget {
     }
 
     /// Runs on every keystroke.
-    public void OnChanged(IEvent handler) {
-        ConnectPlain(handle, "changed", new PlainAdapter(handler));
+    public void OnChanged(Handler handler) {
+        ConnectPlain(handle, "changed", handler);
     }
 
     /// Runs when the user presses Enter.
-    public void OnEntered(IEvent handler) {
-        ConnectPlain(handle, "activate", new PlainAdapter(handler));
+    public void OnEntered(Handler handler) {
+        ConnectPlain(handle, "activate", handler);
     }
 }
 
@@ -494,8 +485,8 @@ public class Button : Container {
 
     public String Label() { return Text.FromNullTerminated(gtk_button_get_label(handle)); }
 
-    public void OnClicked(IEvent handler) {
-        ConnectPlain(handle, "clicked", new PlainAdapter(handler));
+    public void OnClicked(Handler handler) {
+        ConnectPlain(handle, "clicked", handler);
     }
 }
 
@@ -514,8 +505,8 @@ public class CheckBox : Button {
         gtk_toggle_button_set_active(handle, checked ? 1 : 0);
     }
 
-    public void OnToggled(IEvent handler) {
-        ConnectPlain(handle, "toggled", new PlainAdapter(handler));
+    public void OnToggled(Handler handler) {
+        ConnectPlain(handle, "toggled", handler);
     }
 }
 
@@ -583,8 +574,8 @@ public class TextArea : Widget {
 
     /// Runs whenever the text changes. Connected to the *buffer*, because that
     /// is what changes -- the view is only a window onto it.
-    public void OnChanged(IEvent handler) {
-        ConnectPlain(buffer, "changed", new PlainAdapter(handler));
+    public void OnChanged(Handler handler) {
+        ConnectPlain(buffer, "changed", handler);
     }
 }
 
@@ -662,8 +653,8 @@ public class ComboBox : Widget {
         return text;
     }
 
-    public void OnChanged(IEvent handler) {
-        ConnectPlain(handle, "changed", new PlainAdapter(handler));
+    public void OnChanged(Handler handler) {
+        ConnectPlain(handle, "changed", handler);
     }
 }
 
@@ -711,8 +702,8 @@ public class SpinBox : Widget {
     /// How many places after the point. Zero makes it an integer box.
     public void SetDecimals(int digits) { gtk_spin_button_set_digits(handle, (guint)digits); }
 
-    public void OnChanged(IEvent handler) {
-        ConnectPlain(handle, "value-changed", new PlainAdapter(handler));
+    public void OnChanged(Handler handler) {
+        ConnectPlain(handle, "value-changed", handler);
     }
 }
 
@@ -734,8 +725,8 @@ public class Slider : Widget {
     public double Value() { return gtk_range_get_value(handle); }
     public void   SetValue(double value) { gtk_range_set_value(handle, value); }
 
-    public void OnChanged(IEvent handler) {
-        ConnectPlain(handle, "value-changed", new PlainAdapter(handler));
+    public void OnChanged(Handler handler) {
+        ConnectPlain(handle, "value-changed", handler);
     }
 }
 
@@ -769,8 +760,8 @@ public class Notebook : Container {
     public void SetCurrentPage(int index) { gtk_notebook_set_current_page(handle, index); }
     public int  PageCount() { return gtk_notebook_get_n_pages(handle); }
 
-    public void OnPageChanged(IEvent handler) {
-        ConnectPlain(handle, "switch-page", new PlainAdapter(handler));
+    public void OnPageChanged(Handler handler) {
+        ConnectPlain(handle, "switch-page", handler);
     }
 }
 
@@ -821,8 +812,8 @@ public class MenuItem : Container {
         gtk_menu_item_set_submenu(handle, submenu.Handle());
     }
 
-    public void OnChosen(IEvent handler) {
-        ConnectPlain(handle, "activate", new PlainAdapter(handler));
+    public void OnChosen(Handler handler) {
+        ConnectPlain(handle, "activate", handler);
     }
 }
 
@@ -965,7 +956,7 @@ public class Application {
     ///
     /// The only correct way to do something later in a GUI program: a sleep in
     /// a handler stops the loop, and the loop is what repaints.
-    public void Every(int milliseconds, IQuery body) {
+    public void Every(int milliseconds, Question body) {
         Repeat((uint)milliseconds, body);
     }
 }
@@ -974,18 +965,18 @@ public class Application {
 // rather than a GObject signal.
 
 class Ticker {
-    public IQuery Body;
-    public Ticker(IQuery body) { Body = body; }
+    public Question Body;
+    public Ticker(Question body) { Body = body; }
 }
 
 gboolean TickOnce(gpointer data) {
     var ticker = (Ticker)data;
-    return ticker.Body.Fire() ? 1 : 0;
+    return ticker.Body() ? 1 : 0;
 }
 
 void ForgetTicker(gpointer data) { sl_release(data); }
 
-void Repeat(uint milliseconds, IQuery body) {
+void Repeat(uint milliseconds, Question body) {
     var ticker = new Ticker(body);
     sl_retain((gpointer)ticker);
 

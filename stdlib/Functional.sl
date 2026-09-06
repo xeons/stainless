@@ -22,7 +22,7 @@
 // Doing something to every element.
 //
 // A lambda takes its type from what it is assigned to, and an interface with
-// exactly one method is one of the two things it may become (§2.15). So these
+// exactly one method is one of the three things it may become (§2.15). So these
 // are ordinary generic interfaces, and `Filter(names, n => n.Length() > 3u)`
 // works with no function type in the language and no special case in the
 // compiler.

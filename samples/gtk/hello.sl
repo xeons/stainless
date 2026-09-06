@@ -20,12 +20,12 @@
 // because `Gtk` hides the layout and drawing differences; the only sign of
 // which one is running is what the window looks like.
 //
-// The thing to notice is that **every handler is a lambda that captures what
-// it needs**. There is no `sender` parameter to cast, no user-data pointer, no
-// registration table -- a lambda becomes a one-method interface (§2.15), that
-// object is retained for as long as GTK holds it, and it is released when the
-// widget dies. `bindings/gtk/Signals.sl` is the twenty lines that make that
-// true.
+// The thing to notice is that **a handler is a closure** (§2.14.1): either a
+// lambda that captures what it needs, or a method bound to the object that
+// cares. There is no `sender` parameter to cast, no user-data pointer and no
+// registration table -- the closure is boxed, retained for as long as GTK holds
+// it, and released when the widget dies. `bindings/gtk/Signals.sl` is the
+// twenty lines that make that true.
 module Hello;
 
 import Standard.Console;
@@ -42,8 +42,9 @@ class State {
 }
 
 // The drawing, as an object rather than a lambda because it wants a name and
-// some state. A lambda would have done.
-class Face : IPainter {
+// some state. It implements nothing: `Paint` is an ordinary method, and
+// `face.OnPaint(painting.Paint)` binds it to this object.
+class Face {
     State state;
 
     public Face(State shared) { state = shared; }
@@ -131,8 +132,11 @@ public int Main() {
     root.Pack(body, true);
 
     // The drawing on the left, taking the slack.
+    // A bound method as the painter: two words, the method and the object.
+    var painting = new Face(state);
+
     var face = new DrawingArea();
-    face.OnPaint(new Face(state));
+    face.OnPaint(painting.Paint);
     face.SetSize(220, 220);
     body.Pack(face, true);
 

@@ -7,209 +7,192 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           561 pass
-dotnet run --project tests/Stainless.Tests      222 cases, 1 skipped on Windows
+dotnet test tests/Stainless.UnitTests           563 pass
+dotnet run --project tests/Stainless.Tests      225 cases, 1 skipped on Windows
 ```
 
-Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box is worth
-using every time: it caught the missing `errors.txt` for SL0271 within a minute
-of coming back up.
+Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
+and GTK 3, the development packages, Xvfb and `broadwayd`, so a GUI can be
+built *and run* there headlessly — see `bindings/gtk/README.md`.
 
-`master` is ahead of `origin/master`; nothing has been pushed.
+`master` is ahead of `origin/master`; the reflection and closure commits have
+not been pushed.
 
 ## What was built, in order
 
 | | |
 |---|---|
-| `efad37a` | static methods; the fallible factories moved onto their types |
-| `9dc83fc` | `where T :` gains five kinds; `[Shared]` becomes `threadsafe` |
-| `12c0f93` | the whole of C#'s `static`: fields, properties, cctors, static class |
 | `58b5a9e` | an audit of the spec and README against the compiler |
 | `d738588` | reflection writing; `Standard.Json` and `Standard.Xml` |
-| `fe46084` | array element metadata, `OrderedDictionary`, `Option<T>`, and two more |
+| `fe46084` | array element metadata, `OrderedDictionary`, `Option<T>` |
 | `ae43b16` | the docs and this file brought back in line |
-| *(this run)* | `is` with a binding; `Option` becomes `Optional` and grows readers |
+| `6c71390` | `is` with a binding; `Option` becomes `Optional` |
+| `a0677cc` | GTK 2 and GTK 3 bindings, and a widget layer |
+| `3ad68ec` | reflection sees properties, not just their storage |
+| `98db181` | find a reflected type by name |
+| `4fc1dde` | `closure`: a method and the object it belongs to |
+| *(this run)* | the GTK layer moved onto closures; a user-control sample |
 
 ## Findings worth keeping
 
-**A variant's tag test already narrows, and the library had forgotten.**
-`Standard.Json` was full of
+**`closure` is the piece the rest now rests on.** A `delegate` is one pointer,
+which is what makes it a C function pointer and what stops it carrying
+anything: a lambda that reads a name from around it cannot become one (SL0381).
+A closure is that pointer *and* a receiver — Delphi's `of object` — so a
+callback can know *which* counter to add to.
 
-```csharp
-switch (value) { case Bool held: return held.Value; default: return fallback; }
-```
+It cost far less than expected, and the reason is worth remembering:
 
-when the language has had the short form all along, stated in §2.6. Every one
-of those is now
+- **A method already takes its receiver as argument zero**, so a bound method
+  pointer is literally `{method address, object}` and calling one is a single
+  indirect call. No thunk, no shuffling.
+- **It is a two-field struct**, so layout, both ABI classifiers, and the
+  reference walk that retains and releases what a value holds all apply to it
+  without one line of any of them being written for closures. The receiver's
+  static type is an internal marker class, because counting does not care which
+  class an object is — `sl_release` finds that in the object's own header.
+- **A lambda becomes one through the machinery that already existed**: the
+  generated capture class *is* the receiver, and its method already takes it
+  first. So a lambda and a bound method are the same two words.
 
-```csharp
-if (value.Bool) { return value.Value; }
-```
+**Events were built and then deleted, and that was the right sequence.** The
+`event` keyword worked -- `+=`, `-=`, subscription order, safe unsubscription
+mid-raise, ARC -- in about 700 lines of compiler. What killed it was the
+question it forced: *what carries the handler?* Interfaces were the only answer
+at the time, and interfaces were not wanted. Closures answered it better and
+made the keyword's remaining value one thing only: **only the declaring type
+may raise**, which cannot be expressed as a library type because anything that
+can reach the handler list to add to it can also iterate it, and iterating is
+raising. There is no `internal` or `friend`.
 
-in `Json.sl`, `Xml.sl` and `OrderedDictionary`. The spec was not at fault; the
-library was. What §2.6 was missing is a *worked example* rather than the rule,
-and it has one now — a rule stated in a paragraph and a rule shown in four
-lines are not the same document.
+If events come back, they should be `event C Name;` over a closure type, and
+the 700 lines are in `4fc1dde`'s parent commits to crib from.
 
-**`is` with a binding closed the rest of it, and reached further than
-expected.** A tag test cannot narrow a *field* or a *call result* (SL0285),
-because either could be a different value by the time it is read. So:
+**Three compiler bugs found by trying a user's design rather than by testing.**
 
-```csharp
-if (node.Payload is Circle c) { return c.Radius; }
-```
+- **Operators on generic types are never emitted.** `Box<T>` with an
+  `operator+` fails to link, with one instantiation or several. Found while
+  prototyping events as a library type. **Still open.**
+- `var d = SomeFunction;` bound cleanly and emitted `store ptr 0`, which clang
+  rejected as a compiler bug. The lambda case beside it had been fixed and left
+  a comment describing the identical symptom; this was its missing sibling.
+  Fixed, SL0553.
+- A closure call was not in the has-an-effect list, so calling one as a
+  statement warned SL0222. Fixed.
 
-evaluates the value once and names what came out of it. It works for a
-variant's case; for a class, where the test proves the downcast; and — because
-a test through a `C?` asks about the null and the class at once — for
+**A hard keyword is a tax on every program.** `event` was made contextual after
+the GTK bindings turned out to use `event` as a parameter name fifteen times —
+code written hours earlier in the same session. `closure` is contextual for the
+same reason. The test for whether a word can be taken is not "is it rare" but
+"did we ourselves just use it".
 
-```csharp
-if (node.Next is Node n) { return n.Value; }
-```
+**Reflection describes properties now, and that was a correctness fix rather
+than a feature.** An automatic property's storage is a field *named after the
+property*, so a walk over the field table found `Left`, wrote it, and went
+straight past the setter that would have re-run the layout.
+`Field.IsPropertyStorage()` is what tells the two apart; `sl_property_get_*`
+and `_set_*` call the accessors. The unsafe cast from a stored function pointer
+to the prototype its kind implies is written **once**, in the runtime, rather
+than at each call site that would have to guess.
 
-**That last one is the field narrowing TODO.md still lists as an open analysis
-problem.** It is available now for any reference whose type can be named, which
-is most of them. The analysis is still worth having for `!= null`, but the
-irritation that motivated it is largely gone.
+**`FindType` is the other half of a form file.** Types and properties can now
+both be named by a document: `FindType("App.Button")`, `Make`, then set
+properties through their setters. What is still missing is **methods**, so an
+event handler named by a document has nothing to resolve against. That is the
+one remaining piece before a designer.
 
-Three refusals, each with its own diagnostic: the form must be the *whole*
-condition of an `if` (SL0585), a case that carries nothing has nothing to name
-(SL0586), and an interface is not offered a name (SL0587 — a reference does not
-convert down to one).
+**The GTK binding is verified against the libraries, not against
+documentation.** Every declared symbol was checked with `nm -D` against both
+`libgtk-3.so.0` and `libgtk-x11-2.0.so.0`. That caught nine calls filed as
+shared that GTK 2 lacks, and `gtk_entry_set_editable`, which GTK 3 removed. Do
+this after adding declarations: a misfiled call is a link error naming one
+symbol at a time.
 
-SL0585 is the interesting one. The value tested is spilled into a local
-*before* the `if`, so under an `&&` or a `!` it would be evaluated when the
-test would not have been. Restricting the form is what keeps that from being a
-silent change in behaviour.
-
-**The implementation is entirely in the binder, and that was the whole trick.**
-`BindIf` opens a `PatternScope`; spills become statements in a block wrapped
-around the `if`, and bindings become declarations at the top of the branch the
-test proved. The payload read has to be inside that branch — reading a case's
-payload where the tag says otherwise would reinterpret one type's bytes as
-another's, and for a payload holding a reference it would retain a value that
-was never there. **No emitter change at all.**
-
-**A library gap and a compiler gap are hard to tell apart from the library
-side.** `Optional.FlatMap` would not infer: `IFunc<T, Optional<R>>` puts R
-inside a constructed type, and `InferFromLambdaResults` only read a result that
-*was* a bare type parameter. Its own comment said as much and called it "the
-honest outcome until something needs otherwise" — and then something did. The
-fix was to unify structurally with `Infer` rather than assign, and to let
-`AsWritten` substitute all the way down; both were already written for the
-argument pass. Twenty lines, and it generalises to any functional interface
-whose result mentions a parameter inside something else.
-
-**`Standard` is where the shapes of work belong.** `IFunc`, `IPredicate`,
-`IAction`, `IFold` and `IComparer` moved out of `Standard.Collections`, because
-`Optional.Map` needed them and `Standard` cannot depend on a module that
-depends on it. That is the right home anyway: they are what §2.15 says a lambda
-may become, not anything a collection owns, and `Standard` needs no import.
-
-**Check whether the library already has it.** `AppendChar` was added to
-`StringBuilder` and then removed: `AppendCodePoint` had done exactly that,
-in `Text.sl`, since long before. `AppendByte` was genuinely missing, because
-appending one byte meant building a one-element array for `AppendBytes`. The
-same lesson twice in one run — see the tag-test finding above.
+**`g_object_ref_sink` is right for widgets and wrong for a plain GObject.**
+Every `GtkWidget` is a `GInitiallyUnowned`, so its reference is floating and
+sinking claims it. A `GtkTextBuffer` is not, and sinking one *adds* a
+reference — which showed up once as a 126 MB leak that was the test's and not
+the binding's.
 
 **Two representations behind one syntax is the thing to avoid.** `T?` on a
-value type was asked for and turned down in favour of `Optional<T>`, a variant.
-`C?` is a null pointer and costs nothing; a tagged pair is a different thing,
-and giving `?` both meanings would have touched the ABI classifier, layout,
-narrowing and mangling across 37 sites. The variant got narrowing,
-exhaustiveness and ARC from machinery that already existed — and now Java's
-readers (`Get`, `ValueOr`, `Or`, `Map`, `FlatMap`, `Filter`, `IfPresent`) on
-top of it, every one written in terms of `if (this is Some held)`.
-
-`Or` takes a value rather than a supplier, unlike Java's. A lambda here
-allocates a closure to save an evaluation, which is the wrong way round at the
-sizes an optional is used at.
-
-**`new()` means a class here, unlike C#.** There `new T()` on a value type is
-default-initialization; here `new` allocates. A struct would have satisfied a
-constraint whose only purpose it then failed.
-
-**A serializer that cannot represent a field must leave it out.** Writing
-`null` for an array and `{}` for a `List<T>` was silently wrong in a way a
-reader would have believed. `Field.IsWalkable()` — an aggregate *and* carrying
-`[Reflect]` — is what tells a reflected type from a `List`.
-
-**Reading fills an object rather than making one.** A constructor is what makes
-a type's invariants true, so `Json.Populate` takes an instance the program
-made. There is no `Deserialize<T>(text)`: a type argument cannot be written at
-a call, so a function whose only mention of `T` is its return type could never
-be called. I wrote one anyway and the test found it.
-
-**Three compiler bugs, all found by library work rather than by tests.**
-
-- An unreachable tail returned `ZeroOf` of the return type, and a struct
-  coerced into registers has a *literal* LLVM type — `{ i8, i64 }` — which
-  starts with a brace rather than `%`, so it took the integer path and emitted
-  `ret { i8, i64 } 0`. It needed a `Result<T, E>` small enough to coerce, under
-  Itanium, which nothing had instantiated until `Result<JsonValue, JsonError>`.
-- `KindOf` unwrapped an optional and `NestedTypeInfo` did not, so a `C?` field
-  reported kind Class and named no type — which is what stopped any walk into
-  one.
-- `public` on a constructor was silently ignored (now SL0572).
-
-**The audit found six stale claims and four broken examples**, including a
-`FileStream` paragraph describing the latch its own example three lines above
-had replaced, and a `parallel for` example that counted an `int` against an
-`nuint` length. Compile the examples; do not read them. The harness is in
-`scratchpad/audit/` if it is still there — it is 60 lines and worth rebuilding.
+value type was turned down in favour of `Optional<T>`, a variant. `C?` is a
+null pointer and costs nothing; a tagged pair is a different thing. The same
+instinct is why `ClosureTypeSymbol` is not a flag on `DelegateTypeSymbol`:
+sixteen bytes silently reaching a slot that expects a C function pointer is the
+kind of mistake that shows up as a corrupt stack in someone else's code.
 
 ## Next, in the order I would do it
 
-1. **`is` with a binding, widened to `&&`.** `if (x is Number n && n.Held > 0)`
-   is refused today and is the first thing anyone will try. It needs the name
-   in scope for the rest of the condition, so the payload read has to happen
-   mid-expression rather than at the top of the branch: either a lowering of
-   `&&` that can carry a store, or the binding declared outside with
-   definite-assignment behind it. `while` wants the same thing for the same
-   reason, and `else` for a negated test falls out of it.
-2. **An `as` operator**, now much smaller than TODO.md describes. `is C c`
-   covers the branching case; what is left is wanting the answer as a value —
-   passing it on, storing it, or a chain where an `if` per step reads badly.
-3. **A reachability pass from `Main`.** Every program compiles the whole
-   library, and the suite went from 66s to 89s two runs ago purely because two
-   modules were added that nothing imports. It is the most expensive missing
-   thing.
-4. **The +0/+1 dataflow pass.** Still the acknowledged performance item.
-5. **`Standard.Collections` does not use the operators it could.** `Money` in
-   the samples still calls `Money.Add`; `Standard.Time` has had this pass and
-   is what the rest should look like.
-6. **Method metadata in reflection**, which is what would let a deserializer
-   fill a `List<T>` — the one shape `Standard.Json` still cannot represent.
-7. Format specifiers in interpolation; the samples still cover about half the
+1. **Operators on generic types.** A real bug with a one-line repro, and it
+   blocks any generic value type that wants arithmetic or comparison.
+2. **Method metadata in reflection**, with invoke-by-name. The last piece
+   before a form file can wire a handler, and the same work would let a
+   deserializer fill a `List<T>` — the one shape `Standard.Json` cannot
+   represent.
+3. **The component layer.** `samples/gtk/control.sl` is what one control looks
+   like by hand; the next step is a `Component`/`Control` base with ownership
+   and bounds, and a narrow backend interface with GTK and Win32 behind it.
+   Everything it needs exists.
+4. **A reachability pass from `Main`.** Every program compiles the whole
+   library. It is the most expensive missing thing and gets worse as the
+   library grows.
+5. **The +0/+1 dataflow pass.** Still the acknowledged performance item.
+6. **`List<T>` has no `Remove(T)`.** Its `IndexOf` wants `IEquatable<T>`, which
+   a closure is not, so a list of callbacks is removed from by hand.
+7. **`Standard.Collections` does not use the operators it could.** `Money` in
+   the samples still calls `Money.Add`; `Standard.Time` has had this pass.
+8. Format specifiers in interpolation; the samples cover about half the
    language.
 
 ## Things to know before touching the build
 
 - **Heredocs mangle backslashes here.** A `\n` inside `bash <<'EOF'` arrives as
-  a literal newline, which has broken C#, C and Python source repeatedly. Use
-  the Write tool for anything with escapes. A `python << 'PY'` heredoc is safe
-  when the delimiter is quoted *and* the body has no backticks.
-- **This file uses em dashes.** A `python` patch script that matches on `--`
-  will fail its own assertion; check which one is in the text before writing
-  the pattern.
+  a literal newline, which has broken C#, C and Python source repeatedly — and
+  did so twice more this run, in both cases silently reverting an edit whose
+  assertion then failed. Use the Write or Edit tool for anything with escapes.
+- **This file uses em dashes.** A patch script matching on `--` will fail its
+  own assertion; check which is in the text before writing the pattern.
 - `io.open(p, 'wb').write(io.open(p, 'rb').read())` truncates the file before
-  reading it — Python evaluates the callee first. It emptied an `expected.txt`
-  once.
+  reading it — Python evaluates the callee first.
+- **The first `dotnet build` after an rsync onto Linux sometimes dies with
+  `Internal CLR error (0x80131506)`.** It is transient: run it again and it is
+  clean. It happened twice this run and neither time was real.
 - `-o /dev/null` does not work for a build on Windows; the linker wants a real
   path.
 - **Windows reserves `COM1`–`COM9` even with an extension**, so a scratch file
-  named `com2.sl` does not exist as far as any program is concerned. This costs
-  twenty minutes if you do not know it.
+  named `com2.sl` does not exist as far as any program is concerned.
 - A documented `SL####` needs an `errors.txt` case pinning it, or
   `DiagnosticTests.EveryDocumentedCodeIsPinnedByACase` fails.
+- **A new sample must be listed in `SampleTests`**, or
+  `EverySampleOnDiskIsListed` fails. The GTK commit missed this and the failure
+  only showed on Linux, because the sample is `UnixOnly` and skipped on
+  Windows. **Run the unit tests, not just the end-to-end suite, before
+  committing.**
 - A test that looks up a function by name fragment will match the standard
   library once it grows something of that name — `AbiTests` matched
-  `Standard.Xml.Cursor.Take` instead of its own `Take`. Qualify with the
-  module: `4Test4Take`.
+  `Standard.Xml.Cursor.Take` instead of its own. Qualify: `4Test4Take`.
 - Adding a `stdlib/*.sl` file needs `dotnet build` before any program can
   import it; the library is an embedded resource picked up by a wildcard.
 - **Two end-to-end runs at once corrupt each other.** The harness builds every
-  case under one shared `%TEMP%/stainless-tests/` directory, so a second run
-  overwrites the first run's object files mid-compile. It shows up as a
-  scattering of unrelated failures — nine, once — that all pass when the
-  suite is run alone. Do not background one and start another.
+  case under one shared `%TEMP%/stainless-tests/`, so a second run overwrites
+  the first's object files mid-compile. It shows up as a scattering of
+  unrelated failures that all pass when the suite is run alone.
+
+## Running a GUI with no screen
+
+Both are set up on `geekom-a7` and both are in `bindings/gtk/README.md`:
+
+```sh
+broadwayd :5 &                       # GTK 3 only, no X at all
+GDK_BACKEND=broadway BROADWAY_DISPLAY=:5 ./Program
+
+Xvfb :9 -screen 0 1024x768x24 &      # either version
+DISPLAY=:9 ./Program
+```
+
+`broadwayd :5` reports `broadway6.socket`, and `BROADWAY_DISPLAY=:5` is still
+what connects to it. GTK 2 has no broadway — `libgdk-x11-2.0` contains not one
+mention of it — so Xvfb is what tests that side.
+
+**Watch stderr.** GTK reports a bad signal name or a failed cast there and
+nowhere else, so a clean stderr is most of what a headless run is worth.

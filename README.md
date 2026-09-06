@@ -1344,9 +1344,10 @@ Everything below is covered by [the test suite](tests/cases).
   a bound method pointer is the method's own address beside the object, and
   being two fields is what gives it layout, both ABI classifiers and reference
   counting without any of them being written for it
-- Lambdas and closures: `value => value * factor` becomes a generated class
-  implementing a single-method interface, capturing **by value** so it may
-  outlive the scope that built it; a non-capturing one becomes a `delegate`. A
+- Lambdas: `value => value * factor` becomes a generated class capturing **by
+  value**, so it may outlive the scope that built it. What it is *seen* as is
+  decided by what it is assigned to — a `closure`, a single-method interface,
+  or, if it captures nothing, a `delegate`. A
   lambda written in a method reaches its object too — a field, a property,
   `this`, or a method called without a receiver — and captures what it reads by
   the same rule

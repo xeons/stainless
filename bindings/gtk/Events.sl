@@ -56,7 +56,11 @@ import Gtk.Api;
 
 #if UNIX
 
-/// The shape of a signal that carries one pointer and answers.
+/// What such a signal runs. `carried` is whatever the signal carries -- a
+/// `GdkEvent*` for input, a `cairo_t*` for `draw`.
+public closure bool EventHandler(GtkWidget* sender, gpointer carried);
+
+/// The shape of the C callback GTK will make.
 public delegate gboolean EventCallback(GtkWidget* sender, gpointer carried, gpointer data);
 
 extern "C" {
@@ -67,15 +71,15 @@ extern "C" {
                                  gpointer data, GClosureNotify notify, gint flags);
 }
 
-/// What such a signal calls. `carried` is whatever the signal carries -- a
-/// `GdkEvent*` for input, a `cairo_t*` for `draw`.
-public interface IEventHandler {
-    bool Handle(GtkWidget* sender, gpointer carried);
+/// A closure with an address; see `Gtk.Signals.Boxed`.
+class Boxed {
+    public EventHandler Body;
+    public Boxed(EventHandler body) { Body = body; }
 }
 
 gboolean Dispatch(GtkWidget* sender, gpointer carried, gpointer data) {
-    var handler = (IEventHandler)data;
-    return handler.Handle(sender, carried) ? 1 : 0;
+    var boxed = (Boxed)data;
+    return boxed.Body(sender, carried) ? 1 : 0;
 }
 
 void Forget(gpointer data, gpointer closure) {
@@ -83,11 +87,12 @@ void Forget(gpointer data, gpointer closure) {
 }
 
 /// Connects a handler to a signal that carries a pointer and wants an answer.
-public gulong ConnectEvent(GtkWidget* instance, String signal, IEventHandler handler) {
-    sl_retain((gpointer)handler);
+public gulong ConnectEvent(GtkWidget* instance, String signal, EventHandler handler) {
+    var boxed = new Boxed(handler);
+    sl_retain((gpointer)boxed);
 
     return g_signal_connect_data(instance, signal.ToPointer(),
-        Dispatch, (gpointer)handler, Forget, G_CONNECT_DEFAULT);
+        Dispatch, (gpointer)boxed, Forget, G_CONNECT_DEFAULT);
 }
 
 #endif
