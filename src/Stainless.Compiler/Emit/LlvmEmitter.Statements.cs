@@ -43,6 +43,9 @@ public sealed partial class LlvmEmitter
             case BoundExpressionStatement expression: EmitExpressionStatement(expression); break;
             case BoundIf ifStatement: EmitIf(ifStatement); break;
             case BoundWhile whileStatement: EmitWhile(whileStatement); break;
+            case BoundDoWhile doWhile: EmitDoWhile(doWhile); break;
+            case BoundLabel label: EmitLabel(label); break;
+            case BoundGoto jump: EmitGoto(jump); break;
             case BoundFor forStatement: EmitFor(forStatement); break;
             case BoundSwitch switchStatement: EmitSwitch(switchStatement); break;
             case BoundParallel parallel: EmitParallel(parallel); break;
@@ -77,6 +80,7 @@ public sealed partial class LlvmEmitter
         {
             // Owned slots start null so the first assignment's release is a no-op.
             Line($"store ptr null, ptr {slot}");
+            ZeroOnEntry(slot, "ptr");
             TrackOwnedLocal(slot, local.Type);
         }
         else if (local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
@@ -84,6 +88,7 @@ public sealed partial class LlvmEmitter
             // The same reason, one level down: the references inside start null
             // so the first assignment releases nothing.
             Line($"store {StructName(owning)} zeroinitializer, ptr {slot}");
+            ZeroOnEntry(slot, StructName(owning));
             TrackOwnedLocal(slot, local.Type);
         }
 
@@ -152,6 +157,81 @@ public sealed partial class LlvmEmitter
 
         Label(endLabel);
     }
+
+    /// <summary>
+    /// <c>do { ... } while (c);</c>.
+    ///
+    /// The same three blocks a <c>while</c> has, entered at the body rather
+    /// than at the condition -- which is the whole of the difference, and is
+    /// why the body is not emitted twice. <c>continue</c> goes to the
+    /// condition, as C says: it means "ask again", not "start over".
+    /// </summary>
+    private void EmitDoWhile(BoundDoWhile statement)
+    {
+        string bodyLabel = NextLabel("do.body");
+        string conditionLabel = NextLabel("do.cond");
+        string endLabel = NextLabel("do.end");
+
+        Terminator($"br label %{bodyLabel}");
+        Label(bodyLabel);
+
+        _loops.Add((endLabel, _scopes.Count, conditionLabel, _scopes.Count));
+        EmitStatement(statement.Body);
+        _loops.RemoveAt(_loops.Count - 1);
+        if (!_blockTerminated) Terminator($"br label %{conditionLabel}");
+
+        Label(conditionLabel);
+        var condition = EmitExpression(statement.Condition);
+        FlushTemporaries();
+        Terminator($"br i1 {condition.Ref}, label %{bodyLabel}, label %{endLabel}");
+
+        Label(endLabel);
+    }
+
+    /// <summary>
+    /// A <c>goto</c> target.
+    ///
+    /// LLVM blocks are named at their head, so a label is a block of its own
+    /// that the statement before it falls into. It is emitted whether or not
+    /// anything reaches it: the binder has already refused a jump with no
+    /// label, and a block nothing branches to is dead code LLVM removes.
+    /// </summary>
+    private void EmitLabel(BoundLabel statement)
+    {
+        string block = LabelBlock(statement.Label);
+        if (!_blockTerminated) Terminator($"br label %{block}");
+        Label(block);
+    }
+
+    private void EmitGoto(BoundGoto statement)
+    {
+        // Everything the scopes between here and the target were holding is
+        // released, exactly as a `break` out of them would release it. A jump
+        // that leaves a scope must not leave its references behind.
+        FlushTemporaries();
+        ReleaseScopes(_bodyScopeDepth);
+        Terminator($"br label %{LabelBlock(statement.Label)}");
+    }
+
+    /// <summary>
+    /// The block name for a source label, one per label per function.
+    ///
+    /// It is not the source name: two functions may each have a `retry:`, and
+    /// a source label may collide with a name the emitter made for itself.
+    /// </summary>
+    private string LabelBlock(LabelSymbol label)
+    {
+        if (_labelBlocks.TryGetValue(label, out string? existing)) return existing;
+        return _labelBlocks[label] = NextLabel("label." + label.Name);
+    }
+
+    private readonly Dictionary<LabelSymbol, string> _labelBlocks = [];
+
+    /// <summary>
+    /// The scope depth of the function body's own block. Every label sits at
+    /// exactly this depth (SL0595), so this is what a jump releases down to.
+    /// </summary>
+    private int _bodyScopeDepth;
 
     private void EmitFor(BoundFor statement)
     {

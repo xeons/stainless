@@ -77,6 +77,8 @@ public sealed partial class LlvmEmitter
             case BoundClosureCall closureCall: return EmitClosureCall(closureCall);
             case BoundClosureEqual same: return EmitClosureEqual(same);
             case BoundAssignment assignment: return EmitAssignment(assignment);
+            case BoundIncrement increment: return EmitIncrement(increment);
+            case BoundPropertyIncrement stepped: return EmitPropertyIncrement(stepped);
             case BoundPropertyAssignment written: return EmitPropertyAssignment(written);
             case BoundCall call: return EmitCall(call);
             case BoundNew newExpression: return EmitNew(newExpression);
@@ -497,6 +499,117 @@ public sealed partial class LlvmEmitter
              $"({string.Join(", ", arguments)})");
 
         return value;
+    }
+
+    /// <summary>
+    /// <c>++x</c>, <c>x++</c>, <c>--x</c> and <c>x--</c> over a place.
+    ///
+    /// The address is worked out once and then read, changed and written, which
+    /// is what an assignment to <c>x + 1</c> could not promise: that form
+    /// evaluates the place twice, so <c>a[Next()]++</c> would call <c>Next</c>
+    /// on both sides and step an element it never read.
+    /// </summary>
+    private Val EmitIncrement(BoundIncrement increment)
+    {
+        var target = increment.Target;
+
+        // A bit-field is a slice of a storage unit rather than an address, and
+        // the read and the write both know how to splice it.
+        if (target is BoundFieldAccess { Field.IsBitField: true } bitField)
+        {
+            var wasBits = LoadBitField(bitField);
+            var nowBits = StepOne(wasBits, increment.IsIncrement, increment.IsChecked, target.Type);
+            StoreBitField(bitField, nowBits);
+            return increment.IsPrefix ? nowBits : wasBits;
+        }
+
+        string address = EmitAddress(target);
+        string llvmType = LlvmTypeOf(target.Type);
+
+        var was = new Val(Emit(llvmType, $"load {llvmType}, ptr {address}"), llvmType, target.Type);
+        var now = StepOne(was, increment.IsIncrement, increment.IsChecked, target.Type);
+
+        Line($"store {llvmType} {now.Ref}, ptr {address}");
+        return increment.IsPrefix ? now : was;
+    }
+
+    /// <summary>
+    /// The same over a property, which is a getter and a setter rather than an
+    /// address.
+    ///
+    /// The receiver is emitted once and used for both calls, so
+    /// <c>Next().Count++</c> reads and writes one object.
+    /// </summary>
+    private Val EmitPropertyIncrement(BoundPropertyIncrement increment)
+    {
+        var property = increment.Property;
+        var getter = property.Getter!;
+        var setter = property.Setter!;
+
+        string? receiverRef = null;
+        string? virtualGet = null;
+        string? virtualSet = null;
+
+        if (increment.Receiver is not null)
+        {
+            receiverRef = EmitExpression(increment.Receiver).Ref;
+            virtualGet = DispatchTarget(receiverRef, getter);
+            virtualSet = DispatchTarget(receiverRef, setter);
+        }
+
+        string llvmType = LlvmTypeOf(property.Type);
+        string readArguments = receiverRef is null ? "" : $"ptr {receiverRef}";
+
+        var was = new Val(
+            Emit(llvmType, $"call {llvmType} {virtualGet ?? Symbol(getter)}({readArguments})"),
+            llvmType, property.Type);
+
+        var now = StepOne(was, increment.IsIncrement, increment.IsChecked, property.Type);
+
+        var arguments = new List<string>();
+        if (receiverRef is not null) arguments.Add($"ptr {receiverRef}");
+        AppendArgument(now, property.Type, arguments);
+
+        Line($"call void {virtualSet ?? Symbol(setter)}({string.Join(", ", arguments)})");
+        return increment.IsPrefix ? now : was;
+    }
+
+    /// <summary>Where a call to this accessor goes, or null when it is not dispatched.</summary>
+    private string? DispatchTarget(string receiverRef, FunctionSymbol accessor) =>
+        accessor.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiverRef, accessor)
+        : accessor.ContainingType is InterfaceTypeSymbol ? LoadInterfaceMethod(receiverRef, accessor)
+        : accessor.IsDispatched ? LoadVirtualMethod(receiverRef, accessor)
+        : null;
+
+    /// <summary>
+    /// One more, or one less.
+    ///
+    /// A pointer steps by an element, as C's does; a float adds 1.0; an integer
+    /// adds 1, and inside <c>checked</c> notices if that did not fit.
+    /// </summary>
+    private Val StepOne(Val value, bool up, bool watched, TypeSymbol type)
+    {
+        if (type is PointerTypeSymbol pointer)
+            return new Val(
+                Emit("ptr", $"getelementptr inbounds {LlvmTypeOf(pointer.Element)}, " +
+                            $"ptr {value.Ref}, i64 {(up ? 1 : -1)}"),
+                "ptr", type);
+
+        if (type is PrimitiveTypeSymbol { IsFloat: true })
+            return new Val(
+                Emit(value.LlvmType, $"{(up ? "fadd" : "fsub")} {value.LlvmType} {value.Ref}, 1.0"),
+                value.LlvmType, type);
+
+        if (watched)
+            return new Val(
+                CheckedArithmetic(
+                    up ? BoundBinaryOp.Add : BoundBinaryOp.Subtract,
+                    value.LlvmType, value.Ref, "1", IsSigned(type)),
+                value.LlvmType, type);
+
+        return new Val(
+            Emit(value.LlvmType, $"{(up ? "add" : "sub")} {value.LlvmType} {value.Ref}, 1"),
+            value.LlvmType, type);
     }
 
     /// <summary>

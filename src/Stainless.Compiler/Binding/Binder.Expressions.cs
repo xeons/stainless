@@ -35,6 +35,9 @@ public sealed partial class Binder
         BaseSyntax baseExpression => BindBaseValue(baseExpression),
         TypeTestSyntax typeTest => BindTypeTest(typeTest),
         UnarySyntax unary => BindUnary(unary),
+        IncrementSyntax increment => BindIncrement(increment),
+        NameofSyntax nameOf => BindNameof(nameOf),
+        CheckedSyntax guarded => BindChecked(guarded),
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
         CallSyntax call => BindCall(call),
@@ -1220,7 +1223,15 @@ public sealed partial class Binder
 
         left = BindConversion(left, common, span);
         right = BindConversion(right, common, span);
-        return new BoundBinary(span, isComparison ? PrimitiveTypeSymbol.Bool : common, left, op, right);
+
+        // Only the three that can overflow, and only on integers: a float
+        // saturates to infinity rather than wrapping, and there is nothing for
+        // `checked` to catch.
+        bool watched = _checkedArithmetic && common.IsInteger &&
+            op is BoundBinaryOp.Add or BoundBinaryOp.Subtract or BoundBinaryOp.Multiply;
+
+        return new BoundBinary(span, isComparison ? PrimitiveTypeSymbol.Bool : common, left, op, right)
+            { IsChecked = watched };
     }
 
     private static bool IsReferenceLike(TypeSymbol type) =>
@@ -1359,6 +1370,179 @@ public sealed partial class Binder
         if (IsImplicitlyConvertible(left, right.Type)) return right.Type;
 
         return null;
+    }
+
+    /// <summary>
+    /// <c>nameof(x)</c>: the last name in what was written, as a String.
+    ///
+    /// The operand is bound and thrown away, which is the whole value of the
+    /// thing — a name that is checked to be a name of something. Reflection is
+    /// reached by string, so this is what stops a form file, a serializer or a
+    /// property lookup naming a member that was renamed underneath it.
+    /// </summary>
+    private BoundExpression BindNameof(NameofSyntax syntax)
+    {
+        string? written = LastNameIn(syntax.Operand);
+
+        if (written is null)
+        {
+            diagnostics.Error("SL0592", syntax.Operand.Span,
+                "'nameof' takes something with a name — a variable, a parameter, a field, a " +
+                "property, a method or a type — and answers with the last name written in it");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // Bound only to be checked, and nothing it produces is kept: this
+        // answers with text, and the text was in the source. What the binding
+        // buys is that the name is a name of something, which is the whole
+        // reason to write `nameof(Caption)` rather than `"Caption"`.
+        //
+        // Muted, because the operand may equally well be a *type*, and a type
+        // name is not an expression. Trying both and complaining once is what
+        // keeps `nameof(Button)` and `nameof(button)` from needing different
+        // spellings.
+        bool found;
+        using (diagnostics.Muted())
+        {
+            found = BindExpression(syntax.Operand) is not BoundErrorExpression;
+
+            if (!found && syntax.Operand is NameSyntax typeName && _currentScope is { } scope)
+                found = ResolveNamedType(
+                    new NamedTypeSyntax(typeName.Span, typeName.Name, []), scope)
+                    is not ErrorTypeSymbol;
+        }
+
+        if (!found)
+        {
+            diagnostics.Error("SL0596", syntax.Operand.Span,
+                $"there is nothing named '{written}' here, so 'nameof' has nothing to check " +
+                "the spelling of");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundStringLiteral(syntax.Span, _builtins.String, written);
+    }
+
+    /// <summary>The rightmost identifier in a name, member access or call.</summary>
+    private static string? LastNameIn(ExpressionSyntax syntax) => syntax switch
+    {
+        NameSyntax name => name.Name.Parts[^1],
+        MemberAccessSyntax member => member.Member,
+        CallSyntax call => LastNameIn(call.Callee),
+        _ => null,
+    };
+
+    /// <summary>
+    /// <c>checked(e)</c> and <c>unchecked(e)</c>.
+    ///
+    /// Nothing is produced for the word itself: it sets how the arithmetic
+    /// inside is bound, and the operations it applies to carry the answer.
+    /// </summary>
+    private BoundExpression BindChecked(CheckedSyntax syntax)
+    {
+        bool previous = _checkedArithmetic;
+        _checkedArithmetic = syntax.IsChecked;
+        var value = BindExpression(syntax.Operand);
+        _checkedArithmetic = previous;
+        return value;
+    }
+
+    /// <summary>
+    /// <c>++x</c>, <c>x++</c>, <c>--x</c> and <c>x--</c>.
+    ///
+    /// It is not lowered to <c>x = x + 1</c>, for two reasons that both matter:
+    /// the postfix form's value is the one from before the write, and the place
+    /// has to be worked out exactly once, so that <c>a[Next()]++</c> calls
+    /// <c>Next</c> one time.
+    /// </summary>
+    private BoundExpression BindIncrement(IncrementSyntax syntax)
+    {
+        string written = syntax.IsIncrement ? "++" : "--";
+        var target = Widened(BindExpression(syntax.Operand));
+
+        if (target.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // A property is a getter and a setter rather than a place, so it needs
+        // the other node. The read has already bound the receiver exactly once,
+        // which is what that node needs.
+        if (target is BoundCall { Function.Accessor: { } property } read)
+        {
+            if (property.Setter is null)
+            {
+                diagnostics.Error("SL0593", syntax.Span,
+                    $"'{property.Name}' has no setter, so '{written}' has nothing to write back");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            if (!Countable(property.Type, syntax.Span, written))
+                return new BoundErrorExpression(syntax.Span);
+
+            InvalidateVariantFact(target);
+            return new BoundPropertyIncrement(
+                syntax.Span, read.Receiver, property, syntax.IsPrefix, syntax.IsIncrement)
+                { IsChecked = _checkedArithmetic };
+        }
+
+        if (!Writable(target, syntax.Operand.Span, written)) return new BoundErrorExpression(syntax.Span);
+        if (!Countable(target.Type, syntax.Span, written)) return new BoundErrorExpression(syntax.Span);
+
+        InvalidateVariantFact(target);
+        if (WrittenParameter(target) is { } written2) written2.IsAssigned = true;
+
+        return new BoundIncrement(syntax.Span, target, syntax.IsPrefix, syntax.IsIncrement)
+            { IsChecked = _checkedArithmetic };
+    }
+
+    /// <summary>Whether one may be added to a value of this type.</summary>
+    private bool Countable(TypeSymbol type, SourceSpan span, string written)
+    {
+        // A pointer counts in elements, as C's does. Everything else has to be
+        // a number: `++` on a class would be an assignment to a new object,
+        // which is a different thing wearing the same spelling.
+        if (type is PointerTypeSymbol or PrimitiveTypeSymbol { IsNumeric: true }) return true;
+
+        diagnostics.Error("SL0594", span,
+            $"'{written}' adds one to a number or steps a pointer, and this is " +
+            $"'{type.Name}'" +
+            (type is EnumTypeSymbol
+                ? "; an enum is a choice rather than a count, so step the integer behind it"
+                : ""));
+        return false;
+    }
+
+    /// <summary>
+    /// Whether a place may be written: the checks an assignment makes, asked
+    /// separately so that <c>++</c> makes exactly the same ones.
+    /// </summary>
+    private bool Writable(BoundExpression target, SourceSpan span, string written)
+    {
+        if (BaseOf(target) is BoundStaticAccess { Static.IsReadonly: true } owner)
+        {
+            diagnostics.Error("SL0379", span,
+                $"'{owner.Static.Name}' is 'static readonly', so it is written once by its " +
+                "initializer and never again. Drop the 'readonly' if it is meant to change");
+            return false;
+        }
+
+        if (BaseOf(target) is BoundParameterAccess { Parameter.Mode: ParameterMode.In } borrowed)
+        {
+            diagnostics.Error("SL0448", span,
+                $"'{borrowed.Parameter.Name}' is an 'in' parameter, which is the caller's " +
+                "storage and promises not to be written; take it as 'ref' if it should be, or " +
+                "copy it into a local first");
+            return false;
+        }
+
+        if (!target.IsLValue)
+        {
+            diagnostics.Error("SL0240", span,
+                target is BoundLocalAccess { Local.IsConst: true } constant
+                    ? $"'{constant.Local.Name}' is declared 'const' and cannot be assigned"
+                    : $"'{written}' needs a variable, field or dereference to change");
+            return false;
+        }
+
+        return true;
     }
 
     private BoundExpression BindAssignment(AssignmentSyntax syntax)

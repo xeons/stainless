@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Binding;
@@ -62,6 +63,25 @@ public sealed class LocalSymbol(string name, TypeSymbol type, bool isConst)
     public TypeSymbol Type { get; } = type;
     public bool IsConst { get; } = isConst;
     public override string ToString() => $"{Type.Name} {Name}";
+}
+
+/// <summary>
+/// A <c>goto</c> target. One per label per function, made by whichever of the
+/// two the binder meets first: a jump forwards names a label that has not been
+/// bound yet, and a jump backwards names one that has.
+/// </summary>
+public sealed class LabelSymbol(string name)
+{
+    public string Name { get; } = name;
+
+    /// <summary>Where the label itself is, once it has been seen.</summary>
+    public SourceSpan? Declared { get; set; }
+
+    /// <summary>Where the first jump to it is, for the error when it is never declared.</summary>
+    public SourceSpan? FirstUse { get; set; }
+
+    public bool IsUsed { get; set; }
+    public override string ToString() => Name + ":";
 }
 
 public sealed class FunctionSymbol

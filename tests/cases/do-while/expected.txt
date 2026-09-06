@@ -1,0 +1,11 @@
+spins  3
+once   1
+never  0
+evens  30
+found  6
+grid   4 by 3 is 12
+  held turn 0
+  dropped turn 0
+  held turn 1
+  dropped turn 1
+done

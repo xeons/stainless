@@ -1,0 +1,19 @@
+local    local
+type     Button
+struct   Point
+field    X
+property Caption
+method   Press
+static   Total
+function Main
+last     Width
+wraps    -2147483648
+says so  -2147483648
+down     2147483647
+checked  2147483646
+times    1000000
+block    1002000
+block    2000000
+back     -2147483648
+ushort   65000
+double   true

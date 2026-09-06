@@ -141,6 +141,13 @@ public sealed partial class LlvmEmitter(
     /// </summary>
     private readonly List<(int Priority, string Name)> _startup = [];
 
+    /// <summary>
+    /// The <c>llvm.*.with.overflow</c> declarations <c>checked</c> arithmetic
+    /// asked for. Collected rather than declared where they are used, because a
+    /// <c>declare</c> written mid-function would land inside its body.
+    /// </summary>
+    private readonly HashSet<string> _overflowIntrinsics = new(StringComparer.Ordinal);
+
     public string Emit(BoundProgram program)
     {
         Header();
@@ -182,6 +189,15 @@ public sealed partial class LlvmEmitter(
         StringConstants();
         TypeRegistry(program);
         StartupTable();
+
+        // After the functions, because which of these are needed is not known
+        // until the last `checked` expression has been emitted.
+        if (_overflowIntrinsics.Count > 0)
+        {
+            _module.AppendLine();
+            foreach (string declaration in _overflowIntrinsics.OrderBy(d => d, StringComparer.Ordinal))
+                _module.AppendLine(declaration);
+        }
 
         if (_metadata.Length > 0)
         {

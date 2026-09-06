@@ -248,6 +248,8 @@ public sealed partial class LlvmEmitter
             "declare void @sl_divide_by_zero() noreturn nounwind");
         Declare("sl_divide_overflow",
             "declare void @sl_divide_overflow() noreturn nounwind");
+        Declare("sl_arithmetic_overflow",
+            "declare void @sl_arithmetic_overflow() noreturn nounwind");
         Declare("llvm.memcpy.p0.p0.i64", "declare void @llvm.memcpy.p0.p0.i64(ptr, ptr, i64, i1)");
 
         // Up here rather than at its first use: a declaration goes straight into

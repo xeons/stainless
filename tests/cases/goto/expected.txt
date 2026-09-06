@@ -1,0 +1,22 @@
+return 16
+jump   16
+none   -1
+skipping, leaving early:
+  + kept
+  after
+  - kept
+skipping, going through:
+  + kept
+  + skipped
+  saw skipped
+  after
+  - skipped
+  - kept
+retrying:
+  + inner 0
+  - inner 0
+  + inner 1
+  - inner 1
+  + inner 2
+  - inner 2
+  spun 3

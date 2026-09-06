@@ -1,0 +1,15 @@
+post   5 then 6
+pre    7 then 7
+down   6 and 6 then 5
+total  10
+cells  2 after 2 calls
+getset 2 post 2 now 3
+bits   8 0
+byte   255
+wrap   0
+double 2.5
+ptr    20
+ptr    30
+back   20
+fed    0 then 1
+fed    4 then 2

@@ -321,8 +321,57 @@ public sealed partial class LlvmEmitter
             ? MaskShiftCount(type, right.Ref)
             : right.Ref;
 
+        if (binary.IsChecked)
+            return new Val(
+                CheckedArithmetic(binary.Operator, type, left.Ref, operand, signed),
+                type, binary.Type);
+
         return new Val(
             Emit(type, $"{opcode} {type} {left.Ref}, {operand}"), type, binary.Type);
+    }
+
+    /// <summary>
+    /// Add, subtract or multiply, aborting rather than wrapping.
+    ///
+    /// LLVM has an intrinsic per operation that answers with the result and a
+    /// bit saying whether it was representable, which is one instruction on
+    /// every target that has a flags register — so <c>checked</c> costs a test
+    /// and a branch that is never taken, not a wider type and a comparison.
+    ///
+    /// Signedness is part of the intrinsic's name, because wrapping is the same
+    /// bits either way and overflowing is not: 200 + 100 is fine as a
+    /// <c>ushort</c> and is not as a <c>short</c>.
+    /// </summary>
+    private string CheckedArithmetic(
+        BoundBinaryOp op, string type, string left, string right, bool signed)
+    {
+        string name = op switch
+        {
+            BoundBinaryOp.Add => signed ? "sadd" : "uadd",
+            BoundBinaryOp.Subtract => signed ? "ssub" : "usub",
+            _ => signed ? "smul" : "umul",
+        };
+
+        string intrinsic = $"llvm.{name}.with.overflow.{type}";
+        _overflowIntrinsics.Add(
+            $"declare {{ {type}, i1 }} @{intrinsic}({type}, {type}) nounwind willreturn " +
+            "memory(none) speculatable");
+
+        string pair = Emit($"{{ {type}, i1 }}",
+            $"call {{ {type}, i1 }} @{intrinsic}({type} {left}, {type} {right})");
+
+        string overflowed = Emit("i1", $"extractvalue {{ {type}, i1 }} {pair}, 1");
+
+        string failLabel = NextLabel("checked.overflow");
+        string okLabel = NextLabel("checked.ok");
+        Terminator($"br i1 {overflowed}, label %{failLabel}, label %{okLabel}");
+
+        Label(failLabel);
+        Line("call void @sl_arithmetic_overflow()");
+        Terminator("unreachable");
+
+        Label(okLabel);
+        return Emit(type, $"extractvalue {{ {type}, i1 }} {pair}, 0");
     }
 
     /// <summary>

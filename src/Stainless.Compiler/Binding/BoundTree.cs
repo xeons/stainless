@@ -269,6 +269,57 @@ public sealed class BoundBinary(
     public BoundExpression Left { get; } = left;
     public BoundBinaryOp Operator { get; } = op;
     public BoundExpression Right { get; } = right;
+
+    /// <summary>
+    /// Written inside <c>checked</c>, so an overflow of <c>+</c>, <c>-</c> or
+    /// <c>*</c> aborts rather than wrapping.
+    ///
+    /// Wrapping is the default and is defined (§9), so this is opt-in per
+    /// expression rather than a mode the whole program is compiled in.
+    /// </summary>
+    public bool IsChecked { get; init; }
+}
+
+/// <summary>
+/// <c>++x</c>, <c>x++</c>, <c>--x</c> and <c>x--</c> over a place that is not a
+/// property.
+///
+/// The target is addressed once and then loaded, changed and stored, which is
+/// what separates this from an assignment to <c>x + 1</c>: <c>a[Next()]++</c>
+/// must call <c>Next</c> exactly one time.
+/// </summary>
+public sealed class BoundIncrement(
+    SourceSpan span, BoundExpression target, bool isPrefix, bool isIncrement)
+    : BoundExpression(span, target.Type)
+{
+    public BoundExpression Target { get; } = target;
+
+    /// <summary>True for <c>++x</c>: the value is the one after the change.</summary>
+    public bool IsPrefix { get; } = isPrefix;
+    public bool IsIncrement { get; } = isIncrement;
+    public bool IsChecked { get; init; }
+}
+
+/// <summary>
+/// The same over a property, where the place is a getter and a setter rather
+/// than an address.
+///
+/// The receiver is held once, for the reason
+/// <see cref="BoundPropertyAssignment"/> holds one: <c>Next().Count++</c> must
+/// read and write the same object.
+/// </summary>
+public sealed class BoundPropertyIncrement(
+    SourceSpan span,
+    BoundExpression? receiver,
+    PropertySymbol property,
+    bool isPrefix,
+    bool isIncrement) : BoundExpression(span, property.Type)
+{
+    public BoundExpression? Receiver { get; } = receiver;
+    public PropertySymbol Property { get; } = property;
+    public bool IsPrefix { get; } = isPrefix;
+    public bool IsIncrement { get; } = isIncrement;
+    public bool IsChecked { get; init; }
 }
 
 public sealed class BoundAssignment(SourceSpan span, BoundExpression target, BoundExpression value)
@@ -751,6 +802,30 @@ public sealed class BoundWhile(SourceSpan span, BoundExpression condition, Bound
 {
     public BoundExpression Condition { get; } = condition;
     public BoundStatement Body { get; } = body;
+}
+
+/// <summary>
+/// <c>do { ... } while (c);</c>. Kept rather than lowered to a <c>while</c>
+/// with a copy of the body, because a copy would emit the body twice and would
+/// give <c>continue</c> two places to go.
+/// </summary>
+public sealed class BoundDoWhile(SourceSpan span, BoundStatement body, BoundExpression condition)
+    : BoundStatement(span)
+{
+    public BoundStatement Body { get; } = body;
+    public BoundExpression Condition { get; } = condition;
+}
+
+/// <summary>Somewhere a <c>goto</c> in the same function can name.</summary>
+public sealed class BoundLabel(SourceSpan span, LabelSymbol label) : BoundStatement(span)
+{
+    public LabelSymbol Label { get; } = label;
+}
+
+/// <summary>A jump to a <see cref="BoundLabel"/> in the same function.</summary>
+public sealed class BoundGoto(SourceSpan span, LabelSymbol label) : BoundStatement(span)
+{
+    public LabelSymbol Label { get; } = label;
 }
 
 /// <summary>

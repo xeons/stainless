@@ -266,6 +266,7 @@ SL_API void  sl_fail(const char *message);
 /* The integer divisions LLVM leaves undefined. Neither returns. */
 SL_API void  sl_divide_by_zero(void);
 SL_API void  sl_divide_overflow(void);
+SL_API void  sl_arithmetic_overflow(void);
 
 /* ----------------------------------------------------------- inheritance */
 

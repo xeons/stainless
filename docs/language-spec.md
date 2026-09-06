@@ -1392,7 +1392,7 @@ interface, since that is one slot.
 
 ### 2.11 Arrays
 
-#### 2.10.1 `T[]` — a counted array
+#### 2.11.1 `T[]` — a counted array
 
 ```csharp
 var numbers = new int[5];
@@ -1457,7 +1457,7 @@ them
 Elements are stored the way an assignment into an element is, so a literal of
 references retains every one — `[a, b]` outlives the locals `a` and `b`.
 
-#### 2.10.2 `T[N]` — an inline array
+#### 2.11.2 `T[N]` — an inline array
 
 ```csharp
 public struct FindData {
@@ -2921,7 +2921,7 @@ operating system — the narrow CRT entry points would read those bytes in the
 active code page, which works by accident for ASCII and fails for everything
 else.
 
-### 5.12 `Standard.Json` and `Standard.Xml`
+### 5.10 `Standard.Json` and `Standard.Xml`
 
 Both have the same two layers, and the split is the point.
 
@@ -2992,7 +2992,7 @@ rather than a silent nothing. An `XmlNode`'s text is every character run inside
 it joined, which suits the data XML mostly carries and is the wrong model for
 mixed content.
 
-### 5.10 Interfaces may extend interfaces
+### 5.11 Interfaces may extend interfaces
 
 ```csharp
 public interface IWritable : IReadable { void Write(String text); }
@@ -4123,10 +4123,12 @@ var y = x + 1;          // inferred
 const int Limit = 64;   // compile-time constant
 
 if (y > 10) { ... } else { ... }
-while (y > 0) { y = y - 1; }
-for (int i = 0; i < 10; i = i + 1) { ... }
+while (y > 0) { y--; }
+do { y++; } while (y < 10);
+for (int i = 0; i < 10; i++) { ... }
 foreach (int n in numbers) { ... }
 switch (y) { case 0: return 0; default: break; }
+goto done;
 return y;
 ```
 
@@ -4146,48 +4148,10 @@ allocation rather than from the first field, because a class reference points
 at the object header (§2 of [abi.md](abi.md)) — so the number is what to add to
 the reference you are holding.
 
-Operators, by descending precedence: unary `- ! ~ * &` · `* / %` · `+ -` ·
-`<< >>` · `< <= > >=` · `== !=` · `&` · `^` · `|` · `&&` · `||` ·
+Operators, by descending precedence: postfix `x++ x--` · prefix
+`++x --x - ! ~ * &` and `try` · `* / %` · `+ -` · `<< >>` ·
+`< <= > >=` and `is` · `== !=` · `&` · `^` · `|` · `&&` · `||` ·
 `?:` · assignment.
-
-The conditional `a ? b : c` evaluates only the arm it selects, and groups to
-the right, so `a ? b : c ? d : e` reads as `a ? b : (c ? d : e)`. Its arms must
-meet at one type: the same type, a common numeric type, or one that the other
-converts to implicitly.
-
-Conditions must be `bool`; there is no implicit int-to-bool conversion.
-There are no implicit narrowing conversions. Widening integer conversions and
-`int` -> `float`/`double` are implicit, as in C#; everything else needs a
-cast: `(byte)x`.
-
-An integer literal converts implicitly to any integer type that can hold its
-value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
-anything computed still does.
-
-A string literal has type `String`; see section 3.
-
-**The arithmetic C leaves undefined.** C compiles these to whatever falls out,
-and an optimiser is entitled to assume they never happen — which is worse than
-a wrong answer, because it can delete the code around them. Stainless defines
-all three:
-
-| Expression | C | Stainless |
-|---|---|---|
-| `1 << 40` on an `int` | undefined | `1 << (40 & 31)` = 256, as in C# |
-| `x / 0` | undefined | aborts, the way an out-of-range index does |
-| `int.Smallest / -1` | undefined | aborts; the result is not representable |
-
-A shift count is reduced modulo the operand's width, which costs one `and` and
-matches what a C# reader expects. Division is checked where the divisor is not
-already known: a constant divisor is checked at compile time instead, and
-`10 / 0` is an error rather than a program that runs.
-
-```
-error[SL0415]: division by zero
-```
-
-Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
-unchecked, and is defined rather than undefined.
 
 ### 9.1 `switch`
 
@@ -4485,6 +4449,140 @@ outlive the lock it proves, and a job could store an array it was only lent.
 A third — `Mutex<T>` racing on the reference count of what it guarded — is
 closed, because counts are atomic now (§5.2 and §5 of the ABI notes). See
 [concurrency.md](concurrency.md) for the two that are left.
+
+### 9.6 Stepping by one
+
+```csharp
+i++;                    // the value it had, then one more
+++i;                    // one more, and that is the value
+for (int i = 0; i < n; i++) { ... }
+```
+
+`++` and `--` are C#'s, in both positions, over anything that can be written
+to: a local, a parameter, a field, a bit-field, an array element, a property
+and a pointer. A pointer steps by an element as C's does; a float adds one.
+
+**It is not `x = x + 1`**, and two things separate them. The postfix form's
+value is the one from *before* the write, so `i++` and `++i` are different
+expressions rather than two spellings of one. And the place is worked out
+exactly once, so `cells[Next()]++` calls `Next` a single time.
+
+An enum is refused (SL0594): it is a choice rather than a count, and stepping
+one means stepping the integer behind it.
+
+### 9.7 `do`
+
+```csharp
+do { line = Read(); } while (line != null);
+```
+
+The body runs before the condition is first asked, which is the whole of the
+difference from `while`. `continue` goes to the condition — it means "ask
+again", not "start over".
+
+### 9.8 `goto`
+
+```csharp
+for (int a = 0; a < n; a++) {
+    for (int b = 0; b < n; b++) {
+        if (Found(a, b)) { answer = a; goto done; }
+    }
+}
+done:
+```
+
+C#'s, with one restriction: **a label goes at the top level of a function**
+(SL0595). That is not taste, it is what makes the reference counting
+decidable. A jump has to release whatever the scopes between it and the label
+were holding, and a label inside a block would have a different answer for
+every jump that could reach it. At the top level there is one answer: release
+down to the function's own block. Every use a `goto` is actually for fits
+there — out of nested loops, forward to a cleanup, back to a retry.
+
+A jump forwards may skip a declaration, and the local it skipped is still
+released at the end of the block it was in. That is safe because an owned slot
+is cleared at function entry as well as where it is declared, so the release is
+handed a null.
+
+A jump names a label in its own function and nowhere else (SL0589); two labels
+of a name is an error (SL0588); a label nothing jumps to is a warning (SL0591);
+and a `goto` inside a `parallel` block is refused (SL0590), because every label
+is outside one.
+
+### 9.9 `nameof`
+
+```csharp
+FindType(nameof(Button));
+Console.WriteLine($"{nameof(Width)} = {Width}");
+```
+
+The last name written, as a `String`. What it buys over the literal is that the
+name is bound, so renaming the member breaks the build rather than the run:
+reflection here is reached by name, and `FindType("App.Buton")` has nothing to
+say for itself. It takes a variable, parameter, field, property, method or type
+(SL0592, SL0596), and answers with the last name in it — `nameof(button.Width)`
+is `"Width"`.
+
+### 9.10 `checked`
+
+```csharp
+int room = checked(a + b);       // aborts rather than wrapping
+checked { ... }                  // everything inside, as a block
+unchecked { ... }                // and back again
+```
+
+`+`, `-` and `*` on integers wrap, and that is defined rather than undefined
+(see the table below). `checked` asks them to notice instead, and to abort the
+way an out-of-range index does. It costs a test and a branch that is never
+taken; LLVM has an intrinsic per operation that answers with the result and a
+bit, so there is no wider type and no comparison.
+
+Signedness is part of the question: 60000 + 5000 fits a `ushort` and does not
+fit a `short`. A float has nothing to check — it goes to infinity rather than
+wrapping.
+
+Both are **contextual keywords**, as `closure` is: a test in this repository
+had a parameter named `checked` before this existed. So is `out`, which the
+standard library uses as a local in three files.
+
+The conditional `a ? b : c` evaluates only the arm it selects, and groups to
+the right, so `a ? b : c ? d : e` reads as `a ? b : (c ? d : e)`. Its arms must
+meet at one type: the same type, a common numeric type, or one that the other
+converts to implicitly.
+
+Conditions must be `bool`; there is no implicit int-to-bool conversion.
+There are no implicit narrowing conversions. Widening integer conversions and
+`int` -> `float`/`double` are implicit, as in C#; everything else needs a
+cast: `(byte)x`.
+
+An integer literal converts implicitly to any integer type that can hold its
+value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
+anything computed still does.
+
+A string literal has type `String`; see section 3.
+
+**The arithmetic C leaves undefined.** C compiles these to whatever falls out,
+and an optimiser is entitled to assume they never happen — which is worse than
+a wrong answer, because it can delete the code around them. Stainless defines
+all three:
+
+| Expression | C | Stainless |
+|---|---|---|
+| `1 << 40` on an `int` | undefined | `1 << (40 & 31)` = 256, as in C# |
+| `x / 0` | undefined | aborts, the way an out-of-range index does |
+| `int.Smallest / -1` | undefined | aborts; the result is not representable |
+
+A shift count is reduced modulo the operand's width, which costs one `and` and
+matches what a C# reader expects. Division is checked where the divisor is not
+already known: a constant divisor is checked at compile time instead, and
+`10 / 0` is an error rather than a program that runs.
+
+```
+error[SL0415]: division by zero
+```
+
+Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
+unchecked, and is defined rather than undefined.
 
 ## 10. Conditional compilation
 

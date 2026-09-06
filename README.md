@@ -913,8 +913,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 220 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 561 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 234 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 220 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 210 and Windows 219, each
+**Both Windows and Linux are tested.** 234 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 224 and Windows 233, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than

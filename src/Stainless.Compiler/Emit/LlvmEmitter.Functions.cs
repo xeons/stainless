@@ -154,6 +154,11 @@ public sealed partial class LlvmEmitter
 
         DescribeParameters(symbol);
 
+        // The body's own block is pushed by EmitBlock, one deeper than the
+        // scope the parameters are in. A `goto` releases everything above it,
+        // and the binder has already made sure every label is at that depth.
+        _bodyScopeDepth = _scopes.Count + 1;
+
         EmitStatement(function.Body);
 
         // Fall off the end: void returns implicitly, everything else was already

@@ -142,6 +142,23 @@ public sealed partial class LlvmEmitter
         return name;
     }
 
+    /// <summary>
+    /// Clears an owned slot in the entry block as well as where it is declared.
+    ///
+    /// The store at the declaration is what a loop needs: the slot is released
+    /// at the end of every iteration and has to start the next one empty. This
+    /// one is what a <c>goto</c> needs. A jump forwards may skip a declaration
+    /// entirely, and the release at the end of the block that declaration was
+    /// in would then be handed whatever the stack happened to hold.
+    ///
+    /// It costs one store per owned local, in a block that runs once, and LLVM
+    /// deletes it wherever the declaration provably runs first.
+    /// </summary>
+    private void ZeroOnEntry(string slot, string llvmType) =>
+        _entryAllocas.AppendLine(llvmType == "ptr"
+            ? $"  store ptr null, ptr {slot}"
+            : $"  store {llvmType} zeroinitializer, ptr {slot}");
+
     private int AlignOf(string llvmType) => llvmType switch
     {
         "i1" or "i8" => 1,

@@ -120,6 +120,16 @@ void sl_divide_overflow(void)
     sl_fail("integer division overflows: the smallest value divided by -1");
 }
 
+/*
+ * Reached only from inside `checked`. Addition, subtraction and multiplication
+ * wrap by default and that is defined, so this is what the program asked for
+ * rather than something it fell into.
+ */
+void sl_arithmetic_overflow(void)
+{
+    sl_fail("checked arithmetic overflowed");
+}
+
 void sl_object_init(void *pointer, const SlTypeInfo *type)
 {
     SlObject *object = (SlObject *)pointer;

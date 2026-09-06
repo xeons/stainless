@@ -513,6 +513,13 @@ public sealed record IfSyntax(
 public sealed record WhileSyntax(SourceSpan Span, ExpressionSyntax Condition, StatementSyntax Body)
     : StatementSyntax(Span);
 
+/// <summary>
+/// <c>do { ... } while (c);</c> -- a loop whose body runs before its condition
+/// is first asked, which is the whole of the difference from <c>while</c>.
+/// </summary>
+public sealed record DoWhileSyntax(
+    SourceSpan Span, StatementSyntax Body, ExpressionSyntax Condition) : StatementSyntax(Span);
+
 public sealed record ForSyntax(
     SourceSpan Span,
     StatementSyntax? Initializer,
@@ -605,6 +612,25 @@ public sealed record BreakSyntax(SourceSpan Span) : StatementSyntax(Span);
 
 public sealed record ContinueSyntax(SourceSpan Span) : StatementSyntax(Span);
 
+/// <summary>
+/// <c>name:</c> -- somewhere a <c>goto</c> can name.
+///
+/// A label is a statement rather than a modifier on one, so that a label at the
+/// very end of a block has nothing it must be attached to.
+/// </summary>
+public sealed record LabelSyntax(SourceSpan Span, string Name) : StatementSyntax(Span);
+
+/// <summary><c>goto name;</c></summary>
+public sealed record GotoSyntax(SourceSpan Span, string Label, SourceSpan LabelSpan)
+    : StatementSyntax(Span);
+
+/// <summary>
+/// <c>checked { ... }</c> and <c>unchecked { ... }</c>: whether the integer
+/// arithmetic written inside is asked to notice that it overflowed.
+/// </summary>
+public sealed record CheckedBlockSyntax(
+    SourceSpan Span, BlockSyntax Body, bool IsChecked) : StatementSyntax(Span);
+
 // ---------------------------------------------------------------- expressions
 
 public abstract record ExpressionSyntax(SourceSpan Span) : SyntaxNode(Span);
@@ -637,6 +663,31 @@ public sealed record ThisSyntax(SourceSpan Span) : ExpressionSyntax(Span);
 
 public sealed record UnarySyntax(SourceSpan Span, TokenKind Operator, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>++x</c>, <c>x++</c>, <c>--x</c> and <c>x--</c>.
+///
+/// It is not an <see cref="AssignmentSyntax"/> to <c>x + 1</c>, because the
+/// target has to be evaluated exactly once -- <c>a[Next()]++</c> calls
+/// <c>Next</c> one time, not two -- and because the postfix form yields the
+/// value from before the write.
+/// </summary>
+public sealed record IncrementSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Operand,
+    bool IsPrefix,
+    bool IsIncrement) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>nameof(x)</c> -- the last identifier in what was written, as a
+/// <c>String</c>, checked to be something that exists.
+/// </summary>
+public sealed record NameofSyntax(SourceSpan Span, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
+
+/// <summary><c>checked(e)</c> and <c>unchecked(e)</c>.</summary>
+public sealed record CheckedSyntax(
+    SourceSpan Span, ExpressionSyntax Operand, bool IsChecked) : ExpressionSyntax(Span);
 
 public sealed record BinarySyntax(
     SourceSpan Span,

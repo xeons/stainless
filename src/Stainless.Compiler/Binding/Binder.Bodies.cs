@@ -75,6 +75,8 @@ public sealed partial class Binder
         _loopDepth = 0;
         _switchDepth = 0;
         _variantFacts = [];
+        _labels.Clear();
+        _checkedArithmetic = false;
 
         // `base(...)` is only a statement at the very head of a constructor, so
         // the one place it may appear is found before anything is bound and
@@ -90,10 +92,29 @@ public sealed partial class Binder
             : null;
 
         PushScope();
+
+        // BindBlock pushes one more for the body's own block, and that is the
+        // depth a label has to be at.
+        _bodyDepth = _scopes.Count + 1;
+
         var body = BindBlock(function.Body);
         PopScope();
 
         _constructorChain = null;
+
+        // A jump with nowhere to land, and a label nothing lands on. The first
+        // is an error; the second is a warning, because a label costs nothing
+        // and deleting the last jump to one is an ordinary edit.
+        foreach (var label in _labels.Values)
+        {
+            if (label.Declared is null && label.FirstUse is { } used)
+                diagnostics.Error("SL0589", used,
+                    $"there is no label '{label.Name}' in '{function.Name}'; a 'goto' names a " +
+                    "label in the function it is written in, and nowhere else");
+            else if (label.Declared is { } declared && !label.IsUsed)
+                diagnostics.Warning("SL0591", declared,
+                    $"nothing jumps to '{label.Name}'");
+        }
 
         if (function.Kind == FunctionKind.Constructor)
             body = WithBaseConstruction(function, body);
@@ -661,6 +682,10 @@ public sealed partial class Binder
         ExpressionStatementSyntax expression => BindExpressionStatement(expression),
         IfSyntax ifStatement => BindIf(ifStatement),
         WhileSyntax whileStatement => BindWhile(whileStatement),
+        DoWhileSyntax doWhile => BindDoWhile(doWhile),
+        LabelSyntax label => BindLabel(label),
+        GotoSyntax jump => BindGoto(jump),
+        CheckedBlockSyntax guarded => BindCheckedBlock(guarded),
         ForSyntax forStatement => BindFor(forStatement),
         ForEachSyntax forEach => BindForEach(forEach),
         ParallelSyntax parallel => BindParallel(parallel),
@@ -767,6 +792,7 @@ public sealed partial class Binder
 
         bool hasEffect = expression is BoundAssignment or BoundPropertyAssignment or BoundCall
                                     or BoundIndirectCall or BoundClosureCall
+                                    or BoundIncrement or BoundPropertyIncrement
                                     or BoundNew or BoundErrorExpression;
         if (!hasEffect)
             diagnostics.Warning("SL0222", syntax.Span,
@@ -867,6 +893,111 @@ public sealed partial class Binder
         // failing that same condition.
         _variantFacts = entry;
         return new BoundWhile(syntax.Span, condition, body);
+    }
+
+    /// <summary>
+    /// <c>do { ... } while (c);</c>.
+    ///
+    /// The body is bound the way a <c>while</c>'s is -- what it assigns to is
+    /// unknown inside it, and the condition proves nothing after it -- with one
+    /// difference that matters: the condition has not been tested when the body
+    /// first runs, so nothing it would prove may be applied going in.
+    /// </summary>
+    private BoundStatement BindDoWhile(DoWhileSyntax syntax)
+    {
+        if (_variantFacts.Count > 0) InvalidateAssignedIn(syntax.Body);
+
+        var entry = SnapshotFacts();
+
+        _loopDepth++;
+        var body = BindStatement(syntax.Body);
+        _loopDepth--;
+
+        var condition = BindCondition(syntax.Condition);
+
+        _variantFacts = entry;
+        return new BoundDoWhile(syntax.Span, body, condition);
+    }
+
+    /// <summary>
+    /// <c>name:</c>.
+    ///
+    /// Labels are per function rather than per block, which is C's rule and
+    /// C#'s: a jump may leave a block, and a label a jump could not reach would
+    /// be a label for nothing.
+    /// </summary>
+    private BoundStatement BindLabel(LabelSyntax syntax)
+    {
+        var label = LabelNamed(syntax.Name);
+
+        if (label.Declared is not null)
+        {
+            diagnostics.Error("SL0588", syntax.Span,
+                $"'{syntax.Name}' is already a label in this function; a 'goto' names one " +
+                "place, so two of a name would be a jump with two destinations");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        // A label only at the top level of the function body, which is what
+        // makes the jump's reference counting decidable: everything a `goto`
+        // has to release is exactly the scopes between it and there, and a
+        // label nested somewhere else would mean the answer depended on which
+        // jump arrived. Every use a `goto` is actually for -- out of nested
+        // loops, forward to a cleanup, back to a retry -- names one of these.
+        if (_scopes.Count != _bodyDepth)
+        {
+            diagnostics.Error("SL0595", syntax.Span,
+                $"label '{syntax.Name}' is inside a block; a label goes at the top level of " +
+                "the function, so that what a jump to it has to release is the same whichever " +
+                "jump arrives");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        label.Declared = syntax.Span;
+
+        // A variant narrowed above a label is not narrowed at it: a jump from
+        // anywhere in the function arrives here, and what it proved on the way
+        // is not what the fall-through proved.
+        _variantFacts = [];
+        return new BoundLabel(syntax.Span, label);
+    }
+
+    private BoundStatement BindGoto(GotoSyntax syntax)
+    {
+        var label = LabelNamed(syntax.Label);
+        label.IsUsed = true;
+        label.FirstUse ??= syntax.LabelSpan;
+
+        // Every label is at the top level of the function, so every label is
+        // outside the `parallel` block this jump is in -- which makes this a
+        // jump out of work that has to finish where it was started.
+        if (_parallelDepth > 0)
+            diagnostics.Error("SL0590", syntax.Span,
+                $"'goto {syntax.Label}' is inside a 'parallel' block, and every label is " +
+                "outside one; the work queued in a block has to finish there, so there is " +
+                "nothing a jump out of it could mean. Leave with a flag the block sets");
+
+        return new BoundGoto(syntax.Span, label);
+    }
+
+    /// <summary>The label of that name in this function, made on first mention.</summary>
+    private LabelSymbol LabelNamed(string name)
+    {
+        if (_labels.TryGetValue(name, out var existing)) return existing;
+        return _labels[name] = new LabelSymbol(name);
+    }
+
+    /// <summary>
+    /// <c>checked { ... }</c> and <c>unchecked { ... }</c>: the arithmetic
+    /// written inside is bound with overflow noticed, or with it ignored.
+    /// </summary>
+    private BoundStatement BindCheckedBlock(CheckedBlockSyntax syntax)
+    {
+        bool previous = _checkedArithmetic;
+        _checkedArithmetic = syntax.IsChecked;
+        var body = BindBlock(syntax.Body);
+        _checkedArithmetic = previous;
+        return body;
     }
 
     private BoundStatement BindFor(ForSyntax syntax)

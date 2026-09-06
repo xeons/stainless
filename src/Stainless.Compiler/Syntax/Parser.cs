@@ -617,6 +617,17 @@ public sealed class Parser
     }
 
     /// <summary>
+    /// Whether the word here is <c>checked</c> or <c>unchecked</c>.
+    ///
+    /// Contextual, and it had to be: <c>tests/cases/static-methods</c> has a
+    /// parameter named <c>checked</c>, written long before this existed. The
+    /// price is that a function of that exact name could not be called, which
+    /// is the same price <c>closure</c> pays.
+    /// </summary>
+    private bool AtCheckedWord() =>
+        At(TokenKind.Identifier) && Current.Text is "checked" or "unchecked";
+
+    /// <summary>
     /// Whether this is <c>closure R Name(...)</c> rather than something that
     /// merely begins with the word. Contextual, as <c>event</c> is.
     /// </summary>
@@ -1344,6 +1355,30 @@ public sealed class Parser
                 return new WhileSyntax(SpanFrom(start), condition, body);
             }
 
+            case TokenKind.DoKeyword:
+            {
+                Advance();
+                var body = ParseStatement();
+                Expect(TokenKind.WhileKeyword);
+                Expect(TokenKind.OpenParen);
+                var condition = ParseExpression();
+                Expect(TokenKind.CloseParen);
+
+                // The semicolon is C's, and it is what stops `do { } while (c)`
+                // from reading as a `do` followed by an ordinary `while` loop.
+                Expect(TokenKind.Semicolon);
+                return new DoWhileSyntax(SpanFrom(start), body, condition);
+            }
+
+            case TokenKind.GotoKeyword:
+            {
+                Advance();
+                var label = Current;
+                string name = ExpectIdentifier();
+                Expect(TokenKind.Semicolon);
+                return new GotoSyntax(SpanFrom(start), name, label.Span);
+            }
+
             case TokenKind.ForKeyword:
             {
                 Advance();
@@ -1446,6 +1481,29 @@ public sealed class Parser
                 return new BlockSyntax(SpanFrom(start), []);
 
             default:
+                // `checked { ... }`. Contextual, for the reason `closure` is:
+                // the word is a good enough name that a test in this very
+                // repository had a parameter called it. `checked(e)` is an
+                // expression and is recognised further down.
+                if (AtCheckedWord() && Peek(1).Kind == TokenKind.OpenBrace)
+                {
+                    bool wanted = Current.Text == "checked";
+                    Advance();
+                    return new CheckedBlockSyntax(SpanFrom(start), ParseBlock(), wanted);
+                }
+
+                // `name:` is a label. Nothing else in the grammar puts a colon
+                // straight after a leading identifier -- a local declaration is
+                // two names, a call is a paren, and a ternary's colon has an
+                // expression and a '?' before it -- so one token of lookahead
+                // settles it.
+                if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Colon)
+                {
+                    string name = Advance().Text;
+                    Advance();
+                    return new LabelSyntax(SpanFrom(start), name);
+                }
+
                 return ParseSimpleStatement(requireSemicolon: true);
         }
     }
@@ -1770,6 +1828,15 @@ public sealed class Parser
             return new TrySyntax(SpanFrom(start), ParseUnary());
         }
 
+        // `++x` and `--x`. The operand is a unary rather than a postfix so that
+        // `++*p` reads, and the parse is the same shape the postfix form gets.
+        if (AtAny(TokenKind.PlusPlus, TokenKind.MinusMinus))
+        {
+            bool up = At(TokenKind.PlusPlus);
+            Advance();
+            return new IncrementSyntax(SpanFrom(start), ParseUnary(), IsPrefix: true, IsIncrement: up);
+        }
+
         if (AtAny(TokenKind.Minus, TokenKind.Plus, TokenKind.Bang, TokenKind.Tilde,
                   TokenKind.Star, TokenKind.Amp))
         {
@@ -1835,6 +1902,17 @@ public sealed class Parser
                 }
 
                 expression = new IndexSyntax(SpanFrom(start), expression, first);
+                continue;
+            }
+
+            // `x++` and `x--`, after the whole chain, so `a.b[i]++` increments
+            // the element rather than anything on the way to it.
+            if (AtAny(TokenKind.PlusPlus, TokenKind.MinusMinus))
+            {
+                bool up = At(TokenKind.PlusPlus);
+                Advance();
+                expression = new IncrementSyntax(
+                    SpanFrom(start), expression, IsPrefix: false, IsIncrement: up);
                 continue;
             }
 
@@ -1905,6 +1983,21 @@ public sealed class Parser
     private ExpressionSyntax ParsePrimary()
     {
         int start = _pos;
+
+        // `checked(e)` and `unchecked(e)`, before the switch because the word
+        // is an ordinary identifier to the lexer. The paren is what tells it
+        // from a variable of the same name; a *call* to a function actually
+        // named `checked` is the one thing this takes away.
+        if (AtCheckedWord() && Peek(1).Kind == TokenKind.OpenParen)
+        {
+            bool wanted = Current.Text == "checked";
+            Advance();
+            Advance();
+            var guarded = ParseExpression();
+            Expect(TokenKind.CloseParen);
+            return new CheckedSyntax(SpanFrom(start), guarded, wanted);
+        }
+
         switch (Current.Kind)
         {
             case TokenKind.IntLiteral:
@@ -2011,6 +2104,20 @@ public sealed class Parser
                 Expect(TokenKind.CloseParen);
                 return new TypeofSyntax(SpanFrom(start), type);
             }
+
+            case TokenKind.NameofKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+
+                // An expression, not a type: what goes in is a thing that
+                // exists, and the answer is the last name written. Binding it
+                // is what checks the spelling, which is the whole point.
+                var named = ParseExpression();
+                Expect(TokenKind.CloseParen);
+                return new NameofSyntax(SpanFrom(start), named);
+            }
+
 
             case TokenKind.IidofKeyword:
             {

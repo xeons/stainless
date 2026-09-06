@@ -175,6 +175,29 @@ public sealed partial class Binder(
     /// </summary>
     private int _switchDepth;
 
+    /// <summary>
+    /// Every <c>goto</c> target in the function being bound, by name.
+    ///
+    /// Labels are per function, not per block, so this is cleared with the rest
+    /// of the per-function state. A name lands here from whichever comes first,
+    /// the label or a jump to it, because a jump forwards names one that does
+    /// not exist yet.
+    /// </summary>
+    private readonly Dictionary<string, LabelSymbol> _labels = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The scope depth of the function body's own block, which is the one depth
+    /// a label may be written at. See <c>BindLabel</c> for why.
+    /// </summary>
+    private int _bodyDepth;
+
+    /// <summary>
+    /// Whether <c>+</c>, <c>-</c> and <c>*</c> on integers are being asked to
+    /// notice that they overflowed. False everywhere but inside
+    /// <c>checked</c>: wrapping is the language's defined default (§9).
+    /// </summary>
+    private bool _checkedArithmetic;
+
     public BoundProgram Bind(IReadOnlyList<CompilationUnitSyntax> units)
     {
         _builtins.RegisterInto(_modules);

@@ -33,18 +33,18 @@ public enum TokenKind
     ExternKeyword, ExportKeyword,
 
     // Statement keywords
-    IfKeyword, ElseKeyword, WhileKeyword, ForKeyword, ForeachKeyword, InKeyword,
+    IfKeyword, ElseKeyword, WhileKeyword, DoKeyword, ForKeyword, ForeachKeyword, InKeyword,
     SwitchKeyword, CaseKeyword, DefaultKeyword,
     ParallelKeyword, SpawnKeyword,
-    ReturnKeyword, BreakKeyword, ContinueKeyword,
+    ReturnKeyword, BreakKeyword, ContinueKeyword, GotoKeyword,
     VarKeyword, ConstKeyword, WhereKeyword, StaticKeyword, ReadonlyKeyword,
     ThreadsafeKeyword,
     OperatorKeyword, TryKeyword,
     RefKeyword,
 
     // Expression keywords
-    NewKeyword, DeleteKeyword, NullKeyword, TrueKeyword, FalseKeyword,
-    SizeofKeyword, AlignofKeyword, OffsetofKeyword,
+    NewKeyword, NullKeyword, TrueKeyword, FalseKeyword,
+    SizeofKeyword, AlignofKeyword, OffsetofKeyword, NameofKeyword,
     TypeofKeyword, IidofKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
 
     // Primitive type keywords
@@ -56,6 +56,7 @@ public enum TokenKind
     // Punctuation
     OpenParen, CloseParen, OpenBrace, CloseBrace, OpenBracket, CloseBracket,
     Comma, Semicolon, Colon, Dot, Question, Tilde,
+    QuestionDot, QuestionQuestion,
 
     // Operators
     Equals, EqualsEquals, Bang, BangEquals,
@@ -63,10 +64,12 @@ public enum TokenKind
     Plus, Minus, Star, Slash, Percent,
     Amp, AmpAmp, Pipe, PipePipe, Caret,
     LessLess, GreaterGreater, EqualsGreater, MinusGreater,
+    PlusPlus, MinusMinus,
 
     // Compound assignment
     PlusEquals, MinusEquals, StarEquals, SlashEquals, PercentEquals,
     AmpEquals, PipeEquals, CaretEquals, LessLessEquals, GreaterGreaterEquals,
+    QuestionQuestionEquals,
 
     EndOfFile, Bad,
 }
@@ -101,6 +104,7 @@ public static class TokenKindExtensions
         TokenKind.IfKeyword => "if",
         TokenKind.ElseKeyword => "else",
         TokenKind.WhileKeyword => "while",
+        TokenKind.DoKeyword => "do",
         TokenKind.ForKeyword => "for",
         TokenKind.ForeachKeyword => "foreach",
         TokenKind.InKeyword => "in",
@@ -112,6 +116,7 @@ public static class TokenKindExtensions
         TokenKind.ReturnKeyword => "return",
         TokenKind.BreakKeyword => "break",
         TokenKind.ContinueKeyword => "continue",
+        TokenKind.GotoKeyword => "goto",
         TokenKind.VarKeyword => "var",
         TokenKind.ConstKeyword => "const",
         TokenKind.RefKeyword => "ref",
@@ -122,13 +127,13 @@ public static class TokenKindExtensions
         TokenKind.ReadonlyKeyword => "readonly",
         TokenKind.WhereKeyword => "where",
         TokenKind.NewKeyword => "new",
-        TokenKind.DeleteKeyword => "delete",
         TokenKind.NullKeyword => "null",
         TokenKind.TrueKeyword => "true",
         TokenKind.FalseKeyword => "false",
         TokenKind.SizeofKeyword => "sizeof",
         TokenKind.AlignofKeyword => "alignof",
         TokenKind.OffsetofKeyword => "offsetof",
+        TokenKind.NameofKeyword => "nameof",
         TokenKind.TypeofKeyword => "typeof",
         TokenKind.IidofKeyword => "iidof",
         TokenKind.ThisKeyword => "this",
@@ -164,6 +169,8 @@ public static class TokenKindExtensions
         TokenKind.Dot => ".",
         TokenKind.Question => "?",
         TokenKind.Tilde => "~",
+        TokenKind.QuestionDot => "?.",
+        TokenKind.QuestionQuestion => "??",
         TokenKind.Equals => "=",
         TokenKind.EqualsEquals => "==",
         TokenKind.Bang => "!",
@@ -186,6 +193,8 @@ public static class TokenKindExtensions
         TokenKind.GreaterGreater => ">>",
         TokenKind.EqualsGreater => "=>",
         TokenKind.MinusGreater => "->",
+        TokenKind.PlusPlus => "++",
+        TokenKind.MinusMinus => "--",
         TokenKind.PlusEquals => "+=",
         TokenKind.MinusEquals => "-=",
         TokenKind.StarEquals => "*=",
@@ -196,6 +205,7 @@ public static class TokenKindExtensions
         TokenKind.CaretEquals => "^=",
         TokenKind.LessLessEquals => "<<=",
         TokenKind.GreaterGreaterEquals => ">>=",
+        TokenKind.QuestionQuestionEquals => "??=",
         TokenKind.EndOfFile => "end of file",
         _ => null,
     };
