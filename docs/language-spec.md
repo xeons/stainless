@@ -1878,8 +1878,8 @@ value in UTF-16. `Standard.Encoding` is the crossing, and every crossing is
 explicit.
 
 The shape is .NET's, with the static instances replaced by functions: a static
-needs a Sendable type and an initializer that `--shared` has nowhere to run
-(§9.3), so `Encoding.Utf8()` is a call. Everything is behind an interface, so a
+needs an initializer, and `--shared` has nowhere to run one (§9.3), so
+`Encoding.Utf8()` is a call. Everything is behind an interface, so a
 program may add an encoding of its own.
 
 ```csharp
@@ -2157,6 +2157,7 @@ inferred:
 ```csharp
 public class Pair<A> {
     A left;
+    public Pair(A initial) { left = initial; }
     public A KeepLeft<B>(B other) { return left; }
 }
 
@@ -2271,6 +2272,9 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Encoding` | `IEncoding` and the six encodings (§3.6) | on request |
 | `Standard.Convert` | base64, hex and number parsing (§3.7) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
+| `Standard.Env` | the command line, the environment, the working directory | on request |
+| `Standard.Time` | `Instant`, `Duration`, `DateTime` and the monotonic `Clock` | on request |
+| `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` (§8.5) | on request |
 | `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
@@ -2335,8 +2339,8 @@ the standard library, and §5.1 says what it costs and why nothing prunes it.
 
 ### 5.3 Interfaces are named with a leading I
 
-`IComparable<T>`, `IReadOnlyList<T>`, `IWritable` — the C# convention, and the
-one the standard library follows. It is a convention, not a rule the compiler
+`IComparable<T>`, `IReadOnlyList<T>`, `IEnumerable<T>` — the C# convention, and
+the one the standard library follows. It is a convention, not a rule the compiler
 enforces.
 
 ### 5.4 `Standard.Collections`
@@ -2661,10 +2665,12 @@ var whole = IO.ReadTextToEnd(file);
 file.Close();
 ```
 
-A `FileStream`'s construction *is* the open, so one always exists and
-`IsOpen()` says whether it holds a file — which avoids handing back a null the
-caller could not unwrap. Closing is also the destructor's job, so a stream that
-goes out of scope releases its handle either way.
+`FileStream.Open` and its three shorthands are the way to make one, and the
+constructor is private (§2.9): a constructor cannot say why an open failed, and
+the best it could do was hand back a stream holding nothing. `IsOpen()` and
+`Error()` remain for what happens *after* it is open. Closing is the
+destructor's job, so a stream that goes out of scope releases its handle
+whether or not `Close` was called.
 
 Opening takes a `FileMode` (`Open`, `Create`, `Append`) and a `[Flags]`
 `FileAccess` (`Read`, `Write`, `ReadWrite`).
@@ -3009,9 +3015,15 @@ automatic or written makes no difference to the caller.
 public struct Money {
     public long Cents;
 
-    public static Money operator +(Money a, Money b) { return Cents(a.Cents + b.Cents); }
-    public static Money operator *(Money a, long by)  { return Cents(a.Cents * by); }
-    public static Money operator *(long by, Money a)  { return Cents(a.Cents * by); }
+    public static Money Of(long cents) {
+        Money made;
+        made.Cents = cents;
+        return made;
+    }
+
+    public static Money operator +(Money a, Money b) { return Of(a.Cents + b.Cents); }
+    public static Money operator *(Money a, long by)  { return Of(a.Cents * by); }
+    public static Money operator *(long by, Money a)  { return Of(a.Cents * by); }
 
     public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
     public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
@@ -3537,6 +3549,12 @@ refuses ends the program, the same as a failed class downcast.
 #### `com class`: being a COM object
 
 ```csharp
+[Guid("2cd90691-12e2-11dc-9fed-001143a055f9")]
+public com interface ILoudGreeter {
+    int Greet(int times);
+    int Shout();
+}
+
 public com class Greeter : ILoudGreeter {
     int count;
     public int Greet(int times) { count = count + times; return count; }
@@ -3832,7 +3850,7 @@ parallel {
 `parallel for` splits a counted loop across the pool instead:
 
 ```csharp
-parallel for (int i = 0; i < pixels.Length; i = i + 1) {
+parallel for (nuint i = 0u; i < pixels.Length; i = i + 1u) {
     pixels[i] = Shade(pixels[i]);
 }
 ```
@@ -3926,9 +3944,11 @@ become atomic the moment threads exist. Stainless compiles the whole program at
 once, so it simply reads the dependency graph: no guard, no per-access cost, and
 a **compile error** on a cycle rather than a zero at run time.
 
-A static reference is made immortal as it is stored, so it is never destroyed
-and never has its count touched again. There is no teardown, which sidesteps
-C++'s static *destruction* order problem as well.
+A `readonly` static's reference is made immortal as it is stored, so it is
+never destroyed and never has its count touched again. A mutable one is counted
+like any other slot, and what it holds at exit is simply never released. Either
+way there is no teardown, which sidesteps C++'s static *destruction* order
+problem as well.
 
 A `--shared` library has no entry point to initialize statics from, so a static
 in one is an error rather than a silently zeroed global.

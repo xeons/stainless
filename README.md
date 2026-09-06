@@ -559,14 +559,18 @@ constructors.
 public struct Money {
     public long Cents;
 
-    public static Money operator +(Money a, Money b) { return Cents(a.Cents + b.Cents); }
-    public static Money operator *(long by, Money a) { return Cents(a.Cents * by); }
+    public static Money Of(long cents) { Money m; m.Cents = cents; return m; }
+
+    public static Money operator +(Money a, Money b) { return Of(a.Cents + b.Cents); }
+    public static Money operator *(long by, Money a) { return Of(a.Cents * by); }
 
     public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
     public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
 }
 
 public class Grid {
+    int[] cells;
+
     public int this[nuint at] {
         get { return cells[at]; }
         set { cells[at] = value; }
@@ -840,12 +844,13 @@ than every program that compiles it repeating `-l` on the command line.
 
 ### The Win32 API
 
-[bindings/win32](bindings/win32) is what all of the above adds up to: 306
-Windows entry points, 628 constants, 40 structs, unions, enums and delegates,
-the 12 handle types and 7 COM interfaces, with 215 convenience functions over
-them. There is no marshalling layer and nothing is generated — a `WNDCLASSEXW` is a
-Stainless `struct` whose `sizeof` is 80 as it is in C, and a `WNDPROC` is a
-`delegate`, which is the bare function pointer Windows calls.
+[bindings/win32](bindings/win32) is what all of the above adds up to: the
+Windows entry points, constants, structs, unions, enums, delegates, handle
+types and COM interfaces that the samples and the tests here need, with a layer
+of convenience functions over them. There is no marshalling layer and nothing
+is generated — a `WNDCLASSEXW` is a Stainless `struct` whose `sizeof` is 80 as
+it is in C, and a `WNDPROC` is a `delegate`, which is the bare function pointer
+Windows calls.
 
 It comes in two layers, and the module name says which is which. **A DLL name is
 the declarations**, spelled as Windows spells them:
@@ -898,7 +903,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 210 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 216 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 561 compiler unit tests
 ```
 
@@ -909,7 +914,7 @@ exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
 **Both Windows and Linux are tested.** 216 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 200 and Windows 209, each
+Windows-only and 1 is Linux-only, so Linux runs 206 and Windows 215, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1457,10 +1462,10 @@ Everything below is covered by [the test suite](tests/cases).
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](docs/abi.md)
-- [bindings/win32](bindings/win32): the Windows API — 306 entry points, 628
-  constants, 40 structs, unions, enums and delegates, 12 handle types and 7 COM
-  interfaces — as declarations
-  rather than a marshalling layer, in two layers a module name apart:
+- [bindings/win32](bindings/win32): the Windows API — entry points, constants,
+  structs, unions, enums, delegates, handle types and COM interfaces — as
+  declarations rather than a marshalling layer, in two layers a module name
+  apart:
   `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
   Source a program compiles rather than part of the standard library, because
   compiling a wrapper is what makes its library necessary; the raw layer needs
@@ -1614,16 +1619,17 @@ Being straight about the edges, roughly in the order they are worth adding:
   discovered. The metadata describes layouts and the reflection tables describe
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
-- **Static *storage* is module-level only**, and a `--shared` library cannot
-  have any: there is no entry point to initialize it from. A type may have
-  static methods, but not static fields, and there is no per-thread storage.
+- **A `--shared` library cannot have a static**, of a module or of a type:
+  there is no entry point to initialize one from (SL0380). There is no
+  per-thread storage either, and no automatic static property -- its backing
+  storage would have no initializer, which is the one moment a static has.
 - **No calling conventions.** `__stdcall`, `__fastcall` and `__vectorcall`
   cannot be written. On x64 that costs almost nothing — there is one convention
   and only `__vectorcall` differs — but it is the whole story on x86, where
   `__stdcall` is what Win32 uses.
 - **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
   to a `uint` parameter without a cast, which is why
-  [bindings/win32](bindings/win32) spells 628 constants as bare `const uint`
+  [bindings/win32](bindings/win32) spells its constants as bare `const uint`
   rather than as the typed sets they are.
 - **An inline array holds plain data only** and cannot be passed by value
   (SL0486, SL0491). The first is the same question a union cannot answer; the

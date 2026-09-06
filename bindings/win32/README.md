@@ -9,10 +9,10 @@ which one you are looking at:
 | `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
-The raw layer is 306 entry points, 628 constants and 40 structs, unions, enums
-and delegates across eight libraries, plus the 12 handle types and the 17 names
-they go by, and 7 COM interfaces; the thirteen convenience modules add 215
-functions and 9 types on top. Nothing is generated and nothing is marshalled: a
+The raw layer is the entry points, constants, structs, unions, enums and
+delegates of eight libraries, plus the handle types and the names they go by,
+and the COM interfaces; the convenience modules add a task-shaped layer on top
+of those. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
 `delegate`, which is a bare function pointer Windows calls directly. A binding
 is a declaration, not a wrapper.
