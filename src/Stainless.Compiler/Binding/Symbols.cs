@@ -54,6 +54,7 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
 
     public override string ToString() =>
         (Mode == Syntax.ParameterMode.Ref ? "ref " :
+         Mode == Syntax.ParameterMode.Out ? "out " :
          Mode == Syntax.ParameterMode.In ? "in " : "") + $"{Type.Name} {Name}";
 }
 

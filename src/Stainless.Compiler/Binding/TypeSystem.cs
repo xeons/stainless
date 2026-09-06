@@ -558,6 +558,7 @@ public sealed class DelegateTypeSymbol : NamedTypeSymbol
 
     private static string Spelled(ParameterSymbol parameter) =>
         (parameter.Mode == Syntax.ParameterMode.Ref ? "ref " :
+         parameter.Mode == Syntax.ParameterMode.Out ? "out " :
          parameter.Mode == Syntax.ParameterMode.In ? "in " : "") + parameter.Type.Name;
 }
 
@@ -626,6 +627,7 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
 
     private static string Spelled(ParameterSymbol parameter) =>
         (parameter.Mode == Syntax.ParameterMode.Ref ? "ref " :
+         parameter.Mode == Syntax.ParameterMode.Out ? "out " :
          parameter.Mode == Syntax.ParameterMode.In ? "in " : "") + parameter.Type.Name;
 }
 

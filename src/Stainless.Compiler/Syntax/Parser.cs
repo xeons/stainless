@@ -617,6 +617,73 @@ public sealed class Parser
     }
 
     /// <summary>
+    /// Whether <c>out</c> here is the modifier rather than a name.
+    ///
+    /// Contextual, and the standard library is what decided it: <c>out</c> is a
+    /// local in <c>Convert.sl</c> and <c>Encoding.sl</c>, written long before
+    /// this existed. The modifier is always followed by something that starts a
+    /// type or a name, and never by an operator, so one token settles it.
+    /// </summary>
+    private bool AtOutModifier()
+    {
+        if (!At(TokenKind.Identifier) || Current.Text != "out") return false;
+
+        // A literal is here so that `out 5` reaches the binder and is told it
+        // has no storage to write back to, rather than dying in the parser
+        // with a message about a parenthesis.
+        var next = Peek(1).Kind;
+        return next is TokenKind.Identifier or TokenKind.VarKeyword or TokenKind.Star
+                    or TokenKind.ThisKeyword or TokenKind.IntLiteral or TokenKind.FloatLiteral
+                    or TokenKind.StringLiteral or TokenKind.CharLiteral ||
+               PrimitiveKeywords.Contains(next);
+    }
+
+    /// <summary>
+    /// <c>out x</c>, <c>out int x</c> and <c>out var x</c>.
+    ///
+    /// The last two declare the variable at the call, which is most of the
+    /// point: it exists to catch the answer, and a line above saying so is a
+    /// line about the mechanism rather than about the program.
+    /// </summary>
+    private ExpressionSyntax ParseOutArgument(int start)
+    {
+        Advance();
+
+        if (Match(TokenKind.VarKeyword))
+        {
+            var inferred = Current;
+            string inferredName = ExpectIdentifier();
+            return new OutArgumentSyntax(
+                SpanFrom(start), null, null, inferredName, inferred.Span);
+        }
+
+        // `out x` names something that exists; `out int x` declares one. Both
+        // begin with an identifier, so this speculates on reading a type and
+        // finding a name after it.
+        if (Speculate(TryParseOutDeclaration, out var declared) && declared is not null)
+            return new OutArgumentSyntax(
+                SpanFrom(start), null, declared.Type, declared.Name, declared.NameSpan);
+
+        return new OutArgumentSyntax(SpanFrom(start), ParseExpression(), null, null, default);
+    }
+
+    private sealed record OutDeclaration(TypeSyntax Type, string Name, SourceSpan NameSpan);
+
+    private OutDeclaration? TryParseOutDeclaration()
+    {
+        var type = ParseType();
+        if (!At(TokenKind.Identifier)) return null;
+
+        var name = Advance();
+
+        // A declaration is the whole argument, so the next token closes the
+        // list. Anything else means what was read as a type was an expression.
+        if (!AtAny(TokenKind.Comma, TokenKind.CloseParen)) return null;
+
+        return new OutDeclaration(type, name.Text, name.Span);
+    }
+
+    /// <summary>
     /// Whether the word here is <c>checked</c> or <c>unchecked</c>.
     ///
     /// Contextual, and it had to be: <c>tests/cases/static-methods</c> has a
@@ -1047,6 +1114,7 @@ public sealed class Parser
             var mode = ParameterMode.Value;
             if (Match(TokenKind.RefKeyword)) mode = ParameterMode.Ref;
             else if (Match(TokenKind.InKeyword)) mode = ParameterMode.In;
+            else if (AtOutModifier()) { Advance(); mode = ParameterMode.Out; }
 
             var type = ParseType();
             string name = ExpectIdentifier();
@@ -1930,10 +1998,27 @@ public sealed class Parser
         {
             int start = _pos;
 
+            // `name: value`. Nothing else in an argument puts a colon straight
+            // after a leading identifier -- a ternary has its own '?' and an
+            // expression before the colon -- so one token of lookahead is
+            // enough to tell them apart.
+            if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Colon)
+            {
+                var label = Advance();
+                Advance();
+                arguments.Add(new NamedArgumentSyntax(
+                    SpanFrom(start), label.Text, label.Span, ParseExpression()));
+
+                if (!Match(TokenKind.Comma)) break;
+                continue;
+            }
+
             // `ref x` is written at the call too. `in` is not: it promises the
             // callee will not write, which changes nothing the caller must see.
             if (Match(TokenKind.RefKeyword))
                 arguments.Add(new RefArgumentSyntax(SpanFrom(start), ParseExpression()));
+            else if (AtOutModifier())
+                arguments.Add(ParseOutArgument(start));
             else
                 arguments.Add(ParseExpression());
 

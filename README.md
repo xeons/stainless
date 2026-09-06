@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 234 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 238 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 234 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 224 and Windows 233, each
+**Both Windows and Linux are tested.** 238 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 228 and Windows 237, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1325,14 +1325,21 @@ Everything below is covered by [the test suite](tests/cases).
 - `[Flags]` enums: `|`, `&`, `^` and `~` on an enum whose members are bits,
   producing that same enum rather than its number, plus `HasFlag`. The marker
   needs no import, because it is a rule about enums rather than a library
-- `ref` and `in` parameters: the caller's storage rather than a copy of it,
-  writable through the first and not the second. `ref` is written at the call
-  as well as the declaration; a `ref` argument must name storage and is not
-  converted; writing to an `in`, or passing one on as a `ref`, is refused. The
-  mode is part of a signature, so overloads may not differ only in it and a
-  class does not implement `ref int` with `int`. Both are a `T*` at the ABI, so
+- `ref`, `in` and `out` parameters: the caller's storage rather than a copy of
+  it. `ref` is writable and `in` is not; `out` is writable and *must* be
+  written, which is the promise that lets the caller pass a variable holding
+  nothing. `ref` and `out` are written at the call as well as the declaration,
+  must name storage, and are not converted; writing to an `in`, or passing one
+  on as a `ref`, is refused. A call may declare the variable an `out` fills —
+  `TryHalve(10, out var five)` — taking its type from the parameter. The mode is
+  part of a signature, so overloads may not differ only in it and a class does
+  not implement `ref int` with `int`. All three are a `T*` at the ABI, so
   `extern "C" double modf(double, ref double)` needs no shim, and a generated
-  header writes them `T*` and `const T*`
+  header writes them `T*`, `const T*` and `T*`
+- Named arguments: `Draw(text, width: 3, center: true)`, after the positional
+  ones. Each names a parameter, none twice, none left out, and the names take
+  part in choosing an overload — which is what makes a four-`bool` call and a
+  wide constructor readable
 - `delegate`: a named function pointer, one word, C ABI compatible in both
   directions, and storable in a `struct`
 - `closure`: a method **and the object it belongs to** — two words, what Delphi
@@ -1731,11 +1738,14 @@ Being straight about the edges, roughly in the order they are worth adding:
   it there, but a binary moved on its own will not find it. A program with no
   library boundary keeps the copy compiled in and stays standalone, which is
   what the default is about.
-- **No `out`, no `ref` locals and no `ref` returns.** `out` would need
-  definite-assignment analysis to be worth having over `ref`; the other two
-  would need a lifetime story the language does not have.
-- Field initializers are rejected — assign in a constructor. `delete` is
-  reserved but unused.
+- **No `ref` locals and no `ref` returns**, which would need a lifetime story
+  the language does not have. `out` does exist, and brought the language's only
+  definite-assignment analysis with it: every path out of the function has to
+  write the parameter (SL0600), and the caller's storage is cleared before the
+  call so that a hole in that produces a zero rather than whatever the stack
+  held. An ordinary local read before it is written is still nobody's business
+  but the author's.
+- Field initializers are rejected — assign in a constructor.
 
 What is being worked on next, and the known bugs, are in **[TODO.md](TODO.md)**.
 

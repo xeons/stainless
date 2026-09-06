@@ -1,0 +1,9 @@
+half     5
+odd      0
+existing 4
+split    h + ello
+forward  6
+compare  10 and right is now 10
+found    beta at 1
+missing  -1
+result   41

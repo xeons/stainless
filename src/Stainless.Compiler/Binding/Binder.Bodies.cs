@@ -123,6 +123,8 @@ public sealed partial class Binder
             diagnostics.Error("SL0217", function.Span,
                 $"not all paths through '{function.Name}' return a value of type '{function.ReturnType.Name}'");
 
+        CheckOutParametersAssigned(function, body);
+
         _functions.Add(new BoundFunction(function, body));
         _currentFunction = null;
     }
@@ -620,6 +622,147 @@ public sealed partial class Binder
 
         _ => false,
     };
+
+    /// <summary>
+    /// Every <c>out</c> parameter is written before the function returns.
+    ///
+    /// This is the one place the language does definite-assignment analysis,
+    /// and it is here because <c>out</c> is the one place it is load-bearing:
+    /// the caller's variable may never have held anything, and the promise the
+    /// keyword makes is that it does now. A local read before it is written is
+    /// still nobody's business but the author's, which is a gap, but a
+    /// consistent one.
+    ///
+    /// The caller's storage is also cleared before the call, so the worst a
+    /// hole here can produce is a zero rather than whatever the stack held.
+    /// </summary>
+    private void CheckOutParametersAssigned(FunctionSymbol function, BoundBlock body)
+    {
+        var outward = function.Parameters
+            .Where(p => p.Mode == ParameterMode.Out)
+            .ToList();
+
+        if (outward.Count == 0) return;
+
+        // A jump can arrive at a label from anywhere, so "what has been written
+        // by the time control reaches here" stops being a question this walk
+        // can answer. Rather than guess, the check stands down -- and the
+        // clearing at the call site is what still holds.
+        if (_labels.Count > 0) return;
+
+        foreach (var parameter in outward)
+            if (!Assigns(body, parameter, false, function) && !AlwaysReturns(body))
+                diagnostics.Error("SL0600", function.Span,
+                    $"'{function.Name}' can return without writing to '{parameter.Name}', " +
+                    "which is what 'out' promises the caller. Assign it on every path, or " +
+                    "make it 'ref' and let the caller decide what it starts as");
+    }
+
+    /// <summary>
+    /// Whether the parameter is certainly written by the time this statement is
+    /// through, reporting any <c>return</c> reached before it was.
+    /// </summary>
+    private bool Assigns(
+        BoundStatement statement, ParameterSymbol target, bool assigned, FunctionSymbol owner)
+    {
+        switch (statement)
+        {
+            case BoundBlock block:
+                foreach (var inner in block.Statements)
+                    assigned = Assigns(inner, target, assigned, owner);
+                return assigned;
+
+            case BoundExpressionStatement expression:
+                return assigned || Writes(expression.Expression, target);
+
+            case BoundLocalDeclaration declaration:
+                return assigned || Writes(declaration.Initializer, target);
+
+            case BoundReturn returned:
+                if (!assigned && !Writes(returned.Value, target))
+                    diagnostics.Error("SL0600", returned.Span,
+                        $"'{owner.Name}' returns here without having written to " +
+                        $"'{target.Name}', which is what 'out' promises the caller");
+
+                // Nothing follows a return, so whatever it left is not read.
+                return true;
+
+            case BoundIf branch:
+            {
+                bool then = Assigns(branch.Then, target, assigned || Writes(branch.Condition, target), owner);
+                bool otherwise = branch.Else is null
+                    ? assigned || Writes(branch.Condition, target)
+                    : Assigns(branch.Else, target, assigned || Writes(branch.Condition, target), owner);
+                return then && otherwise;
+            }
+
+            // A `do` body always runs, so what it writes is written. Every
+            // other loop may run no times at all.
+            case BoundDoWhile loop:
+                return Assigns(loop.Body, target, assigned, owner);
+
+            case BoundWhile loop:
+                Assigns(loop.Body, target, assigned, owner);
+                return assigned;
+
+            case BoundFor loop:
+                Assigns(loop.Body, target, assigned, owner);
+                return assigned;
+
+            case BoundSwitch chosen:
+            {
+                bool everyArm = chosen.IsExhaustive || chosen.Sections.Any(s => s.IsDefault);
+                bool all = everyArm && chosen.Sections.Count > 0;
+
+                foreach (var section in chosen.Sections)
+                    all &= Assigns(section.Body, target, assigned, owner);
+
+                return assigned || all;
+            }
+
+            case BoundParallel parallel:
+                Assigns(parallel.Body, target, assigned, owner);
+                return assigned;
+
+            default:
+                return assigned;
+        }
+    }
+
+    /// <summary>
+    /// Whether evaluating this expression certainly writes the parameter --
+    /// by assignment, or by handing it on as somebody else's <c>out</c>.
+    /// </summary>
+    private static bool Writes(BoundExpression? expression, ParameterSymbol target) =>
+        expression switch
+        {
+            null => false,
+
+            BoundAssignment { Target: BoundParameterAccess written } assignment =>
+                ReferenceEquals(written.Parameter, target) || Writes(assignment.Value, target),
+
+            BoundAssignment assignment => Writes(assignment.Value, target),
+
+            // `Inner(out mine)` is a write, because Inner is held to the same
+            // promise this function is.
+            BoundAddressOf { FromOutKeyword: true, Operand: BoundParameterAccess passed } =>
+                ReferenceEquals(passed.Parameter, target),
+
+            BoundCall call =>
+                Writes(call.Receiver, target) || call.Arguments.Any(a => Writes(a, target)),
+
+            BoundIndirectCall call =>
+                Writes(call.Target, target) || call.Arguments.Any(a => Writes(a, target)),
+
+            BoundConversion conversion => Writes(conversion.Operand, target),
+            BoundBinary binary => Writes(binary.Left, target) || Writes(binary.Right, target),
+            BoundUnary unary => Writes(unary.Operand, target),
+
+            // Only the condition is certain: an arm may not be the one taken.
+            BoundConditional conditional => Writes(conditional.Condition, target),
+
+            _ => false,
+        };
 
     private static bool ContainsBreak(BoundStatement statement) => statement switch
     {

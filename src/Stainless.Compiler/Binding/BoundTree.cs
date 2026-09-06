@@ -661,6 +661,40 @@ public sealed class BoundAddressOf(SourceSpan span, TypeSymbol type, BoundExpres
     /// other parameter takes one that did.
     /// </summary>
     public bool FromRefKeyword { get; init; }
+
+    /// <summary>
+    /// True when the source wrote <c>out x</c>. Read for the same reason: an
+    /// <c>out</c> parameter takes only an argument that said <c>out</c>.
+    /// </summary>
+    public bool FromOutKeyword { get; init; }
+
+    /// <summary>
+    /// The local an <c>out var x</c> brought into being, or null.
+    ///
+    /// The emitter needs it to give the variable a slot before the call rather
+    /// than after: nothing declared it, so nothing else would.
+    /// </summary>
+    public LocalSymbol? DeclaresLocal { get; init; }
+}
+
+/// <summary>
+/// <c>out var x</c> or <c>out int x</c> at a call, before an overload has been
+/// chosen.
+///
+/// It has no address yet because it has no variable yet, and it has no variable
+/// yet because <c>out var</c> is waiting to be told the type. Kept as a draft
+/// for the same reason an array literal is: it must not vote on which overload
+/// was meant, having said nothing about it.
+/// </summary>
+public sealed class BoundOutDraft(
+    SourceSpan span, TypeSymbol type, string name, SourceSpan nameSpan)
+    : BoundExpression(span, type)
+{
+    public string Name { get; } = name;
+    public SourceSpan NameSpan { get; } = nameSpan;
+
+    /// <summary>True for <c>out var x</c>, where the parameter decides.</summary>
+    public bool NeedsType => Type.IsError();
 }
 
 /// <summary>Allocates a zeroed array of <paramref name="Length"/> elements; yields +1.</summary>

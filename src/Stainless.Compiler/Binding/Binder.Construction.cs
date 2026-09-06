@@ -186,7 +186,12 @@ public sealed partial class Binder
             return new BoundNew(syntax.Span, classType, constructor: null, []);
         }
 
-        var arguments = syntax.Arguments.Select(BindExpression).ToList();
+        // BindArgument rather than BindExpression: a constructor call takes
+        // `ref`, `out` and `name:` like any other, and BindExpression has no
+        // case for those -- it would answer with an error expression and no
+        // diagnostic, which is how `new Rect(left: 1, ...)` came to compile
+        // and construct a rectangle of zeroes.
+        var arguments = syntax.Arguments.Select(BindArgument).ToList();
 
         if (classType.Constructors.Count == 0)
         {
@@ -202,7 +207,8 @@ public sealed partial class Binder
             return new BoundNew(syntax.Span, classType, inherited, []);
         }
 
-        var constructor = ResolveOverload(classType.Constructors, arguments, syntax.Span, $"new {classType.Name}");
+        var constructor = ResolveOverload(
+            classType.Constructors, arguments, syntax.Span, $"new {classType.Name}", syntax.Arguments);
         if (constructor is null) return new BoundErrorExpression(syntax.Span);
 
         // A constructor's visibility is a visibility like any other, and it was
@@ -215,7 +221,26 @@ public sealed partial class Binder
                 "the ones it declares belong to its own module. There is usually a " +
                 "function that makes one and says what went wrong if it could not");
 
-        var converted = ConvertArguments(constructor, arguments, syntax.Arguments);
+        var written = syntax.Arguments;
+
+        if (HasNames(written))
+        {
+            var parameters = constructor.Parameters.Where(p => !p.IsThis).ToList();
+            int[]? order = OrderFor(parameters, written, out string? why);
+
+            if (order is null)
+            {
+                diagnostics.Error("SL0601", syntax.Span,
+                    $"'new {classType.Name}' does not fit: " +
+                    (why ?? "the names do not match its parameters"));
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            (arguments, var reordered) = InDeclaredOrder(arguments, written, order);
+            written = reordered;
+        }
+
+        var converted = ConvertArguments(constructor, arguments, written);
         return new BoundNew(syntax.Span, classType, constructor, converted);
     }
 

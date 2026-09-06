@@ -187,7 +187,11 @@ public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : Synta
 /// write through an <c>in</c>. Both are exactly a <c>T*</c> at the ABI, which
 /// is why they cross <c>extern "C"</c> with nothing in between.
 /// </summary>
-public enum ParameterMode { Value, Ref, In }
+/// <summary>
+/// How a parameter travels. <c>Ref</c>, <c>In</c> and <c>Out</c> are all one
+/// pointer at the ABI; what separates them is who may write and who must.
+/// </summary>
+public enum ParameterMode { Value, Ref, In, Out }
 
 public sealed record ParameterSyntax(
     SourceSpan Span,
@@ -202,6 +206,39 @@ public sealed record ParameterSyntax(
 /// </summary>
 public sealed record RefArgumentSyntax(SourceSpan Span, ExpressionSyntax Value)
     : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>out x</c> at a call, and the two forms that declare what they name:
+/// <c>out int x</c> and <c>out var x</c>.
+///
+/// Declaring at the call is most of why <c>out</c> is worth having over
+/// <c>ref</c> — the variable exists to catch the answer, and a line above
+/// saying so is a line about the mechanism.
+/// </summary>
+/// <param name="DeclaredType">
+/// The type in <c>out int x</c>, null for <c>out var x</c>, and unused when
+/// <see cref="Value"/> names something that already exists.
+/// </param>
+/// <summary>
+/// <c>name: value</c> at a call.
+///
+/// It says which parameter the value is for, so a call with several arguments
+/// of one type reads as what it means rather than as a count. Named arguments
+/// come after the positional ones: mixing the two orders freely would make a
+/// reader work out the mapping to see what a call does.
+/// </summary>
+public sealed record NamedArgumentSyntax(
+    SourceSpan Span,
+    string Name,
+    SourceSpan NameSpan,
+    ExpressionSyntax Value) : ExpressionSyntax(Span);
+
+public sealed record OutArgumentSyntax(
+    SourceSpan Span,
+    ExpressionSyntax? Value,
+    TypeSyntax? DeclaredType,
+    string? DeclaredName,
+    SourceSpan NameSpan) : ExpressionSyntax(Span);
 
 public sealed record FunctionDeclSyntax(
     SourceSpan Span,

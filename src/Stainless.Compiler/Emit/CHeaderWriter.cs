@@ -383,7 +383,7 @@ public static class CHeaderWriter
     /// </summary>
     private static string Declarator(ParameterSymbol parameter) => parameter.Mode switch
     {
-        ParameterMode.Ref => $"{TypeName(parameter.Type)}* {parameter.Name}",
+        ParameterMode.Ref or ParameterMode.Out => $"{TypeName(parameter.Type)}* {parameter.Name}",
         ParameterMode.In => $"const {TypeName(parameter.Type)}* {parameter.Name}",
         _ => Declarator(parameter.Type, parameter.Name),
     };

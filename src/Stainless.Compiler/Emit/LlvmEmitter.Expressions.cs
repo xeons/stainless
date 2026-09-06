@@ -63,6 +63,10 @@ public sealed partial class LlvmEmitter
                 return LoadFrom(expression);
 
             case BoundAddressOf addressOf:
+                // `out var x` declared a variable that no statement did, so
+                // this is where it gets its slot -- before the call, which is
+                // the only moment it could be.
+                if (addressOf.DeclaresLocal is { } declared) DeclareOutLocal(declared);
                 return new Val(EmitAddress(addressOf.Operand), "ptr", addressOf.Type);
 
             case BoundConversion conversion: return EmitConversion(conversion);
@@ -431,6 +435,33 @@ public sealed partial class LlvmEmitter
         }
 
         Line($"store {LlvmTypeOf(targetType)} {value.Ref}, ptr {slot}");
+    }
+
+    /// <summary>
+    /// Gives the variable an <c>out var x</c> introduced a slot, cleared.
+    ///
+    /// Cleared because the language has no definite-assignment analysis: a
+    /// callee that returns without writing would otherwise leave the caller
+    /// reading whatever the stack held. Zero is not the right answer either,
+    /// but it is an answer rather than a hazard, and it matches what a new
+    /// array and an owned local already promise.
+    /// </summary>
+    private void DeclareOutLocal(LocalSymbol local)
+    {
+        if (_slots.ContainsKey(local)) return;
+
+        string llvmType = LlvmTypeOf(local.Type);
+        string slot = Alloca(llvmType, local.Name);
+        _slots[local] = slot;
+
+        Line($"store {llvmType} {ZeroOf(llvmType)}, ptr {slot}");
+
+        if (local.Type.IsManagedSlot() ||
+            local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
+        {
+            ZeroOnEntry(slot, llvmType);
+            TrackOwnedLocal(slot, local.Type);
+        }
     }
 
     private Val EmitAssignment(BoundAssignment assignment)

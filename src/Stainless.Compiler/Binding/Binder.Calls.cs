@@ -31,6 +31,7 @@ public sealed partial class Binder
     private BoundExpression BindCall(CallSyntax syntax)
     {
         var arguments = syntax.Arguments.Select(BindArgument).ToList();
+        RefuseNamesWithoutParameters(syntax);
 
         // `base(...)` is the base constructor and `this(...)` another of this
         // class's own; neither is a member of anything.
@@ -87,7 +88,7 @@ public sealed partial class Binder
                 .Where(f => sameModule || f.IsPublic)
                 .ToList();
 
-            if (visible.Any(f => AcceptsArguments(f, arguments)))
+            if (visible.Any(f => AcceptsArguments(f, arguments, syntax.Arguments)))
                 return BindFunctionCall(syntax, visible, member.Member, arguments);
 
             var qualified = new QualifiedName(member.Span,
@@ -118,7 +119,7 @@ public sealed partial class Binder
                 _currentFunction?.ContainingType?.FindMethods(callee.Name.Text).ToList() is
                     { Count: > 0 } own)
             {
-                var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text);
+                var method = ResolveOverload(own, arguments, callee.Span, callee.Name.Text, syntax.Arguments);
                 if (method is null) return new BoundErrorExpression(syntax.Span);
 
                 // A static one needs nothing to be called on; an instance one
@@ -157,7 +158,7 @@ public sealed partial class Binder
             // not shadow the template it came from: `Sort(list)` instantiating
             // `Sort<Money>` cannot be what a later `Sort(numbers[2:5])` resolves
             // to. So the templates are tried whenever nothing already built fits.
-            if (candidates.Any(c => AcceptsArguments(c, arguments)))
+            if (candidates.Any(c => AcceptsArguments(c, arguments, syntax.Arguments)))
                 return BindFunctionCall(syntax, candidates, callee.Name.Text, arguments);
 
             if (TryBindGenericCall(syntax, callee.Name, arguments) is { } generic) return generic;
@@ -186,7 +187,7 @@ public sealed partial class Binder
                 MethodsOfEnclosingThis(callee.Name.Text) is { Count: > 0 } outerMethods)
             {
                 var outerMethod =
-                    ResolveOverload(outerMethods, arguments, callee.Span, callee.Name.Text);
+                    ResolveOverload(outerMethods, arguments, callee.Span, callee.Name.Text, syntax.Arguments);
                 if (outerMethod is null) return new BoundErrorExpression(syntax.Span);
 
                 var captured = CaptureThis(_closures.Count - 1, callee.Span);
@@ -239,6 +240,11 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindArgument(ExpressionSyntax syntax)
     {
+        // The name says where the value goes, not what it is, so binding it is
+        // binding the value.
+        if (syntax is NamedArgumentSyntax named) syntax = named.Value;
+
+        if (syntax is OutArgumentSyntax outgoing) return BindOutArgument(outgoing);
         if (syntax is not RefArgumentSyntax reference) return BindExpression(syntax);
 
         var target = BindExpression(reference.Value);
@@ -263,6 +269,68 @@ public sealed partial class Binder
             reference.Span, new PointerTypeSymbol(target.Type), target)
         {
             FromRefKeyword = true,
+        };
+    }
+
+    /// <summary>
+    /// <c>out x</c>, and the two forms that declare what they name.
+    ///
+    /// A declaring form goes out as a draft, because <c>out var x</c> says
+    /// nothing about which overload was meant and must not pretend to. The
+    /// local is declared once one has been chosen, in
+    /// <see cref="SettleOutDraft"/>, with the type its parameter says.
+    /// </summary>
+    private BoundExpression BindOutArgument(OutArgumentSyntax syntax)
+    {
+        if (syntax.DeclaredName is { } name)
+        {
+            var declared = syntax.DeclaredType is null
+                ? ErrorTypeSymbol.Instance
+                : ResolveType(syntax.DeclaredType, _currentScope!);
+
+            return new BoundOutDraft(syntax.Span, declared, name, syntax.NameSpan);
+        }
+
+        var target = BindExpression(syntax.Value!);
+        if (target.Type.IsError()) return target;
+
+        if (!IsAddressable(target))
+        {
+            diagnostics.Error("SL0443", syntax.Span,
+                "'out' passes the storage this names rather than a copy of it, and this " +
+                "expression has no storage to pass; put it in a local first, or write " +
+                "'out var' to declare one here");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (IsReadOnlyTarget(target) is { } why)
+        {
+            diagnostics.Error("SL0444", syntax.Span,
+                $"'out' lets the callee write to this, and {why}");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundAddressOf(syntax.Span, new PointerTypeSymbol(target.Type), target)
+        {
+            FromOutKeyword = true,
+        };
+    }
+
+    /// <summary>
+    /// Declares the local an <c>out var x</c> promised, now that a parameter
+    /// has said what type it is.
+    /// </summary>
+    private BoundExpression SettleOutDraft(BoundOutDraft draft, ParameterSymbol parameter)
+    {
+        var type = draft.NeedsType ? parameter.Type : draft.Type;
+        var local = DeclareLocal(draft.Name, type, isConst: false, draft.NameSpan);
+
+        return new BoundAddressOf(
+            draft.Span, new PointerTypeSymbol(type),
+            new BoundLocalAccess(draft.NameSpan, local))
+        {
+            FromOutKeyword = true,
+            DeclaresLocal = local,
         };
     }
 
@@ -437,7 +505,7 @@ public sealed partial class Binder
 
         var method = statics.Count == 1
             ? statics[0]
-            : ResolveOverload(statics, arguments, member.Span, $"{type.Name}.{member.Member}");
+            : ResolveOverload(statics, arguments, member.Span, $"{type.Name}.{member.Member}", syntax.Arguments);
 
         if (method is null) return new BoundErrorExpression(syntax.Span);
 
@@ -541,7 +609,7 @@ public sealed partial class Binder
         // module-level function is.
         var method = overloads.Count == 1
             ? overloads[0]
-            : ResolveOverload(overloads, arguments, member.Span, $"{namedType.Name}.{member.Member}");
+            : ResolveOverload(overloads, arguments, member.Span, $"{namedType.Name}.{member.Member}", syntax.Arguments);
 
         if (method is null) return new BoundErrorExpression(syntax.Span);
 
@@ -738,7 +806,7 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var function = ResolveOverload(candidates, arguments, syntax.Span, name);
+        var function = ResolveOverload(candidates, arguments, syntax.Span, name, syntax.Arguments);
         if (function is null) return new BoundErrorExpression(syntax.Span);
 
         return BuildCall(syntax, function, receiver: null, arguments);
@@ -759,7 +827,29 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var converted = ConvertArguments(function, arguments, syntax.Arguments);
+        // This is the one place every ordinary call passes through, so it is
+        // where the names are turned back into positions -- everything after
+        // it sees an argument list in the order the parameters are declared.
+        var written = syntax.Arguments;
+
+        if (HasNames(written))
+        {
+            var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
+            int[]? order = OrderFor(parameters, written, out string? why);
+
+            if (order is null)
+            {
+                diagnostics.Error("SL0601", syntax.Span,
+                    $"the call to '{function.Name}' does not fit: " +
+                    (why ?? "the names do not match its parameters"));
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            (arguments, var reordered) = InDeclaredOrder(arguments, written, order);
+            written = reordered;
+        }
+
+        var converted = ConvertArguments(function, arguments, written);
         return new BoundCall(syntax.Span, function, receiver, converted)
             { IsNonVirtual = nonVirtual };
     }
@@ -799,7 +889,11 @@ public sealed partial class Binder
     private BoundExpression ConvertArgument(
         BoundExpression argument, ParameterSymbol parameter, SourceSpan span)
     {
-        if (parameter.Mode == ParameterMode.Ref) return argument;
+        // A draft has been waiting for exactly this: the parameter is what
+        // says the type of the variable it declares.
+        if (argument is BoundOutDraft draft) return SettleOutDraft(draft, parameter);
+
+        if (parameter.Mode is ParameterMode.Ref or ParameterMode.Out) return argument;
 
         var value = BindConversion(argument, parameter.Type, span);
 
@@ -950,13 +1044,25 @@ public sealed partial class Binder
         // diagnostic that actually explains what happened.
         if (argument.Type.IsError()) return true;
 
+        // A declaring `out` fits any `out` parameter whose type it did not
+        // already name, which is what makes `out var` say nothing about which
+        // overload was meant.
+        if (argument is BoundOutDraft draft)
+            return parameter.Mode == ParameterMode.Out &&
+                   (draft.NeedsType || draft.Type.Equals(parameter.Type));
+
         bool given = argument is BoundAddressOf { FromRefKeyword: true };
+        bool outward = argument is BoundAddressOf { FromOutKeyword: true };
+
+        if (parameter.Mode == ParameterMode.Out)
+            return outward &&
+                   ((BoundAddressOf)argument).Operand.Type.Equals(parameter.Type);
 
         if (parameter.Mode == ParameterMode.Ref)
             return given &&
                    ((BoundAddressOf)argument).Operand.Type.Equals(parameter.Type);
 
-        return !given && IsImplicitlyConvertible(argument, parameter.Type);
+        return !given && !outward && IsImplicitlyConvertible(argument, parameter.Type);
     }
 
     /// <summary>
@@ -968,6 +1074,28 @@ public sealed partial class Binder
         string name, int index, BoundExpression argument, ParameterSymbol parameter)
     {
         bool given = argument is BoundAddressOf { FromRefKeyword: true };
+        bool outward = argument is BoundAddressOf { FromOutKeyword: true } or BoundOutDraft;
+
+        if (parameter.Mode == ParameterMode.Out && !outward)
+        {
+            diagnostics.Error("SL0597", argument.Span,
+                $"argument {index + 1} of '{name}' is 'out {parameter.Type.Name} " +
+                $"{parameter.Name}', so the call must say so too: write 'out' before it, or " +
+                "'out var' to declare the variable right there");
+            return;
+        }
+
+        if (parameter.Mode != ParameterMode.Out && outward)
+        {
+            diagnostics.Error("SL0598", argument.Span,
+                $"argument {index + 1} of '{name}' is " +
+                (parameter.Mode == ParameterMode.Ref
+                    ? $"'ref {parameter.Type.Name} {parameter.Name}', which the caller has to " +
+                      "have filled in already; write 'ref' rather than 'out'"
+                    : $"'{parameter.Type.Name} {parameter.Name}', which is passed by value; " +
+                      "drop the 'out'"));
+            return;
+        }
 
         if (parameter.Mode == ParameterMode.Ref && !given)
         {
@@ -994,12 +1122,13 @@ public sealed partial class Binder
             ? inner
             : argument;
 
-        if (parameter.Mode == ParameterMode.Ref)
+        if (parameter.Mode is ParameterMode.Ref or ParameterMode.Out)
         {
+            string word = parameter.Mode == ParameterMode.Out ? "out" : "ref";
             diagnostics.Error("SL0447", argument.Span,
-                $"argument {index + 1} of '{name}' is 'ref {parameter.Type.Name}', and this is " +
-                $"'{actual.Type.Name}'. A 'ref' argument is not converted, because the callee " +
-                "writes back through it and there would be nowhere for the result to go");
+                $"argument {index + 1} of '{name}' is '{word} {parameter.Type.Name}', and this " +
+                $"is '{actual.Type.Name}'. It is not converted, because the callee writes back " +
+                "through it and there would be nowhere for the result to go");
             return;
         }
 
@@ -1007,24 +1136,159 @@ public sealed partial class Binder
     }
 
     /// <summary>Whether one candidate could take these arguments.</summary>
-    private bool AcceptsArguments(FunctionSymbol candidate, List<BoundExpression> arguments)
+    private bool AcceptsArguments(
+        FunctionSymbol candidate, List<BoundExpression> arguments,
+        IReadOnlyList<ExpressionSyntax>? written = null)
     {
         int expected = candidate.Parameters.Count(p => !p.IsThis);
         if (candidate.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
             return false;
 
         var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
+
+        // A name may put the arguments in a different order for this candidate
+        // than for the last one, so the permutation is worked out per candidate
+        // rather than once.
+        int[]? order = OrderFor(parameters, written, out _);
+        if (written is not null && HasNames(written) && order is null) return false;
+
         for (int i = 0; i < parameters.Count; i++)
-            if (!ArgumentFits(arguments[i], parameters[i]))
+            if (!ArgumentFits(arguments[order is null ? i : order[i]], parameters[i]))
                 return false;
 
         return true;
     }
 
-    private FunctionSymbol? ResolveOverload(
-        IReadOnlyList<FunctionSymbol> candidates, List<BoundExpression> arguments, SourceSpan span, string name)
+    /// <summary>
+    /// Refuses <c>name: value</c> where the thing being called has no declared
+    /// parameter names to match it against.
+    ///
+    /// A variant case's fields have names, but the call is a construction and
+    /// takes them in order; a delegate and a closure carry a signature rather
+    /// than a declaration. Saying so is better than accepting the name and
+    /// quietly using the position.
+    /// </summary>
+    private void RefuseNamesWithoutParameters(CallSyntax syntax)
     {
-        var viable = candidates.Where(c => AcceptsArguments(c, arguments)).ToList();
+        if (!HasNames(syntax.Arguments)) return;
+
+        string? kind = syntax.Callee switch
+        {
+            BaseSyntax => "a base constructor call",
+            ThisSyntax => "a call to another constructor",
+            _ => null,
+        };
+
+        if (kind is null) return;
+
+        diagnostics.Error("SL0602", syntax.Span,
+            $"{kind} takes its arguments in order, so a name has nothing here to match");
+    }
+
+    /// <summary>Whether any argument was written <c>name: value</c>.</summary>
+    private static bool HasNames(IReadOnlyList<ExpressionSyntax>? written) =>
+        written is not null && written.Any(a => a is NamedArgumentSyntax);
+
+    /// <summary>
+    /// Which argument fills each parameter, or null when the names do not fit.
+    ///
+    /// Positional arguments fill from the left, and each named one goes to the
+    /// parameter it names. The result is indexed by parameter, so a caller
+    /// permutes with it rather than reasoning about the order itself.
+    /// </summary>
+    private static int[]? OrderFor(
+        IReadOnlyList<ParameterSymbol> parameters,
+        IReadOnlyList<ExpressionSyntax>? written,
+        out string? why)
+    {
+        why = null;
+        if (!HasNames(written)) return null;
+
+        var order = new int[parameters.Count];
+        Array.Fill(order, -1);
+
+        bool naming = false;
+
+        for (int i = 0; i < written!.Count; i++)
+        {
+            if (written[i] is not NamedArgumentSyntax named)
+            {
+                // A positional argument after a named one would leave a reader
+                // counting past the names to see where it lands.
+                if (naming)
+                {
+                    why = "a positional argument cannot come after a named one";
+                    return null;
+                }
+
+                if (i >= parameters.Count) return null;
+                order[i] = i;
+                continue;
+            }
+
+            naming = true;
+
+            int at = -1;
+            for (int p = 0; p < parameters.Count; p++)
+                if (parameters[p].Name == named.Name) { at = p; break; }
+
+            if (at < 0)
+            {
+                why = $"there is no parameter named '{named.Name}'";
+                return null;
+            }
+
+            if (order[at] >= 0)
+            {
+                why = $"'{named.Name}' is given twice";
+                return null;
+            }
+
+            order[at] = i;
+        }
+
+        for (int p = 0; p < parameters.Count; p++)
+            if (order[p] < 0)
+            {
+                why = $"nothing was given for '{parameters[p].Name}'";
+                return null;
+            }
+
+        return order;
+    }
+
+    /// <summary>
+    /// The arguments and the syntax that wrote them, in the order the
+    /// parameters are declared.
+    /// </summary>
+    private static (List<BoundExpression> Arguments, List<ExpressionSyntax> Written) InDeclaredOrder(
+        List<BoundExpression> arguments, IReadOnlyList<ExpressionSyntax> written, int[] order)
+    {
+        var values = new List<BoundExpression>(order.Length);
+        var spans = new List<ExpressionSyntax>(order.Length);
+
+        foreach (int from in order)
+        {
+            values.Add(arguments[from]);
+            spans.Add(written[from]);
+        }
+
+        // Anything past the declared parameters is a C variadic's, and those
+        // are positional by construction.
+        for (int i = order.Length; i < arguments.Count; i++)
+        {
+            values.Add(arguments[i]);
+            spans.Add(written[i]);
+        }
+
+        return (values, spans);
+    }
+
+    private FunctionSymbol? ResolveOverload(
+        IReadOnlyList<FunctionSymbol> candidates, List<BoundExpression> arguments, SourceSpan span, string name,
+        IReadOnlyList<ExpressionSyntax>? written = null)
+    {
+        var viable = candidates.Where(c => AcceptsArguments(c, arguments, written)).ToList();
 
         switch (viable.Count)
         {
@@ -1038,6 +1302,20 @@ public sealed partial class Binder
                     var only = candidates[0];
                     var parameters = only.Parameters.Where(p => !p.IsThis).ToList();
                     int expected = parameters.Count;
+
+                    // A name that does not fit is the whole story; reporting a
+                    // type mismatch on top of it would be reporting the
+                    // consequence rather than the cause.
+                    if (HasNames(written))
+                    {
+                        _ = OrderFor(parameters, written, out string? why);
+                        if (why is not null)
+                        {
+                            diagnostics.Error("SL0601", span,
+                                $"the call to '{name}' does not fit: {why}");
+                            return null;
+                        }
+                    }
 
                     if (only.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
                         diagnostics.Error("SL0260", span,

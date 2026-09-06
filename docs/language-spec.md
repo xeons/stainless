@@ -3299,11 +3299,17 @@ overloaded, because dispatch gives each one a single slot
 A *class* implementing two interfaces whose methods share a name is a different
 matter, and it works — see §2.10.
 
-### 7.2 `ref` and `in` parameters
+### 7.2 `ref`, `in` and `out` parameters
 
-A parameter is a copy unless it says otherwise. `ref` and `in` say otherwise:
-both pass the caller's storage rather than a copy of it, and the difference
-between them is whether the callee may write to it.
+A parameter is a copy unless it says otherwise. `ref`, `in` and `out` say
+otherwise: all three pass the caller's storage rather than a copy of it, and
+what separates them is who may write to it and who must.
+
+| | The caller has filled it in | The callee may write | The callee must write |
+|---|---|---|---|
+| `ref` | yes | yes | no |
+| `in` | yes | no | no |
+| `out` | not necessarily | yes | yes |
 
 ```csharp
 void Bump(ref int n) { n = n + 1; }
@@ -3354,9 +3360,84 @@ A generated C header writes `ref T` as `T*` and `in T` as `const T*`. C++ names
 mangle the same way, so `export "C++" void geometry::scale(ref double f, int n)`
 is the symbol a C++ `void geometry::scale(double*, int)` calls.
 
-**What is not here.** No `out`: it would need definite-assignment analysis to be
-worth having over `ref`. No `ref` locals and no `ref` returns, which would need
-a lifetime story the language does not have.
+#### 7.2.1 `out`
+
+```csharp
+bool TryHalve(int n, out int half) {
+    if (n % 2 != 0) { half = 0; return false; }
+    half = n / 2;
+    return true;
+}
+
+if (TryHalve(10, out var five)) { ... }      // declared by the call
+if (TryHalve(7, out int none)) { ... }       // and named outright
+TryHalve(8, out already);                    // or a variable that exists
+```
+
+At the ABI it is exactly what `ref` is, a `T*`. What it adds is a promise in
+each direction: the caller need not have given the variable a value, and the
+callee has to.
+
+**The callee's half is checked** (SL0600). Every path out of the function
+either writes the parameter or is an error, and handing it straight on as
+somebody else's `out` counts as writing it — that callee is held to the same
+promise. This is the only definite-assignment analysis in the language, and it
+is here because this is the one place it is load-bearing: an ordinary local
+read before it is written is still nobody's business but the author's, which is
+a gap, but a consistent one. A function containing a `goto` stands the check
+down, because a label can be arrived at from anywhere and the question stops
+being answerable.
+
+**The caller's storage is cleared before the call.** That is the safety net
+under the gap: a hole in the analysis produces a zero rather than whatever the
+stack held, which is the same promise a new array and an owned local already
+make.
+
+**A call may declare the variable**, and that is most of why `out` is worth
+having over `ref`: the variable exists to catch the answer, and a line above
+saying so is a line about the mechanism. `out var x` takes its type from the
+parameter, which means it says nothing about which overload was meant and does
+not vote on the choice.
+
+`out` is written at the call (SL0597) for the reason `ref` is, and is refused
+where the parameter is not one (SL0598).
+
+**`out` is a contextual keyword**, and the standard library is what decided it:
+`Convert.sl` and `Encoding.sl` both use `out` as a local. It is the modifier
+only where a type or a name follows it.
+
+**Where a `Result` is better.** `out` is for the answer that comes with a
+question — *did it work*, *was it there* — and `Result<T, E>` is for the answer
+that comes with a reason. The library reaches for `Result` (§2.8) almost
+everywhere, and `out` is the shape to use when the failure has nothing to say
+for itself.
+
+**What is not here.** No `ref` locals and no `ref` returns, which would need a
+lifetime story the language does not have.
+
+#### 7.2.2 Named arguments
+
+```csharp
+Draw(text, width: 3, center: true, fill: '.');
+var box = new Rect(left: 1, top: 2, right: 30, bottom: 40);
+```
+
+`name: value` says which parameter a value is for. It exists for the call a
+reader cannot decode — four `bool`s in a row say nothing about which flag is
+which — and for the constructor with more parameters than anyone remembers the
+order of.
+
+**Named arguments come after positional ones** (SL0601). Mixing the two orders
+freely would make a reader count past the names to see where a positional one
+lands. Among themselves the names may be in any order, because each says where
+it goes. Each has to name a parameter, none may be given twice, and none may be
+left empty — all SL0601, which says which of those went wrong.
+
+**A name takes part in choosing an overload**, since two candidates may call
+their parameters different things.
+
+`base(...)` and `this(...)` take their arguments in order (SL0602): they name a
+constructor rather than a declaration, so there is nothing for a name to match.
 
 ### 7.3 Properties
 

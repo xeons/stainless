@@ -863,6 +863,7 @@ public sealed partial class Binder
     /// <summary>A parameter as the source writes it, mode included.</summary>
     private static string Spelled(ParameterSymbol parameter) =>
         (parameter.Mode == ParameterMode.Ref ? "ref " :
+         parameter.Mode == ParameterMode.Out ? "out " :
          parameter.Mode == ParameterMode.In ? "in " : "") + parameter.Type.Name;
 
     /// <summary>

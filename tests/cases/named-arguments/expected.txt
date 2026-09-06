@@ -1,0 +1,10 @@
+[hi...]
+<hi--->
+[any**]
+<some++++>
+rect   1,2 30,40
+mixed  1,2 30,40
+hex    0xff
+quoted "text"
+half   4
+refused 0
