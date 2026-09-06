@@ -549,10 +549,11 @@ public sealed partial class Binder
 
                 var result = AsWritten(method.ReturnType, atUseSite);
 
-                // Only worth binding a body to learn something not already known.
-                if (result is not NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } wanted
-                    || !names.Contains(wanted.Name.Parts[0])
-                    || inferred.ContainsKey(wanted.Name.Parts[0])) continue;
+                // Only worth binding a body to learn something not already
+                // known. The result may be the parameter itself -- `R Apply(T)`
+                // -- or carry it inside something else, which is what
+                // `Optional<R> Apply(T)` does for FlatMap.
+                if (!MentionsUnknown(result, names, inferred)) continue;
 
                 // Every parameter has to be settled before the body can bind.
                 var parameterTypes = ResolveAll(
@@ -562,8 +563,12 @@ public sealed partial class Binder
 
                 if (ProbeLambdaResult(lambda.Syntax, parameterTypes) is not { } produced) continue;
 
-                inferred[wanted.Name.Parts[0]] = produced;
-                learned = true;
+                // Matched structurally rather than assigned, so `Optional<R>`
+                // against an `Optional<nuint>` says R is nuint and a result
+                // that turned out to be some other shape says nothing at all.
+                int known = inferred.Count;
+                Infer(result, produced, names, inferred, candidate.Scope);
+                if (inferred.Count > known) learned = true;
             }
         }
     }
@@ -573,16 +578,65 @@ public sealed partial class Binder
     /// <c>A</c> and <c>B</c> of <c>IFunc&lt;A, B&gt;</c> become whatever was
     /// written at <c>IFunc&lt;T, R&gt;</c>.
     ///
-    /// Bare names only. A functional interface whose method mentions its
-    /// parameter inside another type -- <c>List&lt;B&gt; Apply(A)</c> -- is left
-    /// alone rather than half-translated, and falls through to SL0327 saying
-    /// so, which is the honest outcome until something needs otherwise.
+    /// All the way down, so a method that mentions its interface's parameter
+    /// inside something else -- <c>List&lt;B&gt; Apply(A)</c> -- is restated
+    /// rather than left half-translated.
     /// </summary>
-    private static TypeSyntax AsWritten(TypeSyntax declared, Dictionary<string, TypeSyntax> atUseSite) =>
-        declared is NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } name &&
-        atUseSite.TryGetValue(name.Name.Parts[0], out var written)
-            ? written
-            : declared;
+    private static TypeSyntax AsWritten(TypeSyntax declared, Dictionary<string, TypeSyntax> atUseSite)
+    {
+        switch (declared)
+        {
+            case NamedTypeSyntax { Name.Parts.Count: 1, TypeArguments.Count: 0 } name
+                when atUseSite.TryGetValue(name.Name.Parts[0], out var written):
+                return written;
+
+            case NamedTypeSyntax { TypeArguments.Count: > 0 } constructed:
+            {
+                var arguments = constructed.TypeArguments
+                    .Select(a => AsWritten(a, atUseSite)).ToList();
+
+                return arguments.SequenceEqual(constructed.TypeArguments)
+                    ? constructed
+                    : constructed with { TypeArguments = arguments };
+            }
+
+            case ArrayTypeSyntax array:
+                return array with { Element = AsWritten(array.Element, atUseSite) };
+
+            case SliceTypeSyntax slice:
+                return slice with { Element = AsWritten(slice.Element, atUseSite) };
+
+            case PointerTypeSyntax pointer:
+                return pointer with { Element = AsWritten(pointer.Element, atUseSite) };
+
+            case NullableTypeSyntax nullable:
+                return nullable with { Element = AsWritten(nullable.Element, atUseSite) };
+
+            default:
+                return declared;
+        }
+    }
+
+    /// <summary>
+    /// True when a written type still rests on a parameter nothing has worked
+    /// out yet, which is the only reason to go and bind a lambda's body.
+    /// </summary>
+    private static bool MentionsUnknown(
+        TypeSyntax written, IReadOnlySet<string> names, Dictionary<string, TypeSymbol> inferred) =>
+        written switch
+        {
+            NamedTypeSyntax { Name.Parts: [var only], TypeArguments.Count: 0 } =>
+                names.Contains(only) && !inferred.ContainsKey(only),
+
+            NamedTypeSyntax constructed =>
+                constructed.TypeArguments.Any(a => MentionsUnknown(a, names, inferred)),
+
+            ArrayTypeSyntax array => MentionsUnknown(array.Element, names, inferred),
+            SliceTypeSyntax slice => MentionsUnknown(slice.Element, names, inferred),
+            PointerTypeSyntax pointer => MentionsUnknown(pointer.Element, names, inferred),
+            NullableTypeSyntax nullable => MentionsUnknown(nullable.Element, names, inferred),
+            _ => false,
+        };
 
     /// <summary>
     /// Every type resolved under what has been inferred so far, or null if any

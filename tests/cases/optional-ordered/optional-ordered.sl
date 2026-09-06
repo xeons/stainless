@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: 0BSD
 //
-// `Option<T>`, `OrderedDictionary<K, V>`, and the two things a `List` and a
+// `Optional<T>`, `OrderedDictionary<K, V>`, and the two things a `List` and a
 // `StringBuilder` could not do.
-module OptionOrdered;
+module OptionalOrdered;
 
 import Standard.Collections;
 import Standard.Console;
@@ -14,14 +14,20 @@ void Say(String label, String value) {
 // A value or none, for the types `T?` cannot describe. `nuint?` is refused
 // because a value type has no spare bit to be null with; this costs a tag
 // beside the value and nothing else.
-Option<nuint> FirstEven(int[] values) {
+Optional<nuint> FirstEven(int[] values) {
     for (nuint i = 0u; i < values.Length; i = i + 1u) {
         if (values[i] % 2 == 0) { return Some(i); }
     }
     return None;
 }
 
-String Describe(Option<nuint> found) {
+// A second optional, so `FlatMap` has something to flatten.
+Optional<nuint> Even(nuint value) {
+    if (value % 2u == 0u) { return Some(value); }
+    return None;
+}
+
+String Describe(Optional<nuint> found) {
     switch (found) {
         case Some at: return "at " + Text.FromInteger((long)at.Value);
         case None:    return "none";
@@ -29,7 +35,7 @@ String Describe(Option<nuint> found) {
 }
 
 public int Main() {
-    // ------------------------------------------------------------- Option
+    // ----------------------------------------------------------- Optional
     var evens = new int[3];
     evens[0u] = 1;
     evens[1u] = 4;
@@ -43,11 +49,32 @@ public int Main() {
 
     Say("not-found", Describe(FirstEven(odds)));
 
-    // The two readers that need no proof, because they supply their own.
+    // The readers that need no proof, because they supply their own.
     Say("has-value", Text.FromBool(FirstEven(evens).HasValue()));
     Say("no-value", Text.FromBool(FirstEven(odds).HasValue()));
+    Say("is-empty", Text.FromBool(FirstEven(odds).IsEmpty()));
     Say("value-or", Text.FromInteger((long)FirstEven(odds).ValueOr(99u)));
     Say("value-or-present", Text.FromInteger((long)FirstEven(evens).ValueOr(99u)));
+    Say("get", Text.FromInteger((long)FirstEven(evens).Get()));
+
+    // And the ones that take the work rather than the value.
+    Say("map", Describe(FirstEven(evens).Map(i => i + 10u)));
+    Say("map-none", Describe(FirstEven(odds).Map(i => i + 10u)));
+    Say("map-type", FirstEven(evens).Map(i => "index " + Text.FromInteger((long)i))
+        .ValueOr("(none)"));
+    Say("flat-map", Describe(FirstEven(evens).FlatMap(i => Even(i + 1u))));
+    Say("flat-map-none", Describe(FirstEven(evens).FlatMap(i => Even(i))));
+    Say("filter", Describe(FirstEven(evens).Filter(i => i > 0u)));
+    Say("filter-out", Describe(FirstEven(evens).Filter(i => i > 5u)));
+    Say("or", Describe(FirstEven(odds).Or(FirstEven(evens))));
+    Say("or-held", Describe(FirstEven(evens).Or(FirstEven(odds))));
+
+    FirstEven(evens).IfPresent(i => Say("if-present", Text.FromInteger((long)i)));
+    FirstEven(odds).IfPresent(i => Say("never", "never"));
+
+    // The tag test with a name, which is what these are all shorthand for.
+    if (FirstEven(evens) is Some found) { Say("is-some", Text.FromInteger((long)found.Value)); }
+    if (FirstEven(odds) is None) { Say("is-none", "yes"); }
 
     // ------------------------------------------------- OrderedDictionary
     var map = new OrderedDictionary<String, int>();

@@ -22,7 +22,7 @@
 // Doing something to every element.
 //
 // A lambda takes its type from what it is assigned to, and an interface with
-// exactly one method is one of the two things it may become (§2.14). So these
+// exactly one method is one of the two things it may become (§2.15). So these
 // are ordinary generic interfaces, and `Filter(names, n => n.Length() > 3u)`
 // works with no function type in the language and no special case in the
 // compiler.
@@ -34,27 +34,10 @@
 // name borrowed from a language that does.
 module Standard.Collections;
 
-// ------------------------------------------------------- the shapes of work
-
-/// Turns a T into an R. The transform half of `Map`.
-public interface IFunc<T, R> { R Apply(T value); }
-
-/// Answers a question about a T.
-public interface IPredicate<T> { bool Test(T value); }
-
-/// Does something with a T and returns nothing.
-public interface IAction<T> { void Run(T value); }
-
-/// Folds one T into a running A. Two parameters rather than one, because a
-/// fold is the one shape that carries something along with it.
-public interface IFold<A, T> { A Apply(A total, T value); }
-
-/// Orders two Ts: negative if `left` comes first, positive if `right` does,
-/// zero if neither.
-///
-/// This is what lets a type be sorted more than one way, and what lets a type
-/// that implements no interface be sorted at all.
-public interface IComparer<T> { int Compare(T left, T right); }
+// The shapes a lambda takes here -- `IFunc`, `IPredicate`, `IAction`, `IFold`
+// and `IComparer` -- are declared in `Standard`, because they are what §2.15
+// says a lambda may become rather than anything to do with collections, and
+// `Optional.Map` needs them too. They need no import to reach.
 
 // ---------------------------------------------------------- over an array
 

@@ -489,10 +489,10 @@ public class OrderedDictionary<K, V> where K : IEquatable<K> {
     /// Where a key is, or `None`.
     ///
     /// The one lookup a caller needs: asking whether a key is there and then
-    /// asking for its value walks the collection twice. An `Option` rather
+    /// asking for its value walks the collection twice. An `Optional` rather
     /// than a sentinel, because a position that means "no position" is a rule
     /// every caller has to know and none can be made to.
-    public Option<nuint> IndexOf(K key) {
+    public Optional<nuint> IndexOf(K key) {
         for (nuint i = 0u; i < keys.Count(); i = i + 1u) {
             if (keys.At(i).EqualTo(key)) { return Some(i); }
         }
@@ -514,32 +514,26 @@ public class OrderedDictionary<K, V> where K : IEquatable<K> {
     /// Replaces the value of a key, or appends it. A replaced key keeps the
     /// position it had, which is the point of the collection.
     public void Set(K key, V value) {
-        switch (IndexOf(key)) {
-            case Some at: values.Set(at.Value, value); break;
-            case None:    Add(key, value); break;
-        }
+        if (IndexOf(key) is Some at) { values.Set(at.Value, value); }
+        else { Add(key, value); }
     }
 
     /// The value of a key, or the fallback. There is no overload that aborts:
     /// a caller that wants to know writes `IndexOf`.
     public V Find(K key, V fallback) {
-        switch (IndexOf(key)) {
-            case Some at: return values.At(at.Value);
-            case None:    return fallback;
-        }
+        if (IndexOf(key) is Some at) { return values.At(at.Value); }
+        return fallback;
     }
 
     /// Removes the first entry with that key, closing the gap. Answers whether
     /// there was one.
     public bool Remove(K key) {
-        switch (IndexOf(key)) {
-            case Some at:
-                keys.RemoveAt(at.Value);
-                values.RemoveAt(at.Value);
-                return true;
-            case None:
-                return false;
+        if (IndexOf(key) is Some at) {
+            keys.RemoveAt(at.Value);
+            values.RemoveAt(at.Value);
+            return true;
         }
+        return false;
     }
 
     public void Clear() {

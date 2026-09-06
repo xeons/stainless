@@ -100,7 +100,7 @@ public class XmlAttributes {
     public void Set(String name, String value) { entries.Set(name, value); }
 
     /// Where a name is, or `None`.
-    public Option<nuint> IndexOf(String name) { return entries.IndexOf(name); }
+    public Optional<nuint> IndexOf(String name) { return entries.IndexOf(name); }
 
     public bool Has(String name) { return entries.Has(name); }
 
@@ -857,12 +857,10 @@ void FillInstance(byte* instance, Type type, XmlNode node) {
         // that writes one is read by whichever the type asked for, and one
         // that writes both is read the way the type is marked.
         if (field.Has("XmlAttribute")) {
-            switch (node.Attributes.IndexOf(name)) {
-                case Some at:
-                    FillField(instance, field, node.Attributes.ValueAt(at.Value));
-                    break;
-                case None:
-                    break;
+            // A call result cannot carry a narrowing -- it could answer
+            // differently the second time -- so the name is what holds it.
+            if (node.Attributes.IndexOf(name) is Some at) {
+                FillField(instance, field, node.Attributes.ValueAt(at.Value));
             }
             continue;
         }

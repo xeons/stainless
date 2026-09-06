@@ -475,7 +475,35 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindTypeTest(TypeTestSyntax syntax)
     {
+        // Whatever is being tested is bound outside the pattern scope: the one
+        // binding this `is` may make is its own, and an `is` nested in the
+        // value has no branch of its own to be true in.
+        var enclosing = _patterns;
+        _patterns = null;
         var value = BindExpression(syntax.Value);
+        _patterns = enclosing;
+
+        // A case is not a type and would not resolve as one, so a variant is
+        // asked before the right side is resolved. A case wins over a class of
+        // the same name, because the value says which question was meant.
+        if (value.Type is VariantTypeSymbol variant &&
+            syntax.Tested is NamedTypeSyntax { Name.Parts: [var only], TypeArguments.Count: 0 } &&
+            variant.FindCase(only) is { } namedCase)
+            return BindVariantCaseTest(syntax, value, namedCase);
+
+        // Nothing else a variant could be asked: it is a value type, so it is
+        // never an object of some class, and the only question left is which
+        // of its cases it holds.
+        if (value.Type is VariantTypeSymbol whole &&
+            syntax.Tested is NamedTypeSyntax { Name.Parts: [var missing], TypeArguments.Count: 0 })
+        {
+            diagnostics.Error("SL0518", syntax.Span,
+                $"'{whole.Name}' is a variant and has no case named '{missing}'; " +
+                "what 'is' asks a variant is which case it holds, and those are " +
+                Listed(whole.Cases.Select(c => c.Name)));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         var tested = ResolveType(syntax.Tested, _currentScope!);
         if (value.Type.IsError() || tested.IsError()) return new BoundErrorExpression(syntax.Span);
 
@@ -526,6 +554,15 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
             }
 
+            if (syntax.Binding is not null)
+            {
+                diagnostics.Error("SL0587", syntax.BindingSpan,
+                    $"a QueryInterface for '{asked.Name}' is a call the object answers, and " +
+                    "answers again, so a name here would not be what the test asked about; " +
+                    $"cast it instead, as 'var {syntax.Binding} = ({asked.Name})...'");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
             // Deliberately no "always true" warning for the upward case. A
             // class's base chain is the compiler's; an object's answer is its
             // own, and even IUnknown -> IUnknown is a call it may refuse.
@@ -550,7 +587,108 @@ public sealed partial class Binder
                     $"every '{subjectClass.Name}' is a '{wantedClass.Name}', so this is always true");
         }
 
+        if (syntax.Binding is not null) return BindClassTestBinding(syntax, value, wanted);
+
         return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, wanted);
+    }
+
+    /// <summary>
+    /// <c>v is Circle c</c> over a variant: the test is the tag test, and the
+    /// name is that case's payload.
+    ///
+    /// This is the whole reason the binding form exists. The bare
+    /// <c>if (v.Circle) { v.Radius }</c> narrowing needs a local or a
+    /// parameter to be about (SL0285), because a field or a call result could
+    /// be a different value by the time it is read. A binding says so
+    /// explicitly: the value is taken once, and what came out of it has a name
+    /// of its own.
+    /// </summary>
+    private BoundExpression BindVariantCaseTest(
+        TypeTestSyntax syntax, BoundExpression value, VariantCaseSymbol tested)
+    {
+        if (syntax.Binding is null)
+            return new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, tested);
+
+        if (tested.Payload is null)
+        {
+            diagnostics.Error("SL0586", syntax.BindingSpan,
+                $"case '{tested.Name}' carries nothing, so there is nothing for " +
+                $"'{syntax.Binding}' to be; the test on its own is the whole question");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (PatternSubject(syntax, value) is not { } subject)
+            return new BoundErrorExpression(syntax.Span);
+
+        _patterns!.Bindings.Add((syntax.Binding, tested.Payload, syntax.BindingSpan,
+            new BoundVariantPayload(syntax.BindingSpan, subject, tested, null)));
+
+        return new BoundVariantTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, tested);
+    }
+
+    /// <summary>
+    /// <c>x is Circle c</c> over a class: the test, and the downcast it proved.
+    ///
+    /// The cast checks the base chain a second time, which the test has just
+    /// walked. That is a few loads against a rule with no exception to it --
+    /// a <c>Downcast</c> is checked, always -- and the alternative is a second
+    /// kind of downcast whose safety lives somewhere else in the compiler.
+    /// </summary>
+    private BoundExpression BindClassTestBinding(
+        TypeTestSyntax syntax, BoundExpression value, NamedTypeSymbol wanted)
+    {
+        if (wanted is not ClassTypeSymbol)
+        {
+            diagnostics.Error("SL0587", syntax.BindingSpan,
+                $"'{wanted.Name}' is an interface, and a reference does not convert down to " +
+                $"one, so there is nothing for '{syntax.Binding}' to be; test without a name " +
+                "and reach the object through the interface it already has");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (PatternSubject(syntax, value) is not { } subject)
+            return new BoundErrorExpression(syntax.Span);
+
+        if (ClassifyConversion(subject.Type, wanted, explicitCast: true) is not { } kind)
+        {
+            diagnostics.Error("SL0587", syntax.BindingSpan,
+                $"'{subject.Type.Name}' does not convert to '{wanted.Name}', so the test can " +
+                $"be asked but its answer cannot be named");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        _patterns!.Bindings.Add((syntax.Binding!, wanted, syntax.BindingSpan,
+            new BoundConversion(syntax.BindingSpan, wanted, subject, kind)));
+
+        return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, wanted);
+    }
+
+    /// <summary>
+    /// The value a test and its binding both read, evaluated once.
+    ///
+    /// A local or a parameter is already that. Anything else -- the field and
+    /// the call result this form exists for -- is spilled into a name of the
+    /// compiler's own, declared around the <c>if</c>.
+    /// </summary>
+    private BoundExpression? PatternSubject(TypeTestSyntax syntax, BoundExpression value)
+    {
+        if (_patterns is null)
+        {
+            diagnostics.Error("SL0585", syntax.BindingSpan,
+                $"'{syntax.Binding}' is in scope only where this test succeeded, and there is " +
+                "such a place only when the test is the whole condition of an 'if': write " +
+                "'if (node.Payload is Number n)', and put anything else the branch needs " +
+                "inside it");
+            return null;
+        }
+
+        if (NarrowableSubject(value) is not null) return value;
+
+        var held = DeclareLocal(
+            SyntheticName("is"), value.Type, isConst: true, syntax.Value.Span);
+        _patterns.Spills.Add(new BoundLocalDeclaration(syntax.Value.Span, held, value));
+
+        return new BoundLocalAccess(syntax.Value.Span, held);
     }
 
     private BoundExpression BindName(NameSyntax syntax)

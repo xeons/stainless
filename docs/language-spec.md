@@ -696,6 +696,29 @@ for an interface, and answers false for a null reference — so a test through a
 the program, naming what the object really is; there are no exceptions, and `is`
 is how the question is asked first.
 
+**Naming what the test found.** A test may put the object under a name, in
+scope where the test succeeded:
+
+```csharp
+if (shape is Square square) {
+    ...                                 // 'square' is a Square here
+}
+```
+
+That is the cast written once instead of twice. The name is in scope in the
+branch the test proved and nowhere else — not after the `if`, and not in the
+rest of the condition — so the form is the whole condition of an `if` and not
+part of a larger one (SL0585). Interfaces are not offered a name (SL0587): a
+reference does not convert down to one, so there would be nothing for it to be.
+
+**What is tested is evaluated once**, which is what makes this the way to read
+a field or a call result. `is` through a `C?` asks about the null and the class
+at once, so it is also the narrowing that §2.5 cannot give a field:
+
+```csharp
+if (node.Next is Node n) { return n.Value; }    // 'node.Next' read once
+```
+
 A test that could never be true is a mistake rather than a constant false:
 
 ```
@@ -703,10 +726,9 @@ error[SL0518]: no object is both a 'Circle' and a 'Unrelated': neither derives
 from the other
 ```
 
-There is no `as` yet. It would produce a `C?`, which is now worth having —
-flow narrowing arrived (§2.5), so the result of one would be usable, and
-`if (x is C) { var c = (C)x; }` is two tests where one would do. See
-[TODO.md](../TODO.md).
+There is no `as` yet. It would produce a `C?`, and narrowing (§2.5) would make
+the result usable; what it would add over `is C c` is the case where the answer
+is wanted as a value rather than as a branch. See [TODO.md](../TODO.md).
 
 ### 2.5 Pointers and nullability
 
@@ -781,6 +803,13 @@ proof, and putting it in a local first is both the fix and what the code meant:
 error[SL0248]: 'Node?' may be null, and this is not something a check can be
 about: a field or a call result may be a different value by the time it is
 read. Put it in a local, check that against null, and reach 'Value' through it
+```
+
+The other fix is `is` with a name (§2.4.2), which reads the field once and
+names what came out of it:
+
+```csharp
+if (node.Next is Node n) { return n.Value; }
 ```
 
 **A `weak C?` is never narrowed.** It may die between the check and the use,
@@ -866,6 +895,36 @@ anything that could have changed the value. A variant with exactly two cases
 narrows on a false test as well as a true one, which is why `if (!r.Ok)` proves
 `Fail`. Only a variant held in a local or a parameter can carry a proof (SL0285),
 for the reason given in §2.8.
+
+**This is the short form, and it is usually the one to write.** A reader that
+answers with a fallback needs no `switch`:
+
+```csharp
+double RadiusOr(Shape shape, double fallback) {
+    if (shape.Circle) { return shape.Radius; }
+    return fallback;
+}
+```
+
+It works with a field name shared across cases — narrowing has settled which
+case is there, so `shape.Radius` is that case's — and negated, which is what a
+guard clause wants: `if (!shape.Circle) { return fallback; }`.
+
+**`is` names what a test found**, for the two things a bare tag test cannot be
+about:
+
+```csharp
+if (node.Payload is Circle c) { return c.Radius; }
+```
+
+A field or a call result carries no narrowing (SL0285), because either could be
+a different value by the time the payload is read. `is` says so explicitly: the
+value is evaluated once and what came out of it has a name. That name is a copy
+of the case's payload — the same struct `case Circle c:` binds — and it is in
+scope in the branch the test proved and nowhere else, so the form is the whole
+condition of an `if` rather than part of one (SL0585). A case that carries
+nothing has nothing to name (SL0586); `if (value is Null)` is the whole
+question there.
 
 **Switching over one** covers the cases rather than constant values, and needs
 no `default` once they are all there:
@@ -1150,7 +1209,7 @@ It binds like any other prefix, so `try a + b` is `(try a) + b` and
 `try f().x` covers the whole chain. It is an expression, so several may appear
 in one -- `Ok(try P(a) + try P(b))` -- and each returns on its own failure.
 
-#### 2.8.1 `Option<T>` — a value, or none
+#### 2.8.1 `Optional<T>` — a value, or none
 
 `C?` is a nullable reference: the null is the pointer, so it costs nothing and
 the compiler narrows it (§2.5). A **value type has no spare bit to be null
@@ -1158,10 +1217,10 @@ with**, so `nuint?` is refused (SL0271), and what used to stand in was a magic
 number — a lookup answering with the largest `nuint` there is, and every caller
 agreeing to read that as "not there".
 
-`Option<T>` is that said properly, and it is an ordinary variant:
+`Optional<T>` is that said properly, and it is an ordinary variant:
 
 ```csharp
-public variant Option<T> {
+public variant Optional<T> {
     None;
     Some(T Value);
 }
@@ -1176,14 +1235,44 @@ if (found.Some) { return values.At(found.Value); }
 return fallback;
 ```
 
-`HasValue()` and `ValueOr(fallback)` are there for the two readers that need no
-proof because they supply their own.
+A call result carries no narrowing, so a lookup is read with a name:
+
+```csharp
+if (map.IndexOf(key) is Some found) { return values.At(found.Value); }
+return fallback;
+```
+
+**The readers**, for a caller that would rather not branch:
+
+| | |
+|---|---|
+| `HasValue()`, `IsEmpty()` | whether there is one |
+| `Get()` | the value, **aborting** when there is none — the bargain `Dictionary.Get` makes |
+| `ValueOr(fallback)` | the value, or something the caller supplies |
+| `Or(other)` | this one if it holds anything, else `other` |
+| `Map(f)` | the value put through `f`, or none — `Optional<R>` |
+| `FlatMap(f)` | the same, for an `f` that answers with an optional of its own |
+| `Filter(p)` | this one if `p` accepts what it holds, else none |
+| `IfPresent(a)` | runs `a` on the value, if there is one |
+
+`Map`, `FlatMap`, `Filter` and `IfPresent` take `IFunc`, `IPredicate` and
+`IAction` (§5.5), so a lambda is what gets written at them:
+
+```csharp
+Optional<String> name = index.IndexOf(id).Map(i => people.At(i).Name);
+```
+
+`Or` takes a value rather than something that produces one on demand, unlike
+Java's: a lambda here allocates a closure to save an evaluation, which is the
+wrong way round at the sizes this is used at.
 
 **It is not a replacement for `C?`.** A nullable reference stays what it is —
 the representation is already free there, and `if (c != null)` narrows without
 a case to name. Two representations behind one `?` was the alternative, and it
 would have meant `T?` being a pointer for a class and a tagged pair for a
-value, across layout, mangling and the ABI classifier.
+value, across layout, mangling and the ABI classifier. The names differ for the
+same reason they are different things: `Optional<T>` is this type, and "an
+optional" is what this document calls `C?`.
 
 ### 2.9 How the library reports failure
 
@@ -2475,7 +2564,7 @@ both one of these.
 Asking a container for something it does not have — `Get` with an absent key,
 `Dequeue` on an empty queue — aborts, the same way an out-of-range index does.
 Use `GetOr`, `ContainsKey` or `IsEmpty` where a miss is an ordinary outcome.
-`OrderedDictionary.IndexOf` answers with an `Option<nuint>` (§2.8.1), which is
+`OrderedDictionary.IndexOf` answers with an `Optional<nuint>` (§2.8.1), which is
 the one that needs no rule to be remembered.
 
 Alongside the containers are `Largest`, `Smallest`, `IndexOf` and `Sort`, each
@@ -2516,6 +2605,10 @@ public interface IAction<T>    { void Run(T value); }
 public interface IFold<A, T>   { A Apply(A total, T value); }
 public interface IComparer<T>  { int Compare(T left, T right); }
 ```
+
+These five are declared in `Standard` rather than here, so they need no import:
+they are what §2.15 says a lambda may become, rather than anything a collection
+owns, and `Optional.Map` (§2.8.1) wants them too.
 
 ```csharp
 var adults = Filter(people, p => p.Age >= 18);

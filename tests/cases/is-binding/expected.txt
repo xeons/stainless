@@ -1,0 +1,26 @@
+number 2.5
+bool true
+pair 3,4
+null
+call 9
+call none
+local 3
+local 0.5
+local none
+chain bool false
+chain number -1
+chain other
+sum=42
+dog says woof
+animal says ...
+puppy woof
+not a puppy
+not a puppy
+link -1
+link 2
+holder
+kept
+~Tracked(kept)
+(none)
+held
+walk 1.3

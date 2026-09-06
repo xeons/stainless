@@ -169,6 +169,14 @@ if (shape.Circle) { return shape.Radius; }   // fine
 return shape.Radius;                         // error[SL0286]
 ```
 
+A field or a call result carries no proof — either could be a different value
+by the time the payload is read — so `is` puts what a test found under a name,
+evaluating the thing tested once:
+
+```csharp
+if (node.Payload is Circle c) { return c.Radius; }
+```
+
 Reference counting asks the tag too. A case may hold a `String`, a class or an
 array; copying the variant retains what the case actually present holds, and
 dropping it releases the same. The bytes of a case that is not there are never
@@ -624,6 +632,8 @@ shape.Name();                           // "square" -- three loads and a call
 if (shape is Square) {
     Square square = (Square)shape;      // checked; there is no exception to throw
 }
+
+if (shape is Square square) { ... }     // or once, named where it holds
 ```
 
 C#'s model: one base class, any number of interfaces, and `virtual`,
@@ -1194,6 +1204,11 @@ Everything below is covered by [the test suite](tests/cases).
   return and a `switch`. Only for a local or a parameter, and never for a
   `weak C?`, which may die between the check and the use; an assignment takes
   the proof away, and so does one anywhere in a loop body
+- `is` with a name — `if (node.Payload is Circle c)`, for a variant's case or a
+  class — which is how a field or a call result gets at what a test found. The
+  value is evaluated once and the name is in scope where the test succeeded.
+  Over a `C?` it asks about the null and the class at once, so
+  `if (node.Next is Node n)` is the narrowing a field could not have
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
@@ -1444,12 +1459,15 @@ Everything below is covered by [the test suite](tests/cases).
   what the constructor chose. Arrays and collections are left out of the
   mapping: the field tables record that a field is an array and nothing about
   its elements, so a type holding one wants the document layer
-- `Option<T>`, a variant in `Standard`: a value or none, for the types `T?`
+- `Optional<T>`, a variant in `Standard`: a value or none, for the types `T?`
   cannot describe. `C?` is a nullable reference and costs nothing, but a value
   type has no spare bit to be null with — so `nuint?` is refused and this is
   what `IndexOf` answers with instead of a magic number. Not a second meaning
   for `?`: a pointer for a class and a tagged pair for a value would have been
-  two representations behind one spelling
+  two representations behind one spelling. It reads like Java's — `HasValue`,
+  `IsEmpty`, `Get`, `ValueOr`, `Or`, `Map`, `FlatMap`, `Filter`, `IfPresent` —
+  over machinery that is all variant: `if (found is Some at)` is what every one
+  of them is written in terms of
 - `OrderedDictionary<K, V>`: a dictionary that keeps the order its keys were
   added in, found by scanning rather than hashing. For wherever the order is
   part of the data — a parsed document read back the way it was written — and
@@ -1565,15 +1583,18 @@ Being straight about the edges, roughly in the order they are worth adding:
   as a `C` (§2.5), on the same terms a variant is narrowed — but only for a
   local or a parameter, because a field or a call result may be a different
   value by the time it is read. `if (node.Next != null) { node.Next.Value }` is
-  refused, and a local is both the fix and what the code meant.
+  refused, and a local is both the fix and what the code meant. `is` with a
+  name is the other fix and reads better: `if (node.Payload is Circle c)` for a
+  variant's case, `if (node.Next is Node n)` for a `C?` — the value is taken
+  once, so there is nothing to prove about a second read.
 - **Inheritance stops at a library boundary.** A class from a referenced
   library can be held, called, tested with `is` and cast back to — the base
   relation and every virtual slot cross in the metadata — but it cannot be
   derived from (SL0513). The layout is compiled there and the derived class's
   dispatch table would be built here.
-- **There is no `as`, and no covariant return.** `as` would produce a `C?`,
-  which is now worth having — flow narrowing arrived and `is` plus a cast is
-  two tests where one would do. An override returns exactly what it overrides
+- **There is no `as`, and no covariant return.** `is C c` now covers the case
+  `as` is usually reached for; what is left is wanting the answer as a value
+  rather than as a branch. An override returns exactly what it overrides
   (SL0502).
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it

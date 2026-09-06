@@ -1710,7 +1710,19 @@ public sealed class Parser
             if (At(TokenKind.IsKeyword) && TypeTestPrecedence >= minPrecedence)
             {
                 Advance();
-                left = new TypeTestSyntax(SpanFrom(start), left, ParseType());
+                var tested = ParseType();
+
+                // `x is Circle c` names what the test found. Nothing else in
+                // the grammar puts an identifier straight after an expression,
+                // so no lookahead is needed to tell the two apart.
+                if (At(TokenKind.Identifier))
+                {
+                    var name = Advance();
+                    left = new TypeTestSyntax(
+                        SpanFrom(start), left, tested, name.Text, name.Span);
+                }
+                else left = new TypeTestSyntax(SpanFrom(start), left, tested);
+
                 continue;
             }
 

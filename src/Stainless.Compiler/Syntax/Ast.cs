@@ -671,10 +671,22 @@ public sealed record BaseSyntax(SourceSpan Span) : ExpressionSyntax(Span);
 /// base chain and for an interface by looking in its dispatch table, and it is
 /// how a downcast is made safe -- there being no exception for one to throw.
 /// </summary>
+/// <param name="Binding">
+/// The name in <c>value is Circle c</c>, or null when the test only asks. It is
+/// in scope where the test succeeded and nowhere else, which is why it is
+/// carried here rather than being a declaration of its own: the statement that
+/// declares it is built by whatever the condition belongs to.
+/// </param>
 public sealed record TypeTestSyntax(
     SourceSpan Span,
     ExpressionSyntax Value,
-    TypeSyntax Tested) : ExpressionSyntax(Span);
+    TypeSyntax Tested,
+    string? Binding,
+    SourceSpan BindingSpan) : ExpressionSyntax(Span)
+{
+    public TypeTestSyntax(SourceSpan span, ExpressionSyntax value, TypeSyntax tested)
+        : this(span, value, tested, null, span) { }
+}
 
 public sealed record MemberAccessSyntax(
     SourceSpan Span,

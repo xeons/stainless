@@ -147,9 +147,10 @@ shell's half is written. In rough order of what a program actually wants:
 
 ### An `as` operator
 
-`as` produces a `C?` where a cast produces a `C` or ends the program. Now
-worth having: flow narrowing arrived (§2.5), so the result of one is usable,
-and `if (x is C) { var c = (C)x; }` is two tests where one would do.
+`as` produces a `C?` where a cast produces a `C` or ends the program. Smaller
+than it was: `if (x is C c)` now covers the branching case, so what is left is
+wanting the answer as a value — passing it on, storing it, or a chain of them
+where an `if` per step reads badly.
 
 *Touches:* `Parser`, `Binder.BindTypeTest`, `LlvmEmitter.EmitConversion`.
 
@@ -164,6 +165,13 @@ What would make it sound for a field is knowing that nothing between the check
 and the use could have written it, which is a real analysis rather than a
 lookup: any call, any `ref`, any store through a pointer takes the proof away.
 Worth doing only if the local turns out to be a genuine irritation in practice.
+
+There is now a way to say it where the type can be named: `if (node.Payload is
+Circle c)` for a variant's case, and `if (node.Next is Node n)` for a `C?`,
+which asks about the null and the class at once. Both take the value once and
+name what the test found, so the field is read exactly where it was checked.
+What is still missing is the plain `if (node.Next != null)` reading as a
+narrowing -- and that is the analysis above, not a shape.
 
 *Touches:* `Binder.NarrowableSubject`, `Binder.InvalidateVariantFact`.
 

@@ -105,7 +105,7 @@ public class JsonObject {
 
     /// Where a name is, or `None`. One lookup rather than the two that asking
     /// whether it is there and then asking for it would cost.
-    public Option<nuint> IndexOf(String name) { return members.IndexOf(name); }
+    public Optional<nuint> IndexOf(String name) { return members.IndexOf(name); }
 
     public bool Has(String name) { return members.Has(name); }
 
@@ -149,60 +149,48 @@ public JsonValue NumberOf(long value) { return JsonValue.Number((double)value); 
 
 // The readers below answer with a default rather than a failure, because the
 // case has already been established by anyone who cared: a program that wants
-// to know writes `switch`, and one that wants a value with a fallback writes
-// this.
+// to know switches, and one that wants a value with a fallback writes this.
+//
+// Each is a tag test rather than a switch, which is the short form §2.6
+// describes: `value.Text` asks the tag, and inside the `if` the compiler has
+// established the case, so the field that case carries is readable under its
+// own name. A `switch` with one arm and a `default` says the same thing in
+// twice the lines.
 
 /// The text of a `Text`, or the fallback for anything else.
 public String TextOr(JsonValue value, String fallback) {
-    switch (value) {
-        case Text held: return held.Value;
-        default: return fallback;
-    }
+    if (value.Text) { return value.Value; }
+    return fallback;
 }
 
 public double NumberOr(JsonValue value, double fallback) {
-    switch (value) {
-        case Number held: return held.Value;
-        default: return fallback;
-    }
+    if (value.Number) { return value.Value; }
+    return fallback;
 }
 
 public long IntegerOr(JsonValue value, long fallback) {
-    switch (value) {
-        case Number held: return (long)held.Value;
-        default: return fallback;
-    }
+    if (value.Number) { return (long)value.Value; }
+    return fallback;
 }
 
 public bool BoolOr(JsonValue value, bool fallback) {
-    switch (value) {
-        case Bool held: return held.Value;
-        default: return fallback;
-    }
+    if (value.Bool) { return value.Value; }
+    return fallback;
 }
 
 /// True for the one case that carries nothing.
-public bool IsNull(JsonValue value) {
-    switch (value) {
-        case Null: return true;
-        default: return false;
-    }
-}
+public bool IsNull(JsonValue value) { return value.Null; }
 
 /// The members of an `Object`, or an empty one.
 public JsonObject MembersOf(JsonValue value) {
-    switch (value) {
-        case Object held: return held.Members;
-        default: return new JsonObject();
-    }
+    if (value.Object) { return value.Members; }
+    return new JsonObject();
 }
 
 /// The elements of an `Array`, or an empty list.
 public List<JsonValue> ItemsOf(JsonValue value) {
-    switch (value) {
-        case Array held: return held.Items;
-        default: return new List<JsonValue>();
-    }
+    if (value.Array) { return value.Items; }
+    return new List<JsonValue>();
 }
 
 // ------------------------------------------------------------------ parsing
@@ -913,13 +901,10 @@ public JsonError PopulateFrom<T>(T value, JsonValue document) {
     var type = typeof(T);
     if (type.FieldCount() == 0u) { return JsonError.NotReflected; }
 
-    switch (document) {
-        case Object held:
-            FillInstance((byte*)value, type, held.Members);
-            return JsonError.None;
-        default:
-            return JsonError.NotAnObject;
-    }
+    if (!document.Object) { return JsonError.NotAnObject; }
+
+    FillInstance((byte*)value, type, document.Members);
+    return JsonError.None;
 }
 
 // There is no `Deserialize<T>(String)` returning a fresh `T`, and it is worth
@@ -937,9 +922,10 @@ void FillInstance(byte* instance, Type type, JsonObject members) {
 
         if (!Represents(field)) { continue; }
 
-        switch (members.IndexOf(NameOf(field))) {
-            case Some at: FillField(instance, field, members.ValueAt(at.Value)); break;
-            case None:    break;
+        // A call result cannot carry a narrowing -- it could answer
+        // differently the second time -- so the name is what holds it.
+        if (members.IndexOf(NameOf(field)) is Some at) {
+            FillField(instance, field, members.ValueAt(at.Value));
         }
     }
 }
@@ -948,34 +934,22 @@ void FillField(byte* instance, Field field, JsonValue value) {
     int kind = field.Kind();
 
     if (kind == KindString) {
-        switch (value) {
-            case Text held: Reflection.WriteText(instance, field, held.Value); break;
-            default: break;
-        }
+        if (value.Text) { Reflection.WriteText(instance, field, value.Value); }
         return;
     }
 
     if (kind == KindBool) {
-        switch (value) {
-            case Bool held: Reflection.WriteBool(instance, field, held.Value); break;
-            default: break;
-        }
+        if (value.Bool) { Reflection.WriteBool(instance, field, value.Value); }
         return;
     }
 
     if (field.IsFloating()) {
-        switch (value) {
-            case Number held: Reflection.WriteDouble(instance, field, held.Value); break;
-            default: break;
-        }
+        if (value.Number) { Reflection.WriteDouble(instance, field, value.Value); }
         return;
     }
 
     if (field.IsInteger()) {
-        switch (value) {
-            case Number held: Reflection.WriteInteger(instance, field, (long)held.Value); break;
-            default: break;
-        }
+        if (value.Number) { Reflection.WriteInteger(instance, field, (long)value.Value); }
         return;
     }
 
@@ -990,10 +964,7 @@ void FillField(byte* instance, Field field, JsonValue value) {
 
         if (nested == null) { return; }
 
-        switch (value) {
-            case Object held: FillInstance(nested, field.TypeOf(), held.Members); break;
-            default: break;
-        }
+        if (value.Object) { FillInstance(nested, field.TypeOf(), value.Members); }
         return;
     }
 
@@ -1011,53 +982,28 @@ void FillField(byte* instance, Field field, JsonValue value) {
 void FillArray(byte* instance, Field field, JsonValue value) {
     byte* array = Reflection.ReadArray(instance, field);
     if (array == null) { return; }
+    if (!value.Array) { return; }
 
-    switch (value) {
-        case Array held:
-            nuint length = Reflection.ArrayLength(array);
-            int kind = field.ElementKind();
+    nuint length = Reflection.ArrayLength(array);
+    int kind = field.ElementKind();
 
-            for (nuint i = 0u; i < held.Items.Count() && i < length; i = i + 1u) {
-                byte* at = Reflection.ElementAt(array, field, i);
-                var item = held.Items.At(i);
+    for (nuint i = 0u; i < value.Items.Count() && i < length; i = i + 1u) {
+        byte* at = Reflection.ElementAt(array, field, i);
+        var item = value.Items.At(i);
 
-                if (kind == KindString) {
-                    switch (item) {
-                        case Text text: Reflection.WriteTextAt(at, text.Value); break;
-                        default: break;
-                    }
-                } else if (kind == KindBool) {
-                    switch (item) {
-                        case Bool flag: Reflection.WriteBoolAt(at, flag.Value); break;
-                        default: break;
-                    }
-                } else if (kind == KindFloat || kind == KindDouble) {
-                    switch (item) {
-                        case Number n: Reflection.WriteDoubleAt(at, field, n.Value); break;
-                        default: break;
-                    }
-                } else if (kind == KindClass || kind == KindStruct) {
-                    byte* nested = Reflection.ReadAggregateAt(at, field);
-                    if (nested != null) {
-                        switch (item) {
-                            case Object held2:
-                                FillInstance(nested, field.ElementType(), held2.Members);
-                                break;
-                            default: break;
-                        }
-                    }
-                } else {
-                    switch (item) {
-                        case Number n:
-                            Reflection.WriteIntegerAt(at, field, (long)n.Value);
-                            break;
-                        default: break;
-                    }
-                }
+        if (kind == KindString) {
+            if (item.Text) { Reflection.WriteTextAt(at, item.Value); }
+        } else if (kind == KindBool) {
+            if (item.Bool) { Reflection.WriteBoolAt(at, item.Value); }
+        } else if (kind == KindFloat || kind == KindDouble) {
+            if (item.Number) { Reflection.WriteDoubleAt(at, field, item.Value); }
+        } else if (kind == KindClass || kind == KindStruct) {
+            byte* nested = Reflection.ReadAggregateAt(at, field);
+            if (nested != null) {
+                if (item.Object) { FillInstance(nested, field.ElementType(), item.Members); }
             }
-            break;
-
-        default:
-            break;
+        } else {
+            if (item.Number) { Reflection.WriteIntegerAt(at, field, (long)item.Value); }
+        }
     }
 }

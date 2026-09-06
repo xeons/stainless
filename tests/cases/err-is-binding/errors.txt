@@ -1,0 +1,9 @@
+# Four places a name after `is` has no branch to be true in,
+# a case that carries nothing, an interface, and a name that is no case at all.
+SL0585
+SL0585
+SL0585
+SL0585
+SL0586
+SL0587
+SL0518

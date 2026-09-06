@@ -64,6 +64,39 @@ public variant Result<T, E> {
     }
 }
 
+// --------------------------------------------------------- shapes of work
+
+// A lambda takes its type from what it is assigned to, and an interface with
+// exactly one method is one of the two things it may become (§2.15). These are
+// the shapes worth naming once: they are what a lambda becomes rather than
+// anything a collection owns, which is why they live here and need no import.
+
+/// Turns a T into an R. The transform half of `Map`.
+public interface IFunc<T, R> { R Apply(T value); }
+
+/// Answers a question about a T.
+public interface IPredicate<T> { bool Test(T value); }
+
+/// Does something with a T and returns nothing.
+public interface IAction<T> { void Run(T value); }
+
+/// Folds one T into a running A. Two parameters rather than one, because a
+/// fold is the one shape that carries something along with it.
+public interface IFold<A, T> { A Apply(A total, T value); }
+
+/// Orders two Ts: negative if `left` comes first, positive if `right` does,
+/// zero if neither.
+///
+/// This is what lets a type be sorted more than one way, and what lets a type
+/// that implements no interface be sorted at all.
+public interface IComparer<T> { int Compare(T left, T right); }
+
+// ---------------------------------------------------------- a value, or not
+
+/// Aborts with a message. The same call a container makes when it is asked for
+/// something it does not have.
+extern "C" void sl_fail(byte* message);
+
 /// A value, or none -- for the types `T?` cannot describe.
 ///
 /// `C?` is a nullable reference: the null is the pointer, so it costs nothing
@@ -76,25 +109,47 @@ public variant Result<T, E> {
 /// beside the value and nothing else: no allocation, and the payload is only
 /// read where the compiler has established the case.
 ///
-///     switch (map.IndexOf(key)) {
-///         case Some found: return values.At(found.Value);
-///         case None:       return fallback;
-///     }
+///     if (map.IndexOf(key) is Some found) { return values.At(found.Value); }
+///     return fallback;
 ///
 /// **Not a replacement for `C?`.** A nullable reference stays what it is: the
 /// representation is already free there, and `if (c != null)` narrows without
-/// a case to name. This is for everything a null pointer cannot say.
-public variant Option<T> {
+/// a case to name. This is for everything a null pointer cannot say -- which
+/// is also why the names differ: `Optional<T>` is this type, and "an optional"
+/// is what the spec calls `C?`.
+public variant Optional<T> {
     None;
     Some(T Value);
 
     /// True when there is a value. The reader for a caller that is about to
-    /// ask a second question anyway; `switch` is the one that gets at it.
+    /// ask a second question anyway; `is Some x` is the one that gets at it.
     public bool HasValue() {
-        switch (this) {
-            case Some: return true;
-            case None: return false;
-        }
+        if (this is Some) { return true; }
+        return false;
+    }
+
+    /// True when there is not. The same question the other way round, because
+    /// `!x.HasValue()` reads worse than the thing it means.
+    public bool IsEmpty() {
+        if (this is Some) { return false; }
+        return true;
+    }
+
+    /// The value, aborting when there is none.
+    ///
+    /// The bargain `Dictionary.Get` and an array index make: asking for
+    /// something that is not there is a mistake in the caller rather than a
+    /// value to return. Use `ValueOr` where a miss is ordinary, and
+    /// `is Some x` where the answer decides what happens next.
+    public T Get() {
+        if (this is Some held) { return held.Value; }
+
+        sl_fail("Optional.Get: there is no value");
+
+        // Unreachable: `sl_fail` ends the program. An `extern` cannot say so
+        // here, and there is no `default(T)` to name instead, so the tail is
+        // the one expression of type T that costs nothing to write.
+        return Get();
     }
 
     /// The value if there is one, and `fallback` if there is not.
@@ -102,9 +157,48 @@ public variant Option<T> {
     /// The reader that needs no proof, because it supplies its own -- the same
     /// bargain `Result.ValueOr` makes.
     public T ValueOr(T fallback) {
-        switch (this) {
-            case Some some: return some.Value;
-            case None:      return fallback;
+        if (this is Some held) { return held.Value; }
+        return fallback;
+    }
+
+    /// This one if it holds anything, and `other` if it does not.
+    ///
+    /// `other` is a value rather than something that produces one on demand.
+    /// A lambda would allocate a closure to save an evaluation, which is the
+    /// wrong way round at the sizes this is used at.
+    public Optional<T> Or(Optional<T> other) {
+        if (this is Some) { return this; }
+        return other;
+    }
+
+    /// The value put through `transform`, or none.
+    ///
+    ///     Optional<String> name = found.Map(i => people.At(i).Name);
+    ///
+    /// The transform runs only where there is something to run it on, which is
+    /// the point: it is the `if` that would otherwise be written by hand.
+    public Optional<R> Map<R>(IFunc<T, R> transform) {
+        if (this is Some held) { return Some(transform.Apply(held.Value)); }
+        return None;
+    }
+
+    /// `Map` for a transform that answers with an optional of its own, which
+    /// would otherwise nest one inside the other.
+    public Optional<R> FlatMap<R>(IFunc<T, Optional<R>> transform) {
+        if (this is Some held) { return transform.Apply(held.Value); }
+        return None;
+    }
+
+    /// This one when it holds something `keep` accepts, and none otherwise.
+    public Optional<T> Filter(IPredicate<T> keep) {
+        if (this is Some held) {
+            if (keep.Test(held.Value)) { return this; }
         }
+        return None;
+    }
+
+    /// Runs `action` on the value, if there is one.
+    public void IfPresent(IAction<T> action) {
+        if (this is Some held) { action.Run(held.Value); }
     }
 }

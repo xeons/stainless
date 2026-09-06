@@ -324,6 +324,28 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// The two names <c>x is Case n</c> needs, on their way to the statements
+    /// that will declare them.
+    ///
+    /// A binding is only meaningful where the test succeeded, so nothing here
+    /// is a declaration yet: the <see cref="Spills"/> are declared around the
+    /// <c>if</c> -- they hold the thing tested, evaluated once -- and the
+    /// <see cref="Bindings"/> at the top of the branch the test proved. That
+    /// is also why the form is the whole of a condition and not part of one:
+    /// under a <c>&amp;&amp;</c> the spill would run when the test did not.
+    /// </summary>
+    private sealed class PatternScope
+    {
+        public List<BoundStatement> Spills { get; } = [];
+
+        public List<(string Name, TypeSymbol Type, SourceSpan Span, BoundExpression Value)>
+            Bindings { get; } = [];
+    }
+
+    /// <summary>Non-null only while the whole condition of an `if` is being bound.</summary>
+    private PatternScope? _patterns;
+
+    /// <summary>
     /// The declaration a narrowed fact can be attached to.
     ///
     /// Only a plain local or parameter qualifies. A field or a call result is
@@ -735,13 +757,23 @@ public sealed partial class Binder
 
     private BoundStatement BindIf(IfSyntax syntax)
     {
+        // A binding is offered only where one can be given a scope, which is
+        // the whole of a condition. Parentheses are not a node here, so
+        // `if ((x is Circle c))` arrives as the test itself and works too.
+        var outer = _patterns;
+        _patterns = syntax.Condition is TypeTestSyntax ? new PatternScope() : null;
+
         var condition = BindCondition(syntax.Condition);
+
+        var patterns = _patterns;
+        _patterns = outer;
+
         var (whenTrue, whenFalse) = ConditionFacts(condition);
 
         var entry = SnapshotFacts();
 
         ApplyFacts(whenTrue);
-        var then = BindStatement(syntax.Then);
+        var then = BindPatternBranch(patterns, syntax.Then);
 
         _variantFacts = new Dictionary<object, Fact>(entry);
         ApplyFacts(whenFalse);
@@ -759,7 +791,41 @@ public sealed partial class Binder
         if (thenExits && !elseExits) ApplyFacts(whenFalse);
         else if (elseExits && !thenExits) ApplyFacts(whenTrue);
 
-        return new BoundIf(syntax.Span, condition, then, otherwise);
+        BoundStatement result = new BoundIf(syntax.Span, condition, then, otherwise);
+
+        // The thing tested is evaluated once, before the test, so its name is
+        // declared around the whole `if` rather than inside either branch.
+        return patterns is null || patterns.Spills.Count == 0
+            ? result
+            : new BoundBlock(syntax.Span, [.. patterns.Spills, result]);
+    }
+
+    /// <summary>
+    /// The branch a test proved, with what it found declared at the top of it.
+    ///
+    /// The declarations go here rather than beside the spill because this is
+    /// the only place they are true: reading a case's payload where the tag
+    /// says something else would be reading one type's bytes as another, and
+    /// for a payload holding a reference it would be retaining a value that
+    /// was never there.
+    /// </summary>
+    private BoundStatement BindPatternBranch(PatternScope? patterns, StatementSyntax body)
+    {
+        if (patterns is null || patterns.Bindings.Count == 0) return BindStatement(body);
+
+        PushScope();
+
+        var statements = new List<BoundStatement>();
+        foreach (var (name, type, span, value) in patterns.Bindings)
+        {
+            var local = DeclareLocal(name, type, isConst: true, span);
+            statements.Add(new BoundLocalDeclaration(span, local, value));
+        }
+
+        statements.Add(BindStatement(body));
+
+        PopScope();
+        return new BoundBlock(body.Span, statements);
     }
 
     private BoundStatement BindWhile(WhileSyntax syntax)
