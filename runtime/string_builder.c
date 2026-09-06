@@ -180,3 +180,21 @@ void *sl_string_builder_to_string(void *pointer)
     SlStringBuilder *builder = (SlStringBuilder *)pointer;
     return sl_string_from_bytes(builder->bytes, builder->length);
 }
+
+/*
+ * One byte, for a scanner appending what it just looked at. The builder holds
+ * bytes, so nothing here validates: a caller writing half a character has
+ * written half a character, exactly as sl_string_builder_append_bytes lets it.
+ */
+void sl_string_builder_append_byte(void *pointer, uint8_t value)
+{
+    sl_string_builder_append_bytes(pointer, &value, 1);
+}
+
+/* One code point, encoded. */
+void sl_string_builder_append_char(void *pointer, uint32_t codePoint)
+{
+    uint8_t bytes[4];
+    size_t  length = sl_utf8_encode(codePoint, bytes);
+    sl_string_builder_append_bytes(pointer, bytes, length);
+}

@@ -160,7 +160,8 @@ public sealed partial class LlvmEmitter
 
                 return $"%SlFieldInfo {{ ptr {InternBytes(field.Name)}, " +
                        $"i64 {fieldBase + field.Offset}, i32 {(int)KindOf(field.Type)}, " +
-                       $"ptr {NestedTypeInfo(field.Type)}, {attributes} }}";
+                       $"ptr {NestedTypeInfo(field.Type)}, {attributes}, " +
+                       $"{ElementColumns(field.Type)} }}";
             }).ToList();
 
             string body = string.Join(", ", rows);
@@ -172,6 +173,28 @@ public sealed partial class LlvmEmitter
         string typeAttributes = AttributeTable(type.Attributes);
 
         return $"i64 {reflected.Count}, ptr {fields}, {typeAttributes}";
+    }
+
+    /// <summary>
+    /// What an array field's elements are: their kind, their type when they
+    /// have one, and their stride.
+    ///
+    /// Zeroed for everything else. The stride is what makes a walk over an
+    /// array possible without knowing the element type at compile time -- the
+    /// address of the data plus this, times the index -- and it is the reason
+    /// this is three columns rather than the two a field already had.
+    ///
+    /// A slice is deliberately not included. It is three words rather than a
+    /// reference, so an element of one is not reached the way this describes,
+    /// and answering as though it were would be worse than answering nothing.
+    /// </summary>
+    private static string ElementColumns(TypeSymbol type)
+    {
+        if (type is not ArrayTypeSymbol array) return "i32 0, ptr null, i64 0";
+
+        return $"i32 {(int)KindOf(array.Element)}, " +
+               $"ptr {NestedTypeInfo(array.Element)}, " +
+               $"i64 {array.Element.Size}";
     }
 
     /// <summary>Emits an attribute table and returns its count-and-pointer pair.</summary>
@@ -226,9 +249,17 @@ public sealed partial class LlvmEmitter
 
     private string NextMetadataName(string hint) => $".meta.{hint}.{_nextMetadata++}";
 
-    /// <summary>The TypeInfo a field's own type points at, when it has one.</summary>
+    /// <summary>
+    /// The TypeInfo a field's own type points at, when it has one.
+    ///
+    /// An optional is unwrapped, because <see cref="KindOf"/> unwraps one too:
+    /// a `C?` field reports kind Class, and reporting no type beside that
+    /// said the field held a class of no type -- which is what stopped a
+    /// serializer walking into one.
+    /// </summary>
     private static string NestedTypeInfo(TypeSymbol type) => type switch
     {
+        OptionalTypeSymbol optional => NestedTypeInfo(optional.Element),
         StructTypeSymbol { IsReflected: true } structType => TypeInfoOf(structType),
         ClassTypeSymbol { IsIntrinsic: false } classType => TypeInfoOf(classType),
         _ => "null",

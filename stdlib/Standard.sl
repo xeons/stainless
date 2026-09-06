@@ -63,3 +63,48 @@ public variant Result<T, E> {
         }
     }
 }
+
+/// A value, or none -- for the types `T?` cannot describe.
+///
+/// `C?` is a nullable reference: the null is the pointer, so it costs nothing
+/// and the compiler narrows it. A value type has no spare bit to be null with,
+/// so `nuint?` is refused (SL0271), and what stood in was a magic number --
+/// `IndexOf` answering with the largest `nuint` there is and every caller
+/// agreeing to read that as "not there".
+///
+/// This is that, said properly. It is an ordinary variant, so it costs a tag
+/// beside the value and nothing else: no allocation, and the payload is only
+/// read where the compiler has established the case.
+///
+///     switch (map.IndexOf(key)) {
+///         case Some found: return values.At(found.Value);
+///         case None:       return fallback;
+///     }
+///
+/// **Not a replacement for `C?`.** A nullable reference stays what it is: the
+/// representation is already free there, and `if (c != null)` narrows without
+/// a case to name. This is for everything a null pointer cannot say.
+public variant Option<T> {
+    None;
+    Some(T Value);
+
+    /// True when there is a value. The reader for a caller that is about to
+    /// ask a second question anyway; `switch` is the one that gets at it.
+    public bool HasValue() {
+        switch (this) {
+            case Some: return true;
+            case None: return false;
+        }
+    }
+
+    /// The value if there is one, and `fallback` if there is not.
+    ///
+    /// The reader that needs no proof, because it supplies its own -- the same
+    /// bargain `Result.ValueOr` makes.
+    public T ValueOr(T fallback) {
+        switch (this) {
+            case Some some: return some.Value;
+            case None:      return fallback;
+        }
+    }
+}

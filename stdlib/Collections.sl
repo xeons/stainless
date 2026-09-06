@@ -55,6 +55,8 @@ public interface IHashable {
     nuint HashCode();
 }
 
+
+
 // **A primitive, an enum and a String implement all three without saying so.**
 // None of them can carry a declaration -- a primitive is not a class, an enum
 // is its integer, and String belongs to the runtime -- but they are exactly the
@@ -121,8 +123,14 @@ public class List<T> : IList<T>, IEnumerable<T> {
     T[] items;
     nuint count;
 
+    // One zeroed element to blank a vacated slot with. The language has no
+    // `default(T)`, and `Dictionary` keeps one of these for the same reason:
+    // a slot merely abandoned holds its old reference alive.
+    T[] blank;
+
     public List() {
         items = new T[4];
+        blank = new T[1];
         count = 0;
     }
 
@@ -147,6 +155,35 @@ public class List<T> : IList<T>, IEnumerable<T> {
     public void Set(nuint index, T item) {
         if (index >= count) { sl_array_bounds_fail(index, count); }
         items[index] = item;
+    }
+
+    /// Inserts at a position, moving everything after it up one.
+    ///
+    /// `index == Count()` appends, which is what makes a loop that inserts in
+    /// order need no special case at the end.
+    public void Insert(nuint index, T item) {
+        if (index > count) { sl_array_bounds_fail(index, count); }
+        if (count == items.Length) { Grow(); }
+
+        // Backwards, so a slot is read before the copy that overwrites it.
+        for (nuint i = count; i > index; i = i - 1u) { items[i] = items[i - 1u]; }
+
+        items[index] = item;
+        count = count + 1;
+    }
+
+    /// Removes the item at a position, closing the gap.
+    ///
+    /// The vacated slot is cleared rather than left holding what moved out of
+    /// it: a list of references would otherwise keep the last one alive past
+    /// its removal, which is a leak that only shows up under a profiler.
+    public void RemoveAt(nuint index) {
+        if (index >= count) { sl_array_bounds_fail(index, count); }
+
+        for (nuint i = index; i + 1u < count; i = i + 1u) { items[i] = items[i + 1u]; }
+
+        count = count - 1;
+        items[count] = blank[0u];
     }
 
     public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(this); }
@@ -414,4 +451,99 @@ public void Sort<T>(IList<T> items, IComparer<T> order) {
     Sort(flat, order);
 
     for (nuint i = 0u; i < count; i += 1u) { items.Set(i, flat[i]); }
+}
+
+// ------------------------------------------------------- ordered dictionary
+
+/// A dictionary that remembers the order its keys were added in.
+///
+/// `Dictionary<K, V>` finds a key by hashing and has no order to give back;
+/// this keeps the order and finds a key by scanning. The trade is the whole of
+/// the difference, and it is the right one wherever the order is part of the
+/// data: a parsed document read back the way it was written, a configuration a
+/// person edits, a header list that has to go out as it came in.
+///
+/// **It is a scan.** Lookup is O(n), so this is for the sizes documents
+/// actually are -- a handful of members to a few hundred -- and a program
+/// holding something large enough for that to hurt wants a `Dictionary` beside
+/// it as an index. That is a real limit rather than a temporary one: keeping a
+/// hash index in step with an order would double the storage and every write,
+/// which is not what the collection is for.
+public class OrderedDictionary<K, V> where K : IEquatable<K> {
+    List<K> keys;
+    List<V> values;
+
+    public OrderedDictionary() {
+        keys = new List<K>();
+        values = new List<V>();
+    }
+
+    public nuint Count() { return keys.Count(); }
+
+    /// The key at a position, in insertion order.
+    public K KeyAt(nuint index) { return keys.At(index); }
+
+    /// The value at a position, in insertion order.
+    public V ValueAt(nuint index) { return values.At(index); }
+
+    /// Where a key is, or `None`.
+    ///
+    /// The one lookup a caller needs: asking whether a key is there and then
+    /// asking for its value walks the collection twice. An `Option` rather
+    /// than a sentinel, because a position that means "no position" is a rule
+    /// every caller has to know and none can be made to.
+    public Option<nuint> IndexOf(K key) {
+        for (nuint i = 0u; i < keys.Count(); i = i + 1u) {
+            if (keys.At(i).EqualTo(key)) { return Some(i); }
+        }
+        return None;
+    }
+
+    public bool Has(K key) { return IndexOf(key).HasValue(); }
+
+    /// Appends, without looking for the key first.
+    ///
+    /// A repeated key is kept rather than replaced, because a document that
+    /// contains one said so and dropping either half would be this collection
+    /// deciding what the document meant. `Set` is the one that replaces.
+    public void Add(K key, V value) {
+        keys.Add(key);
+        values.Add(value);
+    }
+
+    /// Replaces the value of a key, or appends it. A replaced key keeps the
+    /// position it had, which is the point of the collection.
+    public void Set(K key, V value) {
+        switch (IndexOf(key)) {
+            case Some at: values.Set(at.Value, value); break;
+            case None:    Add(key, value); break;
+        }
+    }
+
+    /// The value of a key, or the fallback. There is no overload that aborts:
+    /// a caller that wants to know writes `IndexOf`.
+    public V Find(K key, V fallback) {
+        switch (IndexOf(key)) {
+            case Some at: return values.At(at.Value);
+            case None:    return fallback;
+        }
+    }
+
+    /// Removes the first entry with that key, closing the gap. Answers whether
+    /// there was one.
+    public bool Remove(K key) {
+        switch (IndexOf(key)) {
+            case Some at:
+                keys.RemoveAt(at.Value);
+                values.RemoveAt(at.Value);
+                return true;
+            case None:
+                return false;
+        }
+    }
+
+    public void Clear() {
+        keys.Clear();
+        values.Clear();
+    }
 }

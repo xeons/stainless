@@ -68,6 +68,24 @@ extern "C" {
     void   sl_write_reference(byte* instance, byte* field, byte* value);
 
     byte*  sl_type_make(byte* type);
+    void   sl_release(byte* object);
+
+    uint   sl_field_element_kind(byte* field);
+    byte*  sl_field_element_type(byte* field);
+    nuint  sl_field_element_size(byte* field);
+
+    byte*  sl_array_data(byte* array);
+    nuint  sl_array_length(byte* array);
+
+    long   sl_read_at_integer(byte* address, uint kind);
+    double sl_read_at_double(byte* address, uint kind);
+    bool   sl_read_at_bool(byte* address);
+    byte*  sl_read_at_reference(byte* address);
+
+    void   sl_write_at_integer(byte* address, uint kind, long value);
+    void   sl_write_at_double(byte* address, uint kind, double value);
+    void   sl_write_at_bool(byte* address, bool value);
+    void   sl_write_at_text(byte* address, byte* bytes, nuint length);
 }
 
 /// What a field holds. Kept in step with enum SlKind in the runtime.
@@ -185,6 +203,26 @@ public struct Field {
         var kind = Kind();
         return kind == KindClass || kind == KindStruct;
     }
+
+    /// What an array field's elements are. `KindNone` for anything else.
+    public int ElementKind() { return (int)sl_field_element_kind(Handle); }
+
+    /// The type of an array's elements, when they have one.
+    public Type ElementType() {
+        Type result;
+        result.Handle = sl_field_element_type(Handle);
+        return result;
+    }
+
+    /// How far apart an array's elements sit, in bytes. Zero for a field that
+    /// is not an array.
+    public nuint ElementSize() { return sl_field_element_size(Handle); }
+
+    /// True when this field is an array whose elements can be read one by one.
+    ///
+    /// A slice answers false: it is three words rather than a reference, so
+    /// its elements are not where this arithmetic would look.
+    public bool IsArray() { return Kind() == KindArray && ElementSize() > 0u; }
 
     /// True when this field can be walked into: it holds an aggregate, and
     /// that aggregate carries field metadata of its own.
@@ -335,4 +373,107 @@ public byte* Make(Type type) {
 /// theirs.
 public void WriteAggregate(byte* instance, Field field, byte* value) {
     sl_write_reference(instance, field.Handle, value);
+}
+
+/// Makes an object of a class field's own type and stores it in that field,
+/// answering its address. Null when the field is not a class, or its type
+/// carries no metadata.
+///
+/// **The object is zeroed**, so every reference field in it starts null --
+/// including one whose type says it cannot be. That is the whole hazard: an
+/// object made this way is not yet a value of its type, and is only safe once
+/// whatever fills it has filled the fields that may not be null.
+///
+/// It exists because a deserializer holding a document for a nested object,
+/// and a field holding nothing, otherwise has nowhere to put it. Use it where
+/// the document is the thing that decides, and prefer a constructor that made
+/// the object already: `Json.Populate` fills in place and only reaches for
+/// this where a field is marked to say so.
+public byte* MakeInto(byte* instance, Field field) {
+    if (field.Kind() != KindClass) { return null; }
+
+    var inner = field.TypeOf();
+    if (!inner.Exists()) { return null; }
+
+    byte* made = sl_type_make(inner.Handle);
+    if (made == null) { return null; }
+
+    // The field takes a reference of its own; this one was the allocation's,
+    // and letting it go leaves the field the only owner.
+    sl_write_reference(instance, field.Handle, made);
+    sl_release(made);
+    return made;
+}
+
+// ------------------------------------------------------------------- arrays
+
+// An array is a counted object whose elements sit after its header, so
+// reaching one is the data pointer plus a stride. Everything below takes the
+// element's address rather than a field, because an element has no
+// `Field` of its own -- it has a kind and a width, which is what
+// `ElementKind()` and `ElementSize()` are for.
+
+/// The array a field holds, or null. The instance still owns it.
+public byte* ReadArray(byte* instance, Field field) {
+    if (field.Kind() != KindArray) { return null; }
+    return sl_read_reference(instance, field.Handle);
+}
+
+/// How many elements an array has. Zero for null.
+public nuint ArrayLength(byte* array) {
+    if (array == null) { return 0u; }
+    return sl_array_length(array);
+}
+
+/// The address of one element, or null when the array is null or the index is
+/// past its end. Checked rather than trusted: the caller is walking metadata,
+/// and an index that came from a document is not the program's.
+public byte* ElementAt(byte* array, Field field, nuint index) {
+    if (array == null) { return null; }
+    if (index >= sl_array_length(array)) { return null; }
+    return sl_array_data(array) + index * field.ElementSize();
+}
+
+/// Reads an element of a whole-number array.
+public long ReadIntegerAt(byte* address, Field field) {
+    return sl_read_at_integer(address, (uint)field.ElementKind());
+}
+
+public double ReadDoubleAt(byte* address, Field field) {
+    return sl_read_at_double(address, (uint)field.ElementKind());
+}
+
+public bool ReadBoolAt(byte* address) { return sl_read_at_bool(address); }
+
+/// Reads a String element. The array still owns it.
+public String ReadTextAt(byte* address) {
+    var raw = sl_read_at_reference(address);
+    if (raw == null) { return ""; }
+    return Text.FromNullTerminated(raw + 32);
+}
+
+/// The address of an aggregate element: what a class element points at, or
+/// where a struct element sits.
+public byte* ReadAggregateAt(byte* address, Field field) {
+    if (field.ElementKind() == KindStruct) { return address; }
+    if (field.ElementKind() == KindClass || field.ElementKind() == KindInterface) {
+        return sl_read_at_reference(address);
+    }
+    return null;
+}
+
+/// Writes an element of a whole-number array, narrowed to its width.
+public void WriteIntegerAt(byte* address, Field field, long value) {
+    sl_write_at_integer(address, (uint)field.ElementKind(), value);
+}
+
+public void WriteDoubleAt(byte* address, Field field, double value) {
+    sl_write_at_double(address, (uint)field.ElementKind(), value);
+}
+
+public void WriteBoolAt(byte* address, bool value) { sl_write_at_bool(address, value); }
+
+/// Writes a String element, releasing whatever it held.
+public void WriteTextAt(byte* address, String value) {
+    sl_write_at_text(address, value.ToPointer(), value.ByteLength());
 }

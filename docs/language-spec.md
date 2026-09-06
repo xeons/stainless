@@ -2739,14 +2739,23 @@ A value whose JSON type does not fit its field is **skipped**, not converted:
 `{"Years": "40"}` leaves `Years` alone. Guessing at a conversion is how a
 document silently becomes a different one.
 
-**Arrays and collections are left out**, and this is the mapping's real limit.
-A field of type `T[]` is reported as an array and nothing describes its
-elements; a `List<T>` is a class whose own fields are its private storage, so
-walking it finds nothing. Both are omitted from the document rather than
-written as `null` and `{}` — which is what a reader would have believed. A
-type with a collection in it wants the document layer, where a `JsonValue` says
-exactly what is there. Closing this needs element metadata in the field tables
-(§6.7).
+**An array is walked; a `List<T>` is not.** Field metadata describes an
+array's elements (§6.6), so `String[]`, `int[]` and `Point[]` all round-trip.
+A `List<T>` is a class whose own fields are its private storage and whose way
+in is `Add`, which needs method metadata nothing emits — so it is omitted from
+the document rather than written as `{}`, which is what a reader would have
+believed. A type holding one wants the document layer, where a `JsonValue`
+says exactly what is there.
+
+**An array is filled, never replaced.** Its length is the one the constructor
+chose: a document with more elements fills what fits and stops, one with fewer
+leaves the rest alone. Allocating from the document would mean a message
+deciding how much memory to take.
+
+A nested object the constructor left null is skipped, unless the field carries
+`[JsonCreate]` — opt-in per field, because the type is what knows whether an
+object made from a document rather than a constructor is safe. What such an
+object starts as is zeroed, so only the document gives its fields values.
 
 **What XML reads**: elements, attributes, text, CDATA, comments, the five
 predefined entities and numeric character references, and a declaration or
@@ -2909,19 +2918,42 @@ byte* nested = Reflection.ReadAggregate(raw, field);
 Reflection.WriteText(nested, field.TypeOf().FindField("City"), "London");
 ```
 
-`Reflection.Make(type)` allocates a zeroed instance, for a reader that has a
-type and no constructor to call. **Every reference field starts null**,
-including one whose type says it cannot be — so what comes back is safe to fill
-and unsafe to hand out until it has been. `Standard.Json` does not use it, and
-§5.12 says why.
+**An array's elements are described too.** A field of type `T[]` records what
+its elements are and how far apart they sit, which is what makes a walk over
+one possible without knowing `T` at compile time:
+
+```csharp
+byte* array = Reflection.ReadArray(raw, field);
+
+for (nuint i = 0u; i < Reflection.ArrayLength(array); i = i + 1u) {
+    byte* at = Reflection.ElementAt(array, field, i);
+    Console.WriteLine(Reflection.ReadTextAt(at));
+}
+```
+
+`ElementAt` is the data pointer plus the stride times the index, bounds
+checked. The read and write pairs beside it take an address and a kind rather
+than an instance and a field, because an element has no `SlFieldInfo` of its
+own. A **slice** is deliberately not described: it is three words rather than a
+reference, so its elements are not where this arithmetic would look, and
+answering as though they were would be worse than answering nothing.
+
+`Reflection.Make(type)` allocates a zeroed instance and `MakeInto(instance,
+field)` puts one straight into a class field, for a reader that has a document
+and a field holding nothing. **Every reference in what comes back starts
+null**, including one whose type says it cannot be — so it is safe to fill and
+unsafe to hand out until it has been. There is deliberately no cast from
+`byte*` to a typed reference: that would be a hole available everywhere, to
+solve a problem that only exists inside a deserializer.
 
 ### 6.7 What is not there yet
 
-- **No method or interface metadata** — fields only.
+- **No method or interface metadata** — fields and their elements only. It is
+  what stops a reader filling a `List<T>`: the storage is private and the way
+  in is `Add`, which nothing here can call.
 - **No enumeration of types**: `typeof` needs the type named at compile time.
-- **No array or collection element metadata.** A field of type `T[]` is
-  reported as `KindArray` and nothing describes its elements, so a serializer
-  cannot walk one.
+- **No slice element metadata**, for the reason above: a slice is not a reference to
+  its elements.
 
 ## 7. Functions and members
 

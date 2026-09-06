@@ -73,23 +73,26 @@ public class Person {
     }
 }
 
-// What the mapping cannot represent, which it leaves out rather than
-// misstating. An array has no element metadata in the field tables, and a
-// `List<T>` is a class whose own fields are its private storage -- so neither
-// can be walked. Writing `null` for the first and `{}` for the second is what
-// this used to do, and both are things a reader would have believed.
+// An array walks; a `List<T>` still cannot, because its own fields are its
+// private storage and filling one would mean calling `Add`. What cannot be
+// walked is left out rather than misstated -- writing `null` for it says the
+// value was absent when it was not.
 [Reflect]
 public class Bag {
     public String Name;
     public String[] Tags;
     public List<String> More;
     public Plain Untagged;
+    public int[] Counts;
 
     public Bag() {
         Name = "kept";
-        Tags = new String[1];
+        Tags = new String[2];
         More = new List<String>();
         Untagged = new Plain();
+        Counts = new int[2];
+        Tags[0u] = "";
+        Tags[1u] = "";
     }
 }
 
@@ -206,9 +209,20 @@ public int Main() {
         + Text.FromInteger((long)made.Years) + "/[" + made.Where.City + "]");
 
     var bag = new Bag();
-    bag.Tags[0u] = "ignored";
-    bag.More.Add("ignored");
-    Say("unrepresentable", Json.Serialize(bag));
+    bag.Tags[0u] = "walked";
+    bag.More.Add("not walked");
+    Say("arrays", Json.Serialize(bag));
+
+    // Read back into an array the object already has. A document with more
+    // elements than the array fills what fits; one with fewer leaves the rest.
+    var filled = new Bag();
+    Json.Populate(filled, "{\"Tags\":[\"one\",\"two\",\"three\"]}");
+    Say("array-longer", Json.Serialize(filled));
+
+    var shorter = new Bag();
+    shorter.Tags[0u] = "kept";
+    Json.Populate(shorter, "{\"Tags\":[]}");
+    Say("array-shorter", Json.Serialize(shorter));
 
     return 0;
 }

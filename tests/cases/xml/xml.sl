@@ -63,6 +63,10 @@ public class Settings {
 
     public Endpoint Primary;
 
+    // An array is repeated children of one name, which is how XML says a
+    // sequence.
+    public String[] Hosts;
+
     public Settings() {
         Environment = "";
         Version = 0;
@@ -72,6 +76,9 @@ public class Settings {
         Retries = 0;
         Internal = 77;
         Primary = new Endpoint();
+        Hosts = new String[2];
+        Hosts[0u] = "";
+        Hosts[1u] = "";
     }
 }
 
@@ -186,6 +193,16 @@ public int Main() {
     Say("wrong-type", Text.FromInteger((long)typed.Retries));
 
     Say("bad-document", Xml.Describe(Xml.Populate(partial, "<a>")));
+
+    // Arrays, out and back.
+    var listed = new Settings();
+    listed.Hosts[0u] = "one";
+    listed.Hosts[1u] = "two";
+    Say("array-out", Xml.Serialize(listed, "settings"));
+
+    var read = new Settings();
+    Xml.Populate(read, "<settings><Hosts>a</Hosts><Hosts>b</Hosts><Hosts>c</Hosts></settings>");
+    Say("array-in", read.Hosts[0u] + "/" + read.Hosts[1u]);
 
     return 0;
 }

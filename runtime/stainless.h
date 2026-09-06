@@ -113,6 +113,22 @@ typedef struct SlFieldInfo {
     const SlTypeInfo  *type;        /* for aggregates; NULL for primitives */
     size_t             attributeCount;
     const SlAttribute *attributes;
+
+    /*
+     * What an array's elements are, for a field of kind SL_KIND_ARRAY. Zero,
+     * NULL and zero for everything else.
+     *
+     * Appended rather than inserted, as `base` and `vtable` were to
+     * SlTypeInfo: every offset already issued keeps meaning what it meant, so
+     * a library compiled before this still reads correctly.
+     *
+     * `elementSize` is the stride, which is what makes indexing possible
+     * without knowing the element type at compile time -- a walk over an array
+     * is the address of its data plus this, times the index.
+     */
+    uint32_t           elementKind;
+    const SlTypeInfo  *elementType;
+    size_t             elementSize;
 } SlFieldInfo;
 
 struct SlTypeInfo {
@@ -326,6 +342,12 @@ SL_API uint8_t  *sl_string_data(SlString *string);
 SL_API SlString *sl_string_new(size_t byteLength);
 
 SL_API void  *sl_string_from_bytes(const uint8_t *data, size_t byteLength);
+
+/*
+ * One code point as UTF-8, into a caller's buffer of at least four bytes,
+ * answering how many it wrote. Anything that is not a scalar becomes U+FFFD.
+ */
+SL_API size_t sl_utf8_encode(uint32_t codePoint, uint8_t *into);
 SL_API void  *sl_string_from_null_terminated(const char *text);
 SL_API void  *sl_string_from_integer(long long value);
 SL_API void  *sl_string_from_double(double value);
@@ -492,6 +514,8 @@ SL_API extern const SlTypeInfo sl_string_builder_type_info;
 SL_API void  *sl_string_builder_new(void);
 SL_API void   sl_string_builder_append(void *pointer, void *stringPointer);
 SL_API void   sl_string_builder_append_line(void *pointer, void *stringPointer);
+SL_API void   sl_string_builder_append_byte(void *builder, uint8_t value);
+SL_API void   sl_string_builder_append_char(void *builder, uint32_t codePoint);
 SL_API void   sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t byteLength);
 SL_API void   sl_string_builder_append_integer(void *pointer, long long value);
 SL_API void   sl_string_builder_append_double(void *pointer, double value);
@@ -549,6 +573,28 @@ SL_API int64_t            sl_attribute_value_number(const void *attribute, size_
 SL_API const char        *sl_attribute_value_text(const void *attribute, size_t index);
 
 /* Reading a field out of an instance, by its recorded offset. */
+SL_API uint32_t sl_field_element_kind(const void *field);
+SL_API const void *sl_field_element_type(const void *field);
+SL_API size_t   sl_field_element_size(const void *field);
+
+/*
+ * Reading and writing at an address of a known kind, rather than at a field of
+ * an instance. It is what walking an array needs: the element has a kind and a
+ * stride and no SlFieldInfo of its own.
+ */
+SL_API int64_t  sl_read_at_integer(const void *address, uint32_t kind);
+SL_API double   sl_read_at_double(const void *address, uint32_t kind);
+SL_API _Bool    sl_read_at_bool(const void *address);
+SL_API void    *sl_read_at_reference(const void *address);
+
+SL_API void     sl_write_at_integer(void *address, uint32_t kind, int64_t value);
+SL_API void     sl_write_at_double(void *address, uint32_t kind, double value);
+SL_API void     sl_write_at_bool(void *address, _Bool value);
+SL_API void     sl_write_at_text(void *address, const void *bytes, size_t length);
+
+/* The elements of an array object, and how many there are. */
+SL_API void    *sl_array_data(void *array);
+
 SL_API int64_t  sl_read_integer(const void *instance, const void *field);
 SL_API double   sl_read_double(const void *instance, const void *field);
 SL_API _Bool    sl_read_bool(const void *instance, const void *field);

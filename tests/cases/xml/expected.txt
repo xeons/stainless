@@ -37,10 +37,12 @@ document =
 <root id="7">
   <item>a &lt; b &amp; c</item>
 </root>
-serialized = <settings Environment="production" Version="3"><Name>primary &amp; backup</Name><Enabled>true</Enabled><Threshold>0.75</Threshold><retry-limit>5</retry-limit><Primary><Host>example.com</Host><Port>443</Port></Primary></settings>
+serialized = <settings Environment="production" Version="3"><Name>primary &amp; backup</Name><Enabled>true</Enabled><Threshold>0.75</Threshold><retry-limit>5</retry-limit><Primary><Host>example.com</Host><Port>443</Port></Primary><Hosts/><Hosts/></settings>
 populate = no error
-round-tripped = <settings Environment="staging" Version="9"><Name>read back</Name><Enabled>true</Enabled><Threshold>1.25</Threshold><retry-limit>2</retry-limit><Primary><Host>localhost</Host><Port>80</Port></Primary></settings>
+round-tripped = <settings Environment="staging" Version="9"><Name>read back</Name><Enabled>true</Enabled><Threshold>1.25</Threshold><retry-limit>2</retry-limit><Primary><Host>localhost</Host><Port>80</Port></Primary><Hosts/><Hosts/></settings>
 ignored-kept = 77
 partial = unchanged/true
 wrong-type = 4
 bad-document = the document ended inside an element
+array-out = <settings Environment="" Version="0"><Name/><Enabled>false</Enabled><Threshold>0</Threshold><retry-limit>0</retry-limit><Primary><Host/><Port>0</Port></Primary><Hosts>one</Hosts><Hosts>two</Hosts></settings>
+array-in = a/b

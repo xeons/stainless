@@ -113,34 +113,45 @@ size_t sl_string_code_point_count(void *pointer)
  * replacement character's job, and it keeps a String's bytes valid UTF-8 by
  * construction.
  */
-void *sl_string_from_char(uint32_t codePoint)
+/*
+ * One code point as UTF-8. Lifted out of sl_string_from_char so that the
+ * string builder appends a character through the same four branches rather
+ * than carrying a second copy of them.
+ */
+size_t sl_utf8_encode(uint32_t codePoint, uint8_t *bytes)
 {
     if (codePoint > 0x10FFFF || (codePoint >= 0xD800 && codePoint <= 0xDFFF))
         codePoint = 0xFFFD;
 
-    uint8_t bytes[4];
-    size_t length;
-
     if (codePoint < 0x80) {
         bytes[0] = (uint8_t)codePoint;
-        length = 1;
-    } else if (codePoint < 0x800) {
+        return 1;
+    }
+
+    if (codePoint < 0x800) {
         bytes[0] = (uint8_t)(0xC0 | (codePoint >> 6));
         bytes[1] = (uint8_t)(0x80 | (codePoint & 0x3F));
-        length = 2;
-    } else if (codePoint < 0x10000) {
+        return 2;
+    }
+
+    if (codePoint < 0x10000) {
         bytes[0] = (uint8_t)(0xE0 | (codePoint >> 12));
         bytes[1] = (uint8_t)(0x80 | ((codePoint >> 6) & 0x3F));
         bytes[2] = (uint8_t)(0x80 | (codePoint & 0x3F));
-        length = 3;
-    } else {
-        bytes[0] = (uint8_t)(0xF0 | (codePoint >> 18));
-        bytes[1] = (uint8_t)(0x80 | ((codePoint >> 12) & 0x3F));
-        bytes[2] = (uint8_t)(0x80 | ((codePoint >> 6) & 0x3F));
-        bytes[3] = (uint8_t)(0x80 | (codePoint & 0x3F));
-        length = 4;
+        return 3;
     }
 
+    bytes[0] = (uint8_t)(0xF0 | (codePoint >> 18));
+    bytes[1] = (uint8_t)(0x80 | ((codePoint >> 12) & 0x3F));
+    bytes[2] = (uint8_t)(0x80 | ((codePoint >> 6) & 0x3F));
+    bytes[3] = (uint8_t)(0x80 | (codePoint & 0x3F));
+    return 4;
+}
+
+void *sl_string_from_char(uint32_t codePoint)
+{
+    uint8_t bytes[4];
+    size_t length = sl_utf8_encode(codePoint, bytes);
     return sl_string_from_bytes(bytes, length);
 }
 

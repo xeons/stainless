@@ -80,69 +80,42 @@ public String Describe(JsonError error) {
 /// the alternative to a limit is a crash that looks like a compiler bug.
 public const nuint MaxDepth = 128u;
 
-/// What a lookup answers when the name is not there. `nuint` has no negative
-/// to spare, so the largest one stands in -- a collection of that many members
-/// would have exhausted memory long before.
-public const nuint Missing = 18446744073709551615u;
-
 // ------------------------------------------------------------------ objects
 
 /// The members of a JSON object, in the order they were written.
 ///
-/// A `Dictionary` would find a name faster and lose the order, and order is
-/// what makes a document read back the way it was written -- which matters for
-/// a file a person edits. Lookup is a scan, which is the right trade at the
-/// size documents actually are; a program holding a large one should build its
-/// own index.
+/// An `OrderedDictionary` rather than a `Dictionary`: order is what makes a
+/// document read back the way it was written, which matters for a file a
+/// person edits. The cost is that a lookup is a scan -- see the note there.
 public class JsonObject {
-    List<String> names;
-    List<JsonValue> values;
+    OrderedDictionary<String, JsonValue> members;
 
-    public JsonObject() {
-        names = new List<String>();
-        values = new List<JsonValue>();
-    }
+    public JsonObject() { members = new OrderedDictionary<String, JsonValue>(); }
 
-    public nuint Count() { return names.Count(); }
-    public String NameAt(nuint index) { return names.At(index); }
-    public JsonValue ValueAt(nuint index) { return values.At(index); }
+    public nuint Count() { return members.Count(); }
+    public String NameAt(nuint index) { return members.KeyAt(index); }
+    public JsonValue ValueAt(nuint index) { return members.ValueAt(index); }
 
     /// Adds a member. A repeated name is kept rather than replaced, because
     /// that is what the document said; `Find` answers with the first.
-    public void Add(String name, JsonValue value) {
-        names.Add(name);
-        values.Add(value);
-    }
+    public void Add(String name, JsonValue value) { members.Add(name, value); }
 
     /// Replaces the value of a name, or adds it.
-    public void Set(String name, JsonValue value) {
-        var at = IndexOf(name);
-        if (at == Missing) { Add(name, value); return; }
-        values.Set(at, value);
-    }
+    public void Set(String name, JsonValue value) { members.Set(name, value); }
 
-    /// Where a name is, or `Missing` when it is not there.
-    ///
-    /// The one lookup a caller needs: asking whether a name is present and
-    /// then asking for its value walks the members twice, which is what this
-    /// exists to stop.
-    public nuint IndexOf(String name) {
-        for (nuint i = 0u; i < names.Count(); i = i + 1u) {
-            if (names.At(i) == name) { return i; }
-        }
-        return Missing;
-    }
+    /// Where a name is, or `None`. One lookup rather than the two that asking
+    /// whether it is there and then asking for it would cost.
+    public Option<nuint> IndexOf(String name) { return members.IndexOf(name); }
 
-    public bool Has(String name) { return IndexOf(name) != Missing; }
+    public bool Has(String name) { return members.Has(name); }
 
     /// The value of a name, or `Null` when it is not there. A document that
     /// does not mention a field and one that says `null` are the same thing to
     /// a reader that has a default already.
-    public JsonValue Find(String name) {
-        var at = IndexOf(name);
-        if (at == Missing) { return JsonValue.Null; }
-        return values.At(at);
-    }
+    public JsonValue Find(String name) { return members.Find(name, JsonValue.Null); }
+
+    /// Removes the first member of that name, answering whether there was one.
+    public bool Remove(String name) { return members.Remove(name); }
 }
 
 // ------------------------------------------------------------------- values
@@ -781,6 +754,16 @@ public attribute JsonName { String Name; }
 /// Leaves the field out of the document entirely, in both directions.
 public attribute JsonIgnore { }
 
+/// Lets a reader make this field's object when the document has one and the
+/// field is null.
+///
+/// Off by default, and opt-in per field rather than per call, because the type
+/// is what knows whether it is safe. An object made this way is **zeroed**:
+/// every reference in it starts null, and only the document fills them. Mark a
+/// field with this when the document is what decides whether the object is
+/// there, and leave it alone when the constructor already made one.
+public attribute JsonCreate { }
+
 /// The document a value would produce, as a `JsonValue`.
 ///
 /// Reads the field tables of `[Reflect] T`, walking into a nested class or
@@ -815,14 +798,14 @@ JsonValue ValueOfInstance(byte* instance, Type type) {
     return JsonValue.Object(members);
 }
 
-/// Whether this module can write a field, and read it back as what it was.
+/// Whether this module can write a field and read it back as what it was.
 ///
-/// A number, a bool, a String and a `[Reflect]` object are the whole of it.
-/// **An array or a collection is not**, and that is a gap rather than a
-/// decision: the field tables record that a field is an array and nothing
-/// about its elements, and a `List<T>` is a class whose own fields are its
-/// private storage. Neither can be walked without element metadata the
-/// compiler does not emit yet.
+/// A number, a bool, a String, a `[Reflect]` object, and an array of any of
+/// those. **A `List<T>` is not**: it is a class whose own fields are its
+/// private storage, and filling one would mean calling `Add`, which needs
+/// method metadata the compiler does not emit. A slice is not either -- it is
+/// three words rather than a reference, so its elements are not where the
+/// element arithmetic would look.
 ///
 /// Leaving such a field out is the least wrong of the three answers. Writing
 /// `null` says the value was absent when it was not, and walking a `List`
@@ -830,7 +813,27 @@ JsonValue ValueOfInstance(byte* instance, Type type) {
 /// believe.
 bool Represents(Field field) {
     if (field.IsSimple()) { return true; }
-    return field.IsWalkable();
+    if (field.IsWalkable()) { return true; }
+    return RepresentsArray(field);
+}
+
+/// An array whose elements are something this can read and write.
+bool RepresentsArray(Field field) {
+    if (!field.IsArray()) { return false; }
+
+    int kind = field.ElementKind();
+    if (kind == KindString || kind == KindBool) { return true; }
+    if (kind == KindFloat || kind == KindDouble) { return true; }
+    if (kind >= KindChar && kind <= KindNUInt) { return true; }
+    if (kind == KindChar16 || kind == KindChar32) { return true; }
+
+    // An array of objects, when the objects carry field tables of their own.
+    if (kind == KindClass || kind == KindStruct) {
+        var inner = field.ElementType();
+        return inner.Exists() && inner.Has("Reflect");
+    }
+
+    return false;
 }
 
 String NameOf(Field field) {
@@ -851,7 +854,40 @@ JsonValue ValueOfField(byte* instance, Field field) {
         return ValueOfInstance(nested, field.TypeOf());
     }
 
+    if (RepresentsArray(field)) { return ValueOfArray(instance, field); }
+
     return JsonValue.Null;
+}
+
+/// An array field as a JSON array, one element at a time.
+///
+/// A null array is `null` rather than `[]`: the two are different, and a
+/// reader that gets `[]` for an array the object did not have would write it
+/// back as one.
+JsonValue ValueOfArray(byte* instance, Field field) {
+    byte* array = Reflection.ReadArray(instance, field);
+    if (array == null) { return JsonValue.Null; }
+
+    var items = new List<JsonValue>();
+    int kind = field.ElementKind();
+
+    for (nuint i = 0u; i < Reflection.ArrayLength(array); i = i + 1u) {
+        byte* at = Reflection.ElementAt(array, field, i);
+
+        if (kind == KindString) {
+            items.Add(JsonValue.Text(Reflection.ReadTextAt(at)));
+        } else if (kind == KindBool) {
+            items.Add(JsonValue.Bool(Reflection.ReadBoolAt(at)));
+        } else if (kind == KindFloat || kind == KindDouble) {
+            items.Add(JsonValue.Number(Reflection.ReadDoubleAt(at, field)));
+        } else if (kind == KindClass || kind == KindStruct) {
+            items.Add(ValueOfInstance(Reflection.ReadAggregateAt(at, field), field.ElementType()));
+        } else {
+            items.Add(NumberOf(Reflection.ReadIntegerAt(at, field)));
+        }
+    }
+
+    return JsonValue.Array(items);
 }
 
 /// Fills an object's fields from a document.
@@ -901,10 +937,10 @@ void FillInstance(byte* instance, Type type, JsonObject members) {
 
         if (!Represents(field)) { continue; }
 
-        var at = members.IndexOf(NameOf(field));
-        if (at == Missing) { continue; }
-
-        FillField(instance, field, members.ValueAt(at));
+        switch (members.IndexOf(NameOf(field))) {
+            case Some at: FillField(instance, field, members.ValueAt(at.Value)); break;
+            case None:    break;
+        }
     }
 }
 
@@ -945,11 +981,83 @@ void FillField(byte* instance, Field field, JsonValue value) {
 
     if (field.IsWalkable()) {
         byte* nested = Reflection.ReadAggregate(instance, field);
+
+        // A field the constructor left empty, which the type has said the
+        // document may fill.
+        if (nested == null && field.Has("JsonCreate") && !IsNull(value)) {
+            nested = Reflection.MakeInto(instance, field);
+        }
+
         if (nested == null) { return; }
 
         switch (value) {
             case Object held: FillInstance(nested, field.TypeOf(), held.Members); break;
             default: break;
         }
+        return;
+    }
+
+    if (RepresentsArray(field)) { FillArray(instance, field, value); }
+}
+
+/// Fills an array field, element by element, as far as both go.
+///
+/// **The array is not replaced.** Its length is the one the constructor chose,
+/// and a document with more elements than that fills what fits and stops; one
+/// with fewer leaves the rest as they were. Allocating a new array would mean
+/// deciding the length from the document, which is how a message becomes a
+/// memory bill, and reading into an object the program made is the whole
+/// bargain this module makes.
+void FillArray(byte* instance, Field field, JsonValue value) {
+    byte* array = Reflection.ReadArray(instance, field);
+    if (array == null) { return; }
+
+    switch (value) {
+        case Array held:
+            nuint length = Reflection.ArrayLength(array);
+            int kind = field.ElementKind();
+
+            for (nuint i = 0u; i < held.Items.Count() && i < length; i = i + 1u) {
+                byte* at = Reflection.ElementAt(array, field, i);
+                var item = held.Items.At(i);
+
+                if (kind == KindString) {
+                    switch (item) {
+                        case Text text: Reflection.WriteTextAt(at, text.Value); break;
+                        default: break;
+                    }
+                } else if (kind == KindBool) {
+                    switch (item) {
+                        case Bool flag: Reflection.WriteBoolAt(at, flag.Value); break;
+                        default: break;
+                    }
+                } else if (kind == KindFloat || kind == KindDouble) {
+                    switch (item) {
+                        case Number n: Reflection.WriteDoubleAt(at, field, n.Value); break;
+                        default: break;
+                    }
+                } else if (kind == KindClass || kind == KindStruct) {
+                    byte* nested = Reflection.ReadAggregateAt(at, field);
+                    if (nested != null) {
+                        switch (item) {
+                            case Object held2:
+                                FillInstance(nested, field.ElementType(), held2.Members);
+                                break;
+                            default: break;
+                        }
+                    }
+                } else {
+                    switch (item) {
+                        case Number n:
+                            Reflection.WriteIntegerAt(at, field, (long)n.Value);
+                            break;
+                        default: break;
+                    }
+                }
+            }
+            break;
+
+        default:
+            break;
     }
 }

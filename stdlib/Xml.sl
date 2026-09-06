@@ -80,53 +80,34 @@ public String Describe(XmlError error) {
 /// nesting is recursion, and a hostile document is one long line.
 public const nuint MaxDepth = 128u;
 
-/// What a lookup answers when the name is not there, as in `Standard.Json`.
-public const nuint Missing = 18446744073709551615u;
-
 // --------------------------------------------------------------- attributes
 
 /// An element's attributes, in the order they were written.
+///
+/// The same `OrderedDictionary` a JSON object's members are, and for the same
+/// reason: an attribute list that came back reordered is a document nobody
+/// wrote.
 public class XmlAttributes {
-    List<String> names;
-    List<String> values;
+    OrderedDictionary<String, String> entries;
 
-    public XmlAttributes() {
-        names = new List<String>();
-        values = new List<String>();
-    }
+    public XmlAttributes() { entries = new OrderedDictionary<String, String>(); }
 
-    public nuint Count() { return names.Count(); }
-    public String NameAt(nuint index) { return names.At(index); }
-    public String ValueAt(nuint index) { return values.At(index); }
+    public nuint Count() { return entries.Count(); }
+    public String NameAt(nuint index) { return entries.KeyAt(index); }
+    public String ValueAt(nuint index) { return entries.ValueAt(index); }
 
-    public void Add(String name, String value) {
-        names.Add(name);
-        values.Add(value);
-    }
+    public void Add(String name, String value) { entries.Add(name, value); }
+    public void Set(String name, String value) { entries.Set(name, value); }
 
-    public void Set(String name, String value) {
-        var at = IndexOf(name);
-        if (at == Missing) { Add(name, value); return; }
-        values.Set(at, value);
-    }
+    /// Where a name is, or `None`.
+    public Option<nuint> IndexOf(String name) { return entries.IndexOf(name); }
 
-    /// Where a name is, or `Missing`. One lookup rather than the two that
-    /// asking whether it is there and then asking for it would cost.
-    public nuint IndexOf(String name) {
-        for (nuint i = 0u; i < names.Count(); i = i + 1u) {
-            if (names.At(i) == name) { return i; }
-        }
-        return Missing;
-    }
-
-    public bool Has(String name) { return IndexOf(name) != Missing; }
+    public bool Has(String name) { return entries.Has(name); }
 
     /// The value of an attribute, or the fallback when it is not there.
-    public String Find(String name, String fallback) {
-        var at = IndexOf(name);
-        if (at == Missing) { return fallback; }
-        return values.At(at);
-    }
+    public String Find(String name, String fallback) { return entries.Find(name, fallback); }
+
+    public bool Remove(String name) { return entries.Remove(name); }
 }
 
 // ----------------------------------------------------------------- elements
@@ -689,6 +670,10 @@ public attribute XmlAttribute { }
 /// Leaves the field out entirely, in both directions.
 public attribute XmlIgnore { }
 
+/// Lets a reader make this field's object when the element is there and the
+/// field is null. The same opt-in, and the same hazard, as `[JsonCreate]`.
+public attribute XmlCreate { }
+
 /// A value as an element, with each field a child element under it.
 ///
 /// A field marked `[XmlAttribute]` becomes an attribute instead, which is what
@@ -726,9 +711,14 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name) {
             continue;
         }
 
-        // Left out rather than written as something it is not: an array and a
-        // collection have no element metadata to walk. `Standard.Json` says
-        // more about why, and the gap is the same one.
+        // An array is repeated children of one name, which is how XML says a
+        // sequence. A `List<T>` still cannot be walked -- its own fields are
+        // its private storage -- and is left out rather than misstated.
+        if (WalksAsArray(field)) {
+            AddArray(node, instance, field, fieldName);
+            continue;
+        }
+
         if (!field.IsSimple()) { continue; }
 
         var written = TextOfField(instance, field);
@@ -749,6 +739,62 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name) {
 String NameOf(Field field) {
     if (field.Has("XmlName")) { return field.Get("XmlName").AsText(0u); }
     return field.Name();
+}
+
+/// An array whose elements this can write and read back.
+bool WalksAsArray(Field field) {
+    if (!field.IsArray()) { return false; }
+
+    int kind = field.ElementKind();
+    if (kind == KindString || kind == KindBool) { return true; }
+    if (kind == KindFloat || kind == KindDouble) { return true; }
+    if (kind >= KindChar && kind <= KindNUInt) { return true; }
+    if (kind == KindChar16 || kind == KindChar32) { return true; }
+
+    if (kind == KindClass || kind == KindStruct) {
+        var inner = field.ElementType();
+        return inner.Exists() && inner.Has("Reflect");
+    }
+
+    return false;
+}
+
+/// One child element per element of the array, all of the same name.
+///
+/// A null array writes nothing at all, which reads back as an array left
+/// alone -- the same answer an absent element gives, and the right one, since
+/// an object without the array is not an object with an empty one.
+void AddArray(XmlNode node, byte* instance, Field field, String name) {
+    byte* array = Reflection.ReadArray(instance, field);
+    if (array == null) { return; }
+
+    int kind = field.ElementKind();
+
+    for (nuint i = 0u; i < Reflection.ArrayLength(array); i = i + 1u) {
+        byte* at = Reflection.ElementAt(array, field, i);
+
+        if (kind == KindClass || kind == KindStruct) {
+            byte* nested = Reflection.ReadAggregateAt(at, field);
+            if (nested == null) { continue; }
+            node.Add(NodeOfInstance(nested, field.ElementType(), name));
+            continue;
+        }
+
+        var child = new XmlNode(name);
+        child.Text = TextOfElement(at, field);
+        node.Add(child);
+    }
+}
+
+String TextOfElement(byte* at, Field field) {
+    int kind = field.ElementKind();
+
+    if (kind == KindString) { return Reflection.ReadTextAt(at); }
+    if (kind == KindBool) { return Text.FromBool(Reflection.ReadBoolAt(at)); }
+    if (kind == KindFloat || kind == KindDouble) {
+        return Text.FromDouble(Reflection.ReadDoubleAt(at, field));
+    }
+    return Text.FromInteger(Reflection.ReadIntegerAt(at, field));
 }
 
 String TextOfField(byte* instance, Field field) {
@@ -788,11 +834,20 @@ void FillInstance(byte* instance, Type type, XmlNode node) {
         var name = NameOf(field);
 
         if (field.IsWalkable()) {
-            byte* nested = Reflection.ReadAggregate(instance, field);
-            if (nested == null) { continue; }
-
             var child = node.Child(name);
-            if (child != null) { FillInstance(nested, field.TypeOf(), child); }
+            if (child == null) { continue; }
+
+            byte* nested = Reflection.ReadAggregate(instance, field);
+            if (nested == null && field.Has("XmlCreate")) {
+                nested = Reflection.MakeInto(instance, field);
+            }
+
+            if (nested != null) { FillInstance(nested, field.TypeOf(), child); }
+            continue;
+        }
+
+        if (WalksAsArray(field)) {
+            FillArray(instance, field, node.ChildrenNamed(name));
             continue;
         }
 
@@ -802,14 +857,64 @@ void FillInstance(byte* instance, Type type, XmlNode node) {
         // that writes one is read by whichever the type asked for, and one
         // that writes both is read the way the type is marked.
         if (field.Has("XmlAttribute")) {
-            var at = node.Attributes.IndexOf(name);
-            if (at != Missing) { FillField(instance, field, node.Attributes.ValueAt(at)); }
+            switch (node.Attributes.IndexOf(name)) {
+                case Some at:
+                    FillField(instance, field, node.Attributes.ValueAt(at.Value));
+                    break;
+                case None:
+                    break;
+            }
             continue;
         }
 
         var element = node.Child(name);
         if (element != null) { FillField(instance, field, element.Text); }
     }
+}
+
+/// Fills an array field from the children of that name, as far as both go.
+///
+/// The array is not replaced: its length is the one the constructor chose, for
+/// the reason `Standard.Json` gives -- allocating from the document is how a
+/// message becomes a memory bill.
+void FillArray(byte* instance, Field field, List<XmlNode> found) {
+    byte* array = Reflection.ReadArray(instance, field);
+    if (array == null) { return; }
+
+    nuint length = Reflection.ArrayLength(array);
+    int kind = field.ElementKind();
+
+    for (nuint i = 0u; i < found.Count() && i < length; i = i + 1u) {
+        byte* at = Reflection.ElementAt(array, field, i);
+
+        if (kind == KindClass || kind == KindStruct) {
+            byte* nested = Reflection.ReadAggregateAt(at, field);
+            if (nested != null) { FillInstance(nested, field.ElementType(), found.At(i)); }
+            continue;
+        }
+
+        FillElement(at, field, found.At(i).Text);
+    }
+}
+
+void FillElement(byte* at, Field field, String written) {
+    int kind = field.ElementKind();
+
+    if (kind == KindString) { Reflection.WriteTextAt(at, written); return; }
+
+    if (kind == KindBool) {
+        Reflection.WriteBoolAt(at, written == "true" || written == "1");
+        return;
+    }
+
+    if (kind == KindFloat || kind == KindDouble) {
+        var parsed = Convert.ToDouble(written);
+        if (parsed.Ok) { Reflection.WriteDoubleAt(at, field, parsed.Value); }
+        return;
+    }
+
+    var whole = Convert.ToLong(written);
+    if (whole.Ok) { Reflection.WriteIntegerAt(at, field, whole.Value); }
 }
 
 void FillField(byte* instance, Field field, String written) {
