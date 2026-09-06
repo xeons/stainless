@@ -40,6 +40,7 @@ public sealed partial class LlvmEmitter
     {
         if (program.Statics.Count == 0) return;
 
+
         foreach (var symbol in program.Statics)
         {
             string llvmType = LlvmTypeOf(symbol.Type);
@@ -64,16 +65,19 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>
-    /// Runs every static initializer, in the order the binder worked out.
+    /// Runs every static initializer, in the order the binder worked out, then
+    /// every <c>static Name() { }</c> block in declaration order.
     ///
     /// There is no lazy guard and no once-flag: the whole program was compiled
     /// together, so the dependency graph was known and sorted at compile time.
-    /// A reference is made immortal as it is stored, which is what removes the
-    /// last reference traffic from a value every thread can see.
+    /// A <c>readonly</c> reference is made immortal as it is stored, which is
+    /// what removes the last reference traffic from a value every thread can
+    /// see. A mutable one cannot be: the value it holds may be replaced, and
+    /// the old one has to be released.
     /// </summary>
     private void EmitStaticInitializer(BoundProgram program)
     {
-        if (program.Statics.Count == 0) return;
+        if (program.Statics.Count == 0 && program.StaticConstructors.Count == 0) return;
 
         ResetFunctionState();
         _module.AppendLine($"define internal void @{StaticInitializerName}() {{");
@@ -91,25 +95,39 @@ public sealed partial class LlvmEmitter
 
             if (symbol.Type is StructTypeSymbol structType)
             {
-                // Nothing to make immortal: a static must be sendable, and a
-                // struct holding a reference is not, so this is plain bytes.
-                MemCopy(slot, value.Ref, structType.Size);
+                // A struct that holds references is retained field by field,
+                // exactly as an assignment to one anywhere else is. The slot
+                // starts zeroed, so there is nothing for the store to release.
+                if (structType.CarriesReferences()) StoreInto(slot, value, symbol.Type);
+                else MemCopy(slot, value.Ref, structType.Size);
             }
             else
             {
                 Line($"store {value.LlvmType} {value.Ref}, ptr {slot}");
 
-                // Immortal, so retain and release skip it for the rest of the
-                // program: a value that lives to process exit has no reference
-                // traffic, and therefore none to race over.
-                if (symbol.Type.NeedsArc())
+                // A readonly one is immortal, so retain and release skip it for
+                // the rest of the program: a value that lives to process exit
+                // has no reference traffic, and therefore none to race over.
+                if (symbol.Type.NeedsArc() && symbol.IsReadonly)
                     Line($"call void @sl_make_immortal(ptr {value.Ref})");
+
+                // A mutable one is counted like any other slot. It cannot be
+                // immortal, because a later assignment has to release what it
+                // is replacing, and an immortal object is never released.
+                else if (symbol.Type.NeedsArc())
+                    Retain(value.Ref, symbol.Type);
             }
 
             // The initializer's own temporaries go now; the static holds its
             // value outright, and an immortal one cannot be released anyway.
             FlushTemporaries();
         }
+
+        // Then the `static Name() { }` blocks, after every field has its
+        // value -- which is C#'s order, and the only one that makes a block
+        // able to read the fields it is there to arrange.
+        foreach (var initializer in program.StaticConstructors)
+            Line($"call void {Symbol(initializer)}()");
 
         Terminator("ret void");
         PopScopeWithoutRelease();

@@ -49,6 +49,7 @@ public static class Mangler
         {
             FunctionKind.Constructor => "ctor",
             FunctionKind.Destructor => "dtor",
+            FunctionKind.StaticConstructor => "cctor",
             _ => function.Name,
         });
 

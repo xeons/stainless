@@ -62,6 +62,27 @@ public sealed partial class Binder
         // `FileStream.Open` without a call is the method itself, waiting for a
         // delegate to say which overload was meant -- the same thing a bare
         // function name is.
+        // `Counter.Total` -- storage that belongs to the type.
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } holder &&
+            holder.FindStatic(syntax.Member) is { } onType)
+        {
+            if (!CanReach(onType.IsPublic, isProtected: false, holder))
+            {
+                diagnostics.Error("SL0249", syntax.Span,
+                    NotVisible(holder, syntax.Member, isProtected: false));
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return new BoundStaticAccess(syntax.Span, onType);
+        }
+
+        // `Config.Retries` where Retries is a static property: two static
+        // methods wearing the spelling of a field, exactly as an instance
+        // property is.
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } propertyOwner &&
+            propertyOwner.FindProperty(syntax.Member) is { Getter.IsStatic: true } onTheType)
+            return BindPropertyRead(syntax.Span, receiver: null, onTheType);
+
         if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } staticOwner &&
             staticOwner.FindMethods(syntax.Member).ToList() is { Count: > 0 } declared)
         {

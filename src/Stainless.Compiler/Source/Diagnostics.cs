@@ -48,6 +48,9 @@ public static class RetiredDiagnostics
     {
         "SL0214", "SL0237", "SL0251", "SL0256", "SL0259",
         "SL0261", "SL0311", "SL0321", "SL0386", "SL0485",
+
+        // Storage in a type: what a `static` field is.
+        "SL0577",
     };
 }
 

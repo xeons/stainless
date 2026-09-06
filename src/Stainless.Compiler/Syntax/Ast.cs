@@ -443,7 +443,22 @@ public sealed record StaticDeclSyntax(
     Modifiers Modifiers,
     TypeSyntax Type,
     string Name,
-    ExpressionSyntax Value) : Declaration(Span, Modifiers);
+    ExpressionSyntax Value,
+    bool IsReadonly) : Declaration(Span, Modifiers);
+
+/// <summary>
+/// <c>static Name() { ... }</c> inside a type: the block that runs before the
+/// type's statics are read.
+///
+/// C# runs one lazily, before first use, behind a guard checked on every
+/// access. This one runs in the same order the static initializers do -- the
+/// whole program is compiled together, so the order is known -- which costs
+/// nothing per access and turns a cycle into a compile error.
+/// </summary>
+public sealed record StaticConstructorDeclSyntax(
+    SourceSpan Span,
+    string TypeName,
+    BlockSyntax Body) : Declaration(Span, Modifiers.Static);
 
 /// <summary>A module-level <c>const</c>.</summary>
 public sealed record GlobalConstDeclSyntax(

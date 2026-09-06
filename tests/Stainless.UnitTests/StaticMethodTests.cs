@@ -182,30 +182,69 @@ public class StaticMethodTests
     public void AModuleLevelFunctionIsRefused() =>
         Assert.Contains("SL0573", Front.ModuleCodes("static int Free() { return 1; }\nint Main() { return 0; }"));
 
-    /// <summary>A module is what this language has instead of a static class.</summary>
+    /// <summary>
+    /// Only a class may be static, because only a class has instances for the
+    /// word to be denying.
+    /// </summary>
     [Theory]
-    [InlineData("public static class C { }")]
     [InlineData("public static struct S { }")]
     [InlineData("public static interface I { }")]
     [InlineData("public static enum E { A }")]
+    [InlineData("public static delegate void D();")]
     public void AStaticTypeIsRefused(string declaration) =>
         Assert.Contains("SL0578", Front.ModuleCodes(declaration + "\nint Main() { return 0; }"));
 
-    /// <summary>Storage still has to be readonly; nothing would synchronize it.</summary>
+    /// <summary>A static class holds static members and has no instances.</summary>
     [Fact]
-    public void MutableStorageIsStillRefused() =>
-        Assert.Contains("SL0376", Front.ModuleCodes("static int Count = 0;\nint Main() { return 0; }"));
+    public void AStaticClassHoldsStaticMembers() => Assert.Empty(Front.ModuleCodes("""
+        public static class Config {
+            public static int Retries = 3;
+            public static int Doubled() { return Retries * 2; }
+        }
+        int Main() { return Config.Doubled(); }
+        """));
+
+    [Theory]
+    [InlineData("int field;")]
+    [InlineData("public C() { }")]
+    [InlineData("public int Read() { return 1; }")]
+    [InlineData("public int Value { get { return 1; } }")]
+    public void AStaticClassRefusesAnInstanceMember(string member) =>
+        Assert.Contains("SL0583", Front.ModuleCodes(
+            "public static class C { " + member + " }\nint Main() { return 0; }"));
+
+    [Fact]
+    public void AStaticClassCannotBeMade() => Assert.Contains("SL0583", Front.ModuleCodes("""
+        public static class C { public static int N = 1; }
+        int Main() { var c = new C(); return 0; }
+        """));
 
     /// <summary>
-    /// And storage inside a type is refused outright rather than silently
-    /// dropped, which is what happened before a static member could be
-    /// anything else.
+    /// Storage may be mutable. The rule that it could not was the Swift 6 and
+    /// Rust 2024 answer, and this language took C#'s instead: what a static
+    /// holds is warned about (SL0377) rather than refused.
     /// </summary>
     [Fact]
-    public void StorageInATypeIsRefused() => Assert.Contains("SL0577", Front.ModuleCodes("""
-        public class C { static readonly int Shared = 3; }
-        int Main() { return 0; }
-        """));
+    public void MutableStorageIsAllowed() =>
+        Assert.Empty(Front.ModuleCodes("static int Count = 0;\nint Main() { return Count; }"));
+
+    /// <summary>But it still needs a value, because nothing else would give it one.</summary>
+    [Fact]
+    public void StorageNeedsAnInitializer() =>
+        Assert.Contains("SL0376", Front.ModuleCodes("static int Count;\nint Main() { return 0; }"));
+
+    /// <summary>
+    /// Storage inside a type is what a <c>static</c> field is, and it may be
+    /// mutable: nothing about it is different from a module-level one except
+    /// what encloses the name.
+    /// </summary>
+    [Theory]
+    [InlineData("static readonly int Shared = 3;")]
+    [InlineData("static int Count = 0;")]
+    [InlineData("public static int Count = 0;")]
+    public void StorageInATypeIsAField(string declaration) =>
+        Assert.Empty(Front.ModuleCodes(
+            "public class C { " + declaration + " }\nint Main() { return 0; }"));
 
     // ---------------------------------------------------------------- order
 

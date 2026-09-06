@@ -1,0 +1,10 @@
+module   = 5 running 10 20
+made     = 2 doubled=4 version=1
+kind     = registry registry
+renamed  = renamed renamed
+direct   = direct
+defaults = 3 6 defaults
+retries  = 9 18
+late     = 1 arranged 2 second
+replaced = 1 replaced
+name     = a b

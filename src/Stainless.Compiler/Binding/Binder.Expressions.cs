@@ -567,6 +567,13 @@ public sealed partial class Binder
             if (_currentFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
                 return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
+            if (_currentFunction?.ContainingType?.FindStatic(name) is { } ownStatic)
+                return new BoundStaticAccess(syntax.Span, ownStatic);
+
+            if (_currentFunction?.ContainingType?.FindProperty(name) is
+                    { Getter.IsStatic: true } ownStaticProperty)
+                return BindPropertyRead(syntax.Span, receiver: null, ownStaticProperty);
+
             // An unqualified member name inside a method means `this.member`.
             // A static method has no `this`, and saying so here is worth more
             // than letting the name fall through to "is not defined".
@@ -1212,12 +1219,11 @@ public sealed partial class Binder
         if (target.Type.IsError() || value.Type.IsError())
             return new BoundErrorExpression(syntax.Span);
 
-        if (BaseOf(target) is BoundStaticAccess owner)
+        if (BaseOf(target) is BoundStaticAccess { Static.IsReadonly: true } owner)
         {
             diagnostics.Error("SL0379", syntax.Target.Span,
-                $"'{owner.Static.Name}' is a static, and every static is readonly; " +
-                "the value it holds is shared by every thread, so nothing may write it " +
-                "after it is initialized");
+                $"'{owner.Static.Name}' is 'static readonly', so it is written once by its " +
+                "initializer and never again. Drop the 'readonly' if it is meant to change");
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -1283,7 +1289,7 @@ public sealed partial class Binder
     /// an ordinary call and needs to know nothing about properties.
     /// </summary>
     private BoundExpression BindPropertyRead(
-        SourceSpan span, BoundExpression receiver, PropertySymbol property)
+        SourceSpan span, BoundExpression? receiver, PropertySymbol property)
     {
         if (property.Getter is not { } getter) return new BoundErrorExpression(span);
 
@@ -1295,8 +1301,8 @@ public sealed partial class Binder
         }
 
         // A struct accessor takes its receiver by pointer, exactly as a struct
-        // method does.
-        if (property.ContainingType is StructTypeSymbol structType)
+        // method does. A static one has none at all.
+        if (receiver is not null && property.ContainingType is StructTypeSymbol structType)
             receiver = new BoundAddressOf(span, new PointerTypeSymbol(structType), receiver);
 
         return new BoundCall(span, getter, receiver, []);
@@ -1310,13 +1316,16 @@ public sealed partial class Binder
     private BoundExpression BindPropertyAssignment(
         AssignmentSyntax syntax, BoundCall read, PropertySymbol property)
     {
-        var receiver = read.Receiver!;
+        // Null for a static property, which is written by naming the type.
+        var receiver = read.Receiver;
 
         // A struct's setter writes into the receiver's own storage, so this is
         // a write to the parameter exactly as `p.field = x` is.
-        if (WrittenParameter(receiver) is { } mutated) mutated.IsAssigned = true;
-
-        InvalidateVariantFact(receiver);
+        if (receiver is not null)
+        {
+            if (WrittenParameter(receiver) is { } mutated) mutated.IsAssigned = true;
+            InvalidateVariantFact(receiver);
+        }
 
         var value = BindExpression(syntax.Value);
         if (value.Type.IsError() || property.Type.IsError())
@@ -1326,7 +1335,8 @@ public sealed partial class Binder
         {
             // A get-only automatic property is still storage, and the type's own
             // constructor is where storage gets filled in.
-            if (property.BackingField is { } backing && syntax.Operator == TokenKind.Equals &&
+            if (property.BackingField is { } backing && receiver is not null &&
+                syntax.Operator == TokenKind.Equals &&
                 _currentFunction is { Kind: FunctionKind.Constructor } ctor &&
                 ctor.ContainingType == property.ContainingType)
             {
@@ -1358,22 +1368,22 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // A struct's setter writes the receiver's own storage, so a static one is
-        // the very case SL0379 exists for. A class's setter writes the object
-        // rather than the static, which the sendability rules already govern.
-        if (property.ContainingType is StructTypeSymbol &&
-            BaseOf(receiver) is BoundStaticAccess owner)
+        // A struct's setter writes the receiver's own storage, so writing one
+        // through a `static readonly` writes the static. A class's setter writes
+        // the object rather than the static, and a readonly static may hold an
+        // object whose fields still change.
+        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
+            BaseOf(receiver) is BoundStaticAccess { Static.IsReadonly: true } owner)
         {
             diagnostics.Error("SL0379", syntax.Target.Span,
-                $"'{owner.Static.Name}' is a static, and every static is readonly; " +
-                "the value it holds is shared by every thread, so nothing may write it " +
-                "after it is initialized");
+                $"'{owner.Static.Name}' is 'static readonly', so it is written once by its " +
+                "initializer -- and setting a field of the struct it holds is writing it");
             return new BoundErrorExpression(syntax.Span);
         }
 
         // A struct's setter writes through a pointer, so a temporary receiver
         // would be written and then thrown away.
-        if (property.ContainingType is StructTypeSymbol &&
+        if (property.ContainingType is StructTypeSymbol && receiver is not null &&
             receiver is BoundAddressOf { Operand: var target } && !IsRepeatable(target))
         {
             diagnostics.Error("SL0399", syntax.Target.Span,
@@ -1387,7 +1397,7 @@ public sealed partial class Binder
             // `p.X += 1` reads through the getter and writes through the setter,
             // so the receiver is evaluated twice. Requiring it to be a plain load
             // is what makes that harmless.
-            if (!IsRepeatable(receiver))
+            if (receiver is not null && !IsRepeatable(receiver))
             {
                 diagnostics.Error("SL0397", syntax.Target.Span,
                     $"'{property.ContainingType.Name}.{property.Name}' is a property, so this " +

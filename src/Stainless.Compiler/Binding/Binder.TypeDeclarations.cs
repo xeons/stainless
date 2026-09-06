@@ -332,6 +332,8 @@ public sealed partial class Binder
         if (declaration.Modifiers.HasFlag(Modifiers.Threadsafe))
             ClaimThreadsafe(type, declaration.Modifiers, declaration.Span);
 
+        if (declaration.Modifiers.HasFlag(Modifiers.Static)) type.IsStaticClass = true;
+
         if (declaration.Modifiers.HasFlag(Modifiers.Com))
         {
             if (type is ClassTypeSymbol comClass) comClass.IsCom = true;

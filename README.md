@@ -512,21 +512,35 @@ public int Fahrenheit {
 }
 ```
 
-### Static methods
+### Statics
 
 ```csharp
 public class Small {
     int value;
+    static int made = 0;                           // mutable storage
 
-    Small(int checked) { value = checked; }        // private
+    Small(int checked) { value = checked; made = made + 1; }   // private
 
     public static Result<Small, ParseError> Parse(String text) { ... }
+    public static int Made { get { return made; } }
+}
+
+public static class Defaults {
+    public static int Retries = 3;
 }
 
 var small = try Small.Parse(text);
 ```
 
-A member of the type rather than of a value of it. The whole of the difference
+C#'s model: fields, methods, properties, static constructors and `static
+class`, at module scope or on a type, mutable or `readonly`. Storage is
+initialized before `Main` in an order the compiler works out from the
+dependency graph -- no lazy guard on every access, and a compile error on a
+cycle rather than a zero at run time. A static constructor runs there too,
+which is the one departure from C#: "before first use" becomes "before
+`Main`".
+
+A static member is one of the type rather than of a value of it. The whole of the difference
 is the missing receiver: no `this`, so no field is reachable without saying
 which object is meant, and a call names the type.
 
@@ -885,7 +899,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 210 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 552 compiler unit tests
+dotnet test tests/Stainless.UnitTests           # 561 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -894,7 +908,7 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 215 cases, of which 10 are
+**Both Windows and Linux are tested.** 216 cases, of which 10 are
 Windows-only and 1 is Linux-only, so Linux runs 200 and Windows 209, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
@@ -1217,13 +1231,12 @@ Everything below is covered by [the test suite](tests/cases).
 - `parallel { spawn f(x); }` — a fork-join scope whose closing brace waits, so
   a job writes its result straight into the parent's local; and `parallel for`,
   which splits a counted loop across the pool
-- `static readonly` module storage, initialized before `Main` in an order the
-  compiler computes from the dependency graph — no lazy guard, and a compile
-  error on a cycle. Storage is the only thing that must be `readonly`; the
-  other `static` is a method of a type
-- `static` methods on a class or a struct: a member with no receiver, reached
-  by naming the type. It is what a fallible factory is written as, since it can
-  use a private constructor and a constructor cannot report why it failed
+- `static` as C# means it: fields, methods, properties, static constructors and
+  `static class`, on a module or on a type, mutable or `readonly`. Storage is
+  initialized before `Main` in an order the compiler computes from the
+  dependency graph — no lazy guard, and a compile error on a cycle. A static
+  method is what a fallible factory is written as, since it can use a private
+  constructor and a constructor cannot report why it failed
 - `threadsafe`, a word on a class, struct or interface saying that operations
   on it synchronize themselves. Anything crossing a thread that is not that,
   plain data, a `String` or an array of plain data draws a warning at the

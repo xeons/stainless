@@ -50,6 +50,12 @@ public sealed class BoundProgram
 
     /// <summary>Module-level storage, in the order its initializers must run.</summary>
     public required IReadOnlyList<StaticSymbol> Statics { get; init; }
+
+    /// <summary>
+    /// The <c>static Name() { }</c> blocks, in declaration order, to run after
+    /// every static field has its value.
+    /// </summary>
+    public required IReadOnlyList<FunctionSymbol> StaticConstructors { get; init; }
 }
 
 /// <summary>
@@ -120,6 +126,7 @@ public sealed partial class Binder(
     private readonly Dictionary<DelegateTypeSymbol, (DelegateDeclSyntax Declaration, FileScope Scope)> _delegateSyntax = [];
     private readonly Dictionary<StaticSymbol, (StaticDeclSyntax Declaration, FileScope Scope)> _staticSyntax = [];
     private List<StaticSymbol> _staticOrder = [];
+    private readonly List<FunctionSymbol> _staticConstructors = [];
 
     /// <summary>
     /// Numbers the hidden locals a lowering introduces. A '$' cannot appear in a
@@ -214,6 +221,7 @@ public sealed partial class Binder(
             ExternalFunctions = external,
             EntryPoint = requireEntryPoint ? FindEntryPoint() : null,
             Statics = _staticOrder,
+            StaticConstructors = _staticConstructors,
         };
     }
 

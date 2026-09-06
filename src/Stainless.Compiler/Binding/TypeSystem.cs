@@ -321,6 +321,35 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// </summary>
     public bool IsThreadsafe { get; set; }
 
+    /// <summary>
+    /// <c>static</c> fields: storage that belongs to the type rather than to an
+    /// instance of it. Kept apart from <see cref="Fields"/> because it has no
+    /// offset -- there is nothing for it to be at an offset within.
+    /// </summary>
+    public List<StaticSymbol> Statics { get; } = [];
+
+    /// <summary>This type's static field of that name, or null.</summary>
+    public StaticSymbol? FindStatic(string name) =>
+        Statics.FirstOrDefault(s => s.Name == name);
+
+    /// <summary>
+    /// The <c>static Name() { }</c> block, or null. It runs once, before
+    /// <c>Main</c>, after every static field's initializer.
+    /// </summary>
+    public FunctionSymbol? StaticConstructor { get; set; }
+
+    /// <summary>
+    /// Declared <c>static class</c>: a holder for static members, with no
+    /// instances and nothing to derive from it.
+    ///
+    /// A module is already this, and better -- it is a scope, so its members
+    /// need no prefix inside it. What a static class adds is a name that can be
+    /// nested in a module and reached from one, which is what a C# programmer
+    /// reaches for and what makes <c>Math.Sqrt</c> and <c>Registry.Count</c>
+    /// look the same from a call site.
+    /// </summary>
+    public bool IsStaticClass { get; set; }
+
     public List<FunctionSymbol> Methods { get; } = [];
 
     /// <summary>

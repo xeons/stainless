@@ -140,7 +140,7 @@ public sealed partial class LlvmEmitter(
         TypeInfos(program);
         VirtualTables(program);
 
-        _hasStatics = program.Statics.Count > 0;
+        _hasStatics = program.Statics.Count > 0 || program.StaticConstructors.Count > 0;
         StaticStorage(program);
 
         foreach (var function in program.Functions)

@@ -264,5 +264,3 @@ Kept here so the reasoning does not have to be rediscovered.
 - **A C-style preprocessor.** `#if` and its relatives exist because choosing
   between two platforms is a real question. Macros and `#include` are not: a
   name always means itself.
-- **Mutable globals.** Shared state that nothing synchronises. `static readonly`
-  over a type that says how it is safe is the answer.

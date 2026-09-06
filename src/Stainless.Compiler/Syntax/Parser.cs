@@ -187,13 +187,12 @@ public sealed class Parser
 
         if (modifiers.HasFlag(Modifiers.Static) && StaticIsAboutNothing() is { } what)
         {
+            string article = "aeiou".Contains(what[0]) ? "an" : "a";
+
             _diagnostics.Error("SL0578", SpanFrom(start),
-                what == "class" || what == "struct"
-                    ? $"a {what} is not 'static'; a module is what this language has instead " +
-                      "of a static class, and every function in one is already reached by " +
-                      "naming the module"
-                    : $"'static' says a member belongs to its type rather than to an object, " +
-                      $"and a {what} has neither");
+                $"{article} {what} cannot be 'static': the word means that a thing belongs to " +
+                $"its type rather than to an object of it, and {article} {what} has neither. " +
+                "Only a class may be static, and a module is usually the better answer");
             modifiers &= ~Modifiers.Static;
         }
 
@@ -229,7 +228,7 @@ public sealed class Parser
         if (modifiers.HasFlag(Modifiers.Static))
             return AtOperatorDeclaration()
                 ? [ParseOperatorDeclaration(start, modifiers)]
-                : [ParseStaticDeclaration(start, modifiers)];
+                : [ParseStaticDeclaration(start, modifiers, enclosingType)];
 
         if (modifiers.HasFlag(Modifiers.Const))
             return [ParseGlobalConst(start, modifiers)];
@@ -287,7 +286,6 @@ public sealed class Parser
     /// </summary>
     private string? StaticIsAboutNothing() => Current.Kind switch
     {
-        TokenKind.ClassKeyword => "class",
         TokenKind.StructKeyword => "struct",
         TokenKind.InterfaceKeyword => "interface",
         TokenKind.VariantKeyword => "variant",
@@ -682,34 +680,61 @@ public sealed class Parser
     /// rather than to an instance. Which one is being written is decided by
     /// <c>readonly</c>, because storage must have it and a method cannot.
     /// </summary>
-    private Declaration ParseStaticDeclaration(int start, Modifiers modifiers)
+    private Declaration ParseStaticDeclaration(
+        int start, Modifiers modifiers, string? enclosingType)
     {
-        if (!At(TokenKind.ReadonlyKeyword))
+        // `static Name() { }` inside `class Name`: the type's own initializer.
+        // It has no return type, which is what tells it from a method.
+        if (enclosingType is not null &&
+            At(TokenKind.Identifier) && Current.Text == enclosingType &&
+            Peek(1).Kind == TokenKind.OpenParen && Peek(2).Kind == TokenKind.CloseParen)
         {
-            // `static T Name(...)`: a method of the type rather than of an
-            // object of it. Parsed by the ordinary member parser, so a static
-            // method is a method in every respect except the receiver.
-            var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless);
+            Advance();
+            Advance();
+            Advance();
+            return new StaticConstructorDeclSyntax(SpanFrom(start), enclosingType, ParseBlock());
+        }
 
-            if (member is not FunctionDeclSyntax)
+        bool isReadonly = Match(TokenKind.ReadonlyKeyword);
+
+        // `static T Name(...)` is a method; `static T Name = v;` is storage.
+        // Only a parameter list tells them apart, and the type in front of the
+        // name may be several tokens long, so the member parser decides.
+        var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless);
+
+        if (member is FunctionDeclSyntax function)
+        {
+            if (isReadonly)
                 _diagnostics.Error("SL0376", SpanFrom(start),
-                    "a 'static' is either 'readonly' storage or a method; there is no mutable " +
-                    "global in Stainless, because nothing would synchronize it. Hold the mutable " +
-                    "part in a type that says how it is safe, as in " +
-                    "'static readonly AtomicLong Count = ...'");
-
+                    $"'{function.Name}' is a method, and 'readonly' is about storage");
             return member;
         }
 
-        Expect(TokenKind.ReadonlyKeyword);
+        // A property is the third thing, and its accessors carry the word for
+        // it: what a static property is, is two static methods.
+        if (member is PropertyDeclSyntax) return member;
 
-        var type = ParseType();
-        string name = ExpectIdentifier();
-        Expect(TokenKind.Equals);
-        var value = ParseExpression();
-        Expect(TokenKind.Semicolon);
+        if (member is not FieldDeclSyntax field)
+        {
+            _diagnostics.Error("SL0376", SpanFrom(start),
+                $"'static' cannot be written on this");
+            return member;
+        }
 
-        return new StaticDeclSyntax(SpanFrom(start), modifiers, type, name, value);
+        if (field.Initializer is null)
+        {
+            _diagnostics.Error("SL0376", field.Span,
+                $"'{field.Name}' is a static, so it needs a value: the initializers run in " +
+                "dependency order before 'Main', and there is no later moment at which one " +
+                "could be given a first value");
+
+            return new StaticDeclSyntax(
+                SpanFrom(start), modifiers, field.Type, field.Name,
+                new LiteralSyntax(field.Span, TokenKind.IntLiteral, 0L), isReadonly);
+        }
+
+        return new StaticDeclSyntax(
+            SpanFrom(start), modifiers, field.Type, field.Name, field.Initializer, isReadonly);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)

@@ -201,11 +201,16 @@ public sealed class BoundParameterAccess(SourceSpan span, ParameterSymbol parame
     public override bool IsLValue => true;
 }
 
-/// <summary>Reads module-level storage. Never an lvalue: a static is readonly.</summary>
+/// <summary>
+/// Reads static storage, of a module or of a type. Storage either way, so an
+/// lvalue unless it was declared <c>readonly</c>.
+/// </summary>
 public sealed class BoundStaticAccess(SourceSpan span, StaticSymbol symbol)
     : BoundExpression(span, symbol.Type)
 {
     public StaticSymbol Static { get; } = symbol;
+
+    public override bool IsLValue => !Static.IsReadonly;
 }
 
 public sealed class BoundConstantAccess(SourceSpan span, ConstantSymbol constant)
@@ -282,10 +287,11 @@ public sealed class BoundAssignment(SourceSpan span, BoundExpression target, Bou
 /// hold on to the value it just passed.
 /// </summary>
 public sealed class BoundPropertyAssignment(
-    SourceSpan span, BoundExpression receiver, PropertySymbol property, BoundExpression value)
+    SourceSpan span, BoundExpression? receiver, PropertySymbol property, BoundExpression value)
     : BoundExpression(span, property.Type)
 {
-    public BoundExpression Receiver { get; } = receiver;
+    /// <summary>Null for a static property, which is written by naming its type.</summary>
+    public BoundExpression? Receiver { get; } = receiver;
     public PropertySymbol Property { get; } = property;
     public BoundExpression Value { get; } = value;
 

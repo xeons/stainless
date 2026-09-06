@@ -224,35 +224,45 @@ other and needs `threadsafe` to cross one.
 
 ## 3. Statics
 
-Implemented. Stainless already had module-level `const`, folded at compile time
-with no storage. Real static *storage* follows Swift's model, including the part
-Swift arrived at late — but spelled the way C# spells it.
+Implemented, and then changed. What is here now is C#'s model: a static may be
+mutable, may live in a type as well as in a module, and what it holds draws a
+warning rather than a refusal.
 
-Swift has `static let` / `static var` and file-scope globals, lazily initialized
-through `swift_once`. Then Swift 6 (SE-0412) made mutable ones a concurrency
-error: a `var` global must be `let` and `Sendable`, or isolated to a global
-actor, or explicitly marked `nonisolated(unsafe)`. Rust reaches the same place
-from the other side — a `static` must be `Sync`, and `static mut` is an error as
-of edition 2024. C# is the counterexample both were reacting to.
+**The design this replaced** followed Swift's, including the part Swift arrived
+at late. Swift has `static let` / `static var` and file-scope globals, lazily
+initialized through `swift_once`; Swift 6 (SE-0412) then made mutable ones a
+concurrency error — a `var` global must be `let` and `Sendable`, or isolated to
+a global actor, or explicitly `nonisolated(unsafe)`. Rust reaches the same place
+from the other side: a `static` must be `Sync`, and `static mut` is an error as
+of edition 2024. C# was the counterexample both were reacting to, and this
+language went to their destination without the detour.
 
-Stainless takes the destination without the detour, and writes it as C# would:
-
-| Tier | Form | Rule |
+| Tier | Form | |
 |---|---|---|
 | 0 | `const int Limit = 64;` | compile-time value, no storage |
-| 1 | `static readonly int Base = 20;` | plain data or a `String`; frozen on store |
-| 2 | `static readonly AtomicLong Count = new AtomicLong(0);` | mutable only through a `threadsafe` type |
+| 1 | `static readonly int Base = 20;` | written once; a reference is frozen on store |
+| 2 | `static int Counter = 0;` | mutable, and counted like any other slot |
 | 3 | `threadstatic ...` | per-thread storage; deferred |
 
-**There is no `static` without `readonly`**, and that is the whole design: a
-plainly mutable global is shared state nothing synchronizes, so the language
-does not have one. `static readonly` is not a weaker `static` — it is the only
-one, and the error for writing `static` alone says so.
+**Why it changed.** The old rule was sound and it was also answering a question
+the compiler cannot see. Whether two threads reach a static is a fact about what
+the program does, not about the declaration: a program that never spawns
+anything has no race to have, and one that does may reach the value through a
+lock the compiler knows nothing about. Refusing on that leaves a programmer who
+knows better with one move — hold everything in a `threadsafe` wrapper it does
+not need — and the wrapper then says nothing, because it is what you write to
+make the compiler quiet.
 
-The type rules of §1.3 do the rest. Tier 1 is safe because plain data has no
-reference count and a `String` cannot be written; tier 2 is safe because the
-type says how. A `static readonly List<int>` is warned about, and the warning
-points at `Mutex<T>`.
+So the fact is still computed and still reported (§1.3), as a **warning**: a
+`static readonly List<int>` warns and points at `Mutex<T>`, and compiles. What
+`readonly` still buys is real and is not about threads: it refuses a later
+assignment, and it lets a reference be made immortal, so retain and release skip
+it for the rest of the program. A mutable static cannot be immortal, because
+replacing what it holds has to release the old value.
+
+Every static still needs an initializer, whatever else changed: it is written by
+that and by nothing else, and there is no later moment at which a first value
+could arrive.
 
 ### 3.1 Initialization order
 
@@ -267,8 +277,10 @@ no atomics, and a **compile error** on a cycle instead of a runtime mystery.
 
 ### 3.2 Teardown
 
-There is none. A static reference is made immortal as it is stored, so it is
-never destroyed and the process exit reclaims the memory. This sidesteps C++'s
+There is none. A `readonly` static's reference is made immortal as it is stored,
+so it is never destroyed and the process exit reclaims the memory. A mutable one
+is counted like any other slot, and what it holds at exit is simply never
+released -- which is the same outcome by a different route. This sidesteps C++'s
 static *destruction* order problem entirely, and is exactly how string literals
 already behave — which is also why `sl_make_immortal` reads before it writes: a
 literal lives in read-only storage, and storing the marker again would fault.

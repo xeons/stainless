@@ -26,27 +26,44 @@ public sealed partial class Binder
 {
     // ============================================================ statics
 
-    private void DeclareStatic(FileScope scope, StaticDeclSyntax declaration)
+    private void DeclareStatic(
+        FileScope scope, StaticDeclSyntax declaration, NamedTypeSymbol? containingType = null)
     {
         var module = scope.Module;
 
-        if (module.Statics.ContainsKey(declaration.Name) ||
-            module.Constants.ContainsKey(declaration.Name))
+        if (containingType is null &&
+            (module.Statics.ContainsKey(declaration.Name) ||
+             module.Constants.ContainsKey(declaration.Name)))
         {
             diagnostics.Error("SL0201", declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
             return;
         }
 
+        if (containingType is not null &&
+            (containingType.FindStatic(declaration.Name) is not null ||
+             containingType.FindStorage(declaration.Name) is not null ||
+             containingType.FindProperty(declaration.Name) is not null))
+        {
+            diagnostics.Error("SL0205", declaration.Span,
+                $"'{containingType.Name}' already declares a member named '{declaration.Name}'");
+            return;
+        }
+
         var type = ResolveType(declaration.Type, scope);
 
-        module.Statics[declaration.Name] = new StaticSymbol(declaration.Name, type, module.Name)
+        var symbol = new StaticSymbol(declaration.Name, type, module.Name)
         {
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            IsReadonly = declaration.IsReadonly,
+            ContainingType = containingType,
             Span = declaration.Span,
         };
 
-        _staticSyntax[module.Statics[declaration.Name]] = (declaration, scope);
+        if (containingType is not null) containingType.Statics.Add(symbol);
+        else module.Statics[declaration.Name] = symbol;
+
+        _staticSyntax[symbol] = (declaration, scope);
     }
 
     /// <summary>
@@ -71,7 +88,9 @@ public sealed partial class Binder
             symbol.Initializer = value;
 
             // A static outlives every thread, so whatever it holds is reachable
-            // from all of them at once.
+            // from all of them at once. Said, not refused: a program with one
+            // thread has no race to have, and the compiler cannot see which
+            // kind it is looking at.
             if (!IsSendable(symbol.Type))
                 ReportNotSendable(symbol.Type, declaration.Span, $"static '{symbol.Name}'");
         }
@@ -82,6 +101,49 @@ public sealed partial class Binder
             CollectStaticDependencies(symbol, symbol.Initializer);
 
         _staticOrder = SortStatics();
+    }
+
+    /// <summary>
+    /// <c>static Name() { }</c>: a block that runs once, before <c>Main</c>.
+    ///
+    /// C# runs one lazily before the type is first used, behind a guard checked
+    /// on every static access -- a guard that has to become atomic the moment
+    /// threads exist. This runs in the same pass the field initializers do, so
+    /// there is no guard and no per-access cost, and the price is that "before
+    /// first use" becomes "before Main". A program that can tell those apart is
+    /// timing its own startup.
+    ///
+    /// It runs after every static field's initializer, which is C#'s order too,
+    /// and among themselves they run in declaration order.
+    /// </summary>
+    private void DeclareStaticConstructor(
+        FileScope scope, NamedTypeSymbol type, StaticConstructorDeclSyntax declaration)
+    {
+        if (type.StaticConstructor is not null)
+        {
+            diagnostics.Error("SL0209", declaration.Span,
+                $"'{type.Name}' already declares a 'static {type.SimpleName}()'; there is one " +
+                "moment before 'Main' at which a type is set up, so there is one block for it");
+            return;
+        }
+
+        var symbol = new FunctionSymbol
+        {
+            Name = "cctor",
+            ModuleName = scope.Module.Name,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.StaticConstructor,
+            ContainingType = type,
+            IsStatic = true,
+            Body = declaration.Body,
+            Span = declaration.Span,
+            Scope = scope,
+        };
+
+        type.StaticConstructor = symbol;
+        _staticConstructors.Add(symbol);
+        scope.Module.Functions.Add(symbol);
     }
 
     private static void CollectStaticDependencies(StaticSymbol owner, BoundExpression? expression)

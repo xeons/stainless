@@ -259,7 +259,7 @@ public sealed partial class Binder
             $"'{local.Local.Name}' is a 'const'",
         BoundParameterAccess { Parameter.Mode: ParameterMode.In } parameter =>
             $"'{parameter.Parameter.Name}' is an 'in' parameter, which promises not to be written",
-        BoundStaticAccess held =>
+        BoundStaticAccess { Static.IsReadonly: true } held =>
             $"'{held.Static.Name}' is a 'static readonly'",
         _ => null,
     };

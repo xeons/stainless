@@ -30,9 +30,6 @@ public class Box {
     // itself.
     protected static int Guarded() { return 1; }
 
-    // SL0577: storage belongs to a module, which is what this language has
-    // instead of a namespace.
-    static readonly int Shared = 3;
 }
 
 public interface IThing {

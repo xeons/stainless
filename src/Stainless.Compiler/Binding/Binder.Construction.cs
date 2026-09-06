@@ -147,6 +147,14 @@ public sealed partial class Binder
         var type = ResolveType(syntax.Type, _currentScope!);
         if (type.IsError()) return new BoundErrorExpression(syntax.Span);
 
+        if (type is ClassTypeSymbol { IsStaticClass: true })
+        {
+            diagnostics.Error("SL0583", syntax.Span,
+                $"'{type.Name}' is a static class, so there is nothing to make one of: its " +
+                "members belong to the type. Call them on the type itself");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         if (type is not ClassTypeSymbol classType)
         {
             diagnostics.Error("SL0244", syntax.Span,

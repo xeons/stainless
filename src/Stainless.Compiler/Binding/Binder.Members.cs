@@ -355,8 +355,21 @@ public sealed partial class Binder
 
         if (type is VariantTypeSymbol variant) DeclareVariantCases(scope, declaration, variant);
 
+        bool staticOnly = type is ClassTypeSymbol { IsStaticClass: true };
+
         foreach (var member in declaration.Members)
         {
+            // A static class has no instances, so every member that would be
+            // reached through one is a member that could never be reached.
+            if (staticOnly && InstanceMember(member) is { } instanceMember)
+            {
+                diagnostics.Error("SL0583", member.Span,
+                    $"'{type.Name}' is a static class, so it has no instance for " +
+                    $"{instanceMember} to belong to. Make it 'static', or make the class " +
+                    "an ordinary one");
+                continue;
+            }
+
             if (type is AttributeTypeSymbol && member is not FieldDeclSyntax)
             {
                 diagnostics.Error("SL0340", member.Span,
@@ -501,14 +514,12 @@ public sealed partial class Binder
                     break;
                 }
 
-                // Reached silently before static methods existed, which meant
-                // a `static readonly` written in a type simply vanished.
                 case StaticDeclSyntax shared:
-                    diagnostics.Error("SL0577", shared.Span,
-                        $"'{shared.Name}' is 'static readonly' storage inside '{type.Name}'; " +
-                        "that belongs to a module, which is what this language has instead of " +
-                        "a namespace. A 'static' member of a type is a method. Move it out, or " +
-                        "make it a 'const'");
+                    DeclareStatic(scope, shared, type);
+                    break;
+
+                case StaticConstructorDeclSyntax initializer:
+                    DeclareStaticConstructor(scope, type, initializer);
                     break;
 
                 case DestructorDeclSyntax destructor:
@@ -557,6 +568,24 @@ public sealed partial class Binder
     /// fails at a call site far from the declaration that forgot it. C#
     /// arrived at the same rule for the same reason.
     /// </summary>
+    /// <summary>
+    /// Names a member that would need an instance, or null when it would not.
+    /// A destructor is included because it runs when one is destroyed, and a
+    /// constructor because it is what makes one.
+    /// </summary>
+    private static string? InstanceMember(Declaration member) => member switch
+    {
+        FieldDeclSyntax field => $"the field '{field.Name}'",
+        ConstructorDeclSyntax => "a constructor",
+        DestructorDeclSyntax => "a destructor",
+        PropertyDeclSyntax property when !property.Modifiers.HasFlag(Modifiers.Static) =>
+            $"the property '{property.Name}'",
+        FunctionDeclSyntax function when !function.Modifiers.HasFlag(Modifiers.Static) &&
+                                         !function.IsOperator =>
+            $"the method '{function.Name}'",
+        _ => null,
+    };
+
     private void CheckOperatorPairs(NamedTypeSymbol type)
     {
         foreach (var (token, opposite) in OperatorNames.Pairs)
@@ -675,6 +704,18 @@ public sealed partial class Binder
                     "'set;', or give it a body that computes the value");
         }
 
+        bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
+
+        if (isStatic && wantsStorage)
+        {
+            diagnostics.Error("SL0584", declaration.Span,
+                $"'{type.Name}.{declaration.Name}' is static and automatic, so its storage " +
+                "would have no moment at which to be given a first value: a static is written " +
+                "by its initializer and there is no initializer here. Write the accessors over " +
+                "a 'static' field, which has one");
+            return;
+        }
+
         FieldSymbol? backing = null;
         if (wantsStorage)
         {
@@ -776,16 +817,20 @@ public sealed partial class Binder
             Body = accessor.Body,
             Span = accessor.Span,
             Scope = scope,
+            IsStatic = modifiers.HasFlag(Modifiers.Static),
             Accessor = property,
             IsAutoAccessor = accessor.Body is null
                              && !type.IsContract
                              && !modifiers.HasFlag(Modifiers.Abstract),
         };
 
-        TypeSymbol thisType = type is ClassTypeSymbol reference
-            ? reference
-            : new PointerTypeSymbol(type);
-        symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
+        if (!symbol.IsStatic)
+        {
+            TypeSymbol thisType = type is ClassTypeSymbol reference
+                ? reference
+                : new PointerTypeSymbol(type);
+            symbol.Parameters.Add(new ParameterSymbol("this", thisType, 0) { IsThis = true });
+        }
 
         // An indexer's indices come before `value`, so that a setter reads
         // `set_Item(i, v)` -- the order the call site writes them in.

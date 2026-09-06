@@ -18,7 +18,7 @@ using Stainless.Syntax;
 
 namespace Stainless.Binding;
 
-public enum FunctionKind { Function, Method, Constructor, Destructor }
+public enum FunctionKind { Function, Method, Constructor, Destructor, StaticConstructor }
 
 public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
 {
@@ -265,6 +265,26 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     public string ModuleName { get; } = moduleName;
     public bool IsPublic { get; init; }
 
+    /// <summary>
+    /// The type this belongs to, or null for module-level storage.
+    ///
+    /// The two are the same thing in different scopes -- one global, named by
+    /// what encloses it -- so they share a symbol, a mangled name and a place
+    /// in the initialization order.
+    /// </summary>
+    public NamedTypeSymbol? ContainingType { get; init; }
+
+    /// <summary>
+    /// Declared <c>readonly</c>: written once by its initializer and never
+    /// again.
+    ///
+    /// What it buys is more than the refusal to assign. A reference stored in
+    /// one is made immortal, so retain and release skip it for the rest of the
+    /// program -- which a mutable one cannot be, because the value it holds may
+    /// be replaced and the old one has to be released.
+    /// </summary>
+    public bool IsReadonly { get; init; }
+
     public required Source.SourceSpan Span { get; init; }
 
     /// <summary>The initializer, bound in pass 8 like any other body.</summary>
@@ -274,7 +294,9 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     public List<StaticSymbol> DependsOn { get; } = [];
 
     public string QualifiedName =>
-        string.IsNullOrEmpty(ModuleName) ? Name : ModuleName + "." + Name;
+        ContainingType is not null ? ContainingType.QualifiedName + "." + Name
+        : string.IsNullOrEmpty(ModuleName) ? Name
+        : ModuleName + "." + Name;
 
     public override string ToString() => $"{Type.Name} {QualifiedName}";
 }

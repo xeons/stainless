@@ -1,0 +1,8 @@
+# Five instance members, the automatic static property, then the instantiation.
+SL0583
+SL0583
+SL0583
+SL0583
+SL0583
+SL0584
+SL0583

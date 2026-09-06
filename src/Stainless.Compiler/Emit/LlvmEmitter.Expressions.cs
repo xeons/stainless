@@ -460,20 +460,30 @@ public sealed partial class LlvmEmitter
 
         // A setter dispatches for the same reasons a getter does: it is an
         // ordinary method, and `Node.Label = x` on a `Leaf` has to reach the
-        // setter the object really has.
-        var receiver = EmitExpression(assignment.Receiver);
-        string? virtualTarget =
-            setter.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiver.Ref, setter)
-            : setter.ContainingType is InterfaceTypeSymbol ? LoadInterfaceMethod(receiver.Ref, setter)
-            : setter.IsDispatched ? LoadVirtualMethod(receiver.Ref, setter)
-            : null;
+        // setter the object really has. A static one has no object, and so
+        // nothing to dispatch on.
+        string? receiverRef = null;
+        string? virtualTarget = null;
+
+        if (assignment.Receiver is not null)
+        {
+            receiverRef = EmitExpression(assignment.Receiver).Ref;
+
+            virtualTarget =
+                setter.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiverRef, setter)
+                : setter.ContainingType is InterfaceTypeSymbol
+                    ? LoadInterfaceMethod(receiverRef, setter)
+                : setter.IsDispatched ? LoadVirtualMethod(receiverRef, setter)
+                : null;
+        }
 
         // An indexer's indices come before `value`, in the order the setter
         // declares them and the call site wrote them.
         var indices = assignment.Indices.Select(EmitExpression).ToList();
         var value = EmitExpression(assignment.Value);
 
-        var arguments = new List<string> { $"ptr {receiver.Ref}" };
+        var arguments = new List<string>();
+        if (receiverRef is not null) arguments.Add($"ptr {receiverRef}");
 
         for (int i = 0; i < indices.Count; i++)
             AppendArgument(indices[i], assignment.Indices[i].Type, arguments);

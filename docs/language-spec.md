@@ -2547,10 +2547,11 @@ every date before 1970 came back empty. Local time still asks the platform,
 which is the only thing that knows the zone rules.
 
 **`Standard.Random` is a class, not a set of functions.** The state has to live
-somewhere; the language has no mutable global to put it in (§9.3); and a hidden
-one shared by every caller is what makes a program impossible to replay. A
+somewhere, and a hidden one shared by every caller is what makes a program
+impossible to replay -- so it lives in an object the caller holds. A
 `Random(seed)` repeats exactly, on any machine; a `Random()` is seeded by the
-operating system and does not.
+operating system and does not. (The language does now have a mutable static to
+put such a thing in, and that is the reason not to.)
 
 It is **not cryptographic** -- xoshiro256** is fast and its whole future
 follows from its state, which is what makes a seeded run reproducible and what
@@ -3133,6 +3134,52 @@ This is also how a **struct** gets a maker at all: a struct has no
 constructors, so before this there was no way to build one in a single
 expression.
 
+A static method cannot implement an interface method: dispatch arrives on an
+object, and a static method has nowhere to put one.
+
+**A field** is the same storage a module-level `static` is, named by the type
+instead of the module (§9.3). It may be mutable, and it needs an initializer:
+
+```csharp
+public class Registry {
+    static int made = 0;                        // private to the type
+    public static String Kind = "registry";
+    public static readonly String Version = "1";
+}
+```
+
+**A property** is two static methods wearing the spelling of a field, exactly as
+an instance property is two ordinary ones. Both accessors are written: an
+automatic one would need storage with no initializer to fill it, and a static
+has no other moment at which to be given a first value (SL0584).
+
+**A static constructor** is `static Name() { }` inside `class Name`. It runs
+once, before `Main`, after every static field's initializer -- which is C#'s
+order, and the only one that lets the block arrange the fields it is there for.
+
+C# runs one *lazily*, before the type is first used, behind a guard checked on
+every static access; that guard must become atomic the moment threads exist.
+Stainless compiles the whole program at once, so it runs the block in the same
+pass the field initializers run in. The cost is that "before first use" becomes
+"before `Main`", which a program can only tell apart by timing its own startup;
+what it buys is no guard, no per-access cost, and a compile error on a cycle.
+
+**A static class** holds static members and has no instances:
+
+```csharp
+public static class Defaults {
+    public static int Retries = 3;
+    public static int Doubled() { return Retries * 2; }
+}
+```
+
+`new Defaults()` is refused, and so is any member that would need an instance --
+a field, a constructor, a destructor, an instance method or an instance property
+(SL0583). A **module** is usually the better answer, and is what the standard
+library uses: a module is a scope, so its members need no prefix inside it. What
+a static class buys is a name that sits *inside* a module and is reached from
+one.
+
 What `static` may not be written on:
 
 | | Refused because | |
@@ -3141,16 +3188,7 @@ What `static` may not be written on:
 | an interface member | an interface promises what an *object* can do | SL0574 |
 | `virtual`, `override`, `abstract` | dispatch chooses a body from the object a call arrives on | SL0575 |
 | `protected` | the word is about what a derived object reaches through itself | SL0575 |
-| storage inside a type | a `static readonly` belongs to a module | SL0577 |
-| a type declaration | a module is what this language has instead of a static class | SL0578 |
-
-A static method cannot implement an interface method either, for the reason in
-the table: dispatch arrives on an object, and a static method has nowhere to
-put one.
-
-`static readonly` at module scope is the other thing the word introduces
-(§1). It is unchanged, and must still be `readonly`, because nothing would
-synchronize a mutable global (SL0376).
+| a struct, interface, enum, variant, union or delegate | only a class has instances for the word to deny | SL0578 |
 
 ## 8. Interoperability and libraries
 
@@ -3817,7 +3855,7 @@ What is still unchecked is how long a borrowed thing lives — see
 [concurrency.md](concurrency.md) for the model being aimed at and which parts
 of it the compiler enforces today.
 
-### 9.3 `const` and `static readonly`
+### 9.3 `const` and `static`
 
 A `const` is a compile-time value inlined at every use, so it holds what fits in
 one: a number, a `bool`, a `char` or an enum member. Its initializer is a
@@ -3850,16 +3888,28 @@ A character literal suits an integer, as it does in C#, so
 public static readonly int Base = 20;
 public static readonly String Greeting = "hello";
 public static readonly AtomicLong Hits = new AtomicLong(0);
+
+static int Counter = 0;                         // mutable, as C#'s is
 ```
 
-Module-level storage, initialized once before `Main`. **There is no `static`
-without `readonly`.** A plainly mutable global is shared state that nothing
-synchronizes, so the language does not have one; mutation goes through a type
-that says how it is safe, and `static int Counter = 0;` is an error that says so.
+Storage initialized once before `Main`, at module scope or inside a type
+(§7.6). `readonly` is not required and is worth writing anyway: it refuses a
+later assignment, and it lets a reference be made **immortal** as it is stored,
+so retain and release skip it for the rest of the program. A mutable one cannot
+be immortal, because replacing what it holds has to release the old value.
 
-Which types are allowed is the rule in §9.5: plain data, a `String`, or a class
-declared `threadsafe`. `static readonly List<int>` is warned about, and the
-warning points at `Mutex<T>`.
+**Every static needs an initializer.** It is written by that and nothing else --
+the initializers run before `Main` and there is no later moment at which a first
+value could arrive -- so `static int Counter;` is an error (SL0376).
+
+What a static holds is *warned* about rather than refused (§9.5): it outlives
+every thread, so a `List<int>` in one is reachable from all of them and the
+warning points at `Mutex<T>`. That is a change from an earlier design in which a
+static had to be `readonly` and of a shareable type. The rule it replaced was
+Swift 6's and Rust 2024's; this is C#'s, and it is chosen for the reason those
+two are worth having and this one is worth having anyway: whether sharing is a
+race is a fact about what the program does with the value, and a program with
+one thread has no race to have.
 
 **Order is computed, not guessed.** An initializer may read another static, and
 the compiler sorts them so nothing runs before what it reads:
