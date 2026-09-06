@@ -154,10 +154,9 @@ public variant Optional<T> {
 
         sl_fail("Optional.Get: there is no value");
 
-        // Unreachable: `sl_fail` ends the program. An `extern` cannot say so
-        // here, and there is no `default(T)` to name instead, so the tail is
-        // the one expression of type T that costs nothing to write.
-        return Get();
+        // Unreachable: `sl_fail` ends the program, and an `extern` has no way
+        // to say so. The tail has to be some expression of type T.
+        return default(T);
     }
 
     /// The value if there is one, and `fallback` if there is not.

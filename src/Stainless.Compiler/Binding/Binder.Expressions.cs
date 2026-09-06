@@ -38,6 +38,7 @@ public sealed partial class Binder
         IncrementSyntax increment => BindIncrement(increment),
         NameofSyntax nameOf => BindNameof(nameOf),
         CheckedSyntax guarded => BindChecked(guarded),
+        DefaultSyntax zeroed => BindDefault(zeroed),
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
         CallSyntax call => BindCall(call),
@@ -1370,6 +1371,30 @@ public sealed partial class Binder
         if (IsImplicitlyConvertible(left, right.Type)) return right.Type;
 
         return null;
+    }
+
+    /// <summary>
+    /// <c>default(T)</c>.
+    ///
+    /// Allowed for every type, including a class, and that is not a new hole in
+    /// the null discipline: a fresh array is zeroed, so <c>new C[1][0]</c>
+    /// already handed back a null typed as a <c>C</c>, and the library kept
+    /// exactly such an array to blank a vacated slot with. This is that,
+    /// spelled. `void` is the one refusal: there is no value of it to zero.
+    /// </summary>
+    private BoundExpression BindDefault(DefaultSyntax syntax)
+    {
+        var type = ResolveType(syntax.Type, _currentScope!);
+        if (type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (type.IsVoid())
+        {
+            diagnostics.Error("SL0603", syntax.Span,
+                "'default(void)' names no value; 'void' is the absence of one");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundDefault(syntax.Span, type);
     }
 
     /// <summary>

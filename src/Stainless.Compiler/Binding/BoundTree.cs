@@ -697,6 +697,14 @@ public sealed class BoundOutDraft(
     public bool NeedsType => Type.IsError();
 }
 
+/// <summary>
+/// <c>default(T)</c>: the value a type's storage holds before anything is put
+/// in it. Zero for a number, false, null for a reference or pointer, and every
+/// field of a struct the same way down.
+/// </summary>
+public sealed class BoundDefault(SourceSpan span, TypeSymbol type)
+    : BoundExpression(span, type);
+
 /// <summary>Allocates a zeroed array of <paramref name="Length"/> elements; yields +1.</summary>
 public sealed class BoundNewArray(SourceSpan span, ArrayTypeSymbol type, BoundExpression length)
     : BoundExpression(span, type)

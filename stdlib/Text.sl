@@ -57,6 +57,16 @@ public const long NotFound = -1;
 
 public class String {
 
+    /// Text with no bytes in it.
+    ///
+    /// A property rather than a static field, and the reason is worth knowing:
+    /// a `--shared` library has no entry point to run a static's initializer
+    /// from (SL0380), so a field here would have made the whole standard
+    /// library unusable in one. This costs nothing either way -- a string
+    /// literal is one interned object, so every `String.Empty` is the same
+    /// object that every `""` already was.
+    public static String Empty { get { return ""; } }
+
     // -------------------------------------------------------------- testing
 
     /// True when this text begins with `prefix`. An empty prefix always does.

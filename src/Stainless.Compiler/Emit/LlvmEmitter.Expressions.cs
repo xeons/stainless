@@ -69,6 +69,28 @@ public sealed partial class LlvmEmitter
                 if (addressOf.DeclaresLocal is { } declared) DeclareOutLocal(declared);
                 return new Val(EmitAddress(addressOf.Operand), "ptr", addressOf.Type);
 
+            case BoundDefault zeroed:
+            {
+                string llvmType = LlvmTypeOf(zeroed.Type);
+
+                // A struct travels as the address of its storage rather than as
+                // a value in a register, so this needs somewhere to point at --
+                // `zeroinitializer` is a constant, and handing it to the memcpy
+                // that stores a struct copies from address zero.
+                if (zeroed.Type is StructTypeSymbol structType)
+                {
+                    string slot = Alloca(llvmType, "zeroed");
+                    Line($"store {llvmType} zeroinitializer, ptr {slot}");
+
+                    // Nothing to release: every reference in it is already null.
+                    // Nothing to retain either, which is why this is not tracked
+                    // as a temporary.
+                    return new Val(slot, "ptr", structType);
+                }
+
+                return new Val(ZeroOf(llvmType), llvmType, zeroed.Type);
+            }
+
             case BoundConversion conversion: return EmitConversion(conversion);
             case BoundTypeTest test: return EmitTypeTest(test);
             case BoundUnary unary: return EmitUnary(unary);

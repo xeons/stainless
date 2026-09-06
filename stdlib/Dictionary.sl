@@ -62,20 +62,12 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     V[] values;
     bool[] filled;
 
-    // One zeroed element of each, to blank a slot with. The language has no
-    // `default(T)`, and a slot that is merely abandoned would keep whatever
-    // reference it held alive.
-    K[] noKey;
-    V[] noValue;
-
     nuint count;
 
     public Dictionary() {
         keys = new K[8];
         values = new V[8];
         filled = new bool[8];
-        noKey = new K[1];
-        noValue = new V[1];
         count = 0;
     }
 
@@ -170,8 +162,10 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
             i = j;
         }
 
-        keys[i] = noKey[0];
-        values[i] = noValue[0];
+        // Cleared rather than merely abandoned: a slot still holding its old
+        // reference keeps that object alive for as long as the table lives.
+        keys[i] = default(K);
+        values[i] = default(V);
         filled[i] = false;
         count--;
         return true;

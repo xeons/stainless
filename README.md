@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 239 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 241 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 239 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 229 and Windows 238, each
+**Both Windows and Linux are tested.** 241 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 231 and Windows 240, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1391,9 +1391,22 @@ Everything below is covered by [the test suite](tests/cases).
   multi-key order be built by sorting twice. Alongside it: `Largest`,
   `Smallest`, `IndexOf`, `RemoveFirst`, `RemoveWhere`, `Reverse`,
   `BinarySearch` and `LowerBound`
+- **`x.F(y)` is `F(x, y)`** when `x` has no member `F`, which is what makes the
+  library chain:
+
+  ```csharp
+  words.Where(w => w.Length() > 1u).Distinct().OrderBy(ByLength).ToArray()
+  ```
+
+  Uniform call syntax rather than extension methods: a module is a scope here,
+  so a function need not be wrapped in a static class to exist and there is
+  nothing a `this` modifier would add. A member always wins, so nothing a type
+  declares can be shadowed by somebody else's function
 - **Combinators**, over an array, a slice or any `IEnumerable<T>`: `Map`,
   `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `Find`, `FirstOr`,
-  `IndexWhere`, `ForEach`, `Take`, `Skip` and `ToList`. Each takes a generic
+  `IndexWhere`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
+  `ToArray`, plus `Where`, `Select`, `Aggregate` under the names LINQ gave
+  them. Each takes a generic
   `closure` — `Func<T, R>`, `Predicate<T>`, `Action<T>`, `Fold<A, T>`,
   `Comparer<T>` — so a lambda and a method that already exists are the same
   thing:
@@ -1758,6 +1771,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   call so that a hole in that produces a zero rather than whatever the stack
   held. An ordinary local read before it is written is still nobody's business
   but the author's.
+- `default(T)` is the zeroed value of a type, for generic code that cannot
+  write a literal for a type it does not know. Not a new hole in the null
+  discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
+  it. `String.Empty` is a static property rather than a field, because a
+  `--shared` library has no entry point to initialize a static from
 - Field initializers are rejected — assign in a constructor.
 
 What is being worked on next, and the known bugs, are in **[TODO.md](TODO.md)**.

@@ -3349,6 +3349,42 @@ overloaded, because dispatch gives each one a single slot
 A *class* implementing two interfaces whose methods share a name is a different
 matter, and it works — see §2.10.
 
+#### 7.1.1 `x.F(y)` is `F(x, y)`
+
+```csharp
+names.Filter((n) => n.ByteLength() > 3u)
+     .Map(Upper)
+     .ToArray()
+```
+
+**A call written on a value reaches a free function when the value has no such
+member.** The same functions either way — `Filter(names, keep)` and
+`names.Filter(keep)` bind to one symbol — so a library of free functions is a
+pipeline without being written twice.
+
+This is uniform call syntax rather than C#'s extension methods, and the reason
+is that this language has what C# was working around. A module is a scope here,
+so a function need not be wrapped in a static class to exist; there is nothing
+for a `this` modifier to add, and every free function in scope is already a
+candidate.
+
+**A member always wins.** The free function is looked for only where member
+lookup has already failed, so a method added to a type can never be shadowed by
+somebody else's function, and a new free function can never quietly take over a
+call that used to reach a method.
+
+**Visibility is the ordinary rule**: the function has to be one the file could
+have called by name — its own module's, or one it imported. There is no
+separate import for it, and no way for a function a file cannot see to attach
+itself to a type.
+
+**`p->F(x)` is not included.** The arrow insists there was a pointer to follow,
+which is a statement about a member; a free function is not one.
+
+An ambiguity is not resolved by taking a guess: where two free functions both
+fit, the call is left to report that no member of the name exists, and naming
+the function outright is the answer.
+
 ### 7.2 `ref`, `in` and `out` parameters
 
 A parameter is a copy unless it says otherwise. `ref`, `in` and `out` say
@@ -4600,6 +4636,28 @@ exactly once, so `cells[Next()]++` calls `Next` a single time.
 
 An enum is refused (SL0594): it is a choice rather than a count, and stepping
 one means stepping the integer behind it.
+
+### 9.6.1 `default(T)`
+
+```csharp
+T FirstOrNothing<T>(T[:] items) {
+    if (items.Length == 0u) { return default(T); }
+    return items[0u];
+}
+```
+
+The value a type's storage holds before anything is put in it: zero for a
+number, `false`, null for a reference or a pointer, and every field of a struct
+the same way down. It exists for generic code, which cannot write a literal for
+a type it does not know.
+
+**It is not a new hole in the null discipline**, even for a class. A fresh
+array is zeroed (§2.11.1), so `new C[1][0]` already handed back a null typed as
+a `C`, and `Standard.Collections` kept exactly such an array around to blank a
+vacated slot with. This is that, spelled.
+
+`default(void)` is the one refusal (SL0603): `void` is the absence of a value,
+so there is none of it to zero.
 
 ### 9.7 `do`
 

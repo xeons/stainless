@@ -273,6 +273,101 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// <c>x.F(y)</c> where <c>x</c> has no member <c>F</c>, read as
+    /// <c>F(x, y)</c>.
+    ///
+    /// This is uniform call syntax, and it is here rather than C#'s extension
+    /// methods because this language has what C# was working around: a module
+    /// is a scope, so a function need not be wrapped in a static class to
+    /// exist. There is nothing for a <c>this</c> modifier to add — every free
+    /// function in scope is already a candidate, and the only question is
+    /// whether its first parameter fits.
+    ///
+    /// What it buys is the shape a pipeline wants:
+    ///
+    ///     names.Filter((n) =&gt; n.ByteLength() &gt; 3u).Map(Upper).ToArray()
+    ///
+    /// read inside out before, and the same functions either way.
+    ///
+    /// **A member always wins.** This is reached only where lookup has already
+    /// failed, so adding a method to a type can never be shadowed by a function
+    /// somebody wrote elsewhere, and the reverse — a new free function quietly
+    /// taking over a call — cannot happen either.
+    ///
+    /// Visibility is the ordinary rule: the function has to be one this file
+    /// could have called by name. There is no separate import for it, and no
+    /// way for a function the file cannot see to attach itself to a type.
+    /// </summary>
+    private BoundExpression? TryBindAsFreeFunction(
+        CallSyntax syntax, MemberAccessSyntax member,
+        BoundExpression receiver, List<BoundExpression> arguments)
+    {
+        // `p->F(x)` insists there was a pointer to follow, which is a statement
+        // about a member. A free function is not one.
+        if (member.ThroughPointer) return null;
+
+        var written = new List<ExpressionSyntax> { member.Target };
+        written.AddRange(syntax.Arguments);
+
+        var whole = new List<BoundExpression> { receiver };
+        whole.AddRange(arguments);
+
+        var call = new CallSyntax(
+            syntax.Span,
+            new NameSyntax(member.Span, new QualifiedName(member.Span, [member.Member])),
+            written);
+
+        var viable = VisibleFunctions(member.Member)
+            .Where(c => AcceptsArguments(c, whole, written))
+            .ToList();
+
+        if (viable.Count == 1) return BuildCall(call, viable[0], receiver: null, whole);
+
+        // Nothing fits and nothing is ambiguous, so try the generic templates.
+        // Almost everything worth chaining is one -- `Filter`, `Map`, `Sort`
+        // are all generic -- so this is the common path rather than the
+        // fallback it looks like.
+        if (viable.Count > 1) return null;
+
+        var templates = FindGenericFunctions(new QualifiedName(member.Span, [member.Member]));
+        if (templates.Count == 0) return null;
+
+        // Muted: this is a guess, and its failure is not the program's error.
+        // The caller has a better one to report.
+        FunctionSymbol? instantiated;
+        using (diagnostics.Muted())
+            instantiated = InferAndInstantiate(templates, call, whole);
+
+        return instantiated is null ? null : BuildCall(call, instantiated, receiver: null, whole);
+    }
+
+    /// <summary>Every module-level function of that name this file may call.</summary>
+    private List<FunctionSymbol> VisibleFunctions(string name)
+    {
+        var found = _currentModule!.Functions
+            .Where(f => f.Name == name && f.ContainingType is null)
+            .ToList();
+
+        foreach (var imported in _currentScope!.Imports.Values.Distinct())
+            if (imported != _currentModule)
+                found.AddRange(imported.Functions.Where(
+                    f => f.Name == name && f.ContainingType is null && f.IsPublic));
+
+        return found;
+    }
+
+    /// <summary>
+    /// The second half of "no method of that name", when a free function of it
+    /// exists but did not fit. Silence there would be the worst of both: the
+    /// reader can see a function with the right name and is told only that the
+    /// type has no method.
+    /// </summary>
+    private string NoFreeFunctionEither(string name) =>
+        VisibleFunctions(name).Count == 0
+            ? ""
+            : $", and no function '{name}' in scope takes it as a first argument";
+
+    /// <summary>
     /// <c>out x</c>, and the two forms that declare what they name.
     ///
     /// A declaring form goes out as a draft, because <c>out var x</c> says
@@ -550,8 +645,12 @@ public sealed partial class Binder
 
         if (receiver.Type is not NamedTypeSymbol namedType)
         {
+            if (TryBindAsFreeFunction(syntax, member, receiver, arguments) is { } chained)
+                return chained;
+
             diagnostics.Error("SL0255", member.Span,
-                $"'{receiver.Type.Name}' has no method named '{member.Member}'");
+                $"'{receiver.Type.Name}' has no method named '{member.Member}'" +
+                NoFreeFunctionEither(member.Member));
             return new BoundErrorExpression(syntax.Span);
         }
 
@@ -587,8 +686,12 @@ public sealed partial class Binder
             if (TryBindGenericMethodCall(syntax, member, namedType, receiver, arguments) is { } generic)
                 return generic;
 
+            if (TryBindAsFreeFunction(syntax, member, receiver, arguments) is { } chained)
+                return chained;
+
             diagnostics.Error("SL0255", member.Span,
-                $"'{namedType.Name}' has no method named '{member.Member}'");
+                $"'{namedType.Name}' has no method named '{member.Member}'" +
+                NoFreeFunctionEither(member.Member));
             return new BoundErrorExpression(syntax.Span);
         }
 

@@ -2192,6 +2192,15 @@ public sealed class Parser
                 return new TypeofSyntax(SpanFrom(start), type);
             }
 
+            case TokenKind.DefaultKeyword:
+            {
+                Advance();
+                Expect(TokenKind.OpenParen);
+                var zeroed = ParseType();
+                Expect(TokenKind.CloseParen);
+                return new DefaultSyntax(SpanFrom(start), zeroed);
+            }
+
             case TokenKind.NameofKeyword:
             {
                 Advance();

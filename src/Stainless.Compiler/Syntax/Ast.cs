@@ -734,6 +734,16 @@ public sealed record IncrementSyntax(
 public sealed record NameofSyntax(SourceSpan Span, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);
 
+/// <summary>
+/// <c>default(T)</c> — the zeroed value of a type.
+///
+/// It exists for generic code, which cannot write a literal for a type it does
+/// not know. Everything it produces was already reachable: a fresh array is
+/// zeroed, so <c>new T[1][0]</c> was the spelling before this, and the library
+/// kept exactly such an array around to blank a vacated slot with.
+/// </summary>
+public sealed record DefaultSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+
 /// <summary><c>checked(e)</c> and <c>unchecked(e)</c>.</summary>
 public sealed record CheckedSyntax(
     SourceSpan Span, ExpressionSyntax Operand, bool IsChecked) : ExpressionSyntax(Span);

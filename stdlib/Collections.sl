@@ -123,14 +123,8 @@ public class List<T> : IList<T>, IEnumerable<T> {
     T[] items;
     nuint count;
 
-    // One zeroed element to blank a vacated slot with. The language has no
-    // `default(T)`, and `Dictionary` keeps one of these for the same reason:
-    // a slot merely abandoned holds its old reference alive.
-    T[] blank;
-
     public List() {
         items = new T[4];
-        blank = new T[1];
         count = 0;
     }
 
@@ -183,7 +177,9 @@ public class List<T> : IList<T>, IEnumerable<T> {
         for (nuint i = index; i + 1u < count; i++) { items[i] = items[i + 1u]; }
 
         count--;
-        items[count] = blank[0u];
+        // Cleared rather than merely abandoned: a slot still holding its old
+        // reference keeps that object alive for as long as the list lives.
+        items[count] = default(T);
     }
 
     public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(this); }

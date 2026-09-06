@@ -1,0 +1,15 @@
+picked 3
+  bb
+  delta
+  alpha
+agree  true
+adults 2: ada bob
+years  119
+oldest bob
+member ada (36)
+free   age 36
+zeroes 0 0 false 0
+point  0,0
+first  7 then 0
+empty  0 true true
+joined 1
