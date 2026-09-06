@@ -123,7 +123,11 @@ public sealed partial class Binder(
     /// </summary>
     private readonly HashSet<TypeDeclSyntax> _additionalParts = [];
     private readonly Dictionary<EnumTypeSymbol, (EnumDeclSyntax Declaration, FileScope Scope)> _enumSyntax = [];
-    private readonly Dictionary<DelegateTypeSymbol, (DelegateDeclSyntax Declaration, FileScope Scope)> _delegateSyntax = [];
+    /// <summary>
+    /// Keyed by <see cref="NamedTypeSymbol"/> rather than by delegate, because
+    /// a <c>closure</c> is declared the same way and is a struct.
+    /// </summary>
+    private readonly Dictionary<NamedTypeSymbol, (DelegateDeclSyntax Declaration, FileScope Scope)> _delegateSyntax = [];
     private readonly Dictionary<StaticSymbol, (StaticDeclSyntax Declaration, FileScope Scope)> _staticSyntax = [];
     private List<StaticSymbol> _staticOrder = [];
     private readonly List<FunctionSymbol> _staticConstructors = [];

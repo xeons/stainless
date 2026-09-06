@@ -92,6 +92,9 @@ public sealed class Builtins
     /// </summary>
     public AttributeTypeSymbol Align { get; }
 
+    /// <summary>The static type of a closure's receiver; see where it is made.</summary>
+    public ClassTypeSymbol Bound { get; }
+
     public ClassTypeSymbol String { get; }
     public ClassTypeSymbol Utf16String { get; }
     public ClassTypeSymbol StringBuilder { get; }
@@ -178,6 +181,22 @@ public sealed class Builtins
         });
         Align.SetLayout(4, 4);
         Standard.Types[Align.SimpleName] = Align;
+
+        // The static type of a closure's receiver, and nothing else.
+        //
+        // A closure holds whatever object its method belongs to, and reference
+        // counting does not care which class that is: sl_release finds the type
+        // in the object's own header. So the field needs *a* strong reference
+        // type rather than the right one, and this is it -- never instantiated,
+        // never given a TypeInfo, and not public, so no program can name it.
+        Bound = new ClassTypeSymbol
+        {
+            SimpleName = "$bound",
+            ModuleName = StandardModuleName,
+            IsPublic = false,
+            IsIntrinsic = true,
+        };
+        Bound.SetLayout(0, 8);
 
         String = new ClassTypeSymbol
         {

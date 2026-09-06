@@ -1104,6 +1104,26 @@ public sealed partial class Binder
             return new BoundBinary(span, PrimitiveTypeSymbol.Bool, comparableLeft, op, comparableRight);
         }
 
+        // `first == one.Add`: one side is a method group or a lambda, which has
+        // no type of its own, and the other is what settles it. Comparison is
+        // the one place a closure has a context on the far side of the
+        // operator rather than in front of it.
+        if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual)
+        {
+            if (left.Type is ClosureTypeSymbol && right is BoundFunctionGroup or BoundLambda)
+                right = BindConversion(right, left.Type, span);
+            else if (right.Type is ClosureTypeSymbol && left is BoundFunctionGroup or BoundLambda)
+                left = BindConversion(left, right.Type, span);
+        }
+
+        // Two closures: the same method on the same object. What makes one
+        // removable from a list of them, and the reason a method pointer is a
+        // value rather than an object.
+        if (op is BoundBinaryOp.Equal or BoundBinaryOp.NotEqual &&
+            left.Type is ClosureTypeSymbol closure && left.Type.Equals(right.Type))
+            return new BoundClosureEqual(
+                span, closure, left, right, op == BoundBinaryOp.NotEqual);
+
         if (left.Type is not PrimitiveTypeSymbol leftPrimitive ||
             right.Type is not PrimitiveTypeSymbol rightPrimitive)
         {

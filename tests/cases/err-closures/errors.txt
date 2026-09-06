@@ -1,0 +1,6 @@
+# A plain function with no object, a shape that does not match, a bound method
+# given to a delegate, and a method group that nothing settles.
+SL0599
+SL0361
+SL0360
+SL0553

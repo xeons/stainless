@@ -207,6 +207,9 @@ public sealed partial class Binder
     {
         var syntax = lambda.Syntax;
 
+        if (target is ClosureTypeSymbol asMethodPointer)
+            return BindLambdaAsMethodPointer(syntax, asMethodPointer, span);
+
         if (target is DelegateTypeSymbol asDelegate)
             return BindLambdaAsFunction(syntax, asDelegate, span);
 
@@ -380,6 +383,68 @@ public sealed partial class Binder
         _functions.Add(new BoundFunction(symbol, body));
 
         return new BoundClosure(span, target, closureType, context.Captures);
+    }
+
+    /// <summary>
+    /// A lambda becoming a <c>closure</c>: the same generated class, bound to
+    /// as a method pointer rather than reached through an interface.
+    ///
+    /// The generated object *is* the receiver. Its method already takes that
+    /// object as argument zero, which is the shape a closure calls -- so a
+    /// lambda and a bound method produce the identical two words, and nothing
+    /// downstream can tell which it was given.
+    ///
+    /// **No interface is involved.** The class implements none, is never
+    /// dispatched through, and exists only to hold what the lambda captured.
+    /// </summary>
+    private BoundExpression BindLambdaAsMethodPointer(
+        LambdaSyntax syntax, ClosureTypeSymbol target, SourceSpan span)
+    {
+        if (!CheckLambdaArity(syntax, target.Signature.Count, target.Name, span))
+            return new BoundErrorExpression(span);
+
+        var closureType = new ClassTypeSymbol
+        {
+            SimpleName = $"Closure.{_closureCount++}",
+            ModuleName = _currentModule!.Name,
+            Span = span,
+        };
+
+        var symbol = new FunctionSymbol
+        {
+            Name = "Invoke",
+            ModuleName = closureType.ModuleName,
+            ReturnType = target.ReturnType,
+            Linkage = LinkageKind.Stainless,
+            Kind = FunctionKind.Method,
+            ContainingType = closureType,
+            IsPublic = true,
+            Span = syntax.Span,
+            Scope = _currentScope,
+        };
+
+        var self = new ParameterSymbol("this", closureType, 0) { IsThis = true };
+        symbol.Parameters.Add(self);
+        AddLambdaParameters(symbol, syntax, target.Signature);
+
+        closureType.Methods.Add(symbol);
+
+        var context = new ClosureContext
+        {
+            Type = closureType,
+            This = self,
+            OuterScopes = [.. _scopes],
+            OuterFunction = _currentFunction,
+        };
+
+        var body = BindLambdaBody(syntax, symbol, context);
+
+        ComputeLayout(closureType, []);
+        _classes.Add(closureType);
+        _functions.Add(new BoundFunction(symbol, body));
+
+        var made = new BoundClosure(span, closureType, closureType, context.Captures);
+        return new BoundClosureCreate(span, target, symbol, made);
     }
 
     private BoundExpression BindLambdaAsFunction(

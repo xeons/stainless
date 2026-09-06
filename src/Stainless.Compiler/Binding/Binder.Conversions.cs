@@ -107,11 +107,33 @@ public sealed partial class Binder
     private BoundExpression BindFunctionReference(
         BoundFunctionGroup group, TypeSymbol target, SourceSpan span)
     {
+        if (target is ClosureTypeSymbol closure)
+            return BindClosureReference(group, closure, span);
+
         if (target is not DelegateTypeSymbol wanted)
         {
+            // A bound method offered as a group and settled by nothing: the
+            // message that was here before groups carried a receiver.
+            if (group.Receiver is not null)
+            {
+                diagnostics.Error("SL0250", span,
+                    $"'{group.Name}' is a method; call it with '()', or store it in a " +
+                    "'closure' type, which is what can hold a method and its object");
+                return new BoundErrorExpression(span);
+            }
+
             diagnostics.Error("SL0360", span,
                 $"'{group.Name}' is a function; it converts to a delegate type, " +
                 $"and '{target.Name}' is not one");
+            return new BoundErrorExpression(span);
+        }
+
+        if (group.Receiver is not null)
+        {
+            diagnostics.Error("SL0360", span,
+                $"'{group.Name}' is a method, so it carries the object it was reached " +
+                $"through, and '{wanted.Name}' is a delegate -- one pointer, with nowhere " +
+                "to keep it. Declare the type 'closure' instead of 'delegate'");
             return new BoundErrorExpression(span);
         }
 
@@ -133,6 +155,63 @@ public sealed partial class Binder
         }
 
         return new BoundFunctionReference(span, wanted, matches[0]);
+    }
+
+    /// <summary>
+    /// Resolves a function or bound method against the closure it is being
+    /// stored in.
+    ///
+    /// The receiver is not part of the match. A closure's signature says what
+    /// the *call* takes, and the object is what the closure carries, so a
+    /// method of any type fits a closure of the right shape -- which is the
+    /// whole reason a component's handler need not know what it is subscribed
+    /// to.
+    /// </summary>
+    private BoundExpression BindClosureReference(
+        BoundFunctionGroup group, ClosureTypeSymbol wanted, SourceSpan span)
+    {
+        var matches = group.Candidates.Where(wanted.Accepts).ToList();
+
+        if (matches.Count == 0)
+        {
+            diagnostics.Error("SL0361", span,
+                $"no overload of '{group.Name}' matches closure '{wanted.Name}', " +
+                $"which is '{wanted.SignatureText}'");
+            return new BoundErrorExpression(span);
+        }
+
+        if (matches.Count > 1)
+        {
+            diagnostics.Error("SL0362", span,
+                $"'{group.Name}' is ambiguous for closure '{wanted.Name}'");
+            return new BoundErrorExpression(span);
+        }
+
+        var chosen = matches[0];
+
+        // A closure calls what it holds with the object first, which is where a
+        // method already takes its own. A plain function has no such parameter,
+        // so its address cannot go in the same slot -- and a lambda is the way
+        // to say "call this with nothing of its own", because a lambda that
+        // captures nothing still becomes something with a receiver to ignore.
+        if (chosen.IsStatic || chosen.ContainingType is null)
+        {
+            diagnostics.Error("SL0599", span,
+                $"'{group.Name}' has no object, and a closure is a method *and* the object " +
+                $"it belongs to. Reach it through one -- 'thing.{chosen.Name}' -- or wrap it " +
+                "in a lambda, which gives it one");
+            return new BoundErrorExpression(span);
+        }
+
+        if (group.Receiver is null)
+        {
+            diagnostics.Error("SL0599", span,
+                $"'{group.Name}' is an instance method, so a closure over it needs the object " +
+                $"to call it on; write 'something.{chosen.Name}' rather than the name alone");
+            return new BoundErrorExpression(span);
+        }
+
+        return new BoundClosureCreate(span, wanted, chosen, group.Receiver);
     }
 
     /// <summary>

@@ -73,6 +73,9 @@ public sealed partial class LlvmEmitter
             case BoundFunctionReference reference:
                 return new Val(Symbol(reference.Function), "ptr", reference.Type);
             case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
+            case BoundClosureCreate closure: return EmitClosureCreate(closure);
+            case BoundClosureCall closureCall: return EmitClosureCall(closureCall);
+            case BoundClosureEqual same: return EmitClosureEqual(same);
             case BoundAssignment assignment: return EmitAssignment(assignment);
             case BoundPropertyAssignment written: return EmitPropertyAssignment(written);
             case BoundCall call: return EmitCall(call);

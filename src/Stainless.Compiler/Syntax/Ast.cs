@@ -368,12 +368,18 @@ public sealed record AttributeSyntax(
 /// type. It is one pointer with the platform C calling convention, so it is the
 /// same value a C function pointer is.
 /// </summary>
+/// <param name="CarriesReceiver">
+/// True when this was written <c>closure</c> rather than <c>delegate</c>: two
+/// words, a function and the object it is bound to, rather than one. Delphi
+/// spells the same distinction <c>of object</c>.
+/// </param>
 public sealed record DelegateDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,
     string Name,
     TypeSyntax ReturnType,
-    IReadOnlyList<ParameterSyntax> Parameters) : Declaration(Span, Modifiers);
+    IReadOnlyList<ParameterSyntax> Parameters,
+    bool CarriesReceiver = false) : Declaration(Span, Modifiers);
 
 /// <summary>One <c>enum</c> member, with the constant it was given if any.</summary>
 public sealed record EnumMemberSyntax(SourceSpan Span, string Name, ExpressionSyntax? Value)

@@ -61,7 +61,7 @@ public sealed partial class Binder
 
                     case DelegateDeclSyntax delegateDecl:
                         DeclareDelegateSignature(
-                            (DelegateTypeSymbol)module.Types[delegateDecl.Name], delegateDecl, scope);
+                            (NamedTypeSymbol)module.Types[delegateDecl.Name], delegateDecl, scope);
                         break;
 
                     case EnumDeclSyntax enumDecl:
@@ -92,13 +92,59 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Resolves a delegate's return and parameter types. The names are kept for
-    /// diagnostics and for the generated C header; nothing else reads them.
+    /// A <c>closure</c> type: two fields, and the signature its call goes
+    /// through.
+    ///
+    /// The fields are given here rather than anywhere later because layout,
+    /// the ABI classifiers and the reference walk that retains and releases a
+    /// value's contents are all written against a struct's fields. Two fields
+    /// is the whole of what makes a closure work with machinery none of which
+    /// has heard of one.
+    /// </summary>
+    private ClosureTypeSymbol NewClosureType(DelegateDeclSyntax declaration, ModuleSymbol module)
+    {
+        var type = new ClosureTypeSymbol
+        {
+            SimpleName = declaration.Name,
+            ModuleName = module.Name,
+            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            Span = declaration.Span,
+        };
+
+        // The function first, so that the eight bytes at offset zero are the
+        // thing a debugger and a reader both look for.
+        type.Function = new FieldSymbol(
+            ClosureTypeSymbol.FunctionFieldName,
+            new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), type, 0);
+
+        // The receiver second, and counted: this is the field that makes a
+        // closure keep its object alive, and it does so through the ordinary
+        // walk rather than through anything written for closures.
+        type.Receiver = new FieldSymbol(
+            ClosureTypeSymbol.ReceiverFieldName, _builtins.Bound, type, 1);
+
+        type.Fields.Add(type.Function);
+        type.Fields.Add(type.Receiver);
+
+        type.Function.Offset = 0;
+        type.Receiver.Offset = 8;
+        type.SetLayout(16, 8);
+
+        return type;
+    }
+
+    /// <summary>
+    /// Resolves a delegate's or closure's return and parameter types. The names
+    /// are kept for diagnostics and for the generated C header; nothing else
+    /// reads them.
     /// </summary>
     private void DeclareDelegateSignature(
-        DelegateTypeSymbol type, DelegateDeclSyntax declaration, FileScope scope)
+        NamedTypeSymbol type, DelegateDeclSyntax declaration, FileScope scope)
     {
-        type.ReturnType = ResolveType(declaration.ReturnType, scope);
+        var returnType = ResolveType(declaration.ReturnType, scope);
+        string kind = type is ClosureTypeSymbol ? "closure" : "delegate";
+
+        var signature = new List<ParameterSymbol>();
 
         for (int i = 0; i < declaration.Parameters.Count; i++)
         {
@@ -108,15 +154,26 @@ public sealed partial class Binder
             if (parameterType.IsVoid())
             {
                 diagnostics.Error("SL0359", parameter.Span,
-                    $"parameter '{parameter.Name}' of delegate '{type.Name}' cannot be 'void'");
+                    $"parameter '{parameter.Name}' of {kind} '{type.Name}' cannot be 'void'");
                 parameterType = ErrorTypeSymbol.Instance;
             }
 
-            type.Signature.Add(new ParameterSymbol(parameter.Name, parameterType, i)
+            signature.Add(new ParameterSymbol(parameter.Name, parameterType, i)
             {
                 Mode = parameter.Mode,
             });
         }
+
+        if (type is ClosureTypeSymbol closure)
+        {
+            closure.ReturnType = returnType;
+            closure.Signature.AddRange(signature);
+            return;
+        }
+
+        var asDelegate = (DelegateTypeSymbol)type;
+        asDelegate.ReturnType = returnType;
+        asDelegate.Signature.AddRange(signature);
     }
 
     /// <summary>

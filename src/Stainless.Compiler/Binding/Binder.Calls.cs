@@ -198,7 +198,20 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        diagnostics.Error("SL0253", syntax.Span, "this expression is not callable");
+        // Anything else that produced something callable: `handlers.At(i)(1)`,
+        // where the callee is neither a name nor a member but a value of a
+        // closure or delegate type. Bound last, because every shape above is a
+        // name to look up rather than an expression to evaluate.
+        var produced = BindExpression(syntax.Callee);
+
+        if (IsCallableValue(produced.Type))
+            return BuildIndirectCall(syntax, produced, arguments);
+
+        if (produced.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        diagnostics.Error("SL0253", syntax.Span,
+            $"this expression is not callable: it is '{produced.Type.Name}', and only a " +
+            "delegate or a closure is called through");
         return new BoundErrorExpression(syntax.Span);
     }
 
@@ -277,22 +290,24 @@ public sealed partial class Binder
             {
                 string text = name.Name.Parts[0];
 
-                if (LookupLocal(text) is { Type: DelegateTypeSymbol } local)
+                if (LookupLocal(text) is { } local && IsCallableValue(local.Type))
                     return new BoundLocalAccess(name.Span, local);
 
                 if (_currentFunction?.Parameters.FirstOrDefault(
-                        p => p.Name == text && !p.IsThis) is { Type: DelegateTypeSymbol } parameter)
+                        p => p.Name == text && !p.IsThis) is { } parameter &&
+                    IsCallableValue(parameter.Type))
                     return new BoundParameterAccess(name.Span, parameter);
 
-                if (_currentFunction?.ContainingType?.FindProperty(text)
-                        is { Type: DelegateTypeSymbol } property)
+                if (_currentFunction?.ContainingType?.FindProperty(text) is { } property &&
+                    IsCallableValue(property.Type))
                 {
                     var receiver = BindImplicitThis(name.Span);
                     if (receiver is not null)
                         return BindPropertyRead(name.Span, receiver, property);
                 }
 
-                if (_currentFunction?.ContainingType?.FindField(text) is { Type: DelegateTypeSymbol } field)
+                if (_currentFunction?.ContainingType?.FindField(text) is { } field &&
+                    IsCallableValue(field.Type))
                 {
                     var receiver = BindImplicitThis(name.Span);
                     if (receiver is not null) return new BoundFieldAccess(name.Span, receiver, field);
@@ -308,9 +323,16 @@ public sealed partial class Binder
         }
     }
 
+    /// <summary>A value that is called rather than dispatched to.</summary>
+    private static bool IsCallableValue(TypeSymbol type) =>
+        type is DelegateTypeSymbol or ClosureTypeSymbol;
+
     private BoundExpression BuildIndirectCall(
         CallSyntax syntax, BoundExpression target, List<BoundExpression> arguments)
     {
+        if (target.Type is ClosureTypeSymbol closure)
+            return BuildClosureCall(syntax, closure, target, arguments);
+
         var delegateType = (DelegateTypeSymbol)target.Type;
 
         if (arguments.Count != delegateType.Signature.Count)
@@ -338,6 +360,40 @@ public sealed partial class Binder
         }
 
         return new BoundIndirectCall(syntax.Span, delegateType, target, converted);
+    }
+
+    /// <summary>
+    /// The same, through a closure. The receiver it carries goes in first and
+    /// is not one of the arguments written, so the count is checked against the
+    /// signature exactly as a delegate's is.
+    /// </summary>
+    private BoundExpression BuildClosureCall(
+        CallSyntax syntax, ClosureTypeSymbol closure,
+        BoundExpression target, List<BoundExpression> arguments)
+    {
+        if (arguments.Count != closure.Signature.Count)
+        {
+            diagnostics.Error("SL0363", syntax.Span,
+                $"closure '{closure.Name}' is '{closure.SignatureText}' and takes " +
+                $"{Counted(closure.Signature.Count, "argument")}, but {Given(arguments.Count)}");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var converted = new List<BoundExpression>(arguments.Count);
+        for (int i = 0; i < arguments.Count; i++)
+        {
+            var parameter = closure.Signature[i];
+
+            if (!ArgumentFits(arguments[i], parameter))
+            {
+                ReportArgumentMode(closure.Name, i, arguments[i], parameter);
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            converted.Add(ConvertArgument(arguments[i], parameter, syntax.Arguments[i].Span));
+        }
+
+        return new BoundClosureCall(syntax.Span, closure, target, converted);
     }
 
     /// <summary>
@@ -810,12 +866,22 @@ public sealed partial class Binder
         // that exact signature. The delegate is the only context a bare name
         // has, which is also how the overload gets chosen.
         if (argument is BoundFunctionGroup group)
-            return target is DelegateTypeSymbol wanted && group.Candidates.Any(wanted.Accepts);
+            return target switch
+            {
+                DelegateTypeSymbol wanted => group.Candidates.Any(wanted.Accepts),
+
+                // A method fits a closure the same way, and the receiver plays
+                // no part in the match: what the closure carries is the object,
+                // and what its signature describes is the call.
+                ClosureTypeSymbol bound => group.Candidates.Any(bound.Accepts),
+                _ => false,
+            };
 
         if (argument is BoundLambda lambda)
             return target switch
             {
                 DelegateTypeSymbol signature => signature.Signature.Count == lambda.Syntax.Parameters.Count,
+                ClosureTypeSymbol bound => bound.Signature.Count == lambda.Syntax.Parameters.Count,
                 InterfaceTypeSymbol functional => SingleMethodOf(functional) is { } only &&
                     only.Parameters.Count(p => !p.IsThis) == lambda.Syntax.Parameters.Count,
                 _ => false,

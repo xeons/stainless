@@ -219,9 +219,23 @@ public sealed partial class Binder
         if (ReachThroughAnonymous(syntax.Span, receiver, namedType, syntax.Member) is { } reached)
             return reached;
 
-        if (namedType.FindMethod(syntax.Member) is not null)
+        if (namedType.FindMethods(syntax.Member).ToList() is { Count: > 0 } bound)
         {
-            // Methods are only reachable through a call, which BindCall handles.
+            // `obj.Method` with no call after it is a method *bound to* obj,
+            // which is the one thing a closure can hold and a delegate cannot.
+            // It is offered as a group and settled by whatever it is being
+            // stored in; if nothing settles it, BindFunctionReference reports
+            // SL0250 and the message is the one it always was.
+            var instances = bound.Where(m => !m.IsStatic).ToList();
+
+            if (instances.Count > 0)
+                return new BoundFunctionGroup(
+                    syntax.Span, FunctionGroupType.Instance,
+                    $"{namedType.SimpleName}.{syntax.Member}", instances)
+                {
+                    Receiver = receiver,
+                };
+
             diagnostics.Error("SL0250", syntax.Span,
                 $"'{namedType.Name}.{syntax.Member}' is a method; call it with '()'");
             return new BoundErrorExpression(syntax.Span);

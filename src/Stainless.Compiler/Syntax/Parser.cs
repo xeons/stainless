@@ -219,7 +219,7 @@ public sealed class Parser
         if (At(TokenKind.EnumKeyword))
             return [ParseEnumDeclaration(start, modifiers, attributes)];
 
-        if (At(TokenKind.DelegateKeyword))
+        if (At(TokenKind.DelegateKeyword) || AtClosureDeclaration())
             return [ParseDelegateDeclaration(start, modifiers)];
 
         if (At(TokenKind.Tilde) && enclosingType is not null)
@@ -594,18 +594,38 @@ public sealed class Parser
     /// </summary>
     private Declaration ParseDelegateDeclaration(int start, Modifiers modifiers)
     {
-        Expect(TokenKind.DelegateKeyword);
+        // `closure` is the same declaration with a receiver, and is contextual
+        // for the reason `event` is: it is a good enough variable name that
+        // taking it would cost every program for a feature most do not use.
+        bool carriesReceiver = !At(TokenKind.DelegateKeyword);
+        Advance();
+
         var returnType = ParseType();
 
         string name = ExpectIdentifier();
         var parameters = ParseParameterList(out bool variadic);
 
+        string kind = carriesReceiver ? "closure" : "delegate";
+
         if (variadic)
             _diagnostics.Error("SL0358", SpanFrom(start),
-                $"delegate '{name}' cannot be variadic; there is no way to call one safely");
+                $"{kind} '{name}' cannot be variadic; there is no way to call one safely");
 
         Expect(TokenKind.Semicolon);
-        return new DelegateDeclSyntax(SpanFrom(start), modifiers, name, returnType, parameters);
+        return new DelegateDeclSyntax(
+            SpanFrom(start), modifiers, name, returnType, parameters, carriesReceiver);
+    }
+
+    /// <summary>
+    /// Whether this is <c>closure R Name(...)</c> rather than something that
+    /// merely begins with the word. Contextual, as <c>event</c> is.
+    /// </summary>
+    private bool AtClosureDeclaration()
+    {
+        if (!At(TokenKind.Identifier) || Current.Text != "closure") return false;
+
+        var next = Peek(1).Kind;
+        return next == TokenKind.Identifier || PrimitiveKeywords.Contains(next);
     }
 
     /// <summary>

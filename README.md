@@ -1335,6 +1335,15 @@ Everything below is covered by [the test suite](tests/cases).
   header writes them `T*` and `const T*`
 - `delegate`: a named function pointer, one word, C ABI compatible in both
   directions, and storable in a `struct`
+- `closure`: a method **and the object it belongs to** — two words, what Delphi
+  spells `of object`, and what a callback has to be to know anything.
+  `counter.Add` and a capturing lambda are the same type and interchangeable;
+  the receiver is kept alive by ARC for as long as the closure is; and `==`
+  compares both words, so one is removable from a list of them. It costs
+  nothing to support: a method already takes its receiver as argument zero, so
+  a bound method pointer is the method's own address beside the object, and
+  being two fields is what gives it layout, both ABI classifiers and reference
+  counting without any of them being written for it
 - Lambdas and closures: `value => value * factor` becomes a generated class
   implementing a single-method interface, capturing **by value** so it may
   outlive the scope that built it; a non-capturing one becomes a `delegate`. A

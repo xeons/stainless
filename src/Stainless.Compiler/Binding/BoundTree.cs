@@ -329,6 +329,12 @@ public sealed class BoundFunctionGroup(
 {
     public string Name { get; } = name;
     public IReadOnlyList<FunctionSymbol> Candidates { get; } = candidates;
+
+    /// <summary>
+    /// The object <c>obj.Method</c> named, which only a closure can carry.
+    /// Null for a bare function name.
+    /// </summary>
+    public BoundExpression? Receiver { get; init; }
 }
 
 /// <summary>
@@ -478,6 +484,72 @@ public sealed class BoundIndirectCall(
     : BoundExpression(span, delegateType.ReturnType)
 {
     public DelegateTypeSymbol DelegateType { get; } = delegateType;
+    public BoundExpression Target { get; } = target;
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
+}
+
+/// <summary>
+/// Binding a method to an object: the two words of a closure.
+///
+/// <paramref name="receiver"/> is null for a plain function, which has no
+/// object to carry. The call still passes something as argument zero -- the
+/// shape has to be uniform or every call would need a branch -- so a thunk
+/// that ignores it stands in, and the receiver word holds null.
+/// </summary>
+public sealed class BoundClosureCreate(
+    SourceSpan span,
+    ClosureTypeSymbol closureType,
+    FunctionSymbol function,
+    BoundExpression? receiver)
+    : BoundExpression(span, closureType)
+{
+    public ClosureTypeSymbol ClosureType { get; } = closureType;
+    public FunctionSymbol Function { get; } = function;
+    public BoundExpression? Receiver { get; } = receiver;
+}
+
+/// <summary>
+/// Two closures compared: the same method on the same object.
+///
+/// A node of its own rather than two field comparisons joined by <c>&amp;&amp;</c>,
+/// because each side must be evaluated once — <c>Make() == other</c> would
+/// otherwise call <c>Make</c> twice, once per word.
+///
+/// This is what makes a closure removable from a list of them. It is also why
+/// Delphi's method pointers are values rather than objects: two mentions of
+/// <c>this.Handler</c> are equal, where two generated adapters would not have
+/// been.
+/// </summary>
+public sealed class BoundClosureEqual(
+    SourceSpan span,
+    ClosureTypeSymbol closureType,
+    BoundExpression left,
+    BoundExpression right,
+    bool negated)
+    : BoundExpression(span, PrimitiveTypeSymbol.Bool)
+{
+    public ClosureTypeSymbol ClosureType { get; } = closureType;
+    public BoundExpression Left { get; } = left;
+    public BoundExpression Right { get; } = right;
+    public bool Negated { get; } = negated;
+}
+
+/// <summary>
+/// A call through a closure: the function it holds, given the object it holds
+/// as argument zero and then the arguments written.
+///
+/// That the receiver goes first is not a convention invented here. A method
+/// already takes its <c>this</c> in that position, so a bound method needs no
+/// thunk and no shuffling -- the closure is the address of the method itself.
+/// </summary>
+public sealed class BoundClosureCall(
+    SourceSpan span,
+    ClosureTypeSymbol closureType,
+    BoundExpression target,
+    IReadOnlyList<BoundExpression> arguments)
+    : BoundExpression(span, closureType.ReturnType)
+{
+    public ClosureTypeSymbol ClosureType { get; } = closureType;
     public BoundExpression Target { get; } = target;
     public IReadOnlyList<BoundExpression> Arguments { get; } = arguments;
 }

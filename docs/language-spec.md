@@ -1678,7 +1678,73 @@ if (none == null) { ... }
 **A delegate captures nothing.** It refers to a function, not to a function
 plus an environment. A lambda that captures becomes a closure instead — see
 §2.15 — and only a non-capturing one can be a delegate, because there is nowhere
-in a single pointer to keep what was captured.
+in a single pointer to keep what was captured. `closure` below is the type that
+does have somewhere.
+
+### 2.14.1 `closure` — a method and the object it belongs to
+
+```csharp
+public closure void Notify(int value);
+
+Notify first  = counter.Add;              // a bound method
+Notify second = other.Add;                // same type, different object
+Notify third  = (v) => { label.Show(v); };  // a capturing lambda
+first(5);
+```
+
+A closure is **two pointers**: a function, and the receiver to call it on.
+Delphi spells the same distinction `of object`, and it is the difference
+between a callback that can know something and one that cannot — a delegate
+holds a function, and a function alone cannot say *which* counter to add to.
+
+**The representation costs nothing.** A method already takes its receiver as
+argument zero, so a bound method pointer is literally the method's own address
+beside the object, and calling one is a single indirect call with no thunk and
+no shuffling. Being two fields is also what gives it layout, both ABI
+classifiers, and the reference counting that keeps its object alive — none of
+which was written for closures.
+
+**The receiver is kept alive** for as long as the closure is:
+
+```csharp
+Notify Escaping() {
+    var counter = new Counter();
+    return counter.Add;            // the closure holds the counter
+}
+```
+
+**A lambda becomes one too**, capturing by value as it always does (§2.15): a
+captured `int` is a copy, and a captured reference is shared. The object behind
+the closure is then the class the compiler generated to hold what was captured,
+which is why a lambda and a bound method are the same two words and
+interchangeable everywhere.
+
+**Comparison is both words** — the same method *and* the same object:
+
+```csharp
+first == counter.Add        // true
+first == other.Add          // false: different object
+first == counter.Subtract   // false: different method
+```
+
+That is what makes a closure removable from a list of them, and it is the
+reason a method pointer is a value rather than an object: two mentions of
+`counter.Add` are equal, where two generated wrappers would not have been.
+
+**What it is not**
+
+- **Not a C function pointer** (SL0360). Sixteen bytes cannot go where eight
+  are expected, so a closure never satisfies a `delegate` and never crosses
+  `extern "C"`. Declare a `delegate` for that, and take the context as an
+  argument the way C does.
+- **Not over a plain function** (SL0599). A closure is a method *and* an
+  object; a function has no object. Wrap it in a lambda, which gives it one.
+- **Not inferrable by `var`** (SL0553), for the reason a bare function name is
+  not: `counter.Add` names a method, and which closure type it becomes is what
+  the declaration says.
+
+`closure` is a **contextual** keyword, as `event` would have been: it means
+something at the head of a declaration and is an ordinary name everywhere else.
 
 ### 2.15 Lambdas and closures
 

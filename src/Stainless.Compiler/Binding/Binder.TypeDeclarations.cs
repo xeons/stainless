@@ -175,13 +175,17 @@ public sealed partial class Binder
                     continue;
                 }
 
-                var delegateType = new DelegateTypeSymbol
-                {
-                    SimpleName = declaration.Name,
-                    ModuleName = module.Name,
-                    IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
-                    Span = declaration.Span,
-                };
+                // Declared before the loop body reads it, so the local below
+                // keeps the name the rest of this block already uses.
+                NamedTypeSymbol delegateType = declaration.CarriesReceiver
+                    ? NewClosureType(declaration, module)
+                    : new DelegateTypeSymbol
+                    {
+                        SimpleName = declaration.Name,
+                        ModuleName = module.Name,
+                        IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+                        Span = declaration.Span,
+                    };
 
                 ClaimThreadsafe(delegateType, declaration.Modifiers, declaration.Span);
 

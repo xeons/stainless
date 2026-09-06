@@ -718,6 +718,25 @@ public sealed partial class Binder
                         "one method");
                     type = ErrorTypeSymbol.Instance;
                 }
+                else if (type is FunctionGroupType)
+                {
+                    // The same hole as the lambda above, and it emitted the
+                    // same `store ptr 0`. A function name names an overload
+                    // set, not a value: what settles it is the delegate or
+                    // closure it is stored in, and `var` supplies neither.
+                    bool bound = initializer is BoundFunctionGroup { Receiver: not null };
+
+                    diagnostics.Error("SL0553", syntax.Initializer.Span,
+                        $"'{syntax.Name}' cannot be a 'var': " +
+                        (bound
+                            ? "a method reached through an object is a closure, and which " +
+                              "closure it is has to be written out. Give the type, or call it " +
+                              "with '()'"
+                            : "a function name is an overload set rather than a value, and what " +
+                              "picks the overload is the delegate it is stored in. Write the " +
+                              "type out, or call it with '()'"));
+                    type = ErrorTypeSymbol.Instance;
+                }
                 else if (type is VariantDraftType)
                 {
                     string built = (initializer as BoundVariantDraft)?.Case ?? "a case";
@@ -747,7 +766,8 @@ public sealed partial class Binder
         var expression = BindExpression(syntax.Expression);
 
         bool hasEffect = expression is BoundAssignment or BoundPropertyAssignment or BoundCall
-                                    or BoundIndirectCall or BoundNew or BoundErrorExpression;
+                                    or BoundIndirectCall or BoundClosureCall
+                                    or BoundNew or BoundErrorExpression;
         if (!hasEffect)
             diagnostics.Warning("SL0222", syntax.Span,
                 "this expression has no effect; its result is discarded");

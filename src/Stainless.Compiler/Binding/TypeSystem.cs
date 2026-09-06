@@ -371,6 +371,7 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// </summary>
     public List<PropertySymbol> Properties { get; } = [];
 
+
     /// <summary>
     /// Methods with type parameters of their own. They stay templates until a
     /// call says what those parameters are, the same way a generic type does.
@@ -548,6 +549,74 @@ public sealed class DelegateTypeSymbol : NamedTypeSymbol
 
         // The mode is part of the signature: a 'ref int' and an 'int' are
         // passed differently and mean different things to the caller.
+        return !parameters.Where(
+            (p, i) => !p.Type.Equals(Signature[i].Type) || p.Mode != Signature[i].Mode).Any();
+    }
+
+    public string SignatureText =>
+        $"{ReturnType.Name}({string.Join(", ", Signature.Select(Spelled))})";
+
+    private static string Spelled(ParameterSymbol parameter) =>
+        (parameter.Mode == Syntax.ParameterMode.Ref ? "ref " :
+         parameter.Mode == Syntax.ParameterMode.In ? "in " : "") + parameter.Type.Name;
+}
+
+/// <summary>
+/// A <c>closure</c>: a function and the object it is bound to.
+///
+/// **The difference from a delegate is the second word.** A delegate is one
+/// pointer, which is what makes it a C function pointer and what stops it
+/// carrying anything: a lambda that reads a name from around it cannot become
+/// one (SL0381). A closure is a pointer *and* a receiver, so a bound method
+/// and a capturing lambda are both expressible — which is what an event
+/// handler has to be, and what Delphi means by <c>of object</c>.
+///
+/// It is a <see cref="StructTypeSymbol"/> on purpose. Layout, the two ABI
+/// classifiers, and the reference walking that retains and releases a value's
+/// contents are all written against struct fields, so a closure gets every one
+/// of them by being two fields rather than by being special.
+///
+/// **It is deliberately not a <see cref="DelegateTypeSymbol"/>**, so that no
+/// existing test for one can be satisfied by a closure. Sixteen bytes silently
+/// reaching a slot that expects a C function pointer is the kind of mistake
+/// that would show up as a corrupt stack in someone else's code.
+/// </summary>
+public sealed class ClosureTypeSymbol : StructTypeSymbol
+{
+    /// <summary>The field names, which are the compiler's and not reachable.</summary>
+    public const string FunctionFieldName = "$function";
+    public const string ReceiverFieldName = "$receiver";
+
+    public TypeSymbol ReturnType { get; set; } = PrimitiveTypeSymbol.Void;
+
+    /// <summary>
+    /// The signature as written, which never includes the receiver.
+    ///
+    /// The receiver is not part of what a closure's users see: two closures of
+    /// the same declared signature are interchangeable however different the
+    /// objects behind them are. It is part of the *call*, where it goes in
+    /// first, because that is where a Stainless method already expects it.
+    /// </summary>
+    public List<ParameterSymbol> Signature { get; } = [];
+
+    public FieldSymbol? Function { get; set; }
+    public FieldSymbol? Receiver { get; set; }
+
+    /// <summary>
+    /// True when <paramref name="function"/> can be bound into this closure.
+    ///
+    /// The receiver is ignored, which is the whole point: a method's own
+    /// <c>this</c> is what the second word will hold, so a method of the right
+    /// shape fits whatever type declared it.
+    /// </summary>
+    public bool Accepts(FunctionSymbol function)
+    {
+        if (function.IsVariadic) return false;
+
+        var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
+        if (parameters.Count != Signature.Count) return false;
+        if (!function.ReturnType.Equals(ReturnType)) return false;
+
         return !parameters.Where(
             (p, i) => !p.Type.Equals(Signature[i].Type) || p.Mode != Signature[i].Mode).Any();
     }

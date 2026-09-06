@@ -1,0 +1,22 @@
+one = 8
+two = 100
+after-subtract = 7
+same = true
+other-object = false
+other-method = false
+not-equal = true
+through-capture = 10
+by-value = 0
+repeated = 37
+repeated-lambda = 20
+fold = 40
+after-all = 38/101/21
+left = 2
+after-removal = 39/101/22
+escaping
+returned
+~Counter(escaped)
+escaped
+~Counter(counted)
+~Counter(two)
+~Counter(one)

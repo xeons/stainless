@@ -169,6 +169,115 @@ public sealed partial class LlvmEmitter
     /// the target is a loaded pointer rather than a symbol, so the signature has
     /// to be written out for LLVM to know how to call it.
     /// </summary>
+    /// <summary>
+    /// Building a closure: two stores, and a retain on the object.
+    ///
+    /// The function word is the method's own address. Nothing is wrapped and
+    /// nothing is shuffled, because a method already takes its receiver as
+    /// argument zero -- which is the whole reason this representation is two
+    /// words rather than a generated class.
+    /// </summary>
+    private Val EmitClosureCreate(BoundClosureCreate closure)
+    {
+        var type = closure.ClosureType;
+        string slot = Alloca(StructName(type), "closure");
+
+        string functionSlot = StructFieldAddress(slot, type, type.Function!);
+        Line($"store ptr {Symbol(closure.Function)}, ptr {functionSlot}, align 8");
+
+        string receiverSlot = StructFieldAddress(slot, type, type.Receiver!);
+        var receiver = EmitExpression(closure.Receiver!);
+
+        // +1, and tracked, exactly as a struct-returning call's result is: what
+        // comes out of here owns its object until the statement ends or
+        // something stores it.
+        Retain(receiver.Ref, type.Receiver!.Type);
+        Line($"store ptr {receiver.Ref}, ptr {receiverSlot}, align 8");
+
+        TrackTemporary(slot, type);
+        return new Val(slot, "ptr", type);
+    }
+
+    /// <summary>
+    /// Comparing two: both words, and each side loaded once.
+    /// </summary>
+    private Val EmitClosureEqual(BoundClosureEqual comparison)
+    {
+        var type = comparison.ClosureType;
+
+        var left = EmitExpression(comparison.Left);
+        var right = EmitExpression(comparison.Right);
+
+        string leftFunction = Emit("ptr",
+            $"load ptr, ptr {StructFieldAddress(left.Ref, type, type.Function!)}, align 8");
+        string rightFunction = Emit("ptr",
+            $"load ptr, ptr {StructFieldAddress(right.Ref, type, type.Function!)}, align 8");
+
+        string leftReceiver = Emit("ptr",
+            $"load ptr, ptr {StructFieldAddress(left.Ref, type, type.Receiver!)}, align 8");
+        string rightReceiver = Emit("ptr",
+            $"load ptr, ptr {StructFieldAddress(right.Ref, type, type.Receiver!)}, align 8");
+
+        string predicate = comparison.Negated ? "ne" : "eq";
+        string sameFunction = Emit("i1", $"icmp {predicate} ptr {leftFunction}, {rightFunction}");
+        string sameReceiver = Emit("i1", $"icmp {predicate} ptr {leftReceiver}, {rightReceiver}");
+
+        // Equal wants both, different wants either.
+        string combine = comparison.Negated ? "or" : "and";
+        string answer = Emit("i1", $"{combine} i1 {sameFunction}, {sameReceiver}");
+
+        return new Val(answer, "i1", PrimitiveTypeSymbol.Bool);
+    }
+
+    /// <summary>
+    /// Calling one: load both words, and put the object in front of the
+    /// arguments the caller wrote.
+    /// </summary>
+    private Val EmitClosureCall(BoundClosureCall call)
+    {
+        var type = call.ClosureType;
+        var returnInfo = ClassifyResult(type.ReturnType);
+
+        // Resolved before the arguments, for the reason a delegate's target is.
+        var held = EmitExpression(call.Target);
+
+        string functionSlot = StructFieldAddress(held.Ref, type, type.Function!);
+        string function = Emit("ptr", $"load ptr, ptr {functionSlot}, align 8");
+
+        string receiverSlot = StructFieldAddress(held.Ref, type, type.Receiver!);
+        string receiver = Emit("ptr", $"load ptr, ptr {receiverSlot}, align 8");
+
+        var arguments = new List<string>();
+        string? sretSlot = null;
+
+        if (returnInfo.Style == PassStyle.Indirect)
+        {
+            var structType = (StructTypeSymbol)type.ReturnType;
+            sretSlot = Alloca(StructName(structType), "call.sret");
+            arguments.Add($"ptr sret({StructName(structType)}) {sretSlot}");
+        }
+
+        arguments.Add($"ptr {receiver}");
+        AppendArguments(call.Arguments, arguments);
+
+        string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
+        string invocation = $"call {signature} {function}({string.Join(", ", arguments)})";
+
+        if (returnInfo.Style == PassStyle.Indirect)
+        {
+            Line(invocation);
+            return new Val(sretSlot!, "ptr", type.ReturnType);
+        }
+
+        if (type.ReturnType.IsVoid())
+        {
+            Line(invocation);
+            return Val.Void;
+        }
+
+        return new Val(Emit(returnInfo.LlvmType, invocation), returnInfo.LlvmType, type.ReturnType);
+    }
+
     private Val EmitIndirectCall(BoundIndirectCall call)
     {
         var delegateType = call.DelegateType;
