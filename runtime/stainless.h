@@ -399,6 +399,7 @@ SL_API void  *sl_string_from_bytes(const uint8_t *data, size_t byteLength);
 SL_API size_t sl_utf8_encode(uint32_t codePoint, uint8_t *into);
 SL_API void  *sl_string_from_null_terminated(const char *text);
 SL_API void  *sl_string_from_integer(long long value);
+SL_API void  *sl_string_from_unsigned(unsigned long long value);
 SL_API void  *sl_string_from_double(double value);
 SL_API void  *sl_string_from_bool(_Bool value);
 

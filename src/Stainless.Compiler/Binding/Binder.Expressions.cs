@@ -850,6 +850,30 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // A negated literal is wide enough for what it will hold.
+        //
+        // Every integer literal starts out an `int` and adopts a wider type at
+        // the point it is used, where the value can be seen (ConstantFits). A
+        // minus is in between: `-9000000000000000000` is a unary operation on a
+        // literal, so the operation's type is the literal's, and by the time the
+        // assignment could widen it the value has already been truncated to 32
+        // bits -- silently, `int` to `long` being an implicit widening that has
+        // nothing to complain about. So the width is chosen here instead, from
+        // what the *negated* value needs: `-2147483648` is still an `int`, as in
+        // C#, and everything past it is a `long`.
+        if (op is BoundUnaryOp.Negate &&
+            operand is BoundLiteral { Value: ulong magnitude } written &&
+            written.Type is PrimitiveTypeSymbol { IsInteger: true, IsSigned: true } &&
+            magnitude > 2147483648UL)
+        {
+            operand = new BoundLiteral(
+                written.Span,
+                magnitude <= 9223372036854775808UL
+                    ? PrimitiveTypeSymbol.Long
+                    : PrimitiveTypeSymbol.ULong,
+                magnitude);
+        }
+
         // Small integers promote to int before arithmetic, as in C#.
         if (op is BoundUnaryOp.Negate or BoundUnaryOp.BitwiseNot)
             operand = PromoteToInt(operand);

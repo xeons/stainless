@@ -41,5 +41,24 @@ int Main() {
     Console.WriteLine(Text.FromInteger((int)sizeof(Marker)));
     Console.WriteLine(Text.FromInteger((int)sizeof(Tagged)));
 
+    // A negated literal is as wide as the value it holds. Every integer
+    // literal starts out an `int` and adopts a wider type where it is used,
+    // and a minus is in between: without a width chosen for the operation,
+    // `-9000000000000000000` truncated to 32 bits and widened back silently,
+    // `int` to `long` being an implicit conversion with nothing to say.
+    long floor = -9223372036854775808;
+    long wide = -9000000000000000000;
+    long past = -4000000000;
+    int smallest = -2147483648;     // still an int, as in C#
+    Console.WriteLine(Text.FromInteger(floor));
+    Console.WriteLine(Text.FromInteger(wide));
+    Console.WriteLine(Text.FromInteger(past));
+    Console.WriteLine(Text.FromInteger((long)smallest));
+
+    // And an unsigned value past 2^63 writes as itself rather than as the
+    // negative number the same bits spell.
+    ulong huge = 18000000000000000000u;
+    Console.WriteLine(Text.FromInteger(huge));
+
     return 0;
 }

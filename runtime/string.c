@@ -230,6 +230,19 @@ void *sl_string_from_integer(long long value)
     return sl_string_from_bytes((const uint8_t *)buffer, (size_t)(written < 0 ? 0 : written));
 }
 
+/*
+ * The same for an unsigned value, which is a separate entry point because it
+ * has to be: a `nuint` or a `ulong` past 2^63 read through "%lld" prints as a
+ * negative number, and every length, index and hash in the language is one of
+ * those types.
+ */
+void *sl_string_from_unsigned(unsigned long long value)
+{
+    char buffer[32];
+    int  written = snprintf(buffer, sizeof buffer, "%llu", value);
+    return sl_string_from_bytes((const uint8_t *)buffer, (size_t)(written < 0 ? 0 : written));
+}
+
 void *sl_string_from_double(double value)
 {
     char buffer[64];

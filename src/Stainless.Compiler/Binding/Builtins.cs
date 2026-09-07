@@ -336,7 +336,9 @@ public sealed class Builtins
         // --- Standard.Text free functions -----------------------------------
         TextFromLong = Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.Long));
-        TextFromNUInt = Function(Text, "FromInteger", String, "sl_string_from_integer",
+        // A separate runtime entry point rather than the signed one: a `nuint`
+        // past 2^63 formatted through "%lld" prints as a negative number.
+        TextFromNUInt = Function(Text, "FromInteger", String, "sl_string_from_unsigned",
             ("value", PrimitiveTypeSymbol.NUInt));
         TextFromBool = Function(Text, "FromBool", String, "sl_string_from_bool",
             ("value", PrimitiveTypeSymbol.Bool));
