@@ -1,0 +1,19 @@
+a 1 one
+b one
+c 1 9
+d 1 9
+e to|gether
+f 1 2.5 three
+g 2 outer
+h 7
+i 2 two
+j true
+held:
+  first and second
+  dropped first
+  dropped second
+taken apart:
+  first and second
+  dropped first
+  dropped second
+done

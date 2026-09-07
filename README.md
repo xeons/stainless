@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 245 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 248 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 245 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 235 and Windows 244, each
+**Both Windows and Linux are tested.** 248 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 238 and Windows 247, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1780,6 +1780,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   call so that a hole in that produces a zero rather than whatever the stack
   held. An ordinary local read before it is written is still nobody's business
   but the author's.
+- **Tuples**: `(int, String)`, structural, with `Item1` upwards for fields and
+  `var (low, high) = MinMax(xs);` where the names matter. A tuple is a struct,
+  so layout, both ABI classifiers and reference counting apply to it with
+  nothing written for tuples
 - **A type may be declared inside another**, and is lifted out and named for
   where it was written: `Rect.Point` from outside, `Point` from within `Rect`.
   Nesting is about where a name is reached from and nothing else — no hidden

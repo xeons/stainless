@@ -69,6 +69,10 @@ public sealed record FixedArrayTypeSyntax(
 /// <summary><c>T?</c> — an optional class reference.</summary>
 public sealed record NullableTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
+/// <summary><c>(int, String)</c> as a type.</summary>
+public sealed record TupleTypeSyntax(
+    SourceSpan Span, IReadOnlyList<TypeSyntax> Elements) : TypeSyntax(Span);
+
 /// <summary><c>weak T?</c> — a non-owning reference that nulls out on death.</summary>
 public sealed record WeakTypeSyntax(SourceSpan Span, TypeSyntax Element) : TypeSyntax(Span);
 
@@ -542,6 +546,19 @@ public abstract record StatementSyntax(SourceSpan Span) : SyntaxNode(Span);
 public sealed record BlockSyntax(SourceSpan Span, IReadOnlyList<StatementSyntax> Statements)
     : StatementSyntax(Span);
 
+/// <summary>
+/// <c>var (count, name) = Split(line);</c> — a tuple taken apart into locals.
+///
+/// The names are here rather than in the type, because this is where a name is
+/// actually wanted: a tuple's own fields are <c>Item1</c> upwards, and what
+/// they mean is a property of the call that produced them.
+/// </summary>
+public sealed record DeconstructSyntax(
+    SourceSpan Span,
+    IReadOnlyList<string> Names,
+    IReadOnlyList<SourceSpan> NameSpans,
+    ExpressionSyntax Value) : StatementSyntax(Span);
+
 /// <summary>A local declaration. A null <see cref="Type"/> means <c>var</c>.</summary>
 public sealed record LocalDeclSyntax(
     SourceSpan Span,
@@ -700,6 +717,15 @@ public sealed record InterpolatedStringSyntax(
 public sealed record InterpolatedPartSyntax(string? Literal, ExpressionSyntax? Value);
 
 public sealed record NameSyntax(SourceSpan Span, QualifiedName Name) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>(a, b)</c> — several values written as one.
+///
+/// One element is not a tuple but a parenthesised expression, which is why the
+/// parser only builds this where it found a comma.
+/// </summary>
+public sealed record TupleSyntax(
+    SourceSpan Span, IReadOnlyList<ExpressionSyntax> Elements) : ExpressionSyntax(Span);
 
 /// <summary>
 /// <c>try e</c>: the value if it succeeded, and otherwise a return from the

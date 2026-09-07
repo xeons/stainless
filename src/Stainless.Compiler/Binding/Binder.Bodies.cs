@@ -822,6 +822,7 @@ public sealed partial class Binder
     {
         BlockSyntax block => BindBlock(block),
         LocalDeclSyntax local => BindLocalDeclaration(local),
+        DeconstructSyntax taken => BindDeconstruct(taken),
         ExpressionStatementSyntax expression => BindExpressionStatement(expression),
         IfSyntax ifStatement => BindIf(ifStatement),
         WhileSyntax whileStatement => BindWhile(whileStatement),
@@ -948,6 +949,45 @@ public sealed partial class Binder
         BoundConditional chosen => Effective(chosen.WhenTrue) || Effective(chosen.WhenFalse),
         _ => false,
     };
+
+    /// <summary>
+    /// <c>var (count, name) = Split(line);</c>.
+    ///
+    /// The tuple is held in a local of its own so that whatever produced it is
+    /// evaluated once, and each name is then a local initialised from one of
+    /// its fields. Names are wanted here rather than in the type: a tuple's own
+    /// fields are <c>Item1</c> upwards, and what they mean is a property of the
+    /// call that answered with them.
+    /// </summary>
+    private BoundStatement BindDeconstruct(DeconstructSyntax syntax)
+    {
+        var value = BindExpression(syntax.Value);
+        if (value.Type.IsError()) return new BoundBlock(syntax.Span, []);
+
+        if (value.Type is not TupleTypeSymbol tuple)
+        {
+            diagnostics.Error("SL0608", syntax.Value.Span,
+                $"'{value.Type.Name}' is not a tuple, so there is nothing here to take apart");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        if (tuple.Elements.Count != syntax.Names.Count)
+        {
+            diagnostics.Error("SL0609", syntax.Span,
+                $"'{tuple.Name}' has {Counted(tuple.Elements.Count, "element")}, and this " +
+                $"names {syntax.Names.Count}");
+            return new BoundBlock(syntax.Span, []);
+        }
+
+        var source = new LocalSymbol(SyntheticName("taken"), tuple, isConst: false);
+
+        var names = new List<LocalSymbol>(syntax.Names.Count);
+        for (int i = 0; i < syntax.Names.Count; i++)
+            names.Add(DeclareLocal(
+                syntax.Names[i], tuple.Elements[i], isConst: false, syntax.NameSpans[i]));
+
+        return new BoundDeconstruct(syntax.Span, source, value, names);
+    }
 
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
     {

@@ -40,6 +40,7 @@ public sealed partial class LlvmEmitter
         {
             case BoundBlock block: EmitBlock(block); break;
             case BoundLocalDeclaration declaration: EmitLocalDeclaration(declaration); break;
+            case BoundDeconstruct taken: EmitDeconstruct(taken); break;
             case BoundExpressionStatement expression: EmitExpressionStatement(expression); break;
             case BoundIf ifStatement: EmitIf(ifStatement); break;
             case BoundWhile whileStatement: EmitWhile(whileStatement); break;
@@ -100,6 +101,73 @@ public sealed partial class LlvmEmitter
         else if (local.Type is StructTypeSymbol structType && !structType.CarriesReferences())
         {
             Line($"store {StructName(structType)} zeroinitializer, ptr {slot}");
+        }
+
+        FlushTemporaries();
+    }
+
+    /// <summary>
+    /// <c>var (a, b) = t;</c>.
+    ///
+    /// The tuple lands in a slot of its own first, so that whatever produced it
+    /// runs once; each name is then an ordinary local, given a copy of one
+    /// field. A copy, so that the names outlive the tuple and own what they
+    /// hold -- the store is the owning one, which retains a reference.
+    /// </summary>
+    private void EmitDeconstruct(BoundDeconstruct statement)
+    {
+        var tuple = (TupleTypeSymbol)statement.Value.Type;
+
+        string source = Alloca(StructName(tuple), statement.Local.Name);
+        _slots[statement.Local] = source;
+
+        Line($"store {StructName(tuple)} zeroinitializer, ptr {source}");
+
+        // Owned, like any other local holding a struct with references in it.
+        // Without this the tuple keeps a reference to each element for the rest
+        // of the function and the names below keep another -- which is one
+        // release short per element, and the leak the ARC case caught.
+        if (tuple.CarriesReferences())
+        {
+            ZeroOnEntry(source, StructName(tuple));
+            TrackOwnedLocal(source, tuple);
+        }
+
+        StoreInto(source, EmitExpression(statement.Value), tuple);
+
+        for (int i = 0; i < statement.Names.Count; i++)
+        {
+            var local = statement.Names[i];
+            var field = tuple.Fields[i];
+
+            string llvmType = LlvmTypeOf(local.Type);
+            string slot = Alloca(llvmType, local.Name);
+            _slots[local] = slot;
+
+            if (local.Type.IsManagedSlot())
+            {
+                Line($"store ptr null, ptr {slot}");
+                ZeroOnEntry(slot, "ptr");
+                TrackOwnedLocal(slot, local.Type);
+            }
+            else if (local.Type is StructTypeSymbol { } owning && owning.CarriesReferences())
+            {
+                Line($"store {StructName(owning)} zeroinitializer, ptr {slot}");
+                ZeroOnEntry(slot, StructName(owning));
+                TrackOwnedLocal(slot, local.Type);
+            }
+
+            string address = Emit("ptr",
+                $"getelementptr inbounds {StructName(tuple)}, ptr {source}, i32 0, i32 {field.Index}");
+
+            // A struct field travels as its address; anything else is loaded.
+            var held = field.Type is StructTypeSymbol
+                ? new Val(address, "ptr", field.Type)
+                : new Val(
+                    Emit(LlvmTypeOf(field.Type), $"load {LlvmTypeOf(field.Type)}, ptr {address}"),
+                    LlvmTypeOf(field.Type), field.Type);
+
+            StoreInto(slot, held, local.Type);
         }
 
         FlushTemporaries();

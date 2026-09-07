@@ -466,6 +466,46 @@ public class Cache<T> {
 }
 ```
 
+#### 2.2.3 `(int, String)` — a tuple
+
+```csharp
+(int, int) MinMax(int[:] numbers) {
+    ...
+    return (low, high);
+}
+
+var (low, high) = MinMax(numbers);      // named where the names matter
+var range = MinMax(numbers);            // or kept whole
+Console.WriteLine(range.Item1);
+```
+
+Several values travelling as one, for the function with two answers that
+belong together and no reason to declare a struct for the sake of it.
+
+**A tuple is a struct.** Layout, both ABI classifiers and the reference walk
+that retains and releases what a value holds all apply to it without a line of
+any of them being written for tuples — the same bargain `closure` made
+(§2.14.1).
+
+**It is structural.** `(int, String)` written in two modules is one type,
+interned by its element types the way `T[:]` is by its element. Nothing is
+declared and nothing has to line up but the types.
+
+**The fields are `Item1` upwards, and have no names of their own.** Named
+elements would have to either take part in the type's identity — making
+`(int a, int b)` and `(int x, int y)` different types, which is a trap — or not,
+which leaves two names for one field. Where a name is wanted it is wanted at
+the *use* site, and that is what `var (low, high) = ...` is for.
+
+**At least two elements** (SL0606): one value in parentheses is that value.
+Every element is a value (SL0607), so a call returning nothing cannot be one.
+Taking one apart names exactly as many things as it holds (SL0609), and only a
+tuple can be taken apart (SL0608).
+
+A tuple is a type like any other: nested in another tuple, held in a
+`List<(int, String)>`, inferred through a generic — `T FirstOf<T, U>((T, U) p)`
+reads `T` from the argument the way it would through any other shape.
+
 ### 2.3 `[Packed]` and `[Align]`
 
 A struct is laid out by the platform C rules, and two markers change them. Both

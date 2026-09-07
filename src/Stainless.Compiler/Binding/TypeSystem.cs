@@ -717,6 +717,36 @@ public sealed class UnionTypeSymbol : StructTypeSymbol
 /// handed. What it buys is that there are no lifetimes to explain: a slice is
 /// safe by the same rule everything else here is safe by.
 /// </summary>
+/// <summary>
+/// <c>(int, String)</c> — several values travelling as one.
+///
+/// A struct, so layout, both ABI classifiers and the reference walk that
+/// retains and releases what a value holds all apply to it without a line of
+/// any of them being written for tuples. That is the same bargain
+/// <c>closure</c> made, and it is why this is a few dozen lines rather than a
+/// feature.
+///
+/// **Structural**: <c>(int, String)</c> written in two modules is one type.
+/// They are interned by their element types, the way a slice is by its
+/// element.
+///
+/// **The fields have no names of their own** — they are <c>Item1</c> upwards,
+/// as in C#. Named elements would either have to take part in the type's
+/// identity, which makes <c>(int a, int b)</c> and <c>(int x, int y)</c>
+/// different types, or not, which leaves two names for one field. Where a name
+/// is wanted, it is wanted at the use site, and that is what deconstruction is
+/// for: <c>var (count, name) = Split(line);</c>.
+/// </summary>
+public sealed class TupleTypeSymbol : StructTypeSymbol
+{
+    public required IReadOnlyList<TypeSymbol> Elements { get; init; }
+
+    /// <summary>The name of the field holding element <paramref name="index"/>, from 0.</summary>
+    public static string FieldName(int index) => "Item" + (index + 1);
+
+    public override string Name => "(" + string.Join(", ", Elements.Select(e => e.Name)) + ")";
+}
+
 public sealed class SliceTypeSymbol : StructTypeSymbol
 {
     public required TypeSymbol Element { get; init; }

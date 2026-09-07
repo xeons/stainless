@@ -96,6 +96,13 @@ public sealed partial class Binder(
     private readonly Dictionary<TypeSymbol, ArrayTypeSymbol> _arrays = [];
     private readonly Dictionary<TypeSymbol, SliceTypeSymbol> _slices = [];
 
+    /// <summary>
+    /// Tuple types, by their element types written out. Keyed by name rather
+    /// than by the list, because two lists of the same types are two objects
+    /// and one type.
+    /// </summary>
+    private readonly Dictionary<string, TupleTypeSymbol> _tuples = new(StringComparer.Ordinal);
+
     /// <summary>Instantiated generics, keyed by template and type arguments.</summary>
     private readonly Dictionary<string, NamedTypeSymbol> _instantiatedTypes = new(StringComparer.Ordinal);
     private readonly Dictionary<string, FunctionSymbol> _instantiatedFunctions = new(StringComparer.Ordinal);

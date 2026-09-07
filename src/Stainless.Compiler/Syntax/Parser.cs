@@ -1175,7 +1175,8 @@ public sealed class Parser
     ];
 
     private bool AtTypeStart() =>
-        AtAny(PrimitiveKeywords) || At(TokenKind.Identifier) || At(TokenKind.WeakKeyword);
+        AtAny(PrimitiveKeywords) || At(TokenKind.Identifier) || At(TokenKind.WeakKeyword) ||
+        At(TokenKind.OpenParen);
 
     /// <summary>
     /// A type.
@@ -1196,7 +1197,26 @@ public sealed class Parser
         }
 
         TypeSyntax type;
-        if (AtAny(PrimitiveKeywords))
+        if (At(TokenKind.OpenParen))
+        {
+            // `(int, String)`. One element is not a tuple, and a type in
+            // parentheses is not something this language writes, so the comma
+            // is required rather than merely expected.
+            Advance();
+
+            var elements = new List<TypeSyntax>();
+            do { elements.Add(ParseType()); } while (Match(TokenKind.Comma));
+
+            Expect(TokenKind.CloseParen);
+
+            if (elements.Count < 2)
+                _diagnostics.Error("SL0606", SpanFrom(start),
+                    "a tuple type has at least two elements; one value in parentheses is " +
+                    "that value");
+
+            type = new TupleTypeSyntax(SpanFrom(start), elements);
+        }
+        else if (AtAny(PrimitiveKeywords))
         {
             var keyword = Advance().Kind;
             type = new PrimitiveTypeSyntax(SpanFrom(start), keyword);
@@ -1581,6 +1601,32 @@ public sealed class Parser
             case TokenKind.Semicolon:
                 Advance();
                 return new BlockSyntax(SpanFrom(start), []);
+
+            case TokenKind.VarKeyword when Peek(1).Kind == TokenKind.OpenParen:
+            {
+                // `var (a, b) = ...`. `var` is otherwise followed by a name, so
+                // the parenthesis settles it with no speculation.
+                Advance();
+                Advance();
+
+                var names = new List<string>();
+                var spans = new List<SourceSpan>();
+
+                do
+                {
+                    var name = Current;
+                    names.Add(ExpectIdentifier());
+                    spans.Add(name.Span);
+                }
+                while (Match(TokenKind.Comma));
+
+                Expect(TokenKind.CloseParen);
+                Expect(TokenKind.Equals);
+
+                var value = ParseExpression();
+                Expect(TokenKind.Semicolon);
+                return new DeconstructSyntax(SpanFrom(start), names, spans, value);
+            }
 
             default:
                 // `checked { ... }`. Contextual, for the reason `closure` is:
@@ -2273,6 +2319,19 @@ public sealed class Parser
 
                 Advance();
                 var inner = ParseExpression();
+
+                // `(a, b)` is a tuple; `(a)` is `a`. The comma is the whole of
+                // the difference, and there is nothing to speculate about --
+                // by here the cast and the lambda have both had their turn.
+                if (At(TokenKind.Comma))
+                {
+                    var elements = new List<ExpressionSyntax> { inner };
+                    while (Match(TokenKind.Comma)) elements.Add(ParseExpression());
+
+                    Expect(TokenKind.CloseParen);
+                    return new TupleSyntax(SpanFrom(start), elements);
+                }
+
                 Expect(TokenKind.CloseParen);
                 return inner;
             }

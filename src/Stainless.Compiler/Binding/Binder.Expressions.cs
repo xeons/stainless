@@ -39,6 +39,7 @@ public sealed partial class Binder
         NameofSyntax nameOf => BindNameof(nameOf),
         CheckedSyntax guarded => BindChecked(guarded),
         DefaultSyntax zeroed => BindDefault(zeroed),
+        TupleSyntax tuple => BindTuple(tuple),
         BinarySyntax binary => BindBinary(binary),
         AssignmentSyntax assignment => BindAssignment(assignment),
         CallSyntax call => BindCall(call),
@@ -1376,6 +1377,31 @@ public sealed partial class Binder
         if (IsImplicitlyConvertible(left, right.Type)) return right.Type;
 
         return null;
+    }
+
+    /// <summary>
+    /// <c>(a, b)</c>.
+    ///
+    /// The type is whatever the elements are, so nothing has to be written
+    /// down and nothing is inferred from where it is going: a tuple is
+    /// structural, and two of the same element types are one type.
+    /// </summary>
+    private BoundExpression BindTuple(TupleSyntax syntax)
+    {
+        var elements = syntax.Elements.Select(BindExpression).ToList();
+        if (elements.Any(e => e.Type.IsError())) return new BoundErrorExpression(syntax.Span);
+
+        foreach (var element in elements)
+        {
+            if (!element.Type.IsVoid()) continue;
+
+            diagnostics.Error("SL0607", element.Span,
+                "an element of a tuple has to be a value, and this produces none");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var type = TupleOf(elements.Select(e => e.Type).ToList());
+        return new BoundTupleCreate(syntax.Span, type, elements);
     }
 
     /// <summary>

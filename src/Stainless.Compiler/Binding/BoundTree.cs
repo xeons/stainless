@@ -451,6 +451,39 @@ public sealed class BoundLambda(SourceSpan span, TypeSymbol type, Syntax.LambdaS
 /// The type is the variant, which is why this node only ever exists after
 /// something has said which variant was meant.
 /// </summary>
+/// <summary>
+/// <c>(a, b)</c> — a tuple written out.
+///
+/// Its own node rather than a struct literal, because there is no struct
+/// literal: a struct is otherwise filled in field by field. What it emits is
+/// exactly that, all at once.
+/// </summary>
+public sealed class BoundTupleCreate(
+    SourceSpan span, TupleTypeSymbol type, IReadOnlyList<BoundExpression> elements)
+    : BoundExpression(span, type)
+{
+    public TupleTypeSymbol Tuple { get; } = type;
+    public IReadOnlyList<BoundExpression> Elements { get; } = elements;
+}
+
+/// <summary>
+/// <c>var (a, b) = t;</c> — a tuple taken apart into locals.
+///
+/// The tuple is held in <see cref="Local"/> so that whatever produced it is
+/// evaluated once, and each name is a local initialised from one of its
+/// fields.
+/// </summary>
+public sealed class BoundDeconstruct(
+    SourceSpan span,
+    LocalSymbol source,
+    BoundExpression value,
+    IReadOnlyList<LocalSymbol> names) : BoundStatement(span)
+{
+    public LocalSymbol Local { get; } = source;
+    public BoundExpression Value { get; } = value;
+    public IReadOnlyList<LocalSymbol> Names { get; } = names;
+}
+
 public sealed class BoundVariantConstruction(
     SourceSpan span,
     TypeSymbol type,

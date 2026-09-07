@@ -49,6 +49,37 @@ public sealed partial class Binder
     /// and Length, and naming the array it came from would let a caller keep the
     /// whole of it alive on purpose and by accident alike.
     /// </summary>
+    /// <summary>
+    /// <c>(int, String)</c>, made the first time it is asked for.
+    ///
+    /// Interned by its element types, the way a slice is by its element: a
+    /// tuple is structural, so one written in two modules is one type. What
+    /// comes back is an ordinary struct whose fields are <c>Item1</c> upwards,
+    /// which is what makes layout, both ABI classifiers and the reference walk
+    /// apply to it with nothing written for tuples.
+    /// </summary>
+    private TupleTypeSymbol TupleOf(IReadOnlyList<TypeSymbol> elements)
+    {
+        string key = string.Join(",", elements.Select(e => e.Name));
+        if (_tuples.TryGetValue(key, out var existing)) return existing;
+
+        var tuple = new TupleTypeSymbol
+        {
+            Elements = elements.ToList(),
+            SimpleName = "(" + string.Join(", ", elements.Select(e => e.Name)) + ")",
+            ModuleName = Builtins.StandardModuleName,
+        };
+
+        for (int i = 0; i < elements.Count; i++)
+            tuple.Fields.Add(new FieldSymbol(
+                TupleTypeSymbol.FieldName(i), elements[i], tuple, i) { IsPublic = true });
+
+        _tuples[key] = tuple;
+        _structs.Add(tuple);
+        ComputeLayout(tuple, []);
+        return tuple;
+    }
+
     private SliceTypeSymbol SliceOf(TypeSymbol element)
     {
         if (_slices.TryGetValue(element, out var existing)) return existing;
@@ -107,6 +138,14 @@ public sealed partial class Binder
     /// </summary>
     private TypeSymbol ResolveTypeCore(TypeSyntax syntax, FileScope scope)
     {
+        if (syntax is TupleTypeSyntax written)
+        {
+            var elements = written.Elements.Select(e => ResolveType(e, scope)).ToList();
+            if (elements.Any(e => e.IsError())) return ErrorTypeSymbol.Instance;
+            if (elements.Count < 2) return ErrorTypeSymbol.Instance;
+            return TupleOf(elements);
+        }
+
         switch (syntax)
         {
             case SliceTypeSyntax sliceSyntax:
@@ -707,6 +746,12 @@ public sealed partial class Binder
                     ? constructed
                     : constructed with { TypeArguments = arguments };
             }
+
+            case TupleTypeSyntax tuple:
+                return tuple with
+                {
+                    Elements = tuple.Elements.Select(e => AsWritten(e, atUseSite)).ToList(),
+                };
 
             case ArrayTypeSyntax array:
                 return array with { Element = AsWritten(array.Element, atUseSite) };

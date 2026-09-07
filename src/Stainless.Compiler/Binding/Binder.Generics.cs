@@ -583,6 +583,14 @@ public sealed partial class Binder
                 Infer(slice.Element, whole.Element, parameters, inferred, scope);
                 break;
 
+            // `(T, U)` against a `(int, String)`, element by element. A tuple
+            // is structural, so this is the same shape a slice's is.
+            case TupleTypeSyntax written when actual is TupleTypeSymbol actualTuple &&
+                                              written.Elements.Count == actualTuple.Elements.Count:
+                for (int i = 0; i < written.Elements.Count; i++)
+                    Infer(written.Elements[i], actualTuple.Elements[i], parameters, inferred, scope);
+                break;
+
             case PointerTypeSyntax pointer when actual is PointerTypeSymbol actualPointer:
                 Infer(pointer.Element, actualPointer.Element, parameters, inferred, scope);
                 break;

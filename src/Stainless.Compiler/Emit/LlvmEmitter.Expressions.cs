@@ -91,6 +91,7 @@ public sealed partial class LlvmEmitter
                 return new Val(ZeroOf(llvmType), llvmType, zeroed.Type);
             }
 
+            case BoundTupleCreate tuple: return EmitTupleCreate(tuple);
             case BoundConversion conversion: return EmitConversion(conversion);
             case BoundTypeTest test: return EmitTypeTest(test);
             case BoundUnary unary: return EmitUnary(unary);

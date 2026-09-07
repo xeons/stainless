@@ -442,6 +442,32 @@ public sealed partial class LlvmEmitter
     ///
     /// The finished value is a +1 temporary, exactly like one returned by a call.
     /// </summary>
+    /// <summary>
+    /// <c>(a, b)</c>: a slot, zeroed, with each element stored into its field.
+    ///
+    /// Zeroed first so that every field goes in through the ordinary owning
+    /// store -- the slot starts null, so its release is a no-op -- which is the
+    /// same reason a variant is built this way.
+    /// </summary>
+    private Val EmitTupleCreate(BoundTupleCreate expression)
+    {
+        var tuple = expression.Tuple;
+        string slot = Alloca(StructName(tuple), "tuple");
+        Line($"store {StructName(tuple)} zeroinitializer, ptr {slot}");
+
+        for (int i = 0; i < expression.Elements.Count; i++)
+        {
+            var field = tuple.Fields[i];
+            string target = Emit("ptr",
+                $"getelementptr inbounds {StructName(tuple)}, ptr {slot}, i32 0, i32 {field.Index}");
+
+            StoreInto(target, EmitExpression(expression.Elements[i]), field.Type);
+        }
+
+        if (tuple.CarriesReferences()) TrackTemporary(slot, tuple);
+        return new Val(slot, "ptr", tuple);
+    }
+
     private Val EmitVariantConstruction(BoundVariantConstruction expression)
     {
         var variant = (VariantTypeSymbol)expression.Type;
