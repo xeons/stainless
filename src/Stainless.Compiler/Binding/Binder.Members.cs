@@ -418,6 +418,26 @@ public sealed partial class Binder
         var module = scope.Module;
         var classType = type as ClassTypeSymbol;
 
+        var enclosing = _declaringType;
+
+        // The template's name where there is one: a type nested in `Cache<T>`
+        // was hoisted as `Cache.Entry`, before any instantiation of it.
+        _declaringType = type.Template?.Name ?? type.SimpleName;
+
+        try
+        {
+            DeclareMembersOf(scope, declaration, type, module, classType);
+        }
+        finally
+        {
+            _declaringType = enclosing;
+        }
+    }
+
+    private void DeclareMembersOf(
+        FileScope scope, TypeDeclSyntax declaration, NamedTypeSymbol type,
+        ModuleSymbol module, ClassTypeSymbol? classType)
+    {
         if (type is VariantTypeSymbol variant) DeclareVariantCases(scope, declaration, variant);
 
         bool staticOnly = type is ClassTypeSymbol { IsStaticClass: true };

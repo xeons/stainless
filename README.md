@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 244 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 245 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 244 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 234 and Windows 243, each
+**Both Windows and Linux are tested.** 245 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 235 and Windows 244, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1780,6 +1780,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   call so that a hole in that produces a zero rather than whatever the stack
   held. An ordinary local read before it is written is still nobody's business
   but the author's.
+- **A type may be declared inside another**, and is lifted out and named for
+  where it was written: `Rect.Point` from outside, `Point` from within `Rect`.
+  Nesting is about where a name is reached from and nothing else — no hidden
+  reference to an outer instance, and no bearing on layout. It composes, and a
+  nested type does not see its outer type's parameters
 - `?.`, `??` and `??=`, over a `C?`. The receiver is read once, so
   `Next()?.Name` calls `Next` one time. A reference member answers null; a
   value member has no null to answer with, so `node?.Weight` needs a

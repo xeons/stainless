@@ -427,6 +427,45 @@ Signatures spell the underlying type: the header states the ABI, and an alias is
 a name rather than a type. The typedef is there so C can spell a handle the way
 the Stainless source does.
 
+#### 2.2.2 A type declared inside another
+
+```csharp
+public struct Rect {
+    public struct Point { public int X; public int Y; }
+
+    public Point TopLeft;          // the short name, from inside
+}
+
+Rect.Point corner;                 // and the long one, from outside
+```
+
+**It is lifted out and named for where it was written.** `Rect.Point` is the
+type's name everywhere — in a diagnostic, in the mangled symbol, and at a use
+site — and it is an ordinary module-level type that happens to have a dot in
+its name.
+
+That is the whole of what nesting means here: it is about **where a name is
+reached from**. An inner type has no privileged view of the outer one, no
+implicit reference to an instance of it, and no bearing on layout — a `Rect` is
+four ints whether `Point` is written inside it or beside it. C#'s nested types
+work this way too; Java's inner classes do not, and the difference is the
+hidden field Java adds.
+
+Classes, structs, interfaces, variants, unions, enums and delegates may all be
+nested, and nesting composes: `Widget.Bag.Slot` is a struct inside a class
+inside a class.
+
+**A nested type does not see its outer type's parameters.** A type inside
+`Cache<T>` is hoisted to `Cache.Entry`, which is one type rather than one per
+instantiation — so a field of type `T` in it is a `T` that is not in scope. Say
+what it holds, or take the parameter again:
+
+```csharp
+public class Cache<T> {
+    public struct Entry { public nuint Age; }        // fine: mentions no T
+}
+```
+
 ### 2.3 `[Packed]` and `[Align]`
 
 A struct is laid out by the platform C rules, and two markers change them. Both

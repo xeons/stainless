@@ -14,21 +14,6 @@ no "why" is one that should be deleted rather than done.
 
 These are wrong rather than missing, and should go first.
 
-### Nested type declarations are parsed and then discarded
-
-```csharp
-public struct Outer {
-    public struct Inner { public int X; }    // accepted, then gone
-    public Outer.Inner Value;                // error: type not found
-}
-```
-
-The parser takes it and the binder never registers it, with no diagnostic —
-the same shape of bug as the `public extern "C" { }` modifier that used to be
-dropped. Either support nested types or refuse them, but not this.
-
-*Touches:* `Parser.ParseTypeDeclaration`, `Binder` pass 2.
-
 ### Two functions with the same signature are not diagnosed
 
 ```csharp

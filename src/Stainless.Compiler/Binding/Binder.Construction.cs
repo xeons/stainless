@@ -388,35 +388,68 @@ public sealed partial class Binder
     /// for an enum or a variant. A generic type is not reachable this way,
     /// because type arguments cannot be written at a call.
     /// </summary>
+    /// <summary>
+    /// The type a dotted name in expression position means, or null.
+    ///
+    /// Four spellings reach one type, and they are tried in this order because
+    /// each is nearer than the last: `Outer.Inner` written out, `Inner` from
+    /// inside `Outer`, a plain name in this module or an import, and a name
+    /// qualified by its module.
+    ///
+    /// A nested type is looked for before the module path for a reason worth
+    /// keeping: a type in this file called `Outer` is a surer thing than a
+    /// module of that name somebody imported.
+    /// </summary>
+    private TypeSymbol? TypeNamed(IReadOnlyList<string> parts)
+    {
+        var module = _currentScope!.Module;
+        string whole = string.Join('.', parts);
+
+        if (parts.Count > 1)
+        {
+            if (module.Types.TryGetValue(whole, out var nestedHere)) return nestedHere;
+
+            foreach (var imported in _currentScope.Imports.Values.Distinct())
+                if (imported.Types.TryGetValue(whole, out var nestedThere) && nestedThere.IsPublic)
+                    return nestedThere;
+        }
+
+        if (parts.Count == 1)
+        {
+            if (module.Types.TryGetValue(parts[0], out var local)) return local;
+
+            if (Enclosing() is { } within &&
+                module.Types.TryGetValue(within + "." + parts[0], out var sibling))
+                return sibling;
+
+            var visible = _currentScope.Imports.Values.Distinct()
+                .Select(m => m.Types.TryGetValue(parts[0], out var t) && t.IsPublic ? t : null)
+                .Where(t => t is not null)
+                .Distinct()
+                .ToList();
+
+            return visible.Count == 1 ? visible[0] : null;
+        }
+
+        string moduleName = string.Join('.', parts.Take(parts.Count - 1));
+        ModuleSymbol? owner =
+            _currentScope.Imports.TryGetValue(moduleName, out var imported2) ? imported2
+            : _modules.TryGetValue(moduleName, out var known) ? known
+            : null;
+
+        return owner is not null &&
+               owner.Types.TryGetValue(parts[^1], out var qualified) &&
+               (owner == module || qualified.IsPublic)
+            ? qualified
+            : null;
+    }
+
     private NamedTypeSymbol? ResolveTypePrefix(ExpressionSyntax target)
     {
         if (FlattenName(target) is not { } parts) return null;
         if (NamesAValue(parts[0])) return null;
 
-        if (parts.Count == 1)
-        {
-            if (_currentScope!.Module.Types.TryGetValue(parts[0], out var local))
-                return local as NamedTypeSymbol;
-
-            foreach (var imported in _currentScope.Imports.Values.Distinct())
-                if (imported.Types.TryGetValue(parts[0], out var found) &&
-                    found is NamedTypeSymbol { IsPublic: true } visible)
-                    return visible;
-
-            return null;
-        }
-
-        string moduleName = string.Join('.', parts.Take(parts.Count - 1));
-        ModuleSymbol? module =
-            _currentScope!.Imports.TryGetValue(moduleName, out var imported2) ? imported2
-            : _modules.TryGetValue(moduleName, out var known) ? known
-            : null;
-
-        return module is not null &&
-               module.Types.TryGetValue(parts[^1], out var qualified) &&
-               qualified is NamedTypeSymbol { IsPublic: true } reachable
-            ? reachable
-            : null;
+        return TypeNamed(parts) as NamedTypeSymbol;
     }
 
     /// <summary>
@@ -437,20 +470,11 @@ public sealed partial class Binder
 
         if (NamesAValue(parts[0])) return null;
 
-        // Either a bare name in this module, or one qualified by its module.
-        if (parts.Count == 1)
-        {
-            if (_currentScope!.Module.Types.TryGetValue(parts[0], out var local))
-                return local as EnumTypeSymbol;
+        // `Widget.State` is one name when `State` is nested in `Widget`, and a
+        // module and a type when it is not. TypeNamed tries them in that order.
+        if (TypeNamed(parts) is EnumTypeSymbol named) return named;
 
-            var visible = _currentScope.Imports.Values.Distinct()
-                .Select(m => m.Types.TryGetValue(parts[0], out var t) && t.IsPublic ? t : null)
-                .OfType<EnumTypeSymbol>()
-                .Distinct()
-                .ToList();
-
-            return visible.Count == 1 ? visible[0] : null;
-        }
+        if (parts.Count == 1) return null;
 
         string moduleName = string.Join('.', parts.Take(parts.Count - 1));
         ModuleSymbol? module =

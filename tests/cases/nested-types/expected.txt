@@ -1,0 +1,11 @@
+corner   2,4
+middle   7,14
+width    10
+sizes    16 8
+widget   0 #7
+started  true
+asked    true
+handle   11
+slot     3 true false
+cache    held age 1
+cache    42 age 1

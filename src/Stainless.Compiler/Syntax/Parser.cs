@@ -462,7 +462,39 @@ public sealed class Parser
                 continue;
             }
 
-            members.AddRange(ParseDeclaration(enclosingType: name));
+            foreach (var member in ParseDeclaration(enclosingType: name))
+            {
+                // A type declared inside another is lifted out beside it and
+                // named for where it was written, so `Outer.Inner` is its name
+                // everywhere -- in a diagnostic, in the mangled symbol, and at
+                // a use site. Nesting is about where a name is *reached from*;
+                // it says nothing about layout or about what the inner type may
+                // see, and hoisting is what keeps it that way.
+                //
+                // The parse of the inner type has already hoisted whatever was
+                // inside *it*, so this walks the whole list rather than the
+                // first entry: `Outer.Inner.Deeper` gets its full name by being
+                // prefixed once at each level on the way out.
+                switch (member)
+                {
+                    case TypeDeclSyntax inner:
+                        hoisted.Add(inner with { Name = name + "." + inner.Name });
+                        break;
+
+                    case EnumDeclSyntax inner:
+                        hoisted.Add(inner with { Name = name + "." + inner.Name });
+                        break;
+
+                    case DelegateDeclSyntax inner:
+                        hoisted.Add(inner with { Name = name + "." + inner.Name });
+                        break;
+
+                    default:
+                        members.Add(member);
+                        break;
+                }
+            }
+
             if (_pos == before) Advance();
         }
         Expect(TokenKind.CloseBrace);

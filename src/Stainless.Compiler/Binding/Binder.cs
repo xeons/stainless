@@ -192,6 +192,14 @@ public sealed partial class Binder(
     private int _bodyDepth;
 
     /// <summary>
+    /// The simple name of the type whose members are being declared, or null.
+    ///
+    /// It is what lets a bare `Inner` inside `Outer` find `Outer.Inner` during
+    /// pass 4, when there is no function to ask.
+    /// </summary>
+    private string? _declaringType;
+
+    /// <summary>
     /// Whether <c>+</c>, <c>-</c> and <c>*</c> on integers are being asked to
     /// notice that they overflowed. False everywhere but inside
     /// <c>checked</c>: wrapping is the language's defined default (§9).

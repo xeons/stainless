@@ -219,9 +219,31 @@ public sealed partial class Binder
         if (syntax.TypeArguments.Count > 0)
             return ResolveConstructedType(syntax, scope);
 
+        // A type declared inside another is named for where it was written, so
+        // `Outer.Inner` is one name and not a module and a type. It is looked
+        // for before the module path, because a module cannot be called
+        // `Outer` while a type in this file is.
+        if (parts.Count > 1 && module.Types.TryGetValue(syntax.Name.Text, out var nestedHere))
+            return nestedHere;
+
+        if (parts.Count > 1)
+        {
+            foreach (var imported in scope.Imports.Values.Distinct())
+                if (imported.Types.TryGetValue(syntax.Name.Text, out var nestedThere) &&
+                    nestedThere.IsPublic)
+                    return nestedThere;
+        }
+
         if (parts.Count == 1)
         {
             if (module.Types.TryGetValue(parts[0], out var local)) return local;
+
+            // Inside `Outer`, a bare `Inner` is `Outer.Inner`. That is what
+            // makes nesting worth having: the short name works where it
+            // belongs, and the long one everywhere else.
+            if (Enclosing() is { } within &&
+                module.Types.TryGetValue(within + "." + parts[0], out var sibling))
+                return sibling;
             if (module.Aliases.TryGetValue(parts[0], out var ownAlias)) return ResolveAlias(ownAlias);
 
             // Naming a generic without arguments is a common slip; say so plainly.
@@ -356,6 +378,25 @@ public sealed partial class Binder
                 (target == module || found.IsPublic))
                 return found;
         }
+
+        return null;
+    }
+
+    /// <summary>
+    /// The type whose declaration is being bound, by name, or null.
+    ///
+    /// Only the name is wanted: what it is for is finding `Outer.Inner` from
+    /// inside `Outer`, and that is a lookup in the module's own table.
+    /// </summary>
+    private string? Enclosing()
+    {
+        if (_declaringType is { } declaring) return declaring;
+
+        // The *template's* name for an instantiation. `Cache<int>` was written
+        // `Cache`, and the type nested in it was hoisted as `Cache.Entry`
+        // before any instantiation existed.
+        if (_currentFunction?.ContainingType is { } containing)
+            return containing.Template?.Name ?? containing.SimpleName;
 
         return null;
     }
