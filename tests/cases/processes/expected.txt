@@ -1,0 +1,12 @@
+echo     code=0 ok=true out=[hello] err=[]
+code     code=3 ok=false out=[] err=[]
+split    code=0 ok=true out=[out] err=[err]
+missing  refused, why=1
+ran127   code=127 ok=false out=[] err=[]
+stdin    [alpha beta gamma]
+big      past a pipe: true
+started  named=true waited=7
+again    7
+running  true
+stopped  true
+signals  watching=true seen=false

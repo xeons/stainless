@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 241 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 242 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 241 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 231 and Windows 240, each
+**Both Windows and Linux are tested.** 242 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 232 and Windows 241, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1453,6 +1453,15 @@ Everything below is covered by [the test suite](tests/cases).
   `ConcurrentDictionary<K, V>` and a blocking `Channel<T>`. Each owns its
   collection in a field and never hands out a reference to it, because a lock
   protects what it guards and not the reference *count* of what it guards
+- `Standard.Process`: running another program, on both platforms.
+  `Run(program, arguments)` waits and captures; `Start` hands back a `Process`
+  to wait on, poll or stop. **There is no shell** — the arguments are a list,
+  so a `>` or a space in a filename is a character the child receives rather
+  than something a shell acts on. A failure to *start* is a `ProcessError`; a
+  program that ran and returned 1 is a `Completed`, which is an outcome. Both
+  streams are drained while it runs, because a pipe holds about 64KB and a
+  parent that waits first would wait forever. `Signals.Watch()` notices Ctrl-C
+  as a flag to read rather than a handler to run in
 - `Standard.Env`: the command line, environment variables and the working
   directory. `Main(String[] args)` is the better way to read the arguments --
   a function that takes what it needs beats one that goes looking -- and

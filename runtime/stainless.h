@@ -784,6 +784,48 @@ SL_API void  *sl_env_names(void);
 SL_API void  *sl_env_current_directory(void);
 SL_API _Bool  sl_env_set_current_directory(void *path);
 
+/* --------------------------------------------------------- other programs */
+
+/*
+ * Starting another program, waiting for it, and reading what it wrote.
+ *
+ * The arguments are collected one at a time rather than passed as an array:
+ * the two platforms want different things from the same list -- a vector on
+ * POSIX and one quoted command line on Windows -- and collecting first lets
+ * each build its own without the array's layout being known in two places.
+ *
+ * Every call answers with a code from the `ProcessError` in Standard.Process:
+ * 0 for success, then not-found, denied, no-resource, failed.
+ */
+SL_API void  *sl_process_args_new(void);
+SL_API _Bool  sl_process_args_add(void *handle, void *text);
+SL_API void   sl_process_args_free(void *handle);
+
+/* Runs to completion, appending both streams to the builders given. */
+SL_API int    sl_process_run(void *args, void *input, void *outText, void *errText, int *exitCode);
+
+/* Starts one and does not wait; its streams are this process's. */
+SL_API void  *sl_process_start(void *args, int *error);
+SL_API long   sl_process_id(void *handle);
+SL_API int    sl_process_wait(void *handle, int *exitCode);
+
+/* 1 when it has finished, 0 while it runs, -1 when it could not be asked. */
+SL_API int    sl_process_poll(void *handle, int *exitCode);
+SL_API _Bool  sl_process_signal(void *handle, _Bool force);
+SL_API void   sl_process_release(void *handle);
+
+/*
+ * Interrupts, asked for rather than delivered.
+ *
+ * A signal handler runs between two instructions of whatever was executing, so
+ * almost nothing is legal inside one -- no allocation, no locks, and therefore
+ * no Stainless at all. A store to a flag is legal, so that is all the handler
+ * does, and a program reads the flag where it can actually act on it.
+ */
+SL_API _Bool  sl_signals_watch(void);
+SL_API _Bool  sl_signals_interrupted(void);
+SL_API void   sl_signals_clear(void);
+
 /* ------------------------------------------------------------- the clocks */
 
 /*

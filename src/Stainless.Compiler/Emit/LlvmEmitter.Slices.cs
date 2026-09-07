@@ -275,7 +275,39 @@ public sealed partial class LlvmEmitter
             return Val.Void;
         }
 
-        return new Val(Emit(returnInfo.LlvmType, invocation), returnInfo.LlvmType, type.ReturnType);
+        return Landed(Emit(returnInfo.LlvmType, invocation), returnInfo, type.ReturnType);
+    }
+
+    /// <summary>
+    /// What a call answered with, as the rest of the emitter expects to find
+    /// it.
+    ///
+    /// A struct small enough to travel in registers comes back as a value and
+    /// not as an address, and everything downstream of a struct expects an
+    /// address -- so it is put in a slot here. Missing this is not a
+    /// diagnostic: the value is simply used as a pointer, and the load reads
+    /// whatever the first eight bytes of the struct happened to be.
+    ///
+    /// The direct call path has always done this. The two indirect ones did
+    /// not, and nothing noticed until `Optional&lt;T&gt;.FlatMap` started
+    /// taking a closure rather than an interface -- an interface call is a
+    /// direct call through a vtable slot, so it went the other way.
+    /// </summary>
+    private Val Landed(string result, ArgInfo returnInfo, TypeSymbol returnType)
+    {
+        if (returnInfo.Style == PassStyle.Coerce)
+        {
+            var structType = (StructTypeSymbol)returnType;
+            string slot = Alloca(StructName(structType), "call.result");
+            StoreCoerced(slot, result, returnInfo);
+            if (structType.CarriesReferences()) TrackTemporary(slot, structType);
+            return new Val(slot, "ptr", returnType);
+        }
+
+        // A returned reference arrives at +1 and is dropped when the statement ends.
+        if (returnType.NeedsArc()) TrackTemporary(result, returnType);
+
+        return new Val(result, returnInfo.LlvmType, returnType);
     }
 
     private Val EmitIndirectCall(BoundIndirectCall call)
@@ -314,9 +346,7 @@ public sealed partial class LlvmEmitter
             return Val.Void;
         }
 
-        var result = new Val(Emit(signature, invocation), signature, delegateType.ReturnType);
-        if (delegateType.ReturnType.NeedsArc()) TrackTemporary(result.Ref, delegateType.ReturnType);
-        return result;
+        return Landed(Emit(signature, invocation), returnInfo, delegateType.ReturnType);
     }
 
     private Val EmitCall(BoundCall call)

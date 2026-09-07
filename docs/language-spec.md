@@ -2971,6 +2971,65 @@ operating system — the narrow CRT entry points would read those bytes in the
 active code page, which works by accident for ASCII and fails for everything
 else.
 
+### 5.9.1 `Standard.Process`
+
+```csharp
+var done = try Run("git", ["rev-parse", "HEAD"]);
+if (done.Ok()) { Console.WriteLine(done.Output.Trim()); }
+```
+
+Running another program, on both platforms, with the same answers.
+
+**There is no shell**, and there is no overload that takes one command line to
+be split. The program and its arguments are a list, so a `>`, a `|` or a space
+in a filename is a character the child receives rather than something a shell
+acts on. That is the whole of shell injection, designed out rather than warned
+about.
+
+**A failure to start and a failure of the program are different things.**
+`ProcessError` is only about starting — `NotFound`, `Denied`, `NoResource` —
+and a program that ran and returned 1 is a `Completed` with `ExitCode` 1, which
+is an outcome rather than a fault. `grep` answering 1 for "no match" is the
+ordinary case.
+
+Telling those apart takes work on POSIX, and it is worth knowing why. A child
+cannot report a failed exec through its exit code: 127 is the shell's
+convention for "could not run it" and is also a perfectly ordinary code a real
+program might return. So the child is given a close-on-exec pipe and writes
+`errno` into it; a successful exec closes it and the parent reads end-of-file.
+One pipe, one read, and `Run("/no/such/thing")` says `NotFound` while
+`Run("sh", ["-c", "exit 127"])` says the program ran and answered 127.
+
+**Both streams are drained while the child runs.** A pipe holds about 64KB, so
+a parent that waits for the child before reading waits forever on a child that
+writes more — and reading one stream to the end while the child fills the other
+is the same deadlock in a different order. `poll` does it on POSIX and
+`PeekNamedPipe` on Windows.
+
+`Output` and `Errors` are kept apart, so a program that prints progress to one
+does not corrupt what was captured from the other.
+
+**`Start` hands back a `Process`** for a program to be waited on later, or
+asked whether it has finished, or stopped. Its streams are the parent's. A
+`Process` let go of is reaped by its destructor, so nothing is left a zombie;
+it is not killed, letting go saying nothing about wanting it stopped.
+
+`Stop` is `SIGTERM` and `Kill` is `SIGKILL`. On Windows both are
+`TerminateProcess`: there is no polite signal for a process that is not a
+console group of its own, and saying so is better than pretending `Stop` can be
+gentle there.
+
+**Signals are asked for rather than delivered.** A handler runs between two
+instructions of whatever was executing, so almost nothing is legal inside one —
+no allocation, no locks, and therefore no Stainless at all. `Signals.Watch()`
+installs a handler that stores to a flag, and `Signals.Interrupted()` reads it
+where a program can act on it:
+
+```csharp
+Signals.Watch();
+while (!Signals.Interrupted()) { DoAPieceOfWork(); }
+```
+
 ### 5.10 `Standard.Json` and `Standard.Xml`
 
 Both have the same two layers, and the split is the point.
