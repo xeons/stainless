@@ -49,6 +49,30 @@ int Main() {
     var guarded = new Mutex<List<Box<int>>>(boxes);
     { var g = guarded.Lock(); printf("guarded=%d\n", (int)g.Value().Count()); }
 
+    // Two templates that name each other. `Twig<T>` is asked for while
+    // `Sprig<T>` is still declaring its members, so laying either one out at
+    // that moment reads a case list that is not there yet -- which gave the
+    // variant a one-byte payload and a segfault at the first store.
+    Sprig<int> leaf = Bud(4);
+    Sprig<int> tree = Fork(new Twig<int>(leaf, Bud(5)));
+    printf("mutual=%d\n", Count(tree));
+
     printf("done\n");
     return 0;
+}
+
+public variant Sprig<T> { Bud(T Item); Fork(Twig<T> Pair); Bare; }
+
+public class Twig<T> {
+    public Sprig<T> Left;
+    public Sprig<T> Right;
+    public Twig(Sprig<T> left, Sprig<T> right) { Left = left; Right = right; }
+}
+
+int Count(Sprig<int> sprig) {
+    switch (sprig) {
+        case Bud b:  return b.Item;
+        case Fork f: return Count(f.Pair.Left) + Count(f.Pair.Right);
+        case Bare:   return 0;
+    }
 }

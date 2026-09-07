@@ -67,6 +67,34 @@ public sealed partial class Binder
     private static string InstantiationKey(string name, IReadOnlyList<TypeSymbol> arguments) =>
         name + "<" + string.Join(",", arguments.Select(a => a.Name)) + ">";
 
+    /// <summary>How deep the instantiation currently under way is nested.</summary>
+    private int _instantiationDepth;
+
+    /// <summary>Instantiations whose members are known and whose layout is not.</summary>
+    private readonly List<NamedTypeSymbol> _awaitingLayout = [];
+
+    /// <summary>
+    /// Lays out every instantiation the outermost one produced, in the order
+    /// they were made.
+    /// </summary>
+    private void SettleDeferredLayouts()
+    {
+        // Indexed rather than enumerated, and behind the same depth the callers
+        // use: laying a type out can ask for another instantiation, which
+        // appends to this list rather than starting a second settlement of it.
+        _instantiationDepth++;
+        try
+        {
+            for (int i = 0; i < _awaitingLayout.Count; i++) ComputeLayout(_awaitingLayout[i], []);
+        }
+        finally
+        {
+            _instantiationDepth--;
+        }
+
+        _awaitingLayout.Clear();
+    }
+
     /// <summary>
     /// Produces the concrete type for <c>Box&lt;int&gt;</c>, building it the
     /// first time it is asked for.
@@ -158,9 +186,31 @@ public sealed partial class Binder
             type is ClassTypeSymbol or StructTypeSymbol && type is not VariantTypeSymbol)
             type.IsReflected = true;
 
-        DeclareTypeMembers(template.Scope, declaration, type);
-        ResolveImplements(type, declaration, template.Scope);
-        ComputeLayout(type, []);
+        // Members first, and a layout only once every instantiation this one
+        // asked for on the way has members too.
+        //
+        // A template may name another that names it back: `Tree<T>` holding a
+        // `Branch<T>` whose fields are `Tree<T>` is two instantiations, each
+        // requested while the other is still declaring its members. Laying one
+        // out at that moment reads a case list that is still empty and settles
+        // on a one-byte payload -- a wrong size nothing revisits, `LayoutComputed`
+        // having been set by the premature walk. So the layouts wait for the
+        // outermost instantiation to finish, which is the moment every member
+        // any of them holds is known.
+        _awaitingLayout.Add(type);
+
+        _instantiationDepth++;
+        try
+        {
+            DeclareTypeMembers(template.Scope, declaration, type);
+            ResolveImplements(type, declaration, template.Scope);
+        }
+        finally
+        {
+            _instantiationDepth--;
+        }
+
+        if (_instantiationDepth == 0) SettleDeferredLayouts();
 
         // Every body this instantiation owns is bound later, under this same
         // substitution.
