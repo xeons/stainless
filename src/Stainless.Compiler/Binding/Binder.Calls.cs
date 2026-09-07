@@ -30,6 +30,11 @@ public sealed partial class Binder
 {
     private BoundExpression BindCall(CallSyntax syntax)
     {
+        // `a?.M(x)`: the receiver is asked about before the method is reached,
+        // and the whole call is nothing when it was nothing.
+        if (syntax.Callee is MemberAccessSyntax { Conditional: true } asked)
+            return BindConditionalAccess(asked, null, syntax);
+
         var arguments = syntax.Arguments.Select(BindArgument).ToList();
         RefuseNamesWithoutParameters(syntax);
 
@@ -270,6 +275,22 @@ public sealed partial class Binder
         {
             FromRefKeyword = true,
         };
+    }
+
+    /// <summary>
+    /// A call on a receiver that has already been bound.
+    ///
+    /// The ordinary path binds the receiver itself, which <c>a?.M()</c> cannot
+    /// use: it holds the receiver first, so that asking whether it is there and
+    /// reaching through it are one evaluation rather than two.
+    /// </summary>
+    private BoundExpression BindCallOn(
+        BoundExpression receiver, MemberAccessSyntax member, CallSyntax syntax)
+    {
+        var arguments = syntax.Arguments.Select(BindArgument).ToList();
+        RefuseNamesWithoutParameters(syntax);
+
+        return BindMethodCallOn(receiver, syntax, member, arguments);
     }
 
     /// <summary>
@@ -617,15 +638,27 @@ public sealed partial class Binder
     private BoundExpression BindMethodCall(
         CallSyntax syntax, MemberAccessSyntax member, List<BoundExpression> arguments)
     {
-        var receiver = member.Target is BaseSyntax
+        var bound = member.Target is BaseSyntax
             ? BindBaseReceiver(member.Target.Span)
             : BindExpression(member.Target);
 
-        if (receiver is null || receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        if (bound is null || bound.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
-        if (ReachThroughPointer(member, receiver) is not { } reachedThrough)
+        if (ReachThroughPointer(member, bound) is not { } reachedThrough)
             return new BoundErrorExpression(syntax.Span);
-        receiver = reachedThrough;
+
+        return BindMethodCallOn(reachedThrough, syntax, member, arguments);
+    }
+
+    /// <summary>
+    /// The same on a receiver already bound, which is what <c>a?.M()</c> needs:
+    /// it holds the receiver first, so that asking whether it is there and
+    /// reaching through it are one evaluation rather than two.
+    /// </summary>
+    private BoundExpression BindMethodCallOn(
+        BoundExpression receiver, CallSyntax syntax, MemberAccessSyntax member,
+        List<BoundExpression> arguments)
+    {
 
         if (receiver.Type is OptionalTypeSymbol or WeakTypeSymbol)
         {

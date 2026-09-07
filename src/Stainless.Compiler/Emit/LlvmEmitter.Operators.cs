@@ -515,6 +515,11 @@ public sealed partial class LlvmEmitter
         Terminator($"br label %{endLabel}");
 
         Label(endLabel);
+
+        // `a?.Save();` -- neither arm produced anything, so there is nothing to
+        // merge. A phi of void is not a thing LLVM has.
+        if (expression.Type.IsVoid()) return Val.Void;
+
         string llvmType = whenTrue.LlvmType;
         string result = Emit(llvmType,
             $"phi {llvmType} [ {whenTrue.Ref}, %{trueBlock} ], [ {whenFalse.Ref}, %{falseBlock} ]");

@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 242 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 244 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 242 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 232 and Windows 241, each
+**Both Windows and Linux are tested.** 244 cases, of which 10 are
+Windows-only and 1 is Linux-only, so Linux runs 234 and Windows 243, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1780,6 +1780,12 @@ Being straight about the edges, roughly in the order they are worth adding:
   call so that a hole in that produces a zero rather than whatever the stack
   held. An ordinary local read before it is written is still nobody's business
   but the author's.
+- `?.`, `??` and `??=`, over a `C?`. The receiver is read once, so
+  `Next()?.Name` calls `Next` one time. A reference member answers null; a
+  value member has no null to answer with, so `node?.Weight` needs a
+  `?? fallback` and says so (SL0605) rather than inventing a zero a caller
+  cannot tell from a real one. A receiver that cannot be nothing is refused,
+  and `a?.b.c` is an error where `a?.b?.c` is the question actually being asked
 - `default(T)` is the zeroed value of a type, for generic code that cannot
   write a literal for a type it does not know. Not a new hole in the null
   discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before

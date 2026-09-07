@@ -4696,6 +4696,47 @@ exactly once, so `cells[Next()]++` calls `Next` a single time.
 An enum is refused (SL0594): it is a choice rather than a count, and stepping
 one means stepping the integer behind it.
 
+### 9.5.1 `?.` and `??`
+
+```csharp
+node?.Name ?? "none"        // the name, or that, if there is no node
+node?.Save();               // called only if there is something to call it on
+handler ??= Default();      // filled in only if it was empty
+```
+
+**The receiver is read once.** `a?.b` asks whether `a` is there and then
+reaches through it, which is two mentions of one value — so it is held in a
+hidden local first. Without that, `Next()?.Name` would call `Next` twice and
+ask about one object while reading another.
+
+**Nothing has to be expressible.** A class has null and a value type does not
+(§2.5), so:
+
+| | |
+|---|---|
+| `node?.Name` | a `String?`, null when there was no node |
+| `node?.Next` | a `Node?`, the same |
+| `node?.Weight` | an `int`, which has no null — SL0605 |
+| `node?.Save()` | nothing either way, and a statement |
+
+The third is why `??` and `?.` are bound together rather than separately: where
+they meet they fold into one question with two answers, and `node?.Weight ?? 0`
+is how a value-typed member is reached. Without the fallback there is nowhere
+for "there was no node" to go, and the language says so rather than inventing a
+zero that a caller cannot tell from a real one.
+
+**A receiver that cannot be nothing is refused** (SL0604), for `?.`, `??` and
+`??=` alike. `here?.Name` on a plain `Node` is a question with one answer, and
+writing it suggests a doubt the type does not have.
+
+**Each `?.` asks its own question.** `a?.b?.c` is two, and `a?.b.c` is an
+error: the first answered with a `D?`, and a `.` does not reach through one.
+That is the same rule everywhere else — a `C?` is narrowed before it is used —
+rather than a chain that silently swallows the whole expression.
+
+`??` binds looser than `||`, so `a ?? b || c` is `a ?? (b || c)`: the fallback
+is the whole of what follows, which is what it looks like.
+
 ### 9.6.1 `default(T)`
 
 ```csharp

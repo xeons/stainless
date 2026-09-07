@@ -929,14 +929,31 @@ public sealed partial class Binder
         return new BoundLocalDeclaration(syntax.Span, local, initializer);
     }
 
+    /// <summary>
+    /// Whether evaluating this does something, or only produces a value that
+    /// a statement then drops.
+    ///
+    /// A `?.` and a `??=` are a conditional wrapped in a let, and what makes
+    /// them worth writing is inside: `a?.Save()` is a call that may not happen,
+    /// which is an effect. So this looks through both rather than judging the
+    /// shape it arrived in.
+    /// </summary>
+    private static bool Effective(BoundExpression expression) => expression switch
+    {
+        BoundAssignment or BoundPropertyAssignment or BoundCall or BoundIndirectCall
+            or BoundClosureCall or BoundIncrement or BoundPropertyIncrement
+            or BoundNew or BoundErrorExpression => true,
+
+        BoundLet held => Effective(held.Body),
+        BoundConditional chosen => Effective(chosen.WhenTrue) || Effective(chosen.WhenFalse),
+        _ => false,
+    };
+
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
     {
         var expression = BindExpression(syntax.Expression);
 
-        bool hasEffect = expression is BoundAssignment or BoundPropertyAssignment or BoundCall
-                                    or BoundIndirectCall or BoundClosureCall
-                                    or BoundIncrement or BoundPropertyIncrement
-                                    or BoundNew or BoundErrorExpression;
+        bool hasEffect = Effective(expression);
         if (!hasEffect)
             diagnostics.Warning("SL0222", syntax.Span,
                 "this expression has no effect; its result is discarded");

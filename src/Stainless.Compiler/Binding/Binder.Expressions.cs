@@ -858,6 +858,11 @@ public sealed partial class Binder
 
     private BoundExpression BindBinary(BinarySyntax syntax)
     {
+        // `a ?? b` is not a binary operation: only one side is evaluated, and
+        // the left is read twice. It is bound where `?.` is, the two folding
+        // into one question when they meet.
+        if (syntax.Operator == TokenKind.QuestionQuestion) return BindNullFallback(syntax);
+
         var left = BindExpression(syntax.Left);
 
         // `a && b` evaluates b only when a was true, so b is bound knowing it.
@@ -1614,6 +1619,32 @@ public sealed partial class Binder
                     ? $"'{constant.Local.Name}' is declared 'const' and cannot be assigned"
                     : "the left-hand side of an assignment must be a variable, field or dereference");
             return new BoundErrorExpression(syntax.Span);
+        }
+
+        // `a ??= b` is not one of those: the operation is a question about
+        // the target rather than an arithmetic on it, and the value is stored
+        // only when the answer is that there is nothing there.
+        if (syntax.Operator == TokenKind.QuestionQuestionEquals)
+        {
+            if (target.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
+            {
+                diagnostics.Error("SL0604", syntax.Target.Span,
+                    $"'{target.Type.Name}' cannot be nothing, so '??=' has nothing to fill in");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            var absent = new BoundBinary(
+                syntax.Span, PrimitiveTypeSymbol.Bool,
+                target, BoundBinaryOp.Equal,
+                new BoundNullLiteral(syntax.Span, target.Type));
+
+            InvalidateVariantFact(target);
+            if (WrittenParameter(target) is { } filled) filled.IsAssigned = true;
+
+            return new BoundConditional(syntax.Span, target.Type, absent,
+                new BoundAssignment(syntax.Span, target,
+                    BindConversion(value, target.Type, syntax.Value.Span)),
+                target);
         }
 
         // Compound assignment desugars to `target = target op value`.

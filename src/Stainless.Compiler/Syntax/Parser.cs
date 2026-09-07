@@ -1719,6 +1719,10 @@ public sealed class Parser
         TokenKind.Pipe => 3,
         TokenKind.AmpAmp => 2,
         TokenKind.PipePipe => 1,
+
+        // Looser than `||`, so `a ?? b || c` is `a ?? (b || c)` -- which is
+        // what it looks like, the fallback being the whole of what follows.
+        TokenKind.QuestionQuestion => 1,
         _ => 0,
     };
 
@@ -1732,6 +1736,7 @@ public sealed class Parser
         TokenKind.SlashEquals, TokenKind.PercentEquals,
         TokenKind.AmpEquals, TokenKind.PipeEquals, TokenKind.CaretEquals,
         TokenKind.LessLessEquals, TokenKind.GreaterGreaterEquals,
+        TokenKind.QuestionQuestionEquals,
     ];
 
     public ExpressionSyntax ParseExpression() => ParseAssignment();
@@ -1924,13 +1929,14 @@ public sealed class Parser
 
         while (true)
         {
-            if (AtAny(TokenKind.Dot, TokenKind.MinusGreater))
+            if (AtAny(TokenKind.Dot, TokenKind.MinusGreater, TokenKind.QuestionDot))
             {
                 bool arrow = At(TokenKind.MinusGreater);
+                bool asking = At(TokenKind.QuestionDot);
                 Advance();
                 string member = ExpectIdentifier();
                 expression = new MemberAccessSyntax(SpanFrom(start), expression, member)
-                    { ThroughPointer = arrow };
+                    { ThroughPointer = arrow, Conditional = asking };
                 continue;
             }
 

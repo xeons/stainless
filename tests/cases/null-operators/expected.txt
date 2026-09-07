@@ -1,0 +1,19 @@
+a head
+b tail
+c true
+d true
+e true
+f 2
+g -1
+h tail
+i none
+j <tail:2>
+k nothing
+l renamed
+m end
+n end
+o filled
+p filled
+q 7 after 1 call
+r -1 after 1 call
+s renamed after 0 calls

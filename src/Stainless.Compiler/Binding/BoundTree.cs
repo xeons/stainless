@@ -359,6 +359,27 @@ public sealed class BoundPropertyAssignment(
 /// to an <c>if</c>, because only the chosen arm may be evaluated and the result
 /// is a value, not a statement.
 /// </summary>
+/// <summary>
+/// A value held in a fresh local for the duration of an expression.
+///
+/// It exists because some expressions have to name what they are working on
+/// twice -- <c>a?.b</c> asks whether <c>a</c> is there and then reads through
+/// it -- and evaluating it twice would call whatever produced it twice. There
+/// is nowhere in an expression to put a statement, so the binding is an
+/// expression too.
+///
+/// The local borrows: whatever made the value is already a temporary the
+/// statement will drop, and this only reads it in the meantime.
+/// </summary>
+public sealed class BoundLet(
+    SourceSpan span, LocalSymbol local, BoundExpression value, BoundExpression body)
+    : BoundExpression(span, body.Type)
+{
+    public LocalSymbol Local { get; } = local;
+    public BoundExpression Value { get; } = value;
+    public BoundExpression Body { get; } = body;
+}
+
 public sealed class BoundConditional(
     SourceSpan span, TypeSymbol type,
     BoundExpression condition, BoundExpression whenTrue, BoundExpression whenFalse)

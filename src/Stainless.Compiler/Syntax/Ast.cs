@@ -818,6 +818,12 @@ public sealed record MemberAccessSyntax(
     /// quietly meaning the same thing.
     /// </summary>
     public bool ThroughPointer { get; init; }
+
+    /// <summary>
+    /// True when this was written <c>a?.m</c>: the member is reached only if
+    /// the receiver is there, and the whole thing is nothing if it is not.
+    /// </summary>
+    public bool Conditional { get; init; }
 }
 
 /// <summary>

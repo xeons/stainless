@@ -26,8 +26,146 @@ namespace Stainless.Binding;
 /// </summary>
 public sealed partial class Binder
 {
+    /// <summary>
+    /// <c>a?.m</c>, and <c>a?.m ?? fallback</c> where the caller supplies the
+    /// other arm.
+    ///
+    /// The receiver has to be read twice -- once to ask whether it is there,
+    /// once to reach through it -- so it is held in a <see cref="BoundLet"/>
+    /// first. Without that, <c>Next()?.Name</c> would call <c>Next</c> twice
+    /// and ask about one object while reading another.
+    ///
+    /// The result is nothing when the receiver was nothing, and nothing has to
+    /// be expressible: a class has null, and a value type does not (§2.5). So
+    /// a member of a value type is reachable only with a <c>??</c> saying what
+    /// it is instead, which is what <paramref name="fallback"/> carries.
+    /// </summary>
+    /// <param name="call">
+    /// The call this member is the callee of, when there is one: <c>a?.M(x)</c>
+    /// asks the same question and reaches a method rather than a field.
+    /// </param>
+    private BoundExpression BindConditionalAccess(
+        MemberAccessSyntax syntax, ExpressionSyntax? fallbackSyntax, CallSyntax? call = null)
+    {
+        var receiver = BindExpression(syntax.Target);
+        if (receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (receiver.Type is not OptionalTypeSymbol optional)
+        {
+            diagnostics.Error("SL0604", syntax.Span,
+                $"'{receiver.Type.Name}' cannot be nothing, so '?.' has no question to ask; " +
+                "write '.' instead");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // Held once. The local borrows: the receiver is already a temporary
+        // the statement will drop, and this only reads it in the meantime.
+        var held = new LocalSymbol(SyntheticName("asked"), optional, isConst: false);
+        var reading = new BoundLocalAccess(syntax.Target.Span, held);
+
+        var present = new BoundBinary(
+            syntax.Span, PrimitiveTypeSymbol.Bool,
+            reading, BoundBinaryOp.NotEqual,
+            new BoundNullLiteral(syntax.Span, optional));
+
+        var narrowed = new BoundConversion(
+            syntax.Target.Span, optional.Element, reading, ConversionKind.NarrowOptional);
+
+        var value = call is null
+            ? BindMemberOf(narrowed, syntax)
+            : BindCallOn(narrowed, syntax, call);
+
+        if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        BoundExpression whenNothing;
+
+        if (fallbackSyntax is not null)
+        {
+            whenNothing = BindConversion(
+                BindExpression(fallbackSyntax), value.Type, fallbackSyntax.Span);
+        }
+        else if (value.Type is OptionalTypeSymbol or PointerTypeSymbol)
+        {
+            whenNothing = new BoundNullLiteral(syntax.Span, value.Type);
+        }
+        else if (value.Type.IsVoid())
+        {
+            // `a?.Save();` as a statement: nothing is produced either way, so
+            // the other arm is the same nothing.
+            whenNothing = new BoundNullLiteral(syntax.Span, value.Type);
+        }
+        else
+        {
+            diagnostics.Error("SL0605", syntax.Span,
+                $"'{syntax.Member}' is '{value.Type.Name}', which has no null to stand for " +
+                "the receiver having been nothing. Say what it is instead — " +
+                $"'{syntax.Member} ?? something' — or ask with an 'if'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        return new BoundLet(syntax.Span, held, receiver,
+            new BoundConditional(syntax.Span, value.Type, present, value, whenNothing));
+    }
+
+    /// <summary>
+    /// <c>a ?? b</c>.
+    ///
+    /// Written here rather than with the other binary operators because it is
+    /// not one: only one side is evaluated, and the left is read twice. When
+    /// the left is itself a <c>?.</c> the two fold into one question, which is
+    /// what makes <c>a?.Count ?? 0</c> the way to reach a value-typed member.
+    /// </summary>
+    private BoundExpression BindNullFallback(BinarySyntax syntax)
+    {
+        if (syntax.Left is MemberAccessSyntax { Conditional: true } asked)
+            return BindConditionalAccess(asked, syntax.Right);
+
+        if (syntax.Left is CallSyntax { Callee: MemberAccessSyntax { Conditional: true } called } invoked)
+            return BindConditionalAccess(called, syntax.Right, invoked);
+
+        var left = BindExpression(syntax.Left);
+        if (left.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (left.Type is not (OptionalTypeSymbol or PointerTypeSymbol))
+        {
+            diagnostics.Error("SL0604", syntax.Left.Span,
+                $"'{left.Type.Name}' cannot be nothing, so '??' has nothing to fall back from");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var held = new LocalSymbol(SyntheticName("held"), left.Type, isConst: false);
+        var reading = new BoundLocalAccess(syntax.Left.Span, held);
+
+        var present = new BoundBinary(
+            syntax.Span, PrimitiveTypeSymbol.Bool,
+            reading, BoundBinaryOp.NotEqual,
+            new BoundNullLiteral(syntax.Span, left.Type));
+
+        var fallback = BindExpression(syntax.Right);
+        if (fallback.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // `C? ?? C` is a `C`: the whole point is that there is one either way.
+        // `C? ?? C?` stays optional, the fallback being able to be nothing too.
+        var result = left.Type is OptionalTypeSymbol optional &&
+                     fallback.Type is not OptionalTypeSymbol
+            ? optional.Element
+            : left.Type;
+
+        BoundExpression value = result is OptionalTypeSymbol
+            ? reading
+            : new BoundConversion(syntax.Left.Span, result, reading, ConversionKind.NarrowOptional);
+
+        return new BoundLet(syntax.Span, held, left,
+            new BoundConditional(syntax.Span, result, present, value,
+                BindConversion(fallback, result, syntax.Right.Span)));
+    }
+
     private BoundExpression BindMemberAccess(MemberAccessSyntax syntax)
     {
+        // `a?.m` on its own: the fallback is the null the member's type must
+        // have room for, and BindConditionalAccess says so if it has none.
+        if (syntax.Conditional) return BindConditionalAccess(syntax, null);
+
         // `Module.Member` is a qualified name, not a value access. A module,
         // a variant and an enum are all names, so `->` reaches none of them:
         // there is nothing there to be pointed at.
@@ -113,11 +251,23 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        var receiver = syntax.Target is BaseSyntax
+        var bound = syntax.Target is BaseSyntax
             ? BindBaseReceiver(syntax.Target.Span)
             : BindExpression(syntax.Target);
 
-        if (receiver is null || receiver.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+        if (bound is null || bound.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        return BindMemberOf(bound, syntax);
+    }
+
+    /// <summary>
+    /// The member of a value that has already been bound.
+    ///
+    /// Split out so that <c>a?.m</c> can reach it with the narrowed receiver
+    /// it holds, rather than binding the target a second time.
+    /// </summary>
+    private BoundExpression BindMemberOf(BoundExpression receiver, MemberAccessSyntax syntax)
+    {
 
         // An inline array's length was written in its type, so it is a constant
         // rather than a load -- and, unlike the other two, it never had to be

@@ -96,6 +96,24 @@ public sealed partial class LlvmEmitter
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
             case BoundConditional conditional: return EmitConditional(conditional);
+
+            case BoundLet held:
+            {
+                // A slot rather than an SSA name, because everything that
+                // reads a local reads through one -- and a struct is an
+                // address here in any case.
+                string llvmType = LlvmTypeOf(held.Local.Type);
+                string slot = Alloca(llvmType, held.Local.Name);
+                _slots[held.Local] = slot;
+
+                var value = EmitExpression(held.Value);
+                Line($"store {llvmType} {value.Ref}, ptr {slot}");
+
+                // Borrowed, not owned: whatever produced the value is already
+                // a temporary the statement will drop, so nothing is retained
+                // here and nothing is released.
+                return EmitExpression(held.Body);
+            }
             case BoundFunctionReference reference:
                 return new Val(Symbol(reference.Function), "ptr", reference.Type);
             case BoundIndirectCall indirect: return EmitIndirectCall(indirect);
