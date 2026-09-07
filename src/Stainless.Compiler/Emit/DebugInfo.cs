@@ -236,8 +236,10 @@ public sealed class DebugInfo
                 int id = Reserve();
                 _types[type] = id;
                 Fill(id, pointer.Element.IsVoid()
-                    // DWARF spells void* as a pointer with no base type.
-                    ? "!DIDerivedType(tag: DW_TAG_pointer_type, size: 64)"
+                    // DWARF spells void* as a pointer with no base type -- but
+                    // LLVM's textual IR wants the field written all the same,
+                    // and rejects the node outright without it.
+                    ? "!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)"
                     : $"!DIDerivedType(tag: DW_TAG_pointer_type, baseType: !{Type(pointer.Element)}, " +
                       "size: 64)");
                 return id;
@@ -315,14 +317,14 @@ public sealed class DebugInfo
                 // An error type, or something added later that has no description
                 // yet. A pointer-shaped unknown is wrong in less visible ways
                 // than a missing node, which would not verify at all.
-                return _types[type] = Add("!DIDerivedType(tag: DW_TAG_pointer_type, size: 64)");
+                return _types[type] = Add("!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)");
         }
     }
 
     private int BasicType(PrimitiveTypeSymbol primitive)
     {
         if (primitive.IsVoid())
-            return Add("!DIDerivedType(tag: DW_TAG_pointer_type, size: 64)");
+            return Add("!DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)");
 
         if (_basicTypes.TryGetValue(primitive.Name, out int existing)) return existing;
 

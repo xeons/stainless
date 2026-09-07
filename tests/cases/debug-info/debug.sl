@@ -63,6 +63,13 @@ int Main() {
     var boxed = new Box<int>(4);
     var named = new Box<String>("text");
 
+    // A `void*`: DWARF spells it as a pointer with no base type, and LLVM
+    // still wants the field written -- as `null` -- or the node does not
+    // verify. Nothing here had one until it did not build.
+    int cell = 5;
+    void* anything = (void*)&cell;
+
+    Console.WriteLine(Text.FromInteger((long)(nuint)anything != 0 ? 1 : 0));
     Console.WriteLine(Text.FromInteger(node.Doubled()));
     Console.WriteLine(Text.FromInteger(Sum(numbers)));
     Console.WriteLine(Text.FromInteger((int)raw));
