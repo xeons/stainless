@@ -91,6 +91,13 @@ public sealed partial class LlvmEmitter(
     /// those know only the type's name.
     /// </summary>
     private readonly Dictionary<string, int> _structAlignment = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// For a struct whose padding had to be written out, where each declared
+    /// field ended up among the members. Absent for every struct whose fields
+    /// are its members, which is nearly all of them.
+    /// </summary>
+    private readonly Dictionary<string, int[]> _fieldSlots = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _stringObjects = new(StringComparer.Ordinal);
     private readonly Dictionary<LocalSymbol, string> _slots = [];
     private readonly Dictionary<ParameterSymbol, string> _parameterSlots = [];

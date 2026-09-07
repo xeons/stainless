@@ -17,5 +17,8 @@ greeter destroyed
   dropped
 iidof is stable: true
 iidof data1: 1787767828
+iidof data2: 39742
+iidof data3: 19797
+iidof data4: 143 66
 end of Main
 greeter destroyed

@@ -334,8 +334,21 @@ public sealed partial class LlvmEmitter
                 : Emit("ptr", $"getelementptr inbounds i8, ptr {baseAddress}, i64 {field.Offset}");
 
         return Emit("ptr",
-            $"getelementptr inbounds {StructName(owner)}, ptr {baseAddress}, i32 0, i32 {field.Index}");
+            $"getelementptr inbounds {StructName(owner)}, ptr {baseAddress}, " +
+            $"i32 0, i32 {FieldSlot(owner, field)}");
     }
+
+    /// <summary>
+    /// Which member of the emitted struct a declared field is.
+    ///
+    /// The same number as the field's own index, unless the struct had its
+    /// padding written out -- see <c>SpellingOf</c> -- in which case the pads
+    /// are members too and everything after the first of them has moved.
+    /// </summary>
+    private int FieldSlot(StructTypeSymbol owner, FieldSymbol field) =>
+        _fieldSlots.TryGetValue(StructName(owner), out var slots) && field.Index < slots.Length
+            ? slots[field.Index]
+            : field.Index;
 
     // ============================================================ bit-fields
 

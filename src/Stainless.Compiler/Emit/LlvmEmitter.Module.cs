@@ -83,16 +83,7 @@ public sealed partial class LlvmEmitter
                 continue;
             }
 
-            string fields = string.Join(", ", structType.Fields.Select(f => LlvmTypeOf(f.Type)));
-            if (fields.Length == 0) fields = "i8";
-
-            // A packed struct is spelled `<{ }>`, which is how LLVM is told to
-            // put the fields where the C rules with no padding put them. Without
-            // it LLVM would insert its own and every offset after the first
-            // would disagree with the one the binder computed.
-            _module.AppendLine(structType.IsPacked
-                ? $"{StructName(structType)} = type <{{ {fields} }}>"
-                : $"{StructName(structType)} = type {{ {fields} }}");
+            _module.AppendLine($"{StructName(structType)} = type {SpellingOf(structType).Text}");
 
             // Alignment is not part of an LLVM struct type; it is stated at each
             // alloca and each global. So it is remembered here, by name, for the
@@ -118,6 +109,172 @@ public sealed partial class LlvmEmitter
         _module.AppendLine("%SlAttributeValue = type { i32, i64, ptr }");
         _module.AppendLine();
     }
+
+    // ============================================================ struct spelling
+
+    /// <summary>
+    /// How one struct is written in IR, and what that spelling measures.
+    /// </summary>
+    /// <param name="Text">Everything after <c>= type</c>, braces included.</param>
+    /// <param name="Size">What LLVM will make of it, which equals what the binder computed.</param>
+    /// <param name="Alignment">What LLVM will make of it, which may be less.</param>
+    /// <param name="Slots">
+    /// Where each declared field landed among the members, when padding moved
+    /// them; null when the two lists are the same.
+    /// </param>
+    private readonly record struct Spelling(string Text, int Size, int Alignment, int[]? Slots);
+
+    private readonly Dictionary<StructTypeSymbol, Spelling> _spellings = [];
+
+    /// <summary>
+    /// Spells a struct so that LLVM's own idea of it matches the layout the
+    /// binder computed -- exactly, field by field and byte for byte.
+    ///
+    /// Most of the time those agree without being made to: the binder follows
+    /// the platform's C rules and LLVM follows the same ones, so a plain
+    /// <c>{ i8, double }</c> puts the double at 8 in both accounts. Two things
+    /// break the agreement, and neither is something LLVM can be told about a
+    /// *type*:
+    ///
+    ///   - <c>[Align(N)]</c> raises a struct's alignment, and with it its size.
+    ///     LLVM sizes <c>{ i32 }</c> at 4 whatever the source asked for, so an
+    ///     array of them had a stride of 4 while <c>sizeof</c> said 16.
+    ///   - A struct of bit-fields is emitted as bytes, whose alignment is 1,
+    ///     so a struct holding one placed it earlier than C does.
+    ///
+    /// Where they disagree the struct is spelled <c>&lt;{ }&gt;</c> -- packed,
+    /// so LLVM adds nothing of its own -- with the padding written out as
+    /// <c>[k x i8]</c> between the fields and after the last. The declared
+    /// fields then sit exactly where the binder put them, which is where C
+    /// puts them, and the members they became are recorded in
+    /// <see cref="Spelling.Slots"/> so an access still reaches for the right
+    /// one.
+    ///
+    /// Padding is contagious on purpose: a packed struct reports an alignment
+    /// of 1, so anything holding one finds its own offsets disagreeing and is
+    /// written out in turn. That is what carries the correction outwards
+    /// instead of leaving it one level deep.
+    /// </summary>
+    private Spelling SpellingOf(StructTypeSymbol type)
+    {
+        if (_spellings.TryGetValue(type, out var known)) return known;
+
+        // Registered before the fields are walked, so a struct that somehow
+        // reaches itself stops rather than recurring for ever. A value type
+        // containing itself is SL0216 and never gets this far.
+        _spellings[type] = new Spelling("{ i8 }", 1, 1, null);
+
+        var spelling = Spell(type);
+        _spellings[type] = spelling;
+        if (spelling.Slots is not null) _fieldSlots[StructName(type)] = spelling.Slots;
+        return spelling;
+    }
+
+    private Spelling Spell(StructTypeSymbol type)
+    {
+        // A union is storage of the right size and alignment, and a struct of
+        // bit-fields is storage of the right size. Both are spelled where they
+        // are emitted; this only has to say what they measure.
+        if (type is UnionTypeSymbol union)
+        {
+            int element = Math.Max(1, union.Alignment);
+            return new Spelling("", Math.Max(1, union.Size / element) * element, element, null);
+        }
+
+        if (HasBitFields(type))
+            return new Spelling("", Math.Max(1, type.Size), 1, null);
+
+        // An empty struct is one byte, as it is in C++ and Rust, so that the
+        // field after it begins where the binder says it does.
+        if (type.Fields.Count == 0) return new Spelling("{ i8 }", 1, 1, null);
+
+        var members = type.Fields.Select(f => LlvmTypeOf(f.Type)).ToList();
+
+        // What LLVM would do with that list, left to itself.
+        int at = 0, alignment = 1;
+        var natural = new int[type.Fields.Count];
+
+        for (int i = 0; i < type.Fields.Count; i++)
+        {
+            var (size, memberAlignment) = MeasuredAs(type.Fields[i].Type);
+            if (!type.IsPacked)
+            {
+                at = TypeExtensions.AlignTo(at, memberAlignment);
+                alignment = Math.Max(alignment, memberAlignment);
+            }
+
+            natural[i] = at;
+            at += size;
+        }
+
+        int naturalSize = type.IsPacked ? at : TypeExtensions.AlignTo(at, alignment);
+
+        bool agrees = naturalSize == type.Size &&
+                      !type.Fields.Where((f, i) => f.Offset != natural[i]).Any();
+
+        if (agrees)
+            return new Spelling(
+                type.IsPacked ? $"<{{ {string.Join(", ", members)} }}>"
+                              : $"{{ {string.Join(", ", members)} }}",
+                naturalSize, type.IsPacked ? 1 : alignment, null);
+
+        // They do not, so the layout is written out rather than described.
+        var written = new List<string>();
+        var slots = new int[type.Fields.Count];
+        int written_at = 0;
+
+        for (int i = 0; i < type.Fields.Count; i++)
+        {
+            int gap = type.Fields[i].Offset - written_at;
+            if (gap > 0)
+            {
+                written.Add($"[{gap} x i8]");
+                written_at += gap;
+            }
+
+            slots[i] = written.Count;
+            written.Add(members[i]);
+            written_at += MeasuredAs(type.Fields[i].Type).Size;
+        }
+
+        if (type.Size > written_at) written.Add($"[{type.Size - written_at} x i8]");
+
+        return new Spelling($"<{{ {string.Join(", ", written)} }}>", type.Size, 1, slots);
+    }
+
+    /// <summary>
+    /// What LLVM makes of one member's type: the size it occupies in a struct,
+    /// and the boundary it insists on starting at.
+    ///
+    /// It mirrors <see cref="LlvmTypeOf"/> case for case, because it is
+    /// answering a question about the text that produces -- so the two have to
+    /// be changed together.
+    /// </summary>
+    private (int Size, int Alignment) MeasuredAs(TypeSymbol type) => type switch
+    {
+        StructTypeSymbol nested => (SpellingOf(nested).Size, SpellingOf(nested).Alignment),
+
+        // `[N x T]` takes its alignment from the element and its size from all
+        // of them.
+        FixedArrayTypeSymbol inline => (
+            MeasuredAs(inline.Element).Size * inline.Length,
+            MeasuredAs(inline.Element).Alignment),
+
+        EnumTypeSymbol enumType => MeasuredAs(enumType.UnderlyingType),
+
+        PrimitiveTypeSymbol primitive => primitive.Kind switch
+        {
+            PrimitiveKind.Void => (0, 1),
+            PrimitiveKind.Bool or PrimitiveKind.Char
+                or PrimitiveKind.SByte or PrimitiveKind.Byte => (1, 1),
+            PrimitiveKind.Short or PrimitiveKind.UShort or PrimitiveKind.Char16 => (2, 2),
+            PrimitiveKind.Int or PrimitiveKind.UInt
+                or PrimitiveKind.Char32 or PrimitiveKind.Float => (4, 4),
+            _ => (8, 8),
+        },
+
+        _ => (8, 8),        // everything else is a pointer
+    };
 
     /// <summary>
     /// Symbols this module has already declared. The standard library declares

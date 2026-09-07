@@ -84,5 +84,57 @@ int Main() {
 
     Show("offsetof(Holder, First)", offsetof(Holder, First));
     Show("offsetof(Holder, Second)", offsetof(Holder, Second));
+
+    // What `sizeof` says has to be what the generated code does, which is a
+    // separate claim and was once a different answer: LLVM has no way to be
+    // told a type's alignment, so an over-aligned struct was emitted as its
+    // fields and nothing else -- and an array of them had a stride of 4 while
+    // this line said 16.
+    var many = new Wide[3];
+    many[0u].A = 10;
+    many[1u].A = 20;
+    byte* first = (byte*)&many[0u];
+    byte* second = (byte*)&many[1u];
+    Show("stride of Wide[]", (nuint)second - (nuint)first);
+
+    // And a struct holding one has to put it where `offsetof` says, which is
+    // the same claim one level up. The same goes for a struct of bit-fields,
+    // whose storage is bytes and whose alignment is therefore not its own.
+    Show("sizeof(Nesting)", sizeof(Nesting));
+    Show("offsetof(Nesting, Middle)", offsetof(Nesting, Middle));
+    Show("offsetof(Nesting, Last)", offsetof(Nesting, Last));
+
+    Nesting nested;
+    nested.First = 1u;
+    nested.Middle.A = 7;
+    nested.Last = 9u;
+
+    // Read back through the offsets rather than through the fields, so that
+    // the two accounts have to agree rather than merely being consistent.
+    byte* raw = (byte*)&nested;
+    Show("Middle, at its offset",
+         (nuint)*(int*)(raw + offsetof(Nesting, Middle)));
+    Show("Last, at its offset", (nuint)*(raw + offsetof(Nesting, Last)));
+
+    Show("sizeof(Bits)", sizeof(Bits));
+    Show("offsetof(Bits, Flags)", offsetof(Bits, Flags));
+    Show("offsetof(Bits, After)", offsetof(Bits, After));
     return 0;
+}
+
+/// A struct holding an over-aligned one, which is where the two accounts of a
+/// layout meet.
+public struct Nesting {
+    public byte First;
+    public Wide Middle;
+    public byte Last;
+}
+
+public struct Packed3 { public uint A : 3; public uint B : 5; public uint C : 24; }
+
+/// And one holding a struct of bit-fields, whose storage is bytes.
+public struct Bits {
+    public byte    Lead;
+    public Packed3 Flags;
+    public byte    After;
 }

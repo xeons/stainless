@@ -158,7 +158,8 @@ public sealed partial class LlvmEmitter
             }
 
             string address = Emit("ptr",
-                $"getelementptr inbounds {StructName(tuple)}, ptr {source}, i32 0, i32 {field.Index}");
+                $"getelementptr inbounds {StructName(tuple)}, ptr {source}, " +
+                $"i32 0, i32 {FieldSlot(tuple, field)}");
 
             // A struct field travels as its address; anything else is loaded.
             var held = field.Type is StructTypeSymbol

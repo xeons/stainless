@@ -459,7 +459,8 @@ public sealed partial class LlvmEmitter
         {
             var field = tuple.Fields[i];
             string target = Emit("ptr",
-                $"getelementptr inbounds {StructName(tuple)}, ptr {slot}, i32 0, i32 {field.Index}");
+                $"getelementptr inbounds {StructName(tuple)}, ptr {slot}, " +
+                $"i32 0, i32 {FieldSlot(tuple, field)}");
 
             StoreInto(target, EmitExpression(expression.Elements[i]), field.Type);
         }
@@ -485,7 +486,7 @@ public sealed partial class LlvmEmitter
                 var field = payload.Fields[i];
                 string target = Emit("ptr",
                     $"getelementptr inbounds {StructName(payload)}, ptr {address}, " +
-                    $"i32 0, i32 {field.Index}");
+                    $"i32 0, i32 {FieldSlot(payload, field)}");
 
                 StoreInto(target, EmitExpression(expression.Arguments[i]), field.Type);
             }
@@ -570,7 +571,7 @@ public sealed partial class LlvmEmitter
 
         string slot = Emit("ptr",
             $"getelementptr inbounds {StructName(payload)}, ptr {address}, " +
-            $"i32 0, i32 {field.Index}");
+            $"i32 0, i32 {FieldSlot(payload, field)}");
 
         return field.Type is StructTypeSymbol
             ? new Val(slot, "ptr", field.Type)

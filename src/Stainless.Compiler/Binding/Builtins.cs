@@ -293,15 +293,20 @@ public sealed class Builtins
             ModuleName = ComModuleName,
             IsPublic = true,
         };
+        // The last argument is the field's *index*, and the offset is set after
+        // it: this type is built by hand rather than bound from source, so
+        // nothing else fills either in. They were once the same numbers, which
+        // read plausibly and meant that `Data2` reached member 4 of a struct
+        // with four of them.
         Guid.Fields.Add(new FieldSymbol("Data1", PrimitiveTypeSymbol.UInt, Guid, 0)
-            { IsPublic = true });
-        Guid.Fields.Add(new FieldSymbol("Data2", PrimitiveTypeSymbol.UShort, Guid, 4)
-            { IsPublic = true });
-        Guid.Fields.Add(new FieldSymbol("Data3", PrimitiveTypeSymbol.UShort, Guid, 6)
-            { IsPublic = true });
+            { IsPublic = true, Offset = 0 });
+        Guid.Fields.Add(new FieldSymbol("Data2", PrimitiveTypeSymbol.UShort, Guid, 1)
+            { IsPublic = true, Offset = 4 });
+        Guid.Fields.Add(new FieldSymbol("Data3", PrimitiveTypeSymbol.UShort, Guid, 2)
+            { IsPublic = true, Offset = 6 });
         Guid.Fields.Add(new FieldSymbol(
-            "Data4", new FixedArrayTypeSymbol(PrimitiveTypeSymbol.Byte, 8), Guid, 8)
-            { IsPublic = true });
+            "Data4", new FixedArrayTypeSymbol(PrimitiveTypeSymbol.Byte, 8), Guid, 3)
+            { IsPublic = true, Offset = 8 });
         Guid.SetLayout(16, 4);
         Com.Types[Guid.SimpleName] = Guid;
 
