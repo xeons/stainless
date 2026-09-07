@@ -14,6 +14,29 @@ no "why" is one that should be deleted rather than done.
 
 These are wrong rather than missing, and should go first.
 
+### A literal's type does not survive a minus, and there is no float literal
+
+```csharp
+byte  b = 200;          // fine: a literal adopts what can hold it
+sbyte c = -100;         // SL0265, and the same for `short s = -30000;`
+float f = 1.5f;         // SL0265: the suffix lexes, and the literal is a double
+```
+
+Two small spellings, both of which a C# reader will type. The first is
+`ConstantFits` seeing a `BoundLiteral` and a minus giving it a `BoundUnary`
+instead; the negated value is now *typed* correctly (that was a real bug, and is
+fixed), but the fitting rule still does not see through the operator. The second
+is `f` and `d` being accepted by the lexer and both meaning `double`, so the
+suffix that ought to make a `float` is the one thing it cannot do.
+
+Neither is silent -- both are a diagnostic asking for a cast -- which is why
+they are here rather than above. What is wrong is that the cast should not be
+needed.
+
+Found by [samples/tour](samples/tour).
+
+*Touches:* `Binder.ConstantFits`, `Lexer.ReadNumber`.
+
 ### Two functions with the same signature are not diagnosed
 
 ```csharp

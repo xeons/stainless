@@ -83,6 +83,14 @@ public class SampleTests
 
         new("library", ["samples/library/src/math.sl"]) { Shared = true },
 
+        new("tour", [
+            "samples/tour/Platform.sl",
+            "samples/tour/Types.sl",
+            "samples/tour/Types.Members.sl",
+            "samples/tour/Tour.sl",
+            "samples/tour/Library.sl",
+        ]),
+
         new("win32/report", ["samples/win32/report.sl"]) { WindowsOnly = true },
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
 

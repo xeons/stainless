@@ -36,6 +36,15 @@ Hello from Stainless.
 
 That is a real native executable. No VM, no JIT, no assembly loader, no GC.
 
+For the other end of the scale, [samples/tour](samples/tour) is one program that
+uses every feature in this document, printing what it did at each step -- so
+running it says whether the tour is still true, and not only whether it still
+builds.
+
+```
+$ stainless run samples/tour
+```
+
 ---
 
 ## The four ideas it is built around
