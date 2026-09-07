@@ -1,0 +1,17 @@
+termios  60
+winsize  8
+epoll    12
+inotify  16
+itimer   32
+offsets  17 52
+tty      false
+raw      refused true
+size     0 0
+made     true true
+added    true
+quiet    true
+woken    true data 42 readable true
+timer    true
+fired    true
+inotify  true true
+nothing  true

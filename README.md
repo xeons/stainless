@@ -913,7 +913,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 248 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 249 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
 ```
 
@@ -923,8 +923,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 248 cases, of which 10 are
-Windows-only and 1 is Linux-only, so Linux runs 238 and Windows 247, each
+**Both Windows and Linux are tested.** 249 cases, of which 10 are
+Windows-only and 2 are Linux-only, so Linux runs 239 and Windows 247, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1560,7 +1560,11 @@ Everything below is covered by [the test suite](tests/cases).
   Source a program compiles rather than part of the standard library, because
   compiling a wrapper is what makes its library necessary; the raw layer needs
   no library at all
-- [bindings/linux](bindings/linux): the Linux socket calls, on the same terms.
+- [bindings/linux](bindings/linux): the Linux socket calls, the terminal
+  (`termios` and `ioctl`, with raw mode, the window size, the cursor and
+  colour) and the event loop (`epoll`, `eventfd`, `timerfd`, `inotify`) — where
+  everything is a file descriptor, so one wait covers sockets, timers, file
+  changes and other threads together. On the same terms as the Win32 ones.
   `#if LINUX` and not `#if UNIX`, because the functions are POSIX and the
   numbers are not — `AF_INET6` is 10 here, 23 on Windows and 30 on macOS — so
   a file claiming to be POSIX would have to be wrong on two platforms out of

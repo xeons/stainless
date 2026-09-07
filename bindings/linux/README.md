@@ -67,3 +67,65 @@ program that wants Linux's sockets, including the parts that are only Linux's:
 `SO_REUSEPORT`, `accept4`, `SOCK_NONBLOCK`, `socketpair`, `MSG_NOSIGNAL`. None
 of those has a Windows equivalent, so none of them can be in a wrapper that
 claims to work on both.
+
+## The terminal
+
+```
+bindings/linux/
+  api/Termios.sl   module Linux.Termios;   struct termios, tcgetattr,
+                                           tcsetattr, ioctl, winsize, isatty
+  api/Events.sl    module Linux.Events;    epoll, eventfd, timerfd, inotify
+  Terminal.sl      module Linux.Terminal;  raw mode, the size, the cursor,
+                                           colour
+```
+
+`Standard.Console` writes text and is what a program should use for that.
+`Linux.Terminal` is for the things that are not writing text — reading a key
+without waiting for Enter, asking how wide the window is, moving the cursor.
+
+It is called `Terminal` rather than `Console` for the reason the Win32 one is:
+a module is reached by its last name segment, so a `Linux.Console` would shadow
+`Standard.Console` in every file that imported it, and a program doing terminal
+work is exactly the program that also wants to print.
+
+**Colour is ANSI escapes, not calls.** Every terminal Linux has spoken to in
+thirty years understands them, so there is nothing to bind: the sequences are
+written to the output like any other text. What needs binding is the *state* —
+raw mode and the size — which is `termios` and `ioctl`.
+
+**Ask `IsTerminal()` first.** Writing escapes into a pipe puts them in the file.
+That is the same rule the Win32 module states, reached from the other
+direction: there, every console call simply fails when the output is redirected.
+
+**Put the terminal back.** A program that leaves it in raw mode leaves the
+shell it returns to unusable — no echo, no line editing, Ctrl-C doing nothing.
+`Mode` restores in its destructor, so letting it go out of scope is enough.
+
+## The event loop
+
+`epoll`, `eventfd`, `timerfd` and `inotify` have no counterpart on Windows and
+no POSIX equivalent worth the name — `poll` is in `Sockets.sl` and is what
+POSIX has.
+
+**Everything is a file descriptor.** A timer is a descriptor that becomes
+readable when it fires; a wakeup from another thread is a descriptor that
+becomes readable when somebody writes to it; a file change is a descriptor that
+becomes readable when the file changes. So one `epoll_wait` covers sockets,
+files, timers and other threads together, which is why a Linux program needs no
+separate mechanism for each.
+
+## Checked against the headers, not the documentation
+
+Every struct size, offset and constant in these files was printed from the real
+header on the machine before it was written down:
+
+```sh
+printf '#include <termios.h>\n#include <stdio.h>\nint main(void){printf("%%zu\n", sizeof(struct termios));}' > /tmp/c.c
+clang /tmp/c.c -o /tmp/c && /tmp/c
+```
+
+`sizeof(termios)` is 60 and `struct epoll_event` is 12 — the second because it
+is **packed on x86-64**, which a natural layout would get wrong by four bytes
+and hand the kernel a struct it reads the wrong fields out of. `tests/cases/
+linux-terminal` asserts both, so a change that breaks one fails rather than
+misbehaves.
