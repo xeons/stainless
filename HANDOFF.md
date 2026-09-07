@@ -8,15 +8,15 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           563 pass
-dotnet run --project tests/Stainless.Tests      226 cases, 1 skipped on Windows
+dotnet run --project tests/Stainless.Tests      249 cases, 2 skipped on Windows
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
 and GTK 3, the development packages, Xvfb and `broadwayd`, so a GUI can be
 built *and run* there headlessly — see `bindings/gtk/README.md`.
 
-`master` is ahead of `origin/master`; the reflection and closure commits have
-not been pushed.
+`master` is ten commits ahead of `origin/master`. Nothing has been pushed since
+the closure work.
 
 ## What was built, in order
 
@@ -32,7 +32,16 @@ not been pushed.
 | `98db181` | find a reflected type by name |
 | `4fc1dde` | `closure`: a method and the object it belongs to |
 | `b83260a` | the GTK layer moved onto closures; a user-control sample |
-| *(this run)* | generic types get their operators, statics and setup blocks |
+| `972c305` | generic types get their operators, statics and setup blocks |
+| `f836364` | `++` `--`, `do..while`, `goto`, `nameof`, `checked` |
+| `637b155` | `out` parameters and named arguments |
+| `1a334c6` | closures become generic, and the library moves onto them |
+| `22c863c` | `default(T)`, `String.Empty`, and `x.F(y)` meaning `F(x, y)` |
+| `d438ec6` | `Standard.Process` |
+| `93ca9f0` | `?.`, `??`, `??=` |
+| `4902a3f` | types declared inside other types |
+| `c6f92b8` | tuples |
+| `b88a10a` | Linux terminal and event-loop bindings |
 
 ## Findings worth keeping
 
@@ -150,8 +159,76 @@ instinct is why `ClosureTypeSymbol` is not a flag on `DelegateTypeSymbol`:
 sixteen bytes silently reaching a slot that expects a C function pointer is the
 kind of mistake that shows up as a corrupt stack in someone else's code.
 
+**An audit drove most of this run, and the audit's own method is the thing to
+keep.** Every claim in it was checked by compiling a probe rather than by
+reading, and that is what turned up the two findings nobody would have written
+down otherwise: `delete` was a reserved word the parser never mentioned, and
+the standard library was built on the five one-method interfaces the design had
+already disowned. Neither is visible from the source; both are obvious the
+moment something tries them.
+
+**The repository keeps answering the keyword question.** `out` is a local in
+`Convert.sl` and `Encoding.sl`; `checked` is a parameter name in
+`tests/cases/static-methods`. Both are contextual now, as `closure` and `event`
+already were. That is four for four: every time a word looked safe, the tree
+already used it. Grep before taking one — and grep the *code*, not the comments,
+which is a mistake made once this run and caught by the suite.
+
+**A mechanical rewrite needs a test that fails.** A script turning `x = x + 1`
+into `x++` also turned `value = value * 10 + digit` into `value *= 10 + digit`,
+and exactly one test noticed. The compound-assignment pass was dropped: a script
+that cannot see precedence has no business deciding which of those was meant.
+`++` alone is unambiguous and is all that ran.
+
+**Three bugs found by the Linux run that Windows could not have shown.**
+
+- A small struct returned through a **closure or a delegate** was used as an
+  address. The direct-call path has always landed a register-returned struct in
+  a slot; the two indirect paths did not. Nothing hit it until
+  `Optional<T>.FlatMap` began taking a closure rather than an interface, an
+  interface call being a direct call through a vtable slot. SysV-only, that
+  being the ABI that returns an `Optional<nuint>` in two registers.
+- `default(T)` for a struct returned the constant `zeroinitializer`, and a
+  struct travels as the *address* of its storage — so the store memcpy'd from
+  address zero. Caught by a segfault in the first probe.
+- The hidden local a tuple deconstruction holds its tuple in was not tracked as
+  owned, so each element was one release short. Caught by a destructor that
+  printed.
+
+All three are the same shape: **a value that is really an address, or an
+address that is really a value.** That is the seam to look at first when
+something new touches structs.
+
+**`?.` needed somewhere to put a temporary**, and expressions have nowhere to
+put a statement. `BoundLet` — a value held for the duration of an expression —
+is what came of it, and tuples wanted it too. It borrows: whatever produced the
+value is already a temporary the statement will drop.
+
+**Uniform call syntax rather than extension methods.** `x.F(y)` falls back to
+`F(x, y)` when `x` has no member `F`, so the whole combinator surface became
+chainable with no library change at all. C# needs `this` because everything must
+live in a class; a module is a scope here, so there is nothing the modifier
+would add. A member always wins, the fallback being reached only after member
+lookup fails.
+
+**Nesting is about where a name is reached from, and nothing else.** A type
+declared inside another is lifted out and named `Outer.Inner` — no privileged
+view, no hidden reference to an outer instance, no bearing on layout. The
+parser's `hoisted` list, which already existed for anonymous members, is the
+whole mechanism.
+
+**A tuple is a struct**, so layout, both ABI classifiers and the reference walk
+apply to it with nothing written for tuples. Its fields are `Item1` upwards on
+purpose: named elements either take part in the type's identity, making
+`(int a, int b)` and `(int x, int y)` different types, or they do not, leaving
+two names for one field. The name is wanted at the use site, and
+`var (low, high) = ...` is where it goes.
+
 ## Next, in the order I would do it
 
+0. **Push.** Ten commits are unpushed, and the last audit's numbers in the
+   README drift on every commit that adds a case — a unit test pinning them is
+   two hours and stops it for good.
 1. **Method metadata in reflection**, with invoke-by-name. The last piece
    before a form file can wire a handler, and the same work would let a
    deserializer fill a `List<T>` — the one shape `Standard.Json` cannot
