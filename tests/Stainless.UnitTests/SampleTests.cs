@@ -52,6 +52,9 @@ public class SampleTests
 
         /// <summary>Unix-only, for the same reason: the GTK bindings are `#if UNIX`.</summary>
         public bool UnixOnly { get; init; }
+
+        /// <summary>Written against the Forms library, so it needs those sources too.</summary>
+        public bool NeedsForms { get; init; }
     }
 
     private static readonly Sample[] Samples =
@@ -103,12 +106,21 @@ public class SampleTests
         new("win32/report", ["samples/win32/report.sl"]) { WindowsOnly = true },
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
 
+        new("forms/demo", ["samples/forms/demo.sl"]) { WindowsOnly = true, NeedsForms = true },
+
         new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
         new("gtk/control", ["samples/gtk/control.sl"]) { UnixOnly = true },
     ];
 
     /// <summary>The Win32 samples are written against the bindings.</summary>
     private static string[] Win32Bindings() => BindingsUnder("win32");
+
+    /// <summary>The Forms library's own sources, for a sample written against it.</summary>
+    private static string[] FormsSources() =>
+        Directory.EnumerateFiles(Path.Combine(Repository.Root, "forms", "src"),
+                                 "*.sl", SearchOption.AllDirectories)
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .ToArray();
 
     /// <summary>And the GTK sample against those.</summary>
     private static string[] GtkBindings() => BindingsUnder("gtk");
@@ -140,6 +152,7 @@ public class SampleTests
         var paths = sample.Paths.Select(p => Path.Combine(Repository.Root, p)).ToList();
         if (sample.WindowsOnly) paths.AddRange(Win32Bindings());
         if (sample.UnixOnly) paths.AddRange(GtkBindings());
+        if (sample.NeedsForms) paths.AddRange(FormsSources());
 
         Front.BindFiles(paths, out var diagnostics, sample.Shared);
 

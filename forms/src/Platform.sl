@@ -1,0 +1,475 @@
+// Stainless - an experimental systems language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This file is part of the Stainless runtime library. It is free
+// software: you can redistribute it and/or modify it under the terms of
+// the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any
+// later version.
+//
+// It is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// As an additional permission under section 7 of that License, compiling
+// a program with Stainless does not by itself place that program under
+// the GNU General Public License. See LICENSE.RUNTIME.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// The seam between the portable controls and the platform that draws them.
+//
+// **What this replaces.** The LCL's answer is `widgetset/ws*.pp`: a parallel
+// hierarchy of `TWSWinControl`, `TWSButton`, `TWSCustomEdit` whose members are
+// all `class procedure`s, dispatched through `class of` metaclass references
+// that each widgetset registers for each control class. It works, and it needs
+// three things Stainless does not have: metaclasses, a registration pass that
+// runs before anything is constructed, and a `published` section to hang the
+// virtual class methods on.
+//
+// **What replaces it.** Interfaces, and one object per live control. A control
+// owns a *peer* -- the platform's side of it -- and talks to the platform only
+// through that peer's interface. This is the arrangement C# reached for the
+// same problem: WPF's and Avalonia's `I*Impl`, one implementation per platform,
+// created by a factory the application sets once at startup.
+//
+// Three things fall out of it that the LCL pays for elsewhere:
+//
+//   1. **A peer is an object, so it holds state.** The Win32 backend keeps a
+//      window's original window procedure next to its `HWND` for subclassing,
+//      which in the LCL needs a side table keyed by `HWND` (`AllocWindowInfo`,
+//      a global atom, `GetProp` on every message).
+//   2. **The peer's lifetime is the control's.** ARC destroys it, so
+//      `DestroyHandle` is a destructor and cannot be forgotten.
+//   3. **Capabilities are separate interfaces.** A `Button` needs what every
+//      control needs plus a click; a `TextBox` needs selection and a read-only
+//      flag. Rather than one interface with every method any control might
+//      want -- `TWSWinControl` is 40 class methods, most of which most controls
+//      ignore -- each capability is its own interface, and a backend that does
+//      not implement one is a compile error rather than an empty override.
+//
+// **Which way calls go.** Down through `I*Peer`, up through `I*Notify`. The
+// control calls `peer.SetText(...)`; the platform calls `notify.OnClicked()`.
+// Neither side names a type from the other's module, which is what lets the
+// Win32 backend be compiled without the GTK one and vice versa.
+module Forms.Platform;
+
+import Standard.Collections;
+import Forms.Drawing;
+
+/// Aborts with a message, for a mistake in the calling program rather than a
+/// value to hand back. The same one `Standard.Collections` uses.
+extern "C" void sl_fail(byte* message);
+
+// ============================================================ system colours
+
+/// The theme colours a backend can be asked for. An enum rather than a string,
+/// so a backend's switch is exhaustive at a glance and a typo does not compile.
+public enum SystemColorId {
+    Control,
+    ControlText,
+    ControlDark,
+    ControlLight,
+    Window,
+    WindowText,
+    Highlight,
+    HighlightText,
+    GrayText,
+}
+
+// ============================================================ input, as data
+
+/// Which mouse button. `None` exists because a move carries no button and the
+/// alternative is a nullable the handler must unwrap for nothing.
+public enum MouseButton { None, Left, Right, Middle }
+
+/// The modifier keys held when something happened. Bits, so they combine.
+[Flags]
+public enum ModifierKeys {
+    None    = 0,
+    Shift   = 1,
+    Control = 2,
+    Alt     = 4,
+}
+
+/// A key, by what it means rather than where it is. The values are the Win32
+/// virtual-key codes because one backend must own the numbering and Windows'
+/// is the one with names for everything; the GTK backend maps `GDK_KEY_*` on to
+/// this on the way in.
+public enum Key {
+    None = 0,
+    Backspace = 8, Tab = 9, Enter = 13,
+    Shift = 16, Control = 17, Alt = 18,
+    Pause = 19, CapsLock = 20, Escape = 27, Space = 32,
+    PageUp = 33, PageDown = 34, End = 35, Home = 36,
+    Left = 37, Up = 38, Right = 39, Down = 40,
+    Insert = 45, Delete = 46,
+    D0 = 48, D1 = 49, D2 = 50, D3 = 51, D4 = 52,
+    D5 = 53, D6 = 54, D7 = 55, D8 = 56, D9 = 57,
+    A = 65, B = 66, C = 67, D = 68, E = 69, F = 70, G = 71, H = 72, I = 73,
+    J = 74, K = 75, L = 76, M = 77, N = 78, O = 79, P = 80, Q = 81, R = 82,
+    S = 83, T = 84, U = 85, V = 86, W = 87, X = 88, Y = 89, Z = 90,
+    F1 = 112, F2 = 113, F3 = 114, F4  = 115, F5  = 116, F6  = 117,
+    F7 = 118, F8 = 119, F9 = 120, F10 = 121, F11 = 122, F12 = 123,
+}
+
+// ====================================================== platform to control
+
+/// What the platform tells a control happened to it.
+///
+/// A control implements this and hands itself to its peer. Every method is a
+/// *notification*: it reports, it does not ask, and a backend never waits on
+/// what a handler decides -- except `OnClosing`, which is on `IWindowNotify`
+/// where the one case that must ask is visible on its own.
+///
+/// **Coordinates are already client-relative and already scaled.** Turning a
+/// platform's idea of a position into this one is the backend's job, so no
+/// control anywhere contains a coordinate adjustment.
+public interface IControlNotify {
+    void OnPlatformPaint(Graphics surface);
+    void OnPlatformResized(Size extent);
+    void OnPlatformMoved(Point position);
+
+    void OnPlatformMouseDown(MouseButton button, Point at, ModifierKeys modifiers);
+    void OnPlatformMouseUp(MouseButton button, Point at, ModifierKeys modifiers);
+    void OnPlatformMouseMove(Point at, ModifierKeys modifiers);
+    void OnPlatformMouseEnter();
+    void OnPlatformMouseLeave();
+    void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers);
+
+    void OnPlatformKeyDown(Key key, ModifierKeys modifiers);
+    void OnPlatformKeyUp(Key key, ModifierKeys modifiers);
+    /// One typed character, after the platform has applied the keyboard layout
+    /// and any dead keys -- which is why it is a separate notification from
+    /// `OnPlatformKeyDown` and not derivable from it.
+    void OnPlatformKeyPress(char typed);
+
+    void OnPlatformGotFocus();
+    void OnPlatformLostFocus();
+
+    /// The user activated the control: clicked a button, ticked a box, chose a
+    /// menu item. Distinct from a mouse click because the keyboard does it too.
+    void OnPlatformActivated();
+
+    /// The control's own value changed by the user's doing -- text typed, an
+    /// item selected. Never raised for a change the program itself made, which
+    /// is what stops a two-way binding oscillating.
+    void OnPlatformValueChanged();
+}
+
+/// What a top-level window additionally reports.
+public interface IWindowNotify : IControlNotify {
+    /// The user asked to close it. **True lets it close**, false keeps it open,
+    /// which is the one place the platform waits for an answer.
+    bool OnPlatformClosing();
+    void OnPlatformClosed();
+    void OnPlatformActivatedWindow();
+    void OnPlatformDeactivated();
+}
+
+// ====================================================== control to platform
+
+/// How a window is framed, which decides both its border and what it does when
+/// dragged. The LCL's `TBorderStyle` plus `TFormBorderStyle`, merged: they
+/// differed only in which values each accepted.
+public enum WindowBorder {
+    /// No frame at all: a splash screen, a tooltip.
+    None,
+    /// A caption and a frame that cannot be dragged to resize.
+    Fixed,
+    /// The ordinary resizable window.
+    Sizable,
+    /// A thin caption, and absent from the task bar.
+    Tool,
+}
+
+/// Whether a window is normal, minimised or maximised.
+public enum WindowState { Normal, Minimized, Maximized }
+
+/// The frame drawn around a control that has one.
+public enum ControlBorder { None, Single, Sunken }
+
+/// What every control's peer can do.
+///
+/// **`Destroy` is here and is not a destructor.** A peer is destroyed when its
+/// control is, and ARC would do that on its own -- but a control can also be
+/// asked to give up its platform window and make a new one, which is what
+/// changing a border style costs on Windows. So the release is a method, and
+/// the destructor calls it if nothing else has.
+public interface IControlPeer {
+    void SetBounds(Rectangle bounds);
+    void SetVisible(bool visible);
+    void SetEnabled(bool enabled);
+    void SetText(String text);
+    String GetText();
+    void SetFont(Font font);
+    void SetForeColor(Color colour);
+    void SetBackColor(Color colour);
+
+    /// Marks the control as needing repainting. Does not paint: the platform
+    /// decides when, and coalesces several of these into one paint.
+    void Invalidate();
+    /// Paints it now, rather than when the platform gets to it.
+    void Update();
+
+    void Focus();
+    bool HasFocus();
+
+    /// How much room children have, as a size at the origin.
+    ///
+    /// **Always starts at (0, 0)**, because it is the space a child's own
+    /// coordinates are measured in. Where that space begins within the widget
+    /// is `ClientOrigin`, and keeping the two apart is what makes a control
+    /// placed at (0, 0) land in the same place whether its parent has a frame
+    /// or not.
+    Rectangle ClientBounds();
+
+    /// Where the client area begins inside the widget.
+    ///
+    /// Zero for almost everything: on Windows a child's position is already
+    /// relative to its parent's client origin. A group box is the exception --
+    /// its frame and caption occupy the top of its own rectangle, and a child
+    /// placed there would be drawn over them -- so the offset is added when a
+    /// child's bounds are pushed down, and taken off again when the platform
+    /// reports where one ended up.
+    Point ClientOrigin();
+
+    /// What the platform thinks this control ought to be, given its text and
+    /// font. What `AutoSize` uses, and the reason a button sized to its caption
+    /// looks native rather than merely close.
+    Size PreferredSize();
+
+    /// The platform's handle, as an integer. For reaching an API this layer
+    /// does not wrap -- an `HWND` on Windows, a `GtkWidget*` on GTK. Zero if
+    /// the peer has no handle yet.
+    nuint Handle();
+
+    void Destroy();
+}
+
+/// A container that other controls can be put inside.
+public interface IContainerPeer : IControlPeer {
+    /// Re-parents a child on to this container. Called once, when the child's
+    /// peer is made -- a control that changes parent is given a new peer,
+    /// because on Win32 re-parenting a window and re-creating it cost the same
+    /// and only one of them is correct for every control.
+    void AddChild(IControlPeer child);
+    void RemoveChild(IControlPeer child);
+}
+
+/// A top-level window.
+public interface IWindowPeer : IContainerPeer {
+    void SetTitle(String title);
+    void SetBorder(WindowBorder border);
+    void SetState(WindowState state);
+    WindowState GetState();
+    void Activate();
+    void Close();
+    /// Centres it on the monitor it is on, which needs to know which that is.
+    void CenterOnScreen();
+    /// Shows it and does not return until it is closed, which is what a dialog
+    /// is. Answers nothing: what the dialog decided is the dialog's business.
+    void ShowModal();
+}
+
+/// A button, a checkbox or a radio button: something that is pressed.
+public interface IButtonPeer : IControlPeer {
+    /// Makes it the one Enter presses. At most one per window, and the platform
+    /// is what enforces that, so a control that sets it need not unset the
+    /// previous one.
+    void SetDefault(bool isDefault);
+}
+
+/// A checkbox or a radio button, which additionally carries a state.
+public interface ICheckPeer : IButtonPeer {
+    void SetChecked(bool checked);
+    bool GetChecked();
+}
+
+/// Anything the user types into.
+public interface ITextEntryPeer : IControlPeer {
+    void SetReadOnly(bool readOnly);
+    void SetMaxLength(int length);
+    /// Hides what is typed. A character rather than a flag, because the
+    /// platforms differ on what they hide it with and a caller may care.
+    void SetPasswordChar(char mask);
+    void SetSelection(int start, int length);
+    /// Start and length of what is selected, as a tuple so one call answers
+    /// both and they cannot disagree.
+    (int, int) GetSelection();
+    void SetMultiline(bool multiline);
+    /// The lines, for a multiline entry. One entry for a single-line one.
+    String[] GetLines();
+    void SetLines(String[] lines);
+}
+
+/// A list of items the user chooses from: a list box or a combo box.
+public interface IListPeer : IControlPeer {
+    void InsertItem(int index, String text);
+    void RemoveItem(int index);
+    void ClearItems();
+    int  ItemCount();
+    void SetSelectedIndex(int index);
+    /// -1 when nothing is selected, which is what every platform reports and
+    /// what the control layer turns into something better.
+    int  GetSelectedIndex();
+}
+
+/// A combo box, which is a list with an edit on top.
+public interface IComboPeer : IListPeer {
+    /// Whether the text can be typed as well as chosen.
+    void SetEditable(bool editable);
+}
+
+/// A scroll bar, standing alone rather than attached to a scrolling container.
+public interface IScrollBarPeer : IControlPeer {
+    void SetRange(int minimum, int maximum, int pageSize);
+    void SetValue(int value);
+    int  GetValue();
+}
+
+/// A group box: a frame with a caption that other controls sit inside.
+public interface IGroupPeer : IContainerPeer { }
+
+/// A panel: a plain container with an optional border.
+public interface IPanelPeer : IContainerPeer {
+    void SetBorder(ControlBorder border);
+}
+
+/// A label, which is drawn by the platform rather than by the control.
+public interface ILabelPeer : IControlPeer {
+    void SetAlignment(HorizontalAlignment alignment);
+    void SetWordWrap(bool wrap);
+}
+
+/// The platform's font, once it has been made. Opaque: only the backend that
+/// made it knows what is inside, and `Font` holds one so the handle is made
+/// once however many controls share the font.
+public interface IFontBackend {
+    nuint Handle();
+}
+
+/// The platform's drawing surface, behind `Graphics`.
+public interface IGraphicsBackend {
+    Rectangle ClipBounds();
+    void Clear(Color colour);
+    void DrawLine(Pen pen, int x1, int y1, int x2, int y2);
+    void DrawRectangle(Pen pen, Rectangle bounds);
+    void FillRectangle(Brush brush, Rectangle bounds);
+    void DrawEllipse(Pen pen, Rectangle bounds);
+    void FillEllipse(Brush brush, Rectangle bounds);
+    void DrawPolygon(Pen pen, Point[] points);
+    void FillPolygon(Brush brush, Point[] points);
+    void DrawPolyline(Pen pen, Point[] points);
+    void DrawString(String text, Font font, Color colour, int x, int y);
+    void DrawStringIn(String text, Font font, Color colour,
+                      Rectangle bounds, TextFormat format);
+    Size MeasureString(String text, Font font);
+}
+
+// =============================================================== the factory
+
+/// The result of a modal dialog, and of the buttons that produce one.
+public enum DialogResult { None, Ok, Cancel, Yes, No, Abort, Retry, Ignore }
+
+/// Which icon a message box shows.
+public enum MessageIcon { None, Information, Warning, Error, Question }
+
+/// Which buttons a message box offers.
+public enum MessageButtons { Ok, OkCancel, YesNo, YesNoCancel, RetryCancel }
+
+/// One platform, and everything it can make.
+///
+/// **A factory method per peer kind, not per control class.** The LCL needs a
+/// `TWS` class for every control because dispatch is by metaclass; here a
+/// `RadioButton` and a `CheckBox` are both `CreateCheck`, differing by an
+/// argument, and a new control that is a list with different behaviour needs no
+/// new backend code at all. Roughly a dozen methods covers the standard tier,
+/// and each is one native widget.
+///
+/// Every `Create` takes the notification target the peer will report to, which
+/// is the control itself. That is the whole of the wiring: no registration
+/// pass, no table keyed by class, nothing to forget.
+public interface IWidgetSet {
+    /// What this backend is called, for a program that must know -- `"Win32"`,
+    /// `"GTK3"`. The only thing anywhere that names a platform as a string.
+    String Name { get; }
+
+    IWindowPeer    CreateWindow(IWindowNotify owner, WindowBorder border);
+    IButtonPeer    CreateButton(IControlNotify owner, IContainerPeer parent);
+    ICheckPeer     CreateCheck(IControlNotify owner, IContainerPeer parent, bool radio);
+    ILabelPeer     CreateLabel(IControlNotify owner, IContainerPeer parent);
+    ITextEntryPeer CreateTextEntry(IControlNotify owner, IContainerPeer parent,
+                                   bool multiline);
+    IListPeer      CreateList(IControlNotify owner, IContainerPeer parent);
+    IComboPeer     CreateCombo(IControlNotify owner, IContainerPeer parent);
+    IGroupPeer     CreateGroup(IControlNotify owner, IContainerPeer parent);
+    IPanelPeer     CreatePanel(IControlNotify owner, IContainerPeer parent);
+    IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
+                                   bool vertical);
+
+    IFontBackend CreateFont(Font font);
+
+    /// The theme's colour for one role, read now rather than cached, so a
+    /// theme change between two calls is seen.
+    Color SystemColor(SystemColorId which);
+
+    /// The font the platform dresses its own dialogs in. What every control
+    /// starts with, so a program that sets no fonts looks native.
+    Font DefaultFont();
+
+    /// The whole screen, in pixels.
+    Size ScreenSize();
+    /// The part of it not covered by a task bar, which is what a window should
+    /// be centred in and maximised to.
+    Rectangle WorkArea();
+
+    // ------------------------------------------------------------ the loop
+
+    /// Runs until the last window closes. What `Application.Run` calls.
+    void RunEventLoop();
+    /// Handles everything already queued and returns. For a program driving its
+    /// own loop -- a game, an animation -- and the reason `RunEventLoop` is not
+    /// the only way in.
+    bool PumpEvents();
+    /// Makes `RunEventLoop` return.
+    void QuitEventLoop();
+
+    // ---------------------------------------------------------- the common
+
+    /// A message box, which every platform has and nobody wants to build.
+    DialogResult ShowMessage(IWindowPeer? owner, String text, String caption,
+                             MessageButtons buttons, MessageIcon icon);
+}
+
+/// Which platform this program is using.
+///
+/// **Set once, before any control is made.** `Application.Initialize` does it
+/// by picking the backend compiled in, so a program never touches this; it is
+/// public because a test that wants a recording backend, or a program that
+/// supports two and chooses at run time, has nowhere else to say so.
+public static class WidgetSet {
+    static IWidgetSet? current = null;
+
+    /// The platform in use.
+    ///
+    /// Reading it before one is set is a program that built a control before
+    /// `Application.Initialize`, and the message says so rather than letting a
+    /// null reference happen three calls further on.
+    public static IWidgetSet Current {
+        get {
+            var set = current;
+            if (set == null) {
+                sl_fail("no widget set: call Application.Initialize before making a control".ToPointer());
+            }
+            return (IWidgetSet)set;
+        }
+        set { current = value; }
+    }
+
+    /// Whether one has been set, for code that must not trigger the failure
+    /// above -- a destructor running during shutdown, most of all.
+    public static bool IsReady() { return current != null; }
+}

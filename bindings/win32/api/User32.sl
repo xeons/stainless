@@ -510,4 +510,271 @@ public char16* IconQuestion()    { return (char16*)(nuint)32514u; }
 public char16* IconWarning()     { return (char16*)(nuint)32515u; }
 public char16* IconInformation() { return (char16*)(nuint)32516u; }
 
+// ============================================ window properties and subclassing
+//
+// What a widget layer needs beyond the raw window calls above: somewhere to
+// keep a pointer beside an `HWND`, and a way to put a window procedure in front
+// of a system control's own.
+
+public extern "C" {
+    /// Attaches a value to a window under a name. The way to associate data
+    /// with an `HWND` that works on a window this program did not create --
+    /// unlike `GWLP_USERDATA`, which a system control may already be using for
+    /// its own purposes and which there is exactly one of.
+    int   SetPropW(HWND window, char16* name, void* value);
+    void* GetPropW(HWND window, char16* name);
+    void* RemovePropW(HWND window, char16* name);
+
+    /// Calls a window procedure directly. What a subclassed control calls to
+    /// reach the procedure it replaced, in place of `DefWindowProcW`.
+    long  CallWindowProcW(WindowProcedure previous, HWND window, uint message,
+                          ulong wParam, long lParam);
+
+    int   EnableWindow(HWND window, int enable);
+    int   IsWindowEnabled(HWND window);
+
+    /// The theme's colour for one role, as a COLORREF. Read each time rather
+    /// than cached, so a theme change between two calls is seen.
+    uint  GetSysColor(int index);
+    /// The same colour as a brush the system owns -- not to be deleted.
+    HBRUSH GetSysColorBrush(int index);
+
+    /// Translates points from one window's coordinates to another's. Either
+    /// may be null, meaning the screen.
+    int   MapWindowPoints(HWND from, HWND to, Point* points, uint count);
+
+    int   GetDlgCtrlID(HWND window);
+    HWND  GetDlgItem(HWND window, int id);
+    HWND  GetWindow(HWND window, uint relationship);
+    int   GetScrollInfo(HWND window, int bar, ScrollInfo* info);
+    int   SetScrollInfo(HWND window, int bar, ScrollInfo* info, int redraw);
+    int   GetClassNameW(HWND window, char16* buffer, int size);
+}
+
+/// `GetWindow` relationships.
+public const uint GwHwndFirst = 0u;
+public const uint GwHwndLast  = 1u;
+public const uint GwHwndNext  = 2u;
+public const uint GwHwndPrev  = 3u;
+public const uint GwOwner     = 4u;
+public const uint GwChild     = 5u;
+
+/// The system colour indices `GetSysColor` takes.
+public const int ColorScrollBar      = 0;
+public const int ColorBackground     = 1;
+public const int ColorActiveCaption  = 2;
+public const int ColorMenu           = 4;
+public const int ColorWindow         = 5;
+public const int ColorWindowFrame    = 6;
+public const int ColorMenuText       = 7;
+public const int ColorWindowText     = 8;
+public const int ColorCaptionText    = 9;
+public const int ColorActiveBorder   = 10;
+public const int ColorAppWorkspace   = 12;
+public const int ColorHighlight      = 13;
+public const int ColorHighlightText  = 14;
+public const int ColorBtnFace        = 15;
+public const int ColorBtnShadow      = 16;
+public const int ColorGrayText       = 17;
+public const int ColorBtnText        = 18;
+public const int ColorBtnHighlight   = 20;
+public const int Color3DDarkShadow   = 21;
+public const int Color3DLight        = 22;
+public const int ColorInfoText       = 23;
+public const int ColorInfoBackground = 24;
+public const int ColorHotLight       = 26;
+
+/// `SCROLLINFO`, for a scroll bar's range and position in one call.
+public struct ScrollInfo {
+    public uint Size;
+    public uint Mask;
+    public int  Minimum;
+    public int  Maximum;
+    public uint Page;
+    public int  Position;
+    public int  TrackPosition;
+}
+
+public const uint SifRange           = 0x0001u;
+public const uint SifPage            = 0x0002u;
+public const uint SifPosition        = 0x0004u;
+public const uint SifDisableNoScroll = 0x0008u;
+public const uint SifTrackPosition   = 0x0010u;
+public const uint SifAll             = 0x0017u;
+
+public const int ScrollBarHorizontal = 0;
+public const int ScrollBarVertical   = 1;
+public const int ScrollBarControl    = 2;
+
+// ================================================= messages the controls speak
+//
+// A system control is driven by sending it messages rather than by calling
+// functions, so these constants are its API. Grouped by which control answers
+// them, because `BM_GETCHECK` and `CB_GETCOUNT` share a numeric range and only
+// the recipient tells them apart.
+
+/// Messages every control answers.
+public const uint WmSetFont            = 0x0030u;
+public const uint WmGetFont            = 0x0031u;
+public const uint WmNotify             = 0x004Eu;
+public const uint WmContextMenu        = 0x007Bu;
+public const uint WmCtlColorEdit       = 0x0133u;
+public const uint WmCtlColorListBox    = 0x0134u;
+public const uint WmCtlColorButton     = 0x0135u;
+public const uint WmCtlColorStatic     = 0x0138u;
+public const uint WmHorizontalScroll   = 0x0114u;
+public const uint WmVerticalScroll     = 0x0115u;
+public const uint WmMouseLeave         = 0x02A3u;
+public const uint WmSetRedraw          = 0x000Bu;
+public const uint WmGetFontHeight      = 0x0000u;
+
+/// The notification codes a control sends back in the high word of `WPARAM`
+/// with `WM_COMMAND`.
+public const uint BnClicked          = 0u;
+public const uint BnDoubleClicked    = 5u;
+public const uint EnChange           = 0x0300u;
+public const uint EnUpdate           = 0x0400u;
+public const uint EnSetFocus         = 0x0100u;
+public const uint EnKillFocus        = 0x0200u;
+public const uint LbnSelChange       = 1u;
+public const uint LbnDoubleClick     = 2u;
+public const uint CbnSelChange       = 1u;
+public const uint CbnEditChange      = 5u;
+public const uint CbnDropDown        = 7u;
+
+/// Button messages.
+public const uint BmGetCheck = 0x00F0u;
+public const uint BmSetCheck = 0x00F1u;
+public const uint BmSetStyle = 0x00F4u;
+public const uint BstUnchecked = 0u;
+public const uint BstChecked   = 1u;
+
+/// Button styles, which decide whether a `BUTTON` is a push button, a check
+/// box, a radio button or a group box -- all four are the same window class.
+public const uint BsPushButton      = 0x0000u;
+public const uint BsDefPushButton   = 0x0001u;
+public const uint BsCheckBox        = 0x0002u;
+public const uint BsAutoCheckBox    = 0x0003u;
+public const uint BsRadioButton     = 0x0004u;
+public const uint Bs3State          = 0x0005u;
+public const uint BsAutoRadioButton = 0x0009u;
+public const uint BsGroupBox        = 0x0007u;
+public const uint BsOwnerDraw       = 0x000Bu;
+public const uint BsLeftText        = 0x0020u;
+public const uint BsMultiline       = 0x2000u;
+
+/// Edit messages and styles.
+public const uint EmGetSel       = 0x00B0u;
+public const uint EmSetSel       = 0x00B1u;
+public const uint EmGetLineCount = 0x00BAu;
+public const uint EmLineIndex    = 0x00BBu;
+public const uint EmLineLength   = 0x00C1u;
+public const uint EmReplaceSel   = 0x00C2u;
+public const uint EmGetLine      = 0x00C4u;
+public const uint EmSetReadOnly  = 0x00CFu;
+public const uint EmSetLimitText = 0x00C5u;
+public const uint EmSetPasswordChar = 0x00CCu;
+public const uint EmScrollCaret  = 0x00B7u;
+
+public const uint EsLeft        = 0x0000u;
+public const uint EsCenter      = 0x0001u;
+public const uint EsRight       = 0x0002u;
+public const uint EsMultiline   = 0x0004u;
+public const uint EsUpperCase   = 0x0008u;
+public const uint EsLowerCase   = 0x0010u;
+public const uint EsPassword    = 0x0020u;
+public const uint EsAutoVScroll = 0x0040u;
+public const uint EsAutoHScroll = 0x0080u;
+public const uint EsNoHideSel   = 0x0100u;
+public const uint EsReadOnly    = 0x0800u;
+public const uint EsWantReturn  = 0x1000u;
+
+/// List box messages and styles.
+public const uint LbAddString     = 0x0180u;
+public const uint LbInsertString  = 0x0181u;
+public const uint LbDeleteString  = 0x0182u;
+public const uint LbResetContent  = 0x0184u;
+public const uint LbSetSel        = 0x0185u;
+public const uint LbSetCurSel     = 0x0186u;
+public const uint LbGetCurSel     = 0x0188u;
+public const uint LbGetText       = 0x0189u;
+public const uint LbGetTextLen    = 0x018Au;
+public const uint LbGetCount      = 0x018Bu;
+
+public const uint LbsNotify         = 0x0001u;
+public const uint LbsSort           = 0x0002u;
+public const uint LbsMultipleSel    = 0x0008u;
+public const uint LbsHasStrings     = 0x0040u;
+public const uint LbsDisableNoScroll = 0x1000u;
+
+/// Combo box messages and styles.
+public const uint CbGetEditSel    = 0x0140u;
+public const uint CbSetEditSel    = 0x0142u;
+public const uint CbAddString     = 0x0143u;
+public const uint CbDeleteString  = 0x0144u;
+public const uint CbGetCount      = 0x0146u;
+public const uint CbGetCurSel     = 0x0147u;
+public const uint CbGetLbText     = 0x0148u;
+public const uint CbGetLbTextLen  = 0x0149u;
+public const uint CbInsertString  = 0x014Au;
+public const uint CbResetContent  = 0x014Bu;
+public const uint CbSetCurSel     = 0x014Eu;
+
+public const uint CbsSimple         = 0x0001u;
+public const uint CbsDropDown       = 0x0002u;
+public const uint CbsDropDownList   = 0x0003u;
+public const uint CbsAutoHScroll    = 0x0040u;
+public const uint CbsSort           = 0x0100u;
+public const uint CbsHasStrings     = 0x0200u;
+
+/// Static (label) styles.
+public const uint SsLeft        = 0x0000u;
+public const uint SsCenter      = 0x0001u;
+public const uint SsRight       = 0x0002u;
+public const uint SsLeftNoWordWrap = 0x000Cu;
+public const uint SsNoPrefix    = 0x0080u;
+public const uint SsNotify      = 0x0100u;
+public const uint SsSunken      = 0x1000u;
+
+/// Scroll bar styles.
+public const uint SbsHorizontal = 0x0000u;
+public const uint SbsVertical   = 0x0001u;
+
+/// The scroll bar notification codes that arrive in `WM_VSCROLL`'s low word.
+public const uint SbLineUp        = 0u;
+public const uint SbLineDown      = 1u;
+public const uint SbPageUp        = 2u;
+public const uint SbPageDown      = 3u;
+public const uint SbThumbPosition = 4u;
+public const uint SbThumbTrack    = 5u;
+public const uint SbTop           = 6u;
+public const uint SbBottom        = 7u;
+public const uint SbEndScroll     = 8u;
+
+// ======================================================= tracking the mouse
+//
+// Win32 reports a mouse entering a window only by the moves it sends, and
+// reports it leaving not at all -- unless asked, once, per window, per leave.
+
+public struct TrackMouseEvent {
+    public uint Size;
+    public uint Flags;
+    public HWND Window;
+    public uint HoverTime;
+}
+
+public const uint TmeLeave  = 0x00000002u;
+public const uint TmeHover  = 0x00000001u;
+public const uint TmeCancel = 0x80000000u;
+
+public extern "C" {
+    int TrackMouseEvent(TrackMouseEvent* track);
+}
+
+// No helper here that *calls* one of these, deliberately: this layer is
+// declarations, and a declaration nothing calls needs no library. A function
+// with a body would emit a reference and make `bindings/win32/api` need
+// `-l user32` to link, which is exactly what `tests/cases/win32-raw` exists to
+// prevent. The convenience belongs where the other conveniences are.
+
 #endif
