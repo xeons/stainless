@@ -51,15 +51,72 @@ public sealed record ModuleMetadata
     /// Bumped whenever the shape below changes. A consumer refuses a version it
     /// does not know rather than reading fields that have moved.
     /// </summary>
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public int Version { get; init; } = CurrentVersion;
 
     /// <summary>The library this describes, for a diagnostic that can name it.</summary>
     public required string Library { get; init; }
 
+    /// <summary>
+    /// The package this library was built from, and the version it published
+    /// itself as. Null for a library built straight from a command line, which
+    /// has no package to be part of.
+    ///
+    /// This is what makes a dependency checkable rather than merely linkable: a
+    /// consumer that asked for '^1.2' can be told it was handed 2.0 instead of
+    /// discovering it at the first call.
+    /// </summary>
+    public string? Package { get; init; }
+
+    public string? PackageVersion { get; init; }
+
+    /// <summary>
+    /// A fingerprint of everything below, from <see cref="Digest"/>.
+    ///
+    /// <see cref="PackageVersion"/> is what the library claims about itself, and
+    /// a claim can be wrong -- a rebuild that moved a field and kept the number
+    /// is exactly the mistake nobody notices. This is computed from the layouts
+    /// themselves, so it cannot be. The lock file records what was resolved and
+    /// the build compares, which turns "these offsets are stale" from a
+    /// mis-read four bytes into a message.
+    ///
+    /// Written by <see cref="Sealed"/> rather than by whoever builds the record,
+    /// so it is never a field somebody forgot to fill in.
+    /// </summary>
+    public string AbiDigest { get; init; } = "";
+
     public required List<MetadataType> Types { get; init; }
     public required List<MetadataFunction> Functions { get; init; }
+
+    /// <summary>
+    /// This metadata with its digests filled in: one per type, and one over the
+    /// whole surface.
+    ///
+    /// Taken here, at the end, rather than as each piece is described, because a
+    /// digest of part of a surface would be a digest of nothing in particular.
+    /// </summary>
+    public ModuleMetadata Sealed()
+    {
+        var described = this with
+        {
+            Types = Types.Select(t => t with { Digest = Driver.Digest.OfType(t) }).ToList(),
+        };
+
+        // The digest is over what is described, and a type's own digest is not
+        // part of that -- so this reads nothing it is about to write.
+        return described with { AbiDigest = Driver.Digest.OfMetadata(described) };
+    }
+
+    /// <summary>
+    /// Recomputes the digest and says whether it is the one recorded.
+    ///
+    /// Worth asking separately from the lock file's copy, because it catches the
+    /// other direction: a metadata file edited by hand, which is a thing this
+    /// format's being readable makes easy and which nothing else would notice.
+    /// </summary>
+    public bool DigestMatches() =>
+        AbiDigest.Length == 0 || Driver.Digest.OfMetadata(this) == AbiDigest;
 
     private static readonly JsonSerializerOptions Format = new()
     {
@@ -92,6 +149,17 @@ public sealed record ModuleMetadata
                 return null;
             }
 
+            // A metadata file is readable JSON, which makes it editable JSON.
+            // Editing one is how a consumer ends up compiling against a layout
+            // the library does not have, and the digest is what notices.
+            if (!metadata.DigestMatches())
+            {
+                error = $"'{path}' does not match its own digest, so it has been edited since it " +
+                        "was written. Metadata is generated from the library it describes; " +
+                        "rebuild the library rather than changing this file";
+                return null;
+            }
+
             return metadata;
         }
         catch (Exception e) when (e is IOException or JsonException)
@@ -114,6 +182,15 @@ public sealed record MetadataType
     /// <summary>Size and alignment of the fields, without any object header.</summary>
     public required int Size { get; init; }
     public required int Alignment { get; init; }
+
+    /// <summary>
+    /// This type's own fingerprint, from <see cref="Driver.Digest.OfType"/>.
+    ///
+    /// The library has one too, and this is what lets a mismatch name the type
+    /// that moved. "Counter's layout changed" sends the reader somewhere;
+    /// "something in shapes.dll changed" sends them looking.
+    /// </summary>
+    public string Digest { get; init; } = "";
 
     public List<MetadataField> Fields { get; init; } = [];
     public List<MetadataFunction> Methods { get; init; } = [];

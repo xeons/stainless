@@ -1,0 +1,14 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "kind": "executable",
+  "sources": [
+    "src"
+  ],
+  "dependencies": {
+    "shapes": {
+      "path": "../shapes",
+      "version": "^1.0"
+    }
+  }
+}

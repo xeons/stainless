@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "root": "app",
+  "packages": [
+    {
+      "name": "shapes",
+      "version": "1.0.0",
+      "source": "path:../shapes",
+      "link": "shared",
+      "sourceDigest": "7553c9cbfcc107457980c6240495bbaa",
+      "dependencies": []
+    }
+  ]
+}

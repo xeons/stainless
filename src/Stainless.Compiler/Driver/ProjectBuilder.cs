@@ -1,0 +1,499 @@
+// Stainless - an experimental systems language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+namespace Stainless.Driver;
+
+/// <summary>
+/// What the command line still gets to say about a build the project file
+/// already described.
+///
+/// Every field is nullable and null means "whatever the project said". A build
+/// should mean the same thing from one machine to the next, so the project file
+/// is the default for everything; these are the handful of answers that are
+/// about this run rather than about the program -- where the output goes, and
+/// how hard to look at it.
+/// </summary>
+public sealed record BuildOverrides
+{
+    public string? OutputPath { get; init; }
+    public string? IntermediateDirectory { get; init; }
+    public int? OptimizationLevel { get; init; }
+    public bool? Debug { get; init; }
+    public bool KeepIntermediates { get; init; }
+    public bool EmitIrOnly { get; init; }
+    public IReadOnlyList<string> Defines { get; init; } = [];
+    public IReadOnlyList<string> Libraries { get; init; } = [];
+    public Binding.CppAbi? CppAbi { get; init; }
+    public bool? SharedRuntime { get; init; }
+    public string? HeaderPath { get; init; }
+
+    /// <summary>Extra paths named on the command line alongside the project.</summary>
+    public IReadOnlyList<string> ExtraPaths { get; init; } = [];
+}
+
+public sealed record ProjectBuildResult
+{
+    public required bool Success { get; init; }
+    public string? Error { get; init; }
+
+    /// <summary>The root's compilation, once every dependency has been built.</summary>
+    public CompilationResult? Root { get; init; }
+
+    /// <summary>Each shared dependency that was built, in the order it was built.</summary>
+    public IReadOnlyList<string> Built { get; init; } = [];
+
+    /// <summary>Things worth saying that are not worth stopping for.</summary>
+    public IReadOnlyList<string> Warnings { get; init; } = [];
+
+    /// <summary>The lock with whatever this build learned written into it.</summary>
+    public PackageLock? Lock { get; init; }
+
+    public static ProjectBuildResult Failed(string error) =>
+        new() { Success = false, Error = error };
+}
+
+/// <summary>
+/// Builds a project and everything under it.
+///
+/// The order is the resolver's: dependencies first, so nothing ever waits. What
+/// happens to each one depends on how it is linked, and the difference is the
+/// whole reason <see cref="DependencyLink"/> has two cases rather than one --
+/// a source dependency is *part of this program* and joins the same compilation
+/// as everything else, where a shared one is a separate program that this one
+/// links against. The first is the model the language has; the second is the
+/// one that buys a boundary, and pays what a boundary costs.
+/// </summary>
+public sealed class ProjectBuilder(
+    ProjectFile root,
+    Resolution resolution,
+    Action<string>? log = null)
+{
+    private readonly Dictionary<string, ResolvedPackage> _packages =
+        resolution.Order.ToDictionary(p => p.Name, StringComparer.Ordinal);
+
+    private readonly List<string> _warnings = [];
+    private readonly List<string> _built = [];
+
+    /// <summary>Each shared dependency's metadata, once it has been built.</summary>
+    private readonly Dictionary<string, string> _metadata = new(StringComparer.Ordinal);
+
+    /// <summary>What each shared dependency's digest turned out to be.</summary>
+    private readonly Dictionary<string, string> _digests = new(StringComparer.Ordinal);
+
+    public ProjectBuildResult Build(BuildOverrides overrides)
+    {
+        if (!resolution.Success)
+            return ProjectBuildResult.Failed(resolution.Error ?? "the dependencies did not resolve");
+
+        if (CheckSourceDigests() is { } tampered) return ProjectBuildResult.Failed(tampered);
+
+        foreach (var package in resolution.Order)
+        {
+            if (package.Link != DependencyLink.Shared) continue;
+
+            if (BuildDependency(package, overrides) is { } failure) return failure;
+        }
+
+        var options = OptionsFor(root, overrides, output: overrides.OutputPath ?? root.OutputPath());
+        if (options is null) return ProjectBuildResult.Failed(_error!);
+
+        var result = new Compilation().Compile(options);
+
+        return new ProjectBuildResult
+        {
+            Success = result.Success,
+            Root = result,
+            Built = _built,
+            Warnings = _warnings,
+            Lock = UpdatedLock(),
+        };
+    }
+
+    private string? _error;
+
+    // ------------------------------------------------------- dependencies
+
+    /// <summary>
+    /// Builds one dependency as a real shared library, then checks that what
+    /// came out is what the lock file said would.
+    /// </summary>
+    private ProjectBuildResult? BuildDependency(ResolvedPackage package, BuildOverrides overrides)
+    {
+        string output = Path.Combine(
+            BuildDirectory(overrides), package.Name + Toolchain.SharedLibraryExtension);
+
+        string metadata = Path.ChangeExtension(output, ".slmod");
+
+        // What the last build of this dependency said, read before this one
+        // overwrites it. The lock file records a digest, but only one; the file
+        // records every type's, which is the difference between "something
+        // moved" and "Point moved".
+        var before = File.Exists(metadata) ? ModuleMetadata.Read(metadata, out _) : null;
+
+        var options = OptionsFor(
+            package.Project, overrides, output,
+            metadata: metadata,
+            intermediate: Path.Combine(IntermediateDirectory(overrides), package.Name));
+
+        if (options is null) return ProjectBuildResult.Failed(_error!);
+
+        Log($"building {package.Name} {package.Project.Version}");
+
+        var result = new Compilation().Compile(options with { Shared = true });
+
+        if (!result.Success)
+            return new ProjectBuildResult
+            {
+                Success = false,
+                Error = $"the dependency '{package.Name}' did not build",
+                Root = result,
+                Built = _built,
+                Warnings = _warnings,
+            };
+
+        _built.Add(package.Name);
+        _metadata[package.Name] = metadata;
+
+        var described = ModuleMetadata.Read(metadata, out string error);
+        if (described is null) return ProjectBuildResult.Failed(error);
+
+        _digests[package.Name] = described.AbiDigest;
+
+        if (CheckAbiDigest(package, before, described) is { } mismatch)
+        {
+            // A path dependency being edited is the ordinary case and the whole
+            // reason to use one, so it is told rather than stopped. Anything
+            // else is pinned to a fixed commit, where the same version
+            // describing two surfaces means the two builds were not the same
+            // build -- and the code that uses it has one of the two layouts
+            // compiled in.
+            if (package.Source.StartsWith("path:", StringComparison.Ordinal))
+                _warnings.Add(mismatch);
+            else
+                return ProjectBuildResult.Failed(mismatch);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Compares what a dependency just described against what the lock file
+    /// recorded the last time it was built.
+    ///
+    /// A difference here, with the same source and the same commit, means the
+    /// two builds were not the same build -- a different compiler, or a
+    /// different ABI. That is worth stopping for, because the consumer's object
+    /// code has one of those two layouts compiled into it and the linker cannot
+    /// tell which.
+    /// </summary>
+    private static string? CheckAbiDigest(
+        ResolvedPackage package, ModuleMetadata? before, ModuleMetadata after)
+    {
+        if (before is null || before.AbiDigest.Length == 0) return null;
+        if (before.AbiDigest == after.AbiDigest) return null;
+
+        // A new version is allowed to describe a new surface -- that is what a
+        // version is for. What is worth saying is the other case: the number
+        // stayed still and the layouts did not.
+        if (before.PackageVersion != after.PackageVersion) return null;
+
+        var broken = WhatBroke(before, after);
+
+        // A surface that only grew is not a broken promise. Something compiled
+        // against the smaller one calls what it always called, at the offsets it
+        // always called them at -- a minor version would be the polite way to
+        // announce the addition, and nothing is unsafe if it is not.
+        if (broken.Count == 0) return null;
+
+        return
+            $"'{package.Name}' {after.PackageVersion} describes a different surface than the last " +
+            $"build of {after.PackageVersion} did: {Name(broken)}. A version number is a promise " +
+            "about exactly this, and whatever was compiled against the old surface has those " +
+            "offsets and signatures built into it -- the linker cannot tell, because the symbols " +
+            "did not change. Give the new surface a new version, and rebuild what depends on it.";
+    }
+
+    /// <summary>
+    /// What a consumer of the old surface can no longer rely on: everything that
+    /// changed shape, and everything that is gone.
+    ///
+    /// Additions are deliberately not in here. They are the one kind of change
+    /// that cannot invalidate anything already compiled, and reporting them
+    /// would make the common, harmless case look like the dangerous one.
+    /// </summary>
+    private static List<string> WhatBroke(ModuleMetadata before, ModuleMetadata after)
+    {
+        var broken = new List<string>();
+
+        var types = after.Types.ToDictionary(t => t.Module + "." + t.Name, t => t.Digest,
+            StringComparer.Ordinal);
+
+        foreach (var type in before.Types)
+        {
+            string name = type.Module + "." + type.Name;
+
+            if (!types.TryGetValue(name, out string? digest)) broken.Add(name + " (gone)");
+            else if (digest != type.Digest) broken.Add(name);
+        }
+
+        var functions = after.Functions.ToDictionary(
+            f => f.Symbol, Driver.Digest.OfFunction, StringComparer.Ordinal);
+
+        foreach (var function in before.Functions)
+        {
+            string name = (function.Module is null ? "" : function.Module + ".") + function.Name;
+
+            if (!functions.TryGetValue(function.Symbol, out string? digest))
+                broken.Add(name + " (gone)");
+            else if (digest != Driver.Digest.OfFunction(function))
+                broken.Add(name);
+        }
+
+        broken.Sort(StringComparer.Ordinal);
+        return broken;
+    }
+
+    /// <summary>
+    /// Naming a few beats naming none; naming forty beats nothing only in
+    /// theory.
+    /// </summary>
+    private static string Name(List<string> broken) =>
+        broken.Count <= 4
+            ? string.Join(", ", broken)
+            : string.Join(", ", broken.Take(4)) + $", and {broken.Count - 4} more";
+
+    /// <summary>
+    /// Checks that the source being built is the source that was resolved.
+    ///
+    /// Git is held to it and a path is not, and the difference is what the two
+    /// are for: a checkout that changed under a fixed commit is a cache that
+    /// cannot be trusted, where a sibling directory changing is somebody
+    /// working on it, which is the entire reason to use a path dependency. So
+    /// one is an error and the other is worth a word.
+    /// </summary>
+    private string? CheckSourceDigests()
+    {
+        foreach (var package in resolution.Order)
+        {
+            var locked = resolution.Previous?.Find(package.Name);
+            if (locked is null || locked.SourceDigest.Length == 0) continue;
+
+            // Only where the resolver decided on the same thing it decided
+            // last time. A new commit is meant to have new files in it, and so
+            // is a dependency that now points somewhere else.
+            if (locked.Source != package.Source || locked.Revision != package.Revision) continue;
+
+            if (locked.SourceDigest == package.SourceDigest) continue;
+
+            if (package.Source.StartsWith("path:", StringComparison.Ordinal))
+            {
+                _warnings.Add(
+                    $"'{package.Name}' has changed since the lock file was written; it is a path " +
+                    "dependency, so it is being built as it is now");
+                continue;
+            }
+
+            string revision = package.Revision is null
+                ? "the commit it was resolved to"
+                : package.Revision[..Math.Min(12, package.Revision.Length)];
+
+            return
+                $"'{package.Name}' is locked to {revision}, and the files in the package cache " +
+                "are not the ones that commit was resolved to. A fixed commit does not change, " +
+                $"so the cache has been edited or damaged: delete '{package.Directory}' and run " +
+                "'stainless restore'.";
+        }
+
+        return null;
+    }
+
+    // ------------------------------------------------------------- options
+
+    /// <summary>
+    /// The compilation for one package: its own sources, everything its source
+    /// dependencies bring with them, and a reference to every shared one.
+    /// </summary>
+    private CompilationOptions? OptionsFor(
+        ProjectFile project, BuildOverrides overrides, string output,
+        string? metadata = null, string? intermediate = null)
+    {
+        _error = null;
+
+        var paths = new List<string>();
+        var libraries = new List<string>();
+        var references = new List<string>();
+        var linkInputs = new List<string>();
+
+        Collect(project, paths, libraries, references, linkInputs, new HashSet<string>(StringComparer.Ordinal));
+
+        bool isRoot = ReferenceEquals(project, root);
+        if (isRoot) paths.AddRange(overrides.ExtraPaths);
+
+        var sources = Compilation.CollectSourceFiles(paths);
+        if (sources.Errors.Count > 0)
+        {
+            _error = string.Join("\n", sources.Errors);
+            return null;
+        }
+
+        if (sources.Sources.Count == 0)
+        {
+            _error = $"'{project.Path}' found no {Compilation.SourceExtension} files under " +
+                     string.Join(", ", project.Sources.Select(s => $"'{s}'"));
+            return null;
+        }
+
+        if (isRoot)
+        {
+            libraries.AddRange(overrides.Libraries);
+
+            // Beside the binary rather than at the project's own metadata path,
+            // because '-o' may have moved the binary and the two are a pair.
+            if (metadata is null && project.IsLibrary)
+                metadata = Path.ChangeExtension(output, ".slmod");
+        }
+
+        // A dependency is built for the program that needs it, so the answers
+        // that have to match across a boundary are the root's: one ABI and one
+        // runtime, whatever the dependency's own project file happens to say.
+        // The rest -- optimisation, debug info -- is inherited for consistency
+        // rather than for correctness.
+        return new CompilationOptions
+        {
+            SourcePaths = sources.Sources,
+            NativeInputs = [.. sources.NativeInputs, .. linkInputs],
+            Libraries = libraries.Distinct(StringComparer.Ordinal).ToList(),
+            References = references,
+            OutputPath = output,
+            IntermediateDirectory = intermediate ?? IntermediateDirectory(overrides),
+            OptimizationLevel = overrides.OptimizationLevel ?? root.Optimize,
+            Debug = overrides.Debug ?? root.Debug,
+            KeepIntermediates = overrides.KeepIntermediates,
+            EmitIrOnly = overrides.EmitIrOnly && isRoot,
+            Defines = [.. project.Defines, .. overrides.Defines],
+            CppAbi = overrides.CppAbi ?? (root.Abi is null ? null : ProjectFile.ParseAbi(root.Abi)),
+            SharedRuntime = overrides.SharedRuntime ?? (root.Runtime switch
+            {
+                "shared" => true,
+                "static" => false,
+                _ => null,
+            }),
+            Shared = project.IsLibrary,
+            MetadataPath = metadata,
+            HeaderPath = isRoot ? overrides.HeaderPath ?? Resolved(project, project.Header) : null,
+            PackageName = project.Name,
+            PackageVersion = project.Version,
+        };
+    }
+
+    private static string? Resolved(ProjectFile project, string? path) =>
+        path is null ? null : project.Resolve(path);
+
+    /// <summary>
+    /// Walks what a package needs, gathering the two kinds separately.
+    ///
+    /// A source dependency contributes its files *and whatever it in turn needs*,
+    /// because compiling it in means compiling in everything it is made of. A
+    /// shared one contributes a reference and a thing to link, and its own
+    /// sources stay on its side of the boundary -- but its shared dependencies
+    /// come along, because its public surface may name their types and the
+    /// consumer has to be able to resolve those names.
+    /// </summary>
+    private void Collect(
+        ProjectFile project, List<string> paths, List<string> libraries,
+        List<string> references, List<string> linkInputs, HashSet<string> seen)
+    {
+        foreach (string source in project.Sources)
+            paths.Add(project.Resolve(source));
+
+        libraries.AddRange(project.Libraries);
+
+        foreach (var (name, dependency) in project.Dependencies
+                     .OrderBy(d => d.Key, StringComparer.Ordinal))
+        {
+            if (!seen.Add(name)) continue;
+            if (!_packages.TryGetValue(name, out var package)) continue;
+
+            if (dependency.Link == DependencyLink.Source)
+            {
+                Collect(package.Project, paths, libraries, references, linkInputs, seen);
+                continue;
+            }
+
+            if (!_metadata.TryGetValue(name, out string? metadata)) continue;
+
+            references.Add(metadata);
+            linkInputs.Add(LinkInput(Path.ChangeExtension(metadata, Toolchain.SharedLibraryExtension)));
+
+            // Its shared dependencies, whose types its surface may name.
+            CollectShared(package.Project, references, linkInputs, seen);
+        }
+    }
+
+    private void CollectShared(
+        ProjectFile project, List<string> references, List<string> linkInputs, HashSet<string> seen)
+    {
+        foreach (var (name, dependency) in project.Dependencies
+                     .OrderBy(d => d.Key, StringComparer.Ordinal))
+        {
+            if (dependency.Link != DependencyLink.Shared) continue;
+            if (!seen.Add(name)) continue;
+            if (!_metadata.TryGetValue(name, out string? metadata)) continue;
+
+            references.Add(metadata);
+            linkInputs.Add(LinkInput(Path.ChangeExtension(metadata, Toolchain.SharedLibraryExtension)));
+
+            if (_packages.TryGetValue(name, out var package))
+                CollectShared(package.Project, references, linkInputs, seen);
+        }
+    }
+
+    /// <summary>
+    /// What a link line names for a shared library: the import library beside it
+    /// on Windows, and the shared object itself everywhere else. The same rule
+    /// the runtime is linked by, for the same reason.
+    /// </summary>
+    private static string LinkInput(string library) =>
+        OperatingSystem.IsWindows() ? Path.ChangeExtension(library, ".lib") : library;
+
+    private string BuildDirectory(BuildOverrides overrides) =>
+        overrides.OutputPath is not null
+            ? Path.GetDirectoryName(Path.GetFullPath(overrides.OutputPath)) ?? "."
+            : root.Resolve(root.BuildDirectory);
+
+    private string IntermediateDirectory(BuildOverrides overrides) =>
+        overrides.IntermediateDirectory ?? root.Resolve(root.ObjectDirectory);
+
+    /// <summary>
+    /// The lock with what this build learned added to it: the digest of every
+    /// shared dependency, which only a build can know.
+    /// </summary>
+    private PackageLock? UpdatedLock()
+    {
+        if (resolution.Lock is null || _digests.Count == 0) return resolution.Lock;
+
+        return resolution.Lock with
+        {
+            Packages = resolution.Lock.Packages
+                .Select(p => _digests.TryGetValue(p.Name, out string? digest)
+                    ? p with { AbiDigest = digest }
+                    : p)
+                .ToList(),
+        };
+    }
+
+    private void Log(string message) => log?.Invoke(message);
+}

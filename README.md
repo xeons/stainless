@@ -950,15 +950,22 @@ The compiler finds clang on `PATH`, at `C:\Program Files\LLVM\bin`, or wherever
 ## Using it
 
 ```
-stainless build <paths...>     compile to a native executable
-stainless run   <paths...>     compile, then run it
-stainless emit-ir <paths...>   print the generated LLVM IR
+stainless build [paths...]     compile to a native executable
+stainless run   [paths...]     compile, then run it
+stainless emit-ir [paths...]   print the generated LLVM IR
+stainless init [name]          write a stainless.json here
+stainless restore              resolve dependencies and lock them
 
   -o, --out <path>       output file
   --shared               build a shared library instead of an executable
   --header <path>        write a C header for the exported surface
   --metadata <path>      write module metadata for a Stainless consumer
   -r, --reference <path> bind against a library's module metadata
+  --project <path>       the project file to build, or its directory
+  --no-project           ignore any project file and use the paths alone
+  --update               re-resolve dependencies, ignoring the lock
+  --locked               fail rather than change the lock file
+  --offline              use the package cache and never the network
   --runtime <shared|static>
                          whether the runtime is one shared library or a
                          copy in this binary. Shared where two Stainless
@@ -993,6 +1000,100 @@ stainless run samples/win32/window.sl bindings/win32/api/Kernel32.sl \
     bindings/win32/Win32.sl bindings/win32/Ui.sl bindings/win32/Drawing.sl \
     -l user32 -l gdi32
 ```
+
+### Projects
+
+That command line says everything the build needs, and it cannot be *read*. A
+tool that wants to know what a program is made of — an editor, a language
+server, a package resolver — can only run a build and watch what happens, and a
+Makefile is no better, because a Makefile is a program too.
+
+So a project is a document. `stainless.json` at the root of a package, and
+`stainless build` with no paths finds it here or in a parent:
+
+```json
+{
+  "name": "app",
+  "version": "0.1.0",
+  "kind": "executable",
+  "sources": ["src"],
+  "dependencies": {
+    "shapes": { "path": "../shapes", "version": "^1.0" }
+  }
+}
+```
+
+```
+stainless init app      # writes exactly those four fields
+stainless run           # builds the project, and whatever it depends on
+```
+
+JSON because both sides can already read it: the compiler has a parser in the
+framework it is written in, and [stdlib/Json.sl](stdlib/Json.sl) is the other
+one — so a program written in this language can read its own project file with
+nothing new written. A nicer syntax would cost two parsers for ever.
+
+**A field the format does not know is refused**, not ignored. A typo that
+silently did nothing is the failure a readable project file exists to prevent:
+
+```
+error: 'optimise' is not a field of a project file; did you mean 'optimize'?
+```
+
+### Packages
+
+A dependency comes from a directory or from git, and says which versions will
+do. A bare version is a caret — `1.2.0` means "1.2.0 up to but not including
+2.0.0" — which follows Cargo rather than npm, because the bare spelling is the
+one people type and it should mean what they almost always want.
+
+```json
+"dependencies": {
+  "geometry": { "path": "../geometry" },
+  "json":     { "git": "https://example/json.git", "tag": "v2.1.0", "version": "^2.1" },
+  "widgets":  { "path": "../widgets", "link": "shared" }
+}
+```
+
+**A dependency is compiled in by default**, and that is the interesting choice.
+Source is the model this language already has — one program, no headers,
+whole-program binding — so generics, interfaces and variants all cross a source
+dependency, when none of them can cross a binary one. `"link": "shared"` is the
+opt-in for a real boundary: the package is built once as a shared library, bound
+against through its metadata, and can be replaced without rebuilding what uses
+it.
+
+`stainless.lock` records what resolution decided — the exact commit, and a
+digest of the files that were read — and belongs in version control. A tag can
+be moved and a branch is expected to; a locked build goes to the commit rather
+than to the name, and `--update` is the request to look again.
+
+#### A version is a promise; the digest is a fact
+
+Nothing stops 1.2.3 being rebuilt with a field added to the middle of a class,
+and nothing about the number says it happened — while everything compiled
+against it has that class's offsets baked in. It is not a link error. It is a
+program that reads the wrong four bytes and keeps going.
+
+So the metadata also carries a fingerprint taken over the layouts themselves,
+and the build compares. Move a field without moving the version and it says so,
+by name:
+
+```
+note: 'shapes' 1.0.0 describes a different surface than the last build of 1.0.0
+      did: Shapes.Canvas. A version number is a promise about exactly this, and
+      whatever was compiled against the old surface has those offsets and
+      signatures built into it -- the linker cannot tell, because the symbols
+      did not change.
+```
+
+Adding a function is not a broken promise and says nothing; moving a field is.
+A path dependency is told rather than stopped, because being edited in place is
+the entire reason to use one.
+
+[samples/packages](samples/packages) is two packages and one program, and
+[docs/packages.md](docs/packages.md) is the whole of it: every field, the
+version ranges, what resolution does and what it deliberately does not.
 
 ### Building a library
 
@@ -1552,6 +1653,14 @@ Everything below is covered by [the test suite](tests/cases).
   reference counting reaches across, because an object is allocated through the
   library's own TypeInfo. Generics and classes implementing interfaces do not
   cross, and the compiler says so where the library is built
+- Projects and packages: a `stainless.json` that states what a program is made
+  of — a document rather than a script, so a tool can read it — plus versioned
+  dependencies from a path or from git, a committed `stainless.lock`, and an ABI
+  digest over every layout and signature, so a library whose surface moved under
+  a fixed version is a message instead of a program reading the wrong four
+  bytes. A dependency is compiled in by default, which is the model the language
+  already has; `"link": "shared"` is the opt-in for a binary boundary. See
+  [docs/packages.md](docs/packages.md)
 - Attributes and opt-in reflection: field names, offsets, kinds and attribute
   values readable at run time, from `const` tables in the binary
 - `-g`: debug information, in CodeView on Windows and DWARF elsewhere. Every
@@ -1662,7 +1771,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   library can be held, called, tested with `is` and cast back to — the base
   relation and every virtual slot cross in the metadata — but it cannot be
   derived from (SL0513). The layout is compiled there and the derived class's
-  dispatch table would be built here.
+  dispatch table would be built here. Knowing whether that agreement has since
+  broken is no longer the hard part — that is what the ABI digest in
+  [docs/packages.md](docs/packages.md) answers — but building the table across
+  the boundary still is.
 - **There is no `as`, and no covariant return.** `is C c` now covers the case
   `as` is usually reached for; what is left is wanting the answer as a value
   rather than as a branch. An override returns exactly what it overrides
@@ -1820,7 +1932,7 @@ What is being worked on next, and the known bugs, are in **[TODO.md](TODO.md)**.
 ## Repository layout
 
 ```
-docs/                  language specification, ABI, concurrency design
+docs/                  language specification, ABI, concurrency, packages
 runtime/               the runtime, split by feature, embedded in the compiler
 stdlib/                the standard library written in Stainless, also embedded
 bindings/win32/        the Windows API, compiled only by a program that asks

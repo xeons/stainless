@@ -61,7 +61,9 @@ public static class MetadataWriter
         string library,
         IReadOnlySet<string> ownModules,
         DiagnosticBag? diagnostics = null,
-        bool sharedRuntime = false)
+        bool sharedRuntime = false,
+        string? package = null,
+        string? packageVersion = null)
     {
         var types = new List<MetadataType>();
 
@@ -183,13 +185,17 @@ public static class MetadataWriter
         if (diagnostics is not null)
             CheckDescribable(types, functions, diagnostics, program, ownModules);
 
+        // Sealed last: the digest is over the finished description, and taking
+        // it anywhere earlier would be a fingerprint of a half-built one.
         return new ModuleMetadata
         {
             Library = library,
+            Package = package,
+            PackageVersion = packageVersion,
             SharedRuntime = sharedRuntime,
             Types = types,
             Functions = functions,
-        };
+        }.Sealed();
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           563 pass
+dotnet test tests/Stainless.UnitTests           650 pass
 dotnet run --project tests/Stainless.Tests      249 cases, 2 skipped on Windows
 ```
 
@@ -42,8 +42,47 @@ the closure work.
 | `4902a3f` | types declared inside other types |
 | `c6f92b8` | tuples |
 | `b88a10a` | Linux terminal and event-loop bindings |
+| *(uncommitted)* | projects, versioned packages, and the ABI digest |
 
 ## Findings worth keeping
+
+**The project file is for reading, not for building.** The command line already
+said everything a build needs; what it could not do was answer a question. That
+is the whole argument for `stainless.json` and the whole argument against a
+Makefile — a Makefile builds the program perfectly well and the only way to find
+out what it builds is to run it. Everything else about the design follows from
+that one sentence, including JSON, which is not the nicest syntax and is the
+only one both sides can already parse: `System.Text.Json` in the compiler and
+[stdlib/Json.sl](stdlib/Json.sl) in the language itself. An IDE written in
+Stainless can read its own project file with nothing new written.
+
+**A source dependency is the right default, and that was not obvious.** Every
+other package manager's dependency is a binary one, so `"link": "shared"` looked
+like the main case and compiling the source in looked like a shortcut. It is the
+other way round: this language binds a whole program at once with no headers, so
+a source dependency is simply *more files in the same compilation* — which is
+why generics, interfaces and variants cross one and cannot cross a `.slmod`.
+Shared is the opt-in, and it is opting into a boundary with real costs.
+
+**Two digests, and they answer different questions.** `sourceDigest` is over the
+files that were read and is computed at resolution; `abiDigest` is over the
+layouts that came out and can only be known after a build. Conflating them was
+the first design and it was wrong in both directions — a source dependency has
+no library to fingerprint, and a fixed commit whose files changed is a damaged
+cache rather than a version mistake.
+
+**The digest only earns its place if an addition is silent.** The first version
+reported any change to a library's surface under an unchanged version. That fires
+on every added function, which is harmless — nothing compiled against the smaller
+surface can be invalidated by it — and a warning that is usually wrong is a
+warning people learn to skip. Only what *changed or disappeared* is reported now.
+
+**`--update` did not re-fetch a moved tag**, and the test that found it was the
+obvious one: move the tag, build, check the lock held; then `--update`, and check
+it moved. It had not, because the cached checkout was keyed by the pin and a
+present checkout was never re-read. Worth remembering that the cache has two
+independent questions in it — is it here, and is it current — and that a tag is
+immutable by convention rather than by construction.
 
 **`closure` is the piece the rest now rests on.** A `delegate` is one pointer,
 which is what makes it a C function pointer and what stops it carrying
@@ -226,9 +265,15 @@ two names for one field. The name is wanted at the use site, and
 
 ## Next, in the order I would do it
 
-0. **Push.** Ten commits are unpushed, and the last audit's numbers in the
-   README drift on every commit that adds a case — a unit test pinning them is
-   two hours and stops it for good.
+0. **Push.** Ten commits are unpushed and the package work is uncommitted, and
+   the last audit's numbers in the README drift on every commit that adds a
+   case — a unit test pinning them is two hours and stops it for good.
+0.5 **A registry, or a decision not to have one.** Resolution unifies sources
+   rather than searching versions, because a path and a git tag each pin exactly
+   one version and nothing can offer an alternative. That is honest and it is
+   also the reason two packages needing incompatible versions of a third is a
+   hard error with no way out. The search belongs in `PackageResolver.Visit`
+   when there is something to search.
 1. **Method metadata in reflection**, with invoke-by-name. The last piece
    before a form file can wire a handler, and the same work would let a
    deserializer fill a `List<T>` — the one shape `Standard.Json` cannot

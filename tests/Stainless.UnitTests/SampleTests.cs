@@ -72,6 +72,15 @@ public class SampleTests
 
         new("modules", ["samples/modules/App.sl", "samples/modules/Geometry.sl"]),
 
+        // Two packages, which is two project files and one program. Bound
+        // together here because that is what a source dependency is: the
+        // project file decides where the files come from, and the binder sees
+        // the same one program either way.
+        new("packages", [
+            "samples/packages/app/src/App.sl",
+            "samples/packages/shapes/src/Shapes.sl",
+        ]),
+
         new("shop", [
             "samples/shop/src/Program.sl",
             "samples/shop/src/Shop/Bundles.sl",

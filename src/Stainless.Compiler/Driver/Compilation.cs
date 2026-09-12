@@ -59,6 +59,18 @@ public sealed record CompilationOptions
     public IReadOnlyList<string> References { get; init; } = [];
 
     /// <summary>
+    /// The package this build is of, and the version it publishes itself as.
+    /// Both null for a build driven straight from a command line, which is not
+    /// part of a package and has nothing to claim.
+    ///
+    /// They go into the metadata, where they are what lets a consumer be told
+    /// it was handed the wrong version rather than finding out at the first
+    /// call. See <see cref="ProjectFile"/>.
+    /// </summary>
+    public string? PackageName { get; init; }
+    public string? PackageVersion { get; init; }
+
+    /// <summary>
     /// Whether the runtime is one shared library everything links, or a copy
     /// compiled into this binary. Null asks for whichever the build needs.
     ///
@@ -274,12 +286,19 @@ public sealed class Compilation
     /// <summary>
     /// True for files a previous build produced. Without this, scanning a directory
     /// would feed stale object files back into the next link.
+    ///
+    /// <c>build</c> is here alongside <c>obj</c> and <c>bin</c> because it is
+    /// where a project puts its output by default, and a project whose sources
+    /// are <c>"."</c> scans its own output otherwise -- so the second build of
+    /// a library would link the import library the first one wrote.
     /// </summary>
     private static bool IsBuildArtifact(string path)
     {
         string? directory = Path.GetFileName(Path.GetDirectoryName(path));
+
         return string.Equals(directory, "obj", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(directory, "bin", StringComparison.OrdinalIgnoreCase);
+            || string.Equals(directory, "bin", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(directory, "build", StringComparison.OrdinalIgnoreCase);
     }
 
     public CompilationResult Compile(CompilationOptions options)
@@ -444,6 +463,19 @@ public sealed class Compilation
         var toolchain = Toolchain.Locate(out string toolchainError);
         if (toolchain is null) return Failure(toolchainError);
 
+        // The linker will not make the directory it is writing into, and says
+        // so in its own terms -- which read as a compiler bug rather than as a
+        // missing folder. A project puts its output under 'build' by default,
+        // so this is the ordinary case rather than a corner.
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output)) ?? ".");
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return Failure($"could not create the directory for '{output}': {e.Message}");
+        }
+
         IReadOnlyList<string> runtimeObjects = [];
         SharedRuntime? sharedRuntime = null;
         try
@@ -511,7 +543,7 @@ public sealed class Compilation
             File.WriteAllText(metadataPath,
                 MetadataWriter.Write(
                         program, Path.GetFileName(output), ownModules, diagnostics,
-                        options.NeedsSharedRuntime)
+                        options.NeedsSharedRuntime, options.PackageName, options.PackageVersion)
                     .ToJson());
         }
 

@@ -92,10 +92,21 @@ back to — the base relation and every virtual slot already cross in the metada
 
 What stands in the way is that the derived class's dispatch table is built by
 *this* compilation from a layout compiled by *that* one, so the two have to agree
-about the base's slot count and its destroy hook for ever after. The slots cross
-already; what does not is a rule about which changes to a library are compatible.
-One runtime is no longer the obstacle -- both sides share it -- so what is left
-is versioning, which is the real question and a larger one.
+about the base's slot count and its destroy hook for ever after.
+
+Versioning used to be the answer to "and how would either side know that
+agreement broke", and it is now there: a `.slmod` carries an ABI digest over
+every layout, offset and dispatch slot, the lock file records it, and a library
+whose surface moved under a fixed version is a message rather than a program
+reading the wrong four bytes. See [docs/packages.md §5](docs/packages.md).
+
+So what is left is the emitter's half, which is a different and smaller
+question than it looked: building a vtable here from a base described there,
+chaining a destructor across the boundary, and deciding what a derived class
+does when the base gains a virtual method. The digest makes the last of those
+*detectable*; it does not decide what the rule should be.
+
+*Touches:* `Binder.Inheritance`, `LlvmEmitter.Dispatch`, `MetadataLoader`.
 
 ---
 
