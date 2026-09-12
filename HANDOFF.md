@@ -7,8 +7,8 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           650 pass
-dotnet run --project tests/Stainless.Tests      249 cases, 2 skipped on Windows
+dotnet test tests/Stainless.UnitTests           657 pass
+dotnet run --project tests/Stainless.Tests      250 cases, 2 skipped on Windows
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
@@ -42,9 +42,41 @@ the closure work.
 | `4902a3f` | types declared inside other types |
 | `c6f92b8` | tuples |
 | `b88a10a` | Linux terminal and event-loop bindings |
-| *(uncommitted)* | projects, versioned packages, and the ABI digest |
+| `cc4152b` | projects, versioned packages, and the ABI digest |
+| `9050177` | build stamps, and platform library names |
+| *(uncommitted)* | deriving across a library boundary: SL0513 is lifted |
 
 ## Findings worth keeping
+
+**Deriving across a library boundary was mostly an export problem.** The TODO
+called it emitter work and it was four smaller things, three of which were the
+library refusing to hand over what it already had: the destroy hook was `define
+internal`, protected methods were neither described nor exported, and the
+dispatch table's slots were never written down. Once those crossed, the binder
+needed no new logic at all -- `ResolveVirtuals` copies a base's table and
+appends, and it does not care where the table came from.
+
+**The one real obstacle was Windows, and it is about data, not dispatch.** A
+derived class's TypeInfo names its base's, and on Windows an imported *datum*
+has no address until the loader has filled in the import table -- so it cannot
+appear in a constant initializer. The fix is a store at startup through the
+existing `llvm.global_ctors` hook, which the emitter already had for binding
+string literals. ELF needs none of it: a relocation into another shared object
+is ordinary there, which is why the same code passed on Linux before the
+Windows path existed.
+
+**The vtable length is now part of a library's contract.** A derived class
+appends after the base's last slot, so a later version of the base adding a
+virtual method wants a slot something else is using. The decision taken is that
+this is a breaking change by definition -- no reserved slots, no second
+indirection -- and the ABI digest is what enforces it, which is why the digest
+carries the table slot by slot rather than just its contents.
+
+**A guard was written for a case that cannot happen.** The first version refused
+to derive from a referenced com class. A com class never crosses in metadata at
+all (`Crosses` excludes it, and SL0544 says so where the library is built), so
+the check was dead code with a diagnostic attached. Worth checking what the
+*writer* refuses before writing a rule about what the reader might see.
 
 **The project file is for reading, not for building.** The command line already
 said everything a build needs; what it could not do was answer a question. That

@@ -1018,6 +1018,20 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// </summary>
     public string? ExternalTypeInfo { get; init; }
 
+    /// <summary>
+    /// For a class from a referenced library, the destroy hook that takes its
+    /// half of the object apart.
+    ///
+    /// A class derived from it here ends its own hook by calling this one, which
+    /// is the point where an object being taken apart from the outside in
+    /// crosses back into the library that laid the inside out. Null for
+    /// everything compiled here, where <c>DestroyName</c> already says it.
+    /// </summary>
+    public string? ExternalDestroy { get; init; }
+
+    /// <summary>True for a class this compilation only has the metadata of.</summary>
+    public bool IsReferenced => ExternalTypeInfo is not null;
+
     /// <summary>strong count, weak count, TypeInfo pointer. See docs/abi.md.</summary>
     public const int HeaderSize = 24;
 

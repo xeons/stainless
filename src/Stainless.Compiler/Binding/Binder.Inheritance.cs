@@ -399,14 +399,21 @@ public sealed partial class Binder
             return;
         }
 
-        if (baseClass.ExternalTypeInfo is not null)
-        {
-            diagnostics.Error("SL0513", span,
-                $"'{baseClass.Name}' comes from a referenced library, and deriving across a " +
-                "library boundary is not supported: the derived object would carry a dispatch " +
-                "table built here for a layout compiled there");
-            return;
-        }
+        // A class from a referenced library needs no case of its own here. Its
+        // layout, its dispatch table slot by slot, its destroy hook and its
+        // protected members all cross in the metadata, so what is built below is
+        // built on top of them rather than instead of them -- and the two kinds
+        // of class that could not survive that never cross in the first place:
+        // a com class's tear-offs sit after its fields, and a class
+        // implementing an interface is indexed by a program-wide id. The
+        // metadata writer refuses both where the library is built (SL0544,
+        // SL0545), so a referenced base is never either one.
+        //
+        // What deriving costs is that the base's table *length* is now part of
+        // its contract: this class appends after the last slot, so a later
+        // version adding a virtual method would want a slot this one is already
+        // using. That is a breaking change by definition, and the ABI digest is
+        // what refuses it rather than convention.
 
         // Settle the base before taking anything from it. This is what puts the
         // whole hierarchy in order without a separate sorting pass.

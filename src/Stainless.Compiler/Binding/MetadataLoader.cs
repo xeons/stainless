@@ -99,6 +99,7 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
                 {
                     SimpleName = name, ModuleName = described.Module, IsPublic = true,
                     ExternalTypeInfo = described.TypeInfoSymbol,
+                    ExternalDestroy = described.DestroySymbol,
                 },
                 MetadataKind.Union => new UnionTypeSymbol
                 {
@@ -138,6 +139,12 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
 
         foreach (var (described, symbol) in pending) FillMembers(described, symbol, modules);
 
+        // Last, because a slot may be filled by a method this class inherited
+        // rather than declared, so the whole chain has to have its members
+        // before any of them can be looked up.
+        foreach (var (described, symbol) in pending)
+            if (symbol is ClassTypeSymbol classType) FillVirtualTable(described, classType);
+
         foreach (var reference in references)
         foreach (var function in reference.Functions)
         {
@@ -145,6 +152,77 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             module.Functions.Add(Declare(function, module.Name, containingType: null));
         }
     }
+
+    /// <summary>
+    /// Rebuilds a referenced class's dispatch table from the symbols the
+    /// metadata named.
+    ///
+    /// This is what lets a class be derived from across a library boundary: the
+    /// binder appends to a base's table without caring where the table came
+    /// from, so handing it the same list the library built is the whole of the
+    /// work. A slot may be filled by a method this class inherited rather than
+    /// declared, so the lookup walks up.
+    ///
+    /// An abstract slot is null on both sides and stays null: the class holding
+    /// it cannot be made, and every concrete class below it has filled it in.
+    /// </summary>
+    private void FillVirtualTable(MetadataType described, ClassTypeSymbol classType)
+    {
+        foreach (string? slot in described.VirtualTable)
+        {
+            if (slot is null)
+            {
+                // Nothing to call, and nothing that can be: only an abstract
+                // class carries one, and it is never instantiated.
+                classType.VirtualTable.Add(AbstractSlot(classType));
+                continue;
+            }
+
+            if (Find(classType, slot) is { } method)
+            {
+                classType.VirtualTable.Add(method);
+                continue;
+            }
+
+            diagnostics.Error("SL0546", ReferencedSpan,
+                $"'{classType.QualifiedName}' has a dispatch slot filled by '{slot}', which its " +
+                "metadata does not describe. The library and its metadata were written by the " +
+                "same compilation, so this file has been edited or is not the one that library " +
+                "produced");
+
+            classType.VirtualTable.Add(AbstractSlot(classType));
+        }
+    }
+
+    /// <summary>The method with this linker name, in a class or above it.</summary>
+    private static FunctionSymbol? Find(ClassTypeSymbol classType, string symbol)
+    {
+        for (var type = classType; type is not null; type = type.BaseClass)
+            foreach (var method in type.Methods)
+                if (string.Equals(method.MangledName, symbol, StringComparison.Ordinal))
+                    return method;
+
+        return null;
+    }
+
+    /// <summary>
+    /// A stand-in for a slot with nothing in it, so the table keeps its length.
+    /// The length is what a derived class appends after, and a table one short
+    /// would put a derived method in a slot the base is already dispatching.
+    /// </summary>
+    private static FunctionSymbol AbstractSlot(ClassTypeSymbol classType) =>
+        new()
+        {
+            Name = "<abstract>",
+            ModuleName = classType.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            ContainingType = classType,
+            IsAbstract = true,
+            IsVirtual = true,
+            IsExternal = true,
+            Span = ReferencedSpan,
+        };
 
     private static ModuleSymbol Module(Dictionary<string, ModuleSymbol> modules, string name)
     {

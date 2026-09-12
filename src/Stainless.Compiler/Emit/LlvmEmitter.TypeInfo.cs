@@ -31,6 +31,53 @@ namespace Stainless.Emit;
 /// </summary>
 public sealed partial class LlvmEmitter
 {
+    /// <summary>
+    /// Writes the base pointer of every class derived from a referenced one,
+    /// before anything can ask what an object is.
+    ///
+    /// Only Windows needs it, and only for this one field. An imported datum's
+    /// address lives in the import address table and is not known until the
+    /// loader has filled that in, so it cannot be written into a constant --
+    /// which is what a TypeInfo otherwise is. A store at startup costs one
+    /// instruction per derived class, once.
+    ///
+    /// It runs from <c>llvm.global_ctors</c>, so it is done before <c>main</c>
+    /// in a program and on load in a library -- and so before any static
+    /// initializer, which is the earliest anything could hold one of these
+    /// objects and ask <c>sl_is_instance</c> to walk its chain.
+    /// </summary>
+    private void PatchBasesAtStartup(List<ClassTypeSymbol> patched)
+    {
+        if (patched.Count == 0) return;
+
+        const string name = "_SLbind_bases";
+
+        _module.AppendLine();
+        _module.AppendLine($"define internal void @{name}() {{");
+        _module.AppendLine("entry:");
+
+        int slot = 0;
+        foreach (var classType in patched)
+        {
+            _module.AppendLine(
+                $"  %{slot} = getelementptr inbounds i8, ptr @{Mangler.TypeInfoSymbol(classType)}, " +
+                $"i64 {BaseTypeInfoOffset}");
+
+            _module.AppendLine(
+                $"  store ptr @{Mangler.TypeInfoSymbol(classType.BaseClass!)}, ptr %{slot}, align 8");
+
+            slot++;
+        }
+
+        _module.AppendLine("  ret void");
+        _module.AppendLine("}");
+        _module.AppendLine();
+
+        // Priority 0, beside the literal binding: neither reads what the other
+        // writes, and both have to be done before anything the program wrote.
+        _startup.Add((0, name));
+    }
+
     private void TypeInfos(BoundProgram program)
     {
         _interfaceCount = program.Interfaces.Count;
@@ -54,6 +101,27 @@ public sealed partial class LlvmEmitter
                 ? $"@{imported} = external dllimport constant %SlTypeInfo"
                 : $"@{imported} = external constant %SlTypeInfo");
 
+        // The destroy hook of every referenced class something here derives
+        // from. A derived hook ends by calling its base's, which is where an
+        // object being taken apart from the outside in crosses back into the
+        // library that laid the inside out.
+        //
+        // Only the ones actually derived from: declaring every referenced
+        // class's would name symbols in libraries this program links and
+        // otherwise never touches.
+        foreach (string destroy in program.Classes
+                     .Select(c => c.BaseClass)
+                     .OfType<ClassTypeSymbol>()
+                     .Select(b => b.ExternalDestroy)
+                     .OfType<string>()
+                     .Distinct(StringComparer.Ordinal)
+                     .Order(StringComparer.Ordinal))
+            _module.AppendLine(OperatingSystem.IsWindows()
+                ? $"declare dllimport void @{destroy}(ptr)"
+                : $"declare void @{destroy}(ptr)");
+
+        var patched = new List<ClassTypeSymbol>();
+
         foreach (var classType in program.Classes)
         {
             string nameConstant = InternBytes(classType.QualifiedName);
@@ -61,13 +129,25 @@ public sealed partial class LlvmEmitter
                 ? "@" + InterfaceTableName(classType)
                 : "null";
 
+            // Deriving from a referenced class means naming that library's
+            // TypeInfo here. On Windows an imported *datum* has no address until
+            // the loader has filled in the import table, so it cannot appear in
+            // a constant initializer -- it is written at startup instead, and
+            // the table has to be writable to be written to. ELF needs none of
+            // this: a relocation into another shared object is ordinary there.
+            bool patchBase = OperatingSystem.IsWindows() &&
+                             classType.BaseClass is { IsReferenced: true };
+
+            if (patchBase) patched.Add(classType);
+
             // A library's public classes are allocated through this table by
             // whoever consumes them, so it has to leave the binary.
+            string kind = patchBase ? "global" : "constant";
             string visibility = forSharedLibrary && forStainlessConsumers && classType.IsPublic
-                ? OperatingSystem.IsWindows() ? "dllexport constant" : "constant"
-                : "internal constant";
+                ? OperatingSystem.IsWindows() ? $"dllexport {kind}" : kind
+                : $"internal {kind}";
 
-            string baseInfo = classType.BaseClass is { } derivedFrom
+            string baseInfo = classType.BaseClass is { } derivedFrom && !patchBase
                 ? "@" + Mangler.TypeInfoSymbol(derivedFrom)
                 : "null";
 
@@ -89,6 +169,8 @@ public sealed partial class LlvmEmitter
                 $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout}, " +
                 $"{PropertyTable(classType)} }}");
         }
+
+        PatchBasesAtStartup(patched);
 
         // One TypeInfo per array type. The element type is not recorded at run
         // time; instead each destroy hook already knows how to walk its elements,

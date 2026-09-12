@@ -139,7 +139,16 @@ public static class Digest
             type.IsThreadsafe ? "threadsafe" : "",
             type.IsOpaque ? "opaque" : "",
             type.AliasTarget ?? "",
+            Number(type.InstanceSize),
+            type.DestroySymbol ?? "",
         };
+
+        // Slot by slot, in order, and the count with them. A derived class in
+        // another binary copied this table and appended after it, so both what
+        // is in a slot and how many there are are things it compiled in.
+        parts.Add("vtable");
+        parts.Add(Number(type.VirtualTable.Count));
+        parts.AddRange(type.VirtualTable.Select(slot => slot ?? "abstract"));
 
         // By offset and then by name: the offsets are the layout, and the name
         // settles the order of two fields that share one -- a union's cases, and
@@ -183,6 +192,7 @@ public static class Digest
             function.Returns,
             function.Kind.ToString(),
             function.IsStatic ? "static" : "instance",
+            function.IsProtected ? "protected" : "",
             function.IsVariadic ? "variadic" : "",
             Number(function.VirtualSlot),
             function.Accessor ?? "",

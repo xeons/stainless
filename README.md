@@ -1653,6 +1653,14 @@ Everything below is covered by [the test suite](tests/cases).
   reference counting reaches across, because an object is allocated through the
   library's own TypeInfo. Generics and classes implementing interfaces do not
   cross, and the compiler says so where the library is built
+- **Deriving from a class in another binary.** Its layout, its dispatch table
+  slot by slot, its destroy hook and its protected members all cross, so a
+  derived class puts its fields after fields it never saw laid out, builds its
+  table on top of one compiled elsewhere, overrides into it, and hands the
+  object back to the library when its own destructor is done. What it costs is
+  that the base's table length is part of its contract: adding a virtual method
+  to a public class is a breaking change, and the ABI digest is what enforces
+  it rather than convention
 - Projects and packages: a `stainless.json` that states what a program is made
   of — a document rather than a script, so a tool can read it — plus versioned
   dependencies from a path or from git, a committed `stainless.lock`, and an ABI
@@ -1767,14 +1775,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   name is the other fix and reads better: `if (node.Payload is Circle c)` for a
   variant's case, `if (node.Next is Node n)` for a `C?` — the value is taken
   once, so there is nothing to prove about a second read.
-- **Inheritance stops at a library boundary.** A class from a referenced
-  library can be held, called, tested with `is` and cast back to — the base
-  relation and every virtual slot cross in the metadata — but it cannot be
-  derived from (SL0513). The layout is compiled there and the derived class's
-  dispatch table would be built here. Knowing whether that agreement has since
-  broken is no longer the hard part — that is what the ABI digest in
-  [docs/packages.md](docs/packages.md) answers — but building the table across
-  the boundary still is.
 - **There is no `as`, and no covariant return.** `is C c` now covers the case
   `as` is usually reached for; what is left is wanting the answer as a value
   rather than as a branch. An override returns exactly what it overrides

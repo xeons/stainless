@@ -749,9 +749,25 @@ none of them ever builds anything
 base still holds. Interfaces are inherited too, and an override takes the slot,
 so a call through an interface reaches the same body a virtual call would.
 
-**A class from a referenced library may be held, called, tested and cast — but
-not derived from.** Its layout is compiled there and its dispatch table would be
-built here (SL0513).
+**A class from a referenced library may be derived from.** Its layout, its
+dispatch table slot by slot, its destroy hook and its protected members all
+cross in the metadata, so what is built here is built on top of them rather than
+instead of them: the derived object's fields sit after fields this compilation
+never laid out, its table starts as a copy of one compiled elsewhere, and its
+destructor hands the object back to the library when it has finished its own
+half.
+
+What that costs is that **the base's table length becomes part of its
+contract**. A derived class appends after the last slot, so a later version of
+the base adding a virtual method would want a slot something else is already
+using — which makes adding one to a public, non-sealed class a breaking change,
+enforced by the ABI digest rather than by convention (see
+[packages.md §5](packages.md)).
+
+A `com class` from a referenced library still cannot be derived from (SL0513):
+its tear-offs are laid out after its fields by the compilation that built it, so
+a derived class's own fields would land on top of them. Neither can a class the
+runtime provides, such as `String`.
 
 #### 2.4.2 `is`, and casting down
 

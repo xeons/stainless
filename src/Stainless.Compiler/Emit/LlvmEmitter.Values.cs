@@ -74,8 +74,7 @@ public sealed partial class LlvmEmitter
         (type is UnionTypeSymbol ? "%union." : "%struct.") +
         Mangler.SymbolSafe(type.QualifiedName);
 
-    private static string DestroyName(ClassTypeSymbol type) =>
-        "_SLdestroy_" + Mangler.SymbolSafe(type.QualifiedName);
+    private static string DestroyName(ClassTypeSymbol type) => Mangler.DestroySymbol(type);
 
     private static bool IsSigned(TypeSymbol type) => type switch
     {

@@ -441,7 +441,18 @@ public sealed partial class LlvmEmitter
     private void EmitDestroyThunk(ClassTypeSymbol classType)
     {
         ResetFunctionState();
-        _module.AppendLine($"define internal void @{DestroyName(classType)}(ptr %obj) {{");
+
+        // A class derived from this one in another binary ends its own hook by
+        // calling this one -- the object is taken apart from the outside in, and
+        // this is where the outside stops. So a library's public classes hand
+        // theirs out, and everything else keeps it to itself.
+        bool exported = forSharedLibrary && forStainlessConsumers && classType.IsPublic;
+
+        string linkage = exported
+            ? OperatingSystem.IsWindows() ? "dllexport " : ""
+            : "internal ";
+
+        _module.AppendLine($"define {linkage}void @{DestroyName(classType)}(ptr %obj) {{");
         _body.Clear();
         _blockTerminated = false;
 

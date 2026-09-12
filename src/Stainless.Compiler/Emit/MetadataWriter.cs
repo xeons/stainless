@@ -326,17 +326,33 @@ public static class MetadataWriter
         Name = type.SimpleName,
         Size = type.FieldsSize,
         Alignment = type.FieldsAlignment,
+        InstanceSize = type.InstanceSize,
         TypeInfoSymbol = Mangler.TypeInfoSymbol(type),
+        DestroySymbol = Mangler.DestroySymbol(type),
         Base = type.BaseClass?.QualifiedName,
         IsThreadsafe = type.IsThreadsafe,
         Fields = type.Fields.Select(Describe).ToList(),
 
+        // Slot by slot, with the name that fills each. A class derived from
+        // this one in another compilation copies the list and appends to it,
+        // which is what the binder does for one derived here -- from this same
+        // list, in this same order.
+        VirtualTable = type.VirtualTable
+            .Select(m => m.IsAbstract ? null : m.MangledName)
+            .ToList(),
+
         // Constructors and the destructor are methods as far as a consumer is
         // concerned: symbols to call with the object as the receiver.
+        //
+        // Protected is here with public because a dispatched method must be one
+        // or the other (SL0506), so a protected method can be filling a slot a
+        // derived class has to copy or replace -- and a derived class calls
+        // protected members besides. What keeps it protected is the binder;
+        // being in this list only makes it nameable.
         Methods = type.Methods
             .Concat(type.Constructors)
             .Concat(type.Destructor is null ? [] : new[] { type.Destructor })
-            .Where(m => m.IsPublic || m.Kind == FunctionKind.Destructor)
+            .Where(m => m.IsPublic || m.IsProtected || m.Kind == FunctionKind.Destructor)
             .Select(Describe)
             .ToList(),
     };
@@ -386,6 +402,7 @@ public static class MetadataWriter
         Kind = function.Kind,
         IsVariadic = function.IsVariadic,
         IsStatic = function.IsStatic,
+        IsProtected = function.IsProtected,
         VirtualSlot = function.VirtualSlot,
         Accessor = function.Accessor?.Name,
         Module = function.ContainingType is null ? function.ModuleName : null,

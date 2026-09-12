@@ -1,0 +1,12 @@
+4 dog
+woof 4
+yip 99
+dog 8
+puppy
+animal
+dropping
+~Dog sock
+~Animal dog
+~Dog ball
+~Animal dog
+done

@@ -51,7 +51,7 @@ public sealed record ModuleMetadata
     /// Bumped whenever the shape below changes. A consumer refuses a version it
     /// does not know rather than reading fields that have moved.
     /// </summary>
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 3;
 
     public int Version { get; init; } = CurrentVersion;
 
@@ -217,12 +217,49 @@ public sealed record MetadataType
     /// <summary>
     /// The qualified name of the class this one derives from, or null.
     ///
-    /// A consumer cannot derive from a library's class -- the layout is compiled
-    /// there and the dispatch table would be built here -- but it can still hold
-    /// one, upcast it, ask what it is, and cast it back. All four need the
-    /// relation, and none of them needs anything else about it.
+    /// Held, upcast, asked what it is and cast back to -- all four need the
+    /// relation and nothing else. Deriving needs the three fields below as well.
     /// </summary>
     public string? Base { get; init; }
+
+    /// <summary>
+    /// The whole object, header included, which is where a derived class's own
+    /// fields start.
+    ///
+    /// Carried rather than computed from <see cref="Size"/> and the header
+    /// constant, because the constant lives in the compiler: deriving it here
+    /// would be this compilation asserting what the other one did.
+    /// </summary>
+    public int InstanceSize { get; init; }
+
+    /// <summary>
+    /// The hook the runtime calls when the last reference goes, which a derived
+    /// class's own hook ends by calling.
+    ///
+    /// It runs the user's destructor and then drops every managed field this
+    /// class holds, so it is the only thing that knows how to take this half of
+    /// the object apart. A derived class taking the object apart from the
+    /// outside in has to hand over at exactly this point.
+    /// </summary>
+    public string? DestroySymbol { get; init; }
+
+    /// <summary>
+    /// The dispatch table, slot by slot: the linker name that fills each one,
+    /// or null for a slot an abstract method left empty.
+    ///
+    /// A derived class's table starts as a copy of this, with the slots it
+    /// overrides replaced and its own appended -- which is exactly what the
+    /// binder does for a class derived in the same compilation, from the same
+    /// list. Carrying the symbols rather than the table itself is what lets the
+    /// copy be made here: the table is one library's constant, and the symbols
+    /// in it are things this one can call.
+    ///
+    /// Its *length* is the part that cannot change. A derived class appends
+    /// after slot n-1, so a later version of this class adding a virtual method
+    /// would want a slot something else is already using. That is a breaking
+    /// change by definition, and the ABI digest is what refuses it.
+    /// </summary>
+    public List<string?> VirtualTable { get; init; } = [];
 
     /// <summary>
     /// True for a type declared with no body. A consumer may point at one and
@@ -281,6 +318,17 @@ public sealed record MetadataFunction
     /// would pass one, and the callee would read it as the first argument.
     /// </summary>
     public bool IsStatic { get; init; }
+
+    /// <summary>
+    /// Visible to a derived class and to nothing else.
+    ///
+    /// It has to cross, and it has to be exported, because a dispatched method
+    /// must be public or protected (SL0506) -- so a protected one can be filling
+    /// a slot that a class derived across a library boundary has to copy or
+    /// replace. A consumer that is not deriving cannot call it, and the binder
+    /// is what enforces that rather than the linker.
+    /// </summary>
+    public bool IsProtected { get; init; }
 
     /// <summary>
     /// The dispatch slot, or -1 for a method called by name.

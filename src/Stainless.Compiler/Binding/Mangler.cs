@@ -76,6 +76,17 @@ public static class Mangler
     public static string TypeInfoSymbol(ClassTypeSymbol type) =>
         "_SLti" + Sanitize(type.QualifiedName);
 
+    /// <summary>
+    /// The hook the runtime calls when a class's last reference goes.
+    ///
+    /// Here rather than in the emitter because two things need to agree on it:
+    /// the emitter, which defines it, and the metadata writer, which tells
+    /// another compilation what to call when a class derived there hands the
+    /// object back.
+    /// </summary>
+    public static string DestroySymbol(ClassTypeSymbol type) =>
+        "_SLdestroy_" + SymbolSafe(type.QualifiedName);
+
     private static void AppendIdentifier(StringBuilder sb, string identifier)
     {
         sb.Append(identifier.Length);

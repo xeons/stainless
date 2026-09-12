@@ -154,6 +154,12 @@ ships separately, and can be replaced without rebuilding what uses it. It costs
 what a boundary costs — see §8.4 of the language spec — and it is the only form
 where the digest in §5 has anything to check.
 
+A class from a shared dependency can be **derived from**: its layout, its
+dispatch table, its destroy hook and its protected members all cross, so the
+derived class puts its own fields after fields it never saw laid out and hands
+the object back to the library when its destructor is done. What that costs is
+the rule in §5 about adding a virtual method.
+
 One package cannot be linked both ways in one program. Doing so would compile
 its code into the program and load a second copy of it beside the program.
 
@@ -200,7 +206,15 @@ note: 'shapes' 1.0.0 describes a different surface than the last build of 1.0.0
 
 Two things about when it fires. **An addition is not a break**: a surface that
 only grew cannot invalidate anything already compiled, so a new function or a
-new type says nothing. And a **path** dependency is told rather than stopped —
+new type says nothing.
+
+One addition is the exception, and it is the reason the dispatch table is in the
+digest slot by slot. A class derived across a library boundary copies its base's
+table and appends its own methods after it, so **adding a virtual method to a
+public, non-sealed class wants a slot a derived class elsewhere is already
+using**. That is a breaking change by definition; the digest is what turns it
+from a program calling the wrong function into a message naming the class.
+ And a **path** dependency is told rather than stopped —
 being edited in place is the entire reason to use one — where anything pinned to
 a fixed commit is an error, because the same version describing two surfaces
 means the two builds were not the same build.
