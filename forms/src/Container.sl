@@ -62,6 +62,21 @@ public abstract class GraphicControl : Control {
         parent.Add(this);
     }
 
+    /// A graphic control has no window to capture with, so it asks its parent
+    /// -- which is also what routes the events back to it while it holds it.
+    public override void CaptureMouse(bool captured) {
+        var parent = Parent;
+        if (parent == null) { return; }
+        ((WindowedControl)parent).CaptureFor(captured ? this : null);
+    }
+
+    /// The cursor is the parent's to set, for the same reason: there is no
+    /// window here for Windows to ask about.
+    protected override void ApplyCursor() {
+        var parent = Parent;
+        if (parent != null) { ((WindowedControl)parent).RefreshCursor(); }
+    }
+
     /// Repainting a graphic control means repainting the part of the parent it
     /// sits on, because the parent is what will draw it.
     public override void Invalidate() {
@@ -72,12 +87,17 @@ public abstract class GraphicControl : Control {
     /// Draws this control on its parent's surface.
     ///
     /// Called only by `WindowedControl.OnPaint`, which is the one thing that
-    /// knows a graphic control needs asking. The clip is narrowed to the
-    /// control's bounds first, so a control that draws outside them cannot
-    /// scribble on its siblings -- the protection a real window would have got
-    /// from the platform.
+    /// knows a graphic control needs asking.
+    ///
+    /// **The layer is what makes the coordinates its own.** Without it the
+    /// surface is the parent's: a control drawing at (0, 0) would draw at the
+    /// *form's* corner rather than its own, and could draw over its siblings --
+    /// the protection a real window gets from the platform for nothing. The
+    /// clip and the origin are pushed together and put back together.
     void PaintOn(Graphics surface) {
-        OnPaint(PaintEventArgs.Of(surface, Bounds));
+        int layer = surface.PushLayer(Bounds);
+        OnPaint(PaintEventArgs.Of(surface, Rectangle.Of(0, 0, Width, Height)));
+        surface.PopLayer(layer);
     }
 }
 
@@ -112,6 +132,8 @@ public abstract class WindowedControl : Control {
         asContainer = null;
         inside = new List<Control>();
         laying = false;
+        grabbed = null;
+        hovered = null;
         lastClient = Size.Empty;
         if (parent != null) { ((WindowedControl)parent).Add(this); }
     }
@@ -291,6 +313,124 @@ public abstract class WindowedControl : Control {
     protected override void ApplyBackColor() {
         var mine = platform;
         if (mine != null) { ((IControlPeer)mine).SetBackColor(BackColor); }
+    }
+
+    protected override void ApplyCursor() {
+        var mine = platform;
+        if (mine != null) { ((IControlPeer)mine).SetCursor(Cursor); }
+    }
+
+    public override void CaptureMouse(bool captured) {
+        var mine = platform;
+        if (mine != null) { ((IControlPeer)mine).SetCapture(captured); }
+    }
+
+    // ------------------------------------------- the mouse, for the windowless
+    //
+    // A `GraphicControl` has no window, so every message about it arrives here
+    // instead and has to be hit-tested and passed on. That is the cost of the
+    // LCL's control split, and it is paid once -- here -- rather than by each
+    // control that wants it.
+
+    /// Which graphic child holds the mouse, or null.
+    GraphicControl? grabbed;
+    /// Which one the pointer was last over, so that entering and leaving can be
+    /// reported at all -- Windows says nothing about a control it cannot see.
+    GraphicControl? hovered;
+
+    /// The topmost graphic child at a point in this control's coordinates.
+    ///
+    /// Backwards, because a later child is drawn on top of an earlier one, and
+    /// what is on top is what the mouse should find.
+    GraphicControl? GraphicAt(Point at) {
+        nuint count = inside.Count();
+        for (nuint i = count; i > 0u; i -= 1u) {
+            var child = inside.At(i - 1u);
+            if (!child.Visible || !child.Enabled) { continue; }
+            if (child is GraphicControl drawn) {
+                if (drawn.Bounds.Contains(at)) { return drawn; }
+            }
+        }
+        return null;
+    }
+
+    /// Called by a graphic child taking or giving up the mouse.
+    void CaptureFor(GraphicControl? child) {
+        grabbed = child;
+        var mine = platform;
+        if (mine != null) { ((IControlPeer)mine).SetCapture(child != null); }
+    }
+
+    /// Re-asks the platform what the pointer should look like, after a graphic
+    /// child changed its mind about it.
+    void RefreshCursor() { }
+
+    /// Where a point in this control's coordinates is in a child's.
+    Point Within(Control child, Point at) {
+        return Point.At(at.X - child.Left, at.Y - child.Top);
+    }
+
+    /// Whichever graphic child a mouse message belongs to: the one holding the
+    /// mouse if any, otherwise whatever is under the pointer.
+    GraphicControl? MouseTarget(Point at) {
+        var held = grabbed;
+        if (held != null) { return held; }
+        return GraphicAt(at);
+    }
+
+    public override void OnPlatformMouseDown(MouseButton button, Point at,
+                                             ModifierKeys modifiers) {
+        var target = MouseTarget(at);
+        if (target != null) {
+            var child = (GraphicControl)target;
+            child.OnPlatformMouseDown(button, Within(child, at), modifiers);
+            return;
+        }
+        base.OnPlatformMouseDown(button, at, modifiers);
+    }
+
+    public override void OnPlatformMouseUp(MouseButton button, Point at,
+                                           ModifierKeys modifiers) {
+        var target = MouseTarget(at);
+        if (target != null) {
+            var child = (GraphicControl)target;
+            child.OnPlatformMouseUp(button, Within(child, at), modifiers);
+            return;
+        }
+        base.OnPlatformMouseUp(button, at, modifiers);
+    }
+
+    public override void OnPlatformMouseMove(Point at, ModifierKeys modifiers) {
+        var target = MouseTarget(at);
+
+        // Entering and leaving a windowless control is this method's doing --
+        // the pointer never crosses a window boundary, so nothing else would
+        // ever notice. Reported before the move, so a handler that sets up on
+        // enter has done so before the first move arrives.
+        var was = hovered;
+        if (was != target) {
+            if (was != null) { ((GraphicControl)was).OnPlatformMouseLeave(); }
+            hovered = target;
+            if (target != null) { ((GraphicControl)target).OnPlatformMouseEnter(); }
+        }
+
+        if (target != null) {
+            var child = (GraphicControl)target;
+            child.OnPlatformMouseMove(Within(child, at), modifiers);
+            return;
+        }
+        base.OnPlatformMouseMove(at, modifiers);
+    }
+
+    /// The pointer left this control's window, so it has left any graphic child
+    /// it was over too.
+    public override void OnPlatformMouseLeave() {
+        var was = hovered;
+        if (was != null) {
+            hovered = null;
+            ((GraphicControl)was).OnPlatformMouseLeave();
+        }
+        base.OnPlatformMouseLeave();
     }
 
     public override void Invalidate() {

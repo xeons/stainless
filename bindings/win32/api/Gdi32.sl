@@ -173,4 +173,33 @@ public const int DeviceCapsBitsPerPixel     = 12;
 public const int DeviceCapsLogicalPixelsX   = 88;
 public const int DeviceCapsLogicalPixelsY   = 90;
 
+// ========================================================= origin and clipping
+//
+// What a control drawn inside another needs: everything it draws moved to its
+// own corner, and nothing it draws allowed outside it. `SaveDC` and `RestoreDC`
+// above are what put both back in one call.
+
+public extern "C" {
+    /// Moves the origin all drawing is measured from. The previous origin is
+    /// written to `previous`, which may be null.
+    int SetViewportOrgEx(HDC dc, int x, int y, Point* previous);
+    int GetViewportOrgEx(HDC dc, Point* origin);
+    /// Moves it by a delta rather than to a place, which is what nesting wants.
+    int OffsetViewportOrgEx(HDC dc, int dx, int dy, Point* previous);
+
+    /// Narrows the clip to the part of it inside this rectangle. Only ever
+    /// narrows: there is no call that widens one, which is what `SaveDC` and
+    /// `RestoreDC` are for.
+    int IntersectClipRect(HDC dc, int left, int top, int right, int bottom);
+    int ExcludeClipRect(HDC dc, int left, int top, int right, int bottom);
+    /// The smallest rectangle holding the whole clip.
+    int GetClipBox(HDC dc, Rect* bounds);
+}
+
+/// What `GetClipBox` answers.
+public const int ClipError       = 0;
+public const int ClipEmpty       = 1;
+public const int ClipSimple      = 2;
+public const int ClipComplex     = 3;
+
 #endif

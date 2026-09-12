@@ -196,6 +196,24 @@ public enum WindowState { Normal, Minimized, Maximized }
 /// The frame drawn around a control that has one.
 public enum ControlBorder { None, Single, Sunken }
 
+/// What the pointer looks like over a control.
+///
+/// The shapes every platform has, and no more: a cursor from a file is a
+/// resource story, and the list below is what a layout actually needs -- the
+/// resize shapes are what make a splitter look draggable.
+public enum CursorKind {
+    Default,
+    Arrow,
+    Hand,
+    Text,
+    Wait,
+    Cross,
+    SizeWestEast,
+    SizeNorthSouth,
+    SizeAll,
+    No,
+}
+
 /// What every control's peer can do.
 ///
 /// **`Destroy` is here and is not a destructor.** A peer is destroyed when its
@@ -221,6 +239,14 @@ public interface IControlPeer {
 
     void Focus();
     bool HasFocus();
+
+    /// What the pointer looks like over this control.
+    void SetCursor(CursorKind cursor);
+
+    /// Takes or gives up the mouse, so that a drag keeps being reported after
+    /// the pointer has left the control. What every drag needs and what nothing
+    /// else does.
+    void SetCapture(bool captured);
 
     /// How much room children have, as a size at the origin.
     ///
@@ -534,6 +560,19 @@ public interface IListViewPeer : IControlPeer {
     void SetFullRowSelect(bool full, bool gridLines);
 }
 
+// -------------------------------------------------------------------- timer
+
+/// What a timer tells the program.
+public interface ITimerNotify {
+    void OnPlatformTick();
+}
+
+/// A platform timer.
+public interface ITimerPeer {
+    void Start(int milliseconds);
+    void Stop();
+}
+
 /// The platform's font, once it has been made. Opaque: only the backend that
 /// made it knows what is inside, and `Font` holds one so the handle is made
 /// once however many controls share the font.
@@ -544,6 +583,17 @@ public interface IFontBackend {
 /// The platform's drawing surface, behind `Graphics`.
 public interface IGraphicsBackend {
     Rectangle ClipBounds();
+
+    /// Narrows drawing to `bounds` and moves the origin to its corner, so that
+    /// whatever draws next works in its own coordinates and cannot draw outside
+    /// them.
+    ///
+    /// Answers a token for `PopLayer`. What a `GraphicControl` needs, since it
+    /// has no window of its own and would otherwise be drawing in its parent's
+    /// coordinates, over its parent's siblings -- the protection a real window
+    /// gets from the platform for nothing.
+    int PushLayer(Rectangle bounds);
+    void PopLayer(int token);
     void Clear(Color colour);
     void DrawLine(Pen pen, int x1, int y1, int x2, int y2);
     void DrawRectangle(Pen pen, Rectangle bounds);
@@ -566,6 +616,18 @@ public enum DialogResult { None, Ok, Cancel, Yes, No, Abort, Retry, Ignore }
 
 /// Which icon a message box shows.
 public enum MessageIcon { None, Information, Warning, Error, Question }
+
+/// Why a dialog produced no answer.
+///
+/// Declared here rather than beside the dialog classes because it is what the
+/// *seam* answers with: a backend reports the outcome and the control layer
+/// passes it on unchanged.
+public enum DialogOutcome {
+    /// The user pressed Cancel or closed it.
+    Cancelled,
+    /// The platform could not show it at all.
+    Failed,
+}
 
 /// Which buttons a message box offers.
 public enum MessageButtons { Ok, OkCancel, YesNo, YesNoCancel, RetryCancel }
@@ -616,6 +678,22 @@ public interface IWidgetSet {
     /// from `CreateMenu` because Windows makes the two with different calls and
     /// will not exchange one for the other afterwards.
     IMenuPeer CreateMenuBar();
+
+    ITimerPeer CreateTimer(ITimerNotify owner);
+
+    // ------------------------------------------------------------ dialogs
+    //
+    // Each answers what was chosen, so there is nothing to read when nothing
+    // was -- which is the whole difference from `TOpenDialog.Execute`, where a
+    // caller who forgets the test reads a stale path.
+
+    Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,
+                                                   String start, String[] filters);
+    Result<String, DialogOutcome> ChooseFileToSave(IWindowPeer? owner, String title,
+                                                   String start, String[] filters);
+    Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title);
+    Result<Color, DialogOutcome>  ChooseColor(IWindowPeer? owner, Color start);
+    Result<Font, DialogOutcome>   ChooseFont(IWindowPeer? owner, Font start);
 
     IFontBackend CreateFont(Font font);
 

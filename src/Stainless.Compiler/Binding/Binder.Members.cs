@@ -108,6 +108,16 @@ public sealed partial class Binder
         }
 
         _currentScope = null;
+
+        // Every type declared in source now has its members, so an instantiation
+        // made during this pass can finally be laid out. Until this moment it
+        // could not: laying `Result<Color, E>` out reaches `Color`, and a
+        // `Color` this pass had not got to yet has no fields, so it settles at
+        // one byte -- and `LayoutComputed` means nothing ever looks again. The
+        // same trap the generic-to-generic case documents, reached through an
+        // ordinary struct instead of a second template.
+        _membersDeclared = true;
+        SettleDeferredLayouts();
     }
 
     /// <summary>

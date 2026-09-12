@@ -77,6 +77,15 @@ public sealed partial class Binder
     /// Lays out every instantiation the outermost one produced, in the order
     /// they were made.
     /// </summary>
+    /// <summary>
+    /// False until pass 4 has given every source type its members.
+    ///
+    /// An instantiation made before then waits, because a layout computed while
+    /// a struct it reaches is still empty settles on the wrong size and caches
+    /// it.
+    /// </summary>
+    private bool _membersDeclared;
+
     private void SettleDeferredLayouts()
     {
         // Indexed rather than enumerated, and behind the same depth the callers
@@ -210,7 +219,11 @@ public sealed partial class Binder
             _instantiationDepth--;
         }
 
-        if (_instantiationDepth == 0) SettleDeferredLayouts();
+        // Not while pass 4 is still running: see the note at the end of
+        // `DeclareMembers`. An instantiation made before every source type has
+        // its members cannot be laid out, because laying it out would settle a
+        // wrong size on whatever it reaches that is not ready.
+        if (_instantiationDepth == 0 && _membersDeclared) SettleDeferredLayouts();
 
         // Every body this instantiation owns is bound later, under this same
         // substitution.

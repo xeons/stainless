@@ -25,13 +25,20 @@ if (-not (Test-Path $compiler)) {
 
 if (-not (Test-Path $output)) { New-Item -ItemType Directory $output | Out-Null }
 
-# What every Forms program is built from: its own source, the library, and the
-# Win32 declarations the backend is written against.
+# What every Forms program is built from: its own source and the library.
+#
+# The whole binding directory, not only the declarations under `api`: the
+# backend reaches `Win32.Dialogs` for the file choosers and `Win32.Com`
+# underneath it. Compiling a wrapper is what makes its library necessary, which
+# is why the list below is longer than user32 and gdi32.
 $library = @(
     (Join-Path $repository "forms\src"),
-    (Join-Path $repository "bindings\win32\api"),
-    (Join-Path $repository "bindings\win32\Win32.sl")
+    (Join-Path $repository "bindings\win32")
 )
+
+$libraries = @("-l", "user32", "-l", "gdi32", "-l", "comctl32",
+               "-l", "comdlg32", "-l", "ole32", "-l", "shell32",
+               "-l", "advapi32")
 
 $samples = Get-ChildItem $PSScriptRoot -Filter *.sl | Sort-Object Name
 
@@ -40,7 +47,7 @@ foreach ($sample in $samples) {
     $exe  = Join-Path $output "$name.exe"
 
     Write-Host "building $name" -ForegroundColor Cyan
-    & $compiler build $sample.FullName @library -o $exe -l user32 -l gdi32 -l comctl32
+    & $compiler build $sample.FullName @library -o $exe @libraries
     if ($LASTEXITCODE -ne 0) { Write-Error "$name failed to build" }
 
     # The themed common controls are version 6 of comctl32, and the only way to

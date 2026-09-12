@@ -196,6 +196,7 @@ public abstract class Control : IControlNotify {
     /// call in response does not tell the platform straight back. One flag
     /// replaces the LCL's `csLoading`/`csUpdating` pair for this layer's needs.
     bool             echoing;
+    CursorKind       pointer;
 
     protected Control() {
         owner = null;
@@ -211,6 +212,7 @@ public abstract class Control : IControlNotify {
         backgroundSet = false;
         foregroundSet = false;
         echoing = false;
+        pointer = CursorKind.Default;
         Name = "";
     }
 
@@ -491,6 +493,25 @@ public abstract class Control : IControlNotify {
     protected virtual void ApplyForeColor() { }
     protected virtual void ApplyBackColor() { }
 
+    /// What the pointer looks like over this control.
+    public CursorKind Cursor {
+        get => pointer;
+        set {
+            pointer = value;
+            ApplyCursor();
+        }
+    }
+
+    protected virtual void ApplyCursor() { }
+
+    /// Takes the mouse, so that a drag keeps being reported after the pointer
+    /// has left this control -- which is what every drag needs and nothing else
+    /// does.
+    ///
+    /// Virtual because a `GraphicControl` has no window to capture with and has
+    /// to ask its parent, which is also what then routes the events back.
+    public virtual void CaptureMouse(bool captured) { }
+
     /// Marks the control as needing repainting.
     public virtual void Invalidate() {
         var parent = owner;
@@ -584,20 +605,20 @@ public abstract class Control : IControlNotify {
         OnMove();
     }
 
-    public void OnPlatformMouseDown(MouseButton button, Point at, ModifierKeys modifiers) {
+    public virtual void OnPlatformMouseDown(MouseButton button, Point at, ModifierKeys modifiers) {
         OnMouseDown(MouseEventArgs.Of(button, at, modifiers, 0));
     }
 
-    public void OnPlatformMouseUp(MouseButton button, Point at, ModifierKeys modifiers) {
+    public virtual void OnPlatformMouseUp(MouseButton button, Point at, ModifierKeys modifiers) {
         OnMouseUp(MouseEventArgs.Of(button, at, modifiers, 0));
     }
 
-    public void OnPlatformMouseMove(Point at, ModifierKeys modifiers) {
+    public virtual void OnPlatformMouseMove(Point at, ModifierKeys modifiers) {
         OnMouseMove(MouseEventArgs.Of(MouseButton.None, at, modifiers, 0));
     }
 
     public void OnPlatformMouseEnter() { OnMouseEnter(); }
-    public void OnPlatformMouseLeave() { OnMouseLeave(); }
+    public virtual void OnPlatformMouseLeave() { OnMouseLeave(); }
 
     public void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers) {
         OnMouseWheel(MouseEventArgs.Of(MouseButton.None, at, modifiers, delta));

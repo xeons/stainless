@@ -1,5 +1,4 @@
 # The Forms library, compiled into the program rather than linked -- it holds
 # statics, so it cannot be a shared library. See forms/README.md.
 forms/src
-bindings/win32/api
-bindings/win32/Win32.sl
+bindings/win32

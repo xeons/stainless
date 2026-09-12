@@ -400,6 +400,13 @@ public char16* CursorWait()    { return (char16*)(nuint)32514u; }
 public char16* CursorCross()   { return (char16*)(nuint)32515u; }
 public char16* CursorSizeAll() { return (char16*)(nuint)32646u; }
 public char16* CursorHand()    { return (char16*)(nuint)32649u; }
+public char16* CursorSizeNS()  { return (char16*)(nuint)32645u; }
+public char16* CursorSizeWE()  { return (char16*)(nuint)32644u; }
+public char16* CursorNo()      { return (char16*)(nuint)32648u; }
+
+/// `WM_SETCURSOR`'s low word: where on the window the pointer is. A control
+/// answers only for its own client area and leaves the frame to Windows.
+public const long HtClient = 1;
 
 // ================================================================= keyboard
 
@@ -897,5 +904,34 @@ public const uint LrLoadFromFile  = 0x0010u;
 public const uint LrDefaultSize   = 0x0040u;
 public const uint LrCreateDibSection = 0x2000u;
 public const uint LrShared        = 0x8000u;
+
+// ================================================== keyboard navigation
+//
+// Tab, the arrow keys between radio buttons, Enter for the default button and
+// Escape for cancel are not built into a window: they are what
+// `IsDialogMessage` does to a message before it is dispatched, and a window
+// whose loop does not call it simply has none of them.
+
+public extern "C" {
+    /// Handles a navigation key for a window and its children. Answers true
+    /// when it took the message, which the loop must then *not* dispatch.
+    int  IsDialogMessageW(HWND window, Msg* message);
+    HWND GetNextDlgTabItem(HWND window, HWND from, int previous);
+    HWND GetNextDlgGroupItem(HWND window, HWND from, int previous);
+    /// Which control a dialog would give the keyboard to first.
+    int  MapDialogRect(HWND window, Rect* rectangle);
+
+    /// Walks up an ownership chain: the top-level window a control is on.
+    HWND GetAncestor(HWND window, uint what);
+}
+
+public const uint GaParent    = 1u;
+public const uint GaRoot      = 2u;
+public const uint GaRootOwner = 3u;
+
+/// The range of messages that carry a key. `IsDialogMessage` is only worth
+/// asking about these, and asking about the rest costs a call per mouse move.
+public const uint WmKeyFirst = 0x0100u;
+public const uint WmKeyLast  = 0x0109u;
 
 #endif

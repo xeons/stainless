@@ -431,6 +431,30 @@ public class Win32WidgetSet : IWidgetSet {
         return new ImageListBackend(imageSize);
     }
 
+    public ITimerPeer CreateTimer(ITimerNotify owner) { return new TimerPeer(owner); }
+
+    public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,
+                                                          String start, String[] filters) {
+        return OpenFileDialog(owner, title, start, filters);
+    }
+
+    public Result<String, DialogOutcome> ChooseFileToSave(IWindowPeer? owner, String title,
+                                                          String start, String[] filters) {
+        return SaveFileDialog(owner, title, start, filters);
+    }
+
+    public Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title) {
+        return FolderDialogFor(owner, title);
+    }
+
+    public Result<Color, DialogOutcome> ChooseColor(IWindowPeer? owner, Color start) {
+        return ColorDialogFor(owner, start);
+    }
+
+    public Result<Font, DialogOutcome> ChooseFont(IWindowPeer? owner, Font start) {
+        return FontDialogFor(owner, start);
+    }
+
     public IFontBackend CreateFont(Font font) { return new FontBackend(font); }
 
     public Color SystemColor(SystemColorId which) {
@@ -486,6 +510,7 @@ public class Win32WidgetSet : IWidgetSet {
             // here and the reason it is not used.
             if (got == 0) { return; }
             if (got < 0)  { return; }
+            if (Navigated(&message)) { continue; }
             TranslateMessage(&message);
             DispatchMessageW(&message);
         }
@@ -495,10 +520,39 @@ public class Win32WidgetSet : IWidgetSet {
         Msg message;
         while (PeekMessageW(&message, null, 0u, 0u, PeekRemove) != 0) {
             if (message.Message == WmQuit) { return false; }
+            if (Navigated(&message)) { continue; }
             TranslateMessage(&message);
             DispatchMessageW(&message);
         }
         return true;
+    }
+
+    /// Whether the keyboard did something to the window rather than to a
+    /// control: Tab and Shift-Tab between controls, the arrow keys between
+    /// radio buttons in a group, Enter for the default button, Escape for
+    /// cancel, and a menu's underlined letter.
+    ///
+    /// **None of that is built into a window.** It is what `IsDialogMessage`
+    /// does to a message on the way past, and a loop that does not call it has
+    /// none of it -- `WS_TABSTOP` set on every control and Tab doing nothing at
+    /// all, which is exactly where this library was.
+    ///
+    /// The message is given to the *top-level* window the keyboard is in, since
+    /// that is what owns the group a control belongs to. Answering true means
+    /// the message was handled and must not be dispatched again; dispatching it
+    /// anyway is what makes Tab type a tab character into the text box it just
+    /// left.
+    bool Navigated(Msg* message) {
+        if (message->Message < WmKeyFirst || message->Message > WmKeyLast) {
+            return false;
+        }
+        HWND top = GetAncestor(message->Window, GaRoot);
+        if (top == null) { return false; }
+        // Only windows of this library's own class, so a message bound for a
+        // dialog Windows is running -- a message box, a file chooser -- is left
+        // entirely alone.
+        if (PeerOf(top) == null) { return false; }
+        return IsDialogMessageW(top, message) != 0;
     }
 
     public void QuitEventLoop() { PostQuitMessage(0); }

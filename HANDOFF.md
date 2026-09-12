@@ -8,8 +8,8 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           659 pass
-dotnet run --project tests/Stainless.Tests      253 cases, 2 skipped on Windows
-samples/forms/build.ps1 -Test                   45 checks against real widgets
+dotnet run --project tests/Stainless.Tests      254 cases, 2 skipped on Windows
+samples/forms/build.ps1 -Test                   51 checks against real widgets
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
@@ -53,6 +53,26 @@ since the closure work.
 | *this one* | menus and the common controls; interface-to-class narrowing |
 
 ## Findings worth keeping
+
+**A generic instantiated over a struct declared later gave it a one-byte
+layout.** `Forms.Platform` names `Result<Color, DialogOutcome>`; pass 4 reached
+that before it reached `Forms.Drawing`, so laying the instantiation out walked
+into a `Color` with no fields yet, settled on one byte, and set `LayoutComputed`
+so nothing looked again. `Color.FromRgb` then compiled to `define i8` and every
+colour in the program lost its green and blue -- a red window, and a `Bitmap`
+whose only symptom was that.
+
+The trap is the one `Binder.Generics` already documents for template-to-template
+cycles; what was missing is that an *ordinary* struct can be reached the same
+way. The fix is one condition: an instantiation made while pass 4 is still
+running waits, and the deferred layouts settle when every source type has its
+members. `tests/cases/generic-over-later-struct` is the regression, and it
+prints `sizeof: 1` without it.
+
+Worth knowing for its own sake: a wrong `Size` shows up as a *truncated return*,
+because `Win64Abi.ClassifyReturn` coerces a register-sized struct to `i{Size*8}`.
+If a struct ever comes back with only its first field set, look at its layout
+before looking at the call.
 
 **A GUI is the thing that finds the holes.** Five of the six bugs the Forms work
 turned up were invisible until something was measured, and none of them made a

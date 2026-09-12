@@ -107,6 +107,9 @@ src/Controls/Menus.sl       MainMenu, PopupMenu, MenuItem      (lcl/menus.pp)
 src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
                             TabControl, TreeView, ListView, ImageList
                                                             (lcl/comctrls.pp)
+src/Controls/Drawn.sl       PaintBox, Shape, Bevel, Splitter (lcl/extctrls.pp)
+src/Controls/Dialogs.sl     OpenDialog, SaveDialog, FolderDialog, ColorDialog,
+                            FontDialog, Timer      (lcl/dialogs.pp, customtimer)
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 ```
@@ -187,6 +190,25 @@ place whether or not its parent has a frame. Only a group box has a non-zero
 origin, and without it a control placed at the origin is drawn across the
 caption -- while a *docked* one lands correctly, so the two disagreed.
 
+**A windowless control is drawn in a layer, not in its parent's coordinates.**
+A `GraphicControl` has no window, so its parent draws it -- and the obvious way
+to do that, handing over the parent's `Graphics`, means a control drawing at
+(0, 0) draws at the *form's* corner and may draw over its siblings. So the
+parent pushes a layer first: `SaveDC`, `IntersectClipRect`,
+`OffsetViewportOrgEx`, and one `RestoreDC` that puts both back together. A
+`PaintBox` may then draw from its own origin without knowing where it sits.
+
+**And its parent must ask it to.** Only a form handled `WM_PAINT` at first, so a
+`PaintBox` on a tab page was simply never drawn -- no error, no warning, an
+empty rectangle. Every container now draws the windowless children on it, after
+letting the platform control paint itself.
+
+**The mouse reaches a windowless control by hit-testing.** The pointer never
+crosses a window boundary for a control that has no window, so entering and
+leaving it are the parent's to notice and report, and a drag is the parent
+holding the platform capture on the child's behalf. That is what a `Splitter`
+needs and what nothing else does.
+
 **A menu is described first and built second.** Every item is an ordinary
 object until a `MainMenu` is given to a form or a `PopupMenu` is shown; only
 then does a platform menu exist. On Windows a submenu must exist before the item
@@ -259,6 +281,9 @@ grouped by how much work it is rather than by where it lives.
 | `MainMenu`, `PopupMenu`, `MenuItem` | `menus.pp` |
 | `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
+| `PaintBox`, `Shape`, `Bevel`, `Splitter` | `extctrls.pp` |
+| `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
+| `Timer` | `customtimer.pas` |
 | `Color`, `Point`, `Size`, `Rectangle`, `Font`, `Pen`, `Brush`, `Graphics`, `Bitmap` | `graphics.pp` |
 | the widgetset seam | `widgetset/ws*.pp`, `interfaces/win32` |
 
@@ -267,22 +292,13 @@ grouped by how much work it is rather than by where it lives.
 Every one of these is either a composite of what already exists or a Win32 call
 that is already bound.
 
-- **Common dialogs** — `TOpenDialog`, `TSaveDialog`, `TSelectDirectoryDialog`
-  (`dialogs.pp`). The single most-missed thing, and the cheapest:
-  `bindings/win32/Dialogs.sl` already has all three, by both the legacy
-  `ComDlg32` route and the modern `IFileDialog` one. What is left is wrapping
-  them as classes. `TColorDialog` and `TFontDialog` need `ChooseColorW` and
-  `ChooseFontW` bound first, which is a dozen lines each.
-- **`Timer`** (`customtimer.pas`) — `SetTimer`/`KillTimer` are already bound;
-  what it needs is a peer that routes `WM_TIMER` to a closure.
-- **`PaintBox`, `Bevel`, `Shape`** (`extctrls.pp`) — `GraphicControl` exists and
-  each of these is an `OnPaint` and a few properties. `PaintBox` is the one that
-  makes custom drawing usable at all, and should probably come first of the
-  three.
-- **`Splitter`** (`extctrls.pp`) — pure layout arithmetic over a mouse drag, with
-  no platform widget behind it.
 - **`RadioGroup`, `CheckGroup`** (`extctrls.pp`) — a `GroupBox` that builds its
   own children. `LabeledEdit` likewise.
+- **`Image`** (`extctrls.pp`) — a `GraphicControl` that draws a `Bitmap`, which
+  now that both exist is a `DrawBitmap` on `Graphics` and little else.
+- **`Notebook`** without tabs, and `TPageControl` versus `TTabControl` — the
+  LCL distinguishes a tabbed control that owns pages from one that only shows
+  tabs; only the first is here.
 - **`SpinEdit`, `UpDown`** (`spin.pp`, `comctrls.pp`) — the `UDM_*` messages are
   bound in `ComCtl32.sl` already.
 - **`CheckListBox`** (`checklst.pas`) — a `ListView` with `LVS_EX_CHECKBOXES`, or
@@ -304,11 +320,9 @@ that is already bound.
 - **Owner drawing** across list, combo, menu and button. One mechanism
   (`WM_DRAWITEM`, `WM_MEASUREITEM`) that half a dozen controls want, so it is
   worth doing once and properly rather than per control.
-- **Accelerators.** `&O` underlines a letter and works while a menu is open;
-  `Ctrl+O` needs an accelerator table and `TranslateAccelerator` in the message
-  loop.
-- **Tab navigation.** `WS_TABSTOP` is set, but nothing calls `IsDialogMessage`,
-  so Tab does not move between controls. Small, and very noticeable.
+- **Accelerators.** `&O` underlines a letter and works while a menu is open, and
+  `IsDialogMessage` now handles Tab, the arrows, Enter and Escape; `Ctrl+O`
+  still needs an accelerator table and `TranslateAccelerator` in the loop.
 - **`TrayIcon`** (`extctrls.pp`) — needs `Shell_NotifyIconW` bound.
 
 ### Large, and each its own project
@@ -370,9 +384,6 @@ here at all.
 
 - **A GDI object cache.** Every pen and brush is made and deleted per drawing
   call, which cannot leak and is slower than it needs to be.
-- **Tab does not move between controls.** `WS_TABSTOP` is set on everything that
-  should have it, but the message loop does not call `IsDialogMessage`, so
-  nothing acts on it.
 - **`BorderSpacing` and `ChildSizing` are absent.** The LCL's finer layout
   controls; only `Dock` and `Anchors` are here.
 - **`Application` and `WidgetSet` hold static state and warn (SL0377).** A GUI

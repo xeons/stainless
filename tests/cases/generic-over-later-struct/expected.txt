@@ -1,0 +1,4 @@
+sizeof:    4
+returned:  1 2 3 255
+through a variant: 10 20 30 255
+pair:      7 9

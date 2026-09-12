@@ -375,6 +375,16 @@ public sealed class Graphics {
     /// entirely and only a slow one needs to look.
     public Rectangle ClipBounds => backend.ClipBounds();
 
+    /// Narrows drawing to a rectangle and moves the origin to its corner.
+    ///
+    /// Everything drawn until the matching `PopLayer` is in that rectangle's
+    /// own coordinates and clipped to it. What a control drawn inside another
+    /// needs, and the reason a `GraphicControl` may draw from (0, 0) without
+    /// knowing where on the form it sits.
+    public int PushLayer(Rectangle bounds) { return backend.PushLayer(bounds); }
+
+    public void PopLayer(int token) { backend.PopLayer(token); }
+
     public void DrawLine(Pen pen, int x1, int y1, int x2, int y2) {
         backend.DrawLine(pen, x1, y1, x2, y2);
     }

@@ -1,3 +1,2 @@
 forms/src
-bindings/win32/api
-bindings/win32/Win32.sl
+bindings/win32

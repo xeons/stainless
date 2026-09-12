@@ -104,6 +104,18 @@ public class GraphicsBackend : IGraphicsBackend {
 
     public FRect ClipBounds() { return clip; }
 
+    /// `SaveDC` answers a token that puts back the clip *and* the origin
+    /// together, which is exactly the pair this changes -- so there is nothing
+    /// to restore by hand and no way to restore one and forget the other.
+    public int PushLayer(FRect bounds) {
+        int token = SaveDC(dc);
+        IntersectClipRect(dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+        OffsetViewportOrgEx(dc, bounds.X, bounds.Y, null);
+        return token;
+    }
+
+    public void PopLayer(int token) { RestoreDC(dc, token); }
+
     public void Clear(Color colour) {
         Rect whole = ToRect(clip);
         HBRUSH brush = CreateSolidBrush(ToColorRef(colour));

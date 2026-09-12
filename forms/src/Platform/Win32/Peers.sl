@@ -177,6 +177,25 @@ void BindPeer(HWND window, ControlPeer peer) {
 
 void UnbindPeer(HWND window) {
     RemovePropW(window, PeerProperty.ToUtf16().ToPointer());
+    RemovePropW(window, TimerProperty.ToUtf16().ToPointer());
+}
+
+/// The property a timer's window hangs its peer on.
+///
+/// Separate from `PeerProperty` because a timer is not a control: it has no
+/// bounds, no parent and nothing to paint, so it is not a `ControlPeer` and
+/// cannot go in the same slot.
+static readonly String TimerProperty = "StainlessFormsTimer";
+
+void BindTimer(HWND window, TimerPeer timer) {
+    SetPropW(window, TimerProperty.ToUtf16().ToPointer(), (void*)timer);
+}
+
+TimerPeer? TimerOf(HWND window) {
+    if (window == null) { return null; }
+    var raw = GetPropW(window, TimerProperty.ToUtf16().ToPointer());
+    if (raw == null) { return null; }
+    return (TimerPeer)raw;
 }
 
 /// The peer of a window, or null for a window this library did not make --
@@ -199,7 +218,17 @@ ControlPeer? PeerOf(HWND window) {
 /// is answered by the peer's own `Dispatch`.
 long StainlessProc(HWND window, uint message, ulong wParam, long lParam) {
     var peer = PeerOf(window);
-    if (peer == null) { return DefWindowProcW(window, message, wParam, lParam); }
+    if (peer == null) {
+        // A timer's window is of this class too, and has no control behind it.
+        if (message == WmTimer) {
+            var timer = TimerOf(window);
+            if (timer != null) {
+                ((TimerPeer)timer).Fire();
+                return 0;
+            }
+        }
+        return DefWindowProcW(window, message, wParam, lParam);
+    }
     return ((ControlPeer)peer).Dispatch(message, wParam, lParam);
 }
 
@@ -233,6 +262,10 @@ public class ControlPeer : IControlPeer {
     protected bool             tracking;
     protected bool             inside;
     protected bool             destroyed;
+    /// The cursor this control asks for, and which shape it is. Null means the
+    /// class cursor, which is what `Default` leaves in place.
+    protected HCURSOR          pointer;
+    protected CursorKind       shape;
 
     protected ControlPeer(HWND made, IControlNotify owner, bool subclass) {
         window = made;
@@ -246,6 +279,8 @@ public class ControlPeer : IControlPeer {
         tracking = false;
         inside = false;
         destroyed = false;
+        pointer = null;
+        shape = CursorKind.Default;
 
         BindPeer(made, this);
         if (subclass) {
@@ -323,6 +358,16 @@ public class ControlPeer : IControlPeer {
         // left clicking able to place the caret and dragging unable to select
         // anything. Every one of these ends at the procedure this peer
         // displaced, which is what keeps the native behaviour intact.
+        // Windows asks what the pointer should look like on every move, and
+        // takes the answer from the window class unless something says
+        // otherwise. Saying otherwise is the whole of a per-control cursor.
+        if (message == WmSetCursor) {
+            if (pointer != null && (lParam & 0xFFFF) == HtClient) {
+                Win32.User32.SetCursor(pointer);
+                return 1;
+            }
+        }
+
         if (message == WmMouseMove) {
             if (!inside) {
                 inside = true;
@@ -459,6 +504,34 @@ public class ControlPeer : IControlPeer {
         return Inherited(message, wParam, lParam);
     }
 
+    /// Lets the control paint itself, then draws whatever windowless children
+    /// sit on it.
+    ///
+    /// **A graphic child is drawn by its parent or by nobody.** It has no
+    /// window, so no `WM_PAINT` of its own ever arrives; only the control it
+    /// sits on can ask it. A form does that in its own paint handler, and every
+    /// other container has to do the same or its graphic children are simply
+    /// invisible -- which is what a `PaintBox` on a tab page was.
+    ///
+    /// `GetDC` after the inherited paint rather than `BeginPaint` instead of
+    /// it: a `STATIC` and a `BUTTON` draw their own background and frame, and
+    /// taking the paint away from them would cost both.
+    protected long PaintOver(uint message, ulong wParam, long lParam) {
+        long answer = Inherited(message, wParam, lParam);
+
+        var owner = Owner();
+        if (owner == null) { return answer; }
+
+        HDC dc = GetDC(window);
+        if (dc == null) { return answer; }
+        Rect client;
+        GetClientRect(window, &client);
+        var surface = new GraphicsBackend(dc, FromRect(client));
+        ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+        ReleaseDC(window, dc);
+        return answer;
+    }
+
     /// Whether this peer fills its own background.
     ///
     /// True for a window class this library registered, since nothing else
@@ -583,6 +656,31 @@ public class ControlPeer : IControlPeer {
 
     public void Focus()      { SetFocus(window); }
     public bool HasFocus()   { return GetFocus() == window; }
+
+    public void SetCursor(CursorKind wanted) {
+        pointer = CursorFor(wanted);
+        shape = wanted;
+        // Windows asks again on the next move, so there is nothing to redraw.
+    }
+
+    public void SetCapture(bool captured) {
+        if (captured) { Win32.User32.SetCapture(window); }
+        else          { ReleaseCapture(); }
+    }
+
+    /// The system cursor for one of the shapes, loaded from the shared set --
+    /// which is why none of these is ever destroyed.
+    HCURSOR CursorFor(CursorKind wanted) {
+        if (wanted == CursorKind.Hand)           { return LoadCursorW(null, CursorHand()); }
+        if (wanted == CursorKind.Text)           { return LoadCursorW(null, CursorIBeam()); }
+        if (wanted == CursorKind.Wait)           { return LoadCursorW(null, CursorWait()); }
+        if (wanted == CursorKind.Cross)          { return LoadCursorW(null, CursorCross()); }
+        if (wanted == CursorKind.SizeWestEast)   { return LoadCursorW(null, CursorSizeWE()); }
+        if (wanted == CursorKind.SizeNorthSouth) { return LoadCursorW(null, CursorSizeNS()); }
+        if (wanted == CursorKind.SizeAll)        { return LoadCursorW(null, CursorSizeAll()); }
+        if (wanted == CursorKind.No)             { return LoadCursorW(null, CursorNo()); }
+        return LoadCursorW(null, CursorArrow());
+    }
 
     public virtual FRect ClientBounds() {
         Rect r;

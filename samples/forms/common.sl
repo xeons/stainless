@@ -13,6 +13,8 @@ module Common;
 import Standard.Console;
 import Standard.Text;
 import Standard.Collections;
+import Standard.Threading;
+import Standard.Convert;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
@@ -34,6 +36,11 @@ public class CommonForm : Form {
 
     public MenuItem WrapItem;
     public ToolButton BoldButton;
+    public Bevel    Divider;
+    public Shape    Blob;
+    public PaintBox Canvas;
+    public Timer    Clock;
+    public int      Ticks;
 
     public CommonForm() {
         base(WindowBorder.Sizable);
@@ -41,6 +48,8 @@ public class CommonForm : Form {
         SetBounds(0, 0, 820, 560);
 
         icons = new ImageList(16, 16);
+        Ticks = 0;
+        clicks = 0;
 
         BuildMenu();
 
@@ -110,6 +119,25 @@ public class CommonForm : Form {
         readout.SetBounds(16, 104, 360, 20);
         readout.Text = "40%";
 
+        // The windowless half of the control split, which costs a `Control`
+        // object each and no platform window at all.
+        Divider = new Bevel(gaugePage);
+        Divider.SetBounds(16, 132, 360, 2);
+        Divider.Kind = BevelKind.TopLine;
+
+        Blob = new Shape(gaugePage);
+        Blob.SetBounds(16, 146, 60, 60);
+        Blob.Kind = ShapeKind.Circle;
+        Blob.FillColor = Colors.Teal;
+
+        Canvas = new PaintBox(gaugePage);
+        Canvas.SetBounds(90, 146, 286, 60);
+        Canvas.Paint += this.OnDraw;
+        Canvas.MouseDown += this.OnCanvasDown;
+
+        Clock = new Timer(100);
+        Clock.Tick += this.OnTick;
+
         // A context menu, built once and shown where the user asked for it.
         context = new PopupMenu();
         context.Add("Add a row").Click += this.OnAddRow;
@@ -144,6 +172,22 @@ public class CommonForm : Form {
     // ------------------------------------------------------------- handlers
 
     void Say(String what) { status.SetPanelText(0, what); }
+
+    /// Drawn by the parent during its own paint, in the box's own coordinates.
+    void OnDraw(Control sender, PaintEventArgs args) {
+        var surface = args.Graphics;
+        surface.FillRectangle(new Brush(SystemColors.Window), args.ClipRectangle);
+        var pen = new Pen(Colors.Navy, 2, PenStyle.Solid);
+        // From the box's own corner, whatever the form has been resized to.
+        surface.DrawLine(pen, 0, Canvas.Height, Canvas.Width, 0);
+        surface.DrawString("PaintBox", Font, Colors.Maroon, 6, 6);
+    }
+
+    void OnTick(Timer sender) { Ticks = Ticks + 1; }
+
+    void OnCanvasDown(Control sender, MouseEventArgs args) { clicks = clicks + 1; }
+
+    int clicks;
 
     void OnNew(Control sender)       { Say("New."); }
     void OnNew(MenuItem sender)      { Say("New, from the menu."); }
@@ -216,6 +260,12 @@ public class CommonForm : Form {
         Say("Cleared.");
     }
 
+    /// Opens on a given tab, for a screenshot of one that is not the first.
+    public void SelectTab(int which) {
+        if (which < 0 || (nuint)which >= tabs.Pages.Count()) { return; }
+        tabs.SelectedIndex = which;
+    }
+
     // ------------------------------------------------------------ self test
 
     public bool SelfTest() {
@@ -282,6 +332,47 @@ public class CommonForm : Form {
         ok = Check(ok, "a toggle button reads back from Windows", BoldButton.Checked);
         BoldButton.Checked = false;
 
+        // **The windowless controls.** A `GraphicControl` has no platform
+        // window, so nothing about it can be asked of Windows -- which is
+        // exactly why it is worth checking that it exists, is laid out, and
+        // gets the mouse the parent has to hand it.
+        // There is no `Handle` to check: it is declared on `WindowedControl`,
+        // so a graphic control does not have one to be zero -- the split is in
+        // the type rather than in a flag.
+        ok = Check(ok, "a graphic control is laid out",
+                   Canvas.Width == 286 && Canvas.Height == 60);
+        ok = Check(ok, "and is on the page",
+                   Canvas.Parent != null && Canvas.FindForm() != null);
+
+        // The parent hit-tests and forwards, since the pointer never crosses a
+        // window boundary for a control that has no window.
+        int wasClicked = clicks;
+        gaugePage.OnPlatformMouseDown(MouseButton.Left,
+                                      Point.At(Canvas.Left + 5, Canvas.Top + 5),
+                                      ModifierKeys.None);
+        ok = Check(ok, "the parent routes the mouse to a graphic child",
+                   clicks == wasClicked + 1);
+
+        // And a point outside it reaches no graphic child at all.
+        gaugePage.OnPlatformMouseDown(MouseButton.Left, Point.At(2, 2),
+                                      ModifierKeys.None);
+        ok = Check(ok, "and not to one the pointer is not over",
+                   clicks == wasClicked + 1);
+
+        // **The timer needs real time, not just pumping.** `WM_TIMER` is a
+        // low-priority message: Windows generates one only when the queue is
+        // otherwise empty *and* the interval has elapsed, so a tight loop of
+        // eighty pumps finishes in microseconds and sees nothing at all. The
+        // sleep is what makes this a test of the timer rather than of the loop.
+        Clock.Interval = 20;
+        Clock.Start();
+        for (int i = 0; i < 40; i += 1) {
+            Standard.Threading.Sleep(10u);
+            Application.DoEvents();
+        }
+        Clock.Stop();
+        ok = Check(ok, "a timer ticks off the message queue", Ticks > 0);
+
         // And loading a picture that is not there says so, rather than
         // answering a null nobody checks.
         var missing = Bitmap.FromFile("no-such-file.bmp");
@@ -304,6 +395,12 @@ int Main() {
     var arguments = Standard.Env.Arguments();
     for (nuint i = 0u; i < arguments.Length; i += 1u) {
         if (arguments[i] == "--selftest") { testing = true; }
+        // Which tab to open on, so that a screenshot can be taken of one that
+        // is not the first.
+        if (arguments[i] == "--tab" && i + 1u < arguments.Length) {
+            var which = Standard.Convert.ToInt(arguments[i + 1u]);
+            if (which.Ok) { form.SelectTab(which.Value); }
+        }
     }
 
     if (testing) {

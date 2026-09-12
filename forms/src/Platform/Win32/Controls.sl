@@ -455,6 +455,13 @@ public class GroupPeer : ControlPeer, IGroupPeer {
         SetParent((HWND)(void*)child.Handle(), null);
     }
 
+    /// The frame is the `BUTTON`'s to draw and the children are this peer's;
+    /// see `PaintOver`.
+    public override long Dispatch(uint message, ulong wParam, long lParam) {
+        if (message == WmPaint) { return PaintOver(message, wParam, lParam); }
+        return base.Dispatch(message, wParam, lParam);
+    }
+
     /// **A group box has to erase itself, alone among the subclassed ones.**
     ///
     /// `BS_GROUPBOX` paints a frame and a caption and nothing else: its
@@ -507,6 +514,12 @@ public class PanelPeer : ControlPeer, IPanelPeer {
 
     public void RemoveChild(IControlPeer child) {
         SetParent((HWND)(void*)child.Handle(), null);
+    }
+
+    /// A panel is a container, so anything windowless on it is its to draw.
+    public override long Dispatch(uint message, ulong wParam, long lParam) {
+        if (message == WmPaint) { return PaintOver(message, wParam, lParam); }
+        return base.Dispatch(message, wParam, lParam);
     }
 
     public void SetBorder(ControlBorder border) {
