@@ -1461,6 +1461,17 @@ Everything below is covered by [the test suite](tests/cases).
   a bound method pointer is the method's own address beside the object, and
   being two fields is what gives it layout, both ABI classifiers and reference
   counting without any of them being written for it
+- `event`: several subscribers behind one name, in C#'s shape —
+  `source.Changed += listener.OnChanged` and `-=` to take it off again, removal
+  by closure equality so the right one goes. Raising calls every subscriber in
+  the order they subscribed, and **only the declaring type may raise it**: from
+  outside, those two operators are all there is, which is what separates an
+  event from a public field of closure type. Two of C#'s sharp edges are filed
+  off: raising an event nobody has subscribed to does nothing rather than
+  throwing, so no `?.Invoke` anywhere, and a handler must return `void`, since
+  with several subscribers there is no honest answer to what it returned. A
+  raise reads the subscriber list before it starts, so a handler may subscribe
+  or unsubscribe while it runs
 - Lambdas: `value => value * factor` becomes a generated class capturing **by
   value**, so it may outlive the scope that built it. What it is *seen* as is
   decided by what it is assigned to — a `closure`, a single-method interface,

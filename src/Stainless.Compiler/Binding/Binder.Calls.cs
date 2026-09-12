@@ -213,6 +213,36 @@ public sealed partial class Binder
                     return BuildIndirectCall(syntax, BindExpression(callee), arguments);
             }
 
+            // `Fired(value)` where Fired is one of this type's events: raising
+            // it. Only from inside the type that declared it, and only by name
+            // -- `publisher.Fired(...)` is a caller raising somebody else's
+            // event, which is the thing an event exists to prevent.
+            if (callee.Name.Parts.Count == 1 &&
+                _currentFunction?.ContainingType?.FindEvent(callee.Name.Last) is { } raised)
+            {
+                if (raised.ContainingType != _currentFunction.ContainingType)
+                {
+                    diagnostics.Error("SL0554", callee.Span,
+                        $"'{raised.Name}' is declared by '{raised.ContainingType.Name}', and only " +
+                        "the type that declares an event may raise it. A derived class raises " +
+                        "one through a protected method its base provides for that");
+                    return new BoundErrorExpression(syntax.Span);
+                }
+
+                if (raised.Raise is not { } raiser) return new BoundErrorExpression(syntax.Span);
+
+                var self = BindImplicitThis(callee.Span);
+                if (self is null)
+                {
+                    diagnostics.Error("SL0553", callee.Span,
+                        $"'{raised.Name}' is an event and belongs to an instance, so it cannot " +
+                        "be raised from a static method");
+                    return new BoundErrorExpression(syntax.Span);
+                }
+
+                return BuildCall(syntax, raiser, self, arguments);
+            }
+
             diagnostics.Error("SL0252", callee.Span, $"no function named '{callee.Name.Text}' is in scope");
             return new BoundErrorExpression(syntax.Span);
         }
@@ -721,6 +751,18 @@ public sealed partial class Binder
 
             if (TryBindAsFreeFunction(syntax, member, receiver, arguments) is { } chained)
                 return chained;
+
+            // `publisher.Fired(...)` is a caller raising somebody else's event,
+            // which is the one thing having a word for it prevents.
+            if (namedType.FindEvent(member.Member) is { } raised)
+            {
+                diagnostics.Error("SL0554", member.Span,
+                    $"'{namedType.Name}.{member.Member}' is an event, and only " +
+                    $"'{raised.ContainingType.Name}' may raise it -- from inside, by writing " +
+                    $"'{member.Member}(...)'. From out here an event can only be subscribed to " +
+                    "with '+=' and unsubscribed from with '-='");
+                return new BoundErrorExpression(syntax.Span);
+            }
 
             diagnostics.Error("SL0255", member.Span,
                 $"'{namedType.Name}' has no method named '{member.Member}'" +

@@ -1860,8 +1860,83 @@ needs an *object* that implements it — so `ForEach(lines, report.Note)` was
 unwritable, and the library declared `IFunc`, `IPredicate`, `IAction`, `IFold`
 and `IComparer` to stand in for the five shapes it wanted.
 
-`closure` is a **contextual** keyword, as `event` would have been: it means
+`closure` is a **contextual** keyword, as `event` is (§2.14.2): it means
 something at the head of a declaration and is an ordinary name everywhere else.
+
+### 2.14.2 `event` — several subscribers behind one name
+
+```csharp
+public closure void ChangeHandler(Source sender, Change what);
+
+public class Source {
+    public event ChangeHandler Changed;
+
+    public void Announce(int code) { Changed(this, new Change(code)); }
+}
+
+source.Changed += listener.OnChanged;       // subscribe
+source.Changed -= listener.OnChanged;       // unsubscribe
+```
+
+An event is a list of closures that reads like one. Raising it calls every
+subscriber **in the order they subscribed**, each with the arguments the raise
+was written with.
+
+**Only `+=` and `-=` cross the boundary.** From outside the declaring type,
+those two operators are all there is: an event cannot be read (SL0555), assigned
+(SL0556) or raised (SL0554). That is the difference between an event and a
+public field of closure type, and the whole reason the word exists — one
+subscriber must not be able to see the others, replace them all, or fire the
+event on the publisher's behalf.
+
+Inside the declaring type it is raised by writing its name. Only *that* type: a
+derived class raises its base's event through a protected method the base
+provides for it, as in C#.
+
+**An empty event does nothing.** Raising one nobody has subscribed to is a
+no-op, not an error, so a publisher never checks:
+
+```csharp
+public void Announce(int code) { Changed(this, new Change(code)); }   // safe when empty
+```
+
+That is deliberately not C#, where an unsubscribed event is null and raising it
+throws — which is why almost every C# codebase writes `Changed?.Invoke(...)` at
+every raise site.
+
+**A handler must return `void`** (SL0549). Raising calls every subscriber, so
+there is no single value to return; C# keeps the last one's and discards the
+rest. A handler that needs to report something takes an argument to report
+through.
+
+**The type must be a `closure`** (SL0548), not a `delegate`: a subscriber is
+almost always a method on an object, and a delegate is one pointer with nowhere
+to keep the object. A plain function subscribes by way of a lambda, which is
+what gives it one.
+
+**Removal is by value**, on the same terms as closure equality (§2.14.1) — the
+same method *and* the same object. The same handler subscribed twice is two
+subscriptions, and one `-=` undoes one of them. Unsubscribing something that was
+never subscribed does nothing, so a tidy-up may run twice.
+
+**A raise takes the subscriber list before it starts.** Subscribing or
+unsubscribing during a raise does not disturb the raise in progress: exactly the
+subscribers that were there when it began run, none of them twice, and the next
+raise sees the change.
+
+```csharp
+public void Once(Source sender, Change what) {
+    source.Changed -= this.Once;       // safe: this raise still finishes
+}
+```
+
+**Events are not static** (SL0550): the subscribers would outlive every object
+that added one, and nothing would ever take them off.
+
+An event lowers to a hidden array of subscribers and three methods —
+`add_Name`, `remove_Name` and `raise_Name` — the way a property lowers to
+`get_Name` and `set_Name`. The array is replaced rather than changed by each
+subscription, which is what the paragraph above rests on.
 
 ### 2.15 Lambdas and closures
 

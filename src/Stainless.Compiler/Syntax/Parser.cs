@@ -225,6 +225,9 @@ public sealed class Parser
         if (At(TokenKind.Tilde) && enclosingType is not null)
             return [ParseDestructor(start, enclosingType)];
 
+        if (AtEventDeclaration())
+            return [ParseEventDeclaration(start, modifiers, attributes)];
+
         if (modifiers.HasFlag(Modifiers.Static))
             return AtOperatorDeclaration()
                 ? [ParseOperatorDeclaration(start, modifiers)]
@@ -738,6 +741,48 @@ public sealed class Parser
 
         var next = Peek(1).Kind;
         return next == TokenKind.Identifier || PrimitiveKeywords.Contains(next);
+    }
+
+    /// <summary>
+    /// Whether this is <c>event T Name;</c> rather than something that merely
+    /// begins with the word. Contextual on the same terms as <c>closure</c>:
+    /// <c>int event = 3;</c> still declares a field called event, and the price
+    /// is that a *type* called event could not be written here.
+    /// </summary>
+    private bool AtEventDeclaration()
+    {
+        if (!At(TokenKind.Identifier) || Current.Text != "event") return false;
+
+        var next = Peek(1).Kind;
+        return next == TokenKind.Identifier || PrimitiveKeywords.Contains(next);
+    }
+
+    /// <summary>
+    /// <c>public event Notify Fired;</c>
+    ///
+    /// One type and one name. There is no <c>{ add; remove; }</c> form: the two
+    /// methods an event lowers to are always the generated ones, because what
+    /// they do -- copy the list, add or drop one -- is the whole of what an
+    /// event is, and a hand-written pair would only be a way to get it wrong.
+    /// </summary>
+    private Declaration ParseEventDeclaration(
+        int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes)
+    {
+        Advance();
+
+        var type = ParseType();
+        string name = ExpectIdentifier();
+
+        // `= handler` on an event would be an assignment, which is the thing an
+        // event exists to refuse. Said here rather than at the binder, because
+        // the parser is where the reader is still looking at the '='.
+        if (At(TokenKind.Equals))
+            _diagnostics.Error("SL0547", SpanFrom(start),
+                $"'{name}' is an event, so it cannot be given a value: an event is the " +
+                "subscribers it has, and it starts with none. Subscribe with '+='");
+
+        Expect(TokenKind.Semicolon);
+        return new EventDeclSyntax(SpanFrom(start), modifiers, type, name, attributes);
     }
 
     /// <summary>

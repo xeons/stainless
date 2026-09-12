@@ -371,6 +371,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// </summary>
     public List<PropertySymbol> Properties { get; } = [];
 
+    /// <summary>
+    /// Events, whose add and remove methods also appear in <see cref="Methods"/>
+    /// and whose storage appears in <see cref="Fields"/>. This list is what
+    /// makes <c>x.Name +=</c> resolve to a subscription rather than to a field.
+    /// </summary>
+    public List<EventSymbol> Events { get; } = [];
+
 
     /// <summary>
     /// Methods with type parameters of their own. They stay templates until a
@@ -465,6 +472,16 @@ public abstract class NamedTypeSymbol : TypeSymbol
 
     public virtual PropertySymbol? FindProperty(string name) =>
         Properties.FirstOrDefault(p => p.Name == name);
+
+    /// <summary>
+    /// Finds an event on this type or, for a class, on one it derives from.
+    ///
+    /// Inherited because subscribing is not a call: a derived class does not
+    /// redeclare its base's events, and <c>widget.Clicked += ...</c> has to
+    /// reach the one the base declared.
+    /// </summary>
+    public virtual EventSymbol? FindEvent(string name) =>
+        Events.FirstOrDefault(e => e.Name == name);
 
     /// <summary>
     /// Finds a method on this type or, for an interface, on one it extends. The
@@ -996,6 +1013,16 @@ public sealed class ComInterfaceTypeSymbol : NamedTypeSymbol
 
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
+    /// <summary>Also searches base classes, nearest first.</summary>
+    public override EventSymbol? FindEvent(string name)
+    {
+        for (var current = this; current is not null; current = current.BaseClass)
+            if (current.Events.FirstOrDefault(e => e.Name == name) is { } found)
+                return found;
+
+        return null;
+    }
+
     /// <summary>
     /// For a runtime-provided class, the C function that constructs one. When
     /// set, <c>new</c> calls it rather than allocating and running a constructor.

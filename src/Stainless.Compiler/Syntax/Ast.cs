@@ -337,6 +337,23 @@ public sealed record PropertyDeclSyntax(
     public bool IsIndexer => Indices.Count > 0;
 }
 
+/// <summary>
+/// <c>public event Notify Fired;</c> — a list of subscribers that reads like a
+/// closure.
+///
+/// It owns hidden storage the way an automatic property does, and the two
+/// methods that reach it are what <c>+=</c> and <c>-=</c> lower to. What it is
+/// not is a field: from outside the declaring type those two operators are the
+/// only things that can be written, which is the whole reason the word exists
+/// rather than a public field of closure type.
+/// </summary>
+public sealed record EventDeclSyntax(
+    SourceSpan Span,
+    Modifiers Modifiers,
+    TypeSyntax Type,
+    string Name,
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
+
 public sealed record ConstructorDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,

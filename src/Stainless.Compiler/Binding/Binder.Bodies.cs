@@ -64,6 +64,7 @@ public sealed partial class Binder
     private void BindFunctionBody(FunctionSymbol function)
     {
         if (function.IsAutoAccessor) { BindAutoAccessor(function); return; }
+        if (function.Event is not null) { BindEventAccessor(function); return; }
         if (function.Body is null) return;
         if (!_boundFunctions.Add(function)) return;
 
@@ -320,6 +321,245 @@ public sealed partial class Binder
             : new BoundReturn(span, storage);
 
         _functions.Add(new BoundFunction(accessor, new BoundBlock(span, [statement])));
+    }
+
+    /// <summary>
+    /// Supplies the body of <c>add_Name</c> or <c>remove_Name</c>, neither of
+    /// which has syntax to bind.
+    ///
+    /// Both **replace** the array rather than change it, which is the one
+    /// decision in here worth the words. A raise reads the field once and walks
+    /// what it read, so a handler that unsubscribes while the event is being
+    /// raised leaves that walk alone -- it is looking at the old array, which
+    /// still holds exactly the subscribers that were there when the raise
+    /// began. Mutating in place would have that walk skip a handler, or run off
+    /// the end. It is also why the storage is an array and not a list.
+    ///
+    /// Built as bound nodes rather than as synthesised source, for the reason
+    /// <see cref="BindAutoAccessor"/> is: the storage stays unnameable, because
+    /// there is no point at which a name has to resolve to it.
+    /// </summary>
+    private void BindEventAccessor(FunctionSymbol accessor)
+    {
+        if (!_boundFunctions.Add(accessor)) return;
+        if (accessor.Event?.BackingField is not { } field) return;
+
+        if (ReferenceEquals(accessor, accessor.Event.Raise))
+        {
+            BindEventRaiser(accessor, field);
+            return;
+        }
+
+        var span = accessor.Span;
+        var closure = accessor.Event.Type;
+        var array = ArrayOf(closure);
+        var count = PrimitiveTypeSymbol.NUInt;
+
+        var receiver = Receiver(span, accessor.Parameters[0]);
+        var handler = new BoundParameterAccess(span, accessor.Parameters[1]);
+
+        // `this.<name>`, read afresh at each mention: the field is assigned
+        // near the end, and everything before it must see what is there now.
+        BoundExpression Storage() => new BoundFieldAccess(span, receiver, field);
+
+        BoundExpression Number(ulong value) => new BoundLiteral(span, count, value);
+
+        BoundExpression Arithmetic(BoundExpression left, BoundBinaryOp op, BoundExpression right) =>
+            new BoundBinary(span, count, left, op, right);
+
+        BoundExpression Compare(BoundExpression left, BoundBinaryOp op, BoundExpression right) =>
+            new BoundBinary(span, PrimitiveTypeSymbol.Bool, left, op, right);
+
+        var statements = new List<BoundStatement>();
+        var locals = new List<LocalSymbol>();
+
+        LocalSymbol Declare(string name, TypeSymbol type, BoundExpression initial)
+        {
+            var local = new LocalSymbol(name, type, isConst: false);
+            locals.Add(local);
+            statements.Add(new BoundLocalDeclaration(span, local, initial));
+            return local;
+        }
+
+        // A counted loop over the old array: `for (nuint i = 0; i < n; i++)`.
+        BoundStatement Walk(LocalSymbol limit, Func<LocalSymbol, BoundStatement> body)
+        {
+            var index = new LocalSymbol("i", count, isConst: false);
+            var declaration = new BoundLocalDeclaration(span, index, Number(0));
+
+            var loop = new BoundFor(
+                span,
+                declaration,
+                Compare(new BoundLocalAccess(span, index), BoundBinaryOp.Less,
+                    new BoundLocalAccess(span, limit)),
+                new BoundIncrement(span, new BoundLocalAccess(span, index),
+                    isPrefix: false, isIncrement: true),
+                body(index));
+
+            var block = new BoundBlock(span, [loop]);
+            block.Locals.Add(index);
+            return block;
+        }
+
+        BoundExpression At(LocalSymbol source, LocalSymbol index) =>
+            new BoundIndex(span, closure, new BoundLocalAccess(span, source),
+                new BoundLocalAccess(span, index));
+
+        var was = Declare("was", array, Storage());
+        var length = Declare("length", count, new BoundArrayLength(span, count,
+            new BoundLocalAccess(span, was)));
+
+        if (accessor.IsEventAdd)
+        {
+            // One longer, everything copied across, the new one last. Appending
+            // rather than prepending is what makes subscribers run in the order
+            // they subscribed, which is the order anyone reading the code
+            // expects and the only one worth promising.
+            var grown = Declare("grown", array, new BoundNewArray(span, array,
+                Arithmetic(new BoundLocalAccess(span, length), BoundBinaryOp.Add, Number(1))));
+
+            statements.Add(Walk(length, i => new BoundExpressionStatement(span,
+                new BoundAssignment(span, At(grown, i), At(was, i)))));
+
+            statements.Add(new BoundExpressionStatement(span, new BoundAssignment(
+                span,
+                new BoundIndex(span, closure, new BoundLocalAccess(span, grown),
+                    new BoundLocalAccess(span, length)),
+                handler)));
+
+            statements.Add(new BoundExpressionStatement(span,
+                new BoundAssignment(span, Storage(), new BoundLocalAccess(span, grown))));
+
+            Finish();
+            return;
+        }
+
+        // Removing. The first equal subscriber goes and the rest stay, which
+        // matters because the same handler may be subscribed twice: `-=` undoes
+        // one `+=`, not every one of them.
+        //
+        // Found by walking the whole array rather than stopping, so this needs
+        // no break and no early return -- `found == length` means "not there",
+        // and the first match wins because later ones see it already set.
+        var found = Declare("found", count, new BoundLocalAccess(span, length));
+
+        statements.Add(Walk(length, i => new BoundIf(
+            span,
+            new BoundBinary(
+                span, PrimitiveTypeSymbol.Bool,
+                Compare(new BoundLocalAccess(span, found), BoundBinaryOp.Equal,
+                    new BoundLocalAccess(span, length)),
+                BoundBinaryOp.LogicalAnd,
+                new BoundClosureEqual(span, closure, At(was, i), handler, negated: false)),
+            new BoundExpressionStatement(span, new BoundAssignment(
+                span, new BoundLocalAccess(span, found), new BoundLocalAccess(span, i))),
+            null)));
+
+        // Nothing to do, and nothing said: unsubscribing something that was
+        // never subscribed is how a tidy-up runs twice, not a mistake.
+        var shrunk = new LocalSymbol("shrunk", array, isConst: false);
+
+        var removal = new BoundBlock(span, [
+            new BoundLocalDeclaration(span, shrunk, new BoundNewArray(span, array,
+                Arithmetic(new BoundLocalAccess(span, length), BoundBinaryOp.Subtract, Number(1)))),
+
+            Walk(length, i => new BoundIf(
+                span,
+                Compare(new BoundLocalAccess(span, i), BoundBinaryOp.NotEqual,
+                    new BoundLocalAccess(span, found)),
+                new BoundExpressionStatement(span, new BoundAssignment(
+                    span,
+                    new BoundIndex(span, closure, new BoundLocalAccess(span, shrunk),
+                        // Everything after the one that went shifts down by one.
+                        new BoundConditional(
+                            span, count,
+                            Compare(new BoundLocalAccess(span, i), BoundBinaryOp.Less,
+                                new BoundLocalAccess(span, found)),
+                            new BoundLocalAccess(span, i),
+                            Arithmetic(new BoundLocalAccess(span, i), BoundBinaryOp.Subtract,
+                                Number(1)))),
+                    At(was, i))),
+                null)),
+
+            new BoundExpressionStatement(span,
+                new BoundAssignment(span, Storage(), new BoundLocalAccess(span, shrunk))),
+        ]);
+
+        removal.Locals.Add(shrunk);
+
+        statements.Add(new BoundIf(
+            span,
+            Compare(new BoundLocalAccess(span, found), BoundBinaryOp.Less,
+                new BoundLocalAccess(span, length)),
+            removal,
+            null));
+
+        Finish();
+
+        void Finish()
+        {
+            var block = new BoundBlock(span, statements);
+            block.Locals.AddRange(locals);
+            _functions.Add(new BoundFunction(accessor, block));
+        }
+    }
+
+    /// <summary>
+    /// Supplies the body of <c>raise_Name</c>: every subscriber, in the order
+    /// they subscribed, each given the arguments the raise was written with.
+    ///
+    /// The array is read once, into a local, and that local is what the loop
+    /// walks. Everything about raising being safe rests on that one line: a
+    /// handler may subscribe or unsubscribe while it runs, and both replace the
+    /// field with a different array, which this loop is no longer looking at.
+    /// So the subscribers that were there when the raise began are exactly the
+    /// ones that run -- no more, no fewer, and none of them twice.
+    /// </summary>
+    private void BindEventRaiser(FunctionSymbol raiser, FieldSymbol field)
+    {
+        var span = raiser.Span;
+        var closure = raiser.Event!.Type;
+        var array = ArrayOf(closure);
+        var count = PrimitiveTypeSymbol.NUInt;
+
+        var receiver = Receiver(span, raiser.Parameters[0]);
+
+        var was = new LocalSymbol("was", array, isConst: false);
+        var index = new LocalSymbol("i", count, isConst: false);
+
+        var arguments = raiser.Parameters
+            .Where(p => !p.IsThis)
+            .Select(BoundExpression (p) => new BoundParameterAccess(span, p))
+            .ToList();
+
+        var call = new BoundClosureCall(
+            span, closure,
+            new BoundIndex(span, closure,
+                new BoundLocalAccess(span, was), new BoundLocalAccess(span, index)),
+            arguments);
+
+        var loop = new BoundFor(
+            span,
+            new BoundLocalDeclaration(span, index, new BoundLiteral(span, count, 0UL)),
+            new BoundBinary(
+                span, PrimitiveTypeSymbol.Bool,
+                new BoundLocalAccess(span, index), BoundBinaryOp.Less,
+                new BoundArrayLength(span, count, new BoundLocalAccess(span, was))),
+            new BoundIncrement(span, new BoundLocalAccess(span, index),
+                isPrefix: false, isIncrement: true),
+            new BoundExpressionStatement(span, call));
+
+        var inner = new BoundBlock(span, [loop]);
+        inner.Locals.Add(index);
+
+        var block = new BoundBlock(span, [
+            new BoundLocalDeclaration(span, was, new BoundFieldAccess(span, receiver, field)),
+            inner,
+        ]);
+
+        block.Locals.Add(was);
+
+        _functions.Add(new BoundFunction(raiser, block));
     }
 
     // ============================================================ variants

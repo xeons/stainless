@@ -1,0 +1,12 @@
+a s 2
+b s 2
+b s 3
+b s 4
+b s 4
+b s 5
+b s 6
+b s 7
+lambda 7
+once 8
+c t 8
+c t 9

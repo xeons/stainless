@@ -1625,8 +1625,117 @@ public sealed partial class Binder
         return true;
     }
 
+    /// <summary>
+    /// Every name declared as an event, anywhere in the program.
+    ///
+    /// A cheap "could this possibly be one" for <see cref="BindSubscription"/>,
+    /// which has to ask before it binds the receiver: binding it is what turns
+    /// `Registry.Label = x` -- a static reached through its type -- into a
+    /// complaint about an undefined name.
+    /// </summary>
+    private readonly HashSet<string> _eventNames = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// <c>publisher.Fired += handler</c> and its opposite.
+    ///
+    /// Intercepted before the target is bound as a read, because reading an
+    /// event is not a thing that can be done: from outside the declaring type
+    /// these two operators are all there is, and there is no value called
+    /// <c>publisher.Fired</c> for them to be an arithmetic on. That is the
+    /// difference between an event and a public field of closure type, and the
+    /// whole reason the word exists.
+    ///
+    /// Returns null when the target is not an event, which is every other
+    /// <c>+=</c> in the language.
+    /// </summary>
+    private BoundExpression? BindSubscription(AssignmentSyntax syntax)
+    {
+        BoundExpression? receiver;
+        EventSymbol? subscribed;
+        var span = syntax.Target.Span;
+
+        switch (syntax.Target)
+        {
+            // `Fired += h` inside the declaring type.
+            case NameSyntax { Name.Parts.Count: 1 } bare
+                when _currentFunction?.ContainingType?.FindEvent(bare.Name.Last) is { } own:
+                subscribed = own;
+                receiver = BindImplicitThis(span);
+                break;
+
+            case MemberAccessSyntax member:
+            {
+                // Nothing anywhere declares an event of this name, so this is
+                // one of the ordinary compound assignments. Asked before the
+                // receiver is bound, because binding it is what reports
+                // `Registry.Label = ...` -- a static on a type -- as an
+                // undefined name.
+                if (!_eventNames.Contains(member.Member)) return null;
+
+                // Bound quietly: a receiver that does not bind is not this
+                // code's business to complain about. Its type comes back as an
+                // error, no event is found, and the ordinary path binds it
+                // again and says whatever there is to say.
+                BoundExpression target;
+                using (diagnostics.Muted()) target = BindExpression(member.Target);
+
+                if (target.Type is not NamedTypeSymbol named) return null;
+                if (named.FindEvent(member.Member) is not { } found) return null;
+
+                subscribed = found;
+                receiver = target;
+                break;
+            }
+
+            default:
+                return null;
+        }
+
+        // Every other assignment operator, `=` above all. Replacing the list
+        // wholesale is what a public field of closure type would have allowed
+        // and an event does not: one subscriber cannot be allowed to throw away
+        // everybody else's.
+        if (syntax.Operator is not (TokenKind.PlusEquals or TokenKind.MinusEquals))
+        {
+            diagnostics.Error("SL0556", span,
+                $"'{subscribed.ContainingType.Name}.{subscribed.Name}' is an event, so it takes " +
+                $"'+=' and '-=' and nothing else. '{syntax.Operator.FixedText()}' would " +
+                "replace the whole list of subscribers, which is not one subscriber's to do");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (receiver is null)
+        {
+            diagnostics.Error("SL0553", span,
+                $"'{subscribed.Name}' is an event and belongs to an instance, so it cannot be " +
+                "reached from a static method");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (!CanReach(subscribed.IsPublic, subscribed.IsProtected, subscribed.ContainingType))
+        {
+            diagnostics.Error("SL0249", span,
+                NotVisible(subscribed.ContainingType, subscribed.Name, subscribed.IsProtected));
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        bool adding = syntax.Operator == TokenKind.PlusEquals;
+        var accessor = adding ? subscribed.Add : subscribed.Remove;
+        if (accessor is null) return new BoundErrorExpression(syntax.Span);
+
+        // The handler is converted to the event's closure type, which is what
+        // lets `sub.OnFired` be written bare: a method group has no type of its
+        // own, and the event is the context that gives it one.
+        var handler = BindConversion(BindExpression(syntax.Value), subscribed.Type, syntax.Value.Span);
+        if (handler.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        return new BoundCall(syntax.Span, accessor, receiver, [handler]);
+    }
+
     private BoundExpression BindAssignment(AssignmentSyntax syntax)
     {
+        if (BindSubscription(syntax) is { } subscription) return subscription;
+
         // A narrowed optional is still an optional when it is written to: the
         // check established what it held, not what it may be given next.
         var target = Widened(BindExpression(syntax.Target));

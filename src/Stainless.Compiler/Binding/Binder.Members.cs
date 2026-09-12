@@ -562,6 +562,10 @@ public sealed partial class Binder
                     DeclareProperty(scope, type, property);
                     break;
 
+                case EventDeclSyntax declared:
+                    DeclareEvent(scope, type, declared);
+                    break;
+
                 // Only pass 2 declares aliases, and it looks at the top level.
                 // Taking one here and dropping it is the shape of bug this
                 // language keeps finding in itself, so it is refused instead.
@@ -653,6 +657,180 @@ public sealed partial class Binder
     /// fails at a call site far from the declaration that forgot it. C#
     /// arrived at the same rule for the same reason.
     /// </summary>
+    /// <summary>
+    /// Declares an event: hidden storage, and the two methods that reach it.
+    ///
+    /// The shape is an automatic property's, and so is most of the code. What
+    /// differs is what the methods are *for*: a property's accessors are its
+    /// meaning, where an event's exist so that nothing else can touch the list.
+    /// </summary>
+    private void DeclareEvent(FileScope scope, NamedTypeSymbol type, EventDeclSyntax declaration)
+    {
+        var declared = ResolveType(declaration.Type, scope);
+
+        // A closure and not a delegate, because a subscriber is nearly always a
+        // method on some object -- `button.OnClick` -- and a delegate has
+        // nowhere to keep the object. A plain function still subscribes, by way
+        // of a lambda, which is the same answer the rest of the language gives.
+        if (declared is not ClosureTypeSymbol closure)
+        {
+            if (!declared.IsError())
+                diagnostics.Error("SL0548", declaration.Span,
+                    $"'{type.Name}.{declaration.Name}' is an event of type " +
+                    $"'{declared.Name}', and an event is a list of closures: its type has to be " +
+                    "a 'closure', which is a method and the object it belongs to. A 'delegate' " +
+                    "is one pointer and has no object, so a subscriber could not be " +
+                    "'listener.OnChanged'");
+            return;
+        }
+
+        // Raising calls every subscriber, so there is no one value to hand back.
+        // C# keeps the last one's and discards the rest, which is a wart rather
+        // than a feature.
+        if (!closure.ReturnType.IsVoid())
+        {
+            diagnostics.Error("SL0549", declaration.Span,
+                $"'{type.Name}.{declaration.Name}' is an event whose handlers return " +
+                $"'{closure.ReturnType.Name}', and raising one calls every subscriber -- so " +
+                "there is no single value for it to return. Declare the closure 'void', and " +
+                "let a handler report through an argument it is given");
+            return;
+        }
+
+        if (declaration.Modifiers.HasFlag(Modifiers.Static))
+        {
+            diagnostics.Error("SL0550", declaration.Span,
+                $"'{type.Name}.{declaration.Name}' is a static event, which is not supported: " +
+                "its subscribers would outlive every object that added one, and nothing would " +
+                "ever take them off");
+            return;
+        }
+
+        // An event on an interface needs no case of its own: an event is storage
+        // as well as a pair of methods, and SL0300 already refuses every member
+        // of a type that has no state.
+
+        // Named after the event, and hidden from lookup exactly as a property's
+        // storage is, so nothing can reach past the two methods.
+        var backing = new FieldSymbol(declaration.Name, ArrayOf(closure), type, type.Fields.Count)
+        {
+            IsBackingField = true,
+        };
+
+        type.Fields.Add(backing);
+
+        var symbol = new EventSymbol
+        {
+            Name = declaration.Name,
+            Type = closure,
+            ContainingType = type,
+            Span = declaration.Span,
+            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
+            BackingField = backing,
+        };
+
+        symbol.Add = DeclareEventAccessor(scope, type, symbol, adding: true);
+        symbol.Remove = DeclareEventAccessor(scope, type, symbol, adding: false);
+        symbol.Raise = DeclareEventRaiser(scope, type, symbol);
+
+        type.Events.Add(symbol);
+        _eventNames.Add(symbol.Name);
+    }
+
+    /// <summary>
+    /// One of an event's two methods: <c>add_Name</c> or <c>remove_Name</c>,
+    /// each taking one subscriber and returning nothing.
+    ///
+    /// They are ordinary methods with ordinary mangled names, the way a
+    /// property's accessors are, so an event crosses a library boundary as two
+    /// symbols and a field rather than as anything new.
+    /// </summary>
+    private FunctionSymbol? DeclareEventAccessor(
+        FileScope scope, NamedTypeSymbol type, EventSymbol symbol, bool adding)
+    {
+        string name = (adding ? "add_" : "remove_") + symbol.Name;
+
+        if (type.Methods.Any(m => m.Name == name && m.Accepts([symbol.Type])))
+        {
+            diagnostics.Error("SL0552", symbol.Span,
+                $"'{type.Name}' already declares a method named '{name}' taking one " +
+                $"'{symbol.Type.Name}', which is what the event '{symbol.Name}' has to use");
+            return null;
+        }
+
+        var accessor = new FunctionSymbol
+        {
+            Name = name,
+            ModuleName = type.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            ContainingType = type,
+            Span = symbol.Span,
+            IsPublic = symbol.IsPublic,
+            IsProtected = symbol.IsProtected,
+            IsEventAdd = adding,
+        };
+
+        accessor.Event = symbol;
+        accessor.Parameters.Add(new ParameterSymbol("this", type, 0) { IsThis = true });
+        accessor.Parameters.Add(new ParameterSymbol("handler", symbol.Type, 1));
+
+        type.Methods.Add(accessor);
+        scope.Module.Functions.Add(accessor);
+        return accessor;
+    }
+
+    /// <summary>
+    /// The method a raise lowers to: the event's own parameters, and a loop
+    /// over its subscribers.
+    ///
+    /// Never public, whatever the event is. Who may *raise* an event and who
+    /// may subscribe to one are different questions, and the answer to the
+    /// first is only ever the type that declared it -- a publisher whose
+    /// callers could raise its events on its behalf is not publishing anything.
+    /// </summary>
+    private FunctionSymbol? DeclareEventRaiser(
+        FileScope scope, NamedTypeSymbol type, EventSymbol symbol)
+    {
+        string name = "raise_" + symbol.Name;
+
+        var parameters = symbol.Type.Signature.Select(p => p.Type).ToList();
+
+        if (type.Methods.Any(m => m.Name == name && m.Accepts(parameters)))
+        {
+            diagnostics.Error("SL0552", symbol.Span,
+                $"'{type.Name}' already declares a method named '{name}' taking these " +
+                $"parameters, which is what raising the event '{symbol.Name}' has to use");
+            return null;
+        }
+
+        var raiser = new FunctionSymbol
+        {
+            Name = name,
+            ModuleName = type.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            ContainingType = type,
+            Span = symbol.Span,
+            IsPublic = false,
+        };
+
+        raiser.Event = symbol;
+        raiser.Parameters.Add(new ParameterSymbol("this", type, 0) { IsThis = true });
+
+        int index = 1;
+        foreach (var parameter in symbol.Type.Signature)
+            raiser.Parameters.Add(new ParameterSymbol(parameter.Name, parameter.Type, index++)
+            {
+                Mode = parameter.Mode,
+            });
+
+        type.Methods.Add(raiser);
+        scope.Module.Functions.Add(raiser);
+        return raiser;
+    }
+
     /// <summary>
     /// Names a member that would need an instance, or null when it would not.
     /// A destructor is included because it runs when one is destroyed, and a

@@ -391,6 +391,18 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // An event is a member, and one that deliberately cannot be read. Saying
+        // it is not there would send the reader looking for a spelling mistake.
+        if (namedType.FindEvent(syntax.Member) is { } subscribed)
+        {
+            diagnostics.Error("SL0555", syntax.Span,
+                $"'{namedType.Name}.{syntax.Member}' is an event, and an event has no value to " +
+                "read: what it holds is a list of subscribers, and only " +
+                $"'{subscribed.ContainingType.Name}' can see it. Subscribe with '+=' and " +
+                "unsubscribe with '-='");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
         diagnostics.Error("SL0247", syntax.Span,
             $"'{namedType.Name}' has no member named '{syntax.Member}'");
         return new BoundErrorExpression(syntax.Span);

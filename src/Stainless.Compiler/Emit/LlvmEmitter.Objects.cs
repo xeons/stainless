@@ -45,6 +45,7 @@ public sealed partial class LlvmEmitter
             $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
 
         InitializeTearOffs(instance, classType);
+        InitializeEvents(instance, classType);
 
         if (expression.Constructor is not null)
         {
@@ -56,6 +57,37 @@ public sealed partial class LlvmEmitter
         // sl_alloc already returns +1; the statement scope releases it.
         TrackTemporary(instance, classType);
         return new Val(instance, "ptr", classType);
+    }
+
+    /// <summary>
+    /// Gives every event in a freshly allocated object an empty subscriber list.
+    ///
+    /// An array is a value and never null (SL0271), so the zeroed storage
+    /// <c>sl_alloc</c> hands back is not yet one -- and an event is read before
+    /// anything has subscribed, by the first <c>+=</c> as much as by a raise.
+    /// The empty array is what makes "no subscribers" an ordinary case with no
+    /// test anywhere rather than a state every use has to know about.
+    ///
+    /// Here rather than in a constructor because a class need not declare one:
+    /// <c>new Publisher()</c> on a class with no constructor runs nothing, and
+    /// this has to happen on every path that makes an object. Base classes
+    /// included, for the same reason -- the base's constructor may not exist
+    /// either, and the fields are in this object.
+    /// </summary>
+    private void InitializeEvents(string instance, ClassTypeSymbol classType)
+    {
+        for (var current = classType; current is not null; current = current.BaseClass)
+            foreach (var declared in current.Events)
+            {
+                if (declared.BackingField is not { } field) continue;
+                if (field.Type is not ArrayTypeSymbol arrayType) continue;
+
+                string empty = Emit("ptr",
+                    $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
+                    $"i64 0, i64 {arrayType.Element.Size})");
+
+                Line($"store ptr {empty}, ptr {ClassFieldAddress(instance, field)}");
+            }
     }
 
     /// <summary>

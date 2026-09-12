@@ -185,6 +185,12 @@ public sealed class FunctionSymbol
     /// <summary>The property this is the getter or setter of, or null.</summary>
     public PropertySymbol? Accessor { get; set; }
 
+    /// <summary>The event this subscribes to or unsubscribes from, or null.</summary>
+    public EventSymbol? Event { get; set; }
+
+    /// <summary>Which of the two it is. Meaningless unless <see cref="Event"/> is set.</summary>
+    public bool IsEventAdd { get; init; }
+
     /// <summary>
     /// True when the body is the compiler's rather than the programmer's: the
     /// <c>get;</c> and <c>set;</c> of an automatic property, which read and
@@ -225,7 +231,7 @@ public sealed class FunctionSymbol
     public string MangledName =>
         _mangledName ??= ForeignName ?? RuntimeSymbol ?? Mangler.Mangle(this);
 
-    public bool HasBody => Body is not null || IsAutoAccessor;
+    public bool HasBody => Body is not null || IsAutoAccessor || Event is not null;
 
     public override string ToString() =>
         $"{ReturnType.Name} {(ContainingType is null ? "" : ContainingType.Name + ".")}{Name}" +
@@ -267,6 +273,55 @@ public sealed class PropertySymbol
 
     /// <summary>True when the compiler supplies both the storage and the accessors.</summary>
     public bool IsAuto => BackingField is not null;
+
+    public override string ToString() => $"{ContainingType.Name}.{Name}";
+}
+
+/// <summary>
+/// An event: a list of subscribers that reads like a closure.
+///
+/// It is a near-twin of an automatic property — hidden storage plus two
+/// generated methods — and differs in the one way that matters: a property's
+/// accessors *are* its meaning, where an event's exist to keep everything else
+/// away from the storage. Outside the declaring type, <c>+=</c> and <c>-=</c>
+/// are the only things that can be written.
+///
+/// The storage is an array rather than a list, and <see cref="Add"/> and
+/// <see cref="Remove"/> replace it rather than mutate it. That is what makes
+/// raising safe against a handler that unsubscribes while it runs: the raise
+/// took the array once, and what it is walking is no longer what the event
+/// holds.
+/// </summary>
+public sealed class EventSymbol
+{
+    public required string Name { get; init; }
+
+    /// <summary>The closure type a subscriber must be.</summary>
+    public required ClosureTypeSymbol Type { get; init; }
+
+    public required NamedTypeSymbol ContainingType { get; init; }
+    public required Source.SourceSpan Span { get; init; }
+
+    public bool IsPublic { get; init; }
+    public bool IsProtected { get; init; }
+    public bool IsStatic { get; init; }
+
+    /// <summary>The generated <c>T[]</c> holding the subscribers, in order.</summary>
+    public FieldSymbol? BackingField { get; set; }
+
+    public FunctionSymbol? Add { get; set; }
+    public FunctionSymbol? Remove { get; set; }
+
+    /// <summary>
+    /// The method a raise lowers to, holding the loop over the subscribers.
+    ///
+    /// A method rather than a loop inlined at each site, so that "what raising
+    /// means" is written once -- including the part that matters, which is that
+    /// it reads the array before it starts and walks what it read.
+    /// </summary>
+    public FunctionSymbol? Raise { get; set; }
+
+    public List<AppliedAttribute> Attributes { get; } = [];
 
     public override string ToString() => $"{ContainingType.Name}.{Name}";
 }
