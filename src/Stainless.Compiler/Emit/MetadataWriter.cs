@@ -117,6 +117,22 @@ public static class MetadataWriter
                     types.Add(Describe(union) with { Kind = MetadataKind.Union });
                     break;
 
+                // Before the struct case, which a closure would otherwise
+                // match: it *is* a struct, of two fields the compiler owns, and
+                // describing it as one would hand a consumer two fields it
+                // cannot name and no way to call the thing.
+                case ClosureTypeSymbol closureType:
+                    types.Add(Describe(
+                        closureType, MetadataKind.Closure,
+                        closureType.ReturnType, closureType.Signature));
+                    break;
+
+                case DelegateTypeSymbol delegateType:
+                    types.Add(Describe(
+                        delegateType, MetadataKind.Delegate,
+                        delegateType.ReturnType, delegateType.Signature));
+                    break;
+
                 case StructTypeSymbol structType:
                     types.Add(Describe(structType));
                     break;
@@ -354,6 +370,49 @@ public static class MetadataWriter
             .Concat(type.Destructor is null ? [] : new[] { type.Destructor })
             .Where(m => m.IsPublic || m.IsProtected || m.Kind == FunctionKind.Destructor)
             .Select(Describe)
+            .ToList(),
+
+        // The add and remove methods are already among the methods above and
+        // the storage is already among the fields; this says which of them go
+        // together, and that the name is one nothing else may be done to.
+        Events = type.Events
+            .Where(e => e.IsPublic || e.IsProtected)
+            .Select(e => new MetadataEvent
+            {
+                Name = e.Name,
+                Type = MetadataTypeNames.Write(e.Type),
+                IsPublic = e.IsPublic,
+                IsProtected = e.IsProtected,
+            })
+            .ToList(),
+    };
+
+    /// <summary>
+    /// A closure or a delegate: a signature, and the size it travels as.
+    ///
+    /// No fields, deliberately. A delegate has none, and a closure's two are
+    /// the compiler's -- <c>$function</c> and <c>$receiver</c>, the second
+    /// typed with an internal class that has no name a consumer could resolve.
+    /// The other side rebuilds both the way this side built them, which is also
+    /// what keeps the two in step if the representation ever changes.
+    /// </summary>
+    private static MetadataType Describe(
+        NamedTypeSymbol type, MetadataKind kind, TypeSymbol returns,
+        IReadOnlyList<ParameterSymbol> signature) => new()
+    {
+        Kind = kind,
+        Module = type.ModuleName,
+        Name = type.SimpleName,
+        Size = type.Size,
+        Alignment = type.Alignment,
+        Returns = MetadataTypeNames.Write(returns),
+        Signature = signature
+            .Select(p => new MetadataParameter
+            {
+                Name = p.Name,
+                Type = MetadataTypeNames.Write(p.Type),
+                Mode = p.Mode,
+            })
             .ToList(),
     };
 

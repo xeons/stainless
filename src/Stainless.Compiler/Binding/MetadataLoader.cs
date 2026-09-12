@@ -29,7 +29,7 @@ namespace Stainless.Binding;
 /// nothing here is ever emitted as a definition. The library already has the
 /// code; this compilation only needs to know how to call it.
 /// </summary>
-public sealed class MetadataLoader(DiagnosticBag diagnostics)
+public sealed class MetadataLoader(DiagnosticBag diagnostics, Builtins builtins)
 {
     private static readonly SourceText Referenced = new("<referenced>", "");
     private static readonly SourceSpan ReferencedSpan = new(Referenced, 0, 0);
@@ -95,6 +95,16 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
 
             NamedTypeSymbol symbol = described.Kind switch
             {
+                // A closure's two fields are the compiler's, so they are built
+                // here rather than read: the metadata carries the signature,
+                // and the representation is this compilation's business on both
+                // sides of the boundary.
+                MetadataKind.Closure => NewClosure(described),
+                MetadataKind.Delegate => new DelegateTypeSymbol
+                {
+                    SimpleName = name, ModuleName = described.Module, IsPublic = true,
+                },
+
                 MetadataKind.Class => new ClassTypeSymbol
                 {
                     SimpleName = name, ModuleName = described.Module, IsPublic = true,
@@ -137,7 +147,17 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
         foreach (var (alias, target) in aliases)
             alias.Target = Resolve(target) ?? ErrorTypeSymbol.Instance;
 
+        // Signatures before members, because a member may be typed with a
+        // closure and a closure may be typed with anything.
+        foreach (var (described, symbol) in pending)
+            if (described.Kind is MetadataKind.Closure or MetadataKind.Delegate)
+                FillSignature(described, symbol);
+
         foreach (var (described, symbol) in pending) FillMembers(described, symbol, modules);
+
+        // Events after members: an event is its storage and its two methods,
+        // and it is put back together out of them.
+        foreach (var (described, symbol) in pending) LoadEvents(described, symbol);
 
         // Last, because a slot may be filled by a method this class inherited
         // rather than declared, so the whole chain has to have its members
@@ -223,6 +243,145 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics)
             IsExternal = true,
             Span = ReferencedSpan,
         };
+
+    /// <summary>
+    /// Rebuilds a closure type: two fields and a layout, exactly as the binder
+    /// builds one from a declaration.
+    ///
+    /// The signature is filled in later, with everything else that names a
+    /// type, because a closure may take a type described after it.
+    /// </summary>
+    private ClosureTypeSymbol NewClosure(MetadataType described)
+    {
+        var closure = new ClosureTypeSymbol
+        {
+            SimpleName = described.Name,
+            ModuleName = described.Module,
+            IsPublic = true,
+            Span = ReferencedSpan,
+        };
+
+        closure.Function = new FieldSymbol(
+            ClosureTypeSymbol.FunctionFieldName,
+            new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), closure, 0);
+
+        closure.Receiver = new FieldSymbol(
+            ClosureTypeSymbol.ReceiverFieldName, builtins.Bound, closure, 1);
+
+        closure.Fields.Add(closure.Function);
+        closure.Fields.Add(closure.Receiver);
+
+        closure.Function.Offset = 0;
+        closure.Receiver.Offset = 8;
+        closure.SetLayout(16, 8);
+
+        return closure;
+    }
+
+    /// <summary>
+    /// Fills in a closure's or a delegate's signature, once every type it may
+    /// name exists.
+    /// </summary>
+    private void FillSignature(MetadataType described, NamedTypeSymbol symbol)
+    {
+        var returns = described.Returns is null ? null : Resolve(described.Returns);
+
+        if (returns is null)
+        {
+            diagnostics.Error("SL0418", ReferencedSpan,
+                $"'{symbol.QualifiedName}' returns '{described.Returns}', which this program " +
+                "does not know");
+            returns = ErrorTypeSymbol.Instance;
+        }
+
+        var signature = new List<ParameterSymbol>();
+
+        for (int i = 0; i < described.Signature.Count; i++)
+        {
+            var parameter = described.Signature[i];
+            var parameterType = Resolve(parameter.Type);
+
+            if (parameterType is null)
+            {
+                diagnostics.Error("SL0418", ReferencedSpan,
+                    $"'{symbol.QualifiedName}' takes a '{parameter.Type}', which this program " +
+                    "does not know");
+                parameterType = ErrorTypeSymbol.Instance;
+            }
+
+            signature.Add(new ParameterSymbol(parameter.Name, parameterType, i)
+            {
+                Mode = parameter.Mode,
+            });
+        }
+
+        if (symbol is ClosureTypeSymbol closure)
+        {
+            closure.ReturnType = returns;
+            closure.Signature.AddRange(signature);
+            return;
+        }
+
+        var asDelegate = (DelegateTypeSymbol)symbol;
+        asDelegate.ReturnType = returns;
+        asDelegate.Signature.AddRange(signature);
+    }
+
+    /// <summary>
+    /// Reconnects an event to the storage and the two methods it was written
+    /// as, both of which crossed as ordinary members of the type.
+    ///
+    /// Looked up by name because that is what the writer guarantees: the
+    /// storage is named after the event and the methods are <c>add_</c> and
+    /// <c>remove_</c> in front of it, which is the same rule that keeps them
+    /// apart from a hand-written method of the same name (SL0552).
+    /// </summary>
+    private void LoadEvents(MetadataType described, NamedTypeSymbol symbol)
+    {
+        foreach (var described_ in described.Events)
+        {
+            if (Resolve(described_.Type) is not ClosureTypeSymbol closure)
+            {
+                diagnostics.Error("SL0418", ReferencedSpan,
+                    $"the event '{symbol.QualifiedName}.{described_.Name}' is of type " +
+                    $"'{described_.Type}', which this program does not know as a closure");
+                continue;
+            }
+
+            var backing = symbol.Fields.FirstOrDefault(
+                f => f.IsBackingField && f.Name == described_.Name);
+
+            var add = symbol.Methods.FirstOrDefault(m => m.Name == "add_" + described_.Name);
+            var remove = symbol.Methods.FirstOrDefault(m => m.Name == "remove_" + described_.Name);
+
+            if (backing is null || add is null || remove is null)
+            {
+                diagnostics.Error("SL0557", ReferencedSpan,
+                    $"the event '{symbol.QualifiedName}.{described_.Name}' is described without " +
+                    "the storage and methods it is made of. Metadata is generated from the " +
+                    "library it describes; rebuild the library rather than editing the file");
+                continue;
+            }
+
+            var declared = new EventSymbol
+            {
+                Name = described_.Name,
+                Type = closure,
+                ContainingType = symbol,
+                Span = ReferencedSpan,
+                IsPublic = described_.IsPublic,
+                IsProtected = described_.IsProtected,
+                BackingField = backing,
+                Add = add,
+                Remove = remove,
+            };
+
+            add.Event = declared;
+            remove.Event = declared;
+
+            symbol.Events.Add(declared);
+        }
+    }
 
     private static ModuleSymbol Module(Dictionary<string, ModuleSymbol> modules, string name)
     {

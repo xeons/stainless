@@ -260,7 +260,12 @@ public sealed class Compilation
 
                 // C sources sitting beside the Stainless ones belong to the same
                 // program; a directory would otherwise drop them silently.
-                nativeInputs.AddRange(all.Where(IsNativeInput));
+                //
+                // What a previous build wrote is left out here, and only here:
+                // a scan is a guess about what belongs, and feeding a stale
+                // object file back into the next link is the way that guess
+                // goes wrong. A path somebody typed is not a guess.
+                nativeInputs.AddRange(all.Where(f => IsNativeInput(f) && !IsBuildArtifact(f)));
             }
             else if (File.Exists(path))
             {
@@ -275,10 +280,7 @@ public sealed class Compilation
         return new SourceSet
         {
             Sources = files.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
-            NativeInputs = nativeInputs
-                .Where(f => !IsBuildArtifact(f))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList(),
+            NativeInputs = nativeInputs.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
             Errors = errors,
         };
     }

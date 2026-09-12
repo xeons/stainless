@@ -223,9 +223,27 @@ public sealed partial class Binder(
         // program with no references skips it entirely.
         if (references is { Count: > 0 })
         {
-            var loader = new MetadataLoader(diagnostics);
+            var loader = new MetadataLoader(diagnostics, _builtins);
             loader.RegisterIntrinsics(_modules.Values);
             loader.Load(references, _modules);
+
+            // A library's events are events here too, so `+=` on one has to
+            // find them. Without this the name is not in the set the
+            // subscription probe asks first, and the access falls through to
+            // being read -- which an event cannot be.
+            foreach (var declared in _modules.Values
+                         .SelectMany(m => m.Types.Values)
+                         .SelectMany(t => t.Events))
+            {
+                _eventNames.Add(declared.Name);
+
+                // And its storage type has to be one this compilation emits a
+                // TypeInfo for. `new Publisher()` here allocates the whole
+                // object, events included, so the empty array is built on this
+                // side -- and an array's TypeInfo is emitted only for the
+                // element types something asked for.
+                ArrayOf(declared.Type);
+            }
         }
 
         DeclareModules(units);      // pass 1: every module exists

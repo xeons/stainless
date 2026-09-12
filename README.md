@@ -1162,11 +1162,16 @@ counter.Bump();
 Console.WriteLine(counter.Describe());
 ```
 
-Classes cross with their fields, properties, methods, constructors and
-destructors, and so do structs, enums and free functions. Reference counting
-reaches across too: the object is allocated through the library's own TypeInfo,
-so it is destroyed by the destructor the library compiled for its layout, when
-the consumer drops the last reference.
+Classes cross with their fields, properties, methods, constructors, destructors
+and **events**, and so do structs, enums, free functions, `closure` types and
+`delegate` types. A consumer subscribes to an event declared in a library it has
+no source for, with handlers of its own, and the library raises them — and
+because the method that raises an event is private, "only the declaring type may
+raise it" holds across the boundary without anything checking it there.
+
+Reference counting reaches across too: the object is allocated through the
+library's own TypeInfo, so it is destroyed by the destructor the library
+compiled for its layout, when the consumer drops the last reference.
 
 **Both sides link one runtime**, which is what makes that count one count. They
 share an allocator and a C stdio buffer as well, so what a library prints
@@ -1471,7 +1476,8 @@ Everything below is covered by [the test suite](tests/cases).
   throwing, so no `?.Invoke` anywhere, and a handler must return `void`, since
   with several subscribers there is no honest answer to what it returned. A
   raise reads the subscriber list before it starts, so a handler may subscribe
-  or unsubscribe while it runs
+  or unsubscribe while it runs. Events cross a library boundary: a program
+  subscribes to one declared in a library it has no source for
 - Lambdas: `value => value * factor` becomes a generated class capturing **by
   value**, so it may outlive the scope that built it. What it is *seen* as is
   decided by what it is assigned to — a `closure`, a single-method interface,
@@ -1660,10 +1666,11 @@ Everything below is covered by [the test suite](tests/cases).
 - Stainless libraries consumed by Stainless: `--metadata` writes a `.slmod`
   describing a library's public surface, and `--reference` binds another
   compilation against it. Classes cross with their fields, properties, methods,
-  constructors and destructors; so do structs, enums and free functions, and
-  reference counting reaches across, because an object is allocated through the
-  library's own TypeInfo. Generics and classes implementing interfaces do not
-  cross, and the compiler says so where the library is built
+  constructors, destructors and events; so do structs, enums, free functions,
+  closures and delegates, and reference counting reaches across, because an
+  object is allocated through the library's own TypeInfo. Generics and classes
+  implementing interfaces do not cross, and the compiler says so where the
+  library is built
 - **Deriving from a class in another binary.** Its layout, its dispatch table
   slot by slot, its destroy hook and its protected members all cross, so a
   derived class puts its fields after fields it never saw laid out, builds its

@@ -1938,6 +1938,13 @@ An event lowers to a hidden array of subscribers and three methods —
 `get_Name` and `set_Name`. The array is replaced rather than changed by each
 subscription, which is what the paragraph above rests on.
 
+**An event crosses a library boundary.** A consumer subscribes to and
+unsubscribes from an event declared in a library it has no source for, with
+handlers of its own, and the library raises them. What crosses is the closure
+type, the two methods, and the storage; `raise_Name` is private and does not —
+so "only the declaring type may raise it" holds across the boundary by
+construction rather than by a check on the far side.
+
 ### 2.15 Lambdas and closures
 
 A lambda has no type of its own. What it becomes is decided by what it is

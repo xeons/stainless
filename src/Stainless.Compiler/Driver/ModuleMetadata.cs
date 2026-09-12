@@ -51,7 +51,7 @@ public sealed record ModuleMetadata
     /// Bumped whenever the shape below changes. A consumer refuses a version it
     /// does not know rather than reading fields that have moved.
     /// </summary>
-    public const int CurrentVersion = 3;
+    public const int CurrentVersion = 4;
 
     public int Version { get; init; } = CurrentVersion;
 
@@ -170,8 +170,14 @@ public sealed record ModuleMetadata
     }
 }
 
-/// <summary>What kind of declaration a metadata entry describes.</summary>
-public enum MetadataKind { Class, Struct, Enum, Union, Alias }
+/// <summary>
+/// What kind of declaration a metadata entry describes.
+///
+/// Appended to, never reordered: the kind is written as its number, so
+/// inserting one would silently turn every struct in every existing file into
+/// something else.
+/// </summary>
+public enum MetadataKind { Class, Struct, Enum, Union, Alias, Closure, Delegate }
 
 public sealed record MetadataType
 {
@@ -273,6 +279,37 @@ public sealed record MetadataType
     /// way it is spelled here; the type is the same type either way.
     /// </summary>
     public string? AliasTarget { get; init; }
+
+    /// <summary>
+    /// For <see cref="MetadataKind.Closure"/> and
+    /// <see cref="MetadataKind.Delegate"/>, the signature a call goes through.
+    ///
+    /// These carry a signature where every other kind carries fields, and the
+    /// reason is that their fields are not theirs: a closure's two are the
+    /// compiler's own -- one of them typed with an internal class no consumer
+    /// could name -- and a delegate has none at all. A consumer rebuilds both
+    /// from the signature, exactly as the compilation that wrote this built
+    /// them from the declaration.
+    /// </summary>
+    public string? Returns { get; init; }
+
+    public List<MetadataParameter> Signature { get; init; } = [];
+
+    /// <summary>
+    /// The events this type declares.
+    ///
+    /// Their <c>add_</c> and <c>remove_</c> methods are already in
+    /// <see cref="Methods"/> and their storage is already in
+    /// <see cref="Fields"/>, because both are ordinary members of the type.
+    /// What this adds is the one thing a consumer cannot work out from those:
+    /// that they belong together, and that the name they belong to takes
+    /// <c>+=</c> and <c>-=</c> and nothing else.
+    ///
+    /// <c>raise_</c> is deliberately absent. Only the declaring type may raise
+    /// an event, so the method is private and does not cross -- which is that
+    /// rule holding at a library boundary by construction rather than by check.
+    /// </summary>
+    public List<MetadataEvent> Events { get; init; } = [];
 }
 
 public sealed record MetadataField
@@ -292,6 +329,21 @@ public sealed record MetadataField
     /// </summary>
     public int? BitWidth { get; init; }
     public int BitOffset { get; init; }
+}
+
+/// <summary>
+/// One event, as the far side needs to see it: a name, the closure a subscriber
+/// must be, and who is allowed to subscribe.
+/// </summary>
+public sealed record MetadataEvent
+{
+    public required string Name { get; init; }
+
+    /// <summary>The closure type, by name. Its own entry carries the signature.</summary>
+    public required string Type { get; init; }
+
+    public bool IsPublic { get; init; }
+    public bool IsProtected { get; init; }
 }
 
 public sealed record MetadataEnumMember

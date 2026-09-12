@@ -231,7 +231,12 @@ public sealed class FunctionSymbol
     public string MangledName =>
         _mangledName ??= ForeignName ?? RuntimeSymbol ?? Mangler.Mangle(this);
 
-    public bool HasBody => Body is not null || IsAutoAccessor || Event is not null;
+    // An event's accessors are generated rather than written, so they
+    // have a body without having syntax -- but only where they were
+    // generated. The same two methods arriving from a referenced library
+    // are external declarations, and the library has the code.
+    public bool HasBody =>
+        Body is not null || IsAutoAccessor || (Event is not null && !IsExternal);
 
     public override string ToString() =>
         $"{ReturnType.Name} {(ContainingType is null ? "" : ContainingType.Name + ".")}{Name}" +

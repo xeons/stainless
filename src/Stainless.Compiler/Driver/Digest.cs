@@ -150,6 +150,27 @@ public static class Digest
         parts.Add(Number(type.VirtualTable.Count));
         parts.AddRange(type.VirtualTable.Select(slot => slot ?? "abstract"));
 
+        // A closure's or a delegate's signature, which is the whole of what it
+        // is: it has no fields to describe it by, so without this two closures
+        // of different shapes would fingerprint alike.
+        parts.Add("signature");
+        parts.Add(type.Returns ?? "");
+
+        foreach (var parameter in type.Signature)
+            parts.AddRange([parameter.Mode.ToString(), parameter.Type, parameter.Name]);
+
+        // Events by name and type. Their methods are already in the digest as
+        // methods; what this adds is that the name is an event -- which decides
+        // what a consumer is allowed to write, so turning one into an ordinary
+        // field would break code that compiled against it.
+        foreach (var declared in type.Events.OrderBy(e => e.Name, StringComparer.Ordinal))
+            parts.AddRange([
+                "event",
+                declared.Name,
+                declared.Type,
+                declared.IsPublic ? "public" : declared.IsProtected ? "protected" : "",
+            ]);
+
         // By offset and then by name: the offsets are the layout, and the name
         // settles the order of two fields that share one -- a union's cases, and
         // the bit-fields inside a single storage unit.
