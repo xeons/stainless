@@ -1,0 +1,6 @@
+menu: chose Open
+menu: chose a nested item
+menu: a heading raises nothing
+toolbar: button 0 clicked
+toolbar: button 2 clicked
+toolbar: a toggle reports its state: true

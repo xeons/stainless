@@ -7,15 +7,16 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           657 pass
+dotnet test tests/Stainless.UnitTests           659 pass
 dotnet run --project tests/Stainless.Tests      253 cases, 2 skipped on Windows
+samples/forms/build.ps1 -Test                   45 checks against real widgets
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
 and GTK 3, the development packages, Xvfb and `broadwayd`, so a GUI can be
 built *and run* there headlessly — see `bindings/gtk/README.md`.
 
-`master` is fifteen commits ahead of `origin/master`. Nothing has been pushed
+`master` is eighteen commits ahead of `origin/master`. Nothing has been pushed
 since the closure work.
 
 ## What was built, in order
@@ -47,8 +48,56 @@ since the closure work.
 | `fcf8972` | deriving across a library boundary: SL0513 is lifted |
 | `626e5d2` | `event`: several subscribers behind one name |
 | `caaf3e5` | events, closures and delegates cross a library boundary |
+| `25d7c7d` | an array's type info is named after its element's module |
+| `971fed8` | `forms/`: the LCL's architecture under C#'s names |
+| *this one* | menus and the common controls; interface-to-class narrowing |
 
 ## Findings worth keeping
+
+**A GUI is the thing that finds the holes.** Five of the six bugs the Forms work
+turned up were invisible until something was measured, and none of them made a
+compiler or a test complain:
+
+- the form never painted its background, so the client area was black *and*
+  every region a moved control vacated kept its old pixels -- one swallowed
+  `WM_ERASEBKGND`, two symptoms that looked unrelated;
+- `WM_SIZE` reports the *client* extent and `Bounds` is the *window* rectangle,
+  so every resize shrank each bordered control by its frame, compounding, while
+  the borderless button beside it stayed exactly put;
+- reporting a message is not consuming it: answering `WM_MOUSEMOVE` left
+  clicking able to place the caret and dragging unable to select anything;
+- `TCM_INSERTITEMW` is `TCM_FIRST + 62` *decimal*, and the ListView trio are
+  `+75/76/77` -- write the ANSI numbers instead and nothing fails, the control
+  reads a UTF-16 pointer as ANSI and stops at the first zero high byte, so a row
+  count is right and the text is one letter;
+- inserting a tab does not select it, so showing "whichever page is current"
+  showed none of them.
+
+The lesson that generalises: **a peer must not answer what the platform should
+handle**, and a count is not evidence that text arrived. Both are now checked by
+`tests/cases/forms-input` and `tests/cases/forms-menus`, which drive real
+messages rather than calling the API.
+
+**Interface-to-class narrowing cost 25 lines and emits nothing.** `IShape s; if
+(s is Square sq)` was refused, and the machinery was already there: an interface
+reference *is* the object pointer, `Downcast` emits `sl_is_instance` on that
+pointer, and `EmitTypeTest` already had the class-target path -- which is why
+the old error said the test could be asked but its answer could not be named.
+One rule in `ClassifyConversion` was all that was missing. The refusal that
+survives is a *sealed* class that does not implement the interface, since
+nothing below it can supply what it lacks.
+
+It is worth knowing how this bit: the seam grew an `OwnedByParent()` method on
+`IMenuPeer` purely because the Win32 backend could not reach its own concrete
+`MenuPeer` through the interface. A language gap became an API wart one level
+up, and removing the gap removed the wart.
+
+**Array type info was named after the element's simple name.** Two `Point`
+structs in different modules gave their arrays one symbol between them and LLVM
+rejected the second definition -- a message about generated IR, naming a symbol
+that is in no source file, for two ordinary declarations that have every right
+to coexist. `ArraySuffix` now qualifies, as the struct and destructor names
+beside it always did.
 
 **`event` was mostly encapsulation, not machinery.** A list of closures, added
 to and removed from by value, was already writable by hand before any of this --
@@ -327,6 +376,13 @@ two names for one field. The name is wanted at the use site, and
 `var (low, high) = ...` is where it goes.
 
 ## Next, in the order I would do it
+
+**For `forms/`, `forms/README.md` has the full roadmap** -- every LCL unit a
+program would miss, grouped by how much work it is. The short version: common
+dialogs are nearly free because `bindings/win32/Dialogs.sl` already has them;
+`PaintBox` and `Timer` are small and unblock a lot; the GTK backend matters more
+than any control, because a seam with one implementation has quietly stopped
+being a seam; and `grids.pas` is 14,000 lines that Windows has no widget for.
 
 0. **Push.** Fifteen commits are unpushed, and the last audit's numbers in the
    README drift on every commit that adds a case — a unit test pinning them is

@@ -1955,6 +1955,8 @@ runtime/               the runtime, split by feature, embedded in the compiler
 stdlib/                the standard library written in Stainless, also embedded
 bindings/win32/        the Windows API, compiled only by a program that asks
 bindings/linux/        the Linux system calls, on the same terms
+bindings/gtk/          GTK 2 and 3, and a widget layer over them
+forms/                 a GUI framework: the LCL's architecture, C#'s names
 samples/               example programs
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command

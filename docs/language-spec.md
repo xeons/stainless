@@ -803,8 +803,30 @@ if (shape is Square square) {
 That is the cast written once instead of twice. The name is in scope in the
 branch the test proved and nowhere else — not after the `if`, and not in the
 rest of the condition — so the form is the whole condition of an `if` and not
-part of a larger one (SL0585). Interfaces are not offered a name (SL0587): a
-reference does not convert down to one, so there would be nothing for it to be.
+part of a larger one (SL0585). A *class* is what may be named: `x is INamed n`
+is refused (SL0587), because a reference does not convert down to an interface
+and there would be nothing for `n` to be.
+
+**An interface reference narrows to a class**, which is the same question asked
+the same way:
+
+```csharp
+IShape shape = new Square(3.0);
+
+if (shape is Square square) { ... }     // the class behind the interface
+Square also = (Square)shape;            // checked, and aborts if it were not
+```
+
+An interface reference *is* the object pointer (§2.10) — the dispatch table
+hangs off the object rather than travelling beside the reference — so asking
+whether it points at a `Square` is the question a class downcast already asks,
+and the pointer that comes back is the one that went in. It costs the same
+`sl_is_instance` and emits nothing else.
+
+The one narrowing refused here is the one that could never hold: a **sealed**
+class that does not implement the interface, since nothing below it can supply
+what it lacks. An unsealed one is allowed even when it does not itself implement
+the interface, because something deriving from it may.
 
 **What is tested is evaluated once**, which is what makes this the way to read
 a field or a call result. `is` through a `C?` asks about the null and the class

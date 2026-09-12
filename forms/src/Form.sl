@@ -72,6 +72,7 @@ public enum CloseReason { User, Program, ApplicationExit }
 /// nothing here would hold the object that answers for it.
 public class Form : WindowedControl, IWindowNotify {
     IWindowPeer  window;
+    MainMenu?    bar;
     WindowBorder framing;
     bool         closing;
     bool         registered;
@@ -85,6 +86,7 @@ public class Form : WindowedControl, IWindowNotify {
     public Form(WindowBorder border) {
         base(null);
         framing = border;
+        bar = null;
         closing = false;
         registered = false;
         window = WidgetSet.Current.CreateWindow(this, border);
@@ -117,6 +119,52 @@ public class Form : WindowedControl, IWindowNotify {
 
     /// Centres the window on the work area of the screen it is on.
     public void CenterOnScreen() { window.CenterOnScreen(); }
+
+    /// The bar across the top of the window, or null for none.
+    ///
+    /// Assigning one builds it: every item in the tree becomes a platform menu
+    /// item at this moment and not before, which is what lets the tree be
+    /// assembled in any order. Assigning a second one replaces the first.
+    public MainMenu? Menu {
+        get => bar;
+        set {
+            bar = value;
+            if (value == null) {
+                window.SetMenu(null);
+            } else {
+                window.SetMenu(((MainMenu)value).Build());
+            }
+            PerformLayout();
+        }
+    }
+
+    /// This form's window, for the things that need one -- a popup menu, and a
+    /// modal dialog's owner.
+    public IWindowPeer WindowPeer() { return window; }
+
+    /// A point in a control's own coordinates, in the screen's.
+    ///
+    /// What a popup menu needs, since every platform places one in screen
+    /// coordinates and every handler has the point in the control's.
+    public Point ToScreen(Control from, Point at) {
+        int x = at.X;
+        int y = at.Y;
+        Control? walk = from;
+        while (walk != null) {
+            var here = (Control)walk;
+            if (here is Form) { break; }
+            x = x + here.Left;
+            y = y + here.Top;
+            walk = here.Parent;
+        }
+        var frame = Bounds;
+        var client = ClientBounds;
+        // The client area starts inside the frame, and the difference is what
+        // the border and caption cost -- which only the two rectangles know.
+        return Point.At(frame.X + (frame.Width - client.Width) / 2 + x,
+                        frame.Y + (frame.Height - client.Height) - 
+                        (frame.Width - client.Width) / 2 + y);
+    }
 
     /// Shows the window and registers it with the `Application`.
     public override void Show() {

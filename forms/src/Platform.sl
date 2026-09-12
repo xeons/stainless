@@ -157,6 +157,11 @@ public interface IControlNotify {
     /// item selected. Never raised for a change the program itself made, which
     /// is what stops a two-way binding oscillating.
     void OnPlatformValueChanged();
+
+    /// A button on a toolbar was pressed. Separate from `OnPlatformActivated`
+    /// because a toolbar is one control with many buttons, so the report has to
+    /// say which.
+    void OnPlatformToolClicked(int index);
 }
 
 /// What a top-level window additionally reports.
@@ -262,6 +267,8 @@ public interface IContainerPeer : IControlPeer {
 /// A top-level window.
 public interface IWindowPeer : IContainerPeer {
     void SetTitle(String title);
+    /// Puts a menu bar across the top, or takes it away with null.
+    void SetMenu(IMenuPeer? menu);
     void SetBorder(WindowBorder border);
     void SetState(WindowState state);
     WindowState GetState();
@@ -344,6 +351,189 @@ public interface ILabelPeer : IControlPeer {
     void SetWordWrap(bool wrap);
 }
 
+// ============================================================ the common tier
+//
+// What `comctl32` adds on Windows and GTK has its own widgets for. Each is its
+// own interface for the same reason the standard tier is: a control declares
+// the capability it has, and a backend that has not implemented one fails to
+// compile rather than inheriting an empty override.
+
+/// A picture, loaded once and drawn many times.
+public interface IBitmapBackend {
+    int Width();
+    int Height();
+    /// The platform's handle -- an `HBITMAP` on Windows.
+    nuint Handle();
+}
+
+/// Same-sized pictures, indexed by number.
+///
+/// A toolbar, a tree and a list all take their icons from one of these rather
+/// than holding pictures themselves, because that is how every platform does
+/// it: the control stores an index, and the list stores the picture.
+public interface IImageListBackend {
+    /// Adds a picture and answers its index.
+    int Add(IBitmapBackend picture);
+    int Count();
+    Size ImageSize();
+    nuint Handle();
+}
+
+// ------------------------------------------------------------------- menus
+
+/// What a menu item tells the program.
+public interface IMenuItemNotify {
+    void OnPlatformMenuClicked();
+}
+
+/// One item: a command, a separator, or something with a submenu under it.
+public interface IMenuItemPeer {
+    /// What the platform calls this item.
+    ///
+    /// On Windows it is the command id `WM_COMMAND` will carry, which is the
+    /// only thing that identifies a chosen item -- so it is also what a program
+    /// needs to know if it is going to talk to the menu directly.
+    nuint Id();
+
+    void SetText(String text);
+    void SetEnabled(bool enabled);
+    void SetChecked(bool checked);
+    /// Draws it as the default -- bold, and what a double-click would do.
+    void SetDefault(bool isDefault);
+}
+
+/// A menu: the bar across a window, or one that drops down, or one that pops up
+/// under the pointer. All three are the same thing on every platform, which is
+/// why there is one interface rather than three.
+public interface IMenuPeer {
+    /// The platform's handle -- an `HMENU` on Windows -- for reaching a call
+    /// this layer does not wrap.
+    nuint Handle();
+
+    /// Adds a command. `submenu` makes it a heading rather than a command, and
+    /// an item with one raises nothing when chosen.
+    IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu);
+    void AddSeparator();
+    void Clear();
+
+    /// Shows this menu under the pointer and does not return until the user has
+    /// chosen or dismissed it.
+    void ShowPopup(IWindowPeer owner, Point atScreen);
+}
+
+// ------------------------------------------------------------- the controls
+
+/// What kind of thing a toolbar button is.
+public enum ToolButtonKind { Button, Toggle, Separator }
+
+public interface IToolBarPeer : IControlPeer {
+    /// Adds a button and answers its index. `image` is a position in the
+    /// toolbar's image list, or -1 for none.
+    int AddButton(String text, int image, ToolButtonKind kind);
+    /// What the platform calls one button, on the same terms as
+    /// `IMenuItemPeer.Id` -- a toolbar's buttons share one window, so this is
+    /// what tells them apart.
+    nuint ButtonId(int index);
+
+    void SetButtonEnabled(int index, bool enabled);
+    void SetButtonChecked(int index, bool checked);
+    bool GetButtonChecked(int index);
+    void SetImages(IImageListBackend images);
+    /// Shows a caption beside each button rather than only its picture.
+    void SetTextVisible(bool visible);
+    /// Sizes the bar to its buttons, which is what a docked toolbar wants.
+    void ResizeToFit();
+}
+
+public interface IStatusBarPeer : IControlPeer {
+    /// The right-hand edge of each panel, in pixels from the left; the last may
+    /// be -1, meaning "to the end". One call rather than one per panel because
+    /// that is the one message Windows has.
+    void SetPanels(int[] edges);
+    void SetPanelText(int index, String text);
+}
+
+public interface IProgressPeer : IControlPeer {
+    void SetRange(int minimum, int maximum);
+    void SetValue(int value);
+    int  GetValue();
+    /// A bar with no value that simply moves, for work of unknown length.
+    void SetIndeterminate(bool indeterminate);
+}
+
+public interface ITrackBarPeer : IControlPeer {
+    void SetRange(int minimum, int maximum);
+    void SetValue(int value);
+    int  GetValue();
+    /// How often a tick is drawn under the slider.
+    void SetTickFrequency(int every);
+}
+
+public interface ITabControlPeer : IContainerPeer {
+    /// Adds a tab and answers its index.
+    int AddTab(String text, int image);
+    void RemoveTab(int index);
+    void SetTabText(int index, String text);
+    void SetSelectedTab(int index);
+    int  GetSelectedTab();
+    /// How many tabs the control has.
+    int  TabCount();
+    /// The area inside the tabs, where a page's controls go. Not the client
+    /// area: the tabs themselves are part of that.
+    Rectangle PageArea();
+    void SetImages(IImageListBackend images);
+}
+
+/// A place in a tree. Opaque, because a tree is a linked structure and an index
+/// would not survive anything being inserted.
+public interface ITreeNodeHandle {
+    /// What the platform calls this node.
+    ///
+    /// Two handles naming the same node are not necessarily the same object --
+    /// a backend asked which node is selected may wrap the answer afresh each
+    /// time -- so identity is this number rather than the reference.
+    nuint Id();
+}
+
+public interface ITreeViewPeer : IControlPeer {
+    /// Adds a node under `parent` -- null for a root -- after `previous`, or at
+    /// the end when that is null too.
+    ITreeNodeHandle AddNode(ITreeNodeHandle? parent, ITreeNodeHandle? previous,
+                            String text, int image);
+    void RemoveNode(ITreeNodeHandle node);
+    void SetNodeText(ITreeNodeHandle node, String text);
+    String GetNodeText(ITreeNodeHandle node);
+    void Expand(ITreeNodeHandle node, bool expanded);
+    void SelectNode(ITreeNodeHandle node);
+    ITreeNodeHandle? GetSelectedNode();
+    void Clear();
+    void SetImages(IImageListBackend images);
+}
+
+/// How a list shows what it holds.
+public enum ListViewStyle { Details, List, SmallIcon, LargeIcon }
+
+public interface IListViewPeer : IControlPeer {
+    void SetStyle(ListViewStyle style);
+    int  AddColumn(String text, int width, HorizontalAlignment alignment);
+    void SetColumnWidth(int column, int width);
+    /// Adds a row and answers its index.
+    int  AddRow(String text, int image);
+    void SetCell(int row, int column, String text);
+    /// What a cell says, asked of the control rather than remembered.
+    String GetCell(int row, int column);
+    void RemoveRow(int row);
+    void Clear();
+    int  RowCount();
+    int  GetSelectedRow();
+    void SetSelectedRow(int row);
+    void SetImages(IImageListBackend images);
+    /// Whether a click anywhere on a row selects the whole of it, and whether
+    /// the grid is drawn. Both are the same call because Windows makes them one
+    /// extended style word.
+    void SetFullRowSelect(bool full, bool gridLines);
+}
+
 /// The platform's font, once it has been made. Opaque: only the backend that
 /// made it knows what is inside, and `Font` holds one so the handle is made
 /// once however many controls share the font.
@@ -410,7 +600,30 @@ public interface IWidgetSet {
     IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                    bool vertical);
 
+    IToolBarPeer   CreateToolBar(IControlNotify owner, IContainerPeer parent);
+    IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent);
+    IProgressPeer  CreateProgress(IControlNotify owner, IContainerPeer parent);
+    ITrackBarPeer  CreateTrackBar(IControlNotify owner, IContainerPeer parent,
+                                  bool vertical);
+    ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent);
+    ITreeViewPeer  CreateTreeView(IControlNotify owner, IContainerPeer parent);
+    IListViewPeer  CreateListView(IControlNotify owner, IContainerPeer parent);
+
+    /// An empty popup menu, to be filled and then shown under the pointer.
+    IMenuPeer CreateMenu();
+
+    /// An empty menu bar, to be filled and then given to a window. Separate
+    /// from `CreateMenu` because Windows makes the two with different calls and
+    /// will not exchange one for the other afterwards.
+    IMenuPeer CreateMenuBar();
+
     IFontBackend CreateFont(Font font);
+
+    /// A picture read from a file. What the format may be is the backend's
+    /// business; Windows reads `.bmp` without a decoder and nothing else.
+    Result<IBitmapBackend, String> LoadBitmap(String path);
+
+    IImageListBackend CreateImageList(Size imageSize);
 
     /// The theme's colour for one role, read now rather than cached, so a
     /// theme change between two calls is seen.

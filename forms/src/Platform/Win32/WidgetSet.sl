@@ -35,6 +35,7 @@ import Win32.Handles;
 import Win32.Kernel32;
 import Win32.User32;
 import Win32.Gdi32;
+import Win32.ComCtl32;
 
 #if WINDOWS
 
@@ -98,12 +99,16 @@ public class WindowPeer : ControlPeer, IWindowPeer {
     weak IWindowNotify? owningWindow;
     bool running;
     bool quitOnClose;
+    /// Held, not merely handed to Windows: a menu command names an id, and this
+    /// is what turns one back into the item that was chosen.
+    IMenuPeer? menuBar;
 
     public WindowPeer(IWindowNotify owner, WindowBorder border) {
         base(MakeTopLevel(border), owner, false);
         owningWindow = owner;
         running = false;
         quitOnClose = false;
+        menuBar = null;
     }
 
     /// Made before `base(...)` can run, because the base constructor needs the
@@ -141,6 +146,23 @@ public class WindowPeer : ControlPeer, IWindowPeer {
             return 0;
         }
 
+        // A menu command arrives with `lParam` null, where a control would have
+        // put its handle -- that is the whole of how the two are told apart.
+        // The id is resolved by asking this window's own menu to find it, which
+        // is why no table of ids exists anywhere.
+        if (message == WmCommand && lParam == 0) {
+            var bar = menuBar;
+            if (bar != null) {
+                if (bar is MenuPeer tree) {
+                    var item = tree.Find((int)(wParam & 0xFFFFu));
+                    if (item != null) {
+                        ((MenuItemPeer)item).Raise();
+                        return 0;
+                    }
+                }
+            }
+        }
+
         if (message == WmActivate) {
             if (held != null) {
                 // Zero is deactivation; anything else is one of the two ways of
@@ -175,6 +197,12 @@ public class WindowPeer : ControlPeer, IWindowPeer {
                                       (int)((wParam >> 16) & 0xFFFFu));
                     return 0;
                 }
+                // A slider reports the same way, and says nothing about how far
+                // it moved -- the position is asked of it afterwards.
+                if (bar is TrackBarPeer slider) {
+                    slider.Scrolled();
+                    return 0;
+                }
             }
         }
 
@@ -184,6 +212,28 @@ public class WindowPeer : ControlPeer, IWindowPeer {
     // ------------------------------------------------------- IWindowPeer
 
     public void SetTitle(String title) { SetText(title); }
+
+    public void SetMenu(IMenuPeer? menu) {
+        menuBar = menu;
+        if (menu == null) {
+            Win32.User32.SetMenu(window, null);
+        } else {
+            IMenuPeer given = (IMenuPeer)menu;
+            if (given is MenuPeer bar) {
+                // The window frees the menu it holds, so the menu must stop
+                // freeing itself.
+                bar.OwnedByParent();
+                Win32.User32.SetMenu(window, bar.Native());
+            }
+        }
+        DrawMenuBar(window);
+        // The bar takes a row out of the client area, so everything laid out
+        // against it has moved.
+        var owner = Owner();
+        if (owner != null) {
+            ((IControlNotify)owner).OnPlatformResized(ClientBounds().Extent);
+        }
+    }
 
     /// Changing a border after the window exists means changing style bits and
     /// telling Windows the frame moved. Not every bit takes effect -- a window
@@ -279,7 +329,20 @@ public class WindowPeer : ControlPeer, IWindowPeer {
 public class Win32WidgetSet : IWidgetSet {
     Font? defaultFont;
 
-    public Win32WidgetSet() { defaultFont = null; }
+    public Win32WidgetSet() {
+        defaultFont = null;
+
+        // Registers the window classes the common controls live in. Without it
+        // `CreateWindowExW` is handed a class name Windows has never heard of,
+        // fails, and the control simply does not appear -- which looks like a
+        // layout bug rather than a missing call.
+        InitCommonControlsInfo wanted;
+        wanted.Size = (uint)sizeof(InitCommonControlsInfo);
+        wanted.Classes = IccBarClasses | IccTabClasses | IccTreeViewClasses
+                       | IccListViewClasses | IccProgressClass | IccUpDownClass
+                       | IccStandardClasses;
+        InitCommonControlsEx(&wanted);
+    }
 
     public String Name => "Win32";
 
@@ -323,6 +386,49 @@ public class Win32WidgetSet : IWidgetSet {
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                           bool vertical) {
         return new ScrollBarPeer(owner, parent, vertical);
+    }
+
+    public IToolBarPeer CreateToolBar(IControlNotify owner, IContainerPeer parent) {
+        return new ToolBarPeer(owner, parent);
+    }
+
+    public IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent) {
+        return new StatusBarPeer(owner, parent);
+    }
+
+    public IProgressPeer CreateProgress(IControlNotify owner, IContainerPeer parent) {
+        return new ProgressPeer(owner, parent);
+    }
+
+    public ITrackBarPeer CreateTrackBar(IControlNotify owner, IContainerPeer parent,
+                                        bool vertical) {
+        return new TrackBarPeer(owner, parent, vertical);
+    }
+
+    public ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent) {
+        return new TabControlPeer(owner, parent);
+    }
+
+    public ITreeViewPeer CreateTreeView(IControlNotify owner, IContainerPeer parent) {
+        return new TreeViewPeer(owner, parent);
+    }
+
+    public IListViewPeer CreateListView(IControlNotify owner, IContainerPeer parent) {
+        return new ListViewPeer(owner, parent);
+    }
+
+    public IMenuPeer CreateMenu() { return new MenuPeer(false); }
+
+    /// A menu bar, which Windows makes with a different call from a popup and
+    /// will not exchange afterwards.
+    public IMenuPeer CreateMenuBar() { return new MenuPeer(true); }
+
+    public Result<IBitmapBackend, String> LoadBitmap(String path) {
+        return LoadBitmapFile(path);
+    }
+
+    public IImageListBackend CreateImageList(FSize imageSize) {
+        return new ImageListBackend(imageSize);
     }
 
     public IFontBackend CreateFont(Font font) { return new FontBackend(font); }

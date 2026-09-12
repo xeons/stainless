@@ -301,6 +301,18 @@ public sealed partial class Binder
     private static bool IsBytePointer(TypeSymbol type) =>
         type is PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } };
 
+    /// <summary>
+    /// Whether an object behind <paramref name="wanted"/> could be a
+    /// <paramref name="candidate"/>.
+    ///
+    /// True when the class implements the interface itself, and true for any
+    /// unsealed class, since something below it may implement what it does not.
+    /// False only for a sealed class that does not -- the one case where the
+    /// test could never hold, and so the one worth refusing.
+    /// </summary>
+    private static bool CouldImplement(ClassTypeSymbol candidate, InterfaceTypeSymbol wanted) =>
+        candidate.AllInterfaces().Contains(wanted) || !candidate.IsSealed;
+
     private ConversionKind? ClassifyConversion(TypeSymbol from, TypeSymbol to, bool explicitCast)
     {
         if (from.Equals(to)) return ConversionKind.Identity;
@@ -359,6 +371,23 @@ public sealed partial class Binder
         // this costs nothing at run time.
         if (from is NamedTypeSymbol { IsReferenceType: true } source2 && to is InterfaceTypeSymbol wanted)
             return source2.AllInterfaces().Contains(wanted) ? ConversionKind.ClassToInterface : null;
+
+        // And back down again, which is the same check a class downcast is.
+        //
+        // An interface reference *is* the object pointer -- the vtable hangs off
+        // the object's TypeInfo rather than travelling beside the reference --
+        // so asking whether it points at a particular class is the question
+        // 'sl_is_instance' already answers, and the pointer that comes back is
+        // the one that went in. Nothing new is emitted for this.
+        //
+        // Refused where it could never hold: a sealed class that does not
+        // implement the interface can never be behind one. An unsealed one is
+        // allowed, because something deriving from it may implement the
+        // interface even when it does not itself.
+        if (from is InterfaceTypeSymbol implemented && to is ClassTypeSymbol behind)
+            return explicitCast && CouldImplement(behind, implemented)
+                ? ConversionKind.Downcast
+                : null;
 
         if (from is ClassTypeSymbol optionalImplementer &&
             to is OptionalTypeSymbol { Element: InterfaceTypeSymbol optionalWanted })
@@ -421,6 +450,14 @@ public sealed partial class Binder
         {
             if (!explicitCast) return null;
             if (fromOptional.Element.Equals(to)) return ConversionKind.PointerCast;
+
+            // I? -> C, which loses the null and asks the object what it is, on
+            // the same terms as the interface-to-class rule above.
+            if (fromOptional.Element is InterfaceTypeSymbol optionalInterface &&
+                to is ClassTypeSymbol optionalBehind)
+                return CouldImplement(optionalBehind, optionalInterface)
+                    ? ConversionKind.Downcast
+                    : null;
 
             // Derived? -> Base loses the null and nothing else; Base? -> Derived
             // loses the null and checks what is left.

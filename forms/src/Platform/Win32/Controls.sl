@@ -88,7 +88,7 @@ public class ButtonPeer : ControlPeer, IButtonPeer {
 
     /// `BN_CLICKED` arrives whether the button was clicked or pressed with the
     /// keyboard, which is exactly what `OnPlatformActivated` means.
-    protected override bool Notified(uint code) {
+    protected override bool Notified(uint code, int id) {
         if (code != BnClicked) { return false; }
         var owner = Owner();
         if (owner == null) { return false; }
@@ -150,7 +150,7 @@ public class CheckPeer : ControlPeer, ICheckPeer {
         isRadio = radio;
     }
 
-    protected override bool Notified(uint code) {
+    protected override bool Notified(uint code, int id) {
         if (code != BnClicked) { return false; }
         var owner = Owner();
         if (owner == null) { return false; }
@@ -256,7 +256,7 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer {
         multi = multiline;
     }
 
-    protected override bool Notified(uint code) {
+    protected override bool Notified(uint code, int id) {
         if (code != EnChange) { return false; }
         var owner = Owner();
         if (owner == null) { return false; }
@@ -337,7 +337,7 @@ public class ListPeer : ControlPeer, IListPeer {
              owner, true);
     }
 
-    protected override bool Notified(uint code) {
+    protected override bool Notified(uint code, int id) {
         var owner = Owner();
         if (owner == null) { return false; }
         if (code == LbnSelChange) {
@@ -390,7 +390,7 @@ public class ComboPeer : ControlPeer, IComboPeer {
              owner, true);
     }
 
-    protected override bool Notified(uint code) {
+    protected override bool Notified(uint code, int id) {
         var owner = Owner();
         if (owner == null) { return false; }
         if (code == CbnSelChange || code == CbnEditChange) {

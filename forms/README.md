@@ -99,9 +99,14 @@ src/Container.sl            GraphicControl, WindowedControl, the layout pass
                                                             (lcl/controls.pp)
 src/Form.sl                 Form, Screen                    (lcl/forms.pp)
 src/Application.sl          Application                     (lcl/forms.pp)
-src/Controls/*.sl           Button, CheckBox, RadioButton, Label, TextBox,
-                            ListBox, ComboBox, Panel, GroupBox, ScrollBar
-                                                            (lcl/stdctrls.pp)
+src/Controls/Buttons.sl     Button, CheckBox, RadioButton
+src/Controls/Text.sl        Label, TextBox                  (lcl/stdctrls.pp)
+src/Controls/Lists.sl       ListBox, ComboBox
+src/Controls/Containers.sl  Panel, GroupBox, ScrollBar
+src/Controls/Menus.sl       MainMenu, PopupMenu, MenuItem      (lcl/menus.pp)
+src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
+                            TabControl, TreeView, ListView, ImageList
+                                                            (lcl/comctrls.pp)
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 ```
@@ -114,15 +119,29 @@ not a compression ratio. See *What is not here* below.
 ## Building it
 
 ```
-stainless build forms                      # the library, from stainless.json
-stainless run samples/forms/demo.sl forms/src bindings/win32/api \
-    bindings/win32/Win32.sl -l user32 -l gdi32
+stainless run samples/forms/demo.sl   forms/src bindings/win32/api \
+    bindings/win32/Win32.sl -l user32 -l gdi32 -l comctl32
+stainless run samples/forms/common.sl forms/src bindings/win32/api \
+    bindings/win32/Win32.sl -l user32 -l gdi32 -l comctl32
 ```
 
-The demo takes `--selftest`, which builds the same form, pumps the message
-queue, and checks thirteen things against the real controls — docking,
-anchoring, native handles, text round-tripping through Windows, a click reaching
-its handler — then quits. It is what makes a GUI something a build can run.
+or `.\samples\forms\build.ps1`, which builds both into `samples/forms/build`
+(git-ignored), writes the visual-styles manifest each one needs, and takes
+`-Test` to run every self-check and `-Run <name>` to open a window.
+
+Both samples take `--selftest`, which builds the same window, pumps the message
+queue, checks what can be checked without a person in front of it, and quits.
+`demo` makes 21 such checks and `common` 24 — docking, anchoring, native
+handles, text round-tripping through Windows, a click reaching its handler, a
+menu item resolving from its command id. That is what makes a GUI something a
+build can run, and it is how every bug listed under *Decisions worth knowing
+about* was found.
+
+Two end-to-end cases go further, driving real messages at the controls:
+`tests/cases/forms-input` synthesises a mouse drag and a wheel turn and checks
+what the control did with them; `tests/cases/forms-menus` sends `WM_COMMAND` for
+a menu item, a nested item, a heading and a toolbar button, and checks which
+handler ran.
 
 ---
 
@@ -168,6 +187,21 @@ place whether or not its parent has a frame. Only a group box has a non-zero
 origin, and without it a control placed at the origin is drawn across the
 caption -- while a *docked* one lands correctly, so the two disagreed.
 
+**A menu is described first and built second.** Every item is an ordinary
+object until a `MainMenu` is given to a form or a `PopupMenu` is shown; only
+then does a platform menu exist. On Windows a submenu must exist before the item
+that opens it can be created -- the item *is* the submenu's handle -- so building
+as you go means either adding bottom-up or patching afterwards, and `TMenuItem`
+does the second with a rebuild on every insertion. Describing first removes the
+ordering problem instead of managing it.
+
+**A menu command and a control's click are the same message.** `WM_COMMAND`
+with `lParam` null is a menu; with a window handle it is a control. The id is
+resolved by asking the window's own menu tree, recursively -- so there is no
+table of command ids anywhere, and nothing to remember to remove from one. A
+*heading* is skipped in that search: Windows sends no command for one, and
+matching it would run a handler nothing could have raised.
+
 **Reporting a message is not consuming it.** Each peer puts its own window
 procedure in front of a system control's, and everything it reports it then
 hands on. That is easy to get wrong in one direction only: a drag inside a text
@@ -208,31 +242,139 @@ registers it and closing unregisters it, and the last one out stops the loop.
 
 ---
 
-## What is not here
+## What is ported, and what is left
 
-Deliberate omissions, so nobody has to wonder whether they were forgotten:
+The LCL is 276,000 lines across 969 files. This is about 7,600, so the question
+"what is missing" has a long answer — and an unhelpful one unless it is ordered.
+What follows is every LCL unit that a program would notice the absence of,
+grouped by how much work it is rather than by where it lives.
 
-- **Other platforms.** The seam is designed for several and only Win32 is
-  written. GTK is next and is mostly an adapter — `bindings/gtk/Widgets.sl`
-  already wraps twenty widgets.
-- **Form files.** No `.lfm`, no designer, no component streaming. Forms are
-  built in code. The control tree is shaped so a reflection-based loader stays
-  possible later.
-- **The common controls tier.** No `TreeView`, `ListView`, `TabControl`,
-  `ToolBar`, `StatusBar`, `TrackBar`, `ProgressBar`, menus or image lists.
-- **Grids and DB controls**, which are half of `lcl/` by line count.
-- **Docking, drag and drop, actions, hints, accessibility, bi-directional text,
-  and per-monitor DPI.** Each is a real feature of the LCL and each is its own
-  piece of work.
-- **`TStrings`.** `String[]` and `List<String>` do the job.
-- **`BorderSpacing` and `ChildSizing`.** The LCL's finer layout controls; only
-  `Dock` and `Anchors` are here.
-- **Bitmaps and image loading.** `Graphics` draws shapes and text.
-- **A GDI object cache.** Every pen and brush is made and deleted per call,
-  which cannot leak and is slower than it needs to be.
+### Ported
+
+| Here | From |
+|---|---|
+| `Control`, `GraphicControl`, `WindowedControl`, docking, anchors | `controls.pp` |
+| `Form`, `Application`, `Screen` | `forms.pp` |
+| `Button`, `CheckBox`, `RadioButton`, `Label`, `TextBox`, `ListBox`, `ComboBox`, `Panel`, `GroupBox`, `ScrollBar` | `stdctrls.pp` |
+| `MainMenu`, `PopupMenu`, `MenuItem` | `menus.pp` |
+| `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView` | `comctrls.pp` |
+| `ImageList` | `imglist.pp` |
+| `Color`, `Point`, `Size`, `Rectangle`, `Font`, `Pen`, `Brush`, `Graphics`, `Bitmap` | `graphics.pp` |
+| the widgetset seam | `widgetset/ws*.pp`, `interfaces/win32` |
+
+### Next, and each a day rather than a week
+
+Every one of these is either a composite of what already exists or a Win32 call
+that is already bound.
+
+- **Common dialogs** — `TOpenDialog`, `TSaveDialog`, `TSelectDirectoryDialog`
+  (`dialogs.pp`). The single most-missed thing, and the cheapest:
+  `bindings/win32/Dialogs.sl` already has all three, by both the legacy
+  `ComDlg32` route and the modern `IFileDialog` one. What is left is wrapping
+  them as classes. `TColorDialog` and `TFontDialog` need `ChooseColorW` and
+  `ChooseFontW` bound first, which is a dozen lines each.
+- **`Timer`** (`customtimer.pas`) — `SetTimer`/`KillTimer` are already bound;
+  what it needs is a peer that routes `WM_TIMER` to a closure.
+- **`PaintBox`, `Bevel`, `Shape`** (`extctrls.pp`) — `GraphicControl` exists and
+  each of these is an `OnPaint` and a few properties. `PaintBox` is the one that
+  makes custom drawing usable at all, and should probably come first of the
+  three.
+- **`Splitter`** (`extctrls.pp`) — pure layout arithmetic over a mouse drag, with
+  no platform widget behind it.
+- **`RadioGroup`, `CheckGroup`** (`extctrls.pp`) — a `GroupBox` that builds its
+  own children. `LabeledEdit` likewise.
+- **`SpinEdit`, `UpDown`** (`spin.pp`, `comctrls.pp`) — the `UDM_*` messages are
+  bound in `ComCtl32.sl` already.
+- **`CheckListBox`** (`checklst.pas`) — a `ListView` with `LVS_EX_CHECKBOXES`, or
+  an owner-drawn list box.
+- **`HeaderControl`, `CoolBar`** (`comctrls.pp`) — two more `comctl32` classes on
+  the pattern the seven existing ones establish.
+
+### Worth having, and a week each
+
+- **`BitBtn`, `SpeedButton`** (`buttons.pp`) — a button with a picture. Needs
+  either `BS_BITMAP` or owner drawing, and owner drawing is the thing several
+  entries below also want.
+- **`DateTimePicker`, `Calendar`** (`calendar.pp`) — `comctl32` has both; the
+  work is a date type this library does not have yet.
+- **`MaskEdit`** (`maskedit.pp`) and the `editbtn.pas` family — `FileNameEdit`,
+  `DirectoryEdit`, `DateEdit`: an edit with a button that opens a dialog, which
+  is why the dialogs come first.
+- **`ColorBox`, `ColorListBox`** (`colorbox.pas`) — owner-drawn lists.
+- **Owner drawing** across list, combo, menu and button. One mechanism
+  (`WM_DRAWITEM`, `WM_MEASUREITEM`) that half a dozen controls want, so it is
+  worth doing once and properly rather than per control.
+- **Accelerators.** `&O` underlines a letter and works while a menu is open;
+  `Ctrl+O` needs an accelerator table and `TranslateAccelerator` in the message
+  loop.
+- **Tab navigation.** `WS_TABSTOP` is set, but nothing calls `IsDialogMessage`,
+  so Tab does not move between controls. Small, and very noticeable.
+- **`TrayIcon`** (`extctrls.pp`) — needs `Shell_NotifyIconW` bound.
+
+### Large, and each its own project
+
+- **`Grids`** (`grids.pas`, 13,957 lines — the largest unit in the LCL).
+  `TStringGrid` and `TDrawGrid` are drawn from nothing: Windows has no grid, so
+  this is scrolling, selection, in-place editing and painting, all by hand. It
+  is the single biggest thing missing and the one most often wanted.
+- **The rest of `Graphics`** — `TBitmap` in formats other than `.bmp`,
+  `TPicture`, `TIcon`, `TRegion`, drawing *onto* a bitmap, and pixel access
+  (`intfgraphics.pas`, 6,698 lines). PNG on Windows means binding WIC or GDI+.
+- **Printing** (`printers.pas`, `postscriptcanvas.pas`) — a `Canvas` that is a
+  printer, plus the dialogs.
+- **Form streaming** (`lresources.pp`, `propertystorage.pas`) — the `.lfm` tier.
+  Possible here through `Standard.Reflection`, and the control tree is shaped
+  so it stays possible, but it is a parser, a type registry and a property
+  writer.
+- **Actions** (`actnlist.pas`, `stdactns.pas`) — one command behind a menu item,
+  a toolbar button and a shortcut, with enabled state shared.
+- **Docking** (`ldocktree.pas`, 2,192 lines) and drag-and-drop.
+- **Themes** (`themes.pas`, `tmschema.pas`) — drawing *with* the theme rather
+  than letting each control do it, which is what any owner-drawn control needs
+  to look native.
+- **DB controls** (`dbctrls.pp`, `dbgrids.pas`) — these want a dataset
+  abstraction, and Stainless has no database layer at all, so the dependency
+  comes first.
+- **Accessibility** (`TLazAccessibleObject`) — UI Automation on Windows.
+
+### Not planned
+
+- **`customdrawn*`** (five units, 10,000 lines) — a widgetset that draws every
+  control itself rather than using the platform's. The opposite of what the
+  peer design is for.
+- **`lcltype.pp`, `lmessages.pp`, `lclproc.pas`, `lclmemmanager.pas`** —
+  constants, message records and utility code that exist because Object Pascal
+  needed them. `bindings/win32` and the standard library are the answer here.
+- **`TStrings` and the `TCollection` families** — `TListItems`, `TListColumns`,
+  `TStatusPanels`, `TCoolBands` are all there because Object Pascal has no
+  generic list. `List<T>` is one.
+- **`interfacebase.pp`, `lclintf.pas`** — the LCL's own seam, replaced by
+  `Forms.Platform`.
+
+### Before several of the above
+
+Two things are worth doing regardless of which control comes next.
+
+- **The GTK backend.** The seam was designed for more than one platform and has
+  only ever had one, which is the state in which a seam quietly stops being one.
+  `bindings/gtk/Widgets.sl` already wraps twenty widgets, so much of it is an
+  adapter — and it is the only real test of whether `IControlPeer` is portable
+  or merely Win32-shaped.
+- **DPI awareness.** Not a control, but every control is wrong without it on a
+  scaled display.
 
 ## Known rough edges
 
+Things that are here and imperfect, as opposed to the things above that are not
+here at all.
+
+- **A GDI object cache.** Every pen and brush is made and deleted per drawing
+  call, which cannot leak and is slower than it needs to be.
+- **Tab does not move between controls.** `WS_TABSTOP` is set on everything that
+  should have it, but the message loop does not call `IsDialogMessage`, so
+  nothing acts on it.
+- **`BorderSpacing` and `ChildSizing` are absent.** The LCL's finer layout
+  controls; only `Dock` and `Anchors` are here.
 - **`Application` and `WidgetSet` hold static state and warn (SL0377).** A GUI
   toolkit is *thread-affine* — one thread owns the widgets — which is true of
   WinForms, WPF, GTK and Cocoa alike. Stainless can say `threadsafe`, which
@@ -242,6 +384,21 @@ Deliberate omissions, so nobody has to wonder whether they were forgotten:
   construction**, because on Windows they are creation-time style bits.
 - **`InvalidateRegion` repaints the whole control**, since no peer interface
   takes a region yet.
+- **Visual styles need a manifest.** The themed common controls are version 6
+  of `comctl32`, reachable only through a side-by-side manifest naming it;
+  without one Windows loads version 5 and the tabs, toolbar and progress bar
+  look like Windows 2000. They work either way, which is what makes it easy to
+  miss. `samples/forms/build.ps1` writes one beside each executable, because
+  Stainless has `#pragma comment(lib, ...)` and no way to ask the linker for
+  anything else.
+- **A `ListView` row is an index, not an object.** `TListItem` is a
+  `TPersistent` with a `TStrings` hanging off it, so a thousand rows is two
+  thousand objects before any text. Cells are set and read through the list,
+  which is what the platform stores anyway.
+- **Pictures are `.bmp` only**, because `LoadImageW` is the whole of what
+  Windows decodes without a library. PNG needs WIC or GDI+, each a binding of
+  its own. An `ImageList` treats magenta as transparent, as toolbar bitmaps
+  have since Windows 95.
 - **Not DPI aware.** On a scaled display Windows renders the window at 96 DPI
   and scales the result, so text is soft. Per-monitor awareness is a manifest
   setting and a layout that scales with it, and neither is here.

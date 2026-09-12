@@ -58,6 +58,7 @@ import Win32.Handles;
 import Win32.Kernel32;
 import Win32.User32;
 import Win32.Gdi32;
+import Win32.ComCtl32;
 
 #if WINDOWS
 
@@ -414,6 +415,21 @@ public class ControlPeer : IControlPeer {
             return Inherited(message, wParam, lParam);
         }
 
+        // The common controls report through `WM_NOTIFY` instead: a pointer to
+        // a structure beginning with an `NMHDR`, whose `Code` says which longer
+        // structure it really is. Routed the same way as `WM_COMMAND` -- to the
+        // peer of the window that sent it, which is the only thing that knows
+        // what its own codes mean.
+        if (message == WmNotify) {
+            NotifyHeader* header = (NotifyHeader*)(void*)(nuint)lParam;
+            var sender = PeerOf(header->From);
+            if (sender != null) {
+                if (((ControlPeer)sender).NotifiedBy(header->Code, (void*)header)) {
+                    return 0;
+                }
+            }
+        }
+
         // A child control told its parent something happened to it. Win32
         // reports a button's click, an edit's change and a list's selection
         // this way -- to the *parent*, not the control -- so every container
@@ -423,7 +439,8 @@ public class ControlPeer : IControlPeer {
             var child = PeerOf((HWND)(void*)(nuint)lParam);
             if (child != null) {
                 uint code = (uint)((wParam >> 16) & 0xFFFFu);
-                if (((ControlPeer)child).Notified(code)) { return 0; }
+                int commandId = (int)(wParam & 0xFFFFu);
+                if (((ControlPeer)child).Notified(code, commandId)) { return 0; }
             }
         }
 
@@ -488,7 +505,17 @@ public class ControlPeer : IControlPeer {
     /// none of them, because the codes overlap -- `BN_CLICKED` is 0 and so is
     /// nothing else only because a button is what received it -- and only the
     /// peer for a given control knows which numbering it is in.
-    protected virtual bool Notified(uint code) { return false; }
+    /// `id` is the low word: which control, or -- for a toolbar, whose buttons
+    /// all report through the one window -- which button.
+    protected virtual bool Notified(uint code, int id) { return false; }
+
+    /// What one of this control's `WM_NOTIFY` codes means.
+    ///
+    /// `raw` points at the structure the notification carried, which begins
+    /// with an `NotifyHeader` and continues with whatever that code implies --
+    /// so a peer casts it to the longer type only once it has recognised the
+    /// code, which is the whole of the convention.
+    protected virtual bool NotifiedBy(int code, void* raw) { return false; }
 
     /// What this control wants to be drawn in, as `WM_CTLCOLOR*` wants it: the
     /// device context set up, and a brush returned for the background.

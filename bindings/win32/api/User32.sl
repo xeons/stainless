@@ -777,4 +777,125 @@ public extern "C" {
 // `-l user32` to link, which is exactly what `tests/cases/win32-raw` exists to
 // prevent. The convenience belongs where the other conveniences are.
 
+// ======================================================================= menus
+//
+// A menu is not a window. It is a handle with items in it, identified by a
+// command id that comes back through the parent's `WM_COMMAND` -- the same
+// message a button's click arrives on, which is why the two have to share a
+// numbering.
+
+public struct MenuItemInfo {
+    public uint    Size;
+    public uint    Mask;
+    public uint    Type;
+    public uint    State;
+    public uint    Id;
+    public HMENU   SubMenu;
+    public HBITMAP Checked;
+    public HBITMAP Unchecked;
+    public nuint   ItemData;
+    public char16* TypeData;
+    public uint    TypeDataLength;
+    public HBITMAP Item;
+}
+
+public extern "C" {
+    HMENU CreateMenu();
+    HMENU CreatePopupMenu();
+    int   DestroyMenu(HMENU menu);
+    int   SetMenu(HWND window, HMENU menu);
+    HMENU GetMenu(HWND window);
+    int   DrawMenuBar(HWND window);
+
+    int   AppendMenuW(HMENU menu, uint flags, nuint item, char16* text);
+    int   InsertMenuItemW(HMENU menu, uint item, int byPosition, MenuItemInfo* info);
+    int   SetMenuItemInfoW(HMENU menu, uint item, int byPosition, MenuItemInfo* info);
+    int   GetMenuItemInfoW(HMENU menu, uint item, int byPosition, MenuItemInfo* info);
+    int   DeleteMenu(HMENU menu, uint item, uint flags);
+    int   GetMenuItemCount(HMENU menu);
+
+    int   EnableMenuItem(HMENU menu, uint item, uint enable);
+    int   CheckMenuItem(HMENU menu, uint item, uint check);
+    int   CheckMenuRadioItem(HMENU menu, uint first, uint last, uint check, uint flags);
+
+    /// Shows a popup and does not return until the user has chosen or
+    /// dismissed it. With `TPM_RETURNCMD` it answers the command id rather
+    /// than posting `WM_COMMAND`, which is the form that needs no id routing.
+    int   TrackPopupMenu(HMENU menu, uint flags, int x, int y, int reserved,
+                         HWND owner, Rect* area);
+}
+
+/// `AppendMenuW` flags.
+public const uint MfString     = 0x00000000u;
+public const uint MfBitmap     = 0x00000004u;
+public const uint MfOwnerDraw  = 0x00000100u;
+public const uint MfPopup      = 0x00000010u;
+public const uint MfSeparator  = 0x00000800u;
+public const uint MfEnabled    = 0x00000000u;
+public const uint MfGrayed     = 0x00000001u;
+public const uint MfDisabled   = 0x00000002u;
+public const uint MfUnchecked  = 0x00000000u;
+public const uint MfChecked    = 0x00000008u;
+public const uint MfByCommand  = 0x00000000u;
+public const uint MfByPosition = 0x00000400u;
+
+/// `MENUITEMINFO` masks.
+public const uint MiimState      = 0x00000001u;
+public const uint MiimId         = 0x00000002u;
+public const uint MiimSubMenu    = 0x00000004u;
+public const uint MiimCheckMarks = 0x00000008u;
+public const uint MiimType       = 0x00000010u;
+public const uint MiimData       = 0x00000020u;
+public const uint MiimString     = 0x00000040u;
+public const uint MiimBitmap     = 0x00000080u;
+public const uint MiimFType      = 0x00000100u;
+
+public const uint MfsEnabled  = 0x00000000u;
+public const uint MfsGrayed   = 0x00000003u;
+public const uint MfsChecked  = 0x00000008u;
+public const uint MfsDefault  = 0x00001000u;
+
+public const uint MftString    = 0x00000000u;
+public const uint MftSeparator = 0x00000800u;
+public const uint MftRadioCheck = 0x00000200u;
+
+/// `TrackPopupMenu` flags.
+public const uint TpmLeftAlign  = 0x0000u;
+public const uint TpmCenterAlign = 0x0004u;
+public const uint TpmRightAlign = 0x0008u;
+public const uint TpmTopAlign   = 0x0000u;
+public const uint TpmLeftButton = 0x0000u;
+public const uint TpmRightButton = 0x0002u;
+public const uint TpmReturnCmd  = 0x0100u;
+public const uint TpmNonNotify  = 0x0080u;
+
+/// Sent to the owner before a menu drops down, which is when a program that
+/// enables items according to what is selected wants to be asked.
+public const uint WmInitMenuPopup = 0x0117u;
+public const uint WmMenuSelect    = 0x011Fu;
+
+// ==================================================== images from a file
+//
+// Enough to put a picture on a button or in a tree: a bitmap loaded from disk.
+// `LoadImageW` reads a `.bmp` and nothing else, which is the format Windows has
+// always been able to read without a decoder.
+
+public extern "C" {
+    HANDLE LoadImageW(HINSTANCE instance, char16* name, uint kind,
+                      int width, int height, uint flags);
+    HICON  CreateIconFromResourceEx(byte* bits, uint size, int isIcon, uint version,
+                                    int width, int height, uint flags);
+    int    DestroyIcon(HICON icon);
+}
+
+public const uint ImageBitmap = 0u;
+public const uint ImageIcon   = 1u;
+public const uint ImageCursor = 2u;
+
+public const uint LrDefaultColor  = 0x0000u;
+public const uint LrLoadFromFile  = 0x0010u;
+public const uint LrDefaultSize   = 0x0040u;
+public const uint LrCreateDibSection = 0x2000u;
+public const uint LrShared        = 0x8000u;
+
 #endif

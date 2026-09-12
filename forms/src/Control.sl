@@ -624,6 +624,10 @@ public abstract class Control : IControlNotify {
     /// a list overrides it and raises `SelectedIndexChanged` instead.
     public virtual void OnPlatformValueChanged() { OnTextChanged(); }
 
+    /// A toolbar button was pressed. Meaningless for everything that is not a
+    /// toolbar, which is why the base does nothing with it.
+    public virtual void OnPlatformToolClicked(int index) { }
+
     /// Whether we are currently inside a platform notification, for a derived
     /// class whose setter must not answer one.
     protected bool IsEchoing => echoing;

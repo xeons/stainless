@@ -437,6 +437,39 @@ public sealed class Graphics {
     }
 }
 
+// ==================================================================== bitmap
+
+/// A picture, loaded once and drawn many times.
+///
+/// **Read from a file and nothing else, for now.** There is no drawing on to
+/// one and no saving from one; what a `Bitmap` is for at this stage is putting
+/// icons on a toolbar, in a tree and in a list, which is what `ImageList` takes
+/// one for. Which formats can be read is the platform's business -- Windows
+/// decodes `.bmp` without a library and nothing else.
+public sealed class Bitmap {
+    IBitmapBackend backend;
+
+    Bitmap(IBitmapBackend made) { backend = made; }
+
+    /// Reads a picture from disk.
+    ///
+    /// A `Result` rather than a null, because a missing or unreadable file is
+    /// the ordinary case here -- an icon is usually named by a path a program
+    /// built, and the error says which one failed.
+    public static Result<Bitmap, String> FromFile(String path) {
+        var loaded = WidgetSet.Current.LoadBitmap(path);
+        if (!loaded.Ok) { return Fail(loaded.Error); }
+        return Ok(new Bitmap(loaded.Value));
+    }
+
+    public int Width  => backend.Width();
+    public int Height => backend.Height();
+    public Size Extent => Size.Of(backend.Width(), backend.Height());
+
+    /// The platform's picture, for the things that take one.
+    public IBitmapBackend Backend() { return backend; }
+}
+
 // =========================================================== system colours
 
 /// The colours the desktop theme chooses, asked of the platform each time.
