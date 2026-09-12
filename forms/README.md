@@ -110,6 +110,8 @@ src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
 src/Controls/Drawn.sl       PaintBox, Shape, Bevel, Splitter (lcl/extctrls.pp)
 src/Controls/Dialogs.sl     OpenDialog, SaveDialog, FolderDialog, ColorDialog,
                             FontDialog, Timer      (lcl/dialogs.pp, customtimer)
+src/Controls/Groups.sl      RadioGroup, CheckGroup, LabeledEdit, Image,
+                            SpinEdit, CheckListBox, HeaderControl
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 ```
@@ -189,6 +191,22 @@ Keeping the two apart is what makes a control placed at (0, 0) land in the same
 place whether or not its parent has a frame. Only a group box has a non-zero
 origin, and without it a control placed at the origin is drawn across the
 caption -- while a *docked* one lands correctly, so the two disagreed.
+
+**A composite is a container that builds its own children.** `RadioGroup`,
+`CheckGroup` and `LabeledEdit` are not widgets: each is a `GroupBox` or a
+`Panel` that makes what goes in it and lays it out. Two consequences worth
+knowing. A `RadioGroup` reads its selection *from the buttons* rather than from
+a field, because the platform ticks and unticks them itself and a field would be
+a second answer to a settled question. And an overridden `OnResize` must do
+nothing until the constructor has finished: the base constructor resizes, and
+the override then runs before this class's own fields exist — the same trap C#
+has with a virtual call from a base constructor.
+
+**Ticking a radio button clears its group, and Windows does not do that for
+you.** `BS_AUTORADIOBUTTON` clears the others when the *user* clicks one;
+`BM_SETCHECK` clears nothing, so a program that ticked one by hand ended up with
+two ticked and a group whose selected index was whichever came first. C# does
+the same clearing in `RadioButton.Checked`.
 
 **A windowless control is drawn in a layer, not in its parent's coordinates.**
 A `GraphicControl` has no window, so its parent draws it -- and the obvious way
@@ -284,6 +302,10 @@ grouped by how much work it is rather than by where it lives.
 | `PaintBox`, `Shape`, `Bevel`, `Splitter` | `extctrls.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
 | `Timer` | `customtimer.pas` |
+| `RadioGroup`, `CheckGroup`, `LabeledEdit`, `Image` | `extctrls.pp` |
+| `SpinEdit` | `spin.pp` |
+| `CheckListBox` | `checklst.pas` |
+| `HeaderControl` | `comctrls.pp` |
 | `Color`, `Point`, `Size`, `Rectangle`, `Font`, `Pen`, `Brush`, `Graphics`, `Bitmap` | `graphics.pp` |
 | the widgetset seam | `widgetset/ws*.pp`, `interfaces/win32` |
 
@@ -292,19 +314,13 @@ grouped by how much work it is rather than by where it lives.
 Every one of these is either a composite of what already exists or a Win32 call
 that is already bound.
 
-- **`RadioGroup`, `CheckGroup`** (`extctrls.pp`) — a `GroupBox` that builds its
-  own children. `LabeledEdit` likewise.
-- **`Image`** (`extctrls.pp`) — a `GraphicControl` that draws a `Bitmap`, which
-  now that both exist is a `DrawBitmap` on `Graphics` and little else.
 - **`Notebook`** without tabs, and `TPageControl` versus `TTabControl` — the
   LCL distinguishes a tabbed control that owns pages from one that only shows
   tabs; only the first is here.
-- **`SpinEdit`, `UpDown`** (`spin.pp`, `comctrls.pp`) — the `UDM_*` messages are
-  bound in `ComCtl32.sl` already.
-- **`CheckListBox`** (`checklst.pas`) — a `ListView` with `LVS_EX_CHECKBOXES`, or
-  an owner-drawn list box.
-- **`HeaderControl`, `CoolBar`** (`comctrls.pp`) — two more `comctl32` classes on
-  the pattern the seven existing ones establish.
+- **`CoolBar`** (`comctrls.pp`) — one more `comctl32` class on the pattern the
+  ten existing ones establish.
+- **`ToggleBox`, `ButtonPanel`** — a `CheckBox` drawn as a button, and the
+  ok/cancel strip every dialog ends with.
 
 ### Worth having, and a week each
 

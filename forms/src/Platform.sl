@@ -366,6 +366,27 @@ public interface IScrollBarPeer : IControlPeer {
 /// A group box: a frame with a caption that other controls sit inside.
 public interface IGroupPeer : IContainerPeer { }
 
+/// A number with arrows beside it.
+public interface ISpinPeer : IControlPeer {
+    void SetRange(int minimum, int maximum);
+    void SetValue(int value);
+    int  GetValue();
+}
+
+/// A list whose items each have a tick.
+public interface ICheckListPeer : IListPeer {
+    void SetItemChecked(int index, bool checked);
+    bool GetItemChecked(int index);
+}
+
+/// A row of draggable column headings, standing alone rather than on a list.
+public interface IHeaderPeer : IControlPeer {
+    int AddSection(String text, int width);
+    void SetSectionWidth(int index, int width);
+    int  GetSectionWidth(int index);
+    int  SectionCount();
+}
+
 /// A panel: a plain container with an optional border.
 public interface IPanelPeer : IContainerPeer {
     void SetBorder(ControlBorder border);
@@ -607,6 +628,14 @@ public interface IGraphicsBackend {
     void DrawStringIn(String text, Font font, Color colour,
                       Rectangle bounds, TextFormat format);
     Size MeasureString(String text, Font font);
+
+    /// Draws a picture at its own size, or scaled into a rectangle.
+    ///
+    /// Two calls rather than one with a flag, because scaling costs a different
+    /// platform call and a caller that is not scaling should not pay for the
+    /// decision on every frame.
+    void DrawBitmap(IBitmapBackend picture, Point at);
+    void DrawBitmapIn(IBitmapBackend picture, Rectangle into);
 }
 
 // =============================================================== the factory
@@ -661,6 +690,9 @@ public interface IWidgetSet {
     IPanelPeer     CreatePanel(IControlNotify owner, IContainerPeer parent);
     IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                    bool vertical);
+    ISpinPeer      CreateSpin(IControlNotify owner, IContainerPeer parent);
+    ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent);
+    IHeaderPeer    CreateHeader(IControlNotify owner, IContainerPeer parent);
 
     IToolBarPeer   CreateToolBar(IControlNotify owner, IContainerPeer parent);
     IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent);

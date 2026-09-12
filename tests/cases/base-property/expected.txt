@@ -1,0 +1,6 @@
+derived stored: 42
+derived reads:  1
+derived writes: 1
+derived name:   derived over base
+further stored: 23
+through a base: derived over base

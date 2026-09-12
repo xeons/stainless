@@ -608,11 +608,13 @@ public class ControlPeer : IControlPeer {
 
     // ------------------------------------------------------- IControlPeer
 
-    public void SetBounds(FRect bounds) {
+    /// Virtual because a peer may be more than one window: a spin control is an
+    /// edit with an up-down docked inside it, and both have to move together.
+    public virtual void SetBounds(FRect bounds) {
         MoveWindow(window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
     }
 
-    public void SetVisible(bool visible) {
+    public virtual void SetVisible(bool visible) {
         ShowWindow(window, visible ? SwShowNoActivate : SwHide);
     }
 

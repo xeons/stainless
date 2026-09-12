@@ -1,0 +1,529 @@
+// Stainless - an experimental systems language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This file is part of the Stainless runtime library. It is free
+// software: you can redistribute it and/or modify it under the terms of
+// the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any
+// later version.
+//
+// It is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// As an additional permission under section 7 of that License, compiling
+// a program with Stainless does not by itself place that program under
+// the GNU General Public License. See LICENSE.RUNTIME.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// The composites: controls made of other controls rather than of a widget.
+//
+// `RadioGroup`, `CheckGroup`, `LabeledEdit` and `Image` are all the same idea --
+// a thing a program wants often enough that building it by hand every time is
+// noise. None of them is a platform widget and none needs a peer: each is a
+// container that makes its own children, which is exactly what `TRadioGroup`
+// and `TLabeledEdit` are in the LCL too.
+//
+// **Which is why they belong in a library rather than in a program.** The
+// arithmetic that lays out six radio buttons in two columns is the same
+// arithmetic every time, and getting it slightly wrong is the sort of thing
+// nobody notices until the captions are long.
+module Forms;
+
+import Standard.Collections;
+import Forms.Drawing;
+import Forms.Platform;
+
+// ============================================================== radio group
+
+/// A group box holding radio buttons, of which one is chosen.
+///
+/// ```
+/// var priority = new RadioGroup(this);
+/// priority.Text = "Priority";
+/// priority.SetBounds(10, 10, 200, 90);
+/// priority.Add("Low");
+/// priority.Add("High");
+/// priority.SelectedIndex = 0;
+/// priority.SelectedIndexChanged += this.OnPriority;
+/// ```
+///
+/// **Grouping is by parent, and this *is* the parent.** Radio buttons form one
+/// group per containing window on every platform, so putting them in a group
+/// box is not decoration -- it is what stops two sets of choices on one form
+/// behaving as a single set.
+public class RadioGroup : GroupBox {
+    List<RadioButton> buttons;
+    int  columns;
+    bool ready;
+
+    public RadioGroup(WindowedControl parent) {
+        base(parent);
+        buttons = new List<RadioButton>();
+        columns = 1;
+        ready = true;
+    }
+
+    /// How many across. Changing it re-lays out what is already there.
+    public int Columns {
+        get => columns;
+        set {
+            if (value < 1) { return; }
+            columns = value;
+            Arrange();
+        }
+    }
+
+    /// Adds a choice and answers its index.
+    public int Add(String caption) {
+        var made = new RadioButton(this);
+        made.Text = caption;
+        made.Click += this.OnChildClicked;
+        buttons.Add(made);
+        Arrange();
+        return (int)buttons.Count() - 1;
+    }
+
+    public List<RadioButton> Buttons => buttons;
+    public nuint Count => buttons.Count();
+
+    /// Which choice is ticked, or -1.
+    ///
+    /// Read from the buttons rather than remembered, because the platform ticks
+    /// and unticks them itself when one is clicked -- a field here would be a
+    /// second answer to a question that already has one.
+    public int SelectedIndex {
+        get {
+            for (nuint i = 0u; i < buttons.Count(); i += 1u) {
+                if (buttons.At(i).Checked) { return (int)i; }
+            }
+            return -1;
+        }
+        set {
+            if (value < 0 || (nuint)value >= buttons.Count()) { return; }
+            buttons.At((nuint)value).Checked = true;
+        }
+    }
+
+    /// The caption of the chosen item, or null.
+    public String? SelectedText {
+        get {
+            int at = SelectedIndex;
+            if (at < 0) { return null; }
+            return buttons.At((nuint)at).Text;
+        }
+    }
+
+    /// The choice changed.
+    public event EventHandler SelectedIndexChanged;
+
+    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+
+    void OnChildClicked(Control sender) { OnSelectedIndexChanged(); }
+
+    /// Lays the buttons out in `Columns` columns, filling the client area.
+    ///
+    /// Called on every addition, which is O(n) per add and O(n²) to build a
+    /// group -- which for a group small enough to be usable is a few dozen
+    /// `MoveWindow` calls and not worth the bookkeeping to avoid.
+    /// **Nothing before the constructor has finished.** `OnResize` is overridden
+    /// here and the base constructor resizes: the platform window is made,
+    /// given its bounds, and reports them back -- all before this class's own
+    /// fields exist. Arranging then reads a list that has not been made yet.
+    ///
+    /// The same trap C# has with a virtual call from a base constructor, and
+    /// the same answer: a flag that is false until there is something to
+    /// arrange.
+    void Arrange() {
+        if (!ready || buttons.IsEmpty()) { return; }
+        var area = ClientBounds;
+        if (area.Width <= 0 || area.Height <= 0) { return; }
+
+        nuint total = buttons.Count();
+        int perColumn = ((int)total + columns - 1) / columns;
+        if (perColumn < 1) { perColumn = 1; }
+
+        int width = area.Width / columns;
+        int height = area.Height / perColumn;
+        if (height < 20) { height = 20; }
+
+        for (nuint i = 0u; i < total; i += 1u) {
+            int column = (int)i / perColumn;
+            int row = (int)i % perColumn;
+            buttons.At(i).SetBounds(column * width, row * height, width, height);
+        }
+    }
+
+    /// A resize moves every button, since each is a fraction of the client area.
+    protected override void OnResize() {
+        base.OnResize();
+        Arrange();
+    }
+}
+
+// ============================================================== check group
+
+/// The same, with check boxes: any number chosen rather than exactly one.
+public class CheckGroup : GroupBox {
+    List<CheckBox> boxes;
+    int  columns;
+    bool ready;
+
+    public CheckGroup(WindowedControl parent) {
+        base(parent);
+        boxes = new List<CheckBox>();
+        columns = 1;
+        ready = true;
+    }
+
+    public int Columns {
+        get => columns;
+        set {
+            if (value < 1) { return; }
+            columns = value;
+            Arrange();
+        }
+    }
+
+    public int Add(String caption) {
+        var made = new CheckBox(this);
+        made.Text = caption;
+        made.CheckedChanged += this.OnChildChanged;
+        boxes.Add(made);
+        Arrange();
+        return (int)boxes.Count() - 1;
+    }
+
+    public List<CheckBox> Boxes => boxes;
+    public nuint Count => boxes.Count();
+
+    public bool IsChecked(int index) {
+        if (index < 0 || (nuint)index >= boxes.Count()) { return false; }
+        return boxes.At((nuint)index).Checked;
+    }
+
+    public void SetChecked(int index, bool ticked) {
+        if (index < 0 || (nuint)index >= boxes.Count()) { return; }
+        boxes.At((nuint)index).Checked = ticked;
+    }
+
+    /// The indices that are ticked, in order.
+    public int[] CheckedIndices {
+        get {
+            nuint ticked = 0u;
+            for (nuint i = 0u; i < boxes.Count(); i += 1u) {
+                if (boxes.At(i).Checked) { ticked += 1u; }
+            }
+            var found = new int[ticked];
+            nuint at = 0u;
+            for (nuint i = 0u; i < boxes.Count(); i += 1u) {
+                if (boxes.At(i).Checked) {
+                    found[at] = (int)i;
+                    at += 1u;
+                }
+            }
+            return found;
+        }
+    }
+
+    /// One of the boxes was ticked or unticked.
+    public event EventHandler CheckedChanged;
+
+    protected virtual void OnCheckedChanged() { CheckedChanged(this); }
+
+    void OnChildChanged(Control sender) { OnCheckedChanged(); }
+
+    /// See the note on `RadioGroup.Arrange`.
+    void Arrange() {
+        if (!ready || boxes.IsEmpty()) { return; }
+        var area = ClientBounds;
+        if (area.Width <= 0 || area.Height <= 0) { return; }
+
+        nuint total = boxes.Count();
+        int perColumn = ((int)total + columns - 1) / columns;
+        if (perColumn < 1) { perColumn = 1; }
+
+        int width = area.Width / columns;
+        int height = area.Height / perColumn;
+        if (height < 20) { height = 20; }
+
+        for (nuint i = 0u; i < total; i += 1u) {
+            int column = (int)i / perColumn;
+            int row = (int)i % perColumn;
+            boxes.At(i).SetBounds(column * width, row * height, width, height);
+        }
+    }
+
+    protected override void OnResize() {
+        base.OnResize();
+        Arrange();
+    }
+}
+
+// ============================================================= labeled edit
+
+/// A text box with a caption above it, which is what a form is mostly made of.
+///
+/// **A `Panel`, not an `Edit` with a label bolted on.** `TLabeledEdit` is a
+/// `TCustomEdit` that owns a `TBoundLabel` positioned relative to itself, so
+/// the label is outside the control's own bounds and a layout that moves the
+/// edit has to know to expect it. Here the pair is one control whose bounds
+/// contain both, and docking or anchoring it does the obvious thing.
+public class LabeledEdit : Panel {
+    Label   caption;
+    TextBox entry;
+    int     above;
+    bool    ready;
+
+    public LabeledEdit(WindowedControl parent) {
+        base(parent);
+        above = 18;
+
+        caption = new Label(this);
+        entry = new TextBox(this);
+        entry.UserTextChanged += this.OnEntryChanged;
+
+        ready = true;
+        Arrange();
+    }
+
+    /// The caption above the box.
+    public String Caption {
+        get => caption.Text;
+        set { caption.Text = value; }
+    }
+
+    /// What is in the box. `Text` itself is the panel's, which nothing shows.
+    public String Value {
+        get => entry.Text;
+        set { entry.Text = value; }
+    }
+
+    /// The box, for the things a caller may want to set on it directly --
+    /// `PasswordChar`, `MaxLength`, `ReadOnly`.
+    public TextBox Entry => entry;
+    public Label CaptionLabel => caption;
+
+    /// How tall the caption is. The box takes what is left.
+    public int CaptionHeight {
+        get => above;
+        set {
+            above = value;
+            Arrange();
+        }
+    }
+
+    /// The user typed.
+    public event EventHandler ValueChanged;
+
+    protected virtual void OnValueChanged() { ValueChanged(this); }
+
+    void OnEntryChanged(Control sender) { OnValueChanged(); }
+
+    /// See the note on `RadioGroup.Arrange`.
+    void Arrange() {
+        if (!ready) { return; }
+        var area = ClientBounds;
+        if (area.Width <= 0) { return; }
+        caption.SetBounds(0, 0, area.Width, above);
+        int rest = area.Height - above;
+        if (rest < 0) { rest = 0; }
+        entry.SetBounds(0, above, area.Width, rest);
+    }
+
+    protected override void OnResize() {
+        base.OnResize();
+        Arrange();
+    }
+}
+
+// ==================================================================== image
+
+/// A picture on a form.
+///
+/// The `GraphicControl` counterpart of everything else here: no window, no
+/// peer, just a `Bitmap` drawn in the parent's paint.
+public class Image : GraphicControl {
+    Bitmap? picture;
+    bool    stretched;
+
+    public Image(WindowedControl parent) {
+        base(parent);
+        picture = null;
+        stretched = false;
+    }
+
+    /// What is shown, or null for nothing.
+    public Bitmap? Picture {
+        get => picture;
+        set {
+            picture = value;
+            Invalidate();
+        }
+    }
+
+    /// Loads a picture from a file and shows it.
+    public Result<bool, String> Load(String path) {
+        var loaded = Bitmap.FromFile(path);
+        if (!loaded.Ok) { return Fail(loaded.Error); }
+        Picture = loaded.Value;
+        return Ok(true);
+    }
+
+    /// Whether the picture is scaled to the control, or drawn at its own size
+    /// in the top-left corner.
+    public bool Stretch {
+        get => stretched;
+        set {
+            stretched = value;
+            Invalidate();
+        }
+    }
+
+    protected override void OnPaint(PaintEventArgs args) {
+        var held = picture;
+        if (held != null) {
+            var shown = (Bitmap)held;
+            if (stretched) {
+                args.Graphics.DrawBitmap(shown, Rectangle.Of(0, 0, Width, Height));
+            } else {
+                args.Graphics.DrawBitmap(shown, Point.At(0, 0));
+            }
+        }
+        base.OnPaint(args);
+    }
+}
+
+// ================================================================ spin edit
+
+/// A number with arrows beside it.
+///
+/// **One control, two windows.** Windows has no spin control: it has an
+/// up-down, which is a pair of arrows that drives a *buddy* window, so a spin
+/// edit is an `EDIT` with one docked inside its right-hand edge. The pair moves
+/// and hides together, which is the whole of the illusion.
+public class SpinEdit : WindowedControl {
+    ISpinPeer native;
+    int low;
+    int high;
+
+    public SpinEdit(WindowedControl parent) {
+        base(parent);
+        low = 0;
+        high = 100;
+        native = WidgetSet.Current.CreateSpin(this, ParentPeer());
+        AttachPeer(native);
+    }
+
+    public int Minimum {
+        get => low;
+        set {
+            low = value;
+            native.SetRange(low, high);
+        }
+    }
+
+    public int Maximum {
+        get => high;
+        set {
+            high = value;
+            native.SetRange(low, high);
+        }
+    }
+
+    public int Value {
+        get => native.GetValue();
+        set { native.SetValue(value); }
+    }
+
+    /// The number changed, by the arrows or by typing.
+    public event EventHandler ValueChanged;
+
+    protected virtual void OnValueChanged() { ValueChanged(this); }
+
+    public override void OnPlatformValueChanged() { OnValueChanged(); }
+}
+
+// =========================================================== check list box
+
+/// A list whose items each have a tick.
+///
+/// The one control here that is a different widget from the one its name
+/// suggests: a report-mode list view with check boxes, because Windows has no
+/// checked list box and that is what every program that shows one uses.
+public class CheckListBox : ListControl {
+    ICheckListPeer native;
+
+    public CheckListBox(WindowedControl parent) {
+        base(parent);
+        native = WidgetSet.Current.CreateCheckList(this, ParentPeer());
+        AttachPeer(native);
+    }
+
+    protected override IListPeer List => native;
+
+    /// Whether an item is ticked.
+    public bool IsChecked(int index) { return native.GetItemChecked(index); }
+
+    public void SetChecked(int index, bool ticked) {
+        native.SetItemChecked(index, ticked);
+    }
+
+    /// The indices that are ticked, in order.
+    public int[] CheckedIndices {
+        get {
+            int total = (int)Count;
+            nuint ticked = 0u;
+            for (int i = 0; i < total; i += 1) {
+                if (native.GetItemChecked(i)) { ticked += 1u; }
+            }
+            var found = new int[ticked];
+            nuint at = 0u;
+            for (int i = 0; i < total; i += 1) {
+                if (native.GetItemChecked(i)) {
+                    found[at] = i;
+                    at += 1u;
+                }
+            }
+            return found;
+        }
+    }
+}
+
+// ================================================================== header
+
+/// A row of column headings that can be dragged wider.
+///
+/// Standing alone, rather than the one a `ListView` already has: what it is for
+/// is putting headings over something this library does not draw -- a grid a
+/// program owns, most likely.
+public class HeaderControl : WindowedControl {
+    IHeaderPeer native;
+
+    public HeaderControl(WindowedControl parent) {
+        base(parent);
+        native = WidgetSet.Current.CreateHeader(this, ParentPeer());
+        AttachPeer(native);
+    }
+
+    /// Adds a heading and answers its index.
+    public int Add(String text, int width) { return native.AddSection(text, width); }
+
+    public int Count => native.SectionCount();
+
+    public int SectionWidth(int index) { return native.GetSectionWidth(index); }
+
+    public void SetSectionWidth(int index, int width) {
+        native.SetSectionWidth(index, width);
+    }
+
+    /// A heading was dragged.
+    public event EventHandler SectionResized;
+
+    protected virtual void OnSectionResized() { SectionResized(this); }
+
+    public override void OnPlatformValueChanged() { OnSectionResized(); }
+}

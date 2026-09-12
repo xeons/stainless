@@ -699,4 +699,321 @@ public class ListViewPeer : ControlPeer, IListViewPeer {
     }
 }
 
+// ==================================================================== spin
+
+/// An `EDIT` with an `msctls_updown32` glued to it.
+///
+/// **Two windows, not one.** Windows has no spin control: it has an up-down,
+/// which is a pair of arrows that knows how to drive a *buddy* window. So this
+/// makes both, tells the up-down which edit it belongs to, and lets it keep the
+/// text in step -- `UDS_SETBUDDYINT` is what makes the edit show a number at
+/// all, and without it the arrows move a value nothing displays.
+public class SpinPeer : ControlPeer, ISpinPeer {
+    HWND arrows;
+    weak IControlNotify? owning;
+
+    public SpinPeer(IControlNotify owner, IContainerPeer parent) {
+        base(MakeChild("EDIT", WindowOf(parent),
+                       ChildStyle() | EsAutoHScroll | EsRight, WsExClientEdge),
+             owner, true);
+        owning = owner;
+
+        arrows = MakeChild("msctls_updown32", WindowOf(parent),
+                           ChildStyle() | UdsSetBuddyInt | UdsAlignRight
+                                        | UdsArrowKeys | UdsAutoBuddy, 0u);
+        SendMessageW(arrows, UdmSetBuddy, (ulong)(nuint)(void*)window, 0);
+        SetRange(0, 100);
+    }
+
+    ~SpinPeer() {
+        if (arrows != null) {
+            DestroyWindow(arrows);
+            arrows = null;
+        }
+    }
+
+    public void SetRange(int minimum, int maximum) {
+        SendMessageW(arrows, UdmSetRange32, (ulong)minimum, (long)maximum);
+    }
+
+    public void SetValue(int value) {
+        SendMessageW(arrows, UdmSetPos32, 0u, (long)value);
+    }
+
+    public int GetValue() {
+        return (int)SendMessageW(arrows, UdmGetPos32, 0u, 0);
+    }
+
+    /// The edit reports its own changes, which is what makes typing a number
+    /// count as well as clicking the arrows.
+    protected override bool Notified(uint code, int id) {
+        if (code != EnChange) { return false; }
+        IControlNotify? held = owning;
+        if (held == null) { return false; }
+        ((IControlNotify)held).OnPlatformValueChanged();
+        return true;
+    }
+
+    /// The arrows sit inside the edit's right-hand edge, so the pair is laid out
+    /// as one control -- which is the whole illusion.
+    public override void SetBounds(FRect bounds) {
+        MoveWindow(window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
+        // `UDM_SETBUDDY` re-docks the arrows against whatever the buddy now is.
+        SendMessageW(arrows, UdmSetBuddy, (ulong)(nuint)(void*)window, 0);
+    }
+
+    public override void SetVisible(bool visible) {
+        ShowWindow(window, visible ? SwShowNoActivate : SwHide);
+        ShowWindow(arrows, visible ? SwShowNoActivate : SwHide);
+    }
+}
+
+// ========================================================== check list box
+
+/// A list whose items each have a tick.
+///
+/// **A list *view*, not a list box.** Windows has no checked list box; every
+/// program that shows one uses a report-mode list view with
+/// `LVS_EX_CHECKBOXES`, and the LCL owner-draws a list box instead. The list
+/// view is the one that looks native and the one that already knows how to
+/// report a tick.
+public class CheckListPeer : ControlPeer, ICheckListPeer {
+    weak IControlNotify? owning;
+    int rows;
+
+    public CheckListPeer(IControlNotify owner, IContainerPeer parent) {
+        base(MakeChild("SysListView32", WindowOf(parent),
+                       ChildStyle() | LvsReport | LvsShowSelAlways | LvsNoSortHeader,
+                       WsExClientEdge),
+             owner, true);
+        owning = owner;
+        rows = 0;
+        SendMessageW(window, LvmSetExtendedStyle,
+                     (ulong)(LvsExCheckBoxes | LvsExFullRowSelect),
+                     (long)(LvsExCheckBoxes | LvsExFullRowSelect));
+
+        // One column: a report-mode list with no columns shows nothing at all,
+        // which is the trap this control is otherwise. Its width follows the
+        // control's in `SetBounds`, because a column wider than the list is a
+        // horizontal scroll bar under a single column of text.
+        ListColumn column;
+        column.Mask = LvcfWidth | LvcfSubItem;
+        column.Format = LvcfmtLeft;
+        column.Width = 100;
+        column.Text = null;
+        column.TextLength = 0;
+        column.SubItem = 0;
+        column.Image = 0;
+        column.Order = 0;
+        SendMessageW(window, LvmInsertColumnW, 0u, (long)(nuint)&column);
+    }
+
+    /// The one column follows the control, so the text fills it and no
+    /// horizontal scroll bar appears.
+    public override void SetBounds(FRect bounds) {
+        MoveWindow(window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
+        Rect client;
+        GetClientRect(window, &client);
+        int width = client.Right - client.Left;
+        if (width > 0) {
+            SendMessageW(window, LvmSetColumnWidth, 0u, (long)width);
+        }
+    }
+
+    public void InsertItem(int index, String text) {
+        ListItem item;
+        var wide = text.ToUtf16();
+        item.Mask = LvifText;
+        item.Item = index;
+        item.SubItem = 0;
+        item.State = 0u;
+        item.StateMask = 0u;
+        item.Text = wide.ToPointer();
+        item.TextLength = 0;
+        item.Image = 0;
+        item.Param = 0u;
+        item.Indent = 0;
+        item.GroupId = 0;
+        item.Columns = 0u;
+        item.ColumnFormat = null;
+        if (SendMessageW(window, LvmInsertItemW, 0u, (long)(nuint)&item) >= 0) {
+            rows = rows + 1;
+        }
+    }
+
+    public void RemoveItem(int index) {
+        if (SendMessageW(window, LvmDeleteItem, (ulong)index, 0) != 0 && rows > 0) {
+            rows = rows - 1;
+        }
+    }
+
+    public void ClearItems() {
+        SendMessageW(window, LvmDeleteAllItems, 0u, 0);
+        rows = 0;
+    }
+
+    public int ItemCount() { return (int)SendMessageW(window, LvmGetItemCount, 0u, 0); }
+
+    public void SetSelectedIndex(int index) {
+        ListItem item;
+        item.Mask = LvifState;
+        item.Item = index;
+        item.SubItem = 0;
+        item.State = LvisSelected | LvisFocused;
+        item.StateMask = LvisSelected | LvisFocused;
+        item.Text = null;
+        item.TextLength = 0;
+        item.Image = 0;
+        item.Param = 0u;
+        item.Indent = 0;
+        item.GroupId = 0;
+        item.Columns = 0u;
+        item.ColumnFormat = null;
+        SendMessageW(window, LvmSetItemState, (ulong)index, (long)(nuint)&item);
+    }
+
+    public int GetSelectedIndex() {
+        return (int)SendMessageW(window, LvmGetNextItem, (ulong)(nuint)(nint)(-1),
+                                 (long)LvniSelected);
+    }
+
+    /// The tick is the *state image*, one-based: 1 is empty and 2 is ticked.
+    public void SetItemChecked(int index, bool checked) {
+        ListItem item;
+        item.Mask = LvifState;
+        item.Item = index;
+        item.SubItem = 0;
+        item.State = CheckedState(checked);
+        item.StateMask = LvisStateImageMask;
+        item.Text = null;
+        item.TextLength = 0;
+        item.Image = 0;
+        item.Param = 0u;
+        item.Indent = 0;
+        item.GroupId = 0;
+        item.Columns = 0u;
+        item.ColumnFormat = null;
+        SendMessageW(window, LvmSetItemState, (ulong)index, (long)(nuint)&item);
+    }
+
+    public bool GetItemChecked(int index) {
+        ListItem item;
+        item.Mask = LvifState;
+        item.Item = index;
+        item.SubItem = 0;
+        item.State = 0u;
+        item.StateMask = LvisStateImageMask;
+        item.Text = null;
+        item.TextLength = 0;
+        item.Image = 0;
+        item.Param = 0u;
+        item.Indent = 0;
+        item.GroupId = 0;
+        item.Columns = 0u;
+        item.ColumnFormat = null;
+        SendMessageW(window, LvmGetItemW, 0u, (long)(nuint)&item);
+        return ((item.State & LvisStateImageMask) >> 12) == 2u;
+    }
+
+    /// A tick and a selection both arrive as `LVN_ITEMCHANGED`; the state mask
+    /// says which, and both are worth reporting.
+    protected override bool NotifiedBy(int code, void* raw) {
+        if (code != LvnItemChanged) { return false; }
+        NotifyListView* details = (NotifyListView*)raw;
+        if ((details->Changed & 0x0008u) == 0u) { return false; }
+        IControlNotify? held = owning;
+        if (held == null) { return false; }
+        ((IControlNotify)held).OnPlatformValueChanged();
+        return true;
+    }
+}
+
+// ================================================================== header
+
+/// A row of column headings that can be dragged wider.
+public class HeaderPeer : ControlPeer, IHeaderPeer {
+    weak IControlNotify? owning;
+    int sections;
+
+    public HeaderPeer(IControlNotify owner, IContainerPeer parent) {
+        base(MakeChild("SysHeader32", WindowOf(parent),
+                       ChildStyle() | HdsButtons | HdsHorizontal, 0u),
+             owner, true);
+        owning = owner;
+        sections = 0;
+    }
+
+    public int AddSection(String text, int width) {
+        HeaderItem item;
+        var wide = text.ToUtf16();
+        item.Mask = HdiWidth | HdiText | HdiFormat;
+        item.Width = width;
+        item.Text = wide.ToPointer();
+        item.Bitmap = null;
+        item.TextLength = 0;
+        item.Format = HdfLeft | HdfString;
+        item.Param = 0u;
+        item.Image = 0;
+        item.Order = 0;
+        item.Type = 0u;
+        item.FilterData = null;
+        item.State = 0u;
+
+        int at = (int)SendMessageW(window, HdmInsertItemW, (ulong)sections,
+                                   (long)(nuint)&item);
+        if (at >= 0) { sections = sections + 1; }
+        return at;
+    }
+
+    public void SetSectionWidth(int index, int width) {
+        HeaderItem item;
+        item.Mask = HdiWidth;
+        item.Width = width;
+        item.Text = null;
+        item.Bitmap = null;
+        item.TextLength = 0;
+        item.Format = 0;
+        item.Param = 0u;
+        item.Image = 0;
+        item.Order = 0;
+        item.Type = 0u;
+        item.FilterData = null;
+        item.State = 0u;
+        SendMessageW(window, HdmSetItemW, (ulong)index, (long)(nuint)&item);
+    }
+
+    public int GetSectionWidth(int index) {
+        HeaderItem item;
+        item.Mask = HdiWidth;
+        item.Width = 0;
+        item.Text = null;
+        item.Bitmap = null;
+        item.TextLength = 0;
+        item.Format = 0;
+        item.Param = 0u;
+        item.Image = 0;
+        item.Order = 0;
+        item.Type = 0u;
+        item.FilterData = null;
+        item.State = 0u;
+        if (SendMessageW(window, HdmGetItemW, (ulong)index, (long)(nuint)&item) == 0) {
+            return 0;
+        }
+        return item.Width;
+    }
+
+    public int SectionCount() {
+        return (int)SendMessageW(window, HdmGetItemCount, 0u, 0);
+    }
+
+    /// A section was dragged wider or narrower.
+    protected override bool NotifiedBy(int code, void* raw) {
+        if (code != HdnItemChangedW) { return false; }
+        IControlNotify? held = owning;
+        if (held == null) { return false; }
+        ((IControlNotify)held).OnPlatformValueChanged();
+        return true;
+    }
+}
+
 #endif

@@ -723,7 +723,8 @@ public sealed partial class Binder
         if (namedType.FindProperty(member.Member) is { } callableProperty &&
             IsCallableValue(callableProperty.Type))
         {
-            var read = BindPropertyRead(member.Span, receiver, callableProperty);
+            var read = BindPropertyRead(member.Span, receiver, callableProperty,
+                                        nonVirtual: member.Target is BaseSyntax);
             return read.Type.IsError()
                 ? new BoundErrorExpression(syntax.Span)
                 : BuildIndirectCall(syntax, read, arguments);

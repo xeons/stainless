@@ -478,4 +478,57 @@ public const uint UdsArrowKeys   = 0x0020u;
 
 public const int UdnDeltaPos = -722;
 
+// ================================================================== header
+
+/// `HDITEMW`.
+public struct HeaderItem {
+    public uint    Mask;
+    public int     Width;
+    public char16* Text;
+    public HBITMAP Bitmap;
+    public int     TextLength;
+    public int     Format;
+    public nuint   Param;
+    public int     Image;
+    public int     Order;
+    public uint    Type;
+    public void*   FilterData;
+    public uint    State;
+}
+
+public const uint HdmInsertItemW = 0x120Au;   // HDM_FIRST + 10
+public const uint HdmDeleteItem  = 0x1202u;
+public const uint HdmGetItemW    = 0x120Bu;   // HDM_FIRST + 11
+public const uint HdmSetItemW    = 0x120Cu;   // HDM_FIRST + 12
+public const uint HdmGetItemCount = 0x1200u;
+public const uint HdmLayout      = 0x1205u;
+
+public const uint HdiWidth  = 0x0001u;
+public const uint HdiText   = 0x0002u;
+public const uint HdiFormat = 0x0004u;
+
+public const int HdfLeft   = 0x0000;
+public const int HdfRight  = 0x0001;
+public const int HdfCenter = 0x0002;
+public const int HdfString = 0x4000;
+
+public const uint HdsHorizontal = 0x0000u;
+public const uint HdsButtons    = 0x0002u;
+
+public const int HdnItemChangedW = -321;
+
+// ============================================== a list box with tick boxes
+//
+// Windows has no such control. A list view in report mode with
+// `LVS_EX_CHECKBOXES` is the one every program uses, so that is what this is --
+// which is why the constants it needs are the list view's.
+
+/// The state image, which is where a list view keeps a tick: one-based, so 1 is
+/// unticked and 2 is ticked, and 0 means no state image at all.
+public const uint LvisStateImageMask = 0xF000u;
+
+public uint CheckedState(bool ticked) {
+    return ((uint)(ticked ? 2 : 1)) << 12;
+}
+
 #endif

@@ -350,7 +350,8 @@ public sealed partial class Binder
         // and reaching that field directly would skip the accessor and, through
         // an interface, skip dispatch with it.
         if (namedType.FindProperty(syntax.Member) is { } property)
-            return BindPropertyRead(syntax.Span, receiver, property);
+            return BindPropertyRead(syntax.Span, receiver, property,
+                                    nonVirtual: syntax.Target is BaseSyntax);
 
         if (namedType.FindField(syntax.Member) is { } field)
         {
@@ -656,7 +657,8 @@ public sealed partial class Binder
 
         // A variant may carry ordinary members too, and Result's ValueOr is one.
         if (variant.FindProperty(syntax.Member) is { } property)
-            return BindPropertyRead(syntax.Span, receiver, property);
+            return BindPropertyRead(syntax.Span, receiver, property,
+                                    nonVirtual: syntax.Target is BaseSyntax);
 
         var carrying = variant.Cases.Where(c => c.FindField(syntax.Member) is not null).ToList();
 

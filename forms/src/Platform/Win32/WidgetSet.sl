@@ -417,6 +417,18 @@ public class Win32WidgetSet : IWidgetSet {
         return new ListViewPeer(owner, parent);
     }
 
+    public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent) {
+        return new SpinPeer(owner, parent);
+    }
+
+    public ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent) {
+        return new CheckListPeer(owner, parent);
+    }
+
+    public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent) {
+        return new HeaderPeer(owner, parent);
+    }
+
     public IMenuPeer CreateMenu() { return new MenuPeer(false); }
 
     /// A menu bar, which Windows makes with a different call from a popup and

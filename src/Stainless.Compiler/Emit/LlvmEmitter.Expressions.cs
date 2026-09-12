@@ -559,8 +559,11 @@ public sealed partial class LlvmEmitter
         {
             receiverRef = EmitExpression(assignment.Receiver).Ref;
 
-            virtualTarget =
-                setter.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiverRef, setter)
+            // Not through the table for `base.P = x`: the override is what the
+            // object's table holds, so dispatching would call the setter this
+            // one is written inside.
+            virtualTarget = assignment.IsNonVirtual ? null
+                : setter.ContainingType is ComInterfaceTypeSymbol ? LoadComMethod(receiverRef, setter)
                 : setter.ContainingType is InterfaceTypeSymbol
                     ? LoadInterfaceMethod(receiverRef, setter)
                 : setter.IsDispatched ? LoadVirtualMethod(receiverRef, setter)

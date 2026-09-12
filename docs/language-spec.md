@@ -693,7 +693,17 @@ A virtual call is three loads and an indirect call; see
 
 **`base` is where to look, not a value.** `base.M()` calls the implementation
 this class replaced, and is not dispatched — through the vtable an override
-would find itself. `base(...)` runs the base constructor, and only as the very
+would find itself. **A property reached through `base` is the same**, in both
+directions: `base.P` calls the getter this class replaced and `base.P = x` its
+setter, because a property is a pair of methods (§7.3) and the rule is about
+methods. It is the one place the distinction is load-bearing rather than
+pedantic — an override written the obvious way,
+
+```csharp
+public override int Value { get => base.Value; }
+```
+
+would otherwise call itself for ever. `base(...)` runs the base constructor, and only as the very
 first statement of a constructor: the base is built before this class's body
 runs, and a body that had already run would be reading fields nothing had set.
 Left out, the base's constructor taking no arguments is called for you, and

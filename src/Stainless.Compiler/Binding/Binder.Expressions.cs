@@ -1845,8 +1845,22 @@ public sealed partial class Binder
     /// downstream — ARC, interface dispatch, the calling convention — then sees
     /// an ordinary call and needs to know nothing about properties.
     /// </summary>
+    /// <summary>
+    /// <c>base.P</c> is the implementation this class replaced, exactly as
+    /// <c>base.M()</c> is -- so the getter is called directly rather than
+    /// through the vtable.
+    ///
+    /// Without it, an override written the obvious way calls itself:
+    ///
+    ///     public override bool Flag { get =&gt; base.Flag; }
+    ///
+    /// dispatches back to this same getter, for ever, and the program hangs
+    /// with nothing to say. A method has always been non-virtual through
+    /// <c>base</c>; a property accessor is a method and had been missed.
+    /// </summary>
     private BoundExpression BindPropertyRead(
-        SourceSpan span, BoundExpression? receiver, PropertySymbol property)
+        SourceSpan span, BoundExpression? receiver, PropertySymbol property,
+        bool nonVirtual = false)
     {
         if (property.Getter is not { } getter) return new BoundErrorExpression(span);
 
@@ -1862,7 +1876,7 @@ public sealed partial class Binder
         if (receiver is not null && property.ContainingType is StructTypeSymbol structType)
             receiver = new BoundAddressOf(span, new PointerTypeSymbol(structType), receiver);
 
-        return new BoundCall(span, getter, receiver, []);
+        return new BoundCall(span, getter, receiver, []) { IsNonVirtual = nonVirtual };
     }
 
     /// <summary>
@@ -1971,10 +1985,15 @@ public sealed partial class Binder
         // For an indexer, the read that got here already bound and converted
         // the indices, so they are carried over rather than bound again --
         // binding twice would evaluate them twice.
+        // `base.P = x` reaches the setter this class replaced, on the same
+        // terms as the getter above: the read that got here already worked out
+        // which it was, so the answer is carried across rather than decided
+        // twice.
         return new BoundPropertyAssignment(syntax.Span, receiver, property,
             BindConversion(value, property.Type, syntax.Value.Span))
         {
             Indices = property.IsIndexer ? read.Arguments : [],
+            IsNonVirtual = read.IsNonVirtual,
         };
     }
 

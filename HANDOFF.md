@@ -8,8 +8,8 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           659 pass
-dotnet run --project tests/Stainless.Tests      254 cases, 2 skipped on Windows
-samples/forms/build.ps1 -Test                   51 checks against real widgets
+dotnet run --project tests/Stainless.Tests      255 cases, 2 skipped on Windows
+samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
@@ -50,9 +50,25 @@ since the closure work.
 | `caaf3e5` | events, closures and delegates cross a library boundary |
 | `25d7c7d` | an array's type info is named after its element's module |
 | `971fed8` | `forms/`: the LCL's architecture under C#'s names |
-| *this one* | menus and the common controls; interface-to-class narrowing |
+| `fe6a18e` | menus and the common controls; interface-to-class narrowing |
+| `dc8d36c` | the windowless controls; a generic no longer shrinks a struct |
+| *this one* | the composites, and `base` on a property stops dispatching |
 
 ## Findings worth keeping
+
+**`base.P` on a property dispatched back to the override.** A method has always
+been non-virtual through `base` -- the spec says so and `BindMemberOf` passed
+the fact along for a call -- but a property accessor is a method too and did
+not. So the obvious override,
+
+    public override bool Flag { get => base.Flag; }
+
+called itself for ever. Not a crash and not a diagnostic: the program hangs with
+nothing to say, which is how it was found -- a GUI that came up and never
+returned. `BoundCall.IsNonVirtual` already existed; the getter now sets it and
+`BoundPropertyAssignment` gained the same flag for the setter, which travels by
+a different route. `tests/cases/base-property` covers both halves and two levels
+of inheritance.
 
 **A generic instantiated over a struct declared later gave it a one-byte
 layout.** `Forms.Platform` names `Result<Color, DialogOutcome>`; pass 4 reached

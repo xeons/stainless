@@ -26,6 +26,7 @@ public class CommonForm : Form {
     TabPage     treePage;
     TabPage     listPage;
     TabPage     gaugePage;
+    TabPage     formPage;
     TreeView    tree;
     ListView    list;
     ProgressBar progress;
@@ -37,6 +38,12 @@ public class CommonForm : Form {
     public MenuItem WrapItem;
     public ToolButton BoldButton;
     public Bevel    Divider;
+    public RadioGroup Priority;
+    public CheckGroup Options;
+    public LabeledEdit Named;
+    public SpinEdit Quantity;
+    public CheckListBox Chores;
+    public HeaderControl Headings;
     public Shape    Blob;
     public PaintBox Canvas;
     public Timer    Clock;
@@ -138,6 +145,50 @@ public class CommonForm : Form {
         Clock = new Timer(100);
         Clock.Tick += this.OnTick;
 
+        // A fourth page, for the composites -- each of which is a container
+        // that builds its own children rather than a platform widget.
+        formPage = new TabPage(tabs, "Form");
+
+        Priority = new RadioGroup(formPage);
+        Priority.Text = "Priority";
+        Priority.SetBounds(12, 12, 180, 96);
+        Priority.Add("Low");
+        Priority.Add("Normal");
+        Priority.Add("High");
+        Priority.SelectedIndex = 1;
+        Priority.SelectedIndexChanged += this.OnPriority;
+
+        Options = new CheckGroup(formPage);
+        Options.Text = "Options";
+        Options.SetBounds(204, 12, 180, 96);
+        Options.Add("Urgent");
+        Options.Add("Repeat");
+        Options.Add("Notify");
+        Options.SetChecked(0, true);
+
+        Named = new LabeledEdit(formPage);
+        Named.SetBounds(12, 120, 240, 44);
+        Named.Caption = "Item name";
+        Named.Value = "Apples";
+
+        Quantity = new SpinEdit(formPage);
+        Quantity.SetBounds(264, 138, 80, 26);
+        Quantity.Minimum = 1;
+        Quantity.Maximum = 99;
+        Quantity.Value = 6;
+
+        Chores = new CheckListBox(formPage);
+        Chores.SetBounds(12, 176, 240, 110);
+        Chores.Add("Buy milk");
+        Chores.Add("Post letter");
+        Chores.Add("Fix shelf");
+        Chores.SetChecked(1, true);
+
+        Headings = new HeaderControl(formPage);
+        Headings.SetBounds(264, 176, 240, 24);
+        Headings.Add("Name", 120);
+        Headings.Add("Size", 80);
+
         // A context menu, built once and shown where the user asked for it.
         context = new PopupMenu();
         context.Add("Add a row").Click += this.OnAddRow;
@@ -184,6 +235,12 @@ public class CommonForm : Form {
     }
 
     void OnTick(Timer sender) { Ticks = Ticks + 1; }
+
+    void OnPriority(Control sender) {
+        var chosen = Priority.SelectedText;
+        if (chosen == null) { return; }
+        Say("Priority: " + (String)chosen);
+    }
 
     void OnCanvasDown(Control sender, MouseEventArgs args) { clicks = clicks + 1; }
 
@@ -276,10 +333,11 @@ public class CommonForm : Form {
         ok = Check(ok, "status panel text round-trips",
                    status.PanelText(0) == "Ready.");
 
-        ok = Check(ok, "tabs hold their pages", tabs.Pages.Count() == 3u);
-        ok = Check(ok, "the platform has the tabs too", tabs.TabCount == 3);
+        ok = Check(ok, "tabs hold their pages", tabs.Pages.Count() == 4u);
+        ok = Check(ok, "the platform has the tabs too", tabs.TabCount == 4);
         ok = Check(ok, "one page is showing at a time",
-                   treePage.Visible && !listPage.Visible && !gaugePage.Visible);
+                   treePage.Visible && !listPage.Visible
+                   && !gaugePage.Visible && !formPage.Visible);
 
         tabs.SelectedIndex = 1;
         for (int i = 0; i < 6; i += 1) { Application.DoEvents(); }
@@ -372,6 +430,47 @@ public class CommonForm : Form {
         }
         Clock.Stop();
         ok = Check(ok, "a timer ticks off the message queue", Ticks > 0);
+
+        // **The composites.** Each builds its own children, so what is worth
+        // checking is that they were built, laid out inside the parent, and
+        // that reading a value goes to the child rather than to a field that
+        // could disagree with it.
+        ok = Check(ok, "a radio group built its buttons",
+                   Priority.Count == 3u && Priority.Buttons.Count() == 3u);
+        ok = Check(ok, "and reads its choice from them",
+                   Priority.SelectedIndex == 1);
+        Priority.SelectedIndex = 2;
+        ok = Check(ok, "and follows a change",
+                   Priority.SelectedIndex == 2
+                   && Priority.Buttons.At(2u).Checked);
+        ok = Check(ok, "and lays them inside itself",
+                   Priority.Buttons.At(0u).Top == 0
+                   && Priority.Buttons.At(1u).Top > 0);
+
+        ok = Check(ok, "a check group holds several ticks",
+                   Options.IsChecked(0) && !Options.IsChecked(1));
+        Options.SetChecked(2, true);
+        ok = Check(ok, "and reports which", Options.CheckedIndices.Length == 2u);
+
+        ok = Check(ok, "a labelled edit keeps caption and value apart",
+                   Named.Caption == "Item name" && Named.Value == "Apples");
+        Named.Value = "Pears";
+        ok = Check(ok, "and writes through to the box",
+                   Named.Entry.Text == "Pears");
+
+        ok = Check(ok, "a spin edit round-trips through Windows",
+                   Quantity.Value == 6);
+        Quantity.Value = 42;
+        ok = Check(ok, "and follows a change", Quantity.Value == 42);
+
+        ok = Check(ok, "a check list holds its items", Chores.Count == 3u);
+        ok = Check(ok, "and its ticks",
+                   Chores.IsChecked(1) && !Chores.IsChecked(0));
+        Chores.SetChecked(2, true);
+        ok = Check(ok, "and reports which", Chores.CheckedIndices.Length == 2u);
+
+        ok = Check(ok, "a header holds its sections", Headings.Count == 2);
+        ok = Check(ok, "and its widths", Headings.SectionWidth(0) == 120);
 
         // And loading a picture that is not there says so, rather than
         // answering a null nobody checks.

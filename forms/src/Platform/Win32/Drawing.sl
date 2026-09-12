@@ -275,6 +275,36 @@ public class GraphicsBackend : IGraphicsBackend {
         SelectObject(dc, wasFont);
     }
 
+    /// Draws a bitmap through a memory device context, which is the only way
+    /// GDI will copy one: a bitmap is not something a `HDC` can be told to
+    /// draw, it is something selected into a second `HDC` and blitted from.
+    public void DrawBitmap(IBitmapBackend picture, FPoint at) {
+        Blit(picture, Area(at.X, at.Y, picture.Width(), picture.Height()), false);
+    }
+
+    public void DrawBitmapIn(IBitmapBackend picture, FRect into) {
+        Blit(picture, into, true);
+    }
+
+    void Blit(IBitmapBackend picture, FRect into, bool scaled) {
+        HBITMAP bitmap = (HBITMAP)(void*)picture.Handle();
+        if (bitmap == null) { return; }
+
+        HDC memory = CreateCompatibleDC(dc);
+        if (memory == null) { return; }
+        HGDIOBJ was = SelectObject(memory, (HGDIOBJ)(void*)bitmap);
+
+        if (scaled) {
+            StretchBlt(dc, into.X, into.Y, into.Width, into.Height,
+                       memory, 0, 0, picture.Width(), picture.Height(), SrcCopy);
+        } else {
+            BitBlt(dc, into.X, into.Y, into.Width, into.Height, memory, 0, 0, SrcCopy);
+        }
+
+        SelectObject(memory, was);
+        DeleteDC(memory);
+    }
+
     public FSize MeasureString(String text, Font font) {
         var wide = text.ToUtf16();
         HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)font.Resource().Handle());

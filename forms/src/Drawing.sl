@@ -439,6 +439,17 @@ public sealed class Graphics {
         backend.DrawStringIn(text, font, colour, bounds, format);
     }
 
+    /// Draws a picture with its top-left corner at a point.
+    public void DrawBitmap(Bitmap picture, Point at) {
+        backend.DrawBitmap(picture.Backend(), at);
+    }
+
+    /// Draws it scaled to fill a rectangle.
+    public void DrawBitmap(Bitmap picture, Rectangle into) {
+        if (into.IsEmpty) { return; }
+        backend.DrawBitmapIn(picture.Backend(), into);
+    }
+
     /// How large that text would be. What a control's `PreferredSize` is built
     /// from, and the reason a `Graphics` can be asked for before anything is
     /// drawn on it.

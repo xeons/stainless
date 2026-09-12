@@ -347,6 +347,13 @@ public sealed class BoundPropertyAssignment(
     public BoundExpression Value { get; } = value;
 
     /// <summary>
+    /// True for <c>base.P = x</c>: the setter this class replaced, reached
+    /// directly rather than through the vtable, which would find the override
+    /// again.
+    /// </summary>
+    public bool IsNonVirtual { get; init; }
+
+    /// <summary>
     /// What went between the brackets, for <c>a[i] = v</c>. Empty for an
     /// ordinary property, which is the only thing separating the two: an
     /// indexer's setter takes its indices before <c>value</c>.

@@ -128,10 +128,17 @@ public class CheckBox : ButtonBase {
     ///
     /// Read from the platform rather than from a field, because the platform
     /// toggles it when the user clicks and a field would be one click behind.
-    public bool Checked {
+    ///
+    /// Virtual because a radio button has to clear its siblings when it is
+    /// ticked, and a check box must not.
+    public virtual bool Checked {
         get => native.GetChecked();
         set { native.SetChecked(value); }
     }
+
+    /// Sets the tick without telling anything else, for a derived class that
+    /// has more to do around it.
+    protected void SetCheckedOnly(bool ticked) { native.SetChecked(ticked); }
 
     /// The tick changed, whoever changed it.
     public event EventHandler CheckedChanged;
@@ -154,4 +161,31 @@ public class CheckBox : ButtonBase {
 /// the behaviour it already has.
 public class RadioButton : CheckBox {
     public RadioButton(WindowedControl parent) { base(parent, true); }
+
+    /// Ticking one unticks the rest of its group.
+    ///
+    /// **Windows does not do this for a programmatic set.** `BS_AUTORADIOBUTTON`
+    /// clears the other buttons when the *user* clicks one; `BM_SETCHECK`
+    /// clears nothing, so a program that ticked one by hand ended up with two
+    /// ticked and a group whose selected index was whichever came first. C#
+    /// does exactly this in `RadioButton.Checked`, for the same reason.
+    public override bool Checked {
+        get => base.Checked;
+        set {
+            SetCheckedOnly(value);
+            if (!value) { return; }
+            ClearSiblings();
+        }
+    }
+
+    /// Unticks every other radio button with the same parent, which is what
+    /// makes a group a group on every platform.
+    void ClearSiblings() {
+        var parent = Parent;
+        if (parent == null) { return; }
+        foreach (var sibling in ((WindowedControl)parent).Controls) {
+            if (sibling == this) { continue; }
+            if (sibling is RadioButton other) { other.SetCheckedOnly(false); }
+        }
+    }
 }
