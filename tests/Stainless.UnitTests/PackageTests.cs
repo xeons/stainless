@@ -278,6 +278,83 @@ public class DigestTests
 }
 
 /// <summary>
+/// The record of why a dependency did not need rebuilding.
+///
+/// This is the only thing in the compiler that decides not to do work, so it is
+/// the only thing that can be wrong without anything saying so: a build skipped
+/// when it should not have been links perfectly against stale code. Every way
+/// of failing to read one has to mean "build it".
+/// </summary>
+public class BuildStampTests
+{
+    private static string Temp()
+    {
+        string directory = Path.Combine(
+            Path.GetTempPath(), "stainless-stamp", Path.GetRandomFileName());
+
+        Directory.CreateDirectory(directory);
+        return Path.Combine(directory, BuildStamp.FileName);
+    }
+
+    [Fact]
+    public void ReadsBackWhatItWrote()
+    {
+        string path = Temp();
+        new BuildStamp { Inputs = "abc", AbiDigest = "def" }.Write(path);
+
+        var stamp = BuildStamp.Read(path);
+
+        Assert.NotNull(stamp);
+        Assert.Equal("abc", stamp.Inputs);
+        Assert.Equal("def", stamp.AbiDigest);
+    }
+
+    [Fact]
+    public void IsNothingWhenThereIsNoFile() =>
+        Assert.Null(BuildStamp.Read(Temp()));
+
+    /// <summary>
+    /// A half-written or hand-edited stamp says nothing about what is on disk,
+    /// and the safe reading of "says nothing" is "build it".
+    /// </summary>
+    [Fact]
+    public void IsNothingWhenTheFileIsNotOne()
+    {
+        string path = Temp();
+        File.WriteAllText(path, "{ this is not json");
+
+        Assert.Null(BuildStamp.Read(path));
+    }
+
+    /// <summary>
+    /// A stamp from a format this compiler does not know describes inputs it
+    /// cannot compare, so it cannot be believed.
+    /// </summary>
+    [Fact]
+    public void IsNothingWhenTheFormatIsFromElsewhere()
+    {
+        string path = Temp();
+        File.WriteAllText(path, """{ "format": 99, "inputs": "abc", "abiDigest": "def" }""");
+
+        Assert.Null(BuildStamp.Read(path));
+    }
+
+    /// <summary>
+    /// Failing to write one costs a rebuild next time, which is what happens
+    /// with no stamp at all. Failing the build over it would turn a slow build
+    /// into no build.
+    /// </summary>
+    [Fact]
+    public void SaysNothingWhenItCannotBeWritten()
+    {
+        string path = Path.Combine(Temp(), "not-a-directory", BuildStamp.FileName);
+        File.WriteAllText(Path.GetDirectoryName(Path.GetDirectoryName(path))!, "");
+
+        new BuildStamp { Inputs = "a", AbiDigest = "b" }.Write(path);
+    }
+}
+
+/// <summary>
 /// The project file, which is the most user-visible surface after the language
 /// itself and the one where a silent misreading costs the most.
 /// </summary>
@@ -382,6 +459,48 @@ public class ProjectFileTests
         Assert.Equal(
             Path.Combine(directory, "build", "app" + Toolchain.ExecutableExtension),
             project.OutputPath());
+    }
+
+    /// <summary>
+    /// A generated library name is the platform's: 'libshapes.so' where that is
+    /// what makes a library findable, 'shapes.dll' where it is not. Its metadata
+    /// is named after the package either way, because 'libshapes.slmod'
+    /// describes nothing.
+    /// </summary>
+    [Fact]
+    public void NamesALibraryTheWayThePlatformDoes()
+    {
+        string path = Write("""
+            { "name": "shapes", "version": "1.0.0", "kind": "library" }
+            """);
+
+        var project = ProjectFile.Read(path, out _)!;
+        string build = Path.Combine(Path.GetDirectoryName(path)!, "build");
+
+        Assert.Equal(
+            Path.Combine(build, Toolchain.SharedLibraryFileName("shapes")),
+            project.OutputPath());
+
+        Assert.Equal(Path.Combine(build, "shapes.slmod"), project.MetadataPath());
+
+        Assert.Equal(
+            OperatingSystem.IsWindows() ? "shapes.dll" : "libshapes" + Toolchain.SharedLibraryExtension,
+            Path.GetFileName(project.OutputPath()));
+    }
+
+    /// <summary>Metadata follows the binary when '-o' moves it.</summary>
+    [Fact]
+    public void KeepsMetadataBesideWhereverTheLibraryWent()
+    {
+        string path = Write("""
+            { "name": "shapes", "version": "1.0.0", "kind": "library", "output": "out/x.dll" }
+            """);
+
+        var project = ProjectFile.Read(path, out _)!;
+
+        Assert.Equal(
+            Path.Combine(Path.GetDirectoryName(project.OutputPath())!, "shapes.slmod"),
+            project.MetadataPath());
     }
 
     [Fact]

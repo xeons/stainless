@@ -107,14 +107,20 @@ public sealed class PackageResolver(
         if (Environment.GetEnvironmentVariable("STAINLESS_HOME") is { Length: > 0 } home)
             return Path.Combine(home, "cache");
 
-        string root = OperatingSystem.IsWindows()
-            ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-            : Environment.GetEnvironmentVariable("XDG_CACHE_HOME") is { Length: > 0 } xdg
-                ? xdg
-                : Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cache");
+        // On Windows the cache needs saying, because LocalApplicationData holds
+        // every kind of thing. Outside it, the directory is already a cache and
+        // saying so again would name it ~/.cache/stainless/cache.
+        if (OperatingSystem.IsWindows())
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "stainless", "cache");
 
-        return Path.Combine(root, "stainless", "cache");
+        string root = Environment.GetEnvironmentVariable("XDG_CACHE_HOME") is { Length: > 0 } xdg
+            ? xdg
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cache");
+
+        return Path.Combine(root, "stainless");
     }
 
     /// <summary>

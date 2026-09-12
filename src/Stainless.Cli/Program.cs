@@ -460,8 +460,14 @@ internal static class Program
 
         Success($"built {Relative(result.OutputPath!)} in {stopwatch.ElapsedMilliseconds} ms");
 
+        // Built and reused said separately, because "nothing was done" is the
+        // interesting half: a dependency that should have been rebuilt and was
+        // not is a program linked against stale code, and the only chance of
+        // noticing is the build having said so.
         if (built.Built.Count > 0)
-            Console.WriteLine($"  packages: {string.Join(", ", built.Built)}");
+            Console.WriteLine($"  built: {string.Join(", ", built.Built)}");
+        if (built.Reused.Count > 0)
+            Console.WriteLine($"  up to date: {string.Join(", ", built.Reused)}");
         if (result.HeaderPath is not null)
             Console.WriteLine($"  header: {Relative(result.HeaderPath)}");
         if (result.MetadataPath is not null)

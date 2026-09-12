@@ -135,19 +135,32 @@ public sealed record ProjectFile
     {
         if (Output is not null) return Resolve(Output);
 
-        string extension = IsLibrary
-            ? Toolchain.SharedLibraryExtension
-            : Toolchain.ExecutableExtension;
-
-        return System.IO.Path.Combine(Resolve(BuildDirectory), Name + extension);
+        return System.IO.Path.Combine(
+            Resolve(BuildDirectory),
+            IsLibrary
+                ? Toolchain.SharedLibraryFileName(Name)
+                : Name + Toolchain.ExecutableExtension);
     }
 
     /// <summary>
-    /// Where a library's metadata lands. Named after the binary rather than
-    /// after the package, so the two are obviously a pair on disk.
+    /// Where a library's metadata lands: beside the binary, named after the
+    /// package.
+    ///
+    /// After the package rather than after the file, because the file may be
+    /// <c>libshapes.so</c> and <c>libshapes.slmod</c> describes nothing. The
+    /// two are a pair by sitting together.
     /// </summary>
-    public string MetadataPath() =>
-        System.IO.Path.ChangeExtension(OutputPath(), ".slmod");
+    public string MetadataPath() => MetadataBeside(OutputPath(), Name);
+
+    /// <summary>
+    /// The metadata that goes with a library, wherever that library was put.
+    /// One place, because deriving one path from the other by string surgery is
+    /// what made the two disagree the moment either was renamed.
+    /// </summary>
+    public static string MetadataBeside(string library, string package) =>
+        System.IO.Path.Combine(
+            System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(library)) ?? ".",
+            package + ".slmod");
 
     /// <summary>The parsed version, which <see cref="Validate"/> has already checked.</summary>
     public SemanticVersion SemanticVersion() => Driver.SemanticVersion.Parse(Version);

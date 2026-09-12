@@ -278,9 +278,43 @@ something a build quietly fixes into something a build refuses, which is what
 makes the committed lock the one that was actually built.
 
 Fetched packages live in a cache — `%LOCALAPPDATA%\stainless\cache` on Windows
-and `$XDG_CACHE_HOME/stainless/cache` elsewhere, or under `STAINLESS_HOME` if
-that is set. A git dependency needs `git` on `PATH`, and only then: a path
-dependency needs nothing at all.
+and `$XDG_CACHE_HOME/stainless` (usually `~/.cache/stainless`) elsewhere, or
+under `STAINLESS_HOME` if that is set. A git dependency needs `git` on `PATH`,
+and only then: a path dependency needs nothing at all.
+
+## 7.1 What gets rebuilt
+
+A shared dependency is built once and then left alone. Beside its intermediates
+is a stamp recording everything that decided what the last build produced, and a
+build that would produce the same thing does not run:
+
+```
+ok: built build/app in 996 ms
+  up to date: shapes
+```
+
+The rule is **every input, or rebuild**. There is no per-file dependency graph
+and no attempt to work out that some change could not have mattered, because the
+cost of being wrong is not a slow build — it is a program linked against a
+library that no longer matches its source, which links perfectly and reports
+nothing. What counts as an input:
+
+- the compiler itself, by version
+- the package's own files, as a digest of their bytes
+- every package compiled *into* it, on the same terms
+- every library it was bound against, by the surface that library described
+- the optimisation level, debug flag, ABI, runtime and defines
+- where the output goes
+
+Timestamps are deliberately not among them. A file restored from an archive, a
+clock that went backwards, a checkout that rewrote mtimes — each makes a
+timestamp say "unchanged" about different bytes.
+
+Deleting anything the build produced brings the build back, and so does a
+missing or unreadable stamp: every way of failing to read one means "build it".
+
+The root project is not stamped. It is what was asked for, and it is rebuilt
+every time.
 
 ## 8. What a dependency inherits
 

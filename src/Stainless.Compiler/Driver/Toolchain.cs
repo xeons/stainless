@@ -344,6 +344,18 @@ public sealed class Toolchain
         return Run(ClangPath, arguments);
     }
 
+    /// <summary>
+    /// What a shared library built from a package of this name is called.
+    ///
+    /// The <c>lib</c> prefix is not decoration: outside Windows it is what makes
+    /// a library findable as <c>-lshapes</c> rather than only by its full path,
+    /// and the runtime has always been named this way. A generated name should
+    /// be the platform's, the same reason an executable is not called
+    /// <c>app.exe</c> on Linux.
+    /// </summary>
+    public static string SharedLibraryFileName(string name) =>
+        (OperatingSystem.IsWindows() ? "" : "lib") + name + SharedLibraryExtension;
+
     /// <summary>The conventional shared-library extension for this platform.</summary>
     public static string SharedLibraryExtension =>
         OperatingSystem.IsWindows() ? ".dll" : OperatingSystem.IsMacOS() ? ".dylib" : ".so";

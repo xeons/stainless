@@ -101,6 +101,16 @@ public static class Digest
     public static string OfFunction(MetadataFunction function) => Hash(Canonical(function));
 
     /// <summary>
+    /// A digest of an arbitrary list of facts, for a caller that has assembled
+    /// its own. <see cref="ProjectBuilder"/> uses it for the reason a build was
+    /// allowed to be skipped.
+    ///
+    /// The caller owns the order. Joining with the separator below is what makes
+    /// two different lists impossible to render to one string.
+    /// </summary>
+    public static string OfParts(IEnumerable<string> parts) => Hash(parts);
+
+    /// <summary>
     /// Everything about a type that a consumer's compilation can depend on.
     ///
     /// Field and parameter *names* are in here along with the offsets, and that

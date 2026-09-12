@@ -64,6 +64,17 @@ build/app.exe  build/shapes.dll  build/shapes.lib  build/shapes.slmod
 build/stainless-rt.dll
 ```
 
+On Linux the same build produces `libshapes.so` beside `shapes.slmod` and
+`libstainless-rt.so` — a generated library name is the platform's, the same way
+an executable is not called `app.exe` there.
+
+Build it twice and the second one does nothing:
+
+```
+ok: built build/app.exe in 996 ms
+  up to date: shapes
+```
+
 Try it: the program prints the same thing either way. What differs is what was
 built, and what a boundary costs — a `.slmod` describes layouts and signatures,
 so generics and interfaces do not cross one. The compiler says so where the

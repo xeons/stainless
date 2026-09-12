@@ -55,6 +55,14 @@ public sealed record ProjectBuildResult
     /// <summary>Each shared dependency that was built, in the order it was built.</summary>
     public IReadOnlyList<string> Built { get; init; } = [];
 
+    /// <summary>
+    /// Each shared dependency that did not need building. Reported rather than
+    /// silent: a build that skipped work should say which work, or the first
+    /// time it skips something it should not have there is nothing to have
+    /// noticed.
+    /// </summary>
+    public IReadOnlyList<string> Reused { get; init; } = [];
+
     /// <summary>Things worth saying that are not worth stopping for.</summary>
     public IReadOnlyList<string> Warnings { get; init; } = [];
 
@@ -87,8 +95,22 @@ public sealed class ProjectBuilder(
     private readonly List<string> _warnings = [];
     private readonly List<string> _built = [];
 
-    /// <summary>Each shared dependency's metadata, once it has been built.</summary>
-    private readonly Dictionary<string, string> _metadata = new(StringComparer.Ordinal);
+    /// <summary>Dependencies whose last build was still good, so nothing was done.</summary>
+    private readonly List<string> _reused = [];
+
+    /// <summary>
+    /// Each shared dependency once it has been built: where its metadata is,
+    /// and what a link line should name to use it.
+    ///
+    /// Both remembered rather than one derived from the other. A library is
+    /// <c>libshapes.so</c> here and <c>shapes.dll</c> there, its metadata is
+    /// <c>shapes.slmod</c> on both, and what gets linked is a fourth name again
+    /// on Windows -- four spellings that string surgery got to agree only by
+    /// accident.
+    /// </summary>
+    private readonly Dictionary<string, Built> _libraries = new(StringComparer.Ordinal);
+
+    private readonly record struct Built(string Metadata, string LinkInput);
 
     /// <summary>What each shared dependency's digest turned out to be.</summary>
     private readonly Dictionary<string, string> _digests = new(StringComparer.Ordinal);
@@ -117,6 +139,7 @@ public sealed class ProjectBuilder(
             Success = result.Success,
             Root = result,
             Built = _built,
+            Reused = _reused,
             Warnings = _warnings,
             Lock = UpdatedLock(),
         };
@@ -133,9 +156,27 @@ public sealed class ProjectBuilder(
     private ProjectBuildResult? BuildDependency(ResolvedPackage package, BuildOverrides overrides)
     {
         string output = Path.Combine(
-            BuildDirectory(overrides), package.Name + Toolchain.SharedLibraryExtension);
+            BuildDirectory(overrides), Toolchain.SharedLibraryFileName(package.Name));
 
-        string metadata = Path.ChangeExtension(output, ".slmod");
+        string metadata = ProjectFile.MetadataBeside(output, package.Name);
+        string linkInput = LinkInput(output);
+
+        string intermediate = Path.Combine(IntermediateDirectory(overrides), package.Name);
+        string stampPath = Path.Combine(intermediate, BuildStamp.FileName);
+
+        string inputs = Fingerprint(package, overrides, output);
+
+        // Nothing that fed the last build has changed, and everything it
+        // produced is still there. Building it again would produce the same
+        // bytes at the cost of a clang invocation and a link.
+        if (BuildStamp.Read(stampPath) is { } stamp && stamp.Inputs == inputs &&
+            File.Exists(output) && File.Exists(metadata) && File.Exists(linkInput))
+        {
+            _libraries[package.Name] = new Built(metadata, linkInput);
+            _digests[package.Name] = stamp.AbiDigest;
+            _reused.Add(package.Name);
+            return null;
+        }
 
         // What the last build of this dependency said, read before this one
         // overwrites it. The lock file records a digest, but only one; the file
@@ -146,7 +187,7 @@ public sealed class ProjectBuilder(
         var options = OptionsFor(
             package.Project, overrides, output,
             metadata: metadata,
-            intermediate: Path.Combine(IntermediateDirectory(overrides), package.Name));
+            intermediate: intermediate);
 
         if (options is null) return ProjectBuildResult.Failed(_error!);
 
@@ -161,16 +202,21 @@ public sealed class ProjectBuilder(
                 Error = $"the dependency '{package.Name}' did not build",
                 Root = result,
                 Built = _built,
+                Reused = _reused,
                 Warnings = _warnings,
             };
 
         _built.Add(package.Name);
-        _metadata[package.Name] = metadata;
+        _libraries[package.Name] = new Built(metadata, linkInput);
 
         var described = ModuleMetadata.Read(metadata, out string error);
         if (described is null) return ProjectBuildResult.Failed(error);
 
         _digests[package.Name] = described.AbiDigest;
+
+        // Only after everything above succeeded. A stamp written beside a
+        // half-built library would be a promise about a thing that is not there.
+        new BuildStamp { Inputs = inputs, AbiDigest = described.AbiDigest }.Write(stampPath);
 
         if (CheckAbiDigest(package, before, described) is { } mismatch)
         {
@@ -187,6 +233,112 @@ public sealed class ProjectBuilder(
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Everything that decided what a dependency's last build produced.
+    ///
+    /// Every input or rebuild. There is no attempt here to work out that some
+    /// change could not have mattered, because the cost of being wrong is not a
+    /// slow build -- it is a program linked against a library that no longer
+    /// matches its source, which links perfectly and reports nothing. So:
+    ///
+    ///   the compiler         a new one may lower the same source differently
+    ///   the package          its own files, as a digest of their bytes
+    ///   its source closure   compiled *into* it, so their files count too
+    ///   its shared deps      their surfaces are what it was bound against
+    ///   the flags            optimisation, debug, ABI, runtime, defines
+    ///   where it goes        a moved output is a different build
+    ///
+    /// What is deliberately absent is timestamps. A file restored from an
+    /// archive, a clock that went backwards, a checkout that rewrote mtimes --
+    /// each of those makes a timestamp say "unchanged" about different bytes.
+    /// </summary>
+    private string Fingerprint(ResolvedPackage package, BuildOverrides overrides, string output)
+    {
+        var parts = new List<string>
+        {
+            "build",
+            typeof(Compilation).Assembly.GetName().Version?.ToString() ?? "unknown",
+            package.Name,
+            package.Project.Version,
+            package.SourceDigest,
+            output,
+        };
+
+        // Its source closure, in a stable order: a package compiled into this
+        // one is as much a part of it as its own files.
+        foreach (string name in SourceClosure(package.Project).Order(StringComparer.Ordinal))
+            parts.Add(name + "=" +
+                      (_packages.TryGetValue(name, out var inner) ? inner.SourceDigest : "?"));
+
+        // Its shared dependencies, by what they turned out to describe rather
+        // than by what they were built from. Those are already built -- the
+        // resolver put them first -- so the digest is known.
+        foreach (string name in SharedClosure(package.Project).Order(StringComparer.Ordinal))
+            parts.Add(name + ":" + (_digests.TryGetValue(name, out string? abi) ? abi : "?"));
+
+        parts.AddRange([
+            (overrides.OptimizationLevel ?? root.Optimize).ToString(),
+            (overrides.Debug ?? root.Debug) ? "debug" : "",
+            (overrides.CppAbi ?? (root.Abi is null ? null : ProjectFile.ParseAbi(root.Abi)))
+                ?.ToString() ?? "host",
+            (overrides.SharedRuntime ?? (root.Runtime switch
+            {
+                "shared" => true,
+                "static" => false,
+                _ => (bool?)null,
+            }))?.ToString() ?? "default",
+        ]);
+
+        parts.AddRange(package.Project.Defines);
+        parts.AddRange(overrides.Defines);
+
+        return Digest.OfParts(parts);
+    }
+
+    /// <summary>Every package whose files are compiled into this one.</summary>
+    private HashSet<string> SourceClosure(ProjectFile project) =>
+        Closure(project, DependencyLink.Source);
+
+    /// <summary>Every library this one is bound against, directly or through one.</summary>
+    private HashSet<string> SharedClosure(ProjectFile project) =>
+        Closure(project, DependencyLink.Shared);
+
+    /// <summary>
+    /// The packages reachable from a project by one kind of link.
+    ///
+    /// The walk crosses a *source* edge whichever kind it is looking for: a
+    /// source dependency's files are in this compilation, so both what it is
+    /// made of and what it was bound against are this compilation's too. A
+    /// shared edge is only crossed when looking for shared ones, because a
+    /// shared dependency's own source stays on its side of the boundary.
+    /// </summary>
+    private HashSet<string> Closure(ProjectFile project, DependencyLink wanted)
+    {
+        var found = new HashSet<string>(StringComparer.Ordinal);
+        Walk(project, wanted, found, new HashSet<string>(StringComparer.Ordinal));
+        return found;
+    }
+
+    private void Walk(
+        ProjectFile project, DependencyLink wanted, HashSet<string> found, HashSet<string> visited)
+    {
+        foreach (var (name, dependency) in project.Dependencies)
+        {
+            if (!_packages.TryGetValue(name, out var package)) continue;
+
+            if (dependency.Link == wanted) found.Add(name);
+
+            if (dependency.Link != DependencyLink.Source && wanted != DependencyLink.Shared)
+                continue;
+
+            // `visited` and not `found`, because a package can be walked
+            // through without being one of the kind being collected -- and
+            // because resolution rejects cycles, so this is about not walking a
+            // diamond twice rather than about terminating.
+            if (visited.Add(name)) Walk(package.Project, wanted, found, visited);
+        }
     }
 
     /// <summary>
@@ -363,7 +515,7 @@ public sealed class ProjectBuilder(
             // Beside the binary rather than at the project's own metadata path,
             // because '-o' may have moved the binary and the two are a pair.
             if (metadata is null && project.IsLibrary)
-                metadata = Path.ChangeExtension(output, ".slmod");
+                metadata = ProjectFile.MetadataBeside(output, project.Name);
         }
 
         // A dependency is built for the program that needs it, so the answers
@@ -433,10 +585,10 @@ public sealed class ProjectBuilder(
                 continue;
             }
 
-            if (!_metadata.TryGetValue(name, out string? metadata)) continue;
+            if (!_libraries.TryGetValue(name, out var built)) continue;
 
-            references.Add(metadata);
-            linkInputs.Add(LinkInput(Path.ChangeExtension(metadata, Toolchain.SharedLibraryExtension)));
+            references.Add(built.Metadata);
+            linkInputs.Add(built.LinkInput);
 
             // Its shared dependencies, whose types its surface may name.
             CollectShared(package.Project, references, linkInputs, seen);
@@ -451,10 +603,10 @@ public sealed class ProjectBuilder(
         {
             if (dependency.Link != DependencyLink.Shared) continue;
             if (!seen.Add(name)) continue;
-            if (!_metadata.TryGetValue(name, out string? metadata)) continue;
+            if (!_libraries.TryGetValue(name, out var built)) continue;
 
-            references.Add(metadata);
-            linkInputs.Add(LinkInput(Path.ChangeExtension(metadata, Toolchain.SharedLibraryExtension)));
+            references.Add(built.Metadata);
+            linkInputs.Add(built.LinkInput);
 
             if (_packages.TryGetValue(name, out var package))
                 CollectShared(package.Project, references, linkInputs, seen);
