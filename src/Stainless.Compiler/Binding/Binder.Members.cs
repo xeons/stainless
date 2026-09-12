@@ -32,6 +32,23 @@ public sealed partial class Binder
 
     private void DeclareMembers()
     {
+        // Delegate and closure signatures before anything else in this pass.
+        //
+        // An event's raise method takes the parameters of the closure it is
+        // declared with, and it copies them when the event is declared -- so a
+        // class declared above the closure its event names would have copied an
+        // empty list. Nothing here needs a member of anything: a signature
+        // names types, and pass 2 already made every type name exist.
+        foreach (var (scope, unit) in _units)
+        {
+            _currentScope = scope;
+
+            foreach (var declared in unit.Declarations.OfType<DelegateDeclSyntax>())
+                if (declared.TypeParameters.Count == 0 &&
+                    scope.Module.Types.TryGetValue(declared.Name, out var type))
+                    DeclareDelegateSignature((NamedTypeSymbol)type, declared, scope);
+        }
+
         foreach (var (scope, unit) in _units)
         {
             _currentScope = scope;
@@ -59,14 +76,11 @@ public sealed partial class Binder
                         DeclareStatic(scope, staticDecl);
                         break;
 
-                    case DelegateDeclSyntax delegateDecl:
-                        // A generic one has no type here to give a signature
-                        // to: each instantiation resolves its own, under the
-                        // substitution that gives its parameters meaning.
-                        if (delegateDecl.TypeParameters.Count == 0 &&
-                            module.Types.TryGetValue(delegateDecl.Name, out var declared))
-                            DeclareDelegateSignature(
-                                (NamedTypeSymbol)declared, delegateDecl, scope);
+                    // A delegate's signature was resolved above, before any
+                    // type's members. A generic one has no type here to give a
+                    // signature to at all: each instantiation resolves its own,
+                    // under the substitution that gives its parameters meaning.
+                    case DelegateDeclSyntax:
                         break;
 
                     case EnumDeclSyntax enumDecl:

@@ -534,6 +534,55 @@ void Functions() {
     var scaler = new Scaler(6);
     Say("over a field", (long)scaler.ByField()(7));
     Say("over a method", (long)scaler.ByMethod()(7));
+
+    Events();
+}
+
+// ================================================================== §2.14.2
+
+/// Counts what an event told it, so subscribing can be seen to have worked.
+class Watcher {
+    public int Seen;
+    public int Last;
+
+    public Watcher() { Seen = 0; Last = 0; }
+
+    public void OnMoved(int at) { Seen = Seen + 1; Last = at; }
+}
+
+void Events() {
+    Heading("2.14.2 events");
+
+    var control = new Control("watched");
+    var first = new Watcher();
+    var second = new Watcher();
+
+    // Nobody has subscribed, so raising it inside Bump does nothing. There is
+    // no null to trip over: a declared event always has a list, sometimes empty.
+    control.Bump(1);
+    Say("no subscribers", (long)first.Seen);
+
+    control.Moved += first.OnMoved;
+    control.Moved += second.OnMoved;
+    control.Bump(1);
+    Say("both ran", (long)(first.Seen + second.Seen));
+    Say("in order, same value", first.Last == second.Last);
+
+    // Removal is by closure equality -- the same method *and* the same object --
+    // so this takes the first one off and leaves the second.
+    control.Moved -= first.OnMoved;
+    control.Bump(1);
+    Say("one left", (long)second.Seen);
+    Say("the other stopped", (long)first.Seen);
+
+    // A lambda is a closure, so it subscribes like anything else.
+    control.Moved += (at) => { Say("a lambda subscribed", (long)at); };
+    control.Bump(1);
+
+    // Unsubscribing something that was never subscribed does nothing, which is
+    // what lets a tidy-up run twice.
+    control.Moved -= first.OnMoved;
+    Say("absent removal", true);
 }
 
 /// A lambda written inside a class, which is where `this` can be reached.

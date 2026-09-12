@@ -128,7 +128,8 @@ offset 24  +----------------------+
 ```
 
 A class reference is a pointer to **offset 0** (the header). The header is
-24 bytes on 64-bit targets. `TypeInfo` is a static, per-class constant:
+24 bytes on 64-bit targets. `TypeInfo` is a static, per-class constant — with
+one exception, on Windows only, noted under `base` below:
 
 ```c
 struct TypeInfo {
@@ -149,7 +150,21 @@ struct TypeInfo {
     size_t                 propertyCount;   /* zero unless the type is [Reflect] */
     const SlPropertyInfo  *properties;
 };
+```
 
+**`base`, and the one thing that is not a constant.** A class derived from one
+in a *referenced library* names that library's `TypeInfo` here. On Windows an
+imported datum has no address until the loader has filled in the import table,
+so it cannot appear in a constant initializer: such a class's `TypeInfo` is
+emitted writable with `base` null, and a function registered in
+`llvm.global_ctors` stores the real address before `main`. Everything else in
+the record is still written once, at compile time, and nothing ever writes to it
+again.
+
+ELF needs none of this — a relocation into another shared object is ordinary
+there — so outside Windows every `TypeInfo` is a true constant.
+
+```c
 struct SlFieldInfo {
     const char        *name;
     size_t             offset;        /* from the start of the object or value */

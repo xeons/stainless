@@ -52,7 +52,18 @@ public class Control {
 
     /// An ordinary method, so that something exists to name on an instance
     /// and store in a closure.
-    public void Bump(int by) { Left = Left + by; }
+    public void Bump(int by) { Left = Left + by; Moved(Left); }
+
+    // ================================================================ §2.14.2
+
+    /// Several subscribers behind one name. From outside this class the only
+    /// things that can be written are `+=` and `-=`: it cannot be read,
+    /// assigned or raised, which is the whole difference between an event and
+    /// a public field of closure type.
+    ///
+    /// Raised above, by name, which only this class may do. With nobody
+    /// subscribed that does nothing at all.
+    public event Notify Moved;
 }
 
 // ==================================================================== §7.4

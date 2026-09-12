@@ -8,15 +8,15 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           657 pass
-dotnet run --project tests/Stainless.Tests      250 cases, 2 skipped on Windows
+dotnet run --project tests/Stainless.Tests      253 cases, 2 skipped on Windows
 ```
 
 Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
 and GTK 3, the development packages, Xvfb and `broadwayd`, so a GUI can be
 built *and run* there headlessly — see `bindings/gtk/README.md`.
 
-`master` is ten commits ahead of `origin/master`. Nothing has been pushed since
-the closure work.
+`master` is fifteen commits ahead of `origin/master`. Nothing has been pushed
+since the closure work.
 
 ## What was built, in order
 
@@ -44,9 +44,40 @@ the closure work.
 | `b88a10a` | Linux terminal and event-loop bindings |
 | `cc4152b` | projects, versioned packages, and the ABI digest |
 | `9050177` | build stamps, and platform library names |
-| *(uncommitted)* | deriving across a library boundary: SL0513 is lifted |
+| `fcf8972` | deriving across a library boundary: SL0513 is lifted |
+| `626e5d2` | `event`: several subscribers behind one name |
+| `caaf3e5` | events, closures and delegates cross a library boundary |
 
 ## Findings worth keeping
+
+**`event` was mostly encapsulation, not machinery.** A list of closures, added
+to and removed from by value, was already writable by hand before any of this --
+`closure` compares on both words, which the spec describes as what makes one
+"removable from a list of them". What the word adds is that from outside the
+declaring type, `+=` and `-=` are the *only* things that can be written. That is
+the whole difference between an event and a public field of closure type.
+
+**The array is replaced rather than mutated, and that is not a detail.** A raise
+reads the field into a local first and walks that, so a handler may subscribe or
+unsubscribe while the event is running. The obvious first choice -- a `List<T>`
+mutated in place -- makes that case skip a handler or run off the end. C# gets
+the same property for free because multicast delegates are immutable; here it
+comes from copy-on-write. The cost is one allocation per subscription change,
+which is what C# pays too.
+
+**Two of C#'s warts were worth not copying**, and both were the user's call: an
+empty event raises nothing rather than throwing, which removes `?.Invoke` from
+every raise site; and a handler must return `void`, because with several
+subscribers "what did it return" has no honest answer and C# silently keeps the
+last one's.
+
+**A closure crossed a library boundary as a struct, and a delegate as nothing.**
+A closure *is* a struct of two compiler-owned fields, so it matched the struct
+case in the metadata writer and was described by fields a consumer cannot name;
+a delegate is not a struct, matched no case at all, and was silently absent.
+Both now cross as signatures with the far side rebuilding the representation.
+Worth remembering that the writer's type switch is ordered, and that a `case`
+which matches nothing fails quietly.
 
 **Deriving across a library boundary was mostly an export problem.** The TODO
 called it emitter work and it was four smaller things, three of which were the
@@ -297,17 +328,18 @@ two names for one field. The name is wanted at the use site, and
 
 ## Next, in the order I would do it
 
-0. **Push.** Ten commits are unpushed and the package work is uncommitted, and
-   the last audit's numbers in the README drift on every commit that adds a
-   case — a unit test pinning them is two hours and stops it for good.
+0. **Push.** Fifteen commits are unpushed, and the last audit's numbers in the
+   README drift on every commit that adds a case — a unit test pinning them is
+   two hours and stops it for good.
 0.5 **A registry, or a decision not to have one.** Resolution unifies sources
    rather than searching versions, because a path and a git tag each pin exactly
    one version and nothing can offer an alternative. That is honest and it is
    also the reason two packages needing incompatible versions of a third is a
    hard error with no way out. The search belongs in `PackageResolver.Visit`
    when there is something to search.
-1. **Method metadata in reflection**, with invoke-by-name. The last piece
-   before a form file can wire a handler, and the same work would let a
+1. **Method metadata in reflection**, with invoke-by-name. Now the last piece
+   before a form file can wire a handler — `event` supplies the other half, and
+   what is missing is finding the method by name — and the same work would let a
    deserializer fill a `List<T>` — the one shape `Standard.Json` cannot
    represent.
 2. **The component layer.** `samples/gtk/control.sl` is what one control looks
@@ -319,7 +351,9 @@ two names for one field. The name is wanted at the use site, and
    library grows.
 4. **The +0/+1 dataflow pass.** Still the acknowledged performance item.
 5. **`List<T>` has no `Remove(T)`.** Its `IndexOf` wants `IEquatable<T>`, which
-   a closure is not, so a list of callbacks is removed from by hand.
+   a closure is not. Less pressing than it was — `RemoveWhere` takes a predicate
+   for exactly this reason, and a list of callbacks is now usually an `event` —
+   but `Remove(T)` is still the obvious method that is not there.
 6. **`Standard.Collections` does not use the operators it could.** `Money` in
    the samples still calls `Money.Add`; `Standard.Time` has had this pass.
 7. Format specifiers in interpolation; the samples cover about half the

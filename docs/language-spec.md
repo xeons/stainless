@@ -4272,6 +4272,20 @@ int Main() {
 }
 ```
 
+**What crosses.** Classes with their fields, properties, methods, constructors,
+destructors and events; structs, unions, enums, aliases and free functions; and
+`closure` and `delegate` types, which cross as their signatures — a closure's
+two fields are the compiler's own, so the far side rebuilds them rather than
+reading them.
+
+A class from a library can also be **derived from** (§2.4.1) and its events
+**subscribed to** (§2.14.2). Both work because what they need crosses: the
+dispatch table slot by slot, the destroy hook, and the protected members for the
+first; the closure type, the storage and the two subscription methods for the
+second. The method that *raises* an event is private and does not cross, so
+"only the declaring type may raise it" holds here by construction rather than by
+a check on this side.
+
 **Reference counting reaches across.** A class is allocated through the
 library's own TypeInfo, so the object gets the destructor the library compiled
 for it, and the consumer's `release` runs it at the right moment.
