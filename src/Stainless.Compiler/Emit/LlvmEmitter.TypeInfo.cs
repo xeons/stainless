@@ -548,7 +548,31 @@ public sealed partial class LlvmEmitter
         _ => FieldKind.None,
     };
 
-    private static string ArraySuffix(ArrayTypeSymbol type) => Mangler.SymbolSafe(type.Name);
+    /// <summary>
+    /// The symbol suffix for an array type, built from the element's
+    /// <em>qualified</em> name.
+    ///
+    /// <c>type.Name</c> is the simple one, so two <c>Point</c> structs in
+    /// different modules -- <c>Forms.Drawing.Point</c> and
+    /// <c>Win32.User32.Point</c>, say -- gave their arrays one symbol between
+    /// them, and the second definition was rejected by LLVM rather than by
+    /// anything that could name the source. Qualifying matches what the struct
+    /// and destructor names next door already do.
+    ///
+    /// Both symbols this feeds are <c>internal</c>, so the spelling is private
+    /// to one module and no ABI depends on it.
+    /// </summary>
+    private static string ArraySuffix(ArrayTypeSymbol type) =>
+        Mangler.SymbolSafe(QualifiedElementName(type.Element) + "[]");
+
+    private static string QualifiedElementName(TypeSymbol element) => element switch
+    {
+        NamedTypeSymbol named => named.QualifiedName,
+        ArrayTypeSymbol nested => QualifiedElementName(nested.Element) + "[]",
+        FixedArrayTypeSymbol inline => QualifiedElementName(inline.Element) + "[N]",
+        PointerTypeSymbol pointer => QualifiedElementName(pointer.Element) + "*",
+        _ => element.Name,
+    };
 
     private static string ArrayTypeInfoName(ArrayTypeSymbol type) => "_SLti_array_" + ArraySuffix(type);
     private static string ArrayDestroyName(ArrayTypeSymbol type) => "_SLdestroy_array_" + ArraySuffix(type);
