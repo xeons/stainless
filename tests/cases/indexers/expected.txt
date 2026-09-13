@@ -3,4 +3,4 @@ text aab
 row 8
 table 99 k=set
 list 1 22 22
-map 5 5 1
+map 5 5 -1 1

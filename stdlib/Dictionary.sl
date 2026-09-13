@@ -94,8 +94,32 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
 
     public bool ContainsKey(K key) { return filled[Probe(key)]; }
 
-    /// The value for `key`. Aborts when there is none; use `GetOr` or
-    /// `ContainsKey` when a missing key is an ordinary outcome.
+    /// The value for `key`, or `None` when there is none.
+    ///
+    /// **This is the one to reach for.** A key is data -- it arrives from a
+    /// file, a socket or a user -- so a key that is not there is an ordinary
+    /// outcome and not a mistake in the program, which is the line §2.6 draws
+    /// between a value to return and a reason to stop. The answer is read the
+    /// way any other variant is:
+    ///
+    ///     if (settings.Find(name) is Some value) { Use(value); }
+    ///
+    /// One probe, where `ContainsKey` followed by `Get` is two, and no sentinel
+    /// to collide with a real value the way `GetOr` has.
+    public Optional<V> Find(K key) {
+        nuint i = Probe(key);
+        if (!filled[i]) { return None; }
+        return Some(values[i]);
+    }
+
+    /// The value for `key`, aborting when there is none.
+    ///
+    /// The asserting form, and it asserts: use it only where the key is there
+    /// by construction -- one set two lines above, or a name this code chose
+    /// itself. `Get` means the same thing here as on `Optional`, which is that
+    /// the caller is claiming the value exists and would rather stop than
+    /// carry on if it does not. For a key that came from anywhere else, `Find`
+    /// is the question and this is not.
     public V Get(K key) {
         nuint i = Probe(key);
         if (!filled[i]) { sl_fail("Dictionary.Get: no such key"); }
@@ -109,17 +133,18 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         return values[i];
     }
 
-    /// `Get` and `Set` written the way C# writes them.
-    ///
-    /// Reading a key that is not there aborts, as `Get` does, because a
-    /// dictionary cannot invent a value of an arbitrary `V` and returning
-    /// `default(V)` would make a missing key indistinguishable from one
-    /// mapped to zero. `GetOr` and `ContainsKey` are for when absence is an
-    /// ordinary outcome.
-    public V this[K key] {
-        get { return Get(key); }
-        set { Set(key, value); }
-    }
+    // There is deliberately no `this[K]` here, and `List<T>` having one is not
+    // an inconsistency.
+    //
+    // An index is a position the caller worked out, so `list[i]` out of range
+    // is the same mistake `array[i]` is. A key is data that arrived from
+    // somewhere, so `map[key]` looks total and is not -- and unlike `Get` it
+    // carries no verb to warn anyone. An indexer cannot be the honest shape
+    // either: its getter and setter share one type, so returning `Optional<V>`
+    // would make every write `map[k] = Some(v)` and `map[k] += 1` impossible.
+    //
+    // So the lookup is spelled with a name that says which question is being
+    // asked: `Find` for a key that might not be there, `Get` for one that is.
 
     /// Adds the key or replaces what it maps to.
     public void Set(K key, V value) {

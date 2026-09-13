@@ -2869,20 +2869,47 @@ the built-in one.
 | Type | Backed by | Notes |
 |---|---|---|
 | `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>`; `list[i]` |
-| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>`; `map[k]` |
+| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>`; `Find` → `Optional<V>` |
 | `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
 | `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
 | `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
 | `LinkedList<T>` | an index pool | handles, not references — see below |
 | `SortedList<K, V>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
 
-`List<T>` and `Dictionary<K, V>` carry an indexer (§7.5), so `list[i] += 1`
-and `map[key] = value` read and write the way an array does. The `At`, `Get`
-and `Set` methods remain, because an interface has no indexers and
-`IReadOnlyList<T>` declares them; the brackets are what to reach for where the
-type is known. Reading a key a dictionary does not hold aborts, as `Get` does
--- returning `default(V)` would make a missing key and one mapped to zero the
-same answer -- so `GetOr` and `ContainsKey` are for when absence is ordinary.
+`List<T>` carries an indexer (§7.5), so `list[i] += 1` reads and writes the
+way an array does. `At` and `Set` remain, because an interface has no indexers
+and `IReadOnlyList<T>` declares them; the brackets are what to reach for where
+the type is known.
+
+**A dictionary has no indexer, and that is the point.** An index is a position
+the caller worked out, so `list[i]` out of range is the same mistake
+`array[i]` is. A key is data that arrived from a file, a socket or a person, so
+a key that is not there is an ordinary outcome rather than a mistake in the
+program -- which is the line §2.6 draws between a value to return and a reason
+to stop. `map[key]` would look total, would not be, and unlike a named method
+carries no verb to say so.
+
+So a lookup is spelled with the question it is asking:
+
+| | |
+|---|---|
+| `Find(key)` | `Optional<V>`, and **the one to reach for** |
+| `GetOr(key, fallback)` | the value or a default |
+| `ContainsKey(key)` | whether it is there |
+| `Get(key)` | the value, **aborting** when there is none |
+
+```csharp
+if (settings.Find(name) is Some found) { Use(found.Value); }
+```
+
+`Find` costs one probe where `ContainsKey` then `Get` costs two, and it has no
+sentinel to collide with a real value the way `GetOr` does. `Get` is the
+asserting form and it asserts: use it where the key is there by construction,
+and `Find` everywhere else. `SortedList<K, V>` answers the same four ways.
+
+An indexer could not have been the honest shape in any case. Its getter and
+setter share one type (§7.5), so returning `Optional<V>` would make every write
+`map[key] = Some(value)` and `map[key] += 1` impossible.
 
 Every one of them is **walked in place when iterated**. That is worth saying
 because it was not always so: several used to build a whole `List<T>` before

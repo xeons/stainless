@@ -8,7 +8,7 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           743 pass
-dotnet run --project tests/Stainless.Tests      269 cases, 2 skipped on Windows
+dotnet run --project tests/Stainless.Tests      270 cases, 2 skipped on Windows
 samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
@@ -60,7 +60,8 @@ since the closure work.
 | `ce32e32` | indexers on the containers, and one less cascading diagnostic |
 | `68a7403` | doubles that survive being written and read back |
 | `24538c6` | the two allocations that could still wrap |
-| *this one* | an abort keeps the output that explains it |
+| `7708bce` | an abort keeps the output that explains it |
+| *this one* | a missing key is an outcome rather than a crash |
 
 ## Findings worth keeping
 
@@ -162,6 +163,40 @@ of `\u` with two digits became U+0012, and `1lul` meant 1. All three are values
 nobody wrote. A character literal is exactly one scalar, `\u` takes exactly four
 digits and `\U` eight -- `\x` stays variable, since it is a byte and C says so
 -- and a suffix is measured against the set C# actually has.
+
+**A missing dictionary key stopped the program, and that was the wrong call.**
+The question that found it was the user's: how do other languages handle this?
+The survey is the argument, so it is worth keeping.
+
+No language puts an *uncatchable* crash behind the natural spelling. The ones
+that crash on a missing key -- Python, C#, C++ -- all let you catch it. The
+ones whose crash cannot be caught -- Go, Swift, Zig -- made the natural
+spelling return an optional instead. Rust panics uncatchably on `map[k]`, and
+gets away with it because `map[k]` is rare there and `.get()` is what people
+write. Stainless was in the one corner nobody occupies: uncatchable, and the
+shortest thing to write was the one that killed the process.
+
+`Find(key)` returns `Optional<V>` now, on `Dictionary` and `SortedList`. The
+name was already the library's word for it -- `Functional.Find`,
+`Collections.IndexOf`, `Process.Finished` all answer "might not be there" that
+way -- so dictionary lookup was the one place that did not, which reads more
+like an oversight than a decision. `Get` still asserts and still aborts, which
+keeps it consistent with `Optional.Get`.
+
+Two arguments for `Find` that are not about taste. It is **one probe** where
+`ContainsKey` then `Get` is two, each running the hash walk from scratch. And
+`GetOr(k, fallback)` cannot tell a missing key from one mapped to the fallback,
+which is Java's null ambiguity wearing a different coat.
+
+**The `Dictionary` indexer added one commit earlier was taken back out**, and
+that is the part worth remembering. It was a mistake made while fixing
+something else: `map[k]` puts the harshest behaviour behind the most inviting
+syntax, and unlike `Get` it carries no verb to warn anyone. `List<T>` keeps
+its indexer, and the line between them is real rather than convenient -- **an
+index is a position the caller worked out; a key is data that arrived.** An
+indexer could not have been the honest shape anyway: getter and setter share
+one type, so an `Optional<V>` indexer would make every write `map[k] =
+Some(v)` and `map[k] += 1` impossible. That was checked, not assumed.
 
 **An abort threw away everything the program had printed.** `sl_fail` writes
 its line to stderr and calls `abort`, and `abort` does not flush -- so a

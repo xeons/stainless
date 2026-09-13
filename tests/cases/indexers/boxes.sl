@@ -92,11 +92,15 @@ int Main() {
     Console.WriteLine("list " + N((long)list[0]) + " " + N((long)list[1]) + " " +
         N((long)list.At(1)));
 
+    // A dictionary deliberately has no indexer: a key is data rather than a
+    // position, so `map[k]` would look total and abort. `Find` is the question
+    // where the key might not be there, and `Get` asserts that it is.
     var map = new Dictionary<String, int>();
-    map["a"] = 1;
-    map["a"] += 4;
-    Console.WriteLine("map " + N((long)map["a"]) + " " + N((long)map.Get("a")) + " " +
-        N((long)map.Count()));
+    map.Set("a", 1);
+    map.Set("a", map.Get("a") + 4);
+    Console.WriteLine("map " + N((long)map.Get("a")) + " " +
+        N((long)map.Find("a").ValueOr(-1)) + " " +
+        N((long)map.Find("absent").ValueOr(-1)) + " " + N((long)map.Count()));
 
     return 0;
 }
