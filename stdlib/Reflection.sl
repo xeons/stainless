@@ -115,38 +115,74 @@ extern "C" {
 
 /// What a field holds. Kept in step with enum SlKind in the runtime.
 public const int KindNone      = 0;
+/// A `bool`.
 public const int KindBool      = 1;
+/// A `char`: one UTF-8 code unit.
 public const int KindChar      = 2;
+/// An `sbyte`.
 public const int KindSByte     = 3;
+/// A `short`.
 public const int KindShort     = 4;
+/// An `int`.
 public const int KindInt       = 5;
+/// A `long`.
 public const int KindLong      = 6;
+/// An `nint`: pointer-wide and signed.
 public const int KindNInt      = 7;
+/// A `byte`.
 public const int KindByte      = 8;
+/// A `ushort`.
 public const int KindUShort    = 9;
+/// A `uint`.
 public const int KindUInt      = 10;
+/// A `ulong`.
 public const int KindULong     = 11;
+/// An `nuint`: pointer-wide and unsigned.
 public const int KindNUInt     = 12;
+/// A `float`.
 public const int KindFloat     = 13;
+/// A `double`.
 public const int KindDouble    = 14;
+/// A raw pointer. Nothing here follows one -- what it
+/// points at carries no metadata.
 public const int KindPointer   = 15;
+/// A `String`. Read and written by value, through
+/// `ReadText` and `WriteText`.
 public const int KindString    = 16;
+/// A class reference. `TypeOf()` gives the type to walk
+/// into, and the value can be null.
 public const int KindClass     = 17;
+/// An interface reference, walked like a class.
 public const int KindInterface = 18;
+/// A struct, stored inline rather than referenced -- so
+/// its address is where it sits, and it is never null.
 public const int KindStruct    = 19;
+/// An array. `ElementKind` says what is in it.
 public const int KindArray     = 20;
+/// A `char16`: one UTF-16 code unit. Numbered past
+/// `KindArray` because it was added after the numbering was fixed, which is
+/// why `IsInteger` tests it separately.
 public const int KindChar16    = 21;
+/// A `char32`: one Unicode scalar, with the same
+/// numbering story as `KindChar16`.
 public const int KindChar32    = 22;
 
 // ---------------------------------------------------------------- attributes
 
 /// One attribute as written on a declaration, with the constants it was given.
 public struct Attribute {
+    /// The runtime's record for this attribute. Owned by the metadata, which
+    /// lives as long as the program, so it never has to be freed.
     public byte* Handle;
 
+    /// The attribute's name, without the brackets.
     public String Name() { return Text.FromNullTerminated(sl_attribute_name(Handle)); }
 
+    /// How many constants were written in the brackets.
     public nuint ValueCount() { return sl_attribute_value_count(Handle); }
+
+    /// Which kind the value at `index` is -- one of the `Kind` constants --
+    /// so a reader knows whether to call `AsText` or `Number`.
     public int ValueKind(nuint index) { return (int)sl_attribute_value_kind(Handle, index); }
 
     /// The value as text. Only meaningful when ValueKind is KindString.
@@ -154,20 +190,40 @@ public struct Attribute {
         return Text.FromNullTerminated(sl_attribute_value_text(Handle, index));
     }
 
+    /// The value as a whole number. Meaningful for the integer kinds and for
+    /// `KindBool`, where one is true; zero for anything else, including a
+    /// string, rather than a reinterpretation of its pointer.
     public long Number(nuint index) { return sl_attribute_value_number(Handle, index); }
 }
 
 // -------------------------------------------------------------------- fields
 
+/// One field of a type: where it sits, what it holds, and what was written on
+/// it.
+///
+/// A field is the storage. Writing one goes straight past any setter, which is
+/// what a serializer filling plain data wants and what a type with behaviour in
+/// its accessors does not -- see `IsPropertyStorage` and `Type.FindProperty`.
 public struct Field {
+    /// The runtime's record for this field, or null for one that was looked up
+    /// and not found. `Type.FindField` is what answers with a null one.
     public byte* Handle;
 
+    /// The field's name. For an automatic property's storage this is the
+    /// property's name, which is why `IsPropertyStorage` has to exist.
     public String Name() { return Text.FromNullTerminated(sl_field_name(Handle)); }
+
+    /// How many bytes from the start of the instance the field sits. Add it to
+    /// an instance pointer to reach the storage directly.
     public nuint Offset() { return sl_field_offset(Handle); }
+
+    /// What the field holds, as one of the `Kind` constants.
     public int Kind() { return (int)sl_field_kind(Handle); }
 
+    /// How many attributes are written on the field.
     public nuint AttributeCount() { return sl_field_attribute_count(Handle); }
 
+    /// The attribute at `index`, in the order they were written.
     public Attribute AttributeAt(nuint index) {
         Attribute result;
         result.Handle = sl_field_attribute(Handle, index);
@@ -213,6 +269,9 @@ public struct Field {
         return kind >= KindChar && kind <= KindNUInt;
     }
 
+    /// True for a field whose value can be read as a `double` -- a `float` or
+    /// a `double`. An integer field is not one: `ReadDouble` on it answers
+    /// zero rather than converting.
     public bool IsFloating() { return Kind() == KindFloat || Kind() == KindDouble; }
 
     /// True for a field this module can read and write by value: a number, a
@@ -291,9 +350,14 @@ public struct Field {
 /// **Indexers and static properties are not here.** An indexer's accessors
 /// take arguments nothing could supply, and a static one has no instance.
 public struct Property {
+    /// The runtime's record for this property, or null for one that was looked
+    /// up and not found. `Exists` is the check.
     public byte* Handle;
 
+    /// The property's name.
     public String Name() { return Text.FromNullTerminated(sl_property_name(Handle)); }
+
+    /// What the property's type is, as one of the `Kind` constants.
     public int Kind() { return (int)sl_property_kind(Handle); }
 
     /// True when this handle names a property at all; `FindProperty` answers
@@ -316,8 +380,10 @@ public struct Property {
         return result;
     }
 
+    /// How many attributes are written on the property.
     public nuint AttributeCount() { return sl_property_attribute_count(Handle); }
 
+    /// The attribute at `index`, in the order they were written.
     public Attribute AttributeAt(nuint index) {
         Attribute result;
         result.Handle = sl_property_attribute(Handle, index);
@@ -339,8 +405,10 @@ public struct Property {
         return kind >= KindChar && kind <= KindNUInt;
     }
 
+    /// True for a `float` or a `double` property.
     public bool IsFloating() { return Kind() == KindFloat || Kind() == KindDouble; }
 
+    /// True for a `String` property.
     public bool IsText() { return Kind() == KindString; }
 }
 
@@ -352,10 +420,15 @@ public long GetInteger(byte* instance, Property property) {
     return sl_property_get_integer(instance, property.Handle);
 }
 
+/// Calls the getter of a `float` or `double` property. Zero when it cannot be
+/// read, or when its kind is not a floating one.
 public double GetDouble(byte* instance, Property property) {
     return sl_property_get_double(instance, property.Handle);
 }
 
+/// Calls the getter of a `bool` property. False when it cannot be read, or
+/// when its kind is not `KindBool` -- which is indistinguishable from a real
+/// false, so check `CanRead` and `Kind` where it matters.
 public bool GetBool(byte* instance, Property property) {
     return sl_property_get_bool(instance, property.Handle);
 }
@@ -379,10 +452,14 @@ public void SetInteger(byte* instance, Property property, long value) {
     sl_property_set_integer(instance, property.Handle, value);
 }
 
+/// Calls the setter of a floating property, narrowing to `float` where that
+/// is its width. Does nothing when there is no setter.
 public void SetDouble(byte* instance, Property property, double value) {
     sl_property_set_double(instance, property.Handle, value);
 }
 
+/// Calls the setter of a `bool` property. Does nothing when there is no
+/// setter, which `CanWrite` is how to find out in advance.
 public void SetBool(byte* instance, Property property, bool value) {
     sl_property_set_bool(instance, property.Handle, value);
 }
@@ -403,22 +480,38 @@ public void SetAggregate(byte* instance, Property property, byte* value) {
 
 // --------------------------------------------------------------------- types
 
+/// One type, and the way into everything it declares.
+///
+/// Got from `typeof(T)`, from `FindType` by name, or from a field's or
+/// property's `TypeOf()`. Fields and interfaces carry metadata; methods do not,
+/// so there is nothing here to call.
 public struct Type {
+    /// The runtime's record for this type, or null for one that was looked up
+    /// and not found. `Exists` is the check.
     public byte* Handle;
 
+    /// The type's name, qualified by its module.
     public String Name() { return Text.FromNullTerminated(sl_type_name(Handle)); }
+
+    /// How many bytes an instance occupies -- the struct's own size, or for a
+    /// class the size of the object including its header.
     public nuint Size() { return sl_type_size(Handle); }
 
+    /// How many fields the type has, inherited ones included, and automatic
+    /// properties' storage among them.
     public nuint FieldCount() { return sl_type_field_count(Handle); }
 
+    /// The field at `index`, in declaration order with inherited fields first.
     public Field FieldAt(nuint index) {
         Field result;
         result.Handle = sl_type_field(Handle, index);
         return result;
     }
 
+    /// How many attributes are written on the type.
     public nuint AttributeCount() { return sl_type_attribute_count(Handle); }
 
+    /// The attribute at `index`, in the order they were written.
     public Attribute AttributeAt(nuint index) {
         Attribute result;
         result.Handle = sl_type_attribute(Handle, index);
@@ -460,6 +553,8 @@ public struct Type {
     /// would not.
     public nuint PropertyCount() { return sl_type_property_count(Handle); }
 
+    /// The property at `index`. An overridden property appears once, at the
+    /// position the base gave it, carrying the derived accessors.
     public Property PropertyAt(nuint index) {
         Property result;
         result.Handle = sl_type_property(Handle, index);
@@ -486,10 +581,14 @@ public long ReadInteger(byte* instance, Field field) {
     return sl_read_integer(instance, field.Handle);
 }
 
+/// Reads a `float` or `double` field from an instance. Zero when the field's
+/// kind is not a floating one -- no conversion from an integer field.
 public double ReadDouble(byte* instance, Field field) {
     return sl_read_double(instance, field.Handle);
 }
 
+/// Reads a `bool` field from an instance. False when the field's kind is not
+/// `KindBool`, which reads the same as a real false.
 public bool ReadBool(byte* instance, Field field) {
     return sl_read_bool(instance, field.Handle);
 }
@@ -531,10 +630,12 @@ public void WriteInteger(byte* instance, Field field, long value) {
     sl_write_integer(instance, field.Handle, value);
 }
 
+/// Writes a floating field, narrowed to `float` where that is its width.
 public void WriteDouble(byte* instance, Field field, double value) {
     sl_write_double(instance, field.Handle, value);
 }
 
+/// Writes a `bool` field.
 public void WriteBool(byte* instance, Field field, bool value) {
     sl_write_bool(instance, field.Handle, value);
 }
@@ -651,10 +752,15 @@ public long ReadIntegerAt(byte* address, Field field) {
     return sl_read_at_integer(address, (uint)field.ElementKind());
 }
 
+/// Reads an element of a floating array. `field` supplies the element kind,
+/// which is what says whether the four or the eight bytes at `address` are the
+/// value.
 public double ReadDoubleAt(byte* address, Field field) {
     return sl_read_at_double(address, (uint)field.ElementKind());
 }
 
+/// Reads an element of a `bool` array. Takes no field, a `bool` being one byte
+/// whatever array it is in.
 public bool ReadBoolAt(byte* address) { return sl_read_at_bool(address); }
 
 /// Reads a String element. The array still owns it.
@@ -679,10 +785,12 @@ public void WriteIntegerAt(byte* address, Field field, long value) {
     sl_write_at_integer(address, (uint)field.ElementKind(), value);
 }
 
+/// Writes an element of a floating array, narrowed to the element's width.
 public void WriteDoubleAt(byte* address, Field field, double value) {
     sl_write_at_double(address, (uint)field.ElementKind(), value);
 }
 
+/// Writes an element of a `bool` array.
 public void WriteBoolAt(byte* address, bool value) { sl_write_at_bool(address, value); }
 
 /// Writes a String element, releasing whatever it held.

@@ -74,33 +74,84 @@ public const double Epsilon = 0.00000000000000022204;
 
 // ------------------------------------------------------ floating point
 
+// Nothing here signals an error: a value outside a function's domain answers
+// NaN and a value past the range answers an infinity, because that is what the
+// hardware does and there is no exception for it to raise instead. A caller
+// that cares checks with `IsNaN` or `IsFinite` rather than checking first.
+
+/// The square root. Negative `x` gives NaN.
 public double Sqrt(double x) { return sqrt(x); }
+
+/// The cube root, defined for negative `x` as well -- unlike `Sqrt`, and the
+/// reason to reach for this rather than `Pow(x, 1.0 / 3.0)`, which is NaN
+/// there.
 public double Cbrt(double x) { return cbrt(x); }
+
+/// `x` raised to `y`. A negative `x` with a fractional `y` gives NaN; anything
+/// raised to zero, `0.0` included, gives 1.
 public double Pow(double x, double y) { return pow(x, y); }
+
+/// `E` raised to `x`. Overflows to infinity above roughly 709.
 public double Exp(double x) { return exp(x); }
+
+/// The natural logarithm. Zero gives negative infinity and a negative `x`
+/// gives NaN.
 public double Log(double x) { return log(x); }
+
+/// The base-two logarithm, with the same edges as `Log`. More accurate than
+/// `Log(x) / Log(2.0)`, which is the reason it is here.
 public double Log2(double x) { return log2(x); }
+
+/// The base-ten logarithm, with the same edges as `Log`.
 public double Log10(double x) { return log10(x); }
 
+/// The sine of `x` in radians. Use `Radians` on an angle in degrees; a very
+/// large `x` loses accuracy, since the reduction is done in the same double.
 public double Sin(double x) { return sin(x); }
+
+/// The cosine of `x` in radians, with the same caveat as `Sin`.
 public double Cos(double x) { return cos(x); }
+
+/// The tangent of `x` in radians. Near an odd multiple of Pi/2 the answer is
+/// enormous rather than infinite, because no double lands exactly there.
 public double Tan(double x) { return tan(x); }
+
+/// The angle in [-Pi/2, Pi/2] whose sine is `x`. Outside [-1, 1] gives NaN.
 public double Asin(double x) { return asin(x); }
+
+/// The angle in [0, Pi] whose cosine is `x`. Outside [-1, 1] gives NaN.
 public double Acos(double x) { return acos(x); }
+
+/// The angle in (-Pi/2, Pi/2) whose tangent is `x`. Defined everywhere, and
+/// blind to which quadrant the point was in -- `Atan2` is the one that knows.
 public double Atan(double x) { return atan(x); }
 
 /// The angle to (x, y) from the positive x axis, in the correct quadrant.
 /// Note the argument order, which is the C library's: y first.
 public double Atan2(double y, double x) { return atan2(y, x); }
 
+/// The hyperbolic sine. Overflows to an infinity past roughly 710.
 public double Sinh(double x) { return sinh(x); }
+
+/// The hyperbolic cosine, which is at least 1 and never negative. Overflows
+/// like `Sinh`.
 public double Cosh(double x) { return cosh(x); }
+
+/// The hyperbolic tangent, which stays within (-1, 1) and cannot overflow.
 public double Tanh(double x) { return tanh(x); }
 
 /// The length of the vector (x, y), computed without overflowing on the way.
 public double Hypot(double x, double y) { return hypot(x, y); }
 
+// The rounding functions answer a `double`, not an integer: the result may be
+// larger than any `long` holds, and narrowing is the caller's to do once it
+// knows the range.
+
+/// The largest whole number at or below `x`. Goes away from zero for negative
+/// `x`, unlike `Truncate`: `Floor(-2.5)` is -3.
 public double Floor(double x) { return floor(x); }
+
+/// The smallest whole number at or above `x`. `Ceiling(-2.5)` is -2.
 public double Ceiling(double x) { return ceil(x); }
 
 /// To the nearest integer, halves away from zero -- C's rule, not the
@@ -114,9 +165,15 @@ public double Truncate(double x) { return trunc(x); }
 /// `Remainder(-7.0, 3.0)` is -1.0, not 2.0.
 public double Remainder(double x, double y) { return fmod(x, y); }
 
+/// The magnitude, sign removed. Clears the sign bit, so `Abs(-0.0)` is `0.0`
+/// and `Abs` of either infinity is positive infinity.
 public double Abs(double x) { return fabs(x); }
 
+/// The smaller of the two. A NaN argument answers `b`, since every comparison
+/// against NaN is false -- check with `IsNaN` if that matters.
 public double Min(double a, double b) { return a < b ? a : b; }
+
+/// The larger of the two, with the same NaN behaviour as `Min`.
 public double Max(double a, double b) { return a > b ? a : b; }
 
 /// `x`, brought within [low, high]. Aborts nothing when the bounds are the
@@ -144,6 +201,8 @@ public bool IsInfinite(double x) {
     return x - x != 0.0;
 }
 
+/// True for an ordinary number: neither NaN nor an infinity. The check to
+/// make on a value that came out of a division or a parse.
 public bool IsFinite(double x) { return !IsNaN(x) && !IsInfinite(x); }
 
 /// True when the two are within `tolerance` of each other. Comparing floats
@@ -157,45 +216,76 @@ public double Lerp(double from, double to, double at) {
     return from + (to - from) * at;
 }
 
+/// An angle in radians, as degrees.
 public double Degrees(double radians) { return radians * 180.0 / Pi; }
+
+/// An angle in degrees, as radians. Every trigonometric function here takes
+/// radians, so this is what goes between a human's number and `Sin`.
 public double Radians(double degrees) { return degrees * Pi / 180.0; }
 
 // ---------------------------------------------------------------- integers
 
+/// The magnitude of an `int`.
+///
+/// The most negative `int` has no positive counterpart, so `Abs(-2147483648)`
+/// negates to itself and stays negative. Widen to a `long` first where the
+/// input could reach that far.
 public int Abs(int x) { return x < 0 ? -x : x; }
+
+/// The magnitude of a `long`, with the same edge as the `int` form: the most
+/// negative `long` answers itself.
 public long Abs(long x) { return x < 0 ? -x : x; }
 
+/// The smaller of two `int`s.
 public int Min(int a, int b) { return a < b ? a : b; }
+
+/// The larger of two `int`s.
 public int Max(int a, int b) { return a > b ? a : b; }
+
+/// The smaller of two `long`s.
 public long Min(long a, long b) { return a < b ? a : b; }
+
+/// The larger of two `long`s.
 public long Max(long a, long b) { return a > b ? a : b; }
+
+/// The smaller of two `nuint`s.
 public nuint Min(nuint a, nuint b) { return a < b ? a : b; }
+
+/// The larger of two `nuint`s.
 public nuint Max(nuint a, nuint b) { return a > b ? a : b; }
 
+/// `x`, brought within [low, high]. Bounds the wrong way round give `low`
+/// rather than an error, as in the `double` form.
 public int Clamp(int x, int low, int high) {
     if (x < low) { return low; }
     if (x > high) { return high; }
     return x;
 }
 
+/// `x`, brought within [low, high].
 public long Clamp(long x, long low, long high) {
     if (x < low) { return low; }
     if (x > high) { return high; }
     return x;
 }
 
+/// `x`, brought within [low, high]. Unsigned, so there is no negative side to
+/// clamp against and `low` of zero is the natural floor.
 public nuint Clamp(nuint x, nuint low, nuint high) {
     if (x < low) { return low; }
     if (x > high) { return high; }
     return x;
 }
 
+/// -1, 0 or 1 for a negative, zero or positive `int`.
 public int Sign(int x) {
     if (x < 0) { return -1; }
     if (x > 0) { return 1; }
     return 0;
 }
 
+/// -1, 0 or 1 for a negative, zero or positive `long`. An `int` either way,
+/// since three values need no more.
 public int Sign(long x) {
     if (x < 0) { return -1; }
     if (x > 0) { return 1; }
@@ -222,6 +312,10 @@ public long GreatestCommonDivisor(long a, long b) {
     return a;
 }
 
+/// The least common multiple. Zero when either argument is zero.
+///
+/// Divides before multiplying, which keeps the intermediate as small as it can
+/// be; two large arguments can still overflow, and nothing here detects it.
 public long LeastCommonMultiple(long a, long b) {
     if (a == 0 || b == 0) { return 0; }
     return Abs(a / GreatestCommonDivisor(a, b) * b);
@@ -264,6 +358,8 @@ public int TrailingZeros(ulong value) {
     return count;
 }
 
+/// True when exactly one bit is set. Zero is not a power of two and answers
+/// false, which is the case a bare `value & (value - 1)` test gets wrong.
 public bool IsPowerOfTwo(ulong value) {
     return value != 0 && (value & (value - 1)) == 0;
 }

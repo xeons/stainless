@@ -35,13 +35,26 @@ extern "C" void sl_array_bounds_fail(nuint index, nuint length);
 
 // ---------------------------------------------------------------- comparison
 
+/// A value that can be asked whether it equals another of its type.
+///
+/// `EqualTo` has to be an equivalence -- a value equals itself, equality runs
+/// both ways, and two things equal to a third are equal to each other --
+/// because the containers assume all three and none of them checks. A type
+/// used as a dictionary key implements `IHashable` alongside this, and the two
+/// must agree: equal values must hash alike.
 public interface IEquatable<T> {
+    /// True when this value and `other` are the same value. Implementations
+    /// should answer without allocating; this runs once per probe.
     bool EqualTo(T other);
 }
 
 /// Returns a negative number, zero, or a positive number when this value orders
 /// before, with, or after `other`.
 public interface IComparable<T> {
+    /// Negative when this orders before `other`, zero when they order
+    /// together, positive when after. The sign is all that is read -- the
+    /// magnitude means nothing, so returning a subtraction is fine as long as
+    /// it cannot overflow.
     int CompareTo(T other);
 }
 
@@ -52,6 +65,9 @@ public interface IComparable<T> {
 /// implements this should implement `IEquatable<T>` as well, since a hash on
 /// its own only narrows the search.
 public interface IHashable {
+    /// A number standing in for this value. The same value must give the same
+    /// number for as long as it is a key in a table, which means hashing only
+    /// the parts a key is not going to have changed under it.
     nuint HashCode();
 }
 
@@ -74,11 +90,27 @@ public interface IHashable {
 /// name, so any type with a `GetEnumerator()` can be iterated. Naming the shape
 /// is still worth doing, because it lets a sequence be passed around.
 public interface IEnumerator<T> {
+    /// Advances to the next item and reports whether there was one. Must be
+    /// called before the first `Current`: a fresh enumerator sits before the
+    /// start rather than on the first item.
     bool MoveNext();
+
+    /// What the last `MoveNext` landed on. Calling this before the first
+    /// `MoveNext`, or after one that answered false, is a mistake the
+    /// enumerator is not required to catch.
     T Current();
 }
 
+/// Something that can be walked from the start, once per enumerator.
+///
+/// `foreach` does not need this interface -- it finds `GetEnumerator` by name
+/// -- so implementing it is about being passable as a sequence, not about
+/// being iterable.
 public interface IEnumerable<T> {
+    /// A fresh cursor positioned before the first item. Each call gives an
+    /// independent one, so a sequence can be walked twice; what is not
+    /// promised is that the two walks see the same items, since a collection
+    /// changed in between will say something different.
     IEnumerator<T> GetEnumerator();
 }
 
@@ -88,24 +120,43 @@ public class ListEnumerator<T> : IEnumerator<T> {
     IReadOnlyList<T> source;
     nuint next;
 
+    /// A cursor over `items`, positioned before the first one.
+    ///
+    /// The list is held by reference rather than copied, so adding to it or
+    /// removing from it while this cursor is live changes what the cursor
+    /// walks. The count is read on every `MoveNext`, so a removal can end the
+    /// walk early and an insertion can extend it.
     public ListEnumerator(IReadOnlyList<T> items) {
         source = items;
         next = 0;
     }
 
+    /// Advances, answering false at the end.
     public bool MoveNext() {
         if (next >= source.Count()) { return false; }
         next++;
         return true;
     }
 
+    /// The item the last `MoveNext` landed on.
     public T Current() { return source.At(next - 1); }
 }
 
 // ------------------------------------------------------------------- lists
 
+/// A sequence that knows its length and can be indexed, and cannot be changed
+/// through this reference.
+///
+/// Read-only is about what this interface offers, not about the object: the
+/// list behind it may well be a `List<T>` that someone else is still adding
+/// to. Take this as a parameter type where a function reads and does not
+/// write, which says so in the signature.
 public interface IReadOnlyList<T> {
+    /// How many items there are.
     nuint Count();
+
+    /// The item at `index`, counting from zero. An index at or past `Count()`
+    /// aborts with the same message an array overrun gives.
     T At(nuint index);
 }
 
@@ -113,8 +164,14 @@ public interface IReadOnlyList<T> {
 /// be passed anywhere an IReadOnlyList is wanted, at no cost: an interface
 /// reference is a plain pointer, and the object carries a table for both.
 public interface IList<T> : IReadOnlyList<T> {
+    /// Appends to the end. The only operation here that changes the length.
     void Add(T item);
+
+    /// Replaces the item at `index`. Aborts past the end -- this writes over
+    /// an existing item and never extends the list, which `Add` is for.
     void Set(nuint index, T item);
+
+    /// Drops every item, leaving a length of zero.
     void Clear();
 }
 
@@ -123,18 +180,28 @@ public class List<T> : IList<T>, IEnumerable<T> {
     T[] items;
     nuint count;
 
+    /// An empty list. It allocates a small backing array up front, so the
+    /// first few `Add`s do not grow it.
     public List() {
         items = new T[4];
         count = 0;
     }
 
+    /// How many items are in the list -- not how many it has room for, which
+    /// is `Capacity`.
     public nuint Count() { return count; }
 
+    /// True when there is nothing in it.
     public bool IsEmpty() { return count == 0; }
 
     /// The number of items this list can hold before it must grow again.
     public nuint Capacity() { return items.Length; }
 
+    /// The item at `index`, aborting past the end.
+    ///
+    /// Checked against `Count()` rather than against the backing array, so a
+    /// slot that exists but holds nothing is out of range and says so.
+    /// `list[index]` is the same question in fewer characters.
     public T At(nuint index) {
         if (index >= count) { sl_array_bounds_fail(index, count); }
         return items[index];
@@ -158,12 +225,18 @@ public class List<T> : IList<T>, IEnumerable<T> {
         }
     }
 
+    /// Appends to the end, growing the backing array when it is full.
+    ///
+    /// Doubling, so a run of appends costs constant time each on average; a
+    /// single one can cost a copy of everything so far.
     public void Add(T item) {
         if (count == items.Length) { Grow(); }
         items[count] = item;
         count++;
     }
 
+    /// Replaces the item at `index`, aborting past the end. Never extends the
+    /// list -- `Add` is what does that.
     public void Set(nuint index, T item) {
         if (index >= count) { sl_array_bounds_fail(index, count); }
         items[index] = item;
@@ -200,6 +273,9 @@ public class List<T> : IList<T>, IEnumerable<T> {
         items[count] = default(T);
     }
 
+    /// A cursor over this list, for `foreach` and for passing it on as a
+    /// sequence. The cursor reads the list as it goes rather than taking a
+    /// copy, so changing the list during a walk changes what the walk sees.
     public IEnumerator<T> GetEnumerator() { return new ListEnumerator<T>(this); }
 
     /// Drops every item. The backing array is replaced rather than merely
@@ -528,11 +604,14 @@ public class OrderedDictionary<K, V> where K : IEquatable<K> {
     List<K> keys;
     List<V> values;
 
+    /// An empty ordered dictionary.
     public OrderedDictionary() {
         keys = new List<K>();
         values = new List<V>();
     }
 
+    /// How many entries there are. Entries rather than distinct keys: `Add`
+    /// keeps a repeated key, so this can exceed the number of different keys.
     public nuint Count() { return keys.Count(); }
 
     /// The key at a position, in insertion order.
@@ -554,6 +633,8 @@ public class OrderedDictionary<K, V> where K : IEquatable<K> {
         return None;
     }
 
+    /// Whether the key is there at all. A scan, like everything else here, so
+    /// `IndexOf` once beats `Has` followed by a lookup.
     public bool Has(K key) { return IndexOf(key).HasValue(); }
 
     /// Appends, without looking for the key first.
@@ -591,6 +672,7 @@ public class OrderedDictionary<K, V> where K : IEquatable<K> {
         return false;
     }
 
+    /// Drops every entry, leaving a count of zero.
     public void Clear() {
         keys.Clear();
         values.Clear();

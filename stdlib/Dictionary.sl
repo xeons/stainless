@@ -39,9 +39,14 @@ extern "C" void sl_fail(byte* message);
 
 /// One key and one value. What a dictionary yields when it is iterated.
 public class Pair<K, V> {
+    /// The key half.
     public K Key { get; }
+
+    /// The value half.
     public V Value { get; }
 
+    /// Builds a pair. Iteration is what normally makes these -- one per entry
+    /// visited, so a `foreach` over a large dictionary allocates one per step.
     public Pair(K key, V value) {
         Key = key;
         Value = value;
@@ -64,6 +69,7 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
 
     nuint count;
 
+    /// An empty dictionary with room for a few entries before it first grows.
     public Dictionary() {
         keys = new K[8];
         values = new V[8];
@@ -71,8 +77,10 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         count = 0;
     }
 
+    /// How many entries there are. O(1) -- it is a counter, not a scan.
     public nuint Count() { return count; }
 
+    /// True when there are no entries.
     public bool IsEmpty() { return count == 0; }
 
     /// The number of slots the table has. Always a power of two, so the hash is
@@ -92,6 +100,10 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         return i;
     }
 
+    /// Whether `key` is there.
+    ///
+    /// One probe, but reach for `Find` when the value is what is wanted:
+    /// `ContainsKey` and then `Get` probes twice for one answer.
     public bool ContainsKey(K key) { return filled[Probe(key)]; }
 
     /// The value for `key`, or `None` when there is none.
@@ -237,6 +249,12 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         count = 0;
     }
 
+    /// Every key, in the table's own order.
+    ///
+    /// A fresh list, so changing it changes nothing here, and building it is a
+    /// scan of every slot rather than of every entry -- O(capacity), not
+    /// O(count). Pairs with `Values` position for position as long as nothing
+    /// is written in between.
     public List<K> Keys() {
         var result = new List<K>();
         for (nuint i = 0; i < filled.Length; i++) {
@@ -245,6 +263,9 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         return result;
     }
 
+    /// Every value, in the same order `Keys` gives.
+    ///
+    /// Values are not distinct: a value stored under two keys appears twice.
     public List<V> Values() {
         var result = new List<V>();
         for (nuint i = 0; i < filled.Length; i++) {
@@ -253,6 +274,12 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         return result;
     }
 
+    /// A cursor over the entries, for `foreach`.
+    ///
+    /// The order is the table's and is not insertion order; it changes when
+    /// the table grows. `Standard.Collections.OrderedDictionary` is the one
+    /// that keeps an order. Adding or removing during a walk invalidates the
+    /// cursor.
     public IEnumerator<Pair<K, V>> GetEnumerator() {
         return new DictionaryEnumerator<K, V>(this);
     }
@@ -297,12 +324,18 @@ public class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
     nuint at;
     nuint scanned;
 
+    /// A cursor over `dictionary`, positioned before the first entry. The
+    /// dictionary is held by reference and must not be written to while the
+    /// cursor is live.
     public DictionaryEnumerator(Dictionary<K, V> dictionary) {
         source = dictionary;
         at = 0;
         scanned = 0;
     }
 
+    /// Advances to the next occupied slot, answering false at the end. Each
+    /// call skips however many empty slots lie between, so a walk costs
+    /// O(capacity) overall rather than O(count).
     public bool MoveNext() {
         while (scanned < source.Capacity()) {
             at = scanned;
@@ -312,6 +345,7 @@ public class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
         return false;
     }
 
+    /// The entry the last `MoveNext` landed on, as a freshly built `Pair`.
     public Pair<K, V> Current() { return source.PairAt(at); }
 }
 
@@ -326,6 +360,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
     T[] noItem;
     nuint count;
 
+    /// An empty set with room for a few items before it first grows.
     public HashSet() {
         items = new T[8];
         filled = new bool[8];
@@ -333,10 +368,14 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
         count = 0;
     }
 
+    /// How many distinct items there are. O(1).
     public nuint Count() { return count; }
 
+    /// True when there is nothing in it.
     public bool IsEmpty() { return count == 0; }
 
+    /// The number of slots the table has. Always a power of two, so the hash
+    /// is reduced with a mask rather than a division.
     public nuint Capacity() { return items.Length; }
 
     nuint Probe(T item) {
@@ -350,6 +389,8 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
         return i;
     }
 
+    /// Whether `item` is in the set. One probe, and the question the whole
+    /// collection exists to answer.
     public bool Contains(T item) { return filled[Probe(item)]; }
 
     /// Adds the item, reporting whether it was new.
@@ -394,6 +435,8 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
         return true;
     }
 
+    /// Drops every item. The arrays are replaced rather than blanked, so
+    /// anything they held is released now.
     public void Clear() {
         items = new T[8];
         filled = new bool[8];
@@ -419,6 +462,11 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
         for (nuint i = 0; i < doomed.Count(); i++) { Remove(doomed.At(i)); }
     }
 
+    /// Every item, in the table's own order -- which is not insertion order
+    /// and changes when the table grows.
+    ///
+    /// A fresh list, and building it scans every slot: O(capacity), not
+    /// O(count). `foreach` walks the set without building one.
     public List<T> ToList() {
         var result = new List<T>();
         for (nuint i = 0; i < filled.Length; i++) {
@@ -433,6 +481,9 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
     bool SlotFilled(nuint slot) { return filled[slot]; }
     T SlotValue(nuint slot) { return items[slot]; }
 
+    /// A cursor over the items, for `foreach`. Allocates nothing beyond the
+    /// cursor itself, unlike `ToList`. Adding or removing during a walk
+    /// invalidates it.
     public IEnumerator<T> GetEnumerator() { return new HashSetCursor<T>(this); }
 
     void Grow() {
@@ -464,12 +515,15 @@ public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashabl
     nuint at;
     nuint scanned;
 
+    /// A cursor over `set`, positioned before the first item. The set is held
+    /// by reference and must not be written to while the cursor is live.
     public HashSetCursor(HashSet<T> set) {
         source = set;
         at = 0;
         scanned = 0;
     }
 
+    /// Advances to the next occupied slot, answering false at the end.
     public bool MoveNext() {
         while (scanned < source.SlotCount()) {
             at = scanned;
@@ -479,5 +533,6 @@ public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashabl
         return false;
     }
 
+    /// The item the last `MoveNext` landed on.
     public T Current() { return source.SlotValue(at); }
 }

@@ -64,6 +64,7 @@ extern "C" {
 /// with a non-zero `ExitCode`, which is an outcome rather than an error --
 /// `grep` answering 1 for "no match" is the ordinary case, not a fault.
 public enum ProcessError {
+    /// It started.
     None,
 
     /// No such program, on the PATH or at the path given.
@@ -75,6 +76,7 @@ public enum ProcessError {
     /// Out of processes, descriptors or memory.
     NoResource,
 
+    /// It did not start, for a reason none of the above names.
     Failed,
 }
 

@@ -41,22 +41,50 @@ import Standard.Convert;
 
 // ------------------------------------------------------------------- errors
 
+/// Why a document could not be read.
 public enum XmlError {
+    /// Nothing went wrong.
     None,
-    Unexpected,         // a character that cannot appear here
-    UnclosedTag,        // a '<' with no '>'
-    UnclosedText,       // a quoted attribute value with no closing quote
-    MismatchedEnd,      // </b> closing <a>
-    UnexpectedEnd,      // the document stopped inside something
-    BadName,            // a tag or attribute name that is not one
-    BadEntity,          // an & that is not an entity this reads
-    NoRoot,             // nothing but whitespace and comments
-    TrailingContent,    // a second root element
-    TooDeep,            // nested past the limit below
-    DuplicateAttribute, // one element naming an attribute twice
-    NotReflected,       // a type with no field metadata to map onto
+
+    /// A character that cannot appear here.
+    Unexpected,
+
+    /// A `<` with no `>`.
+    UnclosedTag,
+
+    /// A quoted attribute value with no closing quote.
+    UnclosedText,
+
+    /// An end tag naming a different element than the start tag it closes.
+    MismatchedEnd,
+
+    /// The document stopped inside something.
+    UnexpectedEnd,
+
+    /// A tag or attribute name that is not one.
+    BadName,
+
+    /// An `&` that is not an entity this reads. The five XML entities and
+    /// numeric character references are what it reads; a DTD's own are not.
+    BadEntity,
+
+    /// Nothing but whitespace and comments -- no root element.
+    NoRoot,
+
+    /// A second root element. XML allows exactly one.
+    TrailingContent,
+
+    /// Nesting past `MaxDepth`.
+    TooDeep,
+
+    /// One element naming an attribute twice.
+    DuplicateAttribute,
+
+    /// A type with no field metadata to map onto.
+    NotReflected,
 }
 
+/// A sentence describing an error, for a message a person will read.
 public String Describe(XmlError error) {
     switch (error) {
         case XmlError.None: return "no error";
@@ -90,23 +118,37 @@ public const nuint MaxDepth = 128u;
 public class XmlAttributes {
     OrderedDictionary<String, String> entries;
 
+    /// An empty attribute list.
     public XmlAttributes() { entries = new OrderedDictionary<String, String>(); }
 
+    /// How many attributes there are.
     public nuint Count() { return entries.Count(); }
+
+    /// The name at a position, in the order they were written.
     public String NameAt(nuint index) { return entries.KeyAt(index); }
+
+    /// The value at a position, pairing with `NameAt` at the same index.
     public String ValueAt(nuint index) { return entries.ValueAt(index); }
 
+    /// Appends an attribute without looking for the name first. A parsed
+    /// document cannot reach here with a repeat -- that is
+    /// `XmlError.DuplicateAttribute` -- so this is for building one.
     public void Add(String name, String value) { entries.Add(name, value); }
+
+    /// Sets the value of a name, adding it if it is new. A replaced name keeps
+    /// the position it had.
     public void Set(String name, String value) { entries.Set(name, value); }
 
     /// Where a name is, or `None`.
     public Optional<nuint> IndexOf(String name) { return entries.IndexOf(name); }
 
+    /// Whether an attribute of that name is there.
     public bool Has(String name) { return entries.Has(name); }
 
     /// The value of an attribute, or the fallback when it is not there.
     public String Find(String name, String fallback) { return entries.Find(name, fallback); }
 
+    /// Removes an attribute, answering whether it was there.
     public bool Remove(String name) { return entries.Remove(name); }
 }
 
@@ -121,11 +163,22 @@ public class XmlAttributes {
 /// mostly used to carry. `Children` and `Text` together are what a
 /// configuration file has.
 public class XmlNode {
+    /// The tag name, without any namespace prefix being separated out -- a
+    /// prefix arrives as part of the name, since nothing here resolves one.
     public String Name;
+
+    /// The attributes, in the order they were written. Never null; an element
+    /// with none has an empty list.
     public XmlAttributes Attributes;
+
+    /// The child elements, in document order. Never null.
     public List<XmlNode> Children;
+
+    /// Every character run inside this element, joined. Where each run sat
+    /// relative to the children is not kept -- see the note above.
     public String Text;
 
+    /// An element with that name, no attributes, no children and no text.
     public XmlNode(String name) {
         Name = name;
         Attributes = new XmlAttributes();
@@ -159,6 +212,8 @@ public class XmlNode {
         return child.Text;
     }
 
+    /// Appends a child element. Nothing checks for a cycle, so do not add a
+    /// node to one of its own descendants: writing the tree would not end.
     public void Add(XmlNode child) { Children.Add(child); }
 }
 

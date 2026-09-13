@@ -43,11 +43,28 @@ extern "C" {
     long sl_time_zone_offset(long nanoseconds);
 }
 
+// The conversion factors, public because a program that has to hand a count of
+// nanoseconds to a C API should multiply by a name rather than by a literal
+// with the wrong number of zeroes in it.
+
+/// Nanoseconds in a microsecond.
 public const long NanosecondsPerMicrosecond = 1000;
+
+/// Nanoseconds in a millisecond.
 public const long NanosecondsPerMillisecond = 1000000;
+
+/// Nanoseconds in a second.
 public const long NanosecondsPerSecond = 1000000000;
+
+/// Nanoseconds in a minute.
 public const long NanosecondsPerMinute = 60000000000;
+
+/// Nanoseconds in an hour.
 public const long NanosecondsPerHour = 3600000000000;
+
+/// Nanoseconds in a day, which is 24 hours exactly. A calendar day across a
+/// daylight-saving change is not this, and nothing here pretends otherwise:
+/// add a day to an `Instant` and you have added 24 hours.
 public const long NanosecondsPerDay = 86400000000000;
 
 // ---------------------------------------------------------------- duration
@@ -61,34 +78,46 @@ public const long NanosecondsPerDay = 86400000000000;
 ///     var timeout = Duration.FromSeconds(30);
 ///     if (waited > timeout) { ... }
 public struct Duration {
+    /// The length in nanoseconds, which is the whole of the value. Readable
+    /// and writable because a struct's fields are, but a `From` method is what
+    /// says which unit was meant.
     public long Nanoseconds;
 
+    /// A length in nanoseconds. The others are this times a factor, so this is
+    /// the one that cannot overflow on the way in.
     public static Duration FromNanoseconds(long value) {
         Duration span;
         span.Nanoseconds = value;
         return span;
     }
 
+    /// A length in whole microseconds.
     public static Duration FromMicroseconds(long value) {
         return FromNanoseconds(value * NanosecondsPerMicrosecond);
     }
 
+    /// A length in whole milliseconds.
     public static Duration FromMilliseconds(long value) {
         return FromNanoseconds(value * NanosecondsPerMillisecond);
     }
 
+    /// A length in whole seconds.
     public static Duration FromSeconds(long value) {
         return FromNanoseconds(value * NanosecondsPerSecond);
     }
 
+    /// A length in whole minutes.
     public static Duration FromMinutes(long value) {
         return FromNanoseconds(value * NanosecondsPerMinute);
     }
 
+    /// A length in whole hours.
     public static Duration FromHours(long value) {
         return FromNanoseconds(value * NanosecondsPerHour);
     }
 
+    /// A length in whole days of 24 hours each. Past about 106,751 days the
+    /// multiplication overflows a `long` of nanoseconds, silently.
     public static Duration FromDays(long value) {
         return FromNanoseconds(value * NanosecondsPerDay);
     }
@@ -96,20 +125,27 @@ public struct Duration {
     /// Whole units, truncated toward zero. 1,500,000ns is 1 millisecond.
     public long TotalMilliseconds() { return Nanoseconds / NanosecondsPerMillisecond; }
 
+    /// Whole seconds, truncated toward zero.
     public long TotalSeconds() { return Nanoseconds / NanosecondsPerSecond; }
 
+    /// Whole minutes, truncated toward zero.
     public long TotalMinutes() { return Nanoseconds / NanosecondsPerMinute; }
 
+    /// Whole hours, truncated toward zero.
     public long TotalHours() { return Nanoseconds / NanosecondsPerHour; }
 
+    /// Whole 24-hour days, truncated toward zero.
     public long TotalDays() { return Nanoseconds / NanosecondsPerDay; }
 
     /// The same length with fractions kept, for a measurement being reported
     /// rather than counted.
     public double AsSeconds() { return (double)Nanoseconds / 1000000000.0; }
 
+    /// The same length in milliseconds, fractions kept.
     public double AsMilliseconds() { return (double)Nanoseconds / 1000000.0; }
 
+    /// True when the length is below zero, which is what subtracting a later
+    /// instant from an earlier one gives.
     public bool IsNegative() { return Nanoseconds < 0; }
 
     /// Arithmetic, as arithmetic. Adding two lengths of time is what `+` means
@@ -118,10 +154,12 @@ public struct Duration {
         return FromNanoseconds(left.Nanoseconds + right.Nanoseconds);
     }
 
+    /// One length less another. The result may be negative.
     public static Duration operator -(Duration left, Duration right) {
         return FromNanoseconds(left.Nanoseconds - right.Nanoseconds);
     }
 
+    /// The same length the other way round.
     public static Duration operator -(Duration span) {
         return FromNanoseconds(0 - span.Nanoseconds);
     }
@@ -131,34 +169,43 @@ public struct Duration {
         return FromNanoseconds(span.Nanoseconds * times);
     }
 
+    /// The same scaling with the operands the other way round.
     public static Duration operator *(long times, Duration span) {
         return FromNanoseconds(span.Nanoseconds * times);
     }
 
+    /// A length split into `parts`, truncated toward zero. Dividing by zero
+    /// ends the program, as integer division does.
     public static Duration operator /(Duration span, long parts) {
         return FromNanoseconds(span.Nanoseconds / parts);
     }
 
+    /// Whether the two lengths are equal, to the nanosecond.
     public static bool operator ==(Duration left, Duration right) {
         return left.Nanoseconds == right.Nanoseconds;
     }
 
+    /// Whether the two lengths differ.
     public static bool operator !=(Duration left, Duration right) {
         return left.Nanoseconds != right.Nanoseconds;
     }
 
+    /// Whether `left` is the shorter. Signed, so a negative length is below a positive one.
     public static bool operator <(Duration left, Duration right) {
         return left.Nanoseconds < right.Nanoseconds;
     }
 
+    /// Whether `left` is the longer.
     public static bool operator >(Duration left, Duration right) {
         return left.Nanoseconds > right.Nanoseconds;
     }
 
+    /// Whether `left` is no longer than `right`.
     public static bool operator <=(Duration left, Duration right) {
         return left.Nanoseconds <= right.Nanoseconds;
     }
 
+    /// Whether `left` is at least as long as `right`.
     public static bool operator >=(Duration left, Duration right) {
         return left.Nanoseconds >= right.Nanoseconds;
     }
@@ -223,6 +270,8 @@ String FormatDuration(Duration span) {
 /// of two dates is not a date -- which is exactly the thing a free function
 /// named `Add` could not say.
 public struct Instant {
+    /// Nanoseconds since 1970-01-01 UTC, negative before it. The whole of the
+    /// value, and the thing to hand a C API that wants an epoch count.
     public long Nanoseconds;
 
     /// What time it is now. It can go backwards between two calls; use `Clock`
@@ -240,12 +289,16 @@ public struct Instant {
         return at;
     }
 
+    /// An instant from whole seconds since the epoch -- what a `time_t`, a
+    /// file timestamp and most C APIs carry.
     public static Instant FromUnixSeconds(long seconds) {
         Instant at;
         at.Nanoseconds = seconds * NanosecondsPerSecond;
         return at;
     }
 
+    /// An instant from milliseconds since the epoch, which is what JavaScript
+    /// and most JSON APIs use.
     public static Instant FromUnixMilliseconds(long milliseconds) {
         Instant at;
         at.Nanoseconds = milliseconds * NanosecondsPerMillisecond;
@@ -276,6 +329,7 @@ public struct Instant {
     /// file's modification time is, and what most C APIs speak.
     public long ToUnixSeconds() { return Nanoseconds / NanosecondsPerSecond; }
 
+    /// Whole milliseconds since the epoch, rounded toward the epoch.
     public long ToUnixMilliseconds() { return Nanoseconds / NanosecondsPerMillisecond; }
 
     /// This instant as a date and time in UTC.
@@ -309,42 +363,53 @@ public struct Instant {
         return Duration.FromNanoseconds(later.Nanoseconds - earlier.Nanoseconds);
     }
 
+    /// An instant moved forward by a length of time. Exact nanoseconds, so a
+    /// day added is 24 hours and not a calendar day.
     public static Instant operator +(Instant at, Duration span) {
         Instant moved;
         moved.Nanoseconds = at.Nanoseconds + span.Nanoseconds;
         return moved;
     }
 
+    /// An instant moved back by a length of time.
     public static Instant operator -(Instant at, Duration span) {
         Instant moved;
         moved.Nanoseconds = at.Nanoseconds - span.Nanoseconds;
         return moved;
     }
 
+    /// Whether the two name the same nanosecond.
     public static bool operator ==(Instant left, Instant right) {
         return left.Nanoseconds == right.Nanoseconds;
     }
 
+    /// Whether they name different nanoseconds.
     public static bool operator !=(Instant left, Instant right) {
         return left.Nanoseconds != right.Nanoseconds;
     }
 
+    /// Whether `left` is the earlier.
     public static bool operator <(Instant left, Instant right) {
         return left.Nanoseconds < right.Nanoseconds;
     }
 
+    /// Whether `left` is the later.
     public static bool operator >(Instant left, Instant right) {
         return left.Nanoseconds > right.Nanoseconds;
     }
 
+    /// Whether `left` is no later than `right`.
     public static bool operator <=(Instant left, Instant right) {
         return left.Nanoseconds <= right.Nanoseconds;
     }
 
+    /// Whether `left` is no earlier than `right`.
     public static bool operator >=(Instant left, Instant right) {
         return left.Nanoseconds >= right.Nanoseconds;
     }
 
+    /// -1, 0 or 1, for sorting. The operators answer the question a program
+    /// usually has; this answers the one a sort has.
     public static int Compare(Instant left, Instant right) {
         if (left.Nanoseconds < right.Nanoseconds) { return -1; }
         if (left.Nanoseconds > right.Nanoseconds) { return 1; }
@@ -360,15 +425,35 @@ public struct Instant {
 /// in -- the struct itself does not carry that, because a date with no zone is
 /// exactly as ambiguous as it sounds.
 public struct DateTime {
+    /// The year, in full. Zero means the instant was outside what the platform
+    /// can name, and every other field is zero with it -- that is how this
+    /// struct reports a failure, since it has no other way to.
     public int Year;
-    public int Month;        // 1-12
-    public int Day;          // 1-31
-    public int Hour;         // 0-23
-    public int Minute;       // 0-59
-    public int Second;       // 0-60, because a leap second is a thing
+
+    /// The month, 1 to 12.
+    public int Month;
+
+    /// The day of the month, 1 to 31.
+    public int Day;
+
+    /// The hour, 0 to 23.
+    public int Hour;
+
+    /// The minute, 0 to 59.
+    public int Minute;
+
+    /// The second, 0 to 60 -- 60 because a leap second is a real reading of a
+    /// real clock.
+    public int Second;
+
+    /// Nanoseconds within the second, 0 to 999,999,999.
     public int Nanosecond;
-    public int DayOfWeek;    // 0 = Sunday
-    public int DayOfYear;    // 1-366
+
+    /// The day of the week, 0 for Sunday through 6 for Saturday.
+    public int DayOfWeek;
+
+    /// The day of the year, 1 to 366.
+    public int DayOfYear;
 
     /// The date alone: `2026-09-05`.
     public String FormatDate() {
@@ -475,9 +560,17 @@ String FormatInstantIso(Instant at) {
 
 /// Why a moment could not be read.
 public enum TimeError {
+    /// Nothing went wrong. Present so the enum has a zero value; a `Result`
+    /// says success by being `Ok`, so this is not what a failure carries.
     None,
-    Malformed,      // not the shape FormatIso writes
-    OutOfRange,     // the shape, but not a date -- the 31st of February
+
+    /// Not the shape `FormatIso` writes -- the wrong length, or a separator
+    /// in the wrong place, or something that is not a digit where one belongs.
+    Malformed,
+
+    /// The right shape and not a real moment: the 31st of February, a month of
+    /// 13, an hour of 24.
+    OutOfRange,
 }
 
 Result<Instant, TimeError> ParseInstantIso(String text) {
@@ -538,6 +631,8 @@ int Digits(String text, nuint start, nuint count) {
 public class Clock {
     long started;
 
+    /// A clock that starts now. There is no separate `Start`: making one is
+    /// what starts it.
     public Clock() { started = sl_time_monotonic(); }
 
     /// How long since it was made, or since `Restart`.

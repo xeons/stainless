@@ -123,6 +123,8 @@ public threadsafe class Mutex<T> {
     T value;
     byte* handle;
 
+    /// A mutex holding `initial`, unlocked. The value goes in here and comes
+    /// out only through a guard; there is no way to hand it over afterwards.
     public Mutex(T initial) {
         value = initial;
         handle = sl_mutex_new();
@@ -163,8 +165,14 @@ public class Guard<T> {
 
     ~Guard() { owner.Unlock(); }
 
+    /// What the lock guards.
+    ///
+    /// See the hole described on `Mutex`: what this hands back must not
+    /// outlive the guard, and nothing yet enforces it.
     public T Value() { return owner.Read(); }
 
+    /// Replaces the guarded value. For a class `T` this swaps which object is
+    /// guarded; mutating the one `Value` gave back is the usual thing.
     public void Set(T updated) { owner.Write(updated); }
 }
 
@@ -190,6 +198,7 @@ public threadsafe class Monitor<T> {
     byte* handle;
     byte* signal;
 
+    /// A monitor holding `initial`, unlocked and with nobody waiting.
     public Monitor(T initial) {
         value = initial;
         handle = sl_mutex_new();
@@ -228,8 +237,11 @@ public class MonitorGuard<T> {
 
     ~MonitorGuard() { owner.Unlock(); }
 
+    /// What the monitor guards, with the same lifetime caveat as `Guard`.
     public T Value() { return owner.Read(); }
 
+    /// Replaces the guarded value. Pulse afterwards if anyone is waiting on a
+    /// condition this changed -- nothing wakes on its own.
     public void Set(T updated) { owner.Write(updated); }
 
     /// Releases the lock, waits for a pulse, and takes the lock again. Call it
@@ -265,6 +277,7 @@ public threadsafe class RwLock<T> {
     T value;
     byte* handle;
 
+    /// A lock holding `initial`, unheld.
     public RwLock(T initial) {
         value = initial;
         handle = sl_rwlock_new();
@@ -278,6 +291,8 @@ public threadsafe class RwLock<T> {
         return new ReadGuard<T>(this);
     }
 
+    /// Takes a read guard only if no writer holds the lock. Answers null
+    /// rather than blocking.
     public ReadGuard<T>? TryRead() {
         if (sl_rwlock_try_read_lock(handle)) { return new ReadGuard<T>(this); }
         return null;
@@ -289,6 +304,8 @@ public threadsafe class RwLock<T> {
         return new WriteGuard<T>(this);
     }
 
+    /// Takes a write guard only if nothing holds the lock at all. Answers
+    /// null rather than blocking.
     public WriteGuard<T>? TryWrite() {
         if (sl_rwlock_try_write_lock(handle)) { return new WriteGuard<T>(this); }
         return null;
@@ -308,6 +325,9 @@ public class ReadGuard<T> {
 
     ~ReadGuard() { owner.ReadUnlock(); }
 
+    /// What the lock guards, shared with every other reader. Treat it as
+    /// read-only: nothing stops a `T` with mutating methods being mutated
+    /// through this, and doing so races with the other readers.
     public T Value() { return owner.Held(); }
 }
 
@@ -319,8 +339,10 @@ public class WriteGuard<T> {
 
     ~WriteGuard() { owner.WriteUnlock(); }
 
+    /// What the lock guards, exclusively. Safe to mutate through.
     public T Value() { return owner.Held(); }
 
+    /// Replaces the guarded value.
     public void Set(T updated) { owner.Store(updated); }
 }
 
@@ -338,17 +360,27 @@ public class WriteGuard<T> {
 public threadsafe class AtomicLong {
     long cell;
 
+    /// A counter starting at `initial`.
     public AtomicLong(long initial) { cell = initial; }
 
+    /// The value now. A read of a moving counter is stale the moment it is
+    /// returned, so this is for reporting; `Add` and `CompareExchange` are
+    /// what a decision is built on.
     public long Load() { return sl_atomic_load(&cell); }
 
+    /// Overwrites the value, losing whatever was there. `Exchange` is the one
+    /// that tells you what it replaced.
     public void Store(long value) { sl_atomic_store(&cell, value); }
 
     /// Adds and returns the new value, so two threads never see the same result.
     public long Add(long delta) { return sl_atomic_add(&cell, delta); }
 
+    /// Adds one and returns the new value, so two threads never see the same
+    /// number. Note that this is not C's `++`, which answers the old one.
     public long Increment() { return sl_atomic_add(&cell, 1); }
 
+    /// Subtracts one and returns the new value. A reference count reaching
+    /// zero is exactly one thread's result.
     public long Decrement() { return sl_atomic_add(&cell, -1); }
 
     /// Stores `value` and returns what was there before.
@@ -365,8 +397,10 @@ public threadsafe class AtomicLong {
     /// new value, as `Add` does.
     public long And(long mask) { return sl_atomic_and(&cell, mask); }
 
+    /// Sets the bits in `mask`, returning the new value.
     public long Or(long mask) { return sl_atomic_or(&cell, mask); }
 
+    /// Flips the bits in `mask`, returning the new value.
     public long Xor(long mask) { return sl_atomic_xor(&cell, mask); }
 }
 
@@ -377,20 +411,31 @@ public threadsafe class AtomicLong {
 public threadsafe class AtomicInt {
     int cell;
 
+    /// A counter starting at `initial`.
     public AtomicInt(int initial) { cell = initial; }
 
+    /// The value now, stale the moment it is returned.
     public int Load() { return sl_atomic_load32(&cell); }
 
+    /// Overwrites the value, losing whatever was there.
     public void Store(int value) { sl_atomic_store32(&cell, value); }
 
+    /// Adds and returns the new value. Wraps at 32 bits, silently, which is
+    /// the reason to prefer `AtomicLong` where the width is a free choice.
     public int Add(int delta) { return sl_atomic_add32(&cell, delta); }
 
+    /// Adds one and returns the new value.
     public int Increment() { return sl_atomic_add32(&cell, 1); }
 
+    /// Subtracts one and returns the new value.
     public int Decrement() { return sl_atomic_add32(&cell, -1); }
 
+    /// Stores `value` and returns what was there before.
     public int Exchange(int value) { return sl_atomic_exchange32(&cell, value); }
 
+    /// Stores `desired` only if the current value is `expected`, and reports
+    /// whether it did. A false answer means somebody else got there first --
+    /// re-read and try again, which is the shape of every lock-free loop.
     public bool CompareExchange(int expected, int desired) {
         int witness = expected;
         return sl_atomic_compare_exchange32(&cell, &witness, desired);
@@ -402,13 +447,17 @@ public threadsafe class AtomicInt {
 public threadsafe class AtomicBool {
     long cell;
 
+    /// A flag starting at `initial`.
     public AtomicBool(bool initial) {
         cell = 0;
         if (initial) { cell = 1; }
     }
 
+    /// The flag now. Cheap enough to read in a spin loop's condition.
     public bool Load() { return sl_atomic_load(&cell) != 0; }
 
+    /// Sets the flag, losing whatever it was. `Exchange` is the one to use
+    /// when exactly one thread must win.
     public void Store(bool value) {
         long raw = 0;
         if (value) { raw = 1; }
@@ -437,6 +486,9 @@ public threadsafe class Semaphore {
     byte* handle;
     byte* signal;
 
+    /// A semaphore with `initial` permits -- the number of things allowed to
+    /// proceed at once. Zero is a valid start, and makes every `Wait` block
+    /// until something calls `Release`.
     public Semaphore(long initial) {
         permits = initial;
         handle = sl_mutex_new();
@@ -513,6 +565,8 @@ public threadsafe class ManualResetEvent {
     byte* handle;
     byte* signal;
 
+    /// A latch, open when `signalled` is true. Start it closed when waiters
+    /// must not pass until something has happened.
     public ManualResetEvent(bool signalled) {
         open = signalled;
         handle = sl_mutex_new();
@@ -524,12 +578,16 @@ public threadsafe class ManualResetEvent {
         sl_mutex_free(handle);
     }
 
+    /// Blocks until the latch is open, and returns at once if it already is.
+    /// Every waiter passes -- the latch is not consumed.
     public void Wait() {
         sl_mutex_lock(handle);
         while (!open) { sl_condition_wait(signal, handle); }
         sl_mutex_unlock(handle);
     }
 
+    /// The same with a deadline. Answers whether the latch was open, so a
+    /// false means the time ran out.
     public bool WaitFor(ulong milliseconds) {
         sl_mutex_lock(handle);
         while (!open) {
@@ -558,6 +616,8 @@ public threadsafe class ManualResetEvent {
         sl_mutex_unlock(handle);
     }
 
+    /// Whether the latch is open *now*. `Reset` can close it before you act
+    /// on the answer, so this is for reporting rather than for deciding.
     public bool IsSet() {
         sl_mutex_lock(handle);
         bool state = open;
@@ -577,6 +637,8 @@ public threadsafe class AutoResetEvent {
     byte* handle;
     byte* signal;
 
+    /// A turnstile, armed when `signalled` is true -- so the first `Wait`
+    /// passes straight through.
     public AutoResetEvent(bool signalled) {
         ready = signalled;
         handle = sl_mutex_new();
@@ -588,6 +650,8 @@ public threadsafe class AutoResetEvent {
         sl_mutex_free(handle);
     }
 
+    /// Blocks until the turnstile is armed, then passes and closes it behind.
+    /// Exactly one waiter passes per `Set`.
     public void Wait() {
         sl_mutex_lock(handle);
         while (!ready) { sl_condition_wait(signal, handle); }
@@ -595,6 +659,8 @@ public threadsafe class AutoResetEvent {
         sl_mutex_unlock(handle);
     }
 
+    /// The same with a deadline. Answers whether it got through; a false
+    /// leaves the turnstile as it found it.
     public bool WaitFor(ulong milliseconds) {
         sl_mutex_lock(handle);
         while (!ready) {
@@ -629,6 +695,8 @@ public threadsafe class CountdownEvent {
     byte* handle;
     byte* signal;
 
+    /// A latch that opens once `count` things have signalled. A count of zero
+    /// starts open, and `TryAddCount` will refuse to reopen it.
     public CountdownEvent(long count) {
         remaining = count;
         handle = sl_mutex_new();
@@ -662,12 +730,18 @@ public threadsafe class CountdownEvent {
         return added;
     }
 
+    /// Blocks until the count reaches zero. Every waiter passes, and a later
+    /// `Wait` returns at once -- the latch does not re-arm.
+    ///
+    /// The calling thread blocks rather than helping: this is not a `parallel`
+    /// block, so there is no queue for it to work off.
     public void Wait() {
         sl_mutex_lock(handle);
         while (remaining > 0) { sl_condition_wait(signal, handle); }
         sl_mutex_unlock(handle);
     }
 
+    /// The same with a deadline. Answers whether the count reached zero.
     public bool WaitFor(ulong milliseconds) {
         sl_mutex_lock(handle);
         while (remaining > 0) {
@@ -681,6 +755,8 @@ public threadsafe class CountdownEvent {
         return true;
     }
 
+    /// How many signals are still outstanding. A snapshot, and stale the
+    /// moment you have it.
     public long CurrentCount() {
         sl_mutex_lock(handle);
         long count = remaining;
@@ -706,6 +782,11 @@ public threadsafe class Barrier {
     byte* handle;
     byte* signal;
 
+    /// A barrier for exactly `count` participants.
+    ///
+    /// The number is fixed for the life of the barrier. Fewer threads than
+    /// that calling `SignalAndWait` blocks all of them for ever, which is the
+    /// failure to look for when a phase never ends.
     public Barrier(nuint count) {
         participants = count;
         waiting = 0u;
@@ -741,6 +822,8 @@ public threadsafe class Barrier {
         return round;
     }
 
+    /// How many participants the barrier was made for. Fixed, so unlike most
+    /// readings here it cannot be stale.
     public nuint ParticipantCount() { return participants; }
 }
 
@@ -766,6 +849,8 @@ public delegate void Job(byte* argument);
 public class TaskScope {
     byte* handle;
 
+    /// Opens a scope. Starts the thread pool if this is the first one, which
+    /// is what `StartPool` can do earlier and with a chosen size.
     public TaskScope() { handle = sl_scope_begin(); }
 
     /// Queues a job. It may already be running when this returns.
@@ -868,6 +953,7 @@ public nuint CurrentId() { return sl_thread_current_id(); }
 public class SpinWait {
     nuint spins;
 
+    /// A fresh backoff, having spun zero times.
     public SpinWait() { spins = 0u; }
 
     /// One step of backing off.

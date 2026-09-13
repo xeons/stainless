@@ -71,9 +71,15 @@ extern "C" {
 /// holds. Check `Ok` first. The pair exists because a concurrent container
 /// cannot answer "is it empty?" and "give me the front" as two questions.
 public class Taken<T> {
+    /// Whether there was anything to take. Read this before `Value`.
     public bool Ok { get; }
+
+    /// What was taken, meaningful only when `Ok` is true. Otherwise it is
+    /// whatever a zeroed slot holds -- null for a reference, zero for a
+    /// number -- and not a value the container ever contained.
     public T Value { get; }
 
+    /// Builds an answer. The containers make these; a caller reads them.
     public Taken(bool ok, T value) {
         Ok = ok;
         Value = value;
@@ -88,6 +94,8 @@ public threadsafe class ConcurrentQueue<T> {
     byte* gate;
     T[] blank;
 
+    /// An empty queue, with its own mutex. The mutex is freed when the queue
+    /// is, so there is nothing to dispose.
     public ConcurrentQueue() {
         items = new Queue<T>();
         gate = sl_mutex_new();
@@ -96,6 +104,9 @@ public threadsafe class ConcurrentQueue<T> {
 
     ~ConcurrentQueue() { sl_mutex_free(gate); }
 
+    /// Adds to the back. Blocks only for as long as the lock is held, which is
+    /// the enqueue itself; there is no bound on the queue, so this never waits
+    /// for a consumer.
     public void Enqueue(T item) {
         sl_mutex_lock(gate);
         items.Enqueue(item);
@@ -141,6 +152,9 @@ public threadsafe class ConcurrentQueue<T> {
         return result;
     }
 
+    /// Whether it is empty *now*. Another thread may enqueue before you act on
+    /// the answer, so a true here does not mean the next `TryDequeue` fails.
+    /// Reach for `TryDequeue` and read its `Ok` instead.
     public bool IsEmpty() { return Count() == 0; }
 
     /// A snapshot, oldest first. Consistent with itself, and out of date the
@@ -161,6 +175,7 @@ public threadsafe class ConcurrentStack<T> {
     byte* gate;
     T[] blank;
 
+    /// An empty stack, with its own mutex.
     public ConcurrentStack() {
         items = new Stack<T>();
         gate = sl_mutex_new();
@@ -169,12 +184,16 @@ public threadsafe class ConcurrentStack<T> {
 
     ~ConcurrentStack() { sl_mutex_free(gate); }
 
+    /// Adds to the top. Never waits for a consumer -- the stack is unbounded.
     public void Push(T item) {
         sl_mutex_lock(gate);
         items.Push(item);
         sl_mutex_unlock(gate);
     }
 
+    /// Takes the top item if there is one. The answer and the item come back
+    /// together, because asking whether it is empty and then popping would
+    /// race with every other thread.
     public Taken<T> TryPop() {
         sl_mutex_lock(gate);
 
@@ -188,6 +207,9 @@ public threadsafe class ConcurrentStack<T> {
         return new Taken<T>(true, item);
     }
 
+    /// Takes the top item, or `fallback` when there is none. The same as
+    /// `TryPop` without the allocation, for when a sentinel will do -- which
+    /// it will not if `fallback` is a value the stack might hold.
     public T PopOr(T fallback) {
         sl_mutex_lock(gate);
 
@@ -201,6 +223,8 @@ public threadsafe class ConcurrentStack<T> {
         return item;
     }
 
+    /// How many items there are *now*. For reporting rather than for
+    /// deciding: another thread may change it before you act on it.
     public nuint Count() {
         sl_mutex_lock(gate);
         nuint result = items.Count();
@@ -208,8 +232,11 @@ public threadsafe class ConcurrentStack<T> {
         return result;
     }
 
+    /// Whether it is empty *now*, with the same caveat as `Count`.
     public bool IsEmpty() { return Count() == 0; }
 
+    /// A snapshot, top first. Consistent with itself, and out of date the
+    /// moment it is returned.
     public List<T> ToList() {
         sl_mutex_lock(gate);
         var copy = items.ToList();
@@ -226,6 +253,7 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     byte* gate;
     V[] blank;
 
+    /// An empty map, with its own mutex.
     public ConcurrentDictionary() {
         entries = new Dictionary<K, V>();
         gate = sl_mutex_new();
@@ -234,6 +262,8 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
 
     ~ConcurrentDictionary() { sl_mutex_free(gate); }
 
+    /// Sets the value of a key, whether or not it was there. `Add` is the one
+    /// that refuses to overwrite.
     public void Set(K key, V value) {
         sl_mutex_lock(gate);
         entries.Set(key, value);
@@ -250,6 +280,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return added;
     }
 
+    /// The value for `key` if it is there. One lock rather than two, which is
+    /// what makes it different from `ContainsKey` followed by a lookup:
+    /// between those two another thread can remove the key.
     public Taken<V> TryGet(K key) {
         sl_mutex_lock(gate);
 
@@ -263,6 +296,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return new Taken<V>(true, value);
     }
 
+    /// The value for `key`, or `fallback` when it is absent. No allocation,
+    /// at the cost of being unable to tell an absent key from one whose value
+    /// happens to equal the fallback.
     public V GetOr(K key, V fallback) {
         sl_mutex_lock(gate);
         var value = entries.GetOr(key, fallback);
@@ -270,6 +306,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return value;
     }
 
+    /// Whether the key is there *now*. True here does not mean the next
+    /// `TryGet` succeeds -- another thread may remove it in between -- so this
+    /// is for reporting, and `TryGet` is for acting.
     public bool ContainsKey(K key) {
         sl_mutex_lock(gate);
         bool present = entries.ContainsKey(key);
@@ -277,6 +316,8 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return present;
     }
 
+    /// Removes a key, answering whether it was there. The answer is exact:
+    /// exactly one of several threads racing to remove the same key gets true.
     public bool Remove(K key) {
         sl_mutex_lock(gate);
         bool removed = entries.Remove(key);
@@ -284,12 +325,14 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return removed;
     }
 
+    /// Drops every entry, under one lock.
     public void Clear() {
         sl_mutex_lock(gate);
         entries.Clear();
         sl_mutex_unlock(gate);
     }
 
+    /// How many entries there are *now*. For reporting rather than deciding.
     public nuint Count() {
         sl_mutex_lock(gate);
         nuint result = entries.Count();
@@ -297,6 +340,7 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return result;
     }
 
+    /// Whether it is empty *now*, with the same caveat as `Count`.
     public bool IsEmpty() { return Count() == 0; }
 
     /// A snapshot of the keys. Out of date the moment it is returned, which is
@@ -308,6 +352,10 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
         return copy;
     }
 
+    /// A snapshot of the values, in the same order as `Keys` when neither is
+    /// interleaved with a write. Out of date the moment it is returned, and
+    /// pairing the two lists after the fact is not safe -- iterate the map if
+    /// the pairing matters.
     public List<V> Values() {
         sl_mutex_lock(gate);
         var copy = entries.Values();
@@ -338,6 +386,9 @@ public threadsafe class Channel<T> {
     T[] blank;
     bool closed;
 
+    /// An open, empty channel. Unbounded: `Send` never blocks waiting for a
+    /// consumer, so a producer that outruns its consumers grows the queue
+    /// rather than being slowed by it.
     public Channel() {
         items = new Queue<T>();
         gate = sl_mutex_new();
@@ -411,6 +462,9 @@ public threadsafe class Channel<T> {
         sl_mutex_unlock(gate);
     }
 
+    /// Whether `Close` has been called. A closed channel may still have items
+    /// in it: this answers whether more can be sent, not whether more can be
+    /// taken. `Take`'s `Ok` is what answers that.
     public bool IsClosed() {
         sl_mutex_lock(gate);
         bool result = closed;
@@ -418,6 +472,8 @@ public threadsafe class Channel<T> {
         return result;
     }
 
+    /// How many items are waiting *now* -- the producer's backlog. For
+    /// reporting rather than for deciding; a consumer should call `Take`.
     public nuint Count() {
         sl_mutex_lock(gate);
         nuint result = items.Count();

@@ -55,6 +55,24 @@ module Standard.Text;
 /// in some other string. -1 is not.
 public const long NotFound = -1;
 
+/// Immutable UTF-8 text.
+///
+/// The declaration is the runtime's and the behaviour is here, so this is the
+/// second half of a type that `Builtins` opened. Three things a caller needs
+/// before reaching for anything below:
+///
+/// A string cannot be changed once made. Every method that looks like it edits
+/// one -- `Trim`, `Replace`, `ToUpperAscii` -- answers a new string, and the
+/// ones that would have nothing to change answer `this` rather than a copy.
+///
+/// Every position is a byte offset, and every length is a byte count.
+/// `ByteLength` is O(1) and no method here counts characters. Use
+/// `CodePointAt` and `NextCodePoint` to walk by character.
+///
+/// Slicing clamps rather than failing: a `start` past the end and a length
+/// past the end both give what is actually there, so `Substring` cannot be
+/// made to abort. `ByteAt` is the exception and reads the buffer directly. A
+/// search that finds nothing answers `NotFound`.
 public class String {
 
     /// Text with no bytes in it.
@@ -289,6 +307,11 @@ public class String {
         return with.Repeat((width - size) / unit) + this;
     }
 
+    /// The same as `PadRight(width)` with something other than a space.
+    ///
+    /// Measured in bytes, so a multi-byte `with` pads by whole copies and may
+    /// fall short of the width rather than overshoot it. An empty `with`
+    /// answers the string unchanged, since no number of copies would reach.
     public String PadRight(nuint width, String with) {
         nuint size = this.ByteLength();
         nuint unit = with.ByteLength();
@@ -451,6 +474,10 @@ public class String {
     // ---------------------------------------------------------- code points
 
     /// The byte at `index`, which is a code unit and not a character.
+    ///
+    /// Unchecked, unlike the slicing methods: this reads the buffer directly,
+    /// so an `index` at or past `ByteLength` reads memory that is not the
+    /// string's. Check the length first, or slice instead.
     public byte ByteAt(nuint index) {
         return this.ToPointer()[index];
     }
@@ -558,6 +585,16 @@ public class String {
     }
 }
 
+/// Text assembled a piece at a time.
+///
+/// Reach for this where a loop would otherwise write `text = text + more`: a
+/// `String` is immutable, so that line allocates and copies everything so far
+/// on every pass, and a builder appends into one buffer that grows instead.
+/// For two or three pieces known up front, `+` is clearer and costs no more.
+///
+/// The declaration is the runtime's, as `String`'s is, and the appending is
+/// here. Call `ToString` for the text; the builder stays usable afterwards and
+/// the string does not change when it is appended to again.
 public class StringBuilder {
 
     // ------------------------------------------------------------ appending
@@ -729,6 +766,15 @@ public class StringBuilder {
     }
 }
 
+/// UTF-16 text, which exists for the platforms that ask for it.
+///
+/// Not the string type to write a program in -- that is `String`, and this is
+/// what a Windows `W` entry point or a Java-shaped protocol wants on the wire.
+/// Convert at the boundary and stay in `String` everywhere else.
+///
+/// Positions are units, not characters and not bytes: a scalar outside the
+/// basic plane is two units, so `UnitCount` is not a character count and
+/// `UnitAt` can land on half a surrogate pair. `CodePointAt` joins the pair.
 public class Utf16String {
 
     /// Whether there are any units at all.

@@ -174,18 +174,22 @@ public List<T> Filter<T>(IEnumerable<T> items, Predicate<T> keep) {
     return kept;
 }
 
+/// Every element put through the transform, over any sequence.
 public List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform) {
     var mapped = new List<R>();
     foreach (var item in items) { mapped.Add(transform(item)); }
     return mapped;
 }
 
+/// Everything folded into one value, left to right, over any sequence.
 public A Reduce<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine) {
     var total = seed;
     foreach (var item in items) { total = combine(total, item); }
     return total;
 }
 
+/// Whether any element satisfies the predicate, over any sequence. Stops at
+/// the first that does, so the rest of the sequence is never walked.
 public bool Any<T>(IEnumerable<T> items, Predicate<T> test) {
     foreach (var item in items) {
         if (test(item)) { return true; }
@@ -193,6 +197,8 @@ public bool Any<T>(IEnumerable<T> items, Predicate<T> test) {
     return false;
 }
 
+/// Whether every element does, over any sequence. Stops at the first that
+/// does not, and is true of an empty sequence.
 public bool All<T>(IEnumerable<T> items, Predicate<T> test) {
     foreach (var item in items) {
         if (!test(item)) { return false; }
@@ -200,6 +206,7 @@ public bool All<T>(IEnumerable<T> items, Predicate<T> test) {
     return true;
 }
 
+/// How many satisfy the predicate, over any sequence. Walks all of it.
 public nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test) {
     nuint found = 0u;
     foreach (var item in items) {
@@ -208,6 +215,10 @@ public nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test) {
     return found;
 }
 
+/// The first element satisfying the predicate, or `fallback` if none does,
+/// over any sequence. A fallback equal to a real element is indistinguishable
+/// from a miss; `Find` is the overload that tells them apart, and it takes a
+/// slice rather than a sequence.
 public T FirstOr<T>(IEnumerable<T> items, Predicate<T> test, T fallback) {
     foreach (var item in items) {
         if (test(item)) { return item; }
@@ -215,6 +226,7 @@ public T FirstOr<T>(IEnumerable<T> items, Predicate<T> test, T fallback) {
     return fallback;
 }
 
+/// Runs the action over every element of any sequence.
 public void ForEach<T>(IEnumerable<T> items, Action<T> body) {
     foreach (var item in items) { body(item); }
 }
@@ -275,6 +287,8 @@ public List<T> Distinct<T>(T[:] items) where T : IEquatable<T> {
     return seen;
 }
 
+/// The elements, in order, with later repeats left out, over any sequence.
+/// O(n squared) in comparisons, as the slice overload is.
 public List<T> Distinct<T>(IEnumerable<T> items) where T : IEquatable<T> {
     var seen = new List<T>();
     foreach (var item in items) {
@@ -296,6 +310,8 @@ public List<T> OrderBy<T>(T[:] items, Comparer<T> order) {
     return ToList(copy);
 }
 
+/// The elements ordered by what `order` says, over any sequence, leaving the
+/// input alone. Copies into an array first, so it costs one.
 public List<T> OrderBy<T>(IEnumerable<T> items, Comparer<T> order) {
     var copy = ToArray(items);
     Sort(copy, order);
@@ -343,6 +359,7 @@ public List<T> Where<T>(T[:] items, Predicate<T> keep) {
     return kept;
 }
 
+/// `Filter` over any sequence, spelled as LINQ spells it.
 public List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep) {
     var kept = new List<T>();
     foreach (var item in items) {
@@ -358,6 +375,7 @@ public List<R> Select<T, R>(T[:] items, Func<T, R> transform) {
     return made;
 }
 
+/// `Map` over any sequence, spelled as LINQ spells it.
 public List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform) {
     var made = new List<R>();
     foreach (var item in items) { made.Add(transform(item)); }
@@ -371,6 +389,7 @@ public A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine) {
     return total;
 }
 
+/// `Reduce` over any sequence, spelled as LINQ spells it.
 public A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine) {
     var total = seed;
     foreach (var item in items) { total = combine(total, item); }

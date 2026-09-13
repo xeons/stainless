@@ -106,6 +106,10 @@ public Result<int, ConvertError> ToInt(String text) {
     return ToInt(text, 10);
 }
 
+/// `text` as an `int` in `radix`, from 2 to 36.
+///
+/// A number that parses as a `long` and does not fit an `int` is
+/// `OutOfRange`, not a truncation.
 public Result<int, ConvertError> ToInt(String text, uint radix) {
     var wide = ToLong(text, radix);
     switch (wide) {
@@ -125,6 +129,10 @@ public Result<ulong, ConvertError> ToULong(String text) {
     return ToULong(text, 10);
 }
 
+/// `text` as an unsigned whole number in `radix`, from 2 to 36.
+///
+/// Letters count from `a` = 10 in either case. A leading `+` is allowed; a
+/// leading `-` is `Malformed`.
 public Result<ulong, ConvertError> ToULong(String text, uint radix) {
     if (radix < 2 || radix > 36) { return Fail(ConvertError.Malformed); }
 

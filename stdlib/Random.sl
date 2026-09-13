@@ -106,6 +106,8 @@ public class Random {
         return result;
     }
 
+    /// The next 64 bits read as signed, so negative half the time. Reach for
+    /// `NextBelow` when a range is what is wanted.
     public long NextLong() { return (long)NextULong(); }
 
     /// A number in `[0, limit)`. Aborts on a limit of zero, which names an

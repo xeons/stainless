@@ -143,15 +143,26 @@ public byte[] WithoutPreamble(IEncoding encoding, byte[] bytes) {
 /// validate, because a `byte[]` from outside the program is not a `String` and
 /// has promised nothing.
 public class Utf8Encoding : IEncoding {
+    /// `"utf-8"`.
     public String Name() { return "utf-8"; }
+
+    /// EF BB BF. UTF-8 needs no byte order mark -- there is only one order --
+    /// so this is what to *recognise*, not what to write by habit.
     public byte[] Preamble() { return [0xEF, 0xBB, 0xBF]; }
 
+    /// The length the text already has. O(1), since no transcode is needed.
     public nuint GetByteCount(String text) { return text.ByteLength(); }
+
+    /// The text's own bytes. A copy, not a transcode.
     public byte[] GetBytes(String text) { return text.ToBytes(); }
 
     /// Every scalar; that is what UTF-8 is for.
     public bool CanRepresent(char32 scalar) { return true; }
 
+    /// `bytes` validated, with each malformed byte replaced by U+FFFD.
+    ///
+    /// One replacement per bad byte rather than per bad sequence, so a run of
+    /// rubbish is as many U+FFFDs as it is bytes.
     public String GetString(byte[] bytes) {
         var built = new StringBuilder();
         nuint at = 0;
@@ -171,6 +182,13 @@ public class Utf8Encoding : IEncoding {
         return built.ToText();
     }
 
+    /// The strict decode: `Invalid` for anything that is not a scalar, and
+    /// `Incomplete` for a sequence the input ran out during.
+    ///
+    /// Stricter than `GetString`, and deliberately: an overlong sequence, a
+    /// surrogate and a value past U+10FFFF are each refused, because each is a
+    /// way of spelling something that is not a character and each has been a
+    /// security hole in a decoder that accepted it.
     public Result<String, EncodingError> TryGetString(byte[] bytes) {
         nuint at = 0;
 
@@ -200,11 +218,16 @@ public class Utf8Encoding : IEncoding {
 public class Utf16Encoding : IEncoding {
     bool bigEndian;
 
+    /// A UTF-16 encoding, big-endian when `big`. `Utf16()` and
+    /// `Utf16BigEndian()` are the names to reach for.
     public Utf16Encoding(bool big) { bigEndian = big; }
 
+    /// `"utf-16be"` or `"utf-16le"`, whichever this is.
     public String Name() { return bigEndian ? "utf-16be" : "utf-16le"; }
     // Written as an if rather than a ternary: an array literal takes its type
     // from where it is going, and a ternary arm is not somewhere that says.
+    /// FE FF big-endian, FF FE little. Worth writing here, unlike UTF-8's:
+    /// without it there is no way to tell the two orders apart.
     public byte[] Preamble() {
         if (bigEndian) { return [0xFE, 0xFF]; }
         return [0xFF, 0xFE];
@@ -213,8 +236,12 @@ public class Utf16Encoding : IEncoding {
     /// Every scalar, in one unit or two.
     public bool CanRepresent(char32 scalar) { return true; }
 
+    /// Two bytes per unit, so four for a scalar outside the basic plane.
+    /// Costs a transcode to count, which is what `GetBytes` then does again.
     public nuint GetByteCount(String text) { return text.ToUtf16().UnitCount() * 2; }
 
+    /// The text as UTF-16 in this byte order, with no byte order mark --
+    /// prepend `Preamble()` if the reader will need one.
     public byte[] GetBytes(String text) {
         var wide = text.ToUtf16();
         nuint count = wide.UnitCount();
@@ -233,6 +260,9 @@ public class Utf16Encoding : IEncoding {
         return bytes;
     }
 
+    /// `bytes` read as UTF-16, with an unpaired surrogate or a trailing odd
+    /// byte becoming U+FFFD. A byte order mark, if present, is not stripped --
+    /// `WithoutPreamble` is what does that.
     public String GetString(byte[] bytes) {
         var built = new StringBuilder();
         nuint at = 0;
@@ -266,6 +296,8 @@ public class Utf16Encoding : IEncoding {
         return built.ToText();
     }
 
+    /// The strict decode: `Incomplete` for an odd number of bytes or a high
+    /// surrogate at the end, `Invalid` for a surrogate that is not paired.
     public Result<String, EncodingError> TryGetString(byte[] bytes) {
         if (bytes.Length % 2 != 0) { return Fail(EncodingError.Incomplete); }
 
@@ -297,19 +329,27 @@ public class Utf16Encoding : IEncoding {
 public class Utf32Encoding : IEncoding {
     bool bigEndian;
 
+    /// A UTF-32 encoding, big-endian when `big`. `Utf32()` and
+    /// `Utf32BigEndian()` are the names to reach for.
     public Utf32Encoding(bool big) { bigEndian = big; }
 
+    /// `"utf-32be"` or `"utf-32le"`, whichever this is.
     public String Name() { return bigEndian ? "utf-32be" : "utf-32le"; }
 
+    /// Four bytes, and the little-endian one begins with UTF-16LE's -- which
+    /// is why `Detect` tests UTF-32 first.
     public byte[] Preamble() {
         if (bigEndian) { return [0x00, 0x00, 0xFE, 0xFF]; }
         return [0xFF, 0xFE, 0x00, 0x00];
     }
 
+    /// Every scalar, in exactly four bytes.
     public bool CanRepresent(char32 scalar) { return true; }
 
+    /// Four bytes per scalar. Costs a pass to count the scalars.
     public nuint GetByteCount(String text) { return text.CodePointCount() * 4; }
 
+    /// The text as UTF-32 in this byte order, with no byte order mark.
     public byte[] GetBytes(String text) {
         var bytes = new byte[text.CodePointCount() * 4];
         nuint out = 0;
@@ -332,6 +372,9 @@ public class Utf32Encoding : IEncoding {
         return bytes;
     }
 
+    /// `bytes` read as UTF-32, with a value that is not a scalar -- a
+    /// surrogate, or anything past U+10FFFF -- becoming U+FFFD. Trailing bytes
+    /// that do not make a whole four are dropped.
     public String GetString(byte[] bytes) {
         var built = new StringBuilder();
 
@@ -345,6 +388,8 @@ public class Utf32Encoding : IEncoding {
         return built.ToText();
     }
 
+    /// The strict decode: `Incomplete` when the length is not a multiple of
+    /// four, `Invalid` for a value that is not a scalar.
     public Result<String, EncodingError> TryGetString(byte[] bytes) {
         if (bytes.Length % 4 != 0) { return Fail(EncodingError.Incomplete); }
 
@@ -387,15 +432,22 @@ public abstract class SingleByteEncoding : IEncoding {
     /// Which byte writes this scalar, or -1 when none does.
     public abstract int FromScalar(char32 scalar);
 
+    /// The IANA name, which each subclass supplies.
     public abstract String Name();
 
     /// None of these has one: a byte order mark is a Unicode idea.
     public byte[] Preamble() { return []; }
 
+    /// Whether the table has a byte for that scalar. Most of Unicode is not in
+    /// any of these tables, so this is false far more often than it is true.
     public bool CanRepresent(char32 scalar) { return this.FromScalar(scalar) >= 0; }
 
+    /// One byte per scalar, always -- so the count is the scalar count, not
+    /// the text's byte length.
     public nuint GetByteCount(String text) { return text.CodePointCount(); }
 
+    /// The text in this encoding, with anything the table cannot write
+    /// becoming `?`. Check `CanRepresent` first where losing it matters.
     public byte[] GetBytes(String text) {
         var bytes = new byte[text.CodePointCount()];
         nuint out = 0;
@@ -408,6 +460,8 @@ public abstract class SingleByteEncoding : IEncoding {
         return bytes;
     }
 
+    /// `bytes` through the table, one character per byte. Cannot fail: every
+    /// byte means something, even if that something is U+FFFD.
     public String GetString(byte[] bytes) {
         var built = new StringBuilder();
         for (nuint i = 0; i < bytes.Length; i++) {
@@ -424,12 +478,15 @@ public abstract class SingleByteEncoding : IEncoding {
 
 /// US-ASCII. A byte above 127 is not ASCII, and reads as U+FFFD.
 public class AsciiEncoding : SingleByteEncoding {
+    /// `"us-ascii"`.
     public override String Name() { return "us-ascii"; }
 
+    /// The byte itself below 128, and U+FFFD at or above it.
     public override char32 ToScalar(byte value) {
         return value < 128 ? (char32)(uint)value : (char32)0xFFFD;
     }
 
+    /// The scalar itself below U+0080, and -1 at or above it.
     public override int FromScalar(char32 scalar) {
         uint value = (uint)scalar;
         return value < 128 ? (int)value : -1;
@@ -439,10 +496,14 @@ public class AsciiEncoding : SingleByteEncoding {
 /// ISO-8859-1, where byte n is code point n for every n. Nothing can fail in
 /// either direction below U+0100, and nothing above it can be written.
 public class Latin1Encoding : SingleByteEncoding {
+    /// `"iso-8859-1"`.
     public override String Name() { return "iso-8859-1"; }
 
+    /// Byte n is code point n, for every n. Never U+FFFD, which is what makes
+    /// this encoding able to carry any byte sequence at all.
     public override char32 ToScalar(byte value) { return (char32)(uint)value; }
 
+    /// The scalar itself below U+0100, and -1 at or above it.
     public override int FromScalar(char32 scalar) {
         uint value = (uint)scalar;
         return value < 256 ? (int)value : -1;
@@ -453,13 +514,18 @@ public class Latin1Encoding : SingleByteEncoding {
 /// than C1 controls. Five of those 32 positions are unassigned and read as
 /// U+FFFD.
 public class Windows1252Encoding : SingleByteEncoding {
+    /// `"windows-1252"`.
     public override String Name() { return "windows-1252"; }
 
+    /// Latin-1 outside 0x80 to 0x9F, and the punctuation table inside it.
+    /// Five of those 32 positions are unassigned and read as U+FFFD.
     public override char32 ToScalar(byte value) {
         if (value < 0x80 || value > 0x9F) { return (char32)(uint)value; }
         return (char32)Cp1252High((nuint)(value - 0x80));
     }
 
+    /// The Latin-1 byte where there is one, else a scan of the 32-entry
+    /// punctuation table, else -1.
     public override int FromScalar(char32 scalar) {
         uint value = (uint)scalar;
         if (value < 0x80 || (value >= 0xA0 && value < 0x100)) { return (int)value; }

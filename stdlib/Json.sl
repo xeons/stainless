@@ -44,19 +44,41 @@ import Standard.Convert;
 
 // ------------------------------------------------------------------- errors
 
+/// Why a document could not be read.
 public enum JsonError {
+    /// Nothing went wrong.
     None,
-    Unexpected,         // a character that cannot start what is expected here
-    UnterminatedText,   // a string with no closing quote
-    BadEscape,          // a \ followed by something that is not an escape
-    BadNumber,          // digits that are not a JSON number
-    BadLiteral,         // something that started like true, false or null
-    TrailingContent,    // a second value after the first
-    TooDeep,            // nesting past the limit below
-    NotAnObject,        // a document that is not the object a type wants
-    NotReflected,       // a type with no field tables to map onto
+
+    /// A character that cannot start what is expected here.
+    Unexpected,
+
+    /// A string with no closing quote.
+    UnterminatedText,
+
+    /// A backslash followed by something that is not an escape.
+    BadEscape,
+
+    /// Digits that are not a JSON number.
+    BadNumber,
+
+    /// Something that started like `true`, `false` or `null` and was not.
+    BadLiteral,
+
+    /// A second value after the first. A JSON document is one value.
+    TrailingContent,
+
+    /// Nesting past `MaxDepth`.
+    TooDeep,
+
+    /// A document that is not the object a type wants. Only reflection-based
+    /// reading raises this; parsing to a `JsonValue` takes any value.
+    NotAnObject,
+
+    /// A type with no field tables to map onto.
+    NotReflected,
 }
 
+/// A sentence describing an error, for a message a person will read.
 public String Describe(JsonError error) {
     switch (error) {
         case JsonError.None: return "no error";
@@ -90,10 +112,17 @@ public const nuint MaxDepth = 128u;
 public class JsonObject {
     OrderedDictionary<String, JsonValue> members;
 
+    /// An object with no members.
     public JsonObject() { members = new OrderedDictionary<String, JsonValue>(); }
 
+    /// How many members there are. Members rather than distinct names: a
+    /// repeated name is kept, so this can exceed the number of names.
     public nuint Count() { return members.Count(); }
+
+    /// The name at a position, in the order the document wrote them.
     public String NameAt(nuint index) { return members.KeyAt(index); }
+
+    /// The value at a position, pairing with `NameAt` at the same index.
     public JsonValue ValueAt(nuint index) { return members.ValueAt(index); }
 
     /// Adds a member. A repeated name is kept rather than replaced, because
@@ -107,6 +136,8 @@ public class JsonObject {
     /// whether it is there and then asking for it would cost.
     public Optional<nuint> IndexOf(String name) { return members.IndexOf(name); }
 
+    /// Whether a member of that name is there. A scan, so `IndexOf` once
+    /// beats this followed by a lookup.
     public bool Has(String name) { return members.Has(name); }
 
     /// The value of a name, or `Null` when it is not there. A document that
@@ -163,16 +194,25 @@ public String TextOr(JsonValue value, String fallback) {
     return fallback;
 }
 
+/// The value of a `Number`, or the fallback for anything else. A JSON number
+/// is a double, so a large integer has already lost precision by here.
 public double NumberOr(JsonValue value, double fallback) {
     if (value.Number) { return value.Value; }
     return fallback;
 }
 
+/// The value of a `Number` truncated toward zero, or the fallback.
+///
+/// Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
+/// how a field that is conceptually an integer is read back, and a value past
+/// what a `long` holds is not detected.
 public long IntegerOr(JsonValue value, long fallback) {
     if (value.Number) { return (long)value.Value; }
     return fallback;
 }
 
+/// The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
+/// only the JSON literals are.
 public bool BoolOr(JsonValue value, bool fallback) {
     if (value.Bool) { return value.Value; }
     return fallback;

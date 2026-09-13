@@ -88,6 +88,7 @@ extern "C" {
 /// whole list, for the reason `IOError` gives: the values are the same
 /// everywhere, and neither `errno` nor a WSA code is.
 public enum SocketError {
+    /// Nothing went wrong.
     None = 0,
 
     /// Nothing to read, or no room to write, on a socket that is not blocking.
@@ -98,25 +99,34 @@ public enum SocketError {
     /// Nothing is listening there.
     Refused = 2,
 
+    /// A timeout set on the socket ran out before the call finished.
     TimedOut = 3,
+    /// No route to that address.
     Unreachable = 4,
 
     /// Something else already has that port.
     AddressInUse = 5,
 
+    /// An operation that needs a connection, on a socket that has none.
     NotConnected = 6,
 
     /// The peer went away without closing: a reset rather than an ending.
     Reset = 7,
 
+    /// The socket was closed before the call.
     Closed = 8,
+    /// A signal arrived mid-call. Retrying is usually right.
     Interrupted = 9,
+    /// Not permitted -- a low port without the privilege for it, or a
+    /// broadcast send on a socket that was not asked to allow one.
     AccessDenied = 10,
 
     /// The name did not resolve.
     NoName = 11,
 
+    /// The request made no sense for this socket in this state.
     Invalid = 12,
+    /// The platform said something this enum has no name for.
     Unknown = 13,
 }
 
@@ -129,7 +139,10 @@ public enum AddressFamily {
     /// is `SocketError.Invalid` -- which is what Linux says and Windows
     /// quietly does not, handing back an IPv4 socket instead.
     Any = 0,
+    /// IPv4 only.
     IPv4 = 4,
+    /// IPv6 only. Whether it also accepts IPv4 is the platform's default,
+    /// not something set here.
     IPv6 = 6,
 }
 
@@ -144,8 +157,11 @@ public enum SocketKind {
 
 /// Which half of a connection to finish.
 public enum SocketShutdown {
+    /// Stop receiving. The peer can still be written to.
     Receive = 0,
+    /// Stop sending, which is what tells the peer there is no more coming.
     Send = 1,
+    /// Stop both, which is what `Close` does first.
     Both = 2,
 }
 
@@ -184,7 +200,12 @@ const nuint NoSocket = 18446744073709551615u;
 /// which is fine, and is why it cannot cross `extern "C"` (§7.6). Nothing here
 /// needs it to.
 public struct EndPoint {
+    /// The address or name. An empty host means every address on this machine,
+    /// which is what a server binds to.
     public String Host;
+
+    /// The port. Zero asks the system to choose one, which `LocalEndPoint`
+    /// will then say.
     public ushort Port;
 
     /// An endpoint, made in one expression.
@@ -215,6 +236,11 @@ public Result<String, SocketError> Resolve(String host) {
     return Resolve(host, AddressFamily.Any);
 }
 
+/// The first address a name resolves to in one family, as text.
+///
+/// `AddressFamily.Any` takes whichever the resolver prefers. Name it when the
+/// socket that will use the address is already one family or the other, since
+/// an IPv6 address cannot be connected to from an IPv4 socket.
 public Result<String, SocketError> Resolve(String host, AddressFamily family) {
     byte[64] buffer;
     int code = 0;
@@ -316,19 +342,31 @@ public class Socket {
 
     ~Socket() { Close(); }
 
+    /// Whether the handle is still live. False before a failed open and after
+    /// `Close`; it says nothing about whether the peer is still there, which
+    /// only a read can find out.
     public bool IsOpen() { return !closed; }
 
     /// The last error, or `None`. Set by every call that failed, and cleared
     /// by the next one that did not.
     public SocketError Error() { return error; }
 
+    /// Which family the socket was opened for. Fixed at open.
     public AddressFamily Family() { return family; }
+
+    /// Stream or datagram. Fixed at open.
     public SocketKind Kind() { return kind; }
 
     /// The handle itself, for a platform call this wrapper does not make.
     /// A `SOCKET` on Windows and a file descriptor on everything else.
     public nuint Handle() { return handle; }
 
+    /// Closes the handle. Idempotent, and the destructor calls it, so a
+    /// socket that goes out of scope is not leaked.
+    ///
+    /// Closing a stream socket without `Shutdown` first leaves what the peer
+    /// sees up to the platform and to what is still unread; `TcpClient.Close`
+    /// shuts both directions down first, which is what ends one politely.
     public void Close() {
         if (closed) { return; }
         sl_socket_close(handle);
@@ -352,6 +390,10 @@ public class Socket {
     /// and what an empty host means to the resolver.
     public SocketError BindAny(ushort port) { return Bind("", port); }
 
+    /// Starts accepting connections. `backlog` is how many may wait before
+    /// the system refuses more; the platform may cap it lower than asked.
+    ///
+    /// Bind first -- listening on a socket that was never bound fails.
     public SocketError Listen(int backlog) {
         if (closed) { return Note(SocketError.Closed); }
 
@@ -516,10 +558,16 @@ public class Socket {
         return Option(sl_socket_set_reuse_address(handle, on ? 1 : 0, &_code), _code);
     }
 
+    /// Lets a datagram socket send to a broadcast address. Off by default,
+    /// and meaningless on a stream socket.
     public SocketError SetBroadcast(bool on) {
         return Option(sl_socket_set_broadcast(handle, on ? 1 : 0, &_code), _code);
     }
 
+    /// Asks the system to probe an idle connection, so a peer that vanished
+    /// without closing is eventually noticed. The interval is the platform's
+    /// and is measured in hours by default, so this detects a dead peer rather
+    /// than a slow one.
     public SocketError SetKeepAlive(bool on) {
         return Option(sl_socket_set_keep_alive(handle, on ? 1 : 0, &_code), _code);
     }
@@ -529,6 +577,7 @@ public class Socket {
         return Option(sl_socket_set_timeout(handle, milliseconds, 1, &_code), _code);
     }
 
+    /// How long a send waits before giving up. Zero is forever.
     public SocketError SetSendTimeout(int milliseconds) {
         return Option(sl_socket_set_timeout(handle, milliseconds, 0, &_code), _code);
     }
@@ -633,6 +682,10 @@ public class TcpListener {
         return Listen(host, port, AddressFamily.IPv4, 16);
     }
 
+    /// Listens with everything named: the address, the port, the family and
+    /// how many connections may queue.
+    ///
+    /// The other two overloads are this one with IPv4 and a backlog of 16.
     public static Result<TcpListener, SocketError> Listen(
             String host, ushort port, AddressFamily family, int backlog) {
         var opened = Socket.Open(family, SocketKind.Stream);
@@ -656,7 +709,11 @@ public class TcpListener {
 
     ~TcpListener() { Close(); }
 
+    /// Whether it bound and listened. False means the constructor gave up
+    /// part-way, and `Error` says where.
     public bool IsListening() { return listening; }
+
+    /// The last error from the socket underneath, or `None`.
     public SocketError Error() { return socket.Error(); }
 
     /// Where it is listening. With port 0 this is how the port the system
@@ -677,6 +734,8 @@ public class TcpListener {
         return socket.WaitToRead(milliseconds);
     }
 
+    /// Stops listening and closes the socket. Connections already accepted
+    /// are their own sockets and are unaffected.
     public void Close() {
         listening = false;
         socket.Close();
@@ -708,6 +767,10 @@ public class TcpClient : IStream {
         return Connect(host, port, AddressFamily.Any);
     }
 
+    /// Connects, naming the family rather than letting the resolver choose.
+    ///
+    /// Blocks until the connection is made or refused; there is no timeout
+    /// here, and the system's own is measured in tens of seconds.
     public static Result<TcpClient, SocketError> Connect(
             String host, ushort port, AddressFamily family) {
         var opened = Socket.OpenConnected(host, port, family, SocketKind.Stream);
@@ -732,9 +795,16 @@ public class TcpClient : IStream {
     /// The exact reason, which `Error()` rounds off to fit an `IStream`.
     public SocketError SocketError() { return socket.Error(); }
 
+    /// This end of the connection -- the address and the port the system
+    /// chose for it.
     public EndPoint LocalEndPoint() { return socket.LocalEndPoint(); }
+
+    /// The other end: who is connected. What an accepted connection is asked
+    /// to find out where it came from.
     public EndPoint RemoteEndPoint() { return socket.RemoteEndPoint(); }
 
+    /// The socket underneath, for an option this does not expose. Closing it
+    /// closes the connection.
     public Socket Underlying() { return socket; }
 
     /// Sends all of `text`, looping until it has gone.
@@ -772,35 +842,59 @@ public class TcpClient : IStream {
         return Text.FromBytes(&all[0], all.Length);
     }
 
+    /// Waits up to `milliseconds` for something to read, answering whether
+    /// there is. A peer that closed counts as readable -- the read that
+    /// follows returns zero, which is how the ending is seen.
     public bool WaitToRead(int milliseconds) { return socket.WaitToRead(milliseconds); }
+
+    /// Waits up to `milliseconds` for room to write, answering whether there
+    /// is. Only interesting once a send has filled the kernel's buffer.
     public bool WaitToWrite(int milliseconds) { return socket.WaitToWrite(milliseconds); }
 
     // ----------------------------------------------------------- IStream
 
+    /// True while the connection is open and the peer has not finished.
     public bool CanRead() { return socket.IsOpen() && !finished; }
+
+    /// True while the connection is open. A peer that finished sending can
+    /// still be written to, until it closes for real.
     public bool CanWrite() { return socket.IsOpen(); }
 
     /// A connection has no position to move to.
     public bool CanSeek() { return false; }
 
+    /// Reads up to `count` bytes into `buffer` at `offset`, answering how
+    /// many arrived.
+    ///
+    /// Fewer than asked for is normal and not an error: a stream delivers what
+    /// has arrived. Zero means the peer finished, and `Error` distinguishes
+    /// that from a failure.
     public nuint Read(byte[] buffer, nuint offset, nuint count) {
         nuint read = socket.Receive(buffer, offset, count);
         if (read == 0 && socket.Error() == SocketError.None) { finished = true; }
         return read;
     }
 
+    /// Writes up to `count` bytes from `buffer` at `offset`, answering how
+    /// many went. A short write is normal; `SendAll` is the one that loops.
     public nuint Write(byte[] buffer, nuint offset, nuint count) {
         return socket.Send(buffer, offset, count);
     }
 
     /// Not a position, and not pretended to be one.
     public long Position() { return -1; }
+    /// Not a length either. A connection does not know how much is coming.
     public long Length() { return -1; }
+
+    /// Always false. There is nowhere to seek to on a connection.
     public bool Seek(long offset, SeekOrigin origin) { return false; }
 
     /// Nothing is buffered here; the kernel decides when bytes leave.
     public void Flush() { }
 
+    /// Ends the connection politely: shuts both directions down first, so the
+    /// peer sees an ending rather than a reset, then closes. Idempotent, and
+    /// the destructor calls it.
     public void Close() {
         if (socket.IsOpen()) { socket.Shutdown(SocketShutdown.Both); }
         socket.Close();
@@ -846,6 +940,7 @@ public class UdpSocket {
         return Datagram(AddressFamily.IPv4);
     }
 
+    /// The same, in a named family.
     public static Result<UdpSocket, SocketError> Datagram(AddressFamily family) {
         var opened = Socket.Open(family, SocketKind.Datagram);
         if (!opened.Ok) { return Fail(opened.Error); }
@@ -863,6 +958,7 @@ public class UdpSocket {
         return Bind(host, port, AddressFamily.IPv4);
     }
 
+    /// Binds with everything named: the address, the port and the family.
     public static Result<UdpSocket, SocketError> Bind(
             String host, ushort port, AddressFamily family) {
         var opened = Socket.Open(family, SocketKind.Datagram);
@@ -882,10 +978,18 @@ public class UdpSocket {
 
     ~UdpSocket() { Close(); }
 
+    /// Whether the socket is usable. False after `Close`, and after an open
+    /// that did not work.
     public bool IsOpen() { return ready; }
+
+    /// The last error from the socket underneath, or `None`.
     public SocketError Error() { return socket.Error(); }
 
+    /// Where it is bound. With port 0 this is how the port the system chose is
+    /// found out; an unbound socket answers with nothing useful.
     public EndPoint LocalEndPoint() { return socket.LocalEndPoint(); }
+
+    /// The socket underneath, for an option this does not expose.
     public Socket Underlying() { return socket; }
 
     /// Sends one datagram. The count back is how many bytes went, which for a
@@ -894,6 +998,9 @@ public class UdpSocket {
         return socket.SendTo(data, EndPoint.At(host, port));
     }
 
+    /// Sends one datagram of UTF-8. The encoded length is what goes on the
+    /// wire, so a string of multi-byte characters is longer than its character
+    /// count -- which matters against the roughly 1500-byte practical limit.
     public nuint SendText(String text, String host, ushort port) {
         return Send(text.ToBytes(), host, port);
     }
@@ -905,15 +1012,19 @@ public class UdpSocket {
         return socket.ReceiveFrom(buffer, ref from);
     }
 
+    /// Waits up to `milliseconds` for a datagram to arrive, answering whether
+    /// one has. The way to poll without blocking forever on an empty socket.
     public bool WaitToRead(int milliseconds) { return socket.WaitToRead(milliseconds); }
 
     /// Lets this socket send to a broadcast address.
     public SocketError SetBroadcast(bool on) { return socket.SetBroadcast(on); }
 
+    /// How long `Receive` waits before giving up. Zero is forever.
     public SocketError SetReceiveTimeout(int milliseconds) {
         return socket.SetReceiveTimeout(milliseconds);
     }
 
+    /// Closes the socket. Idempotent, and the destructor calls it.
     public void Close() {
         ready = false;
         socket.Close();

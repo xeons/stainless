@@ -99,6 +99,7 @@ String SeparatorText() {
     return Text.FromBytes(&one, 1);
 }
 
+/// Three parts joined left to right, with the same rule at each step.
 public String Join(String first, String second, String third) {
     return Join(Join(first, second), third);
 }
