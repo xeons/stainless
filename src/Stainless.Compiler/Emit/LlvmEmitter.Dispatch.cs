@@ -303,7 +303,9 @@ public sealed partial class LlvmEmitter
             $"  %obj = getelementptr inbounds i8, ptr %self, i64 -{offset}");
 
         forwarded.Insert(returnInfo.Style == PassStyle.Indirect ? 1 : 0, "ptr %obj");
-        string call = $"call {returnType} {Symbol(target)}({string.Join(", ", forwarded)})";
+        string call =
+            $"call {Convention(target)}{returnType} {Symbol(target)}" +
+            $"({string.Join(", ", forwarded)})";
 
         if (returnType == "void")
         {

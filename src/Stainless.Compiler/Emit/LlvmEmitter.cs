@@ -70,14 +70,22 @@ public sealed partial class LlvmEmitter(
     /// name mangling and the bit-field packing and left the argument passing
     /// as Win64 whatever it said -- which made `--abi itanium` produce a
     /// program that could not call a C library.
+    ///
+    /// x86 is asked first and answers for both systems, because the
+    /// architecture decides more than the name mangling does: there are no
+    /// argument registers, and the two systems disagree about returns.
     /// </summary>
     private ArgInfo ClassifyValue(TypeSymbol type) =>
-        abi == CppAbi.Itanium
+        Binding.TargetPlatform.Current.Architecture == Binding.TargetArch.X86
+            ? X86Abi.ClassifyArgument(type, LlvmTypeOf)
+        : abi == CppAbi.Itanium
             ? SysVAbi.ClassifyArgument(type, LlvmTypeOf)
             : Win64Abi.ClassifyArgument(type, LlvmTypeOf);
 
     private ArgInfo ClassifyResult(TypeSymbol type) =>
-        abi == CppAbi.Itanium
+        Binding.TargetPlatform.Current.Architecture == Binding.TargetArch.X86
+            ? X86Abi.ClassifyReturn(type, LlvmTypeOf, Binding.TargetPlatform.Current.IsWindows)
+        : abi == CppAbi.Itanium
             ? SysVAbi.ClassifyReturn(type, LlvmTypeOf)
             : Win64Abi.ClassifyReturn(type, LlvmTypeOf);
 

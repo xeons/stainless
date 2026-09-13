@@ -536,14 +536,18 @@ public sealed partial class LlvmEmitter
             if (returnInfo.Style == PassStyle.Indirect)
                 parts.Add($"ptr sret({StructName((StructTypeSymbol)function.ReturnType)})");
 
+            int declaredFirst = parts.Count;
             foreach (var parameter in function.Parameters)
                 parts.AddRange(Declared(ClassifyParameter(parameter)));
+
+            MarkRegisters(function, parts, declaredFirst);
 
             if (function.IsVariadic) parts.Add("...");
 
             string returnType = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
             Declare(function.MangledName,
-                $"declare {returnType} {Symbol(function)}({string.Join(", ", parts)})");
+                $"declare {Convention(function)}{returnType} {Symbol(function)}" +
+                $"({string.Join(", ", parts)})");
         }
 
         if (program.ExternalFunctions.Count > 0) _module.AppendLine();

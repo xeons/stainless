@@ -103,8 +103,10 @@ public sealed partial class LlvmEmitter
             ? debug.Location(symbol.Span, opening)
             : null;
 
+        MarkRegisters(symbol, declaredParameters, declaredParameters.Count - parameterInfos.Count);
+
         _module.AppendLine(
-            $"define {linkage}{storage}{returnType} {Symbol(symbol)}" +
+            $"define {linkage}{storage}{Convention(symbol)}{returnType} {Symbol(symbol)}" +
             $"({string.Join(", ", declaredParameters)})" +
             (_debugScope is { } attached ? $" !dbg !{attached}" : "") + " {");
         _body.Clear();

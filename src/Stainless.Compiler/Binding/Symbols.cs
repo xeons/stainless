@@ -93,6 +93,17 @@ public sealed class FunctionSymbol
     public required LinkageKind Linkage { get; init; }
 
     /// <summary>
+    /// The convention written on the declaration, or
+    /// <see cref="Syntax.CallingConvention.Default"/>.
+    ///
+    /// It decides two things and only on x86: which LLVM calling convention the
+    /// declaration and every call to it carry, and how the linker name is
+    /// decorated. On a 64-bit target only <c>__vectorcall</c> is anything but a
+    /// note to the reader.
+    /// </summary>
+    public Syntax.CallingConvention CallingConvention { get; init; }
+
+    /// <summary>
     /// The <c>///</c> block written above the declaration, or null. Carried so
     /// that a documentation writer has the prose beside the resolved signature
     /// rather than having to go back to the source for it.

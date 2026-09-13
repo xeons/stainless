@@ -422,6 +422,31 @@ public sealed class Parser
         }
     }
 
+    /// <summary>
+    /// <c>__stdcall</c> and its relatives, written after the linkage string.
+    ///
+    /// They are identifiers rather than keywords, matched by their text where
+    /// one may appear. Two underscores is not a name anybody writes by accident,
+    /// and making them keywords would take four of them from every program to
+    /// serve a declaration form most programs never use.
+    /// </summary>
+    private CallingConvention ParseCallingConvention()
+    {
+        if (!At(TokenKind.Identifier)) return CallingConvention.Default;
+
+        var convention = Current.Text switch
+        {
+            "__cdecl" => CallingConvention.Cdecl,
+            "__stdcall" => CallingConvention.Stdcall,
+            "__fastcall" => CallingConvention.Fastcall,
+            "__vectorcall" => CallingConvention.Vectorcall,
+            _ => CallingConvention.Default,
+        };
+
+        if (convention != CallingConvention.Default) Advance();
+        return convention;
+    }
+
     private List<Declaration> ParseLinkageDeclaration(int start, Modifiers modifiers)
     {
         bool isExtern = At(TokenKind.ExternKeyword);
@@ -452,6 +477,11 @@ public sealed class Parser
             _ => LinkageKind.ExportCpp,
         };
 
+        // Before the block or the single declaration, so that a binding module
+        // says `extern "C" __stdcall { ... }` once rather than on two hundred
+        // lines. A declaration inside the block may still name its own.
+        var blockConvention = ParseCallingConvention();
+
         // Block form: extern "C" { ... }
         //
         // A modifier written on the block belongs to every declaration in it,
@@ -465,7 +495,12 @@ public sealed class Parser
                 int before = _pos;
                 int memberStart = _pos;
                 var memberModifiers = modifiers | ParseModifiers();
-                members.Add(ParseFunctionOrField(memberStart, memberModifiers, linkage));
+                var memberConvention = ParseCallingConvention();
+                if (memberConvention == CallingConvention.Default)
+                    memberConvention = blockConvention;
+
+                members.Add(WithConvention(
+                    ParseFunctionOrField(memberStart, memberModifiers, linkage), memberConvention));
                 if (_pos == before) Advance();
             }
             Expect(TokenKind.CloseBrace);
@@ -474,7 +509,30 @@ public sealed class Parser
 
         // Single-declaration form: extern "C" int puts(byte* s);
         var singleModifiers = modifiers | ParseModifiers();
-        return [ParseFunctionOrField(start, singleModifiers, linkage)];
+        var singleConvention = ParseCallingConvention();
+        if (singleConvention == CallingConvention.Default) singleConvention = blockConvention;
+
+        return [WithConvention(
+            ParseFunctionOrField(start, singleModifiers, linkage), singleConvention)];
+    }
+
+    /// <summary>
+    /// Puts the convention on the declaration, where the declaration is a
+    /// function. A field cannot have one, and one written before a field is
+    /// reported rather than dropped.
+    /// </summary>
+    private Declaration WithConvention(Declaration declaration, CallingConvention convention)
+    {
+        if (convention == CallingConvention.Default) return declaration;
+
+        if (declaration is FunctionDeclSyntax function)
+            return function with { CallingConvention = convention };
+
+        _diagnostics.Error("SL0592", declaration.Span,
+            "a calling convention says how a function is called, so it can only be written on " +
+            "one; this declares a value");
+
+        return declaration;
     }
 
     /// <summary>

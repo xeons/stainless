@@ -41,6 +41,7 @@ public sealed partial class Binder
             ModuleName = module.Name,
             ReturnType = returnType,
             Linkage = declaration.Linkage,
+            CallingConvention = declaration.CallingConvention,
             Documentation = declaration.Documentation,
             Kind = containingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = containingType,

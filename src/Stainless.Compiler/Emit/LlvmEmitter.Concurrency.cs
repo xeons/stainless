@@ -420,7 +420,141 @@ public sealed partial class LlvmEmitter
     /// <c>?add@@YAHHH@Z</c> and <c>_ZN8geometry4areaEdd</c> respectively, of
     /// which only the second happens to fit.
     /// </summary>
-    private static string Symbol(FunctionSymbol function) => Symbol(function.MangledName);
+    /// <summary>
+    /// The symbol for a function.
+    ///
+    /// A decorated name is written with LLVM's <c>\01</c> prefix, which means
+    /// "this is the whole symbol": without it LLVM would add the target's own
+    /// leading underscore to a name that already has one, and
+    /// <c>__stdcall</c>'s <c>_f@8</c> would be looked for as <c>__f@8</c>.
+    /// clang writes the same prefix for the same reason.
+    /// </summary>
+    private static string Symbol(FunctionSymbol function) =>
+        Mangler.IsDecorated(function)
+            ? "@\"\\01" + function.MangledName + "\""
+            : Symbol(function.MangledName);
+
+    /// <summary>
+    /// Which parameters a register convention keeps in registers, one flag per
+    /// declared parameter and the receiver left out.
+    ///
+    /// <para>
+    /// <c>__fastcall</c> has two integer registers, ECX and EDX, and gives them
+    /// to the first two parameters that fit one: an integer, an enum, a bool or
+    /// a pointer no wider than a register. A <c>long</c> does not fit, a float
+    /// does not belong there, and a struct travels on the stack -- each is
+    /// passed over, and the register goes to the next one that is eligible
+    /// rather than being spent.
+    /// </para>
+    ///
+    /// <para>
+    /// <c>__vectorcall</c> adds six vector registers for <c>float</c> and
+    /// <c>double</c>, counted separately, so eight parameters can be in
+    /// registers at once.
+    /// </para>
+    ///
+    /// <para>
+    /// x86 only, which is what clang does: on x64 it writes
+    /// <c>x86_vectorcallcc</c> with no marks at all and lets the convention
+    /// place everything. LLVM allocates from these marks rather than working
+    /// the rule out for itself, so they have to be identical on the
+    /// declaration and at every call -- a call that marks a different set puts
+    /// its arguments where the callee will not look, and nothing says so.
+    /// </para>
+    /// </summary>
+    private static bool[] RegisterParameters(FunctionSymbol function)
+    {
+        var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
+        var marks = new bool[parameters.Count];
+
+        var target = Binding.TargetPlatform.Current;
+        if (target.Architecture != Binding.TargetArch.X86) return marks;
+
+        int integers = function.CallingConvention
+            is Syntax.CallingConvention.Fastcall or Syntax.CallingConvention.Vectorcall ? 2 : 0;
+        int vectors = function.CallingConvention == Syntax.CallingConvention.Vectorcall ? 6 : 0;
+
+        for (int i = 0; i < parameters.Count && (integers > 0 || vectors > 0); i++)
+        {
+            var type = parameters[i].Type;
+
+            // A struct is a copy on the stack whatever the convention, so it
+            // neither takes a register nor uses one up.
+            if (type is StructTypeSymbol) continue;
+
+            if (type is PrimitiveTypeSymbol { IsFloat: true })
+            {
+                if (vectors > 0) { marks[i] = true; vectors--; }
+                continue;
+            }
+
+            // Wider than a register is not split across two: it goes on the
+            // stack and the register stays for whatever comes next.
+            int size = parameters[i].IsByReference ? target.PointerWidth : type.Size;
+            if (size <= target.PointerWidth && integers > 0)
+            {
+                marks[i] = true;
+                integers--;
+            }
+        }
+
+        return marks;
+    }
+
+    /// <summary>
+    /// Puts <c>inreg</c> on the arguments a register convention places in
+    /// registers. <paramref name="first"/> is where the declared parameters
+    /// begin, past any hidden result pointer and receiver.
+    /// </summary>
+    private static void MarkRegisters(
+        FunctionSymbol function, List<string> arguments, int first)
+    {
+        var marks = RegisterParameters(function);
+
+        for (int i = 0; i < marks.Length; i++)
+        {
+            int at = first + i;
+            if (!marks[i] || at >= arguments.Count) continue;
+
+            // The attribute follows the type rather than preceding it: LLVM
+            // reads `i32 inreg %a`, and a declaration with no name is `i32
+            // inreg`. Only a simple type is ever marked -- a struct is never in
+            // a register -- so the type is the first word and nothing else.
+            string argument = arguments[at];
+            int space = argument.IndexOf(' ');
+
+            arguments[at] = space < 0
+                ? argument + " inreg"
+                : argument[..space] + " inreg" + argument[space..];
+        }
+    }
+
+    /// <summary>
+    /// How LLVM spells this function's calling convention, with a trailing
+    /// space, or nothing at all for the platform's own.
+    ///
+    /// It goes on the definition, on the declaration and on every call: LLVM
+    /// treats a call whose convention differs from the callee's as undefined,
+    /// and the mismatch is not diagnosed.
+    /// </summary>
+    private static string Convention(FunctionSymbol function)
+    {
+        var target = Binding.TargetPlatform.Current;
+
+        // One convention on every 64-bit target, and `__vectorcall` is the only
+        // name that still means something there.
+        if (target.Architecture != Binding.TargetArch.X86 &&
+            function.CallingConvention != Syntax.CallingConvention.Vectorcall)
+            return "";
+
+        return function.CallingConvention switch
+        {
+            Syntax.CallingConvention.Stdcall => "x86_stdcallcc ",
+            Syntax.CallingConvention.Fastcall => "x86_fastcallcc ",
+            Syntax.CallingConvention.Vectorcall => "x86_vectorcallcc ",
+            _ => "",
+        };
+    }
 
     /// <summary>
     /// Quoting is enough on its own: a quoted LLVM name escapes only as

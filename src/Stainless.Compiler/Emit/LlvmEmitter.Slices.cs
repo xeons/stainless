@@ -386,7 +386,9 @@ public sealed partial class LlvmEmitter
                 virtualTarget = LoadVirtualMethod(receiver.Ref, function);
         }
 
+        int declaredFirst = arguments.Count;
         AppendArguments(call.Arguments, arguments);
+        MarkRegisters(function, arguments, declaredFirst);
 
         string signature = function.IsVariadic
             ? $"{(returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType)} " +
@@ -397,8 +399,12 @@ public sealed partial class LlvmEmitter
         // a direct call to a known symbol.
         string target = virtualTarget ?? Symbol(function);
 
+        // The convention goes on the call as well as on the callee: LLVM does
+        // not look it up, and a call that disagrees is undefined rather than
+        // refused. A virtual target is reached through a pointer and carries the
+        // declared convention of the method it came from.
         string invocation =
-            $"call {signature} {target}({string.Join(", ", arguments)})";
+            $"call {Convention(function)}{signature} {target}({string.Join(", ", arguments)})";
 
         if (returnInfo.Style == PassStyle.Indirect)
         {

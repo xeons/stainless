@@ -27,13 +27,94 @@ namespace Stainless.Binding;
 /// </summary>
 public static class Mangler
 {
+    /// <summary>
+    /// A C name with the convention's decoration, which is the whole of what a
+    /// convention changes about linking.
+    ///
+    /// <para>
+    /// Microsoft's rules, and they are the ones every x86 Windows library was
+    /// built with: <c>__cdecl</c> takes a leading underscore, <c>__stdcall</c>
+    /// takes one and a <c>@</c> and the number of bytes its arguments occupy,
+    /// <c>__fastcall</c> takes a leading <c>@</c> instead, and
+    /// <c>__vectorcall</c> takes <c>@@</c> and the count with no prefix.
+    /// </para>
+    ///
+    /// <para>
+    /// The byte count is what makes a mismatch a link error rather than a
+    /// corrupted stack: <c>__stdcall</c> has the callee remove the arguments, so
+    /// a caller and a callee that disagree about how many there are would
+    /// otherwise run on and unbalance the stack. Encoding the count in the name
+    /// means the linker refuses first.
+    /// </para>
+    ///
+    /// <para>
+    /// The leading underscore for plain <c>__cdecl</c> is not written here:
+    /// LLVM applies the target's own symbol prefix to every global. It is only
+    /// spelled out when a decoration is added, because then the whole name has
+    /// to be given at once -- which is what the <c>\1</c> prefix in the emitted
+    /// IR says.
+    /// </para>
+    /// </summary>
+    /// <summary>
+    /// True when the convention changed the name, so the whole symbol has to be
+    /// given to LLVM rather than letting it add the target's own prefix.
+    /// </summary>
+    public static bool IsDecorated(FunctionSymbol function) =>
+        function.Linkage is LinkageKind.ExternC or LinkageKind.ExportC &&
+        Decorated(function) != function.Name;
+
+    public static string Decorated(FunctionSymbol function)
+    {
+        var target = TargetPlatform.Current;
+        var convention = function.CallingConvention;
+
+        // One convention on every 64-bit target, and `__vectorcall` is the only
+        // name that still means something there.
+        if (target.Architecture != TargetArch.X86 &&
+            convention != Syntax.CallingConvention.Vectorcall)
+            return function.Name;
+
+        if (convention is Syntax.CallingConvention.Default or Syntax.CallingConvention.Cdecl)
+            return function.Name;
+
+        int bytes = ArgumentBytes(function, target.PointerWidth);
+
+        return convention switch
+        {
+            Syntax.CallingConvention.Stdcall => $"_{function.Name}@{bytes}",
+            Syntax.CallingConvention.Fastcall => $"@{function.Name}@{bytes}",
+            Syntax.CallingConvention.Vectorcall => $"{function.Name}@@{bytes}",
+            _ => function.Name,
+        };
+    }
+
+    /// <summary>
+    /// How many bytes the arguments occupy, each rounded up to a whole stack
+    /// slot. A struct counts its own size rounded the same way, because it is
+    /// pushed whole.
+    /// </summary>
+    private static int ArgumentBytes(FunctionSymbol function, int slot)
+    {
+        int total = 0;
+        foreach (var parameter in function.Parameters)
+        {
+            if (parameter.IsThis) continue;
+
+            // A `ref`, an `in` and an `out` are each one pointer.
+            int size = parameter.IsByReference ? slot : parameter.Type.Size;
+            total += (size + slot - 1) / slot * slot;
+        }
+        return total;
+    }
+
     public static string Mangle(FunctionSymbol function)
     {
-        // C linkage means "use exactly this name" in both directions. A C++
-        // name is mangled by CppMangler and stamped on the symbol, so it never
-        // reaches here.
+        // C linkage means "use exactly this name" in both directions -- except
+        // that on x86 a convention decorates it, and the decoration is part of
+        // the name the linker looks for. A C++ name is mangled by CppMangler and
+        // stamped on the symbol, so it never reaches here.
         if (function.Linkage is LinkageKind.ExternC or LinkageKind.ExportC)
-            return function.Name;
+            return Decorated(function);
 
         var sb = new StringBuilder("_SL");
 

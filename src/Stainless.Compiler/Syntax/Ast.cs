@@ -180,6 +180,47 @@ public static class LinkageKinds
     public static bool IsForeign(this LinkageKind linkage) => linkage != LinkageKind.Stainless;
 }
 
+/// <summary>
+/// How a function passes its arguments and who cleans up after the call.
+///
+/// <para>
+/// There is one answer on every 64-bit target, and <c>__vectorcall</c> is the
+/// only name that means anything there. On x86 the choice is real and visible
+/// in the linker symbol: <c>__stdcall</c> is what Win32 uses, and the name
+/// carries the number of bytes its arguments occupy.
+/// </para>
+/// </summary>
+public enum CallingConvention
+{
+    /// <summary>None written. The platform's default, which is <c>Cdecl</c>
+    /// everywhere this compiler targets.</summary>
+    Default,
+
+    /// <summary>
+    /// <c>__cdecl</c>: the caller pushes the arguments and the caller removes
+    /// them, which is what makes a variadic call possible at all.
+    /// </summary>
+    Cdecl,
+
+    /// <summary>
+    /// <c>__stdcall</c>: the callee removes the arguments, so a call site and a
+    /// declaration that disagree about how many there are corrupt the stack.
+    /// That is why the byte count is in the name -- the linker catches it.
+    /// </summary>
+    Stdcall,
+
+    /// <summary><c>__fastcall</c>: the first two integer arguments in ECX and
+    /// EDX, the rest on the stack, and the callee cleans up.</summary>
+    Fastcall,
+
+    /// <summary>
+    /// <c>__vectorcall</c>: <c>__fastcall</c> extended with vector registers
+    /// for floating-point arguments. The one convention that still differs on
+    /// x64.
+    /// </summary>
+    Vectorcall,
+}
+
 public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : SyntaxNode(Span)
 {
     /// <summary>
@@ -283,6 +324,12 @@ public sealed record FunctionDeclSyntax(
 
     /// <summary>Which operator, for the checks that depend on which.</summary>
     public TokenKind OperatorToken { get; init; }
+
+    /// <summary>
+    /// The convention written before the return type, or
+    /// <see cref="CallingConvention.Default"/>.
+    /// </summary>
+    public CallingConvention CallingConvention { get; init; }
 }
 
 public sealed record FieldDeclSyntax(
