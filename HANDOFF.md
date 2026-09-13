@@ -7,20 +7,27 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           743 pass
+dotnet test tests/Stainless.UnitTests           766 pass
 dotnet run --project tests/Stainless.Tests      271 cases, 2 skipped on Windows
-samples/forms/build.ps1 -Test                   67 checks against real widgets
+stainless doc --stdlib                          22 pages into docs/stdlib
+samples/forms/build.ps1 -Test                   1 failing check, see below
 ```
 
-Green on Windows. That Linux box (`ssh brandon@geekom-a7`) has GTK 2 and GTK 3,
+**The forms suite has one failure and it is not new.** "A tree node reads back
+its text" fails, and fails the same way at `6adca35` -- before any of the
+documentation work -- so it is a real bug in the tree control rather than
+something this session did. Everything else in that suite passes. It is the
+first thing to look at.
+
+That Linux box (`ssh brandon@geekom-a7`) has GTK 2 and GTK 3,
 the development packages, Xvfb and `broadwayd`, so a GUI can be built *and run*
 there headlessly — see `bindings/gtk/README.md`. The suite has **not** been
 re-run there since the hardening pass below, and two of its fixes are worth
 checking before anything is claimed: the deep stack a compilation now runs on,
 and the literal typing, which changes what a mask means in the bindings.
 
-`master` is nineteen commits ahead of `origin/master`. Nothing has been pushed
-since the closure work.
+`master` is one commit ahead of `origin/master`: the comment pass. Everything
+through `stainless doc` is pushed.
 
 ## What was built, in order
 
@@ -63,9 +70,65 @@ since the closure work.
 | `7708bce` | an abort keeps the output that explains it |
 | `bbc04ba` | a missing key is an outcome rather than a crash |
 | `cf82305` | `map[key]` answers an optional, as Swift's does |
-| *this one* | the documentation caught up, and three entries for what it still lacks |
+| `6adca35` | the documentation caught up, and three entries for what it still lacks |
+| `c0d9090` | a block on everything public in the standard library |
+| `0fef32e` | `stainless doc`: the blocks read, and a reference written from them |
+| *this one* | the comments left describing the code, and the arguments moved out |
 
 ## Findings worth keeping
+
+**Documentation found two bugs, and both were found by writing rather than by
+reading.** `String.ByteAt` reads the buffer through the pointer, where every
+other position on a `String` clamps -- so the class could not state the rule it
+appeared to keep, and the method now says it is the exception. And the
+`TcpClient.Close` note claimed a bare close resets the peer, which is true only
+with `SO_LINGER` at zero or unread data waiting; the text now says what the
+platform actually decides. Neither is reachable by probing, because both are
+about what a caller may assume rather than what a program does.
+
+**`///` blocks were not in the syntax tree, and TODO said they were.** The
+lexer discarded them with every other line comment, so nothing downstream had
+ever seen one. That is the kind of claim worth checking before planning around
+it: the generator entry was written as "a writer over what already exists", and
+the writer was the smaller half of the work.
+
+Three rules fell out of putting them in, and each decides where a block may be
+written. Four slashes are not three, or a rule drawn across the file becomes a
+line of punctuation mid-description. An ordinary `//` comment between a block
+and its declaration separates the two -- so an implementation note goes *above*
+the block, which is the opposite of what `Utf16Encoding.Preamble` was doing. And
+a blank line separates them too, so a block above nothing documents nothing.
+
+**Generating the pages found a class of gap no audit over the source had.** An
+interface's members carry no `public` keyword, because they are the contract --
+so a sweep looking for `public` misses every one of them, and `IStream` had
+seven members saying nothing. A variant's cases are neither a member nor a
+modifier, so `Optional`'s `None` and `Some`, `Result`'s `Ok` and `Fail`, and all
+six of `JsonValue`'s were silent too. **The generator is the audit**: a page
+that prints *No documentation* for what is missing finds what a grep for a
+keyword cannot.
+
+**The documentation writer reads syntax, not the bound program.** A generic
+emits nothing until it is instantiated, so `List<T>`, `Dictionary<K, V>` and
+`Optional<T>` have no bound symbol at all unless some program happened to use
+one. A reference covering only the instantiated half of the standard library
+would be worse than none, because nothing on the page would say which half it
+was. It still binds first and writes nothing if that failed, so a signature on a
+page is one the compiler accepted.
+
+**The comment pass was small, and the boundary is why.** Splitting `///` from
+`//` turned "a large mechanical pass over everything" into about thirty
+comments. What made it tractable is that the two are different things: a `///`
+block is documentation and keeps the first entry's bar, and a `//` note above a
+line is describing that line. What was left after that split -- free-standing
+argument, history, comparison with an absent alternative -- was the whole of the
+job.
+
+And the finding inside it: **there are no free-standing argumentative `//`
+blocks in the tree.** Every `//` block reaching for the vocabulary of an
+argument sits directly above the code it is about. The prose that argues already
+lives in `///`, which is where it belongs -- so the pass was mostly a
+confirmation that the convention was already being followed.
 
 **A hardening pass found nine bugs, and eight of them were silent.** The method
 was the one the last audit established -- compile a probe rather than read the
