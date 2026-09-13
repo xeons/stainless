@@ -1,0 +1,1 @@
+a missing key stops the program; see the note in stopping.sl

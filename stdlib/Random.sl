@@ -54,6 +54,12 @@ public class Random {
     public Random(long seed) { Seed((ulong)seed); }
 
     /// A generator seeded by the operating system, so two runs differ.
+    ///
+    /// Aborts if the platform will not supply any entropy at all, which is a
+    /// broken machine rather than an outcome a caller can plan around -- and a
+    /// constructor has nowhere to report one anyway (§2.9). Where that has to
+    /// be survivable, `Random.Bytes` says whether it managed, and
+    /// `new Random(seed)` takes the number it produced.
     public Random() { Seed((ulong)sl_random_seed()); }
 
     /// SplitMix64 spreads one word into four.
@@ -180,5 +186,6 @@ public bool Bytes(byte[] buffer) {
 }
 
 /// One unpredictable 64-bit value from the platform, for seeding something
-/// else deliberately.
+/// else deliberately. Aborts if the platform supplies none; `Bytes` is the
+/// form that reports instead.
 public long Seed() { return sl_random_seed(); }

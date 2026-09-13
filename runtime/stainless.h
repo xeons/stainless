@@ -68,6 +68,23 @@
 #  define SL_API
 #endif
 
+/*
+ * A function that does not come back.
+ *
+ * Every abort path in this header carries it, which is how the header answers
+ * "can this be recovered from" without anyone having to read the body: it
+ * cannot, the process is gone, and nothing written after the call runs.
+ */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#  define SL_NORETURN _Noreturn
+#elif defined(__GNUC__) || defined(__clang__)
+#  define SL_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#  define SL_NORETURN __declspec(noreturn)
+#else
+#  define SL_NORETURN
+#endif
+
 /* ---------------------------------------------------------------- objects */
 
 /* ------------------------------------------------------------- reflection */
@@ -260,13 +277,18 @@ SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);
  */
 SL_API void  sl_make_immortal(void *pointer);
 
-/* Reports a fatal runtime condition and aborts. Never returns. */
-SL_API void  sl_fail(const char *message);
+/* Reports a fatal runtime condition and aborts. Never returns.
+ *
+ * SL_NORETURN is the header's answer to the question every one of these
+ * raises: none of them comes back, so a caller has nothing to handle and
+ * nothing after the call is reached. Saying so lets the C compiler drop the
+ * unreachable tail and warn about anything written there. */
+SL_API SL_NORETURN void sl_fail(const char *message);
 
 /* The integer divisions LLVM leaves undefined. Neither returns. */
-SL_API void  sl_divide_by_zero(void);
-SL_API void  sl_divide_overflow(void);
-SL_API void  sl_arithmetic_overflow(void);
+SL_API SL_NORETURN void sl_divide_by_zero(void);
+SL_API SL_NORETURN void sl_divide_overflow(void);
+SL_API SL_NORETURN void sl_arithmetic_overflow(void);
 
 /* ----------------------------------------------------------- inheritance */
 
@@ -284,7 +306,7 @@ SL_API int   sl_implements(const void *object, size_t interfaceId);
  * A checked downcast that did not hold. Names what the object really is, which
  * is the question the programmer is about to ask. Never returns.
  */
-SL_API void  sl_cast_failed(const void *object, const char *wanted);
+SL_API SL_NORETURN void sl_cast_failed(const void *object, const char *wanted);
 
 /* -------------------------------------------------------------------- COM */
 
@@ -362,7 +384,7 @@ SL_API void  sl_com_release(void *pointer);
    asks and drops what it was given. */
 SL_API void *sl_com_query(void *pointer, const SlGuid *iid);
 SL_API int   sl_com_is(void *pointer, const SlGuid *iid);
-SL_API void  sl_com_cast_failed(const char *from, const char *to);
+SL_API SL_NORETURN void sl_com_cast_failed(const char *from, const char *to);
 
 SL_API int   sl_guid_equals(const SlGuid *left, const SlGuid *right);
 
@@ -611,9 +633,9 @@ typedef struct SlArray {
 SL_API void  *sl_array_alloc(const SlTypeInfo *type, size_t length, size_t elementSize);
 SL_API size_t sl_array_length(void *pointer);
 
-/* Reports an out-of-range index and aborts. Never returns. */
-SL_API void   sl_array_bounds_fail(size_t index, size_t length);
-SL_API void   sl_slice_bounds_fail(size_t from, size_t to, size_t length);
+/* Reports an out-of-range index and aborts. Neither returns. */
+SL_API SL_NORETURN void sl_array_bounds_fail(size_t index, size_t length);
+SL_API SL_NORETURN void sl_slice_bounds_fail(size_t from, size_t to, size_t length);
 
 /* ------------------------------------------------------------- reflection */
 

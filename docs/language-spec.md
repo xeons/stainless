@@ -1314,6 +1314,20 @@ mistake in the program rather than an outcome of it, and those still abort
 through the runtime: threading a Result through every array index would make
 every program worse to read in exchange for nothing.
 
+**Aborting means aborting.** It writes a line to standard error and ends the
+process -- there is no unwinding, no handler and no exit code to inspect from
+inside. What it does first is flush everything the program has written, so the
+output that led up to the failure is there to read: the moment a program's
+account of itself is worth most is the moment it stops.
+
+Every abort in the library is one a caller could have avoided by asking, and
+each says so where it is declared. `Dictionary.Get` and `SortedList.Get` have
+`ContainsKey` and `GetOr`; `Queue`, `Stack` and `LinkedList` have `Count` and
+`IsEmpty`; `Optional.Get` has `ValueOr` and `is Some x`; `Env.ArgumentAt` has
+`ArgumentCount`. The rest of what aborts is the runtime running out -- memory,
+a thread, a mutex -- where the function that failed has no way to return
+anything at all.
+
 **`try` passes a failure to the caller.**
 
 ```csharp

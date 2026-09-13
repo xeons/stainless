@@ -442,6 +442,11 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
         return values[index];
     }
 
+    /// The value for `key`. Aborts when there is none; use `GetOr` or
+    /// `ContainsKey` when a missing key is an ordinary outcome.
+    ///
+    /// The same bargain `Dictionary.Get` makes, said here too because a reader
+    /// who has not met that one is owed it where they are.
     public V Get(K key) {
         nint at = IndexOfKey(key);
         if (at < 0) { sl_fail("SortedList.Get: no such key"); }

@@ -56,11 +56,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+ * Reports why the program is stopping, and stops it.
+ *
+ * Everything the program has already written is flushed first, and that is not
+ * a nicety: `abort` does not flush, so a buffered stdout is discarded, and
+ * what a reader saw was the message and nothing else -- not the output that
+ * led up to it, not even a line printed immediately before. The one moment a
+ * program's own account of itself is worth most is the moment it stops, and it
+ * was the one moment that threw it away.
+ *
+ * fflush(NULL) rather than stdout, because a log the program was writing is
+ * evidence on the same terms. Then the message, then stderr again, so the
+ * explanation lands after the output it explains.
+ */
 void sl_fail(const char *message)
 {
+    fflush(NULL);
+
     fputs("stainless: ", stderr);
     fputs(message, stderr);
     fputc('\n', stderr);
+    fflush(stderr);
+
     abort();
 }
 
@@ -110,8 +128,12 @@ void sl_cast_failed(const void *object, const char *wanted)
     if (object != NULL && header->type != NULL && header->type->name != NULL)
         actual = header->type->name;
 
+    /* The program's own output first, for the reason sl_fail gives. */
+    fflush(NULL);
+
     fprintf(stderr, "stainless: cast failed: a %s is not a %s\n", actual, wanted);
     fflush(stderr);
+
     abort();
 }
 

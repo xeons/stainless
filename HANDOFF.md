@@ -8,7 +8,7 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           743 pass
-dotnet run --project tests/Stainless.Tests      267 cases, 2 skipped on Windows
+dotnet run --project tests/Stainless.Tests      269 cases, 2 skipped on Windows
 samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
@@ -58,7 +58,9 @@ since the closure work.
 | `755d002` | the composites, and `base` on a property stops dispatching |
 | `908fb3a` | a hardening pass: nine bugs, found by probing rather than reading |
 | `ce32e32` | indexers on the containers, and one less cascading diagnostic |
-| *this one* | doubles that survive being written and read back |
+| `68a7403` | doubles that survive being written and read back |
+| `24538c6` | the two allocations that could still wrap |
+| *this one* | an abort keeps the output that explains it |
 
 ## Findings worth keeping
 
@@ -160,6 +162,35 @@ of `\u` with two digits became U+0012, and `1lul` meant 1. All three are values
 nobody wrote. A character literal is exactly one scalar, `\u` takes exactly four
 digits and `\U` eight -- `\x` stays variable, since it is a byte and C says so
 -- and a suffix is measured against the set C# actually has.
+
+**An abort threw away everything the program had printed.** `sl_fail` writes
+its line to stderr and calls `abort`, and `abort` does not flush -- so a
+buffered stdout was discarded and the reader got the message saying why the
+program stopped and none of the output that led up to it. Not even a line
+printed immediately before. Redirected to a file, the file was empty.
+`sl_cast_failed` flushed stderr and had the same hole for stdout.
+
+Both flush everything now, before the message rather than after, so the
+explanation lands below the output it explains. It is one line of C and it is
+the difference between a failure you can read and one you can only be told
+about.
+
+Found by asking the question rather than by probing: *are these actually
+unrecoverable?* They are -- `abort` is unconditional, and every abort path in
+`stainless.h` now says `SL_NORETURN` so the header answers that without anyone
+reading the body. The audit of all 55 call sites is worth keeping: they fall
+into exactly two groups, a **mistake in the program** (18: bounds, division,
+casts, `checked`, an empty queue, a missing key) and **the runtime running
+out** (37: memory, a thread, a mutex, entropy). The first group is what §2.6
+says should abort. The second has no channel at all -- the function that failed
+returns the thing it could not make. Every library abort has a way to ask
+first, and each now says so where it is declared; `SortedList.Get` and
+`Random()` were the two that did not.
+
+**The harness could not test any of it**, which is why none of this was
+covered: a case whose program does not return 0 failed on the exit code.
+`aborts.txt` says a case is expected to stop, and the output is still matched
+exactly -- which is what makes it a test of what a program leaves behind.
 
 **No double survived being written and read back, and that is the one this
 run would have most regretted missing.** `Text.FromDouble` was `snprintf` with

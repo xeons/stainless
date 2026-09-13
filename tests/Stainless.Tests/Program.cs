@@ -62,6 +62,11 @@ namespace Stainless.Tests;
 /// links the libraries it names with -l. Between them they are how a case is
 /// written against bindings/ rather than only against the standard library.
 ///
+/// A case containing aborts.txt is expected to stop rather than return: its
+/// exit code is not checked, and returning 0 fails it instead. The output is
+/// still matched exactly, stdout then stderr, which is what makes it a test of
+/// what a program leaves behind when it stops.
+///
 /// A case containing platform.txt runs only on the platform it names -- windows,
 /// linux or macos -- and is reported as skipped elsewhere. Only a case that
 /// cannot mean anything on another platform should have one.
@@ -434,8 +439,18 @@ internal static class Program
         if (actualOutput != expected)
             return (false, Diff(expected, actualOutput));
 
-        if (exitCode != 0)
+        // A case whose subject is how the program *stops* must be allowed to.
+        // Without this there was no way to write one at all, and a good deal of
+        // what the language guarantees is stated as "this aborts": an
+        // out-of-range index, a division by zero, a failed cast, `checked`
+        // overflow, an empty queue, a missing key. The output is still measured
+        // exactly, which is the whole point -- what a program leaves behind
+        // when it stops is the evidence, and it used to be discarded.
+        if (exitCode != 0 && !File.Exists(Path.Combine(directory, "aborts.txt")))
             return (false, $"the program exited with code {exitCode}");
+
+        if (exitCode == 0 && File.Exists(Path.Combine(directory, "aborts.txt")))
+            return (false, "the program was expected to abort and returned 0 instead");
 
         return (true, $"{actualOutput.Split('\n').Length} line(s) matched");
     }
