@@ -529,7 +529,28 @@ public sealed class Lexer(
             suffix.Append(char.ToLowerInvariant(Current));
             _pos++;
         }
-        if (suffix.ToString() is "f" or "d") isFloat = true;
+        // `f` makes a `float` and `d` a `double`, as in C#. A hex literal
+        // cannot reach here with either, since both are digits there; a binary
+        // one can, and has no floating-point form to be given.
+        //
+        // Anything else is reported rather than ignored. The whole point of a
+        // suffix is to say something the digits cannot, so one that is not a
+        // suffix is a typo that would otherwise mean whatever the digits meant.
+        string suffixText = suffix.ToString();
+        bool isSingle = false;
+
+        if (suffixText is not ("" or "u" or "l" or "ul" or "lu" or "f" or "d"))
+            diagnostics.Error("SL0004", SpanFrom(start),
+                $"'{suffixText}' is not a suffix a number can take; they are 'u', 'l', 'ul', " +
+                "'f' for a float and 'd' for a double");
+        else if (suffixText is "f" or "d")
+        {
+            if (radix == 10) { isFloat = true; isSingle = suffixText == "f"; }
+            else
+                diagnostics.Error("SL0004", SpanFrom(start),
+                    $"a binary literal is an integer, so it cannot take the '{suffixText}' " +
+                    "suffix of a floating-point one");
+        }
 
         string raw = digits.ToString();
         var span = SpanFrom(start);
@@ -543,6 +564,18 @@ public sealed class Lexer(
 
         if (isFloat)
         {
+            // A `float` literal is parsed as one rather than as a rounded
+            // double, so the value is the nearest float to what was written.
+            if (isSingle)
+            {
+                if (!float.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out float f))
+                {
+                    diagnostics.Error("SL0004", span, $"{raw} is not a valid floating-point literal");
+                    f = 0;
+                }
+                return new Token(TokenKind.FloatLiteral, span, text, f);
+            }
+
             if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
             {
                 diagnostics.Error("SL0004", span, $"{raw} is not a valid floating-point literal");
@@ -727,8 +760,16 @@ public sealed class Lexer(
     {
         _pos++;                                             // opening quote
         int value = 0;
+
         if (_pos < _text.Length && Current != '\'')
             value = Current == '\\' ? ReadEscape() : ReadScalar();
+        else if (_pos < _text.Length)
+            // A character literal is exactly one scalar, and none is not one.
+            // Taken quietly it became a zero: something that compiles, runs,
+            // and holds a value nobody wrote.
+            diagnostics.Error("SL0010", SpanFrom(start),
+                "a character literal holds one scalar, and this one is empty; write '\\0' for " +
+                "the zero character, or \"\" for an empty string");
 
         if (_pos < _text.Length && Current == '\'') _pos++;
         else diagnostics.Error("SL0007", SpanFrom(start), "unterminated character literal");
@@ -788,8 +829,18 @@ public sealed class Lexer(
                     _pos++;
                     count++;
                 }
+                // `\x` is a byte, written in one digit or two as in C. The
+                // other two name a scalar and are fixed width, so a short one
+                // is a mistake rather than a smaller number: `\u12` took the
+                // two digits it found, made U+0012, and said nothing about the
+                // four that were meant.
                 if (count == 0)
-                    diagnostics.Error("SL0008", SpanFrom(start), $"escape \\{c} needs at least one hex digit");
+                    diagnostics.Error("SL0008", SpanFrom(start),
+                        $"escape \\{c} needs at least one hex digit");
+                else if (c != 'x' && count < want)
+                    diagnostics.Error("SL0008", SpanFrom(start),
+                        $"escape \\{c} takes exactly {want} hex digits and this one has {count}; " +
+                        "'\\u' names a scalar up to U+FFFF and '\\U' one above it");
 
                 // \x is a byte and says nothing about Unicode; the other two
                 // name a scalar, and there are values in that syntax which are

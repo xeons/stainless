@@ -157,7 +157,6 @@ public class LexerTests
     [InlineData("1E3", 1000.0)]
     [InlineData("1e-3", 0.001)]
     [InlineData("1.5e2", 150.0)]
-    [InlineData("1.5f", 1.5)]
     [InlineData("1.5d", 1.5)]
     public void FloatLiteralsDecode(string source, double expected)
     {
@@ -165,6 +164,32 @@ public class LexerTests
         Assert.Empty(Front.Codes(diagnostics));
         Assert.Equal(TokenKind.FloatLiteral, tokens[0].Kind);
         Assert.Equal(expected, (double)tokens[0].Value!, 12);
+    }
+
+    /// <summary>
+    /// The <c>f</c> suffix makes a <c>float</c>, held as one so that the binder
+    /// can tell it from a double by the value alone. It is parsed as a float
+    /// rather than rounded from a double, so 0.1f is the nearest float to 0.1.
+    /// </summary>
+    [Theory]
+    [InlineData("1.5f", 1.5f)]
+    [InlineData("0.1f", 0.1f)]
+    [InlineData("2.5e3F", 2500f)]
+    public void SingleSuffixMakesAFloat(string source, float expected)
+    {
+        var tokens = Front.Tokens(source, out var diagnostics);
+        Assert.Empty(Front.Codes(diagnostics));
+        Assert.Equal(TokenKind.FloatLiteral, tokens[0].Kind);
+        Assert.Equal(expected, Assert.IsType<float>(tokens[0].Value));
+    }
+
+    [Theory]
+    [InlineData("0b101f")]
+    [InlineData("0b1d")]
+    public void BinaryLiteralRefusesAFloatSuffix(string source)
+    {
+        Front.Tokens(source, out var diagnostics);
+        Assert.Contains("SL0004", Front.Codes(diagnostics));
     }
 
     /// <summary>

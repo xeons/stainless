@@ -303,7 +303,16 @@ public sealed class Compilation
             || string.Equals(directory, "build", StringComparison.OrdinalIgnoreCase);
     }
 
-    public CompilationResult Compile(CompilationOptions options)
+    /// <summary>
+    /// Compiles, on a stack deep enough for what parsing and binding recurse
+    /// over. See <see cref="Source.Recursion"/>: the depth limit is what turns
+    /// absurdly nested source into a diagnostic, and this is what keeps the
+    /// limit from having to be small enough to be reached by real code.
+    /// </summary>
+    public CompilationResult Compile(CompilationOptions options) =>
+        Source.Recursion.OnADeepStack(() => CompileHere(options));
+
+    private CompilationResult CompileHere(CompilationOptions options)
     {
         var diagnostics = new DiagnosticBag();
 

@@ -156,12 +156,25 @@ public sealed partial class LlvmEmitter
         {
             bool flag => flag ? "true" : "false",
             int scalar => scalar.ToString(CultureInfo.InvariantCulture),
-            double number => FormatDouble(number),
+            double number => FormatFloating(number, literal.Type),
+            float number => FormatFloating(number, literal.Type),
             ulong number => FormatInteger(number, literal.Type),
             _ => "0",
         };
         return new Val(text, llvmType, literal.Type);
     }
+
+    /// <summary>
+    /// A floating-point constant at the width of its type.
+    ///
+    /// LLVM spells a <c>float</c> constant as the double that holds it exactly,
+    /// and rejects one that a float cannot hold: `float 0x3FB999999999999A`,
+    /// the double 0.1, is an error rather than a rounding. So a value bound
+    /// for a float is rounded to one first, which is what `const float Tenth =
+    /// 0.1;` meant.
+    /// </summary>
+    private static string FormatFloating(double value, TypeSymbol type) =>
+        FormatDouble(type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Float } ? (float)value : value);
 
     private static string FormatInteger(ulong value, TypeSymbol type)
     {
@@ -195,7 +208,8 @@ public sealed partial class LlvmEmitter
         {
             bool flag => flag ? "true" : "false",
             int scalar => scalar.ToString(CultureInfo.InvariantCulture),
-            double number => FormatDouble(number),
+            double number => FormatFloating(number, constant.Type),
+            float number => FormatFloating(number, constant.Type),
             ulong number => FormatInteger(number, constant.Type),
             string s => InternBytes(s),
             _ => "0",

@@ -7,16 +7,19 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           659 pass
-dotnet run --project tests/Stainless.Tests      255 cases, 2 skipped on Windows
+dotnet test tests/Stainless.UnitTests           742 pass
+dotnet run --project tests/Stainless.Tests      265 cases, 2 skipped on Windows
 samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
-Green on Windows and on Linux (`ssh brandon@geekom-a7`). That box now has GTK 2
-and GTK 3, the development packages, Xvfb and `broadwayd`, so a GUI can be
-built *and run* there headlessly — see `bindings/gtk/README.md`.
+Green on Windows. That Linux box (`ssh brandon@geekom-a7`) has GTK 2 and GTK 3,
+the development packages, Xvfb and `broadwayd`, so a GUI can be built *and run*
+there headlessly — see `bindings/gtk/README.md`. The suite has **not** been
+re-run there since the hardening pass below, and two of its fixes are worth
+checking before anything is claimed: the deep stack a compilation now runs on,
+and the literal typing, which changes what a mask means in the bindings.
 
-`master` is eighteen commits ahead of `origin/master`. Nothing has been pushed
+`master` is nineteen commits ahead of `origin/master`. Nothing has been pushed
 since the closure work.
 
 ## What was built, in order
@@ -52,9 +55,123 @@ since the closure work.
 | `971fed8` | `forms/`: the LCL's architecture under C#'s names |
 | `fe6a18e` | menus and the common controls; interface-to-class narrowing |
 | `dc8d36c` | the windowless controls; a generic no longer shrinks a struct |
-| *this one* | the composites, and `base` on a property stops dispatching |
+| `755d002` | the composites, and `base` on a property stops dispatching |
+| *this one* | a hardening pass: nine bugs, found by probing rather than reading |
 
 ## Findings worth keeping
+
+**A hardening pass found nine bugs, and eight of them were silent.** The method
+was the one the last audit established -- compile a probe rather than read the
+code -- run over a battery of about 150 adversarial programs rather than over
+the spec. What that catches is a different population from what reading
+catches: every one of these is a program that compiled.
+
+**Deeply nested source ended the process rather than being refused.** Four
+hundred nested parentheses overflowed the stack, and a stack overflow is the
+one answer .NET cannot catch: no diagnostic, no exit code worth reading,
+nothing naming the file. Blocks, prefix operators and a member chain each found
+it by a different route, and the member chain found it in the *binder* after
+the parser had survived -- `FlattenName` recursed over a chain the parser had
+built with a loop, so nothing upstream bounded it.
+
+The fix is two things and neither is enough alone. `Recursion.MaxDepth` turns
+the crash into SL0108, and it has to be a fixed number rather than a probe so
+that the same file is refused on every machine. `Recursion.OnADeepStack` is
+what keeps that number from having to be small: on a default stack a few
+hundred levels are already fatal, which is low enough that generated source
+could reach it honestly. Reserving 64 MB is free, since it is address space.
+
+Two details worth keeping. The limit must report *once* and then stop parsing,
+because the unwind that follows produces one `expected ')'` per level -- 1,625
+of them for a 600-deep file, burying the one message that explains it. And
+`Speculate` has to save and restore the "already said so" flag along with the
+diagnostics it discards, or a limit tripped inside a speculative parse is
+reported into a bag that is thrown away and never mentioned again. That one
+cost an hour: the guard was firing and the message was nowhere.
+
+**A literal too large for its type was cut to 32 bits and said nothing.**
+`long l = 9223372036854775808;` compiled and held zero. Every integer literal
+started out an `int`, so a value past that range assigned to something at least
+as wide fell through to an ordinary widening -- `int` to `long` has nothing to
+complain about -- and the emitter narrowed it on the way out. A *narrower*
+target was always caught, but only because nothing widens an `int` to a `byte`:
+the right answer for the wrong reason, which is why the hole was invisible.
+
+Worse and more ordinary: `double d = 5000000000;` printed 705032704. Valid
+code, quietly given a different number.
+
+The fix is C#'s rule, which is worth having for its own sake: a literal is the
+narrowest of `int`, `uint`, `long` and `ulong` that holds it. That makes
+`0xFFFF0000` a `uint`, so `flags & 0xFFFF0000` on an `int` widens the operation
+to `long` and the mask means what a C header means by it. **The bindings were
+relying on the truncation** -- `Com.sl` masks an `HRESULT` that way -- and they
+were getting the right bit pattern by accident. Four samples stopped binding
+the moment the rule was right, which is the useful kind of breakage.
+
+**`char16` and `char32` could not cross a library boundary.** The metadata
+reader's list of primitives was a second copy of the type system's, and it was
+those two short -- so a public struct with a `char16` field was described by
+the library and refused by everything that referenced it. `Primitives_` is
+derived from `PrimitiveTypeSymbol.All` now, and a unit test round-trips every
+primitive there is, so a new one fails that test until it can cross.
+
+A slice and a tuple failed the other way: both are named types interned under
+`Standard`, so they were written as `Standard.int[:]` -- a type in no source
+file, which nothing could read back. They are structural, so they are spelled
+structurally now, and the reader is handed the binder's own `SliceOf` and
+`TupleOf`, because a slice made separately would not compare equal to one the
+consumer's own source resolves to. `tests/cases/library-type-names` proves that
+by assigning one to the other.
+
+The general lesson is the one the writer's ordered type switch already taught:
+**a list kept in two places is a bug with a delay on it.**
+
+**Four shapes reached clang as IR it refuses**, which is the worst kind of
+compiler message -- it names generated text for a mistake in the source, or for
+no mistake at all:
+
+- `void` as a local, a field, a parameter or a type argument became
+  `alloca void` and `type { void }`. It is the absence of a value, so the only
+  place it can be written is what a function returns (SL0309). The three
+  container messages survive because their element is resolved with
+  `allowVoid` -- "there is no array of `void`" says more than the general rule,
+  and two codes for one rule is what the retired list exists to prevent.
+- A struct containing a *fixed array* of itself. The cycle check only recursed
+  through a struct-typed field, so `S[4]` was never looked through; the size
+  was read before it was computed, the struct came out zero bytes wide, and the
+  emitter wrote an LLVM type that referred to itself.
+- A non-ASCII identifier. `SymbolSafe` and `SanitizeIdentifier` both tested
+  `char.IsLetterOrDigit`, which is Unicode-aware, and LLVM's grammar is not --
+  so `café` passed straight through into the IR. Anything past ASCII is spelled
+  as its code point now. Worth noting that a *function* name already worked,
+  because the mangler encodes lengths: the bug was visible only in the three
+  positions that do not.
+- A 2,000-character identifier, which clang reports as a multiple definition of
+  a name defined once. The readable part of an IR local is capped at 64 now;
+  nothing is lost, since what tells two slots apart is the counter after it. A
+  parameter has no counter, so it gets its index appended -- but *only* when the
+  name was actually cut, because the ABI tests pin ordinary signatures and
+  renaming every one of them to fix an absurd case is a bad trade.
+
+**Three malformed literals were taken quietly.** `''` became a zero, an escape
+of `\u` with two digits became U+0012, and `1lul` meant 1. All three are values
+nobody wrote. A character literal is exactly one scalar, `\u` takes exactly four
+digits and `\U` eight -- `\x` stays variable, since it is a byte and C says so
+-- and a suffix is measured against the set C# actually has.
+
+**The project file crashed on `null`.** JSON `null` lands in a property whatever
+its type says and the deserializer does not count it as missing, so eight fields
+answered a malformed file with a NullReferenceException and a stack trace. The
+same pass made a value of the wrong shape name its own field rather than a .NET
+type: `'kind' takes 'executable' or 'library'` instead of `The JSON value could
+not be converted to Stainless.Driver.ProjectKind`.
+
+**Two functions with the same signature are diagnosed now** (SL0211), which the
+TODO had wanted for a while. The check is one line, because the mangled name
+already *is* the signature: two functions in a module collide exactly when they
+mangle alike. It catches a redeclared `extern` too, which is the same mistake
+wearing a C hat.
+
 
 **`base.P` on a property dispatched back to the override.** A method has always
 been non-virtual through `base` -- the spec says so and `BindMemberOf` passed

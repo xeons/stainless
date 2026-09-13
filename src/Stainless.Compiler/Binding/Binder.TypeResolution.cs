@@ -116,9 +116,24 @@ public sealed partial class Binder
     /// a field, a local, a parameter, a return type, an array element, a
     /// <c>sizeof</c> and a generic argument all arrive through this one door.
     /// </summary>
-    private TypeSymbol ResolveType(TypeSyntax syntax, FileScope scope)
+    private TypeSymbol ResolveType(TypeSyntax syntax, FileScope scope, bool allowVoid = false)
     {
         var resolved = ResolveTypeCore(syntax, scope);
+
+        // `void` is the absence of a value, so the only place it can be
+        // written is where no value is produced: a return type. Anywhere else
+        // -- a local, a field, a parameter, a type argument -- it named
+        // storage for nothing, and reached the emitter as `alloca void` or a
+        // struct with a `void` member, which is IR that does not exist. A
+        // pointer is the exception the language does not make: there is no
+        // `void*`, and `byte*` is what C's is spelled here.
+        if (resolved.IsVoid() && !allowVoid)
+        {
+            diagnostics.Error("SL0309", syntax.Span,
+                "'void' is the absence of a value, so it can only be what a function returns; " +
+                "there is no variable, field, parameter or type argument of it");
+            return ErrorTypeSymbol.Instance;
+        }
 
         if (resolved is StructTypeSymbol { IsOpaque: true } opaque)
         {
@@ -150,7 +165,9 @@ public sealed partial class Binder
         {
             case SliceTypeSyntax sliceSyntax:
             {
-                var element = ResolveType(sliceSyntax.Element, scope);
+                // allowVoid, so that the specific message below is the one
+                // reported rather than the general rule in ResolveType.
+                var element = ResolveType(sliceSyntax.Element, scope, allowVoid: true);
                 if (element.IsError()) return element;
 
                 if (element.IsVoid())
@@ -165,7 +182,7 @@ public sealed partial class Binder
 
             case ArrayTypeSyntax array:
             {
-                var element = ResolveType(array.Element, scope);
+                var element = ResolveType(array.Element, scope, allowVoid: true);
                 if (element.IsError()) return element;
                 if (element.IsVoid())
                 {

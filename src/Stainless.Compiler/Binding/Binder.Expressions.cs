@@ -27,7 +27,39 @@ public sealed partial class Binder
 {
     // ------------------------------------------------------------ expressions
 
-    private BoundExpression BindExpression(ExpressionSyntax syntax) => syntax switch
+    /// <summary>
+    /// How deep the walk over one expression or statement currently is. See
+    /// <see cref="Source.Recursion"/>: the parser bounds what it builds, and
+    /// this bounds what a tree from anywhere else -- a lowering, a generic
+    /// instantiated into a new shape -- can ask the binder to walk.
+    /// </summary>
+    private int _bindDepth;
+
+    private bool _boundTooDeep;
+
+    private BoundExpression BindExpression(ExpressionSyntax syntax)
+    {
+        if (++_bindDepth > Source.Recursion.MaxDepth)
+        {
+            _bindDepth--;
+
+            if (!_boundTooDeep)
+            {
+                _boundTooDeep = true;
+                diagnostics.Error("SL0108", syntax.Span,
+                    $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which " +
+                    "is past what can be compiled; the usual cause is generated source, and " +
+                    "the fix is to give the inner part a name of its own");
+            }
+
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        try { return BindExpressionCore(syntax); }
+        finally { _bindDepth--; }
+    }
+
+    private BoundExpression BindExpressionCore(ExpressionSyntax syntax) => syntax switch
     {
         LiteralSyntax literal => BindLiteral(literal),
         NameSyntax name => BindName(name),
@@ -275,10 +307,41 @@ public sealed partial class Binder
         variant.FindCase("Ok") is { Fields.Count: 1 } &&
         variant.FindCase("Fail") is { Fields.Count: 1 };
 
+    /// <summary>
+    /// What an integer literal is before anything asks it to be something
+    /// else: the narrowest of <c>int</c>, <c>uint</c>, <c>long</c> and
+    /// <c>ulong</c> that holds it, as in C#.
+    ///
+    /// Everything used to start out an <c>int</c>, which is right for almost
+    /// every literal ever written and wrong in two ways for the rest. A value
+    /// past <c>int</c> assigned to something at least as wide fell through to
+    /// an ordinary widening and was cut to 32 bits on the way out, so
+    /// <c>long l = 9223372036854775808;</c> compiled and held zero. And a
+    /// bit pattern such as <c>0xFFFF0000</c> met an <c>int</c> operand as an
+    /// <c>int</c>, where C# makes it a <c>uint</c> and widens the operation to
+    /// <c>long</c> -- which is the difference between an answer and a
+    /// coincidence.
+    ///
+    /// A literal small enough to be an <c>int</c> is still an <c>int</c>, so
+    /// nothing about the common case moves.
+    /// </summary>
+    private static PrimitiveTypeSymbol LiteralType(object? value) => value switch
+    {
+        ulong number when number <= int.MaxValue => PrimitiveTypeSymbol.Int,
+        ulong number when number <= uint.MaxValue => PrimitiveTypeSymbol.UInt,
+        ulong number when number <= long.MaxValue => PrimitiveTypeSymbol.Long,
+        ulong => PrimitiveTypeSymbol.ULong,
+        _ => PrimitiveTypeSymbol.Int,
+    };
+
     private BoundExpression BindLiteral(LiteralSyntax syntax) => syntax.Kind switch
     {
-        TokenKind.IntLiteral => new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Int, syntax.Value),
-        TokenKind.FloatLiteral => new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.Double, syntax.Value),
+        TokenKind.IntLiteral => new BoundLiteral(
+            syntax.Span, LiteralType(syntax.Value), syntax.Value),
+        // `1.5f` lexed to a float and `1.5` to a double; the value says which.
+        TokenKind.FloatLiteral => new BoundLiteral(syntax.Span,
+            syntax.Value is float ? PrimitiveTypeSymbol.Float : PrimitiveTypeSymbol.Double,
+            syntax.Value),
         // A character literal is one Unicode scalar. It starts out as the
         // narrowest code unit type that can hold it whole, and CharacterFits
         // lets it become a wider one where the context asks for it.
@@ -1439,7 +1502,10 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression BindDefault(DefaultSyntax syntax)
     {
-        var type = ResolveType(syntax.Type, _currentScope!);
+        // allowVoid, so that the refusal below is the one reported: it says
+        // what `default` in particular cannot do, where the general rule in
+        // ResolveType says only that 'void' is not a type a value has.
+        var type = ResolveType(syntax.Type, _currentScope!, allowVoid: true);
         if (type.IsError()) return new BoundErrorExpression(syntax.Span);
 
         if (type.IsVoid())
@@ -2198,7 +2264,7 @@ public sealed partial class Binder
     /// </summary>
     private TypeSymbol ResolveFixedArray(FixedArrayTypeSyntax syntax, FileScope scope)
     {
-        var element = ResolveType(syntax.Element, scope);
+        var element = ResolveType(syntax.Element, scope, allowVoid: true);
         if (element.IsError()) return element;
 
         if (element.IsVoid())

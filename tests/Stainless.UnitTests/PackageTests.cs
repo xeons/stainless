@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Binding;
 using Stainless.Driver;
 using Xunit;
 
@@ -425,6 +426,61 @@ public class ProjectFileTests
         Assert.Contains(expected, error);
     }
 
+    /// <summary>
+    /// JSON `null` lands in a property whatever its type says, and the
+    /// deserializer does not count it as missing. Each of these was a
+    /// NullReferenceException with a stack trace before it was a message.
+    /// </summary>
+    [Theory]
+    [InlineData("""{ "name": null, "version": "1.0.0" }""", "has the name 'null'")]
+    [InlineData("""{ "name": "app", "version": null }""", "'version' is null")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "sources": null }""", "lists no sources")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "sources": [""] }""", "lists no sources")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "dependencies": null }""", "'dependencies' is null")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "dependencies": { "geo": null } }""", "'geo' is null")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "libraries": null }""", "'libraries'")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "libraries": [""] }""", "one of them is empty")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "defines": null }""", "not a symbol")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "defines": ["9x"] }""", "'9x' is not a symbol")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "output": "" }""", "'output' is empty")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "buildDirectory": " " }""", "'buildDirectory' is empty")]
+    public void RefusesANullOrEmptyFieldWithAMessage(string json, string expected)
+    {
+        Assert.Null(ProjectFile.Read(Write(json), out string error));
+        Assert.Contains(expected, error);
+    }
+
+    /// <summary>
+    /// A value of the wrong shape is named by its field and what it takes,
+    /// not by the .NET type the framework could not make.
+    /// </summary>
+    [Theory]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "kind": "dll" }""", "'kind' takes 'executable' or 'library'")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "optimize": "two" }""", "'optimize' takes a number")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "debug": "yes" }""", "'debug' takes true or false")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "sources": "src" }""", "'sources' takes a list")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "dependencies": [] }""", "'dependencies' takes an object of names")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "dependencies": { "geo": "^1" } }""", "'dependencies.geo' takes an object")]
+    [InlineData("""{ "name": "app", "version": "1.0.0", "dependencies": { "geo": { "path": ".", "link": "dynamic" } } }""", "'dependencies.geo.link' takes 'source' or 'shared'")]
+    [InlineData("""[]""", "a project file is an object")]
+    public void NamesTheFieldWhenAValueHasTheWrongShape(string json, string expected)
+    {
+        Assert.Null(ProjectFile.Read(Write(json), out string error));
+        Assert.Contains(expected, error);
+        Assert.DoesNotContain("System.", error);
+    }
+
+    [Theory]
+    [InlineData("DEBUG", true)]
+    [InlineData("_x1", true)]
+    [InlineData("Ünïcode", true)]
+    [InlineData("9x", false)]
+    [InlineData("a b", false)]
+    [InlineData("", false)]
+    [InlineData("A=1", false)]
+    public void ADefineIsSpelledLikeAnIdentifier(string define, bool valid) =>
+        Assert.Equal(valid, ProjectFile.IsValidDefine(define));
+
     [Theory]
     [InlineData("""{ "geo": {} }""", "neither 'path' nor 'git'")]
     [InlineData("""{ "geo": { "path": "../g", "git": "u" } }""", "both 'path' and 'git'")]
@@ -536,4 +592,104 @@ public class ProjectFileTests
 
         Assert.NotNull(ProjectFile.Read(path, out _));
     }
+}
+
+/// <summary>
+/// The spelling a type crosses a library boundary under.
+///
+/// Both halves are ours, so the only test worth writing is the round trip:
+/// what the writer produces, the reader has to accept, and a name only one of
+/// them knows is silent on both sides. That is how <c>char16</c> and
+/// <c>char32</c> came to be written by a library and unreadable by anything
+/// that referenced it -- the reader's list of primitives was a second copy of
+/// the type system's, and it was two names short.
+/// </summary>
+public class MetadataTypeNameTests
+{
+    /// <summary>
+    /// Every primitive there is, taken from the type system rather than
+    /// listed here, so a new one fails this until it can cross.
+    /// </summary>
+    public static TheoryData<string> EveryPrimitive()
+    {
+        var data = new TheoryData<string>();
+        foreach (var primitive in PrimitiveTypeSymbol.All) data.Add(primitive.Name);
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(EveryPrimitive))]
+    public void EveryPrimitiveRoundTrips(string name)
+    {
+        var read = MetadataTypeNames.Read(name, _ => null);
+
+        Assert.NotNull(read);
+        Assert.Equal(name, MetadataTypeNames.Write(read));
+    }
+
+    /// <summary>
+    /// A wrapper round-trips whatever it wraps, and the reader has to accept
+    /// every shape the writer can produce. A slice and a tuple are named types
+    /// the binder interns, so they are built through the factories a real
+    /// compilation passes; here they are stood in for by their element.
+    /// </summary>
+    [Theory]
+    [InlineData("int*")]
+    [InlineData("byte**")]
+    [InlineData("int[]")]
+    [InlineData("char16[]")]
+    [InlineData("int[][]")]
+    [InlineData("int[4]")]
+    [InlineData("double[16]")]
+    [InlineData("nuint?")]
+    [InlineData("char32*")]
+    public void EveryWrapperRoundTrips(string name)
+    {
+        var read = MetadataTypeNames.Read(name, _ => null);
+
+        Assert.NotNull(read);
+        Assert.Equal(name, MetadataTypeNames.Write(read));
+    }
+
+    /// <summary>
+    /// A name that mentions nothing a consumer could resolve is refused rather
+    /// than guessed at, which is what turns it into a diagnostic where the
+    /// library is built instead of a puzzle where it is used.
+    /// </summary>
+    [Theory]
+    [InlineData("Lib.Point")]
+    [InlineData("Lib.Point[]")]
+    [InlineData("Lib.Point?")]
+    [InlineData("weak Lib.Point?")]
+    [InlineData("Lib.Point[:]")]
+    [InlineData("(int, Lib.Point)")]
+    public void RefusesANameNothingKnows(string name) =>
+        Assert.Null(MetadataTypeNames.Read(name, _ => null));
+
+    /// <summary>
+    /// What the writer checks before it describes a surface: the named types a
+    /// written name is built out of, with the primitives left out because every
+    /// program already has those.
+    /// </summary>
+    [Theory]
+    [InlineData("int", new string[0])]
+    [InlineData("char16[]", new string[0])]
+    [InlineData("int[:]", new string[0])]
+    [InlineData("Lib.Point", new[] { "Lib.Point" })]
+    [InlineData("Lib.Point[:]", new[] { "Lib.Point" })]
+    [InlineData("weak Lib.Node?", new[] { "Lib.Node" })]
+    [InlineData("(int, Lib.Point)", new[] { "Lib.Point" })]
+    [InlineData("(Lib.A, Lib.B[])", new[] { "Lib.A", "Lib.B" })]
+    public void NamesWhatAConsumerWouldHaveToResolve(string written, string[] expected) =>
+        Assert.Equal(expected, MetadataTypeNames.LeafNames(written));
+
+    /// <summary>
+    /// A tuple's own commas are what it is split at, and an element may be a
+    /// tuple itself.
+    /// </summary>
+    [Fact]
+    public void SplitsANestedTupleAtItsOwnCommas() =>
+        Assert.Equal(
+            ["Lib.A", "Lib.B", "Lib.C"],
+            MetadataTypeNames.LeafNames("((Lib.A, Lib.B), Lib.C)"));
 }

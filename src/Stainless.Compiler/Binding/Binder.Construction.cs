@@ -315,14 +315,29 @@ public sealed partial class Binder
     /// Flattens a chain of member accesses back into a dotted name, so that
     /// <c>A.B.Thing</c> can be recognised as a module path. Returns null as soon
     /// as anything other than a plain name appears in the chain.
+    ///
+    /// A loop rather than the recursion this reads as, because the chain is as
+    /// long as the source says and the parser builds it without recursing:
+    /// <c>x.a.a.a...</c> is a postfix loop there, so nothing upstream bounds
+    /// the depth and a long enough one ended the process here. Walking down
+    /// and reversing costs one list and cannot overflow.
     /// </summary>
-    private static IReadOnlyList<string>? FlattenName(ExpressionSyntax expression) => expression switch
+    private static IReadOnlyList<string>? FlattenName(ExpressionSyntax expression)
     {
-        NameSyntax name => name.Name.Parts,
-        MemberAccessSyntax member when FlattenName(member.Target) is { } prefix =>
-            [.. prefix, member.Member],
-        _ => null,
-    };
+        var trailing = new List<string>();
+
+        while (expression is MemberAccessSyntax member)
+        {
+            trailing.Add(member.Member);
+            expression = member.Target;
+        }
+
+        if (expression is not NameSyntax name) return null;
+        if (trailing.Count == 0) return name.Name.Parts;
+
+        trailing.Reverse();
+        return [.. name.Name.Parts, .. trailing];
+    }
 
     /// <summary>
     /// Resolves a member-access target to a module, or null when it names a value.

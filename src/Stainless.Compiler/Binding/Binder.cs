@@ -223,7 +223,10 @@ public sealed partial class Binder(
         // program with no references skips it entirely.
         if (references is { Count: > 0 })
         {
-            var loader = new MetadataLoader(diagnostics, _builtins);
+            var loader = new MetadataLoader(
+                diagnostics, _builtins,
+                element => SliceOf(element),
+                elements => TupleOf(elements));
             loader.RegisterIntrinsics(_modules.Values);
             loader.Load(references, _modules);
 

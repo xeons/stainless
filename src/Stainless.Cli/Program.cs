@@ -743,6 +743,12 @@ internal static class Program
 
                 case "-D" or "--define":
                     if (++i >= args.Length) { Error("'-D' needs a name"); return false; }
+                    if (!ProjectFile.IsValidDefine(args[i]))
+                    {
+                        Error($"'{args[i]}' is not a symbol '#if' could test; a define is " +
+                              "spelled like an identifier");
+                        return false;
+                    }
                     arguments.Defines.Add(args[i]);
                     continue;
 

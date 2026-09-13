@@ -198,8 +198,32 @@ public static class Mangler
     /// arrive here as <c>App.Box&lt;int&gt;</c>, arrays as <c>int[]</c>, and both
     /// the mangler and the emitter must agree on the result.
     /// </summary>
-    public static string SymbolSafe(string name) =>
-        new(name.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
+    /// <summary>
+    /// A name reduced to what a linker symbol may hold.
+    ///
+    /// The test is <c>IsAscii</c> rather than <c>IsLetterOrDigit</c>, and the
+    /// difference is the whole of this method's history: the framework's
+    /// version answers true for every letter Unicode has, so an identifier
+    /// written <c>café</c> passed through unchanged and landed in generated IR,
+    /// which has an ASCII grammar and rejected it -- a message about a file the
+    /// author never wrote, for a name C# would have accepted. Anything past
+    /// ASCII is spelled as its code point instead, so two identifiers that
+    /// differ still do.
+    /// </summary>
+    public static string SymbolSafe(string name)
+    {
+        var sb = new StringBuilder(name.Length);
+
+        foreach (char c in name)
+        {
+            if (char.IsAsciiLetterOrDigit(c)) sb.Append(c);
+            else if (char.IsAscii(c)) sb.Append('_');
+            else sb.Append("_u").Append(((int)c).ToString(
+                "X4", System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        return sb.ToString();
+    }
 
     private static string Sanitize(string qualifiedName) => SymbolSafe(qualifiedName);
 }

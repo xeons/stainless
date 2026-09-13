@@ -173,7 +173,7 @@ public sealed partial class Binder
     private void DeclareDelegateSignature(
         NamedTypeSymbol type, DelegateDeclSyntax declaration, FileScope scope)
     {
-        var returnType = ResolveType(declaration.ReturnType, scope);
+        var returnType = ResolveType(declaration.ReturnType, scope, allowVoid: true);
         string kind = type is ClosureTypeSymbol ? "closure" : "delegate";
 
         var signature = new List<ParameterSymbol>();

@@ -455,6 +455,9 @@ public sealed partial class LlvmEmitter
                     double number =>
                         $"%SlAttributeValue {{ i32 {(int)FieldKind.Double}, " +
                         $"i64 {BitConverter.DoubleToInt64Bits(number)}, ptr null }}",
+                    float number =>
+                        $"%SlAttributeValue {{ i32 {(int)FieldKind.Double}, " +
+                        $"i64 {BitConverter.DoubleToInt64Bits(number)}, ptr null }}",
                     ulong number =>
                         $"%SlAttributeValue {{ i32 {(int)FieldKind.Long}, " +
                         $"i64 {unchecked((long)number)}, ptr null }}",

@@ -10,59 +10,6 @@ no "why" is one that should be deleted rather than done.
 
 ---
 
-## Bugs
-
-These are wrong rather than missing, and should go first.
-
-### A literal's type does not survive a minus, and there is no float literal
-
-```csharp
-byte  b = 200;          // fine: a literal adopts what can hold it
-sbyte c = -100;         // SL0265, and the same for `short s = -30000;`
-float f = 1.5f;         // SL0265: the suffix lexes, and the literal is a double
-```
-
-Two small spellings, both of which a C# reader will type. The first is
-`ConstantFits` seeing a `BoundLiteral` and a minus giving it a `BoundUnary`
-instead; the negated value is now *typed* correctly (that was a real bug, and is
-fixed), but the fitting rule still does not see through the operator. The second
-is `f` and `d` being accepted by the lexer and both meaning `double`, so the
-suffix that ought to make a `float` is the one thing it cannot do.
-
-Neither is silent -- both are a diagnostic asking for a cast -- which is why
-they are here rather than above. What is wrong is that the cast should not be
-needed.
-
-Found by [samples/tour](samples/tour).
-
-*Touches:* `Binder.ConstantFits`, `Lexer.ReadNumber`.
-
-### Two functions with the same signature are not diagnosed
-
-```csharp
-public int F(int a) { return a + 1; }
-public int F(int a) { return a + 2; }    // accepted
-```
-
-Both are declared, both are bound and both are emitted, so the module holds two
-`define`s under one symbol and LLVM is left to object to the redefinition — a
-message about the generated IR, naming a mangled symbol, for a mistake in the
-source. Nothing checks that a module's functions have distinct signatures: an
-interface refuses two methods of the same *name* (SL0416) and a module refuses
-a function and a constant of the same name (SL0201), but overloads are never
-measured against each other.
-
-The check is cheap, because the mangled name already is the signature: two
-functions in a module collide exactly when they mangle alike. What it needs is
-a diagnostic code and something to say about which declaration to point at.
-
-Found by [ManglerTests](tests/Stainless.UnitTests/ManglerTests.cs), which was
-looking for the two type kinds that mangled to nothing — a separate bug, now
-fixed, that made this one reachable from signatures that were genuinely
-different.
-
-*Touches:* `Binder.DeclareFunction`.
-
 ## Next
 
 ### Calling conventions

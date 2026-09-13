@@ -258,7 +258,7 @@ public sealed record ProjectFile
             @"The JSON property '([^']+)' could not be mapped to any \.NET member contained in " +
             @"type '(?:[\w.]*\.)?(\w+)'");
 
-        if (!unmapped.Success) return e.Message ?? "the file is not valid JSON";
+        if (!unmapped.Success) return WrongShape(e) ?? e.Message ?? "the file is not valid JSON";
 
         string wrote = unmapped.Groups[1].Value;
         string where = unmapped.Groups[2].Value == nameof(Dependency)
@@ -275,6 +275,42 @@ public sealed record ProjectFile
                (meant is null
                    ? $". The fields are: {string.Join(", ", known)}"
                    : $"; did you mean '{meant}'?");
+    }
+
+    /// <summary>
+    /// A value of the wrong shape -- <c>"kind": "dll"</c>, <c>"optimize":
+    /// "two"</c>, <c>"sources": "src"</c> -- named by the field and what it
+    /// takes, rather than by the .NET type the framework failed to make.
+    /// Null when the complaint is about something else.
+    /// </summary>
+    private static string? WrongShape(JsonException e)
+    {
+        var shape = System.Text.RegularExpressions.Regex.Match(
+            e.Message ?? "",
+            @"could not be converted to (?<type>[\w.`,\[\]]+)\. Path: \$(?<path>[^ |]*)");
+
+        if (!shape.Success) return null;
+
+        string type = shape.Groups["type"].Value;
+        string field = shape.Groups["path"].Value.TrimStart('.');
+        if (field.Length == 0) return "a project file is an object, { ... }, and this is not one";
+
+        string takes = type switch
+        {
+            _ when type.EndsWith(nameof(ProjectKind)) => "'executable' or 'library'",
+            _ when type.EndsWith(nameof(DependencyLink)) => "'source' or 'shared'",
+            _ when type.EndsWith(nameof(Dependency)) =>
+                "an object saying where the package comes from, as in { \"path\": \"../geometry\" }",
+            _ when type.EndsWith(nameof(ProjectFile)) => "an object, { ... }",
+            _ when type.Contains("List") => "a list, [ ... ]",
+            _ when type.Contains("Dictionary") => "an object of names, { \"name\": ... }",
+            "System.Int32" => "a number",
+            "System.Boolean" => "true or false",
+            "System.String" => "a string",
+            _ => "something else",
+        };
+
+        return $"'{field}' takes {takes}";
     }
 
     /// <summary>The field names as they are spelled in the file.</summary>
@@ -368,10 +404,21 @@ public sealed record ProjectFile
     {
         error = "";
 
-        if (!IsValidName(Name))
+        // JSON `null` lands in a property whatever the property's type says,
+        // and the deserializer does not count it as missing. Each list and
+        // string is checked for it here, once, so that nothing further down
+        // dereferences one; a field that is null is a field that is empty.
+        if (Name is null || !IsValidName(Name))
         {
-            error = $"'{path}' has the name '{Name}'; a package name is one or more letters, " +
-                    "digits, '_', '-' or '.', because it is also a directory in the package cache";
+            error = $"'{path}' has the name '{Name ?? "null"}'; a package name is one or more " +
+                    "letters, digits, '_', '-' or '.', because it is also a directory in the " +
+                    "package cache";
+            return false;
+        }
+
+        if (Version is null)
+        {
+            error = $"'{path}': 'version' is null; a version is three numbers, as in '1.2.3'";
             return false;
         }
 
@@ -381,10 +428,48 @@ public sealed record ProjectFile
             return false;
         }
 
-        if (Sources.Count == 0)
+        if (Sources is null || Sources.Count == 0 || Sources.Any(s => string.IsNullOrWhiteSpace(s)))
         {
             error = $"'{path}' lists no sources; 'sources' names the files and directories that " +
                     "make up this package";
+            return false;
+        }
+
+        foreach (var (field, value) in new[]
+                 {
+                     ("output", Output), ("buildDirectory", BuildDirectory),
+                     ("objectDirectory", ObjectDirectory), ("header", Header),
+                 })
+        {
+            // An empty path resolves to the project directory itself, and the
+            // linker's complaint about writing a file over a directory is not
+            // one a reader can trace back to the field.
+            if (value is not null && value.Trim().Length == 0)
+            {
+                error = $"'{path}': '{field}' is empty; leave it out to take the default, or " +
+                        "name a path";
+                return false;
+            }
+        }
+
+        if (Libraries is null || Libraries.Any(l => string.IsNullOrWhiteSpace(l)))
+        {
+            error = $"'{path}': 'libraries' names libraries the linker finds by name, and one " +
+                    "of them is empty";
+            return false;
+        }
+
+        string? badDefine = Defines?.FirstOrDefault(d => !IsValidDefine(d));
+        if (Defines is null || badDefine is not null)
+        {
+            error = $"'{path}': '{badDefine ?? "null"}' is not a symbol '#if' could test; a " +
+                    "define is spelled like an identifier";
+            return false;
+        }
+
+        if (Dependencies is null)
+        {
+            error = $"'{path}': 'dependencies' is null; leave it out when there are none";
             return false;
         }
 
@@ -415,11 +500,28 @@ public sealed record ProjectFile
                 return false;
             }
 
+            if (dependency is null)
+            {
+                error = $"'{path}': the dependency '{name}' is null; it says where it comes " +
+                        $"from, as in {{ \"path\": \"../{name}\" }}";
+                return false;
+            }
+
             if (!dependency.Validate(name, path, out error)) return false;
         }
 
         return true;
     }
+
+    /// <summary>
+    /// What may follow <c>-D</c> or sit in <c>defines</c>: something <c>#if</c>
+    /// could actually name. A define that no directive can spell is a typo
+    /// that silently defines nothing.
+    /// </summary>
+    public static bool IsValidDefine(string? define) =>
+        define is { Length: > 0 } &&
+        (char.IsLetter(define[0]) || define[0] == '_') &&
+        define.All(c => char.IsLetterOrDigit(c) || c == '_');
 
     /// <summary>
     /// What may be a package name. Deliberately narrower than what JSON allows:

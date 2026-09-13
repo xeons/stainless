@@ -32,6 +32,13 @@ public sealed class Parser
     private DiagnosticBag _diagnostics;
     private int _pos;
 
+    /// <summary>
+    /// How many levels of nesting are open. See <see cref="Source.Recursion"/>:
+    /// a recursive-descent parser recurses once per level, so without a bound
+    /// a deeply nested file ends the process instead of being diagnosed.
+    /// </summary>
+    private int _depth;
+
     public Parser(
         SourceText source, DiagnosticBag diagnostics, IReadOnlyCollection<string>? symbols = null)
     {
@@ -59,6 +66,52 @@ public sealed class Parser
         _tokens = [.. tokens];
     }
 
+    // ------------------------------------------------------------ nesting
+
+    /// <summary>
+    /// Opens one level of nesting, or reports that there are too many.
+    ///
+    /// False means the caller must not descend: it should consume something
+    /// and return a node standing for what it could not parse, exactly as it
+    /// would for any other malformed input. Reported once per file, because a
+    /// program this deep would otherwise produce one message per level.
+    /// </summary>
+    private bool Descend()
+    {
+        if (++_depth <= Source.Recursion.MaxDepth) return true;
+
+        _depth--;
+
+        if (!_tooDeep)
+        {
+            _tooDeep = true;
+            _diagnostics.Error("SL0108", Current.Span,
+                $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which is " +
+                "past what can be compiled; the usual cause is generated source, and the fix " +
+                "is to give the inner part a name of its own");
+
+            // Nothing further in this file can be read usefully: every open
+            // construct is about to be closed by an unwind that did not parse
+            // what was inside it. Going to the end makes that unwind quiet,
+            // which leaves the one message that says what happened.
+            _pos = _tokens.Count - 1;
+        }
+
+        return false;
+    }
+
+    private void Ascend() => _depth--;
+
+    /// <summary>
+    /// What stands in for an expression that could not be read. The same
+    /// zero SL0107 leaves behind, so nothing downstream has a second shape
+    /// to know about.
+    /// </summary>
+    private ExpressionSyntax Unreadable(int start) =>
+        new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);
+
+    private bool _tooDeep;
+
     // ------------------------------------------------------------ token helpers
 
     private Token Current => Peek(0);
@@ -83,16 +136,18 @@ public sealed class Parser
     private Token Expect(TokenKind kind)
     {
         if (At(kind)) return Advance();
-        _diagnostics.Error("SL0100", Current.Span,
-            $"expected {kind.Describe()}, found {Current.Kind.Describe()}");
+        if (!_tooDeep)
+            _diagnostics.Error("SL0100", Current.Span,
+                $"expected {kind.Describe()}, found {Current.Kind.Describe()}");
         return new Token(kind, Current.Span, kind.FixedText() ?? "");
     }
 
     private string ExpectIdentifier()
     {
         if (At(TokenKind.Identifier)) return Advance().Text;
-        _diagnostics.Error("SL0101", Current.Span,
-            $"expected an identifier, found {Current.Kind.Describe()}");
+        if (!_tooDeep)
+            _diagnostics.Error("SL0101", Current.Span,
+                $"expected an identifier, found {Current.Kind.Describe()}");
         return "?";
     }
 
@@ -107,6 +162,8 @@ public sealed class Parser
     private bool Speculate<T>(Func<T?> attempt, out T? result) where T : class
     {
         int savedPos = _pos;
+        int savedDepth = _depth;
+        bool savedTooDeep = _tooDeep;
         var savedDiagnostics = _diagnostics;
         _diagnostics = new DiagnosticBag();
         try
@@ -120,6 +177,12 @@ public sealed class Parser
         finally
         {
             _diagnostics = savedDiagnostics;
+
+            // An attempt that is thrown away leaves nothing behind, the depth
+            // limit's "already said so" included: the same tokens are about to
+            // be parsed again for real, and that parse has to be able to say it.
+            _depth = savedDepth;
+            _tooDeep = savedTooDeep;
         }
     }
 
@@ -1235,6 +1298,19 @@ public sealed class Parser
     {
         int start = _pos;
 
+        if (!Descend())
+        {
+            Advance();
+            var span = SpanFrom(start);
+            return new NamedTypeSyntax(span, new QualifiedName(span, ["?"]));
+        }
+
+        try { return ParseTypeCore(start, allowFixedLength); }
+        finally { Ascend(); }
+    }
+
+    private TypeSyntax ParseTypeCore(int start, bool allowFixedLength)
+    {
         if (Match(TokenKind.WeakKeyword))
         {
             var inner = ParseType(allowFixedLength);
@@ -1496,6 +1572,16 @@ public sealed class Parser
     private StatementSyntax ParseStatement()
     {
         int start = _pos;
+
+        if (!Descend()) { Advance(); return new ExpressionStatementSyntax(
+            SpanFrom(start), Unreadable(start)); }
+
+        try { return ParseStatementCore(start); }
+        finally { Ascend(); }
+    }
+
+    private StatementSyntax ParseStatementCore(int start)
+    {
         switch (Current.Kind)
         {
             case TokenKind.OpenBrace:
@@ -1868,6 +1954,14 @@ public sealed class Parser
     {
         int start = _pos;
 
+        if (!Descend()) { Advance(); return Unreadable(start); }
+
+        try { return ParseAssignmentCore(start); }
+        finally { Ascend(); }
+    }
+
+    private ExpressionSyntax ParseAssignmentCore(int start)
+    {
         // A lambda binds looser than anything else, so it is recognised before
         // the operator chain rather than inside it.
         if (TryParseLambda() is { } lambda) return lambda;
@@ -2017,6 +2111,16 @@ public sealed class Parser
     {
         int start = _pos;
 
+        // A prefix chain -- `!!!x`, `- - -x` -- recurses here without passing
+        // back through ParseAssignment, so it is counted here too.
+        if (!Descend()) { Advance(); return Unreadable(start); }
+
+        try { return ParseUnaryCore(start); }
+        finally { Ascend(); }
+    }
+
+    private ExpressionSyntax ParseUnaryCore(int start)
+    {
         // `try` binds like any other prefix, so `try a + b` is `(try a) + b`
         // and `try f().x` covers the whole chain. Anything wider is written
         // with parentheses, which is where a reader would look for it.
@@ -2401,8 +2505,9 @@ public sealed class Parser
                     return new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);
                 }
 
-                _diagnostics.Error("SL0107", Current.Span,
-                    $"expected an expression, found {Current.Kind.Describe()}");
+                if (!_tooDeep)
+                    _diagnostics.Error("SL0107", Current.Span,
+                        $"expected an expression, found {Current.Kind.Describe()}");
                 Advance();
                 return new LiteralSyntax(SpanFrom(start), TokenKind.IntLiteral, 0UL);
         }

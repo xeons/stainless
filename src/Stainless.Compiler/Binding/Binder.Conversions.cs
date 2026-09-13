@@ -59,7 +59,26 @@ public sealed partial class Binder
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
         if (ConstantFits(expression, target) || CharacterFits(expression, target))
-            return new BoundLiteral(span, target, ((BoundLiteral)expression).Value);
+            return new BoundLiteral(span, target, FoldedConstant(expression, target));
+
+        // A literal that does not fit is a mistake, not a conversion.
+        //
+        // Every integer literal starts out an `int`, so one too large for a
+        // target at least that wide used to fall through to an ordinary
+        // widening -- `int` to `long` has nothing to complain about -- and the
+        // value was cut to 32 bits on the way out. `long l =
+        // 9223372036854775808;` compiled, ran, and held zero. A narrower
+        // target was always caught, but only because nothing widens an `int`
+        // to a `byte`, which is the right answer reached for the wrong reason.
+        if (target is PrimitiveTypeSymbol { IsInteger: true } &&
+            IntegerLiteral(expression) is { } tooLarge)
+        {
+            string written = tooLarge.Negative ? "-" + tooLarge.Magnitude : $"{tooLarge.Magnitude}";
+            diagnostics.Error("SL0266", span,
+                $"{written} does not fit in '{target.Name}', so it cannot be one; the literal " +
+                "is outside the range of that type rather than in need of a conversion");
+            return new BoundErrorExpression(span);
+        }
 
         if (_builtins.IsString(expression.Type) && IsBytePointer(target))
         {
@@ -81,9 +100,16 @@ public sealed partial class Binder
                 return new BoundErrorExpression(span);
             }
 
-            string hint = ClassifyConversion(expression.Type, target, explicitCast: true) is not null
-                ? $"; an explicit cast '({target.Name})' would allow it"
-                : "";
+            // A double literal handed to a float is the one C# habit the cast
+            // hint would send the wrong way: the fix is the suffix, not a cast.
+            string hint = expression is BoundLiteral { Value: double } &&
+                          target is PrimitiveTypeSymbol { Kind: PrimitiveKind.Float }
+                ? $"; write it with an 'f' suffix, " +
+                  $"'{expression.Span.File.Text[expression.Span.Start..expression.Span.End]}f', " +
+                  "to make it a float"
+                : ClassifyConversion(expression.Type, target, explicitCast: true) is not null
+                    ? $"; an explicit cast '({target.Name})' would allow it"
+                    : "";
             diagnostics.Error("SL0265", span,
                 $"cannot convert '{expression.Type.Name}' to '{target.Name}'{hint}");
             return new BoundErrorExpression(span);
@@ -226,15 +252,85 @@ public sealed partial class Binder
     /// </summary>
     private static bool ConstantFits(BoundExpression expression, TypeSymbol target)
     {
-        if (expression is not BoundLiteral { Value: ulong value }) return false;
-        if (expression.Type is not PrimitiveTypeSymbol { IsInteger: true }) return false;
+        if (IntegerLiteral(expression) is not { } written) return false;
+
+        // A float or a double holds any integer that can be written, rounding
+        // if it must, exactly as C# does. It has to be said here rather than
+        // left to the ordinary int-to-float conversion, because every integer
+        // literal starts out an `int`: `double d = 5000000000;` reached the
+        // emitter as an `int` holding a value no `int` holds, and came out
+        // 705032704 -- a valid program, quietly given a different number.
+        if (target is PrimitiveTypeSymbol { IsFloat: true }) return true;
+
         if (target is not PrimitiveTypeSymbol { IsInteger: true } integer) return false;
+
+        // A minus over a literal is a unary operation to the parser, and a
+        // negative literal to the reader: `sbyte c = -100;` is as plain as
+        // `byte b = 200;`. The magnitude is measured against the signed floor,
+        // which is one further out than the ceiling: `-128` fits an sbyte.
+        if (written.Negative)
+        {
+            if (written.Magnitude == 0) return true;
+            if (!integer.IsSigned) return false;
+            ulong floor = integer.Size >= 8 ? 1UL << 63 : 1UL << (integer.Bits - 1);
+            return written.Magnitude <= floor;
+        }
 
         ulong maximum = integer.Size >= 8
             ? (integer.IsSigned ? long.MaxValue : ulong.MaxValue)
             : (1UL << (integer.Bits - (integer.IsSigned ? 1 : 0))) - 1;
 
-        return value <= maximum;
+        return written.Magnitude <= maximum;
+    }
+
+    /// <summary>
+    /// An integer literal, with or without a minus in front of it, or null
+    /// when the expression is neither.
+    /// </summary>
+    private static (ulong Magnitude, bool Negative)? IntegerLiteral(BoundExpression expression)
+    {
+        if (NegatedLiteral(expression) is { } magnitude) return (magnitude, true);
+
+        return expression is BoundLiteral { Value: ulong value } &&
+               expression.Type is PrimitiveTypeSymbol { IsInteger: true }
+            ? (value, false)
+            : null;
+    }
+
+    /// <summary>
+    /// The magnitude of an integer literal under a single minus, or null when
+    /// the expression is not that shape.
+    /// </summary>
+    private static ulong? NegatedLiteral(BoundExpression expression) =>
+        expression is BoundUnary
+        {
+            Operator: BoundUnaryOp.Negate,
+            Operand: BoundLiteral { Value: ulong magnitude } written,
+        } && written.Type is PrimitiveTypeSymbol { IsInteger: true }
+            ? magnitude
+            : null;
+
+    /// <summary>
+    /// The value a fitting literal carries into its new type.
+    ///
+    /// For an integer target that is the literal's own value, or the two's
+    /// complement of a negated one, which is the shape the emitter already
+    /// narrows to the declared width. For a float target it is the number
+    /// itself, held as one, because a <c>double</c> holding a <c>ulong</c>
+    /// would reach the emitter as an integer spelled where a float belongs.
+    /// </summary>
+    private static object? FoldedConstant(BoundExpression expression, TypeSymbol target)
+    {
+        if (IntegerLiteral(expression) is { } written &&
+            target is PrimitiveTypeSymbol { IsFloat: true } number)
+        {
+            double value = written.Negative ? -(double)written.Magnitude : written.Magnitude;
+            return number.Kind == PrimitiveKind.Float ? (float)value : value;
+        }
+
+        return NegatedLiteral(expression) is { } magnitude
+            ? unchecked(0UL - magnitude)
+            : ((BoundLiteral)expression).Value;
     }
 
     /// <summary>

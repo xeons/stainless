@@ -430,8 +430,54 @@ public sealed partial class LlvmEmitter
             ? "@" + mangled
             : "@\"" + mangled + "\"";
 
-    private static string SanitizeIdentifier(string name) =>
-        new(name.Select(c => char.IsLetterOrDigit(c) || c == '_' || c == '.' ? c : '_').ToArray());
+    /// <summary>
+    /// A source name as a local's name in the IR, which is a readability aid
+    /// rather than an identity: what tells two slots apart is the counter
+    /// appended to them. ASCII passes through and anything past it is spelled
+    /// as its code point, because LLVM's grammar for a name is ASCII and the
+    /// framework's <c>IsLetterOrDigit</c> is not -- see
+    /// <see cref="Mangler.SymbolSafe"/>, which this mirrors but for the dot.
+    /// </summary>
+    /// <summary>
+    /// Long enough to read, short enough that LLVM takes it: clang refuses
+    /// a local name of a few thousand characters, reporting it as a multiple
+    /// definition of a name defined once -- a message about generated IR for
+    /// a program whose only sin was a long variable name.
+    /// </summary>
+    private const int LongestIdentifier = 64;
+
+    /// <summary>
+    /// A parameter's name in the IR.
+    ///
+    /// The index goes on only when the readable part had to be cut, since that
+    /// is the only way two parameters can come out spelled alike -- a slot has
+    /// its own counter, and a parameter has nothing but its name. Leaving it
+    /// off otherwise keeps an ordinary signature spelled as it always was,
+    /// which matters because signatures are what the ABI tests pin.
+    /// </summary>
+    private static string ArgumentName(ParameterSymbol parameter) =>
+        parameter.Name.Length > LongestIdentifier
+            ? $"%arg.{SanitizeIdentifier(parameter.Name)}.p{parameter.Index}"
+            : "%arg." + SanitizeIdentifier(parameter.Name);
+
+    private static string SanitizeIdentifier(string name)
+    {
+        // Nothing is lost by cutting it: what tells two locals apart is the
+        // number appended after this, not the name it is given to read by.
+        var sb = new StringBuilder(Math.Min(name.Length, LongestIdentifier));
+
+        foreach (char c in name)
+        {
+            if (sb.Length >= LongestIdentifier) break;
+
+            if (char.IsAsciiLetterOrDigit(c) || c is '_' or '.') sb.Append(c);
+            else if (char.IsAscii(c)) sb.Append('_');
+            else sb.Append("_u").Append(((int)c).ToString(
+                "X4", System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// Emits the class's destroy hook: run the user destructor, then drop every

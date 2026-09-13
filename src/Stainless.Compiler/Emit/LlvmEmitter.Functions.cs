@@ -51,7 +51,7 @@ public sealed partial class LlvmEmitter
 
         foreach (var (parameter, info) in parameterInfos)
         {
-            string name = "%arg." + SanitizeIdentifier(parameter.Name);
+            string name = ArgumentName(parameter);
             incomingNames[parameter] = name;
 
             var spellings = Declared(info).ToList();

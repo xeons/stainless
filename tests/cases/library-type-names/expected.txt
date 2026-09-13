@@ -1,0 +1,6 @@
+units 97 233 128512 0.5 3
+tail 4 16
+pair 7 pair
+both 3 3
+mine 2
+assigned 4

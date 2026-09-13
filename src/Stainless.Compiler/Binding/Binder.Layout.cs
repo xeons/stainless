@@ -65,7 +65,7 @@ public sealed partial class Binder
 
             foreach (var member in union.Fields)
             {
-                if (member.Type is StructTypeSymbol nestedMember)
+                if (StoredStruct(member.Type) is { } nestedMember)
                     ComputeLayout(nestedMember, inProgress);
 
                 member.Offset = 0;
@@ -105,7 +105,7 @@ public sealed partial class Binder
         foreach (var field in type.Fields)
         {
             // Only a struct field forces its type to be laid out first.
-            if (field.Type is StructTypeSymbol nested)
+            if (StoredStruct(field.Type) is { } nested)
                 ComputeLayout(nested, inProgress);
 
             // Packed means no padding anywhere: a field lands where the one
@@ -134,6 +134,25 @@ public sealed partial class Binder
 
         type.SetLayout(size, alignment);
         inProgress.Remove(type);
+    }
+
+    /// <summary>
+    /// The struct a field's storage is made of, looking through fixed arrays,
+    /// or null when the field holds no struct inline.
+    ///
+    /// <c>S[4]</c> holds four of them where they are written, so a field of it
+    /// needs <c>S</c> laid out first and makes <c>S</c> contain itself exactly
+    /// as a plain <c>S</c> field would. Missing that, the cycle went unreported
+    /// and the size was read before it was computed: the struct came out zero
+    /// bytes wide and the emitter wrote an LLVM type that referred to itself,
+    /// which clang rejects as a message about generated IR. An ordinary array
+    /// is a reference and breaks the cycle, which is why only the fixed one is
+    /// looked through.
+    /// </summary>
+    private static StructTypeSymbol? StoredStruct(TypeSymbol type)
+    {
+        while (type is FixedArrayTypeSymbol inline) type = inline.Element;
+        return type as StructTypeSymbol;
     }
 
     /// <summary>

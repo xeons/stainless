@@ -76,9 +76,43 @@ public class BinderTests
     public void AMismatchUnderlinesTheValue() =>
         Assert.Equal(("SL0265", "\"s\""), One("int x = \"s\";"));
 
+    /// <summary>
+    /// A literal outside its type's range is that rather than a conversion
+    /// that needs a cast, and it says so under its own code. The distinction
+    /// earns its place: the value is wrong, and no cast makes 300 a byte.
+    /// </summary>
+    [Theory]
+    [InlineData("byte b = 300;", "300")]
+    [InlineData("sbyte s = -129;", "-129")]
+    [InlineData("int i = 5000000000;", "5000000000")]
+    [InlineData("long l = 9223372036854775808;", "9223372036854775808")]
+    public void ALiteralTooLargeForItsTypeUnderlinesTheLiteral(string body, string underlined) =>
+        Assert.Equal(("SL0266", underlined), One(body));
+
+    /// <summary>
+    /// A literal is the narrowest of int, uint, long and ulong that holds it,
+    /// as in C#, so each of these needs no cast. Everything used to start out
+    /// an int, and a value past its range was cut to 32 bits on the way out.
+    /// </summary>
+    [Theory]
+    [InlineData("int i = 2147483647;")]
+    [InlineData("uint u = 4294967295;")]
+    [InlineData("long l = 9223372036854775807;")]
+    [InlineData("ulong ul = 18446744073709551615;")]
+    [InlineData("nuint n = 5000000000;")]
+    [InlineData("double d = 5000000000;")]
+    [InlineData("float f = 5000000000;")]
+    public void ALiteralAdoptsATypeThatHoldsIt(string body) =>
+        Assert.Empty(Front.BodyCodes(body));
+
+    /// <summary>
+    /// And a bit pattern past an int meets one as the wider type, which is
+    /// what makes a mask written the way a C header writes it mean what it
+    /// says rather than what truncation happened to leave.
+    /// </summary>
     [Fact]
-    public void ALiteralTooLargeForItsTypeUnderlinesTheLiteral() =>
-        Assert.Equal(("SL0265", "300"), One("byte b = 300;"));
+    public void ABitPatternWidensTheOperationRatherThanBeingCut() =>
+        Assert.Empty(Front.BodyCodes("int flags = 1; var masked = flags & 0xFFFF0000;"));
 
     /// <summary>
     /// A narrowing conversion underlines the value being narrowed, which is

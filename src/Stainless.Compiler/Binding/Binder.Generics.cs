@@ -362,7 +362,7 @@ public sealed partial class Binder
         {
             Name = template.Name,
             ModuleName = template.Module.Name,
-            ReturnType = ResolveType(declaration.ReturnType, template.Scope),
+            ReturnType = ResolveType(declaration.ReturnType, template.Scope, allowVoid: true),
             Linkage = LinkageKind.Stainless,
             Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = template.ContainingType,

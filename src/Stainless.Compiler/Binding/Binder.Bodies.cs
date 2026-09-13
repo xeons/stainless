@@ -1058,7 +1058,20 @@ public sealed partial class Binder
         return block;
     }
 
-    private BoundStatement BindStatement(StatementSyntax syntax) => syntax switch
+    private BoundStatement BindStatement(StatementSyntax syntax)
+    {
+        if (++_bindDepth > Source.Recursion.MaxDepth)
+        {
+            _bindDepth--;
+            return new BoundExpressionStatement(
+                syntax.Span, new BoundErrorExpression(syntax.Span));
+        }
+
+        try { return BindStatementCore(syntax); }
+        finally { _bindDepth--; }
+    }
+
+    private BoundStatement BindStatementCore(StatementSyntax syntax) => syntax switch
     {
         BlockSyntax block => BindBlock(block),
         LocalDeclSyntax local => BindLocalDeclaration(local),

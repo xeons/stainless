@@ -31,7 +31,7 @@ public sealed partial class Binder
     private void DeclareFunction(FileScope scope, NamedTypeSymbol? containingType, FunctionDeclSyntax declaration)
     {
         var module = scope.Module;
-        var returnType = ResolveType(declaration.ReturnType, scope);
+        var returnType = ResolveType(declaration.ReturnType, scope, allowVoid: true);
 
         bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
 
@@ -162,6 +162,20 @@ public sealed partial class Binder
             module.Functions.Add(symbol);
             return;
         }
+
+        // Two functions in one module collide exactly when they mangle alike,
+        // and the mangled name is the parameter types. Left unchecked, both
+        // would be emitted under one symbol and LLVM would be the one to say so,
+        // in a message about generated IR naming a symbol that is in no source
+        // file. An `extern` redeclared is caught here too: one C symbol with two
+        // prototypes is a mistake, and with one prototype twice is a forward
+        // declaration, which the language has no need of.
+        if (containingType is null &&
+            module.FindFunctions(declaration.Name).Any(f => f.Accepts(symbol.ParameterTypes.ToList())))
+            diagnostics.Error("SL0211", declaration.Span,
+                $"'{module.Name}' already declares a function '{declaration.Name}' taking " +
+                "these parameter types; overloads must differ in their parameters, and a " +
+                "return type alone does not distinguish two functions");
 
         if (containingType is not null)
         {
@@ -439,7 +453,9 @@ public sealed partial class Binder
             if (declaration.Type is null)
                 type = literal.Kind switch
                 {
-                    TokenKind.FloatLiteral => PrimitiveTypeSymbol.Double,
+                    TokenKind.FloatLiteral => literal.Value is float
+                        ? PrimitiveTypeSymbol.Float
+                        : PrimitiveTypeSymbol.Double,
                     TokenKind.TrueKeyword or TokenKind.FalseKeyword => PrimitiveTypeSymbol.Bool,
                     TokenKind.CharLiteral => PrimitiveTypeSymbol.Char,
                     _ => PrimitiveTypeSymbol.Int,
@@ -526,6 +542,7 @@ public sealed partial class Binder
     {
         ulong number => unchecked(0UL - number),
         double number => -number,
+        float number => -number,
         _ => null,
     };
 }

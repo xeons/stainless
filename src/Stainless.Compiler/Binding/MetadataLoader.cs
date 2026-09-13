@@ -29,7 +29,17 @@ namespace Stainless.Binding;
 /// nothing here is ever emitted as a definition. The library already has the
 /// code; this compilation only needs to know how to call it.
 /// </summary>
-public sealed class MetadataLoader(DiagnosticBag diagnostics, Builtins builtins)
+/// <param name="sliceOf">
+/// How to reach this compilation's <c>T[:]</c>, and <paramref name="tupleOf"/>
+/// its <c>(A, B)</c>. Both are structural but named, so the binder interns
+/// them: a library's <c>int[:]</c> has to be the very symbol a consumer's own
+/// source resolves to, or the two would not compare equal.
+/// </param>
+public sealed class MetadataLoader(
+    DiagnosticBag diagnostics,
+    Builtins builtins,
+    MetadataTypeNames.SliceFactory? sliceOf = null,
+    MetadataTypeNames.TupleFactory? tupleOf = null)
 {
     private static readonly SourceText Referenced = new("<referenced>", "");
     private static readonly SourceSpan ReferencedSpan = new(Referenced, 0, 0);
@@ -556,8 +566,11 @@ public sealed class MetadataLoader(DiagnosticBag diagnostics, Builtins builtins)
     /// against the intrinsic ones every program has.
     /// </summary>
     private TypeSymbol? Resolve(string written) =>
-        MetadataTypeNames.Read(written, name =>
-            _byQualifiedName.TryGetValue(name, out var found) ? found : Intrinsic(name));
+        MetadataTypeNames.Read(
+            written,
+            name => _byQualifiedName.TryGetValue(name, out var found) ? found : Intrinsic(name),
+            sliceOf,
+            tupleOf);
 
     private NamedTypeSymbol? Intrinsic(string qualifiedName) =>
         _intrinsics.TryGetValue(qualifiedName, out var found) ? found : null;

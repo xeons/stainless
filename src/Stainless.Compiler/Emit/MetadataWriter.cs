@@ -261,20 +261,21 @@ public static class MetadataWriter
 
         void Check(string owner, string what, string written)
         {
-            string bare = written.TrimStart();
-            if (bare.StartsWith("weak ", StringComparison.Ordinal)) bare = bare["weak ".Length..];
-            bare = bare.TrimEnd('?', '*');
-            while (bare.EndsWith("[]", StringComparison.Ordinal)) bare = bare[..^2];
+            // Every named type the written name is built out of, primitives
+            // already left out. A slice of a described struct is describable,
+            // and so is a tuple of them -- what is not is the leaf that names
+            // something the metadata does not carry.
+            foreach (string bare in MetadataTypeNames.LeafNames(written))
+            {
+                if (known.Contains(bare)) continue;
+                if (!reported.Add(owner + "/" + bare)) continue;
 
-            if (MetadataTypeNames.Read(bare, _ => null) is not null) return;   // a primitive
-            if (known.Contains(bare)) return;
-            if (!reported.Add(owner + "/" + bare)) return;
-
-            diagnostics.Warning("SL0477",
-                spans.TryGetValue(owner, out var at) ? at : default,
-                $"'{owner}' is described in this library's metadata and {what} is " +
-                $"'{written}', which is not. A consumer would read a name it cannot resolve; " +
-                "keep it out of the public surface, or let it cross as source");
+                diagnostics.Warning("SL0477",
+                    spans.TryGetValue(owner, out var at) ? at : default,
+                    $"'{owner}' is described in this library's metadata and {what} is " +
+                    $"'{written}', which is not. A consumer would read a name it cannot " +
+                    "resolve; keep it out of the public surface, or let it cross as source");
+            }
         }
 
         foreach (var type in types)

@@ -275,6 +275,11 @@ Names and sizes match C# exactly.
 | `char32` | 4 | `char32_t` — one Unicode scalar |
 | `void` | 0 | `void` |
 
+`void` is the absence of a value rather than a value of no size, so the only
+place it can be written is what a function returns (SL0309). There is no
+variable, field, parameter or type argument of it, no `void*` — `byte*` is
+what C's is spelled here — and no array or slice of one (SL0310, SL0451).
+
 The three code unit types are **three encodings, not three widths of one
 type**, and none of them converts to another without a cast:
 
@@ -315,6 +320,12 @@ error[SL0526]: U+D800 is not a Unicode scalar value, so \u cannot name it;
 scalars stop at U+10FFFF and the surrogate range U+D800 to U+DFFF is reserved
 for UTF-16 pairs
 ```
+
+**One scalar means one**, so `''` is not a character (SL0010); `'\0'` is how
+the zero one is written. And `\u` takes exactly four hex digits where `\U`
+takes eight (SL0008) — a short one is a mistake rather than a smaller number,
+since `"\u12"` reading as U+0012 is a value nobody wrote. `\x` is the
+exception and is a byte in one digit or two, as in C.
 
 Against **every other integer they behave as integers**: `char16` and `ushort`
 are the same width and convert freely, arithmetic works, and a `switch` takes
@@ -5069,7 +5080,29 @@ cast: `(byte)x`.
 
 An integer literal converts implicitly to any integer type that can hold its
 value, as in C#: `byte level = 200;` and `nuint size = 64;` need no cast, while
-anything computed still does.
+anything computed still does. A minus in front of one does not take that away:
+`sbyte low = -100;` fits, `-128` fits an `sbyte` where `-129` does not, and
+`byte b = -1;` is refused because nothing unsigned holds it. One that fits
+nothing is refused too, under a code of its own (SL0266), because no cast makes
+300 a `byte` and the value is what is wrong.
+
+Left to itself a literal is the narrowest of `int`, `uint`, `long` and `ulong`
+that holds it, again as in C#. That matters where it meets another operand
+rather than a declaration: `0xFFFF0000` is a `uint`, so `flags & 0xFFFF0000` on
+an `int` widens the whole operation to `long` and the mask means what a C
+header means by it. A literal that fits an `int` is an `int`, so nothing about
+the ordinary case moves.
+
+An integer literal is also exact against a `float` or a `double`:
+`double d = 5000000000;` is five thousand million, not the low thirty-two bits
+of it.
+
+A floating-point literal is a `double` unless it carries the `f` suffix, which
+makes it a `float` -- `float half = 0.5f;` -- parsed as one rather than as a
+rounded double. `float half = 0.5;` is refused, as in C#, with a hint to write
+the suffix; silently rounding a double is what the rule exists to stop. A
+`const float` may be initialized with either spelling, since the constant's
+declared type says what it holds.
 
 A string literal has type `String`; see section 3.
 
@@ -5095,6 +5128,16 @@ error[SL0415]: division by zero
 
 Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
 unchecked, and is defined rather than undefined.
+
+**Nesting stops at 500 levels** (SL0108) — expressions inside expressions,
+blocks inside blocks, types inside types. The limit exists because parsing and
+binding each recurse once per level, and a file deep enough would otherwise end
+the compiler rather than be refused by it: a stack overflow cannot be caught,
+so there is no diagnostic and nothing to say which file did it. It is a bound
+on absurdity rather than a budget: the deepest nesting in this repository, the
+standard library and its tests included, is under twenty, and the usual way to
+meet the limit is generated source. Only the one message is reported, because
+everything the unwind would say after it is a consequence of it.
 
 ## 10. Conditional compilation
 
