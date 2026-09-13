@@ -19,20 +19,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// XML, in the two layers `Standard.Json` has: a document that needs no type,
-// and a mapping onto one that reads a `[Reflect]` type's field tables.
-//
-// **What this reads.** Elements, attributes, text, CDATA, comments, the five
-// predefined entities and numeric character references, and an optional
-// declaration or doctype at the front. That is the shape of a configuration
-// file, a document a program exchanges, and most of what XML is used for now.
-//
-// **What it does not.** Namespaces are not resolved: `<x:name>` is an element
-// whose name is the whole of `x:name`, and `xmlns` is an ordinary attribute. A
-// DTD is skipped rather than applied, so no entity a document declares for
-// itself is expanded and no default attribute appears. Both are refusals to
-// half-implement something: a program that needs them needs all of them, and
-// what is here says so rather than working until it does not.
+/// XML, in the two layers `Standard.Json` has: a document that needs no type,
+/// and a mapping onto one that reads a `[Reflect]` type's field tables.
+///
+/// **What this reads.** Elements, attributes, text, CDATA, comments, the five
+/// predefined entities and numeric character references, and an optional
+/// declaration or doctype at the front. That is the shape of a configuration
+/// file, a document a program exchanges, and most of what XML is used for now.
+///
+/// **What it does not.** Namespaces are not resolved: `<x:name>` is an element
+/// whose name is the whole of `x:name`, and `xmlns` is an ordinary attribute. A
+/// DTD is skipped rather than applied, so no entity a document declares for
+/// itself is expanded and no default attribute appears. Both are refusals to
+/// half-implement something: a program that needs them needs all of them, and
+/// what is here says so rather than working until it does not.
 module Standard.Xml;
 
 import Standard.Collections;

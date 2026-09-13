@@ -19,11 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Directories: making them, removing them, and looking inside.
-//
-// Listing returns full paths rather than bare names, because a bare name is
-// almost never what the next line wants. The order is the platform's and is
-// not sorted; `Sort` is one call away when it matters.
+/// Directories: making them, removing them, and looking inside.
+///
+/// Listing returns full paths rather than bare names, because a bare name is
+/// almost never what the next line wants. The order is the platform's and is
+/// not sorted; `Sort` is one call away when it matters.
 module Standard.Directory;
 
 import Standard.Collections;

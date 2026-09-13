@@ -19,17 +19,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Turning things into other things: bytes into text, text into numbers.
-//
-// Two jobs that .NET puts in one class, and they are here together for the same
-// reason -- they are what a program reaches for at the edge, where a value
-// arrived as characters and has to become something, or has to leave as
-// characters and is not one.
-//
-// Everything that can fail returns a `Result`. There is no `Parse` that stops
-// the program and no `TryParse` with an out parameter, because the language has
-// neither exceptions nor `out`: a function that can fail says so in its return
-// type, and the value is unreadable until the failure has been checked (§2.6).
+/// Turning things into other things: bytes into text, text into numbers.
+///
+/// Two jobs that .NET puts in one class, and they are here together for the same
+/// reason -- they are what a program reaches for at the edge, where a value
+/// arrived as characters and has to become something, or has to leave as
+/// characters and is not one.
+///
+/// Everything that can fail returns a `Result`. There is no `Parse` that stops
+/// the program and no `TryParse` with an out parameter, because the language has
+/// neither exceptions nor `out`: a function that can fail says so in its return
+/// type, and the value is unreadable until the failure has been checked (§2.6).
 module Standard.Convert;
 
 import Standard.Text;

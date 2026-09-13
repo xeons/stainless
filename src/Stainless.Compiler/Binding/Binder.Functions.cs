@@ -41,6 +41,7 @@ public sealed partial class Binder
             ModuleName = module.Name,
             ReturnType = returnType,
             Linkage = declaration.Linkage,
+            Documentation = declaration.Documentation,
             Kind = containingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = containingType,
             // Every interface member is part of the contract, so it is public

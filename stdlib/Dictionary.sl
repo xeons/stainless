@@ -19,16 +19,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// The hash-table collections.
-//
-// A module may span files, so these join Standard.Collections rather than
-// forming a module of their own. Both are open addressing with linear probing:
-// one array per column instead of an array of entries, because an entry would
-// have to be a class and that is an allocation per key.
-//
-// Deletion shifts the following cluster back rather than leaving a tombstone,
-// so a table that is added to and removed from for a long time does not slowly
-// fill up with markers that only a rehash can clear.
+/// The hash-table collections.
+///
+/// A module may span files, so these join Standard.Collections rather than
+/// forming a module of their own. Both are open addressing with linear probing:
+/// one array per column instead of an array of entries, because an entry would
+/// have to be a class and that is an allocation per key.
+///
+/// Deletion shifts the following cluster back rather than leaving a tombstone,
+/// so a table that is added to and removed from for a long time does not slowly
+/// fill up with markers that only a rehash can clear.
 module Standard.Collections;
 
 /// Aborts with a message. Used where a container is asked for something it does

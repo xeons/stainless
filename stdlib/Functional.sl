@@ -19,25 +19,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Doing something to every element.
-//
-// Every one of these takes a `closure` (§2.14.1), which is a method and the
-// object it belongs to. That means both of these work, and mean the same
-// thing:
-//
-//     Filter(names, (n) => n.ByteLength() > 3u);   // a lambda that captures
-//     ForEach(names, report.Add);                  // a method bound to an object
-//
-// The second is what the older shape could not do. These were one-method
-// interfaces until closures could be generic, and an interface needs an object
-// that implements it -- so passing an existing method meant writing a class
-// whose only reason to exist was to carry it.
-//
-// **Eager, not lazy.** Every one of these walks its input to the end and
-// returns a `List<T>`, so `Filter(...)` then `Map(...)` builds two lists. Lazy
-// chaining wants generators -- a `yield` that suspends a function mid-body --
-// and Stainless has none. Saying so is better than implying otherwise with a
-// name borrowed from a language that does.
+/// Doing something to every element.
+///
+/// Every one of these takes a `closure` (§2.14.1), which is a method and the
+/// object it belongs to. That means both of these work, and mean the same
+/// thing:
+///
+///     Filter(names, (n) => n.ByteLength() > 3u);   // a lambda that captures
+///     ForEach(names, report.Add);                  // a method bound to an object
+///
+/// The second is what the older shape could not do. These were one-method
+/// interfaces until closures could be generic, and an interface needs an object
+/// that implements it -- so passing an existing method meant writing a class
+/// whose only reason to exist was to carry it.
+///
+/// **Eager, not lazy.** Every one of these walks its input to the end and
+/// returns a `List<T>`, so `Filter(...)` then `Map(...)` builds two lists. Lazy
+/// chaining wants generators -- a `yield` that suspends a function mid-body --
+/// and Stainless has none. Saying so is better than implying otherwise with a
+/// name borrowed from a language that does.
 module Standard.Collections;
 
 // The shapes a lambda takes here -- `Func`, `Predicate`, `Action`, `Fold` and

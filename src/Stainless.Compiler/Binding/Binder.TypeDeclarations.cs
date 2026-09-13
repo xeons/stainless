@@ -82,6 +82,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
 
                     // `com interface` is its own symbol rather than a flag on
@@ -94,6 +95,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
                     TypeDeclKind.Interface => new InterfaceTypeSymbol
                     {
@@ -101,6 +103,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
                     TypeDeclKind.Attribute => new AttributeTypeSymbol
                     {
@@ -108,6 +111,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
                     TypeDeclKind.Variant => new VariantTypeSymbol
                     {
@@ -115,6 +119,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
                     TypeDeclKind.Union => new UnionTypeSymbol
                     {
@@ -122,6 +127,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
                     _ => new StructTypeSymbol
                     {
@@ -129,6 +135,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = isPublic,
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     },
                 };
 
@@ -195,6 +202,7 @@ public sealed partial class Binder
                         ModuleName = module.Name,
                         IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
                         Span = declaration.Span,
+                        Documentation = declaration.Documentation,
                     };
 
                 ClaimThreadsafe(delegateType, declaration.Modifiers, declaration.Span);
@@ -219,6 +227,7 @@ public sealed partial class Binder
                     ModuleName = module.Name,
                     IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
                     Span = declaration.Span,
+                    Documentation = declaration.Documentation,
                 };
 
                 ClaimThreadsafe(enumType, declaration.Modifiers, declaration.Span);

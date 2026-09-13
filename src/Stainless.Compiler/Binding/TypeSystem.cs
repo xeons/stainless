@@ -256,6 +256,13 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public int Index { get; } = index;
     public bool IsPublic { get; init; }
 
+    /// <summary>
+    /// The <c>///</c> block written above the declaration, or null. Carried so
+    /// that a documentation writer has the prose beside the resolved signature
+    /// rather than having to go back to the source for it.
+    /// </summary>
+    public string? Documentation { get; init; }
+
     /// <summary>Visible to this type and anything deriving from it.</summary>
     public bool IsProtected { get; init; }
 
@@ -302,6 +309,13 @@ public abstract class NamedTypeSymbol : TypeSymbol
     public required string SimpleName { get; init; }
     public required string ModuleName { get; init; }
     public bool IsPublic { get; init; }
+
+    /// <summary>
+    /// The <c>///</c> block written above the declaration, or null. Carried so
+    /// that a documentation writer has the prose beside the resolved signature
+    /// rather than having to go back to the source for it.
+    /// </summary>
+    public string? Documentation { get; init; }
 
     /// <summary>
     /// Where the declaration was written, or null for one this compilation did
@@ -656,6 +670,9 @@ public sealed class EnumMemberSymbol(string name, EnumTypeSymbol declaringEnum, 
 
     /// <summary>The constant, stored as raw bits of the underlying type.</summary>
     public ulong Value { get; } = value;
+
+    /// <summary>The <c>///</c> block written above this case, or null.</summary>
+    public string? Documentation { get; init; }
 
     public override string ToString() => $"{DeclaringEnum.Name}.{Name}";
 }

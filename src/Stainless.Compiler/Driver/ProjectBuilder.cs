@@ -40,6 +40,15 @@ public sealed record BuildOverrides
     public bool? SharedRuntime { get; init; }
     public string? HeaderPath { get; init; }
 
+    /// <summary>Where to write reference documentation, or null for none.</summary>
+    public string? DocumentationPath { get; init; }
+
+    /// <summary>Document the standard library rather than the project's own modules.</summary>
+    public bool DocumentStandardLibrary { get; init; }
+
+    /// <summary>Stop once the documentation is written, emitting nothing.</summary>
+    public bool DocumentationOnly { get; init; }
+
     /// <summary>Extra paths named on the command line alongside the project.</summary>
     public IReadOnlyList<string> ExtraPaths { get; init; } = [];
 }
@@ -122,12 +131,21 @@ public sealed class ProjectBuilder(
 
         if (CheckSourceDigests() is { } tampered) return ProjectBuildResult.Failed(tampered);
 
-        foreach (var package in resolution.Order)
-        {
-            if (package.Link != DependencyLink.Shared) continue;
+        // A documentation run reads the root's own modules and emits nothing, so
+        // there is no boundary for a dependency to be linked across. Building
+        // them would cost a clang invocation each to produce libraries this run
+        // will not open -- and would refuse on a machine with no toolchain,
+        // which is exactly the machine that wants to generate documentation.
+        //
+        // A *source* dependency still contributes, because its files are
+        // compiled in: `Collect` gathers those either way.
+        if (!overrides.DocumentationOnly)
+            foreach (var package in resolution.Order)
+            {
+                if (package.Link != DependencyLink.Shared) continue;
 
-            if (BuildDependency(package, overrides) is { } failure) return failure;
-        }
+                if (BuildDependency(package, overrides) is { } failure) return failure;
+            }
 
         var options = OptionsFor(root, overrides, output: overrides.OutputPath ?? root.OutputPath());
         if (options is null) return ProjectBuildResult.Failed(_error!);
@@ -535,6 +553,9 @@ public sealed class ProjectBuilder(
             Debug = overrides.Debug ?? root.Debug,
             KeepIntermediates = overrides.KeepIntermediates,
             EmitIrOnly = overrides.EmitIrOnly && isRoot,
+            DocumentationPath = isRoot ? overrides.DocumentationPath : null,
+            DocumentStandardLibrary = overrides.DocumentStandardLibrary,
+            DocumentationOnly = overrides.DocumentationOnly && isRoot,
             Defines = [.. project.Defines, .. overrides.Defines],
             CppAbi = overrides.CppAbi ?? (root.Abi is null ? null : ProjectFile.ParseAbi(root.Abi)),
             SharedRuntime = overrides.SharedRuntime ?? (root.Runtime switch

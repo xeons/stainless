@@ -25,5 +25,18 @@ namespace Stainless.Syntax;
 /// </summary>
 public sealed record Token(TokenKind Kind, SourceSpan Span, string Text, object? Value = null)
 {
+    /// <summary>
+    /// The run of <c>///</c> lines immediately above this token, joined with
+    /// newlines and with the marker and one following space removed. Null when
+    /// there was none.
+    ///
+    /// The lexer attaches it to the next token rather than producing a token of
+    /// its own, so a documentation block never has to be skipped by anything
+    /// that reads the stream. Only the token that follows the run carries it,
+    /// which is what makes "the block belongs to this declaration" a lexical
+    /// fact rather than a search back through the source.
+    /// </summary>
+    public string? Documentation { get; init; }
+
     public override string ToString() => $"{Kind} '{Text}'";
 }

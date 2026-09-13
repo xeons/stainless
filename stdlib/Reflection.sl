@@ -19,15 +19,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Reading the metadata the compiler laid down.
-//
-// There is no runtime machinery behind this: a reflected type's fields and
-// attributes are `const` tables in the binary, and everything below is a typed
-// view over them. That is why reflection works in a natively compiled language
-// at all -- it is a layout agreement, not a virtual machine.
-//
-// A type carries metadata only when it is marked [Reflect]. Nothing else does,
-// so nothing else pays for it.
+/// Reading the metadata the compiler laid down.
+///
+/// There is no runtime machinery behind this: a reflected type's fields and
+/// attributes are `const` tables in the binary, and everything below is a typed
+/// view over them. That is why reflection works in a natively compiled language
+/// at all -- it is a layout agreement, not a virtual machine.
+///
+/// A type carries metadata only when it is marked [Reflect]. Nothing else does,
+/// so nothing else pays for it.
 module Standard.Reflection;
 
 /// Marks a class or struct to carry field metadata in the binary.

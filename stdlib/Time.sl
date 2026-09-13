@@ -19,19 +19,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Time, of the two kinds that must not be confused.
-//
-// An `Instant` is a point on the wall clock: a date and a time of day. It can
-// jump, because a user sets the clock, NTP corrects it, or a laptop wakes up.
-// Never subtract two of them to find out how long something took.
-//
-// A `Duration` is a length of time, and `Clock` reads a monotonic counter that
-// only ever goes forward. That pair is what a measurement wants.
-//
-// Both are structs over a single `long` of nanoseconds, so they cost nothing,
-// travel in a register, and compare and subtract as the numbers they are.
-// Sixty-four bits of nanoseconds reaches 292 years either side of 1970, which
-// is not the reason anything here will go wrong.
+/// Time, of the two kinds that must not be confused.
+///
+/// An `Instant` is a point on the wall clock: a date and a time of day. It can
+/// jump, because a user sets the clock, NTP corrects it, or a laptop wakes up.
+/// Never subtract two of them to find out how long something took.
+///
+/// A `Duration` is a length of time, and `Clock` reads a monotonic counter that
+/// only ever goes forward. That pair is what a measurement wants.
+///
+/// Both are structs over a single `long` of nanoseconds, so they cost nothing,
+/// travel in a register, and compare and subtract as the numbers they are.
+/// Sixty-four bits of nanoseconds reaches 292 years either side of 1970, which
+/// is not the reason anything here will go wrong.
 module Standard.Time;
 
 extern "C" {

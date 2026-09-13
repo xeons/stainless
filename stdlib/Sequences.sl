@@ -19,13 +19,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Queues, stacks, linked lists and sorted maps.
-//
-// All four are backed by arrays, which is not the usual choice for the last
-// two. It is the right one here: ARC cannot collect a cycle, so a doubly linked
-// list of objects would leak unless every back-link were weak, and a weak
-// reference is not usable without a way to prove it is still there. Links as
-// indices into a pool have neither problem, and are faster besides.
+/// Queues, stacks, linked lists and sorted maps.
+///
+/// All four are backed by arrays, which is not the usual choice for the last
+/// two. It is the right one here: ARC cannot collect a cycle, so a doubly linked
+/// list of objects would leak unless every back-link were weak, and a weak
+/// reference is not usable without a way to prove it is still there. Links as
+/// indices into a pool have neither problem, and are faster besides.
 module Standard.Collections;
 
 // ------------------------------------------------------------------- queue

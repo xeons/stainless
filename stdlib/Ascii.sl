@@ -19,18 +19,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Asking what a byte is, when the answer is allowed to be an ASCII one.
-//
-// Every function here works on one byte and says nothing about Unicode. That
-// is not a limitation being apologised for -- it is the whole point. A byte
-// above 127 in UTF-8 is part of a character rather than a character, so a
-// question like "is this a digit" has exactly one honest answer at the byte
-// level, and it is this one. Anything that needs to ask about a character
-// should decode first, with `String.CodePointAt`.
-//
-// This is a module of its own rather than more of `Standard.Text` because
-// `Standard.Text` is imported into every module whether a program asks or not,
-// and `IsDigit` is far too good a name to take from every program in the world.
+/// Asking what a byte is, when the answer is allowed to be an ASCII one.
+///
+/// Every function here works on one byte and says nothing about Unicode. That
+/// is not a limitation being apologised for -- it is the whole point. A byte
+/// above 127 in UTF-8 is part of a character rather than a character, so a
+/// question like "is this a digit" has exactly one honest answer at the byte
+/// level, and it is this one. Anything that needs to ask about a character
+/// should decode first, with `String.CodePointAt`.
+///
+/// This is a module of its own rather than more of `Standard.Text` because
+/// `Standard.Text` is imported into every module whether a program asks or not,
+/// and `IsDigit` is far too good a name to take from every program in the world.
 module Standard.Ascii;
 
 /// True for space, tab, newline, vertical tab, form feed and carriage return.

@@ -58,6 +58,20 @@ public sealed class Lexer(
     private bool _sawToken;
 
     /// <summary>
+    /// The <c>///</c> lines collected since the last token, one per entry with
+    /// the marker stripped. Handed to the next token and then cleared.
+    /// </summary>
+    private readonly List<string> _documentation = [];
+
+    /// <summary>
+    /// Line breaks seen since the last <c>///</c> line. A run is contiguous, so
+    /// two of these -- a blank line -- ends the run and the block belongs to
+    /// nothing. One is the ordinary case: the newline that ended the last
+    /// documentation line.
+    /// </summary>
+    private int _breaksSinceDoc;
+
+    /// <summary>
     /// Libraries this file asked to link, from <c>#pragma comment(lib, "...")</c>.
     /// They reach the driver through the compilation unit, and from there the
     /// linker, exactly as a <c>-l</c> on the command line would.
@@ -90,6 +104,17 @@ public sealed class Lexer(
     private Token Next()
     {
         SkipTrivia();
+
+        // Taken before the token is lexed and applied after, so that every path
+        // out of Lex carries it without each one having to remember to.
+        string? documentation = TakeDocumentation();
+        var token = Lex();
+
+        return documentation is null ? token : token with { Documentation = documentation };
+    }
+
+    private Token Lex()
+    {
         int start = _pos;
 
         if (_pos >= _text.Length)
@@ -104,6 +129,19 @@ public sealed class Lexer(
             return LexInterpolatedString(start);
         if (c == '\'') return LexChar(start);
         return LexPunctuation(start);
+    }
+
+    /// <summary>
+    /// The documentation collected since the last token, or null. Clears it, so
+    /// a block reaches exactly one token.
+    /// </summary>
+    private string? TakeDocumentation()
+    {
+        if (_documentation.Count == 0) return null;
+
+        string text = string.Join("\n", _documentation);
+        _documentation.Clear();
+        return text;
     }
 
     private void SkipTrivia()
@@ -127,16 +165,47 @@ public sealed class Lexer(
             }
 
             char c = Current;
-            if (char.IsWhiteSpace(c)) { _pos++; continue; }
+            if (char.IsWhiteSpace(c))
+            {
+                // A blank line between a block and what follows breaks the run,
+                // so the block is documentation of nothing and is dropped.
+                if (c == '\n' && ++_breaksSinceDoc > 1) _documentation.Clear();
+                _pos++;
+                continue;
+            }
 
             if (c == '/' && Peek(1) == '/')
             {
+                // Three slashes and not four: '////' is a rule of slashes
+                // somebody drew, and reading it as prose would put a line of
+                // punctuation in the middle of a description.
+                bool isDoc = Peek(2) == '/' && Peek(3) != '/';
+
+                int from = _pos + (isDoc ? 3 : 2);
                 while (_pos < _text.Length && Current != '\n') _pos++;
+
+                if (isDoc)
+                {
+                    // One leading space is the marker's, not the text's, so
+                    // '/// x' is "x" and '///     x' keeps its indent.
+                    string line = _text[from.._pos].TrimEnd('\r');
+                    if (line.StartsWith(' ')) line = line[1..];
+
+                    _documentation.Add(line);
+                    _breaksSinceDoc = 0;
+                }
+                else
+                {
+                    // An ordinary comment between a block and a declaration
+                    // separates the two, so the block documents nothing.
+                    _documentation.Clear();
+                }
                 continue;
             }
 
             if (c == '/' && Peek(1) == '*')
             {
+                _documentation.Clear();
                 int start = _pos;
                 _pos += 2;
                 int depth = 1;                      // block comments nest, unlike C

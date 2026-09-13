@@ -19,23 +19,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// JSON, in two layers.
-//
-// The lower one is a document: `Json.Parse` gives a `JsonValue`, a variant that
-// is exactly one of the six things JSON has, and `Write` puts one back. Nothing
-// about it needs a type, so it handles a document whose shape a program learns
-// at run time -- which is most of them.
-//
-// The upper one maps a document onto a type, through the field tables a
-// `[Reflect]` type carries (§6). `Serialize` reads an object's fields and
-// `Populate` writes them.
-//
-// **Why the mapping fills an object rather than making one.** A constructor is
-// what establishes a type's invariants, and a deserializer that allocated
-// zeroed memory would produce an object whose non-nullable fields were null --
-// a hole in the type system rather than a value. So `Populate` takes an
-// instance the program made, and `Deserialize<T>` calls `new T()` first, which
-// is what `where T : new()` is there to guarantee.
+/// JSON, in two layers.
+///
+/// The lower one is a document: `Json.Parse` gives a `JsonValue`, a variant that
+/// is exactly one of the six things JSON has, and `Write` puts one back. Nothing
+/// about it needs a type, so it handles a document whose shape a program learns
+/// at run time -- which is most of them.
+///
+/// The upper one maps a document onto a type, through the field tables a
+/// `[Reflect]` type carries (§6). `Serialize` reads an object's fields and
+/// `Populate` writes them.
+///
+/// **Why the mapping fills an object rather than making one.** A constructor is
+/// what establishes a type's invariants, and a deserializer that allocated
+/// zeroed memory would produce an object whose non-nullable fields were null --
+/// a hole in the type system rather than a value. So `Populate` takes an
+/// instance the program made, and `Deserialize<T>` calls `new T()` first, which
+/// is what `where T : new()` is there to guarantee.
 module Standard.Json;
 
 import Standard.Collections;
@@ -157,11 +157,25 @@ public class JsonObject {
 /// a kind field, so reading the wrong one is a compile error rather than a
 /// null: `case Text t:` is the only way to reach `t.Value`.
 public variant JsonValue {
+    /// The literal `null`. Also what `JsonObject.Find` answers for a name the
+    /// document does not mention, since a reader with a default cannot tell
+    /// the two apart and neither should have to.
     Null;
+
+    /// `true` or `false`.
     Bool(bool Value);
+
+    /// A number. JSON has only the one numeric type and it is a double, so an
+    /// integer past 2^53 has already lost precision by the time it is here.
     Number(double Value);
+
+    /// A string, decoded: the escapes are gone and the text is what they meant.
     Text(String Value);
+
+    /// An array, in document order.
     Array(List<JsonValue> Items);
+
+    /// An object, in the order its members were written.
     Object(JsonObject Members);
 }
 

@@ -1,0 +1,2368 @@
+# Standard.Collections
+
+<sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
+
+The Stainless standard collections.
+
+Unlike Standard.Text, nothing here needs runtime support: it is ordinary
+Stainless, compiled alongside your program. Generic declarations cost nothing
+until they are instantiated, so importing this module and using none of it
+emits no code at all.
+
+Interfaces are named with a leading I, as in C#.
+
+## Contents
+
+**Types** &nbsp; [Dictionary&lt;K, V&gt;](#dictionaryk-v) &middot; [DictionaryEnumerator&lt;K, V&gt;](#dictionaryenumeratork-v) &middot; [HashSet&lt;T&gt;](#hashsett) &middot; [HashSetCursor&lt;T&gt;](#hashsetcursort) &middot; [IComparable&lt;T&gt;](#icomparablet) &middot; [IEnumerable&lt;T&gt;](#ienumerablet) &middot; [IEnumerator&lt;T&gt;](#ienumeratort) &middot; [IEquatable&lt;T&gt;](#iequatablet) &middot; [IHashable](#ihashable) &middot; [IList&lt;T&gt;](#ilistt) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt) &middot; [LinkedList&lt;T&gt;](#linkedlistt) &middot; [LinkedListCursor&lt;T&gt;](#linkedlistcursort) &middot; [List&lt;T&gt;](#listt) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort) &middot; [OrderedDictionary&lt;K, V&gt;](#ordereddictionaryk-v) &middot; [Pair&lt;K, V&gt;](#pairk-v) &middot; [Queue&lt;T&gt;](#queuet) &middot; [QueueCursor&lt;T&gt;](#queuecursort) &middot; [SortedList&lt;K, V&gt;](#sortedlistk-v) &middot; [SortedListCursor&lt;K, V&gt;](#sortedlistcursork-v) &middot; [Stack&lt;T&gt;](#stackt) &middot; [StackCursor&lt;T&gt;](#stackcursort)
+
+**Functions** &nbsp; [Aggregate](#aggregate) &middot; [Aggregate](#aggregate) &middot; [All](#all) &middot; [All](#all) &middot; [Any](#any) &middot; [Any](#any) &middot; [BinarySearch](#binarysearch) &middot; [CountWhere](#countwhere) &middot; [CountWhere](#countwhere) &middot; [Distinct](#distinct) &middot; [Distinct](#distinct) &middot; [Filter](#filter) &middot; [Filter](#filter) &middot; [Find](#find) &middot; [FirstOr](#firstor) &middot; [FirstOr](#firstor) &middot; [ForEach](#foreach) &middot; [ForEach](#foreach) &middot; [IndexOf](#indexof) &middot; [IndexWhere](#indexwhere) &middot; [Largest](#largest) &middot; [LowerBound](#lowerbound) &middot; [Map](#map) &middot; [Map](#map) &middot; [OrderBy](#orderby) &middot; [OrderBy](#orderby) &middot; [Reduce](#reduce) &middot; [Reduce](#reduce) &middot; [RemoveFirst](#removefirst) &middot; [RemoveWhere](#removewhere) &middot; [Reverse](#reverse) &middot; [Select](#select) &middot; [Select](#select) &middot; [Skip](#skip) &middot; [Skip](#skip) &middot; [Smallest](#smallest) &middot; [Sort](#sort) &middot; [Sort](#sort) &middot; [Sort](#sort) &middot; [Sort](#sort) &middot; [Take](#take) &middot; [Take](#take) &middot; [ToArray](#toarray) &middot; [ToArray](#toarray) &middot; [ToList](#tolist) &middot; [ToList](#tolist) &middot; [Where](#where) &middot; [Where](#where)
+
+## Types
+
+### Dictionary&lt;K, V&gt; *class*
+
+```
+class Dictionary<K, V> : IEnumerable<Pair<K, V>>
+    where K : IEquatable<K>, IHashable
+```
+
+A map from keys to values.
+
+`K` has to be equatable and hashable. A primitive, an enum and a String all
+are without saying so, so `Dictionary<String, int>` needs nothing extra; a
+class says so by implementing `IEquatable<T>` and `IHashable`.
+
+<sub>[stdlib/Dictionary.sl:63](../../stdlib/Dictionary.sl#L63)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many entries there are. O(1) -- it is a counter, not a scan.
+
+<sub>[stdlib/Dictionary.sl:81](../../stdlib/Dictionary.sl#L81)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when there are no entries.
+
+<sub>[stdlib/Dictionary.sl:84](../../stdlib/Dictionary.sl#L84)</sub>
+
+#### Capacity *method*
+
+```
+nuint Capacity()
+```
+
+The number of slots the table has. Always a power of two, so the hash is
+reduced with a mask rather than a division.
+
+<sub>[stdlib/Dictionary.sl:88](../../stdlib/Dictionary.sl#L88)</sub>
+
+#### ContainsKey *method*
+
+```
+bool ContainsKey(K key)
+```
+
+Whether `key` is there.
+
+One probe, but reach for `Find` when the value is what is wanted:
+`ContainsKey` and then `Get` probes twice for one answer.
+
+<sub>[stdlib/Dictionary.sl:107](../../stdlib/Dictionary.sl#L107)</sub>
+
+#### Find *method*
+
+```
+Optional<V> Find(K key)
+```
+
+The value for `key`, or `None` when there is none.
+
+**This is the one to reach for.** A key is data -- it arrives from a
+file, a socket or a user -- so a key that is not there is an ordinary
+outcome and not a mistake in the program, which is the line §2.6 draws
+between a value to return and a reason to stop. The answer is read the
+way any other variant is:
+
+    if (settings.Find(name) is Some value) { Use(value); }
+
+One probe, where `ContainsKey` followed by `Get` is two, and no sentinel
+to collide with a real value the way `GetOr` has.
+
+<sub>[stdlib/Dictionary.sl:121](../../stdlib/Dictionary.sl#L121)</sub>
+
+#### Get *method*
+
+```
+V Get(K key)
+```
+
+The value for `key`, aborting when there is none.
+
+The asserting form, and it asserts: use it only where the key is there
+by construction -- one set two lines above, or a name this code chose
+itself. `Get` means the same thing here as on `Optional`, which is that
+the caller is claiming the value exists and would rather stop than
+carry on if it does not. For a key that came from anywhere else, `Find`
+is the question and this is not.
+
+<sub>[stdlib/Dictionary.sl:135](../../stdlib/Dictionary.sl#L135)</sub>
+
+#### GetOr *method*
+
+```
+V GetOr(K key, V fallback)
+```
+
+The value for `key`, or `fallback` when there is none.
+
+<sub>[stdlib/Dictionary.sl:142](../../stdlib/Dictionary.sl#L142)</sub>
+
+#### this[] *indexer*
+
+```
+Optional<V> this[K key] { get; set; }
+```
+
+`map[key]`, which answers `Optional<V>` and never stops the program.
+
+Swift's design, and it is the right one for the same reason: a key is
+data rather than a position, so a lookup that misses is an answer. An
+indexer returning `V` would have to abort on a miss, and `map[key]`
+carries no verb to warn anyone that it might -- which is exactly the
+shape a reader trusts without thinking.
+
+    if (settings["timeout"] is Some found) { Use(found.Value); }
+    int port = settings["port"].ValueOr(8080);
+
+A getter and a setter share one type (§7.5), so the setter takes an
+`Optional<V>` too -- and that turns out to say something rather than
+being a cost. A value promotes to the optional holding it, so an
+ordinary write reads as one; and `None` is the absence of a value,
+which is what removing a key means.
+
+    settings["retries"] = 3;            // set
+    settings["retries"] = None;         // remove
+
+What this cannot do is `map[key] += 1`, because there is no value to
+add to when the key is absent. That is not a limitation so much as the
+question being asked out loud: `map[key] = map[key].ValueOr(0) + 1`
+says what should happen, and Swift's `dict[key, default: 0] += 1`
+exists for the same reason.
+
+<sub>[stdlib/Dictionary.sl:173](../../stdlib/Dictionary.sl#L173)</sub>
+
+#### Set *method*
+
+```
+void Set(K key, V value)
+```
+
+Adds the key or replaces what it maps to.
+
+<sub>[stdlib/Dictionary.sl:182](../../stdlib/Dictionary.sl#L182)</sub>
+
+#### Add *method*
+
+```
+bool Add(K key, V value)
+```
+
+Adds the key, or reports that it was already there and changes nothing.
+
+<sub>[stdlib/Dictionary.sl:202](../../stdlib/Dictionary.sl#L202)</sub>
+
+#### Remove *method*
+
+```
+bool Remove(K key)
+```
+
+Removes the key, reporting whether it was there.
+
+<sub>[stdlib/Dictionary.sl:209](../../stdlib/Dictionary.sl#L209)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every entry. The arrays are replaced rather than blanked, so
+anything they held is released now.
+
+<sub>[stdlib/Dictionary.sl:245](../../stdlib/Dictionary.sl#L245)</sub>
+
+#### Keys *method*
+
+```
+List<K> Keys()
+```
+
+Every key, in the table's own order.
+
+A fresh list, so changing it changes nothing here, and building it is a
+scan of every slot rather than of every entry -- O(capacity), not
+O(count). Pairs with `Values` position for position as long as nothing
+is written in between.
+
+<sub>[stdlib/Dictionary.sl:258](../../stdlib/Dictionary.sl#L258)</sub>
+
+#### Values *method*
+
+```
+List<V> Values()
+```
+
+Every value, in the same order `Keys` gives.
+
+Values are not distinct: a value stored under two keys appears twice.
+
+<sub>[stdlib/Dictionary.sl:269](../../stdlib/Dictionary.sl#L269)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<Pair<K, V>> GetEnumerator()
+```
+
+A cursor over the entries, for `foreach`.
+
+The order is the table's and is not insertion order; it changes when
+the table grows. `Standard.Collections.OrderedDictionary` is the one
+that keeps an order. Adding or removing during a walk invalidates the
+cursor.
+
+<sub>[stdlib/Dictionary.sl:283](../../stdlib/Dictionary.sl#L283)</sub>
+
+### DictionaryEnumerator&lt;K, V&gt; *class*
+
+```
+class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
+    where K : IEquatable<K>, IHashable
+```
+
+Walks a dictionary's slots, skipping the empty ones.
+
+The order is the table's own and says nothing about insertion order; adding
+or removing during a walk invalidates it, as it does in C#.
+
+<sub>[stdlib/Dictionary.sl:320](../../stdlib/Dictionary.sl#L320)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances to the next occupied slot, answering false at the end. Each
+call skips however many empty slots lie between, so a walk costs
+O(capacity) overall rather than O(count).
+
+<sub>[stdlib/Dictionary.sl:339](../../stdlib/Dictionary.sl#L339)</sub>
+
+#### Current *method*
+
+```
+Pair<K, V> Current()
+```
+
+The entry the last `MoveNext` landed on, as a freshly built `Pair`.
+
+<sub>[stdlib/Dictionary.sl:349](../../stdlib/Dictionary.sl#L349)</sub>
+
+### HashSet&lt;T&gt; *class*
+
+```
+class HashSet<T> : IEnumerable<T>
+    where T : IEquatable<T>, IHashable
+```
+
+A set of distinct values, with membership in constant time.
+
+The same table as `Dictionary`, without the values.
+
+<sub>[stdlib/Dictionary.sl:357](../../stdlib/Dictionary.sl#L357)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many distinct items there are. O(1).
+
+<sub>[stdlib/Dictionary.sl:372](../../stdlib/Dictionary.sl#L372)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when there is nothing in it.
+
+<sub>[stdlib/Dictionary.sl:375](../../stdlib/Dictionary.sl#L375)</sub>
+
+#### Capacity *method*
+
+```
+nuint Capacity()
+```
+
+The number of slots the table has. Always a power of two, so the hash
+is reduced with a mask rather than a division.
+
+<sub>[stdlib/Dictionary.sl:379](../../stdlib/Dictionary.sl#L379)</sub>
+
+#### Contains *method*
+
+```
+bool Contains(T item)
+```
+
+Whether `item` is in the set. One probe, and the question the whole
+collection exists to answer.
+
+<sub>[stdlib/Dictionary.sl:394](../../stdlib/Dictionary.sl#L394)</sub>
+
+#### Add *method*
+
+```
+bool Add(T item)
+```
+
+Adds the item, reporting whether it was new.
+
+<sub>[stdlib/Dictionary.sl:397](../../stdlib/Dictionary.sl#L397)</sub>
+
+#### Remove *method*
+
+```
+bool Remove(T item)
+```
+
+Removes the item, reporting whether it was there.
+
+<sub>[stdlib/Dictionary.sl:413](../../stdlib/Dictionary.sl#L413)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every item. The arrays are replaced rather than blanked, so
+anything they held is released now.
+
+<sub>[stdlib/Dictionary.sl:440](../../stdlib/Dictionary.sl#L440)</sub>
+
+#### UnionWith *method*
+
+```
+void UnionWith(IReadOnlyList<T> other)
+```
+
+Adds everything in `other` that is not here already.
+
+<sub>[stdlib/Dictionary.sl:447](../../stdlib/Dictionary.sl#L447)</sub>
+
+#### ExceptWith *method*
+
+```
+void ExceptWith(IReadOnlyList<T> other)
+```
+
+Removes everything in `other`.
+
+<sub>[stdlib/Dictionary.sl:452](../../stdlib/Dictionary.sl#L452)</sub>
+
+#### IntersectWith *method*
+
+```
+void IntersectWith(HashSet<T> other)
+```
+
+Keeps only what is also in `other`.
+
+<sub>[stdlib/Dictionary.sl:457](../../stdlib/Dictionary.sl#L457)</sub>
+
+#### ToList *method*
+
+```
+List<T> ToList()
+```
+
+Every item, in the table's own order -- which is not insertion order
+and changes when the table grows.
+
+A fresh list, and building it scans every slot: O(capacity), not
+O(count). `foreach` walks the set without building one.
+
+<sub>[stdlib/Dictionary.sl:470](../../stdlib/Dictionary.sl#L470)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<T> GetEnumerator()
+```
+
+A cursor over the items, for `foreach`. Allocates nothing beyond the
+cursor itself, unlike `ToList`. Adding or removing during a walk
+invalidates it.
+
+<sub>[stdlib/Dictionary.sl:487](../../stdlib/Dictionary.sl#L487)</sub>
+
+### HashSetCursor&lt;T&gt; *class*
+
+```
+class HashSetCursor<T> : IEnumerator<T>
+    where T : IEquatable<T>, IHashable
+```
+
+Walks a set's table, skipping the empty slots.
+
+The same shape as `DictionaryEnumerator`, and for the same reason: the
+materialising version built a whole `List<T>` before the first `MoveNext`,
+so iterating a set allocated as much again as the set held.
+
+<sub>[stdlib/Dictionary.sl:513](../../stdlib/Dictionary.sl#L513)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances to the next occupied slot, answering false at the end.
+
+<sub>[stdlib/Dictionary.sl:527](../../stdlib/Dictionary.sl#L527)</sub>
+
+#### Current *method*
+
+```
+T Current()
+```
+
+The item the last `MoveNext` landed on.
+
+<sub>[stdlib/Dictionary.sl:537](../../stdlib/Dictionary.sl#L537)</sub>
+
+### IComparable&lt;T&gt; *interface*
+
+```
+interface IComparable<T>
+```
+
+Returns a negative number, zero, or a positive number when this value orders
+before, with, or after `other`.
+
+<sub>[stdlib/Collections.sl:53](../../stdlib/Collections.sl#L53)</sub>
+
+#### CompareTo *method*
+
+```
+int CompareTo(T other)
+```
+
+Negative when this orders before `other`, zero when they order
+together, positive when after. The sign is all that is read -- the
+magnitude means nothing, so returning a subtraction is fine as long as
+it cannot overflow.
+
+<sub>[stdlib/Collections.sl:58](../../stdlib/Collections.sl#L58)</sub>
+
+### IEnumerable&lt;T&gt; *interface*
+
+```
+interface IEnumerable<T>
+```
+
+Something that can be walked from the start, once per enumerator.
+
+`foreach` does not need this interface -- it finds `GetEnumerator` by name
+-- so implementing it is about being passable as a sequence, not about
+being iterable.
+
+<sub>[stdlib/Collections.sl:109](../../stdlib/Collections.sl#L109)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<T> GetEnumerator()
+```
+
+A fresh cursor positioned before the first item. Each call gives an
+independent one, so a sequence can be walked twice; what is not
+promised is that the two walks see the same items, since a collection
+changed in between will say something different.
+
+<sub>[stdlib/Collections.sl:114](../../stdlib/Collections.sl#L114)</sub>
+
+### IEnumerator&lt;T&gt; *interface*
+
+```
+interface IEnumerator<T>
+```
+
+A cursor over a sequence. `MoveNext` advances and reports whether there was
+anything to advance to; `Current` returns what it landed on.
+
+`foreach` does not require this interface -- it looks for the methods by
+name, so any type with a `GetEnumerator()` can be iterated. Naming the shape
+is still worth doing, because it lets a sequence be passed around.
+
+<sub>[stdlib/Collections.sl:92](../../stdlib/Collections.sl#L92)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances to the next item and reports whether there was one. Must be
+called before the first `Current`: a fresh enumerator sits before the
+start rather than on the first item.
+
+<sub>[stdlib/Collections.sl:96](../../stdlib/Collections.sl#L96)</sub>
+
+#### Current *method*
+
+```
+T Current()
+```
+
+What the last `MoveNext` landed on. Calling this before the first
+`MoveNext`, or after one that answered false, is a mistake the
+enumerator is not required to catch.
+
+<sub>[stdlib/Collections.sl:101](../../stdlib/Collections.sl#L101)</sub>
+
+### IEquatable&lt;T&gt; *interface*
+
+```
+interface IEquatable<T>
+```
+
+A value that can be asked whether it equals another of its type.
+
+`EqualTo` has to be an equivalence -- a value equals itself, equality runs
+both ways, and two things equal to a third are equal to each other --
+because the containers assume all three and none of them checks. A type
+used as a dictionary key implements `IHashable` alongside this, and the two
+must agree: equal values must hash alike.
+
+<sub>[stdlib/Collections.sl:45](../../stdlib/Collections.sl#L45)</sub>
+
+#### EqualTo *method*
+
+```
+bool EqualTo(T other)
+```
+
+True when this value and `other` are the same value. Implementations
+should answer without allocating; this runs once per probe.
+
+<sub>[stdlib/Collections.sl:48](../../stdlib/Collections.sl#L48)</sub>
+
+### IHashable *interface*
+
+```
+interface IHashable
+```
+
+A value that can be a key in a hash table.
+
+Two values that are `EqualTo` each other must return the same `HashCode`;
+two that are not may still collide, and the table handles it. A type that
+implements this should implement `IEquatable<T>` as well, since a hash on
+its own only narrows the search.
+
+<sub>[stdlib/Collections.sl:67](../../stdlib/Collections.sl#L67)</sub>
+
+#### HashCode *method*
+
+```
+nuint HashCode()
+```
+
+A number standing in for this value. The same value must give the same
+number for as long as it is a key in a table, which means hashing only
+the parts a key is not going to have changed under it.
+
+<sub>[stdlib/Collections.sl:71](../../stdlib/Collections.sl#L71)</sub>
+
+### IList&lt;T&gt; *interface*
+
+```
+interface IList<T> : IReadOnlyList<T>
+```
+
+Everything a read-only list offers, plus mutation. A value of this type can
+be passed anywhere an IReadOnlyList is wanted, at no cost: an interface
+reference is a plain pointer, and the object carries a table for both.
+
+<sub>[stdlib/Collections.sl:166](../../stdlib/Collections.sl#L166)</sub>
+
+#### Add *method*
+
+```
+void Add(T item)
+```
+
+Appends to the end. The only operation here that changes the length.
+
+<sub>[stdlib/Collections.sl:168](../../stdlib/Collections.sl#L168)</sub>
+
+#### Set *method*
+
+```
+void Set(nuint index, T item)
+```
+
+Replaces the item at `index`. Aborts past the end -- this writes over
+an existing item and never extends the list, which `Add` is for.
+
+<sub>[stdlib/Collections.sl:172](../../stdlib/Collections.sl#L172)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every item, leaving a length of zero.
+
+<sub>[stdlib/Collections.sl:175](../../stdlib/Collections.sl#L175)</sub>
+
+### IReadOnlyList&lt;T&gt; *interface*
+
+```
+interface IReadOnlyList<T>
+```
+
+A sequence that knows its length and can be indexed, and cannot be changed
+through this reference.
+
+Read-only is about what this interface offers, not about the object: the
+list behind it may well be a `List<T>` that someone else is still adding
+to. Take this as a parameter type where a function reads and does not
+write, which says so in the signature.
+
+<sub>[stdlib/Collections.sl:154](../../stdlib/Collections.sl#L154)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many items there are.
+
+<sub>[stdlib/Collections.sl:156](../../stdlib/Collections.sl#L156)</sub>
+
+#### At *method*
+
+```
+T At(nuint index)
+```
+
+The item at `index`, counting from zero. An index at or past `Count()`
+aborts with the same message an array overrun gives.
+
+<sub>[stdlib/Collections.sl:160](../../stdlib/Collections.sl#L160)</sub>
+
+### LinkedList&lt;T&gt; *class*
+
+```
+class LinkedList<T> : IEnumerable<T>
+```
+
+A doubly linked list whose links are indices into a pool rather than
+references.
+
+A node is named by a **handle**: a `nint` that stays valid until that node is
+removed, and is `-1` for "no node". Handles are what make the middle of the
+list reachable in constant time, which is the only reason to choose this
+over a `List<T>`:
+
+```csharp
+var line = new LinkedList<String>();
+var first = line.AddLast("a");
+line.AddLast("c");
+line.InsertAfter(first, "b");
+
+for (nint at = line.First(); at >= 0; at = line.After(at)) {
+    Console.WriteLine(line.ValueAt(at));
+}
+```
+
+Removed nodes are recycled, so a list that is added to and removed from
+steadily does not grow without bound.
+
+<sub>[stdlib/Sequences.sl:228](../../stdlib/Sequences.sl#L228)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many nodes are linked in. O(1), and not the size of the pool --
+recycled slots are not counted.
+
+<sub>[stdlib/Sequences.sl:255](../../stdlib/Sequences.sl#L255)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when nothing is linked in.
+
+<sub>[stdlib/Sequences.sl:258](../../stdlib/Sequences.sl#L258)</sub>
+
+#### First *method*
+
+```
+nint First()
+```
+
+A handle to the first node, or -1 when the list is empty.
+
+<sub>[stdlib/Sequences.sl:261](../../stdlib/Sequences.sl#L261)</sub>
+
+#### Last *method*
+
+```
+nint Last()
+```
+
+A handle to the last node, or -1 when the list is empty.
+
+<sub>[stdlib/Sequences.sl:264](../../stdlib/Sequences.sl#L264)</sub>
+
+#### After *method*
+
+```
+nint After(nint handle)
+```
+
+The node after `handle`, or -1 at the end.
+
+<sub>[stdlib/Sequences.sl:267](../../stdlib/Sequences.sl#L267)</sub>
+
+#### Before *method*
+
+```
+nint Before(nint handle)
+```
+
+The node before `handle`, or -1 at the start.
+
+<sub>[stdlib/Sequences.sl:270](../../stdlib/Sequences.sl#L270)</sub>
+
+#### ValueAt *method*
+
+```
+T ValueAt(nint handle)
+```
+
+The value in a node.
+
+`handle` must be live: one this list handed out and has not had
+`RemoveAt` called on. A stale or `-1` handle is not checked and reads
+whatever the pool slot now holds, so test `at >= 0` before walking.
+
+<sub>[stdlib/Sequences.sl:277](../../stdlib/Sequences.sl#L277)</sub>
+
+#### SetAt *method*
+
+```
+void SetAt(nint handle, T value)
+```
+
+Replaces the value in a node, leaving the links alone. Same
+requirement on `handle` as `ValueAt`.
+
+<sub>[stdlib/Sequences.sl:281](../../stdlib/Sequences.sl#L281)</sub>
+
+#### AddFirst *method*
+
+```
+nint AddFirst(T item)
+```
+
+Links a new node at the front and answers its handle. Constant time.
+
+<sub>[stdlib/Sequences.sl:284](../../stdlib/Sequences.sl#L284)</sub>
+
+#### AddLast *method*
+
+```
+nint AddLast(T item)
+```
+
+Links a new node at the back and answers its handle. Constant time --
+the tail is kept, so this does not walk the list.
+
+<sub>[stdlib/Sequences.sl:300](../../stdlib/Sequences.sl#L300)</sub>
+
+#### InsertAfter *method*
+
+```
+nint InsertAfter(nint handle, T item)
+```
+
+Links a new node just after `handle` and answers its handle. Constant
+time, and the reason to choose this over a `List<T>`. Inserting after
+the last node appends.
+
+<sub>[stdlib/Sequences.sl:317](../../stdlib/Sequences.sl#L317)</sub>
+
+#### InsertBefore *method*
+
+```
+nint InsertBefore(nint handle, T item)
+```
+
+Links a new node just before `handle` and answers its handle.
+Inserting before the first node prepends.
+
+<sub>[stdlib/Sequences.sl:333](../../stdlib/Sequences.sl#L333)</sub>
+
+#### RemoveAt *method*
+
+```
+void RemoveAt(nint handle)
+```
+
+Unlinks a node and recycles its slot. The handle is dead afterwards.
+
+<sub>[stdlib/Sequences.sl:340](../../stdlib/Sequences.sl#L340)</sub>
+
+#### RemoveFirst *method*
+
+```
+T RemoveFirst()
+```
+
+Removes and returns the first item. Aborts when the list is empty.
+
+<sub>[stdlib/Sequences.sl:356](../../stdlib/Sequences.sl#L356)</sub>
+
+#### RemoveLast *method*
+
+```
+T RemoveLast()
+```
+
+Removes and returns the last item. Aborts when the list is empty.
+
+<sub>[stdlib/Sequences.sl:365](../../stdlib/Sequences.sl#L365)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every node and the pool with it. Every handle previously handed
+out is dead afterwards.
+
+<sub>[stdlib/Sequences.sl:375](../../stdlib/Sequences.sl#L375)</sub>
+
+#### ToList *method*
+
+```
+List<T> ToList()
+```
+
+The values, head first, as a fresh list. O(n), following the links.
+
+<sub>[stdlib/Sequences.sl:387](../../stdlib/Sequences.sl#L387)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<T> GetEnumerator()
+```
+
+A cursor over the values, head first, for `foreach`. Follows the links
+and keeps its place, so a whole walk is O(n). Adding or removing during
+a walk invalidates it.
+
+<sub>[stdlib/Sequences.sl:402](../../stdlib/Sequences.sl#L402)</sub>
+
+### LinkedListCursor&lt;T&gt; *class*
+
+```
+class LinkedListCursor<T> : IEnumerator<T>
+```
+
+Walks a linked list head first, following the links rather than flattening
+them. `At` is O(n) from the head, so a cursor that used it would make
+iterating O(n squared); this keeps the node it reached.
+
+<sub>[stdlib/Sequences.sl:678](../../stdlib/Sequences.sl#L678)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Follows one link, answering false past the tail.
+
+<sub>[stdlib/Sequences.sl:691](../../stdlib/Sequences.sl#L691)</sub>
+
+#### Current *method*
+
+```
+T Current()
+```
+
+The value in the node the last `MoveNext` reached.
+
+<sub>[stdlib/Sequences.sl:703](../../stdlib/Sequences.sl#L703)</sub>
+
+### List&lt;T&gt; *class*
+
+```
+class List<T> : IList<T>, IEnumerable<T>
+```
+
+A growable list backed by a single array, doubling when it fills.
+
+<sub>[stdlib/Collections.sl:179](../../stdlib/Collections.sl#L179)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many items are in the list -- not how many it has room for, which
+is `Capacity`.
+
+<sub>[stdlib/Collections.sl:192](../../stdlib/Collections.sl#L192)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when there is nothing in it.
+
+<sub>[stdlib/Collections.sl:195](../../stdlib/Collections.sl#L195)</sub>
+
+#### Capacity *method*
+
+```
+nuint Capacity()
+```
+
+The number of items this list can hold before it must grow again.
+
+<sub>[stdlib/Collections.sl:198](../../stdlib/Collections.sl#L198)</sub>
+
+#### At *method*
+
+```
+T At(nuint index)
+```
+
+The item at `index`, aborting past the end.
+
+Checked against `Count()` rather than against the backing array, so a
+slot that exists but holds nothing is out of range and says so.
+`list[index]` is the same question in fewer characters.
+
+<sub>[stdlib/Collections.sl:205](../../stdlib/Collections.sl#L205)</sub>
+
+#### this[] *indexer*
+
+```
+T this[nuint index] { get; set; }
+```
+
+The same two questions as `At` and `Set`, written the way an array is.
+
+The methods stay, because `IReadOnlyList<T>` and `IList<T>` declare
+them and an interface has no indexers. This is the spelling to reach
+for where the type is known, which is nearly everywhere: `items[i] += 1`
+reads through the getter and writes through the setter, so a list is
+indexed on the same terms as the array behind it.
+
+<sub>[stdlib/Collections.sl:217](../../stdlib/Collections.sl#L217)</sub>
+
+#### Add *method*
+
+```
+void Add(T item)
+```
+
+Appends to the end, growing the backing array when it is full.
+
+Doubling, so a run of appends costs constant time each on average; a
+single one can cost a copy of everything so far.
+
+<sub>[stdlib/Collections.sl:232](../../stdlib/Collections.sl#L232)</sub>
+
+#### Set *method*
+
+```
+void Set(nuint index, T item)
+```
+
+Replaces the item at `index`, aborting past the end. Never extends the
+list -- `Add` is what does that.
+
+<sub>[stdlib/Collections.sl:240](../../stdlib/Collections.sl#L240)</sub>
+
+#### Insert *method*
+
+```
+void Insert(nuint index, T item)
+```
+
+Inserts at a position, moving everything after it up one.
+
+`index == Count()` appends, which is what makes a loop that inserts in
+order need no special case at the end.
+
+<sub>[stdlib/Collections.sl:249](../../stdlib/Collections.sl#L249)</sub>
+
+#### RemoveAt *method*
+
+```
+void RemoveAt(nuint index)
+```
+
+Removes the item at a position, closing the gap.
+
+The vacated slot is cleared rather than left holding what moved out of
+it: a list of references would otherwise keep the last one alive past
+its removal, which is a leak that only shows up under a profiler.
+
+<sub>[stdlib/Collections.sl:265](../../stdlib/Collections.sl#L265)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<T> GetEnumerator()
+```
+
+A cursor over this list, for `foreach` and for passing it on as a
+sequence. The cursor reads the list as it goes rather than taking a
+copy, so changing the list during a walk changes what the walk sees.
+
+<sub>[stdlib/Collections.sl:279](../../stdlib/Collections.sl#L279)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every item. The backing array is replaced rather than merely
+forgotten, so any references it held are released now instead of
+lingering until the slots are overwritten.
+
+<sub>[stdlib/Collections.sl:284](../../stdlib/Collections.sl#L284)</sub>
+
+### ListEnumerator&lt;T&gt; *class*
+
+```
+class ListEnumerator<T> : IEnumerator<T>
+```
+
+Walks anything that can be counted and indexed, so one enumerator serves
+every list rather than each list writing its own.
+
+<sub>[stdlib/Collections.sl:119](../../stdlib/Collections.sl#L119)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances, answering false at the end.
+
+<sub>[stdlib/Collections.sl:135](../../stdlib/Collections.sl#L135)</sub>
+
+#### Current *method*
+
+```
+T Current()
+```
+
+The item the last `MoveNext` landed on.
+
+<sub>[stdlib/Collections.sl:142](../../stdlib/Collections.sl#L142)</sub>
+
+### OrderedDictionary&lt;K, V&gt; *class*
+
+```
+class OrderedDictionary<K, V>
+    where K : IEquatable<K>
+```
+
+A dictionary that remembers the order its keys were added in.
+
+`Dictionary<K, V>` finds a key by hashing and has no order to give back;
+this keeps the order and finds a key by scanning. The trade is the whole of
+the difference, and it is the right one wherever the order is part of the
+data: a parsed document read back the way it was written, a configuration a
+person edits, a header list that has to go out as it came in.
+
+**It is a scan.** Lookup is O(n), so this is for the sizes documents
+actually are -- a handful of members to a few hundred -- and a program
+holding something large enough for that to hurt wants a `Dictionary` beside
+it as an index. That is a real limit rather than a temporary one: keeping a
+hash index in step with an order would double the storage and every write,
+which is not what the collection is for.
+
+<sub>[stdlib/Collections.sl:603](../../stdlib/Collections.sl#L603)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many entries there are. Entries rather than distinct keys: `Add`
+keeps a repeated key, so this can exceed the number of different keys.
+
+<sub>[stdlib/Collections.sl:615](../../stdlib/Collections.sl#L615)</sub>
+
+#### KeyAt *method*
+
+```
+K KeyAt(nuint index)
+```
+
+The key at a position, in insertion order.
+
+<sub>[stdlib/Collections.sl:618](../../stdlib/Collections.sl#L618)</sub>
+
+#### ValueAt *method*
+
+```
+V ValueAt(nuint index)
+```
+
+The value at a position, in insertion order.
+
+<sub>[stdlib/Collections.sl:621](../../stdlib/Collections.sl#L621)</sub>
+
+#### IndexOf *method*
+
+```
+Optional<nuint> IndexOf(K key)
+```
+
+Where a key is, or `None`.
+
+The one lookup a caller needs: asking whether a key is there and then
+asking for its value walks the collection twice. An `Optional` rather
+than a sentinel, because a position that means "no position" is a rule
+every caller has to know and none can be made to.
+
+<sub>[stdlib/Collections.sl:629](../../stdlib/Collections.sl#L629)</sub>
+
+#### Has *method*
+
+```
+bool Has(K key)
+```
+
+Whether the key is there at all. A scan, like everything else here, so
+`IndexOf` once beats `Has` followed by a lookup.
+
+<sub>[stdlib/Collections.sl:638](../../stdlib/Collections.sl#L638)</sub>
+
+#### Add *method*
+
+```
+void Add(K key, V value)
+```
+
+Appends, without looking for the key first.
+
+A repeated key is kept rather than replaced, because a document that
+contains one said so and dropping either half would be this collection
+deciding what the document meant. `Set` is the one that replaces.
+
+<sub>[stdlib/Collections.sl:645](../../stdlib/Collections.sl#L645)</sub>
+
+#### Set *method*
+
+```
+void Set(K key, V value)
+```
+
+Replaces the value of a key, or appends it. A replaced key keeps the
+position it had, which is the point of the collection.
+
+<sub>[stdlib/Collections.sl:652](../../stdlib/Collections.sl#L652)</sub>
+
+#### Find *method*
+
+```
+V Find(K key, V fallback)
+```
+
+The value of a key, or the fallback. There is no overload that aborts:
+a caller that wants to know writes `IndexOf`.
+
+<sub>[stdlib/Collections.sl:659](../../stdlib/Collections.sl#L659)</sub>
+
+#### Remove *method*
+
+```
+bool Remove(K key)
+```
+
+Removes the first entry with that key, closing the gap. Answers whether
+there was one.
+
+<sub>[stdlib/Collections.sl:666](../../stdlib/Collections.sl#L666)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every entry, leaving a count of zero.
+
+<sub>[stdlib/Collections.sl:676](../../stdlib/Collections.sl#L676)</sub>
+
+### Pair&lt;K, V&gt; *class*
+
+```
+class Pair<K, V>
+```
+
+One key and one value. What a dictionary yields when it is iterated.
+
+<sub>[stdlib/Dictionary.sl:41](../../stdlib/Dictionary.sl#L41)</sub>
+
+#### Key *property*
+
+```
+K Key { get; }
+```
+
+The key half.
+
+<sub>[stdlib/Dictionary.sl:43](../../stdlib/Dictionary.sl#L43)</sub>
+
+#### Value *property*
+
+```
+V Value { get; }
+```
+
+The value half.
+
+<sub>[stdlib/Dictionary.sl:46](../../stdlib/Dictionary.sl#L46)</sub>
+
+### Queue&lt;T&gt; *class*
+
+```
+class Queue<T> : IEnumerable<T>
+```
+
+First in, first out, over a circular buffer.
+
+`Enqueue` and `Dequeue` are both constant time, and neither moves the other
+items -- which is the whole reason not to use a `List<T>` and remove from
+the front of it.
+
+<sub>[stdlib/Sequences.sl:38](../../stdlib/Sequences.sl#L38)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many items are waiting. O(1).
+
+<sub>[stdlib/Sequences.sl:53](../../stdlib/Sequences.sl#L53)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when there is nothing to dequeue. Check this before `Dequeue` or
+`Peek`, both of which abort on an empty queue.
+
+<sub>[stdlib/Sequences.sl:57](../../stdlib/Sequences.sl#L57)</sub>
+
+#### Capacity *method*
+
+```
+nuint Capacity()
+```
+
+The number of slots the ring has. Always a power of two, so wrapping is
+a mask rather than a division.
+
+<sub>[stdlib/Sequences.sl:61](../../stdlib/Sequences.sl#L61)</sub>
+
+#### Enqueue *method*
+
+```
+void Enqueue(T item)
+```
+
+Adds to the back, growing the ring when it is full.
+
+Constant time, and amortised constant when it grows. Growing moves
+every item once, which is the only time anything is copied.
+
+<sub>[stdlib/Sequences.sl:67](../../stdlib/Sequences.sl#L67)</sub>
+
+#### Dequeue *method*
+
+```
+T Dequeue()
+```
+
+Removes and returns the oldest item. Aborts when the queue is empty.
+
+<sub>[stdlib/Sequences.sl:74](../../stdlib/Sequences.sl#L74)</sub>
+
+#### Peek *method*
+
+```
+T Peek()
+```
+
+The oldest item, without removing it. Aborts when the queue is empty.
+
+<sub>[stdlib/Sequences.sl:88](../../stdlib/Sequences.sl#L88)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops everything. The ring is replaced rather than blanked, so
+anything it held is released now.
+
+<sub>[stdlib/Sequences.sl:95](../../stdlib/Sequences.sl#L95)</sub>
+
+#### ToList *method*
+
+```
+List<T> ToList()
+```
+
+The items, oldest first.
+
+<sub>[stdlib/Sequences.sl:102](../../stdlib/Sequences.sl#L102)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<T> GetEnumerator()
+```
+
+A cursor over the items, oldest first, for `foreach`. Walks the ring
+in place rather than copying, unlike `ToList`. Enqueueing or dequeueing
+during a walk invalidates it.
+
+<sub>[stdlib/Sequences.sl:117](../../stdlib/Sequences.sl#L117)</sub>
+
+### QueueCursor&lt;T&gt; *class*
+
+```
+class QueueCursor<T> : IEnumerator<T>
+```
+
+Walks a queue oldest first, without copying it.
+
+The materialising version this replaced built a whole `List<T>` before the
+first `MoveNext`, so iterating a queue allocated as much again as the queue
+held. A cursor over the ring costs nothing.
+
+<sub>[stdlib/Sequences.sl:632](../../stdlib/Sequences.sl#L632)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances, answering false at the end.
+
+<sub>[stdlib/Sequences.sl:643](../../stdlib/Sequences.sl#L643)</sub>
+
+#### Current *method*
+
+```
+T Current()
+```
+
+The item the last `MoveNext` landed on.
+
+<sub>[stdlib/Sequences.sl:650](../../stdlib/Sequences.sl#L650)</sub>
+
+### SortedList&lt;K, V&gt; *class*
+
+```
+class SortedList<K, V> : IEnumerable<Pair<K, V>>
+    where K : IComparable<K>
+```
+
+A map kept in key order, over two parallel arrays.
+
+Lookup is a binary search and iteration is in order, which is what a
+`Dictionary` cannot do. Insertion moves the tail of the arrays, so this is
+for maps that are read far more than they are written -- a lookup table
+built once, rather than a counter updated in a loop.
+
+<sub>[stdlib/Sequences.sl:449](../../stdlib/Sequences.sl#L449)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many entries there are. O(1).
+
+<sub>[stdlib/Sequences.sl:462](../../stdlib/Sequences.sl#L462)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when there are no entries.
+
+<sub>[stdlib/Sequences.sl:465](../../stdlib/Sequences.sl#L465)</sub>
+
+#### IndexOfKey *method*
+
+```
+nint IndexOfKey(K key)
+```
+
+The index `key` is at, or the index it would be inserted at, negated and
+offset by one so the two cases stay apart: a result below zero means
+"not found, and `-result - 1` is where it goes".
+
+<sub>[stdlib/Sequences.sl:470](../../stdlib/Sequences.sl#L470)</sub>
+
+#### ContainsKey *method*
+
+```
+bool ContainsKey(K key)
+```
+
+Whether `key` is there. A binary search, O(log n). Reach for `Find`
+when the value is what is wanted, rather than searching twice.
+
+<sub>[stdlib/Sequences.sl:487](../../stdlib/Sequences.sl#L487)</sub>
+
+#### KeyAt *method*
+
+```
+K KeyAt(nuint index)
+```
+
+The key at a position in the ordering, counting from the smallest.
+
+<sub>[stdlib/Sequences.sl:490](../../stdlib/Sequences.sl#L490)</sub>
+
+#### ValueAt *method*
+
+```
+V ValueAt(nuint index)
+```
+
+The value at a position in the ordering, paired with `KeyAt` at the
+same index. Aborts past the end.
+
+<sub>[stdlib/Sequences.sl:497](../../stdlib/Sequences.sl#L497)</sub>
+
+#### Find *method*
+
+```
+Optional<V> Find(K key)
+```
+
+The value for `key`, or `None` when there is none. The one to reach
+for, for the reason `Dictionary.Find` gives: a key is data, so a key
+that is not there is an outcome rather than a mistake.
+
+<sub>[stdlib/Sequences.sl:505](../../stdlib/Sequences.sl#L505)</sub>
+
+#### Get *method*
+
+```
+V Get(K key)
+```
+
+The value for `key`, aborting when there is none.
+
+The asserting form, for a key that is there by construction. `Find` is
+the question where it might not be, and `GetOr` where a default will do.
+
+<sub>[stdlib/Sequences.sl:515](../../stdlib/Sequences.sl#L515)</sub>
+
+#### GetOr *method*
+
+```
+V GetOr(K key, V fallback)
+```
+
+The value for `key`, or `fallback` when there is none.
+
+Allocates nothing, at the cost of not distinguishing an absent key from
+one whose stored value equals the fallback. `Find` is the one that
+tells them apart.
+
+<sub>[stdlib/Sequences.sl:526](../../stdlib/Sequences.sl#L526)</sub>
+
+#### Set *method*
+
+```
+void Set(K key, V value)
+```
+
+Sets the value of a key, adding it in order if it is new.
+
+An existing key costs a search. A new one costs the search plus a shift
+of everything after it -- O(n) -- which is what makes this collection a
+poor choice for a map that is written in a loop.
+
+<sub>[stdlib/Sequences.sl:537](../../stdlib/Sequences.sl#L537)</sub>
+
+#### Remove *method*
+
+```
+bool Remove(K key)
+```
+
+Removes a key, answering whether it was there. Closes the gap, so it
+is O(n) like `Set` on a new key.
+
+<sub>[stdlib/Sequences.sl:561](../../stdlib/Sequences.sl#L561)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops every entry. The arrays are replaced rather than blanked, so
+anything they held is released now.
+
+<sub>[stdlib/Sequences.sl:583](../../stdlib/Sequences.sl#L583)</sub>
+
+#### Keys *method*
+
+```
+List<K> Keys()
+```
+
+Every key, smallest first, as a fresh list.
+
+<sub>[stdlib/Sequences.sl:590](../../stdlib/Sequences.sl#L590)</sub>
+
+#### Values *method*
+
+```
+List<V> Values()
+```
+
+Every value, in key order, pairing with `Keys` position for position.
+
+<sub>[stdlib/Sequences.sl:597](../../stdlib/Sequences.sl#L597)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<Pair<K, V>> GetEnumerator()
+```
+
+A cursor over the entries in key order, for `foreach` -- the ordering
+a `Dictionary` cannot give. One `Pair` is built per step. Writing to
+the map during a walk invalidates it.
+
+<sub>[stdlib/Sequences.sl:609](../../stdlib/Sequences.sl#L609)</sub>
+
+### SortedListCursor&lt;K, V&gt; *class*
+
+```
+class SortedListCursor<K, V> : IEnumerator<Pair<K, V>>
+    where K : IComparable<K>
+```
+
+Walks a sorted list in key order.
+
+One `Pair` is built per step, as the materialising version built one per
+entry before the walk began -- the difference is that a loop that stops
+early now stops allocating too.
+
+<sub>[stdlib/Sequences.sl:711](../../stdlib/Sequences.sl#L711)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances to the next key in order, answering false at the end.
+
+<sub>[stdlib/Sequences.sl:722](../../stdlib/Sequences.sl#L722)</sub>
+
+#### Current *method*
+
+```
+Pair<K, V> Current()
+```
+
+The entry the last `MoveNext` landed on, as a freshly built `Pair`.
+
+<sub>[stdlib/Sequences.sl:729](../../stdlib/Sequences.sl#L729)</sub>
+
+### Stack&lt;T&gt; *class*
+
+```
+class Stack<T> : IEnumerable<T>
+```
+
+Last in, first out. The top is the end of the array, so nothing moves.
+
+<sub>[stdlib/Sequences.sl:132](../../stdlib/Sequences.sl#L132)</sub>
+
+#### Count *method*
+
+```
+nuint Count()
+```
+
+How many items are on the stack. O(1).
+
+<sub>[stdlib/Sequences.sl:145](../../stdlib/Sequences.sl#L145)</sub>
+
+#### IsEmpty *method*
+
+```
+bool IsEmpty()
+```
+
+True when there is nothing to pop. Check this before `Pop` or `Peek`,
+both of which abort on an empty stack.
+
+<sub>[stdlib/Sequences.sl:149](../../stdlib/Sequences.sl#L149)</sub>
+
+#### Capacity *method*
+
+```
+nuint Capacity()
+```
+
+The number of slots the backing array has.
+
+<sub>[stdlib/Sequences.sl:152](../../stdlib/Sequences.sl#L152)</sub>
+
+#### Push *method*
+
+```
+void Push(T item)
+```
+
+Pushes onto the top, growing when full. Amortised constant time.
+
+<sub>[stdlib/Sequences.sl:155](../../stdlib/Sequences.sl#L155)</sub>
+
+#### Pop *method*
+
+```
+T Pop()
+```
+
+Removes and returns the top. Aborts when the stack is empty.
+
+<sub>[stdlib/Sequences.sl:162](../../stdlib/Sequences.sl#L162)</sub>
+
+#### Peek *method*
+
+```
+T Peek()
+```
+
+The top, without removing it. Aborts when the stack is empty.
+
+<sub>[stdlib/Sequences.sl:172](../../stdlib/Sequences.sl#L172)</sub>
+
+#### Clear *method*
+
+```
+void Clear()
+```
+
+Drops everything. The array is replaced rather than blanked, so
+anything it held is released now.
+
+<sub>[stdlib/Sequences.sl:179](../../stdlib/Sequences.sl#L179)</sub>
+
+#### ToList *method*
+
+```
+List<T> ToList()
+```
+
+The items, top first, which is the order they would be popped in.
+
+<sub>[stdlib/Sequences.sl:185](../../stdlib/Sequences.sl#L185)</sub>
+
+#### GetEnumerator *method*
+
+```
+IEnumerator<T> GetEnumerator()
+```
+
+A cursor over the items, top first -- the order `Pop` would give them
+back in. Pushing or popping during a walk invalidates it.
+
+<sub>[stdlib/Sequences.sl:196](../../stdlib/Sequences.sl#L196)</sub>
+
+### StackCursor&lt;T&gt; *class*
+
+```
+class StackCursor<T> : IEnumerator<T>
+```
+
+Walks a stack top first, matching the order `Pop` would hand things back.
+
+<sub>[stdlib/Sequences.sl:654](../../stdlib/Sequences.sl#L654)</sub>
+
+#### MoveNext *method*
+
+```
+bool MoveNext()
+```
+
+Advances towards the bottom, answering false at the end.
+
+<sub>[stdlib/Sequences.sl:665](../../stdlib/Sequences.sl#L665)</sub>
+
+#### Current *method*
+
+```
+T Current()
+```
+
+The item the last `MoveNext` landed on.
+
+<sub>[stdlib/Sequences.sl:672](../../stdlib/Sequences.sl#L672)</sub>
+
+## Functions
+
+### Aggregate *function*
+
+```
+A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
+```
+
+`Reduce`, spelled as LINQ spells it.
+
+<sub>[stdlib/Functional.sl:386](../../stdlib/Functional.sl#L386)</sub>
+
+### Aggregate *function*
+
+```
+A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
+```
+
+`Reduce` over any sequence, spelled as LINQ spells it.
+
+<sub>[stdlib/Functional.sl:393](../../stdlib/Functional.sl#L393)</sub>
+
+### All *function*
+
+```
+bool All<T>(T[:] items, Predicate<T> test)
+```
+
+Whether every element does. Stops at the first that does not, and is true
+of an empty input.
+
+<sub>[stdlib/Functional.sl:94](../../stdlib/Functional.sl#L94)</sub>
+
+### All *function*
+
+```
+bool All<T>(IEnumerable<T> items, Predicate<T> test)
+```
+
+Whether every element does, over any sequence. Stops at the first that
+does not, and is true of an empty sequence.
+
+<sub>[stdlib/Functional.sl:202](../../stdlib/Functional.sl#L202)</sub>
+
+### Any *function*
+
+```
+bool Any<T>(T[:] items, Predicate<T> test)
+```
+
+Whether any element satisfies the predicate. Stops at the first that does.
+
+<sub>[stdlib/Functional.sl:85](../../stdlib/Functional.sl#L85)</sub>
+
+### Any *function*
+
+```
+bool Any<T>(IEnumerable<T> items, Predicate<T> test)
+```
+
+Whether any element satisfies the predicate, over any sequence. Stops at
+the first that does, so the rest of the sequence is never walked.
+
+<sub>[stdlib/Functional.sl:193](../../stdlib/Functional.sl#L193)</sub>
+
+### BinarySearch *function*
+
+```
+nuint BinarySearch<T>(T[:] items, T wanted)
+    where T : IComparable<T>
+```
+
+Where `wanted` is in an already-ordered slice, or the length when it is not
+there -- the same convention `IndexOf` follows, so the two read alike.
+
+Two functions rather than one with a found flag, because the language has
+no `out` and a caller that wants the insertion point usually does not want
+the search, and the other way round.
+
+<sub>[stdlib/Collections.sl:510](../../stdlib/Collections.sl#L510)</sub>
+
+### CountWhere *function*
+
+```
+nuint CountWhere<T>(T[:] items, Predicate<T> test)
+```
+
+How many satisfy the predicate.
+
+<sub>[stdlib/Functional.sl:102](../../stdlib/Functional.sl#L102)</sub>
+
+### CountWhere *function*
+
+```
+nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test)
+```
+
+How many satisfy the predicate, over any sequence. Walks all of it.
+
+<sub>[stdlib/Functional.sl:210](../../stdlib/Functional.sl#L210)</sub>
+
+### Distinct *function*
+
+```
+List<T> Distinct<T>(T[:] items)
+    where T : IEquatable<T>
+```
+
+The elements, in order, with later repeats left out.
+
+O(n²) in comparisons, which is what asking nothing of `T` but `IEquatable`
+costs. A `HashSet<T>` does it in one pass and wants `IHashable` as well;
+this is the one to reach for at the sizes a chain works at.
+
+<sub>[stdlib/Functional.sl:282](../../stdlib/Functional.sl#L282)</sub>
+
+### Distinct *function*
+
+```
+List<T> Distinct<T>(IEnumerable<T> items)
+    where T : IEquatable<T>
+```
+
+The elements, in order, with later repeats left out, over any sequence.
+O(n squared) in comparisons, as the slice overload is.
+
+<sub>[stdlib/Functional.sl:292](../../stdlib/Functional.sl#L292)</sub>
+
+### Filter *function*
+
+```
+List<T> Filter<T>(T[:] items, Predicate<T> keep)
+```
+
+The elements the predicate keeps, in the order they were in.
+
+An array converts to a slice of the whole of itself, so this takes both.
+
+<sub>[stdlib/Functional.sl:53](../../stdlib/Functional.sl#L53)</sub>
+
+### Filter *function*
+
+```
+List<T> Filter<T>(IEnumerable<T> items, Predicate<T> keep)
+```
+
+The same, for anything with a `GetEnumerator()` that names its shape --
+`List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
+`SortedList<K, V>` all do.
+
+<sub>[stdlib/Functional.sl:169](../../stdlib/Functional.sl#L169)</sub>
+
+### Find *function*
+
+```
+Optional<T> Find<T>(T[:] items, Predicate<T> test)
+```
+
+The first element satisfying the predicate, if there is one.
+
+    if (Find(people, (p) => p.Age > 65) is Some found) { ... }
+
+An `Optional<T>` rather than a fallback: a struct has no null to stand for
+"none" (§2.5), and inventing a value that means it is how a caller comes to
+treat a real answer as a miss.
+
+<sub>[stdlib/Functional.sl:129](../../stdlib/Functional.sl#L129)</sub>
+
+### FirstOr *function*
+
+```
+T FirstOr<T>(T[:] items, Predicate<T> test, T fallback)
+```
+
+The first element satisfying the predicate, or `fallback` if none does.
+
+The reader that needs no check, because it supplies its own answer. `Find`
+is the one to reach for when "there was none" is a different outcome rather
+than a different value.
+
+<sub>[stdlib/Functional.sl:115](../../stdlib/Functional.sl#L115)</sub>
+
+### FirstOr *function*
+
+```
+T FirstOr<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
+```
+
+The first element satisfying the predicate, or `fallback` if none does,
+over any sequence. A fallback equal to a real element is indistinguishable
+from a miss; `Find` is the overload that tells them apart, and it takes a
+slice rather than a sequence.
+
+<sub>[stdlib/Functional.sl:222](../../stdlib/Functional.sl#L222)</sub>
+
+### ForEach *function*
+
+```
+void ForEach<T>(T[:] items, Action<T> body)
+```
+
+Runs the action over every element.
+
+<sub>[stdlib/Functional.sl:145](../../stdlib/Functional.sl#L145)</sub>
+
+### ForEach *function*
+
+```
+void ForEach<T>(IEnumerable<T> items, Action<T> body)
+```
+
+Runs the action over every element of any sequence.
+
+<sub>[stdlib/Functional.sl:230](../../stdlib/Functional.sl#L230)</sub>
+
+### IndexOf *function*
+
+```
+Optional<nuint> IndexOf<T>(IReadOnlyList<T> items, T wanted)
+    where T : IEquatable<T>
+```
+
+Where the first item equal to `wanted` is, if it is there at all.
+
+    if (IndexOf(names, "beta") is Some at) { names.RemoveAt(at.Value); }
+
+An `Optional<nuint>` rather than the length standing in for "no": the
+sentinel is the thing `Optional<T>` was added to retire, and its own
+documentation names this function as the example. `OrderedDictionary.IndexOf`
+has always answered this way; now they agree.
+
+<sub>[stdlib/Collections.sl:328](../../stdlib/Collections.sl#L328)</sub>
+
+### IndexWhere *function*
+
+```
+Optional<nuint> IndexWhere<T>(T[:] items, Predicate<T> test)
+```
+
+Where the first element satisfying the predicate is, if it is there.
+
+<sub>[stdlib/Functional.sl:137](../../stdlib/Functional.sl#L137)</sub>
+
+### Largest *function*
+
+```
+T Largest<T>(IReadOnlyList<T> items)
+    where T : IComparable<T>
+```
+
+The largest item, by its own ordering. The list must not be empty.
+
+<sub>[stdlib/Collections.sl:299](../../stdlib/Collections.sl#L299)</sub>
+
+### LowerBound *function*
+
+```
+nuint LowerBound<T>(T[:] items, T wanted)
+    where T : IComparable<T>
+```
+
+The first index at which `wanted` could be inserted and leave the slice
+ordered: the length when it belongs at the end, and the index of the first
+equal element when there is one.
+
+<sub>[stdlib/Collections.sl:528](../../stdlib/Collections.sl#L528)</sub>
+
+### Map *function*
+
+```
+List<R> Map<T, R>(T[:] items, Func<T, R> transform)
+```
+
+Every element put through the transform.
+
+    var spelled = Map(numbers, n => Text.FromInteger((long)n));
+
+`R` appears nowhere but in the transform's result, so working it out means
+binding the lambda's body -- which cannot happen until `T` has given the
+lambda its parameter type. The compiler does the two in that order.
+
+<sub>[stdlib/Functional.sl:68](../../stdlib/Functional.sl#L68)</sub>
+
+### Map *function*
+
+```
+List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform)
+```
+
+Every element put through the transform, over any sequence.
+
+<sub>[stdlib/Functional.sl:178](../../stdlib/Functional.sl#L178)</sub>
+
+### OrderBy *function*
+
+```
+List<T> OrderBy<T>(T[:] items, Comparer<T> order)
+```
+
+The elements ordered by what `order` says, leaving the input alone.
+
+`Sort` orders in place, which a chain cannot use: what is being chained
+from is usually somebody else's array. This copies first, and is stable for
+the reason `Sort` is.
+
+<sub>[stdlib/Functional.sl:305](../../stdlib/Functional.sl#L305)</sub>
+
+### OrderBy *function*
+
+```
+List<T> OrderBy<T>(IEnumerable<T> items, Comparer<T> order)
+```
+
+The elements ordered by what `order` says, over any sequence, leaving the
+input alone. Copies into an array first, so it costs one.
+
+<sub>[stdlib/Functional.sl:315](../../stdlib/Functional.sl#L315)</sub>
+
+### Reduce *function*
+
+```
+A Reduce<T, A>(T[:] items, A seed, Fold<A, T> combine)
+```
+
+Everything folded into one value, left to right. The seed decides the
+result type, so `A` is settled before the lambda is looked at.
+
+    long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
+
+<sub>[stdlib/Functional.sl:78](../../stdlib/Functional.sl#L78)</sub>
+
+### Reduce *function*
+
+```
+A Reduce<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
+```
+
+Everything folded into one value, left to right, over any sequence.
+
+<sub>[stdlib/Functional.sl:185](../../stdlib/Functional.sl#L185)</sub>
+
+### RemoveFirst *function*
+
+```
+bool RemoveFirst<T>(List<T> items, T wanted)
+    where T : IEquatable<T>
+```
+
+Removes the first item equal to `wanted`, answering whether there was one.
+
+This is `List<T>.Remove` under another name, and it is a free function
+rather than a method because it needs `T : IEquatable<T>` and a class
+cannot constrain one method's type parameter to something the class itself
+does not demand of every element.
+
+<sub>[stdlib/Collections.sl:341](../../stdlib/Collections.sl#L341)</sub>
+
+### RemoveWhere *function*
+
+```
+nuint RemoveWhere<T>(List<T> items, Predicate<T> match)
+```
+
+Removes every item the predicate accepts, and answers how many went.
+
+    RemoveWhere(handlers, (h) => h == leaving);
+
+A predicate rather than a value, which is what makes it work for a `T` that
+implements nothing -- a `closure` is not `IEquatable`, so a list of
+callbacks could not be removed from at all before this.
+
+Walked from the end, so an index already passed cannot move.
+
+<sub>[stdlib/Collections.sl:358](../../stdlib/Collections.sl#L358)</sub>
+
+### Reverse *function*
+
+```
+void Reverse<T>(T[:] items)
+```
+
+Reverses part of an array in place.
+
+<sub>[stdlib/Collections.sl:541](../../stdlib/Collections.sl#L541)</sub>
+
+### Select *function*
+
+```
+List<R> Select<T, R>(T[:] items, Func<T, R> transform)
+```
+
+`Map`, spelled as LINQ spells it.
+
+<sub>[stdlib/Functional.sl:372](../../stdlib/Functional.sl#L372)</sub>
+
+### Select *function*
+
+```
+List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
+```
+
+`Map` over any sequence, spelled as LINQ spells it.
+
+<sub>[stdlib/Functional.sl:379](../../stdlib/Functional.sl#L379)</sub>
+
+### Skip *function*
+
+```
+List<T> Skip<T>(T[:] items, nuint count)
+```
+
+Everything after the first `count` elements, or nothing if there are fewer.
+
+<sub>[stdlib/Functional.sl:158](../../stdlib/Functional.sl#L158)</sub>
+
+### Skip *function*
+
+```
+List<T> Skip<T>(IEnumerable<T> items, nuint count)
+```
+
+Everything after the first `count`.
+
+<sub>[stdlib/Functional.sl:332](../../stdlib/Functional.sl#L332)</sub>
+
+### Smallest *function*
+
+```
+T Smallest<T>(IReadOnlyList<T> items)
+    where T : IComparable<T>
+```
+
+The smallest item, by its own ordering. The list must not be empty.
+
+<sub>[stdlib/Collections.sl:310](../../stdlib/Collections.sl#L310)</sub>
+
+### Sort *function*
+
+```
+void Sort<T>(T[:] items)
+    where T : IComparable<T>
+```
+
+Orders part of an array in place, smallest first.
+
+An array converts to a slice of the whole of itself, so `Sort(numbers)`
+reaches this and `Sort(numbers[2:5])` orders three of them and leaves the
+rest alone. Nothing is copied either way: a slice is a view.
+
+**Stable, and O(n log n).** Merge sort, bottom-up, with insertion sort for
+short runs. Stability is the property worth paying for -- sorting by one
+key and then another is how a multi-key order gets built, and it only works
+if the second sort leaves equal elements where the first put them. The
+price is one scratch array as long as the input; an in-place quicksort
+would avoid it and would not be stable.
+
+<sub>[stdlib/Collections.sl:386](../../stdlib/Collections.sl#L386)</sub>
+
+### Sort *function*
+
+```
+void Sort<T>(T[:] items, Comparer<T> order)
+```
+
+The same, ordered by a comparer rather than by the type itself.
+
+This is the overload that sorts descending, sorts by a field, or sorts a
+type that implements nothing at all:
+
+    Sort(people, (a, b) => a.Age - b.Age);
+
+<sub>[stdlib/Collections.sl:451](../../stdlib/Collections.sl#L451)</sub>
+
+### Sort *function*
+
+```
+void Sort<T>(IList<T> items)
+    where T : IComparable<T>
+```
+
+Orders a list in place, smallest first.
+
+Copied into an array, sorted there and copied back, rather than merge-sorted
+through the interface. Every `At` and `Set` on an `IList<T>` is a virtual
+call, and a sort makes O(n log n) of them; two linear passes to escape that
+is the cheaper trade, and it gets the array version's stability for free.
+
+<sub>[stdlib/Collections.sl:562](../../stdlib/Collections.sl#L562)</sub>
+
+### Sort *function*
+
+```
+void Sort<T>(IList<T> items, Comparer<T> order)
+```
+
+The same, ordered by a comparer.
+
+<sub>[stdlib/Collections.sl:575](../../stdlib/Collections.sl#L575)</sub>
+
+### Take *function*
+
+```
+List<T> Take<T>(T[:] items, nuint count)
+```
+
+The first `count` elements, or all of them if there are fewer.
+
+<sub>[stdlib/Functional.sl:150](../../stdlib/Functional.sl#L150)</sub>
+
+### Take *function*
+
+```
+List<T> Take<T>(IEnumerable<T> items, nuint count)
+```
+
+The first `count` elements, or all of them if there are fewer.
+
+<sub>[stdlib/Functional.sl:322](../../stdlib/Functional.sl#L322)</sub>
+
+### ToArray *function*
+
+```
+T[] ToArray<T>(IEnumerable<T> items)
+```
+
+Everything in the sequence, as an array.
+
+One `IEnumerable` overload rather than an `IReadOnlyList` one as well: a
+`List<T>` is both, so a pair would be ambiguous at exactly the type a chain
+hands over. That is why `ToList` takes only the sequence too.
+
+<sub>[stdlib/Functional.sl:263](../../stdlib/Functional.sl#L263)</sub>
+
+### ToArray *function*
+
+```
+T[] ToArray<T>(T[:] items)
+```
+
+The same for a slice, which is not an `IEnumerable` and so does not collide.
+
+<sub>[stdlib/Functional.sl:271](../../stdlib/Functional.sl#L271)</sub>
+
+### ToList *function*
+
+```
+List<T> ToList<T>(IEnumerable<T> items)
+```
+
+Everything in the sequence, as a list. The one that makes a `Queue` or a
+`HashSet` usable with the array overloads above.
+
+<sub>[stdlib/Functional.sl:236](../../stdlib/Functional.sl#L236)</sub>
+
+### ToList *function*
+
+```
+List<T> ToList<T>(T[:] items)
+```
+
+And a slice, which an array converts to. Not an overload of the above by
+accident: a slice is not an `IEnumerable`, so nothing is ever both.
+
+<sub>[stdlib/Functional.sl:244](../../stdlib/Functional.sl#L244)</sub>
+
+### Where *function*
+
+```
+List<T> Where<T>(T[:] items, Predicate<T> keep)
+```
+
+`Filter`, spelled as LINQ spells it.
+
+<sub>[stdlib/Functional.sl:354](../../stdlib/Functional.sl#L354)</sub>
+
+### Where *function*
+
+```
+List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
+```
+
+`Filter` over any sequence, spelled as LINQ spells it.
+
+<sub>[stdlib/Functional.sl:363](../../stdlib/Functional.sl#L363)</sub>
+

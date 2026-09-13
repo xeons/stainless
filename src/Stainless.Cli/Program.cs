@@ -47,6 +47,7 @@ internal static class Program
             "build" => Build(rest, run: false),
             "run" => Build(rest, run: true),
             "emit-ir" => EmitIr(rest),
+            "doc" => Document(rest),
             "init" => Init(rest),
             "restore" => Restore(rest),
             _ => UnknownCommand(command),
@@ -69,6 +70,7 @@ internal static class Program
               stainless build [paths...] [options]   compile to a native executable
               stainless run   [paths...] [options]   compile, then run it
               stainless emit-ir [paths...]           print the generated LLVM IR
+              stainless doc [paths...] [options]     write reference documentation
               stainless init [name]                  write a {ProjectFile.FileName} here
               stainless restore [options]            resolve dependencies and lock them
 
@@ -101,6 +103,7 @@ internal static class Program
               -o, --out <path>     output file (default: after the first source)
               --shared             build a shared library instead of an executable
               --header <path>      write a C header for the exported surface
+              --stdlib             (doc) document the standard library itself
               --metadata <path>    write module metadata for a Stainless consumer
               --reference <path>   bind against a library's module metadata
               --project <path>     the project file to build, or the directory holding it
@@ -206,6 +209,98 @@ internal static class Program
 
         Console.WriteLine(result.Ir);
         return 0;
+    }
+
+    /// <summary>
+    /// Writes reference documentation for the <c>///</c> blocks in the source.
+    ///
+    /// It binds first and writes nothing if binding failed, which is the point
+    /// of doing this in the compiler rather than in a script over the text: a
+    /// page here describes something that compiles.
+    /// </summary>
+    private static int Document(string[] args)
+    {
+        if (!TryParse(args, out var arguments) || arguments is null) return 1;
+
+        // '-o' names the output directory here rather than an output file,
+        // which is what 'doc' produces. The defaults differ because the two
+        // answer different questions: a project's own reference, or the
+        // language's.
+        arguments.Documentation =
+            arguments.Output ?? (arguments.StandardLibrary ? "docs/stdlib" : "docs/api");
+        arguments.Output = null;
+
+        // The standard library is compiled into every program, so documenting it
+        // needs no sources of its own -- but the pipeline wants somewhere to
+        // start from, and an empty module is the smallest honest answer.
+        string? scratch = null;
+        if (arguments.StandardLibrary && arguments.Paths.Count == 0)
+        {
+            scratch = Path.Combine(Path.GetTempPath(),
+                                   "stainless-doc-" + Guid.NewGuid().ToString("N") + ".sl");
+            try
+            {
+                File.WriteAllText(scratch, "module Documentation.Empty;\n");
+            }
+            catch (IOException e)
+            {
+                Error($"could not write a temporary file: {e.Message}");
+                return 1;
+            }
+            arguments.Paths.Add(scratch);
+            arguments.NoProject = true;
+        }
+
+        try
+        {
+            var project = FindProject(arguments);
+            if (project is null && arguments.ProjectError is not null)
+            {
+                Error(arguments.ProjectError);
+                return 1;
+            }
+
+            IReadOnlyList<string> pages;
+
+            if (project is not null)
+            {
+                var plan = Resolve(project, arguments);
+                if (plan is null) return 1;
+
+                var built = new ProjectBuilder(project, plan, Note).Build(arguments.ToOverrides());
+                if (!ReportProject(built)) return 1;
+
+                pages = built.Root!.DocumentationFiles;
+            }
+            else
+            {
+                var options = arguments.ToCompilationOptions();
+                if (options is null) return 1;
+
+                var result = new Compilation().Compile(options);
+                if (!Report(result)) return 1;
+
+                pages = result.DocumentationFiles;
+            }
+
+            foreach (string page in pages)
+                Console.WriteLine(Path.GetRelativePath(Environment.CurrentDirectory, page));
+
+            if (pages.Count == 0)
+                Note("nothing public was found to document");
+            else
+                Note($"{pages.Count} files written to {arguments.Documentation}");
+
+            return 0;
+        }
+        finally
+        {
+            if (scratch is not null)
+            {
+                try { File.Delete(scratch); }
+                catch (IOException) { /* a temporary file nobody will look for */ }
+            }
+        }
     }
 
     /// <summary>
@@ -607,6 +702,8 @@ internal static class Program
         public bool Debug { get; set; }
         public bool Shared { get; set; }
         public bool EmitIrOnly { get; set; }
+        public bool StandardLibrary { get; set; }
+        public string? Documentation { get; set; }
         public bool NoProject { get; set; }
         public bool Locked { get; set; }
         public bool Offline { get; set; }
@@ -629,6 +726,9 @@ internal static class Program
             SharedRuntime = SharedRuntime,
             HeaderPath = Header,
             ExtraPaths = Paths,
+            DocumentationPath = Documentation,
+            DocumentStandardLibrary = StandardLibrary,
+            DocumentationOnly = Documentation is not null,
         };
 
         /// <summary>
@@ -691,6 +791,9 @@ internal static class Program
                 MetadataPath = Metadata,
                 References = References,
                 SharedRuntime = SharedRuntime,
+                DocumentationPath = Documentation,
+                DocumentStandardLibrary = StandardLibrary,
+                DocumentationOnly = Documentation is not null,
             };
         }
     }
@@ -799,6 +902,10 @@ internal static class Program
                             Error($"unknown runtime '{args[i]}'; it is 'shared' or 'static'");
                             return false;
                     }
+                    continue;
+
+                case "--stdlib":
+                    arguments.StandardLibrary = true;
                     continue;
 
                 case "--header":

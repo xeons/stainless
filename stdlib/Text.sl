@@ -19,32 +19,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// The rest of `String`.
-//
-// `String` itself is intrinsic: the runtime owns its layout and its allocation,
-// and the compiler creates the symbol before any source is read. What it does
-// not own is the behaviour, and this file adds it -- a type may be declared
-// more than once inside its own module, so `Standard.Text` picks up where
-// `Builtins` left off (§3.2).
-//
-// Two rules run through everything here.
-//
-// **Positions are byte offsets.** A `String` is UTF-8 and length is O(1)
-// precisely because nothing counts characters, so `IndexOf` answers in bytes
-// and `Substring` takes bytes. Every position this file produces lands on a
-// character boundary, because it came from matching whole text -- a UTF-8
-// sequence cannot begin inside another one, which is what makes byte-wise
-// search correct on encoded text rather than merely fast. Positions a *caller*
-// invents are its own business; `CodePointAt` and `NextCodePoint` are here for
-// walking the text properly.
-//
-// **Case and whitespace are ASCII.** Full Unicode case mapping is a table of
-// several thousand entries with locale exceptions, and the runtime has no room
-// for it yet. What is here maps A-Z and a-z and leaves every other byte alone,
-// which is exactly right for identifiers, protocol tokens and file extensions,
-// and visibly wrong for prose in most languages. Anything that says `Ascii` in
-// its name says so; anything that does not is either encoding-independent or
-// documented here.
+/// The rest of `String`.
+///
+/// `String` itself is intrinsic: the runtime owns its layout and its allocation,
+/// and the compiler creates the symbol before any source is read. What it does
+/// not own is the behaviour, and this file adds it -- a type may be declared
+/// more than once inside its own module, so `Standard.Text` picks up where
+/// `Builtins` left off (§3.2).
+///
+/// Two rules run through everything here.
+///
+/// **Positions are byte offsets.** A `String` is UTF-8 and length is O(1)
+/// precisely because nothing counts characters, so `IndexOf` answers in bytes
+/// and `Substring` takes bytes. Every position this file produces lands on a
+/// character boundary, because it came from matching whole text -- a UTF-8
+/// sequence cannot begin inside another one, which is what makes byte-wise
+/// search correct on encoded text rather than merely fast. Positions a *caller*
+/// invents are its own business; `CodePointAt` and `NextCodePoint` are here for
+/// walking the text properly.
+///
+/// **Case and whitespace are ASCII.** Full Unicode case mapping is a table of
+/// several thousand entries with locale exceptions, and the runtime has no room
+/// for it yet. What is here maps A-Z and a-z and leaves every other byte alone,
+/// which is exactly right for identifiers, protocol tokens and file extensions,
+/// and visibly wrong for prose in most languages. Anything that says `Ascii` in
+/// its name says so; anything that does not is either encoding-independent or
+/// documented here.
 module Standard.Text;
 
 /// The byte a search returns when it found nothing.

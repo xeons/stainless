@@ -19,18 +19,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Pseudo-random numbers.
-//
-// A class rather than a set of free functions, and deliberately: the state has
-// to live somewhere, the language has no mutable global to put it in, and a
-// hidden one shared by every caller is what makes a program impossible to
-// reproduce. A `Random` you made is a `Random` you can seed and replay.
-//
-// **This is not cryptographic.** xoshiro256** is fast and well-distributed,
-// and its entire future is computable from 256 bits of state -- which is what
-// makes a seeded run reproducible and what makes it unfit for a key, a token
-// or a password. `Bytes` from the platform is what that needs; `sl_random_bytes`
-// is what this seeds from and is right there.
+/// Pseudo-random numbers.
+///
+/// A class rather than a set of free functions, and deliberately: the state has
+/// to live somewhere, the language has no mutable global to put it in, and a
+/// hidden one shared by every caller is what makes a program impossible to
+/// reproduce. A `Random` you made is a `Random` you can seed and replay.
+///
+/// **This is not cryptographic.** xoshiro256** is fast and well-distributed,
+/// and its entire future is computable from 256 bits of state -- which is what
+/// makes a seeded run reproducible and what makes it unfit for a key, a token
+/// or a password. `Bytes` from the platform is what that needs; `sl_random_bytes`
+/// is what this seeds from and is right there.
 module Standard.Random;
 
 extern "C" {

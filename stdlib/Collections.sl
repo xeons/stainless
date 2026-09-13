@@ -19,14 +19,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// The Stainless standard collections.
-//
-// Unlike Standard.Text, nothing here needs runtime support: it is ordinary
-// Stainless, compiled alongside your program. Generic declarations cost nothing
-// until they are instantiated, so importing this module and using none of it
-// emits no code at all.
-//
-// Interfaces are named with a leading I, as in C#.
+/// The Stainless standard collections.
+///
+/// Unlike Standard.Text, nothing here needs runtime support: it is ordinary
+/// Stainless, compiled alongside your program. Generic declarations cost nothing
+/// until they are instantiated, so importing this module and using none of it
+/// emits no code at all.
+///
+/// Interfaces are named with a leading I, as in C#.
 module Standard.Collections;
 
 /// Aborts with an index and a bound. Shared with the array bounds check, so a

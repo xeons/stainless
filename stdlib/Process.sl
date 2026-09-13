@@ -19,21 +19,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Running another program.
-//
-// **There is no shell.** The program and its arguments are a list, so a `>`, a
-// `|` or a space in a filename is a character the child receives rather than
-// something a shell acts on. That is the whole of shell injection, designed
-// out rather than warned about -- and it is why there is no `Run(String
-// commandLine)` here to reach for by mistake.
-//
-//     var done = try Run("git", ["rev-parse", "HEAD"]);
-//     if (done.Ok()) { Console.WriteLine(done.Output.Trim()); }
-//
-// `Run` waits and captures; `Start` hands back a `Process` to wait on later.
-// Both read the child's streams while it runs, which is not optional: a pipe
-// holds about 64KB, so a parent that waits before reading waits forever on a
-// child that writes more than that.
+/// Running another program.
+///
+/// **There is no shell.** The program and its arguments are a list, so a `>`, a
+/// `|` or a space in a filename is a character the child receives rather than
+/// something a shell acts on. That is the whole of shell injection, designed
+/// out rather than warned about -- and it is why there is no `Run(String
+/// commandLine)` here to reach for by mistake.
+///
+///     var done = try Run("git", ["rev-parse", "HEAD"]);
+///     if (done.Ok()) { Console.WriteLine(done.Output.Trim()); }
+///
+/// `Run` waits and captures; `Start` hands back a `Process` to wait on later.
+/// Both read the child's streams while it runs, which is not optional: a pipe
+/// holds about 64KB, so a parent that waits before reading waits forever on a
+/// child that writes more than that.
 module Standard.Process;
 
 import Standard.Collections;

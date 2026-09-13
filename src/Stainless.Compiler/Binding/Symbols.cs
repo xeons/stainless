@@ -91,6 +91,14 @@ public sealed class FunctionSymbol
     public required string ModuleName { get; init; }
     public required TypeSymbol ReturnType { get; init; }
     public required LinkageKind Linkage { get; init; }
+
+    /// <summary>
+    /// The <c>///</c> block written above the declaration, or null. Carried so
+    /// that a documentation writer has the prose beside the resolved signature
+    /// rather than having to go back to the source for it.
+    /// </summary>
+    public string? Documentation { get; init; }
+
     public FunctionKind Kind { get; init; } = FunctionKind.Function;
     public NamedTypeSymbol? ContainingType { get; init; }
     public bool IsPublic { get; init; }
@@ -258,6 +266,13 @@ public sealed class PropertySymbol
     public required TypeSymbol Type { get; init; }
     public required NamedTypeSymbol ContainingType { get; init; }
     public required Source.SourceSpan Span { get; init; }
+
+    /// <summary>
+    /// The <c>///</c> block written above the declaration, or null. Carried so
+    /// that a documentation writer has the prose beside the resolved signature
+    /// rather than having to go back to the source for it.
+    /// </summary>
+    public string? Documentation { get; init; }
     public bool IsPublic { get; init; }
     public bool IsProtected { get; init; }
 

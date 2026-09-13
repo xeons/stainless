@@ -192,11 +192,19 @@ public sealed class Parser
     {
         int start = _pos;
 
+        string? documentation = Current.Documentation;
+
         QualifiedName? moduleName = null;
         if (Match(TokenKind.ModuleKeyword))
         {
             moduleName = ParseQualifiedName();
             Expect(TokenKind.Semicolon);
+        }
+        else
+        {
+            // No module clause, so the block above the first token belongs to
+            // whatever that token declares rather than to the file.
+            documentation = null;
         }
 
         var imports = new List<ImportSyntax>();
@@ -221,7 +229,10 @@ public sealed class Parser
         // The lexer is null only for the sub-parser over one interpolation's
         // hole, and that one parses an expression rather than a file.
         return new CompilationUnitSyntax(
-            SpanFrom(start), _source, moduleName, imports, declarations, _lexer!.Libraries);
+            SpanFrom(start), _source, moduleName, imports, declarations, _lexer!.Libraries)
+        {
+            Documentation = documentation,
+        };
     }
 
     private QualifiedName ParseQualifiedName()
@@ -243,6 +254,25 @@ public sealed class Parser
     /// block is flattened into its members.
     /// </summary>
     private List<Declaration> ParseDeclaration(string? enclosingType)
+    {
+        // Every declaration funnels through here, so taking the block once and
+        // applying it to whatever comes back is the whole of the plumbing --
+        // the twenty methods below never mention documentation.
+        string? documentation = Current.Documentation;
+
+        var declarations = ParseDeclarationCore(enclosingType);
+        if (documentation is null) return declarations;
+
+        // Only the first: an anonymous struct hoisted out of its parent is a
+        // second declaration from the same source, and the block was written
+        // about the type the reader can see.
+        if (declarations.Count > 0)
+            declarations[0] = declarations[0] with { Documentation = documentation };
+
+        return declarations;
+    }
+
+    private List<Declaration> ParseDeclarationCore(string? enclosingType)
     {
         int start = _pos;
         var attributes = ParseAttributeLists();
@@ -627,6 +657,8 @@ public sealed class Parser
     private VariantCaseSyntax ParseVariantCase()
     {
         int start = _pos;
+        string? documentation = Current.Documentation;
+
         string name = ExpectIdentifier();
 
         IReadOnlyList<ParameterSyntax> parameters = [];
@@ -640,7 +672,10 @@ public sealed class Parser
                 "carries, and a value has a fixed number of them");
 
         Expect(TokenKind.Semicolon);
-        return new VariantCaseSyntax(SpanFrom(start), name, parameters);
+        return new VariantCaseSyntax(SpanFrom(start), name, parameters)
+        {
+            Documentation = documentation,
+        };
     }
 
     /// <summary><c>using Handle = void*;</c></summary>
@@ -673,9 +708,15 @@ public sealed class Parser
         while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
         {
             int memberStart = _pos;
+            string? memberDoc = Current.Documentation;
+
             string memberName = ExpectIdentifier();
             ExpressionSyntax? value = Match(TokenKind.Equals) ? ParseExpression() : null;
-            members.Add(new EnumMemberSyntax(SpanFrom(memberStart), memberName, value));
+
+            members.Add(new EnumMemberSyntax(SpanFrom(memberStart), memberName, value)
+            {
+                Documentation = memberDoc,
+            });
 
             if (!Match(TokenKind.Comma)) break;
         }

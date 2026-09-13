@@ -19,12 +19,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Whole-file operations.
-//
-// A module is a scope, so this is what C# spells as a static class: `File.Exists`
-// is a module-qualified call, and `import Standard.File;` is what makes the
-// short name reach it. Streams live in Standard.IO; this module is for the
-// cases where the whole file is the unit of work.
+/// Whole-file operations.
+///
+/// A module is a scope, so this is what C# spells as a static class: `File.Exists`
+/// is a module-qualified call, and `import Standard.File;` is what makes the
+/// short name reach it. Streams live in Standard.IO; this module is for the
+/// cases where the whole file is the unit of work.
 module Standard.File;
 
 import Standard.Collections;

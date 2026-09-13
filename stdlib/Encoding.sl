@@ -19,25 +19,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Text as bytes, in whichever encoding somebody else chose.
-//
-// A `String` is UTF-8 and there is deliberately no second string type (§3).
-// That settles what text *is* inside a program and says nothing about what
-// arrives from outside it -- a file written by a Windows editor, a protocol
-// header that predates Unicode, a registry value in UTF-16. This module is the
-// crossing, and every crossing is explicit.
-//
-// The shape is .NET's, adapted to what this language has: an interface rather
-// than an abstract class with static instances, because a static needs a
-// Sendable type and an initializer that `--shared` has nowhere to run. So the
-// encodings come from functions -- `Encoding.Utf8()` -- and a program may add
-// one of its own by implementing `IEncoding`.
-//
-// Both directions are lossy by default and say so, which is the same rule the
-// language already applies to `ToUtf16` and `Text.FromUtf16`: what cannot be
-// decoded becomes U+FFFD, and what cannot be encoded becomes `?`. `TryGetString`
-// is the strict form for a caller that needs to know rather than to cope, and
-// `CanRepresent` answers the other direction before anything is written.
+/// Text as bytes, in whichever encoding somebody else chose.
+///
+/// A `String` is UTF-8 and there is deliberately no second string type (§3).
+/// That settles what text *is* inside a program and says nothing about what
+/// arrives from outside it -- a file written by a Windows editor, a protocol
+/// header that predates Unicode, a registry value in UTF-16. This module is the
+/// crossing, and every crossing is explicit.
+///
+/// The shape is .NET's, adapted to what this language has: an interface rather
+/// than an abstract class with static instances, because a static needs a
+/// Sendable type and an initializer that `--shared` has nowhere to run. So the
+/// encodings come from functions -- `Encoding.Utf8()` -- and a program may add
+/// one of its own by implementing `IEncoding`.
+///
+/// Both directions are lossy by default and say so, which is the same rule the
+/// language already applies to `ToUtf16` and `Text.FromUtf16`: what cannot be
+/// decoded becomes U+FFFD, and what cannot be encoded becomes `?`. `TryGetString`
+/// is the strict form for a caller that needs to know rather than to cope, and
+/// `CanRepresent` answers the other direction before anything is written.
 module Standard.Encoding;
 
 import Standard.Text;

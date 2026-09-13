@@ -19,20 +19,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Taking paths apart and putting them together.
-//
-// Purely textual: nothing here touches a disk, and none of it asks whether the
-// path exists.
-//
-// **What counts as a separator is the platform's business, not a preference.**
-// Windows accepts both `\` and `/` everywhere, so both are read apart there and
-// a path from a config file or a URL works either way. Linux and macOS accept
-// only `/` -- and a backslash there is not a separator being generously
-// allowed, it is an ordinary character that a filename may contain. Treating
-// `report\2026.csv` as two parts on Linux is not lenient, it is wrong.
-//
-// So the questions this module answers have different answers on different
-// platforms, and it says which rather than picking one.
+/// Taking paths apart and putting them together.
+///
+/// Purely textual: nothing here touches a disk, and none of it asks whether the
+/// path exists.
+///
+/// **What counts as a separator is the platform's business, not a preference.**
+/// Windows accepts both `\` and `/` everywhere, so both are read apart there and
+/// a path from a config file or a URL works either way. Linux and macOS accept
+/// only `/` -- and a backslash there is not a separator being generously
+/// allowed, it is an ordinary character that a filename may contain. Treating
+/// `report\2026.csv` as two parts on Linux is not lenient, it is wrong.
+///
+/// So the questions this module answers have different answers on different
+/// platforms, and it says which rather than picking one.
 module Standard.Path;
 
 import Standard.Collections;

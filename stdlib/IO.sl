@@ -19,21 +19,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Streams, and the vocabulary the rest of the I/O modules share.
-//
-// **How failure is reported.** Stainless does not unwind, so an operation that
-// can fail says so in its return type:
-//
-//   - An operation that produces something returns `Result<T, IOError>`, the
-//     language's own type. `Value` is unreadable until the compiler has seen
-//     `Ok` checked, so there is no failed result to read by mistake.
-//   - An operation that produces nothing returns an `IOError` directly, and
-//     `IOError.None` is success.
-//   - A stream carries its last error instead, because a stream is used in a
-//     loop and checking after each step would drown the code it is in.
-//
-// That is three shapes rather than one, and it is deliberate: a single shape
-// would make the common cases read worse than the rare one.
+/// Streams, and the vocabulary the rest of the I/O modules share.
+///
+/// **How failure is reported.** Stainless does not unwind, so an operation that
+/// can fail says so in its return type:
+///
+///   - An operation that produces something returns `Result<T, IOError>`, the
+///     language's own type. `Value` is unreadable until the compiler has seen
+///     `Ok` checked, so there is no failed result to read by mistake.
+///   - An operation that produces nothing returns an `IOError` directly, and
+///     `IOError.None` is success.
+///   - A stream carries its last error instead, because a stream is used in a
+///     loop and checking after each step would drown the code it is in.
+///
+/// That is three shapes rather than one, and it is deliberate: a single shape
+/// would make the common cases read worse than the rare one.
 module Standard.IO;
 
 import Standard.Collections;
@@ -154,8 +154,16 @@ public enum SeekOrigin {
 /// end-of-file is seen: fewer than asked for, and zero at the end. Whether
 /// that was an error rather than an ending is what `Error()` says.
 public interface IStream {
+    /// Whether reading is allowed and possible now. False on a write-only
+    /// stream and on a closed one.
     bool CanRead();
+
+    /// Whether writing is allowed and possible now.
     bool CanWrite();
+
+    /// Whether the position can be moved. False for a stream with no position
+    /// to move -- a socket, a pipe -- where `Seek` fails and `Position` and
+    /// `Length` answer -1.
     bool CanSeek();
 
     /// Reads up to `count` bytes into `buffer` starting at `offset`, and
@@ -166,13 +174,24 @@ public interface IStream {
     /// how many it wrote.
     nuint Write(byte[] buffer, nuint offset, nuint count);
 
+    /// Where the next read or write will happen, or -1 when the stream has no
+    /// position.
     long Position();
+
+    /// How many bytes the stream holds, or -1 when it cannot say -- which is
+    /// every stream that is not seekable, and some that are.
     long Length();
 
     /// Moves the cursor. Reports whether it could.
     bool Seek(long offset, SeekOrigin origin);
 
+    /// Pushes buffered bytes onward. What "onward" means is the stream's: for
+    /// a file it is the system, not the disk.
     void Flush();
+
+    /// Releases whatever the stream holds. Implementations make this
+    /// idempotent, and a destructor calls it, so a stream that goes out of
+    /// scope is not leaked.
     void Close();
 
     /// The last error, or `IOError.None`. Cleared by the next successful call.

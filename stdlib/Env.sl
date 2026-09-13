@@ -19,11 +19,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// What the program was started with and what surrounds it.
-//
-// The arguments are also reachable as `Main(String[] args)`, which is the
-// better way to read them -- a function that takes what it needs beats one
-// that goes looking. These are for the code that is nowhere near `Main`.
+/// What the program was started with and what surrounds it.
+///
+/// The arguments are also reachable as `Main(String[] args)`, which is the
+/// better way to read them -- a function that takes what it needs beats one
+/// that goes looking. These are for the code that is nowhere near `Main`.
 module Standard.Env;
 
 import Standard.Collections;

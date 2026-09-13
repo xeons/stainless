@@ -180,7 +180,18 @@ public static class LinkageKinds
     public static bool IsForeign(this LinkageKind linkage) => linkage != LinkageKind.Stainless;
 }
 
-public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : SyntaxNode(Span);
+public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : SyntaxNode(Span)
+{
+    /// <summary>
+    /// The <c>///</c> block written above this declaration, or null.
+    ///
+    /// An <c>init</c> property rather than a positional parameter, because
+    /// every declaration has one and none of them constructs it: the parser
+    /// takes it from the first token of the declaration and applies it to
+    /// whatever came back, in one place.
+    /// </summary>
+    public string? Documentation { get; init; }
+}
 
 /// <summary>
 /// How a parameter is passed.
@@ -453,7 +464,11 @@ public sealed record DelegateDeclSyntax(
 
 /// <summary>One <c>enum</c> member, with the constant it was given if any.</summary>
 public sealed record EnumMemberSyntax(SourceSpan Span, string Name, ExpressionSyntax? Value)
-    : SyntaxNode(Span);
+    : SyntaxNode(Span)
+{
+    /// <summary>The <c>///</c> block written above this case, or null.</summary>
+    public string? Documentation { get; init; }
+}
 
 /// <summary>
 /// <c>enum Color { Red, Green }</c>, optionally over a chosen integer type as in
@@ -480,7 +495,11 @@ public enum TypeDeclKind { Struct, Class, Interface, Attribute, Variant, Union }
 public sealed record VariantCaseSyntax(
     SourceSpan Span,
     string Name,
-    IReadOnlyList<ParameterSyntax> Parameters) : SyntaxNode(Span);
+    IReadOnlyList<ParameterSyntax> Parameters) : SyntaxNode(Span)
+{
+    /// <summary>The <c>///</c> block written above this case, or null.</summary>
+    public string? Documentation { get; init; }
+}
 
 /// <summary>
 /// A type declaration. <c>IsOpaque</c> marks one written <c>struct HWND__;</c>,
@@ -554,7 +573,17 @@ public sealed record CompilationUnitSyntax(
     QualifiedName? ModuleName,
     IReadOnlyList<ImportSyntax> Imports,
     IReadOnlyList<Declaration> Declarations,
-    IReadOnlyList<string> Libraries) : SyntaxNode(Span);
+    IReadOnlyList<string> Libraries) : SyntaxNode(Span)
+{
+    /// <summary>
+    /// The <c>///</c> block written above <c>module X;</c>, or null.
+    ///
+    /// A module may span files, so several units can each carry one; what reads
+    /// them decides what to do with more than one. The standard library writes
+    /// it in whichever file is the module's centre and leaves the rest silent.
+    /// </summary>
+    public string? Documentation { get; init; }
+}
 
 // ---------------------------------------------------------------- statements
 

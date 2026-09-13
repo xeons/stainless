@@ -19,16 +19,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Arithmetic that is not an operator.
-//
-// A module is a scope, so this needs no static class to live in: `Math.Sqrt(x)`
-// is a module-qualified call, and `import Standard.Math;` is what makes the
-// short name reach it.
-//
-// The floating-point functions are the C library's, declared here and called
-// directly. That is the whole implementation -- there is no wrapper layer and
-// no conversion, because a Stainless `double` is a C `double`. The integer ones
-// are written out, since C has no such library.
+/// Arithmetic that is not an operator.
+///
+/// A module is a scope, so this needs no static class to live in: `Math.Sqrt(x)`
+/// is a module-qualified call, and `import Standard.Math;` is what makes the
+/// short name reach it.
+///
+/// The floating-point functions are the C library's, declared here and called
+/// directly. That is the whole implementation -- there is no wrapper layer and
+/// no conversion, because a Stainless `double` is a C `double`. The integer ones
+/// are written out, since C has no such library.
 module Standard.Math;
 
 extern "C" {

@@ -19,27 +19,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Sockets, the same on every platform.
-//
-// Winsock and BSD sockets are the same design that disagrees about every
-// detail -- a handle that is pointer-sized on one and a file descriptor on the
-// other, errors through WSAGetLastError or errno, closesocket or close, and a
-// startup call one of them will not work without. All of that is in
-// runtime/socket.c, for the reason every other platform difference is: a
-// Stainless enum crosses the boundary as itself and an errno does not.
-//
-// Four types, and the choice between them is what the program is doing rather
-// than what the platform offers:
-//
-//   TcpListener   accepts connections
-//   TcpClient     one connection, and an `IStream`, so everything that already
-//                 reads a stream reads a socket
-//   UdpSocket     datagrams, which are not a stream and are not pretended to be
-//   Socket        the one underneath, for anything the three do not cover
-//
-// `TcpClient` being an `IStream` is the point of the design. A reader written
-// against a file works over a connection with nothing changed, because there
-// was never anything file-shaped in it.
+/// Sockets, the same on every platform.
+///
+/// Winsock and BSD sockets are the same design that disagrees about every
+/// detail -- a handle that is pointer-sized on one and a file descriptor on the
+/// other, errors through WSAGetLastError or errno, closesocket or close, and a
+/// startup call one of them will not work without. All of that is in
+/// runtime/socket.c, for the reason every other platform difference is: a
+/// Stainless enum crosses the boundary as itself and an errno does not.
+///
+/// Four types, and the choice between them is what the program is doing rather
+/// than what the platform offers:
+///
+///   TcpListener   accepts connections
+///   TcpClient     one connection, and an `IStream`, so everything that already
+///                 reads a stream reads a socket
+///   UdpSocket     datagrams, which are not a stream and are not pretended to be
+///   Socket        the one underneath, for anything the three do not cover
+///
+/// `TcpClient` being an `IStream` is the point of the design. A reader written
+/// against a file works over a connection with nothing changed, because there
+/// was never anything file-shaped in it.
 module Standard.Net;
 
 import Standard.Collections;

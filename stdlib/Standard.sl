@@ -19,8 +19,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// The language's own vocabulary: the markers and types that are rules rather
-// than library features, and so need no import to reach.
+/// The language's own vocabulary: the markers and types that are rules rather
+/// than library features, and so need no import to reach.
 module Standard;
 
 /// What an operation produced, or why it did not.
@@ -49,7 +49,11 @@ module Standard;
 /// so the payloads overlap: a `Result<String, IOError>` is a tag and one
 /// pointer, not a flag and both halves. Nothing allocates either way.
 public variant Result<T, E> {
+    /// It worked, and `Value` is the answer.
     Ok(T Value);
+
+    /// It did not, and `Error` says why. The value is not there to be read --
+    /// that is the whole of what a variant buys over a pair.
     Fail(E Error);
 
     /// The value if there is one, and `fallback` if there is not.
@@ -126,7 +130,12 @@ extern "C" void sl_fail(byte* message);
 /// is also why the names differ: `Optional<T>` is this type, and "an optional"
 /// is what the spec calls `C?`.
 public variant Optional<T> {
+    /// There is no value. Carries nothing, so there is nothing to read by
+    /// mistake.
     None;
+
+    /// There is one, and `Some` carries it. Reached with `is Some x`, which
+    /// takes the value and names it in the same step.
     Some(T Value);
 
     /// True when there is a value. The reader for a caller that is about to

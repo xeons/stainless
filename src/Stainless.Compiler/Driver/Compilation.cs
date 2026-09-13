@@ -99,6 +99,32 @@ public sealed record CompilationOptions
     public bool EmitIrOnly { get; init; }
 
     /// <summary>
+    /// Where to write reference documentation generated from the <c>///</c>
+    /// blocks, or null for none.
+    ///
+    /// Written after binding and before emission, because a page is only worth
+    /// writing about source the compiler accepted: a signature nobody could
+    /// compile is not documentation, it is a claim.
+    /// </summary>
+    public string? DocumentationPath { get; init; }
+
+    /// <summary>
+    /// Document the standard library rather than the program's own modules.
+    ///
+    /// The standard library is compiled into every program, so its units are
+    /// always there to walk; what this chooses is which half of them the pages
+    /// are about.
+    /// </summary>
+    public bool DocumentStandardLibrary { get; init; }
+
+    /// <summary>
+    /// Stop once the documentation is written. Nothing is emitted, assembled or
+    /// linked, so this needs no toolchain -- which matters, because generating
+    /// documentation is something a machine with no clang should be able to do.
+    /// </summary>
+    public bool DocumentationOnly { get; init; }
+
+    /// <summary>
     /// Describe the program to a debugger: line tables, function names, and the
     /// name, type and stack slot of every local and parameter.
     ///
@@ -142,6 +168,9 @@ public sealed record CompilationResult
     public string? HeaderPath { get; init; }
     public string? MetadataPath { get; init; }
 
+    /// <summary>The documentation pages written, or empty.</summary>
+    public IReadOnlyList<string> DocumentationFiles { get; init; } = [];
+
     /// <summary>A failure outside the source program: a missing tool, unreadable file, bad IR.</summary>
     public string? DriverError { get; init; }
 }
@@ -179,6 +208,20 @@ public static class StandardLibrary
 {
     private const string Prefix = "Stainless.Library.";
 
+    /// <summary>
+    /// What stands in for a directory in a standard-library source's path.
+    ///
+    /// These are compiled out of the compiler's own resources and have no file
+    /// on disk, so the "path" is a label -- one that reads as a label in a
+    /// diagnostic rather than as a directory somebody could go and look in.
+    /// Anything wanting to point at the real source rewrites this; see
+    /// <see cref="RepositoryPath"/>.
+    /// </summary>
+    public const string PathMarker = "<standard>";
+
+    /// <summary>Where these files live in the repository they are written in.</summary>
+    public const string RepositoryPath = "stdlib";
+
     public static IEnumerable<(string Name, string Text)> Sources()
     {
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -191,7 +234,7 @@ public static class StandardLibrary
             if (stream is null) continue;
 
             using var reader = new StreamReader(stream);
-            yield return ("<standard>/" + resource[Prefix.Length..], reader.ReadToEnd());
+            yield return (PathMarker + "/" + resource[Prefix.Length..], reader.ReadToEnd());
         }
     }
 }
@@ -404,8 +447,13 @@ public sealed class Compilation
             references.Add(metadata);
         }
 
+        // Documenting is reading, not building: there is nothing to run, so
+        // demanding a 'Main' would make `stainless doc` refuse exactly the
+        // libraries it is most wanted for.
+        bool needsEntryPoint = !options.Shared && !options.DocumentationOnly;
+
         var program = new Binder(
-            diagnostics, requireEntryPoint: !options.Shared, references: references,
+            diagnostics, requireEntryPoint: needsEntryPoint, references: references,
             cppAbi: options.CppAbi).Bind(units);
         if (diagnostics.HasErrors) return Failed(diagnostics);
 
@@ -414,7 +462,7 @@ public sealed class Compilation
         // source, and pointing at a file nobody wrote reads as a compiler bug.
         var programSpan = units[standardUnits < units.Count ? standardUnits : 0].Span;
 
-        if (program.EntryPoint is null && !options.EmitIrOnly && !options.Shared)
+        if (program.EntryPoint is null && !options.EmitIrOnly && needsEntryPoint)
             diagnostics.Error("SL0290", programSpan,
                 "no entry point was found; declare 'int Main()' in one of the compiled modules, " +
                 "or pass --shared to build a library instead");
@@ -437,6 +485,41 @@ public sealed class Compilation
                 "instead, or build this module into an executable");
 
         if (diagnostics.HasErrors) return Failed(diagnostics);
+
+        // --- document ----------------------------------------------------
+        if (options.DocumentationPath is not null)
+        {
+            // The standard library's units come first and the program's after,
+            // which is what `standardUnits` divides. One or the other, never
+            // both: a page mixing `Standard.Text` with a program's own modules
+            // is a reference to nothing in particular.
+            var documented = options.DocumentStandardLibrary
+                ? units.Take(standardUnits).ToList()
+                : units.Skip(standardUnits).ToList();
+
+            IReadOnlyList<string> pages;
+            try
+            {
+                pages = Emit.DocWriter.Write(
+                    documented,
+                    Path.GetFullPath(options.DocumentationPath),
+                    sourceRoot: Environment.CurrentDirectory,
+                    rewritePath: (StandardLibrary.PathMarker, StandardLibrary.RepositoryPath));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                return Failure($"could not write the documentation to " +
+                               $"'{options.DocumentationPath}': {e.Message}");
+            }
+
+            if (options.DocumentationOnly)
+                return new CompilationResult
+                {
+                    Success = true,
+                    Diagnostics = diagnostics.Sorted().ToList(),
+                    DocumentationFiles = pages,
+                };
+        }
 
         // --- emit --------------------------------------------------------
         var debug = options.Debug

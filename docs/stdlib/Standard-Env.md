@@ -1,0 +1,155 @@
+# Standard.Env
+
+<sub>Generated from the `///` blocks in the source by `stainless doc`. Edit the source, not this file.</sub>
+
+What the program was started with and what surrounds it.
+
+The arguments are also reachable as `Main(String[] args)`, which is the
+better way to read them -- a function that takes what it needs beats one
+that goes looking. These are for the code that is nowhere near `Main`.
+
+## Contents
+
+**Functions** &nbsp; [ArgumentAt](#argumentat) &middot; [ArgumentCount](#argumentcount) &middot; [Arguments](#arguments) &middot; [CurrentDirectory](#currentdirectory) &middot; [Get](#get) &middot; [GetOr](#getor) &middot; [Has](#has) &middot; [Names](#names) &middot; [Program](#program) &middot; [Remove](#remove) &middot; [Set](#set) &middot; [SetCurrentDirectory](#setcurrentdirectory)
+
+## Functions
+
+### ArgumentAt *function*
+
+```
+String ArgumentAt(nuint index)
+```
+
+One argument, counting from zero. Aborts past the end, as an array does.
+
+<sub>[stdlib/Env.sl:52](../../stdlib/Env.sl#L52)</sub>
+
+### ArgumentCount *function*
+
+```
+nuint ArgumentCount()
+```
+
+How many arguments the program was given, not counting its own name.
+
+<sub>[stdlib/Env.sl:49](../../stdlib/Env.sl#L49)</sub>
+
+### Arguments *function*
+
+```
+String[] Arguments()
+```
+
+Every argument, as an array. The same thing `Main(String[] args)` receives.
+
+<sub>[stdlib/Env.sl:58](../../stdlib/Env.sl#L58)</sub>
+
+### CurrentDirectory *function*
+
+```
+String CurrentDirectory()
+```
+
+The directory relative paths are resolved against.
+
+<sub>[stdlib/Env.sl:117](../../stdlib/Env.sl#L117)</sub>
+
+### Get *function*
+
+```
+String? Get(String name)
+```
+
+A variable's value, or null when it is not set.
+
+Null rather than empty, because "not set" and "set to nothing" are
+different states and both platforms can tell them apart. `GetOr` is what
+most callers want.
+
+<sub>[stdlib/Env.sl:77](../../stdlib/Env.sl#L77)</sub>
+
+### GetOr *function*
+
+```
+String GetOr(String name, String fallback)
+```
+
+A variable's value, or `fallback` when it is not set.
+
+<sub>[stdlib/Env.sl:80](../../stdlib/Env.sl#L80)</sub>
+
+### Has *function*
+
+```
+bool Has(String name)
+```
+
+Whether a variable is set, whatever it is set to.
+
+<sub>[stdlib/Env.sl:87](../../stdlib/Env.sl#L87)</sub>
+
+### Names *function*
+
+```
+String[] Names()
+```
+
+The name of every variable, in whatever order the platform keeps them.
+
+<sub>[stdlib/Env.sl:108](../../stdlib/Env.sl#L108)</sub>
+
+### Program *function*
+
+```
+String Program()
+```
+
+The program's own path, as the operating system gave it. That is not
+necessarily where the executable is: a shell may pass a bare name, and on
+Linux nothing guarantees any relationship at all.
+
+<sub>[stdlib/Env.sl:68](../../stdlib/Env.sl#L68)</sub>
+
+### Remove *function*
+
+```
+bool Remove(String name)
+```
+
+Removes a variable, reporting whether the platform accepted it. Removing
+one that was never set is not a failure.
+
+<sub>[stdlib/Env.sl:105](../../stdlib/Env.sl#L105)</sub>
+
+### Set *function*
+
+```
+bool Set(String name, String value)
+```
+
+Sets a variable for this process and anything it starts afterwards.
+
+It does not reach the shell that started this program: a process's
+environment is its own, and a child gets a copy. Reports whether the
+platform accepted it.
+
+**An empty value is not portable.** On Windows, setting a variable to the
+empty string removes it -- `SetEnvironmentVariable` defines it that way,
+and there is no way around it. On Unix the variable exists and is empty.
+A program that needs the distinction should not encode it in a variable's
+value; a program that reads one should use `GetOr` and treat empty and
+unset alike.
+
+<sub>[stdlib/Env.sl:101](../../stdlib/Env.sl#L101)</sub>
+
+### SetCurrentDirectory *function*
+
+```
+bool SetCurrentDirectory(String path)
+```
+
+Changes it, reporting whether the platform accepted it. It fails when the
+path is not a directory, or is not reachable.
+
+<sub>[stdlib/Env.sl:121](../../stdlib/Env.sl#L121)</sub>
+

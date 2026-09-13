@@ -19,18 +19,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Locks, atomics and the job pool.
-//
-// This is step 2 of docs/concurrency.md: the library surface over the runtime
-// primitives, with no new syntax. `spawn` and `parallel` are step 3, and the
-// move and sendability analysis that makes any of this checkable is step 6 --
-// so for now the rules in that document are conventions the compiler does not
-// yet enforce.
-//
-// The one rule that matters most: threads share plain data and frozen data,
-// and move ownership of everything else. Reference counts are atomic, so
-// sharing an object no longer corrupts its count; what the rule protects is
-// the object's *contents*, which nothing synchronizes on its behalf.
+/// Locks, atomics and the job pool.
+///
+/// This is step 2 of docs/concurrency.md: the library surface over the runtime
+/// primitives, with no new syntax. `spawn` and `parallel` are step 3, and the
+/// move and sendability analysis that makes any of this checkable is step 6 --
+/// so for now the rules in that document are conventions the compiler does not
+/// yet enforce.
+///
+/// The one rule that matters most: threads share plain data and frozen data,
+/// and move ownership of everything else. Reference counts are atomic, so
+/// sharing an object no longer corrupts its count; what the rule protects is
+/// the object's *contents*, which nothing synchronizes on its behalf.
 module Standard.Threading;
 
 extern "C" {

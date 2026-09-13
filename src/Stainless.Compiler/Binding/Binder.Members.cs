@@ -253,7 +253,10 @@ public sealed partial class Binder
                         $"the value of '{type.Name}.{member.Name}' must be an integer constant");
             }
 
-            type.Members.Add(new EnumMemberSymbol(member.Name, type, value));
+            type.Members.Add(new EnumMemberSymbol(member.Name, type, value)
+            {
+                Documentation = member.Documentation,
+            });
             next = value + 1;
         }
     }
@@ -545,6 +548,7 @@ public sealed partial class Binder
                         IsPublic = field.Modifiers.HasFlag(Modifiers.Public),
                         IsProtected = field.Modifiers.HasFlag(Modifiers.Protected),
                         IsAnonymous = field.IsAnonymous,
+                        Documentation = field.Documentation,
                     };
 
                     if (field.BitWidth is not null)
@@ -1021,6 +1025,7 @@ public sealed partial class Binder
             Type = propertyType,
             ContainingType = type,
             Span = declaration.Span,
+            Documentation = declaration.Documentation,
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public) || isInterface,
             IsProtected = declaration.Modifiers.HasFlag(Modifiers.Protected),
             BackingField = backing,
