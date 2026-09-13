@@ -1791,7 +1791,7 @@ A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
 
 `Reduce`, spelled as LINQ spells it.
 
-<sub>[stdlib/Functional.sl:386](../../stdlib/Functional.sl#L386)</sub>
+<sub>[stdlib/Functional.sl:381](../../stdlib/Functional.sl#L381)</sub>
 
 ### Aggregate *function*
 
@@ -1801,7 +1801,7 @@ A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
 
 `Reduce` over any sequence, spelled as LINQ spells it.
 
-<sub>[stdlib/Functional.sl:393](../../stdlib/Functional.sl#L393)</sub>
+<sub>[stdlib/Functional.sl:388](../../stdlib/Functional.sl#L388)</sub>
 
 ### All *function*
 
@@ -1812,7 +1812,7 @@ bool All<T>(T[:] items, Predicate<T> test)
 Whether every element does. Stops at the first that does not, and is true
 of an empty input.
 
-<sub>[stdlib/Functional.sl:94](../../stdlib/Functional.sl#L94)</sub>
+<sub>[stdlib/Functional.sl:92](../../stdlib/Functional.sl#L92)</sub>
 
 ### All *function*
 
@@ -1823,7 +1823,7 @@ bool All<T>(IEnumerable<T> items, Predicate<T> test)
 Whether every element does, over any sequence. Stops at the first that
 does not, and is true of an empty sequence.
 
-<sub>[stdlib/Functional.sl:202](../../stdlib/Functional.sl#L202)</sub>
+<sub>[stdlib/Functional.sl:200](../../stdlib/Functional.sl#L200)</sub>
 
 ### Any *function*
 
@@ -1833,7 +1833,7 @@ bool Any<T>(T[:] items, Predicate<T> test)
 
 Whether any element satisfies the predicate. Stops at the first that does.
 
-<sub>[stdlib/Functional.sl:85](../../stdlib/Functional.sl#L85)</sub>
+<sub>[stdlib/Functional.sl:83](../../stdlib/Functional.sl#L83)</sub>
 
 ### Any *function*
 
@@ -1844,7 +1844,7 @@ bool Any<T>(IEnumerable<T> items, Predicate<T> test)
 Whether any element satisfies the predicate, over any sequence. Stops at
 the first that does, so the rest of the sequence is never walked.
 
-<sub>[stdlib/Functional.sl:193](../../stdlib/Functional.sl#L193)</sub>
+<sub>[stdlib/Functional.sl:191](../../stdlib/Functional.sl#L191)</sub>
 
 ### BinarySearch *function*
 
@@ -1870,7 +1870,7 @@ nuint CountWhere<T>(T[:] items, Predicate<T> test)
 
 How many satisfy the predicate.
 
-<sub>[stdlib/Functional.sl:102](../../stdlib/Functional.sl#L102)</sub>
+<sub>[stdlib/Functional.sl:100](../../stdlib/Functional.sl#L100)</sub>
 
 ### CountWhere *function*
 
@@ -1880,7 +1880,7 @@ nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test)
 
 How many satisfy the predicate, over any sequence. Walks all of it.
 
-<sub>[stdlib/Functional.sl:210](../../stdlib/Functional.sl#L210)</sub>
+<sub>[stdlib/Functional.sl:208](../../stdlib/Functional.sl#L208)</sub>
 
 ### Distinct *function*
 
@@ -1895,7 +1895,7 @@ O(n²) in comparisons, which is what asking nothing of `T` but `IEquatable`
 costs. A `HashSet<T>` does it in one pass and wants `IHashable` as well;
 this is the one to reach for at the sizes a chain works at.
 
-<sub>[stdlib/Functional.sl:282](../../stdlib/Functional.sl#L282)</sub>
+<sub>[stdlib/Functional.sl:280](../../stdlib/Functional.sl#L280)</sub>
 
 ### Distinct *function*
 
@@ -1907,7 +1907,7 @@ List<T> Distinct<T>(IEnumerable<T> items)
 The elements, in order, with later repeats left out, over any sequence.
 O(n squared) in comparisons, as the slice overload is.
 
-<sub>[stdlib/Functional.sl:292](../../stdlib/Functional.sl#L292)</sub>
+<sub>[stdlib/Functional.sl:290](../../stdlib/Functional.sl#L290)</sub>
 
 ### Filter *function*
 
@@ -1919,7 +1919,7 @@ The elements the predicate keeps, in the order they were in.
 
 An array converts to a slice of the whole of itself, so this takes both.
 
-<sub>[stdlib/Functional.sl:53](../../stdlib/Functional.sl#L53)</sub>
+<sub>[stdlib/Functional.sl:51](../../stdlib/Functional.sl#L51)</sub>
 
 ### Filter *function*
 
@@ -1931,7 +1931,7 @@ The same, for anything with a `GetEnumerator()` that names its shape --
 `List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
 `SortedList<K, V>` all do.
 
-<sub>[stdlib/Functional.sl:169](../../stdlib/Functional.sl#L169)</sub>
+<sub>[stdlib/Functional.sl:167](../../stdlib/Functional.sl#L167)</sub>
 
 ### Find *function*
 
@@ -1947,7 +1947,7 @@ An `Optional<T>` rather than a fallback: a struct has no null to stand for
 "none" (§2.5), and inventing a value that means it is how a caller comes to
 treat a real answer as a miss.
 
-<sub>[stdlib/Functional.sl:129](../../stdlib/Functional.sl#L129)</sub>
+<sub>[stdlib/Functional.sl:127](../../stdlib/Functional.sl#L127)</sub>
 
 ### FirstOr *function*
 
@@ -1961,7 +1961,7 @@ The reader that needs no check, because it supplies its own answer. `Find`
 is the one to reach for when "there was none" is a different outcome rather
 than a different value.
 
-<sub>[stdlib/Functional.sl:115](../../stdlib/Functional.sl#L115)</sub>
+<sub>[stdlib/Functional.sl:113](../../stdlib/Functional.sl#L113)</sub>
 
 ### FirstOr *function*
 
@@ -1974,7 +1974,7 @@ over any sequence. A fallback equal to a real element is indistinguishable
 from a miss; `Find` is the overload that tells them apart, and it takes a
 slice rather than a sequence.
 
-<sub>[stdlib/Functional.sl:222](../../stdlib/Functional.sl#L222)</sub>
+<sub>[stdlib/Functional.sl:220](../../stdlib/Functional.sl#L220)</sub>
 
 ### ForEach *function*
 
@@ -1984,7 +1984,7 @@ void ForEach<T>(T[:] items, Action<T> body)
 
 Runs the action over every element.
 
-<sub>[stdlib/Functional.sl:145](../../stdlib/Functional.sl#L145)</sub>
+<sub>[stdlib/Functional.sl:143](../../stdlib/Functional.sl#L143)</sub>
 
 ### ForEach *function*
 
@@ -1994,7 +1994,7 @@ void ForEach<T>(IEnumerable<T> items, Action<T> body)
 
 Runs the action over every element of any sequence.
 
-<sub>[stdlib/Functional.sl:230](../../stdlib/Functional.sl#L230)</sub>
+<sub>[stdlib/Functional.sl:228](../../stdlib/Functional.sl#L228)</sub>
 
 ### IndexOf *function*
 
@@ -2022,7 +2022,7 @@ Optional<nuint> IndexWhere<T>(T[:] items, Predicate<T> test)
 
 Where the first element satisfying the predicate is, if it is there.
 
-<sub>[stdlib/Functional.sl:137](../../stdlib/Functional.sl#L137)</sub>
+<sub>[stdlib/Functional.sl:135](../../stdlib/Functional.sl#L135)</sub>
 
 ### Largest *function*
 
@@ -2062,7 +2062,7 @@ Every element put through the transform.
 binding the lambda's body -- which cannot happen until `T` has given the
 lambda its parameter type. The compiler does the two in that order.
 
-<sub>[stdlib/Functional.sl:68](../../stdlib/Functional.sl#L68)</sub>
+<sub>[stdlib/Functional.sl:66](../../stdlib/Functional.sl#L66)</sub>
 
 ### Map *function*
 
@@ -2072,7 +2072,7 @@ List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform)
 
 Every element put through the transform, over any sequence.
 
-<sub>[stdlib/Functional.sl:178](../../stdlib/Functional.sl#L178)</sub>
+<sub>[stdlib/Functional.sl:176](../../stdlib/Functional.sl#L176)</sub>
 
 ### OrderBy *function*
 
@@ -2086,7 +2086,7 @@ The elements ordered by what `order` says, leaving the input alone.
 from is usually somebody else's array. This copies first, and is stable for
 the reason `Sort` is.
 
-<sub>[stdlib/Functional.sl:305](../../stdlib/Functional.sl#L305)</sub>
+<sub>[stdlib/Functional.sl:303](../../stdlib/Functional.sl#L303)</sub>
 
 ### OrderBy *function*
 
@@ -2097,7 +2097,7 @@ List<T> OrderBy<T>(IEnumerable<T> items, Comparer<T> order)
 The elements ordered by what `order` says, over any sequence, leaving the
 input alone. Copies into an array first, so it costs one.
 
-<sub>[stdlib/Functional.sl:315](../../stdlib/Functional.sl#L315)</sub>
+<sub>[stdlib/Functional.sl:313](../../stdlib/Functional.sl#L313)</sub>
 
 ### Reduce *function*
 
@@ -2110,7 +2110,7 @@ result type, so `A` is settled before the lambda is looked at.
 
     long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
 
-<sub>[stdlib/Functional.sl:78](../../stdlib/Functional.sl#L78)</sub>
+<sub>[stdlib/Functional.sl:76](../../stdlib/Functional.sl#L76)</sub>
 
 ### Reduce *function*
 
@@ -2120,7 +2120,7 @@ A Reduce<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
 
 Everything folded into one value, left to right, over any sequence.
 
-<sub>[stdlib/Functional.sl:185](../../stdlib/Functional.sl#L185)</sub>
+<sub>[stdlib/Functional.sl:183](../../stdlib/Functional.sl#L183)</sub>
 
 ### RemoveFirst *function*
 
@@ -2174,7 +2174,7 @@ List<R> Select<T, R>(T[:] items, Func<T, R> transform)
 
 `Map`, spelled as LINQ spells it.
 
-<sub>[stdlib/Functional.sl:372](../../stdlib/Functional.sl#L372)</sub>
+<sub>[stdlib/Functional.sl:367](../../stdlib/Functional.sl#L367)</sub>
 
 ### Select *function*
 
@@ -2184,7 +2184,7 @@ List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
 
 `Map` over any sequence, spelled as LINQ spells it.
 
-<sub>[stdlib/Functional.sl:379](../../stdlib/Functional.sl#L379)</sub>
+<sub>[stdlib/Functional.sl:374](../../stdlib/Functional.sl#L374)</sub>
 
 ### Skip *function*
 
@@ -2194,7 +2194,7 @@ List<T> Skip<T>(T[:] items, nuint count)
 
 Everything after the first `count` elements, or nothing if there are fewer.
 
-<sub>[stdlib/Functional.sl:158](../../stdlib/Functional.sl#L158)</sub>
+<sub>[stdlib/Functional.sl:156](../../stdlib/Functional.sl#L156)</sub>
 
 ### Skip *function*
 
@@ -2204,7 +2204,7 @@ List<T> Skip<T>(IEnumerable<T> items, nuint count)
 
 Everything after the first `count`.
 
-<sub>[stdlib/Functional.sl:332](../../stdlib/Functional.sl#L332)</sub>
+<sub>[stdlib/Functional.sl:330](../../stdlib/Functional.sl#L330)</sub>
 
 ### Smallest *function*
 
@@ -2288,7 +2288,7 @@ List<T> Take<T>(T[:] items, nuint count)
 
 The first `count` elements, or all of them if there are fewer.
 
-<sub>[stdlib/Functional.sl:150](../../stdlib/Functional.sl#L150)</sub>
+<sub>[stdlib/Functional.sl:148](../../stdlib/Functional.sl#L148)</sub>
 
 ### Take *function*
 
@@ -2298,7 +2298,7 @@ List<T> Take<T>(IEnumerable<T> items, nuint count)
 
 The first `count` elements, or all of them if there are fewer.
 
-<sub>[stdlib/Functional.sl:322](../../stdlib/Functional.sl#L322)</sub>
+<sub>[stdlib/Functional.sl:320](../../stdlib/Functional.sl#L320)</sub>
 
 ### ToArray *function*
 
@@ -2312,7 +2312,7 @@ One `IEnumerable` overload rather than an `IReadOnlyList` one as well: a
 `List<T>` is both, so a pair would be ambiguous at exactly the type a chain
 hands over. That is why `ToList` takes only the sequence too.
 
-<sub>[stdlib/Functional.sl:263](../../stdlib/Functional.sl#L263)</sub>
+<sub>[stdlib/Functional.sl:261](../../stdlib/Functional.sl#L261)</sub>
 
 ### ToArray *function*
 
@@ -2322,7 +2322,7 @@ T[] ToArray<T>(T[:] items)
 
 The same for a slice, which is not an `IEnumerable` and so does not collide.
 
-<sub>[stdlib/Functional.sl:271](../../stdlib/Functional.sl#L271)</sub>
+<sub>[stdlib/Functional.sl:269](../../stdlib/Functional.sl#L269)</sub>
 
 ### ToList *function*
 
@@ -2333,7 +2333,7 @@ List<T> ToList<T>(IEnumerable<T> items)
 Everything in the sequence, as a list. The one that makes a `Queue` or a
 `HashSet` usable with the array overloads above.
 
-<sub>[stdlib/Functional.sl:236](../../stdlib/Functional.sl#L236)</sub>
+<sub>[stdlib/Functional.sl:234](../../stdlib/Functional.sl#L234)</sub>
 
 ### ToList *function*
 
@@ -2344,7 +2344,7 @@ List<T> ToList<T>(T[:] items)
 And a slice, which an array converts to. Not an overload of the above by
 accident: a slice is not an `IEnumerable`, so nothing is ever both.
 
-<sub>[stdlib/Functional.sl:244](../../stdlib/Functional.sl#L244)</sub>
+<sub>[stdlib/Functional.sl:242](../../stdlib/Functional.sl#L242)</sub>
 
 ### Where *function*
 
@@ -2354,7 +2354,7 @@ List<T> Where<T>(T[:] items, Predicate<T> keep)
 
 `Filter`, spelled as LINQ spells it.
 
-<sub>[stdlib/Functional.sl:354](../../stdlib/Functional.sl#L354)</sub>
+<sub>[stdlib/Functional.sl:349](../../stdlib/Functional.sl#L349)</sub>
 
 ### Where *function*
 
@@ -2364,5 +2364,5 @@ List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
 
 `Filter` over any sequence, spelled as LINQ spells it.
 
-<sub>[stdlib/Functional.sl:363](../../stdlib/Functional.sl#L363)</sub>
+<sub>[stdlib/Functional.sl:358](../../stdlib/Functional.sl#L358)</sub>
 

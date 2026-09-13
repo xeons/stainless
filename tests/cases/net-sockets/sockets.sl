@@ -61,9 +61,8 @@ int Main() {
     Say("bound-host", address.Host);
     SayBool("bound-port", address.Port != 0u);
 
-    // No family named, so `Any`: the name decides. This is the shape that used
-    // to open an AF_UNSPEC socket before resolving -- which Winsock accepts and
-    // Linux does not, so it worked here and hung there.
+    // No family named, so `Any`: the name decides which family the socket is
+    // opened in, rather than the socket being opened before the name is read.
     var dialled = TcpClient.Connect("127.0.0.1", address.Port);
     SayBool("connected", dialled.Ok);
     if (!dialled.Ok) { return 1; }

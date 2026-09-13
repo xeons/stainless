@@ -43,9 +43,8 @@ extern "C" {
     long sl_time_zone_offset(long nanoseconds);
 }
 
-// The conversion factors, public because a program that has to hand a count of
-// nanoseconds to a C API should multiply by a name rather than by a literal
-// with the wrong number of zeroes in it.
+// The conversion factors, public so that a count of nanoseconds bound for a C
+// API can be written as a multiplication by a name.
 
 /// Nanoseconds in a microsecond.
 public const long NanosecondsPerMicrosecond = 1000;

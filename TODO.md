@@ -12,69 +12,30 @@ no "why" is one that should be deleted rather than done.
 
 ## Documentation
 
-### A documentation block on everything public in the standard library
+The three entries that were here are done. What each turned out to be, since
+none of them was quite what it looked like:
 
-Every public type, function, property and case in `stdlib/` should carry a
-`///` block saying what it is, what it takes, what it answers and what it
-refuses. Some do and some do not, and the ones that do not are the ones a
-reader meets first: a name in a list with nothing beside it.
+**Blocks on everything public.** 484 declarations had none. The bar held:
+what a caller has to know before using it. Writing them found that
+`String.ByteAt` reads the buffer unchecked where every other position on a
+String clamps -- the class had to say which one does not rather than claim a
+rule it does not keep.
 
-It matters because the standard library is the only part of this language most
-people will read. The spec says what a `Dictionary` is; only the source says
-what `GetOr` does when the key is there and mapped to the fallback. Two of
-those gaps were found by asking rather than by reading -- `SortedList.Get` and
-`Random()` both aborted without saying so -- which is a poor way to find them.
+**A generator.** `stainless doc`, and `docs/stdlib/` is its output, checked
+in. The claim here that `///` blocks were in the syntax tree was wrong: the
+lexer threw them away with every other comment. They are a token's
+`Documentation` now, carried to the declaration and onto the symbol. It reads
+syntax rather than a bound program, against what this entry assumed -- a
+generic emits nothing until it is instantiated, so `List<T>` and
+`Dictionary<K, V>` have no bound symbol to walk.
 
-The bar is what a caller has to know before using it, not what the
-implementation does: the shape of the answer, whether it can fail and how it
-says so, what it costs where that is surprising, and which sibling to reach for
-instead where one is the better question.
-
-*Touches:* every file in `stdlib/`.
-
-### A documentation generator
-
-Read the `///` blocks and emit browsable reference documentation for the
-standard library -- one page per module, each public member with its signature,
-its block and a link to its source.
-
-It matters because the blocks are worth writing only if something reads them.
-Today the way to find out what `Standard.Text` offers is to open
-`stdlib/Text.sl` and scroll, which is fine for someone editing the language and
-useless for someone using it.
-
-The compiler already has everything it needs: the binder resolves every public
-signature, `MetadataWriter` already walks exactly the surface that should be
-documented, and `///` blocks are in the syntax tree. The work is a writer that
-takes a bound program and produces Markdown or HTML, plus a decision about
-where the output lives.
-
-Worth doing after the blocks exist, not before: a generator over sparse
-documentation produces a page that looks complete and says nothing.
-
-*Touches:* a new writer beside `Emit/CHeaderWriter.cs`, and `Stainless.Cli`.
-
-### Comments that say what the code does, and nothing else
-
-Go through the tree and remove every comment that is not a direct description
-of what the code does: the speculation, the reasoning, the history of why a
-thing was tried and rejected, and the arguments with alternatives that are not
-there.
-
-It matters because a comment that explains a decision goes stale in a way a
-comment describing the code does not. The code moves and the argument stays,
-and then the argument is wrong -- and a wrong explanation is worse than none,
-because it is believed. A reader wants to know what the line in front of them
-does. Where the reasoning is genuinely worth keeping, its home is this file,
-`HANDOFF.md` or the spec, where it can be revised as a document rather than
-found by accident beside a function.
-
-This is a large mechanical pass over `src/`, `stdlib/`, `runtime/` and
-`tests/cases/`, and a mechanical pass needs a test that fails: the suites must
-be green before and after, since a comment removal that takes a line of code
-with it is exactly the mistake to expect.
-
-*Touches:* everything.
+**Comments that say what the code does.** Smaller than it read. Splitting
+`///` from `//` is what made it tractable: a block is documentation and keeps
+the first entry's bar, and a note beside a line is describing that line. What
+was left -- free-standing argument, history, and comparison with an absent
+alternative -- came to about thirty comments across the tree, and every one of
+them was a `//` block. There were no free-standing argumentative `//` blocks
+at all: that prose lives in `///`, which is where it belongs.
 
 ---
 
@@ -185,11 +146,21 @@ narrowing -- and that is the analysis above, not a shape.
 
 *Touches:* `Binder.NarrowableSubject`, `Binder.InvalidateVariantFact`.
 
-### Reflection that writes
+### Making an instance from a `Type`
 
-Fields can be read from an instance and not set, so a deserializer cannot be
-written; nor can an instance be made from a `Type`. Methods and interfaces carry
-no metadata — fields only.
+Fields and properties can now be read *and* written through reflection, which is
+what `Standard.Json` and `Standard.Xml` are built on. What is still missing is
+the step before that: there is no way to ask a `Type` for a new instance, so
+every reader fills an object the caller already made.
+
+That is why `Populate<T>(T value, String text)` is the shape, and why there is no
+`Deserialize<T>(String)` answering a fresh `T`. Two things would have to change.
+A type argument cannot be written at a call (§4.4) — `<` in expression position
+is ambiguous with less-than — so a function whose only mention of `T` is its
+return type has nothing to infer from and could never be called. And the
+metadata carries no constructor to call once the bytes are allocated.
+
+Methods and interfaces carry no metadata either — fields and properties only.
 
 ### Definition-site constraint checking
 

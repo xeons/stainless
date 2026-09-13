@@ -29,17 +29,11 @@
  * sl_weak_load can safely read the strong count instead of reading freed
  * memory.
  *
- * The counts are atomic. They were not, and the rule above them was that
- * nothing two threads can both reach is ever retained -- which Mutex<T> broke:
- * a lock protects what it guards and not the count of what it guards, so a
- * reference handed out of a lock is retained by one thread while another
- * releases it, an update is lost, and the object is freed while still in use.
- *
- * Making only [Shared] types atomic would not have closed it. Mutex<List<T>>
- * guards a List, and a List is not [Shared]; what would have to be atomic is
- * everything reachable from a [Shared] type, which is most of the heap in any
- * program where the question arises. It could also be laundered through the
- * raw pointer a job takes its argument as.
+ * The counts are atomic, and every count is: a lock protects what it guards
+ * and not the count of what it guards, so a reference handed out of a lock is
+ * retained by one thread while another releases it. Counting only the types
+ * marked [Shared] would not reach that -- Mutex<List<T>> guards a List, and a
+ * List is not [Shared].
  *
  * A retain is relaxed: the caller already holds a reference, so nothing is
  * being published by incrementing. A release is acq_rel, so everything written

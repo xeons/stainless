@@ -76,13 +76,10 @@ public sealed partial class Binder
 
         // A literal that does not fit is a mistake, not a conversion.
         //
-        // Every integer literal starts out an `int`, so one too large for a
-        // target at least that wide used to fall through to an ordinary
-        // widening -- `int` to `long` has nothing to complain about -- and the
-        // value was cut to 32 bits on the way out. `long l =
-        // 9223372036854775808;` compiled, ran, and held zero. A narrower
-        // target was always caught, but only because nothing widens an `int`
-        // to a `byte`, which is the right answer reached for the wrong reason.
+        // Checked here rather than left to the widening: `int` to `long` has
+        // nothing to complain about, so a literal too large for a target at
+        // least that wide would reach the emitter and be cut to 32 bits with
+        // nothing said.
         if (target is PrimitiveTypeSymbol { IsInteger: true } &&
             IntegerLiteral(expression) is { } tooLarge)
         {

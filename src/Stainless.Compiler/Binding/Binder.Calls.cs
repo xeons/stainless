@@ -113,11 +113,8 @@ public sealed partial class Binder
             // A method of the enclosing type, called without a receiver.
             //
             // First, because inside a type a bare name means that type's
-            // member. It used to be last, which made every public function in
-            // every imported module a chance to take the call instead -- and
-            // `Standard.Text` is imported whether a program asks or not, so a
-            // function added there could quietly capture a method call in code
-            // that had never heard of it. A method that does not accept these
+            // member: a public function in an imported module does not get to
+            // take the call instead. A method that does not accept these
             // arguments is still an error about the method, not a licence to go
             // looking for something else with the same name.
             if (callee.Name.Parts.Count == 1 &&

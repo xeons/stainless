@@ -65,7 +65,7 @@ int Main() {
 
     // A `void*`: DWARF spells it as a pointer with no base type, and LLVM
     // still wants the field written -- as `null` -- or the node does not
-    // verify. Nothing here had one until it did not build.
+    // verify.
     int cell = 5;
     void* anything = (void*)&cell;
 

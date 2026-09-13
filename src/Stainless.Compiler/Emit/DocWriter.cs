@@ -192,7 +192,7 @@ public static class DocWriter
             case GlobalConstDeclSyntax constant:
                 module.Constants.Add(new Entry(
                     constant.Name,
-                    $"const {Render(constant.Type)} {constant.Name} = {Render(constant.Value)}",
+                    Constant(constant),
                     constant.Documentation,
                     Locate(unit, constant.Span))
                 { Kind = "constant" });
@@ -216,6 +216,17 @@ public static class DocWriter
                 { Kind = "alias" });
                 break;
         }
+    }
+
+    /// <summary>
+    /// A <c>const</c> as it was written. The type is optional in the source --
+    /// <c>const Pi = 3.14;</c> takes it from the value -- and the page says
+    /// what the source says rather than the type the binder worked out.
+    /// </summary>
+    private static string Constant(GlobalConstDeclSyntax constant)
+    {
+        string type = constant.Type is null ? "" : Render(constant.Type) + " ";
+        return $"const {type}{constant.Name} = {Render(constant.Value)}";
     }
 
     private static Entry DescribeType(TypeDeclSyntax type, CompilationUnitSyntax unit)
@@ -299,7 +310,7 @@ public static class DocWriter
             case GlobalConstDeclSyntax constant:
                 owner.Members.Add(new Entry(
                     constant.Name,
-                    $"const {Render(constant.Type)} {constant.Name} = {Render(constant.Value)}",
+                    Constant(constant),
                     constant.Documentation,
                     Locate(unit, constant.Span))
                 { Kind = "constant" });

@@ -92,9 +92,8 @@ int Main() {
         + Standard.Text.FromInteger((long)before) + " to "
         + Standard.Text.FromInteger((long)after));
 
-    // And a key press, which goes the same route and has always worked --
-    // here so that a change which fixed the mouse by breaking the keyboard
-    // would still be caught.
+    // And a key press, which goes the same route -- here so that a change
+    // fixing the mouse by breaking the keyboard would still be caught.
     var typed = new TextBox(form);
     typed.SetBounds(12, 180, 400, 26);
     Settle();

@@ -23,7 +23,7 @@ IOError AppendText(String path, String text)
 
 Adds `text` to the end, creating the file if it is not there.
 
-<sub>[stdlib/File.sl:154](../../stdlib/File.sl#L154)</sub>
+<sub>[stdlib/File.sl:153](../../stdlib/File.sl#L153)</sub>
 
 ### Copy *function*
 
@@ -34,7 +34,7 @@ IOError Copy(String from, String to)
 Copies a file. Reads it whole, so this is for ordinary files rather than
 for something that will not fit in memory.
 
-<sub>[stdlib/File.sl:168](../../stdlib/File.sl#L168)</sub>
+<sub>[stdlib/File.sl:167](../../stdlib/File.sl#L167)</sub>
 
 ### Delete *function*
 
@@ -75,7 +75,7 @@ Result<byte[], IOError> ReadAllBytes(String path)
 
 The whole file as bytes.
 
-<sub>[stdlib/File.sl:70](../../stdlib/File.sl#L70)</sub>
+<sub>[stdlib/File.sl:69](../../stdlib/File.sl#L69)</sub>
 
 ### ReadAllLines *function*
 
@@ -86,7 +86,7 @@ Result<List<String>, IOError> ReadAllLines(String path)
 The file's lines, with either line ending accepted and a trailing newline
 producing no final empty line.
 
-<sub>[stdlib/File.sl:104](../../stdlib/File.sl#L104)</sub>
+<sub>[stdlib/File.sl:103](../../stdlib/File.sl#L103)</sub>
 
 ### ReadAllText *function*
 
@@ -96,7 +96,7 @@ Result<String, IOError> ReadAllText(String path)
 
 The whole file as text, read as UTF-8.
 
-<sub>[stdlib/File.sl:95](../../stdlib/File.sl#L95)</sub>
+<sub>[stdlib/File.sl:94](../../stdlib/File.sl#L94)</sub>
 
 ### Rename *function*
 
@@ -127,7 +127,7 @@ IOError WriteAllBytes(String path, byte[] data)
 
 Replaces the file with `data`, creating it if needed.
 
-<sub>[stdlib/File.sl:111](../../stdlib/File.sl#L111)</sub>
+<sub>[stdlib/File.sl:110](../../stdlib/File.sl#L110)</sub>
 
 ### WriteAllLines *function*
 
@@ -137,7 +137,7 @@ IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 
 Writes the lines, each followed by a newline.
 
-<sub>[stdlib/File.sl:137](../../stdlib/File.sl#L137)</sub>
+<sub>[stdlib/File.sl:136](../../stdlib/File.sl#L136)</sub>
 
 ### WriteAllText *function*
 
@@ -147,5 +147,5 @@ IOError WriteAllText(String path, String text)
 
 Replaces the file with `text`, written as UTF-8.
 
-<sub>[stdlib/File.sl:124](../../stdlib/File.sl#L124)</sub>
+<sub>[stdlib/File.sl:123](../../stdlib/File.sl#L123)</sub>
 

@@ -51,8 +51,7 @@ int Main() {
 
     // Two templates that name each other. `Twig<T>` is asked for while
     // `Sprig<T>` is still declaring its members, so laying either one out at
-    // that moment reads a case list that is not there yet -- which gave the
-    // variant a one-byte payload and a segfault at the first store.
+    // that moment would read a case list that is not there yet.
     Sprig<int> leaf = Bud(4);
     Sprig<int> tree = Fork(new Twig<int>(leaf, Bud(5)));
     printf("mutual=%d\n", Count(tree));

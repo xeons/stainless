@@ -41,9 +41,7 @@
 module Standard.Collections;
 
 // The shapes a lambda takes here -- `Func`, `Predicate`, `Action`, `Fold` and
-// `Comparer` -- are declared in `Standard`, because they are what §2.15 says a
-// lambda may become rather than anything to do with collections, and
-// `Optional.Map` needs them too. They need no import to reach.
+// `Comparer` -- are declared in `Standard`, and need no import to reach.
 
 // ---------------------------------------------------------- over an array
 
@@ -341,14 +339,11 @@ public List<T> Skip<T>(IEnumerable<T> items, nuint count) {
 
 // ----------------------------------------------------------- other names
 
-// The same work under the names C# gave it, because a reader arriving from
-// LINQ looks for these first.
+// The same work under the names C# gave it, for a reader arriving from LINQ.
 //
-// Written out rather than calling the originals. A one-line body would be the
-// honest thing, but `Map(items, transform)` cannot infer `R` when `transform`
-// is already a `Func<T, R>` value: the inference reads a *lambda's* body, and
-// there is no lambda here to read. Passing a closure on is a shape that does
-// not infer yet.
+// Each body is written out rather than calling the original: `Map(items,
+// transform)` cannot infer `R` from a `Func<T, R>` value, because the
+// inference reads a lambda's body and there is no lambda here.
 
 /// `Filter`, spelled as LINQ spells it.
 public List<T> Where<T>(T[:] items, Predicate<T> keep) {

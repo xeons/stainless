@@ -76,7 +76,7 @@ Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 76 columns and a decoder that refused a newline would be useless for the
 thing it is most often pointed at.
 
-<sub>[stdlib/Convert.sl:315](../../stdlib/Convert.sl#L315)</sub>
+<sub>[stdlib/Convert.sl:311](../../stdlib/Convert.sl#L311)</sub>
 
 ### FromHex *function*
 
@@ -88,7 +88,7 @@ Hexadecimal back into bytes. Either case, and an odd number of digits is
 malformed rather than padded, because there is no way to know which end the
 missing half belonged to.
 
-<sub>[stdlib/Convert.sl:280](../../stdlib/Convert.sl#L280)</sub>
+<sub>[stdlib/Convert.sl:276](../../stdlib/Convert.sl#L276)</sub>
 
 ### FromLong *function*
 
@@ -111,7 +111,7 @@ String ToBase64(byte[] data)
 
 `data` as base64, padded with `=` to a multiple of four.
 
-<sub>[stdlib/Convert.sl:300](../../stdlib/Convert.sl#L300)</sub>
+<sub>[stdlib/Convert.sl:296](../../stdlib/Convert.sl#L296)</sub>
 
 ### ToBase64Text *function*
 
@@ -121,7 +121,7 @@ String ToBase64Text(String text)
 
 Base64 of the UTF-8 bytes of `text`, which is the common case.
 
-<sub>[stdlib/Convert.sl:366](../../stdlib/Convert.sl#L366)</sub>
+<sub>[stdlib/Convert.sl:362](../../stdlib/Convert.sl#L362)</sub>
 
 ### ToBase64Url *function*
 
@@ -132,7 +132,7 @@ String ToBase64Url(byte[] data)
 `data` as base64url: `-` and `_` for the last two characters, and no
 padding. What a JWT and a URL query both want, and RFC 4648 §5.
 
-<sub>[stdlib/Convert.sl:306](../../stdlib/Convert.sl#L306)</sub>
+<sub>[stdlib/Convert.sl:302](../../stdlib/Convert.sl#L302)</sub>
 
 ### ToDouble *function*
 
@@ -156,7 +156,7 @@ String ToHex(byte[] data)
 
 `data` as lowercase hexadecimal, two characters per byte and nothing between.
 
-<sub>[stdlib/Convert.sl:252](../../stdlib/Convert.sl#L252)</sub>
+<sub>[stdlib/Convert.sl:248](../../stdlib/Convert.sl#L248)</sub>
 
 ### ToHex *function*
 
@@ -166,7 +166,7 @@ String ToHex(byte[] data, bool upper)
 
 The same, in the case asked for.
 
-<sub>[stdlib/Convert.sl:257](../../stdlib/Convert.sl#L257)</sub>
+<sub>[stdlib/Convert.sl:253](../../stdlib/Convert.sl#L253)</sub>
 
 ### ToInt *function*
 

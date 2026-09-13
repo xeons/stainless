@@ -126,8 +126,7 @@ int Main() {
     // --------------------------------------------------------- file stream
     //
     // Opening is a Result, so there is no stream to go on using until the
-    // success case has been named. That is the whole difference from the
-    // `IsOpen()` latch this replaced: the check cannot be walked past.
+    // success case has been named: the check cannot be walked past.
     var opened = FileStream.OpenRead(notes);
     printf("open-ok=%d\n", opened.Ok ? 1 : 0);
 

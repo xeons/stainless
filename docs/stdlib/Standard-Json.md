@@ -45,7 +45,7 @@ every reference in it starts null, and only the document fills them. Mark a
 field with this when the document is what decides whether the object is
 there, and leave it alone when the constructor already made one.
 
-<sub>[stdlib/Json.sl:807](../../stdlib/Json.sl#L807)</sub>
+<sub>[stdlib/Json.sl:804](../../stdlib/Json.sl#L804)</sub>
 
 ### JsonError *enum*
 
@@ -166,7 +166,7 @@ attribute JsonIgnore
 
 Leaves the field out of the document entirely, in both directions.
 
-<sub>[stdlib/Json.sl:797](../../stdlib/Json.sl#L797)</sub>
+<sub>[stdlib/Json.sl:794](../../stdlib/Json.sl#L794)</sub>
 
 ### JsonName *attribute*
 
@@ -176,7 +176,7 @@ attribute JsonName
 
 The name this field has in the document, when it differs from the field's.
 
-<sub>[stdlib/Json.sl:794](../../stdlib/Json.sl#L794)</sub>
+<sub>[stdlib/Json.sl:791](../../stdlib/Json.sl#L791)</sub>
 
 ### JsonObject *class*
 
@@ -376,7 +376,7 @@ bool BoolOr(JsonValue value, bool fallback)
 The value of a `Bool`, or the fallback. A `Number` of 1 is not true here;
 only the JSON literals are.
 
-<sub>[stdlib/Json.sl:230](../../stdlib/Json.sl#L230)</sub>
+<sub>[stdlib/Json.sl:227](../../stdlib/Json.sl#L227)</sub>
 
 ### Describe *function*
 
@@ -400,7 +400,7 @@ Truncation, not rounding: `3.9` is 3. JSON has one number type, so this is
 how a field that is conceptually an integer is read back, and a value past
 what a `long` holds is not detected.
 
-<sub>[stdlib/Json.sl:223](../../stdlib/Json.sl#L223)</sub>
+<sub>[stdlib/Json.sl:220](../../stdlib/Json.sl#L220)</sub>
 
 ### IsNull *function*
 
@@ -410,7 +410,7 @@ bool IsNull(JsonValue value)
 
 True for the one case that carries nothing.
 
-<sub>[stdlib/Json.sl:236](../../stdlib/Json.sl#L236)</sub>
+<sub>[stdlib/Json.sl:233](../../stdlib/Json.sl#L233)</sub>
 
 ### ItemsOf *function*
 
@@ -420,7 +420,7 @@ List<JsonValue> ItemsOf(JsonValue value)
 
 The elements of an `Array`, or an empty list.
 
-<sub>[stdlib/Json.sl:245](../../stdlib/Json.sl#L245)</sub>
+<sub>[stdlib/Json.sl:242](../../stdlib/Json.sl#L242)</sub>
 
 ### MembersOf *function*
 
@@ -430,7 +430,7 @@ JsonObject MembersOf(JsonValue value)
 
 The members of an `Object`, or an empty one.
 
-<sub>[stdlib/Json.sl:239](../../stdlib/Json.sl#L239)</sub>
+<sub>[stdlib/Json.sl:236](../../stdlib/Json.sl#L236)</sub>
 
 ### NewArray *function*
 
@@ -475,7 +475,7 @@ double NumberOr(JsonValue value, double fallback)
 The value of a `Number`, or the fallback for anything else. A JSON number
 is a double, so a large integer has already lost precision by here.
 
-<sub>[stdlib/Json.sl:213](../../stdlib/Json.sl#L213)</sub>
+<sub>[stdlib/Json.sl:210](../../stdlib/Json.sl#L210)</sub>
 
 ### Parse *function*
 
@@ -487,7 +487,7 @@ Reads a whole document. Trailing content is an error rather than ignored,
 because a document with a second value in it is a document the writer meant
 something else by.
 
-<sub>[stdlib/Json.sl:642](../../stdlib/Json.sl#L642)</sub>
+<sub>[stdlib/Json.sl:639](../../stdlib/Json.sl#L639)</sub>
 
 ### Populate *function*
 
@@ -507,7 +507,7 @@ A document naming a nested object the constructor left null is skipped
 rather than allocated into, since nothing here could give the rest of that
 object's fields a value.
 
-<sub>[stdlib/Json.sl:946](../../stdlib/Json.sl#L946)</sub>
+<sub>[stdlib/Json.sl:943](../../stdlib/Json.sl#L943)</sub>
 
 ### PopulateFrom *function*
 
@@ -517,7 +517,7 @@ JsonError PopulateFrom<T>(T value, JsonValue document)
 
 The same, from a document already parsed.
 
-<sub>[stdlib/Json.sl:954](../../stdlib/Json.sl#L954)</sub>
+<sub>[stdlib/Json.sl:951](../../stdlib/Json.sl#L951)</sub>
 
 ### Serialize *function*
 
@@ -527,7 +527,7 @@ String Serialize<T>(T value)
 
 The document as text.
 
-<sub>[stdlib/Json.sl:819](../../stdlib/Json.sl#L819)</sub>
+<sub>[stdlib/Json.sl:816](../../stdlib/Json.sl#L816)</sub>
 
 ### SerializeIndented *function*
 
@@ -537,7 +537,7 @@ String SerializeIndented<T>(T value)
 
 The same, indented.
 
-<sub>[stdlib/Json.sl:822](../../stdlib/Json.sl#L822)</sub>
+<sub>[stdlib/Json.sl:819](../../stdlib/Json.sl#L819)</sub>
 
 ### TextOr *function*
 
@@ -547,7 +547,7 @@ String TextOr(JsonValue value, String fallback)
 
 The text of a `Text`, or the fallback for anything else.
 
-<sub>[stdlib/Json.sl:206](../../stdlib/Json.sl#L206)</sub>
+<sub>[stdlib/Json.sl:203](../../stdlib/Json.sl#L203)</sub>
 
 ### ToValue *function*
 
@@ -561,7 +561,7 @@ Reads the field tables of `[Reflect] T`, walking into a nested class or
 struct rather than stopping at it. A field of a kind with no JSON spelling
 -- a pointer, a delegate, an array -- is left out rather than guessed at.
 
-<sub>[stdlib/Json.sl:814](../../stdlib/Json.sl#L814)</sub>
+<sub>[stdlib/Json.sl:811](../../stdlib/Json.sl#L811)</sub>
 
 ### Write *function*
 
@@ -571,7 +571,7 @@ String Write(JsonValue value)
 
 The document as text, on one line.
 
-<sub>[stdlib/Json.sl:657](../../stdlib/Json.sl#L657)</sub>
+<sub>[stdlib/Json.sl:654](../../stdlib/Json.sl#L654)</sub>
 
 ### WriteIndented *function*
 
@@ -581,7 +581,7 @@ String WriteIndented(JsonValue value)
 
 The document as text, indented two spaces a level.
 
-<sub>[stdlib/Json.sl:664](../../stdlib/Json.sl#L664)</sub>
+<sub>[stdlib/Json.sl:661](../../stdlib/Json.sl#L661)</sub>
 
 ## Constants
 

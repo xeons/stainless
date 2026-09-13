@@ -160,9 +160,8 @@ int Main() {
 
     // ------------------------------------------------------------- cursors
 
-    // Every one of these used to build a whole List before the first step, so
-    // walking a container allocated as much again as it held. What is being
-    // checked is that the order did not change when that stopped.
+    // Each of these walks its container in place rather than building a list
+    // first. What is checked is the order each one hands things back in.
 
     var queue = new Queue<int>();
     queue.Enqueue(1); queue.Enqueue(2); queue.Enqueue(3);

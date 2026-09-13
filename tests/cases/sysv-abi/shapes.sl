@@ -46,8 +46,7 @@ public struct A5 { public sbyte[17] A; }
 
 // Bit-fields, which look like they have nothing to do with eightbytes and do.
 // A bit-field is classified by its storage unit -- the whole of its declared
-// type -- because that is what the emitter loads and stores. Marking one byte
-// of it made B1 travel as an i8 and lose three quarters of itself.
+// type -- because that is what the emitter loads and stores.
 public struct B1 { public uint A : 4; public uint B : 4; public uint C : 24; }
 public struct B2 { public byte A : 3; public byte B : 5; }
 public struct B3 { public ulong A : 40; public ulong B : 20; }

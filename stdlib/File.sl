@@ -60,9 +60,8 @@ public IOError Rename(String from, String to) {
     return (IOError)sl_file_rename(from.ToPointer(), to.ToPointer());
 }
 
-// Opening a file is `FileStream.Open` and its shorthands, in Standard.IO: it
-// makes a stream, so it belongs to the stream. This module is for the cases
-// where the whole file is the unit of work and no stream outlives the call.
+// Opening a file is `FileStream.Open` and its shorthands, in Standard.IO.
+// This module is for the cases where the whole file is the unit of work.
 
 // ------------------------------------------------------------------ reading
 

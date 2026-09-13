@@ -96,8 +96,8 @@ public void Main() {
 
     // --- the same machinery, still narrowing variants -----------------
     //
-    // `&&` reaching its right operand was missing for these too, so
-    // `r.Ok && r.Value > 0` did not compile before this.
+    // `&&` binds its right operand knowing the left for a variant too, so
+    // `r.Ok && r.Value > 0` reads the case the left established.
     var found = Find(a, 3);
     if (found.Ok && found.Value > 0) {
         Console.WriteLine("both  " + Text.FromInteger((long)found.Value));

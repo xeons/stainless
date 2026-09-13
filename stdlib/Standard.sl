@@ -72,16 +72,9 @@ public variant Result<T, E> {
 
 // What a lambda becomes, named once.
 //
-// These were five one-method interfaces until closures could be generic. The
-// difference is not cosmetic: an interface needs an object that implements it,
-// so `Each(numbers, total.Add)` had to be written as a class whose only reason
-// to exist was to carry one method. A `closure` is a method and the object it
-// belongs to, in two words, so a bound method and a lambda are the same thing
-// and neither needs a declaration to hold it.
-//
-// They live here rather than in `Standard.Collections` because they are what
-// §2.15 says a lambda may become rather than anything a collection owns, and
-// because `Optional<T>` needs them too. Nothing has to import them.
+// A `closure` is a method and the object it belongs to, so a bound method and
+// a lambda are the same thing and neither needs a declaration to hold it.
+// They live here rather than in `Standard.Collections`, and need no import.
 
 /// Turns a T into an R. The transform half of `Map`.
 public closure R Func<T, R>(T value);

@@ -145,8 +145,7 @@ public void Main() {
     Console.WriteLine("iidof is stable: " + Text.FromBool(first == again));
     // Every part of it, not only the first. `Guid` is built by the compiler
     // rather than bound from source, so its field indices and offsets are
-    // written by hand -- and were once the same numbers, which meant `Data2`
-    // reached the fifth member of a struct with four.
+    // written by hand and each one has to be checked.
     Console.WriteLine("iidof data1: " + Text.FromInteger((long)first->Data1));
     Console.WriteLine("iidof data2: " + Text.FromInteger((long)first->Data2));
     Console.WriteLine("iidof data3: " + Text.FromInteger((long)first->Data3));

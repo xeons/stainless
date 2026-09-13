@@ -19,7 +19,7 @@ closure void Action<T>(T value)
 
 Does something with a T and returns nothing.
 
-<sub>[stdlib/Standard.sl:93](../../stdlib/Standard.sl#L93)</sub>
+<sub>[stdlib/Standard.sl:86](../../stdlib/Standard.sl#L86)</sub>
 
 ### Comparer&lt;T&gt; *closure*
 
@@ -33,7 +33,7 @@ zero if neither.
 This is what lets a type be sorted more than one way, and what lets a type
 that implements no interface be sorted at all.
 
-<sub>[stdlib/Standard.sl:104](../../stdlib/Standard.sl#L104)</sub>
+<sub>[stdlib/Standard.sl:97](../../stdlib/Standard.sl#L97)</sub>
 
 ### Fold&lt;A, T&gt; *closure*
 
@@ -44,7 +44,7 @@ closure A Fold<A, T>(A total, T value)
 Folds one T into a running A. Two parameters rather than one, because a
 fold is the one shape that carries something along with it.
 
-<sub>[stdlib/Standard.sl:97](../../stdlib/Standard.sl#L97)</sub>
+<sub>[stdlib/Standard.sl:90](../../stdlib/Standard.sl#L90)</sub>
 
 ### Func&lt;T, R&gt; *closure*
 
@@ -54,7 +54,7 @@ closure R Func<T, R>(T value)
 
 Turns a T into an R. The transform half of `Map`.
 
-<sub>[stdlib/Standard.sl:87](../../stdlib/Standard.sl#L87)</sub>
+<sub>[stdlib/Standard.sl:80](../../stdlib/Standard.sl#L80)</sub>
 
 ### Optional&lt;T&gt; *variant*
 
@@ -83,7 +83,7 @@ a case to name. This is for everything a null pointer cannot say -- which
 is also why the names differ: `Optional<T>` is this type, and "an optional"
 is what the spec calls `C?`.
 
-<sub>[stdlib/Standard.sl:132](../../stdlib/Standard.sl#L132)</sub>
+<sub>[stdlib/Standard.sl:125](../../stdlib/Standard.sl#L125)</sub>
 
 #### None *case*
 
@@ -94,7 +94,7 @@ None
 There is no value. Carries nothing, so there is nothing to read by
 mistake.
 
-<sub>[stdlib/Standard.sl:135](../../stdlib/Standard.sl#L135)</sub>
+<sub>[stdlib/Standard.sl:128](../../stdlib/Standard.sl#L128)</sub>
 
 #### Some *case*
 
@@ -105,7 +105,7 @@ Some(T Value)
 There is one, and `Some` carries it. Reached with `is Some x`, which
 takes the value and names it in the same step.
 
-<sub>[stdlib/Standard.sl:139](../../stdlib/Standard.sl#L139)</sub>
+<sub>[stdlib/Standard.sl:132](../../stdlib/Standard.sl#L132)</sub>
 
 #### HasValue *method*
 
@@ -116,7 +116,7 @@ bool HasValue()
 True when there is a value. The reader for a caller that is about to
 ask a second question anyway; `is Some x` is the one that gets at it.
 
-<sub>[stdlib/Standard.sl:143](../../stdlib/Standard.sl#L143)</sub>
+<sub>[stdlib/Standard.sl:136](../../stdlib/Standard.sl#L136)</sub>
 
 #### IsEmpty *method*
 
@@ -127,7 +127,7 @@ bool IsEmpty()
 True when there is not. The same question the other way round, because
 `!x.HasValue()` reads worse than the thing it means.
 
-<sub>[stdlib/Standard.sl:150](../../stdlib/Standard.sl#L150)</sub>
+<sub>[stdlib/Standard.sl:143](../../stdlib/Standard.sl#L143)</sub>
 
 #### Get *method*
 
@@ -142,7 +142,7 @@ something that is not there is a mistake in the caller rather than a
 value to return. Use `ValueOr` where a miss is ordinary, and
 `is Some x` where the answer decides what happens next.
 
-<sub>[stdlib/Standard.sl:161](../../stdlib/Standard.sl#L161)</sub>
+<sub>[stdlib/Standard.sl:154](../../stdlib/Standard.sl#L154)</sub>
 
 #### ValueOr *method*
 
@@ -155,7 +155,7 @@ The value if there is one, and `fallback` if there is not.
 The reader that needs no proof, because it supplies its own -- the same
 bargain `Result.ValueOr` makes.
 
-<sub>[stdlib/Standard.sl:175](../../stdlib/Standard.sl#L175)</sub>
+<sub>[stdlib/Standard.sl:168](../../stdlib/Standard.sl#L168)</sub>
 
 #### Or *method*
 
@@ -169,7 +169,7 @@ This one if it holds anything, and `other` if it does not.
 A lambda would allocate a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 
-<sub>[stdlib/Standard.sl:185](../../stdlib/Standard.sl#L185)</sub>
+<sub>[stdlib/Standard.sl:178](../../stdlib/Standard.sl#L178)</sub>
 
 #### Map *method*
 
@@ -184,7 +184,7 @@ The value put through `transform`, or none.
 The transform runs only where there is something to run it on, which is
 the point: it is the `if` that would otherwise be written by hand.
 
-<sub>[stdlib/Standard.sl:196](../../stdlib/Standard.sl#L196)</sub>
+<sub>[stdlib/Standard.sl:189](../../stdlib/Standard.sl#L189)</sub>
 
 #### FlatMap *method*
 
@@ -195,7 +195,7 @@ Optional<R> FlatMap<R>(Func<T, Optional<R>> transform)
 `Map` for a transform that answers with an optional of its own, which
 would otherwise nest one inside the other.
 
-<sub>[stdlib/Standard.sl:203](../../stdlib/Standard.sl#L203)</sub>
+<sub>[stdlib/Standard.sl:196](../../stdlib/Standard.sl#L196)</sub>
 
 #### Filter *method*
 
@@ -205,7 +205,7 @@ Optional<T> Filter(Predicate<T> keep)
 
 This one when it holds something `keep` accepts, and none otherwise.
 
-<sub>[stdlib/Standard.sl:209](../../stdlib/Standard.sl#L209)</sub>
+<sub>[stdlib/Standard.sl:202](../../stdlib/Standard.sl#L202)</sub>
 
 #### IfPresent *method*
 
@@ -215,7 +215,7 @@ void IfPresent(Action<T> action)
 
 Runs `action` on the value, if there is one.
 
-<sub>[stdlib/Standard.sl:217](../../stdlib/Standard.sl#L217)</sub>
+<sub>[stdlib/Standard.sl:210](../../stdlib/Standard.sl#L210)</sub>
 
 ### Predicate&lt;T&gt; *closure*
 
@@ -225,7 +225,7 @@ closure bool Predicate<T>(T value)
 
 Answers a question about a T.
 
-<sub>[stdlib/Standard.sl:90](../../stdlib/Standard.sl#L90)</sub>
+<sub>[stdlib/Standard.sl:83](../../stdlib/Standard.sl#L83)</sub>
 
 ### Result&lt;T, E&gt; *variant*
 

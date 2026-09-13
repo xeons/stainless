@@ -86,10 +86,9 @@ int Main() {
     Show("offsetof(Holder, Second)", offsetof(Holder, Second));
 
     // What `sizeof` says has to be what the generated code does, which is a
-    // separate claim and was once a different answer: LLVM has no way to be
-    // told a type's alignment, so an over-aligned struct was emitted as its
-    // fields and nothing else -- and an array of them had a stride of 4 while
-    // this line said 16.
+    // separate claim: LLVM has no way to be told a type's alignment, so an
+    // over-aligned struct's stride is the emitter's to get right and this
+    // line is what checks that it did.
     var many = new Wide[3];
     many[0u].A = 10;
     many[1u].A = 20;

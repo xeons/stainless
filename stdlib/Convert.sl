@@ -207,11 +207,7 @@ public Result<double, ConvertError> ToDouble(String text) {
 
     // This walk decides only whether the text is a number this library
     // accepts; what the digits are worth is settled once, at the end, by the
-    // runtime -- the sign included. Reading them here as well -- ten times a
-    // running total, or a tenth of a running scale -- loses a bit per digit,
-    // and a tenth is not a binary fraction, so a number written at full
-    // precision did not read back as itself: `1e-07` came back as something
-    // very slightly else.
+    // runtime, the sign included.
     nuint digits = 0;
 
     while (at < size && Ascii.IsDigit(bytes[at])) {

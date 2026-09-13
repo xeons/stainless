@@ -295,9 +295,9 @@ public sealed class Builtins
         };
         // The last argument is the field's *index*, and the offset is set after
         // it: this type is built by hand rather than bound from source, so
-        // nothing else fills either in. They were once the same numbers, which
-        // read plausibly and meant that `Data2` reached member 4 of a struct
-        // with four of them.
+        // nothing else fills either in. The two are not the same number past the
+        // first field, and a `Guid` laid out as though they were reaches one
+        // member off.
         Guid.Fields.Add(new FieldSymbol("Data1", PrimitiveTypeSymbol.UInt, Guid, 0)
             { IsPublic = true, Offset = 0 });
         Guid.Fields.Add(new FieldSymbol("Data2", PrimitiveTypeSymbol.UShort, Guid, 1)

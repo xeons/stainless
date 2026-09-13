@@ -43,9 +43,8 @@ int Main() {
 
     // A negated literal is as wide as the value it holds. Every integer
     // literal starts out an `int` and adopts a wider type where it is used,
-    // and a minus is in between: without a width chosen for the operation,
-    // `-9000000000000000000` truncated to 32 bits and widened back silently,
-    // `int` to `long` being an implicit conversion with nothing to say.
+    // and a minus is in between: the width has to be chosen for the operation,
+    // or the value truncates to 32 bits and widens back with nothing to say.
     long floor = -9223372036854775808;
     long wide = -9000000000000000000;
     long past = -4000000000;

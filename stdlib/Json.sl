@@ -192,15 +192,12 @@ public JsonValue NewObject() { return JsonValue.Object(new JsonObject()); }
 /// at every call rather than at this declaration.
 public JsonValue NumberOf(long value) { return JsonValue.Number((double)value); }
 
-// The readers below answer with a default rather than a failure, because the
-// case has already been established by anyone who cared: a program that wants
-// to know switches, and one that wants a value with a fallback writes this.
+// The readers below answer with a default rather than a failure: a program
+// that wants to know which case it has switches instead.
 //
-// Each is a tag test rather than a switch, which is the short form §2.6
-// describes: `value.Text` asks the tag, and inside the `if` the compiler has
-// established the case, so the field that case carries is readable under its
-// own name. A `switch` with one arm and a `default` says the same thing in
-// twice the lines.
+// Each is a tag test, the short form §2.6 describes: `value.Text` asks the
+// tag, and inside the `if` the compiler has established the case, so the field
+// that case carries is readable under its own name.
 
 /// The text of a `Text`, or the fallback for anything else.
 public String TextOr(JsonValue value, String fallback) {
@@ -960,14 +957,6 @@ public JsonError PopulateFrom<T>(T value, JsonValue document) {
     FillInstance((byte*)value, type, document.Members);
     return JsonError.None;
 }
-
-// There is no `Deserialize<T>(String)` returning a fresh `T`, and it is worth
-// saying why rather than leaving the gap to be noticed. A type argument cannot
-// be written at a call (§4.4) -- `<` in expression position is ambiguous with
-// less-than -- so a function whose only mention of `T` is its return type has
-// nothing to infer from and could never be called. `Populate` takes the object
-// instead, which is the shape that works and also the safer one: the
-// constructor has run.
 
 void FillInstance(byte* instance, Type type, JsonObject members) {
     for (nuint i = 0u; i < type.FieldCount(); i++) {

@@ -852,9 +852,8 @@ public class Utf16String {
 //
 // None of these is public. `Standard.Text` is imported into every module
 // whether the program asked for it or not, so a public function here is a name
-// in every scope in the program -- which is how a `Join(String, String[])`
-// managed to shadow `TaskScope`'s own `Join()`. What is worth having outside
-// this file lives in `Standard.Ascii`, which has to be imported.
+// in every scope in the program. What is worth having outside this file lives
+// in `Standard.Ascii`, which has to be imported.
 
 /// True for space, tab, newline, carriage return, vertical tab and form feed.
 bool IsAsciiWhiteSpace(byte value) {
