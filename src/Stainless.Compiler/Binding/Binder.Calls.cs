@@ -1205,6 +1205,11 @@ public sealed partial class Binder
         if (ConstantFits(argument, target)) return true;
         if (CharacterFits(argument, target)) return true;
 
+        // A value fits the `Optional<T>` holding it. Asked here as well as in
+        // BindConversion so that overload resolution and the conversion itself
+        // agree about what is possible.
+        if (PromotedToOptional(argument, target) is not null) return true;
+
         return ClassifyConversion(argument.Type, target, explicitCast: false) is not null;
     }
 

@@ -56,6 +56,19 @@ public sealed partial class Binder
         if (expression is BoundArrayDraft arrayDraft)
             return BindArraySettle(arrayDraft, target, span);
 
+        // A value becomes the `Optional<T>` holding it, the way it becomes a
+        // `T?` in Swift and C#. This is what lets an indexer be honest about a
+        // lookup that may miss: `map[key]` answers `Optional<V>` and
+        // `map[key] = value` still takes a plain one, because a getter and a
+        // setter share one type (§7.5) and without this every write would read
+        // `map[key] = Some(value)`.
+        //
+        // Desugared to the construction `Some(value)` already produces, so
+        // nothing downstream learns a new shape.
+        if (PromotedToOptional(expression, target) is { } some)
+            return BindVariantConstruction(
+                (VariantTypeSymbol)target, some, [expression], span);
+
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
         if (ConstantFits(expression, target) || CharacterFits(expression, target))
@@ -295,6 +308,37 @@ public sealed partial class Binder
                expression.Type is PrimitiveTypeSymbol { IsInteger: true }
             ? (value, false)
             : null;
+    }
+
+    /// <summary>
+    /// The <c>Some</c> case an expression would be wrapped in to become
+    /// <paramref name="target"/>, or null when no such promotion applies.
+    ///
+    /// Recognised by shape, as <c>Result</c> is: a variant whose template is
+    /// named <c>Optional</c>, with a <c>None</c> carrying nothing and a
+    /// <c>Some</c> carrying one field. The compiler knowing a library type is
+    /// not new -- <c>try</c> knows <c>Result</c> the same way -- and this is
+    /// the price of `Optional&lt;T&gt;` being an ordinary variant rather than
+    /// a second spelling of <c>T?</c>.
+    ///
+    /// Something already of the target type is left alone, so an
+    /// <c>Optional&lt;T&gt;</c> assigned to one is not wrapped twice. An
+    /// <c>Optional&lt;T&gt;</c> assigned to an
+    /// <c>Optional&lt;Optional&lt;T&gt;&gt;</c> is, which is what it means.
+    /// </summary>
+    private VariantCaseSymbol? PromotedToOptional(BoundExpression expression, TypeSymbol target)
+    {
+        if (target is not VariantTypeSymbol { Template.Name: "Optional" } optional) return null;
+        if (expression.Type.Equals(target) || expression.Type.IsError()) return null;
+        if (expression.Type.IsVoid()) return null;
+
+        if (optional.FindCase("None") is not { Fields.Count: 0 }) return null;
+        if (optional.FindCase("Some") is not { Fields.Count: 1 } some) return null;
+
+        // Only when the value can actually be stored in the payload. Without
+        // this every mismatched assignment to an Optional would report the
+        // payload's complaint rather than its own.
+        return IsImplicitlyConvertible(expression, some.Fields[0].Type) ? some : null;
     }
 
     /// <summary>

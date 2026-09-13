@@ -133,18 +133,38 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         return values[i];
     }
 
-    // There is deliberately no `this[K]` here, and `List<T>` having one is not
-    // an inconsistency.
-    //
-    // An index is a position the caller worked out, so `list[i]` out of range
-    // is the same mistake `array[i]` is. A key is data that arrived from
-    // somewhere, so `map[key]` looks total and is not -- and unlike `Get` it
-    // carries no verb to warn anyone. An indexer cannot be the honest shape
-    // either: its getter and setter share one type, so returning `Optional<V>`
-    // would make every write `map[k] = Some(v)` and `map[k] += 1` impossible.
-    //
-    // So the lookup is spelled with a name that says which question is being
-    // asked: `Find` for a key that might not be there, `Get` for one that is.
+    /// `map[key]`, which answers `Optional<V>` and never stops the program.
+    ///
+    /// Swift's design, and it is the right one for the same reason: a key is
+    /// data rather than a position, so a lookup that misses is an answer. An
+    /// indexer returning `V` would have to abort on a miss, and `map[key]`
+    /// carries no verb to warn anyone that it might -- which is exactly the
+    /// shape a reader trusts without thinking.
+    ///
+    ///     if (settings["timeout"] is Some found) { Use(found.Value); }
+    ///     int port = settings["port"].ValueOr(8080);
+    ///
+    /// A getter and a setter share one type (§7.5), so the setter takes an
+    /// `Optional<V>` too -- and that turns out to say something rather than
+    /// being a cost. A value promotes to the optional holding it, so an
+    /// ordinary write reads as one; and `None` is the absence of a value,
+    /// which is what removing a key means.
+    ///
+    ///     settings["retries"] = 3;            // set
+    ///     settings["retries"] = None;         // remove
+    ///
+    /// What this cannot do is `map[key] += 1`, because there is no value to
+    /// add to when the key is absent. That is not a limitation so much as the
+    /// question being asked out loud: `map[key] = map[key].ValueOr(0) + 1`
+    /// says what should happen, and Swift's `dict[key, default: 0] += 1`
+    /// exists for the same reason.
+    public Optional<V> this[K key] {
+        get { return Find(key); }
+        set {
+            if (value is Some held) { Set(key, held.Value); }
+            else { Remove(key); }
+        }
+    }
 
     /// Adds the key or replaces what it maps to.
     public void Set(K key, V value) {

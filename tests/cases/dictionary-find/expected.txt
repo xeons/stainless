@@ -7,5 +7,10 @@ valueOr -1
 empty y
 asserted 30
 ref one ?
+subscript 1
+subscript-miss empty
+subscript-or 8080
+removed yes 1
+counted 2 1
 sorted 5 -1
 still running

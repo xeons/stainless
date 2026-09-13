@@ -92,15 +92,15 @@ int Main() {
     Console.WriteLine("list " + N((long)list[0]) + " " + N((long)list[1]) + " " +
         N((long)list.At(1)));
 
-    // A dictionary deliberately has no indexer: a key is data rather than a
-    // position, so `map[k]` would look total and abort. `Find` is the question
-    // where the key might not be there, and `Get` asserts that it is.
+    // A dictionary's indexer answers `Optional<V>` rather than `V`, because a
+    // key is data rather than a position and a lookup that misses is an
+    // answer. The setter takes one too, so `None` removes.
     var map = new Dictionary<String, int>();
-    map.Set("a", 1);
-    map.Set("a", map.Get("a") + 4);
-    Console.WriteLine("map " + N((long)map.Get("a")) + " " +
-        N((long)map.Find("a").ValueOr(-1)) + " " +
-        N((long)map.Find("absent").ValueOr(-1)) + " " + N((long)map.Count()));
+    map["a"] = 1;
+    map["a"] = map["a"].ValueOr(0) + 4;
+    Console.WriteLine("map " + N((long)map["a"].ValueOr(-1)) + " " +
+        N((long)map.Get("a")) + " " +
+        N((long)map["absent"].ValueOr(-1)) + " " + N((long)map.Count()));
 
     return 0;
 }

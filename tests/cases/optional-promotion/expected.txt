@@ -1,0 +1,8 @@
+promoted 5 text -1
+shapes 9 ok 7
+overload int optional
+struct 7
+class 11
+idempotent 5
+nested 5
+subscript 8080 -1

@@ -8,7 +8,7 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           743 pass
-dotnet run --project tests/Stainless.Tests      270 cases, 2 skipped on Windows
+dotnet run --project tests/Stainless.Tests      271 cases, 2 skipped on Windows
 samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
@@ -61,7 +61,8 @@ since the closure work.
 | `68a7403` | doubles that survive being written and read back |
 | `24538c6` | the two allocations that could still wrap |
 | `7708bce` | an abort keeps the output that explains it |
-| *this one* | a missing key is an outcome rather than a crash |
+| `bbc04ba` | a missing key is an outcome rather than a crash |
+| *this one* | `map[key]` answers an optional, as Swift's does |
 
 ## Findings worth keeping
 
@@ -188,15 +189,40 @@ Two arguments for `Find` that are not about taste. It is **one probe** where
 `GetOr(k, fallback)` cannot tell a missing key from one mapped to the fallback,
 which is Java's null ambiguity wearing a different coat.
 
-**The `Dictionary` indexer added one commit earlier was taken back out**, and
-that is the part worth remembering. It was a mistake made while fixing
-something else: `map[k]` puts the harshest behaviour behind the most inviting
-syntax, and unlike `Get` it carries no verb to warn anyone. `List<T>` keeps
-its indexer, and the line between them is real rather than convenient -- **an
-index is a position the caller worked out; a key is data that arrived.** An
-indexer could not have been the honest shape anyway: getter and setter share
-one type, so an `Optional<V>` indexer would make every write `map[k] =
-Some(v)` and `map[k] += 1` impossible. That was checked, not assumed.
+**The `Dictionary` indexer is back, and it answers `Optional<V>`.** It was
+removed first, on the reasoning that an indexer could not be honest here --
+getter and setter share one type (§7.5), so an `Optional<V>` one would make
+every write `map[k] = Some(v)`. That reasoning was right about the mechanism
+and wrong about the conclusion, because Swift solves it with one rule the
+language did not have: **a value promotes to the optional holding it.**
+
+With `T` → `Optional<T>` implicit, the shared type stops being a cost and
+starts saying something. `map[k] = v` sets, and `map[k] = None` removes,
+because `None` *is* the absence of a value. That is Swift's subscript exactly,
+and it is better than what was there before removal.
+
+The rule is recognised by shape, the way `try` already recognises `Result`:
+a variant whose template is named `Optional` with a `None` carrying nothing
+and a `Some` carrying one field. It desugars in `BindConversion` to the
+construction `Some(x)` already produces, so the emitter learned nothing. It has
+to be asked in **two** places, `BindConversion` and `IsImplicitlyConvertible`,
+or overload resolution and the conversion itself would disagree about what is
+possible.
+
+Three properties worth keeping, each pinned by
+`tests/cases/optional-promotion`: an exact match beats a promotion, so
+`Which(int)` still wins over `Which(Optional<int>)`; something already of the
+target type is not wrapped twice; and an `Optional<T>` assigned to an
+`Optional<Optional<T>>` *is*, which is what that says.
+
+`map[key] += 1` does not compile, and that is the design rather than a gap --
+there is nothing to add to when the key is absent. `map[key] =
+map[key].ValueOr(0) + 1` says what should happen, and Swift's `dict[key,
+default: 0]` exists for the same reason.
+
+`List<T>` keeps its plain indexer. The line between them is real rather than
+convenient: **an index is a position the caller worked out; a key is data that
+arrived.**
 
 **An abort threw away everything the program had printed.** `sl_fail` writes
 its line to stderr and calls `abort`, and `abort` does not flush -- so a

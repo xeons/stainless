@@ -1394,6 +1394,27 @@ if (map.IndexOf(key) is Some found) { return values.At(found.Value); }
 return fallback;
 ```
 
+**A value becomes the `Optional<T>` holding it**, as it becomes a `T?` in Swift
+and C#. `Some(x)` is still how a case is named where naming it reads better;
+the conversion is what lets a signature ask for an optional without every
+caller having to say so.
+
+```csharp
+Optional<int> port = 8080;              // the same as Some(8080)
+Optional<int> none = None;
+```
+
+The rule is what makes an indexer able to be honest. A getter and a setter
+share one type (§7.5), so a subscript answering `Optional<V>` takes one as
+well, and without this every write through it would read `map[key] =
+Some(value)`. With it, `map[key] = value` sets and `map[key] = None` removes
+(§5.4).
+
+It never applies to something already of that type, so an `Optional<T>`
+assigned to one is not wrapped twice, and an exact match always beats it in
+overload resolution. An `Optional<T>` assigned to an `Optional<Optional<T>>`
+*is* wrapped, which is what that says.
+
 **The readers**, for a caller that would rather not branch:
 
 | | |
@@ -2869,7 +2890,7 @@ the built-in one.
 | Type | Backed by | Notes |
 |---|---|---|
 | `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>`; `list[i]` |
-| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>`; `Find` → `Optional<V>` |
+| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>`; `map[k]` → `Optional<V>` |
 | `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
 | `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
 | `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
@@ -2881,35 +2902,47 @@ way an array does. `At` and `Set` remain, because an interface has no indexers
 and `IReadOnlyList<T>` declares them; the brackets are what to reach for where
 the type is known.
 
-**A dictionary has no indexer, and that is the point.** An index is a position
-the caller worked out, so `list[i]` out of range is the same mistake
-`array[i]` is. A key is data that arrived from a file, a socket or a person, so
-a key that is not there is an ordinary outcome rather than a mistake in the
-program -- which is the line §2.6 draws between a value to return and a reason
-to stop. `map[key]` would look total, would not be, and unlike a named method
-carries no verb to say so.
+**A dictionary's indexer answers `Optional<V>`**, which is Swift's design and
+right for the same reason. An index is a position the caller worked out, so
+`list[i]` out of range is the same mistake `array[i]` is. A key is data that
+arrived from a file, a socket or a person, so a key that is not there is an
+ordinary outcome rather than a mistake in the program -- the line §2.6 draws
+between a value to return and a reason to stop. An indexer returning `V` would
+have to stop, and `map[key]` carries no verb to warn anyone that it might.
 
-So a lookup is spelled with the question it is asking:
+```csharp
+if (settings["timeout"] is Some found) { Use(found.Value); }
+int port = settings["port"].ValueOr(8080);
+```
+
+A getter and a setter share one type (§7.5), so the setter takes an
+`Optional<V>` as well. That says something rather than costing something: a
+value promotes to the optional holding it, so an ordinary write reads as one,
+and `None` is the absence of a value, which is what removing a key means.
+
+```csharp
+settings["retries"] = 3;             // set
+settings["retries"] = None;          // remove
+```
+
+What it cannot do is `map[key] += 1`, because there is nothing to add to when
+the key is absent. That is the question being asked out loud rather than a
+limitation: `map[key] = map[key].ValueOr(0) + 1` says what should happen, and
+Swift's `dict[key, default: 0] += 1` exists for the same reason.
+
+The named forms remain, each saying which question it asks:
 
 | | |
 |---|---|
-| `Find(key)` | `Optional<V>`, and **the one to reach for** |
+| `map[key]`, `Find(key)` | `Optional<V>`, and **what to reach for** |
 | `GetOr(key, fallback)` | the value or a default |
 | `ContainsKey(key)` | whether it is there |
 | `Get(key)` | the value, **aborting** when there is none |
 
-```csharp
-if (settings.Find(name) is Some found) { Use(found.Value); }
-```
-
 `Find` costs one probe where `ContainsKey` then `Get` costs two, and it has no
 sentinel to collide with a real value the way `GetOr` does. `Get` is the
-asserting form and it asserts: use it where the key is there by construction,
-and `Find` everywhere else. `SortedList<K, V>` answers the same four ways.
-
-An indexer could not have been the honest shape in any case. Its getter and
-setter share one type (§7.5), so returning `Optional<V>` would make every write
-`map[key] = Some(value)` and `map[key] += 1` impossible.
+asserting form and it asserts: use it where the key is there by construction.
+`SortedList<K, V>` answers the same ways, minus the indexer.
 
 Every one of them is **walked in place when iterated**. That is worth saying
 because it was not always so: several used to build a whole `List<T>` before
