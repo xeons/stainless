@@ -29,12 +29,11 @@
 //
 //     gdk_event_get_coords, gdk_event_get_state, gdk_event_get_root_coords
 //
-// exist in both GTK 2 and GTK 3, and are what `Gtk` calls. Four more --
-// `gdk_event_get_button`, `_keyval`, `_event_type` and `_click_count` -- were
-// added in GTK 3.2 and are **not** in GTK 2, so they sit behind the `#if` and
-// the GTK 2 side reads two structs instead. Those two are declared below with
-// their offsets spelled out, because a wrong one there is silently wrong data
-// rather than a link error.
+// are what `Gtk` calls, along with `gdk_event_get_button`, `_keyval`,
+// `_event_type` and `_click_count`, which arrived in GTK 3.2. Between them
+// they are every field this binding reads, so no struct in the union is
+// declared here at all -- which is the point, because a wrong offset is
+// silently wrong data rather than a link error.
 //
 // The one field that is safe to read from any event is the **type**, which is
 // the first member of every struct in the union by construction. `EventType`
@@ -42,6 +41,7 @@
 module Gtk.Gdk;
 
 import Gtk.GLib;
+import Gtk.GObject;
 
 #if UNIX
 
@@ -172,10 +172,9 @@ public extern "C" {
 
 // ============================================================== reading events
 
-#if !GTK2
 
 public extern "C" {
-    /// GTK 3.2 and later. The GTK 2 branch reads the struct instead.
+    /// GTK 3.2 and later, which is every GTK 3 worth running.
     gint     gdk_event_get_event_type(GdkEvent* event);
     gboolean gdk_event_get_button(GdkEvent* event, guint* button);
     gboolean gdk_event_get_keyval(GdkEvent* event, guint* keyval);
@@ -183,72 +182,111 @@ public extern "C" {
     gboolean gdk_event_get_scroll_direction(GdkEvent* event, gint* direction);
 }
 
-#else
-
-// GTK 2 has none of those, so the two structs a program actually reads are
-// declared here. **The offsets are the point of these declarations**, so they
-// are written out: every event begins with the same four members, and the
-// interesting fields follow at fixed places on a 64-bit build.
-//
-//     0   GdkEventType   type          (an enum, so four bytes)
-//     4                  -- padding to the pointer's alignment
-//     8   GdkWindow*     window
-//     16  gint8          send_event
-//     20  guint32        time
-//
-// Nothing below reads `window` or `send_event`; they are present so that the
-// members after them land where C puts them.
-
-/// `GdkEventButton`, as far as the fields worth reading.
-public struct GdkEventButton {
-    public gint    Type;
-    public gint    Padding;
-    public GdkWindow* Window;
-    public sbyte   SendEvent;
-    public byte[3] SendEventPadding;
-    public guint32 Time;
-
-    /// Where the pointer was, relative to the event's window.
-    public gdouble X;
-    public gdouble Y;
-
-    public gdouble* Axes;
-    public guint    State;
-
-    /// 1 is left, 2 is middle, 3 is right.
-    public guint    Button;
-}
-
-/// `GdkEventKey`, as far as the fields worth reading.
-public struct GdkEventKey {
-    public gint    Type;
-    public gint    Padding;
-    public GdkWindow* Window;
-    public sbyte   SendEvent;
-    public byte[3] SendEventPadding;
-    public guint32 Time;
-
-    public guint   State;
-
-    /// The `GDK_KEY_*` value.
-    public guint   Keyval;
-}
-
-#endif
 
 /// The type of any event, which is the one field every struct in the union
 /// shares and the only one safe to read without knowing which it is.
 ///
-/// GTK 3 has a function for it and GTK 2 does not, so this is where the two
-/// meet. It is a read of offset zero either way -- the accessor does the same
-/// thing -- and going through the function under GTK 3 keeps the binding
-/// honest if GDK ever changes its mind about the layout.
+/// A read of offset zero, in effect, since the type is the first member of
+/// every struct in the union by construction. Going through the accessor
+/// rather than doing that read keeps the binding honest if GDK ever changes
+/// its mind about the layout.
 public gint EventType(GdkEvent* event) {
-    #if !GTK2
         return gdk_event_get_event_type(event);
-    #else
-        return *(gint*)event;
-    #endif
 }
+
+// =================================================================== shapes
+
+/// `GdkRectangle`, which is public in the header and is four `int`s. What a
+/// monitor's geometry and work area are reported in.
+public struct GdkRectangle {
+    public gint X;
+    public gint Y;
+    public gint Width;
+    public gint Height;
+}
+
+/// `GdkRGBA`: four components from 0.0 to 1.0, the way cairo wants them
+/// rather than the way a byte-per-channel colour is written.
+public struct GdkRGBA {
+    public gdouble Red;
+    public gdouble Green;
+    public gdouble Blue;
+    public gdouble Alpha;
+}
+
+// ================================================================== windows
+
+public extern "C" {
+    void gdk_window_set_cursor(GdkWindow* window, gpointer cursor);
+    void gdk_window_get_origin(GdkWindow* window, gint* x, gint* y);
+}
+
+// `gtk_widget_get_window` is the way to one of these, and it is a GTK call
+// rather than a GDK one, so it lives in `Gtk.Api` -- which is also what keeps
+// this file from having to name a `GtkWidget`.
+
+// ================================================================== cursors
+
+public extern "C" {
+    /// A cursor by CSS name -- `"default"`, `"text"`, `"pointer"`, `"wait"`,
+    /// `"crosshair"`, `"ew-resize"`, `"ns-resize"`, `"move"`, `"not-allowed"`.
+    ///
+    /// Names rather than the `GdkCursorType` enum, which is deprecated and
+    /// whose members do not all have a theme behind them. Answers null when
+    /// the theme has no such cursor, and a null cursor means "inherit", which
+    /// is a reasonable thing for an unknown name to do.
+    gpointer gdk_cursor_new_from_name(gpointer display, gchar* name);
+}
+
+// ================================================================= monitors
+
+public extern "C" {
+    /// **Borrowed.** Null on a display with no monitor the compositor calls
+    /// primary, which is why the backend falls back to monitor 0.
+    gpointer gdk_display_get_primary_monitor(gpointer display);
+    gpointer gdk_display_get_monitor(gpointer display, gint number);
+    gint     gdk_display_get_n_monitors(gpointer display);
+
+    void gdk_monitor_get_geometry(gpointer monitor, GdkRectangle* into);
+
+    /// The part not covered by a panel or a dock. The same as the geometry on
+    /// a compositor that does not report one, which is what a window centring
+    /// itself should fall back to anyway.
+    void gdk_monitor_get_workarea(gpointer monitor, GdkRectangle* into);
+}
+
+// ================================================================== pixbufs
+
+/// `GdkPixbuf*`: an image in memory, and a `GObject` rather than a widget --
+/// so its reference is **not** floating and `g_object_ref_sink` would be
+/// wrong on one.
+public using GdkPixbuf = byte;
+
+public extern "C" {
+    /// Null on failure, with `error` filled in. Reads whatever the installed
+    /// loaders read, which on any desktop is at least PNG, JPEG and BMP --
+    /// the one place this backend does more than the Win32 one, which has
+    /// `.bmp` and nothing else.
+    GdkPixbuf* gdk_pixbuf_new_from_file(gchar* path, GError** error);
+
+    gint gdk_pixbuf_get_width(GdkPixbuf* pixbuf);
+    gint gdk_pixbuf_get_height(GdkPixbuf* pixbuf);
+
+    /// A new pixbuf at another size. `GDK_INTERP_BILINEAR` is 2.
+    GdkPixbuf* gdk_pixbuf_scale_simple(GdkPixbuf* pixbuf, gint width, gint height,
+                                       gint interpolation);
+
+    /// The `GType` of a pixbuf, for a tree model column that holds one.
+    /// A call rather than a constant, because it is registered at run time.
+    GType gdk_pixbuf_get_type();
+
+    /// Makes the pixbuf the source for the next cairo operation, with its
+    /// top-left corner at (`x`, `y`). `cairo_paint` then draws it.
+    void gdk_cairo_set_source_pixbuf(gpointer cairo, GdkPixbuf* pixbuf,
+                                     gdouble x, gdouble y);
+}
+
+public const gint GDK_INTERP_NEAREST  = 0;
+public const gint GDK_INTERP_BILINEAR = 2;
 
 #endif

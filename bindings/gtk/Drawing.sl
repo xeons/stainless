@@ -21,13 +21,11 @@
 
 // Painting a widget yourself.
 //
-// **This is where the two GTK versions differ most and the wrapper hides it
-// best.** GTK 3 emits `draw` with a `cairo_t*` already clipped to the damaged
-// region and translated to the widget's corner. GTK 2 emits `expose-event`
-// with a `GdkEventExpose*` and leaves the caller to make a context from the
-// widget's window -- and to destroy it afterwards. A program written against
-// a `Painter` sees neither: it is handed a `Canvas` and the size to paint, and
-// the same routine runs on both.
+// A widget emits `draw` with a `cairo_t*` already clipped to the damaged
+// region and translated to its own corner. A program written against a
+// `Painter` never sees either: it is handed a `Canvas` and the size to paint,
+// which is the whole of what a paint routine needs and none of what a
+// toolkit's signal happens to carry.
 //
 // Cairo is a stateful painter rather than a list of shapes: set a colour,
 // build a path, then fill or stroke it, at which point the path is consumed.
@@ -49,13 +47,6 @@ import Gtk.Api;
 import Gtk.Cairo;
 import Gtk.Events;
 
-#if UNIX && !GTK2
-import Gtk.Api3;
-#endif
-
-#if UNIX && GTK2
-import Gtk.Api2;
-#endif
 
 #if UNIX
 
@@ -205,25 +196,11 @@ public closure void Painter(Canvas canvas, int width, int height);
 /// what the class's field used to be.
 EventHandler PaintAdapter(Painter body) {
     return (sender, carried) => {
-        #if !GTK2
             // GTK 3 hands over a context that is already clipped and
             // translated, and owns it.
             var canvas = new Canvas((cairo_t*)carried);
             body(canvas, gtk_widget_get_allocated_width(sender),
                          gtk_widget_get_allocated_height(sender));
-        #else
-            // GTK 2 hands over the expose event and leaves the context to the
-            // caller, which means making one and destroying it here.
-            cairo_t* cr = gdk_cairo_create(gtk_widget_get_window(sender));
-
-            GtkAllocation area;
-            gtk_widget_get_allocation(sender, &area);
-
-            var canvas = new Canvas(cr);
-            body(canvas, area.Width, area.Height);
-
-            cairo_destroy(cr);
-        #endif
 
         // True: this widget has painted itself and nothing else should.
         return true;
@@ -240,11 +217,7 @@ public class DrawingArea : Widget {
     /// -- GTK runs both, in the order they were connected, and the first to
     /// answer true stops the rest.
     public void OnPaint(Painter painter) {
-        #if !GTK2
             ConnectEvent(handle, "draw", PaintAdapter(painter));
-        #else
-            ConnectEvent(handle, "expose-event", PaintAdapter(painter));
-        #endif
     }
 
     /// Asks to receive mouse and key events.
@@ -312,19 +285,8 @@ EventHandler PointerAdapter(PointerHandler body) {
         at.Control = (state & GDK_CONTROL_MASK) != 0u;
         at.Alt     = (state & GDK_MOD1_MASK) != 0u;
 
-        // The one field the two versions read differently: GTK 3 has an
-        // accessor and GTK 2 does not, so there it is the struct.
         guint button = 0u;
-        #if !GTK2
             gdk_event_get_button(event, &button);
-        #else
-            var raw = (GdkEventButton*)carried;
-            int kind = EventType(event);
-            if (kind == GDK_BUTTON_PRESS || kind == GDK_BUTTON_RELEASE ||
-                kind == GDK_2BUTTON_PRESS || kind == GDK_3BUTTON_PRESS) {
-                button = raw->Button;
-            }
-        #endif
         at.Button = (int)button;
 
         return body(at);
@@ -336,12 +298,7 @@ EventHandler KeyAdapter(KeyHandler body) {
         GdkEvent* event = (GdkEvent*)carried;
 
         guint code = 0u;
-        #if !GTK2
             gdk_event_get_keyval(event, &code);
-        #else
-            var raw = (GdkEventKey*)carried;
-            code = raw->Keyval;
-        #endif
 
         guint state = 0u;
         gdk_event_get_state(event, &state);

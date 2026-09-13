@@ -19,14 +19,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// GTK, in the half that GTK 2 and GTK 3 spell the same way.
+// GTK 3, as a raw binding: entry points and constants under the names the
+// headers give them.
 //
-// This is a raw binding: entry points and constants under the names the
-// headers give them. What is *not* here is anything the two versions disagree
-// about, which lives in `Gtk.Api2` and `Gtk.Api3` -- and the split is the
-// point of the file, because it is much smaller than a reader expects.
-// Windows, buttons, labels, entries, containers, menus, notebooks and dialogs
-// are all common; layout is where the two part company.
+// **This was two files and a `#if`.** GTK 2 was bound beside GTK 3 until the
+// day the toolkit stopped being something a program here merely called and
+// became something `forms/` is built on. Two toolkits behind one seam is two
+// backends to keep honest, and the second of them is one no current
+// distribution ships and that Lazarus itself has stopped supporting -- so the
+// split went, `Gtk.Api2` with it, and `Gtk.Api3` folded in here. What is left
+// of that work is the method: every declaration below was checked against
+// `nm -D --defined-only libgtk-3.so.0`, which is the only way to be sure of a
+// hand-written binding.
 //
 // **There is no `#pragma comment(lib, ...)` here, and that is deliberate.** On
 // Windows a library has one name and `user32` is always `user32`. On Linux the
@@ -45,14 +49,10 @@
 //         -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 \
 //         -l :libglib-2.0.so.0 -l :libcairo.so.2
 //
-//     # GTK 2
-//     stainless run app.sl bindings/gtk -D GTK2 \
-//         -l :libgtk-x11-2.0.so.0 -l :libgdk-x11-2.0.so.0 \
-//         -l :libgobject-2.0.so.0 -l :libglib-2.0.so.0 -l :libcairo.so.2
-//
-// **GTK 3 is what a build gets unless it asks for GTK 2.** `-D GTK2` selects
-// the other one; there is no `-D GTK3`, because a default that has to be
-// spelled out is not a default.
+// There is no version flag any more. GTK 4 would be a separate backend
+// rather than a third branch -- 37 of the calls below are absent from
+// `libgtk-4.so.1`, and they are the load-bearing ones -- so a `#if` would
+// not have served it either.
 //
 // **Every widget pointer is a `GtkWidget*`.** GTK's C API is written in terms
 // of `GtkWindow*`, `GtkButton*` and so on, but the casts between them are the
@@ -96,8 +96,8 @@ public const gint GTK_WIN_POS_MOUSE            = 2;
 public const gint GTK_WIN_POS_CENTER_ALWAYS    = 3;
 public const gint GTK_WIN_POS_CENTER_ON_PARENT = 4;
 
-/// `GtkOrientation`. GTK 3 takes one at construction; GTK 2 has a separate
-/// function per direction, which is the whole of why the layout calls split.
+/// `GtkOrientation`, taken at construction by a box, a separator, a paned
+/// and a scale alike -- one call each, rather than one per direction.
 public const gint GTK_ORIENTATION_HORIZONTAL = 0;
 public const gint GTK_ORIENTATION_VERTICAL   = 1;
 
@@ -180,9 +180,10 @@ public extern "C" {
     /// Null when the running GTK is at least the version asked for, and a
     /// message saying why not otherwise. **Borrowed.**
     ///
-    /// This rather than `gtk_get_major_version`, which GTK 2 does not have:
-    /// there the numbers are exported as variables, and a version test that
-    /// works on both has to be a call.
+    /// A version test that reads as a sentence rather than as three
+    /// comparisons against `gtk_get_major_version` and its two relatives,
+    /// which are below and are what a program wants when it needs the numbers
+    /// themselves rather than a verdict.
     gchar* gtk_check_version(guint major, guint minor, guint micro);
 }
 
@@ -352,9 +353,9 @@ public extern "C" {
     void gtk_entry_set_max_length(GtkWidget* entry, gint length);
     void gtk_entry_set_width_chars(GtkWidget* entry, gint chars);
 
-    /// Read-only or not. `gtk_entry_set_editable` is the call a GTK 2 reader
-    /// will look for; it was removed in GTK 3, and this one -- the interface's
-    /// rather than the widget's -- is in both.
+    /// Read-only or not. `gtk_entry_set_editable` is the call a reader will
+    /// look for and GTK 3 removed it; this one -- `GtkEditable`'s rather than
+    /// `GtkEntry`'s -- is what replaced it, and it works on a text view too.
     void     gtk_editable_set_editable(GtkWidget* entry, gboolean editable);
     gboolean gtk_editable_get_editable(GtkWidget* entry);
 
@@ -511,9 +512,9 @@ public extern "C" {
 public extern "C" {
     /// A widget that draws nothing, so that a program can draw everything.
     ///
-    /// GTK 3 emits `draw` with a `cairo_t*`; GTK 2 emits `expose-event` with a
-    /// `GdkEventExpose*`. That difference is why there is no drawing call in
-    /// this file and two in the version-specific ones.
+    /// It emits `draw` with a `cairo_t*` already clipped to the region
+    /// needing repainting and translated to the widget's corner, so a handler
+    /// works in its own coordinates and cannot draw outside them.
     GtkWidget* gtk_drawing_area_new();
 }
 
@@ -534,6 +535,151 @@ public extern "C" {
     void       gtk_dialog_response(GtkWidget* dialog, gint response);
     GtkWidget* gtk_dialog_add_button(GtkWidget* dialog, gchar* text, gint response);
     GtkWidget* gtk_dialog_get_content_area(GtkWidget* dialog);
+}
+
+// ==================================================================== enums
+
+/// `GtkAlign`. `BASELINE` is what a row of text-bearing widgets wants so that
+/// their letters line up rather than their boxes.
+public const gint GTK_ALIGN_FILL     = 0;
+public const gint GTK_ALIGN_START    = 1;
+public const gint GTK_ALIGN_END      = 2;
+public const gint GTK_ALIGN_CENTER   = 3;
+public const gint GTK_ALIGN_BASELINE = 4;
+
+/// `GTK_STYLE_PROVIDER_PRIORITY_*`. An application's own CSS goes in at
+/// `APPLICATION`, which beats the theme and loses to the user.
+public const guint GTK_STYLE_PROVIDER_PRIORITY_FALLBACK    = 1u;
+public const guint GTK_STYLE_PROVIDER_PRIORITY_THEME       = 200u;
+public const guint GTK_STYLE_PROVIDER_PRIORITY_SETTINGS    = 400u;
+public const guint GTK_STYLE_PROVIDER_PRIORITY_APPLICATION = 600u;
+public const guint GTK_STYLE_PROVIDER_PRIORITY_USER        = 800u;
+
+// ==================================================================== layout
+
+public extern "C" {
+    /// One call for both directions. `GTK_ORIENTATION_HORIZONTAL` is a row.
+    GtkWidget* gtk_box_new(gint orientation, gint spacing);
+
+    GtkWidget* gtk_separator_new(gint orientation);
+    GtkWidget* gtk_paned_new(gint orientation);
+    GtkWidget* gtk_scale_new_with_range(gint orientation, gdouble minimum,
+                                        gdouble maximum, gdouble step);
+
+    void gtk_paned_pack1(GtkWidget* paned, GtkWidget* child, gboolean resize, gboolean shrink);
+    void gtk_paned_pack2(GtkWidget* paned, GtkWidget* child, gboolean resize, gboolean shrink);
+    void gtk_paned_set_position(GtkWidget* paned, gint position);
+}
+
+// ====================================================================== grid
+
+public extern "C" {
+    GtkWidget* gtk_grid_new();
+
+    /// `left` and `top` are the cell, `width` and `height` the span in cells
+    /// -- not the grid lines a child sits between, which is what the older
+    /// `GtkTable` wanted and is off by one from this in the direction that is
+    /// easy to get wrong.
+    void gtk_grid_attach(GtkWidget* grid, GtkWidget* child,
+                         gint left, gint top, gint width, gint height);
+
+    void gtk_grid_set_row_spacing(GtkWidget* grid, guint spacing);
+    void gtk_grid_set_column_spacing(GtkWidget* grid, guint spacing);
+    void gtk_grid_set_row_homogeneous(GtkWidget* grid, gboolean homogeneous);
+    void gtk_grid_set_column_homogeneous(GtkWidget* grid, gboolean homogeneous);
+}
+
+// =========================================================== widget geometry
+
+public extern "C" {
+    void gtk_widget_set_halign(GtkWidget* widget, gint align);
+    void gtk_widget_set_valign(GtkWidget* widget, gint align);
+    void gtk_widget_set_hexpand(GtkWidget* widget, gboolean expand);
+    void gtk_widget_set_vexpand(GtkWidget* widget, gboolean expand);
+
+    /// `start` and `end` rather than left and right, because they follow the
+    /// text direction: in an Arabic locale `start` is the right-hand side.
+    void gtk_widget_set_margin_start(GtkWidget* widget, gint margin);
+    void gtk_widget_set_margin_end(GtkWidget* widget, gint margin);
+    void gtk_widget_set_margin_top(GtkWidget* widget, gint margin);
+    void gtk_widget_set_margin_bottom(GtkWidget* widget, gint margin);
+
+    /// The size the widget was actually given, which is what a draw handler
+    /// needs and is only meaningful once the widget has been laid out.
+    gint gtk_widget_get_allocated_width(GtkWidget* widget);
+    gint gtk_widget_get_allocated_height(GtkWidget* widget);
+}
+
+// ===================================================================== entry
+
+public extern "C" {
+    /// The grey text an empty entry shows.
+    void gtk_entry_set_placeholder_text(GtkWidget* entry, gchar* text);
+}
+
+// ================================================================ the rest
+
+public extern "C" {
+    /// The version as three numbers.
+    guint gtk_get_major_version();
+    guint gtk_get_minor_version();
+    guint gtk_get_micro_version();
+
+    /// Empties a combo box in one call.
+    void gtk_combo_box_text_remove_all(GtkWidget* combo);
+
+    /// Whether the bar draws its text over itself.
+    void gtk_progress_bar_set_show_text(GtkWidget* bar, gboolean show);
+
+    /// The size a scrolled window asks for before its scrollbars appear.
+    void gtk_scrolled_window_set_min_content_width(GtkWidget* scrolled, gint width);
+    void gtk_scrolled_window_set_min_content_height(GtkWidget* scrolled, gint height);
+
+    /// A monospaced text view without going near a font description.
+    void gtk_text_view_set_monospace(GtkWidget* view, gboolean monospace);
+
+    /// Closes a window the way the title bar's button does, which is not the
+    /// same as destroying it: the `delete-event` handler still gets its say.
+    void gtk_window_close(GtkWidget* window);
+}
+
+// ================================================================ header bar
+
+public extern "C" {
+    /// The title bar drawn by the application rather than the window manager.
+    GtkWidget* gtk_header_bar_new();
+
+    void gtk_header_bar_set_title(GtkWidget* bar, gchar* title);
+    void gtk_header_bar_set_subtitle(GtkWidget* bar, gchar* subtitle);
+    void gtk_header_bar_set_show_close_button(GtkWidget* bar, gboolean show);
+    void gtk_header_bar_pack_start(GtkWidget* bar, GtkWidget* child);
+    void gtk_header_bar_pack_end(GtkWidget* bar, GtkWidget* child);
+
+    void gtk_window_set_titlebar(GtkWidget* window, GtkWidget* titlebar);
+}
+
+// ======================================================================= css
+
+public extern "C" {
+    /// The widget's style context, **borrowed**.
+    gpointer gtk_widget_get_style_context(GtkWidget* widget);
+
+    /// Adds a CSS class, so that a provider's `.name { ... }` reaches this
+    /// widget. The way to style one thing differently.
+    void gtk_style_context_add_class(gpointer context, gchar* name);
+    void gtk_style_context_remove_class(gpointer context, gchar* name);
+
+    gpointer gtk_css_provider_new();
+
+    /// `length` of -1 for NUL-terminated. Answers false and fills `error` on a
+    /// parse failure, which is worth checking: bad CSS is silent otherwise.
+    gboolean gtk_css_provider_load_from_data(gpointer provider, gchar* css,
+                                             gssize length, GError** error);
+
+    /// Applies a provider to everything on a screen. `gdk_screen_get_default`
+    /// is in `Gtk.Gdk`.
+    void gtk_style_context_add_provider_for_screen(gpointer screen, gpointer provider,
+                                                   guint priority);
 }
 
 #endif

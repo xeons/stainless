@@ -2,8 +2,8 @@
 
 A GUI framework for Stainless: **the LCL's architecture, C#'s names.**
 
-> An extreme rough draft, like everything else here. Windows only so far, and
-> the control set is the standard tier and nothing above it.
+> An extreme rough draft, like everything else here. Two backends now --
+> Win32 and GTK 3 -- and the control set is everything the seam declares.
 
 ```csharp
 module Hello;
@@ -43,8 +43,10 @@ int Main() {
 }
 ```
 
-Those are real Windows controls — a real `BUTTON`, a real `STATIC` — in a real
-window. No VM, no GC, no designer, no generated code.
+Those are real platform controls — a real `BUTTON` and `STATIC` on Windows, a
+real `GtkButton` and `GtkLabel` on Linux — in a real window. No VM, no GC, no
+designer, no generated code, and **the source above is the same source on
+both**.
 
 ---
 
@@ -114,14 +116,18 @@ src/Controls/Groups.sl      RadioGroup, CheckGroup, LabeledEdit, Image,
                             SpinEdit, CheckListBox, HeaderControl
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
+src/Platform/Gtk/*.sl       the GTK 3 backend           (lcl/interfaces/gtk3/)
 ```
 
-Roughly 4,900 lines against the LCL's 276,000 — which is the scope difference,
-not a compression ratio. See *What is not here* below.
+Roughly 4,900 lines of portable code against the LCL's 276,000 — which is the
+scope difference, not a compression ratio — plus about 3,900 per backend. See
+*What is not here* below.
 
 ---
 
 ## Building it
+
+On Windows:
 
 ```
 stainless run samples/forms/demo.sl   forms/src bindings/win32/api \
@@ -134,13 +140,31 @@ or `.\samples\forms\build.ps1`, which builds both into `samples/forms/build`
 (git-ignored), writes the visual-styles manifest each one needs, and takes
 `-Test` to run every self-check and `-Run <name>` to open a window.
 
+On Linux, the same sources with the other bindings and the other libraries:
+
+```
+stainless run samples/forms/demo.sl forms/src bindings/gtk \
+    -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 \
+    -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
+```
+
+**Nothing in the sample changes between those two lines**, which is the whole
+claim the second backend exists to test. `forms/src/Platform/Select.sl` is
+where that choice is made, and it is a four-line `#if`.
+
 Both samples take `--selftest`, which builds the same window, pumps the message
 queue, checks what can be checked without a person in front of it, and quits.
-`demo` makes 21 such checks and `common` 24 — docking, anchoring, native
-handles, text round-tripping through Windows, a click reaching its handler, a
-menu item resolving from its command id. That is what makes a GUI something a
-build can run, and it is how every bug listed under *Decisions worth knowing
+`demo` makes 21 such checks and `common` 43 — docking, anchoring, native
+handles, text round-tripping through the platform, a click reaching its
+handler, a menu item resolving from its id. That is what makes a GUI something
+a build can run, and it is how every bug listed under *Decisions worth knowing
 about* was found.
+
+**Both suites pass on both backends**, with one exception that is worth more
+than the rest of the sentence: `common`'s "a tree node reads back its text"
+passes on GTK and fails on Win32. Two backends is what turned that from "the
+tree control is broken" into "the *Windows* tree peer is broken", which is a
+different bug in a different file and a much smaller one.
 
 Two end-to-end cases go further, driving real messages at the controls:
 `tests/cases/forms-input` synthesises a mouse drag and a wheel turn and checks
@@ -381,22 +405,52 @@ that is already bound.
 - **`interfacebase.pp`, `lclintf.pas`** — the LCL's own seam, replaced by
   `Forms.Platform`.
 
+### The GTK backend, and what it found
+
+**Done**, and it is the entry this list existed for: a seam with one
+implementation has quietly stopped being a seam, and the only way to find out
+whether `IControlPeer` described a control or described an `HWND` was to write
+the other side of it.
+
+**Not one interface changed.** Thirty of them, `IWidgetSet`'s forty-five
+methods, and the answer came back that the seam is about controls. The
+sharpest evidence is `Lists.sl`: a list box, a checked list, a column header, a
+tree and a details list are five window classes on Windows and five interfaces
+in the seam, and GTK answers all five with one `GtkTreeView` over a model.
+Neither backend had to know.
+
+What the exercise cost, and it is worth knowing before the next backend:
+
+- **Absolute placement.** Every GTK container computes a layout and `forms/`
+  has computed one already, so every container peer's children go into a
+  `GtkFixed`. A size request is a *minimum* there, so a control whose content
+  wants more room than the layout allowed overflows rather than clips; a label
+  ellipsizes to cover it, and the general case is open.
+- **A resize is a request.** `MoveWindow` has resized the window by the time it
+  returns and `gtk_window_resize` has only asked, so the events already in
+  flight describe the size before the request. The window peer drops those
+  echoes until one matches; Win32 needed nothing.
+- **A lambda captures a member read by value** (spec §2.15), so the guard that
+  stops a program-driven change being reported back as the user's has to be a
+  method call. Written as a field read it compiles, runs, and guards nothing --
+  a checked menu item set from its own handler recursed until the stack ran
+  out. Every handler in that backend now goes through a call, and the comment
+  on `GtkPeer.Echoing` says why.
+- **A signal's arity has to match the connector's.** `switch-page` carries a
+  page *and* a page number, so a handler connected as if it carried one reads
+  the boxed closure out of the wrong register. That is a segfault at the first
+  tab added with nothing in the backtrace to suggest a cause.
+
 ### Before several of the above
 
-Two things are worth doing regardless of which control comes next.
-
-- **The GTK backend.** The seam was designed for more than one platform and has
-  only ever had one, which is the state in which a seam quietly stops being one.
-  `bindings/gtk/Widgets.sl` already wraps twenty widgets, so much of it is an
-  adapter — and it is the only real test of whether `IControlPeer` is portable
-  or merely Win32-shaped.
 - **DPI awareness.** Not a control, but every control is wrong without it on a
-  scaled display.
+  scaled display -- and now on two platforms, since both backends turn points
+  into pixels at a hard-coded 96.
 
 ## Known rough edges
 
 Things that are here and imperfect, as opposed to the things above that are not
-here at all.
+here at all. Where one is a backend's rather than the library's, it says so.
 
 - **A GDI object cache.** Every pen and brush is made and deleted per drawing
   call, which cannot leak and is slower than it needs to be.
@@ -431,3 +485,31 @@ here at all.
   setting and a layout that scales with it, and neither is here.
 - **`SelectAll` uses a large sentinel length** rather than asking for the text's
   length in characters.
+
+### GTK's own
+
+- **A size request is a minimum.** A control in a `GtkFixed` is given its
+  natural size when that is larger than the layout allowed, so a long caption
+  overflows rather than clipping. A label ellipsizes and an entry scrolls; a
+  button with more text than room does not.
+- **Text is cairo's toy API**, so there is no shaping, no bidirectional text
+  and no font fallback -- a label in Arabic is drawn wrong. Pango is the fix
+  and is a binding of its own.
+- **A combo box's editability and a text box's multiline-ness are fixed at
+  construction**, which is the same limit the Win32 backend has for the same
+  reason: they are different widgets there and creation-time style bits here.
+- **A password character is GTK's, not the program's.**
+  `gtk_entry_set_visibility` turns hiding on and the theme picks the glyph, so
+  the mask is honoured as "hide" or "do not".
+- **A details list shows icons in the `Details` style only.** GTK's answer to
+  the three icon styles is `GtkIconView`, which is not a tree view and cannot
+  be exchanged for one, so they show as a list with its headers hidden.
+- **A details list has sixteen columns.** A `GtkListStore`'s column count is
+  fixed when it is made and `TListView` programs use two or three; growing one
+  would mean rebuilding the model and copying every row.
+- **A tab's picture and a menu item's default are not drawn.** Neither has a
+  GTK equivalent that matches a theme, so both do nothing rather than
+  approximating one.
+- **`Tool` and `None` borders are the same window.** GTK has no tool window:
+  asking for one is a type hint that several compositors ignore, so both are
+  undecorated and unresizable, which is true everywhere rather than sometimes.

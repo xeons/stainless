@@ -36,9 +36,8 @@
 //
 //   - **The input events.** `delete-event`, `button-press-event`,
 //     `key-press-event` and the rest carry a `GdkEvent*`.
-//   - **Drawing.** GTK 3's `draw` carries a `cairo_t*` and GTK 2's
-//     `expose-event` a `GdkEventExpose*`. Both are pointers, both answer
-//     `gboolean`, and both are therefore this.
+//   - **Drawing.** `draw` carries a `cairo_t*`. A different kind of pointer
+//     from an event, answering the same `gboolean`, and therefore this.
 //
 // So `carried` is deliberately a bare `gpointer` rather than a `GdkEvent*`:
 // what it points at depends on the signal, and the caller of `ConnectEvent` is

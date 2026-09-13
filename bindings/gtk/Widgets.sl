@@ -55,11 +55,11 @@
 // as long as GTK holds them. `Gtk.Signals` is where the retain and the matching
 // release live, and why the arrangement is leak-free with no bookkeeping here.
 //
-// **The version difference is hidden here, not passed on.** `new Box(true, 6)`
-// is `gtk_box_new(GTK_ORIENTATION_VERTICAL, 6)` under GTK 3 and
-// `gtk_vbox_new(FALSE, 6)` under GTK 2; `Grid.Attach` takes a cell and a span
-// on both, and does the off-by-one arithmetic a `GtkTable` wants. The two
-// places the difference could not be hidden say so in their own comments.
+// **The names read as a toolkit rather than as GTK.** `new Box(true, 6)` is
+// a column, `Grid.Attach` takes a cell and a span, and a `ScrollView` has a
+// minimum content size. This layer is what `forms/`'s GTK backend is written
+// against, so it is shaped by what a widget set behind a seam needs rather
+// than by what the C header happens to be called.
 module Gtk;
 
 import Standard.Collections;
@@ -70,13 +70,6 @@ import Gtk.Api;
 import Gtk.Signals;
 import Gtk.Events;
 
-#if UNIX && !GTK2
-import Gtk.Api3;
-#endif
-
-#if UNIX && GTK2
-import Gtk.Api2;
-#endif
 
 #if UNIX
 
@@ -174,29 +167,22 @@ public class Widget {
 
     /// Space outside the widget, on all four sides.
     ///
-    /// **GTK 2 has no widget margin and this does nothing there.** A margin is
-    /// a `GtkAlignment` wrapped around the child, which changes the widget
-    /// tree and so cannot be done to a widget that already has a parent. Reach
-    /// for a `Box`'s spacing or a `Container`'s padding for a layout that has
-    /// to look the same on both.
+    /// A widget property rather than a wrapper around the child, so it can be
+    /// set on a widget that already has a parent and does not change the tree.
     public void SetMargin(int margin) {
-        #if !GTK2
             gtk_widget_set_margin_start(handle, margin);
             gtk_widget_set_margin_end(handle, margin);
             gtk_widget_set_margin_top(handle, margin);
             gtk_widget_set_margin_bottom(handle, margin);
-        #endif
     }
 
     /// Whether the widget takes a share of any extra space in its container.
     ///
-    /// **GTK 2 has no expand property**; there it is an argument to
-    /// `Box.Pack`, which is where a GTK 2 program says it.
+    /// Also settable per child at the point a `Box` packs it, which is the
+    /// older spelling and the one a box's own arguments still offer.
     public void SetExpands(bool horizontal, bool vertical) {
-        #if !GTK2
             gtk_widget_set_hexpand(handle, horizontal ? 1 : 0);
             gtk_widget_set_vexpand(handle, vertical ? 1 : 0);
-        #endif
     }
 
     /// Destroys the widget and everything in it, breaking it out of its
@@ -256,18 +242,13 @@ public class Container : Widget {
 
 /// A row or a column.
 ///
-/// The commonest layout in GTK and the one that changed most between versions:
-/// GTK 3 takes an orientation, GTK 2 has a function per direction. The
-/// constructor is the same either way.
+/// The commonest layout in GTK: children packed end to end, each taking its
+/// natural size unless it was asked to expand.
 public class Box : Container {
     /// A column when `vertical`, a row otherwise.
     public Box(bool vertical, int spacing) {
-        #if !GTK2
             base(gtk_box_new(vertical ? GTK_ORIENTATION_VERTICAL
                                       : GTK_ORIENTATION_HORIZONTAL, spacing));
-        #else
-            base(vertical ? gtk_vbox_new(0, spacing) : gtk_hbox_new(0, spacing));
-        #endif
     }
 
     /// Adds a child at the end of what is there.
@@ -306,26 +287,12 @@ public class Box : Container {
 /// it is done here once instead of in every program.
 public class Grid : Container {
     public Grid() {
-        #if !GTK2
             base(gtk_grid_new());
-        #else
-            // A table has to be told its size and can be resized later; a grid
-            // grows on its own. One row and one column to start with, and
-            // `Attach` grows it.
-            base(gtk_table_new(1u, 1u, 0));
-        #endif
     }
 
     /// Puts a child at a cell, spanning `columns` by `rows` of them.
     public void Attach(Widget child, int column, int row, int columns, int rows) {
-        #if !GTK2
             gtk_grid_attach(handle, child.Handle(), column, row, columns, rows);
-        #else
-            gtk_table_resize(handle, (guint)(row + rows), (guint)(column + columns));
-            gtk_table_attach_defaults(handle, child.Handle(),
-                (guint)column, (guint)(column + columns),
-                (guint)row, (guint)(row + rows));
-        #endif
     }
 
     /// One cell at one place, which is what most calls want.
@@ -334,13 +301,8 @@ public class Grid : Container {
     }
 
     public void SetSpacing(int columns, int rows) {
-        #if !GTK2
             gtk_grid_set_column_spacing(handle, (guint)columns);
             gtk_grid_set_row_spacing(handle, (guint)rows);
-        #else
-            gtk_table_set_col_spacings(handle, (guint)columns);
-            gtk_table_set_row_spacings(handle, (guint)rows);
-        #endif
     }
 }
 
@@ -453,12 +415,8 @@ public class Entry : Widget {
     }
 
     /// The grey prompt an empty entry shows.
-    ///
-    /// **GTK 2 has no placeholder and this does nothing there.**
     public void SetPlaceholder(String text) {
-        #if !GTK2
             gtk_entry_set_placeholder_text(handle, text.ToPointer());
-        #endif
     }
 
     /// Runs on every keystroke.
@@ -597,16 +555,11 @@ public class ScrollView : Container {
 
     /// The size the view asks for before it starts scrolling.
     ///
-    /// **GTK 2 has no minimum content size**; there it falls back to
-    /// `SetSize`, which asks for the same thing less precisely -- it is the
-    /// size of the whole view, scrollbars included.
+    /// Not the same as `SetSize`, which asks for the size of the whole view
+    /// with its scrollbars; this is the part the content gets.
     public void SetMinimumContent(int width, int height) {
-        #if !GTK2
             gtk_scrolled_window_set_min_content_width(handle, width);
             gtk_scrolled_window_set_min_content_height(handle, height);
-        #else
-            gtk_widget_set_size_request(handle, width, height);
-        #endif
     }
 }
 
@@ -614,8 +567,8 @@ public class ScrollView : Container {
 
 /// A drop-down list of strings.
 public class ComboBox : Widget {
-    /// How many have been added, so that `Clear` can undo them one at a time
-    /// under GTK 2, which has no call that empties one.
+    /// How many have been added, so that `ItemCount` can answer without
+    /// walking the model.
     int count;
 
     public ComboBox() { base(gtk_combo_box_text_new()); count = 0; }
@@ -626,13 +579,7 @@ public class ComboBox : Widget {
     }
 
     public void Clear() {
-        #if !GTK2
             gtk_combo_box_text_remove_all(handle);
-        #else
-            for (int i = count - 1; i >= 0; i = i - 1) {
-                gtk_combo_box_text_remove(handle, i);
-            }
-        #endif
         count = 0;
     }
 
@@ -675,14 +622,11 @@ public class ProgressBar : Widget {
 
     /// Text drawn over the bar.
     ///
-    /// **GTK 2 always shows it and GTK 3 has to be told to**, which is the
-    /// whole of the difference; setting text here turns it on where that is
-    /// needed, so a program says this once and gets the same picture.
+    /// A bar shows no text until it is told to, so setting some turns it on:
+    /// a program says this once rather than twice.
     public void SetText(String text) {
         gtk_progress_bar_set_text(handle, text.ToPointer());
-        #if !GTK2
             gtk_progress_bar_set_show_text(handle, 1);
-        #endif
     }
 }
 
@@ -712,14 +656,9 @@ public class SpinBox : Widget {
 /// A number as a track and a handle.
 public class Slider : Widget {
     public Slider(bool vertical, double minimum, double maximum, double step) {
-        #if !GTK2
             base(gtk_scale_new_with_range(
                 vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL,
                 minimum, maximum, step));
-        #else
-            base(vertical ? gtk_vscale_new_with_range(minimum, maximum, step)
-                          : gtk_hscale_new_with_range(minimum, maximum, step));
-        #endif
     }
 
     public double Value() { return gtk_range_get_value(handle); }
@@ -735,12 +674,8 @@ public class Slider : Widget {
 /// A line between things.
 public class Separator : Widget {
     public Separator(bool vertical) {
-        #if !GTK2
             base(gtk_separator_new(vertical ? GTK_ORIENTATION_VERTICAL
                                             : GTK_ORIENTATION_HORIZONTAL));
-        #else
-            base(vertical ? gtk_vseparator_new() : gtk_hseparator_new());
-        #endif
     }
 }
 

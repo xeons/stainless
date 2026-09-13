@@ -181,4 +181,52 @@ public extern "C" {
     void g_type_init();
 }
 
+// ==================================================================== GValue
+
+/// `GValue`: a value and the `GType` that says what it is.
+///
+/// **The one GObject struct a caller allocates**, and the reason a tree model
+/// can be written at all from here: `gtk_list_store_set` is variadic over
+/// column-and-value pairs, which a binding cannot spell, and
+/// `gtk_list_store_set_value` takes one of these instead.
+///
+/// Twenty-four bytes -- a `GType` and a two-slot union -- and declared as
+/// bytes because nothing outside GLib should read them. It must start zeroed,
+/// which is what `G_VALUE_INIT` is in C and what a `GValue` field of a fresh
+/// struct already is here, and `g_value_init` then says which type it holds.
+public struct GValue {
+    public byte[24] Private;
+}
+
+public extern "C" {
+    /// Says what the value will hold. The value must be zeroed first and must
+    /// not already be initialised, which is why one is not reused across
+    /// types without an unset in between.
+    gpointer g_value_init(GValue* value, GType type);
+
+    /// Releases whatever the value holds and leaves it zeroed, ready to be
+    /// initialised again. A `GValue` holding a string owns a copy of it.
+    void g_value_unset(GValue* value);
+
+    void g_value_set_string(GValue* value, gchar* text);
+    void g_value_set_boolean(GValue* value, gboolean state);
+    void g_value_set_int(GValue* value, gint number);
+    void g_value_set_object(GValue* value, gpointer instance);
+
+    /// **Borrowed** -- the string belongs to the value and dies with it.
+    gchar*   g_value_get_string(GValue* value);
+    gboolean g_value_get_boolean(GValue* value);
+    gint     g_value_get_int(GValue* value);
+}
+
+/// The fundamental `GType`s a tree model column is made of.
+///
+/// They are `G_TYPE_MAKE_FUNDAMENTAL(n)` in the header -- `n << 2` -- rather
+/// than symbols a linker could resolve, so they are written out. Checked
+/// against `g_type_name` at run time by the GTK backend's first store.
+public const GType G_TYPE_BOOLEAN = 20u;
+public const GType G_TYPE_INT     = 24u;
+public const GType G_TYPE_STRING  = 64u;
+public const GType G_TYPE_OBJECT  = 80u;
+
 #endif

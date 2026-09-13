@@ -35,6 +35,7 @@ module Forms.Platform.Win32;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if WINDOWS
 import Win32;
 import Win32.Handles;
 import Win32.Kernel32;
@@ -44,8 +45,6 @@ import Win32.ComDlg32;
 import Win32.Com;
 import Win32.Dialogs;
 import Standard.Path;
-
-#if WINDOWS
 
 #pragma comment(lib, "comdlg32")
 

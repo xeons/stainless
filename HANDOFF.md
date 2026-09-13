@@ -11,7 +11,8 @@ dotnet test tests/Stainless.UnitTests           834 pass, Windows and Linux
 dotnet run --project tests/Stainless.Tests      278 cases, 2 skipped on Windows
                                                 268 pass, 12 skipped on Linux
 stainless doc --stdlib                          22 pages into docs/stdlib
-samples/forms/build.ps1 -Test                   1 failing check, see below
+samples/forms/build.ps1 -Test                   demo 21/21, common 42/43
+forms on GTK 3, under broadwayd                 demo 21/21, common 43/43
 ```
 
 **32-bit x86 now runs on both systems.** Four cases build as real 32-bit
@@ -26,22 +27,30 @@ verifies the module and lowers every instruction in it, and `ir.txt` pins each
 signature against what clang writes for the same C. The suite calls such a case
 "assembled for <triple>" rather than passing a program.
 
-**The forms suite has one failure and it is not new.** "A tree node reads back
-its text" fails, and fails the same way at `6adca35` -- before any of the
-documentation work -- so it is a real bug in the tree control rather than
-something this session did. Everything else in that suite passes. It is the
-first thing to look at.
+**`forms/` has a second backend.** GTK 3, beside Win32, and both samples pass
+their whole self-test on both: `demo`'s 21 checks and `common`'s 43. The seam
+was the point -- thirty interfaces written against Win32 and nothing in one of
+them had to change -- and what it cost is written up in `forms/README.md` under
+"The GTK backend, and what it found".
 
-That Linux box (`ssh brandon@geekom-a7`) has GTK 2 and GTK 3,
-the development packages, Xvfb and `broadwayd`, so a GUI can be built *and run*
-there headlessly — see `bindings/gtk/README.md`. The full suite **has** now been
-re-run there and passes; the forms suite has not, and two of the hardening
-fixes below are worth checking before anything is claimed about it: the deep
-stack a compilation now runs on, and the literal typing, which changes what a
-mask means in the bindings.
+**The forms suite's one failure is now known to be Win32's.** "A tree node
+reads back its text" fails on Windows and *passes on GTK*, which is what a
+second backend is for: it was "the tree control is broken" and it is now "the
+Windows tree peer is broken". It fails the same way at `6adca35`, so it is not
+something a recent session did. It is still the first thing to look at, and it
+is now a much smaller thing.
 
-`master` and `origin/master` are level; the documentation pass and the x86 work
-that this file used to say were unpushed have been pushed.
+That Linux box (`ssh brandon@geekom-a7`) has GTK 3, the development packages,
+Xvfb and `broadwayd`, so a GUI can be built *and run* there headlessly — see
+`bindings/gtk/README.md`. The full suite and both forms samples have now been
+run there and pass.
+
+**GTK 2 was dropped**, bindings and all. It was behind `-D GTK2` and it went
+the day this binding stopped being something a program merely calls and became
+the thing `forms/` is built on: two toolkits behind one seam is two backends to
+keep honest, and no current distribution ships the second.
+
+`master` and `origin/master` are level.
 
 ## What was built, in order
 
@@ -92,7 +101,8 @@ that this file used to say were unpushed have been pushed.
 | `034b2ae` | the x86 classifier, and the calling conventions a declaration names |
 | `31d13fe` | the 32-bit build is run rather than claimed |
 | `fb5ba19` | the documentation says x86 is a target |
-| *this one* | Linux x86 runs, COM reaches x86, and ARM64 is classified |
+| `8aa7853` | Linux x86 runs, COM reaches x86, and ARM64 is classified |
+| *this one* | GTK 2 goes, and `forms/` gets its second backend |
 
 ## Findings worth keeping
 
@@ -155,6 +165,49 @@ different answers for `struct { long a, b; }` -- until the obvious: `long` is
 four bytes on Windows and eight on Linux, so the two files did not describe the
 same struct. Stainless has no type whose width depends on the system, so one
 classifier serves both, and `arm64-abi-windows` exists to keep that testable.
+
+### What writing the second backend found
+
+**A lambda captures a member *read* by value.** It is the documented rule
+(spec §2.15) and it is a trap the GTK backend fell into eight times over: the
+guard that stops a program-driven change being reported back as the user's was
+written `if (settingValue)` inside a handler, which tests what the flag said
+when the handler was connected. False, for ever.
+
+Written that way it compiles, it runs, and it guards nothing. A program that
+ticked a checked menu item from its own click handler recursed until the stack
+ran out, and the backtrace was thirty frames of GObject with nothing in it to
+suggest a capture rule. The fix is one line -- read the field through a method,
+because "a method call captures the object, because the call needs one" -- and
+the reason it is worth a heading here is that nothing about the failure points
+at the cause.
+
+**A signal's arity has to match the connector's, and nothing checks.**
+`Gtk.Events` connects handlers taking a sender, one pointer and user data.
+`switch-page` carries a page *and* a page number; `row-activated` a path *and*
+a column. Connect either through it and the user data arrives in a register the
+handler is not reading, so the boxed closure is read out of a `guint`. Segfault
+at the first tab added.
+
+**`gtk_window_resize` is a request and `MoveWindow` is an instruction.** The
+configure events already in flight describe the size *before* the request, so a
+form that resized twice in quick succession laid itself out for the first. The
+window peer drops echoes until one matches what was asked for, bounded at four
+so that a window manager refusing a size cannot silence the window.
+
+**Report the new size after writing it down, not before.** `OnPlatformResized`
+lays the form out again and the layout asks the peer for `ClientBounds` --
+which reads the field the report was about to update. Reporting first meant
+every relayout used the size before the one being reported. That one took a
+`Console.WriteLine` inside the backend to see, because every number involved
+was plausible.
+
+**A `GtkSpinButton` is not a `GtkRange`.** It has a value, a range and steps,
+and `gtk_range_set_range` on one is a `GTK_IS_RANGE` assertion at run time and
+nothing at all at compile time -- because every widget is a `GtkWidget*` to a
+binding. The binding cannot reproduce GTK's checked casts, which is the cost of
+the one-pointer-type decision and is worth remembering when a call does
+nothing.
 
 ### From before
 
@@ -889,11 +942,13 @@ least written about it.
 ## Next, in the order I would do it
 
 **For `forms/`, `forms/README.md` has the full roadmap** -- every LCL unit a
-program would miss, grouped by how much work it is. The short version: common
-dialogs are nearly free because `bindings/win32/Dialogs.sl` already has them;
-`PaintBox` and `Timer` are small and unblock a lot; the GTK backend matters more
-than any control, because a seam with one implementation has quietly stopped
-being a seam; and `grids.pas` is 14,000 lines that Windows has no widget for.
+program would miss, grouped by how much work it is. The short version, now that
+the GTK backend is done and the dialogs, `PaintBox` and `Timer` that this
+paragraph used to recommend are all in: **DPI awareness** first, because both
+backends turn points into pixels at a hard-coded 96 and every control is wrong
+on a scaled display; then **owner drawing**, which half a dozen controls want
+and none has; and `grids.pas`, which is 14,000 lines that neither platform has
+a widget for.
 
 0. **Pin the README's numbers.** Nothing is unpushed any more, but the counts
    in the README drift on every commit that adds a case and they were four

@@ -5,9 +5,6 @@
 //   stainless run samples/gtk/control.sl bindings/gtk \
 //       -l gtk-3 -l gdk-3 -l gobject-2.0 -l glib-2.0 -l cairo
 //
-//   stainless run samples/gtk/control.sl bindings/gtk -D GTK2 \
-//       -l gtk-x11-2.0 -l gdk-x11-2.0 -l gobject-2.0 -l glib-2.0 -l cairo
-//
 // This is the shape a component library is made of, and the point of it is
 // **who knows what**. `SearchBox` is built from an entry and two buttons, and
 // the program using it knows about none of them: it sees a `Widget` to put in

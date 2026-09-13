@@ -169,7 +169,12 @@ public class DemoForm : Form {
     public bool SelfTest() {
         bool ok = true;
 
-        ok = Check(ok, "widget set is Win32", Application.PlatformName == "Win32");
+        // Which backend, rather than that it is a particular one: this
+        // sample is the same source on both, and the name is the one place
+        // anything in `forms/` says a platform out loud.
+        var platform = Application.PlatformName;
+        ok = Check(ok, "widget set is " + platform,
+                   platform == "Win32" || platform == "GTK3");
 
         // Docking: the header took the top of the client area and the status
         // line the bottom, each across the full width.
@@ -191,11 +196,11 @@ public class DemoForm : Form {
 
         // Text really round-trips through the native control.
         entry.Text = "hello";
-        ok = Check(ok, "text box round-trips through Windows", entry.Text == "hello");
+        ok = Check(ok, "text box round-trips through the platform", entry.Text == "hello");
 
         // The check box's state comes from the platform, not a field.
         urgent.Checked = true;
-        ok = Check(ok, "check box reads back from Windows", urgent.Checked);
+        ok = Check(ok, "check box reads back from the platform", urgent.Checked);
         urgent.Checked = false;
 
         // A combo box holds its items too.
@@ -232,8 +237,13 @@ public class DemoForm : Form {
                    entry.Height == wasEntry.Height);
         ok = Check(ok, "a resize keeps a plain control its size",
                    add.Width == wasAdd.Width && add.Height == wasAdd.Height);
-        ok = Check(ok, "the form reports its window size, not its client size",
-                   Width == 700 && Height == 460 && ClientBounds.Width < 700);
+        // **A window's size means different things on the two platforms**,
+        // and neither is wrong: a Win32 window's bounds include its frame, so
+        // the client area is narrower, while a GTK window's size *is* its
+        // content. What is portable is that the form reports what it was set
+        // to and that the client area is no larger than that.
+        ok = Check(ok, "the form reports the size it was set to",
+                   Width == 700 && Height == 460 && ClientBounds.Width <= 700);
 
         // A group box's frame and caption eat into where its children go, and
         // a child placed at the origin must land inside them rather than on

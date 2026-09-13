@@ -36,13 +36,12 @@ module Forms.Platform.Win32;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if WINDOWS
 import Win32;
 import Win32.Handles;
 import Win32.Kernel32;
 import Win32.User32;
 import Win32.Gdi32;
-
-#if WINDOWS
 
 // ===================================================================== font
 

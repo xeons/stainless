@@ -19,12 +19,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Cairo: the drawing API under both versions of GTK.
+// Cairo: what GTK draws with.
 //
-// **Not version-specific**, which is the useful part. GTK 2.8 and later draw
-// with cairo and so does GTK 3, so a paint routine written against this file
-// works under either -- only the *signal* that delivers the context differs,
-// and `Gtk.DrawingArea` hides that.
+// **Not GTK-specific**, which is the useful part. Cairo is its own library
+// with its own release schedule, so a paint routine written against this file
+// is about drawing rather than about a toolkit version -- and that was true
+// back when this binding had a GTK 2 branch, which is why nothing in it had
+// one.
 //
 // Cairo is a stateful painter, not a list of shapes. A call sets the source
 // colour, another builds a path, and a third strokes or fills it, at which
@@ -36,8 +37,8 @@
 //
 // The context a GTK draw handler is given is **borrowed**: it is already
 // clipped to the area needing repainting and translated to the widget's
-// origin, and it must not be destroyed. One made by `gdk_cairo_create` under
-// GTK 2 is owned, and `cairo_destroy` is what pays for it.
+// origin, and it must not be destroyed. One made by `gdk_cairo_create` is
+// owned instead, and `cairo_destroy` is what pays for it.
 module Gtk.Cairo;
 
 import Gtk.GLib;
@@ -142,18 +143,37 @@ public extern "C" {
     void cairo_destroy(cairo_t* cr);
 }
 
-#if GTK2
 
-public extern "C" {
-    /// A context for drawing on a `GdkWindow`, **owned by the caller**.
-    ///
-    /// This is how GTK 2 gets to cairo: an `expose-event` handler asks the
-    /// widget for its window, makes a context, draws, and destroys it. GTK 3
-    /// hands the context over and there is nothing to make or destroy, which
-    /// is why this declaration is on this side of the `#if`.
-    cairo_t* gdk_cairo_create(gpointer window);
+
+// ============================================================ what a pen needs
+
+/// `cairo_font_extents_t`: the metrics of a font rather than of a run of text.
+/// What a line height is, and the one thing `cairo_text_extents` cannot say --
+/// it measures the ink, so "Ag" is taller than "an".
+public struct cairo_font_extents_t {
+    public double Ascent;
+    public double Descent;
+    public double Height;
+    public double MaxXAdvance;
+    public double MaxYAdvance;
 }
 
-#endif
+public extern "C" {
+    void cairo_font_extents(cairo_t* cr, cairo_font_extents_t* into);
+
+    /// The dash pattern: `count` lengths in `dashes`, and a `count` of zero is
+    /// a solid line. The lengths are in user units, so they scale.
+    void cairo_set_dash(cairo_t* cr, gdouble* dashes, gint count, gdouble offset);
+
+    /// Clips to the current path *and* keeps it, which is what pushing a layer
+    /// needs -- `cairo_clip` consumes the path and there is then nothing left
+    /// to fill.
+    void cairo_clip_preserve(cairo_t* cr);
+
+    /// What is left to paint, in user coordinates. A paint handler that only
+    /// draws what it has to asks this first.
+    void cairo_clip_extents(cairo_t* cr, gdouble* x1, gdouble* y1,
+                            gdouble* x2, gdouble* y2);
+}
 
 #endif

@@ -11,15 +11,6 @@
 //       -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 \
 //       -l :libglib-2.0.so.0 -l :libcairo.so.2
 //
-//   # GTK 2, which is the same program
-//   stainless run samples/gtk/hello.sl bindings/gtk -D GTK2 \
-//       -l :libgtk-x11-2.0.so.0 -l :libgdk-x11-2.0.so.0 \
-//       -l :libgobject-2.0.so.0 -l :libglib-2.0.so.0 -l :libcairo.so.2
-//
-// **Nothing below is version-specific.** The same source builds against both,
-// because `Gtk` hides the layout and drawing differences; the only sign of
-// which one is running is what the window looks like.
-//
 // The thing to notice is that **a handler is a closure** (§2.14.1): either a
 // lambda that captures what it needs, or a method bound to the object that
 // cares. There is no `sender` parameter to cast, no user-data pointer and no
@@ -117,7 +108,7 @@ public int Main() {
     about.OnChosen(() => {
         Dialogs.Inform(window, "About",
             "A GTK program written in Stainless.\n" +
-            "The same source builds against GTK 2 and GTK 3.");
+            "Widgets, layout, events, a menu, a timer and custom drawing.");
     });
     help.Append(about);
     help.Append(MenuItem.Divider());
@@ -166,8 +157,8 @@ public int Main() {
 
     side.Pack(new Separator(false), false);
 
-    // A grid, which is a GtkGrid under GTK 3 and a GtkTable under GTK 2 --
-    // the wrapper takes a cell and a span either way.
+    // A grid: a child goes at a cell with a span, rather than between the
+    // four grid lines an older toolkit would have wanted.
     var grid = new Grid();
     grid.SetSpacing(8, 4);
     side.Pack(grid, false);

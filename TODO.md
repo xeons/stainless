@@ -101,6 +101,39 @@ symbol, which is what a named export turns on.
 
 ---
 
+### The GTK backend, which is done, and what is next for `forms/`
+
+`forms/` has two backends now -- Win32 and GTK 3 -- and both samples pass their
+whole self-test on each: 21 checks and 43. The entry that used to be here said
+a seam with one implementation has quietly stopped being one, and that writing
+the second was the only way to find out whether `IControlPeer` described a
+control or an `HWND`.
+
+**It described a control.** Thirty interfaces, forty-five methods on
+`IWidgetSet`, and not one of them changed. The sharpest evidence is that a list
+box, a checked list, a column header, a tree and a details list are five window
+classes on Windows and five interfaces in the seam, and GTK answers all five
+with one `GtkTreeView` over a model -- without either backend knowing.
+
+**GTK 2 went with it.** It was behind `-D GTK2` and `Gtk.Api2`; two toolkits
+behind one seam is two backends to keep honest, and no current distribution
+ships the second.
+
+It also settled an old failure. `common`'s "a tree node reads back its text"
+fails on Win32 and *passes* on GTK, so it is the Windows tree peer rather than
+the tree control -- a different bug in a different file, and a much smaller
+one. It is the first thing to look at in `forms/`.
+
+What is next there is in [forms/README.md](forms/README.md), which has the full
+roadmap. The short version: **DPI awareness**, because both backends now turn
+points into pixels at a hard-coded 96; **owner drawing**, which half a dozen
+controls want and none has; and `grids.pas`, which is 14,000 lines that neither
+platform has a widget for.
+
+*Touches:* `forms/src/Platform/Gtk`, `bindings/gtk`.
+
+---
+
 ## Interop, in the order writing the Win32 bindings wanted them
 
 ### An enum that crosses `extern "C"`
