@@ -8,8 +8,8 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           834 pass, Windows and Linux
-dotnet run --project tests/Stainless.Tests      278 cases, 2 skipped on Windows
-                                                268 pass, 12 skipped on Linux
+dotnet run --project tests/Stainless.Tests      279 cases, 2 skipped on Windows
+                                                269 pass, 12 skipped on Linux
 stainless doc --stdlib                          22 pages into docs/stdlib
 samples/forms/build.ps1 -Test                   demo 21/21, common 42/43
 forms on GTK 3, under broadwayd                 demo 21/21, common 43/43
@@ -168,19 +168,31 @@ classifier serves both, and `arm64-abi-windows` exists to keep that testable.
 
 ### What writing the second backend found
 
-**A lambda captures a member *read* by value.** It is the documented rule
-(spec §2.15) and it is a trap the GTK backend fell into eight times over: the
-guard that stops a program-driven change being reported back as the user's was
-written `if (settingValue)` inside a handler, which tests what the flag said
-when the handler was connected. False, for ever.
+**A bare member read inside a lambda is captured by value.** It is the
+documented rule (spec §2.15) and it is a trap the GTK backend fell into eight
+times over: the guard that stops a program-driven change being reported back as
+the user's was written `if (settingValue)` inside a handler, which tests what
+the flag said when the handler was connected. False, for ever.
 
 Written that way it compiles, it runs, and it guards nothing. A program that
 ticked a checked menu item from its own click handler recursed until the stack
 ran out, and the backtrace was thirty frames of GObject with nothing in it to
-suggest a capture rule. The fix is one line -- read the field through a method,
-because "a method call captures the object, because the call needs one" -- and
-the reason it is worth a heading here is that nothing about the failure points
-at the cause.
+suggest a capture rule.
+
+**The fix is to name the receiver**: `this.busy` captures `this` -- an object
+reference, by the same by-value rule -- and reads the field through it. A
+method that reads the field does the same thing. Only the bare name copies.
+
+**The compiler warns about it now** (SL0610), and the warning is the reason
+this entry is short: it fires on a captured member that something else
+assigns, it points at the read, and it names `this.x` as the fix.
+`tests/cases/warn-captured-member` is the case, and reinstating the bare read
+in `Menus.sl` makes the compiler name the exact line that cost the stack.
+
+**The spec was wrong about `this.Factor`** and now is not: it said a member
+read through `this` copied like a bare one, and it does not -- `this` is
+captured and the field is read through it. That is worth knowing, because it is
+the difference between the rule having an escape hatch and not.
 
 **A signal's arity has to match the connector's, and nothing checks.**
 `Gtk.Events` connects handlers taking a sender, one pointer and user data.

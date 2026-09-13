@@ -940,7 +940,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 280 end-to-end tests
+dotnet run --project tests/Stainless.Tests      # 281 end-to-end tests
 dotnet test tests/Stainless.UnitTests           # 834 compiler unit tests
 ```
 
@@ -950,8 +950,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 280 cases, of which 12 are
-Windows-only and 2 are Linux-only, so Linux runs 268 and Windows 278, each
+**Both Windows and Linux are tested.** 281 cases, of which 12 are
+Windows-only and 2 are Linux-only, so Linux runs 269 and Windows 279, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
@@ -1540,8 +1540,11 @@ Everything below is covered by [the test suite](tests/cases).
   decided by what it is assigned to — a `closure`, a single-method interface,
   or, if it captures nothing, a `delegate`. A
   lambda written in a method reaches its object too — a field, a property,
-  `this`, or a method called without a receiver — and captures what it reads by
-  the same rule
+  `this`, or a method called without a receiver. **Which of those copies is
+  worth knowing**: a bare `factor` copies the value, `this.factor` captures the
+  object and reads it live, and a method call does the same. A captured member
+  that something else assigns is a warning (SL0610), because `if (busy)` in a
+  handler reads as a live test and is not one
 - `weak C?`: assignable, so a reference cycle can be broken. A weak reference
   costs the object nothing while it lives and reads back as `null` once it is
   gone, rather than as a pointer into freed memory

@@ -48,6 +48,119 @@ public sealed partial class Binder
     private readonly List<ClosureContext> _closures = [];
     private int _closureCount;
 
+    // ============================== a captured member that something changes
+
+    /// <summary>
+    /// Every member a lambda captured by reading it, and where.
+    ///
+    /// <para>
+    /// A member read inside a lambda is captured <i>by value</i>, the same as a
+    /// local (spec §2.15): the closure holds what the member said when it was
+    /// made, not a route back to the object. That is the language's rule and it
+    /// is the right one -- a closure may outlive the object, and by-value
+    /// capture is what means there is no lifetime question to answer.
+    /// </para>
+    ///
+    /// <para>
+    /// It is also the one capture rule that looks like the opposite of itself.
+    /// <c>if (busy)</c> inside a handler is a line nobody reads twice, and it
+    /// means "if the flag was set when this handler was connected" -- which is
+    /// almost always no. So where a captured member is <i>also written</i>
+    /// somewhere, the reader is warned that the two are not connected.
+    /// </para>
+    ///
+    /// <para>
+    /// <b>Naming the receiver is the fix, on a class.</b> <c>this.busy</c>
+    /// captures <c>this</c> by the same by-value rule -- but the value of a
+    /// class <c>this</c> is a counted reference, so the copy still names the
+    /// one object and reading through it is live. A method call does the same
+    /// thing for the same reason. Only the bare name copies, because only a
+    /// bare name resolved to a read in the enclosing scope rather than to a
+    /// member of something the closure holds.
+    /// </para>
+    ///
+    /// <para>
+    /// <b>On a struct there is no such fix</b>, because <c>this</c> there is
+    /// the struct and copying it copies the value. Both spellings are stale
+    /// and the warning says so rather than naming a cure that is not one.
+    /// </para>
+    /// </summary>
+    private readonly List<(object Member, string Name, NamedTypeSymbol Owner, SourceSpan Span)>
+        _memberCaptures = [];
+
+    /// <summary>
+    /// Every field and property assigned outside a constructor.
+    ///
+    /// <b>Outside</b>, because a member a constructor sets and nothing else
+    /// changes cannot surprise a closure: whatever it captured is what the
+    /// member will say for ever. Warning about those would put the diagnostic
+    /// on almost every capture there is, and a warning that fires on the
+    /// ordinary case is one people learn to pass over.
+    /// </summary>
+    private readonly HashSet<object> _membersWritten = [];
+
+    /// <summary>
+    /// Remembers that a member was written, for the check at the end of
+    /// binding. Called from every place an assignment is bound.
+    ///
+    /// <para>
+    /// A write <i>inside</i> a lambda needs no test here and gets none: the
+    /// name resolved to the closure's own field on the way in, so the symbol
+    /// recorded is the copy's and never matches the member's. That is the
+    /// same thing the warning is about, seen from the other side.
+    /// </para>
+    /// </summary>
+    private void NoteMemberWritten(BoundExpression target)
+    {
+        if (_currentFunction?.Kind is FunctionKind.Constructor) return;
+
+        switch (target)
+        {
+            case BoundFieldAccess field: _membersWritten.Add(field.Field); break;
+            case BoundCall { Function.Accessor: { } property }: _membersWritten.Add(property); break;
+        }
+    }
+
+    /// <summary>Remembers a property written through its setter.</summary>
+    private void NoteMemberWritten(PropertySymbol property)
+    {
+        if (_currentFunction?.Kind is FunctionKind.Constructor) return;
+        _membersWritten.Add(property);
+    }
+
+    /// <summary>
+    /// Warns about every captured member that something goes on to change.
+    ///
+    /// Run once, after every body is bound, because neither half of the
+    /// question is answerable before then: a member may be captured in one
+    /// file and written in another, and the write may be in a method declared
+    /// after the lambda that reads it.
+    /// </summary>
+    private void ReportCapturedMembersThatChange()
+    {
+        foreach (var (member, name, owner, span) in _memberCaptures)
+        {
+            if (!_membersWritten.Contains(member)) continue;
+
+            // **The fix differs by what `this` is.** A class reference copied
+            // into the closure still names the one object, so reading through
+            // it is live. A struct `this` is the struct, copied -- so there is
+            // no spelling that reads the original, and saying otherwise would
+            // send a reader after something that does not exist.
+            string advice = owner is ClassTypeSymbol
+                ? $"Write 'this.{name}' if it should see the current value, which captures " +
+                  "the object and reads through it; assign it to a local first if it should not"
+                : $"'{owner.Name}' is a struct, so a lambda inside it captures a copy of the " +
+                  "whole value and 'this." + name + "' copies too -- pass what the lambda " +
+                  "needs as a parameter, or make it a method on the struct";
+
+            diagnostics.Warning("SL0610", span,
+                $"this lambda captures '{name}' by value, and '{owner.Name}.{name}' is " +
+                "assigned elsewhere -- so it will keep reading what it said here, not what " +
+                $"it says when the lambda runs. {advice}");
+        }
+    }
+
     /// <summary>
     /// Resolves a name a lambda body used but did not declare, by capturing it.
     ///
@@ -124,11 +237,15 @@ public sealed partial class Binder
         if (receiver.Type is not NamedTypeSymbol owner) return null;
 
         if (owner.FindProperty(name) is { } property)
+        {
+            _memberCaptures.Add((property, name, owner, span));
             return BindPropertyRead(span, receiver, property);
+        }
 
-        return owner.FindField(name) is { } field
-            ? new BoundFieldAccess(span, receiver, field)
-            : null;
+        if (owner.FindField(name) is not { } field) return null;
+
+        _memberCaptures.Add((field, name, owner, span));
+        return new BoundFieldAccess(span, receiver, field);
     }
 
     /// <summary>

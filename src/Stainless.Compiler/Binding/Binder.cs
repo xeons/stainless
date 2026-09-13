@@ -265,6 +265,10 @@ public sealed partial class Binder(
         CheckConstructorDelegation();
         ResolveRemainingAliases();
 
+        // Last, because both halves of the question need every body bound: a
+        // member may be captured in one file and written in another.
+        ReportCapturedMembersThatChange();
+
         // Interface ids are assigned last, because instantiating a generic can
         // introduce a new interface at any point up to here.
         for (int id = 0; id < _interfaces.Count; id++) _interfaces[id].Id = id;

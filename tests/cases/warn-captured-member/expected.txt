@@ -1,0 +1,4 @@
+ran
+0
+settled
+tally 1

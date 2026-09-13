@@ -2073,8 +2073,9 @@ ITransform MakeAdder(int amount) {
 ```
 
 **A lambda written in a method can reach its object.** A field, a property,
-`this` itself, and a method called without a receiver all resolve, and each is
-captured by the same by-value rule as a local:
+`this` itself, and a method called without a receiver all resolve — and *what*
+is captured differs between them, which is the one part of this section to read
+twice:
 
 ```csharp
 class Scaler {
@@ -2089,9 +2090,65 @@ class Scaler {
 ```
 
 `this` inside a lambda means the object the lambda was written in, never the
-closure the compiler generated for it. A member read is captured as a value, so
-`ByField` copies what `Factor` said when the closure was made; a method call
-captures the object, because the call needs one.
+closure the compiler generated for it — and **`this` is what gets captured**,
+by the same by-value rule as a local, which for a class reference means the
+closure holds the object.
+
+So the three differ:
+
+| written | captured | reads |
+|---|---|---|
+| `Factor` | the *value* `Factor` had | what it said when the closure was made |
+| `this.Factor` | `this` | what it says when the closure runs |
+| `Triple(value)` | `this`, because the call needs one | the method, now |
+
+**A bare member read is the only one that copies**, and it copies because the
+name resolved to a read in the enclosing scope rather than to a member of
+something the closure holds. Naming the receiver is what makes it live.
+
+**On a struct it is live for neither**, and the reason is the same rule rather
+than an exception to it: `this` in a struct method is the struct, so capturing
+it by value copies the value. On a class `this` is a counted reference, and a
+copy of a reference still names the one object — which is also why the closure
+keeps it alive. There is no spelling that reads a struct's original storage
+from a lambda; pass what the lambda needs as a parameter instead.
+
+**A captured member that something else writes is a warning** (SL0610), because
+the rule above reads like the opposite of itself at the one place it matters:
+
+```csharp
+class Peer {
+    bool busy;
+
+    public Peer() {
+        OnChanged(() => {
+            if (busy) { return; }       // SL0610: `busy` is a copy
+            Report();
+        });
+    }
+
+    public void Set(int value) {
+        busy = true;                    // this is what makes it a warning
+        Write(value);
+        busy = false;
+    }
+}
+```
+
+`if (busy)` is a line nobody reads twice and it means "if `busy` was set when
+this lambda was made" — which is `false`, for ever. The warning names the two
+halves and fires only when both are there: a member a constructor sets and
+nothing else changes cannot surprise a closure, so capturing one of those is
+silent. Inside a struct it says something different, because there the fix
+below does not exist.
+
+The fix is to name the receiver, which captures the object rather than the
+answer — `if (this.busy)`. A method that reads the field does the same thing
+for the same reason, and reads better where the test is worth a name:
+
+```csharp
+bool Busy() { return busy; }
+```
 
 **Capturing `this` keeps the object alive**, which makes an object that stores
 its own closure a reference cycle. ARC cannot collect one, so break it with a

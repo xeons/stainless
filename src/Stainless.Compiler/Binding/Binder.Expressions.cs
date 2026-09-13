@@ -1651,6 +1651,7 @@ public sealed partial class Binder
                 return new BoundErrorExpression(syntax.Span);
 
             InvalidateVariantFact(target);
+            NoteMemberWritten(property);
             return new BoundPropertyIncrement(
                 syntax.Span, read.Receiver, property, syntax.IsPrefix, syntax.IsIncrement)
                 { IsChecked = _checkedArithmetic };
@@ -1661,6 +1662,7 @@ public sealed partial class Binder
 
         InvalidateVariantFact(target);
         if (WrittenParameter(target) is { } written2) written2.IsAssigned = true;
+        NoteMemberWritten(target);
 
         return new BoundIncrement(syntax.Span, target, syntax.IsPrefix, syntax.IsIncrement)
             { IsChecked = _checkedArithmetic };
@@ -1892,6 +1894,7 @@ public sealed partial class Binder
 
             InvalidateVariantFact(target);
             if (WrittenParameter(target) is { } filled) filled.IsAssigned = true;
+            NoteMemberWritten(target);
 
             return new BoundConditional(syntax.Span, target.Type, absent,
                 new BoundAssignment(syntax.Span, target,
@@ -1915,6 +1918,7 @@ public sealed partial class Binder
         // ParameterSymbol.IsAssigned.
         if (WrittenParameter(target) is { } written) written.IsAssigned = true;
 
+        NoteMemberWritten(target);
         return new BoundAssignment(syntax.Span, target, BindConversion(value, target.Type, syntax.Value.Span));
     }
 
@@ -2082,6 +2086,7 @@ public sealed partial class Binder
         // terms as the getter above: the read that got here already worked out
         // which it was, so the answer is carried across rather than decided
         // twice.
+        NoteMemberWritten(property);
         return new BoundPropertyAssignment(syntax.Span, receiver, property,
             BindConversion(value, property.Type, syntax.Value.Span))
         {

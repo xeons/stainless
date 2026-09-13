@@ -389,19 +389,23 @@ public class GtkPeer : IControlPeer {
         echoing = false;
     }
 
-    /// **Read through a call, never as a field, from inside a lambda.**
+    /// **Never read as a bare field from inside a lambda.**
     ///
-    /// A lambda captures a member *read* by value at the moment it is made
-    /// (spec §2.15), so `if (echoing)` inside a handler tests what the flag
-    /// said when the handler was connected -- which is false, for ever. A
-    /// method call captures the object instead, because the call needs one, so
-    /// this reads the live field.
+    /// A lambda captures a bare member *read* by value at the moment it is
+    /// made (spec §2.15), so `if (echoing)` inside a handler tests what the
+    /// flag said when the handler was connected -- which is false, for ever.
+    /// Written that way it compiles, runs, and silently guards nothing: a
+    /// program that ticked a checked menu item from its own click handler
+    /// recursed until the stack ran out, and the backtrace was thirty frames
+    /// of GObject with nothing in it to suggest a capture rule.
     ///
-    /// It is worth the two lines. Written as a field read it compiles, runs,
-    /// and silently never guards anything: a program that set a checked menu
-    /// item from its own click handler recursed until the stack ran out, and
-    /// the backtrace was thirty frames of GObject with nothing in it to
-    /// suggest a capture rule.
+    /// `this.echoing` would do -- naming the receiver captures the object and
+    /// reads the field through it -- and a call does the same thing for the
+    /// same reason. The call is what this backend uses, because the two names
+    /// say what the pair is for at every one of the dozen sites that uses it.
+    ///
+    /// The compiler warns about the bare form now (SL0610), which it did not
+    /// while this was being written.
     protected bool Echoing() { return echoing; }
     protected void Echo(bool on) { echoing = on; }
 

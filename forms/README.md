@@ -430,12 +430,13 @@ What the exercise cost, and it is worth knowing before the next backend:
   returns and `gtk_window_resize` has only asked, so the events already in
   flight describe the size before the request. The window peer drops those
   echoes until one matches; Win32 needed nothing.
-- **A lambda captures a member read by value** (spec §2.15), so the guard that
-  stops a program-driven change being reported back as the user's has to be a
-  method call. Written as a field read it compiles, runs, and guards nothing --
-  a checked menu item set from its own handler recursed until the stack ran
-  out. Every handler in that backend now goes through a call, and the comment
-  on `GtkPeer.Echoing` says why.
+- **A bare member read inside a lambda is captured by value** (spec §2.15), so
+  the guard that stops a program-driven change being reported back as the
+  user's has to name its receiver -- `this.busy`, or a method that reads it.
+  Written bare it compiles, runs, and guards nothing: a checked menu item set
+  from its own handler recursed until the stack ran out. The compiler warns
+  about it now (SL0610), which it did not while this was being written, and
+  the comment on `GtkPeer.Echoing` is the long version.
 - **A signal's arity has to match the connector's.** `switch-page` carries a
   page *and* a page number, so a handler connected as if it carried one reads
   the boxed closure out of the wrong register. That is a segfault at the first
