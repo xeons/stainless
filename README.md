@@ -418,11 +418,23 @@ which is what lets them be keys and be sorted:
 
 ```csharp
 var ages = new Dictionary<String, int>();
-ages.Set("ada", 36);
+ages["ada"] = 36;
+ages["grace"] = None;                   // None removes
+
+if (ages["ada"] is Some found) { Use(found.Value); }
+int guess = ages["nobody"].ValueOr(0);
 
 var numbers = new List<int>();
+numbers.Add(1);
+numbers[0] += 1;
 Sort(numbers);
 ```
+
+A dictionary's subscript answers `Optional<V>`, as Swift's does: a key is data
+that arrived from somewhere, so a lookup that misses is an answer rather than
+a reason to stop the program. A list's is a plain `V`, because an index is a
+position the caller worked out and an out-of-range one is the mistake
+`array[i]` is.
 
 `IList<T>` extends `IReadOnlyList<T>`, and interfaces are named with a leading
 `I` as in C#.
@@ -594,6 +606,11 @@ public class Grid {
     }
 }
 ```
+
+An indexer's getter and setter share one type, which is a constraint worth
+knowing before designing one: a lookup that may miss answers `Optional<V>`, so
+its setter takes an `Optional<V>` too. That is how `Dictionary` spells removal
+as `map[key] = None`.
 
 C#'s shape: inside the type, `static`, every operand written out. That last
 part is what makes `3 * money` expressible -- an operator whose left operand is
@@ -1386,7 +1403,9 @@ Everything below is covered by [the test suite](tests/cases).
   256 rather than garbage, and an integer division by zero — or the one signed
   division that overflows — aborts the way an out-of-range index does, rather
   than being folded to whatever the optimiser likes. A divisor that is zero at
-  compile time is an error instead
+  compile time is an error instead. Aborting writes a line to standard error
+  and ends the process, after flushing everything the program has written, so
+  the output that led up to the failure is there to read
 - `var`, `const`, explicit locals, compound assignment
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate. UTF-16 converts
@@ -1554,10 +1573,11 @@ Everything below is covered by [the test suite](tests/cases).
 
   Eager, not lazy: each returns a `List<T>`, because lazy chaining wants
   generators and the language has no `yield`
-- **"Not there" is an `Optional`**, not a sentinel. `IndexOf`, `IndexWhere` and
-  `Find` answer with one, so a length or a magic number never stands in for a
-  miss — which is what `Optional<T>` was added for, and what its own
-  documentation names `IndexOf` as the example of
+- **"Not there" is an `Optional`**, not a sentinel. `IndexOf`, `IndexWhere`,
+  `Find` and a dictionary's `map[key]` answer with one, so a length, a magic
+  number or a crash never stands in for a miss. A value converts implicitly to
+  the `Optional<T>` holding it, as it does to a `T?` in Swift and C#, which is
+  what lets `map[key] = value` stay ordinary while `map[key]` stays honest
 - Primitives, enums and `String` satisfy `IComparable<T>`, `IEquatable<T>` and
   `IHashable` without declaring it, so `Sort(numbers)` works on a `List<int>`
   and `Dictionary<String, V>` needs nothing extra
@@ -1651,6 +1671,9 @@ Everything below is covered by [the test suite](tests/cases).
   added in, found by scanning rather than hashing. For wherever the order is
   part of the data — a parsed document read back the way it was written — and
   not for anything large enough for O(n) lookup to hurt
+- `Standard.Text.FromDouble` writes the shortest text that reads back as the
+  same number, and `Standard.Convert.ToDouble` is its correctly-rounded
+  inverse, so a number survives being written and read
 - `Standard.Convert`: base64 and base64url, hex, and integer and floating-point
   parsing in any radix from 2 to 36. Everything that can fail returns a
   `Result`, because there is no exception to throw and no `out` to fill
@@ -1660,7 +1683,11 @@ Everything below is covered by [the test suite](tests/cases).
   The three layout questions answer exactly what C's do, which is how a binding
   checks itself against a header; `offsetof` on a class counts from the
   allocation, so the number is what to add to the reference you hold
-- Integer literals that fit convert implicitly, as in C#
+- Integer literals that fit convert implicitly, as in C#, and one that fits
+  nothing is refused rather than truncated. A literal is the narrowest of
+  `int`, `uint`, `long` and `ulong` that holds it, so a mask written the way a
+  C header writes it means what it says. A floating-point literal is a `double`
+  unless it carries the `f` suffix
 - Shared libraries: `--shared` with a generated C header, and an export table
   containing exactly the `export "C"` functions
 - Stainless libraries consumed by Stainless: `--metadata` writes a `.slmod`

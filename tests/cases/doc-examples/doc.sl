@@ -8,6 +8,7 @@
 module Doc;
 
 import Standard.Collections;
+import Standard.Convert;
 import Standard.Threading;
 import Standard.Console;
 import Standard.IO;
@@ -451,6 +452,68 @@ String Literals() {
            Text.FromInteger((long)SumSlice([10, 20, 30]));
 }
 
+// --- README "containers", spec 5.4 ----------------------------------------
+//
+// A dictionary's subscript answers `Optional<V>`, so a miss is an answer and
+// not a reason to stop. Its setter takes one too, which is what makes `None`
+// mean "remove", and a value promotes to the optional holding it so an
+// ordinary write still reads as one.
+String Lookup() {
+    var ages = new Dictionary<String, int>();
+    ages["ada"] = 36;
+    ages["grace"] = 45;
+    ages["grace"] = None;
+
+    var built = new StringBuilder();
+
+    if (ages["ada"] is Some found) { built.AppendInteger((long)found.Value); }
+    built.Append(":");
+    built.AppendInteger((long)ages["nobody"].ValueOr(0));
+    built.Append(":");
+    built.AppendInteger((long)ages.Count());
+
+    // Counting, said out loud, because there is nothing to add to when the
+    // key is absent.
+    ages["visits"] = ages["visits"].ValueOr(0) + 1;
+    built.Append(":");
+    built.AppendInteger((long)ages["visits"].ValueOr(-1));
+
+    // A list's index is a position rather than data, so its subscript is a
+    // plain value.
+    var numbers = new List<int>();
+    numbers.Add(1);
+    numbers[0] += 1;
+    built.Append(":");
+    built.AppendInteger((long)numbers[0]);
+
+    // Spec 2.8.1: a value becomes the Optional holding it.
+    Optional<int> promoted = 8080;
+    Optional<int> none = None;
+    built.Append(":");
+    built.AppendInteger((long)promoted.ValueOr(-1));
+    built.AppendInteger((long)none.ValueOr(-1));
+
+    return built.ToText();
+}
+
+// --- README "what a number survives", spec 3 ------------------------------
+//
+// FromDouble writes the shortest text that reads back as the same number, and
+// Convert.ToDouble is its correctly-rounded inverse.
+String Numbers() {
+    var built = new StringBuilder();
+    built.Append(Text.FromDouble(3.141592653589793));
+    built.Append(":");
+    built.Append(Text.FromDouble(0.1));
+    built.Append(":");
+    built.Append(Text.FromDouble(60.0));
+
+    var back = Convert.ToDouble(Text.FromDouble(1.0 / 3.0));
+    built.Append(":");
+    built.Append(back.Ok && back.Value == 1.0 / 3.0 ? "round-trips" : "LOST");
+    return built.ToText();
+}
+
 int Main() {
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
@@ -532,6 +595,8 @@ int Main() {
     printf("shapes=%s\n", Shapes().ToPointer());
     printf("inherits=%s\n", Inherits().ToPointer());
     printf("literals=%s\n", Literals().ToPointer());
+    printf("lookup=%s\n", Lookup().ToPointer());
+    printf("numbers=%s\n", Numbers().ToPointer());
     printf("done\n");
     return 0;
 }

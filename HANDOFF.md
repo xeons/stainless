@@ -62,7 +62,8 @@ since the closure work.
 | `24538c6` | the two allocations that could still wrap |
 | `7708bce` | an abort keeps the output that explains it |
 | `bbc04ba` | a missing key is an outcome rather than a crash |
-| *this one* | `map[key]` answers an optional, as Swift's does |
+| `cf82305` | `map[key]` answers an optional, as Swift's does |
+| *this one* | the documentation caught up, and three entries for what it still lacks |
 
 ## Findings worth keeping
 
@@ -687,6 +688,14 @@ purpose: named elements either take part in the type's identity, making
 `(int a, int b)` and `(int x, int y)` different types, or they do not, leaving
 two names for one field. The name is wanted at the use site, and
 `var (low, high) = ...` is where it goes.
+
+**The documentation was brought back in line, and `tests/cases/doc-examples`
+is what keeps it there.** Every block this session added to README.md or the
+spec is compiled and run by that case, so the next time the prose and the
+compiler disagree something fails rather than nobody noticing. The three
+entries at the top of TODO.md came out of the same pass: the standard library
+is the part of this language most people will read, and it is the part with the
+least written about it.
 
 ## Next, in the order I would do it
 
