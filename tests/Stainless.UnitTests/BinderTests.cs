@@ -124,6 +124,22 @@ public class BinderTests
     public void ANarrowingConversionUnderlinesTheSource(string body, string underlined) =>
         Assert.Equal(("SL0265", underlined), One(body));
 
+    /// <summary>
+    /// An argument that did not bind is reported once. It matches every
+    /// overload and none, so overload resolution used to add "the call is
+    /// ambiguous" on top -- a second message about the first one's
+    /// consequence, printed above it.
+    /// </summary>
+    [Fact]
+    public void AnArgumentThatDidNotBindDoesNotAlsoReportAmbiguity() =>
+        Assert.Equal(
+            ["SL0247"],
+            Front.ModuleCodes("""
+                String Pick(long n) { return "l"; }
+                String Pick(nuint n) { return "n"; }
+                String Use(String s) { return Pick(s.Nonexistent); }
+                """));
+
     [Fact]
     public void AnUnknownFunctionUnderlinesItsName() =>
         Assert.Equal(("SL0252", "nope"), One("nope();"));

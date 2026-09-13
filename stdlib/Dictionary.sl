@@ -109,6 +109,18 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
         return values[i];
     }
 
+    /// `Get` and `Set` written the way C# writes them.
+    ///
+    /// Reading a key that is not there aborts, as `Get` does, because a
+    /// dictionary cannot invent a value of an arbitrary `V` and returning
+    /// `default(V)` would make a missing key indistinguishable from one
+    /// mapped to zero. `GetOr` and `ContainsKey` are for when absence is an
+    /// ordinary outcome.
+    public V this[K key] {
+        get { return Get(key); }
+        set { Set(key, value); }
+    }
+
     /// Adds the key or replaces what it maps to.
     public void Set(K key, V value) {
         nuint i = Probe(key);

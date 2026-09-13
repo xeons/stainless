@@ -1467,6 +1467,17 @@ public sealed partial class Binder
         IReadOnlyList<FunctionSymbol> candidates, List<BoundExpression> arguments, SourceSpan span, string name,
         IReadOnlyList<ExpressionSyntax>? written = null)
     {
+        // An argument that did not bind has already been reported, and it
+        // matches every overload and none: saying the call is ambiguous on top
+        // of that is a second message about the first one's consequence, and
+        // it is the one printed first.
+        //
+        // The test is the node and not its type, because a draft -- `out var
+        // x`, an array literal, `Ok(v)` -- carries an error type precisely
+        // while it waits to be told what it is, and refusing to resolve is how
+        // it would never be told.
+        if (arguments.Any(a => a is BoundErrorExpression)) return null;
+
         var viable = candidates.Where(c => AcceptsArguments(c, arguments, written)).ToList();
 
         switch (viable.Count)

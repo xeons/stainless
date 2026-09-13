@@ -7,8 +7,8 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           742 pass
-dotnet run --project tests/Stainless.Tests      265 cases, 2 skipped on Windows
+dotnet test tests/Stainless.UnitTests           743 pass
+dotnet run --project tests/Stainless.Tests      266 cases, 2 skipped on Windows
 samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
@@ -56,7 +56,8 @@ since the closure work.
 | `fe6a18e` | menus and the common controls; interface-to-class narrowing |
 | `dc8d36c` | the windowless controls; a generic no longer shrinks a struct |
 | `755d002` | the composites, and `base` on a property stops dispatching |
-| *this one* | a hardening pass: nine bugs, found by probing rather than reading |
+| `908fb3a` | a hardening pass: nine bugs, found by probing rather than reading |
+| *this one* | indexers on the containers, and one less cascading diagnostic |
 
 ## Findings worth keeping
 
@@ -158,6 +159,26 @@ of `\u` with two digits became U+0012, and `1lul` meant 1. All three are values
 nobody wrote. A character literal is exactly one scalar, `\u` takes exactly four
 digits and `\U` eight -- `\x` stays variable, since it is a byte and C says so
 -- and a suffix is measured against the set C# actually has.
+
+**The containers had no indexers, and the language has had them all along.**
+`list[i]` did not compile; `list.At(i)` and `list.Set(i, v)` were the whole
+surface, and `map.Get(k)` likewise. The methods stay, because an interface has
+no indexers and `IReadOnlyList<T>` declares them, but the brackets are what to
+reach for where the type is known. Probing the way in found this, not reading:
+the first line of the collections probe was `list[0]` because that is what
+anyone would write.
+
+Worth knowing that a **generic** indexer already worked -- on a class and on a
+struct, with `+=` reading through the getter and writing through the setter --
+and that nothing covered it. `tests/cases/indexers` does now.
+
+**An argument that failed to bind was reported twice**, and the second message
+came first: overload resolution saw an error-typed argument, found it matched
+everything and nothing, and said "the call is ambiguous" above the real error.
+The guard has to test the *node* rather than its type, which cost a suite run
+to learn -- `out var x`, an array literal and `Ok(v)` are drafts that carry an
+error type precisely while they wait to be told what they are, and refusing to
+resolve is how they would never be told.
 
 **The project file crashed on `null`.** JSON `null` lands in a property whatever
 its type says and the deserializer does not count it as missing, so eight fields

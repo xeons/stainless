@@ -140,6 +140,24 @@ public class List<T> : IList<T>, IEnumerable<T> {
         return items[index];
     }
 
+    /// The same two questions as `At` and `Set`, written the way an array is.
+    ///
+    /// The methods stay, because `IReadOnlyList<T>` and `IList<T>` declare
+    /// them and an interface has no indexers. This is the spelling to reach
+    /// for where the type is known, which is nearly everywhere: `items[i] += 1`
+    /// reads through the getter and writes through the setter, so a list is
+    /// indexed on the same terms as the array behind it.
+    public T this[nuint index] {
+        get {
+            if (index >= count) { sl_array_bounds_fail(index, count); }
+            return items[index];
+        }
+        set {
+            if (index >= count) { sl_array_bounds_fail(index, count); }
+            items[index] = value;
+        }
+    }
+
     public void Add(T item) {
         if (count == items.Length) { Grow(); }
         items[count] = item;

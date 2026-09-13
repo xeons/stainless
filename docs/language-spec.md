@@ -2845,13 +2845,21 @@ the built-in one.
 
 | Type | Backed by | Notes |
 |---|---|---|
-| `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>` |
-| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>` |
+| `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>`; `list[i]` |
+| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>`; `map[k]` |
 | `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
 | `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
 | `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
 | `LinkedList<T>` | an index pool | handles, not references — see below |
 | `SortedList<K, V>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
+
+`List<T>` and `Dictionary<K, V>` carry an indexer (§7.5), so `list[i] += 1`
+and `map[key] = value` read and write the way an array does. The `At`, `Get`
+and `Set` methods remain, because an interface has no indexers and
+`IReadOnlyList<T>` declares them; the brackets are what to reach for where the
+type is known. Reading a key a dictionary does not hold aborts, as `Get` does
+-- returning `default(V)` would make a missing key and one mapped to zero the
+same answer -- so `GetOr` and `ContainsKey` are for when absence is ordinary.
 
 Every one of them is **walked in place when iterated**. That is worth saying
 because it was not always so: several used to build a whole `List<T>` before
