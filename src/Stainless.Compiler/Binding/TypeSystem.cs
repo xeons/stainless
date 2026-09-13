@@ -71,14 +71,25 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
 {
     public PrimitiveKind Kind { get; }
     public override string Name { get; }
-    public override int Size { get; }
     public override int Alignment => Size == 0 ? 1 : Size;
+
+    /// <summary>
+    /// How many bytes the value occupies. Fixed for every primitive but
+    /// <c>nint</c> and <c>nuint</c>, which are a pointer wide by definition and
+    /// so are the only two that answer differently on a different target.
+    /// </summary>
+    public override int Size =>
+        Kind is PrimitiveKind.NInt or PrimitiveKind.NUInt
+            ? TargetPlatform.Current.PointerWidth
+            : _size;
+
+    private readonly int _size;
 
     private PrimitiveTypeSymbol(PrimitiveKind kind, string name, int size)
     {
         Kind = kind;
         Name = name;
-        Size = size;
+        _size = size;
     }
 
     public bool IsInteger => Kind is >= PrimitiveKind.Char and <= PrimitiveKind.NUInt;
@@ -132,8 +143,8 @@ public sealed class PointerTypeSymbol(TypeSymbol element) : TypeSymbol
 {
     public TypeSymbol Element { get; } = element;
     public override string Name => Element.Name + "*";
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
 
     public override bool Equals(object? obj) =>
         obj is PointerTypeSymbol other && Element.Equals(other.Element);
@@ -147,13 +158,20 @@ public sealed class PointerTypeSymbol(TypeSymbol element) : TypeSymbol
 /// </summary>
 public sealed class ArrayTypeSymbol(TypeSymbol element) : TypeSymbol
 {
-    /// <summary>strong, weak, TypeInfo*, length. Elements start here.</summary>
-    public const int HeaderSize = 32;
+    /// <summary>
+    /// strong, weak, TypeInfo*, length. Elements start here.
+    ///
+    /// Four pointer-width words, which is what the runtime's <c>SlArray</c> is:
+    /// an <c>SlObject</c> and a <c>size_t</c>. Both sides have to agree, and
+    /// the runtime's answer moves with the target because its fields are
+    /// <c>size_t</c> rather than fixed-width.
+    /// </summary>
+    public static int HeaderSize => TargetPlatform.Current.ArrayHeaderSize;
 
     public TypeSymbol Element { get; } = element;
     public override string Name => Element.Name + "[]";
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
     public override bool IsReferenceType => true;
 
@@ -196,8 +214,8 @@ public sealed class OptionalTypeSymbol(TypeSymbol element) : TypeSymbol
 {
     public TypeSymbol Element { get; } = element;
     public override string Name => Element.Name + "?";
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
 
     public override bool Equals(object? obj) =>
@@ -210,8 +228,8 @@ public sealed class WeakTypeSymbol(TypeSymbol element) : TypeSymbol
 {
     public TypeSymbol Element { get; } = element;
     public override string Name => "weak " + Element.Name + "?";
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
 
     public override bool Equals(object? obj) =>
         obj is WeakTypeSymbol other && Element.Equals(other.Element);
@@ -566,8 +584,8 @@ public sealed class DelegateTypeSymbol : NamedTypeSymbol
     /// <summary>The signature's parameters. Never includes a receiver.</summary>
     public List<ParameterSymbol> Signature { get; } = [];
 
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
 
     /// <summary>True when <paramref name="function"/> can be stored in this delegate.</summary>
     public bool Accepts(FunctionSymbol function)
@@ -890,8 +908,8 @@ public sealed class VariantTypeSymbol : StructTypeSymbol
 public sealed class InterfaceTypeSymbol : NamedTypeSymbol
 {
     public override bool IsContract => true;
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
     public override bool IsReferenceType => true;
 
@@ -965,8 +983,8 @@ public sealed class ComInterfaceTypeSymbol : NamedTypeSymbol
     public override bool IsContract => true;
 
     /// <summary>A reference is one pointer, to the object's vtable pointer.</summary>
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
 
     /// <summary>
     /// Counted, so ARC applies -- but through AddRef and Release rather than
@@ -1076,22 +1094,35 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// <summary>True for a class this compilation only has the metadata of.</summary>
     public bool IsReferenced => ExternalTypeInfo is not null;
 
-    /// <summary>strong count, weak count, TypeInfo pointer. See docs/abi.md.</summary>
-    public const int HeaderSize = 24;
+    /// <summary>
+    /// strong count, weak count, TypeInfo pointer. See docs/abi.md.
+    ///
+    /// Three pointer-width words, matching the runtime's <c>SlObject</c>,
+    /// whose fields are <c>size_t</c> and so move with the target too.
+    /// </summary>
+    public static int HeaderSize => TargetPlatform.Current.ObjectHeaderSize;
 
     /// <summary>A class reference is pointer-sized; the object itself lives on the heap.</summary>
-    public override int Size => 8;
-    public override int Alignment => 8;
+    public override int Size => TargetPlatform.Current.PointerWidth;
+    public override int Alignment => TargetPlatform.Current.PointerWidth;
     public override bool IsManaged => true;
 
     /// <summary>
     /// Where a com class's tear-offs begin: after the header and the fields,
     /// rounded up so each vtable pointer is aligned.
     /// </summary>
-    public int TearOffsStart => (HeaderSize + FieldsSize + 7) & ~7;
+    public int TearOffsStart
+    {
+        get
+        {
+            int align = TargetPlatform.Current.PointerWidth;
+            return (HeaderSize + FieldsSize + align - 1) & ~(align - 1);
+        }
+    }
 
-    /// <summary>A vtable pointer and the distance back to the object.</summary>
-    public const int TearOffSize = 16;
+    /// <summary>A vtable pointer and the distance back to the object: two
+    /// pointer-width words.</summary>
+    public static int TearOffSize => TargetPlatform.Current.PointerWidth * 2;
 
     /// <summary>Where the tear-off for one presented interface sits.</summary>
     public int TearOffOffset(ComInterfaceTypeSymbol presented) =>

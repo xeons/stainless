@@ -61,7 +61,7 @@ public sealed partial class LlvmEmitter
         {
             _module.AppendLine(
                 $"  %{slot} = getelementptr inbounds i8, ptr @{Mangler.TypeInfoSymbol(classType)}, " +
-                $"i64 {BaseTypeInfoOffset}");
+                $"i64 {RuntimeLayout.TypeInfoBase}");
 
             _module.AppendLine(
                 $"  store ptr @{Mangler.TypeInfoSymbol(classType.BaseClass!)}, ptr %{slot}, align 8");
@@ -164,7 +164,7 @@ public sealed partial class LlvmEmitter
 
             _module.AppendLine(
                 $"@{Mangler.TypeInfoSymbol(classType)} = {visibility} %SlTypeInfo " +
-                $"{{ i64 {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
+                $"{{ {Word} {classType.InstanceSize}, ptr @{DestroyName(classType)}, " +
                 $"ptr {nameConstant}, ptr {tables}, {Metadata(classType, ClassTypeSymbol.HeaderSize)}, " +
                 $"ptr {baseInfo}, ptr {vtable}, ptr {comLayout}, " +
                 $"{PropertyTable(classType)} }}");
@@ -180,9 +180,9 @@ public sealed partial class LlvmEmitter
             string nameConstant = InternBytes(arrayType.Name);
             _module.AppendLine(
                 $"@{ArrayTypeInfoName(arrayType)} = internal constant %SlTypeInfo " +
-                $"{{ i64 {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
-                $"ptr {nameConstant}, ptr null, i64 0, ptr null, i64 0, ptr null, " +
-                "ptr null, ptr null, ptr null, i64 0, ptr null }");
+                $"{{ {Word} {ArrayTypeSymbol.HeaderSize}, ptr @{ArrayDestroyName(arrayType)}, " +
+                $"ptr {nameConstant}, ptr null, {Word} 0, ptr null, {Word} 0, ptr null, " +
+                $"ptr null, ptr null, ptr null, {Word} 0, ptr null }}");
         }
 
         foreach (var structType in program.Modules
@@ -195,7 +195,7 @@ public sealed partial class LlvmEmitter
             string nameConstant = InternBytes(structType.QualifiedName);
             _module.AppendLine(
                 $"@{StructTypeInfoName(structType)} = internal constant %SlTypeInfo " +
-                $"{{ i64 {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
+                $"{{ {Word} {structType.Size}, ptr null, ptr {nameConstant}, ptr null, " +
                 $"{Metadata(structType, 0)}, ptr null, ptr null, ptr null, " +
                 $"{PropertyTable(structType)} }}");
         }
@@ -248,7 +248,7 @@ public sealed partial class LlvmEmitter
         string block = "@" + NextMetadataName("typeblock");
         _metadata.AppendLine(
             $"{block} = internal global %SlTypeBlock " +
-            $"{{ i64 {reflected.Count}, ptr {table}, ptr null }}");
+            $"{{ {Word} {reflected.Count}, ptr {table}, ptr null }}");
 
         const string name = "_SLregister_types";
 
@@ -298,7 +298,7 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private string Metadata(NamedTypeSymbol type, int fieldBase)
     {
-        if (!type.IsReflected) return "i64 0, ptr null, i64 0, ptr null";
+        if (!type.IsReflected) return $"{Word} 0, ptr null, {Word} 0, ptr null";
 
         // What an instance holds, not what its class declared: a derived class
         // reflects everything it inherited too, because that is what is in the
@@ -326,7 +326,7 @@ public sealed partial class LlvmEmitter
                 int flags = field.IsBackingField ? 1 : 0;
 
                 return $"%SlFieldInfo {{ ptr {InternBytes(field.Name)}, " +
-                       $"i64 {fieldBase + field.Offset}, i32 {(int)KindOf(field.Type)}, " +
+                       $"{Word} {fieldBase + field.Offset}, i32 {(int)KindOf(field.Type)}, " +
                        $"ptr {NestedTypeInfo(field.Type)}, {attributes}, " +
                        $"{ElementColumns(field.Type)}, i32 {flags} }}";
             }).ToList();
@@ -339,7 +339,7 @@ public sealed partial class LlvmEmitter
 
         string typeAttributes = AttributeTable(type.Attributes);
 
-        return $"i64 {reflected.Count}, ptr {fields}, {typeAttributes}";
+        return $"{Word} {reflected.Count}, ptr {fields}, {typeAttributes}";
     }
 
     /// <summary>
@@ -361,7 +361,7 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private string PropertyTable(NamedTypeSymbol type)
     {
-        if (!type.IsReflected) return "i64 0, ptr null";
+        if (!type.IsReflected) return $"{Word} 0, ptr null";
 
         // Base first, so that a derived class's override replaces the
         // declaration it overrides and keeps the position the base gave it.
@@ -384,7 +384,7 @@ public sealed partial class LlvmEmitter
             newest[property.Name] = property;
         }
 
-        if (order.Count == 0) return "i64 0, ptr null";
+        if (order.Count == 0) return $"{Word} 0, ptr null";
 
         // Materialised before anything is appended, for the reason the field
         // rows are: building a row emits its own attribute table.
@@ -408,7 +408,7 @@ public sealed partial class LlvmEmitter
             $"{table} = internal constant [{order.Count} x %SlPropertyInfo] " +
             $"[{string.Join(", ", rows)}]");
 
-        return $"i64 {order.Count}, ptr {table}";
+        return $"{Word} {order.Count}, ptr {table}";
     }
 
     /// <summary>
@@ -426,17 +426,17 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private static string ElementColumns(TypeSymbol type)
     {
-        if (type is not ArrayTypeSymbol array) return "i32 0, ptr null, i64 0";
+        if (type is not ArrayTypeSymbol array) return $"i32 0, ptr null, {Word} 0";
 
         return $"i32 {(int)KindOf(array.Element)}, " +
                $"ptr {NestedTypeInfo(array.Element)}, " +
-               $"i64 {array.Element.Size}";
+               $"{Word} {array.Element.Size}";
     }
 
     /// <summary>Emits an attribute table and returns its count-and-pointer pair.</summary>
     private string AttributeTable(IReadOnlyList<AppliedAttribute> attributes)
     {
-        if (attributes.Count == 0) return "i64 0, ptr null";
+        if (attributes.Count == 0) return $"{Word} 0, ptr null";
 
         var rows = new List<string>();
         foreach (var attribute in attributes)
@@ -472,7 +472,7 @@ public sealed partial class LlvmEmitter
             }
 
             rows.Add($"%SlAttribute {{ ptr {InternBytes(attribute.Type.SimpleName)}, " +
-                     $"i64 {attribute.Values.Count}, ptr {values} }}");
+                     $"{Word} {attribute.Values.Count}, ptr {values} }}");
         }
 
         string rowBody = string.Join(", ", rows);
@@ -480,7 +480,7 @@ public sealed partial class LlvmEmitter
         _metadata.AppendLine(
             $"{table} = internal constant [{attributes.Count} x %SlAttribute] [{rowBody}]");
 
-        return $"i64 {attributes.Count}, ptr {table}";
+        return $"{Word} {attributes.Count}, ptr {table}";
     }
 
     private readonly StringBuilder _metadata = new();

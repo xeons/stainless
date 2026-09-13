@@ -59,12 +59,17 @@ public sealed partial class LlvmEmitter
         foreach (var (text, name) in _stringObjects)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
-            string layout = $"{{ i64, i64, ptr, i64, [{bytes.Length + 1} x i8] }}";
+
+            // strong, weak, type, byteLength, then the bytes. The first four are
+            // an SlObject and a size_t, so all four narrow together with the
+            // target -- see RuntimeLayout.
+            string layout = $"{{ {Word}, {Word}, ptr, {Word}, [{bytes.Length + 1} x i8] }}";
 
             _module.AppendLine(
                 $"{name} = {storage} {layout} " +
-                $"{{ i64 {ImmortalRefCount}, i64 {ImmortalRefCount}, {typeField}, " +
-                $"i64 {bytes.Length}, [{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\" }}, align 8");
+                $"{{ {Word} {ImmortalRefCount}, {Word} {ImmortalRefCount}, {typeField}, " +
+                $"{Word} {bytes.Length}, [{bytes.Length + 1} x i8] c\"{EscapeBytes(bytes)}\" }}, " +
+                $"align {TargetPlatform.Current.PointerWidth}");
         }
 
         if (bindAtStartup && _stringObjects.Count > 0) BindLiteralsAtStartup();
@@ -91,9 +96,10 @@ public sealed partial class LlvmEmitter
         int slot = 0;
         foreach (var (_, literal) in _stringObjects)
         {
-            // Offset 16 is the header's type field; see docs/abi.md.
+            // The header's type field; see docs/abi.md.
             _module.AppendLine(
-                $"  %{slot} = getelementptr inbounds i8, ptr {literal}, i64 16");
+                $"  %{slot} = getelementptr inbounds i8, ptr {literal}, " +
+                $"i64 {RuntimeLayout.TypeInfo}");
             _module.AppendLine($"  store ptr @sl_string_type_info, ptr %{slot}, align 8");
             slot++;
         }
@@ -174,7 +180,7 @@ public sealed partial class LlvmEmitter
             Line($"store ptr {part.Ref}, ptr {at}");
         }
 
-        string joined = Emit("ptr", $"call ptr @sl_string_join(ptr {slots}, i64 {count})");
+        string joined = Emit("ptr", $"call ptr @sl_string_join(ptr {slots}, {Word} {count})");
         TrackTemporary(joined, expression.Type);
         return new Val(joined, "ptr", expression.Type);
     }

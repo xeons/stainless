@@ -168,12 +168,12 @@ public sealed partial class LlvmEmitter
 
                 string lengthSlot = Emit("ptr",
                     $"getelementptr inbounds i8, ptr {operand.Ref}, " +
-                    $"i64 {ArrayTypeSymbol.HeaderSize - 8}");
-                string length = Emit("i64", $"load i64, ptr {lengthSlot}");
+                    $"i64 {RuntimeLayout.ArrayLength}");
+                string length = Emit(Word, $"load {Word}, ptr {lengthSlot}");
 
                 Line($"store ptr {operand.Ref}, ptr {SliceField(slot, type, 0)}");
-                Line($"store i64 0, ptr {SliceField(slot, type, 1)}");
-                Line($"store i64 {length}, ptr {SliceField(slot, type, 2)}");
+                Line($"store {Word} 0, ptr {SliceField(slot, type, 1)}");
+                Line($"store {Word} {length}, ptr {SliceField(slot, type, 2)}");
                 Retain(operand.Ref, operand.Type);
 
                 TrackTemporary(slot, type);
@@ -259,13 +259,17 @@ public sealed partial class LlvmEmitter
         {
             var basePointer = EmitExpression(binary.Left);
             var offset = EmitExpression(binary.Right);
+
+            // A pointer's index is a word wide, so that a GEP on a 32-bit
+            // target is indexed by something the target can hold an address in.
             string index = WidenIndex(offset);
             if (binary.Operator == BoundBinaryOp.Subtract)
-                index = Emit("i64", $"sub i64 0, {index}");
+                index = Emit(Word, $"sub {Word} 0, {index}");
 
             string element = LlvmTypeOf(pointer.Element);
             return new Val(
-                Emit("ptr", $"getelementptr inbounds {element}, ptr {basePointer.Ref}, i64 {index}"),
+                Emit("ptr",
+                    $"getelementptr inbounds {element}, ptr {basePointer.Ref}, {Word} {index}"),
                 "ptr", binary.Type);
         }
 

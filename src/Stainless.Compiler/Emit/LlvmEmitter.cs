@@ -81,6 +81,17 @@ public sealed partial class LlvmEmitter(
             ? SysVAbi.ClassifyReturn(type, LlvmTypeOf)
             : Win64Abi.ClassifyReturn(type, LlvmTypeOf);
 
+    /// <summary>
+    /// How a <c>size_t</c> is spelled in IR for this target: <c>i64</c> on a
+    /// 64-bit one and <c>i32</c> on a 32-bit one.
+    ///
+    /// Every runtime declaration that takes or returns a <c>size_t</c> is
+    /// written with it. Getting one wrong does not fail to build: on x86 a
+    /// cdecl call would push eight bytes where the callee reads four, and
+    /// everything after that argument is somebody else's.
+    /// </summary>
+    private static string Word => Binding.TargetPlatform.Current.NativeIntType;
+
     private readonly StringBuilder _module = new();
     private readonly StringBuilder _body = new();
     private readonly Dictionary<string, string> _byteConstants = new(StringComparer.Ordinal);

@@ -31,11 +31,10 @@ public sealed partial class LlvmEmitter
     private int _interfaceCount;
 
     /// <summary>
-    /// Where the vtable sits in an SlTypeInfo. The `base` pointer is beside it
-    /// at 64 and has no constant here, because nothing emitted reads it: a
-    /// downcast asks `sl_is_instance`, which walks the chain in C.
+    /// Where the vtable sits in an SlTypeInfo: the tenth word, whatever a word
+    /// is on this target. See <see cref="RuntimeLayout"/>.
     /// </summary>
-    private const int VirtualTableOffset = 72;
+    private static int VirtualTableOffset => RuntimeLayout.TypeInfoVTable;
 
     /// <summary>
     /// Where the base TypeInfo pointer sits, for the one case that has to write

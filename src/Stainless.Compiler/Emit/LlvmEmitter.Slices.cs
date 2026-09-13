@@ -32,8 +32,10 @@ public sealed partial class LlvmEmitter
     private string SliceField(string slice, SliceTypeSymbol type, int index) =>
         Emit("ptr", $"getelementptr inbounds {StructName(type)}, ptr {slice}, i32 0, i32 {index}");
 
+    // A slice's offset and length are `nuint` fields, so both narrow with the
+    // target. Loading one as i64 on a 32-bit build would read the field after it.
     private string SliceLength(string slice, SliceTypeSymbol type) =>
-        Emit("i64", $"load i64, ptr {SliceField(slice, type, 2)}");
+        Emit(Word, $"load {Word}, ptr {SliceField(slice, type, 2)}");
 
     /// <summary>
     /// <c>a[from:to]</c>: the array this names, the offset into it, and how far
@@ -53,7 +55,7 @@ public sealed partial class LlvmEmitter
         if (expression.Target.Type is SliceTypeSymbol inner)
         {
             array = Emit("ptr", $"load ptr, ptr {SliceField(source.Ref, inner, 0)}");
-            baseOffset = Emit("i64", $"load i64, ptr {SliceField(source.Ref, inner, 1)}");
+            baseOffset = Emit(Word, $"load {Word}, ptr {SliceField(source.Ref, inner, 1)}");
             sourceLength = SliceLength(source.Ref, inner);
         }
         else
@@ -61,8 +63,8 @@ public sealed partial class LlvmEmitter
             array = source.Ref;
             baseOffset = "0";
             string lengthSlot = Emit("ptr",
-                $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize - 8}");
-            sourceLength = Emit("i64", $"load i64, ptr {lengthSlot}");
+                $"getelementptr inbounds i8, ptr {array}, i64 {RuntimeLayout.ArrayLength}");
+            sourceLength = Emit(Word, $"load {Word}, ptr {lengthSlot}");
         }
 
         string from = expression.Start is null
@@ -91,9 +93,9 @@ public sealed partial class LlvmEmitter
 
         string slot = Alloca(StructName(type), "slice");
         Line($"store ptr {array}, ptr {SliceField(slot, type, 0)}");
-        Line($"store i64 {Emit("i64", $"add i64 {baseOffset}, {from}")}, " +
+        Line($"store {Word} {Emit(Word, $"add {Word} {baseOffset}, {from}")}, " +
              $"ptr {SliceField(slot, type, 1)}");
-        Line($"store i64 {Emit("i64", $"sub i64 {to}, {from}")}, " +
+        Line($"store {Word} {Emit(Word, $"sub {Word} {to}, {from}")}, " +
              $"ptr {SliceField(slot, type, 2)}");
 
         // The array is retained into the slice's field, exactly as a struct
@@ -117,25 +119,25 @@ public sealed partial class LlvmEmitter
 
         string widened = WidenIndex(offset);
         string length = SliceLength(slice.Ref, type);
-        string inRange = Emit("i1", $"icmp ult i64 {widened}, {length}");
+        string inRange = Emit("i1", $"icmp ult {Word} {widened}, {length}");
 
         string okLabel = NextLabel("bounds.ok");
         string failLabel = NextLabel("bounds.fail");
         Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_array_bounds_fail(i64 {widened}, i64 {length})");
+        Line($"call void @sl_array_bounds_fail({Word} {widened}, {Word} {length})");
         Terminator("unreachable");
 
         Label(okLabel);
         string array = Emit("ptr", $"load ptr, ptr {SliceField(slice.Ref, type, 0)}");
-        string start = Emit("i64", $"load i64, ptr {SliceField(slice.Ref, type, 1)}");
+        string start = Emit(Word, $"load {Word}, ptr {SliceField(slice.Ref, type, 1)}");
         string data = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
 
         return Emit("ptr",
             $"getelementptr inbounds {LlvmTypeOf(type.Element)}, ptr {data}, " +
-            $"i64 {Emit("i64", $"add i64 {start}, {widened}")}");
+            $"{Word} {Emit(Word, $"add {Word} {start}, {widened}")}");
     }
 
     private string EmitArrayElementAddress(BoundIndex index)
@@ -145,23 +147,24 @@ public sealed partial class LlvmEmitter
         var offset = EmitExpression(index.Index);
 
         string widened = WidenIndex(offset);
-        string lengthSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {array.Ref}, i64 24");
-        string length = Emit("i64", $"load i64, ptr {lengthSlot}");
-        string inRange = Emit("i1", $"icmp ult i64 {widened}, {length}");
+        string lengthSlot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {array.Ref}, i64 {RuntimeLayout.ArrayLength}");
+        string length = Emit(Word, $"load {Word}, ptr {lengthSlot}");
+        string inRange = Emit("i1", $"icmp ult {Word} {widened}, {length}");
 
         string okLabel = NextLabel("bounds.ok");
         string failLabel = NextLabel("bounds.fail");
         Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_array_bounds_fail(i64 {widened}, i64 {length})");
+        Line($"call void @sl_array_bounds_fail({Word} {widened}, {Word} {length})");
         Terminator("unreachable");
 
         Label(okLabel);
         string data = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array.Ref}, i64 {ArrayTypeSymbol.HeaderSize}");
         return Emit("ptr",
-            $"getelementptr inbounds {LlvmTypeOf(arrayType.Element)}, ptr {data}, i64 {widened}");
+            $"getelementptr inbounds {LlvmTypeOf(arrayType.Element)}, ptr {data}, {Word} {widened}");
     }
 
     /// <summary>

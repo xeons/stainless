@@ -84,7 +84,7 @@ public sealed partial class LlvmEmitter
 
                 string empty = Emit("ptr",
                     $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
-                    $"i64 0, i64 {arrayType.Element.Size})");
+                    $"{Word} 0, {Word} {arrayType.Element.Size})");
 
                 Line($"store ptr {empty}, ptr {ClassFieldAddress(instance, field)}");
             }
@@ -114,8 +114,8 @@ public sealed partial class LlvmEmitter
             Line($"store ptr @{ComVTableName(classType, presented)}, ptr {tearOff}");
 
             string ownerSlot = Emit("ptr",
-                $"getelementptr inbounds i8, ptr {tearOff}, i64 8");
-            Line($"store i64 {offset}, ptr {ownerSlot}");
+                $"getelementptr inbounds i8, ptr {tearOff}, i64 {RuntimeLayout.TearOffOwner}");
+            Line($"store {Word} {offset}, ptr {ownerSlot}");
         }
     }
 
@@ -132,7 +132,8 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private string LoadVirtualMethod(string receiver, FunctionSymbol method)
     {
-        string typeSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {receiver}, i64 16");
+        string typeSlot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {receiver}, i64 {RuntimeLayout.TypeInfo}");
         string typeInfo = Emit("ptr", $"load ptr, ptr {typeSlot}");
 
         string tableSlot = Emit("ptr",
@@ -181,10 +182,12 @@ public sealed partial class LlvmEmitter
         var interfaceType = (InterfaceTypeSymbol)method.ContainingType!;
         int slot = interfaceType.SlotOf(method);
 
-        string typeSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {receiver}, i64 16");
+        string typeSlot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {receiver}, i64 {RuntimeLayout.TypeInfo}");
         string typeInfo = Emit("ptr", $"load ptr, ptr {typeSlot}");
 
-        string tablesSlot = Emit("ptr", $"getelementptr inbounds i8, ptr {typeInfo}, i64 24");
+        string tablesSlot = Emit("ptr",
+            $"getelementptr inbounds i8, ptr {typeInfo}, i64 {RuntimeLayout.TypeInfoInterfaces}");
         string tables = Emit("ptr", $"load ptr, ptr {tablesSlot}");
 
         string vtableSlot = Emit("ptr",
@@ -258,7 +261,7 @@ public sealed partial class LlvmEmitter
         var arrayType = (ArrayTypeSymbol)expression.Type;
         string array = Emit("ptr",
             $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
-            $"i64 {expression.Elements.Count}, i64 {arrayType.Element.Size})");
+            $"{Word} {expression.Elements.Count}, {Word} {arrayType.Element.Size})");
 
         string data = Emit("ptr",
             $"getelementptr inbounds i8, ptr {array}, i64 {ArrayTypeSymbol.HeaderSize}");
@@ -282,7 +285,7 @@ public sealed partial class LlvmEmitter
 
         string array = Emit("ptr",
             $"call ptr @sl_array_alloc(ptr @{ArrayTypeInfoName(arrayType)}, " +
-            $"i64 {length.Ref}, i64 {arrayType.Element.Size})");
+            $"{Word} {length.Ref}, {Word} {arrayType.Element.Size})");
 
         TrackTemporary(array, arrayType);
         return new Val(array, "ptr", arrayType);
@@ -304,13 +307,14 @@ public sealed partial class LlvmEmitter
     {
         var source = EmitExpression(expression.Array);
 
-        // A slice carries its own length; an array's is in the header.
+        // A slice carries its own length; an array's is in the header. Either
+        // way it is a `nuint`, so it is a word wide.
         if (expression.Array.Type is SliceTypeSymbol slice)
-            return new Val(SliceLength(source.Ref, slice), "i64", expression.Type);
+            return new Val(SliceLength(source.Ref, slice), Word, expression.Type);
 
         string slot = Emit("ptr",
-            $"getelementptr inbounds i8, ptr {source.Ref}, i64 {ArrayTypeSymbol.HeaderSize - 8}");
-        return new Val(Emit("i64", $"load i64, ptr {slot}"), "i64", expression.Type);
+            $"getelementptr inbounds i8, ptr {source.Ref}, i64 {RuntimeLayout.ArrayLength}");
+        return new Val(Emit(Word, $"load {Word}, ptr {slot}"), Word, expression.Type);
     }
 
     /// <summary>

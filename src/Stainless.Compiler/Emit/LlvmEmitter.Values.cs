@@ -51,6 +51,14 @@ public sealed partial class LlvmEmitter
                 or PrimitiveKind.Char32 => "i32",
             PrimitiveKind.Float => "float",
             PrimitiveKind.Double => "double",
+
+            // `nint` and `nuint` are a pointer wide, so they are the two that
+            // change with the target. `long` and `ulong` fall here too and are
+            // 64 bits everywhere, which is why the width is asked for rather
+            // than assumed.
+            PrimitiveKind.NInt or PrimitiveKind.NUInt =>
+                Binding.TargetPlatform.Current.NativeIntType,
+
             _ => "i64",
         },
         StructTypeSymbol structType => StructName(structType),

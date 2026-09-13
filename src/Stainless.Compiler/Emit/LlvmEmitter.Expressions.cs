@@ -41,12 +41,14 @@ public sealed partial class LlvmEmitter
             case BoundNullLiteral nullLiteral: return new Val("null", "ptr", nullLiteral.Type);
             case BoundConstantAccess constant: return EmitConstant(constant);
             case BoundStaticAccess shared: return EmitStaticAccess(shared);
+            // All three answer a `nuint`, so all three are a word wide.
             case BoundSizeof sizeofExpression:
-                return new Val(sizeofExpression.MeasuredType.Size.ToString(), "i64", sizeofExpression.Type);
+                return new Val(
+                    sizeofExpression.MeasuredType.Size.ToString(), Word, sizeofExpression.Type);
 
             case BoundAlignof alignofExpression:
                 return new Val(
-                    alignofExpression.MeasuredType.Alignment.ToString(), "i64",
+                    alignofExpression.MeasuredType.Alignment.ToString(), Word,
                     alignofExpression.Type);
 
             // A class field's stored offset is relative to the fields area, and
@@ -56,7 +58,7 @@ public sealed partial class LlvmEmitter
                 return new Val(
                     (offsetofExpression.Field.Offset + (offsetofExpression.Owner is ClassTypeSymbol
                         ? ClassTypeSymbol.HeaderSize : 0)).ToString(),
-                    "i64", offsetofExpression.Type);
+                    Word, offsetofExpression.Type);
 
             case BoundLocalAccess or BoundParameterAccess or BoundThis
                  or BoundFieldAccess or BoundDereference or BoundIndex:
@@ -255,7 +257,7 @@ public sealed partial class LlvmEmitter
                 string elementType = LlvmTypeOf(index.Type);
                 string widened = WidenIndex(offset);
                 return Emit("ptr",
-                    $"getelementptr inbounds {elementType}, ptr {target.Ref}, i64 {widened}");
+                    $"getelementptr inbounds {elementType}, ptr {target.Ref}, {Word} {widened}");
             }
 
             default:
@@ -287,26 +289,52 @@ public sealed partial class LlvmEmitter
         // negative index sign-extends to a very large unsigned value. The length
         // is a constant here rather than a load, because it was in the type.
         string length = inline.Length.ToString();
-        string inRange = Emit("i1", $"icmp ult i64 {widened}, {length}");
+        string inRange = Emit("i1", $"icmp ult {Word} {widened}, {length}");
 
         string okLabel = NextLabel("bounds.ok");
         string failLabel = NextLabel("bounds.fail");
         Terminator($"br i1 {inRange}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_array_bounds_fail(i64 {widened}, i64 {length})");
+        Line($"call void @sl_array_bounds_fail({Word} {widened}, {Word} {length})");
         Terminator("unreachable");
 
         Label(okLabel);
         return Emit("ptr",
-            $"getelementptr inbounds {LlvmTypeOf(inline)}, ptr {array}, i64 0, i64 {widened}");
+            $"getelementptr inbounds {LlvmTypeOf(inline)}, ptr {array}, i64 0, {Word} {widened}");
     }
 
+    /// <summary>
+    /// An index as the target's word, ready to compare against a length and to
+    /// index with.
+    ///
+    /// On a 64-bit target every index is a word or narrower, so this is an
+    /// extension and nothing else. On a 32-bit one an index may be *wider* --
+    /// <c>array[someLong]</c> -- and truncating it would turn 0x1_0000_0000
+    /// into 0: an index past the end of any possible array, passing a check it
+    /// should fail. One that does not fit is saturated instead, to a value no
+    /// length can be, and the ordinary comparison then refuses it.
+    /// </summary>
     private string WidenIndex(Val index)
     {
-        if (index.LlvmType == "i64") return index.Ref;
-        return Emit("i64", $"{(IsSigned(index.Type) ? "sext" : "zext")} {index.LlvmType} {index.Ref} to i64");
+        string word = Word;
+        if (index.LlvmType == word) return index.Ref;
+
+        int wordBits = TargetPlatform.Current.PointerWidth * 8;
+        if (IntegerBits(index.LlvmType) < wordBits)
+            return Emit(word,
+                $"{(IsSigned(index.Type) ? "sext" : "zext")} {index.LlvmType} {index.Ref} to {word}");
+
+        string truncated = Emit(word, $"trunc {index.LlvmType} {index.Ref} to {word}");
+        string fits = Emit("i1",
+            $"icmp ult {index.LlvmType} {index.Ref}, {1L << wordBits}");
+
+        return Emit(word, $"select i1 {fits}, {word} {truncated}, {word} -1");
     }
+
+    /// <summary>How many bits an LLVM integer type spells.</summary>
+    private static int IntegerBits(string llvmType) =>
+        llvmType.StartsWith('i') && int.TryParse(llvmType[1..], out int bits) ? bits : 0;
 
     private string EmitFieldAddress(BoundFieldAccess access)
     {
@@ -733,7 +761,7 @@ public sealed partial class LlvmEmitter
                 $"call i32 @sl_com_is(ptr {value.Ref}, ptr @{IidName(comInterface)})"),
 
             InterfaceTypeSymbol interfaceType => Emit("i32",
-                $"call i32 @sl_implements(ptr {value.Ref}, i64 {interfaceType.Id})"),
+                $"call i32 @sl_implements(ptr {value.Ref}, {Word} {interfaceType.Id})"),
 
             _ => Emit("i32",
                 $"call i32 @sl_is_instance(ptr {value.Ref}, " +

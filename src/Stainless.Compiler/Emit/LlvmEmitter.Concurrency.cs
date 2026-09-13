@@ -61,8 +61,9 @@ public sealed partial class LlvmEmitter
         Declare("sl_scope_begin", "declare ptr @sl_scope_begin()");
         Declare("sl_scope_submit", "declare void @sl_scope_submit(ptr, ptr, ptr)");
         Declare("sl_scope_end", "declare void @sl_scope_end(ptr)");
-        Declare("sl_parallel_range", "declare void @sl_parallel_range(ptr, i64, ptr, ptr)");
-        Declare("malloc", "declare ptr @malloc(i64)");
+        // sl_parallel_range(SlScope*, size_t count, SlRangeJob, void *capture)
+        Declare("sl_parallel_range", $"declare void @sl_parallel_range(ptr, {Word}, ptr, ptr)");
+        Declare("malloc", $"declare ptr @malloc({Word})");
         Declare("free", "declare void @free(ptr)");
     }
 
@@ -121,7 +122,7 @@ public sealed partial class LlvmEmitter
         string blockType = "{ " + string.Join(", ", fieldTypes) + " }";
 
         string size = SizeOfType(blockType);
-        string block = Emit("ptr", $"call ptr @malloc(i64 {size})");
+        string block = Emit("ptr", $"call ptr @malloc({Word} {size})");
 
         for (int i = 0; i < sources.Count; i++)
         {
@@ -260,7 +261,8 @@ public sealed partial class LlvmEmitter
         _thunks.Add(new RangeThunk(name, captureType, statement));
 
         string scope = Emit("ptr", "call ptr @sl_scope_begin()");
-        Line($"call void @sl_parallel_range(ptr {scope}, i64 {count}, ptr @{name}, ptr {capture})");
+        Line($"call void @sl_parallel_range(ptr {scope}, {Word} {count}, " +
+             $"ptr @{name}, ptr {capture})");
         Line($"call void @sl_scope_end(ptr {scope})");
     }
 
@@ -303,11 +305,11 @@ public sealed partial class LlvmEmitter
 
         string firstField = Emit("ptr",
             $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {loop.Captures.Count}");
-        string first = Emit("i64", $"load i64, ptr {firstField}");
+        string first = Emit(Word, $"load {Word}, ptr {firstField}");
 
         string strideField = Emit("ptr",
             $"getelementptr inbounds {thunk.CaptureType}, ptr %capture, i32 0, i32 {loop.Captures.Count + 1}");
-        string stride = Emit("i64", $"load i64, ptr {strideField}");
+        string stride = Emit(Word, $"load {Word}, ptr {strideField}");
 
         // The loop variable belongs to this chunk, not to the parent.
         string variableType = LlvmTypeOf(loop.Variable.Type);
@@ -324,7 +326,7 @@ public sealed partial class LlvmEmitter
         Terminator($"br label %{conditionLabel}");
 
         Label(conditionLabel);
-        string current = Emit("i64", $"load i64, ptr {index}");
+        string current = Emit(Word, $"load {Word}, ptr {index}");
         string more = Emit("i1", $"icmp ult i64 {current}, %end");
         Terminator($"br i1 {more}, label %{bodyLabel}, label %{endLabel}");
 
@@ -554,13 +556,15 @@ public sealed partial class LlvmEmitter
             bool weak = arrayType.Element is WeakTypeSymbol;
             string elementType = LlvmTypeOf(arrayType.Element);
 
-            string lengthSlot = Emit("ptr", "getelementptr inbounds i8, ptr %obj, i64 24");
-            string length = Emit("i64", $"load i64, ptr {lengthSlot}");
+            string lengthSlot = Emit("ptr",
+                $"getelementptr inbounds i8, ptr %obj, i64 {RuntimeLayout.ArrayLength}");
+            string length = Emit(Word, $"load {Word}, ptr {lengthSlot}");
             string data = Emit("ptr",
                 $"getelementptr inbounds i8, ptr %obj, i64 {ArrayTypeSymbol.HeaderSize}");
 
-            string counter = Alloca("i64", "i");
-            Line($"store i64 0, ptr {counter}");
+            // The counter matches the length, which is a `nuint`.
+            string counter = Alloca(Word, "i");
+            Line($"store {Word} 0, ptr {counter}");
 
             string conditionLabel = NextLabel("free.cond");
             string bodyLabel = NextLabel("free.body");
@@ -568,13 +572,13 @@ public sealed partial class LlvmEmitter
 
             Terminator($"br label %{conditionLabel}");
             Label(conditionLabel);
-            string index = Emit("i64", $"load i64, ptr {counter}");
-            string more = Emit("i1", $"icmp ult i64 {index}, {length}");
+            string index = Emit(Word, $"load {Word}, ptr {counter}");
+            string more = Emit("i1", $"icmp ult {Word} {index}, {length}");
             Terminator($"br i1 {more}, label %{bodyLabel}, label %{endLabel}");
 
             Label(bodyLabel);
             string slot = Emit("ptr",
-                $"getelementptr inbounds {elementType}, ptr {data}, i64 {index}");
+                $"getelementptr inbounds {elementType}, ptr {data}, {Word} {index}");
 
             if (arrayType.Element is StructTypeSymbol elementStruct)
             {
@@ -585,8 +589,8 @@ public sealed partial class LlvmEmitter
                 string element = Emit("ptr", $"load ptr, ptr {slot}");
                 Release(element, arrayType.Element);
             }
-            string next = Emit("i64", $"add i64 {index}, 1");
-            Line($"store i64 {next}, ptr {counter}");
+            string next = Emit(Word, $"add {Word} {index}, 1");
+            Line($"store {Word} {next}, ptr {counter}");
             Terminator($"br label %{conditionLabel}");
 
             Label(endLabel);

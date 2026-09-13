@@ -156,6 +156,15 @@ public sealed record CompilationOptions
     /// cross-compilation.
     /// </summary>
     public Binding.CppAbi? CppAbi { get; init; }
+
+    /// <summary>
+    /// The machine this build is for. Null is this one, 64-bit.
+    ///
+    /// It decides how wide a pointer is, which is not a question the emitter
+    /// alone can answer: the binder lays out every struct against it, so it has
+    /// to be settled before anything is bound.
+    /// </summary>
+    public Binding.TargetPlatform? Target { get; init; }
 }
 
 public sealed record CompilationResult
@@ -359,6 +368,19 @@ public sealed class Compilation
     {
         var diagnostics = new DiagnosticBag();
 
+        // Before anything is parsed or bound, because the binder lays out every
+        // struct against it and a layout computed for the wrong width is not
+        // something a later pass could correct.
+        //
+        // `--abi` still has the last word on the name mangling, which is a
+        // separate question from the width: a 64-bit Windows build may be asked
+        // for Itanium names so that the scheme this host does not use still gets
+        // exercised against a real compiler.
+        var target = options.Target ?? Binding.TargetPlatform.Host;
+        if (options.CppAbi is { } chosenAbi) target = target with { Abi = chosenAbi };
+
+        Binding.TargetPlatform.Current = target;
+
         // --- parse -------------------------------------------------------
         var units = new List<CompilationUnitSyntax>();
 
@@ -534,7 +556,7 @@ public sealed class Compilation
             forStainlessConsumers: options.MetadataPath is not null,
             debug: debug,
             sharedRuntime: options.NeedsSharedRuntime,
-            abi: options.CppAbi ?? Binding.CppMangler.HostAbi).Emit(program);
+            abi: target.Abi).Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);

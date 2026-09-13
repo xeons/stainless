@@ -102,6 +102,11 @@ internal static class Program
             OPTIONS
               -o, --out <path>     output file (default: after the first source)
               --shared             build a shared library instead of an executable
+              --target <name>      the machine to build for: x64 (the default),
+                                   x86, or one of those with a system after it --
+                                   x86-windows, x86-linux. A 32-bit target is
+                                   where a calling convention starts to mean
+                                   something
               --header <path>      write a C header for the exported surface
               --stdlib             (doc) document the standard library itself
               --metadata <path>    write module metadata for a Stainless consumer
@@ -710,6 +715,7 @@ internal static class Program
         public bool Update { get; set; }
 
         public Stainless.Binding.CppAbi? Abi { get; set; }
+        public Stainless.Binding.TargetPlatform? Target { get; set; }
         public bool? SharedRuntime { get; set; }
 
         public BuildOverrides ToOverrides() => new()
@@ -786,6 +792,7 @@ internal static class Program
                 Debug = Debug,
                 Defines = Defines,
                 CppAbi = Abi,
+                Target = Target,
                 Shared = Shared,
                 HeaderPath = Header,
                 MetadataPath = Metadata,
@@ -853,6 +860,19 @@ internal static class Program
                         return false;
                     }
                     arguments.Defines.Add(args[i]);
+                    continue;
+
+                case "--target":
+                    if (++i >= args.Length) { Error("'--target' needs a name"); return false; }
+
+                    arguments.Target = Stainless.Binding.TargetPlatform.Parse(args[i]);
+                    if (arguments.Target is null)
+                    {
+                        Error($"'{args[i]}' is not a target this compiler knows");
+                        Console.Error.WriteLine(
+                            "  It is one of: " + Stainless.Binding.TargetPlatform.Names);
+                        return false;
+                    }
                     continue;
 
                 case "--abi":

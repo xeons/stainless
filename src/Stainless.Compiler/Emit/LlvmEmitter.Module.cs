@@ -91,21 +91,38 @@ public sealed partial class LlvmEmitter
             if (structType.Alignment > 1) _structAlignment[StructName(structType)] = structType.Alignment;
         }
 
+        // Every one of these mirrors a struct in runtime/stainless.h, member for
+        // member. A `size_t` there is `word` here and narrows with the target; a
+        // `uint32_t` is `i32` and does not. Getting one wrong does not fail to
+        // build -- it reads the next field.
+        string word = Binding.TargetPlatform.Current.NativeIntType;
+
         // The header every reference type is prefixed with: strong, weak, TypeInfo*.
-        _module.AppendLine("%SlObjectHeader = type { i64, i64, ptr }");
+        _module.AppendLine($"%SlObjectHeader = type {{ {word}, {word}, ptr }}");
+
         // size, destroy, name, interfaces, fieldCount, fields, attributeCount,
-        // attributes, base, vtable, com. The last three are appended rather
-        // than inserted so that every offset the emitter already hard-codes --
-        // the interface table at 24, above all -- goes on meaning what it meant.
+        // attributes, base, vtable, com, propertyCount, properties. The last
+        // five are appended rather than inserted so that every offset the
+        // emitter already hard-codes goes on meaning what it meant.
         _module.AppendLine(
-            "%SlTypeInfo = type { i64, ptr, ptr, ptr, i64, ptr, i64, ptr, ptr, ptr, ptr, "
-            + "i64, ptr }");
+            $"%SlTypeInfo = type {{ {word}, ptr, ptr, ptr, {word}, ptr, {word}, ptr, "
+            + $"ptr, ptr, ptr, {word}, ptr }}");
+
+        // name, offset, kind, type, attributeCount, attributes, elementKind,
+        // elementType, elementSize, flags.
         _module.AppendLine(
-            "%SlFieldInfo = type { ptr, i64, i32, ptr, i64, ptr, i32, ptr, i64, i32 }");
+            $"%SlFieldInfo = type {{ ptr, {word}, i32, ptr, {word}, ptr, i32, ptr, "
+            + $"{word}, i32 }}");
+
+        // name, kind, type, getter, setter, attributeCount, attributes.
         _module.AppendLine(
-            "%SlPropertyInfo = type { ptr, i32, ptr, ptr, ptr, i64, ptr }");
-        _module.AppendLine("%SlTypeBlock = type { i64, ptr, ptr }");
-        _module.AppendLine("%SlAttribute = type { ptr, i64, ptr }");
+            $"%SlPropertyInfo = type {{ ptr, i32, ptr, ptr, ptr, {word}, ptr }}");
+
+        _module.AppendLine($"%SlTypeBlock = type {{ {word}, ptr, ptr }}");
+        _module.AppendLine($"%SlAttribute = type {{ ptr, {word}, ptr }}");
+
+        // `number` is an `int64_t` rather than a `size_t`: it carries an
+        // integer constant or a double's bits, and neither narrows.
         _module.AppendLine("%SlAttributeValue = type { i32, i64, ptr }");
         _module.AppendLine();
     }
@@ -358,13 +375,16 @@ public sealed partial class LlvmEmitter
             $"@sl_utf16_string_type_info = {runtimeConstant} %SlTypeInfo");
         Declare("sl_string_builder_type_info",
             $"@sl_string_builder_type_info = {runtimeConstant} %SlTypeInfo");
+        // sl_array_alloc(const SlTypeInfo*, size_t length, size_t elementSize)
         Declare("sl_array_alloc",
-            "declare noalias ptr @sl_array_alloc(ptr, i64, i64) nounwind");
+            $"declare noalias ptr @sl_array_alloc(ptr, {Word}, {Word}) nounwind");
 
         // The entry point hands the runtime what main() was given, and asks it
         // back as a String[] when Main declared one.
         // An interpolated string, joined in one allocation.
-        Declare("sl_string_join", "declare noalias ptr @sl_string_join(ptr, i64) nounwind");
+        // sl_string_join(void *const *parts, size_t count)
+        Declare("sl_string_join",
+            $"declare noalias ptr @sl_string_join(ptr, {Word}) nounwind");
 
         Declare("sl_args_set", "declare void @sl_args_set(i32, ptr) nounwind");
 
@@ -378,8 +398,9 @@ public sealed partial class LlvmEmitter
         // runtime's. Neither writes anything.
         Declare("sl_is_instance",
             "declare i32 @sl_is_instance(ptr, ptr) nounwind willreturn memory(read)");
+        // sl_implements(const void *object, size_t interfaceId)
         Declare("sl_implements",
-            "declare i32 @sl_implements(ptr, i64) nounwind willreturn memory(read)");
+            $"declare i32 @sl_implements(ptr, {Word}) nounwind willreturn memory(read)");
 
         // Ends the program, so the block after a call to one is unreachable and
         // LLVM may say so.
@@ -398,9 +419,9 @@ public sealed partial class LlvmEmitter
         // what makes a bounds check's failure arm genuinely cold: the success
         // path stops being a branch that might come back.
         Declare("sl_array_bounds_fail",
-            "declare void @sl_array_bounds_fail(i64, i64) noreturn nounwind");
+            $"declare void @sl_array_bounds_fail({Word}, {Word}) noreturn nounwind");
         Declare("sl_slice_bounds_fail",
-            "declare void @sl_slice_bounds_fail(i64, i64, i64) noreturn nounwind");
+            $"declare void @sl_slice_bounds_fail({Word}, {Word}, {Word}) noreturn nounwind");
         Declare("sl_divide_by_zero",
             "declare void @sl_divide_by_zero() noreturn nounwind");
         Declare("sl_divide_overflow",

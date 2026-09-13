@@ -45,6 +45,25 @@ public sealed class Toolchain
 
     private Toolchain(string clangPath) => ClangPath = clangPath;
 
+    /// <summary>
+    /// <c>--target=</c> for anything but the host's own 64-bit build, and
+    /// nothing at all for that.
+    ///
+    /// Nothing rather than the host triple on purpose: naming one makes clang
+    /// pick a target rather than its default, and its default is the one whose
+    /// headers and libraries are certainly installed. A cross build has to name
+    /// one and takes what comes; a native build should not have to.
+    /// </summary>
+    private static IEnumerable<string> TargetArguments
+    {
+        get
+        {
+            var target = Binding.TargetPlatform.Current;
+            if (target.Architecture != Binding.TargetArch.X64)
+                yield return "--target=" + target.Triple;
+        }
+    }
+
     private string? _targetTriple;
 
     /// <summary>
@@ -151,7 +170,15 @@ public sealed class Toolchain
             // Sharing one would hand whichever build ran second the other's.
             // A shared one differs again: it is compiled position-independent
             // and with its exports marked, and neither is true of the other.
-            string suffix = (shared ? ".so" : "") + (debug ? ".g" : "") + ".o";
+            // The target goes in the name for the reason debug and shared do:
+            // an object built for x86 is a different object, and handing a
+            // 64-bit link one of them fails in the linker rather than here.
+            var target = Binding.TargetPlatform.Current;
+            string architecture = target.Architecture == Binding.TargetArch.X64
+                ? ""
+                : "." + target.Architecture.ToString().ToLowerInvariant();
+
+            string suffix = architecture + (shared ? ".so" : "") + (debug ? ".g" : "") + ".o";
             string objectFile = Path.ChangeExtension(source, suffix);
             objectFiles.Add(objectFile);
 
@@ -159,7 +186,8 @@ public sealed class Toolchain
             if (!changed && !headersChanged && File.Exists(objectFile)) continue;
 
             List<string> arguments =
-                ["-c", source, "-ffunction-sections", "-fdata-sections", "-o", objectFile];
+                [.. TargetArguments,
+                 "-c", source, "-ffunction-sections", "-fdata-sections", "-o", objectFile];
 
             if (shared)
             {
@@ -286,7 +314,16 @@ public sealed class Toolchain
         IReadOnlyList<string>? libraries = null,
         SharedRuntime? sharedRuntime = null)
     {
-        List<string> arguments = [irPath];
+        List<string> arguments = [.. TargetArguments, irPath];
+
+        // 32-bit Windows keeps the printf family inline in <stdio.h>, so a
+        // program that calls one has no symbol to link against: the UCRT
+        // import library exports `printf` for x64 and `_printf` for nothing.
+        // This is the compatibility library that defines them out of line, and
+        // it is what a C program built for the same target gets too.
+        var target = Binding.TargetPlatform.Current;
+        if (target.Architecture == Binding.TargetArch.X86 && target.IsWindows)
+            arguments.Add("-llegacy_stdio_definitions");
 
         // One or the other: the runtime is either compiled into this binary or
         // reached in the one library everything shares. Both at once would be

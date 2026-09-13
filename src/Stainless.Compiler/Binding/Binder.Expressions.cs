@@ -1298,12 +1298,39 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
-        if (!TryFindCommonType(leftPrimitive, rightPrimitive, out var common))
+        // Same width and opposite signedness is the one pairing width cannot
+        // settle, and `TryFindCommonType` widens it to `long`. That is right for
+        // two variables and wrong for a variable and a literal: `count - 1` is
+        // `nuint` where `count` is one, and the 1 is an `int` only because that
+        // is what an unsuffixed literal is.
+        //
+        // It never came up while `nuint` was eight bytes -- it was simply the
+        // wider side, and won. On a target where a pointer is four it is the
+        // same width as `int`, and widening to `long` would make the standard
+        // library stop compiling for itself. A literal is a number rather than
+        // a type, so what is asked here is whether the number fits.
+        PrimitiveTypeSymbol? common = null;
+
+        if (leftPrimitive.IsInteger && rightPrimitive.IsInteger &&
+            leftPrimitive.Size == rightPrimitive.Size &&
+            leftPrimitive.IsSigned != rightPrimitive.IsSigned)
         {
-            diagnostics.Error("SL0238", span,
-                $"'{left.Type.Name}' and '{right.Type.Name}' have no common type; " +
-                "add an explicit cast to choose one");
-            return new BoundErrorExpression(span);
+            if (IntegerLiteral(right) is not null && ConstantFits(right, leftPrimitive))
+                common = leftPrimitive;
+            else if (IntegerLiteral(left) is not null && ConstantFits(left, rightPrimitive))
+                common = rightPrimitive;
+        }
+
+        if (common is null)
+        {
+            if (!TryFindCommonType(leftPrimitive, rightPrimitive, out var found))
+            {
+                diagnostics.Error("SL0238", span,
+                    $"'{left.Type.Name}' and '{right.Type.Name}' have no common type; " +
+                    "add an explicit cast to choose one");
+                return new BoundErrorExpression(span);
+            }
+            common = found;
         }
 
         // Bitwise operators need integers, not floats.
