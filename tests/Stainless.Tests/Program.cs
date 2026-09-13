@@ -42,6 +42,13 @@ namespace Stainless.Tests;
 /// A case containing defines.txt is built with each of its lines passed as -D,
 /// and one containing abi.txt is built for the ABI that file names.
 ///
+/// A case containing target.txt is built for the machine that file names -- x86,
+/// say -- and then run. Running it is the point rather than a bonus: a 32-bit
+/// binary that links proves the symbols matched, and only running one proves the
+/// compiler and the runtime agree about how wide a pointer is. A host that
+/// cannot run what it built would need this skipped, and Windows and Linux both
+/// run x86 binaries on x86-64.
+///
 /// A case containing debug.txt is additionally built with debug information, and
 /// every line of that file must appear somewhere in the generated IR. Linking at
 /// all is most of the test: clang runs LLVM's verifier over the metadata, so a
@@ -278,6 +285,16 @@ internal static class Program
             }
             : null;
 
+        string targetPath = Path.Combine(directory, "target.txt");
+        Binding.TargetPlatform? target = null;
+
+        if (File.Exists(targetPath))
+        {
+            string named = File.ReadAllText(targetPath).Trim();
+            target = Binding.TargetPlatform.Parse(named)
+                     ?? throw new InvalidOperationException($"unknown target '{named}'");
+        }
+
         var defines = Lines(directory, "defines.txt");
 
         // A `library/` subdirectory is built first, as a Stainless library with
@@ -336,6 +353,7 @@ internal static class Program
                 name + (shared ? Toolchain.SharedLibraryExtension
                                : Toolchain.ExecutableExtension)),
             IntermediateDirectory = Path.Combine(caseWork, "obj"),
+            Target = target,
             Shared = shared,
             HeaderPath = shared ? Path.Combine(caseWork, "library.h") : null,
 

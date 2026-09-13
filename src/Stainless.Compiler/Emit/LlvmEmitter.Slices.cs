@@ -77,8 +77,8 @@ public sealed partial class LlvmEmitter
 
         // from <= to <= length, in one branch: an unsigned compare catches a
         // negative bound too, because it sign-extends to something enormous.
-        string ordered = Emit("i1", $"icmp ule i64 {from}, {to}");
-        string within = Emit("i1", $"icmp ule i64 {to}, {sourceLength}");
+        string ordered = Emit("i1", $"icmp ule {Word} {from}, {to}");
+        string within = Emit("i1", $"icmp ule {Word} {to}, {sourceLength}");
         string valid = Emit("i1", $"and i1 {ordered}, {within}");
 
         string okLabel = NextLabel("slice.ok");
@@ -86,7 +86,7 @@ public sealed partial class LlvmEmitter
         Terminator($"br i1 {valid}, label %{okLabel}, label %{failLabel}");
 
         Label(failLabel);
-        Line($"call void @sl_slice_bounds_fail(i64 {from}, i64 {to}, i64 {sourceLength})");
+        Line($"call void @sl_slice_bounds_fail({Word} {from}, {Word} {to}, {Word} {sourceLength})");
         Terminator("unreachable");
 
         Label(okLabel);

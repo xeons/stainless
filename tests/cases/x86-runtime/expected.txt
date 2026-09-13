@@ -1,0 +1,13 @@
+pointer   4
+nuint     4
+length    5
+last      44
+slice     3 11 33
+bytes     12
+upper     HELLO, WORLD
+found     7
+chain     6
+entries   3
+two       2
+names     3 gamma
+parsed    4321

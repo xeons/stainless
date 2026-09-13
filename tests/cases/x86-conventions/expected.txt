@@ -1,0 +1,7 @@
+stdcall     = 7   (want 7)
+fastcall    = 7   (want 7)
+vectorcall  = 7   (want 7)
+cdecl       = 7   (want 7)
+five std    = 54321  (want 54321)
+five fast   = 54321  (want 54321)
+wide std    = 1007  (want 1007)
