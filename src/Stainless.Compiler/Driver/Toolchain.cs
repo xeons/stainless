@@ -382,6 +382,25 @@ public sealed class Toolchain
     }
 
     /// <summary>
+    /// Compiles IR to an object file for a target, and does not link it.
+    ///
+    /// It is what a target this machine cannot finish a build for still allows.
+    /// LLVM's verifier runs over the whole module and the back end lowers every
+    /// instruction in it, so a signature the target cannot express is a failure
+    /// here rather than a belief -- and that is most of what a calling
+    /// convention is. Linking would need that system's C library and running
+    /// would need its processor; neither is a reason to leave the IR unchecked.
+    /// </summary>
+    public ToolResult Assemble(
+        string irPath, string objectPath, Binding.TargetPlatform target) =>
+        Run(ClangPath, [
+            "--target=" + target.Triple,
+            "-c", irPath,
+            "-o", objectPath,
+            "-Wno-override-module",
+        ]);
+
+    /// <summary>
     /// What a shared library built from a package of this name is called.
     ///
     /// The <c>lib</c> prefix is not decoration: outside Windows it is what makes

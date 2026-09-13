@@ -57,6 +57,10 @@ public class AbiTests
         public struct Inline3 { public int[3] A; }
         public struct Inline17 { public sbyte[17] A; }
         public struct Nested { public B4 A; public B4 B; }
+        public struct D4 { public double A; public double B; public double C; public double D; }
+        public struct FD { public float A; public double B; }
+        public struct InlineF3 { public float[3] A; }
+        [Align(16)] public struct Wide16 { public long A; public long B; }
         """;
 
     private static ArgInfo Win64Arg(string name) =>
@@ -70,6 +74,12 @@ public class AbiTests
 
     private static ArgInfo SysVReturn(string name) =>
         SysVAbi.ClassifyReturn(Front.Struct(Shapes, name), LlvmEmitter.LlvmTypeOf);
+
+    private static ArgInfo Arm64Arg(string name) =>
+        Aapcs64Abi.ClassifyArgument(Front.Struct(Shapes, name), LlvmEmitter.LlvmTypeOf);
+
+    private static ArgInfo Arm64Return(string name) =>
+        Aapcs64Abi.ClassifyReturn(Front.Struct(Shapes, name), LlvmEmitter.LlvmTypeOf);
 
     /// <summary>
     /// What each shape actually measures.
@@ -256,6 +266,160 @@ public class AbiTests
     public void AOneRegisterReturnIsNotGathered(string shape) =>
         Assert.Equal(SysVArg(shape).LlvmType, SysVReturn(shape).LlvmType);
 
+    // --------------------------------------------------------------- AAPCS64
+
+    /// <summary>
+    /// AAPCS64 asks first whether every member is the same floating-point type.
+    /// Four or fewer of them and no padding is a homogeneous aggregate, which
+    /// travels in one SIMD register each -- <c>{ double x4 }</c> crosses in
+    /// registers at thirty-two bytes, where <c>{ long; long; sbyte; }</c> at
+    /// twenty-four does not.
+    /// </summary>
+    [Theory]
+    [InlineData("F2", "[2 x float]")]
+    [InlineData("F3", "[3 x float]")]
+    [InlineData("InlineF3", "[3 x float]")]
+    [InlineData("D2", "[2 x double]")]
+    [InlineData("D3", "[3 x double]")]
+    [InlineData("D4", "[4 x double]")]
+    public void Arm64PutsAHomogeneousAggregateInSimdRegisters(string shape, string spelling)
+    {
+        var info = Arm64Arg(shape);
+        Assert.Equal(PassStyle.Coerce, info.Style);
+        Assert.Equal([spelling], info.Pieces);
+        Assert.Equal(0, info.PaddedSize);
+    }
+
+    /// <summary>
+    /// And these are the near misses: two floating-point types is not one,
+    /// five members is more than four, and a float beside an int is neither.
+    /// </summary>
+    [Theory]
+    [InlineData("FD", "[2 x i64]")]
+    [InlineData("MixFI", "i64")]
+    [InlineData("MixFL", "[2 x i64]")]
+    [InlineData("MixDI", "[2 x i64]")]
+    [InlineData("MixBD", "[2 x i64]")]
+    public void Arm64IsNotFooledByAFloatInTheStruct(string shape, string spelling) =>
+        Assert.Equal([spelling], Arm64Arg(shape).Pieces);
+
+    /// <summary>
+    /// Everything else of sixteen bytes or less travels in one or two general
+    /// registers, and an argument register is sized by the register rather than
+    /// by the value: a three-byte struct is an <c>i64</c> here where System V
+    /// makes it an <c>i24</c>.
+    /// </summary>
+    [Theory]
+    [InlineData("B1", "i64")]
+    [InlineData("B3", "i64")]
+    [InlineData("B4", "i64")]
+    [InlineData("B5", "i64")]
+    [InlineData("B8", "i64")]
+    [InlineData("Nested", "i64")]
+    [InlineData("B9", "[2 x i64]")]
+    [InlineData("B16", "[2 x i64]")]
+    [InlineData("Inline3", "[2 x i64]")]
+    public void Arm64PutsEverythingElseSmallInGeneralRegisters(string shape, string spelling)
+    {
+        var info = Arm64Arg(shape);
+        Assert.Equal(PassStyle.Coerce, info.Style);
+        Assert.Equal([spelling], info.Pieces);
+    }
+
+    /// <summary>
+    /// A struct holding nothing but pointers keeps them as pointers, which is
+    /// the same register and the spelling LLVM can reason about. One holding a
+    /// pointer and anything else does not.
+    /// </summary>
+    [Fact]
+    public void Arm64KeepsAStructOfPointersAsPointers()
+    {
+        Assert.Equal(["ptr"], Arm64Arg("Ptr").Pieces);
+        Assert.Equal(["[2 x ptr]"], Arm64Arg("TwoPtr").Pieces);
+
+        // And a result does not: clang spells every returned register as an
+        // integer, pointers included.
+        Assert.Equal("i64", Arm64Return("Ptr").LlvmType);
+        Assert.Equal("[2 x i64]", Arm64Return("TwoPtr").LlvmType);
+    }
+
+    /// <summary>
+    /// A value asking to be aligned to sixteen gets one sixteen-byte register
+    /// rather than two of eight, because a pair has to start at an even one and
+    /// a single <c>i128</c> is how that is said.
+    /// </summary>
+    [Fact]
+    public void Arm64GivesASixteenAlignedValueOneRegister()
+    {
+        Assert.Equal(["i128"], Arm64Arg("Wide16").Pieces);
+        Assert.Equal("i128", Arm64Return("Wide16").LlvmType);
+    }
+
+    /// <summary>
+    /// Over sixteen bytes and not homogeneous is a pointer to a copy the caller
+    /// made -- and it must not be spelled <c>byval</c>, which LLVM lowers to the
+    /// value on the outgoing stack instead.
+    /// </summary>
+    [Theory]
+    [InlineData("B17")]
+    [InlineData("Inline17")]
+    public void Arm64PassesALargeStructAsAPointerAndNotByval(string shape)
+    {
+        var info = Arm64Arg(shape);
+        Assert.Equal(PassStyle.Indirect, info.Style);
+        Assert.True(info.IndirectAsPointer);
+
+        // A result is `sret` the way it is everywhere, so it says nothing.
+        Assert.Equal(PassStyle.Indirect, Arm64Return(shape).Style);
+        Assert.False(Arm64Return(shape).IndirectAsPointer);
+    }
+
+    /// <summary>
+    /// A result of eight bytes or less is sized by the value rather than by the
+    /// register, which is the one place AAPCS64's two directions disagree.
+    /// </summary>
+    [Theory]
+    [InlineData("B1", "i8")]
+    [InlineData("B2", "i16")]
+    [InlineData("B3", "i24")]
+    [InlineData("B4", "i32")]
+    [InlineData("B5", "i64")]
+    [InlineData("B8", "i64")]
+    public void Arm64SizesAResultByTheValue(string shape, string spelling)
+    {
+        Assert.Equal(spelling, Arm64Return(shape).LlvmType);
+        Assert.Equal("i64", Arm64Arg(shape).LlvmType);
+    }
+
+    /// <summary>
+    /// A homogeneous aggregate comes back as itself: the registers are the
+    /// same ones it went out in, and that is how clang spells them.
+    /// </summary>
+    [Theory]
+    [InlineData("F2")]
+    [InlineData("D3")]
+    public void Arm64ReturnsAHomogeneousAggregateAsItself(string shape)
+    {
+        var type = Front.Struct(Shapes, shape);
+        Assert.Equal(LlvmEmitter.LlvmTypeOf(type), Arm64Return(shape).LlvmType);
+    }
+
+    /// <summary>
+    /// Where the registers reach past the value, how far is recorded -- because
+    /// the emitter has to read them out of a padded copy rather than out of the
+    /// object, which would read bytes the object does not have.
+    /// </summary>
+    [Theory]
+    [InlineData("B1", 8)]
+    [InlineData("B3", 8)]
+    [InlineData("Inline3", 16)]
+    [InlineData("B8", 0)]
+    [InlineData("B16", 0)]
+    [InlineData("F3", 0)]
+    [InlineData("Wide16", 0)]
+    public void Arm64SaysWhenARegisterReachesPastTheValue(string shape, int padded) =>
+        Assert.Equal(padded, Arm64Arg(shape).PaddedSize);
+
     // ------------------------------------------------- what both must agree on
 
     /// <summary>
@@ -351,5 +515,48 @@ public class AbiTests
         Assert.Contains(
             "ptr byval(%struct.Test_Pair) %arg.v",
             Front.Function(Front.ModuleIr(source, CppAbi.Microsoft), "4Test4Take"));
+    }
+
+    /// <summary>
+    /// The same, for the convention no test can run: ARM64 is classified and
+    /// emitted here and executed nowhere, so the IR is the whole of the
+    /// evidence and it is stated rather than described.
+    ///
+    /// <para>
+    /// Three things are being watched. A twelve-byte struct arrives in two
+    /// eight-byte registers and is written into sixteen bytes that are not the
+    /// object, because storing them over the object would overwrite four bytes
+    /// past the end of it. A homogeneous aggregate arrives as its members. And
+    /// a large one arrives as a bare pointer rather than as <c>byval</c>, which
+    /// LLVM would lower to the value on the outgoing stack instead.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void Arm64ReachesTheEmittedSignature()
+    {
+        const string source = """
+            public struct Tri { public int A; public int B; public int C; }
+            public struct Trio { public float A; public float B; public float C; }
+            public struct Big { public long A; public long B; public sbyte C; }
+            public int Three(Tri v) { return v.A; }
+            public float Floats(Trio v) { return v.A; }
+            public long Large(Big v) { return v.A; }
+            """;
+
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = TargetPlatform.Arm64Linux;
+        string ir;
+        try { ir = Front.ModuleIr(source); }
+        finally { TargetPlatform.Current = before; }
+
+        string three = Front.Function(ir, "4Test5Three");
+        Assert.Contains("[2 x i64] %arg.v", three);
+        Assert.Contains("@llvm.memcpy", three);
+
+        Assert.Contains("[3 x float] %arg.v", Front.Function(ir, "4Test6Floats"));
+
+        string large = Front.Function(ir, "4Test5Large");
+        Assert.Contains("ptr %arg.v", large);
+        Assert.DoesNotContain("byval", large);
     }
 }

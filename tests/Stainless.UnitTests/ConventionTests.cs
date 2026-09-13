@@ -178,6 +178,61 @@ public class ConventionTests
         });
     }
 
+    // ---------------------------------------------------------------- ELF
+
+    /// <summary>
+    /// Decoration is Microsoft's and stops where PE does.
+    ///
+    /// <para>
+    /// An i386 ELF <c>__stdcall</c> gets the convention -- the callee still
+    /// removes the arguments -- and the plain name, which is what gcc has
+    /// always done and what clang writes for <c>i686-unknown-linux-gnu</c>.
+    /// This is the one part of a convention that is the object format's
+    /// question rather than the architecture's, and getting it wrong is a link
+    /// error rather than a wrong answer: the first 32-bit Linux build went
+    /// looking for <c>_add_stdcall@8</c> and there was no such symbol.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void ElfDecoratesNothing()
+    {
+        Under(TargetPlatform.X86Linux, () =>
+        {
+            Assert.Equal("f", Mangler.Decorated(
+                Declared("f", CallingConvention.Stdcall, Int, Int)));
+
+            Assert.Equal("f", Mangler.Decorated(
+                Declared("f", CallingConvention.Fastcall, Int, Int)));
+
+            Assert.Equal("f", Mangler.Decorated(
+                Declared("f", CallingConvention.Vectorcall, Int, Int)));
+
+            Assert.False(Mangler.IsDecorated(
+                Declared("f", CallingConvention.Stdcall, Int, Int)));
+        });
+
+        Under(TargetPlatform.X64Linux, () =>
+            Assert.Equal("f", Mangler.Decorated(
+                Declared("f", CallingConvention.Vectorcall, Int, Int))));
+    }
+
+    /// <summary>
+    /// ARM64 has one convention, so naming another changes neither the symbol
+    /// nor the call.
+    /// </summary>
+    [Fact]
+    public void Arm64HasNothingToTellApart()
+    {
+        Under(TargetPlatform.Arm64Windows, () =>
+        {
+            Assert.Equal("f", Mangler.Decorated(
+                Declared("f", CallingConvention.Stdcall, Int, Int)));
+
+            Assert.Equal("f", Mangler.Decorated(
+                Declared("f", CallingConvention.Vectorcall, Int, Int)));
+        });
+    }
+
     // -------------------------------------------------------------- parsing
 
     [Fact]

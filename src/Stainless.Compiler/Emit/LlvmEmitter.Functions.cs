@@ -144,11 +144,18 @@ public sealed partial class LlvmEmitter
                 // bytes it covered, which is exactly where the fields expect it.
                 string slot = Alloca(LlvmTypeOf(parameter.Type), parameter.Name);
 
+                // Where the registers cover more than the object does, they are
+                // written somewhere that has room for them and the object takes
+                // back its own size.
+                string written = NeedsPadding(info) ? PaddedCopy(info) : slot;
+
                 for (int piece = 0; piece < info.Pieces.Count; piece++)
                 {
                     string value = info.Pieces.Count == 1 ? incoming : $"{incoming}.{piece}";
-                    Line($"store {info.Pieces[piece]} {value}, ptr {PieceAddress(slot, piece)}");
+                    Line($"store {info.Pieces[piece]} {value}, ptr {PieceAddress(written, piece)}");
                 }
+
+                if (written != slot) MemCopy(slot, written, parameter.Type.Size);
 
                 _parameterSlots[parameter] = slot;
                 AdoptWrittenParameter(parameter, slot);

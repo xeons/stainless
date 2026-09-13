@@ -100,8 +100,13 @@ public sealed class FunctionSymbol
     /// declaration and every call to it carry, and how the linker name is
     /// decorated. On a 64-bit target only <c>__vectorcall</c> is anything but a
     /// note to the reader.
+    ///
+    /// Settable because a com interface's slots get one that nobody wrote: on
+    /// x86 every method of a COM vtable is <c>__stdcall</c>, and that is
+    /// stamped on when the table is numbered rather than repeated at each of
+    /// the four places a slot's symbol can be built.
     /// </summary>
-    public Syntax.CallingConvention CallingConvention { get; init; }
+    public Syntax.CallingConvention CallingConvention { get; set; }
 
     /// <summary>
     /// The <c>///</c> block written above the declaration, or null. Carried so

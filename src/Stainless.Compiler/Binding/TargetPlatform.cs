@@ -130,13 +130,50 @@ public sealed record TargetPlatform
     };
 
     /// <summary>
+    /// 64-bit ARM, Microsoft's. The C++ names are Microsoft's here as they are
+    /// on x64, and the argument passing is AAPCS64 either way -- which is the
+    /// one architecture where the two systems agree about structs.
+    /// </summary>
+    public static readonly TargetPlatform Arm64Windows = new()
+    {
+        Architecture = TargetArch.Arm64,
+        PointerWidth = 8,
+        Abi = CppAbi.Microsoft,
+        Triple = "aarch64-pc-windows-msvc",
+    };
+
+    public static readonly TargetPlatform Arm64Linux = new()
+    {
+        Architecture = TargetArch.Arm64,
+        PointerWidth = 8,
+        Abi = CppAbi.Itanium,
+        Triple = "aarch64-unknown-linux-gnu",
+    };
+
+    /// <summary>
     /// The target a build gets when nothing names one: this machine, 64-bit.
+    ///
+    /// The architecture is asked for rather than assumed, because an ARM64 host
+    /// is a real machine to be sitting at and taking x86-64 as the default
+    /// there would build something it cannot run.
     ///
     /// <c>STAINLESS_CPP_ABI</c> still overrides the name mangling, which is how
     /// the scheme a host does not use gets exercised against a real compiler.
     /// </summary>
-    public static TargetPlatform Host =>
-        (OperatingSystem.IsWindows() ? X64Windows : X64Linux) with { Abi = CppMangler.HostAbi };
+    public static TargetPlatform Host
+    {
+        get
+        {
+            bool windows = OperatingSystem.IsWindows();
+            var native =
+                System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture ==
+                System.Runtime.InteropServices.Architecture.Arm64
+                    ? windows ? Arm64Windows : Arm64Linux
+                    : windows ? X64Windows : X64Linux;
+
+            return native with { Abi = CppMangler.HostAbi };
+        }
+    }
 
     /// <summary>
     /// The target named on a command line, or null when the name is not one.
@@ -149,18 +186,23 @@ public sealed record TargetPlatform
             OperatingSystem.IsWindows() ? X64Windows : X64Linux,
         "x86" or "i686" or "i386" or "win32" =>
             OperatingSystem.IsWindows() ? X86Windows : X86Linux,
+        "arm64" or "aarch64" =>
+            OperatingSystem.IsWindows() ? Arm64Windows : Arm64Linux,
 
         "x64-windows" or "x86_64-windows" => X64Windows,
         "x64-linux" or "x86_64-linux" => X64Linux,
         "x86-windows" or "i686-windows" => X86Windows,
         "x86-linux" or "i686-linux" => X86Linux,
+        "arm64-windows" or "aarch64-windows" => Arm64Windows,
+        "arm64-linux" or "aarch64-linux" => Arm64Linux,
 
         _ => null,
     };
 
     /// <summary>Every name <see cref="Parse"/> accepts, for a diagnostic.</summary>
     public static string Names =>
-        "x64, x86, x64-windows, x64-linux, x86-windows, x86-linux";
+        "x64, x86, arm64, x64-windows, x64-linux, x86-windows, x86-linux, " +
+        "arm64-windows, arm64-linux";
 
     // ------------------------------------------------------------- ambient
 

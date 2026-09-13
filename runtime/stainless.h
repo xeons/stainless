@@ -319,6 +319,29 @@ SL_API SL_NORETURN void sl_cast_failed(const void *object, const char *wanted);
  * Windows part of COM is activation, and activation is not here.
  */
 
+/*
+ * The convention every COM method is called with.
+ *
+ * On x86 it is __stdcall: the callee removes the arguments, and that is what
+ * every COM vtable on that architecture holds -- on Windows because Microsoft
+ * defined it that way, and anywhere else because a vtable that disagreed would
+ * not be COM. There is one convention on every 64-bit target, so this is empty
+ * there and the whole of the difference is the line below.
+ *
+ * It belongs on the function pointers as much as on the functions: a call
+ * through a vtable slot is where a caller and a callee disagreeing about who
+ * pops the arguments would unbalance the stack, and nothing would say so.
+ */
+#if defined(__i386__) || defined(_M_IX86)
+#  if defined(_MSC_VER) || defined(__clang__)
+#    define SL_COM_METHOD __stdcall
+#  else
+#    define SL_COM_METHOD __attribute__((stdcall))
+#  endif
+#else
+#  define SL_COM_METHOD
+#endif
+
 /* 16 bytes, laid out as Windows lays a GUID out, which is what a wire format
    and every existing header agree on. */
 typedef struct SlGuid {
@@ -334,9 +357,9 @@ typedef struct SlComObject SlComObject;
    followed by the interface's own methods, which is why a derived interface
    reference is usable as a base one with no conversion at all. */
 typedef struct SlComVtable {
-    int32_t  (*QueryInterface)(void *self, const SlGuid *iid, void **result);
-    uint32_t (*AddRef)(void *self);
-    uint32_t (*Release)(void *self);
+    int32_t  (SL_COM_METHOD *QueryInterface)(void *self, const SlGuid *iid, void **result);
+    uint32_t (SL_COM_METHOD *AddRef)(void *self);
+    uint32_t (SL_COM_METHOD *Release)(void *self);
 } SlComVtable;
 
 struct SlComObject {
@@ -389,10 +412,12 @@ SL_API SL_NORETURN void sl_com_cast_failed(const char *from, const char *to);
 SL_API int   sl_guid_equals(const SlGuid *left, const SlGuid *right);
 
 /* The IUnknown a `com class` gets for free. Every generated vtable puts these
-   three in slots 0 to 2, so the object's own methods start at slot 3. */
-SL_API int32_t  sl_com_object_query(void *self, const SlGuid *iid, void **result);
-SL_API uint32_t sl_com_object_add_ref(void *self);
-SL_API uint32_t sl_com_object_release(void *self);
+   three in slots 0 to 2, so the object's own methods start at slot 3 -- and
+   they go in a vtable, so they carry the convention the rest of it does. */
+SL_API int32_t  SL_COM_METHOD sl_com_object_query(
+    void *self, const SlGuid *iid, void **result);
+SL_API uint32_t SL_COM_METHOD sl_com_object_add_ref(void *self);
+SL_API uint32_t SL_COM_METHOD sl_com_object_release(void *self);
 
 /* ----------------------------------------------------------------- String */
 
@@ -918,10 +943,16 @@ SL_API long long sl_random_seed(void);
  * The lock and condition types are opaque storage sized for the largest
  * platform primitive (glibc's pthread_mutex_t at 40 bytes, pthread_cond_t at
  * 48); Windows uses 8 bytes for each. thread.c asserts the sizes fit.
+ *
+ * Counted in `long long` rather than in pointers, because a pthread primitive
+ * is not a row of pointers and does not shrink with one. glibc's i386
+ * pthread_cond_t is 48 bytes on a machine whose pointer is four, so counting
+ * pointers made the 32-bit storage half the size it had to be -- which is what
+ * thread.c's assertions caught the first time a 32-bit Linux build ran.
  */
 
-typedef struct SlMutex     { void *opaque[5]; } SlMutex;
-typedef struct SlCondition { void *opaque[6]; } SlCondition;
+typedef struct SlMutex     { long long opaque[5]; } SlMutex;     /* 40 bytes */
+typedef struct SlCondition { long long opaque[6]; } SlCondition; /* 48 bytes */
 
 SL_API void  sl_mutex_init(SlMutex *mutex);
 SL_API void  sl_mutex_destroy(SlMutex *mutex);

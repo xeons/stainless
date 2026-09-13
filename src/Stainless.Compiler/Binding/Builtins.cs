@@ -493,6 +493,13 @@ public sealed class Builtins
             IsVirtual = true,
             Span = BuiltinSpan,
             VirtualSlot = slot,
+
+            // IUnknown's three are com interface methods like any others, and
+            // on x86 that means __stdcall. They are built here rather than
+            // bound from source, so the rule has to be repeated once.
+            CallingConvention = TargetPlatform.Current.HasCallingConventions
+                ? Syntax.CallingConvention.Stdcall
+                : Syntax.CallingConvention.Default,
         };
 
         symbol.Parameters.Add(new ParameterSymbol("this", owner, 0) { IsThis = true });

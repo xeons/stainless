@@ -103,10 +103,11 @@ internal static class Program
               -o, --out <path>     output file (default: after the first source)
               --shared             build a shared library instead of an executable
               --target <name>      the machine to build for: x64 (the default),
-                                   x86, or one of those with a system after it --
-                                   x86-windows, x86-linux. A 32-bit target is
-                                   where a calling convention starts to mean
-                                   something
+                                   x86, arm64, or one of those with a system
+                                   after it -- x86-linux, arm64-windows. A
+                                   32-bit target is where a calling convention
+                                   starts to mean something; arm64 is the one
+                                   whose two systems agree about structs
               --header <path>      write a C header for the exported surface
               --stdlib             (doc) document the standard library itself
               --metadata <path>    write module metadata for a Stainless consumer

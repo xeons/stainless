@@ -71,23 +71,32 @@ public sealed partial class LlvmEmitter(
     /// as Win64 whatever it said -- which made `--abi itanium` produce a
     /// program that could not call a C library.
     ///
-    /// x86 is asked first and answers for both systems, because the
-    /// architecture decides more than the name mangling does: there are no
-    /// argument registers, and the two systems disagree about returns.
+    /// The architecture is asked first, because it decides more than the name
+    /// mangling does. x86 has no argument registers at all and its two systems
+    /// disagree about returns; ARM64 asks what is in the struct, the way System
+    /// V does, and gets different answers. Only on x86-64 is the C++ ABI what
+    /// picks, and there it picks between the two that exist.
     /// </summary>
     private ArgInfo ClassifyValue(TypeSymbol type) =>
-        Binding.TargetPlatform.Current.Architecture == Binding.TargetArch.X86
-            ? X86Abi.ClassifyArgument(type, LlvmTypeOf)
-        : abi == CppAbi.Itanium
-            ? SysVAbi.ClassifyArgument(type, LlvmTypeOf)
-            : Win64Abi.ClassifyArgument(type, LlvmTypeOf);
+        Binding.TargetPlatform.Current.Architecture switch
+        {
+            Binding.TargetArch.X86 => X86Abi.ClassifyArgument(type, LlvmTypeOf),
+            Binding.TargetArch.Arm64 => Aapcs64Abi.ClassifyArgument(type, LlvmTypeOf),
+            _ => abi == CppAbi.Itanium
+                ? SysVAbi.ClassifyArgument(type, LlvmTypeOf)
+                : Win64Abi.ClassifyArgument(type, LlvmTypeOf),
+        };
 
     private ArgInfo ClassifyResult(TypeSymbol type) =>
-        Binding.TargetPlatform.Current.Architecture == Binding.TargetArch.X86
-            ? X86Abi.ClassifyReturn(type, LlvmTypeOf, Binding.TargetPlatform.Current.IsWindows)
-        : abi == CppAbi.Itanium
-            ? SysVAbi.ClassifyReturn(type, LlvmTypeOf)
-            : Win64Abi.ClassifyReturn(type, LlvmTypeOf);
+        Binding.TargetPlatform.Current.Architecture switch
+        {
+            Binding.TargetArch.X86 => X86Abi.ClassifyReturn(
+                type, LlvmTypeOf, Binding.TargetPlatform.Current.IsWindows),
+            Binding.TargetArch.Arm64 => Aapcs64Abi.ClassifyReturn(type, LlvmTypeOf),
+            _ => abi == CppAbi.Itanium
+                ? SysVAbi.ClassifyReturn(type, LlvmTypeOf)
+                : Win64Abi.ClassifyReturn(type, LlvmTypeOf),
+        };
 
     /// <summary>
     /// How a <c>size_t</c> is spelled in IR for this target: <c>i64</c> on a

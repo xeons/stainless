@@ -542,10 +542,14 @@ public sealed partial class LlvmEmitter
         var target = Binding.TargetPlatform.Current;
 
         // One convention on every 64-bit target, and `__vectorcall` is the only
-        // name that still means something there.
-        if (target.Architecture != Binding.TargetArch.X86 &&
-            function.CallingConvention != Syntax.CallingConvention.Vectorcall)
-            return "";
+        // name that still means something there -- on x86-64, where Microsoft
+        // defines it. ARM64 has no second convention at all, and spelling an
+        // x86 one on it would be a call LLVM cannot lower.
+        if (target.Architecture == Binding.TargetArch.X64 &&
+            function.CallingConvention == Syntax.CallingConvention.Vectorcall)
+            return "x86_vectorcallcc ";
+
+        if (target.Architecture != Binding.TargetArch.X86) return "";
 
         return function.CallingConvention switch
         {

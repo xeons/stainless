@@ -68,11 +68,27 @@ public static class Mangler
         var target = TargetPlatform.Current;
         var convention = function.CallingConvention;
 
-        // One convention on every 64-bit target, and `__vectorcall` is the only
-        // name that still means something there.
-        if (target.Architecture != TargetArch.X86 &&
-            convention != Syntax.CallingConvention.Vectorcall)
-            return function.Name;
+        // Decoration is Microsoft's, and it reaches no further than PE does.
+        // clang gives an i386 ELF `__stdcall` the convention and the plain
+        // name both, which is what gcc has always done -- so a 32-bit Linux
+        // build went looking for `_add_stdcall@8`, found nothing, and said so
+        // at link time. It is the one thing about a convention that is the
+        // object format's question rather than the architecture's.
+        if (!target.IsWindows) return function.Name;
+
+        // Which conventions are anything but a note to the reader is the
+        // architecture's question. x86 has all of them; there is one on every
+        // 64-bit target, and `__vectorcall` is the only name that still means
+        // something on x86-64, where Microsoft defines it. ARM64 has no second
+        // convention at all, so there is nothing to tell apart.
+        bool decorates = target.Architecture switch
+        {
+            TargetArch.X86 => true,
+            TargetArch.X64 => convention == Syntax.CallingConvention.Vectorcall,
+            _ => false,
+        };
+
+        if (!decorates) return function.Name;
 
         if (convention is Syntax.CallingConvention.Default or Syntax.CallingConvention.Cdecl)
             return function.Name;

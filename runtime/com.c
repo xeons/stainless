@@ -127,6 +127,11 @@ int sl_guid_equals(const SlGuid *left, const SlGuid *right)
  * fields. A tear-off is a vtable pointer followed by its own distance back to
  * the object, so a call arriving through any interface can find the header by
  * subtracting, which is what the three below do.
+ *
+ * They go in a vtable, so they carry SL_COM_METHOD: on x86 that is __stdcall,
+ * and a slot whose callee did not pop the arguments would unbalance the stack
+ * of whatever called it. It is spelled on the architecture rather than on the
+ * system, which is why it is not the #ifdef this file must not grow.
  */
 
 static SlObject *sl_com_owner(void *self)
@@ -135,14 +140,14 @@ static SlObject *sl_com_owner(void *self)
     return (SlObject *)((uint8_t *)self - tearOff->ownerOffset);
 }
 
-uint32_t sl_com_object_add_ref(void *self)
+uint32_t SL_COM_METHOD sl_com_object_add_ref(void *self)
 {
     SlObject *object = sl_com_owner(self);
     sl_retain(object);
     return (uint32_t)object->strong;
 }
 
-uint32_t sl_com_object_release(void *self)
+uint32_t SL_COM_METHOD sl_com_object_release(void *self)
 {
     SlObject *object = sl_com_owner(self);
 
@@ -163,7 +168,7 @@ uint32_t sl_com_object_release(void *self)
  * not in a loop, and a class presenting more than a handful of interfaces is
  * rare enough that a table would cost more than it saves.
  */
-int32_t sl_com_object_query(void *self, const SlGuid *iid, void **result)
+int32_t SL_COM_METHOD sl_com_object_query(void *self, const SlGuid *iid, void **result)
 {
     SlObject *object;
     const SlComLayout *layout;

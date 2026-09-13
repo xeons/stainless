@@ -411,10 +411,19 @@ public sealed partial class LlvmEmitter
         Declare("sl_com_is", "declare i32 @sl_com_is(ptr, ptr)");
         Declare("sl_com_cast_failed",
             "declare void @sl_com_cast_failed(ptr, ptr) noreturn nounwind");
+        // The three that go in a vtable, so the convention and the decorated
+        // name are the target's rather than plain C's.
+        string comConvention = Binding.TargetPlatform.Current.HasCallingConventions
+            ? "x86_stdcallcc "
+            : "";
+
         Declare("sl_com_object_query",
-            "declare i32 @sl_com_object_query(ptr, ptr, ptr)");
-        Declare("sl_com_object_add_ref", "declare i32 @sl_com_object_add_ref(ptr)");
-        Declare("sl_com_object_release", "declare i32 @sl_com_object_release(ptr)");
+            $"declare {comConvention}i32 " +
+            $"{ComRuntimeSymbol("sl_com_object_query", 3)}(ptr, ptr, ptr)");
+        Declare("sl_com_object_add_ref",
+            $"declare {comConvention}i32 {ComRuntimeSymbol("sl_com_object_add_ref", 1)}(ptr)");
+        Declare("sl_com_object_release",
+            $"declare {comConvention}i32 {ComRuntimeSymbol("sl_com_object_release", 1)}(ptr)");
         // Every one of these ends in sl_fail, which ends in abort. Saying so is
         // what makes a bounds check's failure arm genuinely cold: the success
         // path stops being a branch that might come back.
@@ -463,10 +472,30 @@ public sealed partial class LlvmEmitter
     private IEnumerable<string> Declared(ArgInfo info) =>
         info.Style switch
         {
-            PassStyle.Indirect => [$"ptr byval({StructName((StructTypeSymbol)info.Type)})"],
+            PassStyle.Indirect => [
+                info.IndirectAsPointer
+                    ? "ptr"
+                    : $"ptr byval({StructName((StructTypeSymbol)info.Type)})"],
             PassStyle.Coerce => info.Pieces,
             _ => [info.LlvmType],
         };
+
+    /// <summary>
+    /// Where a coerced value is read from, and where one is written before
+    /// being copied back: the value's own storage, or a padded copy of it when
+    /// the registers cover more than the value does.
+    ///
+    /// AAPCS64 is the only convention that asks for this -- a twelve-byte
+    /// struct crosses in two eight-byte registers, so the load is sixteen bytes
+    /// wide. Reading the value itself would read four bytes that are not part
+    /// of it, which faults the day one sits at the end of a page; writing it
+    /// would overwrite four that belong to whatever comes next. clang makes the
+    /// same copy for the same reason.
+    /// </summary>
+    private string PaddedCopy(ArgInfo info) => Alloca(info.LlvmType, "coerce");
+
+    /// <summary>Whether <paramref name="info"/> needs one.</summary>
+    private static bool NeedsPadding(ArgInfo info) => info.PaddedSize > info.Type.Size;
 
     /// <summary>
     /// The address of the eight bytes a coerced struct's <paramref name="index"/>
@@ -483,6 +512,13 @@ public sealed partial class LlvmEmitter
     /// </summary>
     private string LoadCoerced(string address, ArgInfo info)
     {
+        if (NeedsPadding(info))
+        {
+            string padded = PaddedCopy(info);
+            MemCopy(padded, address, info.Type.Size);
+            address = padded;
+        }
+
         if (info.Pieces.Count <= 1)
             return Emit(info.LlvmType, $"load {info.LlvmType}, ptr {address}");
 
@@ -502,6 +538,16 @@ public sealed partial class LlvmEmitter
     /// <summary>Writes such a value back into an object, piece by piece.</summary>
     private void StoreCoerced(string address, string value, ArgInfo info)
     {
+        // Wider than the value: write the registers into a copy of their own
+        // size and take back only the bytes the value has.
+        if (NeedsPadding(info))
+        {
+            string padded = PaddedCopy(info);
+            Line($"store {info.LlvmType} {value}, ptr {padded}");
+            MemCopy(address, padded, info.Type.Size);
+            return;
+        }
+
         if (info.Pieces.Count <= 1)
         {
             Line($"store {info.LlvmType} {value}, ptr {address}");

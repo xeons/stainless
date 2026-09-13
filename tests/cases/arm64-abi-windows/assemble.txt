@@ -1,0 +1,5 @@
+# The same shapes for Microsoft's ARM64, built to an object file and not run.
+#
+# It exists to make the claim testable rather than stated: AAPCS64 is one
+# classifier for both systems, and if Windows ever disagreed about any shape in
+# shapes.sl this case and arm64-abi would stop producing the same signatures.

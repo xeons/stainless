@@ -7,14 +7,24 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           792 pass
-dotnet run --project tests/Stainless.Tests      274 cases, 2 skipped on Windows
+dotnet test tests/Stainless.UnitTests           834 pass, Windows and Linux
+dotnet run --project tests/Stainless.Tests      278 cases, 2 skipped on Windows
+                                                268 pass, 12 skipped on Linux
 stainless doc --stdlib                          22 pages into docs/stdlib
 samples/forms/build.ps1 -Test                   1 failing check, see below
 ```
 
-Three of those cases build as real 32-bit binaries and are run. `--target x86`
-works on Windows; the Linux x86 rule is written and has never executed.
+**32-bit x86 now runs on both systems.** Four cases build as real 32-bit
+binaries and are executed: `x86-abi`, `x86-conventions`, `x86-runtime` and
+`x86-com`. The Linux half had been written off clang and never run, and running
+it found two things -- see "What running Linux x86 found" below.
+
+**ARM64 is classified and has never run**, which is a deliberate weaker claim:
+`tests/cases/arm64-abi` and `arm64-abi-windows` stop at an object file, because
+there is no ARM64 machine here and no ARM64 C library to link against. LLVM
+verifies the module and lowers every instruction in it, and `ir.txt` pins each
+signature against what clang writes for the same C. The suite calls such a case
+"assembled for <triple>" rather than passing a program.
 
 **The forms suite has one failure and it is not new.** "A tree node reads back
 its text" fails, and fails the same way at `6adca35` -- before any of the
@@ -24,13 +34,14 @@ first thing to look at.
 
 That Linux box (`ssh brandon@geekom-a7`) has GTK 2 and GTK 3,
 the development packages, Xvfb and `broadwayd`, so a GUI can be built *and run*
-there headlessly — see `bindings/gtk/README.md`. The suite has **not** been
-re-run there since the hardening pass below, and two of its fixes are worth
-checking before anything is claimed: the deep stack a compilation now runs on,
-and the literal typing, which changes what a mask means in the bindings.
+there headlessly — see `bindings/gtk/README.md`. The full suite **has** now been
+re-run there and passes; the forms suite has not, and two of the hardening
+fixes below are worth checking before anything is claimed about it: the deep
+stack a compilation now runs on, and the literal typing, which changes what a
+mask means in the bindings.
 
-`master` is ahead of `origin/master` by the documentation pass and the x86
-work.
+`master` and `origin/master` are level; the documentation pass and the x86 work
+that this file used to say were unpushed have been pushed.
 
 ## What was built, in order
 
@@ -79,9 +90,73 @@ work.
 | `1563cbb` | the comments left describing the code, and the arguments moved out |
 | `39f0448` | a pointer stops being eight bytes: `--target x86` |
 | `034b2ae` | the x86 classifier, and the calling conventions a declaration names |
-| *this one* | the 32-bit build is run rather than claimed |
+| `31d13fe` | the 32-bit build is run rather than claimed |
+| `fb5ba19` | the documentation says x86 is a target |
+| *this one* | Linux x86 runs, COM reaches x86, and ARM64 is classified |
 
 ## Findings worth keeping
+
+### What running Linux x86 found
+
+Both were failures at compile or link time rather than wrong answers, which is
+the good kind, and neither was in the classifier the entry was about. `X86Abi`'s
+i386 System V rule was right as written.
+
+**The runtime's lock storage was counted in pointers.** `SlMutex` and
+`SlCondition` are opaque storage sized for the largest platform primitive, and
+they were `void *opaque[5]` and `[6]` -- forty and forty-eight bytes on a
+64-bit machine, which is what glibc's `pthread_mutex_t` and `pthread_cond_t`
+need. On i386 those are 24 and 48 and a pointer is four, so the storage came
+out at twenty and twenty-four and `thread.c`'s own `_Static_assert` refused to
+compile it. A pthread primitive is not a row of pointers and does not shrink
+with one; they are counted in `long long` now.
+
+**Decoration was being applied to ELF.** `Mangler` decorated `__stdcall` on
+every x86 target, and the `@N` suffix is Microsoft's and reaches no further
+than PE. clang gives an i386 ELF `__stdcall` the convention -- the callee still
+removes the arguments -- and the plain name, which is what gcc has always done.
+So `x86-conventions` asked the linker for `_add_stdcall@8` and there was no
+such symbol. The rule is now the object format's rather than the
+architecture's, and the same correction applies to `__vectorcall` on x86-64,
+which was being decorated on Linux too.
+
+**`geekom-a7` cannot build a 32-bit binary and there is no password to fix
+that.** It has the i386 *runtime* libraries -- `/usr/lib/i386-linux-gnu` has
+`libc.so.6` and `ld-linux.so.2`, so a 32-bit binary runs -- and none of the
+development half: no `Scrt1.o`, no `crti.o`, no 32-bit `libc.so` or `libgcc`.
+Those come from `libc6-dev-i386` and `gcc-multilib`, `sudo` wants a password,
+and `apt-get download` works without one but leaves the flags to be threaded
+through a compiler driver nobody wants to teach. What runs there is a
+container: [tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile), the .NET
+SDK image plus `clang` and `gcc-multilib`, with the tree bind-mounted. The
+whole Linux suite runs in it, not only the 32-bit cases.
+
+### What ARM64 needed that the other three did not
+
+**The registers can cover more of a value than exists.** A twelve-byte struct
+travels in two eight-byte registers, so the load is sixteen bytes wide. Every
+other classifier here sizes its pieces to what the value actually occupies, and
+the emitter reads and writes them at the object's own address -- which on
+AAPCS64 would read four bytes that are not part of it, and, worse, write four
+that belong to whatever comes next. `ArgInfo.PaddedSize` says how far, and the
+emitter makes the copy clang makes.
+
+**`byval` is not a spelling of "indirect".** LLVM lowers `byval` to the value on
+the *outgoing stack* on every target. That is what System V AMD64 wants; Win64
+gets away with it; AAPCS64 wants a pointer in a general register, which is a
+different place read by a different instruction. Nothing diagnoses the
+difference -- the IR verifies, the program links, and the callee reads a
+register the caller never wrote. It was caught by reading the asm for a
+three-line `.ll` rather than by a test, because no test here can run one.
+
+**Windows and Linux agree about ARM64, and it is worth knowing why the tables
+looked different at first.** Compiling the same C for both triples gave
+different answers for `struct { long a, b; }` -- until the obvious: `long` is
+four bytes on Windows and eight on Linux, so the two files did not describe the
+same struct. Stainless has no type whose width depends on the system, so one
+classifier serves both, and `arm64-abi-windows` exists to keep that testable.
+
+### From before
 
 **A 32-bit build already linked and ran, and was silently wrong.** Before any
 of the target work, `--target x86` did not exist but the path did: clang was
@@ -820,9 +895,10 @@ dialogs are nearly free because `bindings/win32/Dialogs.sl` already has them;
 than any control, because a seam with one implementation has quietly stopped
 being a seam; and `grids.pas` is 14,000 lines that Windows has no widget for.
 
-0. **Push.** Fifteen commits are unpushed, and the last audit's numbers in the
-   README drift on every commit that adds a case — a unit test pinning them is
-   two hours and stops it for good.
+0. **Pin the README's numbers.** Nothing is unpushed any more, but the counts
+   in the README drift on every commit that adds a case and they were four
+   audits stale when this one found them — a unit test asserting them against
+   the two suites is two hours and stops it for good.
 0.5 **A registry, or a decision not to have one.** Resolution unifies sources
    rather than searching versions, because a path and a git tag each pin exactly
    one version and nothing can offer an alternative. That is honest and it is
@@ -865,9 +941,28 @@ being a seam; and `grids.pas` is 14,000 lines that Windows has no widget for.
   `git ls-files` keeps `bin/` and `obj/` out of it — a stale `obj/` from the
   other platform is what makes a synced tree fail in confusing ways:
   ```sh
-  tar -czf /tmp/sync.tgz $(git ls-files) <any-untracked-files>
+  tar -czf /tmp/sync.tgz $(git ls-files -c -o --exclude-standard)
   cat /tmp/sync.tgz | ssh brandon@geekom-a7 "mkdir -p ~/stainless-fix && tar -xzf - -C ~/stainless-fix"
   ```
+  `-c -o --exclude-standard` is tracked files *and* new ones that are not
+  ignored, which is what a work-in-progress tree needs: `git ls-files` alone
+  leaves out every case the run just wrote, and the suite then fails on cases
+  that are not there.
+- **Running the suite on that box, 32-bit cases included**, once the tree is
+  synced:
+  ```sh
+  docker build -t stainless-x86 -f tests/linux-x86.Dockerfile tests
+  docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -e DOTNET_CLI_HOME=/tmp       -v "$HOME/stainless-fix:/src" -w /src stainless-x86       bash -c 'dotnet build Stainless.slnx && dotnet run --project tests/Stainless.Tests --no-build'
+  ```
+  The container is only needed for `--target x86`; everything else builds
+  against the box's own clang. It is there because the box has the i386
+  runtime libraries and none of the development ones, and installing those
+  wants a password.
+- **Run that container as yourself.** Without `-u` the build is root's, and the
+  `bin/` and `obj/` it leaves in the bind-mounted tree belong to root: the next
+  sync cannot overwrite them and you cannot delete them without going back in
+  as root to do it. `HOME` goes with `-u`, because dotnet writes to one and the
+  container has no home directory for a borrowed uid.
 - **The first `dotnet build` after a sync onto Linux sometimes dies with
   `Internal CLR error (0x80131506)`.** It is transient: run it again and it is
   clean. It happened twice in an earlier run and neither time was real.

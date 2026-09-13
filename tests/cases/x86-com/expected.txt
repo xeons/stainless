@@ -1,0 +1,13 @@
+c: held 3, then 2
+c saw           15
+after c         15
+dropping:
+counter destroyed
+dropped
+native add 7    7
+native add 2    9
+native value    9
+releasing:
+c: native counter released
+native live     0
+end of Main

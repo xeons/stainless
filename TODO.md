@@ -41,35 +41,63 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
-### x86, and what is still missing from it
+### x86 and ARM64
 
-`--target x86` builds and runs on Windows, and the calling conventions came
-with it -- the entry that used to be here said they would become real the day a
-32-bit target was added, which was right. `tests/cases/x86-*` build as real
-32-bit binaries and are run by the suite.
+Three of the four entries that were here are done. What each turned out to be:
+
+**Linux x86 ran, and found two bugs a reading could not have.** `X86Abi`'s
+i386 System V rule was right as written -- every struct returned through a
+hidden pointer, whatever its size -- and the suite's four 32-bit cases pass on
+Linux now as they did on Windows. What was wrong was underneath it. The
+runtime's lock storage was counted in pointers, and glibc's i386
+`pthread_cond_t` is 48 bytes on a machine whose pointer is four, so `thread.c`'s
+own assertions refused to compile. And `Mangler` was decorating ELF: an i386
+`__stdcall` gets the convention and the plain name on Linux, which is what gcc
+has always done, so every `extern "C" __stdcall` went looking for a symbol
+nobody had emitted. Both were link-time or compile-time failures rather than
+wrong answers, which is the good kind.
+
+`geekom-a7` has no 32-bit development libraries and no password to install
+them; what runs there is a container, and
+[tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile) is the whole of it --
+the .NET SDK image plus `clang` and `gcc-multilib`.
+
+**COM on x86 was where the convention is attached, and the byte counts answer
+themselves.** A com interface's slots get `__stdcall` when the table is
+numbered, beside the slot number, because both belong to the table rather than
+to the declaration. The vtable's slot names carry no byte count and do not need
+one: a decoration exists so a disagreement about argument size is a link error,
+and a slot is reached by address. The three IUnknown slots are the exception,
+being C functions -- `SL_COM_METHOD` in the runtime header puts the convention
+on them and on the vtable's function pointers, and the emitter asks for the
+decorated name. [tests/cases/com-native](tests/cases/com-native) declares a COM
+vtable in C the way a COM header does and calls through it in both directions;
+`x86-com` is the same program as a 32-bit binary, and it stops working the
+moment the convention is removed.
+
+**ARM64 is classified and has never run.** `Aapcs64Abi` answers for both
+systems -- Microsoft's ARM64 ABI and ARM's agree about every shape asked -- and
+every answer was read off clang, as the other three classifiers were. Two
+things in it have no counterpart elsewhere: a homogeneous floating-point
+aggregate travels in one SIMD register per member whatever its size, and the
+registers may cover more of the value than exists, so a twelve-byte struct is
+read out of a padded copy. A large struct is a pointer and deliberately not
+`byval`, which LLVM lowers to the outgoing stack on every target.
+
+There is no ARM64 machine here and no ARM64 C library to link against, so
+`tests/cases/arm64-abi` stops at an object file: LLVM verifies the module and
+lowers every instruction in it, and `ir.txt` pins each signature against
+clang's. That is weaker than running a program and is meant to read that way.
 
 What is **not** done:
 
-**Linux x86 is written and not run.** `X86Abi` has the i386 System V rule --
-every struct returned through a hidden pointer, whatever its size -- and it was
-read off clang rather than guessed. Nothing has executed it: the suite runs
-what this machine can run, and that is Windows. The box at `geekom-a7` is where
-that gets settled.
-
-**COM on x86.** Every method of a COM interface is `__stdcall` there, and a
-`com interface`'s slots carry no convention -- so the declaration form exists
-and COM still does not reach x86. It is a small change to where the convention
-is attached, and a real question about whether the vtable's slot names should
-carry byte counts.
-
-**ARM64**, which the spec claims and nothing classifies: `ClassifyValue` picks
-between Win64, System V and x86, and AAPCS64 is none of them. A 64-bit pointer
-is what makes it work at all today.
-
 **`stdcall` on a Stainless-defined function.** `export "C" __stdcall` parses and
-emits, and nothing has called one from C across a real boundary.
+emits, and nothing has called one from C across a real boundary. The COM work
+above covers the shape of it -- an adjustor thunk is a Stainless-defined
+`__stdcall` function that C calls through a vtable -- but not the decorated
+symbol, which is what a named export turns on.
 
-*Touches:* `X86Abi`, `Binder.Inheritance` for the COM slots.
+*Touches:* `Mangler`, `tests/cases/x86-conventions`.
 
 ---
 

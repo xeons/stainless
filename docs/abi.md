@@ -1,4 +1,4 @@
-# Stainless ABI (x86-64 and x86: Win64, System V, and 32-bit x86)
+# Stainless ABI (x86-64, x86 and ARM64: Win64, System V, 32-bit x86 and AAPCS64)
 
 ## 1. Value layout
 
@@ -55,7 +55,9 @@ governs C++ name mangling as well.
 
 **`--abi` selects the struct convention as well** (§3.1): Microsoft gives
 Win64 and Itanium gives System V AMD64, so naming one gets that ABI's bit-field
-packing, C++ mangling *and* argument passing together.
+packing, C++ mangling *and* argument passing together. That last part is x86-64
+only — the architecture answers first on x86 and on ARM64, where the two
+systems disagree about more than names or agree about everything.
 
 A struct containing bit-fields is emitted as bytes — `%struct.Header = type
 { [4 x i8] }` — because its fields do not line up with LLVM's when several share
@@ -131,6 +133,15 @@ i386 System V returns *every* struct through a hidden pointer, whatever its
 size. Classifying a Linux x86 return by Windows' rule leaves the value in a
 register the caller never reads.
 
+Both systems are built *and run*:
+[tests/cases/x86-abi](../tests/cases/x86-abi), `x86-conventions`, `x86-runtime`
+and `x86-com` are 32-bit binaries that the suite executes, on Windows and on
+Linux. The Linux half had been written off clang and never executed, and
+running it the first time found two things a reading could not have: the
+runtime's lock storage was counted in pointers where a `pthread_cond_t` is 48
+bytes on a four-byte-pointer machine, and the name decoration below was being
+applied to ELF.
+
 ### 1.10 Calling conventions
 
 A declaration may name one, after the linkage string:
@@ -148,8 +159,8 @@ There is one convention on every 64-bit target, so `__cdecl`, `__stdcall` and
 `__fastcall` are accepted there and mean nothing. `__vectorcall` still differs
 on x64 and is emitted.
 
-On x86 each decorates the linker name, and the number is what the arguments
-occupy with each rounded up to a whole four-byte slot:
+On x86 each decorates the linker name **on Windows**, and the number is what
+the arguments occupy with each rounded up to a whole four-byte slot:
 
 | written | symbol for `int f(int, int)` | arguments in registers |
 |---|---|---|
@@ -165,6 +176,43 @@ them, so the alternative is an unbalanced stack and no diagnostic at all.
 For `__fastcall` and `__vectorcall` the registers go to the first parameters
 that fit one. A `long`, a `float` (under `__fastcall`) and a struct are each
 passed over rather than spending a register.
+
+**Decoration stops where PE does.** An i386 ELF `__stdcall` gets the convention
+— the callee still removes the arguments — and the plain name, which is what
+gcc has always done and what clang writes for `i686-unknown-linux-gnu`. It is
+the one part of a convention that is the object format's question rather than
+the architecture's, and getting it wrong is a link error rather than a wrong
+answer: the first 32-bit Linux build went looking for `_add_stdcall@8` and
+there was no such symbol. The same applies to `__vectorcall` on x86-64, which
+is decorated on Windows and not on Linux.
+
+## 1.11 ARM64
+
+`--target arm64` builds for 64-bit ARM, on Windows or Linux. A pointer is eight
+bytes, so nothing about the layout differs from x86-64 — what differs is how a
+struct crosses a call, which is §3.4's AAPCS64 rules.
+
+`--abi` still chooses the C++ name mangling and the bit-field packing here, as
+it does everywhere, and it no longer chooses the struct convention: there is
+one on this architecture and both systems use it.
+
+**One convention for both systems**, which is not true of either x86 target:
+Microsoft's ARM64 ABI and ARM's agree about every shape in
+[tests/cases/arm64-abi](../tests/cases/arm64-abi), checked by compiling the
+same C for `aarch64-pc-windows-msvc` and `aarch64-unknown-linux-gnu` and
+diffing the declarations. What differs between those two is how wide a C
+`long` is, and Stainless has no type whose width depends on the system.
+
+There is also one *calling* convention, so `__stdcall` and its relatives are
+accepted and mean nothing, and nothing is decorated.
+
+**Nothing here has executed an ARM64 binary.** There is no ARM64 machine in
+this project and no ARM64 C library to link against, so the two cases stop at
+an object file: clang reads the module, LLVM's verifier goes over it, and the
+back end lowers every instruction in it for aarch64. `ir.txt` then pins each
+signature against the one clang writes for the same C. That is weaker than
+running a program and is meant to read that way — a signature that is right in
+every register and wrong about which of them is callee-saved would pass.
 
 ## 2. Object header (class instances)
 
@@ -586,6 +634,30 @@ interface's table is its base's with its own methods appended and a derived
 reference already satisfies the base — the table-side twin of §2.0's rule about
 objects.
 
+**Every slot is `__stdcall` on x86**, on Windows and everywhere else. That is
+part of the binary contract rather than a Windows detail: a COM callee removes
+its own arguments, and a caller that disagreed would unbalance the stack with
+nothing to say so. The convention is not written on a `com interface` — it is
+stamped on when the table is numbered, the same way a slot number is, because
+both belong to the table rather than to the declaration. There is one
+convention on every 64-bit target, so off x86 this changes nothing.
+
+The slot *names* carry no byte count, and do not need one. A decoration exists
+so that a caller and a callee disagreeing about the argument size is a link
+error (§1.10), and a vtable slot is reached by address rather than by name; a
+Stainless-mangled name already states its parameters in any case. The
+exception is the three IUnknown slots, which are C functions in the runtime:
+on x86 Windows they are linked as `_sl_com_object_add_ref@4` and its two
+relatives, and on ELF as themselves.
+
+The C side of that contract is `SL_COM_METHOD` in
+[runtime/stainless.h](../runtime/stainless.h), which goes on the three
+functions and on the vtable's function pointers alike — a call *through* a slot
+is where the disagreement would happen.
+[tests/cases/com-native](../tests/cases/com-native) declares a COM vtable in C
+the way a COM header does and calls through it in both directions, and
+`x86-com` is the same program as a 32-bit binary.
+
 ### 2.9.1 A com class
 
 A `com class` is an ordinary object with tear-offs after its fields:
@@ -658,6 +730,11 @@ typedef struct SlComLayout { size_t count; const SlComEntry *entries; } SlComLay
     [{ ptr, i64 } { ptr @_SLiid_Com_ILoudGreeter, i64 32 },
      { ptr, i64 } { ptr @_SLiid_Com_IGreeter,     i64 48 }]
 ```
+
+`size_t`, so on a 32-bit target the count and the offsets are `i32` and the
+entry array's stride is eight rather than sixteen. Written as `i64` there, the
+runtime read the second entry out of the middle of the first and
+QueryInterface answered with whatever that happened to be.
 
 A linear scan, because QueryInterface is called when a reference changes hands
 rather than in a loop. `IUnknown` is answered by the first entry's tear-off
@@ -856,6 +933,41 @@ The case now also *runs* on Linux, where a wrong classification is a wrong
 answer rather than a wrong text — which is how the bit-field mistake above was
 found, by `bitfield-interop` handing a struct to a C function that read it back
 as zero.
+
+**AAPCS64** asks a different first question: whether every member is the same
+floating-point type. Four or fewer of them and no padding makes a *homogeneous
+floating-point aggregate*, which travels in one SIMD register per member —
+however big it is, so four doubles cross in `v0`–`v3` at thirty-two bytes where
+a twenty-four-byte struct of integers does not cross at all. Everything else of
+sixteen bytes or less goes in one or two general registers; everything larger
+is a pointer to a copy the caller made.
+
+| the struct | argument | result |
+|---|---|---|
+| `{ float; float; float; }` | `[3 x float]` | itself |
+| `{ double x4 }` (32 bytes) | `[4 x double]` | itself |
+| `{ char; char; char; }` | `i64` | `i24` |
+| `{ int; int; int; }` (12 bytes) | `[2 x i64]` | `[2 x i64]` |
+| `{ void*; void*; }` | `[2 x ptr]` | `[2 x i64]` |
+| `[Align(16)] { long; long; }` | `i128` | `i128` |
+| `{ long; long; char; }` (24 bytes) | `ptr` | `sret` |
+
+Three of those are worth saying out loud, because each is a place a reasonable
+guess is wrong:
+
+- **The two directions disagree below eight bytes.** An argument register is
+  sized by the register and a result by the value, so a three-byte struct goes
+  out as an `i64` and comes back as an `i24`. System V sizes both by the value.
+- **The registers may cover more than the value does.** A twelve-byte struct
+  travels in two eight-byte registers, so the load is sixteen bytes wide and is
+  made from a padded copy rather than from the object — reading the object
+  would read four bytes that are not part of it, and writing it would overwrite
+  four that belong to whatever comes next. clang makes the same copy.
+- **A large struct is not `byval`.** AAPCS64 puts a pointer to the caller's copy
+  in a general register; LLVM lowers `byval` to the value on the outgoing stack
+  on every target, which is a different place read by a different instruction,
+  and nothing diagnoses the difference. So the pointer is spelled out and the
+  copy is made by the emitter.
 
 ## 4. Static storage
 

@@ -630,19 +630,31 @@ public sealed partial class LlvmEmitter
             var info = ClassifyValue(structType);
             if (info.Style == PassStyle.Indirect)
             {
-                // Win64 passes a pointer to a copy the caller owns.
+                // Win64 passes a pointer to a copy the caller owns, and so does
+                // AAPCS64 -- the difference is only whether LLVM is told to
+                // make the copy itself.
                 string copy = Alloca(StructName(structType), "arg.copy");
                 MemCopy(copy, value.Ref, structType.Size);
-                arguments.Add($"ptr byval({StructName(structType)}) {copy}");
+                arguments.Add(info.IndirectAsPointer
+                    ? $"ptr {copy}"
+                    : $"ptr byval({StructName(structType)}) {copy}");
             }
             else
             {
                 // One argument per register, each read from the eight bytes it
-                // stands for.
+                // stands for -- out of a padded copy where the registers reach
+                // past the value.
+                string source = value.Ref;
+                if (NeedsPadding(info))
+                {
+                    source = PaddedCopy(info);
+                    MemCopy(source, value.Ref, structType.Size);
+                }
+
                 for (int piece = 0; piece < info.Pieces.Count; piece++)
                 {
                     string spelling = info.Pieces[piece];
-                    string address = PieceAddress(value.Ref, piece);
+                    string address = PieceAddress(source, piece);
                     arguments.Add(
                         $"{spelling} {Emit(spelling, $"load {spelling}, ptr {address}")}");
                 }

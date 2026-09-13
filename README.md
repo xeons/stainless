@@ -865,7 +865,8 @@ extern "C" void* mmap(void* at, nuint size, int prot, int flags, int fd, long of
 A branch that is not taken is never lexed, so it need not parse — a platform you
 have never built on is text until the day you do. `WINDOWS`, `LINUX`, `MACOS`,
 `UNIX`, `X64`, `ARM64` and `STAINLESS` are defined for you; everything else
-comes from `-D`:
+comes from `-D`. The architecture is the one being built *for*, so
+`--target x86` defines `X86` rather than the host's `X64`:
 
 ```
 stainless build src -D FASTMATH
@@ -939,8 +940,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 249 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 563 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 280 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 834 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -949,12 +950,19 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 249 cases, of which 10 are
-Windows-only and 2 are Linux-only, so Linux runs 239 and Windows 247, each
+**Both Windows and Linux are tested.** 280 cases, of which 12 are
+Windows-only and 2 are Linux-only, so Linux runs 268 and Windows 278, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.
+
+Four of those cases are real 32-bit binaries, built and run on both systems, and
+two are built for ARM64 and not run: there is no ARM64 machine here, so they
+stop at an object file LLVM verified and lowered, with their signatures pinned
+against clang's. Building 32-bit on Linux needs the development half of the
+multilib packages, which is what
+[tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile) is for.
 
 macOS is not tested. Nothing in the compiler is Windows-only and the runtime's
 `#ifdef`s have a POSIX branch that Linux exercises, so it is likely close; the
@@ -995,8 +1003,9 @@ stainless restore              resolve dependencies and lock them
                           '#pragma comment(lib, "user32")')
   --abi <microsoft|itanium>  which C and C++ ABI to agree with: names,
                          bit-fields and how a struct is passed
-  --target <name>        the machine to build for: x64 (the default) or x86,
-                         optionally with a system -- x86-windows, x86-linux
+  --target <name>        the machine to build for: x64 (the default), x86 or
+                         arm64, optionally with a system -- x86-windows,
+                         x86-linux, arm64-windows, arm64-linux
   --keep                 keep the generated .ll
   --obj <dir>            directory for intermediates (default ./obj)
   -h, --help  -v, --version
@@ -1305,14 +1314,26 @@ Everything below is covered by [the test suite](tests/cases).
   counted in words rather than in eights. Every struct travels on the stack,
   because there are no argument registers to classify into; returns are where
   the two systems part company, and Windows returns a struct of 1, 2, 4 or 8
-  bytes in a register where i386 System V returns every struct in memory
+  bytes in a register where i386 System V returns every struct in memory. Both
+  systems are built *and run* by the suite, as real 32-bit binaries
+- **ARM64**, with `--target arm64`, and one classifier for both systems because
+  Microsoft's ARM64 ABI and ARM's agree about every shape asked. A struct whose
+  members are all the same floating-point type, four or fewer of them and no
+  padding, travels in one SIMD register each however big it is; everything else
+  of sixteen bytes or less goes in one or two general registers, and everything
+  larger is a pointer to a copy. Nothing here has *run* an ARM64 binary: there
+  is no such machine and no ARM64 C library to link against, so the cases stop
+  at an object file that LLVM verified and lowered, with the signatures pinned
+  against clang's
 - **Calling conventions** a declaration can name: `__cdecl`, `__stdcall`,
   `__fastcall` and `__vectorcall`, written after the linkage string and
   applying to one declaration or to a whole `extern "C"` block. On x64 only
-  `__vectorcall` differs; on x86 each decorates the linker name with what its
-  arguments occupy — `_f@8` for `__stdcall` — which is what makes a caller and
-  a callee disagreeing about the count a link error rather than an unbalanced
-  stack
+  `__vectorcall` differs, and ARM64 has one convention at all; on x86 each
+  decorates the linker name with what its arguments occupy — `_f@8` for
+  `__stdcall` — which is what makes a caller and a callee disagreeing about the
+  count a link error rather than an unbalanced stack. Decoration is Microsoft's
+  and stops where PE does: an i386 ELF `__stdcall` gets the convention and the
+  plain name, which is what gcc has always done
 - `[Packed]` and `[Align(N)]`: no padding at all, and a raised alignment. Both
   are rules about layout rather than library features, so neither needs an
   import; they combine, N is a power of two capped at 16, and both apply to a
@@ -1368,7 +1389,10 @@ Everything below is covered by [the test suite](tests/cases).
   platform. ARC drives `AddRef` and `Release`, `is` and a cast are
   `QueryInterface`, and `[Guid("...")]` folds to a constant `iidof` names. A
   com class presents vtables from an ordinary object through tear-offs, one per
-  interface, each with the distance back that lets a `Release` find the header
+  interface, each with the distance back that lets a `Release` find the header.
+  Every slot is `__stdcall` on x86 — part of the contract rather than a Windows
+  detail — which a `com interface` does not have to say, because the convention
+  is stamped on when its table is numbered
 - `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
   false for null, so a test through a `C?` asks about null and about the class
   at once; a cast that does not hold names what the object really is and ends
@@ -1761,8 +1785,9 @@ Everything below is covered by [the test suite](tests/cases).
   condition grammar, plus `#pragma comment(lib, "...")` so a file can name the
   library it needs. A branch that is not taken is never lexed, so it need not
   parse. `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD`, `UNIX`, `X64`, `ARM64`, `X86`,
-  `ARM` and `STAINLESS` describe the target; `-D` adds the rest. No macros and
-  no `#include`: a name always means itself
+  `ARM` and `STAINLESS` describe the target — the architecture one follows
+  `--target`, so a binding guarded by `#if X86` compiles the half it means to;
+  `-D` adds the rest. No macros and no `#include`: a name always means itself
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
@@ -1913,9 +1938,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   there is no entry point to initialize one from (SL0380). There is no
   per-thread storage either, and no automatic static property -- its backing
   storage would have no initializer, which is the one moment a static has.
-- **COM is x64 and ARM64 only.** Every method of a COM interface is
-  `__stdcall` on x86, and a `com interface`'s slots carry no calling
-  convention — so `--target x86` builds, and COM still does not reach it.
 - **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
   to a `uint` parameter without a cast, which is why
   [bindings/win32](bindings/win32) spells its constants as bare `const uint`

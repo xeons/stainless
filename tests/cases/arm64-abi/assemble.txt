@@ -1,0 +1,4 @@
+# Built to an ARM64 object file and not run: nothing here is an ARM64 machine,
+# and no ARM64 C library is installed to link against. What this does prove is
+# that LLVM verifies the module and lowers every instruction in it for aarch64,
+# which is where a signature the target cannot express would fail.

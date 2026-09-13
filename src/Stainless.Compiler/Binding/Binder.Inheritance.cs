@@ -254,9 +254,21 @@ public sealed partial class Binder
 
         // A slot number is all that makes a call dispatch; `IsVirtual` records
         // that the word was written, and on a com interface method it never is.
+        //
+        // The convention is stamped on here for the same reason the slot number
+        // is: both belong to the table rather than to the declaration, and
+        // nobody writes either. On x86 every method of a COM vtable is
+        // `__stdcall` -- the callee removes the arguments -- and a slot that
+        // disagreed would unbalance the stack of whatever called through it,
+        // with nothing to say so. Here rather than at the four places a slot's
+        // symbol can be built: a method, a property's getter and setter, an
+        // event's pair. There is one convention on every 64-bit target, so off
+        // x86 this changes nothing.
         foreach (var method in type.Methods)
         {
             method.VirtualSlot = type.VirtualTable.Count;
+            if (TargetPlatform.Current.HasCallingConventions)
+                method.CallingConvention = Syntax.CallingConvention.Stdcall;
             type.VirtualTable.Add(method);
         }
 

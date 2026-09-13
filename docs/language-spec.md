@@ -4494,6 +4494,15 @@ So a com interface can name an object another language made, which is the
 point, and carries no Stainless header, which is the cost: it cannot be
 compared for identity, reflected on, or held `weak`.
 
+**Every slot is `__stdcall` on x86**, and a `com interface` does not say so:
+the convention is stamped on when its table is numbered, the same way the slot
+number is, because both belong to the table rather than to the declaration. It
+is part of the binary contract rather than a Windows detail — a COM callee
+removes its own arguments, so a caller that disagreed would unbalance the stack
+with nothing to report it. There is one convention on every 64-bit target, so
+`--target x86` is where this is the whole of the difference and everywhere else
+it is nothing.
+
 **Every com interface extends `IUnknown`**, written or not, so a declaration's
 own first method is slot 3. Extension is **single**: a COM vtable is one array
 and a reference is one pointer to it, so there is room for one chain (SL0530).
@@ -4612,10 +4621,6 @@ programmer knows that this does not do for them.
   does for the shell's half.
 - **A com class cannot derive from a class** (SL0536): the tear-offs sit after
   the fields, and a derived class adds fields after those.
-- **x64 and ARM64 only.** On x86 every COM method is `__stdcall` and each
-  vtable slot's name carries a byte count. The language has `__stdcall` now and
-  `--target x86` builds, but a `com interface`'s slots are not declared with a
-  convention, so COM on x86 is still not reachable.
 - **No `[Guid]` on a class**, so a com class has a layout and no CLSID. It is
   reached by being handed out, not by being asked for.
 
@@ -5278,7 +5283,7 @@ only.
 |---|---|
 | `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD` | the operating system |
 | `UNIX` | any of the above but Windows |
-| `X64`, `ARM64`, `X86`, `ARM` | the architecture |
+| `X64`, `ARM64`, `X86`, `ARM` | the architecture being built for |
 | `STAINLESS` | always |
 
 Everything else comes from `-D` on the command line:

@@ -197,19 +197,25 @@ public sealed partial class LlvmEmitter
                     $"[{slots.Count} x ptr] [{string.Join(", ", slots)}]");
             }
 
+            // SlComEntry is { const SlGuid *iid; size_t offset; } and SlComLayout
+            // is { size_t count; const SlComEntry *entries; }, so the offsets
+            // and the count are a word wide and not eight bytes. Written as
+            // eight, a 32-bit build put the entry array's stride at sixteen
+            // where the runtime read it at eight, and QueryInterface answered
+            // with whatever was next.
             var entries = classType.ComInterfaces
                 .Select(presented =>
-                    $"{{ ptr, i64 }} {{ ptr @{IidName(presented)}, " +
-                    $"i64 {classType.TearOffOffset(presented)} }}")
+                    $"{{ ptr, {Word} }} {{ ptr @{IidName(presented)}, " +
+                    $"{Word} {classType.TearOffOffset(presented)} }}")
                 .ToList();
 
             _module.AppendLine(
                 $"@{ComLayoutName(classType)}_entries = internal constant " +
-                $"[{entries.Count} x {{ ptr, i64 }}] [{string.Join(", ", entries)}]");
+                $"[{entries.Count} x {{ ptr, {Word} }}] [{string.Join(", ", entries)}]");
 
             _module.AppendLine(
-                $"@{ComLayoutName(classType)} = internal constant {{ i64, ptr }} " +
-                $"{{ i64 {entries.Count}, ptr @{ComLayoutName(classType)}_entries }}");
+                $"@{ComLayoutName(classType)} = internal constant {{ {Word}, ptr }} " +
+                $"{{ {Word} {entries.Count}, ptr @{ComLayoutName(classType)}_entries }}");
         }
     }
 
@@ -224,12 +230,12 @@ public sealed partial class LlvmEmitter
         ClassTypeSymbol classType, ComInterfaceTypeSymbol presented, FunctionSymbol required)
     {
         if (required.ContainingType is ComInterfaceTypeSymbol { SimpleName: "IUnknown" })
-            return required.VirtualSlot switch
+            return "ptr " + (required.VirtualSlot switch
             {
-                0 => "ptr @sl_com_object_query",
-                1 => "ptr @sl_com_object_add_ref",
-                _ => "ptr @sl_com_object_release",
-            };
+                0 => ComRuntimeSymbol("sl_com_object_query", 3),
+                1 => ComRuntimeSymbol("sl_com_object_add_ref", 1),
+                _ => ComRuntimeSymbol("sl_com_object_release", 1),
+            });
 
         var found = classType.FindImplementation(required);
         if (found is null) return "ptr null";
@@ -238,6 +244,35 @@ public sealed partial class LlvmEmitter
         // method's slot but has its own tear-off, so the two tables need two
         // thunks for the one method, subtracting two different distances.
         return $"ptr @{AdjustorName(classType, presented, required.VirtualSlot)}";
+    }
+
+    /// <summary>
+    /// The runtime's IUnknown, as the linker will have it.
+    ///
+    /// These three sit in a COM vtable, so on x86 they are <c>__stdcall</c> like
+    /// every other slot -- and Microsoft's decoration then makes the argument
+    /// bytes part of the symbol, so <c>sl_com_object_add_ref</c> is linked as
+    /// <c>_sl_com_object_add_ref@4</c>. The <c>\01</c> tells LLVM that is the
+    /// whole name and not to add the target's underscore to one that has it.
+    ///
+    /// ELF decorates nothing, whatever the convention, so an x86 Linux build
+    /// gets the convention and the plain name. This is the answer to whether a
+    /// vtable's slot names carry byte counts: these three do, because they are
+    /// C names, and no Stainless-linkage slot does -- a mangled name already
+    /// states the parameters, and a slot is reached by address in any case.
+    /// </summary>
+    /// <param name="words">
+    /// How many stack slots the arguments occupy, the receiver included. Every
+    /// parameter of these three is one pointer.
+    /// </param>
+    private static string ComRuntimeSymbol(string name, int words)
+    {
+        var target = Binding.TargetPlatform.Current;
+
+        if (target.Architecture != Binding.TargetArch.X86) return "@" + name;
+        if (!target.IsWindows) return "@" + name;
+
+        return $"@\"\\01_{name}@{words * target.PointerWidth}\"";
     }
 
     private static string AdjustorName(
@@ -297,8 +332,15 @@ public sealed partial class LlvmEmitter
         int offset = classType.TearOffOffset(presented);
         string name2 = AdjustorName(classType, presented, required.VirtualSlot);
 
+        // The thunk is what COM calls, so it carries the slot's convention --
+        // read off the interface's own method rather than decided here, so a
+        // thunk and the vtable it goes in cannot drift apart. The call below
+        // keeps the target's, which on x86 is the default: a com class's
+        // methods are reached from Stainless directly and from COM through
+        // this.
         _module.AppendLine(
-            $"define internal {returnType} @{name2}({string.Join(", ", declared)}) {{");
+            $"define internal {Convention(required)}{returnType} " +
+            $"@{name2}({string.Join(", ", declared)}) {{");
         _module.AppendLine(
             $"  %obj = getelementptr inbounds i8, ptr %self, i64 -{offset}");
 

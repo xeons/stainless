@@ -49,6 +49,15 @@ namespace Stainless.Tests;
 /// cannot run what it built would need this skipped, and Windows and Linux both
 /// run x86 binaries on x86-64.
 ///
+/// A case containing assemble.txt is compiled to IR and then to an object file
+/// for its target, and is never run. That is for a target no machine here can
+/// link for, let alone execute -- ARM64 -- and it is deliberately the weaker
+/// thing: LLVM's verifier reads the whole module and the back end lowers every
+/// instruction in it, so a signature the target cannot express fails, and a
+/// program that would have printed the wrong number does not. Such a case has
+/// ir.txt rather than expected.txt, because the text is all the evidence there
+/// is.
+///
 /// A case containing debug.txt is additionally built with debug information, and
 /// every line of that file must appear somewhere in the generated IR. Linking at
 /// all is most of the test: clang runs LLVM's verifier over the metadata, so a
@@ -236,8 +245,6 @@ internal static class Program
             .Concat(Directory.EnumerateFiles(directory, "*.cpp"))
             .OrderBy(p => p, StringComparer.Ordinal).ToList();
 
-        if (sources.Count == 0) return (false, "the case directory contains no .sl files");
-
         string name = Path.GetFileName(directory);
 
         // Sources from outside the case, named relative to the repository root.
@@ -252,17 +259,36 @@ internal static class Program
                 sources.AddRange(Directory
                     .EnumerateFiles(path, "*.sl", SearchOption.AllDirectories)
                     .OrderBy(f => f, StringComparer.Ordinal));
+
+            // A named .c or .cpp is the other half of a program rather than a
+            // Stainless source, and goes where the case's own natives go. Only
+            // a file named outright: a directory means a Stainless library.
+            else if (path.EndsWith(".c", StringComparison.OrdinalIgnoreCase) ||
+                     path.EndsWith(".cpp", StringComparison.OrdinalIgnoreCase))
+                natives.Add(path);
+
             else
                 sources.Add(path);
         }
+
+        // After sources.txt rather than before it: a case whose whole program
+        // is another case's is how the same program gets asked a second
+        // question -- arm64-abi-windows builds arm64-abi's shapes for the other
+        // system, and a copy of the file would be a copy that drifts.
+        if (sources.Count == 0)
+            return (false, "the case has no .sl files of its own and no sources.txt naming any");
 
         var libraries = Lines(directory, "libraries.txt");
 
         string expectedOutputPath = ExpectedOutputPath(directory);
         string expectedErrorsPath = Path.Combine(directory, "errors.txt");
 
+        // A case built for a target nothing here can run says so, and is then
+        // measured by its IR rather than by its output.
+        bool assembleOnly = File.Exists(Path.Combine(directory, "assemble.txt"));
+
         bool expectsFailure = File.Exists(expectedErrorsPath);
-        if (!expectsFailure && !File.Exists(expectedOutputPath))
+        if (!expectsFailure && !assembleOnly && !File.Exists(expectedOutputPath))
             return (false, "the case has neither expected.txt nor errors.txt");
 
         string caseWork = Path.Combine(workDirectory, name);
@@ -364,6 +390,7 @@ internal static class Program
             Defines = defines,
             Libraries = libraries,
             CppAbi = abi,
+            EmitIrOnly = assembleOnly,
         };
 
         CompilationResult result;
@@ -430,6 +457,35 @@ internal static class Program
             string detail = result.DriverError
                 ?? string.Join("\n", result.Diagnostics.Select(d => d.Render(color: false)));
             return (false, "compilation failed:\n" + detail);
+        }
+
+        // A case for a target this machine cannot link for stops at the object
+        // file: clang reads the module, LLVM verifies it, and the back end
+        // lowers it to that machine's instructions. ir.txt is then what says
+        // the signatures are the ones the C compiler would have written.
+        if (assembleOnly)
+        {
+            var toolchain = Toolchain.Locate(out string toolchainError);
+            if (toolchain is null) return (false, toolchainError);
+
+            var assembled = toolchain.Assemble(
+                result.IrPath!, Path.Combine(caseWork, name + ".o"),
+                target ?? Binding.TargetPlatform.Host);
+
+            if (!assembled.Success)
+                return (false, "the IR did not assemble for " +
+                               $"{(target ?? Binding.TargetPlatform.Host).Triple}:\n" +
+                               assembled.StandardError.TrimEnd());
+
+            string pinned = Path.Combine(directory, "ir.txt");
+            if (!File.Exists(pinned))
+                return (false, "an assemble-only case needs ir.txt: nothing else looks at it");
+
+            if (MissingFromIr(pinned, result.Ir) is { Count: > 0 } absent)
+                return (false, "the generated IR is missing:" + Environment.NewLine + "  " +
+                               string.Join(Environment.NewLine + "  ", absent));
+
+            return (true, $"assembled for {(target ?? Binding.TargetPlatform.Host).Triple}");
         }
 
         // A library is exercised through a C consumer, not run directly.

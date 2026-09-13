@@ -1,0 +1,2 @@
+tests/cases/com-native/counter.sl
+tests/cases/com-native/counter.c

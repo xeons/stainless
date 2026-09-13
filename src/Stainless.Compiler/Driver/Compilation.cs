@@ -697,17 +697,29 @@ public sealed class Compilation
     /// be a rule nobody asked for.
     /// </summary>
     private static HashSet<string> BuildSymbols(CompilationOptions options) =>
-        PlatformSymbols(options.Defines);
+        PlatformSymbols(options.Defines, options.Target);
 
     /// <summary>
-    /// What <c>#if</c> can see: the host's platform and architecture, plus
-    /// whatever <c>-D</c> added.
+    /// What <c>#if</c> can see: the platform and architecture being built for,
+    /// plus whatever <c>-D</c> added.
     ///
+    /// <para>
+    /// The architecture is the <i>target's</i> and not the host's, which is
+    /// what a cross build needs it to be: <c>--target x86</c> on an x86-64 box
+    /// used to define <c>X64</c>, so a binding guarded by <c>#if X86</c> would
+    /// have compiled the wrong half of itself. The operating system is still
+    /// the host's, because a target does not yet change which platform the
+    /// standard library binds to.
+    /// </para>
+    ///
+    /// <para>
     /// Public because anything that drives the front end directly -- the unit
     /// tests, above all -- has to lex with the same set the compiler does, and
     /// a second copy of this list would drift the first time one gained a name.
+    /// </para>
     /// </summary>
-    public static HashSet<string> PlatformSymbols(IEnumerable<string> defines)
+    public static HashSet<string> PlatformSymbols(
+        IEnumerable<string> defines, Binding.TargetPlatform? target = null)
     {
         var symbols = new HashSet<string>(StringComparer.Ordinal) { "STAINLESS" };
 
@@ -716,13 +728,11 @@ public sealed class Compilation
         if (OperatingSystem.IsMacOS()) { symbols.Add("MACOS"); symbols.Add("UNIX"); }
         if (OperatingSystem.IsFreeBSD()) { symbols.Add("FREEBSD"); symbols.Add("UNIX"); }
 
-        symbols.Add(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture switch
+        symbols.Add((target ?? Binding.TargetPlatform.Host).Architecture switch
         {
-            System.Runtime.InteropServices.Architecture.X64 => "X64",
-            System.Runtime.InteropServices.Architecture.Arm64 => "ARM64",
-            System.Runtime.InteropServices.Architecture.X86 => "X86",
-            System.Runtime.InteropServices.Architecture.Arm => "ARM",
-            var other => other.ToString().ToUpperInvariant(),
+            Binding.TargetArch.X86 => "X86",
+            Binding.TargetArch.Arm64 => "ARM64",
+            _ => "X64",
         });
 
         foreach (string defined in defines) symbols.Add(defined);

@@ -50,6 +50,33 @@ public sealed record ArgInfo(PassStyle Style, string LlvmType, TypeSymbol Type)
     /// eight bytes of the value at that offset. Empty for every other style.
     /// </summary>
     public IReadOnlyList<string> Pieces { get; init; } = [];
+
+    /// <summary>
+    /// How many bytes <see cref="Pieces"/> covers, when that is more than the
+    /// value occupies. Zero -- meaning they cover it exactly -- for every
+    /// convention but AAPCS64, where a twelve-byte struct travels in two
+    /// eight-byte registers.
+    ///
+    /// It matters because a coerced value is read from and written to the
+    /// object itself. Where the registers reach past it, a padded copy has to
+    /// stand in: reading the object would read bytes that are not part of it,
+    /// and writing it would overwrite bytes that belong to something else.
+    /// </summary>
+    public int PaddedSize { get; init; }
+
+    /// <summary>
+    /// True when an <see cref="PassStyle.Indirect"/> argument is a pointer to a
+    /// copy the caller made, rather than the copy itself.
+    ///
+    /// System V and Win64 say <c>byval</c>, which hands LLVM the copying as
+    /// well as the pointer. AAPCS64 cannot: LLVM lowers <c>byval</c> to the
+    /// value on the outgoing stack on every target, and AAPCS64 wants a
+    /// pointer in a general register -- a different place, read by a different
+    /// instruction, with nothing to diagnose the difference.
+    ///
+    /// A return is unaffected: <c>sret</c> is a hidden pointer everywhere.
+    /// </summary>
+    public bool IndirectAsPointer { get; init; }
 }
 
 /// <summary>

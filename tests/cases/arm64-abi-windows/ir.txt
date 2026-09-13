@@ -1,0 +1,40 @@
+# The same expectations as arm64-abi, for aarch64-pc-windows-msvc rather than
+# for Linux -- which is the point of the case. ../arm64-abi/shapes.c is the C
+# they came from; clang writes the same declarations for both triples, modulo
+# the dso_local it puts on a Windows one.
+
+# Twelve bytes, not homogeneous: two general registers going out, and one
+# sixteen-byte value coming back.  clang: i32 @sum_tri([2 x i64])
+define i32 @_SL8ArmProbe7sum_triS12ArmProbe_TriEi([2 x i64] %arg.v) {
+
+# Homogeneous, so a register per member and size does not come into it. Quad is
+# thirty-two bytes.  clang: float @sum_trio([3 x float]), double @sum_quad([4 x double])
+define float @_SL8ArmProbe8sum_trioS13ArmProbe_TrioEf([3 x float] %arg.v) {
+define double @_SL8ArmProbe8sum_quadS13ArmProbe_QuadEd([4 x double] %arg.v) {
+
+# Twenty-four bytes and not homogeneous: a pointer to the caller's copy, and
+# deliberately not 'byval' -- LLVM lowers that to the value on the outgoing
+# stack, which is a different place and a different register.
+# clang: i64 @sum_big(ptr dead_on_return noundef)
+define i64 @_SL8ArmProbe7sum_bigS12ArmProbe_BigEl(ptr %arg.v) {
+
+# Nothing but pointers, so they stay pointers on the way in -- and do not on the
+# way back, where clang spells every register an integer.
+# clang: i64 @count_twins([2 x ptr]), [2 x i64] @make_twins()
+define i64 @_SL8ArmProbe11count_twinsS14ArmProbe_TwinsEl([2 x ptr] %arg.v) {
+define [2 x i64] @_SL8ArmProbe10make_twinsvES14ArmProbe_Twins() {
+
+# Three bytes: an argument register is sized by the register and a result by the
+# value, which is the one place the two directions disagree.
+# clang: i32 @sum_small(i64), i24 @make_small()
+define i32 @_SL8ArmProbe9sum_smallS14ArmProbe_SmallEi(i64 %arg.v) {
+define i24 @_SL8ArmProbe10make_smallvES14ArmProbe_Small() {
+
+# A homogeneous aggregate comes back as itself rather than as an array of its
+# members.  clang: %struct.Trio @make_trio()
+define %struct.ArmProbe_Trio @_SL8ArmProbe9make_triovES13ArmProbe_Trio() {
+
+# And the twelve-byte struct's registers reach four bytes past it, so they are
+# written somewhere that has room and the object takes back only its own size.
+%coerce.s1 = alloca [2 x i64], align 8
+call void @llvm.memcpy.p0.p0.i64(ptr %v.s0, ptr %coerce.s1, i64 12, i1 false)

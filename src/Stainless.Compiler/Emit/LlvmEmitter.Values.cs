@@ -171,6 +171,11 @@ public sealed partial class LlvmEmitter
         "i1" or "i8" => 1,
         "i16" => 2,
         "i32" or "float" => 4,
+
+        // AAPCS64's sixteen-byte register, which is aligned the way the value
+        // that asked for it is.
+        "i128" => 16,
+
         _ when llvmType.StartsWith('%') =>
             _structAlignment.TryGetValue(llvmType, out int declared) ? declared : 1,
         _ => 8,
