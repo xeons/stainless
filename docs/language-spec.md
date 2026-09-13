@@ -4612,9 +4612,10 @@ programmer knows that this does not do for them.
   does for the shell's half.
 - **A com class cannot derive from a class** (SL0536): the tear-offs sit after
   the fields, and a derived class adds fields after those.
-- **x64 and ARM64 only**, like the rest of the language. On x86 every COM
-  method is `__stdcall` and the name carries a byte count; on x64 there is one
-  calling convention and the question does not arise.
+- **x64 and ARM64 only.** On x86 every COM method is `__stdcall` and each
+  vtable slot's name carries a byte count. The language has `__stdcall` now and
+  `--target x86` builds, but a `com interface`'s slots are not declared with a
+  convention, so COM on x86 is still not reachable.
 - **No `[Guid]` on a class**, so a com class has a layout and no CLSID. It is
   reached by being handed out, not by being asked for.
 

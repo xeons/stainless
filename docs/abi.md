@@ -1,4 +1,4 @@
-# Stainless ABI (x86-64: Win64 and System V)
+# Stainless ABI (x86-64 and x86: Win64, System V, and 32-bit x86)
 
 ## 1. Value layout
 
@@ -109,6 +109,63 @@ same constant-offset load it would be if the field had been declared directly.
 A generated C header writes the member back as a nameless one, and gives the
 generated type no typedef of its own.
 
+## 1.9 32-bit x86
+
+`--target x86` builds for 32-bit x86, on Windows or Linux. A pointer is four
+bytes, `nint` and `nuint` are four bytes, and every header counted in words
+narrows with them — the object header to 12 and an array's to 16.
+
+Argument passing is simpler than either 64-bit ABI, because there are no
+argument registers to classify into: **every struct travels on the stack**, as
+a copy the caller pushes. clang expands some of them into one argument per
+field, which is the same bytes in the same order.
+
+Returns are where the two systems differ, and it is not a detail:
+
+| | struct of 1, 2, 4 or 8 bytes | any other struct |
+|---|---|---|
+| Windows | `EAX`, or `EDX:EAX` | hidden pointer |
+| System V | hidden pointer | hidden pointer |
+
+i386 System V returns *every* struct through a hidden pointer, whatever its
+size. Classifying a Linux x86 return by Windows' rule leaves the value in a
+register the caller never reads.
+
+### 1.10 Calling conventions
+
+A declaration may name one, after the linkage string:
+
+```
+extern "C" __stdcall int MessageBoxW(nint owner, ...);
+
+extern "C" __stdcall {
+    int GetMessageW(nint message);
+    int TranslateMessage(nint message);
+}
+```
+
+There is one convention on every 64-bit target, so `__cdecl`, `__stdcall` and
+`__fastcall` are accepted there and mean nothing. `__vectorcall` still differs
+on x64 and is emitted.
+
+On x86 each decorates the linker name, and the number is what the arguments
+occupy with each rounded up to a whole four-byte slot:
+
+| written | symbol for `int f(int, int)` | arguments in registers |
+|---|---|---|
+| `__cdecl` | `_f` | none |
+| `__stdcall` | `_f@8` | none |
+| `__fastcall` | `@f@8` | first two that fit `ECX`, `EDX` |
+| `__vectorcall` | `f@@8` | those two, plus six in `XMM0`–`XMM5` |
+
+The count is in the name so that a caller and a callee disagreeing about how
+many arguments there are is a link error. `__stdcall` has the *callee* remove
+them, so the alternative is an unbalanced stack and no diagnostic at all.
+
+For `__fastcall` and `__vectorcall` the registers go to the first parameters
+that fit one. A `long`, a `float` (under `__fastcall`) and a struct are each
+passed over rather than spending a register.
+
 ## 2. Object header (class instances)
 
 Reference types are heap blocks laid out as:
@@ -128,7 +185,9 @@ offset 24  +----------------------+
 ```
 
 A class reference is a pointer to **offset 0** (the header). The header is
-24 bytes on 64-bit targets. `TypeInfo` is a static, per-class constant — with
+three pointer-width words: 24 bytes on a 64-bit target and 12 on a 32-bit one.
+It is `SlObject` in `runtime/stainless.h`, whose three fields are two `size_t`
+and a pointer, so both halves move together. `TypeInfo` is a static, per-class constant — with
 one exception, on Windows only, noted under `base` below:
 
 ```c

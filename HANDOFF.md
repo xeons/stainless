@@ -7,11 +7,14 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           766 pass
-dotnet run --project tests/Stainless.Tests      271 cases, 2 skipped on Windows
+dotnet test tests/Stainless.UnitTests           792 pass
+dotnet run --project tests/Stainless.Tests      274 cases, 2 skipped on Windows
 stainless doc --stdlib                          22 pages into docs/stdlib
 samples/forms/build.ps1 -Test                   1 failing check, see below
 ```
+
+Three of those cases build as real 32-bit binaries and are run. `--target x86`
+works on Windows; the Linux x86 rule is written and has never executed.
 
 **The forms suite has one failure and it is not new.** "A tree node reads back
 its text" fails, and fails the same way at `6adca35` -- before any of the
@@ -26,8 +29,8 @@ re-run there since the hardening pass below, and two of its fixes are worth
 checking before anything is claimed: the deep stack a compilation now runs on,
 and the literal typing, which changes what a mask means in the bindings.
 
-`master` is one commit ahead of `origin/master`: the comment pass. Everything
-through `stainless doc` is pushed.
+`master` is ahead of `origin/master` by the documentation pass and the x86
+work.
 
 ## What was built, in order
 
@@ -73,9 +76,57 @@ through `stainless doc` is pushed.
 | `6adca35` | the documentation caught up, and three entries for what it still lacks |
 | `c0d9090` | a block on everything public in the standard library |
 | `0fef32e` | `stainless doc`: the blocks read, and a reference written from them |
-| *this one* | the comments left describing the code, and the arguments moved out |
+| `1563cbb` | the comments left describing the code, and the arguments moved out |
+| `39f0448` | a pointer stops being eight bytes: `--target x86` |
+| `034b2ae` | the x86 classifier, and the calling conventions a declaration names |
+| *this one* | the 32-bit build is run rather than claimed |
 
 ## Findings worth keeping
+
+**A 32-bit build already linked and ran, and was silently wrong.** Before any
+of the target work, `--target x86` did not exist but the path did: clang was
+handed the IR, it compiled, it linked, and hello-world printed. What that
+proved was the toolchain, and nothing else. A probe that allocated an object
+reported `sizeof(nuint)` as 8 on a target where a pointer is 4, and an array's
+length as 1953724755.
+
+The cause is worth keeping because it explains which things break: the
+runtime's headers are `size_t` and shrink on x86, and the compiler's were
+constants that did not. Fields and elements read correctly, because the
+compiler was self-consistent about those. The two that broke are exactly the
+ones the *runtime* writes — the TypeInfo pointer and the length. A disagreement
+about layout does not fail loudly; it fails where the two sides meet.
+
+**The decoration was never the problem, which is what the TODO assumed.** LLVM
+applies x86's leading underscore to every global on its own, so `@sl_alloc` in
+IR is `_sl_alloc` in the object, matching the runtime. The link error that
+looked like a mangling bug was the x86 UCRT keeping `printf` inline, which
+`-llegacy_stdio_definitions` fixes — and which a C program for the same target
+needs too.
+
+**`inreg` is the mark that does not announce itself.** `__stdcall` worked
+first time. `__fastcall` built, linked, ran, and printed nothing: LLVM
+allocates registers from the `inreg` marks rather than deriving them from the
+calling convention, so the arguments went to the stack while the C callee read
+ECX and EDX. The marks have to be identical on the declaration and at every
+call — a call that marks a different set is undefined rather than refused.
+
+**Win64's classifier is correct for Windows x86, and it is worth saying why.**
+"In a register" on a target with no argument registers degenerates to "on the
+stack", which is x86's rule for every aggregate, and both systems return 1, 2,
+4 and 8-byte structs in EAX or EDX:EAX. i386 System V is the one that differs:
+it returns *every* struct through a hidden pointer, one byte included. All of
+that was read off clang by compiling the same C for each triple, rather than
+off a specification.
+
+**`nuint - 1` stopped compiling, and the standard library is written in it.**
+At eight bytes `nuint` was wider than `int` and won the usual arithmetic rule.
+At four they are the same width and opposite signedness, which the rule widens
+to `long` — and then refuses to assign back. The fix is narrow: in that one
+pairing, an integer literal takes the other side's type when the value fits.
+It is what C# does, and it keeps the same source meaning the same thing at both
+widths, which `tests/cases/x86-runtime` is the check on: every line of its
+output matches the x64 build except the two that report a pointer's width.
 
 **Documentation found two bugs, and both were found by writing rather than by
 reading.** `String.ByteAt` reads the buffer through the pointer, where every

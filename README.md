@@ -995,6 +995,8 @@ stainless restore              resolve dependencies and lock them
                           '#pragma comment(lib, "user32")')
   --abi <microsoft|itanium>  which C and C++ ABI to agree with: names,
                          bit-fields and how a struct is passed
+  --target <name>        the machine to build for: x64 (the default) or x86,
+                         optionally with a system -- x86-windows, x86-linux
   --keep                 keep the generated .ll
   --obj <dir>            directory for intermediates (default ./obj)
   -h, --help  -v, --version
@@ -1299,6 +1301,18 @@ Everything below is covered by [the test suite](tests/cases).
   eightbytes and passing each in an integer or an SSE register, so
   `{ double; int; }` takes one of each and `{ float; int; }` takes one. Every
   shape was checked against clang built for the matching target
+- **32-bit x86**, with `--target x86`: a four-byte pointer, and every header
+  counted in words rather than in eights. Every struct travels on the stack,
+  because there are no argument registers to classify into; returns are where
+  the two systems part company, and Windows returns a struct of 1, 2, 4 or 8
+  bytes in a register where i386 System V returns every struct in memory
+- **Calling conventions** a declaration can name: `__cdecl`, `__stdcall`,
+  `__fastcall` and `__vectorcall`, written after the linkage string and
+  applying to one declaration or to a whole `extern "C"` block. On x64 only
+  `__vectorcall` differs; on x86 each decorates the linker name with what its
+  arguments occupy — `_f@8` for `__stdcall` — which is what makes a caller and
+  a callee disagreeing about the count a link error rather than an unbalanced
+  stack
 - `[Packed]` and `[Align(N)]`: no padding at all, and a raised alignment. Both
   are rules about layout rather than library features, so neither needs an
   import; they combine, N is a power of two capped at 16, and both apply to a
@@ -1899,10 +1913,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   there is no entry point to initialize one from (SL0380). There is no
   per-thread storage either, and no automatic static property -- its backing
   storage would have no initializer, which is the one moment a static has.
-- **No calling conventions.** `__stdcall`, `__fastcall` and `__vectorcall`
-  cannot be written. On x64 that costs almost nothing — there is one convention
-  and only `__vectorcall` differs — but it is the whole story on x86, where
-  `__stdcall` is what Win32 uses.
+- **COM is x64 and ARM64 only.** Every method of a COM interface is
+  `__stdcall` on x86, and a `com interface`'s slots carry no calling
+  convention — so `--target x86` builds, and COM still does not reach it.
 - **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
   to a `uint` parameter without a cast, which is why
   [bindings/win32](bindings/win32) spells its constants as bare `const uint`

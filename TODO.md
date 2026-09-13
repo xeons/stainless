@@ -41,24 +41,35 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
-### Calling conventions
+### x86, and what is still missing from it
 
-`__stdcall`, `__fastcall`, `__vectorcall` on `extern` and `export`. Nearly a
-no-op on x64 — one convention, and only `__vectorcall` differs — but it is the
-whole story on x86, where `__stdcall` is what Win32 uses and the name is
-decorated with the argument-byte count.
+`--target x86` builds and runs on Windows, and the calling conventions came
+with it -- the entry that used to be here said they would become real the day a
+32-bit target was added, which was right. `tests/cases/x86-*` build as real
+32-bit binaries and are run by the suite.
 
-Not a prerequisite for anything, COM included: every pointer and `nint` in the
-compiler is eight bytes and [abi.md](docs/abi.md) is written for x86-64, so
-there is no 32-bit target for the distinction to matter on. It becomes real the
-day one is added, and not before.
+What is **not** done:
 
-The struct classifier that used to share this entry is done: `--abi` now picks
-Win64 or System V for argument passing as well as for mangling and bit-fields.
-What is left here is only the conventions a *declaration* can name, which is a
-different question and an x86-only one.
+**Linux x86 is written and not run.** `X86Abi` has the i386 System V rule --
+every struct returned through a hidden pointer, whatever its size -- and it was
+read off clang rather than guessed. Nothing has executed it: the suite runs
+what this machine can run, and that is Windows. The box at `geekom-a7` is where
+that gets settled.
 
-*Touches:* `Parser`, `TypeSystem`, `Mangler`, `LlvmEmitter.ClassifyParameter`.
+**COM on x86.** Every method of a COM interface is `__stdcall` there, and a
+`com interface`'s slots carry no convention -- so the declaration form exists
+and COM still does not reach x86. It is a small change to where the convention
+is attached, and a real question about whether the vtable's slot names should
+carry byte counts.
+
+**ARM64**, which the spec claims and nothing classifies: `ClassifyValue` picks
+between Win64, System V and x86, and AAPCS64 is none of them. A 64-bit pointer
+is what makes it work at all today.
+
+**`stdcall` on a Stainless-defined function.** `export "C" __stdcall` parses and
+emits, and nothing has called one from C across a real boundary.
+
+*Touches:* `X86Abi`, `Binder.Inheritance` for the COM slots.
 
 ---
 
