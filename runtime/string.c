@@ -52,6 +52,14 @@ uint8_t *sl_string_data(SlString *string)
 /* Allocates a +1 String with room for byteLength bytes plus the NUL. */
 SlString *sl_string_new(size_t byteLength)
 {
+    /* Guard the addition, as the array allocator guards its multiply: a length
+     * near the top of the range would wrap to a small request, and the copy
+     * that follows would run off the end of what was actually allocated. It
+     * takes an unreachable amount of text to get here, which is exactly why it
+     * would never be noticed if it were. */
+    if (byteLength > SIZE_MAX - sizeof(SlString) - 1)
+        sl_fail("string is too large to allocate");
+
     SlString *string = (SlString *)calloc(1, sizeof(SlString) + byteLength + 1);
     if (string == NULL) sl_fail("out of memory");
 
@@ -169,8 +177,13 @@ void *sl_string_from_char(uint32_t codePoint)
 void *sl_string_join(void *const *parts, size_t count)
 {
     size_t total = 0;
-    for (size_t i = 0; i < count; i += 1)
-        if (parts[i] != NULL) total += ((SlString *)parts[i])->byteLength;
+    for (size_t i = 0; i < count; i += 1) {
+        if (parts[i] == NULL) continue;
+
+        size_t part = ((SlString *)parts[i])->byteLength;
+        if (total > SIZE_MAX - part) sl_fail("string is too large to allocate");
+        total += part;
+    }
 
     SlString *joined = sl_string_new(total);
     uint8_t *at = sl_string_data(joined);

@@ -188,6 +188,20 @@ value, so what the library writes the library can read. Worth noting the
 division of labour: which spellings are a number is the library's rule, and
 what the digits are worth is arithmetic nobody should do twice.
 
+**The runtime is clean under `-Wall -Wextra -Wconversion -Wshadow
+-Wcast-qual`**, which is worth knowing because it means the warnings are not
+where to look. The only ones left are a Windows CRT deprecation, a Win32 macro's
+signedness, three deliberate partial initialisers, and the twenty-four
+`-Wcast-qual` hits in `reflection.c` that are the one documented unsafe cast --
+a stored function pointer to the prototype its kind implies.
+
+What a warning cannot see is size arithmetic, and two allocations lacked the
+guard `sl_array_alloc` already had: `sl_string_new` adds a header and a NUL to
+a length, and the builder's reserve adds and then doubles. Both wrap rather
+than fail, and the doubling wraps to zero and loops for ever. It takes an
+unreachable amount of text to get there, which is exactly why nobody would
+notice if it happened. Guarded now, on the same terms as the array.
+
 **Editing `runtime/*.c` needs a `dotnet build` before any program sees it.**
 The C sources are embedded resources written out to the object directory, the
 same as `stdlib/*.sl`, so a fix tested without rebuilding the compiler is a fix

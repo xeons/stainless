@@ -57,10 +57,19 @@ void *sl_string_builder_new(void)
 
 static void sl_string_builder_reserve(SlStringBuilder *builder, size_t extra)
 {
-    if (builder->length + extra <= builder->capacity) return;
+    /* Both of these would wrap rather than fail: the wanted size, and the
+     * doubling that reaches for it -- which on wrapping to zero would loop for
+     * ever rather than merely allocate too little. */
+    if (extra > SIZE_MAX - builder->length) sl_fail("string is too large to build");
+
+    size_t wanted = builder->length + extra;
+    if (wanted <= builder->capacity) return;
 
     size_t capacity = builder->capacity == 0 ? 32 : builder->capacity;
-    while (capacity < builder->length + extra) capacity *= 2;
+    while (capacity < wanted) {
+        if (capacity > SIZE_MAX / 2) { capacity = wanted; break; }
+        capacity *= 2;
+    }
 
     uint8_t *bytes = (uint8_t *)realloc(builder->bytes, capacity);
     if (bytes == NULL) sl_fail("out of memory");
