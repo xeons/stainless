@@ -8,7 +8,7 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           743 pass
-dotnet run --project tests/Stainless.Tests      266 cases, 2 skipped on Windows
+dotnet run --project tests/Stainless.Tests      267 cases, 2 skipped on Windows
 samples/forms/build.ps1 -Test                   67 checks against real widgets
 ```
 
@@ -57,7 +57,8 @@ since the closure work.
 | `dc8d36c` | the windowless controls; a generic no longer shrinks a struct |
 | `755d002` | the composites, and `base` on a property stops dispatching |
 | `908fb3a` | a hardening pass: nine bugs, found by probing rather than reading |
-| *this one* | indexers on the containers, and one less cascading diagnostic |
+| `ce32e32` | indexers on the containers, and one less cascading diagnostic |
+| *this one* | doubles that survive being written and read back |
 
 ## Findings worth keeping
 
@@ -159,6 +160,38 @@ of `\u` with two digits became U+0012, and `1lul` meant 1. All three are values
 nobody wrote. A character literal is exactly one scalar, `\u` takes exactly four
 digits and `\U` eight -- `\x` stays variable, since it is a byte and C says so
 -- and a suffix is measured against the set C# actually has.
+
+**No double survived being written and read back, and that is the one this
+run would have most regretted missing.** `Text.FromDouble` was `snprintf` with
+a plain `%g`, which is six significant digits -- so pi printed as 3.14159, a
+measurement written to a file came back as a different measurement, and a JSON
+document of numbers was quietly damaged by being saved. Nothing failed; the
+numbers were simply not the ones the program had.
+
+The rule now is the shortest *text* that reads back as the same double, found
+by trying each precision from one to seventeen and keeping the shortest that
+round-trips. Two details cost a suite run each and are worth keeping:
+
+- **Shortest text is not shortest precision.** `%.1g` of 60 is `6e+01`, which
+  round-trips perfectly and is five characters where `60` is two. `%g` turns
+  exponential once the precision drops below the decimal exponent, so stopping
+  at the first precision that round-trips turns every round number into
+  scientific notation -- which is how `$60` became `$6e+01` in a sample.
+- **On a tie, plain beats exponential.** `7e+04` and `70000` are both five
+  characters, and only one of them is what anybody means by seventy thousand.
+
+And the inverse had the same shape of bug from the other side: `Convert.
+ToDouble` read the digits by hand, ten times a running total and a tenth of a
+running scale, which loses a bit per digit -- a tenth not being a binary
+fraction. It validates the syntax as before and now asks the runtime for the
+value, so what the library writes the library can read. Worth noting the
+division of labour: which spellings are a number is the library's rule, and
+what the digits are worth is arithmetic nobody should do twice.
+
+**Editing `runtime/*.c` needs a `dotnet build` before any program sees it.**
+The C sources are embedded resources written out to the object directory, the
+same as `stdlib/*.sl`, so a fix tested without rebuilding the compiler is a fix
+tested against the old runtime. That cost one wrong conclusion here.
 
 **The containers had no indexers, and the language has had them all along.**
 `list[i]` did not compile; `list.At(i)` and `list.Set(i, v)` were the whole

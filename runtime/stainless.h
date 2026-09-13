@@ -403,6 +403,22 @@ SL_API void  *sl_string_from_unsigned(unsigned long long value);
 SL_API void  *sl_string_from_double(double value);
 SL_API void  *sl_string_from_bool(_Bool value);
 
+/* The shortest text that reads back as exactly this double, written into
+ * `buffer` and returning its length.
+ *
+ * Shared because there are two callers -- a String and a StringBuilder -- and
+ * a number that prints one way in one of them and another way in the other is
+ * the kind of difference nobody looks for. */
+SL_API size_t sl_format_double(char *buffer, size_t size, double value);
+
+/* The double `count` bytes at `text` spell, correctly rounded.
+ *
+ * The caller decides what is well formed; this only says what the digits are
+ * worth. Reading them by hand -- ten times the running total, or a tenth of a
+ * running scale -- compounds a rounding error per digit, so a number written
+ * by sl_format_double did not read back as itself. */
+SL_API double sl_parse_double(const uint8_t *text, size_t count);
+
 /* One code point as the UTF-8 that spells it. Anything that is not one --
  * past the maximum, or a surrogate -- becomes U+FFFD, so a String's bytes
  * stay valid UTF-8 by construction. */

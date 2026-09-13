@@ -2185,6 +2185,15 @@ produces a `String` whether the program asked for one or not. It also provides
 `FromInteger`, `FromDouble`, `FromBool`, `FromBytes` and `FromNullTerminated`,
 plus `StringBuilder`.
 
+**`FromDouble` writes the shortest text that reads back as the same number**,
+which is what C# and every modern runtime do: `0.1` rather than
+`0.10000000000000001`, and `3.141592653589793` rather than a rounding of it. A
+round number stays round -- `60`, not `6e+01` -- and an exponent appears only
+where it is genuinely shorter. `Standard.Convert`'s `ToDouble` is its inverse
+and is correctly rounded, so anything written can be read back unchanged.
+`AppendDouble` spells a number the same way, since two spellings for one number
+is a difference nobody looks for.
+
 `StringBuilder` appends (`Append`, `AppendLine`, `AppendInteger`,
 `AppendDouble`, `AppendByte`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
 `Contains`) and edits (`Insert`, `Remove`, `Truncate`, `SetByteAt`,

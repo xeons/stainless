@@ -35,6 +35,9 @@ module Standard.Convert;
 import Standard.Text;
 import Standard.Ascii;
 
+// Correctly rounded, which a walk over the digits here cannot be.
+extern "C" double sl_parse_double(byte* text, nuint count);
+
 /// Why a conversion did not happen.
 public enum ConvertError {
     /// There was nothing to convert.
@@ -191,28 +194,26 @@ public Result<double, ConvertError> ToDouble(String text) {
 
     var bytes = text.ToPointer();
     nuint at = 0;
-    bool negative = false;
 
-    if (bytes[0] == 43 || bytes[0] == 45) {
-        negative = bytes[0] == 45;
-        at = 1;
-    }
+    if (bytes[0] == 43 || bytes[0] == 45) { at = 1; }
 
-    double value = 0.0;
+    // This walk decides only whether the text is a number this library
+    // accepts; what the digits are worth is settled once, at the end, by the
+    // runtime -- the sign included. Reading them here as well -- ten times a
+    // running total, or a tenth of a running scale -- loses a bit per digit,
+    // and a tenth is not a binary fraction, so a number written at full
+    // precision did not read back as itself: `1e-07` came back as something
+    // very slightly else.
     nuint digits = 0;
 
     while (at < size && Ascii.IsDigit(bytes[at])) {
-        value = value * 10.0 + (double)(int)(bytes[at] - 48);
         at++;
         digits++;
     }
 
     if (at < size && bytes[at] == 46) {              // '.'
         at++;
-        double scale = 0.1;
         while (at < size && Ascii.IsDigit(bytes[at])) {
-            value = value + (double)(int)(bytes[at] - 48) * scale;
-            scale = scale * 0.1;
             at++;
             digits++;
         }
@@ -223,29 +224,18 @@ public Result<double, ConvertError> ToDouble(String text) {
 
     if (at < size && (bytes[at] == 101 || bytes[at] == 69)) {     // 'e' or 'E'
         at++;
-        bool negativeExponent = false;
 
-        if (at < size && (bytes[at] == 43 || bytes[at] == 45)) {
-            negativeExponent = bytes[at] == 45;
-            at++;
-        }
+        if (at < size && (bytes[at] == 43 || bytes[at] == 45)) { at++; }
 
         if (at >= size || !Ascii.IsDigit(bytes[at])) { return Fail(ConvertError.Malformed); }
 
-        int exponent = 0;
-        while (at < size && Ascii.IsDigit(bytes[at])) {
-            if (exponent < 10000) { exponent = exponent * 10 + (int)(bytes[at] - 48); }
-            at++;
-        }
-
-        for (int i = 0; i < exponent; i++) {
-            if (negativeExponent) { value = value / 10.0; } else { value = value * 10.0; }
-        }
+        while (at < size && Ascii.IsDigit(bytes[at])) { at++; }
     }
 
     if (at != size) { return Fail(ConvertError.Malformed); }
-    if (negative) { return Ok(-value); }
-    return Ok(value);
+
+    // Correctly rounded, which is the one thing the walk above cannot be.
+    return Ok(sl_parse_double(bytes, size));
 }
 
 // ---------------------------------------------------------------- hexadecimal

@@ -102,9 +102,9 @@ void sl_string_builder_append_integer(void *pointer, long long value)
 
 void sl_string_builder_append_double(void *pointer, double value)
 {
-    char buffer[64];
-    int  written = snprintf(buffer, sizeof buffer, "%g", value);
-    if (written > 0) sl_string_builder_append_bytes(pointer, (const uint8_t *)buffer, (size_t)written);
+    char   buffer[64];
+    size_t written = sl_format_double(buffer, sizeof buffer, value);
+    if (written > 0) sl_string_builder_append_bytes(pointer, (const uint8_t *)buffer, written);
 }
 
 size_t sl_string_builder_byte_length(void *pointer)

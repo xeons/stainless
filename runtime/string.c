@@ -243,11 +243,102 @@ void *sl_string_from_unsigned(unsigned long long value)
     return sl_string_from_bytes((const uint8_t *)buffer, (size_t)(written < 0 ? 0 : written));
 }
 
+/*
+ * The shortest text that reads back as exactly this double.
+ *
+ * Plain "%g" is six significant digits, which is not a rounding so much as a
+ * different number: pi printed as 3.14159, a 64-bit identifier in a JSON
+ * document as 9.22337e+18, and nothing at all survived being written and read
+ * back. A program that writes measurements to a file lost them, quietly, and
+ * the only sign was that the file was shorter than it should have been.
+ *
+ * Seventeen digits always round-trips and is what "%.17g" gives, but it also
+ * gives 0.10000000000000001 for a tenth, which is correct and unreadable. So
+ * the shortest *text* that reads back as the same value wins -- every
+ * precision from one to seventeen is tried and the shortest kept.
+ *
+ * The shortest text and the shortest precision are not the same thing, which
+ * is the trap here and was worth one wrong answer to learn: "%.1g" of 60 is
+ * "6e+01", which round-trips perfectly and is five characters where "%.2g"
+ * gives "60". "%g" turns exponential once the precision drops below the
+ * decimal exponent, so stopping at the first precision that round-trips turns
+ * every round number into scientific notation. All seventeen are cheap --
+ * a snprintf and a strtod each -- and printing a number is not a hot path.
+ *
+ * NaN never equals itself, so nothing round-trips and it falls through to the
+ * full-precision spelling, which prints "nan". Infinity compares equal and is
+ * found at the first precision.
+ */
+size_t sl_format_double(char *buffer, size_t size, double value)
+{
+    char   shortest[64];
+    size_t best = 0;
+
+    for (int digits = 1; digits <= 17; digits++)
+    {
+        char candidate[64];
+        int  written = snprintf(candidate, sizeof candidate, "%.*g", digits, value);
+
+        if (written <= 0 || (size_t)written >= sizeof candidate) continue;
+        if (strtod(candidate, NULL) != value) continue;
+
+        if (best != 0)
+        {
+            /* Shorter wins, and on a tie the one without an exponent does:
+             * "7e+04" and "70000" are both five characters and only one of
+             * them is what anybody meant by seventy thousand. */
+            _Bool shorter = (size_t)written < best;
+            _Bool plainer = (size_t)written == best &&
+                            strchr(shortest, 'e') != NULL &&
+                            strchr(candidate, 'e') == NULL;
+
+            if (!shorter && !plainer) continue;
+        }
+
+        memcpy(shortest, candidate, (size_t)written + 1);
+        best = (size_t)written;
+    }
+
+    if (best == 0 || best >= size)
+    {
+        int written = snprintf(buffer, size, "%.17g", value);
+        return (size_t)(written < 0 ? 0 : written);
+    }
+
+    memcpy(buffer, shortest, best);
+    return best;
+}
+
 void *sl_string_from_double(double value)
 {
-    char buffer[64];
-    int  written = snprintf(buffer, sizeof buffer, "%g", value);
-    return sl_string_from_bytes((const uint8_t *)buffer, (size_t)(written < 0 ? 0 : written));
+    char   buffer[64];
+    size_t written = sl_format_double(buffer, sizeof buffer, value);
+    return sl_string_from_bytes((const uint8_t *)buffer, written);
+}
+
+/*
+ * The value some digits spell, correctly rounded.
+ *
+ * The caller has already decided the text is well formed -- which spellings a
+ * number may have is the library's rule and not this one's -- so all that is
+ * wanted here is the arithmetic, and the arithmetic is the part that is hard
+ * to do by hand. Ten times a running total loses a bit per digit and a running
+ * scale of a tenth loses more, because a tenth is not a binary fraction; a
+ * number written at full precision then did not read back as itself.
+ *
+ * A copy is made because the bytes are a String's and are not terminated.
+ * Anything longer than the buffer cannot name a distinct double anyway: a
+ * double carries seventeen significant digits and an exponent of three.
+ */
+double sl_parse_double(const uint8_t *text, size_t count)
+{
+    char buffer[512];
+
+    if (count >= sizeof buffer) count = sizeof buffer - 1;
+    memcpy(buffer, text, count);
+    buffer[count] = '\0';
+
+    return strtod(buffer, NULL);
 }
 
 void *sl_string_from_bool(_Bool value)
