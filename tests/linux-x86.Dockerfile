@@ -2,10 +2,27 @@
 #
 # Building an i386 binary needs the 32-bit crt objects and libc -- Scrt1.o,
 # crti.o, libc.so, libgcc -- which are a separate package from the 32-bit
-# libraries a machine needs merely to *run* one. The Linux box this project
-# uses has the second and not the first, and installing packages there needs a
-# password nobody is going to type into a test run. A container has both and
-# costs nothing but disk.
+# libraries a machine needs merely to *run* one. `gcc-multilib` and the
+# `libc6-dev-i386` it pulls in are those.
+#
+# `libc6-dev:i386` is here as insurance rather than because this image needs it
+# today, and the distinction is worth writing down because it cost a session.
+# Those two packages are not the same thing despite the names: `libc6-dev-i386`
+# ships /usr/lib32 and a couple of -32.h stubs, while `libc6-dev:i386` is the
+# i386-architecture build and is what creates /usr/include/i386-linux-gnu.
+#
+# Whether the second is *needed* depends on the clang. Targeting i386, clang 18
+# falls back to /usr/include/x86_64-linux-gnu and finds the headers there;
+# clang 21 looks in /usr/include/i386-linux-gnu and does not fall back, so the
+# build dies at `bits/libc-header-start.h` -- which reads like a broken
+# toolchain rather than a missing package. This image is currently clang 18 and
+# works either way, but `FROM ...sdk:10.0` is a moving tag and will bring a
+# newer clang eventually.
+#
+# The Linux box this project uses has all of these now and runs the 32-bit
+# cases directly, so this image is no longer on the path of an ordinary run.
+# It is kept for a machine that does not, and because pinning an environment is
+# worth something on its own.
 #
 # From the repository root:
 #
@@ -26,6 +43,8 @@
 # Linux install needs no container at all.
 FROM mcr.microsoft.com/dotnet/sdk:10.0
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends clang gcc-multilib g++-multilib \
+RUN dpkg --add-architecture i386 \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+         clang gcc-multilib g++-multilib libc6-dev:i386 \
     && rm -rf /var/lib/apt/lists/*

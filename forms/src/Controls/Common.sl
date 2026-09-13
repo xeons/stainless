@@ -72,6 +72,19 @@ public class ImageList {
         return Ok(Add(loaded.Value));
     }
 
+    /// Adds a picture out of the program's own resources, by the id its
+    /// resource script gave it.
+    ///
+    /// The usual way to dress a toolbar, because the icons are part of the
+    /// program rather than part of its data: nothing to install beside the
+    /// executable and nothing to find at startup. Windows only -- see
+    /// `Bitmap.FromResource`, whose error this passes on.
+    public Result<int, String> AddResource(int id) {
+        var loaded = Bitmap.FromResource(id);
+        if (!loaded.Ok) { return Fail(loaded.Error); }
+        return Ok(Add(loaded.Value));
+    }
+
     public int Count => backend.Count();
     public Size ImageSize => backend.ImageSize();
 

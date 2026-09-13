@@ -293,6 +293,17 @@ public interface IContainerPeer : IControlPeer {
 /// A top-level window.
 public interface IWindowPeer : IContainerPeer {
     void SetTitle(String title);
+
+    /// Puts an icon in the title bar and wherever else the desktop shows one,
+    /// by the numeric id the program's resource script gave it.
+    ///
+    /// An id rather than a `Bitmap`, because an icon is not a picture: an
+    /// `RT_GROUP_ICON` holds several sizes and the platform picks between them,
+    /// which is what makes a title bar sharp and the task switcher sharp at the
+    /// same time. Answers false where there is no such icon, or no resource
+    /// section to look in.
+    bool SetIconResource(int id);
+
     /// Puts a menu bar across the top, or takes it away with null.
     void SetMenu(IMenuPeer? menu);
     void SetBorder(WindowBorder border);
@@ -732,6 +743,16 @@ public interface IWidgetSet {
     /// A picture read from a file. What the format may be is the backend's
     /// business; Windows reads `.bmp` without a decoder and nothing else.
     Result<IBitmapBackend, String> LoadBitmap(String path);
+
+    /// A picture read out of the binary's own resources, by numeric id.
+    ///
+    /// Windows-only in practice, and deliberately part of the interface
+    /// anyway: a backend that cannot do this has to say so in an error a
+    /// caller can print, which is more useful than the method not existing and
+    /// the program not compiling on the other platform. A resource section is
+    /// a PE idea -- ELF has none, and GLib's GResource is a different thing
+    /// wearing a similar name.
+    Result<IBitmapBackend, String> LoadBitmapResource(int id);
 
     IImageListBackend CreateImageList(Size imageSize);
 

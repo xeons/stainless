@@ -45,6 +45,7 @@ import Win32.Kernel32;
 import Win32.User32;
 import Win32.Gdi32;
 import Win32.ComCtl32;
+import Win32.Resources;
 
 /// The next command id to hand out.
 ///
@@ -295,6 +296,35 @@ public Result<IBitmapBackend, String> LoadBitmapFile(String path) {
 
     // `BITMAP`'s first three fields, which is all that is wanted and which
     // spares a structure nothing else here needs.
+    int[] header = new int[10];
+    GetObjectW((HGDIOBJ)(void*)bitmap, 40, (void*)&header[0u]);
+    int width = header[1u];
+    int height = header[2u];
+    if (height < 0) { height = -height; }
+
+    return Ok(new BitmapBackend(bitmap, width, height));
+}
+
+/// Reads a bitmap out of this program's own resources.
+///
+/// The same `LoadImageW` as above with the other half of its contract: given a
+/// module and a `MAKEINTRESOURCE` name instead of `LrLoadFromFile` and a path,
+/// it reads an `RT_BITMAP` out of the mapped image. Nothing touches the disk,
+/// so an icon cannot go missing between building the program and running it --
+/// which is the whole reason to put one in the binary.
+///
+/// `LrCreateDibSection` for the same reason as above: a device-independent
+/// bitmap keeps its own colours rather than being matched to the screen's
+/// palette on load.
+public Result<IBitmapBackend, String> LoadResourceBitmap(int id) {
+    var handle = LoadImageW((HINSTANCE)GetModuleHandleW(null), Resources.Id(id),
+                            ImageBitmap, 0, 0, LrCreateDibSection);
+    if (handle == null) {
+        return Fail($"this program has no bitmap resource with id {id}");
+    }
+
+    HBITMAP bitmap = (HBITMAP)(void*)handle;
+
     int[] header = new int[10];
     GetObjectW((HGDIOBJ)(void*)bitmap, 40, (void*)&header[0u]);
     int width = header[1u];

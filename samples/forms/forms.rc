@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: 0BSD
+//
+// What every Forms sample carries inside its executable.
+//
+// A resource script is compiled by the build and folded into the binary, so
+// everything below travels in the .exe rather than beside it:
+//
+//     stainless build demo.sl forms.rc ...
+//
+// `llvm-rc` resolves an #include, and a file named by a relative path, against
+// this script's own directory -- so `forms.manifest` is found whichever
+// directory the build was started from.
+
+// ---------------------------------------------------------------- manifest
+//
+// 24 is RT_MANIFEST and 1 is CREATEPROCESS_MANIFEST_RESOURCE_ID, which is the
+// name the loader looks under for an executable's own manifest. This is read
+// before any code in the program runs, which is why nothing asks for it.
+//
+// It is what selects version 6 of comctl32. Without it Windows loads version 5
+// and the tabs, toolbar and progress bar come out looking like Windows 2000 --
+// they work either way, which is what makes the omission easy to miss.
+1 24 "forms.manifest"
+
+// ------------------------------------------------------------------ strings
+//
+// A string table, to show the mechanism: `Resources.Text(id)` reads one back.
+// Strings are stored in blocks of sixteen, so ids that sit together cost one
+// block rather than one each.
+STRINGTABLE
+BEGIN
+    1000 "Stainless Forms"
+    1001 "Built with resources compiled into the binary"
+END

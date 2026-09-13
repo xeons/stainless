@@ -245,6 +245,11 @@ internal static class Program
             .Concat(Directory.EnumerateFiles(directory, "*.cpp"))
             .OrderBy(p => p, StringComparer.Ordinal).ToList();
 
+        // A Windows resource script, for a case whose subject is what ends up
+        // in the binary rather than what the code says.
+        var resources = Directory.EnumerateFiles(directory, "*.rc")
+            .OrderBy(p => p, StringComparer.Ordinal).ToList();
+
         string name = Path.GetFileName(directory);
 
         // Sources from outside the case, named relative to the repository root.
@@ -391,6 +396,7 @@ internal static class Program
             Libraries = libraries,
             CppAbi = abi,
             EmitIrOnly = assembleOnly,
+            ResourceScripts = resources,
         };
 
         CompilationResult result;

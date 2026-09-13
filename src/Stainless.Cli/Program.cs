@@ -83,6 +83,12 @@ internal static class Program
               too; they are handed to the native linker. No bindings are needed,
               because Stainless already speaks the platform C ABI.
 
+              A Windows resource script (.rc) is compiled and folded into
+              the binary. That is how an icon, a string table, a menu, a
+              dialog template or an application manifest gets there.
+              Building for a system that has no resource section leaves
+              it out and says so.
+
               A library the linker can find for itself is named with '-l'
               instead of by path: '-l user32' rather than the full path into
               whichever Windows SDK happens to be installed. A source file can
@@ -785,6 +791,7 @@ internal static class Program
             {
                 SourcePaths = sources.Sources,
                 NativeInputs = sources.NativeInputs,
+                ResourceScripts = sources.ResourceScripts,
                 Libraries = Libraries,
                 OutputPath = Output,
                 IntermediateDirectory = ObjectDirectory,

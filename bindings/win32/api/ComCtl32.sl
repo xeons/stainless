@@ -128,7 +128,24 @@ public extern "C" {
     int        ImageList_GetImageCount(HIMAGELIST list);
     int        ImageList_Draw(HIMAGELIST list, int index, HDC dc,
                               int x, int y, uint style);
+
+    /// Builds a whole list from one wide bitmap, cut into `width`-wide frames.
+    ///
+    /// This is the shape a toolbar's icons have had since Windows 95: one
+    /// strip in the binary's resources, sliced on load. `name` is a resource
+    /// name -- `MAKEINTRESOURCE` for an id -- unless `flags` includes
+    /// `LrLoadFromFile`, in which case it is a path and `instance` is ignored.
+    ///
+    /// `mask` is the colour to treat as transparent. The convention is magenta,
+    /// which is why toolbar bitmaps have been magenta for thirty years;
+    /// `CLR_NONE` means the image has no transparency at all.
+    HIMAGELIST ImageList_LoadImageW(HINSTANCE instance, char16* name, int width,
+                                    int grow, uint mask, uint kind, uint flags);
 }
+
+/// `CLR_NONE`: no colour is transparent. `CLR_DEFAULT` takes the bitmap's own.
+public const uint ClrNone    = 0xFFFFFFFFu;
+public const uint ClrDefault = 0xFF000000u;
 
 public const uint IlcMask   = 0x0001u;
 public const uint IlcColor4 = 0x0004u;
@@ -364,10 +381,21 @@ public const int TvnItemExpandedW = -456;
 
 /// The root of a tree, as `TVI_ROOT` spells it: not a handle at all but a
 /// sentinel that happens to be shaped like one.
-public HTREEITEM TreeRoot()  { return (HTREEITEM)(void*)(nuint)0xFFFF0000u; }
-public HTREEITEM TreeFirst() { return (HTREEITEM)(void*)(nuint)0xFFFF0001u; }
-public HTREEITEM TreeLast()  { return (HTREEITEM)(void*)(nuint)0xFFFF0002u; }
-public HTREEITEM TreeSort()  { return (HTREEITEM)(void*)(nuint)0xFFFF0003u; }
+///
+/// **These are negative numbers, and that is the whole of why they are written
+/// this way.** `commctrl.h` says `((HTREEITEM)(ULONG_PTR)-0x10000)`, so on a
+/// 64-bit machine `TVI_ROOT` is `0xFFFFFFFFFFFF0000` -- the sign extends
+/// through the whole pointer. Writing the literal `0xFFFF0000u` instead gives
+/// `0x00000000FFFF0000`, which is a different value, is not any node, and is
+/// not the root either: the tree rejects every insert under it and answers
+/// zero, which looks exactly like a control that quietly does nothing.
+///
+/// That is what these used to say, and it is why the Win32 tree never held an
+/// item. `-0x10000` as a `nint` is the version that is right on both widths.
+public HTREEITEM TreeRoot()  { return (HTREEITEM)(void*)(nuint)(nint)(-0x10000); }
+public HTREEITEM TreeFirst() { return (HTREEITEM)(void*)(nuint)(nint)(-0xFFFF); }
+public HTREEITEM TreeLast()  { return (HTREEITEM)(void*)(nuint)(nint)(-0xFFFE); }
+public HTREEITEM TreeSort()  { return (HTREEITEM)(void*)(nuint)(nint)(-0xFFFD); }
 
 // ================================================================= list view
 

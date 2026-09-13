@@ -1,0 +1,18 @@
+the first string
+the second string
+missing string: ''
+payload: 8 bytes, first p
+in place: 8 bytes, borrowed true
+greeting: 6 bytes
+payload present: true
+icon present: false
+payload size: 8
+type TEXTBLOB
+type #6
+type #10
+type #16
+rcdata #301
+version 1.2.3.4
+id 301 is an id: true
+and reads back as 301
+named #301

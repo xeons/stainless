@@ -10,7 +10,7 @@ which one you are looking at:
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
 
 The raw layer is the entry points, constants, structs, unions, enums and
-delegates of eight libraries, plus the handle types and the names they go by,
+delegates of ten libraries, plus the handle types and the names they go by,
 and the COM interfaces; the convenience modules add a task-shaped layer on top
 of those. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
@@ -35,6 +35,9 @@ bindings/win32/api/
   ComDlg32.sl    module Win32.ComDlg32;   the open and save dialogs
   Ole32.sl       module Win32.Ole32;      COM: apartments, activation, HRESULT
   ShellCom.sl    module Win32.ShellCom;   IShellItem, IFileDialog and friends
+  ComCtl32.sl    module Win32.ComCtl32;   the common controls: tree, list,
+                                          tabs, toolbar, status, progress
+  Version.sl     module Win32.Version;    reading an RT_VERSION resource
   Ws2_32.sl      module Win32.Ws2_32;     Winsock: sockets, addresses, poll,
                                           getaddrinfo, and WSAStartup
 ```
@@ -134,8 +137,10 @@ declaration nothing calls is not a reference, so the linker never looks for it:
 stainless build app.sl bindings/win32/api
 ```
 
-`tests/cases/win32-raw` is that, as a test — it imports all six modules and
-links with no libraries named.
+`tests/cases/win32-raw` is that, as a test — it imports seven of these modules
+and links with no libraries named. Not all of them: `Ws2_32` and `Version` name
+their own library with a `#pragma`, because neither ws2_32 nor version is
+pulled in by the C runtime the way kernel32 and its neighbours are.
 
 The only function bodies in the raw layer are the handful of constants that are
 pointer-shaped and so cannot be written as `const`: `InvalidHandle()`,
@@ -160,6 +165,7 @@ bindings/win32/
   Shell.sl         module Win32.Shell;        opening things, known folders,
                                               shell items
   Dialogs.sl       module Win32.Dialogs;      the file dialogs, both generations
+  Resources.sl     module Win32.Resources;    what the binary carries inside it
 ```
 
 These exist only where saying it in Stainless is genuinely better than saying it
@@ -179,6 +185,7 @@ Which library each wants:
 | `Win32.Com` | `ole32` |
 | `Win32.Shell` | `shell32` (and `user32`, `ole32`) |
 | `Win32.Dialogs` | `comdlg32` (and `user32`, `ole32`) |
+| `Win32.Resources` | `user32` |
 
 The first row needs none: kernel32 is pulled in by the C runtime every Windows
 program already links.
@@ -281,6 +288,63 @@ the same for the parts with no window.
 - **`Win32.Terminal`, not `Win32.Console`.** A module is reached by its last name
   segment, so a `Win32.Console` would shadow `Standard.Console` in every file
   that imported it.
+
+## Resources
+
+A Windows binary carries data inside itself, indexed by **type** and **name**.
+Putting something there is a build step rather than a call — a `.rc` listed
+among the sources, compiled by `llvm-rc` and folded in by the linker (see
+[§2.2 of the packages doc](../../docs/packages.md)) — and `Win32.Resources` is
+the reading half.
+
+What makes this different from every other part of the API is that **Windows
+reads the resource directory on the program's behalf**. `LoadIconW`,
+`LoadStringW`, `LoadMenuW`, `CreateDialogParamW` and `LoadAcceleratorsW` each
+walk in there and hand back a finished object; `ImageList_LoadImageW` slices a
+toolbar's strip out of it. So the raw declarations sit where Windows puts them
+— the find/load/lock trio in `Win32.Kernel32`, the loaders in `Win32.User32`,
+the image list in `Win32.ComCtl32` — and `Win32.Resources` is the layer that
+makes naming one bearable:
+
+```csharp
+import Win32.Resources;
+import Win32.User32;
+
+String ready = Resources.Text(201u);                        // RT_STRING
+byte[] data  = Resources.Bytes(Resources.Id(301), RtRcData());
+HICON  icon  = Resources.Icon(Resources.Id(1));             // RT_GROUP_ICON
+HMENU  menu  = Resources.Menu(Resources.Id(1));             // RT_MENU
+
+foreach (var name in Resources.Names(RtBitmap())) { ... }   // what is in there
+```
+
+**A name is a string or an integer, through the same parameter.** Windows
+reserves the bottom 64K of the pointer range for the second and calls the cast
+`MAKEINTRESOURCE`; `Resources.Id` is that cast, and `IsId`, `IdOf` and `NameOf`
+are the other direction, for a callback that has to ask which it was given.
+The `RT_` types are functions rather than constants for the same reason the
+standard cursors are — they are integers pretending to be strings, and
+Stainless has no `const char16*`.
+
+**Nothing here is freed.** A resource lives in the mapped image, so
+`LoadResource` hands back a pointer into memory that is already there and
+`LockResource` is a cast. `FreeResource` has done nothing since Win32 and is
+deliberately not declared. `Resources.Pointer` gives that pointer straight out
+— read-only, valid as long as the module is — and `Resources.Bytes` copies for
+anything that outlives the call.
+
+**`RT_VERSION` is the odd one out** and lives in `Win32.Version`, over
+`version.dll`. It is not a value but a small tree -- a fixed block of numbers
+plus per-language string tables -- so it is read with `VerQueryValueW` rather
+than by locking bytes, and it is read from a *file* rather than from a loaded
+module. `Resources.Version()` finds this program's own path and unpacks the
+four-part number; `Resources.VersionOf(path)` asks about anything else.
+
+**Reading another binary's resources** goes through
+`Resources.OpenForResources`, which is `LoadLibraryExW` with
+`LOAD_LIBRARY_AS_DATAFILE`: the file is mapped without `DllMain` running and
+without its imports being resolved, which is the only safe way to pull an icon
+out of an executable this program did not build.
 
 ## What is not bound
 

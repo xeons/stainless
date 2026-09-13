@@ -40,6 +40,12 @@ $libraries = @("-l", "user32", "-l", "gdi32", "-l", "comctl32",
                "-l", "comdlg32", "-l", "ole32", "-l", "shell32",
                "-l", "advapi32")
 
+# What every sample carries inside its .exe: the comctl32 v6 manifest that
+# selects the themed common controls, and a string table. The build compiles
+# this to a .res and the linker folds it in, so there is nothing to copy beside
+# the binary and nothing to lose when one is moved.
+$resources = Join-Path $PSScriptRoot "forms.rc"
+
 $samples = Get-ChildItem $PSScriptRoot -Filter *.sl | Sort-Object Name
 
 foreach ($sample in $samples) {
@@ -47,30 +53,8 @@ foreach ($sample in $samples) {
     $exe  = Join-Path $output "$name.exe"
 
     Write-Host "building $name" -ForegroundColor Cyan
-    & $compiler build $sample.FullName @library -o $exe @libraries
+    & $compiler build $sample.FullName $resources @library -o $exe @libraries
     if ($LASTEXITCODE -ne 0) { Write-Error "$name failed to build" }
-
-    # The themed common controls are version 6 of comctl32, and the only way to
-    # ask for them is a side-by-side manifest naming it. Without one Windows
-    # loads version 5 and the tabs, toolbar and progress bar come out looking
-    # like Windows 2000 -- they work either way, which is what makes the
-    # omission easy to miss.
-    #
-    # A file beside the executable rather than a resource inside it, because
-    # Stainless has '#pragma comment(lib, ...)' and no way to ask the linker for
-    # anything else.
-    Set-Content -Path "$exe.manifest" -Encoding utf8 -Value @'
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <dependency>
-    <dependentAssembly>
-      <assemblyIdentity type="win32" name="Microsoft.Windows.Common-Controls"
-                        version="6.0.0.0" processorArchitecture="*"
-                        publicKeyToken="6595b64144ccf1df" language="*" />
-    </dependentAssembly>
-  </dependency>
-</assembly>
-'@
 }
 
 Write-Host ""

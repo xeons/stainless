@@ -264,6 +264,12 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer {
 
     public void SetTitle(String title) { gtk_window_set_title(widget, title.ToPointer()); }
 
+    /// There is no resource section to read an icon out of; see
+    /// `LoadBitmapResource` on the widget set for why this is a difference in
+    /// the binary format rather than a gap in this backend. GTK takes an icon
+    /// from a file or from the desktop's icon theme instead.
+    public bool SetIconResource(int id) { return false; }
+
     public void SetMenu(IMenuPeer? menu) {
         if (bar != null) {
             gtk_container_remove(stack, bar);

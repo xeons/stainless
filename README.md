@@ -924,7 +924,9 @@ stainless build gui.sl bindings/win32 -l user32 -l gdi32 \
 Every file is `#if WINDOWS`, so elsewhere the modules exist and are empty rather
 than failing to build. [samples/win32/window.sl](samples/win32/window.sl) is a
 working window — class, message loop, double-buffered GDI painting, keyboard —
-and [bindings/win32/README.md](bindings/win32/README.md) is the guide.
+[samples/win32/resources.sl](samples/win32/resources.sl) reads what its own
+binary carries, and [bindings/win32/README.md](bindings/win32/README.md) is the
+guide.
 
 Full details: **[docs/language-spec.md](docs/language-spec.md)**,
 **[docs/abi.md](docs/abi.md)** and, for where threading is going,
@@ -1028,6 +1030,22 @@ stainless run samples/win32/window.sl bindings/win32/api/Kernel32.sl \
     bindings/win32/Win32.sl bindings/win32/Ui.sl bindings/win32/Drawing.sl \
     -l user32 -l gdi32
 ```
+
+A **Windows resource script** (`.rc`) may be listed too. It is compiled with
+`llvm-rc` and the linker folds the result into the executable, which is how an
+icon, a toolbar's image strip, a string table, a menu, a dialog template or an
+application manifest gets *inside* the binary rather than sitting beside it:
+
+```
+stainless run samples/win32/resources.sl samples/win32/resources.rc \
+    bindings/win32 -l user32
+```
+
+A resource section is a PE idea and nothing else has one, so a build for
+another system leaves the script out and warns (SL0700) rather than failing —
+one source tree still builds everywhere. `Win32.Resources` reads them back, and
+`Bitmap.FromResource` in `forms/` is the same thing one layer up. See
+[§2.2 of docs/packages.md](docs/packages.md).
 
 ### Projects
 

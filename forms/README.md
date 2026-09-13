@@ -466,13 +466,13 @@ here at all. Where one is a backend's rather than the library's, it says so.
   construction**, because on Windows they are creation-time style bits.
 - **`InvalidateRegion` repaints the whole control**, since no peer interface
   takes a region yet.
-- **Visual styles need a manifest.** The themed common controls are version 6
-  of `comctl32`, reachable only through a side-by-side manifest naming it;
-  without one Windows loads version 5 and the tabs, toolbar and progress bar
-  look like Windows 2000. They work either way, which is what makes it easy to
-  miss. `samples/forms/build.ps1` writes one beside each executable, because
-  Stainless has `#pragma comment(lib, ...)` and no way to ask the linker for
-  anything else.
+- **Visual styles need a manifest**, and it is now inside the binary. The
+  themed common controls are version 6 of `comctl32`, reachable only through a
+  side-by-side manifest naming it; without one Windows loads version 5 and the
+  tabs, toolbar and progress bar look like Windows 2000. They work either way,
+  which is what makes it easy to miss. `samples/forms/forms.rc` files that
+  manifest as `RT_MANIFEST`, and the build compiles it in -- so there is no
+  longer a loose `.exe.manifest` to copy beside each program and lose.
 - **A `ListView` row is an index, not an object.** `TListItem` is a
   `TPersistent` with a `TStrings` hanging off it, so a thousand rows is two
   thousand objects before any text. Cells are set and read through the list,
@@ -480,7 +480,10 @@ here at all. Where one is a backend's rather than the library's, it says so.
 - **Pictures are `.bmp` only**, because `LoadImageW` is the whole of what
   Windows decodes without a library. PNG needs WIC or GDI+, each a binding of
   its own. An `ImageList` treats magenta as transparent, as toolbar bitmaps
-  have since Windows 95.
+  have since Windows 95. They may come from a file or from the program's own
+  resources -- `Bitmap.FromResource(id)` and `ImageList.AddResource(id)` read
+  an `RT_BITMAP` compiled into the executable, which is how a toolbar's icons
+  stop being something that can go missing between building and running.
 - **Not DPI aware.** On a scaled display Windows renders the window at 96 DPI
   and scales the result, so text is soft. Per-monitor awareness is a manifest
   setting and a layout that scales with it, and neither is here.
@@ -489,6 +492,15 @@ here at all. Where one is a backend's rather than the library's, it says so.
 
 ### GTK's own
 
+- **There are no resources, and this one will not be fixed by work.**
+  `Bitmap.FromResource` and `Form.UseIconResource` fail here, with a message
+  saying why rather than a null. An ELF binary has no resource section: what
+  Windows has is a directory indexed by type and integer id that the *loader*
+  reads, and the nearest thing on Linux -- GLib's GResource -- is a
+  name-to-bytes lookup a library consults, reached by a `resource:///` path and
+  needing `glib-compile-resources` in the build. A program that wants pictures
+  on both systems reads them from files. A GTK program's window icon comes from
+  the desktop's icon theme, keyed by the name in its `.desktop` file.
 - **A size request is a minimum.** A control in a `GtkFixed` is given its
   natural size when that is larger than the layout allowed, so a long caption
   overflows rather than clipping. A label ellipsizes and an entry scrolls; a

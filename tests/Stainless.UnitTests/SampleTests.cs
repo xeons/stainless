@@ -105,6 +105,7 @@ public class SampleTests
 
         new("win32/report", ["samples/win32/report.sl"]) { WindowsOnly = true },
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
+        new("win32/resources", ["samples/win32/resources.sl"]) { WindowsOnly = true },
 
         new("forms/demo", ["samples/forms/demo.sl"]) { WindowsOnly = true, NeedsForms = true },
         new("forms/common", ["samples/forms/common.sl"]) { WindowsOnly = true, NeedsForms = true },

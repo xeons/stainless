@@ -483,6 +483,27 @@ public sealed class Bitmap {
         return Ok(new Bitmap(loaded.Value));
     }
 
+    /// Reads a picture the program is carrying inside itself, by the numeric
+    /// id its resource script gave it.
+    ///
+    /// This is the one that cannot go wrong at the customer's machine. A path
+    /// is a promise about a file that has to still be there, spelled the same
+    /// way, beside a binary that may have been moved; a resource id is checked
+    /// when the program is *built* and travels in the executable. For a
+    /// toolbar's icons -- which are part of the program rather than part of its
+    /// data -- that is the difference between a missing button and no failure
+    /// mode at all.
+    ///
+    /// **Windows only.** The `Result` is the honest way to say so: on a GTK
+    /// build this fails with a message explaining that an ELF binary has no
+    /// resource section, rather than the method not existing and the program
+    /// failing to compile on one of the two platforms.
+    public static Result<Bitmap, String> FromResource(int id) {
+        var loaded = WidgetSet.Current.LoadBitmapResource(id);
+        if (!loaded.Ok) { return Fail(loaded.Error); }
+        return Ok(new Bitmap(loaded.Value));
+    }
+
     public int Width  => backend.Width();
     public int Height => backend.Height();
     public Size Extent => Size.Of(backend.Width(), backend.Height());

@@ -498,6 +498,11 @@ public const int SmBorderWidth            = 5;
 public const int SmBorderHeight           = 6;
 public const int SmIconWidth              = 11;
 public const int SmIconHeight             = 12;
+/// `SM_CXSMICON`/`SM_CYSMICON`: the small icon, which is what goes in a title
+/// bar and in a list view's small-icon view. Not half the large one -- the
+/// theme decides, and on a scaled display it is neither 16 nor 32.
+public const int SmSmallIconWidth         = 49;
+public const int SmSmallIconHeight        = 50;
 public const int SmCursorWidth            = 13;
 public const int SmCursorHeight           = 14;
 public const int SmMenuHeight             = 15;
@@ -881,11 +886,12 @@ public const uint TpmNonNotify  = 0x0080u;
 public const uint WmInitMenuPopup = 0x0117u;
 public const uint WmMenuSelect    = 0x011Fu;
 
-// ==================================================== images from a file
+// ============================================== images, from a file or a resource
 //
-// Enough to put a picture on a button or in a tree: a bitmap loaded from disk.
-// `LoadImageW` reads a `.bmp` and nothing else, which is the format Windows has
-// always been able to read without a decoder.
+// Enough to put a picture on a button or in a tree. `LoadImageW` reads a `.bmp`
+// and nothing else, which is the format Windows has always been able to read
+// without a decoder -- either from disk with `LrLoadFromFile`, or out of the
+// binary's own resources with an `HINSTANCE` and a `MAKEINTRESOURCE` name.
 
 public extern "C" {
     HANDLE LoadImageW(HINSTANCE instance, char16* name, uint kind,
@@ -904,6 +910,130 @@ public const uint LrLoadFromFile  = 0x0010u;
 public const uint LrDefaultSize   = 0x0040u;
 public const uint LrCreateDibSection = 0x2000u;
 public const uint LrShared        = 0x8000u;
+
+// ========================================================= resource types
+//
+// The `RT_` values from `winuser.h`: what a resource *is*, which together with
+// its name is how one is found. They are `MAKEINTRESOURCE` integers rather
+// than strings -- the same trick `IconApplication` and `CursorArrow` above
+// play -- so they are functions here, because Stainless has no `const char16*`.
+//
+// A type not in this list is a custom one, named by an ordinary wide string.
+// `RT_RCDATA` is the type to use for arbitrary bytes rather than inventing one,
+// because every resource editor already knows how to show it.
+
+public char16* RtCursor()       { return (char16*)(nuint)1u; }
+public char16* RtBitmap()       { return (char16*)(nuint)2u; }
+public char16* RtIcon()         { return (char16*)(nuint)3u; }
+public char16* RtMenu()         { return (char16*)(nuint)4u; }
+public char16* RtDialog()       { return (char16*)(nuint)5u; }
+public char16* RtString()       { return (char16*)(nuint)6u; }
+public char16* RtFontDir()      { return (char16*)(nuint)7u; }
+public char16* RtFont()         { return (char16*)(nuint)8u; }
+public char16* RtAccelerator()  { return (char16*)(nuint)9u; }
+public char16* RtRcData()       { return (char16*)(nuint)10u; }
+public char16* RtMessageTable() { return (char16*)(nuint)11u; }
+public char16* RtGroupCursor()  { return (char16*)(nuint)12u; }
+public char16* RtGroupIcon()    { return (char16*)(nuint)14u; }
+public char16* RtVersion()      { return (char16*)(nuint)16u; }
+public char16* RtDlgInclude()   { return (char16*)(nuint)17u; }
+public char16* RtPlugPlay()     { return (char16*)(nuint)19u; }
+public char16* RtVxd()          { return (char16*)(nuint)20u; }
+public char16* RtAniCursor()    { return (char16*)(nuint)21u; }
+public char16* RtAniIcon()      { return (char16*)(nuint)22u; }
+public char16* RtHtml()         { return (char16*)(nuint)23u; }
+public char16* RtManifest()     { return (char16*)(nuint)24u; }
+
+/// `WM_SETICON`: gives a window its icon. `wParam` says which of the two
+/// sizes, and `lParam` is the `HICON`.
+///
+/// Both want setting. The large one is what the task switcher shows and the
+/// small one is what the title bar draws, and a window given only the large
+/// one gets a downscaled blur in its corner.
+public const uint WmSetIcon = 0x0080u;
+public const ulong IconSmallSize = 0u;
+public const ulong IconBigSize   = 1u;
+
+/// The name Windows expects an executable's manifest to be filed under.
+/// `CREATEPROCESS_MANIFEST_RESOURCE_ID`: it is the loader that reads this one,
+/// before any code in the program runs, so nothing here ever asks for it.
+public const int ManifestResourceId = 1;
+
+// ================================== menus, dialogs and accelerators from a resource
+//
+// The three resource types that are not data but *description*. A dialog
+// template is a compiled layout that `CreateDialogParamW` turns into a window
+// full of controls; a menu template is a tree of items; an accelerator table
+// maps a key to a command id. Nothing outside Windows has an equivalent --
+// these are a declarative UI format that the OS itself knows how to read,
+// rather than embedded files a program interprets for itself.
+//
+// The `name` arguments are resource names, so an integer id has to go through
+// `MAKEINTRESOURCE`. `Win32.Resources` is the comfortable way to say that.
+
+public extern "C" {
+    /// Builds a menu from an `RT_MENU` template. The caller owns it until it
+    /// is attached to a window, which is what `SetMenu` above does.
+    HMENU LoadMenuW(HINSTANCE instance, char16* name);
+
+    /// The same from a template already in memory, which is what a program
+    /// that built one itself has.
+    HMENU LoadMenuIndirectW(void* template);
+
+    /// Reads an `RT_ACCELERATOR` table. The handle is shared and is not
+    /// destroyed, which is why there is no matching free here.
+    HACCEL LoadAcceleratorsW(HINSTANCE instance, char16* name);
+
+    /// Turns a key message into a `WM_COMMAND` for the window, and answers
+    /// non-zero when it did -- in which case the loop must *not* dispatch the
+    /// message, exactly as with `IsDialogMessageW`.
+    int    TranslateAcceleratorW(HWND window, HACCEL table, Msg* message);
+
+    /// A modeless dialog from an `RT_DIALOG` template: it is returned, and the
+    /// program's own message loop drives it.
+    HWND   CreateDialogParamW(HINSTANCE instance, char16* name, HWND parent,
+                              DialogProcedure procedure, long parameter);
+
+    /// A modal one. This does not return until the dialog ends itself with
+    /// `EndDialog`, because it runs a message loop of its own.
+    nint   DialogBoxParamW(HINSTANCE instance, char16* name, HWND parent,
+                           DialogProcedure procedure, long parameter);
+
+    /// Ends a modal dialog, and decides what `DialogBoxParamW` answers.
+    int    EndDialog(HWND dialog, nint result);
+
+    /// Reads and writes a dialog control's text by id rather than by `HWND`,
+    /// which is how a template's controls are usually reached -- the template
+    /// named them, so nothing here has to hold a handle. `GetDlgItem` under
+    /// windows above is the one that hands back the `HWND` itself.
+    uint   GetDlgItemTextW(HWND dialog, int id, char16* buffer, int size);
+    int    SetDlgItemTextW(HWND dialog, int id, char16* text);
+}
+
+/// What a dialog procedure is. It answers true when it handled the message,
+/// which is the opposite convention to a window procedure -- a window
+/// procedure passes on what it did not want, and a dialog procedure says so.
+public delegate nint DialogProcedure(HWND dialog, uint message, ulong wParam, long lParam);
+
+/// Sent to a dialog procedure once, before it is shown, with `wParam` holding
+/// the control that would get the keyboard. Answering true takes the default.
+public const uint WmInitDialog = 0x0110u;
+
+// ==================================================== strings from a resource
+
+public extern "C" {
+    /// Copies a string out of an `RT_STRING` table, and answers how many
+    /// characters it wrote -- zero when there is no string with that id.
+    ///
+    /// A string table is stored in blocks of sixteen, which is why an id is a
+    /// plain integer here rather than a resource name: `LoadStringW` works out
+    /// which block to read and where in it to look.
+    ///
+    /// Passing a zero `size` makes it write a pointer to the string's own
+    /// characters into `buffer` instead of copying, and answer the length.
+    /// Those characters are not null-terminated, being a slice of the block.
+    int LoadStringW(HINSTANCE instance, uint id, char16* buffer, int size);
+}
 
 // ================================================== keyboard navigation
 //

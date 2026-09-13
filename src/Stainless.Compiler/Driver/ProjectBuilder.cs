@@ -545,6 +545,7 @@ public sealed class ProjectBuilder(
         {
             SourcePaths = sources.Sources,
             NativeInputs = [.. sources.NativeInputs, .. linkInputs],
+            ResourceScripts = sources.ResourceScripts,
             Libraries = libraries.Distinct(StringComparer.Ordinal).ToList(),
             References = references,
             OutputPath = output,

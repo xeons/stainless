@@ -57,7 +57,8 @@ nothing else.
 | `format` | the version of this file format | 1 |
 
 `sources` takes whatever a command line takes: `.sl` files, directories searched
-recursively, and C sources or object files that belong to the same program.
+recursively, C sources or object files that belong to the same program, and a
+Windows resource script (§2.2).
 Directories rather than a list of files, because where a file sits has no bearing
 on which module it joins — that is stated in the file — so a project never has a
 file list to keep up to date, and neither does anything reading it.
@@ -81,6 +82,59 @@ stainless build src/*.sl        # no project: the paths mean what they always me
 
 Named paths win. Someone who names a file means that file, even from inside a
 project, and `--no-project` says so explicitly.
+
+### 2.2 Resources
+
+A `.rc` among the sources is a **Windows resource script**. The build compiles
+it with `llvm-rc` — which ships beside the clang that is already driving the
+build — and the linker folds the result into the executable, so what it names
+travels *inside* the binary rather than beside it:
+
+```json
+{ "name": "editor", "version": "1.0.0", "sources": ["src", "editor.rc"] }
+```
+
+```
+101 BITMAP  "toolbar.bmp"
+1   ICON    "app.ico"
+1   24      "app.manifest"      // 24 is RT_MANIFEST
+
+STRINGTABLE BEGIN
+    201 "Ready"
+END
+```
+
+That is where an icon, a toolbar's image strip, a string table, a menu, a
+dialog template, an accelerator table and an application manifest live.
+`Win32.Resources` reads them back; `Bitmap.FromResource` in `forms/` is the
+same thing one layer up. clang takes the compiled `.res` on its command line
+directly, so there is no `cvtres` step and no dependency on a particular
+linker.
+
+**Relative paths inside the script resolve against the script's own
+directory**, not the working directory — so a script keeps its bitmaps and its
+`#include`d header beside it and a build started from anywhere finds them.
+This is the one place `llvm-rc` deliberately differs from Microsoft's `rc.exe`,
+and it is the better rule: it is what makes a project relocatable.
+
+**A resource section is a PE idea, and no other format has one.** ELF has
+nothing equivalent: the nearest thing, GLib's GResource, is a name-to-bytes
+lookup that a *library* consults rather than something the loader reads, and
+Mach-O keeps resources in the bundle beside the binary. The difference is
+sharpest for the types that are not data but description — `RT_MENU`,
+`RT_DIALOG` and `RT_ACCELERATOR` are a declarative UI format Windows itself
+interprets, and nothing elsewhere reads them.
+
+So a build for any other target leaves the script out and says so:
+
+```
+warning[SL0700]: 'app.rc' is a Windows resource script and was left out of this
+build: x86_64-pc-linux-gnu has no resource section to put it in
+```
+
+A warning rather than an error, because one source tree is expected to build
+everywhere: a program whose Windows half has an icon and a manifest should not
+need the build itself put behind an `#if`.
 
 ## 3. Versions
 

@@ -59,6 +59,7 @@ public struct HBRUSH__;
 public struct HPEN__;
 public struct HFONT__;
 public struct HBITMAP__;
+public struct HACCEL__;
 public struct HINSTANCE__;
 public struct HKEY__;
 public struct HDROP__;
@@ -89,6 +90,11 @@ public using HBRUSH  = HBRUSH__*;
 public using HPEN    = HPEN__*;
 public using HFONT   = HFONT__*;
 public using HBITMAP = HBITMAP__*;
+
+/// An accelerator table: the keys that turn into commands, read from an
+/// `RT_ACCELERATOR` resource. Shared rather than owned -- Windows keeps one
+/// per table per module and there is nothing to destroy.
+public using HACCEL = HACCEL__*;
 
 /// A loaded module. `windef.h` says `typedef HINSTANCE HMODULE;`, because a
 /// module handle *is* the address it was loaded at.

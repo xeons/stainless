@@ -106,6 +106,19 @@ public class Form : WindowedControl, IWindowNotify {
         set { Text = value; }
     }
 
+    /// Gives the window the icon with this id in the program's resources, and
+    /// answers whether there was one.
+    ///
+    /// A method rather than a property because it can fail, and a property that
+    /// silently does nothing is the worst of both: an icon that did not appear
+    /// is exactly the kind of mistake that survives to a release, since the
+    /// window looks fine with the default one.
+    ///
+    /// **Windows only**, and false everywhere else. An icon in the binary is a
+    /// resource, and only a PE has those; a GTK program takes its icon from the
+    /// desktop's icon theme, keyed by the name in its `.desktop` file.
+    public bool UseIconResource(int id) { return window.SetIconResource(id); }
+
     /// How the window is framed. Read-only after construction; see the note on
     /// the constructor.
     public WindowBorder Border => framing;

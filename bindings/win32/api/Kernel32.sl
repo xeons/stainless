@@ -272,6 +272,89 @@ public const uint LoadLibraryAsDataFile      = 0x00000002u;
 public const uint LoadLibrarySearchSystem32  = 0x00000800u;
 public const uint LoadLibrarySearchDefaultDirs = 0x00001000u;
 
+// ================================================================ resources
+//
+// The data a PE carries inside itself, indexed by type and by name. This is
+// where an icon, a string table, a menu, a dialog template and an application
+// manifest live, and it is the one part of a binary that the loader and the
+// higher-level APIs read on the program's behalf: `LoadIconW`, `LoadStringW`,
+// `LoadMenuW` and `CreateDialogParamW` all walk in here and hand back a
+// finished object. What follows is the layer underneath those -- the way to
+// reach a resource nothing else knows how to interpret.
+//
+// The names are `char16*` because a resource is identified either by a string
+// or by an integer squeezed into a pointer, which is what `MAKEINTRESOURCE`
+// does. `Win32.Resources` is the module that makes that bearable; the
+// declarations here are the ones Windows publishes.
+//
+// The three-call sequence -- find, load, lock -- is historical. Nothing has
+// been unloaded or discarded since Win32: `LoadResource` hands back a pointer
+// into the already-mapped image, `LockResource` is a cast, and `FreeResource`
+// does nothing and is not declared here for that reason. There is nothing to
+// release, which is why none of this appears in a destructor.
+
+public extern "C" {
+    /// Finds a resource, and answers null when there is none of that name.
+    /// `type` is one of the `RT_` values or a string naming a custom type.
+    HANDLE FindResourceW(HMODULE library, char16* name, char16* type);
+
+    /// The same, for a particular language rather than the best match.
+    HANDLE FindResourceExW(HMODULE library, char16* type, char16* name, ushort language);
+
+    /// A handle to the resource's bytes. Despite the name, nothing is read
+    /// from disk: the image is already mapped.
+    HANDLE LoadResource(HMODULE library, HANDLE resource);
+
+    /// The bytes themselves. A pointer into the mapped image, valid for as
+    /// long as the module stays loaded, and never to be written through or
+    /// freed.
+    void*  LockResource(HANDLE loaded);
+
+    /// How many bytes there are. There is no terminator and no header: a
+    /// resource is exactly this long.
+    uint   SizeofResource(HMODULE library, HANDLE resource);
+}
+
+/// Walking what a module actually carries, for a program that did not write
+/// the binary it is reading -- a resource editor, or anything asking whether
+/// an icon is there before trying to load it.
+///
+/// Each callback answers non-zero to continue and zero to stop. `type` and
+/// `name` are `MAKEINTRESOURCE` integers as often as they are strings, which
+/// is what `Win32.Resources.NameOf` is for.
+public delegate int EnumResTypeProc(HMODULE library, char16* type, nint parameter);
+public delegate int EnumResNameProc(HMODULE library, char16* type, char16* name, nint parameter);
+public delegate int EnumResLangProc(HMODULE library, char16* type, char16* name,
+                                    ushort language, nint parameter);
+
+public extern "C" {
+    int EnumResourceTypesW(HMODULE library, EnumResTypeProc callback, nint parameter);
+    int EnumResourceNamesW(HMODULE library, char16* type,
+                           EnumResNameProc callback, nint parameter);
+    int EnumResourceLanguagesW(HMODULE library, char16* type, char16* name,
+                               EnumResLangProc callback, nint parameter);
+}
+
+/// Writing resources into a binary on disk, which is how an installer stamps
+/// a build and how a resource editor saves.
+///
+/// `EndUpdateResource` is what actually rewrites the file; discarding is how
+/// a failed edit is abandoned. The file must not be running.
+public extern "C" {
+    HANDLE BeginUpdateResourceW(char16* path, int deleteExistingResources);
+    int    UpdateResourceW(HANDLE update, char16* type, char16* name, ushort language,
+                           void* data, uint size);
+    int    EndUpdateResourceW(HANDLE update, int discard);
+}
+
+/// The language a resource is filed under. Almost everything uses the
+/// neutral one, which is what `rc` assigns when a script says nothing.
+public const ushort LangNeutral = 0u;
+
+// `RT_MESSAGETABLE` is the one resource type with no `Load...` call of its
+// own: it is read by `FormatMessageW` with `FormatMessageFromHModule`, both
+// of which are under errors at the top of this file.
+
 // ============================================================== environment
 
 public extern "C" {

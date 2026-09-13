@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: 0BSD
+//
+// What resources.sl carries inside its own executable.
+//
+// Compiled by the build and folded into the binary, so nothing named here is a
+// file the program has to find at run time. `llvm-rc` resolves an #include and
+// a relative path against this script's own directory, so this works whichever
+// directory the build was started from.
+
+#include "resources.h"
+
+// ------------------------------------------------------------------ strings
+//
+// A string table is the one resource kind addressed by a bare id: Windows
+// stores strings in blocks of sixteen and works out which block holds the one
+// asked for. Ids that sit together therefore cost one block rather than one
+// each, which is why these are consecutive.
+STRINGTABLE
+BEGIN
+    IDS_TITLE    "Resources"
+    IDS_SUBTITLE "read out of this executable, not off the disk"
+    IDS_READY    "Ready"
+END
+
+// -------------------------------------------------------------------- bytes
+//
+// RCDATA is the type to use for arbitrary data rather than inventing a custom
+// one, because every resource editor already knows how to show it. There is no
+// terminator and no header: the resource is exactly as long as what went in,
+// so the NUL below is there because it was written, not because it is implied.
+IDR_BANNER RCDATA { "Stainless\0" }
+
+// A resource may equally be named by a string, and be of a type this file
+// invents. Both are upper-cased by the resource compiler.
+LICENCE TEXTBLOB { "0BSD\0" }
+
+// ----------------------------------------------------------------- manifest
+//
+// 24 is RT_MANIFEST and 1 is CREATEPROCESS_MANIFEST_RESOURCE_ID. The loader
+// reads this before any code in the program runs, which is why nothing in
+// resources.sl ever asks for it -- it is found here by enumeration, alongside
+// everything else, which is the point being made.
+1 24 "resources.manifest"

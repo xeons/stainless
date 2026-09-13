@@ -32,6 +32,15 @@ public sealed record CompilationOptions
     public IReadOnlyList<string> NativeInputs { get; init; } = [];
 
     /// <summary>
+    /// Windows resource scripts to compile and fold into the binary.
+    ///
+    /// Apart from the other native inputs because these are not handed to the
+    /// linker as they stand: each is compiled to a .res first, and on a target
+    /// that has no resource section there is nothing useful to do with one.
+    /// </summary>
+    public IReadOnlyList<string> ResourceScripts { get; init; } = [];
+
+    /// <summary>
     /// Libraries to link by name rather than by path, from <c>-l</c>. The linker
     /// finds them on its own search path, which is how a platform's own import
     /// libraries are reached: <c>-l user32</c> rather than the full path into
@@ -254,6 +263,9 @@ public sealed record SourceSet
     public required IReadOnlyList<string> Sources { get; init; }
     public required IReadOnlyList<string> NativeInputs { get; init; }
 
+    /// <summary>Windows resource scripts, which are compiled before they are linked.</summary>
+    public IReadOnlyList<string> ResourceScripts { get; init; } = [];
+
     public required IReadOnlyList<string> Errors { get; init; }
 }
 
@@ -271,6 +283,19 @@ public sealed class Compilation
     public static bool IsNativeInput(string path) =>
         NativeExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>The extension a Windows resource script goes by.</summary>
+    public const string ResourceExtension = ".rc";
+
+    /// <summary>
+    /// True for a Windows resource script.
+    ///
+    /// Not among <see cref="NativeExtensions"/> because a .rc is not something
+    /// the linker takes: it is compiled to a .res on the way, and only that is
+    /// a native input.
+    /// </summary>
+    public static bool IsResourceScript(string path) =>
+        Path.GetExtension(path).Equals(ResourceExtension, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>
     /// Expands directories into their .sl files and separates native inputs.
     ///
@@ -281,14 +306,16 @@ public sealed class Compilation
     {
         var files = new List<string>();
         var nativeInputs = new List<string>();
+        var resourceScripts = new List<string>();
         var errors = new List<string>();
 
         foreach (string path in paths)
         {
-            if (IsNativeInput(path))
+            if (IsNativeInput(path) || IsResourceScript(path))
             {
-                if (File.Exists(path)) nativeInputs.Add(Path.GetFullPath(path));
-                else errors.Add($"'{path}' does not exist");
+                if (!File.Exists(path)) errors.Add($"'{path}' does not exist");
+                else if (IsResourceScript(path)) resourceScripts.Add(Path.GetFullPath(path));
+                else nativeInputs.Add(Path.GetFullPath(path));
                 continue;
             }
 
@@ -318,6 +345,13 @@ public sealed class Compilation
                 // object file back into the next link is the way that guess
                 // goes wrong. A path somebody typed is not a guess.
                 nativeInputs.AddRange(all.Where(f => IsNativeInput(f) && !IsBuildArtifact(f)));
+
+                // A resource script beside the sources belongs to the program
+                // for the same reason a C source does. What a previous build
+                // wrote is left out here too: the .res it produced sits under
+                // obj, and feeding that back in would embed every resource
+                // twice.
+                resourceScripts.AddRange(all.Where(f => IsResourceScript(f) && !IsBuildArtifact(f)));
             }
             else if (File.Exists(path))
             {
@@ -333,6 +367,7 @@ public sealed class Compilation
         {
             Sources = files.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
             NativeInputs = nativeInputs.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+            ResourceScripts = resourceScripts.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
             Errors = errors,
         };
     }
@@ -380,6 +415,16 @@ public sealed class Compilation
         if (options.CppAbi is { } chosenAbi) target = target with { Abi = chosenAbi };
 
         Binding.TargetPlatform.Current = target;
+
+        // Said here rather than beside the link, because it is a fact about the
+        // target and not about linking -- so `--emit-ir` for a machine with no
+        // resource section reports it too, and that path returns long before
+        // any linker is reached.
+        if (!target.IsWindows)
+            foreach (string script in options.ResourceScripts)
+                diagnostics.Warning("SL0700", default,
+                    $"'{Path.GetFileName(script)}' is a Windows resource script and was left " +
+                    $"out of this build: {target.Triple} has no resource section to put it in");
 
         // --- parse -------------------------------------------------------
         var units = new List<CompilationUnitSyntax>();
@@ -621,8 +666,20 @@ public sealed class Compilation
                 if (!libraries.Contains(library, StringComparer.Ordinal))
                     libraries.Add(library);
 
+        // A resource script is compiled here rather than with the other native
+        // inputs, because what the linker takes is the .res this produces.
+        var nativeInputs = new List<string>(options.NativeInputs);
+        if (options.ResourceScripts.Count > 0)
+        {
+            var compiled = CompileResources(
+                toolchain, options, target, intermediate, out string resourceError);
+            if (resourceError.Length > 0) return Failure(resourceError);
+
+            nativeInputs.AddRange(compiled);
+        }
+
         var link = toolchain.Link(
-            irPath, runtimeObjects, options.NativeInputs, output, options.OptimizationLevel,
+            irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
             options.Shared, options.Debug, libraries, sharedRuntime);
         if (!link.Success) return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath));
 
@@ -680,6 +737,68 @@ public sealed class Compilation
             HeaderPath = headerPath,
             MetadataPath = metadataPath,
         };
+    }
+
+    /// <summary>
+    /// Compiles each resource script to a .res, and returns what the link line
+    /// should name.
+    ///
+    /// A resource section is a PE idea. ELF has no equivalent -- the nearest
+    /// thing, GLib's GResource, is a name-to-bytes lookup rather than something
+    /// the loader itself reads -- and Mach-O keeps its resources in the bundle
+    /// beside the binary rather than inside it. So on any other target there is
+    /// nothing to compile, and SL0700 has already said so.
+    /// </summary>
+    private static IReadOnlyList<string> CompileResources(
+        Toolchain toolchain, CompilationOptions options, Binding.TargetPlatform target,
+        string intermediate, out string error)
+    {
+        error = "";
+
+        if (!target.IsWindows) return [];
+
+        if (toolchain.ResourceCompilerPath is null)
+        {
+            error = Toolchain.MissingResourceCompiler;
+            return [];
+        }
+
+        var compiled = new List<string>();
+        var taken = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (string script in options.ResourceScripts)
+        {
+            // Named for the script rather than for the program, because a
+            // program may have more than one and one name would mean the
+            // second overwriting the first -- which would link a binary
+            // carrying one script's resources twice and the other's not at
+            // all, with nothing said.
+            //
+            // Two scripts may still share a file name from different
+            // directories, so a name already taken gets its full path's digest
+            // appended. The digest is only on the collision, so the ordinary
+            // obj/ holds `app.res` and stays readable.
+            string stem = Path.GetFileNameWithoutExtension(script);
+            if (!taken.Add(stem))
+                stem += "." + Digest.OfParts([script])[..8];
+
+            string res = Path.Combine(intermediate, stem + ".res");
+
+            var result = toolchain.CompileResource(script, res, target, options.Defines);
+            if (!result.Success)
+            {
+                // llvm-rc reports on stdout as readily as on stderr.
+                string detail = result.StandardError.TrimEnd();
+                if (detail.Length == 0) detail = result.StandardOutput.TrimEnd();
+
+                error = $"could not compile the resource script '{script}':\n{detail}";
+                return [];
+            }
+
+            compiled.Add(res);
+        }
+
+        return compiled;
     }
 
     private static void TryDelete(string path)

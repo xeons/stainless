@@ -37,6 +37,7 @@ import Win32.Kernel32;
 import Win32.User32;
 import Win32.Gdi32;
 import Win32.ComCtl32;
+import Win32.Resources;
 
 /// The window class every form of this library is an instance of. Registered
 /// once, on the first form, because `RegisterClassExW` fails the second time
@@ -211,6 +212,30 @@ public class WindowPeer : ControlPeer, IWindowPeer {
     // ------------------------------------------------------- IWindowPeer
 
     public void SetTitle(String title) { SetText(title); }
+
+    /// Puts an icon on the window, in both the sizes Windows asks for.
+    ///
+    /// `WM_SETICON` twice rather than once, because the large icon is what the
+    /// task switcher shows and the small one is what the title bar draws, and a
+    /// window given only the large one gets a downscaled blur in the corner.
+    /// `LoadImageW` is asked for each size separately so the resource's own
+    /// 16- and 32-pixel images are used rather than one of them resampled.
+    public bool SetIconResource(int id) {
+        HINSTANCE self = (HINSTANCE)GetModuleHandleW(null);
+
+        var large = LoadImageW(self, Resources.Id(id), ImageIcon,
+                               GetSystemMetrics(SmIconWidth),
+                               GetSystemMetrics(SmIconHeight), LrDefaultColor);
+        var small = LoadImageW(self, Resources.Id(id), ImageIcon,
+                               GetSystemMetrics(SmSmallIconWidth),
+                               GetSystemMetrics(SmSmallIconHeight), LrDefaultColor);
+
+        if (large == null && small == null) { return false; }
+
+        if (large != null) { SendMessageW(window, WmSetIcon, IconBigSize, (long)(nuint)large); }
+        if (small != null) { SendMessageW(window, WmSetIcon, IconSmallSize, (long)(nuint)small); }
+        return true;
+    }
 
     public void SetMenu(IMenuPeer? menu) {
         menuBar = menu;
@@ -436,6 +461,10 @@ public class Win32WidgetSet : IWidgetSet {
 
     public Result<IBitmapBackend, String> LoadBitmap(String path) {
         return LoadBitmapFile(path);
+    }
+
+    public Result<IBitmapBackend, String> LoadBitmapResource(int id) {
+        return LoadResourceBitmap(id);
     }
 
     public IImageListBackend CreateImageList(FSize imageSize) {

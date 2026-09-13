@@ -69,11 +69,26 @@ public extern "C" {
 /// The predefined keys. They are pointer-shaped constants rather than handles
 /// anything opened, so they are never closed — and functions rather than
 /// `const`, because Stainless has no `const` pointer.
-public HKEY ClassesRoot()   { return (HKEY)(nuint)0x80000000u; }
-public HKEY CurrentUser()   { return (HKEY)(nuint)0x80000001u; }
-public HKEY LocalMachine()  { return (HKEY)(nuint)0x80000002u; }
-public HKEY Users()         { return (HKEY)(nuint)0x80000003u; }
-public HKEY CurrentConfig() { return (HKEY)(nuint)0x80000005u; }
+///
+/// **Written at full width to match the header, not to fix a failure.**
+/// `winreg.h` says `((HKEY)(ULONG_PTR)((LONG)0x80000000))`, and that cast is
+/// through a *signed* 32-bit type, so on a 64-bit machine the sign extends:
+/// `HKEY_CLASSES_ROOT` is `0xFFFFFFFF80000000`, not `0x0000000080000000`.
+///
+/// Both forms work -- `RegOpenKeyExW` opens the same key given either, which
+/// was measured rather than assumed -- so nothing here was broken. They are
+/// spelled the header's way because a binding's job is to be the same value C
+/// passes, and because `TVI_ROOT` in `Win32.ComCtl32` is the same construction
+/// where the truncated form *did* fail, silently, for as long as it was wrong.
+///
+/// The literal is full width rather than a negative `nint` so that both
+/// architectures are right: truncating it to 32 bits, as an x86 build does,
+/// gives back `0x80000000`.
+public HKEY ClassesRoot()   { return (HKEY)(nuint)0xFFFFFFFF80000000u; }
+public HKEY CurrentUser()   { return (HKEY)(nuint)0xFFFFFFFF80000001u; }
+public HKEY LocalMachine()  { return (HKEY)(nuint)0xFFFFFFFF80000002u; }
+public HKEY Users()         { return (HKEY)(nuint)0xFFFFFFFF80000003u; }
+public HKEY CurrentConfig() { return (HKEY)(nuint)0xFFFFFFFF80000005u; }
 
 // =================================================================== access
 

@@ -286,6 +286,24 @@ public class GtkWidgetSet : IWidgetSet {
         return Ok(new GtkBitmapBackend((gpointer)loaded));
     }
 
+    /// There is nothing to read one out of.
+    ///
+    /// **An ELF binary has no resource section.** This is not a gap in the
+    /// backend that a day's work would close: what Windows has is a directory
+    /// indexed by type and id that the loader itself reads, and nothing on
+    /// Linux is that. The nearest equivalent is GLib's GResource, which is a
+    /// name-to-bytes lookup a library consults -- a different shape, reached by
+    /// a `resource:///` path rather than by a number, and requiring
+    /// `glib-compile-resources` in the build.
+    ///
+    /// So this fails, and says which platform the caller is on rather than
+    /// pretending the id was simply missing. A program that wants its pictures
+    /// on both systems reads them from files.
+    public Result<IBitmapBackend, String> LoadBitmapResource(int id) {
+        return Fail($"no bitmap resource {id}: this is a GTK build, and an ELF " +
+                    "binary has no resource section to read one from");
+    }
+
     public IImageListBackend CreateImageList(Size imageSize) {
         return new GtkImageListBackend(imageSize);
     }

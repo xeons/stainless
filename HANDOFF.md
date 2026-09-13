@@ -7,11 +7,11 @@ and what is worth doing next. Written to be read cold.
 
 ```
 dotnet build Stainless.slnx                     0 warnings
-dotnet test tests/Stainless.UnitTests           834 pass, Windows and Linux
-dotnet run --project tests/Stainless.Tests      279 cases, 2 skipped on Windows
-                                                269 pass, 12 skipped on Linux
+dotnet test tests/Stainless.UnitTests           835 pass, Windows and Linux
+dotnet run --project tests/Stainless.Tests      281 pass, 2 skipped on Windows
+                                                270 pass, 13 skipped on Linux
 stainless doc --stdlib                          22 pages into docs/stdlib
-samples/forms/build.ps1 -Test                   demo 21/21, common 42/43
+samples/forms/build.ps1 -Test                   demo 21/21, common 43/43
 forms on GTK 3, under broadwayd                 demo 21/21, common 43/43
 ```
 
@@ -33,12 +33,13 @@ was the point -- thirty interfaces written against Win32 and nothing in one of
 them had to change -- and what it cost is written up in `forms/README.md` under
 "The GTK backend, and what it found".
 
-**The forms suite's one failure is now known to be Win32's.** "A tree node
-reads back its text" fails on Windows and *passes on GTK*, which is what a
-second backend is for: it was "the tree control is broken" and it is now "the
-Windows tree peer is broken". It fails the same way at `6adca35`, so it is not
-something a recent session did. It is still the first thing to look at, and it
-is now a much smaller thing.
+**The forms suite's one failure is fixed**, and the second backend is what
+found it. "A tree node reads back its text" failed on Windows and *passed on
+GTK*, which narrowed it from "the tree control is broken" to "something on the
+Windows side is". It was one truncated literal -- `TVI_ROOT` is a negative
+number and was written as a 32-bit one, so the Win32 tree had never actually
+held an item. See "The tree view had never held an item" below. Both samples
+now pass every check on both backends.
 
 That Linux box (`ssh brandon@geekom-a7`) has GTK 3, the development packages,
 Xvfb and `broadwayd`, so a GUI can be built *and run* there headlessly — see
@@ -102,9 +103,101 @@ keep honest, and no current distribution ships the second.
 | `31d13fe` | the 32-bit build is run rather than claimed |
 | `fb5ba19` | the documentation says x86 is a target |
 | `8aa7853` | Linux x86 runs, COM reaches x86, and ARM64 is classified |
-| *this one* | GTK 2 goes, and `forms/` gets its second backend |
+| `2c0e8b8` | GTK 2 goes, and `forms/` gets its second backend |
+| `cc4a910` | a lambda capturing a member something else writes warns |
+| *this one* | Windows resources, and the tree view that had never held an item |
 
 ## Findings worth keeping
+
+### What implementing resources found
+
+**clang links a `.res` directly, so there is no cvtres step.** This was the
+whole question the feature turned on, and it was settled by trying it rather
+than by reading: `clang main.c app.res -o app.exe` works, the driver passes the
+`.res` through, and every linker that can produce a PE folds it in. The LLVM
+install here has no `llvm-cvtres.exe` at all, so a design that needed one would
+have been stuck. `llvm-rc` *is* there, beside the clang the build already
+found — which is why `ResourceCompilerPath` looks next to `ClangPath` before it
+looks at `PATH`. The copy beside the driver is the copy that matches.
+
+**`llvm-rc` resolves relative paths against the script's directory, not the
+working directory.** This is a deliberate difference from Microsoft's `rc.exe`
+and it is the better rule — it is what lets a project keep `app.rc` beside its
+bitmaps and still be built from anywhere. Worth knowing because it is the one
+place a `.rc` that works here will behave differently under MSVC's toolchain.
+
+**The warning had to move before the `EmitIrOnly` return.** SL0700 is reported
+right after the target is known rather than beside the link, because
+`assemble.txt` cases set `EmitIrOnly` and return long before any linker is
+reached — so a warning raised at link time could not be pinned by a case at
+all. It is also simply more correct: it is a fact about the target, not about
+linking. `tests/cases/resources-no-section` is the case, and it only passes
+because of that move.
+
+**Three names collided on the way in.** `module` is a keyword, so
+`FindResourceW(HMODULE module, ...)` does not parse — the file's own convention
+is `HMODULE library`. `GetDlgItem` was already declared in `User32.sl` under
+windows, so the dialog block re-declared it (SL0211). And the Win32 widget set's
+`LoadBitmapResource` override initially called a free function of the same
+name, which is infinite recursion; the existing `LoadBitmap`/`LoadBitmapFile`
+split is the pattern, and the free function is now `LoadResourceBitmap`.
+
+**The `.exe.manifest` side-car is gone.** `samples/forms/build.ps1` used to
+write one beside every sample because there was no way to ask the linker for
+anything but a library, which `forms/README.md` listed as a known limit. It is
+now `samples/forms/forms.rc` with `1 24 "forms.manifest"`, verified with
+`llvm-readobj --coff-resources`, and the README paragraph has been rewritten
+rather than left standing.
+
+**Incremental builds were already right, by accident of an earlier decision.**
+A changed `.rc` rebuilds the package with nothing added, because
+`Digest.OfDirectory` hashes *every* file under a package that is not in
+`obj`/`bin`/`build`/`.git` rather than only the `.sl` ones. So the `.h` a
+script includes and the `.bmp` it names are covered too. The "every input, or
+rebuild" rule in `BuildStamp` paid for itself here.
+
+**Two scripts with the same file name overwrote each other.** The first version
+named the output after the script's stem alone, so `a/app.rc` and `b/app.rc`
+both produced `obj/app.res` -- the second overwriting the first, the same path
+added to the link line twice, and one script's resources silently absent from
+the binary. A name already taken now gets eight hex digits of the full path's
+digest appended, only on the collision, so the ordinary `obj/` still holds a
+readable `app.res`. Verified by building both and reading a string out of each.
+
+### The tree view had never held an item
+
+`common`'s "a tree node reads back its text" had been failing at `42/43` on
+Windows since before this work -- confirmed by stashing every change and
+re-running -- and it turned out to be one wrong literal.
+
+**`TVI_ROOT` is a negative number.** `commctrl.h` spells it
+`((HTREEITEM)(ULONG_PTR)-0x10000)`, so on a 64-bit machine the sign extends
+through the whole pointer: `0xFFFFFFFFFFFF0000`. `Win32.ComCtl32` had it as
+`(nuint)0xFFFF0000u`, which zero-extends to `0x00000000FFFF0000` -- a different
+value, naming no node and not the root. `TVM_INSERTITEMW` rejected every insert
+under it and answered zero, and nothing checked the answer.
+
+So the Win32 tree view had **never held a single item**. The other tree checks
+passed because `TreeView` keeps a mirror list of its nodes in Stainless and
+those assertions were reading the mirror, not the control. Only the one check
+that asked the *control* for text ever noticed.
+
+Finding it took ruling out everything else first: the struct offsets, the
+message numbers, the mask bits and `sizeof` were all verified byte-for-byte
+against a C program doing the same thing. The decisive step was dumping the 72
+bytes of `TVINSERTSTRUCTW` from both and diffing them -- the first eight bytes
+differed and nothing else did. Worth remembering as the technique, because
+every individual constant read as correct.
+
+**The same construction appears in `Win32.AdvApi32`**, where `HKEY_CLASSES_ROOT`
+and its neighbours are `(LONG)0x80000000` sign-extended. Those were truncated
+too and were spelled at full width while here -- but note that they were *not*
+broken: `RegOpenKeyExW` opens the same key given either bit pattern, which was
+measured with a C program rather than assumed. The registry tests were passing
+honestly. They now match the header because a binding should be the value C
+passes, not merely one the API tolerates.
+
+Both samples now pass every check on Win32: `demo` 21/21, `common` 43/43.
 
 ### What running Linux x86 found
 
@@ -130,16 +223,42 @@ such symbol. The rule is now the object format's rather than the
 architecture's, and the same correction applies to `__vectorcall` on x86-64,
 which was being decorated on Linux too.
 
-**`geekom-a7` cannot build a 32-bit binary and there is no password to fix
-that.** It has the i386 *runtime* libraries -- `/usr/lib/i386-linux-gnu` has
-`libc.so.6` and `ld-linux.so.2`, so a 32-bit binary runs -- and none of the
-development half: no `Scrt1.o`, no `crti.o`, no 32-bit `libc.so` or `libgcc`.
-Those come from `libc6-dev-i386` and `gcc-multilib`, `sudo` wants a password,
-and `apt-get download` works without one but leaves the flags to be threaded
-through a compiler driver nobody wants to teach. What runs there is a
-container: [tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile), the .NET
-SDK image plus `clang` and `gcc-multilib`, with the tree bind-mounted. The
-whole Linux suite runs in it, not only the 32-bit cases.
+**`geekom-a7` builds 32-bit binaries natively now, and the note that used to be
+here had the reason wrong.** The claim was that the box lacked `gcc-multilib`
+and `libc6-dev-i386`. It did not: both were installed, i386 was an enabled
+foreign architecture, and `/usr/lib32` had `Scrt1.o` and `crti.o`. The 32-bit
+cases failed anyway, with
+
+```
+/usr/include/stdint.h:26:10: fatal error: 'bits/libc-header-start.h' file not found
+```
+
+because what was missing was the **headers**, not the libraries.
+`libc6-dev-i386` ships `/usr/lib32` plus a couple of `-32.h` stubs and leaves
+the real headers shared, so `bits/libc-header-start.h` existed only under
+`/usr/include/x86_64-linux-gnu/`. clang targeting `i386-linux-gnu` looks in
+`/usr/include/i386-linux-gnu/`, which nothing had created.
+
+The package that creates it is **`libc6-dev:i386`** -- the i386-architecture
+build, and *not* the similarly named `libc6-dev-i386` that was already there.
+That naming is the whole trap. It is installed now, and the four 32-bit cases
+pass on the box directly:
+
+```
+dotnet run --project tests/Stainless.Tests -- x86
+all 4 tests passed
+```
+
+**So the container is no longer needed for anything.**
+[tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile) is kept because a
+machine without those packages still wants it, but the whole Linux suite now
+runs on the box itself -- 270 pass, 13 skipped, in 136s against the container's
+249s.
+
+**And the box is reachable without a password.** `ssh brandon@geekom-a7` works
+with key auth and `BatchMode=yes`, so syncing and running the suite there needs
+no interaction at all. An earlier note here said otherwise, and believing it
+cost two runs.
 
 ### What ARM64 needed that the other three did not
 

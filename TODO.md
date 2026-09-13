@@ -57,10 +57,13 @@ has always done, so every `extern "C" __stdcall` went looking for a symbol
 nobody had emitted. Both were link-time or compile-time failures rather than
 wrong answers, which is the good kind.
 
-`geekom-a7` has no 32-bit development libraries and no password to install
-them; what runs there is a container, and
-[tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile) is the whole of it --
-the .NET SDK image plus `clang` and `gcc-multilib`.
+`geekom-a7` runs the 32-bit cases directly now. It had `gcc-multilib` and
+`libc6-dev-i386` all along; what it lacked was `libc6-dev:i386`, the
+i386-architecture build that creates `/usr/include/i386-linux-gnu/` -- which is
+where clang looks when it targets i386, and which the similarly named
+`libc6-dev-i386` does not provide.
+[tests/linux-x86.Dockerfile](tests/linux-x86.Dockerfile) is kept for a machine
+that has neither, and is no longer on the path of an ordinary run.
 
 **COM on x86 was where the convention is attached, and the byte counts answer
 themselves.** A com interface's slots get `__stdcall` when the table is
@@ -119,10 +122,15 @@ with one `GtkTreeView` over a model -- without either backend knowing.
 behind one seam is two backends to keep honest, and no current distribution
 ships the second.
 
-It also settled an old failure. `common`'s "a tree node reads back its text"
-fails on Win32 and *passes* on GTK, so it is the Windows tree peer rather than
-the tree control -- a different bug in a different file, and a much smaller
-one. It is the first thing to look at in `forms/`.
+It also settled an old failure, and that failure is now fixed. `common`'s "a
+tree node reads back its text" failed on Win32 and passed on GTK, which said
+the fault was on the Windows side. It was not in the tree peer at all: the
+`TVI_ROOT` and `TVI_LAST` sentinels in `Win32.ComCtl32` were written as 32-bit
+literals, and `commctrl.h` defines them as *negative* numbers that sign-extend
+to `0xFFFFFFFFFFFF0000` on a 64-bit machine. Every insert was handed a parent
+handle that named nothing, returned zero, and was never checked -- so the Win32
+tree view had never held a single item, and only the peer's mirror list made
+the other tree checks pass. Both samples now pass every check on Win32.
 
 What is next there is in [forms/README.md](forms/README.md), which has the full
 roadmap. The short version: **DPI awareness**, because both backends now turn
@@ -183,6 +191,64 @@ shell's half is written. In rough order of what a program actually wants:
   the real test of whether this scales.
 
 *Touches:* `bindings/win32/api`, `bindings/win32`.
+
+### What resources left open
+
+A `.rc` compiles into the binary now and `Win32.Resources` reads one back, so
+the mechanism is done. Three things around it are not, in the order they are
+worth having:
+
+**A dialog built from its template.** `CreateDialogParamW`, `DialogBoxParamW`
+and `EndDialog` are bound and a `RT_DIALOG` in a script works today through the
+raw layer; what is missing is a `forms/` control that wraps one. It matters
+because a dialog template is how every Windows program has laid out a dialog
+for thirty years -- the layout is data, so it can be edited by a resource
+editor and translated without recompiling, neither of which is true of the
+`SetBounds` calls `forms/` uses now. This is the only one of these three that
+would change how programs are written rather than adding a capability.
+
+**`Bitmap.FromResource` is the one seam method a backend cannot implement.**
+`IWidgetSet.LoadBitmapResource` and `IWindowPeer.SetIconResource` fail on GTK
+with a message rather than a picture. That is a difference in binary format
+rather than a gap, and it is still an asymmetry nothing else in forty-five seam
+methods has.
+
+Two ways to close it, and the measurements that decide between them:
+
+*A `.res` shim.* LLVM will **not** link a `.res` into an ELF binary --
+`ld.lld` answers `unknown file type` -- but it does not have to. A `.res` is a
+flat list of self-describing records, and `llvm-objcopy -I binary -O
+elf64-x86-64 app.res app.o` turns it into an object exposing
+`_binary_app_res_start`/`_end`, which links. Both steps were run and both work.
+A reader for the record format is perhaps a hundred lines. **This is the one to
+do**, because it adds no dependency -- `llvm-rc` and `llvm-objcopy` both ship
+beside the clang the build already requires -- keeps one `.rc` for every
+target, and preserves the type-and-id addressing `Win32.Resources` already
+exposes, so `Resources.Bytes(Id(301), RtRcData())` would compile and run
+unchanged on Linux.
+
+*GResource.* An XML manifest compiled by `glib-compile-resources` into an ELF
+section, reached by a `resource:///` path. It is what other Linux tooling
+understands -- Glade files, CSS, icon themes -- so it is the right answer for a
+program that wants to be a good GNOME citizen. It costs a build-tool
+dependency, and it is keyed by *path* rather than by type and id, so it would
+need a second API shape and would leave the seam asymmetric anyway.
+
+Two things to know before starting either. **`RT_BITMAP` has no
+`BITMAPFILEHEADER`**: `rc` strips those 14 bytes, measured as 70 on disk
+against 56 in the resource, so a decoder like gdk-pixbuf has to be handed a
+synthesized header. And **the byte-shaped half is all that can be closed** --
+`RT_MENU`, `RT_DIALOG` and `RT_ACCELERATOR` are a format Windows itself
+interprets, so the shim would hand a program the bytes of a dialog template
+that nothing on Linux can build a window from.
+
+**A `.res` or a prebuilt resource object is refused.** Only a `.rc` is
+recognised, so a resource compiled by someone else's toolchain -- or one a
+build step generated -- has no way in. It is a line in `NativeExtensions` and a
+passthrough, and the reason to want it is a program whose version resource is
+stamped by CI rather than checked in.
+
+*Touches:* `src/Stainless.Compiler/Driver`, `bindings/win32`, `forms/src`.
 
 ---
 

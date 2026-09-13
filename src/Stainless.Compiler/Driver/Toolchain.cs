@@ -134,6 +134,100 @@ public sealed class Toolchain
         }
     }
 
+    private string? _resourceCompilerPath;
+    private bool _lookedForResourceCompiler;
+
+    /// <summary>
+    /// The Windows resource compiler, or null when there is none to be found.
+    ///
+    /// Looked for beside clang before anywhere else, because llvm-rc ships in
+    /// the same bin directory as the clang that is already driving this build --
+    /// so the copy beside it is the copy that matches, and an older one earlier
+    /// on PATH is not.
+    ///
+    /// Null rather than an error, because a missing resource compiler is only a
+    /// problem for a program that has a .rc in it, and most do not.
+    /// </summary>
+    public string? ResourceCompilerPath
+    {
+        get
+        {
+            if (_lookedForResourceCompiler) return _resourceCompilerPath;
+            _lookedForResourceCompiler = true;
+
+            string? configured = Environment.GetEnvironmentVariable("STAINLESS_RC");
+            if (!string.IsNullOrWhiteSpace(configured) && File.Exists(configured))
+                return _resourceCompilerPath = configured;
+
+            foreach (string candidate in ResourceCompilerCandidates())
+                if (File.Exists(candidate))
+                    return _resourceCompilerPath = candidate;
+
+            return _resourceCompilerPath = null;
+        }
+    }
+
+    private IEnumerable<string> ResourceCompilerCandidates()
+    {
+        string executable = OperatingSystem.IsWindows() ? "llvm-rc.exe" : "llvm-rc";
+
+        if (Path.GetDirectoryName(ClangPath) is { Length: > 0 } beside)
+            yield return Path.Combine(beside, executable);
+
+        foreach (string directory in (Environment.GetEnvironmentVariable("PATH") ?? "")
+                     .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
+        {
+            string trimmed = directory.Trim('"');
+            if (trimmed.Length > 0) yield return Path.Combine(trimmed, executable);
+        }
+
+        if (OperatingSystem.IsWindows())
+        {
+            yield return @"C:\Program Files\LLVM\bin\llvm-rc.exe";
+            yield return @"C:\Program Files (x86)\LLVM\bin\llvm-rc.exe";
+        }
+    }
+
+    /// <summary>What to tell someone whose program has a .rc and whose machine has no llvm-rc.</summary>
+    public const string MissingResourceCompiler =
+        "could not find 'llvm-rc'. A .rc file is a Windows resource script, and compiling one needs it.\n" +
+        "  It ships with LLVM, in the same directory as the clang this build already found:\n" +
+        "    winget install LLVM.LLVM\n" +
+        @"  Or point Stainless at an existing copy:  set STAINLESS_RC=C:\path\to\llvm-rc.exe";
+
+    /// <summary>
+    /// Compiles a Windows resource script to the .res an executable carries.
+    ///
+    /// There is no cvtres step and no dependency on a particular linker: clang
+    /// takes a .res on its command line and hands it through, and every linker
+    /// that can produce a PE knows how to fold one in.
+    ///
+    /// llvm-rc resolves an <c>#include</c>, and a bitmap or manifest named by a
+    /// relative path, against the script's own directory rather than the
+    /// working directory. That is what lets a script keep its files beside it
+    /// and still be built from anywhere, and it is the one place where llvm-rc
+    /// deliberately differs from Microsoft's rc.exe.
+    /// </summary>
+    public ToolResult CompileResource(
+        string scriptPath, string outputPath, Binding.TargetPlatform target,
+        IEnumerable<string>? defines = null)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath)) ?? ".");
+
+        List<string> arguments = [];
+
+        // The same symbols `#if` tests in Stainless and `-D` defines in C, so
+        // one set of names describes the program to all three languages in it.
+        foreach (string define in defines ?? []) arguments.Add("-D" + define);
+
+        // What the Windows headers call this target, for a script that asks.
+        arguments.Add(target.PointerWidth == 8 ? "-D_WIN64" : "-D_WIN32");
+
+        arguments.AddRange(["-fo", outputPath, scriptPath]);
+
+        return Run(ResourceCompilerPath!, arguments);
+    }
+
     private const string RuntimeResourcePrefix = "Stainless.Runtime.";
 
     /// <summary>
