@@ -72,6 +72,45 @@ void EnsureFormClass() {
     formClassRegistered = true;
 }
 
+/// The window class a `CustomControl` is an instance of, registered on the
+/// same terms as the form's and for the same reason.
+///
+/// **A separate class rather than the form's**, because the two disagree about
+/// the one thing a class settles: `CS_DBLCLKS` they share, but a form is a
+/// top-level window with an icon and an arrow cursor, and a drawn control wants
+/// neither. Both leave `Background` null so that `WM_ERASEBKGND` decides -- for
+/// a form, the back colour it was given; for this, nothing at all, because it
+/// draws into a buffer and copies the buffer over every pixel it owns.
+static readonly String CustomClassName = "StainlessFormsCustom";
+static bool customClassRegistered = false;
+
+void EnsureCustomClass() {
+    if (customClassRegistered) { return; }
+
+    var name = CustomClassName.ToUtf16();
+    WindowClass windowClass;
+    windowClass.Size = (uint)sizeof(WindowClass);
+    // Redrawing on both axes: a drawn control's contents almost never survive a
+    // resize unchanged, and one that lays text out to its own width never does.
+    windowClass.Style = ClassStyleHorizontalRedraw | ClassStyleVerticalRedraw
+                      | ClassStyleDoubleClicks;
+    windowClass.Procedure = StainlessProc;
+    windowClass.ClassExtra = 0;
+    windowClass.WindowExtra = 0;
+    windowClass.Instance = GetModuleHandleW(null);
+    windowClass.Icon = null;
+    // Null, so that `WM_SETCURSOR` reaches the peer and `SetCursor` on the
+    // control decides. A class cursor here would win over it on every move.
+    windowClass.Cursor = null;
+    windowClass.Background = null;
+    windowClass.MenuName = null;
+    windowClass.ClassName = name.ToPointer();
+    windowClass.SmallIcon = null;
+
+    RegisterClassExW(&windowClass);
+    customClassRegistered = true;
+}
+
 /// `SPI_GETWORKAREA`: the screen minus the task bar.
 const uint SpiGetWorkArea = 0x0030u;
 
@@ -405,6 +444,10 @@ public class Win32WidgetSet : IWidgetSet {
 
     public IPanelPeer CreatePanel(IControlNotify owner, IContainerPeer parent) {
         return new PanelPeer(owner, parent);
+    }
+
+    public ICustomPeer CreateCustom(IControlNotify owner, IContainerPeer parent) {
+        return new CustomPeer(owner, parent);
     }
 
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,

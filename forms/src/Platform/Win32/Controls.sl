@@ -601,4 +601,188 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer {
     }
 }
 
+// ================================================================== custom
+
+/// A window of a class of this library's own, that draws nothing and hears
+/// everything.
+///
+/// **Registered rather than borrowed.** Every other peer in this file is a
+/// system class with its behaviour subclassed out of the way; this one has no
+/// system class to borrow, because what it is for is precisely the behaviour
+/// none of them have. `STATIC` was tried -- it is what `PanelPeer` uses -- and
+/// it cannot take the focus, which is the whole point.
+///
+/// Three things the class has to say, and each of them is a bug if it does not:
+///
+///   1. **`WS_TABSTOP` and a click that focuses.** `DefWindowProcW` does not
+///      focus a window that is clicked; only a system control's own procedure
+///      does that, and this has none.
+///   2. **`WM_GETDLGCODE`.** The message loop runs `IsDialogMessageW`, which
+///      reads Tab and the arrow keys before any window sees them and spends
+///      them on moving the focus. A control that wants to move a caret with
+///      them has to ask for them by name.
+///   3. **Its own double buffer.** The class brush is null and `WM_ERASEBKGND`
+///      is answered without drawing, so nothing paints the background twice.
+///      The control draws into a bitmap and the bitmap reaches the screen in
+///      one `BitBlt`, which is what keeps a caret blinking over text the user
+///      is typing from flickering the text with it.
+public class CustomPeer : ControlPeer, ICustomPeer {
+    /// Where the caret is and how big, or empty for a control with none. Held
+    /// because the caret belongs to the focused window rather than to a
+    /// control: it is made when the focus arrives and destroyed when it goes,
+    /// and this is what it is made from both times.
+    FRect caret;
+    bool  focusable;
+
+    public CustomPeer(IControlNotify owner, IContainerPeer parent) {
+        base(MakeCustom(WindowOf(parent)), owner, false);
+        caret = Area(0, 0, 0, 0);
+        focusable = true;
+    }
+
+    /// Made before `base(...)`, which needs the window to bind its peer to.
+    static HWND MakeCustom(HWND parent) {
+        EnsureCustomClass();
+        return CreateWindowExW(0u, CustomClassName.ToUtf16().ToPointer(),
+                               "".ToUtf16().ToPointer(),
+                               ChildStyle() | WsClipChildren,
+                               0, 0, 0, 0, parent, null,
+                               GetModuleHandleW(null), null);
+    }
+
+    public void AddChild(IControlPeer child) {
+        SetParent((HWND)(void*)child.Handle(), window);
+    }
+
+    public void RemoveChild(IControlPeer child) {
+        SetParent((HWND)(void*)child.Handle(), null);
+    }
+
+    public void SetBorder(ControlBorder border) {
+        long extended = Win32.User32.GetWindowLongPtrW(window, GwlExtendedStyle);
+        extended = extended & ~(long)(WsExClientEdge | WsExStaticEdge);
+        if (border == ControlBorder.Single)      { extended = extended | (long)WsExStaticEdge; }
+        else if (border == ControlBorder.Sunken) { extended = extended | (long)WsExClientEdge; }
+        Win32.User32.SetWindowLongPtrW(window, GwlExtendedStyle, extended);
+        // The frame is outside the client area, so the window has to be told
+        // its size again before anything recalculates it.
+        SetWindowPos(window, null, 0, 0, 0, 0,
+                     SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
+    }
+
+    public void SetFocusable(bool wanted) {
+        focusable = wanted;
+        long style = Win32.User32.GetWindowLongPtrW(window, GwlStyle);
+        if (wanted) { style = style | (long)WsTabStop; }
+        else        { style = style & ~(long)WsTabStop; }
+        Win32.User32.SetWindowLongPtrW(window, GwlStyle, style);
+    }
+
+    /// The caret is remembered, and applied now only if this window is the one
+    /// that has it -- which is the window with the focus, and no other.
+    public void SetCaret(FRect place) {
+        // **Nothing at all when nothing moved.** A control that works out where
+        // its caret goes while it is painting -- which is where the text has
+        // just been measured, and so the natural place -- sets it on every
+        // paint. Answering that with a destroy and a create would flicker it,
+        // and on GTK, where a caret is drawn rather than owned by the system,
+        // it would ask for another paint and never stop.
+        if (place.X == caret.X && place.Y == caret.Y
+            && place.Width == caret.Width && place.Height == caret.Height) {
+            return;
+        }
+
+        bool sized = place.Width != caret.Width || place.Height != caret.Height;
+        caret = place;
+        if (!HasFocus()) { return; }
+
+        if (place.IsEmpty) {
+            DestroyCaret();
+            return;
+        }
+        // A caret is created at a size, so changing the size means making it
+        // again; moving it does not.
+        if (sized) { MakeCaret(); }
+        else       { SetCaretPos(place.X, place.Y); }
+    }
+
+    void MakeCaret() {
+        if (caret.IsEmpty) { return; }
+        CreateCaret(window, null, caret.Width, caret.Height);
+        SetCaretPos(caret.X, caret.Y);
+        Win32.User32.ShowCaret(window);
+    }
+
+    /// Nothing erases it. The class brush is null and `Dispatch` answers the
+    /// message itself, so the only thing that ever fills the client area is the
+    /// buffer in `PaintBuffered` -- filled in one go and copied in one go.
+    protected override bool ErasesBackground() { return false; }
+
+    public override long Dispatch(uint message, ulong wParam, long lParam) {
+        if (message == WmEraseBackground) { return 1; }
+
+        if (message == WmPaint) { return PaintBuffered(); }
+
+        // Every key, and the characters too. Without this the message loop's
+        // `IsDialogMessageW` takes Tab, the arrows, Return and Escape before
+        // this window is ever asked.
+        if (message == WmGetDlgCode) {
+            if (!focusable) { return 0; }
+            return (long)(DlgcWantAllKeys | DlgcWantChars | DlgcWantArrows | DlgcWantTab);
+        }
+
+        // `DefWindowProcW` does not focus a clicked window, so this does. Before
+        // the base, so that a handler for the click can already assume the
+        // control it is on has the keyboard.
+        if (message == WmLeftButtonDown || message == WmRightButtonDown
+            || message == WmMiddleButtonDown) {
+            if (focusable && GetFocus() != window) { SetFocus(window); }
+        }
+
+        // The caret is the focused window's, so it is made and destroyed with
+        // the focus rather than with the control.
+        if (message == WmSetFocus)  { MakeCaret(); }
+        if (message == WmKillFocus) { DestroyCaret(); }
+
+        return base.Dispatch(message, wParam, lParam);
+    }
+
+    /// Paints into a bitmap, and copies the bitmap to the screen.
+    ///
+    /// `BeginPaint` rather than `GetDC`, because only `BeginPaint` clears the
+    /// update region -- without it the same `WM_PAINT` arrives for ever and the
+    /// program spins. It also hides the caret for the duration and puts it back
+    /// at `EndPaint`, which is why nothing here has to.
+    long PaintBuffered() {
+        PaintStruct paint;
+        HDC screen = BeginPaint(window, &paint);
+        if (screen == null) { return 0; }
+
+        Rect client;
+        GetClientRect(window, &client);
+        int width = client.Right - client.Left;
+        int height = client.Bottom - client.Top;
+
+        var owner = Owner();
+        if (owner != null && width > 0 && height > 0) {
+            HDC     buffer = CreateCompatibleDC(screen);
+            HBITMAP sheet  = CreateCompatibleBitmap(screen, width, height);
+            HGDIOBJ was    = SelectObject(buffer, (HGDIOBJ)sheet);
+
+            FillRect(buffer, &client, BackgroundBrush());
+            var surface = new GraphicsBackend(buffer, FromRect(client));
+            ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+
+            BitBlt(screen, 0, 0, width, height, buffer, 0, 0, SrcCopy);
+
+            SelectObject(buffer, was);
+            DeleteObject((HGDIOBJ)sheet);
+            DeleteDC(buffer);
+        }
+
+        EndPaint(window, &paint);
+        return 0;
+    }
+}
+
 #endif

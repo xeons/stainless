@@ -104,7 +104,7 @@ src/Application.sl          Application                     (lcl/forms.pp)
 src/Controls/Buttons.sl     Button, CheckBox, RadioButton
 src/Controls/Text.sl        Label, TextBox                  (lcl/stdctrls.pp)
 src/Controls/Lists.sl       ListBox, ComboBox
-src/Controls/Containers.sl  Panel, GroupBox, ScrollBar
+src/Controls/Containers.sl  Panel, GroupBox, ScrollBar, CustomControl
 src/Controls/Menus.sl       MainMenu, PopupMenu, MenuItem      (lcl/menus.pp)
 src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
                             TabControl, TreeView, ListView, ImageList
@@ -328,6 +328,7 @@ grouped by how much work it is rather than by where it lives.
 | `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter` | `extctrls.pp` |
+| `CustomControl` | `customcontrol` in `controls.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
 | `Timer` | `customtimer.pas` |
 | `RadioGroup`, `CheckGroup`, `LabeledEdit`, `Image` | `extctrls.pp` |

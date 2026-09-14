@@ -48,6 +48,7 @@ import Gtk.GLib;
 import Gtk.GObject;
 import Gtk.Gdk;
 import Gtk.Api;
+import Gtk.Cairo;
 import Gtk.Signals;
 import Gtk.Events;
 
@@ -1174,6 +1175,178 @@ public class GtkTimerPeer : ITimerPeer {
         if (source == 0u) { return; }
         g_source_remove((guint)source);
         source = 0u;
+    }
+}
+
+// ================================================================== custom
+
+/// How long the caret spends showing, and then hiding, in milliseconds.
+///
+/// GTK's own rate is the `gtk-cursor-blink-time` setting, which is the whole
+/// cycle rather than a half of it and which this does not read yet. 530 is
+/// Windows's default half-cycle, and a caret agreeing with the other platform
+/// is a better wrong answer than one agreeing with nothing.
+const int BlinkHalfCycle = 530;
+
+/// A control the program draws every pixel of, and that takes the keyboard.
+///
+/// **Three widgets, and each earns its place.** A frame on the outside, so that
+/// `SetBorder` has something to set, exactly as `GtkPanelPeer` does. An event
+/// box inside it, because a `GtkFixed` is windowless and a windowless widget
+/// can be given neither the input events nor the focus -- which is the whole
+/// specification of this control. A fixed inside that, so it is a container
+/// like every other one here and the scroll bars a drawn control needs are
+/// ordinary children.
+///
+/// **The draw handler answers false.** For a container, GTK's own `draw` runs
+/// last and is what draws the children; answering true would stop it, and every
+/// child of this control would silently never appear. So this paints the
+/// background and the caret, says it has not finished, and the children land on
+/// top -- which is also the order that puts a scroll bar over the text rather
+/// than under it.
+public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
+    GtkWidget* box;
+
+    /// Where the caret is and how big, or empty for a control with none.
+    FRect  caret;
+    /// Which half of the blink it is in. GTK has no caret of its own -- unlike
+    /// Windows, where the system owns one and blinks it -- so the phase, the
+    /// timer and the drawing are all this peer's.
+    bool   blinkOn;
+    bool   blinking;
+    bool   focusable;
+
+    public GtkCustomPeer(IControlNotify owner) {
+        base(gtk_frame_new(null), owner, gtk_fixed_new());
+
+        box = gtk_event_box_new();
+        gtk_container_add(widget, box);
+        gtk_container_add(box, content);
+        gtk_widget_show(box);
+        gtk_widget_show(content);
+        gtk_frame_set_shadow_type(widget, GTK_SHADOW_NONE);
+
+        // Everything the base connects -- the mouse, the keys, the focus --
+        // goes on the event box, because that is the widget with the window.
+        SetInner(box);
+
+        caret = Area(0, 0, 0, 0);
+        blinkOn = true;
+        blinking = false;
+        focusable = true;
+        gtk_widget_set_can_focus(box, 1);
+
+        // Through methods rather than reading the fields, for the reason every
+        // handler in this backend is: a lambda captures a bare member read by
+        // value at the moment it is made.
+        ConnectEvent(box, "draw", (sender, carried) => { return Painted(carried); });
+
+        // GTK does not focus a clicked widget either; only an entry and a
+        // button do, from their own handlers.
+        ConnectEvent(box, "button-press-event", (sender, carried) => {
+            Take();
+            return false;
+        });
+
+        ConnectEvent(box, "focus-in-event",  (sender, carried) => { Blink(true);  return false; });
+        ConnectEvent(box, "focus-out-event", (sender, carried) => { Blink(false); return false; });
+    }
+
+    public void SetBorder(ControlBorder border) {
+        if (border == ControlBorder.Single) {
+            gtk_frame_set_shadow_type(widget, GTK_SHADOW_IN);
+        } else if (border == ControlBorder.Sunken) {
+            gtk_frame_set_shadow_type(widget, GTK_SHADOW_ETCHED_IN);
+        } else {
+            gtk_frame_set_shadow_type(widget, GTK_SHADOW_NONE);
+        }
+    }
+
+    public void SetFocusable(bool wanted) {
+        focusable = wanted;
+        gtk_widget_set_can_focus(box, wanted ? 1 : 0);
+    }
+
+    /// Remembered, and shown from the next paint. The phase is restarted so
+    /// that a caret being moved is solid while it moves -- a caret that blinked
+    /// on its own schedule would be invisible for half of every keystroke.
+    public void SetCaret(FRect place) {
+        // See `CustomPeer.SetCaret` on Win32: a control that positions its
+        // caret while painting sets it on every paint, and here a repaint is
+        // exactly what this asks for -- so an unchanged caret has to ask for
+        // nothing, or the widget paints for ever.
+        if (place.X == caret.X && place.Y == caret.Y
+            && place.Width == caret.Width && place.Height == caret.Height) {
+            return;
+        }
+
+        caret = place;
+        blinkOn = true;
+        if (!place.IsEmpty && Focused()) { Blink(true); }
+        gtk_widget_queue_draw(box);
+    }
+
+    bool Focused() { return gtk_widget_has_focus(box) != 0; }
+
+    void Take() {
+        if (!focusable) { return; }
+        gtk_widget_grab_focus(box);
+    }
+
+    /// Starts or stops the blink.
+    ///
+    /// The source is not held and never removed: `Phase` answers false as soon
+    /// as the control is unfocused or gone, and a GLib source that answers
+    /// false takes itself off the loop. Holding the tag would mean removing it
+    /// from a destructor that may run after the loop has stopped.
+    void Blink(bool on) {
+        blinkOn = true;
+        if (!on) {
+            blinking = false;
+            gtk_widget_queue_draw(box);
+            return;
+        }
+        if (blinking) { return; }
+        blinking = true;
+        Tick(BlinkHalfCycle, () => { return Phase(); });
+    }
+
+    bool Phase() {
+        if (Owner() == null || !blinking || !Focused()) {
+            blinking = false;
+            return false;
+        }
+        blinkOn = !blinkOn;
+        gtk_widget_queue_draw(box);
+        return true;
+    }
+
+    bool Painted(gpointer carried) {
+        var owner = Owner();
+        if (owner == null) { return false; }
+
+        var surface = new GtkGraphicsBackend(carried);
+        ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+
+        if (!caret.IsEmpty && blinkOn && Focused()) { DrawCaret((cairo_t*)carried); }
+
+        // False, so that GTK's own handler runs and draws the children.
+        return false;
+    }
+
+    /// The caret, in whatever colour the theme says text is.
+    ///
+    /// Asked rather than assumed, because a caret is the one thing on a drawn
+    /// control that has to be visible without knowing what was drawn under it,
+    /// and black on a dark theme is not.
+    void DrawCaret(cairo_t* context) {
+        GdkRGBA ink;
+        gtk_style_context_get_color(gtk_widget_get_style_context(box),
+                                    GTK_STATE_FLAG_NORMAL, &ink);
+        cairo_set_source_rgb(context, ink.Red, ink.Green, ink.Blue);
+        cairo_rectangle(context, (gdouble)caret.X, (gdouble)caret.Y,
+                        (gdouble)caret.Width, (gdouble)caret.Height);
+        cairo_fill(context);
     }
 }
 

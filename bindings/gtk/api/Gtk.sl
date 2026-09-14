@@ -658,6 +658,9 @@ public extern "C" {
     void gtk_window_set_titlebar(GtkWidget* window, GtkWidget* titlebar);
 }
 
+/// `GTK_STATE_FLAG_NORMAL`: a widget doing nothing in particular.
+public const guint GTK_STATE_FLAG_NORMAL = 0u;
+
 // ======================================================================= css
 
 public extern "C" {
@@ -668,6 +671,12 @@ public extern "C" {
     /// widget. The way to style one thing differently.
     void gtk_style_context_add_class(gpointer context, gchar* name);
     void gtk_style_context_remove_class(gpointer context, gchar* name);
+
+    /// The foreground colour this context resolves to, for a widget in a given
+    /// state. The one way to ask the theme a colour question rather than
+    /// asserting an answer -- which matters most for the things CSS cannot
+    /// reach, a caret drawn with cairo being the example.
+    void gtk_style_context_get_color(gpointer context, guint state, GdkRGBA* colour);
 
     gpointer gtk_css_provider_new();
 

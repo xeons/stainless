@@ -403,6 +403,42 @@ public interface IPanelPeer : IContainerPeer {
     void SetBorder(ControlBorder border);
 }
 
+/// A control the program draws every pixel of, and that takes the keyboard.
+///
+/// **The one thing a `PaintBox` cannot be.** A `GraphicControl` has no window,
+/// so it has nothing to give the focus to and no keystroke ever reaches it;
+/// a `Panel` has a window and gives up the focus on purpose, being a container.
+/// A code editor, a grid, a chart the arrow keys move around in -- each needs a
+/// window of its own that draws nothing by itself and hears everything, and
+/// that is the whole of what this is.
+///
+/// A container as well, so that the scroll bars a drawn control needs are
+/// ordinary children of it rather than something the seam has to learn about.
+public interface ICustomPeer : IContainerPeer {
+    void SetBorder(ControlBorder border);
+
+    /// Whether clicking it and tabbing to it give it the keyboard.
+    ///
+    /// A drawn control that only displays -- a chart, a status strip -- says
+    /// false and stays out of the tab order, which is the difference between
+    /// this and a control that merely happens not to handle any keys.
+    void SetFocusable(bool focusable);
+
+    /// Where the insertion point is and how big, or an empty rectangle for a
+    /// control that has none.
+    ///
+    /// **One call rather than a show, a hide and a move**, because a caret is a
+    /// rectangle and those three are all the same fact arriving in pieces. The
+    /// platform keeps it: a caret belongs to whichever window has the focus, so
+    /// the peer puts it back when the control is focused again and takes it
+    /// away when it is not, and the control never has to know that.
+    ///
+    /// Not blinked by the control. Windows blinks the system caret, GTK draws
+    /// one at the rate the desktop settings ask for, and a control that blinked
+    /// its own would disagree with every other application on the screen.
+    void SetCaret(Rectangle place);
+}
+
 /// A label, which is drawn by the platform rather than by the control.
 public interface ILabelPeer : IControlPeer {
     void SetAlignment(HorizontalAlignment alignment);
@@ -699,6 +735,7 @@ public interface IWidgetSet {
     IComboPeer     CreateCombo(IControlNotify owner, IContainerPeer parent);
     IGroupPeer     CreateGroup(IControlNotify owner, IContainerPeer parent);
     IPanelPeer     CreatePanel(IControlNotify owner, IContainerPeer parent);
+    ICustomPeer    CreateCustom(IControlNotify owner, IContainerPeer parent);
     IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                    bool vertical);
     ISpinPeer      CreateSpin(IControlNotify owner, IContainerPeer parent);

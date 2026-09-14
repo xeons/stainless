@@ -155,3 +155,99 @@ public class ScrollBar : WindowedControl {
 
     public override void OnPlatformValueChanged() { OnValueChanged(); }
 }
+
+// ============================================================ custom control
+
+/// A control the program draws every pixel of, and that takes the keyboard.
+///
+/// ```
+/// public class Grid : CustomControl {
+///     public Grid(WindowedControl parent) {
+///         base(parent);
+///         Border = ControlBorder.Sunken;
+///     }
+///
+///     protected override void OnPaint(PaintEventArgs args) {
+///         args.Graphics.Clear(BackColor);
+///         args.Graphics.DrawString("cell", Font, ForeColor, 4, 4);
+///     }
+///
+///     protected override void OnKeyDown(KeyEventArgs args) {
+///         if (args.Key == Key.Down) { Invalidate(); }
+///     }
+/// }
+/// ```
+///
+/// **`PaintBox` is the one to reach for first.** A `PaintBox` is a
+/// `GraphicControl`: it costs nothing but an object, its parent draws it, and
+/// for anything that only displays -- a chart, a gauge, a preview -- that is
+/// the right trade. What it cannot do is take the focus, because it has no
+/// window to give the focus to, so no keystroke ever reaches one. This is the
+/// other half: a real window of its own, which is what the keyboard, a caret
+/// and a scroll bar of its own all need.
+///
+/// **It draws its whole client area, and nothing else does.** The platform is
+/// told not to erase the background, so a paint handler that does not cover
+/// every pixel shows whatever the buffer held. `Clear` on the first line is the
+/// usual answer. What that buys is a control drawn into an off-screen buffer
+/// and copied over in one go, which is the difference between a caret blinking
+/// over text and the text blinking with it.
+///
+/// **A container, like a `Panel`.** Anything may be put inside one, and the
+/// children are drawn over what the control painted -- which is the order a
+/// scroll bar beside its own content needs.
+public class CustomControl : WindowedControl {
+    ICustomPeer   native;
+    ControlBorder edging;
+    Rectangle     insertion;
+    bool          takesFocus;
+
+    public CustomControl(WindowedControl parent) {
+        base(parent);
+        edging = ControlBorder.None;
+        insertion = Rectangle.Empty;
+        takesFocus = true;
+        native = WidgetSet.Current.CreateCustom(this, ParentPeer());
+        AttachContainerPeer(native);
+    }
+
+    /// The frame drawn around it.
+    public ControlBorder Border {
+        get => edging;
+        set {
+            edging = value;
+            native.SetBorder(value);
+            PerformLayout();
+        }
+    }
+
+    /// Whether clicking it and tabbing to it give it the keyboard.
+    ///
+    /// A drawn control that only displays says false and leaves the tab order
+    /// alone -- which is a different thing from one that takes the focus and
+    /// happens to handle no keys, because the second still takes the focus away
+    /// from whatever had it.
+    public bool Focusable {
+        get => takesFocus;
+        set {
+            takesFocus = value;
+            native.SetFocusable(value);
+        }
+    }
+
+    /// Where the insertion point is and how big, in this control's own
+    /// coordinates. `Rectangle.Empty` -- the default -- for a control with no
+    /// caret at all.
+    ///
+    /// **Set it, and stop thinking about it.** The platform owns the blink and
+    /// owns the appearing and disappearing as the focus moves, so a control
+    /// that has just moved its caret has finished: there is no timer to start,
+    /// nothing to hide before painting and nothing to put back after.
+    public Rectangle Caret {
+        get => insertion;
+        set {
+            insertion = value;
+            native.SetCaret(value);
+        }
+    }
+}

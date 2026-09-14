@@ -104,6 +104,7 @@ public const uint WmEraseBackground  = 0x0014u;
 public const uint WmShowWindow       = 0x0018u;
 public const uint WmActivateApp      = 0x001Cu;
 public const uint WmSetCursor        = 0x0020u;
+public const uint WmGetDlgCode       = 0x0087u;
 public const uint WmGetMinMaxInfo    = 0x0024u;
 public const uint WmWindowPosChanged = 0x0047u;
 public const uint WmDisplayChange    = 0x007Eu;
@@ -329,6 +330,38 @@ public extern "C" {
     int InvertRect(HDC dc, Rect* rectangle);
     int DrawTextW(HDC dc, char16* text, int length, Rect* rectangle, uint format);
 }
+
+// ==================================================================== caret
+
+// **One caret per thread, owned by whichever window has the focus.** It is not
+// a property of a window the way a cursor is: `CreateCaret` takes the focus
+// window's caret away and gives it to this one, so a control creates its caret
+// when it is given the focus and destroys it when it loses it. Creating one
+// while another window is focused is not an error and not visible either.
+//
+// A null bitmap and a width and height is a solid block in the system's caret
+// colour, which is what a text caret is; the bitmap form is for the shapes
+// nothing here needs.
+
+public extern "C" {
+    int  CreateCaret(HWND window, HBITMAP shape, int width, int height);
+    int  DestroyCaret();
+    int  SetCaretPos(int x, int y);
+    int  ShowCaret(HWND window);
+    int  HideCaret(HWND window);
+    uint GetCaretBlinkTime();
+}
+
+/// What a control answers `WM_GETDLGCODE` with: which keys it wants for itself
+/// rather than letting `IsDialogMessage` spend them on moving the focus.
+///
+/// **A custom control that does not answer gets no arrow keys and no Tab**,
+/// because the dialog navigation reads them first and a control that never saw
+/// `WM_GETDLGCODE` is assumed to want neither.
+public const uint DlgcWantArrows     = 0x0001u;
+public const uint DlgcWantTab        = 0x0002u;
+public const uint DlgcWantAllKeys    = 0x0004u;
+public const uint DlgcWantChars      = 0x0080u;
 
 public const uint DtLeft           = 0x00000000u;
 public const uint DtCenter         = 0x00000001u;

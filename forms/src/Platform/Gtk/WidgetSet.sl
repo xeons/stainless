@@ -148,6 +148,12 @@ public class GtkWidgetSet : IWidgetSet {
         return peer;
     }
 
+    public ICustomPeer CreateCustom(IControlNotify owner, IContainerPeer parent) {
+        var peer = new GtkCustomPeer(owner);
+        Ready(peer, parent);
+        return peer;
+    }
+
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                           bool vertical) {
         var peer = new GtkScrollBarPeer(owner, vertical);

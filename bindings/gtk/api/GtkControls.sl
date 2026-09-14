@@ -62,6 +62,16 @@ public extern "C" {
 
     void gtk_fixed_put(GtkWidget* fixed, GtkWidget* child, gint x, gint y);
     void gtk_fixed_move(GtkWidget* fixed, GtkWidget* child, gint x, gint y);
+
+    /// A container with a `GdkWindow` of its own, holding one child.
+    ///
+    /// **What a `GtkFixed` has not got.** Most GTK containers are windowless:
+    /// they occupy a region of their parent's window and so cannot be given the
+    /// input events or the focus, which is why a mouse handler on a `GtkFixed`
+    /// never fires. An event box is the standard remedy -- a real window, and
+    /// nothing drawn in it -- and it is what a control that draws itself and
+    /// takes the keyboard is built out of.
+    GtkWidget* gtk_event_box_new();
 }
 
 // ===================================================================== frame
