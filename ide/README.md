@@ -115,10 +115,11 @@ keyboard — did not exist and now does, in
 [forms/src/Controls/Containers.sl](../forms/src/Controls/Containers.sl). A
 `PaintBox` draws but has no window, so nothing can give it the focus and no
 keystroke reaches it; a `Panel` has a window and gives up the focus on purpose.
-The new control has a registered window class on Win32 and an event box on GTK,
-answers `WM_GETDLGCODE` so the arrow keys and Tab reach it rather than moving
-the focus, paints through an off-screen buffer, and carries a caret the platform
-owns and blinks.
+The new control has a registered window class on Win32 and a windowed
+`GtkFixed` on GTK, answers `WM_GETDLGCODE` so the arrow keys and Tab reach it
+rather than moving the focus, paints through an off-screen buffer on Windows,
+and carries a caret — the system's on Win32, drawn and blinked by the peer on
+GTK, since GTK has none of its own.
 
 [samples/forms/drawn.sl](../samples/forms/drawn.sl) is that control on its own,
 without the rest of an IDE around it.

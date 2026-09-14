@@ -1365,8 +1365,6 @@ const int BlinkHalfCycle = 530;
 /// top -- which is also the order that puts a scroll bar over the text rather
 /// than under it.
 public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
-    GtkWidget* box;
-
     /// Where the caret is and how big, or empty for a control with none.
     FRect  caret;
     /// Which half of the blink it is in. GTK has no caret of its own -- unlike
@@ -1379,37 +1377,47 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
     public GtkCustomPeer(IControlNotify owner) {
         base(gtk_frame_new(null), owner, gtk_fixed_new());
 
-        box = gtk_event_box_new();
-        gtk_container_add(widget, box);
-        gtk_container_add(box, content);
-        gtk_widget_show(box);
+        // **The fixed is the drawing surface, and it needs a window to be one.**
+        //
+        // A `GtkFixed` is windowless by default: it occupies a region of its
+        // parent's window, so it can be given neither the input events nor the
+        // focus. The first version put an event box in between to get those --
+        // and an event box renders its own background, on every frame, over
+        // everything the program had just drawn. `OnPaint` was being called and
+        // nothing appeared, which is the worst shape a bug can have.
+        //
+        // A `GtkFixed` renders no background at all. So the fix is not another
+        // widget but a flag: the fixed gets a window of its own and becomes the
+        // thing that is clicked, focused and painted. Lazarus's GTK3 widgetset
+        // does exactly this behind every custom control.
+        gtk_widget_set_has_window(content, 1);
+
+        gtk_container_add(widget, content);
         gtk_widget_show(content);
         gtk_frame_set_shadow_type(widget, GTK_SHADOW_NONE);
 
-        // Everything the base connects -- the mouse, the keys, the focus --
-        // goes on the event box, because that is the widget with the window.
-        SetInner(box);
+        SetInner(content);
 
         caret = Area(0, 0, 0, 0);
         blinkOn = true;
         blinking = false;
         focusable = true;
-        gtk_widget_set_can_focus(box, 1);
+        gtk_widget_set_can_focus(content, 1);
 
         // Through methods rather than reading the fields, for the reason every
         // handler in this backend is: a lambda captures a bare member read by
         // value at the moment it is made.
-        ConnectEvent(box, "draw", (sender, carried) => { return Painted(carried); });
+        ConnectEvent(content, "draw", (sender, carried) => { return Painted(carried); });
 
         // GTK does not focus a clicked widget either; only an entry and a
         // button do, from their own handlers.
-        ConnectEvent(box, "button-press-event", (sender, carried) => {
+        ConnectEvent(content, "button-press-event", (sender, carried) => {
             TakeFocus();
             return false;
         });
 
-        ConnectEvent(box, "focus-in-event",  (sender, carried) => { Blink(true);  return false; });
-        ConnectEvent(box, "focus-out-event", (sender, carried) => { Blink(false); return false; });
+        ConnectEvent(content, "focus-in-event",  (sender, carried) => { Blink(true);  return false; });
+        ConnectEvent(content, "focus-out-event", (sender, carried) => { Blink(false); return false; });
     }
 
     public void SetBorder(ControlBorder border) {
@@ -1424,7 +1432,7 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
 
     public void SetFocusable(bool wanted) {
         focusable = wanted;
-        gtk_widget_set_can_focus(box, wanted ? 1 : 0);
+        gtk_widget_set_can_focus(content, wanted ? 1 : 0);
     }
 
     /// Remembered, and shown from the next paint. The phase is restarted so
@@ -1443,17 +1451,17 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
         caret = place;
         blinkOn = true;
         if (!place.IsEmpty && Focused()) { Blink(true); }
-        gtk_widget_queue_draw(box);
+        gtk_widget_queue_draw(content);
     }
 
-    bool Focused() { return gtk_widget_has_focus(box) != 0; }
+    bool Focused() { return gtk_widget_has_focus(content) != 0; }
 
     /// Not `Take`. An unqualified `Take(...)` finds the standard library's
     /// generic sequence operation of that name, and the error is about
     /// inferring a type argument rather than about the focus.
     void TakeFocus() {
         if (!focusable) { return; }
-        gtk_widget_grab_focus(box);
+        gtk_widget_grab_focus(content);
     }
 
     /// Starts or stops the blink.
@@ -1466,7 +1474,7 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
         blinkOn = true;
         if (!on) {
             blinking = false;
-            gtk_widget_queue_draw(box);
+            gtk_widget_queue_draw(content);
             return;
         }
         if (blinking) { return; }
@@ -1480,10 +1488,15 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
             return false;
         }
         blinkOn = !blinkOn;
-        gtk_widget_queue_draw(box);
+        gtk_widget_queue_draw(content);
         return true;
     }
 
+    /// **False, so that GTK's own handler still runs.** For a `GtkFixed` that
+    /// handler draws the children and nothing else -- no background of its own
+    /// -- so the controls on this one land on top of what the program drew,
+    /// which is the order wanted. Answering true would paint over every scroll
+    /// bar and button placed on the control.
     bool Painted(gpointer carried) {
         var owner = Owner();
         if (owner == null) { return false; }
@@ -1492,8 +1505,6 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
         ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
 
         if (!caret.IsEmpty && blinkOn && Focused()) { DrawCaret((cairo_t*)carried); }
-
-        // False, so that GTK's own handler runs and draws the children.
         return false;
     }
 
@@ -1504,7 +1515,7 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
     /// and black on a dark theme is not.
     void DrawCaret(cairo_t* context) {
         GdkRGBA ink;
-        gtk_style_context_get_color(gtk_widget_get_style_context(box),
+        gtk_style_context_get_color(gtk_widget_get_style_context(content),
                                     GTK_STATE_FLAG_NORMAL, &ink);
         cairo_set_source_rgb(context, ink.Red, ink.Green, ink.Blue);
         cairo_rectangle(context, (gdouble)caret.X, (gdouble)caret.Y,

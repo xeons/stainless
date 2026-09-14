@@ -221,6 +221,19 @@ public extern "C" {
     void gtk_widget_grab_focus(GtkWidget* widget);
     void gtk_widget_set_can_focus(GtkWidget* widget, gboolean can);
 
+    /// Whether the widget gets a `GdkWindow` of its own.
+    ///
+    /// **Most containers have none**, which is why a mouse handler on a
+    /// `GtkFixed` never fires and why one cannot be given the focus: a
+    /// windowless widget occupies a region of its parent's window and the
+    /// events go to the parent. Turning it on makes the container a thing that
+    /// can be clicked, focused and drawn on.
+    ///
+    /// Must be called before the widget is realised. Lazarus's GTK3 widgetset
+    /// does the same to the `GtkFixed` behind every custom control, which is
+    /// where this was taken from.
+    void gtk_widget_set_has_window(GtkWidget* widget, gboolean has);
+
     void gtk_widget_set_tooltip_text(GtkWidget* widget, gchar* text);
     void gtk_widget_set_name(GtkWidget* widget, gchar* name);
 
