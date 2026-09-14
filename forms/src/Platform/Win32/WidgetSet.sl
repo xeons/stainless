@@ -516,6 +516,71 @@ public class Win32WidgetSet : IWidgetSet {
 
     public ITimerPeer CreateTimer(ITimerNotify owner) { return new TimerPeer(owner); }
 
+    // ------------------------------------------------------------ clipboard
+
+    /// **The clipboard is a lock, and every path has to give it back.** Windows
+    /// lets one process hold it at a time, and a process that opens it and
+    /// returns without closing it leaves every other program on the desktop
+    /// unable to copy or paste until it exits. So each of these has exactly one
+    /// `CloseClipboard`, reached by every way out including the failures.
+    public String GetClipboardText() {
+        if (IsClipboardFormatAvailable(ClipboardUnicodeText) == 0) { return ""; }
+        if (OpenClipboard(null) == 0) { return ""; }
+
+        String text = "";
+        HANDLE block = GetClipboardData(ClipboardUnicodeText);
+        if (block != null) {
+            // The handle is the clipboard's, not ours: locked to read, unlocked
+            // after, and never freed. Freeing it is what empties somebody
+            // else's clipboard from inside a paste.
+            void* units = GlobalLock(block);
+            if (units != null) {
+                text = Standard.Text.FromNullTerminatedUtf16((char16*)units);
+                GlobalUnlock(block);
+            }
+        }
+
+        CloseClipboard();
+        return text;
+    }
+
+    public void SetClipboardText(String text) {
+        var wide = text.ToUtf16();
+        nuint units = wide.UnitCount();
+
+        // `GMEM_MOVEABLE`, because the clipboard requires it, and one unit more
+        // than the text for the terminator it expects.
+        HGLOBAL block = GlobalAlloc(GlobalMoveable, (units + 1u) * 2u);
+        if (block == null) { return; }
+
+        char16* into = (char16*)GlobalLock(block);
+        if (into == null) {
+            GlobalFree(block);
+            return;
+        }
+        char16* from = wide.ToPointer();
+        for (nuint i = 0u; i < units; i += 1u) { into[i] = from[i]; }
+        into[units] = (char16)0u;
+        GlobalUnlock(block);
+
+        if (OpenClipboard(null) == 0) {
+            // Nothing took ownership, so the block is still ours to release.
+            GlobalFree(block);
+            return;
+        }
+        EmptyClipboard();
+        // **After this succeeds the block belongs to the system**, and freeing
+        // it would be freeing memory something else now owns.
+        if (SetClipboardData(ClipboardUnicodeText, block) == null) {
+            GlobalFree(block);
+        }
+        CloseClipboard();
+    }
+
+    public bool ClipboardHasText() {
+        return IsClipboardFormatAvailable(ClipboardUnicodeText) != 0;
+    }
+
     public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,
                                                           String start, String[] filters) {
         return OpenFileDialog(owner, title, start, filters);

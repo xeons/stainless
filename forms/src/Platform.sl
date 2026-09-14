@@ -761,6 +761,27 @@ public interface IWidgetSet {
 
     ITimerPeer CreateTimer(ITimerNotify owner);
 
+    // ------------------------------------------------------------ clipboard
+
+    /// What the clipboard holds as text, or `""` when it holds none.
+    ///
+    /// **Text and nothing else, for now.** A clipboard carries any number of
+    /// formats at once and negotiates which one a paste wants, which is a
+    /// design of its own; what an editor needs is the one format both platforms
+    /// agree about and every program offers.
+    ///
+    /// Answering `""` for an empty clipboard rather than a null: a paste of
+    /// nothing and a paste of an empty string do the same thing, so a caller
+    /// that had to tell them apart would only be writing the test twice.
+    String GetClipboardText();
+
+    /// Puts text on the clipboard, replacing whatever was there.
+    void SetClipboardText(String text);
+
+    /// Whether there is text to be had. What a paste command greys itself out
+    /// on, and cheaper than fetching the text to find out.
+    bool ClipboardHasText();
+
     // ------------------------------------------------------------ dialogs
     //
     // Each answers what was chosen, so there is nothing to read when nothing

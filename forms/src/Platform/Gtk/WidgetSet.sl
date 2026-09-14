@@ -230,6 +230,28 @@ public class GtkWidgetSet : IWidgetSet {
         return new GtkTimerPeer(owner);
     }
 
+    // ------------------------------------------------------------ clipboard
+
+    public String GetClipboardText() {
+        gchar* text = gtk_clipboard_wait_for_text(gtk_clipboard_get(ClipboardSelection()));
+        if (text == null) { return ""; }
+        // Owned by us, unlike almost everything else GTK answers, so it is
+        // copied into a String and then freed.
+        String answer = Standard.Text.FromNullTerminated((byte*)text);
+        g_free((gpointer)text);
+        return answer;
+    }
+
+    public void SetClipboardText(String text) {
+        gtk_clipboard_set_text(gtk_clipboard_get(ClipboardSelection()),
+                               (gchar*)text.ToPointer(), -1);
+    }
+
+    public bool ClipboardHasText() {
+        return gtk_clipboard_wait_is_text_available(
+            gtk_clipboard_get(ClipboardSelection())) != 0;
+    }
+
     // ------------------------------------------------------------- dialogs
 
     public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,

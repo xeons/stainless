@@ -64,6 +64,9 @@ module Gtk.Api;
 
 import Gtk.GLib;
 import Gtk.GObject;
+// For `GdkRGBA`, which `gtk_style_context_get_color` answers into. Not a cycle:
+// `Gtk.Gdk` imports GLib and GObject and nothing from here.
+import Gtk.Gdk;
 
 #if UNIX
 
@@ -660,6 +663,39 @@ public extern "C" {
 
 /// `GTK_STATE_FLAG_NORMAL`: a widget doing nothing in particular.
 public const guint GTK_STATE_FLAG_NORMAL = 0u;
+
+// ================================================================= clipboard
+
+public extern "C" {
+    /// The clipboard for a selection atom, **borrowed** -- one object per
+    /// selection per display, owned by GTK and never unreferenced.
+    ///
+    /// `GDK_SELECTION_CLIPBOARD` is the one Ctrl+C and Ctrl+V use.
+    /// `GDK_SELECTION_PRIMARY` is X11's select-to-copy, which is a different
+    /// clipboard with different rules and is not what a menu command means.
+    gpointer gtk_clipboard_get(gpointer selection);
+
+    /// `length` of -1 for NUL-terminated. The text is copied, so the caller's
+    /// buffer may go immediately afterwards.
+    void gtk_clipboard_set_text(gpointer clipboard, gchar* text, gint length);
+
+    /// The text on the clipboard, or null. **Owned by the caller** and freed
+    /// with `g_free`, unlike almost everything else GTK answers here.
+    ///
+    /// It waits: on X11 the clipboard belongs to whichever client last claimed
+    /// it, so reading one is a round trip to another process and this spins the
+    /// main loop until it answers.
+    gchar* gtk_clipboard_wait_for_text(gpointer clipboard);
+
+    gboolean gtk_clipboard_wait_is_text_available(gpointer clipboard);
+}
+
+/// `GDK_SELECTION_CLIPBOARD`, which is an interned atom rather than a number.
+///
+/// GDK's atoms are `(GdkAtom)(gsize)value` for the built-in ones, and the
+/// clipboard selection is atom 69 -- what `gdk_atom_intern("CLIPBOARD")` would
+/// answer without the call.
+public gpointer ClipboardSelection() { return (gpointer)(nuint)69u; }
 
 // ======================================================================= css
 
