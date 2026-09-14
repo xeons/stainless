@@ -99,12 +99,12 @@ public com class Greeter : IGreeter, ICounter {
 /// `com class` carrying a `[Guid]`, so adding a class to this library is
 /// declaring one and nothing else. What comes back is an `IClassFactory` the
 /// host calls `CreateInstance` on.
-export "C" int DllGetClassObject(Guid* clsid, Guid* iid, byte** result) {
+export "C" __stdcall int DllGetClassObject(Guid* clsid, Guid* iid, byte** result) {
     return Com.GetClassObject(clsid, iid, result);
 }
 
 /// Whether the host may unload this module. Always S_FALSE: see the note on
 /// `Com.CanUnloadNow` for why a server whose objects ARC owns declines.
-export "C" int DllCanUnloadNow() {
+export "C" __stdcall int DllCanUnloadNow() {
     return Com.CanUnloadNow();
 }

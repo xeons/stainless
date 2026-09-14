@@ -174,21 +174,6 @@ like.
 
 *Touches:* `runtime/com.c`, `bindings/win32/Com.sl`.
 
-### A `.def` file, for a 32-bit COM server
-
-`export "C" __stdcall` gets the convention right and decorates the name with
-it, so a 32-bit in-proc server exports `_DllGetClassObject@12` where Windows'
-loader looks up `DllGetClassObject`. The fix is what every C++ COM server
-does — a module definition file naming the undecorated exports — and the
-compiler writes none, so it would be `--def <path>` passed through to the
-linker, or generated from the `export` declarations.
-
-Only the module's own exports are affected. Every COM *slot* is already
-`__stdcall` on x86, stamped on when the table is numbered, which is why
-[tests/cases/x86-com](tests/cases/x86-com) passes.
-
-*Touches:* `src/Stainless.Compiler/Driver/Compilation.cs`.
-
 ### More Windows COM interfaces
 
 A binding rather than a project, now that the language part is done and the

@@ -17,7 +17,7 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 ```
 dotnet build Stainless.slnx
 dotnet run --project tests/Stainless.Tests      # 287 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 841 compiler unit tests
+dotnet test tests/Stainless.UnitTests           # 844 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and

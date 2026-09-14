@@ -92,9 +92,17 @@ public sealed partial class LlvmEmitter
 
         // Windows exports only what a binary marks, so a library's declared API
         // has to say so here. Elsewhere default visibility already exports it.
+        //
+        // Except where a calling convention decorated the symbol: marking that
+        // would put `_DllGetClassObject@12` in the export table, and the name
+        // the source declared is the one a caller looks up. Those are named in
+        // the generated module definition file instead, which exports them
+        // under the right name and is the only thing that should -- marking
+        // them here as well would export both. See ModuleDefinition.
         string storage = forSharedLibrary
                          && exported
                          && OperatingSystem.IsWindows()
+                         && !Mangler.IsDecorated(symbol)
             ? "dllexport "
             : "";
 

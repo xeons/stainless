@@ -124,13 +124,12 @@ IID_IGreeter, ...)` reaches the same object. `HKEY_CURRENT_USER` rather than
   never handed out counts too, so the answer can refuse an unload that would
   have been fine, and never allow one that would not. The count exists only in
   a module that has something to activate.
-- **On 32-bit x86 the export is `__cdecl` here**, which is what this host
-  expects and what makes the sample run as written on both. A server that
-  Windows' *own* loader will call wants `__stdcall` with the name left
-  undecorated, and undecorating it needs a `.def` file the compiler cannot
-  write yet. The interface methods are already `__stdcall` on x86 — the
-  compiler stamps that on every COM vtable slot — so only the two exports are
-  affected.
+- **Nothing here is x64-only.** The two exports are `export "C" __stdcall`,
+  which is what Windows' loader calls them with on x86 and what it ignores on
+  x64, and the compiler writes a `.def` so the name in the export table is
+  `DllGetClassObject` rather than the `_DllGetClassObject@12` the convention
+  decorated. Build the server with `--target x86` and the host with `-m32` and
+  the transcript above is the same.
 
 ## See also
 

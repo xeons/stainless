@@ -439,7 +439,8 @@ public sealed class Toolchain
         bool shared = false,
         bool debug = false,
         IReadOnlyList<string>? libraries = null,
-        SharedRuntime? sharedRuntime = null)
+        SharedRuntime? sharedRuntime = null,
+        string? moduleDefinition = null)
     {
         List<string> arguments = [.. TargetArguments, irPath];
 
@@ -478,6 +479,12 @@ public sealed class Toolchain
         // A shared library has no entry point; the linker also emits the import
         // library beside the DLL on Windows.
         if (shared) arguments.Add("-shared");
+
+        // A module definition file, which names exports independently of what
+        // the symbols are called. Only ever written where the two differ; see
+        // ModuleDefinition.
+        if (moduleDefinition is not null)
+            arguments.Add("-Wl,/DEF:" + moduleDefinition);
 
         // -g here is not about the IR, which already carries its own description.
         // It tells clang to keep it through to the binary, and on Windows to ask

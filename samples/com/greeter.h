@@ -52,8 +52,12 @@ inline bool operator==(const GUID &a, const GUID &b) {
     return std::memcmp(&a, &b, sizeof(GUID)) == 0;
 }
 
-/* No __stdcall off x86, exactly as SL_COM_METHOD resolves it. */
-#define STDMETHODCALLTYPE
+/* __stdcall on x86 and nothing elsewhere, exactly as SL_COM_METHOD resolves. */
+#if defined(__i386__) || defined(_M_IX86)
+#  define STDMETHODCALLTYPE __stdcall
+#else
+#  define STDMETHODCALLTYPE
+#endif
 
 struct IUnknown {
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppv) = 0;
@@ -111,8 +115,11 @@ struct ICounter : IUnknown {
 };
 
 /* The one export that matters. COM's own loader calls this; here the host
-   calls it directly, which is the same thing without the registry. */
-typedef HRESULT (*DllGetClassObjectFn)(REFCLSID rclsid, REFIID riid, void **ppv);
-typedef HRESULT (*DllCanUnloadNowFn)(void);
+   calls it directly, which is the same thing without the registry.
+   __stdcall on x86, as every COM entry point is -- the callee pops, so a
+   caller that disagreed would unbalance the stack on the first call. */
+typedef HRESULT (STDMETHODCALLTYPE *DllGetClassObjectFn)(
+    REFCLSID rclsid, REFIID riid, void **ppv);
+typedef HRESULT (STDMETHODCALLTYPE *DllCanUnloadNowFn)(void);
 
 #endif /* GREETER_H */

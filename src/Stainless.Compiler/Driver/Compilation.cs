@@ -703,9 +703,20 @@ public sealed class Compilation
         var nativeInputs = new List<string>(options.NativeInputs);
         if (target.IsWindows) nativeInputs.AddRange(compiledResources);
 
+        // A library whose export names differ from its symbols needs the linker
+        // told which is which. On x64 they never differ and this is null.
+        string? moduleDefinition = null;
+        if (options.Shared && ModuleDefinition.For(program) is { } definition)
+        {
+            moduleDefinition = Path.Combine(
+                intermediate,
+                Path.GetFileNameWithoutExtension(output) + ".def");
+            File.WriteAllText(moduleDefinition, definition);
+        }
+
         var link = toolchain.Link(
             irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
-            options.Shared, options.Debug, libraries, sharedRuntime);
+            options.Shared, options.Debug, libraries, sharedRuntime, moduleDefinition);
         if (!link.Success) return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath));
 
         // The loader looks beside the binary, so that is where the runtime goes.

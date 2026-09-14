@@ -134,6 +134,13 @@ last person to edit it -- the suite is the authority.
   activated, so a program that hosts nothing emits none of it.
   [samples/com](../samples/com) is the server, a C++ host and the destructor
   running between the host's `Release()` and its next line
+- **A module definition file, where the names need one.** On 32-bit x86 a
+  calling convention decorates a symbol, so `export "C" __stdcall` is
+  `_DllGetClassObject@12` in the object file — and Windows' loader looks up
+  `DllGetClassObject`. The compiler writes a `.def` naming those exports under
+  the names their source declared, which is what every C++ COM server does and
+  what keeps "the export table is exactly the `export \"C\"` functions" true on
+  x86 as well as x64. Written only where a name would otherwise be wrong
 - `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
   false for null, so a test through a `C?` asks about null and about the class
   at once; a cast that does not hold names what the object really is and ends
@@ -709,11 +716,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   parts nobody has asked for: apartments beyond `CoInitializeEx`, marshalling,
   proxies and stubs, `IDispatch`, and aggregation, which `CreateInstance`
   refuses outright.
-- **A 32-bit COM server's exports are decorated.** `export "C" __stdcall` gets
-  x86's convention and decorates the name with it, where Windows' loader looks
-  up an undecorated `DllGetClassObject`. Undecorating it needs a `.def` file
-  the compiler does not write. The interface slots are unaffected — those are
-  already `__stdcall` on x86.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
   Stainless library be consumed by Stainless, but a generic, a class that
   implements an interface, a variant and a slice all stay behind: a template

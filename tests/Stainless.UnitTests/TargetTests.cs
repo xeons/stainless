@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Stainless.Binding;
+using Stainless.Driver;
 using Xunit;
 
 namespace Stainless.UnitTests;
@@ -154,4 +155,58 @@ public class TargetTests
         Assert.True(TargetPlatform.X86Windows.HasCallingConventions);
         Assert.False(TargetPlatform.X64Windows.HasCallingConventions);
     }
+
+    // ------------------------------------------- the module definition file
+
+    private const string ComServer =
+        "module Server;\n" +
+        "import Standard.Com;\n" +
+        "export \"C\" __stdcall int DllGetClassObject(Guid* a, Guid* b, byte** c) { return 0; }\n" +
+        "export \"C\" __stdcall int DllCanUnloadNow() { return 1; }\n" +
+        "export \"C\" int Plain(int n) { return n; }\n";
+
+    /// <summary>
+    /// On x86 a convention decorates the symbol, and the export table has to
+    /// carry the name the source wrote: Windows' COM loader looks up
+    /// <c>DllGetClassObject</c>, not <c>_DllGetClassObject@12</c>.
+    /// </summary>
+    [Fact]
+    public void ADecoratedExportIsRenamedByTheModuleDefinition() =>
+        Under(TargetPlatform.X86Windows, () =>
+        {
+            var program = Front.Bind(ComServer, out var diagnostics);
+            Assert.Empty(Front.Codes(diagnostics));
+
+            string definition = Assert.IsType<string>(ModuleDefinition.For(program));
+
+            Assert.Contains("DllGetClassObject = _DllGetClassObject@12", definition);
+            Assert.Contains("DllCanUnloadNow = _DllCanUnloadNow@0", definition);
+
+            // An undecorated export is already exported under its own name, so
+            // naming it here would be one more thing to keep correct.
+            Assert.DoesNotContain("Plain", definition);
+        });
+
+    /// <summary>
+    /// And on x64 nothing is decorated, so there is nothing to rename and no
+    /// file to write. A .def would replace the linker's own export list.
+    /// </summary>
+    [Fact]
+    public void NoModuleDefinitionWhereNothingIsDecorated() =>
+        Under(TargetPlatform.X64Windows, () =>
+        {
+            var program = Front.Bind(ComServer, out var diagnostics);
+            Assert.Empty(Front.Codes(diagnostics));
+            Assert.Null(ModuleDefinition.For(program));
+        });
+
+    /// <summary>A .def is a PE concept; ELF exports by visibility.</summary>
+    [Fact]
+    public void NoModuleDefinitionOffWindows() =>
+        Under(TargetPlatform.X86Linux, () =>
+        {
+            var program = Front.Bind(ComServer, out var diagnostics);
+            Assert.Empty(Front.Codes(diagnostics));
+            Assert.Null(ModuleDefinition.For(program));
+        });
 }

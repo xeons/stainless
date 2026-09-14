@@ -218,6 +218,17 @@ reachable from outside, and that is the only control there is:
 modules may see this — and a library's surface should be stated once,
 deliberately, rather than falling out of visibility rules.
 
+**Exactly** means the name too, which takes work on one target. A calling
+convention decorates a symbol on 32-bit x86 — `export "C" __stdcall int
+DllGetClassObject(...)` is `_DllGetClassObject@12` in the object file — and an
+export table built from symbols would carry that rather than what the source
+said. So a Windows build writes a **module definition file** beside the object
+naming those exports under their declared names, and hands it to the linker.
+It is what every C++ COM server has done since 1993, and it is written only
+where a name would otherwise be wrong: on x64 nothing is decorated, and there
+is no file. The convention itself is untouched — only the name is, because the
+convention is what the caller will use and the name is what it looks up.
+
 The generated header restates what the ABI already guarantees:
 
 ```c
@@ -549,13 +560,12 @@ between the host's `Release()` and its next line.
   does for the shell's half.
 - **A com class cannot derive from a class** (SL0536): the tear-offs sit after
   the fields, and a derived class adds fields after those.
-- **On 32-bit x86 an export is `__cdecl` unless it says otherwise**, and the
-  loader calls `DllGetClassObject` as `__stdcall` with an undecorated name.
-  `export "C" __stdcall` gets the convention but decorates the name
-  (`_DllGetClassObject@12`), and undecorating it needs a `.def` file the
-  compiler does not write. Every COM *slot* is already `__stdcall` there — the
-  compiler stamps that on when the table is numbered — so this reaches only the
-  module's own exports.
+- **On 32-bit x86 an export is `__cdecl` unless it says otherwise.** Windows'
+  loader calls `DllGetClassObject` as `__stdcall`, so a server writes
+  `export "C" __stdcall` — and the name that reaches the export table is the
+  one the source declared, because the compiler writes a module definition
+  file for exactly this ([§8.2](#82-building-a-shared-library)). Every COM
+  *slot* is already `__stdcall` there, stamped on when the table is numbered.
 
 ## 8.6 Linking a platform library
 
