@@ -225,6 +225,7 @@ Beyond the language itself:
 | | |
 |---|---|
 | **[forms/](forms/README.md)** | A GUI framework: the LCL's architecture, C#'s names, on Win32 and GTK 3. |
+| **[ide/](ide/README.md)** | An IDE for Stainless, written in Stainless: a syntax-highlighting editor on `forms/`. |
 | **[bindings/win32/](bindings/win32/README.md)** | The Windows API, in two layers. |
 | **[bindings/gtk/](bindings/gtk/README.md)** | GTK 3, and a widget class hierarchy over it. |
 | **[bindings/linux/](bindings/linux/README.md)** | The Linux system calls, declared and nothing else. |
@@ -245,6 +246,7 @@ bindings/linux/        the Linux system calls, on the same terms
 bindings/gtk/          GTK 3, and a widget layer over it
 forms/                 a GUI framework: the LCL's architecture, C#'s names,
                        on Win32 and GTK 3 behind one seam
+ide/                   an IDE for Stainless, written in Stainless
 samples/               example programs
 src/Stainless.Compiler front end, binder, emitter, driver
 src/Stainless.Cli      the `stainless` command

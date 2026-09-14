@@ -19,5 +19,8 @@ obj/
 # Sample build output, including generated headers
 samples/**/build/
 
+# IDE build output
+ide/build/
+
 # The io test case writes its scratch files here when run from the repo root.
 stainless-io/
