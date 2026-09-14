@@ -434,6 +434,10 @@ public class TabPage : WindowedControl {
     /// Which tab this page is behind.
     public int Index => index;
 
+    /// Told its new number after a page in front of it was removed. Called by
+    /// `TabControl.RemovePage` and by nothing else.
+    public void Renumber(int now) { index = now; }
+
     /// The caption on the tab.
     public String Caption {
         get => StoredText;
@@ -478,6 +482,45 @@ public class TabControl : WindowedControl {
     void SetTabText(int index, String text) { native.SetTabText(index, text); }
 
     public List<TabPage> Pages => pages;
+
+    /// Takes a page out and answers whether it was there.
+    ///
+    /// **Every page after it is renumbered**, which is the whole difficulty. A
+    /// `TabPage` remembers which tab it is behind so that setting its caption
+    /// can name one, and removing the tab in front of it silently makes that
+    /// number point at its neighbour. So the indices are rewritten here rather
+    /// than left for the next caption change to get wrong -- a bug that would
+    /// have shown up as renaming the wrong tab, long after the close that
+    /// caused it.
+    ///
+    /// The page is hidden rather than destroyed: a control's lifetime is its
+    /// parent's, and what a caller does with the page afterwards is its
+    /// business. Dropping the last reference to it is what destroys it.
+    public bool RemovePage(TabPage page) {
+        nuint at = 0u;
+        bool found = false;
+        for (nuint i = 0u; i < pages.Count(); i += 1u) {
+            if (pages.At(i) == page) { at = i; found = true; break; }
+        }
+        if (!found) { return false; }
+
+        native.RemoveTab((int)at);
+        pages.RemoveAt(at);
+        page.Visible = false;
+
+        for (nuint i = at; i < pages.Count(); i += 1u) { pages.At(i).Renumber((int)i); }
+
+        // Removing the selected tab leaves the platform's selection wherever it
+        // landed, which may be -1 with pages still here.
+        int chosen = native.GetSelectedTab();
+        if (chosen < 0 && !pages.IsEmpty()) {
+            chosen = (int)(at >= pages.Count() ? pages.Count() - 1u : at);
+            native.SetSelectedTab(chosen);
+        }
+        ShowOnly(native.GetSelectedTab());
+        OnSelectedIndexChanged();
+        return true;
+    }
 
     /// How many tabs the platform has, which is not the same question as how
     /// many pages this control is holding -- and is the one that notices when
