@@ -21,6 +21,14 @@ text is drawn by the program itself, and the whole of it is Stainless.
 - **A real code editor.** Line numbers, the current line, selection by keyboard
   and by drag, a caret the platform blinks, scroll bars, a rule at column 80,
   and a light and a dark theme.
+- **Tabs.** Several files open at once, each with its own document and its own
+  caret; a tab is marked when its file has been changed. Several paths on the
+  command line each get one.
+- **Cut, copy and paste**, through the real system clipboard, shared with every
+  other program on the desktop.
+- **Text size**, from the View menu or with Ctrl and the mouse wheel, applying
+  to every tab at once because it is a property of how you read rather than of
+  which file you are looking at.
 - **Syntax highlighting**, from a Stainless lexer written in Stainless — a line
   at a time, so editing line 400 of a 4000-line file lexes one line.
 - **Movement and editing** that behave the way they should: word movement with
@@ -42,11 +50,16 @@ Named honestly, since the point of the page is to say where the edges are.
 - **No debugger.** The compiler already emits DWARF and CodeView under `-g`, so
   the intended shape is gdb and lldb driven over the MI2 protocol rather than a
   second debugger written here.
-- **One file at a time.** No tabs and no project tree, so a diagnostic in
-  another file says so rather than opening it.
+- **No project tree**, so a file is reached through Open rather than browsed
+  to. A diagnostic in a file that is not open does open it, which is what tabs
+  made possible.
 - **No undo.** The next thing to write, and the reason `Document` is a list of
   lines with every edit going through `Insert` and `Delete`.
-- **No clipboard**, because `Forms` has no clipboard yet.
+- **No keyboard shortcut for text size.** `+` and `-` are OEM virtual keys and
+  `Forms`' `Key` enum does not name them yet, so it is the menu or Ctrl and the
+  wheel. Cut, copy and paste do have their usual keys.
+- **Closing a tab does not ask.** Unsaved work goes without a prompt, which
+  wants a dialog and a decision about what "discard" means.
 - **The build blocks the window** for as long as it takes. It wants a thread and
   a queue the message loop drains, which in turn wants `Forms` to have an answer
   for marshalling to the UI thread.
@@ -86,6 +99,16 @@ of those becomes a measurement that has to be redone for every line above the
 one being drawn.
 
 ### What this needed from Forms
+
+**A clipboard.** `Forms.Clipboard` — `GetText`, `SetText`, `HasText` — over a
+new seam on the widgetset: `CF_UNICODETEXT` through `GlobalAlloc` on Win32,
+`gtk_clipboard_*` on GTK. Text only so far; a clipboard carries any number of
+formats at once and negotiating between them is a design rather than a method.
+
+**A way to close a tab.** `TabControl` could add pages and never remove one, so
+`RemovePage` is new. The interesting part is that every page after the removed
+one is renumbered — a `TabPage` remembers which tab it is behind, and leaving
+that stale would have shown up much later as renaming the wrong tab.
 
 `CustomControl` — a control that draws every pixel of itself and takes the
 keyboard — did not exist and now does, in

@@ -22,5 +22,8 @@ samples/**/build/
 # IDE build output
 ide/build/
 
+# Screenshots pulled back from the Linux test box
+linux-shots/
+
 # The io test case writes its scratch files here when run from the repo root.
 stainless-io/

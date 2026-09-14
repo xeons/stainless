@@ -45,6 +45,15 @@ const nuint TabWidth = 4u;
 /// sources this is written to edit are wrapped to.
 const nuint RightMargin = 80u;
 
+/// How small and how large the text may be made, in points. Small enough to
+/// fit a wide file on a small screen, large enough to read across a room, and
+/// bounded at all because a size of zero is a division by it.
+const int SmallestFont = 6;
+const int LargestFont = 32;
+
+/// The size the text starts at, and what "reset" goes back to.
+public const int DefaultTextSize = 10;
+
 /// A text editor with syntax highlighting.
 public class CodeEditor : CustomControl {
     Document doc;
@@ -119,7 +128,7 @@ public class CodeEditor : CustomControl {
         ready = false;
 
         Border = ControlBorder.Sunken;
-        Font = new Font(MonospaceFamily(), 10);
+        Font = new Font(MonospaceFamily(), DefaultTextSize);
         BackColor = palette.Background;
         Cursor = CursorKind.Text;
 
@@ -130,6 +139,38 @@ public class CodeEditor : CustomControl {
 
         ready = true;
         Rescrolled();
+    }
+
+    /// The size of the text, in points.
+    ///
+    /// Changing it throws the measured metrics away rather than scaling them:
+    /// a font is not linear -- hinting moves a stem by a whole pixel at a time
+    /// -- so the width of a cell at 11 points is not the width at 10 times
+    /// eleven tenths, and a column worked out that way drifts across the line.
+    public int FontSize {
+        get => Font.Size;
+        set {
+            if (value < SmallestFont || value > LargestFont) { return; }
+            if (value == Font.Size) { return; }
+            Font = Font.WithSize(value);
+        }
+    }
+
+    /// Makes the text one point bigger or smaller, within the range above.
+    /// What Ctrl+`+` and Ctrl+`-` do, and what a menu item calls.
+    public void ResizeFont(int by) { FontSize = Font.Size + by; }
+
+    /// The font changed, so nothing measured from the old one is true.
+    ///
+    /// **`cell` back to zero rather than a remeasure here.** There is no
+    /// `Graphics` outside a paint, and the next paint begins by measuring
+    /// whenever `cell` is zero -- so this says "unknown" and the one place that
+    /// knows how to find out does the work.
+    protected override void OnFontChanged() {
+        cell = 0;
+        lineHeight = 0;
+        Invalidate();
+        base.OnFontChanged();
     }
 
     /// The fixed-width font to use, by the name the platform knows it under.
@@ -166,6 +207,12 @@ public class CodeEditor : CustomControl {
 
     /// Where the caret is.
     public Position CaretPosition => caret;
+
+    /// The first line showing, counting from zero.
+    public nuint TopLine => topLine;
+
+    /// How many whole lines fit in the control as it is now.
+    public int VisibleLineCount => VisibleLines();
 
     /// Whether anything is selected.
     public bool HasSelection => !caret.SameAs(anchor);
@@ -532,6 +579,16 @@ public class CodeEditor : CustomControl {
         // Three lines a notch, as every platform's own setting defaults to.
         int notches = args.Delta / 120;
         if (notches == 0) { notches = args.Delta > 0 ? 1 : -1; }
+
+        // Ctrl and the wheel resizes the text, which is what every editor does
+        // with that gesture. It is also the only way to resize it from the
+        // keyboard-and-mouse: `+` and `-` are OEM virtual keys, and Forms'
+        // `Key` enum does not name them yet.
+        if (args.Modifiers.HasFlag(ModifierKeys.Control)) {
+            ResizeFont(notches > 0 ? 1 : -1);
+            base.OnMouseWheel(args);
+            return;
+        }
         int to = (int)topLine - notches * 3;
         if (to < 0) { to = 0; }
         int highest = (int)doc.LineCount() - 1;
@@ -573,11 +630,12 @@ public class CodeEditor : CustomControl {
         else if (args.Key == Key.PageDown) { MoveVertically(VisibleLines(), shift); }
         else if (args.Key == Key.Home)     { MoveHome(shift, control); }
         else if (args.Key == Key.End)      { MoveEnd(shift, control); }
-        else if (args.Key == Key.A && control) {
-            anchor = Position.At(0u, 0u);
-            nuint end = doc.LineCount() - 1u;
-            caret = Position.At(end, doc.LengthAt(end));
-        }
+        else if (args.Key == Key.C && control) { Copy(); moved = false; }
+        else if (args.Key == Key.X && control) { Cut(); moved = false; }
+        else if (args.Key == Key.V && control) { Paste(); moved = false; }
+        else if (args.Key == Key.Insert && control) { Copy(); moved = false; }
+        else if (args.Key == Key.Insert && shift)   { Paste(); moved = false; }
+        else if (args.Key == Key.A && control) { SelectAll(); }
         else if (args.Key == Key.Backspace) { DeleteBack(); moved = false; }
         else if (args.Key == Key.Delete)    { DeleteForward(); moved = false; }
         else if (args.Key == Key.Enter)     { Type("\n"); moved = false; }
@@ -595,7 +653,9 @@ public class CodeEditor : CustomControl {
     protected override void OnKeyPress(KeyPressEventArgs args) {
         if (!ready) { return; }
         // Everything below a space is a control code, and each one that means
-        // something has already been dealt with as a key.
+        // something has already been dealt with as a key. Ctrl+V arrives here a
+        // second time as character 22, which is exactly why that test is a
+        // range and not a list of the ones we happen to have thought of.
         if (args.KeyChar >= ' ') { Type(Standard.Text.FromChar((char32)args.KeyChar)); }
         base.OnKeyPress(args);
     }
@@ -732,6 +792,47 @@ public class CodeEditor : CustomControl {
     }
 
     // -------------------------------------------------------------- editing
+
+    /// Selects the whole file.
+    public void SelectAll() {
+        anchor = Position.At(0u, 0u);
+        nuint end = doc.LineCount() - 1u;
+        caret = Position.At(end, doc.LengthAt(end));
+        keepWanted = false;
+        Invalidate();
+        OnCaretMoved();
+    }
+
+    /// Copies the selection, and answers whether there was one.
+    ///
+    /// **A copy with nothing selected does nothing** rather than copying the
+    /// line. Some editors do copy the line, and it is a genuinely useful
+    /// shortcut -- but it is also the one that silently replaces what somebody
+    /// carefully put on the clipboard a moment ago, and a clipboard is shared
+    /// with every other program on the desktop.
+    public bool Copy() {
+        if (!HasSelection) { return false; }
+        Clipboard.SetText(SelectedText);
+        return true;
+    }
+
+    /// Copies the selection and takes it out.
+    public bool Cut() {
+        if (!Copy()) { return false; }
+        caret = doc.Delete(anchor, caret);
+        anchor = caret;
+        AfterEdit();
+        return true;
+    }
+
+    /// Puts the clipboard's text in, replacing the selection.
+    public bool Paste() {
+        if (!Clipboard.HasText()) { return false; }
+        String text = Clipboard.GetText();
+        if (text.ByteLength() == 0u) { return false; }
+        Type(text);
+        return true;
+    }
 
     /// Puts text in, replacing the selection if there is one.
     public void Type(String text) {

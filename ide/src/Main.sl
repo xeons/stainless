@@ -35,19 +35,22 @@ int Main() {
     var window = new Shell();
 
     bool testing = false;
-    String opening = "";
     var arguments = Env.Arguments();
     // From zero: `Env.Arguments` is what `Main(String[] args)` would have been
     // handed, which does not include the program's own name.
+    //
+    // Every path named gets a tab, in the order they were given, and the first
+    // one stays in front -- which is what a shell expanding `*.sl` means, and
+    // what `ide a.sl b.sl` means too.
     for (nuint i = 0u; i < arguments.Length; i += 1u) {
         String argument = arguments[i];
-        if (argument == "--selftest") { testing = true; }
-        else if (!argument.StartsWith("-")) { opening = argument; }
+        if (argument == "--selftest") { testing = true; continue; }
+        if (argument.StartsWith("-")) { continue; }
+        if (!window.OpenFile(argument)) {
+            Console.WriteLine("could not read " + argument);
+        }
     }
-
-    if (opening.ByteLength() > 0u && !window.OpenFile(opening)) {
-        Console.WriteLine("could not read " + opening);
-    }
+    window.ShowFirstTab();
 
     if (testing) {
         Console.WriteLine("the Stainless IDE -- self test");
