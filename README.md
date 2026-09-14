@@ -1041,10 +1041,14 @@ stainless run samples/win32/resources.sl samples/win32/resources.rc \
     bindings/win32 -l user32
 ```
 
-A resource section is a PE idea and nothing else has one, so a build for
-another system leaves the script out and warns (SL0700) rather than failing —
-one source tree still builds everywhere. `Win32.Resources` reads them back, and
-`Bitmap.FromResource` in `forms/` is the same thing one layer up. See
+**It works on every target**, by two routes: a PE has a resource directory and
+the linker fills it, and everything else carries the same compiled script in a
+section called `.rsrc` that `Standard.Resources` walks. The two were checked
+against each other entry by entry and answer identically, so
+[tests/cases/resources-portable](tests/cases/resources-portable) has one
+expected output and no `#if` in it. What does not travel is the *operating
+system*: a manifest, an icon and a dialog template are carried and readable
+elsewhere and inert, and SL0700 names them when a program has any. See
 [§2.2 of docs/packages.md](docs/packages.md).
 
 ### Projects

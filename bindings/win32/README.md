@@ -297,6 +297,14 @@ among the sources, compiled by `llvm-rc` and folded in by the linker (see
 [§2.2 of the packages doc](../../docs/packages.md)) — and `Win32.Resources` is
 the reading half.
 
+**`Standard.Resources` is the portable half, and is usually the one to reach
+for.** It reads bytes, string tables and bitmaps identically on every target,
+and it needs no `-l` at all. What is *here* is the part that is Windows by
+nature: an icon or cursor as an `HICON`, a menu as an `HMENU`, an accelerator
+table, enumeration of what a binary holds, and reading the resources of a
+*different* binary. Reach for this when the answer you want is a Windows handle
+rather than bytes.
+
 What makes this different from every other part of the API is that **Windows
 reads the resource directory on the program's behalf**. `LoadIconW`,
 `LoadStringW`, `LoadMenuW`, `CreateDialogParamW` and `LoadAcceleratorsW` each

@@ -1,0 +1,10 @@
+the first string
+the second string
+past the first block
+absent ''
+payload 8 bytes, first p
+in place 8 bytes, pointer true
+greeting 6 bytes
+present true
+absent false
+size 8

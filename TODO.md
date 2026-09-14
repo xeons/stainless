@@ -194,73 +194,25 @@ shell's half is written. In rough order of what a program actually wants:
 
 ### What resources left open
 
-A `.rc` compiles into the binary now and `Win32.Resources` reads one back, so
-the mechanism is done. Three things around it are not, in the order they are
-worth having:
+A `.rc` compiles into the binary on every target now, `Standard.Resources`
+reads one anywhere, and `Bitmap.FromResource` works on both widget backends. Two
+things around it are still open:
 
 **A dialog built from its template.** `CreateDialogParamW`, `DialogBoxParamW`
-and `EndDialog` are bound and a `RT_DIALOG` in a script works today through the
+and `EndDialog` are bound and an `RT_DIALOG` in a script works today through the
 raw layer; what is missing is a `forms/` control that wraps one. It matters
-because a dialog template is how every Windows program has laid out a dialog
-for thirty years -- the layout is data, so it can be edited by a resource
-editor and translated without recompiling, neither of which is true of the
-`SetBounds` calls `forms/` uses now. This is the only one of these three that
-would change how programs are written rather than adding a capability.
+because a dialog template is how every Windows program has laid out a dialog for
+thirty years -- the layout is data, so it can be edited by a resource editor and
+translated without recompiling, neither of which is true of the `SetBounds`
+calls `forms/` uses now. Windows-only by nature: the template is a format the OS
+itself interprets.
 
-**`Bitmap.FromResource` is the one seam method a backend cannot implement.**
-`IWidgetSet.LoadBitmapResource` and `IWindowPeer.SetIconResource` fail on GTK
-with a message rather than a picture. That is a difference in binary format
-rather than a gap, and it is still an asymmetry nothing else in forty-five seam
-methods has.
+**Mach-O has no answer yet.** The blob goes in a section named `.rsrc`, which is
+ELF's spelling. Mach-O wants `__SEGMENT,__section` and is not a target, so
+nothing is wrong today -- but the `section` attribute in `ResourceBlob` is the
+line that would have to learn about it.
 
-Two ways to close it, and the measurements that decide between them:
-
-*A `.res` shim.* LLVM will **not** link a `.res` into an ELF binary --
-`ld.lld` answers `unknown file type` -- but it does not have to. A `.res` is a
-flat list of self-describing records, and `llvm-objcopy -I binary -O
-elf64-x86-64 app.res app.o` turns it into an object exposing
-`_binary_app_res_start`/`_end`, which links. Both steps were run and both work,
-and a Stainless program on Linux has read the blob back -- with no C in the
-build, now that a variable may cross `extern "C"`: those symbols are reached by
-declaring `extern "C" byte _binary_app_res_start;` and taking its address.
-
-What is left is the reader for the record format, which is perhaps a hundred
-lines: a flat sequence of (DataSize, HeaderSize, type, name, fixed tail, data),
-each entry starting at the next four-byte boundary, with type and name each
-either a 0xFFFF marker plus a 16-bit id or a NUL-terminated UTF-16 string. The
-first entry is a null marker and is skipped. `RT_STRING` needs the block
-arithmetic `LoadStringW` does -- strings are filed sixteen to a block, so id 201
-is the tenth entry of block 13 -- and that is the part that proves the shim can
-reproduce what Windows does rather than merely hand back bytes.
-
-**This is the one to do**, because it adds no dependency -- `llvm-rc` and
-`llvm-objcopy` both ship beside the clang the build already requires -- keeps
-one `.rc` for every target, and preserves the type-and-id addressing
-`Win32.Resources` already exposes, so `Resources.Bytes(Id(301), RtRcData())`
-would compile and run unchanged on Linux.
-
-*GResource.* An XML manifest compiled by `glib-compile-resources` into an ELF
-section, reached by a `resource:///` path. It is what other Linux tooling
-understands -- Glade files, CSS, icon themes -- so it is the right answer for a
-program that wants to be a good GNOME citizen. It costs a build-tool
-dependency, and it is keyed by *path* rather than by type and id, so it would
-need a second API shape and would leave the seam asymmetric anyway.
-
-Two things to know before starting either. **`RT_BITMAP` has no
-`BITMAPFILEHEADER`**: `rc` strips those 14 bytes, measured as 70 on disk
-against 56 in the resource, so a decoder like gdk-pixbuf has to be handed a
-synthesized header. And **the byte-shaped half is all that can be closed** --
-`RT_MENU`, `RT_DIALOG` and `RT_ACCELERATOR` are a format Windows itself
-interprets, so the shim would hand a program the bytes of a dialog template
-that nothing on Linux can build a window from.
-
-**A `.res` or a prebuilt resource object is refused.** Only a `.rc` is
-recognised, so a resource compiled by someone else's toolchain -- or one a
-build step generated -- has no way in. It is a line in `NativeExtensions` and a
-passthrough, and the reason to want it is a program whose version resource is
-stamped by CI rather than checked in.
-
-*Touches:* `src/Stainless.Compiler/Driver`, `bindings/win32`, `forms/src`.
+*Touches:* `src/Stainless.Compiler/Emit`, `forms/src`.
 
 ---
 

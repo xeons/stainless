@@ -286,6 +286,29 @@ public extern "C" {
                                      gdouble x, gdouble y);
 }
 
+/// Decoding an image that is already in memory rather than on disk.
+///
+/// `gdk_pixbuf_new_from_file` is the usual way in and takes a path, which is no
+/// use for bytes that came out of the binary's own `.rsrc` section. A loader is
+/// the streaming form of the same decoders: feed it the bytes, close it, and
+/// ask for the result.
+///
+/// **Close it before asking.** The pixbuf is not complete until `close` has
+/// run, and `close` is also what reports a truncated or unrecognised image.
+/// What `get_pixbuf` returns belongs to the loader, so it must be referenced
+/// before the loader is dropped.
+public using GdkPixbufLoader = byte;
+
+public extern "C" {
+    GdkPixbufLoader* gdk_pixbuf_loader_new();
+    gboolean gdk_pixbuf_loader_write(GdkPixbufLoader* loader, byte* bytes,
+                                     gsize count, GError** error);
+    gboolean gdk_pixbuf_loader_close(GdkPixbufLoader* loader, GError** error);
+
+    /// The decoded image, or null. Owned by the loader until referenced.
+    GdkPixbuf* gdk_pixbuf_loader_get_pixbuf(GdkPixbufLoader* loader);
+}
+
 public const gint GDK_INTERP_NEAREST  = 0;
 public const gint GDK_INTERP_BILINEAR = 2;
 

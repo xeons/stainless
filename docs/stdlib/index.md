@@ -23,6 +23,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Process](Standard-Process.md) | Running another program. |
 | [Standard.Random](Standard-Random.md) | Pseudo-random numbers. |
 | [Standard.Reflection](Standard-Reflection.md) | Reading the metadata the compiler laid down. |
+| [Standard.Resources](Standard-Resources.md) | What a program carries inside itself, on every platform. |
 | [Standard.Text](Standard-Text.md) | The rest of `String`. |
 | [Standard.Threading](Standard-Threading.md) | Locks, atomics and the job pool. |
 | [Standard.Time](Standard-Time.md) | Time, of the two kinds that must not be confused. |

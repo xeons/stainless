@@ -27,6 +27,52 @@ namespace Stainless.Emit;
 /// </summary>
 public sealed partial class LlvmEmitter
 {
+    /// <summary>
+    /// The compiled resource script, as bytes the program carries.
+    ///
+    /// **Only where the binary format has nowhere else to put them.** A PE has
+    /// a resource directory and the linker fills it from the same `.res`, so a
+    /// Windows build reads the real thing and this emits nothing -- carrying
+    /// both would be the same bytes twice. ELF has no such section, so the
+    /// bytes ride in ordinary constant data and `Standard.Resources` walks
+    /// them.
+    ///
+    /// Emitted even when empty, so that the symbol always resolves: a program
+    /// that never asks for a resource still links, and one that does gets an
+    /// empty answer rather than a missing symbol.
+    /// </summary>
+    private void ResourceBlob()
+    {
+        if (resourceBlob is null) return;
+
+        // `Standard.Resources` declares these `extern "C"`, because from the
+        // program's side they are storage defined elsewhere -- and "elsewhere"
+        // turns out to be here. Recording the names keeps `StaticStorage` from
+        // emitting an `external global` beside the definition, which LLVM reads
+        // as a redefinition.
+        _definedGlobals.Add("sl_resource_blob");
+        _definedGlobals.Add("sl_resource_blob_size");
+
+        _module.AppendLine();
+        // In a section of its own, named after the one a PE keeps resources in.
+        //
+        // The symbol is what the *program* uses -- a section has no address a
+        // program can ask for without reading its own ELF headers, which is
+        // more fragility than it is worth. What the section buys is everything
+        // outside the program: `readelf -x .rsrc` shows what a binary carries,
+        // and `llvm-objcopy --dump-section .rsrc=out.res` gets the original
+        // .res back out, so a resource editor or a translator's toolchain can
+        // work on a Linux binary the way it would on a Windows one.
+        //
+        // The name is spelled the PE way deliberately. Mach-O would need
+        // `__SEGMENT,__section` instead, and is not a target yet.
+        _module.AppendLine(
+            $"@sl_resource_blob = constant [{resourceBlob.Length} x i8] " +
+            $"c\"{RawBytes(resourceBlob)}\", section \".rsrc\"");
+        _module.AppendLine(
+            $"@sl_resource_blob_size = constant i64 {resourceBlob.Length}");
+    }
+
     private void StringConstants()
     {
         if (_byteConstants.Count == 0 && _stringObjects.Count == 0) return;
@@ -126,9 +172,11 @@ public sealed partial class LlvmEmitter
     /// <summary>
     /// The bytes as LLVM spells them, with nothing added.
     ///
-    /// <see cref="EscapeBytes"/> terminates what it writes, because every
-    /// caller but one is emitting a C string. The exception is a GUID, which
-    /// is sixteen bytes and not text.
+    /// <see cref="EscapeBytes"/> terminates what it writes, because most callers
+    /// are emitting a C string. The exceptions are a GUID and a compiled
+    /// resource script: neither is text, and a resource blob is handed back out
+    /// by `llvm-objcopy --dump-section`, so a byte nobody put there would make
+    /// what comes out differ from what went in.
     /// </summary>
     private static string RawBytes(byte[] bytes)
     {

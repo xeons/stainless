@@ -106,8 +106,10 @@ END
 
 That is where an icon, a toolbar's image strip, a string table, a menu, a
 dialog template, an accelerator table and an application manifest live.
-`Win32.Resources` reads them back; `Bitmap.FromResource` in `forms/` is the
-same thing one layer up. clang takes the compiled `.res` on its command line
+`Standard.Resources` reads them back on any target, `Win32.Resources` adds the
+Windows-only half — icons, menus, accelerators, enumeration — and
+`Bitmap.FromResource` in `forms/` is the same thing one layer up, on both
+backends. clang takes the compiled `.res` on its command line
 directly, so there is no `cvtres` step and no dependency on a particular
 linker.
 
@@ -117,24 +119,38 @@ directory**, not the working directory — so a script keeps its bitmaps and its
 This is the one place `llvm-rc` deliberately differs from Microsoft's `rc.exe`,
 and it is the better rule: it is what makes a project relocatable.
 
-**A resource section is a PE idea, and no other format has one.** ELF has
-nothing equivalent: the nearest thing, GLib's GResource, is a name-to-bytes
-lookup that a *library* consults rather than something the loader reads, and
-Mach-O keeps resources in the bundle beside the binary. The difference is
-sharpest for the types that are not data but description — `RT_MENU`,
-`RT_DIALOG` and `RT_ACCELERATOR` are a declarative UI format Windows itself
-interprets, and nothing elsewhere reads them.
+**It works on every target, by two routes.** A PE has a resource directory and
+the linker fills it from the `.res`, so a Windows build reads the real thing
+through `FindResourceW`. ELF has no such section, so the compiler puts the same
+`.res` in a section called `.rsrc` as ordinary data and `Standard.Resources`
+walks it. The two were checked against each other on the same script, entry by
+entry, and answer identically — which is why
+[tests/cases/resources-portable](../tests/cases/resources-portable) has one
+`expected.txt` and no `#if` in its source.
 
-So a build for any other target leaves the script out and says so:
+Because the section holds the `.res` unchanged, the ordinary tools still work on
+a Linux binary:
 
 ```
-warning[SL0700]: 'app.rc' is a Windows resource script and was left out of this
-build: x86_64-pc-linux-gnu has no resource section to put it in
+readelf -x .rsrc app
+llvm-objcopy --dump-section .rsrc=out.res app     # byte-identical to llvm-rc's
 ```
 
-A warning rather than an error, because one source tree is expected to build
-everywhere: a program whose Windows half has an icon and a manifest should not
-need the build itself put behind an `#if`.
+**What does not travel is the operating system.** Bytes travel; an OS that acts
+on them does not. `RT_MANIFEST` selects comctl32 version 6, `RT_GROUP_ICON`
+becomes a window's icon, `RT_DIALOG` becomes a window full of controls — all by
+machinery that exists only on Windows. Those types are carried and readable
+elsewhere, and inert. The build says so, naming what is actually in the program
+rather than firing on every script:
+
+```
+warning[SL0700]: this program's resources include RT_MANIFEST, which only
+Windows acts on: x86_64-pc-linux-gnu carries them and 'Standard.Resources' can
+read them, but nothing here turns one into a window icon, a menu or a manifest
+```
+
+A script of string tables and RCDATA draws no warning at all, because nothing
+about it is lost.
 
 ## 3. Versions
 

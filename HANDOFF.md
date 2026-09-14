@@ -8,8 +8,8 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           835 pass, Windows and Linux
-dotnet run --project tests/Stainless.Tests      283 pass, 2 skipped on Windows
-                                                272 pass, 13 skipped on Linux
+dotnet run --project tests/Stainless.Tests      284 pass, 2 skipped on Windows
+                                                273 pass, 13 skipped on Linux
 stainless doc --stdlib                          22 pages into docs/stdlib
 samples/forms/build.ps1 -Test                   demo 21/21, common 43/43
 forms on GTK 3, under broadwayd                 demo 21/21, common 43/43
@@ -106,9 +106,83 @@ keep honest, and no current distribution ships the second.
 | `2c0e8b8` | GTK 2 goes, and `forms/` gets its second backend |
 | `cc4a910` | a lambda capturing a member something else writes warns |
 | `ad37dd4` | Windows resources, and the tree view that had never held an item |
-| *this one* | a variable may cross `extern "C"`, not only a function |
+| `e3d82f9` | a variable may cross `extern "C"`, not only a function |
+| *this one* | resources stop being a Windows idea |
 
 ## Findings worth keeping
+
+### Resources on a system that has no resource section
+
+A `.rc` now works on every target. On Windows the linker fills the PE's resource
+directory as before; everywhere else the compiler emits the compiled `.res` as a
+constant in a section called `.rsrc`, and `Standard.Resources` walks it. The two
+were checked against each other on the same script -- `tests/cases/
+resources-portable` has one `expected.txt`, no `#if`, and passes on both.
+
+**The experiment's two hacks both died on contact with integration.**
+`llvm-objcopy -I binary` names its symbols after the input *file*
+(`app.res` -> `_binary_app_res_start`), which is no basis for a stdlib module,
+and it only emits ELF -- there is no `coff-x86-64` or `pei-x86-64`. Both went
+away by emitting the bytes straight into the IR instead: the emitter already had
+`RawBytes` for GUIDs, "sixteen bytes and not text", and a resource blob is the
+second caller that is not text. Using `EscapeBytes` instead appends a NUL, which
+made the extracted blob one byte longer than what `llvm-rc` wrote.
+
+**A section costs one attribute and buys the tooling.** `section ".rsrc"` on the
+global is the whole change. The *program* still finds its resources by symbol --
+a section has no address a program can ask for without reading its own ELF
+headers -- but everything outside the program can now work:
+`llvm-objcopy --dump-section .rsrc=out.res` on a Linux binary gives back a file
+byte-identical to what `llvm-rc` produced, which `llvm-readobj` then reads as a
+resource script.
+
+**The compiler defines what the stdlib declares.** `Standard.Resources` declares
+`sl_resource_blob` with `extern "C"`, and "elsewhere" turns out to be the same
+emitter -- so both wrote `@sl_resource_blob` and LLVM called it a redefinition.
+`_definedGlobals` is the fix: the emitter records what it defines and
+`StaticStorage` skips declaring those.
+
+**SL0700 changed meaning and got better.** It used to say a script "was left out
+of this build", which is no longer true. It now walks the compiled `.res` and
+names only the types that need an OS to act on them -- `RT_MANIFEST`,
+`RT_GROUP_ICON`, `RT_DIALOG` and the rest -- so a script of string tables and
+RCDATA draws no warning at all, because nothing about it is lost.
+
+**Two pre-existing bugs surfaced, neither caused by this work.**
+
+*Integer-to-pointer casts were impossible on x86.* `Binder.Conversions` asked for
+`Size: 8` rather than the target's pointer width, so `(char16*)(nuint)id` -- the
+idiom `bindings/win32` is written in throughout, `CursorArrow`, `InvalidHandle`,
+`TreeRoot` -- was a compile error for a 32-bit target, while `ulong`, which is
+wider than the pointer it would be truncated into, was allowed. Confirmed on a
+clean tree with none of this work present. The rule is `Size >=
+PointerWidth` now, and `bindings/win32` compiles for x86 for the first time.
+
+*`--shared` refused every static, including ones with nothing to initialize.*
+SL0380 exists because a library has no entry point to run initializers from. An
+imported `extern "C"` variable has no initializer at all, so the rule never
+applied to it -- but the check counted it, and twelve library and interop cases
+failed on Linux the moment `Standard.Resources` declared two.
+
+**Win32 APIs in the stdlib need `__stdcall`.** kernel32 is reached for the
+resource directory, and on x86 the import library exports `_GetModuleHandleW@4`
+while a cdecl declaration looks for `_GetModuleHandleW`. `bindings/win32` has
+this wrong throughout and has never been linked for x86 -- worth knowing before
+anyone tries.
+
+**`user32` is deliberately not used.** `LoadStringW` would be the obvious way to
+read a string table, and it would make every program that touches a resource
+link a library it may want nothing else from. The block arithmetic it performs
+is thirty lines, so it is written out and both platforms share it: strings are
+filed sixteen to a block, so id 201 is the tenth entry of block 13.
+
+**`rc` strips the `BITMAPFILEHEADER`.** Windows never wants it -- `LoadImageW`
+takes the DIB header onwards -- and every other decoder does.
+`Resources.BitmapFile` puts it back, verified byte-for-byte against the original
+`.bmp`, which is what lets GTK decode a resource bitmap through a
+`GdkPixbufLoader`. That closed the one asymmetry in the widget seam:
+`Bitmap.FromResource` and `ImageList.AddResource` now work on both backends.
+
 
 ### What extern variables cost, which was less than expected
 

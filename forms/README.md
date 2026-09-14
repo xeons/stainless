@@ -160,11 +160,15 @@ handler, a menu item resolving from its id. That is what makes a GUI something
 a build can run, and it is how every bug listed under *Decisions worth knowing
 about* was found.
 
-**Both suites pass on both backends**, with one exception that is worth more
-than the rest of the sentence: `common`'s "a tree node reads back its text"
-passes on GTK and fails on Win32. Two backends is what turned that from "the
-tree control is broken" into "the *Windows* tree peer is broken", which is a
-different bug in a different file and a much smaller one.
+**Both suites pass on both backends**, and the last exception is worth keeping
+for how it was found. `common`'s "a tree node reads back its text" passed on
+GTK and failed on Win32, which turned "the tree control is broken" into "the
+*Windows* side is broken" -- a much smaller question. The answer was one
+truncated literal: `TVI_ROOT` is a negative number that sign-extends to
+`0xFFFFFFFFFFFF0000` on a 64-bit machine, and the binding had it as a 32-bit
+`0xFFFF0000u`. Every insert was handed a parent handle naming nothing, so the
+Win32 tree view had never actually held an item -- the other tree checks passed
+because they read the peer's own mirror list rather than the control.
 
 Two end-to-end cases go further, driving real messages at the controls:
 `tests/cases/forms-input` synthesises a mouse drag and a wheel turn and checks
@@ -483,7 +487,9 @@ here at all. Where one is a backend's rather than the library's, it says so.
   have since Windows 95. They may come from a file or from the program's own
   resources -- `Bitmap.FromResource(id)` and `ImageList.AddResource(id)` read
   an `RT_BITMAP` compiled into the executable, which is how a toolbar's icons
-  stop being something that can go missing between building and running.
+  stop being something that can go missing between building and running. Both
+  backends do it: GTK decodes the same bytes through a `GdkPixbufLoader`, with
+  the `BITMAPFILEHEADER` that `rc` strips put back first.
 - **Not DPI aware.** On a scaled display Windows renders the window at 96 DPI
   and scales the result, so text is soft. Per-monitor awareness is a manifest
   setting and a layout that scales with it, and neither is here.
@@ -492,15 +498,15 @@ here at all. Where one is a backend's rather than the library's, it says so.
 
 ### GTK's own
 
-- **There are no resources, and this one will not be fixed by work.**
-  `Bitmap.FromResource` and `Form.UseIconResource` fail here, with a message
-  saying why rather than a null. An ELF binary has no resource section: what
-  Windows has is a directory indexed by type and integer id that the *loader*
-  reads, and the nearest thing on Linux -- GLib's GResource -- is a
-  name-to-bytes lookup a library consults, reached by a `resource:///` path and
-  needing `glib-compile-resources` in the build. A program that wants pictures
-  on both systems reads them from files. A GTK program's window icon comes from
-  the desktop's icon theme, keyed by the name in its `.desktop` file.
+- **Resources work here now, and the note that used to be here was wrong.** It
+  argued that `Bitmap.FromResource` could never work because an ELF binary has
+  no resource section. The premise was right and the conclusion was not: the
+  compiler carries the compiled `.res` in a section of its own and
+  `Standard.Resources` walks it, so a bitmap compiled into the program is read
+  the same way on both backends. What is genuinely different is
+  `Form.UseIconResource`, which still answers false: an `RT_GROUP_ICON` becomes
+  a window's icon because *Windows* reads it, and a GTK program's icon comes
+  from the desktop's icon theme, keyed by the name in its `.desktop` file.
 - **A size request is a minimum.** A control in a `GtkFixed` is given its
   natural size when that is larger than the layout allowed, so a long caption
   overflows rather than clipping. A label ellipsizes and an entry scrolls; a

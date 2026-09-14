@@ -627,10 +627,23 @@ public sealed partial class Binder
             to is NamedTypeSymbol { IsReferenceType: true } or ArrayTypeSymbol)
             return explicitCast ? ConversionKind.PointerCast : null;
 
-        if (from is PointerTypeSymbol && to is PrimitiveTypeSymbol { IsInteger: true, Size: 8 })
+        // An integer that is at least as wide as a pointer, in either
+        // direction. **Pointer width, not eight.** This said `Size: 8` and so
+        // asked a question about the host rather than about the target: on a
+        // 32-bit build `nuint` is four bytes, so the one type whose whole
+        // purpose is to hold a pointer was the one refused, while `ulong` --
+        // which is wider than the pointer it would be truncated into -- was
+        // allowed. That made `(char16*)(nuint)id` a compile error for x86, and
+        // `bindings/win32` is written in exactly that idiom: `CursorArrow`,
+        // `InvalidHandle` and `TreeRoot` are all a number cast to a handle.
+        if (from is PointerTypeSymbol &&
+            to is PrimitiveTypeSymbol { IsInteger: true } intTarget &&
+            intTarget.Size >= TargetPlatform.Current.PointerWidth)
             return explicitCast ? ConversionKind.PointerToInteger : null;
 
-        if (from is PrimitiveTypeSymbol { IsInteger: true, Size: 8 } && to is PointerTypeSymbol)
+        if (from is PrimitiveTypeSymbol { IsInteger: true } intSource &&
+            intSource.Size >= TargetPlatform.Current.PointerWidth &&
+            to is PointerTypeSymbol)
             return explicitCast ? ConversionKind.IntegerToPointer : null;
 
         // An enum never converts implicitly, in either direction. That is the

@@ -171,14 +171,27 @@ public sealed class Toolchain
     {
         string executable = OperatingSystem.IsWindows() ? "llvm-rc.exe" : "llvm-rc";
 
-        if (Path.GetDirectoryName(ClangPath) is { Length: > 0 } beside)
-            yield return Path.Combine(beside, executable);
+        // Beside clang, and beside what clang *resolves to*. Debian and Ubuntu
+        // put the real toolchain in /usr/lib/llvm-21/bin and leave a symlink at
+        // /usr/bin/clang; llvm-rc is in the first and not the second, so
+        // following the link is the difference between finding it and not.
+        foreach (string near in new[] { ClangPath, RealPath(ClangPath) })
+            if (Path.GetDirectoryName(near) is { Length: > 0 } beside)
+                yield return Path.Combine(beside, executable);
 
         foreach (string directory in (Environment.GetEnvironmentVariable("PATH") ?? "")
                      .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
         {
             string trimmed = directory.Trim('"');
-            if (trimmed.Length > 0) yield return Path.Combine(trimmed, executable);
+            if (trimmed.Length == 0) continue;
+
+            yield return Path.Combine(trimmed, executable);
+
+            // Those distributions also ship the tools under a versioned name,
+            // so `llvm-rc-21` is on PATH where plain `llvm-rc` is not.
+            if (!OperatingSystem.IsWindows())
+                for (int version = 30; version >= 15; version -= 1)
+                    yield return Path.Combine(trimmed, $"llvm-rc-{version}");
         }
 
         if (OperatingSystem.IsWindows())
@@ -188,8 +201,28 @@ public sealed class Toolchain
         }
     }
 
+    /// <summary>What a path points at once symbolic links are followed.</summary>
+    private static string RealPath(string path)
+    {
+        try
+        {
+            return File.ResolveLinkTarget(path, returnFinalTarget: true)?.FullName ?? path;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return path;
+        }
+    }
+
     /// <summary>What to tell someone whose program has a .rc and whose machine has no llvm-rc.</summary>
-    public const string MissingResourceCompiler =
+    public static string MissingResourceCompiler => OperatingSystem.IsWindows()
+        ? WindowsMissingResourceCompiler
+        : "could not find 'llvm-rc'. A .rc file is a resource script, and compiling one needs it.\n" +
+          "  It ships with LLVM, beside the clang this build already found. On Debian and Ubuntu\n" +
+          "  it is in the llvm package for that version:  sudo apt install llvm\n" +
+          "  Or point Stainless at an existing copy:  export STAINLESS_RC=/path/to/llvm-rc";
+
+    private const string WindowsMissingResourceCompiler =
         "could not find 'llvm-rc'. A .rc file is a Windows resource script, and compiling one needs it.\n" +
         "  It ships with LLVM, in the same directory as the clang this build already found:\n" +
         "    winget install LLVM.LLVM\n" +

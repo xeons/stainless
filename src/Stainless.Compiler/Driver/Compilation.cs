@@ -416,16 +416,6 @@ public sealed class Compilation
 
         Binding.TargetPlatform.Current = target;
 
-        // Said here rather than beside the link, because it is a fact about the
-        // target and not about linking -- so `--emit-ir` for a machine with no
-        // resource section reports it too, and that path returns long before
-        // any linker is reached.
-        if (!target.IsWindows)
-            foreach (string script in options.ResourceScripts)
-                diagnostics.Warning("SL0700", default,
-                    $"'{Path.GetFileName(script)}' is a Windows resource script and was left " +
-                    $"out of this build: {target.Triple} has no resource section to put it in");
-
         // --- parse -------------------------------------------------------
         var units = new List<CompilationUnitSyntax>();
 
@@ -545,9 +535,16 @@ public sealed class Compilation
 
         // Static initializers run from the entry point, and a library has none.
         // Better to say so than to hand back a library whose statics are zero.
-        if (options.Shared && program.Statics.Count > 0)
-            diagnostics.Error("SL0380", program.Statics[0].Span,
-                $"'{program.Statics[0].Name}' is a static, and a --shared library has no entry " +
+        //
+        // A variable declared `extern "C"` is not one of these. It has no
+        // initializer to run -- the storage is defined elsewhere and this names
+        // it -- so there is nothing for a missing entry point to fail to do.
+        // `Standard.Resources` declares two, so without this exception no
+        // --shared build would compile at all.
+        var uninitialized = program.Statics.Where(s => !s.IsImported).ToList();
+        if (options.Shared && uninitialized.Count > 0)
+            diagnostics.Error("SL0380", uninitialized[0].Span,
+                $"'{uninitialized[0].Name}' is a static, and a --shared library has no entry " +
                 "point to initialize one from; hold the value behind an exported function " +
                 "instead, or build this module into an executable");
 
@@ -588,6 +585,40 @@ public sealed class Compilation
                 };
         }
 
+        // --- resources ---------------------------------------------------
+        //
+        // Before emission rather than beside the link, because on a target with
+        // no resource section the bytes travel in the IR as ordinary constant
+        // data: the emitter needs them, and the emitter runs first.
+        //
+        // The toolchain is located here and only here, because compiling a .rc
+        // is the one thing before the link that needs an external tool, and a
+        // documentation-only build must still work on a machine with no clang.
+        IReadOnlyList<string> compiledResources = [];
+        byte[]? resourceBlob = null;
+
+        if (options.ResourceScripts.Count > 0)
+        {
+            var resourceTools = Toolchain.Locate(out string resourceToolError);
+            if (resourceTools is null) return Failure(resourceToolError);
+
+            Directory.CreateDirectory(IntermediateDirectory(options));
+            compiledResources = CompileResources(
+                resourceTools, options, target, IntermediateDirectory(options),
+                out string resourceError);
+            if (resourceError.Length > 0) return Failure(resourceError);
+        }
+
+        // A PE has somewhere to put these and the linker fills it from the same
+        // .res, so a Windows build carries them once, in the resource
+        // directory. Everything else carries them as data. The empty blob is
+        // deliberate: the symbol resolves whether or not a program has any.
+        if (!target.IsWindows)
+        {
+            resourceBlob = ReadResourceBlob(compiledResources);
+            WarnAboutUnreadTypes(resourceBlob, target, diagnostics);
+        }
+
         // --- emit --------------------------------------------------------
         var debug = options.Debug
             ? new DebugInfo(
@@ -601,7 +632,8 @@ public sealed class Compilation
             forStainlessConsumers: options.MetadataPath is not null,
             debug: debug,
             sharedRuntime: options.NeedsSharedRuntime,
-            abi: target.Abi).Emit(program);
+            abi: target.Abi,
+            resourceBlob: resourceBlob).Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
@@ -666,17 +698,10 @@ public sealed class Compilation
                 if (!libraries.Contains(library, StringComparer.Ordinal))
                     libraries.Add(library);
 
-        // A resource script is compiled here rather than with the other native
-        // inputs, because what the linker takes is the .res this produces.
+        // The .res files were compiled before emission. Only a PE linker takes
+        // one; elsewhere the bytes are already in the IR as constant data.
         var nativeInputs = new List<string>(options.NativeInputs);
-        if (options.ResourceScripts.Count > 0)
-        {
-            var compiled = CompileResources(
-                toolchain, options, target, intermediate, out string resourceError);
-            if (resourceError.Length > 0) return Failure(resourceError);
-
-            nativeInputs.AddRange(compiled);
-        }
+        if (target.IsWindows) nativeInputs.AddRange(compiledResources);
 
         var link = toolchain.Link(
             irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
@@ -743,19 +768,18 @@ public sealed class Compilation
     /// Compiles each resource script to a .res, and returns what the link line
     /// should name.
     ///
-    /// A resource section is a PE idea. ELF has no equivalent -- the nearest
-    /// thing, GLib's GResource, is a name-to-bytes lookup rather than something
-    /// the loader itself reads -- and Mach-O keeps its resources in the bundle
-    /// beside the binary rather than inside it. So on any other target there is
-    /// nothing to compile, and SL0700 has already said so.
+    /// The script is compiled for every target, because every target can carry
+    /// what is in it. What differs is where it goes: a PE has a resource
+    /// directory and the linker fills it from this, and everything else carries
+    /// the same bytes as ordinary constant data for `Standard.Resources` to
+    /// walk. What no other target has is an operating system that reads them --
+    /// see SL0700.
     /// </summary>
     private static IReadOnlyList<string> CompileResources(
         Toolchain toolchain, CompilationOptions options, Binding.TargetPlatform target,
         string intermediate, out string error)
     {
         error = "";
-
-        if (!target.IsWindows) return [];
 
         if (toolchain.ResourceCompilerPath is null)
         {
@@ -799,6 +823,107 @@ public sealed class Compilation
         }
 
         return compiled;
+    }
+
+    /// <summary>
+    /// The compiled resources as one blob, for a target that carries them as
+    /// data rather than in a section of its own.
+    ///
+    /// Several scripts concatenate, because a .res is a flat list of records
+    /// rather than a container: joining two of them end to end is a longer list
+    /// and nothing else. Each begins with a null marker entry, so a joined blob
+    /// has one in the middle, and the reader skips a marker wherever it appears
+    /// for exactly that reason.
+    ///
+    /// Empty rather than null when there is nothing to carry, so the symbol is
+    /// emitted either way and a program that asks gets an empty answer instead
+    /// of failing to link.
+    /// </summary>
+    private static byte[] ReadResourceBlob(IReadOnlyList<string> compiled)
+    {
+        if (compiled.Count == 0) return [];
+
+        var joined = new List<byte>();
+        foreach (string path in compiled)
+        {
+            try
+            {
+                joined.AddRange(File.ReadAllBytes(path));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // The file was written moments ago by the resource compiler; if
+                // it cannot be read now, the build has a bigger problem and the
+                // link will say so in its own terms.
+                return [.. joined];
+            }
+        }
+
+        return [.. joined];
+    }
+
+    /// <summary>
+    /// The resource types whose whole point is that the *system* reads them.
+    ///
+    /// Everything else in a script is bytes with a number on it, and bytes
+    /// travel: `Standard.Resources` reads an RCDATA, a bitmap or a string table
+    /// identically on every target. These are different. A manifest is read by
+    /// the Windows loader before any code runs, an icon becomes the window's
+    /// icon, and a dialog template becomes a window full of controls -- all of
+    /// them by machinery that exists nowhere else. Carried elsewhere they are
+    /// readable and inert, which is worth being told once rather than
+    /// discovering when the icon does not appear.
+    /// </summary>
+    private static readonly (int Type, string Name)[] SystemReadTypes =
+    [
+        (1, "RT_CURSOR"), (3, "RT_ICON"), (4, "RT_MENU"), (5, "RT_DIALOG"),
+        (9, "RT_ACCELERATOR"), (11, "RT_MESSAGETABLE"), (12, "RT_GROUP_CURSOR"),
+        (14, "RT_GROUP_ICON"), (16, "RT_VERSION"), (24, "RT_MANIFEST"),
+    ];
+
+    /// <summary>
+    /// Reports the types in a blob that only Windows knows how to act on.
+    ///
+    /// The blob is walked rather than the script, because the script is a
+    /// language with includes and conditionals and the blob is a flat list of
+    /// records with the types already resolved. Reading it here is the same
+    /// walk <c>Standard.Resources</c> does at run time, and it is what lets the
+    /// warning name what is actually in the program instead of firing on every
+    /// build that has a .rc at all.
+    /// </summary>
+    private static void WarnAboutUnreadTypes(
+        byte[] blob, Binding.TargetPlatform target, DiagnosticBag diagnostics)
+    {
+        var present = new SortedSet<string>(StringComparer.Ordinal);
+
+        int at = 0;
+        while (at + 8 <= blob.Length)
+        {
+            int dataSize = BitConverter.ToInt32(blob, at);
+            int headerSize = BitConverter.ToInt32(blob, at + 4);
+            if (headerSize < 32 || at + headerSize > blob.Length) break;
+
+            // The type is the first field after the two sizes: 0xFFFF then a
+            // 16-bit number, or a NUL-terminated UTF-16 string. Only a numbered
+            // one can be a standard type, so a named one is skipped outright.
+            if (BitConverter.ToUInt16(blob, at + 8) == 0xFFFF)
+            {
+                int type = BitConverter.ToUInt16(blob, at + 10);
+                foreach (var (number, name) in SystemReadTypes)
+                    if (number == type) present.Add(name);
+            }
+
+            int next = (at + headerSize + dataSize + 3) & ~3;
+            if (next <= at) break;
+            at = next;
+        }
+
+        if (present.Count == 0) return;
+
+        diagnostics.Warning("SL0700", default,
+            $"this program's resources include {string.Join(", ", present)}, which only Windows " +
+            $"acts on: {target.Triple} carries them and 'Standard.Resources' can read them, but " +
+            "nothing here turns one into a window icon, a menu or a manifest");
     }
 
     private static void TryDelete(string path)

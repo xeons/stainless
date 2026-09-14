@@ -48,6 +48,11 @@ public sealed partial class LlvmEmitter
 
         foreach (var symbol in program.Statics)
         {
+            // Declared `extern "C"` and defined by this emitter: the definition
+            // is already written and a declaration beside it is a redefinition.
+            if (symbol.LinkName is not null && _definedGlobals.Contains(symbol.LinkName))
+                continue;
+
             string llvmType = LlvmTypeOf(symbol.Type);
 
             // An imported one is a promise rather than storage: no initializer,

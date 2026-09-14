@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: 0BSD
 //
-// A resource script is a PE idea. Building this for Linux drops `skipped.rc`
-// and warns (SL0700) rather than failing, so that one source tree with an icon
-// and a manifest in it still builds everywhere without the build itself being
-// put behind an `#if`.
+// A resource script compiled for a target with no resource directory.
+//
+// It is not dropped: the compiler puts the compiled `.res` in the binary's
+// `.rsrc` section as ordinary data, and `Standard.Resources` walks it. What
+// does not travel is the part where the *system* reads a resource on the
+// program's behalf, so SL0700 names the types that needed one.
 module NoResourceSection;
 
 int Main() { return 0; }

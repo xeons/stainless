@@ -1,0 +1,17 @@
+// One script, read the same way on every target.
+//
+// Deliberately all text: a bitmap would be a binary file in the repository, and
+// nothing here needs one. Everything below is a kind that *travels* -- bytes
+// with a number or a name on them -- so the answers must be identical whether
+// they came out of a PE resource directory or out of an ELF .rsrc section.
+
+STRINGTABLE
+BEGIN
+    201 "the first string"
+    202 "the second string"
+    218 "past the first block"
+END
+
+301 RCDATA { "payload\0" }
+
+GREETING TEXTBLOB { "hello\0" }

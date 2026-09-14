@@ -39,6 +39,7 @@ import Standard.Collections;
 import Standard.Text;
 import Forms.Drawing;
 import Forms.Platform;
+import Standard.Resources;
 #if UNIX
 import Gtk.GLib;
 import Gtk.GObject;
@@ -286,22 +287,57 @@ public class GtkWidgetSet : IWidgetSet {
         return Ok(new GtkBitmapBackend((gpointer)loaded));
     }
 
-    /// There is nothing to read one out of.
+    /// A picture out of the binary's own resources, by the id the script gave.
     ///
-    /// **An ELF binary has no resource section.** This is not a gap in the
-    /// backend that a day's work would close: what Windows has is a directory
-    /// indexed by type and id that the loader itself reads, and nothing on
-    /// Linux is that. The nearest equivalent is GLib's GResource, which is a
-    /// name-to-bytes lookup a library consults -- a different shape, reached by
-    /// a `resource:///` path rather than by a number, and requiring
-    /// `glib-compile-resources` in the build.
+    /// **The resource is not a file.** `rc` strips the 14-byte
+    /// `BITMAPFILEHEADER` because Windows never wants it, and every decoder
+    /// that is not Windows does -- so `Resources.BitmapFile` puts it back and
+    /// what arrives here is a whole `.bmp`. Then it is fed to a
+    /// `GdkPixbufLoader` rather than `gdk_pixbuf_new_from_file`, because there
+    /// is no file: the bytes came out of this binary's `.rsrc` section.
     ///
-    /// So this fails, and says which platform the caller is on rather than
-    /// pretending the id was simply missing. A program that wants its pictures
-    /// on both systems reads them from files.
+    /// This used to fail on principle, on the argument that an ELF binary has
+    /// no resource section. The argument was right about the *format* and wrong
+    /// about the conclusion: the compiler carries the compiled script as
+    /// ordinary data, so there is something to read after all.
     public Result<IBitmapBackend, String> LoadBitmapResource(int id) {
-        return Fail($"no bitmap resource {id}: this is a GTK build, and an ELF " +
-                    "binary has no resource section to read one from");
+        Start();
+
+        var whole = Resources.BitmapFile(id);
+        if (whole.Length == 0) {
+            return Fail($"this program has no bitmap resource with id {id}");
+        }
+
+        var loader = gdk_pixbuf_loader_new();
+        if (loader == null) { return Fail("could not start an image loader"); }
+
+        GError* failed = null;
+        gdk_pixbuf_loader_write(loader, &whole[0u], (gsize)whole.Length, &failed);
+
+        // The image is not complete until the loader is closed, and closing is
+        // also what reports one that was truncated or not understood.
+        gdk_pixbuf_loader_close(loader, &failed);
+
+        var decoded = gdk_pixbuf_loader_get_pixbuf(loader);
+        if (decoded == null) {
+            var why = $"bitmap resource {id} could not be decoded";
+            if (failed != null) {
+                if (failed->Message != null) {
+                    why = why + ": " + Text.FromNullTerminated(failed->Message);
+                }
+                g_clear_error(&failed);
+            }
+            g_object_unref((gpointer)loader);
+            return Fail(why);
+        }
+
+        // The pixbuf belongs to the loader, so it is referenced before the
+        // loader is dropped and the backend owns it from here.
+        g_object_ref((gpointer)decoded);
+        g_object_unref((gpointer)loader);
+        if (failed != null) { g_clear_error(&failed); }
+
+        return Ok(new GtkBitmapBackend((gpointer)decoded));
     }
 
     public IImageListBackend CreateImageList(Size imageSize) {

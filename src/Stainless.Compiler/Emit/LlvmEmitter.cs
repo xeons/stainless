@@ -59,7 +59,7 @@ public readonly record struct Val(string Ref, string LlvmType, TypeSymbol Type)
 public sealed partial class LlvmEmitter(
     bool forSharedLibrary = false, bool forStainlessConsumers = false,
     DebugInfo? debug = null, bool sharedRuntime = false,
-    CppAbi abi = CppAbi.Microsoft)
+    CppAbi abi = CppAbi.Microsoft, byte[]? resourceBlob = null)
 {
     /// <summary>
     /// How a struct crosses a call, which is a property of the target and not
@@ -138,6 +138,12 @@ public sealed partial class LlvmEmitter(
     private string? _sretSlot;
     private string _currentBlock = "entry";
     private bool _hasStatics;
+
+    /// <summary>
+    /// Globals this emitter defines itself, which a matching `extern "C"`
+    /// declaration must therefore not declare a second time.
+    /// </summary>
+    private readonly HashSet<string> _definedGlobals = new(StringComparer.Ordinal);
     private ArgInfo _returnInfo = new(PassStyle.Direct, "void", PrimitiveTypeSymbol.Void);
 
     /// <summary>
@@ -194,6 +200,7 @@ public sealed partial class LlvmEmitter(
         VirtualTables(program);
 
         _hasStatics = program.Statics.Count > 0 || program.StaticConstructors.Count > 0;
+        ResourceBlob();
         StaticStorage(program);
 
         foreach (var function in program.Functions)
