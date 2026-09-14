@@ -1244,7 +1244,7 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
         // GTK does not focus a clicked widget either; only an entry and a
         // button do, from their own handlers.
         ConnectEvent(box, "button-press-event", (sender, carried) => {
-            Take();
+            TakeFocus();
             return false;
         });
 
@@ -1288,7 +1288,10 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer {
 
     bool Focused() { return gtk_widget_has_focus(box) != 0; }
 
-    void Take() {
+    /// Not `Take`. An unqualified `Take(...)` finds the standard library's
+    /// generic sequence operation of that name, and the error is about
+    /// inferring a type argument rather than about the focus.
+    void TakeFocus() {
         if (!focusable) { return; }
         gtk_widget_grab_focus(box);
     }
