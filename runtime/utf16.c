@@ -1,5 +1,5 @@
 /*
- * Stainless - an experimental systems language.
+ * Stainless - an experimental general-purpose language.
  * Copyright (C) 2026 Brandon Scott
  *
  * This file is part of the Stainless runtime library. It is free

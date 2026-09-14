@@ -1,4 +1,4 @@
-// Stainless - an experimental systems language.
+// Stainless - an experimental general-purpose language.
 // Copyright (C) 2026 Brandon Scott
 //
 // This program is free software: you can redistribute it and/or modify
