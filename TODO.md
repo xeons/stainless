@@ -335,6 +335,62 @@ it from inside a job is the harder half; see
 
 ---
 
+## Carried over from HANDOFF.md
+
+That file was the running log of what each session found. Everything in it that
+was still true and still wanted is below or above; the rest was the history of
+finished work, and is in `git log` where history belongs.
+
+### Method metadata, and invoke-by-name
+
+Reflection describes types and fields and stops there. Methods are the last
+piece before a form file can wire a handler -- `event` supplies the other half,
+and what is missing is finding the method by name -- and the same work would let
+a deserializer fill a `List<T>`, which is the one shape `Standard.Json` cannot
+represent.
+
+### A registry, or a decision not to have one
+
+Package resolution unifies sources rather than searching versions, because a
+path and a git tag each pin exactly one version and nothing can offer an
+alternative. That is honest, and it is also why two packages needing
+incompatible versions of a third is a hard error with no way out. The search
+belongs in `PackageResolver.Visit` when there is something to search. Deciding
+there will never be a registry is an equally good outcome; what is not good is
+leaving the question open in a comment.
+
+### Pin the test counts against the suites
+
+`README.md` and `docs/internals.md` both state how many cases and unit tests
+there are, and both drift on every commit that adds one. They were four audits
+stale when that was last noticed, and adding two cases for `SL0218` and
+`SL0222` made them stale again on the spot. A unit test asserting the numbers
+against the two suites is an hour and ends it.
+
+### The +0/+1 dataflow pass
+
+Still the acknowledged performance item: retain/release pairs that cancel are
+emitted and then executed. Nothing is wrong, and everything pays for it.
+
+### `List<T>` has no `Remove(T)`
+
+`IndexOf` wants `IEquatable<T>`, which a closure is not. Less pressing than it
+was -- `RemoveWhere` takes a predicate for exactly this reason, and a list of
+callbacks is usually an `event` now -- but it is still the obvious method that
+is not there.
+
+### `Standard.Collections` does not use the operators it could
+
+`Money` in `samples/shop` still calls `Money.Add`. `Standard.Time` has had this
+pass and reads better for it.
+
+### Format specifiers in interpolation
+
+`{n:x}` and `{n,8}` are not written. `:` and `,` inside a hole are already
+reserved so that adding them is not a change of meaning, and
+[§3](docs/spec/03-text.md) says so; `PadLeft` and `Convert.FromLong` are what
+there is until then.
+
 ## Deliberately not doing
 
 Kept here so the reasoning does not have to be rediscovered.

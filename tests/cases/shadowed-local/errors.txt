@@ -1,0 +1,2 @@
+# A block is a scope, and shadowing an enclosing name is refused.
+SL0218
