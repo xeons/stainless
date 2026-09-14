@@ -17,6 +17,50 @@ goto done;
 return y;
 ```
 
+Every one of those means what it means in C#, and the sections below are where
+that is not the whole story. Four rules about the shape of the list itself are
+worth stating, because each is a question a reader asks exactly once:
+
+**A body is a statement, not a block.** `if`, `else`, `while`, `for` and
+`foreach` are each followed by one statement, and a block is one statement
+among others -- so braces are how several are written, not something the
+grammar asks for.
+
+```csharp
+if (n == 0) n = 1; else n = 2;
+while (n < 3) n += 1;
+for (int i = 0; i < 2; i++) n += 10;
+```
+
+**So `else if` is not a construct.** It is `else` followed by an `if`, which is
+why nothing here has a rule for it and why a chain may be as long as it likes.
+The same reading answers the dangling `else`: one belongs to the nearest `if`
+that has not got one already.
+
+```csharp
+if (n > 100) { n = 0; } else if (n > 20) { n += 5; } else { n = -1; }
+```
+
+**Each of `for`'s three parts may be left out**, and `for (;;)` is the loop
+only `break` leaves. The initializer is a statement, so it may declare a
+variable, and that variable's scope is the loop; the condition and the step are
+expressions.
+
+**A block is a scope, and a name may not be reused inside one.** Shadowing is
+refused rather than allowed, whether the name being hidden belongs to an
+enclosing block, to the function, or to a parameter:
+
+```csharp
+int n = 1;
+{
+    int n = 2;      // error[SL0218]: 'n' is already declared in this scope
+}
+```
+
+That is C#'s rule rather than C's, and for C#'s reason: where two readings of a
+name are possible, the likelier cause is a mistake rather than an intention,
+and saying so costs one rename.
+
 Three operators answer what C's answer, which is how a binding checks itself
 against a header:
 
@@ -33,10 +77,21 @@ allocation rather than from the first field, because a class reference points
 at the object header ([§2 of abi.md](../abi.md#2-object-header-class-instances)) — so the number is what to add to
 the reference you are holding.
 
-Operators, by descending precedence: postfix `x++ x--` · prefix
-`++x --x - ! ~ * &` and `try` · `* / %` · `+ -` · `<< >>` ·
-`< <= > >=` and `is` · `== !=` · `&` · `^` · `|` · `&&` · `||` ·
-`?:` · assignment.
+Operators, by descending precedence: primary `a.b` `f(x)` `a[i]` `a[1:4]`
+`x++ x--` · prefix `++x --x - ! ~ * &` and `(T)x` and `try` · `* / %` ·
+`+ -` · `<< >>` · `< <= > >=` and `is` · `== !=` · `&` · `^` · `|` ·
+`&&` · `||` · `?:` · assignment `= += -= *= /= %= &= |= ^= <<= >>=`.
+
+That row is member access, a call, an index, a slice and the postfix steps, and
+it binds tightest: `a.b.c` is `(a.b).c`, and `f(x)[i]` indexes what `f`
+answered. It is also where the terms sit that look like operators and are not:
+`new`, `typeof`, `sizeof`, `alignof`, `offsetof`, `nameof`, `iidof`,
+`default(T)` and `checked(x)` each take a type or a parenthesised expression
+rather than binding over a neighbour, so nothing can group around them wrongly.
+A cast takes a unary operand, which is why `(T)a * b` is `((T)a) * b`.
+
+`?.`, `??` and `??=` are left out of that list deliberately and are in
+§9.7 below, where what they bind against is the whole of the question.
 
 ## 9.1 `switch`
 
@@ -563,6 +618,51 @@ on absurdity rather than a budget: the deepest nesting in this repository, the
 standard library and its tests included, is under twenty, and the usual way to
 meet the limit is generated source. Only the one message is reported, because
 everything the unwind would say after it is a consequence of it.
+
+## 9.13 An expression on its own
+
+A statement may be an expression and nothing else -- an *expression statement*
+-- and most expressions are a mistake in that position. `total + 1;` computes a number and drops it: it is
+valid C, it compiles, and it does nothing at all. So an expression standing
+alone has to be one that could have had an effect, and the rest are warned
+about:
+
+```
+warning[SL0222]: this expression has no effect; its result is discarded
+```
+
+**What counts as an effect is a list, not a judgement**: an assignment -- plain
+or compound, to a variable or to a property -- a call, a `++` or `--`, and
+`new`. Two more are decided by what is inside them: a conditional is effective
+when either arm is, and `a?.M()` for the same reason the call inside it is.
+
+```csharp
+Advance();                  // a call, and the result may be dropped
+count++;
+count = Next();
+thing?.Method();            // effective: the call is
+ready ? Start() : Stop();   // effective: both arms are calls
+
+count + 1;                  // SL0222 -- computed and thrown away
+count;                      // SL0222
+```
+
+**A call is effective whatever it answers.** The warning is not about ignoring
+a return value -- a function whose result is a status is meant to be usable for
+its work alone -- it is about an expression that had no other reason to be
+written.
+
+**The bug it actually catches** is a name that was meant to be a call on
+something else, and a variant's case constructors are where that happens:
+
+```csharp
+Fail("could not read the file");    // SL0222
+```
+
+`Fail` is `Result`'s case constructor ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)), so that
+line builds a `Result` and throws it away. If the author meant a method of
+their own named `Fail`, it was never reached -- and nothing else would have
+said so, because the line is perfectly well typed.
 
 ---
 
