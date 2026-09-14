@@ -140,6 +140,16 @@ public sealed partial class LlvmEmitter(
     private bool _hasStatics;
 
     /// <summary>
+    /// Whether this module keeps a count of the com class objects it has made.
+    ///
+    /// True only where something can be activated, which is what makes the
+    /// module a COM server and gives <c>DllCanUnloadNow</c> a question to
+    /// answer. A program that presents com interfaces but hosts nothing pays
+    /// nothing: the two atomics below are not emitted at all.
+    /// </summary>
+    private bool _countsComObjects;
+
+    /// <summary>
     /// Globals this emitter defines itself, which a matching `extern "C"`
     /// declaration must therefore not declare a second time.
     /// </summary>
@@ -200,6 +210,12 @@ public sealed partial class LlvmEmitter(
         VirtualTables(program);
 
         _hasStatics = program.Statics.Count > 0 || program.StaticConstructors.Count > 0;
+
+        // Before the functions, because EmitNew and the destroy thunks are what
+        // maintain the count and both are emitted below.
+        _countsComObjects = program.Classes.Any(
+            c => c is { IsCom: true, Clsid: not null } && c.ComInterfaces.Count > 0);
+
         ResourceBlob();
         StaticStorage(program);
 

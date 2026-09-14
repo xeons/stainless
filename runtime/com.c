@@ -232,7 +232,19 @@ typedef struct SlClassFactory {
     const void        *vtable;
     int32_t            refs;
     const SlComFactory *entry;
+
+    /* Where to report that this factory is still held. A host that holds a
+       factory and no object is still holding a vtable pointer into the
+       module, so it counts. */
+    int32_t            *live;
 } SlClassFactory;
+
+/* The count moves under the same atomics the compiler emits for objects. */
+static void factory_live_add(int32_t *live, int32_t by)
+{
+    if (live == NULL) return;
+    __atomic_fetch_add(live, by, __ATOMIC_ACQ_REL);
+}
 
 static int32_t SL_COM_METHOD factory_query(void *self, const SlGuid *iid, void **result)
 {
@@ -260,9 +272,13 @@ static uint32_t SL_COM_METHOD factory_add_ref(void *self)
 static uint32_t SL_COM_METHOD factory_release(void *self)
 {
     SlClassFactory *factory = (SlClassFactory *)self;
+    int32_t *live = factory->live;
     int32_t remaining = --factory->refs;
 
-    if (remaining == 0) free(factory);
+    if (remaining == 0) {
+        free(factory);
+        factory_live_add(live, -1);
+    }
     return (uint32_t)remaining;
 }
 
@@ -341,6 +357,8 @@ int32_t sl_com_get_class_object(
         factory->vtable = sl_class_factory_vtable;
         factory->refs = 1;
         factory->entry = &table->entries[i];
+        factory->live = table->live;
+        factory_live_add(table->live, 1);
 
         /* Through QueryInterface rather than straight out, so asking for
            something this factory is not gets E_NOINTERFACE and no leak. */
@@ -354,7 +372,11 @@ int32_t sl_com_get_class_object(
     return SL_COM_CLASS_E_CLASSNOTAVAILABLE;
 }
 
-int32_t sl_com_can_unload_now(void)
+int32_t sl_com_can_unload_now(const SlComFactoryTable *table)
 {
-    return SL_COM_S_FALSE;
+    if (table == NULL || table->live == NULL) return SL_COM_S_FALSE;
+
+    return __atomic_load_n(table->live, __ATOMIC_ACQUIRE) == 0
+        ? SL_COM_S_OK
+        : SL_COM_S_FALSE;
 }

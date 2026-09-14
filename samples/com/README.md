@@ -20,10 +20,11 @@ build.cmd            (Windows)
 [host]      IUnknown identity holds: yes
 [stainless] Reset
 [host]      Total() after Reset -> 0
+[host]      DllCanUnloadNow, holding one  -> S_FALSE
 [host]      releasing the Greeter
 [stainless] Greeter destroyed
 [host]      released
-[host]      DllCanUnloadNow -> S_FALSE (declines)
+[host]      DllCanUnloadNow, holding none -> S_OK
 ```
 
 Three files, and none of them is generated:
@@ -48,6 +49,12 @@ one, because the object carries a tear-off per interface and a COM pointer must
 point at a vtable pointer. Asking either of them for `IUnknown` returns the
 *same* address, which is how COM says "these are one object" — and the sample
 checks it.
+
+**The module knows whether it is still in use.** `DllCanUnloadNow` says
+S_FALSE while the host holds the object and S_OK once it has let go. Each
+object's own count is what decides when it dies; nothing adds those up or lists
+the objects, so the module keeps one total beside them — moved where an object
+is allocated and where its destructor runs.
 
 **Nothing marshals.** `IGreeter` in `greeter.h` is a C++ class with two virtual
 methods after `IUnknown`'s three; `com interface IGreeter` in `greeter.sl` is
@@ -110,11 +117,13 @@ IID_IGreeter, ...)` reaches the same object. `HKEY_CURRENT_USER` rather than
 - **In-process and free-threaded only.** No apartments, no marshalling, no
   proxies or stubs, no `IDispatch`, no aggregation — `CreateInstance` refuses a
   non-null outer with `CLASS_E_NOAGGREGATION` rather than half-supporting it.
-- **`DllCanUnloadNow` always declines.** Answering it honestly needs a count of
-  live objects, and ARC owns those lifetimes with no hook that says "and that
-  was the last one". A server that is never unloaded before the process exits
-  is correct; one that unloads while a caller still holds a vtable pointer is a
-  jump into freed pages.
+- **`DllCanUnloadNow` counts objects, not references.** The module keeps a
+  running total of the com class objects it has made against the ones it has
+  destroyed, plus the class factories still held, and answers S_OK only at
+  zero. It is deliberately conservative: an object made inside the library and
+  never handed out counts too, so the answer can refuse an unload that would
+  have been fine, and never allow one that would not. The count exists only in
+  a module that has something to activate.
 - **On 32-bit x86 the export is `__cdecl` here**, which is what this host
   expects and what makes the sample run as written on both. A server that
   Windows' *own* loader will call wants `__stdcall` with the name left

@@ -128,9 +128,12 @@ last person to edit it -- the suite is the authority.
   `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`
   build exporting `DllGetClassObject` is an in-process COM server that C++
   activates and uses. Activation passes no arguments, so an activatable class
-  needs a constructor taking none (SL0611). [samples/com](../samples/com) is
-  the server, a C++ host and the destructor running between the host's
-  `Release()` and its next line
+  needs a constructor taking none (SL0611). `DllCanUnloadNow` answers from a
+  module-wide count of live com class objects, so it says S_FALSE while one is
+  held and S_OK once none is — the count is kept only where something can be
+  activated, so a program that hosts nothing emits none of it.
+  [samples/com](../samples/com) is the server, a C++ host and the destructor
+  running between the host's `Release()` and its next line
 - `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
   false for null, so a test through a `C?` asks about null and about the class
   at once; a cast that does not hold names what the object really is and ends
@@ -706,10 +709,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   parts nobody has asked for: apartments beyond `CoInitializeEx`, marshalling,
   proxies and stubs, `IDispatch`, and aggregation, which `CreateInstance`
   refuses outright.
-- **`DllCanUnloadNow` always declines.** It answers S_FALSE, which is safe and
-  is what a server that never unloads should say. The honest answer needs a
-  count of live COM objects, and ARC owns those lifetimes with no hook that
-  says which release was the last one.
 - **A 32-bit COM server's exports are decorated.** `export "C" __stdcall` gets
   x86's convention and decorates the name with it, where Windows' loader looks
   up an undecorated `DllGetClassObject`. Undecorating it needs a `.def` file

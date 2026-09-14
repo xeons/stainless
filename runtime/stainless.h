@@ -442,6 +442,18 @@ typedef struct SlComFactory {
 typedef struct SlComFactoryTable {
     size_t               count;
     const SlComFactory  *entries;
+
+    /*
+     * How many com class objects this module has made and not destroyed, plus
+     * how many class factories are still held. NULL where the module keeps no
+     * count, which is every module that hosts nothing.
+     *
+     * A total rather than a walk, because there is nothing to walk: ARC gives
+     * each object its own count and keeps no list of them. The compiler moves
+     * this one as objects are allocated and destroyed; the factory code below
+     * moves it for itself.
+     */
+    int32_t             *live;
 } SlComFactoryTable;
 
 #define SL_COM_E_INVALIDARG        ((int32_t)0x80070057)
@@ -457,19 +469,14 @@ SL_API int32_t sl_com_get_class_object(
     const SlGuid *clsid, const SlGuid *iid, void **result);
 
 /*
- * What DllCanUnloadNow should answer: S_FALSE, always -- never unload me.
+ * What DllCanUnloadNow answers: S_OK when nothing this module made is still
+ * held, S_FALSE otherwise.
  *
- * The honest answer needs a count of live objects, and ARC is what owns an
- * object's lifetime here: the count that decides when one dies is the
- * compiler's, decremented at scope ends across the program, with no hook that
- * says "and that was the last COM object". Returning S_OK on a guess would let
- * the host unload a module some caller still holds a vtable pointer into, and
- * the failure is a jump into freed pages.
- *
- * So this declines. A COM server that is never unloaded until the process
- * exits is correct and common; one that unloads early is neither.
+ * S_FALSE is also the answer for a module that keeps no count, which is the
+ * safe direction: refusing an unload that would have been fine costs a module
+ * staying mapped, and allowing one that is not costs a jump into freed pages.
  */
-SL_API int32_t sl_com_can_unload_now(void);
+SL_API int32_t sl_com_can_unload_now(const SlComFactoryTable *table);
 
 /* ----------------------------------------------------------------- String */
 

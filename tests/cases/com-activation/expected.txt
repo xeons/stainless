@@ -1,4 +1,4 @@
-can unload: 1
+can unload before: yes
 unknown clsid refused              ok
 unknown clsid clears result        ok
 got a class factory                ok
@@ -22,3 +22,8 @@ releasing
 destroyed
 released
 failures: 0
+can unload after: yes
+constructed
+can unload holding one: no
+destroyed
+can unload having dropped it: yes

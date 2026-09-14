@@ -44,6 +44,7 @@ public sealed partial class LlvmEmitter
         string instance = Emit("ptr",
             $"call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
 
+        CountComObject(up: true, classType);
         InitializeTearOffs(instance, classType);
         InitializeEvents(instance, classType);
 
@@ -57,6 +58,27 @@ public sealed partial class LlvmEmitter
         // sl_alloc already returns +1; the statement scope releases it.
         TrackTemporary(instance, classType);
         return new Val(instance, "ptr", classType);
+    }
+
+    /// <summary>
+    /// Moves this module's live-com-object count, where it keeps one.
+    ///
+    /// Every com class instance is counted, not only an activated one: a class
+    /// factory is not the only way an object leaves: a `com class` made inside
+    /// the library and handed out through some other export is just as much
+    /// something the host holds. Counting all of them makes the answer
+    /// conservative, which is the safe direction -- it can only ever refuse an
+    /// unload that would have been fine.
+    /// </summary>
+    private void CountComObject(bool up, ClassTypeSymbol classType)
+    {
+        if (!_countsComObjects || !classType.IsCom) return;
+
+        // Through Emit and not Line: atomicrmw yields the previous value, so it
+        // takes an SSA name whether or not anything wants it, and emitting it
+        // unnamed leaves the emitter's numbering one behind LLVM's.
+        Emit("i32", $"atomicrmw {(up ? "add" : "sub")} ptr @sl_com_live, i32 1 " +
+                    (up ? "monotonic" : "acq_rel"));
     }
 
     /// <summary>

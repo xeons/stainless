@@ -271,9 +271,20 @@ public sealed partial class LlvmEmitter
             $"[{entries.Count} x {{ ptr, ptr }}] " +
             (entries.Count == 0 ? "zeroinitializer" : $"[{string.Join(", ", entries)}]"));
 
+        // What DllCanUnloadNow reads: every com class object this module has
+        // made and not yet destroyed, plus every class factory still held.
+        //
+        // A module-wide total rather than a walk over objects, because there is
+        // nothing to walk -- ARC gives each object its own count and keeps no
+        // list of them. This is the one number those counts do not add up to on
+        // their own, so it is kept as they move.
+        if (_countsComObjects)
+            _module.AppendLine("@sl_com_live = internal global i32 0");
+
         _module.AppendLine(
-            $"@sl_com_factory_table = internal constant {{ {Word}, ptr }} " +
-            $"{{ {Word} {entries.Count}, ptr @sl_com_factory_entries }}");
+            $"@sl_com_factory_table = internal constant {{ {Word}, ptr, ptr }} " +
+            $"{{ {Word} {entries.Count}, ptr @sl_com_factory_entries, " +
+            (_countsComObjects ? "ptr @sl_com_live" : "ptr null") + " }");
 
         // What `Com.GetClassObject` binds to: the runtime function with this
         // module's table already supplied. A shim rather than a special case in
@@ -290,6 +301,15 @@ public sealed partial class LlvmEmitter
         _module.AppendLine(
             "  %answer = call i32 @sl_com_get_class_object(" +
             "ptr @sl_com_factory_table, ptr %clsid, ptr %iid, ptr %result)");
+        _module.AppendLine("  ret i32 %answer");
+        _module.AppendLine("}");
+
+        // And the same for `Com.CanUnloadNow`, which reads the live count the
+        // table points at.
+        _module.AppendLine("define i32 @sl_com_can_unload_here() {");
+        _module.AppendLine("entry:");
+        _module.AppendLine(
+            "  %answer = call i32 @sl_com_can_unload_now(ptr @sl_com_factory_table)");
         _module.AppendLine("  ret i32 %answer");
         _module.AppendLine("}");
     }
@@ -314,6 +334,13 @@ public sealed partial class LlvmEmitter
         _module.AppendLine("entry:");
         _module.AppendLine(
             $"  %object = call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
+
+        // The same count EmitNew keeps; this path does not go through it. Named
+        // because atomicrmw yields a value, and every other value in this
+        // function is named too.
+        if (_countsComObjects)
+            _module.AppendLine(
+                "  %live = atomicrmw add ptr @sl_com_live, i32 1 monotonic");
 
         foreach (var presented in classType.ComInterfaces)
         {

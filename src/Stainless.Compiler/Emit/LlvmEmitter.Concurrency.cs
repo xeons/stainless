@@ -642,6 +642,11 @@ public sealed partial class LlvmEmitter
         _body.Clear();
         _blockTerminated = false;
 
+        // Before the user's destructor, which is the last code that can run for
+        // this object: by the time anything could ask, it is gone either way,
+        // and doing it first means no path out of here skips it.
+        CountComObject(up: false, classType);
+
         if (classType.Destructor is not null)
             Line($"call void {Symbol(classType.Destructor)}(ptr %obj)");
 

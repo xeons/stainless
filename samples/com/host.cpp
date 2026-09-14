@@ -130,6 +130,15 @@ int main(int argc, char **argv)
     if (FAILED(hr)) return Failed("Total", hr);
     std::printf("[host]      Total() after Reset -> %d\n", total);
 
+    // --- what the module says about itself -------------------------------
+    //
+    // Asked while an object is still held, so the answer has to be no. The
+    // module counts every com class object it makes against every one it
+    // destroys; this is that count being non-zero.
+    if (canUnloadNow != nullptr)
+        std::printf("[host]      DllCanUnloadNow, holding one  -> %s\n",
+                    canUnloadNow() == S_OK ? "S_OK (wrong!)" : "S_FALSE");
+
     // --- letting go ------------------------------------------------------
     //
     // The last Release runs the Stainless destructor, from C++, through a
@@ -139,9 +148,10 @@ int main(int argc, char **argv)
     greeter->Release();
     std::printf("[host]      released\n");
 
+    // And now nothing is held, so the module is willing to go.
     if (canUnloadNow != nullptr)
-        std::printf("[host]      DllCanUnloadNow -> %s\n",
-                    canUnloadNow() == S_OK ? "S_OK" : "S_FALSE (declines)");
+        std::printf("[host]      DllCanUnloadNow, holding none -> %s\n",
+                    canUnloadNow() == S_OK ? "S_OK" : "S_FALSE (still held?)");
 
 #ifdef _WIN32
     CoUninitialize();

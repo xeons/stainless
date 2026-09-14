@@ -78,9 +78,29 @@ export "C" int DllCanUnloadNow() { return Com.CanUnloadNow(); }
 /// The C++ half, which does the asking.
 extern "C++" int DriveActivation();
 
+/// S_OK is 0 and S_FALSE is 1, so this reads as "yes" or "no" rather than as a
+/// number nobody remembers the sign of.
+String Unloadable() {
+    return DllCanUnloadNow() == Com.Ok ? "yes" : "no";
+}
+
 public void Main() {
-    Console.WriteLine("can unload: " + Text.FromInteger((long)DllCanUnloadNow()));
+    // Nothing made yet, so nothing is held.
+    Console.WriteLine("can unload before: " + Unloadable());
 
     int failures = DriveActivation();
     Console.WriteLine("failures: " + Text.FromInteger((long)failures));
+
+    // Everything the C++ half made has been released, so the count is back to
+    // where it started. This is the whole of what DllCanUnloadNow reports.
+    Console.WriteLine("can unload after: " + Unloadable());
+
+    // And while one is held it says no, which is the answer that matters --
+    // the other direction would let a host unload a module still in use.
+    {
+        Greeter held = new Greeter();
+        IGreeter it = held;
+        Console.WriteLine("can unload holding one: " + Unloadable());
+    }
+    Console.WriteLine("can unload having dropped it: " + Unloadable());
 }

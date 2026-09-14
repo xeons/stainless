@@ -189,20 +189,6 @@ Only the module's own exports are affected. Every COM *slot* is already
 
 *Touches:* `src/Stainless.Compiler/Driver/Compilation.cs`.
 
-### `DllCanUnloadNow` cannot answer honestly
-
-It returns S_FALSE always, which is safe and is what a server that is never
-unloaded should say. The honest answer needs a count of live COM objects, and
-ARC owns those lifetimes: the count that decides when one dies is the
-compiler's, decremented at scope ends across the whole program, with no hook
-saying "and that was the last object COM can see".
-
-A hook on a com class's allocation and destruction would do it — the create
-function already exists, and the destructor is emitted — but it costs two
-atomics per object for a question most servers never ask.
-
-*Touches:* `runtime/com.c`, `src/Stainless.Compiler/Emit/LlvmEmitter.Dispatch.cs`.
-
 ### More Windows COM interfaces
 
 A binding rather than a project, now that the language part is done and the

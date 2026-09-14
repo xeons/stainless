@@ -428,13 +428,14 @@ public sealed partial class LlvmEmitter
         // by name from an exported function, never through a slot.
         Declare("sl_com_get_class_object",
             "declare i32 @sl_com_get_class_object(ptr, ptr, ptr, ptr)");
-        Declare("sl_com_can_unload_now", "declare i32 @sl_com_can_unload_now()");
+        Declare("sl_com_can_unload_now", "declare i32 @sl_com_can_unload_now(ptr)");
 
         // ComFactoryTable *defines* this one, in this module, to supply the
         // table. Claiming the name here is what stops it also being declared:
         // LLVM's textual parser reads a declare followed by a define of the
         // same function as a redefinition and refuses the module.
         _declared.Add("sl_com_class_object_here");
+        _declared.Add("sl_com_can_unload_here");
         // Every one of these ends in sl_fail, which ends in abort. Saying so is
         // what makes a bounds check's failure arm genuinely cold: the success
         // path stops being a branch that might come back.

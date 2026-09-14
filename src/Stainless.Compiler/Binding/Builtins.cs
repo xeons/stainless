@@ -364,9 +364,10 @@ public sealed class Builtins
             "sl_com_class_object_here",
             ("clsid", guidPointer), ("iid", guidPointer), ("result", bytePointerPointer));
 
-        // S_FALSE, always: see sl_com_can_unload_now for why a server whose
-        // objects ARC owns cannot honestly answer anything else.
-        Function(Com, "CanUnloadNow", PrimitiveTypeSymbol.Int, "sl_com_can_unload_now");
+        // S_OK when nothing this module made is still held. Like GetClassObject
+        // it goes through a shim that supplies the table, which is what carries
+        // the count.
+        Function(Com, "CanUnloadNow", PrimitiveTypeSymbol.Int, "sl_com_can_unload_here");
 
         // --- Standard.Text free functions -----------------------------------
         TextFromLong = Function(Text, "FromInteger", String, "sl_string_from_integer",

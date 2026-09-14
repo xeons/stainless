@@ -518,11 +518,20 @@ taking none. A class with no constructor at all is fine — its fields are the
 zeroes the allocator wrote — but one that has constructors and no empty one is
 refused where it is declared (SL0611) rather than where it could not be made.
 
-`DllGetClassObject` is the whole of what an in-process server must export;
-`Com.CanUnloadNow` is the other half of the pair and always answers S_FALSE,
-because ARC owns object lifetimes and there is no hook that says "and that was
-the last COM object". A server that never unloads is correct; one that unloads
-while a caller holds a vtable pointer is a jump into freed pages.
+`DllGetClassObject` is the whole of what an in-process server must export, and
+`Com.CanUnloadNow` is the other half of the pair. It answers from a count the
+module keeps of every com class object it has made against every one it has
+destroyed, plus the class factories still held: S_FALSE while anything is
+outstanding, S_OK at zero. Each object's own reference count is what decides
+when it dies, and nothing sums those or lists the objects — so this one total
+is kept alongside them, moved where an object is allocated and where its
+destructor runs. It is emitted only in a module that has something to activate,
+so a program presenting com interfaces and hosting nothing pays nothing.
+
+The count is over objects rather than over what escaped, which makes it
+conservative: one made inside the library and never handed out counts as well.
+That errs toward refusing an unload that would have been fine, and never toward
+allowing one that would not.
 
 [samples/com](../../samples/com) is the whole of it: a server built `--shared`,
 a C++ host that loads it and activates the class, and the destructor running
