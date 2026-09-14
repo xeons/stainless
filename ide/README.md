@@ -10,9 +10,22 @@ dotnet build Stainless.slnx      # the compiler, which the IDE drives
 .\ide\build.ps1 -Run -Open samples\shapes.sl
 ```
 
+On Linux there is no script yet; the command is the one in
+[bindings/gtk/README.md](../bindings/gtk/README.md) with `ide/src` in front of
+the library sources:
+
+```
+stainless build ide/src forms/src bindings/gtk -o ide/build/stainless-ide \
+    -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 \
+    -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
+```
+
 It is a native binary with no VM, no GC and no web view — the same as anything
 else this compiler produces. The window is [forms/](../forms/README.md), the
-text is drawn by the program itself, and the whole of it is Stainless.
+text is drawn by the program itself, and the whole of it is Stainless. Both
+backends render it: the Win32 one from the start, and the GTK one since the
+six faults in [forms/README.md](../forms/README.md)'s *What running it found*
+were fixed — the IDE is what found every one of them.
 
 ---
 

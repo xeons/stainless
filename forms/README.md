@@ -414,10 +414,22 @@ that is already bound.
 
 ### The GTK backend, and what it found
 
-**Done**, and it is the entry this list existed for: a seam with one
+**The seam held**, and it is the entry this list existed for: a seam with one
 implementation has quietly stopped being a seam, and the only way to find out
 whether `IControlPeer` described a control or described an `HWND` was to write
 the other side of it.
+
+This entry said **done** for some months, and it was wrong in a way worth
+keeping on the page. Both samples passed every check of their self-tests on
+GTK -- and a control inside a container was one pixel wide, a tab page was
+empty, and nothing a program drew reached the screen at all. None of that is
+something a self-test asks. `SelfTest` reads back what it set: a caption, an
+index, a count. Whether any of it was *drawn* is a question only a person
+looking at the window, or a screenshot, can answer, and nobody had looked.
+
+What looking found is below, under *What running it found*. The lesson is the
+general one: a widgetset's tests prove the model, and only a picture proves the
+view.
 
 **Not one interface changed.** Thirty of them, `IWidgetSet`'s forty-five
 methods, and the answer came back that the seam is about controls. The
@@ -448,6 +460,44 @@ What the exercise cost, and it is worth knowing before the next backend:
   page *and* a page number, so a handler connected as if it carried one reads
   the boxed closure out of the wrong register. That is a segfault at the first
   tab added with nothing in the backtrace to suggest a cause.
+
+### What running it found
+
+Six faults, none of which any self-test could see. Each is fixed; each is here
+because the *shape* of it recurs.
+
+- **An event box painted over everything a program drew.** A handler connected
+  to `draw` runs before the class handler, and `GtkEventBox`'s class handler
+  renders its own background -- so the program drew and the event box covered
+  it, every frame. `OnPaint` was being called throughout, which is why nothing
+  measured it. The event box was there to give a windowless `GtkFixed` the
+  focus and the input; `gtk_widget_set_has_window` does that instead, and a
+  `GtkFixed` renders no background, so the class handler running afterwards
+  draws the children and nothing else. This is Lazarus's own answer -- its
+  GTK3 widgetset does exactly this behind every custom control.
+- **A client area was read from GTK's allocation.** `SetBounds` asks for a size
+  by setting a size *request* and GTK negotiates later, so the allocation is
+  the size before the one asked for, and 1x1 for a widget never allocated.
+  Every child docked into one pixel. A form was unaffected, because the window
+  peer answers from its own bounds -- which is why controls placed straight on
+  a form always looked right and containers never did.
+- **A page's content was parented before its page existed.** `TabPage` builds
+  its panel, which reaches `AddChild`, and only then calls `Register`, which
+  reaches `AddTab`. A notebook cannot answer `AddChild` when it is asked, so it
+  holds the child until it has a page for it.
+- **A page area of 1x1, for ever**, because the control layer asks for it
+  before GTK has allocated anything. A `size-allocate` handler queues a
+  relayout -- queues, because laying out from inside `size-allocate` calls
+  `gtk_fixed_move` while GTK is part-way through allocating that container, and
+  it segfaults.
+- **And that relayout ratcheted the window open to the size of the screen**
+  when the page area was read back from the allocation it had just caused.
+  `PageArea` is derived from the bounds the layout set, minus what the tabs
+  take.
+- **Removing a tab freed widgets the control layer still held.** A notebook
+  holds the only reference to a page, so `gtk_notebook_remove_page` destroys
+  the page and every control on it while the `TabPage` goes on existing. The
+  peer takes a reference of its own, so removal unparents rather than destroys.
 
 ### Before several of the above
 

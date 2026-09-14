@@ -166,6 +166,24 @@ the error lands far from the cause.
 note beside a line describes that line. Commit messages are a sentence-shaped
 subject and then paragraphs of reasoning — read `git log` before writing one.
 
+## Working on `forms/`
+
+**A self-test does not prove anything was drawn.** `SelfTest` in the Forms
+samples reads back what it set -- a caption, an index, a count -- so it passes
+whether or not a single pixel reached the screen. Both samples passed every
+check for months while a control inside a container was one pixel wide and the
+GTK backend drew nothing at all. Take a screenshot; it is the only thing that
+answers the question. The recipe is below.
+
+**Lazarus's LCL is on this machine at `C:\lazarus\lcl`**, and `forms/` is a
+port of its architecture, so it is the reference for how something ought to
+work rather than a curiosity. `lcl/interfaces/gtk3/gtk3widgets.pas` and
+`lcl/interfaces/win32/` are the two that matter. It has already answered at
+least one question better than the obvious solution did: a custom control's
+drawing surface is a `GtkFixed` with `set_has_window(True)`, not an event box
+and not a drawing area, because a `GtkFixed` renders no background and so does
+not paint over what the program drew. Read it before inventing.
+
 ## The Linux box
 
 `ssh brandon@geekom-a7` — Ubuntu, GTK 3 and its development packages, clang,

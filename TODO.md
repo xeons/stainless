@@ -104,10 +104,22 @@ symbol, which is what a named export turns on.
 
 ---
 
-### The GTK backend, which is done, and what is next for `forms/`
+### The GTK backend, and what is next for `forms/`
 
 `forms/` has two backends now -- Win32 and GTK 3 -- and both samples pass their
-whole self-test on each: 21 checks and 43. The entry that used to be here said
+whole self-test on each: 21 checks and 43.
+
+**That sentence said "which is done" for months, and it was not.** Every one of
+those checks passed while a control inside a container was one pixel wide, a
+tab page was empty, and nothing a program drew reached the screen. A self-test
+reads back what it set -- a caption, an index, a count -- and none of that
+asks whether anything was drawn. Six faults were found the first time somebody
+looked at a screenshot, and they are written up in
+[forms/README.md](forms/README.md) under *What running it found*. The general
+lesson is worth more than the six: a widgetset's tests prove the model, and
+only a picture proves the view.
+
+The entry that used to be here said
 a seam with one implementation has quietly stopped being one, and that writing
 the second was the only way to find out whether `IControlPeer` described a
 control or an `HWND`.
