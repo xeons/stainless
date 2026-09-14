@@ -22,11 +22,11 @@ is what `where T : new()` is there to guarantee.
 
 ## Contents
 
-**Types** &nbsp; [JsonCreate](#jsoncreate) &middot; [JsonError](#jsonerror) &middot; [JsonIgnore](#jsonignore) &middot; [JsonName](#jsonname) &middot; [JsonObject](#jsonobject) &middot; [JsonValue](#jsonvalue)
+**Types** &nbsp; [JsonCreate](#jsoncreate-attribute) &middot; [JsonError](#jsonerror-enum) &middot; [JsonIgnore](#jsonignore-attribute) &middot; [JsonName](#jsonname-attribute) &middot; [JsonObject](#jsonobject-class) &middot; [JsonValue](#jsonvalue-variant)
 
-**Functions** &nbsp; [BoolOr](#boolor) &middot; [Describe](#describe) &middot; [IntegerOr](#integeror) &middot; [IsNull](#isnull) &middot; [ItemsOf](#itemsof) &middot; [MembersOf](#membersof) &middot; [NewArray](#newarray) &middot; [NewObject](#newobject) &middot; [NumberOf](#numberof) &middot; [NumberOr](#numberor) &middot; [Parse](#parse) &middot; [Populate](#populate) &middot; [PopulateFrom](#populatefrom) &middot; [Serialize](#serialize) &middot; [SerializeIndented](#serializeindented) &middot; [TextOr](#textor) &middot; [ToValue](#tovalue) &middot; [Write](#write) &middot; [WriteIndented](#writeindented)
+**Functions** &nbsp; [BoolOr](#boolor-function) &middot; [Describe](#describe-function) &middot; [IntegerOr](#integeror-function) &middot; [IsNull](#isnull-function) &middot; [ItemsOf](#itemsof-function) &middot; [MembersOf](#membersof-function) &middot; [NewArray](#newarray-function) &middot; [NewObject](#newobject-function) &middot; [NumberOf](#numberof-function) &middot; [NumberOr](#numberor-function) &middot; [Parse](#parse-function) &middot; [Populate](#populate-function) &middot; [PopulateFrom](#populatefrom-function) &middot; [Serialize](#serialize-function) &middot; [SerializeIndented](#serializeindented-function) &middot; [TextOr](#textor-function) &middot; [ToValue](#tovalue-function) &middot; [Write](#write-function) &middot; [WriteIndented](#writeindented-function)
 
-**Constants** &nbsp; [MaxDepth](#maxdepth)
+**Constants** &nbsp; [MaxDepth](#maxdepth-constant)
 
 ## Types
 

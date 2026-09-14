@@ -24,9 +24,9 @@ is the strict form for a caller that needs to know rather than to cope, and
 
 ## Contents
 
-**Types** &nbsp; [AsciiEncoding](#asciiencoding) &middot; [EncodingError](#encodingerror) &middot; [IEncoding](#iencoding) &middot; [Latin1Encoding](#latin1encoding) &middot; [SingleByteEncoding](#singlebyteencoding) &middot; [Utf16Encoding](#utf16encoding) &middot; [Utf32Encoding](#utf32encoding) &middot; [Utf8Encoding](#utf8encoding) &middot; [Windows1252Encoding](#windows1252encoding)
+**Types** &nbsp; [AsciiEncoding](#asciiencoding-class) &middot; [EncodingError](#encodingerror-enum) &middot; [IEncoding](#iencoding-interface) &middot; [Latin1Encoding](#latin1encoding-class) &middot; [SingleByteEncoding](#singlebyteencoding-class) &middot; [Utf16Encoding](#utf16encoding-class) &middot; [Utf32Encoding](#utf32encoding-class) &middot; [Utf8Encoding](#utf8encoding-class) &middot; [Windows1252Encoding](#windows1252encoding-class)
 
-**Functions** &nbsp; [Ascii](#ascii) &middot; [Detect](#detect) &middot; [Latin1](#latin1) &middot; [Utf16](#utf16) &middot; [Utf16BigEndian](#utf16bigendian) &middot; [Utf32](#utf32) &middot; [Utf32BigEndian](#utf32bigendian) &middot; [Utf8](#utf8) &middot; [Windows1252](#windows1252) &middot; [WithoutPreamble](#withoutpreamble)
+**Functions** &nbsp; [Ascii](#ascii-function) &middot; [Detect](#detect-function) &middot; [Latin1](#latin1-function) &middot; [Utf16](#utf16-function) &middot; [Utf16BigEndian](#utf16bigendian-function) &middot; [Utf32](#utf32-function) &middot; [Utf32BigEndian](#utf32bigendian-function) &middot; [Utf8](#utf8-function) &middot; [Windows1252](#windows1252-function) &middot; [WithoutPreamble](#withoutpreamble-function)
 
 ## Types
 

@@ -17,9 +17,9 @@ the object's *contents*, which nothing synchronizes on its behalf.
 
 ## Contents
 
-**Types** &nbsp; [AtomicBool](#atomicbool) &middot; [AtomicInt](#atomicint) &middot; [AtomicLong](#atomiclong) &middot; [AutoResetEvent](#autoresetevent) &middot; [Barrier](#barrier) &middot; [CountdownEvent](#countdownevent) &middot; [Guard&lt;T&gt;](#guardt) &middot; [Job](#job) &middot; [ManualResetEvent](#manualresetevent) &middot; [Monitor&lt;T&gt;](#monitort) &middot; [MonitorGuard&lt;T&gt;](#monitorguardt) &middot; [Mutex&lt;T&gt;](#mutext) &middot; [ReadGuard&lt;T&gt;](#readguardt) &middot; [RwLock&lt;T&gt;](#rwlockt) &middot; [Semaphore](#semaphore) &middot; [SpinWait](#spinwait) &middot; [TaskScope](#taskscope) &middot; [Thread](#thread) &middot; [WriteGuard&lt;T&gt;](#writeguardt)
+**Types** &nbsp; [AtomicBool](#atomicbool-class) &middot; [AtomicInt](#atomicint-class) &middot; [AtomicLong](#atomiclong-class) &middot; [AutoResetEvent](#autoresetevent-class) &middot; [Barrier](#barrier-class) &middot; [CountdownEvent](#countdownevent-class) &middot; [Guard&lt;T&gt;](#guardt-class) &middot; [Job](#job-delegate) &middot; [ManualResetEvent](#manualresetevent-class) &middot; [Monitor&lt;T&gt;](#monitort-class) &middot; [MonitorGuard&lt;T&gt;](#monitorguardt-class) &middot; [Mutex&lt;T&gt;](#mutext-class) &middot; [ReadGuard&lt;T&gt;](#readguardt-class) &middot; [RwLock&lt;T&gt;](#rwlockt-class) &middot; [Semaphore](#semaphore-class) &middot; [SpinWait](#spinwait-class) &middot; [TaskScope](#taskscope-class) &middot; [Thread](#thread-class) &middot; [WriteGuard&lt;T&gt;](#writeguardt-class)
 
-**Functions** &nbsp; [CurrentId](#currentid) &middot; [ProcessorCount](#processorcount) &middot; [Sleep](#sleep) &middot; [StartPool](#startpool) &middot; [WorkerCount](#workercount) &middot; [Yield](#yield)
+**Functions** &nbsp; [CurrentId](#currentid-function) &middot; [ProcessorCount](#processorcount-function) &middot; [Sleep](#sleep-function) &middot; [StartPool](#startpool-function) &middot; [WorkerCount](#workercount-function) &middot; [Yield](#yield-function)
 
 ## Types
 

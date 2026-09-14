@@ -31,7 +31,7 @@ fail says so in its result.
 
 ## Contents
 
-**Types** &nbsp; [Channel&lt;T&gt;](#channelt) &middot; [ConcurrentDictionary&lt;K, V&gt;](#concurrentdictionaryk-v) &middot; [ConcurrentQueue&lt;T&gt;](#concurrentqueuet) &middot; [ConcurrentStack&lt;T&gt;](#concurrentstackt) &middot; [Taken&lt;T&gt;](#takent)
+**Types** &nbsp; [Channel&lt;T&gt;](#channelt-class) &middot; [ConcurrentDictionary&lt;K, V&gt;](#concurrentdictionaryk-v-class) &middot; [ConcurrentQueue&lt;T&gt;](#concurrentqueuet-class) &middot; [ConcurrentStack&lt;T&gt;](#concurrentstackt-class) &middot; [Taken&lt;T&gt;](#takent-class)
 
 ## Types
 

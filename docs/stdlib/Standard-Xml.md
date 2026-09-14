@@ -19,11 +19,11 @@ what is here says so rather than working until it does not.
 
 ## Contents
 
-**Types** &nbsp; [XmlAttribute](#xmlattribute) &middot; [XmlAttributes](#xmlattributes) &middot; [XmlCreate](#xmlcreate) &middot; [XmlError](#xmlerror) &middot; [XmlIgnore](#xmlignore) &middot; [XmlName](#xmlname) &middot; [XmlNode](#xmlnode)
+**Types** &nbsp; [XmlAttribute](#xmlattribute-attribute) &middot; [XmlAttributes](#xmlattributes-class) &middot; [XmlCreate](#xmlcreate-attribute) &middot; [XmlError](#xmlerror-enum) &middot; [XmlIgnore](#xmlignore-attribute) &middot; [XmlName](#xmlname-attribute) &middot; [XmlNode](#xmlnode-class)
 
-**Functions** &nbsp; [Describe](#describe) &middot; [Parse](#parse) &middot; [Populate](#populate) &middot; [PopulateFrom](#populatefrom) &middot; [Serialize](#serialize) &middot; [SerializeDocument](#serializedocument) &middot; [ToNode](#tonode) &middot; [Write](#write) &middot; [WriteDocument](#writedocument) &middot; [WriteIndented](#writeindented)
+**Functions** &nbsp; [Describe](#describe-function) &middot; [Parse](#parse-function) &middot; [Populate](#populate-function) &middot; [PopulateFrom](#populatefrom-function) &middot; [Serialize](#serialize-function) &middot; [SerializeDocument](#serializedocument-function) &middot; [ToNode](#tonode-function) &middot; [Write](#write-function) &middot; [WriteDocument](#writedocument-function) &middot; [WriteIndented](#writeindented-function)
 
-**Constants** &nbsp; [MaxDepth](#maxdepth)
+**Constants** &nbsp; [MaxDepth](#maxdepth-constant)
 
 ## Types
 

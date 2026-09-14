@@ -16,9 +16,9 @@ type, and the value is unreadable until the failure has been checked (§2.6).
 
 ## Contents
 
-**Types** &nbsp; [ConvertError](#converterror)
+**Types** &nbsp; [ConvertError](#converterror-enum)
 
-**Functions** &nbsp; [FromBase64](#frombase64) &middot; [FromHex](#fromhex) &middot; [FromLong](#fromlong) &middot; [ToBase64](#tobase64) &middot; [ToBase64Text](#tobase64text) &middot; [ToBase64Url](#tobase64url) &middot; [ToDouble](#todouble) &middot; [ToHex](#tohex) &middot; [ToHex](#tohex) &middot; [ToInt](#toint) &middot; [ToInt](#toint) &middot; [ToLong](#tolong) &middot; [ToLong](#tolong) &middot; [ToULong](#toulong) &middot; [ToULong](#toulong)
+**Functions** &nbsp; [FromBase64](#frombase64-function) &middot; [FromHex](#fromhex-function) &middot; [FromLong](#fromlong-function) &middot; [ToBase64](#tobase64-function) &middot; [ToBase64Text](#tobase64text-function) &middot; [ToBase64Url](#tobase64url-function) &middot; [ToDouble](#todouble-function) &middot; [ToHex](#tohex-function) &middot; [ToHex](#tohex-function) &middot; [ToInt](#toint-function) &middot; [ToInt](#toint-function) &middot; [ToLong](#tolong-function) &middot; [ToLong](#tolong-function) &middot; [ToULong](#toulong-function) &middot; [ToULong](#toulong-function)
 
 ## Types
 

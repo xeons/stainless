@@ -20,9 +20,9 @@ would make the common cases read worse than the rare one.
 
 ## Contents
 
-**Types** &nbsp; [FileAccess](#fileaccess) &middot; [FileMode](#filemode) &middot; [FileStream](#filestream) &middot; [IOError](#ioerror) &middot; [IStream](#istream) &middot; [MemoryStream](#memorystream) &middot; [SeekOrigin](#seekorigin)
+**Types** &nbsp; [FileAccess](#fileaccess-enum) &middot; [FileMode](#filemode-enum) &middot; [FileStream](#filestream-class) &middot; [IOError](#ioerror-enum) &middot; [IStream](#istream-interface) &middot; [MemoryStream](#memorystream-class) &middot; [SeekOrigin](#seekorigin-enum)
 
-**Functions** &nbsp; [Describe](#describe) &middot; [ReadTextToEnd](#readtexttoend) &middot; [ReadToEnd](#readtoend) &middot; [SplitLines](#splitlines)
+**Functions** &nbsp; [Describe](#describe-function) &middot; [ReadTextToEnd](#readtexttoend-function) &middot; [ReadToEnd](#readtoend-function) &middot; [SplitLines](#splitlines-function)
 
 ## Types
 

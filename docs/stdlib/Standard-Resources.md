@@ -36,9 +36,9 @@ is what anything outliving the call wants.
 
 ## Contents
 
-**Functions** &nbsp; [BitmapFile](#bitmapfile) &middot; [Bytes](#bytes) &middot; [Bytes](#bytes) &middot; [Exists](#exists) &middot; [Exists](#exists) &middot; [Pointer](#pointer) &middot; [Size](#size) &middot; [Text](#text)
+**Functions** &nbsp; [BitmapFile](#bitmapfile-function) &middot; [Bytes](#bytes-function) &middot; [Bytes](#bytes-function) &middot; [Exists](#exists-function) &middot; [Exists](#exists-function) &middot; [Pointer](#pointer-function) &middot; [Size](#size-function) &middot; [Text](#text-function)
 
-**Constants** &nbsp; [Accelerator](#accelerator) &middot; [Bitmap](#bitmap) &middot; [Cursor](#cursor) &middot; [Dialog](#dialog) &middot; [GroupCursor](#groupcursor) &middot; [GroupIcon](#groupicon) &middot; [Html](#html) &middot; [Icon](#icon) &middot; [Manifest](#manifest) &middot; [ManifestId](#manifestid) &middot; [Menu](#menu) &middot; [MessageTable](#messagetable) &middot; [RcData](#rcdata) &middot; [StringTable](#stringtable) &middot; [Version](#version)
+**Constants** &nbsp; [Accelerator](#accelerator-constant) &middot; [Bitmap](#bitmap-constant) &middot; [Cursor](#cursor-constant) &middot; [Dialog](#dialog-constant) &middot; [GroupCursor](#groupcursor-constant) &middot; [GroupIcon](#groupicon-constant) &middot; [Html](#html-constant) &middot; [Icon](#icon-constant) &middot; [Manifest](#manifest-constant) &middot; [ManifestId](#manifestid-constant) &middot; [Menu](#menu-constant) &middot; [MessageTable](#messagetable-constant) &middot; [RcData](#rcdata-constant) &middot; [StringTable](#stringtable-constant) &middot; [Version](#version-constant)
 
 ## Functions
 

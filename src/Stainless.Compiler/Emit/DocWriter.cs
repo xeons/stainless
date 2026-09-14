@@ -560,7 +560,7 @@ public static class DocWriter
                 page.Append("**").Append(title).Append("** &nbsp; ");
                 page.Append(string.Join(" &middot; ", entries
                     .OrderBy(e => e.Name, StringComparer.Ordinal)
-                    .Select(e => $"[{Escape(e.Name)}](#{Anchor(e.Name)})")));
+                    .Select(e => $"[{Escape(e.Name)}](#{Anchor(e)})")));
                 page.Append("\n\n");
             }
         }
@@ -675,14 +675,31 @@ public static class DocWriter
     private static string FileNameOf(string module) => module.Replace('.', '-') + ".md";
 
     /// <summary>
-    /// A GitHub-flavoured heading anchor: lowercased, punctuation dropped,
-    /// spaces hyphenated. Generic parameters make this worth doing rather than
-    /// guessing -- <c>Dictionary&lt;K, V&gt;</c> becomes <c>dictionaryk-v</c>.
+    /// The anchor GitHub will give this entry's heading.
+    ///
+    /// It has to be computed from the whole heading and not from the name,
+    /// because <see cref="WriteEntry"/> writes the kind after it: the heading
+    /// for <c>HexDigit</c> is <c>### HexDigit *function*</c>, which GitHub
+    /// anchors as <c>hexdigit-function</c>. Anchoring the name alone produced
+    /// <c>#hexdigit</c> and every contents link on every page missed.
     /// </summary>
-    private static string Anchor(string name)
+    private static string Anchor(Entry entry) =>
+        Anchor(entry.Kind.Length > 0 ? $"{entry.Name} {entry.Kind}" : entry.Name);
+
+    /// <summary>
+    /// A GitHub-flavoured heading anchor, taken over a heading's *rendered*
+    /// text: lowercased, everything but a letter, digit, hyphen or underscore
+    /// dropped, spaces hyphenated. Generic parameters make this worth doing
+    /// rather than guessing -- <c>Dictionary&lt;K, V&gt;</c> becomes
+    /// <c>dictionaryk-v</c>.
+    ///
+    /// There is deliberately no trimming, because GitHub does not trim either:
+    /// a heading ending in punctuation after a space keeps a trailing hyphen.
+    /// </summary>
+    private static string Anchor(string heading)
     {
         var anchor = new StringBuilder();
-        foreach (char c in name.ToLowerInvariant())
+        foreach (char c in heading.ToLowerInvariant())
         {
             if (char.IsLetterOrDigit(c) || c == '-' || c == '_') anchor.Append(c);
             else if (c == ' ') anchor.Append('-');

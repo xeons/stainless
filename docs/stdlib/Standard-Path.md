@@ -19,9 +19,9 @@ platforms, and it says which rather than picking one.
 
 ## Contents
 
-**Functions** &nbsp; [DirectoryName](#directoryname) &middot; [Extension](#extension) &middot; [FileName](#filename) &middot; [IsRooted](#isrooted) &middot; [Join](#join) &middot; [Join](#join) &middot; [Split](#split) &middot; [WithExtension](#withextension) &middot; [WithoutExtension](#withoutextension)
+**Functions** &nbsp; [DirectoryName](#directoryname-function) &middot; [Extension](#extension-function) &middot; [FileName](#filename-function) &middot; [IsRooted](#isrooted-function) &middot; [Join](#join-function) &middot; [Join](#join-function) &middot; [Split](#split-function) &middot; [WithExtension](#withextension-function) &middot; [WithoutExtension](#withoutextension-function)
 
-**Constants** &nbsp; [AltSeparator](#altseparator) &middot; [Separator](#separator)
+**Constants** &nbsp; [AltSeparator](#altseparator-constant) &middot; [Separator](#separator-constant)
 
 ## Functions
 

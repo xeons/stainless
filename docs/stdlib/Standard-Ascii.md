@@ -17,7 +17,7 @@ and `IsDigit` is far too good a name to take from every program in the world.
 
 ## Contents
 
-**Functions** &nbsp; [HexDigit](#hexdigit) &middot; [HexDigitUpper](#hexdigitupper) &middot; [HexValue](#hexvalue) &middot; [IsAscii](#isascii) &middot; [IsControl](#iscontrol) &middot; [IsDigit](#isdigit) &middot; [IsHexDigit](#ishexdigit) &middot; [IsLetter](#isletter) &middot; [IsLetterOrDigit](#isletterordigit) &middot; [IsLower](#islower) &middot; [IsUpper](#isupper) &middot; [IsWhiteSpace](#iswhitespace) &middot; [ToLower](#tolower) &middot; [ToUpper](#toupper)
+**Functions** &nbsp; [HexDigit](#hexdigit-function) &middot; [HexDigitUpper](#hexdigitupper-function) &middot; [HexValue](#hexvalue-function) &middot; [IsAscii](#isascii-function) &middot; [IsControl](#iscontrol-function) &middot; [IsDigit](#isdigit-function) &middot; [IsHexDigit](#ishexdigit-function) &middot; [IsLetter](#isletter-function) &middot; [IsLetterOrDigit](#isletterordigit-function) &middot; [IsLower](#islower-function) &middot; [IsUpper](#isupper-function) &middot; [IsWhiteSpace](#iswhitespace-function) &middot; [ToLower](#tolower-function) &middot; [ToUpper](#toupper-function)
 
 ## Functions
 

@@ -18,11 +18,11 @@ is not the reason anything here will go wrong.
 
 ## Contents
 
-**Types** &nbsp; [Clock](#clock) &middot; [DateTime](#datetime) &middot; [Duration](#duration) &middot; [Instant](#instant) &middot; [TimeError](#timeerror)
+**Types** &nbsp; [Clock](#clock-class) &middot; [DateTime](#datetime-struct) &middot; [Duration](#duration-struct) &middot; [Instant](#instant-struct) &middot; [TimeError](#timeerror-enum)
 
-**Functions** &nbsp; [DaysInMonth](#daysinmonth) &middot; [IsLeapYear](#isleapyear)
+**Functions** &nbsp; [DaysInMonth](#daysinmonth-function) &middot; [IsLeapYear](#isleapyear-function)
 
-**Constants** &nbsp; [NanosecondsPerDay](#nanosecondsperday) &middot; [NanosecondsPerHour](#nanosecondsperhour) &middot; [NanosecondsPerMicrosecond](#nanosecondspermicrosecond) &middot; [NanosecondsPerMillisecond](#nanosecondspermillisecond) &middot; [NanosecondsPerMinute](#nanosecondsperminute) &middot; [NanosecondsPerSecond](#nanosecondspersecond)
+**Constants** &nbsp; [NanosecondsPerDay](#nanosecondsperday-constant) &middot; [NanosecondsPerHour](#nanosecondsperhour-constant) &middot; [NanosecondsPerMicrosecond](#nanosecondspermicrosecond-constant) &middot; [NanosecondsPerMillisecond](#nanosecondspermillisecond-constant) &middot; [NanosecondsPerMinute](#nanosecondsperminute-constant) &middot; [NanosecondsPerSecond](#nanosecondspersecond-constant)
 
 ## Types
 

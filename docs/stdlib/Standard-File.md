@@ -11,7 +11,7 @@ cases where the whole file is the unit of work.
 
 ## Contents
 
-**Functions** &nbsp; [AppendText](#appendtext) &middot; [Copy](#copy) &middot; [Delete](#delete) &middot; [Exists](#exists) &middot; [Modified](#modified) &middot; [ReadAllBytes](#readallbytes) &middot; [ReadAllLines](#readalllines) &middot; [ReadAllText](#readalltext) &middot; [Rename](#rename) &middot; [Size](#size) &middot; [WriteAllBytes](#writeallbytes) &middot; [WriteAllLines](#writealllines) &middot; [WriteAllText](#writealltext)
+**Functions** &nbsp; [AppendText](#appendtext-function) &middot; [Copy](#copy-function) &middot; [Delete](#delete-function) &middot; [Exists](#exists-function) &middot; [Modified](#modified-function) &middot; [ReadAllBytes](#readallbytes-function) &middot; [ReadAllLines](#readalllines-function) &middot; [ReadAllText](#readalltext-function) &middot; [Rename](#rename-function) &middot; [Size](#size-function) &middot; [WriteAllBytes](#writeallbytes-function) &middot; [WriteAllLines](#writealllines-function) &middot; [WriteAllText](#writealltext-function)
 
 ## Functions
 

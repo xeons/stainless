@@ -10,9 +10,9 @@ not sorted; `Sort` is one call away when it matters.
 
 ## Contents
 
-**Types** &nbsp; [Entry](#entry)
+**Types** &nbsp; [Entry](#entry-class)
 
-**Functions** &nbsp; [AllFiles](#allfiles) &middot; [Create](#create) &middot; [CreateAll](#createall) &middot; [Delete](#delete) &middot; [Directories](#directories) &middot; [Entries](#entries) &middot; [Exists](#exists) &middot; [Files](#files)
+**Functions** &nbsp; [AllFiles](#allfiles-function) &middot; [Create](#create-function) &middot; [CreateAll](#createall-function) &middot; [Delete](#delete-function) &middot; [Directories](#directories-function) &middot; [Entries](#entries-function) &middot; [Exists](#exists-function) &middot; [Files](#files-function)
 
 ## Types
 

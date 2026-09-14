@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using System.Text.RegularExpressions;
 using Stainless.Emit;
 using Stainless.Syntax;
 using Xunit;
@@ -380,6 +381,56 @@ public class DocumentationTests
         {
             Directory.Delete(directory, recursive: true);
         }
+    }
+
+    /// <summary>
+    /// Every contents link lands on a heading that is actually on the page.
+    ///
+    /// The anchor was once taken over the entry's name alone while the heading
+    /// also carried its kind, so <c>### F *function*</c> was linked as
+    /// <c>#f</c> and every link on every generated page missed. Nothing caught
+    /// it: the pages were written, and no test read one link against the
+    /// heading it claimed to reach.
+    /// </summary>
+    [Fact]
+    public void EveryContentsLinkReachesAHeading()
+    {
+        string page = Page("""
+            module M;
+            /// A function.
+            public int F() { return 0; }
+            /// A class.
+            public class C { }
+            /// A generic class, whose name has punctuation in it.
+            public class Box<T> { }
+            """);
+
+        var headings = new HashSet<string>(
+            Regex.Matches(page, @"^#{1,6} (.*)$", RegexOptions.Multiline)
+                 .Select(m => GitHubAnchor(m.Groups[1].Value)),
+            StringComparer.Ordinal);
+
+        var links = Regex.Matches(page, @"\]\(#([^)]+)\)")
+                         .Select(m => m.Groups[1].Value)
+                         .ToList();
+
+        Assert.NotEmpty(links);
+        Assert.All(links, link => Assert.Contains(link, headings));
+    }
+
+    /// <summary>
+    /// GitHub's anchor for a heading, over its rendered text: entities decoded,
+    /// emphasis and code markers gone, lowercased, everything but a word
+    /// character, hyphen or space dropped, then spaces to hyphens. Written out
+    /// here rather than shared with the writer, so that the two agreeing means
+    /// something.
+    /// </summary>
+    private static string GitHubAnchor(string heading)
+    {
+        string text = System.Net.WebUtility.HtmlDecode(heading)
+                                           .Replace("`", "").Replace("*", "");
+        text = Regex.Replace(text.ToLowerInvariant(), @"[^\w\- ]", "");
+        return text.Replace(' ', '-');
     }
 
     /// <summary>The one module's page, as text.</summary>

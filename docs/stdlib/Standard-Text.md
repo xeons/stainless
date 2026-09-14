@@ -31,9 +31,9 @@ documented here.
 
 ## Contents
 
-**Types** &nbsp; [String](#string) &middot; [StringBuilder](#stringbuilder) &middot; [Utf16String](#utf16string)
+**Types** &nbsp; [String](#string-class) &middot; [StringBuilder](#stringbuilder-class) &middot; [Utf16String](#utf16string-class)
 
-**Constants** &nbsp; [NotFound](#notfound)
+**Constants** &nbsp; [NotFound](#notfound-constant)
 
 ## Types
 

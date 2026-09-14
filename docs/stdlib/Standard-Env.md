@@ -10,7 +10,7 @@ that goes looking. These are for the code that is nowhere near `Main`.
 
 ## Contents
 
-**Functions** &nbsp; [ArgumentAt](#argumentat) &middot; [ArgumentCount](#argumentcount) &middot; [Arguments](#arguments) &middot; [CurrentDirectory](#currentdirectory) &middot; [Get](#get) &middot; [GetOr](#getor) &middot; [Has](#has) &middot; [Names](#names) &middot; [Program](#program) &middot; [Remove](#remove) &middot; [Set](#set) &middot; [SetCurrentDirectory](#setcurrentdirectory)
+**Functions** &nbsp; [ArgumentAt](#argumentat-function) &middot; [ArgumentCount](#argumentcount-function) &middot; [Arguments](#arguments-function) &middot; [CurrentDirectory](#currentdirectory-function) &middot; [Get](#get-function) &middot; [GetOr](#getor-function) &middot; [Has](#has-function) &middot; [Names](#names-function) &middot; [Program](#program-function) &middot; [Remove](#remove-function) &middot; [Set](#set-function) &middot; [SetCurrentDirectory](#setcurrentdirectory-function)
 
 ## Functions
 

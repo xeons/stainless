@@ -17,9 +17,9 @@ is what this seeds from and is right there.
 
 ## Contents
 
-**Types** &nbsp; [Random](#random)
+**Types** &nbsp; [Random](#random-class)
 
-**Functions** &nbsp; [Bytes](#bytes) &middot; [Seed](#seed)
+**Functions** &nbsp; [Bytes](#bytes-function) &middot; [Seed](#seed-function)
 
 ## Types
 

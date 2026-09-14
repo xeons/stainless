@@ -111,7 +111,7 @@ same constant-offset load it would be if the field had been declared directly.
 A generated C header writes the member back as a nameless one, and gives the
 generated type no typedef of its own.
 
-## 1.9 32-bit x86
+### 1.5 32-bit x86
 
 `--target x86` builds for 32-bit x86, on Windows or Linux. A pointer is four
 bytes, `nint` and `nuint` are four bytes, and every header counted in words
@@ -142,7 +142,7 @@ runtime's lock storage was counted in pointers where a `pthread_cond_t` is 48
 bytes on a four-byte-pointer machine, and the name decoration below was being
 applied to ELF.
 
-### 1.10 Calling conventions
+### 1.6 Calling conventions
 
 A declaration may name one, after the linkage string:
 
@@ -186,7 +186,7 @@ answer: the first 32-bit Linux build went looking for `_add_stdcall@8` and
 there was no such symbol. The same applies to `__vectorcall` on x86-64, which
 is decorated on Windows and not on Linux.
 
-## 1.11 ARM64
+### 1.7 ARM64
 
 `--target arm64` builds for 64-bit ARM, on Windows or Linux. A pointer is eight
 bytes, so nothing about the layout differs from x86-64 — what differs is how a
@@ -644,7 +644,7 @@ convention on every 64-bit target, so off x86 this changes nothing.
 
 The slot *names* carry no byte count, and do not need one. A decoration exists
 so that a caller and a callee disagreeing about the argument size is a link
-error (§1.10), and a vtable slot is reached by address rather than by name; a
+error (§1.6), and a vtable slot is reached by address rather than by name; a
 Stainless-mangled name already states its parameters in any case. The
 exception is the three IUnknown slots, which are C functions in the runtime:
 on x86 Windows they are linked as `_sl_com_object_add_ref@4` and its two

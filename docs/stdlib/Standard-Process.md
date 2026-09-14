@@ -20,9 +20,9 @@ child that writes more than that.
 
 ## Contents
 
-**Types** &nbsp; [Completed](#completed) &middot; [Process](#process) &middot; [ProcessError](#processerror) &middot; [Signals](#signals)
+**Types** &nbsp; [Completed](#completed-struct) &middot; [Process](#process-class) &middot; [ProcessError](#processerror-enum) &middot; [Signals](#signals-class)
 
-**Functions** &nbsp; [Run](#run) &middot; [Run](#run)
+**Functions** &nbsp; [Run](#run-function) &middot; [Run](#run-function)
 
 ## Types
 

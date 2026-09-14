@@ -26,9 +26,9 @@ was never anything file-shaped in it.
 
 ## Contents
 
-**Types** &nbsp; [AddressFamily](#addressfamily) &middot; [EndPoint](#endpoint) &middot; [Socket](#socket) &middot; [SocketError](#socketerror) &middot; [SocketKind](#socketkind) &middot; [SocketShutdown](#socketshutdown) &middot; [TcpClient](#tcpclient) &middot; [TcpListener](#tcplistener) &middot; [UdpSocket](#udpsocket)
+**Types** &nbsp; [AddressFamily](#addressfamily-enum) &middot; [EndPoint](#endpoint-struct) &middot; [Socket](#socket-class) &middot; [SocketError](#socketerror-enum) &middot; [SocketKind](#socketkind-enum) &middot; [SocketShutdown](#socketshutdown-enum) &middot; [TcpClient](#tcpclient-class) &middot; [TcpListener](#tcplistener-class) &middot; [UdpSocket](#udpsocket-class)
 
-**Functions** &nbsp; [Describe](#describe) &middot; [Resolve](#resolve) &middot; [Resolve](#resolve)
+**Functions** &nbsp; [Describe](#describe-function) &middot; [Resolve](#resolve-function) &middot; [Resolve](#resolve-function)
 
 ## Types
 

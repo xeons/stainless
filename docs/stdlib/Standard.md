@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action&lt;T&gt;](#actiont) &middot; [Comparer&lt;T&gt;](#comparert) &middot; [Fold&lt;A, T&gt;](#folda-t) &middot; [Func&lt;T, R&gt;](#funct-r) &middot; [Optional&lt;T&gt;](#optionalt) &middot; [Predicate&lt;T&gt;](#predicatet) &middot; [Result&lt;T, E&gt;](#resultt-e)
+**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparer&lt;T&gt;](#comparert-closure) &middot; [Fold&lt;A, T&gt;](#folda-t-closure) &middot; [Func&lt;T, R&gt;](#funct-r-closure) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Result&lt;T, E&gt;](#resultt-e-variant)
 
 ## Types
 
