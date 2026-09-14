@@ -56,6 +56,8 @@ public sealed partial class Binder
             IsOverride = declaration.Modifiers.HasFlag(Modifiers.Override),
             IsAbstract = declaration.Modifiers.HasFlag(Modifiers.Abstract),
             IsSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed),
+            IsConversion = declaration.IsConversion,
+            IsImplicitConversion = declaration.IsImplicitConversion,
             IsStatic = isStatic,
             IsVariadic = declaration.IsVariadic,
             Body = declaration.Body,
@@ -157,6 +159,13 @@ public sealed partial class Binder
                 $"variant '{shadowed.DeclaringVariant.QualifiedName}', and a bare " +
                 $"'{declaration.Name}(...)' builds one of those. A method of a type may still " +
                 "be called this, because a method is reached through its receiver");
+
+        if (declaration.IsConversion)
+        {
+            CheckConversion(containingType, symbol, declaration);
+            module.Functions.Add(symbol);
+            return;
+        }
 
         if (declaration.IsOperator)
         {
@@ -329,6 +338,135 @@ public sealed partial class Binder
         containingType.Operators.Add(symbol);
     }
 
+    /// <summary>
+    /// The rules a conversion operator keeps, and where it is registered.
+    ///
+    /// They are C#'s, and each is about the same thing: a conversion is chosen
+    /// by the types at the point of use rather than by anything written there,
+    /// so the reader has to be able to find it from the two types alone, and
+    /// there has to be exactly one of it.
+    /// </summary>
+    private void CheckConversion(
+        NamedTypeSymbol? containingType, FunctionSymbol symbol, FunctionDeclSyntax declaration)
+    {
+        if (containingType is null)
+        {
+            diagnostics.Error("SL0615", declaration.Span,
+                "a conversion belongs to one of the two types it converts between; a " +
+                "module-level one would give somebody else's types a meaning from a distance");
+            return;
+        }
+
+        if (!symbol.IsPublic)
+            diagnostics.Error("SL0615", declaration.Span,
+                "a conversion must be 'public'; one only its own module could use is a " +
+                "function with an unusual spelling");
+
+        if (symbol.Parameters.Count != 1)
+        {
+            diagnostics.Error("SL0615", declaration.Span,
+                "a conversion takes exactly the value it converts, and this declares " +
+                $"{symbol.Parameters.Count}");
+            return;
+        }
+
+        // Registered now and judged later. What is left to check is about how
+        // two types are related -- whether one derives from the other, whether
+        // the language already converts between them -- and none of that is
+        // settled while signatures are still being resolved.
+        containingType.Conversions.Add(symbol);
+    }
+
+    /// <summary>
+    /// The rules a conversion operator keeps.
+    ///
+    /// They are C#'s, and each is about the same thing: a conversion is chosen
+    /// by the types at the point of use rather than by anything written there,
+    /// so a reader has to be able to find it from the two types alone, and
+    /// there has to be exactly one of it.
+    ///
+    /// This runs after inheritance and layout, because <i>every</i> rule left
+    /// is a question about a pair of types: whether they are the same, whether
+    /// one is an interface, and above all whether the language already carries
+    /// one to the other -- which needs the base chain that pass 5 built.
+    /// </summary>
+    private void CheckConversions()
+    {
+        foreach (var type in _modules.Values.SelectMany(m => m.Types.Values).ToList())
+        {
+            var kept = new List<FunctionSymbol>();
+
+            foreach (var conversion in type.Conversions)
+            {
+                var from = conversion.Parameters[0].Type;
+                var to = conversion.ReturnType;
+
+                if (from.IsError() || to.IsError()) continue;
+
+                if (from.Equals(to))
+                {
+                    diagnostics.Error("SL0615", conversion.Span,
+                        $"this converts '{from.Name}' to itself, which is what it already is");
+                    continue;
+                }
+
+                // One side has to be the declaring type, for the reason an
+                // operator's operand does: reading `(Money)x` says where to
+                // look for what it means.
+                if (!Mentions(from, type) && !Mentions(to, type))
+                {
+                    diagnostics.Error("SL0615", conversion.Span,
+                        $"this converts '{from.Name}' to '{to.Name}', and neither is " +
+                        $"'{type.Name}'; a conversion belongs to one of the two types it is " +
+                        "between, so that the two types are where a reader looks for it");
+                    continue;
+                }
+
+                // An interface is reached by what an object *is*, and a
+                // conversion makes something else. Both would mean a cast to an
+                // interface sometimes asked the object and sometimes ran code.
+                if (from is InterfaceTypeSymbol or ComInterfaceTypeSymbol ||
+                    to is InterfaceTypeSymbol or ComInterfaceTypeSymbol)
+                {
+                    diagnostics.Error("SL0615", conversion.Span,
+                        "a conversion may not be to or from an interface: a cast to one asks " +
+                        "the object what it is, and a conversion would make a different " +
+                        "object instead");
+                    continue;
+                }
+
+                // And nothing may restate a conversion the language already
+                // has -- a base class, an optional, an array to a slice, a
+                // widening. A second answer to a question that is already
+                // answered is one a reader would have to know about to predict
+                // what a cast does.
+                if (ClassifyConversion(
+                        from, to, explicitCast: !conversion.IsImplicitConversion) is not null)
+                {
+                    diagnostics.Error("SL0615", conversion.Span,
+                        $"'{from.Name}' already converts to '{to.Name}'" +
+                        (conversion.IsImplicitConversion ? "" : " with a cast") +
+                        "; a second answer to the same question is one the reader would have " +
+                        "to know about to predict what a cast does");
+                    continue;
+                }
+
+                if (kept.Any(c => c.ReturnType.Equals(to) && c.Parameters[0].Type.Equals(from)))
+                {
+                    diagnostics.Error("SL0211", conversion.Span,
+                        $"'{type.Name}' already declares a conversion from '{from.Name}' " +
+                        $"to '{to.Name}'");
+                    continue;
+                }
+
+                kept.Add(conversion);
+            }
+
+            type.Conversions.Clear();
+            type.Conversions.AddRange(kept);
+        }
+    }
+
     /// <summary>Whether an operand type is the declaring type, or a pointer to it.</summary>
     private static bool Mentions(TypeSymbol operand, NamedTypeSymbol type) =>
         ReferenceEquals(operand, type) ||
@@ -421,9 +559,235 @@ public sealed partial class Binder
                 new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count)
                 {
                     Mode = parameter.Mode,
+                    DeclaredSpan = parameter.Span,
+                    DefaultSyntax = CheckedDefault(symbol, parameter),
                 });
         }
+
+        // A default that is not on the end could only be reached by a name, and
+        // a reader counting arguments would have to know which of them were
+        // filled in. Checked here rather than per call, because it is a fact
+        // about the declaration.
+        var written = symbol.Parameters.Where(p => !p.IsThis).ToList();
+
+        for (int i = 1; i < written.Count; i++)
+            if (!written[i].IsOptional && written[i - 1].IsOptional)
+            {
+                diagnostics.Error("SL0614", written[i].DeclaredSpan ?? symbol.Span,
+                    $"'{written[i].Name}' has no default and '{written[i - 1].Name}' before it " +
+                    "has one; the ones that may be left out go at the end, so that what a call " +
+                    "leaves off is the tail of the list and not a hole in the middle");
+                break;
+            }
     }
+
+    /// <summary>
+    /// The default as written, or null where a default cannot mean anything.
+    ///
+    /// Each refusal is about the same thing: a default is a value the *caller*
+    /// passes, filled in at the call site from the declaration it can see. So
+    /// it needs a call site that has a declaration to read, and it needs to be
+    /// a value.
+    /// </summary>
+    private ExpressionSyntax? CheckedDefault(FunctionSymbol symbol, ParameterSyntax parameter)
+    {
+        if (parameter.Default is null) return null;
+
+        if (parameter.Mode != ParameterMode.Value)
+        {
+            diagnostics.Error("SL0613", parameter.Default.Span,
+                $"'{parameter.Name}' is '{Spelled(parameter.Mode)}', which passes the caller's " +
+                "storage rather than a value, and a default has no storage to be; make it an " +
+                "ordinary parameter, or write an overload that supplies one");
+            return null;
+        }
+
+        if (symbol.IsVariadic)
+        {
+            diagnostics.Error("SL0613", parameter.Default.Span,
+                $"'{symbol.Name}' is variadic, so what a call leaves off is already open-ended; " +
+                "a default here would make two rules for the same tail");
+            return null;
+        }
+
+        return parameter.Default;
+    }
+
+    private static string Spelled(ParameterMode mode) => mode switch
+    {
+        ParameterMode.Ref => "ref",
+        ParameterMode.In => "in",
+        ParameterMode.Out => "out",
+        _ => "",
+    };
+
+    /// <summary>
+    /// Works out what every declared default is worth, and where one may be
+    /// declared at all.
+    ///
+    /// A pass of its own, between the signatures and the bodies, because a
+    /// default is an expression in a signature: <c>int width = Layout.Wide</c>
+    /// names a constant that pass 4 had not folded yet, and no body may be
+    /// bound until every signature is settled. Doing it here also means a
+    /// default nothing ever leaves out is still checked.
+    /// </summary>
+    private void BindParameterDefaults()
+    {
+        // A method is in its module's function list and in its type's, so the
+        // set is what stops one being reported against twice.
+        var seen = new HashSet<FunctionSymbol>();
+
+        void BindDefaultsOnce(FunctionSymbol function)
+        {
+            if (seen.Add(function)) BindDefaultsOf(function);
+        }
+
+        foreach (var module in _modules.Values.ToList())
+        {
+            foreach (var function in module.Functions.ToList())
+                BindDefaultsOnce(function);
+
+            foreach (var type in module.Types.Values.ToList())
+            {
+                foreach (var method in type.Methods.ToList()) BindDefaultsOnce(method);
+                foreach (var declared in type.Operators.ToList()) BindDefaultsOnce(declared);
+
+                if (type is ClassTypeSymbol classType)
+                {
+                    foreach (var constructor in classType.Constructors.ToList())
+                        BindDefaultsOnce(constructor);
+
+                    CheckImplementedDefaults(classType);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Settles one function's defaults, and refuses the one shape that would
+    /// make the same written call mean two things.
+    ///
+    /// <b>An override may not restate a default.</b> A call fills one in from
+    /// the declaration it can see, which is the one the static type gives it,
+    /// so a restated default would be a value that depended on which reference
+    /// the call was made through -- the reader's worst case, because both
+    /// spellings are the same line. C# allows it, and it is a documented trap
+    /// there.
+    /// </summary>
+    private void BindDefaultsOf(FunctionSymbol function)
+    {
+        foreach (var parameter in function.Parameters)
+        {
+            if (parameter.DefaultSyntax is not { } written) continue;
+
+            if (function.IsOverride)
+            {
+                diagnostics.Error("SL0614", written.Span,
+                    $"'{function.Name}' is an override, so it cannot give '{parameter.Name}' a " +
+                    "default: a call fills one in from the declaration it can see, which is the " +
+                    "one the static type gives it, and a second value here would mean the same " +
+                    "line meant different things through a base reference and a derived one");
+                parameter.Default = null;
+                continue;
+            }
+
+            EnsureDefault(function, parameter);
+        }
+    }
+
+    /// <summary>
+    /// The same rule as an override's, across an interface: both declarations
+    /// are visible, and a call through each would read a different value.
+    /// </summary>
+    private void CheckImplementedDefaults(ClassTypeSymbol classType)
+    {
+        foreach (var contract in classType.AllInterfaces())
+            foreach (var required in contract.Methods)
+            {
+                if (!required.Parameters.Any(p => p.IsOptional)) continue;
+                if (classType.FindImplementation(required) is not { } implementation) continue;
+
+                foreach (var parameter in implementation.Parameters)
+                {
+                    if (parameter.DefaultSyntax is not { } written) continue;
+                    if (!required.Parameters.Any(p => p.Name == parameter.Name && p.IsOptional))
+                        continue;
+
+                    diagnostics.Error("SL0614", written.Span,
+                        $"'{contract.Name}.{required.Name}' already gives '{parameter.Name}' a " +
+                        "default, and a call fills one in from the declaration it can see; two " +
+                        "of them would mean a call through the interface and a call through " +
+                        $"'{classType.Name}' passed different values. Leave this one off");
+                    parameter.Default = null;
+                }
+            }
+    }
+
+    /// <summary>
+    /// Binds a default if it has not been bound yet, and returns it.
+    ///
+    /// Lazy as well as eager because a generic's parameters are built when it
+    /// is instantiated, which happens while bodies are being bound -- after the
+    /// pass above has run. There the first call site to leave the parameter out
+    /// is what settles it, and the result is cached, so the expression is bound
+    /// once however many calls omit it.
+    /// </summary>
+    private BoundExpression? EnsureDefault(FunctionSymbol function, ParameterSymbol parameter)
+    {
+        if (parameter.Default is not null) return parameter.Default;
+        if (parameter.DefaultSyntax is not { } written) return null;
+
+        // Bound where it was written, against that file's imports, and with no
+        // function around it: a default is a constant, so there is nothing for
+        // a local, a parameter or a `this` to be.
+        var savedScope = _currentScope;
+        var savedFunction = _currentFunction;
+        var savedPatterns = _patterns;
+
+        if (function.Scope is not null) _currentScope = function.Scope;
+        _currentFunction = null;
+        _patterns = null;
+
+        PushScope();
+        var bound = BindConversion(BindExpression(written), parameter.Type, written.Span);
+        PopScope();
+
+        _currentScope = savedScope;
+        _currentFunction = savedFunction;
+        _patterns = savedPatterns;
+
+        if (bound.Type.IsError()) return null;
+
+        if (!IsConstantDefault(bound))
+        {
+            diagnostics.Error("SL0613", written.Span,
+                $"the default for '{parameter.Name}' is not a constant, and a default is " +
+                "written into every call that leaves it out -- so a call would be running this " +
+                "rather than passing it. A literal, 'null', a 'const', an enum member or " +
+                "'default(T)' is what it may be; anything else belongs in the body");
+            return null;
+        }
+
+        parameter.Default = bound;
+        return bound;
+    }
+
+    /// <summary>
+    /// Whether an expression is the same value every time it is written out.
+    ///
+    /// The test is on the bound tree rather than on the syntax, so a conversion
+    /// the compiler inserted on the way -- an <c>int</c> literal becoming a
+    /// <c>long</c>, an enum member reaching its own type -- does not make a
+    /// constant stop being one.
+    /// </summary>
+    private static bool IsConstantDefault(BoundExpression expression) => expression switch
+    {
+        BoundLiteral or BoundStringLiteral or BoundNullLiteral or BoundDefault => true,
+        BoundConstantAccess => true,
+        BoundConversion conversion => IsConstantDefault(conversion.Operand),
+        BoundUnary { Operator: BoundUnaryOp.Negate } negated => IsConstantDefault(negated.Operand),
+        _ => false,
+    };
 
     private void DeclareGlobalConstant(FileScope scope, GlobalConstDeclSyntax declaration)
     {

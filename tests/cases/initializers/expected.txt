@@ -1,0 +1,12 @@
+untitled 80 0 true 7 0
+named 80 0 true 7 0
+both 10 0 true 7 0
+counter 3
+framed 80 0 true 7 0 2
+written 12 4 false 7 0
+ctor 80 9 true 7 0
+inline/80
+6 of 3
+a, b
+kept
+1

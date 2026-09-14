@@ -95,6 +95,15 @@ public sealed partial class LlvmEmitter
 
             case BoundTupleCreate tuple: return EmitTupleCreate(tuple);
             case BoundConversion conversion: return EmitConversion(conversion);
+
+            // Everything but the last is evaluated for what it does; the last
+            // one is the value. An object initializer is the whole reason
+            // this exists.
+            case BoundSequence sequence:
+            {
+                foreach (var side in sequence.Before) EmitExpression(side);
+                return EmitExpression(sequence.Value);
+            }
             case BoundTypeTest test: return EmitTypeTest(test);
             case BoundUnary unary: return EmitUnary(unary);
             case BoundBinary binary: return EmitBinary(binary);
@@ -102,19 +111,28 @@ public sealed partial class LlvmEmitter
 
             case BoundLet held:
             {
-                // A slot rather than an SSA name, because everything that
-                // reads a local reads through one -- and a struct is an
-                // address here in any case.
-                string llvmType = LlvmTypeOf(held.Local.Type);
-                string slot = Alloca(llvmType, held.Local.Name);
-                _slots[held.Local] = slot;
-
                 var value = EmitExpression(held.Value);
-                Line($"store {llvmType} {value.Ref}, ptr {slot}");
 
                 // Borrowed, not owned: whatever produced the value is already
                 // a temporary the statement will drop, so nothing is retained
                 // here and nothing is released.
+                //
+                // A struct, a tuple, a variant and an inline array are all held
+                // by address, so the name is that address and there is nothing
+                // to copy. Everything else goes in a slot, because that is what
+                // a read of a local reads through.
+                if (held.Local.Type is StructTypeSymbol or FixedArrayTypeSymbol)
+                {
+                    _slots[held.Local] = value.Ref;
+                }
+                else
+                {
+                    string llvmType = LlvmTypeOf(held.Local.Type);
+                    string slot = Alloca(llvmType, held.Local.Name);
+                    _slots[held.Local] = slot;
+                    Line($"store {llvmType} {value.Ref}, ptr {slot}");
+                }
+
                 return EmitExpression(held.Body);
             }
             case BoundFunctionReference reference:

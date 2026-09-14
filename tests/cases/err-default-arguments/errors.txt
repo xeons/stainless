@@ -1,0 +1,6 @@
+# A default that is not a constant, one on a 'ref' and on an 'out', one before a
+# parameter that has none, one restated by an override and one restated beside
+# an interface's, and a call that is outside the range the defaults allow.
+SL0613
+SL0614
+SL0260

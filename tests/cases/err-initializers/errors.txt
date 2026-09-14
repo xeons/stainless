@@ -1,0 +1,5 @@
+# An initializer on a struct, one that reads the object it belongs to, one on a
+# computed property, and four brace lists: an unknown member, a property with no
+# setter, named and bare entries mixed, and a type with no 'Add'.
+SL0617
+SL0618

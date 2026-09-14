@@ -140,15 +140,27 @@ public sealed partial class Binder
     /// </summary>
     private ClosureTypeSymbol NewClosureType(
         DelegateDeclSyntax declaration, ModuleSymbol module,
-        string? displayName = null, IReadOnlyList<TypeSymbol>? typeArguments = null)
+        string? displayName = null, IReadOnlyList<TypeSymbol>? typeArguments = null) =>
+        NewClosureType(
+            displayName ?? declaration.Name, module.Name, declaration.Span,
+            declaration.Modifiers.HasFlag(Modifiers.Public), typeArguments ?? []);
+
+    /// <summary>
+    /// The same two fields, for a closure type nobody declared: the one a
+    /// lambda gets when it is not being assigned to anything that would say
+    /// what it should be.
+    /// </summary>
+    private ClosureTypeSymbol NewClosureType(
+        string simpleName, string moduleName, Source.SourceSpan span,
+        bool isPublic, IReadOnlyList<TypeSymbol> typeArguments)
     {
         var type = new ClosureTypeSymbol
         {
-            SimpleName = displayName ?? declaration.Name,
-            ModuleName = module.Name,
-            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
-            TypeArguments = typeArguments ?? [],
-            Span = declaration.Span,
+            SimpleName = simpleName,
+            ModuleName = moduleName,
+            IsPublic = isPublic,
+            TypeArguments = typeArguments,
+            Span = span,
         };
 
         // The function first, so that the eight bytes at offset zero are the
@@ -529,10 +541,6 @@ public sealed partial class Binder
                             $"'{type.Name}' already declares a member named '{field.Name}'");
                         break;
                     }
-                    if (field.Initializer is not null)
-                        diagnostics.Error("SL0206", field.Span,
-                            "field initializers are not supported yet; assign the field in a constructor");
-
                     var fieldType = ResolveType(field.Type, scope);
 
                     // A struct holding a reference is allowed, and copying one
@@ -557,6 +565,8 @@ public sealed partial class Binder
                         IsProtected = field.Modifiers.HasFlag(Modifiers.Protected),
                         IsAnonymous = field.IsAnonymous,
                         Documentation = field.Documentation,
+                        InitializerSyntax = CheckedFieldInitializer(type, field),
+                        InitializerScope = scope,
                     };
 
                     if (field.BitWidth is not null)
@@ -681,6 +691,114 @@ public sealed partial class Binder
         }
 
         CheckOperatorPairs(type);
+    }
+
+    /// <summary>
+    /// Gives a class with field initializers and no constructor one to run them
+    /// in.
+    ///
+    /// A field initializer is a statement at the head of a constructor, so a
+    /// class that declares none has nowhere to put it. The one made here takes
+    /// no arguments and has an empty body, which is exactly what
+    /// <c>new Thing()</c> already meant for such a class -- the difference is
+    /// that there is now something for the initializers to be the head of, and
+    /// for the base chain to be inserted into.
+    /// </summary>
+    private void SynthesizeInitializerConstructors()
+    {
+        foreach (var type in _modules.Values
+                     .SelectMany(m => m.Types.Values)
+                     .OfType<ClassTypeSymbol>()
+                     .ToList())
+        {
+            if (type.Constructors.Count > 0) continue;
+            if (type.Fields.FirstOrDefault(f => f.InitializerSyntax is not null) is not { } first)
+                continue;
+
+            // The first initializer is where this constructor came from, and
+            // where a diagnostic about it should point.
+            var where = first.InitializerSyntax!.Span;
+
+            var symbol = new FunctionSymbol
+            {
+                Name = "ctor",
+                ModuleName = type.ModuleName,
+                ReturnType = PrimitiveTypeSymbol.Void,
+                Linkage = LinkageKind.Stainless,
+                Kind = FunctionKind.Constructor,
+                ContainingType = type,
+                Body = new BlockSyntax(where, []),
+                Span = where,
+                Scope = first.InitializerScope,
+                IsPublic = true,
+            };
+
+            symbol.Parameters.Add(new ParameterSymbol("this", type, 0) { IsThis = true });
+            type.Constructors.Add(symbol);
+        }
+    }
+
+    /// <summary>
+    /// A field's <c>= value</c>, or null where one cannot mean anything.
+    ///
+    /// A field initializer is a statement at the head of every constructor, so
+    /// what it needs is a constructor to be at the head of. A class has one --
+    /// written, or made for it when it declares none. A value type does not:
+    /// <c>Point p;</c> makes one by declaring it, and there is no moment there
+    /// for an initializer to run at.
+    /// </summary>
+    private ExpressionSyntax? CheckedFieldInitializer(NamedTypeSymbol type, FieldDeclSyntax field)
+    {
+        if (field.Initializer is null) return null;
+
+        if (type is not ClassTypeSymbol)
+        {
+            diagnostics.Error("SL0617", field.Initializer.Span,
+                $"'{type.Name}' is not a class, so there is no moment at which this would " +
+                $"run: '{type.Name} value;' makes one by declaring it rather than by " +
+                "constructing it, and a field initializer runs in a constructor. Give the " +
+                "field its value where the value is made");
+            return null;
+        }
+
+        if (field.IsAnonymous)
+        {
+            diagnostics.Error("SL0617", field.Initializer.Span,
+                "a nameless member has no name to assign to; give its fields their values " +
+                "one at a time");
+            return null;
+        }
+
+        if (field.BitWidth is not null)
+        {
+            diagnostics.Error("SL0617", field.Initializer.Span,
+                $"'{field.Name}' is a bit-field, and bit-fields are laid out in a struct, " +
+                "which has no constructor to run this in");
+            return null;
+        }
+
+        return field.Initializer;
+    }
+
+    /// <summary>
+    /// An automatic property's <c>= value</c>, which is its storage's: the two
+    /// are the same field, so the same rule decides both.
+    /// </summary>
+    private ExpressionSyntax? CheckedPropertyInitializer(
+        NamedTypeSymbol type, PropertyDeclSyntax declaration)
+    {
+        if (declaration.Initializer is null) return null;
+
+        if (type is not ClassTypeSymbol)
+        {
+            diagnostics.Error("SL0617", declaration.Initializer.Span,
+                $"'{type.Name}' is not a class, so there is no moment at which this would " +
+                "run: a property's first value is given in a constructor, and a value type " +
+                "has none");
+            return null;
+        }
+
+        return declaration.Initializer;
     }
 
     /// <summary>
@@ -1015,6 +1133,12 @@ public sealed partial class Binder
             return;
         }
 
+        if (declaration.Initializer is not null && !wantsStorage)
+            diagnostics.Error("SL0617", declaration.Initializer.Span,
+                $"'{type.Name}.{declaration.Name}' computes its value, so there is no storage " +
+                "here to give one to; a value after the accessors belongs to an automatic " +
+                "property, which is the one that owns a field");
+
         FieldSymbol? backing = null;
         if (wantsStorage)
         {
@@ -1023,6 +1147,8 @@ public sealed partial class Binder
             backing = new FieldSymbol(declaration.Name, propertyType, type, type.Fields.Count)
             {
                 IsBackingField = true,
+                InitializerSyntax = CheckedPropertyInitializer(type, declaration),
+                InitializerScope = scope,
             };
             type.Fields.Add(backing);
         }

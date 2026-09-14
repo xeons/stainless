@@ -229,15 +229,6 @@ line that would have to learn about it.
 
 ## Language
 
-### An `as` operator
-
-`as` produces a `C?` where a cast produces a `C` or ends the program. Smaller
-than it was: `if (x is C c)` now covers the branching case, so what is left is
-wanting the answer as a value — passing it on, storing it, or a chain of them
-where an `if` per step reads badly.
-
-*Touches:* `Parser`, `Binder.BindTypeTest`, `LlvmEmitter.EmitConversion`.
-
 ### Narrowing a field
 
 `if (x != null)` narrows a local or a parameter and not `node.Next`, because a

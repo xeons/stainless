@@ -1,0 +1,3 @@
+# Two classes in different families, an optional written twice, a value type,
+# a sealed class that cannot implement the interface, and a variant.
+SL0612

@@ -992,53 +992,43 @@ public sealed partial class Binder
         CallSyntax syntax, FunctionSymbol function, BoundExpression? receiver,
         List<BoundExpression> arguments, bool nonVirtual = false)
     {
-        int expected = function.Parameters.Count(p => !p.IsThis);
-        bool countOk = function.IsVariadic ? arguments.Count >= expected : arguments.Count == expected;
+        var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
 
-        if (!countOk)
+        if (!CheckArity(function.Name, parameters, arguments.Count, function.IsVariadic, syntax.Span))
+            return new BoundErrorExpression(syntax.Span);
+
+        // This is the one place every ordinary call passes through, so it is
+        // where the names are turned back into positions and where a parameter
+        // the call left out is filled in from its default -- everything after
+        // it sees one argument per parameter, in the order they were declared.
+        int[]? map = MapArguments(
+            parameters, arguments.Count, syntax.Arguments, function.IsVariadic, out string? why);
+
+        if (map is null)
         {
-            diagnostics.Error("SL0260", syntax.Span,
-                $"'{function.Name}' takes {expected}{(function.IsVariadic ? " or more" : "")} " +
-                $"argument{(expected == 1 ? "" : "s")}, but {Given(arguments.Count)}");
+            diagnostics.Error("SL0601", syntax.Span,
+                $"the call to '{function.Name}' does not fit: " +
+                (why ?? "the names do not match its parameters"));
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // This is the one place every ordinary call passes through, so it is
-        // where the names are turned back into positions -- everything after
-        // it sees an argument list in the order the parameters are declared.
-        var written = syntax.Arguments;
+        var (ordered, spans) = Arrange(
+            function, parameters, arguments, syntax.Arguments, map, syntax.Span);
 
-        if (HasNames(written))
-        {
-            var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
-            int[]? order = OrderFor(parameters, written, out string? why);
-
-            if (order is null)
-            {
-                diagnostics.Error("SL0601", syntax.Span,
-                    $"the call to '{function.Name}' does not fit: " +
-                    (why ?? "the names do not match its parameters"));
-                return new BoundErrorExpression(syntax.Span);
-            }
-
-            (arguments, var reordered) = InDeclaredOrder(arguments, written, order);
-            written = reordered;
-        }
-
-        var converted = ConvertArguments(function, arguments, written);
+        var converted = ConvertArguments(function, ordered, spans);
         return new BoundCall(syntax.Span, function, receiver, converted)
             { IsNonVirtual = nonVirtual };
     }
 
     private List<BoundExpression> ConvertArguments(
-        FunctionSymbol function, List<BoundExpression> arguments, IReadOnlyList<ExpressionSyntax> syntax)
+        FunctionSymbol function, List<BoundExpression> arguments, IReadOnlyList<SourceSpan> spans)
     {
         var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
         var result = new List<BoundExpression>(arguments.Count);
 
         for (int i = 0; i < arguments.Count; i++)
         {
-            var span = i < syntax.Count ? syntax[i].Span : arguments[i].Span;
+            var span = i < spans.Count ? spans[i] : arguments[i].Span;
 
             if (i >= parameters.Count)
             {
@@ -1207,7 +1197,11 @@ public sealed partial class Binder
         // agree about what is possible.
         if (PromotedToOptional(argument, target) is not null) return true;
 
-        return ClassifyConversion(argument.Type, target, explicitCast: false) is not null;
+        if (ClassifyConversion(argument.Type, target, explicitCast: false) is not null) return true;
+
+        // A declared conversion makes an argument fit, so that overload
+        // resolution and the conversion itself agree about what is possible.
+        return HasUserConversion(argument, target);
     }
 
     /// <summary>
@@ -1321,20 +1315,24 @@ public sealed partial class Binder
         FunctionSymbol candidate, List<BoundExpression> arguments,
         IReadOnlyList<ExpressionSyntax>? written = null)
     {
-        int expected = candidate.Parameters.Count(p => !p.IsThis);
-        if (candidate.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
+        var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        int required = parameters.Count(p => !p.IsOptional);
+
+        if (candidate.IsVariadic
+                ? arguments.Count < parameters.Count
+                : arguments.Count < required || arguments.Count > parameters.Count)
             return false;
 
-        var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
-
         // A name may put the arguments in a different order for this candidate
-        // than for the last one, so the permutation is worked out per candidate
-        // rather than once.
-        int[]? order = OrderFor(parameters, written, out _);
-        if (written is not null && HasNames(written) && order is null) return false;
+        // than for the last one, and a default may fill a different hole, so
+        // the mapping is worked out per candidate rather than once.
+        int[]? map = MapArguments(
+            parameters, arguments.Count, written, candidate.IsVariadic, out _);
+
+        if (map is null) return false;
 
         for (int i = 0; i < parameters.Count; i++)
-            if (!ArgumentFits(arguments[order is null ? i : order[i]], parameters[i]))
+            if (map[i] >= 0 && !ArgumentFits(arguments[map[i]], parameters[i]))
                 return false;
 
         return true;
@@ -1371,22 +1369,60 @@ public sealed partial class Binder
         written is not null && written.Any(a => a is NamedArgumentSyntax);
 
     /// <summary>
-    /// Which argument fills each parameter, or null when the names do not fit.
+    /// Whether this many arguments could fill these parameters at all.
+    ///
+    /// A range rather than a number, now that a parameter may have a default:
+    /// what a call must supply is the ones that have none, and those are the
+    /// front of the list.
+    /// </summary>
+    private bool CheckArity(
+        string name, IReadOnlyList<ParameterSymbol> parameters, int given, bool isVariadic,
+        SourceSpan span)
+    {
+        int total = parameters.Count;
+        int required = parameters.Count(p => !p.IsOptional);
+
+        if (isVariadic ? given >= total : given >= required && given <= total) return true;
+
+        string wanted = isVariadic
+            ? $"{total} or more arguments"
+            : required == total
+                ? Counted(total, "argument")
+                : $"{required} to {total} arguments";
+
+        diagnostics.Error("SL0260", span, $"'{name}' takes {wanted}, but {Given(given)}");
+        return false;
+    }
+
+    /// <summary>
+    /// Which argument fills each parameter, with -1 where the parameter's own
+    /// default fills it. Null when the call cannot be made to fit.
     ///
     /// Positional arguments fill from the left, and each named one goes to the
     /// parameter it names. The result is indexed by parameter, so a caller
     /// permutes with it rather than reasoning about the order itself.
     /// </summary>
-    private static int[]? OrderFor(
+    private static int[]? MapArguments(
         IReadOnlyList<ParameterSymbol> parameters,
+        int given,
         IReadOnlyList<ExpressionSyntax>? written,
+        bool isVariadic,
         out string? why)
     {
         why = null;
-        if (!HasNames(written)) return null;
 
         var order = new int[parameters.Count];
         Array.Fill(order, -1);
+
+        // Nothing named: they fill from the left, and whatever is past the end
+        // is a C variadic's.
+        if (!HasNames(written))
+        {
+            if (given > parameters.Count && !isVariadic) return null;
+
+            for (int i = 0; i < given && i < parameters.Count; i++) order[i] = i;
+            return Complete(parameters, order, out why) ? order : null;
+        }
 
         bool naming = false;
 
@@ -1428,38 +1464,69 @@ public sealed partial class Binder
             order[at] = i;
         }
 
-        for (int p = 0; p < parameters.Count; p++)
-            if (order[p] < 0)
-            {
-                why = $"nothing was given for '{parameters[p].Name}'";
-                return null;
-            }
-
-        return order;
+        return Complete(parameters, order, out why) ? order : null;
     }
 
     /// <summary>
-    /// The arguments and the syntax that wrote them, in the order the
-    /// parameters are declared.
+    /// Whether every parameter is accounted for: either something was given
+    /// for it, or it has a default to fall back on.
     /// </summary>
-    private static (List<BoundExpression> Arguments, List<ExpressionSyntax> Written) InDeclaredOrder(
-        List<BoundExpression> arguments, IReadOnlyList<ExpressionSyntax> written, int[] order)
+    private static bool Complete(
+        IReadOnlyList<ParameterSymbol> parameters, int[] order, out string? why)
     {
-        var values = new List<BoundExpression>(order.Length);
-        var spans = new List<ExpressionSyntax>(order.Length);
+        why = null;
 
-        foreach (int from in order)
+        for (int p = 0; p < parameters.Count; p++)
+            if (order[p] < 0 && !parameters[p].IsOptional)
+            {
+                why = $"nothing was given for '{parameters[p].Name}'";
+                return false;
+            }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The arguments in declared order, each with the span to report against,
+    /// and every parameter the call left out filled in from its default.
+    ///
+    /// The default expression is shared between every call site that omitted
+    /// it. That is sound because it is a constant -- which is the whole reason
+    /// a default must be one.
+    /// </summary>
+    private (List<BoundExpression> Arguments, List<SourceSpan> Spans) Arrange(
+        FunctionSymbol function,
+        IReadOnlyList<ParameterSymbol> parameters,
+        List<BoundExpression> arguments,
+        IReadOnlyList<ExpressionSyntax>? written,
+        int[] map,
+        SourceSpan callSpan)
+    {
+        var values = new List<BoundExpression>(map.Length);
+        var spans = new List<SourceSpan>(map.Length);
+
+        for (int p = 0; p < map.Length; p++)
         {
-            values.Add(arguments[from]);
-            spans.Add(written[from]);
+            if (map[p] < 0)
+            {
+                values.Add(EnsureDefault(function, parameters[p])
+                           ?? new BoundErrorExpression(callSpan));
+                spans.Add(callSpan);
+                continue;
+            }
+
+            values.Add(arguments[map[p]]);
+            spans.Add(written is not null && map[p] < written.Count
+                ? written[map[p]].Span
+                : arguments[map[p]].Span);
         }
 
         // Anything past the declared parameters is a C variadic's, and those
         // are positional by construction.
-        for (int i = order.Length; i < arguments.Count; i++)
+        for (int i = parameters.Count; i < arguments.Count; i++)
         {
             values.Add(arguments[i]);
-            spans.Add(written[i]);
+            spans.Add(written is not null && i < written.Count ? written[i].Span : arguments[i].Span);
         }
 
         return (values, spans);
@@ -1498,25 +1565,21 @@ public sealed partial class Binder
                     // A name that does not fit is the whole story; reporting a
                     // type mismatch on top of it would be reporting the
                     // consequence rather than the cause.
-                    if (HasNames(written))
+                    int[]? map = MapArguments(
+                        parameters, arguments.Count, written, only.IsVariadic, out string? why);
+
+                    if (map is null && why is not null && HasNames(written))
                     {
-                        _ = OrderFor(parameters, written, out string? why);
-                        if (why is not null)
-                        {
-                            diagnostics.Error("SL0601", span,
-                                $"the call to '{name}' does not fit: {why}");
-                            return null;
-                        }
+                        diagnostics.Error("SL0601", span,
+                            $"the call to '{name}' does not fit: {why}");
+                        return null;
                     }
 
-                    if (only.IsVariadic ? arguments.Count < expected : arguments.Count != expected)
-                        diagnostics.Error("SL0260", span,
-                            $"'{name}' takes {expected}{(only.IsVariadic ? " or more" : "")} " +
-                            $"argument{(expected == 1 ? "" : "s")}, but {Given(arguments.Count)}");
-                    else
+                    if (CheckArity(name, parameters, arguments.Count, only.IsVariadic, span))
                         for (int i = 0; i < parameters.Count; i++)
-                            if (!ArgumentFits(arguments[i], parameters[i]))
-                                ReportArgumentMode(name, i, arguments[i], parameters[i]);
+                            if (map is not null && map[i] >= 0 &&
+                                !ArgumentFits(arguments[map[i]], parameters[i]))
+                                ReportArgumentMode(name, i, arguments[map[i]], parameters[i]);
                     return null;
                 }
 

@@ -118,7 +118,10 @@ public sealed partial class Binder
         }
 
         if (function.Kind == FunctionKind.Constructor)
+        {
+            body = WithFieldInitializers(function, body);
             body = WithBaseConstruction(function, body);
+        }
 
         if (!function.ReturnType.IsVoid() && !function.ReturnType.IsError() && !AlwaysReturns(body))
             diagnostics.Error("SL0217", function.Span,
@@ -176,6 +179,87 @@ public sealed partial class Binder
 
     /// <summary>Set while binding a constructor whose source wrote its own chain.</summary>
     private bool _boundExplicitChain;
+
+    /// <summary>
+    /// Puts the field initializers at the head of a constructor, in the order
+    /// they were declared.
+    ///
+    /// <para>
+    /// <b>After the base construction and before the body.</b> A field
+    /// initializer may not read anything -- it is bound with <c>this</c> out of
+    /// reach -- so nothing in it can see whether the base has run; what the
+    /// order buys is that the constructor's own body has the last word, which
+    /// is what somebody writing <c>Width = width;</c> beside <c>int Width =
+    /// 80;</c> means.
+    /// </para>
+    ///
+    /// <para>
+    /// <b>Not in a constructor that chains to <c>this(...)</c>.</b> The one it
+    /// delegates to runs them, and running them again would undo whatever that
+    /// constructor had decided. It is the same rule C# keeps, for the same
+    /// reason as the base chain's.
+    /// </para>
+    ///
+    /// <para>
+    /// The initializers of a base class are not here either: the base's own
+    /// constructor runs them, and that call is what this constructor starts
+    /// with.
+    /// </para>
+    /// </summary>
+    private BoundBlock WithFieldInitializers(FunctionSymbol constructor, BoundBlock body)
+    {
+        if (constructor.ContainingType is not ClassTypeSymbol classType) return body;
+        if (_delegated.ContainsKey(constructor)) return body;
+
+        var initialized = classType.Fields
+            .Where(f => f.InitializerSyntax is not null)
+            .ToList();
+
+        if (initialized.Count == 0) return body;
+
+        var self = constructor.Parameters[0];
+        var savedScope = _currentScope;
+        var statements = new List<BoundStatement>();
+
+        foreach (var field in initialized)
+        {
+            // Bound against the file the *field* was written in, which is not
+            // necessarily this constructor's: a type may be declared across
+            // files, and a name means what it meant where it was written.
+            if (field.InitializerScope is not null) _currentScope = field.InitializerScope;
+
+            var written = field.InitializerSyntax!;
+
+            // With `this` out of reach, so an initializer cannot read a field
+            // that has not been given its value yet -- the mistake C# also
+            // refuses, and the reason it refuses it.
+            _initializingField = true;
+            _reportedFieldInitializerReach = false;
+            var value = BindConversion(BindExpression(written), field.Type, written.Span);
+            _initializingField = false;
+
+            var target = new BoundFieldAccess(
+                written.Span, new BoundThis(written.Span, classType, self), field);
+
+            statements.Add(new BoundExpressionStatement(
+                written.Span, new BoundAssignment(written.Span, target, value)));
+        }
+
+        _currentScope = savedScope;
+
+        // After an explicit `base(...)` or the chain check would move it; the
+        // implicit one is prepended after this runs.
+        int at = _boundExplicitChain && body.Statements.Count > 0 ? 1 : 0;
+
+        return new BoundBlock(body.Span,
+            [.. body.Statements.Take(at), .. statements, .. body.Statements.Skip(at)]);
+    }
+
+    /// <summary>
+    /// Set while a field initializer is being bound, which is the one place
+    /// <c>this</c> is out of reach inside a constructor.
+    /// </summary>
+    private bool _initializingField;
 
     /// <summary>
     /// <c>base(args)</c> at the head of a constructor: run the base's
@@ -1128,17 +1212,34 @@ public sealed partial class Binder
                 }
                 else if (type is LambdaType)
                 {
-                    // A lambda has no type of its own -- it becomes whatever it
-                    // is assigned to -- and `var` is the one place with nothing
-                    // to tell it what that is. Without this the declaration
-                    // bound cleanly and emitted `store ptr 0`, which clang
-                    // rejected as a compiler bug rather than as this mistake.
-                    diagnostics.Error("SL0553", syntax.Initializer.Span,
-                        $"'{syntax.Name}' cannot be a 'var': a lambda has no type of its own " +
-                        "and becomes what it is assigned to, so there is nothing here to infer " +
-                        "from. Write the type out -- a delegate, or an interface with exactly " +
-                        "one method");
-                    type = ErrorTypeSymbol.Instance;
+                    // A lambda that wrote its parameter types out has said
+                    // everything but its result, and binding the body answers
+                    // that -- so it has a type of its own and `var` can hold
+                    // it. One that did not has nothing to infer from, and
+                    // without this the declaration bound cleanly and emitted
+                    // `store ptr 0`, which clang rejected as a compiler bug
+                    // rather than as this mistake.
+                    var written = ((BoundLambda)initializer).Syntax;
+
+                    if (NaturalClosureType(written) is { } natural)
+                    {
+                        type = natural;
+                        initializer = BindConversion(initializer, natural, syntax.Initializer.Span);
+                    }
+                    else
+                    {
+                        diagnostics.Error("SL0553", syntax.Initializer.Span,
+                            $"'{syntax.Name}' cannot be a 'var': " +
+                            (written.Expression is null
+                                ? "a lambda with a block body takes its result from what its " +
+                                  "'return's agree on, and that is decided by the type it is " +
+                                  "becoming rather than the other way round. Write the type " +
+                                  "out, or make the body one expression"
+                                : "this lambda does not say what its parameters are, so there " +
+                                  "is nothing here to infer from. Write them -- " +
+                                  "'(int x) => x * 2' -- or write the type out"));
+                        type = ErrorTypeSymbol.Instance;
+                    }
                 }
                 else if (type is FunctionGroupType)
                 {

@@ -66,6 +66,8 @@ public sealed partial class Binder
         ThisSyntax thisExpression => BindThis(thisExpression),
         BaseSyntax baseExpression => BindBaseValue(baseExpression),
         TypeTestSyntax typeTest => BindTypeTest(typeTest),
+        AsCastSyntax asCast => BindAsCast(asCast),
+        SwitchExpressionSyntax chosen => BindSwitchExpression(chosen),
         UnarySyntax unary => BindUnary(unary),
         IncrementSyntax increment => BindIncrement(increment),
         NameofSyntax nameOf => BindNameof(nameOf),
@@ -466,6 +468,8 @@ public sealed partial class Binder
         // wrote.
         if (_closures.Count > 0) return CaptureThis(_closures.Count - 1, syntax.Span);
 
+        ReportReachingTheObject(syntax.Span);
+
         var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
         if (parameter is null)
         {
@@ -759,6 +763,129 @@ public sealed partial class Binder
         return new BoundLocalAccess(syntax.Value.Span, held);
     }
 
+    /// <summary>
+    /// <c>x as C</c>: the same question <c>is</c> asks, answered with a value.
+    ///
+    /// The result is a <c>C?</c>, which is what makes this worth having beside
+    /// <c>is C c</c>: an answer that is a value can be passed on, stored, or
+    /// given a fallback with <c>??</c>, where a branch can only be entered.
+    ///
+    /// It is the test and the reference it proved, with nothing else in it. The
+    /// value is held in a <see cref="BoundLet"/> so that <c>Parent() as Frame</c>
+    /// calls <c>Parent</c> once, and the arm the test allows is the identical
+    /// pointer under the type the test bought -- no second check, because
+    /// unlike the cast in <c>is C c</c> this one is built here rather than
+    /// asked for through <see cref="ClassifyConversion"/>.
+    ///
+    /// A conversion that cannot fail does not get a test at all: <c>derived as
+    /// Base</c> is the ordinary widening and emits nothing.
+    /// </summary>
+    private BoundExpression BindAsCast(AsCastSyntax syntax)
+    {
+        var value = BindExpression(syntax.Value);
+        if (value.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        // `x as C?` asks for what `as` already answers. Caught on the syntax,
+        // before it resolves to the very type this would return.
+        if (syntax.Tested is NullableTypeSyntax written)
+        {
+            var span = written.Element.Span;
+            diagnostics.Error("SL0612", syntax.Tested.Span,
+                "'as' answers with an optional already, so the '?' says it twice; write " +
+                $"'as {span.File.Text[span.Start..span.End]}'");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (value.Type is VariantTypeSymbol asked)
+        {
+            diagnostics.Error("SL0612", syntax.Span,
+                $"'{asked.Name}' is a variant, and which case it holds is asked with 'is' or " +
+                "a 'switch'; 'as' is for an object that may or may not be of some class");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (value.Type is WeakTypeSymbol)
+        {
+            diagnostics.Error("SL0612", syntax.Span,
+                $"'{value.Type.Name}' may already have died, so what it is cannot be asked " +
+                "directly; read it into an optional first, which is the check that makes it " +
+                "safe to look at");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var tested = ResolveType(syntax.Tested, _currentScope!);
+        if (tested.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (tested is not NamedTypeSymbol { IsReferenceType: true } wanted)
+        {
+            diagnostics.Error("SL0612", syntax.Tested.Span,
+                $"'{tested.Name}' is not a class or an interface, so 'as' has nothing to ask " +
+                "and nothing to answer null with: every other type is known exactly where it " +
+                "is written");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // A COM object answers for itself, and answers again. `(I)x` is the one
+        // spelling of that question, for the reason a binding `is` gives: two
+        // QueryInterface calls are two answers, and this would need both.
+        if (wanted is ComInterfaceTypeSymbol || value.Type.AsReference() is ComInterfaceTypeSymbol)
+        {
+            diagnostics.Error("SL0612", syntax.Span,
+                $"a QueryInterface for '{wanted.Name}' is a call the object answers, so 'as' " +
+                $"would ask it twice; cast it instead, as '({wanted.Name})...', which asks once " +
+                "and ends the program if the answer was no");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (value.Type.AsReference() is not NamedTypeSymbol subject)
+        {
+            diagnostics.Error("SL0612", syntax.Span,
+                $"'as' asks what an object really is, and '{value.Type.Name}' is not a " +
+                "reference to one");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var result = new OptionalTypeSymbol(wanted);
+
+        // Nothing to ask: every one of these already is one of those, so this
+        // is the ordinary widening and the null arm would be unreachable.
+        if (ClassifyConversion(value.Type, result, explicitCast: false) is not null)
+            return BindConversion(value, result, syntax.Span);
+
+        // And nothing to ask the other way either: no object is ever both.
+        if (subject is ClassTypeSymbol subjectClass && wanted is ClassTypeSymbol wantedClass &&
+            !wantedClass.DerivesFrom(subjectClass))
+        {
+            diagnostics.Error("SL0612", syntax.Span,
+                $"no object is both a '{subjectClass.Name}' and a '{wantedClass.Name}': " +
+                "neither derives from the other, so this would always be null");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (subject is ClassTypeSymbol sealedSubject && wanted is InterfaceTypeSymbol contract &&
+            !CouldImplement(sealedSubject, contract))
+        {
+            diagnostics.Error("SL0612", syntax.Span,
+                $"'{sealedSubject.Name}' is sealed and does not implement '{contract.Name}', " +
+                "so this would always be null");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // Read once, asked once, and the arm the test allows is that same
+        // pointer. The local borrows: whatever made the value is a temporary
+        // the statement will drop, and this only reads it in the meantime.
+        var held = new LocalSymbol(SyntheticName("as"), value.Type, isConst: true);
+        var reading = new BoundLocalAccess(syntax.Value.Span, held);
+
+        var body = new BoundConditional(
+            syntax.Span, result,
+            new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, reading, wanted),
+            new BoundConversion(syntax.Span, result, reading, ConversionKind.TestedReference),
+            new BoundNullLiteral(syntax.Span, result));
+
+        return new BoundLet(syntax.Span, held, value, body);
+    }
+
     private BoundExpression BindName(NameSyntax syntax)
     {
         var parts = syntax.Name.Parts;
@@ -853,9 +980,40 @@ public sealed partial class Binder
 
     private BoundExpression? BindImplicitThis(SourceSpan span)
     {
+        ReportReachingTheObject(span);
+
         var parameter = _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis);
         return parameter is null ? null : Receiver(span, parameter);
     }
+
+    /// <summary>
+    /// Refuses a reach for the object from inside a field initializer, and says
+    /// why.
+    ///
+    /// The object is not built yet. A field initializer runs before the
+    /// constructor's body and in the order the fields were declared, so a
+    /// member read here would be whatever the allocation left -- zero -- for
+    /// every field below it, and the reader would have no way to see which.
+    /// C# refuses the same thing for the same reason.
+    /// </summary>
+    private void ReportReachingTheObject(SourceSpan span)
+    {
+        if (!_initializingField || _reportedFieldInitializerReach) return;
+
+        _reportedFieldInitializerReach = true;
+
+        diagnostics.Error("SL0617", span,
+            "a field initializer cannot read the object it belongs to: it runs before the " +
+            "constructor's body, in declaration order, so what it would read is whatever the " +
+            "allocation left. A constructor is where one field's value can depend on another");
+    }
+
+    /// <summary>
+    /// Whether the initializer being bound has already been told. Binding
+    /// carries on after the message so that the rest of the expression is
+    /// bound normally, and one mistake stays one diagnostic.
+    /// </summary>
+    private bool _reportedFieldInitializerReach;
 
     private BoundExpression BindUnary(UnarySyntax syntax)
     {

@@ -98,6 +98,12 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
+        // A conversion the program declared, which is a call rather than a
+        // kind. Asked after everything built in, so nothing anyone writes can
+        // change what an existing conversion means.
+        if (UserConversion(expression, target, allowExplicit: false, span) is { } converted)
+            return converted;
+
         var kind = ClassifyConversion(expression.Type, target, explicitCast: false);
         if (kind is null)
         {
@@ -134,6 +140,86 @@ public sealed partial class Binder
 
         return new BoundConversion(span, target, expression, kind.Value);
     }
+
+    /// <summary>
+    /// The call a declared conversion operator would make, or null when there
+    /// is no such conversion.
+    ///
+    /// Both types are asked, because either may declare it: <c>Money</c> owns
+    /// both <c>long -&gt; Money</c> and <c>Money -&gt; long</c>, and a program
+    /// reading either one looks at <c>Money</c> to find out what it does.
+    ///
+    /// <b>One conversion, and no chain.</b> The value has to be exactly what
+    /// the operator takes -- with the single exception of a literal, which
+    /// adopts the source type the way it adopts any other (<c>Money m = 5;</c>
+    /// where the operator takes a <c>long</c>). Anything else stays an error
+    /// naming the cast that would fix it. C# composes a standard conversion
+    /// with a user-defined one and gets rules nobody can hold in their head;
+    /// what is here instead is a rule that fits in a sentence.
+    /// </summary>
+    private BoundExpression? UserConversion(
+        BoundExpression expression, TypeSymbol target, bool allowExplicit, SourceSpan span)
+    {
+        if (expression.Type.IsError() || target.IsError()) return null;
+        if (expression.Type.Equals(target)) return null;
+
+        var candidates = FindUserConversions(expression, target, allowExplicit);
+
+        if (candidates.Count == 0) return null;
+
+        if (candidates.Count > 1)
+        {
+            diagnostics.Error("SL0616", span,
+                $"two conversions turn '{expression.Type.Name}' into '{target.Name}', and " +
+                "nothing here says which was meant; one of them belongs somewhere else");
+            return new BoundErrorExpression(span);
+        }
+
+        var chosen = candidates[0];
+        var argument = BindConversion(expression, chosen.Parameters[0].Type, span);
+
+        return new BoundCall(span, chosen, receiver: null, [argument]);
+    }
+
+    /// <summary>
+    /// Every declared conversion that could carry this value to that type.
+    ///
+    /// More than one is the program's mistake rather than a preference to be
+    /// resolved, so nothing here ranks them; the caller reports it.
+    /// </summary>
+    private List<FunctionSymbol> FindUserConversions(
+        BoundExpression expression, TypeSymbol target, bool allowExplicit)
+    {
+        var candidates = new List<FunctionSymbol>();
+
+        foreach (var type in new[] { expression.Type, target })
+        {
+            if (type is not NamedTypeSymbol named) continue;
+
+            foreach (var conversion in named.Conversions)
+            {
+                if (!conversion.ReturnType.Equals(target)) continue;
+                if (!allowExplicit && !conversion.IsImplicitConversion) continue;
+
+                var wanted = conversion.Parameters[0].Type;
+
+                if (!expression.Type.Equals(wanted) && !ConstantFits(expression, wanted))
+                    continue;
+
+                if (!candidates.Contains(conversion)) candidates.Add(conversion);
+            }
+        }
+
+        return candidates;
+    }
+
+    /// <summary>
+    /// Whether a declared conversion could take this value to that type. Asked
+    /// by overload resolution, which decides whether a call is possible before
+    /// it decides what it means.
+    /// </summary>
+    private bool HasUserConversion(BoundExpression expression, TypeSymbol target) =>
+        FindUserConversions(expression, target, allowExplicit: false).Count > 0;
 
     /// <summary>
     /// Resolves a bare function name against the delegate it is being stored in.
@@ -460,6 +546,18 @@ public sealed partial class Binder
             return to is PointerTypeSymbol or OptionalTypeSymbol or WeakTypeSymbol or DelegateTypeSymbol
                 ? ConversionKind.NullToReference
                 : null;
+
+        // Two closure types of the same signature are the same two words, and
+        // one of them may be the type a lambda was given rather than one
+        // anybody declared. Nothing is emitted: the layout is identical, and
+        // so is the reference walk that counts the receiver.
+        if (from is ClosureTypeSymbol fromClosure && to is ClosureTypeSymbol toClosure &&
+            fromClosure.ReturnType.Equals(toClosure.ReturnType) &&
+            fromClosure.Signature.Count == toClosure.Signature.Count &&
+            !fromClosure.Signature.Where(
+                (p, i) => !p.Type.Equals(toClosure.Signature[i].Type) ||
+                          p.Mode != toClosure.Signature[i].Mode).Any())
+            return ConversionKind.Identity;
 
         // The whole of an array, as a slice of it.
         if (from is ArrayTypeSymbol whole && to is SliceTypeSymbol asSlice)

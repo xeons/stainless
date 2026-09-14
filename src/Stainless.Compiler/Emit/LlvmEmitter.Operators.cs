@@ -57,6 +57,10 @@ public sealed partial class LlvmEmitter
             // store through sl_weak_retain instead of sl_retain. The value
             // itself is the same pointer either way.
             case ConversionKind.ReferenceToWeak:
+
+            // `x as C`, in the arm where the test said yes. The pointer is the
+            // one that went in, and what the test bought is the type.
+            case ConversionKind.TestedReference:
                 // An interface reference is the very same pointer; the vtable is
                 // reached through the object's TypeInfo, not carried alongside it.
                 return new Val(operand.Ref, to, conversion.Type);

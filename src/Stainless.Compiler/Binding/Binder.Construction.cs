@@ -132,6 +132,12 @@ public sealed partial class Binder
         var kind = ClassifyConversion(operand.Type, targetType, explicitCast: true);
         if (kind is null)
         {
+            // A cast runs a declared conversion of either word: writing the
+            // cast is never wrong, and for an explicit one it is the only
+            // spelling there is.
+            if (UserConversion(operand, targetType, allowExplicit: true, syntax.Span) is { } converted)
+                return converted;
+
             diagnostics.Error("SL0243", syntax.Span,
                 $"cannot convert '{operand.Type.Name}' to '{targetType.Name}'");
             return new BoundErrorExpression(syntax.Span);
@@ -204,7 +210,9 @@ public sealed partial class Binder
             // A class with no way to run one reported that where it was
             // declared, so nothing is said again here.
             TryImplicitBaseConstructor(classType, out var inherited);
-            return new BoundNew(syntax.Span, classType, inherited, []);
+
+            return WithObjectInitializer(
+                syntax, classType, new BoundNew(syntax.Span, classType, inherited, []));
         }
 
         var constructor = ResolveOverload(
@@ -221,27 +229,179 @@ public sealed partial class Binder
                 "the ones it declares belong to its own module. There is usually a " +
                 "function that makes one and says what went wrong if it could not");
 
-        var written = syntax.Arguments;
+        var parameters = constructor.Parameters.Where(p => !p.IsThis).ToList();
 
-        if (HasNames(written))
+        int[]? map = MapArguments(
+            parameters, arguments.Count, syntax.Arguments, constructor.IsVariadic, out string? why);
+
+        if (map is null)
         {
-            var parameters = constructor.Parameters.Where(p => !p.IsThis).ToList();
-            int[]? order = OrderFor(parameters, written, out string? why);
+            diagnostics.Error("SL0601", syntax.Span,
+                $"'new {classType.Name}' does not fit: " +
+                (why ?? "the names do not match its parameters"));
+            return new BoundErrorExpression(syntax.Span);
+        }
 
-            if (order is null)
+        var (ordered, spans) = Arrange(
+            constructor, parameters, arguments, syntax.Arguments, map, syntax.Span);
+
+        var converted = ConvertArguments(constructor, ordered, spans);
+
+        return WithObjectInitializer(
+            syntax, classType, new BoundNew(syntax.Span, classType, constructor, converted));
+    }
+
+    /// <summary>
+    /// <c>new Panel { Width = 3 }</c> and <c>new List&lt;int&gt; { 1, 2 }</c>:
+    /// the object, and the writes or additions the braces asked for.
+    ///
+    /// <para>
+    /// It lowers to exactly what it is short for -- the construction held in a
+    /// name, then one write or one <c>Add</c> per entry, then the name. So
+    /// nothing here can do what the written-out form could not, which is the
+    /// property worth having: an initializer is a way of writing, and not a
+    /// second way of building.
+    /// </para>
+    ///
+    /// <para>
+    /// <b>Which kind it is comes from the entries.</b> Named ones write members
+    /// and bare ones are added, and the two may not be mixed: a brace list that
+    /// did both would be two different things at once, and the reader would
+    /// have to look at the type to see which each entry was.
+    /// </para>
+    ///
+    /// <para>
+    /// <c>Add</c> is found <b>by name rather than by interface</b>, which is
+    /// the rule <c>foreach</c> already keeps for <c>GetEnumerator</c>: a type
+    /// can be built up this way without <c>Standard.Collections</c> appearing
+    /// anywhere in the program.
+    /// </para>
+    /// </summary>
+    private BoundExpression WithObjectInitializer(
+        NewSyntax syntax, ClassTypeSymbol classType, BoundExpression creation)
+    {
+        if (syntax.Initializer is not { } initializer) return creation;
+
+        if (initializer.Entries.Count == 0) return creation;
+
+        bool named = initializer.Entries[0].Name is not null;
+
+        foreach (var entry in initializer.Entries)
+            if (entry.Name is not null != named)
             {
-                diagnostics.Error("SL0601", syntax.Span,
-                    $"'new {classType.Name}' does not fit: " +
-                    (why ?? "the names do not match its parameters"));
+                diagnostics.Error("SL0618", entry.Span,
+                    named
+                        ? "this entry has no name, and the ones before it write members; a " +
+                          "brace list either writes members or adds elements, and cannot be " +
+                          "half of each"
+                        : "this entry names a member, and the ones before it are elements to " +
+                          "add; a brace list either writes members or adds elements, and " +
+                          "cannot be half of each");
                 return new BoundErrorExpression(syntax.Span);
             }
 
-            (arguments, var reordered) = InDeclaredOrder(arguments, written, order);
-            written = reordered;
+        // Held in a name, because every entry works on the same object and the
+        // construction may not be evaluated again.
+        var held = new LocalSymbol(SyntheticName("made"), classType, isConst: true);
+        var reading = new BoundLocalAccess(syntax.Span, held);
+
+        var writes = new List<BoundExpression>();
+
+        foreach (var entry in initializer.Entries)
+        {
+            var written = named
+                ? BindMemberInitializer(classType, reading, entry)
+                : BindElementAddition(classType, reading, entry);
+
+            if (written is null) return new BoundErrorExpression(syntax.Span);
+            writes.Add(written);
         }
 
-        var converted = ConvertArguments(constructor, arguments, written);
-        return new BoundNew(syntax.Span, classType, constructor, converted);
+        return new BoundLet(syntax.Span, held, creation,
+            new BoundSequence(syntax.Span, writes, reading));
+    }
+
+    /// <summary>
+    /// <c>Name = value</c>: the write it is short for, against the object just
+    /// made. A property goes through its setter, as it does anywhere else.
+    /// </summary>
+    private BoundExpression? BindMemberInitializer(
+        ClassTypeSymbol classType, BoundExpression receiver, InitializerEntrySyntax entry)
+    {
+        string name = entry.Name!;
+
+        if (classType.FindProperty(name) is { } property)
+        {
+            if (property.Setter is null)
+            {
+                diagnostics.Error("SL0618", entry.NameSpan,
+                    $"'{classType.Name}.{name}' has no setter, so there is nothing here to " +
+                    "write; a brace list writes members the way an assignment does");
+                return null;
+            }
+
+            if (!CanReach(property.IsPublic, property.IsProtected, property.ContainingType))
+            {
+                diagnostics.Error("SL0249", entry.NameSpan,
+                    NotVisible(property.ContainingType, name, property.IsProtected));
+                return null;
+            }
+
+            var value = BindConversion(BindExpression(entry.Value), property.Type, entry.Value.Span);
+            if (value.Type.IsError()) return null;
+
+            NoteMemberWritten(property);
+            return new BoundPropertyAssignment(entry.Span, receiver, property, value);
+        }
+
+        if (classType.FindField(name) is { IsBackingField: false } field)
+        {
+            if (!CanReach(field.IsPublic, field.IsProtected, field.ContainingType))
+            {
+                diagnostics.Error("SL0249", entry.NameSpan,
+                    NotVisible(field.ContainingType, name, field.IsProtected));
+                return null;
+            }
+
+            var value = BindConversion(BindExpression(entry.Value), field.Type, entry.Value.Span);
+            if (value.Type.IsError()) return null;
+
+            var target = new BoundFieldAccess(entry.NameSpan, receiver, field);
+            return new BoundAssignment(entry.Span, target, value);
+        }
+
+        diagnostics.Error("SL0618", entry.NameSpan,
+            $"'{classType.Name}' has no field or property named '{name}' to write");
+        return null;
+    }
+
+    /// <summary>
+    /// A bare entry: <c>Add(value)</c> on the object just made, found by name
+    /// the way <c>foreach</c> finds <c>GetEnumerator</c>.
+    /// </summary>
+    private BoundExpression? BindElementAddition(
+        ClassTypeSymbol classType, BoundExpression receiver, InitializerEntrySyntax entry)
+    {
+        var candidates = classType.FindMethods("Add").Where(m => !m.IsStatic).ToList();
+
+        if (candidates.Count == 0)
+        {
+            diagnostics.Error("SL0618", entry.Span,
+                $"'{classType.Name}' has no 'Add' method, so there is nothing for an element " +
+                "here to be added with; a brace list of values is a call to 'Add' per value");
+            return null;
+        }
+
+        var argument = BindExpression(entry.Value);
+        if (argument.Type.IsError()) return null;
+
+        var chosen = ResolveOverload(
+            candidates, [argument], entry.Span, $"{classType.Name}.Add");
+
+        if (chosen is null) return null;
+
+        var converted = ConvertArguments(chosen, [argument], [entry.Value.Span]);
+        return new BoundCall(entry.Span, chosen, receiver, converted);
     }
 
     /// <summary>

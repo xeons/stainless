@@ -106,6 +106,13 @@ last person to edit it -- the suite is the authority.
   value is evaluated once and the name is in scope where the test succeeded.
   Over a `C?` it asks about the null and the class at once, so
   `if (node.Next is Node n)` is the narrowing a field could not have
+- `as`, which asks what `is` asks and answers with a value: `x as C` is a `C?`,
+  so the answer can be passed on, stored, or given a fallback --
+  `(shape as INamed)?.Name() ?? "anonymous"`. The value is read once, the arm
+  the test allows is that same pointer with no second check, and a conversion
+  that cannot fail gets no test at all. What could only ever be null is a
+  mistake rather than a null (SL0612), and a COM interface is refused because
+  `QueryInterface` is a call that would be made twice
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
@@ -185,6 +192,48 @@ last person to edit it -- the suite is the authority.
   can check, and refusing would leave someone who knows better with nothing to
   do but write it untruthfully. `where T : threadsafe` is the strict form, and
   there it is an error, because the library author asked
+- Patterns, in a `case` label and in a `switch` expression: a constant, a
+  variant's case, a type, a range (`> 100`), `or`/`and`/`not`, `_`, and a
+  `when` on any of them. Each becomes the `bool` that asks it -- a comparison,
+  a tag test or an `is` -- so there is no matching machinery underneath. A
+  switch whose labels are all constants is still one LLVM `switch` and a jump
+  table; one with a pattern in it is a chain of tests
+- `switch` as an expression: `n switch { < 0 => "negative", _ => "large" }`,
+  which must be exhaustive (SL0620) because it has to produce a value and there
+  is no exception to throw at a value that matched nothing. It lowers to the
+  value held in a name and a conditional per arm
+- A lambda with written parameter types has a type of its own, so `var doubled
+  = (int x) => x * 2;` is a `closure int(int)` -- cached by signature, so two of
+  a shape are one type, and a declared `closure` of that shape is
+  interchangeable with them
+- Field and property initializers: `int Width = 80;` and `int W { get; set; }
+  = 80;`, run at the head of every constructor in declaration order. A class
+  that declares no constructor is given one to run them in; a constructor that
+  chains to `this(...)` does not run them again; and an initializer may not read
+  the object it belongs to (SL0617), because it runs before the constructor's
+  body and would be reading zeroes. A value type has no moment to run one at and
+  refuses it
+- Object and collection initializers: `new Panel { Title = "readme" }` and
+  `new List<int> { 1, 2, 3 }`, lowered to the construction held in a name, a
+  write or an `Add` per entry, and the name. `Add` is found by name rather than
+  by interface, as `foreach` finds `GetEnumerator`; named and bare entries may
+  not be mixed (SL0618)
+- Conversion operators: `public static implicit operator Money(long)` and its
+  `explicit` twin, written inside one of the two types they are between. The
+  word decides whether a cast has to be written, which puts a declared type into
+  the same system the built-in conversions are in. One conversion and no chain:
+  the value is exactly what the operator takes, except for a literal, which
+  adopts the source type as it does anywhere else. What is refused is anything a
+  reader could not find from the two types, and anything the language already
+  answers (SL0615)
+- Default values on parameters: `void Draw(String text, int width = 8)`, filled
+  in at the call from the declaration the caller can see. A constant is what one
+  may be (SL0613), the ones that may be left out are the tail of the list, and
+  exactly one declaration may give it -- an `override` may not restate a default
+  and neither may a method beside the interface method it implements (SL0614),
+  because a call reads the static type's declaration and two values would make
+  the same line mean two things. They cross a library boundary as the value they
+  folded to
 - Full operator set with C# precedence, short-circuit `&&` and `||`, and the
   conditional `a ? b : c`. The arithmetic C leaves undefined is defined here:
   a shift count is reduced modulo the operand's width as in C#, so `1 << 40` is
@@ -566,13 +615,14 @@ Being straight about the edges, roughly in the order they are worth adding:
   members are reachable from inside it and from a value of it, and a maker for
   one is written as a module-level generic function. Inside the type its own
   statics are named directly, as they are anywhere else.
-- **No `switch` expression, and the only pattern is a variant's case.** A
-  switch over a variant covers cases and may bind a payload; everywhere else
-  `switch` is the C# statement and only that. No type patterns, no constants
-  inside a case pattern, no guards, no `goto case`, and no exhaustiveness
-  requirement on an enum, whose value need not be one of its members.
-- **A lambda needs something to be.** It is typed by what it is assigned to, so
-  `var f = x => x;` has nothing to infer from and is refused (SL0553). Capture
+- **No `goto case`, and no exhaustiveness requirement on an enum**, whose value
+  need not be one of its members. A switch expression over one still needs a
+  `_` arm for that reason.
+- **A lambda with nothing written needs something to be.** One that writes its
+  parameter types out has a type of its own -- `var f = (int x) => x * 2;` is a
+  closure -- but `var f = x => x;` has nothing to infer from and is refused
+  (SL0553), and so is a block body, whose result is decided by the type it is
+  becoming. Capture
   is by value only, and a capturing lambda cannot become a `delegate` — a
   function pointer has nowhere to keep what was captured. A lambda that captures `this` keeps its object
   alive, so an object holding its own closure is a cycle; `weak` is how that is
@@ -612,10 +662,8 @@ Being straight about the edges, roughly in the order they are worth adding:
   name is the other fix and reads better: `if (node.Payload is Circle c)` for a
   variant's case, `if (node.Next is Node n)` for a `C?` — the value is taken
   once, so there is nothing to prove about a second read.
-- **There is no `as`, and no covariant return.** `is C c` now covers the case
-  `as` is usually reached for; what is left is wanting the answer as a value
-  rather than as a branch. An override returns exactly what it overrides
-  (SL0502).
+- **There is no covariant return.** An override returns exactly what it
+  overrides (SL0502).
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
   about, so the same name and parameters means `override` or nothing (SL0503).
@@ -633,11 +681,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   single slot, so two of a name in one interface would be a call the receiver
   could not resolve. Methods on classes and structs overload freely, and a
   class may implement two interfaces whose methods share a name.
-- **A property is not initialized where it is declared.** `{ get; set; } = 5;`
-  is rejected for the same reason a field initializer is. `p.X += 1` also needs
-  a receiver that is a plain load, since the getter and the setter each
-  evaluate it. An indexer has no automatic form: `{ get; set; }` would have
-  nothing to find storage for.
+- **A property still evaluates its receiver twice under `+=`.** `p.X += 1`
+  needs a receiver that is a plain load, since the getter and the setter each
+  evaluate it. An indexer has no automatic form either: `{ get; set; }` would
+  have nothing to find storage for.
 - **The compiler prunes no dead code; the linker does.** Every stdlib module is
   compiled with your program whether or not it is imported, and only generics
   are free — an uninstantiated template emits nothing, but a non-generic
@@ -760,7 +807,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
   it. `String.Empty` is a static property rather than a field, because a
   `--shared` library has no entry point to initialize a static from
-- Field initializers are rejected — assign in a constructor.
 
 ---
 

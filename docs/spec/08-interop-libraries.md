@@ -309,7 +309,7 @@ destructors and events; structs, unions, enums, aliases and free functions; and
 two fields are the compiler's own, so the far side rebuilds them rather than
 reading them.
 
-A class from a library can also be **derived from** ([§2.4.1](02-types.md#241-inheritance)) and its events
+A class from a library can also be **derived from** ([§2.4.3](02-types.md#243-inheritance)) and its events
 **subscribed to** ([§2.14.2](02-types.md#2142-event--several-subscribers-behind-one-name)). Both work because what they need crosses: the
 dispatch table slot by slot, the destroy hook, and the protected members for the
 first; the closure type, the storage and the two subscription methods for the
@@ -405,7 +405,7 @@ own first method is slot 3. Extension is **single**: a COM vtable is one array
 and a reference is one pointer to it, so there is room for one chain (SL0530).
 A derived interface's table is its base's with its own methods appended, which
 is what makes an upcast free — the same property that makes a class upcast free
-([§2.4.1](02-types.md#241-inheritance)), arrived at from the table side rather than the object side.
+([§2.4.3](02-types.md#243-inheritance)), arrived at from the table side rather than the object side.
 
 `[Guid("...")]` is required (SL0537) and is understood by the compiler rather
 than stored as metadata: an IID is the interface's identity, not something a

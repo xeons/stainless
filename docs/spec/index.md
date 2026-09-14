@@ -72,8 +72,10 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
   - [2.2.3 `(int, String)` — a tuple](02-types.md#223-int-string--a-tuple)
 - [2.3 `[Packed]` and `[Align]`](02-types.md#23-packed-and-align)
 - [2.4 `class` — reference type, ARC managed](02-types.md#24-class--reference-type-arc-managed)
-  - [2.4.1 Inheritance](02-types.md#241-inheritance)
-  - [2.4.2 `is`, and casting down](02-types.md#242-is-and-casting-down)
+  - [2.4.1 A field with a value](02-types.md#241-a-field-with-a-value)
+  - [2.4.2 Making one with its members written out](02-types.md#242-making-one-with-its-members-written-out)
+  - [2.4.3 Inheritance](02-types.md#243-inheritance)
+  - [2.4.4 `is`, `as`, and casting down](02-types.md#244-is-as-and-casting-down)
 - [2.5 Pointers and nullability](02-types.md#25-pointers-and-nullability)
 - [2.6 `variant` — a value that is one of several things](02-types.md#26-variant--a-value-that-is-one-of-several-things)
 - [2.7 `union` — every member at offset zero](02-types.md#27-union--every-member-at-offset-zero)
@@ -148,15 +150,17 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 
 ### [7. Functions and members](07-functions-members.md)
 
-Functions, `ref`/`in`/`out`, named arguments, properties, operators, indexers and `static`.
+Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, indexers and `static`.
 
 - [7.1 Functions](07-functions-members.md#71-functions)
   - [7.1.1 `x.F(y)` is `F(x, y)`](07-functions-members.md#711-xfy-is-fx-y)
+  - [7.1.2 A parameter with a default](07-functions-members.md#712-a-parameter-with-a-default)
 - [7.2 `ref`, `in` and `out` parameters](07-functions-members.md#72-ref-in-and-out-parameters)
   - [7.2.1 `out`](07-functions-members.md#721-out)
   - [7.2.2 Named arguments](07-functions-members.md#722-named-arguments)
 - [7.3 Properties](07-functions-members.md#73-properties)
 - [7.4 Operators](07-functions-members.md#74-operators)
+  - [7.4.1 `implicit` and `explicit operator`](07-functions-members.md#741-implicit-and-explicit-operator)
 - [7.5 Indexers](07-functions-members.md#75-indexers)
 - [7.6 `static` members](07-functions-members.md#76-static-members)
 
@@ -176,6 +180,8 @@ Functions, `ref`/`in`/`out`, named arguments, properties, operators, indexers an
 `switch`, `parallel`, `const`, `foreach`, thread boundaries, `?.`, `default(T)`, `goto`, `nameof` and `checked`.
 
 - [9.1 `switch`](09-statements-expressions.md#91-switch)
+  - [9.1.1 Patterns](09-statements-expressions.md#911-patterns)
+  - [9.1.2 `switch` as an expression](09-statements-expressions.md#912-switch-as-an-expression)
 - [9.2 `parallel`, `spawn` and `parallel for`](09-statements-expressions.md#92-parallel-spawn-and-parallel-for)
 - [9.3 `const` and `static`](09-statements-expressions.md#93-const-and-static)
 - [9.4 `foreach`](09-statements-expressions.md#94-foreach)

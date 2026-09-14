@@ -322,6 +322,7 @@ public sealed class MetadataLoader(
             signature.Add(new ParameterSymbol(parameter.Name, parameterType, i)
             {
                 Mode = parameter.Mode,
+                Default = DefaultOf(parameter, parameterType),
             });
         }
 
@@ -555,10 +556,41 @@ public sealed class MetadataLoader(
                 new ParameterSymbol(parameter.Name, type, symbol.Parameters.Count)
                 {
                     Mode = parameter.Mode,
+                    Default = DefaultOf(parameter, type),
                 });
         }
 
         return symbol;
+    }
+
+    /// <summary>
+    /// A parameter's default, rebuilt as an expression this compilation can
+    /// write into a call site.
+    ///
+    /// It comes back with the parameter's own type rather than the one it was
+    /// written with, which is what a conversion would have given it anyway:
+    /// the library folded it to a value, and the value is what is left.
+    /// </summary>
+    private static BoundExpression? DefaultOf(MetadataParameter parameter, TypeSymbol type)
+    {
+        if (parameter.Default is not { } written) return null;
+
+        var span = ReferencedSpan;
+
+        return written.Kind switch
+        {
+            "bits" => new BoundLiteral(span, type, written.Bits),
+            "scalar" => new BoundLiteral(span, type, unchecked((int)(long)written.Bits)),
+            "bool" => new BoundLiteral(span, type, written.Bits != 0),
+            "number" => new BoundLiteral(span, type,
+                type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Float }
+                    ? (float)written.Number
+                    : written.Number),
+            "text" => new BoundStringLiteral(span, type, written.Text ?? ""),
+            "null" => new BoundNullLiteral(span, type),
+            "zero" => new BoundDefault(span, type),
+            _ => null,
+        };
     }
 
     /// <summary>

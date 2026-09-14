@@ -981,6 +981,13 @@ public sealed class Parser
     /// </summary>
     private Declaration ParseOperatorDeclaration(int start, Modifiers modifiers)
     {
+        // `static implicit operator Money(long cents)`. The two words are
+        // contextual, as `checked` and `closure` are: neither is reserved, and
+        // `operator` straight after one is what settles it.
+        if (At(TokenKind.Identifier) && Current.Text is "implicit" or "explicit" &&
+            Peek(1).Kind == TokenKind.OperatorKeyword)
+            return ParseConversionDeclaration(start, modifiers);
+
         var returnType = ParseType();
         Expect(TokenKind.OperatorKeyword);
 
@@ -1011,6 +1018,56 @@ public sealed class Parser
             [], [], parameters, IsVariadic: false, body)
         { IsOperator = true, OperatorToken = token.Kind };
     }
+
+    /// <summary>
+    /// <c>public static implicit operator Money(long cents)</c>.
+    ///
+    /// The target type stands where an operator's symbol does, because that is
+    /// what this operator is named: a conversion from its parameter to it. It
+    /// becomes an ordinary function -- <c>op_ToMoney</c> -- and nothing can
+    /// call that name, on the same terms as every other operator.
+    /// </summary>
+    private Declaration ParseConversionDeclaration(int start, Modifiers modifiers)
+    {
+        bool isImplicit = Advance().Text == "implicit";
+        Expect(TokenKind.OperatorKeyword);
+
+        var targetStart = _pos;
+        var target = ParseType();
+        var parameters = ParseParameterList(out bool variadic);
+        var body = At(TokenKind.OpenBrace) ? ParseBlock() : null;
+
+        if (variadic)
+            _diagnostics.Error("SL0615", SpanFrom(start),
+                "a conversion takes exactly the value it converts, so it cannot be variadic");
+
+        if (body is null)
+        {
+            Expect(TokenKind.Semicolon);
+            _diagnostics.Error("SL0559", SpanFrom(start), "an operator needs a body");
+        }
+
+        return new FunctionDeclSyntax(
+            SpanFrom(start), modifiers, LinkageKind.Stainless, target,
+            ConversionName(target, SpanFrom(targetStart)), [], [], parameters,
+            IsVariadic: false, body)
+        {
+            IsOperator = true,
+            IsConversion = true,
+            IsImplicitConversion = isImplicit,
+        };
+    }
+
+    /// <summary>
+    /// The lowered name of a conversion to <paramref name="target"/>.
+    ///
+    /// It has to carry the target, because the parameter list does not: a type
+    /// may convert to two things from the same one, and two functions whose
+    /// name and parameters both match would be one symbol at the linker.
+    /// </summary>
+    private string ConversionName(TypeSyntax target, SourceSpan span) =>
+        "op_To" + Binding.Mangler.SymbolSafe(
+            span.File.Text[span.Start..span.End].Trim());
 
     /// <summary>
     /// <c>static readonly T Name = value;</c>, or <c>static T Name(...)</c>.
@@ -1248,6 +1305,47 @@ public sealed class Parser
     }
 
     /// <summary>
+    /// <c>{ Name = value, ... }</c> or <c>{ value, ... }</c> after a
+    /// construction.
+    ///
+    /// One list either way; the binder decides which kind it is from whether
+    /// the entries are named, because that is also what decides whether the
+    /// type has to have the members or an <c>Add</c>.
+    /// </summary>
+    private ObjectInitializerSyntax ParseObjectInitializer()
+    {
+        int start = _pos;
+        Expect(TokenKind.OpenBrace);
+
+        var entries = new List<InitializerEntrySyntax>();
+
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+
+            // `Name = value`. Nothing else in an expression puts a bare name
+            // in front of a single `=`, so one token of lookahead settles it.
+            if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Equals)
+            {
+                var name = Advance();
+                Advance();
+                entries.Add(new InitializerEntrySyntax(
+                    SpanFrom(at), name.Text, name.Span, ParseExpression()));
+            }
+            else
+            {
+                entries.Add(new InitializerEntrySyntax(
+                    SpanFrom(at), null, SpanFrom(at), ParseExpression()));
+            }
+
+            if (!Match(TokenKind.Comma)) break;
+        }
+
+        Expect(TokenKind.CloseBrace);
+        return new ObjectInitializerSyntax(SpanFrom(start), entries);
+    }
+
+    /// <summary>
     /// The accessor list of a property, or the single expression that stands in
     /// for one: <c>int Area =&gt; width * height;</c> is <c>{ get { return ...; } }</c>.
     /// </summary>
@@ -1267,8 +1365,20 @@ public sealed class Parser
             return new PropertyDeclSyntax(SpanFrom(start), modifiers, type, name, arrow, attributes);
         }
 
+        var accessors = ParseAccessorList(name);
+
+        // `public int Width { get; set; } = 80;`. The storage an automatic
+        // property owns is a field like any other, so it takes a value the
+        // same way one does -- and the binder refuses it where there is no
+        // storage to give a value to.
+        var initializer = Match(TokenKind.Equals) ? ParseExpression() : null;
+        if (initializer is not null) Expect(TokenKind.Semicolon);
+
         return new PropertyDeclSyntax(
-            SpanFrom(start), modifiers, type, name, ParseAccessorList(name), attributes);
+            SpanFrom(start), modifiers, type, name, accessors, attributes)
+        {
+            Initializer = initializer,
+        };
     }
 
     /// <summary>
@@ -1360,7 +1470,14 @@ public sealed class Parser
 
             var type = ParseType();
             string name = ExpectIdentifier();
-            parameters.Add(new ParameterSyntax(SpanFrom(paramStart), type, name, mode));
+
+            // `int width = 80`. Parsed wherever a parameter list is, so that a
+            // default written where one cannot mean anything -- a variant's
+            // case, a delegate -- is refused with a sentence rather than with
+            // "expected ')'".
+            var fallback = Match(TokenKind.Equals) ? ParseExpression() : null;
+
+            parameters.Add(new ParameterSyntax(SpanFrom(paramStart), type, name, mode, fallback));
 
             if (!Match(TokenKind.Comma)) break;
         }
@@ -1907,6 +2024,8 @@ public sealed class Parser
         {
             int sectionStart = _pos;
             var labels = new List<ExpressionSyntax>();
+            var patterns = new List<PatternSyntax>();
+            var guards = new List<ExpressionSyntax?>();
             var bindings = new List<CaseBindingSyntax>();
             bool hasDefault = false;
 
@@ -1921,26 +2040,34 @@ public sealed class Parser
                     int labelStart = _pos;
                     Advance();
 
+                    var pattern = ParsePattern();
+                    patterns.Add(pattern);
+                    guards.Add(AtWhenWord() ? ParseGuard() : null);
+
+                    // A plain constant is kept as an expression as well, because
+                    // a switch all of whose labels are constants becomes one
+                    // LLVM `switch` instruction -- and that is most switches.
+                    if (pattern is ConstantPatternSyntax constant && guards[^1] is null)
+                        labels.Add(constant.Value);
+
                     // `case Circle c:` names a variant's case and binds its
-                    // payload. Two identifiers in a row is the whole of the
-                    // test: no expression starts that way.
-                    if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.Identifier)
-                    {
-                        string caseName = ExpectIdentifier();
-                        string binding = ExpectIdentifier();
+                    // payload. It is a type pattern here, and the binder is
+                    // where a case and a class are told apart -- but the older
+                    // shape is kept for a variant, whose section machinery is
+                    // written against it.
+                    if (pattern is TypePatternSyntax
+                        {
+                            Binding: not null,
+                            Type: NamedTypeSyntax { Name.Parts: [var only], TypeArguments.Count: 0 },
+                        } named && guards[^1] is null)
                         bindings.Add(new CaseBindingSyntax(
-                            SpanFrom(labelStart), caseName, binding));
-                    }
-                    else
-                    {
-                        labels.Add(ParseExpression());
-                    }
+                            SpanFrom(labelStart), only, named.Binding!));
                 }
 
                 Expect(TokenKind.Colon);
             }
 
-            if (labels.Count == 0 && bindings.Count == 0 && !hasDefault)
+            if (patterns.Count == 0 && !hasDefault)
             {
                 _diagnostics.Error("SL0402", Current.Span,
                     "expected 'case' or 'default'; every statement in a switch belongs to a " +
@@ -1959,11 +2086,192 @@ public sealed class Parser
             }
 
             sections.Add(new SwitchSectionSyntax(
-                SpanFrom(sectionStart), labels, hasDefault, statements) { Bindings = bindings });
+                SpanFrom(sectionStart), labels, hasDefault, statements)
+            {
+                Bindings = bindings,
+                Patterns = patterns,
+                Guards = guards,
+            });
         }
 
         Expect(TokenKind.CloseBrace);
         return new SwitchSyntax(SpanFrom(start), value, sections);
+    }
+
+    /// <summary>
+    /// <c>value switch { pattern =&gt; result, ... }</c>.
+    ///
+    /// The arms are separated by commas rather than closed by semicolons,
+    /// because each one is an expression and not a statement -- which is the
+    /// whole difference between this and the statement it is named after.
+    /// </summary>
+    private ExpressionSyntax ParseSwitchExpression(int start, ExpressionSyntax value)
+    {
+        Expect(TokenKind.SwitchKeyword);
+        Expect(TokenKind.OpenBrace);
+
+        var arms = new List<SwitchArmSyntax>();
+
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+            var pattern = ParsePattern();
+            var guard = AtWhenWord() ? ParseGuard() : null;
+
+            Expect(TokenKind.EqualsGreater);
+            arms.Add(new SwitchArmSyntax(SpanFrom(at), pattern, guard, ParseExpression()));
+
+            if (!Match(TokenKind.Comma)) break;
+        }
+
+        Expect(TokenKind.CloseBrace);
+        return new SwitchExpressionSyntax(SpanFrom(start), value, arms);
+    }
+
+    /// <summary>Whether the next word is a contextual <c>when</c>.</summary>
+    private bool AtWhenWord() => At(TokenKind.Identifier) && Current.Text == "when";
+
+    /// <summary>
+    /// <c>when condition</c> after a pattern. The word is contextual, for the
+    /// reason <c>checked</c> is: it is a good enough name that somebody's
+    /// parameter is called it.
+    /// </summary>
+    private ExpressionSyntax ParseGuard()
+    {
+        Advance();
+        return ParseExpression();
+    }
+
+    /// <summary>
+    /// A pattern, with <c>or</c> loosest and <c>and</c> tighter, as in C#.
+    ///
+    /// Both words are contextual and both are read here rather than by the
+    /// expression parser, because a pattern is not an expression: what
+    /// <c>1 or 2</c> means is two questions about one value, and there is no
+    /// value called <c>1 or 2</c>.
+    /// </summary>
+    private PatternSyntax ParsePattern()
+    {
+        int start = _pos;
+        var left = ParsePatternAnd();
+
+        while (At(TokenKind.Identifier) && Current.Text == "or")
+        {
+            Advance();
+            left = new BinaryPatternSyntax(SpanFrom(start), left, IsOr: true, ParsePatternAnd());
+        }
+
+        return left;
+    }
+
+    private PatternSyntax ParsePatternAnd()
+    {
+        int start = _pos;
+        var left = ParsePatternPrimary();
+
+        while (At(TokenKind.Identifier) && Current.Text == "and")
+        {
+            Advance();
+            left = new BinaryPatternSyntax(SpanFrom(start), left, IsOr: false, ParsePatternPrimary());
+        }
+
+        return left;
+    }
+
+    private PatternSyntax ParsePatternPrimary()
+    {
+        int start = _pos;
+
+        if (At(TokenKind.Identifier) && Current.Text == "not")
+        {
+            Advance();
+            return new NotPatternSyntax(SpanFrom(start), ParsePatternPrimary());
+        }
+
+        // `_` matches anything. It is an ordinary identifier to the lexer, and
+        // a pattern is the one place it means this.
+        if (At(TokenKind.Identifier) && Current.Text == "_" &&
+            Peek(1).Kind is TokenKind.Colon or TokenKind.EqualsGreater or TokenKind.Comma)
+        {
+            Advance();
+            return new DiscardPatternSyntax(SpanFrom(start));
+        }
+
+        // `> 5`, `<= 0`. One comparison against a constant, and the operator is
+        // what says this is a pattern rather than a value.
+        if (AtAny(TokenKind.Less, TokenKind.LessEquals, TokenKind.Greater, TokenKind.GreaterEquals))
+        {
+            var op = Advance().Kind;
+            return new RelationalPatternSyntax(SpanFrom(start), op, ParsePatternConstant());
+        }
+
+        if (At(TokenKind.OpenParen))
+        {
+            Advance();
+            var inner = ParsePattern();
+            Expect(TokenKind.CloseParen);
+            return inner;
+        }
+
+        // `Square s` and `Circle c`: a type and a name for what it found. Two
+        // identifiers in a row is the whole of the test -- no expression starts
+        // that way -- and a qualified type is allowed, so the lookahead walks
+        // the dots first.
+        if (At(TokenKind.Identifier) && AtTypeThenName())
+        {
+            var type = ParseType();
+            var name = Current;
+            string binding = ExpectIdentifier();
+            return new TypePatternSyntax(SpanFrom(start), type, binding, name.Span);
+        }
+
+        // Everything else is a constant: a literal, a qualified name, a
+        // negated number. A bare name may still turn out to name a variant's
+        // case or a type, and the binder is where that is settled.
+        return new ConstantPatternSyntax(SpanFrom(start), ParsePatternConstant());
+    }
+
+    /// <summary>
+    /// The value side of a constant or relational pattern. Deliberately not a
+    /// whole expression: <c>or</c> and <c>and</c> belong to the pattern, and a
+    /// ternary's <c>:</c> would eat the label's own.
+    /// </summary>
+    private ExpressionSyntax ParsePatternConstant() => ParseBinary(TypeTestPrecedence);
+
+    /// <summary>
+    /// Whether what follows is a type and then a name, which is what separates
+    /// <c>case Square s:</c> from <c>case Square:</c>.
+    /// </summary>
+    private bool AtTypeThenName()
+    {
+        int at = 0;
+
+        // A qualified name: `Shapes.Square`.
+        while (Peek(at).Kind == TokenKind.Identifier && Peek(at + 1).Kind == TokenKind.Dot)
+            at += 2;
+
+        if (Peek(at).Kind != TokenKind.Identifier) return false;
+        at++;
+
+        // Type arguments, as one balanced group.
+        if (Peek(at).Kind == TokenKind.Less)
+        {
+            int depth = 0;
+
+            while (true)
+            {
+                var kind = Peek(at).Kind;
+                if (kind == TokenKind.EndOfFile) return false;
+                if (kind == TokenKind.Less) depth++;
+                else if (kind == TokenKind.Greater) { depth--; at++; if (depth == 0) break; continue; }
+                else if (kind is TokenKind.Colon or TokenKind.EqualsGreater or TokenKind.Semicolon)
+                    return false;
+                at++;
+            }
+        }
+
+        return Peek(at).Kind == TokenKind.Identifier && Peek(at).Text != "when" &&
+               Peek(at).Text != "or" && Peek(at).Text != "and";
     }
 
     private StatementSyntax ParseSimpleStatement(bool requireSemicolon)
@@ -2035,7 +2343,7 @@ public sealed class Parser
         _ => 0,
     };
 
-    /// <summary>Where <c>is</c> binds: exactly where a relational operator does.</summary>
+    /// <summary>Where <c>is</c> and <c>as</c> bind: exactly where a relational operator does.</summary>
     private const int TypeTestPrecedence = 7;
 
     private static readonly TokenKind[] AssignmentOperators =
@@ -2193,6 +2501,24 @@ public sealed class Parser
                 }
                 else left = new TypeTestSyntax(SpanFrom(start), left, tested);
 
+                continue;
+            }
+
+            // `x as Shape` sits beside it and answers with a value rather than
+            // a branch. `as` is a keyword already -- an import names its alias
+            // with one -- so nothing here is speculative.
+            if (At(TokenKind.AsKeyword) && TypeTestPrecedence >= minPrecedence)
+            {
+                Advance();
+                left = new AsCastSyntax(SpanFrom(start), left, ParseType());
+                continue;
+            }
+
+            // `x switch { ... }` -- the value goes first, which is what makes a
+            // chain of them read left to right.
+            if (At(TokenKind.SwitchKeyword) && TypeTestPrecedence >= minPrecedence)
+            {
+                left = ParseSwitchExpression(start, left);
                 continue;
             }
 
@@ -2482,7 +2808,11 @@ public sealed class Parser
                 }
 
                 var arguments = At(TokenKind.OpenParen) ? ParseArgumentList() : [];
-                return new NewSyntax(SpanFrom(start), type, arguments);
+
+                return new NewSyntax(SpanFrom(start), type, arguments)
+                {
+                    Initializer = At(TokenKind.OpenBrace) ? ParseObjectInitializer() : null,
+                };
             }
 
             case TokenKind.SizeofKeyword:

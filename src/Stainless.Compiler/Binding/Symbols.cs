@@ -41,6 +41,34 @@ public sealed class ParameterSymbol(string name, TypeSymbol type, int index)
     /// <summary>True for the implicit receiver of a method, constructor or destructor.</summary>
     public bool IsThis { get; init; }
 
+    /// <summary>Where it was written, for a diagnostic about the parameter itself.</summary>
+    public Source.SourceSpan? DeclaredSpan { get; init; }
+
+    /// <summary>
+    /// The <c>= value</c> a caller may leave out, as written.
+    ///
+    /// It is kept as syntax because a signature is resolved in pass 4, before
+    /// any constant has been folded: a default naming a <c>const</c> from
+    /// another module would have nothing to read yet. What it is worth is
+    /// settled in a pass of its own, and lands in <see cref="Default"/>.
+    /// </summary>
+    public Syntax.ExpressionSyntax? DefaultSyntax { get; init; }
+
+    /// <summary>
+    /// What a call that leaves this parameter out passes instead, or null when
+    /// there is no default.
+    ///
+    /// Always a constant, so the one expression can stand at every call site
+    /// that omitted it: a call site is where it is emitted, exactly as if it
+    /// had been written there. That is also the rule that makes the default a
+    /// property of the declaration the caller can see rather than of the one
+    /// that runs -- an <c>override</c> may not restate it.
+    /// </summary>
+    public BoundExpression? Default { get; set; }
+
+    /// <summary>Whether a call may leave this parameter out.</summary>
+    public bool IsOptional => DefaultSyntax is not null || Default is not null;
+
     /// <summary>
     /// True when the body writes to this parameter, or to something inside it.
     ///
@@ -137,6 +165,16 @@ public sealed class FunctionSymbol
 
     /// <summary>Declared <c>sealed</c>: an override nothing may override further.</summary>
     public bool IsSealed { get; init; }
+
+    /// <summary>
+    /// True for a conversion operator: it converts its one parameter to its
+    /// return type. <see cref="IsImplicitConversion"/> says whether a cast has
+    /// to be written for it to run.
+    /// </summary>
+    public bool IsConversion { get; init; }
+
+    /// <summary>True when the conversion was written <c>implicit</c>.</summary>
+    public bool IsImplicitConversion { get; init; }
 
     /// <summary>
     /// Declared <c>static</c>: it belongs to the type, not to an instance.

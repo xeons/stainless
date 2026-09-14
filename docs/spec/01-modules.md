@@ -104,7 +104,7 @@ assembly. There is nothing else — no friend declarations, no export lists, and
 no file-level privacy (C# only gained `file` in version 11).
 
 Members follow the same rule: a field or method needs `public` for another
-module to touch it. `protected` ([§2.4.1](02-types.md#241-inheritance)) is the one addition, and
+module to touch it. `protected` ([§2.4.3](02-types.md#243-inheritance)) is the one addition, and
 the only visibility that crosses a module boundary without being public: a base
 class handing something to its derived classes and to nobody else is the whole
 of what the word is for. It adds to module privacy rather than replacing it, so

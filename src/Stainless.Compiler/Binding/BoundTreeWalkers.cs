@@ -47,6 +47,11 @@ internal sealed class StaticReferenceWalker
             case BoundUnary unary: Visit(unary.Operand); break;
             case BoundBinary binary: Visit(binary.Left); Visit(binary.Right); break;
 
+            case BoundSequence sequence:
+                foreach (var side in sequence.Before) Visit(side);
+                Visit(sequence.Value);
+                break;
+
             case BoundConditional conditional:
                 Visit(conditional.Condition);
                 Visit(conditional.WhenTrue);
@@ -61,6 +66,12 @@ internal sealed class StaticReferenceWalker
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
             case BoundTypeTest test: Visit(test.Value); break;
+            case BoundVariantTest asked: Visit(asked.Value); break;
+            case BoundVariantPayload payload: Visit(payload.Receiver); break;
+
+            // A `switch` expression is a name and a chain of conditionals, and
+            // a static initializer may be written as one.
+            case BoundLet held: Visit(held.Value); Visit(held.Body); break;
 
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);
@@ -187,6 +198,11 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 Visit(binary.Left); Visit(binary.Right);
                 break;
 
+            case BoundSequence sequence:
+                foreach (var side in sequence.Before) Visit(side);
+                Visit(sequence.Value);
+                break;
+
             case BoundConditional conditional:
                 Visit(conditional.Condition);
                 Visit(conditional.WhenTrue);
@@ -206,6 +222,12 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
 
             case BoundConversion conversion: Visit(conversion.Operand); break;
             case BoundTypeTest test: Visit(test.Value); break;
+            case BoundVariantTest asked: Visit(asked.Value); break;
+            case BoundVariantPayload payload: Visit(payload.Receiver); break;
+
+            // A `switch` expression is a name and a chain of conditionals, and
+            // a static initializer may be written as one.
+            case BoundLet held: Visit(held.Value); Visit(held.Body); break;
 
             case BoundNew created:
                 foreach (var argument in created.Arguments) Visit(argument);

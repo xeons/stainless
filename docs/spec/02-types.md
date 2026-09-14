@@ -380,7 +380,73 @@ A class value is a pointer to a heap object preceded by an object header
 `new Buffer(64)` allocates, runs the constructor, and yields a reference with
 a count of 1.
 
-### 2.4.1 Inheritance
+### 2.4.1 A field with a value
+
+```csharp
+public class Panel {
+    public int Width = 80;
+    public String Title = "untitled";
+    public bool Visible { get; set; } = true;
+
+    public Panel() { }
+    public Panel(String title) { Title = title; }       // the body has the last word
+}
+```
+
+A field initializer runs **at the head of every constructor**, in the order the
+fields were declared, before the constructor's own statements. So the two
+constructors above both produce a `Panel` whose `Width` is 80, and the second
+one's `Title` is what it was given rather than `"untitled"`.
+
+An automatic property's `= value` is the same thing: the storage it owns is a
+field, and this is that field's initializer.
+
+**A class that declares no constructor gets one**, taking no arguments, so that
+there is a head for the initializers to be at. `new Counter()` meant that
+already; what is new is that something runs.
+
+**A constructor that chains to `this(...)` does not run them**, because the one
+it delegates to already did, and running them twice would undo whatever that
+constructor decided. The base class's initializers are not here either: the
+base's own constructor runs them, and that call is what a derived constructor
+starts with.
+
+**An initializer cannot read the object** (SL0617) -- not `this`, not another
+field, not a method. It runs before the constructor's body and in declaration
+order, so what it would read is whatever the allocation left, which is zero.
+A constructor is where one field's value may depend on another. Everything else
+is in reach: a literal, a `const`, a static, a call to a free function, a `new`.
+
+**Only a class has them.** A `struct` is made by declaring one -- `Point p;` --
+and there is no moment there for an initializer to run at, so one is refused
+(SL0617) rather than silently skipped.
+
+### 2.4.2 Making one with its members written out
+
+```csharp
+var panel = new Panel { Title = "readme", Width = 12 };
+var panel = new Panel("readme") { Width = 12 };         // arguments as well
+var numbers = new List<int> { 1, 2, 3 };
+```
+
+An object initializer is short for the construction held in a name, a write per
+entry, and then the name -- and it is lowered to exactly that, so nothing it can
+do is anything the written-out form could not. The writes go through a setter
+where the member is a property, as they would anywhere else.
+
+A brace list of *bare* values is a collection initializer instead: one `Add` per
+value, found **by name rather than by interface**, which is the rule `foreach`
+already keeps for `GetEnumerator` ([§9.4](09-statements-expressions.md#94-foreach)). A type can be built up this way
+without `Standard.Collections` appearing anywhere in the program.
+
+Which of the two a brace list is comes from its entries, and **they may not be
+mixed** (SL0618): one that did both would be two different things at once, and
+a reader would have to know the type to see which each entry was. The other
+refusals are the ones an assignment would have given anyway -- no such member,
+a property with no setter, a member that is not visible -- plus a type with no
+`Add` to add to.
+
+### 2.4.3 Inheritance
 
 A class may derive from **one** other class, written first in the list after the
 colon, before any interfaces:
@@ -533,7 +599,7 @@ its tear-offs are laid out after its fields by the compilation that built it, so
 a derived class's own fields would land on top of them. Neither can a class the
 runtime provides, such as `String`.
 
-### 2.4.2 `is`, and casting down
+### 2.4.4 `is`, `as`, and casting down
 
 An upcast is implicit and free. Downwards the answer is not in the type, so it
 is asked of the object:
@@ -607,9 +673,41 @@ error[SL0518]: no object is both a 'Circle' and a 'Unrelated': neither derives
 from the other
 ```
 
-There is no `as` yet. It would produce a `C?`, and narrowing ([§2.5](#25-pointers-and-nullability)) would make
-the result usable; what it would add over `is C c` is the case where the answer
-is wanted as a value rather than as a branch. See [TODO.md](../../TODO.md).
+**`as` is the same question, answered with a value.** `x as C` is a `C?`: the
+reference where the test held, and null where it did not.
+
+```csharp
+Square? square = shape as Square;               // the reference, or null
+String name = (shape as INamed)?.Name() ?? "anonymous";
+```
+
+That second line is what `as` is for. `is C c` already covers the branch, and
+covers it better -- the name is in scope exactly where it was proved. What it
+cannot do is hand the answer on: pass it to something taking a `C?`, store it,
+or give it a fallback with `??`. Those want a value, and a branch is not one.
+
+What is tested is evaluated once, as with `is`, so `Parent() as Frame` calls
+`Parent` a single time. The arm the test allows is that same pointer under the
+type the test bought -- no second check -- and a conversion that cannot fail
+gets no test at all: `square as Shape` is the ordinary widening and emits
+nothing.
+
+What it refuses is what could never be anything but null, since `as` is for a
+question with two answers and these have one (all SL0612):
+
+```
+error[SL0612]: no object is both a 'Alpha' and a 'Beta': neither derives from
+the other, so this would always be null
+
+error[SL0612]: 'as' answers with an optional already, so the '?' says it twice;
+write 'as Alpha'
+```
+
+A COM interface is the other refusal, and it is not about the answer being
+known: `QueryInterface` is a call the object answers, and answers again, so a
+test followed by a conversion would ask twice and could be told two different
+things. `(IThing)x` asks once, and ends the program if the answer was no --
+which is the same bargain a binding `is` refuses for the same reason (SL0587).
 
 ## 2.5 Pointers and nullability
 
@@ -686,7 +784,7 @@ about: a field or a call result may be a different value by the time it is
 read. Put it in a local, check that against null, and reach 'Value' through it
 ```
 
-The other fix is `is` with a name ([§2.4.2](#242-is-and-casting-down)), which reads the field once and
+The other fix is `is` with a name ([§2.4.4](#244-is-as-and-casting-down)), which reads the field once and
 names what came out of it:
 
 ```csharp
@@ -1271,7 +1369,7 @@ and a struct is a plain C value with nowhere to keep a count.
 
 Dispatch is four constant-offset loads with no search and no branch — see
 [abi.md](../abi.md) for the tables. An interface reference can be asked what it
-really is, and cast to it, exactly as a class reference can [§2.4.2](#242-is-and-casting-down).
+really is, and cast to it, exactly as a class reference can [§2.4.4](#244-is-as-and-casting-down).
 
 **Interfaces do extend one another**, though, and a class implementing the
 derived one implements the base too:
@@ -1768,9 +1866,9 @@ construction rather than by a check on the far side.
 
 ## 2.15 Lambdas and closures
 
-A lambda has no type of its own. What it becomes is decided by what it is
-assigned to, and there are **three** things it may become: a `closure`
-([§2.14.1](#2141-closure--a-method-and-the-object-it-belongs-to)), an **interface with exactly one method**, or a **delegate**.
+A lambda is typed by what it is assigned to, and there are **three** things it
+may become: a `closure` ([§2.14.1](#2141-closure--a-method-and-the-object-it-belongs-to)), an **interface with exactly one
+method**, or a **delegate**.
 
 ```csharp
 public closure int Transformer(int value);
@@ -1794,6 +1892,28 @@ uses for delegates and Rust for `Fn`. It is an ordinary class, so it is
 reference counted, it lives in a `List<T>` like anything else, and its
 destructor releases what it captured. A closure is that object beside the
 address of its method; an interface reference is that object alone.
+
+**A lambda that writes its parameter types has a type of its own**, so `var`
+can hold one:
+
+```csharp
+var doubled = (int x) => x * 2;         // a closure int(int)
+Console.WriteLine(Text.FromInteger(doubled(21)));
+```
+
+It is a `closure`, because a lambda may capture and a delegate has nowhere to
+keep what it captured. The type is the signature and nothing else, so two
+lambdas of the same shape are the same type and either may be assigned to the
+other -- and a `closure` somebody declared with that shape is interchangeable
+with both, since all three are the same two words.
+
+What this does not reach is a lambda that has not said enough (both SL0553):
+
+- **A parameter with no type.** `var f = x => x;` has nothing to infer from --
+  that is the whole of what a target type was supplying.
+- **A block body.** Its result is whatever its `return`s agree on, and that is
+  decided by the type it is becoming rather than the other way round. One
+  expression, or write the type out.
 
 **Capture is by value, taken when the closure is made.**
 

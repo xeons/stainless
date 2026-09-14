@@ -159,9 +159,92 @@ not be one of its members. There is no `goto case`. Each section has its own
 scope, so two sections may declare the same local name — which C# does not
 allow, having put the whole switch in one scope.
 
-There is no `switch` *expression*, and the only pattern is a variant's case:
-no type patterns, no constants inside one, no guards. This is the C# statement
-plus the one thing a variant needs to be readable at all.
+### 9.1.1 Patterns
+
+A `case` label is a pattern. Most of them are a constant, which is what makes a
+switch a jump table; the rest ask something a constant cannot.
+
+| | |
+|---|---|
+| a constant | `case 3:`, `case "text":`, `case Level.Low:` |
+| a variant's case | `case Circle:`, `case Circle c:` |
+| a type | `case Square:`, `case Square s:` |
+| a range | `case > 100:`, `case <= 0:` |
+| either | `case 1 or 2:`, `case > 0 and < 10:` |
+| neither | `case not 0:` |
+| anything | `case _:` |
+| and a condition on any of them | `case Circle c when c.Radius > 10.0:` |
+
+```csharp
+switch (node) {
+    case Leaf leaf when leaf.Value > 3: return "big leaf";
+    case Leaf leaf:                     return "leaf";
+    case Twig:                          return "twig";
+    default:                            return "node";
+}
+```
+
+**A pattern is a question, and every one of them becomes the `bool` that asks
+it** -- a comparison, a tag test, or the `is` the language already had. There is
+no matching machinery underneath.
+
+**A switch whose labels are all constants is unchanged**: one LLVM `switch`
+instruction, and a jump table if LLVM decides on one. A single pattern anywhere
+in it turns the whole switch into a chain of tests asked in order, because a
+type, a range and a `when` are not values the governor could equal. Everything
+else about the statement stays as it was -- sections that may not fall through,
+`break` that belongs to the switch, `continue` that passes through it.
+
+**A name belongs to one label** (SL0619). A section reached by two of them has
+proved nothing about which, so there would be nothing for the name to be; the
+same rule refuses a name under `or`, `and` or `not`.
+
+**A `when` runs after the pattern matched**, which is what makes it safe for the
+guard to read what the pattern named: the two are joined by `&&`, which
+short-circuits. A guarded label proves nothing about coverage, so a variant
+switch that covers a case only under a `when` still needs the case or a
+`default`.
+
+### 9.1.2 `switch` as an expression
+
+```csharp
+String Describe(int n) {
+    return n switch {
+        < 0     => "negative",
+        0       => "zero",
+        1 or 2  => "small",
+        _       => "large",
+    };
+}
+
+double Area(Shape shape) {
+    return shape switch {
+        Circle c => 3.14159 * c.Radius * c.Radius,
+        Rect r   => r.Width * r.Height,
+        Empty    => 0.0,
+    };                              // no `_`: every case is covered
+}
+```
+
+The value goes first, the arms are separated by commas, and each one is an
+expression rather than a statement -- which is the whole difference between this
+and the statement it is named after.
+
+**It has to be exhaustive** (SL0620). A statement that matches nothing falls
+past itself; an expression that matched nothing would have no value to be, and
+there are no exceptions here to throw at the hole. So the arms end with `_`, or
+they cover every case of a variant.
+
+**The arms agree on a type**, the way a ternary's arms do: the first one decides
+it and the rest convert to it.
+
+**An arm nothing can reach is a warning** (SL0621), which is what an arm after
+`_` is.
+
+It lowers to the value held in a name and a conditional per arm -- `t is P1 ? e1
+: t is P2 ? e2 : e3` -- so nothing written this way can do anything a chain of
+ternaries could not, and the arm a test fails falls into the next conditional
+rather than into a copy of the rest.
 
 ## 9.2 `parallel`, `spawn` and `parallel for`
 

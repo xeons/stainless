@@ -366,6 +366,27 @@ public sealed partial class LlvmEmitter
         int defaultIndex = statement.Sections.ToList().FindIndex(s => s.IsDefault);
         string defaultLabel = defaultIndex < 0 ? endLabel : bodies[defaultIndex];
 
+        // A pattern section is reached by asking rather than by jumping: the
+        // tests run in order, and the first that says yes wins. It comes first
+        // because a pattern switch over a variant is still a chain -- a `when`
+        // is not a tag, and there is no table to put one in.
+        if (statement.Sections.Any(section => section.Tests.Count > 0))
+        {
+            for (int i = 0; i < statement.Sections.Count; i++)
+                foreach (var test in statement.Sections[i].Tests)
+                {
+                    var asked = EmitExpression(test);
+                    string next = NextLabel("switch.test");
+                    Terminator($"br i1 {asked.Ref}, label %{bodies[i]}, label %{next}");
+                    Label(next);
+                }
+
+            Terminator($"br label %{defaultLabel}");
+
+            EmitSwitchBodies(statement, bodies, endLabel);
+            return;
+        }
+
         // A switch over a variant asks the tag, which is an ordinary LLVM switch
         // over a byte -- so a jump table stays LLVM's decision here too.
         if (statement.Value.Type is VariantTypeSymbol switched)

@@ -1,0 +1,7 @@
+# A switch expression with no '_' arm and one that leaves a variant's case out,
+# a name under a pattern that cannot give it one, a type pattern over a value,
+# and an arm nothing reaches.
+SL0620
+SL0619
+SL0438
+SL0621

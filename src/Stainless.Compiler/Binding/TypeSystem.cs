@@ -285,6 +285,23 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public bool IsProtected { get; init; }
 
     /// <summary>
+    /// The <c>= value</c> written on the declaration, or null.
+    ///
+    /// It stays syntax: what it means is a statement at the head of every
+    /// constructor, and it is bound once per constructor, there, where
+    /// <c>this</c> exists and the fields before it have already been given
+    /// their values.
+    /// </summary>
+    public Syntax.ExpressionSyntax? InitializerSyntax { get; init; }
+
+    /// <summary>
+    /// The file the initializer was written in, which is what its names are
+    /// resolved against. A type may be declared across files, so this is not
+    /// necessarily the file a given constructor came from.
+    /// </summary>
+    public FileScope? InitializerScope { get; init; }
+
+    /// <summary>
     /// True for the hidden storage of an automatic property. It is laid out,
     /// destroyed and reflected exactly like any other field; it simply has no
     /// name the source can reach, because the property is that name.
@@ -395,6 +412,19 @@ public abstract class NamedTypeSymbol : TypeSymbol
     /// directly -- which is the lowering, not the language.
     /// </summary>
     public List<FunctionSymbol> Operators { get; } = [];
+
+    /// <summary>
+    /// Conversions this type declares: <c>public static implicit operator
+    /// Money(long)</c> and its explicit twin.
+    ///
+    /// A list of its own rather than a corner of <see cref="Operators"/>,
+    /// because these are looked up by what they convert between rather than by
+    /// a symbol somebody wrote. Each carries its source in its one parameter
+    /// and its target in its return type, and
+    /// <see cref="FunctionSymbol.IsImplicitConversion"/> says which of the two
+    /// words was written.
+    /// </summary>
+    public List<FunctionSymbol> Conversions { get; } = [];
 
     /// <summary>
     /// Properties, whose accessors also appear in <see cref="Methods"/>. This

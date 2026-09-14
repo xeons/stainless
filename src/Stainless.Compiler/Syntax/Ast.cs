@@ -249,11 +249,17 @@ public abstract record Declaration(SourceSpan Span, Modifiers Modifiers) : Synta
 /// </summary>
 public enum ParameterMode { Value, Ref, In, Out }
 
+/// <param name="Default">
+/// The <c>= value</c> a caller may leave out, or null when there is none. It
+/// stays syntax here because a signature is resolved before any constant is
+/// folded; what it is worth is settled in a pass of its own.
+/// </param>
 public sealed record ParameterSyntax(
     SourceSpan Span,
     TypeSyntax Type,
     string Name,
-    ParameterMode Mode = ParameterMode.Value) : SyntaxNode(Span);
+    ParameterMode Mode = ParameterMode.Value,
+    ExpressionSyntax? Default = null) : SyntaxNode(Span);
 
 /// <summary>
 /// <c>ref x</c> at a call. Written at the call as well as the declaration,
@@ -324,6 +330,17 @@ public sealed record FunctionDeclSyntax(
 
     /// <summary>Which operator, for the checks that depend on which.</summary>
     public TokenKind OperatorToken { get; init; }
+
+    /// <summary>
+    /// True for <c>static implicit operator Money(long)</c> and its explicit
+    /// twin. A conversion is an operator whose name is a type rather than a
+    /// punctuation mark, which is why it is a flag here rather than another
+    /// entry in <see cref="OperatorNames"/>.
+    /// </summary>
+    public bool IsConversion { get; init; }
+
+    /// <summary>True when the conversion was written <c>implicit</c>.</summary>
+    public bool IsImplicitConversion { get; init; }
 
     /// <summary>
     /// The convention written before the return type, or
@@ -404,6 +421,13 @@ public sealed record PropertyDeclSyntax(
     public IReadOnlyList<ParameterSyntax> Indices { get; init; } = [];
 
     public bool IsIndexer => Indices.Count > 0;
+
+    /// <summary>
+    /// The <c>= value</c> after the accessor list, or null. Only an automatic
+    /// property may have one: it is the storage that is being given a value,
+    /// and a property with written accessors owns none.
+    /// </summary>
+    public ExpressionSyntax? Initializer { get; init; }
 }
 
 /// <summary>
@@ -749,6 +773,22 @@ public sealed record SwitchSectionSyntax(
     IReadOnlyList<StatementSyntax> Statements) : SyntaxNode(Span)
 {
     /// <summary>
+    /// The patterns this section's labels were written as, one per label.
+    ///
+    /// Every label is a pattern; <see cref="Labels"/> is the subset that are
+    /// plain constants, kept because a switch all of whose labels are constants
+    /// becomes one LLVM <c>switch</c> instruction and a jump table, and that is
+    /// most switches.
+    /// </summary>
+    public IReadOnlyList<PatternSyntax> Patterns { get; init; } = [];
+
+    /// <summary>
+    /// The <c>when</c> a label carried, one per pattern and null where there
+    /// was none.
+    /// </summary>
+    public IReadOnlyList<ExpressionSyntax?> Guards { get; init; } = [];
+
+    /// <summary>
     /// The <c>case Circle c:</c> labels, which name a variant's case and bind
     /// its payload.
     ///
@@ -763,6 +803,72 @@ public sealed record SwitchSectionSyntax(
 /// <summary><c>case Circle c:</c> — a variant case, and a name for its payload.</summary>
 public sealed record CaseBindingSyntax(SourceSpan Span, string Case, string Name)
     : SyntaxNode(Span);
+
+// ---------------------------------------------------------------- patterns
+
+/// <summary>
+/// What a value is matched against: in a <c>case</c> label, in a <c>switch</c>
+/// expression's arm, and in <c>is</c>.
+///
+/// A pattern is not an expression. It asks a question about a value rather than
+/// producing one, and some of them -- a type pattern with a name -- put
+/// something in scope where the question was answered yes.
+/// </summary>
+public abstract record PatternSyntax(SourceSpan Span) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>case 3:</c>, <c>case "text":</c>, <c>case Level.Low:</c> -- and
+/// <c>case Circle:</c>, which is a bare name that nothing here can tell from a
+/// constant. The binder settles that, where the switched type is known.
+/// </summary>
+public sealed record ConstantPatternSyntax(SourceSpan Span, ExpressionSyntax Value)
+    : PatternSyntax(Span);
+
+/// <summary><c>case &gt; 5:</c> -- one comparison against a constant.</summary>
+public sealed record RelationalPatternSyntax(
+    SourceSpan Span, TokenKind Operator, ExpressionSyntax Value) : PatternSyntax(Span);
+
+/// <summary>
+/// <c>case Square:</c> and <c>case Square s:</c> -- what the value really is,
+/// and a name for it. Over a variant the type is one of its cases and the name
+/// is what that case carries.
+/// </summary>
+public sealed record TypePatternSyntax(
+    SourceSpan Span, TypeSyntax Type, string? Binding, SourceSpan BindingSpan)
+    : PatternSyntax(Span);
+
+/// <summary><c>_</c> -- anything at all, and nothing named.</summary>
+public sealed record DiscardPatternSyntax(SourceSpan Span) : PatternSyntax(Span);
+
+/// <summary><c>1 or 2</c>, <c>&gt; 0 and &lt; 10</c>.</summary>
+public sealed record BinaryPatternSyntax(
+    SourceSpan Span, PatternSyntax Left, bool IsOr, PatternSyntax Right) : PatternSyntax(Span);
+
+/// <summary><c>not null</c>, <c>not 0</c>.</summary>
+public sealed record NotPatternSyntax(SourceSpan Span, PatternSyntax Operand)
+    : PatternSyntax(Span);
+
+/// <summary>
+/// One arm of a <c>switch</c> expression: <c>pattern =&gt; value</c>, with an
+/// optional <c>when</c> between them.
+/// </summary>
+public sealed record SwitchArmSyntax(
+    SourceSpan Span,
+    PatternSyntax Pattern,
+    ExpressionSyntax? Guard,
+    ExpressionSyntax Value) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>value switch { pattern =&gt; result, ... }</c>.
+///
+/// The expression form of the statement, and the one that has to be exhaustive:
+/// a statement that matches nothing falls past itself, and an expression that
+/// matched nothing would have no value to be.
+/// </summary>
+public sealed record SwitchExpressionSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Value,
+    IReadOnlyList<SwitchArmSyntax> Arms) : ExpressionSyntax(Span);
 
 /// <summary>
 /// <c>switch (value) { case 1: ... break; default: ... break; }</c>.
@@ -972,7 +1078,29 @@ public sealed record IndexSyntax(SourceSpan Span, ExpressionSyntax Target, Expre
 public sealed record NewSyntax(
     SourceSpan Span,
     TypeSyntax Type,
-    IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span);
+    IReadOnlyList<ExpressionSyntax> Arguments) : ExpressionSyntax(Span)
+{
+    /// <summary>
+    /// The <c>{ ... }</c> after the arguments, or null. It is either a list of
+    /// <c>Name = value</c> members or a list of elements to add, and which one
+    /// is decided by what is in it.
+    /// </summary>
+    public ObjectInitializerSyntax? Initializer { get; init; }
+}
+
+/// <summary>
+/// <c>new Panel { Width = 3 }</c> or <c>new List&lt;int&gt; { 1, 2 }</c>.
+///
+/// Both are the same shape -- a braced list after a construction -- and what
+/// separates them is whether the entries are named. Mixing the two is refused
+/// rather than guessed at.
+/// </summary>
+public sealed record ObjectInitializerSyntax(
+    SourceSpan Span, IReadOnlyList<InitializerEntrySyntax> Entries) : SyntaxNode(Span);
+
+/// <summary>One entry: <c>Name = value</c>, or a value on its own.</summary>
+public sealed record InitializerEntrySyntax(
+    SourceSpan Span, string? Name, SourceSpan NameSpan, ExpressionSyntax Value) : SyntaxNode(Span);
 
 /// <summary>
 /// <c>[a, b, c]</c> — an array written out.
@@ -1022,6 +1150,21 @@ public sealed record LambdaSyntax(
     BlockSyntax? Block) : ExpressionSyntax(Span);
 
 public sealed record CastSyntax(SourceSpan Span, TypeSyntax Type, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>value as Type</c>: the value as one of those, or null.
+///
+/// The same question <see cref="TypeTestSyntax"/> asks, wanting the answer as a
+/// value rather than as a branch. A cast ends the program when it was wrong and
+/// <c>is</c> only says yes or no, so this is what a chain of maybes is written
+/// with: <c>Parent() as Frame</c> passed straight on, or stored.
+///
+/// The type written is the one the object would be, and the result is that type
+/// optional -- <c>x as Frame</c> is a <c>Frame?</c>, because "or null" is the
+/// whole of what this adds.
+/// </summary>
+public sealed record AsCastSyntax(SourceSpan Span, ExpressionSyntax Value, TypeSyntax Tested)
     : ExpressionSyntax(Span);
 
 public sealed record SizeofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);

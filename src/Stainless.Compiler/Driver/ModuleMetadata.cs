@@ -409,4 +409,36 @@ public sealed record MetadataParameter
     /// integer where it expects the address of one.
     /// </summary>
     public Syntax.ParameterMode Mode { get; init; } = Syntax.ParameterMode.Value;
+
+    /// <summary>
+    /// What a call that leaves this parameter out passes instead, or null when
+    /// a call may not leave it out.
+    ///
+    /// It travels as the value rather than as the text it was written as. A
+    /// default may name a <c>const</c> of the library's own, and a consumer
+    /// has no way to read that: what it needs is the number.
+    /// </summary>
+    public MetadataDefault? Default { get; init; }
+}
+
+/// <summary>
+/// A parameter default, folded to the constant it is.
+///
+/// The kinds are the shapes a default may have at all -- a number, a string,
+/// null, or a zeroed value -- which is the same list the compiler checks a
+/// default against where it is written.
+/// </summary>
+public sealed record MetadataDefault
+{
+    /// <summary><c>bits</c>, <c>scalar</c>, <c>bool</c>, <c>number</c>, <c>text</c>, <c>null</c> or <c>zero</c>.</summary>
+    public required string Kind { get; init; }
+
+    /// <summary>An integer, an enum's value, or a code unit's scalar.</summary>
+    public ulong Bits { get; init; }
+
+    /// <summary>A float or a double, which cannot be carried as bits without losing which it was.</summary>
+    public double Number { get; init; }
+
+    /// <summary>A string literal's text.</summary>
+    public string? Text { get; init; }
 }

@@ -413,6 +413,7 @@ public static class MetadataWriter
                 Name = p.Name,
                 Type = MetadataTypeNames.Write(p.Type),
                 Mode = p.Mode,
+                Default = DefaultOf(p),
             })
             .ToList(),
     };
@@ -473,7 +474,41 @@ public static class MetadataWriter
                 Name = p.Name,
                 Type = MetadataTypeNames.Write(p.Type),
                 Mode = p.Mode,
+                Default = DefaultOf(p),
             })
             .ToList(),
+    };
+
+    /// <summary>
+    /// A parameter's default, folded to the constant a consumer will write
+    /// into its own call sites.
+    ///
+    /// The conversions the binder inserted on the way are unwrapped: what a
+    /// consumer needs is the value, and it will give it the parameter's type
+    /// again when it reads it back.
+    /// </summary>
+    private static MetadataDefault? DefaultOf(ParameterSymbol parameter) =>
+        parameter.Default is { } written ? Folded(written) : null;
+
+    private static MetadataDefault? Folded(BoundExpression expression) => expression switch
+    {
+        BoundConversion conversion => Folded(conversion.Operand),
+        BoundStringLiteral text => new MetadataDefault { Kind = "text", Text = text.Value },
+        BoundNullLiteral => new MetadataDefault { Kind = "null" },
+        BoundDefault => new MetadataDefault { Kind = "zero" },
+        BoundLiteral literal => FoldedValue(literal.Value),
+        BoundConstantAccess constant => FoldedValue(constant.Constant.Value),
+        _ => null,
+    };
+
+    private static MetadataDefault? FoldedValue(object? value) => value switch
+    {
+        ulong bits => new MetadataDefault { Kind = "bits", Bits = bits },
+        int scalar => new MetadataDefault { Kind = "scalar", Bits = unchecked((ulong)(long)scalar) },
+        bool flag => new MetadataDefault { Kind = "bool", Bits = flag ? 1UL : 0UL },
+        double number => new MetadataDefault { Kind = "number", Number = number },
+        float number => new MetadataDefault { Kind = "number", Number = number },
+        string text => new MetadataDefault { Kind = "text", Text = text },
+        _ => null,
     };
 }

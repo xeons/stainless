@@ -266,6 +266,11 @@ public sealed partial class Binder(
         ComputeLayouts();           // pass 7: every value type has a size
         CheckUnions();              //         and a union counts nothing
         ValidateLinkageSignatures();// pass 8: no counted reference crosses a language boundary
+        CheckConversions();         //         and no declared conversion restates one
+        SynthesizeInitializerConstructors();
+                                    //         and a class with field initializers has somewhere
+                                    //         to run them
+        BindParameterDefaults();    //         and every default in a signature is a constant
         BindBodies();               // pass 9: only now is any code checked
         BindStatics();              // pass 10: static initializers
         DrainPending();             // pass 11: bodies of everything instantiated along the way,

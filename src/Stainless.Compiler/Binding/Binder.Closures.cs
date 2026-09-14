@@ -451,6 +451,82 @@ public sealed partial class Binder
         return produced;
     }
 
+    /// <summary>
+    /// The type a lambda has when nothing else says what it should be.
+    ///
+    /// <para>
+    /// A lambda is ordinarily typed by what it is assigned to, and for most of
+    /// them that is the only thing that could type it: <c>x =&gt; x</c> says
+    /// nothing about what <c>x</c> is. But a lambda that writes its parameter
+    /// types out has said everything but the result, and the result is what
+    /// binding the body answers -- so <c>var double = (int x) =&gt; x * 2;</c>
+    /// has a type, and it is a <c>closure</c>.
+    /// </para>
+    ///
+    /// <para>
+    /// <b>A closure and not a delegate</b>, because a lambda may capture, and a
+    /// delegate is one pointer with nowhere to keep what was captured. The type
+    /// is cached by signature, so two lambdas of the same shape get the same
+    /// type and are interchangeable; a declared <c>closure</c> of that shape is
+    /// interchangeable with them too (§2.14.1), since the two are the same two
+    /// words.
+    /// </para>
+    ///
+    /// <para>
+    /// Null when the lambda has not said enough: a parameter without a type,
+    /// or a block body, whose result is whatever its <c>return</c>s agree on
+    /// and which needs a declared return type to bind at all.
+    /// </para>
+    /// </summary>
+    private ClosureTypeSymbol? NaturalClosureType(LambdaSyntax syntax)
+    {
+        if (syntax.Expression is null) return null;
+
+        var parameterTypes = new List<TypeSymbol>();
+
+        foreach (var parameter in syntax.Parameters)
+        {
+            if (parameter.Type is null) return null;
+
+            var resolved = ResolveType(parameter.Type, _currentScope!);
+            if (resolved.IsError() || resolved.IsVoid()) return null;
+
+            parameterTypes.Add(resolved);
+        }
+
+        // The body, bound once against those parameter types and thrown away.
+        // This is the same trial `Map(numbers, n => n * 2)` already makes to
+        // work out a type parameter that appears only in a lambda's result.
+        if (ProbeLambdaResult(syntax, parameterTypes) is not { } result) return null;
+        if (result.IsError()) return null;
+
+        string key = $"{result.Name}({string.Join(", ", parameterTypes.Select(t => t.Name))})";
+        if (_naturalClosures.TryGetValue(key, out var existing)) return existing;
+
+        var type = NewClosureType(
+            $"closure {key}", _currentModule!.Name, syntax.Span, isPublic: false, []);
+
+        type.ReturnType = result;
+
+        for (int i = 0; i < parameterTypes.Count; i++)
+            type.Signature.Add(new ParameterSymbol(syntax.Parameters[i].Name, parameterTypes[i], i));
+
+        // Registered so that the emitter writes its TypeInfo and the reference
+        // walk that retains its receiver is generated, exactly as for one
+        // somebody declared.
+        _currentModule.Types[type.SimpleName] = type;
+        _naturalClosures[key] = type;
+
+        return type;
+    }
+
+    /// <summary>
+    /// The closure type each signature got, so that two lambdas of the same
+    /// shape are the same type rather than two types that look alike.
+    /// </summary>
+    private readonly Dictionary<string, ClosureTypeSymbol> _naturalClosures =
+        new(StringComparer.Ordinal);
+
     private BoundExpression BindLambdaAsClosure(
         LambdaSyntax syntax, InterfaceTypeSymbol target, FunctionSymbol method, SourceSpan span)
     {
@@ -701,6 +777,11 @@ public sealed partial class Binder
     {
         var value = BindExpression(syntax.Value);
         if (value.Type.IsError()) return new BoundBlock(syntax.Span, []);
+
+        // A label that asks anything but "is it this constant" -- or any label
+        // with a `when` on it -- takes the whole switch down the pattern path,
+        // where it becomes a chain of tests rather than a jump table.
+        if (NeedsPatterns(syntax, value.Type)) return BindPatternSwitch(syntax, value);
 
         if (value.Type is VariantTypeSymbol variant)
             return BindVariantSwitch(syntax, value, variant);

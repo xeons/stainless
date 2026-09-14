@@ -1,0 +1,15 @@
+ab......
+ab..
+ab--
+AB--
+AB......
+ab***
+hello world 0
+hi world 1
+hey world 0
+crate 12
+3
+nothing
+crate
+###
+######

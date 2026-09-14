@@ -1,0 +1,6 @@
+# A conversion the language already has, one between two types neither of which
+# declares it, one to an interface, one that is not public, one to itself, and
+# the same pair declared twice.
+SL0615
+SL0211
+SL0616

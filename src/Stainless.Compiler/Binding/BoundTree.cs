@@ -74,6 +74,16 @@ public enum ConversionKind
     Downcast,
 
     /// <summary>
+    /// The reference an <c>as</c> proved, as the optional it answers with.
+    ///
+    /// Emits nothing at all. It is the same pointer, and the test that decided
+    /// which arm of the conditional runs is the whole of the check -- unlike
+    /// <see cref="Downcast"/>, which is asked for where nothing has been proved
+    /// and so has to ask the object itself.
+    /// </summary>
+    TestedReference,
+
+    /// <summary>
     /// <c>T[]</c> -> <c>T[:]</c>: the whole array, as a slice of it. Implicit,
     /// because a slice of everything is what an array already is and asking for
     /// a cast would put punctuation in front of every call that takes one.
@@ -385,6 +395,21 @@ public sealed class BoundLet(
     public LocalSymbol Local { get; } = local;
     public BoundExpression Value { get; } = value;
     public BoundExpression Body { get; } = body;
+}
+
+/// <summary>
+/// Several expressions evaluated in order, the last of which is the value.
+///
+/// It exists for the lowering of an object initializer, where a construction
+/// has to be followed by the writes it asked for and still be an expression.
+/// Everything before the last one is evaluated for what it does.
+/// </summary>
+public sealed class BoundSequence(
+    SourceSpan span, IReadOnlyList<BoundExpression> before, BoundExpression value)
+    : BoundExpression(span, value.Type)
+{
+    public IReadOnlyList<BoundExpression> Before { get; } = before;
+    public BoundExpression Value { get; } = value;
 }
 
 public sealed class BoundConditional(
@@ -1017,9 +1042,22 @@ public sealed class BoundParallelFor(
 /// labels are folded literals, so the emitter can put them straight into an
 /// LLVM <c>switch</c> without evaluating anything.
 /// </summary>
+/// <summary>
+/// One section of a switch. A section reached by a constant has
+/// <see cref="BoundSwitchSection.Labels"/> and becomes an arm of an LLVM
+/// <c>switch</c>; one reached by a pattern has
+/// <see cref="BoundSwitchSection.Tests"/> and becomes a comparison in a chain.
+/// </summary>
 public sealed class BoundSwitchSection(
     SourceSpan span, IReadOnlyList<BoundExpression> labels, bool isDefault, BoundStatement body)
 {
+    /// <summary>
+    /// The tests a pattern section is reached by, one per label. Empty for a
+    /// section whose labels are all constants, which is reached by a jump
+    /// table instead.
+    /// </summary>
+    public IReadOnlyList<BoundExpression> Tests { get; init; } = [];
+
     public SourceSpan Span { get; } = span;
     public IReadOnlyList<BoundExpression> Labels { get; } = labels;
     public bool IsDefault { get; } = isDefault;

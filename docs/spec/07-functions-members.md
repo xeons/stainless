@@ -77,6 +77,58 @@ An ambiguity is not resolved by taking a guess: where two free functions both
 fit, the call is left to report that no member of the name exists, and naming
 the function outright is the answer.
 
+### 7.1.2 A parameter with a default
+
+```csharp
+String Draw(String text, int width = 8, char fill = '.', bool loud = false) { ... }
+
+Draw("ab");                       // "ab......"
+Draw("ab", 4);                    // "ab.."
+Draw("ab", loud: true);           // and a name reaches past what was left out
+```
+
+**The default is written into the call**, from the declaration the caller can
+see. That is not an implementation note: it is the whole of the design, and
+every rule below follows from it.
+
+**It must be a constant** (SL0613) -- a literal, `null`, a `const`, an enum
+member or `default(T)`. Anything else would be code standing in a signature and
+running at the caller, once per call site:
+
+```
+error[SL0613]: the default for 'n' is not a constant, and a default is written
+into every call that leaves it out -- so a call would be running this rather
+than passing it
+```
+
+**The ones that may be left out are the tail of the list** (SL0614). A default
+in the middle could only be reached by a name, and a reader counting arguments
+would have to know which of them had been filled in.
+
+**`ref`, `in` and `out` may not have one** (SL0613): all three pass the caller's
+storage rather than a value, and a default has no storage to be.
+
+**Only one declaration may give it.** An `override` may not restate a default,
+and neither may a method beside the interface method it implements (both
+SL0614). C# allows both, and both are the same trap: a call reads the
+declaration the *static* type gives it, so the same line would mean different
+things through a base reference and a derived one. The default belongs to the
+declaration, and there is one of it.
+
+**A name is what reaches past one.** `Draw("ab", loud: true)` leaves `width` and
+`fill` to their defaults; named arguments ([§7.2.2](#722-named-arguments)) and
+defaults are the same feature from two directions, and they compose.
+
+**A default takes part in overload resolution** only by making a candidate
+applicable with fewer arguments. Two candidates that both fit are ambiguous
+(SL0264) as they always were -- a default does not make one of them preferred.
+
+**It crosses a library boundary as the value it folded to.** A default naming a
+`const` of the library's own is a name the consumer cannot read, so the metadata
+carries the number. A generated C header writes none of it: filling one in is
+the caller's half, and a C caller has no declaration of this kind to read, so it
+passes every argument.
+
 ## 7.2 `ref`, `in` and `out` parameters
 
 A parameter is a copy unless it says otherwise. `ref`, `in` and `out` say
@@ -300,9 +352,10 @@ automatic or written makes no difference to the caller.
 - **Not free of evaluation order.** `p.X += 1` calls the getter and then the
   setter, so the receiver is evaluated twice. A receiver that is not a plain
   load — `Make().X += 1` — is rejected rather than quietly evaluated twice.
-- **Not initialized at the declaration.** `public int X { get; set; } = 5;` is
-  not supported, for the same reason a field initializer is not: assign it in a
-  constructor.
+- **Initialized at the declaration only when it owns storage.** `public int X
+  { get; set; } = 5;` gives that storage its first value, at the head of every
+  constructor, exactly as a field initializer does ([§2.4.1](02-types.md#241-a-field-with-a-value)). A property that
+  *computes* its value has no storage to give one to, and says so (SL0617).
 - **Not indexed, by itself.** `this[i]` is an indexer, which is a property that takes arguments and has a section of its own ([§7.5](#75-indexers)).
 
 ## 7.4 Operators
@@ -376,6 +429,64 @@ with `T` substituted -- the same monomorphization every other member of a
 template goes through. Whether the body is *valid* is decided per
 instantiation, as [§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do) says: `a.Value + b.Value` compiles at `int` and is an
 error at some type with no `+`, reported against the use that asked for it.
+
+### 7.4.1 `implicit` and `explicit operator`
+
+```csharp
+public struct Money {
+    public long Cents;
+
+    public static implicit operator Money(long cents) { return Of(cents); }
+    public static explicit operator long(Money value) { return value.Cents; }
+}
+
+Money price = 250L;             // implicit: nothing was lost
+long cents = (long)price;       // explicit: say that you meant it
+```
+
+A conversion is an operator whose name is a type. It is written inside one of
+the two types it is between, `static` and `public`, taking the value and
+returning what it becomes, and it lowers to an ordinary function -- `op_ToMoney`
+-- that nothing can call by name.
+
+**The word is the whole difference.** `implicit` says the conversion loses
+nothing, so it runs wherever the target type is expected: an assignment, an
+argument, a return, an operator's operand. `explicit` says something is lost or
+assumed, so it runs only where a cast is written. That is the same distinction
+the built-in conversions already make -- `int` to `long` is implicit and `long`
+to `int` is a cast -- and declaring one puts a type into that system rather than
+beside it.
+
+**One conversion, and no chain.** The value has to be exactly what the operator
+takes, with one exception: a literal adopts the source type the way it adopts
+any other, so `Money m = 5;` works against an operator taking a `long`. A
+`double` does not reach `Money` by way of `long`, and an `int` variable does not
+either -- write the cast. C# composes a standard conversion with a user-defined
+one at each end and arrives at rules nobody can hold in their head; the rule
+here is meant to fit in a sentence.
+
+**What is refused, and why** (all SL0615):
+
+- **Neither side is the declaring type.** A conversion between two other types
+  would give somebody else's types a meaning from a distance, and a reader
+  would have nowhere to look for it. Same rule as an operator's operand
+  ([§7.4](#74-operators)).
+- **To or from an interface.** A cast to an interface asks the object what it
+  is; a conversion would make a different object instead, and the same
+  punctuation would mean two things.
+- **A conversion the language already has.** A derived class already converts
+  to its base, an array to a slice, an `int` to a `long`. A second answer to a
+  question already answered is one a reader would have to know about to predict
+  what a cast does.
+- **A type to itself**, and the same pair declared twice (SL0211).
+
+Two conversions from different types that both reach the same target are not a
+conflict; two that could both carry *this* value to *that* type are, and the
+call site says so (SL0616) rather than picking one.
+
+**A conversion does not cross a library boundary**, on the same terms as an
+operator: neither is in a module's metadata yet, so a consumer sees the type and
+not what it converts to.
 
 ## 7.5 Indexers
 
