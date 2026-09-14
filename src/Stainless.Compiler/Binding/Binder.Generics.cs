@@ -1,4 +1,4 @@
-// Stainless - an experimental systems language.
+// Stainless - an experimental general-purpose language.
 // Copyright (C) 2026 Brandon Scott
 //
 // This program is free software: you can redistribute it and/or modify
@@ -400,7 +400,7 @@ public sealed partial class Binder
     /// instantiation rather than once against its constraints. A constraint is
     /// therefore a promise verified here, at the use site, where it can name the
     /// offending type -- rather than a Rust-style contract the body is checked
-    /// against. See docs/language-spec.md for what that means in practice.
+    /// against. See docs/spec/04-generics.md for what that means in practice.
     /// </summary>
     private void VerifyConstraints(
         IReadOnlyList<WhereClauseSyntax> clauses,

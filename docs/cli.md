@@ -1,0 +1,286 @@
+<sub>[Stainless](../README.md) &rsaquo; The command line</sub>
+
+# The command line
+
+`stainless --help` is the authority; this page is the same ground with room to
+explain itself.
+
+```
+stainless build [paths...]     compile to a native executable
+stainless run   [paths...]     compile, then run it
+stainless emit-ir [paths...]   print the generated LLVM IR
+stainless doc [paths...]       write reference documentation from /// blocks
+stainless init [name]          write a stainless.json here
+stainless restore              resolve dependencies and lock them
+
+  -o, --out <path>       output file
+  --shared               build a shared library instead of an executable
+  --header <path>        write a C header for the exported surface
+  --metadata <path>      write module metadata for a Stainless consumer
+  -r, --reference <path> bind against a library's module metadata
+  --stdlib               (doc) document the standard library itself
+  -p, --project <path>   the project file to build, or its directory
+  --no-project           ignore any project file and use the paths alone
+  --update               re-resolve dependencies, ignoring the lock
+  --locked               fail rather than change the lock file
+  --offline              use the package cache and never the network
+  --runtime <shared|static>
+                         whether the runtime is one shared library or a
+                         copy in this binary. Shared where two Stainless
+                         binaries meet, static everywhere else
+  -O<0-3>                optimization level (default -O2)
+  -g, --debug            describe the program to a debugger
+  -D, --define <name>    define a symbol for '#if' to test
+  -l, --library <name>   link a library the linker finds by name
+                         (a source file can name one itself, with
+                          '#pragma comment(lib, "user32")')
+  --abi <microsoft|itanium>  which C and C++ ABI to agree with: names,
+                         bit-fields and how a struct is passed
+  --target <name>        the machine to build for: x64 (the default), x86 or
+                         arm64, optionally with a system -- x86-windows,
+                         x86-linux, arm64-windows, arm64-linux
+  --keep                 keep the generated .ll
+  --obj <dir>            directory for intermediates (default ./obj)
+  --                     everything after this is a path, not an option
+  -h, --help  -v, --version
+```
+
+## Paths
+
+Paths may be `.sl` files or directories (searched recursively), in any order.
+C and C++ sources and object files can be listed alongside them and are passed
+straight to the linker:
+
+```
+stainless run samples/interop/interop.sl samples/interop/native.c
+```
+
+A library the linker can find for itself is named with `-l` rather than by path,
+which is how a platform library is reached:
+
+```
+stainless run samples/win32/window.sl bindings/win32 -l user32 -l gdi32
+```
+
+A **Windows resource script** (`.rc`) may be listed too. It is compiled with
+`llvm-rc` and the linker folds the result into the executable, which is how an
+icon, a toolbar's image strip, a string table, a menu, a dialog template or an
+application manifest gets *inside* the binary rather than sitting beside it:
+
+```
+stainless run samples/win32/resources.sl samples/win32/resources.rc \
+    bindings/win32 -l user32
+```
+
+**It works on every target**, by two routes: a PE has a resource directory and
+the linker fills it, and everything else carries the same compiled script in a
+section called `.rsrc` that `Standard.Resources` walks. The two were checked
+against each other entry by entry and answer identically, so
+[tests/cases/resources-portable](../tests/cases/resources-portable) has one
+expected output and no `#if` in it. What does not travel is the *operating
+system*: a manifest, an icon and a dialog template are carried and readable
+elsewhere and inert, and SL0700 names them when a program has any. See
+[§2.2 of packages.md](packages.md#22-resources).
+
+## Reference documentation
+
+`stainless doc` reads the `///` blocks in the source and writes one Markdown
+page per module, plus an index:
+
+```
+stainless doc src -o docs/api        # a project's own modules
+stainless doc --stdlib               # the standard library, into docs/stdlib
+```
+
+[docs/stdlib](stdlib/index.md) is that output for the standard library, checked
+in so it can be read here. It is generated, so the source is what to edit.
+
+## Projects
+
+That command line says everything the build needs, and it cannot be *read*. A
+tool that wants to know what a program is made of — an editor, a language
+server, a package resolver — can only run a build and watch what happens, and a
+Makefile is no better, because a Makefile is a program too.
+
+So a project is a document. `stainless.json` at the root of a package, and
+`stainless build` with no paths finds it here or in a parent:
+
+```json
+{
+  "name": "app",
+  "version": "0.1.0",
+  "kind": "executable",
+  "sources": ["src"],
+  "dependencies": {
+    "shapes": { "path": "../shapes", "version": "^1.0" }
+  }
+}
+```
+
+```
+stainless init app      # writes exactly those four fields
+stainless run           # builds the project, and whatever it depends on
+```
+
+JSON because both sides can already read it: the compiler has a parser in the
+framework it is written in, and [stdlib/Json.sl](../stdlib/Json.sl) is the other
+one — so a program written in this language can read its own project file with
+nothing new written. A nicer syntax would cost two parsers for ever.
+
+**A field the format does not know is refused**, not ignored. A typo that
+silently did nothing is the failure a readable project file exists to prevent:
+
+```
+error: 'optimise' is not a field of a project file; did you mean 'optimize'?
+```
+
+## Packages
+
+A dependency comes from a directory or from git, and says which versions will
+do. A bare version is a caret — `1.2.0` means "1.2.0 up to but not including
+2.0.0" — which follows Cargo rather than npm, because the bare spelling is the
+one people type and it should mean what they almost always want.
+
+```json
+"dependencies": {
+  "geometry": { "path": "../geometry" },
+  "json":     { "git": "https://example/json.git", "tag": "v2.1.0", "version": "^2.1" },
+  "widgets":  { "path": "../widgets", "link": "shared" }
+}
+```
+
+**A dependency is compiled in by default**, and that is the interesting choice.
+Source is the model this language already has — one program, no headers,
+whole-program binding — so generics, interfaces and variants all cross a source
+dependency, when none of them can cross a binary one. `"link": "shared"` is the
+opt-in for a real boundary: the package is built once as a shared library, bound
+against through its metadata, and can be replaced without rebuilding what uses
+it.
+
+`stainless.lock` records what resolution decided — the exact commit, and a
+digest of the files that were read — and belongs in version control. A tag can
+be moved and a branch is expected to; a locked build goes to the commit rather
+than to the name, and `--update` is the request to look again.
+
+### A version is a promise; the digest is a fact
+
+Nothing stops 1.2.3 being rebuilt with a field added to the middle of a class,
+and nothing about the number says it happened — while everything compiled
+against it has that class's offsets baked in. It is not a link error. It is a
+program that reads the wrong four bytes and keeps going.
+
+So the metadata also carries a fingerprint taken over the layouts themselves,
+and the build compares. Move a field without moving the version and it says so,
+by name:
+
+```
+note: 'shapes' 1.0.0 describes a different surface than the last build of 1.0.0
+      did: Shapes.Canvas. A version number is a promise about exactly this, and
+      whatever was compiled against the old surface has those offsets and
+      signatures built into it -- the linker cannot tell, because the symbols
+      did not change.
+```
+
+Adding a function is not a broken promise and says nothing; moving a field is.
+A path dependency is told rather than stopped, because being edited in place is
+the entire reason to use one.
+
+[samples/packages](../samples/packages) is two packages and one program, and
+[docs/packages.md](packages.md) is the whole of it: every field, the
+version ranges, what resolution does and what it deliberately does not.
+
+## Building a library
+
+```
+stainless build src --shared -o build/math.dll --header build/math.h
+```
+
+produces the DLL, its import library, and a C header. A `--shared` build needs
+no `Main`, and **the export table is exactly the `export "C"` functions**:
+
+```csharp
+export "C" int Add(int a, int b) { return a + b; }   // exported
+
+public int Helper() { return 1; }                    // other modules only
+int Secret()        { return 2; }                    // module-private
+```
+
+That library's export table holds exactly one name:
+
+```
+$ llvm-readobj --coff-exports build/math.dll
+Name: Add
+```
+
+`public` deliberately does not export: it answers a different question — which
+modules may see this — and a library's surface should be stated once rather
+than falling out of visibility rules.
+
+Consuming it is ordinary C, because the header restates what the ABI already
+guarantees:
+
+```c
+#include "math.h"
+int main(void) { return Add(40, 2) == 42 ? 0 : 1; }
+```
+
+```
+clang consumer.c build/math.lib -o consumer.exe
+```
+
+One caveat worth knowing: plain C values cross a library boundary freely, but a
+`String`, class or array carries a reference count, and each binary links its
+own copy of the runtime. Pass C types across a *C* boundary and keep managed
+objects on one side of it.
+
+## A library for Stainless
+
+A Stainless consumer is a different matter, because both sides are Stainless and
+the compiler can describe one to the other:
+
+```
+stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
+stainless build app.sl --reference build/shapes.slmod build/shapes.lib -o app.exe
+```
+
+The `.slmod` is generated from the same bound program the library was compiled
+from, so it cannot drift from it. The consumer then writes ordinary Stainless
+against a module it has no source for:
+
+```csharp
+import Library.Shapes;
+
+var counter = new Counter("clicks", tally);
+counter.Step = 3;
+counter.Bump();
+Console.WriteLine(counter.Describe());
+```
+
+Classes cross with their fields, properties, methods, constructors, destructors
+and **events**, and so do structs, enums, free functions, `closure` types and
+`delegate` types. A consumer subscribes to an event declared in a library it has
+no source for, with handlers of its own, and the library raises them — and
+because the method that raises an event is private, "only the declaring type may
+raise it" holds across the boundary without anything checking it there.
+
+Reference counting reaches across too: the object is allocated through the
+library's own TypeInfo, so it is destroyed by the destructor the library
+compiled for its layout, when the consumer drops the last reference.
+
+**Both sides link one runtime**, which is what makes that count one count. They
+share an allocator and a C stdio buffer as well, so what a library prints
+interleaves with its consumer's output in the order the two of them wrote it.
+The compiler builds `stainless-rt` once and copies it beside each binary, so
+`build/` ends up holding it next to the library and the program.
+
+Generics and classes implementing interfaces do not cross, and the compiler says
+so where the library is built rather than leaving the consumer to find a public
+type missing. See [§8.4 of the spec](spec/08-interop-libraries.md#84-a-stainless-library-consumed-by-stainless) for why each is a
+decision about the language rather than a gap in the metadata.
+
+---
+
+---
+
+<sub>[&larr; README](../README.md) &nbsp;&middot;&nbsp;
+[Packages &rarr;](packages.md)</sub>

@@ -1,7 +1,7 @@
 # TODO
 
 What is coming next, and what is known to be wrong. Not a wishlist —
-[README's "What does not exist yet"](README.md#what-does-not-exist-yet) is the
+[docs/status.md's "What does not exist yet"](docs/status.md#what-does-not-exist-yet) is the
 honest full inventory of edges, and this is the subset with an intention behind
 it.
 

@@ -5,7 +5,7 @@ stainless run samples/tour
 ```
 
 One program that uses every feature of the language, in the order
-[the specification](../../docs/language-spec.md) introduces them. It prints what
+[the specification](../../docs/spec/index.md) introduces them. It prints what
 it did at each step, so running it checks that the tour is still *true* rather
 than only that it still builds.
 

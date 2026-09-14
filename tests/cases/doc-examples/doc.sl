@@ -4,7 +4,7 @@
 //
 // Prose drifts away from a compiler quietly. This is here so that when it does,
 // something fails rather than nobody noticing: every block below is lifted from
-// README.md, docs/language-spec.md or docs/concurrency.md.
+// README.md, docs/tour.md, docs/spec/ or docs/concurrency.md.
 module Doc;
 
 import Standard.Collections;
@@ -17,7 +17,7 @@ import Standard.Path;
 
 extern "C" int printf(byte* format, ...);
 
-// --- spec 5.2 / concurrency 4.2 -------------------------------------------
+// --- spec 5.2 / concurrency 4.2 ------------------------------------------
 static readonly Mutex<List<String>> Registry =
     new Mutex<List<String>>(new List<String>());
 
@@ -26,18 +26,18 @@ void Record(String name) {
     guard.Value().Add(name);
 }
 
-// --- spec 2.8 delegates ---------------------------------------------------
+// --- spec 2.14 delegates -------------------------------------------------
 public delegate int Transform(int value);
 int Double(int value) { return value * 2; }
 
-// --- spec 2.9 closures ----------------------------------------------------
+// --- spec 2.15 lambdas ---------------------------------------------------
 public interface ITransform { int Apply(int value); }
 
 ITransform MakeAdder(int amount) {
     return value => value + amount;
 }
 
-// --- spec 2.7 enums -------------------------------------------------------
+// --- spec 2.13 enums -----------------------------------------------------
 public enum Color { Red, Green, Blue }
 public enum Level : byte { Low = 1, Warning = 10, Severe, Fatal = 200 }
 
@@ -50,7 +50,7 @@ int Search(int[] data, int from, int upto, AtomicBool stop) {
     return -1;
 }
 
-// --- spec 5.7 IO ----------------------------------------------------------
+// --- spec 5.9 IO ---------------------------------------------------------
 String Roundtrip() {
     var buffer = new MemoryStream();
     buffer.WriteText("via a stream");
@@ -61,7 +61,7 @@ String Roundtrip() {
     return buffer.ToText() + " / " + reason + " / " + Path.FileName("x/y/notes.txt");
 }
 
-// --- spec 2.6 / 7.1 overloading, and one class implementing two interfaces -
+// --- spec 2.10 / 7.1 overloading, and one class implementing two interfaces -
 interface IEq<T> { bool Same(T other); }
 
 class Both : IEq<int>, IEq<String> {
@@ -85,7 +85,7 @@ String Overloads() {
         + " " + (asNumber.Same(7) && asText.Same("seven") ? "both" : "neither");
 }
 
-// --- spec 2.10 a lambda reaching its object -------------------------------
+// --- spec 2.15 a lambda reaching its object ------------------------------
 class Scaler {
     public int Factor;
     public Scaler(int factor) { Factor = factor; }
@@ -97,7 +97,7 @@ class Scaler {
     public ITransform ByMethod() { return value => Triple(value); }
 }
 
-// --- spec 2.4 weak breaks a cycle -----------------------------------------
+// --- spec 2.5 weak breaks a cycle ----------------------------------------
 class Kid {
     public weak Guardian? Owner;
 }
@@ -116,7 +116,7 @@ String Cycles() {
     return back == null ? "lost" : "linked";
 }
 
-// --- spec 9 arithmetic C leaves undefined ---------------------------------
+// --- spec 9.12 arithmetic C leaves undefined -----------------------------
 int Forty() { return 40; }
 
 String Defined() {
@@ -124,7 +124,7 @@ String Defined() {
         + ":" + Text.FromInteger(1 << 30);
 }
 
-// --- spec 2.5 Result ------------------------------------------------------
+// --- spec 2.8 Result -----------------------------------------------------
 enum Why { None = 0, TooSmall = 1, TooBig = 2 }
 
 Result<int, Why> Doubled(int n) {
@@ -152,7 +152,7 @@ String Results() {
         + " / " + Text.FromInteger(held.ValueOr(0));
 }
 
-// --- spec 2.2 a struct that holds a reference -----------------------------
+// --- spec 2.2 a struct that holds a reference ----------------------------
 struct Holder {
     public String Text;
     public int Tag;
@@ -167,7 +167,7 @@ String Held() {
     return two.Text + Text.FromInteger(two.Tag);
 }
 
-// --- spec 5.4 collections -------------------------------------------------
+// --- spec 5.4 collections ------------------------------------------------
 String Roster() {
     var ages = new Dictionary<String, int>();
     ages.Set("ada", 36);
@@ -190,13 +190,13 @@ String Roster() {
     return text.ToText();
 }
 
-// --- spec 2.7 flags enums -------------------------------------------------
+// --- spec 2.13 flags enums -----------------------------------------------
 [Flags]
 public enum Access : byte {
     None = 0, Read = 1, Write = 2, Execute = 4, All = 7,
 }
 
-// --- spec 9.1 switch ------------------------------------------------------
+// --- spec 9.1 switch -----------------------------------------------------
 String Name(Level level) {
     switch (level) {
         case Level.Low:     return "low";
@@ -219,7 +219,7 @@ int SkipAndStop(int[] values) {
     return total;
 }
 
-// --- spec 7.2 properties --------------------------------------------------
+// --- spec 7.3 properties -------------------------------------------------
 public interface INamed {
     String Name { get; }
     int Rank { get; set; }
@@ -252,13 +252,13 @@ public class Thermostat {
     }
 }
 
-// --- spec 9.2 statics, out of order --------------------------------------
+// --- spec 9.3 statics, out of order --------------------------------------
 static readonly int Total   = Doubled + 1;
 static readonly int Doubled = Base * 2;
 static readonly int Base    = 20;
 
 
-// --- README "Inheritance" / spec 2.4.1 and 2.4.2 --------------------------
+// --- tour "Inheritance" / spec 2.4.1 and 2.4.2 ---------------------------
 public abstract class DocShape {
     protected int sides;
 
@@ -299,7 +299,7 @@ String Inherits() {
     return answer + ":" + Text.FromBool(shape is DocPolygon);
 }
 
-// --- README "Variants" / spec 2.5 -----------------------------------------
+// --- tour "Variants" / spec 2.6 ------------------------------------------
 public variant Shape {
     Circle(double Radius);
     Rect(double Width, double Height);
@@ -329,7 +329,7 @@ String Shapes() {
 }
 
 
-// --- README "Passing by reference" / spec 7.2 -----------------------------
+// --- tour "Passing by reference" / spec 7.2 ------------------------------
 public struct Origin { public double X; public double Y; }
 
 void Bump(ref int n) { n = n + 1; }
@@ -353,7 +353,7 @@ String ByReference() {
 }
 
 
-// --- README "Slices" / spec 2.9 -------------------------------------------
+// --- tour "Slices" / spec 2.12 -------------------------------------------
 String Slicing() {
     var numbers = new int[6];
     for (nuint i = 0; i < numbers.Length; i = i + 1) { numbers[i] = (int)i + 1; }
@@ -375,7 +375,7 @@ String Slicing() {
 }
 
 
-// --- README "Conditional compilation" / spec 10 ---------------------------
+// --- tour "Conditional compilation" / spec 10 ----------------------------
 #if WINDOWS
 String Where() { return "a platform"; }
 #elif UNIX
@@ -385,7 +385,7 @@ String Where() { return "a platform"; }
 #endif
 
 
-// --- README "Layout control" / spec 2.3 -----------------------------------
+// --- tour "Layout control" / spec 2.3 ------------------------------------
 [Packed]
 public struct Wire { public byte Tag; public int Value; public byte Trailer; }
 
@@ -398,7 +398,7 @@ String Layouts() {
 }
 
 
-// --- README "Unions" / spec 2.7 -------------------------------------------
+// --- tour "Unions" / spec 2.7 --------------------------------------------
 public union Word {
     public int Signed;
     public uint Unsigned;
@@ -413,7 +413,7 @@ String Reinterpret() {
 }
 
 
-// --- README "Bit-fields" / spec 2.2 ---------------------------------------
+// --- tour "Bit-fields" / spec 2.3 ----------------------------------------
 public struct PacketHeader {
     public uint Version : 4;
     public uint Kind    : 4;
@@ -433,7 +433,7 @@ String Bits() {
            Text.FromInteger((int)sizeof(PacketHeader));
 }
 
-// --- spec 2.10.1 array literals -------------------------------------------
+// --- spec 2.11.1 array literals ------------------------------------------
 int SumSlice(int[:] slice) {
     int total = 0;
     for (nuint i = 0u; i < slice.Length; i = i + 1u) { total = total + slice[i]; }
@@ -452,7 +452,7 @@ String Literals() {
            Text.FromInteger((long)SumSlice([10, 20, 30]));
 }
 
-// --- README "containers", spec 5.4 ----------------------------------------
+// --- tour "Collections", spec 5.4 ----------------------------------------
 //
 // A dictionary's subscript answers `Optional<V>`, so a miss is an answer and
 // not a reason to stop. Its setter takes one too, which is what makes `None`
@@ -496,7 +496,7 @@ String Lookup() {
     return built.ToText();
 }
 
-// --- README "what a number survives", spec 3 ------------------------------
+// --- tour "Text", spec 3.7 -----------------------------------------------
 //
 // FromDouble writes the shortest text that reads back as the same number, and
 // Convert.ToDouble is its correctly-rounded inverse.
