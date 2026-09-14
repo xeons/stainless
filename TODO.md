@@ -219,13 +219,25 @@ Two ways to close it, and the measurements that decide between them:
 `ld.lld` answers `unknown file type` -- but it does not have to. A `.res` is a
 flat list of self-describing records, and `llvm-objcopy -I binary -O
 elf64-x86-64 app.res app.o` turns it into an object exposing
-`_binary_app_res_start`/`_end`, which links. Both steps were run and both work.
-A reader for the record format is perhaps a hundred lines. **This is the one to
-do**, because it adds no dependency -- `llvm-rc` and `llvm-objcopy` both ship
-beside the clang the build already requires -- keeps one `.rc` for every
-target, and preserves the type-and-id addressing `Win32.Resources` already
-exposes, so `Resources.Bytes(Id(301), RtRcData())` would compile and run
-unchanged on Linux.
+`_binary_app_res_start`/`_end`, which links. Both steps were run and both work,
+and a Stainless program on Linux has read the blob back -- with no C in the
+build, now that a variable may cross `extern "C"`: those symbols are reached by
+declaring `extern "C" byte _binary_app_res_start;` and taking its address.
+
+What is left is the reader for the record format, which is perhaps a hundred
+lines: a flat sequence of (DataSize, HeaderSize, type, name, fixed tail, data),
+each entry starting at the next four-byte boundary, with type and name each
+either a 0xFFFF marker plus a 16-bit id or a NUL-terminated UTF-16 string. The
+first entry is a null marker and is skipped. `RT_STRING` needs the block
+arithmetic `LoadStringW` does -- strings are filed sixteen to a block, so id 201
+is the tenth entry of block 13 -- and that is the part that proves the shim can
+reproduce what Windows does rather than merely hand back bytes.
+
+**This is the one to do**, because it adds no dependency -- `llvm-rc` and
+`llvm-objcopy` both ship beside the clang the build already requires -- keeps
+one `.rc` for every target, and preserves the type-and-id addressing
+`Win32.Resources` already exposes, so `Resources.Bytes(Id(301), RtRcData())`
+would compile and run unchanged on Linux.
 
 *GResource.* An XML manifest compiled by `glib-compile-resources` into an ELF
 section, reached by a `resource:///` path. It is what other Linux tooling

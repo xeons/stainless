@@ -1,0 +1,11 @@
+counter 7
+wide -1
+name defined in C
+c reads 41
+after bump 42
+after add 142 and c agrees 142
+wide now 8589934592
+depth 5 c reads 5
+flags 0 c reads 0
+depth 99 c reads 99
+flags 3 c reads 3

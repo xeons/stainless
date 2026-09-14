@@ -29,8 +29,13 @@ public sealed partial class LlvmEmitter
 {
     // ============================================================ statics
 
+    /// <summary>
+    /// The global's name. Storage that crosses to C keeps the name C knows it
+    /// by; everything else is mangled, because an ordinary static is this
+    /// program's business and two modules may each have one called `count`.
+    /// </summary>
     private static string StaticName(StaticSymbol symbol) =>
-        "_SLstatic_" + Mangler.SymbolSafe(symbol.QualifiedName);
+        symbol.LinkName ?? "_SLstatic_" + Mangler.SymbolSafe(symbol.QualifiedName);
 
     /// <summary>
     /// One zeroed global per static. They are written once, by the initializer
@@ -44,8 +49,17 @@ public sealed partial class LlvmEmitter
         foreach (var symbol in program.Statics)
         {
             string llvmType = LlvmTypeOf(symbol.Type);
+
+            // An imported one is a promise rather than storage: no initializer,
+            // and the linker supplies the definition or fails. An exported one
+            // is storage under a name C can reach, so it is not `internal`.
+            string linkage = symbol.IsImported ? "external " :
+                             symbol.LinkName is not null ? "" : "internal ";
+
+            string body = symbol.IsImported ? "" : " " + ZeroOf(llvmType);
+
             _module.AppendLine(
-                $"@{StaticName(symbol)} = internal global {llvmType} {ZeroOf(llvmType)}, " +
+                $"@{StaticName(symbol)} = {linkage}global {llvmType}{body}, " +
                 $"align {AlignOf(llvmType)}");
         }
 

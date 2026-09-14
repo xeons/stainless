@@ -26,6 +26,83 @@ public sealed partial class Binder
 {
     // ============================================================ statics
 
+    /// <summary>
+    /// <c>extern "C" int errno;</c> and <c>export "C" int slDepth = 0;</c>:
+    /// a variable that is the same storage on both sides of the C boundary.
+    ///
+    /// This is the data half of what <c>extern "C"</c> already did for
+    /// functions, and it is needed for the same reason. A C library's surface
+    /// is not only its entry points: <c>errno</c>, <c>environ</c>, <c>optarg</c>
+    /// and <c>stdin</c> are variables, and a language that speaks the platform
+    /// C ABI but cannot name one of them has to write a C shim whose whole
+    /// content is a getter.
+    ///
+    /// It becomes a <see cref="StaticSymbol"/> because that is what it is --
+    /// one global, read and written through the same path as any other, with
+    /// storage the linker resolves instead of storage this program defines.
+    /// </summary>
+    private void DeclareForeignVariable(FileScope scope, FieldDeclSyntax declaration)
+    {
+        var module = scope.Module;
+
+        if (module.Statics.ContainsKey(declaration.Name) ||
+            module.Constants.ContainsKey(declaration.Name))
+        {
+            diagnostics.Error("SL0201", declaration.Span,
+                $"'{declaration.Name}' is already declared in module '{module.Name}'");
+            return;
+        }
+
+        // A C++ variable's name is mangled by rules of its own -- neither
+        // Itanium nor Microsoft spells a global the way it spells a function --
+        // and none of that is written. Refusing is honest; guessing would
+        // produce a link error nobody could read.
+        if (declaration.Linkage.IsCpp())
+        {
+            diagnostics.Error("SL0701", declaration.Span,
+                $"'{declaration.Name}' is a variable, and a C++ variable's name is mangled by " +
+                "rules this compiler does not implement; declare it 'extern \"C\"', or reach it " +
+                "through a C++ function that returns its address");
+            return;
+        }
+
+        bool imported = declaration.Linkage.IsImport();
+
+        // An imported variable is a declaration, so a value here would be
+        // describing storage this program does not own. An exported one is a
+        // definition and wants one, for the same reason any other static does.
+        if (imported && declaration.Initializer is not null)
+        {
+            diagnostics.Error("SL0702", declaration.Span,
+                $"'{declaration.Name}' is declared 'extern \"C\"', so it is defined elsewhere " +
+                "and cannot be given a value here");
+            return;
+        }
+
+        var type = ResolveType(declaration.Type, scope);
+
+        var symbol = new StaticSymbol(declaration.Name, type, module.Name)
+        {
+            IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
+            LinkName = declaration.Name,
+            IsImported = imported,
+            Span = declaration.Span,
+        };
+
+        module.Statics[declaration.Name] = symbol;
+        _foreignVariables.Add(symbol);
+
+        // An exported one is defined here, so its value is bound and ordered
+        // with every other static's. An imported one has nothing to bind.
+        if (!imported && declaration.Initializer is not null)
+            _staticSyntax[symbol] = (
+                new StaticDeclSyntax(
+                    declaration.Span, declaration.Modifiers, declaration.Type,
+                    declaration.Name, declaration.Initializer, false),
+                scope,
+                new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
+    }
+
     private void DeclareStatic(
         FileScope scope, StaticDeclSyntax declaration, NamedTypeSymbol? containingType = null)
     {
@@ -135,6 +212,15 @@ public sealed partial class Binder
             CollectStaticDependencies(symbol, symbol.Initializer);
 
         _staticOrder = SortStatics();
+
+        // Storage that crosses to C is emitted whether or not it had an
+        // initializer to sort: an imported one has none by definition, and the
+        // emitter still has to declare the global. Nothing without an
+        // initializer can depend on anything, so the front is as good a place
+        // as any.
+        var sorted = new HashSet<StaticSymbol>(_staticOrder);
+        _staticOrder.InsertRange(
+            0, _foreignVariables.Where(variable => !sorted.Contains(variable)));
     }
 
     /// <summary>

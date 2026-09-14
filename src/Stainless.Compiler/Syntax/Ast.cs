@@ -344,6 +344,17 @@ public sealed record FieldDeclSyntax(
     public ExpressionSyntax? BitWidth { get; init; }
 
     /// <summary>
+    /// What <c>extern "C"</c> or <c>export "C"</c> was written in front of this,
+    /// or <see cref="LinkageKind.Stainless"/> for an ordinary field.
+    ///
+    /// A field inside a type ignores it -- a struct's member has no linkage of
+    /// its own, only the struct does. At module scope it is the whole of what
+    /// makes <c>extern "C" int errno;</c> a declaration of C's variable rather
+    /// than an error.
+    /// </summary>
+    public LinkageKind Linkage { get; init; }
+
+    /// <summary>
     /// True for the field a nameless <c>struct { }</c> or <c>union { }</c>
     /// member becomes. The field is real and holds the layout; the name is
     /// generated and unwritable, and lookup reaches through it so that the

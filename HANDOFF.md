@@ -8,8 +8,8 @@ and what is worth doing next. Written to be read cold.
 ```
 dotnet build Stainless.slnx                     0 warnings
 dotnet test tests/Stainless.UnitTests           835 pass, Windows and Linux
-dotnet run --project tests/Stainless.Tests      281 pass, 2 skipped on Windows
-                                                270 pass, 13 skipped on Linux
+dotnet run --project tests/Stainless.Tests      283 pass, 2 skipped on Windows
+                                                272 pass, 13 skipped on Linux
 stainless doc --stdlib                          22 pages into docs/stdlib
 samples/forms/build.ps1 -Test                   demo 21/21, common 43/43
 forms on GTK 3, under broadwayd                 demo 21/21, common 43/43
@@ -105,9 +105,51 @@ keep honest, and no current distribution ships the second.
 | `8aa7853` | Linux x86 runs, COM reaches x86, and ARM64 is classified |
 | `2c0e8b8` | GTK 2 goes, and `forms/` gets its second backend |
 | `cc4a910` | a lambda capturing a member something else writes warns |
-| *this one* | Windows resources, and the tree view that had never held an item |
+| `ad37dd4` | Windows resources, and the tree view that had never held an item |
+| *this one* | a variable may cross `extern "C"`, not only a function |
 
 ## Findings worth keeping
+
+### What extern variables cost, which was less than expected
+
+`extern "C" int errno;` is the data half of what `extern "C"` already did for
+functions, and most of it was already built. **The syntax already parsed** --
+the parser routes an extern declaration through `ParseFunctionOrField` and
+`WithConvention` even has an error for "this declares a value", so a field came
+out the other side with its linkage dropped on the floor. **The storage already
+existed** too: a module-level `static` emits an LLVM global and
+`EmitStaticAccess` already loads through `@name`. What was missing was the
+wiring -- carry `Linkage` onto `FieldDeclSyntax`, give `StaticSymbol` a
+`LinkName` and `IsImported`, declare rather than refuse, and emit `external
+global` under the C name. About 210 lines including the documentation.
+
+**One trap that is the compiler's fault and one that is not.**
+
+`SortStatics` walks `_staticSyntax`, which is keyed by *initializer*. An
+imported variable has none by definition, so the symbol bound, the load emitted,
+and the global was never declared -- IR that names `@errno` and does not define
+it. `_foreignVariables` is a second list for exactly that reason, and the
+comment on it says so.
+
+`errno` itself does not work and should not. Every C library defines it as a
+macro over a function so each thread gets its own -- `_errno()` in the UCRT,
+`__errno_location()` in glibc -- and there is no preprocessor here to see
+through a macro. It fails as a link error naming the symbol, which is the good
+kind; the alternative would have been a plausible wrong number.
+
+**The width trap caught this session's own test.** `long probe_wide = -1;` in
+the C half read back as `2093069526210969599`, because C's `long` is 32 bits on
+Windows and a Stainless `long` is a fixed 64. On a function that is an argument
+arriving wrong; on a variable it is a silent 8-byte load from a 4-byte global.
+The compiler cannot check it -- it never sees the C declaration -- so it is
+documented in §8 and the case's C file says why it uses `long long`.
+
+**It removes a C shim from the resources-on-Linux work.** `llvm-objcopy -I
+binary` leaves `_binary_<name>_start`/`_end`, whose *addresses* are the data;
+reaching them needed a C file whose whole content was two getters, and now does
+not. Verified on Linux: a Stainless program read an embedded 272-byte `.res`
+with no C in the build at all.
+
 
 ### What implementing resources found
 

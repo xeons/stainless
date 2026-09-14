@@ -1199,6 +1199,7 @@ public sealed class Parser
             SpanFrom(start), modifiers, returnType, name, initializer, attributes ?? [])
         {
             BitWidth = bits,
+            Linkage = linkage,
         };
     }
 

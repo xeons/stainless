@@ -397,6 +397,27 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     /// </summary>
     public bool IsReadonly { get; init; }
 
+    /// <summary>
+    /// The name the linker knows this by, for storage that crosses to C, or
+    /// null for ordinary Stainless storage with a mangled name.
+    ///
+    /// <c>extern "C" int errno;</c> and <c>export "C" int slDepth = 0;</c> are
+    /// the two that set it: one names storage defined elsewhere, the other
+    /// defines storage under a name C can reach. Both are the same global to
+    /// everything that reads or writes it, which is why they share a symbol.
+    /// </summary>
+    public string? LinkName { get; init; }
+
+    /// <summary>
+    /// Declared here and defined somewhere else: <c>extern "C" int errno;</c>.
+    ///
+    /// It has no initializer and no storage of its own -- the emitter writes an
+    /// <c>external global</c>, which is a promise to the linker rather than a
+    /// definition, and the linker fails if nothing keeps it. That is the same
+    /// contract an <c>extern "C"</c> function already has.
+    /// </summary>
+    public bool IsImported { get; init; }
+
     public required Source.SourceSpan Span { get; init; }
 
     /// <summary>The initializer, bound in pass 8 like any other body.</summary>

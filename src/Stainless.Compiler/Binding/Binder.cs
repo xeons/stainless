@@ -152,6 +152,13 @@ public sealed partial class Binder(
     /// </summary>
     private readonly HashSet<StaticSymbol> _boundStatics = [];
     private List<StaticSymbol> _staticOrder = [];
+
+    /// <summary>
+    /// Module-level storage that crosses to C. Kept apart because the ordering
+    /// pass walks initializers, and an imported variable has none -- it would
+    /// otherwise never reach the emitter that has to declare it.
+    /// </summary>
+    private readonly List<StaticSymbol> _foreignVariables = [];
     private readonly List<FunctionSymbol> _staticConstructors = [];
 
     /// <summary>

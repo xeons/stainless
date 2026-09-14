@@ -4311,6 +4311,69 @@ extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
 plain data, or a raw pointer
 ```
 
+**A variable may cross too.** A C library's surface is not only its entry
+points: `environ`, `optarg`, `timezone` and `stdin` are storage, and a language
+that speaks the platform C ABI should be able to name one without a shim whose
+whole content is a getter. So `extern "C"` on a variable declares storage
+defined elsewhere, and `export "C"` defines storage C can reach:
+
+```csharp
+extern "C" int   probe_counter;     // defined in C; read and written here
+extern "C" byte* environ;
+
+export "C" int stainless_depth = 0; // defined here; read and written by C
+```
+
+There is **one global**, not two. Nothing is copied and nothing is marshalled:
+the name on each side is the same address, so a write on either side is what
+the other reads. An imported one has no initializer, because the storage is not
+this program's to define:
+
+```
+error[SL0702]: 'already_there' is declared 'extern "C"', so it is defined
+elsewhere and cannot be given a value here
+```
+
+This is the *only* variable allowed at module scope. An ordinary one is still
+refused (SL0204), because a mutable global with no boundary to justify it is
+state every thread reaches and nothing declares — what `static` inside a type
+is for, with the thread-safety question SL0377 asks of it.
+
+**Two things to get right, and the compiler can check neither**, because it
+never sees the C declaration:
+
+*The width has to match.* A Stainless `long` is a fixed 64 bits — C's `long
+long` — and C's own `long` is 32 bits on Windows (§9). On a function a
+mismatch is an argument that arrives wrong; on a variable it is a silent
+8-byte load from a 4-byte global, which reads whatever follows it.
+
+*Many C "variables" are not variables.* `errno` is the famous one: every C
+library defines it as a macro over a function, so that each thread gets its
+own — `_errno()` in the UCRT, `__errno_location()` in glibc. Stainless has no
+preprocessor to see through a macro, so `extern "C" int errno;` is a promise
+nothing keeps and the linker says so. Reach it through the function the macro
+hides:
+
+```csharp
+#if WINDOWS
+extern "C" int* _errno();
+#else
+extern "C" int* __errno_location();
+#endif
+```
+
+That failure is a link error naming the symbol, which is the good kind: the
+alternative would have been reading a plausible wrong number.
+
+**A C++ variable is not supported.** Neither ABI mangles a global the way it
+mangles a function, and none of that is written:
+
+```
+error[SL0701]: 'cpp_global' is a variable, and a C++ variable's name is mangled
+by rules this compiler does not implement; declare it 'extern "C"', or reach it
+through a C++ function that returns its address
+```
+
 ### 8.1 C++ linkage
 
 A C++ function is reached by mangling its signature the way the target's

@@ -92,6 +92,14 @@ public sealed partial class Binder
                         DeclareGlobalConstant(scope, constant);
                         break;
 
+                    // Storage that crosses to C is the one module-level
+                    // variable there is a reason for: it is not this program's
+                    // storage to keep in a type, it is a name the C library
+                    // already owns. Everything else at module scope is refused.
+                    case FieldDeclSyntax field when field.Linkage.IsForeign():
+                        DeclareForeignVariable(scope, field);
+                        break;
+
                     case FieldDeclSyntax field:
                         diagnostics.Error("SL0204", field.Span,
                             $"'{field.Name}' is a module-level variable; only 'const' values are " +
