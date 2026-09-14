@@ -42,6 +42,7 @@
 #include "stainless.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* ------------------------------------------------------------------- ARC */
@@ -209,3 +210,151 @@ const SlGuid sl_iid_unknown = {
     0x00000000, 0x0000, 0x0000,
     { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 }
 };
+
+/* IClassFactory, fixed since 1993 like IUnknown's. */
+const SlGuid sl_iid_class_factory = {
+    0x00000001, 0x0000, 0x0000,
+    { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 }
+};
+
+/* ------------------------------------------------------------ activation */
+
+/*
+ * A class factory over one entry of the compiler's table.
+ *
+ * IClassFactory is IUnknown plus CreateInstance and LockServer, so its vtable
+ * is five slots and the first three are the usual ones. This object is not a
+ * Stainless object -- it has no header, no TypeInfo and no destructor --
+ * because nothing in the language ever holds it: it exists between
+ * DllGetClassObject and the caller's Release, and the caller is C++.
+ */
+typedef struct SlClassFactory {
+    const void        *vtable;
+    int32_t            refs;
+    const SlComFactory *entry;
+} SlClassFactory;
+
+static int32_t SL_COM_METHOD factory_query(void *self, const SlGuid *iid, void **result)
+{
+    SlClassFactory *factory = (SlClassFactory *)self;
+
+    if (result == NULL) return SL_COM_E_POINTER;
+    *result = NULL;
+    if (iid == NULL) return SL_COM_E_POINTER;
+
+    if (!sl_guid_equals(iid, &sl_iid_unknown) &&
+        !sl_guid_equals(iid, &sl_iid_class_factory))
+        return SL_COM_E_NOINTERFACE;
+
+    factory->refs++;
+    *result = factory;
+    return SL_COM_S_OK;
+}
+
+static uint32_t SL_COM_METHOD factory_add_ref(void *self)
+{
+    SlClassFactory *factory = (SlClassFactory *)self;
+    return (uint32_t)++factory->refs;
+}
+
+static uint32_t SL_COM_METHOD factory_release(void *self)
+{
+    SlClassFactory *factory = (SlClassFactory *)self;
+    int32_t remaining = --factory->refs;
+
+    if (remaining == 0) free(factory);
+    return (uint32_t)remaining;
+}
+
+/*
+ * Make one, and hand back the interface asked for rather than the one made.
+ *
+ * create() returns the object's first tear-off with a +1 on it. That is an
+ * IUnknown, and the caller may have asked for something else, so the +1 is
+ * spent on a QueryInterface and released either way -- which is also what
+ * turns "this class does not present that interface" into E_NOINTERFACE
+ * rather than a wrong pointer.
+ */
+static int32_t SL_COM_METHOD factory_create(
+    void *self, void *outer, const SlGuid *iid, void **result)
+{
+    SlClassFactory *factory = (SlClassFactory *)self;
+    void *made;
+    int32_t answer;
+
+    if (result == NULL) return SL_COM_E_POINTER;
+    *result = NULL;
+    if (iid == NULL) return SL_COM_E_POINTER;
+
+    /* Aggregation would need the object to delegate IUnknown to an outer one,
+       and a com class's IUnknown is the compiler's. Refused rather than
+       half-supported. */
+    if (outer != NULL) return SL_COM_CLASS_E_NOAGGREGATION;
+
+    made = factory->entry->create();
+    if (made == NULL) return SL_COM_E_OUTOFMEMORY;
+
+    answer = ((SlComObject *)made)->vtable->QueryInterface(made, iid, result);
+    sl_com_release(made);
+    return answer;
+}
+
+/*
+ * LockServer, which this server does not need: it never unloads. Accepted
+ * rather than refused, because a host is entitled to call it and a failure
+ * here reads as a broken factory.
+ */
+static int32_t SL_COM_METHOD factory_lock(void *self, int32_t lock)
+{
+    (void)self;
+    (void)lock;
+    return SL_COM_S_OK;
+}
+
+static const void *sl_class_factory_vtable[5] = {
+    (const void *)factory_query,
+    (const void *)factory_add_ref,
+    (const void *)factory_release,
+    (const void *)factory_create,
+    (const void *)factory_lock,
+};
+
+int32_t sl_com_get_class_object(
+    const SlComFactoryTable *table,
+    const SlGuid *clsid, const SlGuid *iid, void **result)
+{
+    size_t i;
+
+    if (result == NULL) return SL_COM_E_POINTER;
+    *result = NULL;
+    if (clsid == NULL || iid == NULL) return SL_COM_E_INVALIDARG;
+    if (table == NULL) return SL_COM_CLASS_E_CLASSNOTAVAILABLE;
+
+    for (i = 0; i < table->count; i++) {
+        SlClassFactory *factory;
+
+        if (!sl_guid_equals(clsid, table->entries[i].clsid)) continue;
+
+        factory = (SlClassFactory *)malloc(sizeof(SlClassFactory));
+        if (factory == NULL) return SL_COM_E_OUTOFMEMORY;
+
+        factory->vtable = sl_class_factory_vtable;
+        factory->refs = 1;
+        factory->entry = &table->entries[i];
+
+        /* Through QueryInterface rather than straight out, so asking for
+           something this factory is not gets E_NOINTERFACE and no leak. */
+        {
+            int32_t answer = factory_query(factory, iid, result);
+            factory_release(factory);
+            return answer;
+        }
+    }
+
+    return SL_COM_CLASS_E_CLASSNOTAVAILABLE;
+}
+
+int32_t sl_com_can_unload_now(void)
+{
+    return SL_COM_S_FALSE;
+}

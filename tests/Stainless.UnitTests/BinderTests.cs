@@ -291,6 +291,49 @@ public class BinderTests
         Assert.Equal(["SL0534", "SL0537"], Front.ModuleCodes("com interface IThing { }"));
 
     /// <summary>
+    /// A CLSID on a com class is accepted: it is what lets something ask for
+    /// the class rather than be handed one of its objects.
+    /// </summary>
+    [Fact]
+    public void AComClassMayCarryAClsid() =>
+        Assert.Empty(Front.ModuleCodes(
+            "[Guid(\"9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10\")] com interface I { int F(); }\n" +
+            "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] com class C : I {\n" +
+            "  public int F() { return 0; }\n}"));
+
+    /// <summary>
+    /// A class factory has no arguments to pass, so a class that can be asked
+    /// for needs a constructor taking none.
+    /// </summary>
+    [Fact]
+    public void AnActivatableClassNeedsAnEmptyConstructor() =>
+        Assert.Contains("SL0611", Front.ModuleCodes(
+            "[Guid(\"9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10\")] com interface I { int F(); }\n" +
+            "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] com class C : I {\n" +
+            "  int n;\n  public C(int start) { n = start; }\n" +
+            "  public int F() { return n; }\n}"));
+
+    /// <summary>
+    /// Declaring no constructor at all is not the same as declaring only ones
+    /// that take arguments: the fields are the zeroes the allocator wrote.
+    /// </summary>
+    [Fact]
+    public void AnActivatableClassNeedsNoConstructorAtAll() =>
+        Assert.Empty(Front.ModuleCodes(
+            "[Guid(\"9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10\")] com interface I { int F(); }\n" +
+            "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] com class C : I {\n" +
+            "  public int F() { return 0; }\n}"));
+
+    /// <summary>
+    /// A GUID still means nothing on an ordinary class: it has no vtable for
+    /// anything to reach it through.
+    /// </summary>
+    [Fact]
+    public void APlainClassStillRefusesAGuid() =>
+        Assert.Contains("SL0538", Front.ModuleCodes(
+            "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] class C { }"));
+
+    /// <summary>
     /// Overloads that differ in a parameter type are fine; this is the
     /// baseline the duplicate case is measured against.
     /// </summary>

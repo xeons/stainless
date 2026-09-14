@@ -24,3 +24,5 @@ SL0535
 SL0305
 # an interface that adds nothing to IUnknown
 SL0534
+# a com class with a CLSID and no constructor a factory could call
+SL0611

@@ -338,6 +338,36 @@ public sealed class Builtins
         ComMethod(Unknown, 1, "AddRef", PrimitiveTypeSymbol.UInt, isPublic: false);
         ComMethod(Unknown, 2, "Release", PrimitiveTypeSymbol.UInt, isPublic: false);
 
+        // --- Standard.Com results ---------------------------------------------
+        //
+        // The HRESULTs a com method actually returns, named rather than spelled
+        // as hex at every site. Negative is failure, which is the whole of the
+        // convention; these are the handful the language's own machinery uses
+        // or hands back, not a transcription of winerror.h.
+        Constant(Com, "Ok", PrimitiveTypeSymbol.Int, 0);
+        Constant(Com, "False", PrimitiveTypeSymbol.Int, 1);
+        Constant(Com, "NoInterface", PrimitiveTypeSymbol.Int, unchecked((int)0x80004002));
+        Constant(Com, "PointerError", PrimitiveTypeSymbol.Int, unchecked((int)0x80004003));
+        Constant(Com, "OutOfMemory", PrimitiveTypeSymbol.Int, unchecked((int)0x8007000E));
+        Constant(Com, "InvalidArgument", PrimitiveTypeSymbol.Int, unchecked((int)0x80070057));
+        Constant(Com, "NoAggregation", PrimitiveTypeSymbol.Int, unchecked((int)0x80040110));
+        Constant(Com, "ClassNotAvailable", PrimitiveTypeSymbol.Int, unchecked((int)0x80040111));
+
+        // --- Standard.Com activation -----------------------------------------
+        //
+        // What an in-process COM server exports DllGetClassObject to answer.
+        // The runtime function takes the compiler's factory table first; this
+        // binds to a shim the emitter writes into the module, which supplies
+        // it. So the source writes three arguments and the table stays a thing
+        // the program has rather than a symbol it has to name.
+        Function(Com, "GetClassObject", PrimitiveTypeSymbol.Int,
+            "sl_com_class_object_here",
+            ("clsid", guidPointer), ("iid", guidPointer), ("result", bytePointerPointer));
+
+        // S_FALSE, always: see sl_com_can_unload_now for why a server whose
+        // objects ARC owns cannot honestly answer anything else.
+        Function(Com, "CanUnloadNow", PrimitiveTypeSymbol.Int, "sl_com_can_unload_now");
+
         // --- Standard.Text free functions -----------------------------------
         TextFromLong = Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.Long));
@@ -403,6 +433,8 @@ public sealed class Builtins
         // One line without its terminator, and null at end of input -- a blank
         // line and no line at all are different answers, and a loop that reads
         // until there is nothing left needs to tell them apart.
+        Function(Console, "Flush", PrimitiveTypeSymbol.Void, "sl_console_flush");
+
         Function(Console, "ReadLine", new OptionalTypeSymbol(String), "sl_console_read_line");
         Function(Console, "ReadToEnd", String, "sl_console_read_all");
         Function(Console, "AtEnd", PrimitiveTypeSymbol.Bool, "sl_console_at_end");
@@ -519,6 +551,10 @@ public sealed class Builtins
         string runtimeSymbol,
         params (string Name, TypeSymbol Type)[] parameters) =>
         Declare(module, name, returnType, runtimeSymbol, containingType: null, parameters);
+
+    /// <summary>A public constant of a built-in module.</summary>
+    private static void Constant(ModuleSymbol module, string name, TypeSymbol type, object value) =>
+        module.Constants[name] = new ConstantSymbol(name, type, value) { IsPublic = true };
 
     private static FunctionSymbol Declare(
         ModuleSymbol module,

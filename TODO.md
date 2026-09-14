@@ -154,26 +154,54 @@ cast on every line.
 
 ### Portable COM activation
 
-`com interface` and `com class` exist (spec §8.5) and `Win32.Com`,
-`Win32.Ole32` and `Win32.ShellCom` bind Windows' activation over them, so
-calling COM works on Windows and the binary contract works everywhere.
+The server half is done. `[Guid]` on a `com class` is a CLSID, the compiler
+collects every class carrying one into a factory table, and
+`Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared` build
+exporting `DllGetClassObject` is a real in-process COM server, which
+[samples/com](samples/com) is, called from C++ and checked by
+[tests/cases/com-activation](tests/cases/com-activation).
 
-What does not exist anywhere but Windows is *how an object gets made*. The
-piece worth building is small and deliberately not COM's: a table of factories
-linked into the process, plus `dlopen`/`LoadLibrary` of a module exporting
-`DllGetClassObject`, falling through to the real `CoCreateInstance` on Windows
-so one source reaches the actual shell.
+What is still missing is the **client** half away from Windows: `Com.Create`,
+taking a CLSID and reaching an object without the caller knowing where it came
+from. That wants `dlopen`/`LoadLibrary` of a module exporting
+`DllGetClassObject`, the in-process table first, and a fall-through to the real
+`CoCreateInstance` on Windows so one source reaches the actual shell.
 
 In-process and free-threaded only, stated as a limit rather than discovered as
 one — no apartments, no marshalling, no proxies, no `IDispatch`. The value is
 in the interface discipline, and XPCOM is what pretending otherwise looks
 like.
 
-The same work is what would let a Stainless `com class` be handed to another
-process, which today it cannot be: it can be written and passed around inside
-one program, and nothing can ask for it by CLSID.
-
 *Touches:* `runtime/com.c`, `bindings/win32/Com.sl`.
+
+### A `.def` file, for a 32-bit COM server
+
+`export "C" __stdcall` gets the convention right and decorates the name with
+it, so a 32-bit in-proc server exports `_DllGetClassObject@12` where Windows'
+loader looks up `DllGetClassObject`. The fix is what every C++ COM server
+does — a module definition file naming the undecorated exports — and the
+compiler writes none, so it would be `--def <path>` passed through to the
+linker, or generated from the `export` declarations.
+
+Only the module's own exports are affected. Every COM *slot* is already
+`__stdcall` on x86, stamped on when the table is numbered, which is why
+[tests/cases/x86-com](tests/cases/x86-com) passes.
+
+*Touches:* `src/Stainless.Compiler/Driver/Compilation.cs`.
+
+### `DllCanUnloadNow` cannot answer honestly
+
+It returns S_FALSE always, which is safe and is what a server that is never
+unloaded should say. The honest answer needs a count of live COM objects, and
+ARC owns those lifetimes: the count that decides when one dies is the
+compiler's, decremented at scope ends across the whole program, with no hook
+saying "and that was the last object COM can see".
+
+A hook on a com class's allocation and destruction would do it — the create
+function already exists, and the destructor is emitted — but it costs two
+atomics per object for a question most servers never ask.
+
+*Touches:* `runtime/com.c`, `src/Stainless.Compiler/Emit/LlvmEmitter.Dispatch.cs`.
 
 ### More Windows COM interfaces
 

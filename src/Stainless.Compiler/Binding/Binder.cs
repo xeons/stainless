@@ -262,6 +262,7 @@ public sealed partial class Binder(
         DeclareMembers();           // pass 4: every signature and field type is resolved
         ResolveInterfaces();        // pass 5: every class satisfies what it claims
         ResolveAttributes();        // pass 6: attributes fold to constants
+        CheckActivatableClasses();  //         and a CLSID says who can be made
         ComputeLayouts();           // pass 7: every value type has a size
         CheckUnions();              //         and a union counts nothing
         ValidateLinkageSignatures();// pass 8: no counted reference crosses a language boundary

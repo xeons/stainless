@@ -492,17 +492,61 @@ This is the cost of the compiler owning the reference count, and it is a small
 one against the class of bug it removes — but it is the one thing a COM
 programmer knows that this does not do for them.
 
+### `[Guid]` on a com class: being asked for
+
+An IID names an interface and a CLSID names a class, and the difference is who
+is asking. A caller holding an object asks it for an interface. A caller
+holding *nothing* has only a CLSID, and needs the process to turn that into an
+object. `[Guid]` on a `com class` is what makes the second possible:
+
+```csharp
+[Guid("5a1c8e30-2b47-4d16-a9f3-c04e7b81d629")]
+public com class Greeter : IGreeter, ICounter { ... }
+
+export "C" int DllGetClassObject(Guid* clsid, Guid* iid, byte** result) {
+    return Com.GetClassObject(clsid, iid, result);
+}
+```
+
+The compiler collects every com class carrying one into a table paired with a
+function that makes it, and `Com.GetClassObject` answers that table with an
+`IClassFactory`. **Adding a class to a server is declaring one** — there is no
+registration call, and the factory is not written by hand.
+
+Activation passes no arguments, so an activatable class needs a constructor
+taking none. A class with no constructor at all is fine — its fields are the
+zeroes the allocator wrote — but one that has constructors and no empty one is
+refused where it is declared (SL0611) rather than where it could not be made.
+
+`DllGetClassObject` is the whole of what an in-process server must export;
+`Com.CanUnloadNow` is the other half of the pair and always answers S_FALSE,
+because ARC owns object lifetimes and there is no hook that says "and that was
+the last COM object". A server that never unloads is correct; one that unloads
+while a caller holds a vtable pointer is a jump into freed pages.
+
+[samples/com](../../samples/com) is the whole of it: a server built `--shared`,
+a C++ host that loads it and activates the class, and the destructor running
+between the host's `Release()` and its next line.
+
 ### What is not there
 
-- **Activation.** No `CoCreateInstance` wrapper, no registry, no class
-  factories, no apartments, no marshalling, no proxies or stubs, no
-  `IDispatch`. A program that wants those declares them `extern "C"` like any
-  other Windows API — which is what [bindings/win32](../../bindings/win32) now
+- **The rest of activation.** In-process and free-threaded only, stated as a
+  limit rather than discovered as one: no apartments, no marshalling, no
+  proxies or stubs, no `IDispatch`, and no aggregation — `CreateInstance`
+  refuses a non-null outer rather than half-supporting it. No registry either;
+  a host either writes the two keys itself or opens the module directly, which
+  is what the sample does. A program wanting `CoCreateInstance` declares it
+  `extern "C"` like any other Windows API, as [bindings/win32](../../bindings/win32)
   does for the shell's half.
 - **A com class cannot derive from a class** (SL0536): the tear-offs sit after
   the fields, and a derived class adds fields after those.
-- **No `[Guid]` on a class**, so a com class has a layout and no CLSID. It is
-  reached by being handed out, not by being asked for.
+- **On 32-bit x86 an export is `__cdecl` unless it says otherwise**, and the
+  loader calls `DllGetClassObject` as `__stdcall` with an undecorated name.
+  `export "C" __stdcall` gets the convention but decorates the name
+  (`_DllGetClassObject@12`), and undecorating it needs a `.def` file the
+  compiler does not write. Every COM *slot* is already `__stdcall` there — the
+  compiler stamps that on when the table is numbered — so this reaches only the
+  module's own exports.
 
 ## 8.6 Linking a platform library
 

@@ -300,6 +300,10 @@ public sealed partial class Binder
                 $"'{classType.BaseClass.Name}'; the two cannot be combined yet, because the " +
                 "tear-offs sit after the fields and a derived class adds fields after those");
 
+        // Whether it can be *activated* is checked after the attribute pass,
+        // in CheckActivatableClasses: the CLSID that decides it is read from
+        // [Guid], and that has not been folded yet.
+
         // Every interface a presented one extends is also presented: a caller
         // holding IFileDialog may hand it on as the IUnknown it extends, and
         // QueryInterface has to answer for both.
@@ -688,6 +692,33 @@ public sealed partial class Binder
     }
 
     /// <summary>
+    /// Every com class carrying a CLSID can be made by a class factory, and a
+    /// class factory has no arguments to pass.
+    ///
+    /// After the attribute pass rather than with the other com class checks,
+    /// because the CLSID this turns on is read from <c>[Guid]</c> and folded
+    /// there. A class with no constructor at all is fine -- its fields are the
+    /// zeroes the allocator wrote -- but one that has constructors and no empty
+    /// one could never be activated, and saying so where it is declared beats
+    /// leaving a host to find `CreateInstance` returning nothing useful.
+    /// </summary>
+    private void CheckActivatableClasses()
+    {
+        foreach (var (type, entry) in _typeSyntax)
+        {
+            if (type is not ClassTypeSymbol { IsCom: true, Clsid: not null } classType)
+                continue;
+            if (classType.Constructors.Count == 0) continue;
+            if (classType.Constructors.Any(c => !c.Parameters.Any(p => !p.IsThis))) continue;
+
+            diagnostics.Error("SL0611", classType.Span ?? entry.Declaration.Span,
+                $"'{classType.Name}' has a '[Guid]', so a class factory can be asked to make " +
+                "one, and a class factory has no arguments to pass. Give it a constructor " +
+                "taking none, or drop the '[Guid]' and hand the object out instead");
+        }
+    }
+
+    /// <summary>
     /// Reads <c>[Guid("...")]</c> off a com interface and returns the
     /// attributes that are left for the ordinary machinery.
     ///
@@ -710,11 +741,14 @@ public sealed partial class Binder
             return declaration.Attributes;
         }
 
-        if (type is not ComInterfaceTypeSymbol comInterface)
+        // On an interface it is an IID and on a com class it is a CLSID. The
+        // spelling is the same because the sixteen bytes are; what differs is
+        // what the number names, and so what may be asked with it.
+        if (type is not (ComInterfaceTypeSymbol or ClassTypeSymbol { IsCom: true }))
         {
             diagnostics.Error("SL0538", guids[0].Span,
-                $"'[Guid]' names a COM interface, and '{type.Name}' is not one; write it on a " +
-                "'com interface' declaration");
+                $"'[Guid]' names a COM interface or a COM class, and '{type.Name}' is " +
+                "neither; write it on a 'com interface' or a 'com class' declaration");
             return declaration.Attributes.Except(guids).ToList();
         }
 
@@ -736,8 +770,10 @@ public sealed partial class Binder
             diagnostics.Error("SL0541", only.Arguments[0].Span,
                 $"'{text}' is not a GUID; the form is eight hex digits, three groups of four, " +
                 "then twelve, separated by hyphens");
-        else
+        else if (type is ComInterfaceTypeSymbol comInterface)
             comInterface.Iid = parsed;
+        else
+            ((ClassTypeSymbol)type).Clsid = parsed;
 
         return declaration.Attributes.Except(guids).ToList();
     }

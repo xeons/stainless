@@ -73,6 +73,19 @@ public com class Derived : Base, IThird {
     public int Three() { return 3; }
 }
 
+// A CLSID says a class factory can be asked to make one, and a class factory
+// has no arguments to pass. This class has constructors and no empty one, so
+// nothing could ever activate it.
+[Guid("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")]
+public com interface IFourth { int Four(); }
+
+[Guid("bbbbbbbb-cccc-dddd-eeee-ffffffffffff")]
+public com class NeedsArguments : IFourth {
+    int start;
+    public NeedsArguments(int from) { start = from; }
+    public int Four() { return start; }
+}
+
 public void Main() {
     // 'iidof' names a com interface's [Guid], and IPlain has none.
     Guid* g = iidof(IPlain);

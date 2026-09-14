@@ -59,6 +59,20 @@ void sl_console_write_error(void *pointer)
     fputc(0x0A, stderr);
 }
 
+/*
+ * Make what has been written appear now.
+ *
+ * stdout is buffered, and nothing above flushes: a write per line would cost
+ * every program that prints in a loop, to fix an ordering only some programs
+ * can observe. The two that can are a prompt with no newline after it, and a
+ * shared library -- which has its own buffer, so its output otherwise arrives
+ * in a lump when the module detaches, long after the host's.
+ */
+void sl_console_flush(void)
+{
+    fflush(stdout);
+}
+
 /* ----------------------------------------------------------------- input */
 
 /*

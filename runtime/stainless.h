@@ -419,6 +419,58 @@ SL_API int32_t  SL_COM_METHOD sl_com_object_query(
 SL_API uint32_t SL_COM_METHOD sl_com_object_add_ref(void *self);
 SL_API uint32_t SL_COM_METHOD sl_com_object_release(void *self);
 
+/*
+ * Activation: being asked for a class rather than handed an object.
+ *
+ * A `com class` carrying [Guid("...")] has a CLSID, and the compiler puts it
+ * in a table with a function that makes one. sl_com_get_class_object answers
+ * that table the way DllGetClassObject answers a registry: it finds the CLSID
+ * and returns an IClassFactory for it.
+ *
+ * The table is passed in rather than looked up by name. The runtime may be a
+ * shared library, so a symbol it referenced and the program defined would have
+ * to be weak, and COFF does not do weak the way ELF does.
+ *
+ * In-process and free-threaded only. No apartments, no marshalling, no
+ * proxies, no IDispatch -- stated as a limit rather than discovered as one.
+ */
+typedef struct SlComFactory {
+    const SlGuid *clsid;
+    void *(*create)(void);      /* an owned COM pointer, +1, or NULL */
+} SlComFactory;
+
+typedef struct SlComFactoryTable {
+    size_t               count;
+    const SlComFactory  *entries;
+} SlComFactoryTable;
+
+#define SL_COM_E_INVALIDARG        ((int32_t)0x80070057)
+#define SL_COM_E_OUTOFMEMORY       ((int32_t)0x8007000E)
+#define SL_COM_CLASS_E_NOAGGREGATION ((int32_t)0x80040110)
+#define SL_COM_CLASS_E_CLASSNOTAVAILABLE ((int32_t)0x80040111)
+#define SL_COM_S_FALSE             ((int32_t)1)
+
+SL_API extern const SlGuid sl_iid_class_factory;
+
+SL_API int32_t sl_com_get_class_object(
+    const SlComFactoryTable *table,
+    const SlGuid *clsid, const SlGuid *iid, void **result);
+
+/*
+ * What DllCanUnloadNow should answer: S_FALSE, always -- never unload me.
+ *
+ * The honest answer needs a count of live objects, and ARC is what owns an
+ * object's lifetime here: the count that decides when one dies is the
+ * compiler's, decremented at scope ends across the program, with no hook that
+ * says "and that was the last COM object". Returning S_OK on a guess would let
+ * the host unload a module some caller still holds a vtable pointer into, and
+ * the failure is a jump into freed pages.
+ *
+ * So this declines. A COM server that is never unloaded until the process
+ * exits is correct and common; one that unloads early is neither.
+ */
+SL_API int32_t sl_com_can_unload_now(void);
+
 /* ----------------------------------------------------------------- String */
 
 /*
@@ -811,6 +863,9 @@ SL_API void *sl_type_make(const void *type);
 SL_API void sl_console_write(void *pointer);
 SL_API void sl_console_write_line(void *pointer);
 SL_API void sl_console_write_error(void *pointer);
+/* Make buffered output appear now. A shared library has its own stdout
+   buffer, so without this its lines arrive when the module detaches. */
+SL_API void sl_console_flush(void);
 
 /*
  * One line without its terminator, or NULL at end of input -- a blank line and

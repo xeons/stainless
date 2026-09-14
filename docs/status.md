@@ -123,6 +123,14 @@ last person to edit it -- the suite is the authority.
   Every slot is `__stdcall` on x86 — part of the contract rather than a Windows
   detail — which a `com interface` does not have to say, because the convention
   is stamped on when its table is numbered
+- **A COM server.** `[Guid("...")]` on a `com class` is a CLSID, the compiler
+  gathers every class carrying one into a factory table, and
+  `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`
+  build exporting `DllGetClassObject` is an in-process COM server that C++
+  activates and uses. Activation passes no arguments, so an activatable class
+  needs a constructor taking none (SL0611). [samples/com](../samples/com) is
+  the server, a C++ host and the destructor running between the host's
+  `Release()` and its next line
 - `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
   false for null, so a test through a `C?` asks about null and about the class
   at once; a cast that does not hold names what the object really is and ends
@@ -688,14 +696,25 @@ Being straight about the edges, roughly in the order they are worth adding:
   that is already open tries one address rather than all of them, because a
   socket whose connect failed cannot be reused and that one is already made —
   `Socket.OpenConnected(host, port, ...)` is the form that tries each.
-- **No portable COM activation.** `com interface` and `com class` are in the
-  language (§8.5) and work on every platform, because a COM interface is a
-  pointer to a vtable pointer and nothing else; `Win32.Com` and `Win32.ShellCom`
-  bind the Windows half, so `CoCreateInstance`, `IShellItem` and `IFileDialog`
-  all work. What is absent is activation anywhere *but* Windows — a class
-  factory, a registry of them, `DllGetClassObject` — and, on Windows, the parts
-  nobody has asked for: apartments beyond `CoInitializeEx`, marshalling,
-  proxies and stubs, `IDispatch`.
+- **No portable COM *client* activation.** Being a server is done everywhere:
+  a class factory, a table of them and `DllGetClassObject` all work on any
+  platform, because none of that is Windows. What is missing is the other
+  direction — a `Com.Create(clsid, ...)` that finds a module, loads it and asks
+  it, so a caller need not know where the class came from. On Windows
+  `Win32.Com` and `Win32.ShellCom` bind the real thing, so `CoCreateInstance`,
+  `IShellItem` and `IFileDialog` all work today. Absent everywhere are the
+  parts nobody has asked for: apartments beyond `CoInitializeEx`, marshalling,
+  proxies and stubs, `IDispatch`, and aggregation, which `CreateInstance`
+  refuses outright.
+- **`DllCanUnloadNow` always declines.** It answers S_FALSE, which is safe and
+  is what a server that never unloads should say. The honest answer needs a
+  count of live COM objects, and ARC owns those lifetimes with no hook that
+  says which release was the last one.
+- **A 32-bit COM server's exports are decorated.** `export "C" __stdcall` gets
+  x86's convention and decorates the name with it, where Windows' loader looks
+  up an undecorated `DllGetClassObject`. Undecorating it needs a `.def` file
+  the compiler does not write. The interface slots are unaffected — those are
+  already `__stdcall` on x86.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
   Stainless library be consumed by Stainless, but a generic, a class that
   implements an interface, a variant and a slice all stay behind: a template

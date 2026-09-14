@@ -1165,6 +1165,21 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     /// <summary>The com interfaces this class presents, in tear-off order.</summary>
     public List<ComInterfaceTypeSymbol> ComInterfaces { get; } = [];
 
+    /// <summary>
+    /// The CLSID from <c>[Guid("...")]</c> on a <c>com class</c>, or null.
+    ///
+    /// An IID names an interface and a CLSID names a class, and the difference
+    /// is what each is for: a caller that already holds an object asks it for
+    /// an interface by IID, and a caller that holds nothing asks the process
+    /// for a class by CLSID. So this is what makes a class *activatable* --
+    /// without one it can only be handed out, never asked for.
+    ///
+    /// A class with one is entered into the factory table the runtime answers
+    /// <c>DllGetClassObject</c> from, which is why it also requires a
+    /// constructor taking no arguments (SL0611): activation supplies none.
+    /// </summary>
+    public Guid? Clsid { get; set; }
+
     /// <summary>Declared <c>abstract</c>: <c>new</c> refuses it.</summary>
     public bool IsAbstract { get; set; }
 

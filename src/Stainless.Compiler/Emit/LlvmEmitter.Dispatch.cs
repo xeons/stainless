@@ -219,6 +219,149 @@ public sealed partial class LlvmEmitter
         }
     }
 
+    /// <summary>The CLSID a com class's <c>[Guid]</c> folded to.</summary>
+    private static string ClsidName(ClassTypeSymbol type) =>
+        "_SLclsid_" + Mangler.SymbolSafe(type.QualifiedName);
+
+    /// <summary>The function that makes one, for the runtime's class factory.</summary>
+    private static string ComCreateName(ClassTypeSymbol type) =>
+        "_SLcomcreate_" + Mangler.SymbolSafe(type.QualifiedName);
+
+    /// <summary>
+    /// The table <c>DllGetClassObject</c> is answered from: every com class
+    /// carrying a CLSID, paired with a function that makes one.
+    ///
+    /// It is emitted into the program rather than kept in the runtime, and its
+    /// address is passed to <c>sl_com_get_class_object</c> rather than looked
+    /// up by name. The runtime is a separate library and may be a shared one,
+    /// so a symbol it referenced and the program defined would have to be weak
+    /// -- which COFF does not do the way ELF does. Passing the address costs an
+    /// argument and works the same everywhere.
+    ///
+    /// Always emitted, empty table and all, so the symbol exists whether or not
+    /// this program has anything to activate.
+    /// </summary>
+    private void ComFactoryTable(BoundProgram program)
+    {
+        var activatable = program.Classes
+            .Where(c => c is { IsCom: true, Clsid: not null } && c.ComInterfaces.Count > 0)
+            .OrderBy(c => c.QualifiedName, StringComparer.Ordinal)
+            .ToList();
+
+        _module.AppendLine();
+
+        foreach (var classType in activatable)
+        {
+            var (a, b, c, tail) = GuidParts(classType.Clsid!.Value);
+            _module.AppendLine(
+                $"@{ClsidName(classType)} = internal constant " +
+                $"{{ i32, i16, i16, [8 x i8] }} " +
+                $"{{ i32 {a}, i16 {b}, i16 {c}, [8 x i8] c\"{RawBytes(tail)}\" }}");
+
+            EmitComCreate(classType);
+        }
+
+        // { const SlGuid *clsid; void *(*create)(void); }
+        var entries = activatable
+            .Select(c => $"{{ ptr, ptr }} {{ ptr @{ClsidName(c)}, ptr @{ComCreateName(c)} }}")
+            .ToList();
+
+        _module.AppendLine(
+            $"@sl_com_factory_entries = internal constant " +
+            $"[{entries.Count} x {{ ptr, ptr }}] " +
+            (entries.Count == 0 ? "zeroinitializer" : $"[{string.Join(", ", entries)}]"));
+
+        _module.AppendLine(
+            $"@sl_com_factory_table = internal constant {{ {Word}, ptr }} " +
+            $"{{ {Word} {entries.Count}, ptr @sl_com_factory_entries }}");
+
+        // What `Com.GetClassObject` binds to: the runtime function with this
+        // module's table already supplied. A shim rather than a special case in
+        // the expression emitter, so the call site is an ordinary call.
+        //
+        // Not `internal`, because the builtin is declared like any other
+        // runtime entry point and LLVM refuses a `declare` that a later
+        // `define internal` contradicts. Nothing exports it, so it stays inside
+        // whichever binary emitted it either way.
+        _module.AppendLine(
+            "define i32 @sl_com_class_object_here(" +
+            "ptr %clsid, ptr %iid, ptr %result) {");
+        _module.AppendLine("entry:");
+        _module.AppendLine(
+            "  %answer = call i32 @sl_com_get_class_object(" +
+            "ptr @sl_com_factory_table, ptr %clsid, ptr %iid, ptr %result)");
+        _module.AppendLine("  ret i32 %answer");
+        _module.AppendLine("}");
+    }
+
+    /// <summary>
+    /// A parameterless maker for one activatable class: allocate, wire the
+    /// tear-offs, run the constructor, hand back the first tear-off.
+    ///
+    /// The first tear-off and not the object, because what a class factory
+    /// returns is a COM pointer -- and it is the same address
+    /// <c>QueryInterface</c> answers for IUnknown, which is what lets two
+    /// references to this object be compared for identity. The +1 that
+    /// <c>sl_alloc</c> produced is the one the caller receives.
+    /// </summary>
+    private void EmitComCreate(ClassTypeSymbol classType)
+    {
+        // Parameterless as the source writes it: `this` is a parameter here.
+        var constructor = classType.Constructors
+            .FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis));
+
+        _module.AppendLine($"define internal ptr @{ComCreateName(classType)}() {{");
+        _module.AppendLine("entry:");
+        _module.AppendLine(
+            $"  %object = call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
+
+        foreach (var presented in classType.ComInterfaces)
+        {
+            int offset = classType.TearOffOffset(presented);
+            string slot = $"%tearoff{offset}";
+            _module.AppendLine(
+                $"  {slot} = getelementptr inbounds i8, ptr %object, i64 {offset}");
+            _module.AppendLine(
+                $"  store ptr @{ComVTableName(classType, presented)}, ptr {slot}");
+            _module.AppendLine(
+                $"  %owner{offset} = getelementptr inbounds i8, ptr {slot}, " +
+                $"i64 {RuntimeLayout.TearOffOwner}");
+            _module.AppendLine($"  store {Word} {offset}, ptr %owner{offset}");
+        }
+
+        // Events, for the reason InitializeEvents gives: an array is never
+        // null, and an event is read by the first `+=` as much as by a raise.
+        int slotIndex = 0;
+        for (var current = classType; current is not null; current = current.BaseClass)
+            foreach (var declared in current.Events)
+            {
+                if (declared.BackingField is not { } field) continue;
+                if (field.Type is not ArrayTypeSymbol arrayType) continue;
+
+                string empty = $"%event{slotIndex}";
+                string address = $"%eventat{slotIndex}";
+                slotIndex++;
+
+                _module.AppendLine(
+                    $"  {empty} = call ptr @sl_array_alloc(" +
+                    $"ptr @{ArrayTypeInfoName(arrayType)}, {Word} 0, " +
+                    $"{Word} {arrayType.Element.Size})");
+                _module.AppendLine(
+                    $"  {address} = getelementptr inbounds i8, ptr %object, " +
+                    $"i64 {ClassTypeSymbol.HeaderSize + field.Offset}");
+                _module.AppendLine($"  store ptr {empty}, ptr {address}");
+            }
+
+        if (constructor is not null)
+            _module.AppendLine($"  call void {Symbol(constructor)}(ptr %object)");
+
+        int first = classType.TearOffOffset(classType.ComInterfaces[0]);
+        _module.AppendLine(
+            $"  %result = getelementptr inbounds i8, ptr %object, i64 {first}");
+        _module.AppendLine("  ret ptr %result");
+        _module.AppendLine("}");
+    }
+
     /// <summary>
     /// What goes in one vtable slot.
     ///

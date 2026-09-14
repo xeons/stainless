@@ -184,8 +184,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 286 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 835 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 287 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 841 compiler unit tests
 ```
 
 Then run something:
@@ -228,7 +228,7 @@ Beyond the language itself:
 | **[bindings/win32/](bindings/win32/README.md)** | The Windows API, in two layers. |
 | **[bindings/gtk/](bindings/gtk/README.md)** | GTK 3, and a widget class hierarchy over it. |
 | **[bindings/linux/](bindings/linux/README.md)** | The Linux system calls, declared and nothing else. |
-| **[samples/](samples/)** | Example programs, including [the tour](samples/tour) and [a package](samples/packages). |
+| **[samples/](samples/)** | Example programs, including [the tour](samples/tour), [a package](samples/packages) and [a COM server called from C++](samples/com). |
 
 ---
 

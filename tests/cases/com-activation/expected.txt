@@ -1,0 +1,24 @@
+can unload: 1
+unknown clsid refused              ok
+unknown clsid clears result        ok
+got a class factory                ok
+factory refuses IGreeter           ok
+constructed
+created an instance                ok
+aggregation refused                ok
+constructed
+destroyed
+unpresented interface refused      ok
+LockServer accepted                ok
+Greet(3)                           ok
+Greet(4) accumulates               ok
+Total()                            ok
+QueryInterface(ICounter)           ok
+a second interface is a second address ok
+IUnknown is the same pointer either way ok
+Reset                              ok
+Total() after Reset                ok
+releasing
+destroyed
+released
+failures: 0

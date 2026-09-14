@@ -95,6 +95,10 @@ public class SampleTests
 
         new("library", ["samples/library/src/math.sl"]) { Shared = true },
 
+        // A COM server, so no Main: what it exports is DllGetClassObject, and
+        // the thing that calls it is the C++ host beside it.
+        new("com", ["samples/com/greeter.sl"]) { Shared = true },
+
         new("tour", [
             "samples/tour/Platform.sl",
             "samples/tour/Types.sl",
