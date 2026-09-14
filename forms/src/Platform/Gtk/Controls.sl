@@ -919,9 +919,58 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer {
     /// of them is showing, so that a child added now lands on the right page.
     List<GtkWidget*> pages;
 
+    /// What `PageArea` answered the last time the control layer was told to
+    /// lay out again, so that the same answer is not reported twice. See
+    /// `Reallocated`.
+    FRect reported;
+
+    /// Whether a relayout is already on the main loop waiting to run.
+    bool queued;
+
+    /// A child that has been added but has no page to go on yet.
+    ///
+    /// **The control layer parents a page's content before it makes the page.**
+    /// `TabPage`'s constructor builds its panel -- which is what reaches
+    /// `AddChild` -- and only then calls `TabControl.Register`, which is what
+    /// reaches `AddTab`. Every other container can answer `AddChild`
+    /// immediately because it has somewhere to put the child; a notebook does
+    /// not, because the page is what `AddTab` is about to create.
+    ///
+    /// Putting it on `content` anyway is what the first version did, and it
+    /// put the first tab's controls on a `GtkFixed` that is not in the
+    /// notebook at all, and every later tab's controls on the *previous*
+    /// page. Both are invisible, and the second is invisible in a way that
+    /// looks like the first.
+    GtkPeer? waiting;
+
     public GtkTabControlPeer(IControlNotify owner) {
         base(gtk_notebook_new(), owner, gtk_fixed_new());
         pages = new List<GtkWidget*>();
+        reported = Area(0, 0, 0, 0);
+        queued = false;
+        waiting = null;
+
+        // **A page is the one child GTK sizes rather than the layout.**
+        //
+        // Everywhere else in this backend a child's size is what the layout
+        // decided, and `SetBounds` reports it rather than waiting for GTK to
+        // echo it back a turn of the loop later. A notebook page is the
+        // exception: the control layer does not decide the page area, it
+        // *asks* for it -- and the answer is the page's allocation, which is
+        // 1x1 until GTK has run a size negotiation.
+        //
+        // `ShowOnly` asks during construction, long before that, so every
+        // control on every page was laid out into one pixel and never drawn.
+        // On Win32 the same call works because `TCM_ADJUSTRECT` computes from
+        // the control's own rectangle rather than reading an allocation.
+        //
+        // So this waits for the allocation and then asks the control layer to
+        // lay out again. It reports the tab control's own extent unchanged --
+        // nothing about *it* moved -- which is enough to reach `OnResize`, and
+        // `TabControl.OnResize` is what calls `ShowOnly`.
+        ConnectEvent(widget, "size-allocate", (sender, carried) => {
+            return Reallocated();
+        });
 
         // **`notify::page` rather than `switch-page`, and the reason is a
         // crash.** A handler's C shape has to match what the signal emits, and
@@ -939,20 +988,59 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer {
         });
     }
 
+    /// **Owned, and that is what makes removing one safe.** A notebook holds
+    /// the only reference to a page, so `gtk_notebook_remove_page` drops it to
+    /// zero and destroys the page *and every control the program put on it* --
+    /// while the control layer goes on holding those widgets, because a
+    /// `TabPage` is a control whose lifetime is its own. The next layout then
+    /// moves a freed widget, which is a use-after-free that shows up as
+    /// `GTK_IS_WIDGET` assertions long before it shows up as a crash.
+    ///
+    /// A reference of this peer's own means removal unparents rather than
+    /// destroys, and the page is still there if the program puts it back.
+    /// Holds the child until `AddTab` has a page to put it on.
+    public override void AddChild(IControlPeer child) {
+        waiting = (GtkPeer)child;
+    }
+
     public int AddTab(String text, int image) {
-        GtkWidget* page = gtk_fixed_new();
+        GtkWidget* page = (GtkWidget*)g_object_ref_sink((gpointer)gtk_fixed_new());
         gtk_widget_show(page);
         int index = gtk_notebook_append_page(widget, page,
                                              gtk_label_new(text.ToPointer()));
         pages.Add(page);
         if (pages.Count() == 1u) { content = page; }
+
+        // The page this tab was made for, which is the child added just before
+        // it. Anything else would be a program putting a control straight on a
+        // tab control rather than on one of its pages, which the control layer
+        // does not do.
+        var held = waiting;
+        if (held != null) {
+            var peer = (GtkPeer)held;
+            gtk_fixed_put(page, peer.Widget(), 0, 0);
+            peer.PlacedInto(page);
+            waiting = null;
+        }
         return index;
     }
 
     public void RemoveTab(int index) {
+        if (index < 0 || (nuint)index >= pages.Count()) { return; }
+
+        // The reference taken in `AddTab` is dropped with the peer rather than
+        // here: the page keeps whatever the program put on it, and the control
+        // layer is still holding those controls.
         gtk_notebook_remove_page(widget, index);
         pages.RemoveAt((nuint)index);
         content = pages.Count() == 0u ? content : pages[0u];
+    }
+
+    ~GtkTabControlPeer() {
+        for (nuint i = 0u; i < pages.Count(); i += 1u) {
+            g_object_unref((gpointer)pages[i]);
+        }
+        pages.Clear();
     }
 
     public void SetTabText(int index, String text) {
@@ -970,13 +1058,85 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer {
     public int GetSelectedTab() { return gtk_notebook_get_current_page(widget); }
     public int TabCount()       { return gtk_notebook_get_n_pages(widget); }
 
-    /// The showing page's allocation, which is the area inside the tabs -- and
-    /// is what the seam asks for rather than the client area, since the tabs
-    /// themselves are part of that.
+    /// The area inside the tabs, which is what the seam asks for rather than
+    /// the client area -- the tabs themselves are part of that.
+    ///
+    /// **Derived from the bounds the layout set, minus what the tabs take**,
+    /// rather than read straight off the page's allocation. Reading the
+    /// allocation is a feedback loop: the layout sizes the page's content to
+    /// it, the content's size request grows the notebook, the notebook grows
+    /// the window, and the next allocation is bigger again. It ratchets a
+    /// window open to the size of the screen in a few frames, which is exactly
+    /// what it did.
+    ///
+    /// The tabs' size is the one thing here GTK has to be asked, and it is
+    /// stable once the notebook has been allocated: the difference between
+    /// what the notebook got and what it passed on to the page. Before that it
+    /// is not known at all, so the whole of the bounds is the best answer
+    /// available, and the `size-allocate` that follows corrects it.
     public Rectangle PageArea() {
         if (pages.Count() == 0u) { return ClientBounds(); }
-        return Area(0, 0, gtk_widget_get_allocated_width(content),
-                          gtk_widget_get_allocated_height(content));
+
+        int bookWidth = gtk_widget_get_allocated_width(widget);
+        int bookHeight = gtk_widget_get_allocated_height(widget);
+        int pageWidth = gtk_widget_get_allocated_width(content);
+        int pageHeight = gtk_widget_get_allocated_height(content);
+
+        // 1x1 is GTK's "never allocated", and a page cannot be larger than the
+        // notebook holding it -- either says the measurement is not real yet.
+        if (pageHeight <= 1 || bookHeight < pageHeight || bookWidth < pageWidth) {
+            return Area(0, 0, bounds.Width, bounds.Height);
+        }
+
+        int across = bookWidth - pageWidth;
+        int down = bookHeight - pageHeight;
+        return Area(0, 0, bounds.Width - across, bounds.Height - down);
+    }
+
+    /// GTK has allocated the notebook, so the page area may have become real.
+    ///
+    /// **Guarded on the answer rather than on the signal**, because laying out
+    /// again sets bounds on the page's child, which asks GTK for another
+    /// allocation, which raises this again. Reporting only a *changed* page
+    /// area is what makes that settle instead of spinning: the second pass
+    /// finds the same width and height and stops.
+    ///
+    /// **The relayout is queued, not run here.** Laying out from inside a
+    /// `size-allocate` means calling `gtk_fixed_move` while GTK is part-way
+    /// through allocating that very container, and it segfaults -- the
+    /// backtrace is `gtk_fixed_move` under `ShowOnly` under this handler,
+    /// under `gtk_widget_size_allocate`. Queueing it lets GTK finish, and the
+    /// layout then runs against a notebook that is no longer being edited
+    /// underneath it.
+    ///
+    /// False, so that GTK's own handler still runs -- it is what allocates the
+    /// children.
+    bool Reallocated() {
+        var now = PageArea();
+        if (now.Width == reported.Width && now.Height == reported.Height) {
+            return false;
+        }
+        reported = now;
+
+        // One at a time. A queued pass sets bounds, which asks for another
+        // allocation, which arrives here again; without this a burst of
+        // allocations would queue a pass each.
+        if (!queued) {
+            queued = true;
+            Tick(0, () => { return Relayout(); });
+        }
+        return false;
+    }
+
+    /// The queued pass, on the main loop with GTK's allocation finished.
+    /// Answers false, which takes the source off the loop.
+    bool Relayout() {
+        queued = false;
+        var owner = Owner();
+        if (owner != null) {
+            ((IControlNotify)owner).OnPlatformResized(bounds.Extent);
+        }
+        return false;
     }
 
     /// A tab's picture would be an image packed beside its label. Left until

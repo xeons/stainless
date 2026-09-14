@@ -48,6 +48,48 @@ import Gtk.Api;
 import Gtk.Signals;
 import Gtk.Events;
 
+// ============================================================== mnemonics
+
+/// `&File` as GTK writes it, which is `_File`.
+///
+/// **Both toolkits mark the key with a character in the caption**, and they
+/// disagree about which: Windows uses `&` and GTK uses `_`, each escaping its
+/// own by doubling it. So the seam carries Windows' spelling -- it is the one
+/// `Forms` declares, and the one every caption in every sample is written in
+/// -- and this translates.
+///
+/// A literal underscore has to be doubled on the way out or GTK would read it
+/// as a marker, which is how `Save _As` would have lost its underscore and
+/// gained an accelerator nobody asked for.
+String ToMnemonic(String caption) {
+    var built = new StringBuilder();
+    nuint at = 0u;
+    nuint size = caption.ByteLength();
+
+    while (at < size) {
+        byte c = caption.ByteAt(at);
+        if (c == (byte)'&') {
+            // `&&` is one literal ampersand, and the marker is dropped.
+            if (at + 1u < size && caption.ByteAt(at + 1u) == (byte)'&') {
+                built.Append("&");
+                at += 2u;
+                continue;
+            }
+            built.Append("_");
+            at += 1u;
+            continue;
+        }
+        if (c == (byte)'_') {
+            built.Append("__");
+            at += 1u;
+            continue;
+        }
+        built.Append(caption.Substring(at, 1u));
+        at += 1u;
+    }
+    return built.ToText();
+}
+
 // ============================================================== one item
 
 public class GtkMenuItemPeer : IMenuItemPeer {
@@ -80,7 +122,10 @@ public class GtkMenuItemPeer : IMenuItemPeer {
     /// thing that was activated.
     public nuint Id() { return (nuint)(void*)item; }
 
-    public void SetText(String text) { gtk_menu_item_set_label(item, text.ToPointer()); }
+    public void SetText(String text) {
+        gtk_menu_item_set_label(item, ToMnemonic(text).ToPointer());
+        gtk_menu_item_set_use_underline(item, 1);
+    }
 
     public void SetEnabled(bool enabled) {
         gtk_widget_set_sensitive(item, enabled ? 1 : 0);
@@ -126,11 +171,19 @@ public class GtkMenuPeer : IMenuPeer {
 
     /// Adds a command, or a heading when `submenu` is given.
     ///
-    /// A check item every time, drawing no tick until something sets one: GTK
-    /// will not turn a plain item into a checkable one, and a menu item does
-    /// not know at construction whether it will ever be ticked.
+    /// **A heading is a plain item and a command is a check item**, and the
+    /// split is what stops every entry on the menu bar drawing an empty tick
+    /// box. GTK will not turn a plain item into a checkable one, and a command
+    /// does not know at construction whether it will ever be ticked -- so a
+    /// command stays a check item, which draws its indicator only once
+    /// something has set one. A heading is different in kind: it opens a
+    /// submenu and there is nothing it could mean to tick it, so the question
+    /// never arises and the plain widget is the honest one.
     public IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu) {
-        GtkWidget* made = gtk_check_menu_item_new_with_label(text.ToPointer());
+        String label = ToMnemonic(text);
+        GtkWidget* made = submenu != null
+            ? gtk_menu_item_new_with_mnemonic(label.ToPointer())
+            : gtk_check_menu_item_new_with_mnemonic(label.ToPointer());
         if (submenu != null) {
             gtk_menu_item_set_submenu(made, ((GtkMenuPeer)submenu).Widget());
         }

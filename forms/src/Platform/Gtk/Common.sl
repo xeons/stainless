@@ -698,7 +698,29 @@ public class GtkPeer : IControlPeer {
     /// The allocation rather than the requested size, because the two differ
     /// exactly when the warning on `SetBounds` applies and a control laying
     /// out its children should be told the truth.
+    /// How much room children have.
+    ///
+    /// **What the layout set, not what GTK has allocated.** `SetBounds` asks
+    /// for a size by setting a size *request*; GTK runs its own negotiation
+    /// afterwards, so the allocation is still the size before the one just
+    /// asked for -- and for a widget that has never been allocated it is 1x1,
+    /// which GTK uses as its "no opinion yet" value.
+    ///
+    /// Reading it here is what made every control inside a container invisible
+    /// on this backend: the container was sized correctly, its client area
+    /// answered 1x1, and every child docked into one pixel. It went unnoticed
+    /// because a form answers from its own `bounds` -- `GtkWindowPeer`
+    /// overrides this -- so a control placed straight on a form was laid out
+    /// correctly and a control inside a panel or a tab page was not.
+    ///
+    /// The allocation is still the answer before the layout has said anything,
+    /// which is what `TabControl.PageArea` depends on: a notebook page is
+    /// sized by GTK rather than by the layout, and there the allocation is the
+    /// only source of truth.
     public virtual FRect ClientBounds() {
+        if (bounds.Width > 0 && bounds.Height > 0) {
+            return Area(0, 0, bounds.Width, bounds.Height);
+        }
         return Area(0, 0, gtk_widget_get_allocated_width(widget),
                           gtk_widget_get_allocated_height(widget));
     }
@@ -764,7 +786,9 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer {
     /// The fixed children are placed in, for a peer that has to reach it.
     public GtkWidget* Content() { return content; }
 
-    public void AddChild(IControlPeer child) {
+    /// Virtual, because a notebook cannot honour this when it is called: see
+    /// `GtkTabControlPeer.AddChild`.
+    public virtual void AddChild(IControlPeer child) {
         var peer = (GtkPeer)child;
         gtk_fixed_put(content, peer.Widget(), 0, 0);
         peer.PlacedInto(content);

@@ -479,6 +479,17 @@ public extern "C" {
     GtkWidget* gtk_separator_menu_item_new();
     GtkWidget* gtk_check_menu_item_new_with_label(gchar* label);
 
+    /// The `_mnemonic` pair read `_` in the label as marking the key that
+    /// chooses the item, and `__` as one literal underscore. Windows marks the
+    /// same thing with `&`, which is what the seam carries and what
+    /// `ToMnemonic` in the backend translates.
+    GtkWidget* gtk_check_menu_item_new_with_mnemonic(gchar* label);
+
+    /// Whether the label's `_` is a marker or a character. Set by the
+    /// `_mnemonic` constructors and *not* by `gtk_menu_item_set_label`, so an
+    /// item whose caption is changed later has to be told again.
+    void gtk_menu_item_set_use_underline(GtkWidget* item, gboolean uses);
+
     void gtk_menu_item_set_submenu(GtkWidget* item, GtkWidget* submenu);
     void gtk_menu_shell_append(GtkWidget* shell, GtkWidget* child);
 }
