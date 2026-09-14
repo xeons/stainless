@@ -200,6 +200,74 @@ public class TargetTests
             Assert.Null(ModuleDefinition.For(program));
         });
 
+    /// <summary>
+    /// A file passed with <c>--def</c> is kept, and the compiler's own renames
+    /// are added after it rather than instead of it.
+    ///
+    /// Replacing them would make <c>--def</c> a trap: passing one to add an
+    /// alias would silently drop the renaming that makes a decorated export
+    /// reachable under its declared name at all.
+    /// </summary>
+    [Fact]
+    public void ASuppliedDefinitionIsKeptAndAddedTo() =>
+        Under(TargetPlatform.X86Windows, () =>
+        {
+            string work = Directory.CreateTempSubdirectory("stainless-def").FullName;
+            try
+            {
+                string supplied = Path.Combine(work, "extra.def");
+                File.WriteAllText(supplied, "EXPORTS\n    Alias = _DllCanUnloadNow@0\n");
+
+                var program = Front.Bind(ComServer, out _);
+                string? path = ModuleDefinition.Resolve(
+                    program, supplied, shared: true, work, Path.Combine(work, "server.dll"));
+
+                Assert.NotNull(path);
+                Assert.NotEqual(supplied, path);
+
+                string merged = File.ReadAllText(path!);
+                Assert.Contains("Alias = _DllCanUnloadNow@0", merged);
+                Assert.Contains("DllGetClassObject = _DllGetClassObject@12", merged);
+            }
+            finally { Directory.Delete(work, recursive: true); }
+        });
+
+    /// <summary>
+    /// With nothing of its own to add, the compiler hands the linker the file
+    /// it was given rather than a copy of it.
+    /// </summary>
+    [Fact]
+    public void ASuppliedDefinitionPassesStraightThroughOnX64() =>
+        Under(TargetPlatform.X64Windows, () =>
+        {
+            string work = Directory.CreateTempSubdirectory("stainless-def").FullName;
+            try
+            {
+                string supplied = Path.Combine(work, "extra.def");
+                File.WriteAllText(supplied, "EXPORTS\n    Alias = DllCanUnloadNow\n");
+
+                var program = Front.Bind(ComServer, out _);
+                string? path = ModuleDefinition.Resolve(
+                    program, supplied, shared: true, work, Path.Combine(work, "server.dll"));
+
+                Assert.Equal(Path.GetFullPath(supplied), path);
+            }
+            finally { Directory.Delete(work, recursive: true); }
+        });
+
+    /// <summary>
+    /// An executable marks nothing exported, so there is no export table to
+    /// correct and naming its functions would invent one.
+    /// </summary>
+    [Fact]
+    public void NothingIsGeneratedForAnExecutable() =>
+        Under(TargetPlatform.X86Windows, () =>
+        {
+            var program = Front.Bind(ComServer, out _);
+            Assert.Null(ModuleDefinition.Resolve(
+                program, supplied: null, shared: false, ".", "program.exe"));
+        });
+
     /// <summary>A .def is a PE concept; ELF exports by visibility.</summary>
     [Fact]
     public void NoModuleDefinitionOffWindows() =>

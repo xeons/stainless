@@ -115,6 +115,9 @@ internal static class Program
                                    starts to mean something; arm64 is the one
                                    whose two systems agree about structs
               --header <path>      write a C header for the exported surface
+              --def <path>         a module definition file for the linker, to
+                                   name exports the declarations do not. The
+                                   compiler's own renames are kept as well
               --stdlib             (doc) document the standard library itself
               --metadata <path>    write module metadata for a Stainless consumer
               --reference <path>   bind against a library's module metadata
@@ -704,6 +707,7 @@ internal static class Program
         public string? Output { get; set; }
         public string? ObjectDirectory { get; set; }
         public string? Header { get; set; }
+        public string? ModuleDefinition { get; set; }
         public string? Metadata { get; set; }
         public string? Project { get; set; }
         public string? ProjectError { get; set; }
@@ -738,6 +742,7 @@ internal static class Program
             CppAbi = Abi,
             SharedRuntime = SharedRuntime,
             HeaderPath = Header,
+            ModuleDefinitionPath = ModuleDefinition,
             ExtraPaths = Paths,
             DocumentationPath = Documentation,
             DocumentStandardLibrary = StandardLibrary,
@@ -803,6 +808,7 @@ internal static class Program
                 Target = Target,
                 Shared = Shared,
                 HeaderPath = Header,
+                ModuleDefinitionPath = ModuleDefinition,
                 MetadataPath = Metadata,
                 References = References,
                 SharedRuntime = SharedRuntime,
@@ -939,6 +945,11 @@ internal static class Program
                 case "--header":
                     if (++i >= args.Length) { Error("'--header' needs a path"); return false; }
                     arguments.Header = args[i];
+                    continue;
+
+                case "--def":
+                    if (++i >= args.Length) { Error("'--def' needs a path"); return false; }
+                    arguments.ModuleDefinition = args[i];
                     continue;
 
                 case "--":

@@ -16,6 +16,9 @@ stainless restore              resolve dependencies and lock them
   -o, --out <path>       output file
   --shared               build a shared library instead of an executable
   --header <path>        write a C header for the exported surface
+  --def <path>           a module definition file for the linker, to name
+                         exports the declarations cannot. The compiler's
+                         own renames are kept as well
   --metadata <path>      write module metadata for a Stainless consumer
   -r, --reference <path> bind against a library's module metadata
   --stdlib               (doc) document the standard library itself
@@ -94,6 +97,37 @@ stainless doc --stdlib               # the standard library, into docs/stdlib
 
 [docs/stdlib](stdlib/index.md) is that output for the standard library, checked
 in so it can be read here. It is generated, so the source is what to edit.
+
+## Export names
+
+A library's export table is exactly its `export "C"` functions, under the names
+their declarations wrote. On 32-bit x86 that takes work: a calling convention
+decorates the symbol, so `export "C" __stdcall int DllGetClassObject(...)` is
+`_DllGetClassObject@12` in the object file. The compiler writes a module
+definition file naming those exports properly and hands it to the linker, which
+is why a 32-bit COM server built here is one Windows can actually activate.
+Nothing is decorated on x64, so nothing is written.
+
+`--def` is for the names a declaration cannot state — an alias, an ordinal, a
+data export, a second name for one function:
+
+```
+stainless build src --shared -o build/server.dll --def src/server.def
+```
+
+```
+EXPORTS
+    GetFactory = DllGetClassObject
+```
+
+**It adds to the compiler's own renames rather than replacing them.** A `.def`
+may carry more than one `EXPORTS` section, so the file passed here is kept and
+what the compiler needed is appended in a section of its own. Replacing them
+would make this a trap: passing a `--def` to add one alias would silently drop
+the renaming that makes a decorated export reachable at all.
+
+A module definition file is a PE concept. Nothing reads one on Linux or macOS,
+where a symbol is exported by its visibility and no convention decorates it.
 
 ## Projects
 

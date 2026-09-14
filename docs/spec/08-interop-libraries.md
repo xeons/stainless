@@ -229,6 +229,12 @@ where a name would otherwise be wrong: on x64 nothing is decorated, and there
 is no file. The convention itself is untouched — only the name is, because the
 convention is what the caller will use and the name is what it looks up.
 
+`--def <path>` supplies one of these by hand, for the names a declaration
+cannot state: an alias, an ordinal, a data export. It is added to whatever the
+compiler needed rather than replacing it, since a `.def` may hold more than one
+`EXPORTS` section and dropping the compiler's half would make a decorated
+export unreachable under its own name.
+
 The generated header restates what the ABI already guarantees:
 
 ```c

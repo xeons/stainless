@@ -140,7 +140,9 @@ last person to edit it -- the suite is the authority.
   `DllGetClassObject`. The compiler writes a `.def` naming those exports under
   the names their source declared, which is what every C++ COM server does and
   what keeps "the export table is exactly the `export \"C\"` functions" true on
-  x86 as well as x64. Written only where a name would otherwise be wrong
+  x86 as well as x64. Written only where a name would otherwise be wrong, and
+  `--def` supplies one by hand — an alias, an ordinal, a data export — which is
+  added to the compiler's own renames rather than replacing them
 - `x is T` and a checked `(T)x`, for classes and interfaces alike. `is` answers
   false for null, so a test through a `C?` asks about null and about the class
   at once; a cast that does not hold names what the object really is and ends

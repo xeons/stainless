@@ -58,6 +58,18 @@ public sealed record CompilationOptions
     public string? HeaderPath { get; init; }
 
     /// <summary>
+    /// A module definition file to hand the linker, for export names the
+    /// declarations cannot state: an alias, an ordinal, a data export, or a
+    /// name that differs from the function's.
+    ///
+    /// Whatever the compiler would have generated is kept as well, appended in
+    /// a section of its own — otherwise passing one of these to add an export
+    /// would silently drop the renames that make a decorated symbol reachable
+    /// under its declared name. See <see cref="ModuleDefinition"/>.
+    /// </summary>
+    public string? ModuleDefinitionPath { get; init; }
+
+    /// <summary>
     /// Where to write the module metadata another Stainless compilation binds
     /// against. The C header and this describe the same library to two
     /// different audiences.
@@ -704,15 +716,10 @@ public sealed class Compilation
         if (target.IsWindows) nativeInputs.AddRange(compiledResources);
 
         // A library whose export names differ from its symbols needs the linker
-        // told which is which. On x64 they never differ and this is null.
-        string? moduleDefinition = null;
-        if (options.Shared && ModuleDefinition.For(program) is { } definition)
-        {
-            moduleDefinition = Path.Combine(
-                intermediate,
-                Path.GetFileNameWithoutExtension(output) + ".def");
-            File.WriteAllText(moduleDefinition, definition);
-        }
+        // told which is which, and the author may have names of their own to
+        // add. Null where neither is true, which is the usual answer.
+        string? moduleDefinition = ModuleDefinition.Resolve(
+            program, options.ModuleDefinitionPath, options.Shared, intermediate, output);
 
         var link = toolchain.Link(
             irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,

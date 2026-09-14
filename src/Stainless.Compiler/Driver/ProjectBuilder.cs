@@ -40,6 +40,9 @@ public sealed record BuildOverrides
     public bool? SharedRuntime { get; init; }
     public string? HeaderPath { get; init; }
 
+    /// <summary>A module definition file to hand the linker, or null.</summary>
+    public string? ModuleDefinitionPath { get; init; }
+
     /// <summary>Where to write reference documentation, or null for none.</summary>
     public string? DocumentationPath { get; init; }
 
@@ -568,6 +571,7 @@ public sealed class ProjectBuilder(
             Shared = project.IsLibrary,
             MetadataPath = metadata,
             HeaderPath = isRoot ? overrides.HeaderPath ?? Resolved(project, project.Header) : null,
+            ModuleDefinitionPath = isRoot ? overrides.ModuleDefinitionPath : null,
             PackageName = project.Name,
             PackageVersion = project.Version,
         };
