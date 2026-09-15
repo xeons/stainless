@@ -14,7 +14,8 @@ import Shop.Pricing as Money;
 // Shop.Bundles is deliberately NOT imported. A fully qualified name still
 // reaches it, because qualification names the module directly.
 
-int Main() {
+int Main()
+{
     var register = new Register<IPriced>(4);
 
     // `Book` and `Subscription` come from Shop.Catalog, unqualified.
@@ -27,7 +28,8 @@ int Main() {
     boxed.Include(new Book("TAPL", Money.Cents(6800)));
     register.Add(boxed);
 
-    foreach (var item in register) {
+    foreach (var item in register)
+    {
         Console.WriteLine("  " + item.Label() + " = " + Money.Format(item.Price()));
     }
 

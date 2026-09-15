@@ -38,7 +38,8 @@ module Standard.Process;
 
 import Standard.Collections;
 
-extern "C" {
+extern "C"
+{
     byte* sl_process_args_new();
     bool  sl_process_args_add(byte* args, String text);
     void  sl_process_args_free(byte* args);
@@ -63,7 +64,8 @@ extern "C" {
 /// Only about *starting* it. A program that ran and failed is a `Completed`
 /// with a non-zero `ExitCode`, which is an outcome rather than an error --
 /// `grep` answering 1 for "no match" is the ordinary case, not a fault.
-public enum ProcessError {
+public enum ProcessError
+{
     /// It started.
     None,
 
@@ -81,7 +83,8 @@ public enum ProcessError {
 }
 
 /// What a finished program left behind.
-public struct Completed {
+public struct Completed
+{
     /// Zero by convention means success; 128 + N means a signal killed it,
     /// which is what a shell reports too.
     public int ExitCode;
@@ -94,21 +97,26 @@ public struct Completed {
     public String Errors;
 
     /// The usual question, spelled once.
-    public bool Ok() { return ExitCode == 0; }
+    public bool Ok() => ExitCode == 0;
 }
 
 /// The argument list a call needs, built once and freed however it ends.
-byte* Assemble(String program, String[] arguments) {
+byte* Assemble(String program, String[] arguments)
+{
     byte* args = sl_process_args_new();
-    if (args == null) { return null; }
+    if (args == null)
+        return null;
 
-    if (!sl_process_args_add(args, program)) {
+    if (!sl_process_args_add(args, program))
+    {
         sl_process_args_free(args);
         return null;
     }
 
-    foreach (var argument in arguments) {
-        if (!sl_process_args_add(args, argument)) {
+    foreach (var argument in arguments)
+    {
+        if (!sl_process_args_add(args, argument))
+        {
             sl_process_args_free(args);
             return null;
         }
@@ -117,8 +125,10 @@ byte* Assemble(String program, String[] arguments) {
     return args;
 }
 
-ProcessError Coded(int number) {
-    switch (number) {
+ProcessError Coded(int number)
+{
+    switch (number)
+    {
         case 0:  return ProcessError.None;
         case 1:  return ProcessError.NotFound;
         case 2:  return ProcessError.Denied;
@@ -136,7 +146,8 @@ ProcessError Coded(int number) {
 ///
 /// `arguments` does **not** include the program's own name; that is `program`,
 /// and it is what a PATH lookup is done on when it has no separator in it.
-public Result<Completed, ProcessError> Run(String program, String[] arguments) {
+public Result<Completed, ProcessError> Run(String program, String[] arguments)
+{
     return Run(program, arguments, null);
 }
 
@@ -147,9 +158,11 @@ public Result<Completed, ProcessError> Run(String program, String[] arguments) {
 /// without reading is not an error here: the write stops and the run goes on.
 public Result<Completed, ProcessError> Run(
     String program, String[] arguments, String? input
-) {
+)
+{
     byte* args = Assemble(program, arguments);
-    if (args == null) { return Fail(ProcessError.NoResource); }
+    if (args == null)
+        return Fail(ProcessError.NoResource);
 
     var output = new StringBuilder();
     var errors = new StringBuilder();
@@ -157,7 +170,8 @@ public Result<Completed, ProcessError> Run(
     int status = sl_process_run(args, input, output, errors, out int exitCode);
     sl_process_args_free(args);
 
-    if (status != 0) { return Fail(Coded(status)); }
+    if (status != 0)
+        return Fail(Coded(status));
 
     Completed done;
     done.ExitCode = exitCode;
@@ -172,54 +186,62 @@ public Result<Completed, ProcessError> Run(
 ///
 /// Its streams are this process's own, so what it prints goes where this
 /// program's output goes. `Run` is the one that captures.
-public class Process {
-    byte* handle;
+public class Process
+{
+    byte* _handle;
 
     /// Made by `Start` alone: the handle is the runtime's and there is no way
     /// to come by a valid one otherwise.
-    Process(byte* started) { handle = started; }
+    Process(byte* started) => _handle = started;
 
     /// Reaped here if it was never waited for, so that letting go of a
     /// `Process` does not leave a zombie for the rest of the run. It is not
     /// killed: letting go says nothing about wanting it stopped.
-    ~Process() { sl_process_release(handle); }
+    ~Process() { sl_process_release(_handle); }
 
     /// What the operating system calls it.
-    public long Id() { return sl_process_id(handle); }
+    public long Id() => sl_process_id(_handle);
 
     /// Waits for it to finish, and answers with the code it left.
     ///
     /// Asking twice is harmless and answers the same both times.
-    public Result<int, ProcessError> Wait() {
-        int status = sl_process_wait(handle, out int exitCode);
-        if (status != 0) { return Fail(Coded(status)); }
+    public Result<int, ProcessError> Wait()
+    {
+        int status = sl_process_wait(_handle, out int exitCode);
+        if (status != 0)
+            return Fail(Coded(status));
         return Ok(exitCode);
     }
 
     /// The code it left, if it has finished, without waiting for it.
     ///
     ///     while (child.Finished().IsEmpty()) { DoSomethingElse(); }
-    public Optional<int> Finished() {
-        int answer = sl_process_poll(handle, out int exitCode);
-        if (answer == 1) { return Some(exitCode); }
+    public Optional<int> Finished()
+    {
+        int answer = sl_process_poll(_handle, out int exitCode);
+        if (answer == 1)
+            return Some(exitCode);
         return None;
     }
 
     /// Asks it to stop, the way Ctrl-C would. It may decline.
-    public bool Stop() { return sl_process_signal(handle, false); }
+    public bool Stop() => sl_process_signal(_handle, false);
 
     /// Makes it stop. It cannot decline, and gets no chance to tidy up.
-    public bool Kill() { return sl_process_signal(handle, true); }
+    public bool Kill() => sl_process_signal(_handle, true);
 
     /// Starts a program without waiting for it.
-    public static Result<Process, ProcessError> Start(String program, String[] arguments) {
+    public static Result<Process, ProcessError> Start(String program, String[] arguments)
+    {
         byte* args = Assemble(program, arguments);
-        if (args == null) { return Fail(ProcessError.NoResource); }
+        if (args == null)
+            return Fail(ProcessError.NoResource);
 
         byte* started = sl_process_start(args, out int error);
         sl_process_args_free(args);
 
-        if (started == null) { return Fail(Coded(error)); }
+        if (started == null)
+            return Fail(Coded(error));
         return Ok(new Process(started));
     }
 }
@@ -237,14 +259,15 @@ public class Process {
 ///     Signals.Watch();
 ///     while (!Signals.Interrupted()) { DoAPieceOfWork(); }
 ///     Console.WriteLine("stopping");
-public static class Signals {
+public static class Signals
+{
     /// Starts noticing interrupts. Until this is called they end the program,
     /// which is the right default for something that has nothing to tidy.
-    public static bool Watch() { return sl_signals_watch(); }
+    public static bool Watch() => sl_signals_watch();
 
     /// Whether one has arrived since the last `Clear`.
-    public static bool Interrupted() { return sl_signals_interrupted(); }
+    public static bool Interrupted() => sl_signals_interrupted();
 
     /// Forgets the one that arrived, for a program that means to carry on.
-    public static void Clear() { sl_signals_clear(); }
+    public static void Clear() => sl_signals_clear();
 }

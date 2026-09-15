@@ -36,30 +36,31 @@ import Win32.Handles;
 /// and big enough. `Filter` is stranger: a list of NUL-separated pairs ending
 /// in a double NUL, which no Stainless string can hold —
 /// `Win32.Dialogs.BuildFilter` assembles one.
-public struct OpenFileName {
-    public uint      Size;
-    public HWND      Owner;
+public struct OpenFileName
+{
+    public uint Size;
+    public HWND Owner;
     public HINSTANCE Instance;
-    public char16*   Filter;
-    public char16*   CustomFilter;
-    public uint      CustomFilterMax;
-    public uint      FilterIndex;
-    public char16*   File;
-    public uint      FileMax;
-    public char16*   FileTitle;
-    public uint      FileTitleMax;
-    public char16*   InitialDirectory;
-    public char16*   Title;
-    public uint      Flags;
-    public ushort    FileOffset;
-    public ushort    ExtensionOffset;
-    public char16*   DefaultExtension;
-    public long      CustomData;
-    public void*     Hook;
-    public char16*   TemplateName;
-    public void*     Reserved1;
-    public uint      Reserved2;
-    public uint      FlagsEx;
+    public char16* Filter;
+    public char16* CustomFilter;
+    public uint CustomFilterMax;
+    public uint FilterIndex;
+    public char16* File;
+    public uint FileMax;
+    public char16* FileTitle;
+    public uint FileTitleMax;
+    public char16* InitialDirectory;
+    public char16* Title;
+    public uint Flags;
+    public ushort FileOffset;
+    public ushort ExtensionOffset;
+    public char16* DefaultExtension;
+    public long CustomData;
+    public void* Hook;
+    public char16* TemplateName;
+    public void* Reserved1;
+    public uint Reserved2;
+    public uint FlagsEx;
 }
 
 public const uint OfnReadOnly           = 0x00000001u;
@@ -73,7 +74,8 @@ public const uint OfnCreatePrompt       = 0x00002000u;
 public const uint OfnExplorer           = 0x00080000u;
 public const uint OfnNoDereferenceLinks = 0x00100000u;
 
-public extern "C" {
+public extern "C"
+{
     int  GetOpenFileNameW(OpenFileName* dialog);
     int  GetSaveFileNameW(OpenFileName* dialog);
     uint CommDlgExtendedError();
@@ -82,17 +84,18 @@ public extern "C" {
 // ================================================== choosing a colour and a font
 
 /// `CHOOSECOLORW`.
-public struct ChooseColor {
-    public uint    Size;
-    public HWND    Owner;
-    public HWND    Instance;
-    public uint    Result;
+public struct ChooseColor
+{
+    public uint Size;
+    public HWND Owner;
+    public HWND Instance;
+    public uint Result;
     /// Sixteen entries the dialog reads and writes, so that a colour the user
     /// mixed is still there next time. The caller owns the array.
-    public uint*   CustomColors;
-    public uint    Flags;
-    public long    CustomData;
-    public void*   Hook;
+    public uint* CustomColors;
+    public uint Flags;
+    public long CustomData;
+    public void* Hook;
     public char16* TemplateName;
 }
 
@@ -103,44 +106,46 @@ public const uint CcAnyColor  = 0x00000100u;
 
 /// `LOGFONTW`, which is how Windows describes a font everywhere but
 /// `CreateFontW`'s argument list.
-public struct LogFont {
-    public int      Height;
-    public int      Width;
-    public int      Escapement;
-    public int      Orientation;
-    public int      Weight;
-    public byte     Italic;
-    public byte     Underline;
-    public byte     StrikeOut;
-    public byte     CharSet;
-    public byte     OutPrecision;
-    public byte     ClipPrecision;
-    public byte     Quality;
-    public byte     PitchAndFamily;
+public struct LogFont
+{
+    public int Height;
+    public int Width;
+    public int Escapement;
+    public int Orientation;
+    public int Weight;
+    public byte Italic;
+    public byte Underline;
+    public byte StrikeOut;
+    public byte CharSet;
+    public byte OutPrecision;
+    public byte ClipPrecision;
+    public byte Quality;
+    public byte PitchAndFamily;
     /// `LF_FACESIZE`, fixed at 32 units including the terminator.
     public char16[32] FaceName;
 }
 
 /// `CHOOSEFONTW`.
-public struct ChooseFont {
-    public uint     Size;
-    public HWND     Owner;
-    public HDC      Dc;
+public struct ChooseFont
+{
+    public uint Size;
+    public HWND Owner;
+    public HDC Dc;
     public LogFont* LogFont;
     /// In *tenths* of a point, which is the one place Windows measures a font
     /// in anything but pixels.
-    public int      PointSize;
-    public uint     Flags;
-    public uint     Colors;
-    public long     CustomData;
-    public void*    Hook;
-    public char16*  TemplateName;
+    public int PointSize;
+    public uint Flags;
+    public uint Colors;
+    public long CustomData;
+    public void* Hook;
+    public char16* TemplateName;
     public HINSTANCE Instance;
-    public char16*  Style;
-    public ushort   FontType;
-    public ushort   Reserved;
-    public int      SizeMin;
-    public int      SizeMax;
+    public char16* Style;
+    public ushort FontType;
+    public ushort Reserved;
+    public int SizeMin;
+    public int SizeMax;
 }
 
 public const uint CfScreenFonts        = 0x00000001u;
@@ -153,7 +158,8 @@ public const uint CfForceFontExist     = 0x00010000u;
 public const uint CfLimitSize          = 0x00002000u;
 public const uint CfNoScriptSel        = 0x00800000u;
 
-public extern "C" {
+public extern "C"
+{
     int ChooseColorW(ChooseColor* dialog);
     int ChooseFontW(ChooseFont* dialog);
 }

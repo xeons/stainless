@@ -4,59 +4,74 @@ module Constraints;
 import Standard.Console;
 import Standard.Collections;    // IComparable<T> lives here
 
-public interface IDescribable {
+public interface IDescribable
+{
     String Describe();
 }
 
-public class Money : IComparable<Money>, IDescribable {
-    int cents;
+public class Money : IComparable<Money>, IDescribable
+{
+    int _cents;
 
-    public Money(int amount) { cents = amount; }
-    public int Cents() { return cents; }
+    public Money(int amount) => _cents = amount;
+    public int Cents() => _cents;
 
-    public int CompareTo(Money other) {
-        if (cents < other.Cents()) { return -1; }
-        if (cents > other.Cents()) { return 1; }
+    public int CompareTo(Money other)
+    {
+        if (_cents < other.Cents())
+            return -1;
+        if (_cents > other.Cents())
+            return 1;
         return 0;
     }
 
-    public String Describe() { return Text.FromInteger(cents) + "c"; }
+    public String Describe() => Text.FromInteger(_cents) + "c";
 }
 
 // `where T : IComparable<T>` is F-bounded: T must be comparable to itself.
-T Largest<T>(T[] values) where T : IComparable<T> {
+T Largest<T>(T[] values) where T : IComparable<T>
+{
     var best = values[0];
-    for (nuint i = 1; i < values.Length; i += 1) {
-        if (values[i].CompareTo(best) > 0) { best = values[i]; }
+    for (nuint i = 1; i < values.Length; i++)
+    {
+        if (values[i].CompareTo(best) > 0)
+            best = values[i];
     }
     return best;
 }
 
 // Two constraints on one parameter.
-public class Ranked<T> where T : IComparable<T>, IDescribable {
-    T[] items;
-    nuint count;
+public class Ranked<T> where T : IComparable<T>, IDescribable
+{
+    T[] _items;
+    nuint _count;
 
-    public Ranked(nuint capacity) {
-        items = new T[capacity];
-        count = 0;
+    public Ranked(nuint capacity)
+    {
+        _items = new T[capacity];
+        _count = 0;
     }
 
-    public void Add(T item) {
-        items[count] = item;
-        count += 1;
+    public void Add(T item)
+    {
+        _items[_count] = item;
+        _count++;
     }
 
-    public String BestDescription() {
-        var best = items[0];
-        for (nuint i = 1; i < count; i += 1) {
-            if (items[i].CompareTo(best) > 0) { best = items[i]; }
+    public String BestDescription()
+    {
+        var best = _items[0];
+        for (nuint i = 1; i < _count; i++)
+        {
+            if (_items[i].CompareTo(best) > 0)
+                best = _items[i];
         }
         return best.Describe();
     }
 }
 
-int Main() {
+int Main()
+{
     var prices = new Money[3];
     prices[0] = new Money(250);
     prices[1] = new Money(999);

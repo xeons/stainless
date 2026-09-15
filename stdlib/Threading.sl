@@ -33,7 +33,8 @@
 /// the object's *contents*, which nothing synchronizes on its behalf.
 module Standard.Threading;
 
-extern "C" {
+extern "C"
+{
     byte* sl_mutex_new();
     void  sl_mutex_free(byte* mutex);
     void  sl_mutex_lock(byte* mutex);
@@ -119,13 +120,15 @@ extern "C" {
 /// down and the object was freed while the mutex still held it. Reference counts
 /// are atomic now, which closes that; what remains is the lifetime hole above,
 /// which is about how long a borrowed thing lives rather than about counting.
-public threadsafe class Mutex<T> {
+public threadsafe class Mutex<T>
+{
     T value;
     byte* handle;
 
     /// A mutex holding `initial`, unlocked. The value goes in here and comes
     /// out only through a guard; there is no way to hand it over afterwards.
-    public Mutex(T initial) {
+    public Mutex(T initial)
+    {
         value = initial;
         handle = sl_mutex_new();
     }
@@ -137,43 +140,47 @@ public threadsafe class Mutex<T> {
     /// Keep the result in a variable. `registry.Lock();` on its own locks and
     /// then immediately unlocks, because the guard is a temporary and dies at
     /// the end of the statement.
-    public Guard<T> Lock() {
+    public Guard<T> Lock()
+    {
         sl_mutex_lock(handle);
         return new Guard<T>(this);
     }
 
     /// Takes the lock only if it is free. Returns null rather than blocking.
-    public Guard<T>? TryLock() {
-        if (sl_mutex_try_lock(handle)) { return new Guard<T>(this); }
+    public Guard<T>? TryLock()
+    {
+        if (sl_mutex_try_lock(handle))
+            return new Guard<T>(this);
         return null;
     }
 
     // Reached through a Guard, which is the only thing that holds the lock.
-    T Read() { return value; }
-    void Write(T updated) { value = updated; }
-    void Unlock() { sl_mutex_unlock(handle); }
+    T Read() => value;
+    void Write(T updated) => value = updated;
+    void Unlock() => sl_mutex_unlock(handle);
 }
 
 /// Proof that a lock is held, and the only route to what it guards.
 ///
 /// A guard keeps its mutex alive, so the lock cannot be freed while it is
 /// held. Releasing is the destructor's job; there is no `Unlock` to forget.
-public class Guard<T> {
-    Mutex<T> owner;
+public class Guard<T>
+{
+    Mutex<T> _owner;
 
-    Guard(Mutex<T> held) { owner = held; }
+    Guard(Mutex<T> held) => _owner = held;
 
-    ~Guard() { owner.Unlock(); }
+    ~Guard() { _owner.Unlock(); }
 
     /// What the lock guards.
     ///
     /// See the hole described on `Mutex`: what this hands back must not
     /// outlive the guard, and nothing yet enforces it.
-    public T Value() { return owner.Read(); }
+    public T Value() => _owner.Read();
 
     /// Replaces the guarded value. For a class `T` this swaps which object is
     /// guarded; mutating the one `Value` gave back is the usual thing.
-    public void Set(T updated) { owner.Write(updated); }
+    public void Set(T updated) => _owner.Write(updated);
 }
 
 // ----------------------------------------------------------------- monitors
@@ -193,71 +200,77 @@ public class Guard<T> {
 ///     var held = queue.Lock();
 ///     while (held.Value().IsEmpty()) { held.Wait(); }
 ///     var item = held.Value().Take();
-public threadsafe class Monitor<T> {
+public threadsafe class Monitor<T>
+{
     T value;
     byte* handle;
     byte* signal;
 
     /// A monitor holding `initial`, unlocked and with nobody waiting.
-    public Monitor(T initial) {
+    public Monitor(T initial)
+    {
         value = initial;
         handle = sl_mutex_new();
         signal = sl_condition_new();
     }
 
-    ~Monitor() {
+    ~Monitor()
+    {
         sl_condition_free(signal);
         sl_mutex_free(handle);
     }
 
     /// Blocks until the lock is free. Keep the result in a variable -- a
     /// temporary unlocks at the end of the statement.
-    public MonitorGuard<T> Lock() {
+    public MonitorGuard<T> Lock()
+    {
         sl_mutex_lock(handle);
         return new MonitorGuard<T>(this);
     }
 
     // Reached through a MonitorGuard, which is the only thing holding the lock.
-    T Read() { return value; }
-    void Write(T updated) { value = updated; }
-    void Unlock() { sl_mutex_unlock(handle); }
-    void Sleep() { sl_condition_wait(signal, handle); }
-    bool SleepFor(ulong milliseconds) {
+    T Read() => value;
+    void Write(T updated) => value = updated;
+    void Unlock() => sl_mutex_unlock(handle);
+    void Sleep() => sl_condition_wait(signal, handle);
+    bool SleepFor(ulong milliseconds)
+    {
         return sl_condition_wait_for(signal, handle, milliseconds);
     }
-    void Wake() { sl_condition_signal(signal); }
-    void WakeAll() { sl_condition_broadcast(signal); }
+    void Wake() => sl_condition_signal(signal);
+    void WakeAll() => sl_condition_broadcast(signal);
 }
 
 /// Proof that a monitor is held, and the only route to what it guards.
-public class MonitorGuard<T> {
-    Monitor<T> owner;
+public class MonitorGuard<T>
+{
+    Monitor<T> _owner;
 
-    MonitorGuard(Monitor<T> held) { owner = held; }
+    MonitorGuard(Monitor<T> held) => _owner = held;
 
-    ~MonitorGuard() { owner.Unlock(); }
+    ~MonitorGuard() { _owner.Unlock(); }
 
     /// What the monitor guards, with the same lifetime caveat as `Guard`.
-    public T Value() { return owner.Read(); }
+    public T Value() => _owner.Read();
 
     /// Replaces the guarded value. Pulse afterwards if anyone is waiting on a
     /// condition this changed -- nothing wakes on its own.
-    public void Set(T updated) { owner.Write(updated); }
+    public void Set(T updated) => _owner.Write(updated);
 
     /// Releases the lock, waits for a pulse, and takes the lock again. Call it
     /// in a loop that re-checks what you are waiting for.
-    public void Wait() { owner.Sleep(); }
+    public void Wait() => _owner.Sleep();
 
     /// The same with a deadline. Returns false if the time ran out -- and the
     /// lock is held either way, because the predicate still has to be checked.
-    public bool WaitFor(ulong milliseconds) { return owner.SleepFor(milliseconds); }
+    public bool WaitFor(ulong milliseconds) => _owner.SleepFor(milliseconds);
 
     /// Wakes one waiter. It cannot run until this guard is dropped.
-    public void Pulse() { owner.Wake(); }
+    public void Pulse() => _owner.Wake();
 
     /// Wakes every waiter. Use it when more than one could make progress, or
     /// when waiters are waiting for different conditions on the same value.
-    public void PulseAll() { owner.WakeAll(); }
+    public void PulseAll() => _owner.WakeAll();
 }
 
 // ------------------------------------------------------- reader/writer locks
@@ -273,12 +286,14 @@ public class MonitorGuard<T> {
 /// offers it, and neither should: two readers upgrading at once is a deadlock
 /// with no way out. Drop the read guard, take a write guard, and re-check what
 /// you read -- it may have changed in between.
-public threadsafe class RwLock<T> {
+public threadsafe class RwLock<T>
+{
     T value;
     byte* handle;
 
     /// A lock holding `initial`, unheld.
-    public RwLock(T initial) {
+    public RwLock(T initial)
+    {
         value = initial;
         handle = sl_rwlock_new();
     }
@@ -286,64 +301,72 @@ public threadsafe class RwLock<T> {
     ~RwLock() { sl_rwlock_free(handle); }
 
     /// Blocks until no writer holds the lock. Other readers are welcome.
-    public ReadGuard<T> Read() {
+    public ReadGuard<T> Read()
+    {
         sl_rwlock_read_lock(handle);
         return new ReadGuard<T>(this);
     }
 
     /// Takes a read guard only if no writer holds the lock. Answers null
     /// rather than blocking.
-    public ReadGuard<T>? TryRead() {
-        if (sl_rwlock_try_read_lock(handle)) { return new ReadGuard<T>(this); }
+    public ReadGuard<T>? TryRead()
+    {
+        if (sl_rwlock_try_read_lock(handle))
+            return new ReadGuard<T>(this);
         return null;
     }
 
     /// Blocks until nothing holds the lock at all.
-    public WriteGuard<T> Write() {
+    public WriteGuard<T> Write()
+    {
         sl_rwlock_write_lock(handle);
         return new WriteGuard<T>(this);
     }
 
     /// Takes a write guard only if nothing holds the lock at all. Answers
     /// null rather than blocking.
-    public WriteGuard<T>? TryWrite() {
-        if (sl_rwlock_try_write_lock(handle)) { return new WriteGuard<T>(this); }
+    public WriteGuard<T>? TryWrite()
+    {
+        if (sl_rwlock_try_write_lock(handle))
+            return new WriteGuard<T>(this);
         return null;
     }
 
-    T Held() { return value; }
-    void Store(T updated) { value = updated; }
-    void ReadUnlock() { sl_rwlock_read_unlock(handle); }
-    void WriteUnlock() { sl_rwlock_write_unlock(handle); }
+    T Held() => value;
+    void Store(T updated) => value = updated;
+    void ReadUnlock() => sl_rwlock_read_unlock(handle);
+    void WriteUnlock() => sl_rwlock_write_unlock(handle);
 }
 
 /// Shared access. There is no `Set`, which is the point.
-public class ReadGuard<T> {
-    RwLock<T> owner;
+public class ReadGuard<T>
+{
+    RwLock<T> _owner;
 
-    ReadGuard(RwLock<T> held) { owner = held; }
+    ReadGuard(RwLock<T> held) => _owner = held;
 
-    ~ReadGuard() { owner.ReadUnlock(); }
+    ~ReadGuard() { _owner.ReadUnlock(); }
 
     /// What the lock guards, shared with every other reader. Treat it as
     /// read-only: nothing stops a `T` with mutating methods being mutated
     /// through this, and doing so races with the other readers.
-    public T Value() { return owner.Held(); }
+    public T Value() => _owner.Held();
 }
 
 /// Exclusive access.
-public class WriteGuard<T> {
-    RwLock<T> owner;
+public class WriteGuard<T>
+{
+    RwLock<T> _owner;
 
-    WriteGuard(RwLock<T> held) { owner = held; }
+    WriteGuard(RwLock<T> held) => _owner = held;
 
-    ~WriteGuard() { owner.WriteUnlock(); }
+    ~WriteGuard() { _owner.WriteUnlock(); }
 
     /// What the lock guards, exclusively. Safe to mutate through.
-    public T Value() { return owner.Held(); }
+    public T Value() => _owner.Held();
 
     /// Replaces the guarded value.
-    public void Set(T updated) { owner.Store(updated); }
+    public void Set(T updated) => _owner.Store(updated);
 }
 
 // ------------------------------------------------------------------ atomics
@@ -357,86 +380,90 @@ public class WriteGuard<T> {
 /// It is `long` rather than generic because atomics are not: `Atomic<T>` would
 /// need a constraint saying T is an integer, and Stainless constrains by
 /// interface only. A shared counter wants 64 bits anyway.
-public threadsafe class AtomicLong {
+public threadsafe class AtomicLong
+{
     long cell;
 
     /// A counter starting at `initial`.
-    public AtomicLong(long initial) { cell = initial; }
+    public AtomicLong(long initial) => cell = initial;
 
     /// The value now. A read of a moving counter is stale the moment it is
     /// returned, so this is for reporting; `Add` and `CompareExchange` are
     /// what a decision is built on.
-    public long Load() { return sl_atomic_load(&cell); }
+    public long Load() => sl_atomic_load(&cell);
 
     /// Overwrites the value, losing whatever was there. `Exchange` is the one
     /// that tells you what it replaced.
-    public void Store(long value) { sl_atomic_store(&cell, value); }
+    public void Store(long value) => sl_atomic_store(&cell, value);
 
     /// Adds and returns the new value, so two threads never see the same result.
-    public long Add(long delta) { return sl_atomic_add(&cell, delta); }
+    public long Add(long delta) => sl_atomic_add(&cell, delta);
 
     /// Adds one and returns the new value, so two threads never see the same
     /// number. Note that this is not C's `++`, which answers the old one.
-    public long Increment() { return sl_atomic_add(&cell, 1); }
+    public long Increment() => sl_atomic_add(&cell, 1);
 
     /// Subtracts one and returns the new value. A reference count reaching
     /// zero is exactly one thread's result.
-    public long Decrement() { return sl_atomic_add(&cell, -1); }
+    public long Decrement() => sl_atomic_add(&cell, -1);
 
     /// Stores `value` and returns what was there before.
-    public long Exchange(long value) { return sl_atomic_exchange(&cell, value); }
+    public long Exchange(long value) => sl_atomic_exchange(&cell, value);
 
     /// Stores `desired` only if the current value is `expected`, and reports
     /// whether it did. The building block for anything lock-free.
-    public bool CompareExchange(long expected, long desired) {
+    public bool CompareExchange(long expected, long desired)
+    {
         long witness = expected;
         return sl_atomic_compare_exchange(&cell, &witness, desired);
     }
 
     /// Bitwise, for a set of flags several threads maintain. Each returns the
     /// new value, as `Add` does.
-    public long And(long mask) { return sl_atomic_and(&cell, mask); }
+    public long And(long mask) => sl_atomic_and(&cell, mask);
 
     /// Sets the bits in `mask`, returning the new value.
-    public long Or(long mask) { return sl_atomic_or(&cell, mask); }
+    public long Or(long mask) => sl_atomic_or(&cell, mask);
 
     /// Flips the bits in `mask`, returning the new value.
-    public long Xor(long mask) { return sl_atomic_xor(&cell, mask); }
+    public long Xor(long mask) => sl_atomic_xor(&cell, mask);
 }
 
 /// The same counter in 32 bits, for a cell that has to stay an `int` -- one
 /// shared with C, usually. Prefer `AtomicLong` when the width is your choice:
 /// it is the same speed on any machine this targets and cannot wrap in
 /// practice.
-public threadsafe class AtomicInt {
+public threadsafe class AtomicInt
+{
     int cell;
 
     /// A counter starting at `initial`.
-    public AtomicInt(int initial) { cell = initial; }
+    public AtomicInt(int initial) => cell = initial;
 
     /// The value now, stale the moment it is returned.
-    public int Load() { return sl_atomic_load32(&cell); }
+    public int Load() => sl_atomic_load32(&cell);
 
     /// Overwrites the value, losing whatever was there.
-    public void Store(int value) { sl_atomic_store32(&cell, value); }
+    public void Store(int value) => sl_atomic_store32(&cell, value);
 
     /// Adds and returns the new value. Wraps at 32 bits, silently, which is
     /// the reason to prefer `AtomicLong` where the width is a free choice.
-    public int Add(int delta) { return sl_atomic_add32(&cell, delta); }
+    public int Add(int delta) => sl_atomic_add32(&cell, delta);
 
     /// Adds one and returns the new value.
-    public int Increment() { return sl_atomic_add32(&cell, 1); }
+    public int Increment() => sl_atomic_add32(&cell, 1);
 
     /// Subtracts one and returns the new value.
-    public int Decrement() { return sl_atomic_add32(&cell, -1); }
+    public int Decrement() => sl_atomic_add32(&cell, -1);
 
     /// Stores `value` and returns what was there before.
-    public int Exchange(int value) { return sl_atomic_exchange32(&cell, value); }
+    public int Exchange(int value) => sl_atomic_exchange32(&cell, value);
 
     /// Stores `desired` only if the current value is `expected`, and reports
     /// whether it did. A false answer means somebody else got there first --
     /// re-read and try again, which is the shape of every lock-free loop.
-    public bool CompareExchange(int expected, int desired) {
+    public bool CompareExchange(int expected, int desired)
+    {
         int witness = expected;
         return sl_atomic_compare_exchange32(&cell, &witness, desired);
     }
@@ -444,30 +471,37 @@ public threadsafe class AtomicInt {
 
 /// A flag several threads may set and read. One-way latches -- "has this
 /// started", "should this stop" -- are what it is for.
-public threadsafe class AtomicBool {
+public threadsafe class AtomicBool
+{
     long cell;
 
     /// A flag starting at `initial`.
-    public AtomicBool(bool initial) {
+    public AtomicBool(bool initial)
+    {
         cell = 0;
-        if (initial) { cell = 1; }
+        if (initial)
+            cell = 1;
     }
 
     /// The flag now. Cheap enough to read in a spin loop's condition.
-    public bool Load() { return sl_atomic_load(&cell) != 0; }
+    public bool Load() => sl_atomic_load(&cell) != 0;
 
     /// Sets the flag, losing whatever it was. `Exchange` is the one to use
     /// when exactly one thread must win.
-    public void Store(bool value) {
+    public void Store(bool value)
+    {
         long raw = 0;
-        if (value) { raw = 1; }
+        if (value)
+            raw = 1;
         sl_atomic_store(&cell, raw);
     }
 
     /// Sets the flag and returns what it was, which is how one thread wins a race.
-    public bool Exchange(bool value) {
+    public bool Exchange(bool value)
+    {
         long raw = 0;
-        if (value) { raw = 1; }
+        if (value)
+            raw = 1;
         return sl_atomic_exchange(&cell, raw) != 0;
     }
 }
@@ -481,7 +515,8 @@ public threadsafe class AtomicBool {
 /// thread than locked it, which is occasionally what you want and usually a
 /// sign that `Mutex<T>` was the right answer. Its real use is a limit -- at
 /// most eight downloads at once, at most one writer per file.
-public threadsafe class Semaphore {
+public threadsafe class Semaphore
+{
     long permits;
     byte* handle;
     byte* signal;
@@ -489,66 +524,83 @@ public threadsafe class Semaphore {
     /// A semaphore with `initial` permits -- the number of things allowed to
     /// proceed at once. Zero is a valid start, and makes every `Wait` block
     /// until something calls `Release`.
-    public Semaphore(long initial) {
+    public Semaphore(long initial)
+    {
         permits = initial;
         handle = sl_mutex_new();
         signal = sl_condition_new();
     }
 
-    ~Semaphore() {
+    ~Semaphore()
+    {
         sl_condition_free(signal);
         sl_mutex_free(handle);
     }
 
     /// Blocks until a permit is available, and takes it.
-    public void Wait() {
+    public void Wait()
+    {
         sl_mutex_lock(handle);
-        while (permits <= 0) { sl_condition_wait(signal, handle); }
-        permits -= 1;
+        while (permits <= 0)
+            sl_condition_wait(signal, handle);
+        permits--;
         sl_mutex_unlock(handle);
     }
 
     /// Takes a permit only if one is free right now.
-    public bool TryWait() {
+    public bool TryWait()
+    {
         sl_mutex_lock(handle);
         bool took = permits > 0;
-        if (took) { permits -= 1; }
+        if (took)
+            permits -= 1;
         sl_mutex_unlock(handle);
         return took;
     }
 
     /// Blocks for at most `milliseconds`. Returns whether it got a permit.
-    public bool WaitFor(ulong milliseconds) {
+    public bool WaitFor(ulong milliseconds)
+    {
         sl_mutex_lock(handle);
 
         // Re-checked in a loop because a spurious wake and a real one look the
         // same, and because another thread may take the permit first.
-        while (permits <= 0) {
-            if (!sl_condition_wait_for(signal, handle, milliseconds)) {
+        while (permits <= 0)
+        {
+            if (!sl_condition_wait_for(signal, handle, milliseconds))
+            {
                 sl_mutex_unlock(handle);
                 return false;
             }
         }
 
-        permits -= 1;
+        permits--;
         sl_mutex_unlock(handle);
         return true;
     }
 
     /// Puts one permit back and wakes a waiter.
-    public void Release() { ReleaseMany(1); }
+    public void Release() => ReleaseMany(1);
 
     /// Puts several back at once, waking as many waiters as could proceed.
-    public void ReleaseMany(long count) {
+    public void ReleaseMany(long count)
+    {
         sl_mutex_lock(handle);
         permits += count;
-        if (count == 1) { sl_condition_signal(signal); }
-        else { sl_condition_broadcast(signal); }
+        if (count == 1)
+        {
+            sl_condition_signal(signal);
+        }
+        else
+        {
+            sl_condition_broadcast(signal);
+        }
         sl_mutex_unlock(handle);
     }
 
     /// How many permits are free. A snapshot, and stale the moment you have it.
-    public long Available() {
+    public long Available()
+    {
         sl_mutex_lock(handle);
         long count = permits;
         sl_mutex_unlock(handle);
@@ -560,38 +612,46 @@ public threadsafe class Semaphore {
 /// `Wait` returns at once until something calls `Reset`.
 ///
 /// "Is the server up yet" is the shape it fits.
-public threadsafe class ManualResetEvent {
+public threadsafe class ManualResetEvent
+{
     bool open;
     byte* handle;
     byte* signal;
 
     /// A latch, open when `signalled` is true. Start it closed when waiters
     /// must not pass until something has happened.
-    public ManualResetEvent(bool signalled) {
+    public ManualResetEvent(bool signalled)
+    {
         open = signalled;
         handle = sl_mutex_new();
         signal = sl_condition_new();
     }
 
-    ~ManualResetEvent() {
+    ~ManualResetEvent()
+    {
         sl_condition_free(signal);
         sl_mutex_free(handle);
     }
 
     /// Blocks until the latch is open, and returns at once if it already is.
     /// Every waiter passes -- the latch is not consumed.
-    public void Wait() {
+    public void Wait()
+    {
         sl_mutex_lock(handle);
-        while (!open) { sl_condition_wait(signal, handle); }
+        while (!open)
+            sl_condition_wait(signal, handle);
         sl_mutex_unlock(handle);
     }
 
     /// The same with a deadline. Answers whether the latch was open, so a
     /// false means the time ran out.
-    public bool WaitFor(ulong milliseconds) {
+    public bool WaitFor(ulong milliseconds)
+    {
         sl_mutex_lock(handle);
-        while (!open) {
-            if (!sl_condition_wait_for(signal, handle, milliseconds)) {
+        while (!open)
+        {
+            if (!sl_condition_wait_for(signal, handle, milliseconds))
+            {
                 bool passed = open;
                 sl_mutex_unlock(handle);
                 return passed;
@@ -602,7 +662,8 @@ public threadsafe class ManualResetEvent {
     }
 
     /// Opens the latch and releases everybody waiting.
-    public void Set() {
+    public void Set()
+    {
         sl_mutex_lock(handle);
         open = true;
         sl_condition_broadcast(signal);
@@ -610,7 +671,8 @@ public threadsafe class ManualResetEvent {
     }
 
     /// Closes it again, so the next `Wait` blocks.
-    public void Reset() {
+    public void Reset()
+    {
         sl_mutex_lock(handle);
         open = false;
         sl_mutex_unlock(handle);
@@ -618,7 +680,8 @@ public threadsafe class ManualResetEvent {
 
     /// Whether the latch is open *now*. `Reset` can close it before you act
     /// on the answer, so this is for reporting rather than for deciding.
-    public bool IsSet() {
+    public bool IsSet()
+    {
         sl_mutex_lock(handle);
         bool state = open;
         sl_mutex_unlock(handle);
@@ -632,40 +695,49 @@ public threadsafe class ManualResetEvent {
 /// away -- one signal, one pass, whichever order they happen in. A second
 /// `Set` before anyone waits is *not* remembered, which is the difference
 /// between this and a `Semaphore`.
-public threadsafe class AutoResetEvent {
+public threadsafe class AutoResetEvent
+{
     bool ready;
     byte* handle;
     byte* signal;
 
     /// A turnstile, armed when `signalled` is true -- so the first `Wait`
     /// passes straight through.
-    public AutoResetEvent(bool signalled) {
+    public AutoResetEvent(bool signalled)
+    {
         ready = signalled;
         handle = sl_mutex_new();
         signal = sl_condition_new();
     }
 
-    ~AutoResetEvent() {
+    ~AutoResetEvent()
+    {
         sl_condition_free(signal);
         sl_mutex_free(handle);
     }
 
     /// Blocks until the turnstile is armed, then passes and closes it behind.
     /// Exactly one waiter passes per `Set`.
-    public void Wait() {
+    public void Wait()
+    {
         sl_mutex_lock(handle);
-        while (!ready) { sl_condition_wait(signal, handle); }
+        while (!ready)
+            sl_condition_wait(signal, handle);
         ready = false;
         sl_mutex_unlock(handle);
     }
 
     /// The same with a deadline. Answers whether it got through; a false
     /// leaves the turnstile as it found it.
-    public bool WaitFor(ulong milliseconds) {
+    public bool WaitFor(ulong milliseconds)
+    {
         sl_mutex_lock(handle);
-        while (!ready) {
-            if (!sl_condition_wait_for(signal, handle, milliseconds)) {
-                if (!ready) {
+        while (!ready)
+        {
+            if (!sl_condition_wait_for(signal, handle, milliseconds))
+            {
+                if (!ready)
+                {
                     sl_mutex_unlock(handle);
                     return false;
                 }
@@ -677,7 +749,8 @@ public threadsafe class AutoResetEvent {
     }
 
     /// Lets one waiter through, or arms the next one.
-    public void Set() {
+    public void Set()
+    {
         sl_mutex_lock(handle);
         ready = true;
         sl_condition_signal(signal);
@@ -690,31 +763,37 @@ public threadsafe class AutoResetEvent {
 /// The join half of fork-join, for work that `parallel` cannot bracket --
 /// jobs handed to threads that outlive the function that started them.
 /// Inside a `parallel` block the closing brace already does this.
-public threadsafe class CountdownEvent {
+public threadsafe class CountdownEvent
+{
     long remaining;
     byte* handle;
     byte* signal;
 
     /// A latch that opens once `count` things have signalled. A count of zero
     /// starts open, and `TryAddCount` will refuse to reopen it.
-    public CountdownEvent(long count) {
+    public CountdownEvent(long count)
+    {
         remaining = count;
         handle = sl_mutex_new();
         signal = sl_condition_new();
     }
 
-    ~CountdownEvent() {
+    ~CountdownEvent()
+    {
         sl_condition_free(signal);
         sl_mutex_free(handle);
     }
 
     /// Counts one off. Returns true if that was the last one.
-    public bool Signal() {
+    public bool Signal()
+    {
         sl_mutex_lock(handle);
 
-        if (remaining > 0) { remaining -= 1; }
+        if (remaining > 0)
+            remaining -= 1;
         bool done = remaining == 0;
-        if (done) { sl_condition_broadcast(signal); }
+        if (done)
+            sl_condition_broadcast(signal);
 
         sl_mutex_unlock(handle);
         return done;
@@ -722,10 +801,12 @@ public threadsafe class CountdownEvent {
 
     /// Adds work before it is started. Adding after the count reaches zero is
     /// a race nobody wins, so it is refused rather than reopening the latch.
-    public bool TryAddCount(long count) {
+    public bool TryAddCount(long count)
+    {
         sl_mutex_lock(handle);
         bool added = remaining > 0;
-        if (added) { remaining += count; }
+        if (added)
+            remaining += count;
         sl_mutex_unlock(handle);
         return added;
     }
@@ -735,17 +816,22 @@ public threadsafe class CountdownEvent {
     ///
     /// The calling thread blocks rather than helping: this is not a `parallel`
     /// block, so there is no queue for it to work off.
-    public void Wait() {
+    public void Wait()
+    {
         sl_mutex_lock(handle);
-        while (remaining > 0) { sl_condition_wait(signal, handle); }
+        while (remaining > 0)
+            sl_condition_wait(signal, handle);
         sl_mutex_unlock(handle);
     }
 
     /// The same with a deadline. Answers whether the count reached zero.
-    public bool WaitFor(ulong milliseconds) {
+    public bool WaitFor(ulong milliseconds)
+    {
         sl_mutex_lock(handle);
-        while (remaining > 0) {
-            if (!sl_condition_wait_for(signal, handle, milliseconds)) {
+        while (remaining > 0)
+        {
+            if (!sl_condition_wait_for(signal, handle, milliseconds))
+            {
                 bool done = remaining == 0;
                 sl_mutex_unlock(handle);
                 return done;
@@ -757,7 +843,8 @@ public threadsafe class CountdownEvent {
 
     /// How many signals are still outstanding. A snapshot, and stale the
     /// moment you have it.
-    public long CurrentCount() {
+    public long CurrentCount()
+    {
         sl_mutex_lock(handle);
         long count = remaining;
         sl_mutex_unlock(handle);
@@ -775,7 +862,8 @@ public threadsafe class CountdownEvent {
 /// The phase number is what makes it reusable: a thread released from round 3
 /// that loops straight back in cannot be counted into round 3 a second time,
 /// because the number it is waiting on has already moved.
-public threadsafe class Barrier {
+public threadsafe class Barrier
+{
     nuint participants;
     nuint waiting;
     long phase;
@@ -787,7 +875,8 @@ public threadsafe class Barrier {
     /// The number is fixed for the life of the barrier. Fewer threads than
     /// that calling `SignalAndWait` blocks all of them for ever, which is the
     /// failure to look for when a phase never ends.
-    public Barrier(nuint count) {
+    public Barrier(nuint count)
+    {
         participants = count;
         waiting = 0u;
         phase = 0;
@@ -795,28 +884,32 @@ public threadsafe class Barrier {
         signal = sl_condition_new();
     }
 
-    ~Barrier() {
+    ~Barrier()
+    {
         sl_condition_free(signal);
         sl_mutex_free(handle);
     }
 
     /// Blocks until every participant has arrived. Returns the number of the
     /// phase that just finished.
-    public long SignalAndWait() {
+    public long SignalAndWait()
+    {
         sl_mutex_lock(handle);
 
         long round = phase;
-        waiting += 1u;
+        waiting++;
 
-        if (waiting >= participants) {
+        if (waiting >= participants)
+        {
             waiting = 0u;
-            phase += 1;
+            phase++;
             sl_condition_broadcast(signal);
             sl_mutex_unlock(handle);
             return round;
         }
 
-        while (phase == round) { sl_condition_wait(signal, handle); }
+        while (phase == round)
+            sl_condition_wait(signal, handle);
 
         sl_mutex_unlock(handle);
         return round;
@@ -824,7 +917,7 @@ public threadsafe class Barrier {
 
     /// How many participants the barrier was made for. Fixed, so unlike most
     /// readings here it cannot be stale.
-    public nuint ParticipantCount() { return participants; }
+    public nuint ParticipantCount() => participants;
 }
 
 // -------------------------------------------------------------------- tasks
@@ -846,24 +939,28 @@ public delegate void Job(byte* argument);
 /// local of the function that owns the scope is enough, since the scope joins
 /// before that function returns. Step 6 of docs/concurrency.md is what turns
 /// this from a convention into a rule.
-public class TaskScope {
-    byte* handle;
+public class TaskScope
+{
+    byte* _handle;
 
     /// Opens a scope. Starts the thread pool if this is the first one, which
     /// is what `StartPool` can do earlier and with a chosen size.
-    public TaskScope() { handle = sl_scope_begin(); }
+    public TaskScope() => _handle = sl_scope_begin();
 
     /// Queues a job. It may already be running when this returns.
-    public void Run(Job job, byte* argument) {
-        sl_scope_submit(handle, job, argument);
+    public void Run(Job job, byte* argument)
+    {
+        sl_scope_submit(_handle, job, argument);
     }
 
     /// Waits for every job submitted so far. Doing it twice is harmless, which
     /// is what lets the destructor be a backstop for a scope nobody joined.
-    public void Join() {
-        if (handle != null) {
-            sl_scope_end(handle);
-            handle = null;
+    public void Join()
+    {
+        if (_handle != null)
+        {
+            sl_scope_end(_handle);
+            _handle = null;
         }
     }
 
@@ -893,51 +990,57 @@ public class TaskScope {
 /// there until its thread finishes, which is C++'s `jthread` and is the safe
 /// default: the alternative is a thread still running against storage that has
 /// gone. Say `Detach()` when you mean to let it run loose.
-public class Thread {
-    byte* handle;
+public class Thread
+{
+    byte* _handle;
 
     /// Starts a thread running `body(argument)`. Stainless has no static
     /// methods -- a module is the static class -- so the constructor is the
     /// place this goes.
-    public Thread(Job body, byte* argument) {
-        handle = sl_thread_start(body, argument);
+    public Thread(Job body, byte* argument)
+    {
+        _handle = sl_thread_start(body, argument);
     }
 
     /// Waits for it to finish. Doing it twice is harmless, which is what lets
     /// the destructor be a backstop.
-    public void Join() {
-        if (handle != null) {
-            sl_thread_join(handle);
-            handle = null;
+    public void Join()
+    {
+        if (_handle != null)
+        {
+            sl_thread_join(_handle);
+            _handle = null;
         }
     }
 
     /// Gives up the handle without waiting. The thread runs on and cleans up
     /// after itself; nothing can join it afterwards.
-    public void Detach() {
-        if (handle != null) {
-            sl_thread_detach(handle);
-            handle = null;
+    public void Detach()
+    {
+        if (_handle != null)
+        {
+            sl_thread_detach(_handle);
+            _handle = null;
         }
     }
 
     /// Whether this handle still refers to a thread -- false after `Join` or
     /// `Detach`. It does not say whether the thread is still running.
-    public bool IsJoinable() { return handle != null; }
+    public bool IsJoinable() => _handle != null;
 
     ~Thread() { Join(); }
 }
 
 /// Stops the calling thread for at least this long. It may be longer: this is
 /// the scheduler's floor, not a timer.
-public void Sleep(ulong milliseconds) { sl_thread_sleep(milliseconds); }
+public void Sleep(ulong milliseconds) => sl_thread_sleep(milliseconds);
 
 /// Offers the rest of this thread's slice to anything else that is ready.
-public void Yield() { sl_thread_yield(); }
+public void Yield() => sl_thread_yield();
 
 /// An identifier for the calling thread, unique among those running. It is the
 /// OS's number and means nothing across a restart.
-public nuint CurrentId() { return sl_thread_current_id(); }
+public nuint CurrentId() => sl_thread_current_id();
 
 /// Backs off in a loop that is waiting for something another core will do very
 /// soon -- spinning at first, then yielding once it is clear this will take a
@@ -950,20 +1053,23 @@ public nuint CurrentId() { return sl_thread_current_id(); }
 ///
 ///     var spin = new SpinWait();
 ///     while (!ready.Load()) { spin.Once(); }
-public class SpinWait {
-    nuint spins;
+public class SpinWait
+{
+    nuint _spins;
 
     /// A fresh backoff, having spun zero times.
-    public SpinWait() { spins = 0u; }
+    public SpinWait() => _spins = 0u;
 
     /// One step of backing off.
-    public void Once() {
-        spins += 1u;
+    public void Once()
+    {
+        _spins++;
 
         // Ten pause instructions before the first yield, then a yield every
         // time: long enough for a neighbouring core to finish a short critical
         // section, short enough not to burn a slice on anything longer.
-        if (spins <= 10u) {
+        if (_spins <= 10u)
+        {
             sl_cpu_pause();
             return;
         }
@@ -972,20 +1078,20 @@ public class SpinWait {
     }
 
     /// How many times `Once` has been called.
-    public nuint Count() { return spins; }
+    public nuint Count() => _spins;
 
     /// Starts over, for a loop that is being reused.
-    public void Reset() { spins = 0u; }
+    public void Reset() => _spins = 0u;
 }
 
 // -------------------------------------------------------------------- pool
 
 /// How many threads the pool is running. Zero until the first scope starts it.
-public nuint WorkerCount() { return sl_pool_worker_count(); }
+public nuint WorkerCount() => sl_pool_worker_count();
 
 /// How many hardware threads the machine reports.
-public nuint ProcessorCount() { return sl_cpu_count(); }
+public nuint ProcessorCount() => sl_cpu_count();
 
 /// Starts the pool with a chosen number of workers, before any scope does it
 /// automatically. Passing zero sizes it from the processor count.
-public void StartPool(nuint workers) { sl_pool_start(workers); }
+public void StartPool(nuint workers) => sl_pool_start(workers);

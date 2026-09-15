@@ -52,7 +52,8 @@ import Forms.Platform;
 /// `Color` is always four channels that are already resolved, and the system
 /// colours live in `SystemColors` where they are looked up when asked for.
 /// The BGR packing is a Windows detail, and belongs in the Windows backend.
-public struct Color {
+public struct Color
+{
     public byte R;
     public byte G;
     public byte B;
@@ -62,7 +63,8 @@ public struct Color {
     /// does not, and a type that gains a channel later gains it everywhere.
     public byte A;
 
-    public static Color FromRgb(byte red, byte green, byte blue) {
+    public static Color FromRgb(byte red, byte green, byte blue)
+    {
         Color colour;
         colour.R = red;
         colour.G = green;
@@ -71,7 +73,8 @@ public struct Color {
         return colour;
     }
 
-    public static Color FromArgb(byte alpha, byte red, byte green, byte blue) {
+    public static Color FromArgb(byte alpha, byte red, byte green, byte blue)
+    {
         Color colour = Color.FromRgb(red, green, blue);
         colour.A = alpha;
         return colour;
@@ -82,13 +85,15 @@ public struct Color {
     /// A method rather than `==`, because a struct gets no operators unless
     /// they are written and equality on a colour is wanted rarely enough that
     /// the call site reads better spelled out.
-    public bool Equals(Color other) {
+    public bool Equals(Color other)
+    {
         return R == other.R && G == other.G && B == other.B && A == other.A;
     }
 }
 
 /// The fixed colours, named as C# names them.
-public static class Colors {
+public static class Colors
+{
     public static readonly Color Transparent = Color.FromArgb(0, 0, 0, 0);
     public static readonly Color Black       = Color.FromRgb(0, 0, 0);
     public static readonly Color White       = Color.FromRgb(255, 255, 255);
@@ -110,11 +115,13 @@ public static class Colors {
 // ================================================================= geometry
 
 /// A position, in pixels, relative to whatever contains it.
-public struct Point {
+public struct Point
+{
     public int X;
     public int Y;
 
-    public static Point At(int x, int y) {
+    public static Point At(int x, int y)
+    {
         Point point;
         point.X = x;
         point.Y = y;
@@ -123,17 +130,19 @@ public struct Point {
 
     public static readonly Point Empty = Point.At(0, 0);
 
-    public bool Equals(Point other) { return X == other.X && Y == other.Y; }
+    public bool Equals(Point other) => X == other.X && Y == other.Y;
 }
 
 /// An extent, in pixels. Never negative in practice, though nothing enforces
 /// it: a control constrained smaller than its border would otherwise have to
 /// report something, and zero is the honest answer.
-public struct Size {
+public struct Size
+{
     public int Width;
     public int Height;
 
-    public static Size Of(int width, int height) {
+    public static Size Of(int width, int height)
+    {
         Size size;
         size.Width = width;
         size.Height = height;
@@ -144,7 +153,8 @@ public struct Size {
 
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
-    public bool Equals(Size other) {
+    public bool Equals(Size other)
+    {
         return Width == other.Width && Height == other.Height;
     }
 }
@@ -157,13 +167,15 @@ public struct Size {
 /// wrong. C#'s `Rectangle` is the first, a control's bounds are naturally a
 /// position and a size, and the one place the other form is needed -- talking
 /// to Win32 -- converts at the boundary where the difference is visible.
-public struct Rectangle {
+public struct Rectangle
+{
     public int X;
     public int Y;
     public int Width;
     public int Height;
 
-    public static Rectangle Of(int x, int y, int width, int height) {
+    public static Rectangle Of(int x, int y, int width, int height)
+    {
         Rectangle rectangle;
         rectangle.X = x;
         rectangle.Y = y;
@@ -172,7 +184,8 @@ public struct Rectangle {
         return rectangle;
     }
 
-    public static Rectangle FromEdges(int left, int top, int right, int bottom) {
+    public static Rectangle FromEdges(int left, int top, int right, int bottom)
+    {
         return Rectangle.Of(left, top, right - left, bottom - top);
     }
 
@@ -184,36 +197,41 @@ public struct Rectangle {
     public int Bottom => Y + Height;
 
     public Point Location => Point.At(X, Y);
-    public Size  Extent   => Size.Of(Width, Height);
+    public Size Extent   => Size.Of(Width, Height);
 
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
     /// Whether a point falls inside, with the left and top edges included and
     /// the right and bottom excluded -- the half-open convention every hit test
     /// wants, so two rectangles that share an edge do not both claim it.
-    public bool Contains(Point point) {
+    public bool Contains(Point point)
+    {
         return point.X >= X && point.X < X + Width
             && point.Y >= Y && point.Y < Y + Height;
     }
 
     /// The rectangle shrunk by `amount` on every side, or empty if there is
     /// less than that to shrink.
-    public Rectangle Deflate(int amount) {
+    public Rectangle Deflate(int amount)
+    {
         return Rectangle.Of(X + amount, Y + amount,
                             Width - amount * 2, Height - amount * 2);
     }
 
     /// The part both rectangles cover, which may be empty.
-    public Rectangle Intersect(Rectangle other) {
+    public Rectangle Intersect(Rectangle other)
+    {
         int left   = X > other.X ? X : other.X;
         int top    = Y > other.Y ? Y : other.Y;
         int right  = Right  < other.Right  ? Right  : other.Right;
         int bottom = Bottom < other.Bottom ? Bottom : other.Bottom;
-        if (right <= left || bottom <= top) { return Rectangle.Empty; }
+        if (right <= left || bottom <= top)
+            return Rectangle.Empty;
         return Rectangle.FromEdges(left, top, right, bottom);
     }
 
-    public bool Equals(Rectangle other) {
+    public bool Equals(Rectangle other)
+    {
         return X == other.X && Y == other.Y
             && Width == other.Width && Height == other.Height;
     }
@@ -223,7 +241,8 @@ public struct Rectangle {
 
 /// How a font is drawn, beyond its face and size. Bits, so they combine.
 [Flags]
-public enum FontStyle {
+public enum FontStyle
+{
     Regular   = 0,
     Bold      = 1,
     Italic    = 2,
@@ -244,8 +263,9 @@ public enum FontStyle {
 /// The handle is made once, lazily, by the platform, and released when the last
 /// reference to the font goes. Sharing one `Font` across a hundred controls
 /// therefore costs one platform font, which is what the LCL's sharing was for.
-public sealed class Font {
-    IFontBackend? backend;
+public sealed class Font
+{
+    IFontBackend? _backend;
 
     public String    Family { get; }
     /// In points, as every platform's font dialog states it -- not in pixels,
@@ -253,14 +273,15 @@ public sealed class Font {
     public int       Size   { get; }
     public FontStyle Style  { get; }
 
-    public Font(String family, int size, FontStyle style) {
+    public Font(String family, int size, FontStyle style)
+    {
         Family = family;
         Size = size;
         Style = style;
-        backend = null;
+        _backend = null;
     }
 
-    public Font(String family, int size) { this(family, size, FontStyle.Regular); }
+    public Font(String family, int size) => this(family, size, FontStyle.Regular);
 
     public bool Bold      => Style.HasFlag(FontStyle.Bold);
     public bool Italic    => Style.HasFlag(FontStyle.Italic);
@@ -269,26 +290,28 @@ public sealed class Font {
 
     /// The same font with one thing changed. What a control does when asked to
     /// go bold, since a `Font` cannot be edited in place.
-    public Font WithStyle(FontStyle style) { return new Font(Family, Size, style); }
-    public Font WithSize(int size)         { return new Font(Family, size, Style); }
-    public Font WithFamily(String family)  { return new Font(family, Size, Style); }
+    public Font WithStyle(FontStyle style) => new Font(Family, Size, style);
+    public Font WithSize(int size) => new Font(Family, size, Style);
+    public Font WithFamily(String family) => new Font(family, Size, Style);
 
     /// The platform's font, made on first use.
     ///
     /// Not public: a control hands a `Font` to `Graphics` and the backend asks
     /// for this. A program that has reached for it wanted `Graphics` instead.
-    IFontBackend Backend() {
-        var made = backend;
-        if (made == null) {
+    IFontBackend Backend()
+    {
+        var made = _backend;
+        if (made == null)
+        {
             made = WidgetSet.Current.CreateFont(this);
-            backend = made;
+            _backend = made;
         }
         return (IFontBackend)made;
     }
 
     /// For the backend, which needs the handle it made and cannot see a
     /// module-private method from where it lives.
-    public IFontBackend Resource() { return Backend(); }
+    public IFontBackend Resource() => Backend();
 }
 
 // ============================================================== pen and brush
@@ -297,27 +320,30 @@ public sealed class Font {
 public enum PenStyle { Solid, Dash, Dot, DashDot, None }
 
 /// The outline a `Graphics` draws with.
-public sealed class Pen {
+public sealed class Pen
+{
     public Color    Color { get; }
     public int      Width { get; }
     public PenStyle Style { get; }
 
-    public Pen(Color colour, int width, PenStyle style) {
+    public Pen(Color colour, int width, PenStyle style)
+    {
         Color = colour;
         Width = width;
         Style = style;
     }
 
-    public Pen(Color colour) { this(colour, 1, PenStyle.Solid); }
+    public Pen(Color colour) => this(colour, 1, PenStyle.Solid);
 }
 
 /// The fill a `Graphics` draws with. Solid only for now; a hatch and a gradient
 /// are the two worth adding, and both are a new field here and a new case in
 /// each backend rather than a new type.
-public sealed class Brush {
+public sealed class Brush
+{
     public Color Color { get; }
 
-    public Brush(Color colour) { Color = colour; }
+    public Brush(Color colour) => Color = colour;
 }
 
 // ================================================================= graphics
@@ -328,14 +354,16 @@ public enum VerticalAlignment   { Top, Middle, Bottom }
 
 /// How a run of text is laid out. A struct, because it is three small choices
 /// that travel together and a class would make every draw call allocate.
-public struct TextFormat {
+public struct TextFormat
+{
     public HorizontalAlignment Horizontal;
-    public VerticalAlignment   Vertical;
+    public VerticalAlignment Vertical;
     /// Whether a line too long for the rectangle wraps rather than being cut.
-    public bool                Wrap;
+    public bool Wrap;
 
     public static TextFormat Of(HorizontalAlignment horizontal,
-                                VerticalAlignment vertical, bool wrap) {
+                                VerticalAlignment vertical, bool wrap)
+    {
         TextFormat format;
         format.Horizontal = horizontal;
         format.Vertical = vertical;
@@ -364,16 +392,17 @@ public struct TextFormat {
 /// corrupt its caller; every LCL painting bug of the shape "the colour was
 /// wrong the second time" is that. Here each call takes what it draws with,
 /// which costs one argument and removes the entire class of bug.
-public sealed class Graphics {
-    IGraphicsBackend backend;
+public sealed class Graphics
+{
+    IGraphicsBackend _backend;
 
     /// Not public: a `Graphics` is made by the platform when a paint begins.
-    public Graphics(IGraphicsBackend surface) { backend = surface; }
+    public Graphics(IGraphicsBackend surface) => _backend = surface;
 
     /// Everything inside this is what the control was asked to repaint. Drawing
     /// outside it is not an error and not drawn, so a handler may ignore it
     /// entirely and only a slow one needs to look.
-    public Rectangle ClipBounds => backend.ClipBounds();
+    public Rectangle ClipBounds => _backend.ClipBounds();
 
     /// Narrows drawing to a rectangle and moves the origin to its corner.
     ///
@@ -381,80 +410,97 @@ public sealed class Graphics {
     /// own coordinates and clipped to it. What a control drawn inside another
     /// needs, and the reason a `GraphicControl` may draw from (0, 0) without
     /// knowing where on the form it sits.
-    public int PushLayer(Rectangle bounds) { return backend.PushLayer(bounds); }
+    public int PushLayer(Rectangle bounds) => _backend.PushLayer(bounds);
 
-    public void PopLayer(int token) { backend.PopLayer(token); }
+    public void PopLayer(int token) => _backend.PopLayer(token);
 
-    public void DrawLine(Pen pen, int x1, int y1, int x2, int y2) {
-        backend.DrawLine(pen, x1, y1, x2, y2);
+    public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+    {
+        _backend.DrawLine(pen, x1, y1, x2, y2);
     }
 
-    public void DrawRectangle(Pen pen, Rectangle bounds) {
-        backend.DrawRectangle(pen, bounds);
+    public void DrawRectangle(Pen pen, Rectangle bounds)
+    {
+        _backend.DrawRectangle(pen, bounds);
     }
 
-    public void FillRectangle(Brush brush, Rectangle bounds) {
-        backend.FillRectangle(brush, bounds);
+    public void FillRectangle(Brush brush, Rectangle bounds)
+    {
+        _backend.FillRectangle(brush, bounds);
     }
 
-    public void DrawEllipse(Pen pen, Rectangle bounds) {
-        backend.DrawEllipse(pen, bounds);
+    public void DrawEllipse(Pen pen, Rectangle bounds)
+    {
+        _backend.DrawEllipse(pen, bounds);
     }
 
-    public void FillEllipse(Brush brush, Rectangle bounds) {
-        backend.FillEllipse(brush, bounds);
+    public void FillEllipse(Brush brush, Rectangle bounds)
+    {
+        _backend.FillEllipse(brush, bounds);
     }
 
     /// A closed shape. Fewer than three points draws nothing rather than
     /// failing, since a polygon built from a filtered list may legitimately
     /// come out empty.
-    public void DrawPolygon(Pen pen, Point[] points) {
-        if (points.Length < 3) { return; }
-        backend.DrawPolygon(pen, points);
+    public void DrawPolygon(Pen pen, Point[] points)
+    {
+        if (points.Length < 3)
+            return;
+        _backend.DrawPolygon(pen, points);
     }
 
-    public void FillPolygon(Brush brush, Point[] points) {
-        if (points.Length < 3) { return; }
-        backend.FillPolygon(brush, points);
+    public void FillPolygon(Brush brush, Point[] points)
+    {
+        if (points.Length < 3)
+            return;
+        _backend.FillPolygon(brush, points);
     }
 
     /// An open run of connected lines.
-    public void DrawPolyline(Pen pen, Point[] points) {
-        if (points.Length < 2) { return; }
-        backend.DrawPolyline(pen, points);
+    public void DrawPolyline(Pen pen, Point[] points)
+    {
+        if (points.Length < 2)
+            return;
+        _backend.DrawPolyline(pen, points);
     }
 
     /// Fills the whole clip with one colour. What a paint handler usually does
     /// first, and the reason `OnPaintBackground` need not exist.
-    public void Clear(Color colour) { backend.Clear(colour); }
+    public void Clear(Color colour) => _backend.Clear(colour);
 
     /// Draws text at a point, with no wrapping and no alignment.
-    public void DrawString(String text, Font font, Color colour, int x, int y) {
-        backend.DrawString(text, font, colour, x, y);
+    public void DrawString(String text, Font font, Color colour, int x, int y)
+    {
+        _backend.DrawString(text, font, colour, x, y);
     }
 
     /// Draws text inside a rectangle, aligned and wrapped as the format says.
     public void DrawString(String text, Font font, Color colour,
-                           Rectangle bounds, TextFormat format) {
-        backend.DrawStringIn(text, font, colour, bounds, format);
+                           Rectangle bounds, TextFormat format)
+    {
+        _backend.DrawStringIn(text, font, colour, bounds, format);
     }
 
     /// Draws a picture with its top-left corner at a point.
-    public void DrawBitmap(Bitmap picture, Point at) {
-        backend.DrawBitmap(picture.Backend(), at);
+    public void DrawBitmap(Bitmap picture, Point at)
+    {
+        _backend.DrawBitmap(picture.Backend(), at);
     }
 
     /// Draws it scaled to fill a rectangle.
-    public void DrawBitmap(Bitmap picture, Rectangle into) {
-        if (into.IsEmpty) { return; }
-        backend.DrawBitmapIn(picture.Backend(), into);
+    public void DrawBitmap(Bitmap picture, Rectangle into)
+    {
+        if (into.IsEmpty)
+            return;
+        _backend.DrawBitmapIn(picture.Backend(), into);
     }
 
     /// How large that text would be. What a control's `PreferredSize` is built
     /// from, and the reason a `Graphics` can be asked for before anything is
     /// drawn on it.
-    public Size MeasureString(String text, Font font) {
-        return backend.MeasureString(text, font);
+    public Size MeasureString(String text, Font font)
+    {
+        return _backend.MeasureString(text, font);
     }
 }
 
@@ -467,19 +513,22 @@ public sealed class Graphics {
 /// icons on a toolbar, in a tree and in a list, which is what `ImageList` takes
 /// one for. Which formats can be read is the platform's business -- Windows
 /// decodes `.bmp` without a library and nothing else.
-public sealed class Bitmap {
-    IBitmapBackend backend;
+public sealed class Bitmap
+{
+    IBitmapBackend _backend;
 
-    Bitmap(IBitmapBackend made) { backend = made; }
+    Bitmap(IBitmapBackend made) => _backend = made;
 
     /// Reads a picture from disk.
     ///
     /// A `Result` rather than a null, because a missing or unreadable file is
     /// the ordinary case here -- an icon is usually named by a path a program
     /// built, and the error says which one failed.
-    public static Result<Bitmap, String> FromFile(String path) {
+    public static Result<Bitmap, String> FromFile(String path)
+    {
         var loaded = WidgetSet.Current.LoadBitmap(path);
-        if (!loaded.Ok) { return Fail(loaded.Error); }
+        if (!loaded.Ok)
+            return Fail(loaded.Error);
         return Ok(new Bitmap(loaded.Value));
     }
 
@@ -498,18 +547,20 @@ public sealed class Bitmap {
     /// build this fails with a message explaining that an ELF binary has no
     /// resource section, rather than the method not existing and the program
     /// failing to compile on one of the two platforms.
-    public static Result<Bitmap, String> FromResource(int id) {
+    public static Result<Bitmap, String> FromResource(int id)
+    {
         var loaded = WidgetSet.Current.LoadBitmapResource(id);
-        if (!loaded.Ok) { return Fail(loaded.Error); }
+        if (!loaded.Ok)
+            return Fail(loaded.Error);
         return Ok(new Bitmap(loaded.Value));
     }
 
-    public int Width  => backend.Width();
-    public int Height => backend.Height();
-    public Size Extent => Size.Of(backend.Width(), backend.Height());
+    public int Width  => _backend.Width();
+    public int Height => _backend.Height();
+    public Size Extent => Size.Of(_backend.Width(), _backend.Height());
 
     /// The platform's picture, for the things that take one.
-    public IBitmapBackend Backend() { return backend; }
+    public IBitmapBackend Backend() => _backend;
 }
 
 // =========================================================== system colours
@@ -521,7 +572,8 @@ public sealed class Bitmap {
 /// read, which is also the only way to be right after the user changes theme
 /// mid-run. These are properties rather than `static readonly` fields for
 /// exactly that reason: a field is read once, before `Main`, and then wrong.
-public static class SystemColors {
+public static class SystemColors
+{
     public static Color Control          => WidgetSet.Current.SystemColor(SystemColorId.Control);
     public static Color ControlText      => WidgetSet.Current.SystemColor(SystemColorId.ControlText);
     public static Color Window           => WidgetSet.Current.SystemColor(SystemColorId.Window);

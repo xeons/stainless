@@ -58,110 +58,122 @@ import Gtk.Events;
 /// given belongs to GTK under version 3, and to `DrawingArea` under version 2,
 /// which destroys it when the handler returns. Keeping a `Canvas` past the end
 /// of the handler that was given it is a use-after-free.
-public class Canvas {
-    cairo_t* cr;
+public class Canvas
+{
+    cairo_t* _cr;
 
-    Canvas(cairo_t* context) { cr = context; }
+    Canvas(cairo_t* context) => _cr = context;
 
     /// The cairo context, for a call this layer does not wrap. **Borrowed**,
     /// on the terms above.
-    public cairo_t* Handle() { return cr; }
+    public cairo_t* Handle() => _cr;
 
     // ------------------------------------------------------------ the source
 
     /// Components are 0.0 to 1.0.
-    public void SetColor(double red, double green, double blue) {
-        cairo_set_source_rgb(cr, red, green, blue);
+    public void SetColor(double red, double green, double blue)
+    {
+        cairo_set_source_rgb(_cr, red, green, blue);
     }
 
     /// The same with an alpha, 0.0 clear and 1.0 solid.
-    public void SetColorAlpha(double red, double green, double blue, double alpha) {
-        cairo_set_source_rgba(cr, red, green, blue, alpha);
+    public void SetColorAlpha(double red, double green, double blue, double alpha)
+    {
+        cairo_set_source_rgba(_cr, red, green, blue, alpha);
     }
 
     /// A colour written the way a stylesheet writes one: 0xRRGGBB.
-    public void SetHexColor(int rgb) {
+    public void SetHexColor(int rgb)
+    {
         double red   = (double)((rgb >> 16) & 0xFF) / 255.0;
         double green = (double)((rgb >> 8) & 0xFF) / 255.0;
         double blue  = (double)(rgb & 0xFF) / 255.0;
-        cairo_set_source_rgb(cr, red, green, blue);
+        cairo_set_source_rgb(_cr, red, green, blue);
     }
 
-    public void SetLineWidth(double width) { cairo_set_line_width(cr, width); }
+    public void SetLineWidth(double width) => cairo_set_line_width(_cr, width);
 
     /// Rounded ends on a stroked line, which is what a chart wants and a box
     /// does not.
-    public void SetRoundEnds(bool round) {
-        cairo_set_line_cap(cr, round ? CAIRO_LINE_CAP_ROUND : CAIRO_LINE_CAP_BUTT);
+    public void SetRoundEnds(bool round)
+    {
+        cairo_set_line_cap(_cr, round ? CAIRO_LINE_CAP_ROUND : CAIRO_LINE_CAP_BUTT);
     }
 
     // -------------------------------------------------------------- the path
 
-    public void MoveTo(double x, double y) { cairo_move_to(cr, x, y); }
-    public void LineTo(double x, double y) { cairo_line_to(cr, x, y); }
+    public void MoveTo(double x, double y) => cairo_move_to(_cr, x, y);
+    public void LineTo(double x, double y) => cairo_line_to(_cr, x, y);
 
-    public void Rectangle(double x, double y, double width, double height) {
-        cairo_rectangle(cr, x, y, width, height);
+    public void Rectangle(double x, double y, double width, double height)
+    {
+        cairo_rectangle(_cr, x, y, width, height);
     }
 
     /// A whole circle. `Arc` is the one that takes angles.
-    public void Circle(double x, double y, double radius) {
-        cairo_arc(cr, x, y, radius, 0.0, 6.283185307179586);
+    public void Circle(double x, double y, double radius)
+    {
+        cairo_arc(_cr, x, y, radius, 0.0, 6.283185307179586);
     }
 
     /// An arc clockwise from `start` to `stop`, in radians, with zero pointing
     /// right and angles increasing **downwards** -- because y grows downwards.
-    public void Arc(double x, double y, double radius, double start, double stop) {
-        cairo_arc(cr, x, y, radius, start, stop);
+    public void Arc(double x, double y, double radius, double start, double stop)
+    {
+        cairo_arc(_cr, x, y, radius, start, stop);
     }
 
-    public void CurveTo(double x1, double y1, double x2, double y2, double x3, double y3) {
-        cairo_curve_to(cr, x1, y1, x2, y2, x3, y3);
+    public void CurveTo(double x1, double y1, double x2, double y2, double x3, double y3)
+    {
+        cairo_curve_to(_cr, x1, y1, x2, y2, x3, y3);
     }
 
-    public void ClosePath() { cairo_close_path(cr); }
-    public void ClearPath() { cairo_new_path(cr); }
+    public void ClosePath() => cairo_close_path(_cr);
+    public void ClearPath() => cairo_new_path(_cr);
 
     // ----------------------------------------------------------- the marking
 
     /// Fills the path and **clears it**.
-    public void Fill() { cairo_fill(cr); }
+    public void Fill() => cairo_fill(_cr);
 
     /// Fills and keeps the path, for a shape that is filled and then outlined.
-    public void FillAndKeep() { cairo_fill_preserve(cr); }
+    public void FillAndKeep() => cairo_fill_preserve(_cr);
 
-    public void Stroke() { cairo_stroke(cr); }
-    public void StrokeAndKeep() { cairo_stroke_preserve(cr); }
+    public void Stroke() => cairo_stroke(_cr);
+    public void StrokeAndKeep() => cairo_stroke_preserve(_cr);
 
     /// Paints the current colour over everything. What a paint handler calls
     /// first to clear its background.
-    public void Clear() { cairo_paint(cr); }
+    public void Clear() => cairo_paint(_cr);
 
     /// Limits everything after this to the current path.
-    public void Clip() { cairo_clip(cr); }
+    public void Clip() => cairo_clip(_cr);
 
     // ------------------------------------------------------------------ text
 
     /// Cairo's own documentation calls this the toy text API, and it is: good
     /// enough for a label on a chart, and not what real text layout wants.
-    public void SetFont(String family, double size, bool bold) {
-        cairo_select_font_face(cr, family.ToPointer(), CAIRO_FONT_SLANT_NORMAL,
+    public void SetFont(String family, double size, bool bold)
+    {
+        cairo_select_font_face(_cr, family.ToPointer(), CAIRO_FONT_SLANT_NORMAL,
             bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
-        cairo_set_font_size(cr, size);
+        cairo_set_font_size(_cr, size);
     }
 
     /// Draws text with its **baseline** at `y`, not its top. That is the one
     /// thing to remember about drawing text anywhere.
-    public void DrawText(String text, double x, double y) {
-        cairo_move_to(cr, x, y);
-        cairo_show_text(cr, text.ToPointer());
+    public void DrawText(String text, double x, double y)
+    {
+        cairo_move_to(_cr, x, y);
+        cairo_show_text(_cr, text.ToPointer());
     }
 
     /// How wide the text will be: the pen advance rather than the inked width,
     /// so a trailing space counts. What centring wants.
-    public double TextWidth(String text) {
+    public double TextWidth(String text)
+    {
         cairo_text_extents_t extents;
-        cairo_text_extents(cr, text.ToPointer(), &extents);
+        cairo_text_extents(_cr, text.ToPointer(), &extents);
         return extents.XAdvance;
     }
 
@@ -170,12 +182,12 @@ public class Canvas {
     /// Saves the colour, line width, font and transform. Paired with
     /// `Restore`, and the way to keep one part of a drawing from leaking
     /// settings into the next.
-    public void Save() { cairo_save(cr); }
-    public void Restore() { cairo_restore(cr); }
+    public void Save() => cairo_save(_cr);
+    public void Restore() => cairo_restore(_cr);
 
-    public void Translate(double x, double y) { cairo_translate(cr, x, y); }
-    public void Scale(double x, double y) { cairo_scale(cr, x, y); }
-    public void Rotate(double radians) { cairo_rotate(cr, radians); }
+    public void Translate(double x, double y) => cairo_translate(_cr, x, y);
+    public void Scale(double x, double y) => cairo_scale(_cr, x, y);
+    public void Rotate(double radians) => cairo_rotate(_cr, radians);
 }
 
 // =================================================================== painter
@@ -194,8 +206,10 @@ public closure void Painter(Canvas canvas, int width, int height);
 /// A function returning a closure rather than a class implementing an
 /// interface: the lambda it returns captures the painter, which is exactly
 /// what the class's field used to be.
-EventHandler PaintAdapter(Painter body) {
-    return (sender, carried) => {
+EventHandler PaintAdapter(Painter body)
+{
+    return (sender, carried) =>
+    {
             // GTK 3 hands over a context that is already clipped and
             // translated, and owns it.
             var canvas = new Canvas((cairo_t*)carried);
@@ -210,13 +224,15 @@ EventHandler PaintAdapter(Painter body) {
 // ============================================================== drawing area
 
 /// A widget that draws nothing, so that a program can draw everything.
-public class DrawingArea : Widget {
-    public DrawingArea() { base(gtk_drawing_area_new()); }
+public class DrawingArea : Widget
+{
+    public DrawingArea() => base(gtk_drawing_area_new());
 
     /// Sets what paints the widget. Connecting a second one replaces nothing
     /// -- GTK runs both, in the order they were connected, and the first to
     /// answer true stops the rest.
-    public void OnPaint(Painter painter) {
+    public void OnPaint(Painter painter)
+    {
             ConnectEvent(handle, "draw", PaintAdapter(painter));
     }
 
@@ -226,7 +242,8 @@ public class DrawingArea : Widget {
     /// first mouse handler on one never fires. Call this before connecting
     /// anything, and note that keys also need the widget to be able to take
     /// focus.
-    public void WantInput() {
+    public void WantInput()
+    {
         gtk_widget_add_events(handle,
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
@@ -237,7 +254,8 @@ public class DrawingArea : Widget {
 // ==================================================================== input
 
 /// Where the pointer was and what was held down.
-public struct Pointer {
+public struct Pointer
+{
     public double X;
     public double Y;
 
@@ -251,7 +269,8 @@ public struct Pointer {
 }
 
 /// A key press, as the key and the modifiers.
-public struct Key {
+public struct Key
+{
     /// A `GDK_KEY_*` value.
     public uint Code;
 
@@ -270,8 +289,10 @@ public closure bool PointerHandler(Pointer at);
 /// What a key event runs. True means handled.
 public closure bool KeyHandler(Key key);
 
-EventHandler PointerAdapter(PointerHandler body) {
-    return (sender, carried) => {
+EventHandler PointerAdapter(PointerHandler body)
+{
+    return (sender, carried) =>
+    {
         GdkEvent* event = (GdkEvent*)carried;
 
         Pointer at;
@@ -293,8 +314,10 @@ EventHandler PointerAdapter(PointerHandler body) {
     };
 }
 
-EventHandler KeyAdapter(KeyHandler body) {
-    return (sender, carried) => {
+EventHandler KeyAdapter(KeyHandler body)
+{
+    return (sender, carried) =>
+    {
         GdkEvent* event = (GdkEvent*)carried;
 
         guint code = 0u;

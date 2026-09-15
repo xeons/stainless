@@ -68,7 +68,8 @@ public delegate void GClosureNotify(gpointer data, gpointer closure);
 
 // ============================================================ the reference
 
-public extern "C" {
+public extern "C"
+{
     /// Adds a reference. Answers the same pointer, so it composes.
     gpointer g_object_ref(gpointer instance);
 
@@ -92,7 +93,8 @@ public extern "C" {
 
 // ============================================================== attached data
 
-public extern "C" {
+public extern "C"
+{
     /// Attaches a pointer to an object under a name, with a notify that runs
     /// when the object dies or the key is replaced.
     ///
@@ -108,7 +110,8 @@ public extern "C" {
 
 // ================================================================ properties
 
-public extern "C" {
+public extern "C"
+{
     /// Sets one property by name. Variadic, and **every value must be exactly
     /// the property's type**: a `gboolean` property given a Stainless `bool`
     /// would read three bytes of something else.
@@ -152,7 +155,8 @@ public const gint G_CONNECT_SWAPPED = 2;
 // would be a third module, and there being only two is why this is worth
 // doing rather than working around.
 
-public extern "C" {
+public extern "C"
+{
     void     g_signal_handler_disconnect(gpointer instance, gulong handler);
     gboolean g_signal_handler_is_connected(gpointer instance, gulong handler);
 
@@ -167,7 +171,8 @@ public extern "C" {
 
 // ===================================================================== types
 
-public extern "C" {
+public extern "C"
+{
     /// The `GType` of an instance, and its name. Useful for a message that has
     /// to say what it was actually given.
     GType  g_type_from_name(gchar* name);
@@ -194,11 +199,13 @@ public extern "C" {
 /// bytes because nothing outside GLib should read them. It must start zeroed,
 /// which is what `G_VALUE_INIT` is in C and what a `GValue` field of a fresh
 /// struct already is here, and `g_value_init` then says which type it holds.
-public struct GValue {
+public struct GValue
+{
     public byte[24] Private;
 }
 
-public extern "C" {
+public extern "C"
+{
     /// Says what the value will hold. The value must be zeroed first and must
     /// not already be initialised, which is why one is not reused across
     /// types without an unset in between.

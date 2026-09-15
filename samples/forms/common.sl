@@ -19,125 +19,127 @@ import Forms;
 import Forms.Drawing;
 import Forms.Platform;
 
-public class CommonForm : Form {
-    ToolBar     tools;
-    StatusBar   status;
-    TabControl  tabs;
-    TabPage     treePage;
-    TabPage     listPage;
-    TabPage     gaugePage;
-    TabPage     formPage;
-    TreeView    tree;
-    ListView    list;
-    ProgressBar progress;
-    TrackBar    slider;
-    Label       readout;
-    ImageList   icons;
-    PopupMenu   context;
+public class CommonForm : Form
+{
+    ToolBar _tools;
+    StatusBar _status;
+    TabControl _tabs;
+    TabPage _treePage;
+    TabPage _listPage;
+    TabPage _gaugePage;
+    TabPage _formPage;
+    TreeView _tree;
+    ListView _list;
+    ProgressBar _progress;
+    TrackBar _slider;
+    Label _readout;
+    ImageList _icons;
+    PopupMenu _context;
 
     public MenuItem WrapItem;
     public ToolButton BoldButton;
-    public Bevel    Divider;
+    public Bevel Divider;
     public RadioGroup Priority;
     public CheckGroup Options;
     public LabeledEdit Named;
     public SpinEdit Quantity;
     public CheckListBox Chores;
     public HeaderControl Headings;
-    public Shape    Blob;
+    public Shape Blob;
     public PaintBox Canvas;
-    public Timer    Clock;
-    public int      Ticks;
+    public Timer Clock;
+    public int Ticks;
 
-    public CommonForm() {
+    public CommonForm()
+    {
         base(WindowBorder.Sizable);
         Text = "Common controls";
         SetBounds(0, 0, 820, 560);
 
-        icons = new ImageList(16, 16);
+        _icons = new ImageList(16, 16);
         Ticks = 0;
-        clicks = 0;
+        _clicks = 0;
 
         BuildMenu();
 
         // A toolbar docked to the top, which takes its bite out of the client
         // area before anything else is laid out.
-        tools = new ToolBar(this);
-        tools.Dock = DockStyle.Top;
-        tools.Height = 34;
-        tools.Add("New").Click += this.OnNew;
-        tools.Add("Open").Click += this.OnOpen;
-        tools.AddSeparator();
-        BoldButton = tools.AddToggle("Bold", -1);
+        _tools = new ToolBar(this);
+        _tools.Dock = DockStyle.Top;
+        _tools.Height = 34;
+        _tools.Add("New").Click += this.OnNew;
+        _tools.Add("Open").Click += this.OnOpen;
+        _tools.AddSeparator();
+        BoldButton = _tools.AddToggle("Bold", -1);
         BoldButton.Click += this.OnBold;
 
         // And a status bar at the bottom, which docks itself.
-        status = new StatusBar(this);
-        status.AddPanel(160);
-        status.AddPanel(120);
-        status.AddPanel(-1);
-        status.SetPanelText(0, "Ready.");
-        status.SetPanelText(1, "");
-        status.SetPanelText(2, "");
+        _status = new StatusBar(this);
+        _status.AddPanel(160);
+        _status.AddPanel(120);
+        _status.AddPanel(-1);
+        _status.SetPanelText(0, "Ready.");
+        _status.SetPanelText(1, "");
+        _status.SetPanelText(2, "");
 
         // Everything else goes on the tabs, which fill what is left.
-        tabs = new TabControl(this);
-        tabs.Dock = DockStyle.Fill;
-        tabs.SelectedIndexChanged += this.OnTabChanged;
+        _tabs = new TabControl(this);
+        _tabs.Dock = DockStyle.Fill;
+        _tabs.SelectedIndexChanged += this.OnTabChanged;
 
-        treePage = new TabPage(tabs, "Tree");
-        tree = new TreeView(treePage);
-        tree.Dock = DockStyle.Fill;
-        tree.Images = icons;
-        var shops = tree.Add("Shopping");
+        _treePage = new TabPage(_tabs, "Tree");
+        _tree = new TreeView(_treePage);
+        _tree.Dock = DockStyle.Fill;
+        _tree.Images = _icons;
+        var shops = _tree.Add("Shopping");
         shops.Add("Grocery").Add("Apples");
         shops.Add("Hardware");
-        var trips = tree.Add("Trips");
+        var trips = _tree.Add("Trips");
         trips.Add("Hardware shop");
         shops.Expand();
-        tree.SelectedNodeChanged += this.OnNodeChosen;
+        _tree.SelectedNodeChanged += this.OnNodeChosen;
 
-        listPage = new TabPage(tabs, "List");
-        list = new ListView(listPage);
-        list.Dock = DockStyle.Fill;
-        list.AddColumn("Item", 220);
-        list.AddColumn("Quantity", 90, HorizontalAlignment.Right);
-        list.AddColumn("Where", 160);
-        list.SetFullRowSelect(true, true);
-        list.AddRow(["Apples", "6", "Grocery"]);
-        list.AddRow(["Screws", "40", "Hardware"]);
-        list.AddRow(["Notebook", "2", "Stationery"]);
-        list.SelectedIndexChanged += this.OnRowChosen;
+        _listPage = new TabPage(_tabs, "List");
+        _list = new ListView(_listPage);
+        _list.Dock = DockStyle.Fill;
+        _list.AddColumn("Item", 220);
+        _list.AddColumn("Quantity", 90, HorizontalAlignment.Right);
+        _list.AddColumn("Where", 160);
+        _list.SetFullRowSelect(true, true);
+        _list.AddRow(["Apples", "6", "Grocery"]);
+        _list.AddRow(["Screws", "40", "Hardware"]);
+        _list.AddRow(["Notebook", "2", "Stationery"]);
+        _list.SelectedIndexChanged += this.OnRowChosen;
 
-        gaugePage = new TabPage(tabs, "Gauges");
-        progress = new ProgressBar(gaugePage);
-        progress.SetBounds(16, 24, 360, 22);
-        progress.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        progress.Value = 40;
+        _gaugePage = new TabPage(_tabs, "Gauges");
+        _progress = new ProgressBar(_gaugePage);
+        _progress.SetBounds(16, 24, 360, 22);
+        _progress.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        _progress.Value = 40;
 
-        slider = new TrackBar(gaugePage);
-        slider.SetBounds(16, 60, 360, 36);
-        slider.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        slider.Maximum = 100;
-        slider.Value = 40;
-        slider.ValueChanged += this.OnSlide;
+        _slider = new TrackBar(_gaugePage);
+        _slider.SetBounds(16, 60, 360, 36);
+        _slider.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        _slider.Maximum = 100;
+        _slider.Value = 40;
+        _slider.ValueChanged += this.OnSlide;
 
-        readout = new Label(gaugePage);
-        readout.SetBounds(16, 104, 360, 20);
-        readout.Text = "40%";
+        _readout = new Label(_gaugePage);
+        _readout.SetBounds(16, 104, 360, 20);
+        _readout.Text = "40%";
 
         // The windowless half of the control split, which costs a `Control`
         // object each and no platform window at all.
-        Divider = new Bevel(gaugePage);
+        Divider = new Bevel(_gaugePage);
         Divider.SetBounds(16, 132, 360, 2);
         Divider.Kind = BevelKind.TopLine;
 
-        Blob = new Shape(gaugePage);
+        Blob = new Shape(_gaugePage);
         Blob.SetBounds(16, 146, 60, 60);
         Blob.Kind = ShapeKind.Circle;
         Blob.FillColor = Colors.Teal;
 
-        Canvas = new PaintBox(gaugePage);
+        Canvas = new PaintBox(_gaugePage);
         Canvas.SetBounds(90, 146, 286, 60);
         Canvas.Paint += this.OnDraw;
         Canvas.MouseDown += this.OnCanvasDown;
@@ -147,9 +149,9 @@ public class CommonForm : Form {
 
         // A fourth page, for the composites -- each of which is a container
         // that builds its own children rather than a platform widget.
-        formPage = new TabPage(tabs, "Form");
+        _formPage = new TabPage(_tabs, "Form");
 
-        Priority = new RadioGroup(formPage);
+        Priority = new RadioGroup(_formPage);
         Priority.Text = "Priority";
         Priority.SetBounds(12, 12, 180, 96);
         Priority.Add("Low");
@@ -158,7 +160,7 @@ public class CommonForm : Form {
         Priority.SelectedIndex = 1;
         Priority.SelectedIndexChanged += this.OnPriority;
 
-        Options = new CheckGroup(formPage);
+        Options = new CheckGroup(_formPage);
         Options.Text = "Options";
         Options.SetBounds(204, 12, 180, 96);
         Options.Add("Urgent");
@@ -166,39 +168,40 @@ public class CommonForm : Form {
         Options.Add("Notify");
         Options.SetChecked(0, true);
 
-        Named = new LabeledEdit(formPage);
+        Named = new LabeledEdit(_formPage);
         Named.SetBounds(12, 120, 240, 44);
         Named.Caption = "Item name";
         Named.Value = "Apples";
 
-        Quantity = new SpinEdit(formPage);
+        Quantity = new SpinEdit(_formPage);
         Quantity.SetBounds(264, 138, 80, 26);
         Quantity.Minimum = 1;
         Quantity.Maximum = 99;
         Quantity.Value = 6;
 
-        Chores = new CheckListBox(formPage);
+        Chores = new CheckListBox(_formPage);
         Chores.SetBounds(12, 176, 240, 110);
         Chores.Add("Buy milk");
         Chores.Add("Post letter");
         Chores.Add("Fix shelf");
         Chores.SetChecked(1, true);
 
-        Headings = new HeaderControl(formPage);
+        Headings = new HeaderControl(_formPage);
         Headings.SetBounds(264, 176, 240, 24);
         Headings.Add("Name", 120);
         Headings.Add("Size", 80);
 
         // A context menu, built once and shown where the user asked for it.
-        context = new PopupMenu();
-        context.Add("Add a row").Click += this.OnAddRow;
-        context.Add("Remove the row").Click += this.OnRemoveRow;
-        context.Add(MenuItem.Separator());
-        context.Add("Clear").Click += this.OnClearList;
-        list.MouseUp += this.OnListMouseUp;
+        _context = new PopupMenu();
+        _context.Add("Add a row").Click += this.OnAddRow;
+        _context.Add("Remove the row").Click += this.OnRemoveRow;
+        _context.Add(MenuItem.Separator());
+        _context.Add("Clear").Click += this.OnClearList;
+        _list.MouseUp += this.OnListMouseUp;
     }
 
-    void BuildMenu() {
+    void BuildMenu()
+    {
         var bar = new MainMenu();
 
         var file = bar.Add("&File");
@@ -222,10 +225,11 @@ public class CommonForm : Form {
 
     // ------------------------------------------------------------- handlers
 
-    void Say(String what) { status.SetPanelText(0, what); }
+    void Say(String what) => _status.SetPanelText(0, what);
 
     /// Drawn by the parent during its own paint, in the box's own coordinates.
-    void OnDraw(Control sender, PaintEventArgs args) {
+    void OnDraw(Control sender, PaintEventArgs args)
+    {
         var surface = args.Graphics;
         surface.FillRectangle(new Brush(SystemColors.Window), args.ClipRectangle);
         var pen = new Pen(Colors.Navy, 2, PenStyle.Solid);
@@ -234,126 +238,147 @@ public class CommonForm : Form {
         surface.DrawString("PaintBox", Font, Colors.Maroon, 6, 6);
     }
 
-    void OnTick(Timer sender) { Ticks = Ticks + 1; }
+    void OnTick(Timer sender) => Ticks = Ticks + 1;
 
-    void OnPriority(Control sender) {
+    void OnPriority(Control sender)
+    {
         var chosen = Priority.SelectedText;
-        if (chosen == null) { return; }
+        if (chosen == null)
+            return;
         Say("Priority: " + (String)chosen);
     }
 
-    void OnCanvasDown(Control sender, MouseEventArgs args) { clicks = clicks + 1; }
+    void OnCanvasDown(Control sender, MouseEventArgs args) => _clicks = _clicks + 1;
 
-    int clicks;
+    int _clicks;
 
-    void OnNew(Control sender)       { Say("New."); }
-    void OnNew(MenuItem sender)      { Say("New, from the menu."); }
-    void OnOpen(Control sender)      { Say("Open."); }
-    void OnOpen(MenuItem sender)     { Say("Open, from the menu."); }
-    void OnExit(MenuItem sender)     { Close(); }
+    void OnNew(Control sender) => Say("New.");
+    void OnNew(MenuItem sender) => Say("New, from the menu.");
+    void OnOpen(Control sender) => Say("Open.");
+    void OnOpen(MenuItem sender) => Say("Open, from the menu.");
+    void OnExit(MenuItem sender) => Close();
 
-    void OnBold(Control sender) {
+    void OnBold(Control sender)
+    {
         Say(BoldButton.Checked ? "Bold on." : "Bold off.");
     }
 
-    void OnToggleWrap(MenuItem sender) {
+    void OnToggleWrap(MenuItem sender)
+    {
         sender.Checked = !sender.Checked;
-        tools.ShowText = sender.Checked;
+        _tools.ShowText = sender.Checked;
         Say(sender.Checked ? "Captions shown." : "Captions hidden.");
     }
 
-    void OnEmpty(MenuItem sender) { SetProgress(0); }
-    void OnHalf(MenuItem sender)  { SetProgress(50); }
-    void OnFull(MenuItem sender)  { SetProgress(100); }
+    void OnEmpty(MenuItem sender) => SetProgress(0);
+    void OnHalf(MenuItem sender) => SetProgress(50);
+    void OnFull(MenuItem sender) => SetProgress(100);
 
-    void SetProgress(int value) {
-        progress.Value = value;
-        slider.Value = value;
-        readout.Text = Standard.Text.FromInteger((long)value) + "%";
+    void SetProgress(int value)
+    {
+        _progress.Value = value;
+        _slider.Value = value;
+        _readout.Text = Standard.Text.FromInteger((long)value) + "%";
     }
 
-    void OnSlide(Control sender) {
-        progress.Value = slider.Value;
-        readout.Text = Standard.Text.FromInteger((long)slider.Value) + "%";
+    void OnSlide(Control sender)
+    {
+        _progress.Value = _slider.Value;
+        _readout.Text = Standard.Text.FromInteger((long)_slider.Value) + "%";
     }
 
-    void OnTabChanged(Control sender) {
-        status.SetPanelText(1, "Tab " + Standard.Text.FromInteger((long)tabs.SelectedIndex));
+    void OnTabChanged(Control sender)
+    {
+        _status.SetPanelText(1, "Tab " + Standard.Text.FromInteger((long)_tabs.SelectedIndex));
     }
 
-    void OnNodeChosen(Control sender) {
-        var node = tree.SelectedNode;
-        if (node == null) { return; }
+    void OnNodeChosen(Control sender)
+    {
+        var node = _tree.SelectedNode;
+        if (node == null)
+            return;
         Say("Node: " + ((TreeNode)node).Text);
     }
 
-    void OnRowChosen(Control sender) {
-        status.SetPanelText(2, "Row "
-            + Standard.Text.FromInteger((long)list.SelectedIndex));
+    void OnRowChosen(Control sender)
+    {
+        _status.SetPanelText(2, "Row "
+            + Standard.Text.FromInteger((long)_list.SelectedIndex));
     }
 
-    void OnListMouseUp(Control sender, MouseEventArgs args) {
-        if (args.Button != MouseButton.Right) { return; }
-        context.Show(list, args.Location);
+    void OnListMouseUp(Control sender, MouseEventArgs args)
+    {
+        if (args.Button != MouseButton.Right)
+            return;
+        _context.Show(_list, args.Location);
     }
 
-    void OnAddRow(MenuItem sender) {
-        list.AddRow(["New item", "1", "Somewhere"]);
+    void OnAddRow(MenuItem sender)
+    {
+        _list.AddRow(["New item", "1", "Somewhere"]);
         Say("Added a row.");
     }
 
-    void OnRemoveRow(MenuItem sender) {
-        int at = list.SelectedIndex;
-        if (at < 0) {
+    void OnRemoveRow(MenuItem sender)
+    {
+        int at = _list.SelectedIndex;
+        if (at < 0)
+        {
             Say("Nothing selected.");
             return;
         }
-        list.RemoveRow(at);
+        _list.RemoveRow(at);
         Say("Removed a row.");
     }
 
-    void OnClearList(MenuItem sender) {
-        list.Clear();
+    void OnClearList(MenuItem sender)
+    {
+        _list.Clear();
         Say("Cleared.");
     }
 
     /// Opens on a given tab, for a screenshot of one that is not the first.
-    public void SelectTab(int which) {
-        if (which < 0 || (nuint)which >= tabs.Pages.Count()) { return; }
-        tabs.SelectedIndex = which;
+    public void SelectTab(int which)
+    {
+        if (which < 0 || (nuint)which >= _tabs.Pages.Count())
+            return;
+        _tabs.SelectedIndex = which;
     }
 
     // ------------------------------------------------------------ self test
 
-    public bool SelfTest() {
+    public bool SelfTest()
+    {
         bool ok = true;
 
-        ok = Check(ok, "toolbar has its buttons", tools.Buttons.Count() == 4u);
-        ok = Check(ok, "status bar has its panels", status.PanelCount == 3u);
+        ok = Check(ok, "toolbar has its buttons", _tools.Buttons.Count() == 4u);
+        ok = Check(ok, "status bar has its panels", _status.PanelCount == 3u);
         ok = Check(ok, "status panel text round-trips",
-                   status.PanelText(0) == "Ready.");
+                   _status.PanelText(0) == "Ready.");
 
-        ok = Check(ok, "tabs hold their pages", tabs.Pages.Count() == 4u);
-        ok = Check(ok, "the platform has the tabs too", tabs.TabCount == 4);
+        ok = Check(ok, "tabs hold their pages", _tabs.Pages.Count() == 4u);
+        ok = Check(ok, "the platform has the tabs too", _tabs.TabCount == 4);
         ok = Check(ok, "one page is showing at a time",
-                   treePage.Visible && !listPage.Visible
-                   && !gaugePage.Visible && !formPage.Visible);
+                   _treePage.Visible && !_listPage.Visible
+                   && !_gaugePage.Visible && !_formPage.Visible);
 
-        tabs.SelectedIndex = 1;
-        for (int i = 0; i < 6; i += 1) { Application.DoEvents(); }
+        _tabs.SelectedIndex = 1;
+        for (int i = 0; i < 6; i++)
+            Application.DoEvents();
         ok = Check(ok, "choosing a tab shows only that page",
-                   !treePage.Visible && listPage.Visible);
+                   !_treePage.Visible && _listPage.Visible);
         ok = Check(ok, "a page fills the area under the tabs",
-                   listPage.Width > 0 && listPage.Height > 0);
+                   _listPage.Width > 0 && _listPage.Height > 0);
 
-        ok = Check(ok, "tree holds its roots", tree.Nodes.Count() == 2u);
+        ok = Check(ok, "tree holds its roots", _tree.Nodes.Count() == 2u);
         ok = Check(ok, "a tree node reads back its text",
-                   tree.Nodes.At(0u).Text == "Shopping");
-        var under = tree.Nodes.At(0u).Nodes;
+                   _tree.Nodes.At(0u).Text == "Shopping");
+        var under = _tree.Nodes.At(0u).Nodes;
         ok = Check(ok, "a node holds its children", under.Count() == 2u);
-        tree.SelectedNode = under.At(0u);
-        for (int i = 0; i < 4; i += 1) { Application.DoEvents(); }
-        var chosen = tree.SelectedNode;
+        _tree.SelectedNode = under.At(0u);
+        for (int i = 0; i < 4; i++)
+            Application.DoEvents();
+        var chosen = _tree.SelectedNode;
         ok = Check(ok, "the tree reports the selected node",
                    chosen != null && ((TreeNode)chosen).Text == "Grocery");
 
@@ -362,21 +387,22 @@ public class CommonForm : Form {
         // ANSI and stops at the first character's zero high byte -- so the row
         // exists, the count is right, and the caption is a single letter. Only
         // reading the text finds that.
-        ok = Check(ok, "list holds its rows", list.Count == 3);
+        ok = Check(ok, "list holds its rows", _list.Count == 3);
         ok = Check(ok, "a list cell keeps its whole text",
-                   list.CellText(0, 0) == "Apples");
+                   _list.CellText(0, 0) == "Apples");
         ok = Check(ok, "a list cell past the first does too",
-                   list.CellText(1, 2) == "Hardware");
-        list.SelectedIndex = 2;
-        for (int i = 0; i < 4; i += 1) { Application.DoEvents(); }
-        ok = Check(ok, "the list reports the selected row", list.SelectedIndex == 2);
-        list.RemoveRow(0);
-        ok = Check(ok, "a row can be removed", list.Count == 2);
+                   _list.CellText(1, 2) == "Hardware");
+        _list.SelectedIndex = 2;
+        for (int i = 0; i < 4; i++)
+            Application.DoEvents();
+        ok = Check(ok, "the list reports the selected row", _list.SelectedIndex == 2);
+        _list.RemoveRow(0);
+        ok = Check(ok, "a row can be removed", _list.Count == 2);
 
-        progress.Value = 75;
-        ok = Check(ok, "progress round-trips through Windows", progress.Value == 75);
-        slider.Value = 30;
-        ok = Check(ok, "the slider round-trips too", slider.Value == 30);
+        _progress.Value = 75;
+        ok = Check(ok, "progress round-trips through Windows", _progress.Value == 75);
+        _slider.Value = 30;
+        ok = Check(ok, "the slider round-trips too", _slider.Value == 30);
 
         // The menu tree is real: every item became a platform item when the bar
         // was assigned, and the state set beforehand went down with it.
@@ -404,18 +430,18 @@ public class CommonForm : Form {
 
         // The parent hit-tests and forwards, since the pointer never crosses a
         // window boundary for a control that has no window.
-        int wasClicked = clicks;
-        gaugePage.OnPlatformMouseDown(MouseButton.Left,
+        int wasClicked = _clicks;
+        _gaugePage.OnPlatformMouseDown(MouseButton.Left,
                                       Point.At(Canvas.Left + 5, Canvas.Top + 5),
                                       ModifierKeys.None);
         ok = Check(ok, "the parent routes the mouse to a graphic child",
-                   clicks == wasClicked + 1);
+                   _clicks == wasClicked + 1);
 
         // And a point outside it reaches no graphic child at all.
-        gaugePage.OnPlatformMouseDown(MouseButton.Left, Point.At(2, 2),
+        _gaugePage.OnPlatformMouseDown(MouseButton.Left, Point.At(2, 2),
                                       ModifierKeys.None);
         ok = Check(ok, "and not to one the pointer is not over",
-                   clicks == wasClicked + 1);
+                   _clicks == wasClicked + 1);
 
         // **The timer needs real time, not just pumping.** `WM_TIMER` is a
         // low-priority message: Windows generates one only when the queue is
@@ -424,7 +450,8 @@ public class CommonForm : Form {
         // sleep is what makes this a test of the timer rather than of the loop.
         Clock.Interval = 20;
         Clock.Start();
-        for (int i = 0; i < 40; i += 1) {
+        for (int i = 0; i < 40; i++)
+        {
             Standard.Threading.Sleep(10u);
             Application.DoEvents();
         }
@@ -480,32 +507,40 @@ public class CommonForm : Form {
         return ok;
     }
 
-    bool Check(bool running, String what, bool passed) {
+    bool Check(bool running, String what, bool passed)
+    {
         Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
         return running && passed;
     }
 }
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var form = new CommonForm();
 
     bool testing = false;
     var arguments = Standard.Env.Arguments();
-    for (nuint i = 0u; i < arguments.Length; i += 1u) {
-        if (arguments[i] == "--selftest") { testing = true; }
+    for (nuint i = 0u; i < arguments.Length; i++)
+    {
+        if (arguments[i] == "--selftest")
+            testing = true;
         // Which tab to open on, so that a screenshot can be taken of one that
         // is not the first.
-        if (arguments[i] == "--tab" && i + 1u < arguments.Length) {
+        if (arguments[i] == "--tab" && i + 1u < arguments.Length)
+        {
             var which = Standard.Convert.ToInt(arguments[i + 1u]);
-            if (which.Ok) { form.SelectTab(which.Value); }
+            if (which.Ok)
+                form.SelectTab(which.Value);
         }
     }
 
-    if (testing) {
+    if (testing)
+    {
         Console.WriteLine("Forms for Stainless -- common controls");
         form.Show();
-        for (int i = 0; i < 20; i += 1) { Application.DoEvents(); }
+        for (int i = 0; i < 20; i++)
+            Application.DoEvents();
         bool ok = form.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

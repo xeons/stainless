@@ -51,135 +51,149 @@ public closure bool SearchAllowed(String text);
 /// takes ownership of it, and a composite control owns several -- so it holds
 /// its root rather than being one, and `Root()` is what goes into a layout.
 /// Deriving would have meant claiming to be a single widget it is not.
-public class SearchBox {
-    Box root;
-    Entry field;
-    Button search;
-    Button clear;
-    Label status;
+public class SearchBox
+{
+    Box _root;
+    Entry _field;
+    Button _search;
+    Button _clear;
+    Label _status;
 
     // The subscribers. Empty closures would be a null function pointer, so
     // whether anyone is listening is a flag rather than a comparison.
-    SearchRequested onSearch;
-    bool hasSearch;
+    SearchRequested _onSearch;
+    bool _hasSearch;
 
-    TextChanged onChanged;
-    bool hasChanged;
+    TextChanged _onChanged;
+    bool _hasChanged;
 
-    SearchAllowed allowed;
-    bool hasAllowed;
+    SearchAllowed _allowed;
+    bool _hasAllowed;
 
-    int searches;
+    int _searches;
 
-    public SearchBox(String prompt) {
-        searches = 0;
-        hasSearch = false;
-        hasChanged = false;
-        hasAllowed = false;
+    public SearchBox(String prompt)
+    {
+        _searches = 0;
+        _hasSearch = false;
+        _hasChanged = false;
+        _hasAllowed = false;
 
-        root = new Box(true, 4);
+        _root = new Box(true, 4);
 
         var row = new Box(false, 4);
-        root.Pack(row, false);
+        _root.Pack(row, false);
 
-        field = new Entry();
-        field.SetPlaceholder(prompt);
-        row.Pack(field, true);
+        _field = new Entry();
+        _field.SetPlaceholder(prompt);
+        row.Pack(_field, true);
 
-        search = new Button("Search");
-        row.Pack(search, false);
+        _search = new Button("Search");
+        row.Pack(_search, false);
 
-        clear = new Button("Clear");
-        row.Pack(clear, false);
+        _clear = new Button("Clear");
+        row.Pack(_clear, false);
 
-        status = new Label("");
-        root.Pack(status, false);
+        _status = new Label("");
+        _root.Pack(_status, false);
 
         // The wiring, and the reason a control is worth writing: every one of
         // these is a method of *this* control bound to *this* object, so the
         // handlers know which SearchBox they belong to without a `sender`
         // parameter or a lookup table.
-        search.OnClicked(this.Run);
-        field.OnEntered(this.Run);
-        clear.OnClicked(this.Clear);
-        field.OnChanged(this.Changed);
+        _search.OnClicked(this.Run);
+        _field.OnEntered(this.Run);
+        _clear.OnClicked(this.Clear);
+        _field.OnChanged(this.Changed);
     }
 
     // ------------------------------------------------------------ the surface
 
     /// What a layout puts in. Borrowed: the control owns it.
-    public Widget Root() { return root; }
+    public Widget Root() => _root;
 
-    public String Text() { return field.Text(); }
+    public String Text() => _field.Text();
 
-    public void SetText(String text) { field.SetText(text); }
+    public void SetText(String text) => _field.SetText(text);
 
-    public void SetEnabled(bool enabled) {
-        field.SetEnabled(enabled);
-        search.SetEnabled(enabled);
-        clear.SetEnabled(enabled);
+    public void SetEnabled(bool enabled)
+    {
+        _field.SetEnabled(enabled);
+        _search.SetEnabled(enabled);
+        _clear.SetEnabled(enabled);
     }
 
     /// Runs the search as if the button had been pressed, refusal and all.
     /// What a program calls to restore a saved search on startup.
-    public void Submit() { Run(); }
+    public void Submit() => Run();
 
     /// How many searches have run, which the demo prints and a real control
     /// would not have.
-    public int Count() { return searches; }
+    public int Count() => _searches;
 
     // ------------------------------------------------------------- the events
 
     /// Runs when the user presses Search, or Enter in the field.
-    public void OnSearch(SearchRequested handler) {
-        onSearch = handler;
-        hasSearch = true;
+    public void OnSearch(SearchRequested handler)
+    {
+        _onSearch = handler;
+        _hasSearch = true;
     }
 
     /// Runs on every keystroke.
-    public void OnChanged(TextChanged handler) {
-        onChanged = handler;
-        hasChanged = true;
+    public void OnChanged(TextChanged handler)
+    {
+        _onChanged = handler;
+        _hasChanged = true;
     }
 
     /// Asked before a search runs. Answering false stops it, and the control
     /// says so in its own status line -- which is the sort of thing a control
     /// does that a raw widget will not.
-    public void OnAllowed(SearchAllowed handler) {
-        allowed = handler;
-        hasAllowed = true;
+    public void OnAllowed(SearchAllowed handler)
+    {
+        _allowed = handler;
+        _hasAllowed = true;
     }
 
     // ------------------------------------------------------------- the wiring
 
     /// The one that does the work. Private, and bound to two widgets above.
-    void Run() {
-        var text = field.Text();
+    void Run()
+    {
+        var text = _field.Text();
 
-        if (text.ByteLength() == 0u) {
-            status.SetText("nothing to search for");
+        if (text.ByteLength() == 0u)
+        {
+            _status.SetText("nothing to search for");
             return;
         }
 
-        if (hasAllowed && !allowed(text)) {
-            status.SetText("refused: " + text);
+        if (_hasAllowed && !_allowed(text))
+        {
+            _status.SetText("refused: " + text);
             return;
         }
 
-        searches = searches + 1;
-        status.SetText("searched for " + text);
+        _searches = _searches + 1;
+        _status.SetText("searched for " + text);
 
-        if (hasSearch) { onSearch(text); }
+        if (_hasSearch)
+            _onSearch(text);
     }
 
-    void Clear() {
-        field.SetText("");
-        status.SetText("");
-        if (hasChanged) { onChanged(""); }
+    void Clear()
+    {
+        _field.SetText("");
+        _status.SetText("");
+        if (_hasChanged)
+            _onChanged("");
     }
 
-    void Changed() {
-        if (hasChanged) { onChanged(field.Text()); }
+    void Changed()
+    {
+        if (_hasChanged)
+            _onChanged(_field.Text());
     }
 }
 
@@ -187,37 +201,44 @@ public class SearchBox {
 
 /// Somewhere for the results to go, so that a handler has an object to be
 /// bound to rather than a lambda closing over one.
-class Results {
-    List<String> seen;
-    Label view;
+class Results
+{
+    List<String> _seen;
+    Label _view;
 
-    public Results(Label into) {
-        seen = new List<String>();
-        view = into;
+    public Results(Label into)
+    {
+        _seen = new List<String>();
+        _view = into;
     }
 
     /// A method with exactly the shape of `SearchRequested`, which is what
     /// lets `search.OnSearch(results.Show)` work.
-    public void Show(String text) {
-        seen.Add(text);
+    public void Show(String text)
+    {
+        _seen.Add(text);
 
         var all = new StringBuilder();
-        for (nuint i = 0u; i < seen.Count(); i = i + 1u) {
-            if (i > 0u) { all.Append(", "); }
-            all.Append(seen.At(i));
+        for (nuint i = 0u; i < _seen.Count(); i = i + 1u)
+        {
+            if (i > 0u)
+                all.Append(", ");
+            all.Append(_seen.At(i));
         }
 
-        view.SetText("results: " + all.ToText());
+        _view.SetText("results: " + all.ToText());
         Console.WriteLine("searched: " + text);
     }
 
-    public nuint Count() { return seen.Count(); }
+    public nuint Count() => _seen.Count();
 }
 
-public int Main() {
+public int Main()
+{
     var app = new Application();
 
-    if (!app.Start()) {
+    if (!app.Start())
+    {
         Console.WriteLine("no display; set DISPLAY or run this on a desktop");
         return 1;
     }
@@ -248,7 +269,8 @@ public int Main() {
 
     // A lambda where there is no object to bind to, which is the other half of
     // the same type.
-    search.OnChanged((text) => {
+    search.OnChanged((text) =>
+    {
         heading.SetText(text.ByteLength() == 0u
             ? "Type something and press Search"
             : "About to search for " + text);

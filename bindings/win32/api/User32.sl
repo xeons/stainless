@@ -42,19 +42,22 @@ import Win32.Handles;
 
 // ================================================================= geometry
 
-public struct Point {
+public struct Point
+{
     public int X;
     public int Y;
 }
 
-public struct Size {
+public struct Size
+{
     public int Width;
     public int Height;
 }
 
 /// `RECT`, whose `Right` and `Bottom` are *exclusive*. A rectangle from 0,0 to
 /// 100,50 is 100 wide and 50 tall and does not include column 100.
-public struct Rect {
+public struct Rect
+{
     public int Left;
     public int Top;
     public int Right;
@@ -64,12 +67,13 @@ public struct Rect {
 // ================================================================= messages
 
 /// `MSG`. `sizeof` is 48, as it is in C.
-public struct Msg {
-    public HWND  Window;
-    public uint  Message;
+public struct Msg
+{
+    public HWND Window;
+    public uint Message;
     public ulong WParam;
-    public long  LParam;
-    public uint  Time;
+    public long LParam;
+    public uint Time;
     public Point Cursor;
 }
 
@@ -134,7 +138,8 @@ public const uint WmApp              = 0x8000u;
 public const uint PeekNoRemove = 0x0000u;
 public const uint PeekRemove   = 0x0001u;
 
-public extern "C" {
+public extern "C"
+{
     int  GetMessageW(Msg* message, HWND window, uint first, uint last);
     int  PeekMessageW(Msg* message, HWND window, uint first, uint last, uint remove);
     int  TranslateMessage(Msg* message);
@@ -151,19 +156,20 @@ public extern "C" {
 
 /// `WNDCLASSEXW`. `sizeof` is 80, and `Size` must be set to it before
 /// registering.
-public struct WindowClass {
-    public uint            Size;
-    public uint            Style;
+public struct WindowClass
+{
+    public uint Size;
+    public uint Style;
     public WindowProcedure Procedure;
-    public int             ClassExtra;
-    public int             WindowExtra;
-    public HINSTANCE       Instance;
-    public HICON           Icon;
-    public HCURSOR         Cursor;
-    public HBRUSH          Background;
-    public char16*         MenuName;
-    public char16*         ClassName;
-    public HICON           SmallIcon;
+    public int ClassExtra;
+    public int WindowExtra;
+    public HINSTANCE Instance;
+    public HICON Icon;
+    public HCURSOR Cursor;
+    public HBRUSH Background;
+    public char16* MenuName;
+    public char16* ClassName;
+    public HICON SmallIcon;
 }
 
 public const uint ClassStyleVerticalRedraw   = 0x0001u;
@@ -176,7 +182,8 @@ public const uint ClassStyleNoClose          = 0x0200u;
 public const uint ClassStyleSaveBits         = 0x0800u;
 public const uint ClassStyleDropShadow       = 0x00020000u;
 
-public extern "C" {
+public extern "C"
+{
     ushort RegisterClassExW(WindowClass* windowClass);
     int    UnregisterClassW(char16* name, HINSTANCE instance);
     int    GetClassInfoExW(HINSTANCE instance, char16* name, WindowClass* windowClass);
@@ -184,7 +191,8 @@ public extern "C" {
 
 // ================================================================== windows
 
-public extern "C" {
+public extern "C"
+{
     HWND CreateWindowExW(uint extendedStyle, char16* className, char16* windowName,
                          uint style, int x, int y, int width, int height,
                          HWND parent, HMENU menu, HINSTANCE instance, void* parameter);
@@ -303,12 +311,13 @@ public const int GwlExtendedStyle = -20;
 /// Stainless has no inline fixed-size array field; the size, 72, and every
 /// offset before it are the ones C computes. Nothing should read them — they
 /// are reserved to Windows.
-public struct PaintStruct {
-    public HDC  Dc;
-    public int  Erase;
+public struct PaintStruct
+{
+    public HDC Dc;
+    public int Erase;
     public Rect Paint;
-    public int  Restore;
-    public int  IncrementalUpdate;
+    public int Restore;
+    public int IncrementalUpdate;
     public uint Reserved0;
     public uint Reserved1;
     public uint Reserved2;
@@ -319,7 +328,8 @@ public struct PaintStruct {
     public uint Reserved7;
 }
 
-public extern "C" {
+public extern "C"
+{
     HDC BeginPaint(HWND window, PaintStruct* paint);
     int EndPaint(HWND window, PaintStruct* paint);
     HDC GetDC(HWND window);
@@ -347,7 +357,8 @@ public extern "C" {
 // colour, which is what a text caret is; the bitmap form is for the shapes
 // nothing here needs.
 
-public extern "C" {
+public extern "C"
+{
     int  CreateCaret(HWND window, HBITMAP shape, int width, int height);
     int  DestroyCaret();
     int  SetCaretPos(int x, int y);
@@ -379,7 +390,8 @@ public const uint DtCalculateOnly  = 0x00000400u;
 
 // ============================================================== message box
 
-public extern "C" {
+public extern "C"
+{
     int MessageBoxW(HWND owner, char16* text, char16* caption, uint style);
 }
 
@@ -416,7 +428,8 @@ public const int IdNo     = 7;
 
 // =================================================================== cursor
 
-public extern "C" {
+public extern "C"
+{
     int     GetCursorPos(Point* point);
     int     SetCursorPos(int x, int y);
     HCURSOR LoadCursorW(HINSTANCE instance, char16* name);
@@ -431,15 +444,15 @@ public extern "C" {
 /// The standard cursors, passed to `LoadCursorW` with a null instance. They are
 /// integers pretending to be strings — `MAKEINTRESOURCE` — which is why these
 /// are functions rather than constants: Stainless has no `const char16*`.
-public char16* CursorArrow()   { return (char16*)(nuint)32512u; }
-public char16* CursorIBeam()   { return (char16*)(nuint)32513u; }
-public char16* CursorWait()    { return (char16*)(nuint)32514u; }
-public char16* CursorCross()   { return (char16*)(nuint)32515u; }
-public char16* CursorSizeAll() { return (char16*)(nuint)32646u; }
-public char16* CursorHand()    { return (char16*)(nuint)32649u; }
-public char16* CursorSizeNS()  { return (char16*)(nuint)32645u; }
-public char16* CursorSizeWE()  { return (char16*)(nuint)32644u; }
-public char16* CursorNo()      { return (char16*)(nuint)32648u; }
+public char16* CursorArrow() => (char16*)(nuint)32512u;
+public char16* CursorIBeam() => (char16*)(nuint)32513u;
+public char16* CursorWait() => (char16*)(nuint)32514u;
+public char16* CursorCross() => (char16*)(nuint)32515u;
+public char16* CursorSizeAll() => (char16*)(nuint)32646u;
+public char16* CursorHand() => (char16*)(nuint)32649u;
+public char16* CursorSizeNS() => (char16*)(nuint)32645u;
+public char16* CursorSizeWE() => (char16*)(nuint)32644u;
+public char16* CursorNo() => (char16*)(nuint)32648u;
 
 /// `WM_SETCURSOR`'s low word: where on the window the pointer is. A control
 /// answers only for its own client area and leaves the frame to Windows.
@@ -447,7 +460,8 @@ public const long HtClient = 1;
 
 // ================================================================= keyboard
 
-public extern "C" {
+public extern "C"
+{
     short GetAsyncKeyState(int key);
     short GetKeyState(int key);
     int   GetKeyboardState(byte* state);
@@ -495,7 +509,8 @@ public const int VkRightControl = 0xA3;
 
 // ================================================================ clipboard
 
-public extern "C" {
+public extern "C"
+{
     int    OpenClipboard(HWND owner);
     int    CloseClipboard();
     int    EmptyClipboard();
@@ -511,14 +526,16 @@ public const uint ClipboardHDrop       = 15u;
 
 // =================================================================== timers
 
-public extern "C" {
+public extern "C"
+{
     ulong SetTimer(HWND window, ulong id, uint milliseconds, TimerProcedure callback);
     int   KillTimer(HWND window, ulong id);
 }
 
 // ================================================================== metrics
 
-public extern "C" {
+public extern "C"
+{
     int   GetSystemMetrics(int index);
     int   SystemParametersInfoW(uint action, uint parameter, void* value, uint winIni);
     HICON LoadIconW(HINSTANCE instance, char16* name);
@@ -553,11 +570,11 @@ public const int SmRemoteSession          = 0x1000;
 
 /// The standard icons, passed to `LoadIconW` with a null instance. Also
 /// `MAKEINTRESOURCE` integers, and so also functions.
-public char16* IconApplication() { return (char16*)(nuint)32512u; }
-public char16* IconError()       { return (char16*)(nuint)32513u; }
-public char16* IconQuestion()    { return (char16*)(nuint)32514u; }
-public char16* IconWarning()     { return (char16*)(nuint)32515u; }
-public char16* IconInformation() { return (char16*)(nuint)32516u; }
+public char16* IconApplication() => (char16*)(nuint)32512u;
+public char16* IconError() => (char16*)(nuint)32513u;
+public char16* IconQuestion() => (char16*)(nuint)32514u;
+public char16* IconWarning() => (char16*)(nuint)32515u;
+public char16* IconInformation() => (char16*)(nuint)32516u;
 
 // ============================================ window properties and subclassing
 //
@@ -565,7 +582,8 @@ public char16* IconInformation() { return (char16*)(nuint)32516u; }
 // keep a pointer beside an `HWND`, and a way to put a window procedure in front
 // of a system control's own.
 
-public extern "C" {
+public extern "C"
+{
     /// Attaches a value to a window under a name. The way to associate data
     /// with an `HWND` that works on a window this program did not create --
     /// unlike `GWLP_USERDATA`, which a system control may already be using for
@@ -634,14 +652,15 @@ public const int ColorInfoBackground = 24;
 public const int ColorHotLight       = 26;
 
 /// `SCROLLINFO`, for a scroll bar's range and position in one call.
-public struct ScrollInfo {
+public struct ScrollInfo
+{
     public uint Size;
     public uint Mask;
-    public int  Minimum;
-    public int  Maximum;
+    public int Minimum;
+    public int Maximum;
     public uint Page;
-    public int  Position;
-    public int  TrackPosition;
+    public int Position;
+    public int TrackPosition;
 }
 
 public const uint SifRange           = 0x0001u;
@@ -808,7 +827,8 @@ public const uint SbEndScroll     = 8u;
 // Win32 reports a mouse entering a window only by the moves it sends, and
 // reports it leaving not at all -- unless asked, once, per window, per leave.
 
-public struct TrackMouseEvent {
+public struct TrackMouseEvent
+{
     public uint Size;
     public uint Flags;
     public HWND Window;
@@ -819,7 +839,8 @@ public const uint TmeLeave  = 0x00000002u;
 public const uint TmeHover  = 0x00000001u;
 public const uint TmeCancel = 0x80000000u;
 
-public extern "C" {
+public extern "C"
+{
     int TrackMouseEvent(TrackMouseEvent* track);
 }
 
@@ -836,22 +857,24 @@ public extern "C" {
 // message a button's click arrives on, which is why the two have to share a
 // numbering.
 
-public struct MenuItemInfo {
-    public uint    Size;
-    public uint    Mask;
-    public uint    Type;
-    public uint    State;
-    public uint    Id;
-    public HMENU   SubMenu;
+public struct MenuItemInfo
+{
+    public uint Size;
+    public uint Mask;
+    public uint Type;
+    public uint State;
+    public uint Id;
+    public HMENU SubMenu;
     public HBITMAP Checked;
     public HBITMAP Unchecked;
-    public nuint   ItemData;
+    public nuint ItemData;
     public char16* TypeData;
-    public uint    TypeDataLength;
+    public uint TypeDataLength;
     public HBITMAP Item;
 }
 
-public extern "C" {
+public extern "C"
+{
     HMENU CreateMenu();
     HMENU CreatePopupMenu();
     int   DestroyMenu(HMENU menu);
@@ -933,7 +956,8 @@ public const uint WmMenuSelect    = 0x011Fu;
 // without a decoder -- either from disk with `LrLoadFromFile`, or out of the
 // binary's own resources with an `HINSTANCE` and a `MAKEINTRESOURCE` name.
 
-public extern "C" {
+public extern "C"
+{
     HANDLE LoadImageW(HINSTANCE instance, char16* name, uint kind,
                       int width, int height, uint flags);
     HICON  CreateIconFromResourceEx(byte* bits, uint size, int isIcon, uint version,
@@ -962,27 +986,27 @@ public const uint LrShared        = 0x8000u;
 // `RT_RCDATA` is the type to use for arbitrary bytes rather than inventing one,
 // because every resource editor already knows how to show it.
 
-public char16* RtCursor()       { return (char16*)(nuint)1u; }
-public char16* RtBitmap()       { return (char16*)(nuint)2u; }
-public char16* RtIcon()         { return (char16*)(nuint)3u; }
-public char16* RtMenu()         { return (char16*)(nuint)4u; }
-public char16* RtDialog()       { return (char16*)(nuint)5u; }
-public char16* RtString()       { return (char16*)(nuint)6u; }
-public char16* RtFontDir()      { return (char16*)(nuint)7u; }
-public char16* RtFont()         { return (char16*)(nuint)8u; }
-public char16* RtAccelerator()  { return (char16*)(nuint)9u; }
-public char16* RtRcData()       { return (char16*)(nuint)10u; }
-public char16* RtMessageTable() { return (char16*)(nuint)11u; }
-public char16* RtGroupCursor()  { return (char16*)(nuint)12u; }
-public char16* RtGroupIcon()    { return (char16*)(nuint)14u; }
-public char16* RtVersion()      { return (char16*)(nuint)16u; }
-public char16* RtDlgInclude()   { return (char16*)(nuint)17u; }
-public char16* RtPlugPlay()     { return (char16*)(nuint)19u; }
-public char16* RtVxd()          { return (char16*)(nuint)20u; }
-public char16* RtAniCursor()    { return (char16*)(nuint)21u; }
-public char16* RtAniIcon()      { return (char16*)(nuint)22u; }
-public char16* RtHtml()         { return (char16*)(nuint)23u; }
-public char16* RtManifest()     { return (char16*)(nuint)24u; }
+public char16* RtCursor() => (char16*)(nuint)1u;
+public char16* RtBitmap() => (char16*)(nuint)2u;
+public char16* RtIcon() => (char16*)(nuint)3u;
+public char16* RtMenu() => (char16*)(nuint)4u;
+public char16* RtDialog() => (char16*)(nuint)5u;
+public char16* RtString() => (char16*)(nuint)6u;
+public char16* RtFontDir() => (char16*)(nuint)7u;
+public char16* RtFont() => (char16*)(nuint)8u;
+public char16* RtAccelerator() => (char16*)(nuint)9u;
+public char16* RtRcData() => (char16*)(nuint)10u;
+public char16* RtMessageTable() => (char16*)(nuint)11u;
+public char16* RtGroupCursor() => (char16*)(nuint)12u;
+public char16* RtGroupIcon() => (char16*)(nuint)14u;
+public char16* RtVersion() => (char16*)(nuint)16u;
+public char16* RtDlgInclude() => (char16*)(nuint)17u;
+public char16* RtPlugPlay() => (char16*)(nuint)19u;
+public char16* RtVxd() => (char16*)(nuint)20u;
+public char16* RtAniCursor() => (char16*)(nuint)21u;
+public char16* RtAniIcon() => (char16*)(nuint)22u;
+public char16* RtHtml() => (char16*)(nuint)23u;
+public char16* RtManifest() => (char16*)(nuint)24u;
 
 /// `WM_SETICON`: gives a window its icon. `wParam` says which of the two
 /// sizes, and `lParam` is the `HICON`.
@@ -1011,7 +1035,8 @@ public const int ManifestResourceId = 1;
 // The `name` arguments are resource names, so an integer id has to go through
 // `MAKEINTRESOURCE`. `Win32.Resources` is the comfortable way to say that.
 
-public extern "C" {
+public extern "C"
+{
     /// Builds a menu from an `RT_MENU` template. The caller owns it until it
     /// is attached to a window, which is what `SetMenu` above does.
     HMENU LoadMenuW(HINSTANCE instance, char16* name);
@@ -1061,7 +1086,8 @@ public const uint WmInitDialog = 0x0110u;
 
 // ==================================================== strings from a resource
 
-public extern "C" {
+public extern "C"
+{
     /// Copies a string out of an `RT_STRING` table, and answers how many
     /// characters it wrote -- zero when there is no string with that id.
     ///
@@ -1082,7 +1108,8 @@ public extern "C" {
 // `IsDialogMessage` does to a message before it is dispatched, and a window
 // whose loop does not call it simply has none of them.
 
-public extern "C" {
+public extern "C"
+{
     /// Handles a navigation key for a window and its children. Answers true
     /// when it took the message, which the loop must then *not* dispatch.
     int  IsDialogMessageW(HWND window, Msg* message);

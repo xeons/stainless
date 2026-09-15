@@ -6,21 +6,26 @@ module Arrays;
 
 import Standard.Console;
 
-int Sum(int[] values) {
+int Sum(int[] values)
+{
     var total = 0;
-    foreach (int value in values) { total += value; }
+    foreach (int value in values)
+        total += value;
     return total;
 }
 
 /// A slice is a view: no copy, and the array it came from stays alive as long
 /// as the view does.
-int SumOf(int[:] window) {
+int SumOf(int[:] window)
+{
     var total = 0;
-    foreach (int value in window) { total += value; }
+    foreach (int value in window)
+        total += value;
     return total;
 }
 
-int Main() {
+int Main()
+{
     // An array literal takes its type from where it is going, so a `var` here
     // is an `int[]` decided by the elements themselves.
     var squares = [0, 1, 4, 9, 16];
@@ -30,7 +35,8 @@ int Main() {
 
     // `new T[n]` when the length is not a literal, and the elements are zero.
     var counted = new int[5];
-    for (nuint i = 0u; i < counted.Length; i += 1u) {
+    for (nuint i = 0u; i < counted.Length; i++)
+    {
         counted[i] = (int)(i * i);
     }
     Console.WriteLine("same   = " + Text.FromBool(Sum(counted) == Sum(squares)));

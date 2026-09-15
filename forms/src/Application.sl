@@ -48,7 +48,8 @@ import Forms.Platform;
 ///     return 0;
 /// }
 /// ```
-public static class Application {
+public static class Application
+{
     /// The windows that are open, which is what keeps them alive.
     ///
     /// A form shown from a local variable would otherwise be destroyed when the
@@ -57,9 +58,9 @@ public static class Application {
     /// at a peer whose control had gone. Registering on `Show` and
     /// unregistering on close is the whole of the fix, and is why a program
     /// never has to keep a field for a form it only wanted to open.
-    static List<Form> open = new List<Form>();
+    static List<Form> s_open = new List<Form>();
 
-    static bool started = false;
+    static bool s_started = false;
 
     /// Chooses the platform and gets it ready.
     ///
@@ -72,14 +73,16 @@ public static class Application {
     /// that only ever runs on Windows links no GTK and vice versa. A program
     /// that wants a different one -- a recording backend under test -- sets
     /// `WidgetSet.Current` itself and does not call this.
-    public static void Initialize() {
-        if (started) { return; }
+    public static void Initialize()
+    {
+        if (s_started)
+            return;
         WidgetSet.Current = MakeWidgetSet();
-        started = true;
+        s_started = true;
     }
 
     /// Whether `Initialize` has run.
-    public static bool IsInitialized() { return started; }
+    public static bool IsInitialized() => s_started;
 
     /// Which platform this program ended up on: `"Win32"`, `"GTK3"`.
     public static String PlatformName => WidgetSet.Current.Name;
@@ -87,56 +90,68 @@ public static class Application {
     // ----------------------------------------------------------- the loop
 
     /// Runs until the last window closes.
-    public static void Run() {
+    public static void Run()
+    {
         WidgetSet.Current.RunEventLoop();
     }
 
     /// Handles everything already queued and returns, for a program driving its
     /// own loop. False once the program has been asked to quit.
-    public static bool DoEvents() {
+    public static bool DoEvents()
+    {
         return WidgetSet.Current.PumpEvents();
     }
 
     /// Makes `Run` return, whether or not any window is still open.
-    public static void Quit() {
+    public static void Quit()
+    {
         WidgetSet.Current.QuitEventLoop();
     }
 
     // -------------------------------------------------------- the register
 
     /// Called by `Form.Show`. Not public: a form registers itself.
-    static void Register(Form form) {
-        open.Add(form);
+    static void Register(Form form)
+    {
+        s_open.Add(form);
     }
 
     /// Called when a form has closed. The last one out stops the loop, which is
     /// what makes a one-window program need no `Quit` call at all.
-    static void Unregister(Form form) {
+    static void Unregister(Form form)
+    {
         Remove(form);
-        if (open.IsEmpty()) { Quit(); }
+        if (s_open.IsEmpty())
+            Quit();
     }
 
     /// Drops one form from the register, keeping the order of the rest.
     ///
     /// Written out rather than using a `Remove` on the list, because removal by
     /// value needs equality on `Form` and reference identity is what is meant.
-    static void Remove(Form gone) {
+    static void Remove(Form gone)
+    {
         var kept = new List<Form>();
-        foreach (var form in open) {
-            if (form != gone) { kept.Add(form); }
+        foreach (var form in s_open)
+        {
+            if (form != gone)
+                kept.Add(form);
         }
-        open = kept;
+        s_open = kept;
     }
 
     /// The windows currently open.
-    public static List<Form> OpenForms => open;
+    public static List<Form> OpenForms => s_open;
 
     /// The first window shown, which is the one a program usually means by
     /// "the main window". Null before anything has been shown.
-    public static Form? MainForm {
-        get {
-            if (open.IsEmpty()) { return null; }
-            return open.At(0u);
+    public static Form? MainForm
+    {
+        get
+        {
+            if (s_open.IsEmpty())
+                return null;
+            return s_open.At(0u);
         }
     }
 
@@ -145,27 +160,32 @@ public static class Application {
     /// A message box. The one dialog every program needs and nobody should
     /// have to build.
     public static DialogResult ShowMessage(String text, String caption,
-                                           MessageButtons buttons, MessageIcon icon) {
+                                           MessageButtons buttons, MessageIcon icon)
+    {
         return WidgetSet.Current.ShowMessage(null, text, caption, buttons, icon);
     }
 
     /// Tells the user something.
-    public static void Inform(String text, String caption) {
+    public static void Inform(String text, String caption)
+    {
         ShowMessage(text, caption, MessageButtons.Ok, MessageIcon.Information);
     }
 
     /// Warns them.
-    public static void Warn(String text, String caption) {
+    public static void Warn(String text, String caption)
+    {
         ShowMessage(text, caption, MessageButtons.Ok, MessageIcon.Warning);
     }
 
     /// Reports a failure.
-    public static void Complain(String text, String caption) {
+    public static void Complain(String text, String caption)
+    {
         ShowMessage(text, caption, MessageButtons.Ok, MessageIcon.Error);
     }
 
     /// Asks a yes-or-no question. True for yes.
-    public static bool Ask(String text, String caption) {
+    public static bool Ask(String text, String caption)
+    {
         return ShowMessage(text, caption, MessageButtons.YesNo, MessageIcon.Question)
             == DialogResult.Yes;
     }

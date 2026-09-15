@@ -21,31 +21,33 @@ import Forms;
 import Forms.Drawing;
 import Forms.Platform;
 
-public class ButtonsForm : Form {
-    public CoolBar     Bar;
-    public CoolBand    ToolsBand;
-    public CoolBand    ZoomBand;
-    public ToolBar     Tools;
-    public ComboBox    Zoom;
+public class ButtonsForm : Form
+{
+    public CoolBar Bar;
+    public CoolBand ToolsBand;
+    public CoolBand ZoomBand;
+    public ToolBar Tools;
+    public ComboBox Zoom;
 
-    public Notebook     Pages;
+    public Notebook Pages;
     public NotebookPage FirstPage;
     public NotebookPage SecondPage;
     public NotebookPage ThirdPage;
 
     public ToggleButton Bold;
     public ToggleButton Italic;
-    public Button       Pictured;
-    public SpeedButton  Pen;
-    public SpeedButton  Brush;
-    public SpeedButton  Eraser;
-    public Label        Readout;
+    public Button Pictured;
+    public SpeedButton Pen;
+    public SpeedButton Brush;
+    public SpeedButton Eraser;
+    public Label Readout;
 
-    public ButtonPanel  Buttons;
+    public ButtonPanel Buttons;
 
     public int Presses;
 
-    public ButtonsForm() {
+    public ButtonsForm()
+    {
         base(WindowBorder.Sizable);
         Text = "Buttons, bands and pages";
         SetBounds(0, 0, 640, 460);
@@ -109,7 +111,8 @@ public class ButtonsForm : Form {
         Pages.SelectedIndex = 0;
     }
 
-    void BuildToggles() {
+    void BuildToggles()
+    {
         var explain = new Label(FirstPage);
         explain.SetBounds(12, 12, 400, 20);
         explain.Text = "A toggle button is a check box that stays pressed in.";
@@ -145,7 +148,8 @@ public class ButtonsForm : Form {
         next.Click += this.OnNext;
     }
 
-    void BuildPalette() {
+    void BuildPalette()
+    {
         var explain = new Label(SecondPage);
         explain.SetBounds(12, 12, 400, 20);
         explain.Text = "Speed buttons: no windows, one group, one stays down.";
@@ -161,7 +165,8 @@ public class ButtonsForm : Form {
         next.Click += this.OnNext;
     }
 
-    SpeedButton MakeTool(String caption, int left) {
+    SpeedButton MakeTool(String caption, int left)
+    {
         var made = new SpeedButton(SecondPage);
         made.Text = caption;
         made.SetBounds(left, 40, 62, 30);
@@ -171,7 +176,8 @@ public class ButtonsForm : Form {
         return made;
     }
 
-    void BuildLast() {
+    void BuildLast()
+    {
         var explain = new Label(ThirdPage);
         explain.SetBounds(12, 12, 400, 20);
         explain.Text = "The last page. Nothing showed a tab to get here.";
@@ -182,23 +188,35 @@ public class ButtonsForm : Form {
         back.Click += this.OnFirst;
     }
 
-    void OnStyleChanged(Control sender) {
+    void OnStyleChanged(Control sender)
+    {
         var said = "plain";
-        if (Bold.Checked && Italic.Checked) { said = "bold italic"; }
-        else if (Bold.Checked)              { said = "bold"; }
-        else if (Italic.Checked)            { said = "italic"; }
+        if (Bold.Checked && Italic.Checked)
+        {
+            said = "bold italic";
+        }
+        else if (Bold.Checked)
+        {
+            said = "bold";
+        }
+        else if (Italic.Checked)
+        {
+            said = "italic";
+        }
         Readout.Text = said;
     }
 
-    void OnPressed(Control sender) { Presses = Presses + 1; }
+    void OnPressed(Control sender) => Presses = Presses + 1;
 
-    void OnNext(Control sender) {
+    void OnNext(Control sender)
+    {
         Pages.SelectedIndex = Pages.SelectedIndex + 1;
     }
 
-    void OnFirst(Control sender) { Pages.SelectedIndex = 0; }
+    void OnFirst(Control sender) => Pages.SelectedIndex = 0;
 
-    public bool SelfTest() {
+    public bool SelfTest()
+    {
         bool ok = true;
 
         // ---- the cool bar.
@@ -388,14 +406,16 @@ public class ButtonsForm : Form {
         // cool bar rewraps its rows and the notebook re-fills with its page.
         var startedAt = Bounds;
         SetBounds(startedAt.X, startedAt.Y, 420, 400);
-        for (int i = 0; i < 6; i += 1) { Application.DoEvents(); }
+        for (int i = 0; i < 6; i++)
+            Application.DoEvents();
         ok = Check(ok, "a narrow bar wraps its bands onto two rows",
                    ZoomBand.Top > ToolsBand.Top);
         ok = Check(ok, "and the notebook's page follows the resize",
                    FirstPage.Width == Pages.ClientBounds.Width);
 
         SetBounds(startedAt.X, startedAt.Y, 640, 460);
-        for (int i = 0; i < 6; i += 1) { Application.DoEvents(); }
+        for (int i = 0; i < 6; i++)
+            Application.DoEvents();
         ok = Check(ok, "and widening it puts them back on one",
                    ZoomBand.Top == ToolsBand.Top);
 
@@ -404,37 +424,46 @@ public class ButtonsForm : Form {
 
     /// Sets the page index out of range and answers whether it landed where it
     /// should have. Separate because the check reads better than the two lines.
-    bool ClampsTo(int asked, int wanted) {
+    bool ClampsTo(int asked, int wanted)
+    {
         Pages.SelectedIndex = asked;
         return Pages.SelectedIndex == wanted;
     }
 
-    bool Check(bool running, String what, bool passed) {
+    bool Check(bool running, String what, bool passed)
+    {
         Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
         return running && passed;
     }
 }
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var form = new ButtonsForm();
 
     bool testing = false;
     var arguments = Standard.Env.Arguments();
-    for (nuint i = 0u; i < arguments.Length; i += 1u) {
-        if (arguments[i] == "--selftest") { testing = true; }
+    for (nuint i = 0u; i < arguments.Length; i++)
+    {
+        if (arguments[i] == "--selftest")
+            testing = true;
         // Which page to open on, so that a screenshot can be taken of one that
         // is not the first.
-        if (arguments[i] == "--page" && i + 1u < arguments.Length) {
+        if (arguments[i] == "--page" && i + 1u < arguments.Length)
+        {
             var which = Standard.Convert.ToInt(arguments[i + 1u]);
-            if (which.Ok) { form.Pages.SelectedIndex = which.Value; }
+            if (which.Ok)
+                form.Pages.SelectedIndex = which.Value;
         }
     }
 
-    if (testing) {
+    if (testing)
+    {
         Console.WriteLine("Forms for Stainless -- bands, pages and buttons");
         form.Show();
-        for (int i = 0; i < 20; i += 1) { Application.DoEvents(); }
+        for (int i = 0; i < 20; i++)
+            Application.DoEvents();
         bool ok = form.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

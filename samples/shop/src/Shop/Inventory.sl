@@ -6,48 +6,57 @@ import Shop.Catalog;
 import Shop.Pricing;
 
 // A generic declared here, instantiated from another module entirely.
-public class Register<T> {
-    T[] items;
-    nuint count;
+public class Register<T>
+{
+    T[] _items;
+    nuint _count;
 
-    public Register(nuint capacity) {
-        items = new T[capacity];
-        count = 0;
+    public Register(nuint capacity)
+    {
+        _items = new T[capacity];
+        _count = 0;
     }
 
-    public nuint Count() { return count; }
-    public T At(nuint index) { return items[index]; }
+    public nuint Count() => _count;
+    public T At(nuint index) => _items[index];
 
-    public void Add(T item) {
-        items[count] = item;
-        count += 1;
+    public void Add(T item)
+    {
+        _items[_count] = item;
+        _count++;
     }
 
     /// `foreach` finds this by name rather than by interface, so a Register is
     /// iterable without implementing anything or importing Standard.Collections.
-    public RegisterCursor<T> GetEnumerator() { return new RegisterCursor<T>(this); }
+    public RegisterCursor<T> GetEnumerator() => new RegisterCursor<T>(this);
 }
 
-public class RegisterCursor<T> {
-    Register<T> source;
-    nuint next;
+public class RegisterCursor<T>
+{
+    Register<T> _source;
+    nuint _next;
 
-    public RegisterCursor(Register<T> register) {
-        source = register;
-        next = 0;
+    public RegisterCursor(Register<T> register)
+    {
+        _source = register;
+        _next = 0;
     }
 
-    public bool MoveNext() {
-        if (next >= source.Count()) { return false; }
-        next += 1;
+    public bool MoveNext()
+    {
+        if (_next >= _source.Count())
+            return false;
+        _next++;
         return true;
     }
 
-    public T Current() { return source.At(next - 1); }
+    public T Current() => _source.At(_next - 1);
 }
 
-public Money Total(Register<IPriced> register) {
+public Money Total(Register<IPriced> register)
+{
     var sum = Cents(0);
-    foreach (var item in register) { sum = Add(sum, item.Price()); }
+    foreach (var item in register)
+        sum = Add(sum, item.Price());
     return sum;
 }

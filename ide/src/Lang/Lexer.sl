@@ -49,7 +49,8 @@ import Standard.Collections;
 /// the parser needs to tell `+` from `+=`. Finer in one direction, though --
 /// `DocComment` is separate from `Comment`, and `TypeName` from `Identifier`,
 /// because those are distinctions a reader wants and a parser does not.
-public enum TokenKind {
+public enum TokenKind
+{
     /// Spaces and tabs. Produced rather than skipped, so that the tokens of a
     /// line tile it exactly and a painter can walk them without tracking gaps.
     Whitespace,
@@ -96,7 +97,8 @@ public enum TokenKind {
 ///
 /// A struct, and small on purpose: a file of any size is a great many of these,
 /// and they are rebuilt whenever a line changes.
-public struct Token {
+public struct Token
+{
     public TokenKind Kind;
     /// Byte offset from the start of the line.
     public nuint Start;
@@ -104,7 +106,8 @@ public struct Token {
 
     public nuint End => Start + Length;
 
-    public static Token Of(TokenKind kind, nuint start, nuint length) {
+    public static Token Of(TokenKind kind, nuint start, nuint length)
+    {
         Token token;
         token.Kind = kind;
         token.Start = start;
@@ -119,7 +122,8 @@ public struct Token {
 /// is decided within it, which is what makes rescanning one line enough: if the
 /// state coming out of a line is what it was before the edit, no line below it
 /// can have changed and the editor stops there.
-public enum ScanState {
+public enum ScanState
+{
     /// Nothing is open. The ordinary case, and what a file starts in.
     Normal,
     /// A `/*` is open and has not been closed.
@@ -134,15 +138,17 @@ public enum ScanState {
 /// line. They are instance fields rather than statics because a static holding
 /// a `Dictionary` is shared mutable state the compiler is right to warn about,
 /// and because a scanner is a thing an editor owns anyway.
-public class Scanner {
-    Dictionary<String, bool> keywords;
-    Dictionary<String, bool> contextual;
-    Dictionary<String, bool> primitives;
+public class Scanner
+{
+    Dictionary<String, bool> _keywords;
+    Dictionary<String, bool> _contextual;
+    Dictionary<String, bool> _primitives;
 
-    public Scanner() {
-        keywords = new Dictionary<String, bool>();
-        contextual = new Dictionary<String, bool>();
-        primitives = new Dictionary<String, bool>();
+    public Scanner()
+    {
+        _keywords = new Dictionary<String, bool>();
+        _contextual = new Dictionary<String, bool>();
+        _primitives = new Dictionary<String, bool>();
         Fill();
     }
 
@@ -152,7 +158,8 @@ public class Scanner {
     /// program and its keyword list is a C# enum, so there is no file for this
     /// to load; what keeps the two together is the test that lexes a sample and
     /// checks every word the compiler calls a keyword arrives as one here.
-    void Fill() {
+    void Fill()
+    {
         String[] reserved = [
             "abstract", "alignof", "as", "attribute", "base", "break", "case",
             "class", "com", "const", "continue", "default", "delegate", "do",
@@ -164,7 +171,8 @@ public class Scanner {
             "switch", "this", "threadsafe", "true", "try", "typeof", "union",
             "using", "var", "variant", "virtual", "weak", "where", "while",
         ];
-        foreach (var word in reserved) { keywords.Set(word, true); }
+        foreach (var word in reserved)
+            _keywords.Set(word, true);
 
         // Keywords only where one is already expected, and ordinary
         // identifiers everywhere else. Coloured as keywords regardless, which
@@ -172,7 +180,8 @@ public class Scanner {
         // a reader recognises the word, and telling them apart would need the
         // parser this does not have.
         String[] soft = ["closure", "event", "get", "set", "value"];
-        foreach (var word in soft) { contextual.Set(word, true); }
+        foreach (var word in soft)
+            _contextual.Set(word, true);
 
         // The built-in types. `Keyword` in the compiler's table -- these are
         // reserved words -- but a separate colour here, because a type is the
@@ -182,7 +191,8 @@ public class Scanner {
             "int", "long", "nint", "nuint", "sbyte", "short", "uint", "ulong",
             "ushort", "void",
         ];
-        foreach (var word in built) { primitives.Set(word, true); }
+        foreach (var word in built)
+            _primitives.Set(word, true);
     }
 
     /// Lexes one line, appending to `into`, and answers what it leaves open.
@@ -190,7 +200,8 @@ public class Scanner {
     /// `into` is cleared first. The tokens tile the line exactly -- every byte
     /// belongs to one -- so a painter can walk them end to end without checking
     /// for gaps, and a lookup by column is a scan rather than a search.
-    public ScanState ScanLine(String line, ScanState entry, List<Token> into) {
+    public ScanState ScanLine(String line, ScanState entry, List<Token> into)
+    {
         into.Clear();
 
         nuint size = line.ByteLength();
@@ -198,10 +209,13 @@ public class Scanner {
         var state = entry;
 
         // A line that arrives inside a block comment is one until the `*/`.
-        if (state == ScanState.InBlockComment) {
+        if (state == ScanState.InBlockComment)
+        {
             nuint close = FindBlockEnd(line, 0u);
-            if (close == NotClosed) {
-                if (size > 0u) { into.Add(Token.Of(TokenKind.BlockComment, 0u, size)); }
+            if (close == NotClosed)
+            {
+                if (size > 0u)
+                    into.Add(Token.Of(TokenKind.BlockComment, 0u, size));
                 return ScanState.InBlockComment;
             }
             into.Add(Token.Of(TokenKind.BlockComment, 0u, close));
@@ -211,28 +225,35 @@ public class Scanner {
 
         // A directive is one only at the start of a line, so the test is made
         // once here rather than at every `#`.
-        if (at == 0u) {
+        if (at == 0u)
+        {
             nuint first = SkipSpaces(line, 0u);
-            if (first < size && line.ByteAt(first) == (byte)'#') {
-                if (first > 0u) { into.Add(Token.Of(TokenKind.Whitespace, 0u, first)); }
+            if (first < size && line.ByteAt(first) == (byte)'#')
+            {
+                if (first > 0u)
+                    into.Add(Token.Of(TokenKind.Whitespace, 0u, first));
                 into.Add(Token.Of(TokenKind.Directive, first, size - first));
                 return state;
             }
         }
 
-        while (at < size) {
+        while (at < size)
+        {
             byte c = line.ByteAt(at);
 
-            if (c == (byte)' ' || c == (byte)'\t') {
+            if (c == (byte)' ' || c == (byte)'\t')
+            {
                 nuint run = SkipSpaces(line, at);
                 into.Add(Token.Of(TokenKind.Whitespace, at, run - at));
                 at = run;
                 continue;
             }
 
-            if (c == (byte)'/' && at + 1u < size) {
+            if (c == (byte)'/' && at + 1u < size)
+            {
                 byte next = line.ByteAt(at + 1u);
-                if (next == (byte)'/') {
+                if (next == (byte)'/')
+                {
                     // `///` is documentation; `//` is a note. Three slashes and
                     // not four: `////` is a ruled line, and the compiler treats
                     // it as an ordinary comment.
@@ -242,9 +263,11 @@ public class Scanner {
                                       at, size - at));
                     return state;
                 }
-                if (next == (byte)'*') {
+                if (next == (byte)'*')
+                {
                     nuint close = FindBlockEnd(line, at + 2u);
-                    if (close == NotClosed) {
+                    if (close == NotClosed)
+                    {
                         into.Add(Token.Of(TokenKind.BlockComment, at, size - at));
                         return ScanState.InBlockComment;
                     }
@@ -254,9 +277,14 @@ public class Scanner {
                 }
             }
 
-            if (c == (byte)'"') { at = ScanText(line, at, into); continue; }
+            if (c == (byte)'"')
+            {
+                at = ScanText(line, at, into);
+                continue;
+            }
 
-            if (c == (byte)'$' && at + 1u < size && line.ByteAt(at + 1u) == (byte)'"') {
+            if (c == (byte)'$' && at + 1u < size && line.ByteAt(at + 1u) == (byte)'"')
+            {
                 // The `$` belongs to the string, and what is inside the holes is
                 // lexed as ordinary code by `ScanText`.
                 into.Add(Token.Of(TokenKind.Text, at, 1u));
@@ -264,21 +292,36 @@ public class Scanner {
                 continue;
             }
 
-            if (c == (byte)'\'') { at = ScanCharacter(line, at, into); continue; }
-
-            if (IsDigit(c)) { at = ScanNumber(line, at, into); continue; }
-
-            if (IsWordStart(c)) { at = ScanWord(line, at, into); continue; }
-
-            if (IsBracket(c)) {
-                into.Add(Token.Of(TokenKind.Bracket, at, 1u));
-                at += 1u;
+            if (c == (byte)'\'')
+            {
+                at = ScanCharacter(line, at, into);
                 continue;
             }
 
-            if (IsOperator(c)) {
+            if (IsDigit(c))
+            {
+                at = ScanNumber(line, at, into);
+                continue;
+            }
+
+            if (IsWordStart(c))
+            {
+                at = ScanWord(line, at, into);
+                continue;
+            }
+
+            if (IsBracket(c))
+            {
+                into.Add(Token.Of(TokenKind.Bracket, at, 1u));
+                at++;
+                continue;
+            }
+
+            if (IsOperator(c))
+            {
                 nuint run = at;
-                while (run < size && IsOperator(line.ByteAt(run))) { run += 1u; }
+                while (run < size && IsOperator(line.ByteAt(run)))
+                    run += 1u;
                 into.Add(Token.Of(TokenKind.Operator, at, run - at));
                 at = run;
                 continue;
@@ -290,7 +333,7 @@ public class Scanner {
             // `Unknown` differently, and a stray non-ASCII byte in code is
             // already a mistake the compiler will name.
             into.Add(Token.Of(TokenKind.Unknown, at, 1u));
-            at += 1u;
+            at++;
         }
 
         return state;
@@ -299,17 +342,31 @@ public class Scanner {
     // ------------------------------------------------------------ the parts
 
     /// A word, and which of the three kinds of word it is.
-    nuint ScanWord(String line, nuint at, List<Token> into) {
+    nuint ScanWord(String line, nuint at, List<Token> into)
+    {
         nuint size = line.ByteLength();
         nuint run = at;
-        while (run < size && IsWordPart(line.ByteAt(run))) { run += 1u; }
+        while (run < size && IsWordPart(line.ByteAt(run)))
+            run += 1u;
 
         String word = line.Substring(at, run - at);
         var kind = TokenKind.Identifier;
-        if (primitives.ContainsKey(word))       { kind = TokenKind.TypeName; }
-        else if (keywords.ContainsKey(word))    { kind = TokenKind.Keyword; }
-        else if (contextual.ContainsKey(word))  { kind = TokenKind.ContextualKeyword; }
-        else if (LooksLikeAType(word))          { kind = TokenKind.TypeName; }
+        if (_primitives.ContainsKey(word))
+        {
+            kind = TokenKind.TypeName;
+        }
+        else if (_keywords.ContainsKey(word))
+        {
+            kind = TokenKind.Keyword;
+        }
+        else if (_contextual.ContainsKey(word))
+        {
+            kind = TokenKind.ContextualKeyword;
+        }
+        else if (LooksLikeAType(word))
+        {
+            kind = TokenKind.TypeName;
+        }
 
         into.Add(Token.Of(kind, at, run - at));
         return run;
@@ -327,8 +384,10 @@ public class Scanner {
     /// This is the line the compiler service is on the other side of. When one
     /// exists, what it answers replaces this and the rule stays as the fallback
     /// for a file that has not been analysed yet.
-    bool LooksLikeAType(String word) {
-        if (word.ByteLength() < 2u) { return false; }
+    bool LooksLikeAType(String word)
+    {
+        if (word.ByteLength() < 2u)
+            return false;
         byte first = word.ByteAt(0u);
         // `HWND` and `IO` are types; `MAX` may not be, but a word in capitals
         // is a constant either way, and the two want the same colour far more
@@ -343,19 +402,27 @@ public class Scanner {
     /// **The holes of an interpolated string are lexed as code**, which is what
     /// makes `$"total: {Count(items)}"` read as the call it contains rather
     /// than as one undifferentiated run of text.
-    nuint ScanText(String line, nuint at, List<Token> into) {
+    nuint ScanText(String line, nuint at, List<Token> into)
+    {
         nuint size = line.ByteLength();
         nuint run = at + 1u;
         nuint textStart = at;
 
-        while (run < size) {
+        while (run < size)
+        {
             byte c = line.ByteAt(run);
 
-            if (c == (byte)'\\' && run + 1u < size) { run += 2u; continue; }
+            if (c == (byte)'\\' && run + 1u < size)
+            {
+                run += 2u;
+                continue;
+            }
 
-            if (c == (byte)'{') {
+            if (c == (byte)'{')
+            {
                 // A doubled brace is one literal brace, not a hole.
-                if (run + 1u < size && line.ByteAt(run + 1u) == (byte)'{') {
+                if (run + 1u < size && line.ByteAt(run + 1u) == (byte)'{')
+                {
                     run += 2u;
                     continue;
                 }
@@ -365,15 +432,17 @@ public class Scanner {
                 continue;
             }
 
-            if (c == (byte)'"') {
+            if (c == (byte)'"')
+            {
                 into.Add(Token.Of(TokenKind.Text, textStart, run - textStart + 1u));
                 return run + 1u;
             }
 
-            run += 1u;
+            run++;
         }
 
-        if (run > textStart) { into.Add(Token.Of(TokenKind.Text, textStart, run - textStart)); }
+        if (run > textStart)
+            into.Add(Token.Of(TokenKind.Text, textStart, run - textStart));
         return run;
     }
 
@@ -382,28 +451,37 @@ public class Scanner {
     /// The closing brace is left for the string to take, so that the braces are
     /// coloured as the string they belong to rather than as the code between
     /// them. A hole that is never closed simply runs to the end of the line.
-    nuint ScanHole(String line, nuint at, List<Token> into) {
+    nuint ScanHole(String line, nuint at, List<Token> into)
+    {
         nuint size = line.ByteLength();
         nuint run = at;
         nuint depth = 1u;
 
-        while (run < size) {
+        while (run < size)
+        {
             byte c = line.ByteAt(run);
-            if (c == (byte)'{') { depth += 1u; }
-            else if (c == (byte)'}') {
-                depth -= 1u;
-                if (depth == 0u) { break; }
+            if (c == (byte)'{')
+            {
+                depth += 1u;
             }
-            run += 1u;
+            else if (c == (byte)'}')
+            {
+                depth--;
+                if (depth == 0u)
+                    break;
+            }
+            run++;
         }
 
         // Lexed as its own little line, and the offsets shifted back on to this
         // one. Recursive, which a hole containing a string makes necessary and
         // which terminates because the inner text is strictly shorter.
-        if (run > at) {
+        if (run > at)
+        {
             var inner = new List<Token>();
             ScanLine(line.Substring(at, run - at), ScanState.Normal, inner);
-            foreach (var token in inner) {
+            foreach (var token in inner)
+            {
                 into.Add(Token.Of(token.Kind, at + token.Start, token.Length));
             }
         }
@@ -412,14 +490,24 @@ public class Scanner {
 
     /// A character literal. Same shape as a string and a different colour, and
     /// the same tolerance of never being closed.
-    nuint ScanCharacter(String line, nuint at, List<Token> into) {
+    nuint ScanCharacter(String line, nuint at, List<Token> into)
+    {
         nuint size = line.ByteLength();
         nuint run = at + 1u;
-        while (run < size) {
+        while (run < size)
+        {
             byte c = line.ByteAt(run);
-            if (c == (byte)'\\' && run + 1u < size) { run += 2u; continue; }
-            if (c == (byte)'\'') { run += 1u; break; }
-            run += 1u;
+            if (c == (byte)'\\' && run + 1u < size)
+            {
+                run += 2u;
+                continue;
+            }
+            if (c == (byte)'\'')
+            {
+                run += 1u;
+                break;
+            }
+            run++;
         }
         into.Add(Token.Of(TokenKind.Character, at, run - at));
         return run;
@@ -430,25 +518,34 @@ public class Scanner {
     /// Deliberately loose: `0x1Fu`, `1_000`, `3.14e-2f` and `1.2.3` all come
     /// out as one `Number`. What an editor needs is where the number ends, and
     /// it ends where something that is plainly not part of one begins.
-    nuint ScanNumber(String line, nuint at, List<Token> into) {
+    nuint ScanNumber(String line, nuint at, List<Token> into)
+    {
         nuint size = line.ByteLength();
         nuint run = at;
 
-        while (run < size) {
+        while (run < size)
+        {
             byte c = line.ByteAt(run);
-            if (IsWordPart(c) || c == (byte)'.') {
+            if (IsWordPart(c) || c == (byte)'.')
+            {
                 // `1..2` is a range, not a number with two points in it, and
                 // `x.Count` after a number is a member access.
-                if (c == (byte)'.' && run + 1u < size && !IsDigit(line.ByteAt(run + 1u))) {
+                if (c == (byte)'.' && run + 1u < size && !IsDigit(line.ByteAt(run + 1u)))
+                {
                     break;
                 }
-                run += 1u;
+                run++;
                 continue;
             }
             // An exponent's sign is part of the number, and only there.
-            if ((c == (byte)'+' || c == (byte)'-') && run > at) {
+            if ((c == (byte)'+' || c == (byte)'-') && run > at)
+            {
                 byte previous = line.ByteAt(run - 1u);
-                if (previous == (byte)'e' || previous == (byte)'E') { run += 1u; continue; }
+                if (previous == (byte)'e' || previous == (byte)'E')
+                {
+                    run += 1u;
+                    continue;
+                }
             }
             break;
         }
@@ -460,32 +557,39 @@ public class Scanner {
     // ------------------------------------------------------------ the bytes
 
     /// Where the `*/` after `from` ends, or `NotClosed`.
-    nuint FindBlockEnd(String line, nuint from) {
+    nuint FindBlockEnd(String line, nuint from)
+    {
         nuint size = line.ByteLength();
         nuint run = from;
-        while (run + 1u < size) {
-            if (line.ByteAt(run) == (byte)'*' && line.ByteAt(run + 1u) == (byte)'/') {
+        while (run + 1u < size)
+        {
+            if (line.ByteAt(run) == (byte)'*' && line.ByteAt(run + 1u) == (byte)'/')
+            {
                 return run + 2u;
             }
-            run += 1u;
+            run++;
         }
         return NotClosed;
     }
 
-    nuint SkipSpaces(String line, nuint from) {
+    nuint SkipSpaces(String line, nuint from)
+    {
         nuint size = line.ByteLength();
         nuint run = from;
-        while (run < size) {
+        while (run < size)
+        {
             byte c = line.ByteAt(run);
-            if (c != (byte)' ' && c != (byte)'\t') { break; }
-            run += 1u;
+            if (c != (byte)' ' && c != (byte)'\t')
+                break;
+            run++;
         }
         return run;
     }
 
-    bool IsDigit(byte c) { return c >= (byte)'0' && c <= (byte)'9'; }
+    bool IsDigit(byte c) => c >= (byte)'0' && c <= (byte)'9';
 
-    bool IsWordStart(byte c) {
+    bool IsWordStart(byte c)
+    {
         return (c >= (byte)'a' && c <= (byte)'z')
             || (c >= (byte)'A' && c <= (byte)'Z')
             || c == (byte)'_'
@@ -495,16 +599,18 @@ public class Scanner {
             || c >= 0x80u;
     }
 
-    bool IsWordPart(byte c) { return IsWordStart(c) || IsDigit(c); }
+    bool IsWordPart(byte c) => IsWordStart(c) || IsDigit(c);
 
-    bool IsBracket(byte c) {
+    bool IsBracket(byte c)
+    {
         return c == (byte)'(' || c == (byte)')'
             || c == (byte)'{' || c == (byte)'}'
             || c == (byte)'[' || c == (byte)']'
             || c == (byte)';' || c == (byte)',';
     }
 
-    bool IsOperator(byte c) {
+    bool IsOperator(byte c)
+    {
         return c == (byte)'+' || c == (byte)'-' || c == (byte)'*' || c == (byte)'/'
             || c == (byte)'%' || c == (byte)'=' || c == (byte)'<' || c == (byte)'>'
             || c == (byte)'!' || c == (byte)'&' || c == (byte)'|' || c == (byte)'^'

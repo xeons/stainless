@@ -56,7 +56,8 @@ public const int EPOLL_CLOEXEC = 0x80000;
 /// bytes of padding after `events` and hand the kernel a 16-byte struct it
 /// reads the wrong fields out of.
 [Packed]
-public struct epoll_event {
+public struct epoll_event
+{
     public uint events;
 
     /// Whatever the program put there when it added the entry, handed back
@@ -92,14 +93,16 @@ public const int TFD_NONBLOCK = 0x800;
 public const int TFD_TIMER_ABSTIME = 1;
 
 /// `struct timespec`.
-public struct timespec {
+public struct timespec
+{
     public long tv_sec;
     public long tv_nsec;
 }
 
 /// `struct itimerspec`. A first firing, and an interval to repeat at — an
 /// interval of zero fires once.
-public struct itimerspec {
+public struct itimerspec
+{
     public timespec it_interval;
     public timespec it_value;
 }
@@ -141,8 +144,9 @@ public const uint IN_ALL_EDITS = 0x000003C8u;
 /// followed by its own name, so walking the buffer means stepping by
 /// `sizeof(inotify_event) + len` rather than by a fixed size. That is the one
 /// thing about inotify that catches everybody.
-public struct inotify_event {
-    public int  wd;          // which watch, as add_watch answered
+public struct inotify_event
+{
+    public int wd;          // which watch, as add_watch answered
     public uint mask;        // what happened
     public uint cookie;      // pairs a MOVED_FROM with its MOVED_TO
     public uint len;         // bytes of name that follow, padding included
@@ -150,7 +154,8 @@ public struct inotify_event {
 
 // ================================================================ the calls
 
-public extern "C" {
+public extern "C"
+{
     /// Makes an epoll descriptor. `flags` is 0 or `EPOLL_CLOEXEC`; the older
     /// `epoll_create` took a size and ignored it.
     int epoll_create1(int flags);
@@ -189,7 +194,7 @@ public extern "C" {
 }
 
 /// `errno`, which every call above reports through rather than returning.
-public int Errno() { return *__errno_location(); }
+public int Errno() => *__errno_location();
 
 /// A read or a wait that a signal interrupted. Not an error: ask again.
 public const int EINTR = 4;

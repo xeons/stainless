@@ -82,7 +82,8 @@ public using GtkWidget = byte;
 /// its *size* is public, because callers put one on the stack. Eighty bytes on
 /// a 64-bit build, which is what the fourteen members come to, and it is
 /// declared as bytes because nothing here should be tempted to read them.
-public struct GtkTextIter {
+public struct GtkTextIter
+{
     public byte[80] Private;
 }
 
@@ -151,7 +152,8 @@ public const gint GTK_JUSTIFY_FILL   = 3;
 
 // ============================================================ start and stop
 
-public extern "C" {
+public extern "C"
+{
     /// Starts GTK, **ending the program** if there is no display. `argc` and
     /// `argv` may both be null, which says the toolkit gets no command line of
     /// its own to parse.
@@ -192,7 +194,8 @@ public extern "C" {
 
 // ==================================================================== widget
 
-public extern "C" {
+public extern "C"
+{
     void gtk_widget_show(GtkWidget* widget);
 
     /// Shows the widget and everything inside it. What a window wants once,
@@ -256,7 +259,8 @@ public extern "C" {
 
 // ================================================================= container
 
-public extern "C" {
+public extern "C"
+{
     void gtk_container_add(GtkWidget* container, GtkWidget* child);
     void gtk_container_remove(GtkWidget* container, GtkWidget* child);
     void gtk_container_set_border_width(GtkWidget* container, guint width);
@@ -268,7 +272,8 @@ public extern "C" {
 
 // ==================================================================== window
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_window_new(gint type);
 
     void gtk_window_set_title(GtkWidget* window, gchar* title);
@@ -293,7 +298,8 @@ public extern "C" {
 
 // ======================================================================= box
 
-public extern "C" {
+public extern "C"
+{
     /// `expand` is whether the child takes a share of the extra space, `fill`
     /// whether it grows into the share it took. The pair reads oddly until you
     /// want a centred button: expand true, fill false.
@@ -309,7 +315,8 @@ public extern "C" {
 
 // ==================================================================== button
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_button_new();
     GtkWidget* gtk_button_new_with_label(gchar* label);
 
@@ -348,7 +355,8 @@ public extern "C" {
 
 // ===================================================================== label
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_label_new(gchar* text);
 
     void   gtk_label_set_text(GtkWidget* label, gchar* text);
@@ -368,7 +376,8 @@ public extern "C" {
 
 // ===================================================================== entry
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_entry_new();
 
     void gtk_entry_set_text(GtkWidget* entry, gchar* text);
@@ -396,7 +405,8 @@ public extern "C" {
 
 // ================================================================= text view
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_text_view_new();
 
     /// The buffer, **borrowed** and owned by the view.
@@ -435,7 +445,8 @@ public const gint GTK_WRAP_WORD_CHAR = 3;
 
 // =========================================================== scrolled window
 
-public extern "C" {
+public extern "C"
+{
     /// Both adjustments null means "make your own", which is what every caller
     /// wants.
     GtkWidget* gtk_scrolled_window_new(gpointer horizontal, gpointer vertical);
@@ -445,7 +456,8 @@ public extern "C" {
 
 // ================================================================== combo box
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_combo_box_text_new();
     GtkWidget* gtk_combo_box_text_new_with_entry();
 
@@ -462,7 +474,8 @@ public extern "C" {
 
 // =============================================================== progress bar
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_progress_bar_new();
 
     /// 0.0 to 1.0.
@@ -477,7 +490,8 @@ public extern "C" {
 
 // ================================================================ spin button
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_spin_button_new_with_range(gdouble minimum, gdouble maximum, gdouble step);
 
     gdouble gtk_spin_button_get_value(GtkWidget* spin);
@@ -488,7 +502,8 @@ public extern "C" {
 
 // ===================================================================== range
 
-public extern "C" {
+public extern "C"
+{
     gdouble gtk_range_get_value(GtkWidget* range);
     void    gtk_range_set_value(GtkWidget* range, gdouble value);
     void    gtk_range_set_increments(GtkWidget* range, gdouble step, gdouble page);
@@ -496,7 +511,8 @@ public extern "C" {
 
 // ===================================================================== menus
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_menu_bar_new();
     GtkWidget* gtk_menu_new();
 
@@ -523,7 +539,8 @@ public extern "C" {
 
 // ================================================================== notebook
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_notebook_new();
 
     /// The page index, or -1. `label` is a widget, usually a `GtkLabel`.
@@ -537,7 +554,8 @@ public extern "C" {
 
 // ================================================================= statusbar
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_statusbar_new();
 
     /// A context id for a category of message, so that two parts of a program
@@ -550,7 +568,8 @@ public extern "C" {
 
 // ============================================================== drawing area
 
-public extern "C" {
+public extern "C"
+{
     /// A widget that draws nothing, so that a program can draw everything.
     ///
     /// It emits `draw` with a `cairo_t*` already clipped to the region
@@ -561,7 +580,8 @@ public extern "C" {
 
 // =================================================================== dialogs
 
-public extern "C" {
+public extern "C"
+{
     /// Variadic, and the format string is the message. Passing a caller's text
     /// straight in would let a `%s` in it read the stack, so the wrapper
     /// passes `"%s"` and the text as an argument -- the same rule `printf` has
@@ -598,7 +618,8 @@ public const guint GTK_STYLE_PROVIDER_PRIORITY_USER        = 800u;
 
 // ==================================================================== layout
 
-public extern "C" {
+public extern "C"
+{
     /// One call for both directions. `GTK_ORIENTATION_HORIZONTAL` is a row.
     GtkWidget* gtk_box_new(gint orientation, gint spacing);
 
@@ -614,7 +635,8 @@ public extern "C" {
 
 // ====================================================================== grid
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_grid_new();
 
     /// `left` and `top` are the cell, `width` and `height` the span in cells
@@ -632,7 +654,8 @@ public extern "C" {
 
 // =========================================================== widget geometry
 
-public extern "C" {
+public extern "C"
+{
     void gtk_widget_set_halign(GtkWidget* widget, gint align);
     void gtk_widget_set_valign(GtkWidget* widget, gint align);
     void gtk_widget_set_hexpand(GtkWidget* widget, gboolean expand);
@@ -653,14 +676,16 @@ public extern "C" {
 
 // ===================================================================== entry
 
-public extern "C" {
+public extern "C"
+{
     /// The grey text an empty entry shows.
     void gtk_entry_set_placeholder_text(GtkWidget* entry, gchar* text);
 }
 
 // ================================================================ the rest
 
-public extern "C" {
+public extern "C"
+{
     /// The version as three numbers.
     guint gtk_get_major_version();
     guint gtk_get_minor_version();
@@ -686,7 +711,8 @@ public extern "C" {
 
 // ================================================================ header bar
 
-public extern "C" {
+public extern "C"
+{
     /// The title bar drawn by the application rather than the window manager.
     GtkWidget* gtk_header_bar_new();
 
@@ -704,7 +730,8 @@ public const guint GTK_STATE_FLAG_NORMAL = 0u;
 
 // ================================================================= clipboard
 
-public extern "C" {
+public extern "C"
+{
     /// The clipboard for a selection atom, **borrowed** -- one object per
     /// selection per display, owned by GTK and never unreferenced.
     ///
@@ -733,11 +760,12 @@ public extern "C" {
 /// GDK's atoms are `(GdkAtom)(gsize)value` for the built-in ones, and the
 /// clipboard selection is atom 69 -- what `gdk_atom_intern("CLIPBOARD")` would
 /// answer without the call.
-public gpointer ClipboardSelection() { return (gpointer)(nuint)69u; }
+public gpointer ClipboardSelection() => (gpointer)(nuint)69u;
 
 // ======================================================================= css
 
-public extern "C" {
+public extern "C"
+{
     /// The widget's style context, **borrowed**.
     gpointer gtk_widget_get_style_context(GtkWidget* widget);
 

@@ -34,27 +34,29 @@ import Forms.Platform;
 /// right means finding the next and previous character *boundary* rather than
 /// adding one. `NextCodePoint` does the first, and `Previous` below does the
 /// second the only way a UTF-8 string allows -- by walking from the start.
-public class Scratch : CustomControl {
-    String text;
-    nuint  at;
+public class Scratch : CustomControl
+{
+    String _text;
+    nuint _at;
 
     /// Where a click landed and has not been turned into a position yet, or -1
     /// for none. Answered during the next paint, because turning an x into a
     /// position means measuring text and a `Graphics` to measure with exists
     /// only while painting.
-    int pending;
+    int _pending;
 
-    public Scratch(WindowedControl parent) {
+    public Scratch(WindowedControl parent)
+    {
         base(parent);
-        text = "";
-        at = 0u;
-        pending = -1;
+        _text = "";
+        _at = 0u;
+        _pending = -1;
         Border = ControlBorder.Sunken;
         BackColor = Colors.White;
     }
 
     /// What has been typed into it.
-    public String Content => text;
+    public String Content => _text;
 
     /// Everything, every time, and nothing behind it.
     ///
@@ -62,7 +64,8 @@ public class Scratch : CustomControl {
     /// whole client area is the control's, and whatever it does not draw shows
     /// what the off-screen buffer held. Hence `Clear` on the first line, which
     /// is what nearly every one of these begins with.
-    protected override void OnPaint(PaintEventArgs args) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
         var canvas = args.Graphics;
         canvas.Clear(BackColor);
 
@@ -74,15 +77,17 @@ public class Scratch : CustomControl {
         // every text control here has to do instead.
         int height = canvas.MeasureString("Ag", Font).Height;
         int line = (ClientBounds.Height - height) / 2;
-        if (line < 0) { line = 0; }
+        if (line < 0)
+            line = 0;
 
-        if (pending >= 0) { PlaceFromClick(canvas, inset); }
+        if (_pending >= 0)
+            PlaceFromClick(canvas, inset);
 
-        canvas.DrawString(text, Font, ForeColor, inset, line);
+        canvas.DrawString(_text, Font, ForeColor, inset, line);
 
         // The caret goes after whatever is behind it, so what has to be
         // measured is the text up to the position rather than all of it.
-        var behind = canvas.MeasureString(text.Substring(0u, at), Font);
+        var behind = canvas.MeasureString(_text.Substring(0u, _at), Font);
         Caret = Rectangle.Of(inset + behind.Width, line, 1, height);
     }
 
@@ -92,20 +97,35 @@ public class Scratch : CustomControl {
     /// instead, after the platform has applied the keyboard layout and any dead
     /// keys, which is the only place it is a character rather than a key that
     /// happens to have a letter printed on it.
-    protected override void OnKeyDown(KeyEventArgs args) {
-        nuint size = text.ByteLength();
+    protected override void OnKeyDown(KeyEventArgs args)
+    {
+        nuint size = _text.ByteLength();
 
-        if (args.Key == Key.Left) { Move(Previous(at)); }
-        else if (args.Key == Key.Right) { Move(text.NextCodePoint(at)); }
-        else if (args.Key == Key.Home) { Move(0u); }
-        else if (args.Key == Key.End)  { Move(size); }
-        else if (args.Key == Key.Backspace && at > 0u) {
-            nuint back = Previous(at);
-            text = text.Substring(0u, back) + text.Substring(at);
+        if (args.Key == Key.Left)
+        {
+            Move(Previous(_at));
+        }
+        else if (args.Key == Key.Right)
+        {
+            Move(_text.NextCodePoint(_at));
+        }
+        else if (args.Key == Key.Home)
+        {
+            Move(0u);
+        }
+        else if (args.Key == Key.End)
+        {
+            Move(size);
+        }
+        else if (args.Key == Key.Backspace && _at > 0u)
+        {
+            nuint back = Previous(_at);
+            _text = _text.Substring(0u, back) + _text.Substring(_at);
             Move(back);
         }
-        else if (args.Key == Key.Delete && at < size) {
-            text = text.Substring(0u, at) + text.Substring(text.NextCodePoint(at));
+        else if (args.Key == Key.Delete && _at < size)
+        {
+            _text = _text.Substring(0u, _at) + _text.Substring(_text.NextCodePoint(_at));
             Invalidate();
         }
 
@@ -113,15 +133,17 @@ public class Scratch : CustomControl {
     }
 
     /// One character, already through the keyboard layout.
-    protected override void OnKeyPress(KeyPressEventArgs args) {
+    protected override void OnKeyPress(KeyPressEventArgs args)
+    {
         // Backspace and Return arrive here as characters as well, and neither
         // is one to insert. Everything below a space is a control code.
-        if (args.KeyChar >= ' ') {
+        if (args.KeyChar >= ' ')
+        {
             // Qualified, because `Text` inside a `Control` is the control's
             // own caption property and not the module the function is in.
             String typed = Standard.Text.FromChar((char32)args.KeyChar);
-            text = text.Substring(0u, at) + typed + text.Substring(at);
-            Move(at + typed.ByteLength());
+            _text = _text.Substring(0u, _at) + typed + _text.Substring(_at);
+            Move(_at + typed.ByteLength());
         }
         base.OnKeyPress(args);
     }
@@ -130,89 +152,106 @@ public class Scratch : CustomControl {
     ///
     /// The peer has taken the focus by the time this runs, which is what lets a
     /// handler for a click assume the control it is on has the keyboard.
-    protected override void OnMouseDown(MouseEventArgs args) {
-        pending = args.X;
+    protected override void OnMouseDown(MouseEventArgs args)
+    {
+        _pending = args.X;
         Invalidate();
         base.OnMouseDown(args);
     }
 
-    void Move(nuint to) {
-        at = to;
+    void Move(nuint to)
+    {
+        _at = to;
         Invalidate();
     }
 
     /// The character boundary before `index`, found by walking forward from the
     /// start -- which is the only way a UTF-8 string offers, since a byte does
     /// not say whether the one before it began a character.
-    nuint Previous(nuint index) {
-        if (index == 0u) { return 0u; }
+    nuint Previous(nuint index)
+    {
+        if (index == 0u)
+            return 0u;
         nuint walk = 0u;
         nuint last = 0u;
-        while (walk < index) {
+        while (walk < index)
+        {
             last = walk;
-            walk = text.NextCodePoint(walk);
+            walk = _text.NextCodePoint(walk);
         }
         return last;
     }
 
     /// Turns a click into a position, now that there is something to measure
     /// with: the first boundary whose text is wider than the click.
-    void PlaceFromClick(Graphics canvas, int inset) {
-        nuint size = text.ByteLength();
+    void PlaceFromClick(Graphics canvas, int inset)
+    {
+        nuint size = _text.ByteLength();
         nuint walk = 0u;
-        at = size;
-        while (walk <= size) {
-            var run = canvas.MeasureString(text.Substring(0u, walk), Font);
-            if (inset + run.Width >= pending) { at = walk; break; }
-            if (walk == size) { break; }
-            walk = text.NextCodePoint(walk);
+        _at = size;
+        while (walk <= size)
+        {
+            var run = canvas.MeasureString(_text.Substring(0u, walk), Font);
+            if (inset + run.Width >= _pending)
+            {
+                _at = walk;
+                break;
+            }
+            if (walk == size)
+                break;
+            walk = _text.NextCodePoint(walk);
         }
-        pending = -1;
+        _pending = -1;
     }
 }
 
-public class DrawnForm : Form {
-    Label   explain;
-    Scratch field;
-    Label   note;
+public class DrawnForm : Form
+{
+    Label _explain;
+    Scratch _field;
+    Label _note;
 
-    public DrawnForm() {
+    public DrawnForm()
+    {
         base(WindowBorder.Sizable);
         Text = "A drawn control";
         SetBounds(0, 0, 470, 180);
 
-        explain = new Label(this);
-        explain.SetBounds(12, 14, 440, 34);
-        explain.Text = "The box below is not a TextBox. It is a CustomControl: "
+        _explain = new Label(this);
+        _explain.SetBounds(12, 14, 440, 34);
+        _explain.Text = "The box below is not a TextBox. It is a CustomControl: "
                      + "a window with nothing in it, painting its own text and caret.";
 
-        field = new Scratch(this);
-        field.SetBounds(12, 58, 430, 28);
+        _field = new Scratch(this);
+        _field.SetBounds(12, 58, 430, 28);
 
-        note = new Label(this);
-        note.SetBounds(12, 98, 440, 34);
-        note.Text = "Type into it. Arrows, Home, End, Backspace and Delete work, "
+        _note = new Label(this);
+        _note.SetBounds(12, 98, 440, 34);
+        _note.Text = "Type into it. Arrows, Home, End, Backspace and Delete work, "
                   + "and clicking puts the caret where you clicked.";
     }
 
-    public Scratch Field => field;
+    public Scratch Field => _field;
 
     /// What can be checked with nobody in front of it.
-    public bool SelfTest() {
+    public bool SelfTest()
+    {
         bool ok = true;
 
-        field.Focus();
+        _field.Focus();
         Application.DoEvents();
-        if (!field.Focused) {
+        if (!_field.Focused)
+        {
             Console.WriteLine("FAIL: a CustomControl did not take the focus");
             ok = false;
         }
 
         // The caret is worked out while painting, so it means nothing until one
         // has happened.
-        field.Update();
+        _field.Update();
         Application.DoEvents();
-        if (field.Caret.Height <= 0) {
+        if (_field.Caret.Height <= 0)
+        {
             Console.WriteLine("FAIL: no caret after a paint");
             ok = false;
         }
@@ -220,18 +259,20 @@ public class DrawnForm : Form {
         // Typed through the notification interface rather than through the
         // keyboard, which is the only half of this a machine can drive: what it
         // proves is the control's own editing, not the platform's routing.
-        field.OnPlatformKeyPress('a');
-        field.OnPlatformKeyPress('b');
-        field.OnPlatformKeyPress('c');
-        if (field.Content != "abc") {
-            Console.WriteLine("FAIL: typing gave '" + field.Content + "', not 'abc'");
+        _field.OnPlatformKeyPress('a');
+        _field.OnPlatformKeyPress('b');
+        _field.OnPlatformKeyPress('c');
+        if (_field.Content != "abc")
+        {
+            Console.WriteLine("FAIL: typing gave '" + _field.Content + "', not 'abc'");
             ok = false;
         }
 
-        field.OnPlatformKeyDown(Key.Left, ModifierKeys.None);
-        field.OnPlatformKeyDown(Key.Backspace, ModifierKeys.None);
-        if (field.Content != "ac") {
-            Console.WriteLine("FAIL: left then backspace gave '" + field.Content
+        _field.OnPlatformKeyDown(Key.Left, ModifierKeys.None);
+        _field.OnPlatformKeyDown(Key.Backspace, ModifierKeys.None);
+        if (_field.Content != "ac")
+        {
+            Console.WriteLine("FAIL: left then backspace gave '" + _field.Content
                               + "', not 'ac'");
             ok = false;
         }
@@ -239,38 +280,45 @@ public class DrawnForm : Form {
         // A caret that is moved has to reach the platform, and the peer answers
         // an unchanged one with nothing at all -- so the check is that it moved
         // rather than that it was set.
-        field.Update();
+        _field.Update();
         Application.DoEvents();
-        int atEnd = field.Caret.X;
-        field.OnPlatformKeyDown(Key.Home, ModifierKeys.None);
-        field.Update();
+        int atEnd = _field.Caret.X;
+        _field.OnPlatformKeyDown(Key.Home, ModifierKeys.None);
+        _field.Update();
         Application.DoEvents();
-        if (field.Caret.X >= atEnd) {
+        if (_field.Caret.X >= atEnd)
+        {
             Console.WriteLine("FAIL: Home did not move the caret back");
             ok = false;
         }
 
-        if (ok) {
+        if (ok)
+        {
             Console.WriteLine("  focus, caret, typing, movement and deletion");
         }
         return ok;
     }
 }
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var form = new DrawnForm();
 
     bool testing = false;
     var arguments = Standard.Env.Arguments();
-    for (nuint i = 0u; i < arguments.Length; i += 1u) {
-        if (arguments[i] == "--selftest") { testing = true; }
+    for (nuint i = 0u; i < arguments.Length; i++)
+    {
+        if (arguments[i] == "--selftest")
+            testing = true;
     }
 
-    if (testing) {
+    if (testing)
+    {
         Console.WriteLine("CustomControl -- self test");
         form.Show();
-        for (int i = 0; i < 20; i += 1) { Application.DoEvents(); }
+        for (int i = 0; i < 20; i++)
+            Application.DoEvents();
         bool ok = form.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

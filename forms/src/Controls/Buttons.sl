@@ -46,19 +46,24 @@ import Forms.Platform;
 ///
 /// Abstract, because pressing is all it knows how to do and there is no such
 /// widget on any platform.
-public abstract class ButtonBase : WindowedControl {
-    protected ButtonBase(WindowedControl parent) { base(parent); }
+public abstract class ButtonBase : WindowedControl
+{
+    protected ButtonBase(WindowedControl parent) => base(parent);
 
     /// The button's caption, which is what `Text` already means.
-    public String Caption {
+    public String Caption
+    {
         get => Text;
-        set { Text = value; }
+        set => Text = value;
     }
 
-    public override Size PreferredSize {
-        get {
+    public override Size PreferredSize
+    {
+        get
+        {
             var peer = Peer;
-            if (peer == null) { return Size.Empty; }
+            if (peer == null)
+                return Size.Empty;
             return ((IControlPeer)peer).PreferredSize();
         }
     }
@@ -70,7 +75,7 @@ public abstract class ButtonBase : WindowedControl {
     /// of it. Raising the event rather than telling the platform to draw a
     /// press is deliberate -- what a caller wants is the effect, not the
     /// animation.
-    public void PerformClick() { OnClick(); }
+    public void PerformClick() => OnClick();
 }
 
 // ==================================================================== button
@@ -97,63 +102,73 @@ public abstract class ButtonBase : WindowedControl {
 /// stock glyph -- is not here. It is one table of translated strings and stock
 /// icon names serving one caller, and that caller is `ButtonPanel`, which now
 /// holds the table itself.
-public class Button : ButtonBase {
-    IPushButtonPeer native;
-    Bitmap?         glyph;
-    ImageAlignment  glyphAlign;
-    int             glyphGap;
+public class Button : ButtonBase
+{
+    IPushButtonPeer _native;
+    Bitmap? _glyph;
+    ImageAlignment _glyphAlign;
+    int _glyphGap;
 
-    public Button(WindowedControl parent) {
+    public Button(WindowedControl parent)
+    {
         base(parent);
-        glyph = null;
-        glyphAlign = ImageAlignment.Left;
-        glyphGap = 4;
-        native = WidgetSet.Current.CreateButton(this, ParentPeer());
-        AttachPeer(native);
+        _glyph = null;
+        _glyphAlign = ImageAlignment.Left;
+        _glyphGap = 4;
+        _native = WidgetSet.Current.CreateButton(this, ParentPeer());
+        AttachPeer(_native);
     }
 
     /// Whether Enter presses this button. At most one per window, and the
     /// platform is what enforces that -- so setting it on a second button is
     /// enough, and the first need not be unset.
-    public bool IsDefault {
-        get => isDefault;
-        set {
-            isDefault = value;
-            native.SetDefault(value);
+    public bool IsDefault
+    {
+        get => _isDefault;
+        set
+        {
+            _isDefault = value;
+            _native.SetDefault(value);
         }
     }
 
-    bool isDefault;
+    bool _isDefault;
 
     /// The picture drawn beside the caption, or null for none.
     ///
     /// **The button does not own it.** A `Bitmap` may be on ten buttons at once
     /// and is released when the last reference to it goes, which is what ARC is
     /// for; what the peer keeps is the platform's own copy of it.
-    public Bitmap? Image {
-        get => glyph;
-        set {
-            glyph = value;
-            native.SetImage(value == null ? null : ((Bitmap)value).Backend());
+    public Bitmap? Image
+    {
+        get => _glyph;
+        set
+        {
+            _glyph = value;
+            _native.SetImage(value == null ? null : ((Bitmap)value).Backend());
         }
     }
 
     /// Which side of the caption the picture sits on.
-    public ImageAlignment ImageAlign {
-        get => glyphAlign;
-        set {
-            glyphAlign = value;
-            native.SetImageAlign(value);
+    public ImageAlignment ImageAlign
+    {
+        get => _glyphAlign;
+        set
+        {
+            _glyphAlign = value;
+            _native.SetImageAlign(value);
         }
     }
 
     /// Pixels between the picture and the caption. `TBitBtn.Spacing`, which
     /// defaults to 4 there and here.
-    public int ImageSpacing {
-        get => glyphGap;
-        set {
-            glyphGap = value;
-            native.SetImageSpacing(value);
+    public int ImageSpacing
+    {
+        get => _glyphGap;
+        set
+        {
+            _glyphGap = value;
+            _native.SetImageSpacing(value);
         }
     }
 }
@@ -167,21 +182,24 @@ public class Button : ButtonBase {
 /// value that differs across a selection. Nothing here needs one yet, and a
 /// two-state box whose property is a `bool` is a much better thing to use than
 /// a three-state one whose property is an enum that is usually two of three.
-public class CheckBox : ButtonBase {
-    ICheckPeer native;
+public class CheckBox : ButtonBase
+{
+    ICheckPeer _native;
 
-    public CheckBox(WindowedControl parent) {
+    public CheckBox(WindowedControl parent)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateCheck(this, ParentPeer(), CheckKind.Check);
-        AttachPeer(native);
+        _native = WidgetSet.Current.CreateCheck(this, ParentPeer(), CheckKind.Check);
+        AttachPeer(_native);
     }
 
     /// For `RadioButton` and `ToggleButton`, each of which is the same widget
     /// with one style bit changed.
-    protected CheckBox(WindowedControl parent, CheckKind kind) {
+    protected CheckBox(WindowedControl parent, CheckKind kind)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateCheck(this, ParentPeer(), kind);
-        AttachPeer(native);
+        _native = WidgetSet.Current.CreateCheck(this, ParentPeer(), kind);
+        AttachPeer(_native);
     }
 
     /// Whether it is ticked.
@@ -199,23 +217,24 @@ public class CheckBox : ButtonBase {
     ///
     /// Virtual because a radio button has to clear its siblings when it is
     /// ticked, and a check box must not.
-    public virtual bool Checked {
-        get => native.GetChecked();
-        set { native.SetChecked(value); }
+    public virtual bool Checked
+    {
+        get => _native.GetChecked();
+        set => _native.SetChecked(value);
     }
 
     /// Sets the tick without telling anything else, for a derived class that
     /// has more to do around it.
-    protected void SetCheckedOnly(bool ticked) { native.SetChecked(ticked); }
+    protected void SetCheckedOnly(bool ticked) => _native.SetChecked(ticked);
 
     /// The tick changed, whoever changed it.
     public event EventHandler CheckedChanged;
 
-    protected virtual void OnCheckedChanged() { CheckedChanged(this); }
+    protected virtual void OnCheckedChanged() => CheckedChanged(this);
 
     /// The platform reports a tick as a change of value, which for this control
     /// means the tick and not the caption.
-    public override void OnPlatformValueChanged() { OnCheckedChanged(); }
+    public override void OnPlatformValueChanged() => OnCheckedChanged();
 }
 
 // ============================================================== radio button
@@ -227,8 +246,9 @@ public class CheckBox : ButtonBase {
 /// and is why a form with two sets of choices puts each set in its own `Panel`
 /// or `GroupBox`. A `GroupName` property would have to fight the platform for
 /// the behaviour it already has.
-public class RadioButton : CheckBox {
-    public RadioButton(WindowedControl parent) { base(parent, CheckKind.Radio); }
+public class RadioButton : CheckBox
+{
+    public RadioButton(WindowedControl parent) => base(parent, CheckKind.Radio);
 
     /// Ticking one unticks the rest of its group.
     ///
@@ -237,23 +257,31 @@ public class RadioButton : CheckBox {
     /// clears nothing, so a program that ticked one by hand ended up with two
     /// ticked and a group whose selected index was whichever came first. C#
     /// does exactly this in `RadioButton.Checked`, for the same reason.
-    public override bool Checked {
+    public override bool Checked
+    {
         get => base.Checked;
-        set {
+        set
+        {
             SetCheckedOnly(value);
-            if (!value) { return; }
+            if (!value)
+                return;
             ClearSiblings();
         }
     }
 
     /// Unticks every other radio button with the same parent, which is what
     /// makes a group a group on every platform.
-    void ClearSiblings() {
+    void ClearSiblings()
+    {
         var parent = Parent;
-        if (parent == null) { return; }
-        foreach (var sibling in ((WindowedControl)parent).Controls) {
-            if (sibling == this) { continue; }
-            if (sibling is RadioButton other) { other.SetCheckedOnly(false); }
+        if (parent == null)
+            return;
+        foreach (var sibling in ((WindowedControl)parent).Controls)
+        {
+            if (sibling == this)
+                continue;
+            if (sibling is RadioButton other)
+                other.SetCheckedOnly(false);
         }
     }
 }
@@ -285,8 +313,9 @@ public class RadioButton : CheckBox {
 /// A group of these is *not* a radio group: nothing unticks the others, which
 /// is what `RadioButton` is for. A toolbar's mutually exclusive buttons are
 /// `ToolButton` toggles and the program clears them, as they are in the LCL.
-public class ToggleButton : CheckBox {
-    public ToggleButton(WindowedControl parent) { base(parent, CheckKind.Toggle); }
+public class ToggleButton : CheckBox
+{
+    public ToggleButton(WindowedControl parent) => base(parent, CheckKind.Toggle);
 }
 
 // ============================================================= speed button
@@ -321,52 +350,58 @@ public enum ButtonState { Up, Down, Hot, Disabled }
 /// pen.GroupIndex = 1;
 /// pen.Down = true;
 /// ```
-public class SpeedButton : GraphicControl {
-    Bitmap?        glyph;
-    ImageAlignment glyphAlign;
-    int            margin;
-    int            spacing;
-    bool           flat;
-    bool           down;
-    bool           allowAllUp;
-    int            group;
-    bool           showCaption;
-    bool           hot;
-    bool           pressing;
-    HorizontalAlignment align;
+public class SpeedButton : GraphicControl
+{
+    Bitmap? _glyph;
+    ImageAlignment _glyphAlign;
+    int _margin;
+    int _spacing;
+    bool _flat;
+    bool _down;
+    bool _allowAllUp;
+    int _group;
+    bool _showCaption;
+    bool _hot;
+    bool _pressing;
+    HorizontalAlignment _align;
 
-    public SpeedButton(WindowedControl parent) {
+    public SpeedButton(WindowedControl parent)
+    {
         base(parent);
-        glyph = null;
-        glyphAlign = ImageAlignment.Left;
-        margin = -1;
-        spacing = 4;
-        flat = false;
-        down = false;
-        allowAllUp = false;
-        group = 0;
-        showCaption = true;
-        hot = false;
-        pressing = false;
-        align = HorizontalAlignment.Center;
+        _glyph = null;
+        _glyphAlign = ImageAlignment.Left;
+        _margin = -1;
+        _spacing = 4;
+        _flat = false;
+        _down = false;
+        _allowAllUp = false;
+        _group = 0;
+        _showCaption = true;
+        _hot = false;
+        _pressing = false;
+        _align = HorizontalAlignment.Center;
         Width = 23;
         Height = 22;
     }
 
     /// The picture, or null for a button that is only a caption.
-    public Bitmap? Image {
-        get => glyph;
-        set {
-            glyph = value;
+    public Bitmap? Image
+    {
+        get => _glyph;
+        set
+        {
+            _glyph = value;
             Invalidate();
         }
     }
 
     /// Which side of the caption the picture sits on.
-    public ImageAlignment ImageAlign {
-        get => glyphAlign;
-        set {
-            glyphAlign = value;
+    public ImageAlignment ImageAlign
+    {
+        get => _glyphAlign;
+        set
+        {
+            _glyphAlign = value;
             Invalidate();
         }
     }
@@ -377,19 +412,23 @@ public class SpeedButton : GraphicControl {
     /// `TSpeedButton.Margin` means exactly this, and the -1 is why: a button
     /// whose picture should sit in the middle is the common case, and a button
     /// whose picture should sit four pixels from the left is the rare one.
-    public int Margin {
-        get => margin;
-        set {
-            margin = value;
+    public int Margin
+    {
+        get => _margin;
+        set
+        {
+            _margin = value;
             Invalidate();
         }
     }
 
     /// Pixels between the picture and the caption.
-    public int Spacing {
-        get => spacing;
-        set {
-            spacing = value;
+    public int Spacing
+    {
+        get => _spacing;
+        set
+        {
+            _spacing = value;
             Invalidate();
         }
     }
@@ -398,10 +437,12 @@ public class SpeedButton : GraphicControl {
     ///
     /// What a toolbar button has looked like since Office 97, and what
     /// `TSpeedButton.Flat` turns on.
-    public bool Flat {
-        get => flat;
-        set {
-            flat = value;
+    public bool Flat
+    {
+        get => _flat;
+        set
+        {
+            _flat = value;
             Invalidate();
         }
     }
@@ -411,21 +452,26 @@ public class SpeedButton : GraphicControl {
     /// Setting this on a button with a `GroupIndex` raises the others in its
     /// group, exactly as ticking a radio button unticks its siblings -- and for
     /// the same reason, which is that a group with two down is not a group.
-    public bool Down {
-        get => down;
-        set {
-            if (group != 0 && value) { RaiseGroup(); }
-            down = value;
+    public bool Down
+    {
+        get => _down;
+        set
+        {
+            if (_group != 0 && value)
+                RaiseGroup();
+            _down = value;
             Invalidate();
         }
     }
 
     /// Which set of buttons this one belongs to. Zero -- the default -- is a
     /// button that does not stay down at all.
-    public int GroupIndex {
-        get => group;
-        set {
-            group = value;
+    public int GroupIndex
+    {
+        get => _group;
+        set
+        {
+            _group = value;
             Invalidate();
         }
     }
@@ -433,49 +479,66 @@ public class SpeedButton : GraphicControl {
     /// Whether clicking the one that is down raises it, leaving the group with
     /// nothing chosen. False, as in the LCL, because a palette usually has to
     /// have a tool selected.
-    public bool AllowAllUp {
-        get => allowAllUp;
-        set { allowAllUp = value; }
+    public bool AllowAllUp
+    {
+        get => _allowAllUp;
+        set => _allowAllUp = value;
     }
 
     /// Whether the caption is drawn at all. A palette of icons sets this false
     /// and keeps its `Text` for the tooltip it will one day have.
-    public bool ShowCaption {
-        get => showCaption;
-        set {
-            showCaption = value;
+    public bool ShowCaption
+    {
+        get => _showCaption;
+        set
+        {
+            _showCaption = value;
             Invalidate();
         }
     }
 
     /// Where the caption sits across the room left for it.
-    public HorizontalAlignment Alignment {
-        get => align;
-        set {
-            align = value;
+    public HorizontalAlignment Alignment
+    {
+        get => _align;
+        set
+        {
+            _align = value;
             Invalidate();
         }
     }
 
     /// What it would be drawn as right now.
-    public ButtonState State {
-        get {
-            if (!Enabled)         { return ButtonState.Disabled; }
-            if (down || pressing) { return ButtonState.Down; }
-            if (hot)              { return ButtonState.Hot; }
+    public ButtonState State
+    {
+        get
+        {
+            if (!Enabled)
+                return ButtonState.Disabled;
+            if (_down || _pressing)
+                return ButtonState.Down;
+            if (_hot)
+                return ButtonState.Hot;
             return ButtonState.Up;
         }
     }
 
     /// Raises every other button of this one's group.
-    void RaiseGroup() {
+    void RaiseGroup()
+    {
         var parent = Parent;
-        if (parent == null) { return; }
-        foreach (var sibling in ((WindowedControl)parent).Controls) {
-            if (sibling == this) { continue; }
-            if (sibling is SpeedButton other) {
-                if (other.GroupIndex != group) { continue; }
-                if (!other.Down) { continue; }
+        if (parent == null)
+            return;
+        foreach (var sibling in ((WindowedControl)parent).Controls)
+        {
+            if (sibling == this)
+                continue;
+            if (sibling is SpeedButton other)
+            {
+                if (other.GroupIndex != _group)
+                    continue;
+                if (!other.Down)
+                    continue;
                 other.SetDownOnly(false);
             }
         }
@@ -483,8 +546,9 @@ public class SpeedButton : GraphicControl {
 
     /// Raises or presses without touching the group, for a sibling being raised
     /// by the one that was just pressed.
-    void SetDownOnly(bool pressed) {
-        down = pressed;
+    void SetDownOnly(bool pressed)
+    {
+        _down = pressed;
         Invalidate();
     }
 
@@ -494,46 +558,56 @@ public class SpeedButton : GraphicControl {
     // parent's to notice -- which it does by hit-testing, and which is the same
     // machinery a `Splitter` runs on.
 
-    protected override void OnMouseEnter() {
+    protected override void OnMouseEnter()
+    {
         base.OnMouseEnter();
-        hot = true;
+        _hot = true;
         Invalidate();
     }
 
-    protected override void OnMouseLeave() {
+    protected override void OnMouseLeave()
+    {
         base.OnMouseLeave();
-        hot = false;
+        _hot = false;
         // A press abandoned by dragging off the button is not a click, so the
         // pressed look goes with it and `OnMouseUp` finds nothing to do.
-        pressing = false;
+        _pressing = false;
         Invalidate();
     }
 
-    protected override void OnMouseDown(MouseEventArgs args) {
+    protected override void OnMouseDown(MouseEventArgs args)
+    {
         base.OnMouseDown(args);
-        if (args.Button != MouseButton.Left) { return; }
-        if (!Enabled) { return; }
-        pressing = true;
+        if (args.Button != MouseButton.Left)
+            return;
+        if (!Enabled)
+            return;
+        _pressing = true;
         CaptureMouse(true);
         Invalidate();
     }
 
-    protected override void OnMouseUp(MouseEventArgs args) {
+    protected override void OnMouseUp(MouseEventArgs args)
+    {
         base.OnMouseUp(args);
-        if (!pressing) { return; }
-        pressing = false;
+        if (!_pressing)
+            return;
+        _pressing = false;
         CaptureMouse(false);
 
         bool inside = args.X >= 0 && args.Y >= 0 && args.X < Width && args.Y < Height;
-        if (inside) { Toggle(); }
+        if (inside)
+            Toggle();
         Invalidate();
-        if (inside) { OnClick(); }
+        if (inside)
+            OnClick();
     }
 
     /// Raises `Click` as though it had been pressed, and moves the group with
     /// it. What `ButtonBase.PerformClick` is, on the one button that is not a
     /// `ButtonBase`.
-    public void PerformClick() {
+    public void PerformClick()
+    {
         Toggle();
         Invalidate();
         OnClick();
@@ -542,21 +616,27 @@ public class SpeedButton : GraphicControl {
     /// What a completed press does to a grouped button: presses it and raises
     /// the rest, or -- if it was the one down and the group may be empty --
     /// raises it. A button with no group does nothing here.
-    void Toggle() {
-        if (group == 0) { return; }
-        if (down) {
-            if (allowAllUp) { down = false; }
+    void Toggle()
+    {
+        if (_group == 0)
+            return;
+        if (_down)
+        {
+            if (_allowAllUp)
+                _down = false;
             return;
         }
         RaiseGroup();
-        down = true;
+        _down = true;
     }
 
     // ---------------------------------------------------------- the drawing
 
-    public override Size PreferredSize {
-        get {
-            var picture = glyph;
+    public override Size PreferredSize
+    {
+        get
+        {
+            var picture = _glyph;
             int glyphWide = picture == null ? 0 : ((Bitmap)picture).Width;
             int glyphHigh = picture == null ? 0 : ((Bitmap)picture).Height;
 
@@ -565,16 +645,19 @@ public class SpeedButton : GraphicControl {
             // plus its margins, floored at a Windows button's smallest size,
             // which is what a palette button wants and all `AutoSize` can
             // honestly promise for one that also has text.
-            int room = margin < 0 ? 4 : margin;
+            int room = _margin < 0 ? 4 : _margin;
             int wide = glyphWide + room * 2;
             int high = glyphHigh + room * 2;
-            if (wide < 23) { wide = 23; }
-            if (high < 22) { high = 22; }
+            if (wide < 23)
+                wide = 23;
+            if (high < 22)
+                high = 22;
             return Size.Of(wide, high);
         }
     }
 
-    protected override void OnPaint(PaintEventArgs args) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
         var surface = args.Graphics;
         var whole = Rectangle.Of(0, 0, Width, Height);
         var state = State;
@@ -583,24 +666,26 @@ public class SpeedButton : GraphicControl {
         // which is what lets whatever it sits on show through it. That is the
         // only difference between flat and not, and it is why `Flat` is one
         // test in two places rather than a second paint routine.
-        bool face = !flat || state == ButtonState.Down || state == ButtonState.Hot;
-        if (face) {
+        bool face = !_flat || state == ButtonState.Down || state == ButtonState.Hot;
+        if (face)
+        {
             surface.FillRectangle(new Brush(BackColor), whole);
             DrawEdge(surface, whole, state == ButtonState.Down);
         }
 
-        var picture = glyph;
+        var picture = _glyph;
         int glyphWide = picture == null ? 0 : ((Bitmap)picture).Width;
         int glyphHigh = picture == null ? 0 : ((Bitmap)picture).Height;
 
-        var caption = showCaption ? Text : "";
+        var caption = _showCaption ? Text : "";
         var textSize = caption.IsEmpty() ? Size.Empty
                                          : surface.MeasureString(caption, Font);
-        int gap = (glyphWide > 0 && !caption.IsEmpty()) ? spacing : 0;
-        if (gap < 0) { gap = 0; }
+        int gap = (glyphWide > 0 && !caption.IsEmpty()) ? _spacing : 0;
+        if (gap < 0)
+            gap = 0;
 
-        bool sideways = glyphAlign == ImageAlignment.Left
-                     || glyphAlign == ImageAlignment.Right;
+        bool sideways = _glyphAlign == ImageAlignment.Left
+                     || _glyphAlign == ImageAlignment.Right;
 
         // The picture and the caption as one block, sized on the axis they
         // share and on the axis they stack.
@@ -613,33 +698,47 @@ public class SpeedButton : GraphicControl {
         // pixels from the edge the picture is on. `TSpeedButton.Margin` again.
         int startX = (Width - blockWide) / 2;
         int startY = (Height - blockHigh) / 2;
-        if (margin >= 0) {
-            if (glyphAlign == ImageAlignment.Left)   { startX = margin; }
-            if (glyphAlign == ImageAlignment.Right)  { startX = Width - margin - blockWide; }
-            if (glyphAlign == ImageAlignment.Top)    { startY = margin; }
-            if (glyphAlign == ImageAlignment.Bottom) { startY = Height - margin - blockHigh; }
+        if (_margin >= 0)
+        {
+            if (_glyphAlign == ImageAlignment.Left)
+                startX = _margin;
+            if (_glyphAlign == ImageAlignment.Right)
+                startX = Width - _margin - blockWide;
+            if (_glyphAlign == ImageAlignment.Top)
+                startY = _margin;
+            if (_glyphAlign == ImageAlignment.Bottom)
+                startY = Height - _margin - blockHigh;
         }
-        if (startX < 0) { startX = 0; }
-        if (startY < 0) { startY = 0; }
+        if (startX < 0)
+            startX = 0;
+        if (startY < 0)
+            startY = 0;
 
         int glyphX = startX;
         int glyphY = startY;
         int textX = startX;
         int textY = startY;
 
-        if (glyphAlign == ImageAlignment.Left) {
+        if (_glyphAlign == ImageAlignment.Left)
+        {
             glyphY = startY + (blockHigh - glyphHigh) / 2;
             textX = startX + glyphWide + gap;
             textY = startY + (blockHigh - textSize.Height) / 2;
-        } else if (glyphAlign == ImageAlignment.Right) {
+        }
+        else if (_glyphAlign == ImageAlignment.Right)
+        {
             glyphX = startX + textSize.Width + gap;
             glyphY = startY + (blockHigh - glyphHigh) / 2;
             textY = startY + (blockHigh - textSize.Height) / 2;
-        } else if (glyphAlign == ImageAlignment.Top) {
+        }
+        else if (_glyphAlign == ImageAlignment.Top)
+        {
             glyphX = startX + (blockWide - glyphWide) / 2;
             textX = startX + (blockWide - textSize.Width) / 2;
             textY = startY + glyphHigh + gap;
-        } else {
+        }
+        else
+        {
             glyphX = startX + (blockWide - glyphWide) / 2;
             textX = startX + (blockWide - textSize.Width) / 2;
             glyphY = startY + textSize.Height + gap;
@@ -647,27 +746,34 @@ public class SpeedButton : GraphicControl {
 
         // The caption may be pushed to one end of the room left for it, which
         // is what `Alignment` is for and is only visible on a wide button.
-        if (!caption.IsEmpty() && sideways && margin >= 0) {
-            if (align == HorizontalAlignment.Right) {
-                textX = Width - margin - textSize.Width;
-            } else if (align == HorizontalAlignment.Left
-                       && glyphAlign == ImageAlignment.Right) {
-                textX = margin;
+        if (!caption.IsEmpty() && sideways && _margin >= 0)
+        {
+            if (_align == HorizontalAlignment.Right)
+            {
+                textX = Width - _margin - textSize.Width;
+            }
+            else if (_align == HorizontalAlignment.Left
+                       && _glyphAlign == ImageAlignment.Right)
+            {
+                textX = _margin;
             }
         }
 
         // A pressed button's content moves a pixel down and right, which is
         // most of what makes it look pressed.
-        if (state == ButtonState.Down) {
+        if (state == ButtonState.Down)
+        {
             glyphX = glyphX + 1; glyphY = glyphY + 1;
             textX = textX + 1;   textY = textY + 1;
         }
 
-        if (picture != null) {
+        if (picture != null)
+        {
             surface.DrawBitmap((Bitmap)picture, Point.At(glyphX, glyphY));
         }
 
-        if (!caption.IsEmpty()) {
+        if (!caption.IsEmpty())
+        {
             // A disabled caption is grey, which is the only thing about a
             // disabled speed button that is not the same drawing.
             var ink = Enabled ? ForeColor : SystemColors.GrayText;
@@ -682,7 +788,8 @@ public class SpeedButton : GraphicControl {
     /// when it is pressed. The same two lines a `Bevel` draws, for the same
     /// reason -- there is no theme drawing here yet, and two lines is what a
     /// button looked like before there was.
-    void DrawEdge(Graphics surface, Rectangle bounds, bool sunken) {
+    void DrawEdge(Graphics surface, Rectangle bounds, bool sunken)
+    {
         var first = new Pen(sunken ? SystemColors.ControlDark : SystemColors.ControlLight);
         var second = new Pen(sunken ? SystemColors.ControlLight : SystemColors.ControlDark);
 

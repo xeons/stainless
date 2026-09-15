@@ -48,14 +48,14 @@ import Win32.Ole32;
 ///
 /// The sign bit is the whole test, which is why a success code can carry
 /// information -- `S_FALSE` is 1 and means "yes, but the second answer".
-public bool Succeeded(int result) { return result >= 0; }
+public bool Succeeded(int result) => result >= 0;
 
 /// Whether an `HRESULT` says the call did not work.
-public bool Failed(int result) { return result < 0; }
+public bool Failed(int result) => result < 0;
 
 /// Whether a failure is the user having closed a dialog rather than anything
 /// going wrong.
-public bool WasCancelled(int result) { return result == Cancelled; }
+public bool WasCancelled(int result) => result == Cancelled;
 
 /// An `HRESULT` as text.
 ///
@@ -63,22 +63,35 @@ public bool WasCancelled(int result) { return result == Cancelled; }
 /// case the message Windows already has for it is the useful one. Anything
 /// else is reported as its hex code, because inventing prose for a facility
 /// this does not know would be worse than showing the number.
-public String Describe(int result) {
-    if (result == Ok)              { return "ok"; }
-    if (result == False)           { return "ok (second answer)"; }
-    if (result == Cancelled)       { return "cancelled"; }
-    if (result == NoInterface)     { return "no such interface"; }
-    if (result == PointerError)    { return "null pointer"; }
-    if (result == Aborted)         { return "aborted"; }
-    if (result == OutOfMemory)     { return "out of memory"; }
-    if (result == InvalidArgument) { return "invalid argument"; }
-    if (result == NotImplemented)  { return "not implemented"; }
-    if (result == NotFound)        { return "not found"; }
-    if (result == Failure)         { return "unspecified failure"; }
+public String Describe(int result)
+{
+    if (result == Ok)
+        return "ok";
+    if (result == False)
+        return "ok (second answer)";
+    if (result == Cancelled)
+        return "cancelled";
+    if (result == NoInterface)
+        return "no such interface";
+    if (result == PointerError)
+        return "null pointer";
+    if (result == Aborted)
+        return "aborted";
+    if (result == OutOfMemory)
+        return "out of memory";
+    if (result == InvalidArgument)
+        return "invalid argument";
+    if (result == NotImplemented)
+        return "not implemented";
+    if (result == NotFound)
+        return "not found";
+    if (result == Failure)
+        return "unspecified failure";
 
     // HRESULT_FROM_WIN32(x) is 0x8007 in the high half and the code in the
     // low half, so Windows' own message is available for those.
-    if ((result & 0xFFFF0000) == 0x80070000) {
+    if ((result & 0xFFFF0000) == 0x80070000)
+    {
         return Win32.Describe((uint)(result & 0x0000FFFF));
     }
 
@@ -87,11 +100,13 @@ public String Describe(int result) {
 
 /// An unsigned value as eight hex digits, which is how an `HRESULT` is
 /// written everywhere it appears.
-String Hex(uint value) {
+String Hex(uint value)
+{
     var digits = "0123456789ABCDEF";
     var builder = new StringBuilder();
 
-    for (int shift = 28; shift >= 0; shift = shift - 4) {
+    for (int shift = 28; shift >= 0; shift = shift - 4)
+    {
         nuint at = (nuint)((value >> (uint)shift) & 0xFu);
         builder.Append(digits.Substring(at, 1u));
     }
@@ -106,13 +121,15 @@ String Hex(uint value) {
 /// Every successful call must be matched by an `Uninitialize`, including the
 /// ones that return `S_FALSE` because the apartment was already up. Reference
 /// counting an apartment is Windows' rule, not this binding's.
-public bool Initialize() {
+public bool Initialize()
+{
     return Succeeded(CoInitializeEx(null, ApartmentThreaded | DisableOle1Dde));
 }
 
 /// Brings this thread's apartment up free-threaded, for a thread that will not
 /// pump messages.
-public bool InitializeMultiThreaded() {
+public bool InitializeMultiThreaded()
+{
     return Succeeded(CoInitializeEx(null, MultiThreaded | DisableOle1Dde));
 }
 
@@ -138,7 +155,7 @@ public bool InitializeMultiThreaded() {
 /// The conveniences in `Win32.Dialogs` and `Win32.Shell` are safe either way:
 /// each drops whatever it made before it returns, so nothing of theirs is
 /// still alive when a caller uninitializes.
-public void Uninitialize() { CoUninitialize(); }
+public void Uninitialize() => CoUninitialize();
 
 // ------------------------------------------------------------------- GUIDs
 
@@ -151,17 +168,20 @@ public void Uninitialize() { CoUninitialize(); }
 ///
 /// This is how a CLSID reaches a program. An IID does not need it: `[Guid]` on
 /// a `com interface` folds to a constant, and `iidof` is its address.
-public Guid Parse(String text) {
+public Guid Parse(String text)
+{
     Guid value;
 
     // There is no StartsWith on String yet, and one character is all this
     // needs to know.
     String braced = text;
-    if (text.IsEmpty() || text.Substring(0u, 1u) != "{") {
+    if (text.IsEmpty() || text.Substring(0u, 1u) != "{")
+    {
         braced = "{" + text + "}";
     }
 
-    if (Failed(CLSIDFromString(braced.ToUtf16().ToPointer(), &value))) {
+    if (Failed(CLSIDFromString(braced.ToUtf16().ToPointer(), &value)))
+    {
         Guid empty;
         return empty;
     }
@@ -169,11 +189,13 @@ public Guid Parse(String text) {
 }
 
 /// A GUID as `{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`.
-public String Format(Guid value) {
+public String Format(Guid value)
+{
     // 38 characters and a NUL, which is what StringFromGUID2 documents.
     var buffer = new WideBuffer(40u);
     int units = StringFromGUID2(&value, buffer.Pointer(), (int)buffer.Capacity());
-    if (units <= 0) { return ""; }
+    if (units <= 0)
+        return "";
 
     return Text.FromUtf16(buffer.Pointer(), (nuint)(units - 1));
 }
@@ -181,7 +203,8 @@ public String Format(Guid value) {
 // -------------------------------------------------------------- activation
 
 /// Why an object could not be made.
-public enum ComError : uint {
+public enum ComError : uint
+{
     None = 0u,
 
     /// No class with that CLSID is registered, or its server is missing.
@@ -213,30 +236,39 @@ public enum ComError : uint {
 /// language does not cross on its own: which interface a caller asked for is
 /// known to the caller and not to a signature, so the cast is where the
 /// programmer says it.
-public Result<byte*, ComError> Create(Guid classId, Guid* interfaceId) {
+public Result<byte*, ComError> Create(Guid classId, Guid* interfaceId)
+{
     byte* made = null;
     int hr = CoCreateInstance(&classId, null, AllContexts, interfaceId, &made);
 
-    if (Succeeded(hr)) { return Ok(made); }
+    if (Succeeded(hr))
+        return Ok(made);
     return Fail(Classify(hr));
 }
 
 /// Makes an object in this process only, refusing a class that would need a
 /// server started.
-public Result<byte*, ComError> CreateInProcess(Guid classId, Guid* interfaceId) {
+public Result<byte*, ComError> CreateInProcess(Guid classId, Guid* interfaceId)
+{
     byte* made = null;
     int hr = CoCreateInstance(&classId, null, InProcessServer, interfaceId, &made);
 
-    if (Succeeded(hr)) { return Ok(made); }
+    if (Succeeded(hr))
+        return Ok(made);
     return Fail(Classify(hr));
 }
 
 /// An `HRESULT` from an activation call as one of the errors above.
-public ComError Classify(int result) {
-    if (Succeeded(result))                { return ComError.None; }
-    if (result == NoInterface)            { return ComError.NoInterface; }
-    if ((uint)result == 0x80040154u)      { return ComError.NotRegistered; }  // REGDB_E_CLASSNOTREG
-    if ((uint)result == 0x800401F0u)      { return ComError.NotInitialized; } // CO_E_NOTINITIALIZED
+public ComError Classify(int result)
+{
+    if (Succeeded(result))
+        return ComError.None;
+    if (result == NoInterface)
+        return ComError.NoInterface;
+    if ((uint)result == 0x80040154u)  // REGDB_E_CLASSNOTREG
+        return ComError.NotRegistered;
+    if ((uint)result == 0x800401F0u) // CO_E_NOTINITIALIZED
+        return ComError.NotInitialized;
     return ComError.Other;
 }
 
@@ -248,8 +280,10 @@ public ComError Classify(int result) {
 /// the caller's to release, which is the leak this exists to make impossible.
 /// A null pointer reads as the empty string, because a call that failed leaves
 /// the caller holding one.
-public String TakeString(char16* text) {
-    if (text == null) { return ""; }
+public String TakeString(char16* text)
+{
+    if (text == null)
+        return "";
 
     String result = Text.FromNullTerminatedUtf16(text);
     CoTaskMemFree((byte*)text);
@@ -257,6 +291,6 @@ public String TakeString(char16* text) {
 }
 
 /// Frees a block COM allocated, for the cases `TakeString` does not cover.
-public void Free(byte* block) { CoTaskMemFree(block); }
+public void Free(byte* block) => CoTaskMemFree(block);
 
 #endif

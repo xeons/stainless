@@ -29,7 +29,7 @@ byte HexDigit(int value)
 
 The lowercase hexadecimal digit for a value from 0 to 15.
 
-<sub>[stdlib/Ascii.sl:105](../../stdlib/Ascii.sl#L105)</sub>
+<sub>[stdlib/Ascii.sl:122](../../stdlib/Ascii.sl#L122)</sub>
 
 ### HexDigitUpper *function*
 
@@ -39,7 +39,7 @@ byte HexDigitUpper(int value)
 
 The uppercase hexadecimal digit for a value from 0 to 15.
 
-<sub>[stdlib/Ascii.sl:111](../../stdlib/Ascii.sl#L111)</sub>
+<sub>[stdlib/Ascii.sl:130](../../stdlib/Ascii.sl#L130)</sub>
 
 ### HexValue *function*
 
@@ -49,7 +49,7 @@ int HexValue(byte value)
 
 What a hexadecimal digit is worth, or -1 when it is not one.
 
-<sub>[stdlib/Ascii.sl:97](../../stdlib/Ascii.sl#L97)</sub>
+<sub>[stdlib/Ascii.sl:110](../../stdlib/Ascii.sl#L110)</sub>
 
 ### IsAscii *function*
 
@@ -60,7 +60,7 @@ bool IsAscii(byte value)
 True for a byte below 128, which is the only range where any of this is
 also true of the character.
 
-<sub>[stdlib/Ascii.sl:75](../../stdlib/Ascii.sl#L75)</sub>
+<sub>[stdlib/Ascii.sl:82](../../stdlib/Ascii.sl#L82)</sub>
 
 ### IsControl *function*
 
@@ -70,7 +70,7 @@ bool IsControl(byte value)
 
 True for a control character: below 32, or DEL.
 
-<sub>[stdlib/Ascii.sl:80](../../stdlib/Ascii.sl#L80)</sub>
+<sub>[stdlib/Ascii.sl:88](../../stdlib/Ascii.sl#L88)</sub>
 
 ### IsDigit *function*
 
@@ -80,7 +80,7 @@ bool IsDigit(byte value)
 
 True for `0`-`9`.
 
-<sub>[stdlib/Ascii.sl:42](../../stdlib/Ascii.sl#L42)</sub>
+<sub>[stdlib/Ascii.sl:43](../../stdlib/Ascii.sl#L43)</sub>
 
 ### IsHexDigit *function*
 
@@ -90,7 +90,7 @@ bool IsHexDigit(byte value)
 
 True for `0`-`9`, `a`-`f` and `A`-`F`.
 
-<sub>[stdlib/Ascii.sl:47](../../stdlib/Ascii.sl#L47)</sub>
+<sub>[stdlib/Ascii.sl:49](../../stdlib/Ascii.sl#L49)</sub>
 
 ### IsLetter *function*
 
@@ -100,7 +100,7 @@ bool IsLetter(byte value)
 
 True for `A`-`Z` and `a`-`z`.
 
-<sub>[stdlib/Ascii.sl:54](../../stdlib/Ascii.sl#L54)</sub>
+<sub>[stdlib/Ascii.sl:57](../../stdlib/Ascii.sl#L57)</sub>
 
 ### IsLetterOrDigit *function*
 
@@ -110,7 +110,7 @@ bool IsLetterOrDigit(byte value)
 
 True for a letter or a digit.
 
-<sub>[stdlib/Ascii.sl:59](../../stdlib/Ascii.sl#L59)</sub>
+<sub>[stdlib/Ascii.sl:63](../../stdlib/Ascii.sl#L63)</sub>
 
 ### IsLower *function*
 
@@ -120,7 +120,7 @@ bool IsLower(byte value)
 
 True for `a`-`z`.
 
-<sub>[stdlib/Ascii.sl:69](../../stdlib/Ascii.sl#L69)</sub>
+<sub>[stdlib/Ascii.sl:75](../../stdlib/Ascii.sl#L75)</sub>
 
 ### IsUpper *function*
 
@@ -130,7 +130,7 @@ bool IsUpper(byte value)
 
 True for `A`-`Z`.
 
-<sub>[stdlib/Ascii.sl:64](../../stdlib/Ascii.sl#L64)</sub>
+<sub>[stdlib/Ascii.sl:69](../../stdlib/Ascii.sl#L69)</sub>
 
 ### IsWhiteSpace *function*
 
@@ -150,7 +150,7 @@ byte ToLower(byte value)
 
 The lowercase of an ASCII letter, or the byte unchanged.
 
-<sub>[stdlib/Ascii.sl:91](../../stdlib/Ascii.sl#L91)</sub>
+<sub>[stdlib/Ascii.sl:102](../../stdlib/Ascii.sl#L102)</sub>
 
 ### ToUpper *function*
 
@@ -160,5 +160,5 @@ byte ToUpper(byte value)
 
 The uppercase of an ASCII letter, or the byte unchanged.
 
-<sub>[stdlib/Ascii.sl:85](../../stdlib/Ascii.sl#L85)</sub>
+<sub>[stdlib/Ascii.sl:94](../../stdlib/Ascii.sl#L94)</sub>
 

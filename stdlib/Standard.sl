@@ -48,7 +48,8 @@ module Standard;
 /// Being a variant is also what makes it small. Only one case is ever present,
 /// so the payloads overlap: a `Result<String, IOError>` is a tag and one
 /// pointer, not a flag and both halves. Nothing allocates either way.
-public variant Result<T, E> {
+public variant Result<T, E>
+{
     /// It worked, and `Value` is the answer.
     Ok(T Value);
 
@@ -60,8 +61,10 @@ public variant Result<T, E> {
     ///
     /// The one reader that needs no proof, because it supplies its own: a
     /// caller with a sensible default has nothing to check.
-    public T ValueOr(T fallback) {
-        switch (this) {
+    public T ValueOr(T fallback)
+    {
+        switch (this)
+        {
             case Ok ok: return ok.Value;
             case Fail:  return fallback;
         }
@@ -122,7 +125,8 @@ extern "C" void sl_fail(byte* message);
 /// a case to name. This is for everything a null pointer cannot say -- which
 /// is also why the names differ: `Optional<T>` is this type, and "an optional"
 /// is what the spec calls `C?`.
-public variant Optional<T> {
+public variant Optional<T>
+{
     /// There is no value. Carries nothing, so there is nothing to read by
     /// mistake.
     None;
@@ -133,15 +137,19 @@ public variant Optional<T> {
 
     /// True when there is a value. The reader for a caller that is about to
     /// ask a second question anyway; `is Some x` is the one that gets at it.
-    public bool HasValue() {
-        if (this is Some) { return true; }
+    public bool HasValue()
+    {
+        if (this is Some)
+            return true;
         return false;
     }
 
     /// True when there is not. The same question the other way round, because
     /// `!x.HasValue()` reads worse than the thing it means.
-    public bool IsEmpty() {
-        if (this is Some) { return false; }
+    public bool IsEmpty()
+    {
+        if (this is Some)
+            return false;
         return true;
     }
 
@@ -151,8 +159,10 @@ public variant Optional<T> {
     /// something that is not there is a mistake in the caller rather than a
     /// value to return. Use `ValueOr` where a miss is ordinary, and
     /// `is Some x` where the answer decides what happens next.
-    public T Get() {
-        if (this is Some held) { return held.Value; }
+    public T Get()
+    {
+        if (this is Some held)
+            return held.Value;
 
         sl_fail("Optional.Get: there is no value");
 
@@ -165,8 +175,10 @@ public variant Optional<T> {
     ///
     /// The reader that needs no proof, because it supplies its own -- the same
     /// bargain `Result.ValueOr` makes.
-    public T ValueOr(T fallback) {
-        if (this is Some held) { return held.Value; }
+    public T ValueOr(T fallback)
+    {
+        if (this is Some held)
+            return held.Value;
         return fallback;
     }
 
@@ -175,8 +187,10 @@ public variant Optional<T> {
     /// `other` is a value rather than something that produces one on demand.
     /// A lambda would allocate a closure to save an evaluation, which is the
     /// wrong way round at the sizes this is used at.
-    public Optional<T> Or(Optional<T> other) {
-        if (this is Some) { return this; }
+    public Optional<T> Or(Optional<T> other)
+    {
+        if (this is Some)
+            return this;
         return other;
     }
 
@@ -186,28 +200,37 @@ public variant Optional<T> {
     ///
     /// The transform runs only where there is something to run it on, which is
     /// the point: it is the `if` that would otherwise be written by hand.
-    public Optional<R> Map<R>(Func<T, R> transform) {
-        if (this is Some held) { return Some(transform(held.Value)); }
+    public Optional<R> Map<R>(Func<T, R> transform)
+    {
+        if (this is Some held)
+            return Some(transform(held.Value));
         return None;
     }
 
     /// `Map` for a transform that answers with an optional of its own, which
     /// would otherwise nest one inside the other.
-    public Optional<R> FlatMap<R>(Func<T, Optional<R>> transform) {
-        if (this is Some held) { return transform(held.Value); }
+    public Optional<R> FlatMap<R>(Func<T, Optional<R>> transform)
+    {
+        if (this is Some held)
+            return transform(held.Value);
         return None;
     }
 
     /// This one when it holds something `keep` accepts, and none otherwise.
-    public Optional<T> Filter(Predicate<T> keep) {
-        if (this is Some held) {
-            if (keep(held.Value)) { return this; }
+    public Optional<T> Filter(Predicate<T> keep)
+    {
+        if (this is Some held)
+        {
+            if (keep(held.Value))
+                return this;
         }
         return None;
     }
 
     /// Runs `action` on the value, if there is one.
-    public void IfPresent(Action<T> action) {
-        if (this is Some held) { action(held.Value); }
+    public void IfPresent(Action<T> action)
+    {
+        if (this is Some held)
+            action(held.Value);
     }
 }

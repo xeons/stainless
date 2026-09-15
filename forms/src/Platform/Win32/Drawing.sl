@@ -47,10 +47,12 @@ import Win32.Gdi32;
 
 /// A `HFONT`, made once for a `Font` and deleted when the last reference to it
 /// goes.
-public class FontBackend : IFontBackend {
-    HFONT font;
+public class FontBackend : IFontBackend
+{
+    HFONT _font;
 
-    public FontBackend(Font wanted) {
+    public FontBackend(Font wanted)
+    {
         // A negative height is a *character* height rather than a cell height,
         // which is what a point size means and what every font dialog reports.
         // The 72 is points per inch and `DeviceCapsLogicalPixelsY` is the screen's real DPI,
@@ -58,12 +60,13 @@ public class FontBackend : IFontBackend {
         HDC screen = GetDC(null);
         int dpi = GetDeviceCaps(screen, DeviceCapsLogicalPixelsY);
         ReleaseDC(null, screen);
-        if (dpi <= 0) { dpi = 96; }
+        if (dpi <= 0)
+            dpi = 96;
 
         int height = -(wanted.Size * dpi / 72);
         int weight = wanted.Bold ? FontBold : FontNormal;
 
-        font = CreateFontW(height, 0, 0, 0, weight,
+        _font = CreateFontW(height, 0, 0, 0, weight,
                            (uint)(wanted.Italic ? 1 : 0),
                            (uint)(wanted.Underline ? 1 : 0),
                            (uint)(wanted.Strikeout ? 1 : 0),
@@ -71,17 +74,19 @@ public class FontBackend : IFontBackend {
                            wanted.Family.ToUtf16().ToPointer());
     }
 
-    ~FontBackend() {
-        if (font != null) {
-            DeleteObject((HGDIOBJ)(void*)font);
-            font = null;
+    ~FontBackend()
+    {
+        if (_font != null)
+        {
+            DeleteObject((HGDIOBJ)(void*)_font);
+            _font = null;
         }
     }
 
-    public nuint Handle() { return (nuint)(void*)font; }
+    public nuint Handle() => (nuint)(void*)_font;
 
     /// The font as GDI wants it, for the drawing code in this module.
-    public HFONT Native() { return font; }
+    public HFONT Native() => _font;
 }
 
 // ================================================================= graphics
@@ -92,108 +97,126 @@ public class FontBackend : IFontBackend {
 /// `WM_PAINT` lent, and is thrown away when the paint ends; releasing the
 /// context is the caller's business, because the caller is what called
 /// `BeginPaint` and is the only thing that can call the matching `EndPaint`.
-public class GraphicsBackend : IGraphicsBackend {
-    HDC   dc;
-    FRect clip;
+public class GraphicsBackend : IGraphicsBackend
+{
+    HDC _dc;
+    FRect _clip;
 
-    public GraphicsBackend(HDC context, FRect clipped) {
-        dc = context;
-        clip = clipped;
+    public GraphicsBackend(HDC context, FRect clipped)
+    {
+        _dc = context;
+        _clip = clipped;
     }
 
-    public FRect ClipBounds() { return clip; }
+    public FRect ClipBounds() => _clip;
 
     /// `SaveDC` answers a token that puts back the clip *and* the origin
     /// together, which is exactly the pair this changes -- so there is nothing
     /// to restore by hand and no way to restore one and forget the other.
-    public int PushLayer(FRect bounds) {
-        int token = SaveDC(dc);
-        IntersectClipRect(dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-        OffsetViewportOrgEx(dc, bounds.X, bounds.Y, null);
+    public int PushLayer(FRect bounds)
+    {
+        int token = SaveDC(_dc);
+        IntersectClipRect(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+        OffsetViewportOrgEx(_dc, bounds.X, bounds.Y, null);
         return token;
     }
 
-    public void PopLayer(int token) { RestoreDC(dc, token); }
+    public void PopLayer(int token) => RestoreDC(_dc, token);
 
-    public void Clear(Color colour) {
-        Rect whole = ToRect(clip);
+    public void Clear(Color colour)
+    {
+        Rect whole = ToRect(_clip);
         HBRUSH brush = CreateSolidBrush(ToColorRef(colour));
-        FillRect(dc, &whole, brush);
+        FillRect(_dc, &whole, brush);
         DeleteObject((HGDIOBJ)(void*)brush);
     }
 
     /// Selects a pen made for this call, runs the body, and puts back what was
     /// there. Every outline call goes through here so that none of them can
     /// forget the second half.
-    HPEN UsePen(Pen pen) {
+    HPEN UsePen(Pen pen)
+    {
         int style = PenStyleOf(pen.Style);
         HPEN made = CreatePen(style, pen.Width, ToColorRef(pen.Color));
-        SelectObject(dc, (HGDIOBJ)(void*)made);
+        SelectObject(_dc, (HGDIOBJ)(void*)made);
         return made;
     }
 
-    void DropPen(HPEN made) {
-        SelectObject(dc, GetStockObject(BlackPen));
+    void DropPen(HPEN made)
+    {
+        SelectObject(_dc, GetStockObject(BlackPen));
         DeleteObject((HGDIOBJ)(void*)made);
     }
 
-    HBRUSH UseBrush(Brush brush) {
+    HBRUSH UseBrush(Brush brush)
+    {
         HBRUSH made = CreateSolidBrush(ToColorRef(brush.Color));
-        SelectObject(dc, (HGDIOBJ)(void*)made);
+        SelectObject(_dc, (HGDIOBJ)(void*)made);
         return made;
     }
 
-    void DropBrush(HBRUSH made) {
-        SelectObject(dc, GetStockObject(WhiteBrush));
+    void DropBrush(HBRUSH made)
+    {
+        SelectObject(_dc, GetStockObject(WhiteBrush));
         DeleteObject((HGDIOBJ)(void*)made);
     }
 
-    int PenStyleOf(PenStyle style) {
-        if (style == PenStyle.Dash)    { return PenDash; }
-        if (style == PenStyle.Dot)     { return PenDot; }
-        if (style == PenStyle.DashDot) { return PenDashDot; }
-        if (style == PenStyle.None)    { return PenNull; }
+    int PenStyleOf(PenStyle style)
+    {
+        if (style == PenStyle.Dash)
+            return PenDash;
+        if (style == PenStyle.Dot)
+            return PenDot;
+        if (style == PenStyle.DashDot)
+            return PenDashDot;
+        if (style == PenStyle.None)
+            return PenNull;
         return PenSolid;
     }
 
-    public void DrawLine(Pen pen, int x1, int y1, int x2, int y2) {
+    public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+    {
         HPEN made = UsePen(pen);
-        MoveToEx(dc, x1, y1, null);
-        LineTo(dc, x2, y2);
+        MoveToEx(_dc, x1, y1, null);
+        LineTo(_dc, x2, y2);
         DropPen(made);
     }
 
-    public void DrawRectangle(Pen pen, FRect bounds) {
+    public void DrawRectangle(Pen pen, FRect bounds)
+    {
         HPEN made = UsePen(pen);
         // A hollow brush, so `Rectangle` outlines rather than filling: GDI's
         // shape calls always do both, and this is how "outline only" is said.
-        HGDIOBJ wasBrush = SelectObject(dc, GetStockObject(NullBrush));
-        Rectangle(dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-        SelectObject(dc, wasBrush);
+        HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
+        Rectangle(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+        SelectObject(_dc, wasBrush);
         DropPen(made);
     }
 
-    public void FillRectangle(Brush brush, FRect bounds) {
+    public void FillRectangle(Brush brush, FRect bounds)
+    {
         Rect r = ToRect(bounds);
         HBRUSH made = CreateSolidBrush(ToColorRef(brush.Color));
-        FillRect(dc, &r, made);
+        FillRect(_dc, &r, made);
         DeleteObject((HGDIOBJ)(void*)made);
     }
 
-    public void DrawEllipse(Pen pen, FRect bounds) {
+    public void DrawEllipse(Pen pen, FRect bounds)
+    {
         HPEN made = UsePen(pen);
-        HGDIOBJ wasBrush = SelectObject(dc, GetStockObject(NullBrush));
-        Ellipse(dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-        SelectObject(dc, wasBrush);
+        HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
+        Ellipse(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+        SelectObject(_dc, wasBrush);
         DropPen(made);
     }
 
-    public void FillEllipse(Brush brush, FRect bounds) {
+    public void FillEllipse(Brush brush, FRect bounds)
+    {
         HBRUSH made = UseBrush(brush);
         HPEN pen = CreatePen(PenSolid, 1, ToColorRef(brush.Color));
-        HGDIOBJ wasPen = SelectObject(dc, (HGDIOBJ)(void*)pen);
-        Ellipse(dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
-        SelectObject(dc, wasPen);
+        HGDIOBJ wasPen = SelectObject(_dc, (HGDIOBJ)(void*)pen);
+        Ellipse(_dc, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+        SelectObject(_dc, wasPen);
         DeleteObject((HGDIOBJ)(void*)pen);
         DropBrush(made);
     }
@@ -201,9 +224,11 @@ public class GraphicsBackend : IGraphicsBackend {
     /// Copies the points into the shape GDI wants. Two structures called
     /// `Point` that differ only in which module declared them, so the copy is
     /// a loop rather than a cast.
-    Win32.User32.Point[] Native(FPoint[] points) {
+    Win32.User32.Point[] Native(FPoint[] points)
+    {
         var native = new Win32.User32.Point[points.Length];
-        for (nuint i = 0u; i < points.Length; i += 1u) {
+        for (nuint i = 0u; i < points.Length; i++)
+        {
             Win32.User32.Point one;
             one.X = points[i].X;
             one.Y = points[i].Y;
@@ -212,104 +237,133 @@ public class GraphicsBackend : IGraphicsBackend {
         return native;
     }
 
-    public void DrawPolygon(Pen pen, FPoint[] points) {
+    public void DrawPolygon(Pen pen, FPoint[] points)
+    {
         var native = Native(points);
         HPEN made = UsePen(pen);
-        HGDIOBJ wasBrush = SelectObject(dc, GetStockObject(NullBrush));
-        Polygon(dc, &native[0u], (int)points.Length);
-        SelectObject(dc, wasBrush);
+        HGDIOBJ wasBrush = SelectObject(_dc, GetStockObject(NullBrush));
+        Polygon(_dc, &native[0u], (int)points.Length);
+        SelectObject(_dc, wasBrush);
         DropPen(made);
     }
 
-    public void FillPolygon(Brush brush, FPoint[] points) {
+    public void FillPolygon(Brush brush, FPoint[] points)
+    {
         var native = Native(points);
         HBRUSH made = UseBrush(brush);
-        Polygon(dc, &native[0u], (int)points.Length);
+        Polygon(_dc, &native[0u], (int)points.Length);
         DropBrush(made);
     }
 
-    public void DrawPolyline(Pen pen, FPoint[] points) {
+    public void DrawPolyline(Pen pen, FPoint[] points)
+    {
         var native = Native(points);
         HPEN made = UsePen(pen);
-        Polyline(dc, &native[0u], (int)points.Length);
+        Polyline(_dc, &native[0u], (int)points.Length);
         DropPen(made);
     }
 
-    public void DrawString(String text, Font font, Color colour, int x, int y) {
+    public void DrawString(String text, Font font, Color colour, int x, int y)
+    {
         var wide = text.ToUtf16();
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)font.Resource().Handle());
-        uint wasColour = SetTextColor(dc, ToColorRef(colour));
-        int wasMode = SetBkMode(dc, TransparentBackground);
-        TextOutW(dc, x, y, wide.ToPointer(), (int)wide.UnitCount());
-        SetBkMode(dc, wasMode);
-        SetTextColor(dc, wasColour);
-        SelectObject(dc, wasFont);
+        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource().Handle());
+        uint wasColour = SetTextColor(_dc, ToColorRef(colour));
+        int wasMode = SetBkMode(_dc, TransparentBackground);
+        TextOutW(_dc, x, y, wide.ToPointer(), (int)wide.UnitCount());
+        SetBkMode(_dc, wasMode);
+        SetTextColor(_dc, wasColour);
+        SelectObject(_dc, wasFont);
     }
 
     public void DrawStringIn(String text, Font font, Color colour,
-                             FRect bounds, TextFormat format) {
+                             FRect bounds, TextFormat format)
+    {
         var wide = text.ToUtf16();
         Rect r = ToRect(bounds);
 
         uint flags = 0u;
-        if (format.Horizontal == HorizontalAlignment.Center) { flags = flags | DtCenter; }
-        else if (format.Horizontal == HorizontalAlignment.Right) { flags = flags | DtRight; }
+        if (format.Horizontal == HorizontalAlignment.Center)
+        {
+            flags = flags | DtCenter;
+        }
+        else if (format.Horizontal == HorizontalAlignment.Right)
+        {
+            flags = flags | DtRight;
+        }
 
-        if (format.Wrap) {
+        if (format.Wrap)
+        {
             flags = flags | DtWordBreak;
-        } else {
+        }
+        else
+        {
             flags = flags | DtSingleLine;
             // Vertical centring is a single-line-only feature of DrawText, so
             // it can only be asked for here.
-            if (format.Vertical == VerticalAlignment.Middle) { flags = flags | DtVerticalCenter; }
-            else if (format.Vertical == VerticalAlignment.Bottom) { flags = flags | DtBottom; }
+            if (format.Vertical == VerticalAlignment.Middle)
+            {
+                flags = flags | DtVerticalCenter;
+            }
+            else if (format.Vertical == VerticalAlignment.Bottom)
+            {
+                flags = flags | DtBottom;
+            }
         }
 
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)font.Resource().Handle());
-        uint wasColour = SetTextColor(dc, ToColorRef(colour));
-        int wasMode = SetBkMode(dc, TransparentBackground);
-        DrawTextW(dc, wide.ToPointer(), (int)wide.UnitCount(), &r, flags);
-        SetBkMode(dc, wasMode);
-        SetTextColor(dc, wasColour);
-        SelectObject(dc, wasFont);
+        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource().Handle());
+        uint wasColour = SetTextColor(_dc, ToColorRef(colour));
+        int wasMode = SetBkMode(_dc, TransparentBackground);
+        DrawTextW(_dc, wide.ToPointer(), (int)wide.UnitCount(), &r, flags);
+        SetBkMode(_dc, wasMode);
+        SetTextColor(_dc, wasColour);
+        SelectObject(_dc, wasFont);
     }
 
     /// Draws a bitmap through a memory device context, which is the only way
     /// GDI will copy one: a bitmap is not something a `HDC` can be told to
     /// draw, it is something selected into a second `HDC` and blitted from.
-    public void DrawBitmap(IBitmapBackend picture, FPoint at) {
+    public void DrawBitmap(IBitmapBackend picture, FPoint at)
+    {
         Blit(picture, Area(at.X, at.Y, picture.Width(), picture.Height()), false);
     }
 
-    public void DrawBitmapIn(IBitmapBackend picture, FRect into) {
+    public void DrawBitmapIn(IBitmapBackend picture, FRect into)
+    {
         Blit(picture, into, true);
     }
 
-    void Blit(IBitmapBackend picture, FRect into, bool scaled) {
+    void Blit(IBitmapBackend picture, FRect into, bool scaled)
+    {
         HBITMAP bitmap = (HBITMAP)(void*)picture.Handle();
-        if (bitmap == null) { return; }
+        if (bitmap == null)
+            return;
 
-        HDC memory = CreateCompatibleDC(dc);
-        if (memory == null) { return; }
+        HDC memory = CreateCompatibleDC(_dc);
+        if (memory == null)
+            return;
         HGDIOBJ was = SelectObject(memory, (HGDIOBJ)(void*)bitmap);
 
-        if (scaled) {
-            StretchBlt(dc, into.X, into.Y, into.Width, into.Height,
+        if (scaled)
+        {
+            StretchBlt(_dc, into.X, into.Y, into.Width, into.Height,
                        memory, 0, 0, picture.Width(), picture.Height(), SrcCopy);
-        } else {
-            BitBlt(dc, into.X, into.Y, into.Width, into.Height, memory, 0, 0, SrcCopy);
+        }
+        else
+        {
+            BitBlt(_dc, into.X, into.Y, into.Width, into.Height, memory, 0, 0, SrcCopy);
         }
 
         SelectObject(memory, was);
         DeleteDC(memory);
     }
 
-    public FSize MeasureString(String text, Font font) {
+    public FSize MeasureString(String text, Font font)
+    {
         var wide = text.ToUtf16();
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)font.Resource().Handle());
+        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource().Handle());
         Win32.User32.Size measured;
-        GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
-        SelectObject(dc, wasFont);
+        GetTextExtentPoint32W(_dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
+        SelectObject(_dc, wasFont);
         return Extent(measured.Width, measured.Height);
     }
 }
@@ -320,7 +374,8 @@ public class GraphicsBackend : IGraphicsBackend {
 /// answer, and the screen's own device context is what every Windows program
 /// uses for that. Released immediately, because a screen DC comes from a pool
 /// of five and a program that keeps them stops being able to draw.
-public FSize MeasureWithFont(String text, Font font) {
+public FSize MeasureWithFont(String text, Font font)
+{
     HDC screen = GetDC(null);
     var surface = new GraphicsBackend(screen, Area(0, 0, 0, 0));
     var measured = surface.MeasureString(text, font);

@@ -8,7 +8,8 @@ import Standard.Console;
 // module, and where that module's code came from is the build's business.
 import Shapes;
 
-int Main() {
+int Main()
+{
     var canvas = new Canvas(100, 50);
 
     canvas.Draw(Square(10));

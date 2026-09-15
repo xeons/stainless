@@ -29,7 +29,8 @@ import Tour.Types;
 
 // ==================================================================== §7
 
-void Members() {
+void Members()
+{
     Heading("7. properties, indexers, operators and statics");
 
     // §7.3: a property is a pair of functions wearing the spelling of a field,
@@ -97,40 +98,48 @@ void Members() {
 
 /// Overloads are told apart by their parameters, and a free function is
 /// reached without a prefix from inside the module that declares it.
-String Render(int value) { return $"int {value}"; }
-String Render(double value) { return $"double {value}"; }
-String Render(String value) { return $"text {value}"; }
+String Render(int value) => $"int {value}";
+String Render(double value) => $"double {value}";
+String Render(String value) => $"text {value}";
 
 // ==================================================================== §7.2
 
 /// `ref` is one storage location under two names: the callee writes what the
 /// caller can see.
-void Twice(ref int value) { value *= 2; }
+void Twice(ref int value) => value *= 2;
 
 /// `in` is the same address without the permission to write through it, which
 /// is how a large struct is passed without a copy.
-double Length(in Point point) { return point.X + point.Y; }
+double Length(in Point point) => point.X + point.Y;
 
 /// `out` is a second answer rather than a second call. It must be written
 /// before the function returns, and the caller need not have initialized it.
-bool TryHalve(int n, out int half) {
-    if (n % 2 != 0) { half = 0; return false; }
+bool TryHalve(int n, out int half)
+{
+    if (n % 2 != 0)
+    {
+        half = 0;
+        return false;
+    }
     half = n / 2;
     return true;
 }
 
 /// Passing one straight on, which is what makes `out` compose.
-bool Forward(int n, out int half) { return TryHalve(n, out half); }
+bool Forward(int n, out int half) => TryHalve(n, out half);
 
 /// Four parameters, three of which read as nothing at a call site without
 /// names for them.
-String Draw(String text, int width, bool center, char fill) {
+String Draw(String text, int width, bool center, char fill)
+{
     var pad = new StringBuilder();
-    for (int i = 0; i < width; i++) { pad.Append(Text.FromChar((char32)fill)); }
+    for (int i = 0; i < width; i++)
+        pad.Append(Text.FromChar((char32)fill));
     return (center ? "[" : "<") + text + pad.ToText() + (center ? "]" : ">");
 }
 
-void Calls() {
+void Calls()
+{
     Heading("7.1 and 7.2 how a function is called");
 
     // Overloads, resolved on the arguments.
@@ -169,7 +178,8 @@ void Calls() {
 
 // ==================================================================== §4
 
-void Generics() {
+void Generics()
+{
     Heading("4. generics");
 
     // Monomorphization: `T` is substituted and the body compiled again, so
@@ -207,7 +217,8 @@ void Generics() {
 
 // ==================================================================== §5
 
-void Library() {
+void Library()
+{
     Heading("5. the standard library");
 
     // ------------------------------------------------------------ containers
@@ -263,7 +274,8 @@ void Library() {
         .ToArray();
 
     var line = new StringBuilder();
-    foreach (var n in picked) { line.Append($"{n} "); }
+    foreach (var n in picked)
+        line.Append($"{n} ");
     Say("chained", line.ToText().Trim());
 
     Say("map / reduce", (long)values.Select(n => n * 2).Aggregate(0, (t, n) => t + n));
@@ -290,7 +302,8 @@ void Library() {
     // test may assert without printing a time that changes every run.
     var clock = new Clock();
     long spun = 0;
-    for (int i = 0; i < 100000; i++) { spun += i; }
+    for (int i = 0; i < 100000; i++)
+        spun += i;
     var taken = clock.Elapsed();
     Say("monotonic", taken.Nanoseconds >= 0);
     Say("a duration", Duration.FromSeconds(90).TotalMinutes());
@@ -323,7 +336,8 @@ void Library() {
 
     // ------------------------------------------------------------ documents
     var document = Json.Parse("{\"name\":\"tour\",\"count\":3,\"on\":true}");
-    if (document.Ok) {
+    if (document.Ok)
+    {
         var members = MembersOf(document.Value);
         Say("JSON", TextOr(members.Find("name"), "-"));
         Say("JSON number", IntegerOr(members.Find("count"), -1));
@@ -331,7 +345,8 @@ void Library() {
     }
 
     var parsed = Xml.Parse("<tour kind=\"sample\"><part>one</part></tour>");
-    if (parsed.Ok) {
+    if (parsed.Ok)
+    {
         Say("XML", parsed.Value.Name);
         Say("XML attribute", parsed.Value.Attributes.Find("kind", "-"));
     }
@@ -346,39 +361,60 @@ void Library() {
 /// One serializer, written once, for any reflected type. `T` is concrete by the
 /// time this is compiled, so `typeof(T)` is a constant and every call below is
 /// a load from a table in the binary's read-only data.
-String Describe<T>(T value) {
+String Describe<T>(T value)
+{
     var type = typeof(T);
     var text = new StringBuilder();
 
     text.Append("{");
     var first = true;
 
-    for (nuint i = 0u; i < type.FieldCount(); i++) {
+    for (nuint i = 0u; i < type.FieldCount(); i++)
+    {
         var field = type.FieldAt(i);
-        if (field.Has("Hidden")) { continue; }
+        if (field.Has("Hidden"))
+            continue;
 
-        if (!first) { text.Append(","); }
+        if (!first)
+            text.Append(",");
         first = false;
 
         var name = field.Name();
-        if (field.Has("Column")) { name = field.Get("Column").AsText(0u); }
+        if (field.Has("Column"))
+            name = field.Get("Column").AsText(0u);
 
         text.Append(name);
         text.Append("=");
 
         var raw = (byte*)value;
-        if (field.Kind() == KindString) { text.Append(ReadText(raw, field)); }
-        else if (field.Kind() == KindBool) { text.Append(Text.FromBool(ReadBool(raw, field))); }
-        else if (field.IsFloating()) { text.AppendDouble(ReadDouble(raw, field)); }
-        else if (field.IsInteger()) { text.AppendInteger(ReadInteger(raw, field)); }
-        else { text.Append("?"); }
+        if (field.Kind() == KindString)
+        {
+            text.Append(ReadText(raw, field));
+        }
+        else if (field.Kind() == KindBool)
+        {
+            text.Append(Text.FromBool(ReadBool(raw, field)));
+        }
+        else if (field.IsFloating())
+        {
+            text.AppendDouble(ReadDouble(raw, field));
+        }
+        else if (field.IsInteger())
+        {
+            text.AppendInteger(ReadInteger(raw, field));
+        }
+        else
+        {
+            text.Append("?");
+        }
     }
 
     text.Append("}");
     return text.ToText();
 }
 
-void Reflected() {
+void Reflected()
+{
     Heading("6. attributes and reflection");
 
     var person = new Person("Ada", 36);
@@ -411,7 +447,8 @@ void Reflected() {
 
 // ==================================================================== §8
 
-void Interop() {
+void Interop()
+{
     Heading("8. interoperability");
 
     // A variadic `extern` -- the only kind there is, a Stainless function
@@ -444,34 +481,40 @@ void Interop() {
 /// `threadsafe` asserts what no declaration can prove: every operation here
 /// goes through an atomic, so sharing one really is sound. Without the word the
 /// `spawn` below still compiles, and warns.
-threadsafe class Tally {
+threadsafe class Tally
+{
     AtomicLong total;
 
-    public Tally(AtomicLong cell) { total = cell; }
+    public Tally(AtomicLong cell) => total = cell;
 
-    public void Contribute(long amount) { total.Add(amount); }
+    public void Contribute(long amount) => total.Add(amount);
 }
 
-int Squared(int value) { return value * value; }
+int Squared(int value) => value * value;
 
-long SumOf(int[] values, int from, int upto) {
+long SumOf(int[] values, int from, int upto)
+{
     long total = 0;
-    for (int i = from; i < upto; i++) { total += values[i]; }
+    for (int i = from; i < upto; i++)
+        total += values[i];
     return total;
 }
 
-void Concurrency() {
+void Concurrency()
+{
     Heading("9.2 parallel, spawn, and what may be shared");
 
     var values = new int[100];
-    for (int i = 0; i < 100; i++) { values[i] = i; }
+    for (int i = 0; i < 100; i++)
+        values[i] = i;
 
     // Two halves, each writing into a local the parent still owns. The join at
     // the closing brace is what makes that sound.
     long left = 0;
     long right = 0;
 
-    parallel {
+    parallel
+    {
         spawn left = SumOf(values, 0, 50);
         spawn right = SumOf(values, 50, 100);
     }
@@ -481,8 +524,10 @@ void Concurrency() {
     // One job per iteration: sharing one argument block would give every job
     // the last iteration's values.
     var squares = new int[8];
-    parallel {
-        for (int i = 0; i < 8; i++) {
+    parallel
+    {
+        for (int i = 0; i < 8; i++)
+        {
             spawn squares[i] = Squared(values[i]);
         }
     }
@@ -491,7 +536,8 @@ void Concurrency() {
     // `parallel for` is the same thing said once: the body runs for every
     // index, and nothing it writes may be read by another iteration.
     var doubled = new int[16];
-    parallel for (int i = 0; i < 16; i += 1) {
+    parallel for (int i = 0; i < 16; i += 1)
+    {
         doubled[i] = values[i] * 2;
     }
     Say("parallel for", (long)doubled[15]);
@@ -502,7 +548,8 @@ void Concurrency() {
     var counter = new AtomicLong(0);
     var tally = new Tally(counter);
 
-    parallel {
+    parallel
+    {
         spawn Contribute(tally, guarded, 10);
         spawn Contribute(tally, guarded, 32);
     }
@@ -512,7 +559,8 @@ void Concurrency() {
 
     // A queue that several threads may hold at once.
     var pending = new ConcurrentQueue<long>();
-    parallel {
+    parallel
+    {
         spawn pending.Enqueue(1);
         spawn pending.Enqueue(2);
     }
@@ -521,9 +569,10 @@ void Concurrency() {
 
 /// A newline, written as an escape rather than embedded, so the file the tour
 /// writes is the same on both platforms.
-String Newline() { return Text.FromChar((char32)10); }
+String Newline() => Text.FromChar((char32)10);
 
-void Contribute(Tally tally, Mutex<long> guarded, long amount) {
+void Contribute(Tally tally, Mutex<long> guarded, long amount)
+{
     tally.Contribute(amount);
     var guard = guarded.Lock();
     guard.Set(guard.Value() + amount);

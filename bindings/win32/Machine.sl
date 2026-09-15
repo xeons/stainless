@@ -35,13 +35,15 @@ import Win32.Handles;
 
 /// Page size, processor count and the rest, as the running process sees it.
 /// Under WOW64 that is the emulated view; `NativeInfo()` is the real one.
-public SystemInfo Info() {
+public SystemInfo Info()
+{
     SystemInfo info;
     GetSystemInfo(&info);
     return info;
 }
 
-public SystemInfo NativeInfo() {
+public SystemInfo NativeInfo()
+{
     SystemInfo info;
     GetNativeSystemInfo(&info);
     return info;
@@ -49,7 +51,8 @@ public SystemInfo NativeInfo() {
 
 /// How much memory there is and how much is free. The `Length` field is filled
 /// in here, because the call fails without it.
-public MemoryStatus Memory() {
+public MemoryStatus Memory()
+{
     MemoryStatus status;
     status.Length = (uint)sizeof(MemoryStatus);
     GlobalMemoryStatusEx(&status);
@@ -61,17 +64,23 @@ public MemoryStatus Memory() {
 /// `Info().Architecture` is where the number comes from: `SYSTEM_INFO`'s first
 /// word is a nameless union in the header and here, so the field reads directly
 /// off the struct rather than through a name Windows never gave it.
-public String ArchitectureName(ushort code) {
-    if (code == ProcessorArchitectureX64)   { return "x64"; }
-    if (code == ProcessorArchitectureArm64) { return "arm64"; }
-    if (code == ProcessorArchitectureX86)   { return "x86"; }
-    if (code == ProcessorArchitectureArm)   { return "arm"; }
+public String ArchitectureName(ushort code)
+{
+    if (code == ProcessorArchitectureX64)
+        return "x64";
+    if (code == ProcessorArchitectureArm64)
+        return "arm64";
+    if (code == ProcessorArchitectureX86)
+        return "x86";
+    if (code == ProcessorArchitectureArm)
+        return "arm";
     return "unknown (" + Text.FromInteger((long)code) + ")";
 }
 
 /// Writes to the debugger's output window, and nowhere at all when no debugger
 /// is attached.
-public void DebugPrint(String text) {
+public void DebugPrint(String text)
+{
     OutputDebugStringW(text.ToUtf16().ToPointer());
 }
 
@@ -79,13 +88,15 @@ public void DebugPrint(String text) {
 
 /// Reserves and commits read-write pages in one call, which is what a caller
 /// that just wants memory means.
-public void* AllocatePages(nuint size) {
+public void* AllocatePages(nuint size)
+{
     return VirtualAlloc(null, size, MemCommit | MemReserve, PageReadWrite);
 }
 
 /// Releases what `AllocatePages` returned. The size must be zero for
 /// `MEM_RELEASE`, which is a rule of the API rather than of this binding.
-public bool ReleasePages(void* at) {
+public bool ReleasePages(void* at)
+{
     return Win32.Succeeded(VirtualFree(at, 0u, MemRelease));
 }
 
@@ -97,19 +108,22 @@ public bool ReleasePages(void* at) {
 /// export name is bytes in the file rather than text — which is why its
 /// declaration takes a `byte*` and a Stainless string literal reaches it
 /// directly.
-public HMODULE LoadLibrary(String name) {
+public HMODULE LoadLibrary(String name)
+{
     return LoadLibraryW(name.ToUtf16().ToPointer());
 }
 
 /// The full path of the running .exe, or of a loaded DLL when given its handle.
-public String ModulePath(HMODULE library) {
+public String ModulePath(HMODULE library)
+{
     var buffer = new WideBuffer(32768u);
     uint units = GetModuleFileNameW(library, buffer.Pointer(), buffer.Capacity());
-    if (units == 0u) { return ""; }
+    if (units == 0u)
+        return "";
     return buffer.Text(units);
 }
 
 /// The full path of the running executable.
-public String ExecutablePath() { return ModulePath(null); }
+public String ExecutablePath() => ModulePath(null);
 
 #endif

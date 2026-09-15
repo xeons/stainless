@@ -53,7 +53,7 @@ stating because the thing being released is a GDI+ or libgd object rather
 than memory the language allocated -- ARC counts the `Image`, and the
 `Image` owns the picture.
 
-<sub>[stdlib/Drawing.sl:996](../../stdlib/Drawing.sl#L996)</sub>
+<sub>[stdlib/Drawing.sl:1133](../../stdlib/Drawing.sl#L1133)</sub>
 
 #### Create *method*
 
@@ -63,7 +63,7 @@ static Result<Image, ImageError> Create(int width, int height)
 
 An empty picture, every pixel transparent.
 
-<sub>[stdlib/Drawing.sl:1017](../../stdlib/Drawing.sl#L1017)</sub>
+<sub>[stdlib/Drawing.sl:1159](../../stdlib/Drawing.sl#L1159)</sub>
 
 #### FromBytes *method*
 
@@ -73,7 +73,7 @@ static Result<Image, ImageError> FromBytes(byte[] data)
 
 A picture decoded from bytes, whatever of the four formats they hold.
 
-<sub>[stdlib/Drawing.sl:1029](../../stdlib/Drawing.sl#L1029)</sub>
+<sub>[stdlib/Drawing.sl:1175](../../stdlib/Drawing.sl#L1175)</sub>
 
 #### FromFile *method*
 
@@ -87,7 +87,7 @@ The bytes are read here rather than handed to the decoder, so that a
 missing file is `NotFound` on both platforms rather than whatever each
 library says about one it could not open.
 
-<sub>[stdlib/Drawing.sl:1050](../../stdlib/Drawing.sl#L1050)</sub>
+<sub>[stdlib/Drawing.sl:1201](../../stdlib/Drawing.sl#L1201)</sub>
 
 #### Width *property*
 
@@ -97,7 +97,7 @@ int Width { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1061](../../stdlib/Drawing.sl#L1061)</sub>
+<sub>[stdlib/Drawing.sl:1214](../../stdlib/Drawing.sl#L1214)</sub>
 
 #### Height *property*
 
@@ -107,7 +107,7 @@ int Height { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1062](../../stdlib/Drawing.sl#L1062)</sub>
+<sub>[stdlib/Drawing.sl:1215](../../stdlib/Drawing.sl#L1215)</sub>
 
 #### IsOpen *property*
 
@@ -118,7 +118,7 @@ bool IsOpen { get; }
 Whether the picture is still open. False only after a destructor has
 run, which a program cannot observe on an image it still holds.
 
-<sub>[stdlib/Drawing.sl:1066](../../stdlib/Drawing.sl#L1066)</sub>
+<sub>[stdlib/Drawing.sl:1219](../../stdlib/Drawing.sl#L1219)</sub>
 
 #### GetPixel *method*
 
@@ -132,7 +132,7 @@ Answering rather than failing, because the common caller is a loop over
 a neighbourhood and a test at every edge is what that loop would
 otherwise be made of.
 
-<sub>[stdlib/Drawing.sl:1075](../../stdlib/Drawing.sl#L1075)</sub>
+<sub>[stdlib/Drawing.sl:1228](../../stdlib/Drawing.sl#L1228)</sub>
 
 #### SetPixel *method*
 
@@ -142,7 +142,7 @@ void SetPixel(int x, int y, Rgba colour)
 
 Writes one pixel, replacing whatever was there rather than blending.
 
-<sub>[stdlib/Drawing.sl:1083](../../stdlib/Drawing.sl#L1083)</sub>
+<sub>[stdlib/Drawing.sl:1239](../../stdlib/Drawing.sl#L1239)</sub>
 
 #### Clear *method*
 
@@ -152,7 +152,7 @@ void Clear(Rgba colour)
 
 Fills the whole picture with one colour.
 
-<sub>[stdlib/Drawing.sl:1101](../../stdlib/Drawing.sl#L1101)</sub>
+<sub>[stdlib/Drawing.sl:1261](../../stdlib/Drawing.sl#L1261)</sub>
 
 #### DrawLine *method*
 
@@ -162,7 +162,7 @@ void DrawLine(Rgba colour, int x1, int y1, int x2, int y2, int thickness)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1106](../../stdlib/Drawing.sl#L1106)</sub>
+<sub>[stdlib/Drawing.sl:1268](../../stdlib/Drawing.sl#L1268)</sub>
 
 #### DrawRectangle *method*
 
@@ -172,7 +172,7 @@ void DrawRectangle(Rgba colour, int x, int y, int width, int height, int thickne
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1112](../../stdlib/Drawing.sl#L1112)</sub>
+<sub>[stdlib/Drawing.sl:1276](../../stdlib/Drawing.sl#L1276)</sub>
 
 #### FillRectangle *method*
 
@@ -182,7 +182,7 @@ void FillRectangle(Rgba colour, int x, int y, int width, int height)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1117](../../stdlib/Drawing.sl#L1117)</sub>
+<sub>[stdlib/Drawing.sl:1282](../../stdlib/Drawing.sl#L1282)</sub>
 
 #### DrawEllipse *method*
 
@@ -194,7 +194,7 @@ An ellipse inside the rectangle given, which is how every other API here
 and in `Forms.Drawing` spells one -- libgd's centre-and-size form is
 converted by the backend.
 
-<sub>[stdlib/Drawing.sl:1124](../../stdlib/Drawing.sl#L1124)</sub>
+<sub>[stdlib/Drawing.sl:1290](../../stdlib/Drawing.sl#L1290)</sub>
 
 #### FillEllipse *method*
 
@@ -204,7 +204,7 @@ void FillEllipse(Rgba colour, int x, int y, int width, int height)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1129](../../stdlib/Drawing.sl#L1129)</sub>
+<sub>[stdlib/Drawing.sl:1296](../../stdlib/Drawing.sl#L1296)</sub>
 
 #### DrawPolygon *method*
 
@@ -221,7 +221,7 @@ every mention of whichever one it meant. Neither library should be the
 one that makes the other awkward to import, so this one declares no
 geometry at all.
 
-<sub>[stdlib/Drawing.sl:1150](../../stdlib/Drawing.sl#L1150)</sub>
+<sub>[stdlib/Drawing.sl:1321](../../stdlib/Drawing.sl#L1321)</sub>
 
 #### FillPolygon *method*
 
@@ -231,7 +231,7 @@ void FillPolygon(Rgba colour, int[] points)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1154](../../stdlib/Drawing.sl#L1154)</sub>
+<sub>[stdlib/Drawing.sl:1326](../../stdlib/Drawing.sl#L1326)</sub>
 
 #### Draw *method*
 
@@ -241,7 +241,7 @@ void Draw(Image source, int x, int y)
 
 Draws another picture on this one, at its own size.
 
-<sub>[stdlib/Drawing.sl:1166](../../stdlib/Drawing.sl#L1166)</sub>
+<sub>[stdlib/Drawing.sl:1342](../../stdlib/Drawing.sl#L1342)</sub>
 
 #### DrawScaled *method*
 
@@ -252,7 +252,7 @@ void DrawScaled(Image source, int x, int y, int width, int height, int sourceX, 
 Draws part of another picture into a rectangle of this one, scaling to
 fit. What a thumbnail and a sprite sheet are both made of.
 
-<sub>[stdlib/Drawing.sl:1173](../../stdlib/Drawing.sl#L1173)</sub>
+<sub>[stdlib/Drawing.sl:1350](../../stdlib/Drawing.sl#L1350)</sub>
 
 #### Resize *method*
 
@@ -262,7 +262,7 @@ Result<Image, ImageError> Resize(int width, int height)
 
 A copy at another size, resampled.
 
-<sub>[stdlib/Drawing.sl:1185](../../stdlib/Drawing.sl#L1185)</sub>
+<sub>[stdlib/Drawing.sl:1366](../../stdlib/Drawing.sl#L1366)</sub>
 
 #### Encode *method*
 
@@ -277,7 +277,7 @@ encoder's own default. GDI+ ignores it -- setting it there needs an
 `EncoderParameters` laid out by hand for the one format that reads one,
 and its default of 75 is the same number libgd uses.
 
-<sub>[stdlib/Drawing.sl:1201](../../stdlib/Drawing.sl#L1201)</sub>
+<sub>[stdlib/Drawing.sl:1384](../../stdlib/Drawing.sl#L1384)</sub>
 
 #### Save *method*
 
@@ -287,7 +287,7 @@ ImageError Save(String path, ImageFormat format, int quality)
 
 Encodes and writes to a file. `ImageError.None` when it worked.
 
-<sub>[stdlib/Drawing.sl:1213](../../stdlib/Drawing.sl#L1213)</sub>
+<sub>[stdlib/Drawing.sl:1400](../../stdlib/Drawing.sl#L1400)</sub>
 
 ### ImageError *enum*
 
@@ -297,7 +297,7 @@ enum ImageError
 
 What went wrong.
 
-<sub>[stdlib/Drawing.sl:145](../../stdlib/Drawing.sl#L145)</sub>
+<sub>[stdlib/Drawing.sl:150](../../stdlib/Drawing.sl#L150)</sub>
 
 #### None *case*
 
@@ -307,7 +307,7 @@ None = 0
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:146](../../stdlib/Drawing.sl#L146)</sub>
+<sub>[stdlib/Drawing.sl:152](../../stdlib/Drawing.sl#L152)</sub>
 
 #### NoBackend *case*
 
@@ -320,7 +320,7 @@ There is no imaging library on this machine. On Windows that means
 libgd is not installed, which is ordinary and is why this is a value
 rather than a failure.
 
-<sub>[stdlib/Drawing.sl:152](../../stdlib/Drawing.sl#L152)</sub>
+<sub>[stdlib/Drawing.sl:158](../../stdlib/Drawing.sl#L158)</sub>
 
 #### NotFound *case*
 
@@ -330,7 +330,7 @@ NotFound = 2
 
 No such file, or a directory along the path is missing.
 
-<sub>[stdlib/Drawing.sl:155](../../stdlib/Drawing.sl#L155)</sub>
+<sub>[stdlib/Drawing.sl:161](../../stdlib/Drawing.sl#L161)</sub>
 
 #### Unreadable *case*
 
@@ -340,7 +340,7 @@ Unreadable = 3
 
 It is there and the decoder would not have it.
 
-<sub>[stdlib/Drawing.sl:158](../../stdlib/Drawing.sl#L158)</sub>
+<sub>[stdlib/Drawing.sl:164](../../stdlib/Drawing.sl#L164)</sub>
 
 #### Unsupported *case*
 
@@ -351,7 +351,7 @@ Unsupported = 4
 The format is not one of the four, or is one this build of libgd was
 compiled without.
 
-<sub>[stdlib/Drawing.sl:162](../../stdlib/Drawing.sl#L162)</sub>
+<sub>[stdlib/Drawing.sl:168](../../stdlib/Drawing.sl#L168)</sub>
 
 #### WriteFailed *case*
 
@@ -361,7 +361,7 @@ WriteFailed = 5
 
 The encode worked and the write did not.
 
-<sub>[stdlib/Drawing.sl:165](../../stdlib/Drawing.sl#L165)</sub>
+<sub>[stdlib/Drawing.sl:171](../../stdlib/Drawing.sl#L171)</sub>
 
 #### OutOfMemory *case*
 
@@ -372,7 +372,7 @@ OutOfMemory = 6
 The allocation failed, which for an image means a size nothing could
 hold rather than a machine out of memory.
 
-<sub>[stdlib/Drawing.sl:169](../../stdlib/Drawing.sl#L169)</sub>
+<sub>[stdlib/Drawing.sl:175](../../stdlib/Drawing.sl#L175)</sub>
 
 #### Invalid *case*
 
@@ -383,7 +383,7 @@ Invalid = 7
 A size that is not positive, or a call on an image that is already
 closed.
 
-<sub>[stdlib/Drawing.sl:173](../../stdlib/Drawing.sl#L173)</sub>
+<sub>[stdlib/Drawing.sl:179](../../stdlib/Drawing.sl#L179)</sub>
 
 ### ImageFormat *enum*
 
@@ -397,7 +397,7 @@ Four, because four is what GDI+ and libgd agree about. A file is recognised
 by its first bytes rather than by its name, so a picture that arrived over a
 socket is read the same way as one on disk.
 
-<sub>[stdlib/Drawing.sl:142](../../stdlib/Drawing.sl#L142)</sub>
+<sub>[stdlib/Drawing.sl:147](../../stdlib/Drawing.sl#L147)</sub>
 
 #### Png *case*
 
@@ -407,7 +407,7 @@ Png
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:142](../../stdlib/Drawing.sl#L142)</sub>
+<sub>[stdlib/Drawing.sl:147](../../stdlib/Drawing.sl#L147)</sub>
 
 #### Jpeg *case*
 
@@ -417,7 +417,7 @@ Jpeg
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:142](../../stdlib/Drawing.sl#L142)</sub>
+<sub>[stdlib/Drawing.sl:147](../../stdlib/Drawing.sl#L147)</sub>
 
 #### Bmp *case*
 
@@ -427,7 +427,7 @@ Bmp
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:142](../../stdlib/Drawing.sl#L142)</sub>
+<sub>[stdlib/Drawing.sl:147](../../stdlib/Drawing.sl#L147)</sub>
 
 #### Gif *case*
 
@@ -437,7 +437,7 @@ Gif
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:142](../../stdlib/Drawing.sl#L142)</sub>
+<sub>[stdlib/Drawing.sl:147](../../stdlib/Drawing.sl#L147)</sub>
 
 ### Imaging *class*
 
@@ -451,7 +451,7 @@ The imaging library, loaded once and shared.
 chart wants to say "install libgd" at startup rather than at the end of a
 long computation, and `Available` is how it finds out.
 
-<sub>[stdlib/Drawing.sl:934](../../stdlib/Drawing.sl#L934)</sub>
+<sub>[stdlib/Drawing.sl:1064](../../stdlib/Drawing.sl#L1064)</sub>
 
 #### Available *property*
 
@@ -464,7 +464,7 @@ Whether there is an imaging library on this machine.
 Loads it, so the first call is where the cost is and every `Image` after
 it is free.
 
-<sub>[stdlib/Drawing.sl:967](../../stdlib/Drawing.sl#L967)</sub>
+<sub>[stdlib/Drawing.sl:1101](../../stdlib/Drawing.sl#L1101)</sub>
 
 #### BackendName *property*
 
@@ -475,7 +475,7 @@ static String BackendName { get; }
 The name of the library behind it, for a program that reports what it
 found. `""` when there is none.
 
-<sub>[stdlib/Drawing.sl:971](../../stdlib/Drawing.sl#L971)</sub>
+<sub>[stdlib/Drawing.sl:1105](../../stdlib/Drawing.sl#L1105)</sub>
 
 ### Rgba *struct*
 
@@ -495,7 +495,7 @@ Packed as `0xAARRGGBB`, which is what GDI+ calls an ARGB and what the
 libgd backend converts to and from -- libgd's alpha is seven bits and
 inverted, and that is the only place it shows.
 
-<sub>[stdlib/Drawing.sl:81](../../stdlib/Drawing.sl#L81)</sub>
+<sub>[stdlib/Drawing.sl:82](../../stdlib/Drawing.sl#L82)</sub>
 
 #### R *field*
 
@@ -505,7 +505,7 @@ byte R
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:82](../../stdlib/Drawing.sl#L82)</sub>
+<sub>[stdlib/Drawing.sl:84](../../stdlib/Drawing.sl#L84)</sub>
 
 #### G *field*
 
@@ -515,7 +515,7 @@ byte G
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:83](../../stdlib/Drawing.sl#L83)</sub>
+<sub>[stdlib/Drawing.sl:85](../../stdlib/Drawing.sl#L85)</sub>
 
 #### B *field*
 
@@ -525,7 +525,7 @@ byte B
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:84](../../stdlib/Drawing.sl#L84)</sub>
+<sub>[stdlib/Drawing.sl:86](../../stdlib/Drawing.sl#L86)</sub>
 
 #### A *field*
 
@@ -535,7 +535,7 @@ byte A
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:85](../../stdlib/Drawing.sl#L85)</sub>
+<sub>[stdlib/Drawing.sl:87](../../stdlib/Drawing.sl#L87)</sub>
 
 #### Rgb *method*
 
@@ -545,7 +545,7 @@ static Rgba Rgb(byte red, byte green, byte blue)
 
 An opaque colour.
 
-<sub>[stdlib/Drawing.sl:88](../../stdlib/Drawing.sl#L88)</sub>
+<sub>[stdlib/Drawing.sl:90](../../stdlib/Drawing.sl#L90)</sub>
 
 #### Argb *method*
 
@@ -555,7 +555,7 @@ static Rgba Argb(byte alpha, byte red, byte green, byte blue)
 
 A colour with an alpha, where 0 is invisible and 255 is opaque.
 
-<sub>[stdlib/Drawing.sl:98](../../stdlib/Drawing.sl#L98)</sub>
+<sub>[stdlib/Drawing.sl:101](../../stdlib/Drawing.sl#L101)</sub>
 
 #### FromPacked *method*
 
@@ -566,7 +566,7 @@ static Rgba FromPacked(uint packed)
 From `0xAARRGGBB`, which is what `Packed` answers and what a colour
 written as a hex literal in a program usually is.
 
-<sub>[stdlib/Drawing.sl:109](../../stdlib/Drawing.sl#L109)</sub>
+<sub>[stdlib/Drawing.sl:113](../../stdlib/Drawing.sl#L113)</sub>
 
 #### Packed *property*
 
@@ -576,7 +576,7 @@ uint Packed { get; }
 
 `0xAARRGGBB`.
 
-<sub>[stdlib/Drawing.sl:115](../../stdlib/Drawing.sl#L115)</sub>
+<sub>[stdlib/Drawing.sl:120](../../stdlib/Drawing.sl#L120)</sub>
 
 #### IsInvisible *property*
 
@@ -586,7 +586,7 @@ bool IsInvisible { get; }
 
 Whether anything of this would be drawn at all.
 
-<sub>[stdlib/Drawing.sl:119](../../stdlib/Drawing.sl#L119)</sub>
+<sub>[stdlib/Drawing.sl:124](../../stdlib/Drawing.sl#L124)</sub>
 
 #### Equals *method*
 
@@ -596,7 +596,7 @@ bool Equals(Rgba other)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:121](../../stdlib/Drawing.sl#L121)</sub>
+<sub>[stdlib/Drawing.sl:126](../../stdlib/Drawing.sl#L126)</sub>
 
 #### Transparent *property*
 
@@ -611,7 +611,7 @@ every program, including every shared library anybody builds. A property
 is a function, so there is nothing to initialize and nothing to go
 wrong; the six of them fold to four bytes each.
 
-<sub>[stdlib/Drawing.sl:129](../../stdlib/Drawing.sl#L129)</sub>
+<sub>[stdlib/Drawing.sl:134](../../stdlib/Drawing.sl#L134)</sub>
 
 #### Black *property*
 
@@ -621,7 +621,7 @@ static Rgba Black { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:130](../../stdlib/Drawing.sl#L130)</sub>
+<sub>[stdlib/Drawing.sl:135](../../stdlib/Drawing.sl#L135)</sub>
 
 #### White *property*
 
@@ -631,7 +631,7 @@ static Rgba White { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:131](../../stdlib/Drawing.sl#L131)</sub>
+<sub>[stdlib/Drawing.sl:136](../../stdlib/Drawing.sl#L136)</sub>
 
 #### Red *property*
 
@@ -641,7 +641,7 @@ static Rgba Red { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:132](../../stdlib/Drawing.sl#L132)</sub>
+<sub>[stdlib/Drawing.sl:137](../../stdlib/Drawing.sl#L137)</sub>
 
 #### Green *property*
 
@@ -651,7 +651,7 @@ static Rgba Green { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:133](../../stdlib/Drawing.sl#L133)</sub>
+<sub>[stdlib/Drawing.sl:138](../../stdlib/Drawing.sl#L138)</sub>
 
 #### Blue *property*
 
@@ -661,5 +661,5 @@ static Rgba Blue { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:134](../../stdlib/Drawing.sl#L134)</sub>
+<sub>[stdlib/Drawing.sl:139](../../stdlib/Drawing.sl#L139)</sub>
 

@@ -34,7 +34,7 @@ struct Completed
 
 What a finished program left behind.
 
-<sub>[stdlib/Process.sl:84](../../stdlib/Process.sl#L84)</sub>
+<sub>[stdlib/Process.sl:86](../../stdlib/Process.sl#L86)</sub>
 
 #### ExitCode *field*
 
@@ -45,7 +45,7 @@ int ExitCode
 Zero by convention means success; 128 + N means a signal killed it,
 which is what a shell reports too.
 
-<sub>[stdlib/Process.sl:87](../../stdlib/Process.sl#L87)</sub>
+<sub>[stdlib/Process.sl:90](../../stdlib/Process.sl#L90)</sub>
 
 #### Output *field*
 
@@ -55,7 +55,7 @@ String Output
 
 Everything it wrote to its output, as one String.
 
-<sub>[stdlib/Process.sl:90](../../stdlib/Process.sl#L90)</sub>
+<sub>[stdlib/Process.sl:93](../../stdlib/Process.sl#L93)</sub>
 
 #### Errors *field*
 
@@ -66,7 +66,7 @@ String Errors
 And to its error stream, kept separate so that a program which prints
 progress there does not corrupt what was being captured.
 
-<sub>[stdlib/Process.sl:94](../../stdlib/Process.sl#L94)</sub>
+<sub>[stdlib/Process.sl:97](../../stdlib/Process.sl#L97)</sub>
 
 #### Ok *method*
 
@@ -76,7 +76,7 @@ bool Ok()
 
 The usual question, spelled once.
 
-<sub>[stdlib/Process.sl:97](../../stdlib/Process.sl#L97)</sub>
+<sub>[stdlib/Process.sl:100](../../stdlib/Process.sl#L100)</sub>
 
 ### Process *class*
 
@@ -89,7 +89,7 @@ A program that was started and has not been waited for.
 Its streams are this process's own, so what it prints goes where this
 program's output goes. `Run` is the one that captures.
 
-<sub>[stdlib/Process.sl:175](../../stdlib/Process.sl#L175)</sub>
+<sub>[stdlib/Process.sl:189](../../stdlib/Process.sl#L189)</sub>
 
 #### Id *method*
 
@@ -99,7 +99,7 @@ long Id()
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:188](../../stdlib/Process.sl#L188)</sub>
+<sub>[stdlib/Process.sl:203](../../stdlib/Process.sl#L203)</sub>
 
 #### Wait *method*
 
@@ -111,7 +111,7 @@ Waits for it to finish, and answers with the code it left.
 
 Asking twice is harmless and answers the same both times.
 
-<sub>[stdlib/Process.sl:193](../../stdlib/Process.sl#L193)</sub>
+<sub>[stdlib/Process.sl:208](../../stdlib/Process.sl#L208)</sub>
 
 #### Finished *method*
 
@@ -123,7 +123,7 @@ The code it left, if it has finished, without waiting for it.
 
     while (child.Finished().IsEmpty()) { DoSomethingElse(); }
 
-<sub>[stdlib/Process.sl:202](../../stdlib/Process.sl#L202)</sub>
+<sub>[stdlib/Process.sl:219](../../stdlib/Process.sl#L219)</sub>
 
 #### Stop *method*
 
@@ -133,7 +133,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:209](../../stdlib/Process.sl#L209)</sub>
+<sub>[stdlib/Process.sl:228](../../stdlib/Process.sl#L228)</sub>
 
 #### Kill *method*
 
@@ -143,7 +143,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:212](../../stdlib/Process.sl#L212)</sub>
+<sub>[stdlib/Process.sl:231](../../stdlib/Process.sl#L231)</sub>
 
 #### Start *method*
 
@@ -153,7 +153,7 @@ static Result<Process, ProcessError> Start(String program, String[] arguments)
 
 Starts a program without waiting for it.
 
-<sub>[stdlib/Process.sl:215](../../stdlib/Process.sl#L215)</sub>
+<sub>[stdlib/Process.sl:234](../../stdlib/Process.sl#L234)</sub>
 
 ### ProcessError *enum*
 
@@ -167,7 +167,7 @@ Only about *starting* it. A program that ran and failed is a `Completed`
 with a non-zero `ExitCode`, which is an outcome rather than an error --
 `grep` answering 1 for "no match" is the ordinary case, not a fault.
 
-<sub>[stdlib/Process.sl:66](../../stdlib/Process.sl#L66)</sub>
+<sub>[stdlib/Process.sl:67](../../stdlib/Process.sl#L67)</sub>
 
 #### None *case*
 
@@ -177,7 +177,7 @@ None
 
 It started.
 
-<sub>[stdlib/Process.sl:68](../../stdlib/Process.sl#L68)</sub>
+<sub>[stdlib/Process.sl:70](../../stdlib/Process.sl#L70)</sub>
 
 #### NotFound *case*
 
@@ -187,7 +187,7 @@ NotFound
 
 No such program, on the PATH or at the path given.
 
-<sub>[stdlib/Process.sl:71](../../stdlib/Process.sl#L71)</sub>
+<sub>[stdlib/Process.sl:73](../../stdlib/Process.sl#L73)</sub>
 
 #### Denied *case*
 
@@ -197,7 +197,7 @@ Denied
 
 It exists and this process may not run it.
 
-<sub>[stdlib/Process.sl:74](../../stdlib/Process.sl#L74)</sub>
+<sub>[stdlib/Process.sl:76](../../stdlib/Process.sl#L76)</sub>
 
 #### NoResource *case*
 
@@ -207,7 +207,7 @@ NoResource
 
 Out of processes, descriptors or memory.
 
-<sub>[stdlib/Process.sl:77](../../stdlib/Process.sl#L77)</sub>
+<sub>[stdlib/Process.sl:79](../../stdlib/Process.sl#L79)</sub>
 
 #### Failed *case*
 
@@ -217,7 +217,7 @@ Failed
 
 It did not start, for a reason none of the above names.
 
-<sub>[stdlib/Process.sl:80](../../stdlib/Process.sl#L80)</sub>
+<sub>[stdlib/Process.sl:82](../../stdlib/Process.sl#L82)</sub>
 
 ### Signals *class*
 
@@ -237,7 +237,7 @@ top of its own loop, where it can actually tidy up.
     while (!Signals.Interrupted()) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
-<sub>[stdlib/Process.sl:240](../../stdlib/Process.sl#L240)</sub>
+<sub>[stdlib/Process.sl:262](../../stdlib/Process.sl#L262)</sub>
 
 #### Watch *method*
 
@@ -248,7 +248,7 @@ static bool Watch()
 Starts noticing interrupts. Until this is called they end the program,
 which is the right default for something that has nothing to tidy.
 
-<sub>[stdlib/Process.sl:243](../../stdlib/Process.sl#L243)</sub>
+<sub>[stdlib/Process.sl:266](../../stdlib/Process.sl#L266)</sub>
 
 #### Interrupted *method*
 
@@ -258,7 +258,7 @@ static bool Interrupted()
 
 Whether one has arrived since the last `Clear`.
 
-<sub>[stdlib/Process.sl:246](../../stdlib/Process.sl#L246)</sub>
+<sub>[stdlib/Process.sl:269](../../stdlib/Process.sl#L269)</sub>
 
 #### Clear *method*
 
@@ -268,7 +268,7 @@ static void Clear()
 
 Forgets the one that arrived, for a program that means to carry on.
 
-<sub>[stdlib/Process.sl:249](../../stdlib/Process.sl#L249)</sub>
+<sub>[stdlib/Process.sl:272](../../stdlib/Process.sl#L272)</sub>
 
 ## Functions
 
@@ -286,7 +286,7 @@ returned.
 `arguments` does **not** include the program's own name; that is `program`,
 and it is what a PATH lookup is done on when it has no separator in it.
 
-<sub>[stdlib/Process.sl:139](../../stdlib/Process.sl#L139)</sub>
+<sub>[stdlib/Process.sl:149](../../stdlib/Process.sl#L149)</sub>
 
 ### Run *function*
 
@@ -300,5 +300,5 @@ The pipe is closed once `input` has been written, which is what makes a
 program reading to end-of-input stop rather than wait. A child that exits
 without reading is not an error here: the write stops and the run goes on.
 
-<sub>[stdlib/Process.sl:148](../../stdlib/Process.sl#L148)</sub>
+<sub>[stdlib/Process.sl:159](../../stdlib/Process.sl#L159)</sub>
 

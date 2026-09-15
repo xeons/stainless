@@ -39,7 +39,8 @@ import Standard.Ascii;
 extern "C" double sl_parse_double(byte* text, nuint count);
 
 /// Why a conversion did not happen.
-public enum ConvertError {
+public enum ConvertError
+{
     /// There was nothing to convert.
     Empty,
 
@@ -56,7 +57,8 @@ public enum ConvertError {
 ///
 /// A leading `+` or `-` is allowed and nothing else is: no spaces, no
 /// separators, no trailing units. Trim first if the input might have any.
-public Result<long, ConvertError> ToLong(String text) {
+public Result<long, ConvertError> ToLong(String text)
+{
     return ToLong(text, 10);
 }
 
@@ -64,20 +66,25 @@ public Result<long, ConvertError> ToLong(String text) {
 ///
 /// Letters count from `a` = 10 in either case, so base 16 takes `1F` and `1f`
 /// alike, and base 36 goes to `z`.
-public Result<long, ConvertError> ToLong(String text, uint radix) {
-    if (radix < 2 || radix > 36) { return Fail(ConvertError.Malformed); }
+public Result<long, ConvertError> ToLong(String text, uint radix)
+{
+    if (radix < 2 || radix > 36)
+        return Fail(ConvertError.Malformed);
 
     nuint size = text.ByteLength();
-    if (size == 0) { return Fail(ConvertError.Empty); }
+    if (size == 0)
+        return Fail(ConvertError.Empty);
 
     var bytes = text.ToPointer();
     nuint at = 0;
     bool negative = false;
 
-    if (bytes[0] == 43 || bytes[0] == 45) {          // '+' or '-'
+    if (bytes[0] == 43 || bytes[0] == 45) // '+' or '-'
+    {
         negative = bytes[0] == 45;
         at = 1;
-        if (size == 1) { return Fail(ConvertError.Empty); }
+        if (size == 1)
+            return Fail(ConvertError.Empty);
     }
 
     // Accumulated as unsigned so that long.MinValue, whose magnitude does not
@@ -85,24 +92,30 @@ public Result<long, ConvertError> ToLong(String text, uint radix) {
     // signed accumulator always gets wrong.
     ulong magnitude = 0;
     ulong limit = 9223372036854775807u;
-    if (negative) { limit = 9223372036854775808u; }
+    if (negative)
+        limit = 9223372036854775808u;
 
-    for (nuint i = at; i < size; i++) {
+    for (nuint i = at; i < size; i++)
+    {
         int digit = DigitValue(bytes[i]);
-        if (digit < 0 || (uint)digit >= radix) { return Fail(ConvertError.Malformed); }
+        if (digit < 0 || (uint)digit >= radix)
+            return Fail(ConvertError.Malformed);
 
-        if (magnitude > (limit - (ulong)digit) / (ulong)radix) {
+        if (magnitude > (limit - (ulong)digit) / (ulong)radix)
+        {
             return Fail(ConvertError.OutOfRange);
         }
         magnitude = magnitude * (ulong)radix + (ulong)digit;
     }
 
-    if (negative) { return Ok(-(long)magnitude); }
+    if (negative)
+        return Ok(-(long)magnitude);
     return Ok((long)magnitude);
 }
 
 /// `text` as an `int`, which is `ToLong` plus a range check.
-public Result<int, ConvertError> ToInt(String text) {
+public Result<int, ConvertError> ToInt(String text)
+{
     return ToInt(text, 10);
 }
 
@@ -110,11 +123,14 @@ public Result<int, ConvertError> ToInt(String text) {
 ///
 /// A number that parses as a `long` and does not fit an `int` is
 /// `OutOfRange`, not a truncation.
-public Result<int, ConvertError> ToInt(String text, uint radix) {
+public Result<int, ConvertError> ToInt(String text, uint radix)
+{
     var wide = ToLong(text, radix);
-    switch (wide) {
+    switch (wide)
+    {
         case Ok ok:
-            if (ok.Value < -2147483648 || ok.Value > 2147483647) {
+            if (ok.Value < -2147483648 || ok.Value > 2147483647)
+            {
                 return Fail(ConvertError.OutOfRange);
             }
             return Ok((int)ok.Value);
@@ -125,7 +141,8 @@ public Result<int, ConvertError> ToInt(String text, uint radix) {
 
 /// `text` as an unsigned whole number. A leading `-` is malformed rather than
 /// wrapping, which is the whole point of asking for an unsigned one.
-public Result<ulong, ConvertError> ToULong(String text) {
+public Result<ulong, ConvertError> ToULong(String text)
+{
     return ToULong(text, 10);
 }
 
@@ -133,23 +150,31 @@ public Result<ulong, ConvertError> ToULong(String text) {
 ///
 /// Letters count from `a` = 10 in either case. A leading `+` is allowed; a
 /// leading `-` is `Malformed`.
-public Result<ulong, ConvertError> ToULong(String text, uint radix) {
-    if (radix < 2 || radix > 36) { return Fail(ConvertError.Malformed); }
+public Result<ulong, ConvertError> ToULong(String text, uint radix)
+{
+    if (radix < 2 || radix > 36)
+        return Fail(ConvertError.Malformed);
 
     nuint size = text.ByteLength();
-    if (size == 0) { return Fail(ConvertError.Empty); }
+    if (size == 0)
+        return Fail(ConvertError.Empty);
 
     var bytes = text.ToPointer();
     nuint at = 0;
-    if (bytes[0] == 43) { at = 1; }                  // a '+' is allowed
-    if (at == size) { return Fail(ConvertError.Empty); }
+    if (bytes[0] == 43)                  // a '+' is allowed
+        at = 1;
+    if (at == size)
+        return Fail(ConvertError.Empty);
 
     ulong value = 0;
-    for (nuint i = at; i < size; i++) {
+    for (nuint i = at; i < size; i++)
+    {
         int digit = DigitValue(bytes[i]);
-        if (digit < 0 || (uint)digit >= radix) { return Fail(ConvertError.Malformed); }
+        if (digit < 0 || (uint)digit >= radix)
+            return Fail(ConvertError.Malformed);
 
-        if (value > (18446744073709551615u - (ulong)digit) / (ulong)radix) {
+        if (value > (18446744073709551615u - (ulong)digit) / (ulong)radix)
+        {
             return Fail(ConvertError.OutOfRange);
         }
         value = value * (ulong)radix + (ulong)digit;
@@ -161,9 +186,12 @@ public Result<ulong, ConvertError> ToULong(String text, uint radix) {
 ///
 /// Base ten needs nothing from here: `Text.FromInteger` already does it, and
 /// through C's own formatter.
-public String FromLong(long value, uint radix) {
-    if (radix < 2 || radix > 36) { return ""; }
-    if (value == 0) { return "0"; }
+public String FromLong(long value, uint radix)
+{
+    if (radix < 2 || radix > 36)
+        return "";
+    if (value == 0)
+        return "0";
 
     bool negative = value < 0;
 
@@ -172,17 +200,20 @@ public String FromLong(long value, uint radix) {
     ulong magnitude = negative ? (ulong)(-(value + 1)) + 1u : (ulong)value;
 
     var digits = new StringBuilder();
-    while (magnitude > 0) {
+    while (magnitude > 0)
+    {
         byte digit = DigitTable((nuint)(magnitude % (ulong)radix));
         digits.Append(FromBytes(&digit, 1));
         magnitude = magnitude / (ulong)radix;
     }
 
     var built = new StringBuilder();
-    if (negative) { built.Append("-"); }
+    if (negative)
+        built.Append("-");
 
     // Written backwards, so read backwards.
-    for (nuint i = digits.ByteLength(); i > 0; i--) {
+    for (nuint i = digits.ByteLength(); i > 0; i--)
+    {
         var one = digits.ByteAt(i - 1);
         built.Append(FromBytes(&one, 1));
     }
@@ -196,47 +227,59 @@ public String FromLong(long value, uint radix) {
 /// Accepts what C accepts of the ordinary forms -- an optional sign, digits, a
 /// point, an exponent -- and nothing else. Hexadecimal floats, infinities and
 /// NaN are not spelled here.
-public Result<double, ConvertError> ToDouble(String text) {
+public Result<double, ConvertError> ToDouble(String text)
+{
     nuint size = text.ByteLength();
-    if (size == 0) { return Fail(ConvertError.Empty); }
+    if (size == 0)
+        return Fail(ConvertError.Empty);
 
     var bytes = text.ToPointer();
     nuint at = 0;
 
-    if (bytes[0] == 43 || bytes[0] == 45) { at = 1; }
+    if (bytes[0] == 43 || bytes[0] == 45)
+        at = 1;
 
     // This walk decides only whether the text is a number this library
     // accepts; what the digits are worth is settled once, at the end, by the
     // runtime, the sign included.
     nuint digits = 0;
 
-    while (at < size && Ascii.IsDigit(bytes[at])) {
+    while (at < size && Ascii.IsDigit(bytes[at]))
+    {
         at++;
         digits++;
     }
 
-    if (at < size && bytes[at] == 46) {              // '.'
+    if (at < size && bytes[at] == 46) // '.'
+    {
         at++;
-        while (at < size && Ascii.IsDigit(bytes[at])) {
+        while (at < size && Ascii.IsDigit(bytes[at]))
+        {
             at++;
             digits++;
         }
     }
 
     // A sign and a point and no digits at all is not a number.
-    if (digits == 0) { return Fail(ConvertError.Malformed); }
+    if (digits == 0)
+        return Fail(ConvertError.Malformed);
 
-    if (at < size && (bytes[at] == 101 || bytes[at] == 69)) {     // 'e' or 'E'
+    if (at < size && (bytes[at] == 101 || bytes[at] == 69)) // 'e' or 'E'
+    {
         at++;
 
-        if (at < size && (bytes[at] == 43 || bytes[at] == 45)) { at++; }
+        if (at < size && (bytes[at] == 43 || bytes[at] == 45))
+            at++;
 
-        if (at >= size || !Ascii.IsDigit(bytes[at])) { return Fail(ConvertError.Malformed); }
+        if (at >= size || !Ascii.IsDigit(bytes[at]))
+            return Fail(ConvertError.Malformed);
 
-        while (at < size && Ascii.IsDigit(bytes[at])) { at++; }
+        while (at < size && Ascii.IsDigit(bytes[at]))
+            at++;
     }
 
-    if (at != size) { return Fail(ConvertError.Malformed); }
+    if (at != size)
+        return Fail(ConvertError.Malformed);
 
     // Correctly rounded, which is the one thing the walk above cannot be.
     return Ok(sl_parse_double(bytes, size));
@@ -245,23 +288,29 @@ public Result<double, ConvertError> ToDouble(String text) {
 // ---------------------------------------------------------------- hexadecimal
 
 /// `data` as lowercase hexadecimal, two characters per byte and nothing between.
-public String ToHex(byte[] data) {
+public String ToHex(byte[] data)
+{
     return ToHex(data, false);
 }
 
 /// The same, in the case asked for.
-public String ToHex(byte[] data, bool upper) {
+public String ToHex(byte[] data, bool upper)
+{
     var built = new StringBuilder();
 
-    for (nuint i = 0; i < data.Length; i++) {
+    for (nuint i = 0; i < data.Length; i++)
+    {
         int high = (int)(data[i] >> 4);
         int low = (int)(data[i] & 0x0F);
 
         byte[2] pair;
-        if (upper) {
+        if (upper)
+        {
             pair[0] = Ascii.HexDigitUpper(high);
             pair[1] = Ascii.HexDigitUpper(low);
-        } else {
+        }
+        else
+        {
             pair[0] = Ascii.HexDigit(high);
             pair[1] = Ascii.HexDigit(low);
         }
@@ -273,17 +322,21 @@ public String ToHex(byte[] data, bool upper) {
 /// Hexadecimal back into bytes. Either case, and an odd number of digits is
 /// malformed rather than padded, because there is no way to know which end the
 /// missing half belonged to.
-public Result<byte[], ConvertError> FromHex(String text) {
+public Result<byte[], ConvertError> FromHex(String text)
+{
     nuint size = text.ByteLength();
-    if (size % 2 != 0) { return Fail(ConvertError.Malformed); }
+    if (size % 2 != 0)
+        return Fail(ConvertError.Malformed);
 
     var bytes = text.ToPointer();
     var data = new byte[size / 2];
 
-    for (nuint i = 0; i < data.Length; i++) {
+    for (nuint i = 0; i < data.Length; i++)
+    {
         int high = Ascii.HexValue(bytes[i * 2]);
         int low = Ascii.HexValue(bytes[i * 2 + 1]);
-        if (high < 0 || low < 0) { return Fail(ConvertError.Malformed); }
+        if (high < 0 || low < 0)
+            return Fail(ConvertError.Malformed);
 
         data[i] = (byte)((high << 4) | low);
     }
@@ -293,13 +346,15 @@ public Result<byte[], ConvertError> FromHex(String text) {
 // --------------------------------------------------------------------- base64
 
 /// `data` as base64, padded with `=` to a multiple of four.
-public String ToBase64(byte[] data) {
+public String ToBase64(byte[] data)
+{
     return Encode64(data, false, true);
 }
 
 /// `data` as base64url: `-` and `_` for the last two characters, and no
 /// padding. What a JWT and a URL query both want, and RFC 4648 §5.
-public String ToBase64Url(byte[] data) {
+public String ToBase64Url(byte[] data)
+{
     return Encode64(data, true, false);
 }
 
@@ -308,35 +363,43 @@ public String ToBase64Url(byte[] data) {
 /// Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 /// 76 columns and a decoder that refused a newline would be useless for the
 /// thing it is most often pointed at.
-public Result<byte[], ConvertError> FromBase64(String text) {
+public Result<byte[], ConvertError> FromBase64(String text)
+{
     nuint size = text.ByteLength();
     var bytes = text.ToPointer();
 
     // Counted first: four characters become three bytes, and the padding says
     // how many of the last three are real.
     nuint characters = 0;
-    for (nuint i = 0; i < size; i++) {
+    for (nuint i = 0; i < size; i++)
+    {
         byte one = bytes[i];
-        if (Ascii.IsWhiteSpace(one) || one == 61) { continue; }      // '='
-        if (Base64Value(one) < 0) { return Fail(ConvertError.Malformed); }
+        if (Ascii.IsWhiteSpace(one) || one == 61)      // '='
+            continue;
+        if (Base64Value(one) < 0)
+            return Fail(ConvertError.Malformed);
         characters++;
     }
 
-    if (characters % 4 == 1) { return Fail(ConvertError.Malformed); }
+    if (characters % 4 == 1)
+        return Fail(ConvertError.Malformed);
 
     var data = new byte[characters * 3 / 4];
     uint accumulator = 0;
     nuint held = 0;
     nuint out = 0;
 
-    for (nuint i = 0; i < size; i++) {
+    for (nuint i = 0; i < size; i++)
+    {
         byte one = bytes[i];
-        if (Ascii.IsWhiteSpace(one) || one == 61) { continue; }
+        if (Ascii.IsWhiteSpace(one) || one == 61)
+            continue;
 
         accumulator = (accumulator << 6) | (uint)Base64Value(one);
         held++;
 
-        if (held == 4) {
+        if (held == 4)
+        {
             data[out] = (byte)(accumulator >> 16);
             data[out + 1] = (byte)((accumulator >> 8) & 0xFF);
             data[out + 2] = (byte)(accumulator & 0xFF);
@@ -348,9 +411,12 @@ public Result<byte[], ConvertError> FromBase64(String text) {
 
     // A tail of two characters carries one byte and of three carries two; the
     // bits below those are padding and are dropped.
-    if (held == 2) {
+    if (held == 2)
+    {
         data[out] = (byte)((accumulator >> 4) & 0xFF);
-    } else if (held == 3) {
+    }
+    else if (held == 3)
+    {
         data[out] = (byte)((accumulator >> 10) & 0xFF);
         data[out + 1] = (byte)((accumulator >> 2) & 0xFF);
     }
@@ -359,71 +425,100 @@ public Result<byte[], ConvertError> FromBase64(String text) {
 }
 
 /// Base64 of the UTF-8 bytes of `text`, which is the common case.
-public String ToBase64Text(String text) {
+public String ToBase64Text(String text)
+{
     return ToBase64(text.ToBytes());
 }
 
 // --------------------------------------------------------------------- private
 
-String Encode64(byte[] data, bool url, bool pad) {
+String Encode64(byte[] data, bool url, bool pad)
+{
     var built = new StringBuilder();
     nuint at = 0;
 
-    while (at + 2 < data.Length) {
+    while (at + 2 < data.Length)
+    {
         uint block = ((uint)data[at] << 16) | ((uint)data[at + 1] << 8) | (uint)data[at + 2];
         AppendSix(built, block, 4, url);
         at = at + 3;
     }
 
     nuint left = data.Length - at;
-    if (left == 1) {
+    if (left == 1)
+    {
         AppendSix(built, (uint)data[at] << 16, 2, url);
-        if (pad) { built.Append("=="); }
-    } else if (left == 2) {
+        if (pad)
+        {
+            built.Append("==");
+        }
+    }
+    else if (left == 2)
+    {
         AppendSix(built, ((uint)data[at] << 16) | ((uint)data[at + 1] << 8), 3, url);
-        if (pad) { built.Append("="); }
+        if (pad)
+            built.Append("=");
     }
 
     return built.ToText();
 }
 
 /// The top `count` six-bit groups of a 24-bit block, as characters.
-void AppendSix(StringBuilder built, uint block, nuint count, bool url) {
-    for (nuint i = 0; i < count; i++) {
+void AppendSix(StringBuilder built, uint block, nuint count, bool url)
+{
+    for (nuint i = 0; i < count; i++)
+    {
         uint six = (uint)((block >> (int)(18 - i * 6)) & 0x3F);
         var one = Base64Digit(six, url);
         built.Append(FromBytes(&one, 1));
     }
 }
 
-byte Base64Digit(uint value, bool url) {
-    if (value < 26) { return (byte)(65 + value); }               // 'A'
-    if (value < 52) { return (byte)(97 + value - 26); }          // 'a'
-    if (value < 62) { return (byte)(48 + value - 52); }          // '0'
-    if (value == 62) { return url ? (byte)45 : (byte)43; }       // '-' or '+'
+byte Base64Digit(uint value, bool url)
+{
+    if (value < 26)               // 'A'
+        return (byte)(65 + value);
+    if (value < 52)          // 'a'
+        return (byte)(97 + value - 26);
+    if (value < 62)          // '0'
+        return (byte)(48 + value - 52);
+    if (value == 62)       // '-' or '+'
+        return url ? (byte)45 : (byte)43;
     return url ? (byte)95 : (byte)47;                            // '_' or '/'
 }
 
 /// What a base64 character is worth, in either alphabet, or -1.
-int Base64Value(byte one) {
-    if (one >= 65 && one <= 90) { return (int)one - 65; }
-    if (one >= 97 && one <= 122) { return (int)one - 97 + 26; }
-    if (one >= 48 && one <= 57) { return (int)one - 48 + 52; }
-    if (one == 43 || one == 45) { return 62; }                   // '+' and '-'
-    if (one == 47 || one == 95) { return 63; }                   // '/' and '_'
+int Base64Value(byte one)
+{
+    if (one >= 65 && one <= 90)
+        return (int)one - 65;
+    if (one >= 97 && one <= 122)
+        return (int)one - 97 + 26;
+    if (one >= 48 && one <= 57)
+        return (int)one - 48 + 52;
+    if (one == 43 || one == 45)                   // '+' and '-'
+        return 62;
+    if (one == 47 || one == 95)                   // '/' and '_'
+        return 63;
     return -1;
 }
 
 /// What a digit is worth in any radix up to 36, or -1.
-int DigitValue(byte one) {
-    if (Ascii.IsDigit(one)) { return (int)one - 48; }
-    if (one >= 97 && one <= 122) { return (int)one - 97 + 10; }
-    if (one >= 65 && one <= 90) { return (int)one - 65 + 10; }
+int DigitValue(byte one)
+{
+    if (Ascii.IsDigit(one))
+        return (int)one - 48;
+    if (one >= 97 && one <= 122)
+        return (int)one - 97 + 10;
+    if (one >= 65 && one <= 90)
+        return (int)one - 65 + 10;
     return -1;
 }
 
 /// The lowercase character for a digit value up to 35.
-byte DigitTable(nuint value) {
-    if (value < 10) { return (byte)(48 + value); }
+byte DigitTable(nuint value)
+{
+    if (value < 10)
+        return (byte)(48 + value);
     return (byte)(87 + value);
 }

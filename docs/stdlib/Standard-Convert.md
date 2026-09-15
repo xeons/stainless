@@ -40,7 +40,7 @@ Empty
 
 There was nothing to convert.
 
-<sub>[stdlib/Convert.sl:44](../../stdlib/Convert.sl#L44)</sub>
+<sub>[stdlib/Convert.sl:45](../../stdlib/Convert.sl#L45)</sub>
 
 #### Malformed *case*
 
@@ -50,7 +50,7 @@ Malformed
 
 A character that cannot appear in this form.
 
-<sub>[stdlib/Convert.sl:47](../../stdlib/Convert.sl#L47)</sub>
+<sub>[stdlib/Convert.sl:48](../../stdlib/Convert.sl#L48)</sub>
 
 #### OutOfRange *case*
 
@@ -60,7 +60,7 @@ OutOfRange
 
 The digits were fine and the number does not fit.
 
-<sub>[stdlib/Convert.sl:50](../../stdlib/Convert.sl#L50)</sub>
+<sub>[stdlib/Convert.sl:51](../../stdlib/Convert.sl#L51)</sub>
 
 ## Functions
 
@@ -76,7 +76,7 @@ Whitespace is skipped, because base64 in the wild arrives wrapped at 64 or
 76 columns and a decoder that refused a newline would be useless for the
 thing it is most often pointed at.
 
-<sub>[stdlib/Convert.sl:311](../../stdlib/Convert.sl#L311)</sub>
+<sub>[stdlib/Convert.sl:366](../../stdlib/Convert.sl#L366)</sub>
 
 ### FromHex *function*
 
@@ -88,7 +88,7 @@ Hexadecimal back into bytes. Either case, and an odd number of digits is
 malformed rather than padded, because there is no way to know which end the
 missing half belonged to.
 
-<sub>[stdlib/Convert.sl:276](../../stdlib/Convert.sl#L276)</sub>
+<sub>[stdlib/Convert.sl:325](../../stdlib/Convert.sl#L325)</sub>
 
 ### FromLong *function*
 
@@ -101,7 +101,7 @@ A whole number written in `radix`, from 2 to 36, with lowercase letters.
 Base ten needs nothing from here: `Text.FromInteger` already does it, and
 through C's own formatter.
 
-<sub>[stdlib/Convert.sl:164](../../stdlib/Convert.sl#L164)</sub>
+<sub>[stdlib/Convert.sl:189](../../stdlib/Convert.sl#L189)</sub>
 
 ### ToBase64 *function*
 
@@ -111,7 +111,7 @@ String ToBase64(byte[] data)
 
 `data` as base64, padded with `=` to a multiple of four.
 
-<sub>[stdlib/Convert.sl:296](../../stdlib/Convert.sl#L296)</sub>
+<sub>[stdlib/Convert.sl:349](../../stdlib/Convert.sl#L349)</sub>
 
 ### ToBase64Text *function*
 
@@ -121,7 +121,7 @@ String ToBase64Text(String text)
 
 Base64 of the UTF-8 bytes of `text`, which is the common case.
 
-<sub>[stdlib/Convert.sl:362](../../stdlib/Convert.sl#L362)</sub>
+<sub>[stdlib/Convert.sl:428](../../stdlib/Convert.sl#L428)</sub>
 
 ### ToBase64Url *function*
 
@@ -132,7 +132,7 @@ String ToBase64Url(byte[] data)
 `data` as base64url: `-` and `_` for the last two characters, and no
 padding. What a JWT and a URL query both want, and RFC 4648 §5.
 
-<sub>[stdlib/Convert.sl:302](../../stdlib/Convert.sl#L302)</sub>
+<sub>[stdlib/Convert.sl:356](../../stdlib/Convert.sl#L356)</sub>
 
 ### ToDouble *function*
 
@@ -146,7 +146,7 @@ Accepts what C accepts of the ordinary forms -- an optional sign, digits, a
 point, an exponent -- and nothing else. Hexadecimal floats, infinities and
 NaN are not spelled here.
 
-<sub>[stdlib/Convert.sl:199](../../stdlib/Convert.sl#L199)</sub>
+<sub>[stdlib/Convert.sl:230](../../stdlib/Convert.sl#L230)</sub>
 
 ### ToHex *function*
 
@@ -156,7 +156,7 @@ String ToHex(byte[] data)
 
 `data` as lowercase hexadecimal, two characters per byte and nothing between.
 
-<sub>[stdlib/Convert.sl:248](../../stdlib/Convert.sl#L248)</sub>
+<sub>[stdlib/Convert.sl:291](../../stdlib/Convert.sl#L291)</sub>
 
 ### ToHex *function*
 
@@ -166,7 +166,7 @@ String ToHex(byte[] data, bool upper)
 
 The same, in the case asked for.
 
-<sub>[stdlib/Convert.sl:253](../../stdlib/Convert.sl#L253)</sub>
+<sub>[stdlib/Convert.sl:297](../../stdlib/Convert.sl#L297)</sub>
 
 ### ToInt *function*
 
@@ -176,7 +176,7 @@ Result<int, ConvertError> ToInt(String text)
 
 `text` as an `int`, which is `ToLong` plus a range check.
 
-<sub>[stdlib/Convert.sl:105](../../stdlib/Convert.sl#L105)</sub>
+<sub>[stdlib/Convert.sl:117](../../stdlib/Convert.sl#L117)</sub>
 
 ### ToInt *function*
 
@@ -189,7 +189,7 @@ Result<int, ConvertError> ToInt(String text, uint radix)
 A number that parses as a `long` and does not fit an `int` is
 `OutOfRange`, not a truncation.
 
-<sub>[stdlib/Convert.sl:113](../../stdlib/Convert.sl#L113)</sub>
+<sub>[stdlib/Convert.sl:126](../../stdlib/Convert.sl#L126)</sub>
 
 ### ToLong *function*
 
@@ -202,7 +202,7 @@ Result<long, ConvertError> ToLong(String text)
 A leading `+` or `-` is allowed and nothing else is: no spaces, no
 separators, no trailing units. Trim first if the input might have any.
 
-<sub>[stdlib/Convert.sl:59](../../stdlib/Convert.sl#L59)</sub>
+<sub>[stdlib/Convert.sl:60](../../stdlib/Convert.sl#L60)</sub>
 
 ### ToLong *function*
 
@@ -215,7 +215,7 @@ Result<long, ConvertError> ToLong(String text, uint radix)
 Letters count from `a` = 10 in either case, so base 16 takes `1F` and `1f`
 alike, and base 36 goes to `z`.
 
-<sub>[stdlib/Convert.sl:67](../../stdlib/Convert.sl#L67)</sub>
+<sub>[stdlib/Convert.sl:69](../../stdlib/Convert.sl#L69)</sub>
 
 ### ToULong *function*
 
@@ -226,7 +226,7 @@ Result<ulong, ConvertError> ToULong(String text)
 `text` as an unsigned whole number. A leading `-` is malformed rather than
 wrapping, which is the whole point of asking for an unsigned one.
 
-<sub>[stdlib/Convert.sl:128](../../stdlib/Convert.sl#L128)</sub>
+<sub>[stdlib/Convert.sl:144](../../stdlib/Convert.sl#L144)</sub>
 
 ### ToULong *function*
 
@@ -239,5 +239,5 @@ Result<ulong, ConvertError> ToULong(String text, uint radix)
 Letters count from `a` = 10 in either case. A leading `+` is allowed; a
 leading `-` is `Malformed`.
 
-<sub>[stdlib/Convert.sl:136](../../stdlib/Convert.sl#L136)</sub>
+<sub>[stdlib/Convert.sl:153](../../stdlib/Convert.sl#L153)</sub>
 

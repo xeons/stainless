@@ -67,7 +67,8 @@ public const int SocketError = -1;
 /// Only `Version` and `HighVersion` are worth reading, and only to check that
 /// the version asked for is the version given. The rest is documented as
 /// obsolete by Microsoft's own header.
-public struct WSADATA {
+public struct WSADATA
+{
     public ushort Version;
     public ushort HighVersion;
     public byte[257] Description;
@@ -77,7 +78,8 @@ public struct WSADATA {
     public byte* VendorInfo;
 }
 
-public extern "C" {
+public extern "C"
+{
     /// Must be called before anything else here. `version` is
     /// `MakeWord(2, 2)` for every program written this century.
     int WSAStartup(ushort version, WSADATA* data);
@@ -92,33 +94,38 @@ public extern "C" {
 }
 
 /// `MAKEWORD(low, high)`, which is what `WSAStartup` wants its version as.
-public ushort MakeWord(byte low, byte high) {
+public ushort MakeWord(byte low, byte high)
+{
     return (ushort)((ushort)low | ((ushort)high << 8));
 }
 
 // ================================================================= addresses
 
 /// `struct in_addr`. One IPv4 address, in network byte order.
-public struct in_addr {
+public struct in_addr
+{
     public uint s_addr;
 }
 
 /// `struct in6_addr`. One IPv6 address, as sixteen bytes in order.
-public struct in6_addr {
+public struct in6_addr
+{
     public byte[16] s6_addr;
 }
 
 /// `struct sockaddr`. The base every address begins with, and never the whole
 /// of one: what is really there is a `sockaddr_in` or a `sockaddr_in6`, and
 /// `sa_family` says which.
-public struct sockaddr {
+public struct sockaddr
+{
     public ushort sa_family;
     public byte[14] sa_data;
 }
 
 /// `struct sockaddr_in`. `sin_port` and `sin_addr` are in network byte order:
 /// `htons` and `inet_pton` put them there.
-public struct sockaddr_in {
+public struct sockaddr_in
+{
     public ushort sin_family;
     public ushort sin_port;
     public in_addr sin_addr;
@@ -126,7 +133,8 @@ public struct sockaddr_in {
 }
 
 /// `struct sockaddr_in6`.
-public struct sockaddr_in6 {
+public struct sockaddr_in6
+{
     public ushort sin6_family;
     public ushort sin6_port;
     public uint sin6_flowinfo;
@@ -136,7 +144,8 @@ public struct sockaddr_in6 {
 
 /// `struct sockaddr_storage`: big enough and aligned enough for either family,
 /// which is what `accept` and `recvfrom` should be handed.
-public struct sockaddr_storage {
+public struct sockaddr_storage
+{
     public ushort ss_family;
     public byte[6] __pad1;
     public long __align;
@@ -150,7 +159,8 @@ public struct sockaddr_storage {
 /// header and used here reads the two through each other, which is a pointer
 /// dereference of a string and a string print of a pointer. `ai_addrlen` also
 /// differs: `size_t` here, `socklen_t` there.
-public struct addrinfo {
+public struct addrinfo
+{
     public int ai_flags;
     public int ai_family;
     public int ai_socktype;
@@ -163,13 +173,15 @@ public struct addrinfo {
 
 /// `struct timeval`, for `select`. Both fields are `long` in Windows' header,
 /// which is 32 bits there and not 64.
-public struct timeval {
+public struct timeval
+{
     public int tv_sec;
     public int tv_usec;
 }
 
 /// `struct linger`, for `SO_LINGER`.
-public struct linger {
+public struct linger
+{
     public ushort l_onoff;
     public ushort l_linger;
 }
@@ -177,7 +189,8 @@ public struct linger {
 /// `struct fd_set`. Windows' is an array of sockets and a count, not the
 /// bitmask POSIX uses -- which is why `FD_SETSIZE` here is a limit on *how
 /// many* sockets rather than on how large a descriptor may be.
-public struct fd_set {
+public struct fd_set
+{
     public uint fd_count;
     public nuint[64] fd_array;
 }
@@ -214,7 +227,8 @@ public const uint INADDR_NONE = 4294967295u;
 
 // ============================================================ opening, closing
 
-public extern "C" {
+public extern "C"
+{
     nuint socket(int family, int kind, int protocol);
     int closesocket(nuint handle);
     int shutdown(nuint handle, int how);
@@ -238,7 +252,8 @@ public const int SOMAXCONN = 2147483647;
 
 // ================================================================== transfer
 
-public extern "C" {
+public extern "C"
+{
     /// Returns how many bytes moved, or `SocketError`. A `send` that moves
     /// fewer than asked is normal on a stream and not an error.
     int send(nuint handle, byte* data, int length, int flags);
@@ -257,7 +272,8 @@ public const int MSG_WAITALL = 8;
 
 // =================================================================== options
 
-public extern "C" {
+public extern "C"
+{
     int setsockopt(nuint handle, int level, int name, byte* value, int length);
     int getsockopt(nuint handle, int level, int name, byte* value, int* length);
 
@@ -308,7 +324,8 @@ public const uint FIONREAD = 1074030207u;       // 0x4004667F
 
 // ==================================================================== waiting
 
-public extern "C" {
+public extern "C"
+{
     /// `nfds` is ignored on Windows -- the sets carry their own counts -- and
     /// is present only so that code written for POSIX compiles.
     int select(int nfds, fd_set* readable, fd_set* writable, fd_set* failed,
@@ -321,7 +338,8 @@ public extern "C" {
 }
 
 /// `WSAPOLLFD`, which is `struct pollfd` under another name.
-public struct WSAPOLLFD {
+public struct WSAPOLLFD
+{
     public nuint fd;
     public short events;
     public short revents;
@@ -340,7 +358,8 @@ public const short POLLNVAL = 4;
 
 // ================================================================== byte order
 
-public extern "C" {
+public extern "C"
+{
     ushort htons(ushort value);
     ushort ntohs(ushort value);
     uint htonl(uint value);
@@ -349,7 +368,8 @@ public extern "C" {
 
 // ==================================================================== names
 
-public extern "C" {
+public extern "C"
+{
     /// Both `node` and `service` may be null, and one of them must not be.
     /// The result is a chain: walk `ai_next` and try each, because a host with
     /// both an A and an AAAA record may only be reachable through one.

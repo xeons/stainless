@@ -23,7 +23,8 @@ import Standard.Text;
 /// A shared library has its own stdout buffer, so without the flush every line
 /// below would arrive in a lump when the module detaches -- long after the
 /// host's output, and saying nothing about the order the two actually ran in.
-void Say(String line) {
+void Say(String line)
+{
     Console.WriteLine(line);
     Console.Flush();
 }
@@ -33,7 +34,8 @@ void Say(String line) {
 /// What the host calls. Ordinary COM: an HRESULT back, results through
 /// pointers, and every slot after IUnknown's three.
 [Guid("9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10")]
-public com interface IGreeter {
+public com interface IGreeter
+{
     /// Adds to the running total and reports it.
     int Greet(int times, int* total);
 
@@ -44,7 +46,8 @@ public com interface IGreeter {
 /// A second interface on the same object, so QueryInterface has something to
 /// answer that is not the one the host already holds.
 [Guid("b71e0c48-3a95-4f2d-9c11-6e8a0d3f5b27")]
-public com interface ICounter {
+public com interface ICounter
+{
     int Reset();
 }
 
@@ -56,20 +59,25 @@ public com interface ICounter {
 /// The constructor takes nothing because activation has nothing to pass
 /// (SL0611). Everything else is an ordinary com class.
 [Guid("5a1c8e30-2b47-4d16-a9f3-c04e7b81d629")]
-public com class Greeter : IGreeter, ICounter {
+public com class Greeter : IGreeter, ICounter
+{
     int total;
 
-    public Greeter() {
+    public Greeter()
+    {
         total = 0;
         Say("[stainless] Greeter constructed");
     }
 
-    ~Greeter() {
+    ~Greeter()
+    {
         Say("[stainless] Greeter destroyed");
     }
 
-    public int Greet(int times, int* total) {
-        if (total == null) { return Com.PointerError; }
+    public int Greet(int times, int* total)
+    {
+        if (total == null)
+            return Com.PointerError;
 
         this.total = this.total + times;
         Say("[stainless] Greet(" + Text.FromInteger((long)times) +
@@ -78,13 +86,16 @@ public com class Greeter : IGreeter, ICounter {
         return Com.Ok;
     }
 
-    public int Total(int* total) {
-        if (total == null) { return Com.PointerError; }
+    public int Total(int* total)
+    {
+        if (total == null)
+            return Com.PointerError;
         *total = this.total;
         return Com.Ok;
     }
 
-    public int Reset() {
+    public int Reset()
+    {
         Say("[stainless] Reset");
         total = 0;
         return Com.Ok;
@@ -99,12 +110,14 @@ public com class Greeter : IGreeter, ICounter {
 /// `com class` carrying a `[Guid]`, so adding a class to this library is
 /// declaring one and nothing else. What comes back is an `IClassFactory` the
 /// host calls `CreateInstance` on.
-export "C" __stdcall int DllGetClassObject(Guid* clsid, Guid* iid, byte** result) {
+export "C" __stdcall int DllGetClassObject(Guid* clsid, Guid* iid, byte** result)
+{
     return Com.GetClassObject(clsid, iid, result);
 }
 
 /// Whether the host may unload this module. Always S_FALSE: see the note on
 /// `Com.CanUnloadNow` for why a server whose objects ARC owns declines.
-export "C" __stdcall int DllCanUnloadNow() {
+export "C" __stdcall int DllCanUnloadNow()
+{
     return Com.CanUnloadNow();
 }

@@ -50,7 +50,8 @@ import Gtk.Gdk;
 
 // ===================================================================== fixed
 
-public extern "C" {
+public extern "C"
+{
     /// A container that puts children exactly where it is told.
     ///
     /// **This is what makes a widget set possible at all.** Every other GTK
@@ -76,7 +77,8 @@ public extern "C" {
 
 // ===================================================================== frame
 
-public extern "C" {
+public extern "C"
+{
     /// A box with a caption -- a group box -- and with a null label a plain
     /// frame, which is what a panel's border is.
     GtkWidget* gtk_frame_new(gchar* label);
@@ -93,7 +95,8 @@ public const gint GTK_SHADOW_ETCHED_OUT = 4;
 
 // ================================================ scrollbars and adjustments
 
-public extern "C" {
+public extern "C"
+{
     /// The value, the range and the steps as one object. A scrollbar, a scale
     /// and a scrolled window are all `GtkRange`s over one of these, which is
     /// why a scrollbar's range is set through the adjustment rather than on
@@ -117,7 +120,8 @@ public extern "C" {
 
 // ===================================================================== scale
 
-public extern "C" {
+public extern "C"
+{
     /// Whether the slider writes its value beside itself, and where the marks
     /// under it go.
     void gtk_scale_set_draw_value(GtkWidget* scale, gboolean draw);
@@ -134,7 +138,8 @@ public const gint GTK_POS_BOTTOM = 3;
 
 // =================================================================== toolbar
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_toolbar_new();
 
     /// A `position` of -1 appends. A tool item is a widget, so one call takes
@@ -167,7 +172,8 @@ public const gint GTK_TOOLBAR_BOTH_HORIZ = 3;
 
 // ===================================================================== image
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_image_new();
     GtkWidget* gtk_image_new_from_pixbuf(gpointer pixbuf);
     void gtk_image_set_from_pixbuf(GtkWidget* image, gpointer pixbuf);
@@ -187,11 +193,13 @@ public extern "C" {
 /// **An iter is valid only until the model changes.** A `GtkTreePath` is what
 /// survives one, which is why the tree peer keeps a path per node rather than
 /// an iter.
-public struct GtkTreeIter {
+public struct GtkTreeIter
+{
     public byte[32] Private;
 }
 
-public extern "C" {
+public extern "C"
+{
     GtkWidget* gtk_tree_view_new();
 
     void     gtk_tree_view_set_model(GtkWidget* view, gpointer model);
@@ -213,7 +221,8 @@ public const gint GTK_TREE_VIEW_GRID_LINES_HORIZONTAL = 1;
 public const gint GTK_TREE_VIEW_GRID_LINES_VERTICAL   = 2;
 public const gint GTK_TREE_VIEW_GRID_LINES_BOTH       = 3;
 
-public extern "C" {
+public extern "C"
+{
     /// The `newv` forms, because `gtk_list_store_new` is variadic over its
     /// column types. `types` is an array of `GType` and `columns` its length.
     gpointer gtk_list_store_newv(gint columns, GType* types);
@@ -265,7 +274,8 @@ public extern "C" {
     void     gtk_tree_path_free(gpointer path);
 }
 
-public extern "C" {
+public extern "C"
+{
     /// A column shows one or more renderers. `new_with_attributes` is
     /// variadic, so a column is built in three calls instead -- which is what
     /// that call does internally anyway.
@@ -296,7 +306,8 @@ public const gint GTK_TREE_VIEW_COLUMN_GROW_ONLY = 0;
 public const gint GTK_TREE_VIEW_COLUMN_AUTOSIZE  = 1;
 public const gint GTK_TREE_VIEW_COLUMN_FIXED     = 2;
 
-public extern "C" {
+public extern "C"
+{
     void gtk_tree_selection_set_mode(gpointer selection, gint mode);
 
     /// True when something is selected, and `into` then names it. `model` may
@@ -315,7 +326,8 @@ public const gint GTK_SELECTION_MULTIPLE = 3;
 
 // ===================================================================== menus
 
-public extern "C" {
+public extern "C"
+{
     /// Shows a menu where the pointer is. The modern spelling of
     /// `gtk_menu_popup`, which took six arguments and is deprecated.
     void gtk_menu_popup_at_pointer(GtkWidget* menu, gpointer trigger);
@@ -330,12 +342,14 @@ public extern "C" {
 
 /// `GtkRequisition`: what a widget asks for, in pixels. Public in the header,
 /// and two `int`s.
-public struct GtkRequisition {
+public struct GtkRequisition
+{
     public gint Width;
     public gint Height;
 }
 
-public extern "C" {
+public extern "C"
+{
     /// The smallest it can be, and what it would like to be. `AutoSize` wants
     /// the second; a layout that has to fit wants the first.
     void gtk_widget_get_preferred_size(GtkWidget* widget, GtkRequisition* minimum,
@@ -365,7 +379,8 @@ public extern "C" {
 
 // ===================================================================== style
 
-public extern "C" {
+public extern "C"
+{
     /// A provider on one widget rather than on the whole screen, which is what
     /// a font or a colour set on a single control needs.
     void gtk_style_context_add_provider(gpointer context, gpointer provider,
@@ -375,7 +390,8 @@ public extern "C" {
 
 // ================================================================== choosers
 
-public extern "C" {
+public extern "C"
+{
     /// `gtk_file_chooser_dialog_new` is variadic over button-and-response
     /// pairs. Passing null for the first button ends that list at once, and
     /// `gtk_dialog_add_button` then adds them one at a time -- which is what
@@ -418,7 +434,8 @@ public const gint GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER = 2;
 
 // ===================================================================== label
 
-public extern "C" {
+public extern "C"
+{
     /// Where the text sits inside the label's own allocation, 0.0 to 1.0. A
     /// label centres itself by default, which no other toolkit does and which
     /// a widget set has to undo.
@@ -439,7 +456,8 @@ public const gint PANGO_ELLIPSIZE_END    = 3;
 
 // ==================================================== the default button
 
-public extern "C" {
+public extern "C"
+{
     /// **A window has the default, and a button only consents to it.** Both
     /// calls are needed: the widget must be able to take it and the window
     /// must hand it over.
@@ -449,7 +467,8 @@ public extern "C" {
 
 // ============================================================ window state
 
-public extern "C" {
+public extern "C"
+{
     void gtk_window_iconify(GtkWidget* window);
     void gtk_window_deiconify(GtkWidget* window);
 
@@ -468,7 +487,8 @@ public const gint GDK_WINDOW_STATE_FULLSCREEN = 16;
 
 // ================================================================= editable
 
-public extern "C" {
+public extern "C"
+{
     /// `GtkEditable`'s, so they work on an entry and on a spin button alike.
     /// An `end` of -1 means "to the end of the text".
     void gtk_editable_select_region(GtkWidget* editable, gint start, gint end);
@@ -483,7 +503,8 @@ public extern "C" {
 
 // ================================================================= notebook
 
-public extern "C" {
+public extern "C"
+{
     /// The widget shown on the tab, which is a label for every tab this
     /// backend makes and could be a box with a picture in it.
     void gtk_notebook_set_tab_label(GtkWidget* notebook, GtkWidget* page,
@@ -493,7 +514,8 @@ public extern "C" {
 
 // ========================================================== row references
 
-public extern "C" {
+public extern "C"
+{
     /// **A handle to a row that survives the model changing.** An iter does
     /// not and a path does not: inserting a sibling before a row changes its
     /// path, and a reference is what tracks it instead. This is what a tree
@@ -509,7 +531,8 @@ public extern "C" {
 
 // ================================================== the theme's own colours
 
-public extern "C" {
+public extern "C"
+{
     /// A colour the theme named -- `"theme_bg_color"`, `"theme_fg_color"`,
     /// `"theme_selected_bg_color"`, `"insensitive_fg_color"`.
     ///
@@ -529,7 +552,8 @@ public extern "C" {
 
 // ============================================================== spin button
 
-public extern "C" {
+public extern "C"
+{
     /// **A `GtkSpinButton` is not a `GtkRange`.** It looks like one -- it has
     /// a value, a range and steps -- and `gtk_range_set_range` on one is a
     /// `GTK_IS_RANGE` assertion at run time and nothing at compile time,
@@ -540,7 +564,8 @@ public extern "C" {
 
 // ============================================================ radio buttons
 
-public extern "C" {
+public extern "C"
+{
     /// Puts `button` in `group`'s group, or in one of its own when `group` is
     /// null.
     ///

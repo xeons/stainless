@@ -33,7 +33,8 @@
 /// is what this seeds from and is right there.
 module Standard.Random;
 
-extern "C" {
+extern "C"
+{
     void sl_fail(byte* message);
 
     long sl_random_seed();
@@ -43,15 +44,16 @@ extern "C" {
 /// xoshiro256**, which is the current answer for a general-purpose generator:
 /// four words of state, no multiply in the step, and it passes the test suites
 /// that killed the older ones.
-public class Random {
-    ulong a;
-    ulong b;
-    ulong c;
-    ulong d;
+public class Random
+{
+    ulong _a;
+    ulong _b;
+    ulong _c;
+    ulong _d;
 
     /// A generator seeded from a number you chose. The same seed gives the
     /// same sequence, on every platform and every run -- which is the point.
-    public Random(long seed) { Seed((ulong)seed); }
+    public Random(long seed) => Seed((ulong)seed);
 
     /// A generator seeded by the operating system, so two runs differ.
     ///
@@ -60,7 +62,7 @@ public class Random {
     /// constructor has nowhere to report one anyway (§2.9). Where that has to
     /// be survivable, `Random.Bytes` says whether it managed, and
     /// `new Random(seed)` takes the number it produced.
-    public Random() { Seed((ulong)sl_random_seed()); }
+    public Random() => Seed((ulong)sl_random_seed());
 
     /// SplitMix64 spreads one word into four.
     ///
@@ -68,17 +70,20 @@ public class Random {
     /// corner of the state space, and xoshiro takes a while to escape one --
     /// `new Random(1)` would produce a poor first few numbers. This is the
     /// remedy its authors specify.
-    void Seed(ulong seed) {
-        a = Mix(&seed);
-        b = Mix(&seed);
-        c = Mix(&seed);
-        d = Mix(&seed);
+    void Seed(ulong seed)
+    {
+        _a = Mix(&seed);
+        _b = Mix(&seed);
+        _c = Mix(&seed);
+        _d = Mix(&seed);
 
         // All-zero state is the one xoshiro cannot leave.
-        if ((a | b | c | d) == 0u) { a = 0x9E3779B97F4A7C15u; }
+        if ((_a | _b | _c | _d) == 0u)
+            _a = 0x9E3779B97F4A7C15u;
     }
 
-    ulong Mix(ulong* state) {
+    ulong Mix(ulong* state)
+    {
         *state = *state + 0x9E3779B97F4A7C15u;
 
         ulong z = *state;
@@ -87,28 +92,30 @@ public class Random {
         return z ^ (z >> 31);
     }
 
-    ulong Rotate(ulong value, uint by) {
+    ulong Rotate(ulong value, uint by)
+    {
         return (value << by) | (value >> (64u - by));
     }
 
     /// The next 64 bits. Every other method here is built on this one.
-    public ulong NextULong() {
-        ulong result = Rotate(b * 5u, 7u) * 9u;
-        ulong t = b << 17;
+    public ulong NextULong()
+    {
+        ulong result = Rotate(_b * 5u, 7u) * 9u;
+        ulong t = _b << 17;
 
-        c = c ^ a;
-        d = d ^ b;
-        b = b ^ c;
-        a = a ^ d;
-        c = c ^ t;
-        d = Rotate(d, 45u);
+        _c = _c ^ _a;
+        _d = _d ^ _b;
+        _b = _b ^ _c;
+        _a = _a ^ _d;
+        _c = _c ^ t;
+        _d = Rotate(_d, 45u);
 
         return result;
     }
 
     /// The next 64 bits read as signed, so negative half the time. Reach for
     /// `NextBelow` when a range is what is wanted.
-    public long NextLong() { return (long)NextULong(); }
+    public long NextLong() => (long)NextULong();
 
     /// A number in `[0, limit)`. Aborts on a limit of zero, which names an
     /// empty range and has no answer.
@@ -117,46 +124,55 @@ public class Random {
     /// the low end whenever the limit does not divide 2^64, and the bias is
     /// large exactly when the limit is large. The loop discards the short tail
     /// instead, and runs more than once with probability below one half.
-    public ulong NextBelow(ulong limit) {
-        if (limit == 0u) { sl_fail("Random.NextBelow: the limit must be more than zero"); }
+    public ulong NextBelow(ulong limit)
+    {
+        if (limit == 0u)
+            sl_fail("Random.NextBelow: the limit must be more than zero");
 
         ulong ceiling = 18446744073709551615u - (18446744073709551615u % limit) - 1u;
 
         ulong drawn = NextULong();
-        while (drawn > ceiling) { drawn = NextULong(); }
+        while (drawn > ceiling)
+            drawn = NextULong();
 
         return drawn % limit;
     }
 
     /// A number in `[low, high)`. Aborts when the range is empty.
-    public long NextBetween(long low, long high) {
-        if (high <= low) { sl_fail("Random.NextBetween: the range is empty"); }
+    public long NextBetween(long low, long high)
+    {
+        if (high <= low)
+            sl_fail("Random.NextBetween: the range is empty");
         return low + (long)NextBelow((ulong)(high - low));
     }
 
     /// A number in `[0, limit)`, for the common case of an `int`.
-    public int NextInt(int limit) { return (int)NextBetween(0, (long)limit); }
+    public int NextInt(int limit) => (int)NextBetween(0, (long)limit);
 
     /// True about half the time.
-    public bool NextBool() { return (NextULong() >> 63) != 0u; }
+    public bool NextBool() => (NextULong() >> 63) != 0u;
 
     /// A double in `[0, 1)`.
     ///
     /// The top 53 bits, which is exactly the precision a double has: taking
     /// fewer would leave gaps, and taking more would round some draws up to
     /// 1.0 and break the half-open range.
-    public double NextDouble() {
+    public double NextDouble()
+    {
         return (double)(NextULong() >> 11) * 0.00000000000000011102230246251565;
     }
 
     /// Fills an array with random bytes.
-    public void NextBytes(byte[] buffer) {
+    public void NextBytes(byte[] buffer)
+    {
         nuint at = 0u;
-        while (at < buffer.Length) {
+        while (at < buffer.Length)
+        {
             ulong word = NextULong();
-            for (nuint i = 0u; i < 8u && at < buffer.Length; i += 1u) {
+            for (nuint i = 0u; i < 8u && at < buffer.Length; i++)
+            {
                 buffer[at] = (byte)(word >> (uint)(i * 8u));
-                at += 1u;
+                at++;
             }
         }
     }
@@ -167,10 +183,13 @@ public class Random {
     /// chosen element at or below it. Walking up, or choosing from the whole
     /// array each time, is the classic wrong version -- it produces n^n equally
     /// likely paths over n! orderings, which cannot come out even.
-    public void Shuffle(long[] items) {
-        if (items.Length < 2u) { return; }
+    public void Shuffle(long[] items)
+    {
+        if (items.Length < 2u)
+            return;
 
-        for (nuint i = items.Length - 1u; i > 0u; i -= 1u) {
+        for (nuint i = items.Length - 1u; i > 0u; i--)
+        {
             nuint j = (nuint)NextBelow((ulong)i + 1u);
             long swap = items[i];
             items[i] = items[j];
@@ -182,12 +201,14 @@ public class Random {
 /// Bytes straight from the operating system's cryptographic source, which is
 /// what a key or a token wants. Reports whether it managed; a false is not a
 /// reason to fall back on the clock.
-public bool Bytes(byte[] buffer) {
-    if (buffer.Length == 0u) { return true; }
+public bool Bytes(byte[] buffer)
+{
+    if (buffer.Length == 0u)
+        return true;
     return sl_random_bytes(&buffer[0], buffer.Length);
 }
 
 /// One unpredictable 64-bit value from the platform, for seeding something
 /// else deliberately. Aborts if the platform supplies none; `Bytes` is the
 /// form that reports instead.
-public long Seed() { return sl_random_seed(); }
+public long Seed() => sl_random_seed();

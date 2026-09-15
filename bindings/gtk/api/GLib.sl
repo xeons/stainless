@@ -100,7 +100,8 @@ public delegate gint GCompareFunc(gpointer left, gpointer right);
 
 // =================================================================== memory
 
-public extern "C" {
+public extern "C"
+{
     /// Allocates, and aborts rather than returning null.
     gpointer g_malloc(gsize bytes);
 
@@ -126,19 +127,22 @@ public extern "C" {
 /// Walked rather than indexed: `Data` is the element, `Next` is null at the
 /// end. Most GTK getters that answer with one say the caller owns the list but
 /// not its elements, which is `g_list_free` and not `g_list_free_full`.
-public struct GList {
+public struct GList
+{
     public gpointer Data;
-    public GList*   Next;
-    public GList*   Prev;
+    public GList* Next;
+    public GList* Prev;
 }
 
 /// `GSList`, the singly-linked one. Same story with no `Prev`.
-public struct GSList {
+public struct GSList
+{
     public gpointer Data;
-    public GSList*  Next;
+    public GSList* Next;
 }
 
-public extern "C" {
+public extern "C"
+{
     guint    g_list_length(GList* list);
     gpointer g_list_nth_data(GList* list, guint index);
     void     g_list_free(GList* list);
@@ -157,13 +161,15 @@ public extern "C" {
 /// allocates one, and the caller frees it with `g_error_free`. Passing null
 /// for the whole thing says "I do not want to know", which is legal and
 /// usually wrong.
-public struct GError {
+public struct GError
+{
     public GQuark Domain;
-    public gint   Code;
+    public gint Code;
     public gchar* Message;
 }
 
-public extern "C" {
+public extern "C"
+{
     void g_error_free(GError* error);
     void g_clear_error(GError** error);
 }
@@ -175,7 +181,8 @@ public extern "C" {
 /// A program with a GUI does not need these -- `gtk_main` is the loop -- but
 /// a timer or an idle callback is registered here, and a headless program that
 /// wants GLib's event loop without a display can run one directly.
-public extern "C" {
+public extern "C"
+{
     gpointer g_main_loop_new(gpointer context, gboolean isRunning);
     void     g_main_loop_run(gpointer loop);
     void     g_main_loop_quit(gpointer loop);
@@ -194,7 +201,8 @@ public const gint G_PRIORITY_HIGH_IDLE    = 100;
 public const gint G_PRIORITY_DEFAULT_IDLE = 200;
 public const gint G_PRIORITY_LOW          = 300;
 
-public extern "C" {
+public extern "C"
+{
     /// Runs `function` when nothing else is pending, and again while it
     /// answers true. The `_full` form is the one worth using: it takes the
     /// `GDestroyNotify` that undoes a retain.

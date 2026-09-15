@@ -47,7 +47,8 @@ import Win32.Handles;
 // program already links.
 #pragma comment(lib, "version")
 
-public extern "C" {
+public extern "C"
+{
     /// How many bytes the version block takes, or zero when the file has no
     /// `RT_VERSION` resource at all. `handle` is ignored and exists because
     /// 16-bit Windows used it.
@@ -75,7 +76,8 @@ public extern "C" {
 /// The versions are four 16-bit parts packed into two 32-bit words each, most
 /// significant first: `1.2.3.4` is `VersionMs = 0x00010002`, `VersionLs =
 /// 0x00030004`. `Win32.Resources.FileVersion` unpacks them.
-public struct FixedFileInfo {
+public struct FixedFileInfo
+{
     public uint Signature;
     public uint StructVersion;
     public uint FileVersionMs;

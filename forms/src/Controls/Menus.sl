@@ -57,23 +57,25 @@ public closure void MenuEventHandler(MenuItem sender);
 // =================================================================== an item
 
 /// One line in a menu: a command, a separator, or a heading with more under it.
-public class MenuItem : IMenuItemNotify {
-    IMenuItemPeer? realised;
-    IMenuPeer?     below;
-    List<MenuItem> children;
-    String  caption;
-    bool    enabled;
-    bool    ticked;
-    bool    divider;
+public class MenuItem : IMenuItemNotify
+{
+    IMenuItemPeer? _realised;
+    IMenuPeer? _below;
+    List<MenuItem> _children;
+    String _caption;
+    bool _enabled;
+    bool _ticked;
+    bool _divider;
 
-    public MenuItem(String text) {
-        caption = text;
-        enabled = true;
-        ticked = false;
-        divider = false;
-        realised = null;
-        below = null;
-        children = new List<MenuItem>();
+    public MenuItem(String text)
+    {
+        _caption = text;
+        _enabled = true;
+        _ticked = false;
+        _divider = false;
+        _realised = null;
+        _below = null;
+        _children = new List<MenuItem>();
     }
 
     /// The line between groups of commands.
@@ -81,77 +83,91 @@ public class MenuItem : IMenuItemNotify {
     /// A `MenuItem` with a flag rather than a type of its own, because it goes
     /// in the same list as everything else and a separate type would mean the
     /// list holding a base nobody else derives from.
-    public static MenuItem Separator() {
+    public static MenuItem Separator()
+    {
         var made = new MenuItem("");
-        made.divider = true;
+        made._divider = true;
         return made;
     }
 
-    public bool IsSeparator => divider;
+    public bool IsSeparator => _divider;
 
     /// What the item says. `&` before a letter underlines it and makes it the
     /// key that chooses the item while the menu is open, as everywhere else on
     /// Windows.
-    public String Text {
-        get => caption;
-        set {
-            caption = value;
-            var peer = realised;
-            if (peer != null) { ((IMenuItemPeer)peer).SetText(value); }
+    public String Text
+    {
+        get => _caption;
+        set
+        {
+            _caption = value;
+            var peer = _realised;
+            if (peer != null)
+                ((IMenuItemPeer)peer).SetText(value);
         }
     }
 
-    public bool Enabled {
-        get => enabled;
-        set {
-            enabled = value;
-            var peer = realised;
-            if (peer != null) { ((IMenuItemPeer)peer).SetEnabled(value); }
+    public bool Enabled
+    {
+        get => _enabled;
+        set
+        {
+            _enabled = value;
+            var peer = _realised;
+            if (peer != null)
+                ((IMenuItemPeer)peer).SetEnabled(value);
         }
     }
 
     /// Whether a tick is drawn beside it.
-    public bool Checked {
-        get => ticked;
-        set {
-            ticked = value;
-            var peer = realised;
-            if (peer != null) { ((IMenuItemPeer)peer).SetChecked(value); }
+    public bool Checked
+    {
+        get => _ticked;
+        set
+        {
+            _ticked = value;
+            var peer = _realised;
+            if (peer != null)
+                ((IMenuItemPeer)peer).SetChecked(value);
         }
     }
 
     /// The items under this one. Adding any makes it a heading rather than a
     /// command, and a heading raises nothing when chosen.
-    public List<MenuItem> Items => children;
+    public List<MenuItem> Items => _children;
 
-    public bool HasItems => !children.IsEmpty();
+    public bool HasItems => !_children.IsEmpty();
 
     /// Adds an item underneath and answers **the item**, so that a handler can
     /// be attached to the result of the call.
-    public MenuItem Add(MenuItem child) {
-        children.Add(child);
+    public MenuItem Add(MenuItem child)
+    {
+        _children.Add(child);
         return child;
     }
 
     /// The same, building the item from its caption.
-    public MenuItem Add(String text) { return Add(new MenuItem(text)); }
+    public MenuItem Add(String text) => Add(new MenuItem(text));
 
     /// The item was chosen.
     public event MenuEventHandler Click;
 
-    protected virtual void OnClick() { Click(this); }
+    protected virtual void OnClick() => Click(this);
 
     /// What the platform calls when the user picks this item.
-    public void OnPlatformMenuClicked() { OnClick(); }
+    public void OnPlatformMenuClicked() => OnClick();
 
     /// What the platform calls this item, or zero before the menu is built.
     ///
     /// Here for the same reason `Control.Handle` is: a program that must reach
     /// the platform directly has to be able to name what it is reaching for.
-    public nuint PlatformId {
-        get {
-            var peer = realised;
-            if (peer == null) { return 0u; }
+    public nuint PlatformId
+    {
+        get
+        {
+            var peer = _realised;
+            if (peer == null)
+                return 0u;
             return ((IMenuItemPeer)peer).Id();
         }
     }
@@ -161,34 +177,42 @@ public class MenuItem : IMenuItemNotify {
     /// Depth first, because a submenu must exist before the item that opens it
     /// can be made -- which is the ordering this whole arrangement exists to
     /// make invisible.
-    void Realise(IMenuPeer into) {
-        if (divider) {
+    void Realise(IMenuPeer into)
+    {
+        if (_divider)
+        {
             into.AddSeparator();
             return;
         }
 
         IMenuPeer? submenu = null;
-        if (!children.IsEmpty()) {
+        if (!_children.IsEmpty())
+        {
             var made = WidgetSet.Current.CreateMenu();
-            foreach (var child in children) { child.Realise(made); }
+            foreach (var child in _children)
+                child.Realise(made);
             submenu = made;
-            below = made;
+            _below = made;
         }
 
-        var peer = into.AddItem(this, caption, submenu);
-        realised = peer;
+        var peer = into.AddItem(this, _caption, submenu);
+        _realised = peer;
 
         // The state was set while there was nothing to tell, so it is told now.
-        if (!enabled) { peer.SetEnabled(false); }
-        if (ticked)   { peer.SetChecked(true); }
+        if (!_enabled)
+            peer.SetEnabled(false);
+        if (_ticked)
+            peer.SetChecked(true);
     }
 
     /// Forgets the platform side, so the tree can be built again into a new
     /// menu -- which is what happens when a form is given a second menu bar.
-    void Forget() {
-        realised = null;
-        below = null;
-        foreach (var child in children) { child.Forget(); }
+    void Forget()
+    {
+        _realised = null;
+        _below = null;
+        foreach (var child in _children)
+            child.Forget();
     }
 }
 
@@ -196,29 +220,34 @@ public class MenuItem : IMenuItemNotify {
 
 /// What a menu bar and a popup have in common: a list of items, and the moment
 /// they become a real menu.
-public abstract class Menu {
+public abstract class Menu
+{
     protected IMenuPeer? peer;
-    List<MenuItem> items;
+    List<MenuItem> _items;
 
-    protected Menu() {
+    protected Menu()
+    {
         peer = null;
-        items = new List<MenuItem>();
+        _items = new List<MenuItem>();
     }
 
-    public List<MenuItem> Items => items;
+    public List<MenuItem> Items => _items;
 
     /// Adds a top-level item and answers it.
-    public MenuItem Add(MenuItem item) {
-        items.Add(item);
+    public MenuItem Add(MenuItem item)
+    {
+        _items.Add(item);
         return item;
     }
 
-    public MenuItem Add(String text) { return Add(new MenuItem(text)); }
+    public MenuItem Add(String text) => Add(new MenuItem(text));
 
     /// Builds the whole tree into `into`, which becomes this menu's platform
     /// side.
-    protected void RealiseInto(IMenuPeer into) {
-        foreach (var item in items) {
+    protected void RealiseInto(IMenuPeer into)
+    {
+        foreach (var item in _items)
+        {
             item.Forget();
             item.Realise(into);
         }
@@ -236,12 +265,14 @@ public abstract class Menu {
 /// file.Add("E&xit").Click += this.OnExit;
 /// Menu = bar;
 /// ```
-public class MainMenu : Menu {
-    public MainMenu() { base(); }
+public class MainMenu : Menu
+{
+    public MainMenu() => base();
 
     /// Builds the bar and gives it to a form. Called by `Form.Menu`, which is
     /// how a program attaches one.
-    IMenuPeer Build() {
+    IMenuPeer Build()
+    {
         var bar = WidgetSet.Current.CreateMenuBar();
         RealiseInto(bar);
         return bar;
@@ -254,14 +285,17 @@ public class MainMenu : Menu {
 /// buys the thing a context menu almost always wants: items enabled according
 /// to what is selected *now*, decided in the handler that opens it rather than
 /// kept in step from everywhere that changes the selection.
-public class PopupMenu : Menu {
-    public PopupMenu() { base(); }
+public class PopupMenu : Menu
+{
+    public PopupMenu() => base();
 
     /// Shows it at a point in the control's own coordinates, and does not
     /// return until the user has chosen or dismissed it.
-    public void Show(Control owner, Point at) {
+    public void Show(Control owner, Point at)
+    {
         var form = owner.FindForm();
-        if (form == null) { return; }
+        if (form == null)
+            return;
 
         var built = WidgetSet.Current.CreateMenu();
         RealiseInto(built);

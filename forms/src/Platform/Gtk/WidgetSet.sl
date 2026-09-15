@@ -49,20 +49,22 @@ import Gtk.Cairo;
 import Gtk.Signals;
 import Gtk.Events;
 
-public class GtkWidgetSet : IWidgetSet {
+public class GtkWidgetSet : IWidgetSet
+{
     /// Whether `gtk_init` has run. A program that opens no window never pays
     /// for a display connection, which is what makes a console program that
     /// links `forms/` still start.
-    bool started;
+    bool _started;
 
     /// The theme's font, read once. `gtk-font-name` does not change while a
     /// program runs in any desktop that exists, and a control asks for this
     /// at every construction.
-    Font? themeFont;
+    Font? _themeFont;
 
-    public GtkWidgetSet() {
-        started = false;
-        themeFont = null;
+    public GtkWidgetSet()
+    {
+        _started = false;
+        _themeFont = null;
     }
 
     public String Name { get { return "GTK3"; } }
@@ -72,12 +74,15 @@ public class GtkWidgetSet : IWidgetSet {
     /// `gtk_init_check` rather than `gtk_init`, which calls `exit` when there
     /// is no display: a program with no `DISPLAY` should be told rather than
     /// vanish, and `sl_fail` is what tells it.
-    void Start() {
-        if (started) { return; }
-        started = true;
+    void Start()
+    {
+        if (_started)
+            return;
+        _started = true;
 
         int argc = 0;
-        if (gtk_init_check(&argc, null) == 0) {
+        if (gtk_init_check(&argc, null) == 0)
+        {
             sl_fail(("GTK could not open a display: check DISPLAY or WAYLAND_DISPLAY, " +
                      "or run under broadwayd").ToPointer());
         }
@@ -85,157 +90,190 @@ public class GtkWidgetSet : IWidgetSet {
 
     /// Subscribes a peer and puts it in its parent -- the same two steps for
     /// every control, which is why no `Create` below writes them out.
-    void Ready(GtkPeer peer, IContainerPeer parent) {
+    void Ready(GtkPeer peer, IContainerPeer parent)
+    {
         peer.Listen();
         parent.AddChild(peer);
     }
 
     // ------------------------------------------------------------ controls
 
-    public IWindowPeer CreateWindow(IWindowNotify owner, WindowBorder border) {
+    public IWindowPeer CreateWindow(IWindowNotify owner, WindowBorder border)
+    {
         Start();
         var peer = new GtkWindowPeer(owner, border);
         peer.Listen();
         return peer;
     }
 
-    public IPushButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent) {
+    public IPushButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkButtonPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
     public ICheckPeer CreateCheck(IControlNotify owner, IContainerPeer parent,
-                                  CheckKind kind) {
+                                  CheckKind kind)
+    {
         var peer = new GtkCheckPeer(owner, kind);
         Ready(peer, parent);
         return peer;
     }
 
-    public ILabelPeer CreateLabel(IControlNotify owner, IContainerPeer parent) {
+    public ILabelPeer CreateLabel(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkLabelPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
     public ITextEntryPeer CreateTextEntry(IControlNotify owner, IContainerPeer parent,
-                                          bool multiline) {
+                                          bool multiline)
+    {
         var peer = new GtkEntryPeer(owner, multiline);
         Ready(peer, parent);
         return peer;
     }
 
-    public IListPeer CreateList(IControlNotify owner, IContainerPeer parent) {
+    public IListPeer CreateList(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkListPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IComboPeer CreateCombo(IControlNotify owner, IContainerPeer parent) {
+    public IComboPeer CreateCombo(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkComboPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IGroupPeer CreateGroup(IControlNotify owner, IContainerPeer parent) {
+    public IGroupPeer CreateGroup(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkGroupPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IPanelPeer CreatePanel(IControlNotify owner, IContainerPeer parent) {
+    public IPanelPeer CreatePanel(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkPanelPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public ICustomPeer CreateCustom(IControlNotify owner, IContainerPeer parent) {
+    public ICustomPeer CreateCustom(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkCustomPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
-                                          bool vertical) {
+                                          bool vertical)
+    {
         var peer = new GtkScrollBarPeer(owner, vertical);
         Ready(peer, parent);
         return peer;
     }
 
-    public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent) {
+    public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkSpinPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent) {
+    public ICheckListPeer CreateCheckList(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkCheckListPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent) {
+    public IHeaderPeer CreateHeader(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkHeaderPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IToolBarPeer CreateToolBar(IControlNotify owner, IContainerPeer parent) {
+    public IToolBarPeer CreateToolBar(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkToolBarPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent) {
+    public IStatusBarPeer CreateStatusBar(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkStatusBarPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IProgressPeer CreateProgress(IControlNotify owner, IContainerPeer parent) {
+    public IProgressPeer CreateProgress(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkProgressPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
     public ITrackBarPeer CreateTrackBar(IControlNotify owner, IContainerPeer parent,
-                                        bool vertical) {
+                                        bool vertical)
+    {
         var peer = new GtkTrackBarPeer(owner, vertical);
         Ready(peer, parent);
         return peer;
     }
 
-    public ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent) {
+    public ITabControlPeer CreateTabControl(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkTabControlPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public ITreeViewPeer CreateTreeView(IControlNotify owner, IContainerPeer parent) {
+    public ITreeViewPeer CreateTreeView(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkTreePeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IListViewPeer CreateListView(IControlNotify owner, IContainerPeer parent) {
+    public IListViewPeer CreateListView(IControlNotify owner, IContainerPeer parent)
+    {
         var peer = new GtkListViewPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public IMenuPeer CreateMenu()    { Start(); return new GtkMenuPeer(false); }
-    public IMenuPeer CreateMenuBar() { Start(); return new GtkMenuPeer(true); }
+    public IMenuPeer CreateMenu()
+    {
+        Start();
+        return new GtkMenuPeer(false);
+    }
+    public IMenuPeer CreateMenuBar()
+    {
+        Start();
+        return new GtkMenuPeer(true);
+    }
 
-    public ITimerPeer CreateTimer(ITimerNotify owner) {
+    public ITimerPeer CreateTimer(ITimerNotify owner)
+    {
         Start();
         return new GtkTimerPeer(owner);
     }
 
     // ------------------------------------------------------------ clipboard
 
-    public String GetClipboardText() {
+    public String GetClipboardText()
+    {
         gchar* text = gtk_clipboard_wait_for_text(gtk_clipboard_get(ClipboardSelection()));
-        if (text == null) { return ""; }
+        if (text == null)
+            return "";
         // Owned by us, unlike almost everything else GTK answers, so it is
         // copied into a String and then freed.
         String answer = Standard.Text.FromNullTerminated((byte*)text);
@@ -243,12 +281,14 @@ public class GtkWidgetSet : IWidgetSet {
         return answer;
     }
 
-    public void SetClipboardText(String text) {
+    public void SetClipboardText(String text)
+    {
         gtk_clipboard_set_text(gtk_clipboard_get(ClipboardSelection()),
                                (gchar*)text.ToPointer(), -1);
     }
 
-    public bool ClipboardHasText() {
+    public bool ClipboardHasText()
+    {
         return gtk_clipboard_wait_is_text_available(
             gtk_clipboard_get(ClipboardSelection())) != 0;
     }
@@ -256,41 +296,47 @@ public class GtkWidgetSet : IWidgetSet {
     // ------------------------------------------------------------- dialogs
 
     public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,
-                                                          String start, String[] filters) {
+                                                          String start, String[] filters)
+    {
         Start();
         return OpenFile(owner, title, start, filters);
     }
 
     public Result<String, DialogOutcome> ChooseFileToSave(IWindowPeer? owner, String title,
-                                                          String start, String[] filters) {
+                                                          String start, String[] filters)
+    {
         Start();
         return SaveFile(owner, title, start, filters);
     }
 
-    public Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title) {
+    public Result<String, DialogOutcome> ChooseFolder(IWindowPeer? owner, String title)
+    {
         Start();
         return PickFolder(owner, title);
     }
 
-    public Result<Color, DialogOutcome> ChooseColor(IWindowPeer? owner, Color start) {
+    public Result<Color, DialogOutcome> ChooseColor(IWindowPeer? owner, Color start)
+    {
         Start();
         return PickColor(owner, start);
     }
 
-    public Result<Font, DialogOutcome> ChooseFont(IWindowPeer? owner, Font start) {
+    public Result<Font, DialogOutcome> ChooseFont(IWindowPeer? owner, Font start)
+    {
         Start();
         return PickFont(owner, start);
     }
 
     public DialogResult ShowMessage(IWindowPeer? owner, String text, String caption,
-                                    MessageButtons buttons, MessageIcon icon) {
+                                    MessageButtons buttons, MessageIcon icon)
+    {
         Start();
         return ShowMessageBox(owner, text, caption, buttons, icon);
     }
 
     // ------------------------------------------------------------ resources
 
-    public IFontBackend CreateFont(Font font) { return new GtkFontBackend(font); }
+    public IFontBackend CreateFont(Font font) => new GtkFontBackend(font);
 
     /// A picture from a file.
     ///
@@ -298,15 +344,19 @@ public class GtkWidgetSet : IWidgetSet {
     /// least PNG, JPEG, GIF and BMP -- more than the Win32 backend reads,
     /// because `LoadImageW` reads `.bmp` and nothing else. The seam says the
     /// format is the backend's business, and this is a backend taking it up.
-    public Result<IBitmapBackend, String> LoadBitmap(String path) {
+    public Result<IBitmapBackend, String> LoadBitmap(String path)
+    {
         Start();
         GError* failed = null;
         GdkPixbuf* loaded = gdk_pixbuf_new_from_file(path.ToPointer(), &failed);
 
-        if (loaded == null) {
+        if (loaded == null)
+        {
             var why = "could not read '" + path + "'";
-            if (failed != null) {
-                if (failed->Message != null) {
+            if (failed != null)
+            {
+                if (failed->Message != null)
+                {
                     why = why + ": " + Text.FromNullTerminated(failed->Message);
                 }
                 g_clear_error(&failed);
@@ -329,16 +379,19 @@ public class GtkWidgetSet : IWidgetSet {
     /// no resource section. The argument was right about the *format* and wrong
     /// about the conclusion: the compiler carries the compiled script as
     /// ordinary data, so there is something to read after all.
-    public Result<IBitmapBackend, String> LoadBitmapResource(int id) {
+    public Result<IBitmapBackend, String> LoadBitmapResource(int id)
+    {
         Start();
 
         var whole = Resources.BitmapFile(id);
-        if (whole.Length == 0) {
+        if (whole.Length == 0)
+        {
             return Fail($"this program has no bitmap resource with id {id}");
         }
 
         var loader = gdk_pixbuf_loader_new();
-        if (loader == null) { return Fail("could not start an image loader"); }
+        if (loader == null)
+            return Fail("could not start an image loader");
 
         GError* failed = null;
         gdk_pixbuf_loader_write(loader, &whole[0u], (gsize)whole.Length, &failed);
@@ -348,10 +401,13 @@ public class GtkWidgetSet : IWidgetSet {
         gdk_pixbuf_loader_close(loader, &failed);
 
         var decoded = gdk_pixbuf_loader_get_pixbuf(loader);
-        if (decoded == null) {
+        if (decoded == null)
+        {
             var why = $"bitmap resource {id} could not be decoded";
-            if (failed != null) {
-                if (failed->Message != null) {
+            if (failed != null)
+            {
+                if (failed->Message != null)
+                {
                     why = why + ": " + Text.FromNullTerminated(failed->Message);
                 }
                 g_clear_error(&failed);
@@ -364,12 +420,14 @@ public class GtkWidgetSet : IWidgetSet {
         // loader is dropped and the backend owns it from here.
         g_object_ref((gpointer)decoded);
         g_object_unref((gpointer)loader);
-        if (failed != null) { g_clear_error(&failed); }
+        if (failed != null)
+            g_clear_error(&failed);
 
         return Ok(new GtkBitmapBackend((gpointer)decoded));
     }
 
-    public IImageListBackend CreateImageList(Size imageSize) {
+    public IImageListBackend CreateImageList(Size imageSize)
+    {
         return new GtkImageListBackend(imageSize);
     }
 
@@ -383,17 +441,26 @@ public class GtkWidgetSet : IWidgetSet {
     /// defines and every theme derived from it keeps. A theme that defines
     /// none of them gets the fallbacks below, which are Adwaita's own values
     /// -- so the wrong answer is still a sensible one.
-    public Color SystemColor(SystemColorId which) {
+    public Color SystemColor(SystemColorId which)
+    {
         Start();
 
-        if (which == SystemColorId.Control)     { return Theme("theme_bg_color", 0xF6u, 0xF5u, 0xF4u); }
-        if (which == SystemColorId.ControlText) { return Theme("theme_fg_color", 0x2Eu, 0x34u, 0x36u); }
-        if (which == SystemColorId.ControlDark) { return Theme("borders", 0xCDu, 0xC7u, 0xC2u); }
-        if (which == SystemColorId.ControlLight){ return Theme("theme_base_color", 0xFFu, 0xFFu, 0xFFu); }
-        if (which == SystemColorId.Window)      { return Theme("theme_base_color", 0xFFu, 0xFFu, 0xFFu); }
-        if (which == SystemColorId.WindowText)  { return Theme("theme_text_color", 0x2Eu, 0x34u, 0x36u); }
-        if (which == SystemColorId.Highlight)   { return Theme("theme_selected_bg_color", 0x35u, 0x84u, 0xE4u); }
-        if (which == SystemColorId.HighlightText) { return Theme("theme_selected_fg_color", 0xFFu, 0xFFu, 0xFFu); }
+        if (which == SystemColorId.Control)
+            return Theme("theme_bg_color", 0xF6u, 0xF5u, 0xF4u);
+        if (which == SystemColorId.ControlText)
+            return Theme("theme_fg_color", 0x2Eu, 0x34u, 0x36u);
+        if (which == SystemColorId.ControlDark)
+            return Theme("borders", 0xCDu, 0xC7u, 0xC2u);
+        if (which == SystemColorId.ControlLight)
+            return Theme("theme_base_color", 0xFFu, 0xFFu, 0xFFu);
+        if (which == SystemColorId.Window)
+            return Theme("theme_base_color", 0xFFu, 0xFFu, 0xFFu);
+        if (which == SystemColorId.WindowText)
+            return Theme("theme_text_color", 0x2Eu, 0x34u, 0x36u);
+        if (which == SystemColorId.Highlight)
+            return Theme("theme_selected_bg_color", 0x35u, 0x84u, 0xE4u);
+        if (which == SystemColorId.HighlightText)
+            return Theme("theme_selected_fg_color", 0xFFu, 0xFFu, 0xFFu);
         return Theme("insensitive_fg_color", 0x92u, 0x9Cu, 0x9Fu);
     }
 
@@ -401,14 +468,17 @@ public class GtkWidgetSet : IWidgetSet {
     /// do -- the named colours are the theme's rather than the widget's -- and
     /// one is kept so that a form asking for nine colours makes one widget
     /// rather than nine.
-    GtkWidget* probe;
+    GtkWidget* _probe;
 
-    Color Theme(String name, byte red, byte green, byte blue) {
-        if (probe == null) { probe = (GtkWidget*)g_object_ref_sink((gpointer)gtk_window_new(GTK_WINDOW_TOPLEVEL)); }
+    Color Theme(String name, byte red, byte green, byte blue)
+    {
+        if (_probe == null)
+            _probe = (GtkWidget*)g_object_ref_sink((gpointer)gtk_window_new(GTK_WINDOW_TOPLEVEL));
 
         GdkRGBA found;
-        if (gtk_style_context_lookup_color(gtk_widget_get_style_context(probe),
-                                           name.ToPointer(), &found) == 0) {
+        if (gtk_style_context_lookup_color(gtk_widget_get_style_context(_probe),
+                                           name.ToPointer(), &found) == 0)
+        {
             return Color.FromRgb(red, green, blue);
         }
         return FromRgba(found);
@@ -418,23 +488,33 @@ public class GtkWidgetSet : IWidgetSet {
     /// control starts with. `gtk-font-name` is a Pango description --
     /// `"Cantarell 11"` -- so it is read apart the same way a font chooser's
     /// answer is.
-    public Font DefaultFont() {
+    public Font DefaultFont()
+    {
         Start();
 
-        var made = themeFont;
-        if (made != null) { return (Font)made; }
+        var made = _themeFont;
+        if (made != null)
+            return (Font)made;
 
         var fallback = new Font("Sans", 10, FontStyle.Regular);
         gpointer settings = gtk_settings_get_default();
-        if (settings == null) { themeFont = fallback; return fallback; }
+        if (settings == null)
+        {
+            _themeFont = fallback;
+            return fallback;
+        }
 
         gchar* described = null;
         g_object_get(settings, "gtk-font-name".ToPointer(), &described, null);
-        if (described == null) { themeFont = fallback; return fallback; }
+        if (described == null)
+        {
+            _themeFont = fallback;
+            return fallback;
+        }
 
         var font = ParsePango(Text.FromNullTerminated(described), fallback);
         g_free((gpointer)described);
-        themeFont = font;
+        _themeFont = font;
         return font;
     }
 
@@ -442,29 +522,37 @@ public class GtkWidgetSet : IWidgetSet {
 
     /// The monitor a window should be centred on: the primary one, or the
     /// first, because a compositor need not name one primary.
-    gpointer Monitor() {
+    gpointer Monitor()
+    {
         Start();
         gpointer display = gdk_display_get_default();
-        if (display == null) { return null; }
+        if (display == null)
+            return null;
 
         gpointer monitor = gdk_display_get_primary_monitor(display);
-        if (monitor != null) { return monitor; }
-        if (gdk_display_get_n_monitors(display) <= 0) { return null; }
+        if (monitor != null)
+            return monitor;
+        if (gdk_display_get_n_monitors(display) <= 0)
+            return null;
         return gdk_display_get_monitor(display, 0);
     }
 
-    public Size ScreenSize() {
+    public Size ScreenSize()
+    {
         gpointer monitor = Monitor();
-        if (monitor == null) { return Extent(1024, 768); }
+        if (monitor == null)
+            return Extent(1024, 768);
 
         GdkRectangle area;
         gdk_monitor_get_geometry(monitor, &area);
         return Extent(area.Width, area.Height);
     }
 
-    public Rectangle WorkArea() {
+    public Rectangle WorkArea()
+    {
         gpointer monitor = Monitor();
-        if (monitor == null) { return Area(0, 0, 1024, 768); }
+        if (monitor == null)
+            return Area(0, 0, 1024, 768);
 
         GdkRectangle area;
         gdk_monitor_get_workarea(monitor, &area);
@@ -473,7 +561,11 @@ public class GtkWidgetSet : IWidgetSet {
 
     // --------------------------------------------------------- the loop
 
-    public void RunEventLoop() { Start(); gtk_main(); }
+    public void RunEventLoop()
+    {
+        Start();
+        gtk_main();
+    }
 
     /// Everything already queued, and no waiting.
     ///
@@ -481,17 +573,19 @@ public class GtkWidgetSet : IWidgetSet {
     /// drains the queue and returns -- which is what a program driving its own
     /// loop wants, and the reason `RunEventLoop` is not the only way in.
     /// Answers whether anything was handled.
-    public bool PumpEvents() {
+    public bool PumpEvents()
+    {
         Start();
         bool any = false;
-        while (gtk_events_pending() != 0) {
+        while (gtk_events_pending() != 0)
+        {
             gtk_main_iteration_do(0);
             any = true;
         }
         return any;
     }
 
-    public void QuitEventLoop() { gtk_main_quit(); }
+    public void QuitEventLoop() => gtk_main_quit();
 }
 
 #endif

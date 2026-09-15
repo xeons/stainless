@@ -66,12 +66,14 @@ public using HTREEITEM = HTREEITEM__*;
 
 // ============================================================ initialization
 
-public struct InitCommonControlsInfo {
+public struct InitCommonControlsInfo
+{
     public uint Size;
     public uint Classes;
 }
 
-public extern "C" {
+public extern "C"
+{
     /// Registers the window classes named in the mask. Must be called before
     /// any of these controls is created, and answers false if the library
     /// could not be loaded at all.
@@ -98,10 +100,11 @@ public const uint IccLinkClass       = 0x00008000u;
 /// are. `Code` is read as a *signed* number, because every one of these
 /// constants is negative -- Windows numbers notification codes downwards from
 /// zero so that they cannot collide with anything a program invents.
-public struct NotifyHeader {
-    public HWND  From;
+public struct NotifyHeader
+{
+    public HWND From;
     public nuint Id;
-    public int   Code;
+    public int Code;
 }
 
 /// The codes every control can send.
@@ -116,7 +119,8 @@ public const int NmReleasedCapture = -16;
 
 // ================================================================ image list
 
-public extern "C" {
+public extern "C"
+{
     HIMAGELIST ImageList_Create(int width, int height, uint flags,
                                 int initial, int grow);
     int        ImageList_Destroy(HIMAGELIST list);
@@ -178,10 +182,11 @@ public const uint BcmSetTextMargin = 0x1604u;
 /// The margin is what the spacing between picture and caption is made of --
 /// there is no separate field for it, so a gap on the caption's side of the
 /// picture is a margin on that side.
-public struct ButtonImageList {
+public struct ButtonImageList
+{
     public HIMAGELIST Images;
-    public Rect       Margin;
-    public uint       Align;
+    public Rect Margin;
+    public uint Align;
 }
 
 public const uint ButtonImageListAlignLeft   = 0u;
@@ -193,17 +198,18 @@ public const uint ButtonImageListAlignCenter = 4u;
 // =================================================================== toolbar
 
 /// `TBBUTTON`: one button in a toolbar.
-public struct ToolBarButton {
-    public int   Bitmap;
-    public int   Command;
-    public byte  State;
-    public byte  Style;
-    public byte  Reserved0;
-    public byte  Reserved1;
-    public byte  Reserved2;
-    public byte  Reserved3;
-    public byte  Reserved4;
-    public byte  Reserved5;
+public struct ToolBarButton
+{
+    public int Bitmap;
+    public int Command;
+    public byte State;
+    public byte Style;
+    public byte Reserved0;
+    public byte Reserved1;
+    public byte Reserved2;
+    public byte Reserved3;
+    public byte Reserved4;
+    public byte Reserved5;
     public nuint Data;
     public nuint Text;
 }
@@ -308,14 +314,15 @@ public const uint TbsTop       = 0x0004u;
 // =============================================================== tab control
 
 /// `TCITEMW`.
-public struct TabItem {
-    public uint    Mask;
-    public uint    State;
-    public uint    StateMask;
+public struct TabItem
+{
+    public uint Mask;
+    public uint State;
+    public uint StateMask;
     public char16* Text;
-    public int     TextLength;
-    public int     Image;
-    public nuint   Param;
+    public int TextLength;
+    public int Image;
+    public nuint Param;
 }
 
 /// **The wide variants are a long way from the ANSI ones.** `TCM_INSERTITEMW`
@@ -343,33 +350,36 @@ public const int TcnSelChanging = -552;
 // ================================================================= tree view
 
 /// `TVITEMW`.
-public struct TreeItem {
-    public uint    Mask;
+public struct TreeItem
+{
+    public uint Mask;
     public HTREEITEM Item;
-    public uint    State;
-    public uint    StateMask;
+    public uint State;
+    public uint StateMask;
     public char16* Text;
-    public int     TextLength;
-    public int     Image;
-    public int     SelectedImage;
-    public int     Children;
-    public nuint   Param;
+    public int TextLength;
+    public int Image;
+    public int SelectedImage;
+    public int Children;
+    public nuint Param;
 }
 
 /// `TVINSERTSTRUCTW`, which is a parent, a sibling and an item.
-public struct TreeInsert {
+public struct TreeInsert
+{
     public HTREEITEM Parent;
     public HTREEITEM InsertAfter;
-    public TreeItem  Item;
+    public TreeItem Item;
 }
 
 /// `NMTREEVIEWW`: what a tree reports when something happened to an item.
-public struct NotifyTreeView {
+public struct NotifyTreeView
+{
     public NotifyHeader Header;
-    public uint         Action;
-    public TreeItem     Old;
-    public TreeItem     New;
-    public Point        At;
+    public uint Action;
+    public TreeItem Old;
+    public TreeItem New;
+    public Point At;
 }
 
 public const uint TvmInsertItemW  = 0x1132u;
@@ -425,52 +435,55 @@ public const int TvnItemExpandedW = -456;
 ///
 /// That is what these used to say, and it is why the Win32 tree never held an
 /// item. `-0x10000` as a `nint` is the version that is right on both widths.
-public HTREEITEM TreeRoot()  { return (HTREEITEM)(void*)(nuint)(nint)(-0x10000); }
-public HTREEITEM TreeFirst() { return (HTREEITEM)(void*)(nuint)(nint)(-0xFFFF); }
-public HTREEITEM TreeLast()  { return (HTREEITEM)(void*)(nuint)(nint)(-0xFFFE); }
-public HTREEITEM TreeSort()  { return (HTREEITEM)(void*)(nuint)(nint)(-0xFFFD); }
+public HTREEITEM TreeRoot() => (HTREEITEM)(void*)(nuint)(nint)(-0x10000);
+public HTREEITEM TreeFirst() => (HTREEITEM)(void*)(nuint)(nint)(-0xFFFF);
+public HTREEITEM TreeLast() => (HTREEITEM)(void*)(nuint)(nint)(-0xFFFE);
+public HTREEITEM TreeSort() => (HTREEITEM)(void*)(nuint)(nint)(-0xFFFD);
 
 // ================================================================= list view
 
 /// `LVITEMW`.
-public struct ListItem {
-    public uint    Mask;
-    public int     Item;
-    public int     SubItem;
-    public uint    State;
-    public uint    StateMask;
+public struct ListItem
+{
+    public uint Mask;
+    public int Item;
+    public int SubItem;
+    public uint State;
+    public uint StateMask;
     public char16* Text;
-    public int     TextLength;
-    public int     Image;
-    public nuint   Param;
-    public int     Indent;
-    public int     GroupId;
-    public uint    Columns;
-    public uint*   ColumnFormat;
+    public int TextLength;
+    public int Image;
+    public nuint Param;
+    public int Indent;
+    public int GroupId;
+    public uint Columns;
+    public uint* ColumnFormat;
 }
 
 /// `LVCOLUMNW`.
-public struct ListColumn {
-    public uint    Mask;
-    public int     Format;
-    public int     Width;
+public struct ListColumn
+{
+    public uint Mask;
+    public int Format;
+    public int Width;
     public char16* Text;
-    public int     TextLength;
-    public int     SubItem;
-    public int     Image;
-    public int     Order;
+    public int TextLength;
+    public int SubItem;
+    public int Image;
+    public int Order;
 }
 
 /// `NMLISTVIEW`.
-public struct NotifyListView {
+public struct NotifyListView
+{
     public NotifyHeader Header;
-    public int          Item;
-    public int          SubItem;
-    public uint         NewState;
-    public uint         OldState;
-    public uint         Changed;
-    public Point        At;
-    public nuint        Param;
+    public int Item;
+    public int SubItem;
+    public uint NewState;
+    public uint OldState;
+    public uint Changed;
+    public Point At;
+    public nuint Param;
 }
 
 public const uint LvmInsertItemW   = 0x104Du;   // LVM_FIRST + 77
@@ -542,19 +555,20 @@ public const int UdnDeltaPos = -722;
 // ================================================================== header
 
 /// `HDITEMW`.
-public struct HeaderItem {
-    public uint    Mask;
-    public int     Width;
+public struct HeaderItem
+{
+    public uint Mask;
+    public int Width;
     public char16* Text;
     public HBITMAP Bitmap;
-    public int     TextLength;
-    public int     Format;
-    public nuint   Param;
-    public int     Image;
-    public int     Order;
-    public uint    Type;
-    public void*   FilterData;
-    public uint    State;
+    public int TextLength;
+    public int Format;
+    public nuint Param;
+    public int Image;
+    public int Order;
+    public uint Type;
+    public void* FilterData;
+    public uint State;
 }
 
 public const uint HdmInsertItemW = 0x120Au;   // HDM_FIRST + 10
@@ -588,7 +602,8 @@ public const int HdnItemChangedW = -321;
 /// unticked and 2 is ticked, and 0 means no state image at all.
 public const uint LvisStateImageMask = 0xF000u;
 
-public uint CheckedState(bool ticked) {
+public uint CheckedState(bool ticked)
+{
     return ((uint)(ticked ? 2 : 1)) << 12;
 }
 

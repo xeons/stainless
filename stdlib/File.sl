@@ -30,7 +30,8 @@ module Standard.File;
 import Standard.Collections;
 import Standard.IO;
 
-extern "C" {
+extern "C"
+{
     bool sl_path_exists(byte* path);
     bool sl_path_is_directory(byte* path);
     long sl_path_size(byte* path);
@@ -41,22 +42,24 @@ extern "C" {
 
 /// True when the path names a file that is there. A directory is not a file,
 /// so this is false for one.
-public bool Exists(String path) {
+public bool Exists(String path)
+{
     return sl_path_exists(path.ToPointer()) && !sl_path_is_directory(path.ToPointer());
 }
 
 /// The size in bytes, or -1 when there is nothing there.
-public long Size(String path) { return sl_path_size(path.ToPointer()); }
+public long Size(String path) => sl_path_size(path.ToPointer());
 
 /// When it was last written, in seconds since the epoch, or -1.
-public long Modified(String path) { return sl_path_modified(path.ToPointer()); }
+public long Modified(String path) => sl_path_modified(path.ToPointer());
 
 /// Removes the file. `IOError.None` on success.
-public IOError Delete(String path) { return (IOError)sl_file_delete(path.ToPointer()); }
+public IOError Delete(String path) => (IOError)sl_file_delete(path.ToPointer());
 
 /// Moves or renames. Whether it replaces an existing destination is the
 /// platform's decision, not this one's.
-public IOError Rename(String from, String to) {
+public IOError Rename(String from, String to)
+{
     return (IOError)sl_file_rename(from.ToPointer(), to.ToPointer());
 }
 
@@ -66,11 +69,13 @@ public IOError Rename(String from, String to) {
 // ------------------------------------------------------------------ reading
 
 /// The whole file as bytes.
-public Result<byte[], IOError> ReadAllBytes(String path) {
+public Result<byte[], IOError> ReadAllBytes(String path)
+{
     var file = try FileStream.OpenRead(path);
 
     long size = file.Length();
-    if (size < 0) {
+    if (size < 0)
+    {
         file.Close();
         return Fail(IOError.Unknown);
     }
@@ -80,36 +85,44 @@ public Result<byte[], IOError> ReadAllBytes(String path) {
     var failure = file.Error();
     file.Close();
 
-    if (failure != IOError.None) { return Fail(failure); }
+    if (failure != IOError.None)
+        return Fail(failure);
 
     // A short read is not an error, but the array has to match what arrived.
-    if (got == (nuint)size) { return Ok(data); }
+    if (got == (nuint)size)
+        return Ok(data);
 
     var exact = new byte[got];
-    for (nuint i = 0; i < got; i++) { exact[i] = data[i]; }
+    for (nuint i = 0; i < got; i++)
+        exact[i] = data[i];
     return Ok(exact);
 }
 
 /// The whole file as text, read as UTF-8.
-public Result<String, IOError> ReadAllText(String path) {
+public Result<String, IOError> ReadAllText(String path)
+{
     var raw = try ReadAllBytes(path);
-    if (raw.Length == 0) { return Ok(""); }
+    if (raw.Length == 0)
+        return Ok("");
 
     return Ok(Text.FromBytes(&raw[0], raw.Length));
 }
 
 /// The file's lines, with either line ending accepted and a trailing newline
 /// producing no final empty line.
-public Result<List<String>, IOError> ReadAllLines(String path) {
+public Result<List<String>, IOError> ReadAllLines(String path)
+{
     return Ok(IO.SplitLines(try ReadAllText(path)));
 }
 
 // ------------------------------------------------------------------ writing
 
 /// Replaces the file with `data`, creating it if needed.
-public IOError WriteAllBytes(String path, byte[] data) {
+public IOError WriteAllBytes(String path, byte[] data)
+{
     var opened = FileStream.Create(path);
-    if (!opened.Ok) { return opened.Error; }
+    if (!opened.Ok)
+        return opened.Error;
 
     var file = opened.Value;
 
@@ -120,9 +133,11 @@ public IOError WriteAllBytes(String path, byte[] data) {
 }
 
 /// Replaces the file with `text`, written as UTF-8.
-public IOError WriteAllText(String path, String text) {
+public IOError WriteAllText(String path, String text)
+{
     var opened = FileStream.Create(path);
-    if (!opened.Ok) { return opened.Error; }
+    if (!opened.Ok)
+        return opened.Error;
 
     var file = opened.Value;
 
@@ -133,13 +148,16 @@ public IOError WriteAllText(String path, String text) {
 }
 
 /// Writes the lines, each followed by a newline.
-public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
+public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
+{
     var opened = FileStream.Create(path);
-    if (!opened.Ok) { return opened.Error; }
+    if (!opened.Ok)
+        return opened.Error;
 
     var file = opened.Value;
 
-    for (nuint i = 0; i < lines.Count(); i++) {
+    for (nuint i = 0; i < lines.Count(); i++)
+    {
         file.WriteText(lines.At(i));
         file.WriteText("\n");
     }
@@ -150,9 +168,11 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines) {
 }
 
 /// Adds `text` to the end, creating the file if it is not there.
-public IOError AppendText(String path, String text) {
+public IOError AppendText(String path, String text)
+{
     var opened = FileStream.OpenAppend(path);
-    if (!opened.Ok) { return opened.Error; }
+    if (!opened.Ok)
+        return opened.Error;
 
     var file = opened.Value;
 
@@ -164,8 +184,10 @@ public IOError AppendText(String path, String text) {
 
 /// Copies a file. Reads it whole, so this is for ordinary files rather than
 /// for something that will not fit in memory.
-public IOError Copy(String from, String to) {
+public IOError Copy(String from, String to)
+{
     var data = ReadAllBytes(from);
-    if (!data.Ok) { return data.Error; }
+    if (!data.Ok)
+        return data.Error;
     return WriteAllBytes(to, data.Value);
 }

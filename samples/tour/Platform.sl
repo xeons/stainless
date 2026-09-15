@@ -44,7 +44,8 @@ public const Status Broken = -1;
 /// Which platform this was built for, decided at compile time. `WINDOWS`,
 /// `UNIX`, `LINUX`, `MACOS` and `STAINLESS` are defined by the compiler; `-D`
 /// adds more.
-public String Family() {
+public String Family()
+{
 #if WINDOWS
     return "windows";
 #elif LINUX
@@ -58,7 +59,8 @@ public String Family() {
 
 /// A symbol the tour never defines, so the `#else` is what survives. Nothing
 /// in the discarded branch is lexed, let alone bound.
-public String Mood() {
+public String Mood()
+{
 #if TOUR_IS_GRUMPY
     this line is not even tokenized
 #else
@@ -79,7 +81,8 @@ public extern "C" int c_sum_pair(PlainPair pair);
 
 /// A struct of plain data, which is the only kind that may cross `extern "C"`:
 /// C would copy the bytes and leave a reference count behind.
-public struct PlainPair {
+public struct PlainPair
+{
     public int A;
     public int B;
 }
@@ -111,17 +114,20 @@ public export "C++" int tour::Doubled(int n) { return n * 2; }
 
 /// `export "C"` is the other direction: this one is in the binary's export
 /// table under exactly this name, and the C file calls it.
-public export "C" int tour_triple(int value) { return value * 3; }
+public export "C" int tour_triple(int value) => value * 3;
 
 /// Handles are made from integers here, there being no real window to ask for.
 /// What matters is that the two stay apart on the way through.
-public Slot   SlotAt(nuint n)   { return (Slot)n; }
-public Cursor CursorAt(nuint n) { return (Cursor)n; }
+public Slot   SlotAt(nuint n) => (Slot)n;
+public Cursor CursorAt(nuint n) => (Cursor)n;
 
-public nuint NumberOf(Slot slot) { return (nuint)slot; }
+public nuint NumberOf(Slot slot) => (nuint)slot;
 
-public Status Check(Slot slot, Cursor cursor) {
-    if (slot == null)   { return Broken; }
-    if (cursor == null) { return Broken; }
+public Status Check(Slot slot, Cursor cursor)
+{
+    if (slot == null)
+        return Broken;
+    if (cursor == null)
+        return Broken;
     return Fine;
 }

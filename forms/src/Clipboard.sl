@@ -50,18 +50,21 @@ import Forms.Platform;
 /// does nothing, because there is no answer a caller could usefully act on --
 /// a text editor whose paste failed has nothing to offer the user but the
 /// paste they already asked for.
-public class Clipboard {
+public class Clipboard
+{
     /// Not constructible: everything here is static, and an instance would
     /// suggest there could be two clipboards.
     Clipboard() { }
 
     /// What the clipboard holds as text, or `""` when it holds none.
-    public static String GetText() {
+    public static String GetText()
+    {
         return WidgetSet.Current.GetClipboardText();
     }
 
     /// Puts text on the clipboard, replacing whatever was there.
-    public static void SetText(String text) {
+    public static void SetText(String text)
+    {
         WidgetSet.Current.SetClipboardText(text);
     }
 
@@ -70,7 +73,8 @@ public class Clipboard {
     /// What a paste command greys itself out on. Cheaper than fetching the text
     /// on both platforms -- and on X11 much cheaper, since it does not wait for
     /// another process to hand the contents over.
-    public static bool HasText() {
+    public static bool HasText()
+    {
         return WidgetSet.Current.ClipboardHasText();
     }
 }

@@ -4,47 +4,56 @@ module Generics;
 import Standard.Console;
 
 // A generic class. Nothing in it is checked until it is instantiated.
-public class Box<T> {
-    T value;
+public class Box<T>
+{
+    T _value;
 
-    public Box(T initial) { value = initial; }
+    public Box(T initial) => _value = initial;
 
-    public T Get() { return value; }
-    public void Set(T next) { value = next; }
+    public T Get() => _value;
+    public void Set(T next) => _value = next;
 }
 
 // A growable list built on arrays.
-public class List<T> {
-    T[] items;
-    nuint count;
+public class List<T>
+{
+    T[] _items;
+    nuint _count;
 
-    public List() {
-        items = new T[4];
-        count = 0;
+    public List()
+    {
+        _items = new T[4];
+        _count = 0;
     }
 
-    public nuint Count() { return count; }
+    public nuint Count() => _count;
 
-    public void Add(T item) {
-        if (count == items.Length) {
-            var bigger = new T[count * 2];
-            for (nuint i = 0; i < count; i += 1) { bigger[i] = items[i]; }
-            items = bigger;
+    public void Add(T item)
+    {
+        if (_count == _items.Length)
+        {
+            var bigger = new T[_count * 2];
+            for (nuint i = 0; i < _count; i++)
+                bigger[i] = _items[i];
+            _items = bigger;
         }
-        items[count] = item;
-        count += 1;
+        _items[_count] = item;
+        _count++;
     }
 
-    public T At(nuint index) { return items[index]; }
+    public T At(nuint index) => _items[index];
 }
 
 // A generic function; its type argument is inferred from the arguments.
-T Larger<T>(T a, T b, bool takeFirst) {
-    if (takeFirst) { return a; }
+T Larger<T>(T a, T b, bool takeFirst)
+{
+    if (takeFirst)
+        return a;
     return b;
 }
 
-int Main() {
+int Main()
+{
     var number = new Box<int>(41);
     number.Set(number.Get() + 1);
     Console.WriteLine("box int    = " + Text.FromInteger(number.Get()));
@@ -61,7 +70,8 @@ int Main() {
 
     Console.WriteLine("count      = " + Text.FromInteger(names.Count()));
     var joined = new StringBuilder();
-    for (nuint i = 0; i < names.Count(); i += 1) {
+    for (nuint i = 0; i < names.Count(); i++)
+    {
         joined.Append(names.At(i));
         joined.Append(" ");
     }

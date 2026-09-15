@@ -91,22 +91,24 @@ import Standard.Collections;
 /// Windows reserves the bottom 64K of the pointer range for this, so an id
 /// above 65535 is not representable and is the one thing a resource script
 /// must not use. The cast is what the C macro does, nothing more.
-public char16* Id(int id) { return (char16*)(nuint)(uint)id; }
+public char16* Id(int id) => (char16*)(nuint)(uint)id;
 
 /// True when a name is an integer id rather than a string, which is what a
 /// callback from `EnumResourceNamesW` has to ask before reading it.
-public bool IsId(char16* name) { return (nuint)name < 65536u; }
+public bool IsId(char16* name) => (nuint)name < 65536u;
 
 /// The integer behind such a name. Meaningless unless `IsId` said so.
-public int IdOf(char16* name) { return (int)(uint)(nuint)name; }
+public int IdOf(char16* name) => (int)(uint)(nuint)name;
 
 /// A resource name as text, whichever of the two it is: `#101` for an integer
 /// id, and the string itself otherwise.
 ///
 /// The `#` spelling is the one a resource script uses for the same thing, so
 /// what this prints can be pasted back into an `.rc`.
-public String NameOf(char16* name) {
-    if (IsId(name)) { return $"#{IdOf(name)}"; }
+public String NameOf(char16* name)
+{
+    if (IsId(name))
+        return $"#{IdOf(name)}";
     return Text.FromNullTerminatedUtf16(name);
 }
 
@@ -117,7 +119,7 @@ public String NameOf(char16* name) {
 /// `GetModuleHandleW(null)` is the running executable rather than whichever
 /// DLL this code was compiled into -- the two differ only for a library, which
 /// is why `In` below exists.
-public HMODULE Self() { return GetModuleHandleW(null); }
+public HMODULE Self() => GetModuleHandleW(null);
 
 /// Opens another binary to read its resources and nothing else.
 ///
@@ -128,32 +130,38 @@ public HMODULE Self() { return GetModuleHandleW(null); }
 ///
 /// Null on failure; `Win32.LastErrorMessage` says why. What this returns must
 /// be passed to `CloseModule` when it is done with.
-public HMODULE OpenForResources(String path) {
+public HMODULE OpenForResources(String path)
+{
     return LoadLibraryExW(path.ToUtf16().ToPointer(), null, LoadLibraryAsDataFile);
 }
 
 /// Closes what `OpenForResources` opened.
-public void CloseModule(HMODULE library) {
-    if (library != null) { FreeLibrary(library); }
+public void CloseModule(HMODULE library)
+{
+    if (library != null)
+        FreeLibrary(library);
 }
 
 // -------------------------------------------------------------- raw access
 
 /// Whether a resource of this type and name is there at all.
-public bool Exists(char16* name, char16* type) { return Has(Self(), name, type); }
+public bool Exists(char16* name, char16* type) => Has(Self(), name, type);
 
 /// The same, in another module.
-public bool Has(HMODULE library, char16* name, char16* type) {
+public bool Has(HMODULE library, char16* name, char16* type)
+{
     return FindResourceW(library, name, type) != null;
 }
 
 /// How many bytes a resource holds, or zero when there is no such resource.
-public uint Size(char16* name, char16* type) { return SizeIn(Self(), name, type); }
+public uint Size(char16* name, char16* type) => SizeIn(Self(), name, type);
 
 /// The same, in another module.
-public uint SizeIn(HMODULE library, char16* name, char16* type) {
+public uint SizeIn(HMODULE library, char16* name, char16* type)
+{
     HANDLE found = FindResourceW(library, name, type);
-    if (found == null) { return 0u; }
+    if (found == null)
+        return 0u;
     return SizeofResource(library, found);
 }
 
@@ -165,24 +173,31 @@ public uint SizeIn(HMODULE library, char16* name, char16* type) {
 /// `Bytes`.
 ///
 /// Null when there is no such resource. `size` is set either way.
-public byte* Pointer(char16* name, char16* type, uint* size) {
+public byte* Pointer(char16* name, char16* type, uint* size)
+{
     return PointerIn(Self(), name, type, size);
 }
 
 /// The same, in another module.
-public byte* PointerIn(HMODULE library, char16* name, char16* type, uint* size) {
-    if (size != null) { *size = 0u; }
+public byte* PointerIn(HMODULE library, char16* name, char16* type, uint* size)
+{
+    if (size != null)
+        *size = 0u;
 
     HANDLE found = FindResourceW(library, name, type);
-    if (found == null) { return null; }
+    if (found == null)
+        return null;
 
     HANDLE loaded = LoadResource(library, found);
-    if (loaded == null) { return null; }
+    if (loaded == null)
+        return null;
 
     void* at = LockResource(loaded);
-    if (at == null) { return null; }
+    if (at == null)
+        return null;
 
-    if (size != null) { *size = SizeofResource(library, found); }
+    if (size != null)
+        *size = SizeofResource(library, found);
     return (byte*)at;
 }
 
@@ -190,16 +205,19 @@ public byte* PointerIn(HMODULE library, char16* name, char16* type, uint* size) 
 ///
 /// Empty when there is no such resource, which is the same answer an empty
 /// resource gives -- ask `Exists` first where the difference matters.
-public byte[] Bytes(char16* name, char16* type) { return BytesIn(Self(), name, type); }
+public byte[] Bytes(char16* name, char16* type) => BytesIn(Self(), name, type);
 
 /// The same, in another module.
-public byte[] BytesIn(HMODULE library, char16* name, char16* type) {
+public byte[] BytesIn(HMODULE library, char16* name, char16* type)
+{
     uint size = 0u;
     byte* at = PointerIn(library, name, type, &size);
-    if (at == null || size == 0u) { return new byte[0]; }
+    if (at == null || size == 0u)
+        return new byte[0];
 
     var copy = new byte[(nuint)size];
-    for (int i = 0; i < (int)size; i = i + 1) { copy[i] = at[i]; }
+    for (int i = 0; i < (int)size; i = i + 1)
+        copy[i] = at[i];
     return copy;
 }
 
@@ -214,13 +232,15 @@ public byte[] BytesIn(HMODULE library, char16* name, char16* type) {
 /// An id with no string is an empty string. Windows caps a table entry at
 /// 4096 characters, so nothing is truncated here that was not truncated by
 /// `rc` first.
-public String Text(uint id) { return TextIn(Self(), id); }
+public String Text(uint id) => TextIn(Self(), id);
 
 /// The same, from another module.
-public String TextIn(HMODULE library, uint id) {
+public String TextIn(HMODULE library, uint id)
+{
     var buffer = new WideBuffer(4096u);
     int units = LoadStringW((HINSTANCE)library, id, buffer.Pointer(), (int)buffer.Capacity());
-    if (units <= 0) { return ""; }
+    if (units <= 0)
+        return "";
     return buffer.Text((uint)units);
 }
 
@@ -234,13 +254,15 @@ public String TextIn(HMODULE library, uint id) {
 /// that goes in a title bar.
 ///
 /// Null when there is no such icon. Shared, so there is nothing to destroy.
-public HICON Icon(char16* name) {
+public HICON Icon(char16* name)
+{
     return (HICON)LoadImageW((HINSTANCE)Self(), name, ImageIcon, 0, 0,
                              LrDefaultSize | LrShared);
 }
 
 /// The small icon, for a title bar and the task switcher.
-public HICON IconSmall(char16* name) {
+public HICON IconSmall(char16* name)
+{
     return (HICON)LoadImageW((HINSTANCE)Self(), name, ImageIcon,
                              GetSystemMetrics(SmSmallIconWidth),
                              GetSystemMetrics(SmSmallIconHeight),
@@ -248,7 +270,8 @@ public HICON IconSmall(char16* name) {
 }
 
 /// A cursor from an `RT_GROUP_CURSOR`. Null when there is none.
-public HCURSOR Cursor(char16* name) {
+public HCURSOR Cursor(char16* name)
+{
     return (HCURSOR)LoadImageW((HINSTANCE)Self(), name, ImageCursor, 0, 0,
                                LrDefaultSize | LrShared);
 }
@@ -259,7 +282,8 @@ public HCURSOR Cursor(char16* name) {
 /// `DeleteObject` when it is finished with. `LrShared` is deliberately not
 /// used here, because a bitmap is the one of these three that a program
 /// usually goes on to select into a device context and modify around.
-public HBITMAP Bitmap(char16* name) {
+public HBITMAP Bitmap(char16* name)
+{
     return (HBITMAP)LoadImageW((HINSTANCE)Self(), name, ImageBitmap, 0, 0, LrDefaultColor);
 }
 
@@ -269,7 +293,8 @@ public HBITMAP Bitmap(char16* name) {
 ///
 /// Null when there is no such menu. What this returns is owned by the caller
 /// until `SetMenu` attaches it to a window, after which the window destroys it.
-public HMENU Menu(char16* name) {
+public HMENU Menu(char16* name)
+{
     return LoadMenuW((HINSTANCE)Self(), name);
 }
 
@@ -279,21 +304,23 @@ public HMENU Menu(char16* name) {
 /// convenient. It is only half of what accelerators need: the message loop has
 /// to call `TranslateAcceleratorW` before dispatching, and *not* dispatch a
 /// message the table took.
-public HACCEL Accelerators(char16* name) {
+public HACCEL Accelerators(char16* name)
+{
     return LoadAcceleratorsW((HINSTANCE)Self(), name);
 }
 
 // ----------------------------------------------------------------- version
 
 /// A four-part version number, as `RT_VERSION` stores one.
-public struct FileVersion {
+public struct FileVersion
+{
     public ushort Major;
     public ushort Minor;
     public ushort Build;
     public ushort Revision;
 
     /// The usual `1.2.3.4` spelling.
-    public String Text() { return $"{Major}.{Minor}.{Build}.{Revision}"; }
+    public String Text() => $"{Major}.{Minor}.{Build}.{Revision}";
 }
 
 /// The version a binary reports, read from its `RT_VERSION` resource.
@@ -304,34 +331,40 @@ public struct FileVersion {
 /// All zeroes when the file has no version resource, which is the ordinary
 /// case for anything not built by a Windows toolchain that was told to add
 /// one -- a Stainless binary has none unless its `.rc` says `VERSIONINFO`.
-public FileVersion VersionOf(String path) {
+public FileVersion VersionOf(String path)
+{
     FileVersion answer;
     answer.Major = 0u; answer.Minor = 0u; answer.Build = 0u; answer.Revision = 0u;
 
     var wide = path.ToUtf16();
     uint ignored = 0u;
     uint size = GetFileVersionInfoSizeW(wide.ToPointer(), &ignored);
-    if (size == 0u) { return answer; }
+    if (size == 0u)
+        return answer;
 
     // The block has to outlive every query against it: `VerQueryValueW` hands
     // back a pointer into it rather than a copy. `buffer` living to the end of
     // this function is what makes that safe, and why the numbers are read out
     // before returning rather than the pointer being handed on.
     var buffer = new ByteBuffer(size);
-    if (Failed(GetFileVersionInfoW(wide.ToPointer(), 0u, size, (void*)buffer.Pointer()))) {
+    if (Failed(GetFileVersionInfoW(wide.ToPointer(), 0u, size, (void*)buffer.Pointer())))
+    {
         return answer;
     }
 
     void* found = null;
     uint length = 0u;
     if (Failed(VerQueryValueW((void*)buffer.Pointer(), "\\".ToUtf16().ToPointer(),
-                              &found, &length))) {
+                              &found, &length)))
+    {
         return answer;
     }
-    if (found == null || length < (uint)sizeof(FixedFileInfo)) { return answer; }
+    if (found == null || length < (uint)sizeof(FixedFileInfo))
+        return answer;
 
     FixedFileInfo* fixed = (FixedFileInfo*)found;
-    if (fixed->Signature != FixedFileInfoSignature) { return answer; }
+    if (fixed->Signature != FixedFileInfoSignature)
+        return answer;
 
     // Four 16-bit parts in two 32-bit words, most significant half first.
     answer.Major    = (ushort)(fixed->FileVersionMs >> 16);
@@ -342,10 +375,12 @@ public FileVersion VersionOf(String path) {
 }
 
 /// This program's own version, which means finding its own path first.
-public FileVersion Version() {
+public FileVersion Version()
+{
     var buffer = new WideBuffer(32768u);
     uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity());
-    if (units == 0u) {
+    if (units == 0u)
+    {
         FileVersion none;
         none.Major = 0u; none.Minor = 0u; none.Build = 0u; none.Revision = 0u;
         return none;
@@ -362,10 +397,11 @@ public FileVersion Version() {
 /// reading another file's resources through `OpenForResources`.
 ///
 /// An integer id comes back in the `#101` spelling `NameOf` uses.
-public String[] Names(char16* type) { return NamesIn(Self(), type); }
+public String[] Names(char16* type) => NamesIn(Self(), type);
 
 /// The same, in another module.
-public String[] NamesIn(HMODULE library, char16* type) {
+public String[] NamesIn(HMODULE library, char16* type)
+{
     var found = new List<String>();
 
     // The callback cannot capture, being a plain C function pointer, so the
@@ -377,22 +413,25 @@ public String[] NamesIn(HMODULE library, char16* type) {
 }
 
 /// Every resource *type* a module carries, as text.
-public String[] Types() { return TypesIn(Self()); }
+public String[] Types() => TypesIn(Self());
 
 /// The same, in another module.
-public String[] TypesIn(HMODULE library) {
+public String[] TypesIn(HMODULE library)
+{
     var found = new List<String>();
     EnumResourceTypesW(library, CollectType, (nint)(void*)found);
     return found.ToArray();
 }
 
-int CollectName(HMODULE library, char16* type, char16* name, nint parameter) {
+int CollectName(HMODULE library, char16* type, char16* name, nint parameter)
+{
     var into = (List<String>)(void*)parameter;
     into.Add(NameOf(name));
     return 1;
 }
 
-int CollectType(HMODULE library, char16* type, nint parameter) {
+int CollectType(HMODULE library, char16* type, nint parameter)
+{
     var into = (List<String>)(void*)parameter;
     into.Add(NameOf(type));
     return 1;

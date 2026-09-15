@@ -46,7 +46,8 @@ import Standard.Collections;
 import Standard.IO;
 import Standard.Text;
 
-extern "C" {
+extern "C"
+{
     nuint sl_socket_open(int family, int kind, int* error);
     void  sl_socket_close(nuint handle);
     int   sl_socket_shutdown(nuint handle, int how, int* error);
@@ -87,7 +88,8 @@ extern "C" {
 /// These are the distinctions a program can act on rather than the platform's
 /// whole list, for the reason `IOError` gives: the values are the same
 /// everywhere, and neither `errno` nor a WSA code is.
-public enum SocketError {
+public enum SocketError
+{
     /// Nothing went wrong.
     None = 0,
 
@@ -131,7 +133,8 @@ public enum SocketError {
 }
 
 /// Which internet protocol.
-public enum AddressFamily {
+public enum AddressFamily
+{
     /// Whichever the name resolves to.
     ///
     /// Only meaningful where a name is being resolved: connecting to one, or
@@ -147,7 +150,8 @@ public enum AddressFamily {
 }
 
 /// Which of the two shapes a socket has.
-public enum SocketKind {
+public enum SocketKind
+{
     /// TCP: a stream, ordered and reliable, with no message boundaries.
     Stream = 1,
 
@@ -156,7 +160,8 @@ public enum SocketKind {
 }
 
 /// Which half of a connection to finish.
-public enum SocketShutdown {
+public enum SocketShutdown
+{
     /// Stop receiving. The peer can still be written to.
     Receive = 0,
     /// Stop sending, which is what tells the peer there is no more coming.
@@ -166,8 +171,10 @@ public enum SocketShutdown {
 }
 
 /// What went wrong, in words.
-public String Describe(SocketError error) {
-    switch (error) {
+public String Describe(SocketError error)
+{
+    switch (error)
+    {
         case SocketError.None:         return "no error";
         case SocketError.WouldBlock:   return "nothing ready yet";
         case SocketError.Refused:      return "the connection was refused";
@@ -199,7 +206,8 @@ const nuint NoSocket = 18446744073709551615u;
 /// A struct rather than a class: it holds a `String`, so copying it retains --
 /// which is fine, and is why it cannot cross `extern "C"` (§7.6). Nothing here
 /// needs it to.
-public struct EndPoint {
+public struct EndPoint
+{
     /// The address or name. An empty host means every address on this machine,
     /// which is what a server binds to.
     public String Host;
@@ -209,7 +217,8 @@ public struct EndPoint {
     public ushort Port;
 
     /// An endpoint, made in one expression.
-    public static EndPoint At(String host, ushort port) {
+    public static EndPoint At(String host, ushort port)
+    {
         EndPoint made;
         made.Host = host;
         made.Port = port;
@@ -217,10 +226,12 @@ public struct EndPoint {
     }
 
     /// Written the way one is written.
-    public String Format() {
+    public String Format()
+    {
         // A bare IPv6 address contains colons, so the port needs the brackets
         // that a URL puts round one. IPv4 and a name do not.
-        if (Host.Contains(':')) {
+        if (Host.Contains(':'))
+        {
             return $"[{Host}]:{Port}";
         }
         return $"{Host}:{Port}";
@@ -232,7 +243,8 @@ public struct EndPoint {
 /// One address rather than the list: a list is only useful to something that
 /// will try each in turn, and that is what connecting already does inside the
 /// runtime, where it can try each socket as well as each address.
-public Result<String, SocketError> Resolve(String host) {
+public Result<String, SocketError> Resolve(String host)
+{
     return Resolve(host, AddressFamily.Any);
 }
 
@@ -241,12 +253,14 @@ public Result<String, SocketError> Resolve(String host) {
 /// `AddressFamily.Any` takes whichever the resolver prefers. Name it when the
 /// socket that will use the address is already one family or the other, since
 /// an IPv6 address cannot be connected to from an IPv4 socket.
-public Result<String, SocketError> Resolve(String host, AddressFamily family) {
+public Result<String, SocketError> Resolve(String host, AddressFamily family)
+{
     byte[64] buffer;
     int code = 0;
 
     if (sl_socket_resolve(host.ToPointer(), (int)family, &buffer[0],
-                          AddressSize, &code) == 0) {
+                          AddressSize, &code) == 0)
+    {
         return Fail(code == 0 ? SocketError.NoName : (SocketError)code);
     }
     return Ok(Text.FromNullTerminated(&buffer[0]));
@@ -267,17 +281,20 @@ public Result<String, SocketError> Resolve(String host, AddressFamily family) {
 ///
 /// Closing is the destructor's job, so a socket that goes out of scope gives
 /// its handle back whether or not `Close` was called.
-public class Socket {
-    nuint handle;
-    SocketError error;
-    AddressFamily family;
-    SocketKind kind;
-    bool closed;
+public class Socket
+{
+    nuint _handle;
+    SocketError _error;
+    AddressFamily _family;
+    SocketKind _kind;
+    bool _closed;
 
     /// A socket of a given family and kind, unbound and unconnected.
-    public static Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind) {
+    public static Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind)
+    {
         var made = new Socket(family, kind);
-        if (!made.IsOpen()) { return Fail(made.Error()); }
+        if (!made.IsOpen())
+            return Fail(made.Error());
         return Ok(made);
     }
 
@@ -287,29 +304,33 @@ public class Socket {
     /// a name does not know whether it will get IPv4 or IPv6, so it cannot
     /// open first.
     public static Result<Socket, SocketError> OpenConnected(
-            String host, ushort port, AddressFamily family, SocketKind kind) {
+            String host, ushort port, AddressFamily family, SocketKind kind)
+    {
         var made = new Socket(host, port, family, kind);
-        if (!made.IsOpen()) { return Fail(made.Error()); }
+        if (!made.IsOpen())
+            return Fail(made.Error());
         return Ok(made);
     }
 
-    Socket(AddressFamily family, SocketKind kind) {
-        this.family = family;
-        this.kind = kind;
+    Socket(AddressFamily family, SocketKind kind)
+    {
+        this._family = family;
+        this._kind = kind;
 
         // There is no socket of no family. `Any` is a question for a resolver,
         // and is answered by connecting rather than by opening.
-        if (family == AddressFamily.Any) {
-            handle = NoSocket;
-            error = SocketError.Invalid;
-            closed = true;
+        if (family == AddressFamily.Any)
+        {
+            _handle = NoSocket;
+            _error = SocketError.Invalid;
+            _closed = true;
             return;
         }
 
         int code = 0;
-        handle = sl_socket_open((int)family, (int)kind, &code);
-        error = (SocketError)code;
-        closed = handle == NoSocket;
+        _handle = sl_socket_open((int)family, (int)kind, &code);
+        _error = (SocketError)code;
+        _closed = _handle == NoSocket;
     }
 
     /// A socket that is already connected.
@@ -320,24 +341,26 @@ public class Socket {
     /// a socket of its own family, and a socket whose connect failed is closed
     /// rather than retried -- which is the other reason this cannot be two
     /// steps.
-    Socket(String host, ushort port, AddressFamily family, SocketKind kind) {
-        this.family = family;
-        this.kind = kind;
+    Socket(String host, ushort port, AddressFamily family, SocketKind kind)
+    {
+        this._family = family;
+        this._kind = kind;
 
         int code = 0;
-        handle = sl_socket_open_connected(host.ToPointer(), port, (int)family,
+        _handle = sl_socket_open_connected(host.ToPointer(), port, (int)family,
                                           (int)kind, &code);
-        error = (SocketError)code;
-        closed = handle == NoSocket;
+        _error = (SocketError)code;
+        _closed = _handle == NoSocket;
     }
 
     /// Wraps a handle the runtime already opened, which is what `Accept` has.
-    Socket(nuint accepted, AddressFamily family, SocketKind kind) {
-        handle = accepted;
-        this.family = family;
-        this.kind = kind;
-        error = SocketError.None;
-        closed = accepted == NoSocket;
+    Socket(nuint accepted, AddressFamily family, SocketKind kind)
+    {
+        _handle = accepted;
+        this._family = family;
+        this._kind = kind;
+        _error = SocketError.None;
+        _closed = accepted == NoSocket;
     }
 
     ~Socket() { Close(); }
@@ -345,21 +368,21 @@ public class Socket {
     /// Whether the handle is still live. False before a failed open and after
     /// `Close`; it says nothing about whether the peer is still there, which
     /// only a read can find out.
-    public bool IsOpen() { return !closed; }
+    public bool IsOpen() => !_closed;
 
     /// The last error, or `None`. Set by every call that failed, and cleared
     /// by the next one that did not.
-    public SocketError Error() { return error; }
+    public SocketError Error() => _error;
 
     /// Which family the socket was opened for. Fixed at open.
-    public AddressFamily Family() { return family; }
+    public AddressFamily Family() => _family;
 
     /// Stream or datagram. Fixed at open.
-    public SocketKind Kind() { return kind; }
+    public SocketKind Kind() => _kind;
 
     /// The handle itself, for a platform call this wrapper does not make.
     /// A `SOCKET` on Windows and a file descriptor on everything else.
-    public nuint Handle() { return handle; }
+    public nuint Handle() => _handle;
 
     /// Closes the handle. Idempotent, and the destructor calls it, so a
     /// socket that goes out of scope is not leaked.
@@ -367,53 +390,61 @@ public class Socket {
     /// Closing a stream socket without `Shutdown` first leaves what the peer
     /// sees up to the platform and to what is still unread; `TcpClient.Close`
     /// shuts both directions down first, which is what ends one politely.
-    public void Close() {
-        if (closed) { return; }
-        sl_socket_close(handle);
-        closed = true;
-        handle = NoSocket;
+    public void Close()
+    {
+        if (_closed)
+            return;
+        sl_socket_close(_handle);
+        _closed = true;
+        _handle = NoSocket;
     }
 
     // ------------------------------------------------------------ addresses
 
     /// Takes the address, and the port. Port 0 asks the system to choose one,
     /// which `LocalEndPoint` will then say.
-    public SocketError Bind(String host, ushort port) {
-        if (closed) { return Note(SocketError.Closed); }
+    public SocketError Bind(String host, ushort port)
+    {
+        if (_closed)
+            return Note(SocketError.Closed);
 
         int code = 0;
-        sl_socket_bind(handle, host.ToPointer(), port, (int)family, (int)kind, &code);
+        sl_socket_bind(_handle, host.ToPointer(), port, (int)_family, (int)_kind, &code);
         return Note((SocketError)code);
     }
 
     /// Binds to every address on this machine, which is what a server wants
     /// and what an empty host means to the resolver.
-    public SocketError BindAny(ushort port) { return Bind("", port); }
+    public SocketError BindAny(ushort port) => Bind("", port);
 
     /// Starts accepting connections. `backlog` is how many may wait before
     /// the system refuses more; the platform may cap it lower than asked.
     ///
     /// Bind first -- listening on a socket that was never bound fails.
-    public SocketError Listen(int backlog) {
-        if (closed) { return Note(SocketError.Closed); }
+    public SocketError Listen(int backlog)
+    {
+        if (_closed)
+            return Note(SocketError.Closed);
 
         int code = 0;
-        sl_socket_listen(handle, backlog, &code);
+        sl_socket_listen(_handle, backlog, &code);
         return Note((SocketError)code);
     }
 
     /// Waits for a connection. The socket that comes back is open, or is not
     /// and says why.
-    public Socket Accept() {
-        if (closed) {
+    public Socket Accept()
+    {
+        if (_closed)
+        {
             Note(SocketError.Closed);
-            return new Socket(NoSocket, family, kind);
+            return new Socket(NoSocket, _family, _kind);
         }
 
         int code = 0;
-        nuint accepted = sl_socket_accept(handle, &code);
+        nuint accepted = sl_socket_accept(_handle, &code);
         Note((SocketError)code);
-        return new Socket(accepted, family, kind);
+        return new Socket(accepted, _family, _kind);
     }
 
     /// Connects a socket that is already open.
@@ -422,19 +453,21 @@ public class Socket {
     /// socket whose connect failed cannot be used for a second attempt and
     /// this one is already made. `new Socket(host, port, family, kind)` is the
     /// form that tries them all, and the one a client should reach for.
-    public SocketError Connect(String host, ushort port) {
-        if (closed) { return Note(SocketError.Closed); }
+    public SocketError Connect(String host, ushort port)
+    {
+        if (_closed)
+            return Note(SocketError.Closed);
 
         int code = 0;
-        sl_socket_connect(handle, host.ToPointer(), port, (int)family, (int)kind, &code);
+        sl_socket_connect(_handle, host.ToPointer(), port, (int)_family, (int)_kind, &code);
         return Note((SocketError)code);
     }
 
     /// This end of the connection.
-    public EndPoint LocalEndPoint() { return Address(true); }
+    public EndPoint LocalEndPoint() => Address(true);
 
     /// The other end.
-    public EndPoint RemoteEndPoint() { return Address(false); }
+    public EndPoint RemoteEndPoint() => Address(false);
 
     // ------------------------------------------------------------- transfer
 
@@ -443,23 +476,36 @@ public class Socket {
     /// Fewer than asked for is normal on a stream: the kernel took what fitted
     /// in its buffer. A loop over what is left is the caller's job, or
     /// `SendAll` is.
-    public nuint Send(byte[] buffer, nuint offset, nuint count) {
-        if (closed) { Note(SocketError.Closed); return 0; }
-        if (count == 0) { return 0; }
-        if (offset + count > buffer.Length) { Note(SocketError.Invalid); return 0; }
+    public nuint Send(byte[] buffer, nuint offset, nuint count)
+    {
+        if (_closed)
+        {
+            Note(SocketError.Closed);
+            return 0;
+        }
+        if (count == 0)
+            return 0;
+        if (offset + count > buffer.Length)
+        {
+            Note(SocketError.Invalid);
+            return 0;
+        }
 
         int code = 0;
-        nuint sent = sl_socket_send(handle, &buffer[offset], count, &code);
+        nuint sent = sl_socket_send(_handle, &buffer[offset], count, &code);
         Note((SocketError)code);
         return sent;
     }
 
     /// Sends all of it, or says why it could not.
-    public SocketError SendAll(byte[] buffer) {
+    public SocketError SendAll(byte[] buffer)
+    {
         nuint at = 0;
-        while (at < buffer.Length) {
+        while (at < buffer.Length)
+        {
             nuint sent = Send(buffer, at, buffer.Length - at);
-            if (sent == 0) { return error == SocketError.None ? SocketError.Closed : error; }
+            if (sent == 0)
+                return _error == SocketError.None ? SocketError.Closed : _error;
             at = at + sent;
         }
         return SocketError.None;
@@ -467,18 +513,22 @@ public class Socket {
 
     /// Sends the UTF-8 bytes of `text`, which is what a String already holds,
     /// so nothing is converted or copied on the way.
-    public SocketError SendText(String text) {
-        if (closed) { return Note(SocketError.Closed); }
+    public SocketError SendText(String text)
+    {
+        if (_closed)
+            return Note(SocketError.Closed);
 
         nuint at = 0;
         nuint size = text.ByteLength();
 
-        while (at < size) {
+        while (at < size)
+        {
             int code = 0;
-            nuint sent = sl_socket_send(handle, text.ToPointer() + at, size - at, &code);
+            nuint sent = sl_socket_send(_handle, text.ToPointer() + at, size - at, &code);
             Note((SocketError)code);
 
-            if (sent == 0) { return error == SocketError.None ? SocketError.Closed : error; }
+            if (sent == 0)
+                return _error == SocketError.None ? SocketError.Closed : _error;
             at = at + sent;
         }
         return SocketError.None;
@@ -487,13 +537,23 @@ public class Socket {
     /// Reads up to `count` bytes and reports how many arrived. Zero is the
     /// peer having finished, which is an ending rather than an error -- ask
     /// `Error()` to tell the two apart.
-    public nuint Receive(byte[] buffer, nuint offset, nuint count) {
-        if (closed) { Note(SocketError.Closed); return 0; }
-        if (count == 0) { return 0; }
-        if (offset + count > buffer.Length) { Note(SocketError.Invalid); return 0; }
+    public nuint Receive(byte[] buffer, nuint offset, nuint count)
+    {
+        if (_closed)
+        {
+            Note(SocketError.Closed);
+            return 0;
+        }
+        if (count == 0)
+            return 0;
+        if (offset + count > buffer.Length)
+        {
+            Note(SocketError.Invalid);
+            return 0;
+        }
 
         int code = 0;
-        nuint read = sl_socket_receive(handle, &buffer[offset], count, &code);
+        nuint read = sl_socket_receive(_handle, &buffer[offset], count, &code);
         Note((SocketError)code);
         return read;
     }
@@ -501,13 +561,18 @@ public class Socket {
     // ------------------------------------------------------------ datagrams
 
     /// Sends one datagram. It arrives whole or not at all.
-    public nuint SendTo(byte[] buffer, EndPoint target) {
-        if (closed) { Note(SocketError.Closed); return 0; }
+    public nuint SendTo(byte[] buffer, EndPoint target)
+    {
+        if (_closed)
+        {
+            Note(SocketError.Closed);
+            return 0;
+        }
 
         int code = 0;
-        nuint sent = sl_socket_send_to(handle, &buffer[0], buffer.Length,
+        nuint sent = sl_socket_send_to(_handle, &buffer[0], buffer.Length,
                                        target.Host.ToPointer(), target.Port,
-                                       (int)family, &code);
+                                       (int)_family, &code);
         Note((SocketError)code);
         return sent;
     }
@@ -517,14 +582,19 @@ public class Socket {
     /// A datagram longer than the buffer is truncated and the rest is gone,
     /// which is what a datagram is: there is no second read to get the rest of
     /// one.
-    public nuint ReceiveFrom(byte[] buffer, ref EndPoint from) {
-        if (closed) { Note(SocketError.Closed); return 0; }
+    public nuint ReceiveFrom(byte[] buffer, ref EndPoint from)
+    {
+        if (_closed)
+        {
+            Note(SocketError.Closed);
+            return 0;
+        }
 
         byte[64] host;
         ushort port = 0;
         int code = 0;
 
-        nuint read = sl_socket_receive_from(handle, &buffer[0], buffer.Length,
+        nuint read = sl_socket_receive_from(_handle, &buffer[0], buffer.Length,
                                             &host[0], AddressSize, &port, &code);
         Note((SocketError)code);
 
@@ -537,14 +607,16 @@ public class Socket {
 
     /// Whether a call waits. A socket that does not block answers
     /// `WouldBlock` instead of waiting, which is not a failure.
-    public SocketError SetBlocking(bool blocking) {
-        return Option(sl_socket_set_blocking(handle, blocking ? 1 : 0, &_code), _code);
+    public SocketError SetBlocking(bool blocking)
+    {
+        return Option(sl_socket_set_blocking(_handle, blocking ? 1 : 0, &_code), _code);
     }
 
     /// Turns off Nagle's algorithm, so a small write goes out now rather than
     /// waiting to be joined by the next one.
-    public SocketError SetNoDelay(bool on) {
-        return Option(sl_socket_set_no_delay(handle, on ? 1 : 0, &_code), _code);
+    public SocketError SetNoDelay(bool on)
+    {
+        return Option(sl_socket_set_no_delay(_handle, on ? 1 : 0, &_code), _code);
     }
 
     /// Lets a listener take a port that connections in TIME_WAIT still hold,
@@ -554,41 +626,48 @@ public class Socket {
     /// process steal a port another is actively listening on, which is a
     /// different and much worse thing to ask for. Windows already allows the
     /// TIME_WAIT case without being asked.
-    public SocketError SetReuseAddress(bool on) {
-        return Option(sl_socket_set_reuse_address(handle, on ? 1 : 0, &_code), _code);
+    public SocketError SetReuseAddress(bool on)
+    {
+        return Option(sl_socket_set_reuse_address(_handle, on ? 1 : 0, &_code), _code);
     }
 
     /// Lets a datagram socket send to a broadcast address. Off by default,
     /// and meaningless on a stream socket.
-    public SocketError SetBroadcast(bool on) {
-        return Option(sl_socket_set_broadcast(handle, on ? 1 : 0, &_code), _code);
+    public SocketError SetBroadcast(bool on)
+    {
+        return Option(sl_socket_set_broadcast(_handle, on ? 1 : 0, &_code), _code);
     }
 
     /// Asks the system to probe an idle connection, so a peer that vanished
     /// without closing is eventually noticed. The interval is the platform's
     /// and is measured in hours by default, so this detects a dead peer rather
     /// than a slow one.
-    public SocketError SetKeepAlive(bool on) {
-        return Option(sl_socket_set_keep_alive(handle, on ? 1 : 0, &_code), _code);
+    public SocketError SetKeepAlive(bool on)
+    {
+        return Option(sl_socket_set_keep_alive(_handle, on ? 1 : 0, &_code), _code);
     }
 
     /// How long a read waits before giving up. Zero is forever.
-    public SocketError SetReceiveTimeout(int milliseconds) {
-        return Option(sl_socket_set_timeout(handle, milliseconds, 1, &_code), _code);
+    public SocketError SetReceiveTimeout(int milliseconds)
+    {
+        return Option(sl_socket_set_timeout(_handle, milliseconds, 1, &_code), _code);
     }
 
     /// How long a send waits before giving up. Zero is forever.
-    public SocketError SetSendTimeout(int milliseconds) {
-        return Option(sl_socket_set_timeout(handle, milliseconds, 0, &_code), _code);
+    public SocketError SetSendTimeout(int milliseconds)
+    {
+        return Option(sl_socket_set_timeout(_handle, milliseconds, 0, &_code), _code);
     }
 
     /// Finishes one direction, or both. The other end sees an ending rather
     /// than a reset, which is the difference between this and closing.
-    public SocketError Shutdown(SocketShutdown how) {
-        if (closed) { return Note(SocketError.Closed); }
+    public SocketError Shutdown(SocketShutdown how)
+    {
+        if (_closed)
+            return Note(SocketError.Closed);
 
         int code = 0;
-        sl_socket_shutdown(handle, (int)how, &code);
+        sl_socket_shutdown(_handle, (int)how, &code);
         return Note((SocketError)code);
     }
 
@@ -596,11 +675,11 @@ public class Socket {
 
     /// Waits until there is something to read, the time runs out, or it fails.
     /// A negative wait is forever.
-    public bool WaitToRead(int milliseconds) { return Wait(false, milliseconds); }
+    public bool WaitToRead(int milliseconds) => Wait(false, milliseconds);
 
     /// Waits until there is room to write. On a socket that is connecting
     /// without blocking, this is also how the connection finishing is seen.
-    public bool WaitToWrite(int milliseconds) { return Wait(true, milliseconds); }
+    public bool WaitToWrite(int milliseconds) => Wait(true, milliseconds);
 
     // -------------------------------------------------------------- private
 
@@ -608,37 +687,50 @@ public class Socket {
     /// otherwise each need a local and four lines.
     int _code;
 
-    SocketError Option(int ok, int code) {
-        if (closed) { return Note(SocketError.Closed); }
+    SocketError Option(int ok, int code)
+    {
+        if (_closed)
+            return Note(SocketError.Closed);
         return Note((SocketError)code);
     }
 
-    bool Wait(bool forWriting, int milliseconds) {
-        if (closed) { Note(SocketError.Closed); return false; }
+    bool Wait(bool forWriting, int milliseconds)
+    {
+        if (_closed)
+        {
+            Note(SocketError.Closed);
+            return false;
+        }
 
         int code = 0;
-        int ready = sl_socket_wait(handle, forWriting ? 1 : 0, milliseconds, &code);
+        int ready = sl_socket_wait(_handle, forWriting ? 1 : 0, milliseconds, &code);
         Note((SocketError)code);
         return ready == 1;
     }
 
-    EndPoint Address(bool local) {
+    EndPoint Address(bool local)
+    {
         EndPoint found;
         found.Host = "";
         found.Port = 0;
 
-        if (closed) { Note(SocketError.Closed); return found; }
+        if (_closed)
+        {
+            Note(SocketError.Closed);
+            return found;
+        }
 
         byte[64] host;
         ushort port = 0;
         int code = 0;
 
         int ok = local
-            ? sl_socket_local(handle, &host[0], AddressSize, &port, &code)
-            : sl_socket_remote(handle, &host[0], AddressSize, &port, &code);
+            ? sl_socket_local(_handle, &host[0], AddressSize, &port, &code)
+            : sl_socket_remote(_handle, &host[0], AddressSize, &port, &code);
 
         Note((SocketError)code);
-        if (ok == 0) { return found; }
+        if (ok == 0)
+            return found;
 
         found.Host = Text.FromNullTerminated(&host[0]);
         found.Port = port;
@@ -647,8 +739,9 @@ public class Socket {
 
     /// Records an error and hands it back, so a caller can write
     /// `return Note(...)` and a reader sees both at once.
-    SocketError Note(SocketError code) {
-        error = code;
+    SocketError Note(SocketError code)
+    {
+        _error = code;
         return code;
     }
 }
@@ -666,19 +759,22 @@ public class Socket {
 ///
 ///     var client = server.Accept();
 ///     while (client.IsConnected()) { ... }
-public class TcpListener {
-    Socket socket;
-    bool listening;
+public class TcpListener
+{
+    Socket _socket;
+    bool _listening;
 
     /// Listens on every address this machine has.
-    public static Result<TcpListener, SocketError> Listen(ushort port) {
+    public static Result<TcpListener, SocketError> Listen(ushort port)
+    {
         return Listen("", port, AddressFamily.IPv4, 16);
     }
 
     /// Listens on one address. `"127.0.0.1"` is the useful one: a service that
     /// only its own machine should reach says so here rather than in a
     /// firewall.
-    public static Result<TcpListener, SocketError> Listen(String host, ushort port) {
+    public static Result<TcpListener, SocketError> Listen(String host, ushort port)
+    {
         return Listen(host, port, AddressFamily.IPv4, 16);
     }
 
@@ -687,58 +783,67 @@ public class TcpListener {
     ///
     /// The other two overloads are this one with IPv4 and a backlog of 16.
     public static Result<TcpListener, SocketError> Listen(
-            String host, ushort port, AddressFamily family, int backlog) {
+            String host, ushort port, AddressFamily family, int backlog)
+    {
         var opened = Socket.Open(family, SocketKind.Stream);
-        if (!opened.Ok) { return Fail(opened.Error); }
+        if (!opened.Ok)
+            return Fail(opened.Error);
 
         var made = new TcpListener(opened.Value, host, port, backlog);
-        if (!made.IsListening()) { return Fail(made.Error()); }
+        if (!made.IsListening())
+            return Fail(made.Error());
         return Ok(made);
     }
 
-    TcpListener(Socket opened, String host, ushort port, int backlog) {
-        socket = opened;
-        listening = false;
+    TcpListener(Socket opened, String host, ushort port, int backlog)
+    {
+        _socket = opened;
+        _listening = false;
 
-        socket.SetReuseAddress(true);
-        if (socket.Bind(host, port) != SocketError.None) { return; }
-        if (socket.Listen(backlog) != SocketError.None) { return; }
+        _socket.SetReuseAddress(true);
+        if (_socket.Bind(host, port) != SocketError.None)
+            return;
+        if (_socket.Listen(backlog) != SocketError.None)
+            return;
 
-        listening = true;
+        _listening = true;
     }
 
     ~TcpListener() { Close(); }
 
     /// Whether it bound and listened. False means the constructor gave up
     /// part-way, and `Error` says where.
-    public bool IsListening() { return listening; }
+    public bool IsListening() => _listening;
 
     /// The last error from the socket underneath, or `None`.
-    public SocketError Error() { return socket.Error(); }
+    public SocketError Error() => _socket.Error();
 
     /// Where it is listening. With port 0 this is how the port the system
     /// chose is found out.
-    public EndPoint LocalEndPoint() { return socket.LocalEndPoint(); }
+    public EndPoint LocalEndPoint() => _socket.LocalEndPoint();
 
     /// The socket underneath, for an option this does not expose.
-    public Socket Underlying() { return socket; }
+    public Socket Underlying() => _socket;
 
     /// Waits for a connection. The client that comes back is connected, or is
     /// not and says why.
-    public TcpClient Accept() {
-        return new TcpClient(socket.Accept());
+    public TcpClient Accept()
+    {
+        return new TcpClient(_socket.Accept());
     }
 
     /// Whether a connection is waiting, without blocking to find out.
-    public bool Pending(int milliseconds) {
-        return socket.WaitToRead(milliseconds);
+    public bool Pending(int milliseconds)
+    {
+        return _socket.WaitToRead(milliseconds);
     }
 
     /// Stops listening and closes the socket. Connections already accepted
     /// are their own sockets and are unaffected.
-    public void Close() {
-        listening = false;
-        socket.Close();
+    public void Close()
+    {
+        _listening = false;
+        _socket.Close();
     }
 }
 
@@ -758,12 +863,14 @@ public class TcpListener {
 /// `SocketError()` has the exact one, and the two are there together because a
 /// generic reader wants the first and code that knows it is a socket wants the
 /// second.
-public class TcpClient : IStream {
-    Socket socket;
-    bool finished;
+public class TcpClient : IStream
+{
+    Socket _socket;
+    bool _finished;
 
     /// Connects to a host and port.
-    public static Result<TcpClient, SocketError> Connect(String host, ushort port) {
+    public static Result<TcpClient, SocketError> Connect(String host, ushort port)
+    {
         return Connect(host, port, AddressFamily.Any);
     }
 
@@ -772,96 +879,110 @@ public class TcpClient : IStream {
     /// Blocks until the connection is made or refused; there is no timeout
     /// here, and the system's own is measured in tens of seconds.
     public static Result<TcpClient, SocketError> Connect(
-            String host, ushort port, AddressFamily family) {
+            String host, ushort port, AddressFamily family)
+    {
         var opened = Socket.OpenConnected(host, port, family, SocketKind.Stream);
-        if (!opened.Ok) { return Fail(opened.Error); }
+        if (!opened.Ok)
+            return Fail(opened.Error);
         return Ok(new TcpClient(opened.Value));
     }
 
     /// Wraps a socket somebody else opened, which is what `Accept` produces.
-    public TcpClient(Socket accepted) {
-        socket = accepted;
-        finished = false;
+    public TcpClient(Socket accepted)
+    {
+        _socket = accepted;
+        _finished = false;
     }
 
     ~TcpClient() { Close(); }
 
     /// Whether the connection is there. False after the peer finished, after
     /// `Close`, and if connecting never worked.
-    public bool IsConnected() {
-        return socket.IsOpen() && !finished && socket.Error() == SocketError.None;
+    public bool IsConnected()
+    {
+        return _socket.IsOpen() && !_finished && _socket.Error() == SocketError.None;
     }
 
     /// The exact reason, which `Error()` rounds off to fit an `IStream`.
-    public SocketError SocketError() { return socket.Error(); }
+    public SocketError SocketError() => _socket.Error();
 
     /// This end of the connection -- the address and the port the system
     /// chose for it.
-    public EndPoint LocalEndPoint() { return socket.LocalEndPoint(); }
+    public EndPoint LocalEndPoint() => _socket.LocalEndPoint();
 
     /// The other end: who is connected. What an accepted connection is asked
     /// to find out where it came from.
-    public EndPoint RemoteEndPoint() { return socket.RemoteEndPoint(); }
+    public EndPoint RemoteEndPoint() => _socket.RemoteEndPoint();
 
     /// The socket underneath, for an option this does not expose. Closing it
     /// closes the connection.
-    public Socket Underlying() { return socket; }
+    public Socket Underlying() => _socket;
 
     /// Sends all of `text`, looping until it has gone.
-    public SocketError SendText(String text) { return socket.SendText(text); }
+    public SocketError SendText(String text) => _socket.SendText(text);
 
     /// Sends all of `data`.
-    public SocketError SendAll(byte[] data) { return socket.SendAll(data); }
+    public SocketError SendAll(byte[] data) => _socket.SendAll(data);
 
     /// Reads until the peer finishes, and gives back what arrived.
     ///
     /// For a protocol that ends by closing -- HTTP/1.0, or anything behind
     /// `shutdown` -- this is the whole body. For one that does not, it never
     /// returns, which is the caller's to know.
-    public byte[] ReceiveAll() {
+    public byte[] ReceiveAll()
+    {
         var built = new List<byte>();
         var chunk = new byte[4096];
 
-        while (true) {
-            nuint read = socket.Receive(chunk, 0, chunk.Length);
-            if (read == 0) { finished = true; break; }
+        while (true)
+        {
+            nuint read = _socket.Receive(chunk, 0, chunk.Length);
+            if (read == 0)
+            {
+                _finished = true;
+                break;
+            }
 
-            for (nuint i = 0; i < read; i++) { built.Add(chunk[i]); }
+            for (nuint i = 0; i < read; i++)
+                built.Add(chunk[i]);
         }
 
         var all = new byte[built.Count()];
-        for (nuint i = 0; i < all.Length; i++) { all[i] = built.At(i); }
+        for (nuint i = 0; i < all.Length; i++)
+            all[i] = built.At(i);
         return all;
     }
 
     /// The same, read as UTF-8. Anything malformed becomes U+FFFD, because the
     /// result is a `String` and a `String` is valid UTF-8 by invariant.
-    public String ReceiveText() {
+    public String ReceiveText()
+    {
         var all = ReceiveAll();
-        if (all.Length == 0) { return ""; }
+        if (all.Length == 0)
+            return "";
         return Text.FromBytes(&all[0], all.Length);
     }
 
     /// Waits up to `milliseconds` for something to read, answering whether
     /// there is. A peer that closed counts as readable -- the read that
     /// follows returns zero, which is how the ending is seen.
-    public bool WaitToRead(int milliseconds) { return socket.WaitToRead(milliseconds); }
+    public bool WaitToRead(int milliseconds) => _socket.WaitToRead(milliseconds);
 
     /// Waits up to `milliseconds` for room to write, answering whether there
     /// is. Only interesting once a send has filled the kernel's buffer.
-    public bool WaitToWrite(int milliseconds) { return socket.WaitToWrite(milliseconds); }
+    public bool WaitToWrite(int milliseconds) => _socket.WaitToWrite(milliseconds);
 
     // ----------------------------------------------------------- IStream
 
     /// True while the connection is open and the peer has not finished.
-    public bool CanRead() { return socket.IsOpen() && !finished; }
+    public bool CanRead() => _socket.IsOpen() && !_finished;
 
     /// True while the connection is open. A peer that finished sending can
     /// still be written to, until it closes for real.
-    public bool CanWrite() { return socket.IsOpen(); }
+    public bool CanWrite() => _socket.IsOpen();
 
     /// A connection has no position to move to.
-    public bool CanSeek() { return false; }
+    public bool CanSeek() => false;
 
     /// Reads up to `count` bytes into `buffer` at `offset`, answering how
     /// many arrived.
@@ -869,25 +990,28 @@ public class TcpClient : IStream {
     /// Fewer than asked for is normal and not an error: a stream delivers what
     /// has arrived. Zero means the peer finished, and `Error` distinguishes
     /// that from a failure.
-    public nuint Read(byte[] buffer, nuint offset, nuint count) {
-        nuint read = socket.Receive(buffer, offset, count);
-        if (read == 0 && socket.Error() == SocketError.None) { finished = true; }
+    public nuint Read(byte[] buffer, nuint offset, nuint count)
+    {
+        nuint read = _socket.Receive(buffer, offset, count);
+        if (read == 0 && _socket.Error() == SocketError.None)
+            _finished = true;
         return read;
     }
 
     /// Writes up to `count` bytes from `buffer` at `offset`, answering how
     /// many went. A short write is normal; `SendAll` is the one that loops.
-    public nuint Write(byte[] buffer, nuint offset, nuint count) {
-        return socket.Send(buffer, offset, count);
+    public nuint Write(byte[] buffer, nuint offset, nuint count)
+    {
+        return _socket.Send(buffer, offset, count);
     }
 
     /// Not a position, and not pretended to be one.
-    public long Position() { return -1; }
+    public long Position() => -1;
     /// Not a length either. A connection does not know how much is coming.
-    public long Length() { return -1; }
+    public long Length() => -1;
 
     /// Always false. There is nowhere to seek to on a connection.
-    public bool Seek(long offset, SeekOrigin origin) { return false; }
+    public bool Seek(long offset, SeekOrigin origin) => false;
 
     /// Nothing is buffered here; the kernel decides when bytes leave.
     public void Flush() { }
@@ -895,16 +1019,20 @@ public class TcpClient : IStream {
     /// Ends the connection politely: shuts both directions down first, so the
     /// peer sees an ending rather than a reset, then closes. Idempotent, and
     /// the destructor calls it.
-    public void Close() {
-        if (socket.IsOpen()) { socket.Shutdown(SocketShutdown.Both); }
-        socket.Close();
-        finished = true;
+    public void Close()
+    {
+        if (_socket.IsOpen())
+            _socket.Shutdown(SocketShutdown.Both);
+        _socket.Close();
+        _finished = true;
     }
 
     /// The socket error as the nearest `IOError`, so that a reader which knows
     /// nothing about sockets still gets something it can act on.
-    public IOError Error() {
-        switch (socket.Error()) {
+    public IOError Error()
+    {
+        switch (_socket.Error())
+        {
             case SocketError.None:         return IOError.None;
             case SocketError.Closed:       return IOError.Closed;
             case SocketError.NotConnected: return IOError.Closed;
@@ -931,102 +1059,117 @@ public class TcpClient : IStream {
 ///     var from = EndPoint.At("", 0u);
 ///     var buffer = new byte[1500];
 ///     nuint got = socket.Receive(buffer, ref from);
-public class UdpSocket {
-    Socket socket;
-    bool ready;
+public class UdpSocket
+{
+    Socket _socket;
+    bool _ready;
 
     /// A socket that can send and not receive, because nothing bound it.
-    public static Result<UdpSocket, SocketError> Datagram() {
+    public static Result<UdpSocket, SocketError> Datagram()
+    {
         return Datagram(AddressFamily.IPv4);
     }
 
     /// The same, in a named family.
-    public static Result<UdpSocket, SocketError> Datagram(AddressFamily family) {
+    public static Result<UdpSocket, SocketError> Datagram(AddressFamily family)
+    {
         var opened = Socket.Open(family, SocketKind.Datagram);
-        if (!opened.Ok) { return Fail(opened.Error); }
+        if (!opened.Ok)
+            return Fail(opened.Error);
         return Ok(new UdpSocket(opened.Value));
     }
 
     /// A socket bound to a port, so it can receive. Port 0 asks the system to
     /// choose one, which `LocalEndPoint` will say.
-    public static Result<UdpSocket, SocketError> Bind(ushort port) {
+    public static Result<UdpSocket, SocketError> Bind(ushort port)
+    {
         return Bind("", port, AddressFamily.IPv4);
     }
 
     /// The same, on one address rather than all of them.
-    public static Result<UdpSocket, SocketError> Bind(String host, ushort port) {
+    public static Result<UdpSocket, SocketError> Bind(String host, ushort port)
+    {
         return Bind(host, port, AddressFamily.IPv4);
     }
 
     /// Binds with everything named: the address, the port and the family.
     public static Result<UdpSocket, SocketError> Bind(
-            String host, ushort port, AddressFamily family) {
+            String host, ushort port, AddressFamily family)
+    {
         var opened = Socket.Open(family, SocketKind.Datagram);
-        if (!opened.Ok) { return Fail(opened.Error); }
+        if (!opened.Ok)
+            return Fail(opened.Error);
 
         var bound = opened.Value;
         var failure = bound.Bind(host, port);
-        if (failure != SocketError.None) { return Fail(failure); }
+        if (failure != SocketError.None)
+            return Fail(failure);
 
         return Ok(new UdpSocket(bound));
     }
 
-    UdpSocket(Socket opened) {
-        socket = opened;
-        ready = opened.IsOpen();
+    UdpSocket(Socket opened)
+    {
+        _socket = opened;
+        _ready = opened.IsOpen();
     }
 
     ~UdpSocket() { Close(); }
 
     /// Whether the socket is usable. False after `Close`, and after an open
     /// that did not work.
-    public bool IsOpen() { return ready; }
+    public bool IsOpen() => _ready;
 
     /// The last error from the socket underneath, or `None`.
-    public SocketError Error() { return socket.Error(); }
+    public SocketError Error() => _socket.Error();
 
     /// Where it is bound. With port 0 this is how the port the system chose is
     /// found out; an unbound socket answers with nothing useful.
-    public EndPoint LocalEndPoint() { return socket.LocalEndPoint(); }
+    public EndPoint LocalEndPoint() => _socket.LocalEndPoint();
 
     /// The socket underneath, for an option this does not expose.
-    public Socket Underlying() { return socket; }
+    public Socket Underlying() => _socket;
 
     /// Sends one datagram. The count back is how many bytes went, which for a
     /// datagram is all of them or none.
-    public nuint Send(byte[] data, String host, ushort port) {
-        return socket.SendTo(data, EndPoint.At(host, port));
+    public nuint Send(byte[] data, String host, ushort port)
+    {
+        return _socket.SendTo(data, EndPoint.At(host, port));
     }
 
     /// Sends one datagram of UTF-8. The encoded length is what goes on the
     /// wire, so a string of multi-byte characters is longer than its character
     /// count -- which matters against the roughly 1500-byte practical limit.
-    public nuint SendText(String text, String host, ushort port) {
+    public nuint SendText(String text, String host, ushort port)
+    {
         return Send(text.ToBytes(), host, port);
     }
 
     /// Reads one datagram and says where it came from. A datagram longer than
     /// the buffer is truncated, and the rest is gone -- there is no second
     /// read to collect it.
-    public nuint Receive(byte[] buffer, ref EndPoint from) {
-        return socket.ReceiveFrom(buffer, ref from);
+    public nuint Receive(byte[] buffer, ref EndPoint from)
+    {
+        return _socket.ReceiveFrom(buffer, ref from);
     }
 
     /// Waits up to `milliseconds` for a datagram to arrive, answering whether
     /// one has. The way to poll without blocking forever on an empty socket.
-    public bool WaitToRead(int milliseconds) { return socket.WaitToRead(milliseconds); }
+    public bool WaitToRead(int milliseconds) => _socket.WaitToRead(milliseconds);
 
     /// Lets this socket send to a broadcast address.
-    public SocketError SetBroadcast(bool on) { return socket.SetBroadcast(on); }
+    public SocketError SetBroadcast(bool on) => _socket.SetBroadcast(on);
 
     /// How long `Receive` waits before giving up. Zero is forever.
-    public SocketError SetReceiveTimeout(int milliseconds) {
-        return socket.SetReceiveTimeout(milliseconds);
+    public SocketError SetReceiveTimeout(int milliseconds)
+    {
+        return _socket.SetReceiveTimeout(milliseconds);
     }
 
     /// Closes the socket. Idempotent, and the destructor calls it.
-    public void Close() {
-        ready = false;
-        socket.Close();
+    public void Close()
+    {
+        _ready = false;
+        _socket.Close();
     }
 }

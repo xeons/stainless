@@ -37,25 +37,29 @@ import Win32.Drawing;
 import Win32.Handles;
 import Win32.Kernel32;
 
-extern "C" {
+extern "C"
+{
     void* malloc(nuint size);
     void  free(void* block);
 }
 
 /// Everything this window remembers between messages.
-public struct State {
-    public int  Clicks;
-    public int  CursorX;
-    public int  CursorY;
+public struct State
+{
+    public int Clicks;
+    public int CursorX;
+    public int CursorY;
     public bool Tracking;
 }
 
 // ------------------------------------------------------------ the procedure
 
-long Procedure(HWND window, uint message, ulong wParam, long lParam) {
+long Procedure(HWND window, uint message, ulong wParam, long lParam)
+{
     State* state = (State*)(nuint)GetWindowLongPtrW(window, GwlpUserData);
 
-    switch (message) {
+    switch (message)
+    {
         case WmDestroy:
             PostQuitMessage(0);
             return 0;
@@ -71,7 +75,8 @@ long Procedure(HWND window, uint message, ulong wParam, long lParam) {
             return 1;
 
         case WmMouseMove:
-            if (state != null) {
+            if (state != null)
+            {
                 // Both coordinates are packed into one LPARAM, low word first,
                 // and both are signed: a drag can leave the window to the left.
                 Point at = PointOf(lParam);
@@ -84,15 +89,17 @@ long Procedure(HWND window, uint message, ulong wParam, long lParam) {
             break;
 
         case WmLeftButtonDown:
-            if (state != null) {
-                state->Clicks += 1;
+            if (state != null)
+            {
+                state->Clicks++;
                 Invalidate(window, false);
                 return 0;
             }
             break;
 
         case WmKeyDown:
-            if ((int)wParam == VkEscape) { DestroyWindow(window); }
+            if ((int)wParam == VkEscape)
+                DestroyWindow(window);
             return 0;
 
         // Every other message -- and the two above, if one arrives before the
@@ -106,7 +113,8 @@ long Procedure(HWND window, uint message, ulong wParam, long lParam) {
 
 // --------------------------------------------------------------- the drawing
 
-void Paint(HWND window, State* state) {
+void Paint(HWND window, State* state)
+{
     PaintStruct paint;
     HDC dc = BeginPaint(window, &paint);
 
@@ -127,8 +135,10 @@ void Paint(HWND window, State* state) {
     EndPaint(window, &paint);
 }
 
-void DrawCrosshair(HDC dc, Rect client, State* state) {
-    if (state == null || !state->Tracking) { return; }
+void DrawCrosshair(HDC dc, Rect client, State* state)
+{
+    if (state == null || !state->Tracking)
+        return;
 
     HPEN pen = CreatePen(PenSolid, 1, Colour(60u, 70u, 90u));
     HGDIOBJ previousPen = SelectObject(dc, pen);
@@ -153,7 +163,8 @@ void DrawCrosshair(HDC dc, Rect client, State* state) {
     DeleteObject(brush);
 }
 
-void DrawLabels(HDC dc, State* state) {
+void DrawLabels(HDC dc, State* state)
+{
     HFONT font = CreateFont("Segoe UI", 18, FontNormal, false);
     HGDIOBJ previousFont = SelectObject(dc, font);
 
@@ -162,7 +173,8 @@ void DrawLabels(HDC dc, State* state) {
 
     DrawTextAt(dc, 16, 14, "Move the mouse. Click. Escape closes.");
 
-    if (state != null) {
+    if (state != null)
+    {
         DrawTextAt(dc, 16, 40,
             "clicks: " + Text.FromInteger((long)state->Clicks)
             + "    at " + Text.FromInteger((long)state->CursorX)
@@ -175,7 +187,8 @@ void DrawLabels(HDC dc, State* state) {
 
 // ------------------------------------------------------------------- startup
 
-int Main() {
+int Main()
+{
     HMODULE instance = GetModuleHandleW(null);
 
     var windowClass = NewWindowClass();
@@ -185,7 +198,8 @@ int Main() {
     windowClass.Cursor = LoadCursorW(null, CursorArrow());
     windowClass.ClassName = "StainlessWindow".ToUtf16().ToPointer();
 
-    if (RegisterClassExW(&windowClass) == 0u) {
+    if (RegisterClassExW(&windowClass) == 0u)
+    {
         Console.WriteError("could not register the class: " + Win32.LastErrorMessage());
         return 1;
     }
@@ -198,7 +212,8 @@ int Main() {
     HWND window = CreateWindow("StainlessWindow", "Stainless on Win32",
                                 WsOverlappedWindow, UseDefault, UseDefault,
                                 Width(outer), Height(outer), instance);
-    if (window == null) {
+    if (window == null)
+    {
         Console.WriteError("could not create the window: " + Win32.LastErrorMessage());
         return 1;
     }

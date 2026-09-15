@@ -55,74 +55,89 @@ import Forms.Platform;
 /// group per containing window on every platform, so putting them in a group
 /// box is not decoration -- it is what stops two sets of choices on one form
 /// behaving as a single set.
-public class RadioGroup : GroupBox {
-    List<RadioButton> buttons;
-    int  columns;
-    bool ready;
+public class RadioGroup : GroupBox
+{
+    List<RadioButton> _buttons;
+    int _columns;
+    bool _ready;
 
-    public RadioGroup(WindowedControl parent) {
+    public RadioGroup(WindowedControl parent)
+    {
         base(parent);
-        buttons = new List<RadioButton>();
-        columns = 1;
-        ready = true;
+        _buttons = new List<RadioButton>();
+        _columns = 1;
+        _ready = true;
     }
 
     /// How many across. Changing it re-lays out what is already there.
-    public int Columns {
-        get => columns;
-        set {
-            if (value < 1) { return; }
-            columns = value;
+    public int Columns
+    {
+        get => _columns;
+        set
+        {
+            if (value < 1)
+                return;
+            _columns = value;
             Arrange();
         }
     }
 
     /// Adds a choice and answers its index.
-    public int Add(String caption) {
+    public int Add(String caption)
+    {
         var made = new RadioButton(this);
         made.Text = caption;
         made.Click += this.OnChildClicked;
-        buttons.Add(made);
+        _buttons.Add(made);
         Arrange();
-        return (int)buttons.Count() - 1;
+        return (int)_buttons.Count() - 1;
     }
 
-    public List<RadioButton> Buttons => buttons;
-    public nuint Count => buttons.Count();
+    public List<RadioButton> Buttons => _buttons;
+    public nuint Count => _buttons.Count();
 
     /// Which choice is ticked, or -1.
     ///
     /// Read from the buttons rather than remembered, because the platform ticks
     /// and unticks them itself when one is clicked -- a field here would be a
     /// second answer to a question that already has one.
-    public int SelectedIndex {
-        get {
-            for (nuint i = 0u; i < buttons.Count(); i += 1u) {
-                if (buttons.At(i).Checked) { return (int)i; }
+    public int SelectedIndex
+    {
+        get
+        {
+            for (nuint i = 0u; i < _buttons.Count(); i++)
+            {
+                if (_buttons.At(i).Checked)
+                    return (int)i;
             }
             return -1;
         }
-        set {
-            if (value < 0 || (nuint)value >= buttons.Count()) { return; }
-            buttons.At((nuint)value).Checked = true;
+        set
+        {
+            if (value < 0 || (nuint)value >= _buttons.Count())
+                return;
+            _buttons.At((nuint)value).Checked = true;
         }
     }
 
     /// The caption of the chosen item, or null.
-    public String? SelectedText {
-        get {
+    public String? SelectedText
+    {
+        get
+        {
             int at = SelectedIndex;
-            if (at < 0) { return null; }
-            return buttons.At((nuint)at).Text;
+            if (at < 0)
+                return null;
+            return _buttons.At((nuint)at).Text;
         }
     }
 
     /// The choice changed.
     public event EventHandler SelectedIndexChanged;
 
-    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+    protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
 
-    void OnChildClicked(Control sender) { OnSelectedIndexChanged(); }
+    void OnChildClicked(Control sender) => OnSelectedIndexChanged();
 
     /// Lays the buttons out in `Columns` columns, filling the client area.
     ///
@@ -137,28 +152,35 @@ public class RadioGroup : GroupBox {
     /// The same trap C# has with a virtual call from a base constructor, and
     /// the same answer: a flag that is false until there is something to
     /// arrange.
-    void Arrange() {
-        if (!ready || buttons.IsEmpty()) { return; }
+    void Arrange()
+    {
+        if (!_ready || _buttons.IsEmpty())
+            return;
         var area = ClientBounds;
-        if (area.Width <= 0 || area.Height <= 0) { return; }
+        if (area.Width <= 0 || area.Height <= 0)
+            return;
 
-        nuint total = buttons.Count();
-        int perColumn = ((int)total + columns - 1) / columns;
-        if (perColumn < 1) { perColumn = 1; }
+        nuint total = _buttons.Count();
+        int perColumn = ((int)total + _columns - 1) / _columns;
+        if (perColumn < 1)
+            perColumn = 1;
 
-        int width = area.Width / columns;
+        int width = area.Width / _columns;
         int height = area.Height / perColumn;
-        if (height < 20) { height = 20; }
+        if (height < 20)
+            height = 20;
 
-        for (nuint i = 0u; i < total; i += 1u) {
+        for (nuint i = 0u; i < total; i++)
+        {
             int column = (int)i / perColumn;
             int row = (int)i % perColumn;
-            buttons.At(i).SetBounds(column * width, row * height, width, height);
+            _buttons.At(i).SetBounds(column * width, row * height, width, height);
         }
     }
 
     /// A resize moves every button, since each is a fraction of the client area.
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
         Arrange();
     }
@@ -167,62 +189,78 @@ public class RadioGroup : GroupBox {
 // ============================================================== check group
 
 /// The same, with check boxes: any number chosen rather than exactly one.
-public class CheckGroup : GroupBox {
-    List<CheckBox> boxes;
-    int  columns;
-    bool ready;
+public class CheckGroup : GroupBox
+{
+    List<CheckBox> _boxes;
+    int _columns;
+    bool _ready;
 
-    public CheckGroup(WindowedControl parent) {
+    public CheckGroup(WindowedControl parent)
+    {
         base(parent);
-        boxes = new List<CheckBox>();
-        columns = 1;
-        ready = true;
+        _boxes = new List<CheckBox>();
+        _columns = 1;
+        _ready = true;
     }
 
-    public int Columns {
-        get => columns;
-        set {
-            if (value < 1) { return; }
-            columns = value;
+    public int Columns
+    {
+        get => _columns;
+        set
+        {
+            if (value < 1)
+                return;
+            _columns = value;
             Arrange();
         }
     }
 
-    public int Add(String caption) {
+    public int Add(String caption)
+    {
         var made = new CheckBox(this);
         made.Text = caption;
         made.CheckedChanged += this.OnChildChanged;
-        boxes.Add(made);
+        _boxes.Add(made);
         Arrange();
-        return (int)boxes.Count() - 1;
+        return (int)_boxes.Count() - 1;
     }
 
-    public List<CheckBox> Boxes => boxes;
-    public nuint Count => boxes.Count();
+    public List<CheckBox> Boxes => _boxes;
+    public nuint Count => _boxes.Count();
 
-    public bool IsChecked(int index) {
-        if (index < 0 || (nuint)index >= boxes.Count()) { return false; }
-        return boxes.At((nuint)index).Checked;
+    public bool IsChecked(int index)
+    {
+        if (index < 0 || (nuint)index >= _boxes.Count())
+            return false;
+        return _boxes.At((nuint)index).Checked;
     }
 
-    public void SetChecked(int index, bool ticked) {
-        if (index < 0 || (nuint)index >= boxes.Count()) { return; }
-        boxes.At((nuint)index).Checked = ticked;
+    public void SetChecked(int index, bool ticked)
+    {
+        if (index < 0 || (nuint)index >= _boxes.Count())
+            return;
+        _boxes.At((nuint)index).Checked = ticked;
     }
 
     /// The indices that are ticked, in order.
-    public int[] CheckedIndices {
-        get {
+    public int[] CheckedIndices
+    {
+        get
+        {
             nuint ticked = 0u;
-            for (nuint i = 0u; i < boxes.Count(); i += 1u) {
-                if (boxes.At(i).Checked) { ticked += 1u; }
+            for (nuint i = 0u; i < _boxes.Count(); i++)
+            {
+                if (_boxes.At(i).Checked)
+                    ticked += 1u;
             }
             var found = new int[ticked];
             nuint at = 0u;
-            for (nuint i = 0u; i < boxes.Count(); i += 1u) {
-                if (boxes.At(i).Checked) {
+            for (nuint i = 0u; i < _boxes.Count(); i++)
+            {
+                if (_boxes.At(i).Checked)
+                {
                     found[at] = (int)i;
-                    at += 1u;
+                    at++;
                 }
             }
             return found;
@@ -232,32 +270,39 @@ public class CheckGroup : GroupBox {
     /// One of the boxes was ticked or unticked.
     public event EventHandler CheckedChanged;
 
-    protected virtual void OnCheckedChanged() { CheckedChanged(this); }
+    protected virtual void OnCheckedChanged() => CheckedChanged(this);
 
-    void OnChildChanged(Control sender) { OnCheckedChanged(); }
+    void OnChildChanged(Control sender) => OnCheckedChanged();
 
     /// See the note on `RadioGroup.Arrange`.
-    void Arrange() {
-        if (!ready || boxes.IsEmpty()) { return; }
+    void Arrange()
+    {
+        if (!_ready || _boxes.IsEmpty())
+            return;
         var area = ClientBounds;
-        if (area.Width <= 0 || area.Height <= 0) { return; }
+        if (area.Width <= 0 || area.Height <= 0)
+            return;
 
-        nuint total = boxes.Count();
-        int perColumn = ((int)total + columns - 1) / columns;
-        if (perColumn < 1) { perColumn = 1; }
+        nuint total = _boxes.Count();
+        int perColumn = ((int)total + _columns - 1) / _columns;
+        if (perColumn < 1)
+            perColumn = 1;
 
-        int width = area.Width / columns;
+        int width = area.Width / _columns;
         int height = area.Height / perColumn;
-        if (height < 20) { height = 20; }
+        if (height < 20)
+            height = 20;
 
-        for (nuint i = 0u; i < total; i += 1u) {
+        for (nuint i = 0u; i < total; i++)
+        {
             int column = (int)i / perColumn;
             int row = (int)i % perColumn;
-            boxes.At(i).SetBounds(column * width, row * height, width, height);
+            _boxes.At(i).SetBounds(column * width, row * height, width, height);
         }
     }
 
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
         Arrange();
     }
@@ -272,46 +317,52 @@ public class CheckGroup : GroupBox {
 /// the label is outside the control's own bounds and a layout that moves the
 /// edit has to know to expect it. Here the pair is one control whose bounds
 /// contain both, and docking or anchoring it does the obvious thing.
-public class LabeledEdit : Panel {
-    Label   caption;
-    TextBox entry;
-    int     above;
-    bool    ready;
+public class LabeledEdit : Panel
+{
+    Label _caption;
+    TextBox _entry;
+    int _above;
+    bool _ready;
 
-    public LabeledEdit(WindowedControl parent) {
+    public LabeledEdit(WindowedControl parent)
+    {
         base(parent);
-        above = 18;
+        _above = 18;
 
-        caption = new Label(this);
-        entry = new TextBox(this);
-        entry.UserTextChanged += this.OnEntryChanged;
+        _caption = new Label(this);
+        _entry = new TextBox(this);
+        _entry.UserTextChanged += this.OnEntryChanged;
 
-        ready = true;
+        _ready = true;
         Arrange();
     }
 
     /// The caption above the box.
-    public String Caption {
-        get => caption.Text;
-        set { caption.Text = value; }
+    public String Caption
+    {
+        get => _caption.Text;
+        set => _caption.Text = value;
     }
 
     /// What is in the box. `Text` itself is the panel's, which nothing shows.
-    public String Value {
-        get => entry.Text;
-        set { entry.Text = value; }
+    public String Value
+    {
+        get => _entry.Text;
+        set => _entry.Text = value;
     }
 
     /// The box, for the things a caller may want to set on it directly --
     /// `PasswordChar`, `MaxLength`, `ReadOnly`.
-    public TextBox Entry => entry;
-    public Label CaptionLabel => caption;
+    public TextBox Entry => _entry;
+    public Label CaptionLabel => _caption;
 
     /// How tall the caption is. The box takes what is left.
-    public int CaptionHeight {
-        get => above;
-        set {
-            above = value;
+    public int CaptionHeight
+    {
+        get => _above;
+        set
+        {
+            _above = value;
             Arrange();
         }
     }
@@ -319,22 +370,27 @@ public class LabeledEdit : Panel {
     /// The user typed.
     public event EventHandler ValueChanged;
 
-    protected virtual void OnValueChanged() { ValueChanged(this); }
+    protected virtual void OnValueChanged() => ValueChanged(this);
 
-    void OnEntryChanged(Control sender) { OnValueChanged(); }
+    void OnEntryChanged(Control sender) => OnValueChanged();
 
     /// See the note on `RadioGroup.Arrange`.
-    void Arrange() {
-        if (!ready) { return; }
+    void Arrange()
+    {
+        if (!_ready)
+            return;
         var area = ClientBounds;
-        if (area.Width <= 0) { return; }
-        caption.SetBounds(0, 0, area.Width, above);
-        int rest = area.Height - above;
-        if (rest < 0) { rest = 0; }
-        entry.SetBounds(0, above, area.Width, rest);
+        if (area.Width <= 0)
+            return;
+        _caption.SetBounds(0, 0, area.Width, _above);
+        int rest = area.Height - _above;
+        if (rest < 0)
+            rest = 0;
+        _entry.SetBounds(0, _above, area.Width, rest);
     }
 
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
         Arrange();
     }
@@ -346,50 +402,63 @@ public class LabeledEdit : Panel {
 ///
 /// The `GraphicControl` counterpart of everything else here: no window, no
 /// peer, just a `Bitmap` drawn in the parent's paint.
-public class Image : GraphicControl {
-    Bitmap? picture;
-    bool    stretched;
+public class Image : GraphicControl
+{
+    Bitmap? _picture;
+    bool _stretched;
 
-    public Image(WindowedControl parent) {
+    public Image(WindowedControl parent)
+    {
         base(parent);
-        picture = null;
-        stretched = false;
+        _picture = null;
+        _stretched = false;
     }
 
     /// What is shown, or null for nothing.
-    public Bitmap? Picture {
-        get => picture;
-        set {
-            picture = value;
+    public Bitmap? Picture
+    {
+        get => _picture;
+        set
+        {
+            _picture = value;
             Invalidate();
         }
     }
 
     /// Loads a picture from a file and shows it.
-    public Result<bool, String> Load(String path) {
+    public Result<bool, String> Load(String path)
+    {
         var loaded = Bitmap.FromFile(path);
-        if (!loaded.Ok) { return Fail(loaded.Error); }
+        if (!loaded.Ok)
+            return Fail(loaded.Error);
         Picture = loaded.Value;
         return Ok(true);
     }
 
     /// Whether the picture is scaled to the control, or drawn at its own size
     /// in the top-left corner.
-    public bool Stretch {
-        get => stretched;
-        set {
-            stretched = value;
+    public bool Stretch
+    {
+        get => _stretched;
+        set
+        {
+            _stretched = value;
             Invalidate();
         }
     }
 
-    protected override void OnPaint(PaintEventArgs args) {
-        var held = picture;
-        if (held != null) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
+        var held = _picture;
+        if (held != null)
+        {
             var shown = (Bitmap)held;
-            if (stretched) {
+            if (_stretched)
+            {
                 args.Graphics.DrawBitmap(shown, Rectangle.Of(0, 0, Width, Height));
-            } else {
+            }
+            else
+            {
                 args.Graphics.DrawBitmap(shown, Point.At(0, 0));
             }
         }
@@ -405,46 +474,53 @@ public class Image : GraphicControl {
 /// up-down, which is a pair of arrows that drives a *buddy* window, so a spin
 /// edit is an `EDIT` with one docked inside its right-hand edge. The pair moves
 /// and hides together, which is the whole of the illusion.
-public class SpinEdit : WindowedControl {
-    ISpinPeer native;
-    int low;
-    int high;
+public class SpinEdit : WindowedControl
+{
+    ISpinPeer _native;
+    int _low;
+    int _high;
 
-    public SpinEdit(WindowedControl parent) {
+    public SpinEdit(WindowedControl parent)
+    {
         base(parent);
-        low = 0;
-        high = 100;
-        native = WidgetSet.Current.CreateSpin(this, ParentPeer());
-        AttachPeer(native);
+        _low = 0;
+        _high = 100;
+        _native = WidgetSet.Current.CreateSpin(this, ParentPeer());
+        AttachPeer(_native);
     }
 
-    public int Minimum {
-        get => low;
-        set {
-            low = value;
-            native.SetRange(low, high);
+    public int Minimum
+    {
+        get => _low;
+        set
+        {
+            _low = value;
+            _native.SetRange(_low, _high);
         }
     }
 
-    public int Maximum {
-        get => high;
-        set {
-            high = value;
-            native.SetRange(low, high);
+    public int Maximum
+    {
+        get => _high;
+        set
+        {
+            _high = value;
+            _native.SetRange(_low, _high);
         }
     }
 
-    public int Value {
-        get => native.GetValue();
-        set { native.SetValue(value); }
+    public int Value
+    {
+        get => _native.GetValue();
+        set => _native.SetValue(value);
     }
 
     /// The number changed, by the arrows or by typing.
     public event EventHandler ValueChanged;
 
-    protected virtual void OnValueChanged() { ValueChanged(this); }
+    protected virtual void OnValueChanged() => ValueChanged(this);
 
-    public override void OnPlatformValueChanged() { OnValueChanged(); }
+    public override void OnPlatformValueChanged() => OnValueChanged();
 }
 
 // =========================================================== check list box
@@ -454,38 +530,47 @@ public class SpinEdit : WindowedControl {
 /// The one control here that is a different widget from the one its name
 /// suggests: a report-mode list view with check boxes, because Windows has no
 /// checked list box and that is what every program that shows one uses.
-public class CheckListBox : ListControl {
-    ICheckListPeer native;
+public class CheckListBox : ListControl
+{
+    ICheckListPeer _native;
 
-    public CheckListBox(WindowedControl parent) {
+    public CheckListBox(WindowedControl parent)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateCheckList(this, ParentPeer());
-        AttachPeer(native);
+        _native = WidgetSet.Current.CreateCheckList(this, ParentPeer());
+        AttachPeer(_native);
     }
 
-    protected override IListPeer List => native;
+    protected override IListPeer List => _native;
 
     /// Whether an item is ticked.
-    public bool IsChecked(int index) { return native.GetItemChecked(index); }
+    public bool IsChecked(int index) => _native.GetItemChecked(index);
 
-    public void SetChecked(int index, bool ticked) {
-        native.SetItemChecked(index, ticked);
+    public void SetChecked(int index, bool ticked)
+    {
+        _native.SetItemChecked(index, ticked);
     }
 
     /// The indices that are ticked, in order.
-    public int[] CheckedIndices {
-        get {
+    public int[] CheckedIndices
+    {
+        get
+        {
             int total = (int)Count;
             nuint ticked = 0u;
-            for (int i = 0; i < total; i += 1) {
-                if (native.GetItemChecked(i)) { ticked += 1u; }
+            for (int i = 0; i < total; i++)
+            {
+                if (_native.GetItemChecked(i))
+                    ticked += 1u;
             }
             var found = new int[ticked];
             nuint at = 0u;
-            for (int i = 0; i < total; i += 1) {
-                if (native.GetItemChecked(i)) {
+            for (int i = 0; i < total; i++)
+            {
+                if (_native.GetItemChecked(i))
+                {
                     found[at] = i;
-                    at += 1u;
+                    at++;
                 }
             }
             return found;
@@ -500,39 +585,43 @@ public class CheckListBox : ListControl {
 /// Standing alone, rather than the one a `ListView` already has: what it is for
 /// is putting headings over something this library does not draw -- a grid a
 /// program owns, most likely.
-public class HeaderControl : WindowedControl {
-    IHeaderPeer native;
+public class HeaderControl : WindowedControl
+{
+    IHeaderPeer _native;
 
-    public HeaderControl(WindowedControl parent) {
+    public HeaderControl(WindowedControl parent)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateHeader(this, ParentPeer());
-        AttachPeer(native);
+        _native = WidgetSet.Current.CreateHeader(this, ParentPeer());
+        AttachPeer(_native);
     }
 
     /// Adds a heading and answers its index.
-    public int Add(String text, int width) { return native.AddSection(text, width); }
+    public int Add(String text, int width) => _native.AddSection(text, width);
 
-    public int Count => native.SectionCount();
+    public int Count => _native.SectionCount();
 
-    public int SectionWidth(int index) { return native.GetSectionWidth(index); }
+    public int SectionWidth(int index) => _native.GetSectionWidth(index);
 
-    public void SetSectionWidth(int index, int width) {
-        native.SetSectionWidth(index, width);
+    public void SetSectionWidth(int index, int width)
+    {
+        _native.SetSectionWidth(index, width);
     }
 
     /// A heading was dragged.
     public event EventHandler SectionResized;
 
-    protected virtual void OnSectionResized() { SectionResized(this); }
+    protected virtual void OnSectionResized() => SectionResized(this);
 
-    public override void OnPlatformValueChanged() { OnSectionResized(); }
+    public override void OnPlatformValueChanged() => OnSectionResized();
 }
 
 // ============================================================= button panel
 
 /// Which of a `ButtonPanel`'s four buttons are showing. Bits, so they combine.
 [Flags]
-public enum PanelButtons {
+public enum PanelButtons
+{
     None   = 0,
     Ok     = 1,
     Cancel = 2,
@@ -583,78 +672,83 @@ public enum ButtonOrder { Default, CloseCancelOk, CloseOkCancel }
 /// on Cancel out of the widgetset's stock icon set, which is a thing neither
 /// backend here has. A program that wants pictures sets `Image` on the buttons,
 /// which is a property every `Button` now has.
-public class ButtonPanel : Panel {
-    Button? ok;
-    Button? cancel;
-    Button? close;
-    Button? help;
-    Bevel?  divider;
+public class ButtonPanel : Panel
+{
+    Button? _ok;
+    Button? _cancel;
+    Button? _close;
+    Button? _help;
+    Bevel? _divider;
 
-    PanelButtons showing;
-    ButtonOrder  order;
-    ButtonOrder  resolved;
-    int          gap;
-    bool         rule;
-    PanelButtons preferred;
-    bool         ready;
+    PanelButtons _showing;
+    ButtonOrder _order;
+    ButtonOrder _resolved;
+    int _gap;
+    bool _rule;
+    PanelButtons _preferred;
+    bool _ready;
 
-    public ButtonPanel(WindowedControl parent) {
+    public ButtonPanel(WindowedControl parent)
+    {
         base(parent);
-        showing = PanelButtons.Ok | PanelButtons.Cancel | PanelButtons.Help;
-        order = ButtonOrder.Default;
-        gap = 6;
-        rule = true;
-        preferred = PanelButtons.Ok;
-        ready = false;
+        _showing = PanelButtons.Ok | PanelButtons.Cancel | PanelButtons.Help;
+        _order = ButtonOrder.Default;
+        _gap = 6;
+        _rule = true;
+        _preferred = PanelButtons.Ok;
+        _ready = false;
 
         // **Asked once, here.** `IWidgetSet.Name` is the only thing in this
         // library that names a platform as a string, and this is its only
         // caller outside a backend: what differs between the two desktops is a
         // convention rather than a capability, so there is nothing in the seam
         // to ask instead.
-        resolved = WidgetSet.Current.Name == "Win32"
+        _resolved = WidgetSet.Current.Name == "Win32"
                  ? ButtonOrder.CloseOkCancel : ButtonOrder.CloseCancelOk;
 
         var line = new Bevel(this);
         line.Kind = BevelKind.TopLine;
-        divider = line;
+        _divider = line;
 
-        ok     = Make("OK");
-        cancel = Make("Cancel");
-        close  = Make("Close");
-        help   = Make("Help");
+        _ok     = Make("OK");
+        _cancel = Make("Cancel");
+        _close  = Make("Close");
+        _help   = Make("Help");
 
         Dock = DockStyle.Bottom;
         Height = 42;
 
-        ready = true;
+        _ready = true;
         ApplyShowing();
         ApplyDefault();
         Arrange();
     }
 
-    Button Make(String caption) {
+    Button Make(String caption)
+    {
         var made = new Button(this);
         made.Text = caption;
         return made;
     }
 
     /// The OK button. Always here; `ShowButtons` decides whether it is visible.
-    public Button OkButton => (Button)ok;
-    public Button CancelButton => (Button)cancel;
-    public Button CloseButton => (Button)close;
-    public Button HelpButton => (Button)help;
+    public Button OkButton => (Button)_ok;
+    public Button CancelButton => (Button)_cancel;
+    public Button CloseButton => (Button)_close;
+    public Button HelpButton => (Button)_help;
 
     /// The line across the top that separates the strip from the dialog.
-    public Bevel BevelLine => (Bevel)divider;
+    public Bevel BevelLine => (Bevel)_divider;
 
     /// Which buttons are showing. The default is OK, Cancel and Help, which is
     /// what a dialog usually wants -- `TButtonPanel` shows Close as well, and a
     /// strip with both Cancel and Close in it is a strip nobody designed.
-    public PanelButtons ShowButtons {
-        get => showing;
-        set {
-            showing = value;
+    public PanelButtons ShowButtons
+    {
+        get => _showing;
+        set
+        {
+            _showing = value;
             ApplyShowing();
             ApplyDefault();
             Arrange();
@@ -662,62 +756,73 @@ public class ButtonPanel : Panel {
     }
 
     /// Left to right, and `Default` means whichever the platform prefers.
-    public ButtonOrder Order {
-        get => order;
-        set {
-            order = value;
+    public ButtonOrder Order
+    {
+        get => _order;
+        set
+        {
+            _order = value;
             Arrange();
         }
     }
 
     /// Which order `Default` turned out to mean here. What a test asks, and the
     /// only way to see the decision from outside.
-    public ButtonOrder EffectiveOrder => order == ButtonOrder.Default ? resolved : order;
+    public ButtonOrder EffectiveOrder => _order == ButtonOrder.Default ? _resolved : _order;
 
     /// Pixels between the buttons, and between them and the edges.
-    public int Spacing {
-        get => gap;
-        set {
-            gap = value;
+    public int Spacing
+    {
+        get => _gap;
+        set
+        {
+            _gap = value;
             Arrange();
         }
     }
 
     /// Whether the line across the top is drawn.
-    public bool ShowBevel {
-        get => rule;
-        set {
-            rule = value;
+    public bool ShowBevel
+    {
+        get => _rule;
+        set
+        {
+            _rule = value;
             Arrange();
         }
     }
 
     /// Which button Enter presses. `PanelButtons.None` for none, and a button
     /// that is not showing is never made the default whatever this says.
-    public PanelButtons DefaultButton {
-        get => preferred;
-        set {
-            preferred = value;
+    public PanelButtons DefaultButton
+    {
+        get => _preferred;
+        set
+        {
+            _preferred = value;
             ApplyDefault();
         }
     }
 
-    void ApplyShowing() {
-        OkButton.Visible     = showing.HasFlag(PanelButtons.Ok);
-        CancelButton.Visible = showing.HasFlag(PanelButtons.Cancel);
-        CloseButton.Visible  = showing.HasFlag(PanelButtons.Close);
-        HelpButton.Visible   = showing.HasFlag(PanelButtons.Help);
+    void ApplyShowing()
+    {
+        OkButton.Visible     = _showing.HasFlag(PanelButtons.Ok);
+        CancelButton.Visible = _showing.HasFlag(PanelButtons.Cancel);
+        CloseButton.Visible  = _showing.HasFlag(PanelButtons.Close);
+        HelpButton.Visible   = _showing.HasFlag(PanelButtons.Help);
     }
 
-    void ApplyDefault() {
+    void ApplyDefault()
+    {
         SetDefaultOn(OkButton,     PanelButtons.Ok);
         SetDefaultOn(CancelButton, PanelButtons.Cancel);
         SetDefaultOn(CloseButton,  PanelButtons.Close);
         SetDefaultOn(HelpButton,   PanelButtons.Help);
     }
 
-    void SetDefaultOn(Button button, PanelButtons which) {
-        button.IsDefault = which == preferred && showing.HasFlag(which);
+    void SetDefaultOn(Button button, PanelButtons which)
+    {
+        button.IsDefault = which == _preferred && _showing.HasFlag(which);
     }
 
     /// Lays the buttons out: Help against the left edge, the rest packed
@@ -732,58 +837,82 @@ public class ButtonPanel : Panel {
     /// of "against the right, in this order, with a gap": `DockStyle.Right`
     /// four times would work, and would put them in the order they were built
     /// and give each the full height.
-    void Arrange() {
-        if (!ready) { return; }
+    void Arrange()
+    {
+        if (!_ready)
+            return;
         var area = ClientBounds;
-        if (area.Width <= 0 || area.Height <= 0) { return; }
+        if (area.Width <= 0 || area.Height <= 0)
+            return;
 
         var line = BevelLine;
-        line.Visible = rule;
+        line.Visible = _rule;
         line.SetBounds(0, 0, area.Width, 2);
 
-        int top = rule ? gap : gap / 2;
-        int height = area.Height - top - gap / 2;
-        if (height < 1) { height = 1; }
+        int top = _rule ? _gap : _gap / 2;
+        int height = area.Height - top - _gap / 2;
+        if (height < 1)
+            height = 1;
 
-        if (HelpButton.Visible) {
-            HelpButton.SetBounds(gap, top, WidthOf(HelpButton), height);
+        if (HelpButton.Visible)
+        {
+            HelpButton.SetBounds(_gap, top, WidthOf(HelpButton), height);
         }
 
-        int right = area.Width - gap;
+        int right = area.Width - _gap;
         var packed = InOrder();
-        for (nuint i = packed.Length; i > 0u; i -= 1u) {
+        for (nuint i = packed.Length; i > 0u; i--)
+        {
             var button = packed[i - 1u];
             int width = WidthOf(button);
             button.SetBounds(right - width, top, width, height);
-            right = right - width - gap;
+            right = right - width - _gap;
         }
     }
 
     /// The buttons that pack against the right edge, left to right. Help is not
     /// among them: it has its own corner.
-    Button[] InOrder() {
+    Button[] InOrder()
+    {
         var first = CloseButton;
         var second = EffectiveOrder == ButtonOrder.CloseOkCancel ? OkButton : CancelButton;
         var third = EffectiveOrder == ButtonOrder.CloseOkCancel ? CancelButton : OkButton;
 
         nuint present = 0u;
-        if (first.Visible)  { present += 1u; }
-        if (second.Visible) { present += 1u; }
-        if (third.Visible)  { present += 1u; }
+        if (first.Visible)
+            present += 1u;
+        if (second.Visible)
+            present += 1u;
+        if (third.Visible)
+            present += 1u;
 
         var packed = new Button[present];
         nuint at = 0u;
-        if (first.Visible)  { packed[at] = first;  at += 1u; }
-        if (second.Visible) { packed[at] = second; at += 1u; }
-        if (third.Visible)  { packed[at] = third;  at += 1u; }
+        if (first.Visible)
+        {
+            packed[at] = first;
+            at += 1u;
+        }
+        if (second.Visible)
+        {
+            packed[at] = second;
+            at += 1u;
+        }
+        if (third.Visible)
+        {
+            packed[at] = third;
+            at += 1u;
+        }
         return packed;
     }
 
     /// How wide one button should be: what it asks for, never below the 75
     /// pixels every dialog button on every desktop has been since Windows 3.
-    int WidthOf(Button button) {
+    int WidthOf(Button button)
+    {
         int wanted = button.PreferredSize.Width;
-        if (wanted < 75) { wanted = 75; }
+        if (wanted < 75)
+            wanted = 75;
         return wanted;
     }
 
@@ -792,26 +921,31 @@ public class ButtonPanel : Panel {
     /// The width is zero and means nothing: a button strip is docked to the
     /// bottom and takes whatever width the dialog has, so the only figure a
     /// caller could want is the height.
-    public override Size PreferredSize {
-        get {
+    public override Size PreferredSize
+    {
+        get
+        {
             int tallest = 23;
-            tallest = Taller(tallest, ok);
-            tallest = Taller(tallest, cancel);
-            tallest = Taller(tallest, close);
-            tallest = Taller(tallest, help);
-            return Size.Of(0, tallest + gap + gap / 2 + (rule ? 2 : 0));
+            tallest = Taller(tallest, _ok);
+            tallest = Taller(tallest, _cancel);
+            tallest = Taller(tallest, _close);
+            tallest = Taller(tallest, _help);
+            return Size.Of(0, tallest + _gap + _gap / 2 + (_rule ? 2 : 0));
         }
     }
 
-    int Taller(int best, Button? button) {
-        if (button == null) { return best; }
+    int Taller(int best, Button? button)
+    {
+        if (button == null)
+            return best;
         int wanted = ((Button)button).PreferredSize.Height;
         return wanted > best ? wanted : best;
     }
 
     /// See the note on `RadioGroup.Arrange`: the base constructor resizes, and
     /// this override runs before this class's own fields exist.
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
         Arrange();
     }

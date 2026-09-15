@@ -12,16 +12,18 @@ public attribute JsonIgnore { }
 // [Reflect] is what makes a type carry field metadata. Without it nothing is
 // emitted and typeof is an error, so reflection costs nothing unless asked for.
 [Reflect]
-public class Person {
+public class Person
+{
     [JsonName("full_name")] public String Name;
     [JsonName("age")]       public int    Years;
-                            public bool   Active;
+                            public bool Active;
                             public double Rating;
     [JsonIgnore]            public int    Internal;
 }
 
 [Reflect]
-public struct Point {
+public struct Point
+{
     public double X;
     public double Y;
 }
@@ -29,39 +31,53 @@ public struct Point {
 // One serializer, written once, for any reflected type. T is concrete by the
 // time this is compiled, so typeof(T) is a constant and every call below is a
 // direct load from a table in .rdata.
-public String ToJson<T>(T value) {
+public String ToJson<T>(T value)
+{
     var type = typeof(T);
     var text = new StringBuilder();
 
     text.Append("{");
     var first = true;
 
-    for (nuint i = 0; i < type.FieldCount(); i += 1) {
+    for (nuint i = 0; i < type.FieldCount(); i++)
+    {
         var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore")) { continue; }
+        if (field.Has("JsonIgnore"))
+            continue;
 
-        if (!first) { text.Append(","); }
+        if (!first)
+            text.Append(",");
         first = false;
 
         var name = field.Name();
-        if (field.Has("JsonName")) { name = field.Get("JsonName").AsText(0); }
+        if (field.Has("JsonName"))
+            name = field.Get("JsonName").AsText(0);
 
         text.Append("\"");
         text.Append(name);
         text.Append("\":");
 
         var raw = (byte*)value;
-        if (field.Kind() == KindString) {
+        if (field.Kind() == KindString)
+        {
             text.Append("\"");
             text.Append(ReadText(raw, field));
             text.Append("\"");
-        } else if (field.Kind() == KindBool) {
+        }
+        else if (field.Kind() == KindBool)
+        {
             text.Append(Text.FromBool(ReadBool(raw, field)));
-        } else if (field.IsFloating()) {
+        }
+        else if (field.IsFloating())
+        {
             text.AppendDouble(ReadDouble(raw, field));
-        } else if (field.IsInteger()) {
+        }
+        else if (field.IsInteger())
+        {
             text.AppendInteger(ReadInteger(raw, field));
-        } else {
+        }
+        else
+        {
             text.Append("null");
         }
     }
@@ -70,7 +86,8 @@ public String ToJson<T>(T value) {
     return text.ToText();
 }
 
-int Main() {
+int Main()
+{
     var person = new Person();
     person.Name = "Ada Lovelace";
     person.Years = 36;

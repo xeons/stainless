@@ -62,7 +62,8 @@ public closure bool EventHandler(GtkWidget* sender, gpointer carried);
 /// The shape of the C callback GTK will make.
 public delegate gboolean EventCallback(GtkWidget* sender, gpointer carried, gpointer data);
 
-extern "C" {
+extern "C"
+{
     void sl_retain(gpointer pointer);
     void sl_release(gpointer pointer);
 
@@ -71,22 +72,26 @@ extern "C" {
 }
 
 /// A closure with an address; see `Gtk.Signals.Boxed`.
-class Boxed {
+class Boxed
+{
     public EventHandler Body;
-    public Boxed(EventHandler body) { Body = body; }
+    public Boxed(EventHandler body) => Body = body;
 }
 
-gboolean Dispatch(GtkWidget* sender, gpointer carried, gpointer data) {
+gboolean Dispatch(GtkWidget* sender, gpointer carried, gpointer data)
+{
     var boxed = (Boxed)data;
     return boxed.Body(sender, carried) ? 1 : 0;
 }
 
-void Forget(gpointer data, gpointer closure) {
+void Forget(gpointer data, gpointer closure)
+{
     sl_release(data);
 }
 
 /// Connects a handler to a signal that carries a pointer and wants an answer.
-public gulong ConnectEvent(GtkWidget* instance, String signal, EventHandler handler) {
+public gulong ConnectEvent(GtkWidget* instance, String signal, EventHandler handler)
+{
     var boxed = new Boxed(handler);
     sl_retain((gpointer)boxed);
 

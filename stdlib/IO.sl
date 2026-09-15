@@ -38,7 +38,8 @@ module Standard.IO;
 
 import Standard.Collections;
 
-extern "C" {
+extern "C"
+{
     byte* sl_file_open(byte* path, int mode, int access, int* error);
     void  sl_file_close(byte* handle);
     nuint sl_file_read(byte* handle, byte* buffer, nuint count, int* error);
@@ -55,7 +56,8 @@ extern "C" {
 ///
 /// These are the distinctions a program can act on, not the platform's whole
 /// error list: the values are the same on every platform, which `errno` is not.
-public enum IOError {
+public enum IOError
+{
     /// Nothing went wrong.
     None = 0,
 
@@ -90,8 +92,10 @@ public enum IOError {
 }
 
 /// A sentence describing an error, for a message a person will read.
-public String Describe(IOError error) {
-    switch (error) {
+public String Describe(IOError error)
+{
+    switch (error)
+    {
         case IOError.None:           return "no error";
         case IOError.NotFound:       return "no such file or directory";
         case IOError.AccessDenied:   return "access denied";
@@ -108,7 +112,8 @@ public String Describe(IOError error) {
 // ------------------------------------------------------------------- modes
 
 /// What opening a file should do about whether it is already there.
-public enum FileMode {
+public enum FileMode
+{
     /// It must exist.
     Open = 0,
     /// Create it, or replace what is there.
@@ -119,7 +124,8 @@ public enum FileMode {
 
 /// What may be done with an open file. The members combine.
 [Flags]
-public enum FileAccess {
+public enum FileAccess
+{
     /// Neither. Not useful for opening anything.
     None = 0,
 
@@ -134,7 +140,8 @@ public enum FileAccess {
 }
 
 /// Where a seek offset is measured from.
-public enum SeekOrigin {
+public enum SeekOrigin
+{
     /// From the beginning, so the offset is the position. Negative is refused.
     Start = 0,
 
@@ -153,7 +160,8 @@ public enum SeekOrigin {
 /// Read and Write report how many bytes they moved, which for a read is how
 /// end-of-file is seen: fewer than asked for, and zero at the end. Whether
 /// that was an error rather than an ending is what `Error()` says.
-public interface IStream {
+public interface IStream
+{
     /// Whether reading is allowed and possible now. False on a write-only
     /// stream and on a closed one.
     bool CanRead();
@@ -225,42 +233,49 @@ public interface IStream {
 ///
 /// Closing is the destructor's job too, so a stream that goes out of scope
 /// releases its handle whether or not `Close` was called.
-public class FileStream : IStream {
-    byte* handle;
-    FileAccess access;
-    IOError error;
-    bool closed;
+public class FileStream : IStream
+{
+    byte* _handle;
+    FileAccess _access;
+    IOError _error;
+    bool _closed;
 
     // Private: the four factories below are the way in, and each of them
     // reports a failure rather than returning a stream that holds nothing.
-    FileStream(String path, FileMode mode, FileAccess access) {
+    FileStream(String path, FileMode mode, FileAccess access)
+    {
         int code = 0;
-        handle = sl_file_open(path.ToPointer(), (int)mode, (int)access, &code);
-        this.access = access;
-        error = (IOError)code;
-        closed = handle == null;
+        _handle = sl_file_open(path.ToPointer(), (int)mode, (int)access, &code);
+        this._access = access;
+        _error = (IOError)code;
+        _closed = _handle == null;
     }
 
     /// Opens a file, or says why it could not be opened.
     public static Result<FileStream, IOError> Open(
-            String path, FileMode mode, FileAccess access) {
+            String path, FileMode mode, FileAccess access)
+    {
         var stream = new FileStream(path, mode, access);
-        if (!stream.IsOpen()) { return Fail(stream.Error()); }
+        if (!stream.IsOpen())
+            return Fail(stream.Error());
         return Ok(stream);
     }
 
     /// Opens an existing file for reading.
-    public static Result<FileStream, IOError> OpenRead(String path) {
+    public static Result<FileStream, IOError> OpenRead(String path)
+    {
         return Open(path, FileMode.Open, FileAccess.Read);
     }
 
     /// Creates the file, or replaces what is there.
-    public static Result<FileStream, IOError> Create(String path) {
+    public static Result<FileStream, IOError> Create(String path)
+    {
         return Open(path, FileMode.Create, FileAccess.Write);
     }
 
     /// Opens for writing at the end, creating the file if it is not there.
-    public static Result<FileStream, IOError> OpenAppend(String path) {
+    public static Result<FileStream, IOError> OpenAppend(String path)
+    {
         return Open(path, FileMode.Append, FileAccess.Write);
     }
 
@@ -268,17 +283,17 @@ public class FileStream : IStream {
 
     /// Whether the file is still open. False after `Close`, and after an
     /// open that failed.
-    public bool IsOpen() { return !closed; }
+    public bool IsOpen() => !_closed;
 
     /// True while the file is open and was opened for reading. A file opened
     /// for writing answers false, and `Read` on it fails rather than
     /// returning nothing.
-    public bool CanRead() { return !closed && access.HasFlag(FileAccess.Read); }
+    public bool CanRead() => !_closed && _access.HasFlag(FileAccess.Read);
     /// True while the file is open and was opened for writing.
-    public bool CanWrite() { return !closed && access.HasFlag(FileAccess.Write); }
+    public bool CanWrite() => !_closed && _access.HasFlag(FileAccess.Write);
     /// True while the file is open. Every file is seekable, unlike a
     /// connection.
-    public bool CanSeek() { return !closed; }
+    public bool CanSeek() => !_closed;
 
     /// Reads up to `count` bytes into `buffer` at `offset`, answering how
     /// many it read.
@@ -286,14 +301,24 @@ public class FileStream : IStream {
     /// Zero means the end of the file, or a failure -- `Error()` is what tells
     /// the two apart. A count reaching past the end of `buffer` is refused as
     /// `Invalid` rather than overrunning it.
-    public nuint Read(byte[] buffer, nuint offset, nuint count) {
-        if (closed) { error = IOError.Closed; return 0; }
-        if (count == 0) { return 0; }
-        if (offset + count > buffer.Length) { error = IOError.Invalid; return 0; }
+    public nuint Read(byte[] buffer, nuint offset, nuint count)
+    {
+        if (_closed)
+        {
+            _error = IOError.Closed;
+            return 0;
+        }
+        if (count == 0)
+            return 0;
+        if (offset + count > buffer.Length)
+        {
+            _error = IOError.Invalid;
+            return 0;
+        }
 
         int code = 0;
-        nuint read = sl_file_read(handle, &buffer[offset], count, &code);
-        error = (IOError)code;
+        nuint read = sl_file_read(_handle, &buffer[offset], count, &code);
+        _error = (IOError)code;
         return read;
     }
 
@@ -303,54 +328,79 @@ public class FileStream : IStream {
     /// Fewer than asked for means the write was cut short, and `Error()` says
     /// why -- a full disk, usually. A count reaching past the end of `buffer`
     /// is refused as `Invalid`.
-    public nuint Write(byte[] buffer, nuint offset, nuint count) {
-        if (closed) { error = IOError.Closed; return 0; }
-        if (count == 0) { return 0; }
-        if (offset + count > buffer.Length) { error = IOError.Invalid; return 0; }
+    public nuint Write(byte[] buffer, nuint offset, nuint count)
+    {
+        if (_closed)
+        {
+            _error = IOError.Closed;
+            return 0;
+        }
+        if (count == 0)
+            return 0;
+        if (offset + count > buffer.Length)
+        {
+            _error = IOError.Invalid;
+            return 0;
+        }
 
         int code = 0;
-        nuint written = sl_file_write(handle, &buffer[offset], count, &code);
-        error = (IOError)code;
+        nuint written = sl_file_write(_handle, &buffer[offset], count, &code);
+        _error = (IOError)code;
         return written;
     }
 
     /// Writes the UTF-8 bytes of `text`, which is what a String already holds,
     /// so nothing is converted or copied on the way.
-    public nuint WriteText(String text) {
-        if (closed) { error = IOError.Closed; return 0; }
-        if (text.ByteLength() == 0) { return 0; }
+    public nuint WriteText(String text)
+    {
+        if (_closed)
+        {
+            _error = IOError.Closed;
+            return 0;
+        }
+        if (text.ByteLength() == 0)
+            return 0;
 
         int code = 0;
-        nuint written = sl_file_write(handle, text.ToPointer(), text.ByteLength(), &code);
-        error = (IOError)code;
+        nuint written = sl_file_write(_handle, text.ToPointer(), text.ByteLength(), &code);
+        _error = (IOError)code;
         return written;
     }
 
     /// How far into the file the next read or write will happen, or -1 when
     /// the file is closed.
-    public long Position() {
-        if (closed) { return -1; }
-        return sl_file_position(handle);
+    public long Position()
+    {
+        if (_closed)
+            return -1;
+        return sl_file_position(_handle);
     }
 
     /// How many bytes the file holds, or -1 when it is closed. Asks the
     /// system each time rather than caching, so it sees a file another
     /// process has grown.
-    public long Length() {
-        if (closed) { return -1; }
-        return sl_file_length(handle);
+    public long Length()
+    {
+        if (_closed)
+            return -1;
+        return sl_file_length(_handle);
     }
 
     /// Moves the position, answering whether it worked.
     ///
     /// Seeking past the end is allowed and does not extend the file; the gap
     /// becomes zeroes when something is written there.
-    public bool Seek(long offset, SeekOrigin origin) {
-        if (closed) { error = IOError.Closed; return false; }
+    public bool Seek(long offset, SeekOrigin origin)
+    {
+        if (_closed)
+        {
+            _error = IOError.Closed;
+            return false;
+        }
 
         int code = 0;
-        long landed = sl_file_seek(handle, offset, (int)origin, &code);
-        error = (IOError)code;
+        long landed = sl_file_seek(_handle, offset, (int)origin, &code);
+        _error = (IOError)code;
         return landed >= 0;
     }
 
@@ -358,23 +408,27 @@ public class FileStream : IStream {
     /// disk -- the system's own cache is still in front of it -- so this is
     /// what makes a write visible to other processes, not what makes it
     /// survive a power cut.
-    public void Flush() {
-        if (!closed) { sl_file_flush(handle); }
+    public void Flush()
+    {
+        if (!_closed)
+            sl_file_flush(_handle);
     }
 
     /// Closes the file. Calling it twice is harmless, which matters because the
     /// destructor calls it too.
-    public void Close() {
-        if (closed) { return; }
-        sl_file_close(handle);
-        handle = null;
-        closed = true;
+    public void Close()
+    {
+        if (_closed)
+            return;
+        sl_file_close(_handle);
+        _handle = null;
+        _closed = true;
     }
 
     /// The last error, or `None`. Set by every call that failed and left
     /// alone by one that did not, so read it directly after the call it
     /// belongs to.
-    public IOError Error() { return error; }
+    public IOError Error() => _error;
 }
 
 // ----------------------------------------------------------- memory stream
@@ -384,44 +438,51 @@ public class FileStream : IStream {
 /// The same interface as a file, with nothing behind it but memory: useful for
 /// building a payload before writing it, and for testing something that takes
 /// an `IStream` without touching a disk.
-public class MemoryStream : IStream {
-    byte[] bytes;
-    nuint length;
-    nuint at;
+public class MemoryStream : IStream
+{
+    byte[] _bytes;
+    nuint _length;
+    nuint _at;
 
     /// An empty stream, positioned at the beginning.
-    public MemoryStream() {
-        bytes = new byte[64];
-        length = 0;
-        at = 0;
+    public MemoryStream()
+    {
+        _bytes = new byte[64];
+        _length = 0;
+        _at = 0;
     }
 
     /// Starts with a copy of `initial`, positioned at the beginning.
-    public MemoryStream(byte[] initial) {
-        bytes = new byte[initial.Length + 1];
-        for (nuint i = 0; i < initial.Length; i++) { bytes[i] = initial[i]; }
-        length = initial.Length;
-        at = 0;
+    public MemoryStream(byte[] initial)
+    {
+        _bytes = new byte[initial.Length + 1];
+        for (nuint i = 0; i < initial.Length; i++)
+            _bytes[i] = initial[i];
+        _length = initial.Length;
+        _at = 0;
     }
 
     /// Always true.
-    public bool CanRead() { return true; }
+    public bool CanRead() => true;
     /// Always true.
-    public bool CanWrite() { return true; }
+    public bool CanWrite() => true;
     /// Always true.
-    public bool CanSeek() { return true; }
+    public bool CanSeek() => true;
 
     /// Reads up to `count` bytes into `buffer` at `offset`, answering how
     /// many it read. Zero means the position has reached the end; there is no
     /// failure to distinguish it from.
-    public nuint Read(byte[] buffer, nuint offset, nuint count) {
-        if (offset + count > buffer.Length) { return 0; }
+    public nuint Read(byte[] buffer, nuint offset, nuint count)
+    {
+        if (offset + count > buffer.Length)
+            return 0;
 
-        nuint available = length - at;
+        nuint available = _length - _at;
         nuint taking = count < available ? count : available;
 
-        for (nuint i = 0; i < taking; i++) { buffer[offset + i] = bytes[at + i]; }
-        at = at + taking;
+        for (nuint i = 0; i < taking; i++)
+            buffer[offset + i] = _bytes[_at + i];
+        _at = _at + taking;
         return taking;
     }
 
@@ -430,46 +491,57 @@ public class MemoryStream : IStream {
     ///
     /// Writing over the middle replaces those bytes rather than inserting, so
     /// the length only grows when the position passes the old end.
-    public nuint Write(byte[] buffer, nuint offset, nuint count) {
-        if (offset + count > buffer.Length) { return 0; }
+    public nuint Write(byte[] buffer, nuint offset, nuint count)
+    {
+        if (offset + count > buffer.Length)
+            return 0;
 
-        Reserve(at + count);
-        for (nuint i = 0; i < count; i++) { bytes[at + i] = buffer[offset + i]; }
+        Reserve(_at + count);
+        for (nuint i = 0; i < count; i++)
+            _bytes[_at + i] = buffer[offset + i];
 
-        at = at + count;
-        if (at > length) { length = at; }
+        _at = _at + count;
+        if (_at > _length)
+            _length = _at;
         return count;
     }
 
     /// Appends the UTF-8 bytes of `text`.
-    public void WriteText(String text) {
+    public void WriteText(String text)
+    {
         nuint size = text.ByteLength();
-        Reserve(at + size);
+        Reserve(_at + size);
 
         var source = text.ToPointer();
-        for (nuint i = 0; i < size; i++) { bytes[at + i] = source[i]; }
+        for (nuint i = 0; i < size; i++)
+            _bytes[_at + i] = source[i];
 
-        at = at + size;
-        if (at > length) { length = at; }
+        _at = _at + size;
+        if (_at > _length)
+            _length = _at;
     }
 
     /// Where the next read or write will happen.
-    public long Position() { return (long)at; }
+    public long Position() => (long)_at;
     /// How many bytes have been written, measured to the furthest the
     /// position has ever reached -- not the capacity of the buffer behind it.
-    public long Length() { return (long)length; }
+    public long Length() => (long)_length;
 
     /// Moves the position, answering whether it worked.
     ///
     /// Unlike a file, seeking past the end is refused: there is nothing there
     /// to leave a gap in.
-    public bool Seek(long offset, SeekOrigin origin) {
+    public bool Seek(long offset, SeekOrigin origin)
+    {
         long target = offset;
-        if (origin == SeekOrigin.Current) { target = (long)at + offset; }
-        if (origin == SeekOrigin.End) { target = (long)length + offset; }
+        if (origin == SeekOrigin.Current)
+            target = (long)_at + offset;
+        if (origin == SeekOrigin.End)
+            target = (long)_length + offset;
 
-        if (target < 0 || target > (long)length) { return false; }
-        at = (nuint)target;
+        if (target < 0 || target > (long)_length)
+            return false;
+        _at = (nuint)target;
         return true;
     }
 
@@ -480,78 +552,98 @@ public class MemoryStream : IStream {
     public void Close() { }
 
     /// Always `None`. Nothing a memory stream does can fail.
-    public IOError Error() { return IOError.None; }
+    public IOError Error() => IOError.None;
 
     /// A copy of what has been written, from the start to the high-water mark.
-    public byte[] ToArray() {
-        var copy = new byte[length];
-        for (nuint i = 0; i < length; i++) { copy[i] = bytes[i]; }
+    public byte[] ToArray()
+    {
+        var copy = new byte[_length];
+        for (nuint i = 0; i < _length; i++)
+            copy[i] = _bytes[i];
         return copy;
     }
 
     /// The contents as text, read as UTF-8.
-    public String ToText() {
-        if (length == 0) { return ""; }
-        return Text.FromBytes(&bytes[0], length);
+    public String ToText()
+    {
+        if (_length == 0)
+            return "";
+        return Text.FromBytes(&_bytes[0], _length);
     }
 
-    void Reserve(nuint wanted) {
-        if (wanted <= bytes.Length) { return; }
+    void Reserve(nuint wanted)
+    {
+        if (wanted <= _bytes.Length)
+            return;
 
-        nuint size = bytes.Length * 2;
-        while (size < wanted) { size = size * 2; }
+        nuint size = _bytes.Length * 2;
+        while (size < wanted)
+            size = size * 2;
 
         var bigger = new byte[size];
-        for (nuint i = 0; i < length; i++) { bigger[i] = bytes[i]; }
-        bytes = bigger;
+        for (nuint i = 0; i < _length; i++)
+            bigger[i] = _bytes[i];
+        _bytes = bigger;
     }
 }
 
 // ------------------------------------------------------------------ helpers
 
 /// Reads a stream to its end.
-public Result<byte[], IOError> ReadToEnd(IStream stream) {
+public Result<byte[], IOError> ReadToEnd(IStream stream)
+{
     var collected = new MemoryStream();
     var buffer = new byte[4096];
 
-    for (;;) {
+    for (;;)
+    {
         nuint got = stream.Read(buffer, 0, buffer.Length);
-        if (got == 0) { break; }
+        if (got == 0)
+            break;
         collected.Write(buffer, 0, got);
     }
 
     var failure = stream.Error();
-    if (failure != IOError.None) { return Fail(failure); }
+    if (failure != IOError.None)
+        return Fail(failure);
     return Ok(collected.ToArray());
 }
 
 /// Reads a stream to its end and reads the bytes as UTF-8.
-public Result<String, IOError> ReadTextToEnd(IStream stream) {
+public Result<String, IOError> ReadTextToEnd(IStream stream)
+{
     var raw = ReadToEnd(stream);
-    if (!raw.Ok) { return Fail(raw.Error); }
+    if (!raw.Ok)
+        return Fail(raw.Error);
 
-    if (raw.Value.Length == 0) { return Ok(""); }
+    if (raw.Value.Length == 0)
+        return Ok("");
     return Ok(Text.FromBytes(&raw.Value[0], raw.Value.Length));
 }
 
 /// Splits text into lines, accepting either line ending and dropping a final
 /// empty line, which is what a trailing newline produces.
-public List<String> SplitLines(String text) {
+public List<String> SplitLines(String text)
+{
     var lines = new List<String>();
     var bytes = text.ToPointer();
     nuint size = text.ByteLength();
 
     nuint start = 0;
-    for (nuint i = 0; i < size; i++) {
-        if (bytes[i] != 10) { continue; }
+    for (nuint i = 0; i < size; i++)
+    {
+        if (bytes[i] != 10)
+            continue;
 
         nuint stop = i;
-        if (stop > start && bytes[stop - 1] == 13) { stop = stop - 1; }
+        if (stop > start && bytes[stop - 1] == 13)
+            stop = stop - 1;
 
         lines.Add(Text.FromBytes(&bytes[start], stop - start));
         start = i + 1;
     }
 
-    if (start < size) { lines.Add(Text.FromBytes(&bytes[start], size - start)); }
+    if (start < size)
+        lines.Add(Text.FromBytes(&bytes[start], size - start));
     return lines;
 }

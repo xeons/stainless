@@ -41,6 +41,39 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
+### `stainless format`
+
+[docs/style.md](docs/style.md) is the house style and there is nothing that
+applies it. The C# half is enforced — `.editorconfig` plus
+`EnforceCodeStyleInBuild`, so the build fails on a violation — and the Stainless
+half is enforced by review, which is the weaker half of a rule that exists
+because review kept missing this.
+
+The tree was brought to the standard by a throwaway script that masked strings
+and comments, moved braces, and checked that nothing but layout had changed. A
+real one belongs in the CLI next to `stainless doc`, reading the same syntax
+tree rather than guessing at it with a regular expression. It wants: the brace
+and one-statement-body rules (§3.1–3.3), `i++` (§3.4), the whitespace and
+column-alignment rules (§3.5), and a `--check` mode a build can run.
+
+**Why it matters**: the two halves of this repository disagreed about brace
+style for months, and nothing said so. What a reviewer should be spending
+attention on is §1.4 and §2.1 — whether a name promises the right thing, whether
+a method should have been a property — and neither of those is mechanical.
+
+### The zero-argument methods that should be properties
+
+`Count()`, `IsEmpty()`, `Name()`, `CanRead()`, `Capacity()` are facts about an
+object written as calls; [docs/style.md §2.1](docs/style.md#21-a-property-or-a-method)
+is the rule and roughly 460 declarations disagree with it. Deliberately left
+out of the layout passes: it changes the public surface, so it moves the
+specification, `docs/stdlib/`, the samples and `tests/cases/` together, and it
+is worth reading rather than scripting — `Read()` and `MoveNext()` have side
+effects and stay methods, `FindForm()` does work and stays one.
+
+`OrderedDictionary<K, V>` and the other generics want `TKey`/`TValue` at the
+same time, since both are renames of the same surface.
+
 ### x86 and ARM64
 
 Three of the four entries that were here are done. What each turned out to be:

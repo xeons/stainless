@@ -59,13 +59,14 @@ import Win32.Handles;
 
 /// A `COLORREF` is 0x00BBGGRR — blue in the *high* byte, which is the opposite
 /// of the order the components are usually written in.
-public uint Colour(byte red, byte green, byte blue) {
+public uint Colour(byte red, byte green, byte blue)
+{
     return (uint)red | ((uint)green << 8) | ((uint)blue << 16);
 }
 
-public byte Red(uint colour)   { return (byte)(colour & 0xFFu); }
-public byte Green(uint colour) { return (byte)((colour >> 8) & 0xFFu); }
-public byte Blue(uint colour)  { return (byte)((colour >> 16) & 0xFFu); }
+public byte Red(uint colour) => (byte)(colour & 0xFFu);
+public byte Green(uint colour) => (byte)((colour >> 8) & 0xFFu);
+public byte Blue(uint colour) => (byte)((colour >> 16) & 0xFFu);
 
 public const uint Black    = 0x000000u;
 public const uint White    = 0xFFFFFFu;
@@ -78,20 +79,23 @@ public const uint BlueInk  = 0xFF0000u;
 /// A font at a given pixel height. Negative heights mean "character height"
 /// rather than "cell height", which is what a caller thinking in point sizes
 /// wants; this takes the height as written and does not negate it.
-public HFONT CreateFont(String face, int height, int weight, bool italic) {
+public HFONT CreateFont(String face, int height, int weight, bool italic)
+{
     return CreateFontW(height, 0, 0, 0, weight, (uint)(italic ? 1 : 0), 0u, 0u,
                        DefaultCharSet, 0u, 0u, ClearTypeQuality, DefaultPitch,
                        face.ToUtf16().ToPointer());
 }
 
 /// Draws text at a point, with the current font, colour and alignment.
-public bool DrawTextAt(HDC dc, int x, int y, String text) {
+public bool DrawTextAt(HDC dc, int x, int y, String text)
+{
     var wide = text.ToUtf16();
     return Win32.Succeeded(TextOutW(dc, x, y, wide.ToPointer(), (int)wide.UnitCount()));
 }
 
 /// How wide and tall the text would be in the device context's current font.
-public Size MeasureText(HDC dc, String text) {
+public Size MeasureText(HDC dc, String text)
+{
     var wide = text.ToUtf16();
     Size size;
     size.Width = 0;
@@ -107,13 +111,15 @@ public Size MeasureText(HDC dc, String text) {
 ///
 /// The caller owns all of it and must call `DestroyOffScreen`, which puts back
 /// what was there and then deletes both in the order GDI requires.
-public struct OffScreen {
-    public HDC     Dc;
+public struct OffScreen
+{
+    public HDC Dc;
     public HBITMAP Bitmap;
     public HGDIOBJ Previous;
 }
 
-public OffScreen CreateOffScreen(HDC dc, int width, int height) {
+public OffScreen CreateOffScreen(HDC dc, int width, int height)
+{
     OffScreen buffer;
     buffer.Dc = CreateCompatibleDC(dc);
     buffer.Bitmap = CreateCompatibleBitmap(dc, width, height);
@@ -121,7 +127,8 @@ public OffScreen CreateOffScreen(HDC dc, int width, int height) {
     return buffer;
 }
 
-public void DestroyOffScreen(OffScreen buffer) {
+public void DestroyOffScreen(OffScreen buffer)
+{
     SelectObject(buffer.Dc, buffer.Previous);
     DeleteObject(buffer.Bitmap);
     DeleteDC(buffer.Dc);
@@ -131,7 +138,8 @@ public void DestroyOffScreen(OffScreen buffer) {
 ///
 /// Convenient rather than fast: a caller filling many rectangles in the same
 /// colour should make one brush and keep it.
-public bool Fill(HDC dc, Rect* rectangle, uint colour) {
+public bool Fill(HDC dc, Rect* rectangle, uint colour)
+{
     HBRUSH brush = CreateSolidBrush(colour);
     bool filled = Win32.Succeeded(FillRect(dc, rectangle, brush));
     DeleteObject(brush);

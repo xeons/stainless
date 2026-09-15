@@ -36,7 +36,8 @@ import Win32.Handles;
 
 // =================================================================== errors
 
-public extern "C" {
+public extern "C"
+{
     uint GetLastError();
     void SetLastError(uint code);
     uint FormatMessageW(uint flags, void* source, uint messageId, uint languageId,
@@ -73,7 +74,8 @@ public const uint ErrorIoPending          = 997u;
 
 // ================================================================== handles
 
-public extern "C" {
+public extern "C"
+{
     int CloseHandle(HANDLE handle);
     int DuplicateHandle(HANDLE sourceProcess, HANDLE source, HANDLE targetProcess,
                         HANDLE* target, uint access, int inheritable, uint options);
@@ -91,19 +93,21 @@ public const uint DuplicateSameAccess      = 0x00000002u;
 /// Which of the two a failing call returns is per-function and not guessable —
 /// `CreateFileW` returns this one, `CreateFileMappingW` returns null. A
 /// function rather than a `const` because Stainless has no `const` pointer.
-public HANDLE InvalidHandle() { return (HANDLE)(nuint)0xFFFFFFFFFFFFFFFFu; }
+public HANDLE InvalidHandle() => (HANDLE)(nuint)0xFFFFFFFFFFFFFFFFu;
 
 /// `SECURITY_ATTRIBUTES`. Pass `null` where a call takes one and the default
 /// will do, which is almost everywhere.
-public struct SecurityAttributes {
-    public uint  Length;
+public struct SecurityAttributes
+{
+    public uint Length;
     public void* Descriptor;
-    public int   InheritHandle;
+    public int InheritHandle;
 }
 
 // ==================================================================== files
 
-public extern "C" {
+public extern "C"
+{
     HANDLE CreateFileW(char16* name, uint access, uint shareMode,
                        SecurityAttributes* security, uint disposition,
                        uint flags, HANDLE template);
@@ -199,22 +203,24 @@ public const int MaxPath = 260;
 /// The two trailing `WCHAR` arrays are what this struct is really about: they
 /// are laid out inside it, so the name is at offset 44 and the struct is the
 /// width Windows expects to fill. `Win32.Files.FindData` reads them as text.
-public struct FindData {
-    public uint            Attributes;
-    public FileTime        Created;
-    public FileTime        Accessed;
-    public FileTime        Written;
-    public uint            FileSizeHigh;
-    public uint            FileSizeLow;
-    public uint            Reserved0;
-    public uint            Reserved1;
+public struct FindData
+{
+    public uint Attributes;
+    public FileTime Created;
+    public FileTime Accessed;
+    public FileTime Written;
+    public uint FileSizeHigh;
+    public uint FileSizeLow;
+    public uint Reserved0;
+    public uint Reserved1;
     public char16[MaxPath] FileName;
     public char16[14]      AlternateName;
 }
 
 // =================================================================== memory
 
-public extern "C" {
+public extern "C"
+{
     void*   VirtualAlloc(void* at, nuint size, uint type, uint protect);
     int     VirtualFree(void* at, nuint size, uint type);
     int     VirtualProtect(void* at, nuint size, uint protect, uint* previous);
@@ -259,7 +265,8 @@ public const uint GlobalZeroInit = 0x0040u;
 
 // ================================================================== modules
 
-public extern "C" {
+public extern "C"
+{
     HMODULE LoadLibraryW(char16* name);
     HMODULE LoadLibraryExW(char16* name, HANDLE reserved, uint flags);
     int     FreeLibrary(HMODULE library);
@@ -293,7 +300,8 @@ public const uint LoadLibrarySearchDefaultDirs = 0x00001000u;
 // does nothing and is not declared here for that reason. There is nothing to
 // release, which is why none of this appears in a destructor.
 
-public extern "C" {
+public extern "C"
+{
     /// Finds a resource, and answers null when there is none of that name.
     /// `type` is one of the `RT_` values or a string naming a custom type.
     HANDLE FindResourceW(HMODULE library, char16* name, char16* type);
@@ -327,7 +335,8 @@ public delegate int EnumResNameProc(HMODULE library, char16* type, char16* name,
 public delegate int EnumResLangProc(HMODULE library, char16* type, char16* name,
                                     ushort language, nint parameter);
 
-public extern "C" {
+public extern "C"
+{
     int EnumResourceTypesW(HMODULE library, EnumResTypeProc callback, nint parameter);
     int EnumResourceNamesW(HMODULE library, char16* type,
                            EnumResNameProc callback, nint parameter);
@@ -340,7 +349,8 @@ public extern "C" {
 ///
 /// `EndUpdateResource` is what actually rewrites the file; discarding is how
 /// a failed edit is abandoned. The file must not be running.
-public extern "C" {
+public extern "C"
+{
     HANDLE BeginUpdateResourceW(char16* path, int deleteExistingResources);
     int    UpdateResourceW(HANDLE update, char16* type, char16* name, ushort language,
                            void* data, uint size);
@@ -357,7 +367,8 @@ public const ushort LangNeutral = 0u;
 
 // ============================================================== environment
 
-public extern "C" {
+public extern "C"
+{
     uint    GetEnvironmentVariableW(char16* name, char16* buffer, uint size);
     int     SetEnvironmentVariableW(char16* name, char16* value);
     uint    ExpandEnvironmentStringsW(char16* source, char16* buffer, uint size);
@@ -377,21 +388,24 @@ public extern "C" {
 /// carries: the whole word was `dwOemId` on Windows NT, and is now an
 /// architecture and a reserved half. Both are nameless in the header, so both
 /// are nameless here — `info.Architecture` reads the way C reads it.
-public struct SystemInfo {
-    public union {
+public struct SystemInfo
+{
+    public union
+    {
         public uint OemId;
-        public struct {
+        public struct
+        {
             public ushort Architecture;
             public ushort Reserved;
         }
     }
-    public uint   PageSize;
-    public void*  MinimumApplicationAddress;
-    public void*  MaximumApplicationAddress;
-    public nuint  ActiveProcessorMask;
-    public uint   ProcessorCount;
-    public uint   ProcessorType;
-    public uint   AllocationGranularity;
+    public uint PageSize;
+    public void* MinimumApplicationAddress;
+    public void* MaximumApplicationAddress;
+    public nuint ActiveProcessorMask;
+    public uint ProcessorCount;
+    public uint ProcessorType;
+    public uint AllocationGranularity;
     public ushort ProcessorLevel;
     public ushort ProcessorRevision;
 }
@@ -402,9 +416,10 @@ public const ushort ProcessorArchitectureX64   = 9u;
 public const ushort ProcessorArchitectureArm64 = 12u;
 
 /// `MEMORYSTATUSEX`. `Length` must be set to `sizeof` before the call.
-public struct MemoryStatus {
-    public uint  Length;
-    public uint  MemoryLoad;
+public struct MemoryStatus
+{
+    public uint Length;
+    public uint MemoryLoad;
     public ulong TotalPhysical;
     public ulong AvailablePhysical;
     public ulong TotalPageFile;
@@ -414,7 +429,8 @@ public struct MemoryStatus {
     public ulong AvailableExtendedVirtual;
 }
 
-public extern "C" {
+public extern "C"
+{
     void GetSystemInfo(SystemInfo* info);
     void GetNativeSystemInfo(SystemInfo* info);
     int  GlobalMemoryStatusEx(MemoryStatus* status);
@@ -426,37 +442,40 @@ public extern "C" {
 // =========================================================== process, thread
 
 /// `STARTUPINFOW`. `sizeof` is 104, and `Size` must be set to it.
-public struct StartupInfo {
-    public uint    Size;
+public struct StartupInfo
+{
+    public uint Size;
     public char16* Reserved;
     public char16* Desktop;
     public char16* Title;
-    public uint    X;
-    public uint    Y;
-    public uint    XSize;
-    public uint    YSize;
-    public uint    XCountChars;
-    public uint    YCountChars;
-    public uint    FillAttribute;
-    public uint    Flags;
-    public ushort  ShowWindow;
-    public ushort  Reserved2;
-    public byte*   Reserved3;
-    public HANDLE  StandardInput;
-    public HANDLE  StandardOutput;
-    public HANDLE  StandardError;
+    public uint X;
+    public uint Y;
+    public uint XSize;
+    public uint YSize;
+    public uint XCountChars;
+    public uint YCountChars;
+    public uint FillAttribute;
+    public uint Flags;
+    public ushort ShowWindow;
+    public ushort Reserved2;
+    public byte* Reserved3;
+    public HANDLE StandardInput;
+    public HANDLE StandardOutput;
+    public HANDLE StandardError;
 }
 
 /// `PROCESS_INFORMATION`. Both handles belong to the caller and both must be
 /// closed, including the thread handle nobody wants.
-public struct ProcessInformation {
+public struct ProcessInformation
+{
     public HANDLE Process;
     public HANDLE Thread;
-    public uint   ProcessId;
-    public uint   ThreadId;
+    public uint ProcessId;
+    public uint ThreadId;
 }
 
-public extern "C" {
+public extern "C"
+{
     int    CreateProcessW(char16* application, char16* commandLine,
                           SecurityAttributes* processSecurity,
                           SecurityAttributes* threadSecurity,
@@ -516,13 +535,15 @@ public const uint RealtimePriorityClass    = 0x00000100u;
 
 /// `COORD`: two `short`s, and the reason the console cannot address a buffer
 /// wider than 32767.
-public struct Coord {
+public struct Coord
+{
     public short X;
     public short Y;
 }
 
 /// `SMALL_RECT`, whose edges are *inclusive*, unlike a `RECT`.
-public struct SmallRect {
+public struct SmallRect
+{
     public short Left;
     public short Top;
     public short Right;
@@ -530,59 +551,67 @@ public struct SmallRect {
 }
 
 /// `CONSOLE_SCREEN_BUFFER_INFO`. `sizeof` is 22.
-public struct ScreenBufferInfo {
-    public Coord     Size;
-    public Coord     CursorPosition;
-    public ushort    Attributes;
+public struct ScreenBufferInfo
+{
+    public Coord Size;
+    public Coord CursorPosition;
+    public ushort Attributes;
     public SmallRect Window;
-    public Coord     MaximumWindowSize;
+    public Coord MaximumWindowSize;
 }
 
 /// `CONSOLE_CURSOR_INFO`.
-public struct CursorInfo {
+public struct CursorInfo
+{
     public uint Size;
-    public int  Visible;
+    public int Visible;
 }
 
 /// `KEY_EVENT_RECORD`'s character, which the header makes a union of a wide
 /// and an ANSI character.
-public union Character {
+public union Character
+{
     public ushort Unicode;
-    public byte   Ansi;
+    public byte Ansi;
 }
 
-public struct KeyEvent {
-    public int       KeyDown;
-    public ushort    RepeatCount;
-    public ushort    VirtualKeyCode;
-    public ushort    VirtualScanCode;
+public struct KeyEvent
+{
+    public int KeyDown;
+    public ushort RepeatCount;
+    public ushort VirtualKeyCode;
+    public ushort VirtualScanCode;
     public Character Char;
-    public uint      ControlKeyState;
+    public uint ControlKeyState;
 }
 
-public struct MouseEvent {
+public struct MouseEvent
+{
     public Coord Position;
-    public uint  ButtonState;
-    public uint  ControlKeyState;
-    public uint  Flags;
+    public uint ButtonState;
+    public uint ControlKeyState;
+    public uint Flags;
 }
 
 /// The `INPUT_RECORD` payload, which `EventType` says how to read. A `union`
 /// and not a `variant` for exactly the reason unions exist: the tag lives
 /// outside it, in the record.
-public union InputEvent {
-    public KeyEvent   Key;
+public union InputEvent
+{
+    public KeyEvent Key;
     public MouseEvent Mouse;
-    public Coord      BufferSize;
+    public Coord BufferSize;
 }
 
 /// `INPUT_RECORD`. `sizeof` is 20.
-public struct InputRecord {
-    public ushort     EventType;
+public struct InputRecord
+{
+    public ushort EventType;
     public InputEvent Event;
 }
 
-public extern "C" {
+public extern "C"
+{
     HANDLE GetStdHandle(uint which);
     int    SetStdHandle(uint which, HANDLE handle);
     int    GetConsoleMode(HANDLE handle, uint* mode);
@@ -675,7 +704,8 @@ public const uint CapsLockOn       = 0x0080u;
 // ===================================================================== time
 
 /// `SYSTEMTIME`. `DayOfWeek` is 0 for Sunday and is ignored on input.
-public struct SystemTime {
+public struct SystemTime
+{
     public ushort Year;
     public ushort Month;
     public ushort DayOfWeek;
@@ -689,12 +719,14 @@ public struct SystemTime {
 /// `FILETIME`, as its two halves. It is 8 bytes but only 4-aligned, which is
 /// why the header splits it and why this does too: a `ulong` field here would
 /// be aligned differently and every struct containing one would be wrong.
-public struct FileTime {
+public struct FileTime
+{
     public uint Low;
     public uint High;
 }
 
-public extern "C" {
+public extern "C"
+{
     void  GetSystemTime(SystemTime* time);
     void  GetLocalTime(SystemTime* time);
     int   SetSystemTime(SystemTime* time);

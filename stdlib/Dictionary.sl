@@ -38,7 +38,8 @@ extern "C" void sl_fail(byte* message);
 // ------------------------------------------------------------------- pairs
 
 /// One key and one value. What a dictionary yields when it is iterated.
-public class Pair<K, V> {
+public class Pair<K, V>
+{
     /// The key half.
     public K Key { get; }
 
@@ -47,7 +48,8 @@ public class Pair<K, V> {
 
     /// Builds a pair. Iteration is what normally makes these -- one per entry
     /// visited, so a `foreach` over a large dictionary allocates one per step.
-    public Pair(K key, V value) {
+    public Pair(K key, V value)
+    {
         Key = key;
         Value = value;
     }
@@ -63,38 +65,42 @@ public class Pair<K, V> {
 public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     where K : IEquatable<K>, IHashable
 {
-    K[] keys;
-    V[] values;
-    bool[] filled;
+    K[] _keys;
+    V[] _values;
+    bool[] _filled;
 
-    nuint count;
+    nuint _count;
 
     /// An empty dictionary with room for a few entries before it first grows.
-    public Dictionary() {
-        keys = new K[8];
-        values = new V[8];
-        filled = new bool[8];
-        count = 0;
+    public Dictionary()
+    {
+        _keys = new K[8];
+        _values = new V[8];
+        _filled = new bool[8];
+        _count = 0;
     }
 
     /// How many entries there are. O(1) -- it is a counter, not a scan.
-    public nuint Count() { return count; }
+    public nuint Count() => _count;
 
     /// True when there are no entries.
-    public bool IsEmpty() { return count == 0; }
+    public bool IsEmpty() => _count == 0;
 
     /// The number of slots the table has. Always a power of two, so the hash is
     /// reduced with a mask rather than a division.
-    public nuint Capacity() { return keys.Length; }
+    public nuint Capacity() => _keys.Length;
 
     /// The slot holding `key`, or the first free slot it would take. Which one
     /// it is, is what `filled` at that index says.
-    nuint Probe(K key) {
-        nuint mask = keys.Length - 1;
+    nuint Probe(K key)
+    {
+        nuint mask = _keys.Length - 1;
         nuint i = key.HashCode() & mask;
 
-        while (filled[i]) {
-            if (keys[i].EqualTo(key)) { return i; }
+        while (_filled[i])
+        {
+            if (_keys[i].EqualTo(key))
+                return i;
             i = (i + 1) & mask;
         }
         return i;
@@ -104,7 +110,7 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     ///
     /// One probe, but reach for `Find` when the value is what is wanted:
     /// `ContainsKey` and then `Get` probes twice for one answer.
-    public bool ContainsKey(K key) { return filled[Probe(key)]; }
+    public bool ContainsKey(K key) => _filled[Probe(key)];
 
     /// The value for `key`, or `None` when there is none.
     ///
@@ -118,10 +124,12 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     ///
     /// One probe, where `ContainsKey` followed by `Get` is two, and no sentinel
     /// to collide with a real value the way `GetOr` has.
-    public Optional<V> Find(K key) {
+    public Optional<V> Find(K key)
+    {
         nuint i = Probe(key);
-        if (!filled[i]) { return None; }
-        return Some(values[i]);
+        if (!_filled[i])
+            return None;
+        return Some(_values[i]);
     }
 
     /// The value for `key`, aborting when there is none.
@@ -132,17 +140,21 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     /// the caller is claiming the value exists and would rather stop than
     /// carry on if it does not. For a key that came from anywhere else, `Find`
     /// is the question and this is not.
-    public V Get(K key) {
+    public V Get(K key)
+    {
         nuint i = Probe(key);
-        if (!filled[i]) { sl_fail("Dictionary.Get: no such key"); }
-        return values[i];
+        if (!_filled[i])
+            sl_fail("Dictionary.Get: no such key");
+        return _values[i];
     }
 
     /// The value for `key`, or `fallback` when there is none.
-    public V GetOr(K key, V fallback) {
+    public V GetOr(K key, V fallback)
+    {
         nuint i = Probe(key);
-        if (!filled[i]) { return fallback; }
-        return values[i];
+        if (!_filled[i])
+            return fallback;
+        return _values[i];
     }
 
     /// `map[key]`, which answers `Optional<V>` and never stops the program.
@@ -170,83 +182,102 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     /// question being asked out loud: `map[key] = map[key].ValueOr(0) + 1`
     /// says what should happen, and Swift's `dict[key, default: 0] += 1`
     /// exists for the same reason.
-    public Optional<V> this[K key] {
-        get { return Find(key); }
-        set {
-            if (value is Some held) { Set(key, held.Value); }
-            else { Remove(key); }
+    public Optional<V> this[K key]
+    {
+        get => Find(key);
+        set
+        {
+            if (value is Some held)
+            {
+                Set(key, held.Value);
+            }
+            else
+            {
+                Remove(key);
+            }
         }
     }
 
     /// Adds the key or replaces what it maps to.
-    public void Set(K key, V value) {
+    public void Set(K key, V value)
+    {
         nuint i = Probe(key);
-        if (filled[i]) {
-            values[i] = value;
+        if (_filled[i])
+        {
+            _values[i] = value;
             return;
         }
 
         // Growing moves every entry, so the slot has to be found again after it.
-        if ((count + 1) * 4 > keys.Length * 3) {
+        if ((_count + 1) * 4 > _keys.Length * 3)
+        {
             Grow();
             i = Probe(key);
         }
 
-        keys[i] = key;
-        values[i] = value;
-        filled[i] = true;
-        count++;
+        _keys[i] = key;
+        _values[i] = value;
+        _filled[i] = true;
+        _count++;
     }
 
     /// Adds the key, or reports that it was already there and changes nothing.
-    public bool Add(K key, V value) {
-        if (filled[Probe(key)]) { return false; }
+    public bool Add(K key, V value)
+    {
+        if (_filled[Probe(key)])
+            return false;
         Set(key, value);
         return true;
     }
 
     /// Removes the key, reporting whether it was there.
-    public bool Remove(K key) {
+    public bool Remove(K key)
+    {
         nuint i = Probe(key);
-        if (!filled[i]) { return false; }
+        if (!_filled[i])
+            return false;
 
-        nuint mask = keys.Length - 1;
+        nuint mask = _keys.Length - 1;
         nuint j = i;
 
         // Backward-shift deletion. Everything after the hole is examined, and
         // anything whose own probe would now run past the hole moves back into
         // it, which keeps every remaining key reachable without a tombstone.
-        while (true) {
+        while (true)
+        {
             j = (j + 1) & mask;
-            if (!filled[j]) { break; }
+            if (!_filled[j])
+                break;
 
-            nuint home = keys[j].HashCode() & mask;
+            nuint home = _keys[j].HashCode() & mask;
 
             // Leave it where it is when its home lies cyclically in (i, j].
             bool settled = i <= j ? i < home && home <= j : i < home || home <= j;
-            if (settled) { continue; }
+            if (settled)
+                continue;
 
-            keys[i] = keys[j];
-            values[i] = values[j];
+            _keys[i] = _keys[j];
+            _values[i] = _values[j];
             i = j;
         }
 
         // Cleared rather than merely abandoned: a slot still holding its old
         // reference keeps that object alive for as long as the table lives.
-        keys[i] = default(K);
-        values[i] = default(V);
-        filled[i] = false;
-        count--;
+        _keys[i] = default(K);
+        _values[i] = default(V);
+        _filled[i] = false;
+        _count--;
         return true;
     }
 
     /// Drops every entry. The arrays are replaced rather than blanked, so
     /// anything they held is released now.
-    public void Clear() {
-        keys = new K[8];
-        values = new V[8];
-        filled = new bool[8];
-        count = 0;
+    public void Clear()
+    {
+        _keys = new K[8];
+        _values = new V[8];
+        _filled = new bool[8];
+        _count = 0;
     }
 
     /// Every key, in the table's own order.
@@ -255,10 +286,13 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     /// scan of every slot rather than of every entry -- O(capacity), not
     /// O(count). Pairs with `Values` position for position as long as nothing
     /// is written in between.
-    public List<K> Keys() {
+    public List<K> Keys()
+    {
         var result = new List<K>();
-        for (nuint i = 0; i < filled.Length; i++) {
-            if (filled[i]) { result.Add(keys[i]); }
+        for (nuint i = 0; i < _filled.Length; i++)
+        {
+            if (_filled[i])
+                result.Add(_keys[i]);
         }
         return result;
     }
@@ -266,10 +300,13 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     /// Every value, in the same order `Keys` gives.
     ///
     /// Values are not distinct: a value stored under two keys appears twice.
-    public List<V> Values() {
+    public List<V> Values()
+    {
         var result = new List<V>();
-        for (nuint i = 0; i < filled.Length; i++) {
-            if (filled[i]) { result.Add(values[i]); }
+        for (nuint i = 0; i < _filled.Length; i++)
+        {
+            if (_filled[i])
+                result.Add(_values[i]);
         }
         return result;
     }
@@ -280,35 +317,39 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
     /// the table grows. `Standard.Collections.OrderedDictionary` is the one
     /// that keeps an order. Adding or removing during a walk invalidates the
     /// cursor.
-    public IEnumerator<Pair<K, V>> GetEnumerator() {
+    public IEnumerator<Pair<K, V>> GetEnumerator()
+    {
         return new DictionaryEnumerator<K, V>(this);
     }
 
     // What the enumerator needs and nothing else does: a slot's state, and the
     // entry in it. Not public, so the shape of the table stays inside the
     // module that has to keep it consistent.
-    bool Occupied(nuint slot) { return filled[slot]; }
+    bool Occupied(nuint slot) => _filled[slot];
 
-    Pair<K, V> PairAt(nuint slot) { return new Pair<K, V>(keys[slot], values[slot]); }
+    Pair<K, V> PairAt(nuint slot) => new Pair<K, V>(_keys[slot], _values[slot]);
 
-    void Grow() {
-        var oldKeys = keys;
-        var oldValues = values;
-        var oldFilled = filled;
+    void Grow()
+    {
+        var oldKeys = _keys;
+        var oldValues = _values;
+        var oldFilled = _filled;
 
-        keys = new K[oldKeys.Length * 2];
-        values = new V[oldValues.Length * 2];
-        filled = new bool[oldFilled.Length * 2];
-        count = 0;
+        _keys = new K[oldKeys.Length * 2];
+        _values = new V[oldValues.Length * 2];
+        _filled = new bool[oldFilled.Length * 2];
+        _count = 0;
 
-        for (nuint i = 0; i < oldFilled.Length; i++) {
-            if (!oldFilled[i]) { continue; }
+        for (nuint i = 0; i < oldFilled.Length; i++)
+        {
+            if (!oldFilled[i])
+                continue;
 
             nuint j = Probe(oldKeys[i]);
-            keys[j] = oldKeys[i];
-            values[j] = oldValues[i];
-            filled[j] = true;
-            count++;
+            _keys[j] = oldKeys[i];
+            _values[j] = oldValues[i];
+            _filled[j] = true;
+            _count++;
         }
     }
 }
@@ -320,33 +361,37 @@ public class Dictionary<K, V> : IEnumerable<Pair<K, V>>
 public class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
     where K : IEquatable<K>, IHashable
 {
-    Dictionary<K, V> source;
-    nuint at;
-    nuint scanned;
+    Dictionary<K, V> _source;
+    nuint _at;
+    nuint _scanned;
 
     /// A cursor over `dictionary`, positioned before the first entry. The
     /// dictionary is held by reference and must not be written to while the
     /// cursor is live.
-    public DictionaryEnumerator(Dictionary<K, V> dictionary) {
-        source = dictionary;
-        at = 0;
-        scanned = 0;
+    public DictionaryEnumerator(Dictionary<K, V> dictionary)
+    {
+        _source = dictionary;
+        _at = 0;
+        _scanned = 0;
     }
 
     /// Advances to the next occupied slot, answering false at the end. Each
     /// call skips however many empty slots lie between, so a walk costs
     /// O(capacity) overall rather than O(count).
-    public bool MoveNext() {
-        while (scanned < source.Capacity()) {
-            at = scanned;
-            scanned++;
-            if (source.Occupied(at)) { return true; }
+    public bool MoveNext()
+    {
+        while (_scanned < _source.Capacity())
+        {
+            _at = _scanned;
+            _scanned++;
+            if (_source.Occupied(_at))
+                return true;
         }
         return false;
     }
 
     /// The entry the last `MoveNext` landed on, as a freshly built `Pair`.
-    public Pair<K, V> Current() { return source.PairAt(at); }
+    public Pair<K, V> Current() => _source.PairAt(_at);
 }
 
 // ----------------------------------------------------------------- hash set
@@ -354,36 +399,41 @@ public class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
 /// A set of distinct values, with membership in constant time.
 ///
 /// The same table as `Dictionary`, without the values.
-public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
-    T[] items;
-    bool[] filled;
-    T[] noItem;
-    nuint count;
+public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
+{
+    T[] _items;
+    bool[] _filled;
+    T[] _noItem;
+    nuint _count;
 
     /// An empty set with room for a few items before it first grows.
-    public HashSet() {
-        items = new T[8];
-        filled = new bool[8];
-        noItem = new T[1];
-        count = 0;
+    public HashSet()
+    {
+        _items = new T[8];
+        _filled = new bool[8];
+        _noItem = new T[1];
+        _count = 0;
     }
 
     /// How many distinct items there are. O(1).
-    public nuint Count() { return count; }
+    public nuint Count() => _count;
 
     /// True when there is nothing in it.
-    public bool IsEmpty() { return count == 0; }
+    public bool IsEmpty() => _count == 0;
 
     /// The number of slots the table has. Always a power of two, so the hash
     /// is reduced with a mask rather than a division.
-    public nuint Capacity() { return items.Length; }
+    public nuint Capacity() => _items.Length;
 
-    nuint Probe(T item) {
-        nuint mask = items.Length - 1;
+    nuint Probe(T item)
+    {
+        nuint mask = _items.Length - 1;
         nuint i = item.HashCode() & mask;
 
-        while (filled[i]) {
-            if (items[i].EqualTo(item)) { return i; }
+        while (_filled[i])
+        {
+            if (_items[i].EqualTo(item))
+                return i;
             i = (i + 1) & mask;
         }
         return i;
@@ -391,75 +441,92 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
 
     /// Whether `item` is in the set. One probe, and the question the whole
     /// collection exists to answer.
-    public bool Contains(T item) { return filled[Probe(item)]; }
+    public bool Contains(T item) => _filled[Probe(item)];
 
     /// Adds the item, reporting whether it was new.
-    public bool Add(T item) {
+    public bool Add(T item)
+    {
         nuint i = Probe(item);
-        if (filled[i]) { return false; }
+        if (_filled[i])
+            return false;
 
-        if ((count + 1) * 4 > items.Length * 3) {
+        if ((_count + 1) * 4 > _items.Length * 3)
+        {
             Grow();
             i = Probe(item);
         }
 
-        items[i] = item;
-        filled[i] = true;
-        count++;
+        _items[i] = item;
+        _filled[i] = true;
+        _count++;
         return true;
     }
 
     /// Removes the item, reporting whether it was there.
-    public bool Remove(T item) {
+    public bool Remove(T item)
+    {
         nuint i = Probe(item);
-        if (!filled[i]) { return false; }
+        if (!_filled[i])
+            return false;
 
-        nuint mask = items.Length - 1;
+        nuint mask = _items.Length - 1;
         nuint j = i;
 
-        while (true) {
+        while (true)
+        {
             j = (j + 1) & mask;
-            if (!filled[j]) { break; }
+            if (!_filled[j])
+                break;
 
-            nuint home = items[j].HashCode() & mask;
+            nuint home = _items[j].HashCode() & mask;
             bool settled = i <= j ? i < home && home <= j : i < home || home <= j;
-            if (settled) { continue; }
+            if (settled)
+                continue;
 
-            items[i] = items[j];
+            _items[i] = _items[j];
             i = j;
         }
 
-        items[i] = noItem[0];
-        filled[i] = false;
-        count--;
+        _items[i] = _noItem[0];
+        _filled[i] = false;
+        _count--;
         return true;
     }
 
     /// Drops every item. The arrays are replaced rather than blanked, so
     /// anything they held is released now.
-    public void Clear() {
-        items = new T[8];
-        filled = new bool[8];
-        count = 0;
+    public void Clear()
+    {
+        _items = new T[8];
+        _filled = new bool[8];
+        _count = 0;
     }
 
     /// Adds everything in `other` that is not here already.
-    public void UnionWith(IReadOnlyList<T> other) {
-        for (nuint i = 0; i < other.Count(); i++) { Add(other.At(i)); }
+    public void UnionWith(IReadOnlyList<T> other)
+    {
+        for (nuint i = 0; i < other.Count(); i++)
+            Add(other.At(i));
     }
 
     /// Removes everything in `other`.
-    public void ExceptWith(IReadOnlyList<T> other) {
-        for (nuint i = 0; i < other.Count(); i++) { Remove(other.At(i)); }
+    public void ExceptWith(IReadOnlyList<T> other)
+    {
+        for (nuint i = 0; i < other.Count(); i++)
+            Remove(other.At(i));
     }
 
     /// Keeps only what is also in `other`.
-    public void IntersectWith(HashSet<T> other) {
+    public void IntersectWith(HashSet<T> other)
+    {
         var doomed = new List<T>();
-        for (nuint i = 0; i < filled.Length; i++) {
-            if (filled[i] && !other.Contains(items[i])) { doomed.Add(items[i]); }
+        for (nuint i = 0; i < _filled.Length; i++)
+        {
+            if (_filled[i] && !other.Contains(_items[i]))
+                doomed.Add(_items[i]);
         }
-        for (nuint i = 0; i < doomed.Count(); i++) { Remove(doomed.At(i)); }
+        for (nuint i = 0; i < doomed.Count(); i++)
+            Remove(doomed.At(i));
     }
 
     /// Every item, in the table's own order -- which is not insertion order
@@ -467,40 +534,46 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
     ///
     /// A fresh list, and building it scans every slot: O(capacity), not
     /// O(count). `foreach` walks the set without building one.
-    public List<T> ToList() {
+    public List<T> ToList()
+    {
         var result = new List<T>();
-        for (nuint i = 0; i < filled.Length; i++) {
-            if (filled[i]) { result.Add(items[i]); }
+        for (nuint i = 0; i < _filled.Length; i++)
+        {
+            if (_filled[i])
+                result.Add(_items[i]);
         }
         return result;
     }
 
     /// The two a cursor needs to walk the table: how many slots there are, and
     /// what is in one. A set has no index of its own, so neither is public.
-    nuint SlotCount() { return filled.Length; }
-    bool SlotFilled(nuint slot) { return filled[slot]; }
-    T SlotValue(nuint slot) { return items[slot]; }
+    nuint SlotCount() => _filled.Length;
+    bool SlotFilled(nuint slot) => _filled[slot];
+    T SlotValue(nuint slot) => _items[slot];
 
     /// A cursor over the items, for `foreach`. Allocates nothing beyond the
     /// cursor itself, unlike `ToList`. Adding or removing during a walk
     /// invalidates it.
-    public IEnumerator<T> GetEnumerator() { return new HashSetCursor<T>(this); }
+    public IEnumerator<T> GetEnumerator() => new HashSetCursor<T>(this);
 
-    void Grow() {
-        var oldItems = items;
-        var oldFilled = filled;
+    void Grow()
+    {
+        var oldItems = _items;
+        var oldFilled = _filled;
 
-        items = new T[oldItems.Length * 2];
-        filled = new bool[oldFilled.Length * 2];
-        count = 0;
+        _items = new T[oldItems.Length * 2];
+        _filled = new bool[oldFilled.Length * 2];
+        _count = 0;
 
-        for (nuint i = 0; i < oldFilled.Length; i++) {
-            if (!oldFilled[i]) { continue; }
+        for (nuint i = 0; i < oldFilled.Length; i++)
+        {
+            if (!oldFilled[i])
+                continue;
 
             nuint j = Probe(oldItems[i]);
-            items[j] = oldItems[i];
-            filled[j] = true;
-            count++;
+            _items[j] = oldItems[i];
+            _filled[j] = true;
+            _count++;
         }
     }
 }
@@ -510,29 +583,34 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable {
 /// The same shape as `DictionaryEnumerator`, and for the same reason: the
 /// materialising version built a whole `List<T>` before the first `MoveNext`,
 /// so iterating a set allocated as much again as the set held.
-public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashable {
-    HashSet<T> source;
-    nuint at;
-    nuint scanned;
+public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashable
+{
+    HashSet<T> _source;
+    nuint _at;
+    nuint _scanned;
 
     /// A cursor over `set`, positioned before the first item. The set is held
     /// by reference and must not be written to while the cursor is live.
-    public HashSetCursor(HashSet<T> set) {
-        source = set;
-        at = 0;
-        scanned = 0;
+    public HashSetCursor(HashSet<T> set)
+    {
+        _source = set;
+        _at = 0;
+        _scanned = 0;
     }
 
     /// Advances to the next occupied slot, answering false at the end.
-    public bool MoveNext() {
-        while (scanned < source.SlotCount()) {
-            at = scanned;
-            scanned++;
-            if (source.SlotFilled(at)) { return true; }
+    public bool MoveNext()
+    {
+        while (_scanned < _source.SlotCount())
+        {
+            _at = _scanned;
+            _scanned++;
+            if (_source.SlotFilled(_at))
+                return true;
         }
         return false;
     }
 
     /// The item the last `MoveNext` landed on.
-    public T Current() { return source.SlotValue(at); }
+    public T Current() => _source.SlotValue(_at);
 }

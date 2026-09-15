@@ -147,7 +147,8 @@ public const guint GDK_KEY_space     = 0x020u;
 
 // ============================================================== the accessors
 
-public extern "C" {
+public extern "C"
+{
     /// The pointer position in the event's own window. False if the event
     /// carries no position, which every key event is.
     gboolean gdk_event_get_coords(GdkEvent* event, gdouble* x, gdouble* y);
@@ -173,7 +174,8 @@ public extern "C" {
 // ============================================================== reading events
 
 
-public extern "C" {
+public extern "C"
+{
     /// GTK 3.2 and later, which is every GTK 3 worth running.
     gint     gdk_event_get_event_type(GdkEvent* event);
     gboolean gdk_event_get_button(GdkEvent* event, guint* button);
@@ -190,7 +192,8 @@ public extern "C" {
 /// every struct in the union by construction. Going through the accessor
 /// rather than doing that read keeps the binding honest if GDK ever changes
 /// its mind about the layout.
-public gint EventType(GdkEvent* event) {
+public gint EventType(GdkEvent* event)
+{
         return gdk_event_get_event_type(event);
 }
 
@@ -198,7 +201,8 @@ public gint EventType(GdkEvent* event) {
 
 /// `GdkRectangle`, which is public in the header and is four `int`s. What a
 /// monitor's geometry and work area are reported in.
-public struct GdkRectangle {
+public struct GdkRectangle
+{
     public gint X;
     public gint Y;
     public gint Width;
@@ -207,7 +211,8 @@ public struct GdkRectangle {
 
 /// `GdkRGBA`: four components from 0.0 to 1.0, the way cairo wants them
 /// rather than the way a byte-per-channel colour is written.
-public struct GdkRGBA {
+public struct GdkRGBA
+{
     public gdouble Red;
     public gdouble Green;
     public gdouble Blue;
@@ -216,7 +221,8 @@ public struct GdkRGBA {
 
 // ================================================================== windows
 
-public extern "C" {
+public extern "C"
+{
     void gdk_window_set_cursor(GdkWindow* window, gpointer cursor);
     void gdk_window_get_origin(GdkWindow* window, gint* x, gint* y);
 }
@@ -227,7 +233,8 @@ public extern "C" {
 
 // ================================================================== cursors
 
-public extern "C" {
+public extern "C"
+{
     /// A cursor by CSS name -- `"default"`, `"text"`, `"pointer"`, `"wait"`,
     /// `"crosshair"`, `"ew-resize"`, `"ns-resize"`, `"move"`, `"not-allowed"`.
     ///
@@ -240,7 +247,8 @@ public extern "C" {
 
 // ================================================================= monitors
 
-public extern "C" {
+public extern "C"
+{
     /// **Borrowed.** Null on a display with no monitor the compositor calls
     /// primary, which is why the backend falls back to monitor 0.
     gpointer gdk_display_get_primary_monitor(gpointer display);
@@ -262,7 +270,8 @@ public extern "C" {
 /// wrong on one.
 public using GdkPixbuf = byte;
 
-public extern "C" {
+public extern "C"
+{
     /// Null on failure, with `error` filled in. Reads whatever the installed
     /// loaders read, which on any desktop is at least PNG, JPEG and BMP --
     /// the one place this backend does more than the Win32 one, which has
@@ -299,7 +308,8 @@ public extern "C" {
 /// before the loader is dropped.
 public using GdkPixbufLoader = byte;
 
-public extern "C" {
+public extern "C"
+{
     GdkPixbufLoader* gdk_pixbuf_loader_new();
     gboolean gdk_pixbuf_loader_write(GdkPixbufLoader* loader, byte* bytes,
                                      gsize count, GError** error);

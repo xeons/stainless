@@ -67,7 +67,8 @@ extern "C" void sl_fail(byte* message);
 
 /// The theme colours a backend can be asked for. An enum rather than a string,
 /// so a backend's switch is exhaustive at a glance and a typo does not compile.
-public enum SystemColorId {
+public enum SystemColorId
+{
     Control,
     ControlText,
     ControlDark,
@@ -87,7 +88,8 @@ public enum MouseButton { None, Left, Right, Middle }
 
 /// The modifier keys held when something happened. Bits, so they combine.
 [Flags]
-public enum ModifierKeys {
+public enum ModifierKeys
+{
     None    = 0,
     Shift   = 1,
     Control = 2,
@@ -98,7 +100,8 @@ public enum ModifierKeys {
 /// virtual-key codes because one backend must own the numbering and Windows'
 /// is the one with names for everything; the GTK backend maps `GDK_KEY_*` on to
 /// this on the way in.
-public enum Key {
+public enum Key
+{
     None = 0,
     Backspace = 8, Tab = 9, Enter = 13,
     Shift = 16, Control = 17, Alt = 18,
@@ -127,7 +130,8 @@ public enum Key {
 /// **Coordinates are already client-relative and already scaled.** Turning a
 /// platform's idea of a position into this one is the backend's job, so no
 /// control anywhere contains a coordinate adjustment.
-public interface IControlNotify {
+public interface IControlNotify
+{
     void OnPlatformPaint(Graphics surface);
     void OnPlatformResized(Size extent);
     void OnPlatformMoved(Point position);
@@ -165,7 +169,8 @@ public interface IControlNotify {
 }
 
 /// What a top-level window additionally reports.
-public interface IWindowNotify : IControlNotify {
+public interface IWindowNotify : IControlNotify
+{
     /// The user asked to close it. **True lets it close**, false keeps it open,
     /// which is the one place the platform waits for an answer.
     bool OnPlatformClosing();
@@ -179,7 +184,8 @@ public interface IWindowNotify : IControlNotify {
 /// How a window is framed, which decides both its border and what it does when
 /// dragged. The LCL's `TBorderStyle` plus `TFormBorderStyle`, merged: they
 /// differed only in which values each accepted.
-public enum WindowBorder {
+public enum WindowBorder
+{
     /// No frame at all: a splash screen, a tooltip.
     None,
     /// A caption and a frame that cannot be dragged to resize.
@@ -201,7 +207,8 @@ public enum ControlBorder { None, Single, Sunken }
 /// The shapes every platform has, and no more: a cursor from a file is a
 /// resource story, and the list below is what a layout actually needs -- the
 /// resize shapes are what make a splitter look draggable.
-public enum CursorKind {
+public enum CursorKind
+{
     Default,
     Arrow,
     Hand,
@@ -221,7 +228,8 @@ public enum CursorKind {
 /// asked to give up its platform window and make a new one, which is what
 /// changing a border style costs on Windows. So the release is a method, and
 /// the destructor calls it if nothing else has.
-public interface IControlPeer {
+public interface IControlPeer
+{
     void SetBounds(Rectangle bounds);
     void SetVisible(bool visible);
     void SetEnabled(bool enabled);
@@ -281,7 +289,8 @@ public interface IControlPeer {
 }
 
 /// A container that other controls can be put inside.
-public interface IContainerPeer : IControlPeer {
+public interface IContainerPeer : IControlPeer
+{
     /// Re-parents a child on to this container. Called once, when the child's
     /// peer is made -- a control that changes parent is given a new peer,
     /// because on Win32 re-parenting a window and re-creating it cost the same
@@ -291,7 +300,8 @@ public interface IContainerPeer : IControlPeer {
 }
 
 /// A top-level window.
-public interface IWindowPeer : IContainerPeer {
+public interface IWindowPeer : IContainerPeer
+{
     void SetTitle(String title);
 
     /// Puts an icon in the title bar and wherever else the desktop shows one,
@@ -319,7 +329,8 @@ public interface IWindowPeer : IContainerPeer {
 }
 
 /// A button, a checkbox or a radio button: something that is pressed.
-public interface IButtonPeer : IControlPeer {
+public interface IButtonPeer : IControlPeer
+{
     /// Makes it the one Enter presses. At most one per window, and the platform
     /// is what enforces that, so a control that sets it need not unset the
     /// previous one.
@@ -342,7 +353,8 @@ public enum ImageAlignment { Left, Right, Top, Bottom }
 /// `gtk_button_set_image` does the same to a `GtkCheckButton`'s indicator. So
 /// the capability is declared where both platforms can honour it and nowhere
 /// else, and a check box does not get a method that would quietly ruin it.
-public interface IPushButtonPeer : IButtonPeer {
+public interface IPushButtonPeer : IButtonPeer
+{
     /// The picture, or null for none.
     void SetImage(IBitmapBackend? picture);
     void SetImageAlign(ImageAlignment place);
@@ -360,13 +372,15 @@ public enum CheckKind { Check, Radio, Toggle }
 
 /// A checkbox, a radio button or a toggle button, which additionally carry a
 /// state.
-public interface ICheckPeer : IButtonPeer {
+public interface ICheckPeer : IButtonPeer
+{
     void SetChecked(bool checked);
     bool GetChecked();
 }
 
 /// Anything the user types into.
-public interface ITextEntryPeer : IControlPeer {
+public interface ITextEntryPeer : IControlPeer
+{
     void SetReadOnly(bool readOnly);
     void SetMaxLength(int length);
     /// Hides what is typed. A character rather than a flag, because the
@@ -383,7 +397,8 @@ public interface ITextEntryPeer : IControlPeer {
 }
 
 /// A list of items the user chooses from: a list box or a combo box.
-public interface IListPeer : IControlPeer {
+public interface IListPeer : IControlPeer
+{
     void InsertItem(int index, String text);
     void RemoveItem(int index);
     void ClearItems();
@@ -395,13 +410,15 @@ public interface IListPeer : IControlPeer {
 }
 
 /// A combo box, which is a list with an edit on top.
-public interface IComboPeer : IListPeer {
+public interface IComboPeer : IListPeer
+{
     /// Whether the text can be typed as well as chosen.
     void SetEditable(bool editable);
 }
 
 /// A scroll bar, standing alone rather than attached to a scrolling container.
-public interface IScrollBarPeer : IControlPeer {
+public interface IScrollBarPeer : IControlPeer
+{
     void SetRange(int minimum, int maximum, int pageSize);
     void SetValue(int value);
     int  GetValue();
@@ -411,20 +428,23 @@ public interface IScrollBarPeer : IControlPeer {
 public interface IGroupPeer : IContainerPeer { }
 
 /// A number with arrows beside it.
-public interface ISpinPeer : IControlPeer {
+public interface ISpinPeer : IControlPeer
+{
     void SetRange(int minimum, int maximum);
     void SetValue(int value);
     int  GetValue();
 }
 
 /// A list whose items each have a tick.
-public interface ICheckListPeer : IListPeer {
+public interface ICheckListPeer : IListPeer
+{
     void SetItemChecked(int index, bool checked);
     bool GetItemChecked(int index);
 }
 
 /// A row of draggable column headings, standing alone rather than on a list.
-public interface IHeaderPeer : IControlPeer {
+public interface IHeaderPeer : IControlPeer
+{
     int AddSection(String text, int width);
     void SetSectionWidth(int index, int width);
     int  GetSectionWidth(int index);
@@ -432,7 +452,8 @@ public interface IHeaderPeer : IControlPeer {
 }
 
 /// A panel: a plain container with an optional border.
-public interface IPanelPeer : IContainerPeer {
+public interface IPanelPeer : IContainerPeer
+{
     void SetBorder(ControlBorder border);
 }
 
@@ -447,7 +468,8 @@ public interface IPanelPeer : IContainerPeer {
 ///
 /// A container as well, so that the scroll bars a drawn control needs are
 /// ordinary children of it rather than something the seam has to learn about.
-public interface ICustomPeer : IContainerPeer {
+public interface ICustomPeer : IContainerPeer
+{
     void SetBorder(ControlBorder border);
 
     /// Whether clicking it and tabbing to it give it the keyboard.
@@ -473,7 +495,8 @@ public interface ICustomPeer : IContainerPeer {
 }
 
 /// A label, which is drawn by the platform rather than by the control.
-public interface ILabelPeer : IControlPeer {
+public interface ILabelPeer : IControlPeer
+{
     void SetAlignment(HorizontalAlignment alignment);
     void SetWordWrap(bool wrap);
 }
@@ -486,7 +509,8 @@ public interface ILabelPeer : IControlPeer {
 // compile rather than inheriting an empty override.
 
 /// A picture, loaded once and drawn many times.
-public interface IBitmapBackend {
+public interface IBitmapBackend
+{
     int Width();
     int Height();
     /// The platform's handle -- an `HBITMAP` on Windows.
@@ -498,7 +522,8 @@ public interface IBitmapBackend {
 /// A toolbar, a tree and a list all take their icons from one of these rather
 /// than holding pictures themselves, because that is how every platform does
 /// it: the control stores an index, and the list stores the picture.
-public interface IImageListBackend {
+public interface IImageListBackend
+{
     /// Adds a picture and answers its index.
     int Add(IBitmapBackend picture);
     int Count();
@@ -509,12 +534,14 @@ public interface IImageListBackend {
 // ------------------------------------------------------------------- menus
 
 /// What a menu item tells the program.
-public interface IMenuItemNotify {
+public interface IMenuItemNotify
+{
     void OnPlatformMenuClicked();
 }
 
 /// One item: a command, a separator, or something with a submenu under it.
-public interface IMenuItemPeer {
+public interface IMenuItemPeer
+{
     /// What the platform calls this item.
     ///
     /// On Windows it is the command id `WM_COMMAND` will carry, which is the
@@ -532,7 +559,8 @@ public interface IMenuItemPeer {
 /// A menu: the bar across a window, or one that drops down, or one that pops up
 /// under the pointer. All three are the same thing on every platform, which is
 /// why there is one interface rather than three.
-public interface IMenuPeer {
+public interface IMenuPeer
+{
     /// The platform's handle -- an `HMENU` on Windows -- for reaching a call
     /// this layer does not wrap.
     nuint Handle();
@@ -553,7 +581,8 @@ public interface IMenuPeer {
 /// What kind of thing a toolbar button is.
 public enum ToolButtonKind { Button, Toggle, Separator }
 
-public interface IToolBarPeer : IControlPeer {
+public interface IToolBarPeer : IControlPeer
+{
     /// Adds a button and answers its index. `image` is a position in the
     /// toolbar's image list, or -1 for none.
     int AddButton(String text, int image, ToolButtonKind kind);
@@ -572,7 +601,8 @@ public interface IToolBarPeer : IControlPeer {
     void ResizeToFit();
 }
 
-public interface IStatusBarPeer : IControlPeer {
+public interface IStatusBarPeer : IControlPeer
+{
     /// The right-hand edge of each panel, in pixels from the left; the last may
     /// be -1, meaning "to the end". One call rather than one per panel because
     /// that is the one message Windows has.
@@ -580,7 +610,8 @@ public interface IStatusBarPeer : IControlPeer {
     void SetPanelText(int index, String text);
 }
 
-public interface IProgressPeer : IControlPeer {
+public interface IProgressPeer : IControlPeer
+{
     void SetRange(int minimum, int maximum);
     void SetValue(int value);
     int  GetValue();
@@ -588,7 +619,8 @@ public interface IProgressPeer : IControlPeer {
     void SetIndeterminate(bool indeterminate);
 }
 
-public interface ITrackBarPeer : IControlPeer {
+public interface ITrackBarPeer : IControlPeer
+{
     void SetRange(int minimum, int maximum);
     void SetValue(int value);
     int  GetValue();
@@ -596,7 +628,8 @@ public interface ITrackBarPeer : IControlPeer {
     void SetTickFrequency(int every);
 }
 
-public interface ITabControlPeer : IContainerPeer {
+public interface ITabControlPeer : IContainerPeer
+{
     /// Adds a tab and answers its index.
     int AddTab(String text, int image);
     void RemoveTab(int index);
@@ -613,7 +646,8 @@ public interface ITabControlPeer : IContainerPeer {
 
 /// A place in a tree. Opaque, because a tree is a linked structure and an index
 /// would not survive anything being inserted.
-public interface ITreeNodeHandle {
+public interface ITreeNodeHandle
+{
     /// What the platform calls this node.
     ///
     /// Two handles naming the same node are not necessarily the same object --
@@ -622,7 +656,8 @@ public interface ITreeNodeHandle {
     nuint Id();
 }
 
-public interface ITreeViewPeer : IControlPeer {
+public interface ITreeViewPeer : IControlPeer
+{
     /// Adds a node under `parent` -- null for a root -- after `previous`, or at
     /// the end when that is null too.
     ITreeNodeHandle AddNode(ITreeNodeHandle? parent, ITreeNodeHandle? previous,
@@ -640,7 +675,8 @@ public interface ITreeViewPeer : IControlPeer {
 /// How a list shows what it holds.
 public enum ListViewStyle { Details, List, SmallIcon, LargeIcon }
 
-public interface IListViewPeer : IControlPeer {
+public interface IListViewPeer : IControlPeer
+{
     void SetStyle(ListViewStyle style);
     int  AddColumn(String text, int width, HorizontalAlignment alignment);
     void SetColumnWidth(int column, int width);
@@ -664,12 +700,14 @@ public interface IListViewPeer : IControlPeer {
 // -------------------------------------------------------------------- timer
 
 /// What a timer tells the program.
-public interface ITimerNotify {
+public interface ITimerNotify
+{
     void OnPlatformTick();
 }
 
 /// A platform timer.
-public interface ITimerPeer {
+public interface ITimerPeer
+{
     void Start(int milliseconds);
     void Stop();
 }
@@ -677,12 +715,14 @@ public interface ITimerPeer {
 /// The platform's font, once it has been made. Opaque: only the backend that
 /// made it knows what is inside, and `Font` holds one so the handle is made
 /// once however many controls share the font.
-public interface IFontBackend {
+public interface IFontBackend
+{
     nuint Handle();
 }
 
 /// The platform's drawing surface, behind `Graphics`.
-public interface IGraphicsBackend {
+public interface IGraphicsBackend
+{
     Rectangle ClipBounds();
 
     /// Narrows drawing to `bounds` and moves the origin to its corner, so that
@@ -731,7 +771,8 @@ public enum MessageIcon { None, Information, Warning, Error, Question }
 /// Declared here rather than beside the dialog classes because it is what the
 /// *seam* answers with: a backend reports the outcome and the control layer
 /// passes it on unchanged.
-public enum DialogOutcome {
+public enum DialogOutcome
+{
     /// The user pressed Cancel or closed it.
     Cancelled,
     /// The platform could not show it at all.
@@ -753,7 +794,8 @@ public enum MessageButtons { Ok, OkCancel, YesNo, YesNoCancel, RetryCancel }
 /// Every `Create` takes the notification target the peer will report to, which
 /// is the control itself. That is the whole of the wiring: no registration
 /// pass, no table keyed by class, nothing to forget.
-public interface IWidgetSet {
+public interface IWidgetSet
+{
     /// What this backend is called, for a program that must know -- `"Win32"`,
     /// `"GTK3"`. The only thing anywhere that names a platform as a string.
     String Name { get; }
@@ -886,26 +928,30 @@ public interface IWidgetSet {
 /// by picking the backend compiled in, so a program never touches this; it is
 /// public because a test that wants a recording backend, or a program that
 /// supports two and chooses at run time, has nowhere else to say so.
-public static class WidgetSet {
-    static IWidgetSet? current = null;
+public static class WidgetSet
+{
+    static IWidgetSet? s_current = null;
 
     /// The platform in use.
     ///
     /// Reading it before one is set is a program that built a control before
     /// `Application.Initialize`, and the message says so rather than letting a
     /// null reference happen three calls further on.
-    public static IWidgetSet Current {
-        get {
-            var set = current;
-            if (set == null) {
+    public static IWidgetSet Current
+    {
+        get
+        {
+            var set = s_current;
+            if (set == null)
+            {
                 sl_fail("no widget set: call Application.Initialize before making a control".ToPointer());
             }
             return (IWidgetSet)set;
         }
-        set { current = value; }
+        set => s_current = value;
     }
 
     /// Whether one has been set, for code that must not trigger the failure
     /// above -- a destructor running during shutdown, most of all.
-    public static bool IsReady() { return current != null; }
+    public static bool IsReady() => s_current != null;
 }

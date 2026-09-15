@@ -3,22 +3,26 @@ module Counter;
 
 extern "C" int printf(byte* format, ...);
 
-class Cell {
-    int value;
+class Cell
+{
+    int _value;
 
-    Cell(int start) {
-        value = start;
+    Cell(int start)
+    {
+        _value = start;
     }
 
-    ~Cell() {
-        printf("  ~Cell(%d)\n", value);
+    ~Cell()
+    {
+        printf("  ~Cell(%d)\n", _value);
     }
 
-    public int Get() { return value; }
-    public void Bump() { value += 1; }
+    public int Get() => _value;
+    public void Bump() => _value += 1;
 }
 
-int Main() {
+int Main()
+{
     printf("start\n");
     var a = new Cell(41);
     a.Bump();

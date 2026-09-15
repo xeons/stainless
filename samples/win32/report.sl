@@ -30,17 +30,21 @@ static readonly String Dim = "\x1b[90m";
 static readonly String Bold = "\x1b[1m";
 static readonly String Plain = "\x1b[0m";
 
-void Row(String label, String value) {
+void Row(String label, String value)
+{
     Console.WriteLine("  " + Dim + Pad(label, 14u) + Plain + value);
 }
 
-String Pad(String text, nuint width) {
+String Pad(String text, nuint width)
+{
     String padded = text;
-    while (padded.ByteLength() < width) { padded += " "; }
+    while (padded.ByteLength() < width)
+        padded += " ";
     return padded;
 }
 
-void Heading(String text) {
+void Heading(String text)
+{
     Console.WriteLine("");
     Console.WriteLine(Bold + text + Plain);
 }
@@ -50,9 +54,11 @@ static readonly String CurrentVersion =
 
 /// A string value from HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion,
 /// or a dash.
-String Version(String name) {
+String Version(String name)
+{
     var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
-    switch (opened) {
+    switch (opened)
+    {
         case Fail why: return "-";
         case Ok held:
             var value = Registry.ReadString(held.Value, name);
@@ -65,19 +71,23 @@ String Version(String name) {
 /// the wrong kind is refused rather than reinterpreted, which is why the update
 /// build revision needs its own reader: it is a number, and its neighbours are
 /// strings.
-String VersionNumber(String name) {
+String VersionNumber(String name)
+{
     var opened = Registry.OpenRead(AdvApi32.LocalMachine(), CurrentVersion);
-    switch (opened) {
+    switch (opened)
+    {
         case Fail why: return "-";
         case Ok held:
             var value = Registry.ReadUInt(held.Value, name);
             Registry.Close(held.Value);
-            if (!value.Ok) { return "-"; }
+            if (!value.Ok)
+                return "-";
             return Text.FromInteger((long)value.Value);
     }
 }
 
-int Main() {
+int Main()
+{
     Terminal.EnableAnsi();
 
     Heading("Windows");
@@ -127,15 +137,18 @@ int Main() {
     return 0;
 }
 
-String Megabytes(ulong bytes) {
+String Megabytes(ulong bytes)
+{
     return Text.FromInteger((long)(bytes / 1048576u)) + " MB";
 }
 
 /// The eight console colours, set and put back. This one goes through
 /// SetConsoleTextAttribute rather than through an escape sequence, so it shows
 /// something even on a console where EnableAnsi failed.
-void Swatch() {
-    for (uint i = 0u; i < 8u; i = (uint)(i + 1u)) {
+void Swatch()
+{
+    for (uint i = 0u; i < 8u; i = (uint)(i + 1u))
+    {
         Terminal.SetColour(i | Kernel32.ForegroundIntense);
         Console.Write("##");
     }
@@ -146,9 +159,12 @@ void Swatch() {
 /// The first line with anything on it, so that a multi-line answer fits a row
 /// and a leading blank line -- which `cmd /c ver` produces -- does not read as
 /// an empty answer.
-String Trimmed(String text) {
-    foreach (var line in text.SplitLines()) {
-        if (line.Trim().ByteLength() > 0u) { return line.Trim(); }
+String Trimmed(String text)
+{
+    foreach (var line in text.SplitLines())
+    {
+        if (line.Trim().ByteLength() > 0u)
+            return line.Trim();
     }
     return "";
 }

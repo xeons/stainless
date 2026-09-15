@@ -73,17 +73,20 @@ using FPoint = Forms.Drawing.Point;
 using FSize  = Forms.Drawing.Size;
 using FRect  = Forms.Drawing.Rectangle;
 
-FPoint At(int x, int y)            { return Forms.Drawing.Point.At(x, y); }
-FSize  Extent(int width, int height) { return Forms.Drawing.Size.Of(width, height); }
-FSize  NoSize()                    { return Forms.Drawing.Size.Empty; }
-FRect  Area(int x, int y, int width, int height) {
+FPoint At(int x, int y) => Forms.Drawing.Point.At(x, y);
+FSize  Extent(int width, int height) => Forms.Drawing.Size.Of(width, height);
+FSize  NoSize() => Forms.Drawing.Size.Empty;
+FRect  Area(int x, int y, int width, int height)
+{
     return Forms.Drawing.Rectangle.Of(x, y, width, height);
 }
-FRect  AreaFromEdges(int left, int top, int right, int bottom) {
+FRect  AreaFromEdges(int left, int top, int right, int bottom)
+{
     return Forms.Drawing.Rectangle.FromEdges(left, top, right, bottom);
 }
 
-extern "C" {
+extern "C"
+{
     void sl_fail(byte* message);
 
     /// `SetWindowLongPtrW` in the shape subclassing needs it: taking and
@@ -102,19 +105,22 @@ extern "C" {
 
 /// A `Color` as a COLORREF, which is 0x00BBGGRR -- blue in the high byte,
 /// which is the one thing about GDI colours everyone gets wrong once.
-public uint ToColorRef(Color colour) {
+public uint ToColorRef(Color colour)
+{
     return (uint)colour.R | ((uint)colour.G << 8) | ((uint)colour.B << 16);
 }
 
 /// The other way, dropping alpha because a COLORREF has none.
-public Color FromColorRef(uint raw) {
+public Color FromColorRef(uint raw)
+{
     return Color.FromRgb((byte)(raw & 0xFFu),
                          (byte)((raw >> 8) & 0xFFu),
                          (byte)((raw >> 16) & 0xFFu));
 }
 
 /// A `Rectangle` as a Win32 `RECT`, which is edges rather than an extent.
-public Rect ToRect(FRect bounds) {
+public Rect ToRect(FRect bounds)
+{
     Rect r;
     r.Left = bounds.X;
     r.Top = bounds.Y;
@@ -123,18 +129,23 @@ public Rect ToRect(FRect bounds) {
     return r;
 }
 
-public FRect FromRect(Rect r) {
+public FRect FromRect(Rect r)
+{
     return AreaFromEdges(r.Left, r.Top, r.Right, r.Bottom);
 }
 
 /// Which modifiers are down *now*. Win32 reports them in `WPARAM` for mouse
 /// messages and not at all for key ones, so asking the keyboard directly is the
 /// one answer that is right for both.
-public ModifierKeys CurrentModifiers() {
+public ModifierKeys CurrentModifiers()
+{
     var held = ModifierKeys.None;
-    if (KeyDown(VkShift))   { held = held | ModifierKeys.Shift; }
-    if (KeyDown(VkControl)) { held = held | ModifierKeys.Control; }
-    if (KeyDown(VkMenu))    { held = held | ModifierKeys.Alt; }
+    if (KeyDown(VkShift))
+        held = held | ModifierKeys.Shift;
+    if (KeyDown(VkControl))
+        held = held | ModifierKeys.Control;
+    if (KeyDown(VkMenu))
+        held = held | ModifierKeys.Alt;
     return held;
 }
 
@@ -148,7 +159,8 @@ public ModifierKeys CurrentModifiers() {
 /// Here rather than in `Win32.User32` because that layer is declarations only:
 /// a function with a body there would make the raw bindings need `-l user32`
 /// to link, and their not needing one is a property the tests check.
-public bool TrackMouseLeave(HWND window) {
+public bool TrackMouseLeave(HWND window)
+{
     TrackMouseEvent track;
     track.Size = (uint)sizeof(TrackMouseEvent);
     track.Flags = TmeLeave;
@@ -160,7 +172,7 @@ public bool TrackMouseLeave(HWND window) {
 /// True while a virtual key is held. `GetKeyState`'s high bit, which is the
 /// only bit of it that means "down"; the low bit is the toggle state and is
 /// what makes a naive test read Caps Lock as Shift.
-public bool KeyDown(int key) { return (GetKeyState(key) & 0x8000) != 0; }
+public bool KeyDown(int key) => (GetKeyState(key) & 0x8000) != 0;
 
 // ================================================ attaching a peer to a window
 
@@ -170,11 +182,13 @@ static readonly String PeerProperty = "StainlessFormsPeer";
 
 /// Attaches a peer to its window. The pointer is borrowed, not retained; see
 /// the note at the top of this file.
-void BindPeer(HWND window, ControlPeer peer) {
+void BindPeer(HWND window, ControlPeer peer)
+{
     SetPropW(window, PeerProperty.ToUtf16().ToPointer(), (void*)peer);
 }
 
-void UnbindPeer(HWND window) {
+void UnbindPeer(HWND window)
+{
     RemovePropW(window, PeerProperty.ToUtf16().ToPointer());
     RemovePropW(window, TimerProperty.ToUtf16().ToPointer());
 }
@@ -186,24 +200,31 @@ void UnbindPeer(HWND window) {
 /// cannot go in the same slot.
 static readonly String TimerProperty = "StainlessFormsTimer";
 
-void BindTimer(HWND window, TimerPeer timer) {
+void BindTimer(HWND window, TimerPeer timer)
+{
     SetPropW(window, TimerProperty.ToUtf16().ToPointer(), (void*)timer);
 }
 
-TimerPeer? TimerOf(HWND window) {
-    if (window == null) { return null; }
+TimerPeer? TimerOf(HWND window)
+{
+    if (window == null)
+        return null;
     var raw = GetPropW(window, TimerProperty.ToUtf16().ToPointer());
-    if (raw == null) { return null; }
+    if (raw == null)
+        return null;
     return (TimerPeer)raw;
 }
 
 /// The peer of a window, or null for a window this library did not make --
 /// which every procedure here must allow for, because Windows sends messages
 /// to a window before `CreateWindowExW` has returned the handle to bind.
-ControlPeer? PeerOf(HWND window) {
-    if (window == null) { return null; }
+ControlPeer? PeerOf(HWND window)
+{
+    if (window == null)
+        return null;
     var raw = GetPropW(window, PeerProperty.ToUtf16().ToPointer());
-    if (raw == null) { return null; }
+    if (raw == null)
+        return null;
     return (ControlPeer)raw;
 }
 
@@ -215,13 +236,17 @@ ControlPeer? PeerOf(HWND window) {
 /// function, so its address is a plain C function pointer with no thunk
 /// anywhere; which window it is for is answered by the property, and what to do
 /// is answered by the peer's own `Dispatch`.
-long StainlessProc(HWND window, uint message, ulong wParam, long lParam) {
+long StainlessProc(HWND window, uint message, ulong wParam, long lParam)
+{
     var peer = PeerOf(window);
-    if (peer == null) {
+    if (peer == null)
+    {
         // A timer's window is of this class too, and has no control behind it.
-        if (message == WmTimer) {
+        if (message == WmTimer)
+        {
             var timer = TimerOf(window);
-            if (timer != null) {
+            if (timer != null)
+            {
                 ((TimerPeer)timer).Fire();
                 return 0;
             }
@@ -240,33 +265,35 @@ long StainlessProc(HWND window, uint message, ulong wParam, long lParam) {
 /// owned its control back would make a cycle ARC cannot break, so the window
 /// would outlive the program. Weak costs a check on every notification, which
 /// is what the local-and-test in each handler below is doing.
-public class ControlPeer : IControlPeer {
-    protected HWND            window;
+public class ControlPeer : IControlPeer
+{
+    protected HWND window;
     protected weak IControlNotify? target;
     /// The procedure this peer put itself in front of. For a window class this
     /// library registered there is nothing in front of, and `subclassed` says
     /// which case this is.
-    protected WindowProcedure  displaced;
-    protected bool             subclassed;
+    protected WindowProcedure displaced;
+    protected bool subclassed;
     /// The brush `WM_CTLCOLOR*` answers with, owned and deleted by this peer.
     /// Null until a background colour is set, because until then the system's
     /// own answer is the right one.
-    protected HBRUSH           backBrush;
-    protected Color            backColour;
-    protected Color            foreColour;
-    protected bool             backSet;
-    protected bool             foreSet;
+    protected HBRUSH backBrush;
+    protected Color backColour;
+    protected Color foreColour;
+    protected bool backSet;
+    protected bool foreSet;
     /// Whether a `WM_MOUSELEAVE` has been asked for. Win32 gives one leave per
     /// request, so entering has to ask again each time.
-    protected bool             tracking;
-    protected bool             inside;
-    protected bool             destroyed;
+    protected bool tracking;
+    protected bool inside;
+    protected bool destroyed;
     /// The cursor this control asks for, and which shape it is. Null means the
     /// class cursor, which is what `Default` leaves in place.
-    protected HCURSOR          pointer;
-    protected CursorKind       shape;
+    protected HCURSOR pointer;
+    protected CursorKind shape;
 
-    protected ControlPeer(HWND made, IControlNotify owner, bool subclass) {
+    protected ControlPeer(HWND made, IControlNotify owner, bool subclass)
+    {
         window = made;
         target = owner;
         subclassed = subclass;
@@ -282,9 +309,12 @@ public class ControlPeer : IControlPeer {
         shape = CursorKind.Default;
 
         BindPeer(made, this);
-        if (subclass) {
+        if (subclass)
+        {
             displaced = SetWindowLongPtrW(made, GwlpWindowProc, StainlessProc);
-        } else {
+        }
+        else
+        {
             displaced = StainlessProc;
         }
     }
@@ -294,8 +324,10 @@ public class ControlPeer : IControlPeer {
     /// Hands a message to the procedure this peer displaced: the system
     /// control's own for a subclassed widget, `DefWindowProcW` for a class of
     /// ours.
-    protected long Inherited(uint message, ulong wParam, long lParam) {
-        if (subclassed) {
+    protected long Inherited(uint message, ulong wParam, long lParam)
+    {
+        if (subclassed)
+        {
             return CallWindowProcW(displaced, window, message, wParam, lParam);
         }
         return DefWindowProcW(window, message, wParam, lParam);
@@ -303,7 +335,8 @@ public class ControlPeer : IControlPeer {
 
     /// The control this peer reports to, or null if it has been destroyed --
     /// which a message arriving during teardown genuinely can see.
-    protected IControlNotify? Owner() {
+    protected IControlNotify? Owner()
+    {
         IControlNotify? held = target;
         return held;
     }
@@ -316,10 +349,12 @@ public class ControlPeer : IControlPeer {
     /// box's selection -- adds them and calls `base` for the rest. Everything
     /// here is common to every window: the mouse, the keyboard, focus, paint
     /// and colour.
-    public virtual long Dispatch(uint message, ulong wParam, long lParam) {
+    public virtual long Dispatch(uint message, ulong wParam, long lParam)
+    {
         IControlNotify? owner = target;
 
-        if (message == WmNcDestroy) {
+        if (message == WmNcDestroy)
+        {
             // The last message a window ever gets, and the only safe place to
             // let go of the binding: messages can still arrive before it.
             UnbindPeer(window);
@@ -327,7 +362,8 @@ public class ControlPeer : IControlPeer {
             return Inherited(message, wParam, lParam);
         }
 
-        if (owner == null) { return Inherited(message, wParam, lParam); }
+        if (owner == null)
+            return Inherited(message, wParam, lParam);
         var control = (IControlNotify)owner;
 
         // **Erase, rather than claiming to have.** A window of a class this
@@ -355,11 +391,14 @@ public class ControlPeer : IControlPeer {
         // The clip box rather than a client rectangle, because the DC's origin
         // is the child's choice and the clip box is already in whatever
         // coordinates it set.
-        if (message == WmEraseBackground) {
+        if (message == WmEraseBackground)
+        {
             HDC dc = (HDC)(void*)(nuint)wParam;
-            if (dc != null && WindowFromDC(dc) != window) {
+            if (dc != null && WindowFromDC(dc) != window)
+            {
                 Rect asked;
-                if (GetClipBox(dc, &asked) != 0) {
+                if (GetClipBox(dc, &asked) != 0)
+                {
                     FillRect(dc, &asked, BackgroundBrush());
                 }
                 return 1;
@@ -379,7 +418,8 @@ public class ControlPeer : IControlPeer {
         //
         // The form carries `WS_CLIPCHILDREN`, so this paints only the parts no
         // child covers, which is what keeps a resize from flickering.
-        if (message == WmEraseBackground && ErasesBackground()) {
+        if (message == WmEraseBackground && ErasesBackground())
+        {
             HDC dc = (HDC)(void*)(nuint)wParam;
             Rect client;
             GetClientRect(window, &client);
@@ -396,58 +436,71 @@ public class ControlPeer : IControlPeer {
         // Windows asks what the pointer should look like on every move, and
         // takes the answer from the window class unless something says
         // otherwise. Saying otherwise is the whole of a per-control cursor.
-        if (message == WmSetCursor) {
-            if (pointer != null && (lParam & 0xFFFF) == HtClient) {
+        if (message == WmSetCursor)
+        {
+            if (pointer != null && (lParam & 0xFFFF) == HtClient)
+            {
                 Win32.User32.SetCursor(pointer);
                 return 1;
             }
         }
 
-        if (message == WmMouseMove) {
-            if (!inside) {
+        if (message == WmMouseMove)
+        {
+            if (!inside)
+            {
                 inside = true;
                 control.OnPlatformMouseEnter();
             }
-            if (!tracking) {
+            if (!tracking)
+            {
                 tracking = TrackMouseLeave(window);
             }
             control.OnPlatformMouseMove(PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
 
-        if (message == WmMouseLeave) {
+        if (message == WmMouseLeave)
+        {
             tracking = false;
             inside = false;
             control.OnPlatformMouseLeave();
             return Inherited(message, wParam, lParam);
         }
 
-        if (message == WmLeftButtonDown) {
+        if (message == WmLeftButtonDown)
+        {
             control.OnPlatformMouseDown(MouseButton.Left, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmLeftButtonUp) {
+        if (message == WmLeftButtonUp)
+        {
             control.OnPlatformMouseUp(MouseButton.Left, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmRightButtonDown) {
+        if (message == WmRightButtonDown)
+        {
             control.OnPlatformMouseDown(MouseButton.Right, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmRightButtonUp) {
+        if (message == WmRightButtonUp)
+        {
             control.OnPlatformMouseUp(MouseButton.Right, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmMiddleButtonDown) {
+        if (message == WmMiddleButtonDown)
+        {
             control.OnPlatformMouseDown(MouseButton.Middle, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmMiddleButtonUp) {
+        if (message == WmMiddleButtonUp)
+        {
             control.OnPlatformMouseUp(MouseButton.Middle, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
 
-        if (message == WmMouseWheel) {
+        if (message == WmMouseWheel)
+        {
             // The wheel's position is in *screen* coordinates, unlike every
             // other mouse message, so it has to be brought back.
             int notches = (int)(short)((wParam >> 16) & 0xFFFFu);
@@ -461,21 +514,32 @@ public class ControlPeer : IControlPeer {
             return Inherited(message, wParam, lParam);
         }
 
-        if (message == WmKeyDown || message == WmSysKeyDown) {
+        if (message == WmKeyDown || message == WmSysKeyDown)
+        {
             control.OnPlatformKeyDown((Key)(int)wParam, CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmKeyUp || message == WmSysKeyUp) {
+        if (message == WmKeyUp || message == WmSysKeyUp)
+        {
             control.OnPlatformKeyUp((Key)(int)wParam, CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
-        if (message == WmChar) {
+        if (message == WmChar)
+        {
             control.OnPlatformKeyPress((char)(uint)wParam);
             return Inherited(message, wParam, lParam);
         }
 
-        if (message == WmSetFocus)  { control.OnPlatformGotFocus();  return Inherited(message, wParam, lParam); }
-        if (message == WmKillFocus) { control.OnPlatformLostFocus(); return Inherited(message, wParam, lParam); }
+        if (message == WmSetFocus)
+        {
+            control.OnPlatformGotFocus();
+            return Inherited(message, wParam, lParam);
+        }
+        if (message == WmKillFocus)
+        {
+            control.OnPlatformLostFocus();
+            return Inherited(message, wParam, lParam);
+        }
 
         // **Not the sizes these messages carry.** `WM_SIZE` reports the new
         // *client* extent and `WM_MOVE` the client origin, but a control's
@@ -485,12 +549,14 @@ public class ControlPeer : IControlPeer {
         // resize shrink a bordered control by 4 and shift it by 2, compounding
         // once per resize, while a borderless one next to it stayed put. So the
         // rectangle is asked for rather than taken from the message.
-        if (message == WmSize) {
+        if (message == WmSize)
+        {
             control.OnPlatformResized(BoundsInParent().Extent);
             return Inherited(message, wParam, lParam);
         }
 
-        if (message == WmMove) {
+        if (message == WmMove)
+        {
             control.OnPlatformMoved(BoundsInParent().Location);
             return Inherited(message, wParam, lParam);
         }
@@ -500,11 +566,14 @@ public class ControlPeer : IControlPeer {
         // structure it really is. Routed the same way as `WM_COMMAND` -- to the
         // peer of the window that sent it, which is the only thing that knows
         // what its own codes mean.
-        if (message == WmNotify) {
+        if (message == WmNotify)
+        {
             NotifyHeader* header = (NotifyHeader*)(void*)(nuint)lParam;
             var sender = PeerOf(header->From);
-            if (sender != null) {
-                if (((ControlPeer)sender).NotifiedBy(header->Code, (void*)header)) {
+            if (sender != null)
+            {
+                if (((ControlPeer)sender).NotifiedBy(header->Code, (void*)header))
+                {
                     return 0;
                 }
             }
@@ -515,12 +584,15 @@ public class ControlPeer : IControlPeer {
         // this way -- to the *parent*, not the control -- so every container
         // routes it back down to the peer it names, and each peer says what
         // that notification code means to it.
-        if (message == WmCommand) {
+        if (message == WmCommand)
+        {
             var child = PeerOf((HWND)(void*)(nuint)lParam);
-            if (child != null) {
+            if (child != null)
+            {
                 uint code = (uint)((wParam >> 16) & 0xFFFFu);
                 int commandId = (int)(wParam & 0xFFFFu);
-                if (((ControlPeer)child).Notified(code, commandId)) { return 0; }
+                if (((ControlPeer)child).Notified(code, commandId))
+                    return 0;
             }
         }
 
@@ -528,9 +600,11 @@ public class ControlPeer : IControlPeer {
         // peer's own brush is how a coloured background reaches a system
         // control, which has no other way to be told.
         if (message == WmCtlColorStatic || message == WmCtlColorEdit
-            || message == WmCtlColorButton || message == WmCtlColorListBox) {
+            || message == WmCtlColorButton || message == WmCtlColorListBox)
+        {
             var child = PeerOf((HWND)(void*)(nuint)lParam);
-            if (child != null) {
+            if (child != null)
+            {
                 var painted = (ControlPeer)child;
                 return painted.AnswerColour((HDC)(void*)(nuint)wParam);
             }
@@ -551,14 +625,17 @@ public class ControlPeer : IControlPeer {
     /// `GetDC` after the inherited paint rather than `BeginPaint` instead of
     /// it: a `STATIC` and a `BUTTON` draw their own background and frame, and
     /// taking the paint away from them would cost both.
-    protected long PaintOver(uint message, ulong wParam, long lParam) {
+    protected long PaintOver(uint message, ulong wParam, long lParam)
+    {
         long answer = Inherited(message, wParam, lParam);
 
         var owner = Owner();
-        if (owner == null) { return answer; }
+        if (owner == null)
+            return answer;
 
         HDC dc = GetDC(window);
-        if (dc == null) { return answer; }
+        if (dc == null)
+            return answer;
         Rect client;
         GetClientRect(window, &client);
         var surface = new GraphicsBackend(dc, FromRect(client));
@@ -576,19 +653,21 @@ public class ControlPeer : IControlPeer {
     ///
     /// The exception is a widget that paints part of itself and leaves the
     /// rest to its parent; see `GroupPeer`.
-    protected virtual bool ErasesBackground() { return !subclassed; }
+    protected virtual bool ErasesBackground() => !subclassed;
 
     /// Where this control is, in the coordinates its `Bounds` are expressed in:
     /// the parent's client area for a child, and the screen for a top-level
     /// window -- which is what `Form.Location` means, as it does in C#.
-    protected FRect BoundsInParent() {
+    protected FRect BoundsInParent()
+    {
         Rect frame;
         GetWindowRect(window, &frame);
         int width = frame.Right - frame.Left;
         int height = frame.Bottom - frame.Top;
 
         HWND parent = GetParent(window);
-        if (parent == null) { return Area(frame.Left, frame.Top, width, height); }
+        if (parent == null)
+            return Area(frame.Left, frame.Top, width, height);
 
         Win32.User32.Point corner;
         corner.X = frame.Left;
@@ -602,8 +681,10 @@ public class ControlPeer : IControlPeer {
     /// `backBrush` is made by `SetBackColor`, which every control gets during
     /// `AttachPeer`; the system brush is the fallback for the window that is
     /// asked to erase before that has happened, which a form is.
-    protected HBRUSH BackgroundBrush() {
-        if (backBrush != null) { return backBrush; }
+    protected HBRUSH BackgroundBrush()
+    {
+        if (backBrush != null)
+            return backBrush;
         return GetSysColorBrush(ColorBtnFace);
     }
 
@@ -615,7 +696,7 @@ public class ControlPeer : IControlPeer {
     /// peer for a given control knows which numbering it is in.
     /// `id` is the low word: which control, or -- for a toolbar, whose buttons
     /// all report through the one window -- which button.
-    protected virtual bool Notified(uint code, int id) { return false; }
+    protected virtual bool Notified(uint code, int id) => false;
 
     /// What one of this control's `WM_NOTIFY` codes means.
     ///
@@ -623,13 +704,16 @@ public class ControlPeer : IControlPeer {
     /// with an `NotifyHeader` and continues with whatever that code implies --
     /// so a peer casts it to the longer type only once it has recognised the
     /// code, which is the whole of the convention.
-    protected virtual bool NotifiedBy(int code, void* raw) { return false; }
+    protected virtual bool NotifiedBy(int code, void* raw) => false;
 
     /// What this control wants to be drawn in, as `WM_CTLCOLOR*` wants it: the
     /// device context set up, and a brush returned for the background.
-    long AnswerColour(HDC dc) {
-        if (foreSet) { SetTextColor(dc, ToColorRef(foreColour)); }
-        if (!backSet) { return 0; }
+    long AnswerColour(HDC dc)
+    {
+        if (foreSet)
+            SetTextColor(dc, ToColorRef(foreColour));
+        if (!backSet)
+            return 0;
         SetBkColor(dc, ToColorRef(backColour));
         return (long)(nuint)(void*)backBrush;
     }
@@ -637,7 +721,8 @@ public class ControlPeer : IControlPeer {
     /// The client coordinates packed into an `LPARAM`, both signed -- a drag
     /// can leave a window to the left, and an unsigned read makes that a very
     /// large positive number.
-    protected FPoint PointOfParam(long lParam) {
+    protected FPoint PointOfParam(long lParam)
+    {
         return At((int)(short)(lParam & 0xFFFF), (int)(short)((lParam >> 16) & 0xFFFF));
     }
 
@@ -645,81 +730,109 @@ public class ControlPeer : IControlPeer {
 
     /// Virtual because a peer may be more than one window: a spin control is an
     /// edit with an up-down docked inside it, and both have to move together.
-    public virtual void SetBounds(FRect bounds) {
+    public virtual void SetBounds(FRect bounds)
+    {
         MoveWindow(window, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
     }
 
-    public virtual void SetVisible(bool visible) {
+    public virtual void SetVisible(bool visible)
+    {
         ShowWindow(window, visible ? SwShowNoActivate : SwHide);
     }
 
-    public void SetEnabled(bool enabled) { EnableWindow(window, enabled ? 1 : 0); }
+    public void SetEnabled(bool enabled) => EnableWindow(window, enabled ? 1 : 0);
 
-    public void SetText(String text) {
+    public void SetText(String text)
+    {
         SetWindowTextW(window, text.ToUtf16().ToPointer());
     }
 
-    public String GetText() {
+    public String GetText()
+    {
         int units = GetWindowTextLengthW(window);
-        if (units <= 0) { return ""; }
+        if (units <= 0)
+            return "";
         var buffer = new char16[(nuint)units + 1u];
         int got = GetWindowTextW(window, &buffer[0u], units + 1);
-        if (got <= 0) { return ""; }
+        if (got <= 0)
+            return "";
         return Text.FromUtf16(&buffer[0u], (nuint)got);
     }
 
-    public void SetFont(Font font) {
+    public void SetFont(Font font)
+    {
         // `WM_SETFONT` does not take ownership, so the `Font` object must
         // outlive the control -- which it does, because the control holds it.
         SendMessageW(window, WmSetFont, (ulong)font.Resource().Handle(), 1);
     }
 
-    public void SetForeColor(Color colour) {
+    public void SetForeColor(Color colour)
+    {
         foreColour = colour;
         foreSet = true;
         Invalidate();
     }
 
-    public void SetBackColor(Color colour) {
+    public void SetBackColor(Color colour)
+    {
         backColour = colour;
         backSet = true;
-        if (backBrush != null) { DeleteObject((HGDIOBJ)(void*)backBrush); }
+        if (backBrush != null)
+            DeleteObject((HGDIOBJ)(void*)backBrush);
         backBrush = CreateSolidBrush(ToColorRef(colour));
         Invalidate();
     }
 
-    public void Invalidate() { InvalidateRect(window, null, 1); }
-    public void Update()     { UpdateWindow(window); }
+    public void Invalidate() => InvalidateRect(window, null, 1);
+    public void Update() => UpdateWindow(window);
 
-    public void Focus()      { SetFocus(window); }
-    public bool HasFocus()   { return GetFocus() == window; }
+    public void Focus() => SetFocus(window);
+    public bool HasFocus() => GetFocus() == window;
 
-    public void SetCursor(CursorKind wanted) {
+    public void SetCursor(CursorKind wanted)
+    {
         pointer = CursorFor(wanted);
         shape = wanted;
         // Windows asks again on the next move, so there is nothing to redraw.
     }
 
-    public void SetCapture(bool captured) {
-        if (captured) { Win32.User32.SetCapture(window); }
-        else          { ReleaseCapture(); }
+    public void SetCapture(bool captured)
+    {
+        if (captured)
+        {
+            Win32.User32.SetCapture(window);
+        }
+        else
+        {
+            ReleaseCapture();
+        }
     }
 
     /// The system cursor for one of the shapes, loaded from the shared set --
     /// which is why none of these is ever destroyed.
-    HCURSOR CursorFor(CursorKind wanted) {
-        if (wanted == CursorKind.Hand)           { return LoadCursorW(null, CursorHand()); }
-        if (wanted == CursorKind.Text)           { return LoadCursorW(null, CursorIBeam()); }
-        if (wanted == CursorKind.Wait)           { return LoadCursorW(null, CursorWait()); }
-        if (wanted == CursorKind.Cross)          { return LoadCursorW(null, CursorCross()); }
-        if (wanted == CursorKind.SizeWestEast)   { return LoadCursorW(null, CursorSizeWE()); }
-        if (wanted == CursorKind.SizeNorthSouth) { return LoadCursorW(null, CursorSizeNS()); }
-        if (wanted == CursorKind.SizeAll)        { return LoadCursorW(null, CursorSizeAll()); }
-        if (wanted == CursorKind.No)             { return LoadCursorW(null, CursorNo()); }
+    HCURSOR CursorFor(CursorKind wanted)
+    {
+        if (wanted == CursorKind.Hand)
+            return LoadCursorW(null, CursorHand());
+        if (wanted == CursorKind.Text)
+            return LoadCursorW(null, CursorIBeam());
+        if (wanted == CursorKind.Wait)
+            return LoadCursorW(null, CursorWait());
+        if (wanted == CursorKind.Cross)
+            return LoadCursorW(null, CursorCross());
+        if (wanted == CursorKind.SizeWestEast)
+            return LoadCursorW(null, CursorSizeWE());
+        if (wanted == CursorKind.SizeNorthSouth)
+            return LoadCursorW(null, CursorSizeNS());
+        if (wanted == CursorKind.SizeAll)
+            return LoadCursorW(null, CursorSizeAll());
+        if (wanted == CursorKind.No)
+            return LoadCursorW(null, CursorNo());
         return LoadCursorW(null, CursorArrow());
     }
 
-    public virtual FRect ClientBounds() {
+    public virtual FRect ClientBounds()
+    {
         Rect r;
         GetClientRect(window, &r);
         // `GetClientRect` already answers at the origin; saying so explicitly
@@ -730,23 +843,27 @@ public class ControlPeer : IControlPeer {
     /// Zero, because a child window's position is already measured from its
     /// parent's client origin. Only a widget whose own frame eats into that
     /// space overrides this.
-    public virtual FPoint ClientOrigin() { return At(0, 0); }
+    public virtual FPoint ClientOrigin() => At(0, 0);
 
     /// What Windows thinks this control should be. The base has no opinion --
     /// only a control that can measure its own content does, and each of those
     /// overrides this.
-    public virtual FSize PreferredSize() { return NoSize(); }
+    public virtual FSize PreferredSize() => NoSize();
 
-    public nuint Handle() { return (nuint)(void*)window; }
+    public nuint Handle() => (nuint)(void*)window;
 
-    public void Destroy() {
-        if (destroyed) { return; }
+    public void Destroy()
+    {
+        if (destroyed)
+            return;
         destroyed = true;
-        if (backBrush != null) {
+        if (backBrush != null)
+        {
             DeleteObject((HGDIOBJ)(void*)backBrush);
             backBrush = null;
         }
-        if (window != null) {
+        if (window != null)
+        {
             UnbindPeer(window);
             DestroyWindow(window);
             window = null;
@@ -755,7 +872,7 @@ public class ControlPeer : IControlPeer {
 
     /// The window, for a peer that needs it and for the widget set that makes
     /// children inside it.
-    public HWND Window() { return window; }
+    public HWND Window() => window;
 }
 
 #endif

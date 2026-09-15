@@ -5,7 +5,8 @@ import Geometry;
 
 extern "C" int printf(byte* format, ...);
 
-int Main() {
+int Main()
+{
     Vec2 a;
     a.X = 3.0;
     a.Y = 4.0;
@@ -21,7 +22,8 @@ int Main() {
 }
 
 // Declared after Main, used by Main. No forward declaration, no header.
-double Total() {
+double Total()
+{
     var acc = new Accumulator();
     acc.Add(1.5);
     acc.Add(2.5);

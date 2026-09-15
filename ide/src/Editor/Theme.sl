@@ -24,7 +24,8 @@ import Forms.Drawing;
 import Ide.Lang;
 
 /// The colours a code editor draws with.
-public class Theme {
+public class Theme
+{
     public Color Background;
     public Color Text;
     public Color Comment;
@@ -58,7 +59,8 @@ public class Theme {
     /// stay close to the body text. Comments are the one deliberate exception:
     /// green and low-contrast, so that prose beside code reads as an aside
     /// rather than competing with it.
-    public static Theme Light() {
+    public static Theme Light()
+    {
         var theme = new Theme();
         theme.Background    = Color.FromRgb(255, 255, 255);
         theme.Text          = Color.FromRgb( 24,  24,  28);
@@ -83,7 +85,8 @@ public class Theme {
     }
 
     /// The dark theme.
-    public static Theme Dark() {
+    public static Theme Dark()
+    {
         var theme = new Theme();
         theme.Background    = Color.FromRgb( 30,  30,  34);
         theme.Text          = Color.FromRgb(220, 220, 226);
@@ -108,20 +111,34 @@ public class Theme {
     }
 
     /// What a token of this kind is drawn in.
-    public Color ColorFor(TokenKind kind) {
-        if (kind == TokenKind.Comment)           { return Comment; }
-        if (kind == TokenKind.BlockComment)      { return Comment; }
-        if (kind == TokenKind.DocComment)        { return DocComment; }
-        if (kind == TokenKind.Keyword)           { return Keyword; }
-        if (kind == TokenKind.ContextualKeyword) { return Keyword; }
-        if (kind == TokenKind.TypeName)          { return TypeName; }
-        if (kind == TokenKind.Number)            { return Number; }
-        if (kind == TokenKind.Text)              { return Literal; }
-        if (kind == TokenKind.Character)         { return Literal; }
-        if (kind == TokenKind.Directive)         { return Directive; }
-        if (kind == TokenKind.Attribute)         { return TypeName; }
-        if (kind == TokenKind.Operator)          { return Operator; }
-        if (kind == TokenKind.Bracket)           { return Operator; }
+    public Color ColorFor(TokenKind kind)
+    {
+        if (kind == TokenKind.Comment)
+            return Comment;
+        if (kind == TokenKind.BlockComment)
+            return Comment;
+        if (kind == TokenKind.DocComment)
+            return DocComment;
+        if (kind == TokenKind.Keyword)
+            return Keyword;
+        if (kind == TokenKind.ContextualKeyword)
+            return Keyword;
+        if (kind == TokenKind.TypeName)
+            return TypeName;
+        if (kind == TokenKind.Number)
+            return Number;
+        if (kind == TokenKind.Text)
+            return Literal;
+        if (kind == TokenKind.Character)
+            return Literal;
+        if (kind == TokenKind.Directive)
+            return Directive;
+        if (kind == TokenKind.Attribute)
+            return TypeName;
+        if (kind == TokenKind.Operator)
+            return Operator;
+        if (kind == TokenKind.Bracket)
+            return Operator;
         return Text;
     }
 }

@@ -42,33 +42,39 @@ import Forms.Platform;
 /// holding pictures of their own -- the control stores an index and the list
 /// stores the picture, which is how every platform arranges it and why one
 /// image list can dress several controls.
-public class ImageList {
-    IImageListBackend backend;
-    List<Bitmap> kept;
+public class ImageList
+{
+    IImageListBackend _backend;
+    List<Bitmap> _kept;
 
-    public ImageList(int width, int height) {
-        backend = WidgetSet.Current.CreateImageList(Size.Of(width, height));
-        kept = new List<Bitmap>();
+    public ImageList(int width, int height)
+    {
+        _backend = WidgetSet.Current.CreateImageList(Size.Of(width, height));
+        _kept = new List<Bitmap>();
     }
 
     /// 16x16, which is what a toolbar and a tree use.
-    public ImageList() { this(16, 16); }
+    public ImageList() => this(16, 16);
 
     /// Adds a picture and answers its index, or -1 if the platform refused it.
     ///
     /// The `Bitmap` is kept, because the platform copied the pixels but the
     /// caller has no reason to expect that and every reason to drop the object.
-    public int Add(Bitmap picture) {
-        int at = backend.Add(picture.Backend());
-        if (at >= 0) { kept.Add(picture); }
+    public int Add(Bitmap picture)
+    {
+        int at = _backend.Add(picture.Backend());
+        if (at >= 0)
+            _kept.Add(picture);
         return at;
     }
 
     /// Loads a picture and adds it. The error names the file rather than
     /// answering -1, because a missing icon is a mistake worth reading about.
-    public Result<int, String> AddFile(String path) {
+    public Result<int, String> AddFile(String path)
+    {
         var loaded = Bitmap.FromFile(path);
-        if (!loaded.Ok) { return Fail(loaded.Error); }
+        if (!loaded.Ok)
+            return Fail(loaded.Error);
         return Ok(Add(loaded.Value));
     }
 
@@ -79,17 +85,19 @@ public class ImageList {
     /// program rather than part of its data: nothing to install beside the
     /// executable and nothing to find at startup. Windows only -- see
     /// `Bitmap.FromResource`, whose error this passes on.
-    public Result<int, String> AddResource(int id) {
+    public Result<int, String> AddResource(int id)
+    {
         var loaded = Bitmap.FromResource(id);
-        if (!loaded.Ok) { return Fail(loaded.Error); }
+        if (!loaded.Ok)
+            return Fail(loaded.Error);
         return Ok(Add(loaded.Value));
     }
 
-    public int Count => backend.Count();
-    public Size ImageSize => backend.ImageSize();
+    public int Count => _backend.Count();
+    public Size ImageSize => _backend.ImageSize();
 
     /// The platform's list, for the controls that take one.
-    public IImageListBackend Backend() { return backend; }
+    public IImageListBackend Backend() => _backend;
 }
 
 // =================================================================== toolbar
@@ -101,42 +109,52 @@ public class ImageList {
 /// button an object the platform knows nothing about -- a Windows toolbar owns
 /// its buttons and lays them out itself. This is a handle on one of those: an
 /// index, a caption and a `Click`.
-public class ToolButton {
+public class ToolButton
+{
     weak ToolBar? bar;
-    int index;
+    int _index;
 
-    bool held;
+    bool _held;
 
-    public ToolButton(ToolBar owner, int at) {
+    public ToolButton(ToolBar owner, int at)
+    {
         bar = owner;
-        index = at;
-        held = true;
+        _index = at;
+        _held = true;
     }
 
     /// Where it sits on the bar, counting separators.
-    public int Index => index;
+    public int Index => _index;
 
-    public bool Enabled {
-        get => held;
-        set {
-            held = value;
+    public bool Enabled
+    {
+        get => _held;
+        set
+        {
+            _held = value;
             // A weak reference is never narrowed, so it goes into a strong
             // local first.
             ToolBar? owner = bar;
-            if (owner != null) { ((ToolBar)owner).SetEnabled(index, value); }
+            if (owner != null)
+                ((ToolBar)owner).SetEnabled(_index, value);
         }
     }
 
     /// Whether a toggle button is pressed in. Meaningless on a plain one.
-    public bool Checked {
-        get {
+    public bool Checked
+    {
+        get
+        {
             ToolBar? owner = bar;
-            if (owner == null) { return false; }
-            return ((ToolBar)owner).GetChecked(index);
+            if (owner == null)
+                return false;
+            return ((ToolBar)owner).GetChecked(_index);
         }
-        set {
+        set
+        {
             ToolBar? owner = bar;
-            if (owner != null) { ((ToolBar)owner).SetChecked(index, value); }
+            if (owner != null)
+                ((ToolBar)owner).SetChecked(_index, value);
         }
     }
 
@@ -144,212 +162,249 @@ public class ToolButton {
     public event EventHandler Click;
 
     /// Raised by the bar, which is what the platform reports to.
-    public void Raise(Control sender) { Click(sender); }
+    public void Raise(Control sender) => Click(sender);
 
     /// What the platform calls this button, on the same terms as
     /// `MenuItem.PlatformId`.
-    public nuint PlatformId {
-        get {
+    public nuint PlatformId
+    {
+        get
+        {
             ToolBar? owner = bar;
-            if (owner == null) { return 0u; }
-            return ((ToolBar)owner).ButtonId(index);
+            if (owner == null)
+                return 0u;
+            return ((ToolBar)owner).ButtonId(_index);
         }
     }
 }
 
 /// A row of buttons.
-public class ToolBar : WindowedControl {
-    IToolBarPeer native;
-    List<ToolButton> buttons;
-    ImageList? pictures;
-    bool captions;
+public class ToolBar : WindowedControl
+{
+    IToolBarPeer _native;
+    List<ToolButton> _buttons;
+    ImageList? _pictures;
+    bool _captions;
 
-    public ToolBar(WindowedControl parent) {
+    public ToolBar(WindowedControl parent)
+    {
         base(parent);
-        buttons = new List<ToolButton>();
-        pictures = null;
-        captions = true;
-        native = WidgetSet.Current.CreateToolBar(this, ParentPeer());
-        AttachPeer(native);
+        _buttons = new List<ToolButton>();
+        _pictures = null;
+        _captions = true;
+        _native = WidgetSet.Current.CreateToolBar(this, ParentPeer());
+        AttachPeer(_native);
     }
 
     /// Adds a button and answers it, so a handler can be attached to the result.
-    public ToolButton Add(String text, int image) {
-        int at = native.AddButton(text, image, ToolButtonKind.Button);
+    public ToolButton Add(String text, int image)
+    {
+        int at = _native.AddButton(text, image, ToolButtonKind.Button);
         var made = new ToolButton(this, at);
-        buttons.Add(made);
-        native.ResizeToFit();
+        _buttons.Add(made);
+        _native.ResizeToFit();
         return made;
     }
 
-    public ToolButton Add(String text) { return Add(text, -1); }
+    public ToolButton Add(String text) => Add(text, -1);
 
     /// A button that stays pressed until pressed again.
-    public ToolButton AddToggle(String text, int image) {
-        int at = native.AddButton(text, image, ToolButtonKind.Toggle);
+    public ToolButton AddToggle(String text, int image)
+    {
+        int at = _native.AddButton(text, image, ToolButtonKind.Toggle);
         var made = new ToolButton(this, at);
-        buttons.Add(made);
-        native.ResizeToFit();
+        _buttons.Add(made);
+        _native.ResizeToFit();
         return made;
     }
 
     /// A gap between groups of buttons. Answers nothing: a separator has no
     /// state and nothing to handle.
-    public void AddSeparator() {
-        int at = native.AddButton("", -1, ToolButtonKind.Separator);
-        buttons.Add(new ToolButton(this, at));
-        native.ResizeToFit();
+    public void AddSeparator()
+    {
+        int at = _native.AddButton("", -1, ToolButtonKind.Separator);
+        _buttons.Add(new ToolButton(this, at));
+        _native.ResizeToFit();
     }
 
-    public List<ToolButton> Buttons => buttons;
+    public List<ToolButton> Buttons => _buttons;
 
     /// Where the buttons' pictures come from.
-    public ImageList? Images {
-        get => pictures;
-        set {
-            pictures = value;
-            if (value != null) { native.SetImages(((ImageList)value).Backend()); }
-            native.ResizeToFit();
+    public ImageList? Images
+    {
+        get => _pictures;
+        set
+        {
+            _pictures = value;
+            if (value != null)
+                _native.SetImages(((ImageList)value).Backend());
+            _native.ResizeToFit();
         }
     }
 
     /// Whether a caption is shown beside each picture.
-    public bool ShowText {
-        get => captions;
-        set {
-            captions = value;
-            native.SetTextVisible(value);
+    public bool ShowText
+    {
+        get => _captions;
+        set
+        {
+            _captions = value;
+            _native.SetTextVisible(value);
         }
     }
 
-    nuint ButtonId(int index) { return native.ButtonId(index); }
-    void SetEnabled(int index, bool enabled) { native.SetButtonEnabled(index, enabled); }
-    void SetChecked(int index, bool checked) { native.SetButtonChecked(index, checked); }
-    bool GetChecked(int index) { return native.GetButtonChecked(index); }
+    nuint ButtonId(int index) => _native.ButtonId(index);
+    void SetEnabled(int index, bool enabled) => _native.SetButtonEnabled(index, enabled);
+    void SetChecked(int index, bool checked) => _native.SetButtonChecked(index, checked);
+    bool GetChecked(int index) => _native.GetButtonChecked(index);
 
-    public override Size PreferredSize => native.PreferredSize();
+    public override Size PreferredSize => _native.PreferredSize();
 
     /// The platform says which button; the bar turns that into the button's own
     /// event, so a program never handles "a click on the toolbar" and then
     /// works out which one it was.
-    public override void OnPlatformToolClicked(int index) {
-        if (index < 0 || (nuint)index >= buttons.Count()) { return; }
-        buttons.At((nuint)index).Raise(this);
+    public override void OnPlatformToolClicked(int index)
+    {
+        if (index < 0 || (nuint)index >= _buttons.Count())
+            return;
+        _buttons.At((nuint)index).Raise(this);
     }
 }
 
 // =============================================================== status bar
 
 /// The strip along the bottom, divided into panels.
-public class StatusBar : WindowedControl {
-    IStatusBarPeer native;
-    List<String> texts;
-    List<int>    widths;
+public class StatusBar : WindowedControl
+{
+    IStatusBarPeer _native;
+    List<String> _texts;
+    List<int> _widths;
 
-    public StatusBar(WindowedControl parent) {
+    public StatusBar(WindowedControl parent)
+    {
         base(parent);
-        texts = new List<String>();
-        widths = new List<int>();
-        native = WidgetSet.Current.CreateStatusBar(this, ParentPeer());
-        AttachPeer(native);
+        _texts = new List<String>();
+        _widths = new List<int>();
+        _native = WidgetSet.Current.CreateStatusBar(this, ParentPeer());
+        AttachPeer(_native);
         Dock = DockStyle.Bottom;
     }
 
     /// Adds a panel and answers its index. A width of -1 means "the rest of the
     /// bar", and only the last panel should have one.
-    public int AddPanel(int width) {
-        widths.Add(width);
-        texts.Add("");
+    public int AddPanel(int width)
+    {
+        _widths.Add(width);
+        _texts.Add("");
         Rebuild();
-        return (int)widths.Count() - 1;
+        return (int)_widths.Count() - 1;
     }
 
     /// What a panel says.
-    public String PanelText(int index) {
-        if (index < 0 || (nuint)index >= texts.Count()) { return ""; }
-        return texts.At((nuint)index);
+    public String PanelText(int index)
+    {
+        if (index < 0 || (nuint)index >= _texts.Count())
+            return "";
+        return _texts.At((nuint)index);
     }
 
-    public void SetPanelText(int index, String text) {
-        if (index < 0 || (nuint)index >= texts.Count()) { return; }
-        texts.Set((nuint)index, text);
-        native.SetPanelText(index, text);
+    public void SetPanelText(int index, String text)
+    {
+        if (index < 0 || (nuint)index >= _texts.Count())
+            return;
+        _texts.Set((nuint)index, text);
+        _native.SetPanelText(index, text);
     }
 
-    public nuint PanelCount => widths.Count();
+    public nuint PanelCount => _widths.Count();
 
     /// Turns the panel widths into the running edges Windows wants.
     ///
     /// The platform takes the right-hand edge of each panel rather than its
     /// width, which is one subtraction nobody should have to remember -- so the
     /// widths are what a program gives and this is where they become edges.
-    void Rebuild() {
-        var edges = new int[widths.Count()];
+    void Rebuild()
+    {
+        var edges = new int[_widths.Count()];
         int running = 0;
-        for (nuint i = 0u; i < widths.Count(); i += 1u) {
-            int width = widths.At(i);
-            if (width < 0) {
+        for (nuint i = 0u; i < _widths.Count(); i++)
+        {
+            int width = _widths.At(i);
+            if (width < 0)
+            {
                 edges[i] = -1;
-            } else {
+            }
+            else
+            {
                 running = running + width;
                 edges[i] = running;
             }
         }
-        native.SetPanels(edges);
-        for (nuint i = 0u; i < texts.Count(); i += 1u) {
-            native.SetPanelText((int)i, texts.At(i));
+        _native.SetPanels(edges);
+        for (nuint i = 0u; i < _texts.Count(); i++)
+        {
+            _native.SetPanelText((int)i, _texts.At(i));
         }
     }
 
-    public override Size PreferredSize => native.PreferredSize();
+    public override Size PreferredSize => _native.PreferredSize();
 }
 
 // ============================================================= progress bar
 
 /// How far along something is.
-public class ProgressBar : WindowedControl {
-    IProgressPeer native;
-    int low;
-    int high;
-    bool rolling;
+public class ProgressBar : WindowedControl
+{
+    IProgressPeer _native;
+    int _low;
+    int _high;
+    bool _rolling;
 
-    public ProgressBar(WindowedControl parent) {
+    public ProgressBar(WindowedControl parent)
+    {
         base(parent);
-        low = 0;
-        high = 100;
-        rolling = false;
-        native = WidgetSet.Current.CreateProgress(this, ParentPeer());
-        AttachPeer(native);
+        _low = 0;
+        _high = 100;
+        _rolling = false;
+        _native = WidgetSet.Current.CreateProgress(this, ParentPeer());
+        AttachPeer(_native);
     }
 
-    public int Minimum {
-        get => low;
-        set {
-            low = value;
-            native.SetRange(low, high);
+    public int Minimum
+    {
+        get => _low;
+        set
+        {
+            _low = value;
+            _native.SetRange(_low, _high);
         }
     }
 
-    public int Maximum {
-        get => high;
-        set {
-            high = value;
-            native.SetRange(low, high);
+    public int Maximum
+    {
+        get => _high;
+        set
+        {
+            _high = value;
+            _native.SetRange(_low, _high);
         }
     }
 
-    public int Value {
-        get => native.GetValue();
-        set { native.SetValue(value); }
+    public int Value
+    {
+        get => _native.GetValue();
+        set => _native.SetValue(value);
     }
 
     /// A bar that moves without saying how far along it is, for work whose
     /// length is unknown. C#'s `ProgressBarStyle.Marquee` under a plainer name.
-    public bool Indeterminate {
-        get => rolling;
-        set {
-            rolling = value;
-            native.SetIndeterminate(value);
+    public bool Indeterminate
+    {
+        get => _rolling;
+        set
+        {
+            _rolling = value;
+            _native.SetIndeterminate(value);
         }
     }
 }
@@ -357,59 +412,68 @@ public class ProgressBar : WindowedControl {
 // ================================================================ track bar
 
 /// A slider.
-public class TrackBar : WindowedControl {
-    ITrackBarPeer native;
-    int low;
-    int high;
-    int ticks;
+public class TrackBar : WindowedControl
+{
+    ITrackBarPeer _native;
+    int _low;
+    int _high;
+    int _ticks;
 
-    public TrackBar(WindowedControl parent, bool vertical) {
+    public TrackBar(WindowedControl parent, bool vertical)
+    {
         base(parent);
-        low = 0;
-        high = 100;
-        ticks = 10;
-        native = WidgetSet.Current.CreateTrackBar(this, ParentPeer(), vertical);
-        AttachPeer(native);
+        _low = 0;
+        _high = 100;
+        _ticks = 10;
+        _native = WidgetSet.Current.CreateTrackBar(this, ParentPeer(), vertical);
+        AttachPeer(_native);
     }
 
-    public TrackBar(WindowedControl parent) { this(parent, false); }
+    public TrackBar(WindowedControl parent) => this(parent, false);
 
-    public int Minimum {
-        get => low;
-        set {
-            low = value;
-            native.SetRange(low, high);
+    public int Minimum
+    {
+        get => _low;
+        set
+        {
+            _low = value;
+            _native.SetRange(_low, _high);
         }
     }
 
-    public int Maximum {
-        get => high;
-        set {
-            high = value;
-            native.SetRange(low, high);
+    public int Maximum
+    {
+        get => _high;
+        set
+        {
+            _high = value;
+            _native.SetRange(_low, _high);
         }
     }
 
-    public int Value {
-        get => native.GetValue();
-        set { native.SetValue(value); }
+    public int Value
+    {
+        get => _native.GetValue();
+        set => _native.SetValue(value);
     }
 
     /// How often a tick is drawn beneath the slider.
-    public int TickFrequency {
-        get => ticks;
-        set {
-            ticks = value;
-            native.SetTickFrequency(value);
+    public int TickFrequency
+    {
+        get => _ticks;
+        set
+        {
+            _ticks = value;
+            _native.SetTickFrequency(value);
         }
     }
 
     /// The slider moved, whoever moved it.
     public event EventHandler ValueChanged;
 
-    protected virtual void OnValueChanged() { ValueChanged(this); }
+    protected virtual void OnValueChanged() => ValueChanged(this);
 
-    public override void OnPlatformValueChanged() { OnValueChanged(); }
+    public override void OnPlatformValueChanged() => OnValueChanged();
 }
 
 // ============================================================== tab control
@@ -419,69 +483,79 @@ public class TrackBar : WindowedControl {
 /// A real container, so controls are put on it exactly as they are put on a
 /// panel -- which is what makes a tabbed form no different from an untabbed one
 /// once the page is chosen.
-public class TabPage : WindowedControl {
-    IPanelPeer native;
-    int index;
+public class TabPage : WindowedControl
+{
+    IPanelPeer _native;
+    int _index;
 
-    public TabPage(TabControl owner, String text) {
+    public TabPage(TabControl owner, String text)
+    {
         base(owner);
-        native = WidgetSet.Current.CreatePanel(this, ParentPeer());
-        AttachContainerPeer(native);
+        _native = WidgetSet.Current.CreatePanel(this, ParentPeer());
+        AttachContainerPeer(_native);
         StoredText = text;
-        index = owner.Register(this, text);
+        _index = owner.Register(this, text);
     }
 
     /// Which tab this page is behind.
-    public int Index => index;
+    public int Index => _index;
 
     /// Told its new number after a page in front of it was removed. Called by
     /// `TabControl.RemovePage` and by nothing else.
-    public void Renumber(int now) { index = now; }
+    public void Renumber(int now) => _index = now;
 
     /// The caption on the tab.
-    public String Caption {
+    public String Caption
+    {
         get => StoredText;
-        set {
+        set
+        {
             StoredText = value;
             var owner = Parent;
-            if (owner != null) {
-                if (owner is TabControl tabs) { tabs.SetTabText(index, value); }
+            if (owner != null)
+            {
+                if (owner is TabControl tabs)
+                    tabs.SetTabText(_index, value);
             }
         }
     }
 }
 
 /// A stack of pages with tabs across the top.
-public class TabControl : WindowedControl {
-    ITabControlPeer native;
-    List<TabPage> pages;
-    ImageList? pictures;
+public class TabControl : WindowedControl
+{
+    ITabControlPeer _native;
+    List<TabPage> _pages;
+    ImageList? _pictures;
 
-    public TabControl(WindowedControl parent) {
+    public TabControl(WindowedControl parent)
+    {
         base(parent);
-        pages = new List<TabPage>();
-        pictures = null;
-        native = WidgetSet.Current.CreateTabControl(this, ParentPeer());
-        AttachContainerPeer(native);
+        _pages = new List<TabPage>();
+        _pictures = null;
+        _native = WidgetSet.Current.CreateTabControl(this, ParentPeer());
+        AttachContainerPeer(_native);
     }
 
     /// Called by a `TabPage` as it is built. Not public: a page joins the
     /// control it was constructed with, and there is no other way in.
-    int Register(TabPage page, String text) {
-        int at = native.AddTab(text, -1);
-        pages.Add(page);
+    int Register(TabPage page, String text)
+    {
+        int at = _native.AddTab(text, -1);
+        _pages.Add(page);
         // **Inserting a tab does not make it current.** Windows leaves the
         // selection at -1 until something is chosen, so a control that simply
         // showed whichever page was selected would show none of them -- every
         // page hidden, and a tab strip over an empty rectangle.
-        if (native.GetSelectedTab() < 0) { native.SetSelectedTab(0); }
-        ShowOnly(native.GetSelectedTab());
+        if (_native.GetSelectedTab() < 0)
+            _native.SetSelectedTab(0);
+        ShowOnly(_native.GetSelectedTab());
         return at;
     }
 
-    void SetTabText(int index, String text) { native.SetTabText(index, text); }
+    void SetTabText(int index, String text) => _native.SetTabText(index, text);
 
-    public List<TabPage> Pages => pages;
+    public List<TabPage> Pages => _pages;
 
     /// Takes a page out and answers whether it was there.
     ///
@@ -496,28 +570,38 @@ public class TabControl : WindowedControl {
     /// The page is hidden rather than destroyed: a control's lifetime is its
     /// parent's, and what a caller does with the page afterwards is its
     /// business. Dropping the last reference to it is what destroys it.
-    public bool RemovePage(TabPage page) {
+    public bool RemovePage(TabPage page)
+    {
         nuint at = 0u;
         bool found = false;
-        for (nuint i = 0u; i < pages.Count(); i += 1u) {
-            if (pages.At(i) == page) { at = i; found = true; break; }
+        for (nuint i = 0u; i < _pages.Count(); i++)
+        {
+            if (_pages.At(i) == page)
+            {
+                at = i;
+                found = true;
+                break;
+            }
         }
-        if (!found) { return false; }
+        if (!found)
+            return false;
 
-        native.RemoveTab((int)at);
-        pages.RemoveAt(at);
+        _native.RemoveTab((int)at);
+        _pages.RemoveAt(at);
         page.Visible = false;
 
-        for (nuint i = at; i < pages.Count(); i += 1u) { pages.At(i).Renumber((int)i); }
+        for (nuint i = at; i < _pages.Count(); i++)
+            _pages.At(i).Renumber((int)i);
 
         // Removing the selected tab leaves the platform's selection wherever it
         // landed, which may be -1 with pages still here.
-        int chosen = native.GetSelectedTab();
-        if (chosen < 0 && !pages.IsEmpty()) {
-            chosen = (int)(at >= pages.Count() ? pages.Count() - 1u : at);
-            native.SetSelectedTab(chosen);
+        int chosen = _native.GetSelectedTab();
+        if (chosen < 0 && !_pages.IsEmpty())
+        {
+            chosen = (int)(at >= _pages.Count() ? _pages.Count() - 1u : at);
+            _native.SetSelectedTab(chosen);
         }
-        ShowOnly(native.GetSelectedTab());
+        ShowOnly(_native.GetSelectedTab());
         OnSelectedIndexChanged();
         return true;
     }
@@ -525,31 +609,39 @@ public class TabControl : WindowedControl {
     /// How many tabs the platform has, which is not the same question as how
     /// many pages this control is holding -- and is the one that notices when
     /// an insertion quietly did nothing.
-    public int TabCount => native.TabCount();
+    public int TabCount => _native.TabCount();
 
     /// Which page is showing.
-    public int SelectedIndex {
-        get => native.GetSelectedTab();
-        set {
-            native.SetSelectedTab(value);
+    public int SelectedIndex
+    {
+        get => _native.GetSelectedTab();
+        set
+        {
+            _native.SetSelectedTab(value);
             ShowOnly(value);
             OnSelectedIndexChanged();
         }
     }
 
-    public TabPage? SelectedPage {
-        get {
+    public TabPage? SelectedPage
+    {
+        get
+        {
             int at = SelectedIndex;
-            if (at < 0 || (nuint)at >= pages.Count()) { return null; }
-            return pages.At((nuint)at);
+            if (at < 0 || (nuint)at >= _pages.Count())
+                return null;
+            return _pages.At((nuint)at);
         }
     }
 
-    public ImageList? Images {
-        get => pictures;
-        set {
-            pictures = value;
-            if (value != null) { native.SetImages(((ImageList)value).Backend()); }
+    public ImageList? Images
+    {
+        get => _pictures;
+        set
+        {
+            _pictures = value;
+            if (value != null)
+                _native.SetImages(((ImageList)value).Backend());
         }
     }
 
@@ -558,142 +650,170 @@ public class TabControl : WindowedControl {
     /// the program's business, and a control that did not hide the page it left
     /// would leave both drawn on top of each other. Every toolkit does this
     /// somewhere, and the LCL does it in `TCustomTabControl.ShowCurrentPage`.
-    void ShowOnly(int chosen) {
-        var area = native.PageArea();
-        for (nuint i = 0u; i < pages.Count(); i += 1u) {
-            var page = pages.At(i);
+    void ShowOnly(int chosen)
+    {
+        var area = _native.PageArea();
+        for (nuint i = 0u; i < _pages.Count(); i++)
+        {
+            var page = _pages.At(i);
             bool wanted = (int)i == chosen;
             page.Visible = wanted;
-            if (wanted) { page.Bounds = area; }
+            if (wanted)
+                page.Bounds = area;
         }
     }
 
     /// The chosen page changed.
     public event EventHandler SelectedIndexChanged;
 
-    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+    protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
 
-    public override void OnPlatformValueChanged() {
-        ShowOnly(native.GetSelectedTab());
+    public override void OnPlatformValueChanged()
+    {
+        ShowOnly(_native.GetSelectedTab());
         OnSelectedIndexChanged();
     }
 
     /// A resize moves the page area, so whichever page is showing follows it.
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
-        ShowOnly(native.GetSelectedTab());
+        ShowOnly(_native.GetSelectedTab());
     }
 }
 
 // ================================================================ tree view
 
 /// One node of a `TreeView`.
-public class TreeNode {
+public class TreeNode
+{
     weak TreeView? tree;
-    ITreeNodeHandle handle;
-    List<TreeNode> children;
+    ITreeNodeHandle _handle;
+    List<TreeNode> _children;
 
-    public TreeNode(TreeView owner, ITreeNodeHandle place) {
+    public TreeNode(TreeView owner, ITreeNodeHandle place)
+    {
         tree = owner;
-        handle = place;
-        children = new List<TreeNode>();
+        _handle = place;
+        _children = new List<TreeNode>();
     }
 
     /// The platform's idea of where this node is.
-    public ITreeNodeHandle Handle() { return handle; }
+    public ITreeNodeHandle Handle() => _handle;
 
-    public String Text {
-        get {
+    public String Text
+    {
+        get
+        {
             TreeView? owner = tree;
-            if (owner == null) { return ""; }
-            return ((TreeView)owner).TextOf(handle);
+            if (owner == null)
+                return "";
+            return ((TreeView)owner).TextOf(_handle);
         }
-        set {
+        set
+        {
             TreeView? owner = tree;
-            if (owner != null) { ((TreeView)owner).SetTextOf(handle, value); }
+            if (owner != null)
+                ((TreeView)owner).SetTextOf(_handle, value);
         }
     }
 
-    public List<TreeNode> Nodes => children;
+    public List<TreeNode> Nodes => _children;
 
     /// Adds a node under this one and answers it.
-    public TreeNode Add(String text, int image) {
+    public TreeNode Add(String text, int image)
+    {
         TreeView? owner = tree;
-        if (owner == null) { sl_fail("this node is not on a tree".ToPointer()); }
+        if (owner == null)
+            sl_fail("this node is not on a tree".ToPointer());
         var made = ((TreeView)owner).Insert(this, text, image);
-        children.Add(made);
+        _children.Add(made);
         return made;
     }
 
-    public TreeNode Add(String text) { return Add(text, -1); }
+    public TreeNode Add(String text) => Add(text, -1);
 
-    public void Expand() {
+    public void Expand()
+    {
         TreeView? owner = tree;
-        if (owner != null) { ((TreeView)owner).SetExpanded(handle, true); }
+        if (owner != null)
+            ((TreeView)owner).SetExpanded(_handle, true);
     }
 
-    public void Collapse() {
+    public void Collapse()
+    {
         TreeView? owner = tree;
-        if (owner != null) { ((TreeView)owner).SetExpanded(handle, false); }
+        if (owner != null)
+            ((TreeView)owner).SetExpanded(_handle, false);
     }
 }
 
 /// A tree of nodes that open and close.
-public class TreeView : WindowedControl {
-    ITreeViewPeer native;
-    ImageList? pictures;
-    List<TreeNode> roots;
+public class TreeView : WindowedControl
+{
+    ITreeViewPeer _native;
+    ImageList? _pictures;
+    List<TreeNode> _roots;
     /// Every node made, so that the handle the platform reports can be turned
     /// back into the object a program holds.
-    List<TreeNode> all;
+    List<TreeNode> _all;
 
-    public TreeView(WindowedControl parent) {
+    public TreeView(WindowedControl parent)
+    {
         base(parent);
-        roots = new List<TreeNode>();
-        all = new List<TreeNode>();
-        pictures = null;
-        native = WidgetSet.Current.CreateTreeView(this, ParentPeer());
-        AttachPeer(native);
+        _roots = new List<TreeNode>();
+        _all = new List<TreeNode>();
+        _pictures = null;
+        _native = WidgetSet.Current.CreateTreeView(this, ParentPeer());
+        AttachPeer(_native);
     }
 
     /// Adds a node at the top level and answers it.
-    public TreeNode Add(String text, int image) {
-        var made = new TreeNode(this, native.AddNode(null, null, text, image));
-        roots.Add(made);
-        all.Add(made);
+    public TreeNode Add(String text, int image)
+    {
+        var made = new TreeNode(this, _native.AddNode(null, null, text, image));
+        _roots.Add(made);
+        _all.Add(made);
         return made;
     }
 
-    public TreeNode Add(String text) { return Add(text, -1); }
+    public TreeNode Add(String text) => Add(text, -1);
 
     /// Adds under an existing node. Called by `TreeNode.Add`.
-    TreeNode Insert(TreeNode parent, String text, int image) {
-        var made = new TreeNode(this, native.AddNode(parent.Handle(), null, text, image));
-        all.Add(made);
+    TreeNode Insert(TreeNode parent, String text, int image)
+    {
+        var made = new TreeNode(this, _native.AddNode(parent.Handle(), null, text, image));
+        _all.Add(made);
         return made;
     }
 
-    String TextOf(ITreeNodeHandle node) { return native.GetNodeText(node); }
-    void SetTextOf(ITreeNodeHandle node, String text) { native.SetNodeText(node, text); }
-    void SetExpanded(ITreeNodeHandle node, bool open) { native.Expand(node, open); }
+    String TextOf(ITreeNodeHandle node) => _native.GetNodeText(node);
+    void SetTextOf(ITreeNodeHandle node, String text) => _native.SetNodeText(node, text);
+    void SetExpanded(ITreeNodeHandle node, bool open) => _native.Expand(node, open);
 
-    public List<TreeNode> Nodes => roots;
+    public List<TreeNode> Nodes => _roots;
 
-    public void Clear() {
-        native.Clear();
-        roots.Clear();
-        all.Clear();
+    public void Clear()
+    {
+        _native.Clear();
+        _roots.Clear();
+        _all.Clear();
     }
 
     /// Which node is selected, or null.
-    public TreeNode? SelectedNode {
-        get {
-            var chosen = native.GetSelectedNode();
-            if (chosen == null) { return null; }
+    public TreeNode? SelectedNode
+    {
+        get
+        {
+            var chosen = _native.GetSelectedNode();
+            if (chosen == null)
+                return null;
             return Lookup((ITreeNodeHandle)chosen);
         }
-        set {
-            if (value != null) { native.SelectNode(((TreeNode)value).Handle()); }
+        set
+        {
+            if (value != null)
+                _native.SelectNode(((TreeNode)value).Handle());
         }
     }
 
@@ -707,28 +827,34 @@ public class TreeView : WindowedControl {
     /// A search rather than a table, because a tree small enough to be usable
     /// is a tree small enough to walk. A table would be the right answer for
     /// one with thousands of nodes, and so would virtual nodes.
-    TreeNode? Lookup(ITreeNodeHandle handle) {
+    TreeNode? Lookup(ITreeNodeHandle handle)
+    {
         nuint wanted = handle.Id();
-        foreach (var node in all) {
-            if (node.Handle().Id() == wanted) { return node; }
+        foreach (var node in _all)
+        {
+            if (node.Handle().Id() == wanted)
+                return node;
         }
         return null;
     }
 
-    public ImageList? Images {
-        get => pictures;
-        set {
-            pictures = value;
-            if (value != null) { native.SetImages(((ImageList)value).Backend()); }
+    public ImageList? Images
+    {
+        get => _pictures;
+        set
+        {
+            _pictures = value;
+            if (value != null)
+                _native.SetImages(((ImageList)value).Backend());
         }
     }
 
     /// The selection changed.
     public event EventHandler SelectedNodeChanged;
 
-    protected virtual void OnSelectedNodeChanged() { SelectedNodeChanged(this); }
+    protected virtual void OnSelectedNodeChanged() => SelectedNodeChanged(this);
 
-    public override void OnPlatformValueChanged() { OnSelectedNodeChanged(); }
+    public override void OnPlatformValueChanged() => OnSelectedNodeChanged();
 }
 
 // ================================================================ list view
@@ -740,47 +866,56 @@ public class TreeView : WindowedControl {
 /// thousand objects before any text. Here a row is an index and its cells are
 /// set through the list, which is what the platform stores anyway -- and what
 /// C#'s virtual mode exists to get back to.
-public class ListView : WindowedControl {
-    IListViewPeer native;
-    ListViewStyle showing;
-    ImageList? pictures;
+public class ListView : WindowedControl
+{
+    IListViewPeer _native;
+    ListViewStyle _showing;
+    ImageList? _pictures;
 
-    public ListView(WindowedControl parent) {
+    public ListView(WindowedControl parent)
+    {
         base(parent);
-        showing = ListViewStyle.Details;
-        pictures = null;
-        native = WidgetSet.Current.CreateListView(this, ParentPeer());
-        AttachPeer(native);
-        native.SetFullRowSelect(true, false);
+        _showing = ListViewStyle.Details;
+        _pictures = null;
+        _native = WidgetSet.Current.CreateListView(this, ParentPeer());
+        AttachPeer(_native);
+        _native.SetFullRowSelect(true, false);
     }
 
     /// Adds a column and answers its index. Only a `Details` list shows them.
-    public int AddColumn(String text, int width, HorizontalAlignment alignment) {
-        return native.AddColumn(text, width, alignment);
+    public int AddColumn(String text, int width, HorizontalAlignment alignment)
+    {
+        return _native.AddColumn(text, width, alignment);
     }
 
-    public int AddColumn(String text, int width) {
+    public int AddColumn(String text, int width)
+    {
         return AddColumn(text, width, HorizontalAlignment.Left);
     }
 
-    public void SetColumnWidth(int column, int width) {
-        native.SetColumnWidth(column, width);
+    public void SetColumnWidth(int column, int width)
+    {
+        _native.SetColumnWidth(column, width);
     }
 
     /// Adds a row with its first cell, and answers the row's index.
-    public int AddRow(String text, int image) { return native.AddRow(text, image); }
-    public int AddRow(String text) { return AddRow(text, -1); }
+    public int AddRow(String text, int image) => _native.AddRow(text, image);
+    public int AddRow(String text) => AddRow(text, -1);
 
     /// Sets a cell other than the first. Column zero is the row's own text.
-    public void SetCell(int row, int column, String text) {
-        native.SetCell(row, column, text);
+    public void SetCell(int row, int column, String text)
+    {
+        _native.SetCell(row, column, text);
     }
 
     /// Adds a row and fills every column of it.
-    public int AddRow(String[] cells) {
-        if (cells.Length == 0u) { return -1; }
+    public int AddRow(String[] cells)
+    {
+        if (cells.Length == 0u)
+            return -1;
         int row = AddRow(cells[0u], -1);
-        for (nuint i = 1u; i < cells.Length; i += 1u) {
+        for (nuint i = 1u; i < cells.Length; i++)
+        {
             SetCell(row, (int)i, cells[i]);
         }
         return row;
@@ -790,49 +925,57 @@ public class ListView : WindowedControl {
     ///
     /// Worth having beyond the obvious: it is the only way to tell that the
     /// text really arrived, which a row count cannot.
-    public String CellText(int row, int column) {
-        return native.GetCell(row, column);
+    public String CellText(int row, int column)
+    {
+        return _native.GetCell(row, column);
     }
 
-    public void RemoveRow(int row) { native.RemoveRow(row); }
-    public void Clear() { native.Clear(); }
-    public int Count => native.RowCount();
+    public void RemoveRow(int row) => _native.RemoveRow(row);
+    public void Clear() => _native.Clear();
+    public int Count => _native.RowCount();
 
     /// Which row is selected, or -1.
-    public int SelectedIndex {
-        get => native.GetSelectedRow();
-        set { native.SetSelectedRow(value); }
+    public int SelectedIndex
+    {
+        get => _native.GetSelectedRow();
+        set => _native.SetSelectedRow(value);
     }
 
     /// How the list shows what it holds.
-    public ListViewStyle View {
-        get => showing;
-        set {
-            showing = value;
-            native.SetStyle(value);
+    public ListViewStyle View
+    {
+        get => _showing;
+        set
+        {
+            _showing = value;
+            _native.SetStyle(value);
         }
     }
 
     /// Whether clicking anywhere on a row selects the whole of it, and whether
     /// the grid is drawn.
-    public void SetFullRowSelect(bool full, bool gridLines) {
-        native.SetFullRowSelect(full, gridLines);
+    public void SetFullRowSelect(bool full, bool gridLines)
+    {
+        _native.SetFullRowSelect(full, gridLines);
     }
 
-    public ImageList? Images {
-        get => pictures;
-        set {
-            pictures = value;
-            if (value != null) { native.SetImages(((ImageList)value).Backend()); }
+    public ImageList? Images
+    {
+        get => _pictures;
+        set
+        {
+            _pictures = value;
+            if (value != null)
+                _native.SetImages(((ImageList)value).Backend());
         }
     }
 
     /// The selection changed.
     public event EventHandler SelectedIndexChanged;
 
-    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+    protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
 
-    public override void OnPlatformValueChanged() { OnSelectedIndexChanged(); }
+    public override void OnPlatformValueChanged() => OnSelectedIndexChanged();
 }
 
 // ==================================================================== coolbar
@@ -869,44 +1012,46 @@ public enum GrabberStyle { Simple, Double, HorizontalLines, VerticalLines }
 /// points at a control which is an ordinary child of the cool bar -- so a
 /// toolbar in a band is made with the cool bar as its parent and then handed
 /// over, exactly as `TCoolBand.Control` works.
-public class CoolBand {
+public class CoolBand
+{
     weak CoolBar? bar;
-    Control? held;
-    String   caption;
-    bool     breaks;
-    bool     shown;
-    bool     fixedWidth;
-    int      wanted;
-    int      leastWide;
-    int      leastHigh;
-    Color    tint;
-    bool     tinted;
+    Control? _held;
+    String _caption;
+    bool _breaks;
+    bool _shown;
+    bool _fixedWidth;
+    int _wanted;
+    int _leastWide;
+    int _leastHigh;
+    Color _tint;
+    bool _tinted;
 
     /// Where the layout pass put it. Read-only to a program, as in the LCL --
     /// a band's position is the cool bar's business.
-    int placedLeft;
-    int placedTop;
-    int placedHeight;
+    int _placedLeft;
+    int _placedTop;
+    int _placedHeight;
     /// How wide it is *drawn*, which for the last band in a row is everything
     /// left over rather than `Width`. `TCoolBand.FRealWidth`.
-    int drawnWidth;
+    int _drawnWidth;
 
-    public CoolBand(CoolBar owner) {
+    public CoolBand(CoolBar owner)
+    {
         bar = owner;
-        held = null;
-        caption = "";
-        breaks = true;
-        shown = true;
-        fixedWidth = false;
-        wanted = 180;
-        leastWide = 100;
-        leastHigh = 25;
-        tint = Colors.Transparent;
-        tinted = false;
-        placedLeft = 0;
-        placedTop = 0;
-        placedHeight = 0;
-        drawnWidth = 0;
+        _held = null;
+        _caption = "";
+        _breaks = true;
+        _shown = true;
+        _fixedWidth = false;
+        _wanted = 180;
+        _leastWide = 100;
+        _leastHigh = 25;
+        _tint = Colors.Transparent;
+        _tinted = false;
+        _placedLeft = 0;
+        _placedTop = 0;
+        _placedHeight = 0;
+        _drawnWidth = 0;
         owner.Register(this);
     }
 
@@ -915,19 +1060,23 @@ public class CoolBand {
     /// It must already be a child of the cool bar. Nothing here reparents it:
     /// a control chooses its parent once, at birth, which is the rule
     /// everywhere in this library.
-    public Control? Control {
-        get => held;
-        set {
-            held = value;
+    public Control? Control
+    {
+        get => _held;
+        set
+        {
+            _held = value;
             Refresh();
         }
     }
 
     /// The caption drawn after the grab handle, when `CoolBar.ShowText` is on.
-    public String Text {
-        get => caption;
-        set {
-            caption = value;
+    public String Text
+    {
+        get => _caption;
+        set
+        {
+            _caption = value;
             Refresh();
         }
     }
@@ -935,104 +1084,126 @@ public class CoolBand {
     /// Whether this band starts a new row rather than following the one before
     /// it. True by default, as `TCoolBand.Break` is -- a bar of bands each on
     /// its own row is what a program that set nothing should get.
-    public bool Break {
-        get => breaks;
-        set {
-            breaks = value;
+    public bool Break
+    {
+        get => _breaks;
+        set
+        {
+            _breaks = value;
             Refresh();
         }
     }
 
-    public bool Visible {
-        get => shown;
-        set {
-            shown = value;
-            var one = held;
-            if (one != null) { ((Control)one).Visible = value; }
+    public bool Visible
+    {
+        get => _shown;
+        set
+        {
+            _shown = value;
+            var one = _held;
+            if (one != null)
+                ((Control)one).Visible = value;
             Refresh();
         }
     }
 
     /// Whether the user may drag this band's right edge. A fixed band is also
     /// one its neighbour cannot be resized against.
-    public bool FixedSize {
-        get => fixedWidth;
-        set { fixedWidth = value; }
+    public bool FixedSize
+    {
+        get => _fixedWidth;
+        set => _fixedWidth = value;
     }
 
     /// How wide the band asks to be. Never below `MinWidth`.
-    public int Width {
-        get => wanted;
-        set {
-            int now = value < leastWide ? leastWide : value;
-            if (now == wanted) { return; }
-            wanted = now;
+    public int Width
+    {
+        get => _wanted;
+        set
+        {
+            int now = value < _leastWide ? _leastWide : value;
+            if (now == _wanted)
+                return;
+            _wanted = now;
             Refresh();
         }
     }
 
-    public int MinWidth {
-        get => leastWide;
-        set {
-            leastWide = value;
-            if (wanted < leastWide) { wanted = leastWide; }
+    public int MinWidth
+    {
+        get => _leastWide;
+        set
+        {
+            _leastWide = value;
+            if (_wanted < _leastWide)
+                _wanted = _leastWide;
             Refresh();
         }
     }
 
-    public int MinHeight {
-        get => leastHigh;
-        set {
-            leastHigh = value;
+    public int MinHeight
+    {
+        get => _leastHigh;
+        set
+        {
+            _leastHigh = value;
             Refresh();
         }
     }
 
     /// The band's own background, or nothing set -- the default -- to use the
     /// cool bar's.
-    public Color Color {
-        get => tint;
-        set {
-            tint = value;
-            tinted = true;
+    public Color Color
+    {
+        get => _tint;
+        set
+        {
+            _tint = value;
+            _tinted = true;
             Refresh();
         }
     }
 
-    public bool HasColor => tinted;
+    public bool HasColor => _tinted;
 
-    public int Left   => placedLeft;
-    public int Top    => placedTop;
-    public int Height => placedHeight;
+    public int Left   => _placedLeft;
+    public int Top    => _placedTop;
+    public int Height => _placedHeight;
     /// How wide it is drawn, which is `Width` except for the last band of a
     /// row, which is given whatever is left.
-    public int DrawnWidth => drawnWidth;
+    public int DrawnWidth => _drawnWidth;
 
     /// Widens the band to just fit its control, which is what double-clicking
     /// a grabber does in a real rebar and what `TCoolBand.AutosizeWidth` is.
-    public void AutoSizeWidth() {
+    public void AutoSizeWidth()
+    {
         CoolBar? owner = bar;
-        if (owner == null) { return; }
+        if (owner == null)
+            return;
         Width = ((CoolBar)owner).ContentLeft(this) + ControlWidth()
               + ((CoolBar)owner).HorizontalSpacing + CoolDivider;
     }
 
-    int ControlWidth() {
-        var one = held;
+    int ControlWidth()
+    {
+        var one = _held;
         return one == null ? 0 : ((Control)one).Width;
     }
 
     /// Called by the cool bar's layout pass, and by nothing else.
-    public void PlaceAt(int left, int top, int height, int drawn) {
-        placedLeft = left;
-        placedTop = top;
-        placedHeight = height;
-        drawnWidth = drawn;
+    public void PlaceAt(int left, int top, int height, int drawn)
+    {
+        _placedLeft = left;
+        _placedTop = top;
+        _placedHeight = height;
+        _drawnWidth = drawn;
     }
 
-    void Refresh() {
+    void Refresh()
+    {
         CoolBar? owner = bar;
-        if (owner != null) { ((CoolBar)owner).Rebuild(); }
+        if (owner != null)
+            ((CoolBar)owner).Rebuild();
     }
 }
 
@@ -1071,44 +1242,46 @@ public class CoolBand {
 /// with an `if Vertical` in each of forty places; it is left out rather than
 /// half done. So is right-to-left, for the same reason, and so are the two
 /// themed grab styles.
-public class CoolBar : CustomControl {
-    List<CoolBand>? bands;
+public class CoolBar : CustomControl
+{
+    List<CoolBand>? _bands;
     /// The visible ones, in order, rebuilt by every layout pass. Held rather
     /// than recomputed per hit-test because the paint, the mouse and the layout
     /// all walk the same list and must agree about it.
-    List<CoolBand>? visible;
+    List<CoolBand>? _visible;
 
-    GrabberStyle grabbing;
-    int         grabWide;
-    int         acrossGap;
-    int         downGap;
-    bool        text;
-    bool        fixedWidths;
-    bool        fixedOrder;
-    ImageList?  pictures;
+    GrabberStyle _grabbing;
+    int _grabWide;
+    int _acrossGap;
+    int _downGap;
+    bool _text;
+    bool _fixedWidths;
+    bool _fixedOrder;
+    ImageList? _pictures;
 
-    int  dragging;
-    int  draggedBand;
-    int  dragFrom;
-    int  rowsHigh;
-    bool ready;
+    int _dragging;
+    int _draggedBand;
+    int _dragFrom;
+    int _rowsHigh;
+    bool _ready;
 
-    public CoolBar(WindowedControl parent) {
+    public CoolBar(WindowedControl parent)
+    {
         base(parent);
-        bands = new List<CoolBand>();
-        visible = new List<CoolBand>();
-        grabbing = GrabberStyle.Double;
-        grabWide = 10;
-        acrossGap = 5;
-        downGap = 3;
-        text = true;
-        fixedWidths = false;
-        fixedOrder = false;
-        pictures = null;
-        dragging = CoolDragNone;
-        draggedBand = CoolNowhere;
-        dragFrom = 0;
-        rowsHigh = 0;
+        _bands = new List<CoolBand>();
+        _visible = new List<CoolBand>();
+        _grabbing = GrabberStyle.Double;
+        _grabWide = 10;
+        _acrossGap = 5;
+        _downGap = 3;
+        _text = true;
+        _fixedWidths = false;
+        _fixedOrder = false;
+        _pictures = null;
+        _dragging = CoolDragNone;
+        _draggedBand = CoolNowhere;
+        _dragFrom = 0;
+        _rowsHigh = 0;
 
         // A cool bar takes no keystrokes, so it stays out of the tab order --
         // the controls *in* it are what the keyboard reaches, and they are
@@ -1117,23 +1290,28 @@ public class CoolBar : CustomControl {
         Dock = DockStyle.Top;
         Height = 34;
 
-        ready = true;
+        _ready = true;
         Rebuild();
     }
 
     /// Called by a `CoolBand` as it is built. Not public: a band joins the bar
     /// it was constructed with, and there is no other way in.
-    public void Register(CoolBand band) {
-        var held = bands;
-        if (held == null) { return; }
+    public void Register(CoolBand band)
+    {
+        var held = _bands;
+        if (held == null)
+            return;
         ((List<CoolBand>)held).Add(band);
         Rebuild();
     }
 
-    public List<CoolBand> Bands {
-        get {
-            var held = bands;
-            if (held == null) { return new List<CoolBand>(); }
+    public List<CoolBand> Bands
+    {
+        get
+        {
+            var held = _bands;
+            if (held == null)
+                return new List<CoolBand>();
             return (List<CoolBand>)held;
         }
     }
@@ -1141,70 +1319,84 @@ public class CoolBar : CustomControl {
     public int BandCount => (int)Bands.Count();
 
     /// How the grab handles are drawn.
-    public GrabberStyle GrabStyle {
-        get => grabbing;
-        set {
-            grabbing = value;
+    public GrabberStyle GrabStyle
+    {
+        get => _grabbing;
+        set
+        {
+            _grabbing = value;
             Invalidate();
         }
     }
 
     /// How wide a grab handle is.
-    public int GrabWidth {
-        get => grabWide;
-        set {
-            grabWide = value;
+    public int GrabWidth
+    {
+        get => _grabWide;
+        set
+        {
+            _grabWide = value;
             Rebuild();
         }
     }
 
     /// Pixels between a band's parts -- the handle, the caption, the control.
-    public int HorizontalSpacing {
-        get => acrossGap;
-        set {
-            acrossGap = value;
+    public int HorizontalSpacing
+    {
+        get => _acrossGap;
+        set
+        {
+            _acrossGap = value;
             Rebuild();
         }
     }
 
     /// Pixels above and below a band's control, which is what makes a row
     /// taller than the tallest thing in it.
-    public int VerticalSpacing {
-        get => downGap;
-        set {
-            downGap = value;
+    public int VerticalSpacing
+    {
+        get => _downGap;
+        set
+        {
+            _downGap = value;
             Rebuild();
         }
     }
 
     /// Whether a band's `Text` is drawn.
-    public bool ShowText {
-        get => text;
-        set {
-            text = value;
+    public bool ShowText
+    {
+        get => _text;
+        set
+        {
+            _text = value;
             Rebuild();
         }
     }
 
     /// Whether any band may be resized by dragging. Overrides every band's own
     /// `FixedSize`, which is what `TCustomCoolBar.FixedSize` does.
-    public bool FixedSize {
-        get => fixedWidths;
-        set { fixedWidths = value; }
+    public bool FixedSize
+    {
+        get => _fixedWidths;
+        set => _fixedWidths = value;
     }
 
     /// Whether the bands may be dragged into a different order.
-    public bool FixedOrder {
-        get => fixedOrder;
-        set { fixedOrder = value; }
+    public bool FixedOrder
+    {
+        get => _fixedOrder;
+        set => _fixedOrder = value;
     }
 
     /// The pictures a band's `ImageIndex` names. Declared so that a band that
     /// wants an icon has somewhere to get one; nothing draws one yet.
-    public ImageList? Images {
-        get => pictures;
-        set {
-            pictures = value;
+    public ImageList? Images
+    {
+        get => _pictures;
+        set
+        {
+            _pictures = value;
             Invalidate();
         }
     }
@@ -1213,26 +1405,29 @@ public class CoolBar : CustomControl {
     /// program made, as `TCustomCoolBar.OnChange` is not.
     public event EventHandler Change;
 
-    protected virtual void OnChange() { Change(this); }
+    protected virtual void OnChange() => Change(this);
 
     // -------------------------------------------------------------- layout
 
     /// How tall the bar came out: every row's height, plus the dividers between
     /// them. What a program assigns to `Height` after building the bands.
-    public override Size PreferredSize => Size.Of(0, rowsHigh);
+    public override Size PreferredSize => Size.Of(0, _rowsHigh);
 
     /// Where a band's control begins, measured from the band's left edge: past
     /// the handle, the caption and the gaps between them.
     /// `TCoolBand.CalcControlLeft`.
-    public int ContentLeft(CoolBand band) {
-        int at = CoolGrabIndent + grabWide + acrossGap;
+    public int ContentLeft(CoolBand band)
+    {
+        int at = CoolGrabIndent + _grabWide + _acrossGap;
         int bare = at;
-        if (text && !band.Text.IsEmpty()) {
-            at = at + TextWidth(band.Text) + acrossGap;
+        if (_text && !band.Text.IsEmpty())
+        {
+            at = at + TextWidth(band.Text) + _acrossGap;
         }
         // A band with no caption still gets one gap, so its control does not
         // sit against the handle.
-        if (at == bare) { at = at + acrossGap; }
+        if (at == bare)
+            at = at + _acrossGap;
         return at;
     }
 
@@ -1245,30 +1440,38 @@ public class CoolBar : CustomControl {
     /// caption a few pixels from where the control starts, and the cost of
     /// being right would be keeping a measuring surface alive for the life of
     /// the control.
-    int TextWidth(String caption) { return (int)caption.ByteLength() * 7; }
+    int TextWidth(String caption) => (int)caption.ByteLength() * 7;
 
     /// How tall one band wants to be: its own minimum, its control plus the
     /// vertical spacing, and the caption -- whichever is largest.
     /// `TCoolBand.CalcPreferredHeight`.
-    int BandHeight(CoolBand band) {
+    int BandHeight(CoolBand band)
+    {
         int high = band.MinHeight;
         var one = band.Control;
-        if (one != null) {
-            int wanted = ((Control)one).Height + 2 * downGap;
-            if (wanted > high) { high = wanted; }
+        if (one != null)
+        {
+            int wanted = ((Control)one).Height + 2 * _downGap;
+            if (wanted > high)
+                high = wanted;
         }
-        if (text) {
-            int wanted = Font.Size + 4 + 2 * downGap;
-            if (wanted > high) { high = wanted; }
+        if (_text)
+        {
+            int wanted = Font.Size + 4 + 2 * _downGap;
+            if (wanted > high)
+                high = wanted;
         }
         return high;
     }
 
     /// Whether the band after this one will not fit beside it.
-    bool WrapsAfter(List<CoolBand> row, nuint index, int left) {
-        if (index + 1u >= row.Count()) { return false; }
+    bool WrapsAfter(List<CoolBand> row, nuint index, int left)
+    {
+        if (index + 1u >= row.Count())
+            return false;
         var next = row.At(index + 1u);
-        if (next.Break) { return true; }
+        if (next.Break)
+            return true;
         return left + next.Width - CoolDivider >= Width;
     }
 
@@ -1280,15 +1483,19 @@ public class CoolBar : CustomControl {
     /// so the first pass finds the wraps and the heights and the second places
     /// things. `TCustomCoolBar.CalculateAndAlign` does exactly this and for
     /// exactly this reason.
-    public void Rebuild() {
-        if (!ready) { return; }
+    public void Rebuild()
+    {
+        if (!_ready)
+            return;
 
         var all = Bands;
         var showing = new List<CoolBand>();
-        for (nuint i = 0u; i < all.Count(); i += 1u) {
-            if (all.At(i).Visible) { showing.Add(all.At(i)); }
+        for (nuint i = 0u; i < all.Count(); i++)
+        {
+            if (all.At(i).Visible)
+                showing.Add(all.At(i));
         }
-        visible = showing;
+        _visible = showing;
 
         // ---- pass one: where the rows break, and how tall each is.
         var heights = new int[showing.Count()];
@@ -1297,16 +1504,21 @@ public class CoolBar : CustomControl {
         int left = 0;
         bool rowEnd = true;
 
-        for (nuint i = 0u; i < showing.Count(); i += 1u) {
-            if (rowEnd || showing.At(i).Break) { left = 0; }
+        for (nuint i = 0u; i < showing.Count(); i++)
+        {
+            if (rowEnd || showing.At(i).Break)
+                left = 0;
             int wanted = BandHeight(showing.At(i));
-            if (wanted > tallest) { tallest = wanted; }
+            if (wanted > tallest)
+                tallest = wanted;
             left = left + showing.At(i).Width;
 
             rowEnd = i + 1u >= showing.Count() || WrapsAfter(showing, i, left);
-            if (!rowEnd) { continue; }
+            if (!rowEnd)
+                continue;
 
-            for (nuint y = rowStart; y <= i; y += 1u) { heights[y] = tallest; }
+            for (nuint y = rowStart; y <= i; y++)
+                heights[y] = tallest;
             tallest = 0;
             rowStart = i + 1u;
         }
@@ -1316,9 +1528,11 @@ public class CoolBar : CustomControl {
         left = 0;
         rowEnd = true;
 
-        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+        for (nuint i = 0u; i < showing.Count(); i++)
+        {
             var band = showing.At(i);
-            if (rowEnd || band.Break) { left = 0; }
+            if (rowEnd || band.Break)
+                left = 0;
 
             int height = heights[i];
             int width = band.Width;
@@ -1327,25 +1541,29 @@ public class CoolBar : CustomControl {
             // width it asked for -- otherwise every row would end in a gap the
             // user could not fill.
             int drawn = rowEnd ? Width - left : width;
-            if (drawn < width) { drawn = width; }
+            if (drawn < width)
+                drawn = width;
 
             band.PlaceAt(left, top, height, drawn);
 
             var one = band.Control;
-            if (one != null) {
+            if (one != null)
+            {
                 var child = (Control)one;
                 int contentLeft = left + ContentLeft(band);
-                int room = drawn - ContentLeft(band) - acrossGap - CoolDivider;
-                if (room < 0) { room = 0; }
+                int room = drawn - ContentLeft(band) - _acrossGap - CoolDivider;
+                if (room < 0)
+                    room = 0;
                 child.SetBounds(contentLeft, top + (height - child.Height) / 2,
                                 room, child.Height);
             }
 
             left = left + width;
-            if (rowEnd) { top = top + height + CoolDivider; }
+            if (rowEnd)
+                top = top + height + CoolDivider;
         }
 
-        rowsHigh = top;
+        _rowsHigh = top;
         Invalidate();
     }
 
@@ -1353,23 +1571,29 @@ public class CoolBar : CustomControl {
     ///
     /// The null test is the trap the composites all have: the base constructor
     /// resizes, and this override runs before this class's own fields exist.
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
-        if (bands == null) { return; }
+        if (_bands == null)
+            return;
         Rebuild();
     }
 
-    List<CoolBand> Showing {
-        get {
-            var held = visible;
-            if (held == null) { return new List<CoolBand>(); }
+    List<CoolBand> Showing
+    {
+        get
+        {
+            var held = _visible;
+            if (held == null)
+                return new List<CoolBand>();
             return (List<CoolBand>)held;
         }
     }
 
     // ------------------------------------------------------------- painting
 
-    protected override void OnPaint(PaintEventArgs args) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
         var surface = args.Graphics;
         surface.Clear(BackColor);
 
@@ -1377,18 +1601,21 @@ public class CoolBar : CustomControl {
         var light = new Pen(SystemColors.ControlLight);
         var dark = new Pen(SystemColors.ControlDark);
 
-        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+        for (nuint i = 0u; i < showing.Count(); i++)
+        {
             var band = showing.At(i);
             var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
 
-            if (band.HasColor) { surface.FillRectangle(new Brush(band.Color), whole); }
+            if (band.HasColor)
+                surface.FillRectangle(new Brush(band.Color), whole);
 
             PaintGrabber(surface, light, dark,
                          Rectangle.Of(band.Left + CoolGrabIndent, band.Top + 2,
-                                      grabWide - 1, band.Height - 5));
+                                      _grabWide - 1, band.Height - 5));
 
-            if (text && !band.Text.IsEmpty()) {
-                int x = band.Left + CoolGrabIndent + grabWide + acrossGap;
+            if (_text && !band.Text.IsEmpty())
+            {
+                int x = band.Left + CoolGrabIndent + _grabWide + _acrossGap;
                 var measured = surface.MeasureString(band.Text, Font);
                 int y = band.Top + (band.Height - measured.Height) / 2;
                 surface.DrawString(band.Text, Font, ForeColor, x, y);
@@ -1397,13 +1624,16 @@ public class CoolBar : CustomControl {
             bool last = i + 1u >= showing.Count();
             bool endsRow = last || showing.At(i + 1u).Top != band.Top;
 
-            if (endsRow) {
+            if (endsRow)
+            {
                 // The line under a finished row, which is what separates one
                 // row from the next and the last row from the client area.
                 int y = band.Top + band.Height;
                 surface.DrawLine(dark, 0, y, Width, y);
                 surface.DrawLine(light, 0, y + 1, Width, y + 1);
-            } else {
+            }
+            else
+            {
                 // The upright between two bands sharing a row.
                 int x = band.Left + band.DrawnWidth;
                 surface.DrawLine(dark, x, band.Top + 1, x, band.Top + band.Height - 1);
@@ -1416,14 +1646,17 @@ public class CoolBar : CustomControl {
     }
 
     /// The grab handle, in whichever of the four styles is set.
-    void PaintGrabber(Graphics surface, Pen light, Pen dark, Rectangle at) {
-        if (at.Width <= 0 || at.Height <= 0) { return; }
+    void PaintGrabber(Graphics surface, Pen light, Pen dark, Rectangle at)
+    {
+        if (at.Width <= 0 || at.Height <= 0)
+            return;
         int left = at.X;
         int top = at.Y;
         int right = at.X + at.Width;
         int bottom = at.Y + at.Height;
 
-        if (grabbing == GrabberStyle.Simple) {
+        if (_grabbing == GrabberStyle.Simple)
+        {
             surface.DrawLine(light, left, top, right, top);
             surface.DrawLine(light, left, top, left, bottom);
             surface.DrawLine(dark, left, bottom, right, bottom);
@@ -1431,11 +1664,13 @@ public class CoolBar : CustomControl {
             return;
         }
 
-        if (grabbing == GrabberStyle.Double) {
+        if (_grabbing == GrabberStyle.Double)
+        {
             // Two narrow raised bars side by side, which is the default and the
             // one a Windows rebar draws.
-            int half = (grabWide - 2) / 2;
-            if (half < 1) { half = 1; }
+            int half = (_grabWide - 2) / 2;
+            if (half < 1)
+                half = 1;
             surface.DrawLine(light, left, top, left + half, top);
             surface.DrawLine(light, left, top, left, bottom);
             surface.DrawLine(dark, left, bottom, left + half, bottom);
@@ -1448,9 +1683,11 @@ public class CoolBar : CustomControl {
             return;
         }
 
-        if (grabbing == GrabberStyle.HorizontalLines) {
+        if (_grabbing == GrabberStyle.HorizontalLines)
+        {
             int lines = (at.Height + 1) / 3;
-            for (int w = 0; w < lines; w += 1) {
+            for (int w = 0; w < lines; w++)
+            {
                 int y = top + 1 + w * 3;
                 surface.DrawLine(dark, left, y, right, y);
                 surface.DrawLine(light, left, y + 1, right, y + 1);
@@ -1459,7 +1696,8 @@ public class CoolBar : CustomControl {
         }
 
         int columns = (at.Width + 1) / 3;
-        for (int w = 0; w < columns; w += 1) {
+        for (int w = 0; w < columns; w++)
+        {
             int x = left + 1 + w * 3;
             surface.DrawLine(dark, x, top, x, bottom);
             surface.DrawLine(light, x + 1, top, x + 1, bottom);
@@ -1472,19 +1710,25 @@ public class CoolBar : CustomControl {
     /// handle. `TCustomCoolBar.MouseToBandPos`, with its two sentinels: a point
     /// below the last row or above the first is where a band dropped gets a row
     /// of its own.
-    (int, bool) BandAt(Point at) {
+    (int, bool) BandAt(Point at)
+    {
         var showing = Showing;
-        if (showing.IsEmpty()) { return (CoolNowhere, false); }
+        if (showing.IsEmpty())
+            return (CoolNowhere, false);
 
         var last = showing.At(showing.Count() - 1u);
-        if (at.Y > last.Top + last.Height + CoolDivider) { return (CoolRowBelow, false); }
-        if (at.Y < 0) { return (CoolRowAbove, false); }
+        if (at.Y > last.Top + last.Height + CoolDivider)
+            return (CoolRowBelow, false);
+        if (at.Y < 0)
+            return (CoolRowAbove, false);
 
-        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+        for (nuint i = 0u; i < showing.Count(); i++)
+        {
             var band = showing.At(i);
             var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
-            if (!whole.Contains(at)) { continue; }
-            return ((int)i, at.X <= band.Left + grabWide + 1);
+            if (!whole.Contains(at))
+                continue;
+            return ((int)i, at.X <= band.Left + _grabWide + 1);
         }
         return (CoolNowhere, false);
     }
@@ -1492,90 +1736,115 @@ public class CoolBar : CustomControl {
     /// Whether this band is the first of its row, which is the one whose
     /// handle cannot resize anything: there is no band to its left to take the
     /// pixels from.
-    bool FirstOfRow(int index) {
+    bool FirstOfRow(int index)
+    {
         var showing = Showing;
-        if (index <= 0) { return true; }
+        if (index <= 0)
+            return true;
         return showing.At((nuint)index).Top != showing.At((nuint)(index - 1)).Top;
     }
 
-    protected override void OnMouseDown(MouseEventArgs args) {
+    protected override void OnMouseDown(MouseEventArgs args)
+    {
         base.OnMouseDown(args);
-        if (args.Button != MouseButton.Left) { return; }
+        if (args.Button != MouseButton.Left)
+            return;
 
         var found = BandAt(args.Location);
         int index = found.Item1;
         bool onGrabber = found.Item2;
-        draggedBand = index;
-        dragging = CoolDragNone;
-        if (index < 0) { return; }
+        _draggedBand = index;
+        _dragging = CoolDragNone;
+        if (index < 0)
+            return;
 
         var showing = Showing;
-        if (onGrabber && !FirstOfRow(index) && !fixedWidths
+        if (onGrabber && !FirstOfRow(index) && !_fixedWidths
             && !showing.At((nuint)index).FixedSize
-            && !showing.At((nuint)(index - 1)).FixedSize) {
+            && !showing.At((nuint)(index - 1)).FixedSize)
+        {
             // Dragging a handle resizes the band to its *left*, which is the
             // one whose right edge the handle sits against.
-            dragging = CoolDragResize;
+            _dragging = CoolDragResize;
             var before = showing.At((nuint)(index - 1));
-            dragFrom = args.X - before.Width - before.Left;
+            _dragFrom = args.X - before.Width - before.Left;
             CaptureMouse(true);
             return;
         }
 
-        if (!fixedOrder) {
-            dragging = CoolDragMove;
+        if (!_fixedOrder)
+        {
+            _dragging = CoolDragMove;
             CaptureMouse(true);
         }
     }
 
-    protected override void OnMouseMove(MouseEventArgs args) {
+    protected override void OnMouseMove(MouseEventArgs args)
+    {
         base.OnMouseMove(args);
         var showing = Showing;
-        if (showing.IsEmpty()) { return; }
+        if (showing.IsEmpty())
+            return;
 
-        if (dragging == CoolDragResize) {
-            var before = showing.At((nuint)(draggedBand - 1));
-            before.Width = args.X - dragFrom - before.Left;
+        if (_dragging == CoolDragResize)
+        {
+            var before = showing.At((nuint)(_draggedBand - 1));
+            before.Width = args.X - _dragFrom - before.Left;
             return;
         }
 
-        if (dragging == CoolDragMove) { return; }
+        if (_dragging == CoolDragMove)
+            return;
 
         // Nothing is being dragged, so the cursor says what a drag would do.
         var found = BandAt(args.Location);
         int index = found.Item1;
         bool onGrabber = found.Item2;
-        if (index < 0) { Cursor = CursorKind.Default; return; }
+        if (index < 0)
+        {
+            Cursor = CursorKind.Default;
+            return;
+        }
 
-        if (onGrabber && index > 0 && !FirstOfRow(index) && !fixedWidths
+        if (onGrabber && index > 0 && !FirstOfRow(index) && !_fixedWidths
             && !showing.At((nuint)index).FixedSize
-            && !showing.At((nuint)(index - 1)).FixedSize) {
+            && !showing.At((nuint)(index - 1)).FixedSize)
+        {
             Cursor = CursorKind.SizeWestEast;
-        } else if (!fixedOrder && showing.Count() > 1u) {
+        }
+        else if (!_fixedOrder && showing.Count() > 1u)
+        {
             Cursor = CursorKind.SizeAll;
-        } else {
+        }
+        else
+        {
             Cursor = CursorKind.Default;
         }
     }
 
-    protected override void OnMouseUp(MouseEventArgs args) {
+    protected override void OnMouseUp(MouseEventArgs args)
+    {
         base.OnMouseUp(args);
-        int was = dragging;
-        int dragged = draggedBand;
-        dragging = CoolDragNone;
-        draggedBand = CoolNowhere;
+        int was = _dragging;
+        int dragged = _draggedBand;
+        _dragging = CoolDragNone;
+        _draggedBand = CoolNowhere;
         Cursor = CursorKind.Default;
 
-        if (was == CoolDragNone) { return; }
+        if (was == CoolDragNone)
+            return;
         CaptureMouse(false);
 
-        if (was == CoolDragResize) {
+        if (was == CoolDragResize)
+        {
             OnChange();
             return;
         }
 
-        if (dragged < 0) { return; }
-        if (Drop(dragged, args.Location)) {
+        if (dragged < 0)
+            return;
+        if (Drop(dragged, args.Location))
+        {
             Rebuild();
             OnChange();
         }
@@ -1590,38 +1859,47 @@ public class CoolBar : CustomControl {
     /// Dropped past the right-hand end of a row, it goes after that row's last
     /// band and does *not* break, so it joins the row. Dropped on another band,
     /// it takes that band's place and inherits whether the place breaks a row.
-    bool Drop(int dragged, Point at) {
+    bool Drop(int dragged, Point at)
+    {
         var showing = Showing;
-        if ((nuint)dragged >= showing.Count()) { return false; }
+        if ((nuint)dragged >= showing.Count())
+            return false;
         var moving = showing.At((nuint)dragged);
 
         var found = BandAt(at);
         int onto = found.Item1;
-        if (onto == CoolNowhere) { return false; }
+        if (onto == CoolNowhere)
+            return false;
 
         // A band that broke a row and is leaving it must hand the break to
         // whoever now begins that row, or the row above swallows it.
-        if (moving.Break && (nuint)(dragged + 1) < showing.Count()) {
+        if (moving.Break && (nuint)(dragged + 1) < showing.Count())
+        {
             showing.At((nuint)(dragged + 1)).Break = true;
         }
 
-        if (onto == CoolRowAbove) {
-            if (dragged == 0) { return false; }
+        if (onto == CoolRowAbove)
+        {
+            if (dragged == 0)
+                return false;
             moving.Break = true;
             return MoveTo(moving, 0);
         }
 
-        if (onto == CoolRowBelow) {
+        if (onto == CoolRowBelow)
+        {
             moving.Break = true;
             return MoveTo(moving, (int)Bands.Count() - 1);
         }
 
-        if (onto == dragged) { return false; }
+        if (onto == dragged)
+            return false;
 
         var target = showing.At((nuint)onto);
         bool pastEnd = at.X > target.Left + target.DrawnWidth;
 
-        if (pastEnd) {
+        if (pastEnd)
+        {
             // Joining the end of the target's row.
             moving.Break = false;
             int after = dragged > onto ? onto + 1 : onto;
@@ -1629,7 +1907,8 @@ public class CoolBar : CustomControl {
         }
 
         moving.Break = target.Break;
-        if (dragged > onto) {
+        if (dragged > onto)
+        {
             // Moving left or up: the band it landed on stops beginning the row,
             // because the dropped one now does.
             target.Break = false;
@@ -1637,7 +1916,8 @@ public class CoolBar : CustomControl {
         }
 
         // Moving right or down.
-        if (showing.At((nuint)dragged).Top == target.Top) {
+        if (showing.At((nuint)dragged).Top == target.Top)
+        {
             moving.Break = false;
             return MoveTo(moving, RealIndexOf(showing, onto));
         }
@@ -1648,33 +1928,49 @@ public class CoolBar : CustomControl {
     /// The position in `Bands` of the nth visible band. The two lists differ
     /// whenever a band is hidden, and every move is expressed in visible terms
     /// and applied in real ones.
-    int RealIndexOf(List<CoolBand> showing, int visibleIndex) {
-        if (visibleIndex < 0) { return 0; }
-        if ((nuint)visibleIndex >= showing.Count()) {
+    int RealIndexOf(List<CoolBand> showing, int visibleIndex)
+    {
+        if (visibleIndex < 0)
+            return 0;
+        if ((nuint)visibleIndex >= showing.Count())
+        {
             return (int)Bands.Count() - 1;
         }
         var wanted = showing.At((nuint)visibleIndex);
         var all = Bands;
-        for (nuint i = 0u; i < all.Count(); i += 1u) {
-            if (all.At(i) == wanted) { return (int)i; }
+        for (nuint i = 0u; i < all.Count(); i++)
+        {
+            if (all.At(i) == wanted)
+                return (int)i;
         }
         return 0;
     }
 
     /// Takes a band out of the list and puts it back at another position.
-    bool MoveTo(CoolBand band, int index) {
+    bool MoveTo(CoolBand band, int index)
+    {
         var all = Bands;
         nuint from = 0u;
         bool found = false;
-        for (nuint i = 0u; i < all.Count(); i += 1u) {
-            if (all.At(i) == band) { from = i; found = true; break; }
+        for (nuint i = 0u; i < all.Count(); i++)
+        {
+            if (all.At(i) == band)
+            {
+                from = i;
+                found = true;
+                break;
+            }
         }
-        if (!found) { return false; }
+        if (!found)
+            return false;
 
         int to = index;
-        if (to < 0) { to = 0; }
-        if ((nuint)to >= all.Count()) { to = (int)all.Count() - 1; }
-        if ((nuint)to == from) { return false; }
+        if (to < 0)
+            to = 0;
+        if ((nuint)to >= all.Count())
+            to = (int)all.Count() - 1;
+        if ((nuint)to == from)
+            return false;
 
         all.RemoveAt(from);
         all.Insert((nuint)to, band);

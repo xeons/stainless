@@ -63,7 +63,8 @@ public const gint CAIRO_FONT_WEIGHT_BOLD   = 1;
 /// `Height` are the inked area, `XAdvance` how far the pen moves -- which is
 /// the one to use for laying text out, because a trailing space has advance
 /// and no ink.
-public struct cairo_text_extents_t {
+public struct cairo_text_extents_t
+{
     public gdouble XBearing;
     public gdouble YBearing;
     public gdouble Width;
@@ -72,7 +73,8 @@ public struct cairo_text_extents_t {
     public gdouble YAdvance;
 }
 
-public extern "C" {
+public extern "C"
+{
     // ------------------------------------------------------------- the source
 
     /// Opaque colour. Components are 0.0 to 1.0.
@@ -150,7 +152,8 @@ public extern "C" {
 /// `cairo_font_extents_t`: the metrics of a font rather than of a run of text.
 /// What a line height is, and the one thing `cairo_text_extents` cannot say --
 /// it measures the ink, so "Ag" is taller than "an".
-public struct cairo_font_extents_t {
+public struct cairo_font_extents_t
+{
     public double Ascent;
     public double Descent;
     public double Height;
@@ -158,7 +161,8 @@ public struct cairo_font_extents_t {
     public double MaxYAdvance;
 }
 
-public extern "C" {
+public extern "C"
+{
     void cairo_font_extents(cairo_t* cr, cairo_font_extents_t* into);
 
     /// The dash pattern: `count` lengths in `dashes`, and a `count` of zero is

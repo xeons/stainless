@@ -34,81 +34,102 @@
 module Standard.Ascii;
 
 /// True for space, tab, newline, vertical tab, form feed and carriage return.
-public bool IsWhiteSpace(byte value) {
+public bool IsWhiteSpace(byte value)
+{
     return value == 32 || (value >= 9 && value <= 13);
 }
 
 /// True for `0`-`9`.
-public bool IsDigit(byte value) {
+public bool IsDigit(byte value)
+{
     return value >= 48 && value <= 57;
 }
 
 /// True for `0`-`9`, `a`-`f` and `A`-`F`.
-public bool IsHexDigit(byte value) {
+public bool IsHexDigit(byte value)
+{
     return IsDigit(value)
         || (value >= 97 && value <= 102)
         || (value >= 65 && value <= 70);
 }
 
 /// True for `A`-`Z` and `a`-`z`.
-public bool IsLetter(byte value) {
+public bool IsLetter(byte value)
+{
     return IsUpper(value) || IsLower(value);
 }
 
 /// True for a letter or a digit.
-public bool IsLetterOrDigit(byte value) {
+public bool IsLetterOrDigit(byte value)
+{
     return IsLetter(value) || IsDigit(value);
 }
 
 /// True for `A`-`Z`.
-public bool IsUpper(byte value) {
+public bool IsUpper(byte value)
+{
     return value >= 65 && value <= 90;
 }
 
 /// True for `a`-`z`.
-public bool IsLower(byte value) {
+public bool IsLower(byte value)
+{
     return value >= 97 && value <= 122;
 }
 
 /// True for a byte below 128, which is the only range where any of this is
 /// also true of the character.
-public bool IsAscii(byte value) {
+public bool IsAscii(byte value)
+{
     return value < 128;
 }
 
 /// True for a control character: below 32, or DEL.
-public bool IsControl(byte value) {
+public bool IsControl(byte value)
+{
     return value < 32 || value == 127;
 }
 
 /// The uppercase of an ASCII letter, or the byte unchanged.
-public byte ToUpper(byte value) {
-    if (IsLower(value)) { return (byte)(value - 32); }
+public byte ToUpper(byte value)
+{
+    if (IsLower(value))
+        return (byte)(value - 32);
     return value;
 }
 
 /// The lowercase of an ASCII letter, or the byte unchanged.
-public byte ToLower(byte value) {
-    if (IsUpper(value)) { return (byte)(value + 32); }
+public byte ToLower(byte value)
+{
+    if (IsUpper(value))
+        return (byte)(value + 32);
     return value;
 }
 
 /// What a hexadecimal digit is worth, or -1 when it is not one.
-public int HexValue(byte value) {
-    if (IsDigit(value)) { return (int)value - 48; }
-    if (value >= 97 && value <= 102) { return (int)value - 87; }
-    if (value >= 65 && value <= 70) { return (int)value - 55; }
+public int HexValue(byte value)
+{
+    if (IsDigit(value))
+        return (int)value - 48;
+    if (value >= 97 && value <= 102)
+        return (int)value - 87;
+    if (value >= 65 && value <= 70)
+        return (int)value - 55;
     return -1;
 }
 
 /// The lowercase hexadecimal digit for a value from 0 to 15.
-public byte HexDigit(int value) {
-    if (value < 10) { return (byte)(48 + value); }
+public byte HexDigit(int value)
+{
+    if (value < 10)
+        return (byte)(48 + value);
     return (byte)(87 + value);
 }
 
 /// The uppercase hexadecimal digit for a value from 0 to 15.
-public byte HexDigitUpper(int value) {
-    if (value < 10) { return (byte)(48 + value); }
+public byte HexDigitUpper(int value)
+{
+    if (value < 10)
+        return (byte)(48 + value);
     return (byte)(55 + value);
 }

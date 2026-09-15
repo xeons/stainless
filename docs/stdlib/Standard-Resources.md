@@ -61,7 +61,7 @@ or the full `2^depth` when that field is zero and the depth is 8 or fewer.
 
 Empty when there is no such bitmap.
 
-<sub>[stdlib/Resources.sl:376](../../stdlib/Resources.sl#L376)</sub>
+<sub>[stdlib/Resources.sl:417](../../stdlib/Resources.sl#L417)</sub>
 
 ### Bytes *function*
 
@@ -74,7 +74,7 @@ A resource's bytes, copied into an array this program owns.
 Empty when there is no such resource, which is also what an empty resource
 gives -- ask `Exists` where the difference matters.
 
-<sub>[stdlib/Resources.sl:303](../../stdlib/Resources.sl#L303)</sub>
+<sub>[stdlib/Resources.sl:333](../../stdlib/Resources.sl#L333)</sub>
 
 ### Bytes *function*
 
@@ -84,7 +84,7 @@ byte[] Bytes(String type, String name)
 
 The same, for a resource named by text.
 
-<sub>[stdlib/Resources.sl:310](../../stdlib/Resources.sl#L310)</sub>
+<sub>[stdlib/Resources.sl:341](../../stdlib/Resources.sl#L341)</sub>
 
 ### Exists *function*
 
@@ -94,7 +94,7 @@ bool Exists(int type, int id)
 
 Whether a resource of this type and number is there.
 
-<sub>[stdlib/Resources.sl:276](../../stdlib/Resources.sl#L276)</sub>
+<sub>[stdlib/Resources.sl:303](../../stdlib/Resources.sl#L303)</sub>
 
 ### Exists *function*
 
@@ -104,7 +104,7 @@ bool Exists(String type, String name)
 
 Whether one named by text, of a type named by text, is there.
 
-<sub>[stdlib/Resources.sl:279](../../stdlib/Resources.sl#L279)</sub>
+<sub>[stdlib/Resources.sl:306](../../stdlib/Resources.sl#L306)</sub>
 
 ### Pointer *function*
 
@@ -118,7 +118,7 @@ The memory belongs to the loaded image: read-only, never freed, and valid
 for as long as the program runs. `Bytes` is the one to use for anything that
 outlives the call.
 
-<sub>[stdlib/Resources.sl:295](../../stdlib/Resources.sl#L295)</sub>
+<sub>[stdlib/Resources.sl:324](../../stdlib/Resources.sl#L324)</sub>
 
 ### Size *function*
 
@@ -128,7 +128,7 @@ uint Size(int type, int id)
 
 How many bytes a resource holds, or zero when there is none.
 
-<sub>[stdlib/Resources.sl:284](../../stdlib/Resources.sl#L284)</sub>
+<sub>[stdlib/Resources.sl:312](../../stdlib/Resources.sl#L312)</sub>
 
 ### Text *function*
 
@@ -147,7 +147,7 @@ platforms answer identically and so that Windows needs no user32.
 
 Empty for a number with no string, which is what `LoadStringW` answers too.
 
-<sub>[stdlib/Resources.sl:336](../../stdlib/Resources.sl#L336)</sub>
+<sub>[stdlib/Resources.sl:371](../../stdlib/Resources.sl#L371)</sub>
 
 ## Constants
 

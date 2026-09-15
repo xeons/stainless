@@ -30,7 +30,8 @@ import Standard.Collections;
 import Standard.IO;
 import Standard.Path;
 
-extern "C" {
+extern "C"
+{
     bool  sl_path_exists(byte* path);
     bool  sl_path_is_directory(byte* path);
     int   sl_directory_create(byte* path);
@@ -41,38 +42,46 @@ extern "C" {
 }
 
 /// True when the path names a directory that is there.
-public bool Exists(String path) {
+public bool Exists(String path)
+{
     return sl_path_exists(path.ToPointer()) && sl_path_is_directory(path.ToPointer());
 }
 
 /// Creates one directory. The parent has to exist already; use `CreateAll` when
 /// it might not.
-public IOError Create(String path) {
+public IOError Create(String path)
+{
     return (IOError)sl_directory_create(path.ToPointer());
 }
 
 /// Creates the directory and every parent that is missing.
-public IOError CreateAll(String path) {
-    if (Exists(path)) { return IOError.None; }
+public IOError CreateAll(String path)
+{
+    if (Exists(path))
+        return IOError.None;
 
     var parent = Path.DirectoryName(path);
-    if (parent.ByteLength() > 0 && !Exists(parent)) {
+    if (parent.ByteLength() > 0 && !Exists(parent))
+    {
         var failed = CreateAll(parent);
-        if (failed != IOError.None) { return failed; }
+        if (failed != IOError.None)
+            return failed;
     }
 
     return Create(path);
 }
 
 /// Removes one empty directory.
-public IOError Delete(String path) {
+public IOError Delete(String path)
+{
     return (IOError)sl_directory_delete(path.ToPointer());
 }
 
 // ----------------------------------------------------------------- listing
 
 /// One entry of a directory: where it is, and whether it is itself a directory.
-public class Entry {
+public class Entry
+{
     /// The full path, ready to hand back to `File` or `Directory`. Built from
     /// the path that was listed, so a relative listing gives relative entries.
     public String Path { get; }
@@ -87,7 +96,8 @@ public class Entry {
 
     /// Builds an entry. Listing is what normally makes these; this is here for
     /// a caller assembling the same shape from somewhere else.
-    public Entry(String path, String name, bool isDirectory) {
+    public Entry(String path, String name, bool isDirectory)
+    {
         Path = path;
         Name = name;
         IsDirectory = isDirectory;
@@ -95,11 +105,13 @@ public class Entry {
 }
 
 /// Everything directly inside, files and directories both, not recursively.
-public Result<List<Entry>, IOError> Entries(String path) {
+public Result<List<Entry>, IOError> Entries(String path)
+{
     var found = new List<Entry>();
 
     var cursor = sl_directory_open(path.ToPointer());
-    if (cursor == null) {
+    if (cursor == null)
+    {
         var why = Exists(path) ? IOError.AccessDenied : IOError.NotFound;
         return Fail(why);
     }
@@ -107,7 +119,8 @@ public Result<List<Entry>, IOError> Entries(String path) {
     bool isDirectory = false;
     var raw = sl_directory_next(cursor, &isDirectory);
 
-    while (raw != null) {
+    while (raw != null)
+    {
         // The name lives in the cursor and is replaced on the next step, so it
         // is copied into a String here rather than held on to.
         var name = Text.FromNullTerminated(raw);
@@ -120,25 +133,33 @@ public Result<List<Entry>, IOError> Entries(String path) {
 }
 
 /// The full paths of the files directly inside.
-public Result<List<String>, IOError> Files(String path) {
+public Result<List<String>, IOError> Files(String path)
+{
     var all = Entries(path);
-    if (!all.Ok) { return Fail(all.Error); }
+    if (!all.Ok)
+        return Fail(all.Error);
 
     var paths = new List<String>();
-    foreach (var entry in all.Value) {
-        if (!entry.IsDirectory) { paths.Add(entry.Path); }
+    foreach (var entry in all.Value)
+    {
+        if (!entry.IsDirectory)
+            paths.Add(entry.Path);
     }
     return Ok(paths);
 }
 
 /// The full paths of the directories directly inside.
-public Result<List<String>, IOError> Directories(String path) {
+public Result<List<String>, IOError> Directories(String path)
+{
     var all = Entries(path);
-    if (!all.Ok) { return Fail(all.Error); }
+    if (!all.Ok)
+        return Fail(all.Error);
 
     var paths = new List<String>();
-    foreach (var entry in all.Value) {
-        if (entry.IsDirectory) { paths.Add(entry.Path); }
+    foreach (var entry in all.Value)
+    {
+        if (entry.IsDirectory)
+            paths.Add(entry.Path);
     }
     return Ok(paths);
 }
@@ -147,20 +168,30 @@ public Result<List<String>, IOError> Directories(String path) {
 ///
 /// Written as a worklist rather than a recursion so that a deep tree cannot
 /// run the stack out.
-public Result<List<String>, IOError> AllFiles(String path) {
+public Result<List<String>, IOError> AllFiles(String path)
+{
     var paths = new List<String>();
 
     var pending = new Queue<String>();
     pending.Enqueue(path);
 
-    while (!pending.IsEmpty()) {
+    while (!pending.IsEmpty())
+    {
         var here = pending.Dequeue();
         var listed = Entries(here);
-        if (!listed.Ok) { return Fail(listed.Error); }
+        if (!listed.Ok)
+            return Fail(listed.Error);
 
-        foreach (var entry in listed.Value) {
-            if (entry.IsDirectory) { pending.Enqueue(entry.Path); }
-            else { paths.Add(entry.Path); }
+        foreach (var entry in listed.Value)
+        {
+            if (entry.IsDirectory)
+            {
+                pending.Enqueue(entry.Path);
+            }
+            else
+            {
+                paths.Add(entry.Path);
+            }
         }
     }
 

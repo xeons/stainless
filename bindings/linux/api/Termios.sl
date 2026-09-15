@@ -45,22 +45,24 @@ public const nuint NCCS = 32u;
 /// `sizeof` is 60: four 32-bit flag words, one byte of `c_line`, 32 bytes of
 /// `c_cc`, then two speeds. The three bytes of padding between `c_cc` and
 /// `c_ispeed` are the compiler's, and are there in C too.
-public struct termios {
+public struct termios
+{
     public tcflag_t c_iflag;        // input modes
     public tcflag_t c_oflag;        // output modes
     public tcflag_t c_cflag;        // control modes
     public tcflag_t c_lflag;        // local modes
-    public cc_t     c_line;         // line discipline
+    public cc_t c_line;         // line discipline
     public byte[32] c_cc;           // control characters
-    public speed_t  c_ispeed;
-    public speed_t  c_ospeed;
+    public speed_t c_ispeed;
+    public speed_t c_ospeed;
 }
 
 /// `struct winsize`, what `TIOCGWINSZ` answers with.
 ///
 /// The pixel fields are almost always zero: a terminal emulator knows its
 /// character grid and rarely bothers to report anything else.
-public struct winsize {
+public struct winsize
+{
     public ushort ws_row;
     public ushort ws_col;
     public ushort ws_xpixel;
@@ -137,7 +139,8 @@ public const nuint TIOCGWINSZ = 0x5413u;
 
 // ================================================================ the calls
 
-public extern "C" {
+public extern "C"
+{
     /// Reads the terminal's current settings. -1 and `errno` on failure, which
     /// for a descriptor that is not a terminal is `ENOTTY`.
     int tcgetattr(int fd, termios* state);
@@ -172,6 +175,6 @@ public extern "C" {
 }
 
 /// `errno`, which every call above reports through rather than returning.
-public int Errno() { return *__errno_location(); }
+public int Errno() => *__errno_location();
 
 #endif

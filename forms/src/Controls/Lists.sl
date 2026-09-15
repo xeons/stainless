@@ -42,12 +42,14 @@ import Forms.Platform;
 
 /// What a list box and a combo box have in common: items, and one of them
 /// chosen.
-public abstract class ListControl : WindowedControl {
-    List<String> entries;
+public abstract class ListControl : WindowedControl
+{
+    List<String> _entries;
 
-    protected ListControl(WindowedControl parent) {
+    protected ListControl(WindowedControl parent)
+    {
         base(parent);
-        entries = new List<String>();
+        _entries = new List<String>();
     }
 
     /// The platform's side of the list, which the derived class made.
@@ -59,46 +61,55 @@ public abstract class ListControl : WindowedControl {
     protected override Color DefaultForeColor => SystemColors.WindowText;
 
     /// How many items there are.
-    public nuint Count => entries.Count();
+    public nuint Count => _entries.Count();
 
     /// One item, by position.
-    public String ItemAt(nuint index) { return entries.At(index); }
+    public String ItemAt(nuint index) => _entries.At(index);
 
     /// Every item, as an array. A copy, so a caller may keep it.
-    public String[] Items {
-        get {
-            var all = new String[entries.Count()];
-            for (nuint i = 0u; i < entries.Count(); i += 1u) { all[i] = entries.At(i); }
+    public String[] Items
+    {
+        get
+        {
+            var all = new String[_entries.Count()];
+            for (nuint i = 0u; i < _entries.Count(); i++)
+                all[i] = _entries.At(i);
             return all;
         }
-        set {
+        set
+        {
             Clear();
-            for (nuint i = 0u; i < value.Length; i += 1u) { Add(value[i]); }
+            for (nuint i = 0u; i < value.Length; i++)
+                Add(value[i]);
         }
     }
 
     /// Adds an item to the end.
-    public void Add(String text) {
-        List.InsertItem((int)entries.Count(), text);
-        entries.Add(text);
+    public void Add(String text)
+    {
+        List.InsertItem((int)_entries.Count(), text);
+        _entries.Add(text);
     }
 
     /// Puts one in at a position, moving the rest along.
-    public void Insert(nuint index, String text) {
+    public void Insert(nuint index, String text)
+    {
         List.InsertItem((int)index, text);
-        entries.Insert(index, text);
+        _entries.Insert(index, text);
     }
 
     /// Removes one.
-    public void RemoveAt(nuint index) {
+    public void RemoveAt(nuint index)
+    {
         List.RemoveItem((int)index);
-        entries.RemoveAt(index);
+        _entries.RemoveAt(index);
     }
 
     /// Removes them all.
-    public void Clear() {
+    public void Clear()
+    {
         List.ClearItems();
-        entries.Clear();
+        _entries.Clear();
     }
 
     /// Which item is chosen, or -1 for none.
@@ -106,69 +117,79 @@ public abstract class ListControl : WindowedControl {
     /// **-1 rather than an `Optional<nuint>`**, because that is what the two
     /// platforms report and what every caller compares against; wrapping it
     /// would mean unwrapping it at every use to get back to the same test.
-    public int SelectedIndex {
+    public int SelectedIndex
+    {
         get => List.GetSelectedIndex();
-        set { List.SetSelectedIndex(value); }
+        set => List.SetSelectedIndex(value);
     }
 
     /// The chosen item's text, or null when nothing is chosen.
-    public String? SelectedItem {
-        get {
+    public String? SelectedItem
+    {
+        get
+        {
             int at = SelectedIndex;
-            if (at < 0 || (nuint)at >= entries.Count()) { return null; }
-            return entries.At((nuint)at);
+            if (at < 0 || (nuint)at >= _entries.Count())
+                return null;
+            return _entries.At((nuint)at);
         }
     }
 
     /// The choice changed, whoever changed it.
     public event EventHandler SelectedIndexChanged;
 
-    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+    protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
 
     /// For a list, a change of value is a change of selection -- not of the
     /// control's text, which is what the base would have raised.
-    public override void OnPlatformValueChanged() { OnSelectedIndexChanged(); }
+    public override void OnPlatformValueChanged() => OnSelectedIndexChanged();
 }
 
 // ================================================================= list box
 
 /// A list of items, all of them visible.
-public class ListBox : ListControl {
-    IListPeer native;
+public class ListBox : ListControl
+{
+    IListPeer _native;
 
-    public ListBox(WindowedControl parent) {
+    public ListBox(WindowedControl parent)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateList(this, ParentPeer());
-        AttachPeer(native);
+        _native = WidgetSet.Current.CreateList(this, ParentPeer());
+        AttachPeer(_native);
     }
 
-    protected override IListPeer List => native;
+    protected override IListPeer List => _native;
 }
 
 // ================================================================ combo box
 
 /// A list that drops down from one line.
-public class ComboBox : ListControl {
-    IComboPeer native;
+public class ComboBox : ListControl
+{
+    IComboPeer _native;
 
-    public ComboBox(WindowedControl parent) {
+    public ComboBox(WindowedControl parent)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateCombo(this, ParentPeer());
-        AttachPeer(native);
+        _native = WidgetSet.Current.CreateCombo(this, ParentPeer());
+        AttachPeer(_native);
     }
 
-    protected override IListPeer List => native;
+    protected override IListPeer List => _native;
 
     /// Whether the text can be typed as well as chosen. A creation-time style
     /// on Windows, so this records the wish and the platform may decline it;
     /// see the note on `ComboPeer`.
-    public bool Editable {
-        get => editable;
-        set {
-            editable = value;
-            native.SetEditable(value);
+    public bool Editable
+    {
+        get => _editable;
+        set
+        {
+            _editable = value;
+            _native.SetEditable(value);
         }
     }
 
-    bool editable;
+    bool _editable;
 }

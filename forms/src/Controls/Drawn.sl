@@ -53,8 +53,9 @@ import Forms.Platform;
 ///
 /// **The coordinates are the box's own.** (0, 0) is its top-left corner
 /// wherever it sits on the form, and nothing drawn outside its bounds appears.
-public class PaintBox : GraphicControl {
-    public PaintBox(WindowedControl parent) { base(parent); }
+public class PaintBox : GraphicControl
+{
+    public PaintBox(WindowedControl parent) => base(parent);
 }
 
 // ===================================================================== shape
@@ -66,71 +67,86 @@ public enum ShapeKind { Rectangle, RoundRectangle, Ellipse, Circle, Square }
 ///
 /// `TShape` with the same members under the same names, less `TBrushStyle` --
 /// there is one brush here and it is solid.
-public class Shape : GraphicControl {
-    ShapeKind kind;
-    Color     fill;
-    Color     edge;
-    int       thickness;
+public class Shape : GraphicControl
+{
+    ShapeKind _kind;
+    Color _fill;
+    Color _edge;
+    int _thickness;
 
-    public Shape(WindowedControl parent) {
+    public Shape(WindowedControl parent)
+    {
         base(parent);
-        kind = ShapeKind.Rectangle;
-        fill = Colors.White;
-        edge = Colors.Black;
-        thickness = 1;
+        _kind = ShapeKind.Rectangle;
+        _fill = Colors.White;
+        _edge = Colors.Black;
+        _thickness = 1;
     }
 
-    public ShapeKind Kind {
-        get => kind;
-        set {
-            kind = value;
+    public ShapeKind Kind
+    {
+        get => _kind;
+        set
+        {
+            _kind = value;
             Invalidate();
         }
     }
 
-    public Color FillColor {
-        get => fill;
-        set {
-            fill = value;
+    public Color FillColor
+    {
+        get => _fill;
+        set
+        {
+            _fill = value;
             Invalidate();
         }
     }
 
-    public Color LineColor {
-        get => edge;
-        set {
-            edge = value;
+    public Color LineColor
+    {
+        get => _edge;
+        set
+        {
+            _edge = value;
             Invalidate();
         }
     }
 
-    public int LineWidth {
-        get => thickness;
-        set {
-            thickness = value;
+    public int LineWidth
+    {
+        get => _thickness;
+        set
+        {
+            _thickness = value;
             Invalidate();
         }
     }
 
-    protected override void OnPaint(PaintEventArgs args) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
         var surface = args.Graphics;
-        var brush = new Brush(fill);
-        var pen = new Pen(edge, thickness, PenStyle.Solid);
+        var brush = new Brush(_fill);
+        var pen = new Pen(_edge, _thickness, PenStyle.Solid);
 
         // A square and a circle are the same shapes fitted to the shorter side,
         // which is what makes them worth having as separate kinds rather than
         // leaving a caller to keep the bounds square by hand.
         var area = Rectangle.Of(0, 0, Width - 1, Height - 1);
-        if (kind == ShapeKind.Circle || kind == ShapeKind.Square) {
+        if (_kind == ShapeKind.Circle || _kind == ShapeKind.Square)
+        {
             int side = area.Width < area.Height ? area.Width : area.Height;
             area = Rectangle.Of((area.Width - side) / 2, (area.Height - side) / 2,
                                 side, side);
         }
 
-        if (kind == ShapeKind.Ellipse || kind == ShapeKind.Circle) {
+        if (_kind == ShapeKind.Ellipse || _kind == ShapeKind.Circle)
+        {
             surface.FillEllipse(brush, area);
             surface.DrawEllipse(pen, area);
-        } else {
+        }
+        else
+        {
             surface.FillRectangle(brush, area);
             surface.DrawRectangle(pen, area);
         }
@@ -151,58 +167,74 @@ public enum BevelStyle { Lowered, Raised }
 ///
 /// Two lines of contrasting colour, which is the whole of what a bevel is and
 /// what `TBevel` does with `clBtnShadow` and `clBtnHighlight`.
-public class Bevel : GraphicControl {
-    BevelKind  kind;
-    BevelStyle style;
+public class Bevel : GraphicControl
+{
+    BevelKind _kind;
+    BevelStyle _style;
 
-    public Bevel(WindowedControl parent) {
+    public Bevel(WindowedControl parent)
+    {
         base(parent);
-        kind = BevelKind.Box;
-        style = BevelStyle.Lowered;
+        _kind = BevelKind.Box;
+        _style = BevelStyle.Lowered;
     }
 
-    public BevelKind Kind {
-        get => kind;
-        set {
-            kind = value;
+    public BevelKind Kind
+    {
+        get => _kind;
+        set
+        {
+            _kind = value;
             Invalidate();
         }
     }
 
-    public BevelStyle Style {
-        get => style;
-        set {
-            style = value;
+    public BevelStyle Style
+    {
+        get => _style;
+        set
+        {
+            _style = value;
             Invalidate();
         }
     }
 
-    protected override void OnPaint(PaintEventArgs args) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
         var surface = args.Graphics;
         // Lowered means the shadow is on top and the highlight below; raised is
         // the same two lines the other way round. That is the only difference
         // between the two, and it is why there is no third case.
-        var first = new Pen(style == BevelStyle.Lowered
+        var first = new Pen(_style == BevelStyle.Lowered
             ? SystemColors.ControlDark : SystemColors.ControlLight);
-        var second = new Pen(style == BevelStyle.Lowered
+        var second = new Pen(_style == BevelStyle.Lowered
             ? SystemColors.ControlLight : SystemColors.ControlDark);
 
         int right = Width - 1;
         int bottom = Height - 1;
 
-        if (kind == BevelKind.TopLine) {
+        if (_kind == BevelKind.TopLine)
+        {
             surface.DrawLine(first, 0, 0, right, 0);
             surface.DrawLine(second, 0, 1, right, 1);
-        } else if (kind == BevelKind.BottomLine) {
+        }
+        else if (_kind == BevelKind.BottomLine)
+        {
             surface.DrawLine(first, 0, bottom - 1, right, bottom - 1);
             surface.DrawLine(second, 0, bottom, right, bottom);
-        } else if (kind == BevelKind.LeftLine) {
+        }
+        else if (_kind == BevelKind.LeftLine)
+        {
             surface.DrawLine(first, 0, 0, 0, bottom);
             surface.DrawLine(second, 1, 0, 1, bottom);
-        } else if (kind == BevelKind.RightLine) {
+        }
+        else if (_kind == BevelKind.RightLine)
+        {
             surface.DrawLine(first, right - 1, 0, right - 1, bottom);
             surface.DrawLine(second, right, 0, right, bottom);
-        } else {
+        }
+        else
+        {
             surface.DrawLine(first, 0, 0, right, 0);
             surface.DrawLine(first, 0, 0, 0, bottom);
             surface.DrawLine(second, 0, bottom, right, bottom);
@@ -228,18 +260,20 @@ public class Bevel : GraphicControl {
 /// var bar  = new Splitter(this);  bar.Dock  = DockStyle.Left;
 /// var page = new TextBox(this);   page.Dock = DockStyle.Fill;
 /// ```
-public class Splitter : GraphicControl {
-    bool  dragging;
-    Point grabbed;
-    int   startedAt;
-    int   smallest;
+public class Splitter : GraphicControl
+{
+    bool _dragging;
+    Point _grabbed;
+    int _startedAt;
+    int _smallest;
 
-    public Splitter(WindowedControl parent) {
+    public Splitter(WindowedControl parent)
+    {
         base(parent);
-        dragging = false;
-        grabbed = Point.Empty;
-        startedAt = 0;
-        smallest = 40;
+        _dragging = false;
+        _grabbed = Point.Empty;
+        _startedAt = 0;
+        _smallest = 40;
         Dock = DockStyle.Left;
         Width = 5;
         Height = 5;
@@ -247,70 +281,95 @@ public class Splitter : GraphicControl {
     }
 
     /// The smallest the neighbour may be dragged to.
-    public int MinimumSize {
-        get => smallest;
-        set { smallest = value; }
+    public int MinimumSize
+    {
+        get => _smallest;
+        set => _smallest = value;
     }
 
     /// Which control this splitter resizes: the one docked to the same edge
     /// immediately before it.
-    Control? Neighbour() {
+    Control? Neighbour()
+    {
         var parent = Parent;
-        if (parent == null) { return null; }
+        if (parent == null)
+            return null;
         var siblings = ((WindowedControl)parent).Controls;
         Control? previous = null;
-        foreach (var child in siblings) {
-            if (child == this) { return previous; }
-            if (child.Dock == Dock) { previous = child; }
+        foreach (var child in siblings)
+        {
+            if (child == this)
+                return previous;
+            if (child.Dock == Dock)
+                previous = child;
         }
         return null;
     }
 
-    bool Horizontal => Dock == DockStyle.Left || Dock == DockStyle.Right;
+    bool _Horizontal => Dock == DockStyle.Left || Dock == DockStyle.Right;
 
-    protected override void OnMouseDown(MouseEventArgs args) {
+    protected override void OnMouseDown(MouseEventArgs args)
+    {
         base.OnMouseDown(args);
-        if (args.Button != MouseButton.Left) { return; }
+        if (args.Button != MouseButton.Left)
+            return;
         var beside = Neighbour();
-        if (beside == null) { return; }
-        dragging = true;
+        if (beside == null)
+            return;
+        _dragging = true;
         // In the *parent's* coordinates, because that is the space the drag is
         // measured in and the splitter itself is about to move underneath it.
-        grabbed = Point.At(Left + args.X, Top + args.Y);
-        startedAt = Horizontal ? ((Control)beside).Width : ((Control)beside).Height;
+        _grabbed = Point.At(Left + args.X, Top + args.Y);
+        _startedAt = _Horizontal ? ((Control)beside).Width : ((Control)beside).Height;
         CaptureMouse(true);
     }
 
-    protected override void OnMouseMove(MouseEventArgs args) {
+    protected override void OnMouseMove(MouseEventArgs args)
+    {
         base.OnMouseMove(args);
-        if (!dragging) { return; }
+        if (!_dragging)
+            return;
         var beside = Neighbour();
-        if (beside == null) { return; }
+        if (beside == null)
+            return;
 
         var now = Point.At(Left + args.X, Top + args.Y);
-        int moved = Horizontal ? now.X - grabbed.X : now.Y - grabbed.Y;
+        int moved = _Horizontal ? now.X - _grabbed.X : now.Y - _grabbed.Y;
         // Dragging a right- or bottom-docked splitter grows its neighbour the
         // other way, since the neighbour's far edge is the one that is fixed.
-        if (Dock == DockStyle.Right || Dock == DockStyle.Bottom) { moved = -moved; }
+        if (Dock == DockStyle.Right || Dock == DockStyle.Bottom)
+            moved = -moved;
 
-        int wanted = startedAt + moved;
-        if (wanted < smallest) { wanted = smallest; }
+        int wanted = _startedAt + moved;
+        if (wanted < _smallest)
+            wanted = _smallest;
 
         var control = (Control)beside;
-        if (Horizontal) { control.Width = wanted; } else { control.Height = wanted; }
+        if (_Horizontal)
+        {
+            control.Width = wanted;
+        }
+        else
+        {
+            control.Height = wanted;
+        }
 
         var parent = Parent;
-        if (parent != null) { ((WindowedControl)parent).PerformLayout(); }
+        if (parent != null)
+            ((WindowedControl)parent).PerformLayout();
     }
 
-    protected override void OnMouseUp(MouseEventArgs args) {
+    protected override void OnMouseUp(MouseEventArgs args)
+    {
         base.OnMouseUp(args);
-        if (!dragging) { return; }
-        dragging = false;
+        if (!_dragging)
+            return;
+        _dragging = false;
         CaptureMouse(false);
     }
 
-    protected override void OnPaint(PaintEventArgs args) {
+    protected override void OnPaint(PaintEventArgs args)
+    {
         // Nothing of its own: the parent's background shows through, which is
         // what a splitter looks like on every platform. The cursor is what says
         // it can be dragged.

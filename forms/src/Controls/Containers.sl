@@ -41,23 +41,27 @@ import Forms.Platform;
 /// strip.Dock = DockStyle.Top;
 /// strip.Height = 32;
 /// ```
-public class Panel : WindowedControl {
-    IPanelPeer native;
-    ControlBorder edging;
+public class Panel : WindowedControl
+{
+    IPanelPeer _native;
+    ControlBorder _edging;
 
-    public Panel(WindowedControl parent) {
+    public Panel(WindowedControl parent)
+    {
         base(parent);
-        edging = ControlBorder.None;
-        native = WidgetSet.Current.CreatePanel(this, ParentPeer());
-        AttachContainerPeer(native);
+        _edging = ControlBorder.None;
+        _native = WidgetSet.Current.CreatePanel(this, ParentPeer());
+        AttachContainerPeer(_native);
     }
 
     /// The frame drawn around it.
-    public ControlBorder Border {
-        get => edging;
-        set {
-            edging = value;
-            native.SetBorder(value);
+    public ControlBorder Border
+    {
+        get => _edging;
+        set
+        {
+            _edging = value;
+            _native.SetBorder(value);
             PerformLayout();
         }
     }
@@ -70,19 +74,22 @@ public class Panel : WindowedControl {
 /// Its client area is inset by the frame and the caption, which the platform
 /// works out -- so a control docked to the top of a group box lands under the
 /// caption rather than through it.
-public class GroupBox : WindowedControl {
-    IGroupPeer native;
+public class GroupBox : WindowedControl
+{
+    IGroupPeer _native;
 
-    public GroupBox(WindowedControl parent) {
+    public GroupBox(WindowedControl parent)
+    {
         base(parent);
-        native = WidgetSet.Current.CreateGroup(this, ParentPeer());
-        AttachContainerPeer(native);
+        _native = WidgetSet.Current.CreateGroup(this, ParentPeer());
+        AttachContainerPeer(_native);
     }
 
     /// The caption across the top of the frame.
-    public String Caption {
+    public String Caption
+    {
         get => Text;
-        set { Text = value; }
+        set => Text = value;
     }
 }
 
@@ -94,66 +101,75 @@ public class GroupBox : WindowedControl {
 /// exist yet -- would use the scroll bars the platform attaches to a window,
 /// which are a different thing with a different API. This is the control you
 /// place on a form when the thing being scrolled is yours.
-public class ScrollBar : WindowedControl {
-    IScrollBarPeer native;
-    bool vertical;
-    int  minimum;
-    int  maximum;
-    int  page;
+public class ScrollBar : WindowedControl
+{
+    IScrollBarPeer _native;
+    bool _vertical;
+    int _minimum;
+    int _maximum;
+    int _page;
 
-    public ScrollBar(WindowedControl parent, bool vertical) {
+    public ScrollBar(WindowedControl parent, bool vertical)
+    {
         base(parent);
-        this.vertical = vertical;
-        minimum = 0;
-        maximum = 100;
-        page = 10;
-        native = WidgetSet.Current.CreateScrollBar(this, ParentPeer(), vertical);
-        AttachPeer(native);
-        native.SetRange(minimum, maximum, page);
+        this._vertical = vertical;
+        _minimum = 0;
+        _maximum = 100;
+        _page = 10;
+        _native = WidgetSet.Current.CreateScrollBar(this, ParentPeer(), vertical);
+        AttachPeer(_native);
+        _native.SetRange(_minimum, _maximum, _page);
     }
 
     /// Whether it scrolls up and down rather than left and right.
-    public bool IsVertical => vertical;
+    public bool IsVertical => _vertical;
 
-    public int Minimum {
-        get => minimum;
-        set {
-            minimum = value;
-            native.SetRange(minimum, maximum, page);
+    public int Minimum
+    {
+        get => _minimum;
+        set
+        {
+            _minimum = value;
+            _native.SetRange(_minimum, _maximum, _page);
         }
     }
 
-    public int Maximum {
-        get => maximum;
-        set {
-            maximum = value;
-            native.SetRange(minimum, maximum, page);
+    public int Maximum
+    {
+        get => _maximum;
+        set
+        {
+            _maximum = value;
+            _native.SetRange(_minimum, _maximum, _page);
         }
     }
 
     /// How much one page-down moves by, and how large the thumb is drawn -- the
     /// two are the same number on every platform, because the thumb's size is
     /// what shows how much of the whole is visible.
-    public int PageSize {
-        get => page;
-        set {
-            page = value;
-            native.SetRange(minimum, maximum, page);
+    public int PageSize
+    {
+        get => _page;
+        set
+        {
+            _page = value;
+            _native.SetRange(_minimum, _maximum, _page);
         }
     }
 
     /// Where the thumb is.
-    public int Value {
-        get => native.GetValue();
-        set { native.SetValue(value); }
+    public int Value
+    {
+        get => _native.GetValue();
+        set => _native.SetValue(value);
     }
 
     /// The thumb moved, whoever moved it.
     public event EventHandler ValueChanged;
 
-    protected virtual void OnValueChanged() { ValueChanged(this); }
+    protected virtual void OnValueChanged() => ValueChanged(this);
 
-    public override void OnPlatformValueChanged() { OnValueChanged(); }
+    public override void OnPlatformValueChanged() => OnValueChanged();
 }
 
 // ============================================================ custom control
@@ -196,27 +212,31 @@ public class ScrollBar : WindowedControl {
 /// **A container, like a `Panel`.** Anything may be put inside one, and the
 /// children are drawn over what the control painted -- which is the order a
 /// scroll bar beside its own content needs.
-public class CustomControl : WindowedControl {
-    ICustomPeer   native;
-    ControlBorder edging;
-    Rectangle     insertion;
-    bool          takesFocus;
+public class CustomControl : WindowedControl
+{
+    ICustomPeer _native;
+    ControlBorder _edging;
+    Rectangle _insertion;
+    bool _takesFocus;
 
-    public CustomControl(WindowedControl parent) {
+    public CustomControl(WindowedControl parent)
+    {
         base(parent);
-        edging = ControlBorder.None;
-        insertion = Rectangle.Empty;
-        takesFocus = true;
-        native = WidgetSet.Current.CreateCustom(this, ParentPeer());
-        AttachContainerPeer(native);
+        _edging = ControlBorder.None;
+        _insertion = Rectangle.Empty;
+        _takesFocus = true;
+        _native = WidgetSet.Current.CreateCustom(this, ParentPeer());
+        AttachContainerPeer(_native);
     }
 
     /// The frame drawn around it.
-    public ControlBorder Border {
-        get => edging;
-        set {
-            edging = value;
-            native.SetBorder(value);
+    public ControlBorder Border
+    {
+        get => _edging;
+        set
+        {
+            _edging = value;
+            _native.SetBorder(value);
             PerformLayout();
         }
     }
@@ -227,11 +247,13 @@ public class CustomControl : WindowedControl {
     /// alone -- which is a different thing from one that takes the focus and
     /// happens to handle no keys, because the second still takes the focus away
     /// from whatever had it.
-    public bool Focusable {
-        get => takesFocus;
-        set {
-            takesFocus = value;
-            native.SetFocusable(value);
+    public bool Focusable
+    {
+        get => _takesFocus;
+        set
+        {
+            _takesFocus = value;
+            _native.SetFocusable(value);
         }
     }
 
@@ -243,11 +265,13 @@ public class CustomControl : WindowedControl {
     /// owns the appearing and disappearing as the focus moves, so a control
     /// that has just moved its caret has finished: there is no timer to start,
     /// nothing to hide before painting and nothing to put back after.
-    public Rectangle Caret {
-        get => insertion;
-        set {
-            insertion = value;
-            native.SetCaret(value);
+    public Rectangle Caret
+    {
+        get => _insertion;
+        set
+        {
+            _insertion = value;
+            _native.SetCaret(value);
         }
     }
 }
@@ -259,30 +283,33 @@ public class CustomControl : WindowedControl {
 /// A real container, so controls are put on it exactly as they are put on a
 /// panel. It is never laid out by the program: the notebook fills itself with
 /// whichever page is showing and hides the rest.
-public class NotebookPage : Panel {
-    int index;
+public class NotebookPage : Panel
+{
+    int _index;
 
-    public NotebookPage(Notebook owner, String name) {
+    public NotebookPage(Notebook owner, String name)
+    {
         base(owner);
         StoredText = name;
-        index = owner.Register(this);
+        _index = owner.Register(this);
     }
 
     /// Which page this is, counting from zero.
-    public int Index => index;
+    public int Index => _index;
 
     /// Told its new number after a page in front of it was removed. Called by
     /// `Notebook.RemovePage` and by nothing else.
-    public void Renumber(int now) { index = now; }
+    public void Renumber(int now) => _index = now;
 
     /// What this page is called. Not drawn anywhere -- there are no tabs -- so
     /// it is what a program looks a page up by and what a status line or a
     /// wizard's heading would show. `Caption` rather than `Name` because
     /// `Control.Name` already means the identifier a program knows a control
     /// by, and because `TabPage` spells the same thing the same way.
-    public String Caption {
+    public String Caption
+    {
         get => StoredText;
-        set { StoredText = value; }
+        set => StoredText = value;
     }
 }
 
@@ -310,35 +337,43 @@ public class NotebookPage : Panel {
 /// var done    = new NotebookPage(steps, "Finished");
 /// steps.SelectedIndex = 0;
 /// ```
-public class Notebook : Panel {
-    List<NotebookPage>? pages;
-    int chosen;
+public class Notebook : Panel
+{
+    List<NotebookPage>? _pages;
+    int _chosen;
 
-    public Notebook(WindowedControl parent) {
+    public Notebook(WindowedControl parent)
+    {
         base(parent);
-        pages = new List<NotebookPage>();
-        chosen = -1;
+        _pages = new List<NotebookPage>();
+        _chosen = -1;
     }
 
     /// Called by a `NotebookPage` as it is built. Not public: a page joins the
     /// notebook it was constructed with, and there is no other way in.
-    int Register(NotebookPage page) {
-        var held = pages;
-        if (held == null) { return -1; }
+    int Register(NotebookPage page)
+    {
+        var held = _pages;
+        if (held == null)
+            return -1;
         var list = (List<NotebookPage>)held;
         list.Add(page);
         int at = (int)list.Count() - 1;
         // The first page added becomes the one showing, so a notebook is never
         // a blank rectangle with pages in it that nothing selected.
-        if (chosen < 0) { chosen = 0; }
+        if (_chosen < 0)
+            _chosen = 0;
         ShowOnly();
         return at;
     }
 
-    public List<NotebookPage> Pages {
-        get {
-            var held = pages;
-            if (held == null) { return new List<NotebookPage>(); }
+    public List<NotebookPage> Pages
+    {
+        get
+        {
+            var held = _pages;
+            if (held == null)
+                return new List<NotebookPage>();
             return (List<NotebookPage>)held;
         }
     }
@@ -346,34 +381,45 @@ public class Notebook : Panel {
     public int PageCount => (int)Pages.Count();
 
     /// Which page is showing, or -1 for a notebook with none.
-    public int SelectedIndex {
-        get => chosen;
-        set {
+    public int SelectedIndex
+    {
+        get => _chosen;
+        set
+        {
             int count = PageCount;
             int wanted = value;
-            if (wanted >= count) { wanted = count - 1; }
-            if (wanted < 0) { wanted = count == 0 ? -1 : 0; }
-            if (wanted == chosen) { return; }
-            chosen = wanted;
+            if (wanted >= count)
+                wanted = count - 1;
+            if (wanted < 0)
+                wanted = count == 0 ? -1 : 0;
+            if (wanted == _chosen)
+                return;
+            _chosen = wanted;
             ShowOnly();
             OnSelectedIndexChanged();
         }
     }
 
-    public NotebookPage? SelectedPage {
-        get {
+    public NotebookPage? SelectedPage
+    {
+        get
+        {
             var list = Pages;
-            if (chosen < 0 || (nuint)chosen >= list.Count()) { return null; }
-            return list.At((nuint)chosen);
+            if (_chosen < 0 || (nuint)_chosen >= list.Count())
+                return null;
+            return list.At((nuint)_chosen);
         }
     }
 
     /// The page of that name, or null if there is none. What a program that
     /// named its pages rather than counting them asks with.
-    public NotebookPage? Find(String name) {
+    public NotebookPage? Find(String name)
+    {
         var list = Pages;
-        for (nuint i = 0u; i < list.Count(); i += 1u) {
-            if (list.At(i).Caption == name) { return list.At(i); }
+        for (nuint i = 0u; i < list.Count(); i++)
+        {
+            if (list.At(i).Caption == name)
+                return list.At(i);
         }
         return null;
     }
@@ -383,22 +429,32 @@ public class Notebook : Panel {
     /// The page is hidden rather than destroyed, as `TabControl.RemovePage`
     /// does it and for the same reason: a control's lifetime is its parent's,
     /// and dropping the last reference to it is what destroys it.
-    public bool RemovePage(NotebookPage page) {
+    public bool RemovePage(NotebookPage page)
+    {
         var list = Pages;
         nuint at = 0u;
         bool found = false;
-        for (nuint i = 0u; i < list.Count(); i += 1u) {
-            if (list.At(i) == page) { at = i; found = true; break; }
+        for (nuint i = 0u; i < list.Count(); i++)
+        {
+            if (list.At(i) == page)
+            {
+                at = i;
+                found = true;
+                break;
+            }
         }
-        if (!found) { return false; }
+        if (!found)
+            return false;
 
         list.RemoveAt(at);
         page.Visible = false;
-        for (nuint i = at; i < list.Count(); i += 1u) { list.At(i).Renumber((int)i); }
+        for (nuint i = at; i < list.Count(); i++)
+            list.At(i).Renumber((int)i);
 
         // Removing the page that was showing moves the selection to whatever
         // took its place, or to the last page when it was the last.
-        if (chosen >= (int)list.Count()) { chosen = (int)list.Count() - 1; }
+        if (_chosen >= (int)list.Count())
+            _chosen = (int)list.Count() - 1;
         ShowOnly();
         OnSelectedIndexChanged();
         return true;
@@ -409,23 +465,27 @@ public class Notebook : Panel {
     /// The same job `TabControl.ShowOnly` does, minus the platform: there is no
     /// tab control underneath to ask where the page area is, so it is the whole
     /// of the client area.
-    void ShowOnly() {
-        var held = pages;
-        if (held == null) { return; }
+    void ShowOnly()
+    {
+        var held = _pages;
+        if (held == null)
+            return;
         var list = (List<NotebookPage>)held;
         var area = ClientBounds;
-        for (nuint i = 0u; i < list.Count(); i += 1u) {
+        for (nuint i = 0u; i < list.Count(); i++)
+        {
             var page = list.At(i);
-            bool wanted = (int)i == chosen;
+            bool wanted = (int)i == _chosen;
             page.Visible = wanted;
-            if (wanted) { page.Bounds = area; }
+            if (wanted)
+                page.Bounds = area;
         }
     }
 
     /// The chosen page changed.
     public event EventHandler SelectedIndexChanged;
 
-    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+    protected virtual void OnSelectedIndexChanged() => SelectedIndexChanged(this);
 
     /// A resize moves the page area, so whichever page is showing follows it.
     ///
@@ -433,9 +493,11 @@ public class Notebook : Panel {
     /// this override runs before this class's own fields exist -- the same trap
     /// C# has with a virtual call from a base constructor, and the same one
     /// `RadioGroup` and `CheckGroup` guard against.
-    protected override void OnResize() {
+    protected override void OnResize()
+    {
         base.OnResize();
-        if (pages == null) { return; }
+        if (_pages == null)
+            return;
         ShowOnly();
     }
 }

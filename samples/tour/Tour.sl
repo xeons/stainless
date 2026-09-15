@@ -47,22 +47,25 @@ static int Steps = 0;
 
 // ------------------------------------------------------------------ helpers
 
-void Heading(String name) {
+void Heading(String name)
+{
     Console.WriteLine("");
     Console.WriteLine("== " + name + " " + "=".Repeat(60u - name.ByteLength()));
 }
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine("  " + label.PadRight(22u) + value);
 }
 
-void Say(String label, long value) { Say(label, Text.FromInteger(value)); }
-void Say(String label, bool value) { Say(label, Text.FromBool(value)); }
-void Say(String label, double value) { Say(label, Text.FromDouble(value)); }
+void Say(String label, long value) => Say(label, Text.FromInteger(value));
+void Say(String label, bool value) => Say(label, Text.FromBool(value));
+void Say(String label, double value) => Say(label, Text.FromDouble(value));
 
 // ==================================================================== §1
 
-void Modules() {
+void Modules()
+{
     Heading("1. modules");
 
     // A module is reached by the last segment of its name, so `Tour.Platform`
@@ -95,21 +98,22 @@ void Modules() {
 
 // ==================================================================== §2.1
 
-void Primitives() {
+void Primitives()
+{
     Heading("2.1 primitives");
 
-    bool   yes  = true;
-    byte   b    = 200;              // a literal converts to what can hold it
-    sbyte  sb   = (sbyte)-100;    // a *negative* literal is an expression
-    short  s    = (short)-30000;  // rather than a literal, so it needs a cast
+    bool yes  = true;
+    byte b    = 200;              // a literal converts to what can hold it
+    sbyte sb   = (sbyte)-100;    // a *negative* literal is an expression
+    short s    = (short)-30000;  // rather than a literal, so it needs a cast
     ushort us   = 60000;
-    int    i    = -2000000000;
-    uint   ui   = 4000000000u;
-    long   l    = -9000000000000000000;
-    ulong  ul   = 18000000000000000000u;
-    nint   ni   = -42;              // pointer-wide
-    nuint  nu   = 42u;
-    float  f    = (float)1.5;     // there is no float literal suffix
+    int i    = -2000000000;
+    uint ui   = 4000000000u;
+    long l    = -9000000000000000000;
+    ulong ul   = 18000000000000000000u;
+    nint ni   = -42;              // pointer-wide
+    nuint nu   = 42u;
+    float f    = (float)1.5;     // there is no float literal suffix
     double d    = 2.25;
 
     Say("bool", yes);
@@ -122,10 +126,10 @@ void Primitives() {
 
     // §2.1: three code-unit types, one scalar literal. Which type a character
     // literal becomes is decided by what holds it in a single unit.
-    char   ascii    = 'A';          // U+0041, one UTF-8 byte
+    char ascii    = 'A';          // U+0041, one UTF-8 byte
     char16 accented = 'é';     // one UTF-16 unit, two UTF-8 bytes
     char32 emoji    = '\U0001F600'; // one of anything, and only that
-    char   tab      = '\t';
+    char tab      = '\t';
 
     Say("char", (long)ascii);
     Say("char16", (long)accented);
@@ -142,7 +146,8 @@ void Primitives() {
 
 // ==================================================================== §2.2
 
-void Values() {
+void Values()
+{
     Heading("2.2 structs, and what may be asked about one");
 
     // A struct is a value. There is no constructor: every field starts zeroed.
@@ -176,7 +181,8 @@ void Values() {
     // An inline array is storage rather than a reference, so it is written
     // through the struct that holds it.
     Matrix m;
-    for (nuint k = 0u; k < m.Cell.Length; k++) { m.Cell[k] = (double)k * Half; }
+    for (nuint k = 0u; k < m.Cell.Length; k++)
+        m.Cell[k] = (double)k * Half;
     Say("matrix", $"{m.Cell[0u]} {m.Cell[1u]} {m.Cell[2u]} {m.Cell[3u]}");
 
     // Bit-fields lay out as the target's C ABI lays them out -- which differs
@@ -203,7 +209,8 @@ void Values() {
 
 // ==================================================================== §2.5
 
-void Pointers() {
+void Pointers()
+{
     Heading("2.5 pointers, and the absence of a value");
 
     int number = 5;
@@ -227,7 +234,8 @@ void Pointers() {
     Say("null", maybe == null);
 
     maybe = new Loud("optional");
-    if (maybe != null) {
+    if (maybe != null)
+    {
         Say("narrowed", maybe.Label);   // a `Loud` here, not a `Loud?`
     }
 
@@ -248,25 +256,30 @@ void Pointers() {
 
 // ==================================================================== §2.6
 
-String Area(Shape shape) {
+String Area(Shape shape)
+{
     // A `switch` over a variant is exhaustive: leaving a case out is an error
     // rather than a fall-through to nothing.
-    switch (shape) {
+    switch (shape)
+    {
         case Circle c: return Text.FromDouble(3.0 * c.Radius * c.Radius);
         case Rect r:   return Text.FromDouble(r.Width * r.Height);
         case Empty:    return "0";
     }
 }
 
-int Leaves(Tree<int> tree) {
-    switch (tree) {
+int Leaves(Tree<int> tree)
+{
+    switch (tree)
+    {
         case Leaf:    return 1;
         case Node n:  return Leaves(n.Pair.Left) + Leaves(n.Pair.Right);
         case Nothing: return 0;
     }
 }
 
-void Variants() {
+void Variants()
+{
     Heading("2.6 variants");
 
     Say("circle", Area(Shape.Circle(2.0)));
@@ -276,8 +289,10 @@ void Variants() {
     // §2.6: `is` with a name takes the value once and names what came out,
     // which is what a field or a call result needs.
     Shape shape = Shape.Rect(2.0, 5.0);
-    if (shape is Rect r) { Say("is binding", $"{r.Width}x{r.Height}"); }
-    if (shape is Circle) { Say("is", "unreachable"); }
+    if (shape is Rect r)
+        Say("is binding", $"{r.Width}x{r.Height}");
+    if (shape is Circle)
+        Say("is", "unreachable");
 
     // A generic variant, holding itself. A case is named without its type
     // arguments, because the type it is being built for is already known --
@@ -294,22 +309,26 @@ void Variants() {
     Optional<String> found = Some("here");
     Optional<String> missing = None;
     Say("optional", found.ValueOr("-") + " / " + missing.ValueOr("-"));
-    if (found is Some got) { Say("optional is", got.Value); }
+    if (found is Some got)
+        Say("optional is", got.Value);
 }
 
 // ==================================================================== §2.8
 
 /// A function that can fail says so in its type. `Ok` and `Fail` are decided by
 /// the return type rather than by a name in scope.
-Result<int, ConvertError> Halved(String text) {
+Result<int, ConvertError> Halved(String text)
+{
     // `try` is the early return: on failure it returns `Fail` with the same
     // error, and on success the expression is the value.
     long n = try Convert.ToLong(text);
-    if (n % 2 != 0) { return Fail(ConvertError.Malformed); }
+    if (n % 2 != 0)
+        return Fail(ConvertError.Malformed);
     return Ok((int)(n / 2));
 }
 
-void Results() {
+void Results()
+{
     Heading("2.8 Result, and try");
 
     var good = Halved("84");
@@ -318,9 +337,12 @@ void Results() {
 
     // The two halves are readable only where the compiler has seen which one
     // is there.
-    if (good.Ok) { Say("ok", (long)good.Value); }
-    if (!odd.Ok) { Say("odd", (long)odd.Error); }
-    if (!bad.Ok) { Say("not a number", (long)bad.Error); }
+    if (good.Ok)
+        Say("ok", (long)good.Value);
+    if (!odd.Ok)
+        Say("odd", (long)odd.Error);
+    if (!bad.Ok)
+        Say("not a number", (long)bad.Error);
 
     // A default needs no proof, because it supplies one.
     Say("valueOr", (long)bad.ValueOr(-1));
@@ -328,12 +350,14 @@ void Results() {
     // `&&` carries the proof into what it guards.
     var left = Halved("10");
     var right = Halved("20");
-    if (left.Ok && right.Ok) { Say("sum", (long)(left.Value + right.Value)); }
+    if (left.Ok && right.Ok)
+        Say("sum", (long)(left.Value + right.Value));
 }
 
 // ==================================================================== §2.10
 
-void Contracts() {
+void Contracts()
+{
     Heading("2.10 interfaces");
 
     // A class may implement several, and an interface may extend another.
@@ -350,7 +374,8 @@ void Contracts() {
     // `is` and a cast both work on a class, and a failed cast is a refusal
     // rather than a wrong answer.
     Say("is Polygon", figure is Polygon);
-    if (figure is Square sq) { Say("corners", (long)sq.Corners); }
+    if (figure is Square sq)
+        Say("corners", (long)sq.Corners);
 
     // The delegating constructor, which ran `this(1.0)`.
     var unit = new Square();
@@ -359,12 +384,14 @@ void Contracts() {
 
 // ==================================================================== §2.11
 
-void Arrays() {
+void Arrays()
+{
     Heading("2.11 arrays, and 2.12 slices");
 
     // `new T[n]` is a counted heap object, zeroed.
     var numbers = new int[6];
-    for (nuint i = 0u; i < numbers.Length; i++) { numbers[i] = (int)i + 1; }
+    for (nuint i = 0u; i < numbers.Length; i++)
+        numbers[i] = (int)i + 1;
     Say("length", (long)numbers.Length);
 
     // An array may also be written out, and its element type inferred.
@@ -390,12 +417,15 @@ void Arrays() {
     // §9.4: `foreach` over an array, a slice, and anything with a
     // `GetEnumerator` -- which is a shape rather than an interface.
     long total = 0;
-    foreach (var n in numbers) { total += n; }
-    foreach (var n in numbers[1u:3u]) { total += n; }
+    foreach (var n in numbers)
+        total += n;
+    foreach (var n in numbers[1u:3u])
+        total += n;
     Say("foreach", total);
 
     long counted = 0;
-    foreach (var n in new Countdown(4)) { counted = counted * 10 + n; }
+    foreach (var n in new Countdown(4))
+        counted = counted * 10 + n;
     Say("own enumerator", counted);
 }
 
@@ -405,19 +435,24 @@ void Arrays() {
 /// one function. A tuple *is* a struct, so layout, both ABI classifiers and
 /// the walk that retains and releases what a value holds all apply to it with
 /// nothing written for tuples.
-(int, int) MinMax(int[:] numbers) {
+(int, int) MinMax(int[:] numbers)
+{
     int low = numbers[0u];
     int high = numbers[0u];
 
-    foreach (var n in numbers) {
-        if (n < low) { low = n; }
-        if (n > high) { high = n; }
+    foreach (var n in numbers)
+    {
+        if (n < low)
+            low = n;
+        if (n > high)
+            high = n;
     }
 
     return (low, high);
 }
 
-void Tuples() {
+void Tuples()
+{
     Heading("2.15 tuples");
 
     int[] numbers = [5, 3, 9, 1, 8];
@@ -442,28 +477,38 @@ void Tuples() {
     Say("holding references", split.Item1 + "/" + split.Item2);
 }
 
-long Sum(int[:] values) {
+long Sum(int[:] values)
+{
     long total = 0;
-    for (nuint i = 0u; i < values.Length; i++) { total += values[i]; }
+    for (nuint i = 0u; i < values.Length; i++)
+        total += values[i];
     return total;
 }
 
-void Fill(int[:] values, int with) {
-    for (nuint i = 0u; i < values.Length; i++) { values[i] = with; }
+void Fill(int[:] values, int with)
+{
+    for (nuint i = 0u; i < values.Length; i++)
+        values[i] = with;
 }
 
 // ==================================================================== §2.13
 
-String Describe(Access mode) {
+String Describe(Access mode)
+{
     var text = new StringBuilder();
-    if (mode.HasFlag(Access.Read)) { text.Append("r"); }
-    if (mode.HasFlag(Access.Write)) { text.Append("w"); }
-    if (mode.HasFlag(Access.Execute)) { text.Append("x"); }
-    if (mode == Access.None) { text.Append("-"); }
+    if (mode.HasFlag(Access.Read))
+        text.Append("r");
+    if (mode.HasFlag(Access.Write))
+        text.Append("w");
+    if (mode.HasFlag(Access.Execute))
+        text.Append("x");
+    if (mode == Access.None)
+        text.Append("-");
     return text.ToText();
 }
 
-void Enumerations() {
+void Enumerations()
+{
     Heading("2.13 enums");
 
     // A distinct type over an integer: it does not convert on its own, and
@@ -473,7 +518,8 @@ void Enumerations() {
     Say("one past", (long)Level.Severe);
     Say("named base", (long)sizeof(Level));
 
-    switch (level) {
+    switch (level)
+    {
         case Level.Low: Say("switch", "low"); break;
         case Level.Warning: Say("switch", "warning"); break;
         default: Say("switch", "something else"); break;
@@ -489,10 +535,11 @@ void Enumerations() {
 
 // ==================================================================== §2.14
 
-int Add(int a, int b) { return a + b; }
-int Multiply(int a, int b) { return a * b; }
+int Add(int a, int b) => a + b;
+int Multiply(int a, int b) => a * b;
 
-void Functions() {
+void Functions()
+{
     Heading("2.14 delegates, closures and lambdas");
 
     // A delegate is one function pointer: it holds a function, not an object.
@@ -541,16 +588,26 @@ void Functions() {
 // ================================================================== §2.14.2
 
 /// Counts what an event told it, so subscribing can be seen to have worked.
-class Watcher {
+class Watcher
+{
     public int Seen;
     public int Last;
 
-    public Watcher() { Seen = 0; Last = 0; }
+    public Watcher()
+    {
+        Seen = 0;
+        Last = 0;
+    }
 
-    public void OnMoved(int at) { Seen = Seen + 1; Last = at; }
+    public void OnMoved(int at)
+    {
+        Seen = Seen + 1;
+        Last = at;
+    }
 }
 
-void Events() {
+void Events()
+{
     Heading("2.14.2 events");
 
     var control = new Control("watched");
@@ -586,31 +643,34 @@ void Events() {
 }
 
 /// A lambda written inside a class, which is where `this` can be reached.
-class Scaler {
+class Scaler
+{
     public int Factor;
 
-    public Scaler(int factor) { Factor = factor; }
+    public Scaler(int factor) => Factor = factor;
 
-    int Triple(int n) { return n * 3; }
+    int Triple(int n) => n * 3;
 
     /// A member read is captured as a value, so this copies what `Factor` said
     /// when the closure was made.
-    public Turns<int, int> ByField() { return value => value * Factor; }
+    public Turns<int, int> ByField() => value => value * Factor;
 
     /// A call captures the object, because the call needs one -- and that is
     /// what makes an object holding its own closure a cycle to break.
-    public Turns<int, int> ByMethod() { return value => Triple(value); }
+    public Turns<int, int> ByMethod() => value => Triple(value);
 }
 
 /// Returns a closure over its own parameter, which is what makes the capture
 /// a heap object rather than a stack slot.
-Turns<int, int> Adder(int by) {
+Turns<int, int> Adder(int by)
+{
     return value => value + by;
 }
 
 // ==================================================================== §2.4
 
-void References() {
+void References()
+{
     Heading("2.4 classes, and what owns what");
 
     // ARC: the count is the scope. Both of these are released at the closing
@@ -634,7 +694,8 @@ void References() {
         // into a local first, and the local is what the check is about.
         Child? kid = parent.Kid;
         Parent? owner = child.Owner;
-        if (kid != null && owner != null) { Say("linked", (long)(kid.Id + owner.Id)); }
+        if (kid != null && owner != null)
+            Say("linked", (long)(kid.Id + owner.Id));
     }
 
     // A weak reference reads back as null once what it named is gone, rather
@@ -652,7 +713,8 @@ void References() {
 
 // ==================================================================== §3
 
-void Textual() {
+void Textual()
+{
     Heading("3. text");
 
     // A String is UTF-8, counted, and immutable. A literal is one interned
@@ -678,7 +740,8 @@ void Textual() {
 
     // §3.5: one allocation that grows, for text built a piece at a time.
     var builder = new StringBuilder();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         builder.Append(Text.FromInteger((long)i));
         builder.Append(";");
     }
@@ -724,12 +787,20 @@ void Textual() {
 
 // ==================================================================== §9
 
-void Statements() {
+void Statements()
+{
     Heading("9. statements and expressions");
 
     // `if`, and a condition that must be `bool`.
     int n = 7;
-    if (n > 5) { Say("if", "greater"); } else { Say("if", "not greater"); }
+    if (n > 5)
+    {
+        Say("if", "greater");
+    }
+    else
+    {
+        Say("if", "not greater");
+    }
 
     // The conditional, which evaluates only the arm it selects.
     Say("ternary", n > 5 ? "yes" : "no");
@@ -737,16 +808,20 @@ void Statements() {
 
     // `for`, with `break` and `continue`.
     int total = 0;
-    for (int i = 0; i < 10; i++) {
-        if (i == 3) { continue; }
-        if (i == 8) { break; }
+    for (int i = 0; i < 10; i++)
+    {
+        if (i == 3)
+            continue;
+        if (i == 8)
+            break;
         total += i;
     }
     Say("for", (long)total);
 
     // `while`, and §9.7 `do`, which runs its body before it asks.
     int j = 0;
-    while (j < 5) { j += 2; }
+    while (j < 5)
+        j += 2;
     Say("while", (long)j);
 
     int tries = 0;
@@ -774,7 +849,8 @@ void Statements() {
     // §9.1: `switch` over an integer, with stacked labels and a `default`.
     // There is no fall-through: every arm ends.
     String said = "";
-    switch (n) {
+    switch (n)
+    {
         case 1:
         case 2: said = "small"; break;
         case 7: said = "seven"; break;
@@ -783,7 +859,8 @@ void Statements() {
     Say("switch", said);
 
     // Over a String, which C# allows and C does not.
-    switch (said) {
+    switch (said)
+    {
         case "seven": Say("switch on text", "matched"); break;
         default: Say("switch on text", "missed"); break;
     }
@@ -791,9 +868,15 @@ void Statements() {
     // §9.8: `goto`, and a label, which may only sit at the top level of a
     // function so that what a jump releases is one answer.
     int found = -1;
-    for (int a = 1; a < 10; a++) {
-        for (int b = 1; b < 10; b++) {
-            if (a * b == 42) { found = a * 10 + b; goto done; }
+    for (int a = 1; a < 10; a++)
+    {
+        for (int b = 1; b < 10; b++)
+        {
+            if (a * b == 42)
+            {
+                found = a * 10 + b;
+                goto done;
+            }
         }
     }
 
@@ -810,11 +893,13 @@ done:
     int room = checked(2000000 + 2000000);
     Say("checked", (long)room);
 
-    checked {
+    checked
+    {
         Say("checked block", (long)(1000 * 1000));
     }
 
-    unchecked {
+    unchecked
+    {
         int wrapped = 2147483647;
         wrapped = wrapped + 1;      // defined: it wraps, as C# does
         Say("wrapped", (long)wrapped);
@@ -848,7 +933,8 @@ done:
 
 // ==================================================================== main
 
-int Main(String[] args) {
+int Main(String[] args)
+{
     Console.WriteLine("A tour of Stainless, in " + Family() + " form.");
     Say("arguments", (long)args.Length);
 

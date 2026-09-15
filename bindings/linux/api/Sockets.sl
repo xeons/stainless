@@ -62,25 +62,29 @@ public using socklen_t = uint;
 // ================================================================= addresses
 
 /// `struct in_addr`. One IPv4 address, in network byte order.
-public struct in_addr {
+public struct in_addr
+{
     public uint s_addr;
 }
 
 /// `struct in6_addr`. One IPv6 address, as sixteen bytes in order.
-public struct in6_addr {
+public struct in6_addr
+{
     public byte[16] s6_addr;
 }
 
 /// `struct sockaddr`. The base every address begins with, and never the whole
 /// of one: what is really there is a `sockaddr_in` or a `sockaddr_in6`, and
 /// `sa_family` says which.
-public struct sockaddr {
+public struct sockaddr
+{
     public ushort sa_family;
     public byte[14] sa_data;
 }
 
 /// `struct sockaddr_in`. `sin_port` and `sin_addr` are in network byte order.
-public struct sockaddr_in {
+public struct sockaddr_in
+{
     public ushort sin_family;
     public ushort sin_port;
     public in_addr sin_addr;
@@ -88,7 +92,8 @@ public struct sockaddr_in {
 }
 
 /// `struct sockaddr_in6`.
-public struct sockaddr_in6 {
+public struct sockaddr_in6
+{
     public ushort sin6_family;
     public ushort sin6_port;
     public uint sin6_flowinfo;
@@ -98,7 +103,8 @@ public struct sockaddr_in6 {
 
 /// `struct sockaddr_storage`: big enough and aligned enough for either family,
 /// which is what `accept` and `recvfrom` should be handed.
-public struct sockaddr_storage {
+public struct sockaddr_storage
+{
     public ushort ss_family;
     public byte[6] __pad1;
     public long __align;
@@ -112,7 +118,8 @@ public struct sockaddr_storage {
 /// from one header and used against the other reads the two through each
 /// other, which is a dereference of a string and a print of a pointer.
 /// `ai_addrlen` differs too: `socklen_t` here, `size_t` there.
-public struct addrinfo {
+public struct addrinfo
+{
     public int ai_flags;
     public int ai_family;
     public int ai_socktype;
@@ -124,20 +131,23 @@ public struct addrinfo {
 }
 
 /// `struct timeval`. Both fields are 64 bits on x86-64, where Windows' are 32.
-public struct timeval {
+public struct timeval
+{
     public long tv_sec;
     public long tv_usec;
 }
 
 /// `struct linger`, for `SO_LINGER`. Both fields are `int` here and `u_short`
 /// on Windows.
-public struct linger {
+public struct linger
+{
     public int l_onoff;
     public int l_linger;
 }
 
 /// `struct pollfd`.
-public struct pollfd {
+public struct pollfd
+{
     public int fd;
     public short events;
     public short revents;
@@ -147,7 +157,8 @@ public struct pollfd {
 /// so `FD_SETSIZE` limits how *large* a descriptor may be rather than how many
 /// there may be, and a process with a high descriptor cannot use `select` at
 /// all. `poll` has no such limit and is the one to reach for.
-public struct fd_set {
+public struct fd_set
+{
     public long[16] fds_bits;
 }
 
@@ -187,7 +198,8 @@ public const uint INADDR_NONE = 4294967295u;
 
 // ============================================================ opening, closing
 
-public extern "C" {
+public extern "C"
+{
     int socket(int family, int kind, int protocol);
 
     /// Not `closesocket`: a socket is a file, and this is the same `close`
@@ -224,7 +236,8 @@ public const int SOMAXCONN = 4096;
 
 // ================================================================== transfer
 
-public extern "C" {
+public extern "C"
+{
     /// Return `ssize_t`, which is signed and pointer-sized: -1 for failure and
     /// a count otherwise. Windows returns `int` from the same four.
     long send(int fd, byte* data, nuint length, int flags);
@@ -254,7 +267,8 @@ public const int MSG_NOSIGNAL = 16384;
 
 // =================================================================== options
 
-public extern "C" {
+public extern "C"
+{
     int setsockopt(int fd, int level, int name, void* value, uint length);
     int getsockopt(int fd, int level, int name, void* value, uint* length);
 
@@ -308,7 +322,8 @@ public const int O_NONBLOCK = 2048;
 
 // ==================================================================== waiting
 
-public extern "C" {
+public extern "C"
+{
     /// The one to use. `select` has the `FD_SETSIZE` ceiling and this does
     /// not; a negative timeout waits forever.
     int poll(pollfd* entries, nuint count, int milliseconds);
@@ -332,7 +347,8 @@ public const short POLLWRBAND = 512;
 
 // ================================================================== byte order
 
-public extern "C" {
+public extern "C"
+{
     ushort htons(ushort value);
     ushort ntohs(ushort value);
     uint htonl(uint value);
@@ -341,7 +357,8 @@ public extern "C" {
 
 // ==================================================================== names
 
-public extern "C" {
+public extern "C"
+{
     /// Both `node` and `service` may be null, and one of them must not be.
     /// The result is a chain: walk `ai_next` and try each, because a host with
     /// both an A and an AAAA record may only be reachable through one.
@@ -398,14 +415,15 @@ public const int EAI_OVERFLOW = -12;
 
 // =================================================================== errno
 
-public extern "C" {
+public extern "C"
+{
     /// Where glibc keeps this thread's `errno`. The macro `errno` expands to
     /// `*__errno_location()`, and this is the function under it.
     int* __errno_location();
 }
 
 /// This thread's `errno`.
-public int Errno() { return *__errno_location(); }
+public int Errno() => *__errno_location();
 
 public const int EINTR = 4;
 public const int EBADF = 9;

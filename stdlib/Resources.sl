@@ -91,7 +91,8 @@ public const int ManifestId = 1;
 // which has one calling convention, and everything on x86, where the import
 // library exports `_GetModuleHandleW@4` and a cdecl declaration goes looking
 // for `_GetModuleHandleW`.
-extern "C" __stdcall {
+extern "C" __stdcall
+{
     void* GetModuleHandleW(char16* name);
     void* FindResourceW(void* library, char16* name, char16* type);
     void* LoadResource(void* library, void* resource);
@@ -101,35 +102,45 @@ extern "C" __stdcall {
 
 /// A resource's bytes, or null. `MAKEINTRESOURCE` is the cast: Windows
 /// reserves the bottom 64K of the pointer range for an integer name.
-byte* FindBytes(int type, int id, uint* byteCount) {
-    if (byteCount != null) { *byteCount = 0u; }
+byte* FindBytes(int type, int id, uint* byteCount)
+{
+    if (byteCount != null)
+        *byteCount = 0u;
 
     void* self = GetModuleHandleW(null);
     void* found = FindResourceW(self, (char16*)(nuint)(uint)id, (char16*)(nuint)(uint)type);
-    if (found == null) { return null; }
+    if (found == null)
+        return null;
 
     void* at = LockResource(LoadResource(self, found));
-    if (at == null) { return null; }
+    if (at == null)
+        return null;
 
-    if (byteCount != null) { *byteCount = SizeofResource(self, found); }
+    if (byteCount != null)
+        *byteCount = SizeofResource(self, found);
     return (byte*)at;
 }
 
 /// The same, for a resource named by text rather than by number.
-byte* FindNamedBytes(String type, String name, uint* byteCount) {
-    if (byteCount != null) { *byteCount = 0u; }
+byte* FindNamedBytes(String type, String name, uint* byteCount)
+{
+    if (byteCount != null)
+        *byteCount = 0u;
 
     var wideType = type.ToUtf16();
     var wideName = name.ToUtf16();
 
     void* self = GetModuleHandleW(null);
     void* found = FindResourceW(self, wideName.ToPointer(), wideType.ToPointer());
-    if (found == null) { return null; }
+    if (found == null)
+        return null;
 
     void* at = LockResource(LoadResource(self, found));
-    if (at == null) { return null; }
+    if (at == null)
+        return null;
 
-    if (byteCount != null) { *byteCount = SizeofResource(self, found); }
+    if (byteCount != null)
+        *byteCount = SizeofResource(self, found);
     return (byte*)at;
 }
 
@@ -144,15 +155,17 @@ byte* FindNamedBytes(String type, String name, uint* byteCount) {
 extern "C" byte  sl_resource_blob;
 extern "C" ulong sl_resource_blob_size;
 
-byte* BlobStart() { return &sl_resource_blob; }
-nuint BlobSize()  { return (nuint)sl_resource_blob_size; }
+byte* BlobStart() => &sl_resource_blob;
+nuint BlobSize() => (nuint)sl_resource_blob_size;
 
 /// A resource's bytes, found by walking the `.res` records.
-byte* FindBytes(int type, int id, uint* byteCount) {
+byte* FindBytes(int type, int id, uint* byteCount)
+{
     return Walk(type, "", id, "", byteCount, true, true);
 }
 
-byte* FindNamedBytes(String type, String name, uint* byteCount) {
+byte* FindNamedBytes(String type, String name, uint* byteCount)
+{
     return Walk(0, type, 0, name, byteCount, false, false);
 }
 
@@ -178,11 +191,13 @@ byte* FindNamedBytes(String type, String name, uint* byteCount) {
 // wherever they were joined, so a marker is skipped wherever it appears rather
 // than only at the front.
 
-uint ReadU16(byte* at, nuint offset) {
+uint ReadU16(byte* at, nuint offset)
+{
     return (uint)at[offset] | ((uint)at[offset + 1u] << 8);
 }
 
-uint ReadU32(byte* at, nuint offset) {
+uint ReadU32(byte* at, nuint offset)
+{
     return (uint)at[offset]
          | ((uint)at[offset + 1u] << 8)
          | ((uint)at[offset + 2u] << 16)
@@ -190,12 +205,14 @@ uint ReadU32(byte* at, nuint offset) {
 }
 
 /// Steps over a type or a name, and answers where the next field starts.
-nuint SkipName(byte* blob, nuint at, nuint size, out bool isId, out int id, out nuint textAt) {
+nuint SkipName(byte* blob, nuint at, nuint size, out bool isId, out int id, out nuint textAt)
+{
     isId = false;
     id = 0;
     textAt = 0u;
 
-    if (ReadU16(blob, at) == 0xFFFFu) {
+    if (ReadU16(blob, at) == 0xFFFFu)
+    {
         isId = true;
         id = (int)ReadU16(blob, at + 2u);
         return at + 4u;
@@ -203,33 +220,40 @@ nuint SkipName(byte* blob, nuint at, nuint size, out bool isId, out int id, out 
 
     textAt = at;
     nuint cursor = at;
-    while (cursor + 2u <= size && ReadU16(blob, cursor) != 0u) { cursor = cursor + 2u; }
+    while (cursor + 2u <= size && ReadU16(blob, cursor) != 0u)
+        cursor = cursor + 2u;
     return cursor + 2u;
 }
 
-bool TextEquals(byte* blob, nuint at, String expected) {
+bool TextEquals(byte* blob, nuint at, String expected)
+{
     nuint units = 0u;
-    while (ReadU16(blob, at + units * 2u) != 0u) { units = units + 1u; }
+    while (ReadU16(blob, at + units * 2u) != 0u)
+        units = units + 1u;
     return Text.FromUtf16((char16*)(void*)(blob + at), units) == expected;
 }
 
 /// Walks the blob for one resource. A match is by number or by text on each
 /// half independently, which is what the two flags choose between.
 byte* Walk(int type, String typeName, int id, String name,
-           uint* byteCount, bool typeIsNumber, bool nameIsNumber) {
-    if (byteCount != null) { *byteCount = 0u; }
+           uint* byteCount, bool typeIsNumber, bool nameIsNumber)
+{
+    if (byteCount != null)
+        *byteCount = 0u;
 
     byte* blob = BlobStart();
     nuint size = BlobSize();
     nuint at = 0u;
 
-    while (at + 8u <= size) {
+    while (at + 8u <= size)
+    {
         uint dataSize = ReadU32(blob, at);
         uint headerSize = ReadU32(blob, at + 4u);
 
         // A header shorter than its own fixed part, or one running off the end,
         // means this is not a .res -- stop rather than read whatever follows.
-        if (headerSize < 32u || at + (nuint)headerSize > size) { return null; }
+        if (headerSize < 32u || at + (nuint)headerSize > size)
+            return null;
 
         bool foundTypeIsId;
         int foundTypeId;
@@ -255,13 +279,16 @@ byte* Walk(int type, String typeName, int id, String name,
 
         // A null marker matches nothing, because its type and name are zero and
         // no resource is filed under either.
-        if (typeMatches && nameMatches && dataSize > 0u) {
-            if (byteCount != null) { *byteCount = dataSize; }
+        if (typeMatches && nameMatches && dataSize > 0u)
+        {
+            if (byteCount != null)
+                *byteCount = dataSize;
             return blob + dataAt;
         }
 
         nuint next = (dataAt + (nuint)dataSize + 3u) & ~(nuint)3u;
-        if (next <= at) { return null; }
+        if (next <= at)
+            return null;
         at = next;
     }
 
@@ -273,15 +300,17 @@ byte* Walk(int type, String typeName, int id, String name,
 // ================================================================ reading
 
 /// Whether a resource of this type and number is there.
-public bool Exists(int type, int id) { return FindBytes(type, id, null) != null; }
+public bool Exists(int type, int id) => FindBytes(type, id, null) != null;
 
 /// Whether one named by text, of a type named by text, is there.
-public bool Exists(String type, String name) {
+public bool Exists(String type, String name)
+{
     return FindNamedBytes(type, name, null) != null;
 }
 
 /// How many bytes a resource holds, or zero when there is none.
-public uint Size(int type, int id) {
+public uint Size(int type, int id)
+{
     uint count = 0u;
     FindBytes(type, id, &count);
     return count;
@@ -292,7 +321,8 @@ public uint Size(int type, int id) {
 /// The memory belongs to the loaded image: read-only, never freed, and valid
 /// for as long as the program runs. `Bytes` is the one to use for anything that
 /// outlives the call.
-public byte* Pointer(int type, int id, uint* byteCount) {
+public byte* Pointer(int type, int id, uint* byteCount)
+{
     return FindBytes(type, id, byteCount);
 }
 
@@ -300,24 +330,29 @@ public byte* Pointer(int type, int id, uint* byteCount) {
 ///
 /// Empty when there is no such resource, which is also what an empty resource
 /// gives -- ask `Exists` where the difference matters.
-public byte[] Bytes(int type, int id) {
+public byte[] Bytes(int type, int id)
+{
     uint count = 0u;
     byte* at = FindBytes(type, id, &count);
     return CopyOut(at, count);
 }
 
 /// The same, for a resource named by text.
-public byte[] Bytes(String type, String name) {
+public byte[] Bytes(String type, String name)
+{
     uint count = 0u;
     byte* at = FindNamedBytes(type, name, &count);
     return CopyOut(at, count);
 }
 
-byte[] CopyOut(byte* at, uint count) {
-    if (at == null || count == 0u) { return new byte[0]; }
+byte[] CopyOut(byte* at, uint count)
+{
+    if (at == null || count == 0u)
+        return new byte[0];
 
     var copy = new byte[(nuint)count];
-    for (nuint i = 0u; i < (nuint)count; i = i + 1u) { copy[i] = at[i]; }
+    for (nuint i = 0u; i < (nuint)count; i = i + 1u)
+        copy[i] = at[i];
     return copy;
 }
 
@@ -333,23 +368,29 @@ byte[] CopyOut(byte* at, uint count) {
 /// platforms answer identically and so that Windows needs no user32.
 ///
 /// Empty for a number with no string, which is what `LoadStringW` answers too.
-public String Text(uint id) {
+public String Text(uint id)
+{
     uint count = 0u;
     byte* block = FindBytes(StringTable, (int)(id / 16u) + 1, &count);
-    if (block == null) { return ""; }
+    if (block == null)
+        return "";
 
     nuint within = (nuint)(id % 16u);
     nuint cursor = 0u;
     nuint limit = (nuint)count;
 
-    for (nuint slot = 0u; slot < 16u; slot = slot + 1u) {
-        if (cursor + 2u > limit) { return ""; }
+    for (nuint slot = 0u; slot < 16u; slot = slot + 1u)
+    {
+        if (cursor + 2u > limit)
+            return "";
 
         nuint units = (nuint)((uint)block[cursor] | ((uint)block[cursor + 1u] << 8));
         cursor = cursor + 2u;
 
-        if (slot == within) {
-            if (units == 0u || cursor + units * 2u > limit) { return ""; }
+        if (slot == within)
+        {
+            if (units == 0u || cursor + units * 2u > limit)
+                return "";
             return Text.FromUtf16((char16*)(void*)(block + cursor), units);
         }
 
@@ -373,9 +414,11 @@ public String Text(uint id) {
 /// or the full `2^depth` when that field is zero and the depth is 8 or fewer.
 ///
 /// Empty when there is no such bitmap.
-public byte[] BitmapFile(int id) {
+public byte[] BitmapFile(int id)
+{
     var stored = Bytes(Bitmap, id);
-    if (stored.Length < 40) { return new byte[0]; }
+    if (stored.Length < 40)
+        return new byte[0];
 
     nuint dibSize = (nuint)stored[0u]
                   | ((nuint)stored[1u] << 8)
@@ -389,7 +432,8 @@ public byte[] BitmapFile(int id) {
                 | ((nuint)stored[35u] << 24);
 
     nuint palette = used;
-    if (palette == 0u && depth <= 8u) { palette = (nuint)1u << (int)depth; }
+    if (palette == 0u && depth <= 8u)
+        palette = (nuint)1u << (int)depth;
 
     nuint offset = 14u + dibSize + palette * 4u;
     nuint total  = 14u + (nuint)stored.Length;
@@ -406,7 +450,8 @@ public byte[] BitmapFile(int id) {
     file[12u] = (byte)((offset >> 16) & 255u);
     file[13u] = (byte)((offset >> 24) & 255u);
 
-    for (nuint i = 0u; i < (nuint)stored.Length; i = i + 1u) {
+    for (nuint i = 0u; i < (nuint)stored.Length; i = i + 1u)
+    {
         file[14u + i] = stored[i];
     }
     return file;

@@ -61,42 +61,48 @@ import Gtk.Events;
 /// A literal underscore has to be doubled on the way out or GTK would read it
 /// as a marker, which is how `Save _As` would have lost its underscore and
 /// gained an accelerator nobody asked for.
-String ToMnemonic(String caption) {
+String ToMnemonic(String caption)
+{
     var built = new StringBuilder();
     nuint at = 0u;
     nuint size = caption.ByteLength();
 
-    while (at < size) {
+    while (at < size)
+    {
         byte c = caption.ByteAt(at);
-        if (c == (byte)'&') {
+        if (c == (byte)'&')
+        {
             // `&&` is one literal ampersand, and the marker is dropped.
-            if (at + 1u < size && caption.ByteAt(at + 1u) == (byte)'&') {
+            if (at + 1u < size && caption.ByteAt(at + 1u) == (byte)'&')
+            {
                 built.Append("&");
                 at += 2u;
                 continue;
             }
             built.Append("_");
-            at += 1u;
+            at++;
             continue;
         }
-        if (c == (byte)'_') {
+        if (c == (byte)'_')
+        {
             built.Append("__");
-            at += 1u;
+            at++;
             continue;
         }
         built.Append(caption.Substring(at, 1u));
-        at += 1u;
+        at++;
     }
     return built.ToText();
 }
 
 // ============================================================== one item
 
-public class GtkMenuItemPeer : IMenuItemPeer {
-    GtkWidget* item;
+public class GtkMenuItemPeer : IMenuItemPeer
+{
+    GtkWidget* _item;
     /// True while the program is setting the tick, so that the `activate` GTK
     /// raises for it is not reported as the user choosing the item.
-    bool echoing;
+    bool _echoing;
 
     /// **Through a call, because a lambda captures a member read by value.**
     /// `if (echoing)` in the handler below would test what the flag said when
@@ -105,14 +111,17 @@ public class GtkMenuItemPeer : IMenuItemPeer {
     /// stack ran out, because `gtk_check_menu_item_set_active` emits
     /// `activate` and the guard was not guarding. Win32 never had the problem
     /// -- `CheckMenuItem` raises nothing at all.
-    bool Echoing() { return echoing; }
+    bool Echoing() => _echoing;
 
-    public GtkMenuItemPeer(GtkWidget* made, IMenuItemNotify owner) {
-        item = made;
-        echoing = false;
+    public GtkMenuItemPeer(GtkWidget* made, IMenuItemNotify owner)
+    {
+        _item = made;
+        _echoing = false;
 
-        ConnectPlain(item, "activate", () => {
-            if (Echoing()) { return; }
+        ConnectPlain(_item, "activate", () =>
+        {
+            if (Echoing())
+                return;
             owner.OnPlatformMenuClicked();
         });
     }
@@ -120,21 +129,24 @@ public class GtkMenuItemPeer : IMenuItemPeer {
     /// The widget's address. Win32 needs a number because its items share a
     /// window and a `WM_COMMAND` carries nothing else; here the item *is* the
     /// thing that was activated.
-    public nuint Id() { return (nuint)(void*)item; }
+    public nuint Id() => (nuint)(void*)_item;
 
-    public void SetText(String text) {
-        gtk_menu_item_set_label(item, ToMnemonic(text).ToPointer());
-        gtk_menu_item_set_use_underline(item, 1);
+    public void SetText(String text)
+    {
+        gtk_menu_item_set_label(_item, ToMnemonic(text).ToPointer());
+        gtk_menu_item_set_use_underline(_item, 1);
     }
 
-    public void SetEnabled(bool enabled) {
-        gtk_widget_set_sensitive(item, enabled ? 1 : 0);
+    public void SetEnabled(bool enabled)
+    {
+        gtk_widget_set_sensitive(_item, enabled ? 1 : 0);
     }
 
-    public void SetChecked(bool checked) {
-        echoing = true;
-        gtk_check_menu_item_set_active(item, checked ? 1 : 0);
-        echoing = false;
+    public void SetChecked(bool checked)
+    {
+        _echoing = true;
+        gtk_check_menu_item_set_active(_item, checked ? 1 : 0);
+        _echoing = false;
     }
 
     /// **GTK does not draw a default menu item.** Windows bolds one and
@@ -143,31 +155,35 @@ public class GtkMenuItemPeer : IMenuItemPeer {
     /// approximating it with markup that would not match the theme.
     public void SetDefault(bool isDefault) { }
 
-    public GtkWidget* Widget() { return item; }
+    public GtkWidget* Widget() => _item;
 }
 
 // ================================================================ a menu
 
-public class GtkMenuPeer : IMenuPeer {
-    GtkWidget* menu;
+public class GtkMenuPeer : IMenuPeer
+{
+    GtkWidget* _menu;
     /// Owned: one reference, sunk at construction. A menu bar goes into a
     /// window and a popup goes nowhere, so neither can be left to a parent.
-    List<GtkWidget*> items;
+    List<GtkWidget*> _items;
 
-    public GtkMenuPeer(bool isBar) {
-        menu = (GtkWidget*)g_object_ref_sink(
+    public GtkMenuPeer(bool isBar)
+    {
+        _menu = (GtkWidget*)g_object_ref_sink(
             (gpointer)(isBar ? gtk_menu_bar_new() : gtk_menu_new()));
-        items = new List<GtkWidget*>();
+        _items = new List<GtkWidget*>();
     }
 
-    ~GtkMenuPeer() {
-        if (menu == null) { return; }
-        gtk_widget_destroy(menu);
-        g_object_unref((gpointer)menu);
-        menu = null;
+    ~GtkMenuPeer()
+    {
+        if (_menu == null)
+            return;
+        gtk_widget_destroy(_menu);
+        g_object_unref((gpointer)_menu);
+        _menu = null;
     }
 
-    public nuint Handle() { return (nuint)(void*)menu; }
+    public nuint Handle() => (nuint)(void*)_menu;
 
     /// Adds a command, or a heading when `submenu` is given.
     ///
@@ -179,33 +195,38 @@ public class GtkMenuPeer : IMenuPeer {
     /// something has set one. A heading is different in kind: it opens a
     /// submenu and there is nothing it could mean to tick it, so the question
     /// never arises and the plain widget is the honest one.
-    public IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu) {
+    public IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu)
+    {
         String label = ToMnemonic(text);
         GtkWidget* made = submenu != null
             ? gtk_menu_item_new_with_mnemonic(label.ToPointer())
             : gtk_check_menu_item_new_with_mnemonic(label.ToPointer());
-        if (submenu != null) {
+        if (submenu != null)
+        {
             gtk_menu_item_set_submenu(made, ((GtkMenuPeer)submenu).Widget());
         }
 
-        gtk_menu_shell_append(menu, made);
+        gtk_menu_shell_append(_menu, made);
         gtk_widget_show(made);
-        items.Add(made);
+        _items.Add(made);
         return new GtkMenuItemPeer(made, owner);
     }
 
-    public void AddSeparator() {
+    public void AddSeparator()
+    {
         GtkWidget* line = gtk_separator_menu_item_new();
-        gtk_menu_shell_append(menu, line);
+        gtk_menu_shell_append(_menu, line);
         gtk_widget_show(line);
-        items.Add(line);
+        _items.Add(line);
     }
 
-    public void Clear() {
-        for (nuint i = 0u; i < items.Count(); i++) {
-            gtk_container_remove(menu, items[i]);
+    public void Clear()
+    {
+        for (nuint i = 0u; i < _items.Count(); i++)
+        {
+            gtk_container_remove(_menu, _items[i]);
         }
-        items.Clear();
+        _items.Clear();
     }
 
     /// Shows the menu under the pointer and does not return until it is over.
@@ -220,19 +241,20 @@ public class GtkMenuPeer : IMenuPeer {
     /// Not returning until the menu is over is a nested `gtk_main`, ended by
     /// the menu's own `deactivate` -- the same arrangement a modal window
     /// uses, and for the same reason: GTK pops a menu up and returns.
-    public void ShowPopup(IWindowPeer owner, Point atScreen) {
-        var id = ConnectPlain(menu, "deactivate", () => { gtk_main_quit(); });
+    public void ShowPopup(IWindowPeer owner, Point atScreen)
+    {
+        var id = ConnectPlain(_menu, "deactivate", () => { gtk_main_quit(); });
 
-        gtk_menu_popup_at_pointer(menu, null);
+        gtk_menu_popup_at_pointer(_menu, null);
         gtk_main();
 
         // Disconnected rather than left in place: the menu may be shown again,
         // and a second `deactivate` reaching a loop that has already returned
         // would quit the application's.
-        Disconnect(menu, id);
+        Disconnect(_menu, id);
     }
 
-    public GtkWidget* Widget() { return menu; }
+    public GtkWidget* Widget() => _menu;
 }
 
 #endif

@@ -37,7 +37,8 @@ import Win32.Handles;
 
 import Win32.Kernel32;
 
-public extern "C" {
+public extern "C"
+{
     int RegOpenKeyExW(HKEY key, char16* path, uint options, uint access, HKEY* result);
     int RegCreateKeyExW(HKEY key, char16* path, uint reserved, char16* windowClass,
                         uint options, uint access, SecurityAttributes* security,
@@ -84,11 +85,11 @@ public extern "C" {
 /// The literal is full width rather than a negative `nint` so that both
 /// architectures are right: truncating it to 32 bits, as an x86 build does,
 /// gives back `0x80000000`.
-public HKEY ClassesRoot()   { return (HKEY)(nuint)0xFFFFFFFF80000000u; }
-public HKEY CurrentUser()   { return (HKEY)(nuint)0xFFFFFFFF80000001u; }
-public HKEY LocalMachine()  { return (HKEY)(nuint)0xFFFFFFFF80000002u; }
-public HKEY Users()         { return (HKEY)(nuint)0xFFFFFFFF80000003u; }
-public HKEY CurrentConfig() { return (HKEY)(nuint)0xFFFFFFFF80000005u; }
+public HKEY ClassesRoot() => (HKEY)(nuint)0xFFFFFFFF80000000u;
+public HKEY CurrentUser() => (HKEY)(nuint)0xFFFFFFFF80000001u;
+public HKEY LocalMachine() => (HKEY)(nuint)0xFFFFFFFF80000002u;
+public HKEY Users() => (HKEY)(nuint)0xFFFFFFFF80000003u;
+public HKEY CurrentConfig() => (HKEY)(nuint)0xFFFFFFFF80000005u;
 
 // =================================================================== access
 

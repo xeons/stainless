@@ -48,7 +48,8 @@ import Win32.Handles;
 /// The modern replacement for a PIDL, and what every current shell API takes
 /// and returns.
 [Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
-public com interface IShellItem {
+public com interface IShellItem
+{
     int BindToHandler(byte* bindContext, Guid* handler, Guid* interfaceId, byte** result);
     int GetParent(byte** parent);
     int GetDisplayName(uint kind, char16** name);
@@ -59,7 +60,8 @@ public com interface IShellItem {
 /// A shell item that also answers property queries. Declared for its IID and
 /// its first three slots; the property methods it adds are not bound.
 [Guid("7e9fb0d3-919f-4307-ab2e-9b1860310c93")]
-public com interface IShellItem2 : IShellItem {
+public com interface IShellItem2 : IShellItem
+{
     int GetPropertyStore(uint flags, Guid* interfaceId, byte** store);
     int GetPropertyStoreWithCreateObject(uint flags, byte* createObject,
                                          Guid* interfaceId, byte** store);
@@ -80,7 +82,8 @@ public com interface IShellItem2 : IShellItem {
 /// Several shell items at once: what an open dialog hands back when more than
 /// one file may be chosen.
 [Guid("b63ea76d-1f85-456f-a19c-48159efa858b")]
-public com interface IShellItemArray {
+public com interface IShellItemArray
+{
     int BindToHandler(byte* bindContext, Guid* handler, Guid* interfaceId, byte** result);
     int GetPropertyStore(uint flags, Guid* interfaceId, byte** store);
     int GetPropertyDescriptionList(byte* keyType, Guid* interfaceId, byte** list);
@@ -121,7 +124,8 @@ public const uint AttributeLink        = 0x00010000u;
 /// A dialog that takes over its owner window until it is dismissed. The base
 /// of every file dialog, and the one method they all share.
 [Guid("b4db1657-70d7-485e-8e3e-6fcb5a5c1802")]
-public com interface IModalWindow {
+public com interface IModalWindow
+{
     /// Blocks until the user chooses or cancels. Cancelling is not an error
     /// but it is a failure code -- `Win32.Ole32.Cancelled` -- which is why
     /// `Win32.Dialogs` returns an optional rather than a `Result`.
@@ -134,7 +138,8 @@ public com interface IModalWindow {
 /// This is the base both directions share. `IFileOpenDialog` and
 /// `IFileSaveDialog` each add their own methods after it.
 [Guid("42f85136-db7e-439c-85f1-e4075d135fc8")]
-public com interface IFileDialog : IModalWindow {
+public com interface IFileDialog : IModalWindow
+{
     int SetFileTypes(uint count, FilterSpec* types);
     int SetFileTypeIndex(uint index);
     int GetFileTypeIndex(uint* index);
@@ -163,7 +168,8 @@ public com interface IFileDialog : IModalWindow {
 /// Opening. `GetResults` is the plural of `GetResult` and is what
 /// `AllowMultiselect` makes useful.
 [Guid("d57c7288-d4ad-4768-be02-9d969532d960")]
-public com interface IFileOpenDialog : IFileDialog {
+public com interface IFileOpenDialog : IFileDialog
+{
     int GetResults(byte** items);
     int GetSelectedItems(byte** items);
 }
@@ -171,7 +177,8 @@ public com interface IFileOpenDialog : IFileDialog {
 /// Saving. The extra methods are about writing back into a file that already
 /// exists, which this binding does not use but whose slots must be here.
 [Guid("84bccd23-5fde-4cdb-aea4-af64b83d78ab")]
-public com interface IFileSaveDialog : IFileDialog {
+public com interface IFileSaveDialog : IFileDialog
+{
     int SetSaveAsItem(byte* item);
     int SetProperties(byte* store);
     int SetCollectedProperties(byte* list, int appendDefault);
@@ -185,7 +192,8 @@ public com interface IFileSaveDialog : IFileDialog {
 /// Unlike `OPENFILENAMEW`'s filter this is an array of two pointers rather
 /// than one buffer of NUL-separated text, so building it needs no
 /// `WideBuffer`.
-public struct FilterSpec {
+public struct FilterSpec
+{
     /// "Text files"
     public char16* Name;
     /// "*.txt;*.log"

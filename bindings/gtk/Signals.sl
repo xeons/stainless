@@ -68,7 +68,8 @@ public closure void Handler();
 /// The shape of the C callback GTK will make.
 public delegate void PlainCallback(GtkWidget* sender, gpointer data);
 
-extern "C" {
+extern "C"
+{
     void sl_retain(gpointer pointer);
     void sl_release(gpointer pointer);
 
@@ -78,21 +79,24 @@ extern "C" {
 
 /// A closure with an address, since `user_data` is one pointer and a closure is
 /// two words. The one allocation a subscription costs.
-class Boxed {
+class Boxed
+{
     public Handler Body;
-    public Boxed(Handler body) { Body = body; }
+    public Boxed(Handler body) => Body = body;
 }
 
 /// The C entry point. **One per signal shape, not one per handler**: a
 /// module-level function, so its address is a plain C function pointer and
 /// there is no thunk anywhere in this file.
-void Dispatch(GtkWidget* sender, gpointer data) {
+void Dispatch(GtkWidget* sender, gpointer data)
+{
     var boxed = (Boxed)data;
     boxed.Body();
 }
 
 /// The release half of every connection here.
-void Forget(gpointer data, gpointer closure) {
+void Forget(gpointer data, gpointer closure)
+{
     sl_release(data);
 }
 
@@ -100,7 +104,8 @@ void Forget(gpointer data, gpointer closure) {
 ///
 /// Answers the handler id, which `Disconnect` takes and almost nothing needs:
 /// a handler normally lives exactly as long as the widget it is on.
-public gulong ConnectPlain(GtkWidget* instance, String signal, Handler handler) {
+public gulong ConnectPlain(GtkWidget* instance, String signal, Handler handler)
+{
     var boxed = new Boxed(handler);
     sl_retain((gpointer)boxed);
 
@@ -110,7 +115,8 @@ public gulong ConnectPlain(GtkWidget* instance, String signal, Handler handler) 
 
 /// Drops a connection early. The release happens in `Forget`, exactly as it
 /// would have on the widget's destruction.
-public void Disconnect(GtkWidget* instance, gulong handler) {
+public void Disconnect(GtkWidget* instance, gulong handler)
+{
     g_signal_handler_disconnect(instance, handler);
 }
 

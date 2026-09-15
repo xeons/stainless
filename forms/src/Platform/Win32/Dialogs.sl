@@ -49,8 +49,10 @@ import Standard.Path;
 #pragma comment(lib, "comdlg32")
 
 /// The window handle behind an optional owner.
-HWND OwnerWindowOf(IWindowPeer? owner) {
-    if (owner == null) { return null; }
+HWND OwnerWindowOf(IWindowPeer? owner)
+{
+    if (owner == null)
+        return null;
     return (HWND)(void*)((IWindowPeer)owner).Handle();
 }
 
@@ -60,13 +62,16 @@ HWND OwnerWindowOf(IWindowPeer? owner) {
 /// `Failed`: a program can do nothing different about a COM failure than about
 /// a missing library, and the distinction belongs in a log rather than in a
 /// type every caller has to match on.
-DialogOutcome OutcomeOf(DialogError why) {
-    if (why == DialogError.Cancelled) { return DialogOutcome.Cancelled; }
+DialogOutcome OutcomeOf(DialogError why)
+{
+    if (why == DialogError.Cancelled)
+        return DialogOutcome.Cancelled;
     return DialogOutcome.Failed;
 }
 
 public Result<String, DialogOutcome> OpenFileDialog(IWindowPeer? owner, String title,
-                                                    String start, String[] filters) {
+                                                    String start, String[] filters)
+{
     // `ChooseFileIn` takes a folder to open in; `start` here is a whole path,
     // so the folder is what it sits in and the file name is the suggestion the
     // open dialog has no use for.
@@ -74,21 +79,26 @@ public Result<String, DialogOutcome> OpenFileDialog(IWindowPeer? owner, String t
         ? Dialogs.ChooseFileIn(OwnerWindowOf(owner), title, filters,
                                Standard.Path.DirectoryName(start))
         : Dialogs.ChooseFile(OwnerWindowOf(owner), title, filters);
-    if (!chosen.Ok) { return Fail(OutcomeOf(chosen.Error)); }
+    if (!chosen.Ok)
+        return Fail(OutcomeOf(chosen.Error));
     return Ok(chosen.Value);
 }
 
 public Result<String, DialogOutcome> SaveFileDialog(IWindowPeer? owner, String title,
-                                                    String start, String[] filters) {
+                                                    String start, String[] filters)
+{
     var chosen = Dialogs.ChooseSaveFile(OwnerWindowOf(owner), title, filters,
                                         Standard.Path.FileName(start), "");
-    if (!chosen.Ok) { return Fail(OutcomeOf(chosen.Error)); }
+    if (!chosen.Ok)
+        return Fail(OutcomeOf(chosen.Error));
     return Ok(chosen.Value);
 }
 
-public Result<String, DialogOutcome> FolderDialogFor(IWindowPeer? owner, String title) {
+public Result<String, DialogOutcome> FolderDialogFor(IWindowPeer? owner, String title)
+{
     var chosen = Dialogs.ChooseFolder(OwnerWindowOf(owner), title);
-    if (!chosen.Ok) { return Fail(OutcomeOf(chosen.Error)); }
+    if (!chosen.Ok)
+        return Fail(OutcomeOf(chosen.Error));
     return Ok(chosen.Value);
 }
 
@@ -102,7 +112,8 @@ public Result<String, DialogOutcome> FolderDialogFor(IWindowPeer? owner, String 
 /// give the user an empty palette on every showing.
 static uint[] customColours = new uint[16];
 
-public Result<Color, DialogOutcome> ColorDialogFor(IWindowPeer? owner, Color start) {
+public Result<Color, DialogOutcome> ColorDialogFor(IWindowPeer? owner, Color start)
+{
     ChooseColor choose;
     choose.Size = (uint)sizeof(ChooseColor);
     choose.Owner = OwnerWindowOf(owner);
@@ -116,7 +127,8 @@ public Result<Color, DialogOutcome> ColorDialogFor(IWindowPeer? owner, Color sta
     choose.Hook = null;
     choose.TemplateName = null;
 
-    if (ChooseColorW(&choose) == 0) {
+    if (ChooseColorW(&choose) == 0)
+    {
         return Fail(CommDlgExtendedError() == 0u
             ? DialogOutcome.Cancelled : DialogOutcome.Failed);
     }
@@ -125,11 +137,13 @@ public Result<Color, DialogOutcome> ColorDialogFor(IWindowPeer? owner, Color sta
 
 // ================================================================== font
 
-public Result<Font, DialogOutcome> FontDialogFor(IWindowPeer? owner, Font start) {
+public Result<Font, DialogOutcome> FontDialogFor(IWindowPeer? owner, Font start)
+{
     HDC screen = GetDC(null);
     int dpi = GetDeviceCaps(screen, DeviceCapsLogicalPixelsY);
     ReleaseDC(null, screen);
-    if (dpi <= 0) { dpi = 96; }
+    if (dpi <= 0)
+        dpi = 96;
 
     LogFont described;
     described.Height = -(start.Size * dpi / 72);
@@ -165,16 +179,21 @@ public Result<Font, DialogOutcome> FontDialogFor(IWindowPeer? owner, Font start)
     choose.SizeMin = 0;
     choose.SizeMax = 0;
 
-    if (ChooseFontW(&choose) == 0) {
+    if (ChooseFontW(&choose) == 0)
+    {
         return Fail(CommDlgExtendedError() == 0u
             ? DialogOutcome.Cancelled : DialogOutcome.Failed);
     }
 
     var style = FontStyle.Regular;
-    if (described.Weight >= FontBold)  { style = style | FontStyle.Bold; }
-    if (described.Italic != (byte)0)       { style = style | FontStyle.Italic; }
-    if (described.Underline != (byte)0)    { style = style | FontStyle.Underline; }
-    if (described.StrikeOut != (byte)0)    { style = style | FontStyle.Strikeout; }
+    if (described.Weight >= FontBold)
+        style = style | FontStyle.Bold;
+    if (described.Italic != (byte)0)
+        style = style | FontStyle.Italic;
+    if (described.Underline != (byte)0)
+        style = style | FontStyle.Underline;
+    if (described.StrikeOut != (byte)0)
+        style = style | FontStyle.Strikeout;
 
     // `PointSize` is in tenths, which is the one place Windows measures a font
     // in something other than pixels.
@@ -185,16 +204,20 @@ public Result<Font, DialogOutcome> FontDialogFor(IWindowPeer? owner, Font start)
 ///
 /// Truncated rather than refused: a face name longer than 31 characters does
 /// not exist, and a dialog is not the place to complain about one.
-void CopyFaceName(LogFont* into, String face) {
+void CopyFaceName(LogFont* into, String face)
+{
     var wide = face.ToUtf16();
     nuint units = wide.UnitCount();
-    if (units > 31u) { units = 31u; }
+    if (units > 31u)
+        units = 31u;
     char16* source = wide.ToPointer();
-    for (nuint i = 0u; i < units; i += 1u) { into->FaceName[i] = source[i]; }
+    for (nuint i = 0u; i < units; i++)
+        into->FaceName[i] = source[i];
     into->FaceName[units] = (char16)0;
 }
 
-String FaceNameOf(LogFont* described) {
+String FaceNameOf(LogFont* described)
+{
     return Text.FromNullTerminatedUtf16(&described->FaceName[0u]);
 }
 
@@ -209,55 +232,65 @@ String FaceNameOf(LogFont* described) {
 /// it. So this makes a message-only window: a real window that is never shown,
 /// never laid out and never painted, whose whole job is to have an address the
 /// timer can post to.
-public class TimerPeer : ITimerPeer {
-    HWND window;
+public class TimerPeer : ITimerPeer
+{
+    HWND _window;
     weak ITimerNotify? target;
-    ulong id;
-    bool running;
+    ulong _id;
+    bool _running;
 
-    public TimerPeer(ITimerNotify owner) {
+    public TimerPeer(ITimerNotify owner)
+    {
         target = owner;
-        id = 1u;
-        running = false;
+        _id = 1u;
+        _running = false;
         EnsureFormClass();
         // `HWND_MESSAGE` as the parent is what makes it message-only.
-        window = CreateWindowExW(0u, FormClassName.ToUtf16().ToPointer(),
+        _window = CreateWindowExW(0u, FormClassName.ToUtf16().ToPointer(),
                                  "".ToUtf16().ToPointer(), 0u, 0, 0, 0, 0,
                                  MessageOnlyParent(), null,
                                  GetModuleHandleW(null), null);
-        BindTimer(window, this);
+        BindTimer(_window, this);
     }
 
-    ~TimerPeer() {
+    ~TimerPeer()
+    {
         Stop();
-        if (window != null) {
-            UnbindPeer(window);
-            DestroyWindow(window);
-            window = null;
+        if (_window != null)
+        {
+            UnbindPeer(_window);
+            DestroyWindow(_window);
+            _window = null;
         }
     }
 
-    public void Start(int milliseconds) {
-        if (milliseconds <= 0) { return; }
-        SetTimer(window, id, (uint)milliseconds, null);
-        running = true;
+    public void Start(int milliseconds)
+    {
+        if (milliseconds <= 0)
+            return;
+        SetTimer(_window, _id, (uint)milliseconds, null);
+        _running = true;
     }
 
-    public void Stop() {
-        if (!running) { return; }
-        KillTimer(window, id);
-        running = false;
+    public void Stop()
+    {
+        if (!_running)
+            return;
+        KillTimer(_window, _id);
+        _running = false;
     }
 
     /// Called by the window procedure when `WM_TIMER` arrives.
-    public void Fire() {
+    public void Fire()
+    {
         ITimerNotify? held = target;
-        if (held == null) { return; }
+        if (held == null)
+            return;
         ((ITimerNotify)held).OnPlatformTick();
     }
 }
 
 /// `HWND_MESSAGE`: a parent that makes a window exist without being on screen.
-HWND MessageOnlyParent() { return (HWND)(void*)(nuint)(nint)(-3); }
+HWND MessageOnlyParent() => (HWND)(void*)(nuint)(nint)(-3);
 
 #endif

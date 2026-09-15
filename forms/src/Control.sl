@@ -52,20 +52,22 @@ import Forms.Platform;
 
 /// What happened with the mouse. A `struct`, because a mouse move raises one of
 /// these on every pixel and C#'s class-per-event would allocate on each.
-public struct MouseEventArgs {
-    public MouseButton  Button;
-    public Point        Location;
+public struct MouseEventArgs
+{
+    public MouseButton Button;
+    public Point Location;
     public ModifierKeys Modifiers;
     /// How far a wheel turned, in notches times 120 -- the number every
     /// platform reports, kept rather than divided because a high-resolution
     /// wheel sends fractions of a notch and dividing would throw them away.
-    public int          Delta;
+    public int Delta;
 
     public int X => Location.X;
     public int Y => Location.Y;
 
     public static MouseEventArgs Of(MouseButton button, Point at,
-                                    ModifierKeys modifiers, int delta) {
+                                    ModifierKeys modifiers, int delta)
+    {
         MouseEventArgs args;
         args.Button = button;
         args.Location = at;
@@ -76,15 +78,17 @@ public struct MouseEventArgs {
 }
 
 /// What happened with the keyboard.
-public struct KeyEventArgs {
-    public Key          Key;
+public struct KeyEventArgs
+{
+    public Key Key;
     public ModifierKeys Modifiers;
 
     public bool Shift   => Modifiers.HasFlag(ModifierKeys.Shift);
     public bool Control => Modifiers.HasFlag(ModifierKeys.Control);
     public bool Alt     => Modifiers.HasFlag(ModifierKeys.Alt);
 
-    public static KeyEventArgs Of(Key key, ModifierKeys modifiers) {
+    public static KeyEventArgs Of(Key key, ModifierKeys modifiers)
+    {
         KeyEventArgs args;
         args.Key = key;
         args.Modifiers = modifiers;
@@ -93,10 +97,12 @@ public struct KeyEventArgs {
 }
 
 /// One character the user typed.
-public struct KeyPressEventArgs {
+public struct KeyPressEventArgs
+{
     public char KeyChar;
 
-    public static KeyPressEventArgs Of(char typed) {
+    public static KeyPressEventArgs Of(char typed)
+    {
         KeyPressEventArgs args;
         args.KeyChar = typed;
         return args;
@@ -104,14 +110,16 @@ public struct KeyPressEventArgs {
 }
 
 /// Where to paint, and what needs painting.
-public struct PaintEventArgs {
+public struct PaintEventArgs
+{
     /// Valid only until the handler returns; see `Graphics`.
-    public Graphics  Graphics;
+    public Graphics Graphics;
     /// The part that needs repainting. A handler may paint more and the rest is
     /// clipped away, so only a handler with expensive drawing needs to look.
     public Rectangle ClipRectangle;
 
-    public static PaintEventArgs Of(Graphics surface, Rectangle clip) {
+    public static PaintEventArgs Of(Graphics surface, Rectangle clip)
+    {
         PaintEventArgs args;
         args.Graphics = surface;
         args.ClipRectangle = clip;
@@ -125,11 +133,12 @@ public struct PaintEventArgs {
 /// handler answers by writing to it, and a struct passed by value would carry
 /// the answer nowhere. Which is also why C# makes all of them classes -- it
 /// needed this one to be, and made the rest match.
-public class CancelEventArgs {
+public class CancelEventArgs
+{
     /// Set it to true to stop whatever was about to happen.
     public bool Cancel { get; set; }
 
-    public CancelEventArgs() { Cancel = false; }
+    public CancelEventArgs() => Cancel = false;
 }
 
 // =================================================================== handlers
@@ -156,7 +165,8 @@ public enum DockStyle { None, Top, Bottom, Left, Right, Fill }
 /// parent resizes. Bits, so they combine, and the default is top-left -- which
 /// is what makes a control that says nothing simply stay where it was put.
 [Flags]
-public enum AnchorStyles {
+public enum AnchorStyles
+{
     None   = 0,
     Top    = 1,
     Bottom = 2,
@@ -179,40 +189,42 @@ public enum AnchorStyles {
 /// `Bounds` on a docked control therefore does nothing lasting, which is the
 /// same bargain every layout system makes and is stated here because the LCL
 /// silently allows it.
-public abstract class Control : IControlNotify {
-    WindowedControl? owner;
-    Rectangle        area;
-    DockStyle        docking;
-    AnchorStyles     anchoring;
-    bool             shown;
-    bool             usable;
-    String           caption;
-    Font?            typeface;
-    Color            foreground;
-    Color            background;
-    bool             backgroundSet;
-    bool             foregroundSet;
+public abstract class Control : IControlNotify
+{
+    WindowedControl? _owner;
+    Rectangle _area;
+    DockStyle _docking;
+    AnchorStyles _anchoring;
+    bool _shown;
+    bool _usable;
+    String _caption;
+    Font? _typeface;
+    Color _foreground;
+    Color _background;
+    bool _backgroundSet;
+    bool _foregroundSet;
     /// Set while the platform is telling us something, so that the setter we
     /// call in response does not tell the platform straight back. One flag
     /// replaces the LCL's `csLoading`/`csUpdating` pair for this layer's needs.
-    bool             echoing;
-    CursorKind       pointer;
+    bool _echoing;
+    CursorKind _pointer;
 
-    protected Control() {
-        owner = null;
-        area = Rectangle.Of(0, 0, 100, 24);
-        docking = DockStyle.None;
-        anchoring = AnchorStyles.Top | AnchorStyles.Left;
-        shown = true;
-        usable = true;
-        caption = "";
-        typeface = null;
-        foreground = Colors.Black;
-        background = Colors.White;
-        backgroundSet = false;
-        foregroundSet = false;
-        echoing = false;
-        pointer = CursorKind.Default;
+    protected Control()
+    {
+        _owner = null;
+        _area = Rectangle.Of(0, 0, 100, 24);
+        _docking = DockStyle.None;
+        _anchoring = AnchorStyles.Top | AnchorStyles.Left;
+        _shown = true;
+        _usable = true;
+        _caption = "";
+        _typeface = null;
+        _foreground = Colors.Black;
+        _background = Colors.White;
+        _backgroundSet = false;
+        _foregroundSet = false;
+        _echoing = false;
+        _pointer = CursorKind.Default;
         Name = "";
     }
 
@@ -233,17 +245,20 @@ public abstract class Control : IControlNotify {
     /// re-parenting means destroying and re-creating the window for several
     /// control classes, so the operation that looks like an assignment is
     /// really a rebuild, and a program that wants one should say so.
-    public WindowedControl? Parent => owner;
+    public WindowedControl? Parent => _owner;
 
     /// Called by `WindowedControl` when it takes this control in.
-    void Adopt(WindowedControl newParent) { owner = newParent; }
+    void Adopt(WindowedControl newParent) => _owner = newParent;
 
     /// The form this control is on, walking up until it finds one.
-    public Form? FindForm() {
+    public Form? FindForm()
+    {
         Control? walk = this;
-        while (walk != null) {
+        while (walk != null)
+        {
             var here = (Control)walk;
-            if (here is Form form) { return form; }
+            if (here is Form form)
+                return form;
             walk = here.Parent;
         }
         return null;
@@ -252,59 +267,70 @@ public abstract class Control : IControlNotify {
     // -------------------------------------------------------------- bounds
 
     /// Where the control is, relative to its parent's client area.
-    public Rectangle Bounds {
-        get => area;
-        set {
-            if (area.Equals(value)) { return; }
-            var was = area;
-            area = value;
+    public Rectangle Bounds
+    {
+        get => _area;
+        set
+        {
+            if (_area.Equals(value))
+                return;
+            var was = _area;
+            _area = value;
             ApplyBounds();
-            if (!was.Extent.Equals(value.Extent)) { OnResize(); }
-            if (!was.Location.Equals(value.Location)) { OnMove(); }
-            if (this is WindowedControl container) { container.PerformLayout(); }
+            if (!was.Extent.Equals(value.Extent))
+                OnResize();
+            if (!was.Location.Equals(value.Location))
+                OnMove();
+            if (this is WindowedControl container)
+                container.PerformLayout();
         }
     }
 
-    public int Left   { get => area.X;      set { Bounds = Rectangle.Of(value, area.Y, area.Width, area.Height); } }
-    public int Top    { get => area.Y;      set { Bounds = Rectangle.Of(area.X, value, area.Width, area.Height); } }
-    public int Width  { get => area.Width;  set { Bounds = Rectangle.Of(area.X, area.Y, value, area.Height); } }
-    public int Height { get => area.Height; set { Bounds = Rectangle.Of(area.X, area.Y, area.Width, value); } }
+    public int Left   { get => _area.X;      set { Bounds = Rectangle.Of(value, _area.Y, _area.Width, _area.Height); } }
+    public int Top    { get => _area.Y;      set { Bounds = Rectangle.Of(_area.X, value, _area.Width, _area.Height); } }
+    public int Width  { get => _area.Width;  set { Bounds = Rectangle.Of(_area.X, _area.Y, value, _area.Height); } }
+    public int Height { get => _area.Height; set { Bounds = Rectangle.Of(_area.X, _area.Y, _area.Width, value); } }
 
     /// The far edges, which a layout calculation wants far more often than it
     /// wants the width. Read-only: setting `Right` could mean moving or
     /// resizing, and C# leaves them read-only for the same reason.
-    public int Right  => area.X + area.Width;
-    public int Bottom => area.Y + area.Height;
+    public int Right  => _area.X + _area.Width;
+    public int Bottom => _area.Y + _area.Height;
 
-    public Point Location {
-        get => area.Location;
-        set { Bounds = Rectangle.Of(value.X, value.Y, area.Width, area.Height); }
+    public Point Location
+    {
+        get => _area.Location;
+        set => Bounds = Rectangle.Of(value.X, value.Y, _area.Width, _area.Height);
     }
 
-    public Size Extent {
-        get => area.Extent;
-        set { Bounds = Rectangle.Of(area.X, area.Y, value.Width, value.Height); }
+    public Size Extent
+    {
+        get => _area.Extent;
+        set => Bounds = Rectangle.Of(_area.X, _area.Y, value.Width, value.Height);
     }
 
     /// The area inside this control that its own children use. The same as the
     /// bounds at the origin for anything without a frame, and overridden by
     /// what has one.
     public virtual Rectangle ClientBounds =>
-        Rectangle.Of(0, 0, area.Width, area.Height);
+        Rectangle.Of(0, 0, _area.Width, _area.Height);
 
     /// Moves and sizes in one step, which is what a layout pass wants: two
     /// assignments would lay the children out twice and paint an intermediate
     /// position.
-    public void SetBounds(int x, int y, int width, int height) {
+    public void SetBounds(int x, int y, int width, int height)
+    {
         Bounds = Rectangle.Of(x, y, width, height);
     }
 
     /// Pushes the current bounds at the platform. Overridden by
     /// `WindowedControl`, which has a peer to tell; a `GraphicControl` has
     /// nothing to tell and only needs its parent to repaint.
-    protected virtual void ApplyBounds() {
-        var parent = owner;
-        if (parent != null) { ((WindowedControl)parent).Invalidate(); }
+    protected virtual void ApplyBounds()
+    {
+        var parent = _owner;
+        if (parent != null)
+            ((WindowedControl)parent).Invalidate();
     }
 
     /// How large the control would like to be, given its text and font. Zero
@@ -314,10 +340,12 @@ public abstract class Control : IControlNotify {
 
     /// Resizes to `PreferredSize`, keeping the top-left corner. Does nothing
     /// when the control has no opinion.
-    public void AutoSize() {
+    public void AutoSize()
+    {
         var wanted = PreferredSize;
-        if (wanted.IsEmpty) { return; }
-        Bounds = Rectangle.Of(area.X, area.Y, wanted.Width, wanted.Height);
+        if (wanted.IsEmpty)
+            return;
+        Bounds = Rectangle.Of(_area.X, _area.Y, wanted.Width, wanted.Height);
     }
 
     // -------------------------------------------------------------- layout
@@ -325,21 +353,26 @@ public abstract class Control : IControlNotify {
     /// Which edge this control fills. Setting it re-lays out the parent at
     /// once, because a docked control's position is the parent's decision and
     /// leaving it stale would show the old one.
-    public DockStyle Dock {
-        get => docking;
-        set {
-            if (docking == value) { return; }
-            docking = value;
-            var parent = owner;
-            if (parent != null) { ((WindowedControl)parent).PerformLayout(); }
+    public DockStyle Dock
+    {
+        get => _docking;
+        set
+        {
+            if (_docking == value)
+                return;
+            _docking = value;
+            var parent = _owner;
+            if (parent != null)
+                ((WindowedControl)parent).PerformLayout();
         }
     }
 
     /// Which of the parent's edges this control keeps its distance from.
     /// Ignored entirely when `Dock` is anything but `None`.
-    public AnchorStyles Anchors {
-        get => anchoring;
-        set { anchoring = value; }
+    public AnchorStyles Anchors
+    {
+        get => _anchoring;
+        set => _anchoring = value;
     }
 
     // ---------------------------------------------------------- appearance
@@ -347,24 +380,32 @@ public abstract class Control : IControlNotify {
     /// Whether the control is shown. A control whose parent is hidden is not
     /// visible on screen however this reads, which is why the question a
     /// program usually wants is `IsShowing`.
-    public bool Visible {
-        get => shown;
-        set {
-            if (shown == value) { return; }
-            shown = value;
+    public bool Visible
+    {
+        get => _shown;
+        set
+        {
+            if (_shown == value)
+                return;
+            _shown = value;
             ApplyVisible();
-            var parent = owner;
-            if (parent != null) { ((WindowedControl)parent).PerformLayout(); }
+            var parent = _owner;
+            if (parent != null)
+                ((WindowedControl)parent).PerformLayout();
         }
     }
 
     /// Whether this control and every parent above it is visible -- the
     /// question "can the user see it", which `Visible` alone does not answer.
-    public bool IsShowing {
-        get {
-            if (!shown) { return false; }
-            var parent = owner;
-            if (parent == null) { return true; }
+    public bool IsShowing
+    {
+        get
+        {
+            if (!_shown)
+                return false;
+            var parent = _owner;
+            if (parent == null)
+                return true;
             return ((WindowedControl)parent).IsShowing;
         }
     }
@@ -372,15 +413,18 @@ public abstract class Control : IControlNotify {
     /// Makes the control visible. Virtual because a `Form` has more to do:
     /// it registers itself with the `Application` so that showing a window
     /// built in a local variable keeps it alive.
-    public virtual void Show() { Visible = true; }
-    public void Hide() { Visible = false; }
+    public virtual void Show() => Visible = true;
+    public void Hide() => Visible = false;
 
     /// Whether the control responds to the user.
-    public bool Enabled {
-        get => usable;
-        set {
-            if (usable == value) { return; }
-            usable = value;
+    public bool Enabled
+    {
+        get => _usable;
+        set
+        {
+            if (_usable == value)
+                return;
+            _usable = value;
             ApplyEnabled();
         }
     }
@@ -389,44 +433,53 @@ public abstract class Control : IControlNotify {
     /// title. One property for all of them, as `TControl.Caption` and
     /// `TControl.Text` both were before Delphi split them and had to keep them
     /// in step ever after.
-    public String Text {
+    public String Text
+    {
         get => GetTextValue();
-        set { SetTextValue(value); }
+        set => SetTextValue(value);
     }
 
     /// Overridable so a control backed by a platform widget can read the live
     /// value rather than the last one set -- which for a text box is the only
     /// correct answer, since the user has been typing into it.
-    protected virtual String GetTextValue() { return caption; }
+    protected virtual String GetTextValue() => _caption;
 
-    protected virtual void SetTextValue(String value) {
-        if (caption == value) { return; }
-        caption = value;
+    protected virtual void SetTextValue(String value)
+    {
+        if (_caption == value)
+            return;
+        _caption = value;
         ApplyText();
         OnTextChanged();
     }
 
     /// The stored text, for a derived class that has overridden the accessors
     /// and still needs the field.
-    protected String StoredText {
-        get => caption;
-        set { caption = value; }
+    protected String StoredText
+    {
+        get => _caption;
+        set => _caption = value;
     }
 
     /// The font this control draws with. Inherited from the parent when nothing
     /// has been set here, which is what makes setting a form's font change
     /// every control on it -- the LCL's `ParentFont` without the extra flag,
     /// because "nothing set here" is exactly what a null field already says.
-    public Font Font {
-        get {
-            var mine = typeface;
-            if (mine != null) { return (Font)mine; }
-            var parent = owner;
-            if (parent != null) { return ((WindowedControl)parent).Font; }
+    public Font Font
+    {
+        get
+        {
+            var mine = _typeface;
+            if (mine != null)
+                return (Font)mine;
+            var parent = _owner;
+            if (parent != null)
+                return ((WindowedControl)parent).Font;
             return WidgetSet.Current.DefaultFont();
         }
-        set {
-            typeface = value;
+        set
+        {
+            _typeface = value;
             ApplyFont();
             OnFontChanged();
         }
@@ -441,45 +494,59 @@ public abstract class Control : IControlNotify {
     /// are on every platform and what Windows would have drawn if nothing had
     /// been pushed at it. Each of those overrides this, exactly as C# does with
     /// `TextBoxBase.DefaultBackColor`.
-    protected virtual Color DefaultBackColor {
-        get {
-            var parent = owner;
-            if (parent != null) { return ((WindowedControl)parent).BackColor; }
+    protected virtual Color DefaultBackColor
+    {
+        get
+        {
+            var parent = _owner;
+            if (parent != null)
+                return ((WindowedControl)parent).BackColor;
             return SystemColors.Control;
         }
     }
 
     /// And what it draws its text in, on the same terms.
-    protected virtual Color DefaultForeColor {
-        get {
-            var parent = owner;
-            if (parent != null) { return ((WindowedControl)parent).ForeColor; }
+    protected virtual Color DefaultForeColor
+    {
+        get
+        {
+            var parent = _owner;
+            if (parent != null)
+                return ((WindowedControl)parent).ForeColor;
             return SystemColors.ControlText;
         }
     }
 
     /// The colour text is drawn in, inherited the same way.
-    public Color ForeColor {
-        get {
-            if (foregroundSet) { return foreground; }
+    public Color ForeColor
+    {
+        get
+        {
+            if (_foregroundSet)
+                return _foreground;
             return DefaultForeColor;
         }
-        set {
-            foreground = value;
-            foregroundSet = true;
+        set
+        {
+            _foreground = value;
+            _foregroundSet = true;
             ApplyForeColor();
         }
     }
 
     /// The colour behind it, inherited the same way.
-    public Color BackColor {
-        get {
-            if (backgroundSet) { return background; }
+    public Color BackColor
+    {
+        get
+        {
+            if (_backgroundSet)
+                return _background;
             return DefaultBackColor;
         }
-        set {
-            background = value;
-            backgroundSet = true;
+        set
+        {
+            _background = value;
+            _backgroundSet = true;
             ApplyBackColor();
         }
     }
@@ -494,10 +561,12 @@ public abstract class Control : IControlNotify {
     protected virtual void ApplyBackColor() { }
 
     /// What the pointer looks like over this control.
-    public CursorKind Cursor {
-        get => pointer;
-        set {
-            pointer = value;
+    public CursorKind Cursor
+    {
+        get => _pointer;
+        set
+        {
+            _pointer = value;
             ApplyCursor();
         }
     }
@@ -513,9 +582,11 @@ public abstract class Control : IControlNotify {
     public virtual void CaptureMouse(bool captured) { }
 
     /// Marks the control as needing repainting.
-    public virtual void Invalidate() {
-        var parent = owner;
-        if (parent != null) { ((WindowedControl)parent).Invalidate(); }
+    public virtual void Invalidate()
+    {
+        var parent = _owner;
+        if (parent != null)
+            ((WindowedControl)parent).Invalidate();
     }
 
     // -------------------------------------------------------------- events
@@ -546,27 +617,27 @@ public abstract class Control : IControlNotify {
     // base's event has to come through one of these. Overriding one and not
     // calling `base` is how a derived control suppresses an event entirely.
 
-    protected virtual void OnClick()       { Click(this); }
-    protected virtual void OnDoubleClick() { DoubleClick(this); }
-    protected virtual void OnResize()      { Resize(this); }
-    protected virtual void OnMove()        { Move(this); }
-    protected virtual void OnTextChanged() { TextChanged(this); }
-    protected virtual void OnFontChanged() { FontChanged(this); }
-    protected virtual void OnGotFocus()    { GotFocus(this); }
-    protected virtual void OnLostFocus()   { LostFocus(this); }
-    protected virtual void OnMouseEnter()  { MouseEnter(this); }
-    protected virtual void OnMouseLeave()  { MouseLeave(this); }
+    protected virtual void OnClick() => Click(this);
+    protected virtual void OnDoubleClick() => DoubleClick(this);
+    protected virtual void OnResize() => Resize(this);
+    protected virtual void OnMove() => Move(this);
+    protected virtual void OnTextChanged() => TextChanged(this);
+    protected virtual void OnFontChanged() => FontChanged(this);
+    protected virtual void OnGotFocus() => GotFocus(this);
+    protected virtual void OnLostFocus() => LostFocus(this);
+    protected virtual void OnMouseEnter() => MouseEnter(this);
+    protected virtual void OnMouseLeave() => MouseLeave(this);
 
-    protected virtual void OnMouseDown(MouseEventArgs args)  { MouseDown(this, args); }
-    protected virtual void OnMouseUp(MouseEventArgs args)    { MouseUp(this, args); }
-    protected virtual void OnMouseMove(MouseEventArgs args)  { MouseMove(this, args); }
-    protected virtual void OnMouseWheel(MouseEventArgs args) { MouseWheel(this, args); }
+    protected virtual void OnMouseDown(MouseEventArgs args) => MouseDown(this, args);
+    protected virtual void OnMouseUp(MouseEventArgs args) => MouseUp(this, args);
+    protected virtual void OnMouseMove(MouseEventArgs args) => MouseMove(this, args);
+    protected virtual void OnMouseWheel(MouseEventArgs args) => MouseWheel(this, args);
 
-    protected virtual void OnKeyDown(KeyEventArgs args)       { KeyDown(this, args); }
-    protected virtual void OnKeyUp(KeyEventArgs args)         { KeyUp(this, args); }
-    protected virtual void OnKeyPress(KeyPressEventArgs args) { KeyPress(this, args); }
+    protected virtual void OnKeyDown(KeyEventArgs args) => KeyDown(this, args);
+    protected virtual void OnKeyUp(KeyEventArgs args) => KeyUp(this, args);
+    protected virtual void OnKeyPress(KeyPressEventArgs args) => KeyPress(this, args);
 
-    protected virtual void OnPaint(PaintEventArgs args) { Paint(this, args); }
+    protected virtual void OnPaint(PaintEventArgs args) => Paint(this, args);
 
     // ----------------------------------------------- what the platform says
 
@@ -576,74 +647,86 @@ public abstract class Control : IControlNotify {
     // this. The `echoing` flag is set around the ones that would otherwise
     // cause a write back to the platform that reported them.
 
-    public void OnPlatformPaint(Graphics surface) {
+    public void OnPlatformPaint(Graphics surface)
+    {
         OnPaint(PaintEventArgs.Of(surface, surface.ClipBounds));
     }
 
-    public void OnPlatformResized(Size extent) {
-        echoing = true;
-        area = Rectangle.Of(area.X, area.Y, extent.Width, extent.Height);
-        echoing = false;
+    public void OnPlatformResized(Size extent)
+    {
+        _echoing = true;
+        _area = Rectangle.Of(_area.X, _area.Y, extent.Width, extent.Height);
+        _echoing = false;
         OnResize();
-        if (this is WindowedControl container) { container.PerformLayout(); }
+        if (this is WindowedControl container)
+            container.PerformLayout();
     }
 
-    public void OnPlatformMoved(Point position) {
+    public void OnPlatformMoved(Point position)
+    {
         // The platform measures from the parent widget's corner; `Bounds` is
         // measured from the corner of the area the parent gives its children.
         // Taking the offset off again is what makes a control's position read
         // back as the one it was given, under a group box as anywhere else.
         var placed = position;
-        var parent = owner;
-        if (parent != null) {
+        var parent = _owner;
+        if (parent != null)
+        {
             var origin = ((WindowedControl)parent).ClientOrigin;
             placed = Point.At(position.X - origin.X, position.Y - origin.Y);
         }
-        echoing = true;
-        area = Rectangle.Of(placed.X, placed.Y, area.Width, area.Height);
-        echoing = false;
+        _echoing = true;
+        _area = Rectangle.Of(placed.X, placed.Y, _area.Width, _area.Height);
+        _echoing = false;
         OnMove();
     }
 
-    public virtual void OnPlatformMouseDown(MouseButton button, Point at, ModifierKeys modifiers) {
+    public virtual void OnPlatformMouseDown(MouseButton button, Point at, ModifierKeys modifiers)
+    {
         OnMouseDown(MouseEventArgs.Of(button, at, modifiers, 0));
     }
 
-    public virtual void OnPlatformMouseUp(MouseButton button, Point at, ModifierKeys modifiers) {
+    public virtual void OnPlatformMouseUp(MouseButton button, Point at, ModifierKeys modifiers)
+    {
         OnMouseUp(MouseEventArgs.Of(button, at, modifiers, 0));
     }
 
-    public virtual void OnPlatformMouseMove(Point at, ModifierKeys modifiers) {
+    public virtual void OnPlatformMouseMove(Point at, ModifierKeys modifiers)
+    {
         OnMouseMove(MouseEventArgs.Of(MouseButton.None, at, modifiers, 0));
     }
 
-    public void OnPlatformMouseEnter() { OnMouseEnter(); }
-    public virtual void OnPlatformMouseLeave() { OnMouseLeave(); }
+    public void OnPlatformMouseEnter() => OnMouseEnter();
+    public virtual void OnPlatformMouseLeave() => OnMouseLeave();
 
-    public void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers) {
+    public void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers)
+    {
         OnMouseWheel(MouseEventArgs.Of(MouseButton.None, at, modifiers, delta));
     }
 
-    public void OnPlatformKeyDown(Key key, ModifierKeys modifiers) {
+    public void OnPlatformKeyDown(Key key, ModifierKeys modifiers)
+    {
         OnKeyDown(KeyEventArgs.Of(key, modifiers));
     }
 
-    public void OnPlatformKeyUp(Key key, ModifierKeys modifiers) {
+    public void OnPlatformKeyUp(Key key, ModifierKeys modifiers)
+    {
         OnKeyUp(KeyEventArgs.Of(key, modifiers));
     }
 
-    public void OnPlatformKeyPress(char typed) {
+    public void OnPlatformKeyPress(char typed)
+    {
         OnKeyPress(KeyPressEventArgs.Of(typed));
     }
 
-    public void OnPlatformGotFocus()  { OnGotFocus(); }
-    public void OnPlatformLostFocus() { OnLostFocus(); }
-    public void OnPlatformActivated() { OnClick(); }
+    public void OnPlatformGotFocus() => OnGotFocus();
+    public void OnPlatformLostFocus() => OnLostFocus();
+    public void OnPlatformActivated() => OnClick();
 
     /// The user changed the control's value. The base turns it into
     /// `OnTextChanged`, which is right for everything whose value is its text;
     /// a list overrides it and raises `SelectedIndexChanged` instead.
-    public virtual void OnPlatformValueChanged() { OnTextChanged(); }
+    public virtual void OnPlatformValueChanged() => OnTextChanged();
 
     /// A toolbar button was pressed. Meaningless for everything that is not a
     /// toolbar, which is why the base does nothing with it.
@@ -651,5 +734,5 @@ public abstract class Control : IControlNotify {
 
     /// Whether we are currently inside a platform notification, for a derived
     /// class whose setter must not answer one.
-    protected bool IsEchoing => echoing;
+    protected bool IsEchoing => _echoing;
 }

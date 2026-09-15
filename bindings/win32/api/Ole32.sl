@@ -36,7 +36,8 @@ import Standard.Com;
 
 #if WINDOWS
 
-public extern "C" {
+public extern "C"
+{
     // `CoInitializeEx` returns S_OK the first time on a thread and S_FALSE
     // afterwards; both mean the apartment is up, and both must be matched by a
     // `CoUninitialize`.

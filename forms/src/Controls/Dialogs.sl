@@ -47,11 +47,13 @@ import Forms.Platform;
 /// var filters = [FileFilter.Of("Text files", "*.txt;*.md"),
 ///                FileFilter.Of("All files", "*.*")];
 /// ```
-public struct FileFilter {
+public struct FileFilter
+{
     public String Description;
     public String Patterns;
 
-    public static FileFilter Of(String description, String patterns) {
+    public static FileFilter Of(String description, String patterns)
+    {
         FileFilter filter;
         filter.Description = description;
         filter.Patterns = patterns;
@@ -60,10 +62,12 @@ public struct FileFilter {
 }
 
 /// What a file dialog has in common.
-public abstract class FileDialog {
+public abstract class FileDialog
+{
     protected List<FileFilter> filters;
 
-    protected FileDialog() {
+    protected FileDialog()
+    {
         filters = new List<FileFilter>();
         Title = "";
         FileName = "";
@@ -77,16 +81,19 @@ public abstract class FileDialog {
     public String FileName { get; set; }
 
     /// Adds a kind of file the dialog offers to filter by.
-    public FileDialog AddFilter(String description, String patterns) {
+    public FileDialog AddFilter(String description, String patterns)
+    {
         filters.Add(FileFilter.Of(description, patterns));
         return this;
     }
 
     /// The filters flattened the way the platform wants them, description and
     /// pattern alternating.
-    protected String[] FilterPairs() {
+    protected String[] FilterPairs()
+    {
         var flat = new String[filters.Count() * 2u];
-        for (nuint i = 0u; i < filters.Count(); i += 1u) {
+        for (nuint i = 0u; i < filters.Count(); i++)
+        {
             flat[i * 2u] = filters.At(i).Description;
             flat[i * 2u + 1u] = filters.At(i).Patterns;
         }
@@ -94,49 +101,61 @@ public abstract class FileDialog {
     }
 
     /// The window the dialog should sit over, or null for none.
-    protected IWindowPeer? OwnerOf(Control? owner) {
-        if (owner == null) { return null; }
+    protected IWindowPeer? OwnerOf(Control? owner)
+    {
+        if (owner == null)
+            return null;
         var form = ((Control)owner).FindForm();
-        if (form == null) { return null; }
+        if (form == null)
+            return null;
         return ((Form)form).WindowPeer();
     }
 }
 
 /// Choose a file to open.
-public class OpenDialog : FileDialog {
-    public OpenDialog() { base(); }
+public class OpenDialog : FileDialog
+{
+    public OpenDialog() => base();
 
     /// Shows it, and answers what was chosen.
     ///
     /// `FileName` is also set, for a caller that would rather read it there --
     /// but only when there was an answer, so it is never a stale path.
-    public Result<String, DialogOutcome> Show(Control? owner) {
+    public Result<String, DialogOutcome> Show(Control? owner)
+    {
         var chosen = WidgetSet.Current.ChooseFileToOpen(
             OwnerOf(owner), Title, FileName, FilterPairs());
-        if (chosen.Ok) { FileName = chosen.Value; }
+        if (chosen.Ok)
+            FileName = chosen.Value;
         return chosen;
     }
 }
 
 /// Choose where to save.
-public class SaveDialog : FileDialog {
-    public SaveDialog() { base(); }
+public class SaveDialog : FileDialog
+{
+    public SaveDialog() => base();
 
-    public Result<String, DialogOutcome> Show(Control? owner) {
+    public Result<String, DialogOutcome> Show(Control? owner)
+    {
         var chosen = WidgetSet.Current.ChooseFileToSave(
             OwnerOf(owner), Title, FileName, FilterPairs());
-        if (chosen.Ok) { FileName = chosen.Value; }
+        if (chosen.Ok)
+            FileName = chosen.Value;
         return chosen;
     }
 }
 
 /// Choose a folder.
-public class FolderDialog : FileDialog {
-    public FolderDialog() { base(); }
+public class FolderDialog : FileDialog
+{
+    public FolderDialog() => base();
 
-    public Result<String, DialogOutcome> Show(Control? owner) {
+    public Result<String, DialogOutcome> Show(Control? owner)
+    {
         var chosen = WidgetSet.Current.ChooseFolder(OwnerOf(owner), Title);
-        if (chosen.Ok) { FileName = chosen.Value; }
+        if (chosen.Ok)
+            FileName = chosen.Value;
         return chosen;
     }
 }
@@ -144,22 +163,28 @@ public class FolderDialog : FileDialog {
 // =============================================================== colour dialog
 
 /// Choose a colour.
-public class ColorDialog {
-    public ColorDialog() { Color = Colors.White; }
+public class ColorDialog
+{
+    public ColorDialog() => Color = Colors.White;
 
     /// What the dialog opens on, and what it last answered.
     public Color Color { get; set; }
 
-    public Result<Color, DialogOutcome> Show(Control? owner) {
+    public Result<Color, DialogOutcome> Show(Control? owner)
+    {
         var chosen = WidgetSet.Current.ChooseColor(OwnerWindow(owner), Color);
-        if (chosen.Ok) { Color = chosen.Value; }
+        if (chosen.Ok)
+            Color = chosen.Value;
         return chosen;
     }
 
-    IWindowPeer? OwnerWindow(Control? owner) {
-        if (owner == null) { return null; }
+    IWindowPeer? OwnerWindow(Control? owner)
+    {
+        if (owner == null)
+            return null;
         var form = ((Control)owner).FindForm();
-        if (form == null) { return null; }
+        if (form == null)
+            return null;
         return ((Form)form).WindowPeer();
     }
 }
@@ -167,27 +192,34 @@ public class ColorDialog {
 // ================================================================= font dialog
 
 /// Choose a font.
-public class FontDialog {
-    Font chosen;
+public class FontDialog
+{
+    Font _chosen;
 
-    public FontDialog() { chosen = WidgetSet.Current.DefaultFont(); }
+    public FontDialog() => _chosen = WidgetSet.Current.DefaultFont();
 
     /// What the dialog opens on, and what it last answered.
-    public Font Font {
-        get => chosen;
-        set { chosen = value; }
+    public Font Font
+    {
+        get => _chosen;
+        set => _chosen = value;
     }
 
-    public Result<Font, DialogOutcome> Show(Control? owner) {
-        var answer = WidgetSet.Current.ChooseFont(OwnerWindow(owner), chosen);
-        if (answer.Ok) { chosen = answer.Value; }
+    public Result<Font, DialogOutcome> Show(Control? owner)
+    {
+        var answer = WidgetSet.Current.ChooseFont(OwnerWindow(owner), _chosen);
+        if (answer.Ok)
+            _chosen = answer.Value;
         return answer;
     }
 
-    IWindowPeer? OwnerWindow(Control? owner) {
-        if (owner == null) { return null; }
+    IWindowPeer? OwnerWindow(Control? owner)
+    {
+        if (owner == null)
+            return null;
         var form = ((Control)owner).FindForm();
-        if (form == null) { return null; }
+        if (form == null)
+            return null;
         return ((Form)form).WindowPeer();
     }
 }
@@ -205,59 +237,77 @@ public class FontDialog {
 /// clock.Tick += this.OnSecond;
 /// clock.Start();
 /// ```
-public class Timer : ITimerNotify {
-    ITimerPeer native;
-    int every;
-    bool running;
+public class Timer : ITimerNotify
+{
+    ITimerPeer _native;
+    int _every;
+    bool _running;
 
     /// A timer that has not started, ticking every `milliseconds` when it does.
-    public Timer(int milliseconds) {
-        every = milliseconds;
-        running = false;
-        native = WidgetSet.Current.CreateTimer(this);
+    public Timer(int milliseconds)
+    {
+        _every = milliseconds;
+        _running = false;
+        _native = WidgetSet.Current.CreateTimer(this);
     }
 
-    public Timer() { this(1000); }
+    public Timer() => this(1000);
 
     /// How long between ticks. Changing it while running restarts the interval,
     /// which is the only thing a platform timer can do.
-    public int Interval {
-        get => every;
-        set {
-            every = value;
-            if (running) {
-                native.Stop();
-                native.Start(every);
+    public int Interval
+    {
+        get => _every;
+        set
+        {
+            _every = value;
+            if (_running)
+            {
+                _native.Stop();
+                _native.Start(_every);
             }
         }
     }
 
-    public bool Enabled {
-        get => running;
-        set {
-            if (value) { Start(); } else { Stop(); }
+    public bool Enabled
+    {
+        get => _running;
+        set
+        {
+            if (value)
+            {
+                Start();
+            }
+            else
+            {
+                Stop();
+            }
         }
     }
 
-    public void Start() {
-        if (running) { return; }
-        running = true;
-        native.Start(every);
+    public void Start()
+    {
+        if (_running)
+            return;
+        _running = true;
+        _native.Start(_every);
     }
 
-    public void Stop() {
-        if (!running) { return; }
-        running = false;
-        native.Stop();
+    public void Stop()
+    {
+        if (!_running)
+            return;
+        _running = false;
+        _native.Stop();
     }
 
     /// The interval elapsed.
     public event TimerHandler Tick;
 
-    protected virtual void OnTick() { Tick(this); }
+    protected virtual void OnTick() => Tick(this);
 
     /// What the platform calls.
-    public void OnPlatformTick() { OnTick(); }
+    public void OnPlatformTick() => OnTick();
 }
 
 /// What a timer's handler is given. Not `EventHandler`, because a timer is not

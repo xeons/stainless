@@ -30,7 +30,8 @@ import Forms.Platform;
 import Ide.Editor;
 import Ide.App;
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var window = new Shell();
 
@@ -42,20 +43,29 @@ int Main() {
     // Every path named gets a tab, in the order they were given, and the first
     // one stays in front -- which is what a shell expanding `*.sl` means, and
     // what `ide a.sl b.sl` means too.
-    for (nuint i = 0u; i < arguments.Length; i += 1u) {
+    for (nuint i = 0u; i < arguments.Length; i++)
+    {
         String argument = arguments[i];
-        if (argument == "--selftest") { testing = true; continue; }
-        if (argument.StartsWith("-")) { continue; }
-        if (!window.OpenFile(argument)) {
+        if (argument == "--selftest")
+        {
+            testing = true;
+            continue;
+        }
+        if (argument.StartsWith("-"))
+            continue;
+        if (!window.OpenFile(argument))
+        {
             Console.WriteLine("could not read " + argument);
         }
     }
     window.ShowFirstTab();
 
-    if (testing) {
+    if (testing)
+    {
         Console.WriteLine("the Stainless IDE -- self test");
         window.Show();
-        for (int i = 0; i < 20; i += 1) { Application.DoEvents(); }
+        for (int i = 0; i < 20; i++)
+            Application.DoEvents();
         bool ok = window.SelfTest();
         Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
         return ok ? 0 : 1;

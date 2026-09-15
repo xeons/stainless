@@ -36,7 +36,8 @@ import Win32.Kernel32;
 import Win32.Handles;
 
 /// A `SECURITY_ATTRIBUTES` that says only "the child may inherit this handle".
-public SecurityAttributes Inheritable() {
+public SecurityAttributes Inheritable()
+{
     SecurityAttributes attributes;
     attributes.Length = (uint)sizeof(SecurityAttributes);
     attributes.Descriptor = null;
@@ -45,7 +46,8 @@ public SecurityAttributes Inheritable() {
 }
 
 /// A `STARTUPINFOW` with `cb` filled in and everything else zeroed.
-public StartupInfo NewStartupInfo() {
+public StartupInfo NewStartupInfo()
+{
     StartupInfo startup;
     startup.Size = (uint)sizeof(StartupInfo);
     startup.Reserved = null;
@@ -73,12 +75,14 @@ public StartupInfo NewStartupInfo() {
 /// A process handle becomes signalled when the process exits, a thread's when
 /// the thread does, and an event's when it is set — which is why one function
 /// covers all three.
-public bool Wait(HANDLE handle, uint milliseconds) {
+public bool Wait(HANDLE handle, uint milliseconds)
+{
     return WaitForSingleObject(handle, milliseconds) == WaitObject0;
 }
 
 /// What a finished child left behind.
-public struct Completed {
+public struct Completed
+{
     /// True when the process actually started. Everything else is meaningless
     /// when this is false.
     public bool Started;
@@ -102,7 +106,8 @@ public struct Completed {
 /// that is itself waiting for the child to exit. This reads until the write end
 /// is gone, which happens when the last holder of it closes — hence closing the
 /// parent's copy immediately after the child is started.
-public Completed Run(String commandLine, String workingDirectory) {
+public Completed Run(String commandLine, String workingDirectory)
+{
     Completed completed;
     completed.Started = false;
     completed.ExitCode = 0u;
@@ -113,7 +118,8 @@ public Completed Run(String commandLine, String workingDirectory) {
 
     HANDLE readEnd = null;
     HANDLE writeEnd = null;
-    if (!Win32.Succeeded(CreatePipe(&readEnd, &writeEnd, &security, 0u))) {
+    if (!Win32.Succeeded(CreatePipe(&readEnd, &writeEnd, &security, 0u)))
+    {
         return completed;
     }
 
@@ -143,7 +149,8 @@ public Completed Run(String commandLine, String workingDirectory) {
     // while it is open the pipe has a writer and the read below never ends.
     CloseHandle(writeEnd);
 
-    if (!started) {
+    if (!started)
+    {
         CloseHandle(readEnd);
         return completed;
     }
@@ -164,16 +171,19 @@ public Completed Run(String commandLine, String workingDirectory) {
 /// The child's output is bytes, and this treats them as UTF-8 — which is right
 /// for a program that says so and wrong for one still writing the OEM code
 /// page. `Win32.Terminal.UseUtf8` is what a child of this program would call.
-public String ReadAll(HANDLE pipe) {
+public String ReadAll(HANDLE pipe)
+{
     var text = new StringBuilder();
     var chunk = new ByteBuffer(4096u);
 
-    while (true) {
+    while (true)
+    {
         uint read = 0u;
         int result = ReadFile(pipe, (void*)chunk.Pointer(), chunk.Capacity(), &read, null);
 
         // Zero bytes, or ERROR_BROKEN_PIPE, both mean the writer is gone.
-        if (result == 0 || read == 0u) { break; }
+        if (result == 0 || read == 0u)
+            break;
 
         text.Append(Text.FromBytes(chunk.Pointer(), (nuint)read));
     }
@@ -183,7 +193,8 @@ public String ReadAll(HANDLE pipe) {
 
 /// Starts a command without waiting for it, and returns the handles. The caller
 /// owns both and must close them with `CloseProcess`.
-public ProcessInformation Start(String commandLine, uint flags) {
+public ProcessInformation Start(String commandLine, uint flags)
+{
     ProcessInformation information;
     information.Process = null;
     information.Thread = null;
@@ -199,7 +210,8 @@ public ProcessInformation Start(String commandLine, uint flags) {
 }
 
 /// Waits for a started process and returns its exit code.
-public uint WaitFor(ProcessInformation information) {
+public uint WaitFor(ProcessInformation information)
+{
     WaitForSingleObject(information.Process, Infinite);
     uint code = 0u;
     GetExitCodeProcess(information.Process, &code);
@@ -208,7 +220,8 @@ public uint WaitFor(ProcessInformation information) {
 
 /// Closes both handles a start produced. Not doing this leaks the process
 /// object for as long as the program runs, even after the child has exited.
-public void CloseProcess(ProcessInformation information) {
+public void CloseProcess(ProcessInformation information)
+{
     CloseHandle(information.Process);
     CloseHandle(information.Thread);
 }

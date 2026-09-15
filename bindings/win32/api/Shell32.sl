@@ -35,7 +35,8 @@ import Win32.Handles;
 
 #if WINDOWS
 
-public extern "C" {
+public extern "C"
+{
     HINSTANCE ShellExecuteW(HWND owner, char16* verb, char16* file,
                             char16* parameters, char16* directory, int show);
     uint      SHGetFolderPathW(HWND owner, int folder, HANDLE token, uint flags, char16* path);

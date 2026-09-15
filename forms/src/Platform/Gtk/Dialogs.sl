@@ -50,13 +50,16 @@ import Gtk.Api;
 /// The window a dialog is transient for, or null. A dialog with no parent is
 /// placed by the window manager wherever it likes, which is why every one of
 /// these is given one when the caller has one.
-GtkWidget* ParentOf(IWindowPeer? owner) {
-    if (owner == null) { return null; }
+GtkWidget* ParentOf(IWindowPeer? owner)
+{
+    if (owner == null)
+        return null;
     return ((GtkWindowPeer)owner).Widget();
 }
 
 /// Runs a dialog and answers its response, destroying it either way.
-gint RunAndClose(GtkWidget* dialog) {
+gint RunAndClose(GtkWidget* dialog)
+{
     gint answer = gtk_dialog_run(dialog);
     gtk_widget_destroy(dialog);
     return answer;
@@ -66,9 +69,11 @@ gint RunAndClose(GtkWidget* dialog) {
 
 /// `filters` as the seam gives them: a description and a pattern alternating,
 /// which is how every platform's filter list is written.
-void AddFilters(GtkWidget* chooser, String[] filters) {
+void AddFilters(GtkWidget* chooser, String[] filters)
+{
     nuint i = 0u;
-    while (i + 1u < filters.Length) {
+    while (i + 1u < filters.Length)
+    {
         gpointer filter = gtk_file_filter_new();
         gtk_file_filter_set_name(filter, filters[i].ToPointer());
 
@@ -76,9 +81,11 @@ void AddFilters(GtkWidget* chooser, String[] filters) {
         // -- which is what a Windows filter string looks like and what a
         // program written against the seam will have supplied.
         var patterns = filters[i + 1u].Split(';');
-        for (nuint p = 0u; p < patterns.Length; p++) {
+        for (nuint p = 0u; p < patterns.Length; p++)
+        {
             var one = patterns[p].Trim();
-            if (!one.IsEmpty()) { gtk_file_filter_add_pattern(filter, one.ToPointer()); }
+            if (!one.IsEmpty())
+                gtk_file_filter_add_pattern(filter, one.ToPointer());
         }
         gtk_file_chooser_add_filter(chooser, filter);
         i = i + 2u;
@@ -86,15 +93,18 @@ void AddFilters(GtkWidget* chooser, String[] filters) {
 }
 
 /// What a chooser chose, or why it did not.
-Result<String, DialogOutcome> Chosen(GtkWidget* chooser, gint answer) {
-    if (answer != GTK_RESPONSE_ACCEPT) {
+Result<String, DialogOutcome> Chosen(GtkWidget* chooser, gint answer)
+{
+    if (answer != GTK_RESPONSE_ACCEPT)
+    {
         gtk_widget_destroy(chooser);
         return Fail(DialogOutcome.Cancelled);
     }
 
     gchar* raw = gtk_file_chooser_get_filename(chooser);
     gtk_widget_destroy(chooser);
-    if (raw == null) { return Fail(DialogOutcome.Cancelled); }
+    if (raw == null)
+        return Fail(DialogOutcome.Cancelled);
 
     var path = Text.FromNullTerminated(raw);
     g_free((gpointer)raw);
@@ -102,20 +112,23 @@ Result<String, DialogOutcome> Chosen(GtkWidget* chooser, gint answer) {
 }
 
 public Result<String, DialogOutcome> OpenFile(IWindowPeer? owner, String title,
-                                              String start, String[] filters) {
+                                              String start, String[] filters)
+{
     GtkWidget* chooser = gtk_file_chooser_dialog_new(
         title.ToPointer(), ParentOf(owner), GTK_FILE_CHOOSER_ACTION_OPEN, null);
     gtk_dialog_add_button(chooser, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
     gtk_dialog_add_button(chooser, "_Open".ToPointer(), GTK_RESPONSE_ACCEPT);
 
-    if (!start.IsEmpty()) { gtk_file_chooser_set_filename(chooser, start.ToPointer()); }
+    if (!start.IsEmpty())
+        gtk_file_chooser_set_filename(chooser, start.ToPointer());
     AddFilters(chooser, filters);
 
     return Chosen(chooser, gtk_dialog_run(chooser));
 }
 
 public Result<String, DialogOutcome> SaveFile(IWindowPeer? owner, String title,
-                                              String start, String[] filters) {
+                                              String start, String[] filters)
+{
     GtkWidget* chooser = gtk_file_chooser_dialog_new(
         title.ToPointer(), ParentOf(owner), GTK_FILE_CHOOSER_ACTION_SAVE, null);
     gtk_dialog_add_button(chooser, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
@@ -125,7 +138,8 @@ public Result<String, DialogOutcome> SaveFile(IWindowPeer? owner, String title,
     // A name rather than a filename: a save dialog opens on a directory with
     // the name filled in, and `set_filename` on a file that does not exist
     // yet does nothing at all.
-    if (!start.IsEmpty()) {
+    if (!start.IsEmpty())
+    {
         gtk_file_chooser_set_current_name(chooser, start.ToPointer());
     }
     AddFilters(chooser, filters);
@@ -133,7 +147,8 @@ public Result<String, DialogOutcome> SaveFile(IWindowPeer? owner, String title,
     return Chosen(chooser, gtk_dialog_run(chooser));
 }
 
-public Result<String, DialogOutcome> PickFolder(IWindowPeer? owner, String title) {
+public Result<String, DialogOutcome> PickFolder(IWindowPeer? owner, String title)
+{
     GtkWidget* chooser = gtk_file_chooser_dialog_new(
         title.ToPointer(), ParentOf(owner),
         GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, null);
@@ -145,7 +160,8 @@ public Result<String, DialogOutcome> PickFolder(IWindowPeer? owner, String title
 
 // =================================================================== colour
 
-public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start) {
+public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start)
+{
     GtkWidget* chooser = gtk_color_chooser_dialog_new(
         "Choose a colour".ToPointer(), ParentOf(owner));
 
@@ -153,7 +169,8 @@ public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start) {
     gtk_color_chooser_set_rgba(chooser, &from);
 
     gint answer = gtk_dialog_run(chooser);
-    if (answer != GTK_RESPONSE_OK) {
+    if (answer != GTK_RESPONSE_OK)
+    {
         gtk_widget_destroy(chooser);
         return Fail(DialogOutcome.Cancelled);
     }
@@ -171,50 +188,69 @@ public Result<Color, DialogOutcome> PickColor(IWindowPeer? owner, Color start) {
 /// then a size -- and a `Font` wants the three separately. The size is the
 /// last word when it is a number, the style words are whichever of `Bold` and
 /// `Italic` appear, and what is left is the family.
-public Font ParsePango(String description, Font fallback) {
+public Font ParsePango(String description, Font fallback)
+{
     var words = description.Trim().Split(' ');
-    if (words.Length == 0u) { return fallback; }
+    if (words.Length == 0u)
+        return fallback;
 
     int size = fallback.Size;
     nuint end = words.Length;
 
     var last = Convert.ToInt(words[end - 1u]);
-    if (last.Ok) {
+    if (last.Ok)
+    {
         size = last.Value;
         end = end - 1u;
     }
 
     var style = FontStyle.Regular;
     var family = "";
-    for (nuint i = 0u; i < end; i++) {
+    for (nuint i = 0u; i < end; i++)
+    {
         var word = words[i];
-        if (word == "Bold")        { style = style | FontStyle.Bold; }
-        else if (word == "Italic") { style = style | FontStyle.Italic; }
-        else if (word == "Oblique") { style = style | FontStyle.Italic; }
-        else {
-            if (!family.IsEmpty()) { family = family + " "; }
+        if (word == "Bold")
+        {
+            style = style | FontStyle.Bold;
+        }
+        else if (word == "Italic")
+        {
+            style = style | FontStyle.Italic;
+        }
+        else if (word == "Oblique")
+        {
+            style = style | FontStyle.Italic;
+        }
+        else
+        {
+            if (!family.IsEmpty())
+                family = family + " ";
             family = family + word;
         }
     }
 
-    if (family.IsEmpty()) { family = fallback.Family; }
+    if (family.IsEmpty())
+        family = fallback.Family;
     return new Font(family, size, style);
 }
 
-public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start) {
+public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start)
+{
     GtkWidget* chooser = gtk_font_chooser_dialog_new(
         "Choose a font".ToPointer(), ParentOf(owner));
     gtk_font_chooser_set_font(chooser, PangoName(start).ToPointer());
 
     gint answer = gtk_dialog_run(chooser);
-    if (answer != GTK_RESPONSE_OK) {
+    if (answer != GTK_RESPONSE_OK)
+    {
         gtk_widget_destroy(chooser);
         return Fail(DialogOutcome.Cancelled);
     }
 
     gchar* raw = gtk_font_chooser_get_font(chooser);
     gtk_widget_destroy(chooser);
-    if (raw == null) { return Fail(DialogOutcome.Cancelled); }
+    if (raw == null)
+        return Fail(DialogOutcome.Cancelled);
 
     var described = Text.FromNullTerminated(raw);
     g_free((gpointer)raw);
@@ -224,11 +260,16 @@ public Result<Font, DialogOutcome> PickFont(IWindowPeer? owner, Font start) {
 // ============================================================== message box
 
 /// `GtkMessageType`, which is what the seam's icon becomes.
-gint MessageTypeOf(MessageIcon icon) {
-    if (icon == MessageIcon.Information) { return GTK_MESSAGE_INFO; }
-    if (icon == MessageIcon.Warning)     { return GTK_MESSAGE_WARNING; }
-    if (icon == MessageIcon.Error)       { return GTK_MESSAGE_ERROR; }
-    if (icon == MessageIcon.Question)    { return GTK_MESSAGE_QUESTION; }
+gint MessageTypeOf(MessageIcon icon)
+{
+    if (icon == MessageIcon.Information)
+        return GTK_MESSAGE_INFO;
+    if (icon == MessageIcon.Warning)
+        return GTK_MESSAGE_WARNING;
+    if (icon == MessageIcon.Error)
+        return GTK_MESSAGE_ERROR;
+    if (icon == MessageIcon.Question)
+        return GTK_MESSAGE_QUESTION;
     return GTK_MESSAGE_OTHER;
 }
 
@@ -240,36 +281,50 @@ gint MessageTypeOf(MessageIcon icon) {
 /// all expressible, and it puts them in the platform's order -- the affirmative
 /// last, which is where a GTK user looks for it and the opposite of Windows.
 public DialogResult ShowMessageBox(IWindowPeer? owner, String text, String caption,
-                                   MessageButtons buttons, MessageIcon icon) {
+                                   MessageButtons buttons, MessageIcon icon)
+{
     GtkWidget* dialog = gtk_message_dialog_new(
         ParentOf(owner), GTK_DIALOG_MODAL, MessageTypeOf(icon),
         GTK_BUTTONS_NONE, "%s".ToPointer(), text.ToPointer());
 
     gtk_window_set_title(dialog, caption.ToPointer());
 
-    if (buttons == MessageButtons.Ok) {
+    if (buttons == MessageButtons.Ok)
+    {
         gtk_dialog_add_button(dialog, "_OK".ToPointer(), GTK_RESPONSE_OK);
-    } else if (buttons == MessageButtons.OkCancel) {
+    }
+    else if (buttons == MessageButtons.OkCancel)
+    {
         gtk_dialog_add_button(dialog, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
         gtk_dialog_add_button(dialog, "_OK".ToPointer(), GTK_RESPONSE_OK);
-    } else if (buttons == MessageButtons.YesNo) {
+    }
+    else if (buttons == MessageButtons.YesNo)
+    {
         gtk_dialog_add_button(dialog, "_No".ToPointer(), GTK_RESPONSE_NO);
         gtk_dialog_add_button(dialog, "_Yes".ToPointer(), GTK_RESPONSE_YES);
-    } else if (buttons == MessageButtons.YesNoCancel) {
+    }
+    else if (buttons == MessageButtons.YesNoCancel)
+    {
         gtk_dialog_add_button(dialog, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
         gtk_dialog_add_button(dialog, "_No".ToPointer(), GTK_RESPONSE_NO);
         gtk_dialog_add_button(dialog, "_Yes".ToPointer(), GTK_RESPONSE_YES);
-    } else {
+    }
+    else
+    {
         gtk_dialog_add_button(dialog, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
         gtk_dialog_add_button(dialog, "_Retry".ToPointer(), GTK_RESPONSE_ACCEPT);
     }
 
     gint answer = RunAndClose(dialog);
 
-    if (answer == GTK_RESPONSE_OK)     { return DialogResult.Ok; }
-    if (answer == GTK_RESPONSE_YES)    { return DialogResult.Yes; }
-    if (answer == GTK_RESPONSE_NO)     { return DialogResult.No; }
-    if (answer == GTK_RESPONSE_ACCEPT) { return DialogResult.Retry; }
+    if (answer == GTK_RESPONSE_OK)
+        return DialogResult.Ok;
+    if (answer == GTK_RESPONSE_YES)
+        return DialogResult.Yes;
+    if (answer == GTK_RESPONSE_NO)
+        return DialogResult.No;
+    if (answer == GTK_RESPONSE_ACCEPT)
+        return DialogResult.Retry;
 
     // Cancel, Escape and the title bar's close all arrive here, which is what
     // every one of them means.

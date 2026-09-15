@@ -24,7 +24,7 @@ class Entry
 
 One entry of a directory: where it is, and whether it is itself a directory.
 
-<sub>[stdlib/Directory.sl:75](../../stdlib/Directory.sl#L75)</sub>
+<sub>[stdlib/Directory.sl:83](../../stdlib/Directory.sl#L83)</sub>
 
 #### Path *property*
 
@@ -35,7 +35,7 @@ String Path { get; }
 The full path, ready to hand back to `File` or `Directory`. Built from
 the path that was listed, so a relative listing gives relative entries.
 
-<sub>[stdlib/Directory.sl:78](../../stdlib/Directory.sl#L78)</sub>
+<sub>[stdlib/Directory.sl:87](../../stdlib/Directory.sl#L87)</sub>
 
 #### Name *property*
 
@@ -45,7 +45,7 @@ String Name { get; }
 
 The last part alone, without any directory in front of it.
 
-<sub>[stdlib/Directory.sl:81](../../stdlib/Directory.sl#L81)</sub>
+<sub>[stdlib/Directory.sl:90](../../stdlib/Directory.sl#L90)</sub>
 
 #### IsDirectory *property*
 
@@ -57,7 +57,7 @@ True for a directory, false for anything else -- a regular file, a
 symbolic link to one, a device. Only the directory answer is relied on
 here, because it is the one that decides whether a walk descends.
 
-<sub>[stdlib/Directory.sl:86](../../stdlib/Directory.sl#L86)</sub>
+<sub>[stdlib/Directory.sl:95](../../stdlib/Directory.sl#L95)</sub>
 
 ## Functions
 
@@ -72,7 +72,7 @@ Every file underneath, at any depth.
 Written as a worklist rather than a recursion so that a deep tree cannot
 run the stack out.
 
-<sub>[stdlib/Directory.sl:150](../../stdlib/Directory.sl#L150)</sub>
+<sub>[stdlib/Directory.sl:171](../../stdlib/Directory.sl#L171)</sub>
 
 ### Create *function*
 
@@ -83,7 +83,7 @@ IOError Create(String path)
 Creates one directory. The parent has to exist already; use `CreateAll` when
 it might not.
 
-<sub>[stdlib/Directory.sl:50](../../stdlib/Directory.sl#L50)</sub>
+<sub>[stdlib/Directory.sl:52](../../stdlib/Directory.sl#L52)</sub>
 
 ### CreateAll *function*
 
@@ -93,7 +93,7 @@ IOError CreateAll(String path)
 
 Creates the directory and every parent that is missing.
 
-<sub>[stdlib/Directory.sl:55](../../stdlib/Directory.sl#L55)</sub>
+<sub>[stdlib/Directory.sl:58](../../stdlib/Directory.sl#L58)</sub>
 
 ### Delete *function*
 
@@ -103,7 +103,7 @@ IOError Delete(String path)
 
 Removes one empty directory.
 
-<sub>[stdlib/Directory.sl:68](../../stdlib/Directory.sl#L68)</sub>
+<sub>[stdlib/Directory.sl:75](../../stdlib/Directory.sl#L75)</sub>
 
 ### Directories *function*
 
@@ -113,7 +113,7 @@ Result<List<String>, IOError> Directories(String path)
 
 The full paths of the directories directly inside.
 
-<sub>[stdlib/Directory.sl:135](../../stdlib/Directory.sl#L135)</sub>
+<sub>[stdlib/Directory.sl:152](../../stdlib/Directory.sl#L152)</sub>
 
 ### Entries *function*
 
@@ -123,7 +123,7 @@ Result<List<Entry>, IOError> Entries(String path)
 
 Everything directly inside, files and directories both, not recursively.
 
-<sub>[stdlib/Directory.sl:98](../../stdlib/Directory.sl#L98)</sub>
+<sub>[stdlib/Directory.sl:108](../../stdlib/Directory.sl#L108)</sub>
 
 ### Exists *function*
 
@@ -133,7 +133,7 @@ bool Exists(String path)
 
 True when the path names a directory that is there.
 
-<sub>[stdlib/Directory.sl:44](../../stdlib/Directory.sl#L44)</sub>
+<sub>[stdlib/Directory.sl:45](../../stdlib/Directory.sl#L45)</sub>
 
 ### Files *function*
 
@@ -143,5 +143,5 @@ Result<List<String>, IOError> Files(String path)
 
 The full paths of the files directly inside.
 
-<sub>[stdlib/Directory.sl:123](../../stdlib/Directory.sl#L123)</sub>
+<sub>[stdlib/Directory.sl:136](../../stdlib/Directory.sl#L136)</sub>
 

@@ -43,7 +43,8 @@ import Win32.User32;
 
 // ================================================================== objects
 
-public extern "C" {
+public extern "C"
+{
     HPEN    CreatePen(int style, int width, uint colour);
     HBRUSH  CreateSolidBrush(uint colour);
     HBRUSH  CreateHatchBrush(int style, uint colour);
@@ -101,7 +102,8 @@ public const uint DefaultPitch     = 0u;
 
 // ================================================================== drawing
 
-public extern "C" {
+public extern "C"
+{
     int  MoveToEx(HDC dc, int x, int y, Point* previous);
     int  LineTo(HDC dc, int x, int y);
     int  Rectangle(HDC dc, int left, int top, int right, int bottom);
@@ -134,7 +136,8 @@ public const uint PatCopy    = 0x00F00021u;
 
 // ===================================================================== text
 
-public extern "C" {
+public extern "C"
+{
     int  TextOutW(HDC dc, int x, int y, char16* text, int length);
     int  GetTextExtentPoint32W(HDC dc, char16* text, int length, Size* size);
     uint SetTextColor(HDC dc, uint colour);
@@ -158,7 +161,8 @@ public const uint TextAlignBaseline = 24u;
 
 // ================================================================== bitmaps
 
-public extern "C" {
+public extern "C"
+{
     HDC     CreateCompatibleDC(HDC dc);
     HBITMAP CreateCompatibleBitmap(HDC dc, int width, int height);
     int     DeleteDC(HDC dc);
@@ -179,7 +183,8 @@ public const int DeviceCapsLogicalPixelsY   = 90;
 // own corner, and nothing it draws allowed outside it. `SaveDC` and `RestoreDC`
 // above are what put both back in one call.
 
-public extern "C" {
+public extern "C"
+{
     /// Moves the origin all drawing is measured from. The previous origin is
     /// written to `previous`, which may be null.
     int SetViewportOrgEx(HDC dc, int x, int y, Point* previous);

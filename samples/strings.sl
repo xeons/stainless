@@ -13,15 +13,18 @@ import Standard.Convert;
 
 extern "C" int printf(byte* format, ...);
 
-void Show(String label, String value) {
+void Show(String label, String value)
+{
     Console.WriteLine(label + " " + value);
 }
 
-void ShowNumber(String label, long value) {
+void ShowNumber(String label, long value)
+{
     Console.WriteLine(label + " " + Text.FromInteger(value));
 }
 
-int Main() {
+int Main()
+{
     // ------------------------------------------------------------ the basics
 
     // A literal is a String. It lives in static storage and never allocates.
@@ -48,7 +51,8 @@ int Main() {
     // Walking it properly: CodePointAt reads one character, NextCodePoint
     // steps over it. A `for` over bytes would land inside one.
     var scalars = new StringBuilder();
-    for (nuint at = 0u; at < accented.ByteLength(); at = accented.NextCodePoint(at)) {
+    for (nuint at = 0u; at < accented.ByteLength(); at = accented.NextCodePoint(at))
+    {
         scalars.AppendInteger((long)(uint)accented.CodePointAt(at));
         scalars.Append(" ");
     }
@@ -97,7 +101,8 @@ int Main() {
 
     // And text that arrived as characters becoming something else.
     var port = Convert.ToInt("8080");
-    switch (port) {
+    switch (port)
+    {
         case Ok ok:  ShowNumber("parsed          ", (long)ok.Value); break;
         case Fail:   Show("parsed          ", "not a number"); break;
     }

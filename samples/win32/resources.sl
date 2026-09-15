@@ -36,16 +36,19 @@ static readonly String Dim  = "\x1b[90m";
 static readonly String Bold = "\x1b[1m";
 static readonly String Off  = "\x1b[0m";
 
-void Heading(String text) {
+void Heading(String text)
+{
     Console.WriteLine("");
     Console.WriteLine(Bold + text + Off);
 }
 
-void Line(String label, String value) {
+void Line(String label, String value)
+{
     Console.WriteLine("  " + Dim + label + Off + "  " + value);
 }
 
-int Main() {
+int Main()
+{
     Win32.Terminal.EnableAnsi();
 
     // ------------------------------------------------------------ strings
@@ -95,10 +98,12 @@ int Main() {
     // name nothing here wrote: strings are filed in blocks of sixteen, so ids
     // 201 to 203 all live in block 13. That is why `LoadStringW` takes a bare
     // id and every other call takes a name.
-    foreach (var type in Resources.Types()) {
+    foreach (var type in Resources.Types())
+    {
         var names = Resources.Names(TypeNamed(type));
         Line(type, $"{names.Length} resource(s)");
-        foreach (var name in names) { Console.WriteLine("      " + Dim + name + Off); }
+        foreach (var name in names)
+            Console.WriteLine("      " + Dim + name + Off);
     }
 
     Heading("The manifest");
@@ -116,9 +121,12 @@ int Main() {
     // no DllMain, no imports resolved -- which is the only safe way to read
     // resources out of something this program did not build.
     var shell = Resources.OpenForResources("C:\\Windows\\System32\\shell32.dll");
-    if (shell == null) {
+    if (shell == null)
+    {
         Line("shell32.dll", "could not be opened: " + Win32.LastErrorMessage());
-    } else {
+    }
+    else
+    {
         Line("shell32.dll", $"{Resources.NamesIn(shell, RtGroupIcon()).Length} icon groups");
         Resources.CloseModule(shell);
     }
@@ -133,10 +141,13 @@ int Main() {
 /// script spells one; this is the other direction, so that enumerating types
 /// and then enumerating each type's names works without the caller keeping the
 /// raw pointers around.
-char16* TypeNamed(String type) {
-    if (type.StartsWith("#")) {
+char16* TypeNamed(String type)
+{
+    if (type.StartsWith("#"))
+    {
         var number = Convert.ToInt(type.Substring(1u));
-        if (number.Ok) { return Resources.Id(number.Value); }
+        if (number.Ok)
+            return Resources.Id(number.Value);
     }
     return type.ToUtf16().ToPointer();
 }

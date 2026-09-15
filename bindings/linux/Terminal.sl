@@ -38,7 +38,7 @@ public const int Error = 2;
 ///
 /// The question to ask before writing an escape sequence, and before assuming
 /// there is anybody to read a prompt.
-public bool IsTerminal(int fd) { return isatty(fd) == 1; }
+public bool IsTerminal(int fd) => isatty(fd) == 1;
 
 // ================================================================= the size
 
@@ -46,12 +46,14 @@ public bool IsTerminal(int fd) { return isatty(fd) == 1; }
 ///
 /// It changes under a running program, so this is asked rather than
 /// remembered. Answers `(0, 0)` when the descriptor is not a terminal.
-public (int, int) Size(int fd) {
+public (int, int) Size(int fd)
+{
     winsize measured;
     measured.ws_row = 0;
     measured.ws_col = 0;
 
-    if (ioctl(fd, TIOCGWINSZ, (void*)&measured) != 0) { return (0, 0); }
+    if (ioctl(fd, TIOCGWINSZ, (void*)&measured) != 0)
+        return (0, 0);
     return ((int)measured.ws_row, (int)measured.ws_col);
 }
 
@@ -62,27 +64,31 @@ public (int, int) Size(int fd) {
 /// **Put them back.** A program that leaves the terminal in raw mode leaves
 /// the shell it returns to unusable — no echo, no line editing, and Ctrl-C
 /// doing nothing. A destructor is what makes that hard to forget.
-public class Mode {
-    termios saved;
-    int fd;
-    bool held;
+public class Mode
+{
+    termios _saved;
+    int _fd;
+    bool _held;
 
-    Mode(int descriptor, termios state) {
-        fd = descriptor;
-        saved = state;
-        held = true;
+    Mode(int descriptor, termios state)
+    {
+        _fd = descriptor;
+        _saved = state;
+        _held = true;
     }
 
     /// Puts the settings back, if they have not been put back already.
     ///
     /// `TCSADRAIN` rather than `TCSAFLUSH`: what the program has printed
     /// should reach the screen before the terminal changes under it.
-    public bool Restore() {
-        if (!held) { return true; }
-        held = false;
+    public bool Restore()
+    {
+        if (!_held)
+            return true;
+        _held = false;
 
-        termios state = saved;
-        return tcsetattr(fd, TCSADRAIN, &state) == 0;
+        termios state = _saved;
+        return tcsetattr(_fd, TCSADRAIN, &state) == 0;
     }
 
     ~Mode() { Restore(); }
@@ -96,9 +102,11 @@ public class Mode {
     ///     mode.Restore();
     ///
     /// Or simply let it go out of scope, which does the same.
-    public static Result<Mode, int> Raw(int fd) {
+    public static Result<Mode, int> Raw(int fd)
+    {
         termios before;
-        if (tcgetattr(fd, &before) != 0) { return Fail(Errno()); }
+        if (tcgetattr(fd, &before) != 0)
+            return Fail(Errno());
 
         termios wanted = before;
 
@@ -112,7 +120,8 @@ public class Mode {
         wanted.c_cc[VMIN] = 1;
         wanted.c_cc[VTIME] = 0;
 
-        if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0) { return Fail(Errno()); }
+        if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0)
+            return Fail(Errno());
         return Ok(new Mode(fd, before));
     }
 
@@ -120,28 +129,34 @@ public class Mode {
     /// stops collecting lines and stops echoing, and Ctrl-C still interrupts.
     ///
     /// This is what a prompt wants. Raw is what a full-screen program wants.
-    public static Result<Mode, int> Quiet(int fd) {
+    public static Result<Mode, int> Quiet(int fd)
+    {
         termios before;
-        if (tcgetattr(fd, &before) != 0) { return Fail(Errno()); }
+        if (tcgetattr(fd, &before) != 0)
+            return Fail(Errno());
 
         termios wanted = before;
         wanted.c_lflag &= ~(ECHO | ICANON);
         wanted.c_cc[VMIN] = 1;
         wanted.c_cc[VTIME] = 0;
 
-        if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0) { return Fail(Errno()); }
+        if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0)
+            return Fail(Errno());
         return Ok(new Mode(fd, before));
     }
 
     /// Echo off and nothing else, for reading a password.
-    public static Result<Mode, int> Hidden(int fd) {
+    public static Result<Mode, int> Hidden(int fd)
+    {
         termios before;
-        if (tcgetattr(fd, &before) != 0) { return Fail(Errno()); }
+        if (tcgetattr(fd, &before) != 0)
+            return Fail(Errno());
 
         termios wanted = before;
         wanted.c_lflag &= ~ECHO;
 
-        if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0) { return Fail(Errno()); }
+        if (tcsetattr(fd, TCSAFLUSH, &wanted) != 0)
+            return Fail(Errno());
         return Ok(new Mode(fd, before));
     }
 }
@@ -156,49 +171,51 @@ public class Mode {
 /// A function rather than a `const`, because a `const` holds a number, a bool,
 /// a char or an enum. A String has storage and is reference counted, and the
 /// literal here is one interned object however often it is named.
-String Escape() { return "["; }
+String Escape() => "[";
 
 /// Puts the cursor at a row and column, both counting from 1 as the terminal
 /// does — which is off by one from everything else here, and is the
 /// terminal's convention rather than a choice.
-public void MoveTo(int row, int column) {
+public void MoveTo(int row, int column)
+{
     Console.Write($"{Escape()}{row};{column}H");
 }
 
-public void Up(int rows) { Console.Write($"{Escape()}{rows}A"); }
-public void Down(int rows) { Console.Write($"{Escape()}{rows}B"); }
-public void Right(int columns) { Console.Write($"{Escape()}{columns}C"); }
-public void Left(int columns) { Console.Write($"{Escape()}{columns}D"); }
+public void Up(int rows) => Console.Write($"{Escape()}{rows}A");
+public void Down(int rows) => Console.Write($"{Escape()}{rows}B");
+public void Right(int columns) => Console.Write($"{Escape()}{columns}C");
+public void Left(int columns) => Console.Write($"{Escape()}{columns}D");
 
 /// Clears the screen and puts the cursor at the top left.
-public void Clear() { Console.Write($"{Escape()}2J{Escape()}H"); }
+public void Clear() => Console.Write($"{Escape()}2J{Escape()}H");
 
 /// Clears from the cursor to the end of the line.
-public void ClearLine() { Console.Write($"{Escape()}K"); }
+public void ClearLine() => Console.Write($"{Escape()}K");
 
-public void HideCursor() { Console.Write($"{Escape()}?25l"); }
-public void ShowCursor() { Console.Write($"{Escape()}?25h"); }
+public void HideCursor() => Console.Write($"{Escape()}?25l");
+public void ShowCursor() => Console.Write($"{Escape()}?25h");
 
 /// Switches to the alternate screen, which is what a full-screen program uses
 /// so that the scrollback it found is still there when it leaves.
-public void UseAlternateScreen() { Console.Write($"{Escape()}?1049h"); }
-public void UseMainScreen() { Console.Write($"{Escape()}?1049l"); }
+public void UseAlternateScreen() => Console.Write($"{Escape()}?1049h");
+public void UseMainScreen() => Console.Write($"{Escape()}?1049l");
 
 /// The eight colours every terminal has, as their foreground codes.
-public enum Colour {
+public enum Colour
+{
     Black = 30, Red = 31, Green = 32, Yellow = 33,
     Blue = 34, Magenta = 35, Cyan = 36, White = 37,
     Default = 39,
 }
 
-public void SetColour(Colour colour) { Console.Write($"{Escape()}{(long)colour}m"); }
+public void SetColour(Colour colour) => Console.Write($"{Escape()}{(long)colour}m");
 
-public void SetBackground(Colour colour) { Console.Write($"{Escape()}{(long)colour + 10}m"); }
+public void SetBackground(Colour colour) => Console.Write($"{Escape()}{(long)colour + 10}m");
 
-public void Bold(bool on) { Console.Write(on ? $"{Escape()}1m" : $"{Escape()}22m"); }
+public void Bold(bool on) => Console.Write(on ? $"{Escape()}1m" : $"{Escape()}22m");
 
 /// Puts every attribute back to what it was. The one to call before leaving,
 /// so the shell does not inherit a colour.
-public void Reset() { Console.Write($"{Escape()}0m"); }
+public void Reset() => Console.Write($"{Escape()}0m");
 
 #endif

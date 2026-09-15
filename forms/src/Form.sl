@@ -70,12 +70,13 @@ public enum CloseReason { User, Program, ApplicationExit }
 /// built in a local and shown being destroyed the moment the function returns,
 /// which under ARC it otherwise would be -- the platform holds a window, but
 /// nothing here would hold the object that answers for it.
-public class Form : WindowedControl, IWindowNotify {
-    IWindowPeer  window;
-    MainMenu?    bar;
-    WindowBorder framing;
-    bool         closing;
-    bool         registered;
+public class Form : WindowedControl, IWindowNotify
+{
+    IWindowPeer _window;
+    MainMenu? _bar;
+    WindowBorder _framing;
+    bool _closing;
+    bool _registered;
 
     /// Builds a form with the given frame.
     ///
@@ -83,27 +84,29 @@ public class Form : WindowedControl, IWindowNotify {
     /// afterwards goes straight through and nothing needs replaying. A form
     /// that must choose its border at run time chooses it here, since changing
     /// it later costs the window on Windows.
-    public Form(WindowBorder border) {
+    public Form(WindowBorder border)
+    {
         base(null);
-        framing = border;
-        bar = null;
-        closing = false;
-        registered = false;
-        window = WidgetSet.Current.CreateWindow(this, border);
-        AttachContainerPeer(window);
+        _framing = border;
+        _bar = null;
+        _closing = false;
+        _registered = false;
+        _window = WidgetSet.Current.CreateWindow(this, border);
+        AttachContainerPeer(_window);
         SetBounds(0, 0, 640, 480);
     }
 
     /// The ordinary resizable window.
-    public Form() { this(WindowBorder.Sizable); }
+    public Form() => this(WindowBorder.Sizable);
 
     /// The window's title. The same storage as `Text`, because on every
     /// platform a window's caption *is* its text, and the LCL keeping
     /// `Caption` and `Text` as separate published properties on `TCustomForm`
     /// only ever meant keeping the two in step.
-    public String Title {
+    public String Title
+    {
         get => Text;
-        set { Text = value; }
+        set => Text = value;
     }
 
     /// Gives the window the icon with this id in the program's resources, and
@@ -117,35 +120,41 @@ public class Form : WindowedControl, IWindowNotify {
     /// **Windows only**, and false everywhere else. An icon in the binary is a
     /// resource, and only a PE has those; a GTK program takes its icon from the
     /// desktop's icon theme, keyed by the name in its `.desktop` file.
-    public bool UseIconResource(int id) { return window.SetIconResource(id); }
+    public bool UseIconResource(int id) => _window.SetIconResource(id);
 
     /// How the window is framed. Read-only after construction; see the note on
     /// the constructor.
-    public WindowBorder Border => framing;
+    public WindowBorder Border => _framing;
 
     /// Normal, minimised or maximised. Read from the platform, because the user
     /// changes it without asking.
-    public WindowState State {
-        get => window.GetState();
-        set { window.SetState(value); }
+    public WindowState State
+    {
+        get => _window.GetState();
+        set => _window.SetState(value);
     }
 
     /// Centres the window on the work area of the screen it is on.
-    public void CenterOnScreen() { window.CenterOnScreen(); }
+    public void CenterOnScreen() => _window.CenterOnScreen();
 
     /// The bar across the top of the window, or null for none.
     ///
     /// Assigning one builds it: every item in the tree becomes a platform menu
     /// item at this moment and not before, which is what lets the tree be
     /// assembled in any order. Assigning a second one replaces the first.
-    public MainMenu? Menu {
-        get => bar;
-        set {
-            bar = value;
-            if (value == null) {
-                window.SetMenu(null);
-            } else {
-                window.SetMenu(((MainMenu)value).Build());
+    public MainMenu? Menu
+    {
+        get => _bar;
+        set
+        {
+            _bar = value;
+            if (value == null)
+            {
+                _window.SetMenu(null);
+            }
+            else
+            {
+                _window.SetMenu(((MainMenu)value).Build());
             }
             PerformLayout();
         }
@@ -153,19 +162,22 @@ public class Form : WindowedControl, IWindowNotify {
 
     /// This form's window, for the things that need one -- a popup menu, and a
     /// modal dialog's owner.
-    public IWindowPeer WindowPeer() { return window; }
+    public IWindowPeer WindowPeer() => _window;
 
     /// A point in a control's own coordinates, in the screen's.
     ///
     /// What a popup menu needs, since every platform places one in screen
     /// coordinates and every handler has the point in the control's.
-    public Point ToScreen(Control from, Point at) {
+    public Point ToScreen(Control from, Point at)
+    {
         int x = at.X;
         int y = at.Y;
         Control? walk = from;
-        while (walk != null) {
+        while (walk != null)
+        {
             var here = (Control)walk;
-            if (here is Form) { break; }
+            if (here is Form)
+                break;
             x = x + here.Left;
             y = y + here.Top;
             walk = here.Parent;
@@ -180,13 +192,15 @@ public class Form : WindowedControl, IWindowNotify {
     }
 
     /// Shows the window and registers it with the `Application`.
-    public override void Show() {
-        if (!registered) {
+    public override void Show()
+    {
+        if (!_registered)
+        {
             Application.Register(this);
-            registered = true;
+            _registered = true;
         }
         Visible = true;
-        window.Activate();
+        _window.Activate();
     }
 
     /// Shows it and does not return until it is closed.
@@ -197,24 +211,29 @@ public class Form : WindowedControl, IWindowNotify {
     /// actually is, and the caller reads that after this returns. A dialog
     /// whose answer is genuinely one of ok/cancel gives itself a
     /// `DialogResult` property and loses nothing.
-    public void ShowModal() {
-        if (!registered) {
+    public void ShowModal()
+    {
+        if (!_registered)
+        {
             Application.Register(this);
-            registered = true;
+            _registered = true;
         }
         Visible = true;
-        window.ShowModal();
+        _window.ShowModal();
     }
 
     /// Asks the window to close, running `OnClosing` first so a handler may
     /// refuse -- exactly as though the user had clicked the close box.
-    public void Close() {
-        if (closing) { return; }
+    public void Close()
+    {
+        if (_closing)
+            return;
         var asked = new CancelEventArgs();
         OnClosing(asked);
-        if (asked.Cancel) { return; }
-        closing = true;
-        window.Close();
+        if (asked.Cancel)
+            return;
+        _closing = true;
+        _window.Close();
     }
 
     // ------------------------------------------------------------- events
@@ -231,11 +250,11 @@ public class Form : WindowedControl, IWindowNotify {
     /// a form does work that needs its final size.
     public event EventHandler Shown;
 
-    protected virtual void OnClosing(CancelEventArgs args) { Closing(this, args); }
-    protected virtual void OnClosed()      { Closed(this); }
-    protected virtual void OnActivated()   { Activated(this); }
-    protected virtual void OnDeactivated() { Deactivated(this); }
-    protected virtual void OnShown()       { Shown(this); }
+    protected virtual void OnClosing(CancelEventArgs args) => Closing(this, args);
+    protected virtual void OnClosed() => Closed(this);
+    protected virtual void OnActivated() => Activated(this);
+    protected virtual void OnDeactivated() => Deactivated(this);
+    protected virtual void OnShown() => Shown(this);
 
     // --------------------------------------------- what the platform says
 
@@ -244,30 +263,34 @@ public class Form : WindowedControl, IWindowNotify {
     /// The one notification that is a question rather than a report, which is
     /// why `IWindowNotify` exists at all and why it is the only method on it
     /// that returns anything.
-    public bool OnPlatformClosing() {
+    public bool OnPlatformClosing()
+    {
         var asked = new CancelEventArgs();
         OnClosing(asked);
         return !asked.Cancel;
     }
 
-    public void OnPlatformClosed() {
-        closing = true;
+    public void OnPlatformClosed()
+    {
+        _closing = true;
         OnClosed();
-        if (registered) {
+        if (_registered)
+        {
             Application.Unregister(this);
-            registered = false;
+            _registered = false;
         }
     }
 
-    public void OnPlatformActivatedWindow() { OnActivated(); }
-    public void OnPlatformDeactivated()     { OnDeactivated(); }
+    public void OnPlatformActivatedWindow() => OnActivated();
+    public void OnPlatformDeactivated() => OnDeactivated();
 }
 
 // ================================================================== screen
 
 /// What the display looks like. `TScreen`, without the monitor list, the form
 /// list, the cursor stack or the font enumeration.
-public static class Screen {
+public static class Screen
+{
     /// The whole display, in pixels.
     public static Size Bounds => WidgetSet.Current.ScreenSize();
 

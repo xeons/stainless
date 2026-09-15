@@ -3,40 +3,49 @@ module Interfaces;
 
 import Standard.Console;
 
-public interface IShape {
+public interface IShape
+{
     double Area();
     String Describe();
 }
 
-public interface INamed {
+public interface INamed
+{
     String Name();
 }
 
-public class Circle : IShape, INamed {
-    double radius;
+public class Circle : IShape, INamed
+{
+    double _radius;
 
-    public Circle(double r) { radius = r; }
+    public Circle(double r) => _radius = r;
     ~Circle() { Console.WriteLine("  ~Circle"); }
 
-    public double Area() { return 3.14159265 * radius * radius; }
-    public String Describe() { return "circle of radius " + Text.FromDouble(radius); }
-    public String Name() { return "Circle"; }
+    public double Area() => 3.14159265 * _radius * _radius;
+    public String Describe() => "circle of radius " + Text.FromDouble(_radius);
+    public String Name() => "Circle";
 }
 
-public class Rectangle : IShape {
-    double width;
-    double height;
+public class Rectangle : IShape
+{
+    double _width;
+    double _height;
 
-    public Rectangle(double w, double h) { width = w; height = h; }
+    public Rectangle(double w, double h)
+    {
+        _width = w;
+        _height = h;
+    }
 
-    public double Area() { return width * height; }
-    public String Describe() { return "rectangle " + Text.FromDouble(width) + "x" + Text.FromDouble(height); }
+    public double Area() => _width * _height;
+    public String Describe() => "rectangle " + Text.FromDouble(_width) + "x" + Text.FromDouble(_height);
 }
 
 // Dispatch happens through the interface, not the concrete class.
-double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
+double TotalArea(IShape a, IShape b) => a.Area() + b.Area();
 
-void Report(IShape s) {
+void Report(IShape s)
+{
     var line = new StringBuilder();
     line.Append("  ");
     line.Append(s.Describe());
@@ -45,7 +54,8 @@ void Report(IShape s) {
     Console.WriteLine(line.ToText());
 }
 
-int Main() {
+int Main()
+{
     IShape circle = new Circle(2.0);
     IShape box    = new Rectangle(3.0, 4.0);
 
@@ -59,7 +69,8 @@ int Main() {
 
     // StringBuilder makes repeated appending linear instead of quadratic.
     var builder = new StringBuilder();
-    for (int i = 0; i < 5; i += 1) {
+    for (int i = 0; i < 5; i++)
+    {
         builder.AppendInteger(i);
         builder.Append(",");
     }

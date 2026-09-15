@@ -3,30 +3,34 @@ module Shapes;
 
 extern "C" int printf(byte* format, ...);
 
-public struct Point {
+public struct Point
+{
     public double X;
     public double Y;
 
-    public double LengthSquared() { return X * X + Y * Y; }
+    public double LengthSquared() => X * X + Y * Y;
 }
 
-public struct Pair {
+public struct Pair
+{
     public int A;
     public int B;
 }
 
-double Sum(Point p) { return p.X + p.Y; }
+double Sum(Point p) => p.X + p.Y;
 
-int AddPair(Pair p) { return p.A + p.B; }
+int AddPair(Pair p) => p.A + p.B;
 
-Point Make(double x, double y) {
+Point Make(double x, double y)
+{
     Point p;
     p.X = x;
     p.Y = y;
     return p;
 }
 
-int Main() {
+int Main()
+{
     var p = Make(3.0, 4.0);
     printf("p          = (%g, %g)\n", p.X, p.Y);
     printf("lengthSq   = %g\n", p.LengthSquared());
