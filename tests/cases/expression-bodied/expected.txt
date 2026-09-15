@@ -1,0 +1,11 @@
+area 16
+grown 25
+side 5
+touched 2
+dispatch 25
+override 54
+free 42
+generic 7
+recursive 120
+operator 42
+static registry

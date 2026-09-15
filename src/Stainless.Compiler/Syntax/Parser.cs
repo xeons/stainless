@@ -336,7 +336,20 @@ public sealed class Parser
         {
             Advance();
             var ctorParams = ParseParameterList(out bool ctorVariadic);
-            var ctorBody = ParseBlock();
+
+            // `Point(int x) => _x = x;`. A constructor returns nothing, so the
+            // arrow evaluates its expression exactly as a `void` function's
+            // does. `base(...)` is a call like any other and may be the one.
+            BlockSyntax ctorBody;
+            if (Match(TokenKind.EqualsGreater))
+            {
+                ctorBody = ParseArrowBody(isGetter: false);
+                Expect(TokenKind.Semicolon);
+            }
+            else
+            {
+                ctorBody = ParseBlock();
+            }
 
             if (ctorVariadic)
                 _diagnostics.Error("SL0493", SpanFrom(start),
@@ -1019,7 +1032,8 @@ public sealed class Parser
         Advance();
 
         var parameters = ParseParameterList(out _);
-        var body = At(TokenKind.OpenBrace) ? ParseBlock() : null;
+        // An operator always gives a value back, so its arrow is a getter's.
+        var body = At(TokenKind.OpenBrace) ? ParseBlock() : ParseArrowBodyOrNull(isGetter: true);
 
         if (body is null)
         {
@@ -1049,7 +1063,8 @@ public sealed class Parser
         var targetStart = _pos;
         var target = ParseType();
         var parameters = ParseParameterList(out bool variadic);
-        var body = At(TokenKind.OpenBrace) ? ParseBlock() : null;
+        // A conversion is the value it converts to, so its arrow is a getter's.
+        var body = At(TokenKind.OpenBrace) ? ParseBlock() : ParseArrowBodyOrNull(isGetter: true);
 
         if (variadic)
             _diagnostics.Error("SL0615", SpanFrom(start),
@@ -1102,7 +1117,11 @@ public sealed class Parser
             Advance();
             Advance();
             Advance();
-            return new StaticConstructorDeclSyntax(SpanFrom(start), enclosingType, ParseBlock());
+
+            // A type initializer returns nothing, so its arrow evaluates the
+            // expression the way a `void` function's does.
+            var staticBody = ParseArrowBodyOrNull(isGetter: false) ?? ParseBlock();
+            return new StaticConstructorDeclSyntax(SpanFrom(start), enclosingType, staticBody);
         }
 
         bool isReadonly = Match(TokenKind.ReadonlyKeyword);
@@ -1212,9 +1231,26 @@ public sealed class Parser
             var parameters = ParseParameterList(out bool isVariadic);
             var constraints = ParseWhereClauses();
 
+            // `T F(args) => expression;` is the body written as the one thing
+            // it does. A function returning a value returns the expression; a
+            // `void` one evaluates it, exactly as a getter and a setter do,
+            // which is why both share ParseArrowBody.
             BlockSyntax? body = null;
-            if (At(TokenKind.OpenBrace)) body = ParseBlock();
-            else Expect(TokenKind.Semicolon);
+            if (At(TokenKind.OpenBrace))
+            {
+                body = ParseBlock();
+            }
+            else if (Match(TokenKind.EqualsGreater))
+            {
+                bool returnsValue =
+                    returnType is not PrimitiveTypeSyntax { Keyword: TokenKind.VoidKeyword };
+                body = ParseArrowBody(isGetter: returnsValue);
+                Expect(TokenKind.Semicolon);
+            }
+            else
+            {
+                Expect(TokenKind.Semicolon);
+            }
 
             if (constraints.Count > 0 && typeParameters.Count == 0)
                 _diagnostics.Error("SL0331", SpanFrom(start),
@@ -1446,6 +1482,19 @@ public sealed class Parser
     /// The body behind <c>=&gt;</c>: an expression a getter returns, or one a
     /// setter simply evaluates.
     /// </summary>
+    /// <summary>
+    /// <c>=&gt; expression;</c> if that is what is here, and null otherwise, so
+    /// a caller that has its own diagnostic for a missing body keeps it.
+    /// </summary>
+    private BlockSyntax? ParseArrowBodyOrNull(bool isGetter)
+    {
+        if (!Match(TokenKind.EqualsGreater)) return null;
+
+        var body = ParseArrowBody(isGetter);
+        Expect(TokenKind.Semicolon);
+        return body;
+    }
+
     private BlockSyntax ParseArrowBody(bool isGetter)
     {
         int start = _pos;

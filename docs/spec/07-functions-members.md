@@ -13,6 +13,39 @@ void NoReturn() { }
 Top-level functions are permitted — a module is a scope, so there is no need
 to wrap free functions in a static class the way C# requires.
 
+**`=>` is a body of one expression**, the same form a property has
+([§7.3](#73-properties)) and with the same meaning:
+
+```csharp
+public int Area() => _side * _side;         // returns the expression
+public void Grow() => _side++;              // evaluates it, returns nothing
+int Twice(int n) => n * 2;                  // a free function, equally
+```
+
+What the arrow does depends on the return type, and it is the same split a
+property's accessors make: a function returning a value returns the expression,
+and a `void` one evaluates it. That second half is what lets `Grow` above be
+written at all — the arrow is not "a `return` spelled shorter", it is the body.
+
+It is a body like any other, so it works wherever a braced one does: an
+override, an interface implementation, a generic function, a recursive call. An
+`extern "C"` declaration still may not have one (SL0105), because it is a
+declaration of something defined elsewhere.
+
+**Every member that has a body may be written this way**, and which half of the
+split it takes follows from what it gives back:
+
+```csharp
+public Cube(int side) => base(side);                       // a constructor
+static Registry() => Kind = "registry";                    // a type initializer
+public static Money operator +(Money a, Money b) => Of(a.Cents + b.Cents);
+public static explicit operator long(Money m) => m.Cents;  // a conversion
+public int Side => _side;                                  // a property (§7.3)
+```
+
+A constructor and a type initializer return nothing, so their arrows evaluate;
+an operator and a conversion are the value they produce, so theirs return.
+
 **Overloading is by parameter type**, for methods as much as for free
 functions. A return type alone does not distinguish two of them, because a call
 does not always say what it wants back:
