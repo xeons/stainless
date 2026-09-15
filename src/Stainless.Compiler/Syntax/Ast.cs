@@ -531,8 +531,28 @@ public sealed record DelegateDeclSyntax(
     TypeSyntax ReturnType,
     IReadOnlyList<ParameterSyntax> Parameters,
     bool CarriesReceiver = false,
-    IReadOnlyList<string>? TypeParameters = null) : Declaration(Span, Modifiers)
+    IReadOnlyList<string>? TypeParameters = null,
+    CallingConvention Convention = CallingConvention.Default)
+    : Declaration(Span, Modifiers)
 {
+    /// <summary>
+    /// <c>delegate __stdcall int Callback(int value);</c>, or
+    /// <see cref="CallingConvention.Default"/>.
+    ///
+    /// A delegate is the only type that needs one. Everywhere else the
+    /// convention belongs to a symbol -- a function declares it and the linker
+    /// name carries it -- but a delegate names no symbol: it is a pointer, and
+    /// what it points at was compiled by somebody else. So the convention has
+    /// to be part of the type, or the call through it cannot be emitted
+    /// correctly.
+    ///
+    /// It matters on x86 and nowhere else. The x64 and ARM64 ABIs have one
+    /// convention, so this is ignored there -- which is exactly why a program
+    /// that omits it works on the machine it was written on and corrupts the
+    /// stack on the 32-bit build.
+    /// </summary>
+    public CallingConvention Convention { get; init; } = Convention;
+
     /// <summary>
     /// The names in <c>closure R Apply&lt;T, R&gt;(T value);</c>, or empty.
     ///

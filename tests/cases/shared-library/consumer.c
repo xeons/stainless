@@ -27,5 +27,9 @@ int main(void)
 
     printf("measure=%d\n", (int)Measure((uint8_t*)"handles"));
     printf("bumped=%d\n", bump(SlotRead(slot)));
+
+    /* A static in a shared library: zero to begin with, and it counts. */
+    printf("counted=%d\n", Counted());
+    printf("counted=%d\n", Counted());
     return 0;
 }

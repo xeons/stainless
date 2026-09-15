@@ -335,7 +335,15 @@ public sealed partial class LlvmEmitter
         AppendArguments(call.Arguments, arguments);
 
         string signature = returnInfo.Style == PassStyle.Indirect ? "void" : returnInfo.LlvmType;
-        string invocation = $"call {signature} {target.Ref}({string.Join(", ", arguments)})";
+
+        // **The convention is the delegate's, and there is nothing else to ask.**
+        // A direct call reads it off the function it names; a call through a
+        // pointer has no symbol behind it, so the type is the only thing that
+        // knows -- which is why `delegate __stdcall` exists at all. Empty on
+        // every target but x86, where it is the difference between a call that
+        // works and a stack that does not come back.
+        string convention = ConventionPrefix(call.DelegateType.Convention);
+        string invocation = $"call {convention}{signature} {target.Ref}({string.Join(", ", arguments)})";
 
         if (returnInfo.Style == PassStyle.Indirect)
         {

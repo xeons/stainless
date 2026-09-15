@@ -226,6 +226,7 @@ public sealed partial class Binder
         var asDelegate = (DelegateTypeSymbol)type;
         asDelegate.ReturnType = returnType;
         asDelegate.Signature.AddRange(signature);
+        asDelegate.Convention = declaration.Convention;
     }
 
     /// <summary>

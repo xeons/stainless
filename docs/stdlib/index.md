@@ -12,6 +12,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Concurrent](Standard-Concurrent.md) | Collections more than one thread may hold at once. |
 | [Standard.Convert](Standard-Convert.md) | Turning things into other things: bytes into text, text into numbers. |
 | [Standard.Directory](Standard-Directory.md) | Directories: making them, removing them, and looking inside. |
+| [Standard.Drawing](Standard-Drawing.md) | Raster images: reading them, drawing on them, and writing them back. |
 | [Standard.Encoding](Standard-Encoding.md) | Text as bytes, in whichever encoding somebody else chose. |
 | [Standard.Env](Standard-Env.md) | What the program was started with and what surrounds it. |
 | [Standard.File](Standard-File.md) | Whole-file operations. |

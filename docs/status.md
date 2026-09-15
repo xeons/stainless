@@ -488,6 +488,16 @@ last person to edit it -- the suite is the authority.
   Lossy by default, because `GetString` returns a `String` and a `String` is
   valid UTF-8 by invariant; `TryGetString` is the strict form and refuses an
   overlong sequence as well as a malformed one. `Detect` reads a byte order mark
+- `Standard.Drawing`: raster images. `Image.FromFile` and `FromBytes` decode
+  PNG, JPEG, BMP and GIF by sniffing the first bytes rather than the name;
+  `Create` makes an empty one; lines, rectangles, ellipses, polygons, blits and
+  pixels draw on it; `Encode` and `Save` write it back. GDI+ on Windows and
+  libgd elsewhere, both loaded by name at the first call and neither linked, so
+  a program that makes no image pays nothing and a machine with no imaging
+  library answers `ImageError.NoBackend` rather than failing to link. Written
+  in Stainless like the rest of the library: `delegate __stdcall` and the
+  pointer-to-delegate cast are what a resolved symbol is called through. No
+  text -- a font is where the two backends stop agreeing
 - `Standard.Json` and `Standard.Xml`: each in two layers. A document that needs
   no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
   the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping

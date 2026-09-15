@@ -84,5 +84,20 @@ int Main() {
     IRender bar = new Bar();
     Console.WriteLine(bar.Render());
     Console.WriteLine(bar.Render(6));
+
+    // **A negative default.** It is bound once against the parameter's type
+    // and written into every call that leaves it out, so the conversion runs
+    // over an already-folded constant a second time -- and a negative one is
+    // stored as its two's complement, which read back as a magnitude is
+    // 18446744073709551615 and fits in nothing. Every negative default was an
+    // error at every call that used it, and every positive one was fine.
+    Console.WriteLine(Text.FromInteger(Quality()));
+    Console.WriteLine(Text.FromInteger(Quality(80)));
+    Console.WriteLine(Text.FromInteger(Offset()));
+    Console.WriteLine(Text.FromInteger(Nudge()));
     return 0;
 }
+
+int Quality(int value = -1) { return value; }
+long Offset(long value = -5000000000) { return value; }
+int Nudge(int value = -128) { return value; }

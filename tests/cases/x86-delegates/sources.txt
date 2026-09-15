@@ -1,0 +1,2 @@
+tests/cases/delegate-convention/registry.sl
+tests/cases/delegate-convention/registry.c

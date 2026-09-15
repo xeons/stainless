@@ -4,3 +4,5 @@ pair=42
 slot=20
 measure=7
 bumped=23
+counted=101
+counted=102

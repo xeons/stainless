@@ -614,13 +614,43 @@ public sealed class DelegateTypeSymbol : NamedTypeSymbol
     /// <summary>The signature's parameters. Never includes a receiver.</summary>
     public List<ParameterSymbol> Signature { get; } = [];
 
+    /// <summary>
+    /// The convention a call through this makes, from
+    /// <c>delegate __stdcall int F(int);</c>.
+    ///
+    /// Part of the type rather than of a symbol, because a delegate names no
+    /// symbol: what it points at was compiled elsewhere, so the call site is
+    /// the only place that can get the convention right.
+    /// </summary>
+    public Syntax.CallingConvention Convention { get; set; } = Syntax.CallingConvention.Default;
+
     public override int Size => TargetPlatform.Current.PointerWidth;
     public override int Alignment => TargetPlatform.Current.PointerWidth;
+
+    /// <summary>
+    /// Two conventions that mean the same thing on this target.
+    ///
+    /// <c>Default</c> and <c>__cdecl</c> are the same everywhere, and on a
+    /// target with one convention -- x64 and ARM64 both -- every spelling is.
+    /// So a mismatch is only worth refusing where it would actually miscompile.
+    /// </summary>
+    public static bool SameConvention(
+        Syntax.CallingConvention left, Syntax.CallingConvention right)
+    {
+        if (left == right) return true;
+        if (!TargetPlatform.Current.HasCallingConventions) return true;
+
+        static Syntax.CallingConvention Plain(Syntax.CallingConvention one) =>
+            one == Syntax.CallingConvention.Cdecl ? Syntax.CallingConvention.Default : one;
+
+        return Plain(left) == Plain(right);
+    }
 
     /// <summary>True when <paramref name="function"/> can be stored in this delegate.</summary>
     public bool Accepts(FunctionSymbol function)
     {
         if (function.IsVariadic) return false;
+        if (!SameConvention(function.CallingConvention, Convention)) return false;
 
         var parameters = function.Parameters.Where(p => !p.IsThis).ToList();
         if (parameters.Count != Signature.Count) return false;

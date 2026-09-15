@@ -38,8 +38,41 @@ public sealed partial class LlvmEmitter
         symbol.LinkName ?? "_SLstatic_" + Mangler.SymbolSafe(symbol.QualifiedName);
 
     /// <summary>
-    /// One zeroed global per static. They are written once, by the initializer
-    /// below, before anything else runs.
+    /// The LLVM constant a static can carry on the global itself, or null for
+    /// one that needs code to run.
+    ///
+    /// <b>This is what lets a <c>--shared</c> library have statics at all.</b>
+    /// Initializers run from the entry point and a library has none (SL0380) --
+    /// but <c>static bool tried = false</c> and <c>static Backend? loaded =
+    /// null</c> have nothing to run: they are a zero and a null pointer, and a
+    /// global can be born holding them. Without this, no module compiled into
+    /// every program could remember anything, which is what `Standard.Drawing`
+    /// found when it tried to cache the imaging library it had loaded.
+    ///
+    /// Literals only, and never a managed reference with a value. A string
+    /// literal is an object that has to be made; <c>null</c> is a pointer that
+    /// does not. That line is where the rule stops, because everything past it
+    /// is code.
+    /// </summary>
+    private string? ConstantStaticText(StaticSymbol symbol)
+    {
+        if (!symbol.HasConstantInitializer) return null;
+
+        string llvmType = LlvmTypeOf(symbol.Type);
+
+        // `null` and `default(T)` are the type's zero, which is what the global
+        // would have been given anyway. `EmitLiteral` spells an absent value as
+        // "0", which is right for an integer and is not a pointer, so the same
+        // answer serves a literal holding nothing.
+        if (symbol.Initializer is BoundNullLiteral or BoundDefault) return ZeroOf(llvmType);
+
+        var literal = (BoundLiteral)symbol.Initializer!;
+        return literal.Value is null ? ZeroOf(llvmType) : EmitLiteral(literal).Ref;
+    }
+
+    /// <summary>
+    /// One global per static: holding its constant if it has one, and zeroed
+    /// for the initializer below to write if it does not.
     /// </summary>
     private void StaticStorage(BoundProgram program)
     {
@@ -61,7 +94,11 @@ public sealed partial class LlvmEmitter
             string linkage = symbol.IsImported ? "external " :
                              symbol.LinkName is not null ? "" : "internal ";
 
-            string body = symbol.IsImported ? "" : " " + ZeroOf(llvmType);
+            // A constant goes on the global itself; everything else starts
+            // zeroed and is written by the initializer below. See
+            // `ConstantStaticText`.
+            string body = symbol.IsImported ? ""
+                        : " " + (ConstantStaticText(symbol) ?? ZeroOf(llvmType));
 
             _module.AppendLine(
                 $"@{StaticName(symbol)} = {linkage}global {llvmType}{body}, " +
@@ -108,6 +145,12 @@ public sealed partial class LlvmEmitter
         foreach (var symbol in program.Statics)
         {
             if (symbol.Initializer is null) continue;
+
+            // Already on the global, written by `StaticStorage`. Storing it
+            // again would be the same value twice and would put a `--shared`
+            // library's statics back in the hands of an entry point it has not
+            // got.
+            if (ConstantStaticText(symbol) is not null) continue;
 
             var value = EmitExpression(symbol.Initializer);
             string slot = "@" + StaticName(symbol);

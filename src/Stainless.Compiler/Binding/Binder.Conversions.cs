@@ -69,6 +69,23 @@ public sealed partial class Binder
             return BindVariantConstruction(
                 (VariantTypeSymbol)target, some, [expression], span);
 
+        // **A folded literal is already what it is going to be.**
+        //
+        // A negative constant is stored as its two's complement and the type
+        // says how wide that is: `-1` bound against `int` is a BoundLiteral of
+        // type `int` holding 0xFFFF_FFFF_FFFF_FFFF. Converting one to its own
+        // type a second time reads that back as a magnitude, finds
+        // 18446744073709551615, and reports that it does not fit -- which it
+        // does not, and which is not what it says.
+        //
+        // Nothing needs converting: it arrived as this type. The first caller
+        // to find this was a default parameter value, which is bound once
+        // against the parameter's type and then written into every call that
+        // leaves it out, where the ordinary argument conversion runs over it
+        // again -- so `int quality = -1` was an error at every such call and
+        // `int quality = 1` was fine.
+        if (expression is BoundLiteral && expression.Type.Equals(target)) return expression;
+
         // A literal that fits simply adopts the target type; there is nothing to
         // convert at run time.
         if (ConstantFits(expression, target) || CharacterFits(expression, target))
@@ -709,6 +726,26 @@ public sealed partial class Binder
             bool toBytePointer = to is PointerTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } };
             return explicitCast || toBytePointer ? ConversionKind.PointerCast : null;
         }
+
+        // A pointer and a delegate, explicitly, in either direction.
+        //
+        // **This is what dynamic loading is made of.** `GetProcAddress` and
+        // `dlsym` answer a `void*`, and the only useful thing to do with one is
+        // call it -- which needs a delegate, because a delegate is exactly a C
+        // function pointer and nothing else (§2.14). Without this the idiom was
+        // `*(Fn*)&symbol`: correct, and a line that reads as a mistake and gets
+        // copied as one. `Standard.Drawing` resolves thirty symbols this way.
+        //
+        // Explicit only, and never implicit. Nothing about a `void*` says it
+        // points at code, let alone at code of this signature, so the cast is
+        // an assertion by the programmer -- the same bargain the reference
+        // conversions below already make, and the reason both directions are
+        // spelled out rather than inferred.
+        if (from is PointerTypeSymbol && to is DelegateTypeSymbol)
+            return explicitCast ? ConversionKind.PointerCast : null;
+
+        if (from is DelegateTypeSymbol && to is PointerTypeSymbol)
+            return explicitCast ? ConversionKind.PointerCast : null;
 
         // A reference to a raw pointer, explicitly. Reflection needs it to read an
         // instance by field offset; the result is uncounted, so keep the

@@ -50,6 +50,7 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `Instant`, `Duration`, `DateTime` and the monotonic `Clock` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
+| `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
 | `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
@@ -696,6 +697,46 @@ An `IWritable` answers `IReadable`'s methods and converts to it for free: a
 reference is a plain pointer either way, and a class implementing the derived
 interface carries a dispatch table for both. Implementing `IWritable` therefore
 obliges a class to implement `IReadable` as well, and the compiler checks it.
+
+## 5.12 `Standard.Drawing`
+
+A picture in memory: read from a PNG, drawn on, written back.
+
+```csharp
+var loaded = Image.FromFile("logo.png");
+if (!loaded.Ok) { return; }
+
+var logo = loaded.Value;
+logo.FillRectangle(Rgba.Rgb(200, 30, 30), 8, 8, 64, 24);
+logo.DrawEllipse(Rgba.Black, 4, 4, 72, 32, 2);
+logo.Save("out.png", ImageFormat.Png);
+```
+
+**Written in Stainless, with the platform library loaded by name.** GDI+ on
+Windows and libgd elsewhere, both reached through `delegate`s resolved by
+`GetProcAddress` or `dlsym` at the first call. Nothing is linked, and that is
+what lets this ship in the standard library at all: a `#pragma comment(lib,
+"gdiplus")` would put an import in every Stainless binary including the ones
+that never make an image, and `-lgd` wants libgd's *development* package where
+what a machine has is the runtime one. A program that makes no image pays
+nothing, and a machine with no imaging library answers `ImageError.NoBackend`
+— a value to print, rather than a link error to decipher.
+
+It is the one module here that reaches an operating system directly rather than
+through `runtime/`, because what it needs from the platform is a whole library
+rather than a handful of calls to wrap. That is also what
+`delegate __stdcall` ([§2.14](02-types.md#214-delegate--a-named-function-pointer))
+and the pointer-to-delegate cast are for.
+
+**There is no text**, and that is stated rather than pending. Drawing a string
+needs a font, and the two backends disagree about everything to do with one:
+GDI+ takes a family name and a device context, libgd wants FreeType and a path
+to a `.ttf`.
+
+**`Rgba`, and no `Point`, `Size` or `Rectangle` at all.** `Forms.Drawing`
+declares a `Color` and all three of those, and a program that loaded a PNG to
+put it on a form would otherwise have to qualify every mention of whichever one
+it meant. A polygon therefore takes its points as a flat `int[]`.
 
 ---
 

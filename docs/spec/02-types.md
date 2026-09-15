@@ -1696,6 +1696,47 @@ plus an environment. A lambda that captures becomes a closure instead — see
 in a single pointer to keep what was captured. `closure` below is the type that
 does have somewhere.
 
+**A delegate may name a calling convention**, where a function already can:
+
+```csharp
+public delegate __stdcall int GdipDrawLineI(
+    void* graphics, void* pen, int x1, int y1, int x2, int y2);
+```
+
+It goes in front of the return type, which is where `extern "C" __stdcall int
+f()` already puts it, and the names are the same four a function may use:
+`__cdecl`, `__stdcall`, `__fastcall` and `__vectorcall`.
+
+A delegate is the only *type* that needs one. Everywhere else the convention
+belongs to a symbol: a function declares it, the linker name carries it, and a
+call site reads it off the function it names. A delegate names no symbol — it
+is a pointer, and what it points at was compiled by somebody else — so if the
+type does not say, the call site has nothing to ask.
+
+It matters on x86 and nowhere else: x64 and ARM64 each have one convention, so
+the word is accepted and ignored there. That is precisely why leaving it off is
+dangerous rather than merely wrong. A `__stdcall` callee removes the arguments
+itself, so a 32-bit call through a delegate that did not say so returns to a
+stack pointer several words adrift — and the program does not fail at that
+call, it fails later, somewhere else.
+
+A `closure` may not name one (SL0621). It is a pointer *and* a receiver, passed
+by machinery this language emits at both ends, so there is no foreign function
+for a convention to describe.
+
+**A pointer converts to a delegate with an explicit cast**, and back:
+
+```csharp
+void* symbol = GetProcAddress(library, "GdipDrawLineI".ToPointer());
+var draw = (GdipDrawLineI)symbol;
+```
+
+This is what dynamic loading is made of — `GetProcAddress` and `dlsym` answer a
+`void*`, and the only useful thing to do with one is call it. Explicit only:
+nothing about a `void*` says it points at code, let alone at code of this
+signature, so the cast is an assertion by the programmer in the same way
+`(Shape)pointer` is.
+
 ### 2.14.1 `closure` — a method and the object it belongs to
 
 ```csharp

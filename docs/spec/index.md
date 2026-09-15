@@ -133,6 +133,7 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
   - [5.9.1 `Standard.Process`](05-standard-library.md#591-standardprocess)
 - [5.10 `Standard.Json` and `Standard.Xml`](05-standard-library.md#510-standardjson-and-standardxml)
 - [5.11 Interfaces may extend interfaces](05-standard-library.md#511-interfaces-may-extend-interfaces)
+- [5.12 `Standard.Drawing`](05-standard-library.md#512-standarddrawing)
 
 ### [6. Attributes and reflection](06-attributes-reflection.md)
 

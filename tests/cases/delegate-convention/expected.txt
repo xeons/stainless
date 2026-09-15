@@ -1,0 +1,8 @@
+found three: true
+and not a fourth: true
+stdcall, four arguments: 20
+stdcall, two arguments:  6
+cdecl, two arguments:    42
+and again:               40
+and again:               -5
+and back to a pointer:   true

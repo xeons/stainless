@@ -436,6 +436,42 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     public bool IsReadonly { get; init; }
 
     /// <summary>
+    /// Whether this static's value can be written on the global itself, with
+    /// no code to run.
+    ///
+    /// <b>What makes a static legal in a <c>--shared</c> library.</b>
+    /// Initializers run from the entry point and a library has none (SL0380),
+    /// so the question is whether there is anything to run: <c>= false</c> and
+    /// <c>= null</c> are a zero and a null pointer, and a global can be born
+    /// holding them.
+    ///
+    /// Three shapes and no more: <c>null</c>, <c>default(T)</c>, and a literal
+    /// of a type that is not counted. A string literal is excluded because it
+    /// is an object something has to make, where <c>null</c> is a pointer that
+    /// already exists; a struct literal is excluded because a struct is stored
+    /// field by field and a field may be counted. Everything past that line is
+    /// code, which is what the entry point was for.
+    ///
+    /// The driver reads this to decide what to refuse and the emitter reads it
+    /// to decide what to write, which is why it lives here rather than in
+    /// either of them.
+    /// </summary>
+    public bool HasConstantInitializer
+    {
+        get
+        {
+            if (IsImported) return false;
+
+            // Both are the type's zero, which a global holds by being born.
+            if (Initializer is BoundNullLiteral or BoundDefault) return true;
+
+            return Initializer is BoundLiteral literal &&
+                   Type is not StructTypeSymbol &&
+                   (!Type.NeedsArc() || literal.Value is null);
+        }
+    }
+
+    /// <summary>
     /// The name the linker knows this by, for storage that crosses to C, or
     /// null for ordinary Stainless storage with a mangled name.
     ///

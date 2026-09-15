@@ -56,6 +56,18 @@ export "C" Count Measure(byte* text) {
     return n;
 }
 
+// **A static in a library**, which needs no entry point because its value is a
+// constant: the global is born holding it, so there is nothing for the missing
+// initializer to fail to run. A static that needed code -- a `String`, a `new`
+// -- is still refused, and `err-static-shared` pins that.
+static int Calls = 0;
+static readonly int Base = 100;
+
+export "C" int Counted() {
+    Calls = Calls + 1;
+    return Base + Calls;
+}
+
 // Visible to other Stainless modules, absent from the export table.
 public int Helper() { return 1; }
 

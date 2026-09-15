@@ -1,0 +1,27 @@
+  ok   an imaging library is here
+  ok   and it has a name
+  ok   a picture is made
+  ok   at the size asked for
+  ok   and starts empty
+  ok   a zero width is refused
+  ok   a clear reaches every pixel
+  ok   a filled rectangle is filled
+  ok   and stops where it was told
+  ok   a filled ellipse is filled
+  ok   a filled polygon is filled
+  ok   two points draw nothing
+  ok   a written pixel reads back
+  ok   and keeps roughly its alpha
+  ok   a pixel outside is transparent
+  ok   it encodes
+  ok   to more than a header
+  ok   with a PNG's first bytes
+  ok   and decodes again
+  ok   at the same size
+  ok   with the drawing still in it
+  ok   it resizes
+  ok   one picture draws on another
+  ok   a missing file says so
+  ok   and bytes that are not a picture say so
+  ok   and no bytes at all
+all checks passed

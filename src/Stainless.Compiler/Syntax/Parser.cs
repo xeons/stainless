@@ -797,6 +797,11 @@ public sealed class Parser
         bool carriesReceiver = !At(TokenKind.DelegateKeyword);
         Advance();
 
+        // Before the return type, which is where `extern "C" __stdcall int f()`
+        // already puts it. A convention reads as a property of the call rather
+        // than of the answer, so it goes in front of both.
+        var convention = ParseCallingConvention();
+
         var returnType = ParseType();
 
         string name = ExpectIdentifier();
@@ -809,10 +814,19 @@ public sealed class Parser
             _diagnostics.Error("SL0358", SpanFrom(start),
                 $"{kind} '{name}' cannot be variadic; there is no way to call one safely");
 
+        // A closure is a pointer *and* a receiver, and the receiver is passed
+        // as an ordinary first argument by machinery this language emits. There
+        // is no foreign function on the other end of one, so a convention would
+        // describe nothing.
+        if (carriesReceiver && convention != CallingConvention.Default)
+            _diagnostics.Error("SL0621", SpanFrom(start),
+                $"closure '{name}' cannot name a calling convention; only a delegate can, "
+                + "because only a delegate is a C function pointer");
+
         Expect(TokenKind.Semicolon);
         return new DelegateDeclSyntax(
             SpanFrom(start), modifiers, name, returnType, parameters, carriesReceiver,
-            typeParameters);
+            typeParameters, carriesReceiver ? CallingConvention.Default : convention);
     }
 
     /// <summary>

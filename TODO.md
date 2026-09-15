@@ -191,9 +191,12 @@ like.
 A binding rather than a project, now that the language part is done and the
 shell's half is written. In rough order of what a program actually wants:
 
-- **WIC** — `IWICImagingFactory` and four interfaces under it, which is what
-  loading a PNG or a JPEG takes. It pairs with `Win32.Drawing`, which can
-  already put a bitmap on screen and has no way to read one from a file.
+- **WIC** — `IWICImagingFactory` and four interfaces under it. This was here
+  because loading a PNG or a JPEG took it, and that is done: `Standard.Drawing`
+  reads both through GDI+ on Windows and libgd elsewhere, so what is left for
+  WIC is the things GDI+ is worse at — a decoder for a format GDI+ has none
+  for, and frame-by-frame access to an animated one. Worth doing on its merits
+  rather than because nothing else could read a file.
 - **`IShellItem2` and the Property System** — the declaration is there for its
   IID and its first slots; the property methods are not.
 - **`ITaskbarList3`** — progress in the taskbar button, which is thirty lines

@@ -445,9 +445,14 @@ is already bound.
   `TStringGrid` and `TDrawGrid` are drawn from nothing: Windows has no grid, so
   this is scrolling, selection, in-place editing and painting, all by hand. It
   is the single biggest thing missing and the one most often wanted.
-- **The rest of `Graphics`** — `TBitmap` in formats other than `.bmp`,
-  `TPicture`, `TIcon`, `TRegion`, drawing *onto* a bitmap, and pixel access
-  (`intfgraphics.pas`, 6,698 lines). PNG on Windows means binding WIC or GDI+.
+- **The rest of `Graphics`** — `TPicture`, `TIcon`, `TRegion`
+  (`intfgraphics.pas`, 6,698 lines). Two of the entries that were here are done
+  and are done *below* this library rather than in it: `Standard.Drawing` reads
+  and writes PNG, JPEG, BMP and GIF, draws onto a picture and reads its pixels,
+  on both platforms. What is left for `forms/` is to build `Bitmap` on it, so
+  that a `Forms.Bitmap` is a `Standard.Drawing.Image` that has been handed to
+  the widget set — at which point `Bitmap.FromFile` reads a PNG and the note
+  below stops being true.
 - **Printing** (`printers.pas`, `postscriptcanvas.pas`) — a `Canvas` that is a
   printer, plus the dialogs.
 - **Form streaming** (`lresources.pp`, `propertystorage.pas`) — the `.lfm` tier.
@@ -601,9 +606,11 @@ here at all. Where one is a backend's rather than the library's, it says so.
   `TPersistent` with a `TStrings` hanging off it, so a thousand rows is two
   thousand objects before any text. Cells are set and read through the list,
   which is what the platform stores anyway.
-- **Pictures are `.bmp` only**, because `LoadImageW` is the whole of what
-  Windows decodes without a library. PNG needs WIC or GDI+, each a binding of
-  its own. An `ImageList` treats magenta as transparent, as toolbar bitmaps
+- **Pictures are `.bmp` only here**, because `LoadImageW` is the whole of what
+  Windows decodes without a library. That is now a gap in this library rather
+  than in the language: `Standard.Drawing` reads PNG, JPEG, BMP and GIF on both
+  platforms, and what is missing is the step that hands one of its images to a
+  widget set. An `ImageList` treats magenta as transparent, as toolbar bitmaps
   have since Windows 95. They may come from a file or from the program's own
   resources -- `Bitmap.FromResource(id)` and `ImageList.AddResource(id)` read
   an `RT_BITMAP` compiled into the executable, which is how a toolbar's icons

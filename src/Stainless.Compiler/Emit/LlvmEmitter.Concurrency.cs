@@ -537,7 +537,18 @@ public sealed partial class LlvmEmitter
     /// treats a call whose convention differs from the callee's as undefined,
     /// and the mismatch is not diagnosed.
     /// </summary>
-    private static string Convention(FunctionSymbol function)
+    private static string Convention(FunctionSymbol function) =>
+        ConventionPrefix(function.CallingConvention);
+
+    /// <summary>
+    /// The same answer for a convention that belongs to a type rather than to a
+    /// function, which is what a <c>delegate __stdcall</c> has.
+    ///
+    /// Shared with <see cref="Convention"/> rather than written twice, because
+    /// a call through a pointer and a call to a symbol have to agree: LLVM
+    /// treats a mismatch as undefined and diagnoses nothing.
+    /// </summary>
+    private static string ConventionPrefix(Syntax.CallingConvention convention)
     {
         var target = Binding.TargetPlatform.Current;
 
@@ -546,12 +557,12 @@ public sealed partial class LlvmEmitter
         // defines it. ARM64 has no second convention at all, and spelling an
         // x86 one on it would be a call LLVM cannot lower.
         if (target.Architecture == Binding.TargetArch.X64 &&
-            function.CallingConvention == Syntax.CallingConvention.Vectorcall)
+            convention == Syntax.CallingConvention.Vectorcall)
             return "x86_vectorcallcc ";
 
         if (target.Architecture != Binding.TargetArch.X86) return "";
 
-        return function.CallingConvention switch
+        return convention switch
         {
             Syntax.CallingConvention.Stdcall => "x86_stdcallcc ",
             Syntax.CallingConvention.Fastcall => "x86_fastcallcc ",
