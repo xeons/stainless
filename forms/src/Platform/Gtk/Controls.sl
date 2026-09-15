@@ -102,6 +102,7 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer {
         gtk_box_pack_start(stack, content, 1, 1, 0);
         gtk_widget_show(stack);
         gtk_widget_show(content);
+        ReportPaints();
 
         SetBorder(border);
 
@@ -366,13 +367,80 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer {
 
 // ================================================================== button
 
-public class GtkButtonPeer : GtkPeer, IButtonPeer {
+public class GtkButtonPeer : GtkPeer, IPushButtonPeer {
+    /// The `GtkImage` the button draws, or null for a button with none. Owned
+    /// by the button once given to it, so this is a borrowed pointer kept only
+    /// to change the margin that makes the spacing.
+    GtkWidget* glyph;
+    ImageAlignment placed;
+    int gap;
+
     public GtkButtonPeer(IControlNotify owner) {
         base(gtk_button_new_with_label(""), owner);
+        glyph = null;
+        placed = ImageAlignment.Left;
+        gap = 4;
         ConnectPlain(widget, "clicked", () => {
             var target2 = Owner();
             if (target2 != null) { ((IControlNotify)target2).OnPlatformActivated(); }
         });
+    }
+
+    /// The picture beside the caption, or null for none.
+    ///
+    /// **`always_show_image`, or nothing appears.** GTK hides a button's image
+    /// when the desktop's `gtk-button-images` setting is off, which on every
+    /// theme since GNOME 3.10 it is. A button given a picture and left to the
+    /// setting draws the caption alone, with no warning anywhere -- which is
+    /// the same trap `TGtk3WSBitBtn` falls into and works around.
+    public void SetImage(IBitmapBackend? picture) {
+        if (picture == null) {
+            glyph = null;
+            gtk_button_set_image(widget, null);
+            gtk_button_set_always_show_image(widget, 0);
+            return;
+        }
+
+        var source = (IBitmapBackend)picture;
+        gpointer pixbuf = null;
+        if (source is GtkBitmapBackend made) { pixbuf = made.Pixbuf(); }
+        if (pixbuf == null) { return; }
+
+        glyph = gtk_image_new_from_pixbuf(pixbuf);
+        gtk_button_set_image(widget, glyph);
+        gtk_button_set_always_show_image(widget, 1);
+        ApplyImagePlacement();
+    }
+
+    public void SetImageAlign(ImageAlignment place) {
+        placed = place;
+        ApplyImagePlacement();
+    }
+
+    public void SetImageSpacing(int pixels) {
+        gap = pixels;
+        ApplyImagePlacement();
+    }
+
+    /// **The gap is a margin on the image, because GTK has no spacing to set.**
+    /// The space between a button's image and its label is a style property,
+    /// `image-spacing`, and GTK 3 offers no way to set a style property on one
+    /// widget. So the gap is put on the side of the image the label is on,
+    /// which is the same answer `TGtk3Button.SetSpacing` reaches and calls a
+    /// cheat.
+    void ApplyImagePlacement() {
+        gint position = GTK_POS_LEFT;
+        if (placed == ImageAlignment.Right)  { position = GTK_POS_RIGHT; }
+        if (placed == ImageAlignment.Top)    { position = GTK_POS_TOP; }
+        if (placed == ImageAlignment.Bottom) { position = GTK_POS_BOTTOM; }
+        gtk_button_set_image_position(widget, position);
+
+        if (glyph == null) { return; }
+        int room = gap < 0 ? 0 : gap;
+        gtk_widget_set_margin_start(glyph, placed == ImageAlignment.Right ? room : 0);
+        gtk_widget_set_margin_end(glyph, placed == ImageAlignment.Left ? room : 0);
+        gtk_widget_set_margin_top(glyph, placed == ImageAlignment.Bottom ? room : 0);
+        gtk_widget_set_margin_bottom(glyph, placed == ImageAlignment.Top ? room : 0);
     }
 
     public override void SetText(String text) {
@@ -399,18 +467,31 @@ public class GtkButtonPeer : GtkPeer, IButtonPeer {
 // ============================================================ check and radio
 
 public class GtkCheckPeer : GtkPeer, ICheckPeer {
-    /// Whether this is a radio button, which the container it goes into has
-    /// to know: it joins every radio in it to the first, and there is nothing
+    /// Which of the three this is, which the container it goes into has to
+    /// know: it joins every radio in it to the first, and there is nothing
     /// about a `GtkWidget*` that says which kind it is.
-    bool radioButton;
+    CheckKind sort;
 
-    public bool IsRadio() { return radioButton; }
+    public bool IsRadio() { return sort == CheckKind.Radio; }
 
-    public GtkCheckPeer(IControlNotify owner, bool radio) {
-        base(radio ? gtk_radio_button_new_with_label_from_widget(null, "".ToPointer())
-                   : gtk_check_button_new_with_label("".ToPointer()),
-             owner);
-        radioButton = radio;
+    /// Which widget each kind is. A toggle button is the plain
+    /// `GtkToggleButton` that `GtkCheckButton` itself descends from, so the
+    /// active state, the `toggled` signal and the label all work unchanged --
+    /// only the indicator is gone, which is the whole of what a toggle button
+    /// is.
+    static GtkWidget* WidgetFor(CheckKind kind) {
+        if (kind == CheckKind.Radio) {
+            return gtk_radio_button_new_with_label_from_widget(null, "".ToPointer());
+        }
+        if (kind == CheckKind.Toggle) {
+            return gtk_toggle_button_new_with_label("".ToPointer());
+        }
+        return gtk_check_button_new_with_label("".ToPointer());
+    }
+
+    public GtkCheckPeer(IControlNotify owner, CheckKind kind) {
+        base(WidgetFor(kind), owner);
+        sort = kind;
 
         ConnectPlain(widget, "toggled", () => {
             if (Echoing()) { return; }
@@ -725,6 +806,7 @@ public class GtkGroupPeer : GtkContainerPeer, IGroupPeer {
         base(gtk_frame_new(null), owner, gtk_fixed_new());
         gtk_container_add(widget, content);
         gtk_widget_show(content);
+        ReportPaints();
     }
 
     public override void SetText(String text) {
@@ -752,6 +834,7 @@ public class GtkPanelPeer : GtkContainerPeer, IPanelPeer {
         gtk_container_add(widget, content);
         gtk_widget_show(content);
         gtk_frame_set_shadow_type(widget, GTK_SHADOW_NONE);
+        ReportPaints();
     }
 
     public void SetBorder(ControlBorder border) {

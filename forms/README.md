@@ -101,27 +101,30 @@ src/Container.sl            GraphicControl, WindowedControl, the layout pass
                                                             (lcl/controls.pp)
 src/Form.sl                 Form, Screen                    (lcl/forms.pp)
 src/Application.sl          Application                     (lcl/forms.pp)
-src/Controls/Buttons.sl     Button, CheckBox, RadioButton
+src/Controls/Buttons.sl     Button, CheckBox, RadioButton, ToggleButton,
+                            SpeedButton                     (lcl/buttons.pp)
 src/Controls/Text.sl        Label, TextBox                  (lcl/stdctrls.pp)
 src/Controls/Lists.sl       ListBox, ComboBox
-src/Controls/Containers.sl  Panel, GroupBox, ScrollBar, CustomControl
+src/Controls/Containers.sl  Panel, GroupBox, ScrollBar, CustomControl,
+                            Notebook, NotebookPage
 src/Clipboard.sl            Clipboard                        (lcl/clipbrd.pp)
 src/Controls/Menus.sl       MainMenu, PopupMenu, MenuItem      (lcl/menus.pp)
 src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
-                            TabControl, TreeView, ListView, ImageList
-                                                            (lcl/comctrls.pp)
+                            TabControl, TreeView, ListView, ImageList,
+                            CoolBar, CoolBand            (lcl/comctrls.pp)
 src/Controls/Drawn.sl       PaintBox, Shape, Bevel, Splitter (lcl/extctrls.pp)
 src/Controls/Dialogs.sl     OpenDialog, SaveDialog, FolderDialog, ColorDialog,
                             FontDialog, Timer      (lcl/dialogs.pp, customtimer)
 src/Controls/Groups.sl      RadioGroup, CheckGroup, LabeledEdit, Image,
-                            SpinEdit, CheckListBox, HeaderControl
+                            SpinEdit, CheckListBox, HeaderControl,
+                            ButtonPanel                 (lcl/buttonpanel.pas)
 src/Platform/Select.sl      which backend this build links  (lcl/interfaces/)
 src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 src/Platform/Gtk/*.sl       the GTK 3 backend           (lcl/interfaces/gtk3/)
 ```
 
-Roughly 4,900 lines of portable code against the LCL's 276,000 — which is the
-scope difference, not a compression ratio — plus about 3,900 per backend. See
+Roughly 8,200 lines of portable code against the LCL's 276,000 — which is the
+scope difference, not a compression ratio — plus about 4,500 per backend. See
 *What is not here* below.
 
 ---
@@ -137,9 +140,10 @@ stainless run samples/forms/common.sl forms/src bindings/win32/api \
     bindings/win32/Win32.sl -l user32 -l gdi32 -l comctl32
 ```
 
-or `.\samples\forms\build.ps1`, which builds both into `samples/forms/build`
-(git-ignored), writes the visual-styles manifest each one needs, and takes
-`-Test` to run every self-check and `-Run <name>` to open a window.
+or `.\samples\forms\build.ps1`, which builds every sample in that directory
+into `samples/forms/build` (git-ignored), writes the visual-styles manifest each
+one needs, and takes `-Test` to run every self-check and `-Run <name>` to open a
+window.
 
 On Linux, the same sources with the other bindings and the other libraries:
 
@@ -153,13 +157,22 @@ stainless run samples/forms/demo.sl forms/src bindings/gtk \
 claim the second backend exists to test. `forms/src/Platform/Select.sl` is
 where that choice is made, and it is a four-line `#if`.
 
-Both samples take `--selftest`, which builds the same window, pumps the message
-queue, checks what can be checked without a person in front of it, and quits.
-`demo` makes 21 such checks and `common` 43 — docking, anchoring, native
-handles, text round-tripping through the platform, a click reaching its
-handler, a menu item resolving from its id. That is what makes a GUI something
-a build can run, and it is how every bug listed under *Decisions worth knowing
-about* was found.
+Every sample takes `--selftest`, which builds the same window, pumps the
+message queue, checks what can be checked without a person in front of it, and
+quits. `demo` makes 21 such checks, `common` 43 and `buttons` 51 — docking,
+anchoring, native handles, text round-tripping through the platform, a click
+reaching its handler, a menu item resolving from its id, a cool bar's bands
+wrapping onto a second row when the window narrows. That is what makes a GUI
+something a build can run, and it is how every bug listed under *Decisions
+worth knowing about* was found.
+
+**And a self-test is not a screenshot, which is the lesson this library keeps
+being taught.** `buttons` passed all 51 of its checks on GTK while its three
+speed buttons and its button strip's bevel were drawn nowhere at all — because
+a windowless control is drawn by its parent, and no GTK container but
+`CustomControl` was passing the cairo context down. The same fix made the
+`Shape`, the `Bevel` and the `PaintBox` in `common` appear, which had been
+invisible on GTK since they were written. Take the screenshot.
 
 **Both suites pass on both backends**, and the last exception is worth keeping
 for how it was found. `common`'s "a tree node reads back its text" passed on
@@ -176,6 +189,31 @@ Two end-to-end cases go further, driving real messages at the controls:
 what the control did with them; `tests/cases/forms-menus` sends `WM_COMMAND` for
 a menu item, a nested item, a heading and a toolbar button, and checks which
 handler ran.
+
+### Taking the screenshot
+
+On Linux there is no window manager on the test box, so the window is opened on
+a virtual screen and the screen is captured:
+
+```sh
+Xvfb :9 -screen 0 1024x768x24 &
+DISPLAY=:9 ./buttons --page 1 &
+sleep 3
+DISPLAY=:9 import -window root shot.png          # ImageMagick
+```
+
+On Windows, `CopyFromScreen` answers black over a disconnected session, so ask
+the window to draw itself instead. `PrintWindow` with `PW_RENDERFULLCONTENT`
+works with no visible desktop at all:
+
+```powershell
+$p = Start-Process .\build\buttons.exe -PassThru; Start-Sleep 3; $p.Refresh()
+# GetWindowRect for the size, then:
+#   PrintWindow($p.MainWindowHandle, $graphics.GetHdc(), 2)
+```
+
+Give it a second between the two: a toolbar renders its buttons lazily, and a
+capture taken too early catches half of them.
 
 ---
 
@@ -250,11 +288,38 @@ parent pushes a layer first: `SaveDC`, `IntersectClipRect`,
 empty rectangle. Every container now draws the windowless children on it, after
 letting the platform control paint itself.
 
+**And on GTK, its parent is the only thing that ever holds the brush.** A
+`GraphicControl` has no widget, so the one cairo context it could be drawn with
+is the one its parent's `draw` handler is given. Only `CustomControl` connected
+that signal, so a `PaintBox` on a `Panel`, a `Bevel` on a tab page and a
+`SpeedButton` anywhere were laid out, hit-tested, clickable and invisible --
+for months, with every self-test passing. `GtkContainerPeer.ReportPaints` is
+now called by the panel, the group box and the window, and answers false so
+that GTK still draws the real children over what the program painted.
+
+**A transparent child's `WM_ERASEBKGND` is not the parent's own.** A
+`TBSTYLE_FLAT` toolbar draws no background: it offsets its DC into the parent's
+coordinates and forwards the erase, meaning "paint yours here". A `Panel` is a
+`STATIC`, whose class brush is null, and a `CustomControl` refuses its own
+erase on purpose because it double-buffers — so both handed the toolbar back a
+DC exactly as they found it, which is black, and hovering a button repainted
+more of it black. The two looked like different bugs and were one. Every peer
+now tells the two messages apart with `WindowFromDC` and fills the DC's clip
+box, which is the only rectangle that is right whatever origin the child chose.
+
 **The mouse reaches a windowless control by hit-testing.** The pointer never
 crosses a window boundary for a control that has no window, so entering and
 leaving it are the parent's to notice and report, and a drag is the parent
 holding the platform capture on the child's behalf. That is what a `Splitter`
 needs and what nothing else does.
+
+**A button strip's order is the one thing that is not portable.** Windows puts
+OK before Cancel and the GNOME guidelines put Cancel before OK, and both put
+the affirmative button on the right. `ButtonPanel` is the only thing in the
+portable tier that reads `IWidgetSet.Name`, because what differs is a
+convention rather than a capability and there is nothing in the seam to ask
+instead. It is asked once, at construction, so a program that chose its backend
+at run time gets the right answer too.
 
 **A menu is described first and built second.** Every item is an ordinary
 object until a `MainMenu` is given to a form or a `PopupMenu` is shown; only
@@ -324,11 +389,11 @@ grouped by how much work it is rather than by where it lives.
 |---|---|
 | `Control`, `GraphicControl`, `WindowedControl`, docking, anchors | `controls.pp` |
 | `Form`, `Application`, `Screen` | `forms.pp` |
-| `Button`, `CheckBox`, `RadioButton`, `Label`, `TextBox`, `ListBox`, `ComboBox`, `Panel`, `GroupBox`, `ScrollBar` | `stdctrls.pp` |
+| `Button`, `CheckBox`, `RadioButton`, `ToggleButton`, `Label`, `TextBox`, `ListBox`, `ComboBox`, `Panel`, `GroupBox`, `ScrollBar` | `stdctrls.pp` |
 | `MainMenu`, `PopupMenu`, `MenuItem` | `menus.pp` |
-| `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView` | `comctrls.pp` |
+| `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView`, `CoolBar` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
-| `PaintBox`, `Shape`, `Bevel`, `Splitter` | `extctrls.pp` |
+| `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
 | `CustomControl` | `customcontrol` in `controls.pp` |
 | `Clipboard`, text only | `clipbrd.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
@@ -337,29 +402,31 @@ grouped by how much work it is rather than by where it lives.
 | `SpinEdit` | `spin.pp` |
 | `CheckListBox` | `checklst.pas` |
 | `HeaderControl` | `comctrls.pp` |
+| `SpeedButton`, and `BitBtn` folded into `Button.Image` | `buttons.pp` |
+| `ButtonPanel` | `buttonpanel.pas` |
 | `Color`, `Point`, `Size`, `Rectangle`, `Font`, `Pen`, `Brush`, `Graphics`, `Bitmap` | `graphics.pp` |
 | the widgetset seam | `widgetset/ws*.pp`, `interfaces/win32` |
 
 ### Next, and each a day rather than a week
 
-Every one of these is either a composite of what already exists or a Win32 call
-that is already bound.
+Every one of these is either a composite of what already exists or a call that
+is already bound.
 
-- **`Notebook`** without tabs, and `TPageControl` versus `TTabControl` — the
-  LCL distinguishes a tabbed control that owns pages from one that only shows
-  tabs; only the first is here.
-- **`CoolBar`** (`comctrls.pp`) — one more `comctl32` class on the pattern the
-  ten existing ones establish.
-- **`ToggleBox`, `ButtonPanel`** — a `CheckBox` drawn as a button, and the
-  ok/cancel strip every dialog ends with.
+- **`TTabControl`** — the LCL distinguishes a tabbed control that owns pages
+  from one that only shows tabs. Only the first is here; `Notebook` is now the
+  other half of that family, the one with pages and no tabs at all.
+- **`ScrollBox`** (`forms.pp`) — a container with the platform's own scroll
+  bars, which is a different thing from the standalone `ScrollBar` that is
+  here. Both backends register one already.
+- **`UpDown`, `ColorButton`, `PairSplitter`** — each is one widget the GTK 3
+  widgetset registers and the Win32 side has bound, and each is an afternoon.
+- **`FloatSpinEdit`** — `SpinEdit` is integers only, and `GtkSpinButton` and
+  `UDM_SETRANGE32` both already carry doubles.
 
 ### Worth having, and a week each
 
-- **`BitBtn`, `SpeedButton`** (`buttons.pp`) — a button with a picture. Needs
-  either `BS_BITMAP` or owner drawing, and owner drawing is the thing several
-  entries below also want.
-- **`DateTimePicker`, `Calendar`** (`calendar.pp`) — `comctl32` has both; the
-  work is a date type this library does not have yet.
+- **`DateTimePicker`, `Calendar`** (`calendar.pp`) — `comctl32` has both, and
+  so does GTK; the work is a date type this library does not have yet.
 - **`MaskEdit`** (`maskedit.pp`) and the `editbtn.pas` family — `FileNameEdit`,
   `DirectoryEdit`, `DateEdit`: an edit with a button that opens a dialog, which
   is why the dialogs come first.

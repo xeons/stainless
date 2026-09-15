@@ -99,14 +99,15 @@ public class GtkWidgetSet : IWidgetSet {
         return peer;
     }
 
-    public IButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent) {
+    public IPushButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent) {
         var peer = new GtkButtonPeer(owner);
         Ready(peer, parent);
         return peer;
     }
 
-    public ICheckPeer CreateCheck(IControlNotify owner, IContainerPeer parent, bool radio) {
-        var peer = new GtkCheckPeer(owner, radio);
+    public ICheckPeer CreateCheck(IControlNotify owner, IContainerPeer parent,
+                                  CheckKind kind) {
+        var peer = new GtkCheckPeer(owner, kind);
         Ready(peer, parent);
         return peer;
     }

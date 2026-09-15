@@ -343,6 +343,42 @@ public class ControlPeer : IControlPeer {
         //
         // The form carries `WS_CLIPCHILDREN`, so this paints only the parts no
         // child covers, which is what keeps a resize from flickering.
+        // **A transparent child's erase is always ours to answer**, whatever
+        // this peer does about its own. A `TBSTYLE_FLAT` toolbar draws no
+        // background of its own: it offsets its DC into the parent's
+        // coordinates and forwards `WM_ERASEBKGND`, meaning "paint yours here".
+        // Every peer that left that unanswered left the toolbar black -- on a
+        // `Panel`, whose `STATIC` has a null class brush, and on a
+        // `CustomControl`, which refuses its own erase on purpose. The two
+        // looked like different bugs and were one.
+        //
+        // The clip box rather than a client rectangle, because the DC's origin
+        // is the child's choice and the clip box is already in whatever
+        // coordinates it set.
+        if (message == WmEraseBackground) {
+            HDC dc = (HDC)(void*)(nuint)wParam;
+            if (dc != null && WindowFromDC(dc) != window) {
+                Rect asked;
+                if (GetClipBox(dc, &asked) != 0) {
+                    FillRect(dc, &asked, BackgroundBrush());
+                }
+                return 1;
+            }
+        }
+
+        // **Erase, rather than claiming to have.** A window of a class this
+        // library registered has a null background brush, so if nothing fills
+        // the client area nothing ever does: the window shows whatever memory
+        // held, and every region a moved control vacates keeps the old picture.
+        // Both were one bug.
+        //
+        // Only for our own classes. A subclassed system control is erased by
+        // the procedure it displaced, using the brush its parent hands back
+        // from `WM_CTLCOLOR*` -- filling over that would cost every `EDIT` and
+        // `LISTBOX` its native appearance.
+        //
+        // The form carries `WS_CLIPCHILDREN`, so this paints only the parts no
+        // child covers, which is what keeps a resize from flickering.
         if (message == WmEraseBackground && ErasesBackground()) {
             HDC dc = (HDC)(void*)(nuint)wParam;
             Rect client;

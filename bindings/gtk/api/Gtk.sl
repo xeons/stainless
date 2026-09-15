@@ -330,6 +330,20 @@ public extern "C" {
     /// A radio button joined to `group`, which is another radio button or null
     /// to start a new group. GTK's grouping is by widget, not by container.
     GtkWidget* gtk_radio_button_new_with_label_from_widget(GtkWidget* group, gchar* label);
+
+    /// The picture drawn beside the label. The button takes a reference, so a
+    /// caller may drop its own; passing null removes whatever was there.
+    void       gtk_button_set_image(GtkWidget* button, GtkWidget* image);
+    GtkWidget* gtk_button_get_image(GtkWidget* button);
+
+    /// Where that picture sits, as a `GtkPositionType`.
+    void gtk_button_set_image_position(GtkWidget* button, gint position);
+
+    /// **Needed, and not obviously so.** GTK hides a button's image by default
+    /// when the desktop's `gtk-button-images` setting is off, which on most
+    /// modern themes it is -- so a button given a picture shows none until this
+    /// is set.
+    void gtk_button_set_always_show_image(GtkWidget* button, gboolean always);
 }
 
 // ===================================================================== label

@@ -786,6 +786,37 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer {
     /// The fixed children are placed in, for a peer that has to reach it.
     public GtkWidget* Content() { return content; }
 
+    /// Reports every paint of this container's interior to the control, so
+    /// that the windowless children sitting on it are drawn.
+    ///
+    /// **Nothing but the custom control did this, and nothing but the custom
+    /// control drew.** A `GraphicControl` has no widget of its own: its parent
+    /// is the only thing GTK will ever hand a cairo context to, so a parent
+    /// that does not pass the context on is a parent whose `PaintBox`, `Shape`,
+    /// `Bevel`, `Splitter` and `SpeedButton` are laid out, hit-tested, and
+    /// invisible. Every self-test still passed -- which is the shape of bug
+    /// this backend has produced twice now, and why a screenshot is the only
+    /// answer to "is it drawn".
+    ///
+    /// Called by the containers rather than done here, because
+    /// `GtkCustomPeer` has a draw handler of its own that also puts the caret
+    /// on top, and two handlers would paint the control twice.
+    ///
+    /// **False, always.** The handler reports the paint and does not claim it:
+    /// answering true would stop GTK drawing the container's real children,
+    /// which are the platform controls on the form. False leaves them drawn
+    /// over whatever the program painted, which is the order Win32 gets from
+    /// `WS_CLIPCHILDREN` for nothing.
+    protected void ReportPaints() {
+        ConnectEvent(content, "draw", (sender, carried) => {
+            var owner = Owner();
+            if (owner == null) { return false; }
+            var surface = new GtkGraphicsBackend(carried);
+            ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+            return false;
+        });
+    }
+
     /// Virtual, because a notebook cannot honour this when it is called: see
     /// `GtkTabControlPeer.AddChild`.
     public virtual void AddChild(IControlPeer child) {

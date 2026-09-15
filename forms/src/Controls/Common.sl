@@ -834,3 +834,850 @@ public class ListView : WindowedControl {
 
     public override void OnPlatformValueChanged() { OnSelectedIndexChanged(); }
 }
+
+// ==================================================================== coolbar
+
+/// The two pixels between one band and the next, and between one row and the
+/// next. `TCoolBand.cDivider`.
+const int CoolDivider = 2;
+/// How far in from a band's left edge its grab handle starts.
+const int CoolGrabIndent = 2;
+
+/// What a drag of the mouse over a cool bar is doing right now.
+const int CoolDragNone = 0;
+const int CoolDragMove = 1;
+const int CoolDragResize = 2;
+
+/// What `CoolBar.BandAt` answers for the empty space below the last row and
+/// above the first: a band dropped there gets a row of its own.
+const int CoolRowBelow = -1;
+const int CoolRowAbove = -2;
+/// And for a point that is over no band and neither of those.
+const int CoolNowhere = -3;
+
+/// How a `CoolBand`'s grab handle is drawn.
+///
+/// `TGrabStyle` has two more, `gsGripper` and `gsButton`, and both are a call
+/// into `ThemeServices` for an element this library cannot draw yet. They are
+/// left out rather than approximated, because a gripper drawn by hand is a
+/// gripper that does not match the three real ones on the same screen.
+public enum GrabberStyle { Simple, Double, HorizontalLines, VerticalLines }
+
+/// One band of a `CoolBar`: a grab handle, an optional caption, and a control.
+///
+/// **A band is not a control.** It is a row entry that owns a rectangle and
+/// points at a control which is an ordinary child of the cool bar -- so a
+/// toolbar in a band is made with the cool bar as its parent and then handed
+/// over, exactly as `TCoolBand.Control` works.
+public class CoolBand {
+    weak CoolBar? bar;
+    Control? held;
+    String   caption;
+    bool     breaks;
+    bool     shown;
+    bool     fixedWidth;
+    int      wanted;
+    int      leastWide;
+    int      leastHigh;
+    Color    tint;
+    bool     tinted;
+
+    /// Where the layout pass put it. Read-only to a program, as in the LCL --
+    /// a band's position is the cool bar's business.
+    int placedLeft;
+    int placedTop;
+    int placedHeight;
+    /// How wide it is *drawn*, which for the last band in a row is everything
+    /// left over rather than `Width`. `TCoolBand.FRealWidth`.
+    int drawnWidth;
+
+    public CoolBand(CoolBar owner) {
+        bar = owner;
+        held = null;
+        caption = "";
+        breaks = true;
+        shown = true;
+        fixedWidth = false;
+        wanted = 180;
+        leastWide = 100;
+        leastHigh = 25;
+        tint = Colors.Transparent;
+        tinted = false;
+        placedLeft = 0;
+        placedTop = 0;
+        placedHeight = 0;
+        drawnWidth = 0;
+        owner.Register(this);
+    }
+
+    /// The control this band carries, or null for a band that is only a label.
+    ///
+    /// It must already be a child of the cool bar. Nothing here reparents it:
+    /// a control chooses its parent once, at birth, which is the rule
+    /// everywhere in this library.
+    public Control? Control {
+        get => held;
+        set {
+            held = value;
+            Refresh();
+        }
+    }
+
+    /// The caption drawn after the grab handle, when `CoolBar.ShowText` is on.
+    public String Text {
+        get => caption;
+        set {
+            caption = value;
+            Refresh();
+        }
+    }
+
+    /// Whether this band starts a new row rather than following the one before
+    /// it. True by default, as `TCoolBand.Break` is -- a bar of bands each on
+    /// its own row is what a program that set nothing should get.
+    public bool Break {
+        get => breaks;
+        set {
+            breaks = value;
+            Refresh();
+        }
+    }
+
+    public bool Visible {
+        get => shown;
+        set {
+            shown = value;
+            var one = held;
+            if (one != null) { ((Control)one).Visible = value; }
+            Refresh();
+        }
+    }
+
+    /// Whether the user may drag this band's right edge. A fixed band is also
+    /// one its neighbour cannot be resized against.
+    public bool FixedSize {
+        get => fixedWidth;
+        set { fixedWidth = value; }
+    }
+
+    /// How wide the band asks to be. Never below `MinWidth`.
+    public int Width {
+        get => wanted;
+        set {
+            int now = value < leastWide ? leastWide : value;
+            if (now == wanted) { return; }
+            wanted = now;
+            Refresh();
+        }
+    }
+
+    public int MinWidth {
+        get => leastWide;
+        set {
+            leastWide = value;
+            if (wanted < leastWide) { wanted = leastWide; }
+            Refresh();
+        }
+    }
+
+    public int MinHeight {
+        get => leastHigh;
+        set {
+            leastHigh = value;
+            Refresh();
+        }
+    }
+
+    /// The band's own background, or nothing set -- the default -- to use the
+    /// cool bar's.
+    public Color Color {
+        get => tint;
+        set {
+            tint = value;
+            tinted = true;
+            Refresh();
+        }
+    }
+
+    public bool HasColor => tinted;
+
+    public int Left   => placedLeft;
+    public int Top    => placedTop;
+    public int Height => placedHeight;
+    /// How wide it is drawn, which is `Width` except for the last band of a
+    /// row, which is given whatever is left.
+    public int DrawnWidth => drawnWidth;
+
+    /// Widens the band to just fit its control, which is what double-clicking
+    /// a grabber does in a real rebar and what `TCoolBand.AutosizeWidth` is.
+    public void AutoSizeWidth() {
+        CoolBar? owner = bar;
+        if (owner == null) { return; }
+        Width = ((CoolBar)owner).ContentLeft(this) + ControlWidth()
+              + ((CoolBar)owner).HorizontalSpacing + CoolDivider;
+    }
+
+    int ControlWidth() {
+        var one = held;
+        return one == null ? 0 : ((Control)one).Width;
+    }
+
+    /// Called by the cool bar's layout pass, and by nothing else.
+    public void PlaceAt(int left, int top, int height, int drawn) {
+        placedLeft = left;
+        placedTop = top;
+        placedHeight = height;
+        drawnWidth = drawn;
+    }
+
+    void Refresh() {
+        CoolBar? owner = bar;
+        if (owner != null) { ((CoolBar)owner).Rebuild(); }
+    }
+}
+
+/// A bar of bands, each holding a control the user can move and resize.
+///
+/// **Nothing about this is a platform control, on either platform.** Windows
+/// has `REBARCLASSNAME`, and the LCL does not use it: `TCoolBar` is drawn from
+/// nothing in `coolbar.inc`, and the GTK 3 widgetset does not mention a cool
+/// bar at all. So this is a `CustomControl` that paints bands and places the
+/// controls in them, which is what `TCustomCoolBar` is.
+///
+/// ```
+/// var bar = new CoolBar(this);
+/// bar.Dock = DockStyle.Top;
+///
+/// var tools = new ToolBar(bar);
+/// var first = new CoolBand(bar);
+/// first.Text = "Tools";
+/// first.Control = tools;
+///
+/// var box = new ComboBox(bar);
+/// var second = new CoolBand(bar);
+/// second.Text = "Zoom";
+/// second.Break = false;     // share the row with the band before it
+/// second.Control = box;
+/// ```
+///
+/// **Bands wrap into rows and the wrap is recomputed on every resize**, which
+/// is the behaviour that makes a cool bar worth having and the reason its
+/// height is not a number a program sets. `PreferredSize` answers how tall the
+/// rows came out; a program that wants the bar to fit assigns that to `Height`
+/// after building it, or docks it and lets `AutoSize` do it.
+///
+/// **What is not here.** `Vertical` -- a cool bar down the side of a window --
+/// is every coordinate in this file mirrored, and `TCustomCoolBar` pays for it
+/// with an `if Vertical` in each of forty places; it is left out rather than
+/// half done. So is right-to-left, for the same reason, and so are the two
+/// themed grab styles.
+public class CoolBar : CustomControl {
+    List<CoolBand>? bands;
+    /// The visible ones, in order, rebuilt by every layout pass. Held rather
+    /// than recomputed per hit-test because the paint, the mouse and the layout
+    /// all walk the same list and must agree about it.
+    List<CoolBand>? visible;
+
+    GrabberStyle grabbing;
+    int         grabWide;
+    int         acrossGap;
+    int         downGap;
+    bool        text;
+    bool        fixedWidths;
+    bool        fixedOrder;
+    ImageList?  pictures;
+
+    int  dragging;
+    int  draggedBand;
+    int  dragFrom;
+    int  rowsHigh;
+    bool ready;
+
+    public CoolBar(WindowedControl parent) {
+        base(parent);
+        bands = new List<CoolBand>();
+        visible = new List<CoolBand>();
+        grabbing = GrabberStyle.Double;
+        grabWide = 10;
+        acrossGap = 5;
+        downGap = 3;
+        text = true;
+        fixedWidths = false;
+        fixedOrder = false;
+        pictures = null;
+        dragging = CoolDragNone;
+        draggedBand = CoolNowhere;
+        dragFrom = 0;
+        rowsHigh = 0;
+
+        // A cool bar takes no keystrokes, so it stays out of the tab order --
+        // the controls *in* it are what the keyboard reaches, and they are
+        // ordinary children with windows of their own.
+        Focusable = false;
+        Dock = DockStyle.Top;
+        Height = 34;
+
+        ready = true;
+        Rebuild();
+    }
+
+    /// Called by a `CoolBand` as it is built. Not public: a band joins the bar
+    /// it was constructed with, and there is no other way in.
+    public void Register(CoolBand band) {
+        var held = bands;
+        if (held == null) { return; }
+        ((List<CoolBand>)held).Add(band);
+        Rebuild();
+    }
+
+    public List<CoolBand> Bands {
+        get {
+            var held = bands;
+            if (held == null) { return new List<CoolBand>(); }
+            return (List<CoolBand>)held;
+        }
+    }
+
+    public int BandCount => (int)Bands.Count();
+
+    /// How the grab handles are drawn.
+    public GrabberStyle GrabStyle {
+        get => grabbing;
+        set {
+            grabbing = value;
+            Invalidate();
+        }
+    }
+
+    /// How wide a grab handle is.
+    public int GrabWidth {
+        get => grabWide;
+        set {
+            grabWide = value;
+            Rebuild();
+        }
+    }
+
+    /// Pixels between a band's parts -- the handle, the caption, the control.
+    public int HorizontalSpacing {
+        get => acrossGap;
+        set {
+            acrossGap = value;
+            Rebuild();
+        }
+    }
+
+    /// Pixels above and below a band's control, which is what makes a row
+    /// taller than the tallest thing in it.
+    public int VerticalSpacing {
+        get => downGap;
+        set {
+            downGap = value;
+            Rebuild();
+        }
+    }
+
+    /// Whether a band's `Text` is drawn.
+    public bool ShowText {
+        get => text;
+        set {
+            text = value;
+            Rebuild();
+        }
+    }
+
+    /// Whether any band may be resized by dragging. Overrides every band's own
+    /// `FixedSize`, which is what `TCustomCoolBar.FixedSize` does.
+    public bool FixedSize {
+        get => fixedWidths;
+        set { fixedWidths = value; }
+    }
+
+    /// Whether the bands may be dragged into a different order.
+    public bool FixedOrder {
+        get => fixedOrder;
+        set { fixedOrder = value; }
+    }
+
+    /// The pictures a band's `ImageIndex` names. Declared so that a band that
+    /// wants an icon has somewhere to get one; nothing draws one yet.
+    public ImageList? Images {
+        get => pictures;
+        set {
+            pictures = value;
+            Invalidate();
+        }
+    }
+
+    /// One band was moved or resized by the user. Not raised for a change a
+    /// program made, as `TCustomCoolBar.OnChange` is not.
+    public event EventHandler Change;
+
+    protected virtual void OnChange() { Change(this); }
+
+    // -------------------------------------------------------------- layout
+
+    /// How tall the bar came out: every row's height, plus the dividers between
+    /// them. What a program assigns to `Height` after building the bands.
+    public override Size PreferredSize => Size.Of(0, rowsHigh);
+
+    /// Where a band's control begins, measured from the band's left edge: past
+    /// the handle, the caption and the gaps between them.
+    /// `TCoolBand.CalcControlLeft`.
+    public int ContentLeft(CoolBand band) {
+        int at = CoolGrabIndent + grabWide + acrossGap;
+        int bare = at;
+        if (text && !band.Text.IsEmpty()) {
+            at = at + TextWidth(band.Text) + acrossGap;
+        }
+        // A band with no caption still gets one gap, so its control does not
+        // sit against the handle.
+        if (at == bare) { at = at + acrossGap; }
+        return at;
+    }
+
+    /// How wide a caption is.
+    ///
+    /// **Measured against the font and not against a surface**, because there
+    /// is no `Graphics` outside a paint and the layout pass runs long before
+    /// one exists. Seven pixels per character is what a proportional UI font
+    /// averages at the sizes a cool bar uses; the cost of being wrong is a
+    /// caption a few pixels from where the control starts, and the cost of
+    /// being right would be keeping a measuring surface alive for the life of
+    /// the control.
+    int TextWidth(String caption) { return (int)caption.ByteLength() * 7; }
+
+    /// How tall one band wants to be: its own minimum, its control plus the
+    /// vertical spacing, and the caption -- whichever is largest.
+    /// `TCoolBand.CalcPreferredHeight`.
+    int BandHeight(CoolBand band) {
+        int high = band.MinHeight;
+        var one = band.Control;
+        if (one != null) {
+            int wanted = ((Control)one).Height + 2 * downGap;
+            if (wanted > high) { high = wanted; }
+        }
+        if (text) {
+            int wanted = Font.Size + 4 + 2 * downGap;
+            if (wanted > high) { high = wanted; }
+        }
+        return high;
+    }
+
+    /// Whether the band after this one will not fit beside it.
+    bool WrapsAfter(List<CoolBand> row, nuint index, int left) {
+        if (index + 1u >= row.Count()) { return false; }
+        var next = row.At(index + 1u);
+        if (next.Break) { return true; }
+        return left + next.Width - CoolDivider >= Width;
+    }
+
+    /// Recomputes the rows, places every band and every band's control, and
+    /// repaints.
+    ///
+    /// **Two passes, because a row's height is not known until the row ends.**
+    /// Every band in a row is drawn the same height -- the tallest of them --
+    /// so the first pass finds the wraps and the heights and the second places
+    /// things. `TCustomCoolBar.CalculateAndAlign` does exactly this and for
+    /// exactly this reason.
+    public void Rebuild() {
+        if (!ready) { return; }
+
+        var all = Bands;
+        var showing = new List<CoolBand>();
+        for (nuint i = 0u; i < all.Count(); i += 1u) {
+            if (all.At(i).Visible) { showing.Add(all.At(i)); }
+        }
+        visible = showing;
+
+        // ---- pass one: where the rows break, and how tall each is.
+        var heights = new int[showing.Count()];
+        int tallest = 0;
+        nuint rowStart = 0u;
+        int left = 0;
+        bool rowEnd = true;
+
+        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+            if (rowEnd || showing.At(i).Break) { left = 0; }
+            int wanted = BandHeight(showing.At(i));
+            if (wanted > tallest) { tallest = wanted; }
+            left = left + showing.At(i).Width;
+
+            rowEnd = i + 1u >= showing.Count() || WrapsAfter(showing, i, left);
+            if (!rowEnd) { continue; }
+
+            for (nuint y = rowStart; y <= i; y += 1u) { heights[y] = tallest; }
+            tallest = 0;
+            rowStart = i + 1u;
+        }
+
+        // ---- pass two: place the bands and the controls in them.
+        int top = 0;
+        left = 0;
+        rowEnd = true;
+
+        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+            var band = showing.At(i);
+            if (rowEnd || band.Break) { left = 0; }
+
+            int height = heights[i];
+            int width = band.Width;
+            rowEnd = WrapsAfter(showing, i, left + width) || i + 1u >= showing.Count();
+            // The last band of a row is drawn out to the far edge, whatever
+            // width it asked for -- otherwise every row would end in a gap the
+            // user could not fill.
+            int drawn = rowEnd ? Width - left : width;
+            if (drawn < width) { drawn = width; }
+
+            band.PlaceAt(left, top, height, drawn);
+
+            var one = band.Control;
+            if (one != null) {
+                var child = (Control)one;
+                int contentLeft = left + ContentLeft(band);
+                int room = drawn - ContentLeft(band) - acrossGap - CoolDivider;
+                if (room < 0) { room = 0; }
+                child.SetBounds(contentLeft, top + (height - child.Height) / 2,
+                                room, child.Height);
+            }
+
+            left = left + width;
+            if (rowEnd) { top = top + height + CoolDivider; }
+        }
+
+        rowsHigh = top;
+        Invalidate();
+    }
+
+    /// A resize changes where the rows wrap, so the whole layout is redone.
+    ///
+    /// The null test is the trap the composites all have: the base constructor
+    /// resizes, and this override runs before this class's own fields exist.
+    protected override void OnResize() {
+        base.OnResize();
+        if (bands == null) { return; }
+        Rebuild();
+    }
+
+    List<CoolBand> Showing {
+        get {
+            var held = visible;
+            if (held == null) { return new List<CoolBand>(); }
+            return (List<CoolBand>)held;
+        }
+    }
+
+    // ------------------------------------------------------------- painting
+
+    protected override void OnPaint(PaintEventArgs args) {
+        var surface = args.Graphics;
+        surface.Clear(BackColor);
+
+        var showing = Showing;
+        var light = new Pen(SystemColors.ControlLight);
+        var dark = new Pen(SystemColors.ControlDark);
+
+        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+            var band = showing.At(i);
+            var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
+
+            if (band.HasColor) { surface.FillRectangle(new Brush(band.Color), whole); }
+
+            PaintGrabber(surface, light, dark,
+                         Rectangle.Of(band.Left + CoolGrabIndent, band.Top + 2,
+                                      grabWide - 1, band.Height - 5));
+
+            if (text && !band.Text.IsEmpty()) {
+                int x = band.Left + CoolGrabIndent + grabWide + acrossGap;
+                var measured = surface.MeasureString(band.Text, Font);
+                int y = band.Top + (band.Height - measured.Height) / 2;
+                surface.DrawString(band.Text, Font, ForeColor, x, y);
+            }
+
+            bool last = i + 1u >= showing.Count();
+            bool endsRow = last || showing.At(i + 1u).Top != band.Top;
+
+            if (endsRow) {
+                // The line under a finished row, which is what separates one
+                // row from the next and the last row from the client area.
+                int y = band.Top + band.Height;
+                surface.DrawLine(dark, 0, y, Width, y);
+                surface.DrawLine(light, 0, y + 1, Width, y + 1);
+            } else {
+                // The upright between two bands sharing a row.
+                int x = band.Left + band.DrawnWidth;
+                surface.DrawLine(dark, x, band.Top + 1, x, band.Top + band.Height - 1);
+                surface.DrawLine(light, x + 1, band.Top + 1, x + 1,
+                                 band.Top + band.Height - 1);
+            }
+        }
+
+        base.OnPaint(args);
+    }
+
+    /// The grab handle, in whichever of the four styles is set.
+    void PaintGrabber(Graphics surface, Pen light, Pen dark, Rectangle at) {
+        if (at.Width <= 0 || at.Height <= 0) { return; }
+        int left = at.X;
+        int top = at.Y;
+        int right = at.X + at.Width;
+        int bottom = at.Y + at.Height;
+
+        if (grabbing == GrabberStyle.Simple) {
+            surface.DrawLine(light, left, top, right, top);
+            surface.DrawLine(light, left, top, left, bottom);
+            surface.DrawLine(dark, left, bottom, right, bottom);
+            surface.DrawLine(dark, right, top, right, bottom);
+            return;
+        }
+
+        if (grabbing == GrabberStyle.Double) {
+            // Two narrow raised bars side by side, which is the default and the
+            // one a Windows rebar draws.
+            int half = (grabWide - 2) / 2;
+            if (half < 1) { half = 1; }
+            surface.DrawLine(light, left, top, left + half, top);
+            surface.DrawLine(light, left, top, left, bottom);
+            surface.DrawLine(dark, left, bottom, left + half, bottom);
+            surface.DrawLine(dark, left + half, top, left + half, bottom);
+
+            surface.DrawLine(light, right - half, top, right, top);
+            surface.DrawLine(light, right - half, top, right - half, bottom);
+            surface.DrawLine(dark, right - half, bottom, right, bottom);
+            surface.DrawLine(dark, right, top, right, bottom);
+            return;
+        }
+
+        if (grabbing == GrabberStyle.HorizontalLines) {
+            int lines = (at.Height + 1) / 3;
+            for (int w = 0; w < lines; w += 1) {
+                int y = top + 1 + w * 3;
+                surface.DrawLine(dark, left, y, right, y);
+                surface.DrawLine(light, left, y + 1, right, y + 1);
+            }
+            return;
+        }
+
+        int columns = (at.Width + 1) / 3;
+        for (int w = 0; w < columns; w += 1) {
+            int x = left + 1 + w * 3;
+            surface.DrawLine(dark, x, top, x, bottom);
+            surface.DrawLine(light, x + 1, top, x + 1, bottom);
+        }
+    }
+
+    // ---------------------------------------------------------- the mouse
+
+    /// Which band a point is over, and whether it is over that band's grab
+    /// handle. `TCustomCoolBar.MouseToBandPos`, with its two sentinels: a point
+    /// below the last row or above the first is where a band dropped gets a row
+    /// of its own.
+    (int, bool) BandAt(Point at) {
+        var showing = Showing;
+        if (showing.IsEmpty()) { return (CoolNowhere, false); }
+
+        var last = showing.At(showing.Count() - 1u);
+        if (at.Y > last.Top + last.Height + CoolDivider) { return (CoolRowBelow, false); }
+        if (at.Y < 0) { return (CoolRowAbove, false); }
+
+        for (nuint i = 0u; i < showing.Count(); i += 1u) {
+            var band = showing.At(i);
+            var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
+            if (!whole.Contains(at)) { continue; }
+            return ((int)i, at.X <= band.Left + grabWide + 1);
+        }
+        return (CoolNowhere, false);
+    }
+
+    /// Whether this band is the first of its row, which is the one whose
+    /// handle cannot resize anything: there is no band to its left to take the
+    /// pixels from.
+    bool FirstOfRow(int index) {
+        var showing = Showing;
+        if (index <= 0) { return true; }
+        return showing.At((nuint)index).Top != showing.At((nuint)(index - 1)).Top;
+    }
+
+    protected override void OnMouseDown(MouseEventArgs args) {
+        base.OnMouseDown(args);
+        if (args.Button != MouseButton.Left) { return; }
+
+        var found = BandAt(args.Location);
+        int index = found.Item1;
+        bool onGrabber = found.Item2;
+        draggedBand = index;
+        dragging = CoolDragNone;
+        if (index < 0) { return; }
+
+        var showing = Showing;
+        if (onGrabber && !FirstOfRow(index) && !fixedWidths
+            && !showing.At((nuint)index).FixedSize
+            && !showing.At((nuint)(index - 1)).FixedSize) {
+            // Dragging a handle resizes the band to its *left*, which is the
+            // one whose right edge the handle sits against.
+            dragging = CoolDragResize;
+            var before = showing.At((nuint)(index - 1));
+            dragFrom = args.X - before.Width - before.Left;
+            CaptureMouse(true);
+            return;
+        }
+
+        if (!fixedOrder) {
+            dragging = CoolDragMove;
+            CaptureMouse(true);
+        }
+    }
+
+    protected override void OnMouseMove(MouseEventArgs args) {
+        base.OnMouseMove(args);
+        var showing = Showing;
+        if (showing.IsEmpty()) { return; }
+
+        if (dragging == CoolDragResize) {
+            var before = showing.At((nuint)(draggedBand - 1));
+            before.Width = args.X - dragFrom - before.Left;
+            return;
+        }
+
+        if (dragging == CoolDragMove) { return; }
+
+        // Nothing is being dragged, so the cursor says what a drag would do.
+        var found = BandAt(args.Location);
+        int index = found.Item1;
+        bool onGrabber = found.Item2;
+        if (index < 0) { Cursor = CursorKind.Default; return; }
+
+        if (onGrabber && index > 0 && !FirstOfRow(index) && !fixedWidths
+            && !showing.At((nuint)index).FixedSize
+            && !showing.At((nuint)(index - 1)).FixedSize) {
+            Cursor = CursorKind.SizeWestEast;
+        } else if (!fixedOrder && showing.Count() > 1u) {
+            Cursor = CursorKind.SizeAll;
+        } else {
+            Cursor = CursorKind.Default;
+        }
+    }
+
+    protected override void OnMouseUp(MouseEventArgs args) {
+        base.OnMouseUp(args);
+        int was = dragging;
+        int dragged = draggedBand;
+        dragging = CoolDragNone;
+        draggedBand = CoolNowhere;
+        Cursor = CursorKind.Default;
+
+        if (was == CoolDragNone) { return; }
+        CaptureMouse(false);
+
+        if (was == CoolDragResize) {
+            OnChange();
+            return;
+        }
+
+        if (dragged < 0) { return; }
+        if (Drop(dragged, args.Location)) {
+            Rebuild();
+            OnChange();
+        }
+    }
+
+    /// Moves the dragged band to where it was dropped, and answers whether
+    /// anything changed.
+    ///
+    /// **Three cases, which is the whole of `TCustomCoolBar.MouseUp`'s long
+    /// branch.** Dropped above the first row or below the last, the band gets a
+    /// row of its own -- it is moved to that end of the list and told to break.
+    /// Dropped past the right-hand end of a row, it goes after that row's last
+    /// band and does *not* break, so it joins the row. Dropped on another band,
+    /// it takes that band's place and inherits whether the place breaks a row.
+    bool Drop(int dragged, Point at) {
+        var showing = Showing;
+        if ((nuint)dragged >= showing.Count()) { return false; }
+        var moving = showing.At((nuint)dragged);
+
+        var found = BandAt(at);
+        int onto = found.Item1;
+        if (onto == CoolNowhere) { return false; }
+
+        // A band that broke a row and is leaving it must hand the break to
+        // whoever now begins that row, or the row above swallows it.
+        if (moving.Break && (nuint)(dragged + 1) < showing.Count()) {
+            showing.At((nuint)(dragged + 1)).Break = true;
+        }
+
+        if (onto == CoolRowAbove) {
+            if (dragged == 0) { return false; }
+            moving.Break = true;
+            return MoveTo(moving, 0);
+        }
+
+        if (onto == CoolRowBelow) {
+            moving.Break = true;
+            return MoveTo(moving, (int)Bands.Count() - 1);
+        }
+
+        if (onto == dragged) { return false; }
+
+        var target = showing.At((nuint)onto);
+        bool pastEnd = at.X > target.Left + target.DrawnWidth;
+
+        if (pastEnd) {
+            // Joining the end of the target's row.
+            moving.Break = false;
+            int after = dragged > onto ? onto + 1 : onto;
+            return MoveTo(moving, RealIndexOf(showing, after));
+        }
+
+        moving.Break = target.Break;
+        if (dragged > onto) {
+            // Moving left or up: the band it landed on stops beginning the row,
+            // because the dropped one now does.
+            target.Break = false;
+            return MoveTo(moving, RealIndexOf(showing, onto));
+        }
+
+        // Moving right or down.
+        if (showing.At((nuint)dragged).Top == target.Top) {
+            moving.Break = false;
+            return MoveTo(moving, RealIndexOf(showing, onto));
+        }
+        target.Break = false;
+        return MoveTo(moving, RealIndexOf(showing, onto - 1));
+    }
+
+    /// The position in `Bands` of the nth visible band. The two lists differ
+    /// whenever a band is hidden, and every move is expressed in visible terms
+    /// and applied in real ones.
+    int RealIndexOf(List<CoolBand> showing, int visibleIndex) {
+        if (visibleIndex < 0) { return 0; }
+        if ((nuint)visibleIndex >= showing.Count()) {
+            return (int)Bands.Count() - 1;
+        }
+        var wanted = showing.At((nuint)visibleIndex);
+        var all = Bands;
+        for (nuint i = 0u; i < all.Count(); i += 1u) {
+            if (all.At(i) == wanted) { return (int)i; }
+        }
+        return 0;
+    }
+
+    /// Takes a band out of the list and puts it back at another position.
+    bool MoveTo(CoolBand band, int index) {
+        var all = Bands;
+        nuint from = 0u;
+        bool found = false;
+        for (nuint i = 0u; i < all.Count(); i += 1u) {
+            if (all.At(i) == band) { from = i; found = true; break; }
+        }
+        if (!found) { return false; }
+
+        int to = index;
+        if (to < 0) { to = 0; }
+        if ((nuint)to >= all.Count()) { to = (int)all.Count() - 1; }
+        if ((nuint)to == from) { return false; }
+
+        all.RemoveAt(from);
+        all.Insert((nuint)to, band);
+        return true;
+    }
+}

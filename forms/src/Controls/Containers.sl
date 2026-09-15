@@ -251,3 +251,191 @@ public class CustomControl : WindowedControl {
         }
     }
 }
+
+// ================================================================= notebook
+
+/// One page of a `Notebook`.
+///
+/// A real container, so controls are put on it exactly as they are put on a
+/// panel. It is never laid out by the program: the notebook fills itself with
+/// whichever page is showing and hides the rest.
+public class NotebookPage : Panel {
+    int index;
+
+    public NotebookPage(Notebook owner, String name) {
+        base(owner);
+        StoredText = name;
+        index = owner.Register(this);
+    }
+
+    /// Which page this is, counting from zero.
+    public int Index => index;
+
+    /// Told its new number after a page in front of it was removed. Called by
+    /// `Notebook.RemovePage` and by nothing else.
+    public void Renumber(int now) { index = now; }
+
+    /// What this page is called. Not drawn anywhere -- there are no tabs -- so
+    /// it is what a program looks a page up by and what a status line or a
+    /// wizard's heading would show. `Caption` rather than `Name` because
+    /// `Control.Name` already means the identifier a program knows a control
+    /// by, and because `TabPage` spells the same thing the same way.
+    public String Caption {
+        get => StoredText;
+        set { StoredText = value; }
+    }
+}
+
+/// A stack of pages with no tabs, of which one shows at a time.
+///
+/// **`TabControl` without the tabs, and that is the entire point.** The LCL
+/// keeps `TNotebook`/`TPage` beside `TPageControl`/`TTabSheet` for the case
+/// where the program decides which page is showing and the user never does:
+/// a wizard driven by Back and Next, a settings dialog whose list on the left
+/// chooses the panel on the right, a status area that swaps between three
+/// layouts. Done with a `TabControl` those need the tab strip hidden, which no
+/// platform offers -- Windows has no style for it and GTK's
+/// `gtk_notebook_set_show_tabs` leaves the border behind.
+///
+/// So this is not a platform control at all. It is a `Panel` that fills itself
+/// with one child and hides the others, which is exactly what `TNotebook` is:
+/// the GTK 3 widgetset registers `TGtk3WSNotebook` and `TGtk3WSPage` as empty
+/// classes, because there is nothing for a widgetset to do.
+///
+/// ```
+/// var steps = new Notebook(this);
+/// steps.Dock = DockStyle.Fill;
+/// var welcome = new NotebookPage(steps, "Welcome");
+/// var options = new NotebookPage(steps, "Options");
+/// var done    = new NotebookPage(steps, "Finished");
+/// steps.SelectedIndex = 0;
+/// ```
+public class Notebook : Panel {
+    List<NotebookPage>? pages;
+    int chosen;
+
+    public Notebook(WindowedControl parent) {
+        base(parent);
+        pages = new List<NotebookPage>();
+        chosen = -1;
+    }
+
+    /// Called by a `NotebookPage` as it is built. Not public: a page joins the
+    /// notebook it was constructed with, and there is no other way in.
+    int Register(NotebookPage page) {
+        var held = pages;
+        if (held == null) { return -1; }
+        var list = (List<NotebookPage>)held;
+        list.Add(page);
+        int at = (int)list.Count() - 1;
+        // The first page added becomes the one showing, so a notebook is never
+        // a blank rectangle with pages in it that nothing selected.
+        if (chosen < 0) { chosen = 0; }
+        ShowOnly();
+        return at;
+    }
+
+    public List<NotebookPage> Pages {
+        get {
+            var held = pages;
+            if (held == null) { return new List<NotebookPage>(); }
+            return (List<NotebookPage>)held;
+        }
+    }
+
+    public int PageCount => (int)Pages.Count();
+
+    /// Which page is showing, or -1 for a notebook with none.
+    public int SelectedIndex {
+        get => chosen;
+        set {
+            int count = PageCount;
+            int wanted = value;
+            if (wanted >= count) { wanted = count - 1; }
+            if (wanted < 0) { wanted = count == 0 ? -1 : 0; }
+            if (wanted == chosen) { return; }
+            chosen = wanted;
+            ShowOnly();
+            OnSelectedIndexChanged();
+        }
+    }
+
+    public NotebookPage? SelectedPage {
+        get {
+            var list = Pages;
+            if (chosen < 0 || (nuint)chosen >= list.Count()) { return null; }
+            return list.At((nuint)chosen);
+        }
+    }
+
+    /// The page of that name, or null if there is none. What a program that
+    /// named its pages rather than counting them asks with.
+    public NotebookPage? Find(String name) {
+        var list = Pages;
+        for (nuint i = 0u; i < list.Count(); i += 1u) {
+            if (list.At(i).Caption == name) { return list.At(i); }
+        }
+        return null;
+    }
+
+    /// Takes a page out and answers whether it was there.
+    ///
+    /// The page is hidden rather than destroyed, as `TabControl.RemovePage`
+    /// does it and for the same reason: a control's lifetime is its parent's,
+    /// and dropping the last reference to it is what destroys it.
+    public bool RemovePage(NotebookPage page) {
+        var list = Pages;
+        nuint at = 0u;
+        bool found = false;
+        for (nuint i = 0u; i < list.Count(); i += 1u) {
+            if (list.At(i) == page) { at = i; found = true; break; }
+        }
+        if (!found) { return false; }
+
+        list.RemoveAt(at);
+        page.Visible = false;
+        for (nuint i = at; i < list.Count(); i += 1u) { list.At(i).Renumber((int)i); }
+
+        // Removing the page that was showing moves the selection to whatever
+        // took its place, or to the last page when it was the last.
+        if (chosen >= (int)list.Count()) { chosen = (int)list.Count() - 1; }
+        ShowOnly();
+        OnSelectedIndexChanged();
+        return true;
+    }
+
+    /// Shows the chosen page filling the client area and hides the rest.
+    ///
+    /// The same job `TabControl.ShowOnly` does, minus the platform: there is no
+    /// tab control underneath to ask where the page area is, so it is the whole
+    /// of the client area.
+    void ShowOnly() {
+        var held = pages;
+        if (held == null) { return; }
+        var list = (List<NotebookPage>)held;
+        var area = ClientBounds;
+        for (nuint i = 0u; i < list.Count(); i += 1u) {
+            var page = list.At(i);
+            bool wanted = (int)i == chosen;
+            page.Visible = wanted;
+            if (wanted) { page.Bounds = area; }
+        }
+    }
+
+    /// The chosen page changed.
+    public event EventHandler SelectedIndexChanged;
+
+    protected virtual void OnSelectedIndexChanged() { SelectedIndexChanged(this); }
+
+    /// A resize moves the page area, so whichever page is showing follows it.
+    ///
+    /// **The null test is not defensive.** The base constructor resizes, and
+    /// this override runs before this class's own fields exist -- the same trap
+    /// C# has with a virtual call from a base constructor, and the same one
+    /// `RadioGroup` and `CheckGroup` guard against.
+    protected override void OnResize() {
+        base.OnResize();
+        if (pages == null) { return; }
+        ShowOnly();
+    }
+}

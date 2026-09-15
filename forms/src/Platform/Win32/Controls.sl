@@ -42,6 +42,7 @@ import Win32.Handles;
 import Win32.Kernel32;
 import Win32.User32;
 import Win32.Gdi32;
+import Win32.ComCtl32;
 
 /// The styles every child control shares. `WS_CLIPSIBLINGS` is the one worth
 /// naming: without it two overlapping children each paint over the other and
@@ -79,10 +80,101 @@ HWND WindowOf(IContainerPeer parent) {
 // =================================================================== button
 
 /// A push button.
-public class ButtonPeer : ControlPeer, IButtonPeer {
+public class ButtonPeer : ControlPeer, IPushButtonPeer {
+    /// The one-entry image list holding the button's picture, or null for a
+    /// button with none. Owned here: `BCM_SETIMAGELIST` takes a handle and
+    /// never a copy, so the list has to outlive the call and be destroyed by
+    /// whoever made it.
+    HIMAGELIST glyph;
+    /// The picture's size, kept because `PreferredSize` needs it and asking an
+    /// image list for one entry's extent costs more than remembering it.
+    FSize glyphExtent;
+    ImageAlignment placed;
+    int gap;
+
     public ButtonPeer(IControlNotify owner, IContainerPeer parent) {
         base(MakeChild("BUTTON", WindowOf(parent), ChildStyle() | BsPushButton, 0u),
              owner, true);
+        glyph = null;
+        glyphExtent = Extent(0, 0);
+        placed = ImageAlignment.Left;
+        gap = 4;
+    }
+
+    ~ButtonPeer() {
+        if (glyph != null) { ImageList_Destroy(glyph); glyph = null; }
+    }
+
+    /// The picture beside the caption, or null for none.
+    ///
+    /// **A list of one rather than `BS_BITMAP`.** The old way draws the picture
+    /// *instead of* the caption; `BCM_SETIMAGELIST` draws both and lays them
+    /// out, which is what a caller setting `Image` on a button that also has
+    /// `Text` plainly means. The cost is a one-entry `HIMAGELIST` per button,
+    /// which is what the themed common controls want and what the LCL's Win32
+    /// `TBitBtn` also builds.
+    ///
+    /// Magenta is the colour not drawn, as everywhere else here: a `.bmp` has
+    /// no alpha channel and this is what every toolbar bitmap since Windows 95
+    /// has used to say "transparent".
+    public void SetImage(IBitmapBackend? picture) {
+        if (glyph != null) { ImageList_Destroy(glyph); glyph = null; }
+        glyphExtent = Extent(0, 0);
+
+        if (picture != null) {
+            var source = (IBitmapBackend)picture;
+            if (source is BitmapBackend gdi) {
+                glyph = ImageList_Create(gdi.Width(), gdi.Height(),
+                                         IlcColor32 | IlcMask, 1, 0);
+                ImageList_AddMasked(glyph, gdi.Native(), 0x00FF00FFu);
+                glyphExtent = Extent(gdi.Width(), gdi.Height());
+            }
+        }
+
+        ApplyImage();
+    }
+
+    public void SetImageAlign(ImageAlignment place) {
+        placed = place;
+        ApplyImage();
+    }
+
+    public void SetImageSpacing(int pixels) {
+        gap = pixels;
+        ApplyImage();
+    }
+
+    /// **The gap is a margin, because there is no spacing field.**
+    /// `BUTTON_IMAGELIST` carries a rectangle of room to leave around the
+    /// picture, so the space between picture and caption is the margin on
+    /// whichever side the caption is -- which is the side opposite the
+    /// alignment.
+    void ApplyImage() {
+        ButtonImageList wanted;
+        wanted.Images = glyph;
+        wanted.Margin.Left = 0;
+        wanted.Margin.Top = 0;
+        wanted.Margin.Right = 0;
+        wanted.Margin.Bottom = 0;
+
+        if (placed == ImageAlignment.Right) {
+            wanted.Align = ButtonImageListAlignRight;
+            wanted.Margin.Left = gap;
+        } else if (placed == ImageAlignment.Top) {
+            wanted.Align = ButtonImageListAlignTop;
+            wanted.Margin.Bottom = gap;
+        } else if (placed == ImageAlignment.Bottom) {
+            wanted.Align = ButtonImageListAlignBottom;
+            wanted.Margin.Top = gap;
+        } else {
+            wanted.Align = ButtonImageListAlignLeft;
+            wanted.Margin.Right = gap;
+        }
+
+        // A null list is how the message says "no picture", so this call is
+        // both the set and the clear.
+        SendMessageW(window, BcmSetImageList, 0u, (long)(nuint)&wanted);
+        Invalidate();
     }
 
     /// `BN_CLICKED` arrives whether the button was clicked or pressed with the
@@ -104,13 +196,28 @@ public class ButtonPeer : ControlPeer, IButtonPeer {
                      (ulong)(isDefault ? BsDefPushButton : BsPushButton), 1);
     }
 
-    /// Wide enough for the caption plus the padding a Windows button has, and
-    /// never narrower than the 75x23 dialog units every Windows button is.
+    /// Wide enough for the caption and the picture plus the padding a Windows
+    /// button has, and never narrower than the 75x23 dialog units every Windows
+    /// button is.
     public override FSize PreferredSize() {
-        var owner = Owner();
         var measured = MeasureNative();
-        int width = measured.Width + 20;
-        int height = measured.Height + 10;
+        int width = measured.Width;
+        int height = measured.Height;
+
+        // The picture is beside the caption or above it, so it adds to one
+        // axis and takes the larger of the two on the other.
+        if (glyphExtent.Width > 0) {
+            if (placed == ImageAlignment.Top || placed == ImageAlignment.Bottom) {
+                height = height + gap + glyphExtent.Height;
+                if (width < glyphExtent.Width) { width = glyphExtent.Width; }
+            } else {
+                width = width + gap + glyphExtent.Width;
+                if (height < glyphExtent.Height) { height = glyphExtent.Height; }
+            }
+        }
+
+        width = width + 20;
+        height = height + 10;
         if (width < 75)  { width = 75; }
         if (height < 23) { height = 23; }
         return Extent(width, height);
@@ -131,22 +238,32 @@ public class ButtonPeer : ControlPeer, IButtonPeer {
 
 // ================================================== check box and radio button
 
-/// A check box or a radio button, which differ from each other and from a push
-/// button only in style bits.
+/// A check box, a radio button or a toggle button, which differ from each other
+/// and from a push button only in style bits.
 ///
 /// **`BS_AUTOCHECKBOX` rather than `BS_CHECKBOX`.** The auto form toggles
 /// itself when clicked; the plain one expects the program to do it, which is
 /// what the LCL does and what makes an LCL check box feel a frame slow. The
 /// cost is that the state has to be read back rather than assumed, which
 /// `GetChecked` does.
+///
+/// **A toggle button is `BS_PUSHLIKE` on top of the same auto check box**, so
+/// it clicks, ticks and reads back exactly as one -- Windows only draws it
+/// pressed in instead of drawing a box. That is why `TToggleBox` descends from
+/// `TCustomCheckBox` in the LCL and `ToggleButton` from `CheckBox` here.
 public class CheckPeer : ControlPeer, ICheckPeer {
-    bool isRadio;
+    CheckKind sort;
 
-    public CheckPeer(IControlNotify owner, IContainerPeer parent, bool radio) {
-        base(MakeChild("BUTTON", WindowOf(parent),
-                       ChildStyle() | (radio ? BsAutoRadioButton : BsAutoCheckBox), 0u),
+    static uint StyleFor(CheckKind kind) {
+        if (kind == CheckKind.Radio)  { return BsAutoRadioButton; }
+        if (kind == CheckKind.Toggle) { return BsAutoCheckBox | BsPushLike; }
+        return BsAutoCheckBox;
+    }
+
+    public CheckPeer(IControlNotify owner, IContainerPeer parent, CheckKind kind) {
+        base(MakeChild("BUTTON", WindowOf(parent), ChildStyle() | StyleFor(kind), 0u),
              owner, true);
-        isRadio = radio;
+        sort = kind;
     }
 
     protected override bool Notified(uint code, int id) {
@@ -171,7 +288,9 @@ public class CheckPeer : ControlPeer, ICheckPeer {
         return SendMessageW(window, BmGetCheck, 0u, 0) == (long)BstChecked;
     }
 
-    /// The box or the dot, plus a gap, plus the caption.
+    /// The box or the dot, plus a gap, plus the caption -- or, for a toggle
+    /// button, the caption and a push button's padding, since there is no box
+    /// drawn to leave room for.
     public override FSize PreferredSize() {
         HDC dc = GetDC(window);
         HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
@@ -180,6 +299,15 @@ public class CheckPeer : ControlPeer, ICheckPeer {
         GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
         SelectObject(dc, wasFont);
         ReleaseDC(window, dc);
+
+        if (sort == CheckKind.Toggle) {
+            int width = measured.Width + 20;
+            int high = measured.Height + 10;
+            if (width < 75) { width = 75; }
+            if (high < 23)  { high = 23; }
+            return Extent(width, high);
+        }
+
         int box = GetSystemMetrics(SmCheckBoxWidth);
         if (box <= 0) { box = 13; }
         int height = measured.Height;
@@ -719,7 +847,16 @@ public class CustomPeer : ControlPeer, ICustomPeer {
     protected override bool ErasesBackground() { return false; }
 
     public override long Dispatch(uint message, ulong wParam, long lParam) {
-        if (message == WmEraseBackground) { return 1; }
+        // **Our own erase does nothing, and a child's is not ours to refuse.**
+        // `PaintBuffered` fills every pixel of the client area, so a background
+        // painted before it is painted twice -- which is the flicker the buffer
+        // exists to remove. A transparent child forwarding *its* background to
+        // us is a different message wearing the same number, and the base peer
+        // answers that one; see the note there.
+        if (message == WmEraseBackground) {
+            HDC given = (HDC)(void*)(nuint)wParam;
+            if (given == null || WindowFromDC(given) == window) { return 1; }
+        }
 
         if (message == WmPaint) { return PaintBuffered(); }
 

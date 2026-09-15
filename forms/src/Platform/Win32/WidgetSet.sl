@@ -413,12 +413,13 @@ public class Win32WidgetSet : IWidgetSet {
         return new WindowPeer(owner, border);
     }
 
-    public IButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent) {
+    public IPushButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent) {
         return new ButtonPeer(owner, parent);
     }
 
-    public ICheckPeer CreateCheck(IControlNotify owner, IContainerPeer parent, bool radio) {
-        return new CheckPeer(owner, parent, radio);
+    public ICheckPeer CreateCheck(IControlNotify owner, IContainerPeer parent,
+                                  CheckKind kind) {
+        return new CheckPeer(owner, parent, kind);
     }
 
     public ILabelPeer CreateLabel(IControlNotify owner, IContainerPeer parent) {

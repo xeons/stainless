@@ -527,3 +527,292 @@ public class HeaderControl : WindowedControl {
 
     public override void OnPlatformValueChanged() { OnSectionResized(); }
 }
+
+// ============================================================= button panel
+
+/// Which of a `ButtonPanel`'s four buttons are showing. Bits, so they combine.
+[Flags]
+public enum PanelButtons {
+    None   = 0,
+    Ok     = 1,
+    Cancel = 2,
+    Close  = 4,
+    Help   = 8,
+}
+
+/// The order a `ButtonPanel` puts its buttons in, left to right.
+///
+/// The names say the order and the order is the whole content, so they read as
+/// the answer rather than as a code for one -- `TButtonOrder`'s
+/// `boCloseCancelOK` with the capitals put back. `Default` is the one that is
+/// not an order: it is whichever of the two the platform in use prefers.
+public enum ButtonOrder { Default, CloseCancelOk, CloseOkCancel }
+
+/// The strip of buttons a dialog ends with.
+///
+/// **The affirmative button goes on the right on Windows and on the right on
+/// GNOME, and the two disagree about which button that is.** Windows puts OK
+/// before Cancel; the GNOME guidelines put Cancel before OK. That single
+/// difference is the reason this control exists rather than four buttons placed
+/// by hand -- a dialog laid out by hand is laid out for one desktop, and looks
+/// subtly wrong on the other to everybody who uses it every day.
+///
+/// `Default` asks the widget set which desktop this is. It is the one place in
+/// the portable tier that reads `IWidgetSet.Name`, and it is asked once at
+/// construction rather than compiled in, so a program that chose its backend at
+/// run time gets the right answer too.
+///
+/// **Help is always in the far corner**, on both, which is why the layout is
+/// not simply "pack them against the right".
+///
+/// ```
+/// var buttons = new ButtonPanel(this);
+/// buttons.ShowButtons = PanelButtons.Ok | PanelButtons.Cancel;
+/// buttons.OkButton.Click += this.OnAccept;
+/// buttons.CancelButton.Click += this.OnDismiss;
+/// ```
+///
+/// **All four buttons exist from the start, and `ShowButtons` hides them.**
+/// `TCustomButtonPanel` creates and frees them as the set changes, which here
+/// would mean a handler attached to Cancel disappearing because a program
+/// turned Help on. A control's lifetime is its parent's, and `TabControl`
+/// already hides a removed page rather than destroying it, so this is the rule
+/// that was already in force.
+///
+/// **No stock glyphs.** `TButtonPanel.ShowGlyphs` puts a tick on OK and a cross
+/// on Cancel out of the widgetset's stock icon set, which is a thing neither
+/// backend here has. A program that wants pictures sets `Image` on the buttons,
+/// which is a property every `Button` now has.
+public class ButtonPanel : Panel {
+    Button? ok;
+    Button? cancel;
+    Button? close;
+    Button? help;
+    Bevel?  divider;
+
+    PanelButtons showing;
+    ButtonOrder  order;
+    ButtonOrder  resolved;
+    int          gap;
+    bool         rule;
+    PanelButtons preferred;
+    bool         ready;
+
+    public ButtonPanel(WindowedControl parent) {
+        base(parent);
+        showing = PanelButtons.Ok | PanelButtons.Cancel | PanelButtons.Help;
+        order = ButtonOrder.Default;
+        gap = 6;
+        rule = true;
+        preferred = PanelButtons.Ok;
+        ready = false;
+
+        // **Asked once, here.** `IWidgetSet.Name` is the only thing in this
+        // library that names a platform as a string, and this is its only
+        // caller outside a backend: what differs between the two desktops is a
+        // convention rather than a capability, so there is nothing in the seam
+        // to ask instead.
+        resolved = WidgetSet.Current.Name == "Win32"
+                 ? ButtonOrder.CloseOkCancel : ButtonOrder.CloseCancelOk;
+
+        var line = new Bevel(this);
+        line.Kind = BevelKind.TopLine;
+        divider = line;
+
+        ok     = Make("OK");
+        cancel = Make("Cancel");
+        close  = Make("Close");
+        help   = Make("Help");
+
+        Dock = DockStyle.Bottom;
+        Height = 42;
+
+        ready = true;
+        ApplyShowing();
+        ApplyDefault();
+        Arrange();
+    }
+
+    Button Make(String caption) {
+        var made = new Button(this);
+        made.Text = caption;
+        return made;
+    }
+
+    /// The OK button. Always here; `ShowButtons` decides whether it is visible.
+    public Button OkButton => (Button)ok;
+    public Button CancelButton => (Button)cancel;
+    public Button CloseButton => (Button)close;
+    public Button HelpButton => (Button)help;
+
+    /// The line across the top that separates the strip from the dialog.
+    public Bevel BevelLine => (Bevel)divider;
+
+    /// Which buttons are showing. The default is OK, Cancel and Help, which is
+    /// what a dialog usually wants -- `TButtonPanel` shows Close as well, and a
+    /// strip with both Cancel and Close in it is a strip nobody designed.
+    public PanelButtons ShowButtons {
+        get => showing;
+        set {
+            showing = value;
+            ApplyShowing();
+            ApplyDefault();
+            Arrange();
+        }
+    }
+
+    /// Left to right, and `Default` means whichever the platform prefers.
+    public ButtonOrder Order {
+        get => order;
+        set {
+            order = value;
+            Arrange();
+        }
+    }
+
+    /// Which order `Default` turned out to mean here. What a test asks, and the
+    /// only way to see the decision from outside.
+    public ButtonOrder EffectiveOrder => order == ButtonOrder.Default ? resolved : order;
+
+    /// Pixels between the buttons, and between them and the edges.
+    public int Spacing {
+        get => gap;
+        set {
+            gap = value;
+            Arrange();
+        }
+    }
+
+    /// Whether the line across the top is drawn.
+    public bool ShowBevel {
+        get => rule;
+        set {
+            rule = value;
+            Arrange();
+        }
+    }
+
+    /// Which button Enter presses. `PanelButtons.None` for none, and a button
+    /// that is not showing is never made the default whatever this says.
+    public PanelButtons DefaultButton {
+        get => preferred;
+        set {
+            preferred = value;
+            ApplyDefault();
+        }
+    }
+
+    void ApplyShowing() {
+        OkButton.Visible     = showing.HasFlag(PanelButtons.Ok);
+        CancelButton.Visible = showing.HasFlag(PanelButtons.Cancel);
+        CloseButton.Visible  = showing.HasFlag(PanelButtons.Close);
+        HelpButton.Visible   = showing.HasFlag(PanelButtons.Help);
+    }
+
+    void ApplyDefault() {
+        SetDefaultOn(OkButton,     PanelButtons.Ok);
+        SetDefaultOn(CancelButton, PanelButtons.Cancel);
+        SetDefaultOn(CloseButton,  PanelButtons.Close);
+        SetDefaultOn(HelpButton,   PanelButtons.Help);
+    }
+
+    void SetDefaultOn(Button button, PanelButtons which) {
+        button.IsDefault = which == preferred && showing.HasFlag(which);
+    }
+
+    /// Lays the buttons out: Help against the left edge, the rest packed
+    /// against the right in the chosen order, and the bevel across the top.
+    ///
+    /// **Packed from the right, so the order is read backwards.** The rightmost
+    /// button is the one the eye goes to and the one the order names last, and
+    /// placing right to left is what keeps the gaps even when a button in the
+    /// middle of the list is not showing.
+    ///
+    /// The buttons are placed rather than docked because docking has no notion
+    /// of "against the right, in this order, with a gap": `DockStyle.Right`
+    /// four times would work, and would put them in the order they were built
+    /// and give each the full height.
+    void Arrange() {
+        if (!ready) { return; }
+        var area = ClientBounds;
+        if (area.Width <= 0 || area.Height <= 0) { return; }
+
+        var line = BevelLine;
+        line.Visible = rule;
+        line.SetBounds(0, 0, area.Width, 2);
+
+        int top = rule ? gap : gap / 2;
+        int height = area.Height - top - gap / 2;
+        if (height < 1) { height = 1; }
+
+        if (HelpButton.Visible) {
+            HelpButton.SetBounds(gap, top, WidthOf(HelpButton), height);
+        }
+
+        int right = area.Width - gap;
+        var packed = InOrder();
+        for (nuint i = packed.Length; i > 0u; i -= 1u) {
+            var button = packed[i - 1u];
+            int width = WidthOf(button);
+            button.SetBounds(right - width, top, width, height);
+            right = right - width - gap;
+        }
+    }
+
+    /// The buttons that pack against the right edge, left to right. Help is not
+    /// among them: it has its own corner.
+    Button[] InOrder() {
+        var first = CloseButton;
+        var second = EffectiveOrder == ButtonOrder.CloseOkCancel ? OkButton : CancelButton;
+        var third = EffectiveOrder == ButtonOrder.CloseOkCancel ? CancelButton : OkButton;
+
+        nuint present = 0u;
+        if (first.Visible)  { present += 1u; }
+        if (second.Visible) { present += 1u; }
+        if (third.Visible)  { present += 1u; }
+
+        var packed = new Button[present];
+        nuint at = 0u;
+        if (first.Visible)  { packed[at] = first;  at += 1u; }
+        if (second.Visible) { packed[at] = second; at += 1u; }
+        if (third.Visible)  { packed[at] = third;  at += 1u; }
+        return packed;
+    }
+
+    /// How wide one button should be: what it asks for, never below the 75
+    /// pixels every dialog button on every desktop has been since Windows 3.
+    int WidthOf(Button button) {
+        int wanted = button.PreferredSize.Width;
+        if (wanted < 75) { wanted = 75; }
+        return wanted;
+    }
+
+    /// How tall the strip has to be for the buttons in it.
+    ///
+    /// The width is zero and means nothing: a button strip is docked to the
+    /// bottom and takes whatever width the dialog has, so the only figure a
+    /// caller could want is the height.
+    public override Size PreferredSize {
+        get {
+            int tallest = 23;
+            tallest = Taller(tallest, ok);
+            tallest = Taller(tallest, cancel);
+            tallest = Taller(tallest, close);
+            tallest = Taller(tallest, help);
+            return Size.Of(0, tallest + gap + gap / 2 + (rule ? 2 : 0));
+        }
+    }
+
+    int Taller(int best, Button? button) {
+        if (button == null) { return best; }
+        int wanted = ((Button)button).PreferredSize.Height;
+        return wanted > best ? wanted : best;
+    }
+
+    /// See the note on `RadioGroup.Arrange`: the base constructor resizes, and
+    /// this override runs before this class's own fields exist.
+    protected override void OnResize() {
+        base.OnResize();
+        Arrange();
+    }
+}

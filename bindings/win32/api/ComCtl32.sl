@@ -157,6 +157,39 @@ public const uint IlcColor32 = 0x0020u;
 public const uint IldNormal      = 0x0000u;
 public const uint IldTransparent = 0x0001u;
 
+// =================================================================== button
+//
+// **A picture on an ordinary `BUTTON` is a version 6 feature.** `BS_BITMAP` has
+// been there since Windows 95 and draws the picture *instead of* the caption,
+// which is not what anyone wants; `BCM_SETIMAGELIST` draws both and lays them
+// out, and arrived with the themed common controls. That is one more reason the
+// manifest is not optional.
+
+/// `BCM_FIRST`, the base every one of these messages is an offset from.
+public const uint BcmFirst = 0x1600u;
+
+public const uint BcmSetImageList  = 0x1602u;  // BCM_FIRST + 0x0002
+public const uint BcmGetImageList  = 0x1603u;
+public const uint BcmSetTextMargin = 0x1604u;
+
+/// `BUTTON_IMAGELIST`: the picture a button draws, where it sits, and how much
+/// room is left around it.
+///
+/// The margin is what the spacing between picture and caption is made of --
+/// there is no separate field for it, so a gap on the caption's side of the
+/// picture is a margin on that side.
+public struct ButtonImageList {
+    public HIMAGELIST Images;
+    public Rect       Margin;
+    public uint       Align;
+}
+
+public const uint ButtonImageListAlignLeft   = 0u;
+public const uint ButtonImageListAlignRight  = 1u;
+public const uint ButtonImageListAlignTop    = 2u;
+public const uint ButtonImageListAlignBottom = 3u;
+public const uint ButtonImageListAlignCenter = 4u;
+
 // =================================================================== toolbar
 
 /// `TBBUTTON`: one button in a toolbar.

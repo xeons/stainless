@@ -325,6 +325,10 @@ public extern "C" {
     HDC GetDC(HWND window);
     HDC GetWindowDC(HWND window);
     int ReleaseDC(HWND window, HDC dc);
+    /// Which window a display DC was obtained for, or null for a memory DC.
+    /// The way to tell a `WM_ERASEBKGND` a window was sent about itself from
+    /// one a transparent child forwarded to it.
+    HWND WindowFromDC(HDC dc);
     int FillRect(HDC dc, Rect* rectangle, HBRUSH brush);
     int FrameRect(HDC dc, Rect* rectangle, HBRUSH brush);
     int InvertRect(HDC dc, Rect* rectangle);
@@ -707,6 +711,9 @@ public const uint BsGroupBox        = 0x0007u;
 public const uint BsOwnerDraw       = 0x000Bu;
 public const uint BsLeftText        = 0x0020u;
 public const uint BsMultiline       = 0x2000u;
+/// Draws a check box as a button that stays down, which is what the LCL's
+/// `TToggleBox` and this library's `ToggleButton` are.
+public const uint BsPushLike        = 0x1000u;
 
 /// Edit messages and styles.
 public const uint EmGetSel       = 0x00B0u;

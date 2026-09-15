@@ -326,7 +326,40 @@ public interface IButtonPeer : IControlPeer {
     void SetDefault(bool isDefault);
 }
 
-/// A checkbox or a radio button, which additionally carries a state.
+/// Where a button's picture sits relative to its caption.
+///
+/// Four positions and no more, because four is what both platforms have:
+/// Windows' `BUTTON_IMAGELIST_ALIGN_*` and GTK's `GtkPositionType` are the same
+/// four, and `TButtonLayout` is the same four again. A ninth-of-a-rectangle
+/// alignment like C#'s `ContentAlignment` would be five parts fiction.
+public enum ImageAlignment { Left, Right, Top, Bottom }
+
+/// A push button, which is the one of the three that carries a picture.
+///
+/// **Not on `IButtonPeer`, though a check box would happily draw one.** Windows
+/// gives a `BUTTON` its picture with `BCM_SETIMAGELIST`, which on a check box
+/// replaces the tick rather than sitting beside it, and GTK's
+/// `gtk_button_set_image` does the same to a `GtkCheckButton`'s indicator. So
+/// the capability is declared where both platforms can honour it and nowhere
+/// else, and a check box does not get a method that would quietly ruin it.
+public interface IPushButtonPeer : IButtonPeer {
+    /// The picture, or null for none.
+    void SetImage(IBitmapBackend? picture);
+    void SetImageAlign(ImageAlignment place);
+    /// Pixels between the picture and the caption.
+    void SetImageSpacing(int gap);
+}
+
+/// Which of the three the platform's button class is being asked for.
+///
+/// `Toggle` is a check box that stays down instead of ticking -- `BS_PUSHLIKE`
+/// on Windows, a `GtkToggleButton` on GTK, `TToggleBox` in the LCL. It is a
+/// third value rather than a second boolean beside `radio` because two booleans
+/// have a fourth combination that means nothing.
+public enum CheckKind { Check, Radio, Toggle }
+
+/// A checkbox, a radio button or a toggle button, which additionally carry a
+/// state.
 public interface ICheckPeer : IButtonPeer {
     void SetChecked(bool checked);
     bool GetChecked();
@@ -725,9 +758,10 @@ public interface IWidgetSet {
     /// `"GTK3"`. The only thing anywhere that names a platform as a string.
     String Name { get; }
 
-    IWindowPeer    CreateWindow(IWindowNotify owner, WindowBorder border);
-    IButtonPeer    CreateButton(IControlNotify owner, IContainerPeer parent);
-    ICheckPeer     CreateCheck(IControlNotify owner, IContainerPeer parent, bool radio);
+    IWindowPeer     CreateWindow(IWindowNotify owner, WindowBorder border);
+    IPushButtonPeer CreateButton(IControlNotify owner, IContainerPeer parent);
+    ICheckPeer      CreateCheck(IControlNotify owner, IContainerPeer parent,
+                                CheckKind kind);
     ILabelPeer     CreateLabel(IControlNotify owner, IContainerPeer parent);
     ITextEntryPeer CreateTextEntry(IControlNotify owner, IContainerPeer parent,
                                    bool multiline);
