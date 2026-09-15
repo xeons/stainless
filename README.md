@@ -218,6 +218,7 @@ together.
 | **[Concurrency](docs/concurrency.md)** | Threading as it is, and where it is going. |
 | **[Packages](docs/packages.md)** | `stainless.json`, versions, resolution and the lock file. |
 | **[Building and internals](docs/internals.md)** | Building, testing, and how the compiler works. |
+| **[Coding style](docs/style.md)** | Naming, layout and members, for both languages here. |
 | **[TODO.md](TODO.md)** | What is being worked on next, and the known bugs. |
 
 Beyond the language itself:

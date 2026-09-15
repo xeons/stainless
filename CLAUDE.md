@@ -12,6 +12,14 @@ has the pipeline and a component-by-component table, and
 [docs/spec/](docs/spec/index.md) is the language in ten chapters. Read
 internals before changing the compiler; this file is the operational half.
 
+**[docs/style.md](docs/style.md) is how code here is written** — naming, layout
+and members, for the C# and the Stainless both. Read it before writing either.
+The short version: Allman braces; `_field`, `s_staticField`, `t_threadStatic`;
+`i++` and never `i += 1`; a one-statement body goes braceless on the next line,
+never packed onto one; a zero-argument side-effect-free getter is a property and
+not a method. The existing tree is still being brought to it, so match the
+document rather than the file you are looking at.
+
 ## Commands
 
 ```

@@ -1,0 +1,10 @@
+<Project>
+
+  <!-- The style rules in .editorconfig are checked by the build, not only by an
+       IDE. The C# here already satisfies them, so turning this on costs nothing
+       today and keeps it that way. docs/style.md is the prose version. -->
+  <PropertyGroup>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,520 @@
+<sub>[Stainless](../README.md) &rsaquo; Coding style</sub>
+
+# Coding style
+
+What code in this repository looks like, and why. It covers both languages
+here: the C# the compiler is written in, and the Stainless that everything
+above the compiler is written in. Where they differ, the difference is named
+and a reason is given for it.
+
+The baseline is Microsoft's two pages —
+[identifier names](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/identifier-names)
+and [coding conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions).
+Stainless is a C#-shaped language, so a reader who knows C# should be able to
+read this codebase without learning a second set of habits. Everything below
+either restates one of those pages for emphasis, or departs from it for a
+reason written down beside the rule.
+
+**This document is normative for new code.** The existing tree is being brought
+to it in passes, so a file that disagrees with something here is debt, not a
+counter-example.
+
+---
+
+## 1. Naming
+
+### 1.1 Casing
+
+| Thing | Case | Example |
+|---|---|---|
+| Module, namespace | `PascalCase`, dotted | `Standard.Collections` |
+| Class, struct, enum, variant, union, delegate | `PascalCase` | `WindowedControl`, `ImageFormat` |
+| Interface | `I` + `PascalCase` | `IEnumerable`, `IControlNotify` |
+| Method, property, event, indexer | `PascalCase` | `FindForm`, `Bounds`, `Click` |
+| Public or protected field | `PascalCase` | `public byte R;` |
+| Constant | `PascalCase` | `const double Pi` |
+| Enum member | `PascalCase` | `DockStyle.None` |
+| Local, parameter | `camelCase` | `newParent`, `index` |
+| Private or internal instance field | `_camelCase` | `_owner`, `_backgroundSet` |
+| Private or internal static field | `s_camelCase` | `s_loaded`, `s_started` |
+| Thread-static field | `t_camelCase` | `t_current` |
+| Generic type parameter | `T`, or `T` + `PascalCase` | `T`, `TKey`, `TValue` |
+
+**Constants are `PascalCase`, not `SCREAMING_CASE`.** This is C#'s rule and not
+C's, and the tree already follows it — `Math.Pi`, `Math.Epsilon`,
+`Path.Separator`. A `const` is part of the surface a caller reads, and there is
+no reason for it to shout.
+
+**A `const` that mirrors a foreign one keeps the foreign spelling.** In
+`bindings/`, `GTK_RESPONSE_CANCEL` and `PixelFormat32bppArgb` are named as the
+platform names them, because the value of a binding is that a reader can search
+the vendor's documentation for the identifier in front of them. This is the one
+place `SCREAMING_CASE` is correct, and it stops at the binding's edge: what
+`forms/` exposes on top is named the way everything else here is.
+
+### 1.2 The underscore on fields
+
+A field that is private or internal is written with a leading underscore.
+
+```csharp
+public abstract class Control : IControlNotify
+{
+    WindowedControl? _owner;
+    Rectangle _area;
+    bool _backgroundSet;
+
+    static List<Form> s_open = new List<Form>();
+    static bool s_started = false;
+}
+```
+
+**It is there to answer one question at the point of use.** Reading `_area`
+inside a long method, you know without scrolling that it is state belonging to
+this instance and that nothing outside the class can have written it. Reading
+`area`, you do not — it could equally be a local, a parameter, or something the
+uniform call syntax pulled in from another module. That ambiguity is worse here
+than it is in C#, because [§7.1.1](spec/07-functions-members.md#711-xfy-is-fxy)
+means a bare name has more places it can come from.
+
+**It also removes the need for `this.`** as a disambiguator. A constructor
+parameter and the field it fills can both have the obvious name, and neither
+has to be spelled awkwardly to avoid the other:
+
+```csharp
+Control(Rectangle area)
+{
+    _area = area;
+}
+```
+
+**`s_` and `t_` mark storage that outlives the instance.** A static field is
+shared by every caller on every thread, and a thread-static is the thing that
+looks shared and is not; both are worth seeing at the point of use rather than
+at the declaration. This is the Microsoft naming page's rule, kept for the
+reason it exists.
+
+**Public and protected fields take no underscore.** They are part of the type's
+surface and are cased like any other member — `public byte R;` on `Rgba` stays
+as it is. The underscore is a statement about visibility, so it appears exactly
+where the visibility is private or internal.
+
+### 1.3 Words, not abbreviations
+
+**Spell it out.** `index` rather than `idx`, `parent` rather than `prnt`,
+`count` rather than `cnt`. The exceptions are the ones that have stopped being
+abbreviations — `Id`, `Ok`, `Rgba`, `Utf8`, `Xml`, `Io` — and the loop counter
+`i`, which is a convention and not a name.
+
+**An acronym of two letters is upper-cased; longer than two is `PascalCase`.**
+`IOError`, but `XmlCursor` and `HtmlWriter`. This is C#'s rule and the tree
+already follows it.
+
+**No Hungarian notation**, no type in the name. `String text`, not
+`String strText`. The declaration says what the type is and the compiler
+enforces it.
+
+**Avoid a name that differs from another only by case.** Stainless resolves the
+whole program before it checks any body, so two names a reader can confuse are
+two names a *reviewer* can confuse, and the compiler will not help.
+
+### 1.4 What a name promises
+
+**A method is a verb or a verb phrase.** It does something: `FindForm`,
+`Invalidate`, `WriteLine`, `Adopt`. A method named for a noun is usually a
+property that has not been written as one — see [§2.1](#21-a-property-or-a-method).
+
+**A property is a noun, a noun phrase, or an adjective.** `Bounds`, `Parent`,
+`Capacity`. It names the thing it gives back, because reading it is supposed to
+feel like reading a field.
+
+**A boolean is a question.** `Is`, `Has`, `Can`, `Should`, `Was` — `IsEmpty`,
+`HasFocus`, `CanRead`, `IsInvisible`. A boolean named `Visible` is acceptable
+where the adjective already reads as a state; a boolean named `Check` is not,
+because it does not say which answer means what.
+
+**An event is a verb in the tense it happened in.** `Click`, `Closing`,
+`Closed`, `TextChanged`. The raiser is `On` + the event name, and is
+`protected virtual void` — that pairing is described in
+[forms/src/Control.sl](../forms/src/Control.sl) and is the shape every event in
+this tree has.
+
+**A single word is fine when the word is right.** `Take`, `Skip`, `Map`,
+`Filter`, `Find` are not sloppy — they are the pipeline vocabulary that
+[§7.1.1](spec/07-functions-members.md#711-xfy-is-fxy) exists to serve, and
+`names.Filter(keep).Map(Upper)` reads as well as LINQ does because the words are
+short. What a single word must not be is *vague*: `Update`, `Process`,
+`Handle`, `Do`, `Run` name nothing a caller can predict, and each should say
+what it updates or what it handles.
+
+### 1.5 Two collisions the standard library sets up
+
+`import Standard.Collections` brings roughly twenty short verbs into scope at
+module level — `Take`, `Skip`, `Map`, `Filter`, `Find`, `Any`, `All`,
+`ForEach`. Because a free function is a candidate wherever member lookup fails,
+two mistakes are easy and neither is loud:
+
+- **A method of your own named after one of them** binds to the free function
+  inside a lambda body, and to your method everywhere else. Write `this.` to
+  settle it, or pick a different name.
+- **`Fail` and `Ok` are `Result`'s case constructors** and are in scope
+  everywhere. A method named `Fail` is never called, and the only sign is
+  SL0222, *this expression has no effect*.
+
+**Do not name a member after a case constructor or a collection verb.** The
+compiler will not warn, and the failure looks like a logic bug.
+
+---
+
+## 2. Members
+
+### 2.1 A property or a method
+
+**If it takes no arguments, gives a value back, and has no side effect, it is a
+property.**
+
+```csharp
+public nuint Count => _count;              // yes
+public bool IsEmpty => _count == 0u;       // yes
+public nuint Count() { return _count; }    // no
+```
+
+A property says *this is a fact about the object*; a method says *this does
+something*. Writing a fact as a method costs the caller a pair of parentheses
+that carry no information, and it costs the reader the question of whether the
+call is cheap.
+
+**It stays a method when any of those is untrue:**
+
+- **It does work.** A call that walks a list, touches the filesystem or asks the
+  platform is a method, however simple it looks from outside. `FindForm()`
+  walks up the parent chain, so it is a method; `Parent` is a field read, so it
+  is a property.
+- **It can fail.** Anything returning `Result<T, E>` is a method. A property
+  that hands back a failure reads like a field and is not one.
+- **It gives back something different each call.** `Random.Next()` is a method.
+- **It has a side effect.** `Read()`, `MoveNext()`, `Clear()` are methods even
+  where they return a value, because the object is not the same afterwards.
+
+**`Count` is the property; `Count(predicate)` is the method.** Where both are
+wanted, the no-argument form is the property and the overload that takes work to
+do stays a method. They can coexist.
+
+This rule reshapes a good deal of the existing tree — `Count()`, `IsEmpty()`,
+`Name()`, `CanRead()`, `Capacity()` are all properties written as methods — and
+that conversion is a pass of its own, because it changes the public surface and
+touches the specification, the generated standard-library reference, the samples
+and the test cases together.
+
+### 2.2 Ordering inside a type
+
+Constants, then fields, then constructors, then properties, then methods, then
+nested types. Within each, public before protected before private, and static
+before instance.
+
+**A rule that is worth breaking for cohesion.** A property and the two methods
+only it uses are easier to read together than correctly sorted apart. Where the
+order is broken, the section comment says so — the `// ---- bounds` banners in
+[forms/src/Control.sl](../forms/src/Control.sl) are that, and they are more use
+than a strict sort would have been.
+
+### 2.3 Visibility is written down
+
+**Write the modifier even where it is the default.** `private` on a private
+field, `internal` on an internal one. A reader should not have to remember what
+a missing word means, and the existing tree's bare `WindowedControl? owner;`
+is exactly the declaration the underscore rule is meant to make legible.
+
+The exception is the `partial` halves of the compiler's `Binder`, where the
+established file-local style is already consistent and uniform.
+
+---
+
+## 3. Layout
+
+### 3.1 Braces on their own line
+
+**Allman, in both languages.**
+
+```csharp
+public Form? FindForm()
+{
+    Control? walk = this;
+    while (walk != null)
+    {
+        var here = (Control)walk;
+        if (here is Form form)
+        {
+            return form;
+        }
+
+        walk = here.Parent;
+    }
+
+    return null;
+}
+```
+
+This is the Microsoft convention, and the compiler's C# has always been written
+this way. Stainless was not, and the two halves of one repository disagreeing
+about something this visible is the kind of thing that makes the whole tree feel
+unconsidered. One rule, both languages.
+
+### 3.2 A body of one statement
+
+A single statement under `if`, `else`, `for`, `foreach`, `while` or `do` is
+written **without braces, on the next line, indented**:
+
+```csharp
+if (owner == null)
+    return;
+
+for (nuint i = 0u; i < arguments.Length; i++)
+    total += arguments[i];
+```
+
+**Never on one line.** `if (owner == null) { return; }` packs a branch and its
+consequence into a single line where a reader's eye expects one thing, and it
+is the form this tree has most of. Both of these are wrong:
+
+```csharp
+if (owner == null) { return; }      // no
+if (owner == null) return;          // no
+```
+
+**Braces come back as soon as anything else is true**: two statements, a body
+that wraps over a line, or an `if` that has an `else` at all.
+
+**An `if` with an `else` braces every arm**, however short they are. The
+alternative is a rule about which single-statement arms may go bare, and the
+dangling `else` is exactly the thing such a rule gets wrong — bracing the whole
+chain costs two lines and settles it.
+
+```csharp
+if (found)
+{
+    _cache.Add(key, value);
+    return value;
+}
+else
+{
+    return null;
+}
+```
+
+**A `case` in a `switch` is not affected** — it is a label, and the statements
+under it are indented without braces unless one declares a variable.
+
+### 3.3 One-line members
+
+The same idea on a member: a body of one expression is written with `=>`, not
+as braces packed onto the declaration.
+
+```csharp
+public nuint Count => _count;                            // a property
+public int Area() => _side * _side;                      // a method
+public void Grow() => _side++;                           // void, equally
+void Adopt(WindowedControl parent) => _owner = parent;
+
+public nuint Count() { return _count; }                  // no
+```
+
+`=>` works on a method exactly as it does on a property
+([§7.1](spec/07-functions-members.md#71-functions)): one that returns a value
+returns the expression, and a `void` one evaluates it.
+
+Where the body is more than one expression, or is a statement that is not one —
+an `if`, a loop — the braces go on their own lines as anywhere else.
+
+### 3.4 Stepping by one
+
+**`i++`, never `i += 1` and never `i = i + 1`.**
+
+```csharp
+for (nuint i = 0u; i < arguments.Length; i++)      // yes
+for (nuint i = 0u; i < arguments.Length; i += 1u)  // no
+```
+
+`++` works on every writable place and every numeric type the language has,
+`nuint` and pointers included — [§9.6](spec/09-statements-expressions.md#96-stepping-by-one)
+is the whole rule. `i += 1u` additionally drags the literal's suffix into a line
+that did not need it, and `i += 1` on a `nuint` is a conversion a reader has to
+stop and check.
+
+**`+=` is right when the step is not one.** `i += 2`, `offset += stride`.
+
+**`parallel for` is the exception, and it is the language's.** Its step has to
+bind to an assignment whose right-hand side is an addition, because the loop is
+split into ranges before it runs and the binder reads the stride straight out of
+the syntax. `i++` is a different node and is refused:
+
+```csharp
+parallel for (int i = 0; i < 16; i += 1)    // the only form here
+```
+
+```
+error[SL0371]: a 'parallel for' step must be 'i = i + stride' or 'i += stride'
+```
+
+### 3.5 Whitespace
+
+- **Four spaces**, never tabs.
+- **One statement per line**, one declaration per line.
+- **A blank line between members**, and between logical groups inside a long
+  method. Not two.
+- **No trailing whitespace**, and a single newline at end of file.
+- **A space after a keyword and around a binary operator**; none between a
+  method name and its `(`, and none inside brackets.
+
+**Do not align declarations into columns.**
+
+```csharp
+WindowedControl? _owner;        // yes
+Rectangle _area;
+DockStyle _docking;
+
+WindowedControl? _owner;        // no
+Rectangle        _area;
+DockStyle        _docking;
+```
+
+It looks tidy in the editor and costs a reflowed block every time a type is
+renamed, which puts unrelated lines in a diff and unrelated names in
+`git blame`. The tree has a good deal of this and it is being removed.
+
+### 3.6 Line length
+
+**Stop at 100 columns** for code; the tree's 99th percentile is 86 today, so
+this is headroom rather than a target. **Wrap prose in comments at 80**, which
+is what every `///` block here already does.
+
+A call that does not fit breaks after the opening `(` with its arguments
+indented once, or breaks between chained calls with each `.` at the same
+indent:
+
+```csharp
+names.Filter((n) => n.ByteLength() > 3u)
+     .Map(Upper)
+     .ToArray()
+```
+
+### 3.7 `var`
+
+**Use `var` when the right-hand side already says the type** — a `new`, a cast,
+a literal. Write the type out when the expression does not say it, which is most
+calls:
+
+```csharp
+var here = (Control)walk;                  // the cast says it
+var open = new List<Form>();               // the new says it
+Result<Image, ImageError> loaded = Image.FromFile(path);   // nothing else would
+```
+
+This is the Microsoft convention's position and it is worth keeping, because
+there is no IDE in the loop for most of this tree — the `///` reference is
+generated from the source and a reviewer reads it as text.
+
+---
+
+## 4. Comments
+
+**A `///` block states what a caller has to know before using the
+declaration** — what it does, what it costs, how it fails, and what it does
+*not* do. It is the standard-library reference, generated by `stainless doc`,
+so it is read far more often than the code under it.
+
+**A `//` note beside a line describes that line**, and earns its place by
+saying something the line does not. A comment restating the code is worse than
+none, because it is one more thing to keep true.
+
+**Explain why, and name what was rejected.** This is the house style throughout
+the tree, and it is the reason the code is maintainable at all:
+
+```csharp
+// A `GtkFixed` with `set_has_window(True)`, not an event box and not a drawing
+// area: a `GtkFixed` renders no background, so it does not paint over what the
+// program drew.
+```
+
+**A banner comment divides a long file into sections.** The existing
+`// ====== the colour` and `// ------ bounds` forms are both in use; keep
+whichever the file already uses rather than mixing them.
+
+**Prose uses em dashes, not `--`.** A patch script that matches on `--` will
+fail against text that uses `—`; check which is there before writing the
+pattern.
+
+---
+
+## 5. Files
+
+- **One module per file**, named for what it holds. `stdlib/Collections.sl`
+  declares `module Standard.Collections`.
+- **Every source file carries its licence header** — the GPL-with-runtime-
+  exception block for `stdlib/`, `runtime/` and `forms/`, the
+  `// SPDX-License-Identifier: 0BSD` line for `samples/`. Copy the header from a
+  neighbour rather than writing a new one.
+- **`module` first, then `import`s, then the code.** Imports are not sorted
+  mechanically: `Standard.*` first, then the platform bindings, then the
+  program's own.
+- **A new file under `stdlib/` needs `dotnet build` before anything can import
+  it**, because the standard library is an embedded resource picked up by a
+  wildcard. The same is true of a change to `runtime/*.c`.
+
+---
+
+## 6. Stainless-specific
+
+### 6.1 Failure
+
+**A function that can fail returns `Result<T, E>`**, and the error is an `enum`
+of that module's own — `ImageError`, `IOError`, `ConvertError`. There are no
+exceptions in the language and nothing is signalled by a sentinel return.
+
+**`Optional<T>` is for absence, `Result<T, E>` is for failure.** A lookup that
+found nothing is an `Optional`; a lookup that could not be performed is a
+`Result`.
+
+### 6.2 `where` is not a parameter name
+
+It is read as the start of a generic constraint, and the error lands a long way
+from the cause. The same care is worth taking with any contextual keyword.
+
+### 6.3 Nullability is written down
+
+`WindowedControl?` means it can be null and the compiler will hold you to it.
+A reference that is not marked is one a reader may assume is there — do not mark
+a type nullable to silence a diagnostic you have not understood.
+
+---
+
+## 7. What is enforced
+
+[.editorconfig](../.editorconfig) holds the C# half — brace placement, the
+`_camelCase` and `s_camelCase` field rules, `var` usage, spacing — and
+[Directory.Build.props](../Directory.Build.props) sets
+`EnforceCodeStyleInBuild`, so the build checks them rather than leaving it to
+whichever IDE someone happens to have open. The compiler's C# already satisfies
+every rule there, which is what made turning it on free.
+
+**The Stainless half is not machine-enforced yet.** There is no formatter for
+`.sl` and writing one is its own piece of work; until then this document is the
+rule and review is what applies it. A `stainless format` subcommand is the
+obvious home for it, and [TODO.md](../TODO.md) carries the note.
+
+---
+
+## 8. Bringing the tree to this
+
+The existing code is being converted in passes, largest first, each its own
+commit so that a reformat never travels with a change of behaviour:
+
+1. **Layout** — Allman, one-line bodies, `i++`, column alignment removed.
+2. **Fields** — the `_`, `s_` and `t_` prefixes, and written-out visibility.
+3. **Members** — the zero-argument methods that should be properties, and the
+   vague single-word names. This one changes the public surface, so it moves
+   the specification, the generated reference, the samples and the test cases
+   with it.
+
+**Both suites run before each commit.** They ask different questions, and the
+unit tests hold rules the end-to-end suite cannot see — a new sample has to be
+listed in `SampleTests`, and a documented `SL####` has to be pinned by a case.
