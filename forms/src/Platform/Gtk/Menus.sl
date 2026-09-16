@@ -104,13 +104,22 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// raises for it is not reported as the user choosing the item.
     bool _echoing;
 
-    /// **Through a call, because a lambda captures a member read by value.**
-    /// `if (echoing)` in the handler below would test what the flag said when
-    /// the handler was connected. This is the peer that proved it: a program
-    /// that ticked a menu item from its own click handler recursed until the
-    /// stack ran out, because `gtk_check_menu_item_set_active` emits
-    /// `activate` and the guard was not guarding. Win32 never had the problem
-    /// -- `CheckMenuItem` raises nothing at all.
+    /// **Read as `this.Echoing`, because a lambda captures a bare member read
+    /// by value.** `if (Echoing)` in the handler below tests what the flag said
+    /// when the handler was connected, which is `false` for ever. Naming the
+    /// receiver is what makes it live (§2.15 of the spec).
+    ///
+    /// This is the peer that proved it, twice. A program that ticked a menu
+    /// item from its own click handler recursed until the stack ran out,
+    /// because `gtk_check_menu_item_set_active` emits `activate` and the guard
+    /// was not guarding. Win32 never had the problem -- `CheckMenuItem` raises
+    /// nothing at all.
+    ///
+    /// It was written `bool Echoing()` and called as `Echoing()` the first
+    /// time, since a call captures `this` and so reads the field now. Turning
+    /// it into a property turned the call site into a bare read and brought
+    /// the crash straight back, which is why the receiver is spelled out
+    /// rather than left to the next reader's judgement.
     bool Echoing => _echoing;
 
     public GtkMenuItemPeer(GtkWidget* made, IMenuItemNotify owner)
@@ -120,7 +129,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
 
         ConnectPlain(_item, "activate", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             owner.OnPlatformMenuClicked();
         });

@@ -68,8 +68,14 @@ public sealed partial class Binder
 
                     case TypeDeclSyntax typeDecl:
                         // Templates wait; their members depend on type arguments.
-                        if (typeDecl.TypeParameters.Count == 0)
-                            DeclareTypeMembers(scope, typeDecl, module.Types[typeDecl.Name]);
+                        //
+                        // Looked up rather than indexed, because a name a
+                        // template has already taken leaves nothing here to
+                        // find -- SL0201 has said so by now, and a second
+                        // complaint in the shape of a crash helps nobody.
+                        if (typeDecl.TypeParameters.Count == 0
+                            && module.Types.TryGetValue(typeDecl.Name, out var declared))
+                            DeclareTypeMembers(scope, typeDecl, declared);
                         break;
 
                     case StaticDeclSyntax staticDecl:

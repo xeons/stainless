@@ -65,7 +65,7 @@ int Main()
 
     // Statics are readable from a parallel loop without being captured: they
     // are not locals, so there is nothing to capture.
-    parallel for (int i = 0; i < 100; i = i + 1)
+    for parallel (int i = 0; i < 100; i = i + 1)
         Hits.Add(Base);
     printf("after=%lld\n", Hits.Load());
 

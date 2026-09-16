@@ -44,8 +44,8 @@ int Main()
 
     parallel
     {
-        spawn left = Sum(values, 0, 50);
-        spawn right = Sum(values, 50, 100);
+        left = spawn Sum(values, 0, 50);
+        right = spawn Sum(values, 50, 100);
     }
 
     printf("halves=%d\n", left + right);
@@ -57,7 +57,7 @@ int Main()
     {
         for (int i = 0; i < 8; i = i + 1)
         {
-            spawn squares[i] = Square(i);
+            squares[i] = spawn Square(i);
         }
     }
 
@@ -72,7 +72,7 @@ int Main()
     {
         for (int i = 0; i < 4; i = i + 1)
         {
-            spawn names[i] = Label(i);
+            names[i] = spawn Label(i);
         }
     }
 
@@ -95,12 +95,12 @@ int Main()
 
     printf("accumulated=%lld\n", running.Load());
 
-    // parallel for: the array is captured by address and written through.
+    // for parallel: the array is captured by address and written through.
     var pixels = new int[1000];
     for (int i = 0; i < 1000; i = i + 1)
         pixels[i] = i;
 
-    parallel for (int i = 0; i < 1000; i = i + 1)
+    for parallel (int i = 0; i < 1000; i = i + 1)
     {
         pixels[i] = Shade(pixels[i]);
     }
@@ -112,7 +112,7 @@ int Main()
 
     // An inclusive bound and a stride greater than one.
     var marks = new int[10];
-    parallel for (int i = 0; i <= 8; i = i + 2)
+    for parallel (int i = 0; i <= 8; i = i + 2)
         marks[i] = 1;
 
     int hits = 0;
@@ -121,13 +121,13 @@ int Main()
     printf("hits=%d\n", hits);
 
     // An empty range runs nothing at all.
-    parallel for (int i = 0; i < 0; i = i + 1)
+    for parallel (int i = 0; i < 0; i = i + 1)
         marks[0] = 99;
     printf("guard=%d\n", marks[0]);
 
     // Nested: each chunk of the outer loop runs an inner one of its own.
     var grid = new int[64];
-    parallel for (int row = 0; row < 8; row = row + 1)
+    for parallel (int row = 0; row < 8; row = row + 1)
     {
         for (int column = 0; column < 8; column = column + 1)
         {

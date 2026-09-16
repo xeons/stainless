@@ -515,8 +515,8 @@ void Concurrency()
 
     parallel
     {
-        spawn left = SumOf(values, 0, 50);
-        spawn right = SumOf(values, 50, 100);
+        left = spawn SumOf(values, 0, 50);
+        right = spawn SumOf(values, 50, 100);
     }
 
     Say("parallel", left + right);
@@ -528,19 +528,19 @@ void Concurrency()
     {
         for (int i = 0; i < 8; i++)
         {
-            spawn squares[i] = Squared(values[i]);
+            squares[i] = spawn Squared(values[i]);
         }
     }
     Say("spawn in a loop", (long)(squares[3] + squares[7]));
 
-    // `parallel for` is the same thing said once: the body runs for every
+    // `for parallel` is the same thing said once: the body runs for every
     // index, and nothing it writes may be read by another iteration.
     var doubled = new int[16];
-    parallel for (int i = 0; i < 16; i += 1)
+    for parallel (int i = 0; i < 16; i += 1)
     {
         doubled[i] = values[i] * 2;
     }
-    Say("parallel for", (long)doubled[15]);
+    Say("for parallel", (long)doubled[15]);
 
     // A mutex owns what it guards, so there is no way to read the value
     // without holding the lock.
@@ -565,6 +565,20 @@ void Concurrency()
         spawn pending.Enqueue(2);
     }
     Say("concurrent queue", (long)pending.Count);
+
+    // A thread of its own, for work no closing brace brackets. It takes a
+    // closure, and a closure captures by value -- so there is no frame here
+    // for it to outlive.
+    var ticks = new AtomicLong(0);
+    var worker = new Thread(() => ticks.Add(7));
+    worker.Join();
+    Say("thread", ticks.Load());
+
+    // A future is the same idea with a result. `Get` blocks, which is what
+    // having real threads buys: no `async`, no state machine, and nothing in
+    // any signature changes colour.
+    var later = new Future<long>(() => SumOf(values, 0, 100));
+    Say("future", later.Get());
 }
 
 /// A newline, written as an escape rather than embedded, so the file the tour

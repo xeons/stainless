@@ -246,26 +246,40 @@ It lowers to the value held in a name and a conditional per arm -- `t is P1 ? e1
 ternaries could not, and the arm a test fails falls into the next conditional
 rather than into a copy of the rest.
 
-## 9.2 `parallel`, `spawn` and `parallel for`
+## 9.2 `parallel`, `spawn` and `for parallel`
 
 ```csharp
 int left  = 0;
 int right = 0;
 
 parallel {
-    spawn left  = Sum(values, 0, half);
-    spawn right = Sum(values, half, count);
+    left  = spawn Sum(values, 0, half);
+    right = spawn Sum(values, half, count);
 }                       // every spawned job has finished here
 
 return left + right;
 ```
 
 `parallel` opens a fork-join scope and its closing brace waits for everything
-`spawn` queued inside. There is no `Task` type and no `await`: the brace **is**
+`spawn` queued inside. Nothing here is a handle and there is no `await`: the brace **is**
 the synchronization, so a job writes its result into a local the parent still
 owns. That is sound because the parent cannot leave the block before the join,
 which is also why a job may borrow the frame it was spawned from rather than
 copying everything it needs.
+
+**`spawn` sits in front of the call, not in front of the statement**, because
+the call is the part that forks. The assignment around it is the part that does
+not: the worker performs the store, into a slot the parent allocated and still
+owns, and no assignment expression is ever evaluated. Writing the word at the
+call is also what keeps the destination visible as an ordinary assignment to an
+ordinary local — which it has to be, since the local must be declared before the
+block to outlive it.
+
+That is the whole of where `spawn` may be written. It is not a general operator:
+a spawned call has no value until the join, so `total = spawn Work() + 1` and
+`int local = spawn Work();` are both SL0390. The two shapes are `spawn f(x);`
+and `place = spawn f(x);`, and `place` may be any variable, field or element
+that outlives the block.
 
 A `spawn` may appear anywhere inside the block, including in a loop, and each
 one gets its own copy of the arguments:
@@ -273,15 +287,18 @@ one gets its own copy of the arguments:
 ```csharp
 parallel {
     for (int i = 0; i < 8; i = i + 1) {
-        spawn squares[i] = Square(i);
+        squares[i] = spawn Square(i);
     }
 }
 ```
 
-`parallel for` splits a counted loop across the pool instead:
+`for parallel` splits a counted loop across the pool instead. The word sits on
+the `for` rather than in front of it so that `parallel` means one thing wherever
+it is written — open a fork-join scope — and the loop stays a loop with a
+modifier on it:
 
 ```csharp
-parallel for (nuint i = 0u; i < pixels.Length; i = i + 1u) {
+for parallel (nuint i = 0u; i < pixels.Length; i = i + 1u) {
     pixels[i] = Shade(pixels[i]);
 }
 ```
@@ -296,7 +313,7 @@ Three rules are enforced, each for the same reason:
 |---|---|
 | `return`, `break` or `continue` out of a `parallel` block | it would skip the join and leave jobs running against a dead frame |
 | `spawn f(new Buffer())` | arguments are borrowed, and a temporary dies at the end of the statement, before the job runs |
-| assigning an outside variable in a `parallel for` body | every chunk would race on one slot; write through a captured array, or accumulate into an `AtomicLong` |
+| assigning an outside variable in a `for parallel` body | every chunk would race on one slot; write through a captured array, or accumulate into an `AtomicLong` |
 
 *What* may cross into a job is checked separately, by type, and is the rule in
 [§9.5](#95-what-may-cross-a-thread-boundary): plain data, a `String`, a `threadsafe` class, or an array of plain data.
@@ -420,7 +437,7 @@ loop; `continue` advances the enumerator.
 ## 9.5 What may cross a thread boundary
 
 Checked wherever a value can reach a second thread: a `spawn` argument or
-receiver, a `parallel for` capture, and a `static readonly`.
+receiver, a `for parallel` capture, and a `static readonly`.
 
 | Allowed | Why it is safe |
 |---|---|

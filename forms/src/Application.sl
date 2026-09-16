@@ -34,6 +34,7 @@
 module Forms;
 
 import Standard.Collections;
+import Standard.Threading;
 import Forms.Drawing;
 import Forms.Platform;
 
@@ -62,6 +63,17 @@ public static class Application
 
     static bool s_started = false;
 
+    /// Which thread `Initialize` ran on, and so which one owns every widget.
+    static nuint s_uiThread = 0u;
+
+    /// What another thread has asked the UI thread to run.
+    ///
+    /// A `Mutex` rather than a `ConcurrentQueue` because the drain wants the
+    /// whole queue at once: taking the lot under one lock and running it
+    /// outside means an action that posts another does not deadlock, and does
+    /// not get run in the same turn either.
+    static readonly Mutex<List<Action>> s_posted = new Mutex<List<Action>>(new List<Action>());
+
     /// Chooses the platform and gets it ready.
     ///
     /// **Call it before making any control.** Every control asks the widget set
@@ -78,6 +90,7 @@ public static class Application
         if (s_started)
             return;
         WidgetSet.Current = MakeWidgetSet();
+        s_uiThread = CurrentId();
         s_started = true;
     }
 
@@ -92,6 +105,10 @@ public static class Application
     /// Runs until the last window closes.
     public static void Run()
     {
+        // Anything posted before the loop existed is run first rather than
+        // waiting for the next wake, which may never come in a program that
+        // does its setup on a thread and then shows a window.
+        Drain();
         WidgetSet.Current.RunEventLoop();
     }
 
@@ -99,6 +116,7 @@ public static class Application
     /// own loop. False once the program has been asked to quit.
     public static bool DoEvents()
     {
+        Drain();
         return WidgetSet.Current.PumpEvents();
     }
 
@@ -106,6 +124,96 @@ public static class Application
     public static void Quit()
     {
         WidgetSet.Current.QuitEventLoop();
+    }
+
+    // ------------------------------------------------------- the UI thread
+
+    /// Whether the caller is the thread that owns the widgets.
+    ///
+    /// Every control belongs to the thread that created it -- a Win32 window
+    /// procedure runs on the thread that made the window, and GTK wants its
+    /// main context -- so touching one from anywhere else is a bug whatever it
+    /// appears to do. `Post` is how another thread reaches them instead.
+    public static bool OnUiThread => s_uiThread != 0u && CurrentId() == s_uiThread;
+
+    /// Runs `work` on the UI thread and returns without waiting for it.
+    ///
+    ///     Application.Post(() => _status.Text = "done");
+    ///
+    /// Safe from any thread, and the only thing that is. `work` is a closure,
+    /// so it carries what it captured by value and the controls it names are
+    /// only ever touched on the thread that owns them -- which is the shape the
+    /// sendability rule wants rather than one it tolerates.
+    ///
+    /// **Most programs should not call this.** `Background.Run` is the pair of
+    /// closures you actually want, and this is what it is built on. Reach for
+    /// it directly to report progress from inside a long job.
+    public static void Post(Action work)
+    {
+        Enqueue(work);
+        WidgetSet.Current.Wake();
+    }
+
+    /// Runs `work` on the UI thread and waits for it to finish.
+    ///
+    /// **From the UI thread it runs inline**, because posting and then waiting
+    /// for a loop this call is itself blocking would wait forever. That is the
+    /// classic deadlock in this shape of API, and answering it here is cheaper
+    /// than documenting it.
+    ///
+    /// Prefer `Post` unless the answer is needed before this thread goes on.
+    /// A worker that waits on the UI thread is a worker that has given up the
+    /// thing it went to another thread for.
+    public static void Send(Action work)
+    {
+        if (OnUiThread)
+        {
+            work();
+            return;
+        }
+
+        var done = new ManualResetEvent(false);
+        Post(() =>
+        {
+            work();
+            done.Set();
+        });
+        done.Wait();
+    }
+
+    /// Runs everything posted so far. Called by the backend when `Wake` has
+    /// had its effect, and by `Run` and `DoEvents` so that work posted before
+    /// a loop started is not left sitting.
+    ///
+    /// **The queue is taken whole and run outside the lock.** An action that
+    /// posts another would otherwise deadlock on a lock this call still holds,
+    /// and a queue drained in place could be appended to for as long as the
+    /// actions kept posting -- which would turn one turn of the loop into an
+    /// unbounded one.
+    public static void Drain()
+    {
+        var taken = TakePosted();
+        for (nuint i = 0u; i < taken.Count; i++)
+            taken[i]();
+    }
+
+    static void Enqueue(Action work)
+    {
+        var guard = s_posted.Lock();
+        guard.Value.Add(work);
+    }                                   // ~Guard() unlocks before the wake
+
+    static List<Action> TakePosted()
+    {
+        var taken = new List<Action>();
+        var guard = s_posted.Lock();
+        var pending = guard.Value;
+
+        for (nuint i = 0u; i < pending.Count; i++)
+            taken.Add(pending[i]);
+
+        pending.Clear();
+        return taken;
     }
 
     // -------------------------------------------------------- the register

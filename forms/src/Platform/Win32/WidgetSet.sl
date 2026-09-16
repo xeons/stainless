@@ -29,6 +29,7 @@ module Forms.Platform.Win32;
 
 import Standard.Collections;
 import Forms.Drawing;
+import Forms;
 import Forms.Platform;
 #if WINDOWS
 import Win32;
@@ -72,6 +73,68 @@ void EnsureFormClass()
 
     RegisterClassExW(&windowClass);
     formClassRegistered = true;
+}
+
+// ------------------------------------------------------------ the wake window
+
+/// The window `Wake` posts to, so that the loop turns and the queue is drained.
+///
+/// **A window rather than `PostThreadMessageW`**, which is the obvious answer
+/// and the wrong one. A thread message has no window to be routed to, so any
+/// modal loop Windows runs on this thread -- a message box, a tracking menu, a
+/// drag -- discards it; work posted while a message box was open would simply
+/// be lost. Lazarus's Win32 widget set posts to a window for exactly this
+/// reason, and `lcl/interfaces/win32/` is the reference here as elsewhere.
+///
+/// **Message-only**, parented to `HWND_MESSAGE`, so it is never shown, never
+/// enumerated, never in the task bar and never a candidate for the focus. It
+/// exists to have a message queue and nothing else.
+static readonly String WakeClassName = "StainlessFormsWake";
+
+static HWND s_wake = null;
+static bool wakeClassRegistered = false;
+
+/// Drains the queue, and answers anything else the way a window with no
+/// opinions should.
+long WakeProc(HWND window, uint message, ulong wParam, long lParam)
+{
+    if (message == WmApp)
+    {
+        Application.Drain();
+        return 0;
+    }
+    return DefWindowProcW(window, message, wParam, lParam);
+}
+
+void EnsureWakeWindow()
+{
+    if (s_wake != null)
+        return;
+
+    if (!wakeClassRegistered)
+    {
+        var name = WakeClassName.ToUtf16();
+        WindowClass windowClass;
+        windowClass.Size = (uint)sizeof(WindowClass);
+        windowClass.Style = 0u;
+        windowClass.Procedure = WakeProc;
+        windowClass.ClassExtra = 0;
+        windowClass.WindowExtra = 0;
+        windowClass.Instance = GetModuleHandleW(null);
+        windowClass.Icon = null;
+        windowClass.Cursor = null;
+        windowClass.Background = null;
+        windowClass.MenuName = null;
+        windowClass.ClassName = name.ToPointer();
+        windowClass.SmallIcon = null;
+
+        RegisterClassExW(&windowClass);
+        wakeClassRegistered = true;
+    }
+
+    s_wake = CreateWindowExW(0u, WakeClassName.ToUtf16().ToPointer(), null,
+                             0u, 0, 0, 0, 0,
+                             MessageOnlyParent(), null, GetModuleHandleW(null), null);
 }
 
 /// The window class a `CustomControl` is an instance of, registered on the
@@ -478,6 +541,18 @@ public class Win32WidgetSet : IWidgetSet
                        | IccListViewClasses | IccProgressClass | IccUpDownClass
                        | IccStandardClasses;
         InitCommonControlsEx(&wanted);
+
+        // **Here, and not lazily in `Wake`.** A window belongs to the thread
+        // that created it: one made on a worker has its messages queued to that
+        // worker, where nothing ever dispatches them, so the post is accepted
+        // and silently never arrives. This constructor runs inside
+        // `Application.Initialize`, which is the UI thread by definition -- it
+        // is the one that defines it.
+        //
+        // The self test did not catch this and could not have: it pumps with
+        // `DoEvents`, which drains the queue itself, so the whole wake path was
+        // bypassed. A screenshot caught it.
+        EnsureWakeWindow();
     }
 
     public String Name => "Win32";
@@ -855,6 +930,19 @@ public class Win32WidgetSet : IWidgetSet
     }
 
     public void QuitEventLoop() => PostQuitMessage(0);
+
+    /// Posts to the message-only window, which drains the queue when the
+    /// message is dispatched.
+    ///
+    /// `PostMessageW` is safe from any thread -- it appends to the owning
+    /// thread's queue and returns rather than waiting for it -- which is the
+    /// whole reason this is the Win32 answer. The window is made in the
+    /// constructor, on the UI thread, for the reason recorded there.
+    public void Wake()
+    {
+        if (s_wake != null)
+            PostMessageW(s_wake, WmApp, 0u, 0);
+    }
 
     // ------------------------------------------------------------ dialogs
 

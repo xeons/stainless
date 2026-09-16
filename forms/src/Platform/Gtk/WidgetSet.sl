@@ -38,6 +38,7 @@ module Forms.Platform.Gtk;
 import Standard.Collections;
 import Standard.Text;
 import Forms.Drawing;
+import Forms;
 import Forms.Platform;
 import Standard.Resources;
 #if UNIX
@@ -48,6 +49,16 @@ import Gtk.Api;
 import Gtk.Cairo;
 import Gtk.Signals;
 import Gtk.Events;
+
+/// The idle source `Wake` adds: runs what other threads posted, and removes
+/// itself. `G_SOURCE_REMOVE` is zero, so one wake is one drain -- and a drain
+/// that finds an empty queue is the harmless case, since two wakes can arrive
+/// before either source runs.
+gboolean DrainPosted(gpointer data)
+{
+    Application.Drain();
+    return 0;
+}
 
 public class GtkWidgetSet : IWidgetSet
 {
@@ -595,6 +606,21 @@ public class GtkWidgetSet : IWidgetSet
     }
 
     public void QuitEventLoop() => gtk_main_quit();
+
+    /// Adds a one-shot idle source, which the main loop runs on its own thread.
+    ///
+    /// GTK needs no queue of its own here and no wake window: adding a source
+    /// to the main context *is* the post, and glib makes that safe from any
+    /// thread. What the source does is drain `Application`'s queue, so both
+    /// backends deliver the same work by the same route.
+    ///
+    /// Idle priority rather than default, so that a long run of posted work
+    /// cannot starve redrawing -- which is the thing the posted work almost
+    /// always exists to cause.
+    public void Wake()
+    {
+        g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, DrainPosted, null, null);
+    }
 }
 
 #endif

@@ -194,7 +194,7 @@ public extern "C"
 /// its mind about the layout.
 public gint EventType(GdkEvent* event)
 {
-        return gdk_event_get_event_type(event);
+    return gdk_event_get_event_type(event);
 }
 
 // =================================================================== shapes
@@ -225,6 +225,18 @@ public extern "C"
 {
     void gdk_window_set_cursor(GdkWindow* window, gpointer cursor);
     void gdk_window_get_origin(GdkWindow* window, gint* x, gint* y);
+
+    /// Paints whatever is waiting to be painted, now, rather than when the
+    /// frame clock next ticks. The GDK answer to `UpdateWindow`.
+    ///
+    /// **Deprecated since 3.22 and used anyway**, because nothing replaced it.
+    /// A GTK 3 draw is scheduled on the frame clock, so after a
+    /// `gtk_widget_queue_draw` there is usually nothing *pending* at all --
+    /// `gtk_events_pending` answers zero and a non-blocking pump returns having
+    /// painted nothing. The suggested replacement is to stop wanting a
+    /// synchronous repaint, which is not available to a seam that has one on
+    /// the other side.
+    void gdk_window_process_updates(GdkWindow* window, gboolean children);
 }
 
 // `gtk_widget_get_window` is the way to one of these, and it is a GTK call

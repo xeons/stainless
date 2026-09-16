@@ -183,7 +183,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.1 `switch`](09-statements-expressions.md#91-switch)
   - [9.1.1 Patterns](09-statements-expressions.md#911-patterns)
   - [9.1.2 `switch` as an expression](09-statements-expressions.md#912-switch-as-an-expression)
-- [9.2 `parallel`, `spawn` and `parallel for`](09-statements-expressions.md#92-parallel-spawn-and-parallel-for)
+- [9.2 `parallel`, `spawn` and `for parallel`](09-statements-expressions.md#92-parallel-spawn-and-for-parallel)
 - [9.3 `const` and `static`](09-statements-expressions.md#93-const-and-static)
 - [9.4 `foreach`](09-statements-expressions.md#94-foreach)
 - [9.5 What may cross a thread boundary](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)

@@ -1503,7 +1503,7 @@ public sealed class Parser
 
         StatementSyntax statement = isGetter
             ? new ReturnSyntax(span, expression)
-            : new ExpressionStatementSyntax(span, expression);
+            : AsStatement(span, expression);
 
         return new BlockSyntax(span, [statement]);
     }
@@ -1915,6 +1915,25 @@ public sealed class Parser
             case TokenKind.ForKeyword:
             {
                 Advance();
+
+                // `for parallel (...)` splits a counted loop across the pool.
+                // The word sits here rather than in front of `for` so that
+                // `parallel` means one thing everywhere: open a fork-join scope.
+                if (At(TokenKind.ParallelKeyword))
+                {
+                    Advance();
+                    Expect(TokenKind.OpenParen);
+
+                    var loopInit = ParseSimpleStatement(requireSemicolon: true);
+                    var loopCondition = ParseExpression();
+                    Expect(TokenKind.Semicolon);
+                    var loopStep = ParseExpression();
+                    Expect(TokenKind.CloseParen);
+
+                    return new ParallelForSyntax(
+                        SpanFrom(start), loopInit, loopCondition, loopStep, ParseStatement());
+                }
+
                 Expect(TokenKind.OpenParen);
                 StatementSyntax? initializer = At(TokenKind.Semicolon)
                     ? null
@@ -1931,43 +1950,8 @@ public sealed class Parser
             }
 
             case TokenKind.ParallelKeyword:
-            {
                 Advance();
-
-                // `parallel for (...)` splits a counted loop; `parallel { }` is
-                // a scope that `spawn` queues work on.
-                if (At(TokenKind.ForKeyword))
-                {
-                    Advance();
-                    Expect(TokenKind.OpenParen);
-
-                    var loopInit = ParseSimpleStatement(requireSemicolon: true);
-                    var loopCondition = ParseExpression();
-                    Expect(TokenKind.Semicolon);
-                    var loopStep = ParseExpression();
-                    Expect(TokenKind.CloseParen);
-
-                    return new ParallelForSyntax(
-                        SpanFrom(start), loopInit, loopCondition, loopStep, ParseStatement());
-                }
-
                 return new ParallelSyntax(SpanFrom(start), ParseBlock());
-            }
-
-            case TokenKind.SpawnKeyword:
-            {
-                Advance();
-
-                var spawned = ParseExpression();
-                Expect(TokenKind.Semicolon);
-
-                // `spawn x = f()` parses as an assignment; split it back apart so
-                // the call and the place its result lands stay separate.
-                if (spawned is AssignmentSyntax { Operator: TokenKind.Equals } assignment)
-                    return new SpawnSyntax(SpanFrom(start), assignment.Target, assignment.Value);
-
-                return new SpawnSyntax(SpanFrom(start), null, spawned);
-            }
 
             case TokenKind.ForeachKeyword:
             {
@@ -2367,8 +2351,29 @@ public sealed class Parser
 
         var expression = ParseExpression();
         if (requireSemicolon) Expect(TokenKind.Semicolon);
-        return new ExpressionStatementSyntax(SpanFrom(start), expression);
+        return AsStatement(SpanFrom(start), expression);
     }
+
+    /// <summary>
+    /// An expression standing as a statement, except for the two shapes that
+    /// carry a <c>spawn</c>: <c>spawn f(x);</c> and <c>result = spawn f(x);</c>.
+    /// Those become a <see cref="SpawnSyntax"/>, which holds the call and the
+    /// place its result lands apart from each other — the worker runs the call
+    /// and the store, and the assignment is never an expression anyone
+    /// evaluates. A <c>spawn</c> anywhere else survives as an expression and is
+    /// reported by the binder, where there is a type to talk about.
+    /// </summary>
+    private static StatementSyntax AsStatement(SourceSpan span, ExpressionSyntax expression) =>
+        expression switch
+        {
+            SpawnExpressionSyntax spawn =>
+                new SpawnSyntax(span, null, spawn.Operand),
+
+            AssignmentSyntax { Operator: TokenKind.Equals, Value: SpawnExpressionSyntax spawn } a =>
+                new SpawnSyntax(span, a.Target, spawn.Operand),
+
+            _ => new ExpressionStatementSyntax(span, expression),
+        };
 
     private sealed record LocalDeclHead(TypeSyntax Type, string Name);
 
@@ -2617,6 +2622,16 @@ public sealed class Parser
         {
             Advance();
             return new TrySyntax(SpanFrom(start), ParseUnary());
+        }
+
+        // `spawn` binds like `try`, in front of the call and not in front of the
+        // statement: the fork is at the call, and the assignment around it is
+        // the one part that stays on the parent. Only two statement shapes
+        // accept it, and ParseSimpleStatement is where they are recognised.
+        if (At(TokenKind.SpawnKeyword))
+        {
+            Advance();
+            return new SpawnExpressionSyntax(SpanFrom(start), ParseUnary());
         }
 
         // `++x` and `--x`. The operand is a unary rather than a postfix so that

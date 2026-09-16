@@ -175,9 +175,14 @@ last person to edit it -- the suite is the authority.
   stacked labels and no fall-through. An ordinal switch is one LLVM `switch`, so
   a jump table is LLVM's decision rather than the programmer's; `break` belongs
   to the switch while `continue` passes through it to the enclosing loop
-- `parallel { spawn f(x); }` — a fork-join scope whose closing brace waits, so
-  a job writes its result straight into the parent's local; and `parallel for`,
-  which splits a counted loop across the pool
+- `parallel { place = spawn f(x); }` — a fork-join scope whose closing brace
+  waits, so a job writes its result straight into the parent's local; and
+  `for parallel`, which splits a counted loop across the pool. `spawn` prefixes
+  the call rather than the statement, because the call is the part that forks;
+  `parallel` alone always means the scope
+- `Thread` and `Future<T>` for work no lexical scope brackets — a listener, a
+  background writer, a result returned from the function that started it. Both
+  take a closure, and `Future<T>.Get` blocks, which needs no `async` anywhere
 - `static` as C# means it: fields, methods, properties, static constructors and
   `static class`, on a module or on a type, mutable or `readonly`. Storage is
   initialized before `Main` in an order the compiler computes from the
@@ -187,7 +192,7 @@ last person to edit it -- the suite is the authority.
 - `threadsafe`, a word on a class, struct or interface saying that operations
   on it synchronize themselves. Anything crossing a thread that is not that,
   plain data, a `String` or an array of plain data draws a warning at the
-  `spawn`, the `parallel for` capture, or the static that would share it --
+  `spawn`, the `for parallel` capture, or the static that would share it --
   a warning rather than a refusal, because the word is an assertion no compiler
   can check, and refusing would leave someone who knows better with nothing to
   do but write it untruthfully. `where T : threadsafe` is the strict form, and

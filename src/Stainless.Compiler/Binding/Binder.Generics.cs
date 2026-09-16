@@ -367,13 +367,18 @@ public sealed partial class Binder
             Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = template.ContainingType,
             IsPublic = template.IsPublic,
+            IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static),
             Body = declaration.Body,
             Span = declaration.Span,
             TypeArguments = arguments.ToList(),
             Scope = template.Scope,
         };
 
-        if (template.ContainingType is { } containing)
+        // A static one has no instance, and giving it one anyway is what made
+        // `Helper.Take<T>(...)` unreachable: the symbol came back with a `this`
+        // nobody could supply and with `IsStatic` false, so the only call shape
+        // that fits a static method was refused as needing an object.
+        if (template.ContainingType is { } containing && !symbol.IsStatic)
         {
             // A method receives its instance: classes by reference, structs by pointer.
             TypeSymbol thisType = containing is ClassTypeSymbol reference

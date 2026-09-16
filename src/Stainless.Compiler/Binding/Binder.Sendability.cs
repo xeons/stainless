@@ -45,7 +45,7 @@ public sealed partial class Binder
     /// pragmatic rather than proven: a job borrows the array without retaining
     /// it, which is sound as far as it goes, but nothing yet stops the job from
     /// storing it somewhere and retaining it then. It earns its place because
-    /// data parallelism is the point of `parallel for`, and rejecting it would
+    /// data parallelism is the point of `for parallel`, and rejecting it would
     /// leave the feature with nothing to iterate.
     /// </summary>
     private bool IsSendable(TypeSymbol type)

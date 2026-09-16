@@ -56,7 +56,7 @@ Every section of the specification, with the exclusions listed below.
 | §8.1 `extern "C++"`, `export "C++"`, namespaces | `Interop()`; `native.cpp` |
 | §8.6 `#pragma comment(lib, ...)` | `Platform.sl` |
 | §9 `if`, `for`, `while`, `do`, `switch` over three things, `break`, `continue`, `goto`, labels, the ternary, every compound assignment, `++`/`--`, `?.`, `??`, `??=`, `default(T)`, `nameof`, `checked`, `unchecked`, `const`, `static` | `Statements()` |
-| §9.2 `parallel`, `spawn`, `parallel for`, `threadsafe`, mutexes, atomics | `Concurrency()` |
+| §9.2 `parallel`, `spawn`, `for parallel`, `threadsafe`, mutexes, atomics, `Thread`, `Future<T>` | `Concurrency()` |
 | §9.4 `foreach` over an array, a slice and a type with its own `GetEnumerator` | `Arrays()` |
 | §10 `#if`, `#elif`, `#else`, `#define`, `#region` | `Platform.sl`, `Modules()` |
 

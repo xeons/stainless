@@ -1,0 +1,6 @@
+generic 42
+plain work
+plain then
+echo 11
+echo text
+instance 6

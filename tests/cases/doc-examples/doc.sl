@@ -613,8 +613,8 @@ int Main()
     int hitRight = 0;
     parallel
     {
-        spawn hitLeft  = Search(data, 0, half, stop);
-        spawn hitRight = Search(data, half, 100, stop);
+        hitLeft  = spawn Search(data, 0, half, stop);
+        hitRight = spawn Search(data, half, 100, stop);
     }
     printf("found=%d\n", hitLeft + hitRight + 1);
 
@@ -657,7 +657,7 @@ int Main()
     printf("sections=%d\n", SkipAndStop(counted));
 
     var pixels = new int[16];
-    parallel for (int i = 0; i < 16; i = i + 1)
+    for parallel (int i = 0; i < 16; i = i + 1)
         pixels[i] = i * i;
     printf("pixels=%d\n", pixels[15]);
 

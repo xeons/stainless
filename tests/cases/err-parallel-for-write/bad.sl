@@ -4,7 +4,7 @@ module Bad;
 int Main()
 {
     int total = 0;
-    parallel for (int i = 0; i < 100; i = i + 1)
+    for parallel (int i = 0; i < 100; i = i + 1)
     {
         total = total + i;      // every chunk racing on one variable
     }

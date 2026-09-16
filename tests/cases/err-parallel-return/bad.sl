@@ -8,7 +8,7 @@ int Main()
     int result = 0;
     parallel
     {
-        spawn result = Work();
+        result = spawn Work();
         return result;          // would skip the join
     }
 }

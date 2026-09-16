@@ -76,10 +76,17 @@ public sealed partial class Binder
         // It is tried before the module path, and only when the type really has
         // a static method of that name, so a module and a type of the same name
         // each keep what was already theirs.
+        // A generic one is counted here too. It is a template until its
+        // arguments say what it is, so `FindMethods` does not see it -- and
+        // without this the whole static path was skipped, the type name was
+        // bound as though it were a value, and the error was that the *type*
+        // did not exist. `Helper.Take(() => 5)` said "'Helper' is not defined",
+        // which is true of nothing and sends the reader to the wrong file.
         if (syntax.Callee is MemberAccessSyntax { ThroughPointer: false } onType &&
             ResolveTypePrefix(onType.Target) is { } staticOwner &&
-            staticOwner.FindMethods(onType.Member).ToList() is { Count: > 0 } named2 &&
-            (named2.Any(m => m.IsStatic) || ResolveModulePrefix(onType.Target) is null))
+            (staticOwner.FindMethods(onType.Member).ToList() is { Count: > 0 } named2
+                 && (named2.Any(m => m.IsStatic) || ResolveModulePrefix(onType.Target) is null)
+             || staticOwner.GenericMethods.Any(m => m.Name == onType.Member)))
             return BindStaticCall(syntax, onType, staticOwner, arguments);
 
         // `receiver.Method(args)`, unless the receiver is really a module path.
@@ -634,6 +641,39 @@ public sealed partial class Binder
     {
         var overloads = type.FindMethods(member.Member).ToList();
 
+        // A generic method is a template rather than a method, so it is not
+        // among the overloads and has to be looked for where templates live.
+        //
+        // **When nothing non-generic fits, not only when nothing exists.** One
+        // name may have both -- `Run(Action, Action)` beside
+        // `Run<T>(IProduce<T>, IConsume<T>)` -- and then the arguments are what
+        // decide. Asking only whether the overload list was empty let the
+        // non-generic one answer for every call, so the generic one was
+        // unreachable and the error was about the lambda not fitting `Action`.
+        if (type.GenericMethods.Where(m => m.Name == member.Member).ToList() is { Count: > 0 } templates
+            && !overloads.Any(m => m.IsStatic && AcceptsArguments(m, arguments, syntax.Arguments)))
+        {
+            if (!templates[0].IsPublic && type.ModuleName != _currentModule!.Name)
+            {
+                diagnostics.Error("SL0257", member.Span,
+                    $"'{type.Name}.{member.Member}' is not public");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            var instantiated = InferAndInstantiate(templates, syntax, arguments);
+            if (instantiated is null) return new BoundErrorExpression(syntax.Span);
+
+            if (!instantiated.IsStatic)
+            {
+                diagnostics.Error("SL0576", member.Span,
+                    $"'{type.Name}.{member.Member}' is not static, so it needs an object to be " +
+                    "called on; name one instead of the type");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return BuildCall(syntax, instantiated, receiver: null, arguments);
+        }
+
         // An instance method reached through the type name is the mistake this
         // is worth naming: the call is missing the thing it is about.
         if (overloads.All(m => !m.IsStatic))
@@ -741,6 +781,15 @@ public sealed partial class Binder
         }
 
         var overloads = namedType.FindMethods(member.Member).ToList();
+
+        // The generic sibling of this name is tried whenever nothing here fits,
+        // for the reason spelled out in BindStaticCall: a name may carry both a
+        // generic method and a plain one, and only the arguments say which was
+        // meant.
+        if (overloads.Count > 0 &&
+            !overloads.Any(m => AcceptsArguments(m, arguments, syntax.Arguments)) &&
+            TryBindGenericMethodCall(syntax, member, namedType, receiver, arguments) is { } sibling)
+            return sibling;
 
         if (overloads.Count == 0)
         {

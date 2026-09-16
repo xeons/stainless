@@ -9,7 +9,7 @@ int Main()
     parallel
     {
         // The String dies at the end of this statement, before the job runs.
-        spawn n = Length("a" + "b");
+        n = spawn Length("a" + "b");
     }
     return n;
 }

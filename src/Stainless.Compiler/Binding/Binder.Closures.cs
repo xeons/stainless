@@ -100,6 +100,107 @@ public sealed partial class Binder
     private readonly HashSet<object> _membersWritten = [];
 
     /// <summary>
+    /// The fields each property's getter reads.
+    ///
+    /// <para>
+    /// Capturing <c>Busy</c> is exactly as stale as capturing <c>_busy</c>, but
+    /// the two are different symbols: the capture is recorded against the
+    /// property and the write against the field, so matching one list against
+    /// the other found nothing. A <c>bool Busy => _busy;</c> guard read bare
+    /// inside a handler is therefore frozen at whatever it said when the
+    /// handler was connected, and nothing said so.
+    /// </para>
+    ///
+    /// <para>
+    /// This is not a hypothetical. Every <c>Echoing</c> guard in the GTK backend
+    /// was written as a method and called as one, precisely so that it would be
+    /// live; turning them into properties turned the call sites into bare reads
+    /// and every guard stopped guarding. One of them recursed until the stack
+    /// ran out. The warning that exists to catch this missed all ten, and this
+    /// map is what closes the gap.
+    /// </para>
+    ///
+    /// <para>
+    /// A getter this cannot read through -- one that calls out to C, or reads a
+    /// field of something else -- contributes nothing, so the warning is missed
+    /// rather than invented. That is the right direction to fail in.
+    /// </para>
+    /// </summary>
+    private readonly Dictionary<PropertySymbol, HashSet<FieldSymbol>> _propertyReads = [];
+
+    /// <summary>
+    /// Remembers what a property getter read, once its body is bound.
+    /// </summary>
+    private void NoteGetterReads(FunctionSymbol function, BoundStatement body)
+    {
+        if (function.Accessor is not { } property) return;
+        if (!ReferenceEquals(property.Getter, function)) return;
+
+        var fields = new HashSet<FieldSymbol>();
+        CollectFieldReads(body, fields);
+        if (fields.Count > 0) _propertyReads[property] = fields;
+    }
+
+    private static void CollectFieldReads(BoundStatement? statement, HashSet<FieldSymbol> into)
+    {
+        switch (statement)
+        {
+            case null: return;
+            case BoundBlock block:
+                foreach (var inner in block.Statements) CollectFieldReads(inner, into);
+                break;
+            case BoundReturn returned: CollectFieldReads(returned.Value, into); break;
+            case BoundExpressionStatement expression:
+                CollectFieldReads(expression.Expression, into);
+                break;
+            case BoundLocalDeclaration declaration:
+                CollectFieldReads(declaration.Initializer, into);
+                break;
+            case BoundIf conditional:
+                CollectFieldReads(conditional.Condition, into);
+                CollectFieldReads(conditional.Then, into);
+                CollectFieldReads(conditional.Else, into);
+                break;
+        }
+    }
+
+    private static void CollectFieldReads(BoundExpression? expression, HashSet<FieldSymbol> into)
+    {
+        switch (expression)
+        {
+            case null: return;
+            case BoundFieldAccess field:
+                into.Add(field.Field);
+                CollectFieldReads(field.Receiver, into);
+                break;
+            case BoundCall call:
+                CollectFieldReads(call.Receiver, into);
+                foreach (var argument in call.Arguments) CollectFieldReads(argument, into);
+                break;
+            case BoundBinary binary:
+                CollectFieldReads(binary.Left, into);
+                CollectFieldReads(binary.Right, into);
+                break;
+            case BoundUnary unary: CollectFieldReads(unary.Operand, into); break;
+            case BoundConversion conversion: CollectFieldReads(conversion.Operand, into); break;
+            case BoundDereference dereference: CollectFieldReads(dereference.Operand, into); break;
+            case BoundConditional conditional:
+                CollectFieldReads(conditional.Condition, into);
+                CollectFieldReads(conditional.WhenTrue, into);
+                CollectFieldReads(conditional.WhenFalse, into);
+                break;
+            case BoundIndex index:
+                CollectFieldReads(index.Target, into);
+                CollectFieldReads(index.Index, into);
+                break;
+            case BoundSequence sequence:
+                foreach (var side in sequence.Before) CollectFieldReads(side, into);
+                CollectFieldReads(sequence.Value, into);
+                break;
+        }
+    }
+
+    /// <summary>
     /// Remembers that a member was written, for the check at the end of
     /// binding. Called from every place an assignment is bound.
     ///
@@ -136,11 +237,34 @@ public sealed partial class Binder
     /// file and written in another, and the write may be in a method declared
     /// after the lambda that reads it.
     /// </summary>
+    /// <summary>
+    /// Whether what a capture holds can go on to say something else: the member
+    /// itself was assigned, or -- for a property -- a field its getter reads
+    /// was.
+    /// </summary>
+    private bool IsChanged(object member, out string? through)
+    {
+        through = null;
+        if (_membersWritten.Contains(member)) return true;
+
+        if (member is not PropertySymbol property) return false;
+        if (!_propertyReads.TryGetValue(property, out var fields)) return false;
+
+        // Named, because "the property is assigned elsewhere" would not be true
+        // -- the property may have no setter at all -- and a reader sent to look
+        // for an assignment that is not there stops believing the warning.
+        var written = fields.FirstOrDefault(_membersWritten.Contains);
+        if (written is null) return false;
+
+        through = written.Name;
+        return true;
+    }
+
     private void ReportCapturedMembersThatChange()
     {
         foreach (var (member, name, owner, span) in _memberCaptures)
         {
-            if (!_membersWritten.Contains(member)) continue;
+            if (!IsChanged(member, out string? through)) continue;
 
             // **The fix differs by what `this` is.** A class reference copied
             // into the closure still names the one object, so reading through
@@ -154,10 +278,14 @@ public sealed partial class Binder
                   "whole value and 'this." + name + "' copies too -- pass what the lambda " +
                   "needs as a parameter, or make it a method on the struct";
 
+            string changes = through is null
+                ? $"'{owner.Name}.{name}' is assigned elsewhere"
+                : $"'{owner.Name}.{name}' reads '{through}', which is assigned elsewhere";
+
             diagnostics.Warning("SL0610", span,
-                $"this lambda captures '{name}' by value, and '{owner.Name}.{name}' is " +
-                "assigned elsewhere -- so it will keep reading what it said here, not what " +
-                $"it says when the lambda runs. {advice}");
+                $"this lambda captures '{name}' by value, and {changes} -- so it will keep " +
+                "reading what it said here, not what it says when the lambda runs. " +
+                advice);
         }
     }
 

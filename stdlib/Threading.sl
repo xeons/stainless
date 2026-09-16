@@ -72,6 +72,9 @@ extern "C"
     int  sl_atomic_exchange32(int* cell, int value);
     bool sl_atomic_compare_exchange32(int* cell, int* expected, int desired);
 
+    void  sl_retain(byte* pointer);
+    void  sl_release(byte* pointer);
+
     byte* sl_thread_start(Job body, byte* argument);
     void  sl_thread_join(byte* thread);
     void  sl_thread_detach(byte* thread);
@@ -975,6 +978,53 @@ public class TaskScope
 
 // ------------------------------------------------------------------ threads
 
+/// Work with nothing to pass in and nothing to hand back: what a `Thread` runs.
+///
+/// A closure rather than a delegate, because the point of it is to carry what
+/// it captured -- and capture is by value, so it may outlive the scope that
+/// built it. That is the whole reason a closure is safe here where a pointer to
+/// a local is not.
+public closure void Action();
+
+/// A closure with an address.
+///
+/// The runtime starts a thread from a `Job` and a `byte*`, which is C's shape
+/// and cannot hold a receiver. Boxing the closure in an object gives it one,
+/// and the object's address is the `byte*`. One non-generic base serves both
+/// `Thread` and `Future<T>`, so there is one trampoline rather than one per
+/// instantiation.
+///
+/// **The box owns a reference, and the trampoline drops it.** The starter
+/// retains the box and hands that count to the thread; `RunBoxed` releases it
+/// when the body returns. Nothing else keeps it alive -- which is what makes
+/// `Detach` safe, since the box outlives the `Thread` object rather than
+/// belonging to it.
+class Boxed
+{
+    public virtual void Run() { }
+}
+
+class Running : Boxed
+{
+    Action _body;
+    public Running(Action body) => _body = body;
+    public override void Run() => _body();
+}
+
+void RunBoxed(byte* argument)
+{
+    var boxed = (Boxed)argument;
+    boxed.Run();
+    sl_release(argument);
+}
+
+/// Boxes `work`, hands the box's count to a new thread, and answers the handle.
+byte* StartBoxed(Boxed work)
+{
+    sl_retain((byte*)work);
+    return sl_thread_start(RunBoxed, (byte*)work);
+}
+
 /// One OS thread, started and joinable.
 ///
 /// This is the unstructured option, and it is deliberately second: `parallel`
@@ -1000,9 +1050,28 @@ public class Thread
 {
     byte* _handle;
 
+    /// Starts a thread running `body`, which carries whatever it captured.
+    ///
+    ///     var writer = new Thread(() => Drain(queue));
+    ///
+    /// This is the one to reach for. Capture is by value, so the closure holds
+    /// its own copy of everything it named and there is no frame for it to
+    /// outlive -- which is the hazard the `Job` form below leaves open and
+    /// nothing checks.
+    public Thread(Action body)
+    {
+        _handle = StartBoxed(new Running(body));
+    }
+
     /// Starts a thread running `body(argument)`. Stainless has no static
     /// methods -- a module is the static class -- so the constructor is the
     /// place this goes.
+    ///
+    /// The raw form, for a body that is already a C-shaped callback or an
+    /// argument that is already a block. `argument` is not owned, not counted
+    /// and not checked: keeping it alive for as long as the thread runs is
+    /// yours to arrange, and passing the address of a local and returning is a
+    /// use-after-free. Prefer the closure above.
     public Thread(Job body, byte* argument)
     {
         _handle = sl_thread_start(body, argument);
@@ -1047,6 +1116,138 @@ public void Yield() => sl_thread_yield();
 /// An identifier for the calling thread, unique among those running. It is the
 /// OS's number and means nothing across a restart.
 public nuint CurrentId() => sl_thread_current_id();
+
+// ------------------------------------------------------------------ futures
+
+/// Work that produces a value: what a `Future<T>` runs.
+///
+/// An interface rather than a `closure` because a closure type cannot be
+/// generic, and a lambda targets either -- so `() => Compute(x)` reaches it the
+/// same way it reaches `Action`.
+public interface IProduce<T>
+{
+    T Produce();
+}
+
+/// Work that takes a value: the other half of a handoff, and what a
+/// continuation is.
+///
+/// An interface for the same reason `IProduce<T>` is one -- a closure type
+/// cannot be generic -- and a lambda reaches it the same way.
+public interface IConsume<T>
+{
+    void Consume(T value);
+}
+
+/// A value another thread is still computing.
+///
+///     var answer = new Future<int>(() => Compute(input));
+///     // ... do something else ...
+///     int value = answer.Get();       // blocks until it is there
+///
+/// **This is a future without `async`.** `Get` blocks, which costs nothing here
+/// that it does not cost anywhere else: Stainless has real OS threads and
+/// permits blocking, so waiting needs no coroutine transform and no colour in
+/// any signature. See §12 of docs/concurrency.md for why that is the whole of
+/// the difference between this and a `Task<T>`.
+///
+/// **It is the unstructured half, and it is third.** `parallel` and `spawn`
+/// have no handle to lose and no join to forget, and a `for parallel` loop
+/// beats both for data. A `Future<T>` earns its place only where the result is
+/// wanted somewhere the scope that started it cannot reach -- returned from a
+/// function, stored in a field, waited on by whoever gets there first. That
+/// freedom is the cost: no lexical join means nothing checks what the body
+/// touches.
+///
+/// **One thread per future**, detached, which is the honest price of having no
+/// scope to pool against. Dozens of these are fine and thousands are not; a
+/// program that wants thousands wants a different mechanism than this one.
+///
+/// **The future cannot be destroyed while its thread runs.** The box handed to
+/// the thread holds a reference to it, so the last release happens on the
+/// worker after the value has landed -- which is what lets the destructor free
+/// the condition variable without checking whether anyone is still waiting on
+/// it.
+public threadsafe class Future<T>
+{
+    byte* _mutex;
+    byte* _condition;
+    T _value;
+    bool _filled;
+
+    /// Starts `body` on a thread of its own. It may already have finished when
+    /// this returns.
+    public Future(IProduce<T> body)
+    {
+        _mutex = sl_mutex_new();
+        _condition = sl_condition_new();
+        _filled = false;
+
+        sl_thread_detach(StartBoxed(new Pending<T>(body, this)));
+    }
+
+    /// The value, waiting for it if it is not there yet. Asking twice is
+    /// harmless and the second ask does not block: a future is filled once and
+    /// then read as often as you like, by as many threads as you like.
+    public T Get()
+    {
+        sl_mutex_lock(_mutex);
+        while (!_filled)
+            sl_condition_wait(_condition, _mutex);
+        var value = _value;
+        sl_mutex_unlock(_mutex);
+        return value;
+    }
+
+    /// Whether the value has landed. False here means nothing a moment later,
+    /// so this answers "is there anything else worth doing first" and never
+    /// "is it safe to skip the wait".
+    public bool IsReady
+    {
+        get
+        {
+            sl_mutex_lock(_mutex);
+            var filled = _filled;
+            sl_mutex_unlock(_mutex);
+            return filled;
+        }
+    }
+
+    /// Stores the result and wakes everyone waiting. Called by the worker, and
+    /// visible to this module only: a future is filled by its own body once,
+    /// and filling one from outside would make `Get` a lie.
+    void Fill(T value)
+    {
+        sl_mutex_lock(_mutex);
+        _value = value;
+        _filled = true;
+        sl_mutex_unlock(_mutex);
+
+        // Broadcast outside the lock: a waiter woken while it is still held
+        // would only block again trying to take it.
+        sl_condition_broadcast(_condition);
+    }
+
+    ~Future()
+    {
+        sl_condition_free(_condition);
+        sl_mutex_free(_mutex);
+    }
+}
+
+class Pending<T> : Boxed
+{
+    IProduce<T> _body;
+    Future<T> _target;
+
+    public Pending(IProduce<T> body, Future<T> target)
+    {
+        _body = body;
+        _target = target;
+    }
+
+    public override void Run() => _target.Fill(_body.Produce());
+}
 
 /// Backs off in a loop that is waiting for something another core will do very
 /// soon -- spinning at first, then yielding once it is clear this will take a

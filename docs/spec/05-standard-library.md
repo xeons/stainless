@@ -95,6 +95,27 @@ They are concrete rather than `Atomic<T>` because atomics are not generic — th
 would need a constraint saying `T` is an integer, and Stainless constrains by
 interface only.
 
+`Thread` and `Future<T>` are the unstructured pair, for work with no lexical
+scope to be bracketed by. Both take a closure, which is what makes them safe to
+hand something: capture is by value, so the body owns a copy rather than
+borrowing a frame it might outlive.
+
+```csharp
+var writer = new Thread(() => Drain(queue));    // ~Thread() joins; Detach() lets go
+
+var answer = new Future<int>(() => Compute(input));
+// ... something else worth doing ...
+int value = answer.Get();           // blocks until the value is there
+```
+
+A `Future<T>` is a future with no `async` in sight. `Get` is a condition wait
+rather than a coroutine suspension, so no signature changes colour and there is
+no state machine — which is what blocking being permitted buys. It costs one
+detached thread per future, since there is no scope to pool against, and it is
+the right reach only when the result has to outlive the frame that asked for it;
+a `parallel` block is better wherever one fits, and `for parallel` is better
+than both for data.
+
 `TaskScope` runs `Job` delegates on the pool and joins them:
 
 ```csharp

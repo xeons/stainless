@@ -169,7 +169,7 @@ public class GtkModelPeer : GtkPeer
 
         ConnectPlain((GtkWidget*)selection, "changed", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             var target2 = Owner;
             if (target2 != null)

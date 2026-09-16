@@ -97,7 +97,7 @@ question open. It is not built, and §1.3 is what took its place.
 ### 1.3 What may cross a thread boundary
 
 Checked, as of step 6, at the three places a value can reach another thread: a
-`spawn` argument or receiver, a `parallel for` capture, and a `static readonly`.
+`spawn` argument or receiver, a `for parallel` capture, and a `static readonly`.
 
 | Allowed | Why it is safe |
 |---|---|
@@ -114,7 +114,7 @@ notice.
 The fourth row is the pragmatic one, and worth being honest about: borrowing
 without retaining is sound as far as it goes, but nothing yet stops a job from
 storing the array somewhere and retaining it then. It earns its place because
-data parallelism is the point of `parallel for`, and rejecting it would leave
+data parallelism is the point of `for parallel`, and rejecting it would leave
 the feature with nothing to iterate.
 
 `threadsafe` is an assertion, not a proof — the same bargain Rust's `unsafe
@@ -150,24 +150,43 @@ int left  = 0;
 int right = 0;
 
 parallel {
-    spawn left  = Sum(values, 0, half);
-    spawn right = Sum(values, half, count);
+    left  = spawn Sum(values, 0, half);
+    right = spawn Sum(values, half, count);
 }                                                // the join
 
 return left + right;
 ```
 
-There is no `Task` type at all, and no `Wait()`. The closing brace **is** the
+There is no `Task` type in this construct, and no `Wait()`. The closing brace **is** the
 synchronization, so a job simply writes its result into a local the parent
 still owns — which is sound precisely because the parent cannot leave before
 the join. This is Cilk's model, and it was chosen over `Task<T>` handles for
 three reasons: it needs no new generic type, it needs no per-task completion in
 the runtime, and inside a block that already joins a second `Wait()` is a
 synchronization that mostly is not needed and invites confusion about which one
-actually waits.
+actually waits. A handle does exist for work that has no block to be bracketed
+by — `Future<T>`, §11.0 — and none of those three reasons applies there.
 
 A function that spawns work has the same signature as one that does not, and no
 function anywhere needs an annotation.
+
+**`spawn` goes in front of the call, and this was not always so.** It was first
+written in front of the statement — `spawn left = Sum(...)` — which is Cilk's
+spelling, and which the parser implemented by reading a whole assignment
+expression and splitting it back apart afterwards. That gave the word away: it
+sat in front of an assignment while meaning something about only one half of
+one. The call is the part that forks; the store is the part that does not,
+performed by the worker into a slot the parent allocated and still owns. The
+word now sits where the fork is, and what surrounds it is an ordinary
+assignment to an ordinary local — which it has to be anyway, since the local is
+declared before the block in order to outlive it.
+
+That is also the whole of where the word may be written. A spawned call has no
+value until the join, so `total = spawn Work() + 1` and `int local = spawn
+Work();` are both SL0390; the two shapes are `spawn f(x);` and
+`place = spawn f(x);`. Making it a prefix operator rather than a statement
+keyword is what turns those from a parse failure into a sentence about why
+there is no value there yet.
 
 ### 2.1 Why the scope is lexical
 
@@ -194,14 +213,14 @@ as an error rather than left to be discovered:
   as every other call's are, so nothing crosses a thread as a reference count.
   That only holds if the parent still owns them: `spawn f(new Buffer())` would
   destroy the buffer at the end of the statement, before the job ran.
-- **A `parallel for` body may not assign to a variable declared outside it.**
+- **A `for parallel` body may not assign to a variable declared outside it.**
   Every chunk would be racing on one slot. Writing *through* a captured array is
   the point and is allowed; accumulating into a captured `int` is the classic
   bug, and the error says to use an `AtomicLong` instead.
 
 The costs, measured rather than assumed: **one `malloc` per `spawn`**, for the
 block the worker unpacks. A per-scope arena would remove it, and is the obvious
-change if fine-grained spawning ever matters. `parallel for` does not pay it per
+change if fine-grained spawning ever matters. `for parallel` does not pay it per
 iteration — its captures live on the parent's stack, and the runtime allocates
 once per chunk, not once per index.
 
@@ -391,7 +410,7 @@ and the join counters that make `parallel` blocks work.
 ## 6. Data parallelism
 
 ```csharp
-parallel for (int i = 0; i < pixels.Length; i = i + 1) {
+for parallel (int i = 0; i < pixels.Length; i = i + 1) {
     pixels[i] = Shade(pixels[i]);
 }
 ```
@@ -399,6 +418,14 @@ parallel for (int i = 0; i < pixels.Length; i = i + 1) {
 Implemented, and the first thing here that pays for itself: on a machine with
 cores to spare it runs close to an order of magnitude faster than the same loop
 written serially, with identical results.
+
+**It was `parallel for`, and the word moved onto the `for`.** Sharing a keyword
+with §2's block made one word mean two constructs, and the two hold opposite
+rules about the same thing: a `parallel` block exists so that jobs can assign to
+variables declared outside it, and a `for parallel` body is forbidden from doing
+exactly that. A reader who learned one and met the other learned the wrong
+lesson. `parallel` now means one thing — open a fork-join scope — and the loop
+carries a modifier, which is what it always was.
 
 The loop must be a **counted** one — `i = start`, `i < limit` or `i <= limit`,
 `i = i + stride` with a positive literal stride. A general C-style `for` has no
@@ -462,8 +489,8 @@ Cooperative cancellation, with the `AtomicBool` from §4:
 var stop = new AtomicBool(false);
 
 parallel {
-    spawn foundLeft  = Search(data, 0, half, stop);
-    spawn foundRight = Search(data, half, count, stop);
+    foundLeft  = spawn Search(data, 0, half, stop);
+    foundRight = spawn Search(data, half, count, stop);
 }
 ```
 
@@ -504,7 +531,7 @@ whatever it would have returned, and the flag is the only signal.
 
 ## 10. What exists today
 
-`parallel`, `spawn` and `parallel for` are in the language, over the runtime of
+`parallel`, `spawn` and `for parallel` are in the language, over the runtime of
 §5 and the library of [stdlib/Threading.sl](../stdlib/Threading.sl).
 
 `static readonly` gives it module-level storage, initialized in dependency order
@@ -562,7 +589,7 @@ Order of work, each step useful on its own:
    syntax: generic classes, destructors and delegates were enough.
 3. ~~`spawn` / `parallel` with a lexical join (§2).~~ Done. Results land in the
    parent's locals; the closing brace is the synchronization.
-4. ~~`parallel for` over plain data (§6).~~ Done, and it scales.
+4. ~~`for parallel` over plain data (§6).~~ Done, and it scales.
 5. ~~Statics, tiers 1 and 2, with topological initialization (§3).~~ Done, as
    `static readonly`.
 6. ~~The sendability analysis (§1.3).~~ Done at the three boundaries. It did
@@ -611,7 +638,8 @@ unstructured set, and it is deliberately second rather than absent.
 
 | | |
 |---|---|
-| `Thread` | one OS thread, started with a `Job` and a `byte*`; `Join`, `Detach`, `IsJoinable` |
+| `Thread` | one OS thread, started with an `Action` closure or with a `Job` and a `byte*`; `Join`, `Detach`, `IsJoinable` |
+| `Future<T>` | a value another thread is still computing; `Get` blocks, `IsReady` asks |
 | `Threading.Sleep` / `Yield` / `CurrentId` | the free functions a thread needs about itself |
 | `Monitor<T>` / `MonitorGuard<T>` | a `Mutex<T>` that can be waited on: `Wait`, `WaitFor`, `Pulse`, `PulseAll` |
 | `RwLock<T>` / `ReadGuard<T>` / `WriteGuard<T>` | many readers or one writer, with `TryRead` and `TryWrite` |
@@ -631,6 +659,66 @@ with a destructor that runs on thread exit (Windows **FLS** rather than TLS,
 because `TlsAlloc` has no such callback), `sl_thread_detach`, `sl_thread_sleep`,
 the 32-bit and pointer atomic sets, and `sl_cpu_pause`.
 
+### 11.0 A thread takes a closure, and a future is the missing box
+
+Both of these arrived after the rest of this section, and both are the same
+observation: closures landed (§2.3) and nothing in the unstructured half had
+been revisited since.
+
+**`new Thread(() => Drain(queue))`.** The `Job` + `byte*` constructor is the C
+shape and predates closures, and §11.1 below names that `byte*` as precisely the
+hole nothing checks. A closure closes it by construction rather than by
+analysis: capture is by value, so the closure owns a copy of everything it
+named and there is no frame left for it to outlive. The raw form stays, for a
+body that is already a C callback, and it is now documented as the one that owns
+nothing.
+
+The plumbing is the idiom [bindings/gtk/Events.sl](../bindings/gtk/Events.sl)
+already used: box the closure in an object, hand its address over as the
+`byte*`, retain it on the way in and release it in the trampoline. The box
+owning the count rather than the `Thread` object is what makes `Detach` safe —
+a detached thread's box outlives the handle that started it.
+
+**`Future<T>` is a future with no `async` anywhere near it.** This is the one
+concept the language was actually missing, and it costs nothing precisely
+because blocking is allowed: `Get` is a condition wait, not a coroutine
+suspension, so no signature changes colour and there is no transform (§12). It
+is a box, a mutex and a condition variable.
+
+**A thread each, and not the pool, on purpose.** The obvious objection is that
+there is a worker pool right there and a future should use it. It should not, and
+the reason is what a future's body usually does: it waits. Fetching a URL is a
+socket read, and a pool worker parked in a syscall is a worker doing nothing —
+except that it is also one of `cpus - 1` such workers, fixed at startup and never
+grown ([runtime/thread.c](../runtime/thread.c)). Enough blocking futures and the
+pool is dead, and it takes every `for parallel` in the program down with it,
+because they share those same workers. That is the starvation `TaskCreationOptions.LongRunning`,
+Java's managed blockers and Go's `sysmon` handoff all exist to answer, and §12.3
+already lists the answer as unbuilt.
+
+So the division is by what the work does rather than by taste: **the pool is for
+CPU work that finishes**, which is `parallel`, `spawn` and `for parallel`, and a
+thread of its own is for work that blocks. A future over CPU-bound work would
+indeed be wasteful — and that work has `spawn`, which is better at it.
+
+The mechanical half of the same answer: there is no scope-less submit. The pool's
+only door is `sl_scope_submit`, and a scope is torn down only by `sl_scope_end`,
+which blocks until it drains. A future has no scope and nobody to join it.
+
+It is deliberately *third*, behind `parallel`/`spawn` and behind `for parallel`,
+because it buys one thing and charges for it. What it buys is a result that
+outlives the frame that started it — returned from a function, held in a field,
+waited on by whoever arrives first — which is exactly what a lexical join cannot
+do, since the join happens before the function returns. What it charges is that
+same freedom: no scope means nothing checks what the body touches, and one
+detached thread per future, since there is no scope to pool against. §12.3's
+answer holds here too — dozens, not thousands.
+
+`Task<T>` was rejected for the *structured* form in §2 and that still stands.
+The argument there was that inside a block which already joins, a second
+`Wait()` is a synchronization nobody needs and an invitation to confuse which
+one waits. None of that applies where there is no block.
+
 ### 11.1 The ownership rule is the whole difference
 
 A `spawn`ed job **borrows** the frame that spawned it. That is sound for exactly
@@ -638,11 +726,18 @@ one reason: the closing brace cannot be passed until the job has finished, so
 the frame provably outlives it (§2.1).
 
 A `Thread` has no closing brace. Whatever it touches has to outlive it on its
-own — a `threadsafe` object held in a `static readonly`, or a block the thread
-frees itself. Handing it a pointer to a local and returning is a use-after-free,
-and nothing catches it: the argument is a `byte*`, which is the same hole §1.3
-leaves open for `spawn` and the reason step 6's lifetime analysis is still the
-open item.
+own — a `threadsafe` object held in a `static readonly`, a value the closure
+copied, or a block the thread frees itself. Handing the `Job` form a pointer to
+a local and returning is a use-after-free, and nothing catches it: the argument
+is a `byte*`, which is the same hole §1.3 leaves open for `spawn` and the reason
+step 6's lifetime analysis is still the open item.
+
+The `Action` form of the constructor (§11.0) does not leave it open, which is
+the argument for preferring it. A closure captures by value, so the thing it
+touches is its own copy and there is no frame to outlive. What it cannot do is
+make a shared *object* safe — a captured reference is still a reference, and
+whether two threads may hold one is §1.3's question, unchanged and unchecked
+here.
 
 **The destructor joins.** A `Thread` dropped unjoined blocks where it is
 dropped, which is C++'s `jthread` and the safe default — the alternative is a

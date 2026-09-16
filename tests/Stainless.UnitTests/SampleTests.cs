@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Source;
 using Xunit;
 
 namespace Stainless.UnitTests;
@@ -53,7 +54,23 @@ public class SampleTests
         /// <summary>Unix-only, for the same reason: the GTK bindings are `#if UNIX`.</summary>
         public bool UnixOnly { get; init; }
 
-        /// <summary>Written against the Forms library, so it needs those sources too.</summary>
+        /// <summary>
+        /// Written against the Forms library, so it needs those sources too --
+        /// and the platform bindings the backend for <i>this</i> machine is
+        /// written against.
+        ///
+        /// <para>
+        /// <b>Not platform-specific, and it used to be marked as though it
+        /// were.</b> A Forms program is the same source on both, so every one
+        /// of these carried <c>WindowsOnly</c> only because it needed the Win32
+        /// bindings to bind. The cost of saying it that way was that on Linux
+        /// the sample was skipped entirely, and on Windows the GTK half of
+        /// <c>forms/src</c> is <c>#if UNIX</c> and so never parsed -- which
+        /// left <c>forms/src/Platform/Gtk/</c> bound by nothing, on either
+        /// platform. A mechanical rewrite then broke it in four places and
+        /// three suites stayed green.
+        /// </para>
+        /// </summary>
         public bool NeedsForms { get; init; }
     }
 
@@ -111,10 +128,11 @@ public class SampleTests
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
         new("win32/resources", ["samples/win32/resources.sl"]) { WindowsOnly = true },
 
-        new("forms/demo", ["samples/forms/demo.sl"]) { WindowsOnly = true, NeedsForms = true },
-        new("forms/common", ["samples/forms/common.sl"]) { WindowsOnly = true, NeedsForms = true },
-        new("forms/drawn", ["samples/forms/drawn.sl"]) { WindowsOnly = true, NeedsForms = true },
-        new("forms/buttons", ["samples/forms/buttons.sl"]) { WindowsOnly = true, NeedsForms = true },
+        new("forms/background", ["samples/forms/background.sl"]) { NeedsForms = true },
+        new("forms/demo", ["samples/forms/demo.sl"]) { NeedsForms = true },
+        new("forms/common", ["samples/forms/common.sl"]) { NeedsForms = true },
+        new("forms/drawn", ["samples/forms/drawn.sl"]) { NeedsForms = true },
+        new("forms/buttons", ["samples/forms/buttons.sl"]) { NeedsForms = true },
 
         new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
         new("gtk/control", ["samples/gtk/control.sl"]) { UnixOnly = true },
@@ -160,14 +178,43 @@ public class SampleTests
         var paths = sample.Paths.Select(p => Path.Combine(Repository.Root, p)).ToList();
         if (sample.WindowsOnly) paths.AddRange(Win32Bindings());
         if (sample.UnixOnly) paths.AddRange(GtkBindings());
-        if (sample.NeedsForms) paths.AddRange(FormsSources());
+
+        // A Forms program needs the backend for the machine it is being bound
+        // on, because that is the half of `forms/src` the preprocessor will
+        // keep. Asking for the other one's bindings would bind nothing.
+        if (sample.NeedsForms)
+        {
+            paths.AddRange(FormsSources());
+            paths.AddRange(OperatingSystem.IsWindows() ? Win32Bindings() : GtkBindings());
+        }
 
         Front.BindFiles(paths, out var diagnostics, sample.Shared);
 
+        // The standard library's own diagnostics are not what any of these
+        // tests is asking about and would show up in all of them at once, so
+        // only the code a sample actually drags in is read.
+        //
+        // **`forms` is in this list and was not**, which cost more than the
+        // omission looks like: a Forms sample binds the whole of `forms/src`,
+        // so an error in the library was bound and then discarded on the way to
+        // the assertion. The GTK backend's `ClientBounds` was `override` against
+        // a base member that no longer existed, and this test bound it, saw the
+        // error, and threw it away.
         var complaints = diagnostics.Items
             .Where(d => d.Span.File is null ||
                         d.Span.File.Path.Contains("samples", StringComparison.Ordinal) ||
-                        d.Span.File.Path.Contains("bindings", StringComparison.Ordinal))
+                        d.Span.File.Path.Contains("bindings", StringComparison.Ordinal) ||
+                        // A library the sample drags in, so its *errors* are the
+                        // sample's problem -- but not its warnings. `forms/`
+                        // holds two statics the sendability rule advises
+                        // guarding and that only the UI thread ever touches, and
+                        // §3 of concurrency.md is explicit that wrapping those
+                        // in a `Mutex` they do not need is the wrong answer:
+                        // the wrapper would say nothing, because it is what you
+                        // write to make the compiler quiet. Declining advice is
+                        // allowed; being broken is not.
+                        (d.Span.File.Path.Contains("forms", StringComparison.Ordinal)
+                         && d.Severity == Severity.Error))
             .Select(d => $"{d.Code} {d.Message}")
             .ToList();
 

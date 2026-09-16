@@ -212,9 +212,9 @@ EventHandler PaintAdapter(Painter body)
     {
             // GTK 3 hands over a context that is already clipped and
             // translated, and owns it.
-            var canvas = new Canvas((cairo_t*)carried);
-            body(canvas, gtk_widget_get_allocated_width(sender),
-                         gtk_widget_get_allocated_height(sender));
+        var canvas = new Canvas((cairo_t*)carried);
+        body(canvas, gtk_widget_get_allocated_width(sender),
+                     gtk_widget_get_allocated_height(sender));
 
         // True: this widget has painted itself and nothing else should.
         return true;
@@ -233,7 +233,7 @@ public class DrawingArea : Widget
     /// answer true stops the rest.
     public void OnPaint(Painter painter)
     {
-            ConnectEvent(handle, "draw", PaintAdapter(painter));
+        ConnectEvent(handle, "draw", PaintAdapter(painter));
     }
 
     /// Asks to receive mouse and key events.
@@ -246,7 +246,7 @@ public class DrawingArea : Widget
     {
         gtk_widget_add_events(handle,
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-            GDK_POINTER_MOTION_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
+        GDK_POINTER_MOTION_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
         gtk_widget_set_can_focus(handle, 1);
     }
 }
@@ -307,7 +307,7 @@ EventHandler PointerAdapter(PointerHandler body)
         at.Alt     = (state & GDK_MOD1_MASK) != 0u;
 
         guint button = 0u;
-            gdk_event_get_button(event, &button);
+        gdk_event_get_button(event, &button);
         at.Button = (int)button;
 
         return body(at);
@@ -321,7 +321,7 @@ EventHandler KeyAdapter(KeyHandler body)
         GdkEvent* event = (GdkEvent*)carried;
 
         guint code = 0u;
-            gdk_event_get_keyval(event, &code);
+        gdk_event_get_keyval(event, &code);
 
         guint state = 0u;
         gdk_event_get_state(event, &state);

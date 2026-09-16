@@ -915,6 +915,18 @@ public interface IWidgetSet
     /// Makes `RunEventLoop` return.
     void QuitEventLoop();
 
+    /// Arranges for the UI thread to call `Application.Drain` soon.
+    ///
+    /// **Called from any thread**, and the only member of this interface of
+    /// which that is true. Everything else here touches a widget and so belongs
+    /// to the one thread that owns them; this exists precisely so that work on
+    /// another thread has a way to ask for a turn on that one.
+    ///
+    /// The queue itself is not here. It is portable -- a list and a lock -- so
+    /// it lives in `Application`, and all a backend owes is a way to make its
+    /// loop turn.
+    void Wake();
+
     // ---------------------------------------------------------- the common
 
     /// A message box, which every platform has and nobody wants to build.

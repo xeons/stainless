@@ -278,17 +278,20 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
     /// there. Nothing in the seam says which a window's bounds mean; the
     /// platform does, and a program assuming the Windows answer is assuming
     /// rather than reading.
-    public override FRect ClientBounds()
+    public override FRect ClientBounds
     {
-        int spare = 0;
-        if (_bar != null)
+        get
         {
-            GtkRequisition minimum;
-            GtkRequisition natural;
-            gtk_widget_get_preferred_size(_bar, &minimum, &natural);
-            spare = natural.Height;
+            int spare = 0;
+            if (_bar != null)
+            {
+                GtkRequisition minimum;
+                GtkRequisition natural;
+                gtk_widget_get_preferred_size(_bar, &minimum, &natural);
+                spare = natural.Height;
+            }
+            return Area(0, 0, bounds.Width, bounds.Height - spare);
         }
-        return Area(0, 0, bounds.Width, bounds.Height - spare);
     }
 
     public override void SetVisible(bool visible)
@@ -582,7 +585,7 @@ public class GtkCheckPeer : GtkPeer, ICheckPeer
 
         ConnectPlain(widget, "toggled", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             var target2 = Owner;
             if (target2 == null)
@@ -709,7 +712,7 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
             // one place in this backend where a signal is not on `inner`.
             ConnectPlain((GtkWidget*)_buffer, "changed", () =>
             {
-                if (Echoing)
+                if (this.Echoing)
                     return;
                 var target2 = Owner;
                 if (target2 != null)
@@ -721,7 +724,7 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
             _buffer = null;
             ConnectPlain(widget, "changed", () =>
             {
-                if (Echoing)
+                if (this.Echoing)
                     return;
                 var target2 = Owner;
                 if (target2 != null)
@@ -859,7 +862,7 @@ public class GtkComboPeer : GtkPeer, IComboPeer
 
         ConnectPlain(widget, "changed", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             var target2 = Owner;
             if (target2 != null)
@@ -928,7 +931,7 @@ public class GtkScrollBarPeer : GtkPeer, IScrollBarPeer
 
         ConnectPlain(widget, "value-changed", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             var target2 = Owner;
             if (target2 != null)
@@ -1037,7 +1040,7 @@ public class GtkSpinPeer : GtkPeer, ISpinPeer
 
         ConnectPlain(widget, "value-changed", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             var target2 = Owner;
             if (target2 != null)
@@ -1167,7 +1170,7 @@ public class GtkTrackBarPeer : GtkPeer, ITrackBarPeer
 
         ConnectPlain(widget, "value-changed", () =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return;
             var target2 = Owner;
             if (target2 != null)
@@ -1282,7 +1285,7 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         // the same thing.
         ConnectEvent(widget, "notify::page", (sender, carried) =>
         {
-            if (Echoing)
+            if (this.Echoing)
                 return false;
             var target2 = Owner;
             if (target2 != null)
@@ -1394,7 +1397,7 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         get
         {
             if (_pages.Count == 0u)
-                return ClientBounds();
+                return ClientBounds;
 
             int bookWidth = gtk_widget_get_allocated_width(widget);
             int bookHeight = gtk_widget_get_allocated_height(widget);

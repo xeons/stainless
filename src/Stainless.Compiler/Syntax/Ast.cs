@@ -760,7 +760,7 @@ public sealed record ForEachSyntax(
 public sealed record ParallelSyntax(SourceSpan Span, BlockSyntax Body) : StatementSyntax(Span);
 
 /// <summary>
-/// <c>parallel for (int i = 0; i &lt; n; i = i + 1) { ... }</c> — the loop's
+/// <c>for parallel (int i = 0; i &lt; n; i = i + 1) { ... }</c> — the loop's
 /// iterations split into chunks across the pool. It opens and joins its own
 /// scope, so it needs no enclosing <c>parallel</c>.
 /// </summary>
@@ -772,9 +772,10 @@ public sealed record ParallelForSyntax(
     StatementSyntax Body) : StatementSyntax(Span);
 
 /// <summary>
-/// <c>spawn f(x);</c> or <c>spawn result = f(x);</c> — queues a call on the
+/// <c>spawn f(x);</c> or <c>result = spawn f(x);</c> — queues a call on the
 /// enclosing <c>parallel</c> scope. The assignment happens on the worker, into
-/// storage the parent still owns.
+/// storage the parent still owns, which is why <c>Target</c> is held apart from
+/// the call rather than left as an assignment the worker would have to run.
 /// </summary>
 public sealed record SpawnSyntax(
     SourceSpan Span,
@@ -962,6 +963,16 @@ public sealed record TupleSyntax(
 /// enclosing function carrying the failure on.
 /// </summary>
 public sealed record TrySyntax(SourceSpan Span, ExpressionSyntax Operand)
+    : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>spawn f(x)</c> in expression position. It is only ever a statement —
+/// <c>spawn f(x);</c> or <c>result = spawn f(x);</c> — and the parser folds
+/// those two shapes into a <see cref="SpawnSyntax"/>. This node exists so that
+/// a <c>spawn</c> written anywhere else parses and is then reported against,
+/// rather than failing as a syntax error some distance from the word.
+/// </summary>
+public sealed record SpawnExpressionSyntax(SourceSpan Span, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);
 
 public sealed record ThisSyntax(SourceSpan Span) : ExpressionSyntax(Span);

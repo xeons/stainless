@@ -219,6 +219,38 @@ capture taken too early catches half of them.
 
 ## Decisions worth knowing about
 
+**Slow work goes on a thread, and the answer comes back through the loop.**
+`Background.Run` takes two closures — one that runs off the UI thread, one that
+runs on it with what the first returned — and `samples/forms/background.sl` is
+the whole pattern in one window:
+
+```csharp
+var city = _city.Text;                      // read on the UI thread
+Background.Run(
+    () => FetchWeather(city),               // off it
+    weather => _forecast.Text = weather);   // back on it
+```
+
+Underneath is `Application.Post`, which puts a closure on a queue and asks the
+backend to turn the loop. Most programs should never write it; reach for it
+directly to report progress from inside a long job. `Application.Send` is the
+same thing waited for, and it runs inline when it is already on the UI thread,
+because posting and then blocking the loop you are waiting for is the classic
+deadlock in this shape of API.
+
+**`Post` is on `Application`, not on `Control`.** WinForms puts `BeginInvoke` on
+every control because WinForms genuinely supports several UI threads, each with
+its own pump, so the control says which one to reach. There is one here —
+`WidgetSet.Current` is a single static and so is the register of open windows —
+so a control receiver would be routing theatre, forwarding to the same queue
+every time. What it looks like instead is `Background.Run`, which mentions
+neither.
+
+**This is what a UI program wants instead of `async`.** The work blocks, on a
+thread that is allowed to, and the answer arrives through the message loop the
+program already has. Nothing changes colour and there is no state machine, which
+is what real threads buy — [docs/concurrency.md §12](../docs/concurrency.md).
+
 **A `Graphics` carries no state.** `TCanvas` has a current `Pen`, `Brush` and
 `Font`, so any routine that draws must save and restore three things or corrupt
 its caller — every LCL painting bug of the shape "the colour was wrong the

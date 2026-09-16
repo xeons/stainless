@@ -353,17 +353,17 @@ stop and check.
 
 **`+=` is right when the step is not one.** `i += 2`, `offset += stride`.
 
-**`parallel for` is the exception, and it is the language's.** Its step has to
+**`for parallel` is the exception, and it is the language's.** Its step has to
 bind to an assignment whose right-hand side is an addition, because the loop is
 split into ranges before it runs and the binder reads the stride straight out of
 the syntax. `i++` is a different node and is refused:
 
 ```csharp
-parallel for (int i = 0; i < 16; i += 1)    // the only form here
+for parallel (int i = 0; i < 16; i += 1)    // the only form here
 ```
 
 ```
-error[SL0371]: a 'parallel for' step must be 'i = i + stride' or 'i += stride'
+error[SL0371]: a 'for parallel' step must be 'i = i + stride' or 'i += stride'
 ```
 
 ### 3.5 Whitespace

@@ -86,6 +86,7 @@ public sealed partial class Binder
         LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
         InterpolatedStringSyntax interpolated => BindInterpolatedString(interpolated),
         TrySyntax attempt => BindTry(attempt),
+        SpawnExpressionSyntax spawn => BindMisplacedSpawn(spawn),
         ArrayLiteralSyntax array => BindArrayLiteral(array),
         CastSyntax cast => BindCast(cast),
         SizeofSyntax sizeofExpression => BindSizeof(sizeofExpression),
@@ -236,6 +237,23 @@ public sealed partial class Binder
     /// struct exactly as a written one does. Nothing about it is a special
     /// case downstream.
     /// </summary>
+    /// <summary>
+    /// A <c>spawn</c> that is not a statement of its own. The parser folds the
+    /// two shapes that are — <c>spawn f(x);</c> and <c>result = spawn f(x);</c>
+    /// — into a <see cref="SpawnSyntax"/>, so anything reaching here is a
+    /// <c>spawn</c> whose value someone expected to be able to use, and there
+    /// is no value: the call has not run yet, and will not have until the join.
+    /// </summary>
+    private BoundExpression BindMisplacedSpawn(SpawnExpressionSyntax syntax)
+    {
+        diagnostics.Error("SL0390", syntax.Span,
+            "'spawn' has no value to give this expression -- the call has not run yet, and " +
+            "will not have until the 'parallel' block closes. Write it as a statement of its " +
+            "own, 'spawn f(x);', or store it in something that outlives the block, " +
+            "'result = spawn f(x);'");
+        return new BoundErrorExpression(syntax.Span);
+    }
+
     private BoundExpression BindTry(TrySyntax syntax)
     {
         var operand = BindExpression(syntax.Operand);

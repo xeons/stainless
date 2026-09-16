@@ -87,7 +87,7 @@ internal sealed class StaticReferenceWalker
 }
 
 /// <summary>
-/// Finds what a <c>parallel for</c> body reaches outside itself.
+/// Finds what a <c>for parallel</c> body reaches outside itself.
 ///
 /// Anything declared within the body belongs to one iteration and is ignored.
 /// Everything else is captured by address, so the chunks share the parent's

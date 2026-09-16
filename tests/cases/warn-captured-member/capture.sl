@@ -137,6 +137,42 @@ public class Correct
     }
 }
 
+/// **The same guard as `Correct`, spelled as a property.** `Busy` here is a
+/// bare member read, so the lambda holds the value `_busy` had when the handler
+/// was built -- `false`, for ever -- and the guard never guards.
+///
+/// The capture is recorded against the property and the write against the
+/// field, which is why this went unwarned for a while: the two are different
+/// symbols and matching one list against the other found nothing. Every
+/// `Echoing` guard in the GTK backend was this shape, having been converted
+/// from the method form `Correct` still uses, and one of them recursed until
+/// the stack ran out.
+public class Stale
+{
+    bool _busy;
+    public Act Body;
+
+    bool Busy => _busy;
+
+    public Stale()
+    {
+        _busy = false;
+        Body = () =>
+        {
+            if (Busy)                   // SL0610
+                return;
+            Console.WriteLine("stale ran");
+        };
+    }
+
+    public void Run()
+    {
+        _busy = true;
+        Body();
+        _busy = false;
+    }
+}
+
 /// **A struct has no live spelling at all**, and the warning says so rather
 /// than naming a fix that is not one. `this` in a struct method is the struct,
 /// so capturing it copies the value; on a class it is a counted reference, and
@@ -167,6 +203,9 @@ public void Main()
 
     var correct = new Correct();
     correct.Run();
+
+    // Prints, because the guard is a copy: `Correct` above prints nothing.
+    new Stale().Run();
 
     Tally tally;
     tally.Count = 1;

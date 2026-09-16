@@ -101,6 +101,10 @@ public sealed partial class Binder
         var body = BindBlock(function.Body);
         PopScope();
 
+        // What a getter reads, so that capturing the property can be tested
+        // against what is written the way capturing a field already is.
+        NoteGetterReads(function, body);
+
         _constructorChain = null;
 
         // A jump with nowhere to land, and a label nothing lands on. The first
@@ -1841,7 +1845,7 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// <c>parallel for</c>. The iteration space is computed once and split into
+    /// <c>for parallel</c>. The iteration space is computed once and split into
     /// chunks, so the loop has to be a counted one: <c>i = start</c>,
     /// <c>i &lt; limit</c>, <c>i = i + stride</c>. A general C-style <c>for</c>
     /// has no trip count to divide.
@@ -1874,8 +1878,8 @@ public sealed partial class Binder
             declaration.Local.Type is not PrimitiveTypeSymbol { IsInteger: true })
         {
             diagnostics.Error("SL0369", syntax.Initializer.Span,
-                "a 'parallel for' must start by declaring an integer loop variable, " +
-                "as in 'parallel for (int i = 0; ...)'");
+                "a 'for parallel' must start by declaring an integer loop variable, " +
+                "as in 'for parallel (int i = 0; ...)'");
             return new BoundBlock(syntax.Span, []);
         }
 
@@ -1889,7 +1893,7 @@ public sealed partial class Binder
             Underlying(test.Left) is not BoundLocalAccess counted || counted.Local != variable)
         {
             diagnostics.Error("SL0370", syntax.Condition.Span,
-                $"a 'parallel for' condition must be '{variable.Name} < limit' or " +
+                $"a 'for parallel' condition must be '{variable.Name} < limit' or " +
                 $"'{variable.Name} <= limit'; the loop is split before it runs, so its " +
                 "trip count has to be known up front");
             return new BoundBlock(syntax.Span, []);
@@ -1905,7 +1909,7 @@ public sealed partial class Binder
             Underlying(increment.Left) is not BoundLocalAccess { } from || from.Local != variable)
         {
             diagnostics.Error("SL0371", syntax.Step.Span,
-                $"a 'parallel for' step must be '{variable.Name} = {variable.Name} + stride' " +
+                $"a 'for parallel' step must be '{variable.Name} = {variable.Name} + stride' " +
                 $"or '{variable.Name} += stride'");
             return new BoundBlock(syntax.Span, []);
         }
@@ -1915,7 +1919,7 @@ public sealed partial class Binder
         if (Underlying(increment.Right) is not BoundLiteral { Value: ulong raw } || raw == 0)
         {
             diagnostics.Error("SL0372", syntax.Step.Span,
-                "the stride of a 'parallel for' must be a positive integer literal, " +
+                "the stride of a 'for parallel' must be a positive integer literal, " +
                 "because the iteration space is divided before the loop runs");
             return new BoundBlock(syntax.Span, []);
         }
@@ -1942,7 +1946,7 @@ public sealed partial class Binder
         foreach (var (symbol, span, name) in walker.Assignments)
         {
             diagnostics.Error("SL0373", span,
-                $"'{name}' is declared outside this 'parallel for', so assigning to it " +
+                $"'{name}' is declared outside this 'for parallel', so assigning to it " +
                 "races between chunks; accumulate into an AtomicLong, or into a " +
                 "distinct element per iteration");
         }

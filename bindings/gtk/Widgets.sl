@@ -120,7 +120,7 @@ public class Widget
         g_object_ref_sink(raw);
     }
 
-    ~Widget
+    ~Widget()
     {
         if (handle != null)
             g_object_unref(handle);
@@ -180,10 +180,10 @@ public class Widget
     /// set on a widget that already has a parent and does not change the tree.
     public void SetMargin(int margin)
     {
-            gtk_widget_set_margin_start(handle, margin);
-            gtk_widget_set_margin_end(handle, margin);
-            gtk_widget_set_margin_top(handle, margin);
-            gtk_widget_set_margin_bottom(handle, margin);
+        gtk_widget_set_margin_start(handle, margin);
+        gtk_widget_set_margin_end(handle, margin);
+        gtk_widget_set_margin_top(handle, margin);
+        gtk_widget_set_margin_bottom(handle, margin);
     }
 
     /// Whether the widget takes a share of any extra space in its container.
@@ -192,8 +192,8 @@ public class Widget
     /// older spelling and the one a box's own arguments still offer.
     public void SetExpands(bool horizontal, bool vertical)
     {
-            gtk_widget_set_hexpand(handle, horizontal ? 1 : 0);
-            gtk_widget_set_vexpand(handle, vertical ? 1 : 0);
+        gtk_widget_set_hexpand(handle, horizontal ? 1 : 0);
+        gtk_widget_set_vexpand(handle, vertical ? 1 : 0);
     }
 
     /// Destroys the widget and everything in it, breaking it out of its
@@ -267,8 +267,8 @@ public class Box : Container
     /// A column when `vertical`, a row otherwise.
     public Box(bool vertical, int spacing)
     {
-            base(gtk_box_new(vertical ? GTK_ORIENTATION_VERTICAL
-                                      : GTK_ORIENTATION_HORIZONTAL, spacing));
+        base(gtk_box_new(vertical ? GTK_ORIENTATION_VERTICAL
+                                  : GTK_ORIENTATION_HORIZONTAL, spacing));
     }
 
     /// Adds a child at the end of what is there.
@@ -312,13 +312,13 @@ public class Grid : Container
 {
     public Grid()
     {
-            base(gtk_grid_new());
+        base(gtk_grid_new());
     }
 
     /// Puts a child at a cell, spanning `columns` by `rows` of them.
     public void Attach(Widget child, int column, int row, int columns, int rows)
     {
-            gtk_grid_attach(handle, child.Handle, column, row, columns, rows);
+        gtk_grid_attach(handle, child.Handle, column, row, columns, rows);
     }
 
     /// One cell at one place, which is what most calls want.
@@ -329,8 +329,8 @@ public class Grid : Container
 
     public void SetSpacing(int columns, int rows)
     {
-            gtk_grid_set_column_spacing(handle, (guint)columns);
-            gtk_grid_set_row_spacing(handle, (guint)rows);
+        gtk_grid_set_column_spacing(handle, (guint)columns);
+        gtk_grid_set_row_spacing(handle, (guint)rows);
     }
 }
 
@@ -461,7 +461,7 @@ public class Entry : Widget
     /// The grey prompt an empty entry shows.
     public void SetPlaceholder(String text)
     {
-            gtk_entry_set_placeholder_text(handle, text.ToPointer());
+        gtk_entry_set_placeholder_text(handle, text.ToPointer());
     }
 
     /// Runs on every keystroke.
@@ -624,8 +624,8 @@ public class ScrollView : Container
     /// with its scrollbars; this is the part the content gets.
     public void SetMinimumContent(int width, int height)
     {
-            gtk_scrolled_window_set_min_content_width(handle, width);
-            gtk_scrolled_window_set_min_content_height(handle, height);
+        gtk_scrolled_window_set_min_content_width(handle, width);
+        gtk_scrolled_window_set_min_content_height(handle, height);
     }
 }
 
@@ -652,7 +652,7 @@ public class ComboBox : Widget
 
     public void Clear()
     {
-            gtk_combo_box_text_remove_all(handle);
+        gtk_combo_box_text_remove_all(handle);
         _count = 0;
     }
 
@@ -705,7 +705,7 @@ public class ProgressBar : Widget
     public void SetText(String text)
     {
         gtk_progress_bar_set_text(handle, text.ToPointer());
-            gtk_progress_bar_set_show_text(handle, 1);
+        gtk_progress_bar_set_show_text(handle, 1);
     }
 }
 
@@ -740,9 +740,9 @@ public class Slider : Widget
 {
     public Slider(bool vertical, double minimum, double maximum, double step)
     {
-            base(gtk_scale_new_with_range(
-                vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL,
-                minimum, maximum, step));
+        base(gtk_scale_new_with_range(
+            vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL,
+            minimum, maximum, step));
     }
 
     public double Value => gtk_range_get_value(handle);
@@ -761,8 +761,8 @@ public class Separator : Widget
 {
     public Separator(bool vertical)
     {
-            base(gtk_separator_new(vertical ? GTK_ORIENTATION_VERTICAL
-                                            : GTK_ORIENTATION_HORIZONTAL));
+        base(gtk_separator_new(vertical ? GTK_ORIENTATION_VERTICAL
+                                        : GTK_ORIENTATION_HORIZONTAL));
     }
 }
 

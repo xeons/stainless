@@ -776,11 +776,26 @@ public class GtkPeer : IControlPeer
 
     public void Invalidate() => gtk_widget_queue_draw(widget);
 
-    /// GTK has no `UpdateWindow`: a repaint happens when the main loop next
-    /// runs, and the way to make that now is to let the loop run now.
+    /// Paints it now, which on GTK takes more than letting the loop run.
+    ///
+    /// **Pumping the loop is not enough, and that is not obvious.** A GTK 3
+    /// draw is scheduled on the *frame clock*, not queued as an event, so
+    /// immediately after a `queue_draw` there is nothing pending:
+    /// `gtk_events_pending` answers zero, the `while` below exits without
+    /// painting, and the caller reads whatever the last paint left. This was
+    /// written as a pump alone and the sample that caught it did so by asking
+    /// where the caret was -- it was still where the previous paint had put it.
+    ///
+    /// So the updates are processed first, and the pump stays because the paint
+    /// may raise work of its own.
     public void Update()
     {
         gtk_widget_queue_draw(widget);
+
+        GdkWindow* surface = (GdkWindow*)gtk_widget_get_window(widget);
+        if (surface != null)
+            gdk_window_process_updates(surface, 1);
+
         while (gtk_events_pending() != 0)
             gtk_main_iteration_do(0);
     }
