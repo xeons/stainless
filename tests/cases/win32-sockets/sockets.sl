@@ -17,7 +17,8 @@ import Standard.Console;
 import Standard.Text;
 import Win32.Ws2_32;
 
-extern "C" {
+extern "C"
+{
     long probe_af_inet();
     long probe_af_inet6();
     long probe_sock_stream();
@@ -81,8 +82,10 @@ extern "C" {
 /// Zero when the binding agrees with the header, and one when it does not.
 /// Counted rather than kept in a variable, because a module has no mutable
 /// state to keep one in.
-int Check(String name, long bound, long header) {
-    if (bound == header) { return 0; }
+int Check(String name, long bound, long header)
+{
+    if (bound == header)
+        return 0;
 
     Console.WriteLine("WRONG " + name
         + ": the binding says " + Text.FromInteger(bound)
@@ -90,7 +93,8 @@ int Check(String name, long bound, long header) {
     return 1;
 }
 
-int Constants() {
+int Constants()
+{
     int wrong = 0;
     wrong = wrong + Check("AF_INET", (long)AF_INET, probe_af_inet());
     wrong = wrong + Check("AF_INET6", (long)AF_INET6, probe_af_inet6());
@@ -138,7 +142,8 @@ int Constants() {
     return wrong;
 }
 
-int Layout() {
+int Layout()
+{
     int wrong = 0;
     wrong = wrong + Check("sizeof WSADATA", (long)sizeof(WSADATA), probe_size_wsadata());
     wrong = wrong + Check("sizeof sockaddr", (long)sizeof(sockaddr), probe_size_sockaddr());
@@ -163,15 +168,18 @@ int Layout() {
 }
 
 /// A loopback exchange through the declarations themselves.
-int Exchange() {
+int Exchange()
+{
     WSADATA data;
-    if (WSAStartup(MakeWord(2, 2), &data) != 0) {
+    if (WSAStartup(MakeWord(2, 2), &data) != 0)
+    {
         Console.WriteLine("WRONG WSAStartup failed");
         return 1;
     }
 
     nuint server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (server == InvalidSocket) {
+    if (server == InvalidSocket)
+    {
         Console.WriteLine("WRONG socket failed: " + Text.FromInteger((long)WSAGetLastError()));
         return 1;
     }
@@ -181,12 +189,14 @@ int Exchange() {
     address.sin_port = htons(0u);                       // let the system choose
     address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    if (bind(server, (sockaddr*)&address, (int)sizeof(sockaddr_in)) == SocketError) {
+    if (bind(server, (sockaddr*)&address, (int)sizeof(sockaddr_in)) == SocketError)
+    {
         Console.WriteLine("WRONG bind failed: " + Text.FromInteger((long)WSAGetLastError()));
         return 1;
     }
 
-    if (listen(server, 4) == SocketError) {
+    if (listen(server, 4) == SocketError)
+    {
         Console.WriteLine("WRONG listen failed");
         return 1;
     }
@@ -194,7 +204,8 @@ int Exchange() {
     // What port the system chose.
     sockaddr_in bound;
     int length = (int)sizeof(sockaddr_in);
-    if (getsockname(server, (sockaddr*)&bound, &length) == SocketError) {
+    if (getsockname(server, (sockaddr*)&bound, &length) == SocketError)
+    {
         Console.WriteLine("WRONG getsockname failed");
         return 1;
     }
@@ -202,7 +213,8 @@ int Exchange() {
     Console.WriteLine("port-chosen " + Text.FromBool(ntohs(bound.sin_port) != 0u));
 
     nuint client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (connect(client, (sockaddr*)&bound, (int)sizeof(sockaddr_in)) == SocketError) {
+    if (connect(client, (sockaddr*)&bound, (int)sizeof(sockaddr_in)) == SocketError)
+    {
         Console.WriteLine("WRONG connect failed: " + Text.FromInteger((long)WSAGetLastError()));
         return 1;
     }
@@ -246,7 +258,8 @@ int Exchange() {
     return 0;
 }
 
-int Main() {
+int Main()
+{
     int wrong = Constants() + Layout() + Exchange();
 
     Console.WriteLine("wrong " + Text.FromInteger((long)wrong));

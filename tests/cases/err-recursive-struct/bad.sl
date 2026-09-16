@@ -7,20 +7,24 @@ module Bad;
 // it was computed, the type came out zero bytes wide, and the emitter wrote an
 // LLVM type that referred to itself, which clang reports against generated IR.
 
-struct Direct {
+struct Direct
+{
     public Direct[4] Kids;
 }
 
-struct Nested {
+struct Nested
+{
     public Nested[2] Grid;
 }
 
-struct First {
+struct First
+{
     public Second[2] Seconds;
 }
 
-struct Second {
+struct Second
+{
     public First[2] Firsts;
 }
 
-int Main() { return 0; }
+int Main() => 0;

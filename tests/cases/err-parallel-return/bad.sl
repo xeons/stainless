@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-int Work() { return 1; }
+int Work() => 1;
 
-int Main() {
+int Main()
+{
     int result = 0;
-    parallel {
+    parallel
+    {
         spawn result = Work();
         return result;          // would skip the join
     }

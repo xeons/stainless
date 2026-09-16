@@ -20,7 +20,8 @@ import Win32.AdvApi32;
 import Win32.Shell32;
 import Win32.ComDlg32;
 
-int Main() {
+int Main()
+{
     // Constants from all six, so nothing is dead before the linker sees it.
     Console.WriteLine("kernel32: " + Text.FromInteger((long)GenericRead));
     Console.WriteLine("user32:   " + Text.FromInteger((long)WsOverlappedWindow));
@@ -40,8 +41,8 @@ int Main() {
 
     // The handle types are told apart, and none of them is anything at run
     // time: what these hold is the same pointer `void*` held before.
-    HWND   window = null;
-    HDC    device = null;
+    HWND window = null;
+    HDC device = null;
     HANDLE file   = InvalidHandle();
 
     Console.WriteLine("a handle is one pointer: "

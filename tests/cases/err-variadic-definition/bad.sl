@@ -10,26 +10,31 @@ extern "C" int printf(byte* format, ...);           // fine: called, not defined
 
 // The header would say `int32_t log_line(uint8_t*, ...)` and the definition
 // would take one argument.
-export "C" int log_line(byte* format, ...) {        // SL0493
+export "C" int log_line(byte* format, ...) // SL0493
+{
     return printf(format);
 }
 
 // An ordinary Stainless function has the same hole, and no header to blame.
-int Sum(int first, ...) {                           // SL0493
+int Sum(int first, ...) // SL0493
+{
     return first;
 }
 
-public class Bag {
+public class Bag
+{
     public int Count;
 
     // A constructor's list threw its '...' away without even a name to report
     // it against, which was the same silence in a smaller place.
-    Bag(int count, ...) {                           // SL0493
+    Bag(int count, ...) // SL0493
+    {
         Count = count;
     }
 }
 
-int Main() {
+int Main()
+{
     var bag = new Bag(1);
     return bag.Count - 1;
 }

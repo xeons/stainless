@@ -12,7 +12,8 @@ module PortableResources;
 import Standard.Console;
 import Standard.Resources;
 
-int Main() {
+int Main()
+{
     // A string table is the kind that needs real interpretation rather than a
     // lookup: strings are filed sixteen to a block, so 201 is the tenth entry
     // of block 13 and 218 is the third entry of block 14. Windows does that

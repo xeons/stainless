@@ -6,7 +6,8 @@ import Standard.Console;
 import Standard.Text;
 import Warned;
 
-int Main() {
+int Main()
+{
     Point p;
     p.X = 1.5;
     p.Y = 2.0;

@@ -3,7 +3,8 @@ module App;
 
 import Undescribed;
 
-int Main() {
+int Main()
+{
     Holder held;
     return 0;
 }

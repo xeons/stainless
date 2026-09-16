@@ -5,7 +5,8 @@
 // would only ever report these.
 module BadEscapes;
 
-public void Main() {
+public void Main()
+{
     // Past the end of Unicode, which stops at U+10FFFF.
     char32 pastTheEnd = '\U00110000';
 

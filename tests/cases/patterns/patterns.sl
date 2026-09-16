@@ -15,14 +15,17 @@ public class Node { public int Id = 1; }
 public class Leaf : Node { public int Value = 4; }
 public class Twig : Node { }
 
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
 }
 
-String Classify(int n) {
-    switch (n) {
+String Classify(int n)
+{
+    switch (n)
+    {
         case < 0:        return "negative";
         case 0:          return "zero";
         case 1 or 2:     return "small";
@@ -32,8 +35,10 @@ String Classify(int n) {
     }
 }
 
-String Kind(Node node) {
-    switch (node) {
+String Kind(Node node)
+{
+    switch (node)
+    {
         case Leaf leaf when leaf.Value > 3:
             return "big leaf " + Text.FromInteger(leaf.Value);
 
@@ -48,8 +53,10 @@ String Kind(Node node) {
     }
 }
 
-String Area(Shape shape) {
-    switch (shape) {
+String Area(Shape shape)
+{
+    switch (shape)
+    {
         case Circle c when c.Radius > 10.0:
             return "big circle";
 
@@ -66,8 +73,10 @@ String Area(Shape shape) {
 
 /// A String switch is a chain of comparisons already, and a pattern over one
 /// is the same chain asking a little more.
-String Word(String text) {
-    switch (text) {
+String Word(String text)
+{
+    switch (text)
+    {
         case "a" or "b": return "letter";
         case "1":        return "digit";
         default:         return "other";
@@ -75,15 +84,18 @@ String Word(String text) {
 }
 
 /// `and` and `not` over the same value, which is what makes a range readable.
-String Range(int n) {
-    switch (n) {
+String Range(int n)
+{
+    switch (n)
+    {
         case > 0 and < 10: return "single digit";
         case not 0:        return "other";
         default:           return "zero";
     }
 }
 
-int Main() {
+int Main()
+{
     Console.WriteLine(Word("a"));
     Console.WriteLine(Word("1"));
     Console.WriteLine(Word("z"));
@@ -111,8 +123,10 @@ int Main() {
     // break still belongs to the switch, and continue to the loop.
     int total = 0;
 
-    for (int i = 0; i < 6; i++) {
-        switch (i) {
+    for (int i = 0; i < 6; i++)
+    {
+        switch (i)
+        {
             case < 2:  continue;
             case 4:    break;
             default:   total += i; break;

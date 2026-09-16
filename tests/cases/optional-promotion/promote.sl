@@ -14,24 +14,25 @@ import Standard.Console;
 import Standard.Text;
 import Standard.Collections;
 
-String N(long v) { return Text.FromInteger(v); }
+String N(long v) => Text.FromInteger(v);
 
 // An exact match still wins. A promotion is a conversion, and a conversion
 // never beats a signature that already fits.
-String Which(int v) { return "int"; }
-String Which(Optional<int> v) { return "optional"; }
+String Which(int v) => "int";
+String Which(Optional<int> v) => "optional";
 
 // And is available where nothing exact is there.
-String Only(Optional<int> v) { return N((long)v.ValueOr(-1)); }
+String Only(Optional<int> v) => N((long)v.ValueOr(-1));
 
-Optional<int> Returned(int v) { return v; }
-Optional<String> Named(String s) { return s; }
+Optional<int> Returned(int v) => v;
+Optional<String> Named(String s) => s;
 
 struct Point { public int X; public int Y; }
 
 class Node { public int Value; public Node(int v) { Value = v; } }
 
-int Main() {
+int Main()
+{
     Optional<int> number = 5;
     Optional<String> text = "text";
     Optional<int> nothing = None;
@@ -49,13 +50,15 @@ int Main() {
     p.X = 3;
     p.Y = 4;
     Optional<Point> located = p;
-    if (located is Some here) {
+    if (located is Some here)
+    {
         Console.WriteLine("struct " + N((long)(here.Value.X + here.Value.Y)));
     }
 
     // A counted reference, which the variant owns like any other field.
     Optional<Node> held = new Node(11);
-    if (held is Some node) { Console.WriteLine("class " + N((long)node.Value.Value)); }
+    if (held is Some node)
+        Console.WriteLine("class " + N((long)node.Value.Value));
 
     // Something already an Optional is not wrapped twice.
     Optional<int> again = number;
@@ -64,7 +67,8 @@ int Main() {
     // But an Optional assigned to an Optional of one is, which is what it
     // means rather than a mistake.
     Optional<Optional<int>> nested = number;
-    if (nested is Some lifted) {
+    if (nested is Some lifted)
+    {
         Console.WriteLine("nested " + N((long)lifted.Value.ValueOr(-1)));
     }
 

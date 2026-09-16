@@ -4,37 +4,47 @@ module Slices;
 import Standard.Console;
 import Standard.Collections;
 
-public class Trace {
+public class Trace
+{
     public String Name { get; }
-    public Trace(String name) { Name = name; }
+    public Trace(String name) => Name = name;
     ~Trace() { Console.WriteLine("~" + Name); }
 }
 
-int Sum(int[:] values) {
+int Sum(int[:] values)
+{
     int total = 0;
-    for (nuint i = 0; i < values.Length; i = i + 1) { total = total + values[i]; }
+    for (nuint i = 0; i < values.Length; i = i + 1)
+        total = total + values[i];
     return total;
 }
 
-int SumEach(int[:] values) {
+int SumEach(int[:] values)
+{
     int total = 0;
-    foreach (int v in values) { total = total + v; }
+    foreach (int v in values)
+        total = total + v;
     return total;
 }
 
 // A slice is a view, so writing through one writes the array it came from.
-void Fill(int[:] values, int with) {
-    for (nuint i = 0; i < values.Length; i = i + 1) { values[i] = with; }
+void Fill(int[:] values, int with)
+{
+    for (nuint i = 0; i < values.Length; i = i + 1)
+        values[i] = with;
 }
 
-String Show(int[] values) {
+String Show(int[] values)
+{
     String text = "";
-    foreach (int v in values) { text = text + Text.FromInteger(v) + " "; }
+    foreach (int v in values)
+        text = text + Text.FromInteger(v) + " ";
     return text;
 }
 
 // The array outlives the function that made it, because the slice holds it.
-Trace[:] Middle() {
+Trace[:] Middle()
+{
     var traces = new Trace[3];
     traces[0] = new Trace("a");
     traces[1] = new Trace("b");
@@ -42,9 +52,11 @@ Trace[:] Middle() {
     return traces[1:2];
 }
 
-int Main() {
+int Main()
+{
     var numbers = new int[6];
-    for (nuint i = 0; i < numbers.Length; i = i + 1) { numbers[i] = (int)i + 1; }
+    for (nuint i = 0; i < numbers.Length; i = i + 1)
+        numbers[i] = (int)i + 1;
 
     // An array is a slice of the whole of itself, so no cast is needed.
     Console.WriteLine(Text.FromInteger(Sum(numbers)));

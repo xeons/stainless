@@ -22,24 +22,27 @@ public interface IThing { int Go(); }
 // An incomplete type has no size, so there is no value of one to have. Each of
 // these is the same mistake in a different place, and each is caught at the one
 // door every written type comes through.
-public struct Holder {
+public struct Holder
+{
     public HWND__ Inline;                       // SL0524
 }
 
-nuint Sizes() { return sizeof(HWND__); }        // SL0524
-nuint Aligns() { return alignof(HWND__); }      // SL0524
-HWND__ Give() { return null; }                  // SL0524
+nuint Sizes() => sizeof(HWND__); // SL0524
+nuint Aligns() => alignof(HWND__); // SL0524
+HWND__ Give() => null; // SL0524
 void Take(HWND__ window) { }                    // SL0524
 void ByRef(ref HWND__ window) { }               // SL0524
 
 // An alias belongs to a module, which is what this language has instead of a
 // namespace.
-public struct Outer {
+public struct Outer
+{
     using Inner = int;                          // SL0525
     public int X;
 }
 
-int Main() {
+int Main()
+{
     // The mix-up the opaque types exist to catch: both are pointers, and they
     // are not the same pointer.
     HDC device = null;

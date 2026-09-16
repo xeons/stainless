@@ -22,8 +22,10 @@ const int PerWorker = 500;
 static readonly AtomicLong Total = new AtomicLong(0);
 static readonly AtomicInt Narrow = new AtomicInt(0);
 
-void CountUp(byte* argument) {
-    for (int i = 0; i < PerWorker; i += 1) {
+void CountUp(byte* argument)
+{
+    for (int i = 0; i < PerWorker; i++)
+    {
         Total.Increment();
         Narrow.Increment();
     }
@@ -35,7 +37,8 @@ void CountUp(byte* argument) {
 /// `Wait` before the producer has anything to hand over.
 static readonly Monitor<long> Handoff = new Monitor<long>(0);
 
-void Producer(byte* argument) {
+void Producer(byte* argument)
+{
     Threading.Sleep(5u);
 
     var held = Handoff.Lock();
@@ -49,7 +52,8 @@ static readonly Semaphore Gate = new Semaphore(2);
 static readonly AtomicLong Live = new AtomicLong(0);
 static readonly AtomicLong Peak = new AtomicLong(0);
 
-void Limited(byte* argument) {
+void Limited(byte* argument)
+{
     Gate.Wait();
 
     long now = Live.Increment();
@@ -57,8 +61,10 @@ void Limited(byte* argument) {
     // Raise the high-water mark, and keep trying if another thread moved it
     // first. This is the shape every lock-free update has.
     long seen = Peak.Load();
-    while (now > seen) {
-        if (Peak.CompareExchange(seen, now)) { break; }
+    while (now > seen)
+    {
+        if (Peak.CompareExchange(seen, now))
+            break;
         seen = Peak.Load();
     }
 
@@ -73,7 +79,8 @@ void Limited(byte* argument) {
 static readonly ManualResetEvent Opened = new ManualResetEvent(false);
 static readonly AtomicLong Passed = new AtomicLong(0);
 
-void WaitForGate(byte* argument) {
+void WaitForGate(byte* argument)
+{
     Opened.Wait();
     Passed.Increment();
 }
@@ -81,7 +88,8 @@ void WaitForGate(byte* argument) {
 static readonly AutoResetEvent Turnstile = new AutoResetEvent(false);
 static readonly AtomicLong Through = new AtomicLong(0);
 
-void PassTurnstile(byte* argument) {
+void PassTurnstile(byte* argument)
+{
     Turnstile.Wait();
     Through.Increment();
 }
@@ -90,7 +98,8 @@ void PassTurnstile(byte* argument) {
 
 static readonly CountdownEvent Remaining = new CountdownEvent(Workers);
 
-void ReportDone(byte* argument) {
+void ReportDone(byte* argument)
+{
     Threading.Sleep(1u);
     Remaining.Signal();
 }
@@ -100,8 +109,10 @@ const int Phases = 3;
 static readonly Barrier Round = new Barrier(4u);
 static readonly AtomicLong PhaseSum = new AtomicLong(0);
 
-void Marching(byte* argument) {
-    for (int phase = 0; phase < Phases; phase += 1) {
+void Marching(byte* argument)
+{
+    for (int phase = 0; phase < Phases; phase++)
+    {
         PhaseSum.Increment();
         Round.SignalAndWait();
     }
@@ -112,8 +123,10 @@ void Marching(byte* argument) {
 static readonly RwLock<long> Shared = new RwLock<long>(100);
 static readonly AtomicLong ReadSum = new AtomicLong(0);
 
-void ReadIt(byte* argument) {
-    for (int i = 0; i < 100; i += 1) {
+void ReadIt(byte* argument)
+{
+    for (int i = 0; i < 100; i++)
+    {
         var view = Shared.Read();
         ReadSum.Add(view.Value());
     }
@@ -123,26 +136,32 @@ void ReadIt(byte* argument) {
 
 static readonly AtomicBool Ready = new AtomicBool(false);
 
-void SetReady(byte* argument) {
+void SetReady(byte* argument)
+{
     Threading.Sleep(5u);
     Ready.Store(true);
 }
 
 // ------------------------------------------------------------------- driving
 
-Thread[] StartAll(Job body, int count) {
+Thread[] StartAll(Job body, int count)
+{
     var pool = new Thread[(nuint)count];
-    for (int i = 0; i < count; i += 1) {
+    for (int i = 0; i < count; i++)
+    {
         pool[(nuint)i] = new Thread(body, null);
     }
     return pool;
 }
 
-void JoinAll(Thread[] pool) {
-    foreach (var one in pool) { one.Join(); }
+void JoinAll(Thread[] pool)
+{
+    foreach (var one in pool)
+        one.Join();
 }
 
-int Main() {
+int Main()
+{
     // -------------------------------------------------- one thread, joined
 
     var single = new Thread(CountUp, null);
@@ -166,7 +185,8 @@ int Main() {
     // reference is what the compiler refuses, and rightly.
     {
         var held = Handoff.Lock();
-        while (held.Value() == 0) { held.Wait(); }
+        while (held.Value() == 0)
+            held.Wait();
         printf("handedOver    = %lld\n", held.Value());
     }
 
@@ -249,7 +269,8 @@ int Main() {
     var setter = new Thread(SetReady, null);
 
     var spin = new SpinWait();
-    while (!Ready.Load()) { spin.Once(); }
+    while (!Ready.Load())
+        spin.Once();
 
     setter.Join();
     printf("spunUntilSet  = %d\n", Ready.Load());

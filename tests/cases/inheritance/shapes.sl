@@ -11,17 +11,20 @@ module Inheritance;
 import Standard.Console;
 import Standard.Text;
 
-public interface INamed {
+public interface INamed
+{
     String Name();
 }
 
 /// The root: abstract, so it cannot be made, and every concrete class below
 /// has to answer `Area`.
-public abstract class Shape : INamed {
-    protected int  sides;
+public abstract class Shape : INamed
+{
+    protected int sides;
     protected bool closed;
 
-    Shape(int howMany) {
+    Shape(int howMany)
+    {
         sides = howMany;
         closed = true;
     }
@@ -29,186 +32,214 @@ public abstract class Shape : INamed {
     public abstract double Area();
 
     /// Virtual with a body: a derived class may take it or replace it.
-    public virtual String Describe() {
+    public virtual String Describe()
+    {
         return Name() + " with " + Text.FromInteger(sides) + " sides";
     }
 
-    public virtual String Name() { return "shape"; }
+    public virtual String Name() => "shape";
 
     /// Not virtual, and reads a protected field: the base's own view.
-    public int Sides() { return sides; }
+    public int Sides() => sides;
 }
 
 /// One level down: overrides the abstract method and adds a field of its own,
 /// which has to land after the base's.
-public class Polygon : Shape {
+public class Polygon : Shape
+{
     protected double width;
 
-    Polygon(int howMany, double w) {
+    Polygon(int howMany, double w)
+    {
         base(howMany);
         width = w;
     }
 
-    public override double Area() { return width * width; }
+    public override double Area() => width * width;
 
-    public override String Name() { return "polygon"; }
+    public override String Name() => "polygon";
 
     /// Reaching the base's implementation, which the vtable would never find.
-    public override String Describe() {
+    public override String Describe()
+    {
         return "a " + base.Describe();
     }
 }
 
 /// Two levels down, and sealed: nothing may derive further.
-public sealed class Square : Polygon {
-    int corners;
+public sealed class Square : Polygon
+{
+    int _corners;
 
-    Square(double side) {
+    Square(double side)
+    {
         base(4, side);
-        corners = 4;
+        _corners = 4;
     }
 
     /// Sealed on an override closes the chain at this class.
-    public sealed override String Name() { return "square"; }
+    public sealed override String Name() => "square";
 
-    public int Corners() { return corners; }
+    public int Corners() => _corners;
 }
 
 /// A sibling, so the family is a tree rather than a line.
-public class Circle : Shape {
-    double radius;
+public class Circle : Shape
+{
+    double _radius;
 
-    Circle(double r) {
+    Circle(double r)
+    {
         base(1);
-        radius = r;
+        _radius = r;
         closed = true;
     }
 
-    public override double Area() { return 3.0 * radius * radius; }
-    public override String Name() { return "circle"; }
+    public override double Area() => 3.0 * _radius * _radius;
+    public override String Name() => "circle";
 }
 
 /// The end of the line for construction: it takes no arguments itself, so
 /// anything below it can be built without saying anything.
-public class Dot : Shape {
-    Dot() {
+public class Dot : Shape
+{
+    Dot()
+    {
         base(1);
     }
 
-    public override double Area() { return 0.0; }
-    public override String Name() { return "dot"; }
+    public override double Area() => 0.0;
+    public override String Name() => "dot";
 }
 
 /// A class that declares no constructor at all. `new Point()` runs the nearest
 /// one up the chain that takes no arguments, which is Dot's.
-public class Point : Dot {
+public class Point : Dot
+{
 }
 
 /// One that declares a constructor but no chain: the same constructor runs,
 /// inserted at the head of this one.
-public class Pixel : Dot {
-    int shade;
+public class Pixel : Dot
+{
+    int _shade;
 
-    Pixel(int level) {
-        shade = level;
+    Pixel(int level)
+    {
+        _shade = level;
     }
 
-    public int Shade() { return shade; }
-    public override String Name() { return "pixel"; }
+    public int Shade() => _shade;
+    public override String Name() => "pixel";
 }
 
 /// An abstract property is a pair of abstract accessors, and both dispatch --
 /// a setter for the same reason a getter does.
-public abstract class Node {
+public abstract class Node
+{
     public abstract int    Weight { get; }
     public abstract String Tag    { get; set; }
 
-    public String Summary() { return Tag + "=" + Text.FromInteger(Weight); }
+    public String Summary() => Tag + "=" + Text.FromInteger(Weight);
 }
 
-public class Twig : Node {
-    String held;
+public class Twig : Node
+{
+    String _held;
 
-    Twig() { held = "twig"; }
+    Twig() => _held = "twig";
 
     public override int Weight { get { return 1; } }
 
-    public override String Tag {
-        get { return held; }
-        set { held = value; }
+    public override String Tag
+    {
+        get => _held;
+        set => _held = value;
     }
 }
 
 /// `this(...)` runs another of this class's own constructors first. The one it
 /// delegates to builds the base, so the base is built once and not twice.
-public class Built : Shape {
+public class Built : Shape
+{
     public int Steps;
 
-    Built(int howMany, int steps) {
+    Built(int howMany, int steps)
+    {
         base(howMany);
         Steps = steps;
     }
 
-    Built(int steps) { this(2, steps); }
+    Built(int steps) => this(2, steps);
 
-    Built() {
+    Built()
+    {
         this(5);
         Steps = Steps + 100;
     }
 
-    public override double Area() { return 0.0; }
-    public override String Name() { return "built"; }
+    public override double Area() => 0.0;
+    public override String Name() => "built";
 }
 
 /// Three deep, with a destructor at every level and a reference held at two of
 /// them, so what a drop runs and in which order is the whole of what it shows.
-public class Held {
+public class Held
+{
     public String Tag;
-    Held(String tag) { Tag = tag; }
+    Held(String tag) => Tag = tag;
     ~Held() { Console.WriteLine("    ~Held " + Tag); }
 }
 
-public class Root {
-    Held mine;
-    Root() { mine = new Held("root"); }
+public class Root
+{
+    Held _mine;
+    Root() => _mine = new Held("root");
     ~Root() { Console.WriteLine("  ~Root"); }
 }
 
-public class Middle : Root {
-    Held ours;
-    Middle() { ours = new Held("middle"); }
+public class Middle : Root
+{
+    Held _ours;
+    Middle() => _ours = new Held("middle");
     ~Middle() { Console.WriteLine("  ~Middle"); }
 }
 
-public class Leaf : Middle {
+public class Leaf : Middle
+{
     ~Leaf() { Console.WriteLine("  ~Leaf"); }
 }
 
 /// Virtual properties: the accessors are the methods, so they dispatch like any
 /// other pair.
-public class Counter {
+public class Counter
+{
     protected int held;
 
     public virtual int Value { get { return held; } }
 
-    Counter(int start) { held = start; }
+    Counter(int start) => held = start;
 }
 
-public class Doubling : Counter {
-    Doubling(int start) {
+public class Doubling : Counter
+{
+    Doubling(int start)
+    {
         base(start);
     }
 
     public override int Value { get { return held * 2; } }
 }
 
-void Show(Shape shape) {
+void Show(Shape shape)
+{
     Console.WriteLine(shape.Describe()
         + ", area " + Text.FromDouble(shape.Area())
         + ", sides " + Text.FromInteger(shape.Sides()));
 }
 
-int Main() {
+int Main()
+{
     // --- dispatch through the base -----------------------------------------
     Shape square = new Square(3.0);
     Shape circle = new Circle(2.0);
@@ -229,7 +260,8 @@ int Main() {
     Console.WriteLine("circle is INamed: " + Text.FromBool(circle is INamed));
 
     // --- a downcast, once the question has been asked -----------------------
-    if (square is Square) {
+    if (square is Square)
+    {
         Square back = (Square)square;
         Console.WriteLine("corners: " + Text.FromInteger(back.Corners()));
     }
@@ -278,7 +310,8 @@ int Main() {
     every[2] = polygon;
 
     double total = 0.0;
-    foreach (Shape one in every) { total = total + one.Area(); }
+    foreach (Shape one in every)
+        total = total + one.Area();
     Console.WriteLine("total area: " + Text.FromDouble(total));
 
     // --- destructors chain, derived first ------------------------------------

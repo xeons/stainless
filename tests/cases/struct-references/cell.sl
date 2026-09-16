@@ -7,30 +7,45 @@ module Cell;
 
 import Standard.Console;
 
-class Tracked {
+class Tracked
+{
     public int Id;
-    public Tracked(int id) { Id = id; Console.WriteLine("+" + Text.FromInteger(id)); }
+    public Tracked(int id)
+    {
+        Id = id;
+        Console.WriteLine("+" + Text.FromInteger(id));
+    }
     ~Tracked() { Console.WriteLine("-" + Text.FromInteger(Id)); }
 }
 
-struct Holder {
+struct Holder
+{
     public Tracked Item;
     public int Tag;
 }
 
-class Bag {
+class Bag
+{
     public Holder Slot;
-    public Bag(Tracked t) { Holder h; h.Item = t; h.Tag = 9; Slot = h; }
+    public Bag(Tracked t)
+    {
+        Holder h;
+        h.Item = t;
+        h.Tag = 9;
+        Slot = h;
+    }
 }
 
-Holder Wrap(Tracked t, int tag) {
+Holder Wrap(Tracked t, int tag)
+{
     Holder h;
     h.Item = t;
     h.Tag = tag;
     return h;
 }
 
-int Main() {
+int Main()
+{
     Console.WriteLine("-- copy");
     {
         var one = Wrap(new Tracked(1), 10);

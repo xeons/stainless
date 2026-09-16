@@ -5,17 +5,20 @@ module Utf16RoundTrip;
 
 import Standard.Console;
 
-extern "C" {
+extern "C"
+{
     void* malloc(nuint size);
     void  free(void* block);
 }
 
-void Round(String text) {
+void Round(String text)
+{
     var wide = text.ToUtf16();
     Console.WriteLine(Text.FromInteger(wide.UnitCount()) + " units  " + wide.ToText());
 }
 
-int Main() {
+int Main()
+{
     // One, two, three and four byte scalars, the last of which is a surrogate
     // pair on the way out and has to be rejoined on the way back.
     Round("ascii");

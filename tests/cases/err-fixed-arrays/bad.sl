@@ -1,7 +1,7 @@
 // What an inline array may not be.
 module ErrFixedArrays;
 
-int Size() { return 4; }
+int Size() => 4;
 
 // The length is part of the type, so it has to be known now.
 public struct NotConstant { public int[Size()] Values; }        // SL0487
@@ -24,7 +24,8 @@ public struct Counted { public String[4] Names; }               // SL0486
 // be neither that nor cheap.
 void ByValue(int[4] values) { }                                 // SL0491
 
-int Main() {
+int Main()
+{
     int[4] a;
 
     // The length is in the type, so this is answered now rather than at run

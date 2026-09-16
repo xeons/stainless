@@ -10,33 +10,43 @@ extern "C" int printf(byte* format, ...);
 
 // Enough work per job, and enough jobs, that the threads really do overlap.
 // A container that only looked thread safe would lose items here.
-void Produce(ConcurrentQueue<int> queue, int from, int upto) {
-    for (int i = from; i < upto; i = i + 1) { queue.Enqueue(i); }
+void Produce(ConcurrentQueue<int> queue, int from, int upto)
+{
+    for (int i = from; i < upto; i = i + 1)
+        queue.Enqueue(i);
 }
 
-void Record(ConcurrentDictionary<int, int> map, int from, int upto) {
-    for (int i = from; i < upto; i = i + 1) { map.Set(i, i * 2); }
+void Record(ConcurrentDictionary<int, int> map, int from, int upto)
+{
+    for (int i = from; i < upto; i = i + 1)
+        map.Set(i, i * 2);
 }
 
-void Stack(ConcurrentStack<int> stack, int from, int upto) {
-    for (int i = from; i < upto; i = i + 1) { stack.Push(i); }
+void Stack(ConcurrentStack<int> stack, int from, int upto)
+{
+    for (int i = from; i < upto; i = i + 1)
+        stack.Push(i);
 }
 
 // Every consumer takes until the channel is closed and drained, so between
 // them they see each item exactly once.
-void Consume(Channel<int> channel, AtomicLong total, AtomicLong seen) {
+void Consume(Channel<int> channel, AtomicLong total, AtomicLong seen)
+{
     var item = channel.Take();
-    while (item.Ok) {
+    while (item.Ok)
+    {
         total.Add((long)item.Value);
         seen.Add(1);
         item = channel.Take();
     }
 }
 
-int Main() {
+int Main()
+{
     // ------------------------------------------------------------ queue
     var queue = new ConcurrentQueue<int>();
-    parallel {
+    parallel
+    {
         spawn Produce(queue, 0, 1000);
         spawn Produce(queue, 1000, 2000);
         spawn Produce(queue, 2000, 3000);
@@ -46,7 +56,8 @@ int Main() {
 
     long sum = 0;
     var got = queue.TryDequeue();
-    while (got.Ok) {
+    while (got.Ok)
+    {
         sum = sum + (long)got.Value;
         got = queue.TryDequeue();
     }
@@ -57,14 +68,16 @@ int Main() {
 
     // ------------------------------------------------------------ stack
     var stack = new ConcurrentStack<int>();
-    parallel {
+    parallel
+    {
         spawn Stack(stack, 0, 500);
         spawn Stack(stack, 500, 1000);
     }
 
     long stacked = 0;
     var popped = stack.TryPop();
-    while (popped.Ok) {
+    while (popped.Ok)
+    {
         stacked = stacked + (long)popped.Value;
         popped = stack.TryPop();
     }
@@ -72,7 +85,8 @@ int Main() {
 
     // ------------------------------------------------------- dictionary
     var map = new ConcurrentDictionary<int, int>();
-    parallel {
+    parallel
+    {
         spawn Record(map, 0, 500);
         spawn Record(map, 500, 1000);
         spawn Record(map, 1000, 1500);
@@ -93,12 +107,14 @@ int Main() {
     // ---------------------------------------------------------- channel
     // One producer, three consumers, and a close that wakes all of them.
     var channel = new Channel<int>();
-    for (int i = 1; i <= 600; i = i + 1) { channel.Send(i); }
+    for (int i = 1; i <= 600; i = i + 1)
+        channel.Send(i);
     channel.Close();
 
     var total = new AtomicLong(0);
     var seen = new AtomicLong(0);
-    parallel {
+    parallel
+    {
         spawn Consume(channel, total, seen);
         spawn Consume(channel, total, seen);
         spawn Consume(channel, total, seen);

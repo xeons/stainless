@@ -20,14 +20,20 @@ import Win32.Shell;
 import Win32.ShellCom;
 import Win32.Dialogs;
 
-void Say(String label, bool value) {
+void Say(String label, bool value)
+{
     Console.WriteLine(label + " " + Text.FromBool(value));
 }
 
 /// A known folder path is checked for shape rather than for content: what it
 /// is depends on the machine, and that it is rooted and non-empty does not.
-void Folder(String label, Result<String, ComError> found) {
-    if (!found.Ok) { Console.WriteLine(label + " <failed>"); return; }
+void Folder(String label, Result<String, ComError> found)
+{
+    if (!found.Ok)
+    {
+        Console.WriteLine(label + " <failed>");
+        return;
+    }
 
     String path = found.Value;
     bool rooted = path.ByteLength() > 3u && path.Substring(1u, 2u) == ":\\";
@@ -36,7 +42,8 @@ void Folder(String label, Result<String, ComError> found) {
 
 /// Everything that needs an apartment, in a scope that ends before the
 /// apartment does -- see Win32.Com.Uninitialize for why that matters.
-void Run() {
+void Run()
+{
     // --- known folders ------------------------------------------------
     //
     // Downloads and SavedGames are the point: neither has an
@@ -54,10 +61,18 @@ void Run() {
 
     // --- shell items --------------------------------------------------
     var windows = Shell.KnownFolder(Shell.WindowsId());
-    if (!windows.Ok) { Console.WriteLine("no windows folder"); return; }
+    if (!windows.Ok)
+    {
+        Console.WriteLine("no windows folder");
+        return;
+    }
 
     var item = Shell.ItemFromPath(windows.Value);
-    if (!item.Ok) { Console.WriteLine("no item"); return; }
+    if (!item.Ok)
+    {
+        Console.WriteLine("no item");
+        return;
+    }
 
     Say("path matches   ", Shell.PathOf(item.Value) == windows.Value);
     Say("is a folder    ", Shell.IsFolder(item.Value));
@@ -75,7 +90,11 @@ void Run() {
     // built, which is what makes the slot numbers real rather than internally
     // consistent.
     var made = Com.Create(Dialogs.FileOpenDialogId(), iidof(IFileOpenDialog));
-    if (!made.Ok) { Console.WriteLine("no dialog"); return; }
+    if (!made.Ok)
+    {
+        Console.WriteLine("no dialog");
+        return;
+    }
 
     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
 
@@ -93,7 +112,8 @@ void Run() {
     // Slots 16 and 17: what goes in comes back out.
     dialog.SetFileName("suggested.txt".ToUtf16().ToPointer());
     char16* name = null;
-    if (Com.Succeeded(dialog.GetFileName(&name))) {
+    if (Com.Succeeded(dialog.GetFileName(&name)))
+    {
         Say("filename kept  ", Com.TakeString(name) == "suggested.txt");
     }
 
@@ -107,7 +127,8 @@ void Run() {
         Com.Succeeded(dialog.SetFolder((byte*)item.Value)));
 
     byte* back = null;
-    if (Com.Succeeded(dialog.GetFolder(&back))) {
+    if (Com.Succeeded(dialog.GetFolder(&back)))
+    {
         IShellItem got = (IShellItem)back;
         Say("folder kept    ", Shell.PathOf(got) == windows.Value);
     }
@@ -141,7 +162,8 @@ void Run() {
     // A folder picker is the same dialog with one option, which is what
     // replaced SHBrowseForFolder.
     var picker = Com.Create(Dialogs.FileOpenDialogId(), iidof(IFileOpenDialog));
-    if (!picker.Ok) { return; }
+    if (!picker.Ok)
+        return;
 
     IFileOpenDialog folders = (IFileOpenDialog)picker.Value;
     uint mode = 0u;
@@ -153,8 +175,13 @@ void Run() {
     Say("picks folders  ", (asked & OptionPickFolders) != 0u);
 }
 
-public void Main() {
-    if (!Com.Initialize()) { Console.WriteLine("COM would not start"); return; }
+public void Main()
+{
+    if (!Com.Initialize())
+    {
+        Console.WriteLine("COM would not start");
+        return;
+    }
 
     Run();
 

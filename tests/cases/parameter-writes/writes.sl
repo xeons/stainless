@@ -7,23 +7,30 @@ module Writes;
 
 import Standard.Console;
 
-class Tracked {
+class Tracked
+{
     public int Id;
-    public Tracked(int id) { Id = id; Console.WriteLine("+" + Text.FromInteger(id)); }
+    public Tracked(int id)
+    {
+        Id = id;
+        Console.WriteLine("+" + Text.FromInteger(id));
+    }
     ~Tracked() { Console.WriteLine("-" + Text.FromInteger(Id)); }
 }
 
 struct Cell { public Tracked Item; }
 
 // Rebinding a reference parameter: the caller's object must outlive the call.
-void Rebind(Tracked t) {
+void Rebind(Tracked t)
+{
     t = new Tracked(2);
     Console.WriteLine("inside " + Text.FromInteger(t.Id));
 }
 
 // Writing through a struct parameter, which is the caller's bytes copied but
 // not the caller's ownership.
-void Overwrite(Cell c) {
+void Overwrite(Cell c)
+{
     c.Item = new Tracked(4);
     Console.WriteLine("inside " + Text.FromInteger(c.Item.Id));
 }
@@ -32,15 +39,17 @@ void Overwrite(Cell c) {
 // same write as the one above and adopts the parameter the same way.
 struct Slot { public Tracked Item { get; set; } }
 
-void Replace(Slot s) {
+void Replace(Slot s)
+{
     s.Item = new Tracked(6);
     Console.WriteLine("inside " + Text.FromInteger(s.Item.Id));
 }
 
 // Reading a parameter costs nothing at all, which is the point of borrowing.
-int Read(Tracked t) { return t.Id; }
+int Read(Tracked t) => t.Id;
 
-int Main() {
+int Main()
+{
     Console.WriteLine("-- rebind");
     {
         var original = new Tracked(1);

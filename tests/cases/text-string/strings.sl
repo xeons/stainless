@@ -14,19 +14,23 @@ module TextStrings;
 import Standard.Console;
 import Standard.Text;
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " " + value);
 }
 
-void SayNumber(String label, long value) {
+void SayNumber(String label, long value)
+{
     Console.WriteLine(label + " " + Text.FromInteger(value));
 }
 
-void SayBool(String label, bool value) {
+void SayBool(String label, bool value)
+{
     Console.WriteLine(label + " " + Text.FromBool(value));
 }
 
-int Main() {
+int Main()
+{
     // ------------------------------------------------------------- testing
     SayBool("starts", "hello world".StartsWith("hello"));
     SayBool("starts-no", "hello world".StartsWith("world"));
@@ -106,7 +110,8 @@ int Main() {
     SayNumber("points", (long)text.CodePointCount());
 
     var walked = new StringBuilder();
-    for (nuint at = 0u; at < text.ByteLength(); at = text.NextCodePoint(at)) {
+    for (nuint at = 0u; at < text.ByteLength(); at = text.NextCodePoint(at))
+    {
         walked.Append(Text.FromInteger((long)(uint)text.CodePointAt(at)));
         walked.Append(" ");
     }

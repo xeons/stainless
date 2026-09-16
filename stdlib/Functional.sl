@@ -116,7 +116,7 @@ public nuint CountWhere<T>(T[:] items, Predicate<T> test)
     foreach (var item in items)
     {
         if (test(item))
-            found += 1u;
+            found++;
     }
     return found;
 }
@@ -255,7 +255,7 @@ public nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test)
     foreach (var item in items)
     {
         if (test(item))
-            found += 1u;
+            found++;
     }
     return found;
 }

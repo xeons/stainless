@@ -20,7 +20,8 @@ import Standard.Console;
 import Standard.Text;
 
 [Guid("9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10")]
-public com interface IGreeter {
+public com interface IGreeter
+{
     int Greet(int times, int* total);
     int Total(int* total);
 }
@@ -28,63 +29,78 @@ public com interface IGreeter {
 /// A second interface, so QueryInterface has something to answer that is not
 /// the one the caller already holds.
 [Guid("b71e0c48-3a95-4f2d-9c11-6e8a0d3f5b27")]
-public com interface ICounter {
+public com interface ICounter
+{
     int Reset();
 }
 
 /// `[Guid]` on a com class is a CLSID: it names the class, so a caller with no
 /// object can ask for one.
 [Guid("5a1c8e30-2b47-4d16-a9f3-c04e7b81d629")]
-public com class Greeter : IGreeter, ICounter {
-    int total;
+public com class Greeter : IGreeter, ICounter
+{
+    int _total;
 
-    public Greeter() {
-        total = 0;
+    public Greeter()
+    {
+        _total = 0;
         Console.WriteLine("constructed");
     }
 
     ~Greeter() { Console.WriteLine("destroyed"); }
 
-    public int Greet(int times, int* total) {
-        if (total == null) { return Com.PointerError; }
-        this.total = this.total + times;
-        *total = this.total;
+    public int Greet(int times, int* total)
+    {
+        if (total == null)
+            return Com.PointerError;
+        this._total = this._total + times;
+        *total = this._total;
         return Com.Ok;
     }
 
-    public int Total(int* total) {
-        if (total == null) { return Com.PointerError; }
-        *total = this.total;
+    public int Total(int* total)
+    {
+        if (total == null)
+            return Com.PointerError;
+        *total = this._total;
         return Com.Ok;
     }
 
-    public int Reset() { total = 0; return Com.Ok; }
+    public int Reset()
+    {
+        _total = 0;
+        return Com.Ok;
+    }
 }
 
 /// A com class with no CLSID stays unreachable by one, which is the other half
 /// of the rule: it can be handed out, never asked for.
-public com class Quiet : ICounter {
-    public int Reset() { return Com.Ok; }
+public com class Quiet : ICounter
+{
+    public int Reset() => Com.Ok;
 }
 
 // The COM server entry point, exported exactly as a DLL would export it. Here
 // the C++ half calls it directly, which is what LoadLibrary would have found.
-export "C" int DllGetClassObject(Guid* clsid, Guid* iid, byte** result) {
+export "C" int DllGetClassObject(Guid* clsid, Guid* iid, byte** result)
+{
     return Com.GetClassObject(clsid, iid, result);
 }
 
-export "C" int DllCanUnloadNow() { return Com.CanUnloadNow(); }
+export "C" int DllCanUnloadNow() => Com.CanUnloadNow();
 
 /// The C++ half, which does the asking.
 extern "C++" int DriveActivation();
 
 /// S_OK is 0 and S_FALSE is 1, so this reads as "yes" or "no" rather than as a
 /// number nobody remembers the sign of.
-String Unloadable() {
+String Unloadable()
+{
     return DllCanUnloadNow() == Com.Ok ? "yes" : "no";
 }
 
-public void Main() {
+public void Main()
+{
     // Nothing made yet, so nothing is held.
     Console.WriteLine("can unload before: " + Unloadable());
 

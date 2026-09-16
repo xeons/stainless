@@ -12,27 +12,36 @@ module OptionalNarrowing;
 import Standard.Console;
 import Standard.Text;
 
-public class Node {
+public class Node
+{
     public int Value;
     public Node? Next;
 
-    public Node(int value) { Value = value; Next = null; }
+    public Node(int value)
+    {
+        Value = value;
+        Next = null;
+    }
 }
 
 /// An early return proves the rest of the block, which is what makes the
 /// recursive shape work: `head` is a `Node?` on the way in and a `Node` from
 /// the second line on.
-int Sum(Node? head) {
-    if (head == null) { return 0; }
+int Sum(Node? head)
+{
+    if (head == null)
+        return 0;
     return head.Value + Sum(head.Next);
 }
 
 /// The same over a loop rather than a stack.
-String Walk(Node? head) {
+String Walk(Node? head)
+{
     var text = new StringBuilder();
 
     Node? at = head;
-    while (at != null) {
+    while (at != null)
+    {
         text.AppendInteger((long)at.Value);
         text.Append(" ");
         at = at.Next;               // still assignable: the check said what it
@@ -41,11 +50,12 @@ String Walk(Node? head) {
 }
 
 /// A narrowed optional is an ordinary reference, so it goes wherever one does.
-int Doubled(Node node) { return node.Value * 2; }
+int Doubled(Node node) => node.Value * 2;
 
-Node? Nothing() { return null; }
+Node? Nothing() => null;
 
-public void Main() {
+public void Main()
+{
     var a = new Node(1);
     var b = new Node(2);
     var c = new Node(3);
@@ -57,13 +67,25 @@ public void Main() {
 
     // --- if and else --------------------------------------------------
     Node? maybe = b;
-    if (maybe != null) { Console.WriteLine("if    " + Text.FromInteger((long)maybe.Value)); }
-    else { Console.WriteLine("if    none"); }
+    if (maybe != null)
+    {
+        Console.WriteLine("if    " + Text.FromInteger((long)maybe.Value));
+    }
+    else
+    {
+        Console.WriteLine("if    none");
+    }
 
     // `== null` proves the other arm, which is the same rule read backwards.
     Node? empty = Nothing();
-    if (empty == null) { Console.WriteLine("else  none"); }
-    else { Console.WriteLine("else  " + Text.FromInteger((long)empty.Value)); }
+    if (empty == null)
+    {
+        Console.WriteLine("else  none");
+    }
+    else
+    {
+        Console.WriteLine("else  " + Text.FromInteger((long)empty.Value));
+    }
 
     // --- && binds its right operand knowing the left ------------------
     //
@@ -71,7 +93,8 @@ public void Main() {
     // the same rule a variant follows, and for the same reason: a check would
     // be about one evaluation and the read about another.
     Node? next = maybe != null ? maybe.Next : null;
-    if (maybe != null && next != null) {
+    if (maybe != null && next != null)
+    {
         Console.WriteLine("chain " + Text.FromInteger((long)next.Value));
     }
 
@@ -80,15 +103,18 @@ public void Main() {
     Console.WriteLine("tern  " + Text.FromInteger((long)(t != null ? t.Value : -1)));
 
     // --- as an argument -----------------------------------------------
-    if (t != null) { Console.WriteLine("arg   " + Text.FromInteger((long)Doubled(t))); }
+    if (t != null)
+        Console.WriteLine("arg   " + Text.FromInteger((long)Doubled(t)));
 
     // --- still an optional where it is written ------------------------
-    if (maybe != null) { maybe = null; }
+    if (maybe != null)
+        maybe = null;
     Console.WriteLine("reset " + Text.FromBool(maybe == null));
 
     // --- and the proof does not outlive what it was about -------------
     Node? again = a;
-    if (again != null) {
+    if (again != null)
+    {
         Console.WriteLine("held  " + Text.FromInteger((long)again.Value));
         again = Nothing();
         Console.WriteLine("gone  " + Text.FromBool(again == null));
@@ -99,7 +125,8 @@ public void Main() {
     // `&&` binds its right operand knowing the left for a variant too, so
     // `r.Ok && r.Value > 0` reads the case the left established.
     var found = Find(a, 3);
-    if (found.Ok && found.Value > 0) {
+    if (found.Ok && found.Value > 0)
+    {
         Console.WriteLine("both  " + Text.FromInteger((long)found.Value));
     }
 
@@ -109,13 +136,16 @@ public void Main() {
 
 /// Both kinds of narrowing in one function: a Result to report with, and an
 /// optional to walk.
-Result<int, String> Find(Node? head, int wanted) {
+Result<int, String> Find(Node? head, int wanted)
+{
     int steps = 0;
 
     Node? at = head;
-    while (at != null) {
+    while (at != null)
+    {
         steps = steps + 1;
-        if (at.Value == wanted) { return Ok(steps); }
+        if (at.Value == wanted)
+            return Ok(steps);
         at = at.Next;
     }
     return Fail("not found");

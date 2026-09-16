@@ -14,7 +14,8 @@ import Standard.Console;
 import Standard.Text;
 import Standard.Com;
 
-public extern "C" {
+public extern "C"
+{
     int  CoInitializeEx(byte* reserved, uint flags);
     void CoUninitialize();
     int  SHCreateItemFromParsingName(char16* path, byte* bindContext,
@@ -23,7 +24,8 @@ public extern "C" {
 }
 
 [Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
-public com interface IShellItem {
+public com interface IShellItem
+{
     int BindToHandler(byte* bindContext, Guid* handler, Guid* iid, byte** result);
     int GetParent(byte** parent);
     int GetDisplayName(uint kind, char16** name);
@@ -34,14 +36,16 @@ public com interface IShellItem {
 const uint ApartmentThreaded = 2u;
 const uint NormalDisplay     = 0u;
 
-public void Main() {
+public void Main()
+{
     CoInitializeEx(null, ApartmentThreaded);
 
     byte* raw = null;
     int hr = SHCreateItemFromParsingName(
         "C:\\Windows".ToUtf16().ToPointer(), null, iidof(IShellItem), &raw);
 
-    if (hr < 0) {
+    if (hr < 0)
+    {
         Console.WriteLine("SHCreateItemFromParsingName failed");
         CoUninitialize();
         return;
@@ -53,7 +57,8 @@ public void Main() {
     IShellItem item = (IShellItem)raw;
 
     char16* name = null;
-    if (item.GetDisplayName(NormalDisplay, &name) >= 0) {
+    if (item.GetDisplayName(NormalDisplay, &name) >= 0)
+    {
         Console.WriteLine("display name: " + Text.FromNullTerminatedUtf16(name));
         CoTaskMemFree((byte*)name);
     }

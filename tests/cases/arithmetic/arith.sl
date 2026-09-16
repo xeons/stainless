@@ -5,7 +5,8 @@ extern "C" int printf(byte* format, ...);
 
 const int Limit = 100;
 
-int Main() {
+int Main()
+{
     printf("%d\n", 2 + 3 * 4);
     printf("%d\n", (2 + 3) * 4);
     printf("%d\n", 17 % 5);

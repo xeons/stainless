@@ -6,7 +6,8 @@
 // came to be described by a library and refused by its consumer.
 module Library.Names;
 
-public struct Units {
+public struct Units
+{
     public char Byte;
     public char16 Utf16;
     public char32 Scalar;
@@ -14,7 +15,8 @@ public struct Units {
     public nuint Count;
 }
 
-public struct Point {
+public struct Point
+{
     public int X;
     public int Y;
 }
@@ -23,14 +25,16 @@ public struct Point {
 // the very same symbol its own source resolves to rather than a second copy.
 public int[:] Tail(int[] numbers) { return numbers[1:]; }
 public (int, String) Pair(int n) { return (n, "pair"); }
-public (Point, int[:]) Both(int[] numbers) {
+public (Point, int[:]) Both(int[] numbers)
+{
     Point p;
     p.X = 1;
     p.Y = 2;
     return (p, numbers[2:]);
 }
 
-public Units Measure() {
+public Units Measure()
+{
     Units u;
     u.Byte = 'a';
     u.Utf16 = '\u00E9';
@@ -40,7 +44,8 @@ public Units Measure() {
     return u;
 }
 
-public int[] Squares(nuint n) {
+public int[] Squares(nuint n)
+{
     var made = new int[n];
     for (nuint i = 0; i < n; i++) made[i] = (int)(i * i);
     return made;

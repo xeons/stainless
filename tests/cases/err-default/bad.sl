@@ -5,9 +5,10 @@ module Bad;
 // uniform call still has to find something: `x.F(y)` is `F(x, y)` only where
 // such an `F` is in scope and takes an `x` first.
 
-int Length(String text) { return (int)text.ByteLength(); }
+int Length(String text) => (int)text.ByteLength();
 
-int Main() {
+int Main()
+{
     var nothing = default(void);
 
     // No member, and no function of the name at all.
@@ -18,4 +19,4 @@ int Main() {
     return 0;
 }
 
-int Widen(int n) { return n * 2; }
+int Widen(int n) => n * 2;

@@ -3,9 +3,10 @@ module Bad;
 
 // `try` passes a failure to the caller, so it needs something that could have
 // failed.
-Result<int, int> Main2() {
+Result<int, int> Main2()
+{
     int n = try 5;
     return Ok(n);
 }
 
-int Main() { return 0; }
+int Main() => 0;

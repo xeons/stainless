@@ -20,55 +20,64 @@ import Standard.Console;
 
 public closure void Act();
 
-public class Guarded {
+public class Guarded
+{
     /// Written by `Run` below, and read by the lambda in the constructor. Those
     /// two are not the same storage, which is the whole point of the warning.
-    bool busy;
+    bool _busy;
 
     public Act Body;
 
-    public Guarded() {
+    public Guarded()
+    {
         // `busy = false` here is a constructor and raises nothing: a member a
         // constructor sets and nothing else changes cannot surprise a closure.
-        busy = false;
+        _busy = false;
 
-        Body = () => {
-            if (busy) { return; }              // SL0610
+        Body = () =>
+        {
+            if (_busy)              // SL0610
+                return;
             Console.WriteLine("ran");
         };
     }
 
     /// The write that makes the capture above a warning rather than a fact.
-    public void Run() {
-        busy = true;
+    public void Run()
+    {
+        _busy = true;
         Body();
-        busy = false;
+        _busy = false;
     }
 }
 
 /// A property is the same question: the getter's answer is copied.
-public class Counted {
+public class Counted
+{
     public int Total { get; set; }
 
     public Act Report;
 
-    public Counted() {
+    public Counted()
+    {
         Total = 0;
         Report = () => { Console.WriteLine(Text.FromInteger((long)Total)); };  // SL0610
     }
 
-    public void Bump() { Total = Total + 1; }
+    public void Bump() => Total = Total + 1;
 }
 
 /// Nothing writes `label` outside a constructor, so capturing it is exactly
 /// what it looks like and there is no warning.
-public class Fixed {
-    String label;
+public class Fixed
+{
+    String _label;
     public Act Say;
 
-    public Fixed() {
-        label = "settled";
-        Say = () => { Console.WriteLine(label); };
+    public Fixed()
+    {
+        _label = "settled";
+        Say = () => { Console.WriteLine(_label); };
     }
 }
 
@@ -76,45 +85,55 @@ public class Fixed {
 /// `this` is captured -- an object reference, by the same by-value rule -- and
 /// the field is read through it, so the closure sees what the object says when
 /// it runs. No warning, and the guard works.
-public class Named {
-    bool busy;
+public class Named
+{
+    bool _busy;
     public Act Body;
 
-    public Named() {
-        busy = false;
-        Body = () => {
-            if (this.busy) { return; }
+    public Named()
+    {
+        _busy = false;
+        Body = () =>
+        {
+            if (this._busy)
+                return;
             Console.WriteLine("named ran");
         };
     }
 
-    public void Run() {
-        busy = true;
+    public void Run()
+    {
+        _busy = true;
         Body();
-        busy = false;
+        _busy = false;
     }
 }
 
 /// A method call does the same thing for the same reason, and reads better
 /// where the test is worth a name.
-public class Correct {
-    bool busy;
+public class Correct
+{
+    bool _busy;
     public Act Body;
 
-    bool Busy() { return busy; }
+    bool Busy() => _busy;
 
-    public Correct() {
-        busy = false;
-        Body = () => {
-            if (Busy()) { return; }
+    public Correct()
+    {
+        _busy = false;
+        Body = () =>
+        {
+            if (Busy())
+                return;
             Console.WriteLine("ran");
         };
     }
 
-    public void Run() {
-        busy = true;
+    public void Run()
+    {
+        _busy = true;
         Body();
-        busy = false;
+        _busy = false;
     }
 }
 
@@ -122,15 +141,18 @@ public class Correct {
 /// than naming a fix that is not one. `this` in a struct method is the struct,
 /// so capturing it copies the value; on a class it is a counted reference, and
 /// a copy of a reference still names the one object.
-public struct Tally {
+public struct Tally
+{
     public int Count;
 
-    public Act Show() {
+    public Act Show()
+    {
         return () => { Console.WriteLine("tally " + Text.FromInteger((long)Count)); };  // SL0610
     }
 }
 
-public void Main() {
+public void Main()
+{
     var guarded = new Guarded();
     guarded.Run();
 

@@ -17,15 +17,18 @@ import Standard.Console;
 import Standard.Text;
 import Standard.Collections;
 
-String N(long v) { return Text.FromInteger(v); }
+String N(long v) => Text.FromInteger(v);
 
 // A miss read the way any other variant is, which is the shape to reach for.
-String Describe(Dictionary<String, int> settings, String name) {
-    if (settings.Find(name) is Some found) { return name + "=" + N((long)found.Value); }
+String Describe(Dictionary<String, int> settings, String name)
+{
+    if (settings.Find(name) is Some found)
+        return name + "=" + N((long)found.Value);
     return name + "=unset";
 }
 
-int Main() {
+int Main()
+{
     var settings = new Dictionary<String, int>();
     settings.Set("timeout", 30);
     settings.Set("retries", 0);
@@ -64,7 +67,8 @@ int Main() {
     counts["hits"] = 1;
     counts["misses"] = 9;
 
-    if (counts["hits"] is Some hit) { Console.WriteLine("subscript " + N((long)hit.Value)); }
+    if (counts["hits"] is Some hit)
+        Console.WriteLine("subscript " + N((long)hit.Value));
     Console.WriteLine("subscript-miss " + (counts["absent"].IsEmpty() ? "empty" : "?"));
     Console.WriteLine("subscript-or " + N((long)counts["absent"].ValueOr(8080)));
 

@@ -12,11 +12,12 @@ import Win32.Gdi32;
 import Win32.Kernel32;
 import Win32.AdvApi32;
 
-int Main() {
-    HWND   window = null;
-    HDC    device = null;
+int Main()
+{
+    HWND window = null;
+    HDC device = null;
     HANDLE file   = InvalidHandle();
-    HKEY   key     = LocalMachine();
+    HKEY key     = LocalMachine();
 
     // A device context is not a window.
     ShowWindow(device, 1);                          // SL0262

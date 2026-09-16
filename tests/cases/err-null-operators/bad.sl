@@ -5,14 +5,21 @@ module Bad;
 // and it answers with nothing when there was nothing, so "nothing" has to be
 // something the answer's type can hold.
 
-public class Node {
+public class Node
+{
     public String Name { get; set; }
     public Node? Next { get; set; }
     public int Weight { get; set; }
-    public Node(String name) { Name = name; Next = null; Weight = 0; }
+    public Node(String name)
+    {
+        Name = name;
+        Next = null;
+        Weight = 0;
+    }
 }
 
-int Main() {
+int Main()
+{
     var here = new Node("here");
     Node? maybe = here.Next;
     int plain = 3;

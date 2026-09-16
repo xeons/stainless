@@ -4,4 +4,4 @@ module Convention;
 
 public closure __stdcall int Handler(int value);
 
-int Main() { return 0; }
+int Main() => 0;

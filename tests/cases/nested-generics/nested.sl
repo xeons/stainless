@@ -6,13 +6,15 @@ import Standard.Threading;
 
 extern "C" int printf(byte* format, ...);
 
-public class Box<T> {
-    T value;
-    public Box(T initial) { value = initial; }
-    public T Get() { return value; }
+public class Box<T>
+{
+    T _value;
+    public Box(T initial) => _value = initial;
+    public T Get() => _value;
 }
 
-int Main() {
+int Main()
+{
     // The last two characters here are one shift operator to the lexer; only
     // the parser knows a type argument list is open and splits them.
     var boxes = new List<Box<int>>();
@@ -20,7 +22,8 @@ int Main() {
     boxes.Add(new Box<int>(35));
 
     int total = 0;
-    for (nuint i = 0; i < boxes.Count(); i = i + 1) { total = total + boxes.At(i).Get(); }
+    for (nuint i = 0; i < boxes.Count(); i = i + 1)
+        total = total + boxes.At(i).Get();
     printf("total=%d\n", total);
 
     // Three deep.
@@ -62,14 +65,21 @@ int Main() {
 
 public variant Sprig<T> { Bud(T Item); Fork(Twig<T> Pair); Bare; }
 
-public class Twig<T> {
+public class Twig<T>
+{
     public Sprig<T> Left;
     public Sprig<T> Right;
-    public Twig(Sprig<T> left, Sprig<T> right) { Left = left; Right = right; }
+    public Twig(Sprig<T> left, Sprig<T> right)
+    {
+        Left = left;
+        Right = right;
+    }
 }
 
-int Count(Sprig<int> sprig) {
-    switch (sprig) {
+int Count(Sprig<int> sprig)
+{
+    switch (sprig)
+    {
         case Bud b:  return b.Item;
         case Fork f: return Count(f.Pair.Left) + Count(f.Pair.Right);
         case Bare:   return 0;

@@ -5,19 +5,22 @@ module Bad;
 // has to be one nothing else already filled, and it has to leave none empty.
 // And the names come last, so that a reader never has to count past them.
 
-String Draw(String text, int width, bool center) { return text; }
+String Draw(String text, int width, bool center) => text;
 
-class Rect {
+class Rect
+{
     public Rect(int left, int top) { }
 }
 
-class Square : Rect {
+class Square : Rect
+{
     // A chained constructor takes its arguments in order: there is no
     // declaration here for a name to match against.
-    public Square(int side) { base(left: 0, top: 0); }
+    public Square(int side) => base(left: 0, top: 0);
 }
 
-int Main() {
+int Main()
+{
     // No parameter of that name.
     Draw("hi", width: 2, middle: true);
 

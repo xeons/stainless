@@ -23,13 +23,15 @@ import Standard.Console;
 #pragma comment(lib, "this-library-does-not-exist")
 #endif
 
-extern "C" {
+extern "C"
+{
     int   GetSystemMetrics(int index);          // user32
     void* CreateSolidBrush(uint colour);        // gdi32
     int   DeleteObject(void* object);           // gdi32
 }
 
-int Main() {
+int Main()
+{
     // Both libraries resolved, so both calls are real.
     Console.WriteLine("screen is wider than nothing: "
         + Text.FromBool(GetSystemMetrics(0) > 0));

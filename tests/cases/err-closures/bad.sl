@@ -11,13 +11,15 @@ public delegate void Plain(int value);
 
 void Free(int value) { }
 
-class Counter {
+class Counter
+{
     public int Total;
-    public Counter() { Total = 0; }
-    public void Add(int value) { Total = Total + value; }
+    public Counter() => Total = 0;
+    public void Add(int value) => Total = Total + value;
 }
 
-void Uses(Counter counter) {
+void Uses(Counter counter)
+{
     // A plain function has no object, and a closure is a method and its object.
     Notify a = Free;
 
@@ -33,4 +35,4 @@ void Uses(Counter counter) {
     Console.WriteLine("unreachable");
 }
 
-public int Main() { return 0; }
+public int Main() => 0;

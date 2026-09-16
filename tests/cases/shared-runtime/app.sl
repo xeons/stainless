@@ -10,7 +10,8 @@ import Standard.Console;
 import Standard.Text;
 import Talk;
 
-int Main() {
+int Main()
+{
     Console.WriteLine("app: one");
     Say("two");
     Console.WriteLine("app: three");

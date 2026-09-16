@@ -9,22 +9,27 @@ import Standard.Console;
 import Standard.Collections;
 import Standard.Reflection;
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " = " + value);
 }
 
-void Round(String label, String source) {
+void Round(String label, String source)
+{
     var parsed = Xml.Parse(source);
-    if (!parsed.Ok) {
+    if (!parsed.Ok)
+    {
         Say(label, "failed: " + Xml.Describe(parsed.Error));
         return;
     }
     Say(label, Xml.Write(parsed.Value));
 }
 
-void Refuse(String label, String source) {
+void Refuse(String label, String source)
+{
     var parsed = Xml.Parse(source);
-    if (parsed.Ok) {
+    if (parsed.Ok)
+    {
         Say(label, "accepted, and should not have been");
         return;
     }
@@ -34,15 +39,21 @@ void Refuse(String label, String source) {
 // ---------------------------------------------------------------- the mapping
 
 [Reflect]
-public class Endpoint {
+public class Endpoint
+{
     public String Host;
     public int Port;
 
-    public Endpoint() { Host = ""; Port = 0; }
+    public Endpoint()
+    {
+        Host = "";
+        Port = 0;
+    }
 }
 
 [Reflect]
-public class Settings {
+public class Settings
+{
     // An attribute rather than a child element, which is what makes the
     // output look like XML somebody wrote.
     [XmlAttribute]
@@ -67,7 +78,8 @@ public class Settings {
     // sequence.
     public String[] Hosts;
 
-    public Settings() {
+    public Settings()
+    {
         Environment = "";
         Version = 0;
         Name = "";
@@ -82,7 +94,8 @@ public class Settings {
     }
 }
 
-public int Main() {
+public int Main()
+{
     // -------------------------------------------------------- round trips
     Round("empty", "<a/>");
     Round("empty-pair", "<a></a>");
@@ -127,7 +140,8 @@ public int Main() {
         "<config env=\"live\"><name>server</name><name>second</name>" +
         "<port>8080</port></config>");
 
-    if (parsed.Ok) {
+    if (parsed.Ok)
+    {
         var root = parsed.Value;
         Say("root-name", root.Name);
         Say("attribute", root.Attributes.Find("env", "?"));

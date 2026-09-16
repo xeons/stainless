@@ -33,10 +33,13 @@ public delegate int Orders<T>(T left, T right);
 
 // ------------------------------------------------------- what uses them
 
-public List<T> Kept<T>(T[:] items, Keeps<T> ok) {
+public List<T> Kept<T>(T[:] items, Keeps<T> ok)
+{
     var kept = new List<T>();
-    foreach (var item in items) {
-        if (ok(item)) { kept.Add(item); }
+    foreach (var item in items)
+    {
+        if (ok(item))
+            kept.Add(item);
     }
     return kept;
 }
@@ -45,59 +48,82 @@ public List<T> Kept<T>(T[:] items, Keeps<T> ok) {
 /// binding the lambda's body -- which cannot happen until `T` has given the
 /// lambda its parameter type. The signature it is read off is the closure's
 /// own rather than an interface method's.
-public List<R> Turned<T, R>(T[:] items, Turns<T, R> change) {
+public List<R> Turned<T, R>(T[:] items, Turns<T, R> change)
+{
     var made = new List<R>();
-    foreach (var item in items) { made.Add(change(item)); }
+    foreach (var item in items)
+        made.Add(change(item));
     return made;
 }
 
-public void Each<T>(T[:] items, Takes<T> run) {
-    foreach (var item in items) { run(item); }
+public void Each<T>(T[:] items, Takes<T> run)
+{
+    foreach (var item in items)
+        run(item);
 }
 
-public A Folded<A, T>(T[:] items, A seed, Folds<A, T> step) {
+public A Folded<A, T>(T[:] items, A seed, Folds<A, T> step)
+{
     var total = seed;
-    foreach (var item in items) { total = step(total, item); }
+    foreach (var item in items)
+        total = step(total, item);
     return total;
 }
 
-public int Best<T>(T[:] items, Orders<T> order) {
+public int Best<T>(T[:] items, Orders<T> order)
+{
     int best = 0;
-    for (nuint i = 1u; i < items.Length; i++) {
-        if (order(items[i], items[(nuint)best]) > 0) { best = (int)i; }
+    for (nuint i = 1u; i < items.Length; i++)
+    {
+        if (order(items[i], items[(nuint)best]) > 0)
+            best = (int)i;
     }
     return best;
 }
 
 // A generic closure held in a field, and one that mentions its own template.
-public class Pipeline<T> {
-    Keeps<T> allow;
-    Takes<T> deliver;
+public class Pipeline<T>
+{
+    Keeps<T> _allow;
+    Takes<T> _deliver;
 
-    public Pipeline(Keeps<T> allow, Takes<T> deliver) {
-        this.allow = allow;
-        this.deliver = deliver;
+    public Pipeline(Keeps<T> allow, Takes<T> deliver)
+    {
+        this._allow = allow;
+        this._deliver = deliver;
     }
 
-    public void Offer(T value) {
-        if (allow(value)) { deliver(value); }
+    public void Offer(T value)
+    {
+        if (_allow(value))
+            _deliver(value);
     }
 }
 
 // Somewhere for a bound method to come from.
-class Tally {
+class Tally
+{
     public int Count;
     public int Sum;
 
-    public Tally() { Count = 0; Sum = 0; }
+    public Tally()
+    {
+        Count = 0;
+        Sum = 0;
+    }
 
-    public void Note(int value) { Count++; Sum += value; }
-    public bool Under(int value) { return value < 100; }
+    public void Note(int value)
+    {
+        Count++;
+        Sum += value;
+    }
+    public bool Under(int value) => value < 100;
 }
 
-int Wider(String a, String b) { return (int)a.ByteLength() - (int)b.ByteLength(); }
+int Wider(String a, String b) => (int)a.ByteLength() - (int)b.ByteLength();
 
-public int Main() {
+public int Main()
+{
     int[] numbers = [4, 1, 9, 2, 7];
     String[] words = ["alpha", "bb", "c", "delta"];
 

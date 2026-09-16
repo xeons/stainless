@@ -5,34 +5,41 @@ import Standard.Console;
 import Standard.Collections;
 
 // Interfaces are named with a leading I, as in C#.
-public class Money : IComparable<Money>, IEquatable<Money> {
-    int cents;
+public class Money : IComparable<Money>, IEquatable<Money>
+{
+    int _cents;
 
-    public Money(int amount) { cents = amount; }
-    public int Cents() { return cents; }
+    public Money(int amount) => _cents = amount;
+    public int Cents() => _cents;
 
-    public int CompareTo(Money other) {
-        if (cents < other.Cents()) { return -1; }
-        if (cents > other.Cents()) { return 1; }
+    public int CompareTo(Money other)
+    {
+        if (_cents < other.Cents())
+            return -1;
+        if (_cents > other.Cents())
+            return 1;
         return 0;
     }
 
-    public bool EqualTo(Money other) { return cents == other.Cents(); }
+    public bool EqualTo(Money other) => _cents == other.Cents();
 
-    public String Show() { return Text.FromInteger(cents) + "c"; }
+    public String Show() => Text.FromInteger(_cents) + "c";
 }
 
 // IList<T> extends IReadOnlyList<T>, so a list passed here can only be read.
-String Describe(IReadOnlyList<Money> prices) {
+String Describe(IReadOnlyList<Money> prices)
+{
     var text = new StringBuilder();
-    for (nuint i = 0; i < prices.Count(); i = i + 1) {
+    for (nuint i = 0; i < prices.Count(); i = i + 1)
+    {
         text.Append(prices.At(i).Show());
         text.Append(" ");
     }
     return text.ToText();
 }
 
-int Main() {
+int Main()
+{
     var prices = new List<Money>();
     prices.Add(new Money(250));
     prices.Add(new Money(125));

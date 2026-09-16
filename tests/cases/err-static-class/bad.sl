@@ -4,12 +4,13 @@
 // member that could never be reached -- and there is nothing to make one of.
 module Bad;
 
-public static class Holder {
+public static class Holder
+{
     // Each of these needs an instance.
-    int field;
+    int _field;
     public Holder() { }
     ~Holder() { }
-    public int Read() { return 1; }
+    public int Read() => 1;
     public int Value { get { return 1; } }
 
     // And this one is refused for a different reason: an automatic property
@@ -18,7 +19,8 @@ public static class Holder {
     public static int Count { get; set; }
 }
 
-int Main() {
+int Main()
+{
     var h = new Holder();
     return 0;
 }

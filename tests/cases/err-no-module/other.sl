@@ -1,3 +1,3 @@
 // SPDX-License-Identifier: 0BSD
 module Program;
-int Main() { return 0; }
+int Main() => 0;

@@ -7,17 +7,20 @@ module App;
 import Standard.Console;
 import Library.Bus;
 
-public class Log {
+public class Log
+{
     public String Tag;
 
-    public Log(String tag) { Tag = tag; }
+    public Log(String tag) => Tag = tag;
 
-    public void OnRead(Sensor sender, int value) {
+    public void OnRead(Sensor sender, int value)
+    {
         Console.WriteLine(Tag + " " + sender.Name + " " + Text.FromInteger(value));
     }
 }
 
-int Main() {
+int Main()
+{
     var sensor = new Sensor("s");
 
     // Allocated here, through the library's TypeInfo, and its event is empty
@@ -38,7 +41,8 @@ int Main() {
     sensor.Measure(3);
 
     // A lambda written here, subscribed to an event declared there.
-    sensor.Read += (sender, value) => {
+    sensor.Read += (sender, value) =>
+    {
         Console.WriteLine("lambda " + Text.FromInteger(value));
     };
     sensor.Measure(4);

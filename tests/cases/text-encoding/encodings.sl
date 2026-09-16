@@ -14,20 +14,24 @@ import Standard.Text;
 import Standard.Encoding;
 import Standard.Convert;
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " " + value);
 }
 
-void SayNumber(String label, long value) {
+void SayNumber(String label, long value)
+{
     Console.WriteLine(label + " " + Text.FromInteger(value));
 }
 
-void SayBool(String label, bool value) {
+void SayBool(String label, bool value)
+{
     Console.WriteLine(label + " " + Text.FromBool(value));
 }
 
 /// A round trip through one encoding, reported by whether it came back.
-void RoundTrip(String label, IEncoding encoding, String text) {
+void RoundTrip(String label, IEncoding encoding, String text)
+{
     var bytes = encoding.GetBytes(text);
     var back = encoding.GetString(bytes);
 
@@ -36,7 +40,8 @@ void RoundTrip(String label, IEncoding encoding, String text) {
         + " " + Text.FromBool(back == text));
 }
 
-int Main() {
+int Main()
+{
     // --------------------------------------------------------- round trips
     var sample = "héllo €";
 
@@ -109,15 +114,18 @@ int Main() {
     SayNumber("latin1-bom", (long)Encoding.Latin1().Preamble().Length);
 
     var marked = Encoding.Detect([0xEF, 0xBB, 0xBF, 0x68]);
-    if (marked != null) { Say("detect-utf8", marked.Name()); }
+    if (marked != null)
+        Say("detect-utf8", marked.Name());
 
     var wide = Encoding.Detect([0xFF, 0xFE, 0x41, 0x00]);
-    if (wide != null) { Say("detect-utf16", wide.Name()); }
+    if (wide != null)
+        Say("detect-utf16", wide.Name());
 
     // A UTF-32LE mark begins with a UTF-16LE one, so the longer test has to
     // come first or every UTF-32 file reads as UTF-16.
     var widest = Encoding.Detect([0xFF, 0xFE, 0x00, 0x00]);
-    if (widest != null) { Say("detect-utf32", widest.Name()); }
+    if (widest != null)
+        Say("detect-utf32", widest.Name());
 
     var plain = Encoding.Detect([0x68, 0x69]);
     SayBool("detect-none", plain == null);
@@ -135,14 +143,16 @@ int Main() {
     Say("b64-std", Convert.ToBase64([251, 255, 190]));
 
     var decoded = Convert.FromBase64("SGVsbG8sIFdvcmxkIQ==");
-    switch (decoded) {
+    switch (decoded)
+    {
         case Ok ok: Say("b64-back", Encoding.Utf8().GetString(ok.Value)); break;
         case Fail: Say("b64-back", "failed"); break;
     }
 
     // Wrapped at a column, which is how base64 arrives in the wild.
     var wrapped = Convert.FromBase64("SGVs\nbG8s\nIFdv\ncmxk\nIQ==");
-    switch (wrapped) {
+    switch (wrapped)
+    {
         case Ok ok: Say("b64-wrapped", Encoding.Utf8().GetString(ok.Value)); break;
         case Fail: Say("b64-wrapped", "failed"); break;
     }
@@ -160,7 +170,8 @@ int Main() {
     Say("hex-empty", "[" + Convert.ToHex([]) + "]");
 
     var unhex = Convert.FromHex("000fa5FF");
-    switch (unhex) {
+    switch (unhex)
+    {
         case Ok ok:
             SayNumber("unhex-len", (long)ok.Value.Length);
             SayNumber("unhex-2", (long)ok.Value[2]);
@@ -192,7 +203,8 @@ int Main() {
     SayBool("int32-overflow", narrow.Ok);
 
     var fits = Convert.ToInt("-2147483648");
-    switch (fits) {
+    switch (fits)
+    {
         case Ok ok: SayNumber("int32-min", (long)ok.Value); break;
         case Fail: Say("int32-min", "failed"); break;
     }
@@ -221,15 +233,19 @@ int Main() {
     return 0;
 }
 
-void ShowLong(String label, Result<long, ConvertError> result) {
-    switch (result) {
+void ShowLong(String label, Result<long, ConvertError> result)
+{
+    switch (result)
+    {
         case Ok ok: SayNumber(label, ok.Value); break;
         case Fail: Say(label, "failed"); break;
     }
 }
 
-void ShowDouble(String label, Result<double, ConvertError> result) {
-    switch (result) {
+void ShowDouble(String label, Result<double, ConvertError> result)
+{
+    switch (result)
+    {
         case Ok ok: Say(label, Text.FromDouble(ok.Value)); break;
         case Fail: Say(label, "failed"); break;
     }

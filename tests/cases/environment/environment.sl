@@ -17,11 +17,13 @@ import Standard.Collections;
 
 extern "C" int printf(byte* format, ...);
 
-int Main(String[] args) {
+int Main(String[] args)
+{
     // ------------------------------------------------------------ arguments
 
     printf("argc      = %llu\n", (ulong)args.Length);
-    foreach (var one in args) { printf("  arg     %s\n", one.ToPointer()); }
+    foreach (var one in args)
+        printf("  arg     %s\n", one.ToPointer());
 
     // The same list, reached from away from Main.
     printf("viaEnv    = %llu\n", (ulong)Env.ArgumentCount());
@@ -73,7 +75,8 @@ int Main(String[] args) {
 
     // Round trip, which is what makes the format worth having.
     var parsed = Instant.ParseIso("2026-09-05T14:30:00Z");
-    switch (parsed) {
+    switch (parsed)
+    {
         case Ok ok:
             printf("parsed    = %s\n", ok.Value.FormatIso().ToPointer());
             break;
@@ -131,8 +134,10 @@ int Main(String[] args) {
     var right = new Random(12345);
 
     bool same = true;
-    for (int i = 0; i < 100; i += 1) {
-        if (left.NextULong() != right.NextULong()) { same = false; }
+    for (int i = 0; i < 100; i++)
+    {
+        if (left.NextULong() != right.NextULong())
+            same = false;
     }
     printf("repeats   = %d\n", same);
 
@@ -144,18 +149,22 @@ int Main(String[] args) {
     var draws = new Random(7);
     bool inRange = true;
     var seen = new bool[6];
-    for (int i = 0; i < 600; i += 1) {
+    for (int i = 0; i < 600; i++)
+    {
         int roll = draws.NextInt(6);
-        if (roll < 0 || roll >= 6) { inRange = false; }
+        if (roll < 0 || roll >= 6)
+            inRange = false;
         seen[(nuint)roll] = true;
     }
     printf("inRange   = %d\n", inRange);
     printf("allSeen   = %d\n", All(seen, s => s));
 
     bool unit = true;
-    for (int i = 0; i < 200; i += 1) {
+    for (int i = 0; i < 200; i++)
+    {
         double value = draws.NextDouble();
-        if (value < 0.0 || value >= 1.0) { unit = false; }
+        if (value < 0.0 || value >= 1.0)
+            unit = false;
     }
     printf("unit      = %d\n", unit);
 
@@ -163,14 +172,16 @@ int Main(String[] args) {
 
     // A shuffle keeps every element and, on a fixed seed, is reproducible.
     var deck = new long[8];
-    for (nuint i = 0u; i < deck.Length; i += 1u) { deck[i] = (long)i; }
+    for (nuint i = 0u; i < deck.Length; i++)
+        deck[i] = (long)i;
 
     var shuffler = new Random(99);
     shuffler.Shuffle(deck);
     printf("shuffled  = %lld\n", Reduce(deck, (long)0, (sum, n) => sum + n));
 
     var again = new long[8];
-    for (nuint i = 0u; i < again.Length; i += 1u) { again[i] = (long)i; }
+    for (nuint i = 0u; i < again.Length; i++)
+        again[i] = (long)i;
     new Random(99).Shuffle(again);
     printf("sameOrder = %d\n", SameOrder(deck, again));
 
@@ -182,12 +193,24 @@ int Main(String[] args) {
     // ---------------------------------------------------------------- stdin
 
     var firstLine = Console.ReadLine();
-    if (firstLine == null) { printf("line1     = <none>\n"); }
-    else { printf("line1     = %s\n", firstLine.ToPointer()); }
+    if (firstLine == null)
+    {
+        printf("line1     = <none>\n");
+    }
+    else
+    {
+        printf("line1     = %s\n", firstLine.ToPointer());
+    }
 
     var blank = Console.ReadLine();
-    if (blank == null) { printf("line2     = <none>\n"); }
-    else { printf("line2     = [%llu bytes]\n", (ulong)blank.ByteLength()); }
+    if (blank == null)
+    {
+        printf("line2     = <none>\n");
+    }
+    else
+    {
+        printf("line2     = [%llu bytes]\n", (ulong)blank.ByteLength());
+    }
 
     printf("rest      = %s", Console.ReadToEnd().ToPointer());
     printf("atEnd     = %d\n", Console.AtEnd());
@@ -200,18 +223,25 @@ int Main(String[] args) {
 }
 
 /// A hundred draws, all inside the half-open range asked for.
-bool InRange(Random source, long low, long high) {
-    for (int i = 0; i < 100; i += 1) {
+bool InRange(Random source, long low, long high)
+{
+    for (int i = 0; i < 100; i++)
+    {
         long drawn = source.NextBetween(low, high);
-        if (drawn < low || drawn >= high) { return false; }
+        if (drawn < low || drawn >= high)
+            return false;
     }
     return true;
 }
 
-bool SameOrder(long[] left, long[] right) {
-    if (left.Length != right.Length) { return false; }
-    for (nuint i = 0u; i < left.Length; i += 1u) {
-        if (left[i] != right[i]) { return false; }
+bool SameOrder(long[] left, long[] right)
+{
+    if (left.Length != right.Length)
+        return false;
+    for (nuint i = 0u; i < left.Length; i++)
+    {
+        if (left[i] != right[i])
+            return false;
     }
     return true;
 }

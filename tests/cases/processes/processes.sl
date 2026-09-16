@@ -25,18 +25,20 @@ import Standard.Process;
 
 // The programs differ; everything asked of them does not.
 #if UNIX
-String Shell() { return "sh"; }
-String Flag() { return "-c"; }
+String Shell() => "sh";
+String Flag() => "-c";
 #else
-String Shell() { return "cmd"; }
-String Flag() { return "/c"; }
+String Shell() => "cmd";
+String Flag() => "/c";
 #endif
 
 /// Runs it and reports one line, so the checking happens in one place.
-void Show(String label, String program, String[] arguments) {
+void Show(String label, String program, String[] arguments)
+{
     var answer = Run(program, arguments);
 
-    if (!answer.Ok) {
+    if (!answer.Ok)
+    {
         Console.WriteLine($"{label} refused, why={(int)answer.Error}");
         return;
     }
@@ -47,7 +49,8 @@ void Show(String label, String program, String[] arguments) {
         $"out=[{done.Output.Trim()}] err=[{done.Errors.Trim()}]");
 }
 
-public int Main() {
+public int Main()
+{
     // What it wrote, and what it returned.
     Show("echo    ", Shell(), [Flag(), "echo hello"]);
     Show("code    ", Shell(), [Flag(), "exit 3"]);
@@ -72,7 +75,8 @@ public int Main() {
     // end-of-input stops rather than waiting. `sort` is the one filter both
     // platforms ship, which is why it and not `wc`.
     var sorted = Run(Shell(), [Flag(), "sort"], "gamma\nalpha\nbeta\n");
-    if (sorted.Ok) {
+    if (sorted.Ok)
+    {
         var order = sorted.Value.Output.SplitLines();
         Console.WriteLine($"stdin    [{order[0u].Trim()} {order[1u].Trim()} {order[2u].Trim()}]");
     }
@@ -84,13 +88,15 @@ public int Main() {
 #else
     var big = Run(Shell(), [Flag(), "for /L %i in (1,1,4000) do @echo tttttttttttttttttttttttttttttttttttttttttttttttttt"]);
 #endif
-    if (big.Ok) {
+    if (big.Ok)
+{
         Console.WriteLine($"big      past a pipe: {big.Value.Output.ByteLength() > 100000u}");
     }
 
     // Started without waiting, then waited for.
     var started = Process.Start(Shell(), [Flag(), "exit 7"]);
-    if (started.Ok) {
+    if (started.Ok)
+    {
         var child = started.Value;
         Console.WriteLine($"started  named={child.Id() > 0L} waited={child.Wait().ValueOr(-1)}");
         Console.WriteLine($"again    {child.Wait().ValueOr(-1)}");
@@ -98,7 +104,8 @@ public int Main() {
 
     // Started, seen to be running, and stopped.
     var slow = Process.Start(Shell(), [Flag(), "sleep 30"]);
-    if (slow.Ok) {
+    if (slow.Ok)
+    {
         var child = slow.Value;
         Console.WriteLine($"running  {child.Finished().IsEmpty()}");
         child.Kill();

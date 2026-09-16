@@ -5,7 +5,8 @@ import Standard.Console;
 import Standard.Text;
 import Library.Names;
 
-int Main() {
+int Main()
+{
     var u = Measure();
     Console.WriteLine("units " + Text.FromInteger((int)u.Byte) + " " +
         Text.FromInteger((int)u.Utf16) + " " + Text.FromInteger((int)u.Scalar) + " " +

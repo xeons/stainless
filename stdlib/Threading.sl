@@ -553,7 +553,7 @@ public threadsafe class Semaphore
         sl_mutex_lock(_handle);
         bool took = _permits > 0;
         if (took)
-            _permits -= 1;
+            _permits--;
         sl_mutex_unlock(_handle);
         return took;
     }
@@ -790,7 +790,7 @@ public threadsafe class CountdownEvent
         sl_mutex_lock(_handle);
 
         if (_remaining > 0)
-            _remaining -= 1;
+            _remaining--;
         bool done = _remaining == 0;
         if (done)
             sl_condition_broadcast(_signal);

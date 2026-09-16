@@ -24,4 +24,4 @@ T Redundant<T>(T v) where T : struct, new() { return v; }
 // arguments would have to know their types.
 T Args<T>(T v) where T : new(int) { return v; }
 
-int Main() { return 0; }
+int Main() => 0;

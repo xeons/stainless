@@ -8,4 +8,4 @@
 // program's behalf, so SL0700 names the types that needed one.
 module NoResourceSection;
 
-int Main() { return 0; }
+int Main() => 0;

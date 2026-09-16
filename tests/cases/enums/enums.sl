@@ -8,13 +8,15 @@ public enum Color { Red, Green, Blue }
 // An explicit underlying type, and explicit values that the rest continue from.
 public enum Level : byte { Low = 1, Warning = 10, Severe, Fatal = 200 }
 
-String Describe(Color c) {
+String Describe(Color c)
+{
     if (c == Color.Red) return "red";
     if (c == Color.Green) return "green";
     return "blue";
 }
 
-int Main() {
+int Main()
+{
     var c = Color.Green;
 
     printf("green=%d\n", Describe(c) == "green" ? 1 : 0);

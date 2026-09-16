@@ -520,7 +520,7 @@ public class CodeEditor : CustomControl
         while (count >= 10u)
         {
             count = count / 10u;
-            digits += 1;
+            digits++;
         }
         if (digits < 3)
             digits = 3;

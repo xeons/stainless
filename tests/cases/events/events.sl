@@ -6,43 +6,50 @@ module Events;
 
 import Standard.Console;
 
-public class Change {
+public class Change
+{
     public int Code;
-    public Change(int code) { Code = code; }
+    public Change(int code) => Code = code;
 }
 
 public closure void ChangeHandler(Source sender, Change what);
 
-public class Source {
+public class Source
+{
     public String Name;
 
     public event ChangeHandler Changed;
 
-    public Source(String name) { Name = name; }
+    public Source(String name) => Name = name;
 
     // Only this type can raise its own event, and it does so by name.
-    public void Announce(int code) { Changed(this, new Change(code)); }
+    public void Announce(int code) => Changed(this, new Change(code));
 }
 
-public class Listener {
+public class Listener
+{
     public String Tag;
 
     // Held so a handler can unsubscribe itself while the event is running.
     public Source? Watching;
 
-    public Listener(String tag) { Tag = tag; }
+    public Listener(String tag) => Tag = tag;
 
-    public void OnChanged(Source sender, Change what) {
+    public void OnChanged(Source sender, Change what)
+    {
         Console.WriteLine(Tag + " " + sender.Name + " " + Text.FromInteger(what.Code));
     }
 
-    public void Once(Source sender, Change what) {
+    public void Once(Source sender, Change what)
+    {
         Console.WriteLine("once " + Text.FromInteger(what.Code));
-        if (Watching is Source s) { s.Changed -= this.Once; }
+        if (Watching is Source s)
+            s.Changed -= this.Once;
     }
 }
 
-int Main() {
+int Main()
+{
     var source = new Source("s");
 
     // Nobody has subscribed. Raising is a no-op rather than a null to trip over.
@@ -70,7 +77,8 @@ int Main() {
     source.Announce(6);
 
     // A lambda is a closure too.
-    source.Changed += (sender, what) => {
+    source.Changed += (sender, what) =>
+    {
         Console.WriteLine("lambda " + Text.FromInteger(what.Code));
     };
     source.Announce(7);

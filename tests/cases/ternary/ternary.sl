@@ -5,20 +5,23 @@ import Standard.Console;
 
 extern "C" int printf(byte* format, ...);
 
-class Tag {
-    String name;
-    Tag(String n) { name = n; }
-    public String Name() { return name; }
+class Tag
+{
+    String _name;
+    Tag(String n) => _name = n;
+    public String Name() => _name;
 }
 
-int Max(int a, int b) { return a > b ? a : b; }
+int Max(int a, int b) => a > b ? a : b;
 
 // Nested, to prove the false arm groups to the right.
-String Band(int score) {
+String Band(int score)
+{
     return score >= 90 ? "high" : score >= 50 ? "middle" : "low";
 }
 
-int Main() {
+int Main()
+{
     printf("max=%d\n", Max(3, 9));
     printf("min=%d\n", 3 < 9 ? 3 : 9);
 

@@ -24,28 +24,70 @@ public struct Small { public sbyte A; public sbyte B; public sbyte C; }
 
 // Twelve bytes: two general registers going out, and the twelve bytes have to
 // be copied into sixteen before they are read.
-public int sum_tri(Tri v) { return v.A + v.B + v.C; }
+public int sum_tri(Tri v) => v.A + v.B + v.C;
 
 // Homogeneous, so registers whatever the size.
-public float sum_trio(Trio v) { return v.A + v.B + v.C; }
-public double sum_quad(Quad v) { return v.A + v.B + v.C + v.D; }
+public float sum_trio(Trio v) => v.A + v.B + v.C;
+public double sum_quad(Quad v) => v.A + v.B + v.C + v.D;
 
 // Twenty-four bytes and not homogeneous: a pointer to the caller's copy.
-public long sum_big(Big v) { return v.A + v.B + (long)v.C; }
+public long sum_big(Big v) => v.A + v.B + (long)v.C;
 
 // Pointers stay pointers on the way in.
-public long count_twins(Twins v) { return (v.A == null ? 0L : 1L) + (v.B == null ? 0L : 1L); }
+public long count_twins(Twins v) => (v.A == null ? 0L : 1L) + (v.B == null ? 0L : 1L);
 
 // Three bytes: an i64 going out and an i24 coming back, which is the one place
 // the two directions disagree.
-public Small make_small() { Small s; s.A = 1; s.B = 2; s.C = 3; return s; }
-public int sum_small(Small v) { return (int)v.A + (int)v.B + (int)v.C; }
+public Small make_small()
+{
+    Small s;
+    s.A = 1;
+    s.B = 2;
+    s.C = 3;
+    return s;
+}
+public int sum_small(Small v) => (int)v.A + (int)v.B + (int)v.C;
 
-public Tri make_tri() { Tri t; t.A = 1; t.B = 2; t.C = 3; return t; }
-public Trio make_trio() { Trio t; t.A = 1.0f; t.B = 2.0f; t.C = 3.0f; return t; }
-public Quad make_quad() { Quad q; q.A = 1.0; q.B = 2.0; q.C = 3.0; q.D = 4.0; return q; }
-public Big make_big() { Big b; b.A = 1; b.B = 2; b.C = 3; return b; }
-public Twins make_twins() { Twins t; t.A = null; t.B = null; return t; }
+public Tri make_tri()
+{
+    Tri t;
+    t.A = 1;
+    t.B = 2;
+    t.C = 3;
+    return t;
+}
+public Trio make_trio()
+{
+    Trio t;
+    t.A = 1.0f;
+    t.B = 2.0f;
+    t.C = 3.0f;
+    return t;
+}
+public Quad make_quad()
+{
+    Quad q;
+    q.A = 1.0;
+    q.B = 2.0;
+    q.C = 3.0;
+    q.D = 4.0;
+    return q;
+}
+public Big make_big()
+{
+    Big b;
+    b.A = 1;
+    b.B = 2;
+    b.C = 3;
+    return b;
+}
+public Twins make_twins()
+{
+    Twins t;
+    t.A = null;
+    t.B = null;
+    return t;
+}
 
 int main()
 {

@@ -20,4 +20,4 @@ public class Aligned { public int A; public Aligned() { A = 0; } }
 [Packed]
 public variant Choice { One(int N); Two; }
 
-int Main() { return 0; }
+int Main() => 0;

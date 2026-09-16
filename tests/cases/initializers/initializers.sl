@@ -18,63 +18,74 @@ import Standard.Collections;
 
 public const int Wide = 80;
 
-public class Watch {
+public class Watch
+{
     public int Destroyed;
 }
 
-public class Panel {
+public class Panel
+{
     public int Width = Wide;
     public String Title = "untitled";
     public bool Visible { get; set; } = true;
     public int Id { get; } = 7;
     public int Height;
 
-    int hits = 0;
+    int _hits = 0;
 
     public Panel() { }
 
     /// The body has the last word: the initializer ran before it.
-    public Panel(String title) { Title = title; }
+    public Panel(String title) => Title = title;
 
     /// Chaining to another constructor runs the initializers there and not
     /// again here, so `Width` is 10 rather than 80 at the end of this.
-    public Panel(String title, int width) { this(title); Width = width; }
+    public Panel(String title, int width)
+    {
+        this(title);
+        Width = width;
+    }
 
-    public String Describe() {
+    public String Describe()
+    {
         return Title + " " + Text.FromInteger(Width) + " " + Text.FromInteger(Height) +
                " " + Text.FromBool(Visible) + " " + Text.FromInteger(Id) +
-               " " + Text.FromInteger(hits);
+               " " + Text.FromInteger(_hits);
     }
 }
 
 /// No constructor at all, so one is made to run the initializers in.
-public class Counter {
+public class Counter
+{
     public String Name = "counter";
     public int Value = 3;
 }
 
-public class Framed : Panel {
+public class Framed : Panel
+{
     public int Border = 2;
 
-    public Framed() { base("framed"); }
+    public Framed() => base("framed");
 
-    public String More() { return Describe() + " " + Text.FromInteger(Border); }
+    public String More() => Describe() + " " + Text.FromInteger(Border);
 }
 
 /// Something with a destructor, to show the lowering leaks nothing: an object
 /// initializer is a name holding the construction and then some writes, and
 /// the name is the temporary the statement already dropped.
-public class Tracked {
-    Watch watch;
+public class Tracked
+{
+    Watch _watch;
 
     public String Label = "none";
 
-    public Tracked(Watch w) { watch = w; }
+    public Tracked(Watch w) => _watch = w;
 
-    ~Tracked() { watch.Destroyed = watch.Destroyed + 1; }
+    ~Tracked() { _watch.Destroyed = _watch.Destroyed + 1; }
 }
 
-int Main() {
+int Main()
+{
     Console.WriteLine(new Panel().Describe());
     Console.WriteLine(new Panel("named").Describe());
     Console.WriteLine(new Panel("both", 10).Describe());
@@ -118,4 +129,4 @@ int Main() {
     return 0;
 }
 
-String Describe(Panel p) { return p.Title + "/" + Text.FromInteger(p.Width); }
+String Describe(Panel p) => p.Title + "/" + Text.FromInteger(p.Width);

@@ -9,29 +9,35 @@ import Standard.Console;
 
 interface IMap { int Apply(int x); }
 
-class Scaler {
+class Scaler
+{
     public int Factor;
     public int Offset { get; set; }
 
-    public Scaler(int factor, int offset) { Factor = factor; Offset = offset; }
+    public Scaler(int factor, int offset)
+    {
+        Factor = factor;
+        Offset = offset;
+    }
 
-    int Triple(int n) { return n * 3; }
+    int Triple(int n) => n * 3;
 
-    public IMap ByField()     { return x => x * Factor; }
-    public IMap ByProperty()  { return x => x + Offset; }
-    public IMap ByThis()      { return x => x * this.Factor; }
-    public IMap ByMethod()    { return x => Triple(x); }
-    public IMap ByThisCall()  { return x => this.Triple(x) + this.Factor; }
-    public IMap Nested()      { return x => Wrap(x); }
+    public IMap ByField() => x => x * Factor;
+    public IMap ByProperty() => x => x + Offset;
+    public IMap ByThis() => x => x * this.Factor;
+    public IMap ByMethod() => x => Triple(x);
+    public IMap ByThisCall() => x => this.Triple(x) + this.Factor;
+    public IMap Nested() => x => Wrap(x);
 
-    int Wrap(int n) { return n + Factor; }
+    int Wrap(int n) => n + Factor;
 
     // Captured by value: changing the field afterwards does not change what the
     // closure already took.
-    public IMap Snapshot() { return x => x + Factor; }
+    public IMap Snapshot() => x => x + Factor;
 }
 
-int Main() {
+int Main()
+{
     var scaler = new Scaler(3, 5);
 
     Console.WriteLine(Text.FromInteger(scaler.ByField().Apply(7)));

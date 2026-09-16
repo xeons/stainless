@@ -8,7 +8,8 @@ public struct Point { public int X; }
 // that struct -- which is a parameter that did not need to be one.
 public class Holder<T> where T : Point { T item; }
 
-int Main() {
+int Main()
+{
     Holder<Point> h;
     return 0;
 }

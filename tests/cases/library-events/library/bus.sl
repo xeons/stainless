@@ -10,16 +10,17 @@ import Standard.Console;
 
 public closure void Reading(Sensor sender, int value);
 
-public class Sensor {
+public class Sensor
+{
     public String Name;
 
     public event Reading Read;
 
-    public Sensor(String name) { Name = name; }
+    public Sensor(String name) => Name = name;
 
     // Only this type can raise its own event, wherever the subscribers are.
-    public void Measure(int value) { Read(this, value); }
+    public void Measure(int value) => Read(this, value);
 
     // What a consumer's handler runs alongside.
-    public void Announce() { Console.WriteLine("measuring " + Name); }
+    public void Announce() => Console.WriteLine("measuring " + Name);
 }

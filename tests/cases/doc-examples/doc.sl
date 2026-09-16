@@ -21,19 +21,21 @@ extern "C" int printf(byte* format, ...);
 static readonly Mutex<List<String>> Registry =
     new Mutex<List<String>>(new List<String>());
 
-void Record(String name) {
+void Record(String name)
+{
     var guard = Registry.Lock();
     guard.Value().Add(name);
 }
 
 // --- spec 2.14 delegates -------------------------------------------------
 public delegate int Transform(int value);
-int Double(int value) { return value * 2; }
+int Double(int value) => value * 2;
 
 // --- spec 2.15 lambdas ---------------------------------------------------
 public interface ITransform { int Apply(int value); }
 
-ITransform MakeAdder(int amount) {
+ITransform MakeAdder(int amount)
+{
     return value => value + amount;
 }
 
@@ -42,16 +44,24 @@ public enum Color { Red, Green, Blue }
 public enum Level : byte { Low = 1, Warning = 10, Severe, Fatal = 200 }
 
 // --- concurrency 9.1 cancellation ----------------------------------------
-int Search(int[] data, int from, int upto, AtomicBool stop) {
-    for (int i = from; i < upto; i = i + 1) {
-        if (stop.Load()) { return -1; }
-        if (data[i] == 42) { stop.Store(true); return i; }
+int Search(int[] data, int from, int upto, AtomicBool stop)
+{
+    for (int i = from; i < upto; i = i + 1)
+    {
+        if (stop.Load())
+            return -1;
+        if (data[i] == 42)
+        {
+            stop.Store(true);
+            return i;
+        }
     }
     return -1;
 }
 
 // --- spec 5.9 IO ---------------------------------------------------------
-String Roundtrip() {
+String Roundtrip()
+{
     var buffer = new MemoryStream();
     buffer.WriteText("via a stream");
 
@@ -64,18 +74,21 @@ String Roundtrip() {
 // --- spec 2.10 / 7.1 overloading, and one class implementing two interfaces -
 interface IEq<T> { bool Same(T other); }
 
-class Both : IEq<int>, IEq<String> {
-    public bool Same(int other)    { return other == 7; }
-    public bool Same(String other) { return other == "seven"; }
+class Both : IEq<int>, IEq<String>
+{
+    public bool Same(int other) => other == 7;
+    public bool Same(String other) => other == "seven";
 }
 
-class Printer {
-    public String Show(int n)    { return "int"; }
-    public String Show(String s) { return "text"; }
-    public String Show(double d) { return "double"; }
+class Printer
+{
+    public String Show(int n) => "int";
+    public String Show(String s) => "text";
+    public String Show(double d) => "double";
 }
 
-String Overloads() {
+String Overloads()
+{
     var both = new Both();
     IEq<int> asNumber = both;
     IEq<String> asText = both;
@@ -86,27 +99,31 @@ String Overloads() {
 }
 
 // --- spec 2.15 a lambda reaching its object ------------------------------
-class Scaler {
+class Scaler
+{
     public int Factor;
-    public Scaler(int factor) { Factor = factor; }
+    public Scaler(int factor) => Factor = factor;
 
-    int Triple(int n) { return n * 3; }
+    int Triple(int n) => n * 3;
 
-    public ITransform ByField()  { return value => value * Factor; }
-    public ITransform ByThis()   { return value => value * this.Factor; }
-    public ITransform ByMethod() { return value => Triple(value); }
+    public ITransform ByField() => value => value * Factor;
+    public ITransform ByThis() => value => value * this.Factor;
+    public ITransform ByMethod() => value => Triple(value);
 }
 
 // --- spec 2.5 weak breaks a cycle ----------------------------------------
-class Kid {
+class Kid
+{
     public weak Guardian? Owner;
 }
 
-class Guardian {
+class Guardian
+{
     public Kid? Child;
 }
 
-String Cycles() {
+String Cycles()
+{
     var guardian = new Guardian();
     var kid = new Kid();
     guardian.Child = kid;
@@ -117,9 +134,10 @@ String Cycles() {
 }
 
 // --- spec 9.12 arithmetic C leaves undefined -----------------------------
-int Forty() { return 40; }
+int Forty() => 40;
 
-String Defined() {
+String Defined()
+{
     return Text.FromInteger(1 << Forty())          // 1 << (40 & 31)
         + ":" + Text.FromInteger(1 << 30);
 }
@@ -127,19 +145,24 @@ String Defined() {
 // --- spec 2.8 Result -----------------------------------------------------
 enum Why { None = 0, TooSmall = 1, TooBig = 2 }
 
-Result<int, Why> Doubled(int n) {
-    if (n < 0) { return Fail(Why.TooSmall); }
+Result<int, Why> Doubled(int n)
+{
+    if (n < 0)
+        return Fail(Why.TooSmall);
     return Ok(n * 2);
 }
 
 // The early return, and the proof it leaves behind.
-Result<String, Why> Described(int n) {
+Result<String, Why> Described(int n)
+{
     var doubled = Doubled(n);
-    if (!doubled.Ok) { return Fail(doubled.Error); }
+    if (!doubled.Ok)
+        return Fail(doubled.Error);
     return Ok("got " + Text.FromInteger(doubled.Value));
 }
 
-String Results() {
+String Results()
+{
     var good = Described(21);
     var bad = Described(-1);
 
@@ -153,12 +176,14 @@ String Results() {
 }
 
 // --- spec 2.2 a struct that holds a reference ----------------------------
-struct Holder {
+struct Holder
+{
     public String Text;
     public int Tag;
 }
 
-String Held() {
+String Held()
+{
     Holder one;
     one.Text = "owned";
     one.Tag = 3;
@@ -168,7 +193,8 @@ String Held() {
 }
 
 // --- spec 5.4 collections ------------------------------------------------
-String Roster() {
+String Roster()
+{
     var ages = new Dictionary<String, int>();
     ages.Set("ada", 36);
 
@@ -184,21 +210,26 @@ String Roster() {
     var text = new StringBuilder();
     text.AppendInteger(ages.Get("ada"));
     text.Append(":");
-    for (nuint i = 0; i < numbers.Count(); i = i + 1) { text.AppendInteger(numbers.At(i)); }
+    for (nuint i = 0; i < numbers.Count(); i = i + 1)
+        text.AppendInteger(numbers.At(i));
     text.Append(":");
-    for (nint at = line.First(); at >= 0; at = line.After(at)) { text.Append(line.ValueAt(at)); }
+    for (nint at = line.First(); at >= 0; at = line.After(at))
+        text.Append(line.ValueAt(at));
     return text.ToText();
 }
 
 // --- spec 2.13 flags enums -----------------------------------------------
 [Flags]
-public enum Access : byte {
+public enum Access : byte
+{
     None = 0, Read = 1, Write = 2, Execute = 4, All = 7,
 }
 
 // --- spec 9.1 switch -----------------------------------------------------
-String Name(Level level) {
-    switch (level) {
+String Name(Level level)
+{
+    switch (level)
+    {
         case Level.Low:     return "low";
         case Level.Warning: return "warning";
         case Level.Severe:  return "severe";
@@ -206,10 +237,13 @@ String Name(Level level) {
     }
 }
 
-int SkipAndStop(int[] values) {
+int SkipAndStop(int[] values)
+{
     int total = 0;
-    for (nuint i = 0; i < values.Length; i = i + 1) {
-        switch (values[i]) {
+    for (nuint i = 0; i < values.Length; i = i + 1)
+    {
+        switch (values[i])
+        {
             case -1: continue;
             case 0:  break;
             default: total = total + values[i]; break;
@@ -220,12 +254,14 @@ int SkipAndStop(int[] values) {
 }
 
 // --- spec 7.3 properties -------------------------------------------------
-public interface INamed {
+public interface INamed
+{
     String Name { get; }
     int Rank { get; set; }
 }
 
-public class Person : INamed {
+public class Person : INamed
+{
     public String Name { get; set; }         // automatic: the compiler owns the storage
     public int Visits { get; private set; }  // read anywhere, write in this module
     public int Id { get; }                   // set by a constructor, then fixed
@@ -233,22 +269,31 @@ public class Person : INamed {
 
     public String Label => Name + "#" + Text.FromInteger(Id);   // computed
 
-    public Person(String name, int id) { Name = name; Id = id; Visits = 0; Rank = 0; }
+    public Person(String name, int id)
+    {
+        Name = name;
+        Id = id;
+        Visits = 0;
+        Rank = 0;
+    }
 }
 
-public class Thermostat {
-    int celsius;
+public class Thermostat
+{
+    int _celsius;
 
-    public Thermostat(int c) { celsius = c; }
+    public Thermostat(int c) => _celsius = c;
 
-    public int Fahrenheit {
-        get { return celsius * 9 / 5 + 32; }
-        set { celsius = (value - 32) * 5 / 9; }
+    public int Fahrenheit
+    {
+        get => _celsius * 9 / 5 + 32;
+        set => _celsius = (value - 32) * 5 / 9;
     }
 
-    public int Kelvin {
-        get => celsius + 273;
-        set => celsius = value - 273;
+    public int Kelvin
+    {
+        get => _celsius + 273;
+        set => _celsius = value - 273;
     }
 }
 
@@ -259,39 +304,45 @@ static readonly int Base    = 20;
 
 
 // --- tour "Inheritance" / spec 2.4.1 and 2.4.2 ---------------------------
-public abstract class DocShape {
+public abstract class DocShape
+{
     protected int sides;
 
-    DocShape(int howMany) { sides = howMany; }
+    DocShape(int howMany) => sides = howMany;
 
     public abstract double Area();
-    public virtual String Name() { return "shape"; }
+    public virtual String Name() => "shape";
 }
 
-public class DocPolygon : DocShape {
-    double width;
+public class DocPolygon : DocShape
+{
+    double _width;
 
-    DocPolygon(int howMany, double w) {
+    DocPolygon(int howMany, double w)
+    {
         base(howMany);
-        width = w;
+        _width = w;
     }
 
-    public override double Area() { return width * width; }
-    public override String Name() { return "polygon"; }
+    public override double Area() => _width * _width;
+    public override String Name() => "polygon";
 }
 
-public sealed class DocSquare : DocPolygon {
-    DocSquare(double side) { base(4, side); }
+public sealed class DocSquare : DocPolygon
+{
+    DocSquare(double side) => base(4, side);
 
-    public sealed override String Name() { return "square"; }
+    public sealed override String Name() => "square";
 }
 
-String Inherits() {
+String Inherits()
+{
     DocShape shape = new DocSquare(3.0);
 
     String answer = shape.Name() + ":" + Text.FromDouble(shape.Area());
 
-    if (shape is DocSquare) {
+    if (shape is DocSquare)
+    {
         DocSquare square = (DocSquare)shape;
         answer = answer + ":" + Text.FromDouble(square.Area());
     }
@@ -300,26 +351,32 @@ String Inherits() {
 }
 
 // --- tour "Variants" / spec 2.6 ------------------------------------------
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
 }
 
-double Area(Shape shape) {
-    switch (shape) {
+double Area(Shape shape)
+{
+    switch (shape)
+    {
         case Circle c: return 3.14159 * c.Radius * c.Radius;
         case Rect r:   return r.Width * r.Height;
         case Empty:    return 0.0;
     }
 }
 
-double Radius(Shape shape) {
-    if (shape.Circle) { return shape.Radius; }
+double Radius(Shape shape)
+{
+    if (shape.Circle)
+        return shape.Radius;
     return 0.0;
 }
 
-String Shapes() {
+String Shapes()
+{
     Shape a = Shape.Circle(2.0);
     Shape b = Circle(2.0);
     return Text.FromDouble(Area(a)) + ":" + Text.FromDouble(Area(b)) +
@@ -332,12 +389,13 @@ String Shapes() {
 // --- tour "Passing by reference" / spec 7.2 ------------------------------
 public struct Origin { public double X; public double Y; }
 
-void Bump(ref int n) { n = n + 1; }
-double LengthSquared(in Origin p) { return p.X * p.X + p.Y * p.Y; }
+void Bump(ref int n) => n = n + 1;
+double LengthSquared(in Origin p) => p.X * p.X + p.Y * p.Y;
 
 extern "C" double modf(double value, ref double integral);
 
-String ByReference() {
+String ByReference()
+{
     int count = 1;
     Bump(ref count);
 
@@ -354,9 +412,11 @@ String ByReference() {
 
 
 // --- tour "Slices" / spec 2.12 -------------------------------------------
-String Slicing() {
+String Slicing()
+{
     var numbers = new int[6];
-    for (nuint i = 0; i < numbers.Length; i = i + 1) { numbers[i] = (int)i + 1; }
+    for (nuint i = 0; i < numbers.Length; i = i + 1)
+        numbers[i] = (int)i + 1;
 
     int[:] all    = numbers;
     int[:] middle = numbers[1:4];
@@ -368,7 +428,8 @@ String Slicing() {
     middle[0] = 100;
 
     String text = "";
-    foreach (int v in all) { text = text + Text.FromInteger(v) + " "; }
+    foreach (int v in all)
+        text = text + Text.FromInteger(v) + " ";
 
     return Text.FromInteger((int)middle.Length) + ":" +
            Text.FromInteger((int)tail.Length) + ":" + text;
@@ -377,9 +438,9 @@ String Slicing() {
 
 // --- tour "Conditional compilation" / spec 10 ----------------------------
 #if WINDOWS
-String Where() { return "a platform"; }
+String Where() => "a platform";
 #elif UNIX
-String Where() { return "a platform"; }
+String Where() => "a platform";
 #else
 #error this platform is not one of the ones this file knows
 #endif
@@ -392,20 +453,23 @@ public struct Wire { public byte Tag; public int Value; public byte Trailer; }
 [Align(16)]
 public struct Wide { public double X; public double Y; }
 
-String Layouts() {
+String Layouts()
+{
     return Text.FromInteger((int)sizeof(Wire)) + ":" +
            Text.FromInteger((int)sizeof(Wide));
 }
 
 
 // --- tour "Unions" / spec 2.7 --------------------------------------------
-public union Word {
+public union Word
+{
     public int Signed;
     public uint Unsigned;
     public float Real;
 }
 
-String Reinterpret() {
+String Reinterpret()
+{
     Word word;
     word.Signed = -1;
     return Text.FromInteger((int)sizeof(Word)) + ":" +
@@ -414,13 +478,15 @@ String Reinterpret() {
 
 
 // --- tour "Bit-fields" / spec 2.3 ----------------------------------------
-public struct PacketHeader {
+public struct PacketHeader
+{
     public uint Version : 4;
     public uint Kind    : 4;
     public uint Length  : 24;
 }
 
-String Bits() {
+String Bits()
+{
     PacketHeader header;
     header.Version = 3;
     header.Kind = 9;
@@ -434,13 +500,16 @@ String Bits() {
 }
 
 // --- spec 2.11.1 array literals ------------------------------------------
-int SumSlice(int[:] slice) {
+int SumSlice(int[:] slice)
+{
     int total = 0;
-    for (nuint i = 0u; i < slice.Length; i = i + 1u) { total = total + slice[i]; }
+    for (nuint i = 0u; i < slice.Length; i = i + 1u)
+        total = total + slice[i];
     return total;
 }
 
-String Literals() {
+String Literals()
+{
     var numbers = [1, 2, 3, 4];
     String[] names = ["alpha", "beta"];
     int[3] fixed = [7, 8, 9];
@@ -458,7 +527,8 @@ String Literals() {
 // not a reason to stop. Its setter takes one too, which is what makes `None`
 // mean "remove", and a value promotes to the optional holding it so an
 // ordinary write still reads as one.
-String Lookup() {
+String Lookup()
+{
     var ages = new Dictionary<String, int>();
     ages["ada"] = 36;
     ages["grace"] = 45;
@@ -466,7 +536,8 @@ String Lookup() {
 
     var built = new StringBuilder();
 
-    if (ages["ada"] is Some found) { built.AppendInteger((long)found.Value); }
+    if (ages["ada"] is Some found)
+        built.AppendInteger((long)found.Value);
     built.Append(":");
     built.AppendInteger((long)ages["nobody"].ValueOr(0));
     built.Append(":");
@@ -482,7 +553,7 @@ String Lookup() {
     // plain value.
     var numbers = new List<int>();
     numbers.Add(1);
-    numbers[0] += 1;
+    numbers[0]++;
     built.Append(":");
     built.AppendInteger((long)numbers[0]);
 
@@ -500,7 +571,8 @@ String Lookup() {
 //
 // FromDouble writes the shortest text that reads back as the same number, and
 // Convert.ToDouble is its correctly-rounded inverse.
-String Numbers() {
+String Numbers()
+{
     var built = new StringBuilder();
     built.Append(Text.FromDouble(3.141592653589793));
     built.Append(":");
@@ -514,7 +586,8 @@ String Numbers() {
     return built.ToText();
 }
 
-int Main() {
+int Main()
+{
     Record("first");
     { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
 
@@ -532,12 +605,14 @@ int Main() {
     printf("severe=%d\n", (int)Level.Severe);
 
     var data = new int[100];
-    for (int i = 0; i < 100; i = i + 1) { data[i] = i; }
+    for (int i = 0; i < 100; i = i + 1)
+        data[i] = i;
     var stop = new AtomicBool(false);
     int half = 50;
     int hitLeft = 0;
     int hitRight = 0;
-    parallel {
+    parallel
+    {
         spawn hitLeft  = Search(data, 0, half, stop);
         spawn hitRight = Search(data, half, 100, stop);
     }
@@ -582,10 +657,13 @@ int Main() {
     printf("sections=%d\n", SkipAndStop(counted));
 
     var pixels = new int[16];
-    parallel for (int i = 0; i < 16; i = i + 1) { pixels[i] = i * i; }
+    parallel for (int i = 0; i < 16; i = i + 1)
+        pixels[i] = i * i;
     printf("pixels=%d\n", pixels[15]);
 
-    foreach (int p in pixels) { }
+    foreach (int p in pixels)
+    {
+    }
     printf("bits=%s\n", Bits().ToPointer());
     printf("union=%s\n", Reinterpret().ToPointer());
     printf("layout=%s\n", Layouts().ToPointer());

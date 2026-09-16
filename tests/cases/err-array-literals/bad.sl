@@ -6,7 +6,8 @@ module BadArrayLiterals;
 
 void Take(int[] numbers) { }
 
-public void Main() {
+public void Main()
+{
     // Nothing to infer from, and nothing to infer.
     var nothing = [];
 

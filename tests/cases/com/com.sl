@@ -22,21 +22,24 @@ import Standard.Com;
 /// because every COM vtable begins with those three slots -- so Greet is slot
 /// 3, not slot 0.
 [Guid("6a8f2c14-9b3e-4d55-8f21-7c0e5a913d42")]
-public com interface IGreeter {
+public com interface IGreeter
+{
     int Greet(int times);
 }
 
 /// A derived one. Its table is IGreeter's with Shout appended, which is what
 /// makes an ILoudGreeter reference usable as an IGreeter with no conversion.
 [Guid("2d4b7e91-05a6-4c38-b7de-1f83c6209ab5")]
-public com interface ILoudGreeter : IGreeter {
+public com interface ILoudGreeter : IGreeter
+{
     int Shout();
 }
 
 /// Nothing here implements this, so it is what a failed QueryInterface looks
 /// like.
 [Guid("ff10c3d7-6428-49ba-9e05-b3172d8e4c60")]
-public com interface IAbsent {
+public com interface IAbsent
+{
     int Nothing();
 }
 
@@ -45,30 +48,34 @@ public com interface IAbsent {
 /// An ordinary Stainless object -- header, fields, a destructor -- that also
 /// presents COM vtables. The tear-offs sit after the fields, one per interface,
 /// each holding a vtable pointer and its own distance back to the object.
-public com class Greeter : ILoudGreeter {
-    int count;
+public com class Greeter : ILoudGreeter
+{
+    int _count;
 
-    public Greeter() { count = 0; }
+    public Greeter() => _count = 0;
 
-    public int Greet(int times) {
-        count = count + times;
-        return count;
+    public int Greet(int times)
+    {
+        _count = _count + times;
+        return _count;
     }
 
-    public int Shout() { return count; }
+    public int Shout() => _count;
 
     ~Greeter() { Console.WriteLine("greeter destroyed"); }
 }
 
 /// A second class behind the same interface, so QueryInterface has something
 /// to say no to.
-public com class Quiet : IGreeter {
-    public int Greet(int times) { return times; }
+public com class Quiet : IGreeter
+{
+    public int Greet(int times) => times;
 }
 
 // ------------------------------------------------------------------ helpers
 
-void Say(String label, int value) {
+void Say(String label, int value)
+{
     Console.WriteLine(label + " " + Text.FromInteger((long)value));
 }
 
@@ -77,24 +84,28 @@ void Say(String label, int value) {
 /// The local dies at the end of this function. If ARC were not calling AddRef
 /// through the vtable, so would the object, and the caller would read freed
 /// memory.
-IGreeter Make() {
+IGreeter Make()
+{
     var greeter = new Greeter();
     return greeter;
 }
 
 /// Takes the base interface and asks the object whether it is really the
 /// derived one. The compiler cannot answer this: the object does.
-void Describe(IGreeter greeter) {
+void Describe(IGreeter greeter)
+{
     Console.WriteLine("  is ILoudGreeter " + Text.FromBool(greeter is ILoudGreeter));
     Console.WriteLine("  is IAbsent      " + Text.FromBool(greeter is IAbsent));
 
-    if (greeter is ILoudGreeter) {
+    if (greeter is ILoudGreeter)
+    {
         ILoudGreeter loud = (ILoudGreeter)greeter;
         Say("  shout          ", loud.Shout());
     }
 }
 
-public void Main() {
+public void Main()
+{
     // --- dispatch -----------------------------------------------------
     //
     // Two loads: the reference points at the vtable pointer, so there is no

@@ -3,7 +3,8 @@ module Program;
 
 import Model;
 
-int Main() {
+int Main()
+{
     var account = new Account();
 
     account.Deposit(10);        // fine: the module writes its own setter

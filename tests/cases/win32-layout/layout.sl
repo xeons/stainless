@@ -11,13 +11,15 @@ import Win32.Kernel32;
 import Win32.User32;
 import Win32.ComDlg32;
 
-void Check(String name, nuint measured, nuint wanted) {
+void Check(String name, nuint measured, nuint wanted)
+{
     Console.WriteLine((measured == wanted ? "ok   " : "WRONG ") + name
         + " = " + Text.FromInteger(measured)
         + (measured == wanted ? "" : ", wanted " + Text.FromInteger(wanted)));
 }
 
-int Main() {
+int Main()
+{
     Check("POINT", sizeof(Point), 8u);
     Check("SIZE", sizeof(Size), 8u);
     Check("RECT", sizeof(Rect), 16u);

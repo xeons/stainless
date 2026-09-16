@@ -7,7 +7,8 @@ module App;
 import Standard.Console;
 import Library.Shapes;
 
-int Main() {
+int Main()
+{
     var tally = new Tally();
 
     {

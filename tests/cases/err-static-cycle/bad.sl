@@ -5,4 +5,4 @@ module Bad;
 static readonly int First = Second + 1;
 static readonly int Second = First + 1;
 
-int Main() { return First; }
+int Main() => First;

@@ -2,7 +2,8 @@
 module Bad;
 
 // A hole holds one expression. Two would mean the second was silently dropped.
-int Main() {
+int Main()
+{
     int a = 1;
     int b = 2;
     String written = $"both {a b}";

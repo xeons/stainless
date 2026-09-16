@@ -6,12 +6,14 @@ module Bad;
 
 import Standard.Collections;
 
-public struct Point {
+public struct Point
+{
     // A struct is made by declaring one, so there is no constructor here.
     public int X = 1;
 }
 
-public class Node {
+public class Node
+{
     public int Width = 80;
 
     // The object is not built yet, and every field below this one is still
@@ -21,15 +23,17 @@ public class Node {
     // A property that computes its value owns no storage to give one to.
     public int Computed { get { return 3; } } = 4;
 
-    public int Read() { return Width; }
+    public int Read() => Width;
 }
 
-public class Plain {
+public class Plain
+{
     public int Value;
     public int Squared { get { return Value * Value; } }
 }
 
-int Main() {
+int Main()
+{
     // No such member.
     var a = new Plain { Missing = 1 };
 

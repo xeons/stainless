@@ -3,55 +3,65 @@ module Generics;
 
 import Standard.Console;
 
-public class Box<T> {
-    T value;
-    public Box(T initial) { value = initial; }
-    public T Get() { return value; }
-    public void Set(T next) { value = next; }
+public class Box<T>
+{
+    T _value;
+    public Box(T initial) => _value = initial;
+    public T Get() => _value;
+    public void Set(T next) => _value = next;
 }
 
 // Self-referential: instantiation must terminate.
-public class Node<T> {
-    T value;
-    Node<T>? next;
+public class Node<T>
+{
+    T _value;
+    Node<T>? _next;
 
-    public Node(T initial) { value = initial; }
-    public T Value() { return value; }
-    public void Attach(Node<T> other) { next = other; }
+    public Node(T initial) => _value = initial;
+    public T Value() => _value;
+    public void Attach(Node<T> other) => _next = other;
 }
 
-public class List<T> {
-    T[] items;
-    nuint count;
+public class List<T>
+{
+    T[] _items;
+    nuint _count;
 
-    public List() {
-        items = new T[2];
-        count = 0;
+    public List()
+    {
+        _items = new T[2];
+        _count = 0;
     }
 
-    public nuint Count() { return count; }
+    public nuint Count() => _count;
 
-    public void Add(T item) {
-        if (count == items.Length) {
-            var bigger = new T[count * 2];
-            for (nuint i = 0; i < count; i = i + 1) { bigger[i] = items[i]; }
-            items = bigger;
+    public void Add(T item)
+    {
+        if (_count == _items.Length)
+        {
+            var bigger = new T[_count * 2];
+            for (nuint i = 0; i < _count; i = i + 1)
+                bigger[i] = _items[i];
+            _items = bigger;
         }
-        items[count] = item;
-        count = count + 1;
+        _items[_count] = item;
+        _count = _count + 1;
     }
 
-    public T At(nuint index) { return items[index]; }
+    public T At(nuint index) => _items[index];
 }
 
-T Pick<T>(T a, T b, bool first) {
-    if (first) { return a; }
+T Pick<T>(T a, T b, bool first)
+{
+    if (first)
+        return a;
     return b;
 }
 
-nuint CountOf<T>(T[] values) { return values.Length; }
+nuint CountOf<T>(T[] values) => values.Length;
 
-int Main() {
+int Main()
+{
     var number = new Box<int>(41);
     number.Set(number.Get() + 1);
     Console.WriteLine("int=" + Text.FromInteger(number.Get()));
@@ -70,7 +80,8 @@ int Main() {
     Console.WriteLine("count=" + Text.FromInteger(names.Count()));
 
     var joined = new StringBuilder();
-    for (nuint i = 0; i < names.Count(); i = i + 1) { joined.Append(names.At(i)); }
+    for (nuint i = 0; i < names.Count(); i = i + 1)
+        joined.Append(names.At(i));
     Console.WriteLine("items=" + joined.ToText());
 
     Console.WriteLine("pick=" + Text.FromInteger(Pick(10, 20, false)));

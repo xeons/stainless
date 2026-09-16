@@ -10,37 +10,41 @@ module ConversionOperators;
 import Standard.Console;
 import Standard.Text;
 
-public struct Money {
+public struct Money
+{
     public long Cents;
 
-    public static Money Of(long cents) {
+    public static Money Of(long cents)
+    {
         Money made;
         made.Cents = cents;
         return made;
     }
 
     /// Nothing is lost, so nothing has to be written at the call.
-    public static implicit operator Money(long cents) { return Of(cents); }
+    public static implicit operator Money(long cents) => Of(cents);
 
     /// The currency is, so this one is asked for.
-    public static explicit operator long(Money value) { return value.Cents; }
+    public static explicit operator long(Money value) => value.Cents;
 
     public static Money operator +(Money a, Money b) { return Of(a.Cents + b.Cents); }
 }
 
-public class Meters {
+public class Meters
+{
     public double Value;
 
-    public Meters(double value) { Value = value; }
+    public Meters(double value) => Value = value;
 
-    public static implicit operator Meters(double value) { return new Meters(value); }
-    public static explicit operator double(Meters m) { return m.Value; }
+    public static implicit operator Meters(double value) => new Meters(value);
+    public static explicit operator double(Meters m) => m.Value;
 }
 
-String Show(Money m) { return Text.FromInteger(m.Cents) + "c"; }
-String Show(String text) { return text; }
+String Show(Money m) => Text.FromInteger(m.Cents) + "c";
+String Show(String text) => text;
 
-int Main() {
+int Main()
+{
     Money made = Money.Of(250);
     Money implied = 125L;
     Money literal = 5;              // the literal adopts 'long', then converts
@@ -71,4 +75,4 @@ int Main() {
     return 0;
 }
 
-Money Fee() { return 99L; }
+Money Fee() => 99L;

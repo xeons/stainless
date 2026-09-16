@@ -8,31 +8,36 @@ module LayoutQueries;
 
 import Standard.Console;
 
-public struct Mixed {
-    public byte   Flag;
+public struct Mixed
+{
+    public byte Flag;
     public double Value;
-    public int    Count;
+    public int Count;
 }
 
-public struct Tight {
+public struct Tight
+{
     public int A;
     public int B;
 }
 
 [Packed]
-public struct Squeezed {
-    public byte   Flag;
+public struct Squeezed
+{
+    public byte Flag;
     public double Value;
 }
 
 [Align(16)]
-public struct Wide {
+public struct Wide
+{
     public int A;
 }
 
-public union Word {
-    public int   Signed;
-    public uint  Unsigned;
+public union Word
+{
+    public int Signed;
+    public uint Unsigned;
     public float Real;
 }
 
@@ -41,16 +46,19 @@ public enum Level : byte { Low = 1u, High = 2u }
 /// A class is a header followed by its fields, and a class reference points at
 /// the header — so an offset counts from there and is what to add to the
 /// reference you hold.
-public class Holder {
-    public int    First;
+public class Holder
+{
+    public int First;
     public double Second;
 }
 
-void Show(String name, nuint value) {
+void Show(String name, nuint value)
+{
     Console.WriteLine(name + " = " + Text.FromInteger(value));
 }
 
-int Main() {
+int Main()
+{
     Show("sizeof(Mixed)", sizeof(Mixed));
     Show("alignof(Mixed)", alignof(Mixed));
     Show("offsetof(Mixed, Flag)", offsetof(Mixed, Flag));
@@ -123,7 +131,8 @@ int Main() {
 
 /// A struct holding an over-aligned one, which is where the two accounts of a
 /// layout meet.
-public struct Nesting {
+public struct Nesting
+{
     public byte First;
     public Wide Middle;
     public byte Last;
@@ -132,8 +141,9 @@ public struct Nesting {
 public struct Packed3 { public uint A : 3; public uint B : 5; public uint C : 24; }
 
 /// And one holding a struct of bit-fields, whose storage is bytes.
-public struct Bits {
-    public byte    Lead;
+public struct Bits
+{
+    public byte Lead;
     public Packed3 Flags;
-    public byte    After;
+    public byte After;
 }

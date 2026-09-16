@@ -5,17 +5,20 @@
 // writes into its own call, from one declaration that it can see.
 module Bad;
 
-int Twice(int n) { return n * 2; }
+int Twice(int n) => n * 2;
 
-public interface IDraw {
+public interface IDraw
+{
     void Draw(int width = 4);
 }
 
-public class Base {
+public class Base
+{
     public virtual void Show(int n = 1) { }
 }
 
-public class Derived : Base, IDraw {
+public class Derived : Base, IDraw
+{
     // An override takes the default of what it replaces; a second one here
     // would depend on which reference the call was made through.
     public override void Show(int n = 2) { }
@@ -33,11 +36,12 @@ void Running(int n = Twice(2)) { }
 
 // These pass the caller's storage rather than a value.
 void Borrowed(ref int n = 3) { }
-void Outward(out int n = 3) { n = 1; }
+void Outward(out int n = 3) => n = 1;
 
 void Two(int a, int b = 1) { }
 
-int Main() {
+int Main()
+{
     Two();
     Two(1, 2, 3);
     return 0;

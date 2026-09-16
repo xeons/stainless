@@ -13,7 +13,8 @@ module Pictures;
 import Standard.Console;
 import Standard.Drawing;
 
-int Main() {
+int Main()
+{
     bool ok = true;
 
     ok = Check(ok, "an imaging library is here", Imaging.Available);
@@ -22,7 +23,8 @@ int Main() {
     // ---- making one.
     var made = Image.Create(64, 48);
     ok = Check(ok, "a picture is made", made.Ok);
-    if (!made.Ok) { return Done(false); }
+    if (!made.Ok)
+        return Done(false);
 
     var picture = made.Value;
     ok = Check(ok, "at the size asked for", picture.Width == 64 && picture.Height == 48);
@@ -86,7 +88,8 @@ int Main() {
     // than a buffer of a plausible length.
     var encoded = picture.Encode(ImageFormat.Png);
     ok = Check(ok, "it encodes", encoded.Ok);
-    if (!encoded.Ok) { return Done(false); }
+    if (!encoded.Ok)
+        return Done(false);
 
     ok = Check(ok, "to more than a header", encoded.Value.Length > 100u);
     ok = Check(ok, "with a PNG's first bytes",
@@ -94,7 +97,8 @@ int Main() {
 
     var back = Image.FromBytes(encoded.Value);
     ok = Check(ok, "and decodes again", back.Ok);
-    if (!back.Ok) { return Done(false); }
+    if (!back.Ok)
+        return Done(false);
 
     ok = Check(ok, "at the same size",
                back.Value.Width == 64 && back.Value.Height == 48);
@@ -109,7 +113,8 @@ int Main() {
 
     // ---- drawing one picture on another.
     var sheet = Image.Create(64, 48);
-    if (sheet.Ok) {
+    if (sheet.Ok)
+    {
         sheet.Value.Clear(Rgba.Black);
         sheet.Value.Draw(picture, 0, 0);
         var copied = sheet.Value.GetPixel(20, 16);
@@ -134,12 +139,14 @@ int Main() {
     return Done(ok);
 }
 
-int Done(bool ok) {
+int Done(bool ok)
+{
     Console.WriteLine(ok ? "all checks passed" : "checks FAILED");
     return ok ? 0 : 1;
 }
 
-bool Check(bool running, String what, bool passed) {
+bool Check(bool running, String what, bool passed)
+{
     Console.WriteLine((passed ? "  ok   " : "  FAIL ") + what);
     return running && passed;
 }

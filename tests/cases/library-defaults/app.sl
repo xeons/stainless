@@ -8,7 +8,8 @@ import Standard.Console;
 import Standard.Text;
 import Library.Paint;
 
-int Main() {
+int Main()
+{
     // The const the library folded, arriving as the number it was.
     var brush = new Brush("flat");
     Console.WriteLine(brush.Name + " " + Text.FromInteger(brush.Width));

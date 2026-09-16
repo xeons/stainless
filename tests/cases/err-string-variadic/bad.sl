@@ -3,7 +3,8 @@ module Bad;
 
 extern "C" int printf(byte* format, ...);
 
-int Main() {
+int Main()
+{
     String name = "world" + "!";
     printf("%s\n", name);   // needs name.ToPointer()
     return 0;

@@ -9,26 +9,29 @@ extern "C" int printf(byte* format, ...);
 public enum Suit { Clubs, Diamonds, Hearts, Spades }
 
 // A class is a key by saying so; a primitive, an enum and a String need not.
-public class Card : IEquatable<Card>, IHashable, IComparable<Card> {
-    int rank;
-    public Card(int value) { rank = value; }
-    public int Rank() { return rank; }
+public class Card : IEquatable<Card>, IHashable, IComparable<Card>
+{
+    int _rank;
+    public Card(int value) => _rank = value;
+    public int Rank() => _rank;
 
-    public bool EqualTo(Card other) { return rank == other.Rank(); }
-    public nuint HashCode() { return rank.HashCode(); }
-    public int CompareTo(Card other) { return rank.CompareTo(other.Rank()); }
+    public bool EqualTo(Card other) => _rank == other.Rank();
+    public nuint HashCode() => _rank.HashCode();
+    public int CompareTo(Card other) => _rank.CompareTo(other.Rank());
 }
 
 // Proves that a container releases what it drops, rather than holding it until
 // the container itself dies.
-class Tag {
-    String name;
-    public Tag(String n) { name = n; }
-    public String Name() { return name; }
-    ~Tag() { printf("~Tag(%s)\n", name.ToPointer()); }
+class Tag
+{
+    String _name;
+    public Tag(String n) => _name = n;
+    public String Name() => _name;
+    ~Tag() { printf("~Tag(%s)\n", _name.ToPointer()); }
 }
 
-int Main() {
+int Main()
+{
     // ---------------------------------------------------------- dictionary
     var ages = new Dictionary<String, int>();
     ages.Set("ada", 36);
@@ -49,18 +52,23 @@ int Main() {
     // Enough entries to grow several times, then half of them removed. The
     // deletion shifts clusters back, so every survivor is still reachable.
     var squares = new Dictionary<int, int>();
-    for (int i = 0; i < 200; i = i + 1) { squares.Set(i, i * i); }
+    for (int i = 0; i < 200; i = i + 1)
+        squares.Set(i, i * i);
     printf("grown=%llu capacity=%llu at150=%d\n",
         squares.Count(), squares.Capacity(), squares.Get(150));
 
     int sum = 0;
-    foreach (var pair in squares) { sum = sum + pair.Key; }
+    foreach (var pair in squares)
+        sum = sum + pair.Key;
     printf("keys-sum=%d listed=%llu\n", sum, squares.Keys().Count());
 
-    for (int i = 0; i < 200; i = i + 2) { squares.Remove(i); }
+    for (int i = 0; i < 200; i = i + 2)
+        squares.Remove(i);
     int survivors = 0;
-    for (int i = 1; i < 200; i = i + 2) {
-        if (squares.Get(i) == i * i) { survivors = survivors + 1; }
+    for (int i = 1; i < 200; i = i + 2)
+    {
+        if (squares.Get(i) == i * i)
+            survivors = survivors + 1;
     }
     printf("halved=%llu survivors=%d evens=%d\n",
         squares.Count(), survivors, squares.ContainsKey(150) ? 1 : 0);
@@ -99,12 +107,14 @@ int Main() {
 
     // ---------------------------------------------------------------- queue
     var line = new Queue<int>();
-    for (int i = 0; i < 20; i = i + 1) { line.Enqueue(i); }
+    for (int i = 0; i < 20; i = i + 1)
+        line.Enqueue(i);
     printf("queue=%llu peek=%d take=%d %d\n",
         line.Count(), line.Peek(), line.Dequeue(), line.Dequeue());
 
     int drained = 0;
-    while (!line.IsEmpty()) { drained = drained + line.Dequeue(); }
+    while (!line.IsEmpty())
+        drained = drained + line.Dequeue();
     printf("drained=%d empty=%d\n", drained, line.IsEmpty() ? 1 : 0);
 
     // ---------------------------------------------------------------- stack
@@ -124,12 +134,14 @@ int Main() {
     chain.AddFirst("a");
 
     var forwards = new StringBuilder();
-    for (nint at = chain.First(); at >= 0; at = chain.After(at)) {
+    for (nint at = chain.First(); at >= 0; at = chain.After(at))
+    {
         forwards.Append(chain.ValueAt(at));
     }
 
     var backwards = new StringBuilder();
-    for (nint at = chain.Last(); at >= 0; at = chain.Before(at)) {
+    for (nint at = chain.Last(); at >= 0; at = chain.Before(at))
+    {
         backwards.Append(chain.ValueAt(at));
     }
     printf("chain=%s reversed=%s count=%llu\n",
@@ -141,7 +153,8 @@ int Main() {
     printf("removed=%s %s left=%llu\n",
         chain.RemoveFirst().ToPointer(), chain.RemoveLast().ToPointer(), chain.Count());
     chain.AddLast("recycled");
-    foreach (var item in chain) { printf("  chain %s\n", item.ToPointer()); }
+    foreach (var item in chain)
+        printf("  chain %s\n", item.ToPointer());
 
     // ----------------------------------------------------------- sorted list
     var prices = new SortedList<String, int>();
@@ -150,13 +163,15 @@ int Main() {
     prices.Set("fig", 2);
     prices.Set("apple", 9);
     printf("sorted=%llu apple=%d\n", prices.Count(), prices.Get("apple"));
-    foreach (var pair in prices) { printf("  %s=%d\n", pair.Key.ToPointer(), pair.Value); }
+    foreach (var pair in prices)
+        printf("  %s=%d\n", pair.Key.ToPointer(), pair.Value);
     printf("drop=%d still=%d absent=%d\n",
         prices.Remove("fig") ? 1 : 0, prices.ContainsKey("pear") ? 1 : 0,
         prices.GetOr("nope", -1));
 
     var ordered = new SortedList<int, int>();
-    for (int i = 50; i > 0; i = i - 1) { ordered.Set(i, i * 2); }
+    for (int i = 50; i > 0; i = i - 1)
+        ordered.Set(i, i * 2);
     printf("ordered=%d %d %d of %llu\n",
         ordered.KeyAt(0), ordered.KeyAt(25), ordered.KeyAt(49), ordered.Count());
 

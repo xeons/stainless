@@ -6,7 +6,8 @@ module Bad;
 
 void Nothing() { }
 
-int Main() {
+int Main()
+{
     // Nothing is not a value.
     var empty = (1, Nothing());
 

@@ -18,7 +18,8 @@ extern "C" int printf(byte* format, ...);
 
 // -------------------------------------------------------- making the thing
 
-public enum ParseError {
+public enum ParseError
+{
     None,
     Empty,
     NotADigit,
@@ -30,34 +31,41 @@ public enum ParseError {
 /// The constructor is private and takes something already checked; `Parse` is
 /// the way in, and it reports what was wrong. That pairing is the reason
 /// static methods exist here.
-public class Small {
-    int value;
+public class Small
+{
+    int _value;
 
-    Small(int checked) { value = checked; }
+    Small(int checked) => _value = checked;
 
-    public static Result<Small, ParseError> Parse(String text) {
-        if (text.ByteLength() == 0u) { return Fail(ParseError.Empty); }
+    public static Result<Small, ParseError> Parse(String text)
+    {
+        if (text.ByteLength() == 0u)
+            return Fail(ParseError.Empty);
 
         int total = 0;
-        for (nuint i = 0u; i < text.ByteLength(); i = i + 1u) {
+        for (nuint i = 0u; i < text.ByteLength(); i = i + 1u)
+        {
             byte digit = text.ByteAt(i);
-            if (digit < (byte)'0' || digit > (byte)'9') { return Fail(ParseError.NotADigit); }
+            if (digit < (byte)'0' || digit > (byte)'9')
+                return Fail(ParseError.NotADigit);
 
             total = total * 10 + (int)(digit - (byte)'0');
-            if (total > 999) { return Fail(ParseError.TooBig); }
+            if (total > 999)
+                return Fail(ParseError.TooBig);
         }
 
         return Ok(new Small(total));
     }
 
     /// A second way in, for a number that is already known to fit.
-    public static Small Of(int value) { return new Small(value); }
+    public static Small Of(int _value) => new Small(_value);
 
-    public int Value() { return value; }
+    public int Value() => _value;
 
     /// A static method may call another, and may use the private constructor
     /// the whole point of this was to hide.
-    public static Small Sum(Small left, Small right) {
+    public static Small Sum(Small left, Small right)
+    {
         return Of(left.Value() + right.Value());
     }
 }
@@ -66,46 +74,53 @@ public class Small {
 
 /// Structs have no constructors at all, so a static method is the only way to
 /// make one in a single expression.
-public struct Span {
+public struct Span
+{
     public int Start;
     public int End;
 
-    public static Span From(int start, int end) {
+    public static Span From(int start, int end)
+    {
         Span made;
         made.Start = start;
         made.End = end;
         return made;
     }
 
-    public static Span Empty() { return From(0, 0); }
+    public static Span Empty() => From(0, 0);
 
-    public int Length() { return End - Start; }
+    public int Length() => End - Start;
 
     /// Static and instance members of one type share a name space, so this is
     /// an overload of `Length` and not a redeclaration of it.
-    public static int Length(Span of) { return of.End - of.Start; }
+    public static int Length(Span of) => of.End - of.Start;
 }
 
 // ------------------------------------------------------ reached as a value
 
 public delegate int Combine(Small left, Small right);
 
-int Total(Small[] values, Combine how) {
-    if (values.Length == 0u) { return 0; }
+int Total(Small[] values, Combine how)
+{
+    if (values.Length == 0u)
+        return 0;
 
     var running = values[0];
-    for (nuint i = 1u; i < values.Length; i = i + 1u) {
+    for (nuint i = 1u; i < values.Length; i = i + 1u)
+    {
         running = Small.Of(how(running, values[i]));
     }
     return running.Value();
 }
 
-int Added(Small left, Small right) { return left.Value() + right.Value(); }
+int Added(Small left, Small right) => left.Value() + right.Value();
 
 // ------------------------------------------------------------------- main
 
-String Why(ParseError why) {
-    switch (why) {
+String Why(ParseError why)
+{
+    switch (why)
+    {
         case ParseError.Empty: return "empty";
         case ParseError.NotADigit: return "not a digit";
         case ParseError.TooBig: return "too big";
@@ -113,16 +128,21 @@ String Why(ParseError why) {
     }
 }
 
-void Report(String text) {
+void Report(String text)
+{
     var parsed = Small.Parse(text);
-    if (parsed.Ok) {
+    if (parsed.Ok)
+    {
         printf("%-8s -> %d\n", text.ToPointer(), parsed.Value.Value());
-    } else {
+    }
+    else
+    {
         printf("%-8s -> %s\n", text.ToPointer(), Why(parsed.Error).ToPointer());
     }
 }
 
-public int Main() {
+public int Main()
+{
     Report("0");
     Report("42");
     Report("999");

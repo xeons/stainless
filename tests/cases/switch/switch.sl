@@ -12,8 +12,10 @@ const int Threshold = 3;
 
 // Every section returns, and there is a default, so the function needs no
 // trailing return.
-String Name(Level level) {
-    switch (level) {
+String Name(Level level)
+{
+    switch (level)
+    {
         case Level.Low:     return "low";
         case Level.Warning: return "warning";
         case Level.Severe:  return "severe";
@@ -22,8 +24,10 @@ String Name(Level level) {
 }
 
 // Stacked labels share one body, which is how a switch says "either of these".
-String Parity(int n) {
-    switch (n) {
+String Parity(int n)
+{
+    switch (n)
+    {
         case 0:
         case 2:
         case 4:
@@ -37,9 +41,11 @@ String Parity(int n) {
 }
 
 // A switch over a String, and over a constant label rather than a literal.
-int Rank(String word) {
+int Rank(String word)
+{
     int score = 0;
-    switch (word) {
+    switch (word)
+    {
         case "alpha":
             score = 1;
             break;
@@ -55,10 +61,13 @@ int Rank(String word) {
 }
 
 // break belongs to the switch; continue passes through it to the loop.
-int Count(int[] values) {
+int Count(int[] values)
+{
     int total = 0;
-    for (nuint i = 0; i < values.Length; i = i + 1) {
-        switch (values[i]) {
+    for (nuint i = 0; i < values.Length; i = i + 1)
+    {
+        switch (values[i])
+        {
             case -1:
                 continue;           // to the loop's step, not out of the switch
             case 0:
@@ -73,12 +82,16 @@ int Count(int[] values) {
 }
 
 // A switch inside a loop inside a switch: each break finds its own construct.
-String Nested(int outer) {
+String Nested(int outer)
+{
     var text = new StringBuilder();
-    switch (outer) {
+    switch (outer)
+    {
         case 1:
-            for (int i = 0; i < 4; i = i + 1) {
-                if (i == 3) { break; }      // leaves the loop
+            for (int i = 0; i < 4; i = i + 1)
+            {
+                if (i == 3)      // leaves the loop
+                    break;
                 text.AppendInteger(i);
             }
             text.Append("|");
@@ -90,7 +103,8 @@ String Nested(int outer) {
     return text.ToText();
 }
 
-int Main() {
+int Main()
+{
     printf("levels=%s %s %s %s\n",
         Name(Level.Low).ToPointer(), Name(Level.Warning).ToPointer(),
         Name(Level.Severe).ToPointer(), Name(Level.Fatal).ToPointer());
@@ -112,20 +126,23 @@ int Main() {
 
     // char and bool switch too; a char is an integer as far as dispatch goes.
     char c = 'b';
-    switch (c) {
+    switch (c)
+    {
         case 'a': printf("char=first\n"); break;
         case 'b': printf("char=second\n"); break;
         default:  printf("char=other\n"); break;
     }
 
     bool flag = true;
-    switch (flag) {
+    switch (flag)
+    {
         case true:  printf("flag=yes\n"); break;
         case false: printf("flag=no\n"); break;
     }
 
     // A switch with no default simply does nothing when nothing matches.
-    switch (99) {
+    switch (99)
+    {
         case 1: printf("unreachable\n"); break;
     }
 

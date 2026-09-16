@@ -389,7 +389,8 @@ bool SkipAside(Cursor cursor)
             }
             else if (c == (byte)']')
             {
-                if (depth > 0u) { depth = depth - 1u; }
+                if (depth > 0u)
+                    depth = depth - 1u;
             }
             else if (c == (byte)'>' && depth == 0u)
             {

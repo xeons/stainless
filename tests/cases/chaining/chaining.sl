@@ -24,29 +24,37 @@ module Chaining;
 import Standard.Console;
 import Standard.Collections;
 
-class Person {
+class Person
+{
     public String Name { get; set; }
     public int Age { get; set; }
 
-    public Person(String name, int age) { Name = name; Age = age; }
+    public Person(String name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
 
     /// A method, to prove one still wins over a free function of the name.
-    public String Describe() { return $"{Name} ({Age})"; }
+    public String Describe() => $"{Name} ({Age})";
 }
 
 /// A free function of the same name over a different type. Both are in scope,
 /// and which is reached is decided by whether the receiver has the member.
-String Describe(int age) { return $"age {age}"; }
+String Describe(int age) => $"age {age}";
 
 struct Point { public int X; public int Y; }
 
 /// A generic where `default(T)` is the only value that can be named.
-T FirstOrNothing<T>(T[:] items) {
-    if (items.Length == 0u) { return default(T); }
+T FirstOrNothing<T>(T[:] items)
+{
+    if (items.Length == 0u)
+        return default(T);
     return items[0u];
 }
 
-public int Main() {
+public int Main()
+{
     String[] words = ["delta", "bb", "alpha", "bb", "c", "delta"];
 
     // --------------------------------------------------------- the pipeline
@@ -57,7 +65,8 @@ public int Main() {
                       .ToArray();
 
     Console.WriteLine($"picked {picked.Length}");
-    foreach (var w in picked) { Console.WriteLine($"  {w}"); }
+    foreach (var w in picked)
+        Console.WriteLine($"  {w}");
 
     // The same functions written the old way, to show they are the same.
     var same = ToArray(OrderBy(

@@ -20,7 +20,8 @@ import Standard.Console;
 
 // ------------------------------------------------------------------ a struct
 
-public struct Box<T> {
+public struct Box<T>
+{
     public T Value;
 
     public static Box<T> operator +(Box<T> a, Box<T> b) { return BoxOf(a.Value + b.Value); }
@@ -30,13 +31,14 @@ public struct Box<T> {
     public static bool operator ==(Box<T> a, Box<T> b) { return a.Value == b.Value; }
     public static bool operator !=(Box<T> a, Box<T> b) { return a.Value != b.Value; }
 
-    public T Get() { return Value; }
+    public T Get() => Value;
 }
 
 /// A module-level function rather than a static one, because `Box<int>.Of(2)`
 /// is not something the parser reads today -- a type argument list is only
 /// written where a type is expected.
-public Box<T> BoxOf<T>(T value) {
+public Box<T> BoxOf<T>(T value)
+{
     Box<T> made;
     made.Value = value;
     return made;
@@ -44,13 +46,19 @@ public Box<T> BoxOf<T>(T value) {
 
 // ------------------------------------------------------------------- a class
 
-public class Pair<T> {
+public class Pair<T>
+{
     public T First { get; set; }
     public T Second { get; set; }
 
-    public Pair(T first, T second) { First = first; Second = second; }
+    public Pair(T first, T second)
+    {
+        First = first;
+        Second = second;
+    }
 
-    public static Pair<T> operator +(Pair<T> a, Pair<T> b) {
+    public static Pair<T> operator +(Pair<T> a, Pair<T> b)
+    {
         return new Pair<T>(a.First + b.First, a.Second + b.Second);
     }
 
@@ -59,16 +67,18 @@ public class Pair<T> {
 
 // ------------------------------------- a static, and a block that sets it up
 
-public struct Counted<T> {
+public struct Counted<T>
+{
     // One per instantiation rather than one per template: `Counted<int>` and
     // `Counted<long>` count separately, which the output below shows.
     public static int Made = 0;
 
-    static Counted() { Made = 100; }
+    static Counted() => Made = 100;
 
     public T Value;
 
-    public static Counted<T> operator +(Counted<T> a, Counted<T> b) {
+    public static Counted<T> operator +(Counted<T> a, Counted<T> b)
+    {
         Made = Made + 1;
 
         Counted<T> made;
@@ -76,7 +86,7 @@ public struct Counted<T> {
         return made;
     }
 
-    public int Count() { return Made; }
+    public int Count() => Made;
 }
 
 // ----------------------------------- reached only from inside another generic
@@ -85,7 +95,8 @@ public struct Counted<T> {
 /// happens after the pass that binds statics would have run. That is the case
 /// the interleaving exists for: the operator, the static and the static
 /// constructor all arrive late and still have to be emitted.
-public int Late<T>(T left, T right) {
+public int Late<T>(T left, T right)
+{
     Counted<T> a;
     a.Value = left;
 
@@ -95,7 +106,8 @@ public int Late<T>(T left, T right) {
     return (a + b).Count();
 }
 
-public int Main() {
+public int Main()
+{
     var a = BoxOf(2);
     var b = BoxOf(3);
 

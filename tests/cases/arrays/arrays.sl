@@ -3,22 +3,27 @@ module Arrays;
 
 import Standard.Console;
 
-class Tracker {
-    int id;
-    Tracker(int n) { id = n; }
-    ~Tracker() { Console.WriteLine("~Tracker " + Text.FromInteger(id)); }
-    public int Id() { return id; }
+class Tracker
+{
+    int _id;
+    Tracker(int n) => _id = n;
+    ~Tracker() { Console.WriteLine("~Tracker " + Text.FromInteger(_id)); }
+    public int Id() => _id;
 }
 
-int Sum(int[] values) {
+int Sum(int[] values)
+{
     var total = 0;
-    for (int i = 0; i < (int)values.Length; i = i + 1) { total = total + values[i]; }
+    for (int i = 0; i < (int)values.Length; i = i + 1)
+        total = total + values[i];
     return total;
 }
 
-int Main() {
+int Main()
+{
     var numbers = new int[5];
-    for (int i = 0; i < 5; i = i + 1) { numbers[i] = i * i; }
+    for (int i = 0; i < 5; i = i + 1)
+        numbers[i] = i * i;
 
     Console.WriteLine("length=" + Text.FromInteger(numbers.Length));
     Console.WriteLine("sum=" + Text.FromInteger(Sum(numbers)));

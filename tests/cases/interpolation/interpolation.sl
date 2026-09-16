@@ -13,19 +13,22 @@ import Standard.Collections;
 
 extern "C" int printf(byte* format, ...);
 
-public class Point {
+public class Point
+{
     public int X { get; }
     public int Y { get; }
 
-    public Point(int x, int y) {
+    public Point(int x, int y)
+    {
         X = x;
         Y = y;
     }
 
-    public String Show() { return $"({X}, {Y})"; }
+    public String Show() => $"({X}, {Y})";
 }
 
-int Main() {
+int Main()
+{
     // --------------------------------------------------------------- basics
 
     String who = "Ada";
@@ -108,28 +111,34 @@ int Main() {
     // In a loop, where the allocation difference is what matters and the
     // result is what can be checked.
     var built = new StringBuilder();
-    for (int i = 0; i < 5; i += 1) { built.Append($"<{i}>"); }
+    for (int i = 0; i < 5; i++)
+        built.Append($"<{i}>");
     Console.WriteLine($"loop {built.ToText()}");
 
     // As an argument, as a return value, as a field's value.
     Console.WriteLine(Describe(clicks));
 
     var labels = new List<String>();
-    for (int i = 1; i <= 3; i += 1) { labels.Add($"item {i}"); }
+    for (int i = 1; i <= 3; i++)
+        labels.Add($"item {i}");
     Console.WriteLine($"joined {" | ".Join(ToArray(labels))}");
 
     printf("done\n");
     return 0;
 }
 
-String Describe(int count) {
-    if (count == 1) { return $"{count} click"; }
+String Describe(int count)
+{
+    if (count == 1)
+        return $"{count} click";
     return $"{count} clicks";
 }
 
 /// A List as an array, since `Join` takes one.
-public String[] ToArray(List<String> items) {
+public String[] ToArray(List<String> items)
+{
     var all = new String[items.Count()];
-    for (nuint i = 0u; i < items.Count(); i += 1u) { all[i] = items.At(i); }
+    for (nuint i = 0u; i < items.Count(); i++)
+        all[i] = items.At(i);
     return all;
 }

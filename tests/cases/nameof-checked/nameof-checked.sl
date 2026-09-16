@@ -16,11 +16,16 @@ module NameofChecked;
 
 import Standard.Console;
 
-class Button {
+class Button
+{
     public String Caption { get; set; }
     public int Width { get; set; }
 
-    public Button(String caption) { Caption = caption; Width = 80; }
+    public Button(String caption)
+    {
+        Caption = caption;
+        Width = 80;
+    }
 
     public void Press() { }
 }
@@ -29,7 +34,8 @@ struct Point { public int X; public int Y; }
 
 static int Total = 0;
 
-public int Main() {
+public int Main()
+{
     var button = new Button("Save");
     Point spot;
     spot.X = 3;
@@ -64,7 +70,8 @@ public int Main() {
     Console.WriteLine($"times    {checked(1000 * 1000)}");
 
     // A block, spot everything inside is watched.
-    checked {
+    checked
+    {
         int a = 1000000;
         int b = 2000;
         Console.WriteLine($"block    {a + b}");
@@ -72,8 +79,10 @@ public int Main() {
     }
 
     // And `unchecked` inside it puts the default back.
-    checked {
-        unchecked {
+    checked
+    {
+        unchecked
+        {
             Console.WriteLine($"back     {big + 1}");
         }
     }

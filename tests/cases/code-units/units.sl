@@ -13,16 +13,18 @@ import Standard.Text;
 
 /// The scalar behind each literal, as a number, so the value is checked and
 /// not just the fact that it compiled.
-void Show(String label, long scalar) {
+void Show(String label, long scalar)
+{
     Console.WriteLine(label + " = " + Text.FromInteger(scalar));
 }
 
-public void Main() {
+public void Main()
+{
     // --- one scalar, three widths -------------------------------------
-    char    ascii     = 'A';            // U+0041, one UTF-8 byte
-    char16  accented  = 'é';            // U+00E9, two bytes but one UTF-16 unit
-    char32  cjk       = '日';           // U+65E5, three bytes and still one unit
-    char32  astral    = '😀';           // U+1F600, a surrogate pair in the source
+    char ascii     = 'A';            // U+0041, one UTF-8 byte
+    char16 accented  = 'é';            // U+00E9, two bytes but one UTF-16 unit
+    char32 cjk       = '日';           // U+65E5, three bytes and still one unit
+    char32 astral    = '😀';           // U+1F600, a surrogate pair in the source
 
     Show("ascii", (long)ascii);
     Show("accented", (long)accented);
@@ -35,7 +37,7 @@ public void Main() {
     // scalar above U+FFFF. \x is a byte and says nothing about Unicode.
     char16 escaped16 = '\u65E5';
     char32 escaped32 = '\U0001F600';
-    char   tab       = '\t';
+    char tab       = '\t';
 
     Show("escaped16", (long)escaped16);
     Show("escaped32", (long)escaped32);
@@ -56,7 +58,7 @@ public void Main() {
     // Allowed, and says at the call site that a re-encoding was not what was
     // wanted: 'A' is the same number in all three.
     char16 fromNarrow = (char16)ascii;
-    char   toNarrow   = (char)accented;     // truncates, and looks like it
+    char toNarrow   = (char)accented;     // truncates, and looks like it
     Show("fromNarrow", (long)fromNarrow);
     Show("toNarrow", (long)toNarrow);
 

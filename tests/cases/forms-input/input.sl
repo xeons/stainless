@@ -25,11 +25,13 @@ import Win32.User32;
 
 #if WINDOWS
 
-public class InputForm : Form {
+public class InputForm : Form
+{
     public TextBox Entry;
     public TextBox Notes;
 
-    public InputForm() {
+    public InputForm()
+    {
         base(WindowBorder.Sizable);
         SetBounds(0, 0, 500, 300);
 
@@ -45,7 +47,7 @@ public class InputForm : Form {
 }
 
 /// A point packed into an LPARAM, low word first.
-long At(int x, int y) { return (long)((y << 16) | (x & 0xFFFF)); }
+long At(int x, int y) => (long)((y << 16) | (x & 0xFFFF));
 
 /// `MK_LBUTTON`: the left button is down while this message was sent.
 const ulong LeftButtonHeld = 0x0001u;
@@ -54,9 +56,14 @@ const ulong LeftButtonHeld = 0x0001u;
 /// has scrolled.
 const uint EmGetFirstVisibleLine = 0x00CEu;
 
-void Settle() { for (int i = 0; i < 8; i += 1) { Application.DoEvents(); } }
+void Settle()
+{
+    for (int i = 0; i < 8; i++)
+        Application.DoEvents();
+}
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var form = new InputForm();
     form.Show();
@@ -112,6 +119,6 @@ int Main() {
 
 #else
 
-int Main() { return 0; }
+int Main() => 0;
 
 #endif

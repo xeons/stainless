@@ -6,4 +6,4 @@ module Bad;
 [Flags]
 public class Access { int bits; }
 
-int Main() { return 0; }
+int Main() => 0;

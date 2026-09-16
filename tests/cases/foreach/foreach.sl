@@ -6,48 +6,57 @@ import Standard.Console;
 
 extern "C" int printf(byte* format, ...);
 
-class Item {
-    String name;
-    Item(String n) { name = n; }
-    public String Name() { return name; }
+class Item
+{
+    String _name;
+    Item(String n) => _name = n;
+    public String Name() => _name;
 }
 
 // A type that is iterable without implementing any interface: foreach finds
 // GetEnumerator by name.
-class Countdown {
-    int from;
-    Countdown(int start) { from = start; }
-    public CountdownCursor GetEnumerator() { return new CountdownCursor(from); }
+class Countdown
+{
+    int _from;
+    Countdown(int start) => _from = start;
+    public CountdownCursor GetEnumerator() => new CountdownCursor(_from);
 }
 
-class CountdownCursor {
-    int value;
-    CountdownCursor(int start) { value = start + 1; }
-    public bool MoveNext() {
-        value = value - 1;
-        return value > 0;
+class CountdownCursor
+{
+    int _value;
+    CountdownCursor(int start) => _value = start + 1;
+    public bool MoveNext()
+    {
+        _value = _value - 1;
+        return _value > 0;
     }
-    public int Current() { return value; }
+    public int Current() => _value;
 }
 
-int Main() {
+int Main()
+{
     // An array iterates by index; no allocation, no dispatch.
     var numbers = new int[4];
     numbers[0] = 5; numbers[1] = 6; numbers[2] = 7; numbers[3] = 8;
 
     int total = 0;
-    foreach (int n in numbers) { total = total + n; }
+    foreach (int n in numbers)
+        total = total + n;
     printf("total=%d\n", total);
 
     // `var` infers the element type.
     int doubled = 0;
-    foreach (var n in numbers) { doubled = doubled + n * 2; }
+    foreach (var n in numbers)
+        doubled = doubled + n * 2;
     printf("doubled=%d\n", doubled);
 
     // break and continue behave as in any other loop.
     int firstOdd = 0;
-    foreach (int n in numbers) {
-        if (n % 2 == 0) { continue; }
+    foreach (int n in numbers)
+    {
+        if (n % 2 == 0)
+            continue;
         firstOdd = n;
         break;
     }
@@ -57,7 +66,8 @@ int Main() {
     var items = new Item[2];
     items[0] = new Item("alpha");
     items[1] = new Item("beta");
-    foreach (Item item in items) { Console.WriteLine(item.Name()); }
+    foreach (Item item in items)
+        Console.WriteLine(item.Name());
 
     // A List<T> goes through IEnumerator<T>.
     var list = new List<int>();
@@ -66,18 +76,22 @@ int Main() {
     list.Add(30);
 
     int listTotal = 0;
-    foreach (int n in list) { listTotal = listTotal + n; }
+    foreach (int n in list)
+        listTotal = listTotal + n;
     printf("listTotal=%d\n", listTotal);
 
     // Duck typing: Countdown implements no interface at all.
     var ticks = 0;
-    foreach (int n in new Countdown(3)) { ticks = ticks * 10 + n; }
+    foreach (int n in new Countdown(3))
+        ticks = ticks * 10 + n;
     printf("ticks=%d\n", ticks);
 
     // Nested, over the same array.
     int pairs = 0;
-    foreach (int a in numbers) {
-        foreach (int b in numbers) { pairs = pairs + 1; }
+    foreach (int a in numbers)
+    {
+        foreach (int b in numbers)
+            pairs = pairs + 1;
     }
     printf("pairs=%d\n", pairs);
 

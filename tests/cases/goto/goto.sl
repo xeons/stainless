@@ -14,29 +14,45 @@ module Goto;
 
 import Standard.Console;
 
-class Tag {
+class Tag
+{
     public String Name;
-    public Tag(String name) { Name = name; Console.WriteLine($"  + {name}"); }
+    public Tag(String name)
+    {
+        Name = name;
+        Console.WriteLine($"  + {name}");
+    }
     ~Tag() { Console.WriteLine($"  - {Name}"); }
 }
 
 /// Out of two loops at once, which is the thing `break` cannot do.
-int FirstProduct(int wanted) {
-    for (int a = 1; a < 10; a++) {
-        for (int b = 1; b < 10; b++) {
-            if (a * b == wanted) { return a * 10 + b; }
+int FirstProduct(int wanted)
+{
+    for (int a = 1; a < 10; a++)
+    {
+        for (int b = 1; b < 10; b++)
+        {
+            if (a * b == wanted)
+                return a * 10 + b;
         }
     }
     return -1;
 }
 
 /// The same, written with a jump, so the answer lands in one place.
-int FirstProductByJump(int wanted) {
+int FirstProductByJump(int wanted)
+{
     int answer = -1;
 
-    for (int a = 1; a < 10; a++) {
-        for (int b = 1; b < 10; b++) {
-            if (a * b == wanted) { answer = a * 10 + b; goto found; }
+    for (int a = 1; a < 10; a++)
+    {
+        for (int b = 1; b < 10; b++)
+        {
+            if (a * b == wanted)
+            {
+                answer = a * 10 + b;
+                goto found;
+            }
         }
     }
 
@@ -50,10 +66,12 @@ found:
 /// releases what it holds on the way out. That is safe because an owned slot
 /// is cleared on entry to the function as well as where it is declared -- so
 /// the release is handed a null rather than whatever the stack had.
-void Skipping(bool leave) {
+void Skipping(bool leave)
+{
     var kept = new Tag("kept");
 
-    if (leave) { goto after; }
+    if (leave)
+        goto after;
 
     var skipped = new Tag("skipped");
     Console.WriteLine($"  saw {skipped.Name}");
@@ -63,20 +81,23 @@ after:
 }
 
 /// A jump backwards, out of a nested scope each time round.
-void Retrying() {
+void Retrying()
+{
     int spins = 0;
 
 retry:
     {
         var inner = new Tag($"inner {spins}");
         spins++;
-        if (spins < 3) { goto retry; }
+        if (spins < 3)
+            goto retry;
     }
 
     Console.WriteLine($"  spun {spins}");
 }
 
-public int Main() {
+public int Main()
+{
     Console.WriteLine($"return {FirstProduct(6)}");
     Console.WriteLine($"jump   {FirstProductByJump(6)}");
     Console.WriteLine($"none   {FirstProductByJump(97)}");

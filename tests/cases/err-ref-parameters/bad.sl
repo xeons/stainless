@@ -9,15 +9,16 @@ public class Wrong : IAdjust { public void Adjust(int n) { } }
 
 void Bump(ref int n) { }
 void Reads(in Point p) { }
-int Value() { return 1; }
+int Value() => 1;
 
 // An `in` parameter is the caller's storage and promises not to be written.
-void WritesIn(in int n) { n = 5; }
-void WritesInField(in Point p) { p.X = 1.0; }
-void PassesInOnwards(in Point p) { Takes(ref p); }
+void WritesIn(in int n) => n = 5;
+void WritesInField(in Point p) => p.X = 1.0;
+void PassesInOnwards(in Point p) => Takes(ref p);
 void Takes(ref Point p) { }
 
-int Main() {
+int Main()
+{
     int k = 0;
 
     Bump(k);                    // the call has to say 'ref' too

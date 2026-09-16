@@ -9,7 +9,8 @@ import Standard.Collections;
 
 public threadsafe enum Level { Low, High }
 
-public threadsafe variant Shape {
+public threadsafe variant Shape
+{
     Circle(double Radius);
     Empty;
 }
@@ -19,7 +20,8 @@ public threadsafe delegate void Notify(int value);
 // And the constraint, unmet.
 long Counted<T>(T shared) where T : threadsafe { return 1; }
 
-int Main() {
+int Main()
+{
     var items = new List<int>();
     return (int)Counted(items);
 }

@@ -7,21 +7,24 @@ module Weak;
 
 import Standard.Console;
 
-class Child {
+class Child
+{
     public int Id;
     public weak Parent? Owner;
-    public Child(int id) { Id = id; }
+    public Child(int id) => Id = id;
     ~Child() { Console.WriteLine("-child " + Text.FromInteger(Id)); }
 }
 
-class Parent {
+class Parent
+{
     public int Id;
     public Child? Kid;
-    public Parent(int id) { Id = id; }
+    public Parent(int id) => Id = id;
     ~Parent() { Console.WriteLine("-parent " + Text.FromInteger(Id)); }
 }
 
-int Main() {
+int Main()
+{
     // Strong down, weak back up: both ends still die at the end of the scope.
     {
         var parent = new Parent(1);

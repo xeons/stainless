@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-class Node {
-    int id;
-    Node? next;
-    Node(int n) { id = n; }
-    public int Peek() { return next.id; }   // next may be null
+class Node
+{
+    int _id;
+    Node? _next;
+    Node(int n) => _id = n;
+    public int Peek() => _next._id; // next may be null
 }
 
-int Main() { return 0; }
+int Main() => 0;

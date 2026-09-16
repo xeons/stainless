@@ -16,11 +16,13 @@ public delegate __stdcall int Difference(int a, int b);
 /// And one without, to prove the two are not emitted the same way.
 public delegate int PlainProduct(int a, int b);
 
-extern "C" {
+extern "C"
+{
     void* lookup(byte* name);
 }
 
-int Main() {
+int Main()
+{
     // Exactly the shape GetProcAddress and dlsym answer with.
     void* first = lookup("scaled_sum".ToPointer());
     void* second = lookup("difference".ToPointer());

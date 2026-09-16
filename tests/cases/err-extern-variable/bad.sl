@@ -18,4 +18,4 @@ extern "C++" int cpp_global;
 // And an ordinary module-level variable is refused as it always was.
 int plain;
 
-int Main() { return 0; }
+int Main() => 0;

@@ -11,24 +11,28 @@ import Standard.Console;
 import Standard.Collections;
 import Standard.Convert;
 
-class Node {
+class Node
+{
     public int Value { get; }
     public Node? Next { get; set; }
 
-    public Node(int value) {
+    public Node(int value)
+    {
         Value = value;
         Next = null;
     }
 }
 
-int Main() {
+int Main()
+{
     // The two the layout actually turns on.
     Console.WriteLine("pointer   " + Text.FromInteger((long)sizeof(byte*)));
     Console.WriteLine("nuint     " + Text.FromInteger((long)sizeof(nuint)));
 
     // An array's length lives in its header, past three pointer-width words.
     var numbers = new int[5];
-    for (nuint i = 0u; i < numbers.Length; i++) { numbers[i] = (int)i * 11; }
+    for (nuint i = 0u; i < numbers.Length; i++)
+        numbers[i] = (int)i * 11;
     Console.WriteLine("length    " + Text.FromInteger((long)numbers.Length));
     Console.WriteLine("last      " + Text.FromInteger((long)numbers[numbers.Length - 1]));
 
@@ -55,9 +59,11 @@ int Main() {
     // reads the field exactly where it was checked -- a check on its own does
     // not narrow a field (SL0248).
     int total = head.Value;
-    if (head.Next is Node one) {
+    if (head.Next is Node one)
+    {
         total += one.Value;
-        if (one.Next is Node two) { total += two.Value; }
+        if (one.Next is Node two)
+            total += two.Value;
     }
     Console.WriteLine("chain     " + Text.FromInteger((long)total));
 
@@ -68,7 +74,8 @@ int Main() {
     counts.Set("three", 3);
 
     Console.WriteLine("entries   " + Text.FromInteger((long)counts.Count()));
-    if (counts.Find("two") is Some found) {
+    if (counts.Find("two") is Some found)
+    {
         Console.WriteLine("two       " + Text.FromInteger((long)found.Value));
     }
 

@@ -10,23 +10,27 @@ module Shop.Catalog;
 
 import Shop.Pricing;
 
-public class Subscription : IPriced {
-    String name;
-    Money monthly;
-    int months;
+public class Subscription : IPriced
+{
+    String _name;
+    Money _monthly;
+    int _months;
 
-    public Subscription(String label, Money perMonth, int count) {
-        name = label;
-        monthly = perMonth;
-        months = count;
+    public Subscription(String label, Money perMonth, int count)
+    {
+        _name = label;
+        _monthly = perMonth;
+        _months = count;
     }
 
-    public Money Price() {
+    public Money Price()
+    {
         var total = Pricing.Cents(0);
-        for (int i = 0; i < months; i = i + 1) { total = Pricing.Add(total, monthly); }
+        for (int i = 0; i < _months; i = i + 1)
+            total = Pricing.Add(total, _monthly);
         return total;
     }
 
     // Decorate comes from Books.sl -- same module, no import.
-    public String Label() { return Decorate(name) + " x" + Text.FromInteger(months); }
+    public String Label() => Decorate(_name) + " x" + Text.FromInteger(_months);
 }

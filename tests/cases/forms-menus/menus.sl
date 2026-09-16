@@ -24,15 +24,17 @@ import Win32.User32;
 
 #if WINDOWS
 
-public class MenuForm : Form {
+public class MenuForm : Form
+{
     public MenuItem Open;
     public MenuItem Nested;
     public MenuItem Heading;
-    public ToolBar  Tools;
+    public ToolBar Tools;
     public ToolButton First;
     public ToolButton Toggle;
 
-    public MenuForm() {
+    public MenuForm()
+    {
         base(WindowBorder.Sizable);
         Text = "menus";
         SetBounds(0, 0, 500, 320);
@@ -61,28 +63,35 @@ public class MenuForm : Form {
         Toggle.Click += this.OnThird;
     }
 
-    void OnOpen(MenuItem sender)    { Console.WriteLine("menu: chose Open"); }
-    void OnNested(MenuItem sender)  { Console.WriteLine("menu: chose a nested item"); }
-    void OnHeading(MenuItem sender) { Console.WriteLine("menu: a heading RAN, and should not have"); }
+    void OnOpen(MenuItem sender) => Console.WriteLine("menu: chose Open");
+    void OnNested(MenuItem sender) => Console.WriteLine("menu: chose a nested item");
+    void OnHeading(MenuItem sender) => Console.WriteLine("menu: a heading RAN, and should not have");
 
-    void OnFirst(Control sender)  { Console.WriteLine("toolbar: button 0 clicked"); }
-    void OnSecond(Control sender) { Console.WriteLine("toolbar: button 1 clicked"); }
-    void OnThird(Control sender) {
+    void OnFirst(Control sender) => Console.WriteLine("toolbar: button 0 clicked");
+    void OnSecond(Control sender) => Console.WriteLine("toolbar: button 1 clicked");
+    void OnThird(Control sender)
+    {
         Console.WriteLine("toolbar: button 2 clicked");
         Console.WriteLine("toolbar: a toggle reports its state: "
             + (Toggle.Checked ? "true" : "false"));
     }
 }
 
-void Settle() { for (int i = 0; i < 8; i += 1) { Application.DoEvents(); } }
+void Settle()
+{
+    for (int i = 0; i < 8; i++)
+        Application.DoEvents();
+}
 
 /// Chooses a menu item the way Windows does: `WM_COMMAND` with the id in the
 /// low word and a null `lParam`.
-void ChooseMenu(HWND window, int id) {
+void ChooseMenu(HWND window, int id)
+{
     SendMessageW(window, WmCommand, (ulong)(uint)id, 0);
 }
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var form = new MenuForm();
     form.Show();
@@ -119,6 +128,6 @@ int Main() {
 
 #else
 
-int Main() { return 0; }
+int Main() => 0;
 
 #endif

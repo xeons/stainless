@@ -5,67 +5,84 @@ import Standard.Console;
 import Standard.Collections;    // IComparable<T> lives here
 import Standard.Threading;
 
-public interface IDescribable {
+public interface IDescribable
+{
     String Describe();
 }
 
-public class Money : IComparable<Money>, IDescribable {
-    int cents;
+public class Money : IComparable<Money>, IDescribable
+{
+    int _cents;
 
-    public Money(int amount) { cents = amount; }
-    public int Cents() { return cents; }
+    public Money(int amount) => _cents = amount;
+    public int Cents() => _cents;
 
-    public int CompareTo(Money other) {
-        if (cents < other.Cents()) { return -1; }
-        if (cents > other.Cents()) { return 1; }
+    public int CompareTo(Money other)
+    {
+        if (_cents < other.Cents())
+            return -1;
+        if (_cents > other.Cents())
+            return 1;
         return 0;
     }
 
-    public String Describe() { return Text.FromInteger(cents) + "c"; }
+    public String Describe() => Text.FromInteger(_cents) + "c";
 }
 
-public class Tag : IComparable<Tag>, IDescribable {
-    String name;
+public class Tag : IComparable<Tag>, IDescribable
+{
+    String _name;
 
-    public Tag(String value) { name = value; }
-    public String Name() { return name; }
+    public Tag(String value) => _name = value;
+    public String Name() => _name;
 
-    public int CompareTo(Tag other) {
-        if (name == other.Name()) { return 0; }
+    public int CompareTo(Tag other)
+    {
+        if (_name == other.Name())
+            return 0;
         return 1;
     }
 
-    public String Describe() { return name; }
+    public String Describe() => _name;
 }
 
 // F-bounded: T must be comparable to itself.
-T Largest<T>(T[] values) where T : IComparable<T> {
+T Largest<T>(T[] values) where T : IComparable<T>
+{
     var best = values[0];
-    for (nuint i = 1; i < values.Length; i = i + 1) {
-        if (values[i].CompareTo(best) > 0) { best = values[i]; }
+    for (nuint i = 1; i < values.Length; i = i + 1)
+    {
+        if (values[i].CompareTo(best) > 0)
+            best = values[i];
     }
     return best;
 }
 
 // Two constraints on one parameter, on a generic class.
-public class Ranked<T> where T : IComparable<T>, IDescribable {
-    T[] items;
-    nuint count;
+public class Ranked<T> where T : IComparable<T>, IDescribable
+{
+    T[] _items;
+    nuint _count;
 
-    public Ranked(nuint capacity) {
-        items = new T[capacity];
-        count = 0;
+    public Ranked(nuint capacity)
+    {
+        _items = new T[capacity];
+        _count = 0;
     }
 
-    public void Add(T item) {
-        items[count] = item;
-        count = count + 1;
+    public void Add(T item)
+    {
+        _items[_count] = item;
+        _count = _count + 1;
     }
 
-    public String BestDescription() {
-        var best = items[0];
-        for (nuint i = 1; i < count; i = i + 1) {
-            if (items[i].CompareTo(best) > 0) { best = items[i]; }
+    public String BestDescription()
+    {
+        var best = _items[0];
+        for (nuint i = 1; i < _count; i = i + 1)
+        {
+            if (_items[i].CompareTo(best) > 0)
+                best = _items[i];
         }
         return best.Describe();
     }
@@ -75,17 +92,20 @@ public class Ranked<T> where T : IComparable<T>, IDescribable {
 //                                                    an interface
 
 /// A base class constrains too: the argument must be it or derive from it.
-public class Animal {
+public class Animal
+{
     public Animal() { }
-    public virtual String Says() { return "..."; }
+    public virtual String Says() => "...";
 }
 
-public class Dog : Animal {
+public class Dog : Animal
+{
     public Dog() { }
-    public override String Says() { return "woof"; }
+    public override String Says() => "woof";
 }
 
-public struct Point {
+public struct Point
+{
     public int X;
     public int Y;
 }
@@ -95,8 +115,10 @@ T FirstOf<T>(T[] items) where T : class { return items[0]; }
 
 /// `struct`: a value type, so an element is the value rather than a
 /// reference to one, and there is no null to ask about before writing.
-nuint FillWith<T>(T[] items, T value) where T : struct {
-    for (nuint i = 0u; i < items.Length; i = i + 1u) { items[i] = value; }
+nuint FillWith<T>(T[] items, T value) where T : struct
+{
+    for (nuint i = 0u; i < items.Length; i = i + 1u)
+        items[i] = value;
     return items.Length;
 }
 
@@ -110,7 +132,8 @@ String SaysOf<T>(T animal) where T : Animal { return animal.Says(); }
 
 /// One parameter constrained by another, which is what lets two arguments be
 /// required to line up rather than merely each be something.
-String Louder<T, U>(T thing, U other) where T : U where U : Animal {
+String Louder<T, U>(T thing, U other) where T : U where U : Animal
+{
     return other.Says() + "!";
 }
 
@@ -119,7 +142,8 @@ String Louder<T, U>(T thing, U other) where T : U where U : Animal {
 /// signature is not the compiler guessing.
 long Counted<T>(T shared, long times) where T : threadsafe { return times; }
 
-void Kinds() {
+void Kinds()
+{
     var dogs = new Dog[1];
     dogs[0] = new Dog();
     Console.WriteLine("class=" + FirstOf(dogs).Says());
@@ -145,7 +169,8 @@ void Kinds() {
     Console.WriteLine("threadsafe=" + Text.FromInteger(Counted(cell, cell.Load())));
 }
 
-int Main() {
+int Main()
+{
     var prices = new Money[3];
     prices[0] = new Money(250);
     prices[1] = new Money(999);

@@ -2,7 +2,8 @@
 module Bad;
 
 // `{}` names no value to write.
-int Main() {
+int Main()
+{
     String written = $"nothing {}";
     return (int)written.ByteLength();
 }

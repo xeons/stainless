@@ -11,7 +11,8 @@ module DoWhile;
 
 import Standard.Console;
 
-public int Main() {
+public int Main()
+{
     // Runs three times, asking afterwards each time.
     int spins = 0;
     do { spins++; } while (spins < 3);
@@ -24,54 +25,69 @@ public int Main() {
 
     // Which is exactly what the `while` beside it does not do.
     int never = 0;
-    while (false) { never++; }
+    while (false)
+        never++;
     Console.WriteLine($"never  {never}");
 
     // `continue` goes to the condition, as C says: it means "ask again",
     // not "start over". So the odd numbers are skipped and the loop still ends.
     int evens = 0;
     int n = 0;
-    do {
+    do
+    {
         n++;
-        if (n % 2 == 1) { continue; }
+        if (n % 2 == 1)
+            continue;
         evens += n;
-    } while (n < 10);
+    }
+    while (n < 10);
     Console.WriteLine($"evens  {evens}");
 
     // `break` leaves it, from inside the body.
     int found = 0;
     int probe = 0;
-    do {
+    do
+    {
         probe++;
-        if (probe * probe > 30) { found = probe; break; }
-    } while (probe < 100);
+        if (probe * probe > 30)
+        {
+            found = probe;
+            break;
+        }
+    }
+    while (probe < 100);
     Console.WriteLine($"found  {found}");
 
     // Nested, with a single statement rather than a block for a body.
     int rows = 0;
     int cells = 0;
-    do {
+    do
+    {
         rows++;
         int column = 0;
         do { column++; cells++; } while (column < 3);
-    } while (rows < 4);
+    }
+    while (rows < 4);
     Console.WriteLine($"grid   {rows} by 3 is {cells}");
 
     // A reference counted local declared inside the body: made and dropped
     // once per turn, which is what the `-` lines below count.
     int turn = 0;
-    do {
+    do
+    {
         var tag = new Tag($"turn {turn}");
         turn++;
         Console.WriteLine($"  held {tag.Name}");
-    } while (turn < 2);
+    }
+    while (turn < 2);
 
     Console.WriteLine("done");
     return 0;
 }
 
-class Tag {
+class Tag
+{
     public String Name;
-    public Tag(String name) { Name = name; }
+    public Tag(String name) => Name = name;
     ~Tag() { Console.WriteLine($"  dropped {Name}"); }
 }

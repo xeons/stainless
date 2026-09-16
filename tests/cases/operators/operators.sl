@@ -16,7 +16,8 @@ extern "C" int printf(byte* format, ...);
 
 // ------------------------------------------------------------------- a value
 
-public struct Money {
+public struct Money
+{
     public long Cents;
 
     public static Money operator +(Money a, Money b) { return Cents(a.Cents + b.Cents); }
@@ -24,20 +25,21 @@ public struct Money {
     public static Money operator -(Money a) { return Cents(0 - a.Cents); }
 
     // Both ways round, so the multiplication reads either way it is written.
-    public static Money operator *(Money a, long by) { return Cents(a.Cents * by); }
-    public static Money operator *(long by, Money a) { return Cents(a.Cents * by); }
+    public static Money operator *(Money a, long by) => Cents(a.Cents * by);
+    public static Money operator *(long by, Money a) => Cents(a.Cents * by);
 
     public static Money operator /(Money a, long by) { return Cents(a.Cents / by); }
 
     public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
     public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
-    public static bool operator <(Money a, Money b) { return a.Cents < b.Cents; }
-    public static bool operator >(Money a, Money b) { return a.Cents > b.Cents; }
+    public static bool operator <(Money a, Money b) => a.Cents < b.Cents;
+    public static bool operator >(Money a, Money b) => a.Cents > b.Cents;
     public static bool operator <=(Money a, Money b) { return a.Cents <= b.Cents; }
     public static bool operator >=(Money a, Money b) { return a.Cents >= b.Cents; }
 }
 
-public Money Cents(long value) {
+public Money Cents(long value)
+{
     Money made;
     made.Cents = value;
     return made;
@@ -45,30 +47,33 @@ public Money Cents(long value) {
 
 // A class, to prove an operator is not only for structs -- and that a declared
 // `==` is asked rather than the reference being compared behind its back.
-public class Tag {
+public class Tag
+{
     public String Name { get; }
 
-    public Tag(String name) { Name = name; }
+    public Tag(String name) => Name = name;
 
     public static bool operator ==(Tag a, Tag b) { return a.Name == b.Name; }
     public static bool operator !=(Tag a, Tag b) { return a.Name != b.Name; }
 }
 
 // A set of bits, for the bitwise ones and the unary complement.
-public struct Mask {
+public struct Mask
+{
     public uint Bits;
 
     public static Mask operator |(Mask a, Mask b) { return Of(a.Bits | b.Bits); }
     public static Mask operator &(Mask a, Mask b) { return Of(a.Bits & b.Bits); }
     public static Mask operator ^(Mask a, Mask b) { return Of(a.Bits ^ b.Bits); }
     public static Mask operator ~(Mask a) { return Of(~a.Bits); }
-    public static Mask operator <<(Mask a, int by) { return Of(a.Bits << (uint)by); }
+    public static Mask operator <<(Mask a, int by) => Of(a.Bits << (uint)by);
 
     public static bool operator ==(Mask a, Mask b) { return a.Bits == b.Bits; }
     public static bool operator !=(Mask a, Mask b) { return a.Bits != b.Bits; }
 }
 
-public Mask Of(uint bits) {
+public Mask Of(uint bits)
+{
     Mask made;
     made.Bits = bits;
     return made;
@@ -76,78 +81,109 @@ public Mask Of(uint bits) {
 
 // --------------------------------------------------------------- indexers
 
-public class Grid {
-    int[] cells;
-    nuint width;
+public class Grid
+{
+    int[] _cells;
+    nuint _width;
 
-    public Grid(nuint w, nuint h) {
-        width = w;
-        cells = new int[w * h];
+    public Grid(nuint w, nuint h)
+    {
+        _width = w;
+        _cells = new int[w * h];
     }
 
     /// One index, the flat one.
-    public int this[nuint at] {
-        get { return cells[at]; }
-        set { cells[at] = value; }
+    public int this[nuint at]
+    {
+        get => _cells[at];
+        set => _cells[at] = value;
     }
 }
 
 /// Overloaded on what it takes: by position, and by name.
-public class Bag {
-    List<String> items;
+public class Bag
+{
+    List<String> _items;
 
-    public Bag() { items = new List<String>(); }
+    public Bag() => _items = new List<String>();
 
-    public void Add(String item) { items.Add(item); }
-    public nuint Count() { return items.Count(); }
+    public void Add(String item) => _items.Add(item);
+    public nuint Count() => _items.Count();
 
-    public String this[nuint at] {
-        get { return items.At(at); }
-        set { items.Set(at, value); }
+    public String this[nuint at]
+    {
+        get => _items.At(at);
+        set => _items.Set(at, value);
     }
 
-    public bool this[String wanted] {
-        get {
-            foreach (var one in items) { if (one == wanted) { return true; } }
+    public bool this[String wanted]
+    {
+        get
+        {
+            foreach (var one in _items)
+                if (one == wanted)
+                    return true;
             return false;
         }
-        set { if (value) { items.Add(wanted); } }
+        set
+        {
+            if (value)
+                _items.Add(wanted);
+        }
     }
 }
 
 /// A read-only indexer, which is the common shape and needs no setter.
-public class Squares {
+public class Squares
+{
     public nuint this[nuint n] { get { return n * n; } }
 }
 
 /// An indexer on a struct, which reaches its receiver by pointer.
-public struct Triple {
+public struct Triple
+{
     public int A;
     public int B;
     public int C;
 
-    public int this[nuint at] {
-        get {
-            if (at == 0u) { return A; }
-            if (at == 1u) { return B; }
+    public int this[nuint at]
+    {
+        get
+        {
+            if (at == 0u)
+                return A;
+            if (at == 1u)
+                return B;
             return C;
         }
-        set {
-            if (at == 0u) { A = value; }
-            else if (at == 1u) { B = value; }
-            else { C = value; }
+        set
+        {
+            if (at == 0u)
+            {
+                A = value;
+            }
+            else if (at == 1u)
+            {
+                B = value;
+            }
+            else
+            {
+                C = value;
+            }
         }
     }
 }
 
 /// Inherited like any other member.
-public class Base {
+public class Base
+{
     public int this[nuint at] { get { return (int)at * 10; } }
 }
 
 public class Derived : Base { }
 
-int Main() {
+int Main()
+{
     // ------------------------------------------------------------ arithmetic
 
     var a = Cents(250);
@@ -201,7 +237,7 @@ int Main() {
     var grid = new Grid(3u, 3u);
     grid[0u] = 7;
     grid[4u] = 9;
-    grid[4u] += 1;
+    grid[4u]++;
     grid[8u] = grid[0u] + grid[4u];
 
     printf("grid0     = %d\n", grid[0u]);

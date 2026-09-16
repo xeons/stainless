@@ -54,144 +54,195 @@ public struct B4 { public uint F : 3; public double W; public uint M : 5; }
 public struct B5 { public ushort A : 9; public ushort B : 7; public uint C; }
 
 // Taking one apart: every field read back out of what arrived.
-double TakeI3(I3 v) { return (double)v.A + (double)v.B + (double)v.C; }
-double TakeI5(I5 v) { return (double)v.A + (double)v.B; }
-double TakeI9(I9 v) { return (double)v.A + (double)v.B; }
-double TakeI12(I12 v) { return (double)v.A + (double)v.B + (double)v.C; }
-double TakeI16(I16 v) { return (double)v.A + (double)v.B; }
-double TakeI17(I17 v) { return (double)v.A + (double)v.B + (double)v.C; }
-double TakeF2(F2 v) { return (double)v.A + (double)v.B; }
-double TakeF3(F3 v) { return (double)v.A + (double)v.B + (double)v.C; }
-double TakeD2(D2 v) { return (double)v.A + (double)v.B; }
-double TakeD3(D3 v) { return (double)v.A + (double)v.B + (double)v.C; }
-double TakeM1(M1 v) { return (double)v.A + (double)v.B; }
-double TakeM2(M2 v) { return (double)v.A + (double)v.B; }
-double TakeM3(M3 v) { return (double)v.A + (double)v.B; }
-double TakeM7(M7 v) { return (double)v.A + (double)v.B; }
-double TakeM8(M8 v) { return (double)v.A + (double)v.B; }
-double TakeA3(A3 v) { return (double)v.A[0] + (double)v.A[1] + (double)v.A[2]; }
-double TakeB1(B1 v) { return (double)v.C; }
-double TakeB2(B2 v) { return (double)v.B; }
-double TakeB3(B3 v) { return (double)v.A; }
-double TakeB4(B4 v) { return v.W + (double)v.M; }
-double TakeB5(B5 v) { return (double)v.C + (double)v.A; }
+double TakeI3(I3 v) => (double)v.A + (double)v.B + (double)v.C;
+double TakeI5(I5 v) => (double)v.A + (double)v.B;
+double TakeI9(I9 v) => (double)v.A + (double)v.B;
+double TakeI12(I12 v) => (double)v.A + (double)v.B + (double)v.C;
+double TakeI16(I16 v) => (double)v.A + (double)v.B;
+double TakeI17(I17 v) => (double)v.A + (double)v.B + (double)v.C;
+double TakeF2(F2 v) => (double)v.A + (double)v.B;
+double TakeF3(F3 v) => (double)v.A + (double)v.B + (double)v.C;
+double TakeD2(D2 v) => (double)v.A + (double)v.B;
+double TakeD3(D3 v) => (double)v.A + (double)v.B + (double)v.C;
+double TakeM1(M1 v) => (double)v.A + (double)v.B;
+double TakeM2(M2 v) => (double)v.A + (double)v.B;
+double TakeM3(M3 v) => (double)v.A + (double)v.B;
+double TakeM7(M7 v) => (double)v.A + (double)v.B;
+double TakeM8(M8 v) => (double)v.A + (double)v.B;
+double TakeA3(A3 v) => (double)v.A[0] + (double)v.A[1] + (double)v.A[2];
+double TakeB1(B1 v) => (double)v.C;
+double TakeB2(B2 v) => (double)v.B;
+double TakeB3(B3 v) => (double)v.A;
+double TakeB4(B4 v) => v.W + (double)v.M;
+double TakeB5(B5 v) => (double)v.C + (double)v.A;
 
-B1 GiveB1() { B1 v; v.A = 1u; v.B = 2u; v.C = 1000000u; return v; }
-B2 GiveB2() { B2 v; v.A = 1u; v.B = 9u; return v; }
-B3 GiveB3() { B3 v; v.A = 70000u; v.B = 3u; return v; }
-B4 GiveB4() { B4 v; v.F = 1u; v.W = 2.5; v.M = 21u; return v; }
-B5 GiveB5() { B5 v; v.A = 300u; v.B = 4u; v.C = 90000u; return v; }
+B1 GiveB1()
+{
+    B1 v;
+    v.A = 1u;
+    v.B = 2u;
+    v.C = 1000000u;
+    return v;
+}
+B2 GiveB2()
+{
+    B2 v;
+    v.A = 1u;
+    v.B = 9u;
+    return v;
+}
+B3 GiveB3()
+{
+    B3 v;
+    v.A = 70000u;
+    v.B = 3u;
+    return v;
+}
+B4 GiveB4()
+{
+    B4 v;
+    v.F = 1u;
+    v.W = 2.5;
+    v.M = 21u;
+    return v;
+}
+B5 GiveB5()
+{
+    B5 v;
+    v.A = 300u;
+    v.B = 4u;
+    v.C = 90000u;
+    return v;
+}
 
-double TakeA5(A5 v) { return (double)v.A[0] + (double)v.A[16]; }
+double TakeA5(A5 v) => (double)v.A[0] + (double)v.A[16];
 
 // And building one, so the return side is exercised too.
-I3 GiveI3() {
+I3 GiveI3()
+{
     I3 v;
     v.A = 1;
     v.B = 2;
     v.C = 3;
     return v;
 }
-I5 GiveI5() {
+I5 GiveI5()
+{
     I5 v;
     v.A = 11;
     v.B = 4;
     return v;
 }
-I9 GiveI9() {
+I9 GiveI9()
+{
     I9 v;
     v.A = 12;
     v.B = 5;
     return v;
 }
-I12 GiveI12() {
+I12 GiveI12()
+{
     I12 v;
     v.A = 13;
     v.B = 14;
     v.C = 15;
     return v;
 }
-I16 GiveI16() {
+I16 GiveI16()
+{
     I16 v;
     v.A = 16;
     v.B = 17;
     return v;
 }
-I17 GiveI17() {
+I17 GiveI17()
+{
     I17 v;
     v.A = 18;
     v.B = 19;
     v.C = 6;
     return v;
 }
-F2 GiveF2() {
+F2 GiveF2()
+{
     F2 v;
     v.A = (float)1.5;
     v.B = (float)2.5;
     return v;
 }
-F3 GiveF3() {
+F3 GiveF3()
+{
     F3 v;
     v.A = (float)3.5;
     v.B = (float)4.5;
     v.C = (float)5.5;
     return v;
 }
-D2 GiveD2() {
+D2 GiveD2()
+{
     D2 v;
     v.A = 6.5;
     v.B = 7.5;
     return v;
 }
-D3 GiveD3() {
+D3 GiveD3()
+{
     D3 v;
     v.A = 8.5;
     v.B = 9.5;
     v.C = 10.5;
     return v;
 }
-M1 GiveM1() {
+M1 GiveM1()
+{
     M1 v;
     v.A = 11.5;
     v.B = 20;
     return v;
 }
-M2 GiveM2() {
+M2 GiveM2()
+{
     M2 v;
     v.A = 21;
     v.B = 12.5;
     return v;
 }
-M3 GiveM3() {
+M3 GiveM3()
+{
     M3 v;
     v.A = (float)13.5;
     v.B = 22;
     return v;
 }
-M7 GiveM7() {
+M7 GiveM7()
+{
     M7 v;
     v.A = 7;
     v.B = 14.5;
     return v;
 }
-M8 GiveM8() {
+M8 GiveM8()
+{
     M8 v;
     v.A = (float)15.5;
     v.B = 23;
     return v;
 }
-A3 GiveA3() {
+A3 GiveA3()
+{
     A3 v;
     v.A[0] = 24; v.A[1] = 25; v.A[2] = 26;
     return v;
 }
-A5 GiveA5() {
+A5 GiveA5()
+{
     A5 v;
     v.A[0] = 8; v.A[16] = 9;
     return v;
 }
 
-public void Main() {
+public void Main()
+{
     var line = new StringBuilder();
     line.Clear();
     line.Append("I3  ");

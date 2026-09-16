@@ -14,27 +14,32 @@ public interface IFunc<T> { T Produce(); }
 
 public delegate int Plain(int value);
 
-class Tag {
-    String name;
-    public Tag(String n) { name = n; }
-    public String Name() { return name; }
-    ~Tag() { printf("~Tag(%s)\n", name.ToPointer()); }
+class Tag
+{
+    String _name;
+    public Tag(String n) => _name = n;
+    public String Name() => _name;
+    ~Tag() { printf("~Tag(%s)\n", _name.ToPointer()); }
 }
 
 // A closure outlives the scope that built it, because it captured by value.
-ITransform MakeAdder(int amount) {
+ITransform MakeAdder(int amount)
+{
     return value => value + amount;
 }
 
-int ApplyAll(IReadOnlyList<ITransform> steps, int start) {
+int ApplyAll(IReadOnlyList<ITransform> steps, int start)
+{
     int result = start;
-    for (nuint i = 0; i < steps.Count(); i = i + 1) {
+    for (nuint i = 0; i < steps.Count(); i = i + 1)
+    {
         result = steps.At(i).Apply(result);
     }
     return result;
 }
 
-int Main() {
+int Main()
+{
     int factor = 3;
 
     // Explicit parameter type, inferred parameter type, and a block body.

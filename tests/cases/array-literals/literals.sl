@@ -12,39 +12,46 @@ module ArrayLiterals;
 import Standard.Console;
 import Standard.Text;
 
-void Show(String[] items) {
+void Show(String[] items)
+{
     var line = new StringBuilder();
-    for (nuint i = 0u; i < items.Length; i = i + 1u) {
+    for (nuint i = 0u; i < items.Length; i = i + 1u)
+    {
         line.Append(items[i]);
         line.Append(" ");
     }
     Console.WriteLine(line.ToText());
 }
 
-int Sum(int[:] slice) {
+int Sum(int[:] slice)
+{
     int total = 0;
-    for (nuint i = 0u; i < slice.Length; i = i + 1u) { total = total + slice[i]; }
+    for (nuint i = 0u; i < slice.Length; i = i + 1u)
+        total = total + slice[i];
     return total;
 }
 
 public struct Point { public int X; public int Y; }
 
-public class Thing {
+public class Thing
+{
     public int N;
-    public Thing(int n) { N = n; }
+    public Thing(int n) => N = n;
     ~Thing() { Console.WriteLine("  gone " + Text.FromInteger((long)N)); }
 }
 
 /// Every element is stored the way an assignment into an element would store
 /// it, so a literal of references retains each one -- and these two outlive
 /// the locals that made them.
-Thing[] Build() {
+Thing[] Build()
+{
     var a = new Thing(1);
     var b = new Thing(2);
     return [a, b];
 }
 
-public void Main() {
+public void Main()
+{
     // Inferred from the elements.
     var numbers = [1, 2, 3, 4];
     Console.WriteLine("count " + Text.FromInteger((long)numbers.Length));

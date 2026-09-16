@@ -1,14 +1,16 @@
 // What `offsetof` will not answer.
 module ErrLayoutQueries;
 
-public struct Flags {
+public struct Flags
+{
     public uint A : 3;
     public uint B : 5;
 }
 
 public interface IThing { int Go(); }
 
-int Main() {
+int Main()
+{
     // A bit-field has no byte offset of its own — it shares a storage unit with
     // its neighbours, and the number a caller would want is the unit's. C
     // refuses this too.

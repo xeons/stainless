@@ -33,4 +33,4 @@ module Bad;
 
 #if NEVER_CLOSED
 
-int Main() { return 0; }
+int Main() => 0;

@@ -3,44 +3,51 @@ module ErrBaseUse;
 
 public interface IThing { int Go(); }
 
-public abstract class Shape {
+public abstract class Shape
+{
     protected int sides;
 
-    Shape(int howMany) { sides = howMany; }
+    Shape(int howMany) => sides = howMany;
 
     public abstract double Area();
 }
 
-public class Circle : Shape {
-    Circle() { base(1); }
+public class Circle : Shape
+{
+    Circle() => base(1);
 
-    public override double Area() { return 1.0; }
+    public override double Area() => 1.0;
 
-    public int Sides() { return sides; }
+    public int Sides() => sides;
 }
 
 /// Nothing to do with Circle, so no object is ever both.
-public class Unrelated {
+public class Unrelated
+{
     public int Value;
 }
 
-public class Rooted {
+public class Rooted
+{
     // A class deriving from nothing has no base to name.
-    public int Ask() { return base.Missing; }         // SL0515
+    public int Ask() => base.Missing; // SL0515
 }
 
-public class Elsewhere : Shape {
-    Elsewhere() { base(2); }
+public class Elsewhere : Shape
+{
+    Elsewhere() => base(2);
 
-    public override double Area() { return 0.0; }
+    public override double Area() => 0.0;
 
-    public double Twice() {
+    public double Twice()
+    {
         // `base` is where to look a name up, not a value in its own right.
         var held = base;                              // SL0515
         return 0.0;
     }
 
-    public double Late() {
+    public double Late()
+    {
         // The base is built before this class's body runs, so a chain anywhere
         // but the head would be reading fields nothing had set.
         base(3);                                      // SL0516
@@ -48,42 +55,50 @@ public class Elsewhere : Shape {
     }
 }
 
-public class Wrongly : Shape {
-    Wrongly() {
+public class Wrongly : Shape
+{
+    Wrongly()
+    {
         sides = 1;
         base(1);                                      // SL0516
     }
 
-    public override double Area() { return 0.0; }
+    public override double Area() => 0.0;
 }
 
 /// Shape takes an argument, and this says nothing about which one.
-public class Unsaid : Shape {                         // SL0517
-    public override double Area() { return 0.0; }
+public class Unsaid : Shape // SL0517
+{
+    public override double Area() => 0.0;
 }
 
 /// Constructors that delegate to each other and so never build anything.
-public class Ring {
-    Ring(int a) { this(); }                           // SL0521
-    Ring() { this(1); }
+public class Ring
+{
+    Ring(int a) => this(); // SL0521
+    Ring() => this(1);
 }
 
-public class Selfish {
-    Selfish(int a) { this(a); }                       // SL0521
+public class Selfish
+{
+    Selfish(int a) => this(a); // SL0521
 }
 
-public class Misplaced {
-    int held;
+public class Misplaced
+{
+    int _held;
 
-    Misplaced(int a) { held = a; }
+    Misplaced(int a) => _held = a;
 
-    Misplaced() {
-        held = 0;
+    Misplaced()
+    {
+        _held = 0;
         this(1);                                      // SL0516
     }
 }
 
-int Main() {
+int Main()
+{
     // An abstract class exists to be derived from; there is no such object.
     Shape none = new Shape(1);                        // SL0514
 

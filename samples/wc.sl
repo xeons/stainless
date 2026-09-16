@@ -68,7 +68,7 @@ Count Tally(String text)
         byte at = text.ByteAt(i);
 
         if (at == 10u)
-            found.Lines += 1;
+            found.Lines++;
 
         bool space = at == 32u || at == 9u || at == 10u || at == 13u || at == 11u || at == 12u;
         if (space)

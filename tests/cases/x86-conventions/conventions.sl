@@ -20,7 +20,8 @@ extern "C" __fastcall int five_fastcall(int a, int b, int c, int d, int e);
 // count has to account for.
 extern "C" __stdcall long wide_stdcall(long a, int b);
 
-int Main() {
+int Main()
+{
     printf("stdcall     = %d   (want 7)\n", add_stdcall(3, 4));
     printf("fastcall    = %d   (want 7)\n", add_fastcall(3, 4));
     printf("vectorcall  = %d   (want 7)\n", add_vectorcall(3, 4));

@@ -12,45 +12,55 @@ import Standard.Console;
 
 /// `SYSTEM_INFO`'s opening, which is a union of a whole `DWORD` and two halves,
 /// both nameless.
-public struct SystemInfo {
-    public union {
+public struct SystemInfo
+{
+    public union
+    {
         public uint OemId;
-        public struct {
+        public struct
+        {
             public ushort Architecture;
             public ushort Reserved;
         }
     }
-    public uint  PageSize;
+    public uint PageSize;
     public void* MinimumApplicationAddress;
 }
 
 /// `LARGE_INTEGER`: the same 64 bits read whole or in halves.
-public union LargeInteger {
-    public struct {
+public union LargeInteger
+{
+    public struct
+    {
         public uint Low;
-        public int  High;
+        public int High;
     }
     public long Quad;
 }
 
 /// Nesting one inside another, and a named member beside them, so that lookup
 /// has to go more than one level and still prefer the shallower name.
-public struct Layers {
+public struct Layers
+{
     public int Depth;
-    public struct {
+    public struct
+    {
         public int Middle;
-        public union {
-            public int  AsInt;
+        public union
+        {
+            public int AsInt;
             public byte AsByte;
         }
     }
 }
 
-void Show(String name, nuint value) {
+void Show(String name, nuint value)
+{
     Console.WriteLine(name + " = " + Text.FromInteger(value));
 }
 
-int Main() {
+int Main()
+{
     // --- layout ------------------------------------------------------------
     Show("sizeof(SystemInfo)", sizeof(SystemInfo));
     Show("offsetof(PageSize)", offsetof(SystemInfo, PageSize));

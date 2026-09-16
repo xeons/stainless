@@ -18,27 +18,35 @@ module NullOperators;
 
 import Standard.Console;
 
-class Node {
+class Node
+{
     public String Name { get; set; }
     public Node? Next { get; set; }
     public int Weight { get; set; }
 
-    public Node(String name, int weight) { Name = name; Next = null; Weight = weight; }
+    public Node(String name, int weight)
+    {
+        Name = name;
+        Next = null;
+        Weight = weight;
+    }
 
-    public String Describe() { return $"<{Name}:{Weight}>"; }
-    public void Rename(String to) { Name = to; }
+    public String Describe() => $"<{Name}:{Weight}>";
+    public void Rename(String to) => Name = to;
 }
 
 static int calls = 0;
 
 /// Counts how often it was reached, so that "once" can be checked rather than
 /// asserted.
-Node? Made(bool real) {
+Node? Made(bool real)
+{
     calls++;
     return real ? new Node("made", 7) : null;
 }
 
-public int Main() {
+public int Main()
+{
     var head = new Node("head", 1);
     head.Next = new Node("tail", 2);
 

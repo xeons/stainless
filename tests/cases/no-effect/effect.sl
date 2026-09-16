@@ -9,9 +9,10 @@ module NoEffect;
 
 extern "C" int puts(byte* text);
 
-int Next() { return 7; }
+int Next() => 7;
 
-int Main() {
+int Main()
+{
     int count = 1;
 
     // Each of these could have had an effect, so none of them is warned about.

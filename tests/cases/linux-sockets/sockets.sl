@@ -16,7 +16,8 @@ import Standard.Console;
 import Standard.Text;
 import Linux.Sockets;
 
-extern "C" {
+extern "C"
+{
     long probe_af_inet();
     long probe_af_inet6();
     long probe_af_unix();
@@ -96,8 +97,10 @@ extern "C" {
 }
 
 /// Zero when the binding agrees with the header, and one when it does not.
-int Check(String name, long bound, long header) {
-    if (bound == header) { return 0; }
+int Check(String name, long bound, long header)
+{
+    if (bound == header)
+        return 0;
 
     Console.WriteLine("WRONG " + name
         + ": the binding says " + Text.FromInteger(bound)
@@ -105,7 +108,8 @@ int Check(String name, long bound, long header) {
     return 1;
 }
 
-int Constants() {
+int Constants()
+{
     int wrong = 0;
     wrong = wrong + Check("AF_INET", (long)AF_INET, probe_af_inet());
     wrong = wrong + Check("AF_INET6", (long)AF_INET6, probe_af_inet6());
@@ -171,7 +175,8 @@ int Constants() {
     return wrong;
 }
 
-int Layout() {
+int Layout()
+{
     int wrong = 0;
     wrong = wrong + Check("sizeof sockaddr", (long)sizeof(sockaddr), probe_size_sockaddr());
     wrong = wrong + Check("sizeof sockaddr_in", (long)sizeof(sockaddr_in),
@@ -199,9 +204,11 @@ int Layout() {
 }
 
 /// A loopback exchange through the declarations themselves.
-int Exchange() {
+int Exchange()
+{
     int server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (server < 0) {
+    if (server < 0)
+    {
         Console.WriteLine("WRONG socket failed: " + Text.FromInteger((long)Errno()));
         return 1;
     }
@@ -211,19 +218,22 @@ int Exchange() {
     address.sin_port = htons(0u);                       // let the system choose
     address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    if (bind(server, (sockaddr*)&address, (uint)sizeof(sockaddr_in)) < 0) {
+    if (bind(server, (sockaddr*)&address, (uint)sizeof(sockaddr_in)) < 0)
+    {
         Console.WriteLine("WRONG bind failed: " + Text.FromInteger((long)Errno()));
         return 1;
     }
 
-    if (listen(server, 4) < 0) {
+    if (listen(server, 4) < 0)
+    {
         Console.WriteLine("WRONG listen failed: " + Text.FromInteger((long)Errno()));
         return 1;
     }
 
     sockaddr_in bound;
     uint length = (uint)sizeof(sockaddr_in);
-    if (getsockname(server, (sockaddr*)&bound, &length) < 0) {
+    if (getsockname(server, (sockaddr*)&bound, &length) < 0)
+    {
         Console.WriteLine("WRONG getsockname failed");
         return 1;
     }
@@ -231,7 +241,8 @@ int Exchange() {
     Console.WriteLine("port-chosen " + Text.FromBool(ntohs(bound.sin_port) != 0u));
 
     int client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (connect(client, (sockaddr*)&bound, (uint)sizeof(sockaddr_in)) < 0) {
+    if (connect(client, (sockaddr*)&bound, (uint)sizeof(sockaddr_in)) < 0)
+    {
         Console.WriteLine("WRONG connect failed: " + Text.FromInteger((long)Errno()));
         return 1;
     }
@@ -275,7 +286,8 @@ int Exchange() {
     return 0;
 }
 
-int Main() {
+int Main()
+{
     int wrong = Constants() + Layout() + Exchange();
 
     Console.WriteLine("wrong " + Text.FromInteger((long)wrong));

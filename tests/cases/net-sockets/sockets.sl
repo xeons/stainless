@@ -16,22 +16,27 @@ import Standard.Text;
 import Standard.IO;
 import Standard.Net;
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " " + value);
 }
 
-void SayNumber(String label, long value) {
+void SayNumber(String label, long value)
+{
     Console.WriteLine(label + " " + Text.FromInteger(value));
 }
 
-void SayBool(String label, bool value) {
+void SayBool(String label, bool value)
+{
     Console.WriteLine(label + " " + Text.FromBool(value));
 }
 
-int Main() {
+int Main()
+{
     // ---------------------------------------------------------------- names
     var local = Net.Resolve("localhost");
-    switch (local) {
+    switch (local)
+    {
         case Ok:   SayBool("resolve-localhost", true); break;
         case Fail: SayBool("resolve-localhost", false); break;
     }
@@ -39,7 +44,8 @@ int Main() {
     // A literal address resolves to itself, which is the property that lets
     // one code path take both a name and an address.
     var literal = Net.Resolve("127.0.0.1");
-    switch (literal) {
+    switch (literal)
+    {
         case Ok ok:  Say("resolve-literal", ok.Value); break;
         case Fail:   Say("resolve-literal", "failed"); break;
     }
@@ -53,7 +59,8 @@ int Main() {
     // once and neither has to know a port number in advance.
     var opened = TcpListener.Listen("127.0.0.1", 0u);
     SayBool("listening", opened.Ok);
-    if (!opened.Ok) { return 1; }
+    if (!opened.Ok)
+        return 1;
 
     var server = opened.Value;
 
@@ -65,7 +72,8 @@ int Main() {
     // opened in, rather than the socket being opened before the name is read.
     var dialled = TcpClient.Connect("127.0.0.1", address.Port);
     SayBool("connected", dialled.Ok);
-    if (!dialled.Ok) { return 1; }
+    if (!dialled.Ok)
+        return 1;
 
     var client = dialled.Value;
 
@@ -142,7 +150,8 @@ int Main() {
     //
     // No handshake, so one socket can talk to itself in a straight line.
     var bound = UdpSocket.Bind("127.0.0.1", 0u);
-    if (!bound.Ok) { return 1; }
+    if (!bound.Ok)
+        return 1;
 
     var listener = bound.Value;
     SayBool("udp-open", listener.IsOpen());
@@ -151,7 +160,8 @@ int Main() {
     SayBool("udp-port", inbox.Port != 0u);
 
     var made = UdpSocket.Datagram();
-    if (!made.Ok) { return 1; }
+    if (!made.Ok)
+        return 1;
 
     var sender = made.Value;
     nuint sent = sender.SendText("a datagram", "127.0.0.1", inbox.Port);
@@ -180,7 +190,8 @@ int Main() {
 
     // Two listeners on one port. The second one fails to bind.
     var opening = TcpListener.Listen("127.0.0.1", 0u);
-    if (!opening.Ok) { return 1; }
+    if (!opening.Ok)
+        return 1;
 
     var first = opening.Value;
     var taken = first.LocalEndPoint().Port;
@@ -192,7 +203,8 @@ int Main() {
     // A listener that was closed answers everything with Closed rather than
     // doing anything. Reopening the port now works, since the first let go.
     var reopened = TcpListener.Listen("127.0.0.1", taken);
-    if (!reopened.Ok) { return 1; }
+    if (!reopened.Ok)
+        return 1;
 
     var dead = reopened.Value;
     dead.Close();

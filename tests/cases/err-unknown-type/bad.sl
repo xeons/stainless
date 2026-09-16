@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-int Main() {
+int Main()
+{
     Missing m;
     return 0;
 }

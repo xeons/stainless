@@ -17,15 +17,27 @@ import Standard.Convert;
 import Standard.Reflection;
 
 [Reflect]
-public class Button {
+public class Button
+{
     public int Layouts;
-    int left;
+    int _left;
 
-    public Button() { Layouts = 0; left = 0; Caption = ""; Enabled = false; }
+    public Button()
+    {
+        Layouts = 0;
+        _left = 0;
+        Caption = "";
+        Enabled = false;
+    }
 
-    public int Left {
-        get { return left; }
-        set { left = value; Layouts = Layouts + 1; }
+    public int Left
+    {
+        get => _left;
+        set
+        {
+            _left = value;
+            Layouts = Layouts + 1;
+        }
     }
 
     public String Caption { get; set; }
@@ -33,18 +45,21 @@ public class Button {
 }
 
 [Reflect]
-public class Slider {
-    public Slider() { Value = 0.0; }
+public class Slider
+{
+    public Slider() => Value = 0.0;
     public double Value { get; set; }
 }
 
 /// A type with no [Reflect], to show it is not findable.
-public class Hidden {
+public class Hidden
+{
     public int Anything;
-    public Hidden() { Anything = 0; }
+    public Hidden() => Anything = 0;
 }
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " = " + value);
 }
 
@@ -52,28 +67,46 @@ void Say(String label, String value) {
 ///
 /// This is the whole point of the two features together -- nothing below
 /// mentions Button or Slider by name in code.
-byte* Build(String typeName, String[] settings) {
+byte* Build(String typeName, String[] settings)
+{
     var type = FindType(typeName);
-    if (!type.Exists()) { return null; }
+    if (!type.Exists())
+        return null;
 
     byte* made = Make(type);
-    if (made == null) { return null; }
+    if (made == null)
+        return null;
 
-    for (nuint i = 0u; i + 1u < settings.Length; i = i + 2u) {
+    for (nuint i = 0u; i + 1u < settings.Length; i = i + 2u)
+    {
         var property = type.FindProperty(settings[i]);
-        if (!property.Exists() || !property.CanWrite()) { continue; }
+        if (!property.Exists() || !property.CanWrite())
+            continue;
 
         var value = settings[i + 1u];
 
-        if (property.IsInteger()) {
+        if (property.IsInteger())
+        {
             var parsed = ToLong(value);
-            if (parsed.Ok) { SetInteger(made, property, parsed.Value); }
-        } else if (property.IsFloating()) {
+            if (parsed.Ok)
+            {
+                SetInteger(made, property, parsed.Value);
+            }
+        }
+        else if (property.IsFloating())
+        {
             var parsed = ToDouble(value);
-            if (parsed.Ok) { SetDouble(made, property, parsed.Value); }
-        } else if (property.IsText()) {
+            if (parsed.Ok)
+            {
+                SetDouble(made, property, parsed.Value);
+            }
+        }
+        else if (property.IsText())
+        {
             SetText(made, property, value);
-        } else if (property.Kind() == KindBool) {
+        }
+        else if (property.Kind() == KindBool)
+        {
             SetBool(made, property, value == "true");
         }
     }
@@ -81,7 +114,8 @@ byte* Build(String typeName, String[] settings) {
     return made;
 }
 
-public int Main() {
+public int Main()
+{
     // ------------------------------------------------------ finding a type
     var button = FindType("TypeByName.Button");
     Say("found", Text.FromBool(button.Exists()));

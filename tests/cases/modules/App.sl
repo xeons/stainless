@@ -5,7 +5,8 @@ import Geometry;
 
 extern "C" int printf(byte* format, ...);
 
-int Main() {
+int Main()
+{
     Vec2 a;
     a.X = 3.0;
     a.Y = 4.0;
@@ -22,7 +23,8 @@ int Main() {
 }
 
 // Used above, declared below. No forward declaration exists in this language.
-double Total() {
+double Total()
+{
     var acc = new Accumulator();
     acc.Add(1.5);
     acc.Add(2.5);

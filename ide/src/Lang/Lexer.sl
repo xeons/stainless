@@ -321,7 +321,7 @@ public class Scanner
             {
                 nuint run = at;
                 while (run < size && IsOperator(line.ByteAt(run)))
-                    run += 1u;
+                    run++;
                 into.Add(Token.Of(TokenKind.Operator, at, run - at));
                 at = run;
                 continue;
@@ -347,7 +347,7 @@ public class Scanner
         nuint size = line.ByteLength();
         nuint run = at;
         while (run < size && IsWordPart(line.ByteAt(run)))
-            run += 1u;
+            run++;
 
         String word = line.Substring(at, run - at);
         var kind = TokenKind.Identifier;
@@ -462,7 +462,7 @@ public class Scanner
             byte c = line.ByteAt(run);
             if (c == (byte)'{')
             {
-                depth += 1u;
+                depth++;
             }
             else if (c == (byte)'}')
             {
@@ -504,7 +504,7 @@ public class Scanner
             }
             if (c == (byte)'\'')
             {
-                run += 1u;
+                run++;
                 break;
             }
             run++;
@@ -543,7 +543,7 @@ public class Scanner
                 byte previous = line.ByteAt(run - 1u);
                 if (previous == (byte)'e' || previous == (byte)'E')
                 {
-                    run += 1u;
+                    run++;
                     continue;
                 }
             }

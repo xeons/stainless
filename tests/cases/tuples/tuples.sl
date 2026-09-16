@@ -21,28 +21,34 @@ module Tuples;
 import Standard.Console;
 import Standard.Collections;
 
-class Loud {
+class Loud
+{
     public String Tag;
-    public Loud(String tag) { Tag = tag; }
+    public Loud(String tag) => Tag = tag;
     ~Loud() { Console.WriteLine($"  dropped {Tag}"); }
 }
 
 /// The shape a tuple is for: two answers that belong together, and no struct
 /// declared for the sake of one function.
-(int, int) MinMax(int[:] numbers) {
+(int, int) MinMax(int[:] numbers)
+{
     int low = numbers[0u];
     int high = numbers[0u];
 
-    foreach (var n in numbers) {
-        if (n < low) { low = n; }
-        if (n > high) { high = n; }
+    foreach (var n in numbers)
+    {
+        if (n < low)
+            low = n;
+        if (n > high)
+            high = n;
     }
 
     return (low, high);
 }
 
 /// One that carries references, so ARC has something to do.
-(String, String) SplitAt(String text, nuint at) {
+(String, String) SplitAt(String text, nuint at)
+{
     return (text.Substring(0u, at), text.Substring(at, text.ByteLength() - at));
 }
 
@@ -51,7 +57,8 @@ class Loud {
 /// A tuple through a generic, to show it is an ordinary type.
 T FirstOf<T, U>((T, U) pair) { return pair.Item1; }
 
-public int Main() {
+public int Main()
+{
     // Written out, and read by field.
     var pair = (1, "one");
     Console.WriteLine($"a {pair.Item1} {pair.Item2}");

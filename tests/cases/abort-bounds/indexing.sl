@@ -9,7 +9,8 @@ module Indexing;
 import Standard.Console;
 import Standard.Text;
 
-int Main() {
+int Main()
+{
     var numbers = new int[(nuint)3];
     numbers[0] = 1;
 

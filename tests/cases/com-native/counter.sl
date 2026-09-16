@@ -18,19 +18,25 @@ import Standard.Text;
 import Standard.Com;
 
 [Guid("58ba1f7c-2e04-4a16-9c8d-31e07f6ab254")]
-public com interface ICounter {
+public com interface ICounter
+{
     int Add(int by);
     int Value();
 }
 
 /// Implemented here, called from C.
-public com class Counter : ICounter {
-    int total;
+public com class Counter : ICounter
+{
+    int _total;
 
-    public Counter() { total = 0; }
+    public Counter() => _total = 0;
 
-    public int Add(int by) { total = total + by; return total; }
-    public int Value() { return total; }
+    public int Add(int by)
+    {
+        _total = _total + by;
+        return _total;
+    }
+    public int Value() => _total;
 
     ~Counter() { Console.WriteLine("counter destroyed"); }
 }
@@ -41,11 +47,13 @@ extern "C" int count_through(byte* it);
 extern "C" byte* native_counter();
 extern "C" int native_live();
 
-void Say(String label, int value) {
+void Say(String label, int value)
+{
     Console.WriteLine(label + " " + Text.FromInteger((long)value));
 }
 
-public void Main() {
+public void Main()
+{
     // --- C calling a Stainless com class -------------------------------
     {
         Counter counter = new Counter();

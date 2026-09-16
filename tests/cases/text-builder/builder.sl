@@ -10,19 +10,23 @@ import Standard.Console;
 import Standard.Text;
 import Standard.Ascii;
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " " + value);
 }
 
-void SayNumber(String label, long value) {
+void SayNumber(String label, long value)
+{
     Console.WriteLine(label + " " + Text.FromInteger(value));
 }
 
-void SayBool(String label, bool value) {
+void SayBool(String label, bool value)
+{
     Console.WriteLine(label + " " + Text.FromBool(value));
 }
 
-int Main() {
+int Main()
+{
     // ------------------------------------------------------------ appending
     var built = new StringBuilder();
     built.Append("count=");

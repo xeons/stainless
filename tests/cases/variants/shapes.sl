@@ -6,13 +6,15 @@ import Standard.Collections;
 
 // A destructor is the only way to watch a reference count from inside the
 // language, so the reference-counting cases below hold one of these.
-public class Trace {
+public class Trace
+{
     public String Name { get; }
-    public Trace(String name) { Name = name; }
+    public Trace(String name) => Name = name;
     ~Trace() { Console.WriteLine("~" + Name); }
 }
 
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
@@ -20,19 +22,23 @@ public variant Shape {
 
 // A case may carry a counted reference, and then copying and dropping the
 // variant has to ask the tag which one is really in there.
-public variant Message {
+public variant Message
+{
     Text(String Body);
     Tagged(String Body, Trace Marker);
     Silence;
 }
 
-public variant Tree<T> {
+public variant Tree<T>
+{
     Leaf(T Item);
     Empty;
 }
 
-double Area(Shape shape) {
-    switch (shape) {
+double Area(Shape shape)
+{
+    switch (shape)
+    {
         case Circle c: return 3.14159 * c.Radius * c.Radius;
         case Rect r:   return r.Width * r.Height;
         case Empty:    return 0.0;
@@ -41,8 +47,10 @@ double Area(Shape shape) {
 
 // The same switch without bindings: inside an arm the value is known to be
 // that case, so its fields are readable under their own names.
-String Describe(Shape shape) {
-    switch (shape) {
+String Describe(Shape shape)
+{
+    switch (shape)
+    {
         case Circle: return "circle r=" + Text.FromDouble(shape.Radius);
         case Rect:   return "rect " + Text.FromDouble(shape.Width) +
                             "x" + Text.FromDouble(shape.Height);
@@ -51,22 +59,27 @@ String Describe(Shape shape) {
 }
 
 // Stacked labels, and a default standing in for what is left.
-String Sides(Shape shape) {
-    switch (shape) {
+String Sides(Shape shape)
+{
+    switch (shape)
+    {
         case Circle: case Empty: return "round or nothing";
         default: return "cornered";
     }
 }
 
-String Read(Message message) {
-    switch (message) {
+String Read(Message message)
+{
+    switch (message)
+    {
         case Text t:   return t.Body;
         case Tagged g: return g.Body + "/" + g.Marker.Name;
         case Silence:  return "-";
     }
 }
 
-int Main() {
+int Main()
+{
     Console.WriteLine(Text.FromDouble(Area(Shape.Circle(2.0))));
     Console.WriteLine(Text.FromDouble(Area(Shape.Rect(3.0, 4.0))));
     Console.WriteLine(Text.FromDouble(Area(Shape.Empty)));
@@ -78,8 +91,10 @@ int Main() {
 
     // Narrowing through an `if`, exactly as a Result narrows.
     Shape held = Shape.Rect(6.0, 7.0);
-    if (held.Rect) { Console.WriteLine(Text.FromDouble(held.Width * held.Height)); }
-    if (!held.Rect) { Console.WriteLine("not a rect"); }
+    if (held.Rect)
+        Console.WriteLine(Text.FromDouble(held.Width * held.Height));
+    if (!held.Rect)
+        Console.WriteLine("not a rect");
 
     // Only one case is ever present, so the payloads overlap: Rect is the
     // widest at two doubles, and the tag rounds the whole thing up to 24.
@@ -146,9 +161,11 @@ int Main() {
         steps[4] = Take(100);
 
         int total = 0;
-        for (nuint i = 0; i < steps.Length; i = i + 1) {
+        for (nuint i = 0; i < steps.Length; i = i + 1)
+        {
             Step step = steps[i];
-            switch (step) {
+            switch (step)
+            {
                 case Skip:   continue;
                 case Take t: total = total + t.N; break;
                 case Stop:   i = steps.Length; break;
@@ -166,52 +183,63 @@ int Main() {
 
     // Result is now an ordinary variant, and reads exactly as it did.
     var found = Halve(10);
-    if (found.Ok) { Console.WriteLine(Text.FromInteger(found.Value)); }
+    if (found.Ok)
+        Console.WriteLine(Text.FromInteger(found.Value));
 
     var refused = Halve(7);
-    if (!refused.Ok) { Console.WriteLine(refused.Error); }
+    if (!refused.Ok)
+        Console.WriteLine(refused.Error);
     Console.WriteLine(Text.FromInteger(Halve(9).ValueOr(-1)));
 
     return 0;
 }
 
-public variant Flag {
+public variant Flag
+{
     Up;
     Down;
 }
 
-public variant Step {
+public variant Step
+{
     Skip;
     Take(int N);
     Stop;
 }
 
-public class Envelope {
+public class Envelope
+{
     public Message Carried;
-    public Envelope(Message carried) { Carried = carried; }
+    public Envelope(Message carried) => Carried = carried;
     ~Envelope() { Console.WriteLine("~Envelope"); }
 }
 
-Message Wrap(String body) { return Message.Text(body); }
+Message Wrap(String body) => Message.Text(body);
 
-Tree<int> Ok3() { return Leaf(3); }
-Tree<String> Word() { return Leaf("leaf"); }
+Tree<int> Ok3() => Leaf(3);
+Tree<String> Word() => Leaf("leaf");
 
-int Sum(Tree<int> tree) {
-    switch (tree) {
+int Sum(Tree<int> tree)
+{
+    switch (tree)
+    {
         case Leaf l: return l.Item;
         case Empty:  return 0;
     }
 }
 
-String Label(Tree<String> tree) {
-    switch (tree) {
+String Label(Tree<String> tree)
+{
+    switch (tree)
+    {
         case Leaf l: return l.Item;
         case Empty:  return "";
     }
 }
 
-Result<int, String> Halve(int n) {
-    if (n % 2 != 0) { return Fail("odd"); }
+Result<int, String> Halve(int n)
+{
+    if (n % 2 != 0)
+        return Fail("odd");
     return Ok(n / 2);
 }

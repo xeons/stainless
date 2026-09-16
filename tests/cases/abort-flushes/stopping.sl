@@ -16,7 +16,8 @@ module Stopping;
 import Standard.Console;
 import Standard.Collections;
 
-int Main() {
+int Main()
+{
     Console.WriteLine("one");
     Console.WriteLine("two");
 

@@ -16,7 +16,8 @@ public struct Split    { public int A : 30; public int B : 4; }
 public struct Straddle { public int A : 3; public short B : 4; }
 public struct WithPlain { public int A : 3; public double D; public int B : 5; }
 
-int Main() {
+int Main()
+{
     Console.WriteLine(
         Text.FromInteger((int)sizeof(Flags)) + " " +
         Text.FromInteger((int)sizeof(Mixed)) + " " +

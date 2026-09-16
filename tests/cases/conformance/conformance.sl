@@ -9,35 +9,42 @@ extern "C" int printf(byte* format, ...);
 public enum Level : byte { Low = 1, Warning = 10, Severe, Fatal = 200 }
 
 // A user type still says what it implements; nothing here changes for it.
-public class Money : IComparable<Money>, IEquatable<Money>, IHashable {
-    int cents;
+public class Money : IComparable<Money>, IEquatable<Money>, IHashable
+{
+    int _cents;
 
-    public Money(int amount) { cents = amount; }
-    public int Cents() { return cents; }
+    public Money(int amount) => _cents = amount;
+    public int Cents() => _cents;
 
-    public int CompareTo(Money other) { return cents.CompareTo(other.Cents()); }
-    public bool EqualTo(Money other) { return cents == other.Cents(); }
-    public nuint HashCode() { return cents.HashCode(); }
+    public int CompareTo(Money other) => _cents.CompareTo(other.Cents());
+    public bool EqualTo(Money other) => _cents == other.Cents();
+    public nuint HashCode() => _cents.HashCode();
 }
 
 // The constraint is satisfied by 'int' and 'String' as readily as by a class.
-T Middle<T>(IReadOnlyList<T> items) where T : IComparable<T> {
+T Middle<T>(IReadOnlyList<T> items) where T : IComparable<T>
+{
     var best = items.At(0);
-    for (nuint i = 1; i < items.Count(); i = i + 1) {
-        if (items.At(i).CompareTo(best) > 0) { best = items.At(i); }
+    for (nuint i = 1; i < items.Count(); i = i + 1)
+    {
+        if (items.At(i).CompareTo(best) > 0)
+            best = items.At(i);
     }
     return best;
 }
 
-nuint Digest<T>(IReadOnlyList<T> items) where T : IHashable, IEquatable<T> {
+nuint Digest<T>(IReadOnlyList<T> items) where T : IHashable, IEquatable<T>
+{
     nuint total = 0;
-    for (nuint i = 0; i < items.Count(); i = i + 1) {
+    for (nuint i = 0; i < items.Count(); i = i + 1)
+    {
         total = total + items.At(i).HashCode();
     }
     return total;
 }
 
-int Main() {
+int Main()
+{
     // Sorting a list of primitives, which needed a comparer before.
     var numbers = new List<int>();
     numbers.Add(30); numbers.Add(4); numbers.Add(17); numbers.Add(4);

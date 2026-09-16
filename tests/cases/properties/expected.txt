@@ -1,6 +1,6 @@
 properties = 5
 listed = Left:intrw,Name:Stringrw,Right:intr-,Visible:boolrw,Weight:doublerw
-fields = Layouts(field),left(field),name(field),Name(property),Visible(property),Weight(property)
+fields = Layouts(field),_left(field),_name(field),Name(property),Visible(property),Weight(property)
 left = 7
 layouts = 2
 right = 17

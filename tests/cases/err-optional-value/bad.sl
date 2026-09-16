@@ -7,9 +7,10 @@ module Bad;
 
 public struct Point { public int X; }
 
-nuint? Missing() { return null; }
+nuint? Missing() => null;
 
-int Main() {
+int Main()
+{
     int? count = null;
     Point? here = null;
     return 0;

@@ -18,20 +18,31 @@ import Standard.Reflection;
 /// A type whose setters do something, which is how the test can tell which
 /// path was taken.
 [Reflect]
-public class Control {
+public class Control
+{
     /// Counts every time a setter ran. A field, so reflection sees it as one.
     public int Layouts;
 
-    int left;
-    String name;
+    int _left;
+    String _name;
 
-    public Control() { Layouts = 0; left = 0; name = ""; }
+    public Control()
+    {
+        Layouts = 0;
+        _left = 0;
+        _name = "";
+    }
 
     /// A hand-written property: no backing field, so nothing in the field
     /// table is named 'Left' at all.
-    public int Left {
-        get { return left; }
-        set { left = value; Layouts = Layouts + 1; }
+    public int Left
+    {
+        get => _left;
+        set
+        {
+            _left = value;
+            Layouts = Layouts + 1;
+        }
     }
 
     /// An automatic one. Its storage *is* a field named 'Name', which is the
@@ -40,7 +51,7 @@ public class Control {
 
     /// Read-only, so `CanWrite` is false and a loader can say so rather than
     /// silently dropping what a document asked for.
-    public int Right { get { return left + 10; } }
+    public int Right { get { return _left + 10; } }
 
     public bool Visible { get; set; }
     public double Weight { get; set; }
@@ -48,33 +59,43 @@ public class Control {
 
 /// Inheritance: a derived class lists what it inherited.
 [Reflect]
-public class Panel : Control {
+public class Panel : Control
+{
     public int Depth { get; set; }
-    public Panel() { base(); }
+    public Panel() => base();
 }
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " = " + value);
 }
 
-String KindName(int kind) {
-    if (kind == KindInt) { return "int"; }
-    if (kind == KindString) { return "String"; }
-    if (kind == KindBool) { return "bool"; }
-    if (kind == KindDouble) { return "double"; }
+String KindName(int kind)
+{
+    if (kind == KindInt)
+        return "int";
+    if (kind == KindString)
+        return "String";
+    if (kind == KindBool)
+        return "bool";
+    if (kind == KindDouble)
+        return "double";
     return "kind " + Text.FromInteger((long)kind);
 }
 
-public int Main() {
+public int Main()
+{
     var type = typeof(Control);
 
     // ------------------------------------------------------- what is listed
     Say("properties", Text.FromInteger((long)type.PropertyCount()));
 
     var names = new StringBuilder();
-    for (nuint i = 0u; i < type.PropertyCount(); i = i + 1u) {
+    for (nuint i = 0u; i < type.PropertyCount(); i = i + 1u)
+    {
         var property = type.PropertyAt(i);
-        if (i > 0u) { names.Append(","); }
+        if (i > 0u)
+            names.Append(",");
         names.Append(property.Name());
         names.Append(":");
         names.Append(KindName(property.Kind()));
@@ -86,9 +107,11 @@ public int Main() {
     // A field named after an automatic property says so; one the type
     // declared does not.
     var fields = new StringBuilder();
-    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u) {
+    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u)
+    {
         var field = type.FieldAt(i);
-        if (i > 0u) { fields.Append(","); }
+        if (i > 0u)
+            fields.Append(",");
         fields.Append(field.Name());
         fields.Append(field.IsPropertyStorage() ? "(property)" : "(field)");
     }
@@ -145,8 +168,10 @@ public int Main() {
     // ------------------------------------------------------------ inheritance
     var panelType = typeof(Panel);
     var inherited = new StringBuilder();
-    for (nuint i = 0u; i < panelType.PropertyCount(); i = i + 1u) {
-        if (i > 0u) { inherited.Append(","); }
+    for (nuint i = 0u; i < panelType.PropertyCount(); i = i + 1u)
+    {
+        if (i > 0u)
+            inherited.Append(",");
         inherited.Append(panelType.PropertyAt(i).Name());
     }
     Say("panel", inherited.ToText());

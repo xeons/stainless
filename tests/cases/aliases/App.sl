@@ -11,14 +11,15 @@ using Slot = nuint;
 /// And one that names an imported alias directly, so the chain crosses a module.
 using Code = Status;
 
-int Doubled(int x, int y) { return (x + y) * 2; }
+int Doubled(int x, int y) => (x + y) * 2;
 
-int Main() {
+int Main()
+{
     // An alias is the type it names, so this is the same `nuint` throughout.
     Slot slot = (Slot)7;
 
     HWND window = WindowAt(slot);
-    HDC  device = DeviceAt((nuint)3);
+    HDC device = DeviceAt((nuint)3);
 
     Console.WriteLine("slot: " + Text.FromInteger(SlotOf(window)));
 

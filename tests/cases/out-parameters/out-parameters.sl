@@ -20,52 +20,77 @@ import Standard.Console;
 import Standard.Convert;
 
 /// The shape `out` exists for: an answer and whether there was one.
-bool TryHalve(int n, out int half) {
-    if (n % 2 != 0) { half = 0; return false; }
+bool TryHalve(int n, out int half)
+{
+    if (n % 2 != 0)
+    {
+        half = 0;
+        return false;
+    }
     half = n / 2;
     return true;
 }
 
 /// Two of them, one a counted reference, so ARC has to be right about a
 /// variable that was declared by a call.
-void Split(String text, out String head, out String tail) {
+void Split(String text, out String head, out String tail)
+{
     head = text.Substring(0u, 1u);
     tail = text.Substring(1u, text.ByteLength() - 1u);
 }
 
 /// A parameter handed straight on as somebody else's `out` counts as written:
 /// the callee is held to the same promise.
-bool Forward(int n, out int half) { return TryHalve(n, out half); }
+bool Forward(int n, out int half) => TryHalve(n, out half);
 
 /// `out` next to the other two modes, to show they travel the same way.
-void Compare(in int left, ref int right, out int larger) {
+void Compare(in int left, ref int right, out int larger)
+{
     larger = left > right ? left : right;
     right = left;
 }
 
-class Registry {
-    String[] names;
-    int used;
+class Registry
+{
+    String[] _names;
+    int _used;
 
-    public Registry() { names = new String[4]; used = 0; }
+    public Registry()
+    {
+        _names = new String[4];
+        _used = 0;
+    }
 
-    public void Add(String name) { names[used] = name; used++; }
+    public void Add(String name)
+    {
+        _names[_used] = name;
+        _used++;
+    }
 
-    public bool TryFind(String name, out int at) {
-        for (int i = 0; i < used; i++) {
-            if (names[i] == name) { at = i; return true; }
+    public bool TryFind(String name, out int at)
+    {
+        for (int i = 0; i < _used; i++)
+        {
+            if (_names[i] == name)
+            {
+                at = i;
+                return true;
+            }
         }
         at = -1;
         return false;
     }
 }
 
-public int Main() {
+public int Main()
+{
     // Declared at the call, type inferred from the parameter.
-    if (TryHalve(10, out var five)) { Console.WriteLine($"half     {five}"); }
+    if (TryHalve(10, out var five))
+        Console.WriteLine($"half     {five}");
 
     // Declared at the call, spelled out.
-    if (!TryHalve(7, out int none)) { Console.WriteLine($"odd      {none}"); }
+    if (!TryHalve(7, out int none))
+        Console.WriteLine($"odd      {none}");
 
     // A variable that already exists, which `out` overwrites.
     int already = 99;
@@ -90,12 +115,15 @@ public int Main() {
     registry.Add("alpha");
     registry.Add("beta");
 
-    if (registry.TryFind("beta", out var at)) { Console.WriteLine($"found    beta at {at}"); }
-    if (!registry.TryFind("gamma", out var missing)) { Console.WriteLine($"missing  {missing}"); }
+    if (registry.TryFind("beta", out var at))
+        Console.WriteLine($"found    beta at {at}");
+    if (!registry.TryFind("gamma", out var missing))
+        Console.WriteLine($"missing  {missing}");
 
     // The standard library's own shape, for comparison: a Result carries the
     // value and the failure together, and needs no second variable.
     var parsed = ToLong("41");
-    if (parsed.Ok) { Console.WriteLine($"result   {parsed.Value}"); }
+    if (parsed.Ok)
+        Console.WriteLine($"result   {parsed.Value}");
     return 0;
 }

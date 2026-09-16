@@ -3,11 +3,13 @@ module Build;
 
 import Standard.Console;
 
-int Main() {
+int Main()
+{
     var builder = new StringBuilder();
     Console.WriteLine("empty=" + Text.FromBool(builder.IsEmpty()));
 
-    for (int i = 0; i < 5; i = i + 1) {
+    for (int i = 0; i < 5; i = i + 1)
+    {
         builder.AppendInteger(i);
         builder.Append(",");
     }

@@ -13,30 +13,36 @@ import Standard.Collections;
 
 extern "C" int printf(byte* format, ...);
 
-class Counter {
-    int value;
-    public Counter() { value = 0; }
-    public void Bump() { value = value + 1; }
-    public int Value() { return value; }
+class Counter
+{
+    int _value;
+    public Counter() => _value = 0;
+    public void Bump() => _value = _value + 1;
+    public int Value() => _value;
 }
 
 // A variant's own fields are a tag and a blob of bytes. What it really holds is
 // whatever case is in it, and one of these holds a List.
-variant Payload {
+variant Payload
+{
     Plain(int Count);
     Held(List<int> Items);
 }
 
-int Taken(Payload payload) {
-    switch (payload) {
+int Taken(Payload payload)
+{
+    switch (payload)
+    {
         case Plain plain: return plain.Count;
         default: return -1;
     }
 }
 
-int Main() {
+int Main()
+{
     var counter = new Counter();
-    parallel {
+    parallel
+    {
         // One thread reaching an object another thread also holds. Warned
         // about, and left to the author, who can see that nothing else runs.
         spawn counter.Bump();
@@ -44,7 +50,8 @@ int Main() {
     printf("counter=%d\n", counter.Value());
 
     Payload payload = Payload.Plain(1);
-    parallel {
+    parallel
+    {
         spawn Taken(payload);
     }
     printf("payload=%d\n", Taken(payload));

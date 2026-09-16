@@ -6,4 +6,4 @@ module Bad;
 // certainly reading a type here.
 (int) Single() { return 3; }
 
-int Main() { return Single(); }
+int Main() => Single();

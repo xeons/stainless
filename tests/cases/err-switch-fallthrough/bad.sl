@@ -3,8 +3,10 @@ module Bad;
 
 extern "C" int printf(byte* format, ...);
 
-int Main() {
-    switch (1) {
+int Main()
+{
+    switch (1)
+    {
         case 1:
             printf("one\n");
             // No break: a section may not run off its end.

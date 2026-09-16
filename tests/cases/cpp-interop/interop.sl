@@ -25,13 +25,14 @@ extern "C++" int outer::inner::deep(int n);
 
 // Exported the same way. With no namespace written it takes the module's,
 // because a module is what Stainless calls a namespace.
-export "C++" int Doubled(int n) { return n * 2; }
+export "C++" int Doubled(int n) => n * 2;
 export "C++" double shapes::Perimeter(double w, double h) { return 2.0 * (w + h); }
 
 // Which the C++ side calls back, to prove the export resolves too.
 extern "C++" int RoundTrip(int n);
 
-int Main() {
+int Main()
+{
     Console.WriteLine(Text.FromInteger(cpp_add(40, 2)));
     Console.WriteLine(Text.FromDouble(cpp_scale(2.5, (float)4.0)));
     Console.WriteLine(Text.FromInteger(cpp_wide(40, 2)));

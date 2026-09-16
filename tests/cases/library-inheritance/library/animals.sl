@@ -8,34 +8,37 @@ module Library.Animals;
 
 import Standard.Console;
 
-public class Animal {
-    private int legs;
-    private String name;
+public class Animal
+{
+    private int _legs;
+    private String _name;
 
-    public Animal(int legs, String name) {
-        this.legs = legs;
-        this.name = name;
+    public Animal(int legs, String name)
+    {
+        this._legs = legs;
+        this._name = name;
     }
 
     // Runs after the derived destructor: an object is taken apart from the
     // outside in, and this is where the outside stops.
-    ~Animal() { Console.WriteLine("~Animal " + name); }
+    ~Animal() { Console.WriteLine("~Animal " + _name); }
 
-    public int Legs { get { return legs; } }
-    public String Name { get { return name; } }
+    public int Legs { get { return _legs; } }
+    public String Name { get { return _name; } }
 
     // Slot 0 and slot 1. A class derived in another binary copies both and
     // appends after them, so the length of this list is part of what this
     // library promises.
-    public virtual String Speak() { return "..."; }
-    public virtual int Score() { return legs; }
+    public virtual String Speak() => "...";
+    public virtual int Score() => _legs;
 
     // Visible to a derived class and to nothing else. It has to be exported for
     // one compiled elsewhere to call it; what keeps it protected is the binder.
-    protected int Doubled() { return legs * 2; }
+    protected int Doubled() => _legs * 2;
 }
 
 // Sealed, so the refusal still has something to refuse.
-public sealed class Rock {
+public sealed class Rock
+{
     public int Weight;
 }

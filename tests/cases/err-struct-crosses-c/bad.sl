@@ -10,6 +10,10 @@ struct Holder { Owner owner; }
 // copy the bytes and leave the count behind.
 extern "C" void consume(Holder h);
 
-export "C" Holder produce() { Holder h; return h; }
+export "C" Holder produce()
+{
+    Holder h;
+    return h;
+}
 
-int Main() { return 0; }
+int Main() => 0;

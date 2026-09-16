@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-public class Person {
+public class Person
+{
     public int Age { get; set; }
-    public Person() { Age = 0; }
+    public Person() => Age = 0;
 }
 
-int Main() {
+int Main()
+{
     var person = new Person();
 
     // The accessors are the lowering, not the language.

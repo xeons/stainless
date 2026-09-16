@@ -10,7 +10,8 @@ import Win32.Kernel32;
 import Win32.Clock;
 
 SystemTime At(ushort year, ushort month, ushort day,
-              ushort hour, ushort minute, ushort second) {
+              ushort hour, ushort minute, ushort second)
+{
     SystemTime time;
     time.Year = year;
     time.Month = month;
@@ -23,7 +24,8 @@ SystemTime At(ushort year, ushort month, ushort day,
     return time;
 }
 
-int Main() {
+int Main()
+{
     // The Unix epoch, whose distance from Windows's own 1601 epoch is the one
     // constant everything else here depends on.
     ulong epoch = Clock.FromCalendar(At(1970u, 1u, 1u, 0u, 0u, 0u));

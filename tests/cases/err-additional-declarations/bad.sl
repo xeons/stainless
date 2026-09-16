@@ -8,17 +8,20 @@
 // a rule that let one change String's.
 module Bad;
 
-public class Shape {
+public class Shape
+{
     public int Sides;
 }
 
 // Fine: another declaration, adding a method.
-public class Shape {
-    public int Corners() { return Sides; }
+public class Shape
+{
+    public int Corners() => Sides;
 }
 
 // Not fine: the layout belongs to the declaration that has the fields.
-public class Shape {
+public class Shape
+{
     public int Extra;                           // SL0552
 }
 
@@ -26,13 +29,15 @@ public class Shape {
 // base list arriving later would arrive after they were built.
 public interface IDrawable { void Draw(); }
 
-public class Shape : IDrawable {                // SL0551
+public class Shape : IDrawable // SL0551
+{
     public void Draw() { }
 }
 
 // Not fine: every declaration has to agree about what it is.
-public struct Shape {                           // SL0550
-    public int Wrong() { return 0; }
+public struct Shape // SL0550
+{
+    public int Wrong() => 0;
 }
 
-int Main() { return 0; }
+int Main() => 0;

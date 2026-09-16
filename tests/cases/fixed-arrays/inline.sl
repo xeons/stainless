@@ -12,18 +12,19 @@ public const int MaxPath = 260;
 /// `WIN32_FIND_DATAW`, which is the struct that could not be written before:
 /// it ends in two inline `WCHAR` arrays and its size, 592, is what Windows
 /// expects to fill.
-public struct FindData {
-    public uint            Attributes;
-    public uint            CreatedLow;
-    public uint            CreatedHigh;
-    public uint            AccessedLow;
-    public uint            AccessedHigh;
-    public uint            WrittenLow;
-    public uint            WrittenHigh;
-    public uint            SizeHigh;
-    public uint            SizeLow;
-    public uint            Reserved0;
-    public uint            Reserved1;
+public struct FindData
+{
+    public uint Attributes;
+    public uint CreatedLow;
+    public uint CreatedHigh;
+    public uint AccessedLow;
+    public uint AccessedHigh;
+    public uint WrittenLow;
+    public uint WrittenHigh;
+    public uint SizeHigh;
+    public uint SizeLow;
+    public uint Reserved0;
+    public uint Reserved1;
     public char16[MaxPath] FileName;
     public char16[14]      AlternateName;
 }
@@ -33,20 +34,24 @@ public struct Matrix { public double[9] Cell; }
 /// Nested lengths, which C writes outermost-first after the name.
 public struct Grid { public int[3][2] Rows; }
 
-void Show(String name, nuint value) {
+void Show(String name, nuint value)
+{
     Console.WriteLine(name + " = " + Text.FromInteger(value));
 }
 
 /// An inline array cannot be passed by value — C decays one to a pointer and
 /// copying every element would be neither that nor cheap — so `ref` is how it
 /// crosses, which is `int (*)[9]` on both sides.
-double Total(ref Matrix matrix) {
+double Total(ref Matrix matrix)
+{
     double sum = 0.0;
-    for (nuint i = 0u; i < matrix.Cell.Length; i = i + 1u) { sum = sum + matrix.Cell[i]; }
+    for (nuint i = 0u; i < matrix.Cell.Length; i = i + 1u)
+        sum = sum + matrix.Cell[i];
     return sum;
 }
 
-int Main() {
+int Main()
+{
     // --- layout ------------------------------------------------------------
     Show("sizeof(FindData)", sizeof(FindData));
     Show("alignof(FindData)", alignof(FindData));
@@ -72,7 +77,8 @@ int Main() {
     Console.WriteLine("name: " + Text.FromNullTerminatedUtf16(&data.FileName[0]));
 
     Matrix m;
-    for (nuint i = 0u; i < m.Cell.Length; i = i + 1u) { m.Cell[i] = (double)i * 2.0; }
+    for (nuint i = 0u; i < m.Cell.Length; i = i + 1u)
+        m.Cell[i] = (double)i * 2.0;
     Console.WriteLine("total: " + Text.FromDouble(Total(ref m)));
 
     // --- it is a value, so a copy is a copy ---------------------------------

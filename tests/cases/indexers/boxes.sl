@@ -10,55 +10,64 @@ import Standard.Console;
 import Standard.Text;
 import Standard.Collections;
 
-String N(long v) { return Text.FromInteger(v); }
+String N(long v) => Text.FromInteger(v);
 
 // A generic class: the accessors are instantiated with everything else.
-public class Box<T> {
-    T[] cells;
+public class Box<T>
+{
+    T[] _cells;
 
-    public Box(nuint size) { cells = new T[size]; }
+    public Box(nuint size) => _cells = new T[size];
 
-    public T this[nuint at] {
-        get { return cells[at]; }
-        set { cells[at] = value; }
+    public T this[nuint at]
+    {
+        get => _cells[at];
+        set => _cells[at] = value;
     }
 
-    public nuint Count() { return cells.Length; }
+    public nuint Count() => _cells.Length;
 }
 
 // A generic struct, where the setter reaches its receiver by pointer.
-public struct Row<T> {
+public struct Row<T>
+{
     public T[] items;
 
-    public T this[nuint at] {
-        get { return items[at]; }
-        set { items[at] = value; }
+    public T this[nuint at]
+    {
+        get => items[at];
+        set => items[at] = value;
     }
 }
 
 // Overloaded on what it takes, which is the reason an indexer is not a
 // property with a fixed name.
-public class Table {
-    int[] byNumber;
-    String label;
+public class Table
+{
+    int[] _byNumber;
+    String _label;
 
-    public Table() {
-        byNumber = new int[4];
-        label = "none";
+    public Table()
+    {
+        _byNumber = new int[4];
+        _label = "none";
     }
 
-    public int this[nuint at] {
-        get { return byNumber[at]; }
-        set { byNumber[at] = value; }
+    public int this[nuint at]
+    {
+        get => _byNumber[at];
+        set => _byNumber[at] = value;
     }
 
-    public String this[String named] {
-        get { return named + "=" + label; }
-        set { label = value; }
+    public String this[String named]
+    {
+        get => named + "=" + _label;
+        set => _label = value;
     }
 }
 
-int Main() {
+int Main()
+{
     var box = new Box<int>(4);
     box[0] = 10;
     box[1] = 20;
@@ -75,7 +84,7 @@ int Main() {
     Row<int> row;
     row.items = new int[2];
     row[0] = 7;
-    row[0] += 1;
+    row[0]++;
     Console.WriteLine("row " + N((long)row[0]));
 
     var table = new Table();

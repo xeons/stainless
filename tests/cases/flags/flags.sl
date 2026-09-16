@@ -8,7 +8,8 @@ extern "C" int printf(byte* format, ...);
 // [Flags] says the members combine as bits rather than naming alternatives.
 // It needs no import: it is a rule about enums, not a library to opt into.
 [Flags]
-public enum Access : byte {
+public enum Access : byte
+{
     None    = 0,
     Read    = 1,
     Write   = 2,
@@ -17,7 +18,8 @@ public enum Access : byte {
 }
 
 [Flags]
-public enum Style : uint {
+public enum Style : uint
+{
     Plain     = 0,
     Bold      = 1,
     Italic    = 2,
@@ -27,16 +29,22 @@ public enum Style : uint {
 // Without [Flags] an enum is a choice, and bitwise operators are rejected.
 public enum Colour { Red, Green, Blue }
 
-String Describe(Access mode) {
+String Describe(Access mode)
+{
     var text = new StringBuilder();
-    if (mode.HasFlag(Access.Read)) { text.Append("r"); }
-    if (mode.HasFlag(Access.Write)) { text.Append("w"); }
-    if (mode.HasFlag(Access.Execute)) { text.Append("x"); }
-    if (mode == Access.None) { text.Append("-"); }
+    if (mode.HasFlag(Access.Read))
+        text.Append("r");
+    if (mode.HasFlag(Access.Write))
+        text.Append("w");
+    if (mode.HasFlag(Access.Execute))
+        text.Append("x");
+    if (mode == Access.None)
+        text.Append("-");
     return text.ToText();
 }
 
-int Main() {
+int Main()
+{
     var mode = Access.Read | Access.Write;
 
     printf("mode=%s\n", Describe(mode).ToPointer());
@@ -70,7 +78,8 @@ int Main() {
         (int)style, style.HasFlag(Style.Bold) ? 1 : 0, style.HasFlag(Style.Italic) ? 1 : 0);
 
     // A flags enum still compares and still switches.
-    switch (readOnly) {
+    switch (readOnly)
+    {
         case Access.Read: printf("switch=read\n"); break;
         default:          printf("switch=other\n"); break;
     }

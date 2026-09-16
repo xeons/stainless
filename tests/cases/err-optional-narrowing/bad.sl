@@ -7,33 +7,45 @@
 module BadNarrowing;
 public class Node { public int Value; public Node? Next; public Node(int v) { Value = v; } }
 
-Node? Fresh() { return null; }
+Node? Fresh() => null;
 
-public void Main() {
+public void Main()
+{
     Node? x = new Node(1);
 
     // Reassigned inside the branch: the proof was about the old value.
-    if (x != null) {
+    if (x != null)
+    {
         x = Fresh();
         int bad = x.Value;
     }
 
     // A loop body that reassigns takes the proof away.
     Node? y = new Node(2);
-    while (y != null) {
+    while (y != null)
+    {
         y = Fresh();
         int alsoBad = y.Value;
     }
 
     // The else arm of != null knows nothing good.
     Node? z = new Node(3);
-    if (z != null) { } else { int worse = z.Value; }
+    if (z != null)
+    {
+    }
+    else
+    {
+        int worse = z.Value;
+    }
 
     // Weak cannot be checked at all.
     weak Node? w = new Node(4);
-    if (w != null) { int nope = w.Value; }
+    if (w != null)
+        int nope = w.Value;
 
     // A call result is not a name.
-    if (Fresh() != null) { }
+    if (Fresh() != null)
+    {
+    }
     int never = Fresh().Value;
 }

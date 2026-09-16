@@ -607,7 +607,7 @@ public class Shell : Form
         foreach (var message in _messages)
         {
             if (message.IsError)
-                errors += 1u;
+                errors++;
         }
         if (errors == 0u)
             return "";

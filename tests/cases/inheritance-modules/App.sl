@@ -9,33 +9,40 @@ import Standard.Console;
 import Standard.Text;
 import Zoo;
 
-public class Dog : Quadruped {
-    Dog(String called) {
+public class Dog : Quadruped
+{
+    Dog(String called)
+    {
         base(called);
     }
 
-    public override String Sound() { return "woof"; }
+    public override String Sound() => "woof";
 
     /// Both protected members of a base two modules away.
-    public String Report() {
+    public String Report()
+    {
         return name + " on " + Legs() + " legs";
     }
 }
 
-public class Bird : Animal {
-    Bird(String called) {
+public class Bird : Animal
+{
+    Bird(String called)
+    {
         base(called, 2);
     }
 
-    public override String Sound() { return "tweet"; }
+    public override String Sound() => "tweet";
 
     /// An override that reaches the base implementation it replaced.
-    public override String Speak() {
+    public override String Speak()
+    {
         return base.Speak() + ", quietly";
     }
 }
 
-int Main() {
+int Main()
+{
     Animal dog = new Dog("rex");
     Animal bird = new Bird("pip");
 

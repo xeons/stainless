@@ -5,7 +5,8 @@
 // and a character literal has to fit the type it is given in a single unit.
 module BadCodeUnits;
 
-public void Main() {
+public void Main()
+{
     // U+00E9 is two bytes of UTF-8, so it is not one 'char'.
     char tooWide = 'é';
 
@@ -14,11 +15,11 @@ public void Main() {
 
     // Neither direction is implicit, however the sizes fall: widening does not
     // re-encode and narrowing does not check.
-    char   narrow = 'A';
+    char narrow = 'A';
     char16 widened = narrow;
 
     char16 wide = 'é';
-    char   narrowed = wide;
+    char narrowed = wide;
 
     char32 widest = '日';
     char16 shrunk = widest;

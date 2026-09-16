@@ -3,7 +3,8 @@ module Bad;
 
 enum Color { Red, Green }
 
-int Main() {
+int Main()
+{
     var mixed = Color.Red + Color.Green;    // colours do not add
     return 0;
 }

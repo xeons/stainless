@@ -3,11 +3,13 @@ module ErrInheritanceShape;
 
 public interface IThing { int Go(); }
 
-public class Plain {
+public class Plain
+{
     public int Value;
 }
 
-public sealed class Final {
+public sealed class Final
+{
     public int Value;
 }
 
@@ -19,8 +21,9 @@ public abstract sealed class Neither { }              // SL0496
 
 // The base comes first, so that no keyword is needed to tell it from an
 // interface. Written second it is not a base at all.
-public class Backwards : IThing, Plain {              // SL0508
-    public int Go() { return 0; }
+public class Backwards : IThing, Plain // SL0508
+{
+    public int Go() => 0;
 }
 
 // One base, and one only. With two, a reference to one of them is a different
@@ -44,15 +47,17 @@ public interface IExtends : Plain { }                 // SL0512
 public class Longer : String { }                      // SL0513
 
 // The dispatch words, and `protected`, mean nothing where nothing derives.
-public struct Flat {
+public struct Flat
+{
     protected int Guarded;                            // SL0519
-    public virtual int Go() { return 0; }             // SL0519
+    public virtual int Go() => 0; // SL0519
 }
 
-public interface ISays {
+public interface ISays
+{
     virtual int Twice();                              // SL0519
 }
 
-public virtual int Free() { return 0; }               // SL0519
+public virtual int Free() => 0; // SL0519
 
-int Main() { return 0; }
+int Main() => 0;

@@ -15,9 +15,10 @@ import Standard.Text;
 
 public closure int Transform(int value);
 
-int Apply(Transform t, int n) { return t(n); }
+int Apply(Transform t, int n) => t(n);
 
-int Main() {
+int Main()
+{
     var doubled = (int x) => x * 2;
     Console.WriteLine(Text.FromInteger(doubled(21)));
 

@@ -8,25 +8,29 @@ public closure void Notify(int value);
 public closure int Asked(int value);
 public delegate void Plain(int value);
 
-public interface IHasOne {
+public interface IHasOne
+{
     event Notify Wanted;                          // SL0300: an interface has no state
 }
 
-public class Publisher {
+public class Publisher
+{
     public event Notify Fired;
 
     public event Asked Question;                  // SL0549: handlers cannot return a value
     public event Plain Direct;                    // SL0548: a delegate has no object
     public static event Notify Global;            // SL0550: nothing would unsubscribe
 
-    public void RaiseIt() { Fired(1); }           // fine: its own event, by name
+    public void RaiseIt() => Fired(1); // fine: its own event, by name
 }
 
-public class Subscriber {
+public class Subscriber
+{
     public void On(int value) { }
 }
 
-int Main() {
+int Main()
+{
     var p = new Publisher();
     var s = new Subscriber();
 

@@ -13,23 +13,27 @@ import Standard.Collections;
 
 extern "C" int printf(byte* format, ...);
 
-public class Person {
+public class Person
+{
     public String Name { get; }
     public int Age { get; }
     public String Team { get; }
 
-    public Person(String name, int age, String team) {
+    public Person(String name, int age, String team)
+    {
         Name = name;
         Age = age;
         Team = team;
     }
 }
 
-void Show(String label, String value) {
+void Show(String label, String value)
+{
     Console.WriteLine(label + " " + value);
 }
 
-int Main() {
+int Main()
+{
     var numbers = [5, 3, 9, 1, 7, 3];
 
     // ----------------------------------------------------------- inference
@@ -84,7 +88,8 @@ int Main() {
 
     // Long enough to go through the merge rather than the short-run path.
     var many = new int[100];
-    for (nuint i = 0u; i < many.Length; i += 1u) {
+    for (nuint i = 0u; i < many.Length; i++)
+    {
         many[i] = (int)((i * 37u) % 100u);
     }
 
@@ -196,20 +201,24 @@ int Main() {
 }
 
 /// Whether a slice is ordered smallest first.
-bool InOrder(int[:] items) {
-    for (nuint i = 1u; i < items.Length; i += 1u) {
-        if (items[i - 1u] > items[i]) { return false; }
+bool InOrder(int[:] items)
+{
+    for (nuint i = 1u; i < items.Length; i++)
+    {
+        if (items[i - 1u] > items[i])
+            return false;
     }
     return true;
 }
 
 /// Something for `ForEach` to reach, since a lambda captures by value and an
 /// action returns nothing.
-public class AtomicCounter {
-    long total;
+public class AtomicCounter
+{
+    long _total;
 
-    public AtomicCounter() { total = 0; }
+    public AtomicCounter() => _total = 0;
 
-    public void Add(int value) { total += (long)value; }
-    public long Total() { return total; }
+    public void Add(int value) => _total += (long)value;
+    public long Total() => _total;
 }

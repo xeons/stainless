@@ -4,15 +4,16 @@ module Bad;
 public struct Point { public double X; }
 
 // A slice holds a reference, so it is not a value C can be handed.
-export "C" int Take(int[:] values) { return 0; }
+export "C" int Take(int[:] values) => 0;
 
 // And there is no slice of 'void', for the same reason there is no array of
 // one: a slice is a view onto elements, and 'void' is not an element.
 int[:] OfNothing(void[:] nothing) { return nothing; }
 
-int Length(int[:] values) { return (int)values.Length; }
+int Length(int[:] values) => (int)values.Length;
 
-int Main() {
+int Main()
+{
     var numbers = new int[4];
     int[:] window = numbers[1:3];
 

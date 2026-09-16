@@ -20,7 +20,8 @@ public static readonly String Greeting = "hello";
 struct Point { public int X; public int Y; }
 static readonly Point Origin = MakePoint(3, 4);
 
-Point MakePoint(int x, int y) {
+Point MakePoint(int x, int y)
+{
     Point p;
     p.X = x;
     p.Y = y;
@@ -31,14 +32,16 @@ Point MakePoint(int x, int y) {
 static readonly AtomicLong Hits = new AtomicLong(0);
 static readonly Mutex<int> Guarded = new Mutex<int>(0);
 
-void Bump(byte* argument) {
+void Bump(byte* argument)
+{
     Hits.Increment();
 
     var guard = Guarded.Lock();
     guard.Set(guard.Value() + 1);
 }
 
-int Main() {
+int Main()
+{
     printf("base=%d doubled=%d total=%d\n", Base, Doubled, Total);
     printf("ratio=%g\n", Ratio);
     Console.WriteLine(Greeting);
@@ -48,7 +51,8 @@ int Main() {
     // type rules above are what they are.
     {
         var scope = new TaskScope();
-        for (int i = 0; i < 64; i = i + 1) { scope.Run(Bump, null); }
+        for (int i = 0; i < 64; i = i + 1)
+            scope.Run(Bump, null);
         scope.Join();
     }
 
@@ -61,7 +65,8 @@ int Main() {
 
     // Statics are readable from a parallel loop without being captured: they
     // are not locals, so there is nothing to capture.
-    parallel for (int i = 0; i < 100; i = i + 1) { Hits.Add(Base); }
+    parallel for (int i = 0; i < 100; i = i + 1)
+        Hits.Add(Base);
     printf("after=%lld\n", Hits.Load());
 
     printf("done\n");

@@ -4,9 +4,10 @@ module Bad;
 import Standard.Reflection;
 
 // A class lays its fields out behind a header the compiler owns.
-public class Object {
+public class Object
+{
     public int A : 3;
-    public Object() { A = 0; }
+    public Object() => A = 0;
 }
 
 // Wider than what it is some of.
@@ -29,7 +30,8 @@ public struct Reflected { public int A : 3; }
 public struct Flags { public int A : 3; public int B : 5; }
 void Takes(ref int n) { }
 
-int Main() {
+int Main()
+{
     Flags f;
     f.A = 1;
     Takes(ref f.A);         // a bit-field has no address

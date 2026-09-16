@@ -13,7 +13,8 @@ import Standard.Console;
 import Win32.Resources;
 import Win32.User32;
 
-int Main() {
+int Main()
+{
     // A string table, which is the one resource kind addressed by a bare id
     // rather than by a name -- Windows stores strings in blocks of sixteen and
     // works out which block holds the one asked for.
@@ -47,8 +48,10 @@ int Main() {
     // What the binary actually holds, which is how a program checks that its
     // own build put in what the script said. `#101` is the spelling a resource
     // script uses for an integer name, so what this prints can be pasted back.
-    foreach (var type in Resources.Types()) { Console.WriteLine($"type {type}"); }
-    foreach (var name in Resources.Names(RtRcData())) { Console.WriteLine($"rcdata {name}"); }
+    foreach (var type in Resources.Types())
+        Console.WriteLine($"type {type}");
+    foreach (var name in Resources.Names(RtRcData()))
+        Console.WriteLine($"rcdata {name}");
 
     // The version this binary reports, out of its own RT_VERSION. Read through
     // version.dll rather than the resource API, because a version resource is a

@@ -35,13 +35,16 @@ public const Result Failed = -1;
 
 /// The handles are made from integers here, since there is no real window to
 /// ask for. What matters is that the types stay apart on the way through.
-public HWND WindowAt(nuint slot) { return (HWND)slot; }
-public HDC  DeviceAt(nuint slot) { return (HDC)slot; }
+public HWND WindowAt(nuint slot) => (HWND)slot;
+public HDC  DeviceAt(nuint slot) => (HDC)slot;
 
-public nuint SlotOf(HWND window) { return (nuint)window; }
+public nuint SlotOf(HWND window) => (nuint)window;
 
-public Status Check(HWND window, HDC device) {
-    if (window == null) { return Failed; }
-    if (device == null) { return Failed; }
+public Status Check(HWND window, HDC device)
+{
+    if (window == null)
+        return Failed;
+    if (device == null)
+        return Failed;
     return Ok;
 }

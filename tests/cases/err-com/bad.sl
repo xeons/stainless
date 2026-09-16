@@ -11,7 +11,8 @@ public com struct NotAType { public int X; }
 
 // A com interface with no [Guid] has no identity, so nothing could ever ask an
 // object for it.
-public com interface INoIdentity {
+public com interface INoIdentity
+{
     int Value();
 }
 
@@ -43,8 +44,9 @@ public class NotCom { public int Value() { return 0; } }
 
 // An ordinary class cannot present a com interface: it has no room for a
 // vtable pointer, which is what 'com class' reserves.
-public class Ordinary : IFirst {
-    public int One() { return 1; }
+public class Ordinary : IFirst
+{
+    public int One() => 1;
 }
 
 // A com class has to present something, or nothing outside could hold it.
@@ -69,8 +71,9 @@ public class Base { public int X; }
 [Guid("99999999-aaaa-bbbb-cccc-dddddddddddd")]
 public com interface IThird { int Three(); }
 
-public com class Derived : Base, IThird {
-    public int Three() { return 3; }
+public com class Derived : Base, IThird
+{
+    public int Three() => 3;
 }
 
 // A CLSID says a class factory can be asked to make one, and a class factory
@@ -80,13 +83,15 @@ public com class Derived : Base, IThird {
 public com interface IFourth { int Four(); }
 
 [Guid("bbbbbbbb-cccc-dddd-eeee-ffffffffffff")]
-public com class NeedsArguments : IFourth {
-    int start;
-    public NeedsArguments(int from) { start = from; }
-    public int Four() { return start; }
+public com class NeedsArguments : IFourth
+{
+    int _start;
+    public NeedsArguments(int from) => _start = from;
+    public int Four() => _start;
 }
 
-public void Main() {
+public void Main()
+{
     // 'iidof' names a com interface's [Guid], and IPlain has none.
     Guid* g = iidof(IPlain);
 }

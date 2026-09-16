@@ -7,24 +7,26 @@ module Talk;
 import Standard.Console;
 import Standard.Text;
 
-public void Say(String what) {
+public void Say(String what)
+{
     Console.WriteLine("  library: " + what);
 }
 
 /// An object made here and dropped there. With one runtime the count is one
 /// count, so the destructor runs when the consumer lets go and not before.
-public class Note {
+public class Note
+{
     public String Text;
 
-    Note(String text) { Text = text; }
+    Note(String text) => Text = text;
 
     ~Note() { Console.WriteLine("  library: dropping " + Text); }
 }
 
-public Note Make(String text) { return new Note(text); }
+public Note Make(String text) => new Note(text);
 
 /// A string made on this side and read on the other. Both sides ask the same
 /// allocator for it, and the type it carries is the one runtime's.
-public String Join(String left, String right) { return left + "/" + right; }
+public String Join(String left, String right) => left + "/" + right;
 
-public nuint Length(String text) { return text.ByteLength(); }
+public nuint Length(String text) => text.ByteLength();

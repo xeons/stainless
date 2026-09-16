@@ -5,38 +5,55 @@ import Standard.Console;
 
 public struct Point { public double X; public double Y; }
 
-public class Trace {
+public class Trace
+{
     public String Name { get; }
-    public Trace(String name) { Name = name; }
+    public Trace(String name) => Name = name;
     ~Trace() { Console.WriteLine("~" + Name); }
 }
 
 // `ref` is the caller's storage, so writing to it writes the caller's variable.
-void Bump(ref int n) { n = n + 1; }
-void Swap(ref int a, ref int b) { int t = a; a = b; b = t; }
-void Move(ref Point p, double dx, double dy) { p.X = p.X + dx; p.Y = p.Y + dy; }
+void Bump(ref int n) => n = n + 1;
+void Swap(ref int a, ref int b)
+{
+    int t = a;
+    a = b;
+    b = t;
+}
+void Move(ref Point p, double dx, double dy)
+{
+    p.X = p.X + dx;
+    p.Y = p.Y + dy;
+}
 
 // `in` is the same storage with a promise not to write it, which is what makes
 // it a borrow: a struct crosses without being copied, and nothing may change it.
-double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
+double LengthSquared(in Point p) => p.X * p.X + p.Y * p.Y;
 
 // A `ref` to a counted reference reassigns the caller's slot, releasing what was
 // there and retaining what replaces it.
-void Rename(ref Trace t, String name) { t = new Trace(name); }
-void Forget(ref Trace? t) { t = null; }
+void Rename(ref Trace t, String name) => t = new Trace(name);
+void Forget(ref Trace? t) => t = null;
 
 public interface IAdjust { void Adjust(ref int n); }
 public class Doubler : IAdjust { public void Adjust(ref int n) { n = n * 2; } }
 
 public delegate void Adjuster(ref int n);
-void Triple(ref int n) { n = n * 3; }
+void Triple(ref int n) => n = n * 3;
 
 // A `ref T` is a `T*` at the ABI, so this needs no shim in either direction.
 extern "C" double modf(double value, ref double integral);
 
-Point Made(double x) { Point p; p.X = x; p.Y = x; return p; }
+Point Made(double x)
+{
+    Point p;
+    p.X = x;
+    p.Y = x;
+    return p;
+}
 
-int Main() {
+int Main()
+{
     int n = 1;
     Bump(ref n);
     Bump(ref n);

@@ -9,21 +9,25 @@ public const int Standard = 7;
 
 public enum Shade { Pale, Deep }
 
-public class Brush {
+public class Brush
+{
     public String Name;
     public int Width;
 
-    public Brush(String name, int width = Standard) {
+    public Brush(String name, int width = Standard)
+    {
         Name = name;
         Width = width;
     }
 
-    public String Stroke(int length = 3, Shade shade = Shade.Deep) {
+    public String Stroke(int length = 3, Shade shade = Shade.Deep)
+    {
         return Name + " " + Text.FromInteger(length) + " " + Text.FromInteger((int)shade);
     }
 }
 
-public String Label(String text, String suffix = " (std)", bool upper = false) {
+public String Label(String text, String suffix = " (std)", bool upper = false)
+{
     String made = text + suffix;
     return upper ? made.ToUpperAscii() : made;
 }

@@ -35,7 +35,8 @@ extern "C" int  sl_depth_from_c();
 extern "C" int  sl_flags_from_c();
 extern "C" void set_sl_flags(int value);
 
-int Main() {
+int Main()
+{
     // What C's own initializer left there, read from Stainless.
     Console.WriteLine($"counter {probe_counter}");
     Console.WriteLine($"wide {probe_wide}");

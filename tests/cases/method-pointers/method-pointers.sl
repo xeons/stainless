@@ -23,35 +23,45 @@ extern "C" int printf(byte* format, ...);
 public closure void Notify(int value);
 public closure int Fold(int running, int value);
 
-class Counter {
+class Counter
+{
     public String Name;
     public int Total;
 
-    public Counter(String name) { Name = name; Total = 0; }
+    public Counter(String name)
+    {
+        Name = name;
+        Total = 0;
+    }
     ~Counter() { printf("~Counter(%s)\n", Name.ToPointer()); }
 
-    public void Add(int value) { Total = Total + value; }
-    public void Subtract(int value) { Total = Total - value; }
+    public void Add(int value) => Total = Total + value;
+    public void Subtract(int value) => Total = Total - value;
 
-    public int Combine(int running, int value) { return running + value + Total; }
+    public int Combine(int running, int value) => running + value + Total;
 }
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " = " + value);
 }
 
 /// A closure passed like any other value.
-void Repeat(Notify what, int times, int with) {
-    for (int i = 0; i < times; i = i + 1) { what(with); }
+void Repeat(Notify what, int times, int with)
+{
+    for (int i = 0; i < times; i = i + 1)
+        what(with);
 }
 
 /// And returned, which is what proves the receiver outlives its scope.
-Notify Escaping() {
+Notify Escaping()
+{
     var counter = new Counter("escaped");
     return counter.Add;
 }
 
-public int Main() {
+public int Main()
+{
     var one = new Counter("one");
     var two = new Counter("two");
 
@@ -119,7 +129,8 @@ public int Main() {
     handlers.Add(two.Add);
     handlers.Add(counted.Add);
 
-    for (nuint i = 0u; i < handlers.Count(); i = i + 1u) { handlers.At(i)(1); }
+    for (nuint i = 0u; i < handlers.Count(); i = i + 1u)
+        handlers.At(i)(1);
     Say("after-all", Text.FromInteger((long)one.Total)
         + "/" + Text.FromInteger((long)two.Total)
         + "/" + Text.FromInteger((long)counted.Total));
@@ -127,14 +138,20 @@ public int Main() {
     // Found by comparing both words, so the right one goes. `List<T>` has no
     // `Remove(T)` -- its `IndexOf` wants `IEquatable<T>`, which a closure is
     // not -- so this is the scan that would be behind one.
-    for (nuint i = 0u; i < handlers.Count(); i = i + 1u) {
-        if (handlers.At(i) == two.Add) { handlers.RemoveAt(i); break; }
+    for (nuint i = 0u; i < handlers.Count(); i = i + 1u)
+    {
+        if (handlers.At(i) == two.Add)
+        {
+            handlers.RemoveAt(i);
+            break;
+        }
     }
 
     Say("left", Text.FromInteger((long)handlers.Count()));
 
     // And the one removed is the one meant: two is untouched from here on.
-    for (nuint i = 0u; i < handlers.Count(); i = i + 1u) { handlers.At(i)(1); }
+    for (nuint i = 0u; i < handlers.Count(); i = i + 1u)
+        handlers.At(i)(1);
     Say("after-removal", Text.FromInteger((long)one.Total)
         + "/" + Text.FromInteger((long)two.Total)
         + "/" + Text.FromInteger((long)counted.Total));

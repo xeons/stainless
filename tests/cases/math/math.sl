@@ -6,7 +6,8 @@ import Standard.Console;
 
 extern "C" int printf(byte* format, ...);
 
-int Main() {
+int Main()
+{
     // A module is a scope, so Math needs no static class to live in.
     printf("roots=%.4f %.4f pow=%.1f\n",
         Math.Sqrt(2.0), Math.Cbrt(27.0), Math.Pow(2.0, 10.0));

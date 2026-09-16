@@ -5,7 +5,8 @@ public interface IShape { double Area(); }
 
 public class Holder<T> where U : IShape { T item; }
 
-int Main() {
+int Main()
+{
     Holder<int> h;
     return 0;
 }

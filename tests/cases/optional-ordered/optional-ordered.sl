@@ -7,34 +7,43 @@ module OptionalOrdered;
 import Standard.Collections;
 import Standard.Console;
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " = " + value);
 }
 
 // A value or none, for the types `T?` cannot describe. `nuint?` is refused
 // because a value type has no spare bit to be null with; this costs a tag
 // beside the value and nothing else.
-Optional<nuint> FirstEven(int[] values) {
-    for (nuint i = 0u; i < values.Length; i = i + 1u) {
-        if (values[i] % 2 == 0) { return Some(i); }
+Optional<nuint> FirstEven(int[] values)
+{
+    for (nuint i = 0u; i < values.Length; i = i + 1u)
+    {
+        if (values[i] % 2 == 0)
+            return Some(i);
     }
     return None;
 }
 
 // A second optional, so `FlatMap` has something to flatten.
-Optional<nuint> Even(nuint value) {
-    if (value % 2u == 0u) { return Some(value); }
+Optional<nuint> Even(nuint value)
+{
+    if (value % 2u == 0u)
+        return Some(value);
     return None;
 }
 
-String Describe(Optional<nuint> found) {
-    switch (found) {
+String Describe(Optional<nuint> found)
+{
+    switch (found)
+    {
         case Some at: return "at " + Text.FromInteger((long)at.Value);
         case None:    return "none";
     }
 }
 
-public int Main() {
+public int Main()
+{
     // ----------------------------------------------------------- Optional
     var evens = new int[3];
     evens[0u] = 1;
@@ -73,8 +82,10 @@ public int Main() {
     FirstEven(odds).IfPresent(i => Say("never", "never"));
 
     // The tag test with a name, which is what these are all shorthand for.
-    if (FirstEven(evens) is Some found) { Say("is-some", Text.FromInteger((long)found.Value)); }
-    if (FirstEven(odds) is None) { Say("is-none", "yes"); }
+    if (FirstEven(evens) is Some found)
+        Say("is-some", Text.FromInteger((long)found.Value));
+    if (FirstEven(odds) is None)
+        Say("is-none", "yes");
 
     // ------------------------------------------------- OrderedDictionary
     var map = new OrderedDictionary<String, int>();
@@ -119,14 +130,16 @@ public int Main() {
     list.Insert(list.Count(), "e");
 
     var joined = new StringBuilder();
-    for (nuint i = 0u; i < list.Count(); i = i + 1u) { joined.Append(list.At(i)); }
+    for (nuint i = 0u; i < list.Count(); i = i + 1u)
+        joined.Append(list.At(i));
     Say("inserted", joined.ToText());
 
     list.RemoveAt(0u);
     list.RemoveAt(list.Count() - 1u);
 
     var left = new StringBuilder();
-    for (nuint i = 0u; i < list.Count(); i = i + 1u) { left.Append(list.At(i)); }
+    for (nuint i = 0u; i < list.Count(); i = i + 1u)
+        left.Append(list.At(i));
     Say("removed-ends", left.ToText() + "/" + Text.FromInteger((long)list.Count()));
 
     // --------------------------------------------- StringBuilder appends

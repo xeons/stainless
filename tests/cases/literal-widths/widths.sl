@@ -18,12 +18,13 @@ const float Negative = -2.5f;
 const double Widened = 1.5f;    // and a float literal suits a double one
 const sbyte Floor = -128;
 
-String Show(sbyte v) { return "sbyte"; }
-String Show(int v) { return "int"; }
-String Pick(short v) { return "short"; }
-String Pick(long v) { return "long"; }
+String Show(sbyte v) => "sbyte";
+String Show(int v) => "int";
+String Pick(short v) => "short";
+String Pick(long v) => "long";
 
-int Main() {
+int Main()
+{
     sbyte c = -100;
     short s = -30000;
     sbyte floor = -128;

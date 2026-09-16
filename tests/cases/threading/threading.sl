@@ -14,10 +14,12 @@ const int PerJob = 500;
 
 /// Increments a guarded counter, taking and dropping the lock every time.
 /// If the guard's destructor did not unlock, the second iteration would hang.
-void BumpGuarded(byte* argument) {
+void BumpGuarded(byte* argument)
+{
     var counter = (Mutex<long>)argument;
 
-    for (int i = 0; i < PerJob; i = i + 1) {
+    for (int i = 0; i < PerJob; i = i + 1)
+    {
         var guard = counter.Lock();
         guard.Set(guard.Value() + 1);
     }
@@ -25,21 +27,25 @@ void BumpGuarded(byte* argument) {
 
 /// The same count without a lock. A plain `cell = cell + 1` here would lose
 /// updates on 31 threads; the atomic is what makes the total exact.
-void BumpAtomic(byte* argument) {
+void BumpAtomic(byte* argument)
+{
     var counter = (AtomicLong)argument;
 
-    for (int i = 0; i < PerJob; i = i + 1) {
+    for (int i = 0; i < PerJob; i = i + 1)
+    {
         counter.Increment();
     }
 }
 
-int Main() {
+int Main()
+{
     var guarded = new Mutex<long>(0);
     var counted = new AtomicLong(0);
 
     {
         var scope = new TaskScope();
-        for (int i = 0; i < Jobs; i = i + 1) {
+        for (int i = 0; i < Jobs; i = i + 1)
+        {
             scope.Run(BumpGuarded, (byte*)guarded);
             scope.Run(BumpAtomic, (byte*)counted);
         }

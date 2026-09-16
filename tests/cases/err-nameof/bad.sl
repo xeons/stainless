@@ -5,7 +5,8 @@ module Bad;
 // Both halves of that are checked: there has to be a name written, and it has
 // to be a name of something.
 
-int Main() {
+int Main()
+{
     int counter = 0;
 
     // Nothing here has a name.

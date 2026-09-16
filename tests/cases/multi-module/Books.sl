@@ -8,25 +8,28 @@ module Shop.Catalog;
 
 import Shop.Pricing;
 
-public interface IPriced {
+public interface IPriced
+{
     Money Price();
     String Label();
 }
 
-public class Book : IPriced {
-    String title;
-    Money price;
+public class Book : IPriced
+{
+    String _title;
+    Money _price;
 
-    public Book(String name, Money amount) {
-        title = name;
-        price = amount;
+    public Book(String name, Money amount)
+    {
+        _title = name;
+        _price = amount;
     }
 
-    public Money Price() { return price; }
-    public String Label() { return Decorate(title); }
+    public Money Price() => _price;
+    public String Label() => Decorate(_title);
 }
 
 // No `public`: visible throughout Shop.Catalog, including its other file, but
 // invisible to anyone who imports the module. This is C#'s `internal`, with the
 // module playing the part of the assembly.
-String Decorate(String text) { return "\"" + text + "\""; }
+String Decorate(String text) => "\"" + text + "\"";

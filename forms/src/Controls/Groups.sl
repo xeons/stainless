@@ -251,7 +251,7 @@ public class CheckGroup : GroupBox
             for (nuint i = 0u; i < _boxes.Count(); i++)
             {
                 if (_boxes.At(i).Checked)
-                    ticked += 1u;
+                    ticked++;
             }
             var found = new int[ticked];
             nuint at = 0u;
@@ -561,7 +561,7 @@ public class CheckListBox : ListControl
             for (int i = 0; i < total; i++)
             {
                 if (_native.GetItemChecked(i))
-                    ticked += 1u;
+                    ticked++;
             }
             var found = new int[ticked];
             nuint at = 0u;
@@ -880,28 +880,28 @@ public class ButtonPanel : Panel
 
         nuint present = 0u;
         if (first.Visible)
-            present += 1u;
+            present++;
         if (second.Visible)
-            present += 1u;
+            present++;
         if (third.Visible)
-            present += 1u;
+            present++;
 
         var packed = new Button[present];
         nuint at = 0u;
         if (first.Visible)
         {
             packed[at] = first;
-            at += 1u;
+            at++;
         }
         if (second.Visible)
         {
             packed[at] = second;
-            at += 1u;
+            at++;
         }
         if (third.Visible)
         {
             packed[at] = third;
-            at += 1u;
+            at++;
         }
         return packed;
     }

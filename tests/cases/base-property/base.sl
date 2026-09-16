@@ -16,18 +16,22 @@ module BaseProperty;
 import Standard.Console;
 import Standard.Text;
 
-public class Base {
+public class Base
+{
     protected int held;
     protected int writes;
 
-    public Base() {
+    public Base()
+    {
         held = 0;
         writes = 0;
     }
 
-    public virtual int Value {
+    public virtual int Value
+    {
         get => held;
-        set {
+        set
+        {
             held = value;
             writes = writes + 1;
         }
@@ -39,20 +43,24 @@ public class Base {
 }
 
 /// Reads and writes through `base`, and adds something of its own around both.
-public class Derived : Base {
+public class Derived : Base
+{
     public int Reads { get; private set; }
 
-    public Derived() {
+    public Derived()
+    {
         base();
         Reads = 0;
     }
 
-    public override int Value {
-        get {
+    public override int Value
+    {
+        get
+        {
             Reads = Reads + 1;
             return base.Value;
         }
-        set { base.Value = value * 2; }
+        set => base.Value = value * 2;
     }
 
     /// An expression-bodied override, which is the shape that hangs most
@@ -62,16 +70,19 @@ public class Derived : Base {
 
 /// One more level, to check that `base` means the immediate base rather than
 /// the root of the chain.
-public class Further : Derived {
-    public Further() { base(); }
+public class Further : Derived
+{
+    public Further() => base();
 
-    public override int Value {
+    public override int Value
+    {
         get => base.Value + 1;
-        set { base.Value = value + 10; }
+        set => base.Value = value + 10;
     }
 }
 
-int Main() {
+int Main()
+{
     var d = new Derived();
     d.Value = 21;
     Console.WriteLine("derived stored: " + Standard.Text.FromInteger((long)d.Value));

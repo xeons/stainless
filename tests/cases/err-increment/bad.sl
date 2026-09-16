@@ -5,13 +5,15 @@ module Bad;
 // asked of means something the spelling does not say.
 public enum Level { Low, High }
 
-public class Reading {
+public class Reading
+{
     // No setter, so there is nowhere to write the answer back to.
     public int Value { get; }
-    public Reading() { Value = 0; }
+    public Reading() => Value = 0;
 }
 
-int Main() {
+int Main()
+{
     // A choice is not a count.
     Level level = Level.Low;
     level++;
@@ -32,4 +34,4 @@ int Main() {
     return 0;
 }
 
-int Answer() { return 1; }
+int Answer() => 1;

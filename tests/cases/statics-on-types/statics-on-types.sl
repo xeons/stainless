@@ -26,9 +26,10 @@ static readonly int Limit = 10;
 
 // -------------------------------------------------- storage on a type
 
-public class Registry {
+public class Registry
+{
     // Private to the type, and mutable: the count of everything ever made.
-    static int made = 0;
+    static int s_made = 0;
 
     // Public, so it is read and written by naming the type.
     public static String Kind = "registry";
@@ -37,25 +38,27 @@ public class Registry {
     // no retain or release touches it again.
     public static readonly String Version = "1";
 
-    String name;
+    String _name;
 
-    public Registry(String called) {
-        name = called;
-        made = made + 1;
+    public Registry(String called)
+    {
+        _name = called;
+        s_made = s_made + 1;
     }
 
-    public String Name() { return name; }
+    public String Name() => _name;
 
     // A static method reads the type's storage with no receiver at all.
-    public static int Made() { return made; }
+    public static int Made() => s_made;
 
     // And a static property, which is two static methods wearing the spelling
     // of a field.
-    public static int Doubled { get { return made * 2; } }
+    public static int Doubled { get { return s_made * 2; } }
 
-    public static String Label {
-        get { return Kind; }
-        set { Kind = value; }
+    public static String Label
+    {
+        get => Kind;
+        set => Kind = value;
     }
 }
 
@@ -64,24 +67,27 @@ public class Registry {
 // A class with no instances. A module is the better answer most of the time --
 // it is a scope, so its members need no prefix inside it -- but this is a name
 // that can sit inside a module, which is what a C# programmer reaches for.
-public static class Defaults {
+public static class Defaults
+{
     public static int Retries = 3;
-    static readonly String Note = "defaults";
+    static readonly String s_Note = "defaults";
 
-    public static String Describe() { return Note; }
-    public static int Doubled() { return Retries * 2; }
+    public static String Describe() => s_Note;
+    public static int Doubled() => Retries * 2;
 }
 
 // ---------------------------------------------------- a static constructor
 
-public class Late {
+public class Late
+{
     public static int Ready = 0;
     public static String Note = "";
     public static List<String> Steps = new List<String>();
 
     // Runs after every static field's initializer, which is C#'s order and the
     // only one that makes a block able to arrange the fields it is there for.
-    static Late() {
+    static Late()
+    {
         Ready = 1;
         Note = "arranged";
         Steps.Add("first");
@@ -94,7 +100,8 @@ public class Late {
 // they were written in.
 static readonly int Doubled = Limit * 2;
 
-public int Main() {
+public int Main()
+{
     // Module storage, written.
     Started = Started + 5;
     Phase = "running";

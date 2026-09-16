@@ -7,7 +7,8 @@ module Bad;
 // neither of which is IR that exists -- so the answer was a message about
 // generated text rather than about the program.
 
-struct Holder {
+struct Holder
+{
     public void Nothing;
 }
 
@@ -15,9 +16,10 @@ void Fine() { }
 
 void Takes(void nothing) { }
 
-Result<int, void> Fails() { return Ok(1); }
+Result<int, void> Fails() => Ok(1);
 
-int Main() {
+int Main()
+{
     void local;
     return 0;
 }

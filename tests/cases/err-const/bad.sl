@@ -29,4 +29,4 @@ const int NotAnInt = 1.5;                           // SL0479
 const bool NotABool = 1;                            // SL0479
 const double NotAReal = false;                      // SL0479
 
-int Main() { return Limit + Backwards; }
+int Main() => Limit + Backwards;

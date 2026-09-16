@@ -13,8 +13,9 @@ module Seam;
 
 public enum Why { Cancelled, Failed }
 
-public interface IChooser {
+public interface IChooser
+{
     Result<Colour, Why> Choose(Colour start);
 }
 
-public Result<Colour, Why> Pick(Colour start) { return Ok(start); }
+public Result<Colour, Why> Pick(Colour start) => Ok(start);

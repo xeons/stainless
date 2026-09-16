@@ -22,75 +22,92 @@ import Standard.Console;
 
 // ---------------------------------------------------------- inside a struct
 
-public struct Rect {
+public struct Rect
+{
     public struct Point { public int X; public int Y; }
 
     public Point TopLeft;
     public Point BottomRight;
 
     /// The short name, from inside.
-    public Point Middle() {
+    public Point Middle()
+    {
         Point at;
         at.X = (TopLeft.X + BottomRight.X) / 2;
         at.Y = (TopLeft.Y + BottomRight.Y) / 2;
         return at;
     }
 
-    public int Width() { return BottomRight.X - TopLeft.X; }
+    public int Width() => BottomRight.X - TopLeft.X;
 }
 
 // ----------------------------------------------------------- inside a class
 
-public class Widget {
+public class Widget
+{
     public enum State { Idle, Busy, Gone }
 
-    public class Handle {
+    public class Handle
+    {
         public int Id { get; set; }
-        public Handle(int id) { Id = id; }
+        public Handle(int id) => Id = id;
     }
 
     /// Two deep, to show the naming composes.
-    public class Bag {
+    public class Bag
+    {
         public struct Slot { public int Index; public bool Filled; }
 
         public Slot First;
-        public Bag() { First.Index = 0; First.Filled = false; }
+        public Bag()
+        {
+            First.Index = 0;
+            First.Filled = false;
+        }
     }
 
     public State Now;
     public Handle Grip;
     public Bag Held;
 
-    public Widget(int id) {
+    public Widget(int id)
+    {
         Now = State.Idle;
         Grip = new Handle(id);
         Held = new Bag();
     }
 
-    public void Start() { Now = State.Busy; }
+    public void Start() => Now = State.Busy;
 
-    public String Describe() { return $"{(long)Now} #{Grip.Id}"; }
+    public String Describe() => $"{(long)Now} #{Grip.Id}";
 }
 
 // -------------------------------------------------------- inside a generic
 
-public class Cache<T> {
+public class Cache<T>
+{
     public struct Entry { public nuint Age; public bool Live; }
 
-    Entry state;
-    T held;
+    Entry _state;
+    T _held;
 
-    public Cache(T value) {
-        held = value;
-        state.Age = 0u;
-        state.Live = true;
+    public Cache(T value)
+    {
+        _held = value;
+        _state.Age = 0u;
+        _state.Live = true;
     }
 
-    public T Get() { state.Age++; return held; }
-    public nuint Age() { return state.Age; }
+    public T Get()
+    {
+        _state.Age++;
+        return _held;
+    }
+    public nuint Age() => _state.Age;
 }
 
-public int Main() {
+public int Main()
+{
     // The long name, from outside.
     Rect.Point corner;
     corner.X = 2;

@@ -13,4 +13,4 @@ static readonly String Name = "library";
 // holding it.
 static readonly int Limit = 64;
 
-export "C" int GetLimit() { return Limit + (int)Name.ByteLength(); }
+export "C" int GetLimit() => Limit + (int)Name.ByteLength();

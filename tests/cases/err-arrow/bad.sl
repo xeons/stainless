@@ -1,15 +1,18 @@
 // What `->` refuses. A '.' accepts all of these, which is the difference.
 module ErrArrow;
 
-public struct Point {
+public struct Point
+{
     public int X;
 }
 
-public class Box {
+public class Box
+{
     public int Value;
 }
 
-int Main() {
+int Main()
+{
     Point point;
     point.X = 1;
 

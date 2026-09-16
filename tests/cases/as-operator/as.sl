@@ -9,23 +9,27 @@ module AsOperator;
 import Standard.Console;
 import Standard.Text;
 
-public interface INamed {
+public interface INamed
+{
     String Name();
 }
 
-public class Shape {
-    public virtual int Sides() { return 0; }
+public class Shape
+{
+    public virtual int Sides() => 0;
 }
 
-public class Square : Shape, INamed {
-    public override int Sides() { return 4; }
-    public String Name() { return "square"; }
+public class Square : Shape, INamed
+{
+    public override int Sides() => 4;
+    public String Name() => "square";
 }
 
 public class Circle : Shape { }
 
 /// The branching use, which `is C c` also covers.
-String Describe(Shape shape) {
+String Describe(Shape shape)
+{
     Square? square = shape as Square;
 
     if (square != null)
@@ -35,11 +39,13 @@ String Describe(Shape shape) {
 }
 
 /// The one it exists for: an answer with no branch anywhere in it.
-String NameOf(Shape shape) {
+String NameOf(Shape shape)
+{
     return (shape as INamed)?.Name() ?? "anonymous";
 }
 
-int Main() {
+int Main()
+{
     Shape square = new Square();
     Shape circle = new Circle();
 
@@ -65,7 +71,8 @@ int Main() {
     return 0;
 }
 
-Shape Made() {
+Shape Made()
+{
     Console.WriteLine("made one");
     return new Square();
 }

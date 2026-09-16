@@ -19,9 +19,10 @@ using Alias = int;
 using Alias = long;                                 // SL0201
 
 // Two imported modules both export 'Buffer', so naming it bare has no answer.
-Buffer Pick() {                                     // SL0273
+Buffer Pick() // SL0273
+{
     Buffer b;
     return b;
 }
 
-int Main() { return 0; }
+int Main() => 0;

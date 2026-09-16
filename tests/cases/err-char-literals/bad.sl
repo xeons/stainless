@@ -6,7 +6,8 @@ module Bad;
 // with two digits after it became U+0012 -- values that compile, run, and
 // were written by nobody.
 
-int Main() {
+int Main()
+{
     var empty = '';
     var shortU = "\u12";
     var shortBigU = "\U0001F6";

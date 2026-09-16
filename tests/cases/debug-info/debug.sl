@@ -9,42 +9,50 @@ module Debug;
 import Standard.Console;
 import Standard.Collections;
 
-public struct Point {
+public struct Point
+{
     public double X;
     public double Y;
 }
 
-public enum Level : byte {
+public enum Level : byte
+{
     Quiet = 0,
     Loud  = 7,
 }
 
-public class Node {
+public class Node
+{
     public int Value;
     public weak Node? Parent;
     public Point Where;
 
-    public Node(int value) { Value = value; }
+    public Node(int value) => Value = value;
 
-    public int Doubled() {
+    public int Doubled()
+    {
         int scaled = Value * 2;
         return scaled;
     }
 }
 
-public class Box<T> {
-    T held;
-    public Box(T initial) { held = initial; }
-    public T Get() { return held; }
+public class Box<T>
+{
+    T _held;
+    public Box(T initial) => _held = initial;
+    public T Get() => _held;
 }
 
-int Sum(int[] values) {
+int Sum(int[] values)
+{
     int total = 0;
-    for (nuint i = 0; i < values.Length; i = i + 1) { total = total + values[i]; }
+    for (nuint i = 0; i < values.Length; i = i + 1)
+        total = total + values[i];
     return total;
 }
 
-int Main() {
+int Main()
+{
     Point origin;
     origin.X = 1.5;
     origin.Y = 2.5;

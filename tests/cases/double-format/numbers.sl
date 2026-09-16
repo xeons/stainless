@@ -15,15 +15,17 @@ import Standard.Console;
 import Standard.Text;
 import Standard.Convert;
 
-String D(double v) { return Text.FromDouble(v); }
+String D(double v) => Text.FromDouble(v);
 
 // Every one of these must read back as the value it was written from.
-bool Survives(double v) {
+bool Survives(double v)
+{
     var back = Convert.ToDouble(Text.FromDouble(v));
     return back.Ok && back.Value == v;
 }
 
-int Main() {
+int Main()
+{
     // A round number stays round rather than turning scientific.
     Console.WriteLine("round " + D(0.0) + " " + D(1.0) + " " + D(60.0) + " " +
         D(100.0) + " " + D(150.0) + " " + D(70000.0) + " " + D(-70000.0));

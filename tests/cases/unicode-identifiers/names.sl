@@ -10,16 +10,18 @@ module Names;
 
 extern "C" int printf(byte* format, ...);
 
-struct Poiñt {
+struct Poiñt
+{
     public int X;
     public int Ünit;
 }
 
 int café() { return 40; }
 
-int Sum(int é, int è) { return é + è; }
+int Sum(int é, int è) => é + è;
 
-int Main() {
+int Main()
+{
     int élève = 1;
 
     Poiñt p;

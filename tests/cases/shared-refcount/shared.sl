@@ -17,27 +17,32 @@ extern "C" int printf(byte* format, ...);
 const int Jobs = 16;
 const int PerJob = 20000;
 
-AtomicLong Grab(Mutex<AtomicLong> held) {
+AtomicLong Grab(Mutex<AtomicLong> held)
+{
     var guard = held.Lock();
     return guard.Value();
 }
 
-void Touch(byte* argument) {
+void Touch(byte* argument)
+{
     var held = (Mutex<AtomicLong>)argument;
 
-    for (int i = 0; i < PerJob; i = i + 1) {
+    for (int i = 0; i < PerJob; i = i + 1)
+    {
         var inner = Grab(held);
         inner.Increment();
     }
 }
 
-int Main() {
+int Main()
+{
     var counter = new AtomicLong(0);
     var held = new Mutex<AtomicLong>(counter);
 
     {
         var scope = new TaskScope();
-        for (int i = 0; i < Jobs; i = i + 1) { scope.Run(Touch, (byte*)held); }
+        for (int i = 0; i < Jobs; i = i + 1)
+            scope.Run(Touch, (byte*)held);
         scope.Join();
     }
 

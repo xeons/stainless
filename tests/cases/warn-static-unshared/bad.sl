@@ -11,7 +11,8 @@ extern "C" int printf(byte* format, ...);
 
 static readonly List<int> Registry = new List<int>();
 
-int Main() {
+int Main()
+{
     Registry.Add(7);
     printf("registry=%llu %d\n", Registry.Count(), Registry.At(0u));
     return 0;

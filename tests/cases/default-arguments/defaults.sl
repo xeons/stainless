@@ -14,29 +14,35 @@ public const int Wide = 12;
 
 public enum Level { Quiet, Loud }
 
-public class Box {
+public class Box
+{
     public int Width;
     public String Label;
 
-    public Box(String label, int width = Wide) {
+    public Box(String label, int width = Wide)
+    {
         Label = label;
         Width = width;
     }
 }
 
-public interface IRender {
+public interface IRender
+{
     String Render(int width = 3);
 }
 
 /// A class implementing it does not restate the default: there is one
 /// declaration a call can read, and this is it.
-public class Bar : IRender {
-    public String Render(int width) {
+public class Bar : IRender
+{
+    public String Render(int width)
+    {
         return "#".Repeat((nuint)width);
     }
 }
 
-String Draw(String text, int width = 8, char fill = '.', bool loud = false) {
+String Draw(String text, int width = 8, char fill = '.', bool loud = false)
+{
     String body = text;
 
     while ((int)body.ByteLength() < width)
@@ -48,16 +54,19 @@ String Draw(String text, int width = 8, char fill = '.', bool loud = false) {
     return body;
 }
 
-String Greet(String who, String greeting = "hello", Level level = Level.Quiet) {
+String Greet(String who, String greeting = "hello", Level level = Level.Quiet)
+{
     return greeting + " " + who + " " + Text.FromInteger((int)level);
 }
 
 /// Null is a constant too, and it is the one a reference parameter wants.
-String NameOf(Box? box = null) {
+String NameOf(Box? box = null)
+{
     return box?.Label ?? "nothing";
 }
 
-int Main() {
+int Main()
+{
     // Left off from the right, one at a time.
     Console.WriteLine(Draw("ab"));
     Console.WriteLine(Draw("ab", 4));
@@ -98,6 +107,6 @@ int Main() {
     return 0;
 }
 
-int Quality(int value = -1) { return value; }
-long Offset(long value = -5000000000) { return value; }
-int Nudge(int value = -128) { return value; }
+int Quality(int value = -1) => value;
+long Offset(long value = -5000000000) => value;
+int Nudge(int value = -128) => value;

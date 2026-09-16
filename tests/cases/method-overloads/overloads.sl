@@ -9,23 +9,29 @@ import Standard.Console;
 
 interface IEq<T> { bool Same(T other); }
 
-class Both : IEq<int>, IEq<String> {
+class Both : IEq<int>, IEq<String>
+{
     public int N;
     public String S;
 
-    public Both(int n, String s) { N = n; S = s; }
+    public Both(int n, String s)
+    {
+        N = n;
+        S = s;
+    }
 
-    public bool Same(int other) { return N == other; }
-    public bool Same(String other) { return S == other; }
+    public bool Same(int other) => N == other;
+    public bool Same(String other) => S == other;
 }
 
-class Printer {
-    public String Show(int n)    { return "int " + Text.FromInteger(n); }
-    public String Show(String s) { return "text " + s; }
-    public String Show(double d) { return "double " + Text.FromDouble(d); }
+class Printer
+{
+    public String Show(int n) => "int " + Text.FromInteger(n);
+    public String Show(String s) => "text " + s;
+    public String Show(double d) => "double " + Text.FromDouble(d);
 
     // A call without a receiver picks an overload the same way.
-    public String Pair(int n) { return Show(n) + "/" + Show(n + 1); }
+    public String Pair(int n) => Show(n) + "/" + Show(n + 1);
 }
 
 // An interface that restates a method it inherits declares one signature
@@ -33,21 +39,30 @@ class Printer {
 interface ISized { int Size(); }
 interface ISizedMore : ISized { int Size(); int Extra(); }
 
-class Sized : ISizedMore {
-    public int Size()  { return 3; }
-    public int Extra() { return 9; }
+class Sized : ISizedMore
+{
+    public int Size() => 3;
+    public int Extra() => 9;
 }
 
-struct Vec {
+struct Vec
+{
     public double X;
     public double Y;
 
-    public Vec Scaled(double by) { Vec v; v.X = X * by; v.Y = Y * by; return v; }
-    public Vec Scaled(int by)    { return Scaled((double)by); }
-    public double Dot(Vec other) { return X * other.X + Y * other.Y; }
+    public Vec Scaled(double by)
+    {
+        Vec v;
+        v.X = X * by;
+        v.Y = Y * by;
+        return v;
+    }
+    public Vec Scaled(int by) => Scaled((double)by);
+    public double Dot(Vec other) => X * other.X + Y * other.Y;
 }
 
-int Main() {
+int Main()
+{
     var both = new Both(7, "seven");
 
     Console.WriteLine(both.Same(7) ? "int:yes" : "int:no");

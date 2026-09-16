@@ -4,7 +4,8 @@
 // anything is bound and would hide every other case's diagnostics.
 module Bad;
 
-int Main() {
+int Main()
+{
     var numbers = new int[4];
     var nothing = numbers[];
     return 0;

@@ -6,4 +6,4 @@ public struct HDC__;
 public using HWND = HWND__*;
 public using HDC  = HDC__*;
 
-public int Width(HWND window) { return 0; }
+public int Width(HWND window) => 0;

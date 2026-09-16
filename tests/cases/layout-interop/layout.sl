@@ -5,7 +5,8 @@
 // alignment and every field offset against the generated header.
 module Library.Layout;
 
-public struct Plain {
+public struct Plain
+{
     public byte Tag;
     public int Value;
     public byte Trailer;
@@ -13,7 +14,8 @@ public struct Plain {
 
 // No padding anywhere: what a wire format or an on-disk header looks like.
 [Packed]
-public struct Wire {
+public struct Wire
+{
     public byte Tag;
     public int Value;
     public byte Trailer;
@@ -21,7 +23,8 @@ public struct Wire {
 
 // Raised, never lowered: the fields are already 8-aligned and this asks for 16.
 [Align(16)]
-public struct Wide {
+public struct Wide
+{
     public double X;
     public double Y;
 }
@@ -29,22 +32,23 @@ public struct Wide {
 // Both: nothing padded inside, and the whole of it on a 4-byte boundary.
 [Packed]
 [Align(4)]
-public struct Both {
+public struct Both
+{
     public byte A;
     public int B;
     public byte C;
 }
 
-export "C" nuint PlainSize() { return sizeof(Plain); }
-export "C" nuint WireSize() { return sizeof(Wire); }
-export "C" nuint WideSize() { return sizeof(Wide); }
-export "C" nuint BothSize() { return sizeof(Both); }
+export "C" nuint PlainSize() => sizeof(Plain);
+export "C" nuint WireSize() => sizeof(Wire);
+export "C" nuint WideSize() => sizeof(Wide);
+export "C" nuint BothSize() => sizeof(Both);
 
 // Read through a value C built, so the offsets are checked and not just the size.
 // Every type is also named in a signature, because the header describes exactly
 // what the exported surface mentions and nothing else.
-export "C" byte PlainTag(Plain plain) { return plain.Tag; }
-export "C" int BothB(Both both) { return both.B; }
-export "C" int WireValue(Wire wire) { return wire.Value; }
-export "C" byte WireTrailer(Wire wire) { return wire.Trailer; }
-export "C" double WideY(Wide wide) { return wide.Y; }
+export "C" byte PlainTag(Plain plain) => plain.Tag;
+export "C" int BothB(Both both) => both.B;
+export "C" int WireValue(Wire wire) => wire.Value;
+export "C" byte WireTrailer(Wire wire) => wire.Trailer;
+export "C" double WideY(Wide wide) => wide.Y;

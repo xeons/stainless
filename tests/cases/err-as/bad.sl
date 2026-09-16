@@ -7,12 +7,14 @@ public class Alpha { }
 public sealed class Beta { }
 public interface IThing { void Do(); }
 
-variant Payload {
+variant Payload
+{
     Number(int Value);
     Empty;
 }
 
-int Main() {
+int Main()
+{
     Alpha alpha = new Alpha();
 
     // Neither derives from the other, so this could only ever be null.

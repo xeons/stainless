@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: 0BSD
 module Bad;
 
-int Main() {
+int Main()
+{
     sbyte tooLow = -129;        // one past the floor
     byte negative = -1;         // an unsigned type has no negative
     short wide = -32769;

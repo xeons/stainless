@@ -20,7 +20,8 @@ import Linux.Terminal;
 import Linux.Termios;
 import Linux.Events;
 
-public int Main() {
+public int Main()
+{
     // ------------------------------------------------------------ the layout
 
     Console.WriteLine($"termios  {sizeof(termios)}");

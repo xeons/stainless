@@ -3,11 +3,12 @@
 // likelier cause is a mistake. Documented in §9 of the specification.
 module Shadowed;
 
-int Main() {
+int Main()
+{
     int n = 1;
     {
         int n = 2;      // the enclosing block already has one
-        n += 1;
+        n++;
     }
     return n;
 }

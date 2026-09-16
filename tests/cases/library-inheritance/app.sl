@@ -9,34 +9,38 @@ module App;
 import Standard.Console;
 import Library.Animals;
 
-public class Dog : Animal {
-    private String toy;
+public class Dog : Animal
+{
+    private String _toy;
 
     // The base constructor runs first, across the boundary.
-    public Dog(String toy) {
+    public Dog(String toy)
+    {
         base(4, "dog");
-        this.toy = toy;
+        this._toy = toy;
     }
 
-    ~Dog() { Console.WriteLine("~Dog " + toy); }
+    ~Dog() { Console.WriteLine("~Dog " + _toy); }
 
     // Slot 0, replaced.
-    public override String Speak() { return "woof"; }
+    public override String Speak() => "woof";
 
     // A protected member of a class compiled somewhere else.
-    public int Twice() { return Doubled(); }
+    public int Twice() => Doubled();
 }
 
 // Two levels, the second of which never sees the library at all except through
 // the first.
-public class Puppy : Dog {
-    public Puppy() { base("sock"); }
+public class Puppy : Dog
+{
+    public Puppy() => base("sock");
 
-    public override String Speak() { return "yip"; }
-    public override int Score() { return 99; }
+    public override String Speak() => "yip";
+    public override int Score() => 99;
 }
 
-int Main() {
+int Main()
+{
     {
         Animal a = new Dog("ball");
 
@@ -51,10 +55,14 @@ int Main() {
 
         // The base chain crosses the boundary, so a test against it walks from
         // a TypeInfo built here into one built there.
-        if (p is Dog d) { Console.WriteLine("dog " + Text.FromInteger(d.Twice())); }
-        if (p is Puppy) { Console.WriteLine("puppy"); }
-        if (a is Puppy) { Console.WriteLine("WRONG"); }
-        if (p is Animal) { Console.WriteLine("animal"); }
+        if (p is Dog d)
+            Console.WriteLine("dog " + Text.FromInteger(d.Twice()));
+        if (p is Puppy)
+            Console.WriteLine("puppy");
+        if (a is Puppy)
+            Console.WriteLine("WRONG");
+        if (p is Animal)
+            Console.WriteLine("animal");
 
         Console.WriteLine("dropping");
     }

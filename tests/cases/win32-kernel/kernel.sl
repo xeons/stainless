@@ -15,7 +15,8 @@ import Win32.Files;
 import Win32.Machine;
 import Win32.Clock;
 
-int Main() {
+int Main()
+{
     // --- text out and back ------------------------------------------------
     //
     // Set a variable to something no ANSI code page could carry, then read it
@@ -73,7 +74,8 @@ int Main() {
     var names = Files.Entries(directory);
     Sort(names);
     Console.WriteLine("found " + Text.FromInteger((long)names.Count()) + ":");
-    foreach (String name in names) { Console.WriteLine("  " + name); }
+    foreach (String name in names)
+        Console.WriteLine("  " + name);
 
     // WIN32_FIND_DATAW is a struct with the two inline WCHAR arrays the header
     // gives it, so this is a plain local: 592 bytes, no allocation.
@@ -125,15 +127,19 @@ int Main() {
 
 /// Creates an empty file, through the binding rather than through Standard.File,
 /// so that CreateFileW and CloseHandle are what is being tested.
-void Touch(String path) {
+void Touch(String path)
+{
     HANDLE file = Files.Open(path, GenericWrite, 0u, CreateAlways);
-    if (!Win32.IsInvalid(file)) { CloseHandle(file); }
+    if (!Win32.IsInvalid(file))
+        CloseHandle(file);
 }
 
 /// Deletes the directory and everything directly in it. One level deep is all
 /// this case makes.
-void RemoveTree(String directory) {
-    foreach (String name in Files.Entries(directory)) {
+void RemoveTree(String directory)
+{
+    foreach (String name in Files.Entries(directory))
+    {
         DeleteFileW((directory + "\\" + name).ToUtf16().ToPointer());
     }
     RemoveDirectoryW(directory.ToUtf16().ToPointer());

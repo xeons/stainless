@@ -24,7 +24,8 @@ extern "C" One    make_one(byte a);
 
 extern "C" int between(int a, Three b, int c, Twelve d, int e);
 
-int Main() {
+int Main()
+{
     Three three;  three.A = 1; three.B = 2; three.C = 3;
     Twelve twelve; twelve.A = 10; twelve.B = 20; twelve.C = 30;
     Twins twins;  twins.X = 1.5f; twins.Y = 2.5f;

@@ -12,22 +12,27 @@ import Standard.Reflection;
 
 // --------------------------------------------------------------- the document
 
-void Say(String label, String value) {
+void Say(String label, String value)
+{
     Console.WriteLine(label + " = " + value);
 }
 
-void Round(String label, String text) {
+void Round(String label, String text)
+{
     var parsed = Json.Parse(text);
-    if (!parsed.Ok) {
+    if (!parsed.Ok)
+    {
         Say(label, "failed: " + Json.Describe(parsed.Error));
         return;
     }
     Say(label, Json.Write(parsed.Value));
 }
 
-void Refuse(String label, String text) {
+void Refuse(String label, String text)
+{
     var parsed = Json.Parse(text);
-    if (parsed.Ok) {
+    if (parsed.Ok)
+    {
         Say(label, "accepted, and should not have been");
         return;
     }
@@ -37,15 +42,21 @@ void Refuse(String label, String text) {
 // ---------------------------------------------------------------- the mapping
 
 [Reflect]
-public class Address {
+public class Address
+{
     public String City;
     public String Country;
 
-    public Address() { City = ""; Country = ""; }
+    public Address()
+    {
+        City = "";
+        Country = "";
+    }
 }
 
 [Reflect]
-public class Person {
+public class Person
+{
     public String Name;
     public int Years;
     public bool Active;
@@ -62,7 +73,8 @@ public class Person {
     // A nested object is walked rather than stopped at.
     public Address Where;
 
-    public Person() {
+    public Person()
+    {
         Name = "";
         Years = 0;
         Active = false;
@@ -78,14 +90,16 @@ public class Person {
 // walked is left out rather than misstated -- writing `null` for it says the
 // value was absent when it was not.
 [Reflect]
-public class Bag {
+public class Bag
+{
     public String Name;
     public String[] Tags;
     public List<String> More;
     public Plain Untagged;
     public int[] Counts;
 
-    public Bag() {
+    public Bag()
+    {
         Name = "kept";
         Tags = new String[2];
         More = new List<String>();
@@ -97,12 +111,14 @@ public class Bag {
 }
 
 // A class with no [Reflect] of its own: nothing to walk, so nothing written.
-public class Plain {
+public class Plain
+{
     public int Value;
-    public Plain() { Value = 1; }
+    public Plain() => Value = 1;
 }
 
-public int Main() {
+public int Main()
+{
     // ------------------------------------------------------- round trips
     Round("empty-object", "{}");
     Round("empty-array", "[]");

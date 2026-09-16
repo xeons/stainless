@@ -5,17 +5,19 @@ import Standard.Console;
 
 extern "C" int printf(byte* format, ...);
 
-class Person {
-    String name;
+class Person
+{
+    String _name;
 
-    Person(String who) { name = who; }
-    ~Person() { Console.Write("~Person "); Console.WriteLine(name); }
+    Person(String who) => _name = who;
+    ~Person() { Console.Write("~Person "); Console.WriteLine(_name); }
 
-    public String Name() { return name; }
-    public String Greeting() { return "Hello, " + name; }
+    public String Name() => _name;
+    public String Greeting() => "Hello, " + _name;
 }
 
-int Main() {
+int Main()
+{
     String a = "Hello";
     String b = "World";
     Console.WriteLine(a + ", " + b + "!");
@@ -43,7 +45,8 @@ int Main() {
 
     // Each iteration makes two temporaries that must be released on the spot.
     String accumulated = "";
-    for (int i = 0; i < 3; i = i + 1) {
+    for (int i = 0; i < 3; i = i + 1)
+    {
         accumulated = accumulated + Text.FromInteger(i) + ",";
     }
     Console.WriteLine(accumulated);

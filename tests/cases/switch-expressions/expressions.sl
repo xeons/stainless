@@ -14,7 +14,8 @@ import Standard.Text;
 
 public enum Level { Low, Warning, Severe }
 
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
@@ -23,24 +24,30 @@ public variant Shape {
 public class Node { }
 public class Leaf : Node { public int Value = 4; }
 
-String Describe(Level level) {
-    return level switch {
+String Describe(Level level)
+{
+    return level switch
+    {
         Level.Low => "low",
         Level.Warning => "warning",
         _ => "severe",
     };
 }
 
-double Area(Shape shape) {
-    return shape switch {
+double Area(Shape shape)
+{
+    return shape switch
+    {
         Circle c => 3.14159 * c.Radius * c.Radius,
         Rect r => r.Width * r.Height,
         Empty => 0.0,
     };
 }
 
-String Size(int n) {
-    return n switch {
+String Size(int n)
+{
+    return n switch
+    {
         < 0 => "negative",
         0 => "zero",
         1 or 2 => "small",
@@ -49,22 +56,27 @@ String Size(int n) {
     };
 }
 
-String Guarded(Shape shape) {
-    return shape switch {
+String Guarded(Shape shape)
+{
+    return shape switch
+    {
         Circle c when c.Radius > 10.0 => "big circle",
         Circle c => "circle " + Text.FromDouble(c.Radius),
         _ => "other",
     };
 }
 
-String Kind(Node node) {
-    return node switch {
+String Kind(Node node)
+{
+    return node switch
+    {
         Leaf leaf => "leaf " + Text.FromInteger(leaf.Value),
         _ => "node",
     };
 }
 
-int Main() {
+int Main()
+{
     Console.WriteLine(Describe(Level.Low));
     Console.WriteLine(Describe(Level.Severe));
 
