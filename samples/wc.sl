@@ -170,7 +170,7 @@ int Main(String[] args)
         wanted.Everything();
 
     // Nothing named means standard input, which is what makes it a filter.
-    if (files.Count() == 0u)
+    if (files.Count == 0u)
     {
         Report(wanted, Tally(Console.ReadToEnd()), "");
         return 0;
@@ -199,7 +199,7 @@ int Main(String[] args)
     }
 
     // A total only when there was more than one file to total, as `wc` does.
-    if (files.Count() > 1u)
+    if (files.Count > 1u)
         Report(wanted, total, "total");
 
     if (failures > 0)

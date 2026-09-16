@@ -27,7 +27,7 @@ lexer threw them away with every other comment. They are a token's
 `Documentation` now, carried to the declaration and onto the symbol. It reads
 syntax rather than a bound program, against what this entry assumed -- a
 generic emits nothing until it is instantiated, so `List<T>` and
-`Dictionary<K, V>` have no bound symbol to walk.
+`Dictionary<TKey, TValue>` have no bound symbol to walk.
 
 **Comments that say what the code does.** Smaller than it read. Splitting
 `///` from `//` is what made it tractable: a block is documentation and keeps
@@ -61,18 +61,27 @@ style for months, and nothing said so. What a reviewer should be spending
 attention on is §1.4 and §2.1 — whether a name promises the right thing, whether
 a method should have been a property — and neither of those is mechanical.
 
-### The zero-argument methods that should be properties
+### A built-in member that is a property
 
-`Count()`, `IsEmpty()`, `Name()`, `CanRead()`, `Capacity()` are facts about an
-object written as calls; [docs/style.md §2.1](docs/style.md#21-a-property-or-a-method)
-is the rule and roughly 460 declarations disagree with it. Deliberately left
-out of the layout passes: it changes the public surface, so it moves the
-specification, `docs/stdlib/`, the samples and `tests/cases/` together, and it
-is worth reading rather than scripting — `Read()` and `MoveNext()` have side
-effects and stay methods, `FindForm()` does work and stays one.
+`IsEmpty` is the one question in [docs/style.md §2.1](docs/style.md#21-a-property-or-a-method)
+that is still a method, and not because the rule is unclear. `String` and
+`StringBuilder` get theirs from `Builtins.cs` as a `FunctionSymbol`, and there
+is no way to declare a built-in member as a property: the collections converted
+and these could not follow. Converting the collections alone would leave
+`list.IsEmpty` and `text.IsEmpty()` disagreeing, which is worse than either, so
+nothing moved.
 
-`OrderedDictionary<K, V>` and the other generics want `TKey`/`TValue` at the
-same time, since both are renames of the same surface.
+`Length` on an array is the shape to copy — `Binder.MemberAccess` answers it
+without parentheses as a special case — but a case per name is not the fix. What
+is wanted is a `PropertySymbol` a built-in type can carry, which would also let
+`String.ByteLength` and `Array.Length` stop being two different mechanisms.
+
+**Why it matters**: it is the only place the standard says one thing and the
+standard library does another, and every such place is an argument for ignoring
+the rest of it.
+
+*Touches:* `Builtins.cs`, `Binder.MemberAccess`, `stdlib/Text.sl`, and the
+`IsEmpty()` call sites across the tree.
 
 ### x86 and ARM64
 
@@ -445,7 +454,7 @@ Kept here so the reasoning does not have to be rediscovered.
   Interfaces already give multiple types without multiple state.
 - **Exceptions.** Unwinding needs metadata on every frame and a personality
   routine, and a failure that travels invisibly through code that did not
-  mention it is the thing `Result<T, E>` exists to refuse.
+  mention it is the thing `Result<T, TError>` exists to refuse.
 - **A C-style preprocessor.** `#if` and its relatives exist because choosing
   between two platforms is a real question. Macros and `#include` are not: a
   name always means itself.

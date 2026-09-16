@@ -111,7 +111,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// stack ran out, because `gtk_check_menu_item_set_active` emits
     /// `activate` and the guard was not guarding. Win32 never had the problem
     /// -- `CheckMenuItem` raises nothing at all.
-    bool Echoing() => _echoing;
+    bool Echoing => _echoing;
 
     public GtkMenuItemPeer(GtkWidget* made, IMenuItemNotify owner)
     {
@@ -120,7 +120,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
 
         ConnectPlain(_item, "activate", () =>
         {
-            if (Echoing())
+            if (Echoing)
                 return;
             owner.OnPlatformMenuClicked();
         });
@@ -129,7 +129,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// The widget's address. Win32 needs a number because its items share a
     /// window and a `WM_COMMAND` carries nothing else; here the item *is* the
     /// thing that was activated.
-    public nuint Id() => (nuint)(void*)_item;
+    public nuint Id => (nuint)(void*)_item;
 
     public void SetText(String text)
     {
@@ -155,7 +155,7 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// approximating it with markup that would not match the theme.
     public void SetDefault(bool isDefault) { }
 
-    public GtkWidget* Widget() => _item;
+    public GtkWidget* Widget => _item;
 }
 
 // ================================================================ a menu
@@ -183,7 +183,7 @@ public class GtkMenuPeer : IMenuPeer
         _menu = null;
     }
 
-    public nuint Handle() => (nuint)(void*)_menu;
+    public nuint Handle => (nuint)(void*)_menu;
 
     /// Adds a command, or a heading when `submenu` is given.
     ///
@@ -203,7 +203,7 @@ public class GtkMenuPeer : IMenuPeer
             : gtk_check_menu_item_new_with_mnemonic(label.ToPointer());
         if (submenu != null)
         {
-            gtk_menu_item_set_submenu(made, ((GtkMenuPeer)submenu).Widget());
+            gtk_menu_item_set_submenu(made, ((GtkMenuPeer)submenu).Widget);
         }
 
         gtk_menu_shell_append(_menu, made);
@@ -222,7 +222,7 @@ public class GtkMenuPeer : IMenuPeer
 
     public void Clear()
     {
-        for (nuint i = 0u; i < _items.Count(); i++)
+        for (nuint i = 0u; i < _items.Count; i++)
         {
             gtk_container_remove(_menu, _items[i]);
         }
@@ -254,7 +254,7 @@ public class GtkMenuPeer : IMenuPeer
         Disconnect(_menu, id);
     }
 
-    public GtkWidget* Widget() => _menu;
+    public GtkWidget* Widget => _menu;
 }
 
 #endif

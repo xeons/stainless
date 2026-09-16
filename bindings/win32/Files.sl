@@ -82,7 +82,7 @@ public bool IsDirectory(String path)
 public String FullPath(String path)
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetFullPathNameW(path.ToUtf16().ToPointer(), buffer.Capacity(),
+    uint units = GetFullPathNameW(path.ToUtf16().ToPointer(), buffer.Capacity,
                                   buffer.Pointer(), null);
     if (units == 0u)
         return "";
@@ -94,7 +94,7 @@ public String FullPath(String path)
 public String TempPath()
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetTempPathW(buffer.Capacity(), buffer.Pointer());
+    uint units = GetTempPathW(buffer.Capacity, buffer.Pointer());
     if (units == 0u)
         return "";
     return buffer.Text(units);

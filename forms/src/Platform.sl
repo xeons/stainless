@@ -246,7 +246,7 @@ public interface IControlPeer
     void Update();
 
     void Focus();
-    bool HasFocus();
+    bool HasFocus { get; }
 
     /// What the pointer looks like over this control.
     void SetCursor(CursorKind cursor);
@@ -263,7 +263,7 @@ public interface IControlPeer
     /// is `ClientOrigin`, and keeping the two apart is what makes a control
     /// placed at (0, 0) land in the same place whether its parent has a frame
     /// or not.
-    Rectangle ClientBounds();
+    Rectangle ClientBounds { get; }
 
     /// Where the client area begins inside the widget.
     ///
@@ -273,17 +273,17 @@ public interface IControlPeer
     /// placed there would be drawn over them -- so the offset is added when a
     /// child's bounds are pushed down, and taken off again when the platform
     /// reports where one ended up.
-    Point ClientOrigin();
+    Point ClientOrigin { get; }
 
     /// What the platform thinks this control ought to be, given its text and
     /// font. What `AutoSize` uses, and the reason a button sized to its caption
     /// looks native rather than merely close.
-    Size PreferredSize();
+    Size PreferredSize { get; }
 
     /// The platform's handle, as an integer. For reaching an API this layer
     /// does not wrap -- an `HWND` on Windows, a `GtkWidget*` on GTK. Zero if
     /// the peer has no handle yet.
-    nuint Handle();
+    nuint Handle { get; }
 
     void Destroy();
 }
@@ -402,7 +402,7 @@ public interface IListPeer : IControlPeer
     void InsertItem(int index, String text);
     void RemoveItem(int index);
     void ClearItems();
-    int  ItemCount();
+    int ItemCount { get; }
     void SetSelectedIndex(int index);
     /// -1 when nothing is selected, which is what every platform reports and
     /// what the control layer turns into something better.
@@ -448,7 +448,7 @@ public interface IHeaderPeer : IControlPeer
     int AddSection(String text, int width);
     void SetSectionWidth(int index, int width);
     int  GetSectionWidth(int index);
-    int  SectionCount();
+    int SectionCount { get; }
 }
 
 /// A panel: a plain container with an optional border.
@@ -511,10 +511,10 @@ public interface ILabelPeer : IControlPeer
 /// A picture, loaded once and drawn many times.
 public interface IBitmapBackend
 {
-    int Width();
-    int Height();
+    int Width { get; }
+    int Height { get; }
     /// The platform's handle -- an `HBITMAP` on Windows.
-    nuint Handle();
+    nuint Handle { get; }
 }
 
 /// Same-sized pictures, indexed by number.
@@ -526,9 +526,9 @@ public interface IImageListBackend
 {
     /// Adds a picture and answers its index.
     int Add(IBitmapBackend picture);
-    int Count();
-    Size ImageSize();
-    nuint Handle();
+    int Count { get; }
+    Size ImageSize { get; }
+    nuint Handle { get; }
 }
 
 // ------------------------------------------------------------------- menus
@@ -547,7 +547,7 @@ public interface IMenuItemPeer
     /// On Windows it is the command id `WM_COMMAND` will carry, which is the
     /// only thing that identifies a chosen item -- so it is also what a program
     /// needs to know if it is going to talk to the menu directly.
-    nuint Id();
+    nuint Id { get; }
 
     void SetText(String text);
     void SetEnabled(bool enabled);
@@ -563,7 +563,7 @@ public interface IMenuPeer
 {
     /// The platform's handle -- an `HMENU` on Windows -- for reaching a call
     /// this layer does not wrap.
-    nuint Handle();
+    nuint Handle { get; }
 
     /// Adds a command. `submenu` makes it a heading rather than a command, and
     /// an item with one raises nothing when chosen.
@@ -637,10 +637,10 @@ public interface ITabControlPeer : IContainerPeer
     void SetSelectedTab(int index);
     int  GetSelectedTab();
     /// How many tabs the control has.
-    int  TabCount();
+    int TabCount { get; }
     /// The area inside the tabs, where a page's controls go. Not the client
     /// area: the tabs themselves are part of that.
-    Rectangle PageArea();
+    Rectangle PageArea { get; }
     void SetImages(IImageListBackend images);
 }
 
@@ -653,7 +653,7 @@ public interface ITreeNodeHandle
     /// Two handles naming the same node are not necessarily the same object --
     /// a backend asked which node is selected may wrap the answer afresh each
     /// time -- so identity is this number rather than the reference.
-    nuint Id();
+    nuint Id { get; }
 }
 
 public interface ITreeViewPeer : IControlPeer
@@ -687,7 +687,7 @@ public interface IListViewPeer : IControlPeer
     String GetCell(int row, int column);
     void RemoveRow(int row);
     void Clear();
-    int  RowCount();
+    int RowCount { get; }
     int  GetSelectedRow();
     void SetSelectedRow(int row);
     void SetImages(IImageListBackend images);
@@ -717,13 +717,13 @@ public interface ITimerPeer
 /// once however many controls share the font.
 public interface IFontBackend
 {
-    nuint Handle();
+    nuint Handle { get; }
 }
 
 /// The platform's drawing surface, behind `Graphics`.
 public interface IGraphicsBackend
 {
-    Rectangle ClipBounds();
+    Rectangle ClipBounds { get; }
 
     /// Narrows drawing to `bounds` and moves the origin to its corner, so that
     /// whatever draws next works in its own coordinates and cannot draw outside
@@ -856,7 +856,7 @@ public interface IWidgetSet
 
     /// Whether there is text to be had. What a paste command greys itself out
     /// on, and cheaper than fetching the text to find out.
-    bool ClipboardHasText();
+    bool ClipboardHasText { get; }
 
     // ------------------------------------------------------------ dialogs
     //
@@ -899,10 +899,10 @@ public interface IWidgetSet
     Font DefaultFont();
 
     /// The whole screen, in pixels.
-    Size ScreenSize();
+    Size ScreenSize { get; }
     /// The part of it not covered by a task bar, which is what a window should
     /// be centred in and maximised to.
-    Rectangle WorkArea();
+    Rectangle WorkArea { get; }
 
     // ------------------------------------------------------------ the loop
 
@@ -953,5 +953,5 @@ public static class WidgetSet
 
     /// Whether one has been set, for code that must not trigger the failure
     /// above -- a destructor running during shutdown, most of all.
-    public static bool IsReady() => s_current != null;
+    public static bool IsReady => s_current != null;
 }

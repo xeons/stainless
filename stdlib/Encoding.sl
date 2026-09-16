@@ -60,10 +60,10 @@ public enum EncodingError
 public interface IEncoding
 {
     /// The name IANA gives it, which is also what an HTTP header would carry.
-    String Name();
+    String Name { get; }
 
     /// The bytes that mark this encoding at the start of a file, if any.
-    byte[] Preamble();
+    byte[] Preamble { get; }
 
     /// How many bytes `GetBytes` would produce. Costs a pass, saves an
     /// allocation.
@@ -139,7 +139,7 @@ public IEncoding? Detect(byte[] bytes)
 /// `bytes` without the byte order mark `encoding` writes, if it is there.
 public byte[] WithoutPreamble(IEncoding encoding, byte[] bytes)
 {
-    var mark = encoding.Preamble();
+    var mark = encoding.Preamble;
     if (mark.Length == 0 || !StartsWith(bytes, mark))
         return bytes;
     return Tail(bytes, mark.Length);
@@ -155,11 +155,11 @@ public byte[] WithoutPreamble(IEncoding encoding, byte[] bytes)
 public class Utf8Encoding : IEncoding
 {
     /// `"utf-8"`.
-    public String Name() => "utf-8";
+    public String Name => "utf-8";
 
     /// EF BB BF. UTF-8 needs no byte order mark -- there is only one order --
     /// so this is what to *recognise*, not what to write by habit.
-    public byte[] Preamble() => [0xEF, 0xBB, 0xBF];
+    public byte[] Preamble => [0xEF, 0xBB, 0xBF];
 
     /// The length the text already has. O(1), since no transcode is needed.
     public nuint GetByteCount(String text) => text.ByteLength();
@@ -246,16 +246,19 @@ public class Utf16Encoding : IEncoding
     public Utf16Encoding(bool big) => _bigEndian = big;
 
     /// `"utf-16be"` or `"utf-16le"`, whichever this is.
-    public String Name() => _bigEndian ? "utf-16be" : "utf-16le";
+    public String Name => _bigEndian ? "utf-16be" : "utf-16le";
     // Written as an if rather than a ternary: an array literal takes its type
     // from where it is going, and a ternary arm is not somewhere that says.
     /// FE FF big-endian, FF FE little. Worth writing here, unlike UTF-8's:
     /// without it there is no way to tell the two orders apart.
-    public byte[] Preamble()
+    public byte[] Preamble
     {
-        if (_bigEndian)
-            return [0xFE, 0xFF];
-        return [0xFF, 0xFE];
+        get
+        {
+            if (_bigEndian)
+                return [0xFE, 0xFF];
+            return [0xFF, 0xFE];
+        }
     }
 
     /// Every scalar, in one unit or two.
@@ -266,7 +269,7 @@ public class Utf16Encoding : IEncoding
     public nuint GetByteCount(String text) => text.ToUtf16().UnitCount() * 2;
 
     /// The text as UTF-16 in this byte order, with no byte order mark --
-    /// prepend `Preamble()` if the reader will need one.
+    /// prepend `Preamble` if the reader will need one.
     public byte[] GetBytes(String text)
     {
         var wide = text.ToUtf16();
@@ -380,15 +383,18 @@ public class Utf32Encoding : IEncoding
     public Utf32Encoding(bool big) => _bigEndian = big;
 
     /// `"utf-32be"` or `"utf-32le"`, whichever this is.
-    public String Name() => _bigEndian ? "utf-32be" : "utf-32le";
+    public String Name => _bigEndian ? "utf-32be" : "utf-32le";
 
     /// Four bytes, and the little-endian one begins with UTF-16LE's -- which
     /// is why `Detect` tests UTF-32 first.
-    public byte[] Preamble()
+    public byte[] Preamble
     {
-        if (_bigEndian)
-            return [0x00, 0x00, 0xFE, 0xFF];
-        return [0xFF, 0xFE, 0x00, 0x00];
+        get
+        {
+            if (_bigEndian)
+                return [0x00, 0x00, 0xFE, 0xFF];
+            return [0xFF, 0xFE, 0x00, 0x00];
+        }
     }
 
     /// Every scalar, in exactly four bytes.
@@ -497,10 +503,10 @@ public abstract class SingleByteEncoding : IEncoding
     public abstract int FromScalar(char32 scalar);
 
     /// The IANA name, which each subclass supplies.
-    public abstract String Name();
+    public abstract String Name { get; }
 
     /// None of these has one: a byte order mark is a Unicode idea.
-    public byte[] Preamble() => [];
+    public byte[] Preamble => [];
 
     /// Whether the table has a byte for that scalar. Most of Unicode is not in
     /// any of these tables, so this is false far more often than it is true.
@@ -549,7 +555,7 @@ public abstract class SingleByteEncoding : IEncoding
 public class AsciiEncoding : SingleByteEncoding
 {
     /// `"us-ascii"`.
-    public override String Name() => "us-ascii";
+    public override String Name => "us-ascii";
 
     /// The byte itself below 128, and U+FFFD at or above it.
     public override char32 ToScalar(byte value)
@@ -570,7 +576,7 @@ public class AsciiEncoding : SingleByteEncoding
 public class Latin1Encoding : SingleByteEncoding
 {
     /// `"iso-8859-1"`.
-    public override String Name() => "iso-8859-1";
+    public override String Name => "iso-8859-1";
 
     /// Byte n is code point n, for every n. Never U+FFFD, which is what makes
     /// this encoding able to carry any byte sequence at all.
@@ -590,7 +596,7 @@ public class Latin1Encoding : SingleByteEncoding
 public class Windows1252Encoding : SingleByteEncoding
 {
     /// `"windows-1252"`.
-    public override String Name() => "windows-1252";
+    public override String Name => "windows-1252";
 
     /// Latin-1 outside 0x80 to 0x9F, and the punctuation table inside it.
     /// Five of those 32 positions are unassigned and read as U+FFFD.

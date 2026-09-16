@@ -20,7 +20,7 @@ atomic now, so that half is closed; the lifetime half is not, and it is the
 half this design was already the answer to.
 
 So these types lock a raw mutex directly rather than using `Mutex<T>` from
-Standard.Threading, whose `Guard.Value()` is exactly the hand-out that
+Standard.Threading, whose `Guard.Value` is exactly the hand-out that
 cannot be made safe this way. See the note there.
 
 The API differs from the single-threaded one in one further way, and it is
@@ -31,7 +31,7 @@ fail says so in its result.
 
 ## Contents
 
-**Types** &nbsp; [Channel&lt;T&gt;](#channelt-class) &middot; [ConcurrentDictionary&lt;K, V&gt;](#concurrentdictionaryk-v-class) &middot; [ConcurrentQueue&lt;T&gt;](#concurrentqueuet-class) &middot; [ConcurrentStack&lt;T&gt;](#concurrentstackt-class) &middot; [Taken&lt;T&gt;](#takent-class)
+**Types** &nbsp; [Channel&lt;T&gt;](#channelt-class) &middot; [ConcurrentDictionary&lt;TKey, TValue&gt;](#concurrentdictionarytkey-tvalue-class) &middot; [ConcurrentQueue&lt;T&gt;](#concurrentqueuet-class) &middot; [ConcurrentStack&lt;T&gt;](#concurrentstackt-class) &middot; [Taken&lt;T&gt;](#takent-class)
 
 ## Types
 
@@ -55,7 +55,7 @@ still delivered, and once it is drained every `Take` returns at once with
     // consumer:  var got = channel.Take();
     //            while (got.Ok) { use(got.Value); got = channel.Take(); }
 
-<sub>[stdlib/Concurrent.sl:416](../../stdlib/Concurrent.sl#L416)</sub>
+<sub>[stdlib/Concurrent.sl:425](../../stdlib/Concurrent.sl#L425)</sub>
 
 #### Send *method*
 
@@ -66,7 +66,7 @@ bool Send(T item)
 Adds an item and wakes one waiter. Sending to a closed channel changes
 nothing and reports false.
 
-<sub>[stdlib/Concurrent.sl:444](../../stdlib/Concurrent.sl#L444)</sub>
+<sub>[stdlib/Concurrent.sl:453](../../stdlib/Concurrent.sl#L453)</sub>
 
 #### Take *method*
 
@@ -77,7 +77,7 @@ Taken<T> Take()
 Waits for an item. Returns `Ok` false once the channel is closed and
 drained, and not before.
 
-<sub>[stdlib/Concurrent.sl:462](../../stdlib/Concurrent.sl#L462)</sub>
+<sub>[stdlib/Concurrent.sl:471](../../stdlib/Concurrent.sl#L471)</sub>
 
 #### TryTake *method*
 
@@ -87,7 +87,7 @@ Taken<T> TryTake()
 
 Takes an item if one is there already, without waiting.
 
-<sub>[stdlib/Concurrent.sl:486](../../stdlib/Concurrent.sl#L486)</sub>
+<sub>[stdlib/Concurrent.sl:495](../../stdlib/Concurrent.sl#L495)</sub>
 
 #### Close *method*
 
@@ -97,111 +97,111 @@ void Close()
 
 Says there will be no more, and wakes everyone waiting. Idempotent.
 
-<sub>[stdlib/Concurrent.sl:502](../../stdlib/Concurrent.sl#L502)</sub>
+<sub>[stdlib/Concurrent.sl:511](../../stdlib/Concurrent.sl#L511)</sub>
 
-#### IsClosed *method*
+#### IsClosed *property*
 
 ```
-bool IsClosed()
+bool IsClosed { get; }
 ```
 
 Whether `Close` has been called. A closed channel may still have items
 in it: this answers whether more can be sent, not whether more can be
 taken. `Take`'s `Ok` is what answers that.
 
-<sub>[stdlib/Concurrent.sl:513](../../stdlib/Concurrent.sl#L513)</sub>
+<sub>[stdlib/Concurrent.sl:522](../../stdlib/Concurrent.sl#L522)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items are waiting *now* -- the producer's backlog. For
 reporting rather than for deciding; a consumer should call `Take`.
 
-<sub>[stdlib/Concurrent.sl:523](../../stdlib/Concurrent.sl#L523)</sub>
+<sub>[stdlib/Concurrent.sl:535](../../stdlib/Concurrent.sl#L535)</sub>
 
-### ConcurrentDictionary&lt;K, V&gt; *class*
+### ConcurrentDictionary&lt;TKey, TValue&gt; *class*
 
 ```
-threadsafe class ConcurrentDictionary<K, V>
-    where K : IEquatable<K>, IHashable
+threadsafe class ConcurrentDictionary<TKey, TValue>
+    where TKey : IEquatable<TKey>, IHashable
 ```
 
 A map several threads may use at once.
 
-<sub>[stdlib/Concurrent.sl:272](../../stdlib/Concurrent.sl#L272)</sub>
+<sub>[stdlib/Concurrent.sl:278](../../stdlib/Concurrent.sl#L278)</sub>
 
 #### Set *method*
 
 ```
-void Set(K key, V value)
+void Set(TKey key, TValue value)
 ```
 
 Sets the value of a key, whether or not it was there. `Add` is the one
 that refuses to overwrite.
 
-<sub>[stdlib/Concurrent.sl:290](../../stdlib/Concurrent.sl#L290)</sub>
+<sub>[stdlib/Concurrent.sl:296](../../stdlib/Concurrent.sl#L296)</sub>
 
 #### Add *method*
 
 ```
-bool Add(K key, V value)
+bool Add(TKey key, TValue value)
 ```
 
 Adds the key only if it is absent, reporting whether it did. This is the
 operation `ContainsKey` followed by `Set` cannot be: between those two
 another thread can insert.
 
-<sub>[stdlib/Concurrent.sl:300](../../stdlib/Concurrent.sl#L300)</sub>
+<sub>[stdlib/Concurrent.sl:306](../../stdlib/Concurrent.sl#L306)</sub>
 
 #### TryGet *method*
 
 ```
-Taken<V> TryGet(K key)
+Taken<TValue> TryGet(TKey key)
 ```
 
 The value for `key` if it is there. One lock rather than two, which is
 what makes it different from `ContainsKey` followed by a lookup:
 between those two another thread can remove the key.
 
-<sub>[stdlib/Concurrent.sl:311](../../stdlib/Concurrent.sl#L311)</sub>
+<sub>[stdlib/Concurrent.sl:317](../../stdlib/Concurrent.sl#L317)</sub>
 
 #### GetOr *method*
 
 ```
-V GetOr(K key, V fallback)
+TValue GetOr(TKey key, TValue fallback)
 ```
 
 The value for `key`, or `fallback` when it is absent. No allocation,
 at the cost of being unable to tell an absent key from one whose value
 happens to equal the fallback.
 
-<sub>[stdlib/Concurrent.sl:329](../../stdlib/Concurrent.sl#L329)</sub>
+<sub>[stdlib/Concurrent.sl:335](../../stdlib/Concurrent.sl#L335)</sub>
 
 #### ContainsKey *method*
 
 ```
-bool ContainsKey(K key)
+bool ContainsKey(TKey key)
 ```
 
 Whether the key is there *now*. True here does not mean the next
 `TryGet` succeeds -- another thread may remove it in between -- so this
 is for reporting, and `TryGet` is for acting.
 
-<sub>[stdlib/Concurrent.sl:340](../../stdlib/Concurrent.sl#L340)</sub>
+<sub>[stdlib/Concurrent.sl:346](../../stdlib/Concurrent.sl#L346)</sub>
 
 #### Remove *method*
 
 ```
-bool Remove(K key)
+bool Remove(TKey key)
 ```
 
 Removes a key, answering whether it was there. The answer is exact:
 exactly one of several threads racing to remove the same key gets true.
 
-<sub>[stdlib/Concurrent.sl:350](../../stdlib/Concurrent.sl#L350)</sub>
+<sub>[stdlib/Concurrent.sl:356](../../stdlib/Concurrent.sl#L356)</sub>
 
 #### Clear *method*
 
@@ -211,17 +211,17 @@ void Clear()
 
 Drops every entry, under one lock.
 
-<sub>[stdlib/Concurrent.sl:359](../../stdlib/Concurrent.sl#L359)</sub>
+<sub>[stdlib/Concurrent.sl:365](../../stdlib/Concurrent.sl#L365)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many entries there are *now*. For reporting rather than deciding.
 
-<sub>[stdlib/Concurrent.sl:367](../../stdlib/Concurrent.sl#L367)</sub>
+<sub>[stdlib/Concurrent.sl:373](../../stdlib/Concurrent.sl#L373)</sub>
 
 #### IsEmpty *method*
 
@@ -231,23 +231,23 @@ bool IsEmpty()
 
 Whether it is empty *now*, with the same caveat as `Count`.
 
-<sub>[stdlib/Concurrent.sl:376](../../stdlib/Concurrent.sl#L376)</sub>
+<sub>[stdlib/Concurrent.sl:385](../../stdlib/Concurrent.sl#L385)</sub>
 
 #### Keys *method*
 
 ```
-List<K> Keys()
+List<TKey> Keys()
 ```
 
 A snapshot of the keys. Out of date the moment it is returned, which is
 why it is a copy rather than a view.
 
-<sub>[stdlib/Concurrent.sl:380](../../stdlib/Concurrent.sl#L380)</sub>
+<sub>[stdlib/Concurrent.sl:389](../../stdlib/Concurrent.sl#L389)</sub>
 
 #### Values *method*
 
 ```
-List<V> Values()
+List<TValue> Values()
 ```
 
 A snapshot of the values, in the same order as `Keys` when neither is
@@ -255,7 +255,7 @@ interleaved with a write. Out of date the moment it is returned, and
 pairing the two lists after the fact is not safe -- iterate the map if
 the pairing matters.
 
-<sub>[stdlib/Concurrent.sl:392](../../stdlib/Concurrent.sl#L392)</sub>
+<sub>[stdlib/Concurrent.sl:401](../../stdlib/Concurrent.sl#L401)</sub>
 
 ### ConcurrentQueue&lt;T&gt; *class*
 
@@ -301,10 +301,10 @@ Takes the front item, or `fallback` when there is none. The same as
 
 <sub>[stdlib/Concurrent.sl:141](../../stdlib/Concurrent.sl#L141)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items there are *now*. Another thread may change it before you
@@ -322,7 +322,7 @@ Whether it is empty *now*. Another thread may enqueue before you act on
 the answer, so a true here does not mean the next `TryDequeue` fails.
 Reach for `TryDequeue` and read its `Ok` instead.
 
-<sub>[stdlib/Concurrent.sl:169](../../stdlib/Concurrent.sl#L169)</sub>
+<sub>[stdlib/Concurrent.sl:172](../../stdlib/Concurrent.sl#L172)</sub>
 
 #### ToList *method*
 
@@ -333,7 +333,7 @@ List<T> ToList()
 A snapshot, oldest first. Consistent with itself, and out of date the
 moment it is returned.
 
-<sub>[stdlib/Concurrent.sl:173](../../stdlib/Concurrent.sl#L173)</sub>
+<sub>[stdlib/Concurrent.sl:176](../../stdlib/Concurrent.sl#L176)</sub>
 
 ### ConcurrentStack&lt;T&gt; *class*
 
@@ -343,7 +343,7 @@ threadsafe class ConcurrentStack<T>
 
 A last-in, first-out stack several threads may use at once.
 
-<sub>[stdlib/Concurrent.sl:185](../../stdlib/Concurrent.sl#L185)</sub>
+<sub>[stdlib/Concurrent.sl:188](../../stdlib/Concurrent.sl#L188)</sub>
 
 #### Push *method*
 
@@ -353,7 +353,7 @@ void Push(T item)
 
 Adds to the top. Never waits for a consumer -- the stack is unbounded.
 
-<sub>[stdlib/Concurrent.sl:202](../../stdlib/Concurrent.sl#L202)</sub>
+<sub>[stdlib/Concurrent.sl:205](../../stdlib/Concurrent.sl#L205)</sub>
 
 #### TryPop *method*
 
@@ -365,7 +365,7 @@ Takes the top item if there is one. The answer and the item come back
 together, because asking whether it is empty and then popping would
 race with every other thread.
 
-<sub>[stdlib/Concurrent.sl:212](../../stdlib/Concurrent.sl#L212)</sub>
+<sub>[stdlib/Concurrent.sl:215](../../stdlib/Concurrent.sl#L215)</sub>
 
 #### PopOr *method*
 
@@ -377,18 +377,18 @@ Takes the top item, or `fallback` when there is none. The same as
 `TryPop` without the allocation, for when a sentinel will do -- which
 it will not if `fallback` is a value the stack might hold.
 
-<sub>[stdlib/Concurrent.sl:230](../../stdlib/Concurrent.sl#L230)</sub>
+<sub>[stdlib/Concurrent.sl:233](../../stdlib/Concurrent.sl#L233)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items there are *now*. For reporting rather than for
 deciding: another thread may change it before you act on it.
 
-<sub>[stdlib/Concurrent.sl:247](../../stdlib/Concurrent.sl#L247)</sub>
+<sub>[stdlib/Concurrent.sl:250](../../stdlib/Concurrent.sl#L250)</sub>
 
 #### IsEmpty *method*
 
@@ -398,7 +398,7 @@ bool IsEmpty()
 
 Whether it is empty *now*, with the same caveat as `Count`.
 
-<sub>[stdlib/Concurrent.sl:256](../../stdlib/Concurrent.sl#L256)</sub>
+<sub>[stdlib/Concurrent.sl:262](../../stdlib/Concurrent.sl#L262)</sub>
 
 #### ToList *method*
 
@@ -409,7 +409,7 @@ List<T> ToList()
 A snapshot, top first. Consistent with itself, and out of date the
 moment it is returned.
 
-<sub>[stdlib/Concurrent.sl:260](../../stdlib/Concurrent.sl#L260)</sub>
+<sub>[stdlib/Concurrent.sl:266](../../stdlib/Concurrent.sl#L266)</sub>
 
 ### Taken&lt;T&gt; *class*
 

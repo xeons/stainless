@@ -114,7 +114,7 @@ int Main()
     foreach (int n in numbers)
         total += n;
 
-    Console.WriteLine(Text.FromInteger(total) + " of " + Text.FromInteger((int)numbers.Count()));
+    Console.WriteLine(Text.FromInteger(total) + " of " + Text.FromInteger((int)numbers.Count));
 
     var names = new List<String> { "a", "b" };
     Console.WriteLine(", ".Join(names.ToArray()));

@@ -64,7 +64,7 @@ int Main()
 
     var server = opened.Value;
 
-    var address = server.LocalEndPoint();
+    var address = server.LocalEndPoint;
     Say("bound-host", address.Host);
     SayBool("bound-port", address.Port != 0u);
 
@@ -77,12 +77,12 @@ int Main()
 
     var client = dialled.Value;
 
-    // A TcpClient is an IStream, so its `Error()` rounds a SocketError off for
+    // A TcpClient is an IStream, so its `Error` rounds a SocketError off for
     // a reader that has never heard of a socket. On a live connection that is
     // None, which is the case worth pinning now that a failed connect yields
     // no client to ask.
-    SayBool("client-as-io", client.Error() == IOError.None);
-    SayBool("connected-family", client.Underlying().Family() == AddressFamily.Any);
+    SayBool("client-as-io", client.Error == IOError.None);
+    SayBool("connected-family", client.Underlying.Family == AddressFamily.Any);
 
     // And opening one directly with `Any` is an error rather than a guess,
     // because there is no socket of no family.
@@ -91,11 +91,11 @@ int Main()
     SayBool("any-says-why", !nofamily.Ok && nofamily.Error == SocketError.Invalid);
 
     var accepted = server.Accept();
-    SayBool("accepted", accepted.IsConnected());
+    SayBool("accepted", accepted.IsConnected);
 
     // The two ends agree about who is who.
-    var here = client.LocalEndPoint();
-    var there = client.RemoteEndPoint();
+    var here = client.LocalEndPoint;
+    var there = client.RemoteEndPoint;
     SayBool("peer-port", there.Port == address.Port);
     SayBool("peer-host", there.Host == "127.0.0.1");
     // The text, not the number: an ephemeral port is whatever the system had
@@ -106,7 +106,7 @@ int Main()
     // colons and the port would be indistinguishable from another group.
     Say("formatted-v6", EndPoint.At("::1", 80u).Format());
 
-    var seen = accepted.RemoteEndPoint();
+    var seen = accepted.RemoteEndPoint;
     SayBool("mirror", seen.Port == here.Port);
 
     // ------------------------------------------------------------- talking
@@ -124,27 +124,27 @@ int Main()
     // A `TcpClient` is an `IStream`, so anything written against one reads a
     // connection with nothing changed.
     IStream stream = accepted;
-    SayBool("stream-can-read", stream.CanRead());
-    SayBool("stream-can-write", stream.CanWrite());
-    SayBool("stream-can-seek", stream.CanSeek());
-    SayNumber("stream-length", stream.Length());
+    SayBool("stream-can-read", stream.CanRead);
+    SayBool("stream-can-write", stream.CanWrite);
+    SayBool("stream-can-seek", stream.CanSeek);
+    SayNumber("stream-length", stream.Length);
     SayBool("stream-seek", stream.Seek(0, SeekOrigin.Start));
 
     // ------------------------------------------------------------- endings
     //
     // Shutting down the sending half is how a protocol that ends by closing
     // says it has finished. The other end sees an ending rather than a reset.
-    client.Underlying().Shutdown(SocketShutdown.Send);
+    client.Underlying.Shutdown(SocketShutdown.Send);
 
     var rest = accepted.ReceiveAll();
     SayNumber("after-shutdown", (long)rest.Length);
-    SayBool("finished", !accepted.CanRead());
+    SayBool("finished", !accepted.CanRead);
 
     accepted.Close();
     client.Close();
     server.Close();
 
-    SayBool("closed", !client.IsConnected());
+    SayBool("closed", !client.IsConnected);
 
     // ------------------------------------------------------------------ UDP
     //
@@ -154,9 +154,9 @@ int Main()
         return 1;
 
     var listener = bound.Value;
-    SayBool("udp-open", listener.IsOpen());
+    SayBool("udp-open", listener.IsOpen);
 
-    var inbox = listener.LocalEndPoint();
+    var inbox = listener.LocalEndPoint;
     SayBool("udp-port", inbox.Port != 0u);
 
     var made = UdpSocket.Datagram();
@@ -194,7 +194,7 @@ int Main()
         return 1;
 
     var first = opening.Value;
-    var taken = first.LocalEndPoint().Port;
+    var taken = first.LocalEndPoint.Port;
     var second = TcpListener.Listen("127.0.0.1", taken);
     SayBool("second-listener", second.Ok);
 
@@ -208,7 +208,7 @@ int Main()
 
     var dead = reopened.Value;
     dead.Close();
-    SayBool("closed-listener", dead.IsListening());
+    SayBool("closed-listener", dead.IsListening);
 
     return 0;
 }

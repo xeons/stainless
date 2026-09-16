@@ -12,7 +12,7 @@ class Person
     Person(String who) => _name = who;
     ~Person() { Console.Write("~Person "); Console.WriteLine(_name); }
 
-    public String Name() => _name;
+    public String Name => _name;
     public String Greeting() => "Hello, " + _name;
 }
 
@@ -39,7 +39,7 @@ int Main()
     {
         var p = new Person("Ada");
         Console.WriteLine(p.Greeting());
-        Console.WriteLine(p.Name());
+        Console.WriteLine(p.Name);
     }
     Console.WriteLine("after scope");
 

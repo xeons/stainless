@@ -140,8 +140,8 @@ because that is where a reader looks for how to make one, and because a
 static method is inside the type: it can use the private constructor, which
 is what lets the failing path be closed off rather than merely discouraged.
 
-`IsOpen()` remains, because a stream can be closed after it was opened, and
-`Error()` remains for a failure during a read or a write -- those are
+`IsOpen` remains, because a stream can be closed after it was opened, and
+`Error` remains for a failure during a read or a write -- those are
 outcomes of an operation rather than of the opening, and there is nowhere
 else to put them.
 
@@ -190,10 +190,10 @@ Opens for writing at the end, creating the file if it is not there.
 
 <sub>[stdlib/IO.sl:277](../../stdlib/IO.sl#L277)</sub>
 
-#### IsOpen *method*
+#### IsOpen *property*
 
 ```
-bool IsOpen()
+bool IsOpen { get; }
 ```
 
 Whether the file is still open. False after `Close`, and after an
@@ -201,10 +201,10 @@ open that failed.
 
 <sub>[stdlib/IO.sl:286](../../stdlib/IO.sl#L286)</sub>
 
-#### CanRead *method*
+#### CanRead *property*
 
 ```
-bool CanRead()
+bool CanRead { get; }
 ```
 
 True while the file is open and was opened for reading. A file opened
@@ -213,20 +213,20 @@ returning nothing.
 
 <sub>[stdlib/IO.sl:291](../../stdlib/IO.sl#L291)</sub>
 
-#### CanWrite *method*
+#### CanWrite *property*
 
 ```
-bool CanWrite()
+bool CanWrite { get; }
 ```
 
 True while the file is open and was opened for writing.
 
 <sub>[stdlib/IO.sl:293](../../stdlib/IO.sl#L293)</sub>
 
-#### CanSeek *method*
+#### CanSeek *property*
 
 ```
-bool CanSeek()
+bool CanSeek { get; }
 ```
 
 True while the file is open. Every file is seekable, unlike a
@@ -243,7 +243,7 @@ nuint Read(byte[] buffer, nuint offset, nuint count)
 Reads up to `count` bytes into `buffer` at `offset`, answering how
 many it read.
 
-Zero means the end of the file, or a failure -- `Error()` is what tells
+Zero means the end of the file, or a failure -- `Error` is what tells
 the two apart. A count reaching past the end of `buffer` is refused as
 `Invalid` rather than overrunning it.
 
@@ -258,7 +258,7 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes `count` bytes from `buffer` at `offset`, answering how many it
 wrote.
 
-Fewer than asked for means the write was cut short, and `Error()` says
+Fewer than asked for means the write was cut short, and `Error` says
 why -- a full disk, usually. A count reaching past the end of `buffer`
 is refused as `Invalid`.
 
@@ -275,10 +275,10 @@ so nothing is converted or copied on the way.
 
 <sub>[stdlib/IO.sl:354](../../stdlib/IO.sl#L354)</sub>
 
-#### Position *method*
+#### Position *property*
 
 ```
-long Position()
+long Position { get; }
 ```
 
 How far into the file the next read or write will happen, or -1 when
@@ -286,17 +286,17 @@ the file is closed.
 
 <sub>[stdlib/IO.sl:372](../../stdlib/IO.sl#L372)</sub>
 
-#### Length *method*
+#### Length *property*
 
 ```
-long Length()
+long Length { get; }
 ```
 
 How many bytes the file holds, or -1 when it is closed. Asks the
 system each time rather than caching, so it sees a file another
 process has grown.
 
-<sub>[stdlib/IO.sl:382](../../stdlib/IO.sl#L382)</sub>
+<sub>[stdlib/IO.sl:385](../../stdlib/IO.sl#L385)</sub>
 
 #### Seek *method*
 
@@ -309,7 +309,7 @@ Moves the position, answering whether it worked.
 Seeking past the end is allowed and does not extend the file; the gap
 becomes zeroes when something is written there.
 
-<sub>[stdlib/IO.sl:393](../../stdlib/IO.sl#L393)</sub>
+<sub>[stdlib/IO.sl:399](../../stdlib/IO.sl#L399)</sub>
 
 #### Flush *method*
 
@@ -322,7 +322,7 @@ disk -- the system's own cache is still in front of it -- so this is
 what makes a write visible to other processes, not what makes it
 survive a power cut.
 
-<sub>[stdlib/IO.sl:411](../../stdlib/IO.sl#L411)</sub>
+<sub>[stdlib/IO.sl:417](../../stdlib/IO.sl#L417)</sub>
 
 #### Close *method*
 
@@ -333,19 +333,19 @@ void Close()
 Closes the file. Calling it twice is harmless, which matters because the
 destructor calls it too.
 
-<sub>[stdlib/IO.sl:419](../../stdlib/IO.sl#L419)</sub>
+<sub>[stdlib/IO.sl:425](../../stdlib/IO.sl#L425)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-IOError Error()
+IOError Error { get; }
 ```
 
 The last error, or `None`. Set by every call that failed and left
 alone by one that did not, so read it directly after the call it
 belongs to.
 
-<sub>[stdlib/IO.sl:431](../../stdlib/IO.sl#L431)</sub>
+<sub>[stdlib/IO.sl:437](../../stdlib/IO.sl#L437)</sub>
 
 ### IOError *enum*
 
@@ -472,14 +472,14 @@ A sequence of bytes that can be read, written, or both.
 
 Read and Write report how many bytes they moved, which for a read is how
 end-of-file is seen: fewer than asked for, and zero at the end. Whether
-that was an error rather than an ending is what `Error()` says.
+that was an error rather than an ending is what `Error` says.
 
 <sub>[stdlib/IO.sl:163](../../stdlib/IO.sl#L163)</sub>
 
-#### CanRead *method*
+#### CanRead *property*
 
 ```
-bool CanRead()
+bool CanRead { get; }
 ```
 
 Whether reading is allowed and possible now. False on a write-only
@@ -487,20 +487,20 @@ stream and on a closed one.
 
 <sub>[stdlib/IO.sl:167](../../stdlib/IO.sl#L167)</sub>
 
-#### CanWrite *method*
+#### CanWrite *property*
 
 ```
-bool CanWrite()
+bool CanWrite { get; }
 ```
 
 Whether writing is allowed and possible now.
 
 <sub>[stdlib/IO.sl:170](../../stdlib/IO.sl#L170)</sub>
 
-#### CanSeek *method*
+#### CanSeek *property*
 
 ```
-bool CanSeek()
+bool CanSeek { get; }
 ```
 
 Whether the position can be moved. False for a stream with no position
@@ -531,10 +531,10 @@ how many it wrote.
 
 <sub>[stdlib/IO.sl:183](../../stdlib/IO.sl#L183)</sub>
 
-#### Position *method*
+#### Position *property*
 
 ```
-long Position()
+long Position { get; }
 ```
 
 Where the next read or write will happen, or -1 when the stream has no
@@ -542,10 +542,10 @@ position.
 
 <sub>[stdlib/IO.sl:187](../../stdlib/IO.sl#L187)</sub>
 
-#### Length *method*
+#### Length *property*
 
 ```
-long Length()
+long Length { get; }
 ```
 
 How many bytes the stream holds, or -1 when it cannot say -- which is
@@ -586,10 +586,10 @@ scope is not leaked.
 
 <sub>[stdlib/IO.sl:203](../../stdlib/IO.sl#L203)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-IOError Error()
+IOError Error { get; }
 ```
 
 The last error, or `IOError.None`. Cleared by the next successful call.
@@ -608,37 +608,37 @@ The same interface as a file, with nothing behind it but memory: useful for
 building a payload before writing it, and for testing something that takes
 an `IStream` without touching a disk.
 
-<sub>[stdlib/IO.sl:441](../../stdlib/IO.sl#L441)</sub>
+<sub>[stdlib/IO.sl:447](../../stdlib/IO.sl#L447)</sub>
 
-#### CanRead *method*
-
-```
-bool CanRead()
-```
-
-Always true.
-
-<sub>[stdlib/IO.sl:466](../../stdlib/IO.sl#L466)</sub>
-
-#### CanWrite *method*
+#### CanRead *property*
 
 ```
-bool CanWrite()
+bool CanRead { get; }
 ```
 
 Always true.
 
-<sub>[stdlib/IO.sl:468](../../stdlib/IO.sl#L468)</sub>
+<sub>[stdlib/IO.sl:472](../../stdlib/IO.sl#L472)</sub>
 
-#### CanSeek *method*
+#### CanWrite *property*
 
 ```
-bool CanSeek()
+bool CanWrite { get; }
 ```
 
 Always true.
 
-<sub>[stdlib/IO.sl:470](../../stdlib/IO.sl#L470)</sub>
+<sub>[stdlib/IO.sl:474](../../stdlib/IO.sl#L474)</sub>
+
+#### CanSeek *property*
+
+```
+bool CanSeek { get; }
+```
+
+Always true.
+
+<sub>[stdlib/IO.sl:476](../../stdlib/IO.sl#L476)</sub>
 
 #### Read *method*
 
@@ -650,7 +650,7 @@ Reads up to `count` bytes into `buffer` at `offset`, answering how
 many it read. Zero means the position has reached the end; there is no
 failure to distinguish it from.
 
-<sub>[stdlib/IO.sl:475](../../stdlib/IO.sl#L475)</sub>
+<sub>[stdlib/IO.sl:481](../../stdlib/IO.sl#L481)</sub>
 
 #### Write *method*
 
@@ -664,7 +664,7 @@ needed and answering `count`.
 Writing over the middle replaces those bytes rather than inserting, so
 the length only grows when the position passes the old end.
 
-<sub>[stdlib/IO.sl:494](../../stdlib/IO.sl#L494)</sub>
+<sub>[stdlib/IO.sl:500](../../stdlib/IO.sl#L500)</sub>
 
 #### WriteText *method*
 
@@ -674,28 +674,28 @@ void WriteText(String text)
 
 Appends the UTF-8 bytes of `text`.
 
-<sub>[stdlib/IO.sl:510](../../stdlib/IO.sl#L510)</sub>
+<sub>[stdlib/IO.sl:516](../../stdlib/IO.sl#L516)</sub>
 
-#### Position *method*
+#### Position *property*
 
 ```
-long Position()
+long Position { get; }
 ```
 
 Where the next read or write will happen.
 
-<sub>[stdlib/IO.sl:525](../../stdlib/IO.sl#L525)</sub>
+<sub>[stdlib/IO.sl:531](../../stdlib/IO.sl#L531)</sub>
 
-#### Length *method*
+#### Length *property*
 
 ```
-long Length()
+long Length { get; }
 ```
 
 How many bytes have been written, measured to the furthest the
 position has ever reached -- not the capacity of the buffer behind it.
 
-<sub>[stdlib/IO.sl:528](../../stdlib/IO.sl#L528)</sub>
+<sub>[stdlib/IO.sl:534](../../stdlib/IO.sl#L534)</sub>
 
 #### Seek *method*
 
@@ -708,7 +708,7 @@ Moves the position, answering whether it worked.
 Unlike a file, seeking past the end is refused: there is nothing there
 to leave a gap in.
 
-<sub>[stdlib/IO.sl:534](../../stdlib/IO.sl#L534)</sub>
+<sub>[stdlib/IO.sl:540](../../stdlib/IO.sl#L540)</sub>
 
 #### Flush *method*
 
@@ -718,7 +718,7 @@ void Flush()
 
 Does nothing. There is nothing behind the buffer to push bytes to.
 
-<sub>[stdlib/IO.sl:549](../../stdlib/IO.sl#L549)</sub>
+<sub>[stdlib/IO.sl:555](../../stdlib/IO.sl#L555)</sub>
 
 #### Close *method*
 
@@ -728,17 +728,17 @@ void Close()
 
 Nothing to release; a memory stream stays usable after it.
 
-<sub>[stdlib/IO.sl:552](../../stdlib/IO.sl#L552)</sub>
+<sub>[stdlib/IO.sl:558](../../stdlib/IO.sl#L558)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-IOError Error()
+IOError Error { get; }
 ```
 
 Always `None`. Nothing a memory stream does can fail.
 
-<sub>[stdlib/IO.sl:555](../../stdlib/IO.sl#L555)</sub>
+<sub>[stdlib/IO.sl:561](../../stdlib/IO.sl#L561)</sub>
 
 #### ToArray *method*
 
@@ -748,7 +748,7 @@ byte[] ToArray()
 
 A copy of what has been written, from the start to the high-water mark.
 
-<sub>[stdlib/IO.sl:558](../../stdlib/IO.sl#L558)</sub>
+<sub>[stdlib/IO.sl:564](../../stdlib/IO.sl#L564)</sub>
 
 #### ToText *method*
 
@@ -758,7 +758,7 @@ String ToText()
 
 The contents as text, read as UTF-8.
 
-<sub>[stdlib/IO.sl:567](../../stdlib/IO.sl#L567)</sub>
+<sub>[stdlib/IO.sl:573](../../stdlib/IO.sl#L573)</sub>
 
 ### SeekOrigin *enum*
 
@@ -821,7 +821,7 @@ Result<String, IOError> ReadTextToEnd(IStream stream)
 
 Reads a stream to its end and reads the bytes as UTF-8.
 
-<sub>[stdlib/IO.sl:613](../../stdlib/IO.sl#L613)</sub>
+<sub>[stdlib/IO.sl:619](../../stdlib/IO.sl#L619)</sub>
 
 ### ReadToEnd *function*
 
@@ -831,7 +831,7 @@ Result<byte[], IOError> ReadToEnd(IStream stream)
 
 Reads a stream to its end.
 
-<sub>[stdlib/IO.sl:593](../../stdlib/IO.sl#L593)</sub>
+<sub>[stdlib/IO.sl:599](../../stdlib/IO.sl#L599)</sub>
 
 ### SplitLines *function*
 
@@ -842,5 +842,5 @@ List<String> SplitLines(String text)
 Splits text into lines, accepting either line ending and dropping a final
 empty line, which is what a trailing newline produces.
 
-<sub>[stdlib/IO.sl:626](../../stdlib/IO.sl#L626)</sub>
+<sub>[stdlib/IO.sl:632](../../stdlib/IO.sl#L632)</sub>
 

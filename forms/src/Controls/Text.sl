@@ -80,7 +80,7 @@ public class Label : WindowedControl
         }
     }
 
-    public override Size PreferredSize => _native.PreferredSize();
+    public override Size PreferredSize => _native.PreferredSize;
 
     /// Sizes the label to its text. What a label almost always wants, and the
     /// reason this is a method here rather than an `AutoSize` flag that has to
@@ -237,7 +237,7 @@ public class TextBox : TextBoxBase
         }
     }
 
-    public override Size PreferredSize => _native.PreferredSize();
+    public override Size PreferredSize => _native.PreferredSize;
 
     char _mask;
 }

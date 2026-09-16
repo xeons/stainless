@@ -198,7 +198,7 @@ Two modules are imported into every file without being asked for.
 program mentioned one or not.
 
 `Standard`, because what lives there is the language's own vocabulary rather
-than a library: `Result<T, E>` ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)) and the markers `[Flags]`, `[Packed]` and
+than a library: `Result<T, TError>` ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)) and the markers `[Flags]`, `[Packed]` and
 `[Align]`, each of which is a rule about a declaration rather than a dependency
 on one. Requiring an import for them would make a rule look like a library.
 

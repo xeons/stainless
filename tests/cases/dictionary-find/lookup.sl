@@ -43,8 +43,8 @@ int Main()
     Console.WriteLine("or " + N((long)settings.GetOr("retries", 0)) + " " +
         N((long)settings.GetOr("absent", 0)));
     Console.WriteLine("told apart " +
-        (settings.Find("retries").HasValue() ? "set" : "unset") + " " +
-        (settings.Find("absent").HasValue() ? "set" : "unset"));
+        (settings.Find("retries").HasValue ? "set" : "unset") + " " +
+        (settings.Find("absent").HasValue ? "set" : "unset"));
 
     // The combinators come free, Optional being an ordinary variant.
     Console.WriteLine("valueOr " + N((long)settings.Find("absent").ValueOr(-1)));
@@ -74,7 +74,7 @@ int Main()
 
     counts["misses"] = None;
     Console.WriteLine("removed " + (counts.ContainsKey("misses") ? "no" : "yes") +
-        " " + N((long)counts.Count()));
+        " " + N((long)counts.Count));
 
     // No `+= 1`, because there is nothing to add to when the key is absent.
     // Saying what should happen instead is the point rather than the cost.

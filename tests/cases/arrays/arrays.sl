@@ -8,7 +8,7 @@ class Tracker
     int _id;
     Tracker(int n) => _id = n;
     ~Tracker() { Console.WriteLine("~Tracker " + Text.FromInteger(_id)); }
-    public int Id() => _id;
+    public int Id => _id;
 }
 
 int Sum(int[] values)
@@ -39,7 +39,7 @@ int Main()
         var tracked = new Tracker[2];
         tracked[0] = new Tracker(1);
         tracked[1] = new Tracker(2);
-        Console.WriteLine("ids=" + Text.FromInteger(tracked[0].Id() + tracked[1].Id()));
+        Console.WriteLine("ids=" + Text.FromInteger(tracked[0].Id + tracked[1].Id));
         Console.WriteLine("dropping array");
     }
     Console.WriteLine("done");

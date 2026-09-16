@@ -34,11 +34,11 @@ public class Tag : IComparable<Tag>, IDescribable
     String _name;
 
     public Tag(String value) => _name = value;
-    public String Name() => _name;
+    public String Name => _name;
 
     public int CompareTo(Tag other)
     {
-        if (_name == other.Name())
+        if (_name == other.Name)
             return 0;
         return 1;
     }

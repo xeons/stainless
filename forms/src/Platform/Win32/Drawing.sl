@@ -83,10 +83,10 @@ public class FontBackend : IFontBackend
         }
     }
 
-    public nuint Handle() => (nuint)(void*)_font;
+    public nuint Handle => (nuint)(void*)_font;
 
     /// The font as GDI wants it, for the drawing code in this module.
-    public HFONT Native() => _font;
+    public HFONT Native => _font;
 }
 
 // ================================================================= graphics
@@ -108,7 +108,7 @@ public class GraphicsBackend : IGraphicsBackend
         _clip = clipped;
     }
 
-    public FRect ClipBounds() => _clip;
+    public FRect ClipBounds => _clip;
 
     /// `SaveDC` answers a token that puts back the clip *and* the origin
     /// together, which is exactly the pair this changes -- so there is nothing
@@ -266,7 +266,7 @@ public class GraphicsBackend : IGraphicsBackend
     public void DrawString(String text, Font font, Color colour, int x, int y)
     {
         var wide = text.ToUtf16();
-        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource().Handle());
+        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource.Handle);
         uint wasColour = SetTextColor(_dc, ToColorRef(colour));
         int wasMode = SetBkMode(_dc, TransparentBackground);
         TextOutW(_dc, x, y, wide.ToPointer(), (int)wide.UnitCount());
@@ -310,7 +310,7 @@ public class GraphicsBackend : IGraphicsBackend
             }
         }
 
-        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource().Handle());
+        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource.Handle);
         uint wasColour = SetTextColor(_dc, ToColorRef(colour));
         int wasMode = SetBkMode(_dc, TransparentBackground);
         DrawTextW(_dc, wide.ToPointer(), (int)wide.UnitCount(), &r, flags);
@@ -324,7 +324,7 @@ public class GraphicsBackend : IGraphicsBackend
     /// draw, it is something selected into a second `HDC` and blitted from.
     public void DrawBitmap(IBitmapBackend picture, FPoint at)
     {
-        Blit(picture, Area(at.X, at.Y, picture.Width(), picture.Height()), false);
+        Blit(picture, Area(at.X, at.Y, picture.Width, picture.Height), false);
     }
 
     public void DrawBitmapIn(IBitmapBackend picture, FRect into)
@@ -334,7 +334,7 @@ public class GraphicsBackend : IGraphicsBackend
 
     void Blit(IBitmapBackend picture, FRect into, bool scaled)
     {
-        HBITMAP bitmap = (HBITMAP)(void*)picture.Handle();
+        HBITMAP bitmap = (HBITMAP)(void*)picture.Handle;
         if (bitmap == null)
             return;
 
@@ -346,7 +346,7 @@ public class GraphicsBackend : IGraphicsBackend
         if (scaled)
         {
             StretchBlt(_dc, into.X, into.Y, into.Width, into.Height,
-                       memory, 0, 0, picture.Width(), picture.Height(), SrcCopy);
+                       memory, 0, 0, picture.Width, picture.Height, SrcCopy);
         }
         else
         {
@@ -360,7 +360,7 @@ public class GraphicsBackend : IGraphicsBackend
     public FSize MeasureString(String text, Font font)
     {
         var wide = text.ToUtf16();
-        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource().Handle());
+        HGDIOBJ wasFont = SelectObject(_dc, (HGDIOBJ)(nuint)font.Resource.Handle);
         Win32.User32.Size measured;
         GetTextExtentPoint32W(_dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
         SelectObject(_dc, wasFont);

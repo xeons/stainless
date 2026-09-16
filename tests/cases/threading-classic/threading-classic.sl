@@ -128,7 +128,7 @@ void ReadIt(byte* argument)
     for (int i = 0; i < 100; i++)
     {
         var view = Shared.Read();
-        ReadSum.Add(view.Value());
+        ReadSum.Add(view.Value);
     }
 }
 
@@ -165,9 +165,9 @@ int Main()
     // -------------------------------------------------- one thread, joined
 
     var single = new Thread(CountUp, null);
-    printf("joinable      = %d\n", single.IsJoinable());
+    printf("joinable      = %d\n", single.IsJoinable);
     single.Join();
-    printf("afterJoin     = %d\n", single.IsJoinable());
+    printf("afterJoin     = %d\n", single.IsJoinable);
     printf("oneWorker     = %lld\n", Total.Load());
 
     // ------------------------------------------------------------ counting
@@ -185,9 +185,9 @@ int Main()
     // reference is what the compiler refuses, and rightly.
     {
         var held = Handoff.Lock();
-        while (held.Value() == 0)
+        while (held.Value == 0)
             held.Wait();
-        printf("handedOver    = %lld\n", held.Value());
+        printf("handedOver    = %lld\n", held.Value);
     }
 
     producer.Join();
@@ -206,10 +206,10 @@ int Main()
     Opened.Set();
     JoinAll(waiters);
     printf("allPassed     = %lld\n", Passed.Load());
-    printf("stillOpen     = %d\n", Opened.IsSet());
+    printf("stillOpen     = %d\n", Opened.IsSet);
 
     Opened.Reset();
-    printf("closedAgain   = %d\n", Opened.IsSet());
+    printf("closedAgain   = %d\n", Opened.IsSet);
     printf("timesOut      = %d\n", Opened.WaitFor(20u));
 
     // One `Set` lets exactly one thread through. Started one at a time on
@@ -236,14 +236,14 @@ int Main()
 
     var reporters = StartAll(ReportDone, Workers);
     Remaining.Wait();
-    printf("countedDown   = %lld\n", Remaining.CurrentCount());
+    printf("countedDown   = %lld\n", Remaining.CurrentCount);
     JoinAll(reporters);
 
     // ------------------------------------------------------------- barrier
 
     JoinAll(StartAll(Marching, 4));
     printf("phaseSum      = %lld\n", PhaseSum.Load());
-    printf("participants  = %llu\n", (ulong)Round.ParticipantCount());
+    printf("participants  = %llu\n", (ulong)Round.ParticipantCount);
 
     // -------------------------------------------------------- reader/writer
 
@@ -262,7 +262,7 @@ int Main()
         writer.Set(7);
     }
 
-    printf("written       = %lld\n", Shared.Read().Value());
+    printf("written       = %lld\n", Shared.Read().Value);
 
     // ------------------------------------------------------------- spinning
 
@@ -274,7 +274,7 @@ int Main()
 
     setter.Join();
     printf("spunUntilSet  = %d\n", Ready.Load());
-    printf("spunAtAll     = %d\n", spin.Count() > 0u);
+    printf("spunAtAll     = %d\n", spin.Count > 0u);
 
     // ------------------------------------------------------------- detached
 
@@ -282,7 +282,7 @@ int Main()
     // touches only statics, which is why that is safe.
     var loose = new Thread(CountUp, null);
     loose.Detach();
-    printf("detached      = %d\n", loose.IsJoinable());
+    printf("detached      = %d\n", loose.IsJoinable);
 
     printf("id            = %d\n", Threading.CurrentId() != 0u);
     printf("cpus          = %d\n", Threading.ProcessorCount() > 0u);

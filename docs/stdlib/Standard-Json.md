@@ -192,10 +192,10 @@ person edits. The cost is that a lookup is a scan -- see the note there.
 
 <sub>[stdlib/Json.sl:115](../../stdlib/Json.sl#L115)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many members there are. Members rather than distinct names: a

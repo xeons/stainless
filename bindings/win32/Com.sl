@@ -193,7 +193,7 @@ public String Format(Guid value)
 {
     // 38 characters and a NUL, which is what StringFromGUID2 documents.
     var buffer = new WideBuffer(40u);
-    int units = StringFromGUID2(&value, buffer.Pointer(), (int)buffer.Capacity());
+    int units = StringFromGUID2(&value, buffer.Pointer(), (int)buffer.Capacity);
     if (units <= 0)
         return "";
 
@@ -227,7 +227,7 @@ public enum ComError : uint
 /// ```
 /// var made = Com.Create(Com.Parse(Dialogs.FileOpenDialogClsid), iidof(IFileOpenDialog));
 /// if (made.IsOk()) {
-///     IFileOpenDialog dialog = (IFileOpenDialog)made.Value();
+///     IFileOpenDialog dialog = (IFileOpenDialog)made.Value;
 ///     ...                       // ARC releases it at the end of the scope
 /// }
 /// ```

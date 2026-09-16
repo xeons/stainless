@@ -363,7 +363,7 @@ void Contracts()
     // A class may implement several, and an interface may extend another.
     IDrawable square = new Square(3.0);
     Say("dispatch", square.Draw());
-    Say("inherited", square.Name());        // from INamed, through IDrawable
+    Say("inherited", square.Name);        // from INamed, through IDrawable
 
     Figure figure = new Square(2.0);
     Say("virtual", figure.Draw());          // Polygon's, which calls base's

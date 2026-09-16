@@ -161,7 +161,7 @@ public class Registry
         s_made++;
     }
 
-    public String Name() => _name;
+    public String Name => _name;
 
     public static int Made() => s_made;
 
@@ -199,7 +199,7 @@ public class Widget
         Extent.To = 10;
     }
 
-    public int Width() => Extent.To - Extent.From;
+    public int Width => Extent.To - Extent.From;
 }
 
 #endregion

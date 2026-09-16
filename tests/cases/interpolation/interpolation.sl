@@ -137,8 +137,8 @@ String Describe(int count)
 /// A List as an array, since `Join` takes one.
 public String[] ToArray(List<String> items)
 {
-    var all = new String[items.Count()];
-    for (nuint i = 0u; i < items.Count(); i++)
+    var all = new String[items.Count];
+    for (nuint i = 0u; i < items.Count; i++)
         all[i] = items.At(i);
     return all;
 }

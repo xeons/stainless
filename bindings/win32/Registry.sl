@@ -117,7 +117,7 @@ public bool Close(HKEY key) => RegCloseKey(key) == 0;
 public Result<String, RegistryError> ReadString(HKEY key, String name)
 {
     var buffer = new ByteBuffer(8192u);
-    uint size = buffer.Capacity();
+    uint size = buffer.Capacity;
     uint kind = 0u;
 
     int code = RegQueryValueExW(key, name.ToUtf16().ToPointer(), null, &kind,
@@ -202,7 +202,7 @@ public RegistryError DeleteValue(HKEY key, String name)
 public String SubKey(HKEY key, uint index)
 {
     var buffer = new WideBuffer(256u);
-    uint size = (uint)(buffer.Capacity() + 1u);
+    uint size = (uint)(buffer.Capacity + 1u);
 
     int code = RegEnumKeyExW(key, index, buffer.Pointer(), &size,
                              null, null, null, null);
@@ -215,7 +215,7 @@ public String SubKey(HKEY key, uint index)
 public String ValueName(HKEY key, uint index)
 {
     var buffer = new WideBuffer(16384u);
-    uint size = (uint)(buffer.Capacity() + 1u);
+    uint size = (uint)(buffer.Capacity + 1u);
 
     int code = RegEnumValueW(key, index, buffer.Pointer(), &size,
                              null, null, null, null);

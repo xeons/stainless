@@ -472,7 +472,7 @@ public class GtkPeer : IControlPeer
     ///
     /// The compiler warns about the bare form now (SL0610), which it did not
     /// while this was being written.
-    protected bool Echoing() => echoing;
+    protected bool Echoing => echoing;
     protected void Echo(bool on) => echoing = on;
 
     ~GtkPeer() { Destroy(); }
@@ -480,10 +480,13 @@ public class GtkPeer : IControlPeer
     /// The control this peer reports to, or null once it has gone -- which a
     /// signal arriving during teardown genuinely can see, because GTK emits
     /// `destroy` while the widget is still alive.
-    protected IControlNotify? Owner()
+    protected IControlNotify? Owner
     {
-        IControlNotify? held = target;
-        return held;
+        get
+        {
+            IControlNotify? held = target;
+            return held;
+        }
     }
 
     /// Says which widget carries the signals and the style, for a peer whose
@@ -505,7 +508,7 @@ public class GtkPeer : IControlPeer
     /// Every `Create` in `WidgetSet.sl` calls it once.
     public void Listen()
     {
-        if (Owner() == null)
+        if (Owner == null)
             return;
 
         gtk_widget_add_events(inner,
@@ -516,7 +519,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "button-press-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -527,7 +530,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "button-release-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -538,7 +541,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "motion-notify-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -555,7 +558,7 @@ public class GtkPeer : IControlPeer
         // ends in the correct state either way.
         ConnectEvent(inner, "enter-notify-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner != null)
                 ((IControlNotify)owner).OnPlatformMouseEnter();
             return false;
@@ -563,7 +566,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "leave-notify-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner != null)
                 ((IControlNotify)owner).OnPlatformMouseLeave();
             return false;
@@ -571,7 +574,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "scroll-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -597,7 +600,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "key-press-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -620,7 +623,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "key-release-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
@@ -632,7 +635,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "focus-in-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner != null)
                 ((IControlNotify)owner).OnPlatformGotFocus();
             return false;
@@ -640,7 +643,7 @@ public class GtkPeer : IControlPeer
 
         ConnectEvent(inner, "focus-out-event", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner != null)
                 ((IControlNotify)owner).OnPlatformLostFocus();
             return false;
@@ -715,7 +718,7 @@ public class GtkPeer : IControlPeer
         // because for a child the layout is what decided and GTK would only
         // be echoing it back one turn of the loop later. A top-level window
         // overrides this: there the user is what decided.
-        var owner = Owner();
+        var owner = Owner;
         if (owner != null)
         {
             if (moved)
@@ -783,7 +786,7 @@ public class GtkPeer : IControlPeer
     }
 
     public void Focus() => gtk_widget_grab_focus(inner);
-    public bool HasFocus() => gtk_widget_has_focus(inner) != 0;
+    public bool HasFocus => gtk_widget_has_focus(inner) != 0;
 
     /// **A cursor needs a `GdkWindow` and a widget may not have one yet.**
     /// A control is given its cursor when it is made, long before it is shown,
@@ -846,33 +849,39 @@ public class GtkPeer : IControlPeer
     /// which is what `TabControl.PageArea` depends on: a notebook page is
     /// sized by GTK rather than by the layout, and there the allocation is the
     /// only source of truth.
-    public virtual FRect ClientBounds()
+    public virtual FRect ClientBounds
     {
-        if (bounds.Width > 0 && bounds.Height > 0)
+        get
         {
-            return Area(0, 0, bounds.Width, bounds.Height);
+            if (bounds.Width > 0 && bounds.Height > 0)
+            {
+                return Area(0, 0, bounds.Width, bounds.Height);
+            }
+            return Area(0, 0, gtk_widget_get_allocated_width(widget),
+                              gtk_widget_get_allocated_height(widget));
         }
-        return Area(0, 0, gtk_widget_get_allocated_width(widget),
-                          gtk_widget_get_allocated_height(widget));
     }
 
     /// Zero, because a child of a `GtkFixed` is positioned from the fixed's
     /// own corner. Only a peer whose frame eats into that space -- a group
     /// box -- overrides this.
-    public virtual FPoint ClientOrigin() => At(0, 0);
+    public virtual FPoint ClientOrigin => At(0, 0);
 
     /// What GTK thinks the widget ought to be, which is what `AutoSize` wants.
     /// The natural size rather than the minimum: the minimum is what it can be
     /// squeezed to, and a button squeezed to its minimum has no padding left.
-    public virtual FSize PreferredSize()
+    public virtual FSize PreferredSize
     {
-        GtkRequisition minimum;
-        GtkRequisition natural;
-        gtk_widget_get_preferred_size(widget, &minimum, &natural);
-        return Extent(natural.Width, natural.Height);
+        get
+        {
+            GtkRequisition minimum;
+            GtkRequisition natural;
+            gtk_widget_get_preferred_size(widget, &minimum, &natural);
+            return Extent(natural.Width, natural.Height);
+        }
     }
 
-    public nuint Handle() => (nuint)(void*)widget;
+    public nuint Handle => (nuint)(void*)widget;
 
     public void Destroy()
     {
@@ -896,8 +905,8 @@ public class GtkPeer : IControlPeer
 
     /// The widget, for the widget set that makes children inside it and for a
     /// peer that has to reach one it was given.
-    public GtkWidget* Widget() => widget;
-    public GtkWidget* Inner() => inner;
+    public GtkWidget* Widget => widget;
+    public GtkWidget* Inner => inner;
 }
 
 // ========================================================== containers
@@ -925,7 +934,7 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     }
 
     /// The fixed children are placed in, for a peer that has to reach it.
-    public GtkWidget* Content() => content;
+    public GtkWidget* Content => content;
 
     /// Reports every paint of this container's interior to the control, so
     /// that the windowless children sitting on it are drawn.
@@ -952,7 +961,7 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     {
         ConnectEvent(content, "draw", (sender, carried) =>
         {
-            var owner = Owner();
+            var owner = Owner;
             if (owner == null)
                 return false;
             var surface = new GtkGraphicsBackend(carried);
@@ -966,7 +975,7 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     public virtual void AddChild(IControlPeer child)
     {
         var peer = (GtkPeer)child;
-        gtk_fixed_put(content, peer.Widget(), 0, 0);
+        gtk_fixed_put(content, peer.Widget, 0, 0);
         peer.PlacedInto(content);
 
         // **Radio buttons are grouped by their container**, which is where the
@@ -978,15 +987,15 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
         // ticked at once.
         if (child is GtkCheckPeer check)
         {
-            if (check.IsRadio())
+            if (check.IsRadio)
             {
                 if (_radios == null)
                 {
-                    _radios = check.Widget();
+                    _radios = check.Widget;
                 }
                 else
                 {
-                    gtk_radio_button_join_group(check.Widget(), _radios);
+                    gtk_radio_button_join_group(check.Widget, _radios);
                 }
             }
         }
@@ -1000,7 +1009,7 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     public void RemoveChild(IControlPeer child)
     {
         var peer = (GtkPeer)child;
-        gtk_container_remove(content, peer.Widget());
+        gtk_container_remove(content, peer.Widget);
         peer.PlacedInto(null);
     }
 }

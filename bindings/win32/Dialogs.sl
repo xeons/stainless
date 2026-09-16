@@ -132,7 +132,7 @@ public String AskToOpen(HWND owner, String title, String[] filterPairs)
     dialog.Filter = filter.Pointer();
     dialog.FilterIndex = 1u;
     dialog.File = chosen.Pointer();
-    dialog.FileMax = chosen.Capacity();
+    dialog.FileMax = chosen.Capacity;
     dialog.Title = title.ToUtf16().ToPointer();
     dialog.Flags = OfnExplorer | OfnFileMustExist | OfnPathMustExist | OfnHideReadOnly;
 
@@ -153,7 +153,7 @@ public String AskToSave(HWND owner, String title, String[] filterPairs,
     dialog.Filter = filter.Pointer();
     dialog.FilterIndex = 1u;
     dialog.File = chosen.Pointer();
-    dialog.FileMax = chosen.Capacity();
+    dialog.FileMax = chosen.Capacity;
     dialog.Title = title.ToUtf16().ToPointer();
     dialog.DefaultExtension = defaultExtension.ToUtf16().ToPointer();
     dialog.Flags = OfnExplorer | OfnOverwritePrompt | OfnPathMustExist | OfnHideReadOnly;

@@ -11,7 +11,7 @@ class Node
     Node(int n) => _id = n;
     ~Node() { printf("~Node(%d)\n", _id); }
 
-    public int Id() => _id;
+    public int Id => _id;
     public void Link(Node other) => _next = other;
 }
 
@@ -28,7 +28,7 @@ int Main()
     printf("build\n");
     {
         var chain = Build();
-        printf("head=%d\n", chain.Id());
+        printf("head=%d\n", chain.Id);
         printf("scope end\n");
     }
     printf("released\n");
@@ -37,7 +37,7 @@ int Main()
     for (int i = 0; i < 3; i = i + 1)
     {
         var temp = new Node(100 + i);
-        printf("iter %d\n", temp.Id());
+        printf("iter %d\n", temp.Id);
     }
     printf("loop done\n");
     return 0;

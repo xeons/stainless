@@ -105,16 +105,16 @@ extern "C"
 /// about.
 ///
 ///     var guard = registry.Lock();
-///     guard.Value().Add(name);
+///     guard.Value.Add(name);
 ///     // ~Guard() unlocks here
 ///
-/// **Known hole.** `Value()` hands out what the lock protects, and nothing yet
+/// **Known hole.** `Value` hands out what the lock protects, and nothing yet
 /// stops you storing it somewhere and using it after the guard has gone. C#
 /// has the same hole and worse; Rust closes it with lifetimes. Stainless
 /// closes it when the analysis in step 6 of docs/concurrency.md lands, and not
 /// before. Until then this is a discipline, not a guarantee.
 ///
-/// It used to be unsound for a class `T`: `Value()` retains what it hands out
+/// It used to be unsound for a class `T`: `Value` retains what it hands out
 /// and the caller releases it, often outside the lock, so two threads performed
 /// an unsynchronized read-modify-write on that object's count. The count drifted
 /// down and the object was freed while the mutex still held it. Reference counts
@@ -176,7 +176,7 @@ public class Guard<T>
     ///
     /// See the hole described on `Mutex`: what this hands back must not
     /// outlive the guard, and nothing yet enforces it.
-    public T Value() => _owner.Read();
+    public T Value => _owner.Read();
 
     /// Replaces the guarded value. For a class `T` this swaps which object is
     /// guarded; mutating the one `Value` gave back is the usual thing.
@@ -198,8 +198,8 @@ public class Guard<T>
 /// pulse says only "the value changed", never "it changed the way you want":
 ///
 ///     var held = queue.Lock();
-///     while (held.Value().IsEmpty()) { held.Wait(); }
-///     var item = held.Value().Take();
+///     while (held.Value.IsEmpty()) { held.Wait(); }
+///     var item = held.Value.Take();
 public threadsafe class Monitor<T>
 {
     T _value;
@@ -251,7 +251,7 @@ public class MonitorGuard<T>
     ~MonitorGuard() { _owner.Unlock(); }
 
     /// What the monitor guards, with the same lifetime caveat as `Guard`.
-    public T Value() => _owner.Read();
+    public T Value => _owner.Read();
 
     /// Replaces the guarded value. Pulse afterwards if anyone is waiting on a
     /// condition this changed -- nothing wakes on its own.
@@ -332,7 +332,7 @@ public threadsafe class RwLock<T>
         return null;
     }
 
-    T Held() => _value;
+    T Held => _value;
     void Store(T updated) => _value = updated;
     void ReadUnlock() => sl_rwlock_read_unlock(_handle);
     void WriteUnlock() => sl_rwlock_write_unlock(_handle);
@@ -350,7 +350,7 @@ public class ReadGuard<T>
     /// What the lock guards, shared with every other reader. Treat it as
     /// read-only: nothing stops a `T` with mutating methods being mutated
     /// through this, and doing so races with the other readers.
-    public T Value() => _owner.Held();
+    public T Value => _owner.Held;
 }
 
 /// Exclusive access.
@@ -363,7 +363,7 @@ public class WriteGuard<T>
     ~WriteGuard() { _owner.WriteUnlock(); }
 
     /// What the lock guards, exclusively. Safe to mutate through.
-    public T Value() => _owner.Held();
+    public T Value => _owner.Held;
 
     /// Replaces the guarded value.
     public void Set(T updated) => _owner.Store(updated);
@@ -680,12 +680,15 @@ public threadsafe class ManualResetEvent
 
     /// Whether the latch is open *now*. `Reset` can close it before you act
     /// on the answer, so this is for reporting rather than for deciding.
-    public bool IsSet()
+    public bool IsSet
     {
-        sl_mutex_lock(_handle);
-        bool state = _open;
-        sl_mutex_unlock(_handle);
-        return state;
+        get
+        {
+            sl_mutex_lock(_handle);
+            bool state = _open;
+            sl_mutex_unlock(_handle);
+            return state;
+        }
     }
 }
 
@@ -843,12 +846,15 @@ public threadsafe class CountdownEvent
 
     /// How many signals are still outstanding. A snapshot, and stale the
     /// moment you have it.
-    public long CurrentCount()
+    public long CurrentCount
     {
-        sl_mutex_lock(_handle);
-        long count = _remaining;
-        sl_mutex_unlock(_handle);
-        return count;
+        get
+        {
+            sl_mutex_lock(_handle);
+            long count = _remaining;
+            sl_mutex_unlock(_handle);
+            return count;
+        }
     }
 }
 
@@ -917,7 +923,7 @@ public threadsafe class Barrier
 
     /// How many participants the barrier was made for. Fixed, so unlike most
     /// readings here it cannot be stale.
-    public nuint ParticipantCount() => _participants;
+    public nuint ParticipantCount => _participants;
 }
 
 // -------------------------------------------------------------------- tasks
@@ -1026,7 +1032,7 @@ public class Thread
 
     /// Whether this handle still refers to a thread -- false after `Join` or
     /// `Detach`. It does not say whether the thread is still running.
-    public bool IsJoinable() => _handle != null;
+    public bool IsJoinable => _handle != null;
 
     ~Thread() { Join(); }
 }
@@ -1078,7 +1084,7 @@ public class SpinWait
     }
 
     /// How many times `Once` has been called.
-    public nuint Count() => _spins;
+    public nuint Count => _spins;
 
     /// Starts over, for a loop that is being reused.
     public void Reset() => _spins = 0u;

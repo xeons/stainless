@@ -50,7 +50,7 @@ a managed reference. A struct is raw bytes, so it is *always* safe to hand to
 another thread. That bright line already exists and cost nothing to draw.
 
 > **Two of the three rows above have since moved.** A struct *may* hold a
-> reference now — `Result<T, E>` is one, and copying such a struct retains what
+> reference now — `Result<T, TError>` is one, and copying such a struct retains what
 > it holds ([tests/cases/struct-references](../tests/cases/struct-references/)).
 > So the first row is no longer free by construction, and sendability follows a
 > struct's fields rather than its kind: one of primitives and Strings crosses,
@@ -440,7 +440,7 @@ Two obligations the C ABI imposes, neither yet met:
   (§11). Recursive locks and lock-free collections are still deferred, the first
   deliberately.
 - **Cancellation and failure.** Cancellation works as a shared flag today (§9);
-  what is missing is a reason. `Result<T, E>` now exists, so the sentence that
+  what is missing is a reason. `Result<T, TError>` now exists, so the sentence that
   used to sit here -- that a reason wants an error type the language does not
   have -- is no longer the obstacle. What is left is plumbing a scope handle
   into a job.
@@ -496,7 +496,7 @@ either a `Cancel()` on a scope value or a `cancel;` statement valid inside
 `parallel` would express it.
 
 **Saying why.** A cancelled operation usually wants to report a reason. That
-needs an error type, and `Result<T, E>` is now one -- so this is a question of
+needs an error type, and `Result<T, TError>` is now one -- so this is a question of
 plumbing rather than of a missing feature. Today a cancelled job returns
 whatever it would have returned, and the flag is the only signal.
 

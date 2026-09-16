@@ -200,7 +200,7 @@ public class Process
     ~Process() { sl_process_release(_handle); }
 
     /// What the operating system calls it.
-    public long Id() => sl_process_id(_handle);
+    public long Id => sl_process_id(_handle);
 
     /// Waits for it to finish, and answers with the code it left.
     ///
@@ -215,13 +215,16 @@ public class Process
 
     /// The code it left, if it has finished, without waiting for it.
     ///
-    ///     while (child.Finished().IsEmpty()) { DoSomethingElse(); }
-    public Optional<int> Finished()
+    ///     while (child.Finished.IsEmpty()) { DoSomethingElse(); }
+    public Optional<int> Finished
     {
-        int answer = sl_process_poll(_handle, out int exitCode);
-        if (answer == 1)
-            return Some(exitCode);
-        return None;
+        get
+        {
+            int answer = sl_process_poll(_handle, out int exitCode);
+            if (answer == 1)
+                return Some(exitCode);
+            return None;
+        }
     }
 
     /// Asks it to stop, the way Ctrl-C would. It may decline.
@@ -257,7 +260,7 @@ public class Process
 /// top of its own loop, where it can actually tidy up.
 ///
 ///     Signals.Watch();
-///     while (!Signals.Interrupted()) { DoAPieceOfWork(); }
+///     while (!Signals.Interrupted) { DoAPieceOfWork(); }
 ///     Console.WriteLine("stopping");
 public static class Signals
 {
@@ -266,7 +269,7 @@ public static class Signals
     public static bool Watch() => sl_signals_watch();
 
     /// Whether one has arrived since the last `Clear`.
-    public static bool Interrupted() => sl_signals_interrupted();
+    public static bool Interrupted => sl_signals_interrupted();
 
     /// Forgets the one that arrived, for a program that means to carry on.
     public static void Clear() => sl_signals_clear();

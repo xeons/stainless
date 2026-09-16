@@ -93,8 +93,8 @@ public class ImageList
         return Ok(Add(loaded.Value));
     }
 
-    public int Count => _backend.Count();
-    public Size ImageSize => _backend.ImageSize();
+    public int Count => _backend.Count;
+    public Size ImageSize => _backend.ImageSize;
 
     /// The platform's list, for the controls that take one.
     public IImageListBackend Backend() => _backend;
@@ -258,14 +258,14 @@ public class ToolBar : WindowedControl
     void SetChecked(int index, bool checked) => _native.SetButtonChecked(index, checked);
     bool GetChecked(int index) => _native.GetButtonChecked(index);
 
-    public override Size PreferredSize => _native.PreferredSize();
+    public override Size PreferredSize => _native.PreferredSize;
 
     /// The platform says which button; the bar turns that into the button's own
     /// event, so a program never handles "a click on the toolbar" and then
     /// works out which one it was.
     public override void OnPlatformToolClicked(int index)
     {
-        if (index < 0 || (nuint)index >= _buttons.Count())
+        if (index < 0 || (nuint)index >= _buttons.Count)
             return;
         _buttons.At((nuint)index).Raise(this);
     }
@@ -297,26 +297,26 @@ public class StatusBar : WindowedControl
         _widths.Add(width);
         _texts.Add("");
         Rebuild();
-        return (int)_widths.Count() - 1;
+        return (int)_widths.Count - 1;
     }
 
     /// What a panel says.
     public String PanelText(int index)
     {
-        if (index < 0 || (nuint)index >= _texts.Count())
+        if (index < 0 || (nuint)index >= _texts.Count)
             return "";
         return _texts.At((nuint)index);
     }
 
     public void SetPanelText(int index, String text)
     {
-        if (index < 0 || (nuint)index >= _texts.Count())
+        if (index < 0 || (nuint)index >= _texts.Count)
             return;
         _texts.Set((nuint)index, text);
         _native.SetPanelText(index, text);
     }
 
-    public nuint PanelCount => _widths.Count();
+    public nuint PanelCount => _widths.Count;
 
     /// Turns the panel widths into the running edges Windows wants.
     ///
@@ -325,9 +325,9 @@ public class StatusBar : WindowedControl
     /// widths are what a program gives and this is where they become edges.
     void Rebuild()
     {
-        var edges = new int[_widths.Count()];
+        var edges = new int[_widths.Count];
         int running = 0;
-        for (nuint i = 0u; i < _widths.Count(); i++)
+        for (nuint i = 0u; i < _widths.Count; i++)
         {
             int width = _widths.At(i);
             if (width < 0)
@@ -341,13 +341,13 @@ public class StatusBar : WindowedControl
             }
         }
         _native.SetPanels(edges);
-        for (nuint i = 0u; i < _texts.Count(); i++)
+        for (nuint i = 0u; i < _texts.Count; i++)
         {
             _native.SetPanelText((int)i, _texts.At(i));
         }
     }
 
-    public override Size PreferredSize => _native.PreferredSize();
+    public override Size PreferredSize => _native.PreferredSize;
 }
 
 // ============================================================= progress bar
@@ -574,7 +574,7 @@ public class TabControl : WindowedControl
     {
         nuint at = 0u;
         bool found = false;
-        for (nuint i = 0u; i < _pages.Count(); i++)
+        for (nuint i = 0u; i < _pages.Count; i++)
         {
             if (_pages.At(i) == page)
             {
@@ -590,7 +590,7 @@ public class TabControl : WindowedControl
         _pages.RemoveAt(at);
         page.Visible = false;
 
-        for (nuint i = at; i < _pages.Count(); i++)
+        for (nuint i = at; i < _pages.Count; i++)
             _pages.At(i).Renumber((int)i);
 
         // Removing the selected tab leaves the platform's selection wherever it
@@ -598,7 +598,7 @@ public class TabControl : WindowedControl
         int chosen = _native.GetSelectedTab();
         if (chosen < 0 && !_pages.IsEmpty())
         {
-            chosen = (int)(at >= _pages.Count() ? _pages.Count() - 1u : at);
+            chosen = (int)(at >= _pages.Count ? _pages.Count - 1u : at);
             _native.SetSelectedTab(chosen);
         }
         ShowOnly(_native.GetSelectedTab());
@@ -609,7 +609,7 @@ public class TabControl : WindowedControl
     /// How many tabs the platform has, which is not the same question as how
     /// many pages this control is holding -- and is the one that notices when
     /// an insertion quietly did nothing.
-    public int TabCount => _native.TabCount();
+    public int TabCount => _native.TabCount;
 
     /// Which page is showing.
     public int SelectedIndex
@@ -628,7 +628,7 @@ public class TabControl : WindowedControl
         get
         {
             int at = SelectedIndex;
-            if (at < 0 || (nuint)at >= _pages.Count())
+            if (at < 0 || (nuint)at >= _pages.Count)
                 return null;
             return _pages.At((nuint)at);
         }
@@ -652,8 +652,8 @@ public class TabControl : WindowedControl
     /// somewhere, and the LCL does it in `TCustomTabControl.ShowCurrentPage`.
     void ShowOnly(int chosen)
     {
-        var area = _native.PageArea();
-        for (nuint i = 0u; i < _pages.Count(); i++)
+        var area = _native.PageArea;
+        for (nuint i = 0u; i < _pages.Count; i++)
         {
             var page = _pages.At(i);
             bool wanted = (int)i == chosen;
@@ -699,7 +699,7 @@ public class TreeNode
     }
 
     /// The platform's idea of where this node is.
-    public ITreeNodeHandle Handle() => _handle;
+    public ITreeNodeHandle Handle => _handle;
 
     public String Text
     {
@@ -782,7 +782,7 @@ public class TreeView : WindowedControl
     /// Adds under an existing node. Called by `TreeNode.Add`.
     TreeNode Insert(TreeNode parent, String text, int image)
     {
-        var made = new TreeNode(this, _native.AddNode(parent.Handle(), null, text, image));
+        var made = new TreeNode(this, _native.AddNode(parent.Handle, null, text, image));
         _all.Add(made);
         return made;
     }
@@ -813,7 +813,7 @@ public class TreeView : WindowedControl
         set
         {
             if (value != null)
-                _native.SelectNode(((TreeNode)value).Handle());
+                _native.SelectNode(((TreeNode)value).Handle);
         }
     }
 
@@ -829,10 +829,10 @@ public class TreeView : WindowedControl
     /// one with thousands of nodes, and so would virtual nodes.
     TreeNode? Lookup(ITreeNodeHandle handle)
     {
-        nuint wanted = handle.Id();
+        nuint wanted = handle.Id;
         foreach (var node in _all)
         {
-            if (node.Handle().Id() == wanted)
+            if (node.Handle.Id == wanted)
                 return node;
         }
         return null;
@@ -932,7 +932,7 @@ public class ListView : WindowedControl
 
     public void RemoveRow(int row) => _native.RemoveRow(row);
     public void Clear() => _native.Clear();
-    public int Count => _native.RowCount();
+    public int Count => _native.RowCount;
 
     /// Which row is selected, or -1.
     public int SelectedIndex
@@ -1180,14 +1180,17 @@ public class CoolBand
         CoolBar? owner = bar;
         if (owner == null)
             return;
-        Width = ((CoolBar)owner).ContentLeft(this) + ControlWidth()
+        Width = ((CoolBar)owner).ContentLeft(this) + ControlWidth
               + ((CoolBar)owner).HorizontalSpacing + CoolDivider;
     }
 
-    int ControlWidth()
+    int ControlWidth
     {
-        var one = _held;
-        return one == null ? 0 : ((Control)one).Width;
+        get
+        {
+            var one = _held;
+            return one == null ? 0 : ((Control)one).Width;
+        }
     }
 
     /// Called by the cool bar's layout pass, and by nothing else.
@@ -1316,7 +1319,7 @@ public class CoolBar : CustomControl
         }
     }
 
-    public int BandCount => (int)Bands.Count();
+    public int BandCount => (int)Bands.Count;
 
     /// How the grab handles are drawn.
     public GrabberStyle GrabStyle
@@ -1467,7 +1470,7 @@ public class CoolBar : CustomControl
     /// Whether the band after this one will not fit beside it.
     bool WrapsAfter(List<CoolBand> row, nuint index, int left)
     {
-        if (index + 1u >= row.Count())
+        if (index + 1u >= row.Count)
             return false;
         var next = row.At(index + 1u);
         if (next.Break)
@@ -1490,7 +1493,7 @@ public class CoolBar : CustomControl
 
         var all = Bands;
         var showing = new List<CoolBand>();
-        for (nuint i = 0u; i < all.Count(); i++)
+        for (nuint i = 0u; i < all.Count; i++)
         {
             if (all.At(i).Visible)
                 showing.Add(all.At(i));
@@ -1498,13 +1501,13 @@ public class CoolBar : CustomControl
         _visible = showing;
 
         // ---- pass one: where the rows break, and how tall each is.
-        var heights = new int[showing.Count()];
+        var heights = new int[showing.Count];
         int tallest = 0;
         nuint rowStart = 0u;
         int left = 0;
         bool rowEnd = true;
 
-        for (nuint i = 0u; i < showing.Count(); i++)
+        for (nuint i = 0u; i < showing.Count; i++)
         {
             if (rowEnd || showing.At(i).Break)
                 left = 0;
@@ -1513,7 +1516,7 @@ public class CoolBar : CustomControl
                 tallest = wanted;
             left = left + showing.At(i).Width;
 
-            rowEnd = i + 1u >= showing.Count() || WrapsAfter(showing, i, left);
+            rowEnd = i + 1u >= showing.Count || WrapsAfter(showing, i, left);
             if (!rowEnd)
                 continue;
 
@@ -1528,7 +1531,7 @@ public class CoolBar : CustomControl
         left = 0;
         rowEnd = true;
 
-        for (nuint i = 0u; i < showing.Count(); i++)
+        for (nuint i = 0u; i < showing.Count; i++)
         {
             var band = showing.At(i);
             if (rowEnd || band.Break)
@@ -1536,7 +1539,7 @@ public class CoolBar : CustomControl
 
             int height = heights[i];
             int width = band.Width;
-            rowEnd = WrapsAfter(showing, i, left + width) || i + 1u >= showing.Count();
+            rowEnd = WrapsAfter(showing, i, left + width) || i + 1u >= showing.Count;
             // The last band of a row is drawn out to the far edge, whatever
             // width it asked for -- otherwise every row would end in a gap the
             // user could not fill.
@@ -1601,7 +1604,7 @@ public class CoolBar : CustomControl
         var light = new Pen(SystemColors.ControlLight);
         var dark = new Pen(SystemColors.ControlDark);
 
-        for (nuint i = 0u; i < showing.Count(); i++)
+        for (nuint i = 0u; i < showing.Count; i++)
         {
             var band = showing.At(i);
             var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
@@ -1621,7 +1624,7 @@ public class CoolBar : CustomControl
                 surface.DrawString(band.Text, Font, ForeColor, x, y);
             }
 
-            bool last = i + 1u >= showing.Count();
+            bool last = i + 1u >= showing.Count;
             bool endsRow = last || showing.At(i + 1u).Top != band.Top;
 
             if (endsRow)
@@ -1716,13 +1719,13 @@ public class CoolBar : CustomControl
         if (showing.IsEmpty())
             return (CoolNowhere, false);
 
-        var last = showing.At(showing.Count() - 1u);
+        var last = showing.At(showing.Count - 1u);
         if (at.Y > last.Top + last.Height + CoolDivider)
             return (CoolRowBelow, false);
         if (at.Y < 0)
             return (CoolRowAbove, false);
 
-        for (nuint i = 0u; i < showing.Count(); i++)
+        for (nuint i = 0u; i < showing.Count; i++)
         {
             var band = showing.At(i);
             var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
@@ -1812,7 +1815,7 @@ public class CoolBar : CustomControl
         {
             Cursor = CursorKind.SizeWestEast;
         }
-        else if (!_fixedOrder && showing.Count() > 1u)
+        else if (!_fixedOrder && showing.Count > 1u)
         {
             Cursor = CursorKind.SizeAll;
         }
@@ -1862,7 +1865,7 @@ public class CoolBar : CustomControl
     bool Drop(int dragged, Point at)
     {
         var showing = Showing;
-        if ((nuint)dragged >= showing.Count())
+        if ((nuint)dragged >= showing.Count)
             return false;
         var moving = showing.At((nuint)dragged);
 
@@ -1873,7 +1876,7 @@ public class CoolBar : CustomControl
 
         // A band that broke a row and is leaving it must hand the break to
         // whoever now begins that row, or the row above swallows it.
-        if (moving.Break && (nuint)(dragged + 1) < showing.Count())
+        if (moving.Break && (nuint)(dragged + 1) < showing.Count)
         {
             showing.At((nuint)(dragged + 1)).Break = true;
         }
@@ -1889,7 +1892,7 @@ public class CoolBar : CustomControl
         if (onto == CoolRowBelow)
         {
             moving.Break = true;
-            return MoveTo(moving, (int)Bands.Count() - 1);
+            return MoveTo(moving, (int)Bands.Count - 1);
         }
 
         if (onto == dragged)
@@ -1932,13 +1935,13 @@ public class CoolBar : CustomControl
     {
         if (visibleIndex < 0)
             return 0;
-        if ((nuint)visibleIndex >= showing.Count())
+        if ((nuint)visibleIndex >= showing.Count)
         {
-            return (int)Bands.Count() - 1;
+            return (int)Bands.Count - 1;
         }
         var wanted = showing.At((nuint)visibleIndex);
         var all = Bands;
-        for (nuint i = 0u; i < all.Count(); i++)
+        for (nuint i = 0u; i < all.Count; i++)
         {
             if (all.At(i) == wanted)
                 return (int)i;
@@ -1952,7 +1955,7 @@ public class CoolBar : CustomControl
         var all = Bands;
         nuint from = 0u;
         bool found = false;
-        for (nuint i = 0u; i < all.Count(); i++)
+        for (nuint i = 0u; i < all.Count; i++)
         {
             if (all.At(i) == band)
             {
@@ -1967,8 +1970,8 @@ public class CoolBar : CustomControl
         int to = index;
         if (to < 0)
             to = 0;
-        if ((nuint)to >= all.Count())
-            to = (int)all.Count() - 1;
+        if ((nuint)to >= all.Count)
+            to = (int)all.Count - 1;
         if ((nuint)to == from)
             return false;
 

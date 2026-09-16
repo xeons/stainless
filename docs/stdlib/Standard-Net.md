@@ -180,10 +180,10 @@ open first.
 
 <sub>[stdlib/Net.sl:306](../../stdlib/Net.sl#L306)</sub>
 
-#### IsOpen *method*
+#### IsOpen *property*
 
 ```
-bool IsOpen()
+bool IsOpen { get; }
 ```
 
 Whether the handle is still live. False before a failed open and after
@@ -192,10 +192,10 @@ only a read can find out.
 
 <sub>[stdlib/Net.sl:371](../../stdlib/Net.sl#L371)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-SocketError Error()
+SocketError Error { get; }
 ```
 
 The last error, or `None`. Set by every call that failed, and cleared
@@ -203,30 +203,30 @@ by the next one that did not.
 
 <sub>[stdlib/Net.sl:375](../../stdlib/Net.sl#L375)</sub>
 
-#### Family *method*
+#### Family *property*
 
 ```
-AddressFamily Family()
+AddressFamily Family { get; }
 ```
 
 Which family the socket was opened for. Fixed at open.
 
 <sub>[stdlib/Net.sl:378](../../stdlib/Net.sl#L378)</sub>
 
-#### Kind *method*
+#### Kind *property*
 
 ```
-SocketKind Kind()
+SocketKind Kind { get; }
 ```
 
 Stream or datagram. Fixed at open.
 
 <sub>[stdlib/Net.sl:381](../../stdlib/Net.sl#L381)</sub>
 
-#### Handle *method*
+#### Handle *property*
 
 ```
-nuint Handle()
+nuint Handle { get; }
 ```
 
 The handle itself, for a platform call this wrapper does not make.
@@ -310,20 +310,20 @@ form that tries them all, and the one a client should reach for.
 
 <sub>[stdlib/Net.sl:456](../../stdlib/Net.sl#L456)</sub>
 
-#### LocalEndPoint *method*
+#### LocalEndPoint *property*
 
 ```
-EndPoint LocalEndPoint()
+EndPoint LocalEndPoint { get; }
 ```
 
 This end of the connection.
 
 <sub>[stdlib/Net.sl:467](../../stdlib/Net.sl#L467)</sub>
 
-#### RemoteEndPoint *method*
+#### RemoteEndPoint *property*
 
 ```
-EndPoint RemoteEndPoint()
+EndPoint RemoteEndPoint { get; }
 ```
 
 The other end.
@@ -373,7 +373,7 @@ nuint Receive(byte[] buffer, nuint offset, nuint count)
 
 Reads up to `count` bytes and reports how many arrived. Zero is the
 peer having finished, which is an ending rather than an error -- ask
-`Error()` to tell the two apart.
+`Error` to tell the two apart.
 
 <sub>[stdlib/Net.sl:540](../../stdlib/Net.sl#L540)</sub>
 
@@ -789,10 +789,10 @@ here, and the system's own is measured in tens of seconds.
 
 <sub>[stdlib/Net.sl:881](../../stdlib/Net.sl#L881)</sub>
 
-#### IsConnected *method*
+#### IsConnected *property*
 
 ```
-bool IsConnected()
+bool IsConnected { get; }
 ```
 
 Whether the connection is there. False after the peer finished, after
@@ -806,42 +806,42 @@ Whether the connection is there. False after the peer finished, after
 SocketError SocketError()
 ```
 
-The exact reason, which `Error()` rounds off to fit an `IStream`.
+The exact reason, which `Error` rounds off to fit an `IStream`.
 
-<sub>[stdlib/Net.sl:907](../../stdlib/Net.sl#L907)</sub>
+<sub>[stdlib/Net.sl:910](../../stdlib/Net.sl#L910)</sub>
 
-#### LocalEndPoint *method*
+#### LocalEndPoint *property*
 
 ```
-EndPoint LocalEndPoint()
+EndPoint LocalEndPoint { get; }
 ```
 
 This end of the connection -- the address and the port the system
 chose for it.
 
-<sub>[stdlib/Net.sl:911](../../stdlib/Net.sl#L911)</sub>
+<sub>[stdlib/Net.sl:914](../../stdlib/Net.sl#L914)</sub>
 
-#### RemoteEndPoint *method*
+#### RemoteEndPoint *property*
 
 ```
-EndPoint RemoteEndPoint()
+EndPoint RemoteEndPoint { get; }
 ```
 
 The other end: who is connected. What an accepted connection is asked
 to find out where it came from.
 
-<sub>[stdlib/Net.sl:915](../../stdlib/Net.sl#L915)</sub>
+<sub>[stdlib/Net.sl:918](../../stdlib/Net.sl#L918)</sub>
 
-#### Underlying *method*
+#### Underlying *property*
 
 ```
-Socket Underlying()
+Socket Underlying { get; }
 ```
 
 The socket underneath, for an option this does not expose. Closing it
 closes the connection.
 
-<sub>[stdlib/Net.sl:919](../../stdlib/Net.sl#L919)</sub>
+<sub>[stdlib/Net.sl:922](../../stdlib/Net.sl#L922)</sub>
 
 #### SendText *method*
 
@@ -851,7 +851,7 @@ SocketError SendText(String text)
 
 Sends all of `text`, looping until it has gone.
 
-<sub>[stdlib/Net.sl:922](../../stdlib/Net.sl#L922)</sub>
+<sub>[stdlib/Net.sl:925](../../stdlib/Net.sl#L925)</sub>
 
 #### SendAll *method*
 
@@ -861,7 +861,7 @@ SocketError SendAll(byte[] data)
 
 Sends all of `data`.
 
-<sub>[stdlib/Net.sl:925](../../stdlib/Net.sl#L925)</sub>
+<sub>[stdlib/Net.sl:928](../../stdlib/Net.sl#L928)</sub>
 
 #### ReceiveAll *method*
 
@@ -875,7 +875,7 @@ For a protocol that ends by closing -- HTTP/1.0, or anything behind
 `shutdown` -- this is the whole body. For one that does not, it never
 returns, which is the caller's to know.
 
-<sub>[stdlib/Net.sl:932](../../stdlib/Net.sl#L932)</sub>
+<sub>[stdlib/Net.sl:935](../../stdlib/Net.sl#L935)</sub>
 
 #### ReceiveText *method*
 
@@ -886,7 +886,7 @@ String ReceiveText()
 The same, read as UTF-8. Anything malformed becomes U+FFFD, because the
 result is a `String` and a `String` is valid UTF-8 by invariant.
 
-<sub>[stdlib/Net.sl:958](../../stdlib/Net.sl#L958)</sub>
+<sub>[stdlib/Net.sl:961](../../stdlib/Net.sl#L961)</sub>
 
 #### WaitToRead *method*
 
@@ -898,7 +898,7 @@ Waits up to `milliseconds` for something to read, answering whether
 there is. A peer that closed counts as readable -- the read that
 follows returns zero, which is how the ending is seen.
 
-<sub>[stdlib/Net.sl:969](../../stdlib/Net.sl#L969)</sub>
+<sub>[stdlib/Net.sl:972](../../stdlib/Net.sl#L972)</sub>
 
 #### WaitToWrite *method*
 
@@ -909,38 +909,38 @@ bool WaitToWrite(int milliseconds)
 Waits up to `milliseconds` for room to write, answering whether there
 is. Only interesting once a send has filled the kernel's buffer.
 
-<sub>[stdlib/Net.sl:973](../../stdlib/Net.sl#L973)</sub>
+<sub>[stdlib/Net.sl:976](../../stdlib/Net.sl#L976)</sub>
 
-#### CanRead *method*
+#### CanRead *property*
 
 ```
-bool CanRead()
+bool CanRead { get; }
 ```
 
 True while the connection is open and the peer has not finished.
 
-<sub>[stdlib/Net.sl:978](../../stdlib/Net.sl#L978)</sub>
+<sub>[stdlib/Net.sl:981](../../stdlib/Net.sl#L981)</sub>
 
-#### CanWrite *method*
+#### CanWrite *property*
 
 ```
-bool CanWrite()
+bool CanWrite { get; }
 ```
 
 True while the connection is open. A peer that finished sending can
 still be written to, until it closes for real.
 
-<sub>[stdlib/Net.sl:982](../../stdlib/Net.sl#L982)</sub>
+<sub>[stdlib/Net.sl:985](../../stdlib/Net.sl#L985)</sub>
 
-#### CanSeek *method*
+#### CanSeek *property*
 
 ```
-bool CanSeek()
+bool CanSeek { get; }
 ```
 
 A connection has no position to move to.
 
-<sub>[stdlib/Net.sl:985](../../stdlib/Net.sl#L985)</sub>
+<sub>[stdlib/Net.sl:988](../../stdlib/Net.sl#L988)</sub>
 
 #### Read *method*
 
@@ -955,7 +955,7 @@ Fewer than asked for is normal and not an error: a stream delivers what
 has arrived. Zero means the peer finished, and `Error` distinguishes
 that from a failure.
 
-<sub>[stdlib/Net.sl:993](../../stdlib/Net.sl#L993)</sub>
+<sub>[stdlib/Net.sl:996](../../stdlib/Net.sl#L996)</sub>
 
 #### Write *method*
 
@@ -966,27 +966,27 @@ nuint Write(byte[] buffer, nuint offset, nuint count)
 Writes up to `count` bytes from `buffer` at `offset`, answering how
 many went. A short write is normal; `SendAll` is the one that loops.
 
-<sub>[stdlib/Net.sl:1003](../../stdlib/Net.sl#L1003)</sub>
+<sub>[stdlib/Net.sl:1006](../../stdlib/Net.sl#L1006)</sub>
 
-#### Position *method*
+#### Position *property*
 
 ```
-long Position()
+long Position { get; }
 ```
 
 Not a position, and not pretended to be one.
 
-<sub>[stdlib/Net.sl:1009](../../stdlib/Net.sl#L1009)</sub>
+<sub>[stdlib/Net.sl:1012](../../stdlib/Net.sl#L1012)</sub>
 
-#### Length *method*
+#### Length *property*
 
 ```
-long Length()
+long Length { get; }
 ```
 
 Not a length either. A connection does not know how much is coming.
 
-<sub>[stdlib/Net.sl:1011](../../stdlib/Net.sl#L1011)</sub>
+<sub>[stdlib/Net.sl:1014](../../stdlib/Net.sl#L1014)</sub>
 
 #### Seek *method*
 
@@ -996,7 +996,7 @@ bool Seek(long offset, SeekOrigin origin)
 
 Always false. There is nowhere to seek to on a connection.
 
-<sub>[stdlib/Net.sl:1014](../../stdlib/Net.sl#L1014)</sub>
+<sub>[stdlib/Net.sl:1017](../../stdlib/Net.sl#L1017)</sub>
 
 #### Flush *method*
 
@@ -1006,7 +1006,7 @@ void Flush()
 
 Nothing is buffered here; the kernel decides when bytes leave.
 
-<sub>[stdlib/Net.sl:1017](../../stdlib/Net.sl#L1017)</sub>
+<sub>[stdlib/Net.sl:1020](../../stdlib/Net.sl#L1020)</sub>
 
 #### Close *method*
 
@@ -1018,18 +1018,18 @@ Ends the connection politely: shuts both directions down first, so the
 peer sees an ending rather than a reset, then closes. Idempotent, and
 the destructor calls it.
 
-<sub>[stdlib/Net.sl:1022](../../stdlib/Net.sl#L1022)</sub>
+<sub>[stdlib/Net.sl:1025](../../stdlib/Net.sl#L1025)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-IOError Error()
+IOError Error { get; }
 ```
 
 The socket error as the nearest `IOError`, so that a reader which knows
 nothing about sockets still gets something it can act on.
 
-<sub>[stdlib/Net.sl:1032](../../stdlib/Net.sl#L1032)</sub>
+<sub>[stdlib/Net.sl:1035](../../stdlib/Net.sl#L1035)</sub>
 
 ### TcpListener *class*
 
@@ -1047,7 +1047,7 @@ says which of the three failed.
     var server = try TcpListener.Listen(8080u);
 
     var client = server.Accept();
-    while (client.IsConnected()) { ... }
+    while (client.IsConnected) { ... }
 
 <sub>[stdlib/Net.sl:762](../../stdlib/Net.sl#L762)</sub>
 
@@ -1086,10 +1086,10 @@ The other two overloads are this one with IPv4 and a backlog of 16.
 
 <sub>[stdlib/Net.sl:785](../../stdlib/Net.sl#L785)</sub>
 
-#### IsListening *method*
+#### IsListening *property*
 
 ```
-bool IsListening()
+bool IsListening { get; }
 ```
 
 Whether it bound and listened. False means the constructor gave up
@@ -1097,20 +1097,20 @@ part-way, and `Error` says where.
 
 <sub>[stdlib/Net.sl:816](../../stdlib/Net.sl#L816)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-SocketError Error()
+SocketError Error { get; }
 ```
 
 The last error from the socket underneath, or `None`.
 
 <sub>[stdlib/Net.sl:819](../../stdlib/Net.sl#L819)</sub>
 
-#### LocalEndPoint *method*
+#### LocalEndPoint *property*
 
 ```
-EndPoint LocalEndPoint()
+EndPoint LocalEndPoint { get; }
 ```
 
 Where it is listening. With port 0 this is how the port the system
@@ -1118,10 +1118,10 @@ chose is found out.
 
 <sub>[stdlib/Net.sl:823](../../stdlib/Net.sl#L823)</sub>
 
-#### Underlying *method*
+#### Underlying *property*
 
 ```
-Socket Underlying()
+Socket Underlying { get; }
 ```
 
 The socket underneath, for an option this does not expose.
@@ -1178,7 +1178,7 @@ second is how a program comes to assume things about UDP that are not true.
     var buffer = new byte[1500];
     nuint got = socket.Receive(buffer, ref from);
 
-<sub>[stdlib/Net.sl:1062](../../stdlib/Net.sl#L1062)</sub>
+<sub>[stdlib/Net.sl:1068](../../stdlib/Net.sl#L1068)</sub>
 
 #### Datagram *method*
 
@@ -1188,7 +1188,7 @@ static Result<UdpSocket, SocketError> Datagram()
 
 A socket that can send and not receive, because nothing bound it.
 
-<sub>[stdlib/Net.sl:1068](../../stdlib/Net.sl#L1068)</sub>
+<sub>[stdlib/Net.sl:1074](../../stdlib/Net.sl#L1074)</sub>
 
 #### Datagram *method*
 
@@ -1198,7 +1198,7 @@ static Result<UdpSocket, SocketError> Datagram(AddressFamily family)
 
 The same, in a named family.
 
-<sub>[stdlib/Net.sl:1074](../../stdlib/Net.sl#L1074)</sub>
+<sub>[stdlib/Net.sl:1080](../../stdlib/Net.sl#L1080)</sub>
 
 #### Bind *method*
 
@@ -1209,7 +1209,7 @@ static Result<UdpSocket, SocketError> Bind(ushort port)
 A socket bound to a port, so it can receive. Port 0 asks the system to
 choose one, which `LocalEndPoint` will say.
 
-<sub>[stdlib/Net.sl:1084](../../stdlib/Net.sl#L1084)</sub>
+<sub>[stdlib/Net.sl:1090](../../stdlib/Net.sl#L1090)</sub>
 
 #### Bind *method*
 
@@ -1219,7 +1219,7 @@ static Result<UdpSocket, SocketError> Bind(String host, ushort port)
 
 The same, on one address rather than all of them.
 
-<sub>[stdlib/Net.sl:1090](../../stdlib/Net.sl#L1090)</sub>
+<sub>[stdlib/Net.sl:1096](../../stdlib/Net.sl#L1096)</sub>
 
 #### Bind *method*
 
@@ -1229,49 +1229,49 @@ static Result<UdpSocket, SocketError> Bind(String host, ushort port, AddressFami
 
 Binds with everything named: the address, the port and the family.
 
-<sub>[stdlib/Net.sl:1096](../../stdlib/Net.sl#L1096)</sub>
+<sub>[stdlib/Net.sl:1102](../../stdlib/Net.sl#L1102)</sub>
 
-#### IsOpen *method*
+#### IsOpen *property*
 
 ```
-bool IsOpen()
+bool IsOpen { get; }
 ```
 
 Whether the socket is usable. False after `Close`, and after an open
 that did not work.
 
-<sub>[stdlib/Net.sl:1121](../../stdlib/Net.sl#L1121)</sub>
+<sub>[stdlib/Net.sl:1127](../../stdlib/Net.sl#L1127)</sub>
 
-#### Error *method*
+#### Error *property*
 
 ```
-SocketError Error()
+SocketError Error { get; }
 ```
 
 The last error from the socket underneath, or `None`.
 
-<sub>[stdlib/Net.sl:1124](../../stdlib/Net.sl#L1124)</sub>
+<sub>[stdlib/Net.sl:1130](../../stdlib/Net.sl#L1130)</sub>
 
-#### LocalEndPoint *method*
+#### LocalEndPoint *property*
 
 ```
-EndPoint LocalEndPoint()
+EndPoint LocalEndPoint { get; }
 ```
 
 Where it is bound. With port 0 this is how the port the system chose is
 found out; an unbound socket answers with nothing useful.
 
-<sub>[stdlib/Net.sl:1128](../../stdlib/Net.sl#L1128)</sub>
+<sub>[stdlib/Net.sl:1134](../../stdlib/Net.sl#L1134)</sub>
 
-#### Underlying *method*
+#### Underlying *property*
 
 ```
-Socket Underlying()
+Socket Underlying { get; }
 ```
 
 The socket underneath, for an option this does not expose.
 
-<sub>[stdlib/Net.sl:1131](../../stdlib/Net.sl#L1131)</sub>
+<sub>[stdlib/Net.sl:1137](../../stdlib/Net.sl#L1137)</sub>
 
 #### Send *method*
 
@@ -1282,7 +1282,7 @@ nuint Send(byte[] data, String host, ushort port)
 Sends one datagram. The count back is how many bytes went, which for a
 datagram is all of them or none.
 
-<sub>[stdlib/Net.sl:1135](../../stdlib/Net.sl#L1135)</sub>
+<sub>[stdlib/Net.sl:1141](../../stdlib/Net.sl#L1141)</sub>
 
 #### SendText *method*
 
@@ -1294,7 +1294,7 @@ Sends one datagram of UTF-8. The encoded length is what goes on the
 wire, so a string of multi-byte characters is longer than its character
 count -- which matters against the roughly 1500-byte practical limit.
 
-<sub>[stdlib/Net.sl:1143](../../stdlib/Net.sl#L1143)</sub>
+<sub>[stdlib/Net.sl:1149](../../stdlib/Net.sl#L1149)</sub>
 
 #### Receive *method*
 
@@ -1306,7 +1306,7 @@ Reads one datagram and says where it came from. A datagram longer than
 the buffer is truncated, and the rest is gone -- there is no second
 read to collect it.
 
-<sub>[stdlib/Net.sl:1151](../../stdlib/Net.sl#L1151)</sub>
+<sub>[stdlib/Net.sl:1157](../../stdlib/Net.sl#L1157)</sub>
 
 #### WaitToRead *method*
 
@@ -1317,7 +1317,7 @@ bool WaitToRead(int milliseconds)
 Waits up to `milliseconds` for a datagram to arrive, answering whether
 one has. The way to poll without blocking forever on an empty socket.
 
-<sub>[stdlib/Net.sl:1158](../../stdlib/Net.sl#L1158)</sub>
+<sub>[stdlib/Net.sl:1164](../../stdlib/Net.sl#L1164)</sub>
 
 #### SetBroadcast *method*
 
@@ -1327,7 +1327,7 @@ SocketError SetBroadcast(bool on)
 
 Lets this socket send to a broadcast address.
 
-<sub>[stdlib/Net.sl:1161](../../stdlib/Net.sl#L1161)</sub>
+<sub>[stdlib/Net.sl:1167](../../stdlib/Net.sl#L1167)</sub>
 
 #### SetReceiveTimeout *method*
 
@@ -1337,7 +1337,7 @@ SocketError SetReceiveTimeout(int milliseconds)
 
 How long `Receive` waits before giving up. Zero is forever.
 
-<sub>[stdlib/Net.sl:1164](../../stdlib/Net.sl#L1164)</sub>
+<sub>[stdlib/Net.sl:1170](../../stdlib/Net.sl#L1170)</sub>
 
 #### Close *method*
 
@@ -1347,7 +1347,7 @@ void Close()
 
 Closes the socket. Idempotent, and the destructor calls it.
 
-<sub>[stdlib/Net.sl:1170](../../stdlib/Net.sl#L1170)</sub>
+<sub>[stdlib/Net.sl:1176](../../stdlib/Net.sl#L1176)</sub>
 
 ## Functions
 

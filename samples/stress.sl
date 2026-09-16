@@ -12,7 +12,7 @@ class Node
 
     ~Node() { printf("  ~Node(%d)\n", _id); }
 
-    public int Id() => _id;
+    public int Id => _id;
     public void Link(Node other) => _next = other;
 }
 
@@ -53,7 +53,7 @@ int Main()
         var a = new Node(1);
         var b = new Node(2);
         a.Link(b);
-        printf("  a=%d b=%d\n", a.Id(), b.Id());
+        printf("  a=%d b=%d\n", a.Id, b.Id);
         printf("  leaving inner scope\n");
     }
     printf("chain released\n");

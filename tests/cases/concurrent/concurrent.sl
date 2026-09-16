@@ -52,7 +52,7 @@ int Main()
         spawn Produce(queue, 2000, 3000);
         spawn Produce(queue, 3000, 4000);
     }
-    printf("queued=%llu\n", queue.Count());
+    printf("queued=%llu\n", queue.Count);
 
     long sum = 0;
     var got = queue.TryDequeue();
@@ -92,7 +92,7 @@ int Main()
         spawn Record(map, 1000, 1500);
         spawn Record(map, 1500, 2000);
     }
-    printf("mapped=%llu at777=%d\n", map.Count(), map.GetOr(777, -1));
+    printf("mapped=%llu at777=%d\n", map.Count, map.GetOr(777, -1));
 
     // Add is the operation ContainsKey-then-Set cannot be, since another
     // thread can insert between the two.
@@ -102,7 +102,7 @@ int Main()
     printf("get=%d %d absent=%d\n",
         found.Ok ? 1 : 0, found.Value, map.TryGet(-1).Ok ? 1 : 0);
     printf("remove=%d gone=%d keys=%llu\n",
-        map.Remove(9999) ? 1 : 0, map.Remove(9999) ? 1 : 0, map.Keys().Count());
+        map.Remove(9999) ? 1 : 0, map.Remove(9999) ? 1 : 0, map.Keys().Count);
 
     // ---------------------------------------------------------- channel
     // One producer, three consumers, and a close that wakes all of them.
@@ -121,7 +121,7 @@ int Main()
     }
     // 1 + 2 + ... + 600, and each item taken exactly once.
     printf("channel=%lld items=%lld closed=%d\n",
-        total.Load(), seen.Load(), channel.IsClosed() ? 1 : 0);
+        total.Load(), seen.Load(), channel.IsClosed ? 1 : 0);
     printf("after-close=%d drained=%d\n",
         channel.Send(1) ? 1 : 0, channel.Take().Ok ? 1 : 0);
 

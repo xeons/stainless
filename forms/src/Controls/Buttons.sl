@@ -64,7 +64,7 @@ public abstract class ButtonBase : WindowedControl
             var peer = Peer;
             if (peer == null)
                 return Size.Empty;
-            return ((IControlPeer)peer).PreferredSize();
+            return ((IControlPeer)peer).PreferredSize;
         }
     }
 

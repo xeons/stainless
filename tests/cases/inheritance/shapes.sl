@@ -13,7 +13,7 @@ import Standard.Text;
 
 public interface INamed
 {
-    String Name();
+    String Name { get; }
 }
 
 /// The root: abstract, so it cannot be made, and every concrete class below
@@ -34,10 +34,10 @@ public abstract class Shape : INamed
     /// Virtual with a body: a derived class may take it or replace it.
     public virtual String Describe()
     {
-        return Name() + " with " + Text.FromInteger(sides) + " sides";
+        return Name + " with " + Text.FromInteger(sides) + " sides";
     }
 
-    public virtual String Name() => "shape";
+    public virtual String Name => "shape";
 
     /// Not virtual, and reads a protected field: the base's own view.
     public int Sides() => sides;
@@ -57,7 +57,7 @@ public class Polygon : Shape
 
     public override double Area() => width * width;
 
-    public override String Name() => "polygon";
+    public override String Name => "polygon";
 
     /// Reaching the base's implementation, which the vtable would never find.
     public override String Describe()
@@ -78,7 +78,7 @@ public sealed class Square : Polygon
     }
 
     /// Sealed on an override closes the chain at this class.
-    public sealed override String Name() => "square";
+    public sealed override String Name => "square";
 
     public int Corners() => _corners;
 }
@@ -96,7 +96,7 @@ public class Circle : Shape
     }
 
     public override double Area() => 3.0 * _radius * _radius;
-    public override String Name() => "circle";
+    public override String Name => "circle";
 }
 
 /// The end of the line for construction: it takes no arguments itself, so
@@ -109,7 +109,7 @@ public class Dot : Shape
     }
 
     public override double Area() => 0.0;
-    public override String Name() => "dot";
+    public override String Name => "dot";
 }
 
 /// A class that declares no constructor at all. `new Point()` runs the nearest
@@ -130,7 +130,7 @@ public class Pixel : Dot
     }
 
     public int Shade() => _shade;
-    public override String Name() => "pixel";
+    public override String Name => "pixel";
 }
 
 /// An abstract property is a pair of abstract accessors, and both dispatch --
@@ -179,7 +179,7 @@ public class Built : Shape
     }
 
     public override double Area() => 0.0;
-    public override String Name() => "built";
+    public override String Name => "built";
 }
 
 /// Three deep, with a destructor at every level and a reference held at two of
@@ -251,7 +251,7 @@ int Main()
 
     // --- an interface the base implements and a derived class overrides -----
     INamed named = square;
-    Console.WriteLine("through the interface: " + named.Name());
+    Console.WriteLine("through the interface: " + named.Name);
 
     // --- what the object really is -----------------------------------------
     Console.WriteLine("square is Square: " + Text.FromBool(square is Square));
@@ -278,12 +278,12 @@ int Main()
 
     Point point = new Point();
     Console.WriteLine("point sides: " + Text.FromInteger(point.Sides())
-        + ", name " + point.Name());
+        + ", name " + point.Name);
 
     Pixel pixel = new Pixel(9);
     Console.WriteLine("pixel sides: " + Text.FromInteger(pixel.Sides())
         + ", shade " + Text.FromInteger(pixel.Shade())
-        + ", name " + pixel.Name());
+        + ", name " + pixel.Name);
 
     // --- virtual properties -------------------------------------------------
     Counter plain = new Counter(21);
@@ -301,7 +301,7 @@ int Main()
     Built once = new Built();
     Console.WriteLine("delegated: sides " + Text.FromInteger(once.Sides())
         + ", steps " + Text.FromInteger(once.Steps)
-        + ", name " + once.Name());
+        + ", name " + once.Name);
 
     // --- an array of the base, holding three different classes --------------
     Shape[] every = new Shape[3];

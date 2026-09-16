@@ -20,7 +20,7 @@ const int PerJob = 20000;
 AtomicLong Grab(Mutex<AtomicLong> held)
 {
     var guard = held.Lock();
-    return guard.Value();
+    return guard.Value;
 }
 
 void Touch(byte* argument)

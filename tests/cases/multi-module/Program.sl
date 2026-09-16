@@ -28,7 +28,7 @@ int Main()
     boxed.Include(new Book("TAPL", Money.Cents(6800)));
     register.Add(boxed);
 
-    for (nuint i = 0; i < register.Count(); i = i + 1)
+    for (nuint i = 0; i < register.Count; i = i + 1)
     {
         var item = register.At(i);
         Console.WriteLine("  " + item.Label() + " = " + Money.Format(item.Price()));

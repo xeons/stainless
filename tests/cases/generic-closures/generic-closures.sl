@@ -128,8 +128,8 @@ public int Main()
     String[] words = ["alpha", "bb", "c", "delta"];
 
     // A lambda, at two different type arguments.
-    Console.WriteLine($"kept     {Kept(numbers, (n) => n > 3).Count()}");
-    Console.WriteLine($"words    {Kept(words, (w) => w.ByteLength() > 1u).Count()}");
+    Console.WriteLine($"kept     {Kept(numbers, (n) => n > 3).Count}");
+    Console.WriteLine($"words    {Kept(words, (w) => w.ByteLength() > 1u).Count}");
 
     // The result type read off the lambda's body.
     var spelled = Turned(numbers, (n) => Text.FromInteger((long)n));

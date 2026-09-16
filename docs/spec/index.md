@@ -80,7 +80,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 - [2.6 `variant` — a value that is one of several things](02-types.md#26-variant--a-value-that-is-one-of-several-things)
 - [2.7 `union` — every member at offset zero](02-types.md#27-union--every-member-at-offset-zero)
   - [2.7.1 Nameless members](02-types.md#271-nameless-members)
-- [2.8 `Result<T, E>` — how a function fails](02-types.md#28-resultt-e--how-a-function-fails)
+- [2.8 `Result<T, TError>` — how a function fails](02-types.md#28-resultt-e--how-a-function-fails)
   - [2.8.1 `Optional<T>` — a value, or none](02-types.md#281-optionalt--a-value-or-none)
 - [2.9 How the library reports failure](02-types.md#29-how-the-library-reports-failure)
 - [2.10 `interface` — a contract, dispatched dynamically](02-types.md#210-interface--a-contract-dispatched-dynamically)

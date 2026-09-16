@@ -29,7 +29,7 @@ import Forms.Platform;
 ///
 /// ```
 /// Clipboard.SetText(editor.SelectedText);
-/// if (Clipboard.HasText()) { editor.Type(Clipboard.GetText()); }
+/// if (Clipboard.HasText) { editor.Type(Clipboard.GetText()); }
 /// ```
 ///
 /// **Text and nothing else, so far.** A clipboard carries several formats at
@@ -73,8 +73,11 @@ public class Clipboard
     /// What a paste command greys itself out on. Cheaper than fetching the text
     /// on both platforms -- and on X11 much cheaper, since it does not wait for
     /// another process to hand the contents over.
-    public static bool HasText()
+    public static bool HasText
     {
-        return WidgetSet.Current.ClipboardHasText();
+        get
+        {
+            return WidgetSet.Current.ClipboardHasText;
+        }
     }
 }

@@ -126,7 +126,7 @@ public class XmlAttributes
     public XmlAttributes() => _entries = new OrderedDictionary<String, String>();
 
     /// How many attributes there are.
-    public nuint Count() => _entries.Count();
+    public nuint Count => _entries.Count;
 
     /// The name at a position, in the order they were written.
     public String NameAt(nuint index) => _entries.KeyAt(index);
@@ -195,7 +195,7 @@ public class XmlNode
     /// The first child of that name, or null.
     public XmlNode? Child(String name)
     {
-        for (nuint i = 0u; i < Children.Count(); i++)
+        for (nuint i = 0u; i < Children.Count; i++)
         {
             var child = Children.At(i);
             if (child.Name == name)
@@ -208,7 +208,7 @@ public class XmlNode
     public List<XmlNode> ChildrenNamed(String name)
     {
         var found = new List<XmlNode>();
-        for (nuint i = 0u; i < Children.Count(); i++)
+        for (nuint i = 0u; i < Children.Count; i++)
         {
             var child = Children.At(i);
             if (child.Name == name)
@@ -248,7 +248,7 @@ class Cursor
         Failure = XmlError.None;
     }
 
-    public bool Failed() => Failure != XmlError.None;
+    public bool Failed => Failure != XmlError.None;
 
     public void Reject(XmlError why)
     {
@@ -256,11 +256,11 @@ class Cursor
             Failure = why;
     }
 
-    public bool AtEnd() => At >= Source.ByteLength();
+    public bool AtEnd => At >= Source.ByteLength();
 
     public byte Peek()
     {
-        if (AtEnd())
+        if (AtEnd)
             return (byte)0;
         return Source.ByteAt(At);
     }
@@ -293,7 +293,7 @@ class Cursor
     /// Moves past `word`, or to the end when it is not there.
     public bool SkipPast(String word)
     {
-        while (!AtEnd())
+        while (!AtEnd)
         {
             if (Take(word))
                 return true;
@@ -333,7 +333,7 @@ bool IsNamePart(byte c)
 
 void SkipSpace(Cursor cursor)
 {
-    while (!cursor.AtEnd() && IsSpace(cursor.Source.ByteAt(cursor.At)))
+    while (!cursor.AtEnd && IsSpace(cursor.Source.ByteAt(cursor.At)))
         cursor.Skip();
 }
 
@@ -341,13 +341,13 @@ String ParseName(Cursor cursor)
 {
     nuint start = cursor.At;
 
-    if (cursor.AtEnd() || !IsNameStart(cursor.Peek()))
+    if (cursor.AtEnd || !IsNameStart(cursor.Peek()))
     {
         cursor.Reject(XmlError.BadName);
         return "";
     }
 
-    while (!cursor.AtEnd() && IsNamePart(cursor.Source.ByteAt(cursor.At)))
+    while (!cursor.AtEnd && IsNamePart(cursor.Source.ByteAt(cursor.At)))
         cursor.Skip();
 
     return cursor.Source.Substring(start, cursor.At - start);
@@ -378,7 +378,7 @@ bool SkipAside(Cursor cursor)
         // stop inside it, so the brackets are counted.
         nuint depth = 0u;
 
-        while (!cursor.AtEnd())
+        while (!cursor.AtEnd)
         {
             byte c = cursor.Peek();
             cursor.Skip();
@@ -417,7 +417,7 @@ XmlNode ParseElement(Cursor cursor)
     cursor.Skip();                              // past '<'
 
     var name = ParseName(cursor);
-    if (cursor.Failed())
+    if (cursor.Failed)
         return new XmlNode("");
 
     var node = new XmlNode(name);
@@ -427,7 +427,7 @@ XmlNode ParseElement(Cursor cursor)
     {
         SkipSpace(cursor);
 
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
         {
             cursor.Reject(XmlError.UnclosedTag);
             return node;
@@ -454,7 +454,7 @@ XmlNode ParseElement(Cursor cursor)
         }
 
         var key = ParseName(cursor);
-        if (cursor.Failed())
+        if (cursor.Failed)
             return node;
 
         SkipSpace(cursor);
@@ -475,7 +475,7 @@ XmlNode ParseElement(Cursor cursor)
         cursor.Skip();
 
         var value = ParseUntil(cursor, quote);
-        if (cursor.Failed())
+        if (cursor.Failed)
             return node;
 
         // XML forbids a repeated attribute on one element, and a document with
@@ -496,7 +496,7 @@ XmlNode ParseElement(Cursor cursor)
 
     while (true)
     {
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
         {
             cursor.Reject(XmlError.UnexpectedEnd);
             break;
@@ -510,7 +510,7 @@ XmlNode ParseElement(Cursor cursor)
                 cursor.Skip();
 
                 var closing = ParseName(cursor);
-                if (cursor.Failed())
+                if (cursor.Failed)
                     break;
 
                 if (closing != node.Name)
@@ -547,13 +547,13 @@ XmlNode ParseElement(Cursor cursor)
 
             if (SkipAside(cursor))
             {
-                if (cursor.Failed())
+                if (cursor.Failed)
                     break;
                 continue;
             }
 
             var child = ParseElement(cursor);
-            if (cursor.Failed())
+            if (cursor.Failed)
                 break;
 
             node.Add(child);
@@ -561,7 +561,7 @@ XmlNode ParseElement(Cursor cursor)
         }
 
         text.Append(ParseUntil(cursor, (byte)'<'));
-        if (cursor.Failed())
+        if (cursor.Failed)
             break;
     }
 
@@ -580,7 +580,7 @@ String ParseUntil(Cursor cursor, byte stop)
 
     while (true)
     {
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
         {
             // Running out inside a quoted value is an error; running out of
             // content is the caller's to notice.
@@ -614,7 +614,7 @@ String ParseUntil(Cursor cursor, byte stop)
         }
 
         text.Append(ParseEntity(cursor));
-        if (cursor.Failed())
+        if (cursor.Failed)
             break;
 
         run = cursor.At;
@@ -654,7 +654,7 @@ String ParseCharacterReference(Cursor cursor, uint radix)
     uint value = 0u;
     nuint digits = 0u;
 
-    while (!cursor.AtEnd())
+    while (!cursor.AtEnd)
     {
         byte c = cursor.Peek();
         uint digit = 0u;
@@ -710,14 +710,14 @@ public Result<XmlNode, XmlError> Parse(String source)
     while (true)
     {
         SkipSpace(cursor);
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
             return Fail(XmlError.NoRoot);
 
         if (cursor.Peek() != (byte)'<')
             return Fail(XmlError.Unexpected);
         if (!SkipAside(cursor))
             break;
-        if (cursor.Failed())
+        if (cursor.Failed)
             return Fail(cursor.Failure);
     }
 
@@ -725,21 +725,21 @@ public Result<XmlNode, XmlError> Parse(String source)
         return Fail(XmlError.Unexpected);
 
     var root = ParseElement(cursor);
-    if (cursor.Failed())
+    if (cursor.Failed)
         return Fail(cursor.Failure);
 
     // And anything after it, which may only be more of the same.
     while (true)
     {
         SkipSpace(cursor);
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
             break;
 
         if (cursor.Peek() != (byte)'<')
             return Fail(XmlError.TrailingContent);
         if (!SkipAside(cursor))
             return Fail(XmlError.TrailingContent);
-        if (cursor.Failed())
+        if (cursor.Failed)
             return Fail(cursor.Failure);
     }
 
@@ -783,7 +783,7 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
     text.Append("<");
     text.Append(node.Name);
 
-    for (nuint i = 0u; i < node.Attributes.Count(); i++)
+    for (nuint i = 0u; i < node.Attributes.Count; i++)
     {
         text.Append(" ");
         text.Append(node.Attributes.NameAt(i));
@@ -792,7 +792,7 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
         text.Append("\"");
     }
 
-    bool empty = node.Children.Count() == 0u && node.Text.ByteLength() == 0u;
+    bool empty = node.Children.Count == 0u && node.Text.ByteLength() == 0u;
     if (empty)
     {
         text.Append("/>");
@@ -805,14 +805,14 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
     // represent -- see the note on XmlNode.
     WriteEscaped(text, node.Text, false);
 
-    for (nuint i = 0u; i < node.Children.Count(); i++)
+    for (nuint i = 0u; i < node.Children.Count; i++)
     {
         if (pretty)
             text.Append("\n");
         WriteInto(text, node.Children.At(i), depth + 1u, pretty);
     }
 
-    if (pretty && node.Children.Count() > 0u)
+    if (pretty && node.Children.Count > 0u)
     {
         text.Append("\n");
         for (nuint i = 0u; i < depth; i++)
@@ -925,7 +925,7 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
 
     var text = new StringBuilder();
 
-    for (nuint i = 0u; i < type.FieldCount(); i++)
+    for (nuint i = 0u; i < type.FieldCount; i++)
     {
         var field = type.FieldAt(i);
         if (field.Has("XmlIgnore"))
@@ -933,7 +933,7 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
 
         var fieldName = NameOf(field);
 
-        if (field.IsWalkable())
+        if (field.IsWalkable)
         {
             byte* nested = Reflection.ReadAggregate(instance, field);
             if (nested == null)
@@ -952,7 +952,7 @@ XmlNode NodeOfInstance(byte* instance, Type type, String name)
             continue;
         }
 
-        if (!field.IsSimple())
+        if (!field.IsSimple)
             continue;
 
         var written = TextOfField(instance, field);
@@ -975,16 +975,16 @@ String NameOf(Field field)
 {
     if (field.Has("XmlName"))
         return field.Get("XmlName").AsText(0u);
-    return field.Name();
+    return field.Name;
 }
 
 /// An array whose elements this can write and read back.
 bool WalksAsArray(Field field)
 {
-    if (!field.IsArray())
+    if (!field.IsArray)
         return false;
 
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
     if (kind == KindString || kind == KindBool)
         return true;
     if (kind == KindFloat || kind == KindDouble)
@@ -996,8 +996,8 @@ bool WalksAsArray(Field field)
 
     if (kind == KindClass || kind == KindStruct)
     {
-        var inner = field.ElementType();
-        return inner.Exists() && inner.Has("Reflect");
+        var inner = field.ElementType;
+        return inner.Exists && inner.Has("Reflect");
     }
 
     return false;
@@ -1014,7 +1014,7 @@ void AddArray(XmlNode node, byte* instance, Field field, String name)
     if (array == null)
         return;
 
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
 
     for (nuint i = 0u; i < Reflection.ArrayLength(array); i++)
     {
@@ -1025,7 +1025,7 @@ void AddArray(XmlNode node, byte* instance, Field field, String name)
             byte* nested = Reflection.ReadAggregateAt(at, field);
             if (nested == null)
                 continue;
-            node.Add(NodeOfInstance(nested, field.ElementType(), name));
+            node.Add(NodeOfInstance(nested, field.ElementType, name));
             continue;
         }
 
@@ -1037,7 +1037,7 @@ void AddArray(XmlNode node, byte* instance, Field field, String name)
 
 String TextOfElement(byte* at, Field field)
 {
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
 
     if (kind == KindString)
         return Reflection.ReadTextAt(at);
@@ -1052,13 +1052,13 @@ String TextOfElement(byte* at, Field field)
 
 String TextOfField(byte* instance, Field field)
 {
-    if (field.Kind() == KindString)
+    if (field.Kind == KindString)
         return Reflection.ReadText(instance, field);
-    if (field.Kind() == KindBool)
+    if (field.Kind == KindBool)
         return Text.FromBool(Reflection.ReadBool(instance, field));
-    if (field.IsFloating())
+    if (field.IsFloating)
         return Text.FromDouble(Reflection.ReadDouble(instance, field));
-    if (field.IsInteger())
+    if (field.IsInteger)
         return Text.FromInteger(Reflection.ReadInteger(instance, field));
     return "";
 }
@@ -1081,7 +1081,7 @@ public XmlError Populate<T>(T value, String source)
 public XmlError PopulateFrom<T>(T value, XmlNode node)
 {
     var type = typeof(T);
-    if (type.FieldCount() == 0u)
+    if (type.FieldCount == 0u)
         return XmlError.NotReflected;
 
     FillInstance((byte*)value, type, node);
@@ -1090,7 +1090,7 @@ public XmlError PopulateFrom<T>(T value, XmlNode node)
 
 void FillInstance(byte* instance, Type type, XmlNode node)
 {
-    for (nuint i = 0u; i < type.FieldCount(); i++)
+    for (nuint i = 0u; i < type.FieldCount; i++)
     {
         var field = type.FieldAt(i);
         if (field.Has("XmlIgnore"))
@@ -1098,7 +1098,7 @@ void FillInstance(byte* instance, Type type, XmlNode node)
 
         var name = NameOf(field);
 
-        if (field.IsWalkable())
+        if (field.IsWalkable)
         {
             var child = node.Child(name);
             if (child == null)
@@ -1121,7 +1121,7 @@ void FillInstance(byte* instance, Type type, XmlNode node)
             continue;
         }
 
-        if (!field.IsSimple())
+        if (!field.IsSimple)
             continue;
 
         // An attribute first, then a child element of the name: a document
@@ -1156,9 +1156,9 @@ void FillArray(byte* instance, Field field, List<XmlNode> found)
         return;
 
     nuint length = Reflection.ArrayLength(array);
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
 
-    for (nuint i = 0u; i < found.Count() && i < length; i++)
+    for (nuint i = 0u; i < found.Count && i < length; i++)
     {
         byte* at = Reflection.ElementAt(array, field, i);
 
@@ -1166,7 +1166,7 @@ void FillArray(byte* instance, Field field, List<XmlNode> found)
         {
             byte* nested = Reflection.ReadAggregateAt(at, field);
             if (nested != null)
-                FillInstance(nested, field.ElementType(), found.At(i));
+                FillInstance(nested, field.ElementType, found.At(i));
             continue;
         }
 
@@ -1176,7 +1176,7 @@ void FillArray(byte* instance, Field field, List<XmlNode> found)
 
 void FillElement(byte* at, Field field, String written)
 {
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
 
     if (kind == KindString)
     {
@@ -1205,20 +1205,20 @@ void FillElement(byte* at, Field field, String written)
 
 void FillField(byte* instance, Field field, String written)
 {
-    if (field.Kind() == KindString)
+    if (field.Kind == KindString)
     {
         Reflection.WriteText(instance, field, written);
         return;
     }
 
-    if (field.Kind() == KindBool)
+    if (field.Kind == KindBool)
     {
         // `true` and `1` both, which is what documents in the wild contain.
         Reflection.WriteBool(instance, field, written == "true" || written == "1");
         return;
     }
 
-    if (field.IsFloating())
+    if (field.IsFloating)
     {
         var parsed = Convert.ToDouble(written);
         if (parsed.Ok)
@@ -1226,7 +1226,7 @@ void FillField(byte* instance, Field field, String written)
         return;
     }
 
-    if (field.IsInteger())
+    if (field.IsInteger)
     {
         var parsed = Convert.ToLong(written);
         if (parsed.Ok)

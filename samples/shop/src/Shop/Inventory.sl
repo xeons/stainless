@@ -17,7 +17,7 @@ public class Register<T>
         _count = 0;
     }
 
-    public nuint Count() => _count;
+    public nuint Count => _count;
     public T At(nuint index) => _items[index];
 
     public void Add(T item)
@@ -44,13 +44,13 @@ public class RegisterCursor<T>
 
     public bool MoveNext()
     {
-        if (_next >= _source.Count())
+        if (_next >= _source.Count)
             return false;
         _next++;
         return true;
     }
 
-    public T Current() => _source.At(_next - 1);
+    public T Current => _source.At(_next - 1);
 }
 
 public Money Total(Register<IPriced> register)

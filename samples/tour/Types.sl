@@ -167,7 +167,7 @@ public class Branch<T>
 
 public interface INamed
 {
-    String Name();
+    String Name { get; }
 }
 
 /// An interface may extend another, and then implementing it means supplying
@@ -200,11 +200,11 @@ public abstract class Figure : IDrawable
     public abstract double Area();
 
     /// A body, which a derived class may take or replace.
-    public virtual String Name() => "figure";
+    public virtual String Name => "figure";
 
     public virtual String Draw()
     {
-        return Name() + " with " + Text.FromInteger((long)sides) + " sides";
+        return Name + " with " + Text.FromInteger((long)sides) + " sides";
     }
 
     /// Not virtual, and reads a protected field.
@@ -224,7 +224,7 @@ public class Polygon : Figure
     }
 
     public override double Area() => width * width;
-    public override String Name() => "polygon";
+    public override String Name => "polygon";
 
     /// Reaching the base's implementation, which the dispatch table would
     /// never find.
@@ -278,7 +278,7 @@ public class Parent
 // ==================================================================== §9.4
 
 /// `foreach` is a shape rather than an interface: anything with a
-/// `GetEnumerator()` whose answer has `MoveNext()` and `Current()` works, and
+/// `GetEnumerator()` whose answer has `MoveNext()` and `Current` works, and
 /// the standard library's `IEnumerable<T>` is one thing of that shape rather
 /// than the definition of it.
 public class Countdown
@@ -302,7 +302,7 @@ public class CountdownCursor
         return _value > 0;
     }
 
-    public int Current() => _value;
+    public int Current => _value;
 }
 
 #endregion

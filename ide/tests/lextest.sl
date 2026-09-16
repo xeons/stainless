@@ -19,46 +19,57 @@ import Ide.Lang;
 /// A class because a module cannot hold a mutable variable -- only `const` --
 /// which is the rule that keeps a program's state somewhere a reader can find
 /// it rather than scattered across files that happen to share a module.
-public class Harness {
-    Scanner scanner;
-    int     failures;
+public class Harness
+{
+    Scanner _scanner;
+    int _failures;
 
-    public Harness() {
-        scanner = new Scanner();
-        failures = 0;
+    public Harness()
+    {
+        _scanner = new Scanner();
+        _failures = 0;
     }
 
-    public int Failures => failures;
+    public int Failures => _failures;
 
     /// Lexes one line and checks the kinds it produced, ignoring whitespace --
     /// which is in the stream so a painter can walk it, and is noise here.
-    public void Check(String what, String line, TokenKind[] expected) {
+    public void Check(String what, String line, TokenKind[] expected)
+    {
         var tokens = new List<Token>();
-        scanner.ScanLine(line, ScanState.Normal, tokens);
+        _scanner.ScanLine(line, ScanState.Normal, tokens);
 
         var kinds = new List<TokenKind>();
-        foreach (var token in tokens) {
-            if (token.Kind != TokenKind.Whitespace) { kinds.Add(token.Kind); }
+        foreach (var token in tokens)
+        {
+            if (token.Kind != TokenKind.Whitespace)
+                kinds.Add(token.Kind);
         }
 
-        bool ok = kinds.Count() == expected.Length;
-        if (ok) {
-            for (nuint i = 0u; i < expected.Length; i += 1u) {
-                if (kinds[i] != expected[i]) { ok = false; }
+        bool ok = kinds.Count == expected.Length;
+        if (ok)
+        {
+            for (nuint i = 0u; i < expected.Length; i++)
+            {
+                if (kinds[i] != expected[i])
+                    ok = false;
             }
         }
 
-        if (ok) {
+        if (ok)
+        {
             Console.WriteLine("  ok    " + what);
             return;
         }
 
-        failures += 1;
+        _failures++;
         Console.WriteLine("  FAIL  " + what);
         Console.WriteLine("        line: " + line);
         Console.Write("        got:  ");
-        foreach (var token in tokens) {
-            if (token.Kind == TokenKind.Whitespace) { continue; }
+        foreach (var token in tokens)
+        {
+            if (token.Kind == TokenKind.Whitespace)
+                continue;
             Console.Write(Name(token.Kind) + "('"
                           + line.Substring(token.Start, token.Length) + "') ");
         }
@@ -68,20 +79,24 @@ public class Harness {
     /// Checks that the tokens cover every byte of the line with no gap and no
     /// overlap. A painter walks them end to end, so a gap is a run of text that
     /// never gets drawn.
-    public void CheckTiling(String what, String line) {
+    public void CheckTiling(String what, String line)
+    {
         var tokens = new List<Token>();
-        scanner.ScanLine(line, ScanState.Normal, tokens);
+        _scanner.ScanLine(line, ScanState.Normal, tokens);
 
         nuint at = 0u;
-        foreach (var token in tokens) {
-            if (token.Start != at) {
+        foreach (var token in tokens)
+        {
+            if (token.Start != at)
+            {
                 Failed(what + ": a token starts at " + Standard.Text.FromInteger(token.Start)
                      + " where " + Standard.Text.FromInteger(at) + " was expected");
                 return;
             }
             at = token.End;
         }
-        if (at != line.ByteLength()) {
+        if (at != line.ByteLength())
+        {
             Failed(what + ": the tokens stop at " + Standard.Text.FromInteger(at)
                  + " of " + Standard.Text.FromInteger(line.ByteLength()));
             return;
@@ -90,42 +105,65 @@ public class Harness {
     }
 
     /// Checks what a line leaves open for the next one.
-    public void CheckState(String what, String line, ScanState entry, ScanState expected) {
+    public void CheckState(String what, String line, ScanState entry, ScanState expected)
+    {
         var tokens = new List<Token>();
-        var after = scanner.ScanLine(line, entry, tokens);
-        if (after != expected) { Failed(what); return; }
+        var after = _scanner.ScanLine(line, entry, tokens);
+        if (after != expected)
+        {
+            Failed(what);
+            return;
+        }
         Console.WriteLine("  ok    " + what);
     }
 
     /// Not `Fail`. An unqualified `Fail(x)` is the `Result` variant's own case
     /// constructor, which builds a value and discards it -- so the count never
     /// moved and every check passed. SL0222 is what caught it.
-    public void Failed(String why) {
-        failures += 1;
+    public void Failed(String why)
+    {
+        _failures++;
         Console.WriteLine("  FAIL  " + why);
     }
 
-    String Name(TokenKind kind) {
-        if (kind == TokenKind.Whitespace)        { return "space"; }
-        if (kind == TokenKind.Comment)           { return "comment"; }
-        if (kind == TokenKind.DocComment)        { return "doc"; }
-        if (kind == TokenKind.BlockComment)      { return "block"; }
-        if (kind == TokenKind.Keyword)           { return "keyword"; }
-        if (kind == TokenKind.ContextualKeyword) { return "soft"; }
-        if (kind == TokenKind.TypeName)          { return "type"; }
-        if (kind == TokenKind.Identifier)        { return "name"; }
-        if (kind == TokenKind.Number)            { return "number"; }
-        if (kind == TokenKind.Text)              { return "text"; }
-        if (kind == TokenKind.Character)         { return "char"; }
-        if (kind == TokenKind.Directive)         { return "directive"; }
-        if (kind == TokenKind.Attribute)         { return "attribute"; }
-        if (kind == TokenKind.Operator)          { return "operator"; }
-        if (kind == TokenKind.Bracket)           { return "bracket"; }
+    String Name(TokenKind kind)
+    {
+        if (kind == TokenKind.Whitespace)
+            return "space";
+        if (kind == TokenKind.Comment)
+            return "comment";
+        if (kind == TokenKind.DocComment)
+            return "doc";
+        if (kind == TokenKind.BlockComment)
+            return "block";
+        if (kind == TokenKind.Keyword)
+            return "keyword";
+        if (kind == TokenKind.ContextualKeyword)
+            return "soft";
+        if (kind == TokenKind.TypeName)
+            return "type";
+        if (kind == TokenKind.Identifier)
+            return "name";
+        if (kind == TokenKind.Number)
+            return "number";
+        if (kind == TokenKind.Text)
+            return "text";
+        if (kind == TokenKind.Character)
+            return "char";
+        if (kind == TokenKind.Directive)
+            return "directive";
+        if (kind == TokenKind.Attribute)
+            return "attribute";
+        if (kind == TokenKind.Operator)
+            return "operator";
+        if (kind == TokenKind.Bracket)
+            return "bracket";
         return "unknown";
     }
 }
 
-int Main() {
+int Main()
+{
     var t = new Harness();
     Console.WriteLine("the scanner");
 
@@ -210,7 +248,8 @@ int Main() {
                  "int /* both */ x;", ScanState.Normal, ScanState.Normal);
 
     Console.WriteLine("");
-    if (t.Failures == 0) {
+    if (t.Failures == 0)
+    {
         Console.WriteLine("all checks passed");
         return 0;
     }

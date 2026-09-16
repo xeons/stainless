@@ -132,7 +132,7 @@ int Main()
 
     Heading("The system directory");
     var names = Files.Entries(Environment.SystemDirectory());
-    Row("entries", Text.FromInteger((long)names.Count()));
+    Row("entries", Text.FromInteger((long)names.Count));
     Console.WriteLine("");
     return 0;
 }

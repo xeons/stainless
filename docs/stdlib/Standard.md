@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparer&lt;T&gt;](#comparert-closure) &middot; [Fold&lt;A, T&gt;](#folda-t-closure) &middot; [Func&lt;T, R&gt;](#funct-r-closure) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Result&lt;T, E&gt;](#resultt-e-variant)
+**Types** &nbsp; [Action&lt;T&gt;](#actiont-closure) &middot; [Comparer&lt;T&gt;](#comparert-closure) &middot; [Fold&lt;A, T&gt;](#folda-t-closure) &middot; [Func&lt;T, R&gt;](#funct-r-closure) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant)
 
 ## Types
 
@@ -107,10 +107,10 @@ takes the value and names it in the same step.
 
 <sub>[stdlib/Standard.sl:136](../../stdlib/Standard.sl#L136)</sub>
 
-#### HasValue *method*
+#### HasValue *property*
 
 ```
-bool HasValue()
+bool HasValue { get; }
 ```
 
 True when there is a value. The reader for a caller that is about to
@@ -125,9 +125,9 @@ bool IsEmpty()
 ```
 
 True when there is not. The same question the other way round, because
-`!x.HasValue()` reads worse than the thing it means.
+`!x.HasValue` reads worse than the thing it means.
 
-<sub>[stdlib/Standard.sl:149](../../stdlib/Standard.sl#L149)</sub>
+<sub>[stdlib/Standard.sl:152](../../stdlib/Standard.sl#L152)</sub>
 
 #### Get *method*
 
@@ -142,7 +142,7 @@ something that is not there is a mistake in the caller rather than a
 value to return. Use `ValueOr` where a miss is ordinary, and
 `is Some x` where the answer decides what happens next.
 
-<sub>[stdlib/Standard.sl:162](../../stdlib/Standard.sl#L162)</sub>
+<sub>[stdlib/Standard.sl:165](../../stdlib/Standard.sl#L165)</sub>
 
 #### ValueOr *method*
 
@@ -155,7 +155,7 @@ The value if there is one, and `fallback` if there is not.
 The reader that needs no proof, because it supplies its own -- the same
 bargain `Result.ValueOr` makes.
 
-<sub>[stdlib/Standard.sl:178](../../stdlib/Standard.sl#L178)</sub>
+<sub>[stdlib/Standard.sl:181](../../stdlib/Standard.sl#L181)</sub>
 
 #### Or *method*
 
@@ -169,7 +169,7 @@ This one if it holds anything, and `other` if it does not.
 A lambda would allocate a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 
-<sub>[stdlib/Standard.sl:190](../../stdlib/Standard.sl#L190)</sub>
+<sub>[stdlib/Standard.sl:193](../../stdlib/Standard.sl#L193)</sub>
 
 #### Map *method*
 
@@ -184,7 +184,7 @@ The value put through `transform`, or none.
 The transform runs only where there is something to run it on, which is
 the point: it is the `if` that would otherwise be written by hand.
 
-<sub>[stdlib/Standard.sl:203](../../stdlib/Standard.sl#L203)</sub>
+<sub>[stdlib/Standard.sl:206](../../stdlib/Standard.sl#L206)</sub>
 
 #### FlatMap *method*
 
@@ -195,7 +195,7 @@ Optional<R> FlatMap<R>(Func<T, Optional<R>> transform)
 `Map` for a transform that answers with an optional of its own, which
 would otherwise nest one inside the other.
 
-<sub>[stdlib/Standard.sl:212](../../stdlib/Standard.sl#L212)</sub>
+<sub>[stdlib/Standard.sl:215](../../stdlib/Standard.sl#L215)</sub>
 
 #### Filter *method*
 
@@ -205,7 +205,7 @@ Optional<T> Filter(Predicate<T> keep)
 
 This one when it holds something `keep` accepts, and none otherwise.
 
-<sub>[stdlib/Standard.sl:220](../../stdlib/Standard.sl#L220)</sub>
+<sub>[stdlib/Standard.sl:223](../../stdlib/Standard.sl#L223)</sub>
 
 #### IfPresent *method*
 
@@ -215,7 +215,7 @@ void IfPresent(Action<T> action)
 
 Runs `action` on the value, if there is one.
 
-<sub>[stdlib/Standard.sl:231](../../stdlib/Standard.sl#L231)</sub>
+<sub>[stdlib/Standard.sl:234](../../stdlib/Standard.sl#L234)</sub>
 
 ### Predicate&lt;T&gt; *closure*
 
@@ -227,10 +227,10 @@ Answers a question about a T.
 
 <sub>[stdlib/Standard.sl:86](../../stdlib/Standard.sl#L86)</sub>
 
-### Result&lt;T, E&gt; *variant*
+### Result&lt;T, TError&gt; *variant*
 
 ```
-variant Result<T, E>
+variant Result<T, TError>
 ```
 
 What an operation produced, or why it did not.
@@ -274,7 +274,7 @@ It worked, and `Value` is the answer.
 #### Fail *case*
 
 ```
-Fail(E Error)
+Fail(TError Error)
 ```
 
 It did not, and `Error` says why. The value is not there to be read --

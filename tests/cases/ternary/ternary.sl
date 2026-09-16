@@ -9,7 +9,7 @@ class Tag
 {
     String _name;
     Tag(String n) => _name = n;
-    public String Name() => _name;
+    public String Name => _name;
 }
 
 int Max(int a, int b) => a > b ? a : b;
@@ -40,8 +40,8 @@ int Main()
     // A managed arm: each yields an owned reference, merged into one.
     var a = new Tag("first");
     var b = new Tag("second");
-    Console.WriteLine((1 < 2 ? a : b).Name());
-    Console.WriteLine((1 > 2 ? a : new Tag("fresh")).Name());
+    Console.WriteLine((1 < 2 ? a : b).Name);
+    Console.WriteLine((1 > 2 ? a : new Tag("fresh")).Name);
 
     printf("done\n");
     return 0;

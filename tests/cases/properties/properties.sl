@@ -88,32 +88,32 @@ public int Main()
     var type = typeof(Control);
 
     // ------------------------------------------------------- what is listed
-    Say("properties", Text.FromInteger((long)type.PropertyCount()));
+    Say("properties", Text.FromInteger((long)type.PropertyCount));
 
     var names = new StringBuilder();
-    for (nuint i = 0u; i < type.PropertyCount(); i = i + 1u)
+    for (nuint i = 0u; i < type.PropertyCount; i = i + 1u)
     {
         var property = type.PropertyAt(i);
         if (i > 0u)
             names.Append(",");
-        names.Append(property.Name());
+        names.Append(property.Name);
         names.Append(":");
-        names.Append(KindName(property.Kind()));
-        names.Append(property.CanRead() ? "r" : "-");
-        names.Append(property.CanWrite() ? "w" : "-");
+        names.Append(KindName(property.Kind));
+        names.Append(property.CanRead ? "r" : "-");
+        names.Append(property.CanWrite ? "w" : "-");
     }
     Say("listed", names.ToText());
 
     // A field named after an automatic property says so; one the type
     // declared does not.
     var fields = new StringBuilder();
-    for (nuint i = 0u; i < type.FieldCount(); i = i + 1u)
+    for (nuint i = 0u; i < type.FieldCount; i = i + 1u)
     {
         var field = type.FieldAt(i);
         if (i > 0u)
             fields.Append(",");
-        fields.Append(field.Name());
-        fields.Append(field.IsPropertyStorage() ? "(property)" : "(field)");
+        fields.Append(field.Name);
+        fields.Append(field.IsPropertyStorage ? "(property)" : "(field)");
     }
     Say("fields", fields.ToText());
 
@@ -135,7 +135,7 @@ public int Main()
     // computed and has no storage anywhere.
     var right = type.FindProperty("Right");
     Say("right", Text.FromInteger(GetInteger(raw, right)));
-    Say("right-writable", Text.FromBool(right.CanWrite()));
+    Say("right-writable", Text.FromBool(right.CanWrite));
 
     SetInteger(raw, right, 999);
     Say("right-after", Text.FromInteger(GetInteger(raw, right)));
@@ -163,16 +163,16 @@ public int Main()
 
     // ---------------------------------------------------------- a missing one
     var missing = type.FindProperty("Nope");
-    Say("missing", Text.FromBool(missing.Exists()));
+    Say("missing", Text.FromBool(missing.Exists));
 
     // ------------------------------------------------------------ inheritance
     var panelType = typeof(Panel);
     var inherited = new StringBuilder();
-    for (nuint i = 0u; i < panelType.PropertyCount(); i = i + 1u)
+    for (nuint i = 0u; i < panelType.PropertyCount; i = i + 1u)
     {
         if (i > 0u)
             inherited.Append(",");
-        inherited.Append(panelType.PropertyAt(i).Name());
+        inherited.Append(panelType.PropertyAt(i).Name);
     }
     Say("panel", inherited.ToText());
 

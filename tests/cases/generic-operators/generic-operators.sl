@@ -86,7 +86,7 @@ public struct Counted<T>
         return made;
     }
 
-    public int Count() => Made;
+    public int Count => Made;
 }
 
 // ----------------------------------- reached only from inside another generic
@@ -103,7 +103,7 @@ public int Late<T>(T left, T right)
     Counted<T> b;
     b.Value = right;
 
-    return (a + b).Count();
+    return (a + b).Count;
 }
 
 public int Main()
@@ -137,13 +137,13 @@ public int Main()
 
     var once = g + g;
     var twice = once + g;
-    Console.WriteLine("counted  = " + Text.FromInteger((long)twice.Count())
+    Console.WriteLine("counted  = " + Text.FromInteger((long)twice.Count)
         + " " + Text.FromInteger((long)twice.Value));
 
     // Its own count, because the static belongs to the instantiation.
     Counted<long> h;
     h.Value = 1L;
-    Console.WriteLine("separate = " + Text.FromInteger((long)(h + h).Count()));
+    Console.WriteLine("separate = " + Text.FromInteger((long)(h + h).Count));
 
     uint one = 1u;
     uint two = 2u;

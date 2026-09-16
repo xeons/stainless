@@ -90,11 +90,11 @@ public class RadioGroup : GroupBox
         made.Click += this.OnChildClicked;
         _buttons.Add(made);
         Arrange();
-        return (int)_buttons.Count() - 1;
+        return (int)_buttons.Count - 1;
     }
 
     public List<RadioButton> Buttons => _buttons;
-    public nuint Count => _buttons.Count();
+    public nuint Count => _buttons.Count;
 
     /// Which choice is ticked, or -1.
     ///
@@ -105,7 +105,7 @@ public class RadioGroup : GroupBox
     {
         get
         {
-            for (nuint i = 0u; i < _buttons.Count(); i++)
+            for (nuint i = 0u; i < _buttons.Count; i++)
             {
                 if (_buttons.At(i).Checked)
                     return (int)i;
@@ -114,7 +114,7 @@ public class RadioGroup : GroupBox
         }
         set
         {
-            if (value < 0 || (nuint)value >= _buttons.Count())
+            if (value < 0 || (nuint)value >= _buttons.Count)
                 return;
             _buttons.At((nuint)value).Checked = true;
         }
@@ -160,7 +160,7 @@ public class RadioGroup : GroupBox
         if (area.Width <= 0 || area.Height <= 0)
             return;
 
-        nuint total = _buttons.Count();
+        nuint total = _buttons.Count;
         int perColumn = ((int)total + _columns - 1) / _columns;
         if (perColumn < 1)
             perColumn = 1;
@@ -222,22 +222,22 @@ public class CheckGroup : GroupBox
         made.CheckedChanged += this.OnChildChanged;
         _boxes.Add(made);
         Arrange();
-        return (int)_boxes.Count() - 1;
+        return (int)_boxes.Count - 1;
     }
 
     public List<CheckBox> Boxes => _boxes;
-    public nuint Count => _boxes.Count();
+    public nuint Count => _boxes.Count;
 
     public bool IsChecked(int index)
     {
-        if (index < 0 || (nuint)index >= _boxes.Count())
+        if (index < 0 || (nuint)index >= _boxes.Count)
             return false;
         return _boxes.At((nuint)index).Checked;
     }
 
     public void SetChecked(int index, bool ticked)
     {
-        if (index < 0 || (nuint)index >= _boxes.Count())
+        if (index < 0 || (nuint)index >= _boxes.Count)
             return;
         _boxes.At((nuint)index).Checked = ticked;
     }
@@ -248,14 +248,14 @@ public class CheckGroup : GroupBox
         get
         {
             nuint ticked = 0u;
-            for (nuint i = 0u; i < _boxes.Count(); i++)
+            for (nuint i = 0u; i < _boxes.Count; i++)
             {
                 if (_boxes.At(i).Checked)
                     ticked++;
             }
             var found = new int[ticked];
             nuint at = 0u;
-            for (nuint i = 0u; i < _boxes.Count(); i++)
+            for (nuint i = 0u; i < _boxes.Count; i++)
             {
                 if (_boxes.At(i).Checked)
                 {
@@ -283,7 +283,7 @@ public class CheckGroup : GroupBox
         if (area.Width <= 0 || area.Height <= 0)
             return;
 
-        nuint total = _boxes.Count();
+        nuint total = _boxes.Count;
         int perColumn = ((int)total + _columns - 1) / _columns;
         if (perColumn < 1)
             perColumn = 1;
@@ -599,7 +599,7 @@ public class HeaderControl : WindowedControl
     /// Adds a heading and answers its index.
     public int Add(String text, int width) => _native.AddSection(text, width);
 
-    public int Count => _native.SectionCount();
+    public int Count => _native.SectionCount;
 
     public int SectionWidth(int index) => _native.GetSectionWidth(index);
 

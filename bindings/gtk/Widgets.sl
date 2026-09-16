@@ -100,7 +100,7 @@ public closure bool Question();
 /// Anything that can appear on screen.
 ///
 /// Not abstract, because GTK has widgets this binding does not wrap and
-/// `Widget` is a usable handle on one: `Handle()` is public, and the raw layer
+/// `Widget` is a usable handle on one: `Handle` is public, and the raw layer
 /// takes it.
 public class Widget
 {
@@ -120,7 +120,7 @@ public class Widget
         g_object_ref_sink(raw);
     }
 
-    ~Widget()
+    ~Widget
     {
         if (handle != null)
             g_object_unref(handle);
@@ -130,7 +130,7 @@ public class Widget
     ///
     /// **Borrowed.** It is valid while this wrapper is, and the wrapper is
     /// what owns the reference.
-    public GtkWidget* Handle() => handle;
+    public GtkWidget* Handle => handle;
 
     public void Show() => gtk_widget_show(handle);
 
@@ -245,9 +245,9 @@ public class Container : Widget
 
     /// Puts a child in. A container that holds exactly one -- a window, a
     /// button, a scrolled view -- replaces what was there.
-    public void Add(Widget child) => gtk_container_add(handle, child.Handle());
+    public void Add(Widget child) => gtk_container_add(handle, child.Handle);
 
-    public void Remove(Widget child) => gtk_container_remove(handle, child.Handle());
+    public void Remove(Widget child) => gtk_container_remove(handle, child.Handle);
 
     /// Blank space inside the container's own edge, around everything in it.
     public void SetPadding(int padding)
@@ -279,14 +279,14 @@ public class Box : Container
     /// what a form wants.
     public void Pack(Widget child, bool expand)
     {
-        gtk_box_pack_start(handle, child.Handle(), expand ? 1 : 0, 1, 0u);
+        gtk_box_pack_start(handle, child.Handle, expand ? 1 : 0, 1, 0u);
     }
 
     /// The same, packed from the other end -- the right of a row, the bottom
     /// of a column. Where an OK button goes.
     public void PackEnd(Widget child, bool expand)
     {
-        gtk_box_pack_end(handle, child.Handle(), expand ? 1 : 0, 1, 0u);
+        gtk_box_pack_end(handle, child.Handle, expand ? 1 : 0, 1, 0u);
     }
 
     public void SetSpacing(int spacing) => gtk_box_set_spacing(handle, spacing);
@@ -318,7 +318,7 @@ public class Grid : Container
     /// Puts a child at a cell, spanning `columns` by `rows` of them.
     public void Attach(Widget child, int column, int row, int columns, int rows)
     {
-            gtk_grid_attach(handle, child.Handle(), column, row, columns, rows);
+            gtk_grid_attach(handle, child.Handle, column, row, columns, rows);
     }
 
     /// One cell at one place, which is what most calls want.
@@ -376,7 +376,7 @@ public class Window : Container
     /// Makes this window block its parent, which is what a dialog is.
     public void SetModalFor(Window parent)
     {
-        gtk_window_set_transient_for(handle, parent.Handle());
+        gtk_window_set_transient_for(handle, parent.Handle);
         gtk_window_set_modal(handle, 1);
     }
 
@@ -538,7 +538,7 @@ public class RadioButton : CheckBox
     public RadioButton(String label, RadioButton sibling)
     {
         base(gtk_radio_button_new_with_label_from_widget(
-            sibling.Handle(), label.ToPointer()));
+            sibling.Handle, label.ToPointer()));
     }
 }
 
@@ -719,7 +719,7 @@ public class SpinBox : Widget
         base(gtk_spin_button_new_with_range(minimum, maximum, step));
     }
 
-    public double Value() => gtk_spin_button_get_value(handle);
+    public double Value => gtk_spin_button_get_value(handle);
     public int    IntegerValue() => gtk_spin_button_get_value_as_int(handle);
 
     public void SetValue(double value) => gtk_spin_button_set_value(handle, value);
@@ -745,7 +745,7 @@ public class Slider : Widget
                 minimum, maximum, step));
     }
 
-    public double Value() => gtk_range_get_value(handle);
+    public double Value => gtk_range_get_value(handle);
     public void   SetValue(double value) => gtk_range_set_value(handle, value);
 
     public void OnChanged(Handler handler)
@@ -777,7 +777,7 @@ public class Notebook : Container
     public int AddPage(Widget page, String tab)
     {
         var label = new Label(tab);
-        return gtk_notebook_append_page(handle, page.Handle(), label.Handle());
+        return gtk_notebook_append_page(handle, page.Handle, label.Handle);
     }
 
     public int  CurrentPage() => gtk_notebook_get_current_page(handle);
@@ -808,7 +808,7 @@ public class StatusBar : Widget
     /// GTK's status bar is a *stack*, so that two parts of a program can each
     /// push and pop without losing the other's message. This wrapper uses one
     /// context and replaces, because that is what a status bar looks like from
-    /// the outside; a program that wants the stack has `Handle()`.
+    /// the outside; a program that wants the stack has `Handle`.
     public void SetText(String text)
     {
         gtk_statusbar_pop(handle, _context);
@@ -841,7 +841,7 @@ public class MenuItem : Container
     /// Hangs a menu off this item, which is what makes it a submenu.
     public void SetSubmenu(Menu submenu)
     {
-        gtk_menu_item_set_submenu(handle, submenu.Handle());
+        gtk_menu_item_set_submenu(handle, submenu.Handle);
     }
 
     public void OnChosen(Handler handler)
@@ -857,7 +857,7 @@ public class Menu : Container
 
     protected Menu(GtkWidget* raw) => base(raw);
 
-    public void Append(MenuItem item) => gtk_menu_shell_append(handle, item.Handle());
+    public void Append(MenuItem item) => gtk_menu_shell_append(handle, item.Handle);
 }
 
 /// The bar across the top of a window.
@@ -928,7 +928,7 @@ public static class Dialogs
     /// and the text is data.
     static int Show(Window parent, int kind, int buttons, String title, String message)
     {
-        var dialog = gtk_message_dialog_new(parent.Handle(),
+        var dialog = gtk_message_dialog_new(parent.Handle,
             GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
             kind, buttons, "%s", message.ToPointer());
 

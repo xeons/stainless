@@ -59,8 +59,8 @@ public int Main()
     Say("not-found", Describe(FirstEven(odds)));
 
     // The readers that need no proof, because they supply their own.
-    Say("has-value", Text.FromBool(FirstEven(evens).HasValue()));
-    Say("no-value", Text.FromBool(FirstEven(odds).HasValue()));
+    Say("has-value", Text.FromBool(FirstEven(evens).HasValue));
+    Say("no-value", Text.FromBool(FirstEven(odds).HasValue));
     Say("is-empty", Text.FromBool(FirstEven(odds).IsEmpty()));
     Say("value-or", Text.FromInteger((long)FirstEven(odds).ValueOr(99u)));
     Say("value-or-present", Text.FromInteger((long)FirstEven(evens).ValueOr(99u)));
@@ -93,7 +93,7 @@ public int Main()
     map.Add("second", 2);
     map.Add("third", 3);
 
-    Say("count", Text.FromInteger((long)map.Count()));
+    Say("count", Text.FromInteger((long)map.Count));
     Say("order", map.KeyAt(0u) + "," + map.KeyAt(1u) + "," + map.KeyAt(2u));
     Say("find", Text.FromInteger((long)map.Find("second", -1)));
     Say("missing", Text.FromInteger((long)map.Find("nope", -1)));
@@ -118,7 +118,7 @@ public int Main()
     var repeated = new OrderedDictionary<String, int>();
     repeated.Add("x", 1);
     repeated.Add("x", 2);
-    Say("repeated", Text.FromInteger((long)repeated.Count())
+    Say("repeated", Text.FromInteger((long)repeated.Count)
         + "/" + Text.FromInteger((long)repeated.Find("x", 0)));
 
     // ------------------------------------------------------ List edits
@@ -127,20 +127,20 @@ public int Main()
     list.Add("d");
     list.Insert(0u, "a");
     list.Insert(2u, "c");
-    list.Insert(list.Count(), "e");
+    list.Insert(list.Count, "e");
 
     var joined = new StringBuilder();
-    for (nuint i = 0u; i < list.Count(); i = i + 1u)
+    for (nuint i = 0u; i < list.Count; i = i + 1u)
         joined.Append(list.At(i));
     Say("inserted", joined.ToText());
 
     list.RemoveAt(0u);
-    list.RemoveAt(list.Count() - 1u);
+    list.RemoveAt(list.Count - 1u);
 
     var left = new StringBuilder();
-    for (nuint i = 0u; i < list.Count(); i = i + 1u)
+    for (nuint i = 0u; i < list.Count; i = i + 1u)
         left.Append(list.At(i));
-    Say("removed-ends", left.ToText() + "/" + Text.FromInteger((long)list.Count()));
+    Say("removed-ends", left.ToText() + "/" + Text.FromInteger((long)list.Count));
 
     // --------------------------------------------- StringBuilder appends
     var text = new StringBuilder();

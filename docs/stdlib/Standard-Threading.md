@@ -289,7 +289,7 @@ away -- one signal, one pass, whichever order they happen in. A second
 `Set` before anyone waits is *not* remembered, which is the difference
 between this and a `Semaphore`.
 
-<sub>[stdlib/Threading.sl:698](../../stdlib/Threading.sl#L698)</sub>
+<sub>[stdlib/Threading.sl:701](../../stdlib/Threading.sl#L701)</sub>
 
 #### Wait *method*
 
@@ -300,7 +300,7 @@ void Wait()
 Blocks until the turnstile is armed, then passes and closes it behind.
 Exactly one waiter passes per `Set`.
 
-<sub>[stdlib/Threading.sl:721](../../stdlib/Threading.sl#L721)</sub>
+<sub>[stdlib/Threading.sl:724](../../stdlib/Threading.sl#L724)</sub>
 
 #### WaitFor *method*
 
@@ -311,7 +311,7 @@ bool WaitFor(ulong milliseconds)
 The same with a deadline. Answers whether it got through; a false
 leaves the turnstile as it found it.
 
-<sub>[stdlib/Threading.sl:732](../../stdlib/Threading.sl#L732)</sub>
+<sub>[stdlib/Threading.sl:735](../../stdlib/Threading.sl#L735)</sub>
 
 #### Set *method*
 
@@ -321,7 +321,7 @@ void Set()
 
 Lets one waiter through, or arms the next one.
 
-<sub>[stdlib/Threading.sl:752](../../stdlib/Threading.sl#L752)</sub>
+<sub>[stdlib/Threading.sl:755](../../stdlib/Threading.sl#L755)</sub>
 
 ### Barrier *class*
 
@@ -340,7 +340,7 @@ The phase number is what makes it reusable: a thread released from round 3
 that loops straight back in cannot be counted into round 3 a second time,
 because the number it is waiting on has already moved.
 
-<sub>[stdlib/Threading.sl:865](../../stdlib/Threading.sl#L865)</sub>
+<sub>[stdlib/Threading.sl:871](../../stdlib/Threading.sl#L871)</sub>
 
 #### SignalAndWait *method*
 
@@ -351,18 +351,18 @@ long SignalAndWait()
 Blocks until every participant has arrived. Returns the number of the
 phase that just finished.
 
-<sub>[stdlib/Threading.sl:895](../../stdlib/Threading.sl#L895)</sub>
+<sub>[stdlib/Threading.sl:901](../../stdlib/Threading.sl#L901)</sub>
 
-#### ParticipantCount *method*
+#### ParticipantCount *property*
 
 ```
-nuint ParticipantCount()
+nuint ParticipantCount { get; }
 ```
 
 How many participants the barrier was made for. Fixed, so unlike most
 readings here it cannot be stale.
 
-<sub>[stdlib/Threading.sl:920](../../stdlib/Threading.sl#L920)</sub>
+<sub>[stdlib/Threading.sl:926](../../stdlib/Threading.sl#L926)</sub>
 
 ### CountdownEvent *class*
 
@@ -376,7 +376,7 @@ The join half of fork-join, for work that `parallel` cannot bracket --
 jobs handed to threads that outlive the function that started them.
 Inside a `parallel` block the closing brace already does this.
 
-<sub>[stdlib/Threading.sl:766](../../stdlib/Threading.sl#L766)</sub>
+<sub>[stdlib/Threading.sl:769](../../stdlib/Threading.sl#L769)</sub>
 
 #### Signal *method*
 
@@ -386,7 +386,7 @@ bool Signal()
 
 Counts one off. Returns true if that was the last one.
 
-<sub>[stdlib/Threading.sl:788](../../stdlib/Threading.sl#L788)</sub>
+<sub>[stdlib/Threading.sl:791](../../stdlib/Threading.sl#L791)</sub>
 
 #### TryAddCount *method*
 
@@ -397,7 +397,7 @@ bool TryAddCount(long count)
 Adds work before it is started. Adding after the count reaches zero is
 a race nobody wins, so it is refused rather than reopening the latch.
 
-<sub>[stdlib/Threading.sl:804](../../stdlib/Threading.sl#L804)</sub>
+<sub>[stdlib/Threading.sl:807](../../stdlib/Threading.sl#L807)</sub>
 
 #### Wait *method*
 
@@ -411,7 +411,7 @@ Blocks until the count reaches zero. Every waiter passes, and a later
 The calling thread blocks rather than helping: this is not a `parallel`
 block, so there is no queue for it to work off.
 
-<sub>[stdlib/Threading.sl:819](../../stdlib/Threading.sl#L819)</sub>
+<sub>[stdlib/Threading.sl:822](../../stdlib/Threading.sl#L822)</sub>
 
 #### WaitFor *method*
 
@@ -421,18 +421,18 @@ bool WaitFor(ulong milliseconds)
 
 The same with a deadline. Answers whether the count reached zero.
 
-<sub>[stdlib/Threading.sl:828](../../stdlib/Threading.sl#L828)</sub>
+<sub>[stdlib/Threading.sl:831](../../stdlib/Threading.sl#L831)</sub>
 
-#### CurrentCount *method*
+#### CurrentCount *property*
 
 ```
-long CurrentCount()
+long CurrentCount { get; }
 ```
 
 How many signals are still outstanding. A snapshot, and stale the
 moment you have it.
 
-<sub>[stdlib/Threading.sl:846](../../stdlib/Threading.sl#L846)</sub>
+<sub>[stdlib/Threading.sl:849](../../stdlib/Threading.sl#L849)</sub>
 
 ### Guard&lt;T&gt; *class*
 
@@ -447,10 +447,10 @@ held. Releasing is the destructor's job; there is no `Unlock` to forget.
 
 <sub>[stdlib/Threading.sl:167](../../stdlib/Threading.sl#L167)</sub>
 
-#### Value *method*
+#### Value *property*
 
 ```
-T Value()
+T Value { get; }
 ```
 
 What the lock guards.
@@ -481,7 +481,7 @@ The work a pool thread runs. It is a plain function pointer, so whatever it
 needs arrives as the argument -- usually an object cast to `byte*`, which
 the job casts back.
 
-<sub>[stdlib/Threading.sl:928](../../stdlib/Threading.sl#L928)</sub>
+<sub>[stdlib/Threading.sl:934](../../stdlib/Threading.sl#L934)</sub>
 
 ### ManualResetEvent *class*
 
@@ -538,10 +538,10 @@ Closes it again, so the next `Wait` blocks.
 
 <sub>[stdlib/Threading.sl:674](../../stdlib/Threading.sl#L674)</sub>
 
-#### IsSet *method*
+#### IsSet *property*
 
 ```
-bool IsSet()
+bool IsSet { get; }
 ```
 
 Whether the latch is open *now*. `Reset` can close it before you act
@@ -568,8 +568,8 @@ pulse that lands while it is going to sleep.
 pulse says only "the value changed", never "it changed the way you want":
 
     var held = queue.Lock();
-    while (held.Value().IsEmpty()) { held.Wait(); }
-    var item = held.Value().Take();
+    while (held.Value.IsEmpty()) { held.Wait(); }
+    var item = held.Value.Take();
 
 <sub>[stdlib/Threading.sl:203](../../stdlib/Threading.sl#L203)</sub>
 
@@ -594,10 +594,10 @@ Proof that a monitor is held, and the only route to what it guards.
 
 <sub>[stdlib/Threading.sl:245](../../stdlib/Threading.sl#L245)</sub>
 
-#### Value *method*
+#### Value *property*
 
 ```
-T Value()
+T Value { get; }
 ```
 
 What the monitor guards, with the same lifetime caveat as `Guard`.
@@ -676,16 +676,16 @@ Unlocking is a destructor, so ARC already does it -- including on an early
 about.
 
     var guard = registry.Lock();
-    guard.Value().Add(name);
+    guard.Value.Add(name);
     // ~Guard() unlocks here
 
-**Known hole.** `Value()` hands out what the lock protects, and nothing yet
+**Known hole.** `Value` hands out what the lock protects, and nothing yet
 stops you storing it somewhere and using it after the guard has gone. C#
 has the same hole and worse; Rust closes it with lifetimes. Stainless
 closes it when the analysis in step 6 of docs/concurrency.md lands, and not
 before. Until then this is a discipline, not a guarantee.
 
-It used to be unsound for a class `T`: `Value()` retains what it hands out
+It used to be unsound for a class `T`: `Value` retains what it hands out
 and the caller releases it, often outside the lock, so two threads performed
 an unsynchronized read-modify-write on that object's count. The count drifted
 down and the object was freed while the mutex still held it. Reference counts
@@ -728,10 +728,10 @@ Shared access. There is no `Set`, which is the point.
 
 <sub>[stdlib/Threading.sl:342](../../stdlib/Threading.sl#L342)</sub>
 
-#### Value *method*
+#### Value *property*
 
 ```
-T Value()
+T Value { get; }
 ```
 
 What the lock guards, shared with every other reader. Treat it as
@@ -896,7 +896,7 @@ scheduler have the core back.
     var spin = new SpinWait();
     while (!ready.Load()) { spin.Once(); }
 
-<sub>[stdlib/Threading.sl:1056](../../stdlib/Threading.sl#L1056)</sub>
+<sub>[stdlib/Threading.sl:1062](../../stdlib/Threading.sl#L1062)</sub>
 
 #### Once *method*
 
@@ -906,17 +906,17 @@ void Once()
 
 One step of backing off.
 
-<sub>[stdlib/Threading.sl:1064](../../stdlib/Threading.sl#L1064)</sub>
+<sub>[stdlib/Threading.sl:1070](../../stdlib/Threading.sl#L1070)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many times `Once` has been called.
 
-<sub>[stdlib/Threading.sl:1081](../../stdlib/Threading.sl#L1081)</sub>
+<sub>[stdlib/Threading.sl:1087](../../stdlib/Threading.sl#L1087)</sub>
 
 #### Reset *method*
 
@@ -926,7 +926,7 @@ void Reset()
 
 Starts over, for a loop that is being reused.
 
-<sub>[stdlib/Threading.sl:1084](../../stdlib/Threading.sl#L1084)</sub>
+<sub>[stdlib/Threading.sl:1090](../../stdlib/Threading.sl#L1090)</sub>
 
 ### TaskScope *class*
 
@@ -947,7 +947,7 @@ local of the function that owns the scope is enough, since the scope joins
 before that function returns. Step 6 of docs/concurrency.md is what turns
 this from a convention into a rule.
 
-<sub>[stdlib/Threading.sl:942](../../stdlib/Threading.sl#L942)</sub>
+<sub>[stdlib/Threading.sl:948](../../stdlib/Threading.sl#L948)</sub>
 
 #### Run *method*
 
@@ -957,7 +957,7 @@ void Run(Job job, byte* argument)
 
 Queues a job. It may already be running when this returns.
 
-<sub>[stdlib/Threading.sl:951](../../stdlib/Threading.sl#L951)</sub>
+<sub>[stdlib/Threading.sl:957](../../stdlib/Threading.sl#L957)</sub>
 
 #### Join *method*
 
@@ -968,7 +968,7 @@ void Join()
 Waits for every job submitted so far. Doing it twice is harmless, which
 is what lets the destructor be a backstop for a scope nobody joined.
 
-<sub>[stdlib/Threading.sl:958](../../stdlib/Threading.sl#L958)</sub>
+<sub>[stdlib/Threading.sl:964](../../stdlib/Threading.sl#L964)</sub>
 
 ### Thread *class*
 
@@ -998,7 +998,7 @@ there until its thread finishes, which is C++'s `jthread` and is the safe
 default: the alternative is a thread still running against storage that has
 gone. Say `Detach()` when you mean to let it run loose.
 
-<sub>[stdlib/Threading.sl:993](../../stdlib/Threading.sl#L993)</sub>
+<sub>[stdlib/Threading.sl:999](../../stdlib/Threading.sl#L999)</sub>
 
 #### Join *method*
 
@@ -1009,7 +1009,7 @@ void Join()
 Waits for it to finish. Doing it twice is harmless, which is what lets
 the destructor be a backstop.
 
-<sub>[stdlib/Threading.sl:1007](../../stdlib/Threading.sl#L1007)</sub>
+<sub>[stdlib/Threading.sl:1013](../../stdlib/Threading.sl#L1013)</sub>
 
 #### Detach *method*
 
@@ -1020,18 +1020,18 @@ void Detach()
 Gives up the handle without waiting. The thread runs on and cleans up
 after itself; nothing can join it afterwards.
 
-<sub>[stdlib/Threading.sl:1018](../../stdlib/Threading.sl#L1018)</sub>
+<sub>[stdlib/Threading.sl:1024](../../stdlib/Threading.sl#L1024)</sub>
 
-#### IsJoinable *method*
+#### IsJoinable *property*
 
 ```
-bool IsJoinable()
+bool IsJoinable { get; }
 ```
 
 Whether this handle still refers to a thread -- false after `Join` or
 `Detach`. It does not say whether the thread is still running.
 
-<sub>[stdlib/Threading.sl:1029](../../stdlib/Threading.sl#L1029)</sub>
+<sub>[stdlib/Threading.sl:1035](../../stdlib/Threading.sl#L1035)</sub>
 
 ### WriteGuard&lt;T&gt; *class*
 
@@ -1043,10 +1043,10 @@ Exclusive access.
 
 <sub>[stdlib/Threading.sl:357](../../stdlib/Threading.sl#L357)</sub>
 
-#### Value *method*
+#### Value *property*
 
 ```
-T Value()
+T Value { get; }
 ```
 
 What the lock guards, exclusively. Safe to mutate through.
@@ -1074,7 +1074,7 @@ nuint CurrentId()
 An identifier for the calling thread, unique among those running. It is the
 OS's number and means nothing across a restart.
 
-<sub>[stdlib/Threading.sl:1043](../../stdlib/Threading.sl#L1043)</sub>
+<sub>[stdlib/Threading.sl:1049](../../stdlib/Threading.sl#L1049)</sub>
 
 ### ProcessorCount *function*
 
@@ -1084,7 +1084,7 @@ nuint ProcessorCount()
 
 How many hardware threads the machine reports.
 
-<sub>[stdlib/Threading.sl:1093](../../stdlib/Threading.sl#L1093)</sub>
+<sub>[stdlib/Threading.sl:1099](../../stdlib/Threading.sl#L1099)</sub>
 
 ### Sleep *function*
 
@@ -1095,7 +1095,7 @@ void Sleep(ulong milliseconds)
 Stops the calling thread for at least this long. It may be longer: this is
 the scheduler's floor, not a timer.
 
-<sub>[stdlib/Threading.sl:1036](../../stdlib/Threading.sl#L1036)</sub>
+<sub>[stdlib/Threading.sl:1042](../../stdlib/Threading.sl#L1042)</sub>
 
 ### StartPool *function*
 
@@ -1106,7 +1106,7 @@ void StartPool(nuint workers)
 Starts the pool with a chosen number of workers, before any scope does it
 automatically. Passing zero sizes it from the processor count.
 
-<sub>[stdlib/Threading.sl:1097](../../stdlib/Threading.sl#L1097)</sub>
+<sub>[stdlib/Threading.sl:1103](../../stdlib/Threading.sl#L1103)</sub>
 
 ### WorkerCount *function*
 
@@ -1116,7 +1116,7 @@ nuint WorkerCount()
 
 How many threads the pool is running. Zero until the first scope starts it.
 
-<sub>[stdlib/Threading.sl:1090](../../stdlib/Threading.sl#L1090)</sub>
+<sub>[stdlib/Threading.sl:1096](../../stdlib/Threading.sl#L1096)</sub>
 
 ### Yield *function*
 
@@ -1126,5 +1126,5 @@ void Yield()
 
 Offers the rest of this thread's slice to anything else that is ready.
 
-<sub>[stdlib/Threading.sl:1039](../../stdlib/Threading.sl#L1039)</sub>
+<sub>[stdlib/Threading.sl:1045](../../stdlib/Threading.sl#L1045)</sub>
 

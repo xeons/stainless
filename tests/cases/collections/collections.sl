@@ -30,7 +30,7 @@ public class Money : IComparable<Money>, IEquatable<Money>
 String Describe(IReadOnlyList<Money> prices)
 {
     var text = new StringBuilder();
-    for (nuint i = 0; i < prices.Count(); i = i + 1)
+    for (nuint i = 0; i < prices.Count; i = i + 1)
     {
         text.Append(prices.At(i).Show());
         text.Append(" ");
@@ -47,8 +47,8 @@ int Main()
     prices.Add(new Money(40));
     prices.Add(new Money(600));      // grows past the initial capacity of 4
 
-    Console.WriteLine("count    = " + Text.FromInteger(prices.Count()));
-    Console.WriteLine("capacity = " + Text.FromInteger(prices.Capacity()));
+    Console.WriteLine("count    = " + Text.FromInteger(prices.Count));
+    Console.WriteLine("capacity = " + Text.FromInteger(prices.Capacity));
 
     // A List<Money> is accepted wherever an IReadOnlyList<Money> is wanted.
     Console.WriteLine("items    = " + Describe(prices));

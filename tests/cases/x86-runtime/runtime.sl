@@ -73,7 +73,7 @@ int Main()
     counts.Set("two", 2);
     counts.Set("three", 3);
 
-    Console.WriteLine("entries   " + Text.FromInteger((long)counts.Count()));
+    Console.WriteLine("entries   " + Text.FromInteger((long)counts.Count));
     if (counts.Find("two") is Some found)
     {
         Console.WriteLine("two       " + Text.FromInteger((long)found.Value));
@@ -84,7 +84,7 @@ int Main()
     names.Add("alpha");
     names.Add("beta");
     names.Add("gamma");
-    Console.WriteLine("names     " + Text.FromInteger((long)names.Count())
+    Console.WriteLine("names     " + Text.FromInteger((long)names.Count)
                       + " " + names.At(2));
 
     // And back out through the converter, which walks digits.

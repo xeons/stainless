@@ -293,8 +293,8 @@ public class Socket
     public static Result<Socket, SocketError> Open(AddressFamily family, SocketKind kind)
     {
         var made = new Socket(family, kind);
-        if (!made.IsOpen())
-            return Fail(made.Error());
+        if (!made.IsOpen)
+            return Fail(made.Error);
         return Ok(made);
     }
 
@@ -307,8 +307,8 @@ public class Socket
             String host, ushort port, AddressFamily family, SocketKind kind)
     {
         var made = new Socket(host, port, family, kind);
-        if (!made.IsOpen())
-            return Fail(made.Error());
+        if (!made.IsOpen)
+            return Fail(made.Error);
         return Ok(made);
     }
 
@@ -368,21 +368,21 @@ public class Socket
     /// Whether the handle is still live. False before a failed open and after
     /// `Close`; it says nothing about whether the peer is still there, which
     /// only a read can find out.
-    public bool IsOpen() => !_closed;
+    public bool IsOpen => !_closed;
 
     /// The last error, or `None`. Set by every call that failed, and cleared
     /// by the next one that did not.
-    public SocketError Error() => _error;
+    public SocketError Error => _error;
 
     /// Which family the socket was opened for. Fixed at open.
-    public AddressFamily Family() => _family;
+    public AddressFamily Family => _family;
 
     /// Stream or datagram. Fixed at open.
-    public SocketKind Kind() => _kind;
+    public SocketKind Kind => _kind;
 
     /// The handle itself, for a platform call this wrapper does not make.
     /// A `SOCKET` on Windows and a file descriptor on everything else.
-    public nuint Handle() => _handle;
+    public nuint Handle => _handle;
 
     /// Closes the handle. Idempotent, and the destructor calls it, so a
     /// socket that goes out of scope is not leaked.
@@ -464,10 +464,10 @@ public class Socket
     }
 
     /// This end of the connection.
-    public EndPoint LocalEndPoint() => Address(true);
+    public EndPoint LocalEndPoint => Address(true);
 
     /// The other end.
-    public EndPoint RemoteEndPoint() => Address(false);
+    public EndPoint RemoteEndPoint => Address(false);
 
     // ------------------------------------------------------------- transfer
 
@@ -536,7 +536,7 @@ public class Socket
 
     /// Reads up to `count` bytes and reports how many arrived. Zero is the
     /// peer having finished, which is an ending rather than an error -- ask
-    /// `Error()` to tell the two apart.
+    /// `Error` to tell the two apart.
     public nuint Receive(byte[] buffer, nuint offset, nuint count)
     {
         if (_closed)
@@ -758,7 +758,7 @@ public class Socket
 ///     var server = try TcpListener.Listen(8080u);
 ///
 ///     var client = server.Accept();
-///     while (client.IsConnected()) { ... }
+///     while (client.IsConnected) { ... }
 public class TcpListener
 {
     Socket _socket;
@@ -790,8 +790,8 @@ public class TcpListener
             return Fail(opened.Error);
 
         var made = new TcpListener(opened.Value, host, port, backlog);
-        if (!made.IsListening())
-            return Fail(made.Error());
+        if (!made.IsListening)
+            return Fail(made.Error);
         return Ok(made);
     }
 
@@ -813,17 +813,17 @@ public class TcpListener
 
     /// Whether it bound and listened. False means the constructor gave up
     /// part-way, and `Error` says where.
-    public bool IsListening() => _listening;
+    public bool IsListening => _listening;
 
     /// The last error from the socket underneath, or `None`.
-    public SocketError Error() => _socket.Error();
+    public SocketError Error => _socket.Error;
 
     /// Where it is listening. With port 0 this is how the port the system
     /// chose is found out.
-    public EndPoint LocalEndPoint() => _socket.LocalEndPoint();
+    public EndPoint LocalEndPoint => _socket.LocalEndPoint;
 
     /// The socket underneath, for an option this does not expose.
-    public Socket Underlying() => _socket;
+    public Socket Underlying => _socket;
 
     /// Waits for a connection. The client that comes back is connected, or is
     /// not and says why.
@@ -898,25 +898,28 @@ public class TcpClient : IStream
 
     /// Whether the connection is there. False after the peer finished, after
     /// `Close`, and if connecting never worked.
-    public bool IsConnected()
+    public bool IsConnected
     {
-        return _socket.IsOpen() && !_finished && _socket.Error() == SocketError.None;
+        get
+        {
+            return _socket.IsOpen && !_finished && _socket.Error == SocketError.None;
+        }
     }
 
-    /// The exact reason, which `Error()` rounds off to fit an `IStream`.
-    public SocketError SocketError() => _socket.Error();
+    /// The exact reason, which `Error` rounds off to fit an `IStream`.
+    public SocketError SocketError() => _socket.Error;
 
     /// This end of the connection -- the address and the port the system
     /// chose for it.
-    public EndPoint LocalEndPoint() => _socket.LocalEndPoint();
+    public EndPoint LocalEndPoint => _socket.LocalEndPoint;
 
     /// The other end: who is connected. What an accepted connection is asked
     /// to find out where it came from.
-    public EndPoint RemoteEndPoint() => _socket.RemoteEndPoint();
+    public EndPoint RemoteEndPoint => _socket.RemoteEndPoint;
 
     /// The socket underneath, for an option this does not expose. Closing it
     /// closes the connection.
-    public Socket Underlying() => _socket;
+    public Socket Underlying => _socket;
 
     /// Sends all of `text`, looping until it has gone.
     public SocketError SendText(String text) => _socket.SendText(text);
@@ -947,7 +950,7 @@ public class TcpClient : IStream
                 built.Add(chunk[i]);
         }
 
-        var all = new byte[built.Count()];
+        var all = new byte[built.Count];
         for (nuint i = 0; i < all.Length; i++)
             all[i] = built.At(i);
         return all;
@@ -975,14 +978,14 @@ public class TcpClient : IStream
     // ----------------------------------------------------------- IStream
 
     /// True while the connection is open and the peer has not finished.
-    public bool CanRead() => _socket.IsOpen() && !_finished;
+    public bool CanRead => _socket.IsOpen && !_finished;
 
     /// True while the connection is open. A peer that finished sending can
     /// still be written to, until it closes for real.
-    public bool CanWrite() => _socket.IsOpen();
+    public bool CanWrite => _socket.IsOpen;
 
     /// A connection has no position to move to.
-    public bool CanSeek() => false;
+    public bool CanSeek => false;
 
     /// Reads up to `count` bytes into `buffer` at `offset`, answering how
     /// many arrived.
@@ -993,7 +996,7 @@ public class TcpClient : IStream
     public nuint Read(byte[] buffer, nuint offset, nuint count)
     {
         nuint read = _socket.Receive(buffer, offset, count);
-        if (read == 0 && _socket.Error() == SocketError.None)
+        if (read == 0 && _socket.Error == SocketError.None)
             _finished = true;
         return read;
     }
@@ -1006,9 +1009,9 @@ public class TcpClient : IStream
     }
 
     /// Not a position, and not pretended to be one.
-    public long Position() => -1;
+    public long Position => -1;
     /// Not a length either. A connection does not know how much is coming.
-    public long Length() => -1;
+    public long Length => -1;
 
     /// Always false. There is nowhere to seek to on a connection.
     public bool Seek(long offset, SeekOrigin origin) => false;
@@ -1021,7 +1024,7 @@ public class TcpClient : IStream
     /// the destructor calls it.
     public void Close()
     {
-        if (_socket.IsOpen())
+        if (_socket.IsOpen)
             _socket.Shutdown(SocketShutdown.Both);
         _socket.Close();
         _finished = true;
@@ -1029,19 +1032,22 @@ public class TcpClient : IStream
 
     /// The socket error as the nearest `IOError`, so that a reader which knows
     /// nothing about sockets still gets something it can act on.
-    public IOError Error()
+    public IOError Error
     {
-        switch (_socket.Error())
+        get
         {
-            case SocketError.None:         return IOError.None;
-            case SocketError.Closed:       return IOError.Closed;
-            case SocketError.NotConnected: return IOError.Closed;
-            case SocketError.Reset:        return IOError.Closed;
-            case SocketError.AccessDenied: return IOError.AccessDenied;
-            case SocketError.NoName:       return IOError.NotFound;
-            case SocketError.Refused:      return IOError.NotFound;
-            case SocketError.Invalid:      return IOError.Invalid;
-            default:                       return IOError.Unknown;
+            switch (_socket.Error)
+            {
+                case SocketError.None:         return IOError.None;
+                case SocketError.Closed:       return IOError.Closed;
+                case SocketError.NotConnected: return IOError.Closed;
+                case SocketError.Reset:        return IOError.Closed;
+                case SocketError.AccessDenied: return IOError.AccessDenied;
+                case SocketError.NoName:       return IOError.NotFound;
+                case SocketError.Refused:      return IOError.NotFound;
+                case SocketError.Invalid:      return IOError.Invalid;
+                default:                       return IOError.Unknown;
+            }
         }
     }
 }
@@ -1111,24 +1117,24 @@ public class UdpSocket
     UdpSocket(Socket opened)
     {
         _socket = opened;
-        _ready = opened.IsOpen();
+        _ready = opened.IsOpen;
     }
 
     ~UdpSocket() { Close(); }
 
     /// Whether the socket is usable. False after `Close`, and after an open
     /// that did not work.
-    public bool IsOpen() => _ready;
+    public bool IsOpen => _ready;
 
     /// The last error from the socket underneath, or `None`.
-    public SocketError Error() => _socket.Error();
+    public SocketError Error => _socket.Error;
 
     /// Where it is bound. With port 0 this is how the port the system chose is
     /// found out; an unbound socket answers with nothing useful.
-    public EndPoint LocalEndPoint() => _socket.LocalEndPoint();
+    public EndPoint LocalEndPoint => _socket.LocalEndPoint;
 
     /// The socket underneath, for an option this does not expose.
-    public Socket Underlying() => _socket;
+    public Socket Underlying => _socket;
 
     /// Sends one datagram. The count back is how many bytes went, which for a
     /// datagram is all of them or none.

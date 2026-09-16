@@ -18,7 +18,7 @@ class Counter
     int _value;
     public Counter() => _value = 0;
     public void Bump() => _value = _value + 1;
-    public int Value() => _value;
+    public int Value => _value;
 }
 
 // A variant's own fields are a tag and a blob of bytes. What it really holds is
@@ -47,7 +47,7 @@ int Main()
         // about, and left to the author, who can see that nothing else runs.
         spawn counter.Bump();
     }
-    printf("counter=%d\n", counter.Value());
+    printf("counter=%d\n", counter.Value);
 
     Payload payload = Payload.Plain(1);
     parallel

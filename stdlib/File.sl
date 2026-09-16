@@ -73,7 +73,7 @@ public Result<byte[], IOError> ReadAllBytes(String path)
 {
     var file = try FileStream.OpenRead(path);
 
-    long size = file.Length();
+    long size = file.Length;
     if (size < 0)
     {
         file.Close();
@@ -82,7 +82,7 @@ public Result<byte[], IOError> ReadAllBytes(String path)
 
     var data = new byte[(nuint)size];
     nuint got = file.Read(data, 0, (nuint)size);
-    var failure = file.Error();
+    var failure = file.Error;
     file.Close();
 
     if (failure != IOError.None)
@@ -127,7 +127,7 @@ public IOError WriteAllBytes(String path, byte[] data)
     var file = opened.Value;
 
     file.Write(data, 0, data.Length);
-    var failure = file.Error();
+    var failure = file.Error;
     file.Close();
     return failure;
 }
@@ -142,7 +142,7 @@ public IOError WriteAllText(String path, String text)
     var file = opened.Value;
 
     file.WriteText(text);
-    var failure = file.Error();
+    var failure = file.Error;
     file.Close();
     return failure;
 }
@@ -156,13 +156,13 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 
     var file = opened.Value;
 
-    for (nuint i = 0; i < lines.Count(); i++)
+    for (nuint i = 0; i < lines.Count; i++)
     {
         file.WriteText(lines.At(i));
         file.WriteText("\n");
     }
 
-    var failure = file.Error();
+    var failure = file.Error;
     file.Close();
     return failure;
 }
@@ -177,7 +177,7 @@ public IOError AppendText(String path, String text)
     var file = opened.Value;
 
     file.WriteText(text);
-    var failure = file.Error();
+    var failure = file.Error;
     file.Close();
     return failure;
 }

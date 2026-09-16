@@ -120,7 +120,7 @@ Result<Config, IOError> Load(String path) {
 }
 ```
 
-`Result<T, E>` is an ordinary variant — `Ok(T Value)` and `Fail(E Error)` — and
+`Result<T, TError>` is an ordinary variant — `Ok(T Value)` and `Fail(TError Error)` — and
 every rule it appears to have is a rule variants have. It allocates nothing, and
 only one case is ever present, so a `Result<String, IOError>` is a tag and one
 pointer rather than a flag and both halves. `Ok` and `Fail` are written without
@@ -151,7 +151,7 @@ moved to where the value is used. It is `try` rather than `?` because a postfix
 and there are no exceptions here to confuse it with.
 
 The library reports failure two ways, and the difference is whether there is a
-value: `Result<T, E>` when there is one, the error enum when there is not.
+value: `Result<T, TError>` when there is one, the error enum when there is not.
 Construction is the awkward case, since a constructor must return its type and
 cannot say why it failed. So `FileStream.Open`, `TcpListener.Listen` and
 `TcpClient.Connect` are static methods of the types they make, each returning a
@@ -325,8 +325,8 @@ Sort(prices);              // where T : IComparable<T>
 Largest(prices);           // takes an IReadOnlyList<T>, so it cannot mutate
 ```
 
-`List<T>`, `Dictionary<K, V>`, `HashSet<T>`, `Queue<T>`, `Stack<T>`,
-`LinkedList<T>` and `SortedList<K, V>`. A primitive, an enum and a `String`
+`List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`, `Queue<T>`, `Stack<T>`,
+`LinkedList<T>` and `SortedList<TKey, TValue>`. A primitive, an enum and a `String`
 satisfy `IComparable<T>`, `IEquatable<T>` and `IHashable` without declaring it,
 which is what lets them be keys and be sorted:
 

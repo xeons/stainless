@@ -35,7 +35,7 @@ void RoundTrip(String label, IEncoding encoding, String text)
     var bytes = encoding.GetBytes(text);
     var back = encoding.GetString(bytes);
 
-    Console.WriteLine(label + " " + encoding.Name()
+    Console.WriteLine(label + " " + encoding.Name
         + " " + Text.FromInteger((long)bytes.Length)
         + " " + Text.FromBool(back == text));
 }
@@ -110,22 +110,22 @@ int Main()
     SayBool("latin1-never-fails", never.Ok);
 
     // ------------------------------------------------------------- preambles
-    SayNumber("utf8-bom", (long)Encoding.Utf8().Preamble().Length);
-    SayNumber("latin1-bom", (long)Encoding.Latin1().Preamble().Length);
+    SayNumber("utf8-bom", (long)Encoding.Utf8().Preamble.Length);
+    SayNumber("latin1-bom", (long)Encoding.Latin1().Preamble.Length);
 
     var marked = Encoding.Detect([0xEF, 0xBB, 0xBF, 0x68]);
     if (marked != null)
-        Say("detect-utf8", marked.Name());
+        Say("detect-utf8", marked.Name);
 
     var wide = Encoding.Detect([0xFF, 0xFE, 0x41, 0x00]);
     if (wide != null)
-        Say("detect-utf16", wide.Name());
+        Say("detect-utf16", wide.Name);
 
     // A UTF-32LE mark begins with a UTF-16LE one, so the longer test has to
     // come first or every UTF-32 file reads as UTF-16.
     var widest = Encoding.Detect([0xFF, 0xFE, 0x00, 0x00]);
     if (widest != null)
-        Say("detect-utf32", widest.Name());
+        Say("detect-utf32", widest.Name);
 
     var plain = Encoding.Detect([0x68, 0x69]);
     SayBool("detect-none", plain == null);

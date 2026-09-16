@@ -60,13 +60,13 @@ public class Small
     /// A second way in, for a number that is already known to fit.
     public static Small Of(int _value) => new Small(_value);
 
-    public int Value() => _value;
+    public int Value => _value;
 
     /// A static method may call another, and may use the private constructor
     /// the whole point of this was to hide.
     public static Small Sum(Small left, Small right)
     {
-        return Of(left.Value() + right.Value());
+        return Of(left.Value + right.Value);
     }
 }
 
@@ -89,7 +89,7 @@ public struct Span
 
     public static Span Empty() => From(0, 0);
 
-    public int Length() => End - Start;
+    public int Length => End - Start;
 
     /// Static and instance members of one type share a name space, so this is
     /// an overload of `Length` and not a redeclaration of it.
@@ -110,10 +110,10 @@ int Total(Small[] values, Combine how)
     {
         running = Small.Of(how(running, values[i]));
     }
-    return running.Value();
+    return running.Value;
 }
 
-int Added(Small left, Small right) => left.Value() + right.Value();
+int Added(Small left, Small right) => left.Value + right.Value;
 
 // ------------------------------------------------------------------- main
 
@@ -133,7 +133,7 @@ void Report(String text)
     var parsed = Small.Parse(text);
     if (parsed.Ok)
     {
-        printf("%-8s -> %d\n", text.ToPointer(), parsed.Value.Value());
+        printf("%-8s -> %d\n", text.ToPointer(), parsed.Value.Value);
     }
     else
     {
@@ -152,13 +152,13 @@ public int Main()
 
     // A static method calling a static method, through the private
     // constructor neither of them could reach from outside.
-    printf("sum      = %d\n", Small.Sum(Small.Of(20), Small.Of(22)).Value());
+    printf("sum      = %d\n", Small.Sum(Small.Of(20), Small.Of(22)).Value);
 
     // On a struct, where there was no other way to build one in an
     // expression.
     var span = Span.From(3, 11);
-    printf("span     = %d %d %d\n", span.Start, span.End, span.Length());
-    printf("empty    = %d\n", Span.Empty().Length());
+    printf("span     = %d %d %d\n", span.Start, span.End, span.Length);
+    printf("empty    = %d\n", Span.Empty().Length);
 
     // The overload that takes the value rather than being called on one.
     printf("overload = %d\n", Span.Length(span));

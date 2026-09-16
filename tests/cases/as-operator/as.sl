@@ -2,7 +2,7 @@
 //
 // `as` asks what `is` asks and answers with a value: the reference, or null.
 // What it is for is the answer that gets passed on rather than branched on --
-// `(shape as INamed)?.Name() ?? "anonymous"` is one expression where an `is`
+// `(shape as INamed)?.Name ?? "anonymous"` is one expression where an `is`
 // would be a statement, a local and two branches.
 module AsOperator;
 
@@ -11,7 +11,7 @@ import Standard.Text;
 
 public interface INamed
 {
-    String Name();
+    String Name { get; }
 }
 
 public class Shape
@@ -22,7 +22,7 @@ public class Shape
 public class Square : Shape, INamed
 {
     public override int Sides() => 4;
-    public String Name() => "square";
+    public String Name => "square";
 }
 
 public class Circle : Shape { }
@@ -41,7 +41,7 @@ String Describe(Shape shape)
 /// The one it exists for: an answer with no branch anywhere in it.
 String NameOf(Shape shape)
 {
-    return (shape as INamed)?.Name() ?? "anonymous";
+    return (shape as INamed)?.Name ?? "anonymous";
 }
 
 int Main()

@@ -270,7 +270,7 @@ where the parameter is not one (SL0598).
 only where a type or a name follows it.
 
 **Where a `Result` is better.** `out` is for the answer that comes with a
-question — *did it work*, *was it there* — and `Result<T, E>` is for the answer
+question — *did it work*, *was it there* — and `Result<T, TError>` is for the answer
 that comes with a reason. The library reaches for `Result` ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)) almost
 everywhere, and `out` is the shape to use when the failure has nothing to say
 for itself.

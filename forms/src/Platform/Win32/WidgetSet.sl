@@ -248,7 +248,7 @@ public class WindowPeer : ControlPeer, IWindowPeer
         {
             PaintStruct paint;
             HDC dc = BeginPaint(window, &paint);
-            var owner = Owner();
+            var owner = Owner;
             if (owner != null)
             {
                 var surface = new GraphicsBackend(dc, FromRect(paint.Paint));
@@ -333,16 +333,16 @@ public class WindowPeer : ControlPeer, IWindowPeer
                 // The window frees the menu it holds, so the menu must stop
                 // freeing itself.
                 bar.OwnedByParent();
-                Win32.User32.SetMenu(window, bar.Native());
+                Win32.User32.SetMenu(window, bar.Native);
             }
         }
         DrawMenuBar(window);
         // The bar takes a row out of the client area, so everything laid out
         // against it has moved.
-        var owner = Owner();
+        var owner = Owner;
         if (owner != null)
         {
-            ((IControlNotify)owner).OnPlatformResized(ClientBounds().Extent);
+            ((IControlNotify)owner).OnPlatformResized(ClientBounds.Extent);
         }
     }
 
@@ -443,12 +443,12 @@ public class WindowPeer : ControlPeer, IWindowPeer
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), window);
+        SetParent((HWND)(void*)child.Handle, window);
     }
 
     public void RemoveChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), null);
+        SetParent((HWND)(void*)child.Handle, null);
     }
 }
 
@@ -686,9 +686,12 @@ public class Win32WidgetSet : IWidgetSet
         CloseClipboard();
     }
 
-    public bool ClipboardHasText()
+    public bool ClipboardHasText
     {
-        return IsClipboardFormatAvailable(ClipboardUnicodeText) != 0;
+        get
+        {
+            return IsClipboardFormatAvailable(ClipboardUnicodeText) != 0;
+        }
     }
 
     public Result<String, DialogOutcome> ChooseFileToOpen(IWindowPeer? owner, String title,
@@ -764,16 +767,22 @@ public class Win32WidgetSet : IWidgetSet
         return made;
     }
 
-    public FSize ScreenSize()
+    public FSize ScreenSize
     {
-        return Extent(GetSystemMetrics(SmScreenWidth), GetSystemMetrics(SmScreenHeight));
+        get
+        {
+            return Extent(GetSystemMetrics(SmScreenWidth), GetSystemMetrics(SmScreenHeight));
+        }
     }
 
-    public FRect WorkArea()
+    public FRect WorkArea
     {
-        Rect work;
-        SystemParametersInfoW(SpiGetWorkArea, 0u, (void*)&work, 0u);
-        return FromRect(work);
+        get
+        {
+            Rect work;
+            SystemParametersInfoW(SpiGetWorkArea, 0u, (void*)&work, 0u);
+            return FromRect(work);
+        }
     }
 
     // -------------------------------------------------------------- loop
@@ -854,7 +863,7 @@ public class Win32WidgetSet : IWidgetSet
     {
         HWND parent = null;
         if (owner != null)
-            parent = (HWND)(void*)((IWindowPeer)owner).Handle();
+            parent = (HWND)(void*)((IWindowPeer)owner).Handle;
 
         uint style = ButtonsOf(buttons) | IconOf(icon);
         int answer = MessageBoxW(parent, text.ToUtf16().ToPointer(),

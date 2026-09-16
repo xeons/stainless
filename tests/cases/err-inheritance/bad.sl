@@ -3,7 +3,7 @@ module ErrInheritance;
 
 public abstract class Base
 {
-    public virtual int Value() => 1;
+    public virtual int Value => 1;
 
     public virtual int Twice(int n) => n * 2;
 
@@ -37,7 +37,7 @@ public class Derived : Base
     public override int Fixed() => 1; // SL0500
 
     // Same name and parameters as an inherited method, with no 'override'.
-    public int Value() => 2; // SL0503
+    public int Value => 2; // SL0503
 
     // Overriding, but not with the same signature.
     public override long Twice(int n) => 4; // SL0502
@@ -63,7 +63,7 @@ public sealed class Final : Base
 {
     public override int Required() => 1;
     public override int Bodied() => 1;
-    public sealed override int Value() => 3;
+    public sealed override int Value => 3;
 }
 
 int Main() => 0;

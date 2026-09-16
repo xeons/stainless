@@ -66,7 +66,7 @@ public class Canvas
 
     /// The cairo context, for a call this layer does not wrap. **Borrowed**,
     /// on the terms above.
-    public cairo_t* Handle() => _cr;
+    public cairo_t* Handle => _cr;
 
     // ------------------------------------------------------------ the source
 

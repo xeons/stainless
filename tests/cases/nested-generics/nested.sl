@@ -22,7 +22,7 @@ int Main()
     boxes.Add(new Box<int>(35));
 
     int total = 0;
-    for (nuint i = 0; i < boxes.Count(); i = i + 1)
+    for (nuint i = 0; i < boxes.Count; i = i + 1)
         total = total + boxes.At(i).Get();
     printf("total=%d\n", total);
 
@@ -50,7 +50,7 @@ int Main()
     printf("five=%d\n", five.Get().Get().Get().Get().Get());
 
     var guarded = new Mutex<List<Box<int>>>(boxes);
-    { var g = guarded.Lock(); printf("guarded=%d\n", (int)g.Value().Count()); }
+    { var g = guarded.Lock(); printf("guarded=%d\n", (int)g.Value.Count); }
 
     // Two templates that name each other. `Twig<T>` is asked for while
     // `Sprig<T>` is still declaring its members, so laying either one out at

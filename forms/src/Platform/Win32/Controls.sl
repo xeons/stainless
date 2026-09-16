@@ -76,7 +76,7 @@ HWND MakeChild(String className, HWND parent, uint style, uint extended)
 /// The peer of whatever a widget set was handed as a parent, as a window.
 HWND WindowOf(IContainerPeer parent)
 {
-    return (HWND)(void*)parent.Handle();
+    return (HWND)(void*)parent.Handle;
 }
 
 // =================================================================== button
@@ -140,10 +140,10 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
             var source = (IBitmapBackend)picture;
             if (source is BitmapBackend gdi)
             {
-                _glyph = ImageList_Create(gdi.Width(), gdi.Height(),
+                _glyph = ImageList_Create(gdi.Width, gdi.Height,
                                          IlcColor32 | IlcMask, 1, 0);
-                ImageList_AddMasked(_glyph, gdi.Native(), 0x00FF00FFu);
-                _glyphExtent = Extent(gdi.Width(), gdi.Height());
+                ImageList_AddMasked(_glyph, gdi.Native, 0x00FF00FFu);
+                _glyphExtent = Extent(gdi.Width, gdi.Height);
             }
         }
 
@@ -209,7 +209,7 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     {
         if (code != BnClicked)
             return false;
-        var owner = Owner();
+        var owner = Owner;
         if (owner == null)
             return false;
         ((IControlNotify)owner).OnPlatformActivated();
@@ -229,39 +229,42 @@ public class ButtonPeer : ControlPeer, IPushButtonPeer
     /// Wide enough for the caption and the picture plus the padding a Windows
     /// button has, and never narrower than the 75x23 dialog units every Windows
     /// button is.
-    public override FSize PreferredSize()
+    public override FSize PreferredSize
     {
-        var measured = MeasureNative();
-        int width = measured.Width;
-        int height = measured.Height;
-
-        // The picture is beside the caption or above it, so it adds to one
-        // axis and takes the larger of the two on the other.
-        if (_glyphExtent.Width > 0)
+        get
         {
-            if (_placed == ImageAlignment.Top || _placed == ImageAlignment.Bottom)
+            var measured = MeasureNative();
+            int width = measured.Width;
+            int height = measured.Height;
+
+            // The picture is beside the caption or above it, so it adds to one
+            // axis and takes the larger of the two on the other.
+            if (_glyphExtent.Width > 0)
             {
-                height = height + _gap + _glyphExtent.Height;
-                if (width < _glyphExtent.Width)
+                if (_placed == ImageAlignment.Top || _placed == ImageAlignment.Bottom)
                 {
-                    width = _glyphExtent.Width;
+                    height = height + _gap + _glyphExtent.Height;
+                    if (width < _glyphExtent.Width)
+                    {
+                        width = _glyphExtent.Width;
+                    }
+                }
+                else
+                {
+                    width = width + _gap + _glyphExtent.Width;
+                    if (height < _glyphExtent.Height)
+                        height = _glyphExtent.Height;
                 }
             }
-            else
-            {
-                width = width + _gap + _glyphExtent.Width;
-                if (height < _glyphExtent.Height)
-                    height = _glyphExtent.Height;
-            }
-        }
 
-        width = width + 20;
-        height = height + 10;
-        if (width < 75)
-            width = 75;
-        if (height < 23)
-            height = 23;
-        return Extent(width, height);
+            width = width + 20;
+            height = height + 10;
+            if (width < 75)
+                width = 75;
+            if (height < 23)
+                height = 23;
+            return Extent(width, height);
+        }
     }
 
     /// The text this widget holds, measured in the font it is set to.
@@ -317,7 +320,7 @@ public class CheckPeer : ControlPeer, ICheckPeer
     {
         if (code != BnClicked)
             return false;
-        var owner = Owner();
+        var owner = Owner;
         if (owner == null)
             return false;
         var control = (IControlNotify)owner;
@@ -343,34 +346,37 @@ public class CheckPeer : ControlPeer, ICheckPeer
     /// The box or the dot, plus a gap, plus the caption -- or, for a toggle
     /// button, the caption and a push button's padding, since there is no box
     /// drawn to leave room for.
-    public override FSize PreferredSize()
+    public override FSize PreferredSize
     {
-        HDC dc = GetDC(window);
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
-        var wide = GetText().ToUtf16();
-        Win32.User32.Size measured;
-        GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
-        SelectObject(dc, wasFont);
-        ReleaseDC(window, dc);
-
-        if (_sort == CheckKind.Toggle)
+        get
         {
-            int width = measured.Width + 20;
-            int high = measured.Height + 10;
-            if (width < 75)
-                width = 75;
-            if (high < 23)
-                high = 23;
-            return Extent(width, high);
-        }
+            HDC dc = GetDC(window);
+            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+            var wide = GetText().ToUtf16();
+            Win32.User32.Size measured;
+            GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
+            SelectObject(dc, wasFont);
+            ReleaseDC(window, dc);
 
-        int box = GetSystemMetrics(SmCheckBoxWidth);
-        if (box <= 0)
-            box = 13;
-        int height = measured.Height;
-        if (height < box)
-            height = box;
-        return Extent(measured.Width + box + 8, height + 4);
+            if (_sort == CheckKind.Toggle)
+            {
+                int width = measured.Width + 20;
+                int high = measured.Height + 10;
+                if (width < 75)
+                    width = 75;
+                if (high < 23)
+                    high = 23;
+                return Extent(width, high);
+            }
+
+            int box = GetSystemMetrics(SmCheckBoxWidth);
+            if (box <= 0)
+                box = 13;
+            int height = measured.Height;
+            if (height < box)
+                height = box;
+            return Extent(measured.Width + box + 8, height + 4);
+        }
     }
 }
 
@@ -424,16 +430,19 @@ public class LabelPeer : ControlPeer, ILabelPeer
         Invalidate();
     }
 
-    public override FSize PreferredSize()
+    public override FSize PreferredSize
     {
-        HDC dc = GetDC(window);
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
-        var wide = GetText().ToUtf16();
-        Win32.User32.Size measured;
-        GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
-        SelectObject(dc, wasFont);
-        ReleaseDC(window, dc);
-        return Extent(measured.Width, measured.Height);
+        get
+        {
+            HDC dc = GetDC(window);
+            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+            var wide = GetText().ToUtf16();
+            Win32.User32.Size measured;
+            GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
+            SelectObject(dc, wasFont);
+            ReleaseDC(window, dc);
+            return Extent(measured.Width, measured.Height);
+        }
     }
 }
 
@@ -464,7 +473,7 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
     {
         if (code != EnChange)
             return false;
-        var owner = Owner();
+        var owner = Owner;
         if (owner == null)
             return false;
         ((IControlNotify)owner).OnPlatformValueChanged();
@@ -529,16 +538,19 @@ public class TextEntryPeer : ControlPeer, ITextEntryPeer
         SetText(joined.ToText());
     }
 
-    public override FSize PreferredSize()
+    public override FSize PreferredSize
     {
-        HDC dc = GetDC(window);
-        HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
-        var wide = "Wg".ToUtf16();
-        Win32.User32.Size measured;
-        GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
-        SelectObject(dc, wasFont);
-        ReleaseDC(window, dc);
-        return Extent(120, measured.Height + 8);
+        get
+        {
+            HDC dc = GetDC(window);
+            HGDIOBJ wasFont = SelectObject(dc, (HGDIOBJ)(nuint)(ulong)SendMessageW(window, WmGetFont, 0u, 0));
+            var wide = "Wg".ToUtf16();
+            Win32.User32.Size measured;
+            GetTextExtentPoint32W(dc, wide.ToPointer(), (int)wide.UnitCount(), &measured);
+            SelectObject(dc, wasFont);
+            ReleaseDC(window, dc);
+            return Extent(120, measured.Height + 8);
+        }
     }
 }
 
@@ -558,7 +570,7 @@ public class ListPeer : ControlPeer, IListPeer
 
     protected override bool Notified(uint code, int id)
     {
-        var owner = Owner();
+        var owner = Owner;
         if (owner == null)
             return false;
         if (code == LbnSelChange)
@@ -587,7 +599,7 @@ public class ListPeer : ControlPeer, IListPeer
 
     public void ClearItems() => SendMessageW(window, LbResetContent, 0u, 0);
 
-    public int ItemCount() => (int)SendMessageW(window, LbGetCount, 0u, 0);
+    public int ItemCount => (int)SendMessageW(window, LbGetCount, 0u, 0);
 
     public void SetSelectedIndex(int index)
     {
@@ -621,7 +633,7 @@ public class ComboPeer : ControlPeer, IComboPeer
 
     protected override bool Notified(uint code, int id)
     {
-        var owner = Owner();
+        var owner = Owner;
         if (owner == null)
             return false;
         if (code == CbnSelChange || code == CbnEditChange)
@@ -645,7 +657,7 @@ public class ComboPeer : ControlPeer, IComboPeer
 
     public void ClearItems() => SendMessageW(window, CbResetContent, 0u, 0);
 
-    public int ItemCount() => (int)SendMessageW(window, CbGetCount, 0u, 0);
+    public int ItemCount => (int)SendMessageW(window, CbGetCount, 0u, 0);
 
     public void SetSelectedIndex(int index)
     {
@@ -687,12 +699,12 @@ public class GroupPeer : ControlPeer, IGroupPeer
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), window);
+        SetParent((HWND)(void*)child.Handle, window);
     }
 
     public void RemoveChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), null);
+        SetParent((HWND)(void*)child.Handle, null);
     }
 
     /// The frame is the `BUTTON`'s to draw and the children are this peer's;
@@ -713,7 +725,7 @@ public class GroupPeer : ControlPeer, IGroupPeer
     /// keep, since dropping it is what makes every other control flicker on
     /// resize. So the interior belonged to nobody, and after a resize it showed
     /// whatever the previous contents of that memory were.
-    protected override bool ErasesBackground() => true;
+    protected override bool ErasesBackground => true;
 
     /// The frame costs 8 pixels a side and the caption the top of the box.
     ///
@@ -722,16 +734,19 @@ public class GroupPeer : ControlPeer, IGroupPeer
     /// halves have to agree: this is how much room there is, `ClientOrigin` is
     /// where it starts, and the control layer adds the second to every child it
     /// places.
-    public override FRect ClientBounds()
+    public override FRect ClientBounds
     {
-        Rect r;
-        GetClientRect(window, &r);
-        int width = r.Right - r.Left;
-        int height = r.Bottom - r.Top;
-        return Area(0, 0, width - 16, height - CaptionHeight - 8);
+        get
+        {
+            Rect r;
+            GetClientRect(window, &r);
+            int width = r.Right - r.Left;
+            int height = r.Bottom - r.Top;
+            return Area(0, 0, width - 16, height - CaptionHeight - 8);
+        }
     }
 
-    public override FPoint ClientOrigin() => At(8, CaptionHeight);
+    public override FPoint ClientOrigin => At(8, CaptionHeight);
 }
 
 // =================================================================== panel
@@ -755,12 +770,12 @@ public class PanelPeer : ControlPeer, IPanelPeer
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), window);
+        SetParent((HWND)(void*)child.Handle, window);
     }
 
     public void RemoveChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), null);
+        SetParent((HWND)(void*)child.Handle, null);
     }
 
     /// A panel is a container, so anything windowless on it is its to draw.
@@ -877,7 +892,7 @@ public class ScrollBarPeer : ControlPeer, IScrollBarPeer
         }
 
         SetValue(now);
-        var owner = Owner();
+        var owner = Owner;
         if (owner != null)
             ((IControlNotify)owner).OnPlatformValueChanged();
     }
@@ -937,12 +952,12 @@ public class CustomPeer : ControlPeer, ICustomPeer
 
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), window);
+        SetParent((HWND)(void*)child.Handle, window);
     }
 
     public void RemoveChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), null);
+        SetParent((HWND)(void*)child.Handle, null);
     }
 
     public void SetBorder(ControlBorder border)
@@ -997,7 +1012,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
 
         bool sized = place.Width != _caret.Width || place.Height != _caret.Height;
         _caret = place;
-        if (!HasFocus())
+        if (!HasFocus)
             return;
 
         if (place.IsEmpty)
@@ -1029,7 +1044,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
     /// Nothing erases it. The class brush is null and `Dispatch` answers the
     /// message itself, so the only thing that ever fills the client area is the
     /// buffer in `PaintBuffered` -- filled in one go and copied in one go.
-    protected override bool ErasesBackground() => false;
+    protected override bool ErasesBackground => false;
 
     public override long Dispatch(uint message, ulong wParam, long lParam)
     {
@@ -1097,7 +1112,7 @@ public class CustomPeer : ControlPeer, ICustomPeer
         int width = client.Right - client.Left;
         int height = client.Bottom - client.Top;
 
-        var owner = Owner();
+        var owner = Owner;
         if (owner != null && width > 0 && height > 0)
         {
             HDC buffer = CreateCompatibleDC(screen);

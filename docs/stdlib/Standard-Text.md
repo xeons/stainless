@@ -556,10 +556,10 @@ void AppendJoined(String separator, String[] parts)
 
 <sub>[stdlib/Text.sl:788](../../stdlib/Text.sl#L788)</sub>
 
-#### HasContent *method*
+#### HasContent *property*
 
 ```
-bool HasContent()
+bool HasContent { get; }
 ```
 
 Whether anything has been appended. The opposite of `IsEmpty`.
@@ -578,7 +578,7 @@ Byte by byte through the runtime rather than over a pointer, because a
 builder's storage moves when it grows and a pointer into it would be a
 pointer into the previous allocation.
 
-<sub>[stdlib/Text.sl:811](../../stdlib/Text.sl#L811)</sub>
+<sub>[stdlib/Text.sl:814](../../stdlib/Text.sl#L814)</sub>
 
 #### Contains *method*
 
@@ -588,7 +588,7 @@ bool Contains(String value)
 
 True when `value` appears in what has been built.
 
-<sub>[stdlib/Text.sl:838](../../stdlib/Text.sl#L838)</sub>
+<sub>[stdlib/Text.sl:841](../../stdlib/Text.sl#L841)</sub>
 
 #### Truncate *method*
 
@@ -598,7 +598,7 @@ void Truncate(nuint at)
 
 Everything from `at` to the end, thrown away.
 
-<sub>[stdlib/Text.sl:846](../../stdlib/Text.sl#L846)</sub>
+<sub>[stdlib/Text.sl:849](../../stdlib/Text.sl#L849)</sub>
 
 #### ReplaceFirst *method*
 
@@ -608,7 +608,7 @@ bool ReplaceFirst(String from, String to)
 
 The first occurrence of `from` replaced by `to`, if there is one.
 
-<sub>[stdlib/Text.sl:855](../../stdlib/Text.sl#L855)</sub>
+<sub>[stdlib/Text.sl:858](../../stdlib/Text.sl#L858)</sub>
 
 #### ReplaceAll *method*
 
@@ -621,7 +621,7 @@ Every occurrence of `from` replaced by `to`.
 The search resumes past the replacement, so replacing "a" with "aa"
 terminates rather than growing forever.
 
-<sub>[stdlib/Text.sl:870](../../stdlib/Text.sl#L870)</sub>
+<sub>[stdlib/Text.sl:873](../../stdlib/Text.sl#L873)</sub>
 
 ### Utf16String *class*
 
@@ -639,7 +639,7 @@ Positions are units, not characters and not bytes: a scalar outside the
 basic plane is two units, so `UnitCount` is not a character count and
 `UnitAt` can land on half a surrogate pair. `CodePointAt` joins the pair.
 
-<sub>[stdlib/Text.sl:927](../../stdlib/Text.sl#L927)</sub>
+<sub>[stdlib/Text.sl:930](../../stdlib/Text.sl#L930)</sub>
 
 #### IsEmpty *method*
 
@@ -649,7 +649,7 @@ bool IsEmpty()
 
 Whether there are any units at all.
 
-<sub>[stdlib/Text.sl:931](../../stdlib/Text.sl#L931)</sub>
+<sub>[stdlib/Text.sl:934](../../stdlib/Text.sl#L934)</sub>
 
 #### UnitAt *method*
 
@@ -660,7 +660,7 @@ char16 UnitAt(nuint index)
 The unit at `index`. A unit, not a character: one half of a surrogate
 pair is a unit and is not a character.
 
-<sub>[stdlib/Text.sl:938](../../stdlib/Text.sl#L938)</sub>
+<sub>[stdlib/Text.sl:941](../../stdlib/Text.sl#L941)</sub>
 
 #### CodePointAt *method*
 
@@ -673,7 +673,7 @@ The scalar beginning at `index`, joining a surrogate pair.
 An unpaired surrogate gives U+FFFD, which is what transcoding it would
 have produced -- a lone half cannot be encoded in UTF-8 at all.
 
-<sub>[stdlib/Text.sl:947](../../stdlib/Text.sl#L947)</sub>
+<sub>[stdlib/Text.sl:950](../../stdlib/Text.sl#L950)</sub>
 
 #### NextCodePoint *method*
 
@@ -683,7 +683,7 @@ nuint NextCodePoint(nuint index)
 
 The index of the character after the one at `index`.
 
-<sub>[stdlib/Text.sl:969](../../stdlib/Text.sl#L969)</sub>
+<sub>[stdlib/Text.sl:972](../../stdlib/Text.sl#L972)</sub>
 
 #### Equals *method*
 
@@ -693,7 +693,7 @@ bool Equals(Utf16String other)
 
 True when the two hold the same units.
 
-<sub>[stdlib/Text.sl:982](../../stdlib/Text.sl#L982)</sub>
+<sub>[stdlib/Text.sl:985](../../stdlib/Text.sl#L985)</sub>
 
 #### ToBytes *method*
 
@@ -704,7 +704,7 @@ byte[] ToBytes()
 The units as raw bytes, little-endian, which is what a Windows API and
 a UTF-16LE file both expect.
 
-<sub>[stdlib/Text.sl:1001](../../stdlib/Text.sl#L1001)</sub>
+<sub>[stdlib/Text.sl:1004](../../stdlib/Text.sl#L1004)</sub>
 
 ## Constants
 

@@ -317,8 +317,8 @@ public List<T> ToList<T>(T[:] items)
 public T[] ToArray<T>(IEnumerable<T> items)
 {
     var all = ToList(items);
-    var array = new T[all.Count()];
-    for (nuint i = 0u; i < all.Count(); i++)
+    var array = new T[all.Count];
+    for (nuint i = 0u; i < all.Count; i++)
         array[i] = all.At(i);
     return array;
 }
@@ -391,7 +391,7 @@ public List<T> Take<T>(IEnumerable<T> items, nuint count)
     var kept = new List<T>();
     foreach (var item in items)
     {
-        if (kept.Count() >= count)
+        if (kept.Count >= count)
             return kept;
         kept.Add(item);
     }

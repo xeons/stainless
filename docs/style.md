@@ -189,7 +189,7 @@ call is cheap.
   platform is a method, however simple it looks from outside. `FindForm()`
   walks up the parent chain, so it is a method; `Parent` is a field read, so it
   is a property.
-- **It can fail.** Anything returning `Result<T, E>` is a method. A property
+- **It can fail.** Anything returning `Result<T, TError>` is a method. A property
   that hands back a failure reads like a field and is not one.
 - **It gives back something different each call.** `Random.Next()` is a method.
 - **It has a side effect.** `Read()`, `MoveNext()`, `Clear()` are methods even
@@ -199,11 +199,22 @@ call is cheap.
 wanted, the no-argument form is the property and the overload that takes work to
 do stays a method. They can coexist.
 
-This rule reshapes a good deal of the existing tree — `Count()`, `IsEmpty()`,
-`Name()`, `CanRead()`, `Capacity()` are all properties written as methods — and
-that conversion is a pass of its own, because it changes the public surface and
-touches the specification, the generated standard-library reference, the samples
-and the test cases together.
+**Two exceptions, both of which are the language's rather than a judgement.**
+
+- **A module-level function stays a function.** A property is a pair of
+  accessors reached through an instance and a module has none, so
+  `Env.ArgumentCount()`, `Threading.ProcessorCount()` and `Random.Seed()` keep
+  their parentheses however much they read like facts. Writing one as a
+  property is SL0400.
+- **`IsEmpty` is still a method**, alone among the questions above, because
+  `String` and `StringBuilder` have it as a compiler builtin and a builtin
+  cannot yet be a property. The collections could convert without them, and
+  then `list.IsEmpty` and `text.IsEmpty()` would disagree — which is worse than
+  either. [TODO.md](../TODO.md) carries it.
+
+Everything else has been converted: 328 declarations and the calls that reach
+them, across the standard library, `forms/`, the IDE, the samples, the bindings
+and the test cases.
 
 ### 2.2 Ordering inside a type
 
@@ -466,11 +477,11 @@ pattern.
 
 ### 6.1 Failure
 
-**A function that can fail returns `Result<T, E>`**, and the error is an `enum`
+**A function that can fail returns `Result<T, TError>`**, and the error is an `enum`
 of that module's own — `ImageError`, `IOError`, `ConvertError`. There are no
 exceptions in the language and nothing is signalled by a sentinel return.
 
-**`Optional<T>` is for absence, `Result<T, E>` is for failure.** A lookup that
+**`Optional<T>` is for absence, `Result<T, TError>` is for failure.** A lookup that
 found nothing is an `Optional`; a lookup that could not be performed is a
 `Result`.
 
@@ -505,15 +516,20 @@ obvious home for it, and [TODO.md](../TODO.md) carries the note.
 
 ## 8. Bringing the tree to this
 
-The existing code is being converted in passes, largest first, each its own
-commit so that a reformat never travels with a change of behaviour:
+The tree has been brought to this, in passes, each its own commit so that a
+reformat never travelled with a change of behaviour:
 
 1. **Layout** — Allman, one-line bodies, `i++`, column alignment removed.
-2. **Fields** — the `_`, `s_` and `t_` prefixes, and written-out visibility.
-3. **Members** — the zero-argument methods that should be properties, and the
-   vague single-word names. This one changes the public surface, so it moves
-   the specification, the generated reference, the samples and the test cases
-   with it.
+2. **Fields** — the `_`, `s_` and `t_` prefixes.
+3. **Members** — the zero-argument methods that were facts, and `TKey`,
+   `TValue` and `TError` in place of `K`, `V` and `E`. This one changed the
+   public surface, so it moved the specification, the generated reference, the
+   samples and the test cases with it.
+
+**What is left is the part a script cannot do.** §1.4 — whether a name promises
+what the thing does — is unfinished: `Update`, `Process`, `Handle`, `Get` and
+`Build` are still on members whose names do not say what they update or build.
+That wants reading rather than a pass, one module at a time.
 
 **Both suites run before each commit.** They ask different questions, and the
 unit tests hold rules the end-to-end suite cannot see — a new sample has to be

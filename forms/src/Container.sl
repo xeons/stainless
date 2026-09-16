@@ -222,7 +222,7 @@ public abstract class WindowedControl : Control
             var mine = _platform;
             if (mine == null)
                 return 0u;
-            return ((IControlPeer)mine).Handle();
+            return ((IControlPeer)mine).Handle;
         }
     }
 
@@ -271,7 +271,7 @@ public abstract class WindowedControl : Control
             var mine = _platform;
             if (mine == null)
                 return base.ClientBounds;
-            return ((IControlPeer)mine).ClientBounds();
+            return ((IControlPeer)mine).ClientBounds;
         }
     }
 
@@ -282,7 +282,7 @@ public abstract class WindowedControl : Control
             var mine = _platform;
             if (mine == null)
                 return Size.Empty;
-            return ((IControlPeer)mine).PreferredSize();
+            return ((IControlPeer)mine).PreferredSize;
         }
     }
 
@@ -295,7 +295,7 @@ public abstract class WindowedControl : Control
             var mine = _platform;
             if (mine == null)
                 return Point.Empty;
-            return ((IControlPeer)mine).ClientOrigin();
+            return ((IControlPeer)mine).ClientOrigin;
         }
     }
 
@@ -404,7 +404,7 @@ public abstract class WindowedControl : Control
     /// what is on top is what the mouse should find.
     GraphicControl? GraphicAt(Point at)
     {
-        nuint count = _inside.Count();
+        nuint count = _inside.Count;
         for (nuint i = count; i > 0u; i--)
         {
             var child = _inside.At(i - 1u);
@@ -549,7 +549,7 @@ public abstract class WindowedControl : Control
             var mine = _platform;
             if (mine == null)
                 return false;
-            return ((IControlPeer)mine).HasFocus();
+            return ((IControlPeer)mine).HasFocus;
         }
     }
 

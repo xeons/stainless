@@ -130,7 +130,7 @@ public class CodeEditor : CustomControl
         _ready = false;
 
         Border = ControlBorder.Sunken;
-        Font = new Font(MonospaceFamily(), DefaultTextSize);
+        Font = new Font(MonospaceFamily, DefaultTextSize);
         BackColor = _palette.Background;
         Cursor = CursorKind.Text;
 
@@ -186,13 +186,16 @@ public class CodeEditor : CustomControl
     /// desktop Linux; where neither is present the platform substitutes, and
     /// what it substitutes for a name it does not know is its default
     /// fixed-width face -- which is the right answer anyway.
-    String MonospaceFamily()
+    String MonospaceFamily
     {
-        #if WINDOWS
-        return "Consolas";
-        #else
-        return "DejaVu Sans Mono";
-        #endif
+        get
+        {
+            #if WINDOWS
+            return "Consolas";
+            #else
+            return "DejaVu Sans Mono";
+            #endif
+        }
     }
 
     // ------------------------------------------------------------- the text
@@ -222,7 +225,7 @@ public class CodeEditor : CustomControl
     public nuint TopLine => _topLine;
 
     /// How many whole lines fit in the control as it is now.
-    public int VisibleLineCount => VisibleLines();
+    public int VisibleLineCount => VisibleLines;
 
     /// Whether anything is selected.
     public bool HasSelection => !_caret.SameAs(_anchor);
@@ -257,12 +260,12 @@ public class CodeEditor : CustomControl
     /// reason this is public.
     public void GoTo(nuint row, nuint column)
     {
-        nuint line = row >= _doc.LineCount() ? _doc.LineCount() - 1u : row;
+        nuint line = row >= _doc.LineCount ? _doc.LineCount - 1u : row;
         _caret = Position.At(line, ClampColumn(line, column));
         _anchor = _caret;
         // Roughly a third of the way down, rather than at the very top: an
         // error is nearly always about the lines above it as well.
-        nuint visible = (nuint)VisibleLines();
+        nuint visible = (nuint)VisibleLines;
         _topLine = line > visible / 3u ? line - visible / 3u : 0u;
         Rescrolled();
         ShowCaret();
@@ -348,26 +351,32 @@ public class CodeEditor : CustomControl
     // --------------------------------------------------------------- layout
 
     /// How many whole lines fit.
-    int VisibleLines()
+    int VisibleLines
     {
-        if (_lineHeight <= 0)
-            return 1;
-        int height = ClientBounds.Height - ScrollThickness();
-        int fits = height / _lineHeight;
-        return fits < 1 ? 1 : fits;
+        get
+        {
+            if (_lineHeight <= 0)
+                return 1;
+            int height = ClientBounds.Height - ScrollThickness;
+            int fits = height / _lineHeight;
+            return fits < 1 ? 1 : fits;
+        }
     }
 
     /// How many whole columns fit beside the gutter.
-    int VisibleColumns()
+    int VisibleColumns
     {
-        if (_cell <= 0)
-            return 1;
-        int width = ClientBounds.Width - _gutter - ScrollThickness();
-        int fits = width / _cell;
-        return fits < 1 ? 1 : fits;
+        get
+        {
+            if (_cell <= 0)
+                return 1;
+            int width = ClientBounds.Width - _gutter - ScrollThickness;
+            int fits = width / _cell;
+            return fits < 1 ? 1 : fits;
+        }
     }
 
-    int ScrollThickness() => 16;
+    int ScrollThickness => 16;
 
     /// Puts the scroll bars where they belong and tells them what they are
     /// scrolling. Called on every resize and after every edit.
@@ -376,13 +385,13 @@ public class CodeEditor : CustomControl
         if (!_ready)
             return;
         var area = ClientBounds;
-        int bar = ScrollThickness();
+        int bar = ScrollThickness;
 
         _down.SetBounds(area.Width - bar, 0, bar, area.Height - bar);
         _across.SetBounds(0, area.Height - bar, area.Width - bar, bar);
 
-        int lines = (int)_doc.LineCount();
-        int page = VisibleLines();
+        int lines = (int)_doc.LineCount;
+        int page = VisibleLines;
         _down.Maximum = lines > page ? lines - 1 : 0;
         _down.PageSize = page;
         _down.Value = (int)_topLine;
@@ -393,15 +402,15 @@ public class CodeEditor : CustomControl
         // horizontal thumb of exactly the right size.
         int widest = 0;
         nuint last = _topLine + (nuint)page;
-        if (last > _doc.LineCount())
-            last = _doc.LineCount();
+        if (last > _doc.LineCount)
+            last = _doc.LineCount;
         for (nuint i = _topLine; i < last; i++)
         {
             int width = (int)WidthOf(_doc.TextAt(i));
             if (width > widest)
                 widest = width;
         }
-        int columns = VisibleColumns();
+        int columns = VisibleColumns;
         _across.Maximum = widest > columns ? widest - 1 : 0;
         _across.PageSize = columns;
         _across.Value = (int)_leftColumn;
@@ -437,7 +446,7 @@ public class CodeEditor : CustomControl
     /// whole control.
     void ShowCaret()
     {
-        nuint lines = (nuint)VisibleLines();
+        nuint lines = (nuint)VisibleLines;
         if (_caret.Row < _topLine)
         {
             _topLine = _caret.Row;
@@ -448,7 +457,7 @@ public class CodeEditor : CustomControl
         }
 
         nuint column = ColumnOf(_doc.TextAt(_caret.Row), _caret.Column);
-        nuint columns = (nuint)VisibleColumns();
+        nuint columns = (nuint)VisibleColumns;
         if (column < _leftColumn)
         {
             _leftColumn = column;
@@ -498,8 +507,8 @@ public class CodeEditor : CustomControl
             canvas.DrawLine(new Pen(_palette.Margin), rule, 0, rule, area.Height);
         }
 
-        nuint lines = _doc.LineCount();
-        nuint last = _topLine + (nuint)VisibleLines() + 1u;
+        nuint lines = _doc.LineCount;
+        nuint last = _topLine + (nuint)VisibleLines + 1u;
         if (last > lines)
             last = lines;
 
@@ -515,7 +524,7 @@ public class CodeEditor : CustomControl
     /// How wide the gutter is: room for the largest line number, and a gap.
     int GutterWidth(Graphics canvas)
     {
-        nuint count = _doc.LineCount();
+        nuint count = _doc.LineCount;
         int digits = 1;
         while (count >= 10u)
         {
@@ -610,7 +619,7 @@ public class CodeEditor : CustomControl
     /// it has scrolled off.
     void PlaceCaret()
     {
-        if (_caret.Row < _topLine || _caret.Row >= _topLine + (nuint)VisibleLines() + 1u)
+        if (_caret.Row < _topLine || _caret.Row >= _topLine + (nuint)VisibleLines + 1u)
         {
             Caret = Rectangle.Empty;
             return;
@@ -694,7 +703,7 @@ public class CodeEditor : CustomControl
         int to = (int)_topLine - notches * 3;
         if (to < 0)
             to = 0;
-        int highest = (int)_doc.LineCount() - 1;
+        int highest = (int)_doc.LineCount - 1;
         if (to > highest)
             to = highest;
         if ((nuint)to == _topLine)
@@ -714,7 +723,7 @@ public class CodeEditor : CustomControl
         int row = y / _lineHeight + (int)_topLine;
         if (row < 0)
             row = 0;
-        nuint highest = _doc.LineCount() - 1u;
+        nuint highest = _doc.LineCount - 1u;
         nuint line = (nuint)row > highest ? highest : (nuint)row;
 
         int column = (x - _gutter) / _cell + (int)_leftColumn;
@@ -751,11 +760,11 @@ public class CodeEditor : CustomControl
         }
         else if (args.Key == Key.PageUp)
         {
-            MoveVertically(-VisibleLines(), shift);
+            MoveVertically(-VisibleLines, shift);
         }
         else if (args.Key == Key.PageDown)
         {
-            MoveVertically(VisibleLines(), shift);
+            MoveVertically(VisibleLines, shift);
         }
         else if (args.Key == Key.Home)
         {
@@ -897,7 +906,7 @@ public class CodeEditor : CustomControl
             _caret = Position.At(_caret.Row,
                                 word ? WordRight(line, _caret.Column) : line.NextCodePoint(_caret.Column));
         }
-        else if (_caret.Row + 1u < _doc.LineCount())
+        else if (_caret.Row + 1u < _doc.LineCount)
         {
             _caret = Position.At(_caret.Row + 1u, 0u);
         }
@@ -909,7 +918,7 @@ public class CodeEditor : CustomControl
         int row = (int)_caret.Row + by;
         if (row < 0)
             row = 0;
-        int highest = (int)_doc.LineCount() - 1;
+        int highest = (int)_doc.LineCount - 1;
         if (row > highest)
             row = highest;
 
@@ -949,7 +958,7 @@ public class CodeEditor : CustomControl
     {
         if (document)
         {
-            nuint end = _doc.LineCount() - 1u;
+            nuint end = _doc.LineCount - 1u;
             _caret = Position.At(end, _doc.LengthAt(end));
         }
         else
@@ -1028,7 +1037,7 @@ public class CodeEditor : CustomControl
     public void SelectAll()
     {
         _anchor = Position.At(0u, 0u);
-        nuint end = _doc.LineCount() - 1u;
+        nuint end = _doc.LineCount - 1u;
         _caret = Position.At(end, _doc.LengthAt(end));
         _keepWanted = false;
         Invalidate();
@@ -1064,7 +1073,7 @@ public class CodeEditor : CustomControl
     /// Puts the clipboard's text in, replacing the selection.
     public bool Paste()
     {
-        if (!Clipboard.HasText())
+        if (!Clipboard.HasText)
             return false;
         String text = Clipboard.GetText();
         if (text.ByteLength() == 0u)
@@ -1118,7 +1127,7 @@ public class CodeEditor : CustomControl
             nuint next = _doc.TextAt(_caret.Row).NextCodePoint(_caret.Column);
             _caret = _doc.Delete(_caret, Position.At(_caret.Row, next));
         }
-        else if (_caret.Row + 1u < _doc.LineCount())
+        else if (_caret.Row + 1u < _doc.LineCount)
         {
             _caret = _doc.Delete(_caret, Position.At(_caret.Row + 1u, 0u));
         }

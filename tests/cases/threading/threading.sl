@@ -21,7 +21,7 @@ void BumpGuarded(byte* argument)
     for (int i = 0; i < PerJob; i = i + 1)
     {
         var guard = counter.Lock();
-        guard.Set(guard.Value() + 1);
+        guard.Set(guard.Value + 1);
     }
 }
 
@@ -56,7 +56,7 @@ int Main()
 
     {
         var guard = guarded.Lock();
-        printf("guarded=%lld\n", guard.Value());
+        printf("guarded=%lld\n", guard.Value);
     }
 
     printf("counted=%lld\n", counted.Load());
@@ -82,11 +82,11 @@ int Main()
     var shared = new Mutex<AtomicLong>(new AtomicLong(7));
     {
         var guard = shared.Lock();
-        guard.Value().Add(35);
+        guard.Value.Add(35);
     }
     {
         var guard = shared.Lock();
-        printf("shared=%lld\n", guard.Value().Load());
+        printf("shared=%lld\n", guard.Value.Load());
     }
 
     printf("done\n");

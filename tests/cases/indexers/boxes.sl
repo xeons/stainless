@@ -25,7 +25,7 @@ public class Box<T>
         set => _cells[at] = value;
     }
 
-    public nuint Count() => _cells.Length;
+    public nuint Count => _cells.Length;
 }
 
 // A generic struct, where the setter reaches its receiver by pointer.
@@ -73,7 +73,7 @@ int Main()
     box[1] = 20;
     box[1] += 5;                    // read through the getter, write through the setter
     Console.WriteLine("box " + N((long)box[0]) + " " + N((long)box[1]) + " " +
-        N((long)box.Count()));
+        N((long)box.Count));
 
     // Over a reference type, so the assignment is a retain and a release.
     var text = new Box<String>(2);
@@ -109,7 +109,7 @@ int Main()
     map["a"] = map["a"].ValueOr(0) + 4;
     Console.WriteLine("map " + N((long)map["a"].ValueOr(-1)) + " " +
         N((long)map.Get("a")) + " " +
-        N((long)map["absent"].ValueOr(-1)) + " " + N((long)map.Count()));
+        N((long)map["absent"].ValueOr(-1)) + " " + N((long)map.Count));
 
     return 0;
 }

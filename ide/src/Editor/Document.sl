@@ -137,7 +137,7 @@ public class Document
 
     /// How many lines there are. Never zero: a file with nothing in it is one
     /// empty line, because a caret has to be somewhere.
-    public nuint LineCount() => _lines.Count();
+    public nuint LineCount => _lines.Count;
 
     public Line LineAt(nuint row) => _lines[row];
 
@@ -177,7 +177,7 @@ public class Document
         var parts = text.Replace("\r\n", "\n").Split("\n");
         foreach (var part in parts)
             _lines.Add(new Line(part));
-        if (_lines.Count() == 0u)
+        if (_lines.Count == 0u)
             _lines.Add(new Line(""));
 
         Rescan(0u);
@@ -189,7 +189,7 @@ public class Document
     {
         String separator = _endings == LineEnding.CrLf ? "\r\n" : "\n";
         var builder = new StringBuilder();
-        for (nuint i = 0u; i < _lines.Count(); i++)
+        for (nuint i = 0u; i < _lines.Count; i++)
         {
             if (i > 0u)
                 builder.Append(separator);
@@ -231,7 +231,7 @@ public class Document
     /// are all this call with a different string.
     public Position Insert(Position at, String text)
     {
-        nuint row = Clamp(at.Row, _lines.Count() - 1u);
+        nuint row = Clamp(at.Row, _lines.Count - 1u);
         nuint column = Clamp(at.Column, _lines[row].Text.ByteLength());
 
         String existing = _lines[row].Text;
@@ -277,8 +277,8 @@ public class Document
             end = from;
         }
 
-        nuint firstRow = Clamp(start.Row, _lines.Count() - 1u);
-        nuint lastRow = Clamp(end.Row, _lines.Count() - 1u);
+        nuint firstRow = Clamp(start.Row, _lines.Count - 1u);
+        nuint lastRow = Clamp(end.Row, _lines.Count - 1u);
         nuint firstColumn = Clamp(start.Column, _lines[firstRow].Text.ByteLength());
         nuint lastColumn = Clamp(end.Column, _lines[lastRow].Text.ByteLength());
 
@@ -307,8 +307,8 @@ public class Document
             end = from;
         }
 
-        nuint firstRow = Clamp(start.Row, _lines.Count() - 1u);
-        nuint lastRow = Clamp(end.Row, _lines.Count() - 1u);
+        nuint firstRow = Clamp(start.Row, _lines.Count - 1u);
+        nuint lastRow = Clamp(end.Row, _lines.Count - 1u);
         nuint firstColumn = Clamp(start.Column, _lines[firstRow].Text.ByteLength());
         nuint lastColumn = Clamp(end.Column, _lines[lastRow].Text.ByteLength());
 
@@ -354,10 +354,10 @@ public class Document
     /// one people notice least, because they are looking at what they typed.
     public void Rescan(nuint row)
     {
-        nuint from = Clamp(row, _lines.Count() - 1u);
+        nuint from = Clamp(row, _lines.Count - 1u);
         var state = from == 0u ? ScanState.Normal : _lines[from - 1u].After;
 
-        for (nuint i = from; i < _lines.Count(); i++)
+        for (nuint i = from; i < _lines.Count; i++)
         {
             var line = _lines[i];
             var was = line.After;

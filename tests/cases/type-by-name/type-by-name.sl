@@ -70,7 +70,7 @@ void Say(String label, String value)
 byte* Build(String typeName, String[] settings)
 {
     var type = FindType(typeName);
-    if (!type.Exists())
+    if (!type.Exists)
         return null;
 
     byte* made = Make(type);
@@ -80,12 +80,12 @@ byte* Build(String typeName, String[] settings)
     for (nuint i = 0u; i + 1u < settings.Length; i = i + 2u)
     {
         var property = type.FindProperty(settings[i]);
-        if (!property.Exists() || !property.CanWrite())
+        if (!property.Exists || !property.CanWrite)
             continue;
 
         var value = settings[i + 1u];
 
-        if (property.IsInteger())
+        if (property.IsInteger)
         {
             var parsed = ToLong(value);
             if (parsed.Ok)
@@ -93,7 +93,7 @@ byte* Build(String typeName, String[] settings)
                 SetInteger(made, property, parsed.Value);
             }
         }
-        else if (property.IsFloating())
+        else if (property.IsFloating)
         {
             var parsed = ToDouble(value);
             if (parsed.Ok)
@@ -101,11 +101,11 @@ byte* Build(String typeName, String[] settings)
                 SetDouble(made, property, parsed.Value);
             }
         }
-        else if (property.IsText())
+        else if (property.IsText)
         {
             SetText(made, property, value);
         }
-        else if (property.Kind() == KindBool)
+        else if (property.Kind == KindBool)
         {
             SetBool(made, property, value == "true");
         }
@@ -118,16 +118,16 @@ public int Main()
 {
     // ------------------------------------------------------ finding a type
     var button = FindType("TypeByName.Button");
-    Say("found", Text.FromBool(button.Exists()));
-    Say("name", button.Name());
-    Say("properties", Text.FromInteger((long)button.PropertyCount()));
+    Say("found", Text.FromBool(button.Exists));
+    Say("name", button.Name);
+    Say("properties", Text.FromInteger((long)button.PropertyCount));
 
-    Say("qualified-needed", Text.FromBool(FindType("Button").Exists()));
-    Say("unreflected", Text.FromBool(FindType("TypeByName.Hidden").Exists()));
-    Say("nonsense", Text.FromBool(FindType("No.Such.Type").Exists()));
+    Say("qualified-needed", Text.FromBool(FindType("Button").Exists));
+    Say("unreflected", Text.FromBool(FindType("TypeByName.Hidden").Exists));
+    Say("nonsense", Text.FromBool(FindType("No.Such.Type").Exists));
 
     // A type in the standard library, to show the table is not just this file.
-    Say("cross-module", Text.FromBool(FindType("TypeByName.Slider").Exists()));
+    Say("cross-module", Text.FromBool(FindType("TypeByName.Slider").Exists));
 
     // --------------------------------------------- building from a document
     var settings = new String[6];

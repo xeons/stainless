@@ -211,7 +211,7 @@ public int Main()
     {
         if (animate.IsChecked())
         {
-            state.Fraction = state.Fraction + speed.Value() / 500.0;
+            state.Fraction = state.Fraction + speed.Value / 500.0;
             if (state.Fraction > 1.0)
                 state.Fraction = 0.0;
 

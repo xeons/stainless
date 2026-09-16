@@ -178,10 +178,10 @@ public struct Attribute
     public byte* Handle;
 
     /// The attribute's name, without the brackets.
-    public String Name() => Text.FromNullTerminated(sl_attribute_name(Handle));
+    public String Name => Text.FromNullTerminated(sl_attribute_name(Handle));
 
     /// How many constants were written in the brackets.
-    public nuint ValueCount() => sl_attribute_value_count(Handle);
+    public nuint ValueCount => sl_attribute_value_count(Handle);
 
     /// Which kind the value at `index` is -- one of the `Kind` constants --
     /// so a reader knows whether to call `AsText` or `Number`.
@@ -215,17 +215,17 @@ public struct Field
 
     /// The field's name. For an automatic property's storage this is the
     /// property's name, which is why `IsPropertyStorage` has to exist.
-    public String Name() => Text.FromNullTerminated(sl_field_name(Handle));
+    public String Name => Text.FromNullTerminated(sl_field_name(Handle));
 
     /// How many bytes from the start of the instance the field sits. Add it to
     /// an instance pointer to reach the storage directly.
-    public nuint Offset() => sl_field_offset(Handle);
+    public nuint Offset => sl_field_offset(Handle);
 
     /// What the field holds, as one of the `Kind` constants.
-    public int Kind() => (int)sl_field_kind(Handle);
+    public int Kind => (int)sl_field_kind(Handle);
 
     /// How many attributes are written on the field.
-    public nuint AttributeCount() => sl_field_attribute_count(Handle);
+    public nuint AttributeCount => sl_field_attribute_count(Handle);
 
     /// The attribute at `index`, in the order they were written.
     public Attribute AttributeAt(nuint index)
@@ -244,14 +244,14 @@ public struct Field
     /// depends on what is being filled: plain data wants the field, and
     /// anything whose setter does work -- a control that re-lays-out when it
     /// moves -- wants `Type.FindProperty` instead.
-    public bool IsPropertyStorage() => (sl_field_flags(Handle) & 1u) != 0u;
+    public bool IsPropertyStorage => (sl_field_flags(Handle) & 1u) != 0u;
 
     /// True when an attribute of this name is written on the field.
     public bool Has(String name)
     {
-        for (nuint i = 0; i < AttributeCount(); i++)
+        for (nuint i = 0; i < AttributeCount; i++)
         {
-            if (AttributeAt(i).Name() == name)
+            if (AttributeAt(i).Name == name)
                 return true;
         }
         return false;
@@ -260,10 +260,10 @@ public struct Field
     /// The named attribute, if it is present. Check Has first.
     public Attribute Get(String name)
     {
-        for (nuint i = 0; i < AttributeCount(); i++)
+        for (nuint i = 0; i < AttributeCount; i++)
         {
             var candidate = AttributeAt(i);
-            if (candidate.Name() == name)
+            if (candidate.Name == name)
                 return candidate;
         }
         return AttributeAt(0);
@@ -274,31 +274,37 @@ public struct Field
     /// The two code unit kinds were added after the numbering was fixed, so
     /// they sit past KindArray rather than beside KindChar and a range test
     /// alone no longer reaches them.
-    public bool IsInteger()
+    public bool IsInteger
     {
-        var kind = Kind();
-        if (kind == KindChar16 || kind == KindChar32)
-            return true;
-        return kind >= KindChar && kind <= KindNUInt;
+        get
+        {
+            var kind = Kind;
+            if (kind == KindChar16 || kind == KindChar32)
+                return true;
+            return kind >= KindChar && kind <= KindNUInt;
+        }
     }
 
     /// True for a field whose value can be read as a `double` -- a `float` or
     /// a `double`. An integer field is not one: `ReadDouble` on it answers
     /// zero rather than converting.
-    public bool IsFloating() => Kind() == KindFloat || Kind() == KindDouble;
+    public bool IsFloating => Kind == KindFloat || Kind == KindDouble;
 
     /// True for a field this module can read and write by value: a number, a
     /// bool or a String. Everything else is an aggregate, reached through
     /// `TypeOf()` and walked rather than copied.
-    public bool IsSimple()
+    public bool IsSimple
     {
-        return IsInteger() || IsFloating() || Kind() == KindBool || Kind() == KindString;
+        get
+        {
+            return IsInteger || IsFloating || Kind == KindBool || Kind == KindString;
+        }
     }
 
     /// The type of a field that holds one, or a handle of null.
     ///
     /// Set for a class, an interface and a struct; null for a primitive, whose
-    /// `Kind()` is the whole of what there is to know. It is what makes a
+    /// `Kind` is the whole of what there is to know. It is what makes a
     /// nested object reachable: with the address of the field and the type of
     /// what is in it, the walk continues without any of it being typed.
     public Type TypeOf()
@@ -309,32 +315,38 @@ public struct Field
     }
 
     /// True when this field holds something with fields of its own.
-    public bool IsAggregate()
+    public bool IsAggregate
     {
-        var kind = Kind();
-        return kind == KindClass || kind == KindStruct;
+        get
+        {
+            var kind = Kind;
+            return kind == KindClass || kind == KindStruct;
+        }
     }
 
     /// What an array field's elements are. `KindNone` for anything else.
-    public int ElementKind() => (int)sl_field_element_kind(Handle);
+    public int ElementKind => (int)sl_field_element_kind(Handle);
 
     /// The type of an array's elements, when they have one.
-    public Type ElementType()
+    public Type ElementType
     {
-        Type result;
-        result.Handle = sl_field_element_type(Handle);
-        return result;
+        get
+        {
+            Type result;
+            result.Handle = sl_field_element_type(Handle);
+            return result;
+        }
     }
 
     /// How far apart an array's elements sit, in bytes. Zero for a field that
     /// is not an array.
-    public nuint ElementSize() => sl_field_element_size(Handle);
+    public nuint ElementSize => sl_field_element_size(Handle);
 
     /// True when this field is an array whose elements can be read one by one.
     ///
     /// A slice answers false: it is three words rather than a reference, so
     /// its elements are not where this arithmetic would look.
-    public bool IsArray() => Kind() == KindArray && ElementSize() > 0u;
+    public bool IsArray => Kind == KindArray && ElementSize > 0u;
 
     /// True when this field can be walked into: it holds an aggregate, and
     /// that aggregate carries field metadata of its own.
@@ -343,12 +355,15 @@ public struct Field
     /// Both are classes; only one has anything to walk, and a walk into the
     /// other finds no fields and reports an empty object -- which is a lie
     /// about a list that had things in it.
-    public bool IsWalkable()
+    public bool IsWalkable
     {
-        if (!IsAggregate())
-            return false;
-        var inner = TypeOf();
-        return inner.Exists() && inner.Has("Reflect");
+        get
+        {
+            if (!IsAggregate)
+                return false;
+            var inner = TypeOf();
+            return inner.Exists && inner.Has("Reflect");
+        }
     }
 }
 
@@ -375,22 +390,22 @@ public struct Property
     public byte* Handle;
 
     /// The property's name.
-    public String Name() => Text.FromNullTerminated(sl_property_name(Handle));
+    public String Name => Text.FromNullTerminated(sl_property_name(Handle));
 
     /// What the property's type is, as one of the `Kind` constants.
-    public int Kind() => (int)sl_property_kind(Handle);
+    public int Kind => (int)sl_property_kind(Handle);
 
     /// True when this handle names a property at all; `FindProperty` answers
     /// with a null one when there is no such name.
-    public bool Exists() => Handle != null;
+    public bool Exists => Handle != null;
 
     /// False for a write-only property, and for one whose getter this build
     /// did not emit.
-    public bool CanRead() => sl_property_can_read(Handle);
+    public bool CanRead => sl_property_can_read(Handle);
 
     /// False for a read-only property -- `public int Left { get; }` -- which
     /// is worth checking before a loader decides a document was ignored.
-    public bool CanWrite() => sl_property_can_write(Handle);
+    public bool CanWrite => sl_property_can_write(Handle);
 
     /// The type of an aggregate property, for walking into it. A handle of
     /// null for a primitive.
@@ -402,7 +417,7 @@ public struct Property
     }
 
     /// How many attributes are written on the property.
-    public nuint AttributeCount() => sl_property_attribute_count(Handle);
+    public nuint AttributeCount => sl_property_attribute_count(Handle);
 
     /// The attribute at `index`, in the order they were written.
     public Attribute AttributeAt(nuint index)
@@ -415,28 +430,31 @@ public struct Property
     /// True when an attribute of this name is written on the property.
     public bool Has(String name)
     {
-        for (nuint i = 0u; i < AttributeCount(); i++)
+        for (nuint i = 0u; i < AttributeCount; i++)
         {
-            if (AttributeAt(i).Name() == name)
+            if (AttributeAt(i).Name == name)
                 return true;
         }
         return false;
     }
 
     /// The same three questions a `Field` answers about its kind.
-    public bool IsInteger()
+    public bool IsInteger
     {
-        var kind = Kind();
-        if (kind == KindChar16 || kind == KindChar32)
-            return true;
-        return kind >= KindChar && kind <= KindNUInt;
+        get
+        {
+            var kind = Kind;
+            if (kind == KindChar16 || kind == KindChar32)
+                return true;
+            return kind >= KindChar && kind <= KindNUInt;
+        }
     }
 
     /// True for a `float` or a `double` property.
-    public bool IsFloating() => Kind() == KindFloat || Kind() == KindDouble;
+    public bool IsFloating => Kind == KindFloat || Kind == KindDouble;
 
     /// True for a `String` property.
-    public bool IsText() => Kind() == KindString;
+    public bool IsText => Kind == KindString;
 }
 
 // ------------------------------------------------- reading and writing them
@@ -530,15 +548,15 @@ public struct Type
     public byte* Handle;
 
     /// The type's name, qualified by its module.
-    public String Name() => Text.FromNullTerminated(sl_type_name(Handle));
+    public String Name => Text.FromNullTerminated(sl_type_name(Handle));
 
     /// How many bytes an instance occupies -- the struct's own size, or for a
     /// class the size of the object including its header.
-    public nuint Size() => sl_type_size(Handle);
+    public nuint Size => sl_type_size(Handle);
 
     /// How many fields the type has, inherited ones included, and automatic
     /// properties' storage among them.
-    public nuint FieldCount() => sl_type_field_count(Handle);
+    public nuint FieldCount => sl_type_field_count(Handle);
 
     /// The field at `index`, in declaration order with inherited fields first.
     public Field FieldAt(nuint index)
@@ -549,7 +567,7 @@ public struct Type
     }
 
     /// How many attributes are written on the type.
-    public nuint AttributeCount() => sl_type_attribute_count(Handle);
+    public nuint AttributeCount => sl_type_attribute_count(Handle);
 
     /// The attribute at `index`, in the order they were written.
     public Attribute AttributeAt(nuint index)
@@ -561,16 +579,16 @@ public struct Type
 
     /// True when this handle names a type at all. A `TypeOf()` on a primitive
     /// field answers false.
-    public bool Exists() => Handle != null;
+    public bool Exists => Handle != null;
 
     /// The field of that name, or a handle of null. Names are compared whole,
     /// so a serializer looking up what a document named does one pass.
     public Field FindField(String name)
     {
-        for (nuint i = 0u; i < FieldCount(); i++)
+        for (nuint i = 0u; i < FieldCount; i++)
         {
             var field = FieldAt(i);
-            if (field.Name() == name)
+            if (field.Name == name)
                 return field;
         }
 
@@ -582,9 +600,9 @@ public struct Type
     /// True when the type carries an attribute of that name.
     public bool Has(String name)
     {
-        for (nuint i = 0u; i < AttributeCount(); i++)
+        for (nuint i = 0u; i < AttributeCount; i++)
         {
-            if (AttributeAt(i).Name() == name)
+            if (AttributeAt(i).Name == name)
                 return true;
         }
         return false;
@@ -598,7 +616,7 @@ public struct Type
     /// object through `typeof(Base)` and setting a property the derived class
     /// overrode calls the base's setter, where `.Left = x` in the language
     /// would not.
-    public nuint PropertyCount() => sl_type_property_count(Handle);
+    public nuint PropertyCount => sl_type_property_count(Handle);
 
     /// The property at `index`. An overridden property appears once, at the
     /// position the base gave it, carrying the derived accessors.
@@ -612,10 +630,10 @@ public struct Type
     /// The property of that name, or a handle of null.
     public Property FindProperty(String name)
     {
-        for (nuint i = 0u; i < PropertyCount(); i++)
+        for (nuint i = 0u; i < PropertyCount; i++)
         {
             var property = PropertyAt(i);
-            if (property.Name() == name)
+            if (property.Name == name)
                 return property;
         }
 
@@ -663,9 +681,9 @@ public String ReadText(byte* instance, Field field)
 /// class field holding nothing, which is the one case a caller has to check.
 public byte* ReadAggregate(byte* instance, Field field)
 {
-    if (field.Kind() == KindStruct)
-        return instance + field.Offset();
-    if (field.Kind() == KindClass || field.Kind() == KindInterface)
+    if (field.Kind == KindStruct)
+        return instance + field.Offset;
+    if (field.Kind == KindClass || field.Kind == KindInterface)
     {
         return sl_read_reference(instance, field.Handle);
     }
@@ -712,7 +730,7 @@ public void WriteText(byte* instance, Field field, String value)
     sl_write_text(instance, field.Handle, value.ToPointer(), value.ByteLength());
 }
 
-/// The type of that **qualified** name -- "App.Button", as `Type.Name()`
+/// The type of that **qualified** name -- "App.Button", as `Type.Name`
 /// spells it -- or a handle of null.
 ///
 /// This is the one thing in reflection that is a search rather than a
@@ -726,7 +744,7 @@ public void WriteText(byte* instance, Field field, String value)
 /// the trade `[Reflect]` exists to make explicit.
 ///
 ///     var type = FindType("App.Button");
-///     if (type.Exists()) { byte* made = Make(type); }
+///     if (type.Exists) { byte* made = Make(type); }
 public Type FindType(String name)
 {
     Type result;
@@ -770,11 +788,11 @@ public void WriteAggregate(byte* instance, Field field, byte* value)
 /// this where a field is marked to say so.
 public byte* MakeInto(byte* instance, Field field)
 {
-    if (field.Kind() != KindClass)
+    if (field.Kind != KindClass)
         return null;
 
     var inner = field.TypeOf();
-    if (!inner.Exists())
+    if (!inner.Exists)
         return null;
 
     byte* made = sl_type_make(inner.Handle);
@@ -794,12 +812,12 @@ public byte* MakeInto(byte* instance, Field field)
 // reaching one is the data pointer plus a stride. Everything below takes the
 // element's address rather than a field, because an element has no
 // `Field` of its own -- it has a kind and a width, which is what
-// `ElementKind()` and `ElementSize()` are for.
+// `ElementKind` and `ElementSize` are for.
 
 /// The array a field holds, or null. The instance still owns it.
 public byte* ReadArray(byte* instance, Field field)
 {
-    if (field.Kind() != KindArray)
+    if (field.Kind != KindArray)
         return null;
     return sl_read_reference(instance, field.Handle);
 }
@@ -821,13 +839,13 @@ public byte* ElementAt(byte* array, Field field, nuint index)
         return null;
     if (index >= sl_array_length(array))
         return null;
-    return sl_array_data(array) + index * field.ElementSize();
+    return sl_array_data(array) + index * field.ElementSize;
 }
 
 /// Reads an element of a whole-number array.
 public long ReadIntegerAt(byte* address, Field field)
 {
-    return sl_read_at_integer(address, (uint)field.ElementKind());
+    return sl_read_at_integer(address, (uint)field.ElementKind);
 }
 
 /// Reads an element of a floating array. `field` supplies the element kind,
@@ -835,7 +853,7 @@ public long ReadIntegerAt(byte* address, Field field)
 /// value.
 public double ReadDoubleAt(byte* address, Field field)
 {
-    return sl_read_at_double(address, (uint)field.ElementKind());
+    return sl_read_at_double(address, (uint)field.ElementKind);
 }
 
 /// Reads an element of a `bool` array. Takes no field, a `bool` being one byte
@@ -855,9 +873,9 @@ public String ReadTextAt(byte* address)
 /// where a struct element sits.
 public byte* ReadAggregateAt(byte* address, Field field)
 {
-    if (field.ElementKind() == KindStruct)
+    if (field.ElementKind == KindStruct)
         return address;
-    if (field.ElementKind() == KindClass || field.ElementKind() == KindInterface)
+    if (field.ElementKind == KindClass || field.ElementKind == KindInterface)
     {
         return sl_read_at_reference(address);
     }
@@ -867,13 +885,13 @@ public byte* ReadAggregateAt(byte* address, Field field)
 /// Writes an element of a whole-number array, narrowed to its width.
 public void WriteIntegerAt(byte* address, Field field, long value)
 {
-    sl_write_at_integer(address, (uint)field.ElementKind(), value);
+    sl_write_at_integer(address, (uint)field.ElementKind, value);
 }
 
 /// Writes an element of a floating array, narrowed to the element's width.
 public void WriteDoubleAt(byte* address, Field field, double value)
 {
-    sl_write_at_double(address, (uint)field.ElementKind(), value);
+    sl_write_at_double(address, (uint)field.ElementKind, value);
 }
 
 /// Writes an element of a `bool` array.

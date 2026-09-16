@@ -168,7 +168,7 @@ public class MenuItem : IMenuItemNotify
             var peer = _realised;
             if (peer == null)
                 return 0u;
-            return ((IMenuItemPeer)peer).Id();
+            return ((IMenuItemPeer)peer).Id;
         }
     }
 

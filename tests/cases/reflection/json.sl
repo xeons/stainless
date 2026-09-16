@@ -43,7 +43,7 @@ public String ToJson<T>(T value)
     text.Append("{");
     var first = true;
 
-    for (nuint i = 0; i < type.FieldCount(); i = i + 1)
+    for (nuint i = 0; i < type.FieldCount; i = i + 1)
     {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore"))
@@ -53,7 +53,7 @@ public String ToJson<T>(T value)
             text.Append(",");
         first = false;
 
-        var name = field.Name();
+        var name = field.Name;
         if (field.Has("JsonName"))
             name = field.Get("JsonName").AsText(0);
 
@@ -62,21 +62,21 @@ public String ToJson<T>(T value)
         text.Append("\":");
 
         var raw = (byte*)value;
-        if (field.Kind() == KindString)
+        if (field.Kind == KindString)
         {
             text.Append("\"");
             text.Append(ReadText(raw, field));
             text.Append("\"");
         }
-        else if (field.Kind() == KindBool)
+        else if (field.Kind == KindBool)
         {
             text.Append(Text.FromBool(ReadBool(raw, field)));
         }
-        else if (field.IsFloating())
+        else if (field.IsFloating)
         {
             text.AppendDouble(ReadDouble(raw, field));
         }
-        else if (field.IsInteger())
+        else if (field.IsInteger)
         {
             text.AppendInteger(ReadInteger(raw, field));
         }
@@ -105,7 +105,7 @@ int Main()
     // A struct works the same way, though it has no object header, so its
     // metadata is reached only through typeof.
     var type = typeof(Point);
-    Console.WriteLine(type.Name() + " has " + Text.FromInteger(type.FieldCount())
-                      + " fields, " + Text.FromInteger(type.Size()) + " bytes");
+    Console.WriteLine(type.Name + " has " + Text.FromInteger(type.FieldCount)
+                      + " fields, " + Text.FromInteger(type.Size) + " bytes");
     return 0;
 }

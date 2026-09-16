@@ -73,7 +73,7 @@ int Main()
 
     var names = Files.Entries(directory);
     Sort(names);
-    Console.WriteLine("found " + Text.FromInteger((long)names.Count()) + ":");
+    Console.WriteLine("found " + Text.FromInteger((long)names.Count) + ":");
     foreach (String name in names)
         Console.WriteLine("  " + name);
 

@@ -17,7 +17,7 @@ public class Register<T>
         _count = 0;
     }
 
-    public nuint Count() => _count;
+    public nuint Count => _count;
     public T At(nuint index) => _items[index];
 
     public void Add(T item)
@@ -30,7 +30,7 @@ public class Register<T>
 public Money Total(Register<IPriced> register)
 {
     var sum = Cents(0);
-    for (nuint i = 0; i < register.Count(); i = i + 1)
+    for (nuint i = 0; i < register.Count; i = i + 1)
     {
         sum = Add(sum, register.At(i).Price());
     }

@@ -10,7 +10,7 @@ class Item
 {
     String _name;
     Item(String n) => _name = n;
-    public String Name() => _name;
+    public String Name => _name;
 }
 
 // A type that is iterable without implementing any interface: foreach finds
@@ -31,7 +31,7 @@ class CountdownCursor
         _value = _value - 1;
         return _value > 0;
     }
-    public int Current() => _value;
+    public int Current => _value;
 }
 
 int Main()
@@ -67,7 +67,7 @@ int Main()
     items[0] = new Item("alpha");
     items[1] = new Item("beta");
     foreach (Item item in items)
-        Console.WriteLine(item.Name());
+        Console.WriteLine(item.Name);
 
     // A List<T> goes through IEnumerator<T>.
     var list = new List<int>();

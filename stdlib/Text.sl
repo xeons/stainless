@@ -798,9 +798,12 @@ public class StringBuilder
     // ------------------------------------------------------------- reading
 
     /// Whether anything has been appended. The opposite of `IsEmpty`.
-    public bool HasContent()
+    public bool HasContent
     {
-        return !this.IsEmpty();
+        get
+        {
+            return !this.IsEmpty();
+        }
     }
 
     /// Where `value` first appears in what has been built, or `NotFound`.

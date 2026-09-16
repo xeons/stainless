@@ -159,7 +159,7 @@ public bool SetTitle(String title)
 public String Title()
 {
     var buffer = new WideBuffer(1024u);
-    uint units = GetConsoleTitleW(buffer.Pointer(), buffer.Capacity());
+    uint units = GetConsoleTitleW(buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
         return "";
     return buffer.Text(units);

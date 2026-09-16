@@ -292,9 +292,9 @@ public class Form : WindowedControl, IWindowNotify
 public static class Screen
 {
     /// The whole display, in pixels.
-    public static Size Bounds => WidgetSet.Current.ScreenSize();
+    public static Size Bounds => WidgetSet.Current.ScreenSize;
 
     /// The part not covered by a task bar or dock, which is what a window
     /// should be centred in and what "maximised" actually means.
-    public static Rectangle WorkArea => WidgetSet.Current.WorkArea();
+    public static Rectangle WorkArea => WidgetSet.Current.WorkArea;
 }

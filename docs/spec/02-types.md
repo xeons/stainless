@@ -92,7 +92,7 @@ nothing else. A struct with no fields occupies **one** byte rather than none,
 as it does in C++ and Rust, so that `sizeof` and the emitted layout agree about
 where the field after it begins.
 
-**A struct may also hold a reference**, and `Result<T, E>` is the reason it may:
+**A struct may also hold a reference**, and `Result<T, TError>` is the reason it may:
 
 ```csharp
 public struct Holder {
@@ -1045,7 +1045,7 @@ it. Give one of them a name, so that the one you mean can be said
 A generated C header writes a nameless member back as one, nested where it was
 written, so the header says what the source said.
 
-## 2.8 `Result<T, E>` — how a function fails
+## 2.8 `Result<T, TError>` — how a function fails
 
 Stainless does not unwind. There is no `throw`, no stack unwinding and no
 `catch`, and there will not be: unwinding needs metadata on every frame and a
@@ -1062,13 +1062,13 @@ Result<Config, IOError> Load(String path) {
 }
 ```
 
-**`Result<T, E>` is an ordinary variant** ([§2.6](#26-variant--a-value-that-is-one-of-several-things)), declared in `Standard`, which
+**`Result<T, TError>` is an ordinary variant** ([§2.6](#26-variant--a-value-that-is-one-of-several-things)), declared in `Standard`, which
 is imported everywhere:
 
 ```csharp
-public variant Result<T, E> {
+public variant Result<T, TError> {
     Ok(T Value);
-    Fail(E Error);
+    Fail(TError Error);
 }
 ```
 
@@ -1295,7 +1295,7 @@ Two conventions, and the difference between them is whether there is a value.
 
 | The function | reports failure as |
 |---|---|
-| produces a value | `Result<T, E>` |
+| produces a value | `Result<T, TError>` |
 | produces nothing | the error enum, with `None` for success |
 
 `File.ReadAllBytes` returns a `Result<byte[], IOError>`; `File.Delete` returns

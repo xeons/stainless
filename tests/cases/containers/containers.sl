@@ -26,7 +26,7 @@ class Tag
 {
     String _name;
     public Tag(String n) => _name = n;
-    public String Name() => _name;
+    public String Name => _name;
     ~Tag() { printf("~Tag(%s)\n", _name.ToPointer()); }
 }
 
@@ -39,15 +39,15 @@ int Main()
     ages.Set("alan", 41);
 
     printf("dict=%llu ada=%d absent=%d\n",
-        ages.Count(), ages.Get("ada"), ages.GetOr("nobody", -1));
+        ages.Count, ages.Get("ada"), ages.GetOr("nobody", -1));
     printf("has=%d %d\n",
         ages.ContainsKey("alan") ? 1 : 0, ages.ContainsKey("bob") ? 1 : 0);
 
     ages.Set("ada", 37);
-    printf("replaced=%d count=%llu\n", ages.Get("ada"), ages.Count());
+    printf("replaced=%d count=%llu\n", ages.Get("ada"), ages.Count);
     printf("add=%d dup=%d\n", ages.Add("bob", 1) ? 1 : 0, ages.Add("ada", 9) ? 1 : 0);
     printf("remove=%d gone=%d left=%llu\n",
-        ages.Remove("grace") ? 1 : 0, ages.Remove("grace") ? 1 : 0, ages.Count());
+        ages.Remove("grace") ? 1 : 0, ages.Remove("grace") ? 1 : 0, ages.Count);
 
     // Enough entries to grow several times, then half of them removed. The
     // deletion shifts clusters back, so every survivor is still reachable.
@@ -55,12 +55,12 @@ int Main()
     for (int i = 0; i < 200; i = i + 1)
         squares.Set(i, i * i);
     printf("grown=%llu capacity=%llu at150=%d\n",
-        squares.Count(), squares.Capacity(), squares.Get(150));
+        squares.Count, squares.Capacity, squares.Get(150));
 
     int sum = 0;
     foreach (var pair in squares)
         sum = sum + pair.Key;
-    printf("keys-sum=%d listed=%llu\n", sum, squares.Keys().Count());
+    printf("keys-sum=%d listed=%llu\n", sum, squares.Keys().Count);
 
     for (int i = 0; i < 200; i = i + 2)
         squares.Remove(i);
@@ -71,7 +71,7 @@ int Main()
             survivors = survivors + 1;
     }
     printf("halved=%llu survivors=%d evens=%d\n",
-        squares.Count(), survivors, squares.ContainsKey(150) ? 1 : 0);
+        squares.Count, survivors, squares.ContainsKey(150) ? 1 : 0);
 
     // An enum and a class both work as keys.
     var bySuit = new Dictionary<Suit, String>();
@@ -93,24 +93,24 @@ int Main()
     extra.Add("c");
     extra.Add("d");
     seen.UnionWith(extra);
-    printf("union=%llu\n", seen.Count());
+    printf("union=%llu\n", seen.Count);
 
     var keep = new HashSet<String>();
     keep.Add("a");
     keep.Add("d");
     seen.IntersectWith(keep);
     printf("intersect=%llu a=%d b=%d\n",
-        seen.Count(), seen.Contains("a") ? 1 : 0, seen.Contains("b") ? 1 : 0);
+        seen.Count, seen.Contains("a") ? 1 : 0, seen.Contains("b") ? 1 : 0);
 
     seen.ExceptWith(extra);
-    printf("except=%llu\n", seen.Count());
+    printf("except=%llu\n", seen.Count);
 
     // ---------------------------------------------------------------- queue
     var line = new Queue<int>();
     for (int i = 0; i < 20; i = i + 1)
         line.Enqueue(i);
     printf("queue=%llu peek=%d take=%d %d\n",
-        line.Count(), line.Peek(), line.Dequeue(), line.Dequeue());
+        line.Count, line.Peek(), line.Dequeue(), line.Dequeue());
 
     int drained = 0;
     while (!line.IsEmpty())
@@ -123,7 +123,7 @@ int Main()
     plates.Push("b");
     plates.Push("c");
     printf("stack=%llu top=%s pop=%s %s\n",
-        plates.Count(), plates.Peek().ToPointer(),
+        plates.Count, plates.Peek().ToPointer(),
         plates.Pop().ToPointer(), plates.Pop().ToPointer());
 
     // ----------------------------------------------------------- linked list
@@ -145,13 +145,13 @@ int Main()
         backwards.Append(chain.ValueAt(at));
     }
     printf("chain=%s reversed=%s count=%llu\n",
-        forwards.ToText().ToPointer(), backwards.ToText().ToPointer(), chain.Count());
+        forwards.ToText().ToPointer(), backwards.ToText().ToPointer(), chain.Count);
 
     // A handle stays valid until its own node is removed, and its slot is then
     // reused rather than the pool growing.
     chain.RemoveAt(middle);
     printf("removed=%s %s left=%llu\n",
-        chain.RemoveFirst().ToPointer(), chain.RemoveLast().ToPointer(), chain.Count());
+        chain.RemoveFirst().ToPointer(), chain.RemoveLast().ToPointer(), chain.Count);
     chain.AddLast("recycled");
     foreach (var item in chain)
         printf("  chain %s\n", item.ToPointer());
@@ -162,7 +162,7 @@ int Main()
     prices.Set("apple", 1);
     prices.Set("fig", 2);
     prices.Set("apple", 9);
-    printf("sorted=%llu apple=%d\n", prices.Count(), prices.Get("apple"));
+    printf("sorted=%llu apple=%d\n", prices.Count, prices.Get("apple"));
     foreach (var pair in prices)
         printf("  %s=%d\n", pair.Key.ToPointer(), pair.Value);
     printf("drop=%d still=%d absent=%d\n",
@@ -173,7 +173,7 @@ int Main()
     for (int i = 50; i > 0; i = i - 1)
         ordered.Set(i, i * 2);
     printf("ordered=%d %d %d of %llu\n",
-        ordered.KeyAt(0), ordered.KeyAt(25), ordered.KeyAt(49), ordered.Count());
+        ordered.KeyAt(0), ordered.KeyAt(25), ordered.KeyAt(49), ordered.Count);
 
     // -------------------------------------------------------------- lifetime
     printf("lifetime\n");

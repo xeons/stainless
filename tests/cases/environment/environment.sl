@@ -71,7 +71,7 @@ int Main(String[] args)
     printf("earlyUnix = %lld\n", early.ToUnixSeconds());
 
     // The epoch itself.
-    printf("epoch     = %s\n", Instant.Epoch().FormatIso().ToPointer());
+    printf("epoch     = %s\n", Instant.Epoch.FormatIso().ToPointer());
 
     // Round trip, which is what makes the format worth having.
     var parsed = Instant.ParseIso("2026-09-05T14:30:00Z");
@@ -103,10 +103,10 @@ int Main(String[] args)
     var hour = Duration.FromHours(1);
     var minute = Duration.FromMinutes(1);
 
-    printf("hourSecs  = %lld\n", hour.TotalSeconds());
-    printf("sum       = %lld\n", (hour + minute).TotalSeconds());
-    printf("diff      = %lld\n", (hour - minute).TotalSeconds());
-    printf("negative  = %d\n", (minute - hour).IsNegative());
+    printf("hourSecs  = %lld\n", hour.TotalSeconds);
+    printf("sum       = %lld\n", (hour + minute).TotalSeconds);
+    printf("diff      = %lld\n", (hour - minute).TotalSeconds);
+    printf("negative  = %d\n", (minute - hour).IsNegative);
     printf("format    = %s\n", Duration.FromMilliseconds(3661004).Format().ToPointer());
     printf("small     = %s\n", Duration.FromMilliseconds(42).Format().ToPointer());
     printf("negFormat = %s\n", Duration.FromMilliseconds(-1500).Format().ToPointer());
@@ -114,7 +114,7 @@ int Main(String[] args)
     // Two instants an hour apart, which is a fact about the arithmetic rather
     // than about the machine's clock.
     var later = moon + hour;
-    printf("apart     = %lld\n", (later - moon).TotalSeconds());
+    printf("apart     = %lld\n", (later - moon).TotalSeconds);
 
     // The wall clock is somewhere in this century, and the monotonic one does
     // not go backwards. Neither is a value that can be written down.

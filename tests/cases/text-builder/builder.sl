@@ -61,7 +61,7 @@ int Main()
     SayNumber("index-of", read.IndexOf("world"));
     SayNumber("index-missing", read.IndexOf("nope"));
     SayBool("contains", read.Contains("lo wo"));
-    SayBool("has-content", read.HasContent());
+    SayBool("has-content", read.HasContent);
 
     // -------------------------------------------------------------- editing
     var edited = new StringBuilder();

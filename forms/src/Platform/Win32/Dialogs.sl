@@ -53,7 +53,7 @@ HWND OwnerWindowOf(IWindowPeer? owner)
 {
     if (owner == null)
         return null;
-    return (HWND)(void*)((IWindowPeer)owner).Handle();
+    return (HWND)(void*)((IWindowPeer)owner).Handle;
 }
 
 /// A dialog error, as this layer reports it.

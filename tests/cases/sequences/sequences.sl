@@ -58,7 +58,7 @@ int Main()
     // ---------------------------------------------------------- the rest
 
     var odd = Filter(numbers, n => n % 2 == 1);
-    printf("odd      = %llu\n", (ulong)odd.Count());
+    printf("odd      = %llu\n", (ulong)odd.Count);
 
     printf("any>8    = %d\n", Any(numbers, n => n > 8));
     printf("any>9    = %d\n", Any(numbers, n => n > 9));
@@ -71,9 +71,9 @@ int Main()
     printf("index>99 = %d\n", IndexWhere(numbers, n => n > 99).IsEmpty());
     printf("find>4   = %d\n", Find(numbers, n => n > 4).ValueOr(-1));
 
-    printf("take3    = %llu\n", (ulong)Take(numbers, 3u).Count());
-    printf("skip4    = %llu\n", (ulong)Skip(numbers, 4u).Count());
-    printf("takeAll  = %llu\n", (ulong)Take(numbers, 99u).Count());
+    printf("take3    = %llu\n", (ulong)Take(numbers, 3u).Count);
+    printf("skip4    = %llu\n", (ulong)Skip(numbers, 4u).Count);
+    printf("takeAll  = %llu\n", (ulong)Take(numbers, 99u).Count);
 
     var seen = new AtomicCounter();
     ForEach(numbers, n => seen.Add(n));
@@ -156,7 +156,7 @@ int Main()
     var names = new List<String>();
     names.Add("alpha"); names.Add("be"); names.Add("gamma");
 
-    printf("longNames = %llu\n", (ulong)Filter(names, n => n.ByteLength() > 2u).Count());
+    printf("longNames = %llu\n", (ulong)Filter(names, n => n.ByteLength() > 2u).Count);
     Show("upper    ", Reduce(names, "", (text, n) => text + n.ToUpperAscii() + " "));
     printf("anyShort  = %d\n", Any(names, n => n.ByteLength() < 3u));
 
@@ -189,7 +189,7 @@ int Main()
     // A set has no order to promise, so the total is what is checked.
     var set = new HashSet<int>();
     set.Add(4); set.Add(9); set.Add(4); set.Add(16);
-    printf("setCount  = %llu\n", (ulong)ToList(set).Count());
+    printf("setCount  = %llu\n", (ulong)ToList(set).Count);
     printf("setTotal  = %lld\n", Reduce(ToList(set), (long)0, (sum, n) => sum + (long)n));
 
     var byKey = new SortedList<int, String>();

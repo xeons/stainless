@@ -199,7 +199,7 @@ public int Main()
     boxes.Add(new Node(Value.Number(3.0)));
 
     var builder = new StringBuilder();
-    for (nuint i = 0u; i < boxes.Count(); i = i + 1u)
+    for (nuint i = 0u; i < boxes.Count; i = i + 1u)
     {
         if (boxes.At(i).Get() is Number n)
         {

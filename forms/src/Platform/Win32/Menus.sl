@@ -82,12 +82,12 @@ public class MenuItemPeer : IMenuItemPeer
     }
 
     /// The id `WM_COMMAND` will carry for this item.
-    public int Command() => _id;
+    public int Command => _id;
 
-    public nuint Id() => (nuint)_id;
+    public nuint Id => (nuint)_id;
 
     /// The menu under this item, if it is a heading rather than a command.
-    public IMenuPeer? Submenu() => _below;
+    public IMenuPeer? Submenu => _below;
 
     /// Runs the handler. Called by whichever window resolved the id.
     public void Raise()
@@ -177,10 +177,10 @@ public class MenuPeer : IMenuPeer
         }
     }
 
-    public nuint Handle() => (nuint)(void*)_menu;
+    public nuint Handle => (nuint)(void*)_menu;
 
     /// The same, as the type the Windows calls want.
-    public HMENU Native() => _menu;
+    public HMENU Native => _menu;
 
     /// Says that something else has taken ownership, so this will not destroy
     /// it: a window frees its menu bar, and a menu frees the submenus under it.
@@ -205,7 +205,7 @@ public class MenuPeer : IMenuPeer
                 // A submenu is freed with the menu that holds it, so it must
                 // stop freeing itself.
                 under.OwnedByParent();
-                AppendMenuW(_menu, MfString | MfPopup, (nuint)(void*)under.Native(),
+                AppendMenuW(_menu, MfString | MfPopup, (nuint)(void*)under.Native,
                             text.ToUtf16().ToPointer());
             }
         }
@@ -238,13 +238,13 @@ public class MenuPeer : IMenuPeer
     {
         foreach (var item in _items)
         {
-            var under = item.Submenu();
+            var under = item.Submenu;
             // **A heading is not a command.** An item with a submenu opens it,
             // and Windows sends no `WM_COMMAND` for that -- the id handed to
             // `AppendMenuW` for such an item is the submenu's handle, so the
             // command id this item was given is never used by anything. Letting
             // it match here would run a handler nothing could have raised.
-            if (under == null && item.Command() == id)
+            if (under == null && item.Command == id)
                 return item;
             if (under != null)
             {
@@ -267,7 +267,7 @@ public class MenuPeer : IMenuPeer
     /// through the window at all.
     public void ShowPopup(IWindowPeer owner, FPoint atScreen)
     {
-        HWND window = (HWND)(void*)owner.Handle();
+        HWND window = (HWND)(void*)owner.Handle;
         // Windows will not dismiss a popup on a click outside it unless the
         // owning window is foreground first; without this the menu can be left
         // on screen with nothing able to close it.
@@ -308,10 +308,10 @@ public class BitmapBackend : IBitmapBackend
         }
     }
 
-    public int Width() => _wide;
-    public int Height() => _high;
-    public nuint Handle() => (nuint)(void*)_bitmap;
-    public HBITMAP Native() => _bitmap;
+    public int Width => _wide;
+    public int Height => _high;
+    public nuint Handle => (nuint)(void*)_bitmap;
+    public HBITMAP Native => _bitmap;
 }
 
 /// Reads a `.bmp` from disk.
@@ -408,7 +408,7 @@ public class ImageListBackend : IImageListBackend
     {
         if (picture is BitmapBackend native)
         {
-            int at = ImageList_AddMasked(_list, native.Native(), 0x00FF00FFu);
+            int at = ImageList_AddMasked(_list, native.Native, 0x00FF00FFu);
             if (at >= 0)
                 _held = _held + 1;
             return at;
@@ -420,10 +420,10 @@ public class ImageListBackend : IImageListBackend
     /// asking the platform.
     public int Added() => _held;
 
-    public int Count() => ImageList_GetImageCount(_list);
-    public FSize ImageSize() => _each;
-    public nuint Handle() => (nuint)(void*)_list;
-    public HIMAGELIST Native() => _list;
+    public int Count => ImageList_GetImageCount(_list);
+    public FSize ImageSize => _each;
+    public nuint Handle => (nuint)(void*)_list;
+    public HIMAGELIST Native => _list;
 }
 
 #endif

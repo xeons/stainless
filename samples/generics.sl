@@ -26,7 +26,7 @@ public class List<T>
         _count = 0;
     }
 
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     public void Add(T item)
     {
@@ -68,9 +68,9 @@ int Main()
     names.Add("delta");
     names.Add("epsilon");        // forces a grow
 
-    Console.WriteLine("count      = " + Text.FromInteger(names.Count()));
+    Console.WriteLine("count      = " + Text.FromInteger(names.Count));
     var joined = new StringBuilder();
-    for (nuint i = 0; i < names.Count(); i++)
+    for (nuint i = 0; i < names.Count; i++)
     {
         joined.Append(names.At(i));
         joined.Append(" ");

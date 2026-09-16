@@ -39,7 +39,7 @@ public String Get(String name)
 {
     var buffer = new WideBuffer(32768u);
     uint units = GetEnvironmentVariableW(name.ToUtf16().ToPointer(),
-                                         buffer.Pointer(), buffer.Capacity());
+                                         buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
         return "";
     return buffer.Text(units);
@@ -71,7 +71,7 @@ public String Expand(String text)
 {
     var buffer = new WideBuffer(32768u);
     uint units = ExpandEnvironmentStringsW(text.ToUtf16().ToPointer(),
-                                           buffer.Pointer(), buffer.Capacity());
+                                           buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
         return "";
 
@@ -89,7 +89,7 @@ public String CommandLine()
 public String CurrentDirectory()
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetCurrentDirectoryW(buffer.Capacity(), buffer.Pointer());
+    uint units = GetCurrentDirectoryW(buffer.Capacity, buffer.Pointer());
     if (units == 0u)
         return "";
     return buffer.Text(units);
@@ -103,7 +103,7 @@ public bool SetCurrentDirectory(String path)
 public String SystemDirectory()
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetSystemDirectoryW(buffer.Pointer(), buffer.Capacity());
+    uint units = GetSystemDirectoryW(buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
         return "";
     return buffer.Text(units);
@@ -112,7 +112,7 @@ public String SystemDirectory()
 public String WindowsDirectory()
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetWindowsDirectoryW(buffer.Pointer(), buffer.Capacity());
+    uint units = GetWindowsDirectoryW(buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
         return "";
     return buffer.Text(units);
@@ -122,7 +122,7 @@ public String WindowsDirectory()
 public String ComputerName()
 {
     var buffer = new WideBuffer(256u);
-    uint size = buffer.Capacity();
+    uint size = buffer.Capacity;
     if (!Win32.Succeeded(GetComputerNameW(buffer.Pointer(), &size)))
         return "";
     return buffer.Text(size);

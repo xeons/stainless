@@ -1082,23 +1082,26 @@ public static class Imaging
     /// That is a stated limit rather than an oversight: a lock here would put
     /// `Standard.Threading` underneath a module that otherwise depends on
     /// nothing at all.
-    static Backend? Current()
+    static Backend? Current
     {
-        if (s_tried)
-            return s_loaded;
-        s_tried = true;
+        get
+        {
+            if (s_tried)
+                return s_loaded;
+            s_tried = true;
 
-        var made = new Backend();
-        if (made.Ready)
-            s_loaded = made;
-        return s_loaded;
+            var made = new Backend();
+            if (made.Ready)
+                s_loaded = made;
+            return s_loaded;
+        }
     }
 
     /// Whether there is an imaging library on this machine.
     ///
     /// Loads it, so the first call is where the cost is and every `Image` after
     /// it is free.
-    public static bool Available => Current() != null;
+    public static bool Available => Current != null;
 
     /// The name of the library behind it, for a program that reports what it
     /// found. `""` when there is none.
@@ -1106,7 +1109,7 @@ public static class Imaging
     {
         get
         {
-            if (Current() == null)
+            if (Current == null)
                 return "";
 #if WINDOWS
             return "GDI+";
@@ -1118,7 +1121,7 @@ public static class Imaging
 
     /// The one accessor `Image` uses. Not public: a `Backend` is this
     /// module's own vocabulary and nothing outside could do anything with one.
-    static Backend? Use() => Current();
+    static Backend? Use() => Current;
 }
 
 // ==================================================================== image

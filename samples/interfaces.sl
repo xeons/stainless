@@ -11,7 +11,7 @@ public interface IShape
 
 public interface INamed
 {
-    String Name();
+    String Name { get; }
 }
 
 public class Circle : IShape, INamed
@@ -23,7 +23,7 @@ public class Circle : IShape, INamed
 
     public double Area() => 3.14159265 * _radius * _radius;
     public String Describe() => "circle of radius " + Text.FromDouble(_radius);
-    public String Name() => "Circle";
+    public String Name => "Circle";
 }
 
 public class Rectangle : IShape
@@ -65,7 +65,7 @@ int Main()
 
     // A class may implement several interfaces; each gets its own vtable.
     INamed named = new Circle(1.0);
-    Console.WriteLine("named = " + named.Name());
+    Console.WriteLine("named = " + named.Name);
 
     // StringBuilder makes repeated appending linear instead of quadratic.
     var builder = new StringBuilder();

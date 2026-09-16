@@ -18,7 +18,7 @@ public class Node<T>
     Node<T>? _next;
 
     public Node(T initial) => _value = initial;
-    public T Value() => _value;
+    public T Value => _value;
     public void Attach(Node<T> other) => _next = other;
 }
 
@@ -33,7 +33,7 @@ public class List<T>
         _count = 0;
     }
 
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     public void Add(T item)
     {
@@ -71,16 +71,16 @@ int Main()
 
     var chain = new Node<int>(7);
     chain.Attach(new Node<int>(8));
-    Console.WriteLine("node=" + Text.FromInteger(chain.Value()));
+    Console.WriteLine("node=" + Text.FromInteger(chain.Value));
 
     var names = new List<String>();
     names.Add("a");
     names.Add("b");
     names.Add("c");         // forces a grow
-    Console.WriteLine("count=" + Text.FromInteger(names.Count()));
+    Console.WriteLine("count=" + Text.FromInteger(names.Count));
 
     var joined = new StringBuilder();
-    for (nuint i = 0; i < names.Count(); i = i + 1)
+    for (nuint i = 0; i < names.Count; i = i + 1)
         joined.Append(names.At(i));
     Console.WriteLine("items=" + joined.ToText());
 

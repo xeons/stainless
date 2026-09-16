@@ -80,18 +80,18 @@ void Members()
     Say("static readonly", Registry.Version);
     Say("static method", (long)Registry.Made());
     Say("static property", (long)Registry.Doubled);
-    Say("instances", one.Name() + " " + two.Name());
+    Say("instances", one.Name + " " + two.Name);
     Say("static class", $"{Defaults.Retries} {Defaults.Note()}");
 
     // A type declared inside another, named for where it was written.
-    var widget = new Widget();
+    var widget = new Widget;
     widget.Mood = Widget.State.Busy;    // the long name, from outside
     Widget.Span span;
     span.From = 2;
     span.To = 9;
     widget.Extent = span;
     Say("nested enum", (long)widget.Mood);
-    Say("nested struct", (long)widget.Width());
+    Say("nested struct", (long)widget.Width);
 }
 
 // ==================================================================== §7.1
@@ -226,7 +226,7 @@ void Library()
     list.Add("gamma");
     list.Add("alpha");
     list.Add("beta");
-    Say("List", $"{list.Count()} items, first {list.At(0u)}");
+    Say("List", $"{list.Count} items, first {list.At(0u)}");
 
     var map = new Dictionary<String, int>();
     map.Set("one", 1);
@@ -238,7 +238,7 @@ void Library()
     set.Add(1);
     set.Add(1);
     set.Add(2);
-    Say("HashSet", (long)set.Count());
+    Say("HashSet", (long)set.Count);
 
     var queue = new Queue<int>();
     queue.Enqueue(1);
@@ -253,7 +253,7 @@ void Library()
     var chain = new LinkedList<String>();
     chain.AddLast("tail");
     chain.AddFirst("head");
-    Say("LinkedList", (long)chain.Count());
+    Say("LinkedList", (long)chain.Count);
 
     var sorted = new SortedList<int, String>();
     sorted.Set(2, "two");
@@ -306,7 +306,7 @@ void Library()
         spun += i;
     var taken = clock.Elapsed();
     Say("monotonic", taken.Nanoseconds >= 0);
-    Say("a duration", Duration.FromSeconds(90).TotalMinutes());
+    Say("a duration", Duration.FromSeconds(90).TotalMinutes);
 
     // ------------------------------------------------------------ the world
     Say("has PATH", Env.Has("PATH") || Env.Has("Path"));
@@ -323,7 +323,7 @@ void Library()
     Say("wrote", IO.Describe(File.WriteAllText(file, "one" + Newline() + "two" + Newline())));
 
     var read = File.ReadAllLines(file);
-    Say("read back", read.Ok ? (long)read.Value.Count() : -1);
+    Say("read back", read.Ok ? (long)read.Value.Count : -1);
     Say("size", File.Size(file));
     Say("extension", Path.Extension(file));
     Say("file name", Path.FileName(file));
@@ -369,7 +369,7 @@ String Describe<T>(T value)
     text.Append("{");
     var first = true;
 
-    for (nuint i = 0u; i < type.FieldCount(); i++)
+    for (nuint i = 0u; i < type.FieldCount; i++)
     {
         var field = type.FieldAt(i);
         if (field.Has("Hidden"))
@@ -379,7 +379,7 @@ String Describe<T>(T value)
             text.Append(",");
         first = false;
 
-        var name = field.Name();
+        var name = field.Name;
         if (field.Has("Column"))
             name = field.Get("Column").AsText(0u);
 
@@ -387,19 +387,19 @@ String Describe<T>(T value)
         text.Append("=");
 
         var raw = (byte*)value;
-        if (field.Kind() == KindString)
+        if (field.Kind == KindString)
         {
             text.Append(ReadText(raw, field));
         }
-        else if (field.Kind() == KindBool)
+        else if (field.Kind == KindBool)
         {
             text.Append(Text.FromBool(ReadBool(raw, field)));
         }
-        else if (field.IsFloating())
+        else if (field.IsFloating)
         {
             text.AppendDouble(ReadDouble(raw, field));
         }
-        else if (field.IsInteger())
+        else if (field.IsInteger)
         {
             text.AppendInteger(ReadInteger(raw, field));
         }
@@ -420,8 +420,8 @@ void Reflected()
     var person = new Person("Ada", 36);
     var type = typeof(Person);
 
-    Say("type name", type.Name());
-    Say("fields", (long)type.FieldCount());
+    Say("type name", type.Name);
+    Say("fields", (long)type.FieldCount);
     Say("serialized", Describe(person));
 
     // A field is an offset, so writing one stores bytes.
@@ -431,9 +431,9 @@ void Reflected()
 
     // A property is a pair of functions, so writing one runs the setter --
     // which is the difference the two tables exist to keep.
-    Say("properties", (long)type.PropertyCount());
+    Say("properties", (long)type.PropertyCount);
     var city = type.FindProperty("City");
-    Say("can write", city.CanWrite());
+    Say("can write", city.CanWrite);
     SetText((byte*)person, city, "Lovelace");
     Say("property written", person.City);
 
@@ -442,7 +442,7 @@ void Reflected()
     Say("ignored", type.FindField("Internal").Has("Hidden"));
 
     // And a type may be found by its name, which is what a loader needs.
-    Say("by name", FindType("Tour.Types.Person").Exists());
+    Say("by name", FindType("Tour.Types.Person").Exists);
 }
 
 // ==================================================================== §8
@@ -555,7 +555,7 @@ void Concurrency()
     }
 
     Say("atomic", counter.Load());
-    Say("mutex", guarded.Lock().Value());
+    Say("mutex", guarded.Lock().Value);
 
     // A queue that several threads may hold at once.
     var pending = new ConcurrentQueue<long>();
@@ -564,7 +564,7 @@ void Concurrency()
         spawn pending.Enqueue(1);
         spawn pending.Enqueue(2);
     }
-    Say("concurrent queue", (long)pending.Count());
+    Say("concurrent queue", (long)pending.Count);
 }
 
 /// A newline, written as an escape rather than embedded, so the file the tour
@@ -575,5 +575,5 @@ void Contribute(Tally tally, Mutex<long> guarded, long amount)
 {
     tally.Contribute(amount);
     var guard = guarded.Lock();
-    guard.Set(guard.Value() + amount);
+    guard.Set(guard.Value + amount);
 }

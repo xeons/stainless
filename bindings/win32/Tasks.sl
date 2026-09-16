@@ -179,7 +179,7 @@ public String ReadAll(HANDLE pipe)
     while (true)
     {
         uint read = 0u;
-        int result = ReadFile(pipe, (void*)chunk.Pointer(), chunk.Capacity(), &read, null);
+        int result = ReadFile(pipe, (void*)chunk.Pointer(), chunk.Capacity, &read, null);
 
         // Zero bytes, or ERROR_BROKEN_PIPE, both mean the writer is gone.
         if (result == 0 || read == 0u)

@@ -117,7 +117,7 @@ public HMODULE LoadLibrary(String name)
 public String ModulePath(HMODULE library)
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetModuleFileNameW(library, buffer.Pointer(), buffer.Capacity());
+    uint units = GetModuleFileNameW(library, buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
         return "";
     return buffer.Text(units);

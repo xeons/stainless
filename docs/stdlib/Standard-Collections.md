@@ -13,17 +13,17 @@ Interfaces are named with a leading I, as in C#.
 
 ## Contents
 
-**Types** &nbsp; [Dictionary&lt;K, V&gt;](#dictionaryk-v-class) &middot; [DictionaryEnumerator&lt;K, V&gt;](#dictionaryenumeratork-v-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetCursor&lt;T&gt;](#hashsetcursort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListCursor&lt;T&gt;](#linkedlistcursort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;K, V&gt;](#ordereddictionaryk-v-class) &middot; [Pair&lt;K, V&gt;](#pairk-v-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueCursor&lt;T&gt;](#queuecursort-class) &middot; [SortedList&lt;K, V&gt;](#sortedlistk-v-class) &middot; [SortedListCursor&lt;K, V&gt;](#sortedlistcursork-v-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackCursor&lt;T&gt;](#stackcursort-class)
+**Types** &nbsp; [Dictionary&lt;TKey, TValue&gt;](#dictionarytkey-tvalue-class) &middot; [DictionaryEnumerator&lt;TKey, TValue&gt;](#dictionaryenumeratortkey-tvalue-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetCursor&lt;T&gt;](#hashsetcursort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListCursor&lt;T&gt;](#linkedlistcursort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;TKey, TValue&gt;](#ordereddictionarytkey-tvalue-class) &middot; [Pair&lt;TKey, TValue&gt;](#pairtkey-tvalue-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueCursor&lt;T&gt;](#queuecursort-class) &middot; [SortedList&lt;TKey, TValue&gt;](#sortedlisttkey-tvalue-class) &middot; [SortedListCursor&lt;TKey, TValue&gt;](#sortedlistcursortkey-tvalue-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackCursor&lt;T&gt;](#stackcursort-class)
 
 **Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [CountWhere](#countwhere-function) &middot; [CountWhere](#countwhere-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [Filter](#filter-function) &middot; [Filter](#filter-function) &middot; [Find](#find-function) &middot; [FirstOr](#firstor-function) &middot; [FirstOr](#firstor-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [IndexWhere](#indexwhere-function) &middot; [Largest](#largest-function) &middot; [LowerBound](#lowerbound-function) &middot; [Map](#map-function) &middot; [Map](#map-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [Reduce](#reduce-function) &middot; [Reduce](#reduce-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Smallest](#smallest-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
 
 ## Types
 
-### Dictionary&lt;K, V&gt; *class*
+### Dictionary&lt;TKey, TValue&gt; *class*
 
 ```
-class Dictionary<K, V> : IEnumerable<Pair<K, V>>
-    where K : IEquatable<K>, IHashable
+class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
+    where TKey : IEquatable<TKey>, IHashable
 ```
 
 A map from keys to values.
@@ -34,10 +34,10 @@ class says so by implementing `IEquatable<T>` and `IHashable`.
 
 <sub>[stdlib/Dictionary.sl:65](../../stdlib/Dictionary.sl#L65)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many entries there are. O(1) -- it is a counter, not a scan.
@@ -54,10 +54,10 @@ True when there are no entries.
 
 <sub>[stdlib/Dictionary.sl:87](../../stdlib/Dictionary.sl#L87)</sub>
 
-#### Capacity *method*
+#### Capacity *property*
 
 ```
-nuint Capacity()
+nuint Capacity { get; }
 ```
 
 The number of slots the table has. Always a power of two, so the hash is
@@ -68,7 +68,7 @@ reduced with a mask rather than a division.
 #### ContainsKey *method*
 
 ```
-bool ContainsKey(K key)
+bool ContainsKey(TKey key)
 ```
 
 Whether `key` is there.
@@ -81,7 +81,7 @@ One probe, but reach for `Find` when the value is what is wanted:
 #### Find *method*
 
 ```
-Optional<V> Find(K key)
+Optional<TValue> Find(TKey key)
 ```
 
 The value for `key`, or `None` when there is none.
@@ -102,7 +102,7 @@ to collide with a real value the way `GetOr` has.
 #### Get *method*
 
 ```
-V Get(K key)
+TValue Get(TKey key)
 ```
 
 The value for `key`, aborting when there is none.
@@ -119,7 +119,7 @@ is the question and this is not.
 #### GetOr *method*
 
 ```
-V GetOr(K key, V fallback)
+TValue GetOr(TKey key, TValue fallback)
 ```
 
 The value for `key`, or `fallback` when there is none.
@@ -129,14 +129,14 @@ The value for `key`, or `fallback` when there is none.
 #### this[] *indexer*
 
 ```
-Optional<V> this[K key] { get; set; }
+Optional<TValue> this[TKey key] { get; set; }
 ```
 
-`map[key]`, which answers `Optional<V>` and never stops the program.
+`map[key]`, which answers `Optional<TValue>` and never stops the program.
 
 Swift's design, and it is the right one for the same reason: a key is
 data rather than a position, so a lookup that misses is an answer. An
-indexer returning `V` would have to abort on a miss, and `map[key]`
+indexer returning `TValue` would have to abort on a miss, and `map[key]`
 carries no verb to warn anyone that it might -- which is exactly the
 shape a reader trusts without thinking.
 
@@ -144,7 +144,7 @@ shape a reader trusts without thinking.
     int port = settings["port"].ValueOr(8080);
 
 A getter and a setter share one type (§7.5), so the setter takes an
-`Optional<V>` too -- and that turns out to say something rather than
+`Optional<TValue>` too -- and that turns out to say something rather than
 being a cost. A value promotes to the optional holding it, so an
 ordinary write reads as one; and `None` is the absence of a value,
 which is what removing a key means.
@@ -163,7 +163,7 @@ exists for the same reason.
 #### Set *method*
 
 ```
-void Set(K key, V value)
+void Set(TKey key, TValue value)
 ```
 
 Adds the key or replaces what it maps to.
@@ -173,7 +173,7 @@ Adds the key or replaces what it maps to.
 #### Add *method*
 
 ```
-bool Add(K key, V value)
+bool Add(TKey key, TValue value)
 ```
 
 Adds the key, or reports that it was already there and changes nothing.
@@ -183,7 +183,7 @@ Adds the key, or reports that it was already there and changes nothing.
 #### Remove *method*
 
 ```
-bool Remove(K key)
+bool Remove(TKey key)
 ```
 
 Removes the key, reporting whether it was there.
@@ -204,7 +204,7 @@ anything they held is released now.
 #### Keys *method*
 
 ```
-List<K> Keys()
+List<TKey> Keys()
 ```
 
 Every key, in the table's own order.
@@ -219,7 +219,7 @@ is written in between.
 #### Values *method*
 
 ```
-List<V> Values()
+List<TValue> Values()
 ```
 
 Every value, in the same order `Keys` gives.
@@ -231,7 +231,7 @@ Values are not distinct: a value stored under two keys appears twice.
 #### GetEnumerator *method*
 
 ```
-IEnumerator<Pair<K, V>> GetEnumerator()
+IEnumerator<Pair<TKey, TValue>> GetEnumerator()
 ```
 
 A cursor over the entries, for `foreach`.
@@ -243,11 +243,11 @@ cursor.
 
 <sub>[stdlib/Dictionary.sl:320](../../stdlib/Dictionary.sl#L320)</sub>
 
-### DictionaryEnumerator&lt;K, V&gt; *class*
+### DictionaryEnumerator&lt;TKey, TValue&gt; *class*
 
 ```
-class DictionaryEnumerator<K, V> : IEnumerator<Pair<K, V>>
-    where K : IEquatable<K>, IHashable
+class DictionaryEnumerator<TKey, TValue> : IEnumerator<Pair<TKey, TValue>>
+    where TKey : IEquatable<TKey>, IHashable
 ```
 
 Walks a dictionary's slots, skipping the empty ones.
@@ -269,10 +269,10 @@ O(capacity) overall rather than O(count).
 
 <sub>[stdlib/Dictionary.sl:381](../../stdlib/Dictionary.sl#L381)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-Pair<K, V> Current()
+Pair<TKey, TValue> Current { get; }
 ```
 
 The entry the last `MoveNext` landed on, as a freshly built `Pair`.
@@ -292,10 +292,10 @@ The same table as `Dictionary`, without the values.
 
 <sub>[stdlib/Dictionary.sl:402](../../stdlib/Dictionary.sl#L402)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many distinct items there are. O(1).
@@ -312,10 +312,10 @@ True when there is nothing in it.
 
 <sub>[stdlib/Dictionary.sl:422](../../stdlib/Dictionary.sl#L422)</sub>
 
-#### Capacity *method*
+#### Capacity *property*
 
 ```
-nuint Capacity()
+nuint Capacity { get; }
 ```
 
 The number of slots the table has. Always a power of two, so the hash
@@ -446,10 +446,10 @@ Advances to the next occupied slot, answering false at the end.
 
 <sub>[stdlib/Dictionary.sl:602](../../stdlib/Dictionary.sl#L602)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-T Current()
+T Current { get; }
 ```
 
 The item the last `MoveNext` landed on.
@@ -534,10 +534,10 @@ start rather than on the first item.
 
 <sub>[stdlib/Collections.sl:100](../../stdlib/Collections.sl#L100)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-T Current()
+T Current { get; }
 ```
 
 What the last `MoveNext` landed on. Calling this before the first
@@ -659,10 +659,10 @@ write, which says so in the signature.
 
 <sub>[stdlib/Collections.sl:163](../../stdlib/Collections.sl#L163)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items there are.
@@ -675,7 +675,7 @@ How many items there are.
 T At(nuint index)
 ```
 
-The item at `index`, counting from zero. An index at or past `Count()`
+The item at `index`, counting from zero. An index at or past `Count`
 aborts with the same message an array overrun gives.
 
 <sub>[stdlib/Collections.sl:170](../../stdlib/Collections.sl#L170)</sub>
@@ -710,10 +710,10 @@ steadily does not grow without bound.
 
 <sub>[stdlib/Sequences.sl:254](../../stdlib/Sequences.sl#L254)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many nodes are linked in. O(1), and not the size of the pool --
@@ -925,10 +925,10 @@ Follows one link, answering false past the tail.
 
 <sub>[stdlib/Sequences.sl:811](../../stdlib/Sequences.sl#L811)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-T Current()
+T Current { get; }
 ```
 
 The value in the node the last `MoveNext` reached.
@@ -945,10 +945,10 @@ A growable list backed by a single array, doubling when it fills.
 
 <sub>[stdlib/Collections.sl:190](../../stdlib/Collections.sl#L190)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items are in the list -- not how many it has room for, which
@@ -966,10 +966,10 @@ True when there is nothing in it.
 
 <sub>[stdlib/Collections.sl:208](../../stdlib/Collections.sl#L208)</sub>
 
-#### Capacity *method*
+#### Capacity *property*
 
 ```
-nuint Capacity()
+nuint Capacity { get; }
 ```
 
 The number of items this list can hold before it must grow again.
@@ -984,7 +984,7 @@ T At(nuint index)
 
 The item at `index`, aborting past the end.
 
-Checked against `Count()` rather than against the backing array, so a
+Checked against `Count` rather than against the backing array, so a
 slot that exists but holds nothing is out of range and says so.
 `list[index]` is the same question in fewer characters.
 
@@ -1038,7 +1038,7 @@ void Insert(nuint index, T item)
 
 Inserts at a position, moving everything after it up one.
 
-`index == Count()` appends, which is what makes a loop that inserts in
+`index == Count` appends, which is what makes a loop that inserts in
 order need no special case at the end.
 
 <sub>[stdlib/Collections.sl:273](../../stdlib/Collections.sl#L273)</sub>
@@ -1102,21 +1102,21 @@ Advances, answering false at the end.
 
 <sub>[stdlib/Collections.sl:142](../../stdlib/Collections.sl#L142)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-T Current()
+T Current { get; }
 ```
 
 The item the last `MoveNext` landed on.
 
 <sub>[stdlib/Collections.sl:151](../../stdlib/Collections.sl#L151)</sub>
 
-### OrderedDictionary&lt;K, V&gt; *class*
+### OrderedDictionary&lt;TKey, TValue&gt; *class*
 
 ```
-class OrderedDictionary<K, V>
-    where K : IEquatable<K>
+class OrderedDictionary<TKey, TValue>
+    where TKey : IEquatable<TKey>
 ```
 
 A dictionary that remembers the order its keys were added in.
@@ -1136,10 +1136,10 @@ which is not what the collection is for.
 
 <sub>[stdlib/Collections.sl:718](../../stdlib/Collections.sl#L718)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many entries there are. Entries rather than distinct keys: `Add`
@@ -1150,7 +1150,7 @@ keeps a repeated key, so this can exceed the number of different keys.
 #### KeyAt *method*
 
 ```
-K KeyAt(nuint index)
+TKey KeyAt(nuint index)
 ```
 
 The key at a position, in insertion order.
@@ -1160,7 +1160,7 @@ The key at a position, in insertion order.
 #### ValueAt *method*
 
 ```
-V ValueAt(nuint index)
+TValue ValueAt(nuint index)
 ```
 
 The value at a position, in insertion order.
@@ -1170,7 +1170,7 @@ The value at a position, in insertion order.
 #### IndexOf *method*
 
 ```
-Optional<nuint> IndexOf(K key)
+Optional<nuint> IndexOf(TKey key)
 ```
 
 Where a key is, or `None`.
@@ -1185,7 +1185,7 @@ every caller has to know and none can be made to.
 #### Has *method*
 
 ```
-bool Has(K key)
+bool Has(TKey key)
 ```
 
 Whether the key is there at all. A scan, like everything else here, so
@@ -1196,7 +1196,7 @@ Whether the key is there at all. A scan, like everything else here, so
 #### Add *method*
 
 ```
-void Add(K key, V value)
+void Add(TKey key, TValue value)
 ```
 
 Appends, without looking for the key first.
@@ -1210,7 +1210,7 @@ deciding what the document meant. `Set` is the one that replaces.
 #### Set *method*
 
 ```
-void Set(K key, V value)
+void Set(TKey key, TValue value)
 ```
 
 Replaces the value of a key, or appends it. A replaced key keeps the
@@ -1221,7 +1221,7 @@ position it had, which is the point of the collection.
 #### Find *method*
 
 ```
-V Find(K key, V fallback)
+TValue Find(TKey key, TValue fallback)
 ```
 
 The value of a key, or the fallback. There is no overload that aborts:
@@ -1232,7 +1232,7 @@ a caller that wants to know writes `IndexOf`.
 #### Remove *method*
 
 ```
-bool Remove(K key)
+bool Remove(TKey key)
 ```
 
 Removes the first entry with that key, closing the gap. Answers whether
@@ -1250,10 +1250,10 @@ Drops every entry, leaving a count of zero.
 
 <sub>[stdlib/Collections.sl:808](../../stdlib/Collections.sl#L808)</sub>
 
-### Pair&lt;K, V&gt; *class*
+### Pair&lt;TKey, TValue&gt; *class*
 
 ```
-class Pair<K, V>
+class Pair<TKey, TValue>
 ```
 
 One key and one value. What a dictionary yields when it is iterated.
@@ -1263,7 +1263,7 @@ One key and one value. What a dictionary yields when it is iterated.
 #### Key *property*
 
 ```
-K Key { get; }
+TKey Key { get; }
 ```
 
 The key half.
@@ -1273,7 +1273,7 @@ The key half.
 #### Value *property*
 
 ```
-V Value { get; }
+TValue Value { get; }
 ```
 
 The value half.
@@ -1294,10 +1294,10 @@ the front of it.
 
 <sub>[stdlib/Sequences.sl:38](../../stdlib/Sequences.sl#L38)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items are waiting. O(1).
@@ -1315,10 +1315,10 @@ True when there is nothing to dequeue. Check this before `Dequeue` or
 
 <sub>[stdlib/Sequences.sl:59](../../stdlib/Sequences.sl#L59)</sub>
 
-#### Capacity *method*
+#### Capacity *property*
 
 ```
-nuint Capacity()
+nuint Capacity { get; }
 ```
 
 The number of slots the ring has. Always a power of two, so wrapping is
@@ -1416,21 +1416,21 @@ Advances, answering false at the end.
 
 <sub>[stdlib/Sequences.sl:755](../../stdlib/Sequences.sl#L755)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-T Current()
+T Current { get; }
 ```
 
 The item the last `MoveNext` landed on.
 
 <sub>[stdlib/Sequences.sl:764](../../stdlib/Sequences.sl#L764)</sub>
 
-### SortedList&lt;K, V&gt; *class*
+### SortedList&lt;TKey, TValue&gt; *class*
 
 ```
-class SortedList<K, V> : IEnumerable<Pair<K, V>>
-    where K : IComparable<K>
+class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
+    where TKey : IComparable<TKey>
 ```
 
 A map kept in key order, over two parallel arrays.
@@ -1442,10 +1442,10 @@ built once, rather than a counter updated in a loop.
 
 <sub>[stdlib/Sequences.sl:522](../../stdlib/Sequences.sl#L522)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many entries there are. O(1).
@@ -1465,7 +1465,7 @@ True when there are no entries.
 #### IndexOfKey *method*
 
 ```
-nint IndexOfKey(K key)
+nint IndexOfKey(TKey key)
 ```
 
 The index `key` is at, or the index it would be inserted at, negated and
@@ -1477,7 +1477,7 @@ offset by one so the two cases stay apart: a result below zero means
 #### ContainsKey *method*
 
 ```
-bool ContainsKey(K key)
+bool ContainsKey(TKey key)
 ```
 
 Whether `key` is there. A binary search, O(log n). Reach for `Find`
@@ -1488,7 +1488,7 @@ when the value is what is wanted, rather than searching twice.
 #### KeyAt *method*
 
 ```
-K KeyAt(nuint index)
+TKey KeyAt(nuint index)
 ```
 
 The key at a position in the ordering, counting from the smallest.
@@ -1498,7 +1498,7 @@ The key at a position in the ordering, counting from the smallest.
 #### ValueAt *method*
 
 ```
-V ValueAt(nuint index)
+TValue ValueAt(nuint index)
 ```
 
 The value at a position in the ordering, paired with `KeyAt` at the
@@ -1509,7 +1509,7 @@ same index. Aborts past the end.
 #### Find *method*
 
 ```
-Optional<V> Find(K key)
+Optional<TValue> Find(TKey key)
 ```
 
 The value for `key`, or `None` when there is none. The one to reach
@@ -1521,7 +1521,7 @@ that is not there is an outcome rather than a mistake.
 #### Get *method*
 
 ```
-V Get(K key)
+TValue Get(TKey key)
 ```
 
 The value for `key`, aborting when there is none.
@@ -1534,7 +1534,7 @@ the question where it might not be, and `GetOr` where a default will do.
 #### GetOr *method*
 
 ```
-V GetOr(K key, V fallback)
+TValue GetOr(TKey key, TValue fallback)
 ```
 
 The value for `key`, or `fallback` when there is none.
@@ -1548,7 +1548,7 @@ tells them apart.
 #### Set *method*
 
 ```
-void Set(K key, V value)
+void Set(TKey key, TValue value)
 ```
 
 Sets the value of a key, adding it in order if it is new.
@@ -1562,7 +1562,7 @@ poor choice for a map that is written in a loop.
 #### Remove *method*
 
 ```
-bool Remove(K key)
+bool Remove(TKey key)
 ```
 
 Removes a key, answering whether it was there. Closes the gap, so it
@@ -1584,7 +1584,7 @@ anything they held is released now.
 #### Keys *method*
 
 ```
-List<K> Keys()
+List<TKey> Keys()
 ```
 
 Every key, smallest first, as a fresh list.
@@ -1594,7 +1594,7 @@ Every key, smallest first, as a fresh list.
 #### Values *method*
 
 ```
-List<V> Values()
+List<TValue> Values()
 ```
 
 Every value, in key order, pairing with `Keys` position for position.
@@ -1604,7 +1604,7 @@ Every value, in key order, pairing with `Keys` position for position.
 #### GetEnumerator *method*
 
 ```
-IEnumerator<Pair<K, V>> GetEnumerator()
+IEnumerator<Pair<TKey, TValue>> GetEnumerator()
 ```
 
 A cursor over the entries in key order, for `foreach` -- the ordering
@@ -1613,11 +1613,11 @@ the map during a walk invalidates it.
 
 <sub>[stdlib/Sequences.sl:716](../../stdlib/Sequences.sl#L716)</sub>
 
-### SortedListCursor&lt;K, V&gt; *class*
+### SortedListCursor&lt;TKey, TValue&gt; *class*
 
 ```
-class SortedListCursor<K, V> : IEnumerator<Pair<K, V>>
-    where K : IComparable<K>
+class SortedListCursor<TKey, TValue> : IEnumerator<Pair<TKey, TValue>>
+    where TKey : IComparable<TKey>
 ```
 
 Walks a sorted list in key order.
@@ -1638,10 +1638,10 @@ Advances to the next key in order, answering false at the end.
 
 <sub>[stdlib/Sequences.sl:848](../../stdlib/Sequences.sl#L848)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-Pair<K, V> Current()
+Pair<TKey, TValue> Current { get; }
 ```
 
 The entry the last `MoveNext` landed on, as a freshly built `Pair`.
@@ -1658,10 +1658,10 @@ Last in, first out. The top is the end of the array, so nothing moves.
 
 <sub>[stdlib/Sequences.sl:145](../../stdlib/Sequences.sl#L145)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many items are on the stack. O(1).
@@ -1679,10 +1679,10 @@ both of which abort on an empty stack.
 
 <sub>[stdlib/Sequences.sl:164](../../stdlib/Sequences.sl#L164)</sub>
 
-#### Capacity *method*
+#### Capacity *property*
 
 ```
-nuint Capacity()
+nuint Capacity { get; }
 ```
 
 The number of slots the backing array has.
@@ -1771,10 +1771,10 @@ Advances towards the bottom, answering false at the end.
 
 <sub>[stdlib/Sequences.sl:781](../../stdlib/Sequences.sl#L781)</sub>
 
-#### Current *method*
+#### Current *property*
 
 ```
-T Current()
+T Current { get; }
 ```
 
 The item the last `MoveNext` landed on.

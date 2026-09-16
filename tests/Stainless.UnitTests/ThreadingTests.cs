@@ -97,20 +97,20 @@ public class ThreadingTests
     /// </summary>
     [Theory]
     [InlineData("var m = new Monitor<long>(0); var g = m.Lock(); g.Set(1); g.Pulse(); g.PulseAll();")]
-    [InlineData("var m = new Monitor<long>(0); var g = m.Lock(); bool b = g.WaitFor(1u); long v = g.Value();")]
-    [InlineData("var l = new RwLock<long>(0); var r = l.Read(); long v = r.Value();")]
+    [InlineData("var m = new Monitor<long>(0); var g = m.Lock(); bool b = g.WaitFor(1u); long v = g.Value;")]
+    [InlineData("var l = new RwLock<long>(0); var r = l.Read(); long v = r.Value;")]
     [InlineData("var l = new RwLock<long>(0); var w = l.Write(); w.Set(1);")]
     [InlineData("var l = new RwLock<long>(0); var r = l.TryRead(); var w = l.TryWrite();")]
     [InlineData("var s = new Semaphore(2); s.Wait(); s.Release(); s.ReleaseMany(2); bool t = s.TryWait();")]
     [InlineData("var s = new Semaphore(2); bool got = s.WaitFor(1u); long free = s.Available();")]
-    [InlineData("var e = new ManualResetEvent(false); e.Set(); e.Wait(); e.Reset(); bool s = e.IsSet();")]
+    [InlineData("var e = new ManualResetEvent(false); e.Set(); e.Wait(); e.Reset(); bool s = e.IsSet;")]
     [InlineData("var e = new AutoResetEvent(false); e.Set(); bool got = e.WaitFor(1u);")]
     [InlineData("var c = new CountdownEvent(2); bool last = c.Signal(); bool grew = c.TryAddCount(1); c.Wait();")]
-    [InlineData("var c = new CountdownEvent(2); long left = c.CurrentCount(); bool ok = c.WaitFor(1u);")]
-    [InlineData("var b = new Barrier(2u); long phase = b.SignalAndWait(); nuint n = b.ParticipantCount();")]
+    [InlineData("var c = new CountdownEvent(2); long left = c.CurrentCount; bool ok = c.WaitFor(1u);")]
+    [InlineData("var b = new Barrier(2u); long phase = b.SignalAndWait(); nuint n = b.ParticipantCount;")]
     [InlineData("var a = new AtomicLong(0); a.And(1); a.Or(2); a.Xor(3); a.Exchange(4);")]
     [InlineData("var a = new AtomicInt(0); a.Increment(); a.Decrement(); a.Add(2); bool ok = a.CompareExchange(0, 1);")]
-    [InlineData("var s = new SpinWait(); s.Once(); nuint n = s.Count(); s.Reset();")]
+    [InlineData("var s = new SpinWait(); s.Once(); nuint n = s.Count; s.Reset();")]
     [InlineData("Threading.Sleep(1u); Threading.Yield(); nuint id = Threading.CurrentId();")]
     public void TheSurfaceResolves(string body)
     {
@@ -130,7 +130,7 @@ public class ThreadingTests
 
             int Main() {
                 var thread = new Thread(Work, null);
-                bool live = thread.IsJoinable();
+                bool live = thread.IsJoinable;
                 thread.Join();
                 thread.Detach();
                 return 0;

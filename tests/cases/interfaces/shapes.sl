@@ -11,7 +11,7 @@ public interface IShape
 
 public interface INamed
 {
-    String Name();
+    String Name { get; }
 }
 
 public class Circle : IShape, INamed
@@ -23,7 +23,7 @@ public class Circle : IShape, INamed
 
     public double Area() => 4.0 * _radius * _radius;
     public String Describe() => "circle:" + Text.FromDouble(_radius);
-    public String Name() => "Circle";
+    public String Name => "Circle";
 }
 
 public class Rectangle : IShape
@@ -60,7 +60,7 @@ int Main()
 
     // One class, two interfaces, one vtable each.
     INamed named = new Circle(1.0);
-    Console.WriteLine("named=" + named.Name());
+    Console.WriteLine("named=" + named.Name);
 
     // An optional interface reference is still just a pointer.
     IShape? maybe = null;

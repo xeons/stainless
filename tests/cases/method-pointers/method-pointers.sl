@@ -129,7 +129,7 @@ public int Main()
     handlers.Add(two.Add);
     handlers.Add(counted.Add);
 
-    for (nuint i = 0u; i < handlers.Count(); i = i + 1u)
+    for (nuint i = 0u; i < handlers.Count; i = i + 1u)
         handlers.At(i)(1);
     Say("after-all", Text.FromInteger((long)one.Total)
         + "/" + Text.FromInteger((long)two.Total)
@@ -138,7 +138,7 @@ public int Main()
     // Found by comparing both words, so the right one goes. `List<T>` has no
     // `Remove(T)` -- its `IndexOf` wants `IEquatable<T>`, which a closure is
     // not -- so this is the scan that would be behind one.
-    for (nuint i = 0u; i < handlers.Count(); i = i + 1u)
+    for (nuint i = 0u; i < handlers.Count; i = i + 1u)
     {
         if (handlers.At(i) == two.Add)
         {
@@ -147,10 +147,10 @@ public int Main()
         }
     }
 
-    Say("left", Text.FromInteger((long)handlers.Count()));
+    Say("left", Text.FromInteger((long)handlers.Count));
 
     // And the one removed is the one meant: two is untouched from here on.
-    for (nuint i = 0u; i < handlers.Count(); i = i + 1u)
+    for (nuint i = 0u; i < handlers.Count; i = i + 1u)
         handlers.At(i)(1);
     Say("after-removal", Text.FromInteger((long)one.Total)
         + "/" + Text.FromInteger((long)two.Total)

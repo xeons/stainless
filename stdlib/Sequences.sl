@@ -52,7 +52,7 @@ public class Queue<T> : IEnumerable<T>
     }
 
     /// How many items are waiting. O(1).
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     /// True when there is nothing to dequeue. Check this before `Dequeue` or
     /// `Peek`, both of which abort on an empty queue.
@@ -60,7 +60,7 @@ public class Queue<T> : IEnumerable<T>
 
     /// The number of slots the ring has. Always a power of two, so wrapping is
     /// a mask rather than a division.
-    public nuint Capacity() => _items.Length;
+    public nuint Capacity => _items.Length;
 
     /// Adds to the back, growing the ring when it is full.
     ///
@@ -157,14 +157,14 @@ public class Stack<T> : IEnumerable<T>
     }
 
     /// How many items are on the stack. O(1).
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     /// True when there is nothing to pop. Check this before `Pop` or `Peek`,
     /// both of which abort on an empty stack.
     public bool IsEmpty() => _count == 0;
 
     /// The number of slots the backing array has.
-    public nuint Capacity() => _items.Length;
+    public nuint Capacity => _items.Length;
 
     /// Pushes onto the top, growing when full. Amortised constant time.
     public void Push(T item)
@@ -280,7 +280,7 @@ public class LinkedList<T> : IEnumerable<T>
 
     /// How many nodes are linked in. O(1), and not the size of the pool --
     /// recycled slots are not counted.
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     /// True when nothing is linked in.
     public bool IsEmpty() => _count == 0;
@@ -460,7 +460,7 @@ public class LinkedList<T> : IEnumerable<T>
 
     /// The three a cursor needs to walk the links. A node is an index into the
     /// pool, and -1 is the end -- which is why these are nint and not nuint.
-    nint FirstNode() => _head;
+    nint FirstNode => _head;
     nint NodeAfter(nint node) => _next[(nuint)node];
     T NodeValue(nint node) => _items[(nuint)node];
 
@@ -519,22 +519,22 @@ public class LinkedList<T> : IEnumerable<T>
 /// `Dictionary` cannot do. Insertion moves the tail of the arrays, so this is
 /// for maps that are read far more than they are written -- a lookup table
 /// built once, rather than a counter updated in a loop.
-public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
+public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TKey : IComparable<TKey>
 {
-    K[] _keys;
-    V[] _values;
+    TKey[] _keys;
+    TValue[] _values;
     nuint _count;
 
     /// An empty map with room for a few entries before it first grows.
     public SortedList()
     {
-        _keys = new K[8];
-        _values = new V[8];
+        _keys = new TKey[8];
+        _values = new TValue[8];
         _count = 0;
     }
 
     /// How many entries there are. O(1).
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     /// True when there are no entries.
     public bool IsEmpty() => _count == 0;
@@ -542,7 +542,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
     /// The index `key` is at, or the index it would be inserted at, negated and
     /// offset by one so the two cases stay apart: a result below zero means
     /// "not found, and `-result - 1` is where it goes".
-    public nint IndexOfKey(K key)
+    public nint IndexOfKey(TKey key)
     {
         nuint low = 0;
         nuint high = _count;
@@ -569,10 +569,10 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
 
     /// Whether `key` is there. A binary search, O(log n). Reach for `Find`
     /// when the value is what is wanted, rather than searching twice.
-    public bool ContainsKey(K key) => IndexOfKey(key) >= 0;
+    public bool ContainsKey(TKey key) => IndexOfKey(key) >= 0;
 
     /// The key at a position in the ordering, counting from the smallest.
-    public K KeyAt(nuint index)
+    public TKey KeyAt(nuint index)
     {
         if (index >= _count)
             sl_array_bounds_fail(index, _count);
@@ -581,7 +581,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
 
     /// The value at a position in the ordering, paired with `KeyAt` at the
     /// same index. Aborts past the end.
-    public V ValueAt(nuint index)
+    public TValue ValueAt(nuint index)
     {
         if (index >= _count)
             sl_array_bounds_fail(index, _count);
@@ -591,7 +591,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
     /// The value for `key`, or `None` when there is none. The one to reach
     /// for, for the reason `Dictionary.Find` gives: a key is data, so a key
     /// that is not there is an outcome rather than a mistake.
-    public Optional<V> Find(K key)
+    public Optional<TValue> Find(TKey key)
     {
         nint at = IndexOfKey(key);
         if (at < 0)
@@ -603,7 +603,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
     ///
     /// The asserting form, for a key that is there by construction. `Find` is
     /// the question where it might not be, and `GetOr` where a default will do.
-    public V Get(K key)
+    public TValue Get(TKey key)
     {
         nint at = IndexOfKey(key);
         if (at < 0)
@@ -616,7 +616,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
     /// Allocates nothing, at the cost of not distinguishing an absent key from
     /// one whose stored value equals the fallback. `Find` is the one that
     /// tells them apart.
-    public V GetOr(K key, V fallback)
+    public TValue GetOr(TKey key, TValue fallback)
     {
         nint at = IndexOfKey(key);
         if (at < 0)
@@ -629,7 +629,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
     /// An existing key costs a search. A new one costs the search plus a shift
     /// of everything after it -- O(n) -- which is what makes this collection a
     /// poor choice for a map that is written in a loop.
-    public void Set(K key, V value)
+    public void Set(TKey key, TValue value)
     {
         nint at = IndexOfKey(key);
         if (at >= 0)
@@ -657,7 +657,7 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
 
     /// Removes a key, answering whether it was there. Closes the gap, so it
     /// is O(n) like `Set` on a new key.
-    public bool Remove(K key)
+    public bool Remove(TKey key)
     {
         nint at = IndexOfKey(key);
         if (at < 0)
@@ -673,8 +673,8 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
 
         // The vacated slot still refers to the last entry; blanking it releases
         // that reference now rather than at the next insertion.
-        var noKeys = new K[1];
-        var noValues = new V[1];
+        var noKeys = new TKey[1];
+        var noValues = new TValue[1];
         _keys[_count] = noKeys[0];
         _values[_count] = noValues[0];
         return true;
@@ -684,44 +684,44 @@ public class SortedList<K, V> : IEnumerable<Pair<K, V>> where K : IComparable<K>
     /// anything they held is released now.
     public void Clear()
     {
-        _keys = new K[8];
-        _values = new V[8];
+        _keys = new TKey[8];
+        _values = new TValue[8];
         _count = 0;
     }
 
     /// Every key, smallest first, as a fresh list.
-    public List<K> Keys()
+    public List<TKey> Keys()
     {
-        var result = new List<K>();
+        var result = new List<TKey>();
         for (nuint i = 0; i < _count; i++)
             result.Add(_keys[i]);
         return result;
     }
 
     /// Every value, in key order, pairing with `Keys` position for position.
-    public List<V> Values()
+    public List<TValue> Values()
     {
-        var result = new List<V>();
+        var result = new List<TValue>();
         for (nuint i = 0; i < _count; i++)
             result.Add(_values[i]);
         return result;
     }
 
     /// The entry at a position, in key order. What the cursor walks.
-    Pair<K, V> PairAt(nuint index) => new Pair<K, V>(_keys[index], _values[index]);
+    Pair<TKey, TValue> PairAt(nuint index) => new Pair<TKey, TValue>(_keys[index], _values[index]);
 
     /// A cursor over the entries in key order, for `foreach` -- the ordering
     /// a `Dictionary` cannot give. One `Pair` is built per step. Writing to
     /// the map during a walk invalidates it.
-    public IEnumerator<Pair<K, V>> GetEnumerator()
+    public IEnumerator<Pair<TKey, TValue>> GetEnumerator()
     {
-        return new SortedListCursor<K, V>(this);
+        return new SortedListCursor<TKey, TValue>(this);
     }
 
     void Grow()
     {
-        var biggerKeys = new K[_keys.Length * 2];
-        var biggerValues = new V[_values.Length * 2];
+        var biggerKeys = new TKey[_keys.Length * 2];
+        var biggerValues = new TValue[_values.Length * 2];
 
         for (nuint i = 0; i < _count; i++)
         {
@@ -754,14 +754,14 @@ public class QueueCursor<T> : IEnumerator<T>
     /// Advances, answering false at the end.
     public bool MoveNext()
     {
-        if (_next >= _source.Count())
+        if (_next >= _source.Count)
             return false;
         _next++;
         return true;
     }
 
     /// The item the last `MoveNext` landed on.
-    public T Current() => _source.At(_next - 1);
+    public T Current => _source.At(_next - 1);
 }
 
 /// Walks a stack top first, matching the order `Pop` would hand things back.
@@ -780,14 +780,14 @@ public class StackCursor<T> : IEnumerator<T>
     /// Advances towards the bottom, answering false at the end.
     public bool MoveNext()
     {
-        if (_next >= _source.Count())
+        if (_next >= _source.Count)
             return false;
         _next++;
         return true;
     }
 
     /// The item the last `MoveNext` landed on.
-    public T Current() => _source.FromTop(_next - 1);
+    public T Current => _source.FromTop(_next - 1);
 }
 
 /// Walks a linked list head first, following the links rather than flattening
@@ -813,7 +813,7 @@ public class LinkedListCursor<T> : IEnumerator<T>
         if (!_started)
         {
             _started = true;
-            _at = _source.FirstNode();
+            _at = _source.FirstNode;
         }
         else if (_at >= 0)
         {
@@ -824,7 +824,7 @@ public class LinkedListCursor<T> : IEnumerator<T>
     }
 
     /// The value in the node the last `MoveNext` reached.
-    public T Current() => _source.NodeValue(_at);
+    public T Current => _source.NodeValue(_at);
 }
 
 /// Walks a sorted list in key order.
@@ -832,13 +832,13 @@ public class LinkedListCursor<T> : IEnumerator<T>
 /// One `Pair` is built per step, as the materialising version built one per
 /// entry before the walk began -- the difference is that a loop that stops
 /// early now stops allocating too.
-public class SortedListCursor<K, V> : IEnumerator<Pair<K, V>> where K : IComparable<K>
+public class SortedListCursor<TKey, TValue> : IEnumerator<Pair<TKey, TValue>> where TKey : IComparable<TKey>
 {
-    SortedList<K, V> _source;
+    SortedList<TKey, TValue> _source;
     nuint _next;
 
     /// A cursor over `list`, positioned before the smallest key.
-    public SortedListCursor(SortedList<K, V> list)
+    public SortedListCursor(SortedList<TKey, TValue> list)
     {
         _source = list;
         _next = 0;
@@ -847,12 +847,12 @@ public class SortedListCursor<K, V> : IEnumerator<Pair<K, V>> where K : ICompara
     /// Advances to the next key in order, answering false at the end.
     public bool MoveNext()
     {
-        if (_next >= _source.Count())
+        if (_next >= _source.Count)
             return false;
         _next++;
         return true;
     }
 
     /// The entry the last `MoveNext` landed on, as a freshly built `Pair`.
-    public Pair<K, V> Current() => _source.PairAt(_next - 1);
+    public Pair<TKey, TValue> Current => _source.PairAt(_next - 1);
 }

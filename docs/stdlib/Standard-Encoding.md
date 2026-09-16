@@ -38,17 +38,17 @@ class AsciiEncoding : SingleByteEncoding
 
 US-ASCII. A byte above 127 is not ASCII, and reads as U+FFFD.
 
-<sub>[stdlib/Encoding.sl:549](../../stdlib/Encoding.sl#L549)</sub>
+<sub>[stdlib/Encoding.sl:555](../../stdlib/Encoding.sl#L555)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-override String Name()
+String Name { get; }
 ```
 
 `"us-ascii"`.
 
-<sub>[stdlib/Encoding.sl:552](../../stdlib/Encoding.sl#L552)</sub>
+<sub>[stdlib/Encoding.sl:558](../../stdlib/Encoding.sl#L558)</sub>
 
 #### ToScalar *method*
 
@@ -58,7 +58,7 @@ override char32 ToScalar(byte value)
 
 The byte itself below 128, and U+FFFD at or above it.
 
-<sub>[stdlib/Encoding.sl:555](../../stdlib/Encoding.sl#L555)</sub>
+<sub>[stdlib/Encoding.sl:561](../../stdlib/Encoding.sl#L561)</sub>
 
 #### FromScalar *method*
 
@@ -68,7 +68,7 @@ override int FromScalar(char32 scalar)
 
 The scalar itself below U+0080, and -1 at or above it.
 
-<sub>[stdlib/Encoding.sl:561](../../stdlib/Encoding.sl#L561)</sub>
+<sub>[stdlib/Encoding.sl:567](../../stdlib/Encoding.sl#L567)</sub>
 
 ### EncodingError *enum*
 
@@ -114,20 +114,20 @@ asks the encode direction the question `TryGetString` asks of the other.
 
 <sub>[stdlib/Encoding.sl:60](../../stdlib/Encoding.sl#L60)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-String Name()
+String Name { get; }
 ```
 
 The name IANA gives it, which is also what an HTTP header would carry.
 
 <sub>[stdlib/Encoding.sl:63](../../stdlib/Encoding.sl#L63)</sub>
 
-#### Preamble *method*
+#### Preamble *property*
 
 ```
-byte[] Preamble()
+byte[] Preamble { get; }
 ```
 
 The bytes that mark this encoding at the start of a file, if any.
@@ -198,17 +198,17 @@ class Latin1Encoding : SingleByteEncoding
 ISO-8859-1, where byte n is code point n for every n. Nothing can fail in
 either direction below U+0100, and nothing above it can be written.
 
-<sub>[stdlib/Encoding.sl:570](../../stdlib/Encoding.sl#L570)</sub>
+<sub>[stdlib/Encoding.sl:576](../../stdlib/Encoding.sl#L576)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-override String Name()
+String Name { get; }
 ```
 
 `"iso-8859-1"`.
 
-<sub>[stdlib/Encoding.sl:573](../../stdlib/Encoding.sl#L573)</sub>
+<sub>[stdlib/Encoding.sl:579](../../stdlib/Encoding.sl#L579)</sub>
 
 #### ToScalar *method*
 
@@ -219,7 +219,7 @@ override char32 ToScalar(byte value)
 Byte n is code point n, for every n. Never U+FFFD, which is what makes
 this encoding able to carry any byte sequence at all.
 
-<sub>[stdlib/Encoding.sl:577](../../stdlib/Encoding.sl#L577)</sub>
+<sub>[stdlib/Encoding.sl:583](../../stdlib/Encoding.sl#L583)</sub>
 
 #### FromScalar *method*
 
@@ -229,7 +229,7 @@ override int FromScalar(char32 scalar)
 
 The scalar itself below U+0100, and -1 at or above it.
 
-<sub>[stdlib/Encoding.sl:580](../../stdlib/Encoding.sl#L580)</sub>
+<sub>[stdlib/Encoding.sl:586](../../stdlib/Encoding.sl#L586)</sub>
 
 ### SingleByteEncoding *class*
 
@@ -248,7 +248,7 @@ A base class rather than three copies, because the three differ only in the
 table -- and the two that matter differ only in the 32 entries between 0x80
 and 0x9F.
 
-<sub>[stdlib/Encoding.sl:491](../../stdlib/Encoding.sl#L491)</sub>
+<sub>[stdlib/Encoding.sl:497](../../stdlib/Encoding.sl#L497)</sub>
 
 #### ToScalar *method*
 
@@ -258,7 +258,7 @@ abstract char32 ToScalar(byte value)
 
 What this byte means. Every byte means something.
 
-<sub>[stdlib/Encoding.sl:494](../../stdlib/Encoding.sl#L494)</sub>
+<sub>[stdlib/Encoding.sl:500](../../stdlib/Encoding.sl#L500)</sub>
 
 #### FromScalar *method*
 
@@ -268,27 +268,27 @@ abstract int FromScalar(char32 scalar)
 
 Which byte writes this scalar, or -1 when none does.
 
-<sub>[stdlib/Encoding.sl:497](../../stdlib/Encoding.sl#L497)</sub>
+<sub>[stdlib/Encoding.sl:503](../../stdlib/Encoding.sl#L503)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-abstract String Name()
+String Name { get; }
 ```
 
 The IANA name, which each subclass supplies.
 
-<sub>[stdlib/Encoding.sl:500](../../stdlib/Encoding.sl#L500)</sub>
+<sub>[stdlib/Encoding.sl:506](../../stdlib/Encoding.sl#L506)</sub>
 
-#### Preamble *method*
+#### Preamble *property*
 
 ```
-byte[] Preamble()
+byte[] Preamble { get; }
 ```
 
 None of these has one: a byte order mark is a Unicode idea.
 
-<sub>[stdlib/Encoding.sl:503](../../stdlib/Encoding.sl#L503)</sub>
+<sub>[stdlib/Encoding.sl:509](../../stdlib/Encoding.sl#L509)</sub>
 
 #### CanRepresent *method*
 
@@ -299,7 +299,7 @@ bool CanRepresent(char32 scalar)
 Whether the table has a byte for that scalar. Most of Unicode is not in
 any of these tables, so this is false far more often than it is true.
 
-<sub>[stdlib/Encoding.sl:507](../../stdlib/Encoding.sl#L507)</sub>
+<sub>[stdlib/Encoding.sl:513](../../stdlib/Encoding.sl#L513)</sub>
 
 #### GetByteCount *method*
 
@@ -310,7 +310,7 @@ nuint GetByteCount(String text)
 One byte per scalar, always -- so the count is the scalar count, not
 the text's byte length.
 
-<sub>[stdlib/Encoding.sl:511](../../stdlib/Encoding.sl#L511)</sub>
+<sub>[stdlib/Encoding.sl:517](../../stdlib/Encoding.sl#L517)</sub>
 
 #### GetBytes *method*
 
@@ -321,7 +321,7 @@ byte[] GetBytes(String text)
 The text in this encoding, with anything the table cannot write
 becoming `?`. Check `CanRepresent` first where losing it matters.
 
-<sub>[stdlib/Encoding.sl:515](../../stdlib/Encoding.sl#L515)</sub>
+<sub>[stdlib/Encoding.sl:521](../../stdlib/Encoding.sl#L521)</sub>
 
 #### GetString *method*
 
@@ -332,7 +332,7 @@ String GetString(byte[] bytes)
 `bytes` through the table, one character per byte. Cannot fail: every
 byte means something, even if that something is U+FFFD.
 
-<sub>[stdlib/Encoding.sl:531](../../stdlib/Encoding.sl#L531)</sub>
+<sub>[stdlib/Encoding.sl:537](../../stdlib/Encoding.sl#L537)</sub>
 
 #### TryGetString *method*
 
@@ -342,7 +342,7 @@ Result<String, EncodingError> TryGetString(byte[] bytes)
 
 Never fails, which is the whole character of a single-byte encoding.
 
-<sub>[stdlib/Encoding.sl:542](../../stdlib/Encoding.sl#L542)</sub>
+<sub>[stdlib/Encoding.sl:548](../../stdlib/Encoding.sl#L548)</sub>
 
 ### Utf16Encoding *class*
 
@@ -354,20 +354,20 @@ UTF-16, in either byte order.
 
 <sub>[stdlib/Encoding.sl:240](../../stdlib/Encoding.sl#L240)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-String Name()
+String Name { get; }
 ```
 
 `"utf-16be"` or `"utf-16le"`, whichever this is.
 
 <sub>[stdlib/Encoding.sl:249](../../stdlib/Encoding.sl#L249)</sub>
 
-#### Preamble *method*
+#### Preamble *property*
 
 ```
-byte[] Preamble()
+byte[] Preamble { get; }
 ```
 
 FE FF big-endian, FF FE little. Worth writing here, unlike UTF-8's:
@@ -383,7 +383,7 @@ bool CanRepresent(char32 scalar)
 
 Every scalar, in one unit or two.
 
-<sub>[stdlib/Encoding.sl:262](../../stdlib/Encoding.sl#L262)</sub>
+<sub>[stdlib/Encoding.sl:265](../../stdlib/Encoding.sl#L265)</sub>
 
 #### GetByteCount *method*
 
@@ -394,7 +394,7 @@ nuint GetByteCount(String text)
 Two bytes per unit, so four for a scalar outside the basic plane.
 Costs a transcode to count, which is what `GetBytes` then does again.
 
-<sub>[stdlib/Encoding.sl:266](../../stdlib/Encoding.sl#L266)</sub>
+<sub>[stdlib/Encoding.sl:269](../../stdlib/Encoding.sl#L269)</sub>
 
 #### GetBytes *method*
 
@@ -403,9 +403,9 @@ byte[] GetBytes(String text)
 ```
 
 The text as UTF-16 in this byte order, with no byte order mark --
-prepend `Preamble()` if the reader will need one.
+prepend `Preamble` if the reader will need one.
 
-<sub>[stdlib/Encoding.sl:270](../../stdlib/Encoding.sl#L270)</sub>
+<sub>[stdlib/Encoding.sl:273](../../stdlib/Encoding.sl#L273)</sub>
 
 #### GetString *method*
 
@@ -417,7 +417,7 @@ String GetString(byte[] bytes)
 byte becoming U+FFFD. A byte order mark, if present, is not stripped --
 `WithoutPreamble` is what does that.
 
-<sub>[stdlib/Encoding.sl:296](../../stdlib/Encoding.sl#L296)</sub>
+<sub>[stdlib/Encoding.sl:299](../../stdlib/Encoding.sl#L299)</sub>
 
 #### TryGetString *method*
 
@@ -428,7 +428,7 @@ Result<String, EncodingError> TryGetString(byte[] bytes)
 The strict decode: `Incomplete` for an odd number of bytes or a high
 surrogate at the end, `Invalid` for a surrogate that is not paired.
 
-<sub>[stdlib/Encoding.sl:337](../../stdlib/Encoding.sl#L337)</sub>
+<sub>[stdlib/Encoding.sl:340](../../stdlib/Encoding.sl#L340)</sub>
 
 ### Utf32Encoding *class*
 
@@ -438,28 +438,28 @@ class Utf32Encoding : IEncoding
 
 UTF-32: one scalar per four bytes, and no surrogates anywhere.
 
-<sub>[stdlib/Encoding.sl:374](../../stdlib/Encoding.sl#L374)</sub>
+<sub>[stdlib/Encoding.sl:377](../../stdlib/Encoding.sl#L377)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-String Name()
+String Name { get; }
 ```
 
 `"utf-32be"` or `"utf-32le"`, whichever this is.
 
-<sub>[stdlib/Encoding.sl:383](../../stdlib/Encoding.sl#L383)</sub>
+<sub>[stdlib/Encoding.sl:386](../../stdlib/Encoding.sl#L386)</sub>
 
-#### Preamble *method*
+#### Preamble *property*
 
 ```
-byte[] Preamble()
+byte[] Preamble { get; }
 ```
 
 Four bytes, and the little-endian one begins with UTF-16LE's -- which
 is why `Detect` tests UTF-32 first.
 
-<sub>[stdlib/Encoding.sl:387](../../stdlib/Encoding.sl#L387)</sub>
+<sub>[stdlib/Encoding.sl:390](../../stdlib/Encoding.sl#L390)</sub>
 
 #### CanRepresent *method*
 
@@ -469,7 +469,7 @@ bool CanRepresent(char32 scalar)
 
 Every scalar, in exactly four bytes.
 
-<sub>[stdlib/Encoding.sl:395](../../stdlib/Encoding.sl#L395)</sub>
+<sub>[stdlib/Encoding.sl:401](../../stdlib/Encoding.sl#L401)</sub>
 
 #### GetByteCount *method*
 
@@ -479,7 +479,7 @@ nuint GetByteCount(String text)
 
 Four bytes per scalar. Costs a pass to count the scalars.
 
-<sub>[stdlib/Encoding.sl:398](../../stdlib/Encoding.sl#L398)</sub>
+<sub>[stdlib/Encoding.sl:404](../../stdlib/Encoding.sl#L404)</sub>
 
 #### GetBytes *method*
 
@@ -489,7 +489,7 @@ byte[] GetBytes(String text)
 
 The text as UTF-32 in this byte order, with no byte order mark.
 
-<sub>[stdlib/Encoding.sl:401](../../stdlib/Encoding.sl#L401)</sub>
+<sub>[stdlib/Encoding.sl:407](../../stdlib/Encoding.sl#L407)</sub>
 
 #### GetString *method*
 
@@ -501,7 +501,7 @@ String GetString(byte[] bytes)
 surrogate, or anything past U+10FFFF -- becoming U+FFFD. Trailing bytes
 that do not make a whole four are dropped.
 
-<sub>[stdlib/Encoding.sl:431](../../stdlib/Encoding.sl#L431)</sub>
+<sub>[stdlib/Encoding.sl:437](../../stdlib/Encoding.sl#L437)</sub>
 
 #### TryGetString *method*
 
@@ -512,7 +512,7 @@ Result<String, EncodingError> TryGetString(byte[] bytes)
 The strict decode: `Incomplete` when the length is not a multiple of
 four, `Invalid` for a value that is not a scalar.
 
-<sub>[stdlib/Encoding.sl:449](../../stdlib/Encoding.sl#L449)</sub>
+<sub>[stdlib/Encoding.sl:455](../../stdlib/Encoding.sl#L455)</sub>
 
 ### Utf8Encoding *class*
 
@@ -528,20 +528,20 @@ has promised nothing.
 
 <sub>[stdlib/Encoding.sl:155](../../stdlib/Encoding.sl#L155)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-String Name()
+String Name { get; }
 ```
 
 `"utf-8"`.
 
 <sub>[stdlib/Encoding.sl:158](../../stdlib/Encoding.sl#L158)</sub>
 
-#### Preamble *method*
+#### Preamble *property*
 
 ```
-byte[] Preamble()
+byte[] Preamble { get; }
 ```
 
 EF BB BF. UTF-8 needs no byte order mark -- there is only one order --
@@ -618,17 +618,17 @@ Windows-1252: Latin-1, except that 0x80 to 0x9F carry punctuation rather
 than C1 controls. Five of those 32 positions are unassigned and read as
 U+FFFD.
 
-<sub>[stdlib/Encoding.sl:590](../../stdlib/Encoding.sl#L590)</sub>
+<sub>[stdlib/Encoding.sl:596](../../stdlib/Encoding.sl#L596)</sub>
 
-#### Name *method*
+#### Name *property*
 
 ```
-override String Name()
+String Name { get; }
 ```
 
 `"windows-1252"`.
 
-<sub>[stdlib/Encoding.sl:593](../../stdlib/Encoding.sl#L593)</sub>
+<sub>[stdlib/Encoding.sl:599](../../stdlib/Encoding.sl#L599)</sub>
 
 #### ToScalar *method*
 
@@ -639,7 +639,7 @@ override char32 ToScalar(byte value)
 Latin-1 outside 0x80 to 0x9F, and the punctuation table inside it.
 Five of those 32 positions are unassigned and read as U+FFFD.
 
-<sub>[stdlib/Encoding.sl:597](../../stdlib/Encoding.sl#L597)</sub>
+<sub>[stdlib/Encoding.sl:603](../../stdlib/Encoding.sl#L603)</sub>
 
 #### FromScalar *method*
 
@@ -650,7 +650,7 @@ override int FromScalar(char32 scalar)
 The Latin-1 byte where there is one, else a scan of the 32-entry
 punctuation table, else -1.
 
-<sub>[stdlib/Encoding.sl:606](../../stdlib/Encoding.sl#L606)</sub>
+<sub>[stdlib/Encoding.sl:612](../../stdlib/Encoding.sl#L612)</sub>
 
 ## Functions
 

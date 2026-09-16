@@ -76,7 +76,7 @@ public class GtkFontBackend : IFontBackend
         Name = PangoName(font);
     }
 
-    public nuint Handle() => 0u;
+    public nuint Handle => 0u;
 }
 
 /// Sets cairo's font from one of ours. The slant and the weight are cairo's
@@ -124,14 +124,14 @@ public class GtkBitmapBackend : IBitmapBackend
         }
     }
 
-    public int Width() => gdk_pixbuf_get_width((GdkPixbuf*)_pixbuf);
-    public int Height() => gdk_pixbuf_get_height((GdkPixbuf*)_pixbuf);
+    public int Width => gdk_pixbuf_get_width((GdkPixbuf*)_pixbuf);
+    public int Height => gdk_pixbuf_get_height((GdkPixbuf*)_pixbuf);
 
-    public nuint Handle() => (nuint)_pixbuf;
+    public nuint Handle => (nuint)_pixbuf;
 
     /// The pixbuf itself, for the image list and the toolbar, which need the
     /// object rather than a number.
-    public gpointer Pixbuf() => _pixbuf;
+    public gpointer Pixbuf => _pixbuf;
 }
 
 /// Same-sized pictures, indexed by number.
@@ -154,14 +154,14 @@ public class GtkImageListBackend : IImageListBackend
 
     ~GtkImageListBackend()
     {
-        for (nuint i = 0u; i < _pictures.Count(); i++)
+        for (nuint i = 0u; i < _pictures.Count; i++)
             g_object_unref(_pictures[i]);
         _pictures.Clear();
     }
 
     public int Add(IBitmapBackend picture)
     {
-        var source = ((GtkBitmapBackend)picture).Pixbuf();
+        var source = ((GtkBitmapBackend)picture).Pixbuf;
         gpointer scaled = source;
 
         // Scaled only when it has to be, and the copy is owned either way --
@@ -179,22 +179,22 @@ public class GtkImageListBackend : IImageListBackend
         }
 
         _pictures.Add(scaled);
-        return (int)_pictures.Count() - 1;
+        return (int)_pictures.Count - 1;
     }
 
-    public int Count() => (int)_pictures.Count();
-    public FSize ImageSize() => _extent;
+    public int Count => (int)_pictures.Count;
+    public FSize ImageSize => _extent;
 
     /// **Borrowed.** A list has no handle of its own -- there is no such GTK
     /// object -- so this answers the address of the list itself, which is
     /// enough for a program comparing two lists and no use for anything else.
-    public nuint Handle() => 0u;
+    public nuint Handle => 0u;
 
     /// One picture, for a toolbar button or a tree row. Null for an index
     /// nothing was added at, which is what a control passing -1 means.
     public gpointer Pixbuf(int index)
     {
-        if (index < 0 || (nuint)index >= _pictures.Count())
+        if (index < 0 || (nuint)index >= _pictures.Count)
             return null;
         return _pictures[(nuint)index];
     }
@@ -243,14 +243,17 @@ public class GtkGraphicsBackend : IGraphicsBackend
         _depth = _depth - 1;
     }
 
-    public Rectangle ClipBounds()
+    public Rectangle ClipBounds
     {
-        gdouble x1 = 0.0;
-        gdouble y1 = 0.0;
-        gdouble x2 = 0.0;
-        gdouble y2 = 0.0;
-        cairo_clip_extents(_cairo, &x1, &y1, &x2, &y2);
-        return Area((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
+        get
+        {
+            gdouble x1 = 0.0;
+            gdouble y1 = 0.0;
+            gdouble x2 = 0.0;
+            gdouble y2 = 0.0;
+            cairo_clip_extents(_cairo, &x1, &y1, &x2, &y2);
+            return Area((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
+        }
     }
 
     // -------------------------------------------------------------- paint
@@ -528,7 +531,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
     public void DrawBitmap(IBitmapBackend picture, Point at)
     {
-        var pixbuf = ((GtkBitmapBackend)picture).Pixbuf();
+        var pixbuf = ((GtkBitmapBackend)picture).Pixbuf;
         cairo_save(_cairo);
         gdk_cairo_set_source_pixbuf(_cairo, (GdkPixbuf*)pixbuf,
                                     (double)at.X, (double)at.Y);
@@ -541,7 +544,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     /// resampled copy per frame would be the expensive way round.
     public void DrawBitmapIn(IBitmapBackend picture, Rectangle into)
     {
-        var pixbuf = (GdkPixbuf*)((GtkBitmapBackend)picture).Pixbuf();
+        var pixbuf = (GdkPixbuf*)((GtkBitmapBackend)picture).Pixbuf;
         int width = gdk_pixbuf_get_width(pixbuf);
         int height = gdk_pixbuf_get_height(pixbuf);
         if (width <= 0 || height <= 0)

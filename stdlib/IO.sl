@@ -159,20 +159,20 @@ public enum SeekOrigin
 ///
 /// Read and Write report how many bytes they moved, which for a read is how
 /// end-of-file is seen: fewer than asked for, and zero at the end. Whether
-/// that was an error rather than an ending is what `Error()` says.
+/// that was an error rather than an ending is what `Error` says.
 public interface IStream
 {
     /// Whether reading is allowed and possible now. False on a write-only
     /// stream and on a closed one.
-    bool CanRead();
+    bool CanRead { get; }
 
     /// Whether writing is allowed and possible now.
-    bool CanWrite();
+    bool CanWrite { get; }
 
     /// Whether the position can be moved. False for a stream with no position
     /// to move -- a socket, a pipe -- where `Seek` fails and `Position` and
     /// `Length` answer -1.
-    bool CanSeek();
+    bool CanSeek { get; }
 
     /// Reads up to `count` bytes into `buffer` starting at `offset`, and
     /// returns how many it read. Zero means the end.
@@ -184,11 +184,11 @@ public interface IStream
 
     /// Where the next read or write will happen, or -1 when the stream has no
     /// position.
-    long Position();
+    long Position { get; }
 
     /// How many bytes the stream holds, or -1 when it cannot say -- which is
     /// every stream that is not seekable, and some that are.
-    long Length();
+    long Length { get; }
 
     /// Moves the cursor. Reports whether it could.
     bool Seek(long offset, SeekOrigin origin);
@@ -203,7 +203,7 @@ public interface IStream
     void Close();
 
     /// The last error, or `IOError.None`. Cleared by the next successful call.
-    IOError Error();
+    IOError Error { get; }
 }
 
 // ------------------------------------------------------------- file stream
@@ -226,8 +226,8 @@ public interface IStream
 /// static method is inside the type: it can use the private constructor, which
 /// is what lets the failing path be closed off rather than merely discouraged.
 ///
-/// `IsOpen()` remains, because a stream can be closed after it was opened, and
-/// `Error()` remains for a failure during a read or a write -- those are
+/// `IsOpen` remains, because a stream can be closed after it was opened, and
+/// `Error` remains for a failure during a read or a write -- those are
 /// outcomes of an operation rather than of the opening, and there is nowhere
 /// else to put them.
 ///
@@ -256,8 +256,8 @@ public class FileStream : IStream
             String path, FileMode mode, FileAccess access)
     {
         var stream = new FileStream(path, mode, access);
-        if (!stream.IsOpen())
-            return Fail(stream.Error());
+        if (!stream.IsOpen)
+            return Fail(stream.Error);
         return Ok(stream);
     }
 
@@ -283,22 +283,22 @@ public class FileStream : IStream
 
     /// Whether the file is still open. False after `Close`, and after an
     /// open that failed.
-    public bool IsOpen() => !_closed;
+    public bool IsOpen => !_closed;
 
     /// True while the file is open and was opened for reading. A file opened
     /// for writing answers false, and `Read` on it fails rather than
     /// returning nothing.
-    public bool CanRead() => !_closed && _access.HasFlag(FileAccess.Read);
+    public bool CanRead => !_closed && _access.HasFlag(FileAccess.Read);
     /// True while the file is open and was opened for writing.
-    public bool CanWrite() => !_closed && _access.HasFlag(FileAccess.Write);
+    public bool CanWrite => !_closed && _access.HasFlag(FileAccess.Write);
     /// True while the file is open. Every file is seekable, unlike a
     /// connection.
-    public bool CanSeek() => !_closed;
+    public bool CanSeek => !_closed;
 
     /// Reads up to `count` bytes into `buffer` at `offset`, answering how
     /// many it read.
     ///
-    /// Zero means the end of the file, or a failure -- `Error()` is what tells
+    /// Zero means the end of the file, or a failure -- `Error` is what tells
     /// the two apart. A count reaching past the end of `buffer` is refused as
     /// `Invalid` rather than overrunning it.
     public nuint Read(byte[] buffer, nuint offset, nuint count)
@@ -325,7 +325,7 @@ public class FileStream : IStream
     /// Writes `count` bytes from `buffer` at `offset`, answering how many it
     /// wrote.
     ///
-    /// Fewer than asked for means the write was cut short, and `Error()` says
+    /// Fewer than asked for means the write was cut short, and `Error` says
     /// why -- a full disk, usually. A count reaching past the end of `buffer`
     /// is refused as `Invalid`.
     public nuint Write(byte[] buffer, nuint offset, nuint count)
@@ -369,21 +369,27 @@ public class FileStream : IStream
 
     /// How far into the file the next read or write will happen, or -1 when
     /// the file is closed.
-    public long Position()
+    public long Position
     {
-        if (_closed)
-            return -1;
-        return sl_file_position(_handle);
+        get
+        {
+            if (_closed)
+                return -1;
+            return sl_file_position(_handle);
+        }
     }
 
     /// How many bytes the file holds, or -1 when it is closed. Asks the
     /// system each time rather than caching, so it sees a file another
     /// process has grown.
-    public long Length()
+    public long Length
     {
-        if (_closed)
-            return -1;
-        return sl_file_length(_handle);
+        get
+        {
+            if (_closed)
+                return -1;
+            return sl_file_length(_handle);
+        }
     }
 
     /// Moves the position, answering whether it worked.
@@ -428,7 +434,7 @@ public class FileStream : IStream
     /// The last error, or `None`. Set by every call that failed and left
     /// alone by one that did not, so read it directly after the call it
     /// belongs to.
-    public IOError Error() => _error;
+    public IOError Error => _error;
 }
 
 // ----------------------------------------------------------- memory stream
@@ -463,11 +469,11 @@ public class MemoryStream : IStream
     }
 
     /// Always true.
-    public bool CanRead() => true;
+    public bool CanRead => true;
     /// Always true.
-    public bool CanWrite() => true;
+    public bool CanWrite => true;
     /// Always true.
-    public bool CanSeek() => true;
+    public bool CanSeek => true;
 
     /// Reads up to `count` bytes into `buffer` at `offset`, answering how
     /// many it read. Zero means the position has reached the end; there is no
@@ -522,10 +528,10 @@ public class MemoryStream : IStream
     }
 
     /// Where the next read or write will happen.
-    public long Position() => (long)_at;
+    public long Position => (long)_at;
     /// How many bytes have been written, measured to the furthest the
     /// position has ever reached -- not the capacity of the buffer behind it.
-    public long Length() => (long)_length;
+    public long Length => (long)_length;
 
     /// Moves the position, answering whether it worked.
     ///
@@ -552,7 +558,7 @@ public class MemoryStream : IStream
     public void Close() { }
 
     /// Always `None`. Nothing a memory stream does can fail.
-    public IOError Error() => IOError.None;
+    public IOError Error => IOError.None;
 
     /// A copy of what has been written, from the start to the high-water mark.
     public byte[] ToArray()
@@ -603,7 +609,7 @@ public Result<byte[], IOError> ReadToEnd(IStream stream)
         collected.Write(buffer, 0, got);
     }
 
-    var failure = stream.Error();
+    var failure = stream.Error;
     if (failure != IOError.None)
         return Fail(failure);
     return Ok(collected.ToArray());

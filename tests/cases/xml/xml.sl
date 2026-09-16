@@ -148,8 +148,8 @@ public int Main()
         Say("missing-attribute", root.Attributes.Find("nope", "(default)"));
         Say("child-text", root.TextOf("name", "?"));
         Say("missing-child", root.TextOf("nope", "(default)"));
-        Say("named-count", Text.FromInteger((long)root.ChildrenNamed("name").Count()));
-        Say("child-count", Text.FromInteger((long)root.Children.Count()));
+        Say("named-count", Text.FromInteger((long)root.ChildrenNamed("name").Count));
+        Say("child-count", Text.FromInteger((long)root.Children.Count));
     }
 
     // Building one by hand.

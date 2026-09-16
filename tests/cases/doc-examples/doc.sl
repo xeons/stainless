@@ -24,7 +24,7 @@ static readonly Mutex<List<String>> Registry =
 void Record(String name)
 {
     var guard = Registry.Lock();
-    guard.Value().Add(name);
+    guard.Value.Add(name);
 }
 
 // --- spec 2.14 delegates -------------------------------------------------
@@ -210,7 +210,7 @@ String Roster()
     var text = new StringBuilder();
     text.AppendInteger(ages.Get("ada"));
     text.Append(":");
-    for (nuint i = 0; i < numbers.Count(); i = i + 1)
+    for (nuint i = 0; i < numbers.Count; i = i + 1)
         text.AppendInteger(numbers.At(i));
     text.Append(":");
     for (nint at = line.First(); at >= 0; at = line.After(at))
@@ -541,7 +541,7 @@ String Lookup()
     built.Append(":");
     built.AppendInteger((long)ages["nobody"].ValueOr(0));
     built.Append(":");
-    built.AppendInteger((long)ages.Count());
+    built.AppendInteger((long)ages.Count);
 
     // Counting, said out loud, because there is nothing to add to when the
     // key is absent.
@@ -589,7 +589,7 @@ String Numbers()
 int Main()
 {
     Record("first");
-    { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value().Count()); }
+    { var g = Registry.Lock(); printf("recorded=%d\n", (int)g.Value.Count); }
 
     Transform t = Double;
     printf("delegate=%d\n", t(21));

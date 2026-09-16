@@ -131,30 +131,30 @@ public struct Duration
     }
 
     /// Whole units, truncated toward zero. 1,500,000ns is 1 millisecond.
-    public long TotalMilliseconds() => Nanoseconds / NanosecondsPerMillisecond;
+    public long TotalMilliseconds => Nanoseconds / NanosecondsPerMillisecond;
 
     /// Whole seconds, truncated toward zero.
-    public long TotalSeconds() => Nanoseconds / NanosecondsPerSecond;
+    public long TotalSeconds => Nanoseconds / NanosecondsPerSecond;
 
     /// Whole minutes, truncated toward zero.
-    public long TotalMinutes() => Nanoseconds / NanosecondsPerMinute;
+    public long TotalMinutes => Nanoseconds / NanosecondsPerMinute;
 
     /// Whole hours, truncated toward zero.
-    public long TotalHours() => Nanoseconds / NanosecondsPerHour;
+    public long TotalHours => Nanoseconds / NanosecondsPerHour;
 
     /// Whole 24-hour days, truncated toward zero.
-    public long TotalDays() => Nanoseconds / NanosecondsPerDay;
+    public long TotalDays => Nanoseconds / NanosecondsPerDay;
 
     /// The same length with fractions kept, for a measurement being reported
     /// rather than counted.
-    public double AsSeconds() => (double)Nanoseconds / 1000000000.0;
+    public double AsSeconds => (double)Nanoseconds / 1000000000.0;
 
     /// The same length in milliseconds, fractions kept.
-    public double AsMilliseconds() => (double)Nanoseconds / 1000000.0;
+    public double AsMilliseconds => (double)Nanoseconds / 1000000.0;
 
     /// True when the length is below zero, which is what subtracting a later
     /// instant from an earlier one gives.
-    public bool IsNegative() => Nanoseconds < 0;
+    public bool IsNegative => Nanoseconds < 0;
 
     /// Arithmetic, as arithmetic. Adding two lengths of time is what `+` means
     /// everywhere else, and spelling it `Time.Add(a, b)` only hid that.
@@ -318,11 +318,14 @@ public struct Instant
     }
 
     /// 1970-01-01 00:00:00 UTC, which is where the count starts.
-    public static Instant Epoch()
+    public static Instant Epoch
     {
-        Instant at;
-        at.Nanoseconds = 0;
-        return at;
+        get
+        {
+            Instant at;
+            at.Nanoseconds = 0;
+            return at;
+        }
     }
 
     /// An instant from whole seconds since the epoch -- what a `time_t`, a
@@ -397,7 +400,7 @@ public struct Instant
 
     /// How far ahead of UTC the local zone was at this instant, in seconds.
     /// Negative west of Greenwich.
-    public long ZoneOffsetSeconds() => sl_time_zone_offset(Nanoseconds);
+    public long ZoneOffsetSeconds => sl_time_zone_offset(Nanoseconds);
 
     /// How long apart two instants are. Negative if the right one is later.
     public static Duration operator -(Instant later, Instant earlier)

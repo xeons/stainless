@@ -108,7 +108,7 @@ public class Bag
     public Bag() => _items = new List<String>();
 
     public void Add(String item) => _items.Add(item);
-    public nuint Count() => _items.Count();
+    public nuint Count => _items.Count;
 
     public String this[nuint at]
     {
@@ -254,7 +254,7 @@ int Main()
 
     bag["gamma"] = true;
     printf("added     = %d\n", bag["gamma"]);
-    printf("count     = %llu\n", (ulong)bag.Count());
+    printf("count     = %llu\n", (ulong)bag.Count);
 
     bag[0u] = "ALPHA";
     printf("replaced  = %s\n", bag[0u].ToPointer());

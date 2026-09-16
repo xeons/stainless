@@ -340,7 +340,7 @@ public class CommonForm : Form
     /// Opens on a given tab, for a screenshot of one that is not the first.
     public void SelectTab(int which)
     {
-        if (which < 0 || (nuint)which >= _tabs.Pages.Count())
+        if (which < 0 || (nuint)which >= _tabs.Pages.Count)
             return;
         _tabs.SelectedIndex = which;
     }
@@ -351,12 +351,12 @@ public class CommonForm : Form
     {
         bool ok = true;
 
-        ok = Check(ok, "toolbar has its buttons", _tools.Buttons.Count() == 4u);
+        ok = Check(ok, "toolbar has its buttons", _tools.Buttons.Count == 4u);
         ok = Check(ok, "status bar has its panels", _status.PanelCount == 3u);
         ok = Check(ok, "status panel text round-trips",
                    _status.PanelText(0) == "Ready.");
 
-        ok = Check(ok, "tabs hold their pages", _tabs.Pages.Count() == 4u);
+        ok = Check(ok, "tabs hold their pages", _tabs.Pages.Count == 4u);
         ok = Check(ok, "the platform has the tabs too", _tabs.TabCount == 4);
         ok = Check(ok, "one page is showing at a time",
                    _treePage.Visible && !_listPage.Visible
@@ -370,11 +370,11 @@ public class CommonForm : Form
         ok = Check(ok, "a page fills the area under the tabs",
                    _listPage.Width > 0 && _listPage.Height > 0);
 
-        ok = Check(ok, "tree holds its roots", _tree.Nodes.Count() == 2u);
+        ok = Check(ok, "tree holds its roots", _tree.Nodes.Count == 2u);
         ok = Check(ok, "a tree node reads back its text",
                    _tree.Nodes.At(0u).Text == "Shopping");
         var under = _tree.Nodes.At(0u).Nodes;
-        ok = Check(ok, "a node holds its children", under.Count() == 2u);
+        ok = Check(ok, "a node holds its children", under.Count == 2u);
         _tree.SelectedNode = under.At(0u);
         for (int i = 0; i < 4; i++)
             Application.DoEvents();
@@ -463,7 +463,7 @@ public class CommonForm : Form
         // that reading a value goes to the child rather than to a field that
         // could disagree with it.
         ok = Check(ok, "a radio group built its buttons",
-                   Priority.Count == 3u && Priority.Buttons.Count() == 3u);
+                   Priority.Count == 3u && Priority.Buttons.Count == 3u);
         ok = Check(ok, "and reads its choice from them",
                    Priority.SelectedIndex == 1);
         Priority.SelectedIndex = 2;

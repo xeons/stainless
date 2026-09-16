@@ -48,14 +48,14 @@ module Standard;
 /// Being a variant is also what makes it small. Only one case is ever present,
 /// so the payloads overlap: a `Result<String, IOError>` is a tag and one
 /// pointer, not a flag and both halves. Nothing allocates either way.
-public variant Result<T, E>
+public variant Result<T, TError>
 {
     /// It worked, and `Value` is the answer.
     Ok(T Value);
 
     /// It did not, and `Error` says why. The value is not there to be read --
     /// that is the whole of what a variant buys over a pair.
-    Fail(E Error);
+    Fail(TError Error);
 
     /// The value if there is one, and `fallback` if there is not.
     ///
@@ -137,15 +137,18 @@ public variant Optional<T>
 
     /// True when there is a value. The reader for a caller that is about to
     /// ask a second question anyway; `is Some x` is the one that gets at it.
-    public bool HasValue()
+    public bool HasValue
     {
-        if (this is Some)
-            return true;
-        return false;
+        get
+        {
+            if (this is Some)
+                return true;
+            return false;
+        }
     }
 
     /// True when there is not. The same question the other way round, because
-    /// `!x.HasValue()` reads worse than the thing it means.
+    /// `!x.HasValue` reads worse than the thing it means.
     public bool IsEmpty()
     {
         if (this is Some)

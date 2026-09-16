@@ -311,7 +311,7 @@ public sealed class Font
 
     /// For the backend, which needs the handle it made and cannot see a
     /// module-private method from where it lives.
-    public IFontBackend Resource() => Backend();
+    public IFontBackend Resource => Backend();
 }
 
 // ============================================================== pen and brush
@@ -402,7 +402,7 @@ public sealed class Graphics
     /// Everything inside this is what the control was asked to repaint. Drawing
     /// outside it is not an error and not drawn, so a handler may ignore it
     /// entirely and only a slow one needs to look.
-    public Rectangle ClipBounds => _backend.ClipBounds();
+    public Rectangle ClipBounds => _backend.ClipBounds;
 
     /// Narrows drawing to a rectangle and moves the origin to its corner.
     ///
@@ -555,9 +555,9 @@ public sealed class Bitmap
         return Ok(new Bitmap(loaded.Value));
     }
 
-    public int Width  => _backend.Width();
-    public int Height => _backend.Height();
-    public Size Extent => Size.Of(_backend.Width(), _backend.Height());
+    public int Width  => _backend.Width;
+    public int Height => _backend.Height;
+    public Size Extent => Size.Of(_backend.Width, _backend.Height);
 
     /// The platform's picture, for the things that take one.
     public IBitmapBackend Backend() => _backend;

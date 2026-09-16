@@ -35,14 +35,14 @@ void Wipe(String root)
     var files = Directory.AllFiles(root);
     if (files.Ok)
     {
-        for (nuint i = 0; i < files.Value.Count(); i = i + 1)
+        for (nuint i = 0; i < files.Value.Count; i = i + 1)
             File.Delete(files.Value.At(i));
     }
 
     var nested = Directory.Directories(root);
     if (nested.Ok)
     {
-        for (nuint i = 0; i < nested.Value.Count(); i = i + 1)
+        for (nuint i = 0; i < nested.Value.Count; i = i + 1)
             Directory.Delete(nested.Value.At(i));
     }
 
@@ -73,23 +73,23 @@ int Main()
 
     printf("rooted=%d %d %d parts=%llu\n",
         Path.IsRooted("/x") ? 1 : 0, Path.IsRooted("C:/x") ? 1 : 0,
-        Path.IsRooted("x") ? 1 : 0, Path.Split("a/b/c").Count());
+        Path.IsRooted("x") ? 1 : 0, Path.Split("a/b/c").Count);
 
     // ------------------------------------------------------- memory stream
     var buffer = new MemoryStream();
     buffer.WriteText("hello ");
     buffer.WriteText("world");
     printf("memory=%s length=%lld position=%lld\n",
-        buffer.ToText().ToPointer(), buffer.Length(), buffer.Position());
+        buffer.ToText().ToPointer(), buffer.Length, buffer.Position);
 
     buffer.Seek(0, SeekOrigin.Start);
     var five = new byte[5];
     printf("memory-read=%llu bytes=%s at=%lld\n",
         buffer.Read(five, 0, (nuint)5), Text.FromBytes(&five[0], (nuint)5).ToPointer(),
-        buffer.Position());
+        buffer.Position);
 
     printf("memory-can=%d%d%d seek-past=%d\n",
-        buffer.CanRead() ? 1 : 0, buffer.CanWrite() ? 1 : 0, buffer.CanSeek() ? 1 : 0,
+        buffer.CanRead ? 1 : 0, buffer.CanWrite ? 1 : 0, buffer.CanSeek ? 1 : 0,
         buffer.Seek(9999, SeekOrigin.Start) ? 1 : 0);
 
     // ------------------------------------------------------------- files
@@ -112,14 +112,14 @@ int Main()
     if (lines.Ok)
     {
         printf("lines=%llu first=%s last=%s\n",
-            lines.Value.Count(), lines.Value.At(0).ToPointer(),
-            lines.Value.At(lines.Value.Count() - 1).ToPointer());
+            lines.Value.Count, lines.Value.At(0).ToPointer(),
+            lines.Value.At(lines.Value.Count - 1).ToPointer());
     }
 
     File.AppendText(notes, "line three\n");
     var appended = File.ReadAllLines(notes);
     if (appended.Ok)
-        printf("appended=%llu\n", appended.Value.Count());
+        printf("appended=%llu\n", appended.Value.Count);
 
     var raw = File.ReadAllBytes(notes);
     printf("bytes=%d %llu\n", raw.Ok ? 1 : 0, raw.Ok ? raw.Value.Length : 0);
@@ -149,12 +149,12 @@ int Main()
         var head = new byte[4];
         nuint got = stream.Read(head, 0, (nuint)4);
         printf("stream=%d read=%llu head=%s position=%lld\n",
-            stream.IsOpen() ? 1 : 0, got,
-            Text.FromBytes(&head[0], got).ToPointer(), stream.Position());
+            stream.IsOpen ? 1 : 0, got,
+            Text.FromBytes(&head[0], got).ToPointer(), stream.Position);
 
         printf("can=%d%d%d length=%lld\n",
-            stream.CanRead() ? 1 : 0, stream.CanWrite() ? 1 : 0, stream.CanSeek() ? 1 : 0,
-            stream.Length());
+            stream.CanRead ? 1 : 0, stream.CanWrite ? 1 : 0, stream.CanSeek ? 1 : 0,
+            stream.Length);
 
         stream.Seek(0, SeekOrigin.Start);
         var whole = IO.ReadTextToEnd(stream);
@@ -165,7 +165,7 @@ int Main()
 
         // `IsOpen` and `Error` remain, for what happens after a stream is
         // open: a read on a closed one is an outcome of the read.
-        printf("closed-error=%s\n", IO.Describe(stream.Error()).ToPointer());
+        printf("closed-error=%s\n", IO.Describe(stream.Error).ToPointer());
     }
 
     // Opening something that is not there is a failure carrying its reason,
@@ -201,15 +201,15 @@ int Main()
     if (entries.Ok && files.Ok && dirs.Ok && everything.Ok)
     {
         printf("entries=%llu files=%llu dirs=%llu all-files=%llu\n",
-            entries.Value.Count(), files.Value.Count(),
-            dirs.Value.Count(), everything.Value.Count());
+            entries.Value.Count, files.Value.Count,
+            dirs.Value.Count, everything.Value.Count);
     }
 
     var listed = File.ReadAllLines(Path.Join(root, "list.txt"));
     if (listed.Ok)
     {
         printf("written-lines=%llu %s\n",
-            listed.Value.Count(), listed.Value.At(1).ToPointer());
+            listed.Value.Count, listed.Value.At(1).ToPointer());
     }
 
     var nowhere = Directory.Entries(Path.Join(root, "no-such"));

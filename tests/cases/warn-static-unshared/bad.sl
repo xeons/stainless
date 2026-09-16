@@ -14,6 +14,6 @@ static readonly List<int> Registry = new List<int>();
 int Main()
 {
     Registry.Add(7);
-    printf("registry=%llu %d\n", Registry.Count(), Registry.At(0u));
+    printf("registry=%llu %d\n", Registry.Count, Registry.At(0u));
     return 0;
 }

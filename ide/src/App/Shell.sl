@@ -122,7 +122,7 @@ public class Shell : Form
         get
         {
             int at = _book.SelectedIndex;
-            if (at < 0 || (nuint)at >= _open.Count())
+            if (at < 0 || (nuint)at >= _open.Count)
                 return null;
             return _open.At((nuint)at).Editor;
         }
@@ -143,7 +143,7 @@ public class Shell : Form
         }
     }
 
-    public nuint TabCount => _open.Count();
+    public nuint TabCount => _open.Count;
 
     /// Brings the first tab to the front and gives it the keyboard.
     ///
@@ -215,7 +215,7 @@ public class Shell : Form
         // An untouched, unnamed, empty first tab is a placeholder rather than a
         // document, so opening a file replaces it instead of sitting beside it.
         var spare = Current;
-        bool replacing = _open.Count() == 1u && spare != null && IsBlank((CodeEditor)spare);
+        bool replacing = _open.Count == 1u && spare != null && IsBlank((CodeEditor)spare);
         var stale = replacing ? _open.At(0u) : null;
 
         var tab = AddTab(document);
@@ -230,7 +230,7 @@ public class Shell : Form
     {
         return editor.Contents.Location.ByteLength() == 0u
             && !editor.Contents.Edited
-            && editor.Contents.LineCount() == 1u
+            && editor.Contents.LineCount == 1u
             && editor.Contents.LengthAt(0u) == 0u;
     }
 
@@ -244,7 +244,7 @@ public class Shell : Form
     void CloseTab(EditorTab tab)
     {
         _book.RemovePage(tab.Page);
-        for (nuint i = 0u; i < _open.Count(); i++)
+        for (nuint i = 0u; i < _open.Count; i++)
         {
             if (_open.At(i) == tab)
             {
@@ -371,7 +371,7 @@ public class Shell : Form
     void OnCloseTab(MenuItem sender)
     {
         int at = _book.SelectedIndex;
-        if (at < 0 || (nuint)at >= _open.Count())
+        if (at < 0 || (nuint)at >= _open.Count)
             return;
         CloseTab(_open.At((nuint)at));
     }
@@ -498,7 +498,7 @@ public class Shell : Form
         if (cut > 0)
         {
             String beside = self.Substring(0u, (nuint)cut) + Separator()
-                          + "stainless" + Extension();
+                          + "stainless" + Extension;
             if (File.Exists(beside))
                 return beside;
         }
@@ -514,13 +514,16 @@ public class Shell : Form
         #endif
     }
 
-    String Extension()
+    String Extension
     {
-        #if WINDOWS
-        return ".exe";
-        #else
-        return "";
-        #endif
+        get
+        {
+            #if WINDOWS
+            return ".exe";
+            #else
+            return "";
+            #endif
+        }
     }
 
     void OnBuild(MenuItem sender) => Compile(false);
@@ -620,7 +623,7 @@ public class Shell : Form
     void OnOutputChosen(Control sender)
     {
         nuint index = (nuint)_output.SelectedIndex;
-        if (_output.SelectedIndex < 0 || index >= _messages.Count())
+        if (_output.SelectedIndex < 0 || index >= _messages.Count)
             return;
 
         var message = _messages[index];
@@ -708,15 +711,15 @@ public class Shell : Form
             Console.WriteLine("FAIL: typing");
             ok = false;
         }
-        if (editor.Contents.LineAt(0u).Tokens.Count() == 0u)
+        if (editor.Contents.LineAt(0u).Tokens.Count == 0u)
         {
             Console.WriteLine("FAIL: the line did not lex");
             ok = false;
         }
 
         editor.Type("\nint Second() { return 1; }");
-        if (editor.Contents.LineCount() != 2u
-            || editor.Contents.LineAt(1u).Tokens.Count() == 0u)
+        if (editor.Contents.LineCount != 2u
+            || editor.Contents.LineAt(1u).Tokens.Count == 0u)
         {
             Console.WriteLine("FAIL: a second line");
             ok = false;
@@ -738,7 +741,7 @@ public class Shell : Form
             ok = false;
         }
 
-        nuint lines = editor.Contents.LineCount();
+        nuint lines = editor.Contents.LineCount;
         editor.GoTo(lines - 1u, editor.Contents.LengthAt(lines - 1u));
         if (!editor.Paste())
         {
@@ -748,11 +751,11 @@ public class Shell : Form
         // Two lines pasted at the end of two gives three, not four: the first
         // pasted line joins the line the caret was on, which is what makes a
         // paste in the middle of a line work at all.
-        if (editor.Contents.LineCount() != lines * 2u - 1u)
+        if (editor.Contents.LineCount != lines * 2u - 1u)
         {
             Console.WriteLine("FAIL: pasting " + Standard.Text.FromInteger(lines)
                               + " lines at the end of " + Standard.Text.FromInteger(lines)
-                              + " gave " + Standard.Text.FromInteger(editor.Contents.LineCount()));
+                              + " gave " + Standard.Text.FromInteger(editor.Contents.LineCount));
             ok = false;
         }
         Clipboard.SetText(was);
@@ -768,14 +771,14 @@ public class Shell : Form
         Resize(-2);
 
         // A second tab, brought to the front, then closed again.
-        nuint had = _open.Count();
+        nuint had = _open.Count;
         NewFile();
-        if (_open.Count() != had + 1u)
+        if (_open.Count != had + 1u)
         {
             Console.WriteLine("FAIL: a new tab did not appear");
             ok = false;
         }
-        if (_book.SelectedIndex != (int)(_open.Count() - 1u))
+        if (_book.SelectedIndex != (int)(_open.Count - 1u))
         {
             Console.WriteLine("FAIL: the new tab did not come to the front");
             ok = false;
@@ -783,26 +786,26 @@ public class Shell : Form
 
         int at = _book.SelectedIndex;
         CloseTab(_open.At((nuint)at));
-        if (_open.Count() != had)
+        if (_open.Count != had)
         {
             Console.WriteLine("FAIL: closing a tab did not remove it");
             ok = false;
         }
 
         // Closing them all leaves one empty tab rather than none.
-        while (_open.Count() > 1u)
+        while (_open.Count > 1u)
             CloseTab(_open.At(0u));
         CloseTab(_open.At(0u));
-        if (_open.Count() != 1u)
+        if (_open.Count != 1u)
         {
             Console.WriteLine("FAIL: closing every tab left "
-                              + Standard.Text.FromInteger(_open.Count()));
+                              + Standard.Text.FromInteger(_open.Count));
             ok = false;
         }
 
         // Several files at once, which is what the command line does and what
         // a single open never exercised.
-        while (_open.Count() > 1u)
+        while (_open.Count > 1u)
             CloseTab(_open.At(0u));
         OpenFile("samples/shapes.sl");
         OpenFile("samples/hello.sl");
@@ -814,7 +817,7 @@ public class Shell : Form
         // Only checkable from the repository root, since the paths are
         // relative; said rather than skipped silently, so a run that proved
         // less than it looks like says so.
-        if (_open.Count() != 3u)
+        if (_open.Count != 3u)
         {
             Console.WriteLine("  (three-tab check skipped: run from the repository root)");
         }

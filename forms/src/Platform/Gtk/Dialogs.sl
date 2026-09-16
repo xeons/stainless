@@ -54,7 +54,7 @@ GtkWidget* ParentOf(IWindowPeer? owner)
 {
     if (owner == null)
         return null;
-    return ((GtkWindowPeer)owner).Widget();
+    return ((GtkWindowPeer)owner).Widget;
 }
 
 /// Runs a dialog and answers its response, destroying it either way.

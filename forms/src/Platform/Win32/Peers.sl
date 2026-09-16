@@ -335,10 +335,13 @@ public class ControlPeer : IControlPeer
 
     /// The control this peer reports to, or null if it has been destroyed --
     /// which a message arriving during teardown genuinely can see.
-    protected IControlNotify? Owner()
+    protected IControlNotify? Owner
     {
-        IControlNotify? held = target;
-        return held;
+        get
+        {
+            IControlNotify? held = target;
+            return held;
+        }
     }
 
     // ------------------------------------------------------- the dispatch
@@ -418,7 +421,7 @@ public class ControlPeer : IControlPeer
         //
         // The form carries `WS_CLIPCHILDREN`, so this paints only the parts no
         // child covers, which is what keeps a resize from flickering.
-        if (message == WmEraseBackground && ErasesBackground())
+        if (message == WmEraseBackground && ErasesBackground)
         {
             HDC dc = (HDC)(void*)(nuint)wParam;
             Rect client;
@@ -551,13 +554,13 @@ public class ControlPeer : IControlPeer
         // rectangle is asked for rather than taken from the message.
         if (message == WmSize)
         {
-            control.OnPlatformResized(BoundsInParent().Extent);
+            control.OnPlatformResized(BoundsInParent.Extent);
             return Inherited(message, wParam, lParam);
         }
 
         if (message == WmMove)
         {
-            control.OnPlatformMoved(BoundsInParent().Location);
+            control.OnPlatformMoved(BoundsInParent.Location);
             return Inherited(message, wParam, lParam);
         }
 
@@ -629,7 +632,7 @@ public class ControlPeer : IControlPeer
     {
         long answer = Inherited(message, wParam, lParam);
 
-        var owner = Owner();
+        var owner = Owner;
         if (owner == null)
             return answer;
 
@@ -653,27 +656,30 @@ public class ControlPeer : IControlPeer
     ///
     /// The exception is a widget that paints part of itself and leaves the
     /// rest to its parent; see `GroupPeer`.
-    protected virtual bool ErasesBackground() => !subclassed;
+    protected virtual bool ErasesBackground => !subclassed;
 
     /// Where this control is, in the coordinates its `Bounds` are expressed in:
     /// the parent's client area for a child, and the screen for a top-level
     /// window -- which is what `Form.Location` means, as it does in C#.
-    protected FRect BoundsInParent()
+    protected FRect BoundsInParent
     {
-        Rect frame;
-        GetWindowRect(window, &frame);
-        int width = frame.Right - frame.Left;
-        int height = frame.Bottom - frame.Top;
+        get
+        {
+            Rect frame;
+            GetWindowRect(window, &frame);
+            int width = frame.Right - frame.Left;
+            int height = frame.Bottom - frame.Top;
 
-        HWND parent = GetParent(window);
-        if (parent == null)
-            return Area(frame.Left, frame.Top, width, height);
+            HWND parent = GetParent(window);
+            if (parent == null)
+                return Area(frame.Left, frame.Top, width, height);
 
-        Win32.User32.Point corner;
-        corner.X = frame.Left;
-        corner.Y = frame.Top;
-        ScreenToClient(parent, &corner);
-        return Area(corner.X, corner.Y, width, height);
+            Win32.User32.Point corner;
+            corner.X = frame.Left;
+            corner.Y = frame.Top;
+            ScreenToClient(parent, &corner);
+            return Area(corner.X, corner.Y, width, height);
+        }
     }
 
     /// The brush this control's background is painted with.
@@ -763,7 +769,7 @@ public class ControlPeer : IControlPeer
     {
         // `WM_SETFONT` does not take ownership, so the `Font` object must
         // outlive the control -- which it does, because the control holds it.
-        SendMessageW(window, WmSetFont, (ulong)font.Resource().Handle(), 1);
+        SendMessageW(window, WmSetFont, (ulong)font.Resource.Handle, 1);
     }
 
     public void SetForeColor(Color colour)
@@ -787,7 +793,7 @@ public class ControlPeer : IControlPeer
     public void Update() => UpdateWindow(window);
 
     public void Focus() => SetFocus(window);
-    public bool HasFocus() => GetFocus() == window;
+    public bool HasFocus => GetFocus() == window;
 
     public void SetCursor(CursorKind wanted)
     {
@@ -831,26 +837,29 @@ public class ControlPeer : IControlPeer
         return LoadCursorW(null, CursorArrow());
     }
 
-    public virtual FRect ClientBounds()
+    public virtual FRect ClientBounds
     {
-        Rect r;
-        GetClientRect(window, &r);
-        // `GetClientRect` already answers at the origin; saying so explicitly
-        // is what keeps a peer that overrides this honest about the contract.
-        return Area(0, 0, r.Right - r.Left, r.Bottom - r.Top);
+        get
+        {
+            Rect r;
+            GetClientRect(window, &r);
+            // `GetClientRect` already answers at the origin; saying so explicitly
+            // is what keeps a peer that overrides this honest about the contract.
+            return Area(0, 0, r.Right - r.Left, r.Bottom - r.Top);
+        }
     }
 
     /// Zero, because a child window's position is already measured from its
     /// parent's client origin. Only a widget whose own frame eats into that
     /// space overrides this.
-    public virtual FPoint ClientOrigin() => At(0, 0);
+    public virtual FPoint ClientOrigin => At(0, 0);
 
     /// What Windows thinks this control should be. The base has no opinion --
     /// only a control that can measure its own content does, and each of those
     /// overrides this.
-    public virtual FSize PreferredSize() => NoSize();
+    public virtual FSize PreferredSize => NoSize();
 
-    public nuint Handle() => (nuint)(void*)window;
+    public nuint Handle => (nuint)(void*)window;
 
     public void Destroy()
     {

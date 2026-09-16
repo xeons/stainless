@@ -287,10 +287,13 @@ public class GtkWidgetSet : IWidgetSet
                                (gchar*)text.ToPointer(), -1);
     }
 
-    public bool ClipboardHasText()
+    public bool ClipboardHasText
     {
-        return gtk_clipboard_wait_is_text_available(
-            gtk_clipboard_get(ClipboardSelection())) != 0;
+        get
+        {
+            return gtk_clipboard_wait_is_text_available(
+                gtk_clipboard_get(ClipboardSelection())) != 0;
+        }
     }
 
     // ------------------------------------------------------------- dialogs
@@ -537,26 +540,32 @@ public class GtkWidgetSet : IWidgetSet
         return gdk_display_get_monitor(display, 0);
     }
 
-    public Size ScreenSize()
+    public Size ScreenSize
     {
-        gpointer monitor = Monitor();
-        if (monitor == null)
-            return Extent(1024, 768);
+        get
+        {
+            gpointer monitor = Monitor();
+            if (monitor == null)
+                return Extent(1024, 768);
 
-        GdkRectangle area;
-        gdk_monitor_get_geometry(monitor, &area);
-        return Extent(area.Width, area.Height);
+            GdkRectangle area;
+            gdk_monitor_get_geometry(monitor, &area);
+            return Extent(area.Width, area.Height);
+        }
     }
 
-    public Rectangle WorkArea()
+    public Rectangle WorkArea
     {
-        gpointer monitor = Monitor();
-        if (monitor == null)
-            return Area(0, 0, 1024, 768);
+        get
+        {
+            gpointer monitor = Monitor();
+            if (monitor == null)
+                return Area(0, 0, 1024, 768);
 
-        GdkRectangle area;
-        gdk_monitor_get_workarea(monitor, &area);
-        return Area(area.X, area.Y, area.Width, area.Height);
+            GdkRectangle area;
+            gdk_monitor_get_workarea(monitor, &area);
+            return Area(area.X, area.Y, area.Width, area.Height);
+        }
     }
 
     // --------------------------------------------------------- the loop

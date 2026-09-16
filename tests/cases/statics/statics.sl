@@ -37,7 +37,7 @@ void Bump(byte* argument)
     Hits.Increment();
 
     var guard = Guarded.Lock();
-    guard.Set(guard.Value() + 1);
+    guard.Set(guard.Value + 1);
 }
 
 int Main()
@@ -60,7 +60,7 @@ int Main()
 
     {
         var guard = Guarded.Lock();
-        printf("guarded=%d\n", guard.Value());
+        printf("guarded=%d\n", guard.Value);
     }
 
     // Statics are readable from a parallel loop without being captured: they

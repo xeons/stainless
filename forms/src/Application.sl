@@ -82,7 +82,7 @@ public static class Application
     }
 
     /// Whether `Initialize` has run.
-    public static bool IsInitialized() => s_started;
+    public static bool IsInitialized => s_started;
 
     /// Which platform this program ended up on: `"Win32"`, `"GTK3"`.
     public static String PlatformName => WidgetSet.Current.Name;

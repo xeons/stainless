@@ -115,13 +115,13 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
 
         SendMessageW(window, TbAddButtonsW, 1u, (long)(nuint)&button);
         _commands.Add(button.Command);
-        return (int)_commands.Count() - 1;
+        return (int)_commands.Count - 1;
     }
 
     /// Which button a command id belongs to, or -1.
     int IndexOf(int command)
     {
-        for (nuint i = 0u; i < _commands.Count(); i++)
+        for (nuint i = 0u; i < _commands.Count; i++)
         {
             if (_commands.At(i) == command)
                 return (int)i;
@@ -131,7 +131,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
 
     int CommandAt(int index)
     {
-        if (index < 0 || (nuint)index >= _commands.Count())
+        if (index < 0 || (nuint)index >= _commands.Count)
             return -1;
         return _commands.At((nuint)index);
     }
@@ -185,7 +185,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
 
     public void SetImages(IImageListBackend images)
     {
-        SendMessageW(window, TbSetImageList, 0u, (long)(nuint)images.Handle());
+        SendMessageW(window, TbSetImageList, 0u, (long)(nuint)images.Handle);
     }
 
     /// `TBSTYLE_LIST` puts the caption beside the picture; without it there is
@@ -209,13 +209,16 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     public void ResizeToFit() => SendMessageW(window, TbAutoSize, 0u, 0);
 
     /// As tall as the bar makes itself, and as wide as it is given.
-    public override FSize PreferredSize()
+    public override FSize PreferredSize
     {
-        long packed = SendMessageW(window, TbGetButtonSize, 0u, 0);
-        int height = (int)((packed >> 16) & 0xFFFFu);
-        if (height <= 0)
-            height = 24;
-        return Extent(0, height + 8);
+        get
+        {
+            long packed = SendMessageW(window, TbGetButtonSize, 0u, 0);
+            int height = (int)((packed >> 16) & 0xFFFFu);
+            if (height <= 0)
+                height = 24;
+            return Extent(0, height + 8);
+        }
     }
 }
 
@@ -244,14 +247,17 @@ public class StatusBarPeer : ControlPeer, IStatusBarPeer
     }
 
     /// A status bar decides its own height from the font, and is right about it.
-    public override FSize PreferredSize()
+    public override FSize PreferredSize
     {
-        Rect frame;
-        GetWindowRect(window, &frame);
-        int height = frame.Bottom - frame.Top;
-        if (height <= 0)
-            height = 22;
-        return Extent(0, height);
+        get
+        {
+            Rect frame;
+            GetWindowRect(window, &frame);
+            int height = frame.Bottom - frame.Top;
+            if (height <= 0)
+                height = 22;
+            return Extent(0, height);
+        }
     }
 }
 
@@ -362,12 +368,12 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
     /// A tab control is a container, so a page's controls are children of it.
     public void AddChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), window);
+        SetParent((HWND)(void*)child.Handle, window);
     }
 
     public void RemoveChild(IControlPeer child)
     {
-        SetParent((HWND)(void*)child.Handle(), null);
+        SetParent((HWND)(void*)child.Handle, null);
     }
 
     public int AddTab(String text, int image)
@@ -424,9 +430,12 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         return (int)SendMessageW(window, TcmGetCurSel, 0u, 0);
     }
 
-    public int TabCount()
+    public int TabCount
     {
-        return (int)SendMessageW(window, TcmGetItemCount, 0u, 0);
+        get
+        {
+            return (int)SendMessageW(window, TcmGetItemCount, 0u, 0);
+        }
     }
 
     /// The area under the tabs, which is what a page gets.
@@ -434,17 +443,20 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
     /// `TCM_ADJUSTRECT` converts between the whole control and the part inside,
     /// and is the only thing that knows how tall a row of tabs is -- which
     /// depends on the font, the theme and how many rows the tabs wrapped on to.
-    public FRect PageArea()
+    public FRect PageArea
     {
-        Rect area;
-        GetClientRect(window, &area);
-        SendMessageW(window, TcmAdjustRect, 0u, (long)(nuint)&area);
-        return Area(area.Left, area.Top, area.Right - area.Left, area.Bottom - area.Top);
+        get
+        {
+            Rect area;
+            GetClientRect(window, &area);
+            SendMessageW(window, TcmAdjustRect, 0u, (long)(nuint)&area);
+            return Area(area.Left, area.Top, area.Right - area.Left, area.Bottom - area.Top);
+        }
     }
 
     public void SetImages(IImageListBackend images)
     {
-        SendMessageW(window, TcmSetImageList, 0u, (long)(nuint)images.Handle());
+        SendMessageW(window, TcmSetImageList, 0u, (long)(nuint)images.Handle);
     }
 
     protected override bool NotifiedBy(int code, void* raw)
@@ -468,8 +480,8 @@ public class TreeNodeHandle : ITreeNodeHandle
 {
     HTREEITEM _item;
     public TreeNodeHandle(HTREEITEM handle) => _item = handle;
-    public HTREEITEM Native() => _item;
-    public nuint Id() => (nuint)(void*)_item;
+    public HTREEITEM Native => _item;
+    public nuint Id => (nuint)(void*)_item;
 }
 
 public class TreeViewPeer : ControlPeer, ITreeViewPeer
@@ -497,13 +509,13 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         {
             ITreeNodeHandle above = (ITreeNodeHandle)parent;
             if (above is TreeNodeHandle real)
-                insert.Parent = real.Native();
+                insert.Parent = real.Native;
         }
         if (previous != null)
         {
             ITreeNodeHandle before = (ITreeNodeHandle)previous;
             if (before is TreeNodeHandle real)
-                insert.InsertAfter = real.Native();
+                insert.InsertAfter = real.Native;
         }
 
         var wide = text.ToUtf16();
@@ -531,7 +543,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
     HTREEITEM NativeOf(ITreeNodeHandle node)
     {
         if (node is TreeNodeHandle real)
-            return real.Native();
+            return real.Native;
         return null;
     }
 
@@ -603,7 +615,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
 
     public void SetImages(IImageListBackend images)
     {
-        SendMessageW(window, TvmSetImageList, 0u, (long)(nuint)images.Handle());
+        SendMessageW(window, TvmSetImageList, 0u, (long)(nuint)images.Handle);
     }
 
     protected override bool NotifiedBy(int code, void* raw)
@@ -775,7 +787,7 @@ public class ListViewPeer : ControlPeer, IListViewPeer
         _rows = 0;
     }
 
-    public int RowCount() => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
+    public int RowCount => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
 
     public int GetSelectedRow()
     {
@@ -805,7 +817,7 @@ public class ListViewPeer : ControlPeer, IListViewPeer
 
     public void SetImages(IImageListBackend images)
     {
-        SendMessageW(window, LvmSetImageList, 1u, (long)(nuint)images.Handle());
+        SendMessageW(window, LvmSetImageList, 1u, (long)(nuint)images.Handle);
     }
 
     public void SetFullRowSelect(bool full, bool gridLines)
@@ -1013,7 +1025,7 @@ public class CheckListPeer : ControlPeer, ICheckListPeer
         _rows = 0;
     }
 
-    public int ItemCount() => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
+    public int ItemCount => (int)SendMessageW(window, LvmGetItemCount, 0u, 0);
 
     public void SetSelectedIndex(int index)
     {
@@ -1178,9 +1190,12 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
         return item.Width;
     }
 
-    public int SectionCount()
+    public int SectionCount
     {
-        return (int)SendMessageW(window, HdmGetItemCount, 0u, 0);
+        get
+        {
+            return (int)SendMessageW(window, HdmGetItemCount, 0u, 0);
+        }
     }
 
     /// A section was dragged wider or narrower.

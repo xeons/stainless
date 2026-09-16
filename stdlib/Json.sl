@@ -121,7 +121,7 @@ public class JsonObject
 
     /// How many members there are. Members rather than distinct names: a
     /// repeated name is kept, so this can exceed the number of names.
-    public nuint Count() => _members.Count();
+    public nuint Count => _members.Count;
 
     /// The name at a position, in the order the document wrote them.
     public String NameAt(nuint index) => _members.KeyAt(index);
@@ -283,7 +283,7 @@ class Cursor
         Failure = JsonError.None;
     }
 
-    public bool Failed() => Failure != JsonError.None;
+    public bool Failed => Failure != JsonError.None;
 
     /// The first reason wins: everything after a failure is noise about the
     /// same mistake, and the first one is where it was made.
@@ -293,11 +293,11 @@ class Cursor
             Failure = why;
     }
 
-    public bool AtEnd() => At >= Text.ByteLength();
+    public bool AtEnd => At >= Text.ByteLength();
 
     public byte Peek()
     {
-        if (AtEnd())
+        if (AtEnd)
             return (byte)0;
         return Text.ByteAt(At);
     }
@@ -307,7 +307,7 @@ class Cursor
 
 void SkipSpace(Cursor cursor)
 {
-    while (!cursor.AtEnd())
+    while (!cursor.AtEnd)
     {
         byte c = cursor.Text.ByteAt(cursor.At);
         if (c != (byte)' ' && c != (byte)'\t' && c != (byte)'\n' && c != (byte)'\r')
@@ -322,7 +322,7 @@ void SkipSpace(Cursor cursor)
 /// two that recurse.
 JsonValue ParseValue(Cursor cursor)
 {
-    if (cursor.Failed())
+    if (cursor.Failed)
         return JsonValue.Null;
 
     if (cursor.Depth > MaxDepth)
@@ -333,7 +333,7 @@ JsonValue ParseValue(Cursor cursor)
 
     SkipSpace(cursor);
 
-    if (cursor.AtEnd())
+    if (cursor.AtEnd)
     {
         cursor.Reject(JsonError.Unexpected);
         return JsonValue.Null;
@@ -382,7 +382,7 @@ JsonValue ParseObject(Cursor cursor)
         }
 
         var name = ParseText(cursor);
-        if (cursor.Failed())
+        if (cursor.Failed)
             break;
 
         SkipSpace(cursor);
@@ -394,7 +394,7 @@ JsonValue ParseObject(Cursor cursor)
         cursor.Skip();
 
         var value = ParseValue(cursor);
-        if (cursor.Failed())
+        if (cursor.Failed)
             break;
 
         members.Add(name, value);
@@ -440,7 +440,7 @@ JsonValue ParseArray(Cursor cursor)
     while (true)
     {
         var value = ParseValue(cursor);
-        if (cursor.Failed())
+        if (cursor.Failed)
             break;
 
         items.Add(value);
@@ -487,7 +487,7 @@ String ParseText(Cursor cursor)
 
     while (true)
     {
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
         {
             cursor.Reject(JsonError.UnterminatedText);
             return "";
@@ -517,7 +517,7 @@ String ParseText(Cursor cursor)
         }
 
         cursor.Skip();
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
         {
             cursor.Reject(JsonError.UnterminatedText);
             return "";
@@ -561,7 +561,7 @@ String ParseText(Cursor cursor)
         else if (escape == (byte)'u')
         {
             uint first = ParseHex4(cursor);
-            if (cursor.Failed())
+            if (cursor.Failed)
                 return "";
 
             uint scalar = first;
@@ -576,7 +576,7 @@ String ParseText(Cursor cursor)
                 {
                     cursor.At = cursor.At + 2u;
                     uint second = ParseHex4(cursor);
-                    if (cursor.Failed())
+                    if (cursor.Failed)
                         return "";
 
                     if (second >= 0xDC00u && second <= 0xDFFFu)
@@ -616,7 +616,7 @@ uint ParseHex4(Cursor cursor)
 
     for (nuint i = 0u; i < 4u; i++)
     {
-        if (cursor.AtEnd())
+        if (cursor.AtEnd)
         {
             cursor.Reject(JsonError.BadEscape);
             return 0u;
@@ -660,7 +660,7 @@ JsonValue ParseNumber(Cursor cursor)
         cursor.At = cursor.At + 1u;
 
     nuint digits = cursor.At;
-    while (!cursor.AtEnd() && IsDigit(cursor.Text.ByteAt(cursor.At)))
+    while (!cursor.AtEnd && IsDigit(cursor.Text.ByteAt(cursor.At)))
     {
         cursor.Skip();
     }
@@ -678,12 +678,12 @@ JsonValue ParseNumber(Cursor cursor)
         return JsonValue.Null;
     }
 
-    if (!cursor.AtEnd() && cursor.Text.ByteAt(cursor.At) == (byte)'.')
+    if (!cursor.AtEnd && cursor.Text.ByteAt(cursor.At) == (byte)'.')
     {
         cursor.Skip();
         nuint fraction = cursor.At;
 
-        while (!cursor.AtEnd() && IsDigit(cursor.Text.ByteAt(cursor.At)))
+        while (!cursor.AtEnd && IsDigit(cursor.Text.ByteAt(cursor.At)))
         {
             cursor.Skip();
         }
@@ -695,14 +695,14 @@ JsonValue ParseNumber(Cursor cursor)
         }
     }
 
-    if (!cursor.AtEnd())
+    if (!cursor.AtEnd)
     {
         byte e = cursor.Text.ByteAt(cursor.At);
         if (e == (byte)'e' || e == (byte)'E')
         {
             cursor.Skip();
 
-            if (!cursor.AtEnd())
+            if (!cursor.AtEnd)
             {
                 byte sign = cursor.Text.ByteAt(cursor.At);
                 if (sign == (byte)'+' || sign == (byte)'-')
@@ -710,7 +710,7 @@ JsonValue ParseNumber(Cursor cursor)
             }
 
             nuint exponent = cursor.At;
-            while (!cursor.AtEnd() && IsDigit(cursor.Text.ByteAt(cursor.At)))
+            while (!cursor.AtEnd && IsDigit(cursor.Text.ByteAt(cursor.At)))
             {
                 cursor.Skip();
             }
@@ -773,11 +773,11 @@ public Result<JsonValue, JsonError> Parse(String text)
     var cursor = new Cursor(text);
 
     var value = ParseValue(cursor);
-    if (cursor.Failed())
+    if (cursor.Failed)
         return Fail(cursor.Failure);
 
     SkipSpace(cursor);
-    if (!cursor.AtEnd())
+    if (!cursor.AtEnd)
         return Fail(JsonError.TrailingContent);
 
     return Ok(value);
@@ -829,14 +829,14 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
             break;
 
         case Array array:
-            if (array.Items.Count() == 0u)
+            if (array.Items.Count == 0u)
             {
                 text.Append("[]");
                 break;
             }
 
             text.Append("[");
-            for (nuint i = 0u; i < array.Items.Count(); i++)
+            for (nuint i = 0u; i < array.Items.Count; i++)
             {
                 if (i > 0u)
                     text.Append(",");
@@ -850,14 +850,14 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
             break;
 
         case Object object:
-            if (object.Members.Count() == 0u)
+            if (object.Members.Count == 0u)
             {
                 text.Append("{}");
                 break;
             }
 
             text.Append("{");
-            for (nuint i = 0u; i < object.Members.Count(); i++)
+            for (nuint i = 0u; i < object.Members.Count; i++)
             {
                 if (i > 0u)
                     text.Append(",");
@@ -1012,7 +1012,7 @@ JsonValue ValueOfInstance(byte* instance, Type type)
 
     var members = new JsonObject();
 
-    for (nuint i = 0u; i < type.FieldCount(); i++)
+    for (nuint i = 0u; i < type.FieldCount; i++)
     {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore"))
@@ -1044,9 +1044,9 @@ JsonValue ValueOfInstance(byte* instance, Type type)
 /// believe.
 bool Represents(Field field)
 {
-    if (field.IsSimple())
+    if (field.IsSimple)
         return true;
-    if (field.IsWalkable())
+    if (field.IsWalkable)
         return true;
     return RepresentsArray(field);
 }
@@ -1054,10 +1054,10 @@ bool Represents(Field field)
 /// An array whose elements are something this can read and write.
 bool RepresentsArray(Field field)
 {
-    if (!field.IsArray())
+    if (!field.IsArray)
         return false;
 
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
     if (kind == KindString || kind == KindBool)
         return true;
     if (kind == KindFloat || kind == KindDouble)
@@ -1070,8 +1070,8 @@ bool RepresentsArray(Field field)
     // An array of objects, when the objects carry field tables of their own.
     if (kind == KindClass || kind == KindStruct)
     {
-        var inner = field.ElementType();
-        return inner.Exists() && inner.Has("Reflect");
+        var inner = field.ElementType;
+        return inner.Exists && inner.Has("Reflect");
     }
 
     return false;
@@ -1081,23 +1081,23 @@ String NameOf(Field field)
 {
     if (field.Has("JsonName"))
         return field.Get("JsonName").AsText(0u);
-    return field.Name();
+    return field.Name;
 }
 
 JsonValue ValueOfField(byte* instance, Field field)
 {
-    int kind = field.Kind();
+    int kind = field.Kind;
 
     if (kind == KindString)
         return JsonValue.Text(Reflection.ReadText(instance, field));
     if (kind == KindBool)
         return JsonValue.Bool(Reflection.ReadBool(instance, field));
-    if (field.IsFloating())
+    if (field.IsFloating)
         return JsonValue.Number(Reflection.ReadDouble(instance, field));
-    if (field.IsInteger())
+    if (field.IsInteger)
         return NumberOf(Reflection.ReadInteger(instance, field));
 
-    if (field.IsWalkable())
+    if (field.IsWalkable)
     {
         byte* nested = Reflection.ReadAggregate(instance, field);
         return ValueOfInstance(nested, field.TypeOf());
@@ -1121,7 +1121,7 @@ JsonValue ValueOfArray(byte* instance, Field field)
         return JsonValue.Null;
 
     var items = new List<JsonValue>();
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
 
     for (nuint i = 0u; i < Reflection.ArrayLength(array); i++)
     {
@@ -1141,7 +1141,7 @@ JsonValue ValueOfArray(byte* instance, Field field)
         }
         else if (kind == KindClass || kind == KindStruct)
         {
-            items.Add(ValueOfInstance(Reflection.ReadAggregateAt(at, field), field.ElementType()));
+            items.Add(ValueOfInstance(Reflection.ReadAggregateAt(at, field), field.ElementType));
         }
         else
         {
@@ -1176,7 +1176,7 @@ public JsonError Populate<T>(T value, String text)
 public JsonError PopulateFrom<T>(T value, JsonValue document)
 {
     var type = typeof(T);
-    if (type.FieldCount() == 0u)
+    if (type.FieldCount == 0u)
         return JsonError.NotReflected;
 
     if (!document.Object)
@@ -1188,7 +1188,7 @@ public JsonError PopulateFrom<T>(T value, JsonValue document)
 
 void FillInstance(byte* instance, Type type, JsonObject members)
 {
-    for (nuint i = 0u; i < type.FieldCount(); i++)
+    for (nuint i = 0u; i < type.FieldCount; i++)
     {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore"))
@@ -1208,7 +1208,7 @@ void FillInstance(byte* instance, Type type, JsonObject members)
 
 void FillField(byte* instance, Field field, JsonValue value)
 {
-    int kind = field.Kind();
+    int kind = field.Kind;
 
     if (kind == KindString)
     {
@@ -1224,21 +1224,21 @@ void FillField(byte* instance, Field field, JsonValue value)
         return;
     }
 
-    if (field.IsFloating())
+    if (field.IsFloating)
     {
         if (value.Number)
             Reflection.WriteDouble(instance, field, value.Value);
         return;
     }
 
-    if (field.IsInteger())
+    if (field.IsInteger)
     {
         if (value.Number)
             Reflection.WriteInteger(instance, field, (long)value.Value);
         return;
     }
 
-    if (field.IsWalkable())
+    if (field.IsWalkable)
     {
         byte* nested = Reflection.ReadAggregate(instance, field);
 
@@ -1278,9 +1278,9 @@ void FillArray(byte* instance, Field field, JsonValue value)
         return;
 
     nuint length = Reflection.ArrayLength(array);
-    int kind = field.ElementKind();
+    int kind = field.ElementKind;
 
-    for (nuint i = 0u; i < value.Items.Count() && i < length; i++)
+    for (nuint i = 0u; i < value.Items.Count && i < length; i++)
     {
         byte* at = Reflection.ElementAt(array, field, i);
         var item = value.Items.At(i);
@@ -1312,7 +1312,7 @@ void FillArray(byte* instance, Field field, JsonValue value)
             if (nested != null)
             {
                 if (item.Object)
-                    FillInstance(nested, field.ElementType(), item.Members);
+                    FillInstance(nested, field.ElementType, item.Members);
             }
         }
         else

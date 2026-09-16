@@ -91,8 +91,8 @@ public abstract class FileDialog
     /// pattern alternating.
     protected String[] FilterPairs()
     {
-        var flat = new String[filters.Count() * 2u];
-        for (nuint i = 0u; i < filters.Count(); i++)
+        var flat = new String[filters.Count * 2u];
+        for (nuint i = 0u; i < filters.Count; i++)
         {
             flat[i * 2u] = filters.At(i).Description;
             flat[i * 2u + 1u] = filters.At(i).Patterns;

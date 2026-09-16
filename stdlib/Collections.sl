@@ -102,7 +102,7 @@ public interface IEnumerator<T>
     /// What the last `MoveNext` landed on. Calling this before the first
     /// `MoveNext`, or after one that answered false, is a mistake the
     /// enumerator is not required to catch.
-    T Current();
+    T Current { get; }
 }
 
 /// Something that can be walked from the start, once per enumerator.
@@ -141,14 +141,14 @@ public class ListEnumerator<T> : IEnumerator<T>
     /// Advances, answering false at the end.
     public bool MoveNext()
     {
-        if (_next >= _source.Count())
+        if (_next >= _source.Count)
             return false;
         _next++;
         return true;
     }
 
     /// The item the last `MoveNext` landed on.
-    public T Current() => _source.At(_next - 1);
+    public T Current => _source.At(_next - 1);
 }
 
 // ------------------------------------------------------------------- lists
@@ -163,9 +163,9 @@ public class ListEnumerator<T> : IEnumerator<T>
 public interface IReadOnlyList<T>
 {
     /// How many items there are.
-    nuint Count();
+    nuint Count { get; }
 
-    /// The item at `index`, counting from zero. An index at or past `Count()`
+    /// The item at `index`, counting from zero. An index at or past `Count`
     /// aborts with the same message an array overrun gives.
     T At(nuint index);
 }
@@ -202,17 +202,17 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     /// How many items are in the list -- not how many it has room for, which
     /// is `Capacity`.
-    public nuint Count() => _count;
+    public nuint Count => _count;
 
     /// True when there is nothing in it.
     public bool IsEmpty() => _count == 0;
 
     /// The number of items this list can hold before it must grow again.
-    public nuint Capacity() => _items.Length;
+    public nuint Capacity => _items.Length;
 
     /// The item at `index`, aborting past the end.
     ///
-    /// Checked against `Count()` rather than against the backing array, so a
+    /// Checked against `Count` rather than against the backing array, so a
     /// slot that exists but holds nothing is out of range and says so.
     /// `list[index]` is the same question in fewer characters.
     public T At(nuint index)
@@ -268,7 +268,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 
     /// Inserts at a position, moving everything after it up one.
     ///
-    /// `index == Count()` appends, which is what makes a loop that inserts in
+    /// `index == Count` appends, which is what makes a loop that inserts in
     /// order need no special case at the end.
     public void Insert(nuint index, T item)
     {
@@ -332,11 +332,11 @@ public class List<T> : IList<T>, IEnumerable<T>
 /// The largest item, by its own ordering. The list must not be empty.
 public T Largest<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
-    if (items.Count() == 0)
+    if (items.Count == 0)
         sl_array_bounds_fail(0, 0);
 
     var best = items.At(0);
-    for (nuint i = 1; i < items.Count(); i++)
+    for (nuint i = 1; i < items.Count; i++)
     {
         if (items.At(i).CompareTo(best) > 0)
             best = items.At(i);
@@ -347,11 +347,11 @@ public T Largest<T>(IReadOnlyList<T> items) where T : IComparable<T>
 /// The smallest item, by its own ordering. The list must not be empty.
 public T Smallest<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
-    if (items.Count() == 0)
+    if (items.Count == 0)
         sl_array_bounds_fail(0, 0);
 
     var best = items.At(0);
-    for (nuint i = 1; i < items.Count(); i++)
+    for (nuint i = 1; i < items.Count; i++)
     {
         if (items.At(i).CompareTo(best) < 0)
             best = items.At(i);
@@ -369,7 +369,7 @@ public T Smallest<T>(IReadOnlyList<T> items) where T : IComparable<T>
 /// has always answered this way; now they agree.
 public Optional<nuint> IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T>
 {
-    for (nuint i = 0; i < items.Count(); i++)
+    for (nuint i = 0; i < items.Count; i++)
     {
         if (items.At(i).EqualTo(wanted))
             return Some(i);
@@ -405,7 +405,7 @@ public bool RemoveFirst<T>(List<T> items, T wanted) where T : IEquatable<T>
 public nuint RemoveWhere<T>(List<T> items, Predicate<T> match)
 {
     nuint went = 0u;
-    nuint i = items.Count();
+    nuint i = items.Count;
 
     while (i > 0u)
     {
@@ -668,7 +668,7 @@ public void Reverse<T>(T[:] items)
 /// is the cheaper trade, and it gets the array version's stability for free.
 public void Sort<T>(IList<T> items) where T : IComparable<T>
 {
-    nuint count = items.Count();
+    nuint count = items.Count;
     if (count < 2u)
         return;
 
@@ -685,7 +685,7 @@ public void Sort<T>(IList<T> items) where T : IComparable<T>
 /// The same, ordered by a comparer.
 public void Sort<T>(IList<T> items, Comparer<T> order)
 {
-    nuint count = items.Count();
+    nuint count = items.Count;
     if (count < 2u)
         return;
 
@@ -715,27 +715,27 @@ public void Sort<T>(IList<T> items, Comparer<T> order)
 /// it as an index. That is a real limit rather than a temporary one: keeping a
 /// hash index in step with an order would double the storage and every write,
 /// which is not what the collection is for.
-public class OrderedDictionary<K, V> where K : IEquatable<K>
+public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 {
-    List<K> _keys;
-    List<V> _values;
+    List<TKey> _keys;
+    List<TValue> _values;
 
     /// An empty ordered dictionary.
     public OrderedDictionary()
     {
-        _keys = new List<K>();
-        _values = new List<V>();
+        _keys = new List<TKey>();
+        _values = new List<TValue>();
     }
 
     /// How many entries there are. Entries rather than distinct keys: `Add`
     /// keeps a repeated key, so this can exceed the number of different keys.
-    public nuint Count() => _keys.Count();
+    public nuint Count => _keys.Count;
 
     /// The key at a position, in insertion order.
-    public K KeyAt(nuint index) => _keys.At(index);
+    public TKey KeyAt(nuint index) => _keys.At(index);
 
     /// The value at a position, in insertion order.
-    public V ValueAt(nuint index) => _values.At(index);
+    public TValue ValueAt(nuint index) => _values.At(index);
 
     /// Where a key is, or `None`.
     ///
@@ -743,9 +743,9 @@ public class OrderedDictionary<K, V> where K : IEquatable<K>
     /// asking for its value walks the collection twice. An `Optional` rather
     /// than a sentinel, because a position that means "no position" is a rule
     /// every caller has to know and none can be made to.
-    public Optional<nuint> IndexOf(K key)
+    public Optional<nuint> IndexOf(TKey key)
     {
-        for (nuint i = 0u; i < _keys.Count(); i++)
+        for (nuint i = 0u; i < _keys.Count; i++)
         {
             if (_keys.At(i).EqualTo(key))
                 return Some(i);
@@ -755,14 +755,14 @@ public class OrderedDictionary<K, V> where K : IEquatable<K>
 
     /// Whether the key is there at all. A scan, like everything else here, so
     /// `IndexOf` once beats `Has` followed by a lookup.
-    public bool Has(K key) => IndexOf(key).HasValue();
+    public bool Has(TKey key) => IndexOf(key).HasValue;
 
     /// Appends, without looking for the key first.
     ///
     /// A repeated key is kept rather than replaced, because a document that
     /// contains one said so and dropping either half would be this collection
     /// deciding what the document meant. `Set` is the one that replaces.
-    public void Add(K key, V value)
+    public void Add(TKey key, TValue value)
     {
         _keys.Add(key);
         _values.Add(value);
@@ -770,7 +770,7 @@ public class OrderedDictionary<K, V> where K : IEquatable<K>
 
     /// Replaces the value of a key, or appends it. A replaced key keeps the
     /// position it had, which is the point of the collection.
-    public void Set(K key, V value)
+    public void Set(TKey key, TValue value)
     {
         if (IndexOf(key) is Some at)
         {
@@ -784,7 +784,7 @@ public class OrderedDictionary<K, V> where K : IEquatable<K>
 
     /// The value of a key, or the fallback. There is no overload that aborts:
     /// a caller that wants to know writes `IndexOf`.
-    public V Find(K key, V fallback)
+    public TValue Find(TKey key, TValue fallback)
     {
         if (IndexOf(key) is Some at)
             return _values.At(at.Value);
@@ -793,7 +793,7 @@ public class OrderedDictionary<K, V> where K : IEquatable<K>
 
     /// Removes the first entry with that key, closing the gap. Answers whether
     /// there was one.
-    public bool Remove(K key)
+    public bool Remove(TKey key)
     {
         if (IndexOf(key) is Some at)
         {

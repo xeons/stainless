@@ -21,7 +21,7 @@ import Standard.Com;
 public com interface ICounter
 {
     int Add(int by);
-    int Value();
+    int Value { get; }
 }
 
 /// Implemented here, called from C.
@@ -36,7 +36,7 @@ public com class Counter : ICounter
         _total = _total + by;
         return _total;
     }
-    public int Value() => _total;
+    public int Value => _total;
 
     ~Counter() { Console.WriteLine("counter destroyed"); }
 }
@@ -60,7 +60,7 @@ public void Main()
         ICounter it = counter;
 
         Say("c saw          ", count_through((byte*)it));
-        Say("after c        ", it.Value());
+        Say("after c        ", it.Value);
         Console.WriteLine("dropping:");
     }
     Console.WriteLine("dropped");
@@ -74,7 +74,7 @@ public void Main()
         ICounter native = (ICounter)native_counter();
         Say("native add 7   ", native.Add(7));
         Say("native add 2   ", native.Add(2));
-        Say("native value   ", native.Value());
+        Say("native value   ", native.Value);
         Console.WriteLine("releasing:");
     }
     Say("native live    ", native_live());

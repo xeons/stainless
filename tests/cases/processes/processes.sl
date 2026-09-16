@@ -98,7 +98,7 @@ public int Main()
     if (started.Ok)
     {
         var child = started.Value;
-        Console.WriteLine($"started  named={child.Id() > 0L} waited={child.Wait().ValueOr(-1)}");
+        Console.WriteLine($"started  named={child.Id > 0L} waited={child.Wait().ValueOr(-1)}");
         Console.WriteLine($"again    {child.Wait().ValueOr(-1)}");
     }
 
@@ -107,12 +107,12 @@ public int Main()
     if (slow.Ok)
     {
         var child = slow.Value;
-        Console.WriteLine($"running  {child.Finished().IsEmpty()}");
+        Console.WriteLine($"running  {child.Finished.IsEmpty()}");
         child.Kill();
         Console.WriteLine($"stopped  {child.Wait().Ok}");
     }
 
     // Interrupts are noticed rather than delivered, so this asks.
-    Console.WriteLine($"signals  watching={Signals.Watch()} seen={Signals.Interrupted()}");
+    Console.WriteLine($"signals  watching={Signals.Watch()} seen={Signals.Interrupted}");
     return 0;
 }

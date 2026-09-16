@@ -88,8 +88,8 @@ last person to edit it -- the suite is the authority.
   Reference counting consults the tag, so a case may hold a `String`, a class
   or an array and only what is really there is ever counted. Generic variants
   monomorphize like anything else
-- `Result<T, E>`: the language's answer to an exception, and now an ordinary
-  variant — `Ok(T Value)` and `Fail(E Error)` — with no machinery of its own.
+- `Result<T, TError>`: the language's answer to an exception, and now an ordinary
+  variant — `Ok(T Value)` and `Fail(TError Error)` — with no machinery of its own.
   A call that succeeds allocates nothing; `Ok(x)` and `Fail(e)` are written
   without type arguments and take their type from what they are returned or
   assigned into, the way a lambda does. `Value` and `Error` are readable only
@@ -365,8 +365,8 @@ last person to edit it -- the suite is the authority.
   different slots
 - Overloading by parameter type, on methods as well as module-level functions;
   a return type alone does not distinguish two of them
-- `Standard.Collections`: `List<T>`, `Dictionary<K, V>`, `HashSet<T>`,
-  `Queue<T>`, `Stack<T>`, `LinkedList<T>` and `SortedList<K, V>`, plus
+- `Standard.Collections`: `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`,
+  `Queue<T>`, `Stack<T>`, `LinkedList<T>` and `SortedList<TKey, TValue>`, plus
   `IComparable<T>`, `IEquatable<T>`, `IHashable`, `IReadOnlyList<T>`,
   `IList<T>`, `IEnumerable<T>` and `IEnumerator<T>`. Every container is
   array-backed — ARC cannot collect a cycle, so the linked list links by index
@@ -437,7 +437,7 @@ last person to edit it -- the suite is the authority.
   `IsNaN`/`IsInfinite`/`IsFinite`, `GreatestCommonDivisor`, and the bit
   functions. A module is a scope, so `Math.Sqrt(x)` needs no static class
 - `Standard.Concurrent`: `ConcurrentQueue<T>`, `ConcurrentStack<T>`,
-  `ConcurrentDictionary<K, V>` and a blocking `Channel<T>`. Each owns its
+  `ConcurrentDictionary<TKey, TValue>` and a blocking `Channel<T>`. Each owns its
   collection in a field and never hands out a reference to it, because a lock
   protects what it guards and not the reference *count* of what it guards
 - `Standard.Process`: running another program, on both platforms.
@@ -517,7 +517,7 @@ last person to edit it -- the suite is the authority.
   `IsEmpty`, `Get`, `ValueOr`, `Or`, `Map`, `FlatMap`, `Filter`, `IfPresent` —
   over machinery that is all variant: `if (found is Some at)` is what every one
   of them is written in terms of
-- `OrderedDictionary<K, V>`: a dictionary that keeps the order its keys were
+- `OrderedDictionary<TKey, TValue>`: a dictionary that keeps the order its keys were
   added in, found by scanning rather than hashing. For wherever the order is
   part of the data — a parsed document read back the way it was written — and
   not for anything large enough for O(n) lookup to hurt

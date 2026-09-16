@@ -25,7 +25,7 @@ public class Money : IComparable<Money>, IEquatable<Money>, IHashable
 T Middle<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
     var best = items.At(0);
-    for (nuint i = 1; i < items.Count(); i = i + 1)
+    for (nuint i = 1; i < items.Count; i = i + 1)
     {
         if (items.At(i).CompareTo(best) > 0)
             best = items.At(i);
@@ -36,7 +36,7 @@ T Middle<T>(IReadOnlyList<T> items) where T : IComparable<T>
 nuint Digest<T>(IReadOnlyList<T> items) where T : IHashable, IEquatable<T>
 {
     nuint total = 0;
-    for (nuint i = 0; i < items.Count(); i = i + 1)
+    for (nuint i = 0; i < items.Count; i = i + 1)
     {
         total = total + items.At(i).HashCode();
     }

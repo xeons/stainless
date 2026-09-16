@@ -91,10 +91,10 @@ program's output goes. `Run` is the one that captures.
 
 <sub>[stdlib/Process.sl:189](../../stdlib/Process.sl#L189)</sub>
 
-#### Id *method*
+#### Id *property*
 
 ```
-long Id()
+long Id { get; }
 ```
 
 What the operating system calls it.
@@ -113,15 +113,15 @@ Asking twice is harmless and answers the same both times.
 
 <sub>[stdlib/Process.sl:208](../../stdlib/Process.sl#L208)</sub>
 
-#### Finished *method*
+#### Finished *property*
 
 ```
-Optional<int> Finished()
+Optional<int> Finished { get; }
 ```
 
 The code it left, if it has finished, without waiting for it.
 
-    while (child.Finished().IsEmpty()) { DoSomethingElse(); }
+    while (child.Finished.IsEmpty()) { DoSomethingElse(); }
 
 <sub>[stdlib/Process.sl:219](../../stdlib/Process.sl#L219)</sub>
 
@@ -133,7 +133,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:228](../../stdlib/Process.sl#L228)</sub>
+<sub>[stdlib/Process.sl:231](../../stdlib/Process.sl#L231)</sub>
 
 #### Kill *method*
 
@@ -143,7 +143,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:231](../../stdlib/Process.sl#L231)</sub>
+<sub>[stdlib/Process.sl:234](../../stdlib/Process.sl#L234)</sub>
 
 #### Start *method*
 
@@ -153,7 +153,7 @@ static Result<Process, ProcessError> Start(String program, String[] arguments)
 
 Starts a program without waiting for it.
 
-<sub>[stdlib/Process.sl:234](../../stdlib/Process.sl#L234)</sub>
+<sub>[stdlib/Process.sl:237](../../stdlib/Process.sl#L237)</sub>
 
 ### ProcessError *enum*
 
@@ -234,10 +234,10 @@ is what the handler does, and this is where a program reads it -- at the
 top of its own loop, where it can actually tidy up.
 
     Signals.Watch();
-    while (!Signals.Interrupted()) { DoAPieceOfWork(); }
+    while (!Signals.Interrupted) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
-<sub>[stdlib/Process.sl:262](../../stdlib/Process.sl#L262)</sub>
+<sub>[stdlib/Process.sl:265](../../stdlib/Process.sl#L265)</sub>
 
 #### Watch *method*
 
@@ -248,17 +248,17 @@ static bool Watch()
 Starts noticing interrupts. Until this is called they end the program,
 which is the right default for something that has nothing to tidy.
 
-<sub>[stdlib/Process.sl:266](../../stdlib/Process.sl#L266)</sub>
+<sub>[stdlib/Process.sl:269](../../stdlib/Process.sl#L269)</sub>
 
-#### Interrupted *method*
+#### Interrupted *property*
 
 ```
-static bool Interrupted()
+static bool Interrupted { get; }
 ```
 
 Whether one has arrived since the last `Clear`.
 
-<sub>[stdlib/Process.sl:269](../../stdlib/Process.sl#L269)</sub>
+<sub>[stdlib/Process.sl:272](../../stdlib/Process.sl#L272)</sub>
 
 #### Clear *method*
 
@@ -268,7 +268,7 @@ static void Clear()
 
 Forgets the one that arrived, for a program that means to carry on.
 
-<sub>[stdlib/Process.sl:272](../../stdlib/Process.sl#L272)</sub>
+<sub>[stdlib/Process.sl:275](../../stdlib/Process.sl#L275)</sub>
 
 ## Functions
 

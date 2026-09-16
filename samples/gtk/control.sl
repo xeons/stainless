@@ -129,7 +129,7 @@ public class SearchBox
 
     /// How many searches have run, which the demo prints and a real control
     /// would not have.
-    public int Count() => _searches;
+    public int Count => _searches;
 
     // ------------------------------------------------------------- the events
 
@@ -219,7 +219,7 @@ class Results
         _seen.Add(text);
 
         var all = new StringBuilder();
-        for (nuint i = 0u; i < _seen.Count(); i = i + 1u)
+        for (nuint i = 0u; i < _seen.Count; i = i + 1u)
         {
             if (i > 0u)
                 all.Append(", ");
@@ -230,7 +230,7 @@ class Results
         Console.WriteLine("searched: " + text);
     }
 
-    public nuint Count() => _seen.Count();
+    public nuint Count => _seen.Count;
 }
 
 public int Main()

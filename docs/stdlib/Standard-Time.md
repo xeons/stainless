@@ -42,7 +42,7 @@ stepped the clock is a bug nobody finds.
     DoTheWork();
     Console.WriteLine(clock.Elapsed().Format());
 
-<sub>[stdlib/Time.sl:711](../../stdlib/Time.sl#L711)</sub>
+<sub>[stdlib/Time.sl:714](../../stdlib/Time.sl#L714)</sub>
 
 #### Elapsed *method*
 
@@ -52,7 +52,7 @@ Duration Elapsed()
 
 How long since it was made, or since `Restart`.
 
-<sub>[stdlib/Time.sl:720](../../stdlib/Time.sl#L720)</sub>
+<sub>[stdlib/Time.sl:723](../../stdlib/Time.sl#L723)</sub>
 
 #### Restart *method*
 
@@ -62,7 +62,7 @@ Duration Restart()
 
 Starts again from now, returning what had passed until this moment.
 
-<sub>[stdlib/Time.sl:726](../../stdlib/Time.sl#L726)</sub>
+<sub>[stdlib/Time.sl:729](../../stdlib/Time.sl#L729)</sub>
 
 #### Monotonic *method*
 
@@ -73,7 +73,7 @@ static Duration Monotonic()
 A reading of the monotonic counter, for code that would rather keep
 the number than an object. Meaningless on its own; subtract two.
 
-<sub>[stdlib/Time.sl:736](../../stdlib/Time.sl#L736)</sub>
+<sub>[stdlib/Time.sl:739](../../stdlib/Time.sl#L739)</sub>
 
 ### DateTime *struct*
 
@@ -87,7 +87,7 @@ Made by `ToUtc` or `ToLocal`, which is what says which zone the numbers are
 in -- the struct itself does not carry that, because a date with no zone is
 exactly as ambiguous as it sounds.
 
-<sub>[stdlib/Time.sl:480](../../stdlib/Time.sl#L480)</sub>
+<sub>[stdlib/Time.sl:483](../../stdlib/Time.sl#L483)</sub>
 
 #### Year *field*
 
@@ -99,7 +99,7 @@ The year, in full. Zero means the instant was outside what the platform
 can name, and every other field is zero with it -- that is how this
 struct reports a failure, since it has no other way to.
 
-<sub>[stdlib/Time.sl:485](../../stdlib/Time.sl#L485)</sub>
+<sub>[stdlib/Time.sl:488](../../stdlib/Time.sl#L488)</sub>
 
 #### Month *field*
 
@@ -109,7 +109,7 @@ int Month
 
 The month, 1 to 12.
 
-<sub>[stdlib/Time.sl:488](../../stdlib/Time.sl#L488)</sub>
+<sub>[stdlib/Time.sl:491](../../stdlib/Time.sl#L491)</sub>
 
 #### Day *field*
 
@@ -119,7 +119,7 @@ int Day
 
 The day of the month, 1 to 31.
 
-<sub>[stdlib/Time.sl:491](../../stdlib/Time.sl#L491)</sub>
+<sub>[stdlib/Time.sl:494](../../stdlib/Time.sl#L494)</sub>
 
 #### Hour *field*
 
@@ -129,7 +129,7 @@ int Hour
 
 The hour, 0 to 23.
 
-<sub>[stdlib/Time.sl:494](../../stdlib/Time.sl#L494)</sub>
+<sub>[stdlib/Time.sl:497](../../stdlib/Time.sl#L497)</sub>
 
 #### Minute *field*
 
@@ -139,7 +139,7 @@ int Minute
 
 The minute, 0 to 59.
 
-<sub>[stdlib/Time.sl:497](../../stdlib/Time.sl#L497)</sub>
+<sub>[stdlib/Time.sl:500](../../stdlib/Time.sl#L500)</sub>
 
 #### Second *field*
 
@@ -150,7 +150,7 @@ int Second
 The second, 0 to 60 -- 60 because a leap second is a real reading of a
 real clock.
 
-<sub>[stdlib/Time.sl:501](../../stdlib/Time.sl#L501)</sub>
+<sub>[stdlib/Time.sl:504](../../stdlib/Time.sl#L504)</sub>
 
 #### Nanosecond *field*
 
@@ -160,7 +160,7 @@ int Nanosecond
 
 Nanoseconds within the second, 0 to 999,999,999.
 
-<sub>[stdlib/Time.sl:504](../../stdlib/Time.sl#L504)</sub>
+<sub>[stdlib/Time.sl:507](../../stdlib/Time.sl#L507)</sub>
 
 #### DayOfWeek *field*
 
@@ -170,7 +170,7 @@ int DayOfWeek
 
 The day of the week, 0 for Sunday through 6 for Saturday.
 
-<sub>[stdlib/Time.sl:507](../../stdlib/Time.sl#L507)</sub>
+<sub>[stdlib/Time.sl:510](../../stdlib/Time.sl#L510)</sub>
 
 #### DayOfYear *field*
 
@@ -180,7 +180,7 @@ int DayOfYear
 
 The day of the year, 1 to 366.
 
-<sub>[stdlib/Time.sl:510](../../stdlib/Time.sl#L510)</sub>
+<sub>[stdlib/Time.sl:513](../../stdlib/Time.sl#L513)</sub>
 
 #### FormatDate *method*
 
@@ -190,7 +190,7 @@ String FormatDate()
 
 The date alone: `2026-09-05`.
 
-<sub>[stdlib/Time.sl:513](../../stdlib/Time.sl#L513)</sub>
+<sub>[stdlib/Time.sl:516](../../stdlib/Time.sl#L516)</sub>
 
 #### FormatTime *method*
 
@@ -200,7 +200,7 @@ String FormatTime()
 
 The time of day alone: `14:30:00`.
 
-<sub>[stdlib/Time.sl:525](../../stdlib/Time.sl#L525)</sub>
+<sub>[stdlib/Time.sl:528](../../stdlib/Time.sl#L528)</sub>
 
 ### Duration *struct*
 
@@ -303,60 +303,60 @@ multiplication overflows a `long` of nanoseconds, silently.
 
 <sub>[stdlib/Time.sl:128](../../stdlib/Time.sl#L128)</sub>
 
-#### TotalMilliseconds *method*
+#### TotalMilliseconds *property*
 
 ```
-long TotalMilliseconds()
+long TotalMilliseconds { get; }
 ```
 
 Whole units, truncated toward zero. 1,500,000ns is 1 millisecond.
 
 <sub>[stdlib/Time.sl:134](../../stdlib/Time.sl#L134)</sub>
 
-#### TotalSeconds *method*
+#### TotalSeconds *property*
 
 ```
-long TotalSeconds()
+long TotalSeconds { get; }
 ```
 
 Whole seconds, truncated toward zero.
 
 <sub>[stdlib/Time.sl:137](../../stdlib/Time.sl#L137)</sub>
 
-#### TotalMinutes *method*
+#### TotalMinutes *property*
 
 ```
-long TotalMinutes()
+long TotalMinutes { get; }
 ```
 
 Whole minutes, truncated toward zero.
 
 <sub>[stdlib/Time.sl:140](../../stdlib/Time.sl#L140)</sub>
 
-#### TotalHours *method*
+#### TotalHours *property*
 
 ```
-long TotalHours()
+long TotalHours { get; }
 ```
 
 Whole hours, truncated toward zero.
 
 <sub>[stdlib/Time.sl:143](../../stdlib/Time.sl#L143)</sub>
 
-#### TotalDays *method*
+#### TotalDays *property*
 
 ```
-long TotalDays()
+long TotalDays { get; }
 ```
 
 Whole 24-hour days, truncated toward zero.
 
 <sub>[stdlib/Time.sl:146](../../stdlib/Time.sl#L146)</sub>
 
-#### AsSeconds *method*
+#### AsSeconds *property*
 
 ```
-double AsSeconds()
+double AsSeconds { get; }
 ```
 
 The same length with fractions kept, for a measurement being reported
@@ -364,20 +364,20 @@ rather than counted.
 
 <sub>[stdlib/Time.sl:150](../../stdlib/Time.sl#L150)</sub>
 
-#### AsMilliseconds *method*
+#### AsMilliseconds *property*
 
 ```
-double AsMilliseconds()
+double AsMilliseconds { get; }
 ```
 
 The same length in milliseconds, fractions kept.
 
 <sub>[stdlib/Time.sl:153](../../stdlib/Time.sl#L153)</sub>
 
-#### IsNegative *method*
+#### IsNegative *property*
 
 ```
-bool IsNegative()
+bool IsNegative { get; }
 ```
 
 True when the length is below zero, which is what subtracting a later
@@ -569,10 +569,10 @@ to measure how long something took.
 
 <sub>[stdlib/Time.sl:313](../../stdlib/Time.sl#L313)</sub>
 
-#### Epoch *method*
+#### Epoch *property*
 
 ```
-static Instant Epoch()
+static Instant Epoch { get; }
 ```
 
 1970-01-01 00:00:00 UTC, which is where the count starts.
@@ -588,7 +588,7 @@ static Instant FromUnixSeconds(long seconds)
 An instant from whole seconds since the epoch -- what a `time_t`, a
 file timestamp and most C APIs carry.
 
-<sub>[stdlib/Time.sl:330](../../stdlib/Time.sl#L330)</sub>
+<sub>[stdlib/Time.sl:333](../../stdlib/Time.sl#L333)</sub>
 
 #### FromUnixMilliseconds *method*
 
@@ -599,7 +599,7 @@ static Instant FromUnixMilliseconds(long milliseconds)
 An instant from milliseconds since the epoch, which is what JavaScript
 and most JSON APIs use.
 
-<sub>[stdlib/Time.sl:339](../../stdlib/Time.sl#L339)</sub>
+<sub>[stdlib/Time.sl:342](../../stdlib/Time.sl#L342)</sub>
 
 #### FromUtc *method*
 
@@ -609,7 +609,7 @@ static Instant FromUtc(int year, int month, int day, int hour, int minute, int s
 
 A UTC date and time as an instant.
 
-<sub>[stdlib/Time.sl:347](../../stdlib/Time.sl#L347)</sub>
+<sub>[stdlib/Time.sl:350](../../stdlib/Time.sl#L350)</sub>
 
 #### FromLocal *method*
 
@@ -621,7 +621,7 @@ A local date and time as an instant. Ambiguous during the hour a clock
 goes back, and impossible during the hour it goes forward; the platform
 decides.
 
-<sub>[stdlib/Time.sl:359](../../stdlib/Time.sl#L359)</sub>
+<sub>[stdlib/Time.sl:362](../../stdlib/Time.sl#L362)</sub>
 
 #### ToUnixSeconds *method*
 
@@ -632,7 +632,7 @@ long ToUnixSeconds()
 Whole seconds since the epoch, rounded toward the epoch. This is what a
 file's modification time is, and what most C APIs speak.
 
-<sub>[stdlib/Time.sl:370](../../stdlib/Time.sl#L370)</sub>
+<sub>[stdlib/Time.sl:373](../../stdlib/Time.sl#L373)</sub>
 
 #### ToUnixMilliseconds *method*
 
@@ -642,7 +642,7 @@ long ToUnixMilliseconds()
 
 Whole milliseconds since the epoch, rounded toward the epoch.
 
-<sub>[stdlib/Time.sl:373](../../stdlib/Time.sl#L373)</sub>
+<sub>[stdlib/Time.sl:376](../../stdlib/Time.sl#L376)</sub>
 
 #### ToUtc *method*
 
@@ -652,7 +652,7 @@ DateTime ToUtc()
 
 This instant as a date and time in UTC.
 
-<sub>[stdlib/Time.sl:376](../../stdlib/Time.sl#L376)</sub>
+<sub>[stdlib/Time.sl:379](../../stdlib/Time.sl#L379)</sub>
 
 #### ToLocal *method*
 
@@ -663,7 +663,7 @@ DateTime ToLocal()
 The same in the machine's local zone, with whatever the platform
 believes about daylight saving.
 
-<sub>[stdlib/Time.sl:380](../../stdlib/Time.sl#L380)</sub>
+<sub>[stdlib/Time.sl:383](../../stdlib/Time.sl#L383)</sub>
 
 #### FormatIso *method*
 
@@ -673,7 +673,7 @@ String FormatIso()
 
 ISO 8601, to the second: `2026-09-05T14:30:00Z`.
 
-<sub>[stdlib/Time.sl:383](../../stdlib/Time.sl#L383)</sub>
+<sub>[stdlib/Time.sl:386](../../stdlib/Time.sl#L386)</sub>
 
 #### ParseIso *method*
 
@@ -690,18 +690,18 @@ a struct is never null (SL0271) -- and because "that is not a date" and
 Deliberately strict: exactly the shape `FormatIso` writes, so a round
 trip is exact and anything else is refused rather than half-read.
 
-<sub>[stdlib/Time.sl:393](../../stdlib/Time.sl#L393)</sub>
+<sub>[stdlib/Time.sl:396](../../stdlib/Time.sl#L396)</sub>
 
-#### ZoneOffsetSeconds *method*
+#### ZoneOffsetSeconds *property*
 
 ```
-long ZoneOffsetSeconds()
+long ZoneOffsetSeconds { get; }
 ```
 
 How far ahead of UTC the local zone was at this instant, in seconds.
 Negative west of Greenwich.
 
-<sub>[stdlib/Time.sl:400](../../stdlib/Time.sl#L400)</sub>
+<sub>[stdlib/Time.sl:403](../../stdlib/Time.sl#L403)</sub>
 
 #### operator - *operator*
 
@@ -711,7 +711,7 @@ static Duration operator -(Instant later, Instant earlier)
 
 How long apart two instants are. Negative if the right one is later.
 
-<sub>[stdlib/Time.sl:403](../../stdlib/Time.sl#L403)</sub>
+<sub>[stdlib/Time.sl:406](../../stdlib/Time.sl#L406)</sub>
 
 #### operator + *operator*
 
@@ -722,7 +722,7 @@ static Instant operator +(Instant at, Duration span)
 An instant moved forward by a length of time. Exact nanoseconds, so a
 day added is 24 hours and not a calendar day.
 
-<sub>[stdlib/Time.sl:410](../../stdlib/Time.sl#L410)</sub>
+<sub>[stdlib/Time.sl:413](../../stdlib/Time.sl#L413)</sub>
 
 #### operator - *operator*
 
@@ -732,7 +732,7 @@ static Instant operator -(Instant at, Duration span)
 
 An instant moved back by a length of time.
 
-<sub>[stdlib/Time.sl:418](../../stdlib/Time.sl#L418)</sub>
+<sub>[stdlib/Time.sl:421](../../stdlib/Time.sl#L421)</sub>
 
 #### operator == *operator*
 
@@ -742,7 +742,7 @@ static bool operator ==(Instant left, Instant right)
 
 Whether the two name the same nanosecond.
 
-<sub>[stdlib/Time.sl:426](../../stdlib/Time.sl#L426)</sub>
+<sub>[stdlib/Time.sl:429](../../stdlib/Time.sl#L429)</sub>
 
 #### operator != *operator*
 
@@ -752,7 +752,7 @@ static bool operator !=(Instant left, Instant right)
 
 Whether they name different nanoseconds.
 
-<sub>[stdlib/Time.sl:432](../../stdlib/Time.sl#L432)</sub>
+<sub>[stdlib/Time.sl:435](../../stdlib/Time.sl#L435)</sub>
 
 #### operator &lt; *operator*
 
@@ -762,7 +762,7 @@ static bool operator <(Instant left, Instant right)
 
 Whether `left` is the earlier.
 
-<sub>[stdlib/Time.sl:438](../../stdlib/Time.sl#L438)</sub>
+<sub>[stdlib/Time.sl:441](../../stdlib/Time.sl#L441)</sub>
 
 #### operator &gt; *operator*
 
@@ -772,7 +772,7 @@ static bool operator >(Instant left, Instant right)
 
 Whether `left` is the later.
 
-<sub>[stdlib/Time.sl:444](../../stdlib/Time.sl#L444)</sub>
+<sub>[stdlib/Time.sl:447](../../stdlib/Time.sl#L447)</sub>
 
 #### operator &lt;= *operator*
 
@@ -782,7 +782,7 @@ static bool operator <=(Instant left, Instant right)
 
 Whether `left` is no later than `right`.
 
-<sub>[stdlib/Time.sl:450](../../stdlib/Time.sl#L450)</sub>
+<sub>[stdlib/Time.sl:453](../../stdlib/Time.sl#L453)</sub>
 
 #### operator &gt;= *operator*
 
@@ -792,7 +792,7 @@ static bool operator >=(Instant left, Instant right)
 
 Whether `left` is no earlier than `right`.
 
-<sub>[stdlib/Time.sl:456](../../stdlib/Time.sl#L456)</sub>
+<sub>[stdlib/Time.sl:459](../../stdlib/Time.sl#L459)</sub>
 
 #### Compare *method*
 
@@ -803,7 +803,7 @@ static int Compare(Instant left, Instant right)
 -1, 0 or 1, for sorting. The operators answer the question a program
 usually has; this answers the one a sort has.
 
-<sub>[stdlib/Time.sl:463](../../stdlib/Time.sl#L463)</sub>
+<sub>[stdlib/Time.sl:466](../../stdlib/Time.sl#L466)</sub>
 
 ### TimeError *enum*
 
@@ -813,7 +813,7 @@ enum TimeError
 
 Why a moment could not be read.
 
-<sub>[stdlib/Time.sl:630](../../stdlib/Time.sl#L630)</sub>
+<sub>[stdlib/Time.sl:633](../../stdlib/Time.sl#L633)</sub>
 
 #### None *case*
 
@@ -824,7 +824,7 @@ None
 Nothing went wrong. Present so the enum has a zero value; a `Result`
 says success by being `Ok`, so this is not what a failure carries.
 
-<sub>[stdlib/Time.sl:634](../../stdlib/Time.sl#L634)</sub>
+<sub>[stdlib/Time.sl:637](../../stdlib/Time.sl#L637)</sub>
 
 #### Malformed *case*
 
@@ -835,7 +835,7 @@ Malformed
 Not the shape `FormatIso` writes -- the wrong length, or a separator
 in the wrong place, or something that is not a digit where one belongs.
 
-<sub>[stdlib/Time.sl:638](../../stdlib/Time.sl#L638)</sub>
+<sub>[stdlib/Time.sl:641](../../stdlib/Time.sl#L641)</sub>
 
 #### OutOfRange *case*
 
@@ -846,7 +846,7 @@ OutOfRange
 The right shape and not a real moment: the 31st of February, a month of
 13, an hour of 24.
 
-<sub>[stdlib/Time.sl:642](../../stdlib/Time.sl#L642)</sub>
+<sub>[stdlib/Time.sl:645](../../stdlib/Time.sl#L645)</sub>
 
 ## Functions
 
@@ -858,7 +858,7 @@ int DaysInMonth(int year, int month)
 
 How many days a month has, which for February depends on the year.
 
-<sub>[stdlib/Time.sl:581](../../stdlib/Time.sl#L581)</sub>
+<sub>[stdlib/Time.sl:584](../../stdlib/Time.sl#L584)</sub>
 
 ### IsLeapYear *function*
 
@@ -868,7 +868,7 @@ bool IsLeapYear(int year)
 
 Whether a year has 366 days, by the Gregorian rule.
 
-<sub>[stdlib/Time.sl:571](../../stdlib/Time.sl#L571)</sub>
+<sub>[stdlib/Time.sl:574](../../stdlib/Time.sl#L574)</sub>
 
 ## Constants
 

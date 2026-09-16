@@ -358,7 +358,7 @@ public class Notebook : Panel
             return -1;
         var list = (List<NotebookPage>)held;
         list.Add(page);
-        int at = (int)list.Count() - 1;
+        int at = (int)list.Count - 1;
         // The first page added becomes the one showing, so a notebook is never
         // a blank rectangle with pages in it that nothing selected.
         if (_chosen < 0)
@@ -378,7 +378,7 @@ public class Notebook : Panel
         }
     }
 
-    public int PageCount => (int)Pages.Count();
+    public int PageCount => (int)Pages.Count;
 
     /// Which page is showing, or -1 for a notebook with none.
     public int SelectedIndex
@@ -405,7 +405,7 @@ public class Notebook : Panel
         get
         {
             var list = Pages;
-            if (_chosen < 0 || (nuint)_chosen >= list.Count())
+            if (_chosen < 0 || (nuint)_chosen >= list.Count)
                 return null;
             return list.At((nuint)_chosen);
         }
@@ -416,7 +416,7 @@ public class Notebook : Panel
     public NotebookPage? Find(String name)
     {
         var list = Pages;
-        for (nuint i = 0u; i < list.Count(); i++)
+        for (nuint i = 0u; i < list.Count; i++)
         {
             if (list.At(i).Caption == name)
                 return list.At(i);
@@ -434,7 +434,7 @@ public class Notebook : Panel
         var list = Pages;
         nuint at = 0u;
         bool found = false;
-        for (nuint i = 0u; i < list.Count(); i++)
+        for (nuint i = 0u; i < list.Count; i++)
         {
             if (list.At(i) == page)
             {
@@ -448,13 +448,13 @@ public class Notebook : Panel
 
         list.RemoveAt(at);
         page.Visible = false;
-        for (nuint i = at; i < list.Count(); i++)
+        for (nuint i = at; i < list.Count; i++)
             list.At(i).Renumber((int)i);
 
         // Removing the page that was showing moves the selection to whatever
         // took its place, or to the last page when it was the last.
-        if (_chosen >= (int)list.Count())
-            _chosen = (int)list.Count() - 1;
+        if (_chosen >= (int)list.Count)
+            _chosen = (int)list.Count - 1;
         ShowOnly();
         OnSelectedIndexChanged();
         return true;
@@ -472,7 +472,7 @@ public class Notebook : Panel
             return;
         var list = (List<NotebookPage>)held;
         var area = ClientBounds;
-        for (nuint i = 0u; i < list.Count(); i++)
+        for (nuint i = 0u; i < list.Count; i++)
         {
             var page = list.At(i);
             bool wanted = (int)i == _chosen;

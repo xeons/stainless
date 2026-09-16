@@ -9,7 +9,7 @@
 compiled alongside your program.
 
 **A generic that nobody instantiates costs nothing**, because there is nothing
-to emit until it is instantiated. That covers `List<T>`, `Dictionary<K, V>`,
+to emit until it is instantiated. That covers `List<T>`, `Dictionary<TKey, TValue>`,
 `Mutex<T>`, every container and every concurrent one.
 
 **A non-generic function or class is emitted whether or not it is used**, and
@@ -52,7 +52,7 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
-| `Standard` | `Result<T, E>`, `[Flags]`, and the rest of what the language itself reads | automatically |
+| `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
 ## 5.2 `Standard.Threading`
 
@@ -165,12 +165,12 @@ the built-in one.
 | Type | Backed by | Notes |
 |---|---|---|
 | `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>`; `list[i]` |
-| `Dictionary<K, V>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<K, V>`; `map[k]` → `Optional<V>` |
+| `Dictionary<TKey, TValue>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<TKey, TValue>`; `map[k]` → `Optional<V>` |
 | `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
 | `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
 | `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
 | `LinkedList<T>` | an index pool | handles, not references — see below |
-| `SortedList<K, V>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
+| `SortedList<TKey, TValue>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
 
 `List<T>` carries an indexer ([§7.5](07-functions-members.md#75-indexers)), so `list[i] += 1` reads and writes the
 way an array does. `At` and `Set` remain, because an interface has no indexers
@@ -217,7 +217,7 @@ The named forms remain, each saying which question it asks:
 `Find` costs one probe where `ContainsKey` then `Get` costs two, and it has no
 sentinel to collide with a real value the way `GetOr` does. `Get` is the
 asserting form and it asserts: use it where the key is there by construction.
-`SortedList<K, V>` answers the same ways, minus the indexer.
+`SortedList<TKey, TValue>` answers the same ways, minus the indexer.
 
 Every one of them is **walked in place when iterated**. That is worth saying
 because it was not always so: several used to build a whole `List<T>` before
@@ -251,7 +251,7 @@ for (nint at = line.First(); at >= 0; at = line.After(at)) {
 }
 ```
 
-`OrderedDictionary<K, V>` keeps the order its keys were added in and finds one
+`OrderedDictionary<TKey, TValue>` keeps the order its keys were added in and finds one
 by scanning rather than hashing. That is the whole difference from
 `Dictionary`, and it is the right trade wherever the order is part of the data
 — a parsed document read back the way it was written, a configuration a person
@@ -464,7 +464,7 @@ var got = work.TryDequeue();
 if (got.Ok) { Console.WriteLine(got.Value); }
 ```
 
-`ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<K, V>` and
+`ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<TKey, TValue>` and
 `Channel<T>`, each `threadsafe` and each safe for several threads at once.
 
 Every operation that can fail returns a `Taken<T>` — whether there was

@@ -35,7 +35,7 @@ attribute XmlAttribute
 
 Writes the field as an attribute of its element rather than as a child.
 
-<sub>[stdlib/Xml.sl:891](../../stdlib/Xml.sl#L891)</sub>
+<sub>[stdlib/Xml.sl:892](../../stdlib/Xml.sl#L892)</sub>
 
 ### XmlAttributes *class*
 
@@ -51,10 +51,10 @@ wrote.
 
 <sub>[stdlib/Xml.sl:121](../../stdlib/Xml.sl#L121)</sub>
 
-#### Count *method*
+#### Count *property*
 
 ```
-nuint Count()
+nuint Count { get; }
 ```
 
 How many attributes there are.
@@ -153,7 +153,7 @@ attribute XmlCreate
 Lets a reader make this field's object when the element is there and the
 field is null. The same opt-in, and the same hazard, as `[JsonCreate]`.
 
-<sub>[stdlib/Xml.sl:898](../../stdlib/Xml.sl#L898)</sub>
+<sub>[stdlib/Xml.sl:899](../../stdlib/Xml.sl#L899)</sub>
 
 ### XmlError *enum*
 
@@ -304,7 +304,7 @@ attribute XmlIgnore
 
 Leaves the field out entirely, in both directions.
 
-<sub>[stdlib/Xml.sl:894](../../stdlib/Xml.sl#L894)</sub>
+<sub>[stdlib/Xml.sl:895](../../stdlib/Xml.sl#L895)</sub>
 
 ### XmlName *attribute*
 
@@ -314,7 +314,7 @@ attribute XmlName
 
 The element name a field is written as, when it differs from the field's.
 
-<sub>[stdlib/Xml.sl:888](../../stdlib/Xml.sl#L888)</sub>
+<sub>[stdlib/Xml.sl:889](../../stdlib/Xml.sl#L889)</sub>
 
 ### XmlNode *class*
 
@@ -437,7 +437,7 @@ Result<XmlNode, XmlError> Parse(String source)
 
 Reads a whole document and answers with its root element.
 
-<sub>[stdlib/Xml.sl:704](../../stdlib/Xml.sl#L704)</sub>
+<sub>[stdlib/Xml.sl:705](../../stdlib/Xml.sl#L705)</sub>
 
 ### Populate *function*
 
@@ -451,7 +451,7 @@ The object is the program's, for the reason `Json.Populate` takes one: its
 constructor has run, so a field the document does not mention keeps the
 value the type promised rather than a zero.
 
-<sub>[stdlib/Xml.sl:1070](../../stdlib/Xml.sl#L1070)</sub>
+<sub>[stdlib/Xml.sl:1071](../../stdlib/Xml.sl#L1071)</sub>
 
 ### PopulateFrom *function*
 
@@ -461,7 +461,7 @@ XmlError PopulateFrom<T>(T value, XmlNode node)
 
 The same, from an element already parsed.
 
-<sub>[stdlib/Xml.sl:1080](../../stdlib/Xml.sl#L1080)</sub>
+<sub>[stdlib/Xml.sl:1081](../../stdlib/Xml.sl#L1081)</sub>
 
 ### Serialize *function*
 
@@ -471,7 +471,7 @@ String Serialize<T>(T value, String name)
 
 The element as text.
 
-<sub>[stdlib/Xml.sl:911](../../stdlib/Xml.sl#L911)</sub>
+<sub>[stdlib/Xml.sl:912](../../stdlib/Xml.sl#L912)</sub>
 
 ### SerializeDocument *function*
 
@@ -481,7 +481,7 @@ String SerializeDocument<T>(T value, String name)
 
 The same, with a declaration and indentation.
 
-<sub>[stdlib/Xml.sl:914](../../stdlib/Xml.sl#L914)</sub>
+<sub>[stdlib/Xml.sl:915](../../stdlib/Xml.sl#L915)</sub>
 
 ### ToNode *function*
 
@@ -495,7 +495,7 @@ A field marked `[XmlAttribute]` becomes an attribute instead, which is what
 makes the output look like XML a person would have written rather than a
 JSON document with angle brackets.
 
-<sub>[stdlib/Xml.sl:905](../../stdlib/Xml.sl#L905)</sub>
+<sub>[stdlib/Xml.sl:906](../../stdlib/Xml.sl#L906)</sub>
 
 ### Write *function*
 
@@ -505,7 +505,7 @@ String Write(XmlNode node)
 
 The element as text, on one line.
 
-<sub>[stdlib/Xml.sl:751](../../stdlib/Xml.sl#L751)</sub>
+<sub>[stdlib/Xml.sl:752](../../stdlib/Xml.sl#L752)</sub>
 
 ### WriteDocument *function*
 
@@ -515,7 +515,7 @@ String WriteDocument(XmlNode node)
 
 The declaration and the element under it, which is what a whole file wants.
 
-<sub>[stdlib/Xml.sl:769](../../stdlib/Xml.sl#L769)</sub>
+<sub>[stdlib/Xml.sl:770](../../stdlib/Xml.sl#L770)</sub>
 
 ### WriteIndented *function*
 
@@ -527,7 +527,7 @@ The same, indented two spaces a level. An element with text in it is still
 written on one line, because the whitespace an indent adds would become
 part of that text when it was read back.
 
-<sub>[stdlib/Xml.sl:761](../../stdlib/Xml.sl#L761)</sub>
+<sub>[stdlib/Xml.sl:762](../../stdlib/Xml.sl#L762)</sub>
 
 ## Constants
 

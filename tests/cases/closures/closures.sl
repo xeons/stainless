@@ -18,7 +18,7 @@ class Tag
 {
     String _name;
     public Tag(String n) => _name = n;
-    public String Name() => _name;
+    public String Name => _name;
     ~Tag() { printf("~Tag(%s)\n", _name.ToPointer()); }
 }
 
@@ -31,7 +31,7 @@ ITransform MakeAdder(int amount)
 int ApplyAll(IReadOnlyList<ITransform> steps, int start)
 {
     int result = start;
-    for (nuint i = 0; i < steps.Count(); i = i + 1)
+    for (nuint i = 0; i < steps.Count; i = i + 1)
     {
         result = steps.At(i).Apply(result);
     }
@@ -80,7 +80,7 @@ int Main()
     printf("before\n");
     {
         var tag = new Tag("held");
-        IAction announce = () => Console.WriteLine(tag.Name());
+        IAction announce = () => Console.WriteLine(tag.Name);
         announce.Run();
         printf("leaving\n");
     }

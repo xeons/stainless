@@ -70,7 +70,7 @@ public String Describe(uint code)
     var buffer = new WideBuffer(1024u);
     uint units = FormatMessageW(
         FormatMessageFromSystem | FormatMessageIgnoreInserts,
-        null, code, 0u, buffer.Pointer(), buffer.Capacity(), null);
+        null, code, 0u, buffer.Pointer(), buffer.Capacity, null);
 
     if (units == 0u)
         return "";
@@ -124,7 +124,7 @@ public bool Failed(int result) => result == 0;
 ///
 /// ```
 /// var buffer = new WideBuffer(260u);
-/// uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity());
+/// uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity);
 /// String path = buffer.Text(units);
 /// ```
 ///
@@ -158,7 +158,7 @@ public class WideBuffer
 
     /// How many units fit, not counting the terminator. This is the number
     /// nearly every wide API wants as its size argument.
-    public uint Capacity() => _capacity;
+    public uint Capacity => _capacity;
 
     /// One unit, without a bounds check — this is a raw buffer and reading past
     /// the end is the caller's mistake to avoid, as it is in C.
@@ -199,7 +199,7 @@ public class ByteBuffer
     ~ByteBuffer() { free((void*)_bytes); }
 
     public byte* Pointer() => _bytes;
-    public uint Capacity() => _capacity;
+    public uint Capacity => _capacity;
 
     /// One byte, unchecked.
     public byte At(uint index) => _bytes[index];

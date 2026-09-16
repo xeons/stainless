@@ -61,7 +61,7 @@ public abstract class ListControl : WindowedControl
     protected override Color DefaultForeColor => SystemColors.WindowText;
 
     /// How many items there are.
-    public nuint Count => _entries.Count();
+    public nuint Count => _entries.Count;
 
     /// One item, by position.
     public String ItemAt(nuint index) => _entries.At(index);
@@ -71,8 +71,8 @@ public abstract class ListControl : WindowedControl
     {
         get
         {
-            var all = new String[_entries.Count()];
-            for (nuint i = 0u; i < _entries.Count(); i++)
+            var all = new String[_entries.Count];
+            for (nuint i = 0u; i < _entries.Count; i++)
                 all[i] = _entries.At(i);
             return all;
         }
@@ -87,7 +87,7 @@ public abstract class ListControl : WindowedControl
     /// Adds an item to the end.
     public void Add(String text)
     {
-        List.InsertItem((int)_entries.Count(), text);
+        List.InsertItem((int)_entries.Count, text);
         _entries.Add(text);
     }
 
@@ -129,7 +129,7 @@ public abstract class ListControl : WindowedControl
         get
         {
             int at = SelectedIndex;
-            if (at < 0 || (nuint)at >= _entries.Count())
+            if (at < 0 || (nuint)at >= _entries.Count)
                 return null;
             return _entries.At((nuint)at);
         }

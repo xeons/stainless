@@ -38,7 +38,7 @@ public struct Rect
         return at;
     }
 
-    public int Width() => BottomRight.X - TopLeft.X;
+    public int Width => BottomRight.X - TopLeft.X;
 }
 
 // ----------------------------------------------------------- inside a class
@@ -120,7 +120,7 @@ public int Main()
 
     Console.WriteLine($"corner   {corner.X},{corner.Y}");
     Console.WriteLine($"middle   {box.Middle().X},{box.Middle().Y}");
-    Console.WriteLine($"width    {box.Width()}");
+    Console.WriteLine($"width    {box.Width}");
 
     // Nesting says nothing about layout: a Rect is four ints, and a Point two.
     Console.WriteLine($"sizes    {sizeof(Rect)} {sizeof(Rect.Point)}");

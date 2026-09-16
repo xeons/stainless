@@ -238,7 +238,7 @@ public String Text(uint id) => TextIn(Self(), id);
 public String TextIn(HMODULE library, uint id)
 {
     var buffer = new WideBuffer(4096u);
-    int units = LoadStringW((HINSTANCE)library, id, buffer.Pointer(), (int)buffer.Capacity());
+    int units = LoadStringW((HINSTANCE)library, id, buffer.Pointer(), (int)buffer.Capacity);
     if (units <= 0)
         return "";
     return buffer.Text((uint)units);
@@ -378,7 +378,7 @@ public FileVersion VersionOf(String path)
 public FileVersion Version()
 {
     var buffer = new WideBuffer(32768u);
-    uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity());
+    uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity);
     if (units == 0u)
     {
         FileVersion none;

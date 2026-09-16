@@ -169,9 +169,9 @@ public class GtkModelPeer : GtkPeer
 
         ConnectPlain((GtkWidget*)selection, "changed", () =>
         {
-            if (Echoing())
+            if (Echoing)
                 return;
-            var target2 = Owner();
+            var target2 = Owner;
             if (target2 != null)
                 ((IControlNotify)target2).OnPlatformValueChanged();
         });
@@ -192,7 +192,7 @@ public class GtkModelPeer : GtkPeer
             if (clicks != 2u)
                 return false;
 
-            var target2 = Owner();
+            var target2 = Owner;
             if (target2 != null)
                 ((IControlNotify)target2).OnPlatformActivated();
             return false;
@@ -218,25 +218,28 @@ public class GtkModelPeer : GtkPeer
     /// indices rather than the printed path, which would have to be parsed:
     /// `"3:1"` is the second child of the fourth root, and a flat model only
     /// ever produces the first number.
-    protected int SelectedRow()
+    protected int SelectedRow
     {
-        GtkTreeIter row;
-        if (gtk_tree_selection_get_selected(selection, null, &row) == 0)
-            return -1;
-
-        gpointer path = gtk_tree_model_get_path(model, &row);
-        if (path == null)
-            return -1;
-
-        int index = -1;
-        if (gtk_tree_path_get_depth(path) > 0)
+        get
         {
-            gint* indices = gtk_tree_path_get_indices(path);
-            if (indices != null)
-                index = indices[0u];
+            GtkTreeIter row;
+            if (gtk_tree_selection_get_selected(selection, null, &row) == 0)
+                return -1;
+
+            gpointer path = gtk_tree_model_get_path(model, &row);
+            if (path == null)
+                return -1;
+
+            int index = -1;
+            if (gtk_tree_path_get_depth(path) > 0)
+            {
+                gint* indices = gtk_tree_path_get_indices(path);
+                if (indices != null)
+                    index = indices[0u];
+            }
+            gtk_tree_path_free(path);
+            return index;
         }
-        gtk_tree_path_free(path);
-        return index;
     }
 
     protected void SelectRow(int index)
@@ -294,10 +297,10 @@ public class GtkListPeer : GtkModelPeer, IListPeer
     }
 
     public void ClearItems() => gtk_list_store_clear(model);
-    public int  ItemCount() => RowCountOf();
+    public int ItemCount => RowCountOf();
 
     public void SetSelectedIndex(int index) => SelectRow(index);
-    public int  GetSelectedIndex() => SelectedRow();
+    public int  GetSelectedIndex() => SelectedRow;
 }
 
 // ============================================================= checked list
@@ -353,7 +356,7 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
         }
         PutFlag(model, &row, 0, !TakeFlag(model, &row, 0));
 
-        var target2 = Owner();
+        var target2 = Owner;
         if (target2 != null)
             ((IControlNotify)target2).OnPlatformValueChanged();
     }
@@ -383,10 +386,10 @@ public class GtkCheckListPeer : GtkModelPeer, ICheckListPeer
     }
 
     public void ClearItems() => gtk_list_store_clear(model);
-    public int  ItemCount() => RowCountOf();
+    public int ItemCount => RowCountOf();
 
     public void SetSelectedIndex(int index) => SelectRow(index);
-    public int  GetSelectedIndex() => SelectedRow();
+    public int  GetSelectedIndex() => SelectedRow;
 
     public void SetItemChecked(int index, bool checked)
     {
@@ -441,12 +444,12 @@ public class GtkHeaderPeer : GtkPeer, IHeaderPeer
         gtk_tree_view_append_column(widget, column);
         _sections.Add(column);
         _widths.Add(width);
-        return (int)_sections.Count() - 1;
+        return (int)_sections.Count - 1;
     }
 
     public void SetSectionWidth(int index, int width)
     {
-        if (index < 0 || (nuint)index >= _sections.Count())
+        if (index < 0 || (nuint)index >= _sections.Count)
             return;
         gtk_tree_view_column_set_fixed_width(_sections[(nuint)index], width);
         _widths[(nuint)index] = width;
@@ -454,12 +457,12 @@ public class GtkHeaderPeer : GtkPeer, IHeaderPeer
 
     public int GetSectionWidth(int index)
     {
-        if (index < 0 || (nuint)index >= _widths.Count())
+        if (index < 0 || (nuint)index >= _widths.Count)
             return 0;
         return _widths[(nuint)index];
     }
 
-    public int SectionCount() => (int)_sections.Count();
+    public int SectionCount => (int)_sections.Count;
 }
 
 // ================================================================== a tree
@@ -475,7 +478,7 @@ public class GtkTreeNode : ITreeNodeHandle
 {
     public nuint Number { get; }
     public GtkTreeNode(nuint id) => Number = id;
-    public nuint Id() => Number;
+    public nuint Id => Number;
 }
 
 public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
@@ -531,7 +534,7 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         if (node == null)
             return false;
 
-        var found = _nodes.Find(((ITreeNodeHandle)node).Id());
+        var found = _nodes.Find(((ITreeNodeHandle)node).Id);
         if (found is Some held)
         {
             gpointer path = gtk_tree_row_reference_get_path(held.Value);
@@ -585,11 +588,11 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         if (IterFor(node, &row))
             gtk_tree_store_remove(model, &row);
 
-        var found = _nodes.Find(node.Id());
+        var found = _nodes.Find(node.Id);
         if (found is Some held)
         {
             gtk_tree_row_reference_free(held.Value);
-            _nodes.Remove(node.Id());
+            _nodes.Remove(node.Id);
         }
     }
 
@@ -738,7 +741,7 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
 
     public int AddColumn(String text, int width, HorizontalAlignment alignment)
     {
-        int index = (int)_headings.Count();
+        int index = (int)_headings.Count;
         if (index >= _columns)
             return -1;
 
@@ -772,7 +775,7 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
 
     public void SetColumnWidth(int column, int width)
     {
-        if (column < 0 || (nuint)column >= _headings.Count())
+        if (column < 0 || (nuint)column >= _headings.Count)
             return;
         gtk_tree_view_column_set_fixed_width(_headings[(nuint)column], width);
     }
@@ -817,9 +820,9 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
     }
 
     public void Clear() => gtk_list_store_clear(model);
-    public int  RowCount() => RowCountOf();
+    public int RowCount => RowCountOf();
 
-    public int  GetSelectedRow() => SelectedRow();
+    public int  GetSelectedRow() => SelectedRow;
     public void SetSelectedRow(int row) => SelectRow(row);
 
     public void SetImages(IImageListBackend images)
