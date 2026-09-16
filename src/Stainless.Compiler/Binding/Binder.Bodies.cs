@@ -1678,17 +1678,25 @@ public sealed partial class Binder
             return null;
         }
 
-        if (getEnumerator.ReturnType is not NamedTypeSymbol enumerator ||
+        // `Current` is a property, so what is looked for first is its getter,
+        // `get_Current`. A method of the bare name is still accepted: it is
+        // what an enumerator written before this looked like, and the two
+        // lower to the same single call.
+        var enumerator = getEnumerator.ReturnType as NamedTypeSymbol;
+        var current = enumerator is null ? null
+            : enumerator.FindMethod("get_Current") ?? enumerator.FindMethod("Current");
+
+        if (enumerator is null ||
             enumerator.FindMethod("MoveNext") is not { } moveNext ||
             !moveNext.ReturnType.IsBool() ||
             moveNext.Parameters.Count(p => !p.IsThis) != 0 ||
-            enumerator.FindMethod("Current") is not { } current ||
+            current is null ||
             current.Parameters.Count(p => !p.IsThis) != 0 ||
             current.ReturnType.IsVoid())
         {
             diagnostics.Error("SL0357", syntax.Collection.Span,
                 $"'{sequence.Type.Name}.GetEnumerator()' returns '{getEnumerator.ReturnType.Name}', " +
-                "which is not an enumerator; that needs a 'bool MoveNext()' and a 'Current()' " +
+                "which is not an enumerator; that needs a 'bool MoveNext()' and a 'Current' " +
                 "returning the element");
             return null;
         }
