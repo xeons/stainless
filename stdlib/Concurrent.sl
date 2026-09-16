@@ -94,45 +94,45 @@ public class Taken<T>
 /// A first-in, first-out queue several threads may use at once.
 public threadsafe class ConcurrentQueue<T>
 {
-    Queue<T> items;
-    byte* gate;
-    T[] blank;
+    Queue<T> _items;
+    byte* _gate;
+    T[] _blank;
 
     /// An empty queue, with its own mutex. The mutex is freed when the queue
     /// is, so there is nothing to dispose.
     public ConcurrentQueue()
     {
-        items = new Queue<T>();
-        gate = sl_mutex_new();
-        blank = new T[1];
+        _items = new Queue<T>();
+        _gate = sl_mutex_new();
+        _blank = new T[1];
     }
 
-    ~ConcurrentQueue() { sl_mutex_free(gate); }
+    ~ConcurrentQueue() { sl_mutex_free(_gate); }
 
     /// Adds to the back. Blocks only for as long as the lock is held, which is
     /// the enqueue itself; there is no bound on the queue, so this never waits
     /// for a consumer.
     public void Enqueue(T item)
     {
-        sl_mutex_lock(gate);
-        items.Enqueue(item);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        _items.Enqueue(item);
+        sl_mutex_unlock(_gate);
     }
 
     /// Takes the front item if there is one. The answer and the item come back
     /// together, because asking twice would race.
     public Taken<T> TryDequeue()
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (items.IsEmpty())
+        if (_items.IsEmpty())
         {
-            sl_mutex_unlock(gate);
-            return new Taken<T>(false, blank[0]);
+            sl_mutex_unlock(_gate);
+            return new Taken<T>(false, _blank[0]);
         }
 
-        var item = items.Dequeue();
-        sl_mutex_unlock(gate);
+        var item = _items.Dequeue();
+        sl_mutex_unlock(_gate);
         return new Taken<T>(true, item);
     }
 
@@ -140,16 +140,16 @@ public threadsafe class ConcurrentQueue<T>
     /// `TryDequeue` without the allocation, for when a sentinel will do.
     public T DequeueOr(T fallback)
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (items.IsEmpty())
+        if (_items.IsEmpty())
         {
-            sl_mutex_unlock(gate);
+            sl_mutex_unlock(_gate);
             return fallback;
         }
 
-        var item = items.Dequeue();
-        sl_mutex_unlock(gate);
+        var item = _items.Dequeue();
+        sl_mutex_unlock(_gate);
         return item;
     }
 
@@ -157,9 +157,9 @@ public threadsafe class ConcurrentQueue<T>
     /// act on it, so this is for reporting rather than for deciding.
     public nuint Count()
     {
-        sl_mutex_lock(gate);
-        nuint result = items.Count();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        nuint result = _items.Count();
+        sl_mutex_unlock(_gate);
         return result;
     }
 
@@ -172,9 +172,9 @@ public threadsafe class ConcurrentQueue<T>
     /// moment it is returned.
     public List<T> ToList()
     {
-        sl_mutex_lock(gate);
-        var copy = items.ToList();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        var copy = _items.ToList();
+        sl_mutex_unlock(_gate);
         return copy;
     }
 }
@@ -184,26 +184,26 @@ public threadsafe class ConcurrentQueue<T>
 /// A last-in, first-out stack several threads may use at once.
 public threadsafe class ConcurrentStack<T>
 {
-    Stack<T> items;
-    byte* gate;
-    T[] blank;
+    Stack<T> _items;
+    byte* _gate;
+    T[] _blank;
 
     /// An empty stack, with its own mutex.
     public ConcurrentStack()
     {
-        items = new Stack<T>();
-        gate = sl_mutex_new();
-        blank = new T[1];
+        _items = new Stack<T>();
+        _gate = sl_mutex_new();
+        _blank = new T[1];
     }
 
-    ~ConcurrentStack() { sl_mutex_free(gate); }
+    ~ConcurrentStack() { sl_mutex_free(_gate); }
 
     /// Adds to the top. Never waits for a consumer -- the stack is unbounded.
     public void Push(T item)
     {
-        sl_mutex_lock(gate);
-        items.Push(item);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        _items.Push(item);
+        sl_mutex_unlock(_gate);
     }
 
     /// Takes the top item if there is one. The answer and the item come back
@@ -211,16 +211,16 @@ public threadsafe class ConcurrentStack<T>
     /// race with every other thread.
     public Taken<T> TryPop()
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (items.IsEmpty())
+        if (_items.IsEmpty())
         {
-            sl_mutex_unlock(gate);
-            return new Taken<T>(false, blank[0]);
+            sl_mutex_unlock(_gate);
+            return new Taken<T>(false, _blank[0]);
         }
 
-        var item = items.Pop();
-        sl_mutex_unlock(gate);
+        var item = _items.Pop();
+        sl_mutex_unlock(_gate);
         return new Taken<T>(true, item);
     }
 
@@ -229,16 +229,16 @@ public threadsafe class ConcurrentStack<T>
     /// it will not if `fallback` is a value the stack might hold.
     public T PopOr(T fallback)
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (items.IsEmpty())
+        if (_items.IsEmpty())
         {
-            sl_mutex_unlock(gate);
+            sl_mutex_unlock(_gate);
             return fallback;
         }
 
-        var item = items.Pop();
-        sl_mutex_unlock(gate);
+        var item = _items.Pop();
+        sl_mutex_unlock(_gate);
         return item;
     }
 
@@ -246,9 +246,9 @@ public threadsafe class ConcurrentStack<T>
     /// deciding: another thread may change it before you act on it.
     public nuint Count()
     {
-        sl_mutex_lock(gate);
-        nuint result = items.Count();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        nuint result = _items.Count();
+        sl_mutex_unlock(_gate);
         return result;
     }
 
@@ -259,9 +259,9 @@ public threadsafe class ConcurrentStack<T>
     /// moment it is returned.
     public List<T> ToList()
     {
-        sl_mutex_lock(gate);
-        var copy = items.ToList();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        var copy = _items.ToList();
+        sl_mutex_unlock(_gate);
         return copy;
     }
 }
@@ -271,27 +271,27 @@ public threadsafe class ConcurrentStack<T>
 /// A map several threads may use at once.
 public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHashable
 {
-    Dictionary<K, V> entries;
-    byte* gate;
-    V[] blank;
+    Dictionary<K, V> _entries;
+    byte* _gate;
+    V[] _blank;
 
     /// An empty map, with its own mutex.
     public ConcurrentDictionary()
     {
-        entries = new Dictionary<K, V>();
-        gate = sl_mutex_new();
-        blank = new V[1];
+        _entries = new Dictionary<K, V>();
+        _gate = sl_mutex_new();
+        _blank = new V[1];
     }
 
-    ~ConcurrentDictionary() { sl_mutex_free(gate); }
+    ~ConcurrentDictionary() { sl_mutex_free(_gate); }
 
     /// Sets the value of a key, whether or not it was there. `Add` is the one
     /// that refuses to overwrite.
     public void Set(K key, V value)
     {
-        sl_mutex_lock(gate);
-        entries.Set(key, value);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        _entries.Set(key, value);
+        sl_mutex_unlock(_gate);
     }
 
     /// Adds the key only if it is absent, reporting whether it did. This is the
@@ -299,9 +299,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// another thread can insert.
     public bool Add(K key, V value)
     {
-        sl_mutex_lock(gate);
-        bool added = entries.Add(key, value);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        bool added = _entries.Add(key, value);
+        sl_mutex_unlock(_gate);
         return added;
     }
 
@@ -310,16 +310,16 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// between those two another thread can remove the key.
     public Taken<V> TryGet(K key)
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (!entries.ContainsKey(key))
+        if (!_entries.ContainsKey(key))
         {
-            sl_mutex_unlock(gate);
-            return new Taken<V>(false, blank[0]);
+            sl_mutex_unlock(_gate);
+            return new Taken<V>(false, _blank[0]);
         }
 
-        var value = entries.Get(key);
-        sl_mutex_unlock(gate);
+        var value = _entries.Get(key);
+        sl_mutex_unlock(_gate);
         return new Taken<V>(true, value);
     }
 
@@ -328,9 +328,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// happens to equal the fallback.
     public V GetOr(K key, V fallback)
     {
-        sl_mutex_lock(gate);
-        var value = entries.GetOr(key, fallback);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        var value = _entries.GetOr(key, fallback);
+        sl_mutex_unlock(_gate);
         return value;
     }
 
@@ -339,9 +339,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// is for reporting, and `TryGet` is for acting.
     public bool ContainsKey(K key)
     {
-        sl_mutex_lock(gate);
-        bool present = entries.ContainsKey(key);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        bool present = _entries.ContainsKey(key);
+        sl_mutex_unlock(_gate);
         return present;
     }
 
@@ -349,26 +349,26 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// exactly one of several threads racing to remove the same key gets true.
     public bool Remove(K key)
     {
-        sl_mutex_lock(gate);
-        bool removed = entries.Remove(key);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        bool removed = _entries.Remove(key);
+        sl_mutex_unlock(_gate);
         return removed;
     }
 
     /// Drops every entry, under one lock.
     public void Clear()
     {
-        sl_mutex_lock(gate);
-        entries.Clear();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        _entries.Clear();
+        sl_mutex_unlock(_gate);
     }
 
     /// How many entries there are *now*. For reporting rather than deciding.
     public nuint Count()
     {
-        sl_mutex_lock(gate);
-        nuint result = entries.Count();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        nuint result = _entries.Count();
+        sl_mutex_unlock(_gate);
         return result;
     }
 
@@ -379,9 +379,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// why it is a copy rather than a view.
     public List<K> Keys()
     {
-        sl_mutex_lock(gate);
-        var copy = entries.Keys();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        var copy = _entries.Keys();
+        sl_mutex_unlock(_gate);
         return copy;
     }
 
@@ -391,9 +391,9 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
     /// the pairing matters.
     public List<V> Values()
     {
-        sl_mutex_lock(gate);
-        var copy = entries.Values();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        var copy = _entries.Values();
+        sl_mutex_unlock(_gate);
         return copy;
     }
 }
@@ -415,45 +415,45 @@ public threadsafe class ConcurrentDictionary<K, V> where K : IEquatable<K>, IHas
 ///     //            while (got.Ok) { use(got.Value); got = channel.Take(); }
 public threadsafe class Channel<T>
 {
-    Queue<T> items;
-    byte* gate;
-    byte* arrived;
-    T[] blank;
-    bool closed;
+    Queue<T> _items;
+    byte* _gate;
+    byte* _arrived;
+    T[] _blank;
+    bool _closed;
 
     /// An open, empty channel. Unbounded: `Send` never blocks waiting for a
     /// consumer, so a producer that outruns its consumers grows the queue
     /// rather than being slowed by it.
     public Channel()
     {
-        items = new Queue<T>();
-        gate = sl_mutex_new();
-        arrived = sl_condition_new();
-        blank = new T[1];
-        closed = false;
+        _items = new Queue<T>();
+        _gate = sl_mutex_new();
+        _arrived = sl_condition_new();
+        _blank = new T[1];
+        _closed = false;
     }
 
     ~Channel()
     {
-        sl_condition_free(arrived);
-        sl_mutex_free(gate);
+        sl_condition_free(_arrived);
+        sl_mutex_free(_gate);
     }
 
     /// Adds an item and wakes one waiter. Sending to a closed channel changes
     /// nothing and reports false.
     public bool Send(T item)
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (closed)
+        if (_closed)
         {
-            sl_mutex_unlock(gate);
+            sl_mutex_unlock(_gate);
             return false;
         }
 
-        items.Enqueue(item);
-        sl_condition_signal(arrived);
-        sl_mutex_unlock(gate);
+        _items.Enqueue(item);
+        sl_condition_signal(_arrived);
+        sl_mutex_unlock(_gate);
         return true;
     }
 
@@ -461,50 +461,50 @@ public threadsafe class Channel<T>
     /// drained, and not before.
     public Taken<T> Take()
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
         // A wait can return without a signal, so the condition is re-tested in
         // a loop rather than assumed. That is true of every condition variable
         // on every platform.
-        while (items.IsEmpty() && !closed)
+        while (_items.IsEmpty() && !_closed)
         {
-            sl_condition_wait(arrived, gate);
+            sl_condition_wait(_arrived, _gate);
         }
 
-        if (items.IsEmpty())
+        if (_items.IsEmpty())
         {
-            sl_mutex_unlock(gate);
-            return new Taken<T>(false, blank[0]);
+            sl_mutex_unlock(_gate);
+            return new Taken<T>(false, _blank[0]);
         }
 
-        var item = items.Dequeue();
-        sl_mutex_unlock(gate);
+        var item = _items.Dequeue();
+        sl_mutex_unlock(_gate);
         return new Taken<T>(true, item);
     }
 
     /// Takes an item if one is there already, without waiting.
     public Taken<T> TryTake()
     {
-        sl_mutex_lock(gate);
+        sl_mutex_lock(_gate);
 
-        if (items.IsEmpty())
+        if (_items.IsEmpty())
         {
-            sl_mutex_unlock(gate);
-            return new Taken<T>(false, blank[0]);
+            sl_mutex_unlock(_gate);
+            return new Taken<T>(false, _blank[0]);
         }
 
-        var item = items.Dequeue();
-        sl_mutex_unlock(gate);
+        var item = _items.Dequeue();
+        sl_mutex_unlock(_gate);
         return new Taken<T>(true, item);
     }
 
     /// Says there will be no more, and wakes everyone waiting. Idempotent.
     public void Close()
     {
-        sl_mutex_lock(gate);
-        closed = true;
-        sl_condition_broadcast(arrived);
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        _closed = true;
+        sl_condition_broadcast(_arrived);
+        sl_mutex_unlock(_gate);
     }
 
     /// Whether `Close` has been called. A closed channel may still have items
@@ -512,9 +512,9 @@ public threadsafe class Channel<T>
     /// taken. `Take`'s `Ok` is what answers that.
     public bool IsClosed()
     {
-        sl_mutex_lock(gate);
-        bool result = closed;
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        bool result = _closed;
+        sl_mutex_unlock(_gate);
         return result;
     }
 
@@ -522,9 +522,9 @@ public threadsafe class Channel<T>
     /// reporting rather than for deciding; a consumer should call `Take`.
     public nuint Count()
     {
-        sl_mutex_lock(gate);
-        nuint result = items.Count();
-        sl_mutex_unlock(gate);
+        sl_mutex_lock(_gate);
+        nuint result = _items.Count();
+        sl_mutex_unlock(_gate);
         return result;
     }
 }

@@ -265,33 +265,33 @@ const uint GlobalMoveable = 0x0002u;
 /// thing to test afterwards.
 threadsafe sealed class Backend
 {
-    GdiplusStartupFn startup;
-    GdipCreateBitmapFromStreamFn fromStream;
-    GdipCreateBitmapFromScan0Fn fromScan0;
-    GdipDisposeImageFn dispose;
-    GdipGetImageWidthFn imageWidth;
-    GdipGetImageHeightFn imageHeight;
-    GdipBitmapGetPixelFn getPixel;
-    GdipBitmapSetPixelFn setPixel;
-    GdipGetImageGraphicsContextFn context;
-    GdipDeleteGraphicsFn deleteGraphics;
-    GdipSetSmoothingModeFn smoothing;
-    GdipGraphicsClearFn clear;
-    GdipCreatePen1Fn makePen;
-    GdipDeletePenFn dropPen;
-    GdipCreateSolidFillFn makeBrush;
-    GdipDeleteBrushFn dropBrush;
-    GdipDrawLineIFn drawLine;
-    GdipRectangleIFn drawRectangle;
-    GdipRectangleIFn fillRectangle;
-    GdipRectangleIFn drawEllipse;
-    GdipRectangleIFn fillEllipse;
-    GdipDrawPolygonIFn drawPolygon;
-    GdipFillPolygonIFn fillPolygon;
-    GdipDrawImageRectRectIFn blit;
-    GdipSaveImageToStreamFn toStream;
-    CreateStreamOnHGlobalFn makeStream;
-    GetHGlobalFromStreamFn memoryOf;
+    GdiplusStartupFn _startup;
+    GdipCreateBitmapFromStreamFn _fromStream;
+    GdipCreateBitmapFromScan0Fn _fromScan0;
+    GdipDisposeImageFn _dispose;
+    GdipGetImageWidthFn _imageWidth;
+    GdipGetImageHeightFn _imageHeight;
+    GdipBitmapGetPixelFn _getPixel;
+    GdipBitmapSetPixelFn _setPixel;
+    GdipGetImageGraphicsContextFn _context;
+    GdipDeleteGraphicsFn _deleteGraphics;
+    GdipSetSmoothingModeFn _smoothing;
+    GdipGraphicsClearFn _clear;
+    GdipCreatePen1Fn _makePen;
+    GdipDeletePenFn _dropPen;
+    GdipCreateSolidFillFn _makeBrush;
+    GdipDeleteBrushFn _dropBrush;
+    GdipDrawLineIFn _drawLine;
+    GdipRectangleIFn _drawRectangle;
+    GdipRectangleIFn _fillRectangle;
+    GdipRectangleIFn _drawEllipse;
+    GdipRectangleIFn _fillEllipse;
+    GdipDrawPolygonIFn _drawPolygon;
+    GdipFillPolygonIFn _fillPolygon;
+    GdipDrawImageRectRectIFn _blit;
+    GdipSaveImageToStreamFn _toStream;
+    CreateStreamOnHGlobalFn _makeStream;
+    GetHGlobalFromStreamFn _memoryOf;
 
     /// Whether every symbol resolved and GDI+ started.
     public bool Ready;
@@ -307,33 +307,33 @@ threadsafe sealed class Backend
 
         bool complete = true;
 
-        startup = (GdiplusStartupFn)Find(gdiplus, "GdiplusStartup", &complete);
-        fromStream = (GdipCreateBitmapFromStreamFn)Find(gdiplus, "GdipCreateBitmapFromStream", &complete);
-        fromScan0 = (GdipCreateBitmapFromScan0Fn)Find(gdiplus, "GdipCreateBitmapFromScan0", &complete);
-        dispose = (GdipDisposeImageFn)Find(gdiplus, "GdipDisposeImage", &complete);
-        imageWidth = (GdipGetImageWidthFn)Find(gdiplus, "GdipGetImageWidth", &complete);
-        imageHeight = (GdipGetImageHeightFn)Find(gdiplus, "GdipGetImageHeight", &complete);
-        getPixel = (GdipBitmapGetPixelFn)Find(gdiplus, "GdipBitmapGetPixel", &complete);
-        setPixel = (GdipBitmapSetPixelFn)Find(gdiplus, "GdipBitmapSetPixel", &complete);
-        context = (GdipGetImageGraphicsContextFn)Find(gdiplus, "GdipGetImageGraphicsContext", &complete);
-        deleteGraphics = (GdipDeleteGraphicsFn)Find(gdiplus, "GdipDeleteGraphics", &complete);
-        smoothing = (GdipSetSmoothingModeFn)Find(gdiplus, "GdipSetSmoothingMode", &complete);
-        clear = (GdipGraphicsClearFn)Find(gdiplus, "GdipGraphicsClear", &complete);
-        makePen = (GdipCreatePen1Fn)Find(gdiplus, "GdipCreatePen1", &complete);
-        dropPen = (GdipDeletePenFn)Find(gdiplus, "GdipDeletePen", &complete);
-        makeBrush = (GdipCreateSolidFillFn)Find(gdiplus, "GdipCreateSolidFill", &complete);
-        dropBrush = (GdipDeleteBrushFn)Find(gdiplus, "GdipDeleteBrush", &complete);
-        drawLine = (GdipDrawLineIFn)Find(gdiplus, "GdipDrawLineI", &complete);
-        drawRectangle = (GdipRectangleIFn)Find(gdiplus, "GdipDrawRectangleI", &complete);
-        fillRectangle = (GdipRectangleIFn)Find(gdiplus, "GdipFillRectangleI", &complete);
-        drawEllipse = (GdipRectangleIFn)Find(gdiplus, "GdipDrawEllipseI", &complete);
-        fillEllipse = (GdipRectangleIFn)Find(gdiplus, "GdipFillEllipseI", &complete);
-        drawPolygon = (GdipDrawPolygonIFn)Find(gdiplus, "GdipDrawPolygonI", &complete);
-        fillPolygon = (GdipFillPolygonIFn)Find(gdiplus, "GdipFillPolygonI", &complete);
-        blit = (GdipDrawImageRectRectIFn)Find(gdiplus, "GdipDrawImageRectRectI", &complete);
-        toStream = (GdipSaveImageToStreamFn)Find(gdiplus, "GdipSaveImageToStream", &complete);
-        makeStream = (CreateStreamOnHGlobalFn)Find(ole, "CreateStreamOnHGlobal", &complete);
-        memoryOf = (GetHGlobalFromStreamFn)Find(ole, "GetHGlobalFromStream", &complete);
+        _startup = (GdiplusStartupFn)Find(gdiplus, "GdiplusStartup", &complete);
+        _fromStream = (GdipCreateBitmapFromStreamFn)Find(gdiplus, "GdipCreateBitmapFromStream", &complete);
+        _fromScan0 = (GdipCreateBitmapFromScan0Fn)Find(gdiplus, "GdipCreateBitmapFromScan0", &complete);
+        _dispose = (GdipDisposeImageFn)Find(gdiplus, "GdipDisposeImage", &complete);
+        _imageWidth = (GdipGetImageWidthFn)Find(gdiplus, "GdipGetImageWidth", &complete);
+        _imageHeight = (GdipGetImageHeightFn)Find(gdiplus, "GdipGetImageHeight", &complete);
+        _getPixel = (GdipBitmapGetPixelFn)Find(gdiplus, "GdipBitmapGetPixel", &complete);
+        _setPixel = (GdipBitmapSetPixelFn)Find(gdiplus, "GdipBitmapSetPixel", &complete);
+        _context = (GdipGetImageGraphicsContextFn)Find(gdiplus, "GdipGetImageGraphicsContext", &complete);
+        _deleteGraphics = (GdipDeleteGraphicsFn)Find(gdiplus, "GdipDeleteGraphics", &complete);
+        _smoothing = (GdipSetSmoothingModeFn)Find(gdiplus, "GdipSetSmoothingMode", &complete);
+        _clear = (GdipGraphicsClearFn)Find(gdiplus, "GdipGraphicsClear", &complete);
+        _makePen = (GdipCreatePen1Fn)Find(gdiplus, "GdipCreatePen1", &complete);
+        _dropPen = (GdipDeletePenFn)Find(gdiplus, "GdipDeletePen", &complete);
+        _makeBrush = (GdipCreateSolidFillFn)Find(gdiplus, "GdipCreateSolidFill", &complete);
+        _dropBrush = (GdipDeleteBrushFn)Find(gdiplus, "GdipDeleteBrush", &complete);
+        _drawLine = (GdipDrawLineIFn)Find(gdiplus, "GdipDrawLineI", &complete);
+        _drawRectangle = (GdipRectangleIFn)Find(gdiplus, "GdipDrawRectangleI", &complete);
+        _fillRectangle = (GdipRectangleIFn)Find(gdiplus, "GdipFillRectangleI", &complete);
+        _drawEllipse = (GdipRectangleIFn)Find(gdiplus, "GdipDrawEllipseI", &complete);
+        _fillEllipse = (GdipRectangleIFn)Find(gdiplus, "GdipFillEllipseI", &complete);
+        _drawPolygon = (GdipDrawPolygonIFn)Find(gdiplus, "GdipDrawPolygonI", &complete);
+        _fillPolygon = (GdipFillPolygonIFn)Find(gdiplus, "GdipFillPolygonI", &complete);
+        _blit = (GdipDrawImageRectRectIFn)Find(gdiplus, "GdipDrawImageRectRectI", &complete);
+        _toStream = (GdipSaveImageToStreamFn)Find(gdiplus, "GdipSaveImageToStream", &complete);
+        _makeStream = (CreateStreamOnHGlobalFn)Find(ole, "CreateStreamOnHGlobal", &complete);
+        _memoryOf = (GetHGlobalFromStreamFn)Find(ole, "GetHGlobalFromStream", &complete);
 
         if (!complete)
             return;
@@ -345,7 +345,7 @@ threadsafe sealed class Backend
         nuint[] input = new nuint[4u];
         input[0u] = 1u;
         nuint token = 0u;
-        if (startup(&token, (void*)&input[0u], null) != 0)
+        if (_startup(&token, (void*)&input[0u], null) != 0)
             return;
 
         Ready = true;
@@ -369,7 +369,7 @@ threadsafe sealed class Backend
     public void* Create(int width, int height)
     {
         void* bitmap = null;
-        if (fromScan0(width, height, 0, PixelFormat32bppArgb, null, &bitmap) != 0)
+        if (_fromScan0(width, height, 0, PixelFormat32bppArgb, null, &bitmap) != 0)
         {
             return null;
         }
@@ -386,24 +386,24 @@ threadsafe sealed class Backend
         // Released when `stream` goes, which is the end of this function. GDI+
         // keeps a reference of its own to a stream it decoded from, so letting
         // go of this one does not take the pixels with it.
-        if (fromStream((void*)(IUnknown)stream, &bitmap) != 0)
+        if (_fromStream((void*)(IUnknown)stream, &bitmap) != 0)
             return null;
         return bitmap;
     }
 
-    public void Destroy(void* image) => dispose(image);
+    public void Destroy(void* image) => _dispose(image);
 
     public int Width(void* image)
     {
         uint value = 0u;
-        imageWidth(image, &value);
+        _imageWidth(image, &value);
         return (int)value;
     }
 
     public int Height(void* image)
     {
         uint value = 0u;
-        imageHeight(image, &value);
+        _imageHeight(image, &value);
         return (int)value;
     }
 
@@ -412,13 +412,13 @@ threadsafe sealed class Backend
     public uint GetPixel(void* image, int x, int y)
     {
         uint colour = 0u;
-        getPixel(image, x, y, &colour);
+        _getPixel(image, x, y, &colour);
         return colour;
     }
 
     public void SetPixel(void* image, int x, int y, uint colour)
     {
-        setPixel(image, x, y, colour);
+        _setPixel(image, x, y, colour);
     }
 
     // -------------------------------------------------------------- drawing
@@ -431,9 +431,9 @@ threadsafe sealed class Backend
     void* Context(void* image)
     {
         void* graphics = null;
-        if (context(image, &graphics) != 0)
+        if (_context(image, &graphics) != 0)
             return null;
-        smoothing(graphics, SmoothingAntiAlias);
+        _smoothing(graphics, SmoothingAntiAlias);
         return graphics;
     }
 
@@ -442,8 +442,8 @@ threadsafe sealed class Backend
         void* graphics = Context(image);
         if (graphics == null)
             return;
-        clear(graphics, colour);
-        deleteGraphics(graphics);
+        _clear(graphics, colour);
+        _deleteGraphics(graphics);
     }
 
     public void Line(void* image, int x1, int y1, int x2, int y2, uint colour, int thickness)
@@ -453,12 +453,12 @@ threadsafe sealed class Backend
             return;
 
         void* pen = null;
-        if (makePen(colour, (float)thickness, UnitPixel, &pen) == 0)
+        if (_makePen(colour, (float)thickness, UnitPixel, &pen) == 0)
         {
-            drawLine(graphics, pen, x1, y1, x2, y2);
-            dropPen(pen);
+            _drawLine(graphics, pen, x1, y1, x2, y2);
+            _dropPen(pen);
         }
-        deleteGraphics(graphics);
+        _deleteGraphics(graphics);
     }
 
     /// A rectangle or an ellipse, outlined or filled, which is four calls that
@@ -473,40 +473,40 @@ threadsafe sealed class Backend
         if (filled)
         {
             void* brush = null;
-            if (makeBrush(colour, &brush) == 0)
+            if (_makeBrush(colour, &brush) == 0)
             {
                 if (ellipse)
                 {
-                    fillEllipse(graphics, brush, x, y, width, height);
+                    _fillEllipse(graphics, brush, x, y, width, height);
                 }
                 else
                 {
-                    fillRectangle(graphics, brush, x, y, width, height);
+                    _fillRectangle(graphics, brush, x, y, width, height);
                 }
-                dropBrush(brush);
+                _dropBrush(brush);
             }
         }
         else
         {
             void* pen = null;
-            if (makePen(colour, (float)thickness, UnitPixel, &pen) == 0)
+            if (_makePen(colour, (float)thickness, UnitPixel, &pen) == 0)
             {
                 // A one-pixel pen straddles the edge, so the far row and column
                 // of a width-by-height rectangle fall outside it. Both backends
                 // want the far edge given as the last pixel.
                 if (ellipse)
                 {
-                    drawEllipse(graphics, pen, x, y, width - 1, height - 1);
+                    _drawEllipse(graphics, pen, x, y, width - 1, height - 1);
                 }
                 else
                 {
-                    drawRectangle(graphics, pen, x, y, width - 1, height - 1);
+                    _drawRectangle(graphics, pen, x, y, width - 1, height - 1);
                 }
-                dropPen(pen);
+                _dropPen(pen);
             }
         }
 
-        deleteGraphics(graphics);
+        _deleteGraphics(graphics);
     }
 
     public void Polygon(void* image, int[] points, uint colour, int thickness, bool filled)
@@ -519,23 +519,23 @@ threadsafe sealed class Backend
         if (filled)
         {
             void* brush = null;
-            if (makeBrush(colour, &brush) == 0)
+            if (_makeBrush(colour, &brush) == 0)
             {
-                fillPolygon(graphics, brush, &points[0u], count, FillAlternate);
-                dropBrush(brush);
+                _fillPolygon(graphics, brush, &points[0u], count, FillAlternate);
+                _dropBrush(brush);
             }
         }
         else
         {
             void* pen = null;
-            if (makePen(colour, (float)thickness, UnitPixel, &pen) == 0)
+            if (_makePen(colour, (float)thickness, UnitPixel, &pen) == 0)
             {
-                drawPolygon(graphics, pen, &points[0u], count);
-                dropPen(pen);
+                _drawPolygon(graphics, pen, &points[0u], count);
+                _dropPen(pen);
             }
         }
 
-        deleteGraphics(graphics);
+        _deleteGraphics(graphics);
     }
 
     public void Blit(void* destination, void* source,
@@ -544,8 +544,8 @@ threadsafe sealed class Backend
         void* graphics = Context(destination);
         if (graphics == null)
             return;
-        blit(graphics, source, dx, dy, dw, dh, sx, sy, sw, sh, UnitPixel, null, null, null);
-        deleteGraphics(graphics);
+        _blit(graphics, source, dx, dy, dw, dh, sx, sy, sw, sh, UnitPixel, null, null, null);
+        _deleteGraphics(graphics);
     }
 
     // -------------------------------------------------------------- codecs
@@ -600,7 +600,7 @@ threadsafe sealed class Backend
     IUnknown? EmptyStream()
     {
         void* stream = null;
-        if (makeStream(null, 1, &stream) != 0)
+        if (_makeStream(null, 1, &stream) != 0)
             return null;
         return (IUnknown)stream;
     }
@@ -623,7 +623,7 @@ threadsafe sealed class Backend
         GlobalUnlock(block);
 
         void* stream = null;
-        if (makeStream(block, 1, &stream) != 0)
+        if (_makeStream(block, 1, &stream) != 0)
         {
             GlobalFree(block);
             return null;
@@ -650,11 +650,11 @@ threadsafe sealed class Backend
         // its own default of 75. Saying so is better than an `EncoderParameters`
         // this would have to lay out by hand for the one format that reads it,
         // and 75 is the number libgd uses too.
-        if (toStream(image, raw, &encoder, null) != 0)
+        if (_toStream(image, raw, &encoder, null) != 0)
             return nothing;
 
         void* block = null;
-        if (memoryOf(raw, &block) != 0 || block == null)
+        if (_memoryOf(raw, &block) != 0 || block == null)
             return nothing;
 
         nuint size = GlobalSize(block);
@@ -720,31 +720,31 @@ const int RtldLazyLocal = 0x00001;
 /// libgd, resolved once.
 threadsafe sealed class Backend
 {
-    GdImageCreateTrueColorFn createTrueColor;
-    GdImageDestroyFn destroy;
-    GdImageCreateFromPtrFn fromPng;
-    GdImageCreateFromPtrFn fromJpeg;
-    GdImageCreateFromPtrFn fromGif;
-    GdImageCreateFromPtrFn fromBmp;
-    GdImageToPtrFn toPng;
-    GdImageToPtrQualityFn toJpeg;
-    GdImageToPtrFn toGif;
-    GdImageToPtrQualityFn toBmp;
-    GdFreeFn release;
-    GdImageGetClipFn getClip;
-    GdImageSetPixelFn setPixel;
-    GdImageGetPixelFn getPixel;
-    GdImageLineFn line;
-    GdImageRectFn rectangle;
-    GdImageRectFn fillRectangle;
-    GdImageEllipseFn ellipse;
-    GdImageEllipseFn fillEllipse;
-    GdImagePolygonFn polygon;
-    GdImagePolygonFn fillPolygon;
-    GdImageSetThicknessFn thickness;
-    GdImageFlagFn blending;
-    GdImageFlagFn saveAlpha;
-    GdImageCopyResampledFn resample;
+    GdImageCreateTrueColorFn _createTrueColor;
+    GdImageDestroyFn _destroy;
+    GdImageCreateFromPtrFn _fromPng;
+    GdImageCreateFromPtrFn _fromJpeg;
+    GdImageCreateFromPtrFn _fromGif;
+    GdImageCreateFromPtrFn _fromBmp;
+    GdImageToPtrFn _toPng;
+    GdImageToPtrQualityFn _toJpeg;
+    GdImageToPtrFn _toGif;
+    GdImageToPtrQualityFn _toBmp;
+    GdFreeFn _release;
+    GdImageGetClipFn _getClip;
+    GdImageSetPixelFn _setPixel;
+    GdImageGetPixelFn _getPixel;
+    GdImageLineFn _line;
+    GdImageRectFn _rectangle;
+    GdImageRectFn _fillRectangle;
+    GdImageEllipseFn _ellipse;
+    GdImageEllipseFn _fillEllipse;
+    GdImagePolygonFn _polygon;
+    GdImagePolygonFn _fillPolygon;
+    GdImageSetThicknessFn _thickness;
+    GdImageFlagFn _blending;
+    GdImageFlagFn _saveAlpha;
+    GdImageCopyResampledFn _resample;
 
     public bool Ready;
 
@@ -769,29 +769,29 @@ threadsafe sealed class Backend
 
         bool complete = true;
 
-        createTrueColor = (GdImageCreateTrueColorFn)Find(library, "gdImageCreateTrueColor", &complete);
-        destroy = (GdImageDestroyFn)Find(library, "gdImageDestroy", &complete);
-        fromPng = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromPngPtr", &complete);
-        fromJpeg = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromJpegPtr", &complete);
-        fromGif = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromGifPtr", &complete);
-        toPng = (GdImageToPtrFn)Find(library, "gdImagePngPtr", &complete);
-        toJpeg = (GdImageToPtrQualityFn)Find(library, "gdImageJpegPtr", &complete);
-        toGif = (GdImageToPtrFn)Find(library, "gdImageGifPtr", &complete);
-        release = (GdFreeFn)Find(library, "gdFree", &complete);
-        getClip = (GdImageGetClipFn)Find(library, "gdImageGetClip", &complete);
-        setPixel = (GdImageSetPixelFn)Find(library, "gdImageSetPixel", &complete);
-        getPixel = (GdImageGetPixelFn)Find(library, "gdImageGetPixel", &complete);
-        line = (GdImageLineFn)Find(library, "gdImageLine", &complete);
-        rectangle = (GdImageRectFn)Find(library, "gdImageRectangle", &complete);
-        fillRectangle = (GdImageRectFn)Find(library, "gdImageFilledRectangle", &complete);
-        ellipse = (GdImageEllipseFn)Find(library, "gdImageEllipse", &complete);
-        fillEllipse = (GdImageEllipseFn)Find(library, "gdImageFilledEllipse", &complete);
-        polygon = (GdImagePolygonFn)Find(library, "gdImagePolygon", &complete);
-        fillPolygon = (GdImagePolygonFn)Find(library, "gdImageFilledPolygon", &complete);
-        thickness = (GdImageSetThicknessFn)Find(library, "gdImageSetThickness", &complete);
-        blending = (GdImageFlagFn)Find(library, "gdImageAlphaBlending", &complete);
-        saveAlpha = (GdImageFlagFn)Find(library, "gdImageSaveAlpha", &complete);
-        resample = (GdImageCopyResampledFn)Find(library, "gdImageCopyResampled", &complete);
+        _createTrueColor = (GdImageCreateTrueColorFn)Find(library, "gdImageCreateTrueColor", &complete);
+        _destroy = (GdImageDestroyFn)Find(library, "gdImageDestroy", &complete);
+        _fromPng = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromPngPtr", &complete);
+        _fromJpeg = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromJpegPtr", &complete);
+        _fromGif = (GdImageCreateFromPtrFn)Find(library, "gdImageCreateFromGifPtr", &complete);
+        _toPng = (GdImageToPtrFn)Find(library, "gdImagePngPtr", &complete);
+        _toJpeg = (GdImageToPtrQualityFn)Find(library, "gdImageJpegPtr", &complete);
+        _toGif = (GdImageToPtrFn)Find(library, "gdImageGifPtr", &complete);
+        _release = (GdFreeFn)Find(library, "gdFree", &complete);
+        _getClip = (GdImageGetClipFn)Find(library, "gdImageGetClip", &complete);
+        _setPixel = (GdImageSetPixelFn)Find(library, "gdImageSetPixel", &complete);
+        _getPixel = (GdImageGetPixelFn)Find(library, "gdImageGetPixel", &complete);
+        _line = (GdImageLineFn)Find(library, "gdImageLine", &complete);
+        _rectangle = (GdImageRectFn)Find(library, "gdImageRectangle", &complete);
+        _fillRectangle = (GdImageRectFn)Find(library, "gdImageFilledRectangle", &complete);
+        _ellipse = (GdImageEllipseFn)Find(library, "gdImageEllipse", &complete);
+        _fillEllipse = (GdImageEllipseFn)Find(library, "gdImageFilledEllipse", &complete);
+        _polygon = (GdImagePolygonFn)Find(library, "gdImagePolygon", &complete);
+        _fillPolygon = (GdImagePolygonFn)Find(library, "gdImageFilledPolygon", &complete);
+        _thickness = (GdImageSetThicknessFn)Find(library, "gdImageSetThickness", &complete);
+        _blending = (GdImageFlagFn)Find(library, "gdImageAlphaBlending", &complete);
+        _saveAlpha = (GdImageFlagFn)Find(library, "gdImageSaveAlpha", &complete);
+        _resample = (GdImageCopyResampledFn)Find(library, "gdImageCopyResampled", &complete);
 
         // BMP arrived in libgd 2.1.1 and a distribution may predate it, so
         // these two are allowed to be missing and the format is refused when
@@ -799,9 +799,9 @@ threadsafe sealed class Backend
         void* bmpIn = dlsym(library, "gdImageCreateFromBmpPtr".ToPointer());
         void* bmpOut = dlsym(library, "gdImageBmpPtr".ToPointer());
         if (bmpIn != null)
-            fromBmp = (GdImageCreateFromPtrFn)bmpIn;
+            _fromBmp = (GdImageCreateFromPtrFn)bmpIn;
         if (bmpOut != null)
-            toBmp = (GdImageToPtrQualityFn)bmpOut;
+            _toBmp = (GdImageToPtrQualityFn)bmpOut;
 
         Ready = complete;
     }
@@ -839,17 +839,17 @@ threadsafe sealed class Backend
 
     public void* Create(int width, int height)
     {
-        void* image = createTrueColor(width, height);
+        void* image = _createTrueColor(width, height);
         if (image == null)
             return null;
 
         // A new truecolor image is opaque black, and one made to be drawn on
         // should start empty. Blending off, or the fill would compose with the
         // black rather than replace it.
-        blending(image, 0);
-        fillRectangle(image, 0, 0, width - 1, height - 1, ToGd(0u));
-        blending(image, 1);
-        saveAlpha(image, 1);
+        _blending(image, 0);
+        _fillRectangle(image, 0, 0, width - 1, height - 1, ToGd(0u));
+        _blending(image, 1);
+        _saveAlpha(image, 1);
         return image;
     }
 
@@ -864,20 +864,20 @@ threadsafe sealed class Backend
             return null;
 
         if (format == ImageFormat.Png)
-            image = fromPng(size, raw);
+            image = _fromPng(size, raw);
         if (format == ImageFormat.Jpeg)
-            image = fromJpeg(size, raw);
+            image = _fromJpeg(size, raw);
         if (format == ImageFormat.Gif)
-            image = fromGif(size, raw);
-        if (format == ImageFormat.Bmp && fromBmp != null)
-            image = fromBmp(size, raw);
+            image = _fromGif(size, raw);
+        if (format == ImageFormat.Bmp && _fromBmp != null)
+            image = _fromBmp(size, raw);
 
         if (image != null)
-            saveAlpha(image, 1);
+            _saveAlpha(image, 1);
         return image;
     }
 
-    public void Destroy(void* image) => destroy(image);
+    public void Destroy(void* image) => _destroy(image);
 
     /// **The size comes from the clipping rectangle and not from `gdImageSX`.**
     /// SX and SY are macros over the structure's fields, so using them would
@@ -887,43 +887,43 @@ threadsafe sealed class Backend
     public int Width(void* image)
     {
         int left = 0; int top = 0; int right = 0; int bottom = 0;
-        getClip(image, &left, &top, &right, &bottom);
+        _getClip(image, &left, &top, &right, &bottom);
         return right - left + 1;
     }
 
     public int Height(void* image)
     {
         int left = 0; int top = 0; int right = 0; int bottom = 0;
-        getClip(image, &left, &top, &right, &bottom);
+        _getClip(image, &left, &top, &right, &bottom);
         return bottom - top + 1;
     }
 
     // --------------------------------------------------------------- pixels
 
-    public uint GetPixel(void* image, int x, int y) => FromGd(getPixel(image, x, y));
+    public uint GetPixel(void* image, int x, int y) => FromGd(_getPixel(image, x, y));
 
     public void SetPixel(void* image, int x, int y, uint colour)
     {
         // Replace rather than blend: a caller writing a pixel means that pixel.
-        blending(image, 0);
-        setPixel(image, x, y, ToGd(colour));
-        blending(image, 1);
+        _blending(image, 0);
+        _setPixel(image, x, y, ToGd(colour));
+        _blending(image, 1);
     }
 
     // -------------------------------------------------------------- drawing
 
     public void Clear(void* image, uint colour)
     {
-        blending(image, 0);
-        fillRectangle(image, 0, 0, Width(image) - 1, Height(image) - 1, ToGd(colour));
-        blending(image, 1);
+        _blending(image, 0);
+        _fillRectangle(image, 0, 0, Width(image) - 1, Height(image) - 1, ToGd(colour));
+        _blending(image, 1);
     }
 
     public void Line(void* image, int x1, int y1, int x2, int y2, uint colour, int width)
     {
-        thickness(image, width < 1 ? 1 : width);
-        line(image, x1, y1, x2, y2, ToGd(colour));
-        thickness(image, 1);
+        _thickness(image, width < 1 ? 1 : width);
+        _line(image, x1, y1, x2, y2, ToGd(colour));
+        _thickness(image, 1);
     }
 
     public void Shape(void* image, bool isEllipse, int x, int y, int width, int height,
@@ -937,25 +937,25 @@ threadsafe sealed class Backend
             {
                 // libgd's ellipse is a centre and a size, where every other API
                 // here gives the bounding box.
-                fillEllipse(image, x + width / 2, y + height / 2, width, height, ink);
+                _fillEllipse(image, x + width / 2, y + height / 2, width, height, ink);
             }
             else
             {
-                fillRectangle(image, x, y, x + width - 1, y + height - 1, ink);
+                _fillRectangle(image, x, y, x + width - 1, y + height - 1, ink);
             }
             return;
         }
 
-        thickness(image, stroke < 1 ? 1 : stroke);
+        _thickness(image, stroke < 1 ? 1 : stroke);
         if (isEllipse)
         {
-            ellipse(image, x + width / 2, y + height / 2, width, height, ink);
+            _ellipse(image, x + width / 2, y + height / 2, width, height, ink);
         }
         else
         {
-            rectangle(image, x, y, x + width - 1, y + height - 1, ink);
+            _rectangle(image, x, y, x + width - 1, y + height - 1, ink);
         }
-        thickness(image, 1);
+        _thickness(image, 1);
     }
 
     public void Polygon(void* image, int[] points, uint colour, int stroke, bool filled)
@@ -965,13 +965,13 @@ threadsafe sealed class Backend
 
         if (filled)
         {
-            fillPolygon(image, &points[0u], count, ink);
+            _fillPolygon(image, &points[0u], count, ink);
             return;
         }
 
-        thickness(image, stroke < 1 ? 1 : stroke);
-        polygon(image, &points[0u], count, ink);
-        thickness(image, 1);
+        _thickness(image, stroke < 1 ? 1 : stroke);
+        _polygon(image, &points[0u], count, ink);
+        _thickness(image, 1);
     }
 
     public void Blit(void* destination, void* source,
@@ -980,7 +980,7 @@ threadsafe sealed class Backend
         // Resampled even when the sizes match, so that the alpha composes the
         // same way it does when they do not. `gdImageCopy` would be faster and
         // would disagree with itself at two different scales.
-        resample(destination, source, dx, dy, sx, sy, dw, dh, sw, sh);
+        _resample(destination, source, dx, dy, sx, sy, dw, dh, sw, sh);
     }
 
     // -------------------------------------------------------------- codecs
@@ -993,13 +993,13 @@ threadsafe sealed class Backend
         void* raw = null;
 
         if (format == ImageFormat.Png)
-            raw = toPng(image, &size);
+            raw = _toPng(image, &size);
         if (format == ImageFormat.Jpeg)
-            raw = toJpeg(image, &size, quality < 0 ? 75 : quality);
+            raw = _toJpeg(image, &size, quality < 0 ? 75 : quality);
         if (format == ImageFormat.Gif)
-            raw = toGif(image, &size);
-        if (format == ImageFormat.Bmp && toBmp != null)
-            raw = toBmp(image, &size, 0);
+            raw = _toGif(image, &size);
+        if (format == ImageFormat.Bmp && _toBmp != null)
+            raw = _toBmp(image, &size, 0);
 
         if (raw == null || size <= 0)
             return new byte[0u];
@@ -1008,7 +1008,7 @@ threadsafe sealed class Backend
         // an array is the language's and `gdFree` is libgd's.
         var data = new byte[(nuint)size];
         memcpy((void*)&data[0u], raw, (nuint)size);
-        release(raw);
+        _release(raw);
         return data;
     }
 }

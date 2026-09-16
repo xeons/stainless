@@ -483,11 +483,11 @@ void Interop()
 /// `spawn` below still compiles, and warns.
 threadsafe class Tally
 {
-    AtomicLong total;
+    AtomicLong _total;
 
-    public Tally(AtomicLong cell) => total = cell;
+    public Tally(AtomicLong cell) => _total = cell;
 
-    public void Contribute(long amount) => total.Add(amount);
+    public void Contribute(long amount) => _total.Add(amount);
 }
 
 int Squared(int value) => value * value;

@@ -61,11 +61,11 @@ public com interface ICounter
 [Guid("5a1c8e30-2b47-4d16-a9f3-c04e7b81d629")]
 public com class Greeter : IGreeter, ICounter
 {
-    int total;
+    int _total;
 
     public Greeter()
     {
-        total = 0;
+        _total = 0;
         Say("[stainless] Greeter constructed");
     }
 
@@ -79,10 +79,10 @@ public com class Greeter : IGreeter, ICounter
         if (total == null)
             return Com.PointerError;
 
-        this.total = this.total + times;
+        this._total = this._total + times;
         Say("[stainless] Greet(" + Text.FromInteger((long)times) +
-            ") -> " + Text.FromInteger((long)this.total));
-        *total = this.total;
+            ") -> " + Text.FromInteger((long)this._total));
+        *total = this._total;
         return Com.Ok;
     }
 
@@ -90,14 +90,14 @@ public com class Greeter : IGreeter, ICounter
     {
         if (total == null)
             return Com.PointerError;
-        *total = this.total;
+        *total = this._total;
         return Com.Ok;
     }
 
     public int Reset()
     {
         Say("[stainless] Reset");
-        total = 0;
+        _total = 0;
         return Com.Ok;
     }
 }
