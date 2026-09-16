@@ -12,12 +12,14 @@ module Increment;
 
 import Standard.Console;
 
-class Counter {
+class Counter
+{
     public int Value { get; set; }
-    public Counter() { Value = 0; }
+    public Counter() => Value = 0;
 }
 
-struct Flags {
+struct Flags
+{
     public uint Low : 4;
     public uint High : 4;
 }
@@ -25,9 +27,14 @@ struct Flags {
 static int calls = 0;
 
 /// Counts how often an index expression was evaluated.
-int Next() { calls++; return 1; }
+int Next()
+{
+    calls++;
+    return 1;
+}
 
-public int Main() {
+public int Main()
+{
     // A local, both ways round.
     int i = 5;
     Console.WriteLine($"post   {i++} then {i}");
@@ -36,7 +43,8 @@ public int Main() {
 
     // The loop everybody writes.
     int total = 0;
-    for (int n = 0; n < 5; n++) { total += n; }
+    for (int n = 0; n < 5; n++)
+        total += n;
     Console.WriteLine($"total  {total}");
 
     // An array element, indexed by something with a side effect.
@@ -89,7 +97,49 @@ public int Main() {
     int fed = 0;
     Console.WriteLine($"fed    {Twice(fed++)} then {fed}");
     Console.WriteLine($"fed    {Twice(++fed)} then {fed}");
+
+    // An indexer is a property that takes arguments, and the arguments belong
+    // to the step as much as the receiver does. This read and wrote a cell
+    // nobody had named until the accessors were given their indices: the
+    // increment went somewhere else and the value never moved.
+    var grid = new Grid(8u);
+    grid[4u] = 9;
+    grid[4u]++;
+    Console.WriteLine($"index  {grid[4u]}");
+    grid[4u]--;
+    Console.WriteLine($"index  {grid[4u]}");
+
+    // And the index is worked out exactly once, as an array's is.
+    grid[Counter.Next()]++;
+    Console.WriteLine($"once   {grid[2u]} after {Counter.Calls} call");
     return 0;
 }
 
-int Twice(int n) { return n * 2; }
+/// An indexer over an array, so `grid[i]` is a pair of accessor calls rather
+/// than an address.
+class Grid
+{
+    int[] _cells;
+
+    public Grid(nuint size) => _cells = new int[size];
+
+    public int this[nuint at]
+    {
+        get => _cells[at];
+        set => _cells[at] = value;
+    }
+}
+
+/// Counts how many times an index expression was evaluated.
+class Counter
+{
+    public static int Calls = 0;
+
+    public static nuint Next()
+    {
+        Calls++;
+        return 2u;
+    }
+}
+
+int Twice(int n) => n * 2;

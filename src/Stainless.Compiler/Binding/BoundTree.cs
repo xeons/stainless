@@ -323,13 +323,23 @@ public sealed class BoundPropertyIncrement(
     BoundExpression? receiver,
     PropertySymbol property,
     bool isPrefix,
-    bool isIncrement) : BoundExpression(span, property.Type)
+    bool isIncrement,
+    IReadOnlyList<BoundExpression>? arguments = null) : BoundExpression(span, property.Type)
 {
     public BoundExpression? Receiver { get; } = receiver;
     public PropertySymbol Property { get; } = property;
     public bool IsPrefix { get; } = isPrefix;
     public bool IsIncrement { get; } = isIncrement;
     public bool IsChecked { get; init; }
+
+    /// <summary>
+    /// The indices, when the property is an indexer. <c>grid[4]++</c> reaches
+    /// <c>get_Item(grid, 4)</c> and <c>set_Item(grid, 4, value)</c>, so the
+    /// index belongs to the node as much as the receiver does — and is
+    /// evaluated once for the same reason, so <c>grid[Next()]++</c> calls
+    /// <c>Next</c> a single time.
+    /// </summary>
+    public IReadOnlyList<BoundExpression> Arguments { get; } = arguments ?? [];
 }
 
 public sealed class BoundAssignment(SourceSpan span, BoundExpression target, BoundExpression value)

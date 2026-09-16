@@ -1811,7 +1811,8 @@ public sealed partial class Binder
             InvalidateVariantFact(target);
             NoteMemberWritten(property);
             return new BoundPropertyIncrement(
-                syntax.Span, read.Receiver, property, syntax.IsPrefix, syntax.IsIncrement)
+                syntax.Span, read.Receiver, property, syntax.IsPrefix, syntax.IsIncrement,
+                read.Arguments)
                 { IsChecked = _checkedArithmetic };
         }
 

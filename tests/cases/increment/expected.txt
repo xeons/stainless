@@ -13,3 +13,6 @@ ptr    30
 back   20
 fed    0 then 1
 fed    4 then 2
+index  10
+index  9
+once   1 after 1 call

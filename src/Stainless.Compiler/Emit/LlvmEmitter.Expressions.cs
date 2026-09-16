@@ -706,16 +706,31 @@ public sealed partial class LlvmEmitter
         }
 
         string llvmType = LlvmTypeOf(property.Type);
-        string readArguments = receiverRef is null ? "" : $"ptr {receiverRef}";
+
+        // An indexer's accessors take the indices as well as the receiver.
+        // They are emitted once and reused by both calls, so `grid[Next()]++`
+        // calls `Next` a single time and reads and writes the same element.
+        var indices = new List<string>();
+        for (int at = 0; at < increment.Arguments.Count; at++)
+        {
+            var argument = increment.Arguments[at];
+            AppendArgument(EmitExpression(argument), argument.Type, indices);
+        }
+
+        var readArguments = new List<string>();
+        if (receiverRef is not null) readArguments.Add($"ptr {receiverRef}");
+        readArguments.AddRange(indices);
 
         var was = new Val(
-            Emit(llvmType, $"call {llvmType} {virtualGet ?? Symbol(getter)}({readArguments})"),
+            Emit(llvmType,
+                $"call {llvmType} {virtualGet ?? Symbol(getter)}({string.Join(", ", readArguments)})"),
             llvmType, property.Type);
 
         var now = StepOne(was, increment.IsIncrement, increment.IsChecked, property.Type);
 
         var arguments = new List<string>();
         if (receiverRef is not null) arguments.Add($"ptr {receiverRef}");
+        arguments.AddRange(indices);
         AppendArgument(now, property.Type, arguments);
 
         Line($"call void {virtualSet ?? Symbol(setter)}({string.Join(", ", arguments)})");
