@@ -447,6 +447,55 @@ a call, and it is worth writing even upwards — there is no "always true"
 warning here, because even that answer is the object's. A cast that the object
 refuses ends the program, the same as a failed class downcast.
 
+### `[NoUnknown]`: a vtable that is not COM
+
+Some C libraries hand out the other thing: a bare array of function pointers,
+with no `QueryInterface`, no `AddRef` and no `Release` at the front of it. The
+binary shape is the same — a pointer to a vtable pointer — and everything COM
+adds is absent.
+
+```csharp
+[NoUnknown]
+public com interface IXAudio2Voice {
+    void GetVoiceDetails(VoiceDetails* details);       // slot 0, not slot 3
+    int  SetOutputVoices(VoiceSends* sends);
+    ...
+    void DestroyVoice();
+}
+```
+
+XAudio2's voices are the example the attribute exists for. `IXAudio2Voice`
+derives from nothing, its own first method is slot **0**, and a voice is ended
+by calling `DestroyVoice` rather than by a count reaching zero. Reaching one
+through an ordinary `com interface` would call `SetOutputVoices` where ARC
+expected `AddRef`, and the failure would be silent.
+
+Two things follow, and both are consequences rather than choices:
+
+- **The numbering starts at zero**, because there is nothing in front of it.
+- **ARC leaves it alone**, because the two slots ARC calls are not there. Such
+  a reference is a pointer that has methods: copying it counts nothing,
+  dropping it releases nothing, and how the object dies is the library's to
+  say.
+
+What the attribute costs is everything `IUnknown` was for. There is no `[Guid]`
+(SL0624) — an IID names an interface *to QueryInterface*, and there is none to
+ask. There is no `is` and no cast between two such interfaces, for the same
+reason. And a chain is all one kind or the other (SL0622): extending across
+would put `IUnknown` three slots into the middle of one table. It may be
+written only on a `com interface` (SL0623).
+
+A cast from `byte*` still adopts the pointer, and adopting costs nothing here
+because there was no `+1` to take over:
+
+```csharp
+byte* raw = null;
+audio.CreateSourceVoice(&raw, &format, 0u, 2.0f, null, null, null);
+var voice = (IXAudio2SourceVoice)raw;
+...
+voice.DestroyVoice();                  // the library's rule, written out
+```
+
 ### `com class`: being a COM object
 
 ```csharp

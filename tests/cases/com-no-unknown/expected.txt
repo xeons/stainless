@@ -1,0 +1,11 @@
+slot 0 volume = 3
+slot 1 volume = 5
+loudest       = 5
+after set     = 10
+mix           = 60
+through alias = 11
+alive before  = 1
+c: voice destroyed
+alive after   = 0
+slot 1 still  = 5
+end of Main

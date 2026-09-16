@@ -1,0 +1,11 @@
+header  = 20
+payload = 44
+magic   = yes
+area    = 24
+retries = 3
+timeout = 1.5
+verbose = no
+default = high
+kind    = 42
+through = 42
+label   = matched

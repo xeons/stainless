@@ -19,12 +19,14 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.IO](Standard-IO.md) | Streams, and the vocabulary the rest of the I/O modules share. |
 | [Standard.Json](Standard-Json.md) | JSON, in two layers. |
 | [Standard.Math](Standard-Math.md) | Arithmetic that is not an operator. |
+| [Standard.Media.Audio](Standard-Media-Audio.md) | Sound out of the machine, and sound into it. |
 | [Standard.Net](Standard-Net.md) | Sockets, the same on every platform. |
 | [Standard.Path](Standard-Path.md) | Taking paths apart and putting them together. |
 | [Standard.Process](Standard-Process.md) | Running another program. |
 | [Standard.Random](Standard-Random.md) | Pseudo-random numbers. |
 | [Standard.Reflection](Standard-Reflection.md) | Reading the metadata the compiler laid down. |
 | [Standard.Resources](Standard-Resources.md) | What a program carries inside itself, on every platform. |
+| [Standard.Security.Cryptography](Standard-Security-Cryptography.md) | Hashes, message authentication codes, key derivation and block ciphers. |
 | [Standard.Text](Standard-Text.md) | The rest of `String`. |
 | [Standard.Threading](Standard-Threading.md) | Locks, atomics and the job pool. |
 | [Standard.Time](Standard-Time.md) | Time, of the two kinds that must not be confused. |

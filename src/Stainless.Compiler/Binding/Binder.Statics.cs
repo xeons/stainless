@@ -119,6 +119,7 @@ public sealed partial class Binder
 
         if (containingType is not null &&
             (containingType.FindStatic(declaration.Name) is not null ||
+             containingType.Constants.Any(c => c.Name == declaration.Name) ||
              containingType.FindStorage(declaration.Name) is not null ||
              containingType.FindProperty(declaration.Name) is not null))
         {

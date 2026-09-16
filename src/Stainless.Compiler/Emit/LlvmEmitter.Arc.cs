@@ -208,8 +208,25 @@ public sealed partial class LlvmEmitter
     }
 
     /// <summary>Registers a +1 value for release once the current statement finishes.</summary>
-    private void TrackTemporary(string reference, TypeSymbol type) =>
+    ///
+    /// <remarks>
+    /// A <c>[NoUnknown]</c> com interface has no +1 to drop: releasing one
+    /// would call whatever its vtable has where Release would be. The guard is
+    /// here rather than at each caller because there is nothing any of them
+    /// could usefully do instead.
+    ///
+    /// It names that case rather than asking <c>NeedsArc</c>, which is a
+    /// narrower question than this one: a slice and a struct holding a
+    /// reference both answer false to it and both are tracked here.
+    /// </remarks>
+    private void TrackTemporary(string reference, TypeSymbol type)
+    {
+        if (type is ComInterfaceTypeSymbol { HasUnknown: false } or
+            OptionalTypeSymbol { Element: ComInterfaceTypeSymbol { HasUnknown: false } })
+            return;
+
         _pendingReleases.Add((reference, type));
+    }
 
     private void FlushTemporaries(int from = 0)
     {

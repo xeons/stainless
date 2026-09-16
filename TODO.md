@@ -228,6 +228,50 @@ like.
 
 *Touches:* `runtime/com.c`, `bindings/win32/Com.sl`.
 
+### Direct3D 12
+
+`Win32.Dxgi`, `Win32.D3D11` and `Win32.D3DCompiler` are bound, and
+`Windows.DirectX11` is the layer over them: a device and a swap chain on an
+`HWND`, a depth buffer, meshes, materials, constant buffers, alpha blending,
+and `SaveFrame` to read the back buffer out as a picture.
+[samples/directx](../samples/directx) renders a triangle and a lit, rotating,
+shadow-casting cube with it.
+
+**Direct3D 12 is not bound.** It is not more of the same: the device makes
+nothing that draws, a command list is recorded and submitted to a queue, memory
+is the program's to place and to keep alive across frames, and a fence is how
+it knows when the GPU is finished. The binding is mechanical -- the generator
+that read `ID3D11DeviceContext`'s hundred and eight slots out of the header's
+own `Vtbl` structs reads `ID3D12GraphicsCommandList` just as well -- and the
+*layer* is not, because a `Windows.DirectX12` that hid the queue and the fence
+would be hiding the only two things D3D12 exists to expose.
+
+**Why it matters**: nothing today needs it. D3D11 draws, and the machines that
+require D3D12 are the ones a renderer would be written for rather than a
+binding. What it would buy is the honest test of whether the COM story here
+scales to an API whose resource lifetimes are not reference counts.
+
+*Touches:* `bindings/win32/api`, a new `Windows.DirectX12`.
+
+### What DirectX 11 does not cover yet
+
+The layer is the six objects every program makes, and three things a second
+program would want are missing:
+
+- **Textures.** `CreateShaderResourceView` and `CreateSamplerState` are bound
+  and nothing wraps them, so a mesh can have colours and not a picture. It is
+  the smallest of the three and the most often wanted.
+- **A shadow map.** [samples/directx/cube.sl](../samples/directx/cube.sl)
+  projects the cube onto the floor with a matrix, which is exact for a flat
+  floor and wrong for anything else. A real one renders depth from the light
+  into a texture and samples it, which needs render-to-texture -- and therefore
+  the textures above.
+- **Multisampling.** The swap chain is flip-discard, which takes none, so
+  anti-aliasing means rendering to a multisampled target and resolving.
+  `ResolveSubresource` is bound.
+
+*Touches:* `bindings/win32/DirectX11.sl`.
+
 ### More Windows COM interfaces
 
 A binding rather than a project, now that the language part is done and the
@@ -360,6 +404,44 @@ part is the whole difficulty; the walk itself is a worklist.
 *Touches:* a new pass between binding and emission, and `LlvmEmitter`'s
 decision about what to write.
 
+### Public-key cryptography
+
+`Standard.Security.Cryptography` is the symmetric half and is complete: MD5,
+SHA-1, SHA-256, SHA-384, SHA-512, HMAC over any of them, PBKDF2, HKDF, AES in
+ECB, CBC, CFB and CTR, AES-GCM, the platform's entropy, and a constant-time
+comparison. Every answer is pinned against a published vector by
+`tests/cases/cryptography`.
+
+**RSA, ECDsa, ECDiffieHellman and X.509 are not there, and none of them is the
+work.** The work underneath all four is an arbitrary-precision integer:
+addition, multiplication, modular exponentiation with a Montgomery ladder, and
+an inverse -- in constant time, because the whole point of the exponent is that
+it is secret. That is a module of its own, it is the thing a mistake in is
+invisible, and half of it is worse than none.
+
+The honest alternatives are to write it, to bind to a library that has
+(bcrypt on Windows, OpenSSL elsewhere, and then two backends to keep honest),
+or to say that this standard library does the symmetric half and expects a
+program needing a signature to reach outside. **The third is what is happening
+and it should be a decision rather than a gap.**
+
+Two smaller things are also absent and are not blocked on any of that:
+scrypt and Argon2, which is what PBKDF2's weakness against a GPU actually calls
+for; and ChaCha20-Poly1305, which is AES-GCM's alternative on a machine with no
+AES instructions.
+
+### AES that does not leak through the cache
+
+The AES here is byte-oriented with a table-driven S-box, which is the shape
+that is known to leak a key to an attacker who can watch the data cache. It is
+right for a file, a protocol and a password store, and it is not the thing to
+put under a remote attacker who can time it.
+
+The two answers are AES-NI, which is an intrinsic the language has no way to
+spell, and a bitsliced fallback, which is a rewrite of the cipher that never
+indexes a table by a secret. Both are real work; the doc block on the module
+says plainly which one it is, which is the least that should be true.
+
 ### Case mapping beyond ASCII
 
 `ToUpperAscii` and `ToLowerAscii` say what they do. The real thing is a table
@@ -372,6 +454,23 @@ language's idea of alphabetical.
 The honest options are to link ICU, to generate the tables from
 UnicodeData.txt, or to keep saying `Ascii` in the name. The third is what is
 happening.
+
+### Audio that is not PCM
+
+`Standard.Media.Audio` plays and records interleaved PCM through WASAPI on
+Windows and ALSA elsewhere, and reads and writes WAV. Three things around it
+are open:
+
+- **A decoder.** WAV is the only container, so a program with an MP3, an Ogg or
+  a FLAC has nothing. Each is a real piece of work and a separate module;
+  saying so is better than a half-written one.
+- **Mixing.** One device, one stream: a second sound needs a second device,
+  which the platform may refuse. `Win32.Sound` is the mixer on Windows, over
+  XAudio2, and Linux has no equivalent here.
+- **ALSA has been compiled and not run.** The Windows half has played and
+  recorded on this machine; the ALSA half is written against the same seam and
+  has never opened a device. `geekom-a7` is where that gets answered, and until
+  it is, half of this module is a claim rather than a fact.
 
 ### Cancellation that skips queued work
 

@@ -789,13 +789,35 @@ public sealed partial class Binder
         _ => false,
     };
 
-    private void DeclareGlobalConstant(FileScope scope, GlobalConstDeclSyntax declaration)
+    /// <summary>
+    /// <c>const int Limit = 64;</c>, at module scope or inside a type.
+    ///
+    /// The two differ only in where the symbol is filed. A constant is inlined
+    /// at every use and has no storage, so unlike a <c>static</c> it needs no
+    /// moment at which to be initialized -- which is what lets a type in a
+    /// <c>--shared</c> library carry one (SL0380 refuses the static).
+    /// </summary>
+    private void DeclareGlobalConstant(
+        FileScope scope, GlobalConstDeclSyntax declaration,
+        NamedTypeSymbol? containingType = null)
     {
         var module = scope.Module;
-        if (module.Constants.ContainsKey(declaration.Name))
+
+        if (containingType is null && module.Constants.ContainsKey(declaration.Name))
         {
             diagnostics.Error("SL0201", declaration.Span,
                 $"'{declaration.Name}' is already declared in module '{module.Name}'");
+            return;
+        }
+
+        if (containingType is not null &&
+            (containingType.Constants.Any(c => c.Name == declaration.Name) ||
+             containingType.FindStatic(declaration.Name) is not null ||
+             containingType.FindStorage(declaration.Name) is not null ||
+             containingType.FindProperty(declaration.Name) is not null))
+        {
+            diagnostics.Error("SL0205", declaration.Span,
+                $"'{containingType.Name}' already declares a member named '{declaration.Name}'");
             return;
         }
 
@@ -834,7 +856,7 @@ public sealed partial class Binder
         else
         {
             diagnostics.Error("SL0215", declaration.Value.Span,
-                "a module-level 'const' must be initialized with a literal");
+                "a 'const' must be initialized with a literal");
         }
 
         // A constant is a value inlined at every use, so it has to be something
@@ -853,10 +875,13 @@ public sealed partial class Binder
             // an undefined name on top of the one real error.
         }
 
-        module.Constants[declaration.Name] = new ConstantSymbol(declaration.Name, type, value)
+        var symbol = new ConstantSymbol(declaration.Name, type, value)
         {
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
         };
+
+        if (containingType is not null) containingType.Constants.Add(symbol);
+        else module.Constants[declaration.Name] = symbol;
     }
 
     /// <summary>

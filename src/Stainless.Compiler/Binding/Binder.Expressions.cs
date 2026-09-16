@@ -918,6 +918,12 @@ public sealed partial class Binder
             if (_currentFunction?.Parameters.FirstOrDefault(p => p.Name == name && !p.IsThis) is { } parameter)
                 return Narrowed(new BoundParameterAccess(syntax.Span, parameter), parameter);
 
+            // A constant the enclosing type declares, named without the type
+            // in front of it -- which is how it reads inside its own methods,
+            // and what C# does with the same declaration.
+            if (_currentFunction?.ContainingType?.FindConstant(name) is { } ownConstant)
+                return new BoundConstantAccess(syntax.Span, ownConstant);
+
             if (_currentFunction?.ContainingType?.FindStatic(name) is { } ownStatic)
                 return new BoundStaticAccess(syntax.Span, ownStatic);
 

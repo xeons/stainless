@@ -51,6 +51,8 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Time` | `Instant`, `Duration`, `DateTime` and the monotonic `Clock` | on request |
 | `Standard.Random` | xoshiro256**, seeded by you or by the operating system | on request |
 | `Standard.Drawing` | raster images: decode, draw, encode ([§5.12](#512-standarddrawing)) | on request |
+| `Standard.Security.Cryptography` | hashes, MACs, key derivation, AES ([§5.13](#513-standardsecuritycryptography)) | on request |
+| `Standard.Media.Audio` | playing and recording sound ([§5.14](#514-standardmediaaudio)) | on request |
 | `Standard.Com` | `Guid` and `IUnknown`, for `com interface` ([§8.5](08-interop-libraries.md#85-com)) | on request |
 | `Standard` | `Result<T, TError>`, `[Flags]`, and the rest of what the language itself reads | automatically |
 
@@ -758,6 +760,67 @@ to a `.ttf`.
 declares a `Color` and all three of those, and a program that loaded a PNG to
 put it on a form would otherwise have to qualify every mention of whichever one
 it meant. A polygon therefore takes its points as a flat `int[]`.
+
+
+## 5.13 `Standard.Security.Cryptography`
+
+```csharp
+var digest = Sha256.HashData(Encoding.Utf8().GetBytes("hello"));
+var mac    = HmacSha256.HashData(key, message);
+var box    = try AesGcm.FromKey(key);
+```
+
+**The shape is `System.Security.Cryptography`'s**, so a program being ported
+finds the names where it left them. Three things differ, and each is a rule
+this language already has: the casing is the house rule's (`Sha256`, not
+`SHA256`); anything that can fail returns a `Result` rather than throwing a
+`CryptographicException`; and `SHA256.Create()` is `new Sha256()`, because
+.NET's factory exists to choose an implementation at run time and there is one
+here.
+
+| | |
+|---|---|
+| hashes | `Md5`, `Sha1`, `Sha256`, `Sha384`, `Sha512`, over `IHashAlgorithm` |
+| MACs | `Hmac` over any of them, and `HmacSha256` and its siblings |
+| derivation | `Rfc2898DeriveBytes.Pbkdf2`, `Hkdf` |
+| ciphers | `Aes` in ECB, CBC, CFB and CTR; `AesGcm` |
+| the rest | `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals` |
+
+Every answer is pinned against a published test vector — FIPS-180 and RFC 1321
+for the digests, RFC 2202 and 4231 for HMAC, RFC 6070 for PBKDF2, RFC 5869 for
+HKDF, FIPS-197 for the AES blocks, SP 800-38A for the modes and the GCM
+specification's own case 3 — by `tests/cases/cryptography`.
+
+**What is not there is public-key.** RSA, ECDsa, ECDiffieHellman and X.509 all
+rest on arbitrary-precision integer arithmetic, which this standard library
+does not have; [TODO.md](../../TODO.md) carries the shape that would take.
+
+## 5.14 `Standard.Media.Audio`
+
+```csharp
+var clip = try Wav.FromFile("chime.wav");
+Audio.Play(clip);
+
+var heard = try Audio.Record(AudioFormat.Voice, 3.0);
+Wav.Save(heard, "heard.wav");
+```
+
+Interleaved PCM and nothing else: 8-bit unsigned or 16-bit signed, one channel
+or two. That is what every platform agrees about and what a WAV file holds.
+`AudioPlayer` and `AudioRecorder` are the streaming halves, `Wav` is the
+container, and `Tone` makes a sound to check a device with.
+
+**WASAPI on Windows, ALSA everywhere else, and neither is linked.** Both are
+reached by name the first time a device is opened, exactly as `Standard.Drawing`
+reaches GDI+ and libgd — so a program that makes no sound pays nothing, and a
+machine with no audio library answers `AudioError.NoBackend`, which is a value
+to print rather than a link error.
+
+WASAPI rather than `winmm`'s `waveOut`: the latter still exists on Windows 11
+and has been an emulation on top of WASAPI since Vista, so it adds a buffer of
+latency to reach the same mixer and does not work inside an app container. A
+program that wants a game engine's mixing and 3D positioning wants
+`Win32.XAudio2`, which is bound separately.
 
 ---
 

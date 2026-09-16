@@ -328,6 +328,30 @@ one: a number, a `bool`, a `char` or an enum member. Its initializer is a
 literal, or a negated one — `const int GwlpUserData = -21;` — since a C header
 is full of those.
 
+**It may be written at module scope or inside a type**, and means the same
+thing in both. Inside a type it is named `Type.Name` from outside and without
+the prefix from within, and a derived class sees what its base declared:
+
+```csharp
+public sealed class Aes {
+    public const nuint BlockSize = 16u;
+
+    void AddRoundKey(byte[] block, nuint round) {
+        nuint at = round * BlockSize;           // no prefix inside the type
+    }
+}
+
+nuint blocks = length / Aes.BlockSize;          // and the type's name outside
+```
+
+A constant is the one piece of shared state a `--shared` library may carry,
+and for the reason the others may not: it is inlined rather than stored, so
+there is nothing to initialize and no entry point needed to do it
+([§7.6](07-functions-members.md#76-static-members) is where `static` runs into
+that). The one place it does not reach is an inline array's length, `T[N]`,
+which is settled during layout — before any type has its members — so a length
+there must still be a literal or a module-level `const`.
+
 A `String` is not one of them. It is a counted object, and inlining a pointer to
 its bytes would produce something that looks like a `String`, passes every check
 and is not one, so it is refused with the alternative:

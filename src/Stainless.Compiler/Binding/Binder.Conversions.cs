@@ -606,6 +606,12 @@ public sealed partial class Binder
         if (from is ComInterfaceTypeSymbol fromCom && to is ComInterfaceTypeSymbol toCom)
         {
             if (fromCom.DerivesFrom(toCom)) return ConversionKind.ComUpcast;
+
+            // A QueryInterface is a call through slot 0, and a `[NoUnknown]`
+            // vtable has something else there. The cast is refused rather than
+            // emitted as a call to whatever that turned out to be.
+            if (!fromCom.HasUnknown || !toCom.HasUnknown) return null;
+
             return explicitCast ? ConversionKind.ComQuery : null;
         }
 

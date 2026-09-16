@@ -660,6 +660,10 @@ public sealed partial class Binder
                     DeclareStatic(scope, shared, type);
                     break;
 
+                case GlobalConstDeclSyntax constant:
+                    DeclareGlobalConstant(scope, constant, type);
+                    break;
+
                 case StaticConstructorDeclSyntax initializer:
                     DeclareStaticConstructor(scope, type, initializer);
                     break;

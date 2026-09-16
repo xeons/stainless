@@ -73,6 +73,12 @@ public sealed partial class Binder
 
         var classType = type as ClassTypeSymbol;
 
+        // `[NoUnknown]` has to be read before the base list is walked, and long
+        // before the attribute pass: it decides where the numbering starts, and
+        // whether this interface may extend the one it names at all.
+        if (type is ComInterfaceTypeSymbol vtable)
+            vtable.HasUnknown = !declaration.Attributes.Any(a => a.Name.Last == "NoUnknown");
+
         if (type is StructTypeSymbol && declaration.Implements.Count > 0)
         {
             string kind = type switch
@@ -202,6 +208,16 @@ public sealed partial class Binder
             if (_typeSyntax.TryGetValue(comInterface, out var entry))
                 ResolveImplements(comInterface, entry.Declaration, entry.Scope);
 
+            if (derived.HasUnknown != comInterface.HasUnknown)
+            {
+                diagnostics.Error("SL0622", span,
+                    $"'{derived.Name}' and '{comInterface.Name}' disagree about whether their " +
+                    "vtable begins with IUnknown, and one table cannot do both: extending the " +
+                    "other would put IUnknown three slots into the middle of it. Write " +
+                    "'[NoUnknown]' on both, or on neither");
+                return;
+            }
+
             derived.BaseInterface = comInterface;
             return;
         }
@@ -246,8 +262,9 @@ public sealed partial class Binder
     {
         // Nothing extends nothing: a root com interface still starts with
         // IUnknown, because every COM vtable does and ARC calls two of its
-        // slots.
-        type.BaseInterface ??= _builtins.Unknown == type ? null : _builtins.Unknown;
+        // slots. A `[NoUnknown]` one is the exception, and starts at zero.
+        if (type.HasUnknown)
+            type.BaseInterface ??= _builtins.Unknown == type ? null : _builtins.Unknown;
 
         if (type.BaseInterface is { } baseInterface)
             type.VirtualTable.AddRange(baseInterface.VirtualTable);
@@ -272,7 +289,8 @@ public sealed partial class Binder
             type.VirtualTable.Add(method);
         }
 
-        if (type.VirtualTable.Count > ComInterfaceTypeSymbol.UnknownSlots) return;
+        int inherited = type.HasUnknown ? ComInterfaceTypeSymbol.UnknownSlots : 0;
+        if (type.VirtualTable.Count > inherited) return;
         if (type == _builtins.Unknown) return;
 
         diagnostics.Warning("SL0534", declaration.Span,
@@ -728,17 +746,42 @@ public sealed partial class Binder
     private IReadOnlyList<AttributeSyntax> BindGuid(
         NamedTypeSymbol type, TypeDeclSyntax declaration)
     {
-        var guids = declaration.Attributes.Where(a => a.Name.Last == "Guid").ToList();
+        // `[NoUnknown]` was read in pass 5, where it decided the numbering.
+        // Taken out here so the ordinary machinery does not go looking for an
+        // attribute type nobody declared.
+        var unknowns = declaration.Attributes.Where(a => a.Name.Last == "NoUnknown").ToList();
+        var rest = unknowns.Count == 0
+            ? declaration.Attributes
+            : declaration.Attributes.Except(unknowns).ToList();
+
+        if (unknowns.Count > 0 && type is not ComInterfaceTypeSymbol)
+            diagnostics.Error("SL0623", unknowns[0].Span,
+                $"'[NoUnknown]' says a COM vtable does not begin with IUnknown, and " +
+                $"'{type.Name}' is not a com interface; write it on a 'com interface'");
+
+        var guids = rest.Where(a => a.Name.Last == "Guid").ToList();
         if (guids.Count == 0)
         {
             // Without one the interface has no identity, so nothing can ask an
-            // object for it and a cast to it could never be answered.
-            if (type is ComInterfaceTypeSymbol needsOne && needsOne != _builtins.Unknown)
+            // object for it and a cast to it could never be answered. A
+            // `[NoUnknown]` one has no QueryInterface to be asked through, so
+            // an IID would name something nobody could use.
+            if (type is ComInterfaceTypeSymbol { HasUnknown: true } needsOne &&
+                needsOne != _builtins.Unknown)
                 diagnostics.Error("SL0537", declaration.Span,
                     $"'{type.Name}' is a com interface and has no '[Guid(\"...\")]'. An IID is " +
                     "how QueryInterface names an interface, so without one nothing could ever " +
                     "ask an object for this one");
-            return declaration.Attributes;
+            return rest;
+        }
+
+        if (type is ComInterfaceTypeSymbol { HasUnknown: false })
+        {
+            diagnostics.Error("SL0624", guids[0].Span,
+                $"'{type.Name}' is '[NoUnknown]', so its vtable has no QueryInterface and an " +
+                "IID would name something nothing could ask for. Drop the '[Guid]', or drop " +
+                "the '[NoUnknown]'");
+            return rest.Except(guids).ToList();
         }
 
         // On an interface it is an IID and on a com class it is a CLSID. The
@@ -749,7 +792,7 @@ public sealed partial class Binder
             diagnostics.Error("SL0538", guids[0].Span,
                 $"'[Guid]' names a COM interface or a COM class, and '{type.Name}' is " +
                 "neither; write it on a 'com interface' or a 'com class' declaration");
-            return declaration.Attributes.Except(guids).ToList();
+            return rest.Except(guids).ToList();
         }
 
         if (guids.Count > 1)
@@ -763,7 +806,7 @@ public sealed partial class Binder
             diagnostics.Error("SL0540", only.Span,
                 "'[Guid]' takes one string literal, as in " +
                 "'[Guid(\"42f85136-db7e-439c-85f1-e4075d135fc8\")]'");
-            return declaration.Attributes.Except(guids).ToList();
+            return rest.Except(guids).ToList();
         }
 
         if (!Guid.TryParseExact(text, "D", out var parsed))
@@ -775,7 +818,7 @@ public sealed partial class Binder
         else
             ((ClassTypeSymbol)type).Clsid = parsed;
 
-        return declaration.Attributes.Except(guids).ToList();
+        return rest.Except(guids).ToList();
     }
 
     private void BindAttributes(

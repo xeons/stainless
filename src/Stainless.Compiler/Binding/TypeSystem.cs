@@ -382,6 +382,29 @@ public abstract class NamedTypeSymbol : TypeSymbol
         Statics.FirstOrDefault(s => s.Name == name);
 
     /// <summary>
+    /// <c>const</c> members: values inlined at every use, belonging to the type
+    /// rather than to the module around it.
+    ///
+    /// Kept apart from <see cref="Statics"/> because a constant has no storage
+    /// to initialize -- which is also why it is the one thing a type in a
+    /// <c>--shared</c> library may carry that a static may not.
+    /// </summary>
+    public List<ConstantSymbol> Constants { get; } = [];
+
+    /// <summary>
+    /// This type's constant of that name, or one a base declared. The walk is
+    /// the same one <see cref="FindMethods"/> makes: a derived type sees what
+    /// it inherits.
+    /// </summary>
+    public ConstantSymbol? FindConstant(string name)
+    {
+        if (Constants.FirstOrDefault(c => c.Name == name) is { } here)
+            return here;
+
+        return (this as ClassTypeSymbol)?.BaseClass?.FindConstant(name);
+    }
+
+    /// <summary>
     /// The <c>static Name() { }</c> block, or null. It runs once, before
     /// <c>Main</c>, after every static field's initializer.
     /// </summary>
@@ -1049,9 +1072,33 @@ public sealed class ComInterfaceTypeSymbol : NamedTypeSymbol
     /// <summary>
     /// Counted, so ARC applies -- but through AddRef and Release rather than
     /// through sl_retain, which is what <c>NeedsComArc</c> tells the emitter.
+    ///
+    /// A <c>[NoUnknown]</c> interface has neither to call, so it is not counted
+    /// and <see cref="TypeExtensions.NeedsArc"/> says so.
     /// </summary>
-    public override bool IsManaged => true;
+    public override bool IsManaged => HasUnknown;
     public override bool IsReferenceType => true;
+
+    /// <summary>
+    /// Whether this vtable begins with IUnknown, as every COM vtable does.
+    ///
+    /// <para>
+    /// False only for a <c>[NoUnknown]</c> declaration, which describes the
+    /// other thing a C library sometimes hands out: a bare array of function
+    /// pointers with no QueryInterface, no AddRef and no Release.
+    /// XAudio2's voices are the example -- <c>IXAudio2Voice</c> derives from
+    /// nothing, its own first method is slot <b>0</b>, and it is destroyed by
+    /// calling <c>DestroyVoice</c> rather than by a count reaching zero.
+    /// </para>
+    /// <para>
+    /// Two things follow, and both are consequences rather than choices. The
+    /// numbering starts at zero, because there is nothing in front of it. And
+    /// ARC leaves it alone, because the two slots ARC calls are not there --
+    /// which makes such a reference a pointer with methods, whose lifetime is
+    /// the library's business and not the language's.
+    /// </para>
+    /// </summary>
+    public bool HasUnknown { get; set; } = true;
 
     /// <summary>
     /// The interface this one extends, or null for <c>IUnknown</c> itself.
@@ -1317,8 +1364,19 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
 public static class TypeExtensions
 {
     /// <summary>True when values of this type participate in retain/release.</summary>
-    public static bool NeedsArc(this TypeSymbol type) =>
-        type.IsReferenceType || type is OptionalTypeSymbol;
+    ///
+    /// <remarks>
+    /// A <c>[NoUnknown]</c> com interface is the one reference type that does
+    /// not: there is no AddRef and no Release in its vtable to call, so there
+    /// is no count for the emitter to keep. It is still a reference -- it may
+    /// be null, and a cast reinterprets it -- and it is simply never counted.
+    /// </remarks>
+    public static bool NeedsArc(this TypeSymbol type) => type switch
+    {
+        ComInterfaceTypeSymbol { HasUnknown: false } => false,
+        OptionalTypeSymbol { Element: ComInterfaceTypeSymbol { HasUnknown: false } } => false,
+        _ => type.IsReferenceType || type is OptionalTypeSymbol,
+    };
 
     /// <summary>
     /// True for any slot the emitter must maintain a count in: a strong

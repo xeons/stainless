@@ -596,6 +596,12 @@ expression.
 A static method cannot implement an interface method: dispatch arrives on an
 object, and a static method has nowhere to put one.
 
+**A `const`** belongs to the type in the same way and is not storage at all: it
+is inlined at every use ([§9.3](09-statements-expressions.md#93-const-and-static)),
+so it needs no initializer to be run and is the one type member a `--shared`
+library may have. `Aes.BlockSize` is reached by the type's name from outside
+and by its own name from within.
+
 **A field** is the same storage a module-level `static` is, named by the type
 instead of the module ([§9.3](09-statements-expressions.md#93-const-and-static)). It may be mutable, and it needs an initializer:
 

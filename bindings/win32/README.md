@@ -8,6 +8,7 @@ which one you are looking at:
 | `Win32.Handles` | **a header name**: the handle types, which belong to no one DLL — `windef.h` |
 | `Win32.Kernel32`, `Win32.User32`, … | **a DLL name**: declarations and nothing else, spelled as Windows spells them |
 | `Win32`, `Win32.Files`, `Win32.Ui`, … | **a task name**: the conveniences, written on top of those declarations |
+| `Windows.DirectX`, `Windows.DirectX11` | **a subject**: the graphics layers, which are large enough to be their own thing |
 
 The raw layer is the entry points, constants, structs, unions, enums and
 delegates of ten libraries, plus the handle types and the names they go by,
@@ -40,7 +41,19 @@ bindings/win32/api/
   Version.sl     module Win32.Version;    reading an RT_VERSION resource
   Ws2_32.sl      module Win32.Ws2_32;     Winsock: sockets, addresses, poll,
                                           getaddrinfo, and WSAStartup
+  XInput.sl      module Win32.XInput;     game controllers
+  XAudio2.sl     module Win32.XAudio2;    the mixer a game plays through
+  Dxgi.sl        module Win32.Dxgi;       adapters, outputs, formats, the
+                                          swap chain
+  D3D11.sl       module Win32.D3D11;      Direct3D 11
+  D3DCompiler.sl module Win32.D3DCompiler; HLSL into bytecode
 ```
+
+The DirectX and audio modules were not transcribed by hand. The `*Vtbl` struct
+each header generates for C is the authority on slot order and signature, and
+that is what was read: a method in the wrong slot is a call to a different
+function with nothing to report it, and `ID3D11DeviceContext` alone has a
+hundred and eight of them.
 
 One module per DLL, so there is never a question about where something lives or
 which `-l` it wants. The console and the clock are in `Kernel32` because that is
@@ -50,6 +63,19 @@ Two are not DLLs. `Handles` is the handle types: `HWND` belongs to no single
 library, which is why Windows keeps it in `windef.h`. `ShellCom` is the COM
 interfaces the shell exposes, which likewise belong to no DLL — an interface is
 a contract, and the object behind it comes from wherever activation found it.
+
+### The one vtable that is not COM
+
+`Win32.XAudio2`'s voices are the exception to everything above. `IXAudio2` is a
+real COM object — it derives from `IUnknown`, it is counted, ARC releases it —
+and `IXAudio2Voice` is not: it derives from nothing, its own first method is
+slot **0**, and a voice ends when `DestroyVoice` is called rather than when a
+count reaches zero. Reaching one through an ordinary `com interface` would call
+`SetOutputVoices` where ARC expected `AddRef`, and the failure would be silent.
+
+`[NoUnknown]` is what says so, and
+[§8.5 of the specification](../../docs/spec/08-interop-libraries.md#nounknown-a-vtable-that-is-not-com)
+is what it means. It exists for this.
 
 ### The handle types
 
@@ -166,7 +192,17 @@ bindings/win32/
                                               shell items
   Dialogs.sl       module Win32.Dialogs;      the file dialogs, both generations
   Resources.sl     module Win32.Resources;    what the binary carries inside it
+  Gamepad.sl       module Win32.Gamepad;      pads, dead zones, edges, rumble
+  Sound.sl         module Win32.Sound;        a mixer: several sounds at once
+  DirectX.sl       module Windows.DirectX;    adapters and the shader compiler
+  DirectX11.sl     module Windows.DirectX11;  a device, a swap chain, a frame
 ```
+
+The last three are named `Windows.` rather than `Win32.` because they are a
+subject rather than a task: Direct3D is large enough that a program using it is
+mostly using it, and the name should say which API it is looking at. `Gamepad`
+and `Sound` keep the `Win32.` prefix, being one convenience layer each over one
+DLL.
 
 These exist only where saying it in Stainless is genuinely better than saying it
 in C: **text**, which crosses as UTF-8 and has to be widened; **lifetime**,
@@ -186,6 +222,10 @@ Which library each wants:
 | `Win32.Shell` | `shell32` (and `user32`, `ole32`) |
 | `Win32.Dialogs` | `comdlg32` (and `user32`, `ole32`) |
 | `Win32.Resources` | `user32` |
+| `Win32.Gamepad` | `xinput` |
+| `Win32.Sound` | `xaudio2` (and `ole32`) |
+| `Windows.DirectX` | `dxgi`, `d3dcompiler` |
+| `Windows.DirectX11` | `d3d11` (and the two above) |
 
 The first row needs none: kernel32 is pulled in by the C runtime every Windows
 program already links.

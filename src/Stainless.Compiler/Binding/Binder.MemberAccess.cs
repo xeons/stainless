@@ -197,6 +197,22 @@ public sealed partial class Binder
             return BindVariantConstruction(variantType, named, [], syntax.Span);
         }
 
+        // `Aes.BlockSize` -- a value inlined here, belonging to the type.
+        // Before the statics, because a constant has no storage to read and
+        // the two cannot collide: SL0205 refuses a type that declares both.
+        if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target) is { } constantOwner &&
+            constantOwner.FindConstant(syntax.Member) is { } inlined)
+        {
+            if (!CanReach(inlined.IsPublic, isProtected: false, constantOwner))
+            {
+                diagnostics.Error("SL0249", syntax.Span,
+                    NotVisible(constantOwner, syntax.Member, isProtected: false));
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            return new BoundConstantAccess(syntax.Span, inlined);
+        }
+
         // `FileStream.Open` without a call is the method itself, waiting for a
         // delegate to say which overload was meant -- the same thing a bare
         // function name is.

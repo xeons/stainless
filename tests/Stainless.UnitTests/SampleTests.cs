@@ -88,6 +88,7 @@ public class SampleTests
         new("stress", ["samples/stress.sl"]),
         new("strings", ["samples/strings.sl"]),
         new("wc", ["samples/wc.sl"]),
+        new("audio", ["samples/audio/audio.sl"]),
         new("interop", ["samples/interop/interop.sl"]),
 
         new("modules", ["samples/modules/App.sl", "samples/modules/Geometry.sl"]),
@@ -125,6 +126,8 @@ public class SampleTests
         ]),
 
         new("win32/report", ["samples/win32/report.sl"]) { WindowsOnly = true },
+        new("directx/triangle", ["samples/directx/triangle.sl"]) { WindowsOnly = true },
+        new("directx/cube", ["samples/directx/cube.sl"]) { WindowsOnly = true },
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
         new("win32/resources", ["samples/win32/resources.sl"]) { WindowsOnly = true },
 

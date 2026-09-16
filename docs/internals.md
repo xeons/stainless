@@ -16,8 +16,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 302 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 848 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 317 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 853 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -26,8 +26,8 @@ a unit test asks the front end alone -- what did the lexer make of this, where
 exactly does this error point, which registers does this struct travel in --
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 302 cases, of which 13 are
-Windows-only and 2 are Linux-only, so Linux runs 289 and Windows 300, each
+**Both Windows and Linux are tested.** 317 cases, of which 13 are
+Windows-only and 2 are Linux-only, so Linux runs 304 and Windows 315, each
 skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
