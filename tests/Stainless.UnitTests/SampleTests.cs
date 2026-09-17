@@ -127,7 +127,10 @@ public class SampleTests
 
         new("win32/report", ["samples/win32/report.sl"]) { WindowsOnly = true },
         new("directx/triangle", ["samples/directx/triangle.sl"]) { WindowsOnly = true },
-        new("directx/cube", ["samples/directx/cube.sl"]) { WindowsOnly = true },
+        new("directx/cube", [
+            "samples/directx/cube.sl",
+            "samples/directx/tracker.sl",
+        ]) { WindowsOnly = true },
         new("win32/window", ["samples/win32/window.sl"]) { WindowsOnly = true },
         new("win32/resources", ["samples/win32/resources.sl"]) { WindowsOnly = true },
 

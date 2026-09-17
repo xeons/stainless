@@ -3,14 +3,23 @@
 // A rotating cube, a light above it, the shadow it casts, bouncing text, and
 // chiptune.
 //
-//   stainless run samples/directx/cube.sl bindings/win32 -l user32
-//   stainless run samples/directx/cube.sl bindings/win32 -l user32 -- 600
-//   stainless run samples/directx/cube.sl bindings/win32 -l user32 -- 120 quiet shot
+//   stainless run samples/directx/cube.sl samples/directx/tracker.sl \
+//       bindings/win32 -l user32
+//
+//   ... -- 600                  draw 600 frames and stop
+//   ... -- 120 quiet shot       no sound, and write cube.png
+//   ... -- song.xm              play that module instead
 //
 // The number is how many frames to draw before closing; with none it runs
 // until the window is closed. `quiet` skips the music, which is what a machine
 // with no audio device wants, and `shot` writes `cube.png` from the back
 // buffer -- because the only thing that proves a frame was drawn is a picture.
+//
+// **The music is whichever `.xm` it finds**, and the tune it synthesises
+// itself when it finds none. An argument ending in `.xm` names one; otherwise
+// it looks for `comicbakery.xm` beside itself. `Tracker` is the player, and it
+// is in a file of its own because it is a library rather than part of a
+// sample.
 //
 // **Everything here is this repository's own.** Direct3D 11 through
 // `Windows.DirectX11`, XAudio2 through `Win32.Sound`, and the matrix maths in
@@ -30,8 +39,10 @@
 //     texture, no sampler and no font.
 //   - **The shaders.** One pair for all of it: a transform, a light, and an
 //     override colour that the shadow and the text use to draw flat.
-//   - **The music.** A square-wave lead over an arpeggiated bass, synthesised
-//     into a buffer at startup and looped by XAudio2.
+//   - **The music.** An `.xm` module if one is there, played by `Tracker`;
+//     otherwise three voices in the C64 idiom, synthesised at startup -- a
+//     pulse-width-modulated lead with vibrato, a per-frame arpeggio standing
+//     in for chords, and a plucked bass. Either way XAudio2 loops it.
 module Cube;
 
 import Standard.Console;
@@ -51,6 +62,7 @@ import Win32.D3DCompiler;
 import Win32.Sound;
 import Windows.DirectX;
 import Windows.DirectX11;
+import Tracker;
 
 // ==================================================================== maths
 
@@ -499,66 +511,209 @@ String Source() =>
 
 // ==================================================================== music
 
-/// A chiptune, as 16-bit mono PCM.
+/// What is going to be played, and at what rate and width.
+struct Music
+{
+    public byte[] Samples;
+    public uint Rate;
+    public uint Channels;
+    public String Source;
+}
+
+/// A module if one can be found, and the synthesised tune if not.
 ///
-/// **A chiptune is a square wave and a rhythm**, and that is all this is: a
-/// melody whose duty cycle alternates for a bit of timbre, an arpeggiated bass
-/// under it, and a short envelope on every note so that it plucks the way a
-/// two-channel sound chip did rather than droning.
+/// A module is thirty kilobytes for two minutes where the same as PCM is
+/// twelve megabytes, which is the whole reason the format exists -- and it
+/// means a demo can carry real music without carrying a wave file.
+Music Load(String wanted)
+{
+    Music music;
+    music.Rate = 22050u;
+
+    String[] candidates = [
+        wanted,
+        "comicbakery.xm",
+        "samples/directx/comicbakery.xm",
+        "../comicbakery.xm",
+    ];
+
+    for (nuint i = 0u; i < candidates.Length; i++)
+    {
+        if (candidates[i].ByteLength() == 0u)
+            continue;
+
+        var loaded = Tracker.Load(candidates[i]);
+        if (!loaded.Ok)
+            continue;
+
+        var song = loaded.Value;
+        music.Samples = Tracker.Render(song, music.Rate, 240.0);
+        music.Channels = 2u;
+        music.Source = song.Name + " (" + candidates[i] + ")";
+        return music;
+    }
+
+    music.Samples = Chiptune(music.Rate);
+    music.Channels = 1u;
+    music.Source = "the built-in chiptune";
+    return music;
+}
+
+// A three-voice chiptune, written the way a C64 routine wrote one.
+//
+// **The sound is the technique, not the waveform.** A SID had three voices and
+// no chords, so its music faked them: one voice cycles through the notes of a
+// chord at the frame rate, fast enough that the ear hears a chord and slow
+// enough that it shimmers. That arpeggio is the single most recognisable thing
+// about the era. Two more habits do the rest -- the lead's pulse width is
+// swept so a plain square stops sounding like a test tone, and a slow vibrato
+// comes in after a note has been held a moment.
+//
+// Everything below is an original tune in that idiom, in A minor.
+
+/// The player ran once a video frame, which on a PAL machine was 50 Hz. Every
+/// per-tick decision here -- which note of the chord, how far through the
+/// envelope -- happens at that rate, because that is what gives the style its
+/// particular graininess.
+const double TicksPerSecond = 50.0;
+
+/// Six ticks a row is about 125 beats a minute in sixteenths.
+const nuint TicksPerRow = 6u;
+
+/// A row with nothing in it. Any value no note could have.
+const int Rest = -128;
+
+/// The melody, in semitones from A above middle C, one entry per row.
+int[] Lead() => [
+    12, Rest, 10, 12,   15, Rest, 12, 10,
+     7, Rest, 10, 12,   15,   17, 15, 12,
+    12, Rest, 15, 17,   19, Rest, 17, 15,
+    12,   10,  7,  5,    3,    5,  7, 10,
+];
+
+/// The chord under each group of four rows: Am, Am, F, F, C, C, G, G. Three
+/// notes each, an octave or so below the melody, which is where a SID put
+/// them.
+int[] Chords() => [
+    -12,  -9,  -5,     -12,  -9,  -5,
+    -16, -12,  -7,     -16, -12,  -7,
+     -9,  -5,  -2,      -9,  -5,  -2,
+    -14, -10,  -7,     -14, -10,  -7,
+];
+
+/// The root of each chord, two octaves down, for the bass.
+int[] BassRoots() => [-24, -24, -28, -28, -21, -21, -26, -26];
+
+/// How many rows the pattern is.
+const nuint RowCount = 32u;
+
+/// The tune, rendered as 16-bit mono PCM.
+///
+/// Three voices are summed and clipped, which is what a chip did too. The
+/// phases are accumulated rather than computed from the elapsed time, because
+/// a frequency that changes -- and the vibrato changes it every sample --
+/// leaves a click at every boundary if the phase is recomputed instead.
 byte[] Chiptune(uint rate)
 {
-    int[] melody = [
-        0, 3, 7, 12,  7, 3, 0, 3,
-        5, 8, 12, 15, 12, 8, 5, 3,
-        0, 3, 7, 12,  7, 12, 15, 12,
-        7, 3, 0, -5,  0, 3, 7, 0,
-    ];
-    int[] bass = [-24, -24, -17, -17, -19, -19, -24, -24];
+    nuint samplesPerTick = (nuint)((double)rate / TicksPerSecond);
+    nuint samplesPerRow = samplesPerTick * TicksPerRow;
+    nuint frames = samplesPerRow * RowCount;
 
-    double noteSeconds = 0.15;
-    nuint perNote = (nuint)(noteSeconds * (double)rate);
-    nuint frames = perNote * melody.Length;
     byte[] samples = new byte[frames * 2u];
 
-    for (nuint note = 0u; note < melody.Length; note++)
+    var lead = Lead();
+    var chords = Chords();
+    var roots = BassRoots();
+
+    double leadPhase = 0.0;
+    double arpPhase = 0.0;
+    double bassPhase = 0.0;
+
+    // The two slow modulations, which run continuously rather than restarting
+    // with each note -- that is what makes them sound like one instrument
+    // rather than like an effect.
+    double pulsePhase = 0.0;
+    double vibratoPhase = 0.0;
+
+    for (nuint frame = 0u; frame < frames; frame++)
     {
-        double lead = Frequency(melody[note]);
-        double under = Frequency(bass[note % bass.Length]);
+        nuint row = frame / samplesPerRow;
+        nuint intoRow = frame - row * samplesPerRow;
+        nuint tick = frame / samplesPerTick;
+        double through = (double)intoRow / (double)samplesPerRow;
 
-        // The duty cycle changes every fourth note, which is the one thing
-        // that keeps a square wave from sounding like a test tone.
-        double duty = 0.5;
-        if (note % 4u >= 2u)
-            duty = 0.25;
+        nuint chord = row / 4u;
 
-        for (nuint i = 0u; i < perNote; i++)
+        pulsePhase = pulsePhase + 0.7 / (double)rate;
+        vibratoPhase = vibratoPhase + 5.5 / (double)rate;
+
+        // ------------------------------------------------------------ lead
+
+        double leadValue = 0.0;
+        int note = lead[row];
+
+        if (note != Rest)
         {
-            double t = (double)i / (double)rate;
-            double through = (double)i / (double)perNote;
+            // Vibrato, held back until the note has sounded for a moment: a
+            // C64 routine delayed it by a few ticks for exactly this reason,
+            // and it is the difference between expression and seasickness.
+            double depth = through < 0.25 ? 0.0 : (through - 0.25) * 0.012;
+            double wobble = 1.0 + depth * Math.Sin(vibratoPhase * 6.28318530717958623200);
 
-            // A fast attack and a long decay: a plucked note rather than an
-            // organ, and the reason the tune has any rhythm at all.
-            double envelope = Math.Pow(1.0 - through, 1.6);
-            if (through < 0.02)
-                envelope = through / 0.02;
+            leadPhase = leadPhase + Frequency(note) * wobble / (double)rate;
 
-            double value = Square(lead * t, duty) * 0.30 * envelope
-                         + Square(under * t, 0.5) * 0.16 * envelope;
+            // Pulse-width modulation: the duty cycle sweeps between a thin
+            // reedy pulse and a hollow square.
+            double duty = 0.5 + 0.28 * Math.Sin(pulsePhase * 6.28318530717958623200);
 
-            int sample = (int)(value * 32000.0);
-            if (sample > 32767)
-                sample = 32767;
-            if (sample < -32768)
-                sample = -32768;
+            // A hard attack and a gate that closes before the row ends, which
+            // is what separates one note from the next without a rest.
+            double envelope = 1.0;
+            if (through < 0.03)
+                envelope = through / 0.03;
+            else if (through > 0.82)
+                envelope = (1.0 - through) / 0.18;
 
-            int stored = sample;
-            if (stored < 0)
-                stored = stored + 65536;
-
-            nuint frame = note * perNote + i;
-            samples[frame * 2u] = (byte)(stored & 0xFF);
-            samples[frame * 2u + 1u] = (byte)((stored >> 8) & 0xFF);
+            leadValue = Pulse(leadPhase, duty) * 0.26 * envelope;
         }
+
+        // ------------------------------------------------------- the arpeggio
+
+        // One note of the chord per tick, cycling. This is the whole trick:
+        // three notes at 50 Hz is heard as a chord.
+        nuint which = tick % 3u;
+        int arpNote = chords[chord * 3u + which];
+        arpPhase = arpPhase + Frequency(arpNote) / (double)rate;
+
+        // Softer than the lead and never gated, so it sits underneath as a
+        // texture rather than a part.
+        double arpValue = Pulse(arpPhase, 0.5) * 0.11;
+
+        // ------------------------------------------------------------- bass
+
+        // Eighth notes: the root on every other row, plucked.
+        double bassValue = 0.0;
+        if (row % 2u == 0u)
+        {
+            bassPhase = bassPhase + Frequency(roots[chord]) / (double)rate;
+            double decay = Math.Pow(1.0 - through, 1.4);
+            bassValue = Pulse(bassPhase, 0.5) * 0.30 * decay;
+        }
+
+        // ------------------------------------------------------------- mix
+
+        int sample = (int)((leadValue + arpValue + bassValue) * 30000.0);
+        if (sample > 32767)
+            sample = 32767;
+        if (sample < -32768)
+            sample = -32768;
+
+        int stored = sample;
+        if (stored < 0)
+            stored = stored + 65536;
+
+        samples[frame * 2u] = (byte)(stored & 0xFF);
+        samples[frame * 2u + 1u] = (byte)((stored >> 8) & 0xFF);
     }
 
     return samples;
@@ -582,8 +737,11 @@ double Frequency(int semitones)
     return 440.0 * ratio;
 }
 
-/// A square wave of a given duty cycle, from a phase in cycles.
-double Square(double cycles, double duty)
+/// A pulse wave of a given duty cycle, from an accumulated phase in cycles.
+///
+/// The phase is allowed to grow without bound and only its fraction is used,
+/// which costs nothing here and keeps the caller from having to wrap it.
+double Pulse(double cycles, double duty)
 {
     double phase = cycles - (double)(long)cycles;
     return phase < duty ? 1.0 : -1.0;
@@ -628,6 +786,7 @@ int Main()
     long limit = 0;
     bool quiet = false;
     bool shot = false;
+    String songPath = "";
 
     for (nuint i = 0u; i < Env.ArgumentCount(); i++)
     {
@@ -636,6 +795,8 @@ int Main()
             quiet = true;
         else if (argument == "shot")
             shot = true;
+        else if (argument.EndsWith(".xm"))
+            songPath = argument;
         else
             limit = Convert.ToLong(argument).ValueOr(limit);
     }
@@ -771,12 +932,15 @@ int Main()
         else
         {
             mixer = engine.Value;
-            var loaded = engine.Value.Load(Chiptune(22050u), 22050u, 1u);
+
+            var tune = Load(songPath);
+            var loaded = engine.Value.Load(tune.Samples, tune.Rate, tune.Channels);
             if (loaded.Ok)
             {
                 music = loaded.Value;
                 loaded.Value.Loop(0.7f);
-                Console.WriteLine("chiptune: " + Text.FromDouble(loaded.Value.Duration) +
+                Console.WriteLine("music: " + tune.Source + ", " +
+                                  Text.FromDouble(loaded.Value.Duration) +
                                   " seconds, looping");
             }
         }
