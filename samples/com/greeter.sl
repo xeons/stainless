@@ -9,7 +9,7 @@
 // happens to present a COM vtable.
 //
 // What makes it a *server* rather than an object you could pass around is the
-// three exports at the bottom. `DllGetClassObject` is how COM asks a module
+// two exports at the bottom. `DllGetClassObject` is how COM asks a module
 // for a class it has never seen, and answering it is what lets the host say
 // "make me one of these" with nothing but a CLSID.
 module Greeter;
@@ -115,8 +115,9 @@ export "C" __stdcall int DllGetClassObject(Guid* clsid, Guid* iid, byte** result
     return Com.GetClassObject(clsid, iid, result);
 }
 
-/// Whether the host may unload this module. Always S_FALSE: see the note on
-/// `Com.CanUnloadNow` for why a server whose objects ARC owns declines.
+/// Whether the host may unload this module: S_OK once no object this module
+/// made is still held, and S_FALSE while one is, because unloading then would
+/// leave that object's vtable pointing into code that is gone.
 export "C" __stdcall int DllCanUnloadNow()
 {
     return Com.CanUnloadNow();

@@ -158,7 +158,7 @@ job C# gives that word:
 ```csharp
 public using Handle = void*;
 public using Count  = nuint;
-public using Status = Result;       // an alias may name another
+public using Size   = Count;        // an alias may name another
 ```
 
 An alias **is** the type it names. There is no wrapper, no conversion and
@@ -176,7 +176,7 @@ A ring of aliases names no type, and is refused whether or not anything uses it:
 error[SL0522]: 'Ring' is defined in terms of itself, so it names no type
 ```
 
-**Distinctness comes from the type, not the alias** — see [§2.2.1](02-types.md#221-struct-hwnd--a-type-declared-and-not-laid-out).
+**Distinctness comes from the type, not the alias** — see [§2.2.1](02-types.md#221-struct-hwnd__--a-type-declared-and-not-laid-out).
 
 ## 1.6 Ambiguity
 
@@ -198,7 +198,7 @@ Two modules are imported into every file without being asked for.
 program mentioned one or not.
 
 `Standard`, because what lives there is the language's own vocabulary rather
-than a library: `Result<T, TError>` ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)) and the markers `[Flags]`, `[Packed]` and
+than a library: `Result<T, TError>` ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails)) and the markers `[Flags]`, `[Packed]` and
 `[Align]`, each of which is a rule about a declaration rather than a dependency
 on one. Requiring an import for them would make a rule look like a library.
 

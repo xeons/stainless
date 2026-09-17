@@ -334,6 +334,28 @@ public class BinderTests
             "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] class C { }"));
 
     /// <summary>
+    /// A <c>[NoUnknown]</c> vtable has no QueryInterface and no IID, so every
+    /// spelling of the question is refused where it is written, from either
+    /// side. It used to reach the emitter, which wrote a call against an IID
+    /// nothing defined, and the build ended in "this is a compiler bug".
+    /// </summary>
+    [Theory]
+    [InlineData("bool r = a is IB;", "SL0518")]
+    [InlineData("bool r = c is IA;", "SL0518")]
+    [InlineData("bool r = a is IC;", "SL0518")]
+    [InlineData("int r = a switch { IB => 1, _ => 0 };", "SL0619")]
+    [InlineData("int r = c switch { IA => 1, _ => 0 };", "SL0619")]
+    [InlineData("var r = (IB)a;", "SL0243")]
+    [InlineData("var r = a as IB;", "SL0612")]
+    public void ANoUnknownInterfaceCannotBeAskedWhatItIs(string statement, string code) =>
+        Assert.Equal([code], Front.ModuleCodes(
+            "[NoUnknown] com interface IA { void A(); }\n" +
+            "[NoUnknown] com interface IB { void B(); }\n" +
+            "[Guid(\"9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10\")] com interface IC { void C(); }\n" +
+            "void F()\n{\n    var a = (IA)(byte*)null;\n    var c = (IC)(byte*)null;\n    " +
+            statement + "\n}"));
+
+    /// <summary>
     /// Overloads that differ in a parameter type are fine; this is the
     /// baseline the duplicate case is measured against.
     /// </summary>
@@ -411,6 +433,75 @@ public class BinderTests
     public void EveryDeclarationMustAgreeAboutTheKind() =>
         Assert.Equal(["SL0550"], Front.ModuleCodes(
             "public class C { }\npublic struct C { }"));
+
+    /// <summary>
+    /// Every kind of type a name can be declared as, with <c>$</c> for the
+    /// name, and what a second declaration of the same kind may add to it.
+    /// </summary>
+    private static readonly (string Kind, string Source)[] s_declarationKinds =
+    [
+        ("class", "class $ { int A; }"),
+        ("struct", "struct $ { int A; }"),
+        ("opaque", "struct $;"),
+        ("union", "union $ { int A; float B; }"),
+        ("variant", "variant $ { One; Two(int A); }"),
+        ("interface", "interface $ { int F(); }"),
+        ("com", "[Guid(\"9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10\")] com interface $ { int F(); }"),
+        ("attribute", "attribute $ { int A; }"),
+        ("enum", "enum $ { A, B }"),
+        ("delegate", "delegate int $(int x, int y);"),
+        ("closure", "closure int $(int x);"),
+        ("alias", "using $ = int;"),
+        ("generic class", "class $<T> { T A; }"),
+        ("generic variant", "variant $<T> { Leaf(T Item); }"),
+        ("generic closure", "closure T $<T>(T x);"),
+    ];
+
+    public static TheoryData<string, string> DeclarationKindPairs()
+    {
+        var data = new TheoryData<string, string>();
+        foreach (var first in s_declarationKinds)
+            foreach (var second in s_declarationKinds)
+                data.Add(first.Kind, second.Kind);
+        return data;
+    }
+
+    /// <summary>
+    /// Two declarations of one name, of every pair of kinds, in one file and in
+    /// two: one of them loses, is reported, and nothing after pass 2 goes
+    /// looking for a symbol it never made.
+    ///
+    /// Each later pass used to find a declaration's type by its name, which is
+    /// the winner's -- so a delegate losing to a struct was cast to a delegate,
+    /// and an enum losing to a generic variant was looked up where only the
+    /// template was. Tried in both files because pass 2 takes a file's classes
+    /// before its delegates and its delegates before its enums, and the order
+    /// two declarations meet in is what decided which one crashed.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DeclarationKindPairs))]
+    public void TwoTypesOfOneNameAreADuplicateWhateverTheirKinds(string first, string second)
+    {
+        string firstSource = s_declarationKinds.Single(k => k.Kind == first).Source.Replace("$", "N");
+        string secondSource = s_declarationKinds.Single(k => k.Kind == second).Source.Replace("$", "N");
+
+        // The one pairing that is not a duplicate: a type declared twice in its
+        // own module, which is a later part adding behaviour to the first.
+        string[] parts = ["class", "struct", "union", "variant", "interface", "com", "attribute"];
+        bool addsToTheFirst = first == second && parts.Contains(first);
+
+        string[] reported = ["SL0201", "SL0550", "SL0551", "SL0552"];
+
+        foreach (var codes in new[]
+                 {
+                     Front.ModuleCodes(firstSource + "\n" + secondSource),
+                     Front.FilesCodes(firstSource, secondSource),
+                 })
+        {
+            if (!addsToTheFirst)
+                Assert.Contains(codes, reported.Contains);
+        }
+    }
 
     /// <summary>
     /// A generic is a template rather than a type, and two of them are still
@@ -510,5 +601,154 @@ public class BinderTests
     {
         var program = Front.Bind("module Test;\nint F() { return 0; }", out _);
         Assert.Null(program.EntryPoint);
+    }
+
+    // ------------------------------------------ what a reported error leaves
+
+    /// <summary>
+    /// An override of an undefined base, overridden again further down.
+    ///
+    /// The first override matched nothing and was left with no slot, and the
+    /// class deriving from it then matched that method and wrote its own into
+    /// slot -1 of the dispatch table.
+    /// </summary>
+    [Fact]
+    public void AnOverrideThatOverridesNothingCanStillBeOverridden()
+    {
+        var codes = Front.ModuleCodes(
+            """
+            public class Dog : Animal
+            {
+                public Dog() { }
+                public override String Speak() => "woof";
+            }
+
+            public class Puppy : Dog
+            {
+                public override String Speak() => "yip";
+            }
+            """);
+
+        Assert.Contains("SL0276", codes);
+        Assert.Contains("SL0499", codes);
+    }
+
+    /// <summary>
+    /// The same for each other way an override can fail: each is reported
+    /// once, at the class that wrote it, and the class below is not also
+    /// blamed for overriding something that is still a dispatched method.
+    /// </summary>
+    [Theory]
+    [InlineData("public String Speak() => \"?\";", "SL0500")]
+    [InlineData("public virtual int Speak() => 0;", "SL0502")]
+    public void AnOverrideThatFailsLeavesADispatchedMethod(string inBase, string code)
+    {
+        var codes = Front.ModuleCodes(
+            $$"""
+            public class Animal { {{inBase}} }
+            public class Dog : Animal { public override String Speak() => "woof"; }
+            public class Puppy : Dog { public override String Speak() => "yip"; }
+            """);
+
+        Assert.Equal([code], codes);
+    }
+
+    /// <summary>
+    /// A generic call with more arguments than any template of its name has
+    /// parameters.
+    ///
+    /// The first template is tried anyway, so that there is something to report
+    /// against, and checking whether it accepted the arguments read a parameter
+    /// for each argument -- past the end of the list.
+    /// </summary>
+    [Theory]
+    [InlineData(
+        "T Middle<T>(T a) => a;\nint Main() { return Middle(1, 2); }")]
+    [InlineData(
+        "class Util { public T Middle<T>(T a) => a; }\n" +
+        "int Main() { var util = new Util(); return util.Middle(1, 2); }")]
+    [InlineData(
+        "import Standard.Collections;\n" +
+        "int Main() { int[] numbers = [3]; return FirstOr(numbers, n => n > 1, 99, 1); }")]
+    public void AGenericCallWithTooManyArgumentsIsAnArityError(string body)
+    {
+        Front.Bind("module Test;\n" + body, out var diagnostics);
+        Assert.Contains("SL0260", Front.Codes(diagnostics));
+    }
+
+    /// <summary>
+    /// A module-level function written 'static', which reads a name.
+    ///
+    /// The word is refused, and the function used to keep it anyway: a static
+    /// function looking up a bare name asks its type for an instance member of
+    /// that name, and this one has no type. The generic form never reported the
+    /// word at all.
+    /// </summary>
+    [Theory]
+    [InlineData("static int Free() { return Read; }")]
+    [InlineData("static int Free<T>(T value) { return Read; }\nint Use() { return Free(1); }")]
+    public void AStaticModuleFunctionIsAnOrdinaryOneOnceReported(string body)
+    {
+        var codes = Front.ModuleCodes("class Box { }\n" + body);
+
+        Assert.Contains("SL0573", codes);
+        Assert.Contains("SL0229", codes);
+    }
+
+    /// <summary>
+    /// A struct that contains itself, by every route to it, with something
+    /// that walks its fields after layout: a union that asks whether it holds a
+    /// reference, a C signature that asks the same, a variant case, a thread.
+    ///
+    /// SL0216 was reported and the cycle left in place, so the first of those
+    /// walks recursed until the process died of a stack overflow.
+    /// </summary>
+    [Theory]
+    [InlineData("struct S { S self; }")]
+    [InlineData("struct S { T other; }\nstruct T { S back; }")]
+    [InlineData("struct S { S[2] pair; }")]
+    [InlineData("struct S { int bits : 3; S self; }")]
+    [InlineData("union S { int n; S self; }")]
+    [InlineData("variant S { Leaf; Node(S inner); }")]
+    [InlineData("struct S { (S, int) pair; }")]
+    public void AStructThatContainsItselfIsReportedAndSurvived(string declaration)
+    {
+        var codes = Front.ModuleCodes(
+            declaration + "\n" +
+            """
+            union U { int n; S s; }
+            extern "C" void consume(S s);
+            export "C" S produce() { S s; return s; }
+            variant V { None; Some(S s); }
+            void Send(S s) { var worker = go () => { S copy = s; }; }
+            """);
+
+        Assert.Contains("SL0216", codes);
+    }
+
+    /// <summary>
+    /// Every diagnostic's span runs forwards.
+    ///
+    /// Each of these reported one that ended a character before it began: a
+    /// node the parser built having consumed no token of its own takes its
+    /// start from the token it stopped at and its end from the one before.
+    /// </summary>
+    [Theory]
+    [InlineData("struct Point { } class Plain { }\nint Main() { new Plain { 1, }; return 0; }")]
+    [InlineData(
+        "variant Shape { Circle(double Radius); }\n" +
+        "double Area(Shape shape) { return shape switch { Circle(((c))) => Radius }; }\n" +
+        "int Main() { return 0; }")]
+    [InlineData(
+        "struct Point { int X; } class Holder<T> where T : Point { T item; }\n" +
+        "int Main()\n{\n    Holder<Point\n> h;\n    return 0;\n}")]
+    public void EverySpanRunsForwards(string body)
+    {
+        Front.Bind("module Test;\n" + body, out var diagnostics);
+
+        Assert.NotEmpty(Front.Codes(diagnostics));
+        foreach (var diagnostic in diagnostics.Items.Where(d => d.Span.File?.Path == Front.TestFile))
+            Assert.True(diagnostic.Span.Start <= diagnostic.Span.End,
+                $"{diagnostic.Code} runs from {diagnostic.Span.Start} back to {diagnostic.Span.End}");
     }
 }

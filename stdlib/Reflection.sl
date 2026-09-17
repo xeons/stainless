@@ -539,8 +539,9 @@ public void SetAggregate(byte* instance, Property property, byte* value)
 /// One type, and the way into everything it declares.
 ///
 /// Got from `typeof(T)`, from `FindType` by name, or from a field's or
-/// property's `TypeOf()`. Fields and interfaces carry metadata; methods do not,
-/// so there is nothing here to call.
+/// property's `TypeOf()`. Only a class or struct marked `[Reflect]` carries
+/// metadata, and what it carries is its fields, properties and attributes;
+/// methods are not described, so there is nothing here to call.
 public struct Type
 {
     /// The runtime's record for this type, or null for one that was looked up

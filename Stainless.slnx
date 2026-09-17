@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="src/Stainless.Compiler/Stainless.Compiler.csproj" />
   <Project Path="src/Stainless.Cli/Stainless.Cli.csproj" />
+  <Project Path="tests/Stainless.Fuzz/Stainless.Fuzz.csproj" />
   <Project Path="tests/Stainless.Tests/Stainless.Tests.csproj" />
   <Project Path="tests/Stainless.UnitTests/Stainless.UnitTests.csproj" />
 </Solution>

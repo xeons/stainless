@@ -23,7 +23,7 @@ they are stored in the binary, not evaluated:
 [JsonName("full_name")] public String Name;
 ```
 
-Attributes go on classes, structs and fields. An attribute type is never a
+Attributes go on types, fields and properties. An attribute type is never a
 value: it cannot be instantiated, named as a type, or passed around.
 
 ## 6.2 `[Reflect]` opts a type in
@@ -54,13 +54,13 @@ a constant and no work:
 import Standard.Reflection;
 
 var type = typeof(Person);
-type.Name();                       // "App.Person"
-type.FieldCount();
+type.Name;                         // "App.Person"
+type.FieldCount;
 
 var field = type.FieldAt(0);
-field.Name();                      // "Name"
-field.Offset();                    // 24, past the object header
-field.Kind();                      // KindString
+field.Name;                        // "Name"
+field.Offset;                      // 24, past the object header
+field.Kind;                        // KindString
 field.Has("JsonName");
 field.Get("JsonName").AsText(0);   // "full_name"
 ```
@@ -87,7 +87,7 @@ public String ToJson<T>(T value) {
     var type = typeof(T);
     var text = new StringBuilder();
     ...
-    for (nuint i = 0; i < type.FieldCount(); i = i + 1) {
+    for (nuint i = 0; i < type.FieldCount; i++) {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore")) { continue; }
         ...
@@ -110,12 +110,12 @@ So the two are described separately:
 
 ```csharp
 var type = typeof(Control);
-type.PropertyCount();
+type.PropertyCount;
 
 var left = type.FindProperty("Left");
-left.Kind();                       // KindInt
-left.CanRead();                    // true
-left.CanWrite();                   // false for 'int Right { get; }'
+left.Kind;                         // KindInt
+left.CanRead;                      // true
+left.CanWrite;                     // false for 'int Right { get; }'
 
 SetInteger(raw, left, 42);         // calls the setter
 GetInteger(raw, left);             // calls the getter
@@ -126,7 +126,7 @@ matching readers. Setting through the wrong one does nothing rather than
 writing the wrong bytes, and so does setting a property with no setter.
 
 **An automatic property's storage is a field named after the property**, which
-is why `Field.IsPropertyStorage()` exists: without it a walk over the field
+is why `Field.IsPropertyStorage` exists: without it a walk over the field
 table cannot tell `Name` the storage from `Name` the property, and writing it
 goes straight past the accessor. A field the type actually declared answers
 false.
@@ -150,7 +150,7 @@ the other direction, and it is a search:
 
 ```csharp
 var type = FindType("App.Button");        // the qualified name
-if (type.Exists()) {
+if (type.Exists) {
     byte* made = Make(type);
     SetInteger(made, type.FindProperty("Left"), 40);
 }
@@ -225,7 +225,7 @@ one possible without knowing `T` at compile time:
 ```csharp
 byte* array = Reflection.ReadArray(raw, field);
 
-for (nuint i = 0u; i < Reflection.ArrayLength(array); i = i + 1u) {
+for (nuint i = 0u; i < Reflection.ArrayLength(array); i++) {
     byte* at = Reflection.ElementAt(array, field, i);
     Console.WriteLine(Reflection.ReadTextAt(at));
 }
@@ -251,7 +251,8 @@ solve a problem that only exists inside a deserializer.
 - **No method or interface metadata** — fields and their elements only. It is
   what stops a reader filling a `List<T>`: the storage is private and the way
   in is `Add`, which nothing here can call.
-- **No enumeration of types**: `typeof` needs the type named at compile time.
+- **No enumeration of types**: `FindType` answers for a name, but nothing lists
+  the types a binary holds.
 - **No slice element metadata**, for the reason above: a slice is not a reference to
   its elements.
 

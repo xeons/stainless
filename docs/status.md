@@ -129,7 +129,10 @@ last person to edit it -- the suite is the authority.
   interface, each with the distance back that lets a `Release` find the header.
   Every slot is `__stdcall` on x86 — part of the contract rather than a Windows
   detail — which a `com interface` does not have to say, because the convention
-  is stamped on when its table is numbered
+  is stamped on when its table is numbered. `[NoUnknown]` describes the vtable a
+  C library hands out that is not COM — XAudio2's voices — so its first method
+  is slot 0 and ARC counts nothing through it; the cost is no `[Guid]`, no
+  `QueryInterface` and no cast (SL0622, SL0623, SL0624)
 - **A COM server.** `[Guid("...")]` on a `com class` is a CLSID, the compiler
   gathers every class carrying one into a factory table, and
   `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`
@@ -182,7 +185,7 @@ last person to edit it -- the suite is the authority.
   `parallel` alone always means the scope
 - `Thread` and `Future<T>` for work no lexical scope brackets — a listener, a
   background writer, a result returned from the function that started it. Both
-  take a closure, and `Future<T>.Get` blocks, which needs no `async` anywhere
+  take a lambda, and `Future<T>.Get` blocks, which needs no `async` anywhere
 - `static` as C# means it: fields, methods, properties, static constructors and
   `static class`, on a module or on a type, mutable or `readonly`. Storage is
   initialized before `Main` in an order the compiler computes from the
@@ -248,7 +251,10 @@ last person to edit it -- the suite is the authority.
   compile time is an error instead. Aborting writes a line to standard error
   and ends the process, after flushing everything the program has written, so
   the output that led up to the failure is there to read
-- `var`, `const`, explicit locals, compound assignment
+- `var`, `const`, explicit locals, compound assignment. A `const` may also be a
+  member of a type — inlined like a module-level one, reached as `Type.Name`
+  from outside and inherited down a class chain — and a `--shared` library may
+  carry one, since there is nothing to initialize
 - `String`: UTF-8, immutable, reference counted, `+` and `==`, zero-copy
   `ToPointer()`, `ToUtf16()`, and literals that never allocate. UTF-16 converts
   back with `ToText()` or, from a buffer a platform API filled, with
@@ -386,7 +392,7 @@ last person to edit it -- the suite is the authority.
   library chain:
 
   ```csharp
-  words.Where(w => w.Length() > 1u).Distinct().OrderBy(ByLength).ToArray()
+  words.Where(w => w.ByteLength() > 1u).Distinct().OrderBy((a, b) => a.CompareTo(b)).ToArray()
   ```
 
   Uniform call syntax rather than extension methods: a module is a scope here,
@@ -503,6 +509,17 @@ last person to edit it -- the suite is the authority.
   in Stainless like the rest of the library: `delegate __stdcall` and the
   pointer-to-delegate cast are what a resolved symbol is called through. No
   text -- a font is where the two backends stop agreeing
+- `Standard.Security.Cryptography`: the symmetric half, complete. MD5, SHA-1,
+  SHA-256, SHA-384 and SHA-512, HMAC over any of them, PBKDF2, HKDF, AES in ECB,
+  CBC, CFB and CTR, AES-GCM, the platform's entropy and a constant-time
+  comparison, in `System.Security.Cryptography`'s shape with a `Result` where
+  .NET throws. Every answer is pinned against a published test vector. Not
+  public-key, which wants a constant-time bignum the library does not have
+- `Standard.Media.Audio`: playing and recording interleaved PCM, and reading and
+  writing WAV. WASAPI on Windows and ALSA elsewhere, both reached by name at the
+  first device rather than linked, so a machine with neither answers
+  `AudioError.NoBackend`. The Windows half has played and recorded; the ALSA
+  half has compiled and never opened a device
 - `Standard.Json` and `Standard.Xml`: each in two layers. A document that needs
   no type -- `Json.Parse` gives a `JsonValue`, a variant that is exactly one of
   the six things JSON has, and `Xml.Parse` gives an `XmlNode` -- and a mapping
@@ -585,7 +602,11 @@ last person to edit it -- the suite is the authority.
   `Win32.User32` is what the DLL exports, `Win32.Ui` is the conveniences on top.
   Source a program compiles rather than part of the standard library, because
   compiling a wrapper is what makes its library necessary; the raw layer needs
-  no library at all
+  no library at all. It reaches as far as XInput, XAudio2, DXGI and Direct3D 11,
+  read out of the SDK headers' `*Vtbl` structs rather than transcribed, with
+  `Win32.Gamepad`, `Win32.Sound`, `Windows.DirectX` and `Windows.DirectX11` on
+  top; [samples/directx](../samples/directx) draws a lit, shadowed cube to a
+  module player. Direct3D 12 is not bound
 - [bindings/linux](../bindings/linux): the Linux socket calls, the terminal
   (`termios` and `ioctl`, with raw mode, the window size, the cursor and
   colour) and the event loop (`epoll`, `eventfd`, `timerfd`, `inotify`) — where
@@ -605,6 +626,26 @@ last person to edit it -- the suite is the authority.
   `ARM` and `STAINLESS` describe the target — the architecture one follows
   `--target`, so a binding guarded by `#if X86` compiles the half it means to;
   `-D` adds the rest. No macros and no `#include`: a name always means itself
+- **Tuples**: `(int, String)`, structural, with `Item1` upwards for fields and
+  `var (low, high) = MinMax(xs);` where the names matter. A tuple is a struct,
+  so layout, both ABI classifiers and reference counting apply to it with
+  nothing written for tuples
+- **A type may be declared inside another**, and is lifted out and named for
+  where it was written: `Rect.Point` from outside, `Point` from within `Rect`.
+  Nesting is about where a name is reached from and nothing else — no hidden
+  reference to an outer instance, and no bearing on layout. It composes, and a
+  nested type does not see its outer type's parameters
+- `?.`, `??` and `??=`, over a `C?`. The receiver is read once, so
+  `Next()?.Name` calls `Next` one time. A reference member answers null; a
+  value member has no null to answer with, so `node?.Weight` needs a
+  `?? fallback` and says so (SL0605) rather than inventing a zero a caller
+  cannot tell from a real one. A receiver that cannot be nothing is refused,
+  and `a?.b.c` is an error where `a?.b?.c` is the question actually being asked
+- `default(T)` is the zeroed value of a type, for generic code that cannot
+  write a literal for a type it does not know. Not a new hole in the null
+  discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
+  it. `String.Empty` is a static property rather than a field, because a
+  `--shared` library has no entry point to initialize a static from
 - Diagnostics with source excerpts and caret runs
 
 ## What does not exist yet
@@ -686,7 +727,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   is its accessors rather than an offset, so setting one through reflection
   runs the setter — which is what anything whose setter does work needs, and
   what writing an automatic property's storage silently skips.
-  `Field.IsPropertyStorage()` is how the two are told apart. `FindType` looks
+  `Field.IsPropertyStorage` is how the two are told apart. `FindType` looks
   a `[Reflect]` type up by its qualified name, so a document can say which type
   it wants where `typeof` cannot. **Methods and interfaces carry no metadata.**
   That is what stops a serializer filling a `List<T>`: its storage is private
@@ -749,12 +790,16 @@ Being straight about the edges, roughly in the order they are worth adding:
   discovered. The metadata describes layouts and the reflection tables describe
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
-- **A `--shared` library cannot have a static**, of a module or of a type:
-  there is no entry point to initialize one from (SL0380). There is no
+- **A `--shared` library cannot have a static**, of a module or of a type,
+  unless its value is a literal — a number, `null`, `default` — that the global
+  can simply be born holding: there is no entry point to run any other
+  initializer from (SL0380). There is no
   per-thread storage either, and no automatic static property -- its backing
   storage would have no initializer, which is the one moment a static has.
-- **An enum does not cross `extern "C"`.** A `[Flags] enum : uint` will not pass
-  to a `uint` parameter without a cast, which is why
+- **An enum does not become its number at `extern "C"`.** It crosses as exactly
+  its underlying integer where the declaration names the enum, but a
+  `[Flags] enum : uint` will not pass to a `uint` parameter without a cast, which
+  is why
   [bindings/win32](../bindings/win32) spells its constants as bare `const uint`
   rather than as the typed sets they are.
 - **An inline array holds plain data only** and cannot be passed by value
@@ -782,10 +827,10 @@ Being straight about the edges, roughly in the order they are worth adding:
   refuses outright.
 - **A library's surface is narrower than a module's.** `--metadata` lets a
   Stainless library be consumed by Stainless, but a generic, a class that
-  implements an interface, a variant and a slice all stay behind: a template
-  emits nothing until it is instantiated, a dispatch table is indexed by an id
-  assigned across a whole program, a variant's cases are not a layout, and a
-  slice is a type the compiler builds rather than one the source declared.
+  implements an interface and a variant all stay behind: a template emits
+  nothing until it is instantiated, a dispatch table is indexed by an id
+  assigned across a whole program, and a variant's cases are not a layout. A
+  slice or a tuple of what the metadata describes does cross.
   Anything reaching one of those through a field or a signature is reported too
   (SL0419, SL0420, SL0441, SL0477), all of them where the library is built
   rather than where the consumer trips over them.
@@ -802,26 +847,6 @@ Being straight about the edges, roughly in the order they are worth adding:
   call so that a hole in that produces a zero rather than whatever the stack
   held. An ordinary local read before it is written is still nobody's business
   but the author's.
-- **Tuples**: `(int, String)`, structural, with `Item1` upwards for fields and
-  `var (low, high) = MinMax(xs);` where the names matter. A tuple is a struct,
-  so layout, both ABI classifiers and reference counting apply to it with
-  nothing written for tuples
-- **A type may be declared inside another**, and is lifted out and named for
-  where it was written: `Rect.Point` from outside, `Point` from within `Rect`.
-  Nesting is about where a name is reached from and nothing else — no hidden
-  reference to an outer instance, and no bearing on layout. It composes, and a
-  nested type does not see its outer type's parameters
-- `?.`, `??` and `??=`, over a `C?`. The receiver is read once, so
-  `Next()?.Name` calls `Next` one time. A reference member answers null; a
-  value member has no null to answer with, so `node?.Weight` needs a
-  `?? fallback` and says so (SL0605) rather than inventing a zero a caller
-  cannot tell from a real one. A receiver that cannot be nothing is refused,
-  and `a?.b.c` is an error where `a?.b?.c` is the question actually being asked
-- `default(T)` is the zeroed value of a type, for generic code that cannot
-  write a literal for a type it does not know. Not a new hole in the null
-  discipline: a fresh array is zeroed, so `new C[1][0]` was the spelling before
-  it. `String.Empty` is a static property rather than a field, because a
-  `--shared` library has no entry point to initialize a static from
 
 ---
 

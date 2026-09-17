@@ -65,7 +65,7 @@ public WideBuffer BuildFilter(String[] pairs)
 {
     // Every entry, its terminator, and the extra terminator that ends the list.
     nuint units = 1u;
-    for (nuint i = 0u; i < pairs.Length; i = i + 1u)
+    for (nuint i = 0u; i < pairs.Length; i++)
     {
         units = units + pairs[i].ToUtf16().UnitCount() + 1u;
     }
@@ -74,17 +74,17 @@ public WideBuffer BuildFilter(String[] pairs)
     char16* target = buffer.Pointer();
 
     nuint at = 0u;
-    for (nuint i = 0u; i < pairs.Length; i = i + 1u)
+    for (nuint i = 0u; i < pairs.Length; i++)
     {
         var wide = pairs[i].ToUtf16();
         char16* source = wide.ToPointer();
-        for (nuint j = 0u; j < wide.UnitCount(); j = j + 1u)
+        for (nuint j = 0u; j < wide.UnitCount(); j++)
         {
             target[at] = source[j];
-            at = at + 1u;
+            at++;
         }
         target[at] = 0u;
-        at = at + 1u;
+        at++;
     }
     target[at] = 0u;
     return buffer;
@@ -197,7 +197,7 @@ public FilterSpec[] BuildSpecs(String[] pairs, Utf16String[] held)
     nuint count = pairs.Length / 2u;
     var specs = new FilterSpec[count];
 
-    for (nuint i = 0u; i < count; i = i + 1u)
+    for (nuint i = 0u; i < count; i++)
     {
         held[i * 2u]      = pairs[i * 2u].ToUtf16();
         held[i * 2u + 1u] = pairs[i * 2u + 1u].ToUtf16();

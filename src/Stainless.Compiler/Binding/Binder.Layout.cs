@@ -46,8 +46,7 @@ public sealed partial class Binder
 
         if (!inProgress.Add(type))
         {
-            diagnostics.Error("SL0216", type.Span ?? default,
-                $"struct '{type.QualifiedName}' contains itself, so it has no finite size");
+            ReportContainsItself(type);
             type.SetLayout(0, 1);
             return;
         }
@@ -65,8 +64,7 @@ public sealed partial class Binder
 
             foreach (var member in union.Fields)
             {
-                if (StoredStruct(member.Type) is { } nestedMember)
-                    ComputeLayout(nestedMember, inProgress);
+                LayOutStoredStruct(member, inProgress);
 
                 member.Offset = 0;
                 member.BitOffset = 0;
@@ -104,9 +102,7 @@ public sealed partial class Binder
 
         foreach (var field in type.Fields)
         {
-            // Only a struct field forces its type to be laid out first.
-            if (StoredStruct(field.Type) is { } nested)
-                ComputeLayout(nested, inProgress);
+            LayOutStoredStruct(field, inProgress);
 
             // Packed means no padding anywhere: a field lands where the one
             // before it ended, and the type asks nothing of its own address.
@@ -135,6 +131,38 @@ public sealed partial class Binder
         type.SetLayout(size, alignment);
         inProgress.Remove(type);
     }
+
+    /// <summary>
+    /// Lays out the struct a field holds inline before the field is placed --
+    /// or, when that struct is one being laid out further up, reports that it
+    /// contains itself and cuts the cycle.
+    ///
+    /// Only a struct field forces its type to be laid out first; a reference
+    /// is a pointer whatever it points at. The cut is what the report alone
+    /// did not do: the field kept its type, and every later walk that
+    /// recurses through field types -- whether a struct carries references,
+    /// whether it may cross to another thread, how an ABI classifies it --
+    /// followed the cycle until the stack ran out. As the error type it is a
+    /// field of no size that holds nothing, which is all that can be said of
+    /// it once its size has been refused.
+    /// </summary>
+    private void LayOutStoredStruct(FieldSymbol field, HashSet<NamedTypeSymbol> inProgress)
+    {
+        if (StoredStruct(field.Type) is not { } nested) return;
+
+        if (inProgress.Contains(nested))
+        {
+            ReportContainsItself(nested);
+            field.Type = ErrorTypeSymbol.Instance;
+            return;
+        }
+
+        ComputeLayout(nested, inProgress);
+    }
+
+    private void ReportContainsItself(NamedTypeSymbol type) =>
+        diagnostics.Error("SL0216", type.Span ?? default,
+            $"struct '{type.QualifiedName}' contains itself, so it has no finite size");
 
     /// <summary>
     /// The struct a field's storage is made of, looking through fixed arrays,
@@ -184,8 +212,8 @@ public sealed partial class Binder
                 "the storage unit. Until one of them is chosen and checked against it, this is " +
                 "refused rather than guessed");
 
-        foreach (var nested in type.Fields.Select(f => f.Type).OfType<StructTypeSymbol>())
-            ComputeLayout(nested, inProgress);
+        foreach (var field in type.Fields)
+            LayOutStoredStruct(field, inProgress);
 
         int alignment = 1;
         foreach (var field in type.Fields)
@@ -223,13 +251,25 @@ public sealed partial class Binder
             }
 
             long unit = (long)field.Type.Size * 8;
+            long boundary = (long)Math.Max(1, field.Type.Alignment) * 8;
 
-            // A bit-field must sit inside one storage unit of its own type. If
-            // it would cross the boundary, it starts at the next one.
-            if (bit / unit != (bit + width - 1) / unit)
-                bit = (bit + unit - 1) / unit * unit;
+            // A bit-field must fit in one storage unit of its own type's size,
+            // starting on a boundary of its own type's alignment. If it would
+            // not, it starts on the next boundary.
+            //
+            // **The boundary is the alignment, not the size.** The two are the
+            // same number for every type but a `long` or a `double` on i386
+            // System V, where they are eight and four -- and there clang puts
+            // `long long x : 33` straight after an `int`, at bit 32, because an
+            // eight-byte unit starting at byte four holds it. Stepping by the
+            // size put it at bit 64 and made the struct four bytes too long.
+            long start = bit / boundary * boundary;
+            if (bit + width > start + unit)
+            {
+                bit = (bit + boundary - 1) / boundary * boundary;
+                start = bit;
+            }
 
-            long start = bit / unit * unit;
             field.Offset = (int)(start / 8);
             field.BitOffset = (int)(bit - start);
             bit += width;

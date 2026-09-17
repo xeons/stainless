@@ -290,4 +290,138 @@ public class ParserTests
         Front.Parse("module A;\nint F() { if (true) {", out var diagnostics);
         Assert.True(diagnostics.HasErrors);
     }
+
+    // ------------------------------------------------------ malformed input
+
+    /// <summary>
+    /// Parses a file on the stack a compilation gets, and asks that the parse
+    /// came back, said something, and pointed every message at text that is
+    /// there. An exception fails the test by escaping it.
+    /// </summary>
+    private static string[] ParseMalformed(string source)
+    {
+        var diagnostics = Source.Recursion.OnADeepStack(() =>
+        {
+            Front.Parse(source, out var bag);
+            return bag;
+        });
+
+        Assert.True(diagnostics.HasErrors);
+        foreach (var diagnostic in diagnostics.Items)
+        {
+            Assert.True(0 <= diagnostic.Span.Start &&
+                        diagnostic.Span.Start <= diagnostic.Span.End &&
+                        diagnostic.Span.End <= source.Length,
+                $"{diagnostic.Code} has span {diagnostic.Span.Start}..{diagnostic.Span.End} " +
+                $"in a file of {source.Length}");
+        }
+
+        return Front.Codes(diagnostics);
+    }
+
+    private static string Repeat(string text, int count) => string.Concat(Enumerable.Repeat(text, count));
+
+    /// <summary>
+    /// Input the fuzzer found. Each reached the end of the file with something
+    /// still open -- most by passing the depth limit, which jumps there -- and
+    /// the recovery that followed consumed "one more" token at the end.
+    /// That walked the position past the last token, and the next span taken
+    /// from it indexed outside the list.
+    /// </summary>
+    [Theory]
+    [InlineData(" Main(\n{ ", "switch ", 600)]
+    [InlineData(" Main(\n{ ", "2 ? canvas ? ", 600)]
+    [InlineData(" Main(\n{\n", "    while ;\n", 600)]
+    [InlineData(" Total(\n    {\n", "        if (total {\n", 600)]
+    [InlineData("class Parent Parent", "(", 600)]
+    [InlineData("    [( (", "", 0)]
+    public void RecoveryAtTheEndOfTheFileDoesNotThrow(string head, string repeated, int count) =>
+        ParseMalformed(head + Repeat(repeated, count));
+
+    /// <summary>
+    /// A span over nothing is empty where it would have begun. Taken from the
+    /// start token to the last token consumed, it ran backwards instead -- the
+    /// last token consumed was the one before the start -- and a caret drawn
+    /// from it has a negative width.
+    /// </summary>
+    [Theory]
+    [InlineData("extern __stdcall\n{ 0")]
+    [InlineData("<>( where : INamed, class , class")]
+    [InlineData(" static explicit operator operator")]
+    public void ASpanOverNothingIsEmptyRatherThanBackwards(string source) =>
+        ParseMalformed(source);
+
+    /// <summary>
+    /// A conversion is named for its target type and nothing else. The name was
+    /// taken from the type's first token to the last token consumed, after the
+    /// parameters and body had been, so the body's text was part of the symbol.
+    /// </summary>
+    [Fact]
+    public void AConversionIsNamedForItsTargetAlone()
+    {
+        var unit = Front.Parse("""
+            module A;
+            public struct Money
+            {
+                long _cents;
+                public static implicit operator Money(long cents) { return Of(cents); }
+            }
+            """, out var diagnostics);
+
+        Assert.False(diagnostics.HasErrors);
+        var conversion = Assert.IsType<TypeDeclSyntax>(unit.Declarations[0])
+            .Members.OfType<FunctionDeclSyntax>().Single(f => f.IsConversion);
+        Assert.Equal("op_ToMoney", conversion.Name);
+    }
+
+    /// <summary>
+    /// A lambda's parameter types and a cast's type may both hold a fixed-array
+    /// length, which is an expression. So every open parenthesis was parsed
+    /// once as each guess and once for real, and the time doubled per level:
+    /// the fuzzer's forty levels would not have finished this year.
+    /// </summary>
+    [Fact]
+    public void NestedGuessesAreNotRepeated()
+    {
+        string source = "module A;\nint Main() { var n = " +
+                        Repeat("( [", 40) + "1" + Repeat("] )", 40) + "; return 0; }";
+
+        var parse = Task.Run(() => Front.Parse(source));
+        Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
+    }
+
+    /// <summary>
+    /// A <c>&gt;&gt;</c> split in two by a guess that was then abandoned is
+    /// whole again for the parse that follows. The lambda guess comes first,
+    /// and it left the halves behind, so the cast saw one <c>&gt;</c> too few.
+    /// </summary>
+    [Fact]
+    public void AnAbandonedGuessPutsItsSplitShiftBack()
+    {
+        Assert.Equal("(cast x)", Shape("(List<List<int>>)x"));
+        Front.Expression("(List<List<int>>)x", out var diagnostics);
+        Assert.False(diagnostics.HasErrors);
+    }
+
+    /// <summary>
+    /// A type declared inside a type is a level of nesting, and past the limit
+    /// it is SL0108 like a block inside a block. It was not counted, so the
+    /// fuzzer's three thousand `public interface`s each opened a level nothing
+    /// bounded -- and hoisting copies every inner type once per level above it,
+    /// which made that half a minute of parsing.
+    /// </summary>
+    [Fact]
+    public void ATypeInsideATypeCountsTowardTheNestingLimit()
+    {
+        string source = "module A;\n" + Repeat("interface I {\n", 4000) + Repeat("}", 4000);
+
+        var parse = Task.Run(() => Source.Recursion.OnADeepStack(() =>
+        {
+            Front.Parse(source, out var diagnostics);
+            return diagnostics;
+        }));
+
+        Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
+        Assert.Contains("SL0108", Front.Codes(parse.Result));
+    }
 }

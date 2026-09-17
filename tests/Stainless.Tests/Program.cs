@@ -334,7 +334,6 @@ internal static class Program
         // only way to test it is to actually perform both.
         string libraryDirectory = Path.Combine(directory, "library");
         string? referencePath = null;
-        string? importLibrary = null;
 
         // A warning about what a library's metadata leaves out is reported where
         // the library is built, so that build's diagnostics have to be kept for
@@ -366,18 +365,18 @@ internal static class Program
                 return (false, "the library failed to build:\n" +
                                (libraryResult.DriverError ?? string.Join("\n",
                                    libraryResult.Diagnostics.Select(d => d.Render(color: false)))));
-
-            string beside = Path.ChangeExtension(libraryOutput, ".lib");
-            importLibrary = File.Exists(beside) ? beside : libraryOutput;
         }
 
         var options = new CompilationOptions
         {
             SourcePaths = sources,
             // A shared case compiles its C separately, against the built library.
-            NativeInputs = shared
-                ? []
-                : importLibrary is null ? natives : [.. natives, importLibrary],
+            //
+            // The library itself is not named: '--reference' links what its
+            // metadata describes, from beside the metadata, and every library
+            // case is how that stays true. Naming it here too once hid that it
+            // did not.
+            NativeInputs = shared ? [] : natives,
             References = referencePath is null ? [] : [referencePath],
             OutputPath = Path.Combine(
                 caseWork,

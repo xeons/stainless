@@ -99,7 +99,7 @@ bindings/gtk/
 
 ```csharp
 button.OnClicked(this.Save);                      // a method bound to an object
-button.OnClicked(() => { count = count + 1; });   // or a lambda that captures
+button.OnClicked(() => { count.Bump(); });         // or a lambda that captures
 ```
 
 Both are the same two words. A closure is a *value* and `user_data` is one
@@ -128,13 +128,6 @@ simply add a reference to.
 - **Pango.** The one that matters now, and the reason it does is `forms/`: its
   GTK backend draws text with cairo's toy API, so there is no shaping, no
   bidirectional text and no font fallback.
-
-`GtkTreeView` and the model classes *were* the biggest gap and are here now --
-`gtk_list_store_set` is variadic and `gtk_list_store_set_value` is not, which
-is what `Gtk.GObject`'s `GValue` exists for. So is `GtkFileChooser`: its
-constructor is variadic over button-and-response pairs, and passing null for
-the first button ends that list so `gtk_dialog_add_button` can add them one at
-a time, which is what the variadic tail does anyway.
 - **GTK 4**, which is a separate backend rather than a third `#if` branch.
   **37 of the 138 calls in the shared file are absent from `libgtk-4.so.1`** —
   measured, not guessed — and they are the load-bearing ones: `gtk_main` and
@@ -146,7 +139,14 @@ a time, which is what the variadic tail does anyway.
   controllers rather than signals on the widget. Sharing a file with that
   would leave the shared half smaller than the branches.
 - **Windows and macOS.** These files say `#if UNIX` and mean it: the `g*`
-  typedefs below are Linux LP64, and `gulong` is 32 bits on a Windows GTK.
+  typedefs in `GLib.sl` are Linux LP64, and `gulong` is 32 bits on a Windows GTK.
+
+`GtkTreeView` and the model classes *were* the biggest gap and are here now —
+`gtk_list_store_set` is variadic and `gtk_list_store_set_value` is not, which
+is what `Gtk.GObject`'s `GValue` exists for. So is `GtkFileChooser`: its
+constructor is variadic over button-and-response pairs, and passing null for
+the first button ends that list so `gtk_dialog_add_button` can add them one at
+a time, which is what the variadic tail does anyway.
 
 ## Verifying a change
 
@@ -166,8 +166,8 @@ The ownership plumbing can be checked without a display at all, because a
 handler whose destructor prints, drop the buffer, and watch it release.
 Fifty thousand connect-emit-destroy cycles hold steady at 14 MB.
 
-**And run `forms/`'s two samples**, which are the real exercise now: between
-them they build sixty-four checks' worth of widgets and drive them.
+**And run `forms/`'s samples**, which are the real exercise now: between
+them they build a hundred and sixteen checks' worth of widgets and drive them.
 
 ```sh
 stainless build samples/forms/common.sl forms/src bindings/gtk -o /tmp/common     -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0     -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
@@ -204,14 +204,12 @@ GDK_BACKEND=broadway BROADWAY_DISPLAY=:5 ./YourProgram
 ```
 
 That is enough to drive a whole widget tree from a timer, emit signals with
-`g_signal_emit_by_name`, count paints and quit — which is how this binding was
-tested. **Note the socket number:** `broadwayd :5` reports
-`broadway6.socket`, and `BROADWAY_DISPLAY=:5` is still what connects to it.
+`g_signal_emit_by_name`, count paints and quit — which is how this binding, and
+the `forms/` backend on top of it, were tested. **Note the socket number:**
+`broadwayd :5` reports `broadway6.socket`, and `BROADWAY_DISPLAY=:5` is still
+what connects to it.
 
-Broadway is enough to drive a whole widget tree from a timer, emit signals
-with `g_signal_emit_by_name`, count paints and quit — which is how this
-binding, and the `forms/` backend on top of it, were tested. An `Xvfb` works
-too, and is what a GTK build without broadway would need:
+An `Xvfb` works too, and is what a GTK build without broadway would need:
 
 ```sh
 Xvfb :9 -screen 0 1024x768x24 &

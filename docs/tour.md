@@ -9,7 +9,7 @@ linker instead of an assembly loader.
 This is the guided version, written to be read start to finish. The
 [language specification](spec/index.md) is the exhaustive one, and
 [samples/tour](../samples/tour) is this same ground as one program that prints
-what it did at each step -- so running it says whether the tour is still true,
+what it did at each step — so running it says whether the tour is still true,
 and not only whether it still builds.
 
 ---
@@ -41,7 +41,7 @@ public class Buffer {
 
     ~Buffer() { Free(data); }
 
-    public nuint Length() { return length; }
+    public nuint Length => length;
 }
 
 // Callable from C as plain `sl_scale`.
@@ -145,7 +145,7 @@ public Result<List<String>, IOError> ReadAllLines(String path) {
 ```
 
 `try e` is the value on success, and returns `Fail(e.Error)` from the enclosing
-function on failure -- the named temporary and the early return it replaces,
+function on failure — the named temporary and the early return it replaces,
 moved to where the value is used. It is `try` rather than `?` because a postfix
 `?` would sit exactly where the ternary's does; Zig means the same by the word,
 and there are no exceptions here to confuse it with.
@@ -155,7 +155,7 @@ value: `Result<T, TError>` when there is one, the error enum when there is not.
 Construction is the awkward case, since a constructor must return its type and
 cannot say why it failed. So `FileStream.Open`, `TcpListener.Listen` and
 `TcpClient.Connect` are static methods of the types they make, each returning a
-`Result`, and the constructors they replace are private -- a static method is
+`Result`, and the constructors they replace are private — a static method is
 inside the type, so it can reach one nothing outside can.
 
 ### Text
@@ -218,7 +218,7 @@ last. That line emits five `sl_string_concat` calls written the old way and one
 `sl_string_join` written this way.
 
 A hole takes a `String`, a number, a `bool` or a `char32`. Anything else is
-refused rather than given a default -- there is no `ToString` every type owes.
+refused rather than given a default — there is no `ToString` every type owes.
 A `char` is one UTF-8 *code unit* and not a character, so it has to say which it
 means: `(char32)c` for the character, `(long)c` for the number.
 
@@ -231,7 +231,7 @@ numbers[2] = 9;                     // bounds checked, unsigned compare
 public class Box<T> {
     T value;
     public Box(T initial) { value = initial; }
-    public T Get() { return value; }
+    public T Value => value;
 }
 
 var boxed = new Box<String>("text");    // a real type, compiled for String
@@ -254,11 +254,11 @@ public class Ranked<T> where T : IComparable<T>, IDescribable { ... }
 T Fresh<T>(T old) where T : new() { return new T(); }
 T Copied<T>(T value) where T : struct { return value; }
 String Says<T>(T animal) where T : Animal { return animal.Says(); }
-String Both<T, U>(T a, U b) where T : U where U : INamed { return b.Name(); }
+String Both<T, U>(T a, U b) where T : U where U : INamed { return b.Name; }
 ```
 
 `new()` means a **class** here, unlike C#: `new` allocates, and a struct is
-declared where it is used -- so a struct would satisfy a constraint whose only
+declared where it is used — so a struct would satisfy a constraint whose only
 purpose it then failed.
 
 A violated constraint is caught where the generic is instantiated:
@@ -340,13 +340,13 @@ int guess = ages["nobody"].ValueOr(0);
 
 var numbers = new List<int>();
 numbers.Add(1);
-numbers[0] += 1;
+numbers[0]++;
 Sort(numbers);
 ```
 
-A dictionary's subscript answers `Optional<V>`, as Swift's does: a key is data
+A dictionary's subscript answers `Optional<TValue>`, as Swift's does: a key is data
 that arrived from somewhere, so a lookup that misses is an answer rather than
-a reason to stop the program. A list's is a plain `V`, because an index is a
+a reason to stop the program. A list's is a plain `T`, because an index is a
 position the caller worked out and an out-of-range one is the mistake
 `array[i]` is.
 
@@ -359,7 +359,7 @@ A parameter is a copy unless it says otherwise. `ref` passes the caller's
 storage and may write it; `in` passes the same storage and promises not to.
 
 ```csharp
-void Bump(ref int n) { n = n + 1; }
+void Bump(ref int n) { n++; }
 double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
 
 int count = 1;
@@ -369,7 +369,7 @@ LengthSquared(origin);        // no copy, and origin cannot change
 
 `ref` is written at the call too, because a reader should be able to see that
 the value may come back changed. A `ref` argument has to name storage and is not
-converted on the way in - the callee writes back through it, and a converted
+converted on the way in — the callee writes back through it, and a converted
 copy would have nowhere to put the result.
 
 Both are exactly a `T*` at the ABI, so they cross a language boundary with
@@ -407,7 +407,7 @@ reflected type:
 ```csharp
 public String ToJson<T>(T value) {
     var type = typeof(T);
-    for (nuint i = 0; i < type.FieldCount(); i = i + 1) {
+    for (nuint i = 0; i < type.FieldCount; i++) {
         var field = type.FieldAt(i);
         if (field.Has("JsonIgnore")) { continue; }
         ...
@@ -433,7 +433,7 @@ public class Person {
     public String Label => Name + "#" + Text.FromInteger(Id);   // computed
 
     public Person(String name, int id) { Name = name; Id = id; Visits = 0; }
-    public void Visit() { Visits = Visits + 1; }
+    public void Visit() { Visits++; }
 }
 ```
 
@@ -462,7 +462,7 @@ public class Small {
     int value;
     static int made = 0;                           // mutable storage
 
-    Small(int checked) { value = checked; made = made + 1; }   // private
+    Small(int checked) { value = checked; made++; }   // private
 
     public static Result<Small, ParseError> Parse(String text) { ... }
     public static int Made { get { return made; } }
@@ -478,7 +478,7 @@ var small = try Small.Parse(text);
 C#'s model: fields, methods, properties, static constructors and `static
 class`, at module scope or on a type, mutable or `readonly`. Storage is
 initialized before `Main` in an order the compiler works out from the
-dependency graph -- no lazy guard on every access, and a compile error on a
+dependency graph — no lazy guard on every access, and a compile error on a
 cycle rather than a zero at run time. A static constructor runs there too,
 which is the one departure from C#: "before first use" becomes "before
 `Main`".
@@ -489,7 +489,7 @@ which object is meant, and a call names the type.
 
 It exists for the case above. A constructor has to return its own type, so it
 cannot say why it failed, and the best it could do was hand back an object
-holding nothing -- which is a value a caller can go on using while nothing
+holding nothing — which is a value a caller can go on using while nothing
 forces the check. A static method is *inside* the type, so it can use a private
 constructor, and that is what turns the discouraged shape into an absent one.
 
@@ -522,12 +522,12 @@ public class Grid {
 ```
 
 An indexer's getter and setter share one type, which is a constraint worth
-knowing before designing one: a lookup that may miss answers `Optional<V>`, so
-its setter takes an `Optional<V>` too. That is how `Dictionary` spells removal
+knowing before designing one: a lookup that may miss answers `Optional<TValue>`, so
+its setter takes an `Optional<TValue>` too. That is how `Dictionary` spells removal
 as `map[key] = None`.
 
 C#'s shape: inside the type, `static`, every operand written out. That last
-part is what makes `3 * money` expressible -- an operator whose left operand is
+part is what makes `3 * money` expressible — an operator whose left operand is
 not the declaring type has no receiver to hang off.
 
 `&&` and `||` cannot be overloaded, because they short-circuit and an overload
@@ -545,7 +545,7 @@ public abstract class Shape {
     Shape(int howMany) { sides = howMany; }
 
     public abstract double Area();
-    public virtual String Name() { return "shape"; }
+    public virtual String Name => "shape";
 }
 
 public class Polygon : Shape {
@@ -557,17 +557,17 @@ public class Polygon : Shape {
     }
 
     public override double Area() { return width * width; }
-    public override String Name() { return "polygon"; }
+    public override String Name => "polygon";
 }
 
 public sealed class Square : Polygon {
     Square(double side) { base(4, side); }
 
-    public sealed override String Name() { return "square"; }
+    public sealed override String Name => "square";
 }
 
 Shape shape = new Square(3.0);
-shape.Name();                           // "square" -- three loads and a call
+String name = shape.Name;               // "square" — three loads and a call
 
 if (shape is Square) {
     Square square = (Square)shape;      // checked; there is no exception to throw
@@ -778,7 +778,7 @@ extern "C" void* mmap(void* at, nuint size, int prot, int flags, int fd, long of
 
 A branch that is not taken is never lexed, so it need not parse — a platform you
 have never built on is text until the day you do. `WINDOWS`, `LINUX`, `MACOS`,
-`UNIX`, `X64`, `ARM64` and `STAINLESS` are defined for you; everything else
+`FREEBSD`, `UNIX`, `X64`, `X86`, `ARM64` and `STAINLESS` are defined for you; everything else
 comes from `-D`. The architecture is the one being built *for*, so
 `--target x86` defines `X86` rather than the host's `X64`:
 
@@ -827,12 +827,13 @@ int code = RunMessageLoop();
 Both are source you compile with your program rather than part of the standard
 library, because compiling a *wrapper* is what makes its library necessary — an
 undefined symbol is an error before the dead-strip that would have removed it.
-The raw layer has no such cost, and links with nothing named at all:
+The raw layer has no such cost, and links with nothing named at all; each
+convenience module names its own library with `#pragma comment(lib, ...)`, so
+neither needs a `-l`, but the whole directory links every one of them:
 
 ```
 stainless build app.sl bindings/win32/api                        # free
-stainless build gui.sl bindings/win32 -l user32 -l gdi32 \
-    -l advapi32 -l shell32 -l comdlg32                           # with the conveniences
+stainless build gui.sl bindings/win32                            # with the conveniences
 ```
 
 Every file is `#if WINDOWS`, so elsewhere the modules exist and are empty rather

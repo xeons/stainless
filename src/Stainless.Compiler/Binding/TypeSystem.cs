@@ -62,7 +62,7 @@ public sealed class ErrorTypeSymbol : TypeSymbol
 {
     public static readonly ErrorTypeSymbol Instance = new();
     private ErrorTypeSymbol() { }
-    public override string Name => "<error>";
+    public override string Name => Source.DiagnosticBag.ErrorTypeName;
     public override int Size => 0;
     public override int Alignment => 1;
 }
@@ -71,7 +71,10 @@ public sealed class PrimitiveTypeSymbol : TypeSymbol
 {
     public PrimitiveKind Kind { get; }
     public override string Name { get; }
-    public override int Alignment => Size == 0 ? 1 : Size;
+    public override int Alignment =>
+        Kind is PrimitiveKind.Long or PrimitiveKind.ULong or PrimitiveKind.Double
+            ? TargetPlatform.Current.WideScalarAlignment
+            : Size == 0 ? 1 : Size;
 
     /// <summary>
     /// How many bytes the value occupies. Fixed for every primitive but
@@ -269,7 +272,18 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     public List<AppliedAttribute> Attributes { get; } = [];
 
     public string Name { get; } = name;
-    public TypeSymbol Type { get; } = type;
+
+    /// <summary>
+    /// What the field holds.
+    ///
+    /// Settable for one reason: a struct field that makes its struct contain
+    /// itself is reported during layout (SL0216) and becomes the error type
+    /// there. Every walk over fields after that -- whether a struct carries
+    /// references, whether it may be sent, how an ABI passes it -- recurses
+    /// through field types and would never come back out of the cycle.
+    /// </summary>
+    public TypeSymbol Type { get; internal set; } = type;
+
     public NamedTypeSymbol ContainingType { get; } = containingType;
     public int Index { get; } = index;
     public bool IsPublic { get; init; }
@@ -734,6 +748,35 @@ public sealed class ClosureTypeSymbol : StructTypeSymbol
 
     public FieldSymbol? Function { get; set; }
     public FieldSymbol? Receiver { get; set; }
+
+    /// <summary>
+    /// Gives the closure its two fields and its layout: two pointer-width words.
+    ///
+    /// One place for the binder and the metadata loader both, because the two
+    /// used to write the layout out separately as eight and sixteen -- which
+    /// agreed with each other and with no 32-bit target, where the LLVM type
+    /// <c>{ ptr, ptr }</c> is eight bytes. <c>sizeof</c> and every offset after
+    /// a closure field came out twice what the emitted struct was.
+    /// </summary>
+    internal void AddFields(ClassTypeSymbol bound)
+    {
+        // The function first, so that the word at offset zero is the thing a
+        // debugger and a reader both look for.
+        Function = new FieldSymbol(FunctionFieldName, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), this, 0);
+
+        // The receiver second, and counted: this is the field that makes a
+        // closure keep its object alive, and it does so through the ordinary
+        // walk rather than through anything written for closures.
+        Receiver = new FieldSymbol(ReceiverFieldName, bound, this, 1);
+
+        Fields.Add(Function);
+        Fields.Add(Receiver);
+
+        int word = TargetPlatform.Current.PointerWidth;
+        Function.Offset = 0;
+        Receiver.Offset = word;
+        SetLayout(word * 2, word);
+    }
 
     /// <summary>
     /// True when <paramref name="function"/> can be bound into this closure.
@@ -1395,8 +1438,10 @@ public static class TypeExtensions
     /// all. Only a struct that actually holds a reference pays for one, and it
     /// is then no longer a type that may cross <c>extern "C"</c>.
     ///
-    /// The recursion terminates because a struct may not contain itself; that
-    /// cycle is rejected during layout (SL0216).
+    /// The recursion terminates because a struct may not contain itself: that
+    /// cycle is rejected during layout (SL0216), which makes the field closing
+    /// it the error type. So this is safe to ask after layout, and before it
+    /// only of a type already laid out.
     /// </summary>
     public static bool CarriesReferences(this TypeSymbol type) => type switch
     {

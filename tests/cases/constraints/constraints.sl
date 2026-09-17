@@ -126,6 +126,21 @@ nuint FillWith<T>(T[] items, T value) where T : struct
 /// handed rather than only read it.
 T Blank<T>(T old) where T : new() { return new T(); }
 
+/// A class that declares no constructor is given one taking no arguments, so
+/// it satisfies `new()` exactly as `new Undeclared()` says it can be made. It
+/// has no initializer either, which is what used to leave it with none at all.
+public class Undeclared
+{
+    public String Label => "undeclared";
+}
+
+/// And the same constraint on a type rather than a function, which is checked
+/// where the type is named.
+public class Factory<T> where T : new()
+{
+    public T Make() => new T();
+}
+
 /// A base class, so the body may use what the base declares -- through the
 /// vtable, so an override still wins.
 String SaysOf<T>(T animal) where T : Animal { return animal.Says(); }
@@ -160,6 +175,7 @@ void Kinds()
     // `new T()` inside the template, on a class whose constructor takes
     // nothing. The blank one is a different object from the one passed in.
     Console.WriteLine("new=" + Blank(new Dog()).Says());
+    Console.WriteLine("implicit=" + new Factory<Undeclared>().Make().Label);
 
     // Dispatch still happens: T is Dog, and Dog overrides.
     Console.WriteLine("base=" + SaysOf(new Dog()));

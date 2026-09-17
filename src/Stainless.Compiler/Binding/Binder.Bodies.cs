@@ -1847,7 +1847,7 @@ public sealed partial class Binder
     /// <summary>
     /// <c>for parallel</c>. The iteration space is computed once and split into
     /// chunks, so the loop has to be a counted one: <c>i = start</c>,
-    /// <c>i &lt; limit</c>, <c>i = i + stride</c>. A general C-style <c>for</c>
+    /// <c>i &lt; limit</c>, <c>i++</c> or <c>i += stride</c>. A general C-style <c>for</c>
     /// has no trip count to divide.
     /// </summary>
     private BoundStatement BindParallelFor(ParallelForSyntax syntax)
@@ -1900,23 +1900,36 @@ public sealed partial class Binder
         }
 
         var step = BindExpression(syntax.Step);
-        if (step is not BoundAssignment
-            {
-                Target: BoundLocalAccess stepped,
-                Value: BoundBinary { Operator: BoundBinaryOp.Add } increment,
-            } ||
-            stepped.Local != variable ||
-            Underlying(increment.Left) is not BoundLocalAccess { } from || from.Local != variable)
+        BoundExpression stride;
+
+        // `i++` and `++i` are a stride of one, and the house style's way of
+        // writing it; which of the two values the expression has is never read.
+        if (step is BoundIncrement { IsIncrement: true, Target: BoundLocalAccess bumped } &&
+            bumped.Local == variable)
+        {
+            stride = new BoundLiteral(syntax.Step.Span, variable.Type, 1UL);
+        }
+        else if (step is BoundAssignment
+                 {
+                     Target: BoundLocalAccess stepped,
+                     Value: BoundBinary { Operator: BoundBinaryOp.Add } increment,
+                 } &&
+                 stepped.Local == variable &&
+                 Underlying(increment.Left) is BoundLocalAccess from && from.Local == variable)
+        {
+            stride = increment.Right;
+        }
+        else
         {
             diagnostics.Error("SL0371", syntax.Step.Span,
-                $"a 'for parallel' step must be '{variable.Name} = {variable.Name} + stride' " +
-                $"or '{variable.Name} += stride'");
+                $"a 'for parallel' step must be '{variable.Name}++', " +
+                $"'{variable.Name} += stride' or '{variable.Name} = {variable.Name} + stride'");
             return new BoundBlock(syntax.Span, []);
         }
 
         // A non-constant stride could be zero or negative, and either makes the
         // trip count meaningless. A literal can simply be checked.
-        if (Underlying(increment.Right) is not BoundLiteral { Value: ulong raw } || raw == 0)
+        if (Underlying(stride) is not BoundLiteral { Value: ulong raw } || raw == 0)
         {
             diagnostics.Error("SL0372", syntax.Step.Span,
                 "the stride of a 'for parallel' must be a positive integer literal, " +
@@ -1952,7 +1965,7 @@ public sealed partial class Binder
         }
 
         return new BoundParallelFor(
-            syntax.Span, variable, start, test.Right, increment.Right,
+            syntax.Span, variable, start, test.Right, stride,
             test.Operator == BoundBinaryOp.LessEqual, body, walker.Captures);
     }
 

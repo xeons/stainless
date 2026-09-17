@@ -28,6 +28,14 @@ dotnet run --project tests/Stainless.Tests      # end-to-end: compile, link, run
 dotnet test tests/Stainless.UnitTests           # the front end alone
 ```
 
+**A crash is not a diagnostic, and the fuzzer finds them.** `dotnet run --project
+tests/Stainless.Fuzz -- fuzz --minutes 10` mutates the tree's own programs and
+keeps every input that makes the compiler throw, overflow, hang or report a span
+outside its file; `-- replay` re-runs the findings against the current build.
+A finding that is fixed gets a case in `tests/cases/` or a unit test like any
+other bug — the findings directory is not a suite. See
+[docs/internals.md](docs/internals.md#building-and-testing).
+
 One end-to-end case, by name fragment — the first non-dash argument is a
 filter, and `-v` shows the command and the output:
 
@@ -85,8 +93,11 @@ them off does not fail cleanly (see below).
 exactly one expectation: `expected.txt` (it must compile, run, and print this)
 or `errors.txt` (it must fail, and every `SL####` the file names must be
 reported). Optional beside them: `args.txt`, `stdin.txt`, `warnings.txt`,
-`defines.txt`, `abi.txt`, `target.txt`, and `expected.linux.txt` for a case
-whose subject genuinely differs by platform.
+`defines.txt`, `abi.txt`, `target.txt`, `platform.txt`, `sources.txt`,
+`libraries.txt`, and `expected.linux.txt` for a case whose subject genuinely
+differs by platform. The comment at the top of
+`tests/Stainless.Tests/Program.cs` is the full list, including the cases that
+stop at an object file and so have `ir.txt` in place of `expected.txt`.
 
 **The whole-program rule is the thing to understand first.** Every name in the
 program is resolved before any body is checked, in eleven binder passes. That is
@@ -116,7 +127,9 @@ before that.
 **Two end-to-end runs at once corrupt each other.** The harness builds every
 case under one shared `%TEMP%/stainless-tests/`, so a second run overwrites the
 first's object files mid-compile. It looks like a scatter of unrelated failures
-that all pass when the suite is run alone.
+that all pass when the suite is run alone. The directory is `Path.GetTempPath()`,
+so a run that must happen beside another — in a second worktree, say — gets
+its own by setting `TEMP` and `TMP` first.
 
 **A locked output file reports as a compiler bug.** If a program built here is
 still running, the link fails with `permission denied` followed by "this is a
@@ -177,7 +190,7 @@ subject and then paragraphs of reasoning — read `git log` before writing one.
 ## Working on `forms/`
 
 **A self-test does not prove anything was drawn.** `SelfTest` in the Forms
-samples reads back what it set -- a caption, an index, a count -- so it passes
+samples reads back what it set — a caption, an index, a count — so it passes
 whether or not a single pixel reached the screen. Both samples passed every
 check for months while a control inside a container was one pixel wide and the
 GTK backend drew nothing at all. Take a screenshot; it is the only thing that

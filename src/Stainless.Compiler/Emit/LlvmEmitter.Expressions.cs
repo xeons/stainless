@@ -424,11 +424,12 @@ public sealed partial class LlvmEmitter
     {
         var field = access.Field;
         int width = field.BitWidth!.Value;
-        int bits = field.Type.Size * 8;
+        int bytes = AccessBytes(field);
+        int bits = bytes * 8;
         string unit = $"i{bits}";
 
         string address = EmitFieldAddress(access);
-        string loaded = Emit(unit, $"load {unit}, ptr {address}, align {field.Type.Size}");
+        string loaded = Emit(unit, $"load {unit}, ptr {address}, align {AccessAlignment(field)}");
 
         string value;
         if (IsSigned(field.Type))
@@ -444,9 +445,15 @@ public sealed partial class LlvmEmitter
             value = Emit(unit, $"and {unit} {low}, {Mask(width)}");
         }
 
-        // A bool is one bit to LLVM whatever it is to the layout.
+        // A bool is one bit to LLVM whatever it is to the layout, and a unit
+        // narrower than the type widens the way the type's sign says.
         string declared = LlvmTypeOf(field.Type);
-        if (declared != unit) value = Emit(declared, $"trunc {unit} {value} to {declared}");
+        int declaredBits = int.Parse(declared[1..], CultureInfo.InvariantCulture);
+        if (declaredBits < bits)
+            value = Emit(declared, $"trunc {unit} {value} to {declared}");
+        else if (declaredBits > bits)
+            value = Emit(declared,
+                $"{(IsSigned(field.Type) ? "sext" : "zext")} {unit} {value} to {declared}");
 
         return new Val(value, declared, field.Type);
     }
@@ -460,15 +467,17 @@ public sealed partial class LlvmEmitter
     {
         var field = access.Field;
         int width = field.BitWidth!.Value;
-        int bits = field.Type.Size * 8;
+        int bytes = AccessBytes(field);
+        int bits = bytes * 8;
         string unit = $"i{bits}";
 
         string address = EmitFieldAddress(access);
-        string loaded = Emit(unit, $"load {unit}, ptr {address}, align {field.Type.Size}");
+        string loaded = Emit(unit, $"load {unit}, ptr {address}, align {AccessAlignment(field)}");
 
-        string widened = value.LlvmType == unit
+        int valueBits = int.Parse(value.LlvmType[1..], CultureInfo.InvariantCulture);
+        string widened = valueBits == bits
             ? value.Ref
-            : Emit(unit, $"zext {value.LlvmType} {value.Ref} to {unit}");
+            : Emit(unit, $"{(valueBits < bits ? "zext" : "trunc")} {value.LlvmType} {value.Ref} to {unit}");
 
         string kept = Emit(unit, $"and {unit} {loaded}, {~(Mask(width) << field.BitOffset) & MaskAll(bits)}");
         string trimmed = Emit(unit, $"and {unit} {widened}, {Mask(width)}");
@@ -477,8 +486,35 @@ public sealed partial class LlvmEmitter
             : Emit(unit, $"shl {unit} {trimmed}, {field.BitOffset}");
 
         Line($"store {unit} {Emit(unit, $"or {unit} {kept}, {placed}")}, ptr {address}, " +
-             $"align {field.Type.Size}");
+             $"align {AccessAlignment(field)}");
     }
+
+    /// <summary>
+    /// How many bytes are loaded and stored to reach a bit-field: the smallest
+    /// power of two holding it from the start of its unit, and never more than
+    /// the unit.
+    ///
+    /// Not simply the unit, because on i386 System V a unit can be wider than
+    /// the struct it is in. `struct { char c; long long x : 3; }` is four bytes
+    /// there, with an eight-byte `long long` unit starting at zero, so loading
+    /// the whole unit read four bytes past the end of the value and storing it
+    /// wrote them. Everywhere else a unit ends inside its struct, and the
+    /// narrower access reads the same bits.
+    /// </summary>
+    private static int AccessBytes(FieldSymbol field)
+    {
+        int needed = (field.BitOffset + field.BitWidth!.Value + 7) / 8;
+        int bytes = 1;
+        while (bytes < needed) bytes *= 2;
+        return Math.Min(bytes, Math.Max(1, field.Type.Size));
+    }
+
+    /// <summary>
+    /// The alignment a unit's address is known to have: its type's, which on
+    /// i386 System V is less than its size for a `long`.
+    /// </summary>
+    private static int AccessAlignment(FieldSymbol field) =>
+        Math.Min(AccessBytes(field), Math.Max(1, field.Type.Alignment));
 
     /// <summary>The low <paramref name="width"/> bits set, as LLVM writes a constant.</summary>
     private static long Mask(int width) => width >= 64 ? -1L : (1L << width) - 1;

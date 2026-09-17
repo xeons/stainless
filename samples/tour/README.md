@@ -9,7 +9,7 @@ One program that uses every feature of the language, in the order
 it did at each step, so running it checks that the tour is still *true* rather
 than only that it still builds.
 
-Five files, about 2,000 lines with the commentary:
+Five files, about 2,300 lines with the commentary:
 
 | | |
 |---|---|
@@ -40,12 +40,12 @@ Every section of the specification, with the exclusions listed below.
 | §2.5 pointers, `->`, `void*`, `T?`, narrowing | `Pointers()` |
 | §2.6 variants, exhaustive `switch`, `is` with a binding, generic variants, `Optional<T>` | `Variants()` |
 | §2.7 unions, anonymous `struct`/`union` members | `Values()` |
-| §2.8 `Result<T, E>`, `Ok`/`Fail`, `try` | `Results()` |
+| §2.8 `Result<T, TError>`, `Ok`/`Fail`, `try` | `Results()` |
 | §2.10 interfaces, interface inheritance, dynamic dispatch | `Contracts()` |
 | §2.11–2.12 arrays, array literals, fixed arrays, slices, all four slice forms | `Arrays()` |
 | §2.13 enums, a named base, `[Flags]`, `HasFlag` | `Enumerations()` |
-| §2.14 delegates, closures, bound methods, lambdas, capture by value | `Functions()` |
-| §2.15 tuples, deconstruction | `Tuples()` |
+| §2.14–2.15 delegates, closures, bound methods, lambdas, capture by value | `Functions()` |
+| §2.2.3 tuples, deconstruction | `Tuples()` |
 | §3 text, escapes, `StringBuilder`, interpolation, UTF-16, encodings, `ToPointer` | `Textual()` |
 | §4 generic functions, types, methods, constraints, generic operators, generic closures | `Generics()` |
 | §5 containers, sequences, `Math`, `Random`, `Time`, `Env`, files, JSON, XML, `Convert` | `Library()` |
@@ -128,7 +128,7 @@ Six bugs, all fixed, each with a regression case named beside it:
    LLVM would make of its fields is now written out: packed, with the padding
    spelled `[k x i8]` between the fields and after the last. It is contagious on
    purpose — a packed struct reports an alignment of 1, so anything holding one
-   is written out in turn -- which is what carries the correction outwards. Of
+   is written out in turn — which is what carries the correction outwards. Of
    the 153 structs the tour emits, three need it. The same mechanism fixes a
    struct holding a struct of bit-fields, whose storage is bytes and whose
    alignment was therefore not its own. — `tests/cases/layout-queries`

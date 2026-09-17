@@ -97,7 +97,7 @@ question open. It is not built, and §1.3 is what took its place.
 ### 1.3 What may cross a thread boundary
 
 Checked, as of step 6, at the three places a value can reach another thread: a
-`spawn` argument or receiver, a `for parallel` capture, and a `static readonly`.
+`spawn` argument or receiver, a `for parallel` capture, and a static.
 
 | Allowed | Why it is safe |
 |---|---|
@@ -307,8 +307,10 @@ literal lives in read-only storage, and storing the marker again would fault.
 ### 3.3 Libraries
 
 A `--shared` build has no entry point, so there is nothing to run the
-initializers from. A static in a library is a compile error rather than a
-silently zeroed global; hold the value behind an exported function instead.
+initializers from. A static in a library is a compile error (SL0380) rather
+than a silently zeroed global; hold the value behind an exported function
+instead. The exception is a static whose value is a literal — a number, `null`,
+`default` — which the global is simply born holding, so there is nothing to run.
 
 ---
 
@@ -333,7 +335,7 @@ static readonly Mutex<List<String>> Registry = new Mutex<List<String>>(new List<
 
 void Record(String name) {
     var guard = Registry.Lock();      // Guard<List<String>>
-    guard.Value().Add(name);
+    guard.Value.Add(name);
 }                                     // ~Guard() unlocks
 ```
 
@@ -343,7 +345,7 @@ is a destructor, so ARC already does it — including on an early `return`.
 
 > **This example was unsound if `Record` was called from two threads**, for a
 > reason that only turned up when Standard.Concurrent was built on it: See §10:
-> `guard.Value()` retains the list, and that count was not atomic. Everything in
+> `guard.Value` retains the list, and that count was not atomic. Everything in
 > this section was right about the *lock* and wrong about the *count*. Counts
 > are atomic now, so the example is sound as written; the lifetime hole above,
 > which is about how long the borrow lives, is untouched by that.
@@ -356,7 +358,7 @@ primitives in §5 are missing. Locking can therefore ship before closures, befor
 **Still open after step 6.** Sendability is a rule about *types*, and this is a
 rule about *lifetimes*, so the analysis that landed does not touch it.
 
-**The known hole:** `guard.Value()` hands out a reference that can outlive the
+**The known hole:** `guard.Value` hands out a reference that can outlive the
 guard. Nothing today prevents storing it somewhere and using it unlocked. C#
 has the same hole and worse; Rust closes it with lifetimes. Stainless closes it
 later, when the move and sendability analysis of §1 lands, and not before. It is
@@ -372,8 +374,7 @@ discarded `Guard` would catch it, and is worth adding.
 ## 5. What the runtime provides
 
 A new translation unit, [runtime/thread.c](../runtime/thread.c), split by
-platform — Win32 today, pthreads behind the same interface, matching the
-"Win64 only" honesty elsewhere.
+platform — Win32 and pthreads behind the same interface.
 
 | Primitive | Windows | POSIX |
 |---|---|---|
@@ -410,7 +411,7 @@ and the join counters that make `parallel` blocks work.
 ## 6. Data parallelism
 
 ```csharp
-for parallel (int i = 0; i < pixels.Length; i = i + 1) {
+for parallel (nuint i = 0u; i < pixels.Length; i++) {
     pixels[i] = Shade(pixels[i]);
 }
 ```
@@ -428,7 +429,7 @@ lesson. `parallel` now means one thing — open a fork-join scope — and the lo
 carries a modifier, which is what it always was.
 
 The loop must be a **counted** one — `i = start`, `i < limit` or `i <= limit`,
-`i = i + stride` with a positive literal stride. A general C-style `for` has no
+and `i++`, or `i += stride` with a positive literal stride. A general C-style `for` has no
 trip count, and the iteration space has to be divided before the body runs.
 Anything else is rejected with that explanation.
 
@@ -536,14 +537,14 @@ whatever it would have returned, and the flag is the only signal.
 
 `static readonly` gives it module-level storage, initialized in dependency order
 before `Main`, and §1.3's sendability rule is checked wherever a value can reach
-a second thread. An unsynchronized class can no longer cross a thread boundary
-at all.
+a second thread. An unsynchronized class crossing a thread boundary is warned
+about (SL0377) rather than refused, for the reason §1.3 gives.
 
 All seven steps are done. Three things are still open.
 
 **The one that matters most, found while building Standard.Concurrent:**
 `Mutex<T>` is unsound when `T` is a class and the mutex is used from more than
-one thread. `Guard.Value()` returns the guarded object, which retains it, and
+one thread. `Guard.Value` returns the guarded object, which retains it, and
 dropping the result releases it — so two threads locking *in turn* still do an
 unsynchronized read-modify-write on that object's reference count. The lock
 protects the contents; nothing protects the count. It drifts down and the
@@ -571,7 +572,7 @@ made here.
 > argument as a `byte*`.
 >
 > So every count is atomic. Reproduced before it was fixed, which is the part
-> worth recording: sixteen threads returning `guard.Value()` out of the lock
+> worth recording: sixteen threads returning `guard.Value` out of the lock
 > crashed about one run in six, and has not crashed in the twenty-five runs
 > since. An atomic pair costs more than a plain one, and the bill lands on
 > redundant traffic the compiler should not be emitting — which makes the +0/+1
@@ -621,10 +622,12 @@ What is still open, in the order it is worth doing:
    retain a plain-data array it was only lent (§1.3). Both are questions about
    how long a borrowed thing lives, which sendability — a rule about types —
    cannot answer.
-3. **The runtime as a shared library.** Each binary links its own copy, so two
-   sides of a library boundary have separate allocators and separate stdio
-   buffers. That is visible today as output from a library not interleaving with
-   its consumer's in the order it was written.
+3. ~~**The runtime as a shared library.**~~ Done. Each binary used to link its
+   own copy, so two sides of a library boundary had separate allocators and
+   separate stdio buffers, and a library's output did not interleave with its
+   consumer's in the order it was written. Where two Stainless binaries meet the
+   runtime is now one shared library beside them; a program with no such
+   boundary keeps its copy compiled in, and `--runtime` overrides the choice.
 
 ---
 
@@ -752,11 +755,11 @@ that suggests a weaker guarantee than it gives. Two spellings for one operation
 is worse than one.
 
 **`ThreadLocal<T>`.** The slots exist in the runtime; the type does not.
-Stainless constrains by interface only — there is no `where T : class` — so a
-generic `ThreadLocal<T>` would accept `ThreadLocal<int>` and have nowhere to put
-the `int`. This is the same reason `AtomicLong` is not `Atomic<T>`. It wants
-either a non-generic pair of types or a constraint the language does not have,
-and neither is worth guessing at before something needs it.
+When this was written Stainless constrained by interface only, so a generic
+`ThreadLocal<T>` would have accepted `ThreadLocal<int>` and had nowhere to put
+the `int` — the same reason `AtomicLong` is not `Atomic<T>`. `where T : class`
+exists now, so what is left is only that nothing has needed the type, and it is
+not worth guessing at before something does.
 
 **Recursive locks.** A recursive lock usually means an ownership question went
 unanswered, and neither platform's default primitive is one.

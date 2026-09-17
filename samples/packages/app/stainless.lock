@@ -6,8 +6,8 @@
       "name": "shapes",
       "version": "1.0.0",
       "source": "path:../shapes",
-      "link": "shared",
-      "sourceDigest": "7553c9cbfcc107457980c6240495bbaa",
+      "link": "source",
+      "sourceDigest": "762ca4f5963f2ceffa34a9f11331c94d",
       "dependencies": []
     }
   ]

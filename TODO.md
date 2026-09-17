@@ -44,8 +44,9 @@ at all: that prose lives in `///`, which is where it belongs.
 ### `stainless format`
 
 [docs/style.md](docs/style.md) is the house style and there is nothing that
-applies it. The C# half is enforced — `.editorconfig` plus
-`EnforceCodeStyleInBuild`, so the build fails on a violation — and the Stainless
+applies it. The C# half is partly enforced — `.editorconfig` plus
+`EnforceCodeStyleInBuild`, so the build warns on a naming violation, though not
+on brace placement or spacing — and the Stainless
 half is enforced by review, which is the weaker half of a rule that exists
 because review kept missing this.
 
@@ -148,8 +149,9 @@ symbol, which is what a named export turns on.
 
 ### The GTK backend, and what is next for `forms/`
 
-`forms/` has two backends now -- Win32 and GTK 3 -- and both samples pass their
-whole self-test on each: 21 checks and 43.
+`forms/` has two backends now -- Win32 and GTK 3 -- and all five samples pass
+their whole self-test on each: `demo`'s 21 checks, `common`'s 44 and `buttons`'
+51.
 
 **That sentence said "which is done" for months, and it was not.** Every one of
 those checks passed while a control inside a container was one pixel wide, a
@@ -184,7 +186,7 @@ literals, and `commctrl.h` defines them as *negative* numbers that sign-extend
 to `0xFFFFFFFFFFFF0000` on a 64-bit machine. Every insert was handed a parent
 handle that named nothing, returned zero, and was never checked -- so the Win32
 tree view had never held a single item, and only the peer's mirror list made
-the other tree checks pass. Both samples now pass every check on Win32.
+the other tree checks pass. Every sample now passes every check on Win32.
 
 What is next there is in [forms/README.md](forms/README.md), which has the full
 roadmap. The short version: **DPI awareness**, because both backends now turn
@@ -234,7 +236,7 @@ like.
 `Windows.DirectX11` is the layer over them: a device and a swap chain on an
 `HWND`, a depth buffer, meshes, materials, constant buffers, alpha blending,
 and `SaveFrame` to read the back buffer out as a picture.
-[samples/directx](../samples/directx) renders a triangle and a lit, rotating,
+[samples/directx](samples/directx) renders a triangle and a lit, rotating,
 shadow-casting cube with it.
 
 **Direct3D 12 is not bound.** It is not more of the same: the device makes
@@ -261,7 +263,7 @@ program would want are missing:
 - **Textures.** `CreateShaderResourceView` and `CreateSamplerState` are bound
   and nothing wraps them, so a mesh can have colours and not a picture. It is
   the smallest of the three and the most often wanted.
-- **A shadow map.** [samples/directx/cube.sl](../samples/directx/cube.sl)
+- **A shadow map.** [samples/directx/cube.sl](samples/directx/cube.sl)
   projects the cube onto the floor with a matrix, which is exact for a flat
   floor and wrong for anything else. A real one renders depth from the light
   into a texture and samples it, which needs render-to-texture -- and therefore
@@ -447,7 +449,7 @@ says plainly which one it is, which is the least that should be true.
 `ToUpperAscii` and `ToLowerAscii` say what they do. The real thing is a table
 of several thousand entries with locale exceptions -- Turkish dotless i, German
 sharp s uppercasing to two characters, Greek final sigma -- and none of it fits
-in a runtime that is currently 3,000 lines of C. There is also no collation:
+in a runtime that is currently 6,000 lines of C. There is also no collation:
 `CompareTo` orders by bytes, which orders by code point and resembles no
 language's idea of alphabetical.
 

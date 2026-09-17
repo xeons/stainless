@@ -186,16 +186,26 @@ public sealed partial class LlvmEmitter
         string slot = Alloca(StructName(type), "closure");
 
         string functionSlot = StructFieldAddress(slot, type, type.Function!);
-        Line($"store ptr {Symbol(closure.Function)}, ptr {functionSlot}, align 8");
+        Line($"store ptr {Symbol(closure.Function)}, ptr {functionSlot}, align {TargetPlatform.Current.PointerWidth}");
 
         string receiverSlot = StructFieldAddress(slot, type, type.Receiver!);
-        var receiver = EmitExpression(closure.Receiver!);
+
+        // A plain function's thunk has no object, and ignores the null it is
+        // handed in place of one.
+        if (closure.Receiver is null)
+        {
+            Line($"store ptr null, ptr {receiverSlot}, align 8");
+            TrackTemporary(slot, type);
+            return new Val(slot, "ptr", type);
+        }
+
+        var receiver = EmitExpression(closure.Receiver);
 
         // +1, and tracked, exactly as a struct-returning call's result is: what
         // comes out of here owns its object until the statement ends or
         // something stores it.
         Retain(receiver.Ref, type.Receiver!.Type);
-        Line($"store ptr {receiver.Ref}, ptr {receiverSlot}, align 8");
+        Line($"store ptr {receiver.Ref}, ptr {receiverSlot}, align {TargetPlatform.Current.PointerWidth}");
 
         TrackTemporary(slot, type);
         return new Val(slot, "ptr", type);
@@ -212,14 +222,14 @@ public sealed partial class LlvmEmitter
         var right = EmitExpression(comparison.Right);
 
         string leftFunction = Emit("ptr",
-            $"load ptr, ptr {StructFieldAddress(left.Ref, type, type.Function!)}, align 8");
+            $"load ptr, ptr {StructFieldAddress(left.Ref, type, type.Function!)}, align {TargetPlatform.Current.PointerWidth}");
         string rightFunction = Emit("ptr",
-            $"load ptr, ptr {StructFieldAddress(right.Ref, type, type.Function!)}, align 8");
+            $"load ptr, ptr {StructFieldAddress(right.Ref, type, type.Function!)}, align {TargetPlatform.Current.PointerWidth}");
 
         string leftReceiver = Emit("ptr",
-            $"load ptr, ptr {StructFieldAddress(left.Ref, type, type.Receiver!)}, align 8");
+            $"load ptr, ptr {StructFieldAddress(left.Ref, type, type.Receiver!)}, align {TargetPlatform.Current.PointerWidth}");
         string rightReceiver = Emit("ptr",
-            $"load ptr, ptr {StructFieldAddress(right.Ref, type, type.Receiver!)}, align 8");
+            $"load ptr, ptr {StructFieldAddress(right.Ref, type, type.Receiver!)}, align {TargetPlatform.Current.PointerWidth}");
 
         string predicate = comparison.Negated ? "ne" : "eq";
         string sameFunction = Emit("i1", $"icmp {predicate} ptr {leftFunction}, {rightFunction}");
@@ -245,10 +255,10 @@ public sealed partial class LlvmEmitter
         var held = EmitExpression(call.Target);
 
         string functionSlot = StructFieldAddress(held.Ref, type, type.Function!);
-        string function = Emit("ptr", $"load ptr, ptr {functionSlot}, align 8");
+        string function = Emit("ptr", $"load ptr, ptr {functionSlot}, align {TargetPlatform.Current.PointerWidth}");
 
         string receiverSlot = StructFieldAddress(held.Ref, type, type.Receiver!);
-        string receiver = Emit("ptr", $"load ptr, ptr {receiverSlot}, align 8");
+        string receiver = Emit("ptr", $"load ptr, ptr {receiverSlot}, align {TargetPlatform.Current.PointerWidth}");
 
         var arguments = new List<string>();
         string? sretSlot = null;

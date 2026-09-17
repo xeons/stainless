@@ -214,7 +214,7 @@ public sealed partial class Binder
         {
             Kind: PrimitiveKind.Byte or PrimitiveKind.UShort or PrimitiveKind.UInt
                 or PrimitiveKind.ULong or PrimitiveKind.NUInt
-        } => _builtins.TextFromNUInt,
+        } => _builtins.TextFromULong,
 
         _ => null,
     };
@@ -622,27 +622,12 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
-        // A COM object answers for itself, so the only pairing the compiler
-        // can rule out is one where neither side is COM at all: a Stainless
-        // reference has no QueryInterface to ask, and a COM one has no header
-        // to walk.
         if (wanted is ComInterfaceTypeSymbol || subject is ComInterfaceTypeSymbol)
         {
-            if (wanted is not ComInterfaceTypeSymbol asked)
-            {
-                diagnostics.Error("SL0518", syntax.Span,
-                    $"'{subject.Name}' is a com interface and '{wanted.Name}' is not; all a COM " +
-                    "reference can be asked is QueryInterface, and that names com interfaces");
+            if (!CanAskCom("SL0518", syntax.Span, subject, wanted))
                 return new BoundErrorExpression(syntax.Span);
-            }
 
-            if (subject is not ComInterfaceTypeSymbol && subject is not ClassTypeSymbol { IsCom: true })
-            {
-                diagnostics.Error("SL0518", syntax.Span,
-                    $"'{subject.Name}' is not a COM reference, so there is no QueryInterface to " +
-                    $"ask it whether it is a '{asked.Name}'");
-                return new BoundErrorExpression(syntax.Span);
-            }
+            var asked = (ComInterfaceTypeSymbol)wanted;
 
             if (syntax.Binding is not null)
             {
@@ -680,6 +665,52 @@ public sealed partial class Binder
         if (syntax.Binding is not null) return BindClassTestBinding(syntax, value, wanted);
 
         return new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, value, wanted);
+    }
+
+    /// <summary>
+    /// Whether an <c>is</c> or a type pattern can ask <paramref name="subject"/>
+    /// whether it is a <paramref name="wanted"/>, where at least one of the two
+    /// is COM. Reports under <paramref name="code"/> when it cannot.
+    ///
+    /// A COM object answers for itself, so the only pairings the compiler can
+    /// rule out are the ones with nobody to ask: a Stainless reference has no
+    /// QueryInterface, a COM one has no header to walk, and a <c>[NoUnknown]</c>
+    /// vtable has something else in slot 0 and no IID to ask it with. That last
+    /// is the rule the cast already keeps; without it here the test was emitted
+    /// against an IID nothing had defined.
+    /// </summary>
+    private bool CanAskCom(
+        string code, SourceSpan span, NamedTypeSymbol subject, NamedTypeSymbol wanted)
+    {
+        if (wanted is not ComInterfaceTypeSymbol asked)
+        {
+            diagnostics.Error(code, span,
+                $"'{subject.Name}' is a com interface and '{wanted.Name}' is not; all a COM " +
+                "reference can be asked is QueryInterface, and that names com interfaces");
+            return false;
+        }
+
+        if (subject is not ComInterfaceTypeSymbol && subject is not ClassTypeSymbol { IsCom: true })
+        {
+            diagnostics.Error(code, span,
+                $"'{subject.Name}' is not a COM reference, so there is no QueryInterface to " +
+                $"ask it whether it is a '{asked.Name}'");
+            return false;
+        }
+
+        var noUnknown = subject is ComInterfaceTypeSymbol { HasUnknown: false }
+            ? subject
+            : asked.HasUnknown ? null : asked;
+
+        if (noUnknown is not null)
+        {
+            diagnostics.Error(code, span,
+                $"'{noUnknown.Name}' is '[NoUnknown]', so there is no QueryInterface to ask " +
+                $"whether '{subject.Name}' is a '{asked.Name}' and no IID to ask it with");
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>

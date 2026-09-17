@@ -196,6 +196,44 @@ public partial class DiagnosticTests
         Assert.Equal(2, bag.Sorted().Count());
     }
 
+    /// <summary>
+    /// A type that did not resolve becomes the error type, and everything that
+    /// later checks against it used to say so: "argument 1 of 'MessageBoxW'
+    /// expects '&lt;error&gt;', but 'null' was given", after the missing import
+    /// that was the whole of the problem. Only the causes are reported now.
+    /// </summary>
+    [Fact]
+    public void AnUnresolvedTypeReportsOnlyItsCause()
+    {
+        Front.BindModule(
+            "import Windows.Missing;\n" +
+            "extern \"C\" int MessageBoxW(HWND owner, ushort* text, ushort* caption, uint flags);\n" +
+            "int Take(Widget w) => 0;\n" +
+            "void Use()\n{\n" +
+            "    MessageBoxW(null, null, null, 0u);\n" +
+            "    Take(3);\n" +
+            "}",
+            out var diagnostics);
+
+        Assert.Equal(["SL0202", "SL0276", "SL0276"], Front.Codes(diagnostics));
+        Assert.DoesNotContain(diagnostics.Items,
+            d => d.Message.Contains(DiagnosticBag.ErrorTypeName, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// But an error type with nothing before it to explain it is a compiler bug,
+    /// and hiding the only sign of that would be worse than the noise.
+    /// </summary>
+    [Fact]
+    public void AnErrorTypeWithNoCauseIsStillReported()
+    {
+        var bag = new DiagnosticBag();
+        bag.Error("SL0262", default, $"expects '{DiagnosticBag.ErrorTypeName}'");
+        bag.Error("SL0262", default, $"expects '{DiagnosticBag.ErrorTypeName}' again");
+
+        Assert.Single(bag.Items);
+    }
+
     [Fact]
     public void AddRangeKeepsBothBags()
     {

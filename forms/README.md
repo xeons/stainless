@@ -12,28 +12,31 @@ import Forms;
 import Forms.Drawing;
 import Forms.Platform;
 
-public class MainForm : Form {
-    Button greet;
-    Label  said;
+public class MainForm : Form
+{
+    private Button _greet;
+    private Label _said;
 
-    public MainForm() {
+    public MainForm()
+    {
         base(WindowBorder.Sizable);
         Text = "Hello";
         SetBounds(0, 0, 320, 140);
 
-        greet = new Button(this);
-        greet.Text = "Greet";
-        greet.SetBounds(12, 12, 90, 26);
-        greet.Click += this.OnGreet;
+        _greet = new Button(this);
+        _greet.Text = "Greet";
+        _greet.SetBounds(12, 12, 90, 26);
+        _greet.Click += this.OnGreet;
 
-        said = new Label(this);
-        said.SetBounds(12, 52, 280, 22);
+        _said = new Label(this);
+        _said.SetBounds(12, 52, 280, 22);
     }
 
-    void OnGreet(Control sender) { said.Text = "Hello from Stainless."; }
+    void OnGreet(Control sender) => _said.Text = "Hello from Stainless.";
 }
 
-int Main() {
+int Main()
+{
     Application.Initialize();
     var form = new MainForm();
     form.CenterOnScreen();
@@ -101,6 +104,7 @@ src/Container.sl            GraphicControl, WindowedControl, the layout pass
                                                             (lcl/controls.pp)
 src/Form.sl                 Form, Screen                    (lcl/forms.pp)
 src/Application.sl          Application                     (lcl/forms.pp)
+src/Background.sl           Background: work off the UI thread, answered on it
 src/Controls/Buttons.sl     Button, CheckBox, RadioButton, ToggleButton,
                             SpeedButton                     (lcl/buttons.pp)
 src/Controls/Text.sl        Label, TextBox                  (lcl/stdctrls.pp)
@@ -123,8 +127,8 @@ src/Platform/Win32/*.sl     the Windows backend       (lcl/interfaces/win32/)
 src/Platform/Gtk/*.sl       the GTK 3 backend           (lcl/interfaces/gtk3/)
 ```
 
-Roughly 8,200 lines of portable code against the LCL's 276,000 — which is the
-scope difference, not a compression ratio — plus about 4,500 per backend. See
+Roughly 9,500 lines of portable code against the LCL's 276,000 — which is the
+scope difference, not a compression ratio — plus about 5,500 per backend. See
 *What is not here* below.
 
 ---
@@ -134,15 +138,16 @@ scope difference, not a compression ratio — plus about 4,500 per backend. See
 On Windows:
 
 ```
-stainless run samples/forms/demo.sl   forms/src bindings/win32/api \
-    bindings/win32/Win32.sl -l user32 -l gdi32 -l comctl32
-stainless run samples/forms/common.sl forms/src bindings/win32/api \
-    bindings/win32/Win32.sl -l user32 -l gdi32 -l comctl32
+stainless run samples/forms/demo.sl forms/src bindings/win32 \
+    -l user32 -l gdi32 -l comctl32 -l comdlg32 -l ole32 -l shell32 -l advapi32
 ```
 
+The whole binding directory rather than only `api`, because the backend
+reaches `Win32.Dialogs`, `Win32.Com` and `Win32.Resources`.
+
 or `.\samples\forms\build.ps1`, which builds every sample in that directory
-into `samples/forms/build` (git-ignored), writes the visual-styles manifest each
-one needs, and takes `-Test` to run every self-check and `-Run <name>` to open a
+into `samples/forms/build` (git-ignored), compiles the visual-styles manifest
+into each one, and takes `-Test` to run every self-check and `-Run <name>` to open a
 window.
 
 On Linux, the same sources with the other bindings and the other libraries:
@@ -159,7 +164,7 @@ where that choice is made, and it is a four-line `#if`.
 
 Every sample takes `--selftest`, which builds the same window, pumps the
 message queue, checks what can be checked without a person in front of it, and
-quits. `demo` makes 21 such checks, `common` 43 and `buttons` 51 — docking,
+quits. `demo` makes 21 such checks, `common` 44 and `buttons` 51 — docking,
 anchoring, native handles, text round-tripping through the platform, a click
 reaching its handler, a menu item resolving from its id, a cool bar's bands
 wrapping onto a second row when the window narrows. That is what makes a GUI
@@ -410,7 +415,7 @@ registers it and closing unregisters it, and the last one out stops the loop.
 
 ## What is ported, and what is left
 
-The LCL is 276,000 lines across 969 files. This is about 7,600, so the question
+The LCL is 276,000 lines across 969 files. This is about 9,500, so the question
 "what is missing" has a long answer — and an unhelpful one unless it is ordered.
 What follows is every LCL unit that a program would notice the absence of,
 grouped by how much work it is rather than by where it lives.

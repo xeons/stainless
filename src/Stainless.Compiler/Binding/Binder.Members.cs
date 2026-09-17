@@ -44,9 +44,8 @@ public sealed partial class Binder
             _currentScope = scope;
 
             foreach (var declared in unit.Declarations.OfType<DelegateDeclSyntax>())
-                if (declared.TypeParameters.Count == 0 &&
-                    scope.Module.Types.TryGetValue(declared.Name, out var type))
-                    DeclareDelegateSignature((NamedTypeSymbol)type, declared, scope);
+                if (_declaredTypes.TryGetValue(declared, out var type))
+                    DeclareDelegateSignature(type, declared, scope);
         }
 
         foreach (var (scope, unit) in _units)
@@ -60,21 +59,28 @@ public sealed partial class Binder
                 {
                     case FunctionDeclSyntax function:
                         if (function.TypeParameters.Count > 0)
+                        {
+                            // Here and not per instantiation, which would say
+                            // it once for every type argument, or never.
+                            if (function.Modifiers.HasFlag(Modifiers.Static))
+                                CheckStatic(containingType: null, function);
+
                             module.GenericFunctions.Add(
                                 new GenericFunctionTemplate(function.Name, scope, function));
+                        }
                         else
+                        {
                             DeclareFunction(scope, containingType: null, function);
+                        }
                         break;
 
+                    // Templates wait, since their members depend on type
+                    // arguments, and a declaration that lost its name to
+                    // another has no type to give members to: SL0201 or SL0550
+                    // has said so, and a second complaint in the shape of a
+                    // crash helps nobody. Neither is in the map.
                     case TypeDeclSyntax typeDecl:
-                        // Templates wait; their members depend on type arguments.
-                        //
-                        // Looked up rather than indexed, because a name a
-                        // template has already taken leaves nothing here to
-                        // find -- SL0201 has said so by now, and a second
-                        // complaint in the shape of a crash helps nobody.
-                        if (typeDecl.TypeParameters.Count == 0
-                            && module.Types.TryGetValue(typeDecl.Name, out var declared))
+                        if (_declaredTypes.TryGetValue(typeDecl, out var declared))
                             DeclareTypeMembers(scope, typeDecl, declared);
                         break;
 
@@ -90,8 +96,8 @@ public sealed partial class Binder
                         break;
 
                     case EnumDeclSyntax enumDecl:
-                        DeclareEnumMembers(
-                            (EnumTypeSymbol)module.Types[enumDecl.Name], enumDecl, scope);
+                        if (_declaredTypes.TryGetValue(enumDecl, out var enumType))
+                            DeclareEnumMembers((EnumTypeSymbol)enumType, enumDecl, scope);
                         break;
 
                     case GlobalConstDeclSyntax constant:
@@ -169,24 +175,7 @@ public sealed partial class Binder
             Span = span,
         };
 
-        // The function first, so that the eight bytes at offset zero are the
-        // thing a debugger and a reader both look for.
-        type.Function = new FieldSymbol(
-            ClosureTypeSymbol.FunctionFieldName,
-            new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), type, 0);
-
-        // The receiver second, and counted: this is the field that makes a
-        // closure keep its object alive, and it does so through the ordinary
-        // walk rather than through anything written for closures.
-        type.Receiver = new FieldSymbol(
-            ClosureTypeSymbol.ReceiverFieldName, _builtins.Bound, type, 1);
-
-        type.Fields.Add(type.Function);
-        type.Fields.Add(type.Receiver);
-
-        type.Function.Offset = 0;
-        type.Receiver.Offset = 8;
-        type.SetLayout(16, 8);
+        type.AddFields(_builtins.Bound);
 
         return type;
     }

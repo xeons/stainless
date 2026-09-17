@@ -17,7 +17,7 @@ to wrap free functions in a static class the way C# requires.
 ([§7.3](#73-properties)) and with the same meaning:
 
 ```csharp
-public int Area() => _side * _side;         // returns the expression
+public int Scaled(int by) => _side * by;    // returns the expression
 public void Grow() => _side++;              // evaluates it, returns nothing
 int Twice(int n) => n * 2;                  // a free function, equally
 ```
@@ -62,6 +62,18 @@ Which one a call means is decided from the arguments, exactly as it is for a
 module-level function: a call that fits none is SL0263 and one that fits
 several equally is SL0264.
 
+**Fitting several is not the same as fitting them equally.** When more than one
+candidate fits, the one whose every argument converts at least as well as it
+does for each of the others, and one of them better, is chosen, which is C#'s
+rule. An identity is better than any conversion; of two targets, the one that
+converts to the other and not back is better, so an `int` goes to `long` rather
+than `double`; and of two integers where neither holds the other, the signed
+one is better, so a `uint` goes to `long` rather than `ulong`. It is what lets
+`Text.FromInteger` take a `byte`, a `uint` or a literal although its `long`,
+`ulong` and `nuint` overloads all accept one. `Pair(int, long)` and
+`Pair(long, int)` called with `(1, 2)` are each better for one argument, and
+that is SL0264.
+
 **An interface method may not be overloaded.** An interface gives each of its
 methods a dispatch slot by position, so two of a name in one interface would be
 a call the receiver could not resolve:
@@ -78,7 +90,7 @@ matter, and it works — see [§2.10](02-types.md#210-interface--a-contract-disp
 
 ```csharp
 names.Filter((n) => n.ByteLength() > 3u)
-     .Map(Upper)
+     .Map((n) => n.ToUpperAscii())
      .ToArray()
 ```
 
@@ -124,7 +136,7 @@ Draw("ab", loud: true);           // and a name reaches past what was left out
 see. That is not an implementation note: it is the whole of the design, and
 every rule below follows from it.
 
-**It must be a constant** (SL0613) -- a literal, `null`, a `const`, an enum
+**It must be a constant** (SL0613) — a literal, `null`, a `const`, an enum
 member or `default(T)`. Anything else would be code standing in a signature and
 running at the caller, once per call site:
 
@@ -154,7 +166,7 @@ defaults are the same feature from two directions, and they compose.
 
 **A default takes part in overload resolution** only by making a candidate
 applicable with fewer arguments. Two candidates that both fit are ambiguous
-(SL0264) as they always were -- a default does not make one of them preferred.
+(SL0264) as they always were — a default does not make one of them preferred.
 
 **It crosses a library boundary as the value it folded to.** A default naming a
 `const` of the library's own is a name the consumer cannot read, so the metadata
@@ -175,7 +187,7 @@ what separates them is who may write to it and who must.
 | `out` | not necessarily | yes | yes |
 
 ```csharp
-void Bump(ref int n) { n = n + 1; }
+void Bump(ref int n) { n++; }
 double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
 
 int count = 1;
@@ -271,7 +283,7 @@ only where a type or a name follows it.
 
 **Where a `Result` is better.** `out` is for the answer that comes with a
 question — *did it work*, *was it there* — and `Result<T, TError>` is for the answer
-that comes with a reason. The library reaches for `Result` ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)) almost
+that comes with a reason. The library reaches for `Result` ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails)) almost
 everywhere, and `out` is the shape to use when the failure has nothing to say
 for itself.
 
@@ -413,7 +425,7 @@ public struct Money {
 ```
 
 C#'s shape: **inside the type it is for, `static`, with every operand written
-out**. The last part is the one that earns itself -- `3 * money` needs an
+out**. The last part is the one that earns itself — `3 * money` needs an
 operator whose left operand is not the declaring type, and a method with an
 implicit receiver could not express it.
 
@@ -431,7 +443,7 @@ its operators apart from its methods, and an operator is reached by writing it.
 | unary | `-` `!` `~` |
 
 **What may not, and why.** `&&` and `\|\|` short-circuit, and an overload would
-have to evaluate both sides to be called at all -- so overloading them would
+have to evaluate both sides to be called at all — so overloading them would
 change what the operator *means* rather than what it does (SL0558). `=` is not
 an operator but a store. And the compound forms are not overloaded separately:
 `a += b` is defined as `a = a + b` and picks up whatever `+` does, which is one
@@ -458,7 +470,7 @@ would otherwise get. That is the whole reason to declare one.
 
 **A generic type may declare operators**, and each instantiation gets its own.
 `Box<T>` with an `operator +` gives `Box<int>` and `Box<long>` a body each,
-with `T` substituted -- the same monomorphization every other member of a
+with `T` substituted — the same monomorphization every other member of a
 template goes through. Whether the body is *valid* is decided per
 instantiation, as [§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do) says: `a.Value + b.Value` compiles at `int` and is an
 error at some type with no `+`, reported against the use that asked for it.
@@ -479,22 +491,22 @@ long cents = (long)price;       // explicit: say that you meant it
 
 A conversion is an operator whose name is a type. It is written inside one of
 the two types it is between, `static` and `public`, taking the value and
-returning what it becomes, and it lowers to an ordinary function -- `op_ToMoney`
--- that nothing can call by name.
+returning what it becomes, and it lowers to an ordinary function — `op_ToMoney`
+— that nothing can call by name.
 
 **The word is the whole difference.** `implicit` says the conversion loses
 nothing, so it runs wherever the target type is expected: an assignment, an
 argument, a return, an operator's operand. `explicit` says something is lost or
 assumed, so it runs only where a cast is written. That is the same distinction
-the built-in conversions already make -- `int` to `long` is implicit and `long`
-to `int` is a cast -- and declaring one puts a type into that system rather than
+the built-in conversions already make — `int` to `long` is implicit and `long`
+to `int` is a cast — and declaring one puts a type into that system rather than
 beside it.
 
 **One conversion, and no chain.** The value has to be exactly what the operator
 takes, with one exception: a literal adopts the source type the way it adopts
 any other, so `Money m = 5;` works against an operator taking a `long`. A
 `double` does not reach `Money` by way of `long`, and an `int` variable does not
-either -- write the cast. C# composes a standard conversion with a user-defined
+either — write the cast. C# composes a standard conversion with a user-defined
 one at each end and arrives at rules nobody can hold in their head; the rule
 here is meant to fit in a sentence.
 
@@ -535,7 +547,7 @@ public class Grid {
 ```
 
 A property that takes arguments, lowered to `get_Item(i)` and
-`set_Item(i, value)` -- again C#'s spelling. `a[i] += 1` reads through the
+`set_Item(i, value)` — again C#'s spelling. `a[i] += 1` reads through the
 getter and writes through the setter, on the same terms as any other property
 ([§7.3](#73-properties)).
 
@@ -552,7 +564,7 @@ compiler find storage; there is nothing to find here, since what an index
 *means* is the whole of what an indexer is for. Both accessors are written, or
 just the getter for a read-only one.
 
-An indexer is inherited like any other member, and works on a struct -- where
+An indexer is inherited like any other member, and works on a struct — where
 the setter reaches its receiver by pointer, as every struct method does.
 
 ## 7.6 `static` members
@@ -571,7 +583,7 @@ public class Small {
         return Ok(new Small(total));
     }
 
-    public int Value() { return value; }
+    public int Value => value;
 }
 
 var small = try Small.Parse(text);
@@ -583,7 +595,7 @@ value instead is refused, as is naming the type to reach an instance method
 (SL0576). Each of those says which spelling was meant.
 
 Everything else about it is an ordinary method. It overloads by parameters
-alongside the instance methods of the same name -- though two members differing
+alongside the instance methods of the same name — though two members differing
 only by `static` collide, since the receiver was never part of the signature.
 It may be named without a call, `Type.Name`, and become a delegate. And it may
 use a private constructor, which is what lets a fallible factory close off the
@@ -598,9 +610,10 @@ object, and a static method has nowhere to put one.
 
 **A `const`** belongs to the type in the same way and is not storage at all: it
 is inlined at every use ([§9.3](09-statements-expressions.md#93-const-and-static)),
-so it needs no initializer to be run and is the one type member a `--shared`
-library may have. `Aes.BlockSize` is reached by the type's name from outside
-and by its own name from within.
+so it needs no initializer to be run — and a `--shared` library, which has no
+entry point to run one from (SL0380), may have it whatever its value.
+`Aes.BlockSize` is reached by the type's name from outside and by its own name
+from within.
 
 **A field** is the same storage a module-level `static` is, named by the type
 instead of the module ([§9.3](09-statements-expressions.md#93-const-and-static)). It may be mutable, and it needs an initializer:
@@ -619,7 +632,7 @@ automatic one would need storage with no initializer to fill it, and a static
 has no other moment at which to be given a first value (SL0584).
 
 **A static constructor** is `static Name() { }` inside `class Name`. It runs
-once, before `Main`, after every static field's initializer -- which is C#'s
+once, before `Main`, after every static field's initializer — which is C#'s
 order, and the only one that lets the block arrange the fields it is there for.
 
 C# runs one *lazily*, before the type is first used, behind a guard checked on
@@ -638,7 +651,7 @@ public static class Defaults {
 }
 ```
 
-`new Defaults()` is refused, and so is any member that would need an instance --
+`new Defaults()` is refused, and so is any member that would need an instance —
 a field, a constructor, a destructor, an instance method or an instance property
 (SL0583). A **module** is usually the better answer, and is what the standard
 library uses: a module is a scope, so its members need no prefix inside it. What

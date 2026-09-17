@@ -16,24 +16,53 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 317 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 853 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 324 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,126 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
 runs a program, which proves the whole pipeline and takes a fifth of a second;
-a unit test asks the front end alone -- what did the lexer make of this, where
-exactly does this error point, which registers does this struct travel in --
+a unit test asks the front end alone — what did the lexer make of this, where
+exactly does this error point, which registers does this struct travel in —
 and takes a millisecond, so it can be asked by the hundred.
 
-**Both Windows and Linux are tested.** 317 cases, of which 13 are
-Windows-only and 2 are Linux-only, so Linux runs 304 and Windows 315, each
-skipping the other's. A case whose *subject* differs by platform -- `Path.Join` writes a
+**A third question is what the compiler does with a program nobody wrote.**
+Both suites hold programs that were meant to compile or meant to fail, and
+neither holds the half-typed, truncated and nonsensical ones an editor hands a
+compiler all day. [tests/Stainless.Fuzz](../tests/Stainless.Fuzz) makes those:
+
+```
+dotnet run --project tests/Stainless.Fuzz -- fuzz --minutes 10
+dotnet run --project tests/Stainless.Fuzz -- replay     # which findings still fail
+dotnet run --project tests/Stainless.Fuzz -- repro file.sl
+```
+
+It mutates every test case, sample and standard library file a token at a time
+— deleting, repeating, swapping, nesting seven hundred deep — and compiles each
+mutant through parse, bind and emit in process, stopping wherever the driver
+would. A compiler may reject anything; it may not throw, overflow its stack,
+run forever, or report a span that is not in the file, and any of those is kept
+under `%TEMP%/stainless-fuzz/crashes`, one directory per distinct failure, with
+the input shrunk to what still fails the same way.
+
+Each worker is a process rather than a thread, because a stack overflow ends a
+.NET process whatever handler is installed and a loop cannot be interrupted, so
+the supervisor keeps the input a worker was compiling when it died or went
+quiet. It is not coverage-guided: that would mean instrumenting the compiler
+assembly, and keeping any mutant that makes the compiler report something new
+has been enough to get past the parser. It does not link or run anything, so
+it finds crashes and not miscompilations. Its first five minutes found two
+dozen crashes the suites had not, and a fixed one is pinned by an ordinary case
+like any other bug — the fuzzer's findings directory is not a test suite.
+
+**Both Windows and Linux are tested.** 324 cases, of which 13 are
+Windows-only and 2 are Linux-only, so Linux runs 311 and Windows 322, each
+skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
-other -- carries an `expected.linux.txt` beside its `expected.txt` rather than
+other — carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.
 
-Four of those cases are real 32-bit binaries, built and run on both systems, and
+Nine of those cases are real 32-bit binaries, built and run on both systems, and
 two are built for ARM64 and not run: there is no ARM64 machine here, so they
 stop at an object file LLVM verified and lowered, with their signatures pinned
 against clang's. Building 32-bit on Linux needs the development half of the

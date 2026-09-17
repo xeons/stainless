@@ -20,7 +20,8 @@ stainless restore              resolve dependencies and lock them
                          exports the declarations cannot. The compiler's
                          own renames are kept as well
   --metadata <path>      write module metadata for a Stainless consumer
-  -r, --reference <path> bind against a library's module metadata
+  -r, --reference <path> bind against a library's module metadata, and link
+                         the library beside it
   --stdlib               (doc) document the standard library itself
   -p, --project <path>   the project file to build, or its directory
   --no-project           ignore any project file and use the paths alone
@@ -44,7 +45,7 @@ stainless restore              resolve dependencies and lock them
                          x86-linux, arm64-windows, arm64-linux
   --keep                 keep the generated .ll
   --obj <dir>            directory for intermediates (default ./obj)
-  --                     everything after this is a path, not an option
+  --                     (run) everything after this is passed to the program
   -h, --help  -v, --version
 ```
 
@@ -274,8 +275,14 @@ the compiler can describe one to the other:
 
 ```
 stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
-stainless build app.sl --reference build/shapes.slmod build/shapes.lib -o app.exe
+stainless build app.sl --reference build/shapes.slmod -o app.exe
 ```
+
+The metadata names its library, and **`--reference` links it** from beside the
+`.slmod` — the import library on Windows, the shared object elsewhere. It used
+to take the library as a second input, and leaving that off was a link error
+about a name nobody had declared. A library moved away from its metadata is
+still passed as an ordinary input.
 
 The `.slmod` is generated from the same bound program the library was compiled
 from, so it cannot drift from it. The consumer then writes ordinary Stainless
@@ -311,8 +318,6 @@ Generics and classes implementing interfaces do not cross, and the compiler says
 so where the library is built rather than leaving the consumer to find a public
 type missing. See [§8.4 of the spec](spec/08-interop-libraries.md#84-a-stainless-library-consumed-by-stainless) for why each is a
 decision about the language rather than a gap in the metadata.
-
----
 
 ---
 

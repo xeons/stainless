@@ -20,8 +20,9 @@ Names and sizes match C# exactly.
 
 `void` is the absence of a value rather than a value of no size, so the only
 place it can be written is what a function returns (SL0309). There is no
-variable, field, parameter or type argument of it, no `void*` — `byte*` is
-what C's is spelled here — and no array or slice of one (SL0310, SL0451).
+variable, field, parameter or type argument of it, and no array or slice of one
+(SL0310, SL0451). `void*` is not a value of it but a pointer, and means what
+C's does.
 
 The three code unit types are **three encodings, not three widths of one
 type**, and none of them converts to another without a cast:
@@ -230,7 +231,7 @@ public class Cache<T> {
 
 var (low, high) = MinMax(numbers);      // named where the names matter
 var range = MinMax(numbers);            // or kept whole
-Console.WriteLine(range.Item1);
+Console.WriteLine(Text.FromInteger(range.Item1));
 ```
 
 Several values travelling as one, for the function with two answers that
@@ -411,13 +412,13 @@ constructor decided. The base class's initializers are not here either: the
 base's own constructor runs them, and that call is what a derived constructor
 starts with.
 
-**An initializer cannot read the object** (SL0617) -- not `this`, not another
+**An initializer cannot read the object** (SL0617) — not `this`, not another
 field, not a method. It runs before the constructor's body and in declaration
 order, so what it would read is whatever the allocation left, which is zero.
 A constructor is where one field's value may depend on another. Everything else
 is in reach: a literal, a `const`, a static, a call to a free function, a `new`.
 
-**Only a class has them.** A `struct` is made by declaring one -- `Point p;` --
+**Only a class has them.** A `struct` is made by declaring one — `Point p;` —
 and there is no moment there for an initializer to run at, so one is refused
 (SL0617) rather than silently skipped.
 
@@ -430,7 +431,7 @@ var numbers = new List<int> { 1, 2, 3 };
 ```
 
 An object initializer is short for the construction held in a name, a write per
-entry, and then the name -- and it is lowered to exactly that, so nothing it can
+entry, and then the name — and it is lowered to exactly that, so nothing it can
 do is anything the written-out form could not. The writes go through a setter
 where the member is a property, as they would anywhere else.
 
@@ -442,8 +443,8 @@ without `Standard.Collections` appearing anywhere in the program.
 Which of the two a brace list is comes from its entries, and **they may not be
 mixed** (SL0618): one that did both would be two different things at once, and
 a reader would have to know the type to see which each entry was. The other
-refusals are the ones an assignment would have given anyway -- no such member,
-a property with no setter, a member that is not visible -- plus a type with no
+refusals are the ones an assignment would have given anyway — no such member,
+a property with no setter, a member that is not visible — plus a type with no
 `Add` to add to.
 
 ### 2.4.3 Inheritance
@@ -682,13 +683,13 @@ String name = (shape as INamed)?.Name() ?? "anonymous";
 ```
 
 That second line is what `as` is for. `is C c` already covers the branch, and
-covers it better -- the name is in scope exactly where it was proved. What it
+covers it better — the name is in scope exactly where it was proved. What it
 cannot do is hand the answer on: pass it to something taking a `C?`, store it,
 or give it a fallback with `??`. Those want a value, and a branch is not one.
 
 What is tested is evaluated once, as with `is`, so `Parent() as Frame` calls
 `Parent` a single time. The arm the test allows is that same pointer under the
-type the test bought -- no second check -- and a conversion that cannot fail
+type the test bought — no second check — and a conversion that cannot fail
 gets no test at all: `square as Shape` is the ordinary widening and emits
 nothing.
 
@@ -706,7 +707,7 @@ write 'as Alpha'
 A COM interface is the other refusal, and it is not about the answer being
 known: `QueryInterface` is a call the object answers, and answers again, so a
 test followed by a conversion would ask twice and could be told two different
-things. `(IThing)x` asks once, and ends the program if the answer was no --
+things. `(IThing)x` asks once, and ends the program if the answer was no —
 which is the same bargain a binding `is` refuses for the same reason (SL0587).
 
 ## 2.5 Pointers and nullability
@@ -873,7 +874,7 @@ negation, `&&`, `||`, a ternary, an early return — and it is taken away again 
 anything that could have changed the value. A variant with exactly two cases
 narrows on a false test as well as a true one, which is why `if (!r.Ok)` proves
 `Fail`. Only a variant held in a local or a parameter can carry a proof (SL0285),
-for the reason given in [§2.8](#28-resultt-e--how-a-function-fails).
+for the reason given in [§2.8](#28-resultt-terror--how-a-function-fails).
 
 **This is the short form, and it is usually the one to write.** A reader that
 answers with a fallback needs no `switch`:
@@ -1083,12 +1084,12 @@ flag and both halves. A call that succeeds allocates nothing.
 **`Ok` and `Fail` take their type from where they are going.** Neither can be
 written with type arguments — type arguments cannot be written at a call at all
 ([§4.4](04-generics.md#44-what-is-and-is-not-supported)) — and one value could not say what both of them are: `Ok(4)` fixes `T`
-and says nothing about `E`. So the compiler reads the type being returned,
+and says nothing about `TError`. So the compiler reads the type being returned,
 assigned into, or passed as an argument, exactly as it does for a lambda:
 
 ```csharp
 Result<int, Why> Doubled(int n) {
-    if (n < 0) { return Fail(Why.TooSmall); }   // E from the return type
+    if (n < 0) { return Fail(Why.TooSmall); }   // TError from the return type
     return Ok(n * 2);                           // T from the return type
 }
 
@@ -1124,7 +1125,7 @@ The early return is the one most code is written around, and it is why
 everything after it.
 
 ```csharp
-var raw = File.ReadAllBytes(path);
+var raw = File.ReadAllText(path);
 if (!raw.Ok) { return Fail(raw.Error); }
 Console.Write(raw.Value);                    // proved by the line above
 ```
@@ -1156,7 +1157,7 @@ through the runtime: threading a Result through every array index would make
 every program worse to read in exchange for nothing.
 
 **Aborting means aborting.** It writes a line to standard error and ends the
-process -- there is no unwinding, no handler and no exit code to inspect from
+process — there is no unwinding, no handler and no exit code to inspect from
 inside. What it does first is flush everything the program has written, so the
 output that led up to the failure is there to read: the moment a program's
 account of itself is worth most is the moment it stops.
@@ -1165,8 +1166,8 @@ Every abort in the library is one a caller could have avoided by asking, and
 each says so where it is declared. `Dictionary.Get` and `SortedList.Get` have
 `ContainsKey` and `GetOr`; `Queue`, `Stack` and `LinkedList` have `Count` and
 `IsEmpty`; `Optional.Get` has `ValueOr` and `is Some x`; `Env.ArgumentAt` has
-`ArgumentCount`. The rest of what aborts is the runtime running out -- memory,
-a thread, a mutex -- where the function that failed has no way to return
+`ArgumentCount`. The rest of what aborts is the runtime running out — memory,
+a thread, a mutex — where the function that failed has no way to return
 anything at all.
 
 **`try` passes a failure to the caller.**
@@ -1179,7 +1180,7 @@ public Result<List<String>, IOError> ReadAllLines(String path) {
 
 `try e` evaluates `e`; on success the expression *is* the value, and on failure
 the enclosing function returns `Fail(e.Error)` at once. It is exactly the two
-lines it replaces -- the named temporary and the early return -- moved to where
+lines it replaces — the named temporary and the early return — moved to where
 the value is used.
 
 It is spelled `try` and not `?` for a reason worth recording: a postfix `?`
@@ -1200,7 +1201,7 @@ Three rules:
 
 It binds like any other prefix, so `try a + b` is `(try a) + b` and
 `try f().x` covers the whole chain. It is an expression, so several may appear
-in one -- `Ok(try P(a) + try P(b))` -- and each returns on its own failure.
+in one — `Ok(try P(a) + try P(b))` — and each returns on its own failure.
 
 ### 2.8.1 `Optional<T>` — a value, or none
 
@@ -1246,7 +1247,7 @@ Optional<int> none = None;
 ```
 
 The rule is what makes an indexer able to be honest. A getter and a setter
-share one type ([§7.5](07-functions-members.md#75-indexers)), so a subscript answering `Optional<V>` takes one as
+share one type ([§7.5](07-functions-members.md#75-indexers)), so a subscript answering `Optional<TValue>` takes one as
 well, and without this every write through it would read `map[key] =
 Some(value)`. With it, `map[key] = value` sets and `map[key] = None` removes
 ([§5.4](05-standard-library.md#54-standardcollections)).
@@ -1260,7 +1261,7 @@ overload resolution. An `Optional<T>` assigned to an `Optional<Optional<T>>`
 
 | | |
 |---|---|
-| `HasValue()`, `IsEmpty()` | whether there is one |
+| `HasValue`, `IsEmpty()` | whether there is one |
 | `Get()` | the value, **aborting** when there is none — the bargain `Dictionary.Get` makes |
 | `ValueOr(fallback)` | the value, or something the caller supplies |
 | `Or(other)` | this one if it holds anything, else `other` |
@@ -1299,12 +1300,12 @@ Two conventions, and the difference between them is whether there is a value.
 | produces nothing | the error enum, with `None` for success |
 
 `File.ReadAllBytes` returns a `Result<byte[], IOError>`; `File.Delete` returns
-an `IOError`. The second is not a lesser form of the first -- `Result<void, E>`
+an `IOError`. The second is not a lesser form of the first — `Result<void, TError>`
 is not expressible, and would say nothing the enum does not.
 
 **Construction is the awkward case**, because a constructor has to return its
 type and so cannot report why it failed. Every language with checked errors
-answers this with a function -- Rust's `TcpStream::connect`, Go's `net.Dial` --
+answers this with a function — Rust's `TcpStream::connect`, Go's `net.Dial` —
 and so does this one, as a **static method of the type being made** ([§7.6](07-functions-members.md#76-static-members)):
 
 ```csharp
@@ -1313,7 +1314,7 @@ var listener = try TcpListener.Listen("0.0.0.0", 80u);
 
 The constructor is private, and that is what makes this the way in rather than
 merely the recommended way. A static method is inside the type, so it may use a
-constructor nothing outside it can -- which is why the failing shape is gone
+constructor nothing outside it can — which is why the failing shape is gone
 rather than discouraged. There is no way left to obtain a listener that exists
 and is not listening.
 
@@ -1322,7 +1323,7 @@ and is not listening.
 returns a `Result`, whose failure cannot be walked past because it has no value
 to read until its case has been named.
 
-`IsOpen()` and `Error()` remain on a stream or a socket, for what happens
+`IsOpen` and `Error` remain on a stream or a socket, for what happens
 *after* it is open: a read on a closed stream is an outcome of the read, and
 there is nowhere else to put it.
 
@@ -1787,14 +1788,31 @@ That is what makes a closure removable from a list of them, and it is the
 reason a method pointer is a value rather than an object: two mentions of
 `counter.Add` are equal, where two generated wrappers would not have been.
 
+**A plain function becomes one too**, with no lambda around it:
+
+```csharp
+public closure String Shout(String text);
+String Upper(String s) => s.ToUpperAscii();
+
+Shout loud = Upper;
+var shouted = names.Map(Upper);           // R is String, read off Upper
+```
+
+It has no object, so the receiver word is null and the function word is a thunk
+the compiler writes once per function: it takes the receiver, ignores it, and
+passes the arguments on. Once rather than once per mention is what keeps
+comparison honest — two mentions of `Upper` are equal, so a function added to
+an event with `+=` comes off again with `-=` — and a null receiver means making
+one allocates nothing. A generic result is read off the function's declared
+return type, as it is off a lambda's body
+([§4.4](04-generics.md#44-what-is-and-is-not-supported)).
+
 **What it is not**
 
 - **Not a C function pointer** (SL0360). Sixteen bytes cannot go where eight
   are expected, so a closure never satisfies a `delegate` and never crosses
   `extern "C"`. Declare a `delegate` for that, and take the context as an
   argument the way C does.
-- **Not over a plain function** (SL0599). A closure is a method *and* an
-  object; a function has no object. Wrap it in a lambda, which gives it one.
 - **Not inferrable by `var`** (SL0553), for the reason a bare function name is
   not: `counter.Add` names a method, and which closure type it becomes is what
   the declaration says.
@@ -1945,12 +1963,12 @@ Console.WriteLine(Text.FromInteger(doubled(21)));
 It is a `closure`, because a lambda may capture and a delegate has nowhere to
 keep what it captured. The type is the signature and nothing else, so two
 lambdas of the same shape are the same type and either may be assigned to the
-other -- and a `closure` somebody declared with that shape is interchangeable
+other — and a `closure` somebody declared with that shape is interchangeable
 with both, since all three are the same two words.
 
 What this does not reach is a lambda that has not said enough (both SL0553):
 
-- **A parameter with no type.** `var f = x => x;` has nothing to infer from --
+- **A parameter with no type.** `var f = x => x;` has nothing to infer from —
   that is the whole of what a target type was supplying.
 - **A block body.** Its result is whatever its `return`s agree on, and that is
   decided by the type it is becoming rather than the other way round. One
@@ -2063,7 +2081,7 @@ which is the only thing that knows them. A lambda with no target is an error —
 `var f = x => x;` has nothing to infer from, and SL0553 says so.
 
 A closure is a class, so crossing a thread boundary with one warns unless it is
-declared `threadsafe` ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) -- which it cannot be, having no declaration to
+declared `threadsafe` ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) — which it cannot be, having no declaration to
 write the word on. That is the right answer rather than an oversight: a closure
 holds captured state, and nothing synchronizes it.
 

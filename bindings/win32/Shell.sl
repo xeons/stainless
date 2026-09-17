@@ -313,7 +313,7 @@ public String[] PathsOf(IShellItemArray items)
     var paths = new String[count];
 
     nuint found = 0u;
-    for (nuint i = 0u; i < count; i = i + 1u)
+    for (nuint i = 0u; i < count; i++)
     {
         var got = ItemAt(items, (uint)i);
         if (!got.Ok)
@@ -324,7 +324,7 @@ public String[] PathsOf(IShellItemArray items)
             continue;
 
         paths[found] = path;
-        found = found + 1u;
+        found++;
     }
 
     if (found == count)
@@ -332,7 +332,7 @@ public String[] PathsOf(IShellItemArray items)
 
     // Some items had no path, so the array is longer than what was found.
     var exact = new String[found];
-    for (nuint i = 0u; i < found; i = i + 1u)
+    for (nuint i = 0u; i < found; i++)
         exact[i] = paths[i];
     return exact;
 }

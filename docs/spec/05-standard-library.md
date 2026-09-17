@@ -46,6 +46,10 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Ascii` | what one byte is, when ASCII is the honest answer | on request |
 | `Standard.Encoding` | `IEncoding` and the six encodings ([§3.6](03-text.md#36-other-encodings)) | on request |
 | `Standard.Convert` | base64, hex and number parsing ([§3.7](03-text.md#37-conversions)) | on request |
+| `Standard.Process` | running another program, and signals ([§5.9.1](#591-standardprocess)) | on request |
+| `Standard.Json` | JSON, as a document or onto a type ([§5.10](#510-standardjson-and-standardxml)) | on request |
+| `Standard.Xml` | XML, in the same two layers ([§5.10](#510-standardjson-and-standardxml)) | on request |
+| `Standard.Resources` | what a `.rc` folded into the binary, read back on every platform ([§2.2 of packages.md](../packages.md#22-resources)) | on request |
 | `Standard.Net` | TCP and UDP sockets, the same on every platform | on request |
 | `Standard.Env` | the command line, the environment, the working directory | on request |
 | `Standard.Time` | `Instant`, `Duration`, `DateTime` and the monotonic `Clock` | on request |
@@ -71,7 +75,7 @@ static readonly Mutex<List<String>> Registry =
 
 void Record(String name) {
     var guard = Registry.Lock();
-    guard.Value().Add(name);
+    guard.Value.Add(name);
 }                                   // ~Guard() unlocks, including on a return
 ```
 
@@ -80,22 +84,22 @@ without holding the lock and no way to forget which lock guards what. `lock
 (obj) { }` was rejected for the opposite reason: it would put a lock word in
 every object header and charge every single-threaded program for it.
 
-**What `Value()` still does not promise.** It hands out what the lock protects,
+**What `Value` still does not promise.** It hands out what the lock protects,
 and nothing stops the caller keeping it after the guard has gone. That is a
 lifetime question, and Stainless does not answer it yet; C# has the same hole
 and Rust closes it with lifetimes.
 
-It used to be worse than a discipline. `Value()` retains what it returns and the
+It used to be worse than a discipline. `Value` retains what it returns and the
 caller releases it, usually outside the lock, so two threads performed an
 unsynchronized read-modify-write on the count — it drifted down and the object
 was freed while the mutex still held it. Reference counts are atomic now, which
 closes that half; see [§10 of concurrency.md](../concurrency.md#10-what-exists-today) for why the narrower
 fix of "atomic counts for `threadsafe` types" would not have.
 
-`AtomicLong` and `AtomicBool` are sequentially consistent counters and flags.
-They are concrete rather than `Atomic<T>` because atomics are not generic — that
-would need a constraint saying `T` is an integer, and Stainless constrains by
-interface only.
+`AtomicInt`, `AtomicLong` and `AtomicBool` are sequentially consistent counters
+and flags. They are concrete rather than `Atomic<T>` because atomics are not
+generic — that would need a constraint saying `T` is an integer, and no
+constraint ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)) says that.
 
 `Thread` and `Future<T>` are the unstructured pair, for work with no lexical
 scope to be bracketed by. Both take a closure, which is what makes them safe to
@@ -131,7 +135,7 @@ so nothing checks what crosses that particular boundary — unlike `spawn`, wher
 [§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary) applies; and keeping a `Guard` alive is a discipline, not a guarantee. See [concurrency.md](../concurrency.md) for the model these are aiming
 at and which parts of it the compiler does not yet enforce.
 
-This module is not free when unused: `AtomicLong`, `AtomicBool` and `TaskScope`
+This module is not free when unused: `AtomicLong`, `AtomicBool`, `TaskScope` and the rest
 are ordinary classes rather than templates, so their code is emitted whether or
 not a program mentions them. That is true of every non-generic declaration in
 the standard library, and [§5.1](#51-what-ships-and-how) says what it costs and why nothing prunes it.
@@ -149,7 +153,7 @@ public interface IEquatable<T>     { bool EqualTo(T other); }
 public interface IComparable<T>    { int CompareTo(T other); }
 public interface IHashable         { nuint HashCode(); }
 
-public interface IReadOnlyList<T>  { nuint Count(); T At(nuint index); }
+public interface IReadOnlyList<T>  { nuint Count { get; } T At(nuint index); }
 
 public interface IList<T> : IReadOnlyList<T> {
     void Add(T item);
@@ -188,24 +192,24 @@ the built-in one.
 | Type | Backed by | Notes |
 |---|---|---|
 | `List<T>` | one array, doubling | `IList<T>`, `IEnumerable<T>`; `list[i]` |
-| `Dictionary<TKey, TValue>` | open addressing | `K : IEquatable<K>, IHashable`; iterates `Pair<TKey, TValue>`; `map[k]` → `Optional<V>` |
+| `Dictionary<TKey, TValue>` | open addressing | `TKey : IEquatable<TKey>, IHashable`; iterates `Pair<TKey, TValue>`; `map[k]` → `Optional<TValue>` |
 | `HashSet<T>` | open addressing | `UnionWith`, `IntersectWith`, `ExceptWith` |
 | `Queue<T>` | circular buffer | `Enqueue`, `Dequeue`, `Peek` |
 | `Stack<T>` | one array | `Push`, `Pop`, `Peek` |
 | `LinkedList<T>` | an index pool | handles, not references — see below |
-| `SortedList<TKey, TValue>` | two sorted arrays | `K : IComparable<K>`; binary search, ordered iteration |
+| `SortedList<TKey, TValue>` | two sorted arrays | `TKey : IComparable<TKey>`; binary search, ordered iteration |
 
 `List<T>` carries an indexer ([§7.5](07-functions-members.md#75-indexers)), so `list[i] += 1` reads and writes the
 way an array does. `At` and `Set` remain, because an interface has no indexers
 and `IReadOnlyList<T>` declares them; the brackets are what to reach for where
 the type is known.
 
-**A dictionary's indexer answers `Optional<V>`**, which is Swift's design and
+**A dictionary's indexer answers `Optional<TValue>`**, which is Swift's design and
 right for the same reason. An index is a position the caller worked out, so
 `list[i]` out of range is the same mistake `array[i]` is. A key is data that
 arrived from a file, a socket or a person, so a key that is not there is an
-ordinary outcome rather than a mistake in the program -- the line [§2.6](02-types.md#26-variant--a-value-that-is-one-of-several-things) draws
-between a value to return and a reason to stop. An indexer returning `V` would
+ordinary outcome rather than a mistake in the program — the line [§2.6](02-types.md#26-variant--a-value-that-is-one-of-several-things) draws
+between a value to return and a reason to stop. An indexer returning `TValue` would
 have to stop, and `map[key]` carries no verb to warn anyone that it might.
 
 ```csharp
@@ -214,7 +218,7 @@ int port = settings["port"].ValueOr(8080);
 ```
 
 A getter and a setter share one type ([§7.5](07-functions-members.md#75-indexers)), so the setter takes an
-`Optional<V>` as well. That says something rather than costing something: a
+`Optional<TValue>` as well. That says something rather than costing something: a
 value promotes to the optional holding it, so an ordinary write reads as one,
 and `None` is the absence of a value, which is what removing a key means.
 
@@ -232,7 +236,7 @@ The named forms remain, each saying which question it asks:
 
 | | |
 |---|---|
-| `map[key]`, `Find(key)` | `Optional<V>`, and **what to reach for** |
+| `map[key]`, `Find(key)` | `Optional<TValue>`, and **what to reach for** |
 | `GetOr(key, fallback)` | the value or a default |
 | `ContainsKey(key)` | whether it is there |
 | `Get(key)` | the value, **aborting** when there is none |
@@ -315,9 +319,8 @@ it.
 
 ## 5.5 Doing something to every element
 
-A lambda becomes an interface with exactly one method ([§2.15](02-types.md#215-lambdas-and-closures)), so the
-combinators need no function type in the language and no special case in the
-compiler — they are ordinary generic functions over ordinary generic closures.
+A lambda becomes a `closure` ([§2.15](02-types.md#215-lambdas-and-closures)), so the
+combinators need no special case in the compiler — they are ordinary generic functions over ordinary generic closures.
 
 ```csharp
 public closure R    Func<T, R>(T value);
@@ -353,8 +356,10 @@ Sort(people, (a, b) => a.Age - b.Age);
 ```
 
 `Map`, `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `Find`, `FirstOr`,
-`IndexWhere`, `ForEach`, `Take`, `Skip` and `ToList`, each over a `T[:]` —
-which an array converts to — and over any `IEnumerable<T>`.
+`IndexWhere`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
+`ToArray`, each over a `T[:]` — which an array converts to — and over any
+`IEnumerable<T>`. `Select`, `Where` and `Aggregate` are `Map`, `Filter` and
+`Reduce` spelled as LINQ spells them.
 
 **`Find` and `IndexWhere` answer with an `Optional`** ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)), and so does
 `Collections.IndexOf`: a length standing in for "not there" is the sentinel
@@ -397,7 +402,7 @@ int Main(String[] args) {
 ```
 
 `Main` takes either nothing or a `String[]`, and nothing else (SL0282). The
-array holds the arguments only -- the program's own name is `Env.Program()`,
+array holds the arguments only — the program's own name is `Env.Program()`,
 because it is not one of them and treating it as one is the mistake C's argv
 invites. `Standard.Env` reaches the same list from anywhere, which is for code
 that is nowhere near `Main`; taking the array as a parameter is better where it
@@ -409,7 +414,7 @@ the variable there and keeps an empty one on Unix. Treat empty and unset alike,
 which is what `GetOr` does.
 
 **`Standard.Time` keeps two kinds of time apart, because confusing them is the
-usual bug.** An `Instant` is a point on the wall clock and can jump -- a user
+usual bug.** An `Instant` is a point on the wall clock and can jump — a user
 sets it, NTP corrects it, a laptop wakes. A `Duration` is a length, and `Clock`
 reads a **monotonic** counter that only goes forward:
 
@@ -426,8 +431,8 @@ that: `hour + minute` is a `Duration`, `later - earlier` is the `Duration`
 between two instants, and `instant + span` is another instant. Adding two
 instants is not defined, because the sum of two dates is not a date.
 
-They are made by naming the unit -- `Duration.FromSeconds(30)`,
-`Instant.FromUtc(...)` -- rather than by a free function, since a bare count of
+They are made by naming the unit — `Duration.FromSeconds(30)`,
+`Instant.FromUtc(...)` — rather than by a free function, since a bare count of
 nanoseconds at a call site says nothing about which unit was meant.
 
 The UTC calendar is computed rather than delegated to `gmtime`, because the
@@ -437,12 +442,12 @@ which is the only thing that knows the zone rules.
 
 **`Standard.Random` is a class, not a set of functions.** The state has to live
 somewhere, and a hidden one shared by every caller is what makes a program
-impossible to replay -- so it lives in an object the caller holds. A
+impossible to replay — so it lives in an object the caller holds. A
 `Random(seed)` repeats exactly, on any machine; a `Random()` is seeded by the
 operating system and does not. (The language does now have a mutable static to
 put such a thing in, and that is the reason not to.)
 
-It is **not cryptographic** -- xoshiro256** is fast and its whole future
+It is **not cryptographic** — xoshiro256** is fast and its whole future
 follows from its state, which is what makes a seeded run reproducible and what
 makes it unfit for a key. `Random.Bytes` goes straight to the platform's
 source for that.
@@ -465,8 +470,8 @@ because a Stainless `double` *is* a C `double`.
 `Abs`, `Min`, `Max`, `Clamp` and `Sign` are overloaded across `int`, `long`,
 `nuint` and `double`, resolved by argument type. Alongside them are the usual
 transcendentals, `Floor`/`Ceiling`/`Round`/`Truncate`, `IsNaN`/`IsInfinite`/
-`IsFinite`, `Lerp` and `Near`, the integer `GreatestCommonDivisor` and
-`DivideCeiling`, and the bit functions `PopCount`, `LeadingZeros`,
+`IsFinite`, `Lerp` and `Near`, the integer `GreatestCommonDivisor`,
+`LeastCommonMultiple` and `DivideCeiling`, and the bit functions `PopCount`, `LeadingZeros`,
 `TrailingZeros`, `IsPowerOfTwo` and `NextPowerOfTwo`.
 
 `Round` takes halves away from zero, which is C's rule rather than the banker's
@@ -484,7 +489,7 @@ parallel {
 }
 
 var got = work.TryDequeue();
-if (got.Ok) { Console.WriteLine(got.Value); }
+if (got.Ok) { Console.WriteLine(Text.FromInteger(got.Value)); }
 ```
 
 `ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<TKey, TValue>` and
@@ -526,14 +531,14 @@ throughout: a module is the static class. What lives on a type instead is what
 *makes* one: `FileStream.Open` and its shorthands ([§7.6](07-functions-members.md#76-static-members)), because a constructor
 cannot report why an open failed.
 
-**How failure is reported.** Stainless does not unwind ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)), so the outcome
+**How failure is reported.** Stainless does not unwind ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails)), so the outcome
 comes back as a value, in one of three shapes:
 
 | Shape | Used by | Reads as |
 |---|---|---|
 | `Result<T, IOError>` | anything that produces a value | `if (r.Ok) { r.Value }` |
 | `IOError` | anything that does not | `if (File.Delete(p) != IOError.None)` |
-| the stream's own `Error()` | streams | checked after a loop, not each step |
+| the stream's own `Error` | streams | checked after a loop, not each step |
 
 Three shapes rather than one is deliberate: a single shape makes the common
 cases read worse than the rare one. There is no failed value to read by
@@ -541,7 +546,7 @@ mistake — `Value` does not compile until the check has happened — and a call
 that would rather carry on writes `read.ValueOr("")`.
 
 **Streams.** `IStream` is `Read`/`Write`/`Seek`/`Length`/`Position`/`Flush`/
-`Close` plus `CanRead`/`CanWrite`/`CanSeek`. `FileStream` and `MemoryStream`
+`Close` plus `CanRead`/`CanWrite`/`CanSeek` and `Error`. `FileStream` and `MemoryStream`
 implement it.
 
 ```csharp
@@ -552,8 +557,8 @@ file.Close();
 
 `FileStream.Open` and its three shorthands are the way to make one, and the
 constructor is private ([§2.9](02-types.md#29-how-the-library-reports-failure)): a constructor cannot say why an open failed, and
-the best it could do was hand back a stream holding nothing. `IsOpen()` and
-`Error()` remain for what happens *after* it is open. Closing is the
+the best it could do was hand back a stream holding nothing. `IsOpen` and
+`Error` remain for what happens *after* it is open. Closing is the
 destructor's job, so a stream that goes out of scope releases its handle
 whether or not `Close` was called.
 
@@ -631,12 +636,12 @@ gentle there.
 **Signals are asked for rather than delivered.** A handler runs between two
 instructions of whatever was executing, so almost nothing is legal inside one —
 no allocation, no locks, and therefore no Stainless at all. `Signals.Watch()`
-installs a handler that stores to a flag, and `Signals.Interrupted()` reads it
+installs a handler that stores to a flag, and `Signals.Interrupted` reads it
 where a program can act on it:
 
 ```csharp
 Signals.Watch();
-while (!Signals.Interrupted()) { DoAPieceOfWork(); }
+while (!Signals.Interrupted) { DoAPieceOfWork(); }
 ```
 
 ## 5.10 `Standard.Json` and `Standard.Xml`

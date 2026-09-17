@@ -1,0 +1,11 @@
+IntLong size     16
+IntLong.B        8
+IntLong align    8
+ByteDouble size  24
+ByteDouble.B     8
+ByteDouble.C     16
+LongByte size    16
+Nested size      24
+Nested.I         8
+read nested      3000000021
+read by value    42.5

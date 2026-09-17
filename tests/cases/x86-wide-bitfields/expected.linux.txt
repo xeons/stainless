@@ -1,0 +1,12 @@
+A 4, bytes agree
+B 8, bytes agree
+C 12, bytes agree
+D 12, bytes agree
+E 4, bytes agree
+F 8, bytes agree
+G 4, bytes agree
+H 12, bytes agree
+sentinel 77, G.X -2
+read C 2 -11259375 3
+read D 447392426 357913941 4
+read E 5 21

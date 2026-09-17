@@ -85,6 +85,110 @@ public class TargetTests
         });
     }
 
+    private const string WideFields = """
+        struct IntLong { public int A; public long B; }
+        struct ByteDouble { public byte A; public double B; public int C; }
+        struct Closed { public int A; public Op F; public int B; }
+        public closure int Op(int x);
+        """;
+
+    /// <summary>
+    /// A <c>long</c> or a <c>double</c> starts on a four-byte boundary inside an
+    /// i386 System V struct and an eight-byte one everywhere else. The x86 case
+    /// that checks this against clang only runs on Linux, so this is what holds
+    /// it on a Windows machine.
+    /// </summary>
+    [Theory]
+    [InlineData("x86-linux", 12, 4, 16, 4, 12)]
+    [InlineData("x86-windows", 16, 8, 24, 8, 16)]
+    [InlineData("x64-linux", 16, 8, 24, 8, 16)]
+    [InlineData("arm64-linux", 16, 8, 24, 8, 16)]
+    public void WideScalarsAlignAsTheTargetsCDoes(
+        string target, int intLong, int longAt, int byteDouble, int doubleAt, int intAt) =>
+        Under(TargetPlatform.Parse(target)!, () =>
+        {
+            var first = Front.Struct(WideFields, "IntLong");
+            Assert.Equal(intLong, first.Size);
+            Assert.Equal(longAt, first.Fields[1].Offset);
+
+            var second = Front.Struct(WideFields, "ByteDouble");
+            Assert.Equal(byteDouble, second.Size);
+            Assert.Equal(doubleAt, second.Fields[1].Offset);
+            Assert.Equal(intAt, second.Fields[2].Offset);
+        });
+
+    /// <summary>
+    /// A bit-field is reached through no more bytes than it needs. On i386
+    /// System V `struct { sbyte c; long x : 3; }` is four bytes holding an
+    /// eight-byte unit, and loading the whole unit read past the value's end.
+    /// </summary>
+    [Fact]
+    public void ABitFieldIsNotReadPastItsStruct() =>
+        Under(TargetPlatform.X86Linux, () =>
+        {
+            const string source = """
+                public struct G { public sbyte C; public long X : 3; }
+                public long Read(G g) => g.X;
+                public G Write(G g) { g.X = -2; return g; }
+                """;
+
+            // The bit-field rules are the ABI's, and this host's is not Linux's.
+            string ir = Front.ModuleIr(source, CppAbi.Itanium);
+            var program = Front.BindModule(source, out _, CppAbi.Itanium);
+            Assert.Equal(4, program.Structs.First(s => s.Name == "G").Size);
+
+            var bodies = Bodies(ir, "4Test4Read", "4Test5Write");
+            // The unit is loaded and stored with its alignment stated; the
+            // function's own i64 return slot is not, and is not the question.
+            Assert.Contains("load i16", bodies);
+            Assert.DoesNotMatch(@"(load i64|store i64 \S+), ptr \S+, align", bodies);
+        });
+
+    private static string Bodies(string ir, params string[] names) =>
+        string.Join("\n", names.Select(name =>
+        {
+            int definition = ir.IndexOf(name, StringComparison.Ordinal);
+            int from = ir.LastIndexOf("define", definition, StringComparison.Ordinal);
+            int to = ir.IndexOf("\n}", definition, StringComparison.Ordinal);
+            return ir[from..to];
+        }));
+
+    /// <summary>A closure is two pointers, whatever a pointer measures.</summary>
+    [Theory]
+    [InlineData("x86-windows", 4, 8, 12, 16)]
+    [InlineData("x64-windows", 8, 16, 24, 32)]
+    public void AClosureIsTwoWords(string target, int closureAt, int closureSize, int afterAt, int size) =>
+        Under(TargetPlatform.Parse(target)!, () =>
+        {
+            var type = Front.Struct(WideFields, "Closed");
+            Assert.Equal(closureAt, type.Fields[1].Offset);
+            Assert.Equal(closureSize, type.Fields[1].Type.Size);
+            Assert.Equal(afterAt, type.Fields[2].Offset);
+            Assert.Equal(size, type.Size);
+        });
+
+    /// <summary>
+    /// Every integer type reaches one of <c>Text.FromInteger</c>'s overloads on
+    /// every target. Which overload is exact moves with the width of
+    /// <c>nuint</c>, so a rule that only worked because two types happened to be
+    /// the same size would pass on one target and not another.
+    /// </summary>
+    [Theory]
+    [InlineData("x64-windows")]
+    [InlineData("x86-windows")]
+    [InlineData("x86-linux")]
+    [InlineData("arm64-linux")]
+    public void EveryIntegerHasAFromInteger(string target) =>
+        Under(TargetPlatform.Parse(target)!, () =>
+        {
+            string[] types = ["sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "nint", "nuint"];
+            string body = string.Join("\n", types.Select((t, i) =>
+                $"    {t} v{i} = 1; String s{i} = Text.FromInteger(v{i}); String i{i} = $\"{{v{i}}}\";"));
+
+            Front.BindBody(body + "\n    String literal = Text.FromInteger(42);", out var diagnostics);
+            Assert.Empty(Front.Codes(diagnostics));
+        });
+
     /// <summary>
     /// The two headers are three and four words, which is what the runtime's
     /// <c>SlObject</c> and <c>SlArray</c> are. They disagreed before the target

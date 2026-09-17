@@ -141,6 +141,27 @@ public static class Front
     }
 
     /// <summary>
+    /// Binds several module bodies of the same module, each as its own file.
+    ///
+    /// For a question whose answer depends on which file a declaration is in:
+    /// pass 2 takes one file at a time, and within a file one kind of
+    /// declaration at a time, so two declarations in one file meet in a
+    /// different order from the same two in different files.
+    /// </summary>
+    public static string[] FilesCodes(params string[] bodies)
+    {
+        var diagnostics = new DiagnosticBag();
+        var units = Library.Value.ToList();
+
+        foreach (string body in bodies)
+            units.Add(new Parser(Text("module Test;\n" + body), diagnostics, Symbols)
+                .ParseCompilationUnit());
+
+        new Binder(diagnostics, requireEntryPoint: false).Bind(units);
+        return Codes(diagnostics);
+    }
+
+    /// <summary>
     /// Binds a module body: the <c>module</c> line is supplied, so a test can be
     /// one declaration long.
     /// </summary>

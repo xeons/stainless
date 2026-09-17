@@ -271,19 +271,7 @@ public sealed class MetadataLoader(
             Span = ReferencedSpan,
         };
 
-        closure.Function = new FieldSymbol(
-            ClosureTypeSymbol.FunctionFieldName,
-            new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), closure, 0);
-
-        closure.Receiver = new FieldSymbol(
-            ClosureTypeSymbol.ReceiverFieldName, builtins.Bound, closure, 1);
-
-        closure.Fields.Add(closure.Function);
-        closure.Fields.Add(closure.Receiver);
-
-        closure.Function.Offset = 0;
-        closure.Receiver.Offset = 8;
-        closure.SetLayout(16, 8);
+        closure.AddFields(builtins.Bound);
 
         return closure;
     }

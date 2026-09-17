@@ -46,6 +46,38 @@ public class ThreadingTests
     private static string[] Body(string body) =>
         Module("int Main()\n{\n" + body + "\n    return 0;\n}");
 
+    // ------------------------------------------------ a for parallel's step
+
+    /// <summary>
+    /// Every spelling of a positive constant stride. <c>i++</c> is the one the
+    /// style guide asks for, and it used to be refused (SL0371).
+    /// </summary>
+    [Theory]
+    [InlineData("int", "i++")]
+    [InlineData("int", "++i")]
+    [InlineData("int", "i += 1")]
+    [InlineData("int", "i = i + 2")]
+    [InlineData("nuint", "i++")]
+    [InlineData("long", "++i")]
+    public void AParallelForStepsByAPositiveConstant(string type, string step) =>
+        Assert.Empty(Body(
+            "var values = new int[10];\n" +
+            $"for parallel ({type} i = 0; i < 10; {step})\n    values[0] = 1;"));
+
+    /// <summary>
+    /// And nothing else: a step backwards, a step of another variable, or a
+    /// step that is not a sum has no trip count to divide.
+    /// </summary>
+    [Theory]
+    [InlineData("i--")]
+    [InlineData("--i")]
+    [InlineData("j++")]
+    [InlineData("i = i * 2")]
+    public void AParallelForRefusesAnyOtherStep(string step) =>
+        Assert.Equal(["SL0371"], Body(
+            "var values = new int[10];\nint j = 0;\n" +
+            $"for parallel (int i = 0; i < 10; {step})\n    values[0] = 1;"));
+
     // ------------------------------------------- what may be a shared static
 
     [Theory]

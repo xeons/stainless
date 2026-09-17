@@ -502,47 +502,23 @@ public sealed partial class Binder
 
             if (method.IsOverride)
             {
-                if (inherited is null)
+                if (CanOverride(classType, method, inherited))
                 {
-                    diagnostics.Error("SL0499", method.Span,
-                        classType.BaseClass is null
-                            ? $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
-                              $"'{classType.Name}' derives from nothing"
-                            : $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
-                              $"'{classType.BaseClass.Name}' declares nothing of that name and " +
-                              "those parameters");
-                    continue;
+                    method.Overridden = inherited;
+                    method.VirtualSlot = inherited.VirtualSlot;
+                    classType.VirtualTable[method.VirtualSlot] = method;
                 }
-
-                if (!inherited.IsVirtual)
+                else
                 {
-                    diagnostics.Error("SL0500", method.Span,
-                        $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is not " +
-                        "virtual, so it cannot be overridden; mark it 'virtual' or 'abstract'");
-                    continue;
+                    // One that replaces nothing has been reported, and still
+                    // takes a slot of its own as though it were 'virtual'. A
+                    // class deriving from this one may override it in turn,
+                    // and would otherwise be handed a slot of -1 to write
+                    // into: a class deriving from an undefined base, and
+                    // another deriving from that, crashed exactly so.
+                    method.VirtualSlot = classType.VirtualTable.Count;
+                    classType.VirtualTable.Add(method);
                 }
-
-                if (inherited.IsSealed)
-                {
-                    diagnostics.Error("SL0501", method.Span,
-                        $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is a sealed " +
-                        "override, so nothing may override it further");
-                    continue;
-                }
-
-                if (!SignaturesAgree(method, inherited))
-                {
-                    diagnostics.Error("SL0502", method.Span,
-                        $"'{classType.Name}.{Describe(method)}' does not match what it overrides; " +
-                        $"expected '{inherited.ReturnType.Name} {inherited.Name}(" +
-                        string.Join(", ", inherited.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
-                        ")'");
-                    continue;
-                }
-
-                method.Overridden = inherited;
-                method.VirtualSlot = inherited.VirtualSlot;
-                classType.VirtualTable[method.VirtualSlot] = method;
                 continue;
             }
 
@@ -595,6 +571,55 @@ public sealed partial class Binder
                 $"{missing.ReturnType.Name} {missing.Name}(" +
                 string.Join(", ", missing.Parameters.Where(p => !p.IsThis)
                     .Select(p => p.Type.Name + " " + p.Name)) + ")'");
+    }
+
+    /// <summary>
+    /// Whether an <c>override</c> may replace the inherited method it matched,
+    /// reporting why not when it may not.
+    /// </summary>
+    private bool CanOverride(
+        ClassTypeSymbol classType, FunctionSymbol method,
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] FunctionSymbol? inherited)
+    {
+        if (inherited is null)
+        {
+            diagnostics.Error("SL0499", method.Span,
+                classType.BaseClass is null
+                    ? $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
+                      $"'{classType.Name}' derives from nothing"
+                    : $"'{classType.Name}.{Describe(method)}' is marked 'override' and " +
+                      $"'{classType.BaseClass.Name}' declares nothing of that name and " +
+                      "those parameters");
+            return false;
+        }
+
+        if (!inherited.IsVirtual)
+        {
+            diagnostics.Error("SL0500", method.Span,
+                $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is not " +
+                "virtual, so it cannot be overridden; mark it 'virtual' or 'abstract'");
+            return false;
+        }
+
+        if (inherited.IsSealed)
+        {
+            diagnostics.Error("SL0501", method.Span,
+                $"'{inherited.ContainingType!.Name}.{Describe(inherited)}' is a sealed " +
+                "override, so nothing may override it further");
+            return false;
+        }
+
+        if (!SignaturesAgree(method, inherited))
+        {
+            diagnostics.Error("SL0502", method.Span,
+                $"'{classType.Name}.{Describe(method)}' does not match what it overrides; " +
+                $"expected '{inherited.ReturnType.Name} {inherited.Name}(" +
+                string.Join(", ", inherited.Parameters.Where(p => !p.IsThis).Select(Spelled)) +
+                ")'");
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>

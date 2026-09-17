@@ -5,11 +5,8 @@ module Bad;
 
 import Standard.Console;
 
-public closure void Notify(int value);
 public closure void Two(int a, int b);
 public delegate void Plain(int value);
-
-void Free(int value) { }
 
 class Counter
 {
@@ -20,9 +17,6 @@ class Counter
 
 void Uses(Counter counter)
 {
-    // A plain function has no object, and a closure is a method and its object.
-    Notify a = Free;
-
     // Wrong shape for the closure.
     Two b = counter.Add;
 

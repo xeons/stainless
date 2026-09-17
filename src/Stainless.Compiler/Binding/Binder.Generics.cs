@@ -367,7 +367,10 @@ public sealed partial class Binder
             Kind = template.ContainingType is null ? FunctionKind.Function : FunctionKind.Method,
             ContainingType = template.ContainingType,
             IsPublic = template.IsPublic,
-            IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static),
+            // Only a member is static; the word on a module function was
+            // refused where the template was declared (SL0573).
+            IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static) &&
+                       template.ContainingType is not null,
             Body = declaration.Body,
             Span = declaration.Span,
             TypeArguments = arguments.ToList(),
@@ -477,10 +480,15 @@ public sealed partial class Binder
                 diagnostics.Error("SL0328", span,
                     $"'{argument.Name}' cannot be used as '{parameter}' in {owner} because " +
                     $"'{parameter}' is constrained to 'new()', and " +
-                    (argument is ClassTypeSymbol
-                        ? $"'{argument.Name}' has no public constructor taking no arguments"
-                        : $"'{argument.Name}' is a {KindOf(argument)}: 'new' allocates, and " +
-                          "only a class is allocated"));
+                    argument switch
+                    {
+                        ClassTypeSymbol { IsAbstract: true } =>
+                            $"'{argument.Name}' is abstract, so there is no such object to make",
+                        ClassTypeSymbol =>
+                            $"'{argument.Name}' has no public constructor taking no arguments",
+                        _ => $"'{argument.Name}' is a {KindOf(argument)}: 'new' allocates, and " +
+                             "only a class is allocated",
+                    });
                 return;
         }
 
@@ -543,10 +551,18 @@ public sealed partial class Binder
     /// default-initialization. It is not that here -- <c>new</c> allocates, and
     /// a struct is declared rather than allocated (SL0244) -- so a struct
     /// would satisfy a constraint whose whole purpose it then failed.
+    ///
+    /// A class that declares no constructor is given one taking no arguments
+    /// (§2.4.1), and <c>new Base()</c> already compiled; the constraint used to
+    /// look only at the declared list, and so refused a class <c>new</c> would
+    /// have made. A base with no constructor of that shape was reported where
+    /// the class was declared, so it is not asked about again here. An abstract
+    /// class is refused, because <c>new</c> refuses it (SL0514).
     /// </summary>
     private static bool IsDefaultConstructible(TypeSymbol type) =>
-        type is ClassTypeSymbol declared &&
-        declared.Constructors.Any(c => c.IsPublic && !c.Parameters.Any(p => !p.IsThis));
+        type is ClassTypeSymbol { IsAbstract: false } declared &&
+        (declared.Constructors.Count == 0 ||
+         declared.Constructors.Any(c => c.IsPublic && !c.Parameters.Any(p => !p.IsThis)));
 
     /// <summary>The word for what a type is, for a diagnostic that has to say.</summary>
     private string KindOf(TypeSymbol type) =>

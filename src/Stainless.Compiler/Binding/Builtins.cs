@@ -104,11 +104,11 @@ public sealed class Builtins
     /// <summary>
     /// The conversions an interpolated string reaches for. Named rather than
     /// looked up, because overload resolution would have to pick between the
-    /// long and nuint versions of FromInteger and the binder already knows
-    /// which it means.
+    /// signed and unsigned versions of FromInteger and the binder already
+    /// knows which it means.
     /// </summary>
     public FunctionSymbol TextFromLong { get; }
-    public FunctionSymbol TextFromNUInt { get; }
+    public FunctionSymbol TextFromULong { get; }
     public FunctionSymbol TextFromBool { get; }
     public FunctionSymbol TextFromChar { get; }
     public FunctionSymbol TextFromDouble { get; }
@@ -196,7 +196,7 @@ public sealed class Builtins
             IsPublic = false,
             IsIntrinsic = true,
         };
-        Bound.SetLayout(0, 8);
+        Bound.SetLayout(0, TargetPlatform.Current.PointerWidth);
 
         String = new ClassTypeSymbol
         {
@@ -205,7 +205,7 @@ public sealed class Builtins
             IsPublic = true,
             IsIntrinsic = true,
         };
-        String.SetLayout(0, 8);
+        String.SetLayout(0, TargetPlatform.Current.PointerWidth);
 
         Utf16String = new ClassTypeSymbol
         {
@@ -214,7 +214,7 @@ public sealed class Builtins
             IsPublic = true,
             IsIntrinsic = true,
         };
-        Utf16String.SetLayout(0, 8);
+        Utf16String.SetLayout(0, TargetPlatform.Current.PointerWidth);
 
         // Mutable text. Its bytes are a separate growable allocation, so `new`
         // goes through a runtime factory rather than the usual sl_alloc.
@@ -226,7 +226,7 @@ public sealed class Builtins
             IsIntrinsic = true,
             RuntimeFactory = "sl_string_builder_new",
         };
-        StringBuilder.SetLayout(0, 8);
+        StringBuilder.SetLayout(0, TargetPlatform.Current.PointerWidth);
 
         Text.Types[String.SimpleName] = String;
         Text.Types[Utf16String.SimpleName] = Utf16String;
@@ -372,9 +372,20 @@ public sealed class Builtins
         // --- Standard.Text free functions -----------------------------------
         TextFromLong = Function(Text, "FromInteger", String, "sl_string_from_integer",
             ("value", PrimitiveTypeSymbol.Long));
-        // A separate runtime entry point rather than the signed one: a `nuint`
+        // A separate runtime entry point rather than the signed one: a `ulong`
         // past 2^63 formatted through "%lld" prints as a negative number.
-        TextFromNUInt = Function(Text, "FromInteger", String, "sl_string_from_unsigned",
+        TextFromULong = Function(Text, "FromInteger", String, "sl_string_from_unsigned",
+            ("value", PrimitiveTypeSymbol.ULong));
+
+        // And one for `nuint`, which is a `size_t` in C and so cannot share the
+        // `unsigned long long` entry point: this was once the only unsigned
+        // overload, declared as taking a `nuint` and bound to the 64-bit
+        // function, and on a 32-bit target the runtime read four bytes of
+        // argument and four of whatever was next on the stack. `$"{n}"` printed
+        // 8612659968337772549 for 5. It stays an overload of its own rather than
+        // leaving a `nuint` to widen, so that the call a `nuint` makes is to an
+        // entry point declared with its own width on every target.
+        Function(Text, "FromInteger", String, "sl_string_from_size",
             ("value", PrimitiveTypeSymbol.NUInt));
         TextFromBool = Function(Text, "FromBool", String, "sl_string_from_bool",
             ("value", PrimitiveTypeSymbol.Bool));

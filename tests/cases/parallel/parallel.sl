@@ -100,7 +100,7 @@ int Main()
     for (int i = 0; i < 1000; i = i + 1)
         pixels[i] = i;
 
-    for parallel (int i = 0; i < 1000; i = i + 1)
+    for parallel (int i = 0; i < 1000; i++)
     {
         pixels[i] = Shade(pixels[i]);
     }
@@ -121,13 +121,13 @@ int Main()
     printf("hits=%d\n", hits);
 
     // An empty range runs nothing at all.
-    for parallel (int i = 0; i < 0; i = i + 1)
+    for parallel (int i = 0; i < 0; i += 1)
         marks[0] = 99;
     printf("guard=%d\n", marks[0]);
 
     // Nested: each chunk of the outer loop runs an inner one of its own.
     var grid = new int[64];
-    for parallel (int row = 0; row < 8; row = row + 1)
+    for parallel (int row = 0; row < 8; ++row)
     {
         for (int column = 0; column < 8; column = column + 1)
         {
@@ -139,6 +139,17 @@ int Main()
     for (int i = 0; i < 64; i = i + 1)
         gridTotal = gridTotal + grid[i];
     printf("grid=%d\n", gridTotal);
+
+    // An unsigned counter over an array's length, stepped the way the style
+    // guide writes every loop. `i++` is a stride of one, as `++row` was above.
+    var ramp = new long[100];
+    for parallel (nuint i = 0u; i < ramp.Length; i++)
+        ramp[i] = (long)(i * i);
+
+    long rampTotal = 0;
+    for (nuint i = 0u; i < ramp.Length; i++)
+        rampTotal = rampTotal + ramp[i];
+    printf("unsigned=%lld\n", rampTotal);
 
     printf("done\n");
     return 0;

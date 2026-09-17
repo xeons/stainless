@@ -216,7 +216,7 @@ public byte[] BytesIn(HMODULE library, char16* name, char16* type)
         return new byte[0];
 
     var copy = new byte[(nuint)size];
-    for (int i = 0; i < (int)size; i = i + 1)
+    for (int i = 0; i < (int)size; i++)
         copy[i] = at[i];
     return copy;
 }

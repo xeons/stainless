@@ -64,7 +64,7 @@ public sealed partial class LlvmEmitter
                 $"i64 {RuntimeLayout.TypeInfoBase}");
 
             _module.AppendLine(
-                $"  store ptr @{Mangler.TypeInfoSymbol(classType.BaseClass!)}, ptr %{slot}, align 8");
+                $"  store ptr @{Mangler.TypeInfoSymbol(classType.BaseClass!)}, ptr %{slot}, align {TargetPlatform.Current.PointerWidth}");
 
             slot++;
         }

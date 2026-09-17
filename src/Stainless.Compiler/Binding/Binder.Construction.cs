@@ -138,8 +138,17 @@ public sealed partial class Binder
             if (UserConversion(operand, targetType, allowExplicit: true, syntax.Span) is { } converted)
                 return converted;
 
+            // The one com pairing refused for a reason the types alone do not
+            // show, so the reason is said.
+            string hint = operand.Type is ComInterfaceTypeSymbol fromCom &&
+                          targetType is ComInterfaceTypeSymbol toCom &&
+                          (!fromCom.HasUnknown || !toCom.HasUnknown)
+                ? $"; '{(fromCom.HasUnknown ? toCom : fromCom).Name}' is '[NoUnknown]', so " +
+                  "there is no QueryInterface to ask"
+                : "";
+
             diagnostics.Error("SL0243", syntax.Span,
-                $"cannot convert '{operand.Type.Name}' to '{targetType.Name}'");
+                $"cannot convert '{operand.Type.Name}' to '{targetType.Name}'{hint}");
             return new BoundErrorExpression(syntax.Span);
         }
 

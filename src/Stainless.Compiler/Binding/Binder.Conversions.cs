@@ -309,7 +309,14 @@ public sealed partial class Binder
     private BoundExpression BindClosureReference(
         BoundFunctionGroup group, ClosureTypeSymbol wanted, SourceSpan span)
     {
-        var matches = group.Candidates.Where(wanted.Accepts).ToList();
+        // An instance method is a candidate only with the object it was reached
+        // through. No name reaches one without it today -- a bare method name
+        // inside its class is not a group -- and this keeps it that way should
+        // one start to, rather than handing the method a null receiver.
+        var matches = group.Candidates
+            .Where(wanted.Accepts)
+            .Where(f => group.Receiver is not null || f.IsStatic || f.ContainingType is null)
+            .ToList();
 
         if (matches.Count == 0)
         {
@@ -330,28 +337,79 @@ public sealed partial class Binder
 
         // A closure calls what it holds with the object first, which is where a
         // method already takes its own. A plain function has no such parameter,
-        // so its address cannot go in the same slot -- and a lambda is the way
-        // to say "call this with nothing of its own", because a lambda that
-        // captures nothing still becomes something with a receiver to ignore.
+        // so its address cannot go in that slot; a thunk that takes one and
+        // ignores it can, with null for the object.
         if (chosen.IsStatic || chosen.ContainingType is null)
-        {
-            diagnostics.Error("SL0599", span,
-                $"'{group.Name}' has no object, and a closure is a method *and* the object " +
-                $"it belongs to. Reach it through one -- 'thing.{chosen.Name}' -- or wrap it " +
-                "in a lambda, which gives it one");
-            return new BoundErrorExpression(span);
-        }
-
-        if (group.Receiver is null)
-        {
-            diagnostics.Error("SL0599", span,
-                $"'{group.Name}' is an instance method, so a closure over it needs the object " +
-                $"to call it on; write 'something.{chosen.Name}' rather than the name alone");
-            return new BoundErrorExpression(span);
-        }
+            return new BoundClosureCreate(span, wanted, ThunkFor(chosen), receiver: null);
 
         return new BoundClosureCreate(span, wanted, chosen, group.Receiver);
     }
+
+    /// <summary>
+    /// The one thunk per plain function that lets a closure hold it: a function
+    /// taking an ignored receiver first, then the function's own parameters,
+    /// and passing them straight on.
+    ///
+    /// <para>
+    /// This used to be refused (SL0599), with "wrap it in a lambda" as the way
+    /// out -- which is exactly what this writes, except that a lambda is a new
+    /// class and a new object at every mention. A thunk shared by every mention
+    /// and a null receiver instead cost no allocation, and they keep what
+    /// closure equality promises: two mentions of <c>Upper</c> are equal, so
+    /// one subscribed with <c>+=</c> can be removed with <c>-=</c>.
+    /// </para>
+    /// </summary>
+    private FunctionSymbol ThunkFor(FunctionSymbol function)
+    {
+        if (_thunks.TryGetValue(function, out var existing)) return existing;
+
+        var thunk = new FunctionSymbol
+        {
+            Name = $"Thunk.{_closureCount++}",
+            ModuleName = _currentModule!.Name,
+            ReturnType = function.ReturnType,
+            Linkage = LinkageKind.Stainless,
+            IsPublic = false,
+            Span = function.Span,
+            Scope = _currentScope,
+        };
+
+        var ignored = new PointerTypeSymbol(PrimitiveTypeSymbol.Byte);
+        thunk.Parameters.Add(new ParameterSymbol("receiver", ignored, 0));
+
+        var forwarded = new List<BoundExpression>();
+        foreach (var parameter in function.Parameters.Where(p => !p.IsThis))
+        {
+            var own = new ParameterSymbol(parameter.Name, parameter.Type, thunk.Parameters.Count)
+            {
+                Mode = parameter.Mode,
+            };
+            thunk.Parameters.Add(own);
+
+            BoundExpression access = new BoundParameterAccess(function.Span, own);
+
+            // A parameter passed by address is the caller's storage already, and
+            // the address of it is what the function wants in turn.
+            forwarded.Add(own.IsByReference
+                ? new BoundAddressOf(function.Span, new PointerTypeSymbol(own.Type), access)
+                {
+                    FromRefKeyword = own.Mode == ParameterMode.Ref,
+                    FromOutKeyword = own.Mode == ParameterMode.Out,
+                }
+                : access);
+        }
+
+        var call = new BoundCall(function.Span, function, receiver: null, forwarded);
+        BoundStatement statement = function.ReturnType.IsVoid()
+            ? new BoundExpressionStatement(function.Span, call)
+            : new BoundReturn(function.Span, call);
+
+        _functions.Add(new BoundFunction(thunk, new BoundBlock(function.Span, [statement])));
+        _thunks[function] = thunk;
+        return thunk;
+    }
+
+    private readonly Dictionary<FunctionSymbol, FunctionSymbol> _thunks = [];
 
     /// <summary>
     /// Returns how to get from <paramref name="from"/> to <paramref name="to"/>,

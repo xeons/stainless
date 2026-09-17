@@ -147,7 +147,7 @@ public class WideBuffer
 
         // Zeroed, so a caller that reads the buffer without checking the
         // returned length gets an empty string rather than whatever was there.
-        for (nuint i = 0u; i <= (nuint)unitCount; i = i + 1u)
+        for (nuint i = 0u; i <= (nuint)unitCount; i++)
             _units[i] = 0u;
     }
 
@@ -192,7 +192,7 @@ public class ByteBuffer
         if (_bytes == null)
             sl_fail("out of memory allocating a Win32 byte buffer");
 
-        for (nuint i = 0u; i < (nuint)byteCount; i = i + 1u)
+        for (nuint i = 0u; i < (nuint)byteCount; i++)
             _bytes[i] = 0u;
     }
 
@@ -227,7 +227,7 @@ public WideBuffer Copy(String text)
 
     char16* target = buffer.Pointer();
     char16* source = wide.ToPointer();
-    for (nuint i = 0u; i < wide.UnitCount(); i = i + 1u)
+    for (nuint i = 0u; i < wide.UnitCount(); i++)
         target[i] = source[i];
     return buffer;
 }

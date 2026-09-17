@@ -129,6 +129,22 @@ public sealed partial class Binder(
     /// decides whether a field in it is allowed.
     /// </summary>
     private readonly HashSet<TypeDeclSyntax> _additionalParts = [];
+
+    /// <summary>
+    /// The type each non-generic type, enum, delegate or closure declaration
+    /// made, or added to.
+    ///
+    /// Every pass after the second finds a declaration's symbol here and never
+    /// by its name. The name belongs to whichever declaration won it, so a
+    /// lookup by name hands a declaration that lost -- SL0201, SL0550 -- a
+    /// symbol of some other kind, or none at all. A declaration absent from
+    /// this map is either a generic one, which is a template and has no type
+    /// until something instantiates it, or one pass 2 reported and which has
+    /// nothing more to say.
+    /// </summary>
+    private readonly Dictionary<Declaration, NamedTypeSymbol> _declaredTypes =
+        new(ReferenceEqualityComparer.Instance);
+
     private readonly Dictionary<EnumTypeSymbol, (EnumDeclSyntax Declaration, FileScope Scope)> _enumSyntax = [];
     /// <summary>
     /// Keyed by <see cref="NamedTypeSymbol"/> rather than by delegate, because

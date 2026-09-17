@@ -146,7 +146,7 @@ public sealed partial class LlvmEmitter
             _module.AppendLine(
                 $"  %{slot} = getelementptr inbounds i8, ptr {literal}, " +
                 $"i64 {RuntimeLayout.TypeInfo}");
-            _module.AppendLine($"  store ptr @sl_string_type_info, ptr %{slot}, align 8");
+            _module.AppendLine($"  store ptr @sl_string_type_info, ptr %{slot}, align {TargetPlatform.Current.PointerWidth}");
             slot++;
         }
 
@@ -218,7 +218,7 @@ public sealed partial class LlvmEmitter
         if (count == 0)
             return new Val(InternStringObject(""), "ptr", expression.Type);
 
-        string slots = Emit("ptr", $"alloca [{count} x ptr], align 8");
+        string slots = Emit("ptr", $"alloca [{count} x ptr], align {TargetPlatform.Current.PointerWidth}");
 
         for (int i = 0; i < count; i++)
         {

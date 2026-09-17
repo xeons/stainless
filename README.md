@@ -184,8 +184,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 317 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 853 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 324 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,126 compiler unit tests
 ```
 
 Then run something:
@@ -254,6 +254,7 @@ src/Stainless.Cli      the `stainless` command
 tests/cases/           one directory per end-to-end test
 tests/Stainless.Tests  the end-to-end runner
 tests/Stainless.UnitTests  the compiler's own tests
+tests/Stainless.Fuzz   a fuzzer: mutated programs, looking for crashes
 ```
 
 ## License

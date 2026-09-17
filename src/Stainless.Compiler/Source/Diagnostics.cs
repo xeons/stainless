@@ -51,6 +51,10 @@ public static class RetiredDiagnostics
 
         // Storage in a type: what a `static` field is.
         "SL0577",
+
+        // A plain function as a closure, refused until a shared thunk and a
+        // null receiver made it a closure like any other.
+        "SL0599",
     };
 }
 
@@ -138,16 +142,34 @@ public sealed class DiagnosticBag
     public void Error(string code, SourceSpan span, string message)
     {
         Fresh(code);
-        if (_muted > 0) return;
+        if (_muted > 0 || IsCascade(message)) return;
         _items.Add(new Diagnostic(Severity.Error, code, message, span));
     }
 
     public void Warning(string code, SourceSpan span, string message)
     {
         Fresh(code);
-        if (_muted > 0) return;
+        if (_muted > 0 || IsCascade(message)) return;
         _items.Add(new Diagnostic(Severity.Warning, code, message, span));
     }
+
+    /// <summary>What the binder's stand-in for a type it could not resolve is called.</summary>
+    public const string ErrorTypeName = "<error>";
+
+    /// <summary>
+    /// A message that names the error type is about a consequence, not a cause.
+    ///
+    /// The type is what a name that did not resolve became, and that failure
+    /// was reported where it happened -- so "argument 1 expects '&lt;error&gt;'"
+    /// tells the reader nothing but that the compiler has an internal name for
+    /// it. Dropped here rather than at each place a type is spelled into a
+    /// message, because there are hundreds of those and a new one would bring
+    /// the cascade straight back. Only once an error is already in the bag, so
+    /// that an error type with no root -- which would be a compiler bug -- is
+    /// still seen.
+    /// </summary>
+    private bool IsCascade(string message) =>
+        message.Contains(ErrorTypeName, StringComparison.Ordinal) && HasErrors;
 
     /// <summary>
     /// Catches a retired code being brought back. It is a debug assertion

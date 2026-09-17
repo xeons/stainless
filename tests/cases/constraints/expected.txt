@@ -4,6 +4,7 @@ tag=beta
 class=woof
 struct=3 7
 new=woof
+implicit=undeclared
 base=woof
 related=...!
 threadsafe=4

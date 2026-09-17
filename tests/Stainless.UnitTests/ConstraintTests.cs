@@ -102,10 +102,33 @@ public class ConstraintTests
     [Theory]
     [InlineData("var n = Fresh(new NeedsAnArgument(1));")]
     [InlineData("var h = Fresh(Made());")]
+    [InlineData("var a = Fresh(Abstract());")]
     public void NewRefusesWhatItCannotMake(string body) =>
         Assert.Contains("SL0328",
             With("T Fresh<T>(T v) where T : new() { return new T(); }\n" +
-                 "Hidden Made() { return null; }", body));
+                 "Hidden Made() { return null; }\n" +
+                 "public abstract class Shape { }\n" +
+                 "Shape Abstract() { return null; }", body));
+
+    /// <summary>
+    /// A class that declares no constructor is given one taking no arguments
+    /// (spec §2.4.1), so <c>new()</c> must accept what <c>new</c> accepts. It
+    /// used to look only at the constructors the class had, and one with no
+    /// field initializers -- nothing to synthesize a constructor for -- had
+    /// none, and was refused.
+    /// </summary>
+    [Theory]
+    [InlineData("var b = Fresh(new Bare());")]
+    [InlineData("var h = new Holder<Bare>();")]
+    [InlineData("var h = new Holder<Initialized>();")]
+    [InlineData("var h = new Holder<DerivedBare>();")]
+    public void NewAcceptsAClassThatDeclaresNoConstructor(string body) =>
+        Assert.Empty(
+            With("T Fresh<T>(T v) where T : new() { return new T(); }\n" +
+                 "public class Bare { }\n" +
+                 "public class Initialized { public int Size = 3; }\n" +
+                 "public class DerivedBare : Animal { }\n" +
+                 "public class Holder<T> where T : new() { }", body));
 
     // --------------------------------------------------------- a base class
 

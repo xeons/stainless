@@ -125,8 +125,8 @@ public sealed partial class Binder
         // -- a local, a field, a parameter, a type argument -- it named
         // storage for nothing, and reached the emitter as `alloca void` or a
         // struct with a `void` member, which is IR that does not exist. A
-        // pointer is the exception the language does not make: there is no
-        // `void*`, and `byte*` is what C's is spelled here.
+        // pointer never reaches this: `void*` is resolved as a pointer, which
+        // has a size whatever it points at, and means what C's does.
         if (resolved.IsVoid() && !allowVoid)
         {
             diagnostics.Error("SL0309", syntax.Span,
@@ -632,6 +632,9 @@ public sealed partial class Binder
     /// It loops, because one lambda's result may settle another's parameter,
     /// and stops as soon as a pass learns nothing -- so a call that genuinely
     /// cannot be inferred reaches SL0327 rather than spinning.
+    ///
+    /// A function passed by name takes the same route, with its declaration
+    /// read in place of a body: see <see cref="NamedFunctionResult"/>.
     /// </summary>
     private void InferFromLambdaResults(
         GenericFunctionTemplate candidate,
@@ -648,7 +651,9 @@ public sealed partial class Binder
 
             for (int i = 0; i < shared; i++)
             {
-                if (arguments[i] is not BoundLambda lambda) continue;
+                var lambda = arguments[i] as BoundLambda;
+                var group = arguments[i] as BoundFunctionGroup;
+                if (lambda is null && group is null) continue;
 
                 // Read off the interface's *declaration* rather than a resolved
                 // symbol. `IFunc<int, R>` will not resolve at all while R is
@@ -664,7 +669,8 @@ public sealed partial class Binder
                 // only in where the signature is written down.
                 if (Callable(written.Name, candidate.Scope) is not { } shape) continue;
                 if (shape.Names.Count != written.TypeArguments.Count) continue;
-                if (shape.Parameters.Count != lambda.Syntax.Parameters.Count) continue;
+                if (lambda is not null && shape.Parameters.Count != lambda.Syntax.Parameters.Count)
+                    continue;
 
                 // The declaration writes its signature in terms of its own
                 // parameter names; the use site says what each of those is.
@@ -680,24 +686,94 @@ public sealed partial class Binder
                 // known. The result may be the parameter itself -- `R Apply(T)`
                 // -- or carry it inside something else, which is what
                 // `Optional<R> Apply(T)` does for FlatMap.
-                if (!MentionsUnknown(result, names, inferred)) continue;
+                var parametersWritten = shape.Parameters
+                    .Select(p => AsWritten(p.Type, atUseSite))
+                    .ToList();
+                bool parametersUnknown =
+                    parametersWritten.Any(p => MentionsUnknown(p, names, inferred));
 
-                // Every parameter has to be settled before the body can bind.
-                var parameterTypes = ResolveAll(
-                    shape.Parameters.Select(p => AsWritten(p.Type, atUseSite)),
-                    candidate.Scope, inferred);
-                if (parameterTypes is null) continue;
+                // A function's parameters are declared, so a named one can say
+                // what they are as well as what it returns; a lambda's cannot.
+                if (!MentionsUnknown(result, names, inferred) &&
+                    (lambda is not null || !parametersUnknown))
+                    continue;
 
-                if (ProbeLambdaResult(lambda.Syntax, parameterTypes) is not { } produced) continue;
+                int known = inferred.Count;
+                TypeSymbol? produced;
+
+                if (lambda is not null)
+                {
+                    // Every parameter has to be settled before the body can bind.
+                    var parameterTypes = ResolveAll(parametersWritten, candidate.Scope, inferred);
+                    if (parameterTypes is null) continue;
+
+                    produced = ProbeLambdaResult(lambda.Syntax, parameterTypes);
+                }
+                else
+                {
+                    produced = NamedFunctionResult(
+                        group!, parametersWritten, parametersUnknown,
+                        candidate.Scope, names, inferred);
+                }
+
+                if (produced is null) continue;
 
                 // Matched structurally rather than assigned, so `Optional<R>`
                 // against an `Optional<nuint>` says R is nuint and a result
                 // that turned out to be some other shape says nothing at all.
-                int known = inferred.Count;
                 Infer(result, produced, names, inferred, candidate.Scope);
                 if (inferred.Count > known) learned = true;
             }
         }
+    }
+
+    /// <summary>
+    /// What a function passed by name returns, for the signature it is being
+    /// passed as -- which is what a lambda's body would have said, read off a
+    /// declaration instead.
+    ///
+    /// Which overload is meant is settled by the parameter types already
+    /// inferred: <c>Map(names, Upper)</c> knows T is String, and so wants the
+    /// <c>Upper</c> that takes one. Where those are not known yet, a name with
+    /// exactly one function of the right arity is that function, and its
+    /// parameters are what settles them. Anything less certain says nothing,
+    /// and the call reaches SL0327 as it would have.
+    /// </summary>
+    private TypeSymbol? NamedFunctionResult(
+        BoundFunctionGroup group,
+        IReadOnlyList<TypeSyntax> parametersWritten,
+        bool parametersUnknown,
+        FileScope scope,
+        HashSet<string> names,
+        Dictionary<string, TypeSymbol> inferred)
+    {
+        // Only what the conversion that follows could take: an instance method
+        // named without its object is refused there, so it is no answer here.
+        var fitting = group.Candidates
+            .Where(f => group.Receiver is not null || f.IsStatic || f.ContainingType is null)
+            .Where(f => f.Parameters.Count(p => !p.IsThis) == parametersWritten.Count)
+            .ToList();
+
+        if (!parametersUnknown)
+        {
+            if (ResolveAll(parametersWritten, scope, inferred) is not { } wanted) return null;
+
+            fitting = fitting
+                .Where(f => f.Parameters.Where(p => !p.IsThis)
+                    .Select(p => p.Type).SequenceEqual(wanted))
+                .ToList();
+
+            return fitting.Count == 1 ? fitting[0].ReturnType : null;
+        }
+
+        if (fitting.Count != 1) return null;
+
+        var only = fitting[0];
+        var declared = only.Parameters.Where(p => !p.IsThis).ToList();
+        for (int i = 0; i < declared.Count; i++)
+            Infer(parametersWritten[i], declared[i].Type, names, inferred, scope);
+
+        return only.ReturnType;
     }
 
     /// <summary>
@@ -857,7 +933,12 @@ public sealed partial class Binder
 
         try
         {
-            for (int i = 0; i < arguments.Count; i++)
+            // Only as far as both lists go. When no template has the arity of
+            // the call, the first is tried anyway so that the call can report
+            // against something, and an argument past its last parameter is
+            // the arity's problem, which the call itself reports as SL0260.
+            int shared = Math.Min(arguments.Count, template.Declaration.Parameters.Count);
+            for (int i = 0; i < shared; i++)
             {
                 var wanted = ResolveType(template.Declaration.Parameters[i].Type, template.Scope);
                 if (wanted.IsError()) return false;

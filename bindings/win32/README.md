@@ -11,7 +11,7 @@ which one you are looking at:
 | `Windows.DirectX`, `Windows.DirectX11` | **a subject**: the graphics layers, which are large enough to be their own thing |
 
 The raw layer is the entry points, constants, structs, unions, enums and
-delegates of ten libraries, plus the handle types and the names they go by,
+delegates of fifteen libraries, plus the handle types and the names they go by,
 and the COM interfaces; the convenience modules add a task-shaped layer on top
 of those. Nothing is generated and nothing is marshalled: a
 `WNDCLASSEXW` is a Stainless `struct` with the same fields in the same order — `sizeof` returns 80, as it does in C — and a `WNDPROC` is a
@@ -198,7 +198,7 @@ bindings/win32/
   DirectX11.sl     module Windows.DirectX11;  a device, a swap chain, a frame
 ```
 
-The last three are named `Windows.` rather than `Win32.` because they are a
+The last two are named `Windows.` rather than `Win32.` because they are a
 subject rather than a task: Direct3D is large enough that a program using it is
 mostly using it, and the name should say which API it is looking at. `Gamepad`
 and `Sound` keep the `Win32.` prefix, being one convenience layer each over one
@@ -235,8 +235,8 @@ program already links.
 Name the modules you use:
 
 ```
-stainless build gui.sl bindings/win32/api/Kernel32.sl bindings/win32/api/User32.sl \
-    bindings/win32/Win32.sl bindings/win32/Ui.sl
+stainless build gui.sl bindings/win32/api/Handles.sl bindings/win32/api/Kernel32.sl \
+    bindings/win32/api/User32.sl bindings/win32/Win32.sl bindings/win32/Ui.sl
 ```
 
 or take the whole directory:
@@ -248,8 +248,8 @@ stainless build app.sl bindings/win32
 Neither needs a `-l`, because each convenience module names its own library with
 `#pragma comment(lib, "...")`. Compiling a wrapper is still what makes that
 library necessary — an undefined symbol is an error before the dead-strip that
-would have removed it — so the second form links all five whether or not the
-program calls into them. Naming only what you use is how to avoid that.
+would have removed it — so the second form links every library the directory names — Direct3D,
+XAudio2 and XInput included — whether or not the program calls into them. Naming only what you use is how to avoid that.
 
 That is also why none of this is in `stdlib/`, which is compiled into every
 program: a `CreateWindowExW` in there would make every Stainless program on
@@ -268,7 +268,7 @@ harder half — a wide API writes into a buffer the caller owns — so
 
 ```csharp
 var buffer = new WideBuffer(32768u);
-uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity());
+uint units = GetModuleFileNameW(null, buffer.Pointer(), buffer.Capacity);
 String path = buffer.Text(units);
 ```
 
@@ -399,13 +399,14 @@ out of an executable this program did not build.
 - **COM beyond the shell.** `Win32.Ole32` and `Win32.ShellCom` bind the
   activation half and the shell's interfaces — `IShellItem`,
   `IShellItemArray`, `IFileDialog` and both its directions — and `Win32.Com`,
-  `Win32.Shell` and `Win32.Dialogs` are the conveniences over them. What is not
-  here is everything else COM reaches: Direct2D, WIC, the Windows Property
+  `Win32.Shell` and `Win32.Dialogs` are the conveniences over them; DXGI,
+  Direct3D 11 and XAudio2 are COM too, and are bound. What is not here is
+  everything else COM reaches: Direct2D, WIC, the Windows Property
   System, `ITaskbarList3`, `IDispatch` and automation.
 - **A Stainless object handed *out* as a COM object.** `com class` exists and
   works (§8.5), so this is a matter of writing the class; what is absent is a
   class factory and `DllGetClassObject`, which is what would let another
   process ask for one.
-- **Winsock**, GDI+, DirectX, the Common Controls, WMI, the event log.
+- **GDI+**, Direct3D 12, WMI, the event log.
 - **32-bit Windows.** `LRESULT` and `LPARAM` are written `long` and `WPARAM`
   `ulong` because Windows is 64-bit; a 32-bit target would want `nint`/`nuint`.

@@ -44,13 +44,8 @@ public sealed partial class Binder
                     continue;
                 }
 
-                if (module.Types.ContainsKey(declaration.Name) ||
-                    module.GenericTypes.ContainsKey(declaration.Name))
-                {
-                    diagnostics.Error("SL0201", declaration.Span,
-                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                if (!ClaimTypeName(module, declaration))
                     continue;
-                }
 
                 // A generic declaration is a template, not a type. Nothing about it
                 // is checked until something instantiates it.
@@ -62,9 +57,6 @@ public sealed partial class Binder
                         diagnostics.Error("SL0523", declaration.Span,
                             $"'{declaration.Name}' has no body, so it has nothing for a type " +
                             "parameter to appear in");
-                    else if (module.GenericTypes.ContainsKey(declaration.Name))
-                        diagnostics.Error("SL0201", declaration.Span,
-                            $"'{declaration.Name}' is already declared in module '{module.Name}'");
                     else
                         module.GenericTypes[declaration.Name] =
                             new GenericTypeTemplate(declaration.Name, scope, declaration);
@@ -145,6 +137,7 @@ public sealed partial class Binder
 
                 module.Types[declaration.Name] = type;
                 _typeSyntax[type] = (declaration, scope);
+                _declaredTypes[declaration] = type;
 
                 if (type is ClassTypeSymbol { IsIntrinsic: false } classType) _classes.Add(classType);
                 if (type is InterfaceTypeSymbol interfaceType) _interfaces.Add(interfaceType);
@@ -153,14 +146,8 @@ public sealed partial class Binder
 
             foreach (var declaration in unit.Declarations.OfType<AliasDeclSyntax>())
             {
-                if (module.Types.ContainsKey(declaration.Name) ||
-                    module.GenericTypes.ContainsKey(declaration.Name) ||
-                    module.Aliases.ContainsKey(declaration.Name))
-                {
-                    diagnostics.Error("SL0201", declaration.Span,
-                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                if (!ClaimTypeName(module, declaration))
                     continue;
-                }
 
                 var alias = new AliasSymbol(declaration.Name, module.Name)
                 {
@@ -174,14 +161,8 @@ public sealed partial class Binder
 
             foreach (var declaration in unit.Declarations.OfType<DelegateDeclSyntax>())
             {
-                if (module.Types.ContainsKey(declaration.Name) ||
-                    module.GenericTypes.ContainsKey(declaration.Name) ||
-                    module.GenericDelegates.ContainsKey(declaration.Name))
-                {
-                    diagnostics.Error("SL0201", declaration.Span,
-                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                if (!ClaimTypeName(module, declaration))
                     continue;
-                }
 
                 // A generic one stays a template until something names its type
                 // arguments, exactly as a generic class does.
@@ -209,17 +190,13 @@ public sealed partial class Binder
 
                 module.Types[declaration.Name] = delegateType;
                 _delegateSyntax[delegateType] = (declaration, scope);
+                _declaredTypes[declaration] = delegateType;
             }
 
             foreach (var declaration in unit.Declarations.OfType<EnumDeclSyntax>())
             {
-                if (module.Types.ContainsKey(declaration.Name) ||
-                    module.GenericTypes.ContainsKey(declaration.Name))
-                {
-                    diagnostics.Error("SL0201", declaration.Span,
-                        $"'{declaration.Name}' is already declared in module '{module.Name}'");
+                if (!ClaimTypeName(module, declaration))
                     continue;
-                }
 
                 var enumType = new EnumTypeSymbol
                 {
@@ -234,8 +211,43 @@ public sealed partial class Binder
 
                 module.Types[declaration.Name] = enumType;
                 _enumSyntax[enumType] = (declaration, scope);
+                _declaredTypes[declaration] = enumType;
             }
         }
+    }
+
+    /// <summary>
+    /// Whether a type name is still free in its module, reporting SL0201 when
+    /// it is not.
+    ///
+    /// One question asked of all four tables, by every kind of declaration.
+    /// Each loop above used to ask its own subset -- a type did not look at the
+    /// aliases, an enum not at the generic closures -- which was harmless only
+    /// while the declaration it skipped came later in the same file. Pass 2
+    /// takes one file at a time, so a closure in one file and a class of the
+    /// same name in the next were both accepted, and whichever the resolver
+    /// happened to ask about first was the one every use meant.
+    /// </summary>
+    private bool ClaimTypeName(ModuleSymbol module, Declaration declaration)
+    {
+        string name = declaration switch
+        {
+            TypeDeclSyntax type => type.Name,
+            DelegateDeclSyntax declared => declared.Name,
+            EnumDeclSyntax declared => declared.Name,
+            AliasDeclSyntax alias => alias.Name,
+            _ => throw new ArgumentException("not a type declaration", nameof(declaration)),
+        };
+
+        if (!module.Types.ContainsKey(name) &&
+            !module.GenericTypes.ContainsKey(name) &&
+            !module.GenericDelegates.ContainsKey(name) &&
+            !module.Aliases.ContainsKey(name))
+            return true;
+
+        diagnostics.Error("SL0201", declaration.Span,
+            $"'{name}' is already declared in module '{module.Name}'");
+        return false;
     }
 
     /// <summary>
@@ -404,7 +416,12 @@ public sealed partial class Binder
     /// </summary>
     private void DeclareAdditionalPart(TypeDeclSyntax declaration, NamedTypeSymbol existing)
     {
-        if (KindOf(existing) != declaration.Kind ||
+        // An enum, a delegate and a closure were not made by a type
+        // declaration, so they have no kind of one to compare -- and asked for
+        // one they read as a struct, which let a struct be accepted as more of
+        // a delegate.
+        if (existing is EnumTypeSymbol or DelegateTypeSymbol or ClosureTypeSymbol ||
+            KindOf(existing) != declaration.Kind ||
             (existing is ComInterfaceTypeSymbol) != declaration.Modifiers.HasFlag(Modifiers.Com))
         {
             diagnostics.Error("SL0550", declaration.Span,
@@ -429,6 +446,7 @@ public sealed partial class Binder
                 "has nothing to say by having no body");
 
         _additionalParts.Add(declaration);
+        _declaredTypes[declaration] = existing;
     }
 
     /// <summary>The kind of declaration a symbol came from, for comparing two.</summary>
@@ -452,6 +470,7 @@ public sealed partial class Binder
         UnionTypeSymbol => "union",
         ClassTypeSymbol => "class",
         DelegateTypeSymbol => "delegate",
+        ClosureTypeSymbol => "closure",
         EnumTypeSymbol => "enum",
         _ => "struct",
     };

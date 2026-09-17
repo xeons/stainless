@@ -287,11 +287,20 @@ public sealed partial class LlvmEmitter
             PrimitiveKind.Short or PrimitiveKind.UShort or PrimitiveKind.Char16 => (2, 2),
             PrimitiveKind.Int or PrimitiveKind.UInt
                 or PrimitiveKind.Char32 or PrimitiveKind.Float => (4, 4),
-            _ => (8, 8),
+            PrimitiveKind.NInt or PrimitiveKind.NUInt => (PointerBytes, PointerBytes),
+
+            // i386 System V's four, which LLVM's data layout for that triple
+            // says as well.
+            _ => (8, TargetPlatform.Current.WideScalarAlignment),
         },
 
-        _ => (8, 8),        // everything else is a pointer
+        // Everything else is a pointer, which is four bytes on a 32-bit target.
+        // Reading eight there made every struct holding one disagree with the
+        // binder, and so be written out byte by byte as a packed struct.
+        _ => (PointerBytes, PointerBytes),
     };
+
+    private static int PointerBytes => TargetPlatform.Current.PointerWidth;
 
     /// <summary>
     /// Symbols this module has already declared. The standard library declares

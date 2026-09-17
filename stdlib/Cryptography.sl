@@ -57,7 +57,7 @@
 /// is right for a file, a protocol and a password store, and it is not the
 /// thing to put under a remote attacker who can time it. AES-NI and a
 /// bitsliced fallback are what would answer that, and neither is written --
-/// [TODO.md](../TODO.md) carries the note.
+/// TODO.md carries the note.
 ///
 /// **What is not here yet is public-key.** RSA, ECDsa, ECDiffieHellman and
 /// X.509 all rest on arbitrary-precision integer arithmetic, which this

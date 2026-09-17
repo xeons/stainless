@@ -257,6 +257,17 @@ void *sl_string_from_unsigned(unsigned long long value)
 }
 
 /*
+ * A `nuint`, which is a `size_t` and so four bytes on a 32-bit target. It
+ * cannot be the entry point above under another declaration: a caller passing
+ * four bytes to a function that reads eight prints the next thing on the stack
+ * as the high half.
+ */
+void *sl_string_from_size(size_t value)
+{
+    return sl_string_from_unsigned((unsigned long long)value);
+}
+
+/*
  * The shortest text that reads back as exactly this double.
  *
  * Plain "%g" is six significant digits, which is not a rounding so much as a

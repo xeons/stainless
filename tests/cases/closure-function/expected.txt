@@ -1,0 +1,7 @@
+QUIET
+5
+42
+equal
+heard=5
+ALPHA GAMMA
+BE

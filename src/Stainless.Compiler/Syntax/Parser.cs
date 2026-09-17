@@ -46,6 +46,10 @@ public sealed class Parser
         _diagnostics = diagnostics;
         _lexer = new Lexer(source, diagnostics, symbols);
         _tokens = _lexer.Tokenize();
+
+        // The lexer gave up on the rest of the file and has said why; what it
+        // did not read would otherwise come back as a message per open brace.
+        _tooDeep = _lexer.TooDeep;
     }
 
     /// <summary>
@@ -53,12 +57,20 @@ public sealed class Parser
     ///
     /// The tokens came from the same file and carry their real positions, so
     /// everything this parser reports points where it should.
+    ///
+    /// It starts at its parent's depth rather than at nothing. A hole is
+    /// nested inside the expression that holds it, and a count that restarted
+    /// in each one would let <c>$"{ ... $"{ ... }" ... }"</c> go as deep as the
+    /// limit squared.
     /// </summary>
-    private Parser(SourceText source, DiagnosticBag diagnostics, IReadOnlyList<Token> tokens)
+    private Parser(SourceText source, DiagnosticBag diagnostics, IReadOnlyList<Token> tokens,
+                   int depth, bool tooDeep)
     {
         _source = source;
         _diagnostics = diagnostics;
         _lexer = null;
+        _depth = depth;
+        _tooDeep = tooDeep;
 
         // Copied, because the parser rewrites a `>>` into two `>` in place
         // when it closes nested type arguments, and the lexer's list is not
@@ -124,7 +136,22 @@ public sealed class Parser
     private bool At(TokenKind kind) => Current.Kind == kind;
     private bool AtAny(params TokenKind[] kinds) => kinds.Contains(Current.Kind);
 
-    private Token Advance() => _tokens[Math.Min(_pos++, _tokens.Count - 1)];
+    /// <summary>
+    /// Consumes the current token, except the end of the file, which stays put.
+    ///
+    /// A position past the last token is a place no token is, and every
+    /// <c>int start = _pos</c> taken there is an index <see cref="SpanFrom"/>
+    /// cannot read. Recovery calls this at the end of the file freely -- the
+    /// depth limit jumps there and the whole unwind then consumes "one more" --
+    /// so the rule is kept here once rather than at each of those callers.
+    /// </summary>
+    private Token Advance()
+    {
+        var token = _tokens[_pos];
+        if (_pos < _tokens.Count - 1)
+            _pos++;
+        return token;
+    }
 
     private bool Match(TokenKind kind)
     {
@@ -151,8 +178,37 @@ public sealed class Parser
         return "?";
     }
 
-    private SourceSpan SpanFrom(int startIndex) =>
-        new(_source, _tokens[startIndex].Span.Start, _tokens[Math.Max(0, _pos - 1)].Span.End);
+    /// <summary>
+    /// From the start of the token at <paramref name="startIndex"/> to the end
+    /// of the last one consumed.
+    ///
+    /// So it has to be asked after the node's last part has been parsed, never
+    /// as an argument ahead of that part: C# evaluates arguments left to
+    /// right, and <c>new X(SpanFrom(start), ParseExpression())</c> measures
+    /// the node before its expression exists.
+    ///
+    /// When nothing has been consumed since, the last token consumed is the one
+    /// before the start, and its end lies before the start's beginning -- a
+    /// span that runs backwards. What was parsed is nothing, so the span is
+    /// empty, at the place it would have begun.
+    /// </summary>
+    private SourceSpan SpanFrom(int startIndex)
+    {
+        int start = _tokens[startIndex].Span.Start;
+        if (_pos <= startIndex)
+            return new(_source, start, start);
+
+        return new(_source, start, _tokens[_pos - 1].Span.End);
+    }
+
+    /// <summary>Each speculation that failed, by what was attempted and at which token.</summary>
+    private readonly HashSet<(System.Reflection.MethodInfo Attempt, int Position)> _failedSpeculations = [];
+
+    /// <summary>
+    /// Every <c>&gt;&gt;</c> split in two, with the token it was, newest on top,
+    /// so that a speculation which is thrown away can put them back.
+    /// </summary>
+    private readonly Stack<(int Index, Token Token)> _splits = [];
 
     /// <summary>
     /// Runs <paramref name="attempt"/> without committing: token position is
@@ -161,7 +217,22 @@ public sealed class Parser
     /// </summary>
     private bool Speculate<T>(Func<T?> attempt, out T? result) where T : class
     {
+        // An attempt that failed here once fails here again, and trying it
+        // again is not free: a lambda's parameter list and a cast's type can
+        // both hold a fixed-array length, which is a whole expression, so
+        // `([([([1])])])` parsed each level's contents once per guess and then
+        // once for real -- twice as long for every pair of brackets, which is
+        // a hang by twenty-five. Remembering the failure makes the guess cost
+        // what the parse it guessed at cost, once.
+        var key = (attempt.Method, _pos);
+        if (_failedSpeculations.Contains(key))
+        {
+            result = null;
+            return false;
+        }
+
         int savedPos = _pos;
+        int savedSplits = _splits.Count;
         int savedDepth = _depth;
         bool savedTooDeep = _tooDeep;
         var savedDiagnostics = _diagnostics;
@@ -171,6 +242,17 @@ public sealed class Parser
             result = attempt();
             if (result is not null && !_diagnostics.HasErrors) return true;
             _pos = savedPos;
+
+            // A `>>` the attempt split is whole again. Left in halves, the
+            // parse that follows sees one `>` where the text has two, and
+            // `(List<List<int>>)x` -- tried as a lambda first -- is no longer a cast.
+            while (_splits.Count > savedSplits)
+            {
+                var (index, token) = _splits.Pop();
+                _tokens[index] = token;
+            }
+
+            _failedSpeculations.Add(key);
             result = null;
             return false;
         }
@@ -601,6 +683,15 @@ public sealed class Parser
         var members = new List<Declaration>();
         var cases = new List<VariantCaseSyntax>();
 
+        // A type inside a type is a level of nesting like a block inside a
+        // block, and it costs more than one: every level copies the types hoisted
+        // out of the levels below it to prefix their names, so four thousand
+        // levels took most of a minute to parse before this bound applied.
+        if (!Descend())
+            return new TypeDeclSyntax(
+                SpanFrom(start), modifiers, kind, name, typeParameters, constraints,
+                implements, members, attributes) { Cases = cases };
+
         int anonymous = 0;
 
         while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
@@ -664,6 +755,7 @@ public sealed class Parser
 
             if (_pos == before) Advance();
         }
+        Ascend();
         Expect(TokenKind.CloseBrace);
 
         if (constraints.Count > 0 && typeParameters.Count == 0)
@@ -890,7 +982,8 @@ public sealed class Parser
             return new OutArgumentSyntax(
                 SpanFrom(start), null, declared.Type, declared.Name, declared.NameSpan);
 
-        return new OutArgumentSyntax(SpanFrom(start), ParseExpression(), null, null, default);
+        var target = ParseExpression();
+        return new OutArgumentSyntax(SpanFrom(start), target, null, null, default);
     }
 
     private sealed record OutDeclaration(TypeSyntax Type, string Name, SourceSpan NameSpan);
@@ -1062,6 +1155,11 @@ public sealed class Parser
 
         var targetStart = _pos;
         var target = ParseType();
+
+        // Named here, while the last token consumed is still the type's own:
+        // any later and the name takes in the parameters and the body too.
+        string name = ConversionName(SpanFrom(targetStart));
+
         var parameters = ParseParameterList(out bool variadic);
         // A conversion is the value it converts to, so its arrow is a getter's.
         var body = At(TokenKind.OpenBrace) ? ParseBlock() : ParseArrowBodyOrNull(isGetter: true);
@@ -1078,7 +1176,7 @@ public sealed class Parser
 
         return new FunctionDeclSyntax(
             SpanFrom(start), modifiers, LinkageKind.Stainless, target,
-            ConversionName(target, SpanFrom(targetStart)), [], [], parameters,
+            name, [], [], parameters,
             IsVariadic: false, body)
         {
             IsOperator = true,
@@ -1088,13 +1186,13 @@ public sealed class Parser
     }
 
     /// <summary>
-    /// The lowered name of a conversion to <paramref name="target"/>.
+    /// The lowered name of a conversion to the type written at <paramref name="span"/>.
     ///
     /// It has to carry the target, because the parameter list does not: a type
     /// may convert to two things from the same one, and two functions whose
     /// name and parameters both match would be one symbol at the linker.
     /// </summary>
-    private string ConversionName(TypeSyntax target, SourceSpan span) =>
+    private static string ConversionName(SourceSpan span) =>
         "op_To" + Binding.Mangler.SymbolSafe(
             span.File.Text[span.Start..span.End].Trim());
 
@@ -1379,13 +1477,14 @@ public sealed class Parser
             {
                 var name = Advance();
                 Advance();
-                entries.Add(new InitializerEntrySyntax(
-                    SpanFrom(at), name.Text, name.Span, ParseExpression()));
+                var value = ParseExpression();
+                entries.Add(new InitializerEntrySyntax(SpanFrom(at), name.Text, name.Span, value));
             }
             else
             {
-                entries.Add(new InitializerEntrySyntax(
-                    SpanFrom(at), null, SpanFrom(at), ParseExpression()));
+                // A positional entry has no name, so the value stands where one would.
+                var value = ParseExpression();
+                entries.Add(new InitializerEntrySyntax(SpanFrom(at), null, value.Span, value));
             }
 
             if (!Match(TokenKind.Comma)) break;
@@ -1407,9 +1506,10 @@ public sealed class Parser
         // no such form, which is why this is here and not in the shared part.
         if (Match(TokenKind.EqualsGreater))
         {
+            var getter = ParseArrowBody(isGetter: true);
             var arrow = new List<AccessorSyntax>
             {
-                new(SpanFrom(start), Modifiers.None, IsGetter: true, ParseArrowBody(isGetter: true)),
+                new(SpanFrom(start), Modifiers.None, IsGetter: true, getter),
             };
             Expect(TokenKind.Semicolon);
             return new PropertyDeclSyntax(SpanFrom(start), modifiers, type, name, arrow, attributes);
@@ -1462,8 +1562,9 @@ public sealed class Parser
             // are both statements and end at a semicolon.
             if (At(TokenKind.OpenBrace))
             {
+                var block = ParseBlock();
                 accessors.Add(new AccessorSyntax(
-                    SpanFrom(accessorStart), accessorModifiers, isGetter, ParseBlock()));
+                    SpanFrom(accessorStart), accessorModifiers, isGetter, block));
                 continue;
             }
 
@@ -1748,7 +1849,8 @@ public sealed class Parser
             return new ConstraintSyntax(SpanFrom(start), ConstraintKind.New, null);
         }
 
-        return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Type, ParseType());
+        var type = ParseType();
+        return new ConstraintSyntax(SpanFrom(start), ConstraintKind.Type, type);
     }
 
     /// <summary>
@@ -1811,6 +1913,7 @@ public sealed class Parser
 
         var shift = _tokens[_pos];
         var span = shift.Span;
+        _splits.Push((_pos, shift));
 
         // Put back the half this list did not need, so the enclosing one closes.
         _tokens[_pos] = new Token(
@@ -1930,8 +2033,9 @@ public sealed class Parser
                     var loopStep = ParseExpression();
                     Expect(TokenKind.CloseParen);
 
+                    var loopBody = ParseStatement();
                     return new ParallelForSyntax(
-                        SpanFrom(start), loopInit, loopCondition, loopStep, ParseStatement());
+                        SpanFrom(start), loopInit, loopCondition, loopStep, loopBody);
                 }
 
                 Expect(TokenKind.OpenParen);
@@ -1950,8 +2054,11 @@ public sealed class Parser
             }
 
             case TokenKind.ParallelKeyword:
+            {
                 Advance();
-                return new ParallelSyntax(SpanFrom(start), ParseBlock());
+                var block = ParseBlock();
+                return new ParallelSyntax(SpanFrom(start), block);
+            }
 
             case TokenKind.ForeachKeyword:
             {
@@ -2032,7 +2139,8 @@ public sealed class Parser
                 {
                     bool wanted = Current.Text == "checked";
                     Advance();
-                    return new CheckedBlockSyntax(SpanFrom(start), ParseBlock(), wanted);
+                    var block = ParseBlock();
+                    return new CheckedBlockSyntax(SpanFrom(start), block, wanted);
                 }
 
                 // `name:` is a label. Nothing else in the grammar puts a colon
@@ -2166,7 +2274,8 @@ public sealed class Parser
             var guard = AtWhenWord() ? ParseGuard() : null;
 
             Expect(TokenKind.EqualsGreater);
-            arms.Add(new SwitchArmSyntax(SpanFrom(at), pattern, guard, ParseExpression()));
+            var result = ParseExpression();
+            arms.Add(new SwitchArmSyntax(SpanFrom(at), pattern, guard, result));
 
             if (!Match(TokenKind.Comma)) break;
         }
@@ -2205,7 +2314,8 @@ public sealed class Parser
         while (At(TokenKind.Identifier) && Current.Text == "or")
         {
             Advance();
-            left = new BinaryPatternSyntax(SpanFrom(start), left, IsOr: true, ParsePatternAnd());
+            var right = ParsePatternAnd();
+            left = new BinaryPatternSyntax(SpanFrom(start), left, IsOr: true, right);
         }
 
         return left;
@@ -2219,7 +2329,8 @@ public sealed class Parser
         while (At(TokenKind.Identifier) && Current.Text == "and")
         {
             Advance();
-            left = new BinaryPatternSyntax(SpanFrom(start), left, IsOr: false, ParsePatternPrimary());
+            var right = ParsePatternPrimary();
+            left = new BinaryPatternSyntax(SpanFrom(start), left, IsOr: false, right);
         }
 
         return left;
@@ -2232,7 +2343,8 @@ public sealed class Parser
         if (At(TokenKind.Identifier) && Current.Text == "not")
         {
             Advance();
-            return new NotPatternSyntax(SpanFrom(start), ParsePatternPrimary());
+            var negated = ParsePatternPrimary();
+            return new NotPatternSyntax(SpanFrom(start), negated);
         }
 
         // `_` matches anything. It is an ordinary identifier to the lexer, and
@@ -2249,7 +2361,8 @@ public sealed class Parser
         if (AtAny(TokenKind.Less, TokenKind.LessEquals, TokenKind.Greater, TokenKind.GreaterEquals))
         {
             var op = Advance().Kind;
-            return new RelationalPatternSyntax(SpanFrom(start), op, ParsePatternConstant());
+            var bound = ParsePatternConstant();
+            return new RelationalPatternSyntax(SpanFrom(start), op, bound);
         }
 
         if (At(TokenKind.OpenParen))
@@ -2275,7 +2388,8 @@ public sealed class Parser
         // Everything else is a constant: a literal, a qualified name, a
         // negated number. A bare name may still turn out to name a variant's
         // case or a type, and the binder is where that is settled.
-        return new ConstantPatternSyntax(SpanFrom(start), ParsePatternConstant());
+        var constant = ParsePatternConstant();
+        return new ConstantPatternSyntax(SpanFrom(start), constant);
     }
 
     /// <summary>
@@ -2473,7 +2587,9 @@ public sealed class Parser
         // The one form that needs no lookahead past a single token.
         if (At(TokenKind.Identifier) && Peek(1).Kind == TokenKind.EqualsGreater)
         {
-            var single = new LambdaParameterSyntax(SpanFrom(_pos), null, Advance().Text);
+            int at = _pos;
+            string name = Advance().Text;
+            var single = new LambdaParameterSyntax(SpanFrom(at), null, name);
             Advance();
             return FinishLambda(start, [single]);
         }
@@ -2522,9 +2638,13 @@ public sealed class Parser
     private ExpressionSyntax FinishLambda(int start, List<LambdaParameterSyntax> parameters)
     {
         if (At(TokenKind.OpenBrace))
-            return new LambdaSyntax(SpanFrom(start), parameters, null, ParseBlock());
+        {
+            var block = ParseBlock();
+            return new LambdaSyntax(SpanFrom(start), parameters, null, block);
+        }
 
-        return new LambdaSyntax(SpanFrom(start), parameters, ParseExpression(), null);
+        var body = ParseExpression();
+        return new LambdaSyntax(SpanFrom(start), parameters, body, null);
     }
 
     private ExpressionSyntax ParseConditional()
@@ -2578,7 +2698,8 @@ public sealed class Parser
             if (At(TokenKind.AsKeyword) && TypeTestPrecedence >= minPrecedence)
             {
                 Advance();
-                left = new AsCastSyntax(SpanFrom(start), left, ParseType());
+                var wanted = ParseType();
+                left = new AsCastSyntax(SpanFrom(start), left, wanted);
                 continue;
             }
 
@@ -2621,7 +2742,8 @@ public sealed class Parser
         if (At(TokenKind.TryKeyword))
         {
             Advance();
-            return new TrySyntax(SpanFrom(start), ParseUnary());
+            var tried = ParseUnary();
+            return new TrySyntax(SpanFrom(start), tried);
         }
 
         // `spawn` binds like `try`, in front of the call and not in front of the
@@ -2631,7 +2753,8 @@ public sealed class Parser
         if (At(TokenKind.SpawnKeyword))
         {
             Advance();
-            return new SpawnExpressionSyntax(SpanFrom(start), ParseUnary());
+            var spawned = ParseUnary();
+            return new SpawnExpressionSyntax(SpanFrom(start), spawned);
         }
 
         // `++x` and `--x`. The operand is a unary rather than a postfix so that
@@ -2640,7 +2763,8 @@ public sealed class Parser
         {
             bool up = At(TokenKind.PlusPlus);
             Advance();
-            return new IncrementSyntax(SpanFrom(start), ParseUnary(), IsPrefix: true, IsIncrement: up);
+            var operand = ParseUnary();
+            return new IncrementSyntax(SpanFrom(start), operand, IsPrefix: true, IsIncrement: up);
         }
 
         if (AtAny(TokenKind.Minus, TokenKind.Plus, TokenKind.Bang, TokenKind.Tilde,
@@ -2745,8 +2869,8 @@ public sealed class Parser
             {
                 var label = Advance();
                 Advance();
-                arguments.Add(new NamedArgumentSyntax(
-                    SpanFrom(start), label.Text, label.Span, ParseExpression()));
+                var value = ParseExpression();
+                arguments.Add(new NamedArgumentSyntax(SpanFrom(start), label.Text, label.Span, value));
 
                 if (!Match(TokenKind.Comma)) break;
                 continue;
@@ -2755,7 +2879,10 @@ public sealed class Parser
             // `ref x` is written at the call too. `in` is not: it promises the
             // callee will not write, which changes nothing the caller must see.
             if (Match(TokenKind.RefKeyword))
-                arguments.Add(new RefArgumentSyntax(SpanFrom(start), ParseExpression()));
+            {
+                var referenced = ParseExpression();
+                arguments.Add(new RefArgumentSyntax(SpanFrom(start), referenced));
+            }
             else if (AtOutModifier())
                 arguments.Add(ParseOutArgument(start));
             else
@@ -2790,8 +2917,17 @@ public sealed class Parser
                 continue;
             }
 
-            var inner = new Parser(_source, _diagnostics, segment.Tokens!);
+            var inner = new Parser(_source, _diagnostics, segment.Tokens!, _depth, _tooDeep);
             var value = inner.ParseExpression();
+
+            // A limit reached inside the hole was reached here too, and this
+            // parser has to stop as the inner one did or the rest of the file
+            // is parsed on after the message that said it would not be.
+            if (inner._tooDeep && !_tooDeep)
+            {
+                _tooDeep = true;
+                _pos = _tokens.Count - 1;
+            }
 
             if (!inner.At(TokenKind.EndOfFile))
                 _diagnostics.Error("SL0556", inner.Current.Span,

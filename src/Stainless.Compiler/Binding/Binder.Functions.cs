@@ -33,6 +33,10 @@ public sealed partial class Binder
         var module = scope.Module;
         var returnType = ResolveType(declaration.ReturnType, scope, allowVoid: true);
 
+        // Static is a statement about a member. On a module-level function the
+        // word is refused below (SL0573) and the function is an ordinary one:
+        // everything that reads IsStatic goes on to ask which type the method
+        // is a member of, and this one is a member of nothing.
         bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
 
         var symbol = new FunctionSymbol
@@ -58,7 +62,7 @@ public sealed partial class Binder
             IsSealed = declaration.Modifiers.HasFlag(Modifiers.Sealed),
             IsConversion = declaration.IsConversion,
             IsImplicitConversion = declaration.IsImplicitConversion,
-            IsStatic = isStatic,
+            IsStatic = isStatic && containingType is not null,
             IsVariadic = declaration.IsVariadic,
             Body = declaration.Body,
             Span = declaration.Span,

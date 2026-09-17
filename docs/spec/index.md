@@ -67,7 +67,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 
 - [2.1 Primitives](02-types.md#21-primitives)
 - [2.2 `struct` — value type, C layout](02-types.md#22-struct--value-type-c-layout)
-  - [2.2.1 `struct HWND__;` — a type declared and not laid out](02-types.md#221-struct-hwnd--a-type-declared-and-not-laid-out)
+  - [2.2.1 `struct HWND__;` — a type declared and not laid out](02-types.md#221-struct-hwnd__--a-type-declared-and-not-laid-out)
   - [2.2.2 A type declared inside another](02-types.md#222-a-type-declared-inside-another)
   - [2.2.3 `(int, String)` — a tuple](02-types.md#223-int-string--a-tuple)
 - [2.3 `[Packed]` and `[Align]`](02-types.md#23-packed-and-align)
@@ -80,7 +80,7 @@ Primitives, `struct`, `class`, pointers, `variant`, `union`, `Result`, `interfac
 - [2.6 `variant` — a value that is one of several things](02-types.md#26-variant--a-value-that-is-one-of-several-things)
 - [2.7 `union` — every member at offset zero](02-types.md#27-union--every-member-at-offset-zero)
   - [2.7.1 Nameless members](02-types.md#271-nameless-members)
-- [2.8 `Result<T, TError>` — how a function fails](02-types.md#28-resultt-e--how-a-function-fails)
+- [2.8 `Result<T, TError>` — how a function fails](02-types.md#28-resultt-terror--how-a-function-fails)
   - [2.8.1 `Optional<T>` — a value, or none](02-types.md#281-optionalt--a-value-or-none)
 - [2.9 How the library reports failure](02-types.md#29-how-the-library-reports-failure)
 - [2.10 `interface` — a contract, dispatched dynamically](02-types.md#210-interface--a-contract-dispatched-dynamically)
@@ -119,7 +119,7 @@ Monomorphization, constraints, and what is and is not supported.
 
 ### [5. The standard library](05-standard-library.md)
 
-What ships and how: threading, collections, environment, math, concurrency, I/O, processes, JSON and XML.
+What ships and how: threading, collections, environment, math, concurrency, I/O, processes, JSON and XML, images, cryptography and sound.
 
 - [5.1 What ships, and how](05-standard-library.md#51-what-ships-and-how)
 - [5.2 `Standard.Threading`](05-standard-library.md#52-standardthreading)
@@ -134,6 +134,8 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 - [5.10 `Standard.Json` and `Standard.Xml`](05-standard-library.md#510-standardjson-and-standardxml)
 - [5.11 Interfaces may extend interfaces](05-standard-library.md#511-interfaces-may-extend-interfaces)
 - [5.12 `Standard.Drawing`](05-standard-library.md#512-standarddrawing)
+- [5.13 `Standard.Security.Cryptography`](05-standard-library.md#513-standardsecuritycryptography)
+- [5.14 `Standard.Media.Audio`](05-standard-library.md#514-standardmediaaudio)
 
 ### [6. Attributes and reflection](06-attributes-reflection.md)
 
@@ -194,6 +196,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [9.10 `goto`](09-statements-expressions.md#910-goto)
 - [9.11 `nameof`](09-statements-expressions.md#911-nameof)
 - [9.12 `checked`](09-statements-expressions.md#912-checked)
+- [9.13 An expression on its own](09-statements-expressions.md#913-an-expression-on-its-own)
 
 ### [10. Conditional compilation](10-conditional-compilation.md)
 

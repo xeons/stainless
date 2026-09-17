@@ -166,6 +166,41 @@ public class InterpolationTests
         Assert.DoesNotContain("sl_string_concat", body, StringComparison.Ordinal);
     }
 
+    // ---------------------------------------------------------------- depth
+
+    private static string[] ParseCodes(string expression) => Source.Recursion.OnADeepStack(() =>
+    {
+        Front.Parse("module A;\nint Main() { var s = " + expression + "; return 0; }",
+                    out var diagnostics);
+        return Front.Codes(diagnostics);
+    });
+
+    private static string Nested(string open, string inner, string close, int count) =>
+        string.Concat(Enumerable.Repeat(open, count)) + inner +
+        string.Concat(Enumerable.Repeat(close, count));
+
+    /// <summary>
+    /// A hole is lexed by recursing into the token loop, so a string in a hole
+    /// in a string is the one place the lexer recurses, and a hundred thousand
+    /// of them overflowed even the compilation's deep stack. It is refused at
+    /// the parser's depth limit instead, with the one message and nothing about
+    /// the strings left unterminated by giving up.
+    /// </summary>
+    [Fact]
+    public void AnInterpolationNestedTooDeeplyIsRefusedByTheLexer() =>
+        Assert.Equal(["SL0108"], ParseCodes(Nested("$\"{", "1", "}\"", 100_000)));
+
+    /// <summary>
+    /// The parser over a hole counts from its parent's depth. Each started from
+    /// nothing, so two hundred strings in strings, the innermost holding two
+    /// hundred parentheses, was within the limit in every parser and past it
+    /// in all of them together.
+    /// </summary>
+    [Fact]
+    public void AHoleCountsTheDepthItIsNestedAt() =>
+        Assert.Equal(["SL0108"],
+            ParseCodes(Nested("$\"{", Nested("(", "1", ")", 200), "}\"", 200)));
+
     /// <summary>
     /// And an interpolation with no holes is a literal, so it costs what one
     /// costs: static bytes, no allocation and no call.

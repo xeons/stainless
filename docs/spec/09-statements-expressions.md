@@ -23,12 +23,12 @@ worth stating, because each is a question a reader asks exactly once:
 
 **A body is a statement, not a block.** `if`, `else`, `while`, `for` and
 `foreach` are each followed by one statement, and a block is one statement
-among others -- so braces are how several are written, not something the
+among others — so braces are how several are written, not something the
 grammar asks for.
 
 ```csharp
 if (n == 0) n = 1; else n = 2;
-while (n < 3) n += 1;
+while (n < 3) n++;
 for (int i = 0; i < 2; i++) n += 10;
 ```
 
@@ -142,7 +142,7 @@ leaves the switch and not the loop. With no enclosing loop, `continue` in a
 switch has nothing to continue and is rejected.
 
 ```csharp
-for (nuint i = 0; i < values.Length; i = i + 1) {
+for (nuint i = 0; i < values.Length; i++) {
     switch (values[i]) {
         case -1: continue;      // next iteration, skipping the rest of the body
         case 0:  break;         // out of the switch, into the rest of the body
@@ -185,14 +185,14 @@ switch (node) {
 ```
 
 **A pattern is a question, and every one of them becomes the `bool` that asks
-it** -- a comparison, a tag test, or the `is` the language already had. There is
+it** — a comparison, a tag test, or the `is` the language already had. There is
 no matching machinery underneath.
 
 **A switch whose labels are all constants is unchanged**: one LLVM `switch`
 instruction, and a jump table if LLVM decides on one. A single pattern anywhere
 in it turns the whole switch into a chain of tests asked in order, because a
 type, a range and a `when` are not values the governor could equal. Everything
-else about the statement stays as it was -- sections that may not fall through,
+else about the statement stays as it was — sections that may not fall through,
 `break` that belongs to the switch, `continue` that passes through it.
 
 **A name belongs to one label** (SL0619). A section reached by two of them has
@@ -227,7 +227,7 @@ double Area(Shape shape) {
 ```
 
 The value goes first, the arms are separated by commas, and each one is an
-expression rather than a statement -- which is the whole difference between this
+expression rather than a statement — which is the whole difference between this
 and the statement it is named after.
 
 **It has to be exhaustive** (SL0620). A statement that matches nothing falls
@@ -241,8 +241,8 @@ it and the rest convert to it.
 **An arm nothing can reach is a warning** (SL0621), which is what an arm after
 `_` is.
 
-It lowers to the value held in a name and a conditional per arm -- `t is P1 ? e1
-: t is P2 ? e2 : e3` -- so nothing written this way can do anything a chain of
+It lowers to the value held in a name and a conditional per arm — `t is P1 ? e1
+: t is P2 ? e2 : e3` — so nothing written this way can do anything a chain of
 ternaries could not, and the arm a test fails falls into the next conditional
 rather than into a copy of the rest.
 
@@ -286,7 +286,7 @@ one gets its own copy of the arguments:
 
 ```csharp
 parallel {
-    for (int i = 0; i < 8; i = i + 1) {
+    for (int i = 0; i < 8; i++) {
         squares[i] = spawn Square(i);
     }
 }
@@ -298,14 +298,15 @@ it is written — open a fork-join scope — and the loop stays a loop with a
 modifier on it:
 
 ```csharp
-for parallel (nuint i = 0u; i < pixels.Length; i = i + 1u) {
+for parallel (nuint i = 0u; i < pixels.Length; i++) {
     pixels[i] = Shade(pixels[i]);
 }
 ```
 
-The loop has to be counted — `i = start`, `i < limit` or `i <= limit`, and
-`i = i + stride` with a positive literal stride — because the iteration space is
-divided before the body runs and a general C-style `for` has no trip count.
+The loop has to be counted — `i = start`, `i < limit` or `i <= limit`, and a
+step of `i++` or `++i`, or `i += stride` or `i = i + stride` with a positive
+literal stride — because the iteration space is divided before the body runs and
+a general C-style `for` has no trip count.
 
 Three rules are enforced, each for the same reason:
 
@@ -344,9 +345,9 @@ public sealed class Aes {
 nuint blocks = length / Aes.BlockSize;          // and the type's name outside
 ```
 
-A constant is the one piece of shared state a `--shared` library may carry,
-and for the reason the others may not: it is inlined rather than stored, so
-there is nothing to initialize and no entry point needed to do it
+A constant is shared state a `--shared` library may always carry, and for the
+reason a static often may not: it is inlined rather than stored, so there is
+nothing to initialize and no entry point needed to do it
 ([§7.6](07-functions-members.md#76-static-members) is where `static` runs into
 that). The one place it does not reach is an inline array's length, `T[N]`,
 which is settled during layout — before any type has its members — so a length
@@ -371,8 +372,7 @@ error[SL0479]: 'Mask' is declared 'int', and a floating-point literal is not one
 ```
 
 A character literal suits an integer, as it does in C#, so
-`const int Newline = '
-';` is fine.
+`const int Newline = '\n';` is fine.
 
 ```csharp
 public static readonly int Base = 20;
@@ -388,9 +388,9 @@ later assignment, and it lets a reference be made **immortal** as it is stored,
 so retain and release skip it for the rest of the program. A mutable one cannot
 be immortal, because replacing what it holds has to release the old value.
 
-**Every static needs an initializer.** It is written by that and nothing else --
+**Every static needs an initializer.** It is written by that and nothing else —
 the initializers run before `Main` and there is no later moment at which a first
-value could arrive -- so `static int Counter;` is an error (SL0376).
+value could arrive — so `static int Counter;` is an error (SL0376).
 
 What a static holds is *warned* about rather than refused ([§9.5](#95-what-may-cross-a-thread-boundary)): it outlives
 every thread, so a `List<int>` in one is reachable from all of them and the
@@ -423,13 +423,16 @@ way there is no teardown, which sidesteps C++'s static *destruction* order
 problem as well.
 
 A `--shared` library has no entry point to initialize statics from, so a static
-in one is an error rather than a silently zeroed global.
+in one is an error (SL0380) rather than a silently zeroed global — unless the
+global can be born holding its value: `null`, `default(T)`, or a literal of a
+type that is not counted, so `static int Counter = 0;` is allowed and a
+`String` literal is not.
 
 ## 9.4 `foreach`
 
 ```csharp
 foreach (int n in numbers) { total = total + n; }
-foreach (var item in list) { Console.WriteLine(item.Name()); }
+foreach (var item in list) { Console.WriteLine(item.Name); }
 ```
 
 An **array** iterates by index, with no allocation and no dispatch. Anything
@@ -444,12 +447,13 @@ class Countdown {
 
 class CountdownCursor {
     public bool MoveNext() { ... }
-    public int Current() { ... }
+    public int Current => ...;
 }
 ```
 
-`Current()` is a method rather than a property, because Stainless has no
-properties. `Standard.Collections` names the shape as `IEnumerable<T>` and
+`Current` is looked for as a property first and then as a method of that name,
+which is what an enumerator written before properties existed looks like; both
+lower to one call. `Standard.Collections` names the shape as `IEnumerable<T>` and
 `IEnumerator<T>` so that a sequence can be passed around, and `List<T>`
 implements both — but `foreach` does not require them.
 
@@ -461,7 +465,7 @@ loop; `continue` advances the enumerator.
 ## 9.5 What may cross a thread boundary
 
 Checked wherever a value can reach a second thread: a `spawn` argument or
-receiver, a `for parallel` capture, and a `static readonly`.
+receiver, a `for parallel` capture, and a static.
 
 | Allowed | Why it is safe |
 |---|---|
@@ -670,7 +674,7 @@ wrapping.
 
 Both are **contextual keywords**, as `closure` is: a test in this repository
 had a parameter named `checked` before this existed. So is `out`, which the
-standard library uses as a local in three files.
+standard library uses as a local.
 
 The conditional `a ? b : c` evaluates only the arm it selects, and groups to
 the right, so `a ? b : c ? d : e` reads as `a ? b : (c ? d : e)`. Its arms must
@@ -702,7 +706,7 @@ An integer literal is also exact against a `float` or a `double`:
 of it.
 
 A floating-point literal is a `double` unless it carries the `f` suffix, which
-makes it a `float` -- `float half = 0.5f;` -- parsed as one rather than as a
+makes it a `float` — `float half = 0.5f;` — parsed as one rather than as a
 rounded double. `float half = 0.5;` is refused, as in C#, with a hint to write
 the suffix; silently rounding a double is what the rule exists to stop. A
 `const float` may be initialized with either spelling, since the constant's
@@ -719,7 +723,7 @@ all three:
 |---|---|---|
 | `1 << 40` on an `int` | undefined | `1 << (40 & 31)` = 256, as in C# |
 | `x / 0` | undefined | aborts, the way an out-of-range index does |
-| `int.Smallest / -1` | undefined | aborts; the result is not representable |
+| the most negative `int` `/ -1` | undefined | aborts; the result is not representable |
 
 A shift count is reduced modulo the operand's width, which costs one `and` and
 matches what a C# reader expects. Division is checked where the divisor is not
@@ -734,7 +738,9 @@ Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
 unchecked, and is defined rather than undefined.
 
 **Nesting stops at 500 levels** (SL0108) — expressions inside expressions,
-blocks inside blocks, types inside types. The limit exists because parsing and
+blocks inside blocks, types inside types, and interpolated strings inside the
+holes of interpolated strings, which count together with whatever encloses
+them. The limit exists because parsing and
 binding each recurse once per level, and a file deep enough would otherwise end
 the compiler rather than be refused by it: a stack overflow cannot be caught,
 so there is no diagnostic and nothing to say which file did it. It is a bound
@@ -745,8 +751,8 @@ everything the unwind would say after it is a consequence of it.
 
 ## 9.13 An expression on its own
 
-A statement may be an expression and nothing else -- an *expression statement*
--- and most expressions are a mistake in that position. `total + 1;` computes a number and drops it: it is
+A statement may be an expression and nothing else — an *expression statement*
+— and most expressions are a mistake in that position. `total + 1;` computes a number and drops it: it is
 valid C, it compiles, and it does nothing at all. So an expression standing
 alone has to be one that could have had an effect, and the rest are warned
 about:
@@ -755,8 +761,8 @@ about:
 warning[SL0222]: this expression has no effect; its result is discarded
 ```
 
-**What counts as an effect is a list, not a judgement**: an assignment -- plain
-or compound, to a variable or to a property -- a call, a `++` or `--`, and
+**What counts as an effect is a list, not a judgement**: an assignment — plain
+or compound, to a variable or to a property — a call, a `++` or `--`, and
 `new`. Two more are decided by what is inside them: a conditional is effective
 when either arm is, and `a?.M()` for the same reason the call inside it is.
 
@@ -772,8 +778,8 @@ count;                      // SL0222
 ```
 
 **A call is effective whatever it answers.** The warning is not about ignoring
-a return value -- a function whose result is a status is meant to be usable for
-its work alone -- it is about an expression that had no other reason to be
+a return value — a function whose result is a status is meant to be usable for
+its work alone — it is about an expression that had no other reason to be
 written.
 
 **The bug it actually catches** is a name that was meant to be a call on
@@ -783,9 +789,9 @@ something else, and a variant's case constructors are where that happens:
 Fail("could not read the file");    // SL0222
 ```
 
-`Fail` is `Result`'s case constructor ([§2.8](02-types.md#28-resultt-e--how-a-function-fails)), so that
+`Fail` is `Result`'s case constructor ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails)), so that
 line builds a `Result` and throws it away. If the author meant a method of
-their own named `Fail`, it was never reached -- and nothing else would have
+their own named `Fail`, it was never reached — and nothing else would have
 said so, because the line is perfectly well typed.
 
 ---

@@ -92,6 +92,18 @@ public sealed record TargetPlatform
     /// </summary>
     public int ArrayHeaderSize => PointerWidth * 4;
 
+    /// <summary>
+    /// The boundary a <c>long</c>, a <c>ulong</c> or a <c>double</c> starts on.
+    ///
+    /// Eight everywhere but i386 System V, where it is four: gcc and clang put
+    /// the <c>long long</c> in <c>struct { int a; long long b; }</c> at offset
+    /// 4 and make the struct 12 bytes, while MSVC on 32-bit Windows keeps the
+    /// eight of every 64-bit ABI and makes it 16. Reading the size as the
+    /// alignment, as every other primitive does, laid out every such struct
+    /// for x86 Linux the Windows way.
+    /// </summary>
+    public int WideScalarAlignment => Architecture == TargetArch.X86 && !IsWindows ? 4 : 8;
+
     /// <summary>The LLVM integer type a <c>nuint</c> or a <c>nint</c> is.</summary>
     public string NativeIntType => PointerWidth == 8 ? "i64" : "i32";
 

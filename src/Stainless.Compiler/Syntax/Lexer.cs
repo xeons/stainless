@@ -78,6 +78,23 @@ public sealed class Lexer(
     /// </summary>
     public List<string> Libraries { get; } = [];
 
+    /// <summary>
+    /// How many interpolation holes are open around the current position.
+    ///
+    /// A hole is lexed by recursing into the ordinary token loop, and a string
+    /// in it may have holes of its own, so <c>$"{$"{$"{...</c> is the one
+    /// construct that makes the lexer recurse. It is bounded by the same limit
+    /// as the parser's nesting, for the same reason: see <see cref="Source.Recursion"/>.
+    /// </summary>
+    private int _holeDepth;
+
+    /// <summary>
+    /// True once the hole limit has been reported. Everything after that point
+    /// is abandoned, so the parser is told not to add its own complaints about
+    /// the tokens that are missing as a result.
+    /// </summary>
+    public bool TooDeep { get; private set; }
+
     private bool Skipping => _conditions.Any(c => !c.Active);
 
     private char Current => Peek(0);
@@ -94,9 +111,14 @@ public sealed class Lexer(
             if (token.Kind == TokenKind.EndOfFile) break;
         }
 
-        foreach (var open in _conditions)
-            diagnostics.Error("SL0454", new SourceSpan(source, open.Start, open.Start + 3),
-                "this '#if' is never closed; add '#endif'");
+        // The '#endif' of a group open when the hole limit abandoned the text
+        // was in the part that was never read.
+        if (!TooDeep)
+        {
+            foreach (var open in _conditions)
+                diagnostics.Error("SL0454", new SourceSpan(source, open.Start, open.Start + 3),
+                    "this '#if' is never closed; add '#endif'");
+        }
 
         return tokens;
     }
@@ -715,7 +737,8 @@ public sealed class Lexer(
         {
             if (_pos >= _text.Length || Current == '\n')
             {
-                diagnostics.Error("SL0006", SpanFrom(start), "unterminated string literal");
+                if (!TooDeep)
+                    diagnostics.Error("SL0006", SpanFrom(start), "unterminated string literal");
                 break;
             }
 
@@ -778,6 +801,32 @@ public sealed class Lexer(
     private InterpolationSegment LexHole(int outerStart)
     {
         int openedAt = _pos;
+
+        if (_holeDepth == Source.Recursion.MaxDepth)
+        {
+            if (!TooDeep)
+            {
+                TooDeep = true;
+                diagnostics.Error("SL0108", new SourceSpan(source, openedAt, openedAt + 1),
+                    $"this is nested more than {Source.Recursion.MaxDepth} levels deep, which " +
+                    "is past what can be compiled; the usual cause is generated source, and " +
+                    "the fix is to give the inner part a name of its own");
+            }
+
+            // As the parser does: nothing after this can be read usefully, and
+            // going to the end lets every open string close without a message
+            // of its own about being unterminated.
+            _pos = _text.Length;
+            return InterpolationSegment.Hole([new Token(TokenKind.EndOfFile, SpanFrom(_pos), "")]);
+        }
+
+        _holeDepth++;
+        try { return LexHoleCore(outerStart, openedAt); }
+        finally { _holeDepth--; }
+    }
+
+    private InterpolationSegment LexHoleCore(int outerStart, int openedAt)
+    {
         _pos++;                                             // the '{'
 
         var tokens = new List<Token>();
@@ -789,7 +838,8 @@ public sealed class Lexer(
 
             if (_pos >= _text.Length)
             {
-                diagnostics.Error("SL0006", SpanFrom(outerStart), "unterminated string literal");
+                if (!TooDeep)
+                    diagnostics.Error("SL0006", SpanFrom(outerStart), "unterminated string literal");
                 break;
             }
 
@@ -808,7 +858,7 @@ public sealed class Lexer(
             tokens.Add(token);
         }
 
-        if (tokens.Count == 0)
+        if (tokens.Count == 0 && !TooDeep)
             diagnostics.Error("SL0555", SpanFrom(openedAt),
                 "this interpolation is empty; '{}' has no value to write");
 

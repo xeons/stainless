@@ -133,6 +133,73 @@ public class InferenceTests
     public void ALambdaWithNoTargetIsRefused() =>
         Assert.Contains("SL0553", Body("var f = x => x;"));
 
+    // ------------------------------------------- a function passed by name
+
+    /// <summary>
+    /// Closures rather than interfaces, because a function converts to a
+    /// closure; and two <c>Twice</c>s, so which one is meant has to be chosen
+    /// by the type already inferred rather than by being the only one.
+    /// </summary>
+    private const string Named = """
+        public closure R Func<T, R>(T value);
+
+        public R Apply<T, R>(T[:] items, Func<T, R> f) { return f(items[0u]); }
+        public R Call<T, R>(Func<T, R> f, T value) { return f(value); }
+        public nuint Shapes<T, R>(Func<T, R> f) { return 0u; }
+
+        String Spell(int n) => "n";
+        long Twice(int n) => (long)n * 2;
+        double Twice(double n) => n * 2.0;
+        int Pick(int n) => n;
+        String Pick(String s) => s;
+
+        int Main()
+        {
+            var numbers = [1, 2];
+
+        """;
+
+    private static string[] NamedBody(string body) =>
+        Front.ModuleCodes(Named + body + "\n    return 0;\n}");
+
+    /// <summary>
+    /// The result is read off the declaration, as it would be off a lambda's
+    /// body. This was SL0327 -- only a lambda was read -- and before that the
+    /// function could not become a closure at all.
+    /// </summary>
+    [Theory]
+    [InlineData("String result = Apply(numbers, Spell);")]
+    [InlineData("String result = numbers.Apply(Spell);")]
+    [InlineData("long result = Apply(numbers, Twice);")]
+    [InlineData("String result = Call(Spell, 3);")]
+    public void AResultTypeIsReadOffANamedFunction(string body) => Assert.Empty(NamedBody(body));
+
+    /// <summary>
+    /// And it is the right type: the overload the argument chose, whose
+    /// <c>long</c> will not quietly become a <c>double</c> or a <c>String</c>.
+    /// </summary>
+    [Theory]
+    [InlineData("int wrong = Apply(numbers, Twice);")]
+    [InlineData("String wrong = Apply(numbers, Twice);")]
+    public void TheOverloadIsChosenByTheInferredParameter(string body)
+    {
+        var codes = NamedBody(body);
+        Assert.NotEmpty(codes);
+        Assert.DoesNotContain("SL0327", codes);
+    }
+
+    /// <summary>
+    /// A name with one function of the arity settles the parameter types as
+    /// well; an overloaded one, with nothing else to choose by, is not guessed.
+    /// </summary>
+    [Fact]
+    public void AnUnoverloadedNameSettlesItsParameters() =>
+        Assert.Empty(NamedBody("nuint result = Shapes(Spell);"));
+
+    [Fact]
+    public void AnOverloadNothingNarrowsIsNotGuessed() =>
+        Assert.Equal(["SL0327"], NamedBody("nuint result = Shapes(Pick);"));
+
     // ------------------------------------------------------ nothing leaks
 
     /// <summary>

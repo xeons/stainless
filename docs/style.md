@@ -73,7 +73,7 @@ inside a long method, you know without scrolling that it is state belonging to
 this instance and that nothing outside the class can have written it. Reading
 `area`, you do not — it could equally be a local, a parameter, or something the
 uniform call syntax pulled in from another module. That ambiguity is worse here
-than it is in C#, because [§7.1.1](spec/07-functions-members.md#711-xfy-is-fxy)
+than it is in C#, because [§7.1.1](spec/07-functions-members.md#711-xfy-is-fx-y)
 means a bare name has more places it can come from.
 
 **It also removes the need for `this.`** as a disambiguator. A constructor
@@ -140,7 +140,7 @@ this tree has.
 
 **A single word is fine when the word is right.** `Take`, `Skip`, `Map`,
 `Filter`, `Find` are not sloppy — they are the pipeline vocabulary that
-[§7.1.1](spec/07-functions-members.md#711-xfy-is-fxy) exists to serve, and
+[§7.1.1](spec/07-functions-members.md#711-xfy-is-fx-y) exists to serve, and
 `names.Filter(keep).Map(Upper)` reads as well as LINQ does because the words are
 short. What a single word must not be is *vague*: `Update`, `Process`,
 `Handle`, `Do`, `Run` name nothing a caller can predict, and each should say
@@ -191,7 +191,8 @@ call is cheap.
   is a property.
 - **It can fail.** Anything returning `Result<T, TError>` is a method. A property
   that hands back a failure reads like a field and is not one.
-- **It gives back something different each call.** `Random.Next()` is a method.
+- **It gives back something different each call.** `Random.NextULong()` is a
+  method.
 - **It has a side effect.** `Read()`, `MoveNext()`, `Clear()` are methods even
   where they return a value, because the object is not the same afterwards.
 
@@ -232,8 +233,8 @@ than a strict sort would have been.
 
 **Write the modifier even where it is the default.** `private` on a private
 field, `internal` on an internal one. A reader should not have to remember what
-a missing word means, and the existing tree's bare `WindowedControl? owner;`
-is exactly the declaration the underscore rule is meant to make legible.
+a missing word means, and the existing tree's `WindowedControl? _owner;`, with
+the underscore and no modifier, still leaves that question to the reader.
 
 The exception is the `partial` halves of the compiler's `Binder`, where the
 established file-local style is already consistent and uniform.
@@ -285,7 +286,7 @@ for (nuint i = 0u; i < arguments.Length; i++)
 
 **Never on one line.** `if (owner == null) { return; }` packs a branch and its
 consequence into a single line where a reader's eye expects one thing, and it
-is the form this tree has most of. Both of these are wrong:
+is the form this tree had most of. Both of these are wrong:
 
 ```csharp
 if (owner == null) { return; }      // no
@@ -353,17 +354,11 @@ stop and check.
 
 **`+=` is right when the step is not one.** `i += 2`, `offset += stride`.
 
-**`for parallel` is the exception, and it is the language's.** Its step has to
-bind to an assignment whose right-hand side is an addition, because the loop is
-split into ranges before it runs and the binder reads the stride straight out of
-the syntax. `i++` is a different node and is refused:
+**`for parallel` is no exception.** Its step is read as a stride before the
+loop is split into ranges, and `i++` is a stride of one:
 
 ```csharp
-for parallel (int i = 0; i < 16; i += 1)    // the only form here
-```
-
-```
-error[SL0371]: a 'for parallel' step must be 'i = i + stride' or 'i += stride'
+for parallel (nuint i = 0u; i < pixels.Length; i++)
 ```
 
 ### 3.5 Whitespace
@@ -390,7 +385,7 @@ DockStyle        _docking;
 
 It looks tidy in the editor and costs a reflowed block every time a type is
 renamed, which puts unrelated lines in a diff and unrelated names in
-`git blame`. The tree has a good deal of this and it is being removed.
+`git blame`. The tree had a good deal of this, and the layout pass removed it.
 
 ### 3.6 Line length
 
@@ -503,9 +498,16 @@ a type nullable to silence a diagnostic you have not understood.
 [.editorconfig](../.editorconfig) holds the C# half — brace placement, the
 `_camelCase` and `s_camelCase` field rules, `var` usage, spacing — and
 [Directory.Build.props](../Directory.Build.props) sets
-`EnforceCodeStyleInBuild`, so the build checks them rather than leaving it to
-whichever IDE someone happens to have open. The compiler's C# already satisfies
-every rule there, which is what made turning it on free.
+`EnforceCodeStyleInBuild`, so the build checks some of them rather than leaving
+all of it to whichever IDE someone happens to have open. The compiler's C#
+already satisfies every rule there, which is what made turning it on free.
+
+**Not all of that file reaches the build.** The naming rules, the ban on
+`this.` and the predefined-type rules are at `warning` and are reported by
+`dotnet build`, as warnings rather than errors. Brace placement and spacing are
+formatting options with no `IDE0055` severity set, and the `var` and
+expression-body preferences are at `suggestion`, so those three are applied by
+an editor and not checked by the build.
 
 **The Stainless half is not machine-enforced yet.** There is no formatter for
 `.sl` and writing one is its own piece of work; until then this document is the

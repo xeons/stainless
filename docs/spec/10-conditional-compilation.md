@@ -27,7 +27,7 @@ part of "no preprocessor" that mattered; `#if` was never what made C headers
 what they are.
 
 **The directives** are `#if`, `#elif`, `#else`, `#endif`, `#define`, `#undef`,
-`#error`, `#warning`, `#region` and `#endregion`. Anything else is an error
+`#error`, `#warning`, `#region`, `#endregion` and `#pragma`. Anything else is an error
 rather than something to be ignored. A directive must begin its line, and may be
 indented; groups nest.
 
@@ -45,9 +45,9 @@ only.
 
 | Symbol | When |
 |---|---|
-| `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD` | the operating system |
+| `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD` | the operating system — still the host's, since `--target` does not change it yet |
 | `UNIX` | any of the above but Windows |
-| `X64`, `ARM64`, `X86`, `ARM` | the architecture being built for |
+| `X64`, `ARM64`, `X86` | the architecture being built for, which `--target` does change |
 | `STAINLESS` | always |
 
 Everything else comes from `-D` on the command line:

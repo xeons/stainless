@@ -74,8 +74,8 @@ Named honestly, since the point of the page is to say where the edges are.
 - **Closing a tab does not ask.** Unsaved work goes without a prompt, which
   wants a dialog and a decision about what "discard" means.
 - **The build blocks the window** for as long as it takes. It wants a thread and
-  a queue the message loop drains, which in turn wants `Forms` to have an answer
-  for marshalling to the UI thread.
+  a queue the message loop drains, and `Forms` has that now as `Background.Run`;
+  the IDE has not been moved onto it.
 
 ---
 

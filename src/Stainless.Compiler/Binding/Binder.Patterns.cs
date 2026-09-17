@@ -256,13 +256,19 @@ public sealed partial class Binder
             return null;
         }
 
-        if (subject.Type.AsReference() is not NamedTypeSymbol)
+        if (subject.Type.AsReference() is not NamedTypeSymbol subjectType)
         {
             diagnostics.Error("SL0619", syntax.Span,
                 $"'{subject.Type.Name}' is not a reference to an object, so what it really is " +
                 "is not a question");
             return null;
         }
+
+        // The pairings 'is' refuses, refused here for the same reasons: this
+        // is the same test, and it reaches the same emitter.
+        if ((wanted is ComInterfaceTypeSymbol || subjectType is ComInterfaceTypeSymbol) &&
+            !CanAskCom("SL0619", syntax.Span, subjectType, wanted))
+            return null;
 
         var reference = new BoundTypeTest(syntax.Span, PrimitiveTypeSymbol.Bool, subject, wanted);
 

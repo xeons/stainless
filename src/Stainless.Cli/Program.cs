@@ -120,8 +120,10 @@ internal static class Program
                                    compiler's own renames are kept as well
               --stdlib             (doc) document the standard library itself
               --metadata <path>    write module metadata for a Stainless consumer
-              --reference <path>   bind against a library's module metadata
-              --project <path>     the project file to build, or the directory holding it
+              -r, --reference <path>
+                                   bind against a library's module metadata, and
+                                   link the library found beside it
+              -p, --project <path> the project file to build, or the directory holding it
               --no-project         ignore any project file and use the paths alone
               --locked             fail rather than change the lock file (for CI)
               --offline            use the package cache and never the network
@@ -144,6 +146,7 @@ internal static class Program
                                    is passed (default: the host's)
               --keep               keep the generated .ll next to the output
               --obj <dir>          directory for intermediates (default: ./obj)
+              --                   (run) everything after this is passed to the program
               -h, --help           show this message
               -v, --version        show the version
 
@@ -155,9 +158,9 @@ internal static class Program
 
               Adding '--metadata' says the consumer will be Stainless rather than
               C, and widens the table to the public declarations that metadata
-              describes. The consumer then passes '--reference' and links the
-              library, and writes ordinary Stainless against a module it has no
-              source for.
+              describes. The consumer then passes '--reference', which links the
+              library beside that metadata, and writes ordinary Stainless against
+              a module it has no source for.
 
             EXAMPLES
               stainless run samples/hello.sl
@@ -167,7 +170,8 @@ internal static class Program
               stainless build src -o build/app.exe -O3
               stainless build src --shared -o build/math.dll --header build/math.h
               stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
-              stainless build app.sl -r build/shapes.slmod build/shapes.lib -o app.exe
+              stainless build app.sl -r build/shapes.slmod -o app.exe
+              stainless run app.sl -- first second  (arguments for the program)
               stainless build gui.sl -l user32 -l gdi32 -o gui.exe
               stainless emit-ir samples/hello.sl
             """);

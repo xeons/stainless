@@ -58,8 +58,9 @@ for one is a module-level generic function whose argument infers `T`.
 
 ## 4.2 Constraints
 
-A `where` clause says which interfaces a type argument must implement. It goes
-after the parameter list and after any base list, as in C#:
+A `where` clause says what a type argument must be — most often, which
+interfaces it must implement. It goes after the parameter list and after any
+base list, as in C#:
 
 ```csharp
 public interface IComparable<T> {
@@ -68,7 +69,7 @@ public interface IComparable<T> {
 
 T Largest<T>(T[] values) where T : IComparable<T> {
     var best = values[0];
-    for (nuint i = 1; i < values.Length; i = i + 1) {
+    for (nuint i = 1; i < values.Length; i++) {
         if (values[i].CompareTo(best) > 0) { best = values[i]; }
     }
     return best;
@@ -82,11 +83,12 @@ constraints, and a declaration several clauses:
 ```csharp
 public class Ranked<T> where T : IComparable<T>, IDescribable { ... }
 
-public class Table<K, V> where K : IComparable<K> where V : IDescribable { ... }
+public class Table<TKey, TValue> where TKey : IComparable<TKey> where TValue : IDescribable { ... }
 ```
 
-Only interfaces constrain. There is no `where T : SomeClass`, no `class` or
-`struct` kind constraint, and no `new()` constraint.
+An interface is not the only thing that may follow the colon: a base class,
+another type parameter, `class`, `struct`, `new()` and `threadsafe` may too, and
+[§4.3](#43-what-a-constraint-does-and-does-not-do) lists what each demands.
 
 ## 4.3 What a constraint does, and does not, do
 
@@ -119,7 +121,7 @@ error at the use site and a signature that states its requirements.
 | `U` | another type parameter of the same template | |
 | `class` | a reference type: counted, and may be null | |
 | `struct` | a value type: copied where it is assigned, never null | |
-| `new()` | a **class** with a public constructor taking no arguments | |
+| `new()` | a **class**, not abstract, with a public constructor taking no arguments — or with no constructor declared, which is given one ([§2.4.1](02-types.md#241-a-field-with-a-value)) | |
 | `threadsafe` | a type that says more than one thread may hold it ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) | |
 
 Several are separated by commas in one clause, and several clauses by repeating
@@ -197,6 +199,13 @@ Not yet:
   — or a generic interface's single method, which is where this started. They
   differ only in where the signature is written down.
 
+  A **function passed by name** is read the same way, off its declaration
+  instead of a body: in `Map(names, Upper)`, `T` is `String` from `names`, so
+  the `Upper` meant is the one taking a `String`, and what it returns is `R`.
+  Where the parameter types are not known yet, a name with exactly one function
+  of the right arity settles them too. An overloaded name that the known types
+  do not narrow to one says nothing, and the call is SL0327.
+
   Two limits, both reported as SL0327 rather than guessed at. A **block-bodied**
   lambda is not read this way — binding `n => { return n * 2; }` needs the
   return type that is being worked out — so write it as an expression, or name
@@ -217,16 +226,16 @@ public class List<T> {
         count = 0;
     }
 
-    public nuint Count() { return count; }
+    public nuint Count => count;
 
     public void Add(T item) {
         if (count == items.Length) {
             var bigger = new T[count * 2];
-            for (nuint i = 0; i < count; i = i + 1) { bigger[i] = items[i]; }
+            for (nuint i = 0; i < count; i++) { bigger[i] = items[i]; }
             items = bigger;
         }
         items[count] = item;
-        count = count + 1;
+        count++;
     }
 
     public T At(nuint index) { return items[index]; }

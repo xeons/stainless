@@ -39,8 +39,9 @@ Three things follow from that shape:
 - **Literals never allocate.** The compiler emits them as static constants with
   an *immortal* reference count, which `retain` and `release` skip entirely.
 
-Because a `String` owns a reference count, it cannot live in a `struct` —
-structs are copied as raw bytes, which is what keeps them C-compatible.
+Because a `String` owns a reference count, a `struct` holding one retains it on
+every copy and can no longer be handed to C ([§2.2](02-types.md#22-struct--value-type-c-layout)) — a struct of plain data is
+copied as raw bytes, which is what keeps it C-compatible.
 
 ## 3.2 Members
 
@@ -117,14 +118,14 @@ plus `StringBuilder`.
 **`FromDouble` writes the shortest text that reads back as the same number**,
 which is what C# and every modern runtime do: `0.1` rather than
 `0.10000000000000001`, and `3.141592653589793` rather than a rounding of it. A
-round number stays round -- `60`, not `6e+01` -- and an exponent appears only
+round number stays round — `60`, not `6e+01` — and an exponent appears only
 where it is genuinely shorter. `Standard.Convert`'s `ToDouble` is its inverse
 and is correctly rounded, so anything written can be read back unchanged.
 `AppendDouble` spells a number the same way, since two spellings for one number
 is a difference nobody looks for.
 
 `StringBuilder` appends (`Append`, `AppendLine`, `AppendInteger`,
-`AppendDouble`, `AppendByte`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
+`AppendDouble`, `AppendByte`, `AppendBytes`, `AppendCodePoint`, `AppendJoined`), reads (`ByteAt`, `IndexOf`,
 `Contains`) and edits (`Insert`, `Remove`, `Truncate`, `SetByteAt`,
 `ReplaceFirst`, `ReplaceAll`). Unlike `String` it hands out no pointer: its
 bytes are a growable allocation that moves, so a `byte*` into it would dangle at
@@ -180,7 +181,7 @@ returns `char16*`, and `ToText()`, which transcodes back.
 took the second would accept any 16-bit pointer within reach — an array of
 counts, a `short*` off by one field. Naming the units is what makes the wrong
 pointer a compile error, and it is the same move the handle types made against
-`void*` ([§2.2.1](02-types.md#221-struct-hwnd--a-type-declared-and-not-laid-out)). A cast still crosses between them where a C header really did
+`void*` ([§2.2.1](02-types.md#221-struct-hwnd__--a-type-declared-and-not-laid-out)). A cast still crosses between them where a C header really did
 mean a number.
 
 The return direction usually is not a `Utf16String` at all, because a wide API
@@ -228,7 +229,7 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 | `AppendInteger(long)`, `AppendDouble(double)` | `void` |
 | `AppendCodePoint(char32)` | `void`, encoded as UTF-8 |
 | `AppendJoined(sep, parts)` | `void` |
-| `ByteLength()`, `IsEmpty()`, `HasContent()` | `nuint`, `bool`, `bool` |
+| `ByteLength()`, `IsEmpty()`, `HasContent` | `nuint`, `bool`, `bool` |
 | `ByteAt(i)`, `SetByteAt(i, b)` | `byte`, `void` |
 | `IndexOf(String)`, `Contains(String)` | `long`, `bool` |
 | `Insert(at, String)`, `Remove(at, n)`, `Truncate(at)` | `void` |
@@ -236,9 +237,10 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 | `Clear()` | `void`, keeps the capacity |
 | `ToText()` | `String`, a snapshot; the builder stays usable |
 
-There is deliberately no `Append(long)` or `Append(double)`: an integer literal
-converts to both, so the two together would make `Append(42)` ambiguous, which
-is why the two were spelled out in the first place.
+There is deliberately no `Append(long)` or `Append(double)`. An integer literal
+converts to both, and although `Append(42)` would now choose `long`
+([§7.1](07-functions-members.md#71-functions)), a name that says what is written is still
+the clearer call — which is why the two were spelled out in the first place.
 
 Unlike `String`, its bytes are a separate growable allocation, so it is not
 NUL-terminated and has no `ToPointer()`. Call `ToText().ToPointer()` to reach C.
@@ -268,8 +270,8 @@ var back  = Encoding.Utf16().GetString(bytes);     // "héllo"
 
 | Member of `IEncoding` | Result |
 |---|---|
-| `Name()` | `String`, as IANA spells it |
-| `Preamble()` | `byte[]`, the byte order mark or empty |
+| `Name` | `String`, as IANA spells it |
+| `Preamble` | `byte[]`, the byte order mark or empty |
 | `GetByteCount(text)` | `nuint` |
 | `GetBytes(text)` | `byte[]` |
 | `GetString(bytes)` | `String` |
@@ -318,12 +320,13 @@ switch (port) {
 | `ToDouble` | `Result<double, ConvertError>` |
 | `FromLong(value, radix)` | `String` — base 10 is `Text.FromInteger` |
 | `ToHex(data)`, `FromHex(text)` | `String`, `Result<byte[], ConvertError>` |
-| `ToBase64(data)`, `ToBase64Url(data)` | `String` |
+| `ToBase64(data)`, `ToBase64Url(data)`, `ToBase64Text(text)` | `String` |
 | `FromBase64(text)` | `Result<byte[], ConvertError>`, either alphabet |
 
 Everything that can fail returns a `Result`. There is no `Parse` that stops the
-program and no `TryParse` with an out parameter, because the language has
-neither exceptions nor `out`.
+program, because the language has no exceptions, and no `TryParse` with an
+`out` parameter, because a conversion that fails has a reason to give and `out`
+is for the answer that has none ([§7.2.1](07-functions-members.md#721-out)).
 
 Two details worth knowing, because both are where a parser is usually wrong.
 The integer parsers accumulate as *unsigned* so that the most negative `long`,
@@ -342,7 +345,7 @@ Console.WriteLine($"clicks: {clicks}  at {x}, {y}");
 sugar over the `Text.From*` conversions that were already there, with one
 difference that is not cosmetic: the whole string is **joined in a single
 allocation**. The `+` chain it replaces calls `sl_string_concat` once per
-operator and throws every result but the last away -- the line above emits five
+operator and throws every result but the last away — the line above emits five
 calls written that way, and one written this way.
 
 An interpolation with no holes is a literal, and costs what one costs.
@@ -359,7 +362,7 @@ An interpolation with no holes is a literal, and costs what one costs.
 
 Anything else is refused (SL0557) rather than given a default. There is no
 `ToString` that every type owes, and inventing one to make this work would be a
-much larger decision than a formatting syntax -- every class would owe an
+much larger decision than a formatting syntax — every class would owe an
 implementation, and a default that printed a type name would be worse than
 nothing.
 
@@ -371,8 +374,8 @@ name yet; the error says so rather than printing a `1`.
 
 **Braces.** `{{` and `}}` are how a literal brace is written. A lone `}` closes
 nothing and is refused (SL0554), because it is far more often the end of a hole
-that was never opened. A hole may contain braces of its own -- an index, a
-nested interpolation, a string with braces in it -- and the depth is counted:
+that was never opened. A hole may contain braces of its own — an index, a
+nested interpolation, a string with braces in it — and the depth is counted:
 
 ```csharp
 $"deep {$"inner {n}"}"          // an interpolation inside a hole

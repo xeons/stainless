@@ -536,7 +536,7 @@ void Concurrency()
     // `for parallel` is the same thing said once: the body runs for every
     // index, and nothing it writes may be read by another iteration.
     var doubled = new int[16];
-    for parallel (int i = 0; i < 16; i += 1)
+    for parallel (int i = 0; i < 16; i++)
     {
         doubled[i] = values[i] * 2;
     }

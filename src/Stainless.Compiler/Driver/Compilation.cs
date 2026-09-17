@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using System.Text;
+using System.Text.RegularExpressions;
 using Stainless.Binding;
 using Stainless.Emit;
 using Stainless.Source;
@@ -206,28 +208,96 @@ public sealed record CompilationResult
 }
 
 /// <summary>Turns a linker failure into an explanation of who has to fix it.</summary>
-internal static class LinkDiagnosis
+public static class LinkDiagnosis
 {
     /// <summary>
     /// An undefined symbol is normally the program's own doing: an <c>extern "C"</c>
-    /// declaration whose library nothing linked. Saying "compiler bug" there sends
-    /// the reader to the wrong place, so that claim is kept for the case where the
-    /// toolchain objected to something the compiler itself wrote.
+    /// declaration whose library nothing linked, or a Stainless library bound
+    /// against through <c>--reference</c> whose binary was not beside its
+    /// metadata. Saying "compiler bug" there sends the reader to the wrong
+    /// place, so that claim is kept for the case where the toolchain objected to
+    /// something the compiler itself wrote.
+    ///
+    /// The two causes are told apart by the name, because they are fixed in
+    /// different places. Every name the program itself had to write as
+    /// <c>extern "C"</c> is a C name; a Stainless one is mangled, and starts
+    /// with <c>_SL</c>. This said <c>extern "C"</c> of both, which sent the
+    /// reader of <c>_SL3Lib5Total...</c> looking for a declaration that was
+    /// never written.
     /// </summary>
-    public static string Explain(string linkerOutput, string irPath) =>
-        Undefined(linkerOutput)
-            ? "the linker could not find everything the program refers to:\n" + linkerOutput +
-              "\nA name declared 'extern \"C\"' has to come from somewhere. Link what defines " +
-              "it:\n'-l <name>' for a library the linker can find on its own, or its path as " +
-              "an\nordinary input."
-            : "the native toolchain rejected the generated IR:\n" + linkerOutput +
-              $"\nThe IR is at {irPath}; this is a compiler bug, not a bug in your program.";
+    /// <param name="unlinkedReferences">
+    /// The libraries named by <c>--reference</c> metadata that could not be
+    /// found to link, by the name the metadata gives them.
+    /// </param>
+    public static string Explain(
+        string linkerOutput, string irPath, IReadOnlyList<string>? unlinkedReferences = null)
+    {
+        if (!Undefined(linkerOutput))
+            return "the native toolchain rejected the generated IR:\n" + linkerOutput +
+                   $"\nThe IR is at {irPath}; this is a compiler bug, not a bug in your program.";
+
+        var names = UndefinedNames(linkerOutput).ToList();
+        bool stainless = names.Any(IsStainlessName);
+
+        // A linker whose spelling was not recognised still said "undefined", so
+        // with no names to go on the C explanation stands as it always did.
+        bool c = names.Count == 0 || names.Any(n => !IsStainlessName(n));
+
+        var text = new StringBuilder("the linker could not find everything the program refers to:\n")
+            .Append(linkerOutput);
+
+        if (stainless)
+        {
+            text.Append("\nA name starting '_SL' is a Stainless function or type, and comes from " +
+                        "the library\nthat compiled it.");
+
+            bool one = unlinkedReferences is { Count: 1 };
+            if (unlinkedReferences is { Count: > 0 })
+                text.Append($" {Listed(unlinkedReferences)} {(one ? "was" : "were")} not beside " +
+                            $"{(one ? "its" : "their")} metadata to be linked, so\n" +
+                            $"pass {(one ? "it" : "each")} as an ordinary input -- the import " +
+                            "library, on Windows.");
+            else
+                text.Append(" Pass that library as an ordinary input -- the import library, on\n" +
+                            "Windows -- or keep it beside the metadata '--reference' names.");
+        }
+
+        if (c)
+            text.Append("\nA name declared 'extern \"C\"' has to come from somewhere. Link what defines " +
+                        "it:\n'-l <name>' for a library the linker can find on its own, or its path as " +
+                        "an\nordinary input.");
+
+        return text.ToString();
+    }
+
+    private static string Listed(IReadOnlyList<string> libraries) =>
+        string.Join(", ", libraries.Select(l => $"'{l}'"));
 
     /// <summary>How the three linkers Stainless drives each spell it.</summary>
     private static bool Undefined(string output) =>
         output.Contains("undefined symbol", StringComparison.OrdinalIgnoreCase) ||
         output.Contains("undefined reference", StringComparison.OrdinalIgnoreCase) ||
         output.Contains("unresolved external symbol", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The missing names, as lld-link (<c>undefined symbol: name</c>), GNU ld and
+    /// lld (<c>undefined reference to `name'</c> and <c>undefined symbol: name</c>)
+    /// and link.exe (<c>unresolved external symbol name</c>) write them.
+    /// </summary>
+    private static IEnumerable<string> UndefinedNames(string output) =>
+        Regex.Matches(
+                output,
+                @"(?:undefined symbol:\s*|undefined reference to [`']|unresolved external symbol\s+)" +
+                @"([^\s`'""()]+)",
+                RegexOptions.IgnoreCase)
+            .Select(m => m.Groups[1].Value);
+
+    /// <summary>
+    /// A mangled Stainless name. On 32-bit Windows the target's own underscore
+    /// comes first, so one or two of them may precede the <c>SL</c>.
+    /// </summary>
+    private static bool IsStainlessName(string name) =>
+        Regex.IsMatch(name, @"^_{1,2}SL(?:\d|ti|destroy_)");
 }
 
 /// <summary>
@@ -495,6 +565,8 @@ public sealed class Compilation
 
         // --- bind --------------------------------------------------------
         var references = new List<ModuleMetadata>();
+        var referenceLinkInputs = new List<string>();
+        var unlinkedReferences = new List<string>();
         foreach (string path in options.References)
         {
             var metadata = ModuleMetadata.Read(path, out string referenceError);
@@ -514,6 +586,17 @@ public sealed class Compilation
                     "'--runtime'.");
 
             references.Add(metadata);
+
+            // The metadata names the library it describes, and a library built
+            // with '--metadata' leaves the two side by side. So what to link is
+            // already known, and asking for it again on the command line only
+            // gave a link error to anyone who took '--reference' to mean what it
+            // says. A library that has been moved away from its metadata is
+            // still linked by naming it as an input, and is explained below if
+            // it is not.
+            string linkInput = ReferencedLinkInput(path, metadata, target);
+            if (File.Exists(linkInput)) referenceLinkInputs.Add(linkInput);
+            else unlinkedReferences.Add(metadata.Library);
         }
 
         // Documenting is reading, not building: there is nothing to run, so
@@ -722,6 +805,12 @@ public sealed class Compilation
         var nativeInputs = new List<string>(options.NativeInputs);
         if (target.IsWindows) nativeInputs.AddRange(compiledResources);
 
+        // Once each, however it was reached: a project build and a command line
+        // that still names the import library both pass it already.
+        foreach (string linkInput in referenceLinkInputs)
+            if (!nativeInputs.Any(given => SamePath(given, linkInput)))
+                nativeInputs.Add(linkInput);
+
         // A library whose export names differ from its symbols needs the linker
         // told which is which, and the author may have names of their own to
         // add. Null where neither is true, which is the usual answer.
@@ -731,7 +820,8 @@ public sealed class Compilation
         var link = toolchain.Link(
             irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
             options.Shared, options.Debug, libraries, sharedRuntime, moduleDefinition);
-        if (!link.Success) return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath));
+        if (!link.Success)
+            return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath, unlinkedReferences));
 
         // The loader looks beside the binary, so that is where the runtime goes.
         // Both a program and a Stainless library need it there, and they are
@@ -1044,6 +1134,24 @@ public sealed class Compilation
     /// because a debug build needs it before the program has been bound and so
     /// before the default output name is known.
     /// </summary>
+    /// <summary>
+    /// What a link line names for the library a <c>--reference</c> describes:
+    /// its import library on Windows and the shared object itself elsewhere,
+    /// looked for beside the metadata. The rule a project build links a shared
+    /// dependency by, and the runtime too.
+    /// </summary>
+    private static string ReferencedLinkInput(string metadataPath, ModuleMetadata metadata, TargetPlatform target)
+    {
+        string library = Path.Combine(
+            Path.GetDirectoryName(Path.GetFullPath(metadataPath)) ?? ".", metadata.Library);
+        return target.IsWindows ? Path.ChangeExtension(library, ".lib") : library;
+    }
+
+    private static bool SamePath(string left, string right) =>
+        string.Equals(
+            Path.GetFullPath(left), Path.GetFullPath(right),
+            OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+
     private static string IntermediateDirectory(CompilationOptions options) =>
         options.IntermediateDirectory
         ?? Path.Combine(

@@ -17,12 +17,14 @@ class Choices
 {
     public String Show(long n) => "long";
     public String Show(nuint n) => "nuint";
+    public String Pair(int a, long b) => "int, long";
+    public String Pair(long a, int b) => "long, int";
 }
 
 String Ambiguous()
 {
     var choices = new Choices();
-    return choices.Show(1);       // a literal fits both
+    return choices.Pair(1, 2);    // each is better for one argument
 }
 
 String Missing()

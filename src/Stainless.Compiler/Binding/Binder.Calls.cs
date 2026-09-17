@@ -1647,8 +1647,108 @@ public sealed partial class Binder
 
                 if (exact.Count == 1) return exact[0];
 
+                if (Best(viable, arguments, written) is { } best) return best;
+
                 diagnostics.Error("SL0264", span, $"the call to '{name}' is ambiguous");
                 return null;
         }
+    }
+
+    /// <summary>
+    /// The one candidate whose every argument converts at least as well as it
+    /// does for each of the others, and one of them better -- or null when
+    /// there is no such candidate.
+    ///
+    /// C#'s rule, and for the reason C# has it. Without it only an exact match
+    /// could win, so `Text.FromInteger` of a `byte`, a `uint` or an integer
+    /// literal was ambiguous between its `long`, `ulong` and `nuint` overloads
+    /// on every target: each widens to all three, and "fits several" was
+    /// treated as "fits several equally". A `byte` fits a `long` better than a
+    /// `ulong`, and saying so is what the spec's "equally" already implied.
+    /// </summary>
+    private FunctionSymbol? Best(
+        List<FunctionSymbol> viable, List<BoundExpression> arguments,
+        IReadOnlyList<ExpressionSyntax>? written)
+    {
+        var shapes = viable.Select(c => ParameterTypesByArgument(c, arguments.Count, written)).ToList();
+
+        var winners = viable
+            .Where((_, i) => Enumerable.Range(0, viable.Count)
+                .All(j => j == i || IsBetter(shapes[i], shapes[j], arguments)))
+            .ToList();
+
+        return winners.Count == 1 ? winners[0] : null;
+    }
+
+    /// <summary>
+    /// The parameter type each argument lands on for one candidate, or null
+    /// past the declared parameters, where a C variadic's arguments go.
+    /// </summary>
+    private static TypeSymbol?[] ParameterTypesByArgument(
+        FunctionSymbol candidate, int count, IReadOnlyList<ExpressionSyntax>? written)
+    {
+        var parameters = candidate.Parameters.Where(p => !p.IsThis).ToList();
+        var types = new TypeSymbol?[count];
+        int[]? map = MapArguments(parameters, count, written, candidate.IsVariadic, out _);
+        if (map is null) return types;
+
+        for (int p = 0; p < parameters.Count; p++)
+            if (map[p] >= 0)
+                types[map[p]] = parameters[p].Type;
+
+        return types;
+    }
+
+    /// <summary>No argument converts worse to <paramref name="first"/>, and one converts better.</summary>
+    private bool IsBetter(TypeSymbol?[] first, TypeSymbol?[] second, List<BoundExpression> arguments)
+    {
+        bool better = false;
+
+        for (int i = 0; i < arguments.Count; i++)
+        {
+            int comparison = CompareConversions(arguments[i], first[i], second[i]);
+            if (comparison < 0) return false;
+            if (comparison > 0) better = true;
+        }
+
+        return better;
+    }
+
+    /// <summary>
+    /// Positive when <paramref name="argument"/> converts better to
+    /// <paramref name="first"/> than to <paramref name="second"/>, negative for
+    /// the reverse, and zero when neither is better.
+    ///
+    /// Identity is best. Otherwise the target that converts to the other and
+    /// not back is the more specific, as <c>long</c> is to <c>double</c> and a
+    /// derived class is to its base. Two integers neither of which holds the
+    /// other are settled towards the signed one, as C# settles them: a
+    /// <c>uint</c> reaching <c>long</c> or <c>ulong</c> keeps its value
+    /// either way, and the signed type is the one arithmetic expects.
+    /// </summary>
+    private int CompareConversions(BoundExpression argument, TypeSymbol? first, TypeSymbol? second)
+    {
+        if (first is null || second is null || first.Equals(second)) return 0;
+
+        // A draft waiting to be told its type, or an argument already reported,
+        // has no conversion to rank.
+        if (argument.Type.IsError()) return 0;
+
+        if (argument.Type.Equals(first)) return 1;
+        if (argument.Type.Equals(second)) return -1;
+
+        bool firstToSecond = ClassifyConversion(first, second, explicitCast: false) is not null;
+        bool secondToFirst = ClassifyConversion(second, first, explicitCast: false) is not null;
+        if (firstToSecond != secondToFirst) return firstToSecond ? 1 : -1;
+
+        if (first is PrimitiveTypeSymbol { IsInteger: true, IsCodeUnit: false } a &&
+            second is PrimitiveTypeSymbol { IsInteger: true, IsCodeUnit: false } b &&
+            a.IsSigned != b.IsSigned)
+        {
+            var (signed, unsigned) = a.IsSigned ? (a, b) : (b, a);
+            if (unsigned.Size >= signed.Size) return a.IsSigned ? 1 : -1;
+        }
+
+        return 0;
     }
 }

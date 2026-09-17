@@ -39,7 +39,7 @@ a symbol rather than defining one — but only one of them should make it
 
 **A `...` may be called and not written.** `printf` is bound with one and works;
 a function this program *defines* may not have one, whatever its linkage. Nothing
-in the language reads the extra arguments -- there is no `va_list` -- so the
+in the language reads the extra arguments — there is no `va_list` — so the
 definition would ignore them while the generated header promised the variadic
 convention, which on Win64 wants floating-point arguments duplicated into the
 integer registers and on SysV wants `al` to carry a vector-register count. The
@@ -168,9 +168,9 @@ is encoded at all, and how a repeated type is abbreviated:
 | `geometry::area(double, double)` | `_ZN8geometry4areaEdd` | `?area@geometry@@YANNN@Z` |
 | `geometry::mix(int*, double*, int*)` | `_ZN8geometry3mixEPiPdS0_` | `?mix@geometry@@YAHPEAHPEAN0@Z` |
 
-The compiler emits whichever the target uses, and `STAINLESS_CPP_ABI` overrides
-the choice so that the scheme a host does not use can still be checked against a
-real compiler.
+The compiler emits whichever the target uses. `--abi microsoft` or `--abi
+itanium` overrides the choice, as does `STAINLESS_CPP_ABI`, so that the scheme a
+host does not use can still be checked against a real compiler.
 
 Both schemes are stable, which is what makes this worth writing: Itanium has
 been for far longer, and Microsoft's since Visual Studio 2015, whose v140
@@ -273,7 +273,9 @@ on one side of it.** A managed reference appears in a generated header as
 dereference or free.
 
 Lifting that restriction means shipping the Stainless runtime as its own shared
-library, so both sides count against the same allocator. That is not done yet.
+library, so both sides count against the same allocator. `--runtime shared` does
+that, and is the default where two Stainless binaries meet
+([§8.4](#84-a-stainless-library-consumed-by-stainless)).
 
 ## 8.4 A Stainless library consumed by Stainless
 
@@ -284,12 +286,18 @@ source, so something has to carry what the source would have said.
 
 ```
 stainless build lib --shared -o build/shapes.dll --metadata build/shapes.slmod
-stainless build app.sl --reference build/shapes.slmod build/shapes.lib -o app.exe
+stainless build app.sl --reference build/shapes.slmod -o app.exe
 ```
 
 The `.slmod` is generated, never edited, and cannot drift from the library
 because it is written from the same bound program. It describes the public
 surface: layouts, field offsets, signatures, and the linker names to call.
+
+The metadata names its library, and **`--reference` links it** from beside the
+`.slmod` — the import library on Windows, the shared object elsewhere. It used
+to take the library as a second input, and leaving that off was a link error
+about a name nobody had declared. A library moved away from its metadata is
+still passed as an ordinary input.
 
 ```csharp
 import Library.Shapes;                  // a module this compilation has no source for
@@ -327,7 +335,7 @@ for `--metadata` says something different — that another Stainless compilation
 will bind against this — and that surface is exactly the public declarations the
 metadata describes.
 
-**What does not cross, and why.** Both are consequences of the language
+**What does not cross, and why.** Each is a consequence of the language
 compiling a whole program at once, and the compiler says so where the library is
 built rather than leaving the consumer to find a public type mysteriously
 missing:
@@ -480,10 +488,12 @@ Two things follow, and both are consequences rather than choices:
 
 What the attribute costs is everything `IUnknown` was for. There is no `[Guid]`
 (SL0624) — an IID names an interface *to QueryInterface*, and there is none to
-ask. There is no `is` and no cast between two such interfaces, for the same
-reason. And a chain is all one kind or the other (SL0622): extending across
-would put `IUnknown` three slots into the middle of one table. It may be
-written only on a `com interface` (SL0623).
+ask. For the same reason nothing can ask what such a reference really is: there
+is no cast to or from another com interface (SL0243), no `is` (SL0518) and no
+type pattern (SL0619), whichever side the `[NoUnknown]` is on. And a chain is
+all one kind or the other (SL0622): extending across would put `IUnknown` three
+slots into the middle of one table. It may be written only on a
+`com interface` (SL0623).
 
 A cast from `byte*` still adopts the pointer, and adopting costs nothing here
 because there was no `+1` to take over:
@@ -656,7 +666,7 @@ the function referring to it, so compiling a module full of `extern "C"`
 declarations does not cost anything, but compiling a *wrapper* that calls one
 makes its library necessary whether or not the program ever reaches it. That is
 why [bindings/win32](../../bindings/win32) is source a program chooses to compile
-rather than part of the standard library, which is compiled into everything --
+rather than part of the standard library, which is compiled into everything —
 and why it keeps its declarations in `Win32.<Dll>` modules apart from the
 conveniences, so that importing the whole Windows API can stay free.
 
