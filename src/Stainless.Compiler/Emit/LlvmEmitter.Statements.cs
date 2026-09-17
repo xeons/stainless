@@ -52,6 +52,7 @@ public sealed partial class LlvmEmitter
             case BoundParallel parallel: EmitParallel(parallel); break;
             case BoundParallelFor parallelFor: EmitParallelFor(parallelFor); break;
             case BoundSpawn spawn: EmitSpawn(spawn); break;
+            case BoundAsm assembly: EmitAsm(assembly); break;
             case BoundReturn returnStatement: EmitReturn(returnStatement); break;
             case BoundBreak: EmitJump(isBreak: true); break;
             case BoundContinue: EmitJump(isBreak: false); break;

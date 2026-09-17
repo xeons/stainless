@@ -184,8 +184,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 324 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,126 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 350 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,269 compiler unit tests
 ```
 
 Then run something:

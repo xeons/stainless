@@ -161,7 +161,7 @@ public class Scanner
     void Fill()
     {
         String[] reserved = [
-            "abstract", "alignof", "as", "attribute", "base", "break", "case",
+            "abstract", "alignof", "as", "asm", "attribute", "base", "break", "case",
             "class", "com", "const", "continue", "default", "delegate", "do",
             "else", "embed", "enum", "export", "extern", "false", "for", "foreach",
             "goto", "if", "iidof", "import", "in", "interface", "is", "module",

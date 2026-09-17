@@ -998,6 +998,60 @@ public sealed class BoundFor(
 }
 
 /// <summary>
+/// One register of an <c>asm</c> statement and what it is paired with.
+/// </summary>
+/// <param name="value">
+/// For <c>in</c>, the value, already converted where a literal had to be; for
+/// <c>out</c> and <c>inout</c>, the place, which has an address.
+/// </param>
+/// <param name="constraint">The register as LLVM is to be told it.</param>
+public sealed class BoundAsmOperand(
+    SourceSpan span, Syntax.AsmDirection direction, AsmRegister register, string constraint,
+    BoundExpression value)
+{
+    public SourceSpan Span { get; } = span;
+    public Syntax.AsmDirection Direction { get; } = direction;
+    public AsmRegister Register { get; } = register;
+    public string Constraint { get; } = constraint;
+    public BoundExpression Value { get; } = value;
+
+    public bool IsInput => Direction != Syntax.AsmDirection.Out;
+    public bool IsOutput => Direction != Syntax.AsmDirection.In;
+}
+
+/// <summary>
+/// <c>asm (operands) { text }</c>: one LLVM inline-assembly call.
+///
+/// The clobbers are decided here rather than by the emitter, because they are
+/// the rule the language states — every register a C call may change, and
+/// every operand's register — and the binder is where the target is known in
+/// the terms that rule is written in.
+/// </summary>
+public sealed class BoundAsm(
+    SourceSpan span, string text, SourceSpan textSpan, IReadOnlyList<BoundAsmOperand> operands,
+    IReadOnlyList<string> clobbers) : BoundStatement(span)
+{
+    /// <summary>The instructions, exactly as written between the braces.</summary>
+    public string Text { get; } = text;
+
+    /// <summary>The braces and what is between them, in the source.</summary>
+    public SourceSpan TextSpan { get; } = textSpan;
+
+    public IReadOnlyList<BoundAsmOperand> Operands { get; } = operands;
+
+    /// <summary>Every register the block is assumed to change, in LLVM's spelling.</summary>
+    public IReadOnlyList<string> Clobbers { get; } = clobbers;
+
+    /// <summary>
+    /// True when an operand was refused and left out, which is an error already
+    /// reported. The flow analysis takes such a block to have written
+    /// everything, so that one mistake is not also reported as an 'out' left
+    /// unwritten.
+    /// </summary>
+    public bool IsIncomplete { get; init; }
+}
+
+/// <summary>
 /// A fork-join scope. The emitter opens a runtime scope before the body and
 /// joins it after, so nothing spawned inside can outlive the block.
 /// </summary>

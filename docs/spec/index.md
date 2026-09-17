@@ -2,7 +2,7 @@
 
 # Stainless Language Specification
 
-<sub>Draft 145</sub>
+<sub>Draft 146</sub>
 
 > **An extreme rough draft.** This describes an experiment rather than a settled
 > design; anything here may change, and several sections describe behaviour that
@@ -169,7 +169,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 
 ### [8. Interoperability and libraries](08-interop-libraries.md)
 
-`extern`/`export`, C++ linkage, shared libraries, what crosses a boundary, COM, linking a platform library, and embedding a file.
+`extern`/`export`, C++ linkage, shared libraries, what crosses a boundary, COM, linking a platform library, embedding a file, and inline assembly.
 
 - [8.1 C++ linkage](08-interop-libraries.md#81-c-linkage)
 - [8.2 Building a shared library](08-interop-libraries.md#82-building-a-shared-library)
@@ -178,6 +178,13 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [8.5 COM](08-interop-libraries.md#85-com)
 - [8.6 Linking a platform library](08-interop-libraries.md#86-linking-a-platform-library)
 - [8.7 Embedding a file](08-interop-libraries.md#87-embedding-a-file)
+- [8.8 Inline assembly](08-interop-libraries.md#88-inline-assembly)
+  - [8.8.1 Operands](08-interop-libraries.md#881-operands)
+  - [8.8.2 Registers](08-interop-libraries.md#882-registers)
+  - [8.8.3 What a block may change](08-interop-libraries.md#883-what-a-block-may-change)
+  - [8.8.4 The text](08-interop-libraries.md#884-the-text)
+  - [8.8.5 What is undefined](08-interop-libraries.md#885-what-is-undefined)
+  - [8.8.6 Examples](08-interop-libraries.md#886-examples)
 
 ### [9. Statements and expressions](09-statements-expressions.md)
 

@@ -85,4 +85,80 @@ public class LinkDiagnosisTests
         string text = LinkDiagnosis.Explain("error: invalid IR", "app.ll");
         Assert.Contains("compiler bug", text);
     }
+
+    // ---------------------------------------------------------- the assembler
+
+    /// <summary>A block whose braces start at the given offset of the source.</summary>
+    private static Binding.BoundAsm Block(Source.SourceText file, int brace)
+    {
+        int end = file.Text.IndexOf('}', brace) + 1;
+        var span = new Source.SourceSpan(file, brace, end);
+        return new Binding.BoundAsm(span, file.Text[(brace + 1)..(end - 1)], span, [], []);
+    }
+
+    /// <summary>
+    /// LLVM numbers the lines of what it was given and does not say which block
+    /// it was. On x86 the text after the brace is its second line, and the line
+    /// it echoes is what finds the block among several.
+    /// </summary>
+    [Fact]
+    public void AnAssemblerErrorGoesBackToItsLine()
+    {
+        const string source = "asm {\n    nop\n}\nasm {\n    mov rax, 1\n    bogus rax\n}";
+        var file = Front.Text(source);
+        var blocks = new[] { Block(file, source.IndexOf('{')), Block(file, source.LastIndexOf('{')) };
+
+        const string output =
+            "<inline asm>:4:5: error: invalid instruction mnemonic 'bogus'\n" +
+            "    bogus rax\n" +
+            "    ^~~~~\n" +
+            "error: cannot compile inline asm\n";
+
+        Assert.True(AssemblerDiagnosis.Rejected(output));
+
+        var diagnostics = new Source.DiagnosticBag();
+        AssemblerDiagnosis.Report(output, blocks, Binding.TargetPlatform.X64Windows, diagnostics);
+
+        var diagnostic = Assert.Single(diagnostics.Items);
+        Assert.Equal("SL0723", diagnostic.Code);
+        Assert.Equal("bogus rax", Front.Underlined(source, diagnostic));
+        Assert.Contains("invalid instruction mnemonic 'bogus'", diagnostic.Message);
+    }
+
+    /// <summary>ARM has one syntax, so nothing comes before the block's own first line.</summary>
+    [Fact]
+    public void AnArm64AssemblerErrorIsNotOffset()
+    {
+        const string source = "asm { add x0, x0, #1\nbad x0 }";
+        var file = Front.Text(source);
+
+        const string output = "<inline asm>:2:1: error: unrecognized instruction mnemonic\nbad x0 \n^\n";
+
+        var diagnostics = new Source.DiagnosticBag();
+        AssemblerDiagnosis.Report(
+            output, [Block(file, source.IndexOf('{'))], Binding.TargetPlatform.Arm64Linux, diagnostics);
+
+        Assert.Equal("bad x0", Front.Underlined(source, Assert.Single(diagnostics.Items)));
+    }
+
+    /// <summary>
+    /// An error with no line to put it on still belongs to the program rather
+    /// than to the compiler, so it is reported against a block in LLVM's words.
+    /// </summary>
+    [Fact]
+    public void AnAssemblerErrorWithNoLineIsStillTheProgramsOwn()
+    {
+        const string source = "asm { jmp nowhere }";
+        var file = Front.Text(source);
+        const string output = "<unknown>:0: error: assembler label 'nowhere' can not be undefined\n" +
+                              "error: cannot compile inline asm\n";
+
+        var diagnostics = new Source.DiagnosticBag();
+        AssemblerDiagnosis.Report(
+            output, [Block(file, source.IndexOf('{'))], Binding.TargetPlatform.X64Linux, diagnostics);
+
+        var diagnostic = Assert.Single(diagnostics.Items);
+        Assert.Equal("SL0723", diagnostic.Code);
+        Assert.Contains("can not be undefined", diagnostic.Message);
+    }
 }

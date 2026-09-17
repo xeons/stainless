@@ -928,6 +928,48 @@ public sealed record GotoSyntax(SourceSpan Span, string Label, SourceSpan LabelS
 public sealed record CheckedBlockSyntax(
     SourceSpan Span, BlockSyntax Body, bool IsChecked) : StatementSyntax(Span);
 
+/// <summary>Which way an <c>asm</c> operand's value travels.</summary>
+public enum AsmDirection
+{
+    /// <summary>Into the register before the block runs.</summary>
+    In,
+
+    /// <summary>Out of the register after the block has run.</summary>
+    Out,
+
+    /// <summary>Both: the place is read into the register and written back from it.</summary>
+    InOut,
+}
+
+/// <summary>
+/// <c>in rcx = count</c>, <c>out rax = low</c> or <c>inout rdx = total</c>:
+/// one register and the value or place it is paired with. The register is a
+/// name here and nothing more, because which names are registers depends on
+/// the target and the target is the binder's to know.
+/// </summary>
+public sealed record AsmOperandSyntax(
+    SourceSpan Span,
+    AsmDirection Direction,
+    string Register,
+    SourceSpan RegisterSpan,
+    ExpressionSyntax Value) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>asm (operands) { text }</c> — instructions for the target's assembler,
+/// written inside a function.
+///
+/// <see cref="Text"/> is what was between the braces, untouched; the lexer
+/// captured it as one token, since assembly is not Stainless and cutting it
+/// into Stainless tokens would lose it. <see cref="TextSpan"/> covers the
+/// braces as well, which is what lets a complaint from the assembler be put
+/// back on the line it was about.
+/// </summary>
+public sealed record AsmSyntax(
+    SourceSpan Span,
+    IReadOnlyList<AsmOperandSyntax> Operands,
+    string Text,
+    SourceSpan TextSpan) : StatementSyntax(Span);
+
 // ---------------------------------------------------------------- expressions
 
 public abstract record ExpressionSyntax(SourceSpan Span) : SyntaxNode(Span);

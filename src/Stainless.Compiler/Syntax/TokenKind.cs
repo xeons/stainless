@@ -22,6 +22,9 @@ public enum TokenKind
     Identifier, IntLiteral, FloatLiteral, StringLiteral, CharLiteral,
     InterpolatedString,
 
+    // The text of an `asm` block, from its `{` to its matching `}`, as one token.
+    AsmBody,
+
     // Declaration keywords
     ModuleKeyword, ImportKeyword, AsKeyword, UsingKeyword,
     VirtualKeyword, OverrideKeyword, AbstractKeyword, SealedKeyword,
@@ -35,7 +38,7 @@ public enum TokenKind
     // Statement keywords
     IfKeyword, ElseKeyword, WhileKeyword, DoKeyword, ForKeyword, ForeachKeyword, InKeyword,
     SwitchKeyword, CaseKeyword, DefaultKeyword,
-    ParallelKeyword, SpawnKeyword,
+    ParallelKeyword, SpawnKeyword, AsmKeyword,
     ReturnKeyword, BreakKeyword, ContinueKeyword, GotoKeyword,
     VarKeyword, ConstKeyword, WhereKeyword, StaticKeyword, ReadonlyKeyword,
     ThreadsafeKeyword,
@@ -113,6 +116,7 @@ public static class TokenKindExtensions
         TokenKind.DefaultKeyword => "default",
         TokenKind.ParallelKeyword => "parallel",
         TokenKind.SpawnKeyword => "spawn",
+        TokenKind.AsmKeyword => "asm",
         TokenKind.ReturnKeyword => "return",
         TokenKind.BreakKeyword => "break",
         TokenKind.ContinueKeyword => "continue",
@@ -219,6 +223,7 @@ public static class TokenKindExtensions
         TokenKind.StringLiteral => "a string literal",
         TokenKind.CharLiteral => "a character literal",
         TokenKind.InterpolatedString => "an interpolated string",
+        TokenKind.AsmBody => "an assembly block",
         TokenKind.EndOfFile => "end of file",
         _ => kind.FixedText() is { } t ? "'" + t + "'" : kind.ToString(),
     };

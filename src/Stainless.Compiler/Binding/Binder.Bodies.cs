@@ -874,6 +874,10 @@ public sealed partial class Binder
         if (node is Syntax.AssignmentSyntax assignment && RootName(assignment.Target) is { } assigned)
             names.Add(assigned);
 
+        if (node is Syntax.AsmOperandSyntax { Direction: not Syntax.AsmDirection.In } output &&
+            RootName(output.Value) is { } stored)
+            names.Add(stored);
+
         foreach (var child in ChildNodes(node)) CollectAssignedNames(child, names);
     }
 
@@ -1052,6 +1056,16 @@ public sealed partial class Binder
                 Assigns(parallel.Body, target, assigned, owner);
                 return assigned;
 
+            // An output is stored once the block has run, which is as certain
+            // as an assignment: nothing in the language can leave the block
+            // any other way.
+            case BoundAsm assembly:
+                return assigned || assembly.IsIncomplete || assembly.Operands.Any(o =>
+                    o.IsOutput
+                        ? o.Value is BoundParameterAccess written &&
+                          ReferenceEquals(written.Parameter, target)
+                        : Writes(o.Value, target));
+
             default:
                 return assigned;
         }
@@ -1171,6 +1185,7 @@ public sealed partial class Binder
         LabelSyntax label => BindLabel(label),
         GotoSyntax jump => BindGoto(jump),
         CheckedBlockSyntax guarded => BindCheckedBlock(guarded),
+        AsmSyntax assembly => BindAsm(assembly),
         ForSyntax forStatement => BindFor(forStatement),
         ForEachSyntax forEach => BindForEach(forEach),
         ParallelSyntax parallel => BindParallel(parallel),
@@ -1556,6 +1571,203 @@ public sealed partial class Binder
         var body = BindBlock(syntax.Body);
         _checkedArithmetic = previous;
         return body;
+    }
+
+    /// <summary>
+    /// <c>asm (in rcx = n, out rax = r) { ... }</c>.
+    ///
+    /// The text is not looked at: it is the target assembler's, and that
+    /// assembler is where a mistake in it is found (SL0723, from the driver).
+    /// What is checked here is everything the assembler cannot see — which
+    /// registers exist on this target, what a value may be to travel in one,
+    /// and whether an output has somewhere to go.
+    /// </summary>
+    private BoundStatement BindAsm(AsmSyntax syntax)
+    {
+        var target = TargetPlatform.Current;
+        var operands = new List<BoundAsmOperand>();
+        var named = new Dictionary<string, AsmOperandSyntax>(StringComparer.Ordinal);
+
+        foreach (var operand in syntax.Operands)
+        {
+            // Bound first, so that a mistake in the expression is reported even
+            // when the register is also wrong.
+            var value = BindExpression(operand.Value);
+
+            if (AsmRegisters.Find(target, operand.Register) is not { } register)
+            {
+                diagnostics.Error("SL0716", operand.RegisterSpan,
+                    $"'{operand.Register}' is not a register an operand can name on " +
+                    $"{AsmRegisters.ArchitectureName(target)}, which is what this build is " +
+                    $"for; the registers are {AsmRegisters.Examples(target)}");
+                continue;
+            }
+
+            if (register.Refusal is { } refusal)
+            {
+                diagnostics.Error("SL0717", operand.RegisterSpan,
+                    $"'{register.Name}' cannot be an 'asm' operand: it is {refusal}");
+                continue;
+            }
+
+            // One `in` and one `out` may share a register: the value goes in from
+            // one place and comes out to another, which is `inout` with the two
+            // places different, and the first thing anyone writes for it.
+            string direction = operand.Direction switch
+            {
+                AsmDirection.In => "in",
+                AsmDirection.Out => "out",
+                _ => "inout",
+            };
+
+            if (named.TryGetValue(register.Whole + "/" + direction, out var earlier) ||
+                named.TryGetValue(register.Whole + "/inout", out earlier) ||
+                (operand.Direction == AsmDirection.InOut &&
+                 (named.TryGetValue(register.Whole + "/in", out earlier) ||
+                  named.TryGetValue(register.Whole + "/out", out earlier))))
+            {
+                bool sameName = string.Equals(
+                    earlier.Register, operand.Register, StringComparison.OrdinalIgnoreCase);
+
+                diagnostics.Error("SL0718", operand.RegisterSpan,
+                    $"'{operand.Register}' is named twice" +
+                    (sameName ? "" : $", the first time as '{earlier.Register}'") +
+                    "; a register holds one value going in and one coming out, so it may be " +
+                    "one 'in' and one 'out', or one 'inout'");
+                continue;
+            }
+
+            named[register.Whole + "/" + direction] = operand;
+
+            if (value.Type.IsError()) continue;
+
+            if (operand.Direction != AsmDirection.Out)
+                value = AsmLiteral(value, register);
+
+            if (!AsmValueFits(operand, register, value)) continue;
+
+            if (operand.Direction != AsmDirection.In && !AsmPlace(operand, value)) continue;
+
+            bool single = value.Type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Float };
+            operands.Add(new BoundAsmOperand(
+                operand.Span, operand.Direction, register,
+                AsmRegisters.Constraint(target, register, single), value));
+        }
+
+        var clobbers = AsmRegisters.Clobbers(target, operands.Select(o => o.Register));
+        return new BoundAsm(syntax.Span, syntax.Text, syntax.TextSpan, operands, clobbers)
+        {
+            IsIncomplete = operands.Count != syntax.Operands.Count,
+        };
+    }
+
+    /// <summary>
+    /// An integer literal given to a register takes the register's width when
+    /// it fits there, as it would a declaration's: <c>in al = 200</c> is a
+    /// byte, not an <c>int</c> too wide for the register. Given to a vector
+    /// register, it is the floating-point number it names.
+    /// </summary>
+    private BoundExpression AsmLiteral(BoundExpression value, AsmRegister register)
+    {
+        if (IntegerLiteral(value) is not { } written) return value;
+
+        TypeSymbol wanted = register switch
+        {
+            { Kind: AsmRegisterKind.Vector, Bits: 32 } => PrimitiveTypeSymbol.Float,
+            { Kind: AsmRegisterKind.Vector } => PrimitiveTypeSymbol.Double,
+            { Bits: 8 } => written.Negative ? PrimitiveTypeSymbol.SByte : PrimitiveTypeSymbol.Byte,
+            { Bits: 16 } => written.Negative ? PrimitiveTypeSymbol.Short : PrimitiveTypeSymbol.UShort,
+            { Bits: 32 } => written.Negative ? PrimitiveTypeSymbol.Int : PrimitiveTypeSymbol.UInt,
+            _ => written.Negative ? PrimitiveTypeSymbol.Long : PrimitiveTypeSymbol.ULong,
+        };
+
+        // One that does not fit keeps its own type, and the width check below
+        // is what says so.
+        return ConstantFits(value, wanted) ? BindConversion(value, wanted, value.Span) : value;
+    }
+
+    /// <summary>
+    /// Whether a value of this type may travel in this register: plain data of
+    /// the register's kind, no wider than the register is.
+    /// </summary>
+    private bool AsmValueFits(AsmOperandSyntax operand, AsmRegister register, BoundExpression value)
+    {
+        var type = value.Type;
+
+        bool general = type is EnumTypeSymbol or PointerTypeSymbol or DelegateTypeSymbol ||
+                       type is PrimitiveTypeSymbol { IsInteger: true } ||
+                       type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool };
+        bool floating = type is PrimitiveTypeSymbol { IsFloat: true };
+
+        if (!general && !floating)
+        {
+            diagnostics.Error("SL0719", operand.Value.Span,
+                $"'{type.Name}' cannot travel in a register. An 'asm' operand is an integer, " +
+                "a 'bool', a character, an enum, a pointer or a delegate, or a 'float' or " +
+                "'double' in a vector register" +
+                (type.CarriesReferences()
+                    ? "; a counted reference would leave the block with nothing keeping " +
+                      "count of it, so pass its address as a pointer instead"
+                    : type is StructTypeSymbol
+                        ? "; a struct is several values, so pass its address, or one field " +
+                          "per register"
+                        : ""));
+            return false;
+        }
+
+        if (general != (register.Kind == AsmRegisterKind.General))
+        {
+            diagnostics.Error("SL0721", operand.Value.Span,
+                register.Kind == AsmRegisterKind.Vector
+                    ? $"'{register.Name}' is a vector register, which an operand uses for a " +
+                      $"'float' or a 'double', and this is '{type.Name}'"
+                    : $"'{register.Name}' is an integer register, and '{type.Name}' belongs " +
+                      "in a vector register; its bits would have to be converted to be " +
+                      "anything here, so convert them before the block");
+            return false;
+        }
+
+        // A vector register named whole takes either width.
+        if (register.Bits == 0) return true;
+
+        int bits = type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Bool } ? 8 : type.Size * 8;
+        if (bits <= register.Bits) return true;
+
+        diagnostics.Error("SL0720", operand.Value.Span,
+            $"'{type.Name}' is {bits} bits and '{register.Name}' holds {register.Bits}, so " +
+            "the value would not fit; name the wider register" +
+            (type is PrimitiveTypeSymbol { Kind: PrimitiveKind.Double }
+                ? ", or write the literal with 'f' if it was meant to be a 'float'"
+                : ", or narrow the value with a cast first"));
+        return false;
+    }
+
+    /// <summary>
+    /// Whether an <c>out</c> or <c>inout</c> operand has a place to write to,
+    /// with every check an assignment makes and the bookkeeping one does.
+    ///
+    /// A bit-field is refused where an assignment would take it: the address
+    /// of every output is worked out before the block runs, so that each place
+    /// is evaluated once, and a bit-field is the one place with no address.
+    /// </summary>
+    private bool AsmPlace(AsmOperandSyntax operand, BoundExpression place)
+    {
+        string written = operand.Direction == AsmDirection.Out ? "out" : "inout";
+        if (!Writable(place, operand.Value.Span, $"{written} {operand.Register}")) return false;
+
+        if (place is BoundFieldAccess { Field.IsBitField: true } bits)
+        {
+            diagnostics.Error("SL0722", operand.Value.Span,
+                $"'{bits.Field.Name}' is a bit-field, and an 'asm' output is written through " +
+                "its place's address, which a bit-field does not have. Take the value into a " +
+                "local and assign the field from it");
+            return false;
+        }
+
+        InvalidateVariantFact(place);
+        if (WrittenParameter(place) is { } parameter) parameter.IsAssigned = true;
+        NoteMemberWritten(place);
+        return true;
     }
 
     private BoundStatement BindFor(ForSyntax syntax)

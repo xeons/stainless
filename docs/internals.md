@@ -16,8 +16,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 332 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,162 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 350 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,269 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -55,15 +55,15 @@ it finds crashes and not miscompilations. Its first five minutes found two
 dozen crashes the suites had not, and a fixed one is pinned by an ordinary case
 like any other bug — the fuzzer's findings directory is not a test suite.
 
-**Both Windows and Linux are tested.** 332 cases, of which 13 are
-Windows-only and 2 are Linux-only, so Linux runs 319 and Windows 330, each
+**Both Windows and Linux are tested.** 350 cases, of which 13 are
+Windows-only and 2 are Linux-only, so Linux runs 337 and Windows 348, each
 skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other — carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.
 
-Ten of those cases are real 32-bit binaries, built and run on both systems, and
-four are built for ARM64 and not run: there is no ARM64 machine here, so they
+Eleven of those cases are real 32-bit binaries, built and run on both systems, and
+six are built for ARM64 and not run: there is no ARM64 machine here, so they
 stop at an object file LLVM verified and lowered, with their signatures pinned
 against clang's. Building 32-bit on Linux needs the development half of the
 multilib packages, which is what

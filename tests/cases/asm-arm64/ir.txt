@@ -1,0 +1,26 @@
+# What an asm statement is for aarch64-unknown-linux-gnu. There is no ARM64
+# machine here, so the object file LLVM lowered this to is the evidence that
+# every constraint below binds; the constraint strings are the rule itself.
+
+# No 'inteldialect': ARM has one syntax. An 'inout' register is an output and
+# an input, and every operand's register is among the clobbers.
+#
+# The clobbers are AAPCS64's caller-saved set: x0 to x17, x18 because Linux
+# leaves the platform register to be used, the link register spelled 'lr' —
+# '~{x30}' parses and LLVM ignores it — and every vector register but v8 to v15.
+call i64 asm "\0A        add x0, x0, x1\0A    ", "={x0},{x0},{x1},~{x0},~{x1},~{x2},~{x3},~{x4},~{x5},~{x6},~{x7},~{x8},~{x9},~{x10},~{x11},~{x12},~{x13},~{x14},~{x15},~{x16},~{x17},~{x18},~{lr},~{v0},~{v1},~{v2},~{v3},~{v4},~{v5},~{v6},~{v7},~{v16},~{v17},~{v18},~{v19},~{v20},~{v21},~{v22},~{v23},~{v24},~{v25},~{v26},~{v27},~{v28},~{v29},~{v30},~{v31},~{nzcv}"(i64
+
+# Several outputs are a literal struct, in the order written. x30 is 'lr' as an
+# operand too, and a vector register is spelled by what it carries: 's' for a
+# float, 'd' for a double, whichever of v1 or d2 was written.
+call { i64, float, double } asm
+"={lr},={s1},={d2},{w9},{lr},{s1},{d2},~{x0},
+
+# A comment, and ';' separating two instructions on one line, reach LLVM as
+# written.
+// a comment\0A        fadd s1, s1, s1 ; fadd d2, d2, d2\0A
+
+# x18 as an operand, which Windows refuses.
+"={x0},{x18},~{x0},
+
+call void asm " nop ", "~{x0},

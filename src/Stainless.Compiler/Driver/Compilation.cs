@@ -738,13 +738,14 @@ public sealed class Compilation
                 codeView: OperatingSystem.IsWindows())
             : null;
 
-        string ir = new LlvmEmitter(
+        var emitter = new LlvmEmitter(
             forSharedLibrary: options.Shared,
             forStainlessConsumers: options.MetadataPath is not null,
             debug: debug,
             sharedRuntime: options.NeedsSharedRuntime,
             abi: target.Abi,
-            resourceBlob: resourceBlob).Emit(program);
+            resourceBlob: resourceBlob);
+        string ir = emitter.Emit(program);
 
         string output = options.OutputPath
             ?? DefaultOutputPath(program, options.SourcePaths, options.Shared);
@@ -831,7 +832,18 @@ public sealed class Compilation
             irPath, runtimeObjects, nativeInputs, output, options.OptimizationLevel,
             options.Shared, options.Debug, libraries, sharedRuntime, moduleDefinition);
         if (!link.Success)
+        {
+            // An 'asm' block is the one part of the IR whose text the program
+            // wrote rather than the compiler, so a complaint about it is the
+            // program's to fix and goes back to its line.
+            if (AssemblerDiagnosis.Rejected(link.StandardError) && emitter.AsmBlocks.Count > 0)
+            {
+                AssemblerDiagnosis.Report(link.StandardError, emitter.AsmBlocks, target, diagnostics);
+                return Failed(diagnostics);
+            }
+
             return Failure(LinkDiagnosis.Explain(link.StandardError.TrimEnd(), irPath, unlinkedReferences));
+        }
 
         // The loader looks beside the binary, so that is where the runtime goes.
         // Both a program and a Stainless library need it there, and they are

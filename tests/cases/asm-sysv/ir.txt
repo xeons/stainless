@@ -1,0 +1,12 @@
+# The System V AMD64 caller-saved set: rsi and rdi carry arguments there and
+# are not preserved, and neither is any vector register — where Windows keeps
+# rsi, rdi and xmm6 to xmm15 for the caller. Then the three flags clang writes
+# for every x86 inline assembly call.
+call i64 asm inteldialect "\0A        add rax, rdi\0A    ", "={rax},{rax},{rdi},~{rax},~{rcx},~{rdx},~{rsi},~{rdi},~{r8},~{r9},~{r10},~{r11},~{xmm0},~{xmm1},~{xmm2},~{xmm3},~{xmm4},~{xmm5},~{xmm6},~{xmm7},~{xmm8},~{xmm9},~{xmm10},~{xmm11},~{xmm12},~{xmm13},~{xmm14},~{xmm15},~{dirflag},~{fpsr},~{flags}"(i64
+
+# A callee-saved register named as an operand joins the clobbers after the
+# volatile set, which is what makes the function save and restore it. A 32-bit
+# name is given to LLVM as written, and clobbers the whole register.
+call { double, i64 } asm inteldialect
+"={xmm0},={rbx},{xmm0},{ecx},~{rax},
+~{xmm15},~{rbx},~{dirflag},~{fpsr},~{flags}"(double

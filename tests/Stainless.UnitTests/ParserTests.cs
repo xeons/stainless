@@ -424,4 +424,100 @@ public class ParserTests
         Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
         Assert.Contains("SL0108", Front.Codes(parse.Result));
     }
+
+    // ------------------------------------------------------------------ asm
+
+    /// <summary>The first statement of the one function a source declares.</summary>
+    private static StatementSyntax FirstStatement(string body, out Source.DiagnosticBag diagnostics)
+    {
+        var unit = Front.Parse("module Test;\nvoid F()\n{\n" + body + "\n}", out diagnostics);
+        return unit.Declarations.OfType<FunctionDeclSyntax>().Single().Body!.Statements[0];
+    }
+
+    [Fact]
+    public void AsmOperandsKeepTheirDirectionRegisterAndValue()
+    {
+        var statement = FirstStatement(
+            "asm (in rcx = count + 1, out rax = low, inout RDX = totals[i]) { rdtsc }",
+            out var diagnostics);
+
+        Assert.Empty(diagnostics.Items);
+        var asm = Assert.IsType<AsmSyntax>(statement);
+
+        Assert.Equal([AsmDirection.In, AsmDirection.Out, AsmDirection.InOut],
+                     asm.Operands.Select(o => o.Direction));
+        Assert.Equal(["rcx", "rax", "RDX"], asm.Operands.Select(o => o.Register));
+        Assert.Equal(["(+ count 1)", "low", "([] totals i)"],
+                     asm.Operands.Select(o => Render(o.Value)));
+        Assert.Equal(" rdtsc ", asm.Text);
+    }
+
+    [Theory]
+    [InlineData("asm { nop }", 0)]
+    [InlineData("asm () { nop }", 0)]
+    [InlineData("asm (out rax = r) { nop }", 1)]
+    public void AsmOperandsAreOptional(string body, int count)
+    {
+        var statement = FirstStatement(body, out var diagnostics);
+
+        Assert.Empty(diagnostics.Items);
+        Assert.Equal(count, Assert.IsType<AsmSyntax>(statement).Operands.Count);
+    }
+
+    /// <summary>
+    /// An operand's value is a conditional, not an assignment: the <c>=</c>
+    /// after the register is the operand's own, and a second one is not read
+    /// as part of the value.
+    /// </summary>
+    [Fact]
+    public void AnAsmOperandValueIsNotAnAssignment()
+    {
+        FirstStatement("asm (in rax = a = b) { nop }", out var diagnostics);
+        Assert.Contains("SL0100", Front.Codes(diagnostics));
+    }
+
+    /// <summary>
+    /// <c>out</c> and <c>inout</c> are words, as <c>out</c> is at a call, and
+    /// stay names everywhere else.
+    /// </summary>
+    [Fact]
+    public void OutAndInoutRemainNames()
+    {
+        Front.Parse("module Test;\nvoid F()\n{\n    int out = 1;\n    int inout = out;\n}",
+                    out var diagnostics);
+        Assert.Empty(diagnostics.Items);
+    }
+
+    [Fact]
+    public void AnAsmOperandWithNoDirectionIsReportedAndStillRead()
+    {
+        var statement = FirstStatement("asm (rax = total) { nop }", out var diagnostics);
+
+        Assert.Equal(["SL0715"], Front.Codes(diagnostics));
+        var operand = Assert.Single(Assert.IsType<AsmSyntax>(statement).Operands);
+        Assert.Equal("rax", operand.Register);
+    }
+
+    [Theory]
+    [InlineData("asm (out rax = r);")]
+    [InlineData("asm (out rax = r) nop;")]
+    public void AsmWithNoBodyIsReported(string body)
+    {
+        FirstStatement(body, out var diagnostics);
+        Assert.Contains("SL0714", Front.Codes(diagnostics));
+    }
+
+    /// <summary>
+    /// A body that never closed took the rest of the file, and the one message
+    /// about it is the lexer's: the function and anything else it left open
+    /// say nothing more.
+    /// </summary>
+    [Fact]
+    public void AnUnterminatedAsmBodyIsTheOnlyComplaint()
+    {
+        Front.Parse("module Test;\nclass C\n{\n    void F()\n    {\n        asm { {k1 {k2 {k3 }\n    }\n}",
+                    out var diagnostics);
+
+        Assert.Equal(["SL0713"], Front.Codes(diagnostics));
+    }
 }

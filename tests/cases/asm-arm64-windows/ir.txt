@@ -1,0 +1,9 @@
+# asm-arm64's blocks for aarch64-pc-windows-msvc. The one difference is x18:
+# Windows keeps the thread environment block in it, so it is neither an operand
+# a block may name nor a register a block may change, and it is not declared
+# clobbered — the list goes from x17 straight to the link register.
+call i64 asm "\0A        add x0, x0, x1\0A    ", "={x0},{x0},{x1},~{x0},~{x1},~{x2},~{x3},~{x4},~{x5},~{x6},~{x7},~{x8},~{x9},~{x10},~{x11},~{x12},~{x13},~{x14},~{x15},~{x16},~{x17},~{lr},~{v0},~{v1},~{v2},~{v3},~{v4},~{v5},~{v6},~{v7},~{v16},~{v17},~{v18},~{v19},~{v20},~{v21},~{v22},~{v23},~{v24},~{v25},~{v26},~{v27},~{v28},~{v29},~{v30},~{v31},~{nzcv}"(i64
+
+call { i64, float, double } asm
+"={lr},={s1},={d2},{w9},{lr},{s1},{d2},~{x0},
+call void asm " nop ", "~{x0},

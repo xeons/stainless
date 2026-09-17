@@ -45,6 +45,11 @@ internal sealed class Mutator
         "yield", "fixed", "sizeof", "typeof", "nameof", "is", "as", "switch", "case", "when",
         "where", "operator", "implicit", "const", "static", "override", "virtual", "partial",
         "extern \"C\"", "export \"C\"", "#if", "#else", "#endif", "///", "/*", "*/", "\\",
+
+        // An asm statement's shapes: the body is lexed as raw text, so a stray
+        // brace, a missing one and an operand list left open are all edges.
+        "asm", "asm {", "asm { nop }", "asm (", "asm (out rax = x) {", "inout", "rax", "xmm0",
+        "x30", "rsp", "in rcx =", "out eax =",
     ];
 
     private static readonly string[] s_brackets = ["()", "[]", "{}", "<>"];

@@ -1,0 +1,2 @@
+# Built for x86_64 Linux and not run, so that the System V clobbers are checked on
+# every machine rather than only on a Linux one.

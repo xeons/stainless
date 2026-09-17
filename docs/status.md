@@ -172,6 +172,14 @@ last person to edit it -- the suite is the authority.
   else. Both schemes are checked against clang's own output for the same
   signatures. C++ *classes* are not reachable yet; that needs object and vtable
   layout, and an answer for exceptions crossing a boundary nothing unwinds
+- `asm (in rcx = n, out rax = r) { ... }` — inline assembly as a statement, in
+  Intel syntax on x86 and x64 and ARM's own on ARM64, lowered to one LLVM
+  inline-assembly call. Registers are checked against the target, a value
+  narrower than its register is extended by its signedness, and every block is
+  declared to clobber what a C call may, so there is no list to get wrong. Run
+  on Windows x64, Linux x64 and 32-bit x86 on both, with a test that fails if
+  the clobbers are; ARM64 is built to an object file and pinned as text. A
+  mistake in the text is reported on its line by the assembler, as SL0723
 - Win64 struct ABI: register coercion, `byval`, `sret`
 - `if` / `while` / `for` / `foreach` / `break` / `continue` / `return`, recursion
 - `switch` over integers, `char`, `bool`, enums, `String` and variants, with

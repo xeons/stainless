@@ -2060,6 +2060,9 @@ public sealed class Parser
                 return new ParallelSyntax(SpanFrom(start), block);
             }
 
+            case TokenKind.AsmKeyword:
+                return ParseAsm(start);
+
             case TokenKind.ForeachKeyword:
             {
                 Advance();
@@ -2159,7 +2162,90 @@ public sealed class Parser
         }
     }
 
-    /// <summary>A local declaration or an expression statement.</summary>
+    /// <summary>
+    /// <c>asm { ... }</c> and <c>asm (in rcx = n, out rax = r) { ... }</c>.
+    ///
+    /// The body arrives as one token the lexer captured whole, so all that is
+    /// parsed here is the operand list. Each operand's value is read as a
+    /// conditional rather than as a full expression: the <c>=</c> is the
+    /// operand's own, and <c>in rax = a = b</c> reading as an assignment inside
+    /// it would be a second meaning of the same character one token later.
+    /// </summary>
+    private StatementSyntax ParseAsm(int start)
+    {
+        Expect(TokenKind.AsmKeyword);
+        var operands = new List<AsmOperandSyntax>();
+
+        if (Match(TokenKind.OpenParen))
+        {
+            if (!At(TokenKind.CloseParen))
+            {
+                do
+                {
+                    operands.Add(ParseAsmOperand());
+                }
+                while (Match(TokenKind.Comma));
+            }
+
+            Expect(TokenKind.CloseParen);
+        }
+
+        if (At(TokenKind.AsmBody))
+        {
+            var body = Advance();
+
+            // A body with no closing brace took the rest of the file, and every
+            // construct around it is now unclosed for that one reason.
+            if (_lexer?.UnterminatedAsm == body.Span.Start) _tooDeep = true;
+
+            return new AsmSyntax(SpanFrom(start), operands, (string)body.Value!, body.Span);
+        }
+
+        if (!_tooDeep)
+            _diagnostics.Error("SL0714", Current.Span,
+                $"expected the assembly block after 'asm', found {Current.Kind.Describe()}; " +
+                "the instructions go between braces, as in 'asm (out rax = low) { rdtsc }'");
+
+        return new AsmSyntax(SpanFrom(start), operands, "", Current.Span);
+    }
+
+    /// <summary>
+    /// <c>in rcx = count</c>. <c>in</c> is a keyword and <c>out</c> and
+    /// <c>inout</c> are words, as <c>out</c> is at a call — the standard
+    /// library has a local named <c>out</c>, and nothing here needs it to stop
+    /// being one.
+    /// </summary>
+    private AsmOperandSyntax ParseAsmOperand()
+    {
+        int start = _pos;
+        var direction = AsmDirection.In;
+
+        if (Match(TokenKind.InKeyword))
+        {
+            direction = AsmDirection.In;
+        }
+        else if (At(TokenKind.Identifier) && Current.Text is "out" or "inout" &&
+                 Peek(1).Kind == TokenKind.Identifier)
+        {
+            direction = Advance().Text == "out" ? AsmDirection.Out : AsmDirection.InOut;
+        }
+        else if (!_tooDeep)
+        {
+            // Read on as though 'in' had been written, so that the register and
+            // the value are still checked; the direction is the one mistake.
+            _diagnostics.Error("SL0715", Current.Span,
+                "an 'asm' operand says which way its value goes: 'in rcx = value' before the " +
+                "block, 'out rax = place' after it, or 'inout rdx = place' for both");
+        }
+
+        var registerToken = Current;
+        string register = ExpectIdentifier();
+        Expect(TokenKind.Equals);
+        var value = ParseConditional();
+
+        return new AsmOperandSyntax(SpanFrom(start), direction, register, registerToken.Span, value);
+    }
+
     /// <summary>
     /// <c>switch (value) { case ...: ... }</c>. Labels stack: every <c>case</c>
     /// and <c>default</c> written before the first statement belongs to the

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Binding;
 using Xunit;
 
 namespace Stainless.UnitTests;
@@ -750,5 +751,242 @@ public class BinderTests
         foreach (var diagnostic in diagnostics.Items.Where(d => d.Span.File?.Path == Front.TestFile))
             Assert.True(diagnostic.Span.Start <= diagnostic.Span.End,
                 $"{diagnostic.Code} runs from {diagnostic.Span.Start} back to {diagnostic.Span.End}");
+    }
+
+    // ------------------------------------------------------------------ asm
+
+    /// <summary>
+    /// Runs a test with the ambient target set, and puts it back. The register
+    /// tables are the target's, so every question here is asked of a named one
+    /// rather than of whatever machine the tests happen to run on.
+    /// </summary>
+    private static void Under(TargetPlatform target, Action body)
+    {
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = target;
+        try { body(); }
+        finally { TargetPlatform.Current = before; }
+    }
+
+    [Theory]
+    [InlineData("long r = 0; asm (in rcx = 1, out rax = r) { nop }")]
+    [InlineData("long r = 0; asm (inout RAX = r) { nop }")]
+    [InlineData("int r = 0; asm (in cl = 200, out eax = r) { nop }")]
+    [InlineData("short s = -2; long r = 0; asm (in rcx = s, out rdx = r) { nop }")]
+    [InlineData("bool b = false; asm (out al = b) { nop }")]
+    [InlineData("char c = 'a'; asm (inout al = c) { nop }")]
+    [InlineData("int* p = null; asm (in rsi = p) { nop }")]
+    [InlineData("double d = 1.0; float f = 1.0f; asm (inout xmm0 = d, inout xmm15 = f) { nop }")]
+    [InlineData("double d = 0.0; asm (in xmm1 = 3, out xmm0 = d) { nop }")]
+    [InlineData("int r = 0; asm (in r15 = 1, out r8d = r) { nop }")]
+    [InlineData("asm { nop }")]
+    public void AnX64AsmStatementThatFitsReportsNothing(string body) =>
+        Under(TargetPlatform.X64Windows, () => Assert.Empty(Front.BodyCodes(body)));
+
+    [Theory]
+    [InlineData("long r = 0; asm (in x0 = 1, inout x30 = r) { nop }")]
+    [InlineData("int r = 0; asm (in lr = 1, out w9 = r) { nop }")]
+    [InlineData("double d = 0.0; float f = 0.0f; asm (inout v0 = d, inout s1 = f, inout d2 = f) { nop }")]
+    [InlineData("long r = 0; asm (in x18 = 1, out x0 = r) { nop }")]
+    public void AnArm64AsmStatementThatFitsReportsNothing(string body) =>
+        Under(TargetPlatform.Arm64Linux, () => Assert.Empty(Front.BodyCodes(body)));
+
+    [Theory]
+    [InlineData("int r = 0; asm (out ebx = r) { nop }")]
+    [InlineData("short r = 0; asm (in al = 1, out si = r) { nop }")]
+    [InlineData("double d = 0.0; asm (inout xmm7 = d) { nop }")]
+    public void AnX86AsmStatementThatFitsReportsNothing(string body) =>
+        Under(TargetPlatform.X86Windows, () => Assert.Empty(Front.BodyCodes(body)));
+
+    /// <summary>
+    /// A register name is looked up in the target's table, so another
+    /// architecture's name is unknown and the message says which one was being
+    /// built for.
+    /// </summary>
+    [Theory]
+    [InlineData("X64Windows", "x0", "x64")]
+    [InlineData("X64Windows", "ah", "x64")]
+    [InlineData("X86Windows", "rax", "x86")]
+    [InlineData("X86Windows", "sil", "x86")]
+    [InlineData("X86Windows", "xmm8", "x86")]
+    [InlineData("Arm64Linux", "rax", "arm64")]
+    [InlineData("Arm64Linux", "x31", "arm64")]
+    public void AnUnknownRegisterNamesTheArchitecture(string target, string register, string architecture)
+    {
+        var platform = (TargetPlatform)typeof(TargetPlatform).GetField(target)!.GetValue(null)!;
+
+        Under(platform, () =>
+        {
+            Front.BindBody($"long r = 0; asm (out {register} = r) {{ nop }}", out var diagnostics);
+            var diagnostic = Front.Only(diagnostics);
+
+            Assert.Equal("SL0716", diagnostic.Code);
+            Assert.Contains($"on {architecture}", diagnostic.Message);
+        });
+    }
+
+    [Theory]
+    [InlineData("X64Windows", "rsp")]
+    [InlineData("X64Windows", "spl")]
+    [InlineData("X64Windows", "rbp")]
+    [InlineData("X64Windows", "ebp")]
+    [InlineData("X86Windows", "esp")]
+    [InlineData("X86Linux", "ebp")]
+    [InlineData("Arm64Linux", "sp")]
+    [InlineData("Arm64Linux", "x29")]
+    [InlineData("Arm64Linux", "fp")]
+    [InlineData("Arm64Windows", "x18")]
+    [InlineData("Arm64Windows", "w18")]
+    public void AStackFrameOrReservedRegisterIsNotAnOperand(string target, string register)
+    {
+        var platform = (TargetPlatform)typeof(TargetPlatform).GetField(target)!.GetValue(null)!;
+
+        Under(platform, () =>
+            Assert.Equal(["SL0717"],
+                         Front.BodyCodes($"long r = 0; asm (in {register} = r) {{ nop }}")));
+    }
+
+    /// <summary>
+    /// Two names for one register are one register, and a register holds one
+    /// value going in and one coming out: two of either, or <c>inout</c> beside
+    /// anything, is named twice.
+    /// </summary>
+    [Theory]
+    [InlineData("in al = a, in RAX = b")]
+    [InlineData("out rax = a, out eax = b")]
+    [InlineData("inout rcx = a, out cx = b")]
+    [InlineData("in rcx = a, inout ecx = b")]
+    [InlineData("in rdx = a, out rdx = b, in dl = a")]
+    public void ARegisterNamedTwiceIsReported(string operands) =>
+        Under(TargetPlatform.X64Linux, () =>
+        {
+            Front.BindBody($"byte a = 0; byte b = 0; asm ({operands}) {{ nop }}", out var diagnostics);
+            Assert.Equal("SL0718", Front.Only(diagnostics).Code);
+        });
+
+    /// <summary>
+    /// One <c>in</c> and one <c>out</c> on a register is <c>inout</c> with its
+    /// two places different, whichever is written first and whatever names
+    /// they use.
+    /// </summary>
+    [Theory]
+    [InlineData("in rax = a, out rax = b")]
+    [InlineData("out eax = b, in rax = a")]
+    [InlineData("in al = a, out AL = b")]
+    public void OneInAndOneOutMayShareARegister(string operands) =>
+        Under(TargetPlatform.X64Linux, () =>
+            Assert.Empty(Front.BodyCodes($"byte a = 0; byte b = 0; asm ({operands}) {{ nop }}")));
+
+    [Theory]
+    [InlineData("String s = \"x\"; asm (in rcx = s) { nop }")]
+    [InlineData("var a = new int[1]; asm (in rcx = a) { nop }")]
+    [InlineData("Pair p; asm (in rcx = p) { nop }")]
+    [InlineData("Holder? o = null; asm (in rcx = o) { nop }")]
+    public void ACountedOrCompoundValueCannotTravelInARegister(string body) =>
+        Under(TargetPlatform.X64Windows, () =>
+        {
+            Front.BindModule("public struct Pair { public int A; public int B; }\n" +
+                             "public class Holder { }\n" +
+                             "void F()\n{\n" + body + "\n}", out var diagnostics);
+            Assert.Equal(["SL0719"], Front.Codes(diagnostics));
+        });
+
+    [Theory]
+    [InlineData("long v = 0; asm (in eax = v) { nop }")]
+    [InlineData("int v = 0; asm (out ax = v) { nop }")]
+    [InlineData("asm (in al = 256) { nop }")]
+    [InlineData("int* p = null; asm (in ecx = p) { nop }")]
+    public void AValueWiderThanItsRegisterIsReported(string body) =>
+        Under(TargetPlatform.X64Windows, () => Assert.Equal(["SL0720"], Front.BodyCodes(body)));
+
+    [Theory]
+    [InlineData("double d = 0.0; asm (in s0 = d) { nop }")]
+    [InlineData("asm (in s0 = 1.5) { nop }")]
+    [InlineData("long v = 0; asm (in w0 = v) { nop }")]
+    public void AValueWiderThanAnArm64RegisterIsReported(string body) =>
+        Under(TargetPlatform.Arm64Linux, () => Assert.Equal(["SL0720"], Front.BodyCodes(body)));
+
+    [Theory]
+    [InlineData("double d = 0.0; asm (in rax = d) { nop }")]
+    [InlineData("float f = 0.0f; asm (out rax = f) { nop }")]
+    [InlineData("long v = 0; asm (in xmm0 = v) { nop }")]
+    [InlineData("bool b = false; asm (out xmm3 = b) { nop }")]
+    public void AValueInTheWrongKindOfRegisterIsReported(string body) =>
+        Under(TargetPlatform.X64Windows, () => Assert.Equal(["SL0721"], Front.BodyCodes(body)));
+
+    /// <summary>
+    /// An output needs a place with an address: the checks an assignment makes,
+    /// and a bit-field refused because it has none.
+    /// </summary>
+    [Theory]
+    [InlineData("asm (out rax = 5) { nop }", "SL0240")]
+    [InlineData("const long c = 1; asm (inout rax = c) { nop }", "SL0240")]
+    [InlineData("Bits b; asm (out eax = b.Flag) { nop }", "SL0722")]
+    public void AnAsmOutputNeedsAPlaceWithAnAddress(string body, string code) =>
+        Under(TargetPlatform.X64Windows, () =>
+        {
+            Front.BindModule("public struct Bits { public uint Flag : 3; }\n" +
+                             "void F()\n{\n" + body + "\n}", out var diagnostics);
+            Assert.Equal([code], Front.Codes(diagnostics));
+        });
+
+    [Fact]
+    public void AnInParameterIsNotAnAsmOutput() =>
+        Under(TargetPlatform.X64Windows, () =>
+            Assert.Equal(["SL0448"], Front.ModuleCodes(
+                "void F(in long v)\n{\n    asm (out rax = v) { nop }\n}")));
+
+    /// <summary>
+    /// An <c>out</c> parameter written only by a block is written: nothing in
+    /// the language leaves a block except by running off its end.
+    /// </summary>
+    [Fact]
+    public void AnAsmOutputWritesAnOutParameter() =>
+        Under(TargetPlatform.X64Windows, () =>
+            Assert.Empty(Front.ModuleCodes(
+                "void F(out long low, out int high)\n{\n" +
+                "    asm (out rax = low, out edx = high) { rdtsc }\n}")));
+
+    /// <summary>
+    /// And a block whose operand was refused is taken to have written
+    /// everything, so the one mistake is not reported twice.
+    /// </summary>
+    [Fact]
+    public void ARefusedAsmOutputIsNotAlsoAnUnwrittenOut() =>
+        Under(TargetPlatform.X64Windows, () =>
+            Assert.Equal(["SL0716"], Front.ModuleCodes(
+                "void F(out long low)\n{\n    asm (out x0 = low) { nop }\n}")));
+
+    /// <summary>
+    /// An output to a variable outside a <c>for parallel</c> body is the same
+    /// race an assignment to it is, and is refused the same way.
+    /// </summary>
+    [Fact]
+    public void AnAsmOutputOutsideAParallelLoopIsARace() =>
+        Under(TargetPlatform.X64Windows, () =>
+            Assert.Equal(["SL0373"], Front.BodyCodes(
+                "long total = 0;\nfor parallel (int i = 0; i < 4; i++)\n" +
+                "{\n    asm (inout rax = total) { add rax, 1 }\n}")));
+
+    /// <summary>
+    /// Every operand's register joins the clobbers after the volatile set, once,
+    /// by the name of the whole register; the flags come last.
+    /// </summary>
+    [Fact]
+    public void ClobbersAreTheVolatileSetThenTheOperandsThenTheFlags()
+    {
+        var target = TargetPlatform.X64Windows;
+        var clobbers = AsmRegisters.Clobbers(target,
+        [
+            AsmRegisters.Find(target, "ebx")!,
+            AsmRegisters.Find(target, "rax")!,
+            AsmRegisters.Find(target, "bl")!,
+        ]);
+
+        Assert.Equal(
+            ["rax", "rcx", "rdx", "r8", "r9", "r10", "r11",
+             "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
+             "rbx", "dirflag", "fpsr", "flags"],
+            clobbers);
     }
 }

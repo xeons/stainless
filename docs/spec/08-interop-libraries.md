@@ -901,6 +901,331 @@ default configuration, a stub of machine code — and the only one of the two
 that can be writable or executable. What it cannot do is be enumerated,
 replaced after linking, or read by the operating system.
 
+## 8.8 Inline assembly
+
+```csharp
+long Cycles()
+{
+    long low = 0;
+    long high = 0;
+    asm (out rax = low, out rdx = high)
+    {
+        rdtsc
+    }
+    return (high << 32) | low;
+}
+```
+
+Some things a program needs are an instruction and not a function: `rdtsc`,
+`cpuid`, a system register, a sequence a vectoriser will not find. C reaches
+them through a compiler's intrinsics or a separate `.s` file, and a separate
+file means a second toolchain, a calling convention written out by hand for
+each target, and a call where one instruction was wanted. `asm` is the
+instruction written where it is used.
+
+**It is a statement, and only a statement.** `asm { ... }` or `asm (operands)
+{ ... }` goes wherever a statement may — a loop, a lambda, a `for parallel`
+body, a function `spawn` calls — and has no value, so it is never an
+expression and never a constant. Two other forms were considered and left out.
+A function whose whole body is assembly has to follow the calling convention
+itself, once per target and by hand, which is precisely the work this form
+takes away. Assembly at module level has no operands, so nothing about it can
+be checked and everything about it is a symbol the program has to agree with
+by name. Both remain possible with a `.s` file among the inputs, which is the
+honest place for them.
+
+It is **LLVM's inline assembly**, the construct clang lowers an MSVC `__asm`
+block to: one `call ... asm` in the IR, with the operands as register
+constraints. Nothing is called at run time — the instructions are placed in the
+function, and the optimiser moves values into and out of the named registers
+around them.
+
+### 8.8.1 Operands
+
+```csharp
+asm (in rcx = count, in rsi = &buffer[0], inout rax = total, out rdx = carry)
+{
+    ...
+}
+```
+
+| | |
+|---|---|
+| `in reg = value` | the value is placed in the register before the block |
+| `out reg = place` | the register's value is stored into the place after it |
+| `inout reg = place` | both: the place is read in, and written back |
+
+`in` is the keyword it already was; `out` and `inout` are words, as `out` is at
+a call ([§7.2.1](07-functions-members.md#721-out)), and stay names everywhere
+else. An operand with no direction is SL0715, and the rest of it is still
+checked. The value after `=` is read as an expression without assignment,
+because the `=` is the operand's.
+
+**Every operand is evaluated once, in the order written, before the block** —
+an input's value, and an output's address — **and the outputs are stored in
+the same order after it.** Taking the address first is what makes `inout rax =
+counts[Next()]` call `Next` once rather than once to read and again to write. A
+place is anything an assignment could write that has an address: a local, a
+parameter, a field, an element, a dereference or a static. The checks an
+assignment makes are made (SL0240, SL0448, SL0379), and a bit-field is refused
+because it is the one place with no address (SL0722).
+
+**An output is a write.** An `out` parameter written only by a block is written,
+so SL0600 is satisfied by it; and an output to a variable declared outside a
+`for parallel` body is the race an assignment to one is (SL0373).
+
+**What may travel in a register** is plain data: an integer, a `bool`, a
+character type, an enum, a pointer or a delegate in a general register, and a
+`float` or a `double` in a vector register. A counted reference cannot — the
+block could copy it anywhere, with nothing to count the copy — nor can a
+struct, which is several values; pass the address instead (SL0719). A value of
+one kind in the other kind of register is SL0721: an integer's bits in an `xmm`
+register would have to be converted to mean anything, and a conversion belongs
+before the block, where it can be seen.
+
+**Widths.** A value wider than its register is an error (SL0720): `in eax =
+aLong` has nowhere to put the upper half. A narrower one is allowed, and what
+it means is fixed rather than left to the optimiser:
+
+| | |
+|---|---|
+| a narrower value going in | extended to the register's width by its own signedness, so an `int` of -1 in `rcx` is -1 in all sixty-four bits |
+| a narrower place coming out | the register's low bits |
+| a `bool` going in | 0 or 1, extended |
+| a `bool` coming out | whether the register is anything but zero |
+| a `float` in `xmm0` or `v0` | the low 32 bits; the rest of the register is unspecified |
+
+LLVM happens to zero-extend an `i32` handed to `{rcx}` today. Nothing promises
+that, and a block reading the whole register would otherwise see whatever its
+upper half last held — which is right until the day it is not, and then only
+at one optimisation level. So the compiler extends explicitly, and the cost is
+one `sext` or `zext` the optimiser folds away whenever the value was wide
+already.
+
+**A literal takes the register's width** where it fits, as it takes a
+declaration's: `in al = 200` is a byte, and `in al = 256` is SL0720. An integer
+literal given to a vector register is the floating-point number it names.
+
+### 8.8.2 Registers
+
+| Target | General | Vector |
+|---|---|---|
+| x64 | `rax`–`r15`, `eax`–`r15d`, `ax`–`r15w`, `al`–`r15b` (with `sil` and `dil`) | `xmm0`–`xmm15` |
+| x86 | `eax`, `ebx`, `ecx`, `edx`, `esi`, `edi`; `ax`–`di`; `al`–`dl` | `xmm0`–`xmm7` |
+| arm64 | `x0`–`x30`, `w0`–`w30`, `lr` | `v0`–`v31`, and `d0`–`d31`, `s0`–`s31` |
+
+Names are case-insensitive. The table checked is the target's, so `x0` built for
+x64 is SL0716, and the message names the architecture that was being built for
+— which is most of the answer when a file meant for another one was compiled by
+mistake. The high-byte registers `ah` to `dh` are not there: they are not the
+low bits of anything, so none of the width rules above would mean anything for
+them.
+
+**Some registers cannot be operands** (SL0717): the stack pointer (`rsp`,
+`esp`, `sp` and every width of them), because a block that moved it would leave
+every local at the wrong address; the frame pointer (`rbp`, `ebp`, `x29`,
+`fp`), which a function may address its locals through; and on Windows ARM64
+`x18`, which holds the thread environment block. Linux leaves `x18` to be used,
+so there it is an ordinary register.
+
+**A register holds one value going in and one coming out**, so it may be named
+by one `in` and one `out` — `in rcx = count, out rcx = left` puts `count` in and
+stores what the block leaves in `left` — or by one `inout`, which is the same
+thing with the two places the same. Anything more is SL0718, whatever the
+names: `eax` is `rax`, and `d3` is `v3`.
+
+On ARM64 a vector register is given to LLVM by the width of what it carries —
+`s1` for a `float` and `d1` for a `double`, whether `v1`, `s1` or `d1` was
+written — and `x30` is given as `lr`. Both are LLVM's rules: `{v0}` with a
+`float` crashes its code generator, `{d0}` with one converts the value to a
+double on the way in, and `{x30}` is refused as an operand and ignored as a
+clobber. `d` names a register holding a double, so a `float` in it is the
+narrower case above; `s` names one holding a float, so a `double` is too wide.
+
+### 8.8.3 What a block may change
+
+**A block may change every register a C call may change**, and every one of
+them is declared changed to LLVM — the caller-saved set of the target, listed in
+[§3.5 of the ABI notes](../abi.md#35-what-a-call-may-change). **A callee-saved
+register it changes, it restores**, exactly as a C function would. The flags
+are declared changed too.
+
+```
+call { i64, i64 } asm inteldialect "rdtsc", "={rax},={rdx},~{rax},~{rcx},~{rdx},
+    ~{r8},~{r9},~{r10},~{r11},~{xmm0},~{xmm1},~{xmm2},~{xmm3},~{xmm4},~{xmm5},
+    ~{dirflag},~{fpsr},~{flags}"()
+```
+
+The alternative is Rust's `asm!`, which makes the author list each clobbered
+register, or declare the block to follow the C convention with
+`clobber_abi("C")`. A list is precise: a value may stay in a register the block
+did not touch, and nothing is moved. What it costs is that a list wrong by one
+register is a miscompilation, and not a loud one — the optimiser reads a value
+back from a register the block overwrote, which it does only when it chose that
+register for something live across the block, which depends on the
+optimisation level and on the code around it. A block can be right at `-O0` and
+wrong at `-O2`, or right until the function around it changes. Making the C set
+the rule means there is no list to get wrong. What *that* costs is that a value
+live across a block cannot stay in a volatile register — it moves to a
+callee-saved one or to the stack, just as it would across a call — and that
+the rule is a fact to know rather than something written beside the block.
+Rust's own escape hatch is the same trade, and it is the one most blocks want.
+
+**An operand's register is always declared changed**, callee-saved or not.
+LLVM reads an input register it was not told is clobbered as still holding its
+value afterwards, and will take the value from there: a block that took
+`{rcx}` and zeroed it had the zero added into its result, at `-O1`. Declaring
+it costs nothing for a volatile register, and for a callee-saved one it is what
+makes the function save and restore it — so a block may leave `rbx` changed
+once `rbx` is an operand.
+
+[tests/cases/asm-clobbers](../../tests/cases/asm-clobbers) is what holds the
+rule: seven values live across a block that destroys every volatile register,
+built optimised. With the vector registers left out of the clobbers it prints a
+different number, and with the general ones left out it prints another; it runs
+on Windows and on Linux, whose sets differ, and
+[x86-asm](../../tests/cases/x86-asm) does the same for 32-bit x86.
+
+### 8.8.4 The text
+
+**Everything between the braces is the target assembler's**, handed to it as
+written, line for line, less any carriage return. The compiler does not read
+it: a misspelt instruction is found by LLVM as the program is built, and put
+back on the line it was about.
+
+```
+error[SL0723]: the assembler rejected this line of an 'asm' block: invalid
+instruction mnemonic 'bogus'
+ --> clock.sl:9:9
+  |
+9 |         bogus rax
+  |         ^^^^^^^^^
+```
+
+**x86 is Intel syntax** — `mov rax, rcx`, destination first, `qword ptr [rsi]`
+— because it is what the processor's documentation and most of what is written
+about x86 use. ARM has one syntax.
+
+| | x86, x64 | arm64 |
+|---|---|---|
+| `// comment` and `/* comment */` | yes | yes |
+| `# comment` | yes, anywhere on a line | only at the start of a line; elsewhere `#` is an immediate |
+| `; comment` | **no** — `;` separates two instructions on one line | the same |
+| a named label, `loop:` | yes, and a symbol of the whole object file | the same |
+| a numbered label, `1:` | yes, reached forward as `1f`; `1b` reads as the binary number 1 | yes, `1f` and `1b` |
+
+**`;` is not a comment**, which is the one thing a reader of MASM will expect it
+to be. `mov rax, 1 ; set it` is two instructions, and the second is `set it`.
+
+**A named label is a symbol of the object file**, not of the block, so two
+blocks anywhere in a program may not both define `done`. A numbered label may
+repeat, which is what makes it the one to reach for in a block; on x86 it can
+only be jumped to forwards.
+
+**Braces are counted**, comments and all, so a block may hold one only with its
+partner. `vaddps zmm0 {k1}, zmm1, zmm2` is fine, and a comment reading `// }`
+ends the block early. Recognising comments while looking for the end would mean
+knowing which syntax the target has — `#` starts a comment on one and not the
+other — and a rule that changed with `--target` would lex one file two ways. A
+block that is never closed takes the rest of the file (SL0713), and an `asm`
+with no braces after it has no block at all (SL0714).
+
+**Nothing inside is a directive.** A line beginning `#if` is x86's comment
+rather than a condition; `#if` goes around the whole statement:
+
+```csharp
+#if X64
+    asm (out rax = low, out rdx = high) { rdtsc }
+#elif ARM64
+    asm (out x0 = low) { mrs x0, cntvct_el0 }
+#endif
+```
+
+**`asm` is a keyword, not a contextual word.** The body has to be captured by
+the lexer, since assembly is not Stainless tokens and the file is tokenized
+before anything is parsed, and the lexer cannot see whether a word begins a
+statement: `void asm(int x) { ... }` has exactly the shape of a block. Nothing
+in this repository used the word as a name.
+
+### 8.8.5 What is undefined
+
+The compiler cannot see inside a block, so these are the programmer's to keep,
+and breaking any of them is undefined behaviour rather than a diagnostic:
+
+- **Leaving other than by the end.** A `ret`, or a jump to a label outside the
+  block, skips the stores of the outputs and whatever the function had to
+  release, and returns through a frame the block does not know the shape of.
+- **Changing a callee-saved register that is not an operand** without putting
+  it back, or the stack pointer, or the frame pointer.
+- **Leaving state a call would not.** The direction flag clear, and on x86 the
+  x87 stack empty, as the C ABI requires at every call.
+- **Writing through an operand into storage the language manages** — a
+  `String`'s bytes, an array past its length — which a pointer already allows
+  and a block allows no more carefully.
+
+### 8.8.6 Examples
+
+```csharp
+// Counts a buffer's set bits, whichever machine this is.
+nuint Population(byte* bytes, nuint count)
+{
+    nuint total = 0;
+#if X64
+    asm (in rsi = bytes, in rcx = count, out rax = total)
+    {
+        xor eax, eax
+        test rcx, rcx
+        jz 2f
+    population:
+        movzx edx, byte ptr [rsi]
+        popcnt edx, edx
+        add rax, rdx
+        inc rsi
+        dec rcx
+        jnz population
+    2:
+    }
+#elif X86
+    asm (in esi = bytes, in ecx = count, out eax = total)
+    {
+        xor eax, eax
+        test ecx, ecx
+        jz 2f
+    population32:
+        movzx edx, byte ptr [esi]
+        popcnt edx, edx
+        add eax, edx
+        inc esi
+        dec ecx
+        jnz population32
+    2:
+    }
+#elif ARM64
+    asm (in x1 = bytes, in x2 = count, out x0 = total)
+    {
+        mov x0, #0
+        cbz x2, 2f
+    1:
+        ldrb w3, [x1], #1
+        fmov d0, x3
+        cnt v0.8b, v0.8b
+        umov w3, v0.b[0]
+        add x0, x0, x3
+        subs x2, x2, #1
+        b.ne 1b
+    2:
+    }
+#endif
+    return total;
+}
+```
+
+The x86 blocks name their loops because an Intel-syntax `1b` is a number, and
+each name is a symbol of the whole program, so the two differ. `nuint` is the
+register's width on every target, which is what lets one declaration serve all
+three. The ARM64 block uses `x3` and `v0` without naming either: both are
+caller-saved, so both are declared changed already.
+
 ---
 
 <sub>[&larr; Functions and members](07-functions-members.md) &nbsp;&middot;&nbsp; [Statements and expressions &rarr;](09-statements-expressions.md)</sub>

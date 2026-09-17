@@ -15,10 +15,14 @@ foreach (int n in numbers) { ... }
 switch (y) { case 0: return 0; default: break; }
 goto done;
 return y;
+asm (out rax = low, out rdx = high) { rdtsc }
 ```
 
 Every one of those means what it means in C#, and the sections below are where
-that is not the whole story. Four rules about the shape of the list itself are
+that is not the whole story. The last is not C#'s at all: it is instructions for
+the target's assembler, with registers paired to values, and it is in
+[§8.8](08-interop-libraries.md#88-inline-assembly) beside the rest of what
+reaches below the language rather than here. Four rules about the shape of the list itself are
 worth stating, because each is a question a reader asks exactly once:
 
 **A body is a statement, not a block.** `if`, `else`, `while`, `for` and

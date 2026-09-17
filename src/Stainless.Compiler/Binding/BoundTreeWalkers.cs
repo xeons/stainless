@@ -167,6 +167,17 @@ internal sealed class CaptureWalker(LocalSymbol loopVariable)
                 break;
 
             case BoundReturn returned: Visit(returned.Value); break;
+
+            // An output is an assignment to its place, and every chunk of a
+            // `for parallel` storing into one outside variable is the race the
+            // rule exists for.
+            case BoundAsm assembly:
+                foreach (var operand in assembly.Operands)
+                {
+                    if (operand.IsOutput) Assigned(operand.Value);
+                    Visit(operand.Value);
+                }
+                break;
         }
     }
 

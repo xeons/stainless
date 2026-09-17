@@ -360,4 +360,112 @@ public class LexerTests
     public void UndefTakesADefineBack() =>
         Assert.Empty(
             Front.Kinds("#define MINE\n#undef MINE\n#if MINE\nint\n#endif"));
+
+    // ------------------------------------------------------------------ asm
+
+    /// <summary>
+    /// The body of an <c>asm</c> statement is one token holding the text
+    /// between its braces exactly, and its span covers the braces. Nothing
+    /// inside is lexed: a <c>#</c> here is an x86 comment rather than the
+    /// character this language has no use for.
+    /// </summary>
+    [Fact]
+    public void AnAsmBodyIsOneTokenOfRawText()
+    {
+        const string source = "asm { mov rax, [rcx + 8] # load\n  add rax, 1 }";
+        var tokens = Front.Tokens(source, out var diagnostics);
+
+        Assert.Empty(diagnostics.Items);
+        Assert.Equal([TokenKind.AsmKeyword, TokenKind.AsmBody, TokenKind.EndOfFile],
+                     tokens.Select(t => t.Kind));
+
+        var body = tokens[1];
+        Assert.Equal(" mov rax, [rcx + 8] # load\n  add rax, 1 ", body.Value);
+        Assert.Equal(source.IndexOf('{'), body.Span.Start);
+        Assert.Equal(source.Length, body.Span.End);
+    }
+
+    /// <summary>
+    /// The operands are ordinary tokens, parentheses inside them are counted,
+    /// and the body is only looked for once the list has closed.
+    /// </summary>
+    [Fact]
+    public void AsmOperandsAreOrdinaryTokens()
+    {
+        var kinds = Front.Kinds("asm (in rcx = F((a)), out rax = r) { rdtsc }");
+
+        Assert.Equal(TokenKind.AsmKeyword, kinds[0]);
+        Assert.Equal(TokenKind.OpenParen, kinds[1]);
+        Assert.Equal(TokenKind.InKeyword, kinds[2]);
+        Assert.Equal(TokenKind.AsmBody, kinds[^1]);
+        Assert.Equal(1, kinds.Count(k => k == TokenKind.AsmBody));
+        Assert.DoesNotContain(TokenKind.OpenBrace, kinds);
+    }
+
+    /// <summary>
+    /// Braces inside the body are counted, so a balanced pair — AVX-512's
+    /// <c>{k1}</c> — stays inside it.
+    /// </summary>
+    [Fact]
+    public void BalancedBracesStayInsideAnAsmBody()
+    {
+        var tokens = Front.Tokens("asm { vaddps zmm0 {k1}, zmm1, zmm2 } int");
+
+        Assert.Equal(" vaddps zmm0 {k1}, zmm1, zmm2 ", tokens[1].Value);
+        Assert.Equal(TokenKind.IntKeyword, tokens[2].Kind);
+    }
+
+    /// <summary>
+    /// Only straight after the word, or after its operands, does a brace open a
+    /// body. Anywhere else it is punctuation, including a block that merely
+    /// follows a statement that began with <c>asm</c>.
+    /// </summary>
+    [Theory]
+    [InlineData("asm; { x }")]
+    [InlineData("asm (in rax = y); { x }")]
+    [InlineData("{ x } asm")]
+    public void ABraceAwayFromAsmIsPunctuation(string source) =>
+        Assert.DoesNotContain(TokenKind.AsmBody, Front.Kinds(source));
+
+    /// <summary>
+    /// An operand list that meets a brace before it closes is abandoned, so a
+    /// missing <c>)</c> does not turn the rest of the file into assembly.
+    /// </summary>
+    [Fact]
+    public void ABraceInsideTheOperandsAbandonsTheBody()
+    {
+        var kinds = Front.Kinds("asm (in rax = x { mov rax, 1 } int y;");
+
+        Assert.DoesNotContain(TokenKind.AsmBody, kinds);
+        Assert.Contains(TokenKind.IntKeyword, kinds);
+    }
+
+    /// <summary>
+    /// A body with no closing brace takes the rest of the file, says so once at
+    /// the brace that opened it, and still ends in an end-of-file token.
+    /// </summary>
+    [Fact]
+    public void AnUnterminatedAsmBodyIsReportedAtItsBrace()
+    {
+        const string source = "asm { mov rax, 1\nint x;";
+        var tokens = Front.Tokens(source, out var diagnostics);
+
+        var only = Assert.Single(diagnostics.Items);
+        Assert.Equal("SL0713", only.Code);
+        Assert.Equal(source.IndexOf('{'), only.Span.Start);
+
+        Assert.Equal([TokenKind.AsmKeyword, TokenKind.AsmBody, TokenKind.EndOfFile],
+                     tokens.Select(t => t.Kind));
+        Assert.Equal(source.Length, tokens[1].Span.End);
+    }
+
+    /// <summary>
+    /// <c>asm</c> is a keyword and not a contextual word, because the lexer is
+    /// where the body is recognised and it cannot see whether a word is at the
+    /// start of a statement: <c>void asm(int x) { ... }</c> has exactly the
+    /// shape of a block.
+    /// </summary>
+    [Fact]
+    public void AsmIsAKeyword() =>
+        Assert.Equal(TokenKind.AsmKeyword, TokenKindExtensions.Keywords["asm"]);
 }

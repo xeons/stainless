@@ -1,0 +1,21 @@
+add 42
+divide -3 -2
+halves 5 9
+int in rcx -7
+uint in r9 4294967280
+byte in cl 200
+literal in al 250
+short from ax -2
+int from rax 3
+bool out 1
+bool in 1
+char Q
+enum 14
+pointer sum 110
+double 9
+float 2.5
+literal in xmm3 3
+places 100 200 300
+once 34 after 1 call
+labels 11
+in and out 42

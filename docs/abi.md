@@ -1031,6 +1031,41 @@ guess is wrong:
   and nothing diagnoses the difference. So the pointer is spelled out and the
   copy is made by the emitter.
 
+### 3.5 What a call may change
+
+Which registers a C call leaves the caller to preserve, by target. It matters
+twice here: it is what every function the compiler writes relies on across a
+call, and it is exactly what an `asm` block is declared to clobber
+([§8.8.3](spec/08-interop-libraries.md#883-what-a-block-may-change)).
+
+| Target | General | Vector |
+|---|---|---|
+| x64 Windows | `rax` `rcx` `rdx` `r8`–`r11` | `xmm0`–`xmm5` |
+| x64 System V | `rax` `rcx` `rdx` `rsi` `rdi` `r8`–`r11` | `xmm0`–`xmm15` |
+| x86, both systems | `eax` `ecx` `edx` | `xmm0`–`xmm7` |
+| ARM64 Linux | `x0`–`x18`, `x30` | `v0`–`v7`, `v16`–`v31` |
+| ARM64 Windows | `x0`–`x17`, `x30` | `v0`–`v7`, `v16`–`v31` |
+
+Everything else is the callee's to restore: `rbx`, `rbp` and `r12`–`r15`
+everywhere on x64, and on Windows `rsi`, `rdi` and `xmm6`–`xmm15` too; `ebx`,
+`esi`, `edi` and `ebp` on x86; `x19`–`x29` and the low halves of `v8`–`v15` on
+ARM64. The flags are never preserved, and the direction flag must be clear
+again when control comes back.
+
+**`x18` is the one register whose answer is the system's rather than the
+architecture's.** AAPCS64 calls it the platform register and leaves it to the
+platform: Windows keeps the current thread's environment block in it, so
+nothing else may change it, and Linux leaves it free as a temporary. So a block
+may name it and is declared to clobber it on Linux, and may do neither on
+Windows.
+
+How LLVM is told is not always the spelling above. A clobber of the link
+register has to be written `~{lr}`: `~{x30}` parses and is silently ignored, and
+the function then does not save the register it is about to lose. As an operand
+it is `{lr}` too, since `{x29}` and `{x30}` are refused. The x86 flags are
+written `~{dirflag},~{fpsr},~{flags}`, which is what clang writes for every
+inline assembly call it emits; ARM64's are `~{nzcv}`.
+
 ## 4. Static storage
 
 A static becomes one zeroed global per declaration. A single generated

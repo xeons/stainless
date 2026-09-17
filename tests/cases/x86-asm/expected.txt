@@ -1,0 +1,7 @@
+add 42
+short in cx -3
+short in ecx -3
+divide 14 2
+pointer sum 18
+double 4.5
+across 227340

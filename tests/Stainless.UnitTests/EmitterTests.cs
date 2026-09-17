@@ -503,4 +503,164 @@ public class EmitterTests
     /// <summary>Every line of the IR that starts with a given prefix.</summary>
     private static List<string> Lines(string ir, string prefix) =>
         ir.Split('\n').Where(l => l.StartsWith(prefix, StringComparison.Ordinal)).ToList();
+
+    // ------------------------------------------------------------------ asm
+
+    /// <summary>The IR of function <c>F</c>, with the module body built for a target.</summary>
+    private static string AsmFunction(TargetPlatform target, string body)
+    {
+        var before = TargetPlatform.Current;
+        TargetPlatform.Current = target;
+        try
+        {
+            return Front.TestFunction(Front.ModuleIr("public void F()\n{\n" + body + "\n}"), "F");
+        }
+        finally
+        {
+            TargetPlatform.Current = before;
+        }
+    }
+
+    /// <summary>
+    /// The whole call, for the target whose rules the constraint string is
+    /// most of: outputs, then inputs, then the Win64 volatile set, then the
+    /// flags. Every block gets the same clobbers, operands or not.
+    /// </summary>
+    [Fact]
+    public void AnX64WindowsBlockClobbersTheWin64VolatileSet()
+    {
+        string body = AsmFunction(TargetPlatform.X64Windows,
+            "long a = 1; long r = 0;\nasm (in rcx = a, out rax = r) { mov rax, rcx }");
+
+        Assert.Contains(
+            "call i64 asm inteldialect \" mov rax, rcx \", " +
+            "\"={rax},{rcx},~{rax},~{rcx},~{rdx},~{r8},~{r9},~{r10},~{r11}," +
+            "~{xmm0},~{xmm1},~{xmm2},~{xmm3},~{xmm4},~{xmm5},~{dirflag},~{fpsr},~{flags}\"(i64 ",
+            body);
+    }
+
+    [Fact]
+    public void AnX64LinuxBlockClobbersTheSystemVVolatileSet()
+    {
+        string body = AsmFunction(TargetPlatform.X64Linux, "asm { nop }");
+
+        Assert.Contains(
+            "call void asm inteldialect \" nop \", " +
+            "\"~{rax},~{rcx},~{rdx},~{rsi},~{rdi},~{r8},~{r9},~{r10},~{r11}," +
+            "~{xmm0},~{xmm1},~{xmm2},~{xmm3},~{xmm4},~{xmm5},~{xmm6},~{xmm7}," +
+            "~{xmm8},~{xmm9},~{xmm10},~{xmm11},~{xmm12},~{xmm13},~{xmm14},~{xmm15}," +
+            "~{dirflag},~{fpsr},~{flags}\"()",
+            body);
+    }
+
+    [Fact]
+    public void AnX86BlockClobbersThreeRegistersAndEveryVectorRegister()
+    {
+        string body = AsmFunction(TargetPlatform.X86Linux, "asm { nop }");
+
+        Assert.Contains(
+            "\"~{eax},~{ecx},~{edx},~{xmm0},~{xmm1},~{xmm2},~{xmm3},~{xmm4},~{xmm5}," +
+            "~{xmm6},~{xmm7},~{dirflag},~{fpsr},~{flags}\"()",
+            body);
+    }
+
+    /// <summary>
+    /// ARM64 has one syntax, so no dialect. x18 is clobbered on Linux and not
+    /// on Windows, and the link register is spelled the one way LLVM acts on.
+    /// </summary>
+    [Fact]
+    public void AnArm64BlockClobbersByItsSystem()
+    {
+        string linux = AsmFunction(TargetPlatform.Arm64Linux, "asm { nop }");
+        string windows = AsmFunction(TargetPlatform.Arm64Windows, "asm { nop }");
+
+        Assert.Contains("call void asm \" nop \", \"~{x0},", linux);
+        Assert.Contains("~{x17},~{x18},~{lr},~{v0},", linux);
+        Assert.Contains("~{v7},~{v16},", linux);
+        Assert.Contains("~{v31},~{nzcv}\"()", linux);
+
+        Assert.Contains("~{x17},~{lr},~{v0},", windows);
+        Assert.DoesNotContain("x18", windows);
+        Assert.DoesNotContain("inteldialect", windows);
+    }
+
+    /// <summary>
+    /// On ARM64 x30 is <c>lr</c> as an operand as well as a clobber, and a vector
+    /// register is spelled by the value it carries rather than by what was
+    /// written.
+    /// </summary>
+    [Fact]
+    public void Arm64OperandsAreSpelledTheWayLlvmBindsThem()
+    {
+        string body = AsmFunction(TargetPlatform.Arm64Linux,
+            "long l = 0; float f = 0.0f; double d = 0.0;\n" +
+            "asm (inout x30 = l, inout v1 = f, inout d2 = f, inout v3 = d) { nop }");
+
+        Assert.Contains(
+            "call { i64, float, float, double } asm \" nop \", " +
+            "\"={lr},={s1},={s2},={d3},{lr},{s1},{s2},{d3},~{x0},", body);
+    }
+
+    /// <summary>
+    /// A value narrower than its register is extended by its own signedness,
+    /// and one read back narrower is the low bits; a bool is whether the
+    /// register is anything but zero.
+    /// </summary>
+    [Fact]
+    public void NarrowOperandsAreExtendedAndTruncated()
+    {
+        string body = AsmFunction(TargetPlatform.X64Windows,
+            "int s = -1; uint u = 1; bool b = true; short o = 0; bool r = false;\n" +
+            "asm (in rcx = s, in rdx = u, in r8b = b, out ax = o, out r9 = r) { nop }");
+
+        Assert.Contains("sext i32 ", body);
+        Assert.Contains(" to i64", body);
+        Assert.Contains("zext i32 ", body);
+        Assert.Contains("zext i1 ", body);
+        Assert.Contains(" to i8", body);
+        Assert.Contains("call { i16, i64 } asm", body);
+        Assert.Contains("icmp ne i64 ", body);
+    }
+
+    /// <summary>
+    /// A literal that fits the register is given the register's width, so
+    /// nothing needs extending; a pointer travels as one.
+    /// </summary>
+    [Fact]
+    public void LiteralsAndPointersNeedNoConversion()
+    {
+        string body = AsmFunction(TargetPlatform.X64Windows,
+            "int* p = null;\nasm (in al = 200, in rsi = p) { nop }");
+
+        Assert.Contains("\"{al},{rsi},", body);
+        Assert.Contains("(i8 200, ptr ", body);
+    }
+
+    /// <summary>
+    /// Several outputs come back as a struct and are unpacked in the order
+    /// written, each into the address worked out before the block.
+    /// </summary>
+    [Fact]
+    public void SeveralOutputsAreUnpackedInOrder()
+    {
+        string body = AsmFunction(TargetPlatform.X64Windows,
+            "long low = 0; long high = 0;\nasm (out rax = low, out rdx = high) { rdtsc }");
+
+        Assert.Contains("call { i64, i64 } asm inteldialect \" rdtsc \", \"={rax},={rdx},", body);
+        Assert.Contains("extractvalue { i64, i64 } ", body);
+        Assert.Contains(", 0", body);
+        Assert.Contains(", 1", body);
+    }
+
+    /// <summary>
+    /// The text is escaped for an LLVM string — a quote, a backslash, a
+    /// newline, anything outside printable ASCII — and a carriage return is
+    /// dropped, so a file saved with either line ending emits the same IR.
+    /// </summary>
+    [Theory]
+    [InlineData("mov rax, 1\r\nret", "mov rax, 1\\0Aret")]
+    [InlineData(".ascii \"a\\b\"", ".ascii \\22a\\5Cb\\22")]
+    [InlineData("\tnop # é", "\\09nop # \\C3\\A9")]
+    public void AsmTextIsEscapedForAnLlvmString(string text, string escaped) =>
+        Assert.Equal(escaped, Emit.LlvmEmitter.AsmString(text));
 }

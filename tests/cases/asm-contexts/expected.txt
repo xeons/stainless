@@ -1,0 +1,6 @@
+cpuid leaves some
+rdtsc ticks
+loop 55
+lambda 27
+for parallel 240
+spawn 169

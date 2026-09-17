@@ -130,9 +130,166 @@ public sealed class Lexer(
         // Taken before the token is lexed and applied after, so that every path
         // out of Lex carries it without each one having to remember to.
         string? documentation = TakeDocumentation();
-        var token = Lex();
 
+        var token = _asm is AsmPosition.AfterWord or AsmPosition.AfterOperands &&
+                    _pos < _text.Length && Current == '{'
+            ? LexAsmBody(_pos)
+            : Lex();
+
+        FollowAsm(token);
         return documentation is null ? token : token with { Documentation = documentation };
+    }
+
+    // ============================================================ asm
+
+    /// <summary>Where the lexer is relative to the last <c>asm</c> it read.</summary>
+    private enum AsmPosition
+    {
+        /// <summary>Nowhere near one: a <c>{</c> is punctuation.</summary>
+        None,
+
+        /// <summary>Straight after the word, where either the operands or the body may start.</summary>
+        AfterWord,
+
+        /// <summary>Inside the parenthesised operands, which are ordinary tokens.</summary>
+        InOperands,
+
+        /// <summary>After the operands' closing parenthesis, where only the body may start.</summary>
+        AfterOperands,
+    }
+
+    private AsmPosition _asm;
+
+    /// <summary>
+    /// Where the <c>asm</c> body that ran to the end of the file began, or null.
+    /// The parser reads it to stay quiet about the constructs left open, which
+    /// is all of them and all for the one reason already reported.
+    /// </summary>
+    public int? UnterminatedAsm { get; private set; }
+
+    /// <summary>How many parentheses are open inside an <c>asm</c> statement's operands.</summary>
+    private int _asmParentheses;
+
+    /// <summary>
+    /// Keeps track of whether the next <c>{</c> opens an assembly body.
+    ///
+    /// <para>
+    /// This has to be the lexer's question rather than the parser's, because
+    /// the body is not tokens: <c>mov rax, [rcx + 8] # load</c> is not
+    /// Stainless, and a <c>#</c> in it is not even a character this language
+    /// has. The whole file is tokenized before the parser runs, so by the time
+    /// the parser could say "a body goes here" the text would already have been
+    /// cut into the wrong pieces.
+    /// </para>
+    ///
+    /// <para>
+    /// So the shape is recognised here instead: the word, then optionally a
+    /// parenthesised list lexed as ordinary tokens with its depth counted, then
+    /// a <c>{</c>. Anything else leaves the lexer as it was, and the parser
+    /// says what is missing. A <c>{</c>, <c>}</c> or <c>;</c> inside the
+    /// operands gives up on the statement as well, so a <c>(</c> that is never
+    /// closed cannot turn the rest of the file into assembly.
+    /// </para>
+    ///
+    /// <para>
+    /// It is why <c>asm</c> is a keyword and not a contextual word. The lexer
+    /// cannot see statement position, so a method named <c>asm</c> would have
+    /// its body read as assembly — <c>void asm(int x) { ... }</c> is exactly
+    /// the shape above. No source in this repository used the word as a name.
+    /// </para>
+    /// </summary>
+    private void FollowAsm(Token token)
+    {
+        switch (_asm)
+        {
+            case AsmPosition.None:
+                if (token.Kind == TokenKind.AsmKeyword)
+                    _asm = AsmPosition.AfterWord;
+                return;
+
+            case AsmPosition.AfterWord when token.Kind == TokenKind.OpenParen:
+                _asm = AsmPosition.InOperands;
+                _asmParentheses = 1;
+                return;
+
+            case AsmPosition.InOperands:
+                switch (token.Kind)
+                {
+                    case TokenKind.OpenParen:
+                        _asmParentheses++;
+                        return;
+
+                    case TokenKind.CloseParen:
+                        if (--_asmParentheses == 0)
+                            _asm = AsmPosition.AfterOperands;
+                        return;
+
+                    case TokenKind.OpenBrace or TokenKind.CloseBrace or TokenKind.Semicolon
+                        or TokenKind.EndOfFile:
+                        _asm = AsmPosition.None;
+                        return;
+
+                    default:
+                        return;
+                }
+
+            default:
+                // The body itself, or whatever stood where one should have.
+                _asm = token.Kind == TokenKind.AsmKeyword ? AsmPosition.AfterWord : AsmPosition.None;
+                return;
+        }
+    }
+
+    /// <summary>
+    /// The text between an <c>asm</c> statement's braces, as one token whose
+    /// value is that text exactly as written — line breaks, indentation and
+    /// comments included — and whose span runs from the <c>{</c> to the
+    /// <c>}</c>.
+    ///
+    /// <para>
+    /// Braces are counted wherever they are, comments included, so a block may
+    /// hold one only with its partner: AVX-512's <c>{k1}</c> is fine, and a
+    /// comment reading <c>// }</c> ends the block. Recognising comments here
+    /// would mean knowing which syntax the target's assembler has — <c>#</c>
+    /// starts one on x86 and is an immediate on ARM — and a rule that changed
+    /// with <c>--target</c> would make the same file lex differently on two
+    /// machines.
+    /// </para>
+    ///
+    /// <para>
+    /// Nothing inside is read as a directive either. The text is the
+    /// assembler's, and a line beginning <c>#if</c> in it is an x86 comment
+    /// rather than a condition; <c>#if</c> goes around the whole statement.
+    /// </para>
+    /// </summary>
+    private Token LexAsmBody(int start)
+    {
+        _pos++;                                             // the '{'
+        int depth = 1;
+
+        while (_pos < _text.Length)
+        {
+            char c = _text[_pos++];
+            if (c == '{')
+            {
+                depth++;
+            }
+            else if (c == '}' && --depth == 0)
+            {
+                string text = _text[(start + 1)..(_pos - 1)];
+                return new Token(TokenKind.AsmBody, SpanFrom(start), _text[start.._pos], text);
+            }
+        }
+
+        // The rest of the file was taken, which is the only reading a missing
+        // brace allows; what follows is reported once, here, rather than as a
+        // stream of complaints about declarations that were never lexed.
+        UnterminatedAsm = start;
+        diagnostics.Error("SL0713", new SourceSpan(source, start, start + 1),
+            "this 'asm' block is never closed; its '}' is missing, so the rest of the file " +
+            "was read as assembly. Braces inside the block are counted, comments included");
+
+        return new Token(TokenKind.AsmBody, SpanFrom(start), _text[start.._pos], _text[(start + 1).._pos]);
     }
 
     private Token Lex()
