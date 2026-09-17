@@ -86,8 +86,10 @@ That row is member access, a call, an index, a slice and the postfix steps, and
 it binds tightest: `a.b.c` is `(a.b).c`, and `f(x)[i]` indexes what `f`
 answered. It is also where the terms sit that look like operators and are not:
 `new`, `typeof`, `sizeof`, `alignof`, `offsetof`, `nameof`, `iidof`,
-`default(T)` and `checked(x)` each take a type or a parenthesised expression
-rather than binding over a neighbour, so nothing can group around them wrongly.
+`embed`, `default(T)` and `checked(x)` each take a type or a parenthesised
+argument list rather than binding over a neighbour, so nothing can group around
+them wrongly. `embed("logo.png")` is a file's bytes as a `byte[]`, placed by the
+linker ([§8.7](08-interop-libraries.md#87-embedding-a-file)).
 A cast takes a unary operand, which is why `(T)a * b` is `((T)a) * b`.
 
 `?.`, `??` and `??=` are left out of that list deliberately and are in

@@ -1,0 +1,26 @@
+# COFF's: read-only data is `.rdata`, and the flags are letters for what the
+# section holds and what it permits.
+module asm ".section \22.rdata\22,\22dr\22"
+module asm ".section \22.data\22,\22dw\22"
+module asm ".section \22.stub\22,\22xr\22"
+module asm ".p2align 3"
+
+# A static holding an embed is born holding its address, with no initializer
+# to run, and the same file, section and access twice is one object.
+@_SLstatic_EmbedCase_Blobs_Table = internal global ptr @"\01_SLembed0", align 8
+@_SLstatic_EmbedCase_Blobs_Again = internal global ptr @"\01_SLembed0", align 8
+@_SLstatic_EmbedCase_Blobs_Scratch = internal global ptr @"\01_SLembed1", align 8
+
+# The object: two immortal counts, a null type word, the length, the file. The
+# length is also the count `.incbin` is held to.
+module asm "_SLembed0:"
+module asm ".quad -1"
+module asm ".quad 0"
+module asm ".quad 13"
+data/table.bin\22,0,13"
+stub.bin\22,0,6"
+module asm ".text"
+
+# Declared as the whole object, hidden, and not constant.
+@"\01_SLembed0" = external hidden global { i64, i64, ptr, i64, [13 x i8] }, align 8
+@"\01_SLembed3" = external hidden global { i64, i64, ptr, i64, [0 x i8] }, align 8

@@ -1,0 +1,2 @@
+# A section name past eight bytes, which lld-link cuts short in the image.
+SL0710

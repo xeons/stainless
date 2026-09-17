@@ -191,6 +191,7 @@ public sealed class ProjectBuilder(
         // produced is still there. Building it again would produce the same
         // bytes at the cost of a clang invocation and a link.
         if (BuildStamp.Read(stampPath) is { } stamp && stamp.Inputs == inputs &&
+            stamp.EmbeddedFilesAreUnchanged() &&
             File.Exists(output) && File.Exists(metadata) && File.Exists(linkInput))
         {
             _libraries[package.Name] = new Built(metadata, linkInput);
@@ -237,7 +238,12 @@ public sealed class ProjectBuilder(
 
         // Only after everything above succeeded. A stamp written beside a
         // half-built library would be a promise about a thing that is not there.
-        new BuildStamp { Inputs = inputs, AbiDigest = described.AbiDigest }.Write(stampPath);
+        new BuildStamp
+        {
+            Inputs = inputs,
+            AbiDigest = described.AbiDigest,
+            Embedded = BuildStamp.Digests(result.EmbeddedFiles),
+        }.Write(stampPath);
 
         if (CheckAbiDigest(package, before, described) is { } mismatch)
         {
@@ -270,6 +276,11 @@ public sealed class ProjectBuilder(
     ///   its shared deps      their surfaces are what it was bound against
     ///   the flags            optimisation, debug, ABI, runtime, defines
     ///   where it goes        a moved output is a different build
+    ///
+    /// And one more that cannot be hashed here, because nothing knows it until
+    /// the package has been bound: the files its <c>embed</c>s name. The stamp
+    /// keeps those beside this hash, with their digests — see
+    /// <see cref="BuildStamp.Embedded"/>.
     ///
     /// What is deliberately absent is timestamps. A file restored from an
     /// archive, a clock that went backwards, a checkout that rewrote mtimes --

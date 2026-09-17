@@ -16,8 +16,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 324 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,126 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 332 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,162 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -55,15 +55,15 @@ it finds crashes and not miscompilations. Its first five minutes found two
 dozen crashes the suites had not, and a fixed one is pinned by an ordinary case
 like any other bug — the fuzzer's findings directory is not a test suite.
 
-**Both Windows and Linux are tested.** 324 cases, of which 13 are
-Windows-only and 2 are Linux-only, so Linux runs 311 and Windows 322, each
+**Both Windows and Linux are tested.** 332 cases, of which 13 are
+Windows-only and 2 are Linux-only, so Linux runs 319 and Windows 330, each
 skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other — carries an `expected.linux.txt` beside its `expected.txt` rather than
 having the difference argued away.
 
-Nine of those cases are real 32-bit binaries, built and run on both systems, and
-two are built for ARM64 and not run: there is no ARM64 machine here, so they
+Ten of those cases are real 32-bit binaries, built and run on both systems, and
+four are built for ARM64 and not run: there is no ARM64 machine here, so they
 stop at an object file LLVM verified and lowered, with their signatures pinned
 against clang's. Building 32-bit on Linux needs the development half of the
 multilib packages, which is what
@@ -122,6 +122,7 @@ ships in the same directory.
 | [Binding/Binder.cs](../src/Stainless.Compiler/Binding/Binder.cs) | the eleven passes; one partial class over `Binder.*.cs`, a file per area — bodies, calls, closures, conversions, generics, inheritance, layout |
 | [Binding/TypeSystem.cs](../src/Stainless.Compiler/Binding/TypeSystem.cs) | types and C-rule layout |
 | [Binding/TargetPlatform.cs](../src/Stainless.Compiler/Binding/TargetPlatform.cs) | what `--target` and `--abi` parse to, and the host's defaults |
+| [Binding/EmbeddedFile.cs](../src/Stainless.Compiler/Binding/EmbeddedFile.cs) | what an `embed` is: which sections a target already owns, and the assembly the object is written as |
 | [Binding/Builtins.cs](../src/Stainless.Compiler/Binding/Builtins.cs) | `String`, `StringBuilder`, `[Flags]`, and the ordering and hashing a primitive gets for free |
 | [Binding/Mangler.cs](../src/Stainless.Compiler/Binding/Mangler.cs) | symbol names |
 | [Binding/CppMangler.cs](../src/Stainless.Compiler/Binding/CppMangler.cs) | C++ symbol names, in the Itanium and Microsoft schemes |

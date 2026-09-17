@@ -59,6 +59,33 @@ public sealed record BuildStamp
     /// </summary>
     public required string AbiDigest { get; init; }
 
+    /// <summary>
+    /// Every file the build embedded, with the digest of its bytes then.
+    ///
+    /// <b>Kept apart from <see cref="Inputs"/> because it cannot be known in
+    /// advance.</b> Everything in that hash is read before the build starts;
+    /// which files an <c>embed</c> names is only known once the program has
+    /// been bound. A package's own directory is already in its source digest,
+    /// but an <c>embed</c> may name a file anywhere — a sibling directory, an
+    /// absolute path — and a build that did not look at it again would link
+    /// yesterday's bytes into today's library and report nothing.
+    /// </summary>
+    public IReadOnlyList<StampedFile> Embedded { get; init; } = [];
+
+    /// <summary>
+    /// Whether every embedded file still has the bytes it had when the stamp
+    /// was written. A file that is gone or cannot be read has not: it digests
+    /// to nothing, which matches no digest, and the build then reports it.
+    /// </summary>
+    public bool EmbeddedFilesAreUnchanged() =>
+        Embedded.All(file => file.Digest.Length > 0 && Digest.OfFile(file.Path) == file.Digest);
+
+    /// <summary>The digest of each of these files, as a stamp records them.</summary>
+    public static IReadOnlyList<StampedFile> Digests(IEnumerable<string> paths) =>
+        paths.Distinct(StringComparer.Ordinal)
+             .Select(path => new StampedFile(path, Digest.OfFile(path)))
+             .ToList();
+
     private static readonly JsonSerializerOptions Format_ = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -106,3 +133,6 @@ public sealed record BuildStamp
         }
     }
 }
+
+/// <summary>A file a build read, by where it is and what its bytes were.</summary>
+public sealed record StampedFile(string Path, string Digest);

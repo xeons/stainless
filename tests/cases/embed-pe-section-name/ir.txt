@@ -1,0 +1,2 @@
+# The object file keeps the whole name; it is the image that loses it.
+module asm ".section \22.embedded_logo\22,\22dr\22"

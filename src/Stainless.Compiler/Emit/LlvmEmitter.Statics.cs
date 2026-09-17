@@ -66,6 +66,10 @@ public sealed partial class LlvmEmitter
         // answer serves a literal holding nothing.
         if (symbol.Initializer is BoundNullLiteral or BoundDefault) return ZeroOf(llvmType);
 
+        // An address the linker fills in, in writable data where every loader
+        // applies a relocation. See `EmbeddedData`.
+        if (symbol.Initializer is BoundEmbed embedded) return EmbedSymbol(embedded.File);
+
         var literal = (BoundLiteral)symbol.Initializer!;
         return literal.Value is null ? ZeroOf(llvmType) : EmitLiteral(literal).Ref;
     }

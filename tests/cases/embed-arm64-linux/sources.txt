@@ -1,0 +1,2 @@
+# The embed case's program, built for another target.
+tests/cases/embed/embed.sl

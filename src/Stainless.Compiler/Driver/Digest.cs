@@ -277,6 +277,28 @@ public static class Digest
         return Hash(parts);
     }
 
+    /// <summary>
+    /// The digest of one file's bytes, or an empty string when it cannot be
+    /// read.
+    ///
+    /// Empty rather than an exception because the only question asked of it
+    /// is whether a file is the one a build last saw, and a file that cannot
+    /// be read is not — the build that follows will say why.
+    /// </summary>
+    public static string OfFile(string path)
+    {
+        try
+        {
+            using var stream = File.OpenRead(path);
+            return Convert.ToHexStringLower(SHA256.HashData(stream));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException
+                                      or ArgumentException or NotSupportedException)
+        {
+            return "";
+        }
+    }
+
     private static string Relative(string root, string path) =>
         Path.GetRelativePath(root, path).Replace('\\', '/');
 

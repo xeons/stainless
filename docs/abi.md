@@ -407,6 +407,24 @@ storage. `sl_retain` and `sl_release` return immediately for such objects, so a
 statically allocated instance costs neither an allocation nor any reference
 traffic. String literals are emitted this way.
 
+So is the array an `embed` names
+([§8.7 of the specification](spec/08-interop-libraries.md#87-embedding-a-file)),
+with one difference: its type word is **zero**. The object is written as
+assembly into a section whose permissions the program chose — read-only data,
+writable data or code — and a pointer there would be a relocation, which in a
+read-only or executable section of a position-independent Linux executable lld
+refuses and GNU ld turns into a `DT_TEXTREL`. Nothing reads it: the counts are checked before anything else in the
+header, the runtime treats a null type as none wherever it does look, and an
+array's type information has no dispatch, interface or COM table to find.
+
+```
+offset 0   strong      SIZE_MAX
+offset 8   weak        SIZE_MAX
+offset 16  type        0
+offset 24  length      the file's size
+offset 32  the file, byte for byte
+```
+
 ### 2.2 Enums, delegates and closures
 
 An **enum** is exactly its underlying integer — `int` unless another is named.
@@ -1018,7 +1036,10 @@ guess is wrong:
 A static becomes one zeroed global per declaration. A single generated
 function, `_SLstatics`, runs every initializer in dependency order and is called
 from `main` before anything else. A static whose value is a literal — a number,
-`null`, `default` — needs no code at all: the global is emitted holding it.
+`null`, `default` — needs no code at all: the global is emitted holding it. So
+does one holding an `embed`, whose object the linker placed: the global is born
+holding its address, and that relocation is in writable data, where every
+loader applies one.
 
 There is no lazy guard and no once-flag: the whole program is compiled together,
 so the order is computed at compile time rather than discovered at run time. A

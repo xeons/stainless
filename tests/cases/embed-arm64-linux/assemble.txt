@@ -1,0 +1,5 @@
+# Built to an object file and not run. What it proves is that the assembly
+# `embed` writes is accepted by the assembler for this object format and
+# architecture — the section directive's syntax, the word size and `.incbin` —
+# which is where the two formats differ and where a mistake would be a build
+# failure reported as a compiler bug.

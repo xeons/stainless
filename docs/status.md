@@ -562,6 +562,14 @@ last person to edit it -- the suite is the authority.
   unless it carries the `f` suffix
 - Shared libraries: `--shared` with a generated C header, and an export table
   containing exactly the `export "C"` functions
+- **`embed`**: `static readonly byte[] Logo = embed("logo.png");` carries a
+  file in the binary as an immortal array the linker places — no copy, no
+  startup code, and legal in a `--shared` library. The path is relative to the
+  source file that wrote it; `access:` makes it writable or executable and
+  `section:` names where it goes, with each combination an assembler would get
+  wrong refused where it is written. Run on x64 and x86, on Windows and Linux,
+  and assembled for ARM64 on both. A dependency is rebuilt when a file it embeds
+  changes. See [§8.7](spec/08-interop-libraries.md#87-embedding-a-file)
 - Stainless libraries consumed by Stainless: `--metadata` writes a `.slmod`
   describing a library's public surface, and `--reference` binds another
   compilation against it. Classes cross with their fields, properties, methods,
@@ -791,8 +799,9 @@ Being straight about the edges, roughly in the order they are worth adding:
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
 - **A `--shared` library cannot have a static**, of a module or of a type,
-  unless its value is a literal — a number, `null`, `default` — that the global
-  can simply be born holding: there is no entry point to run any other
+  unless its value is a literal — a number, `null`, `default` — or an `embed`,
+  that the global can simply be born holding: there is no entry point to run any
+  other
   initializer from (SL0380). There is no
   per-thread storage either, and no automatic static property -- its backing
   storage would have no initializer, which is the one moment a static has.

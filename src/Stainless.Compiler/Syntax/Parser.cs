@@ -3101,6 +3101,19 @@ public sealed class Parser
                 return new IidofSyntax(SpanFrom(start), type);
             }
 
+            case TokenKind.EmbedKeyword:
+            {
+                Advance();
+
+                // The argument list a call has, named arguments included, so
+                // `section:` and `access:` are spelled the way every other
+                // optional argument is. What may go in it is the binder's
+                // question: a wrong one is then reported against the argument
+                // rather than as a parse error somewhere after it.
+                var arguments = ParseArgumentList();
+                return new EmbedSyntax(SpanFrom(start), arguments);
+            }
+
             case TokenKind.OpenParen:
             {
                 // `(Type)operand` is a cast; anything else in parentheses is grouping.
@@ -3182,7 +3195,7 @@ public sealed class Parser
             TokenKind.ThisKeyword, TokenKind.BaseKeyword, TokenKind.NewKeyword,
             TokenKind.SizeofKeyword,
             TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,
-            TokenKind.TypeofKeyword,
+            TokenKind.TypeofKeyword, TokenKind.EmbedKeyword,
             TokenKind.TrueKeyword, TokenKind.FalseKeyword, TokenKind.NullKeyword,
             TokenKind.Bang, TokenKind.Tilde);
 

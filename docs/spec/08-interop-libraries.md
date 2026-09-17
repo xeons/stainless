@@ -680,6 +680,227 @@ A name declared 'extern "C"' has to come from somewhere. Link what defines it:
 ordinary input.
 ```
 
+## 8.7 Embedding a file
+
+```csharp
+static readonly byte[] Logo = embed("logo.png");                        // read-only data
+static readonly byte[] Table = embed("data/table.bin", access: "rw");   // writable
+static readonly byte[] Stub = embed("stub.bin", section: ".stub", access: "rx");
+```
+
+`embed` makes a file's bytes part of the binary and names them as a `byte[]`.
+Nothing is copied at run time and nothing is read from disk: the linker places
+an array object holding the file, and the expression is its address. It is an
+expression like any other, so a local may be given one as well as a static —
+but a static is what it is for, because the object exists for the life of the
+program whatever holds it.
+
+This is what C does with `xxd -i` and a generated header, and what C23 does
+with `#embed`. It is a keyword here, like `nameof` and `sizeof`, rather than a
+function in the standard library, because what it produces is decided when the
+program is built and no function runs then.
+
+**Every argument is a string literal.** The path, the section and the access
+each decide something about the binary, so none of them can be a value the
+program computes (SL0704) — not a `static readonly String`, and not two
+literals joined with `+`. A file whose name is known only at run time is a file
+to read, and `Standard.File` reads it. The path comes first, and the other two
+are named arguments ([§7.2.2](07-functions-members.md#722-named-arguments)),
+each given once (SL0703).
+
+### The path
+
+**Relative to the source file that wrote the `embed`**, not to the directory
+the build was started in. A source file and the data beside it move together,
+and a build started from a project two directories up, from the test harness
+or from an editor then finds the same bytes. It is the rule `llvm-rc` follows
+for a resource script and the one `#include "..."` starts with, and for the
+same reason: it is what makes a project relocatable. An absolute path is taken
+as written.
+
+The file is checked where the `embed` is bound, so a mistake is an error on the
+literal that made it rather than an assembler failure later. A file that is not
+there, a directory, a file that cannot be opened, and one larger than an array
+on the target can describe are all SL0706:
+
+```
+error[SL0706]: there is no file at 'C:\src\game\assets\logo.png' to embed
+```
+
+A relative path also needs a file to be relative to. Source compiled from a
+file always has one; the standard library, which the compiler holds as
+resources, and text an editor or a test hands the compiler under a made-up
+name do not, and a relative `embed` in either is refused rather than resolved
+against whatever the working directory happens to be.
+
+**Two identical embeds are one object.** The same file, placed in the same
+section with the same access, is the same bytes, so a program that names it in
+three places carries it once and all three are the same reference. Changing the
+access or the section makes another object, because those are different memory.
+
+### Access
+
+`access:` is some of the letters `r`, `w` and `x`, each at most once, in any
+order, and always including `r` (SL0707). The default is `"r"`.
+
+| Access | Default section, PE | Default section, ELF | What it is for |
+|---|---|---|---|
+| `"r"` | `.rdata` | `.rodata` | data the program reads — the usual case |
+| `"rw"` | `.data` | `.data` | a table the program also updates |
+| `"rx"` | `.text` | `.text` | machine code to call |
+| `"rwx"` | none | none | code written at run time; name a section |
+
+**Writing to a read-only embed faults**, as writing to a string literal does in
+C. Nothing checks it when the program is compiled — an element store looks the
+same whatever array it is into — and nothing makes it silently work either:
+the page is mapped read-only, and the store is an access violation or a
+`SIGSEGV`. The optimiser is not told the bytes are constant, deliberately, so
+that the fault is what happens rather than the store being deleted as
+something that cannot occur. Ask for `"rw"` where the program writes.
+
+**`"rwx"` has no default** (SL0708). Every target has a section for read-only
+data, for writable data and for code, and none has one for memory that is both
+writable and executable — the combination security hardening exists to remove.
+Quietly making one would put it in a binary nobody asked for it in by name, so
+it is asked for by name:
+
+```csharp
+static readonly byte[] Scratch = embed("trampoline.bin", section: ".jit", access: "rwx");
+```
+
+`"rx"` is how an embed becomes code. The first element is the first byte of the
+file, and a pointer to it converts to a `delegate`
+([§2.14](02-types.md#214-delegate--a-named-function-pointer)):
+
+```csharp
+public delegate int Answer();
+
+static readonly byte[] Stub = embed("stub.bin", section: ".stub", access: "rx");
+...
+var answer = (Answer)(void*)&Stub[0];      // B8 2A 00 00 00 C3: mov eax, 42; ret
+Console.WriteLine($"{answer()}");          // 42
+```
+
+### Sections
+
+`section:` names where the object goes; without it the object goes where the
+table above says. A name has to survive being written into an assembler
+directive and named again by a linker script, so it may not be empty or hold a
+quote, a backslash, a comma, whitespace or a control character (SL0709).
+
+**A section already has its permissions, and an embed cannot give it others**
+(SL0711). An assembler does not take flags for a section it knows: `.text`
+asked for as read-only data is still executable, silently, on both object
+formats — so an embed asking `.text` for `"r"` would get code. The same holds
+for a name extending one of those (`.text.stub` on ELF, `.text$stub` on PE,
+which the linker folds into `.text`), for `.bss`, which holds no bytes in the
+file at all, and for a section this program defines: the first embed placed in
+one decides its access, and a second asking for different access is refused
+rather than left for the assembler to reject or, on PE, to ignore.
+
+```
+error[SL0711]: '.text' is always "rx" on x86_64-pc-linux-gnu, and the assembler
+would keep that whatever an embed asked for, so "r" cannot be placed there; name
+a section of its own
+```
+
+**A PE image keeps eight bytes of a section name.** An object file can hold a
+longer one, and lld-link then cuts it short in the executable without a word —
+`.embedded_logo` becomes `.embedde`. The bytes arrive either way, so this is a
+warning rather than an error, and only for a Windows target (SL0710): what
+breaks is a tool looking for the section by the name the source gave it.
+
+### What is in the section
+
+The section holds the whole array object — the header and then the file — so
+that the address the program holds is an ordinary array reference and nothing
+has to be built at startup:
+
+```
+word 0   strong count   all ones: SL_IMMORTAL
+word 1   weak count     all ones
+word 2   type           0
+word 3   length         the file's size in bytes
+word 4…  the file, byte for byte
+```
+
+A word is eight bytes on a 64-bit target and four on x86, and the object is
+aligned to one. The cost is that the section is not only the file: a dump of it
+shows the header in front — 32 bytes on a 64-bit target — and a tool reading
+the section expecting the file alone has to skip them. `&Stub[0]` is the first
+byte of the file.
+
+**The object file has the section; the executable has what the linker made of
+it.** A linker script decides which input sections become which output ones,
+and the default one does not always keep a name: GNU ld's folds `.stub` into
+`.text`, so on Linux the stub above runs from `.text` and `readelf -x .stub`
+finds nothing, and the eight-byte limit above is the same kind of thing on
+Windows. The permissions survive, because an output section has at least those
+of everything folded into it. A name no default script mentions — `.jit`,
+`.blob` — is one that reaches the executable as written.
+
+**The type word is zero, where every other object has a pointer.** A pointer
+there would be a relocation, and a relocation in a read-only or executable
+section of a position-independent Linux executable is one the loader would have
+to write to a page it is not allowed to: lld refuses to link it ("recompile with
+-fPIC"), and GNU ld links it with a warning and a `DT_TEXTREL` that hardened
+systems will not load. Zero is safe because
+nothing reachable from a `byte[]` reads it. An immortal object's counts are
+checked first by everything that would touch its header — retain, release,
+their weak counterparts and `sl_make_immortal` all return before reading
+further — so it is never destroyed and never asks its type how. The runtime
+already treats a null type as no type wherever it does read one: a class test is
+false, an interface test is false, and a failed cast's message calls it `null`.
+And an array's type information has no dispatch table, no interfaces and no COM
+layout, so no call on an array could have looked one up.
+
+**The bytes are assembly, not an IR global.** An IR global can be given a
+section but not the section's flags; on ELF, one placed in a section an
+assembler directive also named becomes a second section of the same name with
+the flags LLVM chose. So the compiler writes the directive, the header and an
+`.incbin` of the file into the module's assembly, in the syntax of the target's
+object format, and refers to the label from the IR. That also keeps the IR
+small — a megabyte of image is one line rather than three megabytes of escaped
+bytes — and means the compiler never holds the file in memory: the assembler
+reads it. `.incbin` is given the length the file had when it was checked, so a
+file that shrank in between is an assembler error rather than a length word
+promising bytes that are not there.
+
+### Rebuilding
+
+**An embedded file is an input to the build**, as a source file is. A shared
+dependency is rebuilt when one it embeds has changed, wherever the file is: its
+build stamp records each embedded file and the digest of its bytes, and a stamp
+whose files no longer match is a stamp that says nothing
+([packages.md §7.1](../packages.md#71-what-gets-rebuilt)). They are kept beside
+the stamp's other inputs rather than hashed with them, because every other
+input is known before the build starts and which files a program embeds is not
+known until it has been bound.
+
+One thing it does not reach is the lock file. A package's `sourceDigest` is
+taken over its own directory when dependencies are resolved, before anything is
+bound, so an embed of a file outside the package changes what is built without
+changing that digest. Keep what a package embeds inside the package.
+
+### `embed` or a resource
+
+[Resources](../packages.md#22-resources) are the other way to carry bytes, and
+the two answer different questions.
+
+A **resource** is found at run time, by a type and a number, through
+`Standard.Resources`. It is how a Windows program carries what Windows itself
+reads — an icon, a manifest, a dialog template, a version block — and a program
+can enumerate what it has, look one up by an ID computed at run time, and
+replace one in the binary afterwards with a resource editor. What that costs is
+a lookup and an API.
+
+An **`embed`** is found by the linker, by name. There is no lookup, no ID and
+no API: the program holds the array from the moment it starts. It is the right
+choice for data the program itself uses — a font, a shader, a lookup table, a
+default configuration, a stub of machine code — and the only one of the two
+that can be writable or executable. What it cannot do is be enumerated,
+replaced after linking, or read by the operating system.
+
 ---
 
 <sub>[&larr; Functions and members](07-functions-members.md) &nbsp;&middot;&nbsp; [Statements and expressions &rarr;](09-statements-expressions.md)</sub>

@@ -56,6 +56,15 @@ public sealed class BoundProgram
     /// every static field has its value.
     /// </summary>
     public required IReadOnlyList<FunctionSymbol> StaticConstructors { get; init; }
+
+    /// <summary>
+    /// Every file an <c>embed</c> carries into the binary, one per distinct
+    /// object, in the order they were first bound.
+    ///
+    /// The emitter writes them and the driver reads them, because a file the
+    /// program embeds is as much an input to the build as a source file is.
+    /// </summary>
+    public IReadOnlyList<EmbeddedFile> Embeds { get; init; } = [];
 }
 
 /// <summary>
@@ -334,6 +343,7 @@ public sealed partial class Binder(
             EntryPoint = requireEntryPoint ? FindEntryPoint() : null,
             Statics = _staticOrder,
             StaticConstructors = _staticConstructors,
+            Embeds = _embeds.Values.OrderBy(e => e.Index).ToList(),
         };
     }
 

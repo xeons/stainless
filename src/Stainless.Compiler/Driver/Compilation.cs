@@ -203,6 +203,15 @@ public sealed record CompilationResult
     /// <summary>The documentation pages written, or empty.</summary>
     public IReadOnlyList<string> DocumentationFiles { get; init; } = [];
 
+    /// <summary>
+    /// Every file an <c>embed</c> carried into the output, as a full path.
+    ///
+    /// They are inputs to the build as much as the sources are, and something
+    /// deciding whether a build is up to date has to be able to ask for them:
+    /// only the binder knows which files a program embeds.
+    /// </summary>
+    public IReadOnlyList<string> EmbeddedFiles { get; init; } = [];
+
     /// <summary>A failure outside the source program: a missing tool, unreadable file, bad IR.</summary>
     public string? DriverError { get; init; }
 }
@@ -752,6 +761,7 @@ public sealed class Compilation
                 Diagnostics = diagnostics.Sorted().ToList(),
                 IrPath = irPath,
                 Ir = ir,
+                EmbeddedFiles = EmbeddedFiles(program),
             };
 
         // --- assemble and link -------------------------------------------
@@ -876,6 +886,7 @@ public sealed class Compilation
             Ir = ir,
             HeaderPath = headerPath,
             MetadataPath = metadataPath,
+            EmbeddedFiles = EmbeddedFiles(program),
         };
     }
 
@@ -1200,6 +1211,10 @@ public sealed class Compilation
 
         return common;
     }
+
+    /// <summary>Each file the program embeds, once, however many objects it makes.</summary>
+    private static List<string> EmbeddedFiles(Binding.BoundProgram program) =>
+        program.Embeds.Select(e => e.Path).Distinct(StringComparer.Ordinal).ToList();
 
     private static CompilationResult Failed(DiagnosticBag diagnostics) =>
         new() { Success = false, Diagnostics = diagnostics.Sorted().ToList() };

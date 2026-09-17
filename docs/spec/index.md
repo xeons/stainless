@@ -169,7 +169,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 
 ### [8. Interoperability and libraries](08-interop-libraries.md)
 
-`extern`/`export`, C++ linkage, shared libraries, what crosses a boundary, COM, and linking a platform library.
+`extern`/`export`, C++ linkage, shared libraries, what crosses a boundary, COM, linking a platform library, and embedding a file.
 
 - [8.1 C++ linkage](08-interop-libraries.md#81-c-linkage)
 - [8.2 Building a shared library](08-interop-libraries.md#82-building-a-shared-library)
@@ -177,6 +177,7 @@ Functions, defaults, `ref`/`in`/`out`, named arguments, properties, operators, i
 - [8.4 A Stainless library consumed by Stainless](08-interop-libraries.md#84-a-stainless-library-consumed-by-stainless)
 - [8.5 COM](08-interop-libraries.md#85-com)
 - [8.6 Linking a platform library](08-interop-libraries.md#86-linking-a-platform-library)
+- [8.7 Embedding a file](08-interop-libraries.md#87-embedding-a-file)
 
 ### [9. Statements and expressions](09-statements-expressions.md)
 

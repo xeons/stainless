@@ -246,6 +246,7 @@ public sealed partial class LlvmEmitter(
             EmitEntryPoint(program.EntryPoint);
 
         StringConstants();
+        EmbeddedData(program);
         TypeRegistry(program);
         StartupTable();
 

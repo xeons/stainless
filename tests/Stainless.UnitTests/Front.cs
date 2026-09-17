@@ -120,6 +120,23 @@ public static class Front
     }
 
     /// <summary>
+    /// Binds a file as though it had been read from <paramref name="path"/>,
+    /// without it having to be there.
+    ///
+    /// For a rule about where a source file is: <c>embed</c> finds a file
+    /// relative to the one that wrote it, which <see cref="TestFile"/> is not.
+    /// </summary>
+    public static BoundProgram BindAt(string path, string source, out DiagnosticBag diagnostics)
+    {
+        diagnostics = new DiagnosticBag();
+        var unit = new Parser(new SourceText(path, source), diagnostics, Symbols)
+            .ParseCompilationUnit();
+        var units = Library.Value.Append(unit).ToList();
+
+        return new Binder(diagnostics, requireEntryPoint: false).Bind(units);
+    }
+
+    /// <summary>
     /// Binds several files together, as one program.
     ///
     /// For anything written on disk rather than in a test: the samples, and the

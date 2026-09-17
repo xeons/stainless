@@ -163,7 +163,7 @@ public class Scanner
         String[] reserved = [
             "abstract", "alignof", "as", "attribute", "base", "break", "case",
             "class", "com", "const", "continue", "default", "delegate", "do",
-            "else", "enum", "export", "extern", "false", "for", "foreach",
+            "else", "embed", "enum", "export", "extern", "false", "for", "foreach",
             "goto", "if", "iidof", "import", "in", "interface", "is", "module",
             "nameof", "new", "null", "offsetof", "operator", "override",
             "parallel", "private", "protected", "public", "readonly", "ref",

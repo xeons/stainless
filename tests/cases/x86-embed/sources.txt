@@ -1,0 +1,4 @@
+# The embed case, built for 32-bit x86: four-byte header words, `.long`
+# rather than `.quad`, and an i686 Windows name with no underscore put in
+# front of it.
+tests/cases/embed/embed.sl

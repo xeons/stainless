@@ -445,8 +445,9 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     /// <c>= null</c> are a zero and a null pointer, and a global can be born
     /// holding them.
     ///
-    /// Three shapes and no more: <c>null</c>, <c>default(T)</c>, and a literal
-    /// of a type that is not counted. A string literal is excluded because it
+    /// Four shapes and no more: <c>null</c>, <c>default(T)</c>, a literal of a
+    /// type that is not counted, and <c>embed</c>, whose object is made by the
+    /// linker rather than by code. A string literal is excluded because it
     /// is an object something has to make, where <c>null</c> is a pointer that
     /// already exists; a struct literal is excluded because a struct is stored
     /// field by field and a field may be counted. Everything past that line is
@@ -464,6 +465,11 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
 
             // Both are the type's zero, which a global holds by being born.
             if (Initializer is BoundNullLiteral or BoundDefault) return true;
+
+            // An embedded file is an object the linker already placed, so the
+            // global is born holding its address — the relocation is in
+            // writable data, where every loader will apply one.
+            if (Initializer is BoundEmbed) return true;
 
             return Initializer is BoundLiteral literal &&
                    Type is not StructTypeSymbol &&

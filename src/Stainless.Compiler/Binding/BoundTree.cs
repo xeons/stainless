@@ -890,6 +890,17 @@ public sealed class BoundIidof(
     public ComInterfaceTypeSymbol Named { get; } = named;
 }
 
+/// <summary>
+/// <c>embed("logo.png")</c>. The address of an immortal <c>byte[]</c> the
+/// linker placed, so this costs nothing at run time and the same file embedded
+/// twice the same way is the same object.
+/// </summary>
+public sealed class BoundEmbed(SourceSpan span, TypeSymbol type, EmbeddedFile file)
+    : BoundExpression(span, type)
+{
+    public EmbeddedFile File { get; } = file;
+}
+
 public sealed class BoundThis(SourceSpan span, TypeSymbol type, ParameterSymbol parameter)
     : BoundExpression(span, type)
 {

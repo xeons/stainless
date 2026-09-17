@@ -9,3 +9,8 @@
 # `text=auto` still detects a binary by content and leaves it alone, so nothing
 # added later needs a rule of its own unless git guesses wrong about it.
 * text=auto eol=lf
+
+# What `embed` carries is bytes, and a checkout that turned a CRLF in one into an
+# LF would change the program built from it. `text=auto` guesses from content
+# and would guess right about most of these, which is not the same as always.
+*.bin binary

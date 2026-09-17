@@ -1213,3 +1213,13 @@ public sealed record TypeofSyntax(SourceSpan Span, TypeSyntax Type) : Expression
 
 /// <summary><c>iidof(IFoo)</c>: a com interface's IID, as a <c>Guid*</c>.</summary>
 public sealed record IidofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
+
+/// <summary>
+/// <c>embed("logo.png", section: ".logo", access: "r")</c>: a file's bytes,
+/// carried in the binary as a <c>byte[]</c>.
+///
+/// The arguments are kept as written, named ones included, so that each rule
+/// about them is reported against the argument that broke it.
+/// </summary>
+public sealed record EmbedSyntax(SourceSpan Span, IReadOnlyList<ExpressionSyntax> Arguments)
+    : ExpressionSyntax(Span);
