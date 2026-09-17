@@ -48,7 +48,7 @@ public enum TokenKind
     // Expression keywords
     NewKeyword, NullKeyword, TrueKeyword, FalseKeyword,
     SizeofKeyword, AlignofKeyword, OffsetofKeyword, NameofKeyword,
-    TypeofKeyword, IidofKeyword, EmbedKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
+    TypeofKeyword, IidofKeyword, ThisKeyword, BaseKeyword, IsKeyword, WeakKeyword,
 
     // Primitive type keywords
     VoidKeyword, BoolKeyword, CharKeyword, Char16Keyword, Char32Keyword,
@@ -140,7 +140,6 @@ public static class TokenKindExtensions
         TokenKind.NameofKeyword => "nameof",
         TokenKind.TypeofKeyword => "typeof",
         TokenKind.IidofKeyword => "iidof",
-        TokenKind.EmbedKeyword => "embed",
         TokenKind.ThisKeyword => "this",
         TokenKind.BaseKeyword => "base",
         TokenKind.IsKeyword => "is",

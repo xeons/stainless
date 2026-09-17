@@ -407,7 +407,7 @@ storage. `sl_retain` and `sl_release` return immediately for such objects, so a
 statically allocated instance costs neither an allocation nor any reference
 traffic. String literals are emitted this way.
 
-So is the array an `embed` names
+So is the array an `[Embed]` static holds
 ([§8.7 of the specification](spec/08-interop-libraries.md#87-embedding-a-file)),
 with one difference: its type word is **zero**. The object is written as
 assembly into a section whose permissions the program chose — read-only data,
@@ -1072,7 +1072,7 @@ A static becomes one zeroed global per declaration. A single generated
 function, `_SLstatics`, runs every initializer in dependency order and is called
 from `main` before anything else. A static whose value is a literal — a number,
 `null`, `default` — needs no code at all: the global is emitted holding it. So
-does one holding an `embed`, whose object the linker placed: the global is born
+does one carrying an `[Embed]`, whose object the linker placed: the global is born
 holding its address, and that relocation is in writable data, where every
 loader applies one.
 

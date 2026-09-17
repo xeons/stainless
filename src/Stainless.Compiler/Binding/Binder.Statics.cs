@@ -98,7 +98,7 @@ public sealed partial class Binder
             _staticSyntax[symbol] = (
                 new StaticDeclSyntax(
                     declaration.Span, declaration.Modifiers, declaration.Type,
-                    declaration.Name, declaration.Initializer, false),
+                    declaration.Name, declaration.Initializer, false, []),
                 scope,
                 new Dictionary<string, TypeSymbol>(_substitution, StringComparer.Ordinal));
     }
@@ -180,9 +180,7 @@ public sealed partial class Binder
                 _currentFunction = null;
                 _substitution = substitution;
 
-                var value = BindConversion(
-                    BindExpression(declaration.Value), symbol.Type, declaration.Value.Span);
-                symbol.Initializer = value;
+                BindStatic(symbol, declaration, scope);
 
                 // A static outlives every thread, so whatever it holds is
                 // reachable from all of them at once. Said, not refused: a
@@ -195,6 +193,75 @@ public sealed partial class Binder
 
         _currentScope = null;
         _substitution = previousSubstitution;
+    }
+
+    /// <summary>
+    /// One static's value: what its initializer says, or what <c>[Embed]</c>
+    /// says instead.
+    ///
+    /// <para>
+    /// The two are alternatives rather than a pair, which is the whole of why
+    /// <c>[Embed]</c> is written where it is. An embedded object is made by the
+    /// linker and not by code, so there is nothing for an initializer to
+    /// evaluate; writing one beside the attribute would be writing two answers
+    /// to the same question, and only one of them could be kept.
+    /// </para>
+    ///
+    /// <para>
+    /// The attributes are bound here rather than in pass 6, because the set of
+    /// statics is not closed until monomorphization is — the same reason this
+    /// pass drains a table instead of walking one.
+    /// </para>
+    /// </summary>
+    private void BindStatic(StaticSymbol symbol, StaticDeclSyntax declaration, FileScope scope)
+    {
+        AttributeSyntax? embed = null;
+
+        BindAttributes(
+            declaration.Attributes, symbol.Attributes, scope, symbol.QualifiedName,
+            written =>
+            {
+                // A second one would be a second file for one static, and there
+                // is one static.
+                if (embed is not null)
+                    diagnostics.Error("SL0729", written.Span,
+                        $"'{symbol.Name}' already has an '[Embed]'; a static holds one object, " +
+                        "so it carries one file");
+                else
+                    embed = written;
+            });
+
+        if (embed is not null)
+        {
+            bool isBytes = symbol.Type is
+                ArrayTypeSymbol { Element: PrimitiveTypeSymbol { Kind: PrimitiveKind.Byte } };
+
+            if (declaration.Value is not null)
+                diagnostics.Error("SL0731", declaration.Value.Span,
+                    $"'{symbol.Name}' has an '[Embed]', so the linker makes what it holds and " +
+                    "there is nothing for an initializer to run; drop the '=', or drop the " +
+                    "attribute and read the file with 'Standard.File'");
+            else if (!isBytes)
+                diagnostics.Error("SL0730", declaration.Span,
+                    $"'{symbol.Name}' is '{symbol.Type.Name}', and an embedded file is its bytes: " +
+                    "declare it 'byte[]'");
+            else
+                symbol.Initializer = BindEmbed(embed);
+
+            return;
+        }
+
+        if (declaration.Value is null)
+        {
+            diagnostics.Error("SL0376", declaration.Span,
+                $"'{symbol.Name}' is a static, so it needs a value: the initializers run in " +
+                "dependency order before 'Main', and there is no later moment at which one " +
+                "could be given a first value");
+            return;
+        }
+
+        symbol.Initializer = BindConversion(
+            BindExpression(declaration.Value), symbol.Type, declaration.Value.Span);
     }
 
     /// <summary>

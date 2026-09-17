@@ -139,9 +139,11 @@ What ships and how: threading, collections, environment, math, concurrency, I/O,
 
 ### [6. Attributes and reflection](06-attributes-reflection.md)
 
-`[Reflect]`, `typeof`, the tables that get emitted, and a serializer written once.
+Attributes and their arguments, `[Reflect]`, `typeof`, the tables that get emitted, and a serializer written once.
 
 - [6.1 Attributes](06-attributes-reflection.md#61-attributes)
+  - [Positional and named arguments](06-attributes-reflection.md#positional-and-named-arguments)
+  - [Where an attribute may go](06-attributes-reflection.md#where-an-attribute-may-go)
 - [6.2 `[Reflect]` opts a type in](06-attributes-reflection.md#62-reflect-opts-a-type-in)
 - [6.3 `typeof` and `Standard.Reflection`](06-attributes-reflection.md#63-typeof-and-standardreflection)
 - [6.4 A serializer, written once](06-attributes-reflection.md#64-a-serializer-written-once)

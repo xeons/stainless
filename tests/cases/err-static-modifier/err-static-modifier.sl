@@ -3,7 +3,7 @@
 // The refusals that happen while reading the word `static`, rather than while
 // working out what it meant. They are in a case of their own because a file
 // that does not parse never reaches the binder, so a parse refusal would hide
-// every other one.
+// every refusal the binder would have made.
 module ErrStaticModifier;
 
 // SL0578: only a class has instances for the word to be denying. A module is
@@ -14,6 +14,6 @@ public static interface IHolder { int Read(); }
 public static enum Level { Low, High }
 public static delegate void Notify(int value);
 
-// SL0376: a static is written by its initializer, and there is no later moment
-// at which one could be given a first value.
-static int Counter;
+// A static with no value is refused too (SL0376), but by the binder rather
+// than here: whether it needs one depends on whether an attribute says where
+// its bytes come from, which is a question about names. err-embed pins it.

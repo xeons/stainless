@@ -891,9 +891,13 @@ public sealed class BoundIidof(
 }
 
 /// <summary>
-/// <c>embed("logo.png")</c>. The address of an immortal <c>byte[]</c> the
-/// linker placed, so this costs nothing at run time and the same file embedded
-/// twice the same way is the same object.
+/// What an <c>[Embed]</c> static holds: the address of an immortal
+/// <c>byte[]</c> the linker placed, so it costs nothing at run time and the
+/// same file embedded twice the same way is the same object.
+///
+/// It is only ever a static's initializer — there is no expression that
+/// produces one — which is what makes it a constant the global can be born
+/// holding rather than something the entry point has to run.
 /// </summary>
 public sealed class BoundEmbed(SourceSpan span, TypeSymbol type, EmbeddedFile file)
     : BoundExpression(span, type)

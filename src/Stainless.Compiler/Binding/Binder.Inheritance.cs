@@ -731,6 +731,20 @@ public sealed partial class Binder
                     type.Name + "." + property.Name);
                 property.BackingField?.Attributes.AddRange(property.Attributes);
             }
+
+            // An event's storage is a field, so what was written on the event
+            // lands there, exactly as an automatic property's does. Without
+            // this the attribute was parsed and then dropped, which is the one
+            // thing an attribute must never quietly be.
+            foreach (var member in entry.Declaration.Members.OfType<EventDeclSyntax>())
+            {
+                if (member.Attributes.Count == 0) continue;
+                if (type.Events.FirstOrDefault(e => e.Name == member.Name) is not
+                    { BackingField: { } storage }) continue;
+
+                BindAttributes(member.Attributes, storage.Attributes, entry.Scope,
+                    type.Name + "." + member.Name);
+            }
         }
     }
 
@@ -846,11 +860,22 @@ public sealed partial class Binder
         return rest.Except(guids).ToList();
     }
 
+    /// <summary>
+    /// Binds every applied attribute onto a declaration.
+    /// </summary>
+    /// <param name="embed">
+    /// What to do with <c>[Embed]</c>, which only a static has anywhere to put.
+    /// Null everywhere else, and then writing one is the error it is: the
+    /// attribute decides where a value comes from, so a declaration that
+    /// silently ignored it would be a declaration with no value and no word
+    /// about why.
+    /// </param>
     private void BindAttributes(
         IReadOnlyList<AttributeSyntax> syntax,
         List<AppliedAttribute> applied,
         FileScope scope,
-        string owner)
+        string owner,
+        Action<AttributeSyntax>? embed = null)
     {
         foreach (var attribute in syntax)
         {
@@ -865,28 +890,47 @@ public sealed partial class Binder
                 continue;
             }
 
-            if (attribute.Arguments.Count != attributeType.Fields.Count)
+            // The compiler reads this one itself, out of a static's declaration,
+            // so it never becomes an AppliedAttribute: there is no reflection
+            // table a static appears in, and its three fields are a question for
+            // the linker rather than a record for a reader.
+            if (attributeType == _builtins.Embed)
             {
-                diagnostics.Error("SL0343", attribute.Span,
-                    $"'{attributeType.Name}' takes {attributeType.Fields.Count} " +
-                    $"argument{(attributeType.Fields.Count == 1 ? "" : "s")}, " +
-                    $"but {Given(attribute.Arguments.Count)}");
+                if (embed is null)
+                    diagnostics.Error("SL0729", attribute.Span,
+                        "'[Embed]' says where a static's bytes come from, and " +
+                        $"'{owner}' is not a static; write it on a " +
+                        "'static readonly byte[]' with no initializer");
+                else
+                    embed(attribute);
+
                 continue;
             }
+
+            if (!MatchArguments(attributeType, attribute, out var given)) continue;
 
             var values = new List<object?>();
             bool ok = true;
 
-            for (int i = 0; i < attribute.Arguments.Count; i++)
+            for (int i = 0; i < attributeType.Fields.Count; i++)
             {
-                var expected = attributeType.Fields[i].Type;
-                var value = ConstantValue(attribute.Arguments[i], expected);
+                var field = attributeType.Fields[i];
 
+                // A field nobody wrote a value for. Its type's default is what
+                // it holds, and null is how every default reads back: a zero
+                // number, a false flag, and no text.
+                if (given[i] is not { } written)
+                {
+                    values.Add(null);
+                    continue;
+                }
+
+                var value = ConstantValue(written, field.Type);
                 if (value is null)
                 {
-                    diagnostics.Error("SL0344", attribute.Arguments[i].Span,
-                        $"argument {i + 1} of '{attributeType.Name}' must be a constant " +
-                        $"'{expected.Name}'; attribute values are written into the binary");
+                    diagnostics.Error("SL0344", written.Span,
+                        $"'{attributeType.Name}.{field.Name}' must be a constant " +
+                        $"'{field.Type.Name}'; attribute values are written into the binary");
                     ok = false;
                     break;
                 }
@@ -896,6 +940,100 @@ public sealed partial class Binder
 
             if (ok) applied.Add(new AppliedAttribute(attributeType, values));
         }
+    }
+
+    /// <summary>
+    /// Matches an attribute's arguments to its fields: the positional ones in
+    /// the order the fields were declared, then <c>Name = value</c> for any of
+    /// the rest.
+    ///
+    /// <para>
+    /// A field given neither way keeps its type's default — a zero, false, or
+    /// nothing at all for a String. That is what makes an optional field
+    /// possible without an attribute declaration having to say which of its
+    /// fields are optional: every one of them is, and an attribute that means
+    /// nothing without a value says so when it is read.
+    /// </para>
+    ///
+    /// <para>
+    /// Positional arguments come first, as they do at a call. Allowing the two
+    /// orders to mix would mean a reader counting past the named ones to work
+    /// out which field a later bare value belongs to, which is the work naming
+    /// them was supposed to remove.
+    /// </para>
+    /// </summary>
+    private bool MatchArguments(
+        AttributeTypeSymbol type, AttributeSyntax attribute, out ExpressionSyntax?[] given)
+    {
+        given = new ExpressionSyntax?[type.Fields.Count];
+        bool ok = true;
+        bool named = false;
+        int next = 0;
+
+        foreach (var argument in attribute.Arguments)
+        {
+            if (argument is NamedArgumentSyntax name)
+            {
+                named = true;
+
+                int at = IndexOfField(type, name.Name);
+                if (at < 0)
+                {
+                    diagnostics.Error("SL0724", name.NameSpan,
+                        $"'{type.Name}' has no field named '{name.Name}'; it has " +
+                        (type.Fields.Count == 0
+                            ? "none at all"
+                            : string.Join(", ", type.Fields.Select(f => $"'{f.Name}'"))));
+                    ok = false;
+                    continue;
+                }
+
+                if (given[at] is not null)
+                {
+                    diagnostics.Error("SL0725", argument.Span,
+                        $"'{type.Name}.{type.Fields[at].Name}' is given twice; an attribute's " +
+                        "field has one value");
+                    ok = false;
+                    continue;
+                }
+
+                given[at] = name.Value;
+                continue;
+            }
+
+            if (named)
+            {
+                diagnostics.Error("SL0726", argument.Span,
+                    "this value comes after a field named with '=', so which field of " +
+                    $"'{type.Name}' it is for would have to be counted out; write the " +
+                    "positional arguments first, or name this one too");
+                ok = false;
+                continue;
+            }
+
+            if (next >= type.Fields.Count)
+            {
+                diagnostics.Error("SL0343", attribute.Span,
+                    $"'{type.Name}' has {type.Fields.Count} " +
+                    $"field{(type.Fields.Count == 1 ? "" : "s")}, " +
+                    $"but {Given(attribute.Arguments.Count)}");
+                return false;
+            }
+
+            given[next++] = argument;
+        }
+
+        return ok;
+    }
+
+    /// <summary>Which field an attribute's <c>Name = value</c> names, or -1.</summary>
+    private static int IndexOfField(AttributeTypeSymbol type, string name)
+    {
+        for (int i = 0; i < type.Fields.Count; i++)
+            if (string.Equals(type.Fields[i].Name, name, StringComparison.Ordinal))
+                return i;
+
+        return -1;
     }
 
     /// <summary>Folds a literal to the value an attribute field will hold, or null.</summary>

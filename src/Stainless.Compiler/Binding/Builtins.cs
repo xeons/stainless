@@ -92,6 +92,17 @@ public sealed class Builtins
     /// </summary>
     public AttributeTypeSymbol Align { get; }
 
+    /// <summary>
+    /// <c>[Embed("logo.png", Section = ".logo", Access = "r")]</c>: the static
+    /// this is written on holds that file's bytes, placed by the linker.
+    ///
+    /// A marker the compiler acts on rather than a library type, so it needs no
+    /// import — and being one of the compiler's own is what keeps a program's
+    /// own <c>attribute Embed</c> from being mistaken for it, since the check is
+    /// against this symbol and not against the name.
+    /// </summary>
+    public AttributeTypeSymbol Embed { get; }
+
     /// <summary>The static type of a closure's receiver; see where it is made.</summary>
     public ClassTypeSymbol Bound { get; }
 
@@ -231,6 +242,27 @@ public sealed class Builtins
         Text.Types[String.SimpleName] = String;
         Text.Types[Utf16String.SimpleName] = Utf16String;
         Text.Types[StringBuilder.SimpleName] = StringBuilder;
+
+        // Declared after String, because its three fields are Strings. It is
+        // never laid out -- nothing makes one -- but a size is what every other
+        // attribute type has, and one pointer per field is what this would be.
+        Embed = new AttributeTypeSymbol
+        {
+            SimpleName = "Embed",
+            ModuleName = StandardModuleName,
+            IsPublic = true,
+        };
+
+        int word = TargetPlatform.Current.PointerWidth;
+        foreach (string field in new[] { "Path", "Section", "Access" })
+            Embed.Fields.Add(
+                new FieldSymbol(field, String, Embed, Embed.Fields.Count * word)
+                {
+                    IsPublic = true,
+                });
+
+        Embed.SetLayout(3 * word, word);
+        Standard.Types[Embed.SimpleName] = Embed;
 
         // --- String methods ------------------------------------------------
         Method(String, "ByteLength", PrimitiveTypeSymbol.NUInt, "sl_string_byte_length");

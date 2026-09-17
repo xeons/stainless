@@ -152,10 +152,11 @@ read them, but nothing here turns one into a window icon, a menu or a manifest
 A script of string tables and RCDATA draws no warning at all, because nothing
 about it is lost.
 
-**For bytes the program itself reads, `embed` is usually the better tool.** A
+**For bytes the program itself reads, `[Embed]` is usually the better tool.** A
 resource is looked up at run time by type and number, which is what Windows
-needs to find an icon and what lets a tool enumerate or replace one; an `embed`
-is a `byte[]` the linker places and the program holds from the start, with no
+needs to find an icon and what lets a tool enumerate or replace one; an
+`[Embed]` static is a `byte[]` the linker places and the program holds from the
+start, with no
 lookup and no API, and it can be writable or executable. What it cannot do is
 be read by the operating system. The trade is set out in
 [§8.7 of the specification](spec/08-interop-libraries.md#embed-or-a-resource).
@@ -393,7 +394,7 @@ nothing. What counts as an input:
 
 - the compiler itself, by version
 - the package's own files, as a digest of their bytes
-- every file an `embed` in it names, as a digest of its bytes, wherever that file
+- every file an `[Embed]` in it names, as a digest of its bytes, wherever that file
   is — recorded after the build, because which files those are is only known
   once the package has been bound
 - every package compiled *into* it, on the same terms

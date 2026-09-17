@@ -416,6 +416,14 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     public bool IsPublic { get; init; }
 
     /// <summary>
+    /// What was written in brackets in front of it. Nothing reflects over a
+    /// static — there is no instance to read one from — so these are here to be
+    /// bound rather than dropped, and for the compiler's own <c>[Embed]</c>,
+    /// which is taken out before this list is filled.
+    /// </summary>
+    public List<AppliedAttribute> Attributes { get; } = [];
+
+    /// <summary>
     /// The type this belongs to, or null for module-level storage.
     ///
     /// The two are the same thing in different scopes -- one global, named by
@@ -446,7 +454,7 @@ public sealed class StaticSymbol(string name, TypeSymbol type, string moduleName
     /// holding them.
     ///
     /// Four shapes and no more: <c>null</c>, <c>default(T)</c>, a literal of a
-    /// type that is not counted, and <c>embed</c>, whose object is made by the
+    /// type that is not counted, and <c>[Embed]</c>, whose object is made by the
     /// linker rather than by code. A string literal is excluded because it
     /// is an object something has to make, where <c>null</c> is a pointer that
     /// already exists; a struct literal is excluded because a struct is stored

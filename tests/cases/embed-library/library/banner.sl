@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: 0BSD
 //
-// A static initialized with `embed`, in a library built --shared. A library has
+// A static carrying an `[Embed]`, in a library built --shared. A library has
 // no entry point to run an initializer from (SL0380), so this compiles only
 // because the static is born holding the object's address — there is no code
 // to run, and nothing is refused.
@@ -10,7 +10,8 @@ import Standard.Text;
 
 static class Held
 {
-    public static readonly byte[] Banner = embed("banner.txt");
+    [Embed("banner.txt")]
+    public static readonly byte[] Banner;
 }
 
 /// The bytes, as text. The array lives in the library's image and is immortal,

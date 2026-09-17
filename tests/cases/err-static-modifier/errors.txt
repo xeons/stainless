@@ -1,3 +1,2 @@
-# Both are refused while reading, before any binding happens.
+# Refused while reading, before any binding happens.
 SL0578
-SL0376

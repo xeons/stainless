@@ -94,6 +94,10 @@ public static class Front
         return new Parser(Text(source), diagnostics, Symbols).ParseCompilationUnit();
     }
 
+    /// <summary>The one declaration a module body parses to.</summary>
+    public static Declaration Declaration(string body) =>
+        Parse("module Test;\n" + body).Declarations.Single();
+
     /// <summary>Parses one expression, as an expression rather than as a file.</summary>
     public static ExpressionSyntax Expression(string source) => Expression(source, out _);
 

@@ -7,7 +7,8 @@ module PeSectionName;
 
 public static class Held
 {
-    public static readonly byte[] Logo = embed("logo.bin", section: ".embedded_logo");
+    [Embed("logo.bin", Section = ".embedded_logo")]
+    public static readonly byte[] Logo;
 }
 
 int Main() => (int)Held.Logo.Length;

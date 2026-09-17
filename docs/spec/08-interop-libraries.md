@@ -683,34 +683,55 @@ ordinary input.
 ## 8.7 Embedding a file
 
 ```csharp
-static readonly byte[] Logo = embed("logo.png");                        // read-only data
-static readonly byte[] Table = embed("data/table.bin", access: "rw");   // writable
-static readonly byte[] Stub = embed("stub.bin", section: ".stub", access: "rx");
+[Embed("logo.png")]                                  // read-only data
+public static readonly byte[] Logo;
+
+[Embed("data/table.bin", Access = "rw")]             // writable
+public static byte[] Table;
+
+[Embed("stub.bin", Section = ".stub", Access = "rx")]
+public static readonly byte[] Stub;
 ```
 
-`embed` makes a file's bytes part of the binary and names them as a `byte[]`.
+`[Embed]` makes a file's bytes part of the binary and names them as a `byte[]`.
 Nothing is copied at run time and nothing is read from disk: the linker places
-an array object holding the file, and the expression is its address. It is an
-expression like any other, so a local may be given one as well as a static —
-but a static is what it is for, because the object exists for the life of the
-program whatever holds it.
+an array object holding the file, and the static is born holding its address.
 
 This is what C does with `xxd -i` and a generated header, and what C23 does
-with `#embed`. It is a keyword here, like `nameof` and `sizeof`, rather than a
-function in the standard library, because what it produces is decided when the
-program is built and no function runs then.
+with `#embed`. It is an attribute here, rather than a function or an
+expression, because what it says is a property of the declaration: this static
+is that file. An earlier version of this was `embed("logo.png")`, an expression
+with `section:` and `access:` as named arguments, and it read as a call —
+something that happens — when nothing happens at all, and it put two words
+about where bytes go in the binary in the middle of an argument list. **An
+embed is a static and nothing else**: there are no embedded locals, no embed
+as an argument, and no embed in the middle of an expression, because the object
+exists for the life of the program and a static is the declaration that says
+so.
 
-**Every argument is a string literal.** The path, the section and the access
-each decide something about the binary, so none of them can be a value the
-program computes (SL0704) — not a `static readonly String`, and not two
-literals joined with `+`. A file whose name is known only at run time is a file
-to read, and `Standard.File` reads it. The path comes first, and the other two
-are named arguments ([§7.2.2](07-functions-members.md#722-named-arguments)),
-each given once (SL0703).
+It goes on a module-level `static` or on a `static` field of a class or struct
+— the two are the same storage named by different scopes — and nowhere else
+(SL0729). The static must be declared `byte[]` (SL0730) and must have no
+initializer (SL0731): the linker makes the object, so there is nothing for an
+initializer to run, and a declaration with both would be two answers to the
+same question.
+
+**Every field is a string literal.** The path, the section and the access each
+decide something about the binary, so none of them can be a value the program
+computes (SL0704) — not a `static readonly String`, and not two literals joined
+with `+`. A file whose name is known only at run time is a file to read, and
+`Standard.File` reads it.
+
+The three fields are `Path`, `Section` and `Access`, in that order, so the path
+is the first positional argument and the other two may be written positionally
+or by name ([§6.1](06-attributes-reflection.md#61-attributes)). Naming them is
+the usual form, because `Section` and `Access` are rare enough that a reader
+meeting a bare `".stub"` would have to go and look. The path is the one field
+with no sensible default, so leaving it out is an error (SL0703).
 
 ### The path
 
-**Relative to the source file that wrote the `embed`**, not to the directory
+**Relative to the source file that wrote the `[Embed]`**, not to the directory
 the build was started in. A source file and the data beside it move together,
 and a build started from a project two directories up, from the test harness
 or from an editor then finds the same bytes. It is the rule `llvm-rc` follows
@@ -718,10 +739,10 @@ for a resource script and the one `#include "..."` starts with, and for the
 same reason: it is what makes a project relocatable. An absolute path is taken
 as written.
 
-The file is checked where the `embed` is bound, so a mistake is an error on the
-literal that made it rather than an assembler failure later. A file that is not
-there, a directory, a file that cannot be opened, and one larger than an array
-on the target can describe are all SL0706:
+The file is checked where the attribute is bound, so a mistake is an error on
+the literal that made it rather than an assembler failure later. A file that is
+not there, a directory, a file that cannot be opened, and one larger than an
+array on the target can describe are all SL0706:
 
 ```
 error[SL0706]: there is no file at 'C:\src\game\assets\logo.png' to embed
@@ -730,17 +751,18 @@ error[SL0706]: there is no file at 'C:\src\game\assets\logo.png' to embed
 A relative path also needs a file to be relative to. Source compiled from a
 file always has one; the standard library, which the compiler holds as
 resources, and text an editor or a test hands the compiler under a made-up
-name do not, and a relative `embed` in either is refused rather than resolved
+name do not, and a relative `[Embed]` in either is refused rather than resolved
 against whatever the working directory happens to be.
 
 **Two identical embeds are one object.** The same file, placed in the same
-section with the same access, is the same bytes, so a program that names it in
-three places carries it once and all three are the same reference. Changing the
-access or the section makes another object, because those are different memory.
+section with the same access, is the same bytes, so a program whose statics
+name it in three places carries it once and all three hold the same reference —
+a module-level static and a class's field alike. Changing the access or the
+section makes another object, because those are different memory.
 
 ### Access
 
-`access:` is some of the letters `r`, `w` and `x`, each at most once, in any
+`Access` is some of the letters `r`, `w` and `x`, each at most once, in any
 order, and always including `r` (SL0707). The default is `"r"`.
 
 | Access | Default section, PE | Default section, ELF | What it is for |
@@ -765,7 +787,8 @@ Quietly making one would put it in a binary nobody asked for it in by name, so
 it is asked for by name:
 
 ```csharp
-static readonly byte[] Scratch = embed("trampoline.bin", section: ".jit", access: "rwx");
+[Embed("trampoline.bin", Section = ".jit", Access = "rwx")]
+public static byte[] Scratch;
 ```
 
 `"rx"` is how an embed becomes code. The first element is the first byte of the
@@ -775,7 +798,8 @@ file, and a pointer to it converts to a `delegate`
 ```csharp
 public delegate int Answer();
 
-static readonly byte[] Stub = embed("stub.bin", section: ".stub", access: "rx");
+[Embed("stub.bin", Section = ".stub", Access = "rx")]
+static readonly byte[] Stub;
 ...
 var answer = (Answer)(void*)&Stub[0];      // B8 2A 00 00 00 C3: mov eax, 42; ret
 Console.WriteLine($"{answer()}");          // 42
@@ -783,7 +807,7 @@ Console.WriteLine($"{answer()}");          // 42
 
 ### Sections
 
-`section:` names where the object goes; without it the object goes where the
+`Section` names where the object goes; without it the object goes where the
 table above says. A name has to survive being written into an assembler
 directive and named again by a linker script, so it may not be empty or hold a
 quote, a backslash, a comma, whitespace or a control character (SL0709).
@@ -866,6 +890,12 @@ reads it. `.incbin` is given the length the file had when it was checked, so a
 file that shrank in between is an assembler error rather than a length word
 promising bytes that are not there.
 
+**A static with an `[Embed]` has nothing to initialize**, which is what makes
+one legal in a `--shared` library ([§8.2](#82-building-a-shared-library)):
+initializers run from the entry point and a library has none (SL0380), but this
+global is born holding the object's address. The address is a relocation in
+writable data, which every loader applies, so the only work is the linker's.
+
 ### Rebuilding
 
 **An embedded file is an input to the build**, as a source file is. A shared
@@ -882,7 +912,7 @@ taken over its own directory when dependencies are resolved, before anything is
 bound, so an embed of a file outside the package changes what is built without
 changing that digest. Keep what a package embeds inside the package.
 
-### `embed` or a resource
+### `[Embed]` or a resource
 
 [Resources](../packages.md#22-resources) are the other way to carry bytes, and
 the two answer different questions.
@@ -894,7 +924,7 @@ can enumerate what it has, look one up by an ID computed at run time, and
 replace one in the binary afterwards with a resource editor. What that costs is
 a lookup and an API.
 
-An **`embed`** is found by the linker, by name. There is no lookup, no ID and
+An **`[Embed]`** is found by the linker, by name. There is no lookup, no ID and
 no API: the program holds the array from the moment it starts. It is the right
 choice for data the program itself uses — a font, a shader, a lookup table, a
 default configuration, a stub of machine code — and the only one of the two

@@ -17,14 +17,61 @@ public attribute JsonIgnore { }
 ```
 
 It is written in brackets before a declaration, with **constant** arguments —
-they are stored in the binary, not evaluated:
+they are stored in the binary, not evaluated (SL0344):
 
 ```csharp
 [JsonName("full_name")] public String Name;
 ```
 
-Attributes go on types, fields and properties. An attribute type is never a
-value: it cannot be instantiated, named as a type, or passed around.
+An attribute type is never a value: it cannot be instantiated, named as a type,
+or passed around.
+
+### Positional and named arguments
+
+The arguments fill the fields in the order they were declared. Past those, a
+field is set by name, with `=`:
+
+```csharp
+public attribute Column { String Name; int Width; bool Hidden; }
+
+[Column("full_name", Width = 32)]      // one positional, one named
+[Column(Name = "age", Hidden = true)]  // all named, and one left out
+[Column("zip", 5, false)]              // all positional
+```
+
+`=` rather than the `name:` a call uses (SL0727), because an attribute is a
+value being built and not a call being made: what stands to the left of the
+sign is a field, and the line reads as the assignment it is. It is also what C#
+writes, so the shape is one a reader already knows.
+
+**The positional arguments come first** (SL0726). Letting the two orders mix
+would mean counting past the named ones to work out which field a later bare
+value belongs to, which is the work naming them was supposed to remove. Each
+field may be given once (SL0725), by either route, and a name the attribute
+does not declare is an error (SL0724) rather than a value that goes nowhere.
+
+**A field given neither way keeps its type's default** — a zero, `false`, or
+nothing at all for a `String`. That is what makes a field optional without an
+attribute declaration having to say which of its fields are: every one of them
+is. Reflection reports the value's kind as `KindNone`, so a reader can tell a
+field that was left out from one written as `0`.
+
+### Where an attribute may go
+
+On a type, an enum, a field, a property, an event, and a `static`. Anywhere
+else is an error (SL0728) rather than a line the compiler drops: an attribute
+may decide something — `[Embed]`
+([§8.7](08-interop-libraries.md#87-embedding-a-file)) decides what a static
+holds — and a declaration that quietly ignored one would compile to a
+declaration that does not have it, with nothing in the output to say which had
+happened.
+
+A method is not on that list, and that is the one absence worth a word: methods
+carry no metadata, so there is no table for a reader to find an attribute in and
+nothing an attribute on one could ever be read back from
+([§6.4.2](#642-finding-a-type-by-name) has what that costs). An attribute on a
+`static` is bound and checked like any other, though nothing reflects over
+statics either — there is no instance to read one from.
 
 ## 6.2 `[Reflect]` opts a type in
 

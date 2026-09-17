@@ -2250,7 +2250,7 @@ public sealed partial class Binder
     private static bool IsHeldElsewhere(BoundExpression expression) => expression switch
     {
         BoundConversion conversion => IsHeldElsewhere(conversion.Operand),
-        BoundStringLiteral or BoundNullLiteral or BoundEmbed => true,
+        BoundStringLiteral or BoundNullLiteral => true,
         BoundLocalAccess or BoundParameterAccess or BoundThis => true,
         BoundFieldAccess or BoundIndex or BoundDereference => true,
         _ => false,

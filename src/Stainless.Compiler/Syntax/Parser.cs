@@ -372,7 +372,11 @@ public sealed class Parser
         }
 
         if (At(TokenKind.ExternKeyword) || At(TokenKind.ExportKeyword))
+        {
+            RejectAttributes(attributes, "an 'extern' or 'export' declaration, whose shape " +
+                                         "belongs to the other language");
             return ParseLinkageDeclaration(start, modifiers);
+        }
 
         if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword,
                   TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword,
@@ -389,33 +393,50 @@ public sealed class Parser
         }
 
         if (At(TokenKind.UsingKeyword))
+        {
+            RejectAttributes(attributes, "a type alias, which declares no type of its own");
             return [ParseAliasDeclaration(start, modifiers)];
+        }
 
         if (At(TokenKind.EnumKeyword))
             return [ParseEnumDeclaration(start, modifiers, attributes)];
 
         if (At(TokenKind.DelegateKeyword) || AtClosureDeclaration())
+        {
+            RejectAttributes(attributes, "a delegate");
             return [ParseDelegateDeclaration(start, modifiers)];
+        }
 
         if (At(TokenKind.Tilde) && enclosingType is not null)
+        {
+            RejectAttributes(attributes, "a destructor");
             return [ParseDestructor(start, enclosingType)];
+        }
 
         if (AtEventDeclaration())
             return [ParseEventDeclaration(start, modifiers, attributes)];
 
         if (modifiers.HasFlag(Modifiers.Static))
-            return AtOperatorDeclaration()
-                ? [ParseOperatorDeclaration(start, modifiers)]
-                : [ParseStaticDeclaration(start, modifiers, enclosingType)];
+        {
+            if (!AtOperatorDeclaration())
+                return [ParseStaticDeclaration(start, modifiers, enclosingType, attributes)];
+
+            RejectAttributes(attributes, "an operator");
+            return [ParseOperatorDeclaration(start, modifiers)];
+        }
 
         if (modifiers.HasFlag(Modifiers.Const))
+        {
+            RejectAttributes(attributes, "a 'const', which is a value and not storage");
             return [ParseGlobalConst(start, modifiers)];
+        }
 
         // A constructor looks like `TypeName(` inside its own type.
         if (enclosingType is not null &&
             At(TokenKind.Identifier) && Current.Text == enclosingType &&
             Peek(1).Kind == TokenKind.OpenParen)
         {
+            RejectAttributes(attributes, "a constructor");
             Advance();
             var ctorParams = ParseParameterList(out bool ctorVariadic);
 
@@ -442,7 +463,15 @@ public sealed class Parser
             return [new ConstructorDeclSyntax(SpanFrom(start), modifiers, enclosingType, ctorParams, ctorBody)];
         }
 
-        return [ParseFunctionOrField(start, modifiers, LinkageKind.Stainless, attributes)];
+        var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless, attributes);
+
+        // A field and a property both keep what was written on them; a function
+        // has no metadata table for one to be read back from, so an attribute
+        // there would be a line of source with nowhere to go.
+        if (member is FunctionDeclSyntax)
+            RejectAttributes(attributes, "a function");
+
+        return [member];
     }
 
     /// <summary>
@@ -460,7 +489,7 @@ public sealed class Parser
             {
                 int start = _pos;
                 var name = ParseQualifiedName();
-                var arguments = At(TokenKind.OpenParen) ? ParseArgumentList() : [];
+                var arguments = At(TokenKind.OpenParen) ? ParseAttributeArguments() : [];
                 attributes.Add(new AttributeSyntax(SpanFrom(start), name, arguments));
             }
             while (Match(TokenKind.Comma));
@@ -469,6 +498,76 @@ public sealed class Parser
         }
 
         return attributes;
+    }
+
+    /// <summary>
+    /// An attribute's arguments: constants for the fields in the order they
+    /// were declared, and then <c>Name = value</c> for any of the rest.
+    ///
+    /// <c>=</c> rather than the <c>name:</c> a call uses, because an attribute
+    /// is a value being built and not a call being made: what stands to the
+    /// left of the sign is a field, and the line reads as the assignment it is.
+    /// It is also what C# writes, so the shape is one a reader already knows.
+    ///
+    /// One token of lookahead settles it. Nothing an attribute may hold is an
+    /// identifier -- the values are literals, because they are written into the
+    /// binary rather than evaluated -- so a name followed by <c>=</c> can only
+    /// be a field being named.
+    /// </summary>
+    private List<ExpressionSyntax> ParseAttributeArguments()
+    {
+        var arguments = new List<ExpressionSyntax>();
+        Expect(TokenKind.OpenParen);
+
+        while (!At(TokenKind.CloseParen) && !At(TokenKind.EndOfFile))
+        {
+            int start = _pos;
+
+            // `Name: value` is caught here rather than left to fail as an
+            // expression, because the two forms are one keystroke apart and the
+            // parse error that follows the colon says nothing about which.
+            if (At(TokenKind.Identifier) &&
+                Peek(1).Kind is TokenKind.Equals or TokenKind.Colon)
+            {
+                var label = Advance();
+                if (Advance().Kind == TokenKind.Colon)
+                    _diagnostics.Error("SL0727", SpanFrom(start),
+                        $"'{label.Text}' is a field of the attribute, so it is set with " +
+                        $"'{label.Text} = ...'; ':' is how a call names a parameter, and an " +
+                        "attribute is a value rather than a call");
+
+                var value = ParseExpression();
+                arguments.Add(
+                    new NamedArgumentSyntax(SpanFrom(start), label.Text, label.Span, value));
+            }
+            else
+            {
+                arguments.Add(ParseExpression());
+            }
+
+            if (!Match(TokenKind.Comma)) break;
+        }
+
+        Expect(TokenKind.CloseParen);
+        return arguments;
+    }
+
+    /// <summary>
+    /// Reports an attribute written where nothing will ever read one.
+    ///
+    /// Dropping it silently is the worse answer: an attribute that decides
+    /// something -- <c>[Embed]</c> decides what a static holds -- would compile
+    /// to a declaration that does not have it, and nothing in the output would
+    /// say which of the two happened.
+    /// </summary>
+    private void RejectAttributes(IReadOnlyList<AttributeSyntax> attributes, string what)
+    {
+        if (attributes.Count == 0) return;
+
+        _diagnostics.Error("SL0728", attributes[0].Span,
+            $"'[{attributes[0].Name.Last}]' cannot be written on {what}. An attribute goes on a " +
+            "type, an enum, a field, a property, an event or a static, which are the " +
+            "declarations something reads one back from");
     }
 
     /// <summary>
@@ -1204,7 +1303,8 @@ public sealed class Parser
     /// <c>readonly</c>, because storage must have it and a method cannot.
     /// </summary>
     private Declaration ParseStaticDeclaration(
-        int start, Modifiers modifiers, string? enclosingType)
+        int start, Modifiers modifiers, string? enclosingType,
+        IReadOnlyList<AttributeSyntax> attributes)
     {
         // `static Name() { }` inside `class Name`: the type's own initializer.
         // It has no return type, which is what tells it from a method.
@@ -1212,6 +1312,7 @@ public sealed class Parser
             At(TokenKind.Identifier) && Current.Text == enclosingType &&
             Peek(1).Kind == TokenKind.OpenParen && Peek(2).Kind == TokenKind.CloseParen)
         {
+            RejectAttributes(attributes, "a type initializer");
             Advance();
             Advance();
             Advance();
@@ -1227,10 +1328,12 @@ public sealed class Parser
         // `static T Name(...)` is a method; `static T Name = v;` is storage.
         // Only a parameter list tells them apart, and the type in front of the
         // name may be several tokens long, so the member parser decides.
-        var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless);
+        var member = ParseFunctionOrField(start, modifiers, LinkageKind.Stainless, attributes);
 
         if (member is FunctionDeclSyntax function)
         {
+            RejectAttributes(attributes, "a function");
+
             if (isReadonly)
                 _diagnostics.Error("SL0376", SpanFrom(start),
                     $"'{function.Name}' is a method, and 'readonly' is about storage");
@@ -1248,20 +1351,12 @@ public sealed class Parser
             return member;
         }
 
-        if (field.Initializer is null)
-        {
-            _diagnostics.Error("SL0376", field.Span,
-                $"'{field.Name}' is a static, so it needs a value: the initializers run in " +
-                "dependency order before 'Main', and there is no later moment at which one " +
-                "could be given a first value");
-
-            return new StaticDeclSyntax(
-                SpanFrom(start), modifiers, field.Type, field.Name,
-                new LiteralSyntax(field.Span, TokenKind.IntLiteral, 0L), isReadonly);
-        }
-
+        // A missing initializer is carried rather than reported: `[Embed]` is a
+        // static with none, and whether an attribute says where the value comes
+        // from is a question about names, which is the binder's.
         return new StaticDeclSyntax(
-            SpanFrom(start), modifiers, field.Type, field.Name, field.Initializer, isReadonly);
+            SpanFrom(start), modifiers, field.Type, field.Name, field.Initializer, isReadonly,
+            attributes);
     }
 
     private Declaration ParseDestructor(int start, string enclosingType)
@@ -3187,19 +3282,6 @@ public sealed class Parser
                 return new IidofSyntax(SpanFrom(start), type);
             }
 
-            case TokenKind.EmbedKeyword:
-            {
-                Advance();
-
-                // The argument list a call has, named arguments included, so
-                // `section:` and `access:` are spelled the way every other
-                // optional argument is. What may go in it is the binder's
-                // question: a wrong one is then reported against the argument
-                // rather than as a parse error somewhere after it.
-                var arguments = ParseArgumentList();
-                return new EmbedSyntax(SpanFrom(start), arguments);
-            }
-
             case TokenKind.OpenParen:
             {
                 // `(Type)operand` is a cast; anything else in parentheses is grouping.
@@ -3281,7 +3363,7 @@ public sealed class Parser
             TokenKind.ThisKeyword, TokenKind.BaseKeyword, TokenKind.NewKeyword,
             TokenKind.SizeofKeyword,
             TokenKind.AlignofKeyword, TokenKind.OffsetofKeyword,
-            TokenKind.TypeofKeyword, TokenKind.EmbedKeyword,
+            TokenKind.TypeofKeyword,
             TokenKind.TrueKeyword, TokenKind.FalseKeyword, TokenKind.NullKeyword,
             TokenKind.Bang, TokenKind.Tilde);
 

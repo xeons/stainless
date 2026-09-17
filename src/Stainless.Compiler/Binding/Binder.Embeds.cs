@@ -22,7 +22,8 @@ using Stainless.Syntax;
 namespace Stainless.Binding;
 
 /// <summary>
-/// <c>embed</c>: a file's bytes as an immortal <c>byte[]</c> the linker places.
+/// <c>[Embed]</c>: a file's bytes as an immortal <c>byte[]</c> the linker
+/// places, named by the static it is written on.
 /// </summary>
 public sealed partial class Binder
 {
@@ -42,11 +43,11 @@ public sealed partial class Binder
         new(StringComparer.Ordinal);
 
     /// <summary>
-    /// <c>embed(path)</c>, <c>embed(path, section: ".s")</c>,
-    /// <c>embed(path, access: "rw")</c>.
+    /// <c>[Embed("data/table.bin", Section = ".stub", Access = "rx")]</c>, read
+    /// off the static it was written on.
     ///
     /// <para>
-    /// Every argument is a string literal, because each one decides something
+    /// Every field is a string literal, because each one decides something
     /// about the binary and the binary is decided before the program runs. A
     /// path computed at run time is a file read, which is what
     /// <c>Standard.File</c> is for.
@@ -59,88 +60,27 @@ public sealed partial class Binder
     /// build stamp digests them, and neither needs the binder to hold a copy of
     /// a file that may be large.
     /// </para>
+    ///
+    /// <para>
+    /// Returns null once the reason this is not an embed has been reported. The
+    /// static then has no initializer, which is what it would have had anyway.
+    /// </para>
     /// </summary>
-    private BoundExpression BindEmbed(EmbedSyntax syntax)
+    private BoundEmbed? BindEmbed(AttributeSyntax syntax)
     {
-        StringArgument? path = null;
-        StringArgument? section = null;
-        StringArgument? access = null;
-        bool failed = false;
+        var declared = _builtins.Embed;
+        if (!MatchArguments(declared, syntax, out var given)) return null;
 
-        foreach (var argument in syntax.Arguments)
-        {
-            string? name = argument is NamedArgumentSyntax named ? named.Name : null;
-            var value = argument is NamedArgumentSyntax { Value: var inner } ? inner : argument;
+        StringArgument? path = Literal(given[0], declared.Fields[0], out bool pathFailed);
+        StringArgument? section = Literal(given[1], declared.Fields[1], out bool sectionFailed);
+        StringArgument? access = Literal(given[2], declared.Fields[2], out bool accessFailed);
 
-            if (argument is RefArgumentSyntax or OutArgumentSyntax)
-            {
-                diagnostics.Error("SL0703", argument.Span,
-                    "'embed' takes string literals; 'ref' and 'out' have nothing to refer to here");
-                failed = true;
-                continue;
-            }
+        if (path is null && !pathFailed)
+            diagnostics.Error("SL0703", syntax.Span,
+                "'[Embed]' needs the path of the file to carry, as a string literal: " +
+                "'[Embed(\"logo.png\")]'");
 
-            ref StringArgument? slot = ref path;
-            switch (name)
-            {
-                case null when path is null && section is null && access is null:
-                    break;
-
-                case null:
-                    diagnostics.Error("SL0703", argument.Span,
-                        "'embed' takes one path, and then 'section:' and 'access:' by name");
-                    failed = true;
-                    continue;
-
-                case "section":
-                    slot = ref section;
-                    break;
-
-                case "access":
-                    slot = ref access;
-                    break;
-
-                default:
-                    diagnostics.Error("SL0703", ((NamedArgumentSyntax)argument).NameSpan,
-                        $"'embed' has no argument named '{name}'; it takes a path, then " +
-                        "'section:' and 'access:'");
-                    failed = true;
-                    continue;
-            }
-
-            if (slot is not null)
-            {
-                diagnostics.Error("SL0703", argument.Span,
-                    $"'{name}' is given twice; 'embed' takes each argument once");
-                failed = true;
-                continue;
-            }
-
-            // A literal and nothing else. `const` strings are refused too:
-            // what goes in the binary should be readable where it is asked
-            // for, and a constant is one more place to look.
-            if (value is not LiteralSyntax { Kind: TokenKind.StringLiteral, Value: string text })
-            {
-                diagnostics.Error("SL0704", value.Span,
-                    $"'embed' needs {(name is null ? "the path" : $"'{name}'")} as a string " +
-                    "literal, because it is decided when the program is built rather than when " +
-                    "it runs; to read a file at run time, use 'Standard.File'");
-                failed = true;
-                continue;
-            }
-
-            slot = new StringArgument(text, value.Span);
-        }
-
-        if (path is null)
-        {
-            if (!failed)
-                diagnostics.Error("SL0703", syntax.Span,
-                    "'embed' needs the path of the file to carry, as a string literal");
-            return new BoundErrorExpression(syntax.Span);
-        }
-
-        if (failed) return new BoundErrorExpression(syntax.Span);
+        if (path is null || pathFailed || sectionFailed || accessFailed) return null;
 
         var target = TargetPlatform.Current;
 
@@ -159,7 +99,7 @@ public sealed partial class Binder
                     $"'{Printable(writtenAccess.Text)}' is not an access; write the letters " +
                     "'r', 'w' and 'x', each at most once and 'r' always — \"r\", \"rw\", " +
                     "\"rx\" or \"rwx\"");
-                return new BoundErrorExpression(syntax.Span);
+                return null;
             }
 
             granted = parsed;
@@ -173,7 +113,7 @@ public sealed partial class Binder
             {
                 diagnostics.Error("SL0709", writtenSection.Span,
                     $"'{Printable(writtenSection.Text)}' cannot name a section: {problem}");
-                return new BoundErrorExpression(syntax.Span);
+                return null;
             }
 
             placed = writtenSection.Text;
@@ -195,18 +135,18 @@ public sealed partial class Binder
         {
             diagnostics.Error("SL0708", access!.Value.Span,
                 "memory both writable and executable has no default section; name one with " +
-                "'section:', so that asking for it is something the source says out loud");
-            return new BoundErrorExpression(syntax.Span);
+                "'Section = ...', so that asking for it is something the source says out loud");
+            return null;
         }
 
         // Last, and only for an embed that is otherwise sound: the first one
         // placed in a section is what decides its access, and one that failed
         // for another reason should not get to decide it.
         if (resolved is null)
-            return new BoundErrorExpression(syntax.Span);
+            return null;
 
         if (!SectionAccepts(placed, granted, section?.Span ?? access?.Span ?? syntax.Span, target))
-            return new BoundErrorExpression(syntax.Span);
+            return null;
 
         var key = (resolved.Value.Path, placed, granted);
         if (!_embeds.TryGetValue(key, out var file))
@@ -220,6 +160,39 @@ public sealed partial class Binder
     }
 
     private readonly record struct StringArgument(string Text, SourceSpan Span);
+
+    /// <summary>
+    /// One of <c>[Embed]</c>'s three fields as the literal it has to be, or
+    /// null when it was not written at all.
+    ///
+    /// <para>
+    /// A literal and nothing else — not a <c>const</c>, and not two literals
+    /// joined with <c>+</c>. Every other attribute's arguments are folded the
+    /// same way, but this one is read here rather than through
+    /// <c>ConstantValue</c> because what comes back has to carry the span of
+    /// the literal: every rule below is about what the text says, and each is
+    /// reported against the text that said it.
+    /// </para>
+    /// </summary>
+    /// <param name="failed">
+    /// True when something was written and it was not a string literal, so that
+    /// a missing path and a bad one are told apart.
+    /// </param>
+    private StringArgument? Literal(ExpressionSyntax? written, FieldSymbol field, out bool failed)
+    {
+        failed = false;
+        if (written is null) return null;
+
+        if (written is LiteralSyntax { Kind: TokenKind.StringLiteral, Value: string text })
+            return new StringArgument(text, written.Span);
+
+        diagnostics.Error("SL0704", written.Span,
+            $"'[Embed]' needs '{field.Name}' as a string literal, because it is decided when " +
+            "the program is built rather than when it runs; to read a file at run time, use " +
+            "'Standard.File'");
+        failed = true;
+        return null;
+    }
 
     /// <summary>
     /// Whether a section can be given this access: one the target already

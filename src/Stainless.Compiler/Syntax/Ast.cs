@@ -629,19 +629,27 @@ public sealed record TypeDeclSyntax(
 
 /// <summary>
 /// <c>public static readonly List&lt;String&gt; Registry = ...;</c> — module-level
-/// storage, initialized once before <c>Main</c>.
+/// storage, initialized once before <c>Main</c>, and the same shape written
+/// inside a type.
 ///
 /// There is no <c>static</c> without <c>readonly</c>: a plainly mutable global
 /// is shared state that nothing synchronizes, and that is the bug this language
 /// would rather not have. Mutation goes through a type that says how it is safe.
 /// </summary>
+/// <param name="Value">
+/// The initializer, or null where none was written. Null is a mistake in every
+/// case but one — <c>[Embed]</c>, whose object the linker makes, so there is
+/// nothing for an initializer to do — and which of the two it is is a question
+/// only the binder can answer.
+/// </param>
 public sealed record StaticDeclSyntax(
     SourceSpan Span,
     Modifiers Modifiers,
     TypeSyntax Type,
     string Name,
-    ExpressionSyntax Value,
-    bool IsReadonly) : Declaration(Span, Modifiers);
+    ExpressionSyntax? Value,
+    bool IsReadonly,
+    IReadOnlyList<AttributeSyntax> Attributes) : Declaration(Span, Modifiers);
 
 /// <summary>
 /// <c>static Name() { ... }</c> inside a type: the block that runs before the
@@ -1255,13 +1263,3 @@ public sealed record TypeofSyntax(SourceSpan Span, TypeSyntax Type) : Expression
 
 /// <summary><c>iidof(IFoo)</c>: a com interface's IID, as a <c>Guid*</c>.</summary>
 public sealed record IidofSyntax(SourceSpan Span, TypeSyntax Type) : ExpressionSyntax(Span);
-
-/// <summary>
-/// <c>embed("logo.png", section: ".logo", access: "r")</c>: a file's bytes,
-/// carried in the binary as a <c>byte[]</c>.
-///
-/// The arguments are kept as written, named ones included, so that each rule
-/// about them is reported against the argument that broke it.
-/// </summary>
-public sealed record EmbedSyntax(SourceSpan Span, IReadOnlyList<ExpressionSyntax> Arguments)
-    : ExpressionSyntax(Span);

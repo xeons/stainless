@@ -159,11 +159,6 @@ public sealed partial class LlvmEmitter
             // interface are the same pointer.
             case BoundIidof iidof:
                 return new Val("@" + IidName(iidof.Named), "ptr", iidof.Type);
-
-            // The same: an object the linker placed, so its address is the
-            // whole of the value, and it is immortal, so nothing is counted.
-            case BoundEmbed embedded:
-                return new Val(EmbedSymbol(embedded.File), "ptr", embedded.Type);
             case BoundVariantConstruction built: return EmitVariantConstruction(built);
             case BoundVariantTest test: return EmitVariantTest(test);
             case BoundVariantPayload payload: return EmitVariantPayload(payload);

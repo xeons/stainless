@@ -84,20 +84,28 @@ public class EmbedTests
 
     // ------------------------------------------------------------- syntax
 
+    /// <summary>
+    /// <c>embed</c> was a keyword and is not one any more: a program is free to
+    /// call something that, and nothing in the language reads it.
+    /// </summary>
     [Fact]
-    public void EmbedIsAKeyword() =>
-        Assert.Equal([TokenKind.EmbedKeyword], Front.Kinds("embed"));
+    public void EmbedIsAnOrdinaryWord() =>
+        Assert.Equal([TokenKind.Identifier], Front.Kinds("embed"));
 
     [Fact]
-    public void TheArgumentsAreKeptAsWrittenNamedOnesIncluded()
+    public void TheAttributeKeepsItsArgumentsAsWritten()
     {
-        var embedded = Assert.IsType<EmbedSyntax>(
-            Front.Expression("""embed("stub.bin", section: ".stub", access: "rx")"""));
+        var declaration = Assert.IsType<StaticDeclSyntax>(
+            Front.Declaration(
+                """[Embed("stub.bin", Section = ".stub")] static readonly byte[] Stub;"""));
 
-        Assert.Equal(3, embedded.Arguments.Count);
-        Assert.IsType<LiteralSyntax>(embedded.Arguments[0]);
-        Assert.Equal("section", Assert.IsType<NamedArgumentSyntax>(embedded.Arguments[1]).Name);
-        Assert.Equal("access", Assert.IsType<NamedArgumentSyntax>(embedded.Arguments[2]).Name);
+        Assert.Null(declaration.Value);
+
+        var written = Assert.Single(declaration.Attributes);
+        Assert.Equal("Embed", written.Name.Last);
+        Assert.Equal(2, written.Arguments.Count);
+        Assert.IsType<LiteralSyntax>(written.Arguments[0]);
+        Assert.Equal("Section", Assert.IsType<NamedArgumentSyntax>(written.Arguments[1]).Name);
     }
 
     // ------------------------------------------------------------- access
@@ -129,35 +137,63 @@ public class EmbedTests
     {
         var scratch = new Scratch();
         var program = scratch.Bind(
-            """public nuint Length() { byte[] table = embed("data/table.bin"); return table.Length; }""",
+            """[Embed("data/table.bin")] public static readonly byte[] Table;""",
             out var diagnostics);
 
         Assert.False(diagnostics.HasErrors);
         var file = Assert.Single(program.Embeds);
         Assert.Equal(4, file.Length);
         Assert.Equal(Path.Combine(scratch.Directory, "data", "table.bin"), file.Path);
+
+        var symbol = program.Statics.Single(s => s.Name == "Table");
+        Assert.Equal("byte[]", symbol.Type.Name);
+        Assert.Same(file, Assert.IsType<BoundEmbed>(symbol.Initializer).File);
+    }
+
+    /// <summary>
+    /// The three fields are positional in the order they are declared, which is
+    /// what makes naming them optional rather than the only way to write them.
+    /// </summary>
+    [Fact]
+    public void ThePathSectionAndAccessMayBePositional()
+    {
+        var scratch = new Scratch();
+        scratch.Bind(
+            """[Embed("stub.bin", ".stub", "rx")] public static readonly byte[] Stub;""",
+            out var diagnostics);
+
+        Assert.False(diagnostics.HasErrors);
     }
 
     /// <summary>
     /// The same file, section and access is one object, and changing any of
-    /// the three is another.
+    /// the three is another — across a module-level static and a class's
+    /// field alike, because what makes two embeds one is the bytes and where
+    /// they go rather than what names them.
     /// </summary>
     [Fact]
     public void IdenticalEmbedsAreOneObject()
     {
         var scratch = new Scratch();
         var program = scratch.Bind("""
-            public void F()
+            [Embed("data/table.bin")] static readonly byte[] A;
+            [Embed("data/../data/table.bin")] static readonly byte[] B;
+            [Embed("data/table.bin", Access = "rw")] static byte[] C;
+
+            public static class Held
             {
-                var a = embed("data/table.bin");
-                var b = embed("data/../data/table.bin");
-                var c = embed("data/table.bin", access: "rw");
-                var d = embed("data/table.bin", section: ".mine");
+                [Embed("data/table.bin")] public static readonly byte[] D;
+                [Embed("data/table.bin", Section = ".mine")] public static readonly byte[] E;
             }
             """, out var diagnostics);
 
         Assert.False(diagnostics.HasErrors);
         Assert.Equal(3, program.Embeds.Count);
+
+        BoundEmbed Held(string name) => Assert.IsType<BoundEmbed>(
+            program.Statics.Single(s => s.ModuleName == "Test" && s.Name == name).Initializer);
+
+        Assert.Same(Held("A").File, Held("D").File);
     }
 
     /// <summary>
@@ -169,7 +205,7 @@ public class EmbedTests
     {
         var scratch = new Scratch();
         var program = scratch.Bind(
-            """public static class Held { public static readonly byte[] Table = embed("data/table.bin"); }""",
+            """public static class Held { [Embed("data/table.bin")] public static readonly byte[] Table; }""",
             out var diagnostics);
 
         Assert.False(diagnostics.HasErrors);
@@ -182,7 +218,7 @@ public class EmbedTests
         var scratch = new Scratch();
         string absolute = Path.Combine(scratch.Directory, "stub.bin").Replace('\\', '/');
 
-        Assert.Empty(scratch.Codes($$"""public void F() { var s = embed("{{absolute}}"); }"""));
+        Assert.Empty(scratch.Codes($$"""[Embed("{{absolute}}")] static readonly byte[] S;"""));
     }
 
     /// <summary>
@@ -193,7 +229,8 @@ public class EmbedTests
     [Fact]
     public void ARelativePathNeedsASourceOnDisk()
     {
-        var diagnostic = Front.Only(Diagnostics("""public void F() { var s = embed("stub.bin"); }"""));
+        var diagnostic = Front.Only(
+            Diagnostics("""[Embed("stub.bin")] static readonly byte[] S;"""));
 
         Assert.Equal("SL0705", diagnostic.Code);
     }
@@ -205,30 +242,70 @@ public class EmbedTests
     }
 
     [Theory]
-    [InlineData("""embed()""", "SL0703")]
-    [InlineData("""embed("stub.bin", "stub.bin")""", "SL0703")]
-    [InlineData("""embed("stub.bin", align: "8")""", "SL0703")]
-    [InlineData("""embed("stub.bin", access: "r", access: "r")""", "SL0703")]
-    [InlineData("""embed(Path)""", "SL0704")]
-    [InlineData("""embed("stub.bin", access: Path)""", "SL0704")]
-    [InlineData("""embed("missing.bin")""", "SL0706")]
-    [InlineData("""embed("data")""", "SL0706")]
-    [InlineData("""embed("")""", "SL0706")]
-    [InlineData("""embed("stub.bin", access: "x")""", "SL0707")]
-    [InlineData("""embed("stub.bin", access: "rwx")""", "SL0708")]
-    [InlineData("""embed("stub.bin", section: ".a b")""", "SL0709")]
-    [InlineData("""embed("stub.bin", section: ".a\tb")""", "SL0709")]
-    [InlineData("""embed("stub.bin", section: "")""", "SL0709")]
-    [InlineData("""embed("stub.bin", section: ".text")""", "SL0711")]
-    [InlineData("""embed("stub.bin", section: ".data")""", "SL0711")]
-    [InlineData("""embed("stub.bin", section: ".bss")""", "SL0711")]
-    public void EachRuleHasItsCode(string expression, string code)
+    [InlineData("""Embed()""", "SL0703")]
+    [InlineData("""Embed("stub.bin", ".a", "r", "more")""", "SL0343")]
+    [InlineData("""Embed(Path)""", "SL0704")]
+    [InlineData("""Embed("stub.bin", Access = Path)""", "SL0704")]
+    [InlineData("""Embed("missing.bin")""", "SL0706")]
+    [InlineData("""Embed("data")""", "SL0706")]
+    [InlineData("""Embed("")""", "SL0706")]
+    [InlineData("""Embed("stub.bin", Access = "x")""", "SL0707")]
+    [InlineData("""Embed("stub.bin", Access = "rwx")""", "SL0708")]
+    [InlineData("""Embed("stub.bin", Section = ".a b")""", "SL0709")]
+    [InlineData("""Embed("stub.bin", Section = ".a\tb")""", "SL0709")]
+    [InlineData("""Embed("stub.bin", Section = "")""", "SL0709")]
+    [InlineData("""Embed("stub.bin", Section = ".text")""", "SL0711")]
+    [InlineData("""Embed("stub.bin", Section = ".data")""", "SL0711")]
+    [InlineData("""Embed("stub.bin", Section = ".bss")""", "SL0711")]
+    [InlineData("""Embed("stub.bin", Alignment = "8")""", "SL0724")]
+    [InlineData("""Embed("stub.bin", Access = "r", Access = "r")""", "SL0725")]
+    [InlineData("""Embed("stub.bin", Section = ".a", "rw")""", "SL0726")]
+    public void EachRuleHasItsCode(string attribute, string code)
     {
         var scratch = new Scratch();
 
         Assert.Equal([code], scratch.Codes(
-            $"static readonly String Path = \"stub.bin\";\npublic void F() {{ var s = {expression}; }}"));
+            $"static readonly String Path = \"stub.bin\";\n" +
+            $"[{attribute}] static readonly byte[] Blob;"));
     }
+
+    /// <summary>
+    /// Where <c>[Embed]</c> may not go, each named by what it was written on.
+    /// </summary>
+    [Theory]
+    [InlineData("""public class Held { [Embed("stub.bin")] public byte[] Bytes; }""", "SL0729")]
+    [InlineData("""[Embed("stub.bin")] public class Held { }""", "SL0729")]
+    [InlineData("""public class Held { [Embed("stub.bin")] public byte[] B { get; set; } }""",
+                "SL0729")]
+    [InlineData("""[Embed("stub.bin")] public void F() { }""", "SL0728")]
+    [InlineData("""[Embed("stub.bin")] using Bytes = byte[];""", "SL0728")]
+    [InlineData("""[Embed("stub.bin")] const int Size = 1;""", "SL0728")]
+    [InlineData("""[Embed("stub.bin")] extern "C" int errno;""", "SL0728")]
+    public void AnEmbedGoesOnAStaticAndNowhereElse(string body, string code) =>
+        Assert.Contains(code, new Scratch().Codes(body));
+
+    [Fact]
+    public void AStaticWithAnEmbedHasNoInitializer() =>
+        Assert.Equal(["SL0731"], new Scratch().Codes(
+            """[Embed("stub.bin")] static readonly byte[] S = null;"""));
+
+    [Fact]
+    public void AnEmbedIsBytesAndNothingElse() =>
+        Assert.Equal(["SL0730"], new Scratch().Codes(
+            """[Embed("stub.bin")] static readonly String S;"""));
+
+    /// <summary>
+    /// The other half of the same rule: a static with no <c>[Embed]</c> and no
+    /// value is the mistake it always was.
+    /// </summary>
+    [Fact]
+    public void AStaticWithoutAnEmbedStillNeedsAValue() =>
+        Assert.Equal(["SL0376"], new Scratch().Codes("static readonly int Count;"));
+
+    [Fact]
+    public void OneStaticCarriesOneFile() =>
+        Assert.Equal(["SL0729"], new Scratch().Codes(
+            """[Embed("stub.bin"), Embed("data/table.bin")] static readonly byte[] S;"""));
 
     [Fact]
     public void WritableAndExecutableIsAllowedWhenTheSectionIsNamed()
@@ -236,7 +313,7 @@ public class EmbedTests
         var scratch = new Scratch();
 
         Assert.Empty(scratch.Codes(
-            """public void F() { var s = embed("stub.bin", section: ".jit", access: "rwx"); }"""));
+            """[Embed("stub.bin", Section = ".jit", Access = "rwx")] static byte[] S;"""));
     }
 
     [Fact]
@@ -245,7 +322,7 @@ public class EmbedTests
         var scratch = new Scratch();
 
         Assert.Empty(scratch.Codes(
-            """public void F() { var s = embed("stub.bin", section: ".text", access: "rx"); }"""));
+            """[Embed("stub.bin", Section = ".text", Access = "rx")] static readonly byte[] S;"""));
     }
 
     [Fact]
@@ -253,12 +330,9 @@ public class EmbedTests
     {
         var scratch = new Scratch();
         var codes = scratch.Codes("""
-            public void F()
-            {
-                var a = embed("stub.bin", section: ".shared");
-                var b = embed("data/table.bin", section: ".shared");
-                var c = embed("stub.bin", section: ".shared", access: "rw");
-            }
+            [Embed("stub.bin", Section = ".shared")] static readonly byte[] A;
+            [Embed("data/table.bin", Section = ".shared")] static readonly byte[] B;
+            [Embed("stub.bin", Section = ".shared", Access = "rw")] static byte[] C;
             """);
 
         Assert.Equal(["SL0711"], codes);
@@ -291,7 +365,7 @@ public class EmbedTests
     {
         var scratch = new Scratch();
         const string body =
-            """public void F() { var s = embed("stub.bin", section: ".embedded_logo"); }""";
+            """[Embed("stub.bin", Section = ".embedded_logo")] static readonly byte[] S;""";
 
         Under(TargetPlatform.X64Windows, () =>
         {
@@ -304,7 +378,7 @@ public class EmbedTests
         Under(TargetPlatform.X64Linux, () => Assert.Empty(scratch.Codes(body)));
         Under(TargetPlatform.X64Windows, () =>
             Assert.Empty(scratch.Codes(
-                """public void F() { var s = embed("stub.bin", section: ".embedde"); }""")));
+                """[Embed("stub.bin", Section = ".embedde")] static readonly byte[] S;""")));
     }
 
     [Fact]
@@ -415,7 +489,7 @@ public class EmbedTests
         Under(TargetPlatform.X64Linux, () =>
         {
             var program = scratch.Bind(
-                """public static class Held { public static readonly byte[] Stub = embed("stub.bin", section: ".stub", access: "rx"); }""",
+                """public static class Held { [Embed("stub.bin", Section = ".stub", Access = "rx")] public static readonly byte[] Stub; }""",
                 out var diagnostics);
             Assert.False(diagnostics.HasErrors);
 

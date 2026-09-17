@@ -1438,19 +1438,36 @@ public static class TypeExtensions
     /// all. Only a struct that actually holds a reference pays for one, and it
     /// is then no longer a type that may cross <c>extern "C"</c>.
     ///
-    /// The recursion terminates because a struct may not contain itself: that
-    /// cycle is rejected during layout (SL0216), which makes the field closing
-    /// it the error type. So this is safe to ask after layout, and before it
-    /// only of a type already laid out.
+    /// A struct may not contain itself — layout rejects that cycle with
+    /// SL0216 — but the cycle is reported and left in the tree, so the walk
+    /// carries its own guard rather than trusting that there is none. Without
+    /// it, every question asked about such a struct after layout ran until the
+    /// stack was gone.
     /// </summary>
-    public static bool CarriesReferences(this TypeSymbol type) => type switch
+    public static bool CarriesReferences(this TypeSymbol type) => CarriesReferences(type, []);
+
+    /// <param name="walked">
+    /// The types this question is already inside. A type reached twice answers
+    /// the same both times, and a type reached while it is still being asked
+    /// about is the cycle: false is the right answer there, because a struct
+    /// that contains itself has no layout for a reference to sit in.
+    /// </param>
+    private static bool CarriesReferences(TypeSymbol type, HashSet<TypeSymbol> walked)
     {
-        // A variant's own fields are a tag and a blob of bytes, which carry
-        // nothing; what it holds is decided by the case the tag names.
-        VariantTypeSymbol variant => variant.CasesCarryReferences,
-        StructTypeSymbol structType => structType.Fields.Any(f => f.Type.CarriesReferences()),
-        _ => type.IsManagedSlot(),
-    };
+        if (!walked.Add(type)) return false;
+
+        return type switch
+        {
+            // A variant's own fields are a tag and a blob of bytes, which carry
+            // nothing; what it holds is decided by the case the tag names.
+            VariantTypeSymbol variant => variant.Cases.Any(
+                c => c.Payload is not null &&
+                     c.Payload.Fields.Any(f => CarriesReferences(f.Type, walked))),
+            StructTypeSymbol structType =>
+                structType.Fields.Any(f => CarriesReferences(f.Type, walked)),
+            _ => type.IsManagedSlot(),
+        };
+    }
 
     /// <summary>The type a reference points at, or null.</summary>
     public static TypeSymbol? AsReference(this TypeSymbol type) => type switch

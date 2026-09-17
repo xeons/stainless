@@ -94,7 +94,6 @@ public sealed partial class Binder
         OffsetofSyntax offsetofExpression => BindOffsetof(offsetofExpression),
         TypeofSyntax typeofExpression => BindTypeof(typeofExpression),
         IidofSyntax iidofExpression => BindIidof(iidofExpression),
-        EmbedSyntax embedded => BindEmbed(embedded),
         _ => new BoundErrorExpression(syntax.Span),
     };
 
@@ -2321,7 +2320,6 @@ public sealed partial class Binder
     private static bool IsRepeatable(BoundExpression expression) => expression switch
     {
         BoundLiteral or BoundStringLiteral or BoundNullLiteral or BoundConstantAccess => true,
-        BoundEmbed => true,
         BoundLocalAccess or BoundParameterAccess or BoundThis or BoundStaticAccess => true,
         BoundFieldAccess field => field.Receiver is null || IsRepeatable(field.Receiver),
         BoundDereference dereference => IsRepeatable(dereference.Operand),

@@ -1,0 +1,4 @@
+Name: 3 values, name 'full_name', width 32, hidden 0 (default)
+Years: 3 values, name 'age', width 0 (default), hidden 1
+City: 3 values, name 'city', width 0 (default), hidden 0 (default)
+Postcode: 3 values, name 'zip', width 5, hidden 0

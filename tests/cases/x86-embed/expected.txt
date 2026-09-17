@@ -2,8 +2,9 @@ length 13
 bytes 83 76 0 255 13 10 128 127 10 13 144 233 65
 checksum 3574557169
 same object true
-same from a local true
+same from a module static true
 writable is another true
+positional is the same true
 through a pointer 83 76
 written 200 201, read-only still 83 65
 stub length 6
