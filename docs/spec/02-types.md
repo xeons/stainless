@@ -1225,14 +1225,14 @@ only where the case has been established, and every rule it appears to have is
 a rule variants have:
 
 ```csharp
-if (found.Some) { return values.At(found.Value); }
+if (found.Some) { return values[found.Value]; }
 return fallback;
 ```
 
 A call result carries no narrowing, so a lookup is read with a name:
 
 ```csharp
-if (map.IndexOf(key) is Some found) { return values.At(found.Value); }
+if (map.IndexOf(key) is Some found) { return values[found.Value]; }
 return fallback;
 ```
 
@@ -1261,7 +1261,7 @@ overload resolution. An `Optional<T>` assigned to an `Optional<Optional<T>>`
 
 | | |
 |---|---|
-| `HasValue`, `IsEmpty()` | whether there is one |
+| `HasValue`, `IsEmpty` | whether there is one |
 | `Get()` | the value, **aborting** when there is none — the bargain `Dictionary.Get` makes |
 | `ValueOr(fallback)` | the value, or something the caller supplies |
 | `Or(other)` | this one if it holds anything, else `other` |
@@ -1275,7 +1275,7 @@ overload resolution. An `Optional<T>` assigned to an `Optional<Optional<T>>`
 written at them:
 
 ```csharp
-Optional<String> name = index.IndexOf(id).Map(i => people.At(i).Name);
+Optional<String> name = index.IndexOf(id).Map(i => people[i].Name);
 ```
 
 `Or` takes a value rather than something that produces one on demand, unlike

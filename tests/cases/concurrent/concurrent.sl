@@ -63,7 +63,7 @@ int Main()
     }
     // 0 + 1 + ... + 3999
     printf("drained=%lld empty=%d again=%d\n",
-        sum, queue.IsEmpty() ? 1 : 0, queue.TryDequeue().Ok ? 1 : 0);
+        sum, queue.IsEmpty ? 1 : 0, queue.TryDequeue().Ok ? 1 : 0);
     printf("fallback=%d\n", queue.DequeueOr(-1));
 
     // ------------------------------------------------------------ stack
@@ -81,7 +81,7 @@ int Main()
         stacked = stacked + (long)popped.Value;
         popped = stack.TryPop();
     }
-    printf("stacked=%lld empty=%d or=%d\n", stacked, stack.IsEmpty() ? 1 : 0, stack.PopOr(-7));
+    printf("stacked=%lld empty=%d or=%d\n", stacked, stack.IsEmpty ? 1 : 0, stack.PopOr(-7));
 
     // ------------------------------------------------------- dictionary
     var map = new ConcurrentDictionary<int, int>();

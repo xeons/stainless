@@ -831,7 +831,7 @@ public class GtkEntryPeer : GtkPeer, ITextEntryPeer
     public String[] GetLines()
     {
         var whole = GetText();
-        if (whole.IsEmpty())
+        if (whole.IsEmpty)
             return new String[0u];
         return whole.Split('\n');
     }

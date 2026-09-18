@@ -32,7 +32,7 @@ String Describe(IReadOnlyList<Money> prices)
     var text = new StringBuilder();
     for (nuint i = 0; i < prices.Count; i++)
     {
-        text.Append(prices.At(i).Show());
+        text.Append(prices[i].Show());
         text.Append(" ");
     }
     return text.ToText();
@@ -62,12 +62,12 @@ int Main()
     {
         Console.WriteLine($"index of 999c = {at.Value}");
     }
-    Console.WriteLine($"index of 1c   = {IndexOf(prices, new Money(1)).IsEmpty()}");
+    Console.WriteLine($"index of 1c   = {IndexOf(prices, new Money(1)).IsEmpty}");
 
     Sort(prices);
     Console.WriteLine($"sorted   = {Describe(prices)}");
 
     prices.Clear();
-    Console.WriteLine($"cleared  = {prices.IsEmpty()}");
+    Console.WriteLine($"cleared  = {prices.IsEmpty}");
     return 0;
 }

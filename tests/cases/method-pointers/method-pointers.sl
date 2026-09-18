@@ -130,7 +130,7 @@ public int Main()
     handlers.Add(counted.Add);
 
     for (nuint i = 0u; i < handlers.Count; i = i + 1u)
-        handlers.At(i)(1);
+        handlers[i](1);
     Say("after-all", Text.FromInteger((long)one.Total)
         + "/" + Text.FromInteger((long)two.Total)
         + "/" + Text.FromInteger((long)counted.Total));
@@ -140,7 +140,7 @@ public int Main()
     // not -- so this is the scan that would be behind one.
     for (nuint i = 0u; i < handlers.Count; i = i + 1u)
     {
-        if (handlers.At(i) == two.Add)
+        if (handlers[i] == two.Add)
         {
             handlers.RemoveAt(i);
             break;
@@ -151,7 +151,7 @@ public int Main()
 
     // And the one removed is the one meant: two is untouched from here on.
     for (nuint i = 0u; i < handlers.Count; i = i + 1u)
-        handlers.At(i)(1);
+        handlers[i](1);
     Say("after-removal", Text.FromInteger((long)one.Total)
         + "/" + Text.FromInteger((long)two.Total)
         + "/" + Text.FromInteger((long)counted.Total));

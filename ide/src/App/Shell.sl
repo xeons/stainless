@@ -210,7 +210,7 @@ public class Shell : Form
             int at = _book.SelectedIndex;
             if (at < 0 || (nuint)at >= _open.Count)
                 return null;
-            return _open.At((nuint)at).Editor;
+            return _open[(nuint)at].Editor;
         }
     }
 
@@ -238,10 +238,10 @@ public class Shell : Form
     /// `*.sl` means the first.
     public void ShowFirstTab()
     {
-        if (_open.IsEmpty())
+        if (_open.IsEmpty)
             return;
         _book.SelectedIndex = 0;
-        _open.At(0u).Editor.Focus();
+        _open[0u].Editor.Focus();
     }
 
     /// Makes a tab, puts an editor on it, and brings it to the front.
@@ -302,7 +302,7 @@ public class Shell : Form
         // document, so opening a file replaces it instead of sitting beside it.
         var spare = Current;
         bool replacing = _open.Count == 1u && spare != null && IsBlank((CodeEditor)spare);
-        var stale = replacing ? _open.At(0u) : null;
+        var stale = replacing ? _open[0u] : null;
 
         var tab = AddTab(document);
         if (stale != null)
@@ -338,7 +338,7 @@ public class Shell : Form
         _book.RemovePage(tab.Page);
         for (nuint i = 0u; i < _open.Count; i++)
         {
-            if (_open.At(i) == tab)
+            if (_open[i] == tab)
             {
                 _open.RemoveAt(i);
                 break;
@@ -346,7 +346,7 @@ public class Shell : Form
         }
         // A window with no editor in it has nowhere to type, so closing the
         // last tab opens an empty one rather than leaving a hole.
-        if (_open.IsEmpty())
+        if (_open.IsEmpty)
         {
             NewFile();
             return;
@@ -487,7 +487,7 @@ public class Shell : Form
         int at = _book.SelectedIndex;
         if (at < 0 || (nuint)at >= _open.Count)
             return;
-        var tab = _open.At((nuint)at);
+        var tab = _open[(nuint)at];
         if (!MayClose(tab))
             return;
         CloseTab(tab);
@@ -544,7 +544,7 @@ public class Shell : Form
             nuint at = i - 1u;
             if (at >= _open.Count)
                 continue;
-            if (!MayClose(_open.At(at)))
+            if (!MayClose(_open[at]))
                 return false;
         }
         return true;
@@ -1495,10 +1495,10 @@ public class Shell : Form
         var node = (TreeNode)chosen;
         for (nuint i = 0u; i < _treeNodes.Count; i++)
         {
-            if (_treeNodes.At(i) == node)
+            if (_treeNodes[i] == node)
             {
-                if (!OpenFile(_treePaths.At(i)))
-                    Say("Could not read " + _treePaths.At(i));
+                if (!OpenFile(_treePaths[i]))
+                    Say("Could not read " + _treePaths[i]);
                 return;
             }
         }
@@ -1512,7 +1512,7 @@ public class Shell : Form
         if (row < 0 || (nuint)row >= _errorLines.Count)
             return;
 
-        GoToMessage(_errorLines.At((nuint)row));
+        GoToMessage(_errorLines[(nuint)row]);
     }
 
     // -------------------------------------------------------------- the rest
@@ -1668,7 +1668,7 @@ public class Shell : Form
         }
 
         int at = _book.SelectedIndex;
-        CloseTab(_open.At((nuint)at));
+        CloseTab(_open[(nuint)at]);
         if (_open.Count != had)
         {
             Console.WriteLine("FAIL: closing a tab did not remove it");
@@ -1677,8 +1677,8 @@ public class Shell : Form
 
         // Closing them all leaves one empty tab rather than none.
         while (_open.Count > 1u)
-            CloseTab(_open.At(0u));
-        CloseTab(_open.At(0u));
+            CloseTab(_open[0u]);
+        CloseTab(_open[0u]);
         if (_open.Count != 1u)
         {
             Console.WriteLine("FAIL: closing every tab left "
@@ -1689,7 +1689,7 @@ public class Shell : Form
         // Several files at once, which is what the command line does and what
         // a single open never exercised.
         while (_open.Count > 1u)
-            CloseTab(_open.At(0u));
+            CloseTab(_open[0u]);
         OpenFile("samples/shapes.sl");
         OpenFile("samples/hello.sl");
         OpenFile("samples/json.sl");
@@ -1856,7 +1856,7 @@ public class Shell : Form
                 ok = false;
             }
 
-            CloseTab(_open.At(_open.Count - 1u));
+            CloseTab(_open[_open.Count - 1u]);
             Application.DoEvents();
         }
 
@@ -2007,7 +2007,7 @@ public class Shell : Form
                 ok = false;
             }
 
-            CloseTab(_open.At(_open.Count - 1u));
+            CloseTab(_open[_open.Count - 1u]);
             Application.DoEvents();
         }
 

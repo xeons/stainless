@@ -56,7 +56,7 @@ a second declaration of the type ([§1.2.1](01-modules.md#121-and-so-may-a-type)
 | `a == b`, `a != b` | `bool` | compares bytes, not identity |
 | `ByteLength()` | `nuint` | O(1) |
 | `CodePointCount()` | `nuint` | O(n) |
-| `IsEmpty()` | `bool` | O(1) |
+| `IsEmpty` | `bool` | O(1) |
 | `ToPointer()` | `byte*` | O(1), no copy |
 | `ToUtf16()` | `Utf16String` | allocates and transcodes |
 | **testing** | | |
@@ -171,7 +171,7 @@ var wide = message.ToUtf16();       // owned, NUL terminated, released by ARC
 MessageBoxW(0, wide.ToPointer(), null, 0);
 ```
 
-It offers `UnitCount()`, `IsEmpty()`, `UnitAt(i)`, `CodePointAt(i)` and
+It offers `UnitCount()`, `IsEmpty`, `UnitAt(i)`, `CodePointAt(i)` and
 `NextCodePoint(i)` — which join a surrogate pair, so a character outside the
 basic plane reads as one scalar across two units — plus `Equals(other)`,
 `ToBytes()`, which gives the raw little-endian units, `ToPointer()`, which
@@ -229,7 +229,7 @@ Console.WriteLine(builder.ToText());       // 0,1,2,3,4,
 | `AppendInteger(long)`, `AppendDouble(double)` | `void` |
 | `AppendCodePoint(char32)` | `void`, encoded as UTF-8 |
 | `AppendJoined(sep, parts)` | `void` |
-| `ByteLength()`, `IsEmpty()`, `HasContent` | `nuint`, `bool`, `bool` |
+| `ByteLength()`, `IsEmpty`, `HasContent` | `nuint`, `bool`, `bool` |
 | `ByteAt(i)`, `SetByteAt(i, b)` | `byte`, `void` |
 | `IndexOf(String)`, `Contains(String)` | `long`, `bool` |
 | `Insert(at, String)`, `Remove(at, n)`, `Truncate(at)` | `void` |

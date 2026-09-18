@@ -215,7 +215,7 @@ public FilterSpec[] BuildSpecs(String[] pairs, Utf16String[] held)
 int Prepare(IFileDialog dialog, HWND owner, String title,
             String[] filterPairs, uint options)
 {
-    if (!title.IsEmpty())
+    if (!title.IsEmpty)
         dialog.SetTitle(title.ToUtf16().ToPointer());
 
     uint existing = 0u;
@@ -248,7 +248,7 @@ Result<String, DialogError> Chosen(IFileDialog dialog, int shown)
     IShellItem item = (IShellItem)raw;
     String path = Shell.PathOf(item);
 
-    if (path.IsEmpty())
+    if (path.IsEmpty)
         return Fail(DialogError.Other);
     return Ok(path);
 }
@@ -334,11 +334,11 @@ public Result<String, DialogError> ChooseSaveFile(HWND owner, String title,
 
     IFileSaveDialog dialog = (IFileSaveDialog)made.Value;
 
-    if (!suggestedName.IsEmpty())
+    if (!suggestedName.IsEmpty)
     {
         dialog.SetFileName(suggestedName.ToUtf16().ToPointer());
     }
-    if (!defaultExtension.IsEmpty())
+    if (!defaultExtension.IsEmpty)
     {
         dialog.SetDefaultExtension(defaultExtension.ToUtf16().ToPointer());
     }

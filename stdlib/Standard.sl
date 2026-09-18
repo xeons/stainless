@@ -117,7 +117,7 @@ extern "C" void sl_fail(byte* message);
 /// beside the value and nothing else: no allocation, and the payload is only
 /// read where the compiler has established the case.
 ///
-///     if (map.IndexOf(key) is Some found) { return values.At(found.Value); }
+///     if (map.IndexOf(key) is Some found) { return values[found.Value]; }
 ///     return fallback;
 ///
 /// **Not a replacement for `C?`.** A nullable reference stays what it is: the
@@ -149,11 +149,14 @@ public variant Optional<T>
 
     /// True when there is not. The same question the other way round, because
     /// `!x.HasValue` reads worse than the thing it means.
-    public bool IsEmpty()
+    public bool IsEmpty
     {
-        if (this is Some)
-            return false;
-        return true;
+        get
+        {
+            if (this is Some)
+                return false;
+            return true;
+        }
     }
 
     /// The value, aborting when there is none.
@@ -199,7 +202,7 @@ public variant Optional<T>
 
     /// The value put through `transform`, or none.
     ///
-    ///     Optional<String> name = found.Map(i => people.At(i).Name);
+    ///     Optional<String> name = found.Map(i => people[i].Name);
     ///
     /// The transform runs only where there is something to run it on, which is
     /// the point: it is the `if` that would otherwise be written by hand.

@@ -56,7 +56,7 @@ public class Queue<T> : IEnumerable<T>
 
     /// True when there is nothing to dequeue. Check this before `Dequeue` or
     /// `Peek`, both of which abort on an empty queue.
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty => _count == 0;
 
     /// The number of slots the ring has. Always a power of two, so wrapping is
     /// a mask rather than a division.
@@ -161,7 +161,7 @@ public class Stack<T> : IEnumerable<T>
 
     /// True when there is nothing to pop. Check this before `Pop` or `Peek`,
     /// both of which abort on an empty stack.
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty => _count == 0;
 
     /// The number of slots the backing array has.
     public nuint Capacity => _items.Length;
@@ -283,7 +283,7 @@ public class LinkedList<T> : IEnumerable<T>
     public nuint Count => _count;
 
     /// True when nothing is linked in.
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty => _count == 0;
 
     /// A handle to the first node, or -1 when the list is empty.
     public nint First() => _head;
@@ -537,7 +537,7 @@ public class SortedList<TKey, TValue> : IEnumerable<Pair<TKey, TValue>> where TK
     public nuint Count => _count;
 
     /// True when there are no entries.
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty => _count == 0;
 
     /// The index `key` is at, or the index it would be inserted at, negated and
     /// offset by one so the two cases stay apart: a result below zero means

@@ -94,7 +94,7 @@ public int Main()
     var all = new List<(int, String)>();
     all.Add((1, "one"));
     all.Add((2, "two"));
-    Console.WriteLine($"i {all.Count} {all.At(1u).Item2}");
+    Console.WriteLine($"i {all.Count} {all[1u].Item2}");
 
     // Structural: the same two element types, made two different ways.
     var made = MinMax(numbers);

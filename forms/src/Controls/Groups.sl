@@ -107,7 +107,7 @@ public class RadioGroup : GroupBox
         {
             for (nuint i = 0u; i < _buttons.Count; i++)
             {
-                if (_buttons.At(i).Checked)
+                if (_buttons[i].Checked)
                     return (int)i;
             }
             return -1;
@@ -116,7 +116,7 @@ public class RadioGroup : GroupBox
         {
             if (value < 0 || (nuint)value >= _buttons.Count)
                 return;
-            _buttons.At((nuint)value).Checked = true;
+            _buttons[(nuint)value].Checked = true;
         }
     }
 
@@ -128,7 +128,7 @@ public class RadioGroup : GroupBox
             int at = SelectedIndex;
             if (at < 0)
                 return null;
-            return _buttons.At((nuint)at).Text;
+            return _buttons[(nuint)at].Text;
         }
     }
 
@@ -154,7 +154,7 @@ public class RadioGroup : GroupBox
     /// arrange.
     void Arrange()
     {
-        if (!_ready || _buttons.IsEmpty())
+        if (!_ready || _buttons.IsEmpty)
             return;
         var area = ClientBounds;
         if (area.Width <= 0 || area.Height <= 0)
@@ -174,7 +174,7 @@ public class RadioGroup : GroupBox
         {
             int column = (int)i / perColumn;
             int row = (int)i % perColumn;
-            _buttons.At(i).SetBounds(column * width, row * height, width, height);
+            _buttons[i].SetBounds(column * width, row * height, width, height);
         }
     }
 
@@ -232,14 +232,14 @@ public class CheckGroup : GroupBox
     {
         if (index < 0 || (nuint)index >= _boxes.Count)
             return false;
-        return _boxes.At((nuint)index).Checked;
+        return _boxes[(nuint)index].Checked;
     }
 
     public void SetChecked(int index, bool ticked)
     {
         if (index < 0 || (nuint)index >= _boxes.Count)
             return;
-        _boxes.At((nuint)index).Checked = ticked;
+        _boxes[(nuint)index].Checked = ticked;
     }
 
     /// The indices that are ticked, in order.
@@ -250,14 +250,14 @@ public class CheckGroup : GroupBox
             nuint ticked = 0u;
             for (nuint i = 0u; i < _boxes.Count; i++)
             {
-                if (_boxes.At(i).Checked)
+                if (_boxes[i].Checked)
                     ticked++;
             }
             var found = new int[ticked];
             nuint at = 0u;
             for (nuint i = 0u; i < _boxes.Count; i++)
             {
-                if (_boxes.At(i).Checked)
+                if (_boxes[i].Checked)
                 {
                     found[at] = (int)i;
                     at++;
@@ -277,7 +277,7 @@ public class CheckGroup : GroupBox
     /// See the note on `RadioGroup.Arrange`.
     void Arrange()
     {
-        if (!_ready || _boxes.IsEmpty())
+        if (!_ready || _boxes.IsEmpty)
             return;
         var area = ClientBounds;
         if (area.Width <= 0 || area.Height <= 0)
@@ -297,7 +297,7 @@ public class CheckGroup : GroupBox
         {
             int column = (int)i / perColumn;
             int row = (int)i % perColumn;
-            _boxes.At(i).SetBounds(column * width, row * height, width, height);
+            _boxes[i].SetBounds(column * width, row * height, width, height);
         }
     }
 

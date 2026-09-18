@@ -226,7 +226,7 @@ void Library()
     list.Add("gamma");
     list.Add("alpha");
     list.Add("beta");
-    Say("List", $"{list.Count} items, first {list.At(0u)}");
+    Say("List", $"{list.Count} items, first {list[0u]}");
 
     var map = new Dictionary<String, int>();
     map.Set("one", 1);

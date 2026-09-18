@@ -133,10 +133,10 @@ public int Main()
 
     // The result type read off the lambda's body.
     var spelled = Turned(numbers, (n) => Text.FromInteger((long)n));
-    Console.WriteLine($"spelled  {spelled.At(0u)} and {spelled.At(4u)}");
+    Console.WriteLine($"spelled  {spelled[0u]} and {spelled[4u]}");
 
     var lengths = Turned(words, (w) => (int)w.ByteLength());
-    Console.WriteLine($"lengths  {lengths.At(0u)} {lengths.At(2u)}");
+    Console.WriteLine($"lengths  {lengths[0u]} {lengths[2u]}");
 
     // A fold, whose two parameters are different types.
     Console.WriteLine($"sum      {Folded(numbers, 0, (total, n) => total + n)}");

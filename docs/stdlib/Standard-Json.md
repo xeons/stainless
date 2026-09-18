@@ -45,7 +45,7 @@ every reference in it starts null, and only the document fills them. Mark a
 field with this when the document is what decides whether the object is
 there, and leave it alone when the constructor already made one.
 
-<sub>[stdlib/Json.sl:990](../../stdlib/Json.sl#L990)</sub>
+<sub>[stdlib/Json.sl:1019](../../stdlib/Json.sl#L1019)</sub>
 
 ### JsonError *enum*
 
@@ -166,7 +166,7 @@ attribute JsonIgnore
 
 Leaves the field out of the document entirely, in both directions.
 
-<sub>[stdlib/Json.sl:980](../../stdlib/Json.sl#L980)</sub>
+<sub>[stdlib/Json.sl:1009](../../stdlib/Json.sl#L1009)</sub>
 
 ### JsonName *attribute*
 
@@ -176,7 +176,7 @@ attribute JsonName
 
 The name this field has in the document, when it differs from the field's.
 
-<sub>[stdlib/Json.sl:977](../../stdlib/Json.sl#L977)</sub>
+<sub>[stdlib/Json.sl:1006](../../stdlib/Json.sl#L1006)</sub>
 
 ### JsonObject *class*
 
@@ -487,7 +487,7 @@ Reads a whole document. Trailing content is an error rather than ignored,
 because a document with a second value in it is a document the writer meant
 something else by.
 
-<sub>[stdlib/Json.sl:771](../../stdlib/Json.sl#L771)</sub>
+<sub>[stdlib/Json.sl:799](../../stdlib/Json.sl#L799)</sub>
 
 ### Populate *function*
 
@@ -507,7 +507,7 @@ A document naming a nested object the constructor left null is skipped
 rather than allocated into, since nothing here could give the rest of that
 object's fields a value.
 
-<sub>[stdlib/Json.sl:1166](../../stdlib/Json.sl#L1166)</sub>
+<sub>[stdlib/Json.sl:1195](../../stdlib/Json.sl#L1195)</sub>
 
 ### PopulateFrom *function*
 
@@ -517,7 +517,7 @@ JsonError PopulateFrom<T>(T value, JsonValue document)
 
 The same, from a document already parsed.
 
-<sub>[stdlib/Json.sl:1176](../../stdlib/Json.sl#L1176)</sub>
+<sub>[stdlib/Json.sl:1205](../../stdlib/Json.sl#L1205)</sub>
 
 ### Serialize *function*
 
@@ -527,7 +527,7 @@ String Serialize<T>(T value)
 
 The document as text.
 
-<sub>[stdlib/Json.sl:1003](../../stdlib/Json.sl#L1003)</sub>
+<sub>[stdlib/Json.sl:1032](../../stdlib/Json.sl#L1032)</sub>
 
 ### SerializeIndented *function*
 
@@ -537,7 +537,7 @@ String SerializeIndented<T>(T value)
 
 The same, indented.
 
-<sub>[stdlib/Json.sl:1006](../../stdlib/Json.sl#L1006)</sub>
+<sub>[stdlib/Json.sl:1035](../../stdlib/Json.sl#L1035)</sub>
 
 ### TextOr *function*
 
@@ -561,7 +561,7 @@ Reads the field tables of `[Reflect] T`, walking into a nested class or
 struct rather than stopping at it. A field of a kind with no JSON spelling
 -- a pointer, a delegate, an array -- is left out rather than guessed at.
 
-<sub>[stdlib/Json.sl:997](../../stdlib/Json.sl#L997)</sub>
+<sub>[stdlib/Json.sl:1026](../../stdlib/Json.sl#L1026)</sub>
 
 ### Write *function*
 
@@ -571,7 +571,7 @@ String Write(JsonValue value)
 
 The document as text, on one line.
 
-<sub>[stdlib/Json.sl:789](../../stdlib/Json.sl#L789)</sub>
+<sub>[stdlib/Json.sl:818](../../stdlib/Json.sl#L818)</sub>
 
 ### WriteIndented *function*
 
@@ -581,7 +581,7 @@ String WriteIndented(JsonValue value)
 
 The document as text, indented two spaces a level.
 
-<sub>[stdlib/Json.sl:797](../../stdlib/Json.sl#L797)</sub>
+<sub>[stdlib/Json.sl:826](../../stdlib/Json.sl#L826)</sub>
 
 ## Constants
 

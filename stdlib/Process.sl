@@ -215,7 +215,7 @@ public class Process
 
     /// The code it left, if it has finished, without waiting for it.
     ///
-    ///     while (child.Finished.IsEmpty()) { DoSomethingElse(); }
+    ///     while (child.Finished.IsEmpty) { DoSomethingElse(); }
     public Optional<int> Finished
     {
         get

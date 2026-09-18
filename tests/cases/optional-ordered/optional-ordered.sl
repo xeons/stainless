@@ -61,7 +61,7 @@ public int Main()
     // The readers that need no proof, because they supply their own.
     Say("has-value", Text.FromBool(FirstEven(evens).HasValue));
     Say("no-value", Text.FromBool(FirstEven(odds).HasValue));
-    Say("is-empty", Text.FromBool(FirstEven(odds).IsEmpty()));
+    Say("is-empty", Text.FromBool(FirstEven(odds).IsEmpty));
     Say("value-or", Text.FromInteger((long)FirstEven(odds).ValueOr(99u)));
     Say("value-or-present", Text.FromInteger((long)FirstEven(evens).ValueOr(99u)));
     Say("get", Text.FromInteger((long)FirstEven(evens).Get()));
@@ -131,7 +131,7 @@ public int Main()
 
     var joined = new StringBuilder();
     for (nuint i = 0u; i < list.Count; i = i + 1u)
-        joined.Append(list.At(i));
+        joined.Append(list[i]);
     Say("inserted", joined.ToText());
 
     list.RemoveAt(0u);
@@ -139,7 +139,7 @@ public int Main()
 
     var left = new StringBuilder();
     for (nuint i = 0u; i < list.Count; i = i + 1u)
-        left.Append(list.At(i));
+        left.Append(list[i]);
     Say("removed-ends", left.ToText() + "/" + Text.FromInteger((long)list.Count));
 
     // --------------------------------------------- StringBuilder appends

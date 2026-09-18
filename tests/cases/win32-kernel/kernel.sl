@@ -31,13 +31,13 @@ int Main()
     Console.WriteLine("expanded: " + Environment.Expand("[%STAINLESS_TEST%]"));
 
     Console.WriteLine("cleared: " + Text.FromBool(Environment.Clear("STAINLESS_TEST")));
-    Console.WriteLine("gone: " + Text.FromBool(Environment.Get("STAINLESS_TEST").IsEmpty()));
+    Console.WriteLine("gone: " + Text.FromBool(Environment.Get("STAINLESS_TEST").IsEmpty));
 
     // --- errors -------------------------------------------------------------
     Console.WriteLine("code 2: " + Win32.Describe(2u));
     Console.WriteLine("code 5: " + Win32.Describe(5u));
     Console.WriteLine("an impossible code has no message: "
-        + Text.FromBool(Win32.Describe(0xFFFFFFFEu).IsEmpty()));
+        + Text.FromBool(Win32.Describe(0xFFFFFFFEu).IsEmpty));
 
     Console.WriteLine("0 is failure: " + Text.FromBool(Win32.Failed(0)));
     Console.WriteLine("1 is success: " + Text.FromBool(Win32.Succeeded(1)));

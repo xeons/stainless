@@ -34,7 +34,7 @@ int Main()
 
     printf("cstring=%s\n", b.ToPointer());
     Console.WriteLine(b.Substring(0, 3));
-    printf("empty=%d\n", "".IsEmpty());
+    printf("empty=%d\n", "".IsEmpty);
 
     {
         var p = new Person("Ada");

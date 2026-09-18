@@ -107,7 +107,7 @@ public int Main()
     if (slow.Ok)
     {
         var child = slow.Value;
-        Console.WriteLine($"running  {child.Finished.IsEmpty()}");
+        Console.WriteLine($"running  {child.Finished.IsEmpty}");
         child.Kill();
         Console.WriteLine($"stopped  {child.Wait().Ok}");
     }

@@ -84,7 +84,7 @@ void AddFilters(GtkWidget* chooser, String[] filters)
         for (nuint p = 0u; p < patterns.Length; p++)
         {
             var one = patterns[p].Trim();
-            if (!one.IsEmpty())
+            if (!one.IsEmpty)
                 gtk_file_filter_add_pattern(filter, one.ToPointer());
         }
         gtk_file_chooser_add_filter(chooser, filter);
@@ -119,7 +119,7 @@ public Result<String, DialogOutcome> OpenFile(IWindowPeer? owner, String title,
     gtk_dialog_add_button(chooser, "_Cancel".ToPointer(), GTK_RESPONSE_CANCEL);
     gtk_dialog_add_button(chooser, "_Open".ToPointer(), GTK_RESPONSE_ACCEPT);
 
-    if (!start.IsEmpty())
+    if (!start.IsEmpty)
         gtk_file_chooser_set_filename(chooser, start.ToPointer());
     AddFilters(chooser, filters);
 
@@ -138,7 +138,7 @@ public Result<String, DialogOutcome> SaveFile(IWindowPeer? owner, String title,
     // A name rather than a filename: a save dialog opens on a directory with
     // the name filled in, and `set_filename` on a file that does not exist
     // yet does nothing at all.
-    if (!start.IsEmpty())
+    if (!start.IsEmpty)
     {
         gtk_file_chooser_set_current_name(chooser, start.ToPointer());
     }
@@ -223,13 +223,13 @@ public Font ParsePango(String description, Font fallback)
         }
         else
         {
-            if (!family.IsEmpty())
+            if (!family.IsEmpty)
                 family = family + " ";
             family = family + word;
         }
     }
 
-    if (family.IsEmpty())
+    if (family.IsEmpty)
         family = fallback.Family;
     return new Font(family, size, style);
 }

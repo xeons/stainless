@@ -121,7 +121,7 @@ Optional<int> Finished { get; }
 
 The code it left, if it has finished, without waiting for it.
 
-    while (child.Finished.IsEmpty()) { DoSomethingElse(); }
+    while (child.Finished.IsEmpty) { DoSomethingElse(); }
 
 <sub>[stdlib/Process.sl:219](../../stdlib/Process.sl#L219)</sub>
 

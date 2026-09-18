@@ -24,11 +24,11 @@ public class Money : IComparable<Money>, IEquatable<Money>, IHashable
 // The constraint is satisfied by 'int' and 'String' as readily as by a class.
 T Middle<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
-    var best = items.At(0);
+    var best = items[0];
     for (nuint i = 1; i < items.Count; i = i + 1)
     {
-        if (items.At(i).CompareTo(best) > 0)
-            best = items.At(i);
+        if (items[i].CompareTo(best) > 0)
+            best = items[i];
     }
     return best;
 }
@@ -38,7 +38,7 @@ nuint Digest<T>(IReadOnlyList<T> items) where T : IHashable, IEquatable<T>
     nuint total = 0;
     for (nuint i = 0; i < items.Count; i = i + 1)
     {
-        total = total + items.At(i).HashCode();
+        total = total + items[i].HashCode();
     }
     return total;
 }
@@ -50,7 +50,7 @@ int Main()
     numbers.Add(30); numbers.Add(4); numbers.Add(17); numbers.Add(4);
     Sort(numbers);
     printf("sorted=%d %d %d %d\n",
-        numbers.At(0), numbers.At(1), numbers.At(2), numbers.At(3));
+        numbers[0], numbers[1], numbers[2], numbers[3]);
     printf("index=%llu largest=%d smallest=%d\n",
         IndexOf(numbers, 17).ValueOr(99u), Largest(numbers), Smallest(numbers));
 
@@ -59,7 +59,7 @@ int Main()
     words.Add("pear"); words.Add("apple"); words.Add("fig");
     Sort(words);
     printf("words=%s %s %s\n",
-        words.At(0).ToPointer(), words.At(1).ToPointer(), words.At(2).ToPointer());
+        words[0].ToPointer(), words[1].ToPointer(), words[2].ToPointer());
     printf("longest=%s\n", Middle(words).ToPointer());
 
     // The three members, written out on values of each kind.
@@ -96,7 +96,7 @@ int Main()
     moneys.Add(new Money(125));
     Sort(moneys);
     printf("money=%d %d hashes=%d\n",
-        moneys.At(0).Cents(), moneys.At(1).Cents(),
+        moneys[0].Cents(), moneys[1].Cents(),
         Digest(moneys) == Digest(moneys) ? 1 : 0);
     printf("digests=%d %d\n",
         Digest(numbers) == Digest(numbers) ? 1 : 0,

@@ -223,10 +223,10 @@ How many entries there are *now*. For reporting rather than deciding.
 
 <sub>[stdlib/Concurrent.sl:373](../../stdlib/Concurrent.sl#L373)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 Whether it is empty *now*, with the same caveat as `Count`.
@@ -312,10 +312,10 @@ act on it, so this is for reporting rather than for deciding.
 
 <sub>[stdlib/Concurrent.sl:158](../../stdlib/Concurrent.sl#L158)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 Whether it is empty *now*. Another thread may enqueue before you act on
@@ -390,10 +390,10 @@ deciding: another thread may change it before you act on it.
 
 <sub>[stdlib/Concurrent.sl:250](../../stdlib/Concurrent.sl#L250)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 Whether it is empty *now*, with the same caveat as `Count`.

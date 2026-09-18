@@ -84,7 +84,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     public nuint Count => _count;
 
     /// True when there are no entries.
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty => _count == 0;
 
     /// The number of slots the table has. Always a power of two, so the hash is
     /// reduced with a mask rather than a division.
@@ -419,7 +419,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     public nuint Count => _count;
 
     /// True when there is nothing in it.
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty => _count == 0;
 
     /// The number of slots the table has. Always a power of two, so the hash
     /// is reduced with a mask rather than a division.
@@ -506,14 +506,14 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     public void UnionWith(IReadOnlyList<T> other)
     {
         for (nuint i = 0; i < other.Count; i++)
-            Add(other.At(i));
+            Add(other[i]);
     }
 
     /// Removes everything in `other`.
     public void ExceptWith(IReadOnlyList<T> other)
     {
         for (nuint i = 0; i < other.Count; i++)
-            Remove(other.At(i));
+            Remove(other[i]);
     }
 
     /// Keeps only what is also in `other`.
@@ -526,7 +526,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
                 doomed.Add(_items[i]);
         }
         for (nuint i = 0; i < doomed.Count; i++)
-            Remove(doomed.At(i));
+            Remove(doomed[i]);
     }
 
     /// Every item, in the table's own order -- which is not insertion order

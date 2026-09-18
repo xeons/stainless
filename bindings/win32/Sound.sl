@@ -225,7 +225,7 @@ public sealed class Mixer
                 // to the engine: a voice nothing names is a voice nothing can
                 // destroy, and the engine keeps it until it shuts down.
                 for (nuint made = 0u; made < voices.Count; made++)
-                    voices.At(made).DestroyVoice();
+                    voices[made].DestroyVoice();
                 return Fail(SoundError.NoVoice);
             }
 
@@ -287,7 +287,7 @@ public sealed class Sound
         get
         {
             XAUDIO2_VOICE_DETAILS details;
-            _voices.At(0u).GetVoiceDetails(&details);
+            _voices[0u].GetVoiceDetails(&details);
             if (details.InputSampleRate == 0u || details.InputChannels == 0u)
                 return 0.0;
 
@@ -377,8 +377,8 @@ public sealed class Sound
 
         for (nuint i = 0u; i < _voices.Count; i++)
         {
-            _voices.At(i).Stop(0u, XAUDIO2_COMMIT_NOW);
-            _voices.At(i).FlushSourceBuffers();
+            _voices[i].Stop(0u, XAUDIO2_COMMIT_NOW);
+            _voices[i].FlushSourceBuffers();
         }
     }
 
@@ -393,7 +393,7 @@ public sealed class Sound
             for (nuint i = 0u; i < _voices.Count; i++)
             {
                 XAUDIO2_VOICE_STATE state;
-                _voices.At(i).GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
+                _voices[i].GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
                 if (state.BuffersQueued > 0u)
                     return true;
             }
@@ -411,8 +411,8 @@ public sealed class Sound
 
         for (nuint i = 0u; i < _voices.Count; i++)
         {
-            _voices.At(i).Stop(0u, XAUDIO2_COMMIT_NOW);
-            _voices.At(i).DestroyVoice();
+            _voices[i].Stop(0u, XAUDIO2_COMMIT_NOW);
+            _voices[i].DestroyVoice();
         }
     }
 
@@ -423,12 +423,12 @@ public sealed class Sound
         for (nuint i = 0u; i < _voices.Count; i++)
         {
             XAUDIO2_VOICE_STATE state;
-            _voices.At(i).GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
+            _voices[i].GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
             if (state.BuffersQueued == 0u)
-                return _voices.At(i);
+                return _voices[i];
         }
 
-        var oldest = _voices.At(_next);
+        var oldest = _voices[_next];
         _next = (_next + 1u) % _voices.Count;
         return oldest;
     }

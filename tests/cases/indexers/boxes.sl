@@ -99,7 +99,7 @@ int Main()
     list[1] = 20;
     list[1] += 2;
     Console.WriteLine("list " + N((long)list[0]) + " " + N((long)list[1]) + " " +
-        N((long)list.At(1)));
+        N((long)list[1]));
 
     // A dictionary's indexer answers `Optional<V>` rather than `V`, because a
     // key is data rather than a position and a lookup that misses is an

@@ -201,7 +201,7 @@ public int Main()
     var builder = new StringBuilder();
     for (nuint i = 0u; i < boxes.Count; i = i + 1u)
     {
-        if (boxes.At(i).Get() is Number n)
+        if (boxes[i].Get() is Number n)
         {
             builder.AppendDouble(n.Held);
         }

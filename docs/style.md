@@ -207,15 +207,15 @@ do stays a method. They can coexist.
   `Env.ArgumentCount()`, `Threading.ProcessorCount()` and `Random.Seed()` keep
   their parentheses however much they read like facts. Writing one as a
   property is SL0400.
-- **`IsEmpty` is still a method**, alone among the questions above, because
-  `String` and `StringBuilder` have it as a compiler builtin and a builtin
-  cannot yet be a property. The collections could convert without them, and
-  then `list.IsEmpty` and `text.IsEmpty()` would disagree — which is worse than
-  either. [TODO.md](../TODO.md) carries it.
+- **`IsEmpty` is a property**, including on `String` and `StringBuilder`. It
+  was the one exception here for a while, because those two get theirs from
+  `Builtins.cs` and a builtin could only be a `FunctionSymbol`. Builtins can
+  carry a `PropertySymbol` now, so the exception is gone and every `IsEmpty` in
+  the tree agrees.
 
-Everything else has been converted: 328 declarations and the calls that reach
-them, across the standard library, `forms/`, the IDE, the samples, the bindings
-and the test cases.
+Everything has been converted: 328 declarations and the calls that reach them,
+across the standard library, `forms/`, the IDE, the samples, the bindings and
+the test cases.
 
 ### 2.2 Ordering inside a type
 

@@ -208,7 +208,7 @@ public class ProjectDialog : Form
         {
             _references.Add(dependency.Name + "  --  " + dependency.Describe());
         }
-        if (project.Dependencies.IsEmpty())
+        if (project.Dependencies.IsEmpty)
             _references.Add("(no dependencies)");
         _libraries.Text = Joined(project.Libraries);
 
@@ -304,7 +304,7 @@ public class ProjectDialog : Form
         var answer = new String[kept.Count];
         for (nuint i = 0u; i < kept.Count; i++)
         {
-            answer[i] = kept.At(i);
+            answer[i] = kept[i];
         }
         return answer;
     }

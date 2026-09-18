@@ -319,7 +319,7 @@ public T[] ToArray<T>(IEnumerable<T> items)
     var all = ToList(items);
     var array = new T[all.Count];
     for (nuint i = 0u; i < all.Count; i++)
-        array[i] = all.At(i);
+        array[i] = all[i];
     return array;
 }
 
@@ -342,7 +342,7 @@ public List<T> Distinct<T>(T[:] items) where T : IEquatable<T>
     var seen = new List<T>();
     foreach (var item in items)
     {
-        if (IndexOf(seen, item).IsEmpty())
+        if (IndexOf(seen, item).IsEmpty)
             seen.Add(item);
     }
     return seen;
@@ -355,7 +355,7 @@ public List<T> Distinct<T>(IEnumerable<T> items) where T : IEquatable<T>
     var seen = new List<T>();
     foreach (var item in items)
     {
-        if (IndexOf(seen, item).IsEmpty())
+        if (IndexOf(seen, item).IsEmpty)
             seen.Add(item);
     }
     return seen;

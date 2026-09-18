@@ -267,7 +267,7 @@ public sealed class Builtins
         // --- String methods ------------------------------------------------
         Method(String, "ByteLength", PrimitiveTypeSymbol.NUInt, "sl_string_byte_length");
         Method(String, "CodePointCount", PrimitiveTypeSymbol.NUInt, "sl_string_code_point_count");
-        Method(String, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_is_empty");
+        Property(String, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_is_empty");
         Method(String, "ToPointer", BytePointer, "sl_string_pointer");
         Method(String, "ToUtf16", Utf16String, "sl_string_to_utf16");
         Method(String, "Substring", String, "sl_string_substring",
@@ -295,7 +295,7 @@ public sealed class Builtins
             "sl_string_builder_append_byte", ("value", PrimitiveTypeSymbol.Byte));
         Method(StringBuilder, "ByteLength", PrimitiveTypeSymbol.NUInt,
             "sl_string_builder_byte_length");
-        Method(StringBuilder, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_builder_is_empty");
+        Property(StringBuilder, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_builder_is_empty");
         Method(StringBuilder, "Clear", PrimitiveTypeSymbol.Void, "sl_string_builder_clear");
 
         // Reading and editing what is already there. A builder's bytes move as
@@ -518,6 +518,47 @@ public sealed class Builtins
         var symbol = Declare(Text, name, returnType, runtimeSymbol, owner, parameters);
         owner.Methods.Add(symbol);
         return symbol;
+    }
+
+    /// <summary>
+    /// A built-in member that reads as a property rather than a call:
+    /// <c>text.IsEmpty</c>, not <c>text.IsEmpty()</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The getter is an ordinary runtime function and the <see cref="PropertySymbol"/>
+    /// is what member lookup finds, so nothing in the binder or the emitter
+    /// needed a special case -- <c>FindProperty</c> already searches any named
+    /// type's <c>Properties</c>, and a built-in class is one.
+    /// </para>
+    /// <para>
+    /// <b>The getter is deliberately not added to <c>owner.Methods</c>.</b>
+    /// Leaving it there would make both spellings work, and two spellings of one
+    /// member is exactly how a codebase ends up using the wrong one everywhere.
+    /// </para>
+    /// <para>
+    /// This is what <c>docs/style.md</c> §2.1 was waiting for: <c>IsEmpty</c>
+    /// was the one question in that section still answered by a method, and only
+    /// because <c>String</c> and <c>StringBuilder</c> get theirs from here.
+    /// </para>
+    /// </remarks>
+    private PropertySymbol Property(
+        ClassTypeSymbol owner, string name, TypeSymbol type, string runtimeSymbol)
+    {
+        var getter = Declare(Text, "get_" + name, type, runtimeSymbol, owner, []);
+
+        var property = new PropertySymbol
+        {
+            Name = name,
+            Type = type,
+            ContainingType = owner,
+            Span = BuiltinSpan,
+            IsPublic = true,
+            Getter = getter,
+        };
+
+        owner.Properties.Add(property);
+        return property;
     }
 
     /// <summary>

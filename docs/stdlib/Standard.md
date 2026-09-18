@@ -118,10 +118,10 @@ ask a second question anyway; `is Some x` is the one that gets at it.
 
 <sub>[stdlib/Standard.sl:140](../../stdlib/Standard.sl#L140)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when there is not. The same question the other way round, because
@@ -142,7 +142,7 @@ something that is not there is a mistake in the caller rather than a
 value to return. Use `ValueOr` where a miss is ordinary, and
 `is Some x` where the answer decides what happens next.
 
-<sub>[stdlib/Standard.sl:165](../../stdlib/Standard.sl#L165)</sub>
+<sub>[stdlib/Standard.sl:168](../../stdlib/Standard.sl#L168)</sub>
 
 #### ValueOr *method*
 
@@ -155,7 +155,7 @@ The value if there is one, and `fallback` if there is not.
 The reader that needs no proof, because it supplies its own -- the same
 bargain `Result.ValueOr` makes.
 
-<sub>[stdlib/Standard.sl:181](../../stdlib/Standard.sl#L181)</sub>
+<sub>[stdlib/Standard.sl:184](../../stdlib/Standard.sl#L184)</sub>
 
 #### Or *method*
 
@@ -169,7 +169,7 @@ This one if it holds anything, and `other` if it does not.
 A lambda would allocate a closure to save an evaluation, which is the
 wrong way round at the sizes this is used at.
 
-<sub>[stdlib/Standard.sl:193](../../stdlib/Standard.sl#L193)</sub>
+<sub>[stdlib/Standard.sl:196](../../stdlib/Standard.sl#L196)</sub>
 
 #### Map *method*
 
@@ -184,7 +184,7 @@ The value put through `transform`, or none.
 The transform runs only where there is something to run it on, which is
 the point: it is the `if` that would otherwise be written by hand.
 
-<sub>[stdlib/Standard.sl:206](../../stdlib/Standard.sl#L206)</sub>
+<sub>[stdlib/Standard.sl:209](../../stdlib/Standard.sl#L209)</sub>
 
 #### FlatMap *method*
 
@@ -195,7 +195,7 @@ Optional<R> FlatMap<R>(Func<T, Optional<R>> transform)
 `Map` for a transform that answers with an optional of its own, which
 would otherwise nest one inside the other.
 
-<sub>[stdlib/Standard.sl:215](../../stdlib/Standard.sl#L215)</sub>
+<sub>[stdlib/Standard.sl:218](../../stdlib/Standard.sl#L218)</sub>
 
 #### Filter *method*
 
@@ -205,7 +205,7 @@ Optional<T> Filter(Predicate<T> keep)
 
 This one when it holds something `keep` accepts, and none otherwise.
 
-<sub>[stdlib/Standard.sl:223](../../stdlib/Standard.sl#L223)</sub>
+<sub>[stdlib/Standard.sl:226](../../stdlib/Standard.sl#L226)</sub>
 
 #### IfPresent *method*
 
@@ -215,7 +215,7 @@ void IfPresent(Action<T> action)
 
 Runs `action` on the value, if there is one.
 
-<sub>[stdlib/Standard.sl:234](../../stdlib/Standard.sl#L234)</sub>
+<sub>[stdlib/Standard.sl:237](../../stdlib/Standard.sl#L237)</sub>
 
 ### Predicate&lt;T&gt; *closure*
 

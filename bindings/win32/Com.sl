@@ -175,7 +175,7 @@ public Guid Parse(String text)
     // There is no StartsWith on String yet, and one character is all this
     // needs to know.
     String braced = text;
-    if (text.IsEmpty() || text.Substring(0u, 1u) != "{")
+    if (text.IsEmpty || text.Substring(0u, 1u) != "{")
     {
         braced = "{" + text + "}";
     }

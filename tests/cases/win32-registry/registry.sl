@@ -65,7 +65,7 @@ int Main()
             {
                 case Ok text:
                     Console.WriteLine("ProductName is a non-empty string: "
-                        + Text.FromBool(!text.Value.IsEmpty()));
+                        + Text.FromBool(!text.Value.IsEmpty));
                     Console.WriteLine("and it begins with 'Windows': "
                         + Text.FromBool(text.Value.Substring(0u, 7u) == "Windows"));
                     break;
@@ -98,11 +98,11 @@ int Main()
             Console.WriteLine("it has subkeys: " + Text.FromBool(counts.SubKeys > 0u));
             Console.WriteLine("it has values: " + Text.FromBool(counts.Values > 0u));
             Console.WriteLine("the first value has a name: "
-                + Text.FromBool(!Registry.ValueName(key, 0u).IsEmpty()));
+                + Text.FromBool(!Registry.ValueName(key, 0u).IsEmpty));
             Console.WriteLine("the first subkey has a name: "
-                + Text.FromBool(!Registry.SubKey(key, 0u).IsEmpty()));
+                + Text.FromBool(!Registry.SubKey(key, 0u).IsEmpty));
             Console.WriteLine("one past the end is empty: "
-                + Text.FromBool(Registry.SubKey(key, counts.SubKeys).IsEmpty()));
+                + Text.FromBool(Registry.SubKey(key, counts.SubKeys).IsEmpty));
 
             Console.WriteLine("closed: " + Text.FromBool(Registry.Close(key)));
             break;

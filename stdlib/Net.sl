@@ -952,7 +952,7 @@ public class TcpClient : IStream
 
         var all = new byte[built.Count];
         for (nuint i = 0; i < all.Length; i++)
-            all[i] = built.At(i);
+            all[i] = built[i];
         return all;
     }
 

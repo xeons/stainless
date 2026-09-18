@@ -136,7 +136,7 @@ public class MenuItem : IMenuItemNotify
     /// command, and a heading raises nothing when chosen.
     public List<MenuItem> Items => _children;
 
-    public bool HasItems => !_children.IsEmpty();
+    public bool HasItems => !_children.IsEmpty;
 
     /// Adds an item underneath and answers **the item**, so that a handler can
     /// be attached to the result of the call.
@@ -186,7 +186,7 @@ public class MenuItem : IMenuItemNotify
         }
 
         IMenuPeer? submenu = null;
-        if (!_children.IsEmpty())
+        if (!_children.IsEmpty)
         {
             var made = WidgetSet.Current.CreateMenu();
             foreach (var child in _children)

@@ -125,13 +125,13 @@ void Reads(Harness harness)
     harness.Check("two dependencies", project.Dependencies.Count == 2u);
     if (project.Dependencies.Count == 2u)
     {
-        var shapes = project.Dependencies.At(0u);
+        var shapes = project.Dependencies[0u];
         harness.Same("a dependency keeps its name", "shapes", shapes.Name);
         harness.Check("and knows it is a path", shapes.IsPath && !shapes.IsGit);
         harness.Same("and reads as its directory", "../shapes", shapes.Describe());
         harness.Same("with a version", "^1.0", shapes.Version);
 
-        var json = project.Dependencies.At(1u);
+        var json = project.Dependencies[1u];
         harness.Check("a git dependency knows it", json.IsGit && !json.IsPath);
         harness.Same("and reads as its repository and tag",
                      "https://example/json.git#v2.1.0", json.Describe());
@@ -253,8 +253,8 @@ void Writes(Harness harness)
         harness.Same("round-tripped header", "build/app.h", again.Header);
         harness.Check("round-tripped dependency",
                       again.Dependencies.Count == 1u
-                      && again.Dependencies.At(0u).Name == "shapes"
-                      && again.Dependencies.At(0u).Path == "../shapes");
+                      && again.Dependencies[0u].Name == "shapes"
+                      && again.Dependencies[0u].Path == "../shapes");
     }
 }
 

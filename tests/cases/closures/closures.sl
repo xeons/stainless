@@ -33,7 +33,7 @@ int ApplyAll(IReadOnlyList<ITransform> steps, int start)
     int result = start;
     for (nuint i = 0; i < steps.Count; i = i + 1)
     {
-        result = steps.At(i).Apply(result);
+        result = steps[i].Apply(result);
     }
     return result;
 }

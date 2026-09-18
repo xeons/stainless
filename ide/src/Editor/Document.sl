@@ -212,8 +212,8 @@ public class Document
     public bool Edited => _savedAt < 0 || (nuint)_savedAt != _done.Count;
 
     /// Whether there is anything to undo, or to redo.
-    public bool CanUndo => !_done.IsEmpty();
-    public bool CanRedo => !_undone.IsEmpty();
+    public bool CanUndo => !_done.IsEmpty;
+    public bool CanRedo => !_undone.IsEmpty;
 
     public LineEnding Endings => _endings;
 
@@ -418,7 +418,7 @@ public class Document
     /// single action. False when they do not.
     bool Merge(bool inserted, Position from, Position to, String text)
     {
-        if (_done.IsEmpty() || text.Contains("\n") || text.Contains("\r"))
+        if (_done.IsEmpty || text.Contains("\n") || text.Contains("\r"))
             return false;
 
         var last = _done[_done.Count - 1u];
@@ -454,7 +454,7 @@ public class Document
     /// rather than `CanUndo` and then this -- the answer says both.
     public Optional<Position> Undo()
     {
-        if (_done.IsEmpty())
+        if (_done.IsEmpty)
             return None;
 
         var last = _done[_done.Count - 1u];
@@ -467,7 +467,7 @@ public class Document
     /// Does the last undone edit again.
     public Optional<Position> Redo()
     {
-        if (_undone.IsEmpty())
+        if (_undone.IsEmpty)
             return None;
 
         var last = _undone[_undone.Count - 1u];

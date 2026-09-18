@@ -229,7 +229,7 @@ public static class Application
     static void Unregister(Form form)
     {
         Remove(form);
-        if (s_open.IsEmpty())
+        if (s_open.IsEmpty)
             Quit();
     }
 
@@ -257,9 +257,9 @@ public static class Application
     {
         get
         {
-            if (s_open.IsEmpty())
+            if (s_open.IsEmpty)
                 return null;
-            return s_open.At(0u);
+            return s_open[0u];
         }
     }
 

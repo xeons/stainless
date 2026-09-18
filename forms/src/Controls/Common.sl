@@ -267,7 +267,7 @@ public class ToolBar : WindowedControl
     {
         if (index < 0 || (nuint)index >= _buttons.Count)
             return;
-        _buttons.At((nuint)index).Raise(this);
+        _buttons[(nuint)index].Raise(this);
     }
 }
 
@@ -305,14 +305,14 @@ public class StatusBar : WindowedControl
     {
         if (index < 0 || (nuint)index >= _texts.Count)
             return "";
-        return _texts.At((nuint)index);
+        return _texts[(nuint)index];
     }
 
     public void SetPanelText(int index, String text)
     {
         if (index < 0 || (nuint)index >= _texts.Count)
             return;
-        _texts.Set((nuint)index, text);
+        _texts[(nuint)index] = text;
         _native.SetPanelText(index, text);
     }
 
@@ -329,7 +329,7 @@ public class StatusBar : WindowedControl
         int running = 0;
         for (nuint i = 0u; i < _widths.Count; i++)
         {
-            int width = _widths.At(i);
+            int width = _widths[i];
             if (width < 0)
             {
                 edges[i] = -1;
@@ -343,7 +343,7 @@ public class StatusBar : WindowedControl
         _native.SetPanels(edges);
         for (nuint i = 0u; i < _texts.Count; i++)
         {
-            _native.SetPanelText((int)i, _texts.At(i));
+            _native.SetPanelText((int)i, _texts[i]);
         }
     }
 
@@ -576,7 +576,7 @@ public class TabControl : WindowedControl
         bool found = false;
         for (nuint i = 0u; i < _pages.Count; i++)
         {
-            if (_pages.At(i) == page)
+            if (_pages[i] == page)
             {
                 at = i;
                 found = true;
@@ -591,12 +591,12 @@ public class TabControl : WindowedControl
         page.Visible = false;
 
         for (nuint i = at; i < _pages.Count; i++)
-            _pages.At(i).Renumber((int)i);
+            _pages[i].Renumber((int)i);
 
         // Removing the selected tab leaves the platform's selection wherever it
         // landed, which may be -1 with pages still here.
         int chosen = _native.GetSelectedTab();
-        if (chosen < 0 && !_pages.IsEmpty())
+        if (chosen < 0 && !_pages.IsEmpty)
         {
             chosen = (int)(at >= _pages.Count ? _pages.Count - 1u : at);
             _native.SetSelectedTab(chosen);
@@ -630,7 +630,7 @@ public class TabControl : WindowedControl
             int at = SelectedIndex;
             if (at < 0 || (nuint)at >= _pages.Count)
                 return null;
-            return _pages.At((nuint)at);
+            return _pages[(nuint)at];
         }
     }
 
@@ -655,7 +655,7 @@ public class TabControl : WindowedControl
         var area = _native.PageArea;
         for (nuint i = 0u; i < _pages.Count; i++)
         {
-            var page = _pages.At(i);
+            var page = _pages[i];
             bool wanted = (int)i == chosen;
             page.Visible = wanted;
             if (wanted)
@@ -1423,7 +1423,7 @@ public class CoolBar : CustomControl
     {
         int at = CoolGrabIndent + _grabWide + _acrossGap;
         int bare = at;
-        if (_text && !band.Text.IsEmpty())
+        if (_text && !band.Text.IsEmpty)
         {
             at = at + TextWidth(band.Text) + _acrossGap;
         }
@@ -1472,7 +1472,7 @@ public class CoolBar : CustomControl
     {
         if (index + 1u >= row.Count)
             return false;
-        var next = row.At(index + 1u);
+        var next = row[index + 1u];
         if (next.Break)
             return true;
         return left + next.Width - CoolDivider >= Width;
@@ -1495,8 +1495,8 @@ public class CoolBar : CustomControl
         var showing = new List<CoolBand>();
         for (nuint i = 0u; i < all.Count; i++)
         {
-            if (all.At(i).Visible)
-                showing.Add(all.At(i));
+            if (all[i].Visible)
+                showing.Add(all[i]);
         }
         _visible = showing;
 
@@ -1509,12 +1509,12 @@ public class CoolBar : CustomControl
 
         for (nuint i = 0u; i < showing.Count; i++)
         {
-            if (rowEnd || showing.At(i).Break)
+            if (rowEnd || showing[i].Break)
                 left = 0;
-            int wanted = BandHeight(showing.At(i));
+            int wanted = BandHeight(showing[i]);
             if (wanted > tallest)
                 tallest = wanted;
-            left = left + showing.At(i).Width;
+            left = left + showing[i].Width;
 
             rowEnd = i + 1u >= showing.Count || WrapsAfter(showing, i, left);
             if (!rowEnd)
@@ -1533,7 +1533,7 @@ public class CoolBar : CustomControl
 
         for (nuint i = 0u; i < showing.Count; i++)
         {
-            var band = showing.At(i);
+            var band = showing[i];
             if (rowEnd || band.Break)
                 left = 0;
 
@@ -1606,7 +1606,7 @@ public class CoolBar : CustomControl
 
         for (nuint i = 0u; i < showing.Count; i++)
         {
-            var band = showing.At(i);
+            var band = showing[i];
             var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
 
             if (band.HasColor)
@@ -1616,7 +1616,7 @@ public class CoolBar : CustomControl
                          Rectangle.Of(band.Left + CoolGrabIndent, band.Top + 2,
                                       _grabWide - 1, band.Height - 5));
 
-            if (_text && !band.Text.IsEmpty())
+            if (_text && !band.Text.IsEmpty)
             {
                 int x = band.Left + CoolGrabIndent + _grabWide + _acrossGap;
                 var measured = surface.MeasureString(band.Text, Font);
@@ -1625,7 +1625,7 @@ public class CoolBar : CustomControl
             }
 
             bool last = i + 1u >= showing.Count;
-            bool endsRow = last || showing.At(i + 1u).Top != band.Top;
+            bool endsRow = last || showing[i + 1u].Top != band.Top;
 
             if (endsRow)
             {
@@ -1716,10 +1716,10 @@ public class CoolBar : CustomControl
     (int, bool) BandAt(Point at)
     {
         var showing = Showing;
-        if (showing.IsEmpty())
+        if (showing.IsEmpty)
             return (CoolNowhere, false);
 
-        var last = showing.At(showing.Count - 1u);
+        var last = showing[showing.Count - 1u];
         if (at.Y > last.Top + last.Height + CoolDivider)
             return (CoolRowBelow, false);
         if (at.Y < 0)
@@ -1727,7 +1727,7 @@ public class CoolBar : CustomControl
 
         for (nuint i = 0u; i < showing.Count; i++)
         {
-            var band = showing.At(i);
+            var band = showing[i];
             var whole = Rectangle.Of(band.Left, band.Top, band.DrawnWidth, band.Height);
             if (!whole.Contains(at))
                 continue;
@@ -1744,7 +1744,7 @@ public class CoolBar : CustomControl
         var showing = Showing;
         if (index <= 0)
             return true;
-        return showing.At((nuint)index).Top != showing.At((nuint)(index - 1)).Top;
+        return showing[(nuint)index].Top != showing[(nuint)(index - 1)].Top;
     }
 
     protected override void OnMouseDown(MouseEventArgs args)
@@ -1763,13 +1763,13 @@ public class CoolBar : CustomControl
 
         var showing = Showing;
         if (onGrabber && !FirstOfRow(index) && !_fixedWidths
-            && !showing.At((nuint)index).FixedSize
-            && !showing.At((nuint)(index - 1)).FixedSize)
+            && !showing[(nuint)index].FixedSize
+            && !showing[(nuint)(index - 1)].FixedSize)
         {
             // Dragging a handle resizes the band to its *left*, which is the
             // one whose right edge the handle sits against.
             _dragging = CoolDragResize;
-            var before = showing.At((nuint)(index - 1));
+            var before = showing[(nuint)(index - 1)];
             _dragFrom = args.X - before.Width - before.Left;
             CaptureMouse(true);
             return;
@@ -1786,12 +1786,12 @@ public class CoolBar : CustomControl
     {
         base.OnMouseMove(args);
         var showing = Showing;
-        if (showing.IsEmpty())
+        if (showing.IsEmpty)
             return;
 
         if (_dragging == CoolDragResize)
         {
-            var before = showing.At((nuint)(_draggedBand - 1));
+            var before = showing[(nuint)(_draggedBand - 1)];
             before.Width = args.X - _dragFrom - before.Left;
             return;
         }
@@ -1810,8 +1810,8 @@ public class CoolBar : CustomControl
         }
 
         if (onGrabber && index > 0 && !FirstOfRow(index) && !_fixedWidths
-            && !showing.At((nuint)index).FixedSize
-            && !showing.At((nuint)(index - 1)).FixedSize)
+            && !showing[(nuint)index].FixedSize
+            && !showing[(nuint)(index - 1)].FixedSize)
         {
             Cursor = CursorKind.SizeWestEast;
         }
@@ -1867,7 +1867,7 @@ public class CoolBar : CustomControl
         var showing = Showing;
         if ((nuint)dragged >= showing.Count)
             return false;
-        var moving = showing.At((nuint)dragged);
+        var moving = showing[(nuint)dragged];
 
         var found = BandAt(at);
         int onto = found.Item1;
@@ -1878,7 +1878,7 @@ public class CoolBar : CustomControl
         // whoever now begins that row, or the row above swallows it.
         if (moving.Break && (nuint)(dragged + 1) < showing.Count)
         {
-            showing.At((nuint)(dragged + 1)).Break = true;
+            showing[(nuint)(dragged + 1)].Break = true;
         }
 
         if (onto == CoolRowAbove)
@@ -1898,7 +1898,7 @@ public class CoolBar : CustomControl
         if (onto == dragged)
             return false;
 
-        var target = showing.At((nuint)onto);
+        var target = showing[(nuint)onto];
         bool pastEnd = at.X > target.Left + target.DrawnWidth;
 
         if (pastEnd)
@@ -1919,7 +1919,7 @@ public class CoolBar : CustomControl
         }
 
         // Moving right or down.
-        if (showing.At((nuint)dragged).Top == target.Top)
+        if (showing[(nuint)dragged].Top == target.Top)
         {
             moving.Break = false;
             return MoveTo(moving, RealIndexOf(showing, onto));
@@ -1939,11 +1939,11 @@ public class CoolBar : CustomControl
         {
             return (int)Bands.Count - 1;
         }
-        var wanted = showing.At((nuint)visibleIndex);
+        var wanted = showing[(nuint)visibleIndex];
         var all = Bands;
         for (nuint i = 0u; i < all.Count; i++)
         {
-            if (all.At(i) == wanted)
+            if (all[i] == wanted)
                 return (int)i;
         }
         return 0;
@@ -1957,7 +1957,7 @@ public class CoolBar : CustomControl
         bool found = false;
         for (nuint i = 0u; i < all.Count; i++)
         {
-            if (all.At(i) == band)
+            if (all[i] == band)
             {
                 from = i;
                 found = true;

@@ -198,14 +198,14 @@ public class DockLayout
 
         for (nuint i = 1u; i < chosen.Count; i++)
         {
-            var moving = chosen.At(i);
+            var moving = chosen[i];
             nuint j = i;
-            while (j > 0u && chosen.At(j - 1u).Order > moving.Order)
+            while (j > 0u && chosen[j - 1u].Order > moving.Order)
             {
-                chosen.Set(j, chosen.At(j - 1u));
+                chosen[j] = chosen[j - 1u];
                 j--;
             }
-            chosen.Set(j, moving);
+            chosen[j] = moving;
         }
 
         return chosen;
@@ -332,7 +332,7 @@ public DockLayout ParseLayout(String text)
             var items = value.Items;
             for (nuint i = 0u; i < items.Count; i++)
             {
-                var item = items.At(i);
+                var item = items[i];
                 if (!item.Object)
                     continue;
 
@@ -362,7 +362,7 @@ public DockLayout ParseLayout(String text)
     // called them something else, and starting with three empty wells would
     // read as the panes having failed to appear. The default arrangement is
     // the honest answer, and the next save overwrites the file.
-    if (layout.Places.IsEmpty())
+    if (layout.Places.IsEmpty)
         return DockLayout.Default();
 
     return layout;

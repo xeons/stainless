@@ -21,7 +21,7 @@ int Main()
     // Reading is safe here and writing would not be; the compiler can see
     // neither, so it says what it does know and leaves the choice.
     for parallel (int i = 0; i < 10; i = i + 1)
-        total.Add((long)items.At((nuint)i));
+        total.Add((long)items[(nuint)i]);
 
     printf("total=%lld\n", total.Load());
     return 0;

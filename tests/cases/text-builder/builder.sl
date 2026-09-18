@@ -98,7 +98,7 @@ int Main()
     // ---------------------------------------------------------- Utf16String
     var wide = "aé€".ToUtf16();
     SayNumber("utf16-units", (long)wide.UnitCount());
-    SayBool("utf16-empty", wide.IsEmpty());
+    SayBool("utf16-empty", wide.IsEmpty);
     SayNumber("utf16-unit-at", (long)(uint)wide.UnitAt(0u));
     SayNumber("utf16-point", (long)(uint)wide.CodePointAt(1u));
     Say("utf16-round-trip", wide.ToText());

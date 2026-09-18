@@ -48,7 +48,7 @@ int Main()
 
     // The combinators come free, Optional being an ordinary variant.
     Console.WriteLine("valueOr " + N((long)settings.Find("absent").ValueOr(-1)));
-    Console.WriteLine("empty " + (settings.Find("absent").IsEmpty() ? "y" : "n"));
+    Console.WriteLine("empty " + (settings.Find("absent").IsEmpty ? "y" : "n"));
 
     // A key that is there by construction: `Get` is honest here.
     Console.WriteLine("asserted " + N((long)settings.Get("timeout")));
@@ -69,7 +69,7 @@ int Main()
 
     if (counts["hits"] is Some hit)
         Console.WriteLine("subscript " + N((long)hit.Value));
-    Console.WriteLine("subscript-miss " + (counts["absent"].IsEmpty() ? "empty" : "?"));
+    Console.WriteLine("subscript-miss " + (counts["absent"].IsEmpty ? "empty" : "?"));
     Console.WriteLine("subscript-or " + N((long)counts["absent"].ValueOr(8080)));
 
     counts["misses"] = None;

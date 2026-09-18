@@ -372,10 +372,10 @@ public class CommonForm : Form
 
         ok = Check(ok, "tree holds its roots", _tree.Nodes.Count == 2u);
         ok = Check(ok, "a tree node reads back its text",
-                   _tree.Nodes.At(0u).Text == "Shopping");
-        var under = _tree.Nodes.At(0u).Nodes;
+                   _tree.Nodes[0u].Text == "Shopping");
+        var under = _tree.Nodes[0u].Nodes;
         ok = Check(ok, "a node holds its children", under.Count == 2u);
-        _tree.SelectedNode = under.At(0u);
+        _tree.SelectedNode = under[0u];
         for (int i = 0; i < 4; i++)
             Application.DoEvents();
         var chosen = _tree.SelectedNode;
@@ -469,10 +469,10 @@ public class CommonForm : Form
         Priority.SelectedIndex = 2;
         ok = Check(ok, "and follows a change",
                    Priority.SelectedIndex == 2
-                   && Priority.Buttons.At(2u).Checked);
+                   && Priority.Buttons[2u].Checked);
         ok = Check(ok, "and lays them inside itself",
-                   Priority.Buttons.At(0u).Top == 0
-                   && Priority.Buttons.At(1u).Top > 0);
+                   Priority.Buttons[0u].Top == 0
+                   && Priority.Buttons[1u].Top > 0);
 
         ok = Check(ok, "a check group holds several ticks",
                    Options.IsChecked(0) && !Options.IsChecked(1));

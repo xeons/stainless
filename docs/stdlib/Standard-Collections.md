@@ -15,7 +15,7 @@ Interfaces are named with a leading I, as in C#.
 
 **Types** &nbsp; [Dictionary&lt;TKey, TValue&gt;](#dictionarytkey-tvalue-class) &middot; [DictionaryEnumerator&lt;TKey, TValue&gt;](#dictionaryenumeratortkey-tvalue-class) &middot; [HashSet&lt;T&gt;](#hashsett-class) &middot; [HashSetCursor&lt;T&gt;](#hashsetcursort-class) &middot; [IComparable&lt;T&gt;](#icomparablet-interface) &middot; [IEnumerable&lt;T&gt;](#ienumerablet-interface) &middot; [IEnumerator&lt;T&gt;](#ienumeratort-interface) &middot; [IEquatable&lt;T&gt;](#iequatablet-interface) &middot; [IHashable](#ihashable-interface) &middot; [IList&lt;T&gt;](#ilistt-interface) &middot; [IReadOnlyList&lt;T&gt;](#ireadonlylistt-interface) &middot; [LinkedList&lt;T&gt;](#linkedlistt-class) &middot; [LinkedListCursor&lt;T&gt;](#linkedlistcursort-class) &middot; [List&lt;T&gt;](#listt-class) &middot; [ListEnumerator&lt;T&gt;](#listenumeratort-class) &middot; [OrderedDictionary&lt;TKey, TValue&gt;](#ordereddictionarytkey-tvalue-class) &middot; [Pair&lt;TKey, TValue&gt;](#pairtkey-tvalue-class) &middot; [Queue&lt;T&gt;](#queuet-class) &middot; [QueueCursor&lt;T&gt;](#queuecursort-class) &middot; [SortedList&lt;TKey, TValue&gt;](#sortedlisttkey-tvalue-class) &middot; [SortedListCursor&lt;TKey, TValue&gt;](#sortedlistcursortkey-tvalue-class) &middot; [Stack&lt;T&gt;](#stackt-class) &middot; [StackCursor&lt;T&gt;](#stackcursort-class)
 
-**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [CountWhere](#countwhere-function) &middot; [CountWhere](#countwhere-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [Filter](#filter-function) &middot; [Filter](#filter-function) &middot; [Find](#find-function) &middot; [FirstOr](#firstor-function) &middot; [FirstOr](#firstor-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [IndexWhere](#indexwhere-function) &middot; [Largest](#largest-function) &middot; [LowerBound](#lowerbound-function) &middot; [Map](#map-function) &middot; [Map](#map-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [Reduce](#reduce-function) &middot; [Reduce](#reduce-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Smallest](#smallest-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
+**Functions** &nbsp; [Aggregate](#aggregate-function) &middot; [Aggregate](#aggregate-function) &middot; [All](#all-function) &middot; [All](#all-function) &middot; [Any](#any-function) &middot; [Any](#any-function) &middot; [BinarySearch](#binarysearch-function) &middot; [Contains](#contains-function) &middot; [CountWhere](#countwhere-function) &middot; [CountWhere](#countwhere-function) &middot; [Distinct](#distinct-function) &middot; [Distinct](#distinct-function) &middot; [Filter](#filter-function) &middot; [Filter](#filter-function) &middot; [Find](#find-function) &middot; [FirstOr](#firstor-function) &middot; [FirstOr](#firstor-function) &middot; [ForEach](#foreach-function) &middot; [ForEach](#foreach-function) &middot; [IndexOf](#indexof-function) &middot; [IndexWhere](#indexwhere-function) &middot; [Largest](#largest-function) &middot; [LastIndexOf](#lastindexof-function) &middot; [LowerBound](#lowerbound-function) &middot; [Map](#map-function) &middot; [Map](#map-function) &middot; [OrderBy](#orderby-function) &middot; [OrderBy](#orderby-function) &middot; [Reduce](#reduce-function) &middot; [Reduce](#reduce-function) &middot; [RemoveFirst](#removefirst-function) &middot; [RemoveWhere](#removewhere-function) &middot; [Reverse](#reverse-function) &middot; [Select](#select-function) &middot; [Select](#select-function) &middot; [Skip](#skip-function) &middot; [Skip](#skip-function) &middot; [Smallest](#smallest-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Sort](#sort-function) &middot; [Take](#take-function) &middot; [Take](#take-function) &middot; [ToArray](#toarray-function) &middot; [ToArray](#toarray-function) &middot; [ToList](#tolist-function) &middot; [ToList](#tolist-function) &middot; [Where](#where-function) &middot; [Where](#where-function)
 
 ## Types
 
@@ -44,10 +44,10 @@ How many entries there are. O(1) -- it is a counter, not a scan.
 
 <sub>[stdlib/Dictionary.sl:84](../../stdlib/Dictionary.sl#L84)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when there are no entries.
@@ -302,10 +302,10 @@ How many distinct items there are. O(1).
 
 <sub>[stdlib/Dictionary.sl:419](../../stdlib/Dictionary.sl#L419)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when there is nothing in it.
@@ -610,7 +610,18 @@ Everything a read-only list offers, plus mutation. A value of this type can
 be passed anywhere an IReadOnlyList is wanted, at no cost: an interface
 reference is a plain pointer, and the object carries a table for both.
 
-<sub>[stdlib/Collections.sl:176](../../stdlib/Collections.sl#L176)</sub>
+<sub>[stdlib/Collections.sl:179](../../stdlib/Collections.sl#L179)</sub>
+
+#### this[] *indexer*
+
+```
+T this[nuint index] { get; set; }
+```
+
+The item at `index`, readable and writable. Redeclared because an
+interface cannot widen an inherited member from get-only to get-set.
+
+<sub>[stdlib/Collections.sl:183](../../stdlib/Collections.sl#L183)</sub>
 
 #### Add *method*
 
@@ -618,20 +629,19 @@ reference is a plain pointer, and the object carries a table for both.
 void Add(T item)
 ```
 
-Appends to the end. The only operation here that changes the length.
+Appends to the end.
 
-<sub>[stdlib/Collections.sl:179](../../stdlib/Collections.sl#L179)</sub>
+<sub>[stdlib/Collections.sl:186](../../stdlib/Collections.sl#L186)</sub>
 
-#### Set *method*
+#### RemoveAt *method*
 
 ```
-void Set(nuint index, T item)
+void RemoveAt(nuint index)
 ```
 
-Replaces the item at `index`. Aborts past the end -- this writes over
-an existing item and never extends the list, which `Add` is for.
+Removes the item at `index`, closing the gap.
 
-<sub>[stdlib/Collections.sl:183](../../stdlib/Collections.sl#L183)</sub>
+<sub>[stdlib/Collections.sl:189](../../stdlib/Collections.sl#L189)</sub>
 
 #### Clear *method*
 
@@ -641,7 +651,7 @@ void Clear()
 
 Drops every item, leaving a length of zero.
 
-<sub>[stdlib/Collections.sl:186](../../stdlib/Collections.sl#L186)</sub>
+<sub>[stdlib/Collections.sl:192](../../stdlib/Collections.sl#L192)</sub>
 
 ### IReadOnlyList&lt;T&gt; *interface*
 
@@ -669,16 +679,26 @@ How many items there are.
 
 <sub>[stdlib/Collections.sl:166](../../stdlib/Collections.sl#L166)</sub>
 
-#### At *method*
+#### IsEmpty *property*
 
 ```
-T At(nuint index)
+bool IsEmpty { get; }
+```
+
+Whether there are none.
+
+<sub>[stdlib/Collections.sl:169](../../stdlib/Collections.sl#L169)</sub>
+
+#### this[] *indexer*
+
+```
+T this[nuint index] { get; }
 ```
 
 The item at `index`, counting from zero. An index at or past `Count`
 aborts with the same message an array overrun gives.
 
-<sub>[stdlib/Collections.sl:170](../../stdlib/Collections.sl#L170)</sub>
+<sub>[stdlib/Collections.sl:173](../../stdlib/Collections.sl#L173)</sub>
 
 ### LinkedList&lt;T&gt; *class*
 
@@ -721,10 +741,10 @@ recycled slots are not counted.
 
 <sub>[stdlib/Sequences.sl:283](../../stdlib/Sequences.sl#L283)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when nothing is linked in.
@@ -943,7 +963,28 @@ class List<T> : IList<T>, IEnumerable<T>
 
 A growable list backed by a single array, doubling when it fills.
 
-<sub>[stdlib/Collections.sl:190](../../stdlib/Collections.sl#L190)</sub>
+**The shape is .NET's `List<T>`.** A standard library that renames what
+everyone already knows charges for it at every lookup, so the members here
+are spelled the way C# spells them and mean what C# means.
+
+Two deliberate differences, both stated rather than discovered:
+
+- **`IsEmpty` is a property and .NET has no such member at all.** It reads
+  better than `Count == 0` at the point of use, and
+  [docs/style.md](docs/style.md) is the reason it is a property and not a
+  method: a zero-argument side-effect-free getter is a property here.
+- **The members that compare two `T`s are free functions below**, not
+  methods. `Contains`, `IndexOf`, `Remove`, `Sort` and `BinarySearch` all
+  need `T : IEquatable<T>` or `IComparable<T>`, and this class constrains
+  `T` not at all -- a `List<Control>` has to stay possible. A class cannot
+  demand of one method's type parameter what it does not demand of every
+  element. .NET reaches them through `EqualityComparer<T>.Default`, which is
+  a runtime lookup this language has no equivalent of.
+
+The members taking a predicate need no constraint, so those are methods,
+exactly as in .NET.
+
+<sub>[stdlib/Collections.sl:217](../../stdlib/Collections.sl#L217)</sub>
 
 #### Count *property*
 
@@ -954,41 +995,31 @@ nuint Count { get; }
 How many items are in the list -- not how many it has room for, which
 is `Capacity`.
 
-<sub>[stdlib/Collections.sl:205](../../stdlib/Collections.sl#L205)</sub>
+<sub>[stdlib/Collections.sl:240](../../stdlib/Collections.sl#L240)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
-True when there is nothing in it.
+Whether there is nothing in it.
 
-<sub>[stdlib/Collections.sl:208](../../stdlib/Collections.sl#L208)</sub>
+<sub>[stdlib/Collections.sl:243](../../stdlib/Collections.sl#L243)</sub>
 
 #### Capacity *property*
 
 ```
-nuint Capacity { get; }
+nuint Capacity { get; set; }
 ```
 
 The number of items this list can hold before it must grow again.
 
-<sub>[stdlib/Collections.sl:211](../../stdlib/Collections.sl#L211)</sub>
+Settable, as in .NET: assigning reallocates to exactly that size. A
+value below `Count` is ignored rather than truncating, because losing
+items is not what anyone means by reserving room.
 
-#### At *method*
-
-```
-T At(nuint index)
-```
-
-The item at `index`, aborting past the end.
-
-Checked against `Count` rather than against the backing array, so a
-slot that exists but holds nothing is out of range and says so.
-`list[index]` is the same question in fewer characters.
-
-<sub>[stdlib/Collections.sl:218](../../stdlib/Collections.sl#L218)</sub>
+<sub>[stdlib/Collections.sl:250](../../stdlib/Collections.sl#L250)</sub>
 
 #### this[] *indexer*
 
@@ -996,15 +1027,17 @@ slot that exists but holds nothing is out of range and says so.
 T this[nuint index] { get; set; }
 ```
 
-The same two questions as `At` and `Set`, written the way an array is.
+The item at `index`, aborting past the end.
 
-The methods stay, because `IReadOnlyList<T>` and `IList<T>` declare
-them and an interface has no indexers. This is the spelling to reach
-for where the type is known, which is nearly everywhere: `items[i] += 1`
-reads through the getter and writes through the setter, so a list is
-indexed on the same terms as the array behind it.
+Checked against `Count` rather than against the backing array, so a
+slot that exists but holds nothing is out of range and says so.
 
-<sub>[stdlib/Collections.sl:232](../../stdlib/Collections.sl#L232)</sub>
+**This is the only way to reach an item.** There were `At` and `Set`
+methods beside it and they are gone: two spellings of one operation is
+how a codebase ends up using the longer one everywhere, which is what
+had happened here.
+
+<sub>[stdlib/Collections.sl:270](../../stdlib/Collections.sl#L270)</sub>
 
 #### Add *method*
 
@@ -1017,18 +1050,17 @@ Appends to the end, growing the backing array when it is full.
 Doubling, so a run of appends costs constant time each on average; a
 single one can cost a copy of everything so far.
 
-<sub>[stdlib/Collections.sl:252](../../stdlib/Collections.sl#L252)</sub>
+<sub>[stdlib/Collections.sl:290](../../stdlib/Collections.sl#L290)</sub>
 
-#### Set *method*
+#### AddRange *method*
 
 ```
-void Set(nuint index, T item)
+void AddRange(IEnumerable<T> items)
 ```
 
-Replaces the item at `index`, aborting past the end. Never extends the
-list -- `Add` is what does that.
+Appends every item of another sequence, in its order.
 
-<sub>[stdlib/Collections.sl:262](../../stdlib/Collections.sl#L262)</sub>
+<sub>[stdlib/Collections.sl:299](../../stdlib/Collections.sl#L299)</sub>
 
 #### Insert *method*
 
@@ -1041,7 +1073,7 @@ Inserts at a position, moving everything after it up one.
 `index == Count` appends, which is what makes a loop that inserts in
 order need no special case at the end.
 
-<sub>[stdlib/Collections.sl:273](../../stdlib/Collections.sl#L273)</sub>
+<sub>[stdlib/Collections.sl:311](../../stdlib/Collections.sl#L311)</sub>
 
 #### RemoveAt *method*
 
@@ -1055,7 +1087,218 @@ The vacated slot is cleared rather than left holding what moved out of
 it: a list of references would otherwise keep the last one alive past
 its removal, which is a leak that only shows up under a profiler.
 
-<sub>[stdlib/Collections.sl:293](../../stdlib/Collections.sl#L293)</sub>
+<sub>[stdlib/Collections.sl:331](../../stdlib/Collections.sl#L331)</sub>
+
+#### RemoveRange *method*
+
+```
+void RemoveRange(nuint index, nuint count)
+```
+
+Removes `count` items from `index` onwards.
+
+<sub>[stdlib/Collections.sl:344](../../stdlib/Collections.sl#L344)</sub>
+
+#### RemoveAll *method*
+
+```
+nuint RemoveAll(Predicate<T> matches)
+```
+
+Removes every item the predicate accepts, and answers how many went.
+
+One pass that compacts in place, so removing half a list costs one
+traversal rather than one shuffle per removal.
+
+<sub>[stdlib/Collections.sl:363](../../stdlib/Collections.sl#L363)</sub>
+
+#### Reverse *method*
+
+```
+void Reverse()
+```
+
+Reverses the list in place.
+
+<sub>[stdlib/Collections.sl:383](../../stdlib/Collections.sl#L383)</sub>
+
+#### ToArray *method*
+
+```
+T[] ToArray()
+```
+
+The items as a new array, which the caller owns.
+
+<sub>[stdlib/Collections.sl:394](../../stdlib/Collections.sl#L394)</sub>
+
+#### CopyTo *method*
+
+```
+void CopyTo(T[] into, nuint at)
+```
+
+Copies the items into `into`, starting at `at`.
+
+<sub>[stdlib/Collections.sl:403](../../stdlib/Collections.sl#L403)</sub>
+
+#### GetRange *method*
+
+```
+List<T> GetRange(nuint index, nuint count)
+```
+
+A new list holding `count` items from `index` onwards.
+
+<sub>[stdlib/Collections.sl:412](../../stdlib/Collections.sl#L412)</sub>
+
+#### Find *method*
+
+```
+T Find(Predicate<T> matches)
+```
+
+The first item the predicate accepts, or `default(T)` when there is
+none -- which is `null` for a reference type, as it is in .NET.
+
+<sub>[stdlib/Collections.sl:425](../../stdlib/Collections.sl#L425)</sub>
+
+#### FindLast *method*
+
+```
+T FindLast(Predicate<T> matches)
+```
+
+The last item the predicate accepts, or `default(T)`.
+
+<sub>[stdlib/Collections.sl:436](../../stdlib/Collections.sl#L436)</sub>
+
+#### FindAll *method*
+
+```
+List<T> FindAll(Predicate<T> matches)
+```
+
+Every item the predicate accepts, in order.
+
+<sub>[stdlib/Collections.sl:447](../../stdlib/Collections.sl#L447)</sub>
+
+#### FindIndex *method*
+
+```
+Optional<nuint> FindIndex(Predicate<T> matches)
+```
+
+Where the first item the predicate accepts is, or `None`.
+
+**An `Optional<nuint>`, where .NET answers -1.** The sentinel is the
+thing `Optional<T>` exists to retire, `IndexOf` below already answers
+this way, and an index that is a `nuint` cannot hold -1 at all. This is
+the one place the shape deliberately departs from C#, and it departs
+because C#'s shape is a workaround for a type it does not have.
+
+<sub>[stdlib/Collections.sl:465](../../stdlib/Collections.sl#L465)</sub>
+
+#### FindLastIndex *method*
+
+```
+Optional<nuint> FindLastIndex(Predicate<T> matches)
+```
+
+Where the last item the predicate accepts is, or `None`.
+
+<sub>[stdlib/Collections.sl:476](../../stdlib/Collections.sl#L476)</sub>
+
+#### Exists *method*
+
+```
+bool Exists(Predicate<T> matches)
+```
+
+Whether any item is accepted by the predicate.
+
+<sub>[stdlib/Collections.sl:487](../../stdlib/Collections.sl#L487)</sub>
+
+#### TrueForAll *method*
+
+```
+bool TrueForAll(Predicate<T> matches)
+```
+
+Whether every item is.
+
+<sub>[stdlib/Collections.sl:490](../../stdlib/Collections.sl#L490)</sub>
+
+#### ForEach *method*
+
+```
+void ForEach(Action<T> action)
+```
+
+Runs `action` over each item, in order.
+
+The list is read as it goes, so an action that adds to it is a loop
+that does not end. .NET throws for this; there is nothing to throw
+here, and saying so is the whole of what can be done about it.
+
+<sub>[stdlib/Collections.sl:505](../../stdlib/Collections.sl#L505)</sub>
+
+#### EnsureCapacity *method*
+
+```
+nuint EnsureCapacity(nuint capacity)
+```
+
+Makes sure there is room for `capacity` items, and answers the capacity
+afterwards. Never shrinks.
+
+<sub>[stdlib/Collections.sl:515](../../stdlib/Collections.sl#L515)</sub>
+
+#### TrimExcess *method*
+
+```
+void TrimExcess()
+```
+
+Gives back the room past `Count`.
+
+<sub>[stdlib/Collections.sl:523](../../stdlib/Collections.sl#L523)</sub>
+
+#### Slice *method*
+
+```
+List<T> Slice(nuint index, nuint count)
+```
+
+`count` items from `index`, as a new list. .NET's name for `GetRange`
+since ranges arrived, and the two are the same call.
+
+<sub>[stdlib/Collections.sl:531](../../stdlib/Collections.sl#L531)</sub>
+
+#### InsertRange *method*
+
+```
+void InsertRange(nuint index, IEnumerable<T> items)
+```
+
+Inserts every item of another sequence at `index`, in its order.
+
+<sub>[stdlib/Collections.sl:534](../../stdlib/Collections.sl#L534)</sub>
+
+#### AsReadOnly *method*
+
+```
+IReadOnlyList<T> AsReadOnly()
+```
+
+This list seen as something that cannot be changed through it.
+
+**The same object, not a copy.** .NET answers a `ReadOnlyCollection<T>`
+wrapper for the same reason this answers an interface: what it buys is a
+signature that says "I will not write to this", and neither stops the
+owner writing to it meanwhile.
+
+<sub>[stdlib/Collections.sl:550](../../stdlib/Collections.sl#L550)</sub>
 
 #### GetEnumerator *method*
 
@@ -1067,7 +1310,7 @@ A cursor over this list, for `foreach` and for passing it on as a
 sequence. The cursor reads the list as it goes rather than taking a
 copy, so changing the list during a walk changes what the walk sees.
 
-<sub>[stdlib/Collections.sl:310](../../stdlib/Collections.sl#L310)</sub>
+<sub>[stdlib/Collections.sl:555](../../stdlib/Collections.sl#L555)</sub>
 
 #### Clear *method*
 
@@ -1079,7 +1322,7 @@ Drops every item. The backing array is replaced rather than merely
 forgotten, so any references it held are released now instead of
 lingering until the slots are overwritten.
 
-<sub>[stdlib/Collections.sl:315](../../stdlib/Collections.sl#L315)</sub>
+<sub>[stdlib/Collections.sl:560](../../stdlib/Collections.sl#L560)</sub>
 
 ### ListEnumerator&lt;T&gt; *class*
 
@@ -1134,7 +1377,7 @@ it as an index. That is a real limit rather than a temporary one: keeping a
 hash index in step with an order would double the storage and every write,
 which is not what the collection is for.
 
-<sub>[stdlib/Collections.sl:718](../../stdlib/Collections.sl#L718)</sub>
+<sub>[stdlib/Collections.sl:984](../../stdlib/Collections.sl#L984)</sub>
 
 #### Count *property*
 
@@ -1145,7 +1388,7 @@ nuint Count { get; }
 How many entries there are. Entries rather than distinct keys: `Add`
 keeps a repeated key, so this can exceed the number of different keys.
 
-<sub>[stdlib/Collections.sl:732](../../stdlib/Collections.sl#L732)</sub>
+<sub>[stdlib/Collections.sl:998](../../stdlib/Collections.sl#L998)</sub>
 
 #### KeyAt *method*
 
@@ -1155,7 +1398,7 @@ TKey KeyAt(nuint index)
 
 The key at a position, in insertion order.
 
-<sub>[stdlib/Collections.sl:735](../../stdlib/Collections.sl#L735)</sub>
+<sub>[stdlib/Collections.sl:1001](../../stdlib/Collections.sl#L1001)</sub>
 
 #### ValueAt *method*
 
@@ -1165,7 +1408,7 @@ TValue ValueAt(nuint index)
 
 The value at a position, in insertion order.
 
-<sub>[stdlib/Collections.sl:738](../../stdlib/Collections.sl#L738)</sub>
+<sub>[stdlib/Collections.sl:1004](../../stdlib/Collections.sl#L1004)</sub>
 
 #### IndexOf *method*
 
@@ -1180,7 +1423,7 @@ asking for its value walks the collection twice. An `Optional` rather
 than a sentinel, because a position that means "no position" is a rule
 every caller has to know and none can be made to.
 
-<sub>[stdlib/Collections.sl:746](../../stdlib/Collections.sl#L746)</sub>
+<sub>[stdlib/Collections.sl:1012](../../stdlib/Collections.sl#L1012)</sub>
 
 #### Has *method*
 
@@ -1191,7 +1434,7 @@ bool Has(TKey key)
 Whether the key is there at all. A scan, like everything else here, so
 `IndexOf` once beats `Has` followed by a lookup.
 
-<sub>[stdlib/Collections.sl:758](../../stdlib/Collections.sl#L758)</sub>
+<sub>[stdlib/Collections.sl:1024](../../stdlib/Collections.sl#L1024)</sub>
 
 #### Add *method*
 
@@ -1205,7 +1448,7 @@ A repeated key is kept rather than replaced, because a document that
 contains one said so and dropping either half would be this collection
 deciding what the document meant. `Set` is the one that replaces.
 
-<sub>[stdlib/Collections.sl:765](../../stdlib/Collections.sl#L765)</sub>
+<sub>[stdlib/Collections.sl:1031](../../stdlib/Collections.sl#L1031)</sub>
 
 #### Set *method*
 
@@ -1216,7 +1459,7 @@ void Set(TKey key, TValue value)
 Replaces the value of a key, or appends it. A replaced key keeps the
 position it had, which is the point of the collection.
 
-<sub>[stdlib/Collections.sl:773](../../stdlib/Collections.sl#L773)</sub>
+<sub>[stdlib/Collections.sl:1039](../../stdlib/Collections.sl#L1039)</sub>
 
 #### Find *method*
 
@@ -1227,7 +1470,7 @@ TValue Find(TKey key, TValue fallback)
 The value of a key, or the fallback. There is no overload that aborts:
 a caller that wants to know writes `IndexOf`.
 
-<sub>[stdlib/Collections.sl:787](../../stdlib/Collections.sl#L787)</sub>
+<sub>[stdlib/Collections.sl:1053](../../stdlib/Collections.sl#L1053)</sub>
 
 #### Remove *method*
 
@@ -1238,7 +1481,7 @@ bool Remove(TKey key)
 Removes the first entry with that key, closing the gap. Answers whether
 there was one.
 
-<sub>[stdlib/Collections.sl:796](../../stdlib/Collections.sl#L796)</sub>
+<sub>[stdlib/Collections.sl:1062](../../stdlib/Collections.sl#L1062)</sub>
 
 #### Clear *method*
 
@@ -1248,7 +1491,7 @@ void Clear()
 
 Drops every entry, leaving a count of zero.
 
-<sub>[stdlib/Collections.sl:808](../../stdlib/Collections.sl#L808)</sub>
+<sub>[stdlib/Collections.sl:1074](../../stdlib/Collections.sl#L1074)</sub>
 
 ### Pair&lt;TKey, TValue&gt; *class*
 
@@ -1304,10 +1547,10 @@ How many items are waiting. O(1).
 
 <sub>[stdlib/Sequences.sl:55](../../stdlib/Sequences.sl#L55)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when there is nothing to dequeue. Check this before `Dequeue` or
@@ -1452,10 +1695,10 @@ How many entries there are. O(1).
 
 <sub>[stdlib/Sequences.sl:537](../../stdlib/Sequences.sl#L537)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when there are no entries.
@@ -1668,10 +1911,10 @@ How many items are on the stack. O(1).
 
 <sub>[stdlib/Sequences.sl:160](../../stdlib/Sequences.sl#L160)</sub>
 
-#### IsEmpty *method*
+#### IsEmpty *property*
 
 ```
-bool IsEmpty()
+bool IsEmpty { get; }
 ```
 
 True when there is nothing to pop. Check this before `Pop` or `Peek`,
@@ -1860,7 +2103,19 @@ Two functions rather than one with a found flag, because the language has
 no `out` and a caller that wants the insertion point usually does not want
 the search, and the other way round.
 
-<sub>[stdlib/Collections.sl:595](../../stdlib/Collections.sl#L595)</sub>
+<sub>[stdlib/Collections.sl:861](../../stdlib/Collections.sl#L861)</sub>
+
+### Contains *function*
+
+```
+bool Contains<T>(IReadOnlyList<T> items, T wanted)
+    where T : IEquatable<T>
+```
+
+Whether `wanted` is in the list at all. `List<T>.Contains` in .NET, and a
+free function here for the reason `IndexOf` is.
+
+<sub>[stdlib/Collections.sl:629](../../stdlib/Collections.sl#L629)</sub>
 
 ### CountWhere *function*
 
@@ -2012,7 +2267,7 @@ sentinel is the thing `Optional<T>` was added to retire, and its own
 documentation names this function as the example. `OrderedDictionary.IndexOf`
 has always answered this way; now they agree.
 
-<sub>[stdlib/Collections.sl:370](../../stdlib/Collections.sl#L370)</sub>
+<sub>[stdlib/Collections.sl:617](../../stdlib/Collections.sl#L617)</sub>
 
 ### IndexWhere *function*
 
@@ -2033,7 +2288,18 @@ T Largest<T>(IReadOnlyList<T> items)
 
 The largest item, by its own ordering. The list must not be empty.
 
-<sub>[stdlib/Collections.sl:333](../../stdlib/Collections.sl#L333)</sub>
+<sub>[stdlib/Collections.sl:580](../../stdlib/Collections.sl#L580)</sub>
+
+### LastIndexOf *function*
+
+```
+Optional<nuint> LastIndexOf<T>(IReadOnlyList<T> items, T wanted)
+    where T : IEquatable<T>
+```
+
+Where the *last* item equal to `wanted` is, if it is there at all.
+
+<sub>[stdlib/Collections.sl:635](../../stdlib/Collections.sl#L635)</sub>
 
 ### LowerBound *function*
 
@@ -2046,7 +2312,7 @@ The first index at which `wanted` could be inserted and leave the slice
 ordered: the length when it belongs at the end, and the index of the first
 equal element when there is one.
 
-<sub>[stdlib/Collections.sl:623](../../stdlib/Collections.sl#L623)</sub>
+<sub>[stdlib/Collections.sl:889](../../stdlib/Collections.sl#L889)</sub>
 
 ### Map *function*
 
@@ -2136,7 +2402,7 @@ rather than a method because it needs `T : IEquatable<T>` and a class
 cannot constrain one method's type parameter to something the class itself
 does not demand of every element.
 
-<sub>[stdlib/Collections.sl:386](../../stdlib/Collections.sl#L386)</sub>
+<sub>[stdlib/Collections.sl:652](../../stdlib/Collections.sl#L652)</sub>
 
 ### RemoveWhere *function*
 
@@ -2154,7 +2420,7 @@ callbacks could not be removed from at all before this.
 
 Walked from the end, so an index already passed cannot move.
 
-<sub>[stdlib/Collections.sl:405](../../stdlib/Collections.sl#L405)</sub>
+<sub>[stdlib/Collections.sl:671](../../stdlib/Collections.sl#L671)</sub>
 
 ### Reverse *function*
 
@@ -2164,7 +2430,7 @@ void Reverse<T>(T[:] items)
 
 Reverses part of an array in place.
 
-<sub>[stdlib/Collections.sl:645](../../stdlib/Collections.sl#L645)</sub>
+<sub>[stdlib/Collections.sl:911](../../stdlib/Collections.sl#L911)</sub>
 
 ### Select *function*
 
@@ -2215,7 +2481,7 @@ T Smallest<T>(IReadOnlyList<T> items)
 
 The smallest item, by its own ordering. The list must not be empty.
 
-<sub>[stdlib/Collections.sl:348](../../stdlib/Collections.sl#L348)</sub>
+<sub>[stdlib/Collections.sl:595](../../stdlib/Collections.sl#L595)</sub>
 
 ### Sort *function*
 
@@ -2237,7 +2503,7 @@ if the second sort leaves equal elements where the first put them. The
 price is one scratch array as long as the input; an in-place quicksort
 would avoid it and would not be stable.
 
-<sub>[stdlib/Collections.sl:439](../../stdlib/Collections.sl#L439)</sub>
+<sub>[stdlib/Collections.sl:705](../../stdlib/Collections.sl#L705)</sub>
 
 ### Sort *function*
 
@@ -2252,7 +2518,7 @@ type that implements nothing at all:
 
     Sort(people, (a, b) => a.Age - b.Age);
 
-<sub>[stdlib/Collections.sl:520](../../stdlib/Collections.sl#L520)</sub>
+<sub>[stdlib/Collections.sl:786](../../stdlib/Collections.sl#L786)</sub>
 
 ### Sort *function*
 
@@ -2268,7 +2534,7 @@ through the interface. Every `At` and `Set` on an `IList<T>` is a virtual
 call, and a sort makes O(n log n) of them; two linear passes to escape that
 is the cheaper trade, and it gets the array version's stability for free.
 
-<sub>[stdlib/Collections.sl:669](../../stdlib/Collections.sl#L669)</sub>
+<sub>[stdlib/Collections.sl:935](../../stdlib/Collections.sl#L935)</sub>
 
 ### Sort *function*
 
@@ -2278,7 +2544,7 @@ void Sort<T>(IList<T> items, Comparer<T> order)
 
 The same, ordered by a comparer.
 
-<sub>[stdlib/Collections.sl:686](../../stdlib/Collections.sl#L686)</sub>
+<sub>[stdlib/Collections.sl:952](../../stdlib/Collections.sl#L952)</sub>
 
 ### Take *function*
 

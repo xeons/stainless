@@ -425,7 +425,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     /// baseline cairo draws from.
     public void DrawString(String text, Font font, Color colour, int x, int y)
     {
-        if (text.IsEmpty())
+        if (text.IsEmpty)
             return;
         SelectFont(_cairo, font);
         Source(colour);
@@ -441,7 +441,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
     public void DrawStringIn(String text, Font font, Color colour,
                              Rectangle bounds, TextFormat format)
     {
-        if (text.IsEmpty())
+        if (text.IsEmpty)
             return;
         SelectFont(_cairo, font);
         Source(colour);
@@ -527,7 +527,7 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
         cairo_font_extents_t metrics;
         cairo_font_extents(_cairo, &metrics);
-        if (text.IsEmpty())
+        if (text.IsEmpty)
             return Extent(0, (int)metrics.Height);
 
         cairo_text_extents_t ink;

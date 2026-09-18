@@ -802,7 +802,7 @@ public class StringBuilder
     {
         get
         {
-            return !this.IsEmpty();
+            return !this.IsEmpty;
         }
     }
 
@@ -931,10 +931,7 @@ public class Utf16String
 {
 
     /// Whether there are any units at all.
-    public bool IsEmpty()
-    {
-        return this.UnitCount() == 0;
-    }
+    public bool IsEmpty => this.UnitCount() == 0;
 
     /// The unit at `index`. A unit, not a character: one half of a surrogate
     /// pair is a unit and is not a character.

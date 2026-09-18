@@ -131,13 +131,13 @@ public int Main()
     // The static constructor ran before any of this.
     printf("late     = %d %s %llu %s\n",
         Late.Ready, Late.Note.ToPointer(), Late.Steps.Count,
-        Late.Steps.At(1u).ToPointer());
+        Late.Steps[1u].ToPointer());
 
     // A mutable static holding a reference is counted like any other slot: the
     // list it held is released when the next one replaces it.
     Late.Steps = new List<String>();
     Late.Steps.Add("replaced");
-    printf("replaced = %llu %s\n", Late.Steps.Count, Late.Steps.At(0u).ToPointer());
+    printf("replaced = %llu %s\n", Late.Steps.Count, Late.Steps[0u].ToPointer());
 
     printf("name     = %s %s\n", a.Name.ToPointer(), b.Name.ToPointer());
     return 0;

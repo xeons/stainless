@@ -439,7 +439,7 @@ Result<String[], String> ReadTextArray(JsonObject members, String name, String p
 
         for (nuint i = 0u; i < items.Count; i++)
         {
-            var item = items.At(i);
+            var item = items[i];
             if (!item.Text)
                 return Fail("'" + path + "': every entry in '" + name + "' is a string");
             answer[i] = item.Value;
@@ -560,7 +560,7 @@ bool Names(List<String> known, String wanted)
 {
     for (nuint i = 0u; i < known.Count; i++)
     {
-        if (known.At(i) == wanted)
+        if (known[i] == wanted)
             return true;
     }
     return false;
@@ -573,7 +573,7 @@ String Join(List<String> names)
     {
         if (i > 0u)
             built.Append(", ");
-        built.Append(names.At(i));
+        built.Append(names[i]);
     }
     return built.ToText();
 }
@@ -591,11 +591,11 @@ String Nearest(String wrote, List<String> known)
 
     for (nuint i = 0u; i < known.Count; i++)
     {
-        nuint distance = Distance(lowered, known.At(i).ToLowerAscii());
+        nuint distance = Distance(lowered, known[i].ToLowerAscii());
         if (distance >= closest)
             continue;
         closest = distance;
-        best = known.At(i);
+        best = known[i];
     }
 
     nuint allowed = wrote.ByteLength() / 3u;
@@ -787,7 +787,7 @@ JsonValue DependencyObject(List<Dependency> dependencies)
 
     for (nuint i = 0u; i < dependencies.Count; i++)
     {
-        var dependency = dependencies.At(i);
+        var dependency = dependencies[i];
         var inside = new JsonObject();
 
         AddText(inside, "path", dependency.Path, "");

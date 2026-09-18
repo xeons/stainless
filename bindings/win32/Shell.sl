@@ -320,7 +320,7 @@ public String[] PathsOf(IShellItemArray items)
             continue;
 
         String path = PathOf(got.Value);
-        if (path.IsEmpty())
+        if (path.IsEmpty)
             continue;
 
         paths[found] = path;

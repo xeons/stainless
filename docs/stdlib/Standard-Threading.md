@@ -693,7 +693,7 @@ pulse that lands while it is going to sleep.
 pulse says only "the value changed", never "it changed the way you want":
 
     var held = queue.Lock();
-    while (held.Value.IsEmpty()) { held.Wait(); }
+    while (held.Value.IsEmpty) { held.Wait(); }
     var item = held.Value.Take();
 
 <sub>[stdlib/Threading.sl:206](../../stdlib/Threading.sl#L206)</sub>

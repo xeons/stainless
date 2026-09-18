@@ -18,7 +18,7 @@ int Main()
     bool ok = true;
 
     ok = Check(ok, "an imaging library is here", Imaging.Available);
-    ok = Check(ok, "and it has a name", !Imaging.BackendName.IsEmpty());
+    ok = Check(ok, "and it has a name", !Imaging.BackendName.IsEmpty);
 
     // ---- making one.
     var made = Image.Create(64, 48);

@@ -76,7 +76,7 @@ void Run()
 
     Say("path matches   ", Shell.PathOf(item.Value) == windows.Value);
     Say("is a folder    ", Shell.IsFolder(item.Value));
-    Say("has a name     ", !Shell.NameOf(item.Value).IsEmpty());
+    Say("has a name     ", !Shell.NameOf(item.Value).IsEmpty);
 
     var parent = Shell.ParentOf(item.Value);
     Say("has a parent   ", parent.Ok);

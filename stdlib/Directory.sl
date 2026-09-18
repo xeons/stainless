@@ -175,7 +175,7 @@ public Result<List<String>, IOError> AllFiles(String path)
     var pending = new Queue<String>();
     pending.Enqueue(path);
 
-    while (!pending.IsEmpty())
+    while (!pending.IsEmpty)
     {
         var here = pending.Dequeue();
         var listed = Entries(here);

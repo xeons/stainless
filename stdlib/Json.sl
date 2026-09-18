@@ -871,7 +871,7 @@ void WriteInto(StringBuilder text, JsonValue value, nuint depth, bool pretty)
                     text.Append(",");
                 if (pretty)
                     Newline(text, depth + 1u);
-                WriteInto(text, array.Items.At(i), depth + 1u, pretty);
+                WriteInto(text, array.Items[i], depth + 1u, pretty);
             }
             if (pretty)
                 Newline(text, depth);
@@ -1335,7 +1335,7 @@ void FillArray(byte* instance, Field field, JsonValue value)
     for (nuint i = 0u; i < value.Items.Count && i < length; i++)
     {
         byte* at = Reflection.ElementAt(array, field, i);
-        var item = value.Items.At(i);
+        var item = value.Items[i];
 
         if (kind == KindString)
         {

@@ -211,7 +211,7 @@ String Roster()
     text.AppendInteger(ages.Get("ada"));
     text.Append(":");
     for (nuint i = 0; i < numbers.Count; i = i + 1)
-        text.AppendInteger(numbers.At(i));
+        text.AppendInteger(numbers[i]);
     text.Append(":");
     for (nint at = line.First(); at >= 0; at = line.After(at))
         text.Append(line.ValueAt(at));

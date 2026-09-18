@@ -123,7 +123,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     {
         for (nuint i = 0u; i < _commands.Count; i++)
         {
-            if (_commands.At(i) == command)
+            if (_commands[i] == command)
                 return (int)i;
         }
         return -1;
@@ -133,7 +133,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     {
         if (index < 0 || (nuint)index >= _commands.Count)
             return -1;
-        return _commands.At((nuint)index);
+        return _commands[(nuint)index];
     }
 
     /// A toolbar's buttons all report through the toolbar's own window, so the

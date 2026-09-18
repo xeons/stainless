@@ -23,7 +23,7 @@ int Main()
 
     int total = 0;
     for (nuint i = 0; i < boxes.Count; i = i + 1)
-        total = total + boxes.At(i).Get();
+        total = total + boxes[i].Get();
     printf("total=%d\n", total);
 
     // Three deep.

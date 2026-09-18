@@ -678,9 +678,9 @@ public class SpeedButton : GraphicControl
         int glyphHigh = picture == null ? 0 : ((Bitmap)picture).Height;
 
         var caption = _showCaption ? Text : "";
-        var textSize = caption.IsEmpty() ? Size.Empty
+        var textSize = caption.IsEmpty ? Size.Empty
                                          : surface.MeasureString(caption, Font);
-        int gap = (glyphWide > 0 && !caption.IsEmpty()) ? _spacing : 0;
+        int gap = (glyphWide > 0 && !caption.IsEmpty) ? _spacing : 0;
         if (gap < 0)
             gap = 0;
 
@@ -746,7 +746,7 @@ public class SpeedButton : GraphicControl
 
         // The caption may be pushed to one end of the room left for it, which
         // is what `Alignment` is for and is only visible on a wide button.
-        if (!caption.IsEmpty() && sideways && _margin >= 0)
+        if (!caption.IsEmpty && sideways && _margin >= 0)
         {
             if (_align == HorizontalAlignment.Right)
             {
@@ -772,7 +772,7 @@ public class SpeedButton : GraphicControl
             surface.DrawBitmap((Bitmap)picture, Point.At(glyphX, glyphY));
         }
 
-        if (!caption.IsEmpty())
+        if (!caption.IsEmpty)
         {
             // A disabled caption is grey, which is the only thing about a
             // disabled speed button that is not the same drawing.

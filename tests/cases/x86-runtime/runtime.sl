@@ -85,7 +85,7 @@ int Main()
     names.Add("beta");
     names.Add("gamma");
     Console.WriteLine("names     " + Text.FromInteger((long)names.Count)
-                      + " " + names.At(2));
+                      + " " + names[2]);
 
     // And back out through the converter, which walks digits.
     var parsed = ToLong("4321");

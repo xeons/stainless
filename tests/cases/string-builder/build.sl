@@ -6,7 +6,7 @@ import Standard.Console;
 int Main()
 {
     var builder = new StringBuilder();
-    Console.WriteLine("empty=" + Text.FromBool(builder.IsEmpty()));
+    Console.WriteLine("empty=" + Text.FromBool(builder.IsEmpty));
 
     for (int i = 0; i < 5; i = i + 1)
     {
@@ -25,7 +25,7 @@ int Main()
     // ToText snapshots; the builder keeps going afterwards.
     String snapshot = builder.ToText();
     builder.Clear();
-    Console.WriteLine("cleared=" + Text.FromBool(builder.IsEmpty()));
+    Console.WriteLine("cleared=" + Text.FromBool(builder.IsEmpty));
     Console.WriteLine("snapshot kept " + Text.FromInteger(snapshot.ByteLength()) + " bytes");
     return 0;
 }

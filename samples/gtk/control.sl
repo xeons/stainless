@@ -223,7 +223,7 @@ class Results
         {
             if (i > 0u)
                 all.Append(", ");
-            all.Append(_seen.At(i));
+            all.Append(_seen[i]);
         }
 
         _view.SetText("results: " + all.ToText());

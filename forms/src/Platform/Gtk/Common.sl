@@ -682,7 +682,7 @@ public class GtkPeer : IControlPeer
             g_object_unref(styling);
             styling = null;
         }
-        if (body.IsEmpty())
+        if (body.IsEmpty)
             return;
 
         styling = gtk_css_provider_new();

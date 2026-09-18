@@ -94,8 +94,8 @@ public abstract class FileDialog
         var flat = new String[filters.Count * 2u];
         for (nuint i = 0u; i < filters.Count; i++)
         {
-            flat[i * 2u] = filters.At(i).Description;
-            flat[i * 2u + 1u] = filters.At(i).Patterns;
+            flat[i * 2u] = filters[i].Description;
+            flat[i * 2u + 1u] = filters[i].Patterns;
         }
         return flat;
     }

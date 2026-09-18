@@ -36,14 +36,14 @@ void Wipe(String root)
     if (files.Ok)
     {
         for (nuint i = 0; i < files.Value.Count; i = i + 1)
-            File.Delete(files.Value.At(i));
+            File.Delete(files.Value[i]);
     }
 
     var nested = Directory.Directories(root);
     if (nested.Ok)
     {
         for (nuint i = 0; i < nested.Value.Count; i = i + 1)
-            Directory.Delete(nested.Value.At(i));
+            Directory.Delete(nested.Value[i]);
     }
 
     Directory.Delete(root);
@@ -112,8 +112,8 @@ int Main()
     if (lines.Ok)
     {
         printf("lines=%llu first=%s last=%s\n",
-            lines.Value.Count, lines.Value.At(0).ToPointer(),
-            lines.Value.At(lines.Value.Count - 1).ToPointer());
+            lines.Value.Count, lines.Value[0].ToPointer(),
+            lines.Value[lines.Value.Count - 1].ToPointer());
     }
 
     File.AppendText(notes, "line three\n");
@@ -209,7 +209,7 @@ int Main()
     if (listed.Ok)
     {
         printf("written-lines=%llu %s\n",
-            listed.Value.Count, listed.Value.At(1).ToPointer());
+            listed.Value.Count, listed.Value[1].ToPointer());
     }
 
     var nowhere = Directory.Entries(Path.Join(root, "no-such"));

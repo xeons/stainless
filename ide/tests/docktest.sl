@@ -123,9 +123,9 @@ void Ordering(Harness harness)
 
     var ordered = layout.On(DockEdge.Bottom);
     harness.SameNumber("three on the edge", 3, (long)ordered.Count);
-    harness.Same("the low order leads", "b", ordered.At(0u).Name);
-    harness.Same("the tie keeps the order it was read in", "c", ordered.At(1u).Name);
-    harness.Same("and the high order trails", "a", ordered.At(2u).Name);
+    harness.Same("the low order leads", "b", ordered[0u].Name);
+    harness.Same("the tie keeps the order it was read in", "c", ordered[1u].Name);
+    harness.Same("and the high order trails", "a", ordered[2u].Name);
 }
 
 void RoundTrips(Harness harness)
@@ -154,8 +154,8 @@ void RoundTrips(Harness harness)
     // is what makes the tab order of the bottom well stay put between runs.
     var bottom = again.On(DockEdge.Bottom);
     harness.SameNumber("the bottom well still has two", 2, (long)bottom.Count);
-    harness.Same("in the order they were written", Panes.Errors, bottom.At(0u).Name);
-    harness.Same("and the second stayed second", Panes.Output, bottom.At(1u).Name);
+    harness.Same("in the order they were written", Panes.Errors, bottom[0u].Name);
+    harness.Same("and the second stayed second", Panes.Output, bottom[1u].Name);
 
     // The text itself, not merely what it parses to: a file a person is
     // expected to be able to edit is a file that has to be readable.

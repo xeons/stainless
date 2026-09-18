@@ -140,7 +140,7 @@ int Main()
 
     var adapters = Adapters();
     if (adapters.Count > 0u)
-        Console.WriteLine("adapter: " + AdapterName(adapters.At(0u)));
+        Console.WriteLine("adapter: " + AdapterName(adapters[0u]));
 
     // ----------------------------------------------------------- the shaders
 

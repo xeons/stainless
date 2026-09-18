@@ -422,7 +422,7 @@ public abstract class WindowedControl : Control
         nuint count = _inside.Count;
         for (nuint i = count; i > 0u; i--)
         {
-            var child = _inside.At(i - 1u);
+            var child = _inside[i - 1u];
             if (!child.Visible || !child.Enabled)
                 continue;
             if (child is GraphicControl drawn)

@@ -197,7 +197,7 @@ public sealed class Module
             {
                 nuint which = (nuint)Order[i];
                 if (which < Patterns.Count)
-                    rows += Patterns.At(which).Rows;
+                    rows += Patterns[which].Rows;
             }
 
             // A tick is 2.5 / tempo seconds, and a row is `Speed` ticks.
@@ -607,7 +607,7 @@ public byte[] Render(Module song, uint rate, double maxSeconds)
             continue;
         }
 
-        var pattern = song.Patterns.At(which);
+        var pattern = song.Patterns[which];
         if (row >= pattern.Rows)
         {
             row = 0u;
@@ -624,11 +624,11 @@ public byte[] Render(Module song, uint rate, double maxSeconds)
         else
         {
             for (nuint channel = 0u; channel < channels; channel++)
-                TickVoice(voices.At(channel), tick, rate);
+                TickVoice(voices[channel], tick, rate);
         }
 
         for (nuint channel = 0u; channel < channels; channel++)
-            AdvanceEnvelope(voices.At(channel));
+            AdvanceEnvelope(voices[channel]);
 
         nuint samplesThisTick = (nuint)((double)rate * 2.5 / (double)tempo);
         if (samplesThisTick == 0u)
@@ -683,7 +683,7 @@ void StartRow(Module song, Pattern pattern, nuint row, List<Voice> voices,
 {
     for (nuint channel = 0u; channel < channels; channel++)
     {
-        var voice = voices.At(channel);
+        var voice = voices[channel];
         Note note = pattern.Notes[row * channels + channel];
 
         voice.Effect = (int)note.Effect;
@@ -698,7 +698,7 @@ void StartRow(Module song, Pattern pattern, nuint row, List<Voice> voices,
             nuint index = (nuint)note.Instrument - 1u;
             if (index < song.Instruments.Count)
             {
-                voice.Instrument = song.Instruments.At(index);
+                voice.Instrument = song.Instruments[index];
                 var instrument = (Instrument)voice.Instrument;
 
                 // An instrument on its own, with no note, resets the volume
@@ -732,7 +732,7 @@ void StartRow(Module song, Pattern pattern, nuint row, List<Voice> voices,
 
                 if (which < found.Samples.Count)
                 {
-                    var sample = found.Samples.At(which);
+                    var sample = found.Samples[which];
                     int realNote = (int)key + sample.RelativeNote;
                     int period = PeriodOf(realNote, sample.Finetune);
 
@@ -1084,7 +1084,7 @@ nuint Mix(byte[] output, nuint written, nuint capacity, List<Voice> voices,
 
         for (nuint channel = 0u; channel < channels; channel++)
         {
-            var voice = voices.At(channel);
+            var voice = voices[channel];
             if (!voice.Playing)
                 continue;
 

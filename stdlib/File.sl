@@ -158,7 +158,7 @@ public IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 
     for (nuint i = 0; i < lines.Count; i++)
     {
-        file.WriteText(lines.At(i));
+        file.WriteText(lines[i]);
         file.WriteText("\n");
     }
 

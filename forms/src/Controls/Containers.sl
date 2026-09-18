@@ -407,7 +407,7 @@ public class Notebook : Panel
             var list = Pages;
             if (_chosen < 0 || (nuint)_chosen >= list.Count)
                 return null;
-            return list.At((nuint)_chosen);
+            return list[(nuint)_chosen];
         }
     }
 
@@ -418,8 +418,8 @@ public class Notebook : Panel
         var list = Pages;
         for (nuint i = 0u; i < list.Count; i++)
         {
-            if (list.At(i).Caption == name)
-                return list.At(i);
+            if (list[i].Caption == name)
+                return list[i];
         }
         return null;
     }
@@ -436,7 +436,7 @@ public class Notebook : Panel
         bool found = false;
         for (nuint i = 0u; i < list.Count; i++)
         {
-            if (list.At(i) == page)
+            if (list[i] == page)
             {
                 at = i;
                 found = true;
@@ -449,7 +449,7 @@ public class Notebook : Panel
         list.RemoveAt(at);
         page.Visible = false;
         for (nuint i = at; i < list.Count; i++)
-            list.At(i).Renumber((int)i);
+            list[i].Renumber((int)i);
 
         // Removing the page that was showing moves the selection to whatever
         // took its place, or to the last page when it was the last.
@@ -474,7 +474,7 @@ public class Notebook : Panel
         var area = ClientBounds;
         for (nuint i = 0u; i < list.Count; i++)
         {
-            var page = list.At(i);
+            var page = list[i];
             bool wanted = (int)i == _chosen;
             page.Visible = wanted;
             if (wanted)

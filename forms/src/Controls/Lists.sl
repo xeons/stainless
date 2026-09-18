@@ -64,7 +64,7 @@ public abstract class ListControl : WindowedControl
     public nuint Count => _entries.Count;
 
     /// One item, by position.
-    public String ItemAt(nuint index) => _entries.At(index);
+    public String ItemAt(nuint index) => _entries[index];
 
     /// Every item, as an array. A copy, so a caller may keep it.
     public String[] Items
@@ -73,7 +73,7 @@ public abstract class ListControl : WindowedControl
         {
             var all = new String[_entries.Count];
             for (nuint i = 0u; i < _entries.Count; i++)
-                all[i] = _entries.At(i);
+                all[i] = _entries[i];
             return all;
         }
         set
@@ -131,7 +131,7 @@ public abstract class ListControl : WindowedControl
             int at = SelectedIndex;
             if (at < 0 || (nuint)at >= _entries.Count)
                 return null;
-            return _entries.At((nuint)at);
+            return _entries[(nuint)at];
         }
     }
 

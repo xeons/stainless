@@ -270,7 +270,7 @@ byte[] Pack(List<double> numbers)
 {
     byte[] bytes = new byte[numbers.Count * 4u];
     for (nuint i = 0u; i < numbers.Count; i++)
-        PutFloat(bytes, i * 4u, numbers.At(i));
+        PutFloat(bytes, i * 4u, numbers[i]);
     return bytes;
 }
 
@@ -846,7 +846,7 @@ int Main()
 
     var adapters = Adapters();
     if (adapters.Count > 0u)
-        Console.WriteLine("adapter: " + AdapterName(adapters.At(0u)));
+        Console.WriteLine("adapter: " + AdapterName(adapters[0u]));
 
     // ----------------------------------------------------------- the shaders
 

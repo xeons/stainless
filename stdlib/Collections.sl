@@ -148,7 +148,7 @@ public class ListEnumerator<T> : IEnumerator<T>
     }
 
     /// The item the last `MoveNext` landed on.
-    public T Current => _source.At(_next - 1);
+    public T Current => _source[_next - 1];
 }
 
 // ------------------------------------------------------------------- lists
@@ -165,9 +165,12 @@ public interface IReadOnlyList<T>
     /// How many items there are.
     nuint Count { get; }
 
+    /// Whether there are none.
+    bool IsEmpty { get; }
+
     /// The item at `index`, counting from zero. An index at or past `Count`
     /// aborts with the same message an array overrun gives.
-    T At(nuint index);
+    T this[nuint index] { get; }
 }
 
 /// Everything a read-only list offers, plus mutation. A value of this type can
@@ -175,18 +178,42 @@ public interface IReadOnlyList<T>
 /// reference is a plain pointer, and the object carries a table for both.
 public interface IList<T> : IReadOnlyList<T>
 {
-    /// Appends to the end. The only operation here that changes the length.
+    /// The item at `index`, readable and writable. Redeclared because an
+    /// interface cannot widen an inherited member from get-only to get-set.
+    T this[nuint index] { get; set; }
+
+    /// Appends to the end.
     void Add(T item);
 
-    /// Replaces the item at `index`. Aborts past the end -- this writes over
-    /// an existing item and never extends the list, which `Add` is for.
-    void Set(nuint index, T item);
+    /// Removes the item at `index`, closing the gap.
+    void RemoveAt(nuint index);
 
     /// Drops every item, leaving a length of zero.
     void Clear();
 }
 
 /// A growable list backed by a single array, doubling when it fills.
+///
+/// **The shape is .NET's `List<T>`.** A standard library that renames what
+/// everyone already knows charges for it at every lookup, so the members here
+/// are spelled the way C# spells them and mean what C# means.
+///
+/// Two deliberate differences, both stated rather than discovered:
+///
+/// - **`IsEmpty` is a property and .NET has no such member at all.** It reads
+///   better than `Count == 0` at the point of use, and
+///   [docs/style.md](docs/style.md) is the reason it is a property and not a
+///   method: a zero-argument side-effect-free getter is a property here.
+/// - **The members that compare two `T`s are free functions below**, not
+///   methods. `Contains`, `IndexOf`, `Remove`, `Sort` and `BinarySearch` all
+///   need `T : IEquatable<T>` or `IComparable<T>`, and this class constrains
+///   `T` not at all -- a `List<Control>` has to stay possible. A class cannot
+///   demand of one method's type parameter what it does not demand of every
+///   element. .NET reaches them through `EqualityComparer<T>.Default`, which is
+///   a runtime lookup this language has no equivalent of.
+///
+/// The members taking a predicate need no constraint, so those are methods,
+/// exactly as in .NET.
 public class List<T> : IList<T>, IEnumerable<T>
 {
     T[] _items;
@@ -200,35 +227,46 @@ public class List<T> : IList<T>, IEnumerable<T>
         _count = 0;
     }
 
+    /// An empty list with room for `capacity` items already reserved, for when
+    /// the size is known and the doubling would be waste.
+    public List(nuint capacity)
+    {
+        _items = new T[capacity < 1u ? 1u : capacity];
+        _count = 0;
+    }
+
     /// How many items are in the list -- not how many it has room for, which
     /// is `Capacity`.
     public nuint Count => _count;
 
-    /// True when there is nothing in it.
-    public bool IsEmpty() => _count == 0;
+    /// Whether there is nothing in it.
+    public bool IsEmpty => _count == 0;
 
     /// The number of items this list can hold before it must grow again.
-    public nuint Capacity => _items.Length;
+    ///
+    /// Settable, as in .NET: assigning reallocates to exactly that size. A
+    /// value below `Count` is ignored rather than truncating, because losing
+    /// items is not what anyone means by reserving room.
+    public nuint Capacity
+    {
+        get => _items.Length;
+        set
+        {
+            if (value < _count || value == _items.Length)
+                return;
+            Resize(value < 1u ? 1u : value);
+        }
+    }
 
     /// The item at `index`, aborting past the end.
     ///
     /// Checked against `Count` rather than against the backing array, so a
     /// slot that exists but holds nothing is out of range and says so.
-    /// `list[index]` is the same question in fewer characters.
-    public T At(nuint index)
-    {
-        if (index >= _count)
-            sl_array_bounds_fail(index, _count);
-        return _items[index];
-    }
-
-    /// The same two questions as `At` and `Set`, written the way an array is.
     ///
-    /// The methods stay, because `IReadOnlyList<T>` and `IList<T>` declare
-    /// them and an interface has no indexers. This is the spelling to reach
-    /// for where the type is known, which is nearly everywhere: `items[i] += 1`
-    /// reads through the getter and writes through the setter, so a list is
-    /// indexed on the same terms as the array behind it.
+    /// **This is the only way to reach an item.** There were `At` and `Set`
+    /// methods beside it and they are gone: two spellings of one operation is
+    /// how a codebase ends up using the longer one everywhere, which is what
+    /// had happened here.
     public T this[nuint index]
     {
         get
@@ -257,13 +295,13 @@ public class List<T> : IList<T>, IEnumerable<T>
         _count++;
     }
 
-    /// Replaces the item at `index`, aborting past the end. Never extends the
-    /// list -- `Add` is what does that.
-    public void Set(nuint index, T item)
+    /// Appends every item of another sequence, in its order.
+    public void AddRange(IEnumerable<T> items)
     {
-        if (index >= _count)
-            sl_array_bounds_fail(index, _count);
-        _items[index] = item;
+        foreach (var item in items)
+        {
+            Add(item);
+        }
     }
 
     /// Inserts at a position, moving everything after it up one.
@@ -299,10 +337,217 @@ public class List<T> : IList<T>, IEnumerable<T>
             _items[i] = _items[i + 1u];
 
         _count--;
-        // Cleared rather than merely abandoned: a slot still holding its old
-        // reference keeps that object alive for as long as the list lives.
         _items[_count] = default(T);
     }
+
+    /// Removes `count` items from `index` onwards.
+    public void RemoveRange(nuint index, nuint count)
+    {
+        if (count == 0)
+            return;
+        if (index + count > _count)
+            sl_array_bounds_fail(index, _count);
+
+        for (nuint i = index; i + count < _count; i++)
+            _items[i] = _items[i + count];
+
+        for (nuint i = _count - count; i < _count; i++)
+            _items[i] = default(T);
+        _count = _count - count;
+    }
+
+    /// Removes every item the predicate accepts, and answers how many went.
+    ///
+    /// One pass that compacts in place, so removing half a list costs one
+    /// traversal rather than one shuffle per removal.
+    public nuint RemoveAll(Predicate<T> matches)
+    {
+        nuint kept = 0;
+        for (nuint i = 0; i < _count; i++)
+        {
+            if (!matches(_items[i]))
+            {
+                _items[kept] = _items[i];
+                kept++;
+            }
+        }
+
+        nuint removed = _count - kept;
+        for (nuint i = kept; i < _count; i++)
+            _items[i] = default(T);
+        _count = kept;
+        return removed;
+    }
+
+    /// Reverses the list in place.
+    public void Reverse()
+    {
+        for (nuint i = 0; i < _count / 2u; i++)
+        {
+            var swap = _items[i];
+            _items[i] = _items[_count - 1u - i];
+            _items[_count - 1u - i] = swap;
+        }
+    }
+
+    /// The items as a new array, which the caller owns.
+    public T[] ToArray()
+    {
+        var answer = new T[_count];
+        for (nuint i = 0; i < _count; i++)
+            answer[i] = _items[i];
+        return answer;
+    }
+
+    /// Copies the items into `into`, starting at `at`.
+    public void CopyTo(T[] into, nuint at)
+    {
+        if (at + _count > into.Length)
+            sl_array_bounds_fail(at, into.Length);
+        for (nuint i = 0; i < _count; i++)
+            into[at + i] = _items[i];
+    }
+
+    /// A new list holding `count` items from `index` onwards.
+    public List<T> GetRange(nuint index, nuint count)
+    {
+        if (index + count > _count)
+            sl_array_bounds_fail(index, _count);
+
+        var answer = new List<T>(count);
+        for (nuint i = 0; i < count; i++)
+            answer.Add(_items[index + i]);
+        return answer;
+    }
+
+    /// The first item the predicate accepts, or `default(T)` when there is
+    /// none -- which is `null` for a reference type, as it is in .NET.
+    public T Find(Predicate<T> matches)
+    {
+        for (nuint i = 0; i < _count; i++)
+        {
+            if (matches(_items[i]))
+                return _items[i];
+        }
+        return default(T);
+    }
+
+    /// The last item the predicate accepts, or `default(T)`.
+    public T FindLast(Predicate<T> matches)
+    {
+        for (nuint i = _count; i > 0u; i--)
+        {
+            if (matches(_items[i - 1u]))
+                return _items[i - 1u];
+        }
+        return default(T);
+    }
+
+    /// Every item the predicate accepts, in order.
+    public List<T> FindAll(Predicate<T> matches)
+    {
+        var answer = new List<T>();
+        for (nuint i = 0; i < _count; i++)
+        {
+            if (matches(_items[i]))
+                answer.Add(_items[i]);
+        }
+        return answer;
+    }
+
+    /// Where the first item the predicate accepts is, or `None`.
+    ///
+    /// **An `Optional<nuint>`, where .NET answers -1.** The sentinel is the
+    /// thing `Optional<T>` exists to retire, `IndexOf` below already answers
+    /// this way, and an index that is a `nuint` cannot hold -1 at all. This is
+    /// the one place the shape deliberately departs from C#, and it departs
+    /// because C#'s shape is a workaround for a type it does not have.
+    public Optional<nuint> FindIndex(Predicate<T> matches)
+    {
+        for (nuint i = 0; i < _count; i++)
+        {
+            if (matches(_items[i]))
+                return Some(i);
+        }
+        return None;
+    }
+
+    /// Where the last item the predicate accepts is, or `None`.
+    public Optional<nuint> FindLastIndex(Predicate<T> matches)
+    {
+        for (nuint i = _count; i > 0u; i--)
+        {
+            if (matches(_items[i - 1u]))
+                return Some(i - 1u);
+        }
+        return None;
+    }
+
+    /// Whether any item is accepted by the predicate.
+    public bool Exists(Predicate<T> matches) => FindIndex(matches).HasValue;
+
+    /// Whether every item is.
+    public bool TrueForAll(Predicate<T> matches)
+    {
+        for (nuint i = 0; i < _count; i++)
+        {
+            if (!matches(_items[i]))
+                return false;
+        }
+        return true;
+    }
+
+    /// Runs `action` over each item, in order.
+    ///
+    /// The list is read as it goes, so an action that adds to it is a loop
+    /// that does not end. .NET throws for this; there is nothing to throw
+    /// here, and saying so is the whole of what can be done about it.
+    public void ForEach(Action<T> action)
+    {
+        for (nuint i = 0; i < _count; i++)
+        {
+            action(_items[i]);
+        }
+    }
+
+    /// Makes sure there is room for `capacity` items, and answers the capacity
+    /// afterwards. Never shrinks.
+    public nuint EnsureCapacity(nuint capacity)
+    {
+        if (capacity > _items.Length)
+            Resize(capacity);
+        return _items.Length;
+    }
+
+    /// Gives back the room past `Count`.
+    public void TrimExcess()
+    {
+        if (_count < _items.Length)
+            Resize(_count < 1u ? 1u : _count);
+    }
+
+    /// `count` items from `index`, as a new list. .NET's name for `GetRange`
+    /// since ranges arrived, and the two are the same call.
+    public List<T> Slice(nuint index, nuint count) => GetRange(index, count);
+
+    /// Inserts every item of another sequence at `index`, in its order.
+    public void InsertRange(nuint index, IEnumerable<T> items)
+    {
+        nuint at = index;
+        foreach (var item in items)
+        {
+            Insert(at, item);
+            at++;
+        }
+    }
+
+    /// This list seen as something that cannot be changed through it.
+    ///
+    /// **The same object, not a copy.** .NET answers a `ReadOnlyCollection<T>`
+    /// wrapper for the same reason this answers an interface: what it buys is a
+    /// signature that says "I will not write to this", and neither stops the
+    /// owner writing to it meanwhile.
+    public IReadOnlyList<T> AsReadOnly() => this;
 
     /// A cursor over this list, for `foreach` and for passing it on as a
     /// sequence. The cursor reads the list as it goes rather than taking a
@@ -318,9 +563,11 @@ public class List<T> : IList<T>, IEnumerable<T>
         _count = 0;
     }
 
-    void Grow()
+    void Grow() => Resize(_items.Length * 2u);
+
+    void Resize(nuint room)
     {
-        var bigger = new T[_items.Length * 2];
+        var bigger = new T[room];
         for (nuint i = 0; i < _count; i++)
             bigger[i] = _items[i];
         _items = bigger;
@@ -335,11 +582,11 @@ public T Largest<T>(IReadOnlyList<T> items) where T : IComparable<T>
     if (items.Count == 0)
         sl_array_bounds_fail(0, 0);
 
-    var best = items.At(0);
+    var best = items[0];
     for (nuint i = 1; i < items.Count; i++)
     {
-        if (items.At(i).CompareTo(best) > 0)
-            best = items.At(i);
+        if (items[i].CompareTo(best) > 0)
+            best = items[i];
     }
     return best;
 }
@@ -350,11 +597,11 @@ public T Smallest<T>(IReadOnlyList<T> items) where T : IComparable<T>
     if (items.Count == 0)
         sl_array_bounds_fail(0, 0);
 
-    var best = items.At(0);
+    var best = items[0];
     for (nuint i = 1; i < items.Count; i++)
     {
-        if (items.At(i).CompareTo(best) < 0)
-            best = items.At(i);
+        if (items[i].CompareTo(best) < 0)
+            best = items[i];
     }
     return best;
 }
@@ -371,8 +618,27 @@ public Optional<nuint> IndexOf<T>(IReadOnlyList<T> items, T wanted) where T : IE
 {
     for (nuint i = 0; i < items.Count; i++)
     {
-        if (items.At(i).EqualTo(wanted))
+        if (items[i].EqualTo(wanted))
             return Some(i);
+    }
+    return None;
+}
+
+/// Whether `wanted` is in the list at all. `List<T>.Contains` in .NET, and a
+/// free function here for the reason `IndexOf` is.
+public bool Contains<T>(IReadOnlyList<T> items, T wanted) where T : IEquatable<T>
+{
+    return IndexOf(items, wanted).HasValue;
+}
+
+/// Where the *last* item equal to `wanted` is, if it is there at all.
+public Optional<nuint> LastIndexOf<T>(IReadOnlyList<T> items, T wanted)
+    where T : IEquatable<T>
+{
+    for (nuint i = items.Count; i > 0u; i--)
+    {
+        if (items[i - 1u].EqualTo(wanted))
+            return Some(i - 1u);
     }
     return None;
 }
@@ -410,7 +676,7 @@ public nuint RemoveWhere<T>(List<T> items, Predicate<T> match)
     while (i > 0u)
     {
         i--;
-        if (match(items.At(i)))
+        if (match(items[i]))
         {
             items.RemoveAt(i);
             went++;
@@ -674,12 +940,12 @@ public void Sort<T>(IList<T> items) where T : IComparable<T>
 
     var flat = new T[count];
     for (nuint i = 0u; i < count; i++)
-        flat[i] = items.At(i);
+        flat[i] = items[i];
 
     Sort(flat);
 
     for (nuint i = 0u; i < count; i++)
-        items.Set(i, flat[i]);
+        items[i] = flat[i];
 }
 
 /// The same, ordered by a comparer.
@@ -691,12 +957,12 @@ public void Sort<T>(IList<T> items, Comparer<T> order)
 
     var flat = new T[count];
     for (nuint i = 0u; i < count; i++)
-        flat[i] = items.At(i);
+        flat[i] = items[i];
 
     Sort(flat, order);
 
     for (nuint i = 0u; i < count; i++)
-        items.Set(i, flat[i]);
+        items[i] = flat[i];
 }
 
 // ------------------------------------------------------- ordered dictionary
@@ -732,10 +998,10 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     public nuint Count => _keys.Count;
 
     /// The key at a position, in insertion order.
-    public TKey KeyAt(nuint index) => _keys.At(index);
+    public TKey KeyAt(nuint index) => _keys[index];
 
     /// The value at a position, in insertion order.
-    public TValue ValueAt(nuint index) => _values.At(index);
+    public TValue ValueAt(nuint index) => _values[index];
 
     /// Where a key is, or `None`.
     ///
@@ -747,7 +1013,7 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     {
         for (nuint i = 0u; i < _keys.Count; i++)
         {
-            if (_keys.At(i).EqualTo(key))
+            if (_keys[i].EqualTo(key))
                 return Some(i);
         }
         return None;
@@ -774,7 +1040,7 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     {
         if (IndexOf(key) is Some at)
         {
-            _values.Set(at.Value, value);
+            _values[at.Value] = value;
         }
         else
         {
@@ -787,7 +1053,7 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     public TValue Find(TKey key, TValue fallback)
     {
         if (IndexOf(key) is Some at)
-            return _values.At(at.Value);
+            return _values[at.Value];
         return fallback;
     }
 

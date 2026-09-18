@@ -44,9 +44,9 @@ int Main()
     var spelled = Map(numbers, n => "<" + Text.FromInteger((long)n) + ">");
     var halved = Map(numbers, n => (double)n / 2.0);
 
-    printf("doubled  = %d %d\n", doubled.At(0u), doubled.At(1u));
-    Show("spelled ", spelled.At(0u) + spelled.At(1u));
-    printf("halved   = %.1f\n", halved.At(0u));
+    printf("doubled  = %d %d\n", doubled[0u], doubled[1u]);
+    Show("spelled ", spelled[0u] + spelled[1u]);
+    printf("halved   = %.1f\n", halved[0u]);
 
     // A from the seed, so the fold's lambda has everything it needs up front.
     long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
@@ -68,7 +68,7 @@ int Main()
     printf("first>4  = %d\n", FirstOr(numbers, n => n > 4, -1));
     printf("first>99 = %d\n", FirstOr(numbers, n => n > 99, -1));
     printf("index>8  = %llu\n", (ulong)IndexWhere(numbers, n => n > 8).ValueOr(99u));
-    printf("index>99 = %d\n", IndexWhere(numbers, n => n > 99).IsEmpty());
+    printf("index>99 = %d\n", IndexWhere(numbers, n => n > 99).IsEmpty);
     printf("find>4   = %d\n", Find(numbers, n => n > 4).ValueOr(-1));
 
     printf("take3    = %llu\n", (ulong)Take(numbers, 3u).Count);
@@ -134,10 +134,10 @@ int Main()
     var list = new List<int>();
     list.Add(4); list.Add(2); list.Add(8); list.Add(6);
     Sort(list);
-    printf("list     = %d %d\n", list.At(0u), list.At(3u));
+    printf("list     = %d %d\n", list[0u], list[3u]);
 
     Sort(list, (a, b) => b - a);
-    printf("listDesc = %d %d\n", list.At(0u), list.At(3u));
+    printf("listDesc = %d %d\n", list[0u], list[3u]);
 
     // ------------------------------------------------------------ searching
 
@@ -161,7 +161,7 @@ int Main()
     printf("anyShort  = %d\n", Any(names, n => n.ByteLength() < 3u));
 
     var lengths = Map(names, n => (long)n.ByteLength());
-    printf("lengths   = %lld %lld\n", lengths.At(0u), lengths.At(1u));
+    printf("lengths   = %lld %lld\n", lengths[0u], lengths[1u]);
 
     // ------------------------------------------------------------- cursors
 

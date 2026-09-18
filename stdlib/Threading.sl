@@ -201,7 +201,7 @@ public class Guard<T>
 /// pulse says only "the value changed", never "it changed the way you want":
 ///
 ///     var held = queue.Lock();
-///     while (held.Value.IsEmpty()) { held.Wait(); }
+///     while (held.Value.IsEmpty) { held.Wait(); }
 ///     var item = held.Value.Take();
 public threadsafe class Monitor<T>
 {

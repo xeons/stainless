@@ -197,7 +197,7 @@ public class XmlNode
     {
         for (nuint i = 0u; i < Children.Count; i++)
         {
-            var child = Children.At(i);
+            var child = Children[i];
             if (child.Name == name)
                 return child;
         }
@@ -210,7 +210,7 @@ public class XmlNode
         var found = new List<XmlNode>();
         for (nuint i = 0u; i < Children.Count; i++)
         {
-            var child = Children.At(i);
+            var child = Children[i];
             if (child.Name == name)
                 found.Add(child);
         }
@@ -809,7 +809,7 @@ void WriteInto(StringBuilder text, XmlNode node, nuint depth, bool pretty)
     {
         if (pretty)
             text.Append("\n");
-        WriteInto(text, node.Children.At(i), depth + 1u, pretty);
+        WriteInto(text, node.Children[i], depth + 1u, pretty);
     }
 
     if (pretty && node.Children.Count > 0u)
@@ -1166,11 +1166,11 @@ void FillArray(byte* instance, Field field, List<XmlNode> found)
         {
             byte* nested = Reflection.ReadAggregateAt(at, field);
             if (nested != null)
-                FillInstance(nested, field.ElementType, found.At(i));
+                FillInstance(nested, field.ElementType, found[i]);
             continue;
         }
 
-        FillElement(at, field, found.At(i).Text);
+        FillElement(at, field, found[i].Text);
     }
 }
 

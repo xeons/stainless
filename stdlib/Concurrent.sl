@@ -125,7 +125,7 @@ public threadsafe class ConcurrentQueue<T>
     {
         sl_mutex_lock(_gate);
 
-        if (_items.IsEmpty())
+        if (_items.IsEmpty)
         {
             sl_mutex_unlock(_gate);
             return new Taken<T>(false, _blank[0]);
@@ -142,7 +142,7 @@ public threadsafe class ConcurrentQueue<T>
     {
         sl_mutex_lock(_gate);
 
-        if (_items.IsEmpty())
+        if (_items.IsEmpty)
         {
             sl_mutex_unlock(_gate);
             return fallback;
@@ -169,7 +169,7 @@ public threadsafe class ConcurrentQueue<T>
     /// Whether it is empty *now*. Another thread may enqueue before you act on
     /// the answer, so a true here does not mean the next `TryDequeue` fails.
     /// Reach for `TryDequeue` and read its `Ok` instead.
-    public bool IsEmpty() => Count == 0;
+    public bool IsEmpty => Count == 0;
 
     /// A snapshot, oldest first. Consistent with itself, and out of date the
     /// moment it is returned.
@@ -216,7 +216,7 @@ public threadsafe class ConcurrentStack<T>
     {
         sl_mutex_lock(_gate);
 
-        if (_items.IsEmpty())
+        if (_items.IsEmpty)
         {
             sl_mutex_unlock(_gate);
             return new Taken<T>(false, _blank[0]);
@@ -234,7 +234,7 @@ public threadsafe class ConcurrentStack<T>
     {
         sl_mutex_lock(_gate);
 
-        if (_items.IsEmpty())
+        if (_items.IsEmpty)
         {
             sl_mutex_unlock(_gate);
             return fallback;
@@ -259,7 +259,7 @@ public threadsafe class ConcurrentStack<T>
     }
 
     /// Whether it is empty *now*, with the same caveat as `Count`.
-    public bool IsEmpty() => Count == 0;
+    public bool IsEmpty => Count == 0;
 
     /// A snapshot, top first. Consistent with itself, and out of date the
     /// moment it is returned.
@@ -382,7 +382,7 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
     }
 
     /// Whether it is empty *now*, with the same caveat as `Count`.
-    public bool IsEmpty() => Count == 0;
+    public bool IsEmpty => Count == 0;
 
     /// A snapshot of the keys. Out of date the moment it is returned, which is
     /// why it is a copy rather than a view.
@@ -475,12 +475,12 @@ public threadsafe class Channel<T>
         // A wait can return without a signal, so the condition is re-tested in
         // a loop rather than assumed. That is true of every condition variable
         // on every platform.
-        while (_items.IsEmpty() && !_closed)
+        while (_items.IsEmpty && !_closed)
         {
             sl_condition_wait(_arrived, _gate);
         }
 
-        if (_items.IsEmpty())
+        if (_items.IsEmpty)
         {
             sl_mutex_unlock(_gate);
             return new Taken<T>(false, _blank[0]);
@@ -496,7 +496,7 @@ public threadsafe class Channel<T>
     {
         sl_mutex_lock(_gate);
 
-        if (_items.IsEmpty())
+        if (_items.IsEmpty)
         {
             sl_mutex_unlock(_gate);
             return new Taken<T>(false, _blank[0]);

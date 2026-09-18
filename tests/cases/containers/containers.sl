@@ -113,9 +113,9 @@ int Main()
         line.Count, line.Peek(), line.Dequeue(), line.Dequeue());
 
     int drained = 0;
-    while (!line.IsEmpty())
+    while (!line.IsEmpty)
         drained = drained + line.Dequeue();
-    printf("drained=%d empty=%d\n", drained, line.IsEmpty() ? 1 : 0);
+    printf("drained=%d empty=%d\n", drained, line.IsEmpty ? 1 : 0);
 
     // ---------------------------------------------------------------- stack
     var plates = new Stack<String>();

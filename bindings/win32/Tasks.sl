@@ -138,7 +138,7 @@ public Completed Run(String commandLine, String workingDirectory)
     var mutable = Win32.Copy(commandLine);
 
     ProcessInformation information;
-    char16* directory = workingDirectory.IsEmpty()
+    char16* directory = workingDirectory.IsEmpty
         ? null : workingDirectory.ToUtf16().ToPointer();
 
     bool started = Win32.Succeeded(CreateProcessW(

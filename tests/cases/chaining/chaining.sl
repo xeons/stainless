@@ -87,10 +87,10 @@ public int Main()
 
     Console.WriteLine($"adults {adults.Length}: {adults[0]} {adults[1]}");
     Console.WriteLine($"years  {people.Aggregate(0, (sum, p) => sum + p.Age)}");
-    Console.WriteLine($"oldest {people.ToArray().Find((p) => p.Age > 60).ValueOr(people.At(0u)).Name}");
+    Console.WriteLine($"oldest {people.ToArray().Find((p) => p.Age > 60).ValueOr(people[0u]).Name}");
 
     // A member wins over a free function of the same name.
-    Console.WriteLine($"member {people.At(0u).Describe()}");
+    Console.WriteLine($"member {people[0u].Describe()}");
     Console.WriteLine($"free   {36.Describe()}");
 
     // ---------------------------------------------------------- default(T)
@@ -107,7 +107,7 @@ public int Main()
     // --------------------------------------------------------- String.Empty
 
     var blank = String.Empty;
-    Console.WriteLine($"empty  {blank.ByteLength()} {blank == ""} {blank.IsEmpty()}");
+    Console.WriteLine($"empty  {blank.ByteLength()} {blank == ""} {blank.IsEmpty}");
     Console.WriteLine($"joined {(blank + "x").ByteLength()}");
     return 0;
 }

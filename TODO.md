@@ -62,28 +62,6 @@ style for months, and nothing said so. What a reviewer should be spending
 attention on is §1.4 and §2.1 — whether a name promises the right thing, whether
 a method should have been a property — and neither of those is mechanical.
 
-### A built-in member that is a property
-
-`IsEmpty` is the one question in [docs/style.md §2.1](docs/style.md#21-a-property-or-a-method)
-that is still a method, and not because the rule is unclear. `String` and
-`StringBuilder` get theirs from `Builtins.cs` as a `FunctionSymbol`, and there
-is no way to declare a built-in member as a property: the collections converted
-and these could not follow. Converting the collections alone would leave
-`list.IsEmpty` and `text.IsEmpty()` disagreeing, which is worse than either, so
-nothing moved.
-
-`Length` on an array is the shape to copy — `Binder.MemberAccess` answers it
-without parentheses as a special case — but a case per name is not the fix. What
-is wanted is a `PropertySymbol` a built-in type can carry, which would also let
-`String.ByteLength` and `Array.Length` stop being two different mechanisms.
-
-**Why it matters**: it is the only place the standard says one thing and the
-standard library does another, and every such place is an argument for ignoring
-the rest of it.
-
-*Touches:* `Builtins.cs`, `Binder.MemberAccess`, `stdlib/Text.sl`, and the
-`IsEmpty()` call sites across the tree.
-
 ### x86 and ARM64
 
 Three of the four entries that were here are done. What each turned out to be:

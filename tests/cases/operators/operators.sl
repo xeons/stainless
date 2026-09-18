@@ -112,8 +112,8 @@ public class Bag
 
     public String this[nuint at]
     {
-        get => _items.At(at);
-        set => _items.Set(at, value);
+        get => _items[at];
+        set => _items[at] = value;
     }
 
     public bool this[String wanted]

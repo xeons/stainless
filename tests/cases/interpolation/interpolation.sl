@@ -139,6 +139,6 @@ public String[] ToArray(List<String> items)
 {
     var all = new String[items.Count];
     for (nuint i = 0u; i < items.Count; i++)
-        all[i] = items.At(i);
+        all[i] = items[i];
     return all;
 }

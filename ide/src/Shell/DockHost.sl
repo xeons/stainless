@@ -392,7 +392,7 @@ class AutoHideStrip : CustomControl
     /// guarantees that.
     bool Remeasure(Graphics canvas)
     {
-        if (_panes.IsEmpty() || _edge == DockEdge.Bottom)
+        if (_panes.IsEmpty || _edge == DockEdge.Bottom)
             return false;
 
         int widest = StripThickness;
@@ -457,14 +457,14 @@ class AutoHideStrip : CustomControl
 
         for (nuint i = 0u; i < _boxes.Count && i < _panes.Count; i++)
         {
-            var box = _boxes.At(i);
+            var box = _boxes[i];
             bool hot = (int)i == _hot;
 
             canvas.FillRectangle(new Brush(hot ? SystemColors.ControlLight
                                               : SystemColors.Control), box);
             canvas.DrawRectangle(new Pen(SystemColors.ControlDark), box);
 
-            String label = _panes.At(i).Title;
+            String label = _panes[i].Title;
             var size = canvas.MeasureString(label, Font);
             canvas.DrawString(label, Font, SystemColors.ControlText,
                               box.X + (box.Width - size.Width) / 2,
@@ -477,7 +477,7 @@ class AutoHideStrip : CustomControl
         var point = Point.At(x, y);
         for (nuint i = 0u; i < _boxes.Count; i++)
         {
-            if (_boxes.At(i).Contains(point))
+            if (_boxes[i].Contains(point))
                 return (int)i;
         }
         return -1;
@@ -554,7 +554,7 @@ public class DockWell : Panel
 
     public DockEdge Edge => _edge;
     public List<ToolWindow> Panes => _panes;
-    public bool IsEmpty() => _panes.IsEmpty();
+    public bool IsEmpty => _panes.IsEmpty;
 
     /// Whether the caption is drawn as the pane being worked in.
     public bool Active
@@ -591,7 +591,7 @@ public class DockWell : Panel
             int at = _book.SelectedIndex;
             if (at < 0 || (nuint)at >= _panes.Count)
                 return null;
-            return _panes.At((nuint)at);
+            return _panes[(nuint)at];
         }
     }
 
@@ -600,7 +600,7 @@ public class DockWell : Panel
     {
         for (nuint i = 0u; i < _panes.Count; i++)
         {
-            if (_panes.At(i).PaneName == name)
+            if (_panes[i].PaneName == name)
             {
                 _book.SelectedIndex = (int)i;
                 Retitle();
@@ -1032,7 +1032,7 @@ public class DockHost : Panel
         if (strip.ChosenIndex >= strip.Panes.Count)
             return;
 
-        var pane = strip.Panes.At(strip.ChosenIndex);
+        var pane = strip.Panes[strip.ChosenIndex];
         var well = WellHolding(pane.PaneName);
         if (well == null)
             return;
