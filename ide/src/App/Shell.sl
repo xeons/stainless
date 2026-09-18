@@ -41,6 +41,7 @@ import Ide.Lang;
 import Ide.Editor;
 import Ide.Project;
 import Ide.Build;
+import Ide.Shell;
 
 /// One open file: the tab it is behind, and the editor on it.
 ///
@@ -66,8 +67,15 @@ public class Shell : Form
     TabControl _book;
     List<EditorTab> _open;
 
+    /// The wells, the splitters and the strips. Everything but the menu and the
+    /// status bar lives inside it.
+    DockHost _dock;
+    /// Where the panes are and how wide, read at startup and written at exit.
+    DockLayout _arrangement;
+
     ListBox _output;
-    Splitter _divider;
+    ListView _errors;
+    TreeView _tree;
     StatusBar _status;
     MainMenu _bar;
 
@@ -83,6 +91,20 @@ public class Shell : Form
 
     /// What the last build reported, one entry per line of its output.
     List<BuildMessage> _messages;
+
+    /// For each row of the Error List, which `_messages` entry it came from.
+    ///
+    /// A parallel list rather than a second copy of the diagnostic, because the
+    /// two lists show the same build: Output has a row per *line* and the Error
+    /// List a row per *diagnostic*, so the indices differ and one of them has to
+    /// carry the mapping. Keeping the diagnostic in one place is what stops the
+    /// two from ever disagreeing about where a double-click goes.
+    List<nuint> _errorLines;
+
+    /// Every file the tree is showing, by node, so that a double-click knows
+    /// what to open. `TreeNode` carries no tag of its own.
+    List<TreeNode> _treeNodes;
+    List<String> _treePaths;
 
     /// The project in front, and the file it was read from. Null when the
     /// window is showing loose files, which is still a thing it does: a
@@ -104,6 +126,9 @@ public class Shell : Form
 
         _open = new List<EditorTab>();
         _messages = new List<BuildMessage>();
+        _errorLines = new List<nuint>();
+        _treeNodes = new List<TreeNode>();
+        _treePaths = new List<String>();
         _project = null;
         _projectPath = "";
         _building = false;
@@ -122,20 +147,50 @@ public class Shell : Form
         _status.AddPanel(110);      // how many errors
         _status.AddPanel(0);        // where the caret is
 
-        _output = new ListBox(this);
-        _output.Dock = DockStyle.Bottom;
-        _output.Height = 160;
+        // The layout is read before anything is built, because where a pane
+        // goes is decided as it is made -- a control's parent is fixed at
+        // construction and `forms/` cannot move it afterwards.
+        _arrangement = ReadLayout(LayoutPath());
+        _dock = new DockHost(this, _arrangement);
+        _dock.Dock = DockStyle.Fill;
+
+        var solution = _dock.Add(Panes.Solution, "Solution Explorer", DockEdge.Left);
+        _tree = new TreeView(solution);
+        _tree.Dock = DockStyle.Fill;
+        _tree.DoubleClick += this.OnTreeChosen;
+
+        var errors = _dock.Add(Panes.Errors, "Error List", DockEdge.Bottom);
+        _errors = new ListView(errors);
+        _errors.Dock = DockStyle.Fill;
+        _errors.View = ListViewStyle.Details;
+        _errors.SetFullRowSelect(true, true);
+        // Widths that add up to less than the bottom well starts at, so that
+        // every column is visible without scrolling on a first run. Description
+        // is the one that gives, because it is also the one the platform lets
+        // you widen by dragging when a message is long.
+        _errors.AddColumn("", 22);
+        _errors.AddColumn("Code", 70);
+        _errors.AddColumn("Description", 380);
+        _errors.AddColumn("File", 140);
+        _errors.AddColumn("Line", 50, HorizontalAlignment.Right);
+        _errors.DoubleClick += this.OnErrorChosen;
+
+        var output = _dock.Add(Panes.Output, "Output", DockEdge.Bottom);
+        _output = new ListBox(output);
+        _output.Dock = DockStyle.Fill;
         _output.DoubleClick += this.OnOutputChosen;
 
-        _divider = new Splitter(this);
-        _divider.Dock = DockStyle.Bottom;
-
-        _book = new TabControl(this);
+        _book = new TabControl(_dock.Documents);
         _book.Dock = DockStyle.Fill;
         _book.SelectedIndexChanged += this.OnTabChanged;
 
+        // Once, after every pane exists, rather than after each -- see
+        // `DockHost.Arrange`.
+        _dock.Arrange();
+
         BuildMenu();
         NewFile();
+        ShowProjectTree();
         Say("Ready.");
     }
 
@@ -357,6 +412,17 @@ public class Shell : Form
         build.Add("&Clear output").Click += this.OnClearOutput;
 
         var view = _bar.Add("&View");
+        // The panes first, which is where Visual Studio puts them and where
+        // someone goes after closing one by accident -- a closed pane is hidden
+        // rather than destroyed, so this brings back the same tree with the
+        // same project already in it.
+        view.Add("&Solution Explorer").Click += this.OnShowSolution;
+        view.Add("&Error List").Click += this.OnShowErrors;
+        view.Add("&Output").Click += this.OnShowOutput;
+        view.Add(MenuItem.Separator());
+        view.Add("&Reset layout").Click += this.OnResetLayout;
+        view.Add(MenuItem.Separator());
+
         _themeItem = view.Add("&Dark theme");
         _themeItem.Click += this.OnToggleTheme;
         view.Add(MenuItem.Separator());
@@ -613,6 +679,7 @@ public class Shell : Form
         _project = null;
         _projectPath = "";
         Retitle();
+        ShowProjectTree();
         Say("Project closed. Building compiles the file in front.");
     }
 
@@ -635,6 +702,7 @@ public class Shell : Form
         _project = read.Value;
         _projectPath = path;
         Retitle();
+        ShowProjectTree();
 
         var project = (ProjectFile)read.Value;
         Say("Project " + project.Name + " " + project.Version + ".");
@@ -664,6 +732,7 @@ public class Shell : Form
         _project = read.Value;
         _projectPath = found;
         Retitle();
+        ShowProjectTree();
     }
 
     /// What the compiler is being asked to do, for the status line.
@@ -676,8 +745,7 @@ public class Shell : Form
 
     void OnClearOutput(MenuItem sender)
     {
-        _output.Clear();
-        _messages.Clear();
+        ClearOutput();
     }
 
     /// Saves what needs saving, then runs the compiler off the UI thread.
@@ -712,8 +780,7 @@ public class Shell : Form
         if (!SaveBeforeBuilding())
             return;
 
-        _output.Clear();
-        _messages.Clear();
+        ClearOutput();
 
         var arguments = BuildArguments(thenRun);
         Say(thenRun ? "Running..." : "Building...");
@@ -734,8 +801,7 @@ public class Shell : Form
             return;
         }
 
-        _output.Clear();
-        _messages.Clear();
+        ClearOutput();
         Say("Cleaning...");
 
         // `stainless` has no clean of its own: what a clean removes is the
@@ -919,11 +985,46 @@ public class Shell : Form
     /// **The list shows what a person reads and the model keeps what a click
     /// needs**, which is why the two are built together: the line the compiler
     /// sent is JSON, and nobody wants to read that.
+    ///
+    /// A diagnostic also goes to the Error List, which is the same information
+    /// in the shape a person scans rather than reads -- a column each for the
+    /// code, the message and the place, sortable by the platform, with the
+    /// linker's own complaints and whatever a `run` printed left in Output
+    /// where they belong.
     void Show(String line)
     {
         var message = BuildMessage.Parse(line);
         _output.Add(message.Describe());
         _messages.Add(message);
+
+        if (message.IsDiagnostic)
+            AddError(message);
+    }
+
+    /// Empties both panes and the model under them.
+    ///
+    /// One method rather than the three lines repeated at each of the four
+    /// places a build starts: the Error List was added after two of them
+    /// existed, and a fourth pane will be added after this one.
+    void ClearOutput()
+    {
+        _output.Clear();
+        _errors.Clear();
+        _messages.Clear();
+        _errorLines.Clear();
+    }
+
+    /// One diagnostic as a row, remembering which output line it came from so
+    /// that double-clicking either list does the same thing.
+    void AddError(BuildMessage message)
+    {
+        int row = _errors.AddRow(message.IsError ? "!" : "?");
+        _errors.SetCell(row, 1, message.Code);
+        _errors.SetCell(row, 2, message.Message);
+        _errors.SetCell(row, 3, NameOf(message.File));
+        _errors.SetCell(row, 4, message.HasPlace
+                                ? Standard.Text.FromInteger(message.Line) : "");
+        _errorLines.Add(_messages.Count - 1u);
     }
 
     /// A line that is not the compiler's, shown as it came.
@@ -951,8 +1052,17 @@ public class Shell : Form
     /// tabs made possible and what the single-editor version had to refuse.
     void OnOutputChosen(Control sender)
     {
-        nuint index = (nuint)_output.SelectedIndex;
-        if (_output.SelectedIndex < 0 || index >= _messages.Count)
+        if (_output.SelectedIndex < 0)
+            return;
+        GoToMessage((nuint)_output.SelectedIndex);
+    }
+
+    /// Goes to what the diagnostic at `index` points at. Shared by Output and
+    /// the Error List, so that the two cannot drift into doing different things
+    /// with the same double-click.
+    void GoToMessage(nuint index)
+    {
+        if (index >= _messages.Count)
             return;
 
         var message = _messages[index];
@@ -977,6 +1087,188 @@ public class Shell : Form
         found.Editor.GoTo(message.Line - 1u,
                           message.Column > 0u ? message.Column - 1u : 0u);
         found.Editor.Focus();
+    }
+
+
+
+    // ------------------------------------------------------------- the panes
+
+    void OnShowSolution(MenuItem sender) => ShowPane(Panes.Solution, "Solution Explorer");
+    void OnShowErrors(MenuItem sender) => ShowPane(Panes.Errors, "Error List");
+    void OnShowOutput(MenuItem sender) => ShowPane(Panes.Output, "Output");
+
+    void ShowPane(String name, String title)
+    {
+        if (_dock.Reveal(name))
+            Say(title + ".");
+    }
+
+    /// Puts every pane back where a first run would have had it.
+    ///
+    /// **It writes the file and says to restart**, rather than rearranging the
+    /// window. A pane's edge is fixed when it is constructed -- `forms/` cannot
+    /// reparent a control -- so moving one back to an edge it was not built on
+    /// is the one thing this cannot do live. Saying so is better than a menu
+    /// item that silently does three quarters of what it says.
+    void OnResetLayout(MenuItem sender)
+    {
+        _arrangement = DockLayout.Default();
+        if (SaveLayout(_arrangement, LayoutPath()))
+            Say("Layout reset. It takes effect next time this starts.");
+        else
+            Say("Could not write " + LayoutPath() + ".");
+    }
+
+    /// Saves where everything is, on the way out.
+    ///
+    /// **`Remember` first**, because a splitter drag sets its neighbour's width
+    /// on the control and tells nobody -- there is no drag-finished event to
+    /// have listened for, so the sizes are read back off the controls at the
+    /// one moment they are wanted.
+    ///
+    /// A failure to write is deliberately silent. The window is closing; there
+    /// is nowhere to put the message that anyone would see, and losing a pane
+    /// width is not worth refusing to exit over.
+    protected override void OnClosing(CancelEventArgs args)
+    {
+        base.OnClosing(args);
+        if (args.Cancel)
+            return;
+
+        _dock.Remember();
+        SaveLayout(_arrangement, LayoutPath());
+    }
+
+    // ------------------------------------------------------ the project tree
+
+    /// Fills the Solution Explorer from the project in front.
+    ///
+    /// **From the project's `sources`, walked on disk**, rather than from a
+    /// list of files the project keeps -- because it keeps none. A Stainless
+    /// project names directories and the compiler compiles what is in them,
+    /// which is the whole reason a project file here is twenty lines rather
+    /// than a manifest of every file. The tree therefore shows what the build
+    /// will actually see, which is a stronger guarantee than a file list that
+    /// has to be kept in step.
+    ///
+    /// Rebuilt whole rather than patched. A project is opened and closed rarely
+    /// and holds tens of files, so the cost is nothing and the alternative is a
+    /// diff against the file system that can be wrong.
+    void ShowProjectTree()
+    {
+        _tree.Clear();
+        _treeNodes.Clear();
+        _treePaths.Clear();
+
+        if (_project == null)
+        {
+            var none = _tree.Add("No project open");
+            none.Expand();
+            return;
+        }
+
+        var project = (ProjectFile)_project;
+        var root = _tree.Add(project.Name + " (" + project.Version + ")");
+
+        foreach (var source in project.SourcesFor(ProjectFile.ThisPlatform))
+        {
+            String resolved = project.Resolve(source);
+            var branch = root.Add(source);
+
+            if (Directory.Exists(resolved))
+            {
+                AddFiles(branch, resolved);
+            }
+            else if (File.Exists(resolved))
+            {
+                Remember(branch, resolved);
+            }
+            branch.Expand();
+        }
+
+        // References last and always, even when empty: a References node that
+        // appears only sometimes is one people stop looking for.
+        var references = root.Add("References");
+        foreach (var dependency in project.Dependencies)
+        {
+            references.Add(dependency.Name + " -- " + dependency.Describe());
+        }
+        foreach (var library in project.LibrariesFor(ProjectFile.ThisPlatform))
+        {
+            references.Add(library);
+        }
+
+        root.Expand();
+    }
+
+    /// Every `.sl` in a directory, and every directory under it.
+    ///
+    /// Sorted by the platform's own enumeration order, which on both systems is
+    /// what the file system gives -- not sorted here, because a tree that
+    /// reordered what the build sees would be lying about the build.
+    void AddFiles(TreeNode branch, String folder)
+    {
+        var folders = Directory.Directories(folder);
+        if (folders.Ok)
+        {
+            foreach (var inner in folders.Value)
+            {
+                var below = branch.Add(NameOf(inner));
+                AddFiles(below, inner);
+            }
+        }
+
+        var files = Directory.Files(folder);
+        if (!files.Ok)
+            return;
+
+        foreach (var file in files.Value)
+        {
+            if (file.EndsWith(".sl"))
+                Remember(branch.Add(NameOf(file)), file);
+        }
+    }
+
+    /// Ties a node to the file it stands for.
+    ///
+    /// Two parallel lists rather than a field on the node, because `TreeNode`
+    /// carries no tag and adding one would put a `String` on every node of
+    /// every tree in `forms/` for the sake of this one. A handful of files is a
+    /// handful of entries, and the search is over in microseconds.
+    void Remember(TreeNode node, String path)
+    {
+        _treeNodes.Add(node);
+        _treePaths.Add(path);
+    }
+
+    /// A node was double-clicked. A file opens; anything else does nothing.
+    void OnTreeChosen(Control sender)
+    {
+        var chosen = _tree.SelectedNode;
+        if (chosen == null)
+            return;
+
+        var node = (TreeNode)chosen;
+        for (nuint i = 0u; i < _treeNodes.Count; i++)
+        {
+            if (_treeNodes.At(i) == node)
+            {
+                if (!OpenFile(_treePaths.At(i)))
+                    Say("Could not read " + _treePaths.At(i));
+                return;
+            }
+        }
+    }
+
+    /// A row of the Error List was double-clicked, which goes to exactly where
+    /// the same diagnostic in Output goes -- one path through one model.
+    void OnErrorChosen(Control sender)
+    {
+        int row = _errors.SelectedIndex;
+        if (row < 0 || (nuint)row >= _errorLines.Count)
+            return;
+
+        GoToMessage(_errorLines.At((nuint)row));
     }
 
     // -------------------------------------------------------------- the rest
@@ -1245,6 +1537,102 @@ public class Shell : Form
             Application.DoEvents();
         }
 
+        // The panes, and what a self test can honestly say about them.
+        //
+        // **Not that anything is on the screen.** Three wells and a strip are
+        // exactly the kind of thing `forms/` passed 116 checks about while
+        // drawing nothing, so the arrangement is proved by screenshot and what
+        // is proved here is the model underneath: that each pane was made, that
+        // it landed on the edge the layout asked for, and that closing and
+        // reopening one is the same object rather than a new empty tree.
+        {
+            if (_dock.PaneCount != 3u)
+            {
+                Console.WriteLine("FAIL: expected three panes, found "
+                                  + Standard.Text.FromInteger(_dock.PaneCount));
+                ok = false;
+            }
+
+            if (_dock.EdgeOf(Panes.Solution) != DockEdge.Left)
+            {
+                Console.WriteLine("FAIL: the tree is not in the left well");
+                ok = false;
+            }
+            if (_dock.EdgeOf(Panes.Errors) != DockEdge.Bottom
+                || _dock.EdgeOf(Panes.Output) != DockEdge.Bottom)
+            {
+                Console.WriteLine("FAIL: the build's panes are not in the bottom well");
+                ok = false;
+            }
+
+            // A pane nobody has heard of is not held, which is what makes
+            // `Reveal` safe to call from a menu that outlives a pane.
+            if (_dock.Holds("toolbox") || _dock.Reveal("toolbox"))
+            {
+                Console.WriteLine("FAIL: a pane that does not exist was found");
+                ok = false;
+            }
+
+            // Closing hides rather than destroys. The tree inside the pane is
+            // live and the IDE is still holding it, so what comes back must be
+            // the same one -- with the project still in it.
+            nuint rooted = _tree.Nodes.Count;
+            if (!_dock.Close(Panes.Solution))
+            {
+                Console.WriteLine("FAIL: closing the tree pane did nothing");
+                ok = false;
+            }
+            Application.DoEvents();
+
+            if (_dock.Showing(Panes.Solution))
+            {
+                Console.WriteLine("FAIL: a closed pane is still showing");
+                ok = false;
+            }
+            if (!_dock.Holds(Panes.Solution))
+            {
+                Console.WriteLine("FAIL: a closed pane was destroyed rather than hidden");
+                ok = false;
+            }
+
+            if (!_dock.Reveal(Panes.Solution))
+            {
+                Console.WriteLine("FAIL: a closed pane could not be reopened");
+                ok = false;
+            }
+            Application.DoEvents();
+
+            if (!_dock.Showing(Panes.Solution))
+            {
+                Console.WriteLine("FAIL: reopening the tree pane did not show it");
+                ok = false;
+            }
+            if (_tree.Nodes.Count != rooted)
+            {
+                Console.WriteLine("FAIL: reopening the tree pane lost what was in it");
+                ok = false;
+            }
+
+            // What is about to be written is what is on the screen, which is
+            // the one thing `Remember` exists to guarantee -- a splitter drag
+            // raises nothing, so the sizes are read back off the controls.
+            _dock.Remember();
+            var written = ParseLayout(WriteLayout(_dock.Layout));
+            if (written.Find(Panes.Solution) == null
+                || written.Find(Panes.Errors) == null
+                || written.Find(Panes.Output) == null)
+            {
+                Console.WriteLine("FAIL: the layout about to be saved lost a pane");
+                ok = false;
+            }
+            if (written.LeftWidth < SmallestWell || written.LeftWidth > LargestWell)
+            {
+                Console.WriteLine("FAIL: the saved left width is out of range at "
+                                  + Standard.Text.FromInteger((long)written.LeftWidth));
+                ok = false;
+            }
+        }
+
         // The project, which is what makes Build mean the program rather than
         // the file. Opening a file inside the fixture should find it without
         // anyone asking -- which is the behaviour, not just the reader.
@@ -1292,7 +1680,8 @@ public class Shell : Form
 
         if (ok)
         {
-            Console.WriteLine("  editing, undo, lexing, the clipboard, text size, tabs and the project");
+            Console.WriteLine("  editing, undo, lexing, the clipboard, text size, tabs,");
+            Console.WriteLine("  the project and the docked panes");
         }
         return ok;
     }

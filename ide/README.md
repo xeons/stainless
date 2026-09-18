@@ -1,8 +1,9 @@
 # An IDE for Stainless, written in Stainless
 
 > **An extreme rough draft**, like everything else here — and younger than most
-> of it. What works is an editor with real syntax highlighting, a build that
-> runs the compiler, and an error line that takes you to the line it names.
+> of it. What works is a docked window in the Visual Studio arrangement, an
+> editor with real syntax highlighting, a project tree, a build that runs the
+> compiler, and an error line that takes you to the line it names.
 
 ```
 dotnet build Stainless.slnx      # the compiler, which the IDE drives
@@ -64,6 +65,20 @@ were fixed — the IDE is what found every one of them.
   to the last save clears the asterisk, because the file on disk is what is in
   front of you again — which a latched "modified" flag cannot say.
 - **Open, save, save-as**, with the file's own line endings kept.
+- **Docked tool windows**, in the Visual Studio arrangement: a Solution
+  Explorer down the left, an Error List and an Output pane tabbed together
+  along the bottom, and the editors in the middle. Splitters size the wells,
+  the close box hides a pane and the pin auto-hides it to a labelled strip on
+  its edge that slides back out on hover. Where everything is — which edge,
+  pinned or not, how wide — is remembered between runs.
+- **A Solution Explorer** over the project: its `sources` roots walked on disk,
+  a References node listing dependencies and linker libraries, and a
+  double-click that opens a file. It shows what the *build* will see rather
+  than a file list kept in step by hand, because a Stainless project names
+  directories rather than files.
+- **An Error List**, one row per diagnostic with severity, code, message, file
+  and line, beside the raw Output. Double-clicking either goes to the same
+  place, through one model rather than two.
 
 ## What does not exist yet
 
@@ -79,13 +94,19 @@ Named honestly, since the point of the page is to say where the edges are.
 - **No debugger.** The compiler already emits DWARF and CodeView under `-g`, so
   the intended shape is gdb and lldb driven over the MI2 protocol rather than a
   second debugger written here.
-- **No project tree.** The project itself is read now — `stainless.json`, the
-  same file the compiler reads, found by walking up from whatever file was
-  opened — and Build builds *it* rather than the file in front, which is what
-  makes a program of two files buildable from here at all. What is missing is
-  somewhere to show it: a file is still reached through Open rather than
-  browsed to. A diagnostic in a file that is not open does open it, which is
-  what tabs made possible.
+- **Panes do not float and cannot be dragged between edges.** A pane's edge is
+  read from the layout file and honoured, so hand-editing
+  `%APPDATA%/Stainless/ide/layout.json` moves one today — but there is no drag,
+  and nothing floats into a window of its own. Both need a drag with a
+  dock-target preview and one of them needs a second top-level window; neither
+  is what separates an editor from an IDE. *Reset layout* on the View menu says
+  it takes effect next time, and that is honest rather than lazy: a control
+  belongs to the parent it was constructed with and `forms/` cannot move it, so
+  putting a pane back on an edge it was not built on is the one thing that
+  cannot happen live.
+- **No Properties window yet.** The name is reserved in the layout file and the
+  right-hand well is built and empty until there is something to put in it.
+
 - **Undo does not reach across files.** Each document has its own stack, which
   is right, and there is no single "undo the last thing I did anywhere".
 - **No keyboard shortcut for text size.** `+` and `-` are OEM virtual keys and
@@ -114,20 +135,29 @@ ide/src/Editor/Theme.sl     what each kind of token is drawn in
 ide/src/Editor/CodeEditor.sl the control that draws it and edits it
 ide/src/Project/Project.sl  stainless.json, read and written
 ide/src/Build/Diagnostics.sl what the compiler said, out of its JSON
-ide/src/App/Shell.sl        the window: menu, editor, output, status
+ide/src/Shell/Layout.sl     which pane is where, and how wide -- no controls
+ide/src/Shell/DockHost.sl   the wells, the splitters and the auto-hide strips
+ide/src/App/Shell.sl        the window: menu, panes, editors, status
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
 ide/tests/buildtest.sl      the diagnostic reader, on real compiler output
 ide/tests/projecttest.sl    the project reader, on files that are awkward
+ide/tests/docktest.sl       the layout model, on files a newer build wrote
 ide/tests/fixture/          a two-file project, which is the smallest thing
                             that fails if Build ever compiles one file again
 ```
 
-**Three of those are modules rather than parts of the window**, and the reason
-is the same each time: `Ide.Project` and `Ide.Build` mention no control, so a
-console harness can test them without linking a widget set or opening a
-display. `BuildMessage` was a struct at the bottom of `Shell.sl` and moving it
-is what made `buildtest.sl` possible at all.
+**Four of those are modules rather than parts of the window**, and the reason is
+the same each time: `Ide.Project`, `Ide.Build` and `Ide.Shell`'s `Layout.sl`
+mention no control, so a console harness can test them without linking a widget
+set or opening a display. `BuildMessage` was a struct at the bottom of
+`Shell.sl` and moving it is what made `buildtest.sl` possible at all.
+
+`Ide.Shell` is deliberately split down that line rather than by subject: a
+layout is a list of placements and three sizes, and *that* can be checked
+without a screen — it round-trips, a width of 40000 is capped, and a file from a
+build with different panes does not take the window down. What cannot be checked
+that way is whether any of it appears, which is what the screenshots are for.
 
 Three decisions carry most of it.
 
