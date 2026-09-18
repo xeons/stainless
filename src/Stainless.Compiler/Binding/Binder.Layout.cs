@@ -34,6 +34,32 @@ public sealed partial class Binder
         var inProgress = new HashSet<NamedTypeSymbol>();
         foreach (var type in _modules.Values.SelectMany(m => m.Types.Values))
             ComputeLayout(type, inProgress);
+
+        // A tuple is laid out here rather than where it was interned, which is
+        // in the middle of resolving the field that first named it: a struct
+        // reached from there has no fields yet, so it was laid out as an empty
+        // one and marked done, and `struct S { (S, int) pair; }` came out four
+        // bytes wide with nothing reported. Every other struct the binder makes
+        // for itself is already laid out by now, and a second call returns at
+        // once, so this costs the walk and nothing else.
+        foreach (var structType in _structs)
+            ComputeLayout(structType, inProgress);
+
+        // A body may name a tuple no signature did, and bodies are bound two
+        // passes after this one. From here a tuple is laid out where it is
+        // interned, as it always was: nothing a body writes can make a struct
+        // contain itself, because every struct it can name is laid out already.
+        _layoutsComputed = true;
+    }
+
+    /// <summary>Whether pass 7 has run, which decides when a tuple is laid out.</summary>
+    private bool _layoutsComputed;
+
+    /// <summary>Lays out a type the binder interned after pass 7.</summary>
+    private void LayOutIfLate(NamedTypeSymbol type)
+    {
+        if (_layoutsComputed)
+            ComputeLayout(type, []);
     }
 
     /// <summary>

@@ -76,7 +76,7 @@ public sealed partial class Binder
 
         _tuples[key] = tuple;
         _structs.Add(tuple);
-        ComputeLayout(tuple, []);
+        LayOutIfLate(tuple);
         return tuple;
     }
 

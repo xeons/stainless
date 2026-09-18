@@ -712,24 +712,28 @@ public class BinderTests
     [InlineData("struct S { int bits : 3; S self; }")]
     [InlineData("union S { int n; S self; }")]
     [InlineData("variant S { Leaf; Node(S inner); }")]
+    [InlineData("struct S { (S, int) pair; }")]
+    [InlineData("struct S { (int, (S, byte)) nested; }")]
     public void AStructThatContainsItselfIsReportedAndSurvived(string declaration) =>
         Assert.Contains("SL0216", Front.ModuleCodes(WalkedEveryWay(declaration)));
 
     /// <summary>
-    /// Through a tuple, the same cycle is survived and <b>not</b> reported.
-    ///
-    /// A tuple is interned and laid out where it is first named, which for
-    /// <c>struct S { (S, int) pair; }</c> is in the middle of resolving the
-    /// field that names it: S has no fields yet when the tuple lays it out, so
-    /// the check inside layout has nothing to see, and by the layout pass S is
-    /// already marked done. What this pins is the half that is true — the walks
-    /// afterwards terminate — so that the day the cycle is reported, only the
-    /// half that is missing changes.
+    /// A tuple of ordinary structs is laid out by the C rules like any other
+    /// struct, which is what the cycle check above must not cost: the tuple was
+    /// laid out where it was interned, and moving that into the layout pass is
+    /// what let the cycle be seen at all.
     /// </summary>
     [Fact]
-    public void AStructThatContainsItselfThroughATupleIsNotYetReported() =>
-        Assert.DoesNotContain(
-            "SL0216", Front.ModuleCodes(WalkedEveryWay("struct S { (S, int) pair; }")));
+    public void ATupleIsLaidOutByTheCRules()
+    {
+        var holder = Front.Struct(
+            "public struct Point { public int X; public int Y; }\n" +
+            "public struct Holder { public (Point, int) Pair; public byte Tag; }",
+            "Holder");
+
+        Assert.Equal(16, holder.Size);
+        Assert.Equal(12, holder.Fields.Single(f => f.Name == "Tag").Offset);
+    }
 
     /// <summary>
     /// The declaration, and one of everything that walks a struct's fields

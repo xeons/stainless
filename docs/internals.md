@@ -16,8 +16,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 350 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,269 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 352 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,337 compiler unit tests
 ```
 
 The two suites ask different questions. An end-to-end case compiles, links and
@@ -55,8 +55,8 @@ it finds crashes and not miscompilations. Its first five minutes found two
 dozen crashes the suites had not, and a fixed one is pinned by an ordinary case
 like any other bug — the fuzzer's findings directory is not a test suite.
 
-**Both Windows and Linux are tested.** 350 cases, of which 13 are
-Windows-only and 2 are Linux-only, so Linux runs 337 and Windows 348, each
+**Both Windows and Linux are tested.** 352 cases, of which 13 are
+Windows-only and 2 are Linux-only, so Linux runs 339 and Windows 350, each
 skipping the other's. A case whose *subject* differs by platform — `Path.Join` writes a
 different separator, and `\x` is rooted on one and an ordinary name on the
 other — carries an `expected.linux.txt` beside its `expected.txt` rather than
