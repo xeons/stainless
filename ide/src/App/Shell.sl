@@ -392,6 +392,7 @@ public class Shell : Form
         file.Add("&Open...").Click += this.OnOpen;
         file.Add("Open &project...").Click += this.OnOpenProject;
         file.Add("C&lose project").Click += this.OnCloseProject;
+        file.Add("P&roperties...").Click += this.OnProjectProperties;
         file.Add("&Save").Click += this.OnSave;
         file.Add("Save &As...").Click += this.OnSaveAs;
         file.Add(MenuItem.Separator());
@@ -1200,6 +1201,68 @@ public class Shell : Form
 
 
 
+    // ------------------------------------------------- the project properties
+
+    /// Edits `stainless.json` in a window, and writes it back on OK.
+    ///
+    /// **Modal, and the model is only touched if OK is pressed.** The tree, the
+    /// build and the title all read the project in front, so a dialog that
+    /// edited it live would have every other pane showing something half
+    /// changed. The dialog fills itself from the project and writes back in one
+    /// pass, which makes Cancel genuinely nothing having happened.
+    ///
+    /// **The file is re-read after writing**, rather than keeping the object the
+    /// dialog edited. The writer emits only what differs from a default, so what
+    /// lands on disk is not always field-for-field what went in -- and the model
+    /// the window goes on using should be the one a fresh start would get, not a
+    /// slightly richer one only this session has.
+    void OnProjectProperties(MenuItem sender)
+    {
+        if (_project == null)
+        {
+            Say("No project is open.");
+            return;
+        }
+
+        var project = (ProjectFile)_project;
+        var dialog = new ProjectDialog();
+        dialog.Load(project);
+        dialog.ShowModal();
+
+        if (!dialog.Accepted)
+        {
+            Say("Properties unchanged.");
+            return;
+        }
+
+        // **A guard, not a validation.** The dialog has already read itself
+        // back into the project; this asks whether what came out could possibly
+        // be right. It exists because the first version of this read the
+        // controls *after* the window had closed -- when a `TextBox`'s text is
+        // gone, because it lives in the native control -- and wrote a project
+        // with no name and no sources over a working one. That bug is fixed at
+        // its cause, and this stands between the next one and somebody's file.
+        if (project.Name == "" || project.Sources.Length == 0u)
+        {
+            Show("refusing to write a project with no name or no sources");
+            Say("Properties not saved.");
+            return;
+        }
+
+        var written = Project.Write(project, _projectPath);
+        if (!written.Ok)
+        {
+            Show(written.Error);
+            Say("Could not write " + _projectPath);
+            return;
+        }
+
+        if (!OpenProject(_projectPath))
+            return;
+
+        Say("Project saved.");
+    }
+
     // ------------------------------------------------------ find and replace
 
     /// Opens the find window, seeded from the selection.
@@ -1795,6 +1858,36 @@ public class Shell : Form
 
             CloseTab(_open.At(_open.Count - 1u));
             Application.DoEvents();
+        }
+
+        // The three list fields the properties dialog edits as one line each.
+        // A trailing space must not become an entry that names nothing, which
+        // is what would send the compiler looking for a directory called "".
+        {
+            String[] round = ProjectDialog.Split(
+                ProjectDialog.Joined(["src", "../forms/src", "vendor"]));
+            if (round.Length != 3u || round[0u] != "src"
+                || round[1u] != "../forms/src" || round[2u] != "vendor")
+            {
+                Console.WriteLine("FAIL: a source list did not survive the round trip");
+                ok = false;
+            }
+
+            if (ProjectDialog.Split("  a   b  ").Length != 2u)
+            {
+                Console.WriteLine("FAIL: runs of spaces made empty entries");
+                ok = false;
+            }
+            if (ProjectDialog.Split("   ").Length != 0u)
+            {
+                Console.WriteLine("FAIL: a field of spaces was not empty");
+                ok = false;
+            }
+            if (ProjectDialog.Joined([]) != "")
+            {
+                Console.WriteLine("FAIL: an empty list did not join to nothing");
+                ok = false;
+            }
         }
 
         // Find and replace, which is entirely model and so is entirely

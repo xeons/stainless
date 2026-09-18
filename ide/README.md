@@ -88,6 +88,12 @@ were fixed — the IDE is what found every one of them.
   the close box hides a pane and the pin auto-hides it to a labelled strip on
   its edge that slides back out on hover. Where everything is — which edge,
   pinned or not, how wide — is remembered between runs.
+- **Project properties**, a tabbed window over `stainless.json` — General,
+  Build, References and Paths, grouped as [docs/packages.md](../docs/packages.md)
+  describes the format rather than by what fits on a page. Modal, and nothing
+  reaches the project until OK; the file is re-read afterwards, because the
+  writer emits only what differs from a default and the model the window goes on
+  using should be what a fresh start would get.
 - **A Solution Explorer** over the project: its `sources` roots walked on disk,
   a References node listing dependencies and linker libraries, and a
   double-click that opens a file. It shows what the *build* will see rather
@@ -121,8 +127,18 @@ Named honestly, since the point of the page is to say where the edges are.
   belongs to the parent it was constructed with and `forms/` cannot move it, so
   putting a pane back on an edge it was not built on is the one thing that
   cannot happen live.
-- **No Properties window yet.** The name is reserved in the layout file and the
-  right-hand well is built and empty until there is something to put in it.
+- **No Properties *pane*.** Project properties are a dialog, which is the right
+  shape for editing a file; a docked property grid over a selected control is a
+  designer feature and waits for one. The name is reserved in the layout file
+  and the right-hand well is built and empty until then.
+- **`sources`, `defines` and `libraries` are edited as one space-separated
+  line each.** Short lists of short words, where a text field shows the whole of
+  it at once and three buttons round a list box does not — but a path with a
+  space in it cannot be written that way, and nothing quotes yet.
+- **Dependencies are shown, not edited.** A dependency is a name, a source, a
+  version requirement and a link mode; editing one properly is its own dialog,
+  and a half-editor that dropped the fields it did not show would be worse than
+  a list.
 
 - **Undo does not reach across files.** Each document has its own stack, which
   is right, and there is no single "undo the last thing I did anywhere".
@@ -152,6 +168,7 @@ ide/src/Shell/Layout.sl     which pane is where, and how wide -- no controls
 ide/src/Shell/DockHost.sl   the wells, the splitters and the auto-hide strips
 ide/src/App/Shell.sl        the window: menu, panes, editors, status
 ide/src/App/FindDialog.sl   find and replace, over whichever tab is in front
+ide/src/App/ProjectDialog.sl stainless.json, edited in four pages
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
 ide/tests/buildtest.sl      the diagnostic reader, on real compiler output

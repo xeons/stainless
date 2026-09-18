@@ -256,6 +256,25 @@ thread that is allowed to, and the answer arrives through the message loop the
 program already has. Nothing changes colour and there is no state machine, which
 is what real threads buy — [docs/concurrency.md §12](../docs/concurrency.md).
 
+**A modal window no longer takes the program down with it.** `ShowModal` runs a
+loop of its own, and `WM_DESTROY` ended it by calling `PostQuitMessage` — which
+puts `WM_QUIT` on the *thread's* queue rather than a window's. The modal loop
+leaves on its own flag without ever dequeuing it, so the message sat there until
+the application's loop picked it up and exited. Closing any dialog closed the
+whole program, and nothing about the dialog was wrong by then, which is what
+made it hard to see. Clearing the flag is sufficient: `WM_DESTROY` arrives inside
+the modal loop's own `DispatchMessageW`, so the `while` re-reads it the moment
+that returns.
+
+**The modal loop also does the keyboard pre-processing the main loop always
+did.** `IsDialogMessageW` is what makes Tab move between controls and the arrows
+move within a radio group, and `ShowModal` never called it — so a dialog, the one
+window where that matters most, had none of it. Escape is handled just above it
+rather than through it: `IsDialogMessageW` turns Escape into a `WM_COMMAND`
+carrying `IDCANCEL`, which means something only to a real dialog box with a
+control of that id, and these are ordinary windows. Claiming id 2 in `WM_COMMAND`
+was the alternative and could not be told apart from a menu item numbered 2.
+
 **`Control.DoubleClick` is raised, which it was not for a long time.** The event
 was declared and `OnDoubleClick` existed, and nothing on either backend ever
 called it — so every handler attached to it anywhere was dead, silently, and the

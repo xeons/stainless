@@ -207,6 +207,29 @@ uint ExtendedStyleForBorder(WindowBorder border)
 // ============================================================ the top window
 
 /// A top-level window.
+/// Whether the keyboard did something to a window rather than to a control.
+///
+/// At module level rather than on the widget set because **two** loops need it
+/// and only one had it: the application's loop called it and `ShowModal`'s did
+/// not, so a modal dialog had no Tab between its controls, no arrows within a
+/// radio group and no Escape to cancel -- the three things that make a dialog
+/// feel like a dialog. The widget set keeps a method of the old name that
+/// forwards here, since that is where the reasoning is documented.
+bool DialogKey(Msg* message)
+{
+    if (message->Message < WmKeyFirst || message->Message > WmKeyLast)
+        return false;
+    HWND top = GetAncestor(message->Window, GaRoot);
+    if (top == null)
+        return false;
+    // Only windows of this library's own class, so a message bound for a
+    // dialog Windows is running -- a message box, a file chooser -- is left
+    // entirely alone.
+    if (PeerOf(top) == null)
+        return false;
+    return IsDialogMessageW(top, message) != 0;
+}
+
 public class WindowPeer : ControlPeer, IWindowPeer
 {
     weak IWindowNotify? owningWindow;
@@ -259,12 +282,23 @@ public class WindowPeer : ControlPeer, IWindowPeer
         {
             if (held != null)
                 ((IWindowNotify)held).OnPlatformClosed();
-            if (_running)
-            {
-                _running = false;
-                // A modal window runs its own loop; this is what ends it.
-                PostQuitMessage(0);
-            }
+
+            // A modal window runs its own loop, and clearing the flag is the
+            // whole of what ends it.
+            //
+            // **It must not post a quit**, which is what this did and what made
+            // closing any modal dialog exit the whole program. `PostQuitMessage`
+            // puts `WM_QUIT` on the *thread's* queue, not a window's: the modal
+            // loop leaves on the flag without ever dequeuing it, so the message
+            // sits there until the application's own loop picks it up and takes
+            // the program down with it. Nothing about the dialog is wrong by
+            // then, which is what makes it hard to see.
+            //
+            // No wake-up is needed in its place. `WM_DESTROY` arrives inside the
+            // modal loop's own `DispatchMessageW`, so the `while` re-reads the
+            // flag the moment that returns; there is no blocked `GetMessageW`
+            // to rescue.
+            _running = false;
             return 0;
         }
 
@@ -491,6 +525,29 @@ public class WindowPeer : ControlPeer, IWindowPeer
             int got = GetMessageW(&message, null, 0u, 0u);
             if (got <= 0)
                 break;
+            // **Escape closes a modal window**, which nothing else would do.
+            // `IsDialogMessageW` turns Escape into a `WM_COMMAND` carrying
+            // `IDCANCEL`, and that only means anything to a real dialog box
+            // with a control of that id -- these are ordinary windows, so it
+            // arrives as a command nobody claims and Escape does nothing.
+            // Handled here rather than by claiming id 2 in `WM_COMMAND`, where
+            // it could not be told apart from a menu item numbered 2.
+            //
+            // Through `WM_CLOSE` rather than `DestroyWindow`, so that a window
+            // which refuses to close still refuses when asked this way.
+            if (message.Message == WmKeyDown && (int)message.WParam == VkEscape
+                && GetAncestor(message.Window, GaRoot) == window)
+            {
+                SendMessageW(window, WmClose, 0u, 0);
+                continue;
+            }
+
+            // The same pre-processing the application's loop does, which this
+            // loop did not -- so Tab and the arrows move between the controls
+            // of a dialog instead of being dispatched raw at whatever happens
+            // to have the focus.
+            if (DialogKey(&message))
+                continue;
             TranslateMessage(&message);
             DispatchMessageW(&message);
         }
@@ -917,22 +974,10 @@ public class Win32WidgetSet : IWidgetSet
     /// the message was handled and must not be dispatched again; dispatching it
     /// anyway is what makes Tab type a tab character into the text box it just
     /// left.
-    bool Navigated(Msg* message)
-    {
-        if (message->Message < WmKeyFirst || message->Message > WmKeyLast)
-        {
-            return false;
-        }
-        HWND top = GetAncestor(message->Window, GaRoot);
-        if (top == null)
-            return false;
-        // Only windows of this library's own class, so a message bound for a
-        // dialog Windows is running -- a message box, a file chooser -- is left
-        // entirely alone.
-        if (PeerOf(top) == null)
-            return false;
-        return IsDialogMessageW(top, message) != 0;
-    }
+    /// **The body is `DialogKey`, at module level**, because `ShowModal` runs a
+    /// loop of its own and needs the same pre-processing -- and it is not a
+    /// method of this class.
+    bool Navigated(Msg* message) => DialogKey(message);
 
     public void QuitEventLoop() => PostQuitMessage(0);
 
