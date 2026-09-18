@@ -70,6 +70,18 @@ were fixed — the IDE is what found every one of them.
   to the last save clears the asterisk, because the file on disk is what is in
   front of you again — which a latched "modified" flag cannot say.
 - **Open, save, save-as**, with the file's own line endings kept.
+- **Find and replace**, in a modeless window so the text stays reachable while
+  it is open — Find Next, Replace, Replace All, and Match case. It searches
+  whichever tab is in front *at the moment a button is pressed* rather than the
+  one that was in front when it opened, and it is kept rather than rebuilt, so
+  the last search survives closing it.
+- **Closing a tab asks**, with Save, Discard and Cancel — three answers, because
+  Cancel is the one people reach for when they hit close by mistake and is the
+  one a two-button prompt cannot say. Closing the window asks about every edited
+  tab in turn.
+- **A project build saves every edited tab**, not only the one in front, because
+  the compiler reads the directories the project names and an unsaved change in
+  another tab is one it will not see.
 - **Docked tool windows**, in the Visual Studio arrangement: a Solution
   Explorer down the left, an Error List and an Output pane tabbed together
   along the bottom, and the editors in the middle. Splitters size the wells,
@@ -117,16 +129,12 @@ Named honestly, since the point of the page is to say where the edges are.
 - **No keyboard shortcut for text size.** `+` and `-` are OEM virtual keys and
   `Forms`' `Key` enum does not name them yet, so it is the menu or Ctrl and the
   wheel. Cut, copy and paste do have their usual keys.
-- **Closing a tab does not ask.** Unsaved work goes without a prompt, which
-  wants a dialog and a decision about what "discard" means.
 - **The build's output arrives all at once**, at the end. The build itself no
   longer blocks the window — it runs on `Background.Run`, which is the thread
   and the queue `Forms` has had for this all along — but `Process.Run` captures
   both streams and answers when the child exits, so there is nothing to report
   from as it goes. A build that streams wants a `Standard.Process` handing back
   its pipes as they fill, which is a change below the IDE rather than in it.
-- **A project build saves only the file in front.** It should save every edited
-  tab, and that wants a decision about tabs that have never had a name.
 
 ---
 
@@ -143,6 +151,7 @@ ide/src/Build/Diagnostics.sl what the compiler said, out of its JSON
 ide/src/Shell/Layout.sl     which pane is where, and how wide -- no controls
 ide/src/Shell/DockHost.sl   the wells, the splitters and the auto-hide strips
 ide/src/App/Shell.sl        the window: menu, panes, editors, status
+ide/src/App/FindDialog.sl   find and replace, over whichever tab is in front
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
 ide/tests/buildtest.sl      the diagnostic reader, on real compiler output

@@ -81,6 +81,11 @@ public class Shell : Form
 
     MenuItem _themeItem;
 
+    /// The find window, made the first time it is asked for and kept after
+    /// that -- so the last search and the Match case tick survive closing it.
+    /// Null until then: a window nobody has asked for should not be built.
+    FindDialog? _finder;
+
     /// The size every editor's text is, kept here rather than on an editor
     /// because it is a preference of the program's and not of one file's.
     int _textSize;
@@ -131,6 +136,7 @@ public class Shell : Form
         _treePaths = new List<String>();
         _project = null;
         _projectPath = "";
+        _finder = null;
         _building = false;
         _compiler = FindCompiler();
         _textSize = 10;
@@ -402,6 +408,9 @@ public class Shell : Form
         edit.Add("&Paste").Click += this.OnPaste;
         edit.Add(MenuItem.Separator());
         edit.Add("Select &all").Click += this.OnSelectAll;
+        edit.Add(MenuItem.Separator());
+        edit.Add("&Find and replace...").Click += this.OnFind;
+        edit.Add("Find &next").Click += this.OnFindNext;
 
         var build = _bar.Add("&Build");
         build.Add("&Build").Click += this.OnBuild;
@@ -477,7 +486,67 @@ public class Shell : Form
         int at = _book.SelectedIndex;
         if (at < 0 || (nuint)at >= _open.Count)
             return;
-        CloseTab(_open.At((nuint)at));
+        var tab = _open.At((nuint)at);
+        if (!MayClose(tab))
+            return;
+        CloseTab(tab);
+    }
+
+    /// Offers to save a tab that has been edited. Answers whether closing it
+    /// should go ahead.
+    ///
+    /// **Three answers, not two.** Yes saves and closes, No discards and
+    /// closes, and Cancel leaves everything as it was -- which is the one a
+    /// two-button prompt cannot express and the one people reach for when they
+    /// realise they hit close by mistake. `YesNoCancel` is what every editor
+    /// uses here for exactly that reason.
+    ///
+    /// **A tab that has never been named still asks.** It has no path, so
+    /// saying yes opens the Save As dialog, and cancelling *that* has to cancel
+    /// the close too -- otherwise declining to choose a filename throws the
+    /// work away, which is the same accident the prompt exists to prevent.
+    ///
+    /// True for a tab with nothing to lose, so the caller never has to ask
+    /// whether it was edited first.
+    bool MayClose(EditorTab tab)
+    {
+        if (!tab.Editor.Contents.Edited)
+            return true;
+
+        String name = NameOf(tab.Editor.Contents.Location);
+        if (name == "")
+            name = "this file";
+
+        var answer = Application.ShowMessage(
+            "Save the changes to " + name + " before closing it?",
+            "Stainless", MessageButtons.YesNoCancel, MessageIcon.Question);
+
+        if (answer == DialogResult.Yes)
+            return SaveTo(tab.Editor, tab.Editor.Contents.Location);
+
+        // Anything that is not an explicit Yes or No keeps the tab. A dialog
+        // that failed to open answers `None`, and treating that as "discard"
+        // would lose work because a window manager was busy.
+        return answer == DialogResult.No;
+    }
+
+    /// Every edited tab, asked about in turn. False as soon as one is
+    /// cancelled, leaving the rest untouched -- which is what cancelling the
+    /// whole operation means.
+    bool MayCloseAll()
+    {
+        // Backwards, because saying No to a tab closes it and shortens the
+        // list under the loop. Going forwards would skip the tab that slid
+        // into the index just visited, which is the classic way to lose one.
+        for (nuint i = _open.Count; i > 0u; i--)
+        {
+            nuint at = i - 1u;
+            if (at >= _open.Count)
+                continue;
+            if (!MayClose(_open.At(at)))
+                return false;
+        }
+        return true;
     }
 
     /// Saves an editor to `path`, or asks for one when it is empty. Answers
@@ -522,6 +591,7 @@ public class Shell : Form
     }
 
     void OnExit(MenuItem sender) => Close();
+
 
     // -------------------------------------------------------- the clipboard
 
@@ -874,11 +944,23 @@ public class Shell : Form
         return removed;
     }
 
-    /// The file in front, saved, or false when it could not be.
+    /// Everything that needs saving, saved, or false when something could not
+    /// be and the build should not start.
     ///
-    /// A project build still saves the file in front and nothing else, which is
-    /// the honest half-measure: saving every edited tab is what a project build
-    /// should do and wants a decision about tabs that have never had a name.
+    /// **Every edited tab when a project is open, not only the one in front.**
+    /// A project build compiles the directories the project names, so a change
+    /// sitting unsaved in another tab is a change the compiler will not see --
+    /// and the failure that produces is the worst kind: the build succeeds, or
+    /// fails in a file you are not looking at, and the source on screen does not
+    /// match what was compiled. Without a project the build is of one file, so
+    /// only that one is saved.
+    ///
+    /// **A tab that has never had a name is where this had to make a decision.**
+    /// The file in front gets the Save As dialog, because building it is a
+    /// direct instruction about that file. Any *other* unnamed tab is skipped
+    /// rather than prompted for: a build is not the moment to be asked to name
+    /// three scratch buffers, and an unnamed tab is in no directory the project
+    /// names, so the compiler was never going to read it.
     bool SaveBeforeBuilding()
     {
         var now = Current;
@@ -891,16 +973,43 @@ public class Shell : Form
         {
             if (!SaveTo(editor, ""))
                 return false;
-            path = editor.Contents.Location;
         }
         else if (editor.Contents.Edited && !editor.Contents.Save(path))
         {
             Say("Could not write " + path);
             return false;
         }
-
         RelabelFor(editor);
+
+        if (_project != null && !SaveEveryOtherTab(editor))
+            return false;
+
         Retitle();
+        return true;
+    }
+
+    /// The edited tabs that are not the one in front. False if one refused to
+    /// be written, naming it -- a build against a stale file on disk is worse
+    /// than no build.
+    bool SaveEveryOtherTab(CodeEditor except)
+    {
+        foreach (var tab in _open)
+        {
+            var editor = tab.Editor;
+            if (editor == except || !editor.Contents.Edited)
+                continue;
+
+            String path = editor.Contents.Location;
+            if (path.ByteLength() == 0u)
+                continue;
+
+            if (!editor.Contents.Save(path))
+            {
+                Say("Could not write " + path);
+                return false;
+            }
+            Relabel(tab);
+        }
         return true;
     }
 
@@ -1091,6 +1200,68 @@ public class Shell : Form
 
 
 
+    // ------------------------------------------------------ find and replace
+
+    /// Opens the find window, seeded from the selection.
+    ///
+    /// **Seeded from the selection**, because looking for the word under the
+    /// caret is what Find is for nine times out of ten -- and only when the
+    /// selection is on one line, since a multi-line selection is not something
+    /// a line-oriented search can look for and putting it in the box would
+    /// promise otherwise.
+    void OnFind(MenuItem sender)
+    {
+        var dialog = Finder();
+
+        var now = Current;
+        if (now != null)
+        {
+            var editor = (CodeEditor)now;
+            String chosen = editor.SelectedText;
+            if (chosen != "" && !chosen.Contains("\n"))
+                dialog.Needle = chosen;
+        }
+
+        dialog.Present();
+    }
+
+    /// Find Next without opening the window, which is what the menu item next
+    /// to it is for: once a search is set up, repeating it should not need the
+    /// dialog in front of the thing being searched.
+    void OnFindNext(MenuItem sender)
+    {
+        var now = Current;
+        if (now == null)
+            return;
+
+        var dialog = Finder();
+        if (dialog.Needle == "")
+        {
+            OnFind(sender);
+            return;
+        }
+
+        if (!((CodeEditor)now).FindNext(dialog.Needle, false, true))
+            Say("No more matches for '" + dialog.Needle + "'.");
+        else
+            Say("");
+    }
+
+    /// The find window, made on the first ask.
+    FindDialog Finder()
+    {
+        var made = _finder;
+        if (made != null)
+            return (FindDialog)made;
+
+        // The closure is why this dialog holds no editor: it asks for whichever
+        // one is in front at the moment a button is pressed, so changing tabs
+        // with the window open searches the tab now being looked at.
+        var dialog = new FindDialog(() => this.Current);
+        _finder = dialog;
+        return dialog;
+    }
+
     // ------------------------------------------------------------- the panes
 
     void OnShowSolution(MenuItem sender) => ShowPane(Panes.Solution, "Solution Explorer");
@@ -1134,6 +1305,16 @@ public class Shell : Form
         base.OnClosing(args);
         if (args.Cancel)
             return;
+
+        // Asked before the layout is written, and the layout is not written at
+        // all if the answer is no: a session that was not closed should not
+        // leave a saved arrangement behind, because the next thing the person
+        // does may be to move a pane and close properly.
+        if (!MayCloseAll())
+        {
+            args.Cancel = true;
+            return;
+        }
 
         _dock.Remember();
         SaveLayout(_arrangement, LayoutPath());
@@ -1609,6 +1790,127 @@ public class Shell : Form
             if (pad.HasSelection)
             {
                 Console.WriteLine("FAIL: an empty line selected something");
+                ok = false;
+            }
+
+            CloseTab(_open.At(_open.Count - 1u));
+            Application.DoEvents();
+        }
+
+        // Find and replace, which is entirely model and so is entirely
+        // checkable here -- the dialog is three text boxes over these methods.
+        {
+            var pad = AddTab(new Document()).Editor;
+            pad.Focus();
+            Application.DoEvents();
+            pad.Type("one two one\nthree ONE four\none");
+
+            pad.GoTo(0u, 0u);
+            if (!pad.FindNext("one", true, true) || pad.SelectedText != "one"
+                || pad.CaretPosition.Row != 0u)
+            {
+                Console.WriteLine("FAIL: the first match was not found");
+                ok = false;
+            }
+
+            // Again, which must advance rather than find the same one.
+            if (!pad.FindNext("one", true, true) || pad.CaretPosition.Row != 0u
+                || pad.CaretPosition.Column != 11u)
+            {
+                Console.WriteLine("FAIL: find next did not advance, landing at column "
+                                  + Standard.Text.FromInteger(pad.CaretPosition.Column));
+                ok = false;
+            }
+
+            // Case matters when it is asked to, so `ONE` on line 2 is skipped
+            // and the next match is the one on line 3.
+            if (!pad.FindNext("one", true, true) || pad.CaretPosition.Row != 2u)
+            {
+                Console.WriteLine("FAIL: a case-sensitive find matched the wrong case");
+                ok = false;
+            }
+
+            // And the search wraps back to the top rather than stopping.
+            if (!pad.FindNext("one", true, true) || pad.CaretPosition.Row != 0u)
+            {
+                Console.WriteLine("FAIL: the search did not wrap");
+                ok = false;
+            }
+
+            // Ignoring case reaches `ONE`, which the pass above walked past.
+            pad.GoTo(1u, 0u);
+            if (!pad.FindNext("one", false, true) || pad.CaretPosition.Row != 1u
+                || pad.SelectedText != "ONE")
+            {
+                Console.WriteLine("FAIL: a case-insensitive find missed 'ONE'");
+                ok = false;
+            }
+
+            // Something that is not there is not found, and wrapping must not
+            // turn that into a loop that never ends.
+            if (pad.FindNext("zebra", false, true))
+            {
+                Console.WriteLine("FAIL: found something that is not there");
+                ok = false;
+            }
+
+            // Replace acts on a selection that already matches, and otherwise
+            // only finds -- the first press selects, the second replaces.
+            pad.GoTo(0u, 0u);
+            if (pad.ReplaceCurrent("two", "2", true))
+            {
+                Console.WriteLine("FAIL: replace changed something without a match selected");
+                ok = false;
+            }
+            if (!pad.ReplaceCurrent("two", "2", true))
+            {
+                Console.WriteLine("FAIL: replace did not take the selected match");
+                ok = false;
+            }
+            if (pad.Contents.TextAt(0u) != "one 2 one")
+            {
+                Console.WriteLine("FAIL: after replace line one reads '"
+                                  + pad.Contents.TextAt(0u) + "'");
+                ok = false;
+            }
+
+            // Replace All counts what it did, reaches every line, and honours
+            // case -- `ONE` on line two stays.
+            nuint changed = pad.ReplaceAll("one", "1", true);
+            if (changed != 3u)
+            {
+                Console.WriteLine("FAIL: replace all changed "
+                                  + Standard.Text.FromInteger(changed) + " rather than 3");
+                ok = false;
+            }
+            if (pad.Contents.TextAt(0u) != "1 2 1"
+                || pad.Contents.TextAt(1u) != "three ONE four"
+                || pad.Contents.TextAt(2u) != "1")
+            {
+                Console.WriteLine("FAIL: replace all left '" + pad.Contents.TextAt(0u)
+                                  + "' / '" + pad.Contents.TextAt(1u)
+                                  + "' / '" + pad.Contents.TextAt(2u) + "'");
+                ok = false;
+            }
+
+            // The replacement containing the needle is the case that never
+            // terminates if the sweep wraps. It must replace each once.
+            nuint grown = pad.ReplaceAll("1", "11", true);
+            if (grown != 3u || pad.Contents.TextAt(0u) != "11 2 11")
+            {
+                Console.WriteLine("FAIL: a replacement containing the needle gave "
+                                  + Standard.Text.FromInteger(grown) + " and '"
+                                  + pad.Contents.TextAt(0u) + "'");
+                ok = false;
+            }
+
+            // And the whole thing is one undo per replacement rather than a
+            // document that cannot be put back.
+            while (pad.Undo()) { }
+            if (pad.Contents.TextAt(0u) != "")
+            {
+                Console.WriteLine("FAIL: undoing every replacement left '"
+                                  + pad.Contents.TextAt(0u) + "'");
                 ok = false;
             }
 

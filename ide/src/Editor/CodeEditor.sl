@@ -635,6 +635,172 @@ public class CodeEditor : CustomControl
         Caret = Rectangle.Of(x, y, 2, _lineHeight);
     }
 
+    // --------------------------------------------------------- find, replace
+
+    /// Finds `needle` after the caret and selects it. True when it found one.
+    ///
+    /// **Searched line by line, not over one big string.** The document is a
+    /// list of lines, and joining it to search would allocate the whole file on
+    /// every keystroke of an incremental find. The cost is that a needle
+    /// containing a newline is never found, which is stated here rather than
+    /// discovered: the find bar is a line-oriented tool, and a multi-line search
+    /// wants a different interface anyway.
+    ///
+    /// **From the end of the selection, not from the caret.** After a match is
+    /// found and selected, the caret is at its end and the anchor at its start;
+    /// searching again from the lower of those would find the same match
+    /// forever. Taking the higher is what makes Find Next advance.
+    ///
+    /// `wrap` decides what happens at the end of the file: true starts again at
+    /// the top, which is what a Find Next button does, and false stops, which is
+    /// what Replace All wants so that it terminates.
+    public bool FindNext(String needle, bool matchCase, bool wrap)
+    {
+        if (!_ready || needle.ByteLength() == 0u || _doc.LineCount == 0u)
+            return false;
+
+        var from = _caret.Before(_anchor) ? _anchor : _caret;
+        String wanted = matchCase ? needle : needle.ToLowerAscii();
+
+        // The line the caret is on, from the caret; then every line after it;
+        // then, if wrapping, from the top back to and including this one -- so
+        // a match earlier on the caret's own line is found last rather than
+        // skipped, which is the off-by-one this shape exists to avoid.
+        nuint rows = _doc.LineCount;
+        for (nuint step = 0u; step <= rows; step++)
+        {
+            nuint row = from.Row + step;
+            bool wrapped = row >= rows;
+            if (wrapped)
+            {
+                if (!wrap)
+                    return false;
+                row = row - rows;
+            }
+
+            String line = _doc.TextAt(row);
+            String hay = matchCase ? line : line.ToLowerAscii();
+
+            // Only the first line of the sweep starts part-way in.
+            nuint start = (step == 0u) ? from.Column : 0u;
+            if (start > hay.ByteLength())
+                continue;
+
+            long at = hay.IndexOf(wanted, start);
+            if (at < 0)
+                continue;
+
+            // The last step is the caret's own line come round again, and a
+            // match at or after where we began is one already reported.
+            if (wrapped && row == from.Row && (nuint)at >= from.Column)
+                return false;
+
+            SelectRange(row, (nuint)at, (nuint)at + needle.ByteLength());
+            return true;
+        }
+
+        return false;
+    }
+
+    /// Replaces the selection when it is already the thing being looked for,
+    /// then finds the next one. True when anything was replaced.
+    ///
+    /// **Replace does not replace what is not selected.** A Replace button
+    /// pressed when the selection is something else finds the next match and
+    /// changes nothing, which is what every editor does -- the first press
+    /// selects, the second replaces. Doing both at once means a stray click
+    /// silently edits a place nobody looked at.
+    public bool ReplaceCurrent(String needle, String with, bool matchCase)
+    {
+        if (!_ready || needle.ByteLength() == 0u)
+            return false;
+
+        String chosen = SelectedText;
+        bool matches = matchCase
+            ? chosen == needle
+            : chosen.ToLowerAscii() == needle.ToLowerAscii();
+
+        if (!matches)
+        {
+            FindNext(needle, matchCase, true);
+            return false;
+        }
+
+        var start = _caret.Before(_anchor) ? _caret : _anchor;
+        var end = _caret.Before(_anchor) ? _anchor : _caret;
+
+        _doc.Delete(start, end);
+        var landed = _doc.Insert(start, with);
+        _caret = landed;
+        _anchor = landed;
+        _keepWanted = false;
+
+        ShowCaret();
+        Invalidate();
+        OnCaretMoved();
+        OnEdited();
+
+        FindNext(needle, matchCase, true);
+        return true;
+    }
+
+    /// Replaces every occurrence and answers how many.
+    ///
+    /// **From the very top, and never wrapping**, which is what makes it
+    /// terminate. Wrapping would find the replacements again whenever the
+    /// replacement contains the needle -- `x` to `xx` is the case that never
+    /// ends -- and starting where the caret happens to be would quietly miss
+    /// everything above it.
+    public nuint ReplaceAll(String needle, String with, bool matchCase)
+    {
+        if (!_ready || needle.ByteLength() == 0u)
+            return 0u;
+
+        _caret = Position.At(0u, 0u);
+        _anchor = _caret;
+
+        nuint done = 0u;
+        while (FindNext(needle, matchCase, false))
+        {
+            var start = _caret.Before(_anchor) ? _caret : _anchor;
+            var end = _caret.Before(_anchor) ? _anchor : _caret;
+
+            _doc.Delete(start, end);
+            var landed = _doc.Insert(start, with);
+            _caret = landed;
+            _anchor = landed;
+            done++;
+        }
+
+        _keepWanted = false;
+        ShowCaret();
+        Invalidate();
+        OnCaretMoved();
+        if (done > 0u)
+            OnEdited();
+        return done;
+    }
+
+    /// Selects a run on one line and scrolls it into view.
+    void SelectRange(nuint row, nuint from, nuint to)
+    {
+        _anchor = Position.At(row, from);
+        _caret = Position.At(row, to);
+        _keepWanted = false;
+
+        // Into view the way `GoTo` does it, rather than only far enough: a
+        // match found at the bottom of the file should not sit on the last
+        // visible line with no context under it.
+        nuint visible = (nuint)VisibleLines;
+        if (row < _topLine || row >= _topLine + visible)
+            _topLine = row > visible / 3u ? row - visible / 3u : 0u;
+
+        Rescrolled();
+        ShowCaret();
+        Invalidate();
+        OnCaretMoved();
+    }
+
     // ------------------------------------------------------------ the mouse
 
     protected override void OnMouseDown(MouseEventArgs args)
