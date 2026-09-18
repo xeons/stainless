@@ -90,6 +90,19 @@ An interface is not the only thing that may follow the colon: a base class,
 another type parameter, `class`, `struct`, `new()` and `threadsafe` may too, and
 [§4.3](#43-what-a-constraint-does-and-does-not-do) lists what each demands.
 
+`where` is a **contextual** keyword, as it is in C#: it is read as one only in
+the two places a constraint clause may begin — after a type's base list, and
+after a generic method's parameter list — and is an ordinary identifier
+everywhere else. So `where` remains available as a parameter, a local, a field
+or a property name, which matters because it is an ordinary English noun that
+turns up in exactly those positions:
+
+```csharp
+String Describe<T>(T thing, String where) where T : IDescribable {
+    return thing.Describe() + "@" + where;
+}
+```
+
 ## 4.3 What a constraint does, and does not, do
 
 A constraint is **verified where the generic is instantiated**, and the error

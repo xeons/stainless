@@ -137,6 +137,20 @@ public sealed class Parser
     private bool AtAny(params TokenKind[] kinds) => kinds.Contains(Current.Kind);
 
     /// <summary>
+    /// Whether the current token is an ordinary identifier spelled
+    /// <paramref name="word"/> -- a contextual keyword.
+    ///
+    /// A word matched this way is a keyword only where the grammar has nowhere
+    /// else to go, and is a name everywhere else. That is worth the indirection
+    /// for exactly the reason C# spells <c>where</c>, <c>value</c> and
+    /// <c>yield</c> the same way: a reserved word is taken out of every
+    /// program's vocabulary for ever, and the ones a language adds late are the
+    /// ones most likely to already be somebody's variable.
+    /// </summary>
+    private bool AtContextual(string word) =>
+        At(TokenKind.Identifier) && Current.Text == word;
+
+    /// <summary>
     /// Consumes the current token, except the end of the file, which stays put.
     ///
     /// A position past the last token is a place no token is, and every
@@ -1889,11 +1903,26 @@ public sealed class Parser
     /// Parses any number of <c>where T : Shape, Named</c> clauses. They follow
     /// the base list and precede the body, as in C#.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>where</c> is <b>contextual</b>: the lexer makes an ordinary
+    /// identifier of it and only this loop reads it as a keyword. It can do
+    /// that because the two places a constraint clause may begin -- after a
+    /// type's base list, and after a generic method's parameter list -- admit
+    /// no identifier otherwise, so there is nothing to be ambiguous with.
+    /// </para>
+    /// <para>
+    /// It was a reserved word until it was not, and the cost of that was
+    /// entirely borne by programs: <c>where</c> is an ordinary noun that shows
+    /// up as a parameter and a local constantly, and reserving it failed those
+    /// uses with 'expected an identifier' pointing at a line that looked fine.
+    /// </para>
+    /// </remarks>
     private List<WhereClauseSyntax> ParseWhereClauses()
     {
         var clauses = new List<WhereClauseSyntax>();
 
-        while (At(TokenKind.WhereKeyword))
+        while (AtContextual("where"))
         {
             int start = _pos;
             Advance();

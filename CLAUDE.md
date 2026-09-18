@@ -178,9 +178,6 @@ them (`Take`, `Skip`, `Map`, `Filter`, `Find`, `Any`, `All`, `ForEach`, …):
   everywhere. A method named `Fail` will silently never be called — the only
   sign is SL0222, "this expression has no effect".
 
-**`where` cannot be a parameter name** — it is read as a generic constraint, and
-the error lands far from the cause.
-
 **Match the surrounding prose.** Documentation and commit messages here explain
 *why*, name the alternative that was rejected, and say what a thing costs. A
 `///` block states what a caller must know before using the declaration; a `//`

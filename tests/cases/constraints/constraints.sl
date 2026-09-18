@@ -206,5 +206,41 @@ int Main()
     Console.WriteLine("tag=" + tags.BestDescription());
 
     Kinds();
+    Contextual();
     return 0;
+}
+
+// ------------------------------------------------- `where` is not a keyword
+
+// `where` is contextual: a keyword only where a constraint clause may begin,
+// and an ordinary name everywhere else. It reads as a keyword twice on the
+// next line and as a parameter once, which is the whole of the rule.
+String Describe<T>(T thing, String where) where T : IDescribable
+{
+    // And as a local, shadowing nothing, in a body that also calls a method
+    // on the constrained parameter.
+    String what = thing.Describe();
+    return what + "@" + where;
+}
+
+public class Landmark
+{
+    // As a field and as a property, both of which read the word in a position
+    // a declaration starts -- where a reserved word fails differently again.
+    String where;
+
+    public Landmark(String at) => where = at;
+
+    public String Where => where;
+}
+
+void Contextual()
+{
+    Console.WriteLine("where=" + Describe(new Money(45), "till"));
+    Console.WriteLine("field=" + new Landmark("pier").Where);
+
+    // A local of that name outside any generic, followed by a statement that
+    // begins with an identifier -- the shape a contextual match could swallow.
+    String where = "here";
+    Console.WriteLine("local=" + where);
 }
