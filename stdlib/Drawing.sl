@@ -997,7 +997,7 @@ threadsafe sealed class Backend
                 into[at + 1u] = (byte)((colour >> 8) & 0xFFu);
                 into[at + 2u] = (byte)((colour >> 16) & 0xFFu);
                 into[at + 3u] = (byte)((colour >> 24) & 0xFFu);
-                at = at + 4u;
+                at += 4u;
             }
         }
         return true;

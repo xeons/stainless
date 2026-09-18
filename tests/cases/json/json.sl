@@ -89,6 +89,20 @@ public class Person
 // private storage and filling one would mean calling `Add`. What cannot be
 // walked is left out rather than misstated -- writing `null` for it says the
 // value was absent when it was not.
+// An array field the constructor never sized. There is no length for a reader
+// to fill in place, which used to mean the document was dropped and the field
+// stayed null -- so an array had to be pre-sized by a constructor that could
+// not know the size.
+[Reflect]
+public class Sparse
+{
+    public String Name;
+    public String[] Tags;
+    public int[] Counts;
+
+    public Sparse() => Name = "kept";
+}
+
 [Reflect]
 public class Bag
 {
@@ -239,6 +253,19 @@ public int Main()
     shorter.Tags[0u] = "kept";
     Json.Populate(shorter, "{\"Tags\":[]}");
     Say("array-shorter", Json.Serialize(shorter));
+
+    // An array the constructor never made. The elements have already been
+    // parsed by the time this is reached, so taking the length from the
+    // document costs an allocation the document has paid for.
+    var sparse = new Sparse();
+    Json.Populate(sparse, "{\"Tags\":[\"a\",\"b\",\"c\"],\"Counts\":[4,5]}");
+    Say("array-null", Json.Serialize(sparse));
+
+    // And an empty one is still an array rather than a null, so a reader can
+    // tell "the document said none" from "the document said nothing".
+    var none = new Sparse();
+    Json.Populate(none, "{\"Tags\":[]}");
+    Say("array-empty", Json.Serialize(none));
 
     return 0;
 }

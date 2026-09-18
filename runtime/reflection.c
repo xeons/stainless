@@ -301,6 +301,37 @@ size_t sl_field_element_size(const void *field)
     return ((const SlFieldInfo *)field)->elementSize;
 }
 
+/*
+ * A new array for an array-typed field, of a length nothing knew at compile
+ * time.
+ *
+ * This is the one thing reflection could not do about an array. Elements could
+ * be read and written, and the stride made that possible without knowing the
+ * element type -- but there was no way to *make* one, so a document that said
+ * how many elements it had could only be read into an array that already
+ * happened to be the right length. That is why Standard.Json could round-trip
+ * an array and not fill one.
+ *
+ * Everything it takes was already here. The field's own record carries the
+ * array type -- the same record sl_array_alloc takes when the compiler emits a
+ * `new T[n]` -- and the stride beside it, and the type's destroy hook already
+ * knows whether the elements are references and how to walk them. So this adds
+ * no knowledge, only an entry point: nothing about the header, the layout or
+ * the lifetime is decided here.
+ *
+ * Null when the field is not an array, or is one the compiler recorded no type
+ * for. The caller writes the result through sl_write_reference, which retains
+ * it, so the array is owned by the object it was written into.
+ */
+void *sl_field_new_array(const void *field, size_t length)
+{
+    const SlFieldInfo *info = (const SlFieldInfo *)field;
+
+    if (info->kind != SL_KIND_ARRAY || info->type == NULL) return NULL;
+
+    return sl_array_alloc(info->type, length, info->elementSize);
+}
+
 /* The elements begin immediately after the header, as sl_array_alloc lays them out. */
 void *sl_array_data(void *array)
 {

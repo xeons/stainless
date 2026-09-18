@@ -57,6 +57,11 @@ if ($Test) {
     if ($LASTEXITCODE -ne 0) { Write-Error "the scanner tests failed" }
 
     Write-Host ""
+    Write-Host "the project reader" -ForegroundColor Cyan
+    & $compiler run (Join-Path $PSScriptRoot "tests\projecttest.sl") (Join-Path $PSScriptRoot "src\Project")
+    if ($LASTEXITCODE -ne 0) { Write-Error "the project tests failed" }
+
+    Write-Host ""
     Write-Host "the window" -ForegroundColor Cyan
     & $exe --selftest
     if ($LASTEXITCODE -ne 0) { Write-Error "the IDE self test failed" }

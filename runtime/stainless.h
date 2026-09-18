@@ -750,6 +750,13 @@ SL_API const void *sl_field_element_type(const void *field);
 SL_API size_t   sl_field_element_size(const void *field);
 
 /*
+ * A new array of `length` elements for an array-typed field. Null for a field
+ * that is not one. See the definition for why this is the only thing about an
+ * array that reflection could not do.
+ */
+SL_API void *sl_field_new_array(const void *field, size_t length);
+
+/*
  * Reading and writing at an address of a known kind, rather than at a field of
  * an instance. It is what walking an array needs: the element has a kind and a
  * stride and no SlFieldInfo of its own.

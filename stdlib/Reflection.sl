@@ -74,6 +74,7 @@ extern "C"
     uint   sl_field_element_kind(byte* field);
     byte*  sl_field_element_type(byte* field);
     nuint  sl_field_element_size(byte* field);
+    byte*  sl_field_new_array(byte* field, nuint length);
 
     uint   sl_field_flags(byte* field);
 
@@ -821,6 +822,30 @@ public byte* ReadArray(byte* instance, Field field)
     if (field.Kind != KindArray)
         return null;
     return sl_read_reference(instance, field.Handle);
+}
+
+/// A new array of `count` elements, of whatever this field holds.
+///
+/// **The one thing about an array that could not be done here.** Elements
+/// could be read and written, and the stride made that possible without
+/// knowing the element type -- but there was no way to *make* one, so a
+/// document that said how many elements it had could only be read into an
+/// array that already happened to be that long. That is the whole of why a
+/// reader could round-trip an array and not fill one.
+///
+/// The elements are zero, which for a reference means null, so an array handed
+/// back from here is safe to write into in any order and safe to abandon
+/// half-filled.
+///
+/// Null for a field that is not an array, and for one whose array type the
+/// build recorded nothing for. `WriteAggregate` is what puts it in the field,
+/// and it retains -- so the caller still owns what it was given and the object
+/// owns what it now holds.
+public byte* NewArray(Field field, nuint count)
+{
+    if (field.Kind != KindArray)
+        return null;
+    return sl_field_new_array(field.Handle, count);
 }
 
 /// How many elements an array has. Zero for null.

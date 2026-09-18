@@ -44,3 +44,5 @@ deserialized = no error/Alan Turing/41/[]
 arrays = {"Name":"kept","Tags":["walked",""],"Counts":[0,0]}
 array-longer = {"Name":"kept","Tags":["one","two"],"Counts":[0,0]}
 array-shorter = {"Name":"kept","Tags":["kept",""],"Counts":[0,0]}
+array-null = {"Name":"kept","Tags":["a","b","c"],"Counts":[4,5]}
+array-empty = {"Name":"kept","Tags":[],"Counts":null}

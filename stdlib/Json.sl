@@ -1263,19 +1263,42 @@ void FillField(byte* instance, Field field, JsonValue value)
 
 /// Fills an array field, element by element, as far as both go.
 ///
-/// **The array is not replaced.** Its length is the one the constructor chose,
-/// and a document with more elements than that fills what fits and stops; one
-/// with fewer leaves the rest as they were. Allocating a new array would mean
-/// deciding the length from the document, which is how a message becomes a
-/// memory bill, and reading into an object the program made is the whole
-/// bargain this module makes.
+/// **An array the object already has is not replaced.** Its length is the one
+/// the constructor chose, and a document with more elements than that fills
+/// what fits and stops; one with fewer leaves the rest as they were. That is
+/// the bargain this module makes everywhere else -- it reads into an object
+/// the program made -- and it is also what stops a document deciding how much
+/// memory to spend.
+///
+/// **A field that is null is a different question, and the answer changed.**
+/// There is no length the constructor chose, so filling in place means filling
+/// nothing: the field stayed null and the document was silently dropped, which
+/// is why a `String[]` had to be pre-sized by a constructor that could not know
+/// the size. One is allocated now, at the document's length.
+///
+/// That is not the memory bill the paragraph above refuses, and the difference
+/// is worth stating: the elements have *already been parsed*. `value.Items` is
+/// a real list of real values in memory before this is reached, so an array of
+/// `Items.Count` elements is bounded by an allocation that has happened
+/// anyway. What the rule above refuses is a length field naming a number
+/// nothing has paid for yet, and a JSON array has no such thing.
 void FillArray(byte* instance, Field field, JsonValue value)
 {
-    byte* array = Reflection.ReadArray(instance, field);
-    if (array == null)
-        return;
     if (!value.Array)
         return;
+
+    byte* array = Reflection.ReadArray(instance, field);
+    if (array == null)
+    {
+        array = Reflection.NewArray(field, value.Items.Count);
+        if (array == null)
+            return;
+
+        // Written before it is filled, so the field owns it: `WriteAggregate`
+        // retains, and a failure part-way through then leaves a short array
+        // rather than a leak.
+        Reflection.WriteAggregate(instance, field, array);
+    }
 
     nuint length = Reflection.ArrayLength(array);
     int kind = field.ElementKind;

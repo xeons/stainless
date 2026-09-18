@@ -501,6 +501,16 @@ public sealed partial class LlvmEmitter
         OptionalTypeSymbol optional => NestedTypeInfo(optional.Element),
         StructTypeSymbol { IsReflected: true } structType => TypeInfoOf(structType),
         ClassTypeSymbol { IsIntrinsic: false } classType => TypeInfoOf(classType),
+
+        // An array's own record, which every array type already has -- it is
+        // what carries the destroy hook that walks the elements. It was left
+        // null here for as long as reflection could only read an array that
+        // already existed; `sl_field_new_array` is what needs it, because
+        // making one takes the record of the array rather than of its
+        // elements. `IsAggregate` still answers false for an array, so nothing
+        // that walks fields starts walking into one.
+        ArrayTypeSymbol array => "@" + ArrayTypeInfoName(array),
+
         _ => "null",
     };
 
