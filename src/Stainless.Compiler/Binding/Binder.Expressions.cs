@@ -344,20 +344,54 @@ public sealed partial class Binder
     ///
     /// A literal small enough to be an <c>int</c> is still an <c>int</c>, so
     /// nothing about the common case moves.
+    ///
+    /// <para><c>u</c> and <c>l</c> raise that floor. The magnitude rule alone
+    /// makes <c>20u</c> an <c>int</c>, because twenty fits one -- so the suffix
+    /// the lexer accepts and checks meant nothing at all, and
+    /// <c>nuint n = 20u * 4u;</c> was refused for multiplying two
+    /// <c>int</c>s. A suffix exists to say what the digits cannot; this is
+    /// where it gets to.</para>
     /// </summary>
-    private static PrimitiveTypeSymbol LiteralType(object? value) => value switch
+    private static PrimitiveTypeSymbol LiteralType(object? value, string text)
     {
-        ulong number when number <= int.MaxValue => PrimitiveTypeSymbol.Int,
-        ulong number when number <= uint.MaxValue => PrimitiveTypeSymbol.UInt,
-        ulong number when number <= long.MaxValue => PrimitiveTypeSymbol.Long,
-        ulong => PrimitiveTypeSymbol.ULong,
-        _ => PrimitiveTypeSymbol.Int,
-    };
+        if (value is not ulong number) return PrimitiveTypeSymbol.Int;
+
+        bool unsigned = false;
+        bool wide = false;
+
+        // Only the trailing letters are a suffix. A hex literal's digits run to
+        // 'f', and `0xDul` ends in one of each -- so this walks back from the
+        // end rather than searching the text.
+        for (int i = text.Length - 1; i >= 0; i--)
+        {
+            char c = char.ToLowerInvariant(text[i]);
+            if (c == 'u') { unsigned = true; continue; }
+            if (c == 'l') { wide = true; continue; }
+            break;
+        }
+
+        // The suffix names a floor and the magnitude names another; the answer
+        // is whichever is higher. `4294967296u` is a `ulong` because it has to
+        // be, not a `uint` because that is what the letter asked for.
+        if (unsigned && wide) return PrimitiveTypeSymbol.ULong;
+        if (unsigned)
+            return number <= uint.MaxValue ? PrimitiveTypeSymbol.UInt : PrimitiveTypeSymbol.ULong;
+        if (wide)
+            return number <= long.MaxValue ? PrimitiveTypeSymbol.Long : PrimitiveTypeSymbol.ULong;
+
+        return number switch
+        {
+            <= int.MaxValue => PrimitiveTypeSymbol.Int,
+            <= uint.MaxValue => PrimitiveTypeSymbol.UInt,
+            <= long.MaxValue => PrimitiveTypeSymbol.Long,
+            _ => PrimitiveTypeSymbol.ULong,
+        };
+    }
 
     private BoundExpression BindLiteral(LiteralSyntax syntax) => syntax.Kind switch
     {
         TokenKind.IntLiteral => new BoundLiteral(
-            syntax.Span, LiteralType(syntax.Value), syntax.Value),
+            syntax.Span, LiteralType(syntax.Value, syntax.Text), syntax.Value),
         // `1.5f` lexed to a float and `1.5` to a double; the value says which.
         TokenKind.FloatLiteral => new BoundLiteral(syntax.Span,
             syntax.Value is float ? PrimitiveTypeSymbol.Float : PrimitiveTypeSymbol.Double,

@@ -982,7 +982,17 @@ public sealed record AsmSyntax(
 
 public abstract record ExpressionSyntax(SourceSpan Span) : SyntaxNode(Span);
 
-public sealed record LiteralSyntax(SourceSpan Span, TokenKind Kind, object? Value)
+/// <summary>
+/// A literal, and the text it was written as.
+///
+/// <c>Text</c> is there for the one thing the value cannot say: an integer's
+/// <c>u</c> and <c>l</c> suffixes decide its type and are not part of its
+/// magnitude, so <c>20u</c> and <c>20</c> arrive here with the same
+/// <c>Value</c> and must not arrive with the same type. It is empty for a
+/// literal the parser invented rather than read.
+/// </summary>
+public sealed record LiteralSyntax(SourceSpan Span, TokenKind Kind, object? Value,
+                                   string Text = "")
     : ExpressionSyntax(Span);
 
 /// <summary>

@@ -22,6 +22,8 @@ String Show(sbyte v) => "sbyte";
 String Show(int v) => "int";
 String Pick(short v) => "short";
 String Pick(long v) => "long";
+String Which(int v) => "int";
+String Which(uint v) => "uint";
 
 int Main()
 {
@@ -61,5 +63,24 @@ int Main()
     // An exact match still wins, and a literal that fits only one overload
     // picks it.
     printf("%s %s\n", Show(-5).ToPointer(), Pick(-40000).ToPointer());
+
+    // `u` and `l` raise the floor the magnitude sets. Twenty fits an int,
+    // so without this the suffix meant nothing and two of them multiplied
+    // gave an int -- which is why `nuint n = 20u * 4u;` used to be refused.
+    nuint scaled = 20u * 4u;
+    nuint summed = 20u + 4u;
+    uint product = 20u * 4u;
+    long widened = 3l * 4l;
+    ulong both = 5ul * 2ul;
+    printf("%llu %llu %u %lld %llu\n", (ulong)scaled, (ulong)summed, product, widened, both);
+
+    // Only the trailing letters are the suffix: a hex literal's digits run
+    // to 'f', and this one ends in one letter of each kind.
+    nuint hex = 0xDul;
+    uint byteMask = 0xFFu;
+    printf("%llu %u\n", (ulong)hex, byteMask);
+
+    // The suffix decides an overload, and an unsuffixed literal is unmoved.
+    printf("%s %s\n", Which(20u).ToPointer(), Which(20).ToPointer());
     return 0;
 }

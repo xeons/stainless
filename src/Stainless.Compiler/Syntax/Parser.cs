@@ -3149,7 +3149,7 @@ public sealed class Parser
             case TokenKind.FalseKeyword:
             {
                 var token = Advance();
-                return new LiteralSyntax(SpanFrom(start), token.Kind, token.Value);
+                return new LiteralSyntax(SpanFrom(start), token.Kind, token.Value, token.Text);
             }
 
             case TokenKind.InterpolatedString:
