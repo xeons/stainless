@@ -116,6 +116,31 @@ public enum LineEnding
 // ================================================================= document
 
 /// The lines, the lexer, and what has changed.
+/// One edit, and what it would take to put it back.
+///
+/// **Both directions from one record.** An insertion knows where it began,
+/// where it ended and what went in -- which is enough to take it out again --
+/// and a deletion knows the same three things, which is enough to put it back.
+/// So undo and redo are the same structure read two ways rather than two
+/// stacks of different things.
+public struct Edit
+{
+    /// True for an insertion, false for a deletion.
+    public bool Inserted;
+
+    /// Where it began, and where it ended. For a deletion these are the two
+    /// ends of what was taken out, measured before it went.
+    public Position From;
+    public Position To;
+
+    /// What was put in or taken out.
+    public String Text;
+
+    /// Where the caret was before the edit, so undoing puts it back where the
+    /// person was rather than where the machine finished.
+    public Position Caret;
+}
+
 public class Document
 {
     List<Line> _lines;
@@ -124,6 +149,30 @@ public class Document
     bool _edited;
     LineEnding _endings;
 
+    /// What has been done, and what has been undone.
+    ///
+    /// Both hold `Edit`s; which list one is in says which way it is about to be
+    /// read. Redo is cleared by any new edit, which is what every editor does
+    /// and what stops a redo applying to text it was never recorded against.
+    List<Edit> _done;
+    List<Edit> _undone;
+
+    /// Set while an undo or a redo is being applied, so the edit it makes is
+    /// not itself recorded. Without it the first undo pushes its own inverse
+    /// and the second undoes the undo, for ever.
+    bool _applying;
+
+    /// How many edits had been done when the file was last read or written.
+    ///
+    /// **`_edited` is derived from this rather than latched**, so undoing back
+    /// to the last save clears the asterisk -- which is what a person means by
+    /// "I put it back". A latched flag says a file is modified after it has
+    /// been returned to exactly what is on disk.
+    ///
+    /// -1 when the saved state is no longer reachable: a save, then an undo
+    /// past it, then a new edit throws away the redo that led back.
+    long _savedAt;
+
     public Document()
     {
         _lines = new List<Line>();
@@ -131,6 +180,10 @@ public class Document
         _location = "";
         _edited = false;
         _endings = LineEnding.Lf;
+        _done = new List<Edit>();
+        _undone = new List<Edit>();
+        _applying = false;
+        _savedAt = 0;
         _lines.Add(new Line(""));
         Rescan(0u);
     }
@@ -153,13 +206,24 @@ public class Document
     }
 
     /// Whether it has been changed since it was last read or written.
-    public bool Edited => _edited;
+    ///
+    /// Answered from the undo stack rather than from a flag, so undoing back to
+    /// the last save says the file is unmodified again.
+    public bool Edited => _savedAt < 0 || (nuint)_savedAt != _done.Count;
+
+    /// Whether there is anything to undo, or to redo.
+    public bool CanUndo => !_done.IsEmpty();
+    public bool CanRedo => !_undone.IsEmpty();
 
     public LineEnding Endings => _endings;
 
     /// Says it has been saved, without writing anything. For a caller that did
     /// the writing itself.
-    public void MarkSaved() => _edited = false;
+    public void MarkSaved()
+    {
+        _edited = false;
+        _savedAt = (long)_done.Count;
+    }
 
     // ----------------------------------------------------------- the file
 
@@ -244,7 +308,10 @@ public class Document
             Replace(row, before + parts[0] + after);
             Rescan(row);
             _edited = true;
-            return Position.At(row, column + parts[0].ByteLength());
+
+            var landedHere = Position.At(row, column + parts[0].ByteLength());
+            Record(true, Position.At(row, column), landedHere, text);
+            return landedHere;
         }
 
         // Several lines: the first joins what was before the caret, the last
@@ -262,7 +329,10 @@ public class Document
 
         Rescan(row);
         _edited = true;
-        return Position.At(landed, parts[parts.Length - 1u].ByteLength());
+
+        var ended = Position.At(landed, parts[parts.Length - 1u].ByteLength());
+        Record(true, Position.At(row, column), ended, text);
+        return ended;
     }
 
     /// Takes out everything between two positions, and answers where the caret
@@ -282,6 +352,12 @@ public class Document
         nuint firstColumn = Clamp(start.Column, _lines[firstRow].Text.ByteLength());
         nuint lastColumn = Clamp(end.Column, _lines[lastRow].Text.ByteLength());
 
+        // Read before anything is removed: this is what an undo puts back, and
+        // afterwards there is nothing left to read it from.
+        var startAt = Position.At(firstRow, firstColumn);
+        var endAt = Position.At(lastRow, lastColumn);
+        String removed = _applying ? "" : TextBetween(startAt, endAt);
+
         String head = _lines[firstRow].Text.Substring(0u, firstColumn);
         String tail = _lines[lastRow].Text.Substring(lastColumn);
 
@@ -293,7 +369,131 @@ public class Document
 
         Rescan(firstRow);
         _edited = true;
+
+        Record(false, startAt, endAt, removed);
         return Position.At(firstRow, firstColumn);
+    }
+
+    // ------------------------------------------------------------ undoing
+
+    /// Remembers an edit, merging it into the one before where that reads as
+    /// one action.
+    ///
+    /// **Typing a word is one undo, not seven.** Every character is its own
+    /// call to `Insert`, and an undo stack that kept them apart would make
+    /// undo useless for the thing it is used for most. Two insertions merge
+    /// when the second starts exactly where the first ended and neither
+    /// carries a newline -- so typing runs together, and pressing Return,
+    /// clicking elsewhere or pasting a paragraph each start a new one.
+    ///
+    /// Backspacing runs together the same way, by the opposite test: the
+    /// second deletion ends exactly where the first began.
+    void Record(bool inserted, Position from, Position to, String text)
+    {
+        if (_applying)
+            return;
+
+        // Any new edit makes a redo meaningless: what was undone was recorded
+        // against text that no longer exists.
+        _undone.Clear();
+
+        // A save the undo stack can no longer reach: the file was saved, undone
+        // past that point, and then edited, so the path back is gone.
+        if (_savedAt > (long)_done.Count)
+            _savedAt = -1;
+
+        if (Merge(inserted, from, to, text))
+            return;
+
+        Edit made;
+        made.Inserted = inserted;
+        made.From = from;
+        made.To = to;
+        made.Text = text;
+        made.Caret = from;
+        _done.Add(made);
+    }
+
+    /// Extends the last edit rather than adding one, where the two read as a
+    /// single action. False when they do not.
+    bool Merge(bool inserted, Position from, Position to, String text)
+    {
+        if (_done.IsEmpty() || text.Contains("\n") || text.Contains("\r"))
+            return false;
+
+        var last = _done[_done.Count - 1u];
+        if (last.Inserted != inserted || last.Text.Contains("\n"))
+            return false;
+
+        if (inserted)
+        {
+            // Typed on: this insertion begins where the last one ended.
+            if (!last.To.SameAs(from))
+                return false;
+
+            last.Text = last.Text + text;
+            last.To = to;
+            _done[_done.Count - 1u] = last;
+            return true;
+        }
+
+        // Backspaced on: this deletion ends where the last one began, so the
+        // text belongs in front of what is already recorded.
+        if (!last.From.SameAs(to))
+            return false;
+
+        last.Text = text + last.Text;
+        last.From = from;
+        _done[_done.Count - 1u] = last;
+        return true;
+    }
+
+    /// Puts the last edit back, and answers where the caret goes.
+    ///
+    /// Nothing when there is nothing to undo, which is what a caller checks
+    /// rather than `CanUndo` and then this -- the answer says both.
+    public Optional<Position> Undo()
+    {
+        if (_done.IsEmpty())
+            return None;
+
+        var last = _done[_done.Count - 1u];
+        _done.RemoveAt(_done.Count - 1u);
+        _undone.Add(last);
+
+        return Apply(!last.Inserted, last);
+    }
+
+    /// Does the last undone edit again.
+    public Optional<Position> Redo()
+    {
+        if (_undone.IsEmpty())
+            return None;
+
+        var last = _undone[_undone.Count - 1u];
+        _undone.RemoveAt(_undone.Count - 1u);
+        _done.Add(last);
+
+        return Apply(last.Inserted, last);
+    }
+
+    /// Applies an edit in one direction or the other.
+    ///
+    /// `_applying` is what keeps this from recording itself: `Insert` and
+    /// `Delete` are the only way to change the text, and they are the same two
+    /// calls whether a person or an undo is asking.
+    Optional<Position> Apply(bool insert, Edit edit)
+    {
+        _applying = true;
+
+        Position caret;
+        if (insert)
+            caret = Insert(edit.From, edit.Text);
+        else
+            caret = Delete(edit.From, edit.To);
+
+        _applying = false;
+        return Some(caret);
     }
 
     /// Everything between two positions, as a string.

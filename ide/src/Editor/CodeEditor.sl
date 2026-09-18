@@ -803,6 +803,23 @@ public class CodeEditor : CustomControl
         {
             SelectAll();
         }
+        else if (args.Key == Key.Z && control && !shift)
+        {
+            Undo();
+            moved = false;
+        }
+        else if (args.Key == Key.Y && control)
+        {
+            Redo();
+            moved = false;
+        }
+        else if (args.Key == Key.Z && control && shift)
+        {
+            // Ctrl+Shift+Z as well as Ctrl+Y, because both are in people's
+            // fingers and neither is used for anything else here.
+            Redo();
+            moved = false;
+        }
         else if (args.Key == Key.Backspace)
         {
             DeleteBack();
@@ -1034,6 +1051,39 @@ public class CodeEditor : CustomControl
     // -------------------------------------------------------------- editing
 
     /// Selects the whole file.
+    /// Puts the last edit back and goes to where it was.
+    ///
+    /// The selection is dropped rather than restored. What was selected before
+    /// an edit is not what the edit left behind, and an undo that reinstated a
+    /// stale selection would put the next keystroke somewhere surprising.
+    public bool Undo()
+    {
+        if (_doc.Undo() is Some at)
+        {
+            _caret = at.Value;
+            _anchor = _caret;
+            AfterEdit();
+            return true;
+        }
+        return false;
+    }
+
+    /// Does the last undone edit again.
+    public bool Redo()
+    {
+        if (_doc.Redo() is Some at)
+        {
+            _caret = at.Value;
+            _anchor = _caret;
+            AfterEdit();
+            return true;
+        }
+        return false;
+    }
+
+    public bool CanUndo => _doc.CanUndo;
+    public bool CanRedo => _doc.CanRedo;
+
     public void SelectAll()
     {
         _anchor = Position.At(0u, 0u);

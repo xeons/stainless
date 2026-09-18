@@ -145,6 +145,7 @@ internal static class Program
                                    mangling, bit-field layout and how a struct
                                    is passed (default: the host's)
               --keep               keep the generated .ll next to the output
+              --diagnostics <form> 'text' for a person, 'json' for a tool
               --obj <dir>          directory for intermediates (default: ./obj)
               --                   (run) everything after this is passed to the program
               -h, --help           show this message
@@ -913,6 +914,16 @@ internal static class Program
                     arguments.Keep = true;
                     continue;
 
+                case "--diagnostics":
+                    if (++i >= args.Length) { Error("'--diagnostics' needs a form"); return false; }
+                    if (args[i] is not ("text" or "json"))
+                    {
+                        Error($"'{args[i]}' is not a diagnostic form; they are 'text' and 'json'");
+                        return false;
+                    }
+                    s_jsonDiagnostics = args[i] == "json";
+                    continue;
+
                 case "--shared":
                     arguments.Shared = true;
                     continue;
@@ -1008,19 +1019,37 @@ internal static class Program
         return false;
     }
 
+    /// <summary>
+    /// Whether diagnostics are written as JSON rather than for a person.
+    ///
+    /// A static because <see cref="Report"/> is reached from several commands
+    /// and threading a flag through each of them would be five signatures
+    /// changed to carry one bool. It is set once, from the command line, before
+    /// anything can be reported.
+    /// </summary>
+    private static bool s_jsonDiagnostics;
+
     private static bool Report(CompilationResult result)
     {
-        bool color = !Console.IsErrorRedirected;
+        bool color = !Console.IsErrorRedirected && !s_jsonDiagnostics;
 
         foreach (var diagnostic in result.Diagnostics)
-            Console.Error.WriteLine(diagnostic.Render(color));
+        {
+            Console.Error.WriteLine(s_jsonDiagnostics
+                ? diagnostic.RenderJson()
+                : diagnostic.Render(color));
+        }
 
         if (result.DriverError is not null) Error(result.DriverError);
 
         if (!result.Success)
         {
+            // The count is a sentence for a person, and it is not one in JSON:
+            // a reader counting the objects it received already has it, and a
+            // line of prose in the middle of the stream is a line every reader
+            // has to learn to skip.
             int errors = result.Diagnostics.Count(d => d.Severity == Source.Severity.Error);
-            if (errors > 0)
+            if (errors > 0 && !s_jsonDiagnostics)
                 Console.Error.WriteLine(
                     $"compilation failed with {errors} error{(errors == 1 ? "" : "s")}.");
             return false;
@@ -1029,8 +1058,22 @@ internal static class Program
         return true;
     }
 
+    /// <summary>
+    /// Something that went wrong which is not about a span of source: a missing
+    /// file, a linker that refused, a project that could not be read.
+    ///
+    /// In JSON mode it goes out as a diagnostic with no file and no code, so a
+    /// reader has one stream to read rather than a stream and a special case.
+    /// </summary>
     private static void Error(string message)
     {
+        if (s_jsonDiagnostics)
+        {
+            Console.Error.WriteLine(
+                new Source.Diagnostic(Source.Severity.Error, "", message, default).RenderJson());
+            return;
+        }
+
         bool color = !Console.IsErrorRedirected;
         Console.Error.WriteLine($"{(color ? "\u001b[1;31m" : "")}error{(color ? "\u001b[0m" : "")}: {message}");
     }

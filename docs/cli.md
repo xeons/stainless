@@ -86,6 +86,36 @@ system*: a manifest, an icon and a dialog template are carried and readable
 elsewhere and inert, and SL0700 names them when a program has any. See
 [§2.3 of packages.md](packages.md#23-resources).
 
+## Diagnostics for a tool
+
+`--diagnostics json` writes each diagnostic as **one object on one line**
+instead of the rendered form, which is what an editor should read:
+
+```
+{"severity":"error","code":"SL0265","message":"cannot convert 'String' to 'int',
+ "file":"C:\\Code\\src\\main.sl","line":5,"column":13,"length":14}
+```
+
+(Shown wrapped; it is one line.)
+
+`length` is the span the caret run underlines, so an editor can underline the
+same thing rather than guessing at a word. A diagnostic about something with no
+source of its own — a type read back from a library's metadata — leaves `file`,
+`line`, `column` and `length` out rather than naming a file nothing could open.
+Anything that goes wrong which is not about a span, such as a linker that
+refused, arrives the same way with an empty `code`.
+
+One object per line rather than one array around the whole build, so a reader
+can act on each as it arrives and a build that dies part-way still leaves what
+it managed to say readable. Nothing else is written to the error stream in this
+mode — the "compilation failed with 3 errors" line is a sentence for a person,
+and a reader counting the objects it received already has it.
+
+The IDE used to read the rendered form and take it apart again, deciding a line
+was an error because it began with `error` and finding the place by counting
+colons from the right so a drive letter would survive. That worked, and it was
+a parser for a format never meant to be parsed.
+
 ## Reference documentation
 
 `stainless doc` reads the `///` blocks in the source and writes one Markdown

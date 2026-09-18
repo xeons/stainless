@@ -53,8 +53,16 @@ were fixed — the IDE is what found every one of them.
   Ctrl, `Home` alternating between the first non-blank and column zero, a
   remembered column across vertical movement, and Tab indenting a selection
   rather than replacing it.
-- **Build and run**, which saves the file, runs `stainless`, and lists what came
-  back. Double-click a diagnostic and the caret goes to it.
+- **Build and run**, which builds the *project* when there is one, on a thread
+  that is not the one drawing the window. Double-click a diagnostic and the
+  caret goes to it — and the diagnostic is read from the compiler's own JSON
+  (`--diagnostics json`) rather than parsed back out of the message meant for a
+  person, which is what it used to be.
+- **Undo and redo**, with Ctrl+Z and Ctrl+Y. Typing a word is one undo rather
+  than seven: consecutive insertions merge while the caret keeps moving
+  forward, and a newline, a click or a paste each start a new one. Undoing back
+  to the last save clears the asterisk, because the file on disk is what is in
+  front of you again — which a latched "modified" flag cannot say.
 - **Open, save, save-as**, with the file's own line endings kept.
 
 ## What does not exist yet
@@ -65,6 +73,9 @@ Named honestly, since the point of the page is to say where the edges are.
   an editor can know from one line is what it knows; everything else needs the
   binder, and the binder is in the compiler. The plan is a `stainless serve`
   mode speaking JSON, with the lexer staying as the fast path and the fallback.
+  `--diagnostics json` is the first stone of it and already carries what a
+  squiggle needs — a code, a place, and a length to underline — which is why
+  the editor does not have to guess at any of that any more.
 - **No debugger.** The compiler already emits DWARF and CodeView under `-g`, so
   the intended shape is gdb and lldb driven over the MI2 protocol rather than a
   second debugger written here.
@@ -75,8 +86,8 @@ Named honestly, since the point of the page is to say where the edges are.
   somewhere to show it: a file is still reached through Open rather than
   browsed to. A diagnostic in a file that is not open does open it, which is
   what tabs made possible.
-- **No undo.** The next thing to write, and the reason `Document` is a list of
-  lines with every edit going through `Insert` and `Delete`.
+- **Undo does not reach across files.** Each document has its own stack, which
+  is right, and there is no single "undo the last thing I did anywhere".
 - **No keyboard shortcut for text size.** `+` and `-` are OEM virtual keys and
   `Forms`' `Key` enum does not name them yet, so it is the menu or Ctrl and the
   wheel. Cut, copy and paste do have their usual keys.
@@ -96,14 +107,27 @@ Named honestly, since the point of the page is to say where the edges are.
 ## How it is put together
 
 ```
+ide/stainless.json          what the IDE is made of, on either system
 ide/src/Lang/Lexer.sl       Stainless, lexed one line at a time
 ide/src/Editor/Document.sl  the text: lines, and what each lexed to
 ide/src/Editor/Theme.sl     what each kind of token is drawn in
 ide/src/Editor/CodeEditor.sl the control that draws it and edits it
+ide/src/Project/Project.sl  stainless.json, read and written
+ide/src/Build/Diagnostics.sl what the compiler said, out of its JSON
 ide/src/App/Shell.sl        the window: menu, editor, output, status
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
+ide/tests/buildtest.sl      the diagnostic reader, on real compiler output
+ide/tests/projecttest.sl    the project reader, on files that are awkward
+ide/tests/fixture/          a two-file project, which is the smallest thing
+                            that fails if Build ever compiles one file again
 ```
+
+**Three of those are modules rather than parts of the window**, and the reason
+is the same each time: `Ide.Project` and `Ide.Build` mention no control, so a
+console harness can test them without linking a widget set or opening a
+display. `BuildMessage` was a struct at the bottom of `Shell.sl` and moving it
+is what made `buildtest.sl` possible at all.
 
 Three decisions carry most of it.
 

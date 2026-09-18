@@ -102,6 +102,96 @@ public sealed record Diagnostic(Severity Severity, string Code, string Message, 
         sb.Append($"{C(sevColor)}{new string('^', caretLen)}{C(reset)}\n");
         return sb.ToString();
     }
+
+    /// <summary>
+    /// The same diagnostic as one line of JSON, for a tool rather than a person.
+    ///
+    /// <para>
+    /// The IDE read the pretty form and took it apart again: it decided a line
+    /// was an error because it started with "error", and found the place by
+    /// counting colons from the right of the <c>--&gt;</c> line so that a
+    /// Windows drive letter would not be mistaken for one. That works, and it
+    /// is a parser for a format that was never meant to be parsed -- the first
+    /// time a message wraps differently, or a path holds something the rule did
+    /// not expect, it is wrong and silently.
+    /// </para>
+    ///
+    /// <para>
+    /// <b>One object per line rather than one array</b>, so a reader can act on
+    /// a diagnostic as it arrives and a build that dies part-way still leaves
+    /// every diagnostic it managed to emit readable. That is what makes this
+    /// usable by a build that streams, which is the shape the IDE wants next.
+    /// </para>
+    ///
+    /// <para>
+    /// The line and column are one-based and counted as the caret line counts
+    /// them, so they point where the rendered form points. <c>length</c> is the
+    /// span's, which lets an editor underline what the caret run underlines
+    /// rather than guessing at a word.
+    /// </para>
+    /// </summary>
+    public string RenderJson()
+    {
+        var sb = new StringBuilder();
+
+        sb.Append("{\"severity\":\"");
+        sb.Append(Severity switch
+        {
+            Severity.Error => "error",
+            Severity.Warning => "warning",
+            _ => "note",
+        });
+        sb.Append("\",\"code\":");
+        AppendString(sb, Code);
+        sb.Append(",\"message\":");
+        AppendString(sb, Message);
+
+        // Something with no source of its own -- a type read back from a
+        // library's metadata -- says so by having no file, rather than by
+        // naming one nothing could open.
+        if (Span.File is not null)
+        {
+            var (line, column) = Span.File.GetLineColumn(Span.Start);
+            sb.Append(",\"file\":");
+            AppendString(sb, Span.File.Path);
+            sb.Append($",\"line\":{line},\"column\":{column},\"length\":{Span.Length}");
+        }
+
+        sb.Append('}');
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// A JSON string, escaped by hand.
+    ///
+    /// By hand rather than through a serializer because this runs for every
+    /// diagnostic of every build and the shape is five fields; the dependency
+    /// is not worth the line it would save. The control-character case is the
+    /// one that earns the method: a message may carry a tab out of source text,
+    /// and a raw one makes the line invalid JSON.
+    /// </summary>
+    private static void AppendString(StringBuilder sb, string value)
+    {
+        sb.Append('"');
+
+        foreach (char c in value)
+        {
+            switch (c)
+            {
+                case '"': sb.Append("\\\""); break;
+                case '\\': sb.Append(@"\\"); break;
+                case '\n': sb.Append(@"\n"); break;
+                case '\r': sb.Append(@"\r"); break;
+                case '\t': sb.Append(@"\t"); break;
+                default:
+                    if (c < ' ') sb.Append($"\\u{(int)c:x4}");
+                    else sb.Append(c);
+                    break;
+            }
+        }
+
+        sb.Append('"');
+    }
 }
 
 public sealed class DiagnosticBag

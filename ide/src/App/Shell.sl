@@ -29,6 +29,7 @@ import Standard.Text;
 import Standard.Collections;
 import Standard.IO;
 import Standard.File;
+import Standard.Json;
 import Standard.Process;
 import Standard.Path;
 import Standard.Directory;
@@ -39,6 +40,7 @@ import Forms.Platform;
 import Ide.Lang;
 import Ide.Editor;
 import Ide.Project;
+import Ide.Build;
 
 /// One open file: the tab it is behind, and the editor on it.
 ///
@@ -111,9 +113,14 @@ public class Shell : Form
 
         _status = new StatusBar(this);
         _status.Dock = DockStyle.Bottom;
-        _status.AddPanel(420);
-        _status.AddPanel(180);
-        _status.AddPanel(0);
+        // Four, and the third is why. The error count used to be written into
+        // the same panel as the message, so "Built." appeared and was replaced
+        // by "3 errors" on the same line in the same instant -- which read as
+        // the build having said only the second thing.
+        _status.AddPanel(420);      // the path
+        _status.AddPanel(200);      // what just happened
+        _status.AddPanel(110);      // how many errors
+        _status.AddPanel(0);        // where the caret is
 
         _output = new ListBox(this);
         _output.Dock = DockStyle.Bottom;
@@ -332,6 +339,9 @@ public class Shell : Form
         file.Add("E&xit").Click += this.OnExit;
 
         var edit = _bar.Add("&Edit");
+        edit.Add("&Undo").Click += this.OnUndo;
+        edit.Add("&Redo").Click += this.OnRedo;
+        edit.Add(MenuItem.Separator());
         edit.Add("Cu&t").Click += this.OnCut;
         edit.Add("&Copy").Click += this.OnCopy;
         edit.Add("&Paste").Click += this.OnPaste;
@@ -448,6 +458,24 @@ public class Shell : Form
     void OnExit(MenuItem sender) => Close();
 
     // -------------------------------------------------------- the clipboard
+
+    void OnUndo(MenuItem sender)
+    {
+        var now = Current;
+        if (now == null)
+            return;
+        if (!((CodeEditor)now).Undo())
+            Say("Nothing to undo.");
+    }
+
+    void OnRedo(MenuItem sender)
+    {
+        var now = Current;
+        if (now == null)
+            return;
+        if (!((CodeEditor)now).Redo())
+            Say("Nothing to redo.");
+    }
 
     void OnCut(MenuItem sender)
     {
@@ -815,13 +843,16 @@ public class Shell : Form
     {
         String verb = thenRun ? "run" : "build";
 
+        // JSON, because the alternative is reading a format meant for a person
+        // and guessing which part of it was the file name. `BuildMessage` says
+        // what that cost.
         if (_project != null)
-            return [verb, "--project", _projectPath];
+            return [verb, "--diagnostics", "json", "--project", _projectPath];
 
         var now = Current;
         if (now == null)
-            return [verb];
-        return [verb, ((CodeEditor)now).Contents.Location];
+            return [verb, "--diagnostics", "json"];
+        return [verb, "--diagnostics", "json", ((CodeEditor)now).Contents.Location];
     }
 
     /// Runs the compiler on a thread and reports back on the UI one.
@@ -855,27 +886,51 @@ public class Shell : Form
         var result = finished.Value;
         // The compiler writes diagnostics to the error stream and the program's
         // own output to the other, so both are shown, in that order.
-        ShowAll(result.Errors);
-        ShowAll(result.Output);
+        ShowAll(result.Errors, true);
+        ShowAll(result.Output, false);
 
         Say(result.ExitCode == 0
             ? success
             : "Failed, with " + Standard.Text.FromInteger(result.ExitCode) + ".");
-        _status.SetPanelText(1, CountErrors());
+        _status.SetPanelText(2, CountErrors());
     }
 
-    void ShowAll(String text)
+    /// Every line of one of the compiler's two streams.
+    ///
+    /// `diagnostics` says which. The error stream carries the compiler's own
+    /// JSON and is read as such; the other carries whatever the program
+    /// printed and is nobody's to interpret -- a `run` whose program prints a
+    /// line beginning with a brace is printing a line beginning with a brace.
+    void ShowAll(String text, bool diagnostics)
     {
         if (text.ByteLength() == 0u)
             return;
         foreach (var line in text.Replace("\r\n", "\n").Split("\n"))
-            Show(line);
+        {
+            if (diagnostics)
+                Show(line);
+            else
+                ShowRaw(line);
+        }
     }
 
+    /// Adds one line of the compiler's output to the pane.
+    ///
+    /// **The list shows what a person reads and the model keeps what a click
+    /// needs**, which is why the two are built together: the line the compiler
+    /// sent is JSON, and nobody wants to read that.
     void Show(String line)
     {
+        var message = BuildMessage.Parse(line);
+        _output.Add(message.Describe());
+        _messages.Add(message);
+    }
+
+    /// A line that is not the compiler's, shown as it came.
+    void ShowRaw(String line)
+    {
         _output.Add(line);
-        _messages.Add(BuildMessage.Parse(line));
+        _messages.Add(BuildMessage.Plain());
     }
 
     String CountErrors()
@@ -934,7 +989,7 @@ public class Shell : Form
         var editor = (CodeEditor)now;
         var at = editor.CaretPosition;
         String line = editor.Contents.TextAt(at.Row);
-        _status.SetPanelText(2,
+        _status.SetPanelText(3,
             "Ln " + Standard.Text.FromInteger(at.Row + 1u)
           + ", Col " + Standard.Text.FromInteger(editor.ColumnOf(line, at.Column) + 1u));
     }
@@ -970,6 +1025,17 @@ public class Shell : Form
     }
 
     void Say(String what) => _status.SetPanelText(1, what);
+
+    /// Whether a list of arguments holds one.
+    static bool Names(String[] arguments, String wanted)
+    {
+        foreach (var argument in arguments)
+        {
+            if (argument == wanted)
+                return true;
+        }
+        return false;
+    }
 
     /// What the self test checks, since a window cannot be typed into by a
     /// machine.
@@ -1109,6 +1175,76 @@ public class Shell : Form
             ok = false;
         }
 
+        // Undo, which is the one thing here that a self test can prove
+        // completely: the text after undoing is either what it was or it is
+        // not, and nobody has to look at the window to find out.
+        {
+            var scratch = AddTab(new Document());
+            var pad = scratch.Editor;
+            pad.Focus();
+            Application.DoEvents();
+
+            pad.Type("hello");
+            if (pad.Contents.TextAt(0u) != "hello")
+            {
+                Console.WriteLine("FAIL: undo setup");
+                ok = false;
+            }
+
+            // Typing a word is one undo and not five, which is the whole
+            // reason the stack coalesces.
+            pad.Undo();
+            if (pad.Contents.TextAt(0u) != "")
+            {
+                Console.WriteLine("FAIL: one undo did not take back a typed word, leaving '"
+                                  + pad.Contents.TextAt(0u) + "'");
+                ok = false;
+            }
+
+            pad.Redo();
+            if (pad.Contents.TextAt(0u) != "hello")
+            {
+                Console.WriteLine("FAIL: redo did not put it back");
+                ok = false;
+            }
+
+            // A newline ends a run, so what follows undoes on its own.
+            // Three calls, because that is what three keystrokes are --
+            // one Type of the whole string is one insertion and rightly
+            // one undo.
+            pad.Type("\n");
+            pad.Type("w");
+            pad.Type("orld");
+            pad.Undo();
+            if (pad.Contents.LineCount != 2u || pad.Contents.TextAt(1u) != "")
+            {
+                Console.WriteLine("FAIL: undo crossed a line it should not have");
+                ok = false;
+            }
+
+            // And undoing everything says the file is unmodified again, rather
+            // than staying starred because a flag was latched.
+            while (pad.Undo()) { }
+            if (pad.Contents.Edited)
+            {
+                Console.WriteLine("FAIL: undoing back to the start left the file modified");
+                ok = false;
+            }
+            if (pad.Contents.TextAt(0u) != "" || pad.Contents.LineCount != 1u)
+            {
+                Console.WriteLine("FAIL: undoing everything did not empty the document");
+                ok = false;
+            }
+            if (pad.CanUndo)
+            {
+                Console.WriteLine("FAIL: there was still something to undo");
+                ok = false;
+            }
+
+            CloseTab(scratch);
+            Application.DoEvents();
+        }
+
         // The project, which is what makes Build mean the program rather than
         // the file. Opening a file inside the fixture should find it without
         // anyone asking -- which is the behaviour, not just the reader.
@@ -1124,11 +1260,29 @@ public class Shell : Form
 
             // And the arguments that finding it changes, which is the whole
             // point: a project build names the project and never a file.
+            //
+            // By what is in them rather than by where: this checked position 1
+            // and broke the day `--diagnostics json` was added in front, which
+            // is the test being about the wrong thing rather than the change
+            // being wrong.
             var arguments = BuildArguments(false);
-            if (arguments.Length != 3u || arguments[1u] != "--project")
+            if (!Names(arguments, "--project") || !Names(arguments, _projectPath))
             {
                 Console.WriteLine("FAIL: a project build did not ask for the project");
                 ok = false;
+            }
+            if (!Names(arguments, "--diagnostics") || !Names(arguments, "json"))
+            {
+                Console.WriteLine("FAIL: a build did not ask for diagnostics it can read");
+                ok = false;
+            }
+            foreach (var argument in arguments)
+            {
+                if (argument.EndsWith(".sl"))
+                {
+                    Console.WriteLine("FAIL: a project build named a source file: " + argument);
+                    ok = false;
+                }
             }
         }
         else
@@ -1138,78 +1292,8 @@ public class Shell : Form
 
         if (ok)
         {
-            Console.WriteLine("  editing, lexing, the clipboard, text size, tabs and the project");
+            Console.WriteLine("  editing, undo, lexing, the clipboard, text size, tabs and the project");
         }
         return ok;
-    }
-}
-
-// ================================================================== messages
-
-/// One line of the compiler's output, and where it points.
-///
-/// **Parsed rather than asked for.** The compiler prints
-/// `  --> path\to\file.sl:12:5` under each diagnostic, which is a format meant
-/// for a person; reading it is what makes an error clickable today, and it is
-/// the thing a `stainless serve` mode replaces with an answer that does not
-/// have to be guessed at.
-public struct BuildMessage
-{
-    public String File;
-    public nuint Line;
-    public nuint Column;
-    public bool IsError;
-
-    public bool HasPlace => Line > 0u;
-
-    public static BuildMessage Parse(String line)
-    {
-        BuildMessage found;
-        found.File = "";
-        found.Line = 0u;
-        found.Column = 0u;
-        found.IsError = line.StartsWith("error");
-
-        String trimmed = line.Trim();
-        if (!trimmed.StartsWith("--> "))
-            return found;
-
-        // `path:line:column`, and the path may itself contain a colon after a
-        // drive letter -- so the two numbers are taken from the end rather than
-        // the path from the beginning.
-        String rest = trimmed.Substring(4u);
-        long lastColon = rest.LastIndexOf(":");
-        if (lastColon < 0)
-            return found;
-        String columnText = rest.Substring((nuint)lastColon + 1u);
-
-        String upToColumn = rest.Substring(0u, (nuint)lastColon);
-        long beforeThat = upToColumn.LastIndexOf(":");
-        if (beforeThat < 0)
-            return found;
-
-        found.File = upToColumn.Substring(0u, (nuint)beforeThat);
-        found.Line = ParseNumber(upToColumn.Substring((nuint)beforeThat + 1u));
-        found.Column = ParseNumber(columnText);
-        return found;
-    }
-
-    /// A run of digits as a number, and zero for anything else. Deliberately
-    /// forgiving: this is reading a message meant for a person.
-    static nuint ParseNumber(String text)
-    {
-        nuint value = 0u;
-        nuint at = 0u;
-        if (text.ByteLength() == 0u)
-            return 0u;
-        while (at < text.ByteLength())
-        {
-            byte c = text.ByteAt(at);
-            if (c < (byte)'0' || c > (byte)'9')
-                return at == 0u ? 0u : value;
-            value = value * 10u + (nuint)(c - (byte)'0');
-            at++;
-        }
-        return value;
     }
 }
