@@ -53,7 +53,7 @@ stating because the thing being released is a GDI+ or libgd object rather
 than memory the language allocated -- ARC counts the `Image`, and the
 `Image` owns the picture.
 
-<sub>[stdlib/Drawing.sl:1136](../../stdlib/Drawing.sl#L1136)</sub>
+<sub>[stdlib/Drawing.sl:1229](../../stdlib/Drawing.sl#L1229)</sub>
 
 #### Create *method*
 
@@ -63,7 +63,7 @@ static Result<Image, ImageError> Create(int width, int height)
 
 An empty picture, every pixel transparent.
 
-<sub>[stdlib/Drawing.sl:1162](../../stdlib/Drawing.sl#L1162)</sub>
+<sub>[stdlib/Drawing.sl:1255](../../stdlib/Drawing.sl#L1255)</sub>
 
 #### FromBytes *method*
 
@@ -73,7 +73,7 @@ static Result<Image, ImageError> FromBytes(byte[] data)
 
 A picture decoded from bytes, whatever of the four formats they hold.
 
-<sub>[stdlib/Drawing.sl:1178](../../stdlib/Drawing.sl#L1178)</sub>
+<sub>[stdlib/Drawing.sl:1271](../../stdlib/Drawing.sl#L1271)</sub>
 
 #### FromFile *method*
 
@@ -87,7 +87,7 @@ The bytes are read here rather than handed to the decoder, so that a
 missing file is `NotFound` on both platforms rather than whatever each
 library says about one it could not open.
 
-<sub>[stdlib/Drawing.sl:1204](../../stdlib/Drawing.sl#L1204)</sub>
+<sub>[stdlib/Drawing.sl:1297](../../stdlib/Drawing.sl#L1297)</sub>
 
 #### Width *property*
 
@@ -97,7 +97,7 @@ int Width { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1217](../../stdlib/Drawing.sl#L1217)</sub>
+<sub>[stdlib/Drawing.sl:1310](../../stdlib/Drawing.sl#L1310)</sub>
 
 #### Height *property*
 
@@ -107,7 +107,7 @@ int Height { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1218](../../stdlib/Drawing.sl#L1218)</sub>
+<sub>[stdlib/Drawing.sl:1311](../../stdlib/Drawing.sl#L1311)</sub>
 
 #### IsOpen *property*
 
@@ -118,7 +118,7 @@ bool IsOpen { get; }
 Whether the picture is still open. False only after a destructor has
 run, which a program cannot observe on an image it still holds.
 
-<sub>[stdlib/Drawing.sl:1222](../../stdlib/Drawing.sl#L1222)</sub>
+<sub>[stdlib/Drawing.sl:1315](../../stdlib/Drawing.sl#L1315)</sub>
 
 #### GetPixel *method*
 
@@ -132,7 +132,7 @@ Answering rather than failing, because the common caller is a loop over
 a neighbourhood and a test at every edge is what that loop would
 otherwise be made of.
 
-<sub>[stdlib/Drawing.sl:1231](../../stdlib/Drawing.sl#L1231)</sub>
+<sub>[stdlib/Drawing.sl:1324](../../stdlib/Drawing.sl#L1324)</sub>
 
 #### SetPixel *method*
 
@@ -142,7 +142,68 @@ void SetPixel(int x, int y, Rgba colour)
 
 Writes one pixel, replacing whatever was there rather than blending.
 
-<sub>[stdlib/Drawing.sl:1242](../../stdlib/Drawing.sl#L1242)</sub>
+<sub>[stdlib/Drawing.sl:1335](../../stdlib/Drawing.sl#L1335)</sub>
+
+#### Stride *property*
+
+```
+nuint Stride { get; }
+```
+
+How many bytes one row of `CopyPixels` occupies: four per pixel, with no
+padding between rows.
+
+<sub>[stdlib/Drawing.sl:1346](../../stdlib/Drawing.sl#L1346)</sub>
+
+#### PixelByteLength *property*
+
+```
+nuint PixelByteLength { get; }
+```
+
+How many bytes `CopyPixels` writes.
+
+<sub>[stdlib/Drawing.sl:1349](../../stdlib/Drawing.sl#L1349)</sub>
+
+#### CopyPixels *method*
+
+```
+bool CopyPixels(byte[] into)
+```
+
+Every pixel, as four bytes each in the order **blue, green, red,
+alpha**, rows top to bottom with no padding.
+
+That order rather than red-first because it is what both a Windows DIB
+and this module's own `Rgba.Packed` already are: `Packed` is
+`0xAARRGGBB`, and its bytes on every machine this compiles for are B, G,
+R, A. A reader wanting the other order swaps two bytes per pixel and
+knows it is doing so; making this the packed order would have every
+reader convert instead.
+
+The alpha is **straight, not premultiplied**. Premultiplying is what a
+particular compositor wants rather than what the picture is, so it
+belongs to whoever is about to composite.
+
+False when the picture is closed, when there is no backend, when `into`
+is shorter than `PixelByteLength`, or when the backend refused.
+
+<sub>[stdlib/Drawing.sl:1367](../../stdlib/Drawing.sl#L1367)</sub>
+
+#### ToBgra *method*
+
+```
+byte[] ToBgra()
+```
+
+The same bytes in an array of the right size, or an empty one for the
+failures `CopyPixels` answers false for.
+
+Empty rather than null for the reason `Encode` gives: an array is a value
+here and is never null, and a picture with no pixels is not something
+either backend produces.
+
+<sub>[stdlib/Drawing.sl:1385](../../stdlib/Drawing.sl#L1385)</sub>
 
 #### Clear *method*
 
@@ -152,7 +213,7 @@ void Clear(Rgba colour)
 
 Fills the whole picture with one colour.
 
-<sub>[stdlib/Drawing.sl:1264](../../stdlib/Drawing.sl#L1264)</sub>
+<sub>[stdlib/Drawing.sl:1406](../../stdlib/Drawing.sl#L1406)</sub>
 
 #### DrawLine *method*
 
@@ -162,7 +223,7 @@ void DrawLine(Rgba colour, int x1, int y1, int x2, int y2, int thickness)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1271](../../stdlib/Drawing.sl#L1271)</sub>
+<sub>[stdlib/Drawing.sl:1413](../../stdlib/Drawing.sl#L1413)</sub>
 
 #### DrawRectangle *method*
 
@@ -172,7 +233,7 @@ void DrawRectangle(Rgba colour, int x, int y, int width, int height, int thickne
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1279](../../stdlib/Drawing.sl#L1279)</sub>
+<sub>[stdlib/Drawing.sl:1421](../../stdlib/Drawing.sl#L1421)</sub>
 
 #### FillRectangle *method*
 
@@ -182,7 +243,7 @@ void FillRectangle(Rgba colour, int x, int y, int width, int height)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1285](../../stdlib/Drawing.sl#L1285)</sub>
+<sub>[stdlib/Drawing.sl:1427](../../stdlib/Drawing.sl#L1427)</sub>
 
 #### DrawEllipse *method*
 
@@ -194,7 +255,7 @@ An ellipse inside the rectangle given, which is how every other API here
 and in `Forms.Drawing` spells one -- libgd's centre-and-size form is
 converted by the backend.
 
-<sub>[stdlib/Drawing.sl:1293](../../stdlib/Drawing.sl#L1293)</sub>
+<sub>[stdlib/Drawing.sl:1435](../../stdlib/Drawing.sl#L1435)</sub>
 
 #### FillEllipse *method*
 
@@ -204,7 +265,7 @@ void FillEllipse(Rgba colour, int x, int y, int width, int height)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1299](../../stdlib/Drawing.sl#L1299)</sub>
+<sub>[stdlib/Drawing.sl:1441](../../stdlib/Drawing.sl#L1441)</sub>
 
 #### DrawPolygon *method*
 
@@ -221,7 +282,7 @@ every mention of whichever one it meant. Neither library should be the
 one that makes the other awkward to import, so this one declares no
 geometry at all.
 
-<sub>[stdlib/Drawing.sl:1324](../../stdlib/Drawing.sl#L1324)</sub>
+<sub>[stdlib/Drawing.sl:1466](../../stdlib/Drawing.sl#L1466)</sub>
 
 #### FillPolygon *method*
 
@@ -231,7 +292,7 @@ void FillPolygon(Rgba colour, int[] points)
 
 *No documentation.*
 
-<sub>[stdlib/Drawing.sl:1329](../../stdlib/Drawing.sl#L1329)</sub>
+<sub>[stdlib/Drawing.sl:1471](../../stdlib/Drawing.sl#L1471)</sub>
 
 #### Draw *method*
 
@@ -241,7 +302,7 @@ void Draw(Image source, int x, int y)
 
 Draws another picture on this one, at its own size.
 
-<sub>[stdlib/Drawing.sl:1345](../../stdlib/Drawing.sl#L1345)</sub>
+<sub>[stdlib/Drawing.sl:1487](../../stdlib/Drawing.sl#L1487)</sub>
 
 #### DrawScaled *method*
 
@@ -252,7 +313,7 @@ void DrawScaled(Image source, int x, int y, int width, int height, int sourceX, 
 Draws part of another picture into a rectangle of this one, scaling to
 fit. What a thumbnail and a sprite sheet are both made of.
 
-<sub>[stdlib/Drawing.sl:1353](../../stdlib/Drawing.sl#L1353)</sub>
+<sub>[stdlib/Drawing.sl:1495](../../stdlib/Drawing.sl#L1495)</sub>
 
 #### Resize *method*
 
@@ -262,7 +323,7 @@ Result<Image, ImageError> Resize(int width, int height)
 
 A copy at another size, resampled.
 
-<sub>[stdlib/Drawing.sl:1369](../../stdlib/Drawing.sl#L1369)</sub>
+<sub>[stdlib/Drawing.sl:1511](../../stdlib/Drawing.sl#L1511)</sub>
 
 #### Encode *method*
 
@@ -277,7 +338,7 @@ encoder's own default. GDI+ ignores it -- setting it there needs an
 `EncoderParameters` laid out by hand for the one format that reads one,
 and its default of 75 is the same number libgd uses.
 
-<sub>[stdlib/Drawing.sl:1387](../../stdlib/Drawing.sl#L1387)</sub>
+<sub>[stdlib/Drawing.sl:1529](../../stdlib/Drawing.sl#L1529)</sub>
 
 #### Save *method*
 
@@ -287,7 +348,7 @@ ImageError Save(String path, ImageFormat format, int quality)
 
 Encodes and writes to a file. `ImageError.None` when it worked.
 
-<sub>[stdlib/Drawing.sl:1403](../../stdlib/Drawing.sl#L1403)</sub>
+<sub>[stdlib/Drawing.sl:1545](../../stdlib/Drawing.sl#L1545)</sub>
 
 ### ImageError *enum*
 
@@ -451,7 +512,7 @@ The imaging library, loaded once and shared.
 chart wants to say "install libgd" at startup rather than at the end of a
 long computation, and `Available` is how it finds out.
 
-<sub>[stdlib/Drawing.sl:1064](../../stdlib/Drawing.sl#L1064)</sub>
+<sub>[stdlib/Drawing.sl:1157](../../stdlib/Drawing.sl#L1157)</sub>
 
 #### Available *property*
 
@@ -464,7 +525,7 @@ Whether there is an imaging library on this machine.
 Loads it, so the first call is where the cost is and every `Image` after
 it is free.
 
-<sub>[stdlib/Drawing.sl:1104](../../stdlib/Drawing.sl#L1104)</sub>
+<sub>[stdlib/Drawing.sl:1197](../../stdlib/Drawing.sl#L1197)</sub>
 
 #### BackendName *property*
 
@@ -475,7 +536,7 @@ static String BackendName { get; }
 The name of the library behind it, for a program that reports what it
 found. `""` when there is none.
 
-<sub>[stdlib/Drawing.sl:1108](../../stdlib/Drawing.sl#L1108)</sub>
+<sub>[stdlib/Drawing.sl:1201](../../stdlib/Drawing.sl#L1201)</sub>
 
 ### Rgba *struct*
 

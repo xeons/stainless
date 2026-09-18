@@ -221,6 +221,33 @@ delegate __stdcall int GdipDrawImageRectRectIFn(void* graphics, void* image,
                                                 void* callback, void* callbackData);
 delegate __stdcall int GdipSaveImageToStreamFn(void* image, void* stream,
                                                Guid* encoder, void* parameters);
+delegate __stdcall int GdipBitmapLockBitsFn(void* bitmap, GpRect* area, uint mode,
+                                            int format, BitmapData* locked);
+delegate __stdcall int GdipBitmapUnlockBitsFn(void* bitmap, BitmapData* locked);
+
+/// The rectangle GDI+ locks, which is `GpRect` and not Windows' own `RECT`:
+/// this one is a width and a height where a `RECT` is a second corner.
+struct GpRect
+{
+    int X;
+    int Y;
+    int Width;
+    int Height;
+}
+
+/// What `GdipBitmapLockBits` fills in. `Stride` is signed because a bitmap may
+/// be stored bottom-up, in which case it is negative and `Scan0` points at the
+/// last row -- which is why the copy below walks rows rather than taking the
+/// whole block at once.
+struct BitmapData
+{
+    uint Width;
+    uint Height;
+    int Stride;
+    int Format;
+    void* Scan0;
+    nuint Reserved;
+}
 
 delegate __stdcall int CreateStreamOnHGlobalFn(void* memory, int deleteOnRelease,
                                                void** stream);
@@ -257,6 +284,8 @@ const int FillAlternate = 0;
 const int UnitPixel = 2;
 /// `GMEM_MOVEABLE`, which is what a stream over an `HGLOBAL` requires.
 const uint GlobalMoveable = 0x0002u;
+/// `ImageLockModeRead`. Nothing here locks for writing.
+const uint LockModeRead = 0x0001u;
 
 /// GDI+, resolved once.
 ///
@@ -290,6 +319,8 @@ threadsafe sealed class Backend
     GdipFillPolygonIFn _fillPolygon;
     GdipDrawImageRectRectIFn _blit;
     GdipSaveImageToStreamFn _toStream;
+    GdipBitmapLockBitsFn _lock;
+    GdipBitmapUnlockBitsFn _unlock;
     CreateStreamOnHGlobalFn _makeStream;
     GetHGlobalFromStreamFn _memoryOf;
 
@@ -332,6 +363,8 @@ threadsafe sealed class Backend
         _fillPolygon = (GdipFillPolygonIFn)Find(gdiplus, "GdipFillPolygonI", &complete);
         _blit = (GdipDrawImageRectRectIFn)Find(gdiplus, "GdipDrawImageRectRectI", &complete);
         _toStream = (GdipSaveImageToStreamFn)Find(gdiplus, "GdipSaveImageToStream", &complete);
+        _lock = (GdipBitmapLockBitsFn)Find(gdiplus, "GdipBitmapLockBits", &complete);
+        _unlock = (GdipBitmapUnlockBitsFn)Find(gdiplus, "GdipBitmapUnlockBits", &complete);
         _makeStream = (CreateStreamOnHGlobalFn)Find(ole, "CreateStreamOnHGlobal", &complete);
         _memoryOf = (GetHGlobalFromStreamFn)Find(ole, "GetHGlobalFromStream", &complete);
 
@@ -419,6 +452,37 @@ threadsafe sealed class Backend
     public void SetPixel(void* image, int x, int y, uint colour)
     {
         _setPixel(image, x, y, colour);
+    }
+
+    /// Every pixel at once, as four bytes each in the order blue, green, red,
+    /// alpha.
+    ///
+    /// GDI+ stores exactly that -- `PixelFormat32bppARGB` is a little-endian
+    /// `0xAARRGGBB`, whose bytes in memory are B, G, R, A -- so a locked row is
+    /// copied rather than converted. Row by row rather than in one block,
+    /// because `Stride` is signed: a bottom-up bitmap reports a negative one
+    /// and points `Scan0` at the last row.
+    public bool CopyPixels(void* image, int width, int height, byte* into)
+    {
+        GpRect area;
+        area.X = 0;
+        area.Y = 0;
+        area.Width = width;
+        area.Height = height;
+
+        BitmapData locked;
+        if (_lock(image, &area, LockModeRead, PixelFormat32bppArgb, &locked) != 0)
+            return false;
+
+        nuint row = (nuint)width * 4u;
+        for (int y = 0; y < height; y++)
+        {
+            byte* source = (byte*)locked.Scan0 + (nint)y * (nint)locked.Stride;
+            memcpy((void*)(into + (nuint)y * row), (void*)source, row);
+        }
+
+        _unlock(image, &locked);
+        return true;
     }
 
     // -------------------------------------------------------------- drawing
@@ -910,6 +974,35 @@ threadsafe sealed class Backend
         _blending(image, 1);
     }
 
+    /// Every pixel at once, in the same blue, green, red, alpha order the
+    /// Windows backend answers.
+    ///
+    /// **A call per pixel, where GDI+ locks and copies rows.** libgd's true
+    /// colour rows are a `int**` inside a structure this module deliberately
+    /// does not describe -- reaching into it would mean pinning libgd's layout,
+    /// which is the thing `void*` here exists to avoid. `gdImageGetPixel` is a
+    /// resolved function pointer and an array index, so an icon costs a
+    /// thousand calls and a photograph a million; that is the price of not
+    /// knowing the structure, and it is paid once when a picture is handed to
+    /// a widget set rather than per frame.
+    public bool CopyPixels(void* image, int width, int height, byte* into)
+    {
+        nuint at = 0u;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                uint colour = FromGd(_getPixel(image, x, y));
+                into[at] = (byte)(colour & 0xFFu);
+                into[at + 1u] = (byte)((colour >> 8) & 0xFFu);
+                into[at + 2u] = (byte)((colour >> 16) & 0xFFu);
+                into[at + 3u] = (byte)((colour >> 24) & 0xFFu);
+                at = at + 4u;
+            }
+        }
+        return true;
+    }
+
     // -------------------------------------------------------------- drawing
 
     public void Clear(void* image, uint colour)
@@ -1246,6 +1339,55 @@ public sealed class Image
         var backend = Imaging.Use();
         if (backend != null)
             ((Backend)backend).SetPixel(_handle, x, y, colour.Packed);
+    }
+
+    /// How many bytes one row of `CopyPixels` occupies: four per pixel, with no
+    /// padding between rows.
+    public nuint Stride => (nuint)_wide * 4u;
+
+    /// How many bytes `CopyPixels` writes.
+    public nuint PixelByteLength => Stride * (nuint)_high;
+
+    /// Every pixel, as four bytes each in the order **blue, green, red,
+    /// alpha**, rows top to bottom with no padding.
+    ///
+    /// That order rather than red-first because it is what both a Windows DIB
+    /// and this module's own `Rgba.Packed` already are: `Packed` is
+    /// `0xAARRGGBB`, and its bytes on every machine this compiles for are B, G,
+    /// R, A. A reader wanting the other order swaps two bytes per pixel and
+    /// knows it is doing so; making this the packed order would have every
+    /// reader convert instead.
+    ///
+    /// The alpha is **straight, not premultiplied**. Premultiplying is what a
+    /// particular compositor wants rather than what the picture is, so it
+    /// belongs to whoever is about to composite.
+    ///
+    /// False when the picture is closed, when there is no backend, when `into`
+    /// is shorter than `PixelByteLength`, or when the backend refused.
+    public bool CopyPixels(byte[] into)
+    {
+        if (_handle == null || into.Length < PixelByteLength)
+            return false;
+
+        var backend = Imaging.Use();
+        if (backend == null)
+            return false;
+
+        return ((Backend)backend).CopyPixels(_handle, _wide, _high, &into[0u]);
+    }
+
+    /// The same bytes in an array of the right size, or an empty one for the
+    /// failures `CopyPixels` answers false for.
+    ///
+    /// Empty rather than null for the reason `Encode` gives: an array is a value
+    /// here and is never null, and a picture with no pixels is not something
+    /// either backend produces.
+    public byte[] ToBgra()
+    {
+        var pixels = new byte[PixelByteLength];
+        if (!CopyPixels(pixels))
+            return new byte[0u];
+        return pixels;
     }
 
     bool Inside(int x, int y)

@@ -129,6 +129,14 @@ public class GtkBitmapBackend : IBitmapBackend
 
     public nuint Handle => (nuint)_pixbuf;
 
+    /// What the pixbuf itself says, which is the honest answer and not one
+    /// this backend has to act on: cairo composites a pixbuf correctly whether
+    /// or not it has an alpha channel, so nothing here branches on this. It is
+    /// the Win32 side that must choose between two different blits, and the
+    /// seam asks both the same question rather than having one of them carry a
+    /// property only the other means anything by.
+    public bool HasAlpha => gdk_pixbuf_get_has_alpha((GdkPixbuf*)_pixbuf) != 0;
+
     /// The pixbuf itself, for the image list and the toolbar, which need the
     /// object rather than a number.
     public gpointer Pixbuf => _pixbuf;

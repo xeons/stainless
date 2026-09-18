@@ -21,6 +21,11 @@
   ok   with the drawing still in it
   ok   it resizes
   ok   one picture draws on another
+  ok   every pixel reads out at once
+  ok   as four bytes a pixel
+  ok   in blue, green, red, alpha order
+  ok   and the same the other way
+  ok   a buffer too small is refused
   ok   a missing file says so
   ok   and bytes that are not a picture say so
   ok   and no bytes at all

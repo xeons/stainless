@@ -682,6 +682,11 @@ public class Win32WidgetSet : IWidgetSet
         return LoadResourceBitmap(id);
     }
 
+    public Result<IBitmapBackend, String> CreateBitmap(int width, int height, byte[] pixels)
+    {
+        return CreateBitmapFromPixels(width, height, pixels);
+    }
+
     public IImageListBackend CreateImageList(FSize imageSize)
     {
         return new ImageListBackend(imageSize);

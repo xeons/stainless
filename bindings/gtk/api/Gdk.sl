@@ -293,6 +293,32 @@ public extern "C"
     gint gdk_pixbuf_get_width(GdkPixbuf* pixbuf);
     gint gdk_pixbuf_get_height(GdkPixbuf* pixbuf);
 
+    /// An empty pixbuf that owns its own pixels.
+    ///
+    /// **This rather than `gdk_pixbuf_new_from_data`**, which does not copy:
+    /// that one points at the caller's memory for the pixbuf's whole life, and
+    /// handing it the interior of a Stainless array would hand GTK something
+    /// ARC is entitled to free first. This allocates, `gdk_pixbuf_get_pixels`
+    /// says where, and the copy is the caller's to make.
+    ///
+    /// `colourspace` is `GDK_COLORSPACE_RGB`, which is 0 and the only one
+    /// there has ever been; `bitsPerSample` is 8 and nothing else is
+    /// supported.
+    GdkPixbuf* gdk_pixbuf_new(gint colourspace, gboolean hasAlpha, gint bitsPerSample,
+                              gint width, gint height);
+
+    /// The pixels themselves: red, green, blue and then alpha where there is
+    /// one -- not the blue-first order Windows uses.
+    byte* gdk_pixbuf_get_pixels(GdkPixbuf* pixbuf);
+
+    /// Bytes from the start of one row to the start of the next, which is
+    /// **not** width times four: gdk-pixbuf aligns rows, so a copy that
+    /// assumes otherwise shears the picture.
+    gint gdk_pixbuf_get_rowstride(GdkPixbuf* pixbuf);
+
+    /// Whether there is a fourth byte per pixel. Non-zero for yes.
+    gboolean gdk_pixbuf_get_has_alpha(GdkPixbuf* pixbuf);
+
     /// A new pixbuf at another size. `GDK_INTERP_BILINEAR` is 2.
     GdkPixbuf* gdk_pixbuf_scale_simple(GdkPixbuf* pixbuf, gint width, gint height,
                                        gint interpolation);

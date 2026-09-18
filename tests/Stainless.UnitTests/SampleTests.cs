@@ -139,6 +139,7 @@ public class SampleTests
         new("forms/common", ["samples/forms/common.sl"]) { NeedsForms = true },
         new("forms/drawn", ["samples/forms/drawn.sl"]) { NeedsForms = true },
         new("forms/buttons", ["samples/forms/buttons.sl"]) { NeedsForms = true },
+        new("forms/pictures", ["samples/forms/pictures.sl"]) { NeedsForms = true },
 
         new("gtk/hello", ["samples/gtk/hello.sl"]) { UnixOnly = true },
         new("gtk/control", ["samples/gtk/control.sl"]) { UnixOnly = true },

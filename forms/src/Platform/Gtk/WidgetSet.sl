@@ -380,6 +380,57 @@ public class GtkWidgetSet : IWidgetSet
         return Ok(new GtkBitmapBackend((gpointer)loaded));
     }
 
+    /// A picture from pixels the caller already has.
+    ///
+    /// The seam hands over **blue, green, red, alpha** -- a DIB's order, and
+    /// `Standard.Drawing`'s -- and gdk-pixbuf wants red first, so this swaps
+    /// two bytes of each pixel on the way in. That is the whole difference
+    /// between the two backends here, and it is why the seam states an order
+    /// rather than saying "the platform's".
+    ///
+    /// The alpha stays straight: cairo composites premultiplied, but
+    /// `gdk_cairo_set_source_pixbuf` does that conversion itself, so
+    /// premultiplying here would apply it twice.
+    public Result<IBitmapBackend, String> CreateBitmap(int width, int height, byte[] pixels)
+    {
+        Start();
+
+        if (width <= 0 || height <= 0)
+            return Fail("a bitmap needs a positive width and height");
+
+        nuint needed = (nuint)width * (nuint)height * 4u;
+        if (pixels.Length < needed)
+        {
+            return Fail("a bitmap of " + Text.FromInteger((long)width) + "x"
+                        + Text.FromInteger((long)height) + " needs "
+                        + Text.FromInteger((long)needed) + " bytes and was given "
+                        + Text.FromInteger((long)pixels.Length));
+        }
+
+        GdkPixbuf* made = gdk_pixbuf_new(0, 1, 8, width, height);
+        if (made == null)
+            return Fail("gdk-pixbuf would not make a bitmap of that size");
+
+        byte* into = gdk_pixbuf_get_pixels(made);
+        nuint stride = (nuint)gdk_pixbuf_get_rowstride(made);
+        nuint row = (nuint)width * 4u;
+
+        for (nuint y = 0u; y < (nuint)height; y++)
+        {
+            nuint source = y * row;
+            nuint target = y * stride;
+            for (nuint x = 0u; x < row; x = x + 4u)
+            {
+                into[target + x]      = pixels[source + x + 2u];   // red
+                into[target + x + 1u] = pixels[source + x + 1u];   // green
+                into[target + x + 2u] = pixels[source + x];        // blue
+                into[target + x + 3u] = pixels[source + x + 3u];   // alpha
+            }
+        }
+
+        return Ok(new GtkBitmapBackend((gpointer)made));
+    }
+
     /// A picture out of the binary's own resources, by the id the script gave.
     ///
     /// **The resource is not a file.** `rc` strips the 14-byte

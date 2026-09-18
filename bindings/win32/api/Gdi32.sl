@@ -171,6 +171,100 @@ public extern "C"
     int     RestoreDC(HDC dc, int state);
 }
 
+/// A device-independent bitmap's description.
+///
+/// `Height` is signed and the sign is the whole point: a positive one means
+/// the rows are stored bottom-up, which is the DIB's own ancient convention,
+/// and a negative one means top-down, which is how every decoder in the world
+/// hands pixels over. Writing the negative is what turns a copy into a
+/// straight `memcpy` rather than a loop that walks one of the two backwards.
+public struct BitmapInfoHeader
+{
+    public uint Size;
+    public int  Width;
+    public int  Height;
+    public ushort Planes;
+    public ushort BitCount;
+    public uint Compression;
+    public uint ImageByteLength;
+    public int  PixelsPerMeterX;
+    public int  PixelsPerMeterY;
+    public uint ColoursUsed;
+    public uint ColoursImportant;
+}
+
+/// A header and its palette. At 32 bits a pixel there is no palette, so this
+/// is the header and one unused entry -- which is what `BITMAPINFO` is in the
+/// header too, and why passing a bare `BitmapInfoHeader*` is the usual way
+/// this is called.
+public struct BitmapInfo
+{
+    public BitmapInfoHeader Header;
+    public uint FirstColour;
+}
+
+public extern "C"
+{
+    /// Makes a DIB and hands back a pointer to the pixels it owns.
+    ///
+    /// The bits belong to the bitmap: they are valid until `DeleteObject`, and
+    /// must not be freed. `GdiFlush` is required before reading back anything
+    /// GDI drew into them, and is not required for writing them before the
+    /// bitmap is first used, which is what a decoder does.
+    HBITMAP CreateDIBSection(HDC dc, BitmapInfo* info, uint usage,
+                             void** bits, void* section, uint offset);
+    int GdiFlush();
+}
+
+/// How two pictures are combined, for `GdiAlphaBlend`.
+///
+/// `SourceConstantAlpha` is a whole-picture opacity applied on top of whatever
+/// the per-pixel alpha says; 255 means "use the pixels' own". `AlphaFormat` is
+/// `AC_SRC_ALPHA` when the source has a per-pixel alpha channel and zero when
+/// it does not, and getting that wrong is invisible in one direction and total
+/// in the other: claiming an alpha channel a bitmap has not got reads whatever
+/// is in the fourth byte, which for a `.bmp` is zero, which is transparent.
+public struct BlendFunction
+{
+    public byte Operation;
+    public byte Flags;
+    public byte SourceConstantAlpha;
+    public byte AlphaFormat;
+}
+
+public extern "C"
+{
+    /// `AlphaBlend`, under the name gdi32 exports it by.
+    ///
+    /// **`GdiAlphaBlend` rather than `AlphaBlend`**, which is the same function:
+    /// the documented name lives in `msimg32.dll`, whose entire content is
+    /// forwarders, and gdi32 has exported this one since Windows 2000. Naming
+    /// it here means nothing has to link a second library for a picture with
+    /// transparency in it.
+    ///
+    /// **The source must be premultiplied** -- each colour already scaled by
+    /// its own alpha. Given straight colour it lightens every partly
+    /// transparent pixel, which reads as a halo round every icon rather than
+    /// as an obvious failure.
+    int GdiAlphaBlend(HDC destination, int x, int y, int width, int height,
+                      HDC source, int sourceX, int sourceY,
+                      int sourceWidth, int sourceHeight, BlendFunction blend);
+}
+
+/// `AC_SRC_OVER`, the only blend operation there is.
+public const byte BlendSourceOver = 0;
+/// `AC_SRC_ALPHA`: the source carries a per-pixel alpha channel.
+public const byte BlendSourceAlpha = 1;
+
+/// `BI_RGB`: no compression. At 32 bits a pixel the bytes of each are blue,
+/// green, red and then one GDI itself ignores -- which is what makes a
+/// straight alpha channel something a caller has to composite rather than
+/// something `BitBlt` honours.
+public const uint BitmapCompressionRgb = 0u;
+
+/// `DIB_RGB_COLORS`, as against palette indices.
+public const uint DibRgbColours = 0u;
+
 public const int DeviceCapsHorizontalPixels = 8;
 public const int DeviceCapsVerticalPixels   = 10;
 public const int DeviceCapsBitsPerPixel     = 12;

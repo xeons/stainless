@@ -482,14 +482,15 @@ is already bound.
   `TStringGrid` and `TDrawGrid` are drawn from nothing: Windows has no grid, so
   this is scrolling, selection, in-place editing and painting, all by hand. It
   is the single biggest thing missing and the one most often wanted.
-- **The rest of `Graphics`** — `TPicture`, `TIcon`, `TRegion`
-  (`intfgraphics.pas`, 6,698 lines). Two of the entries that were here are done
-  and are done *below* this library rather than in it: `Standard.Drawing` reads
-  and writes PNG, JPEG, BMP and GIF, draws onto a picture and reads its pixels,
-  on both platforms. What is left for `forms/` is to build `Bitmap` on it, so
-  that a `Forms.Bitmap` is a `Standard.Drawing.Image` that has been handed to
-  the widget set — at which point `Bitmap.FromFile` reads a PNG and the note
-  below stops being true.
+- **The rest of `Graphics`** — `TIcon` and `TRegion` (`intfgraphics.pas`,
+  6,698 lines). The rest of the entries that were here are done, and are done
+  *below* this library rather than in it: `Standard.Drawing` reads and writes
+  PNG, JPEG, BMP and GIF, draws onto a picture and reads its pixels, on both
+  platforms — and `Bitmap.FromImage` now hands one of its images to the widget
+  set, so `Bitmap.FromFile` reads all four formats on both backends.
+  `IWidgetSet.CreateBitmap` is the seam that made that possible, and it takes
+  pixels rather than a path precisely so that every decoder question stays on
+  the other side of it.
 - **Printing** (`printers.pas`, `postscriptcanvas.pas`) — a `Canvas` that is a
   printer, plus the dialogs.
 - **Form streaming** (`lresources.pp`, `propertystorage.pas`) — the `.lfm` tier.
@@ -643,11 +644,20 @@ here at all. Where one is a backend's rather than the library's, it says so.
   `TPersistent` with a `TStrings` hanging off it, so a thousand rows is two
   thousand objects before any text. Cells are set and read through the list,
   which is what the platform stores anyway.
-- **Pictures are `.bmp` only here**, because `LoadImageW` is the whole of what
-  Windows decodes without a library. That is now a gap in this library rather
-  than in the language: `Standard.Drawing` reads PNG, JPEG, BMP and GIF on both
-  platforms, and what is missing is the step that hands one of its images to a
-  widget set. An `ImageList` treats magenta as transparent, as toolbar bitmaps
+- **Pictures are PNG, JPEG, BMP and GIF**, on both backends, because
+  `Bitmap.FromFile` decodes through `Standard.Drawing` and hands the pixels to
+  the widget set through `IWidgetSet.CreateBitmap`. The platform's own loader is
+  the fallback for a machine with no imaging library, and on Windows that is
+  `LoadImageW`, which reads `.bmp` and nothing else — which is what this note
+  used to say was the whole story. The two backends differ in one place and it
+  is written down in the seam: pixels cross as blue, green, red, alpha, so the
+  Win32 side copies them straight into a DIB and premultiplies for
+  `AlphaBlend`, while the GTK side swaps two bytes per pixel and leaves the
+  alpha straight because `gdk_cairo_set_source_pixbuf` premultiplies for
+  itself. [samples/forms/pictures.sl](../samples/forms/pictures.sl) draws a
+  deliberately asymmetric picture, sends it through PNG, and shows it — so a
+  flip, a red-for-blue swap or a wrong row stride is visible rather than
+  subtle. An `ImageList` treats magenta as transparent, as toolbar bitmaps
   have since Windows 95. They may come from a file or from the program's own
   resources -- `Bitmap.FromResource(id)` and `ImageList.AddResource(id)` read
   an `RT_BITMAP` compiled into the executable, which is how a toolbar's icons

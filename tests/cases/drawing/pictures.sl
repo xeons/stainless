@@ -122,6 +122,26 @@ int Main()
                    copied.R == (byte)200 && copied.G == (byte)30 && copied.B == (byte)30);
     }
 
+    // ---- every pixel at once.
+    var pixels = new byte[picture.PixelByteLength];
+    bool copied = picture.CopyPixels(pixels);
+    ok = Check(ok, "every pixel reads out at once", copied);
+    ok = Check(ok, "as four bytes a pixel",
+               picture.Stride == 256u && picture.PixelByteLength == 12288u);
+
+    // The filled rectangle covers (20, 16), which is row 16 column 20.
+    nuint at = picture.Stride * 16u + 80u;
+    ok = Check(ok, "in blue, green, red, alpha order",
+               pixels[at] == (byte)30 && pixels[at + 1u] == (byte)30
+               && pixels[at + 2u] == (byte)200 && pixels[at + 3u] == (byte)255);
+
+    var again = picture.ToBgra();
+    ok = Check(ok, "and the same the other way",
+               again.Length == picture.PixelByteLength && again[at + 2u] == (byte)200);
+
+    ok = Check(ok, "a buffer too small is refused",
+               !picture.CopyPixels(new byte[16u]));
+
     // ---- what goes wrong.
     var missing = Image.FromFile("no-such-picture-anywhere.png");
     ok = Check(ok, "a missing file says so",

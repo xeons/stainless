@@ -515,6 +515,17 @@ public interface IBitmapBackend
     int Height { get; }
     /// The platform's handle -- an `HBITMAP` on Windows.
     nuint Handle { get; }
+
+    /// Whether the picture carries a per-pixel alpha channel that can be
+    /// drawn with.
+    ///
+    /// **Not "has four bytes per pixel".** A `.bmp` read by the platform's own
+    /// loader is 32 bits deep and its fourth byte is zero, which is exactly
+    /// what "invisible" is spelled as -- so a backend that answered true for
+    /// one of those would draw nothing at all and look like a broken blit. It
+    /// is true only where the pixels came from somewhere that says what the
+    /// channel means, which today is `CreateBitmap`.
+    bool HasAlpha { get; }
 }
 
 /// Same-sized pictures, indexed by number.
@@ -876,7 +887,27 @@ public interface IWidgetSet
 
     /// A picture read from a file. What the format may be is the backend's
     /// business; Windows reads `.bmp` without a decoder and nothing else.
+    ///
+    /// **`Bitmap.FromFile` tries `CreateBitmap` first** and only falls back to
+    /// this, so what a backend decodes natively decides the speed rather than
+    /// the answer. It is still here because it is the path that works when
+    /// `Standard.Drawing` has no imaging library to load.
     Result<IBitmapBackend, String> LoadBitmap(String path);
+
+    /// A picture the caller already has the pixels of.
+    ///
+    /// `pixels` is four bytes each in the order **blue, green, red, alpha**,
+    /// rows top to bottom, `width * 4` bytes to a row and no padding -- which
+    /// is `Standard.Drawing.Image.CopyPixels`' order, and a Windows DIB's, and
+    /// what `Rgba.Packed` already is in memory. The alpha is straight, not
+    /// premultiplied; a backend that composites premultiplied does that
+    /// conversion itself, because it is the one that knows.
+    ///
+    /// This is the seam that lets `forms/` show a PNG. Every decoder question
+    /// -- which formats, which library, which platform has it -- belongs to
+    /// `Standard.Drawing` and stops here, so a widget set only ever has to
+    /// know how to turn bytes into whatever its own toolkit holds pictures in.
+    Result<IBitmapBackend, String> CreateBitmap(int width, int height, byte[] pixels);
 
     /// A picture read out of the binary's own resources, by numeric id.
     ///

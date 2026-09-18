@@ -508,11 +508,23 @@ public sealed class Graphics
 
 /// A picture, loaded once and drawn many times.
 ///
-/// **Read from a file and nothing else, for now.** There is no drawing on to
-/// one and no saving from one; what a `Bitmap` is for at this stage is putting
-/// icons on a toolbar, in a tree and in a list, which is what `ImageList` takes
-/// one for. Which formats can be read is the platform's business -- Windows
-/// decodes `.bmp` without a library and nothing else.
+/// **PNG, JPEG, BMP and GIF, on both backends.** Which formats can be read used
+/// to be the platform's business, and that meant `.bmp` and nothing else on
+/// Windows, because `LoadImageW` is the whole of what Windows decodes without a
+/// library. `Standard.Drawing` decodes all four everywhere -- GDI+ on Windows,
+/// libgd elsewhere -- so a `Bitmap` is now one of its images handed to the
+/// widget set, and the platform's own loader is the fallback rather than the
+/// rule.
+///
+/// The two libraries stay apart otherwise, and deliberately:
+/// `Standard.Drawing` is a picture in memory that knows nothing about windows,
+/// and this is a picture the *toolkit* holds -- an `HBITMAP`, a `GdkPixbuf` --
+/// which is the only kind a control can draw. `FromImage` is the one crossing,
+/// and it copies: what a widget set holds afterwards owes nothing to the image
+/// it came from.
+///
+/// There is still no drawing on to one and no saving from one. Draw on a
+/// `Standard.Drawing.Image` and bring the result across.
 public sealed class Bitmap
 {
     IBitmapBackend _backend;
@@ -526,10 +538,48 @@ public sealed class Bitmap
     /// built, and the error says which one failed.
     public static Result<Bitmap, String> FromFile(String path)
     {
+        // The decoder first, because it reads four formats where the widget
+        // set reads one -- and the widget set second, because a machine with
+        // no imaging library still has whatever its own toolkit can decode.
+        if (Standard.Drawing.Imaging.Available)
+        {
+            var read = Standard.Drawing.Image.FromFile(path);
+            if (read.Ok)
+                return FromImage(read.Value);
+
+            // A file that is genuinely missing is worth saying so about
+            // directly; anything else may still be something the platform
+            // knows and this does not, so it falls through.
+            if (read.Error == Standard.Drawing.ImageError.NotFound)
+                return Fail("could not read '" + path + "': there is no such file");
+        }
+
         var loaded = WidgetSet.Current.LoadBitmap(path);
         if (!loaded.Ok)
             return Fail(loaded.Error);
         return Ok(new Bitmap(loaded.Value));
+    }
+
+    /// A picture the program decoded, drew or generated, handed to the widget
+    /// set.
+    ///
+    /// This is the crossing between the two drawing libraries, and it is a
+    /// copy: the pixels are read out of `picture` once and given to the
+    /// toolkit, so the two are independent afterwards and drawing on the image
+    /// again does not change the bitmap.
+    public static Result<Bitmap, String> FromImage(Standard.Drawing.Image picture)
+    {
+        if (!picture.IsOpen)
+            return Fail("that picture has been closed");
+
+        var pixels = picture.ToBgra();
+        if (pixels.Length == 0u)
+            return Fail("could not read the picture's pixels");
+
+        var made = WidgetSet.Current.CreateBitmap(picture.Width, picture.Height, pixels);
+        if (!made.Ok)
+            return Fail(made.Error);
+        return Ok(new Bitmap(made.Value));
     }
 
     /// Reads a picture the program is carrying inside itself, by the numeric

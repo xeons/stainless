@@ -402,16 +402,31 @@ public class LabeledEdit : Panel
 ///
 /// The `GraphicControl` counterpart of everything else here: no window, no
 /// peer, just a `Bitmap` drawn in the parent's paint.
+///
+/// **Four properties decide where the picture goes**, and they are the LCL's
+/// and C#'s, which agree: `Stretch` fills the control, `Proportional` keeps
+/// the shape while doing it, `Center` puts a picture smaller than the control
+/// in the middle rather than the corner, and `AutoSize` moves the *control* to
+/// the picture instead. `Stretch` and `AutoSize` together are a contradiction
+/// -- one resizes the picture to the control and the other the control to the
+/// picture -- and `AutoSize` wins, because it is the one that says what the
+/// control is for.
 public class Image : GraphicControl
 {
     Bitmap? _picture;
     bool _stretched;
+    bool _proportional;
+    bool _centred;
+    bool _sizing;
 
     public Image(WindowedControl parent)
     {
         base(parent);
         _picture = null;
         _stretched = false;
+        _proportional = false;
+        _centred = false;
+        _sizing = false;
     }
 
     /// What is shown, or null for nothing.
@@ -421,8 +436,59 @@ public class Image : GraphicControl
         set
         {
             _picture = value;
+            FitToPicture();
             Invalidate();
         }
+    }
+
+    /// Whether the picture is scaled to keep its shape when it is stretched.
+    ///
+    /// Nothing on its own: without `Stretch` there is no scaling for this to
+    /// constrain, which is the LCL's rule and is why it is not a three-valued
+    /// `Scaling` property.
+    public bool Proportional
+    {
+        get => _proportional;
+        set
+        {
+            _proportional = value;
+            Invalidate();
+        }
+    }
+
+    /// Whether a picture smaller than the control sits in the middle of it.
+    public bool Center
+    {
+        get => _centred;
+        set
+        {
+            _centred = value;
+            Invalidate();
+        }
+    }
+
+    /// Whether the control takes the picture's size when one is given to it.
+    public bool AutoSize
+    {
+        get => _sizing;
+        set
+        {
+            _sizing = value;
+            FitToPicture();
+        }
+    }
+
+    void FitToPicture()
+    {
+        if (!_sizing)
+            return;
+
+        var held = _picture;
+        if (held == null)
+            return;
+
+        var shown = (Bitmap)held;
+        SetBounds(Left, Top, shown.Width, shown.Height);
     }
 
     /// Loads a picture from a file and shows it.
@@ -453,16 +519,49 @@ public class Image : GraphicControl
         if (held != null)
         {
             var shown = (Bitmap)held;
-            if (_stretched)
-            {
-                args.Graphics.DrawBitmap(shown, Rectangle.Of(0, 0, Width, Height));
-            }
-            else
-            {
-                args.Graphics.DrawBitmap(shown, Point.At(0, 0));
-            }
+            args.Graphics.DrawBitmap(shown, Placement(shown));
         }
         base.OnPaint(args);
+    }
+
+    /// Where the picture goes, which is the whole of what the four properties
+    /// decide. One function rather than four cases in `OnPaint`, because they
+    /// interact: proportional stretching is a scale *and* a centring, and
+    /// getting that as two independent branches is how a picture ends up
+    /// correctly sized in the wrong corner.
+    Rectangle Placement(Bitmap shown)
+    {
+        int wide = shown.Width;
+        int high = shown.Height;
+
+        if (wide <= 0 || high <= 0)
+            return Rectangle.Of(0, 0, Width, Height);
+
+        if (!_stretched)
+        {
+            if (!_centred)
+                return Rectangle.Of(0, 0, wide, high);
+            return Rectangle.Of((Width - wide) / 2, (Height - high) / 2, wide, high);
+        }
+
+        if (!_proportional)
+            return Rectangle.Of(0, 0, Width, Height);
+
+        // The smaller of the two ratios is the one that fits, and it is
+        // computed in whole numbers rather than as a double: a control and a
+        // picture are both counted in pixels, and multiplying before dividing
+        // keeps the answer exact without going near floating point.
+        int fitted = Width * high;
+        int other = Height * wide;
+
+        int shownWide = fitted <= other ? Width : (wide * Height) / high;
+        int shownHigh = fitted <= other ? (high * Width) / wide : Height;
+
+        // Proportional stretching centres what is left over. Filling from the
+        // corner instead would put a wide picture against the top of a tall
+        // control, which is never what was meant.
+        return Rectangle.Of((Width - shownWide) / 2, (Height - shownHigh) / 2,
+                            shownWide, shownHigh);
     }
 }
 

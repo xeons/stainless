@@ -291,12 +291,24 @@ public class BitmapBackend : IBitmapBackend
     HBITMAP _bitmap;
     int _wide;
     int _high;
+    bool _alpha;
 
     public BitmapBackend(HBITMAP handle, int width, int height)
     {
         _bitmap = handle;
         _wide = width;
         _high = height;
+        _alpha = false;
+    }
+
+    /// The same, for a bitmap whose alpha channel means something -- which is
+    /// the one this library made itself, from pixels a decoder produced.
+    public BitmapBackend(HBITMAP handle, int width, int height, bool alpha)
+    {
+        _bitmap = handle;
+        _wide = width;
+        _high = height;
+        _alpha = alpha;
     }
 
     ~BitmapBackend()
@@ -311,7 +323,66 @@ public class BitmapBackend : IBitmapBackend
     public int Width => _wide;
     public int Height => _high;
     public nuint Handle => (nuint)(void*)_bitmap;
+    public bool HasAlpha => _alpha;
     public HBITMAP Native => _bitmap;
+}
+
+/// A picture from pixels the caller already has.
+///
+/// `pixels` is blue, green, red, alpha, rows top to bottom -- which is a DIB's
+/// own byte order, so the copy is a `memcpy` rather than a conversion. The
+/// header asks for a *negative* height to say the rows are top-down; without
+/// it GDI would read them bottom-up and the picture would be upside down.
+///
+/// **The alpha arrives straight and is stored premultiplied.** `AlphaBlend`
+/// is the only thing on Windows that reads this channel and it requires
+/// premultiplied colour -- given straight colour it lightens every
+/// partly-transparent pixel, which looks like a halo round every icon. Doing
+/// it here means the seam can promise one thing and each backend can want
+/// what it wants.
+public Result<IBitmapBackend, String> CreateBitmapFromPixels(int width, int height,
+                                                             byte[] pixels)
+{
+    if (width <= 0 || height <= 0)
+        return Fail("a bitmap needs a positive width and height");
+
+    nuint needed = (nuint)width * (nuint)height * 4u;
+    if (pixels.Length < needed)
+        return Fail("a bitmap of " + Text.FromInteger((long)width) + "x"
+                    + Text.FromInteger((long)height) + " needs "
+                    + Text.FromInteger((long)needed) + " bytes and was given "
+                    + Text.FromInteger((long)pixels.Length));
+
+    BitmapInfo info;
+    info.Header.Size = (uint)sizeof(BitmapInfoHeader);
+    info.Header.Width = width;
+    info.Header.Height = -height;               // top-down, as above
+    info.Header.Planes = (ushort)1;
+    info.Header.BitCount = (ushort)32;
+    info.Header.Compression = BitmapCompressionRgb;
+    info.Header.ImageByteLength = 0u;
+    info.Header.PixelsPerMeterX = 0;
+    info.Header.PixelsPerMeterY = 0;
+    info.Header.ColoursUsed = 0u;
+    info.Header.ColoursImportant = 0u;
+    info.FirstColour = 0u;
+
+    void* bits = null;
+    var handle = CreateDIBSection(null, &info, DibRgbColours, &bits, null, 0u);
+    if (handle == null || bits == null)
+        return Fail("Windows would not make a bitmap of that size");
+
+    byte* into = (byte*)bits;
+    for (nuint i = 0u; i < needed; i = i + 4u)
+    {
+        uint alpha = (uint)pixels[i + 3u];
+        into[i]      = (byte)(((uint)pixels[i] * alpha) / 255u);
+        into[i + 1u] = (byte)(((uint)pixels[i + 1u] * alpha) / 255u);
+        into[i + 2u] = (byte)(((uint)pixels[i + 2u] * alpha) / 255u);
+        into[i + 3u] = (byte)alpha;
+    }
+
+    return Ok(new BitmapBackend(handle, width, height, true));
 }
 
 /// Reads a `.bmp` from disk.

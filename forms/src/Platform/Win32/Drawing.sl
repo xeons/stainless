@@ -343,7 +343,21 @@ public class GraphicsBackend : IGraphicsBackend
             return;
         HGDIOBJ was = SelectObject(memory, (HGDIOBJ)(void*)bitmap);
 
-        if (scaled)
+        if (picture.HasAlpha)
+        {
+            // `GdiAlphaBlend` scales as well as blends, so there is no
+            // stretched-versus-not branch here: the destination rectangle is
+            // the source rectangle when nothing is scaling.
+            BlendFunction blend;
+            blend.Operation = BlendSourceOver;
+            blend.Flags = 0;
+            blend.SourceConstantAlpha = 255;
+            blend.AlphaFormat = BlendSourceAlpha;
+
+            GdiAlphaBlend(_dc, into.X, into.Y, into.Width, into.Height,
+                          memory, 0, 0, picture.Width, picture.Height, blend);
+        }
+        else if (scaled)
         {
             StretchBlt(_dc, into.X, into.Y, into.Width, into.Height,
                        memory, 0, 0, picture.Width, picture.Height, SrcCopy);
