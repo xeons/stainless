@@ -256,6 +256,31 @@ public interface IControlPeer
     /// else does.
     void SetCapture(bool captured);
 
+    /// Puts the control in front of its siblings, so that one overlapping
+    /// another covers it rather than being covered.
+    ///
+    /// **Only among siblings**, which is the whole of what both platforms
+    /// offer: a child cannot be raised above its parent's siblings, so a panel
+    /// that must cover the whole window has to be a child of the whole window.
+    ///
+    /// Z-order is otherwise the order controls were made in, and that is a poor
+    /// thing to depend on -- it ties what is in front to the order of lines in
+    /// a constructor, and the two drift apart the first time a control is added
+    /// in a hurry. Anything that deliberately overlaps says so by calling this.
+    void BringToFront();
+
+    /// Where the pointer is now, in this control's own coordinates. Outside it
+    /// answers a point outside it, including negative ones.
+    ///
+    /// **Asked, not waited for**, which is the whole reason it exists. Enter
+    /// and leave events answer "is the pointer over *this* control", and a
+    /// container gets a leave the moment the pointer moves onto one of its own
+    /// children -- so anything that has to know whether the pointer is still
+    /// somewhere inside a panel, rather than over the panel itself, cannot be
+    /// written from events at all. A pane that slides out and has to slide back
+    /// when the pointer leaves is exactly that, and it is why this is here.
+    Point PointerPosition();
+
     /// How much room children have, as a size at the origin.
     ///
     /// **Always starts at (0, 0)**, because it is the space a child's own

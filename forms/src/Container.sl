@@ -385,6 +385,21 @@ public abstract class WindowedControl : Control
             ((IControlPeer)mine).SetCapture(captured);
     }
 
+    public override void BringToFront()
+    {
+        var mine = _platform;
+        if (mine != null)
+            ((IControlPeer)mine).BringToFront();
+    }
+
+    public override Point PointerPosition()
+    {
+        var mine = _platform;
+        if (mine == null)
+            return Point.Empty;
+        return ((IControlPeer)mine).PointerPosition();
+    }
+
     // ------------------------------------------- the mouse, for the windowless
     //
     // A `GraphicControl` has no window, so every message about it arrives here

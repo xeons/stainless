@@ -840,6 +840,39 @@ public class GtkPeer : IControlPeer
         }
     }
 
+    public Point PointerPosition()
+    {
+        gpointer surface = gtk_widget_get_window(inner);
+        if (surface == null)
+            return Point.Empty;
+
+        gpointer seat = gdk_display_get_default_seat(gdk_display_get_default());
+        if (seat == null)
+            return Point.Empty;
+
+        gpointer device = gdk_seat_get_pointer(seat);
+        if (device == null)
+            return Point.Empty;
+
+        gint x = 0;
+        gint y = 0;
+        guint buttons = 0u;
+        gdk_window_get_device_position((GdkWindow*)surface, device, &x, &y, &buttons);
+        return Point.At((int)x, (int)y);
+    }
+
+    public void BringToFront()
+    {
+        // Only a widget with a window of its own can be stacked, and a GTK
+        // widget may legitimately have none -- a label or a button draws on its
+        // parent's. Nothing to raise is not a failure: a windowless widget is
+        // painted in container order and was already in front of what it was
+        // added after.
+        gpointer surface = gtk_widget_get_window(inner);
+        if (surface != null)
+            gdk_window_raise((GdkWindow*)surface);
+    }
+
     /// What the layout gave the widget, at the origin.
     ///
     /// The allocation rather than the requested size, because the two differ

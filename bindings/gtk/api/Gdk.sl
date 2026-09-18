@@ -226,6 +226,24 @@ public extern "C"
     void gdk_window_set_cursor(GdkWindow* window, gpointer cursor);
     void gdk_window_get_origin(GdkWindow* window, gint* x, gint* y);
 
+    /// Raises a window above its siblings.
+    ///
+    /// GDK rather than GTK because there is no GTK call for it: the container
+    /// that gives a child its own window is what stacking applies to, and
+    /// `gtk_widget_set_child_visible` and friends say nothing about order.
+    void gdk_window_raise(GdkWindow* window);
+
+    /// Where the pointer is, in this window's own coordinates.
+    ///
+    /// The device has to be named because X11 has had more than one pointer
+    /// since XInput2, and the seat is how GTK 3 says "the one this display is
+    /// being driven by". `gdk_window_get_pointer` is the one-argument version
+    /// and has been deprecated since 3.0.
+    gpointer gdk_window_get_device_position(GdkWindow* window, gpointer device,
+                                            gint* x, gint* y, guint* mask);
+    gpointer gdk_display_get_default_seat(gpointer display);
+    gpointer gdk_seat_get_pointer(gpointer seat);
+
     /// Paints whatever is waiting to be painted, now, rather than when the
     /// frame clock next ticks. The GDK answer to `UpdateWindow`.
     ///

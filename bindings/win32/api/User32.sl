@@ -286,6 +286,12 @@ public const int SwShowDefault     = 10;
 /// `CW_USEDEFAULT`: let Windows choose the position or the size.
 public const int UseDefault = -2147483648;
 
+/// The `insertAfter` values `SetWindowPos` takes in place of a window handle.
+/// `HwndTop` is the front of the sibling order, which is what raising a control
+/// above the ones it overlaps asks for.
+public const nint HwndTop    = 0;
+public const nint HwndBottom = 1;
+
 public const uint SwpNoSize       = 0x0001u;
 public const uint SwpNoMove       = 0x0002u;
 public const uint SwpNoZOrder     = 0x0004u;

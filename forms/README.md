@@ -256,6 +256,25 @@ thread that is allowed to, and the answer arrives through the message loop the
 program already has. Nothing changes colour and there is no state machine, which
 is what real threads buy — [docs/concurrency.md §12](../docs/concurrency.md).
 
+**Z-order and the pointer are asked for, not waited for.** `Control` carries
+two small methods that exist because a *docked* window needs them and nothing
+else in the library did: `BringToFront`, which raises a control above the
+siblings it overlaps, and `PointerPosition`, which answers where the pointer is
+in this control's own coordinates.
+
+The second is the interesting one. Enter and leave events answer "is the pointer
+over *this* control", and a container is told the pointer left the instant it
+moves onto one of that container's own children — so a panel that must know
+whether the pointer is still somewhere *inside* it cannot be written from events
+at all. The IDE's auto-hidden panes are exactly that: one would slide shut the
+moment the pointer reached the tree inside it. `GetCursorPos` plus
+`ScreenToClient` on Win32, `gdk_window_get_device_position` on GTK, and a
+`GraphicControl` answers by asking its parent and subtracting.
+
+Both are also what a form designer needs — a transparent input shield over live
+controls is `BringToFront` and nothing else — which is why they are here rather
+than in `ide/`.
+
 **A `Graphics` carries no state.** `TCanvas` has a current `Pen`, `Brush` and
 `Font`, so any routine that draws must save and restore three things or corrupt
 its caller — every LCL painting bug of the shape "the colour was wrong the

@@ -581,6 +581,29 @@ public abstract class Control : IControlNotify
     /// to ask its parent, which is also what then routes the events back.
     public virtual void CaptureMouse(bool captured) { }
 
+    /// Puts this control in front of the siblings it overlaps.
+    ///
+    /// Does nothing for a `GraphicControl`, which has no window to stack: one
+    /// is painted by its parent in the order the parent holds it, and changing
+    /// that would mean reordering the parent's list of children -- a different
+    /// operation with different consequences for the layout pass, which is
+    /// ordered by that same list.
+    public virtual void BringToFront() { }
+
+    /// Where the pointer is now, in this control's own coordinates.
+    ///
+    /// A `GraphicControl` answers relative to itself by asking its parent and
+    /// subtracting, since the parent is what owns the window the platform can
+    /// measure against.
+    public virtual Point PointerPosition()
+    {
+        var parent = _owner;
+        if (parent == null)
+            return Point.Empty;
+        var outer = ((WindowedControl)parent).PointerPosition();
+        return Point.At(outer.X - Left, outer.Y - Top);
+    }
+
     /// Marks the control as needing repainting.
     public virtual void Invalidate()
     {

@@ -814,6 +814,33 @@ public class ControlPeer : IControlPeer
         }
     }
 
+    public FPoint PointerPosition()
+    {
+        // Two types called `Point` are in scope here -- the library's and the
+        // one `GetCursorPos` fills -- so both are named in full. `FPoint` is
+        // the alias this file already uses for the first.
+        Win32.User32.Point where;
+        where.X = 0;
+        where.Y = 0;
+
+        if (GetCursorPos(&where) == 0)
+            return Forms.Drawing.Point.Empty;
+
+        ScreenToClient(window, &where);
+        return At(where.X, where.Y);
+    }
+
+    public void BringToFront()
+    {
+        // Position and size are the caller's business and are usually being
+        // set in the same breath, so this changes the Z-order and nothing
+        // else. `SwpNoActivate` because raising a panel must not take the
+        // keyboard off whatever has it -- an auto-hidden pane slides out under
+        // the pointer while the editor still owns the caret.
+        SetWindowPos(window, (HWND)(void*)HwndTop, 0, 0, 0, 0,
+                     SwpNoMove | SwpNoSize | SwpNoActivate);
+    }
+
     /// The system cursor for one of the shapes, loaded from the shared set --
     /// which is why none of these is ever destroyed.
     HCURSOR CursorFor(CursorKind wanted)
