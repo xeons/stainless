@@ -51,6 +51,7 @@ int Main()
     Reads(harness);
     Refuses(harness);
     Writes(harness);
+    Finds(harness);
 
     Console.WriteLine(harness.Failures == 0u
                       ? "all checks passed"
@@ -254,4 +255,44 @@ void Writes(Harness harness)
                       && again.Dependencies.At(0u).Name == "shapes"
                       && again.Dependencies.At(0u).Path == "../shapes");
     }
+}
+
+void Finds(Harness harness)
+{
+    Console.WriteLine("finding");
+
+    // Everything above parses text. This is the only part that touches a real
+    // file, and it is the part the window actually calls: a file is opened,
+    // and the project it belongs to is found by walking up from it.
+    //
+    // The path is relative to the repository root, which is where the test is
+    // run from -- and `Find` does not make a path absolute, so this also shows
+    // what that limit does and does not stop.
+    String found = Project.Find("ide/tests/fixture/src");
+    harness.Check("a project is found from a file beside it", found != "");
+
+    if (found == "")
+        return;
+
+    var read = Project.Read(found);
+    harness.Check("and reads", read.Ok);
+    if (!read.Ok)
+    {
+        Console.WriteLine("         " + read.Error);
+        return;
+    }
+
+    var project = read.Value;
+    harness.Same("with the name the file gives", "fixture", project.Name);
+    harness.Check("and one source root",
+                  project.Sources.Length == 1u && project.Sources[0u] == "src");
+
+    // The directory is what every relative path in the file is measured
+    // against, so a project read from a path is useless without it.
+    harness.Check("and knows where it was read from", project.Directory != ".");
+    harness.Check("so a source root resolves under it",
+                  project.Resolve("src").Contains("fixture"));
+
+    harness.Check("and a directory with no project above it finds none",
+                  Project.Find("stainless-nowhere-at-all") == "");
 }

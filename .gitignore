@@ -22,6 +22,9 @@ samples/**/build/
 # IDE build output
 ide/build/
 
+# What the IDE's fixture project builds when a test compiles it
+ide/tests/fixture/build/
+
 # Screenshots pulled back from the Linux test box
 linux-shots/
 

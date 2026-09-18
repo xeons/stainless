@@ -30,12 +30,15 @@ import Standard.Collections;
 import Standard.IO;
 import Standard.File;
 import Standard.Process;
+import Standard.Path;
+import Standard.Directory;
 import Standard.Env;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
 import Ide.Lang;
 import Ide.Editor;
+import Ide.Project;
 
 /// One open file: the tab it is behind, and the editor on it.
 ///
@@ -79,6 +82,18 @@ public class Shell : Form
     /// What the last build reported, one entry per line of its output.
     List<BuildMessage> _messages;
 
+    /// The project in front, and the file it was read from. Null when the
+    /// window is showing loose files, which is still a thing it does: a
+    /// scratch `.sl` with a `Main` is a program, and asking for a project
+    /// before one can be compiled would be a worse editor than this was.
+    ProjectFile? _project;
+    String _projectPath;
+
+    /// Whether a build is running. One at a time, and the menu says so rather
+    /// than queueing: two compilers writing the same object directory is the
+    /// failure that looks like a scatter of unrelated errors.
+    bool _building;
+
     public Shell()
     {
         base(WindowBorder.Sizable);
@@ -87,6 +102,9 @@ public class Shell : Form
 
         _open = new List<EditorTab>();
         _messages = new List<BuildMessage>();
+        _project = null;
+        _projectPath = "";
+        _building = false;
         _compiler = FindCompiler();
         _textSize = 10;
         _dark = false;
@@ -222,6 +240,12 @@ public class Shell : Form
         if (stale != null)
             CloseTab((EditorTab)stale);
         tab.Editor.Focus();
+
+        // A file usually arrives with a project above it, and finding it here
+        // is what makes Build mean "build this program" without anyone having
+        // opened the project by hand.
+        AdoptProjectFor(path);
+
         Say("Opened " + path);
         return true;
     }
@@ -298,6 +322,8 @@ public class Shell : Form
         var file = _bar.Add("&File");
         file.Add("&New").Click += this.OnNew;
         file.Add("&Open...").Click += this.OnOpen;
+        file.Add("Open &project...").Click += this.OnOpenProject;
+        file.Add("C&lose project").Click += this.OnCloseProject;
         file.Add("&Save").Click += this.OnSave;
         file.Add("Save &As...").Click += this.OnSaveAs;
         file.Add(MenuItem.Separator());
@@ -315,6 +341,8 @@ public class Shell : Form
         var build = _bar.Add("&Build");
         build.Add("&Build").Click += this.OnBuild;
         build.Add("&Run").Click += this.OnRun;
+        build.Add(MenuItem.Separator());
+        build.Add("&Clean").Click += this.OnClean;
         build.Add(MenuItem.Separator());
         build.Add("&Clear output").Click += this.OnClearOutput;
 
@@ -529,48 +557,294 @@ public class Shell : Form
     void OnBuild(MenuItem sender) => Compile(false);
     void OnRun(MenuItem sender) => Compile(true);
 
+    // ------------------------------------------------------------ the project
+
+    /// Opens a project file, or a directory holding one.
+    void OnOpenProject(MenuItem sender)
+    {
+        var dialog = new OpenDialog();
+        dialog.Title = "Open project";
+        dialog.AddFilter("Stainless projects", "stainless.json");
+        dialog.AddFilter("All files", "*");
+
+        var chosen = dialog.Show(this);
+        if (!chosen.Ok)
+            return;
+
+        OpenProject(chosen.Value);
+    }
+
+    void OnCloseProject(MenuItem sender)
+    {
+        if (_project == null)
+        {
+            Say("No project is open.");
+            return;
+        }
+
+        _project = null;
+        _projectPath = "";
+        Retitle();
+        Say("Project closed. Building compiles the file in front.");
+    }
+
+    /// Reads a project and takes it as the one in front.
+    ///
+    /// **A failure is shown and does not close what was open.** A project file
+    /// being edited is broken for as long as it takes to type the next line,
+    /// and an editor that dropped the project on every keystroke's worth of
+    /// invalid JSON would be unusable.
+    public bool OpenProject(String path)
+    {
+        var read = Project.Read(path);
+        if (!read.Ok)
+        {
+            Show(read.Error);
+            Say("That project could not be read.");
+            return false;
+        }
+
+        _project = read.Value;
+        _projectPath = path;
+        Retitle();
+
+        var project = (ProjectFile)read.Value;
+        Say("Project " + project.Name + " " + project.Version + ".");
+        return true;
+    }
+
+    /// Looks for a project above a file that has just been opened, and adopts
+    /// it when there is one and none is open already.
+    ///
+    /// Silent either way. Opening a file is not asking a question, and a
+    /// message saying no project was found would be noise on every scratch
+    /// file -- while a project quietly found is what makes Build do the right
+    /// thing without anyone having said so.
+    void AdoptProjectFor(String path)
+    {
+        if (_project != null || path.ByteLength() == 0u)
+            return;
+
+        String found = Project.Find(Path.DirectoryName(path));
+        if (found == "")
+            return;
+
+        var read = Project.Read(found);
+        if (!read.Ok)
+            return;
+
+        _project = read.Value;
+        _projectPath = found;
+        Retitle();
+    }
+
+    /// What the compiler is being asked to do, for the status line.
+    String ProjectName()
+    {
+        if (_project == null)
+            return "";
+        return ((ProjectFile)_project).Name;
+    }
+
     void OnClearOutput(MenuItem sender)
     {
         _output.Clear();
         _messages.Clear();
     }
 
-    /// Saves the file in front, then runs the compiler over it.
+    /// Saves what needs saving, then runs the compiler off the UI thread.
     ///
-    /// **Synchronous, and that is the next thing to fix.** The window stops
-    /// answering for as long as the build takes, which for one file is a second
-    /// and for a project is not. What it needs is the build on a thread with its
-    /// output arriving through a queue the message loop drains -- and what that
-    /// needs first is a decision about how `Forms` marshals to the UI thread,
-    /// which it has no answer for yet.
+    /// **What is built is the project when there is one**, through
+    /// `--project`, which is the flag that exists so a build can be asked for
+    /// from somewhere other than the project's own directory. Without a
+    /// project it is the file in front, which is what this did for every file
+    /// before -- and which cannot build a program of two, so the project is
+    /// the answer rather than a convenience.
+    ///
+    /// **The window stays alive while it runs**, which it did not before: the
+    /// compiler ran on the UI thread and the window stopped answering for as
+    /// long as the build took. `Background.Run` takes a closure that runs off
+    /// the thread and one that runs back on it with the answer, which is
+    /// exactly this shape.
+    ///
+    /// **The output still arrives all at once at the end.** `Process.Run`
+    /// captures both streams and answers when the child exits, so there is
+    /// nothing to stream from. Streaming wants a `Process` that hands back its
+    /// pipes as they fill, and that is a change to `Standard.Process` rather
+    /// than to this. What was actually wrong -- a window that stopped
+    /// repainting -- is fixed; a build that reports as it goes is not yet.
     void Compile(bool thenRun)
+    {
+        if (_building)
+        {
+            Say("A build is already running.");
+            return;
+        }
+
+        if (!SaveBeforeBuilding())
+            return;
+
+        _output.Clear();
+        _messages.Clear();
+
+        var arguments = BuildArguments(thenRun);
+        Say(thenRun ? "Running..." : "Building...");
+        Start(arguments, thenRun ? "Ran." : "Built.");
+    }
+
+    void OnClean(MenuItem sender)
+    {
+        if (_building)
+        {
+            Say("A build is already running.");
+            return;
+        }
+
+        if (_project == null)
+        {
+            Say("Clean needs a project; there is nothing else to clean.");
+            return;
+        }
+
+        _output.Clear();
+        _messages.Clear();
+        Say("Cleaning...");
+
+        // `stainless` has no clean of its own: what a clean removes is the
+        // object directory, and the build stamp inside it is what makes the
+        // next build do all the work again. Removed here rather than by asking
+        // for a flag that does not exist.
+        var project = (ProjectFile)_project;
+        String rubbish = project.Resolve(project.ObjectDirectory);
+
+        if (!IsInsideProject(project, rubbish))
+        {
+            Show("refusing to clean '" + rubbish + "', which is outside the project");
+            Say("Clean refused.");
+            return;
+        }
+
+        if (!Directory.Exists(rubbish))
+        {
+            Say("Nothing to clean.");
+            return;
+        }
+
+        nuint removed = RemoveTree(rubbish);
+        Show("removed " + Standard.Text.FromInteger((long)removed) + " files from " + rubbish);
+        Say("Cleaned.");
+    }
+
+    /// Whether a path the project named is somewhere this may delete.
+    ///
+    /// **A clean deletes a directory tree, and the path comes out of a file.**
+    /// `objectDirectory` is an ordinary string a project may say anything in,
+    /// `".."` included, and a typo there should not cost somebody their source.
+    /// So the resolved directory has to sit under the project's own and be
+    /// longer than it -- which refuses the project directory itself as well as
+    /// anything above it.
+    bool IsInsideProject(ProjectFile project, String directory)
+    {
+        String root = project.Directory;
+        if (root == "" || directory == "")
+            return false;
+        if (directory.ByteLength() <= root.ByteLength())
+            return false;
+        return directory.StartsWith(root);
+    }
+
+    /// Deletes a directory and everything under it, answering how many files
+    /// went. Deepest first, since a directory is only removable once empty.
+    nuint RemoveTree(String directory)
+    {
+        nuint removed = 0u;
+
+        var inside = Directory.Directories(directory);
+        if (inside.Ok)
+        {
+            foreach (var child in inside.Value)
+                removed = removed + RemoveTree(child);
+        }
+
+        var files = Directory.Files(directory);
+        if (files.Ok)
+        {
+            foreach (var file in files.Value)
+            {
+                if (File.Delete(file) == IOError.None)
+                    removed++;
+            }
+        }
+
+        Directory.Delete(directory);
+        return removed;
+    }
+
+    /// The file in front, saved, or false when it could not be.
+    ///
+    /// A project build still saves the file in front and nothing else, which is
+    /// the honest half-measure: saving every edited tab is what a project build
+    /// should do and wants a decision about tabs that have never had a name.
+    bool SaveBeforeBuilding()
     {
         var now = Current;
         if (now == null)
-            return;
+            return false;
         var editor = (CodeEditor)now;
 
         String path = editor.Contents.Location;
         if (path.ByteLength() == 0u)
         {
             if (!SaveTo(editor, ""))
-                return;
+                return false;
             path = editor.Contents.Location;
         }
         else if (editor.Contents.Edited && !editor.Contents.Save(path))
         {
             Say("Could not write " + path);
-            return;
+            return false;
         }
+
         RelabelFor(editor);
         Retitle();
+        return true;
+    }
 
-        _output.Clear();
-        _messages.Clear();
-        Say(thenRun ? "Running..." : "Building...");
+    /// What the compiler is asked, which is the project when there is one.
+    String[] BuildArguments(bool thenRun)
+    {
+        String verb = thenRun ? "run" : "build";
 
-        String[] arguments = [thenRun ? "run" : "build", path];
-        var finished = Process.Run(_compiler, arguments);
+        if (_project != null)
+            return [verb, "--project", _projectPath];
+
+        var now = Current;
+        if (now == null)
+            return [verb];
+        return [verb, ((CodeEditor)now).Contents.Location];
+    }
+
+    /// Runs the compiler on a thread and reports back on the UI one.
+    ///
+    /// **Everything the worker needs is read before it starts.** The closure
+    /// captures two strings and an array, and touches no control: a control
+    /// read from another thread is the bug this arrangement exists to avoid,
+    /// and `Forms` says so where `Background.Run` is declared.
+    void Start(String[] arguments, String success)
+    {
+        _building = true;
+        String compiler = _compiler;
+
+        Background.Run(
+            () => Process.Run(compiler, arguments),
+            finished => Finished(finished, success));
+    }
+
+    /// Back on the UI thread, with whatever the compiler said.
+    void Finished(Result<Completed, ProcessError> finished, String success)
+    {
+        _building = false;
+
         if (!finished.Ok)
         {
             Show("could not start '" + _compiler + "' -- is it on the path?");
@@ -585,7 +859,7 @@ public class Shell : Form
         ShowAll(result.Output);
 
         Say(result.ExitCode == 0
-            ? (thenRun ? "Ran." : "Built.")
+            ? success
             : "Failed, with " + Standard.Text.FromInteger(result.ExitCode) + ".");
         _status.SetPanelText(1, CountErrors());
     }
@@ -684,7 +958,14 @@ public class Shell : Form
         }
         var editor = (CodeEditor)now;
         String path = editor.Contents.Location;
-        Text = (editor.Contents.Edited ? "* " : "") + NameOf(path) + " -- Stainless";
+
+        // The project's name leads, as it does in every editor that has one:
+        // which program this is matters more than which of its files is in
+        // front, and the file is in the tab already.
+        String project = ProjectName();
+        String lead = project == "" ? "" : project + " -- ";
+
+        Text = (editor.Contents.Edited ? "* " : "") + lead + NameOf(path) + " -- Stainless";
         _status.SetPanelText(0, path.ByteLength() == 0u ? "Not saved" : path);
     }
 
@@ -828,9 +1109,36 @@ public class Shell : Form
             ok = false;
         }
 
+        // The project, which is what makes Build mean the program rather than
+        // the file. Opening a file inside the fixture should find it without
+        // anyone asking -- which is the behaviour, not just the reader.
+        if (OpenFile("ide/tests/fixture/src/main.sl"))
+        {
+            Application.DoEvents();
+            if (ProjectName() != "fixture")
+            {
+                Console.WriteLine("FAIL: opening a file did not find the project above it,"
+                                  + " and answered '" + ProjectName() + "'");
+                ok = false;
+            }
+
+            // And the arguments that finding it changes, which is the whole
+            // point: a project build names the project and never a file.
+            var arguments = BuildArguments(false);
+            if (arguments.Length != 3u || arguments[1u] != "--project")
+            {
+                Console.WriteLine("FAIL: a project build did not ask for the project");
+                ok = false;
+            }
+        }
+        else
+        {
+            Console.WriteLine("  (project check skipped: run from the repository root)");
+        }
+
         if (ok)
         {
-            Console.WriteLine("  editing, lexing, the clipboard, text size and tabs");
+            Console.WriteLine("  editing, lexing, the clipboard, text size, tabs and the project");
         }
         return ok;
     }
