@@ -267,5 +267,22 @@ public int Main()
     Json.Populate(none, "{\"Tags\":[]}");
     Say("array-empty", Json.Serialize(none));
 
+    // A file with a UTF-8 byte order mark in front of it, which is what
+    // Notepad and PowerShell 5.1 write by default -- so a hand-edited config
+    // file on Windows very often has one. It is skipped rather than refused:
+    // RFC 8259 says a parser may ignore one, and refusing it rejects a file
+    // that looks perfectly correct in every editor.
+    String marked = "﻿{\"Tags\":[\"x\"]}";
+    var withMark = new Sparse();
+    Json.Populate(withMark, marked);
+    Say("bom", Json.Serialize(withMark));
+
+    // And one that is *only* a mark is still an empty document, not a value.
+    Say("bom-alone", Json.Parse("﻿").Ok ? "parsed" : "refused");
+
+    // A mark that is not at the start is content, and content is not a value
+    // the grammar allows before a brace.
+    Say("bom-inside", Json.Parse("{﻿}").Ok ? "parsed" : "refused");
+
     return 0;
 }

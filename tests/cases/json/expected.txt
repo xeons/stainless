@@ -46,3 +46,6 @@ array-longer = {"Name":"kept","Tags":["one","two"],"Counts":[0,0]}
 array-shorter = {"Name":"kept","Tags":["kept",""],"Counts":[0,0]}
 array-null = {"Name":"kept","Tags":["a","b","c"],"Counts":[4,5]}
 array-empty = {"Name":"kept","Tags":[],"Counts":null}
+bom = {"Name":"kept","Tags":["x"],"Counts":null}
+bom-alone = refused
+bom-inside = refused

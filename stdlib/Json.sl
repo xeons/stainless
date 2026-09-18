@@ -305,6 +305,34 @@ class Cursor
     public void Skip() => At = At + 1u;
 }
 
+/// Steps over a leading UTF-8 byte order mark, `EF BB BF`.
+///
+/// **RFC 8259 says a parser must not add one and may ignore one**, and ignoring
+/// it is the only useful reading on Windows: Notepad, PowerShell 5.1's
+/// `Set-Content -Encoding utf8` and a good deal else write one by default, so a
+/// configuration file a person edited by hand very often has three bytes in
+/// front of the opening brace. Refusing that is refusing the file for a reason
+/// nobody can see -- the text looks exactly right in every editor -- and it is
+/// worth remembering that this was found by a layout file that silently did
+/// nothing.
+///
+/// Only at the very start, and only the UTF-8 spelling. A mark in the middle is
+/// a zero-width no-break space and is content; UTF-16's marks are not valid
+/// here at all, since the document is bytes and a UTF-16 one is not UTF-8.
+void SkipByteOrderMark(Cursor cursor)
+{
+    if (cursor.Text.ByteLength() < 3u)
+        return;
+    if (cursor.Text.ByteAt(0u) == 0xEFu
+     && cursor.Text.ByteAt(1u) == 0xBBu
+     && cursor.Text.ByteAt(2u) == 0xBFu)
+    {
+        cursor.Skip();
+        cursor.Skip();
+        cursor.Skip();
+    }
+}
+
 void SkipSpace(Cursor cursor)
 {
     while (!cursor.AtEnd)
@@ -771,6 +799,7 @@ bool Matches(Cursor cursor, String word)
 public Result<JsonValue, JsonError> Parse(String text)
 {
     var cursor = new Cursor(text);
+    SkipByteOrderMark(cursor);
 
     var value = ParseValue(cursor);
     if (cursor.Failed)
