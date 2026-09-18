@@ -6,18 +6,23 @@
 
 ```
 dotnet build Stainless.slnx      # the compiler, which the IDE drives
+stainless build --project ide    # the IDE, on either system
+```
+
+**The same line on both**, which it was not until
+[ide/stainless.json](stainless.json) existed. What each system needs — the
+Win32 bindings and seven libraries here, the GTK bindings and six there — is a
+platform section in the project file rather than two command lines in a page
+nobody re-reads ([packages.md §2.1](../docs/packages.md#21-what-one-platform-adds)).
+What used to be printed here for Linux was four lines of `-l` flags, and it
+drifted.
+
+`build.ps1` is still there for what a project file does not cover, which is
+running the tests afterwards:
+
+```
 .\ide\build.ps1 -Test            # build the IDE and run its tests
 .\ide\build.ps1 -Run -Open samples\shapes.sl
-```
-
-On Linux there is no script yet; the command is the one in
-[bindings/gtk/README.md](../bindings/gtk/README.md) with `ide/src` in front of
-the library sources:
-
-```
-stainless build ide/src forms/src bindings/gtk -o ide/build/stainless-ide \
-    -l :libgtk-3.so.0 -l :libgdk-3.so.0 -l :libgobject-2.0.so.0 \
-    -l :libglib-2.0.so.0 -l :libcairo.so.2 -l :libgdk_pixbuf-2.0.so.0
 ```
 
 It is a native binary with no VM, no GC and no web view — the same as anything
@@ -63,9 +68,13 @@ Named honestly, since the point of the page is to say where the edges are.
 - **No debugger.** The compiler already emits DWARF and CodeView under `-g`, so
   the intended shape is gdb and lldb driven over the MI2 protocol rather than a
   second debugger written here.
-- **No project tree**, so a file is reached through Open rather than browsed
-  to. A diagnostic in a file that is not open does open it, which is what tabs
-  made possible.
+- **No project tree.** The project itself is read now — `stainless.json`, the
+  same file the compiler reads, found by walking up from whatever file was
+  opened — and Build builds *it* rather than the file in front, which is what
+  makes a program of two files buildable from here at all. What is missing is
+  somewhere to show it: a file is still reached through Open rather than
+  browsed to. A diagnostic in a file that is not open does open it, which is
+  what tabs made possible.
 - **No undo.** The next thing to write, and the reason `Document` is a list of
   lines with every edit going through `Insert` and `Delete`.
 - **No keyboard shortcut for text size.** `+` and `-` are OEM virtual keys and
@@ -73,9 +82,14 @@ Named honestly, since the point of the page is to say where the edges are.
   wheel. Cut, copy and paste do have their usual keys.
 - **Closing a tab does not ask.** Unsaved work goes without a prompt, which
   wants a dialog and a decision about what "discard" means.
-- **The build blocks the window** for as long as it takes. It wants a thread and
-  a queue the message loop drains, and `Forms` has that now as `Background.Run`;
-  the IDE has not been moved onto it.
+- **The build's output arrives all at once**, at the end. The build itself no
+  longer blocks the window — it runs on `Background.Run`, which is the thread
+  and the queue `Forms` has had for this all along — but `Process.Run` captures
+  both streams and answers when the child exits, so there is nothing to report
+  from as it goes. A build that streams wants a `Standard.Process` handing back
+  its pipes as they fill, which is a change below the IDE rather than in it.
+- **A project build saves only the file in front.** It should save every edited
+  tab, and that wants a decision about tabs that have never had a name.
 
 ---
 

@@ -1,0 +1,19 @@
+{
+  "name": "stainless-ide",
+  "version": "0.1.0",
+  "kind": "executable",
+  "sources": ["src", "../forms/src", "../samples/forms/forms.rc"],
+  "windows": {
+    "sources": ["../bindings/win32"],
+    "libraries": [
+      "user32", "gdi32", "comctl32", "comdlg32", "ole32", "shell32", "advapi32"
+    ]
+  },
+  "linux": {
+    "sources": ["../bindings/gtk"],
+    "libraries": [
+      ":libgtk-3.so.0", ":libgdk-3.so.0", ":libgobject-2.0.so.0",
+      ":libglib-2.0.so.0", ":libcairo.so.2", ":libgdk_pixbuf-2.0.so.0"
+    ]
+  }
+}

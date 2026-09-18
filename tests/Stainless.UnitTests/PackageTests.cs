@@ -388,6 +388,117 @@ public class ProjectFileTests
     }
 
     /// <summary>
+    /// A cross-platform program is the case one flat list of sources cannot
+    /// state, and the reason every Forms program in this tree was built by a
+    /// shell script rather than by its own project file.
+    /// </summary>
+    [Fact]
+    public void APlatformSectionAddsToTheBaseLists()
+    {
+        var project = ProjectFile.Read(Write("""
+            {
+              "name": "app", "version": "1.0.0",
+              "sources": ["src"], "libraries": ["m"], "defines": ["SHARED"],
+              "windows": {
+                "sources": ["bindings/win32"], "libraries": ["user32"],
+                "defines": ["WIN"]
+              },
+              "linux": {
+                "sources": ["bindings/gtk"], "libraries": [":libgtk-3.so.0"]
+              }
+            }
+            """), out string error);
+
+        Assert.Null(error is "" ? null : error);
+        Assert.NotNull(project);
+
+        Assert.Equal(["src", "bindings/win32"], project.SourcesFor(TargetPlatform.X64Windows));
+        Assert.Equal(["m", "user32"], project.LibrariesFor(TargetPlatform.X64Windows));
+        Assert.Equal(["SHARED", "WIN"], project.DefinesFor(TargetPlatform.X64Windows));
+
+        Assert.Equal(["src", "bindings/gtk"], project.SourcesFor(TargetPlatform.X64Linux));
+        Assert.Equal(["m", ":libgtk-3.so.0"], project.LibrariesFor(TargetPlatform.X64Linux));
+
+        // The overlay adds; it does not replace. A Linux build keeps the base
+        // define and gains nothing, because that overlay names none.
+        Assert.Equal(["SHARED"], project.DefinesFor(TargetPlatform.X64Linux));
+    }
+
+    /// <summary>
+    /// A project naming no platform section answers the base lists themselves,
+    /// which is the common case and should allocate nothing.
+    /// </summary>
+    [Fact]
+    public void NoPlatformSectionLeavesTheListsAlone()
+    {
+        var project = ProjectFile.Read(Write("""
+            { "name": "app", "version": "1.0.0", "sources": ["src"] }
+            """), out _);
+
+        Assert.NotNull(project);
+        Assert.Same(project.Sources, project.SourcesFor(TargetPlatform.X64Windows));
+        Assert.Same(project.Sources, project.SourcesFor(TargetPlatform.X64Linux));
+    }
+
+    [Fact]
+    public void RefusesAFieldAPlatformSectionDoesNotHave()
+    {
+        ProjectFile.Read(Write("""
+            {
+              "name": "app", "version": "1.0.0",
+              "windows": { "libaries": ["user32"] }
+            }
+            """), out string error);
+
+        Assert.Contains("is not a field of a platform section", error);
+        Assert.Contains("did you mean 'libraries'", error);
+    }
+
+    /// <summary>
+    /// <c>#if</c> sees the platform being built <i>for</i>.
+    ///
+    /// The architecture was made to follow the target years before the
+    /// operating system was, on the argument that a target did not change which
+    /// platform the standard library binds to -- and the standard library
+    /// chooses its platform with these very symbols, so it did.
+    /// </summary>
+    [Fact]
+    public void TheSymbolsFollowTheTarget()
+    {
+        var windows = Compilation.PlatformSymbols([], TargetPlatform.X64Windows);
+        Assert.Contains("WINDOWS", windows);
+        Assert.DoesNotContain("UNIX", windows);
+        Assert.DoesNotContain("LINUX", windows);
+        Assert.Contains("X64", windows);
+
+        var linux = Compilation.PlatformSymbols([], TargetPlatform.X64Linux);
+        Assert.Contains("LINUX", linux);
+        Assert.Contains("UNIX", linux);
+        Assert.DoesNotContain("WINDOWS", linux);
+
+        var small = Compilation.PlatformSymbols([], TargetPlatform.X86Linux);
+        Assert.Contains("X86", small);
+        Assert.Contains("UNIX", small);
+        Assert.DoesNotContain("X64", small);
+    }
+
+    /// <summary>
+    /// With no target named the host still answers, and it has to: there is no
+    /// macOS or FreeBSD triple, so deriving the symbols from
+    /// <see cref="TargetPlatform.Host"/> would take <c>MACOS</c> away from a
+    /// machine that has it.
+    /// </summary>
+    [Fact]
+    public void WithNoTargetTheHostStillAnswers()
+    {
+        var symbols = Compilation.PlatformSymbols([]);
+
+        Assert.Equal(OperatingSystem.IsWindows(), symbols.Contains("WINDOWS"));
+        Assert.Equal(OperatingSystem.IsMacOS(), symbols.Contains("MACOS"));
+        Assert.Equal(!OperatingSystem.IsWindows(), symbols.Contains("UNIX"));
+    }
+
+    /// <summary>
     /// The reason unknown fields are refused rather than ignored: a typo that
     /// does nothing is a build that silently is not the one that was asked for.
     /// </summary>

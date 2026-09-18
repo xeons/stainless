@@ -54,14 +54,74 @@ nothing else.
 | `debug` | describe the program to a debugger | false |
 | `abi` | `microsoft` or `itanium` | the host's |
 | `runtime` | `shared` or `static` | whatever the build needs |
+| `windows`, `linux`, `macos` | what that platform adds (§2.1) | none |
 | `format` | the version of this file format | 1 |
 
 `sources` takes whatever a command line takes: `.sl` files, directories searched
 recursively, C sources or object files that belong to the same program, and a
-Windows resource script (§2.2).
+Windows resource script (§2.3).
 Directories rather than a list of files, because where a file sits has no bearing
 on which module it joins — that is stated in the file — so a project never has a
 file list to keep up to date, and neither does anything reading it.
+
+### 2.1 What one platform adds
+
+A cross-platform program is the thing one flat `sources` cannot say. A program
+with a user interface wants `bindings/win32` and `user32 gdi32 comctl32` on
+Windows, and `bindings/gtk` with `:libgtk-3.so.0` on Linux, and there is one
+`sources` and one `libraries`. Until there was somewhere to put that, every
+such program in this repository was built by a shell script — which is exactly
+what a project file exists to replace, since a script builds the program
+perfectly well and answers no questions about it.
+
+```json
+{
+  "name": "app",
+  "version": "0.1.0",
+  "sources": ["src", "../forms/src"],
+
+  "windows": {
+    "sources": ["../bindings/win32"],
+    "libraries": ["user32", "gdi32", "comctl32"]
+  },
+  "linux": {
+    "sources": ["../bindings/gtk"],
+    "libraries": [":libgtk-3.so.0", ":libgdk-3.so.0"]
+  }
+}
+```
+
+A section holds `sources`, `libraries` and `defines` and nothing else.
+`optimize`, `abi` and `runtime` are answers about *how* a program is built
+rather than about what it is made of, and a project wanting one of those per
+platform is asking for two builds rather than one file — which `--target` and a
+second invocation already are.
+
+**A section adds; it never replaces.** The base lists are what the program is
+made of everywhere and a section is what one platform needs on top. That is
+what the case actually looks like, and it means the base can be read without
+checking three sections for a removal.
+
+**Platform names, not a condition language.** A `when` with an expression in it
+is how this grows into a build script, and the whole argument for this file
+being a document is that a script answers no questions. Three names answer what
+is actually asked.
+
+**The platform is the one being built *for*.** `--target x64-linux` takes the
+`linux` section wherever it is run, because what is being described is the
+program that comes out rather than the machine it came out of — and `#if
+WINDOWS` follows the target for the same reason, so the two always agree.
+
+`macos` is accepted and selected by nothing, there being no macOS target yet. A
+project that already describes its macOS build should not have to be edited on
+the day one can be run.
+
+**A field a section does not have is refused too**, and says which kind of
+thing it was talking about:
+
+```
+error: 'libaries' is not a field of a platform section; did you mean 'libraries'?
+```
 
 **A field that is not in this table is refused.** A typo that silently did
 nothing is precisely the failure a readable project file exists to prevent, so
@@ -71,7 +131,7 @@ the build names the field and, where it can, guesses what was meant:
 error: 'optimise' is not a field of a project file; did you mean 'optimize'?
 ```
 
-### 2.1 Finding it
+### 2.2 Finding it
 
 ```
 stainless build                 # this directory, or the nearest parent with one
@@ -83,7 +143,7 @@ stainless build src/*.sl        # no project: the paths mean what they always me
 Named paths win. Someone who names a file means that file, even from inside a
 project, and `--no-project` says so explicitly.
 
-### 2.2 Resources
+### 2.3 Resources
 
 A `.rc` among the sources is a **Windows resource script**. The build compiles
 it with `llvm-rc` — which ships beside the clang that is already driving the

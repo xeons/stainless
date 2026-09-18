@@ -107,6 +107,38 @@ public sealed record ProjectFile
     public int Optimize { get; init; } = 2;
     public bool Debug { get; init; }
 
+    /// <summary>
+    /// What this project adds when it is built for Windows, for Linux, or for
+    /// macOS.
+    ///
+    /// A cross-platform program is the case the flat lists above cannot state:
+    /// a Forms program wants <c>bindings/win32</c> and <c>user32 gdi32
+    /// comctl32</c> on one and <c>bindings/gtk</c> with <c>:libgtk-3.so.0</c>
+    /// on the other, and there is one <c>sources</c> and one <c>libraries</c>.
+    /// Every such program in this tree is therefore built by a shell script,
+    /// which is exactly the thing a project file exists to replace.
+    ///
+    /// **An overlay adds; it does not replace.** The base lists are what the
+    /// program is made of everywhere and the overlay is what one platform needs
+    /// on top, which is what the case actually looks like -- and it means a
+    /// reader can understand the base without checking three overlays for a
+    /// removal.
+    ///
+    /// **Platform names, not a condition language.** <c>"when"</c> with an
+    /// expression in it is how this grows into a build script, and a Makefile
+    /// "would build the program perfectly well and answer no questions about
+    /// it" -- which is the whole argument for this file being a document. Three
+    /// names answer what is actually asked.
+    ///
+    /// **The platform is the one being built *for*.** A cross build from
+    /// Windows to Linux takes the Linux overlay, because what is being
+    /// described is the program that comes out rather than the machine it came
+    /// out of.
+    /// </summary>
+    public PlatformOverlay? Windows { get; init; }
+    public PlatformOverlay? Linux { get; init; }
+    public PlatformOverlay? Macos { get; init; }
+
     /// <summary>"microsoft" or "itanium"; null is the host's.</summary>
     public string? Abi { get; init; }
 
@@ -126,6 +158,50 @@ public sealed record ProjectFile
     /// <summary>Resolves a path written in the file against the file's own directory.</summary>
     public string Resolve(string path) =>
         System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory, path));
+
+    /// <summary>
+    /// The overlay for a target, or null when the file names none for it.
+    ///
+    /// Only the two platforms this compiler targets can be reached; macOS is
+    /// accepted in a file and selected by nothing, because a project that
+    /// already describes its macOS build should not have to be edited on the
+    /// day one can be run.
+    ///
+    /// <para>
+    /// This follows the target's operating system, and so does <c>#if
+    /// WINDOWS</c> -- see <see cref="Compilation.PlatformSymbols"/>. The two
+    /// have to agree: an overlay selecting <c>bindings/gtk</c> while
+    /// <c>WINDOWS</c> was defined would compile the GTK backend's sources with
+    /// the Win32 backend's half of every <c>#if</c> in them, which is a pile of
+    /// unresolved names rather than anything a reader could trace back here.
+    /// </para>
+    /// </summary>
+    public PlatformOverlay? OverlayFor(Binding.TargetPlatform target) =>
+        target.IsWindows ? Windows : Linux;
+
+    /// <summary>What to compile for a target: the base list, then the overlay's.</summary>
+    public IReadOnlyList<string> SourcesFor(Binding.TargetPlatform target) =>
+        Combine(Sources, OverlayFor(target)?.Sources);
+
+    /// <summary>The linker's <c>-l</c> list for a target.</summary>
+    public IReadOnlyList<string> LibrariesFor(Binding.TargetPlatform target) =>
+        Combine(Libraries, OverlayFor(target)?.Libraries);
+
+    /// <summary>The <c>#if</c> symbols for a target.</summary>
+    public IReadOnlyList<string> DefinesFor(Binding.TargetPlatform target) =>
+        Combine(Defines, OverlayFor(target)?.Defines);
+
+    /// <summary>
+    /// Base then overlay, and the base list itself when there is no overlay --
+    /// so the common case allocates nothing and the order is always "what this
+    /// is made of, then what this platform adds".
+    /// </summary>
+    private static IReadOnlyList<string> Combine(
+        List<string> shared, List<string>? extra)
+    {
+        if (extra is null || extra.Count == 0) return shared;
+        return [.. shared, .. extra];
+    }
 
     /// <summary>
     /// Where this package's binary lands: what <c>output</c> said, or the
@@ -261,13 +337,20 @@ public sealed record ProjectFile
         if (!unmapped.Success) return WrongShape(e) ?? e.Message ?? "the file is not valid JSON";
 
         string wrote = unmapped.Groups[1].Value;
-        string where = unmapped.Groups[2].Value == nameof(Dependency)
-            ? "a dependency"
-            : "a project file";
+        string shape = unmapped.Groups[2].Value;
+        string where = shape switch
+        {
+            nameof(Dependency) => "a dependency",
+            nameof(PlatformOverlay) => "a platform section",
+            _ => "a project file",
+        };
 
-        var known = Fields(unmapped.Groups[2].Value == nameof(Dependency)
-            ? typeof(Dependency)
-            : typeof(ProjectFile));
+        var known = Fields(shape switch
+        {
+            nameof(Dependency) => typeof(Dependency),
+            nameof(PlatformOverlay) => typeof(PlatformOverlay),
+            _ => typeof(ProjectFile),
+        });
 
         string? meant = Nearest(wrote, known);
 
@@ -301,6 +384,8 @@ public sealed record ProjectFile
             _ when type.EndsWith(nameof(DependencyLink)) => "'source' or 'shared'",
             _ when type.EndsWith(nameof(Dependency)) =>
                 "an object saying where the package comes from, as in { \"path\": \"../geometry\" }",
+            _ when type.EndsWith(nameof(PlatformOverlay)) =>
+                "an object of what that platform adds, as in { \"libraries\": [\"user32\"] }",
             _ when type.EndsWith(nameof(ProjectFile)) => "an object, { ... }",
             _ when type.Contains("List") => "a list, [ ... ]",
             _ when type.Contains("Dictionary") => "an object of names, { \"name\": ... }",
@@ -491,6 +576,15 @@ public sealed record ProjectFile
             return false;
         }
 
+        foreach (var (platform, overlay) in new[]
+                 {
+                     ("windows", Windows), ("linux", Linux), ("macos", Macos),
+                 })
+        {
+            if (overlay is not null && !overlay.Validate(platform, path, out error))
+                return false;
+        }
+
         foreach (var (name, dependency) in Dependencies)
         {
             if (!IsValidName(name))
@@ -549,6 +643,62 @@ public enum ProjectKind
 
     /// <summary>A package other packages depend on.</summary>
     Library,
+}
+
+/// <summary>
+/// What one platform adds to a project.
+///
+/// Three lists and nothing else, deliberately. <c>optimize</c>, <c>abi</c> and
+/// <c>runtime</c> are answers about how a program is built rather than about
+/// what it is made of, and a project wanting one of them per platform is
+/// asking for two builds rather than one file -- which is what
+/// <c>--target</c> and a second invocation already are.
+/// </summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record PlatformOverlay
+{
+    /// <summary>Extra files and directories to compile on this platform.</summary>
+    public List<string> Sources { get; init; } = [];
+
+    /// <summary>Extra libraries for the linker to find by name.</summary>
+    public List<string> Libraries { get; init; } = [];
+
+    /// <summary>Extra symbols <c>#if</c> can test.</summary>
+    public List<string> Defines { get; init; } = [];
+
+    public bool Validate(string platform, string path, out string error)
+    {
+        error = "";
+
+        foreach (var (field, values) in new[]
+                 {
+                     ("sources", Sources), ("libraries", Libraries), ("defines", Defines),
+                 })
+        {
+            if (values is null)
+            {
+                error = $"'{path}': '{platform}.{field}' is null; leave it out when there " +
+                        "is nothing to add";
+                return false;
+            }
+
+            if (values.Any(v => string.IsNullOrWhiteSpace(v)))
+            {
+                error = $"'{path}': one of '{platform}.{field}' is empty";
+                return false;
+            }
+        }
+
+        string? badDefine = Defines.FirstOrDefault(d => !ProjectFile.IsValidDefine(d));
+        if (badDefine is not null)
+        {
+            error = $"'{path}': '{badDefine}' is not a symbol '#if' could test; a define is " +
+                    "spelled like an identifier";
+            return false;
+        }
+
+        return true;
+    }
 }
 
 /// <summary>

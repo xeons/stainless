@@ -52,6 +52,7 @@ int Main()
     Refuses(harness);
     Writes(harness);
     Finds(harness);
+    Platforms(harness);
 
     Console.WriteLine(harness.Failures == 0u
                       ? "all checks passed"
@@ -295,4 +296,90 @@ void Finds(Harness harness)
 
     harness.Check("and a directory with no project above it finds none",
                   Project.Find("stainless-nowhere-at-all") == "");
+}
+
+void Platforms(Harness harness)
+{
+    Console.WriteLine("platforms");
+
+    // The case a flat `sources` cannot state, and the reason every Forms
+    // program in this tree was built by a shell script instead of by its own
+    // project file.
+    String text = "{"
+        + "\"name\": \"app\", \"version\": \"1.0.0\","
+        + "\"sources\": [\"src\"], \"libraries\": [\"m\"], \"defines\": [\"SHARED\"],"
+        + "\"windows\": { \"sources\": [\"bindings/win32\"],"
+        + "              \"libraries\": [\"user32\"], \"defines\": [\"WIN\"] },"
+        + "\"linux\":   { \"sources\": [\"bindings/gtk\"],"
+        + "              \"libraries\": [\":libgtk-3.so.0\"] }"
+        + "}";
+
+    var read = Project.Parse(text, "p.json");
+    harness.Check("a project with platform sections reads", read.Ok);
+    if (!read.Ok)
+    {
+        Console.WriteLine("         " + read.Error);
+        return;
+    }
+
+    var project = read.Value;
+
+    var windows = project.SourcesFor("windows");
+    harness.Check("windows adds to the sources",
+                  windows.Length == 2u && windows[0u] == "src"
+                  && windows[1u] == "bindings/win32");
+
+    var linux = project.SourcesFor("linux");
+    harness.Check("and linux adds its own",
+                  linux.Length == 2u && linux[1u] == "bindings/gtk");
+
+    harness.Check("libraries the same way",
+                  project.LibrariesFor("windows").Length == 2u
+                  && project.LibrariesFor("linux")[1u] == ":libgtk-3.so.0");
+
+    // Adding and not replacing is the whole rule: a platform naming no defines
+    // keeps the base one rather than clearing it.
+    harness.Check("an overlay adds rather than replaces",
+                  project.DefinesFor("windows").Length == 2u
+                  && project.DefinesFor("linux").Length == 1u
+                  && project.DefinesFor("linux")[0u] == "SHARED");
+
+    harness.Check("a platform named by nothing adds nothing",
+                  project.SourcesFor("macos").Length == 1u);
+
+    // A typo inside a section is refused like one anywhere else. This is the
+    // half a second reader is most likely to quietly accept.
+    var typo = Project.Parse(
+        "{\"name\":\"a\",\"windows\":{\"libaries\":[\"user32\"]}}", "p.json");
+    harness.Check("a typo inside a section is refused", typo.Fail);
+    if (typo.Fail)
+    {
+        harness.Check("and named as a platform section",
+                      typo.Error.Contains("a platform section")
+                      && typo.Error.Contains("did you mean 'libraries'"));
+    }
+
+    var wrong = Project.Parse("{\"name\":\"a\",\"windows\":[1]}", "p.json");
+    harness.Check("a section that is not an object is refused", wrong.Fail);
+
+    // Round-tripping, so the writer and the reader cannot disagree about a name.
+    var back = Project.Parse(Project.ToJson(project), "round.json");
+    harness.Check("platform sections round-trip", back.Ok);
+    if (back.Ok)
+    {
+        harness.Check("with what they added still there",
+                      back.Value.SourcesFor("windows").Length == 2u
+                      && back.Value.LibrariesFor("linux").Length == 2u
+                      && back.Value.DefinesFor("windows").Length == 2u);
+    }
+
+    // And the real file this whole feature exists for.
+    var mine = Project.Read("ide/stainless.json");
+    harness.Check("the IDE's own project reads", mine.Ok);
+    if (mine.Ok)
+    {
+        harness.Check("and names a binding directory per platform",
+                      mine.Value.SourcesFor("windows").Length == 4u
+                      && mine.Value.SourcesFor("linux").Length == 4u);
+    }
 }

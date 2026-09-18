@@ -104,6 +104,30 @@ public class Dependency
     }
 }
 
+/// What one platform adds to a project.
+///
+/// Three lists and nothing else, which is the compiler's shape: `optimize`,
+/// `abi` and `runtime` are answers about how a program is built rather than
+/// about what it is made of, and a project wanting one of them per platform is
+/// asking for two builds rather than one file.
+[Reflect]
+public class PlatformOverlay
+{
+    [JsonName("sources")]   public String[] Sources;
+    [JsonName("libraries")] public String[] Libraries;
+    [JsonName("defines")]   public String[] Defines;
+
+    public PlatformOverlay()
+    {
+        Sources = [];
+        Libraries = [];
+        Defines = [];
+    }
+
+    public bool IsEmpty =>
+        Sources.Length == 0u && Libraries.Length == 0u && Defines.Length == 0u;
+}
+
 /// A project, as the file says it is.
 ///
 /// **`ProjectFile` rather than `Project`**, which is what it is called on the
@@ -141,6 +165,20 @@ public class ProjectFile
     /// `"shared"` or `"static"`; empty lets the build decide.
     [JsonName("runtime")]         public String Runtime;
 
+    /// What Windows, Linux and macOS each add.
+    ///
+    /// **Not reflected, for the reason `Dependencies` is not**: filling one
+    /// means making a `PlatformOverlay`, and there is no way to ask a `Type`
+    /// for an instance. Read by hand beside the dependency map.
+    ///
+    /// Empty rather than null, so a caller never has to ask which -- a project
+    /// naming no Windows section and one naming an empty Windows section mean
+    /// the same thing, and there is nothing a reader could do with the
+    /// difference.
+    [JsonIgnore] public PlatformOverlay Windows;
+    [JsonIgnore] public PlatformOverlay Linux;
+    [JsonIgnore] public PlatformOverlay Macos;
+
     /// What it depends on, by name.
     ///
     /// **Not reflected, and filled by hand.** Every other field above is
@@ -172,6 +210,9 @@ public class ProjectFile
         Abi = "";
         Runtime = "";
         Dependencies = new List<Dependency>();
+        Windows = new PlatformOverlay();
+        Linux = new PlatformOverlay();
+        Macos = new PlatformOverlay();
         Directory = ".";
     }
 
@@ -182,6 +223,60 @@ public class ProjectFile
 
     /// A path written in the file, against the file's own directory.
     public String Resolve(String path) => Combine(Directory, path);
+
+    /// The overlay for a platform. `"windows"`, `"linux"` or `"macos"`;
+    /// anything else answers an empty one.
+    public PlatformOverlay OverlayFor(String platform)
+    {
+        if (platform == "windows")
+            return Windows;
+        if (platform == "linux")
+            return Linux;
+        if (platform == "macos")
+            return Macos;
+        return new PlatformOverlay();
+    }
+
+    /// What is compiled for a platform: the base list, then that platform's.
+    ///
+    /// The overlay adds and never replaces, which is what the case actually
+    /// looks like -- a program is mostly the same everywhere and needs one
+    /// binding directory more on each -- and it means this list can be read
+    /// without checking three overlays for a removal.
+    public String[] SourcesFor(String platform) => Both(Sources, OverlayFor(platform).Sources);
+
+    public String[] LibrariesFor(String platform) => Both(Libraries, OverlayFor(platform).Libraries);
+
+    public String[] DefinesFor(String platform) => Both(Defines, OverlayFor(platform).Defines);
+
+    /// The platform this program was built for, which is the one whose overlay
+    /// a window showing "what will be compiled" should show.
+    public static String ThisPlatform
+    {
+        get
+        {
+            #if WINDOWS
+            return "windows";
+            #elif MACOS
+            return "macos";
+            #else
+            return "linux";
+            #endif
+        }
+    }
+
+    String[] Both(String[] shared, String[] extra)
+    {
+        if (extra.Length == 0u)
+            return shared;
+
+        var answer = new String[shared.Length + extra.Length];
+        for (nuint i = 0u; i < shared.Length; i++)
+            answer[i] = shared[i];
+        for (nuint i = 0u; i < extra.Length; i++)
+            answer[shared.Length + i] = extra[i];
+        return answer;
+    }
 }
 
 /// What the file is called, wherever it is.
@@ -292,6 +387,21 @@ public Result<ProjectFile, String> Parse(String text, String path)
         return Fail(defines.Error);
     project.Defines = defines.Value;
 
+    var windows = ReadOverlay(members, "windows", path);
+    if (!windows.Ok)
+        return Fail(windows.Error);
+    project.Windows = windows.Value;
+
+    var linux = ReadOverlay(members, "linux", path);
+    if (!linux.Ok)
+        return Fail(linux.Error);
+    project.Linux = linux.Value;
+
+    var macos = ReadOverlay(members, "macos", path);
+    if (!macos.Ok)
+        return Fail(macos.Error);
+    project.Macos = macos.Value;
+
     var dependencies = ReadDependencies(members, path);
     if (!dependencies.Ok)
         return Fail(dependencies.Error);
@@ -339,6 +449,44 @@ Result<String[], String> ReadTextArray(JsonObject members, String name, String p
     }
 
     return Ok([]);
+}
+
+/// One platform's section, or an empty one when the file names none.
+Result<PlatformOverlay, String> ReadOverlay(JsonObject members, String platform, String path)
+{
+    var made = new PlatformOverlay();
+
+    if (members.IndexOf(platform) is Some at)
+    {
+        var value = members.ValueAt(at.Value);
+        if (!value.Object)
+        {
+            return Fail("'" + path + "': '" + platform + "' is an object of what that "
+                        + "platform adds, as in { \"libraries\": [\"user32\"] }");
+        }
+
+        var inside = value.Members;
+        var unknown = FirstUnknown(inside, KnownOverlayFields(), "a platform section", path);
+        if (unknown != "")
+            return Fail(unknown);
+
+        var sources = ReadTextArray(inside, "sources", path);
+        if (!sources.Ok)
+            return Fail(sources.Error);
+        made.Sources = sources.Value;
+
+        var libraries = ReadTextArray(inside, "libraries", path);
+        if (!libraries.Ok)
+            return Fail(libraries.Error);
+        made.Libraries = libraries.Value;
+
+        var defines = ReadTextArray(inside, "defines", path);
+        if (!defines.Ok)
+            return Fail(defines.Error);
+        made.Defines = defines.Value;
+    }
+
+    return Ok(made);
 }
 
 /// The dependency map, which reflection cannot fill.
@@ -503,8 +651,22 @@ List<String> KnownFields()
         names.Add(field.Has("JsonName") ? field.Get("JsonName").AsText(0u) : field.Name);
     }
 
-    // The one the type does not carry, because reflection cannot fill it.
+    // The four the type does not carry, because reflection cannot fill any of
+    // them: each is an object, and making one takes a constructor no `Type`
+    // can be asked for.
     names.Add("dependencies");
+    names.Add("windows");
+    names.Add("linux");
+    names.Add("macos");
+    return names;
+}
+
+List<String> KnownOverlayFields()
+{
+    var names = new List<String>();
+    names.Add("sources");
+    names.Add("libraries");
+    names.Add("defines");
     return names;
 }
 
@@ -559,6 +721,10 @@ public String ToJson(ProjectFile project)
     if (project.Dependencies.Count > 0u)
         members.Add("dependencies", DependencyObject(project.Dependencies));
 
+    AddOverlay(members, "windows", project.Windows);
+    AddOverlay(members, "linux", project.Linux);
+    AddOverlay(members, "macos", project.Macos);
+
     if (project.Libraries.Length > 0u)
         members.Add("libraries", TextArray(project.Libraries));
     if (project.Defines.Length > 0u)
@@ -589,6 +755,22 @@ void AddText(JsonObject members, String name, String value, String fallback)
     if (value == fallback || value == "")
         return;
     members.Add(name, JsonValue.Text(value));
+}
+
+void AddOverlay(JsonObject members, String name, PlatformOverlay overlay)
+{
+    if (overlay.IsEmpty)
+        return;
+
+    var inside = new JsonObject();
+    if (overlay.Sources.Length > 0u)
+        inside.Add("sources", TextArray(overlay.Sources));
+    if (overlay.Libraries.Length > 0u)
+        inside.Add("libraries", TextArray(overlay.Libraries));
+    if (overlay.Defines.Length > 0u)
+        inside.Add("defines", TextArray(overlay.Defines));
+
+    members.Add(name, JsonValue.Object(inside));
 }
 
 JsonValue TextArray(String[] values)

@@ -145,6 +145,38 @@ symbol, which is what a named export turns on.
 
 *Touches:* `Mangler`, `tests/cases/x86-conventions`.
 
+### Cross-compiling to another operating system
+
+`--target x64-linux` on a Windows box now does everything the compiler itself
+controls: `#if WINDOWS` is off and `UNIX` is on, a project's `linux` overlay is
+the one that applies, clang is told the triple, the runtime's objects are named
+for the target rather than colliding with the host's, and the whole of a GTK
+program compiles. It stops at `stdio.h`, because cross-compiling wants the
+target's headers and libraries and this machine has none.
+
+Four things had read "the target" as "the architecture" and were fixed getting
+that far; **three more are still host-based and are the ones that name files**:
+
+- `Toolchain.ExecutableExtension` and `SharedLibraryExtension`, which decide
+  `.exe` against nothing and `.dll` against `.so`;
+- `SharedLibraryFileName`, which decides the `lib` prefix;
+- the runtime's own shared-library name, built from both.
+
+They are not wrong today for any build that can complete, because a build that
+would expose them cannot get past the sysroot. They are listed because the next
+person to hit this will hit them immediately after, and because `ExecutableExtension`
+is reached from `ProjectFile.OutputPath()` -- which has no target in scope, and
+that is the actual work: threading one there, or moving the decision to where
+the target is known.
+
+**What would make any of it testable** is a sysroot: clang's `--sysroot` plus a
+Linux `/usr/include` and `/usr/lib` copied onto the Windows box, or the reverse.
+`geekom-a7` is the other half of that pair and can already build for Linux
+natively, so the question this answers is narrower than it looks -- it is
+whether one machine can produce both, not whether both platforms work.
+
+*Touches:* `Toolchain`, `ProjectFile.OutputPath`.
+
 ---
 
 ### The GTK backend, and what is next for `forms/`

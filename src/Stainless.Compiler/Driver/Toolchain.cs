@@ -46,23 +46,47 @@ public sealed class Toolchain
     private Toolchain(string clangPath) => ClangPath = clangPath;
 
     /// <summary>
-    /// <c>--target=</c> for anything but the host's own 64-bit build, and
-    /// nothing at all for that.
+    /// <c>--target=</c> for a cross build, and nothing at all for a native one.
     ///
     /// Nothing rather than the host triple on purpose: naming one makes clang
     /// pick a target rather than its default, and its default is the one whose
     /// headers and libraries are certainly installed. A cross build has to name
     /// one and takes what comes; a native build should not have to.
+    ///
+    /// <para>
+    /// **Cross means either half being different, not just the architecture.**
+    /// This tested the architecture alone, so <c>--target x64-linux</c> on an
+    /// x64 Windows box named no triple at all: clang used its own default,
+    /// which is MSVC, and the build got as far as <c>lld-link</c> asking for
+    /// <c>:libgtk-3.so.0.lib</c>. The architecture was the only half that had
+    /// ever differed, which is why it read as the whole question.
+    /// </para>
     /// </summary>
     private static IEnumerable<string> TargetArguments
     {
         get
         {
             var target = Binding.TargetPlatform.Current;
-            if (target.Architecture != Binding.TargetArch.X64)
+            var host = Binding.TargetPlatform.Host;
+
+            if (target.Architecture != host.Architecture || target.IsWindows != host.IsWindows)
                 yield return "--target=" + target.Triple;
         }
     }
+
+    /// <summary>
+    /// The triple this build actually uses: the one named on the command line
+    /// when it is a cross build, and clang's own default when it is not.
+    ///
+    /// The difference matters to <see cref="DeadStripArgument"/>, which chooses
+    /// between three spellings of one idea by what the linker will be. Asking
+    /// clang for its default answers about the host, which is the wrong machine
+    /// whenever <c>--target</c> named another.
+    /// </summary>
+    private string EffectiveTriple =>
+        TargetArguments.FirstOrDefault() is { } named
+            ? named["--target=".Length..]
+            : TargetTriple;
 
     private string? _targetTriple;
 
@@ -85,9 +109,9 @@ public sealed class Toolchain
     /// quarter off a hello-world binary, and costs a flag.
     /// </summary>
     private string DeadStripArgument =>
-        TargetTriple.Contains("windows-msvc", StringComparison.Ordinal) ? "-Wl,/OPT:REF"
-        : TargetTriple.Contains("apple", StringComparison.Ordinal) ||
-          TargetTriple.Contains("darwin", StringComparison.Ordinal) ? "-Wl,-dead_strip"
+        EffectiveTriple.Contains("windows-msvc", StringComparison.Ordinal) ? "-Wl,/OPT:REF"
+        : EffectiveTriple.Contains("apple", StringComparison.Ordinal) ||
+          EffectiveTriple.Contains("darwin", StringComparison.Ordinal) ? "-Wl,-dead_strip"
         : "-Wl,--gc-sections";
 
     /// <summary>Returns the toolchain, or null with an explanation if clang is missing.</summary>
@@ -300,12 +324,24 @@ public sealed class Toolchain
             // The target goes in the name for the reason debug and shared do:
             // an object built for x86 is a different object, and handing a
             // 64-bit link one of them fails in the linker rather than here.
+            //
+            // **The operating system is half of that and was missing**, so an
+            // x64 Windows object and an x64 Linux one were both `arc.o` and the
+            // second build silently linked the first's. The linker said
+            // "unknown file type" about a COFF object it was handed on an ELF
+            // link, which names the symptom and nothing about the cause.
             var target = Binding.TargetPlatform.Current;
-            string architecture = target.Architecture == Binding.TargetArch.X64
-                ? ""
-                : "." + target.Architecture.ToString().ToLowerInvariant();
+            var host = Binding.TargetPlatform.Host;
 
-            string suffix = architecture + (shared ? ".so" : "") + (debug ? ".g" : "") + ".o";
+            bool native = target.Architecture == host.Architecture
+                       && target.IsWindows == host.IsWindows;
+
+            string platform = native
+                ? ""
+                : "." + target.Architecture.ToString().ToLowerInvariant()
+                      + (target.IsWindows ? "-windows" : "-linux");
+
+            string suffix = platform + (shared ? ".so" : "") + (debug ? ".g" : "") + ".o";
             string objectFile = Path.ChangeExtension(source, suffix);
             objectFiles.Add(objectFile);
 
@@ -325,8 +361,10 @@ public sealed class Toolchain
                 arguments.Add("-DSTAINLESS_RUNTIME_BUILD");
 
                 // Windows relocates a DLL at load time and rejects the flag;
-                // everywhere else a shared object has to be built for it.
-                if (!OperatingSystem.IsWindows())
+                // everywhere else a shared object has to be built for it. The
+                // question is about the binary being produced, so it is the
+                // target's to answer and not the machine's.
+                if (!target.IsWindows)
                     arguments.AddRange(["-fPIC", "-fvisibility=hidden"]);
             }
 

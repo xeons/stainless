@@ -84,7 +84,7 @@ against each other entry by entry and answer identically, so
 expected output and no `#if` in it. What does not travel is the *operating
 system*: a manifest, an icon and a dialog template are carried and readable
 elsewhere and inert, and SL0700 names them when a program has any. See
-[§2.2 of packages.md](packages.md#22-resources).
+[§2.3 of packages.md](packages.md#23-resources).
 
 ## Reference documentation
 
@@ -168,6 +168,21 @@ silently did nothing is the failure a readable project file exists to prevent:
 ```
 error: 'optimise' is not a field of a project file; did you mean 'optimize'?
 ```
+
+**What differs by platform goes in a section named after one**, which is what
+lets a program with a user interface be one project rather than one shell
+script per system:
+
+```json
+"windows": { "sources": ["bindings/win32"], "libraries": ["user32", "gdi32"] },
+"linux":   { "sources": ["bindings/gtk"],   "libraries": [":libgtk-3.so.0"] }
+```
+
+A section adds to the base lists rather than replacing them, and the one that
+applies is chosen by what is being built *for* — so `--target x64-linux` takes
+the `linux` section wherever it runs, exactly as `#if WINDOWS` follows the same
+target. [§2.1 of packages.md](packages.md#21-what-one-platform-adds) has the
+whole of it.
 
 ## Packages
 

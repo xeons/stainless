@@ -54,6 +54,17 @@ public sealed record BuildOverrides
 
     /// <summary>Extra paths named on the command line alongside the project.</summary>
     public IReadOnlyList<string> ExtraPaths { get; init; } = [];
+
+    /// <summary>
+    /// What is being built for, or null for this machine.
+    ///
+    /// **A project build ignored <c>--target</c> entirely** until this was
+    /// here: the options a project produced never set it, so the flag was
+    /// parsed, carried, and dropped. It decides the platform overlay as well
+    /// as the code, which is why it had to stop being ignored before an
+    /// overlay could mean anything.
+    /// </summary>
+    public Binding.TargetPlatform? Target { get; init; }
 }
 
 public sealed record ProjectBuildResult
@@ -127,8 +138,17 @@ public sealed class ProjectBuilder(
     /// <summary>What each shared dependency's digest turned out to be.</summary>
     private readonly Dictionary<string, string> _digests = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// What every platform question is answered against: what was asked for,
+    /// or this machine. Resolved once per build rather than per package, so a
+    /// dependency cannot be collected for a different platform than the root.
+    /// </summary>
+    private Binding.TargetPlatform _target = Binding.TargetPlatform.Host;
+
     public ProjectBuildResult Build(BuildOverrides overrides)
     {
+        _target = overrides.Target ?? Binding.TargetPlatform.Host;
+
         if (!resolution.Success)
             return ProjectBuildResult.Failed(resolution.Error ?? "the dependencies did not resolve");
 
@@ -323,7 +343,12 @@ public sealed class ProjectBuilder(
             }))?.ToString() ?? "default",
         ]);
 
-        parts.AddRange(package.Project.Defines);
+        // The target, because it decides the code *and* which platform overlay
+        // was folded in below -- so two builds differing only in `--target`
+        // must not look alike to a stamp.
+        parts.Add(_target.Triple);
+
+        parts.AddRange(package.Project.DefinesFor(_target));
         parts.AddRange(overrides.Defines);
 
         return Digest.OfParts(parts);
@@ -536,7 +561,7 @@ public sealed class ProjectBuilder(
         if (sources.Sources.Count == 0)
         {
             _error = $"'{project.Path}' found no {Compilation.SourceExtension} files under " +
-                     string.Join(", ", project.Sources.Select(s => $"'{s}'"));
+                     string.Join(", ", project.SourcesFor(_target).Select(s => $"'{s}'"));
             return null;
         }
 
@@ -571,7 +596,8 @@ public sealed class ProjectBuilder(
             DocumentationPath = isRoot ? overrides.DocumentationPath : null,
             DocumentStandardLibrary = overrides.DocumentStandardLibrary,
             DocumentationOnly = overrides.DocumentationOnly && isRoot,
-            Defines = [.. project.Defines, .. overrides.Defines],
+            Defines = [.. project.DefinesFor(_target), .. overrides.Defines],
+            Target = overrides.Target,
             CppAbi = overrides.CppAbi ?? (root.Abi is null ? null : ProjectFile.ParseAbi(root.Abi)),
             SharedRuntime = overrides.SharedRuntime ?? (root.Runtime switch
             {
@@ -605,10 +631,10 @@ public sealed class ProjectBuilder(
         ProjectFile project, List<string> paths, List<string> libraries,
         List<string> references, List<string> linkInputs, HashSet<string> seen)
     {
-        foreach (string source in project.Sources)
+        foreach (string source in project.SourcesFor(_target))
             paths.Add(project.Resolve(source));
 
-        libraries.AddRange(project.Libraries);
+        libraries.AddRange(project.LibrariesFor(_target));
 
         foreach (var (name, dependency) in project.Dependencies
                      .OrderBy(d => d.Key, StringComparer.Ordinal))

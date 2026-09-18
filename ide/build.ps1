@@ -25,27 +25,17 @@ if (-not (Test-Path $compiler)) {
     Write-Error "no compiler at $compiler -- run 'dotnet build Stainless.slnx' first"
 }
 
-if (-not (Test-Path $output)) { New-Item -ItemType Directory $output | Out-Null }
-
-# The IDE's own source, the Forms library, and the Windows bindings Forms
-# reaches -- the whole binding directory rather than only `api`, because the
-# backend uses `Win32.Dialogs` for the file choosers and `Win32.Com` under it.
-$sources = @(
-    (Join-Path $PSScriptRoot "src"),
-    (Join-Path $repository "forms\src"),
-    (Join-Path $repository "bindings\win32")
-)
-
-# The comctl32 v6 manifest, so the common controls are the themed ones. Shared
-# with the Forms samples rather than copied.
-$resources = Join-Path $repository "samples\forms\forms.rc"
-
-$libraries = @("-l", "user32", "-l", "gdi32", "-l", "comctl32",
-               "-l", "comdlg32", "-l", "ole32", "-l", "shell32",
-               "-l", "advapi32")
-
+# Everything about what the IDE is made of now lives in `ide/stainless.json`:
+# its own source, the Forms library, the manifest resource, and the bindings
+# and libraries each platform needs. That last part is why it could not live
+# there before -- one flat `sources` cannot say `bindings/win32` on one system
+# and `bindings/gtk` on the other, and a platform section can.
+#
+# So this script is a convenience for running the tests afterwards rather than
+# a second description of the program, and the Linux command in README.md is
+# now the same three words as the Windows one.
 Write-Host "building the IDE" -ForegroundColor Cyan
-& $compiler build $sources[0] $resources $sources[1] $sources[2] -o $exe @libraries
+& $compiler build --project $PSScriptRoot
 if ($LASTEXITCODE -ne 0) { Write-Error "the IDE failed to build" }
 
 Write-Host "built $exe" -ForegroundColor Green

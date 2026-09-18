@@ -748,6 +748,7 @@ internal static class Program
             HeaderPath = Header,
             ModuleDefinitionPath = ModuleDefinition,
             ExtraPaths = Paths,
+            Target = Target,
             DocumentationPath = Documentation,
             DocumentStandardLibrary = StandardLibrary,
             DocumentationOnly = Documentation is not null,

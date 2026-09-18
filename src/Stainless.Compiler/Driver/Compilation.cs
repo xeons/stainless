@@ -1086,12 +1086,36 @@ public sealed class Compilation
     /// plus whatever <c>-D</c> added.
     ///
     /// <para>
-    /// The architecture is the <i>target's</i> and not the host's, which is
-    /// what a cross build needs it to be: <c>--target x86</c> on an x86-64 box
-    /// used to define <c>X64</c>, so a binding guarded by <c>#if X86</c> would
-    /// have compiled the wrong half of itself. The operating system is still
-    /// the host's, because a target does not yet change which platform the
-    /// standard library binds to.
+    /// **Every one of them is the target's, not the host's.** <c>--target
+    /// x86</c> on an x86-64 box used to define <c>X64</c>, so a binding guarded
+    /// by <c>#if X86</c> compiled the wrong half of itself; the architecture
+    /// was fixed then and the operating system was left behind, on the argument
+    /// that a target did not change which platform the standard library binds
+    /// to. That argument does not survive being looked at: the standard library
+    /// chooses its platform <i>with these very symbols</i> -- <c>#if WINDOWS</c>
+    /// is what picks GDI+ over libgd in <c>Standard.Drawing</c> -- and the C
+    /// runtime beside it is compiled by clang for the triple, so its
+    /// <c>#ifdef _WIN32</c> has followed the target all along. Leaving the
+    /// operating system on the host meant a cross build compiled the Windows
+    /// half of the Stainless code against the Linux half of the C.
+    /// </para>
+    ///
+    /// <para>
+    /// **A build with no <c>--target</c> answers exactly as it did**, from the
+    /// host. That is not only for compatibility: <see
+    /// cref="Binding.TargetPlatform"/> has no macOS or FreeBSD triple, so
+    /// <see cref="Binding.TargetPlatform.Host"/> on either answers with a Linux
+    /// one -- and deriving the symbols from that would take <c>MACOS</c> away
+    /// from a machine that has it. What a target cannot yet name, the host is
+    /// still asked about.
+    /// </para>
+    ///
+    /// <para>
+    /// This says what <c>#if</c> may compile, and nothing about whether the
+    /// result links. Cross-compiling to another operating system also wants
+    /// that system's libraries, which is a separate problem and an unsolved
+    /// one; what changes here is that the half the compiler controls is now
+    /// self-consistent.
     /// </para>
     ///
     /// <para>
@@ -1105,10 +1129,22 @@ public sealed class Compilation
     {
         var symbols = new HashSet<string>(StringComparer.Ordinal) { "STAINLESS" };
 
-        if (OperatingSystem.IsWindows()) symbols.Add("WINDOWS");
-        if (OperatingSystem.IsLinux()) { symbols.Add("LINUX"); symbols.Add("UNIX"); }
-        if (OperatingSystem.IsMacOS()) { symbols.Add("MACOS"); symbols.Add("UNIX"); }
-        if (OperatingSystem.IsFreeBSD()) { symbols.Add("FREEBSD"); symbols.Add("UNIX"); }
+        if (target is null)
+        {
+            if (OperatingSystem.IsWindows()) symbols.Add("WINDOWS");
+            if (OperatingSystem.IsLinux()) { symbols.Add("LINUX"); symbols.Add("UNIX"); }
+            if (OperatingSystem.IsMacOS()) { symbols.Add("MACOS"); symbols.Add("UNIX"); }
+            if (OperatingSystem.IsFreeBSD()) { symbols.Add("FREEBSD"); symbols.Add("UNIX"); }
+        }
+        else if (target.IsWindows)
+        {
+            symbols.Add("WINDOWS");
+        }
+        else
+        {
+            symbols.Add("LINUX");
+            symbols.Add("UNIX");
+        }
 
         symbols.Add((target ?? Binding.TargetPlatform.Host).Architecture switch
         {
