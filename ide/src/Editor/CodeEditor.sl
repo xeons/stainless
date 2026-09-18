@@ -655,6 +655,81 @@ public class CodeEditor : CustomControl
         base.OnMouseDown(args);
     }
 
+    /// Double-clicking selects the word under the pointer.
+    ///
+    /// The caret is already where the second click landed -- the backend raises
+    /// the press *and* the double, in that order, precisely so a control that
+    /// tracks presses sees both -- so this only has to widen the selection out
+    /// to the word's edges from where it already is.
+    ///
+    /// **Both edges are found by scanning from the caret**, rather than by
+    /// reusing `WordLeft` and `WordRight`. Those two are keyboard movement:
+    /// they cross runs of spaces, because Ctrl+Left from the start of a word
+    /// must reach the previous one. A double-click on a space should select
+    /// that run of spaces and stop, and a double-click inside a word should
+    /// take the word and not the gap after it.
+    protected override void OnDoubleClick()
+    {
+        base.OnDoubleClick();
+        SelectWord();
+    }
+
+    /// Selects the run the caret is in: a word, a run of spaces, or a run of
+    /// punctuation. What a double-click does, separated from the gesture so
+    /// that it can be asked for by a menu, by a keystroke, and by a test that
+    /// has no mouse.
+    public void SelectWord()
+    {
+        if (!_ready)
+            return;
+
+        String line = _doc.TextAt(_caret.Row);
+        nuint size = line.ByteLength();
+        if (size == 0u)
+            return;
+
+        nuint at = _caret.Column;
+        if (at >= size)
+            at = StepLeft(line, size);
+
+        // Which run the byte under the pointer belongs to. A word, a run of
+        // spaces, or a run of punctuation -- three cases rather than two, so
+        // that double-clicking `=>` takes both characters instead of one.
+        byte here = line.ByteAt(at);
+        bool wordly = IsWord(here);
+        bool spacey = IsSpace(here);
+
+        nuint start = at;
+        while (start > 0u)
+        {
+            nuint back = StepLeft(line, start);
+            if (!SameRun(line.ByteAt(back), wordly, spacey))
+                break;
+            start = back;
+        }
+
+        nuint end = at;
+        while (end < size && SameRun(line.ByteAt(end), wordly, spacey))
+            end = line.NextCodePoint(end);
+
+        _anchor = Position.At(_caret.Row, start);
+        _caret = Position.At(_caret.Row, end);
+        _keepWanted = false;
+        ShowCaret();
+        Invalidate();
+        OnCaretMoved();
+    }
+
+    /// Whether a byte belongs to the same run as the one double-clicked.
+    bool SameRun(byte c, bool wordly, bool spacey)
+    {
+        if (wordly)
+            return IsWord(c);
+        if (spacey)
+            return IsSpace(c);
+        return !IsWord(c) && !IsSpace(c);
+    }
+
     protected override void OnMouseMove(MouseEventArgs args)
     {
         if (!_ready)

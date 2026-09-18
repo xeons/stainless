@@ -481,6 +481,18 @@ public class ControlPeer : IControlPeer
             control.OnPlatformMouseUp(MouseButton.Left, PointOfParam(lParam), CurrentModifiers());
             return Inherited(message, wParam, lParam);
         }
+        if (message == WmLeftDoubleClick)
+        {
+            // **Both, from the one message.** Windows sends this *instead of*
+            // the second `WM_LBUTTONDOWN`, not as well as it, so a control that
+            // counts presses would silently miss every other one. GTK sends the
+            // press and then the double, and raising both here is what makes
+            // the two platforms agree about what a control saw.
+            control.OnPlatformMouseDown(MouseButton.Left, PointOfParam(lParam),
+                                        CurrentModifiers());
+            control.OnPlatformDoubleClick();
+            return Inherited(message, wParam, lParam);
+        }
         if (message == WmRightButtonDown)
         {
             control.OnPlatformMouseDown(MouseButton.Right, PointOfParam(lParam), CurrentModifiers());

@@ -1537,6 +1537,85 @@ public class Shell : Form
             Application.DoEvents();
         }
 
+        // Selecting a word, which is what a double-click now does -- and could
+        // not do before, because `Control.DoubleClick` was raised by nothing on
+        // either backend and so had never fired at all.
+        //
+        // The gesture is not testable without a mouse; what it *does* is, which
+        // is why `SelectWord` is a method rather than only a handler.
+        {
+            var pad = AddTab(new Document()).Editor;
+            pad.Focus();
+            Application.DoEvents();
+            pad.Type("var total = count + 1;   // sum");
+
+            // Inside a word takes the word and not the space after it.
+            pad.GoTo(0u, 5u);
+            pad.SelectWord();
+            if (pad.SelectedText != "total")
+            {
+                Console.WriteLine("FAIL: double-click on a word selected '"
+                                  + pad.SelectedText + "'");
+                ok = false;
+            }
+
+            // At the first byte of a word, which is where a click usually lands.
+            pad.GoTo(0u, 0u);
+            pad.SelectWord();
+            if (pad.SelectedText != "var")
+            {
+                Console.WriteLine("FAIL: at the start of a word it selected '"
+                                  + pad.SelectedText + "'");
+                ok = false;
+            }
+
+            // A run of spaces is its own run, and stops at the word either side.
+            pad.GoTo(0u, 23u);
+            pad.SelectWord();
+            if (pad.SelectedText != "   ")
+            {
+                Console.WriteLine("FAIL: on spaces it selected '"
+                                  + pad.SelectedText + "' rather than three spaces");
+                ok = false;
+            }
+
+            // Punctuation is the third run, so `//` comes out whole rather than
+            // one slash -- which is the case two runs would get wrong.
+            pad.GoTo(0u, 26u);
+            pad.SelectWord();
+            if (pad.SelectedText != "//")
+            {
+                Console.WriteLine("FAIL: on punctuation it selected '"
+                                  + pad.SelectedText + "'");
+                ok = false;
+            }
+
+            // Past the end of the line, where a click in the empty space to the
+            // right of the text lands. It must select the last run, not reach
+            // past the line and not fault.
+            pad.GoTo(0u, 200u);
+            pad.SelectWord();
+            if (pad.SelectedText != "sum")
+            {
+                Console.WriteLine("FAIL: past the end of the line it selected '"
+                                  + pad.SelectedText + "'");
+                ok = false;
+            }
+
+            // An empty line has no run at all, and must not select anything or
+            // walk off the front of a zero-length string.
+            pad.Type("\n");
+            pad.SelectWord();
+            if (pad.HasSelection)
+            {
+                Console.WriteLine("FAIL: an empty line selected something");
+                ok = false;
+            }
+
+            CloseTab(_open.At(_open.Count - 1u));
+            Application.DoEvents();
+        }
+
         // The panes, and what a self test can honestly say about them.
         //
         // **Not that anything is on the screen.** Three wells and a strip are
@@ -1680,8 +1759,8 @@ public class Shell : Form
 
         if (ok)
         {
-            Console.WriteLine("  editing, undo, lexing, the clipboard, text size, tabs,");
-            Console.WriteLine("  the project and the docked panes");
+            Console.WriteLine("  editing, undo, word selection, lexing, the clipboard,");
+            Console.WriteLine("  text size, tabs, the project and the docked panes");
         }
         return ok;
     }

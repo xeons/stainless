@@ -157,6 +157,21 @@ public interface IControlNotify
     /// menu item. Distinct from a mouse click because the keyboard does it too.
     void OnPlatformActivated();
 
+    /// The left button was pressed twice inside the double-click time.
+    ///
+    /// Separate from a second `OnPlatformMouseDown` because the platform is
+    /// what owns the time and the distance that make two clicks one gesture,
+    /// and a control counting them itself would get a different answer from
+    /// every other program on the desktop.
+    ///
+    /// The mouse-down for the second click is still reported, before this: a
+    /// control that only tracks presses must not miss one, and a control that
+    /// wants the gesture is looking at this instead. Win32 substitutes
+    /// `WM_LBUTTONDBLCLK` for that second `WM_LBUTTONDOWN` rather than sending
+    /// both, so the backend raises both from the one message to make the two
+    /// platforms agree.
+    void OnPlatformDoubleClick();
+
     /// The control's own value changed by the user's doing -- text typed, an
     /// item selected. Never raised for a change the program itself made, which
     /// is what stops a two-way binding oscillating.

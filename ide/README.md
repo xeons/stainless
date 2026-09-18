@@ -54,9 +54,14 @@ were fixed — the IDE is what found every one of them.
   Ctrl, `Home` alternating between the first non-blank and column zero, a
   remembered column across vertical movement, and Tab indenting a selection
   rather than replacing it.
+- **Double-click selects a word**, or a run of spaces, or a run of punctuation —
+  three runs rather than two, so `//` and `=>` come out whole.
 - **Build and run**, which builds the *project* when there is one, on a thread
   that is not the one drawing the window. Double-click a diagnostic and the
-  caret goes to it — and the diagnostic is read from the compiler's own JSON
+  caret goes to it — which is newer than it looks, because `Control.DoubleClick`
+  was declared in `forms/` and raised by nothing until this was chased down, so
+  the click had never worked on any pane. The diagnostic is read from the
+  compiler's own JSON
   (`--diagnostics json`) rather than parsed back out of the message meant for a
   person, which is what it used to be.
 - **Undo and redo**, with Ctrl+Z and Ctrl+Y. Typing a word is one undo rather

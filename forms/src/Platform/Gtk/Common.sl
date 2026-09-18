@@ -523,6 +523,20 @@ public class GtkPeer : IControlPeer
             if (owner == null)
                 return false;
             var event = (GdkEvent*)carried;
+
+            // GTK sends a plain press, then a second plain press, then a
+            // `GDK_2BUTTON_PRESS` carrying the same position -- so the double
+            // arrives as a *third* event rather than in place of anything. It
+            // must not be reported as another press, or every double-click
+            // would be three of them.
+            if (EventType(event) == GDK_2BUTTON_PRESS)
+            {
+                ((IControlNotify)owner).OnPlatformDoubleClick();
+                return false;
+            }
+            if (EventType(event) == GDK_3BUTTON_PRESS)
+                return false;
+
             ((IControlNotify)owner).OnPlatformMouseDown(
                 ButtonOf(event), PointOf(event), ModifiersOf(event));
             return false;

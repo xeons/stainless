@@ -745,6 +745,7 @@ public abstract class Control : IControlNotify
     public void OnPlatformGotFocus() => OnGotFocus();
     public void OnPlatformLostFocus() => OnLostFocus();
     public void OnPlatformActivated() => OnClick();
+    public void OnPlatformDoubleClick() => OnDoubleClick();
 
     /// The user changed the control's value. The base turns it into
     /// `OnTextChanged`, which is right for everything whose value is its text;

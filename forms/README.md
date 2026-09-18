@@ -256,6 +256,20 @@ thread that is allowed to, and the answer arrives through the message loop the
 program already has. Nothing changes colour and there is no state machine, which
 is what real threads buy — [docs/concurrency.md §12](../docs/concurrency.md).
 
+**`Control.DoubleClick` is raised, which it was not for a long time.** The event
+was declared and `OnDoubleClick` existed, and nothing on either backend ever
+called it — so every handler attached to it anywhere was dead, silently, and the
+only symptom was a double-click doing nothing at all. It is raised from
+`WM_LBUTTONDBLCLK` on Win32 and `GDK_2BUTTON_PRESS` on GTK, in `ControlPeer` and
+`GtkPeer` rather than per control, so it works for everything at once.
+
+The two platforms disagree about the second press and the backends reconcile it
+here rather than leaving it to controls. Windows sends `WM_LBUTTONDBLCLK`
+*instead of* the second `WM_LBUTTONDOWN`; GTK sends the press and then a
+separate double. So Win32 raises both from the one message and GTK swallows the
+double as a press — and a control that counts presses and a control that wants
+the gesture each see the same thing on both.
+
 **Z-order and the pointer are asked for, not waited for.** `Control` carries
 two small methods that exist because a *docked* window needs them and nothing
 else in the library did: `BringToFront`, which raises a control above the
