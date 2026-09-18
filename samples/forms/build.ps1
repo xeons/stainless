@@ -13,14 +13,32 @@ param(
     [string] $Run = ""
 )
 
-$ErrorActionPreference = "Stop"
+# `Stop` applies to cmdlets, and native commands are handled by checking
+# `$LASTEXITCODE` after each one -- which every call below does.
+#
+# **Not `Stop` for the compiler.** Windows PowerShell 5.1 wraps each line a
+# native program writes to stderr in an ErrorRecord, and under `Stop` that makes
+# the first *warning* a terminating error: `stainless` prints one SL0377 today,
+# so `-Test` died before running a single test and reported it as
+# NativeCommandError. An exit code is what says whether a build failed; a line
+# on stderr is not.
+$ErrorActionPreference = "Continue"
+
+# Says what went wrong and stops, which `Write-Error` no longer does now that
+# the preference above is `Continue`. A failing build has to end in a non-zero
+# exit code, or a caller -- CI, or another script -- reads a red page as a pass.
+function Fail([string] $why)
+{
+    Write-Host $why -ForegroundColor Red
+    exit 1
+}
 
 $repository = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $compiler   = Join-Path $repository "src\Stainless.Cli\bin\Debug\net10.0\stainless.exe"
 $output     = Join-Path $PSScriptRoot "build"
 
 if (-not (Test-Path $compiler)) {
-    Write-Error "no compiler at $compiler -- run 'dotnet build Stainless.slnx' first"
+    Fail "no compiler at $compiler -- run 'dotnet build Stainless.slnx' first"
 }
 
 if (-not (Test-Path $output)) { New-Item -ItemType Directory $output | Out-Null }
@@ -54,7 +72,7 @@ foreach ($sample in $samples) {
 
     Write-Host "building $name" -ForegroundColor Cyan
     & $compiler build $sample.FullName $resources @library -o $exe @libraries
-    if ($LASTEXITCODE -ne 0) { Write-Error "$name failed to build" }
+    if ($LASTEXITCODE -ne 0) { Fail "$name failed to build" }
 }
 
 Write-Host ""
@@ -68,12 +86,12 @@ if ($Test) {
         $exe  = Join-Path $output "$name.exe"
         Write-Host "--selftest $name" -ForegroundColor Cyan
         & $exe --selftest
-        if ($LASTEXITCODE -ne 0) { Write-Error "$name self test failed" }
+        if ($LASTEXITCODE -ne 0) { Fail "$name self test failed" }
     }
 }
 
 if ($Run -ne "") {
     $exe = Join-Path $output "$Run.exe"
-    if (-not (Test-Path $exe)) { Write-Error "no sample called '$Run' in $output" }
+    if (-not (Test-Path $exe)) { Fail "no sample called '$Run' in $output" }
     & $exe
 }

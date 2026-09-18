@@ -14,7 +14,25 @@ param(
     [string] $Open = ""
 )
 
-$ErrorActionPreference = "Stop"
+# `Stop` applies to cmdlets, and native commands are handled by checking
+# `$LASTEXITCODE` after each one -- which every call below does.
+#
+# **Not `Stop` for the compiler.** Windows PowerShell 5.1 wraps each line a
+# native program writes to stderr in an ErrorRecord, and under `Stop` that makes
+# the first *warning* a terminating error: `stainless` prints one SL0377 today,
+# so `-Test` died before running a single test and reported it as
+# NativeCommandError. An exit code is what says whether a build failed; a line
+# on stderr is not.
+$ErrorActionPreference = "Continue"
+
+# Says what went wrong and stops, which `Write-Error` no longer does now that
+# the preference above is `Continue`. A failing build has to end in a non-zero
+# exit code, or a caller -- CI, or another script -- reads a red page as a pass.
+function Fail([string] $why)
+{
+    Write-Host $why -ForegroundColor Red
+    exit 1
+}
 
 $repository = Resolve-Path (Join-Path $PSScriptRoot "..")
 $compiler   = Join-Path $repository "src\Stainless.Cli\bin\Debug\net10.0\stainless.exe"
@@ -22,7 +40,7 @@ $output     = Join-Path $PSScriptRoot "build"
 $exe        = Join-Path $output "stainless-ide.exe"
 
 if (-not (Test-Path $compiler)) {
-    Write-Error "no compiler at $compiler -- run 'dotnet build Stainless.slnx' first"
+    Fail "no compiler at $compiler -- run 'dotnet build Stainless.slnx' first"
 }
 
 # Everything about what the IDE is made of now lives in `ide/stainless.json`:
@@ -36,7 +54,7 @@ if (-not (Test-Path $compiler)) {
 # now the same three words as the Windows one.
 Write-Host "building the IDE" -ForegroundColor Cyan
 & $compiler build --project $PSScriptRoot
-if ($LASTEXITCODE -ne 0) { Write-Error "the IDE failed to build" }
+if ($LASTEXITCODE -ne 0) { Fail "the IDE failed to build" }
 
 Write-Host "built $exe" -ForegroundColor Green
 
@@ -44,22 +62,30 @@ if ($Test) {
     Write-Host ""
     Write-Host "the scanner" -ForegroundColor Cyan
     & $compiler run (Join-Path $PSScriptRoot "tests\lextest.sl") (Join-Path $PSScriptRoot "src\Lang")
-    if ($LASTEXITCODE -ne 0) { Write-Error "the scanner tests failed" }
+    if ($LASTEXITCODE -ne 0) { Fail "the scanner tests failed" }
 
     Write-Host ""
     Write-Host "reading what the compiler said" -ForegroundColor Cyan
     & $compiler run (Join-Path $PSScriptRoot "tests\buildtest.sl") (Join-Path $PSScriptRoot "src\Build")
-    if ($LASTEXITCODE -ne 0) { Write-Error "the diagnostic tests failed" }
+    if ($LASTEXITCODE -ne 0) { Fail "the diagnostic tests failed" }
 
     Write-Host ""
     Write-Host "the project reader" -ForegroundColor Cyan
     & $compiler run (Join-Path $PSScriptRoot "tests\projecttest.sl") (Join-Path $PSScriptRoot "src\Project")
-    if ($LASTEXITCODE -ne 0) { Write-Error "the project tests failed" }
+    if ($LASTEXITCODE -ne 0) { Fail "the project tests failed" }
+
+    Write-Host ""
+    Write-Host "the docking layout" -ForegroundColor Cyan
+    # One file rather than the directory: `Ide.Shell` is two files, and the
+    # other one is the controls -- which would drag in a widget set and a
+    # display for a test that needs neither.
+    & $compiler run (Join-Path $PSScriptRoot "tests\docktest.sl") (Join-Path $PSScriptRoot "src\Shell\Layout.sl")
+    if ($LASTEXITCODE -ne 0) { Fail "the docking tests failed" }
 
     Write-Host ""
     Write-Host "the window" -ForegroundColor Cyan
     & $exe --selftest
-    if ($LASTEXITCODE -ne 0) { Write-Error "the IDE self test failed" }
+    if ($LASTEXITCODE -ne 0) { Fail "the IDE self test failed" }
 }
 
 if ($Run) {
