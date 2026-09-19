@@ -33,6 +33,9 @@
 //   sldb line <binary> f:n     what address a source line begins at
 //   sldb addr <binary> 0xNNN   what source line an address came from
 //   sldb run <binary> [f:n]    run it, stopping at a line
+//   sldb stack <binary> f:n    the call stack where it stops
+//   sldb step <binary> f:n [k] step k lines from there, into calls
+//   sldb next <binary> f:n [k] the same, over them
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -753,6 +756,118 @@ bool FindLineAddress(List<LineTable> tables, String where, nuint* address,
     return false;
 }
 
+/// Runs to a breakpoint and then does something there.
+///
+/// The three commands below differ only in what that something is, so the
+/// launching, the breakpoint and the reporting are written once.
+int RunToBreakpointThen(String path, String where, String what, int times)
+{
+    var made = MakeTarget();
+    if (!made.Ok)
+    {
+        Console.WriteLine("sldb: " + made.Error);
+        return 1;
+    }
+
+    var read = Image.FromFile(path);
+    if (!read.Ok)
+    {
+        Console.WriteLine("sldb: " + read.Error);
+        return 1;
+    }
+
+    var image = read.Value;
+    var info = new DwarfInfo(image);
+    String bad = info.Read();
+    if (bad.ByteLength() != 0u)
+    {
+        Console.WriteLine("sldb: " + bad);
+        return 1;
+    }
+
+    var tables = ReadEveryLineTable(info);
+    var engine = new Engine(made.Value, image, info, tables);
+    var target = made.Value;
+
+    nuint at = 0u;
+    uint chosen = 0u;
+    if (!FindLineAddress(tables, where, &at, &chosen))
+    {
+        Console.WriteLine("sldb: no code for " + where);
+        return 1;
+    }
+    engine.Add(at, where);
+
+    var started = engine.Start(path, "");
+    if (!started.Ok)
+    {
+        Console.WriteLine("sldb: " + started.Error);
+        return 1;
+    }
+
+    var stop = started.Value;
+    if (stop.Kind != StopKind.Breakpoint)
+    {
+        Console.WriteLine("sldb: never reached " + where);
+        engine.Terminate();
+        return 1;
+    }
+
+    Console.WriteLine("stopped at " + engine.Describe(stop.Address));
+
+    if (what == "stack")
+    {
+        PrintCallStack(target, engine, stop.Thread);
+        engine.Terminate();
+        return 0;
+    }
+
+    for (int i = 0; i < times; i++)
+    {
+        var moved = what == "next" ? engine.StepOver(stop.Thread)
+                                   : engine.StepIn(stop.Thread);
+        if (moved.Kind == StopKind.Exited)
+        {
+            Console.WriteLine("exited with "
+                              + Standard.Text.FromInteger((long)moved.ExitCode));
+            return 0;
+        }
+        if (moved.Kind == StopKind.Fault)
+        {
+            Console.WriteLine("fault 0x" + FormatHexadecimal((ulong)moved.Code));
+            engine.Terminate();
+            return 1;
+        }
+        Console.WriteLine("  -> " + engine.Describe(moved.Address)
+                          + "   " + engine.FunctionAt(moved.Address));
+        stop = moved;
+    }
+
+    engine.Terminate();
+    return 0;
+}
+
+void PrintCallStack(ITarget target, Engine engine, uint thread)
+{
+    var frames = WalkStack(target, thread);
+    for (nuint i = 0u; i < frames.Count; i++)
+    {
+        var frame = frames[i];
+        String name = engine.FunctionAt(frame.Pc);
+
+        // **Every frame above the first is a return address**, which is the
+        // instruction *after* the call. Asked about that address directly, the
+        // line table answers the line the call returns to -- which is usually
+        // the same line and occasionally the next one. Stepping back one byte
+        // asks about the call itself.
+        nuint asking = i == 0u ? frame.Pc : frame.Pc - 1u;
+
+        Console.WriteLine("  #" + FormatNumber(i) + "  "
+                          + PadRight(name.ByteLength() != 0u ? name : "??", 24)
+                          + engine.Describe(asking));
+    }
+}
+
 int PrintUsage()
 {
     Console.WriteLine("sldb -- the Stainless debugger");
@@ -764,6 +879,9 @@ int PrintUsage()
     Console.WriteLine("  sldb line <binary> f:n     what address a line begins at");
     Console.WriteLine("  sldb addr <binary> 0xNNN   what line an address came from");
     Console.WriteLine("  sldb run <binary> [f:n]    run it, stopping at a line");
+    Console.WriteLine("  sldb stack <binary> f:n    the call stack where it stops");
+    Console.WriteLine("  sldb step <binary> f:n [k] step k lines, into calls");
+    Console.WriteLine("  sldb next <binary> f:n [k] the same, over them");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
 }
@@ -797,6 +915,15 @@ int Main()
 
     if (args[0u] == "run" && args.Length >= 2u)
         return RunProgram(args[1u], args.Length >= 3u ? args[2u] : "");
+
+    if (args[0u] == "stack" && args.Length >= 3u)
+        return RunToBreakpointThen(args[1u], args[2u], "stack", 0);
+
+    if ((args[0u] == "step" || args[0u] == "next") && args.Length >= 3u)
+    {
+        int times = args.Length >= 4u ? (int)ParseNumber(args[3u]) : 1;
+        return RunToBreakpointThen(args[1u], args[2u], args[0u], times);
+    }
 
     return PrintUsage();
 }

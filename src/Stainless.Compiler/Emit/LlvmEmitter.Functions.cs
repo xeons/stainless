@@ -115,7 +115,7 @@ public sealed partial class LlvmEmitter
 
         _module.AppendLine(
             $"define {linkage}{storage}{Convention(symbol)}{returnType} {Symbol(symbol)}" +
-            $"({string.Join(", ", declaredParameters)})" +
+            $"({string.Join(", ", declaredParameters)})" + FrameAttributes +
             (_debugScope is { } attached ? $" !dbg !{attached}" : "") + " {");
         _body.Clear();
         _blockTerminated = false;

@@ -140,7 +140,8 @@ public sealed partial class LlvmEmitter
         if (program.Statics.Count == 0 && program.StaticConstructors.Count == 0) return;
 
         ResetFunctionState();
-        _module.AppendLine($"define internal void @{StaticInitializerName}() {{");
+        _module.AppendLine($"define internal void @{StaticInitializerName}()"
+                           + FrameAttributes + " {");
         _body.Clear();
         _blockTerminated = false;
 
@@ -242,7 +243,8 @@ public sealed partial class LlvmEmitter
     private void EmitEntryPoint(FunctionSymbol entry)
     {
         _nextTemp = 0;
-        _module.AppendLine("define i32 @main(i32 %argc, ptr %argv) {");
+        _module.AppendLine("define i32 @main(i32 %argc, ptr %argv)"
+                           + FrameAttributes + " {");
         _module.AppendLine("entry:");
         _module.AppendLine("  call void @sl_args_set(i32 %argc, ptr %argv)");
 

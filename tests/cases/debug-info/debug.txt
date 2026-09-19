@@ -39,3 +39,11 @@ distinct !DICompileUnit(language: DW_LANG_C_plus_plus
 
 # Instructions carry locations, and a variable is tied to its slot.
 call void @llvm.dbg.declare(
+
+# The frame pointer, which a debugger cannot walk a stack without. LLVM omits
+# it at every level unless asked -- at -O0 too, because clang's own default
+# comes from clang passing this, not from the optimisation level -- and without
+# it `DW_AT_frame_base` describes RSP and describes a frame nothing can unwind.
+# See docs/dwarf.md, which measures it both ways.
+attributes #0 = { "frame-pointer"="all" }
+define i32 @main(i32 %argc, ptr %argv) #0

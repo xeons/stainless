@@ -163,7 +163,8 @@ public sealed partial class LlvmEmitter
     private void EmitSpawnThunk(SpawnThunk thunk)
     {
         ResetFunctionState();
-        _module.AppendLine($"define internal void @{thunk.Name}(ptr %block) {{");
+        _module.AppendLine($"define internal void @{thunk.Name}(ptr %block)"
+                           + FrameAttributes + " {");
         _body.Clear();
         _blockTerminated = false;
 
@@ -282,7 +283,8 @@ public sealed partial class LlvmEmitter
 
         ResetFunctionState();
         _module.AppendLine(
-            $"define internal void @{thunk.Name}(ptr %capture, i64 %start, i64 %end) {{");
+            $"define internal void @{thunk.Name}(ptr %capture, i64 %start, i64 %end)"
+            + FrameAttributes + " {");
         _body.Clear();
         _blockTerminated = false;
 
@@ -649,7 +651,8 @@ public sealed partial class LlvmEmitter
             ? OperatingSystem.IsWindows() ? "dllexport " : ""
             : "internal ";
 
-        _module.AppendLine($"define {linkage}void @{DestroyName(classType)}(ptr %obj) {{");
+        _module.AppendLine($"define {linkage}void @{DestroyName(classType)}(ptr %obj)"
+                           + FrameAttributes + " {");
         _body.Clear();
         _blockTerminated = false;
 
@@ -701,7 +704,8 @@ public sealed partial class LlvmEmitter
     private void EmitArrayDestroyThunk(ArrayTypeSymbol arrayType)
     {
         ResetFunctionState();
-        _module.AppendLine($"define internal void @{ArrayDestroyName(arrayType)}(ptr %obj) {{");
+        _module.AppendLine($"define internal void @{ArrayDestroyName(arrayType)}(ptr %obj)"
+                           + FrameAttributes + " {");
         _body.Clear();
         _blockTerminated = false;
 

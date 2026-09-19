@@ -24,7 +24,8 @@ stainless build --project debug
 | `src/Target.sl` | the seam: `ITarget`, and a `DebugEvent` variant |
 | `src/Target/Win32.sl` | the `DEBUG_EVENT` loop |
 | `src/Target/Select.sl` | the one `#if` in the engine |
-| `src/Engine.sl` | breakpoints, the slide, and run control |
+| `src/Engine.sl` | breakpoints, the slide, run control and stepping |
+| `src/Stack.sl` | the frame-pointer walk |
 | `tests/sldb.sl` | the console debugger |
 
 ## Four decisions worth knowing before reading the code
@@ -181,11 +182,67 @@ the loader finishes. Reporting it starts every session at an address in `ntdll`
 that no source line covers; handing it back to the program with
 `DBG_EXCEPTION_NOT_HANDLED` kills the program. It is swallowed exactly once.
 
+## Stepping and the stack
+
+```
+$ sldb stack fp-dwarf.exe fixture.sl:41
+stopped at .../fixture.sl:41
+  #0  Total                   .../fixture.sl:41
+  #1  Main                    .../fixture.sl:61
+
+$ sldb step fp-dwarf.exe fixture.sl:61 4      # into the call
+  -> .../fixture.sl:35   Total
+  -> .../fixture.sl:37   Total
+  -> .../fixture.sl:38   Total
+  -> .../fixture.sl:40   Total
+
+$ sldb next fp-dwarf.exe fixture.sl:61 3      # over it
+  -> .../fixture.sl:62   Main
+  -> .../fixture.sl:63   Main
+  -> .../fixture.sl:65   Main
+```
+
+**The stack walk is two loads per frame, and only because the compiler emits a
+frame pointer.** It does that under `-g` and nowhere else -- one attribute
+group, `"frame-pointer"="all"`, added because LLVM omits the frame pointer at
+every optimisation level unless asked, `-O0` included. Without it
+`DW_AT_frame_base` describes RSP, which is correct and describes a frame
+nothing can unwind. It is not an unwinder: at `-O2`, or through the C runtime,
+the real answer is `.eh_frame` and `.pdata`, both of which every binary already
+carries.
+
+**Every frame above the first is a return address**, so the line table is asked
+about the byte *before* it. Asked about the return address directly it answers
+the line the call comes back to, which is usually the same line and
+occasionally the next one -- `#1 Main` above lands on line 61, the call itself,
+because of that one subtraction.
+
+**A call is recognised by leaving the function's address range, not by the
+stack pointer going down.** The obvious test is the stack pointer, and it is
+wrong: a function's own prologue pushes the frame pointer, so the first
+instruction of every function looks like a call was taken. Stepping into
+`Total` then "arrived" at `Total` again and stopped on its opening line for
+ever, and stepping over it read a saved `rbp` where a return address should be.
+
+**Three failures here shared one shape**, which is worth naming because the
+fourth will too: a target that has stopped is waiting for a `Resume` that
+answers the event it reported, and every path that forgets one looks like a
+hang or like a step that ran to the end of the program. Getting off a
+breakpoint is itself a step, so a flag has to say whether the single step now
+in flight is housekeeping or the thing somebody asked for.
+
+**Stepping in stops at the callee's first instruction, not at its
+`prologue_end`.** Running to the marker means a temporary breakpoint, and a
+temporary breakpoint at an address taken from the line table without first
+proving it is inside this function is `0xCC` written into somebody else's code
+-- which is exactly what happened, and what the wild addresses in the output
+were. Worth doing, worth doing carefully, and not done here.
+
 ## Still to come
 
-Stepping and the frame-pointer stack walk, then values -- locals, the type
-graph, `String` and arrays, and the runtime type out of an object header --
-and then `ptrace`, which the seam exists to make a transcription job. The IDE
+Values -- locals, the type graph, `String` and arrays, and the runtime type out
+of an object header -- and then `ptrace`, which the seam exists to make a
+transcription job. The IDE
 surface is last and is meant to be thin: everything in it comes from snapshot
 types this console tool has already exercised.
 

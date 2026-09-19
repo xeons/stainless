@@ -126,6 +126,17 @@ public class Engine
     Breakpoint? _steppingOver;
     uint _steppingThread;
 
+    /// Whether the single step now in flight is one somebody asked for.
+    ///
+    /// **Getting off a breakpoint is a step too**, and it is the same
+    /// mechanism: a trap is lifted, one instruction runs, the trap goes back.
+    /// So the step that resumes from a breakpoint and the step a user asked
+    /// for arrive as the same event, and only this says which. Without it the
+    /// first `step` after a breakpoint is swallowed as housekeeping and the
+    /// program runs to the end -- which looks exactly like stepping not being
+    /// implemented.
+    bool _stepIsWanted;
+
     public Engine(ITarget target, Image image, DwarfInfo info,
                   List<LineTable> tables)
     {
@@ -138,6 +149,7 @@ public class Engine
         _slideKnown = false;
         _steppingOver = null;
         _steppingThread = 0u;
+        _stepIsWanted = false;
     }
 
     public List<Breakpoint> Breakpoints => _breakpoints;
@@ -172,20 +184,23 @@ public class Engine
     }
 
     /// Runs until something stops it.
+    ///
+    /// **Resuming is not optional and was, for one afternoon, conditional.**
+    /// A stopped target is waiting for a `Resume` that answers the event it
+    /// reported; without one it simply does not run, and the next wait sits
+    /// until it times out. Written so that only the step-off path resumed,
+    /// this worked perfectly from a breakpoint -- which always takes that path
+    /// -- and cost a full timeout every time it was reached from anywhere
+    /// else. The symptom was a step-over that appeared to hang.
     public Stop Continue()
     {
-        while (true)
-        {
-            // A breakpoint the process is standing on has to be stepped off
-            // before anything can run.
-            if (_steppingOver != null)
-                StepOffBreakpoint();
-
-            var happened = _target.Wait(60000u);
-            var answer = Interpret(happened);
-            if (answer != null)
-                return (Stop)answer;
-        }
+        // A breakpoint the process is standing on has to be stepped off before
+        // anything can run, and that resumes as part of doing it.
+        if (_steppingOver != null)
+            StepOffBreakpoint();
+        else
+            _target.Resume(true);
+        return WaitForStop();
     }
 
     /// Turns one platform event into a stop, or null to keep going.
@@ -233,17 +248,24 @@ public class Engine
         // off a breakpoint it is standing on.
         if (code == StepExceptionCode())
         {
+            // Whatever the step was for, a breakpoint that was lifted to let
+            // it happen goes back now.
             if (_steppingOver != null)
             {
                 PlantOne((Breakpoint)_steppingOver);
                 _steppingOver = null;
-                // The processor clears the trap flag itself when it takes the
-                // exception, so there is nothing to turn off -- only something
-                // not to turn on again.
+            }
+
+            // The processor clears the trap flag itself when it takes the
+            // exception, so there is nothing to turn off -- only something not
+            // to turn on again.
+            if (!_stepIsWanted)
+            {
                 _target.Resume(true);
                 return null;
             }
 
+            _stepIsWanted = false;
             var stop = new Stop(StopKind.Step);
             stop.Thread = thread;
             stop.Address = address;
@@ -357,6 +379,268 @@ public class Engine
             return;
         registers.Pc = address;
         _target.WriteRegisters(thread, &registers);
+    }
+
+    // ------------------------------------------------------------- stepping
+
+    /// One machine instruction.
+    ///
+    /// The building block of everything below, and the only thing here that
+    /// does not consult the line table.
+    public Stop StepInstruction(uint thread)
+    {
+        _stepIsWanted = true;
+
+        if (_steppingOver != null)
+        {
+            // Already standing on a breakpoint: the step off it *is* the step
+            // that was asked for, so this does not add a second one.
+            StepOffBreakpoint();
+            return WaitForStop();
+        }
+
+        _target.SetSingleStep(thread, true);
+        _target.Resume(true);
+        return WaitForStop();
+    }
+
+    /// Runs until one of this engine's breakpoints or something worse.
+    Stop WaitForStop()
+    {
+        while (true)
+        {
+            var happened = _target.Wait(60000u);
+            var answer = Interpret(happened);
+            if (answer != null)
+                return (Stop)answer;
+        }
+    }
+
+    /// Steps one source line, entering any function that has line information
+    /// and running straight through any that has none.
+    ///
+    /// **Running through a function with no lines is the point, not a
+    /// shortcut.** Under `-g` the C runtime is compiled `-O0 -g` too, so
+    /// stepping into `sl_retain` is a thing that can happen -- and a step that
+    /// lands in the allocator is a step nobody asked for. A function this
+    /// engine has no lines for is stepped over whole.
+    public Stop StepIn(uint thread) => StepLine(thread, false);
+
+    /// Steps one source line, running whole any function that is called.
+    public Stop StepOver(uint thread) => StepLine(thread, true);
+
+    Stop StepLine(uint thread, bool over)
+    {
+        Registers start;
+        start.Pc = 0u;
+        start.StackPointer = 0u;
+        start.FramePointer = 0u;
+        if (!_target.ReadRegisters(thread, &start))
+            return new Stop(StopKind.NotRunning);
+
+        String startLine = LineKeyAt(start.Pc);
+
+        // **Where the current function is, which is how a call is recognised.**
+        //
+        // The obvious test is that the stack pointer went down, and it is
+        // wrong: a function's own prologue pushes the frame pointer, so the
+        // first instruction of every function looks like a call was taken.
+        // Stepping into `Total` then "arrived" at `Total` again and stopped
+        // dead on its opening line, and stepping over it read a saved `rbp`
+        // where it expected a return address and planted a breakpoint on
+        // nothing.
+        //
+        // Leaving the function's address range is what a call actually is.
+        nuint low = 0u;
+        nuint high = 0u;
+        bool bounded = FunctionRangeAt(start.Pc, &low, &high);
+
+        // A bound on the work rather than on the answer: a single source line
+        // is a few dozen instructions, and a loop that never leaves it means
+        // something is wrong that a debugger should not hang over.
+        for (int guard = 0; guard < 200000; guard++)
+        {
+            var stop = StepInstruction(thread);
+            if (stop.Kind != StopKind.Step)
+                return stop;
+
+            Registers now;
+            now.Pc = 0u;
+            now.StackPointer = 0u;
+            now.FramePointer = 0u;
+            if (!_target.ReadRegisters(thread, &now))
+                return stop;
+
+            bool inside = bounded && now.Pc >= low && now.Pc < high;
+            if (!inside)
+            {
+                // Deeper: a call. The program counter is at the callee's first
+                // instruction, so the cell the stack pointer names is the
+                // return address `call` pushed -- and nothing has pushed over
+                // it yet, which is why the range test has to be what gets us
+                // here.
+                if (now.StackPointer < start.StackPointer)
+                {
+                    bool known = LineKeyAt(now.Pc).ByteLength() != 0u;
+                    if (over || !known)
+                    {
+                        var ran = RunToReturn(thread, now.StackPointer);
+                        if (ran.Kind != StopKind.Step)
+                            return ran;
+                        continue;
+                    }
+                    // Stepping in, and the callee has lines: the step ends at
+                    // its first instruction.
+                    //
+                    // **Not at its `prologue_end`**, which is where a
+                    // breakpoint on the function belongs and is a different
+                    // question. Running there means a temporary breakpoint,
+                    // and a temporary breakpoint at an address chosen from the
+                    // line table without proving it is inside this function is
+                    // 0xCC written into somebody else's code. It is worth
+                    // doing and worth doing carefully; see the note in
+                    // `debug/README.md`.
+                    return AtLine(stop, now.Pc);
+                }
+
+                // Shallower, or sideways with no range to judge by: the frame
+                // returned, and the step ends wherever the caller is.
+                return AtLine(stop, now.Pc);
+            }
+
+            String here = LineKeyAt(now.Pc);
+            if (here.ByteLength() != 0u && here != startLine)
+                return AtLine(stop, now.Pc);
+        }
+
+        return new Stop(StopKind.Step);
+    }
+
+    /// Runs to the end of the current function.
+    public Stop StepOut(uint thread)
+    {
+        var frames = WalkStack(_target, thread);
+        if (frames.Count < 2u)
+        {
+            // Nothing above this frame: running out of it is running to the
+            // end of the program.
+            return Continue();
+        }
+        return RunToAddress(thread, frames[1u].Pc);
+    }
+
+    /// Runs until the address the stack pointer is pointing at is reached,
+    /// which is how a call is stepped over.
+    Stop RunToReturn(uint thread, nuint stackPointer)
+    {
+        byte[] cell = new byte[8];
+        if (!_target.ReadMemory(stackPointer, cell, 8u))
+            return new Stop(StopKind.Step);
+        return RunToAddress(thread, (nuint)LittleEndianWord(cell));
+    }
+
+    /// A breakpoint that exists for one stop.
+    ///
+    /// It goes through the same planting as a real one, so the step-off dance
+    /// applies to it as well -- which is why it is removed *after* the stop
+    /// rather than before resuming.
+    Stop RunToAddress(uint thread, nuint runtimeAddress)
+    {
+        var already = FindBreakpoint(runtimeAddress);
+        if (already != null)
+            return Continue();          // there is already one there
+
+        var temporary = new Breakpoint(ToLinked(runtimeAddress), "");
+        _breakpoints.Add(temporary);
+        PlantOne(temporary);
+
+        var stop = Continue();
+
+        if (_steppingOver == temporary)
+        {
+            // It fired. Step off it before taking it away, or the original byte
+            // never goes back -- and say the step is wanted, or the same flag
+            // that keeps `Continue` from stopping on housekeeping swallows this
+            // one and the wait runs to the end of the program.
+            _stepIsWanted = true;
+            StepOffBreakpoint();
+            WaitForStop();
+        }
+        UnplantOne(temporary);
+        RemoveBreakpoint(temporary);
+
+        // A stop at the temporary breakpoint is a completed step rather than a
+        // breakpoint the caller asked for.
+        if (stop.Kind == StopKind.Breakpoint && stop.At == temporary)
+        {
+            var done = new Stop(StopKind.Step);
+            done.Thread = stop.Thread;
+            done.Address = stop.Address;
+            return done;
+        }
+        return stop;
+    }
+
+    /// The runtime address range of the function containing an address.
+    public bool FunctionRangeAt(nuint runtimeAddress, nuint* low, nuint* high)
+    {
+        nuint linked = ToLinked(runtimeAddress);
+        for (nuint u = 0u; u < _info.Units.Count; u++)
+        {
+            var unit = _info.Units[u];
+            for (nuint i = 0u; i < unit.Dies.Count; i++)
+            {
+                var die = unit.Dies[i];
+                if (die.Tag != TagSubprogram)
+                    continue;
+                nuint from = 0u;
+                nuint to = 0u;
+                if (die.Range(&from, &to) && linked >= from && linked < to)
+                {
+                    *low = ToRuntime(from);
+                    *high = ToRuntime(to);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    void RemoveBreakpoint(Breakpoint one)
+    {
+        for (nuint i = 0u; i < _breakpoints.Count; i++)
+        {
+            if (_breakpoints[i] == one)
+            {
+                _breakpoints.RemoveAt(i);
+                return;
+            }
+        }
+    }
+
+    Stop AtLine(Stop stop, nuint pc)
+    {
+        stop.Address = pc;
+        return stop;
+    }
+
+    /// A file and line as one string, for telling two positions apart.
+    ///
+    /// Empty when the address has no line at all, which is what says a function
+    /// belongs to the runtime rather than to the program.
+    String LineKeyAt(nuint runtimeAddress)
+    {
+        nuint linked = ToLinked(runtimeAddress);
+        for (nuint u = 0u; u < _tables.Count; u++)
+        {
+            var row = _tables[u].RowCovering(linked);
+            if (row == null)
+                continue;
+            var here = (LineRow)row;
+            return _tables[u].FileName(here.File) + ":"
+                 + Standard.Text.FromInteger((long)here.Line);
+        }
+        return "";
     }
 
     /// Where a stop happened, as a source line -- the whole point of the

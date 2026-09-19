@@ -296,7 +296,7 @@ public sealed partial class LlvmEmitter
         // whichever binary emitted it either way.
         _module.AppendLine(
             "define i32 @sl_com_class_object_here(" +
-            "ptr %clsid, ptr %iid, ptr %result) {");
+            "ptr %clsid, ptr %iid, ptr %result)" + FrameAttributes + " {");
         _module.AppendLine("entry:");
         _module.AppendLine(
             "  %answer = call i32 @sl_com_get_class_object(" +
@@ -306,7 +306,7 @@ public sealed partial class LlvmEmitter
 
         // And the same for `Com.CanUnloadNow`, which reads the live count the
         // table points at.
-        _module.AppendLine("define i32 @sl_com_can_unload_here() {");
+        _module.AppendLine("define i32 @sl_com_can_unload_here()" + FrameAttributes + " {");
         _module.AppendLine("entry:");
         _module.AppendLine(
             "  %answer = call i32 @sl_com_can_unload_now(ptr @sl_com_factory_table)");
@@ -330,7 +330,8 @@ public sealed partial class LlvmEmitter
         var constructor = classType.Constructors
             .FirstOrDefault(c => !c.Parameters.Any(p => !p.IsThis));
 
-        _module.AppendLine($"define internal ptr @{ComCreateName(classType)}() {{");
+        _module.AppendLine($"define internal ptr @{ComCreateName(classType)}()"
+                           + FrameAttributes + " {");
         _module.AppendLine("entry:");
         _module.AppendLine(
             $"  %object = call ptr @sl_alloc(ptr @{Mangler.TypeInfoSymbol(classType)})");
@@ -510,7 +511,7 @@ public sealed partial class LlvmEmitter
         // this.
         _module.AppendLine(
             $"define internal {Convention(required)}{returnType} " +
-            $"@{name2}({string.Join(", ", declared)}) {{");
+            $"@{name2}({string.Join(", ", declared)})" + FrameAttributes + " {");
         _module.AppendLine(
             $"  %obj = getelementptr inbounds i8, ptr %self, i64 -{offset}");
 

@@ -265,6 +265,14 @@ public sealed partial class LlvmEmitter(
             _module.Append(_metadata);
         }
 
+        // The one attribute group, and only under -g. See FrameAttributes.
+        if (debug is not null)
+        {
+            _module.AppendLine();
+            _module.AppendLine($"attributes #{FrameAttributeGroup} = " +
+                               "{ \"frame-pointer\"=\"all\" }");
+        }
+
         // Last, because a node is created the first time something refers to it
         // and the functions above are what refer to most of them.
         if (debug is not null)
@@ -275,6 +283,41 @@ public sealed partial class LlvmEmitter(
 
         return _module.ToString();
     }
+
+    /// <summary>
+    /// The attribute group number every definition carries under <c>-g</c>.
+    /// </summary>
+    private const int FrameAttributeGroup = 0;
+
+    /// <summary>
+    /// <c>" #0"</c> under <c>-g</c>, and nothing otherwise: the frame pointer,
+    /// which a debugger cannot walk a stack without.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>LLVM omits the frame pointer at every level unless asked, including
+    /// at <c>-O0</c>.</b> That is not the behaviour clang has, because clang
+    /// passes this attribute itself; a front end that emits no function
+    /// attributes at all — which this one did — gets no frame pointer anywhere
+    /// and a <c>DW_AT_frame_base</c> of <c>DW_OP_reg7 RSP</c>. The description
+    /// is correct and describes a frame nothing can unwind.
+    /// </para>
+    /// <para>
+    /// With it, a function opens <c>push rbp; mov rbp, rsp</c>,
+    /// <c>DW_AT_frame_base</c> becomes <c>DW_OP_reg6 RBP</c>, and a stack walk
+    /// is a two-load loop rather than a CFI interpreter.
+    /// <c>docs/dwarf.md</c> has the measurement either way.
+    /// </para>
+    /// <para>
+    /// Only under <c>-g</c>: a frame pointer costs a register and a couple of
+    /// instructions per call, which is a price a release build has no reason to
+    /// pay. It also makes <c>perf</c> and WPA produce usable stacks for any
+    /// Stainless binary built for debugging, which is worth having on its own.
+    /// </para>
+    /// </remarks>
+    private string FrameAttributes => debug is not null
+        ? $" #{FrameAttributeGroup}"
+        : "";
 
     /// <summary>
     /// The one <c>llvm.global_ctors</c>, which both PE and ELF honour: what it

@@ -160,7 +160,8 @@ public sealed partial class LlvmEmitter
         {
             ResetFunctionState();
             _module.AppendLine(
-                $"define internal void @{VariantArcName(variant, retaining)}(ptr %value) {{");
+                $"define internal void @{VariantArcName(variant, retaining)}(ptr %value)"
+                + FrameAttributes + " {");
             _body.Clear();
             _blockTerminated = false;
 
