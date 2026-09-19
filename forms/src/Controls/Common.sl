@@ -1791,7 +1791,10 @@ public class CoolBar : CustomControl
             return;
         }
 
-        if (!_fixedOrder)
+        // **By the gripper, and not by anywhere on the band.** A rebar moves a
+        // band by its grab handle; the rest of a band belongs to the control
+        // sitting in it, and a press there is that control's business.
+        if (onGrabber && !_fixedOrder)
         {
             _dragging = CoolDragMove;
             CaptureMouse(true);
@@ -1816,16 +1819,22 @@ public class CoolBar : CustomControl
             return;
 
         // Nothing is being dragged, so the cursor says what a drag would do.
+        //
+        // **Only over a gripper.** A cursor set here is inherited by every
+        // child that does not set one of its own -- `WM_SETCURSOR` walks up to
+        // the parent -- so a bar that claimed the move cursor for the whole of
+        // a band claimed it over the toolbar buttons sitting in that band too,
+        // which is how this was reported.
         var found = BandAt(args.Location);
         int index = found.Item1;
         bool onGrabber = found.Item2;
-        if (index < 0)
+        if (index < 0 || !onGrabber)
         {
             Cursor = CursorKind.Default;
             return;
         }
 
-        if (onGrabber && index > 0 && !FirstOfRow(index) && !_fixedWidths
+        if (index > 0 && !FirstOfRow(index) && !_fixedWidths
             && !showing[(nuint)index].FixedSize
             && !showing[(nuint)(index - 1)].FixedSize)
         {

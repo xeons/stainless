@@ -514,6 +514,32 @@ public class ControlPeer : IControlPeer
             return Inherited(message, wParam, lParam);
         }
 
+        if (message == WmContextMenu)
+        {
+            // **Screen coordinates, like the wheel and unlike everything
+            // else** -- and `-1` for the whole of lParam means the keyboard
+            // asked, through the menu key or Shift+F10, in which case there is
+            // no pointer for the menu to appear under.
+            bool byKeyboard = lParam == -1;
+            FPoint where = At(0, 0);
+
+            if (!byKeyboard)
+            {
+                Win32.User32.Point screen;
+                screen.X = (int)(short)(lParam & 0xFFFF);
+                screen.Y = (int)(short)((lParam >> 16) & 0xFFFF);
+                ScreenToClient(window, &screen);
+                where = At(screen.X, screen.Y);
+            }
+
+            // Handled stops here; unhandled goes on to the default, which
+            // offers the request to the parent window -- so a form's own menu
+            // still appears for a click on a child that has none.
+            if (control.OnPlatformContextMenu(where, byKeyboard))
+                return 0;
+            return Inherited(message, wParam, lParam);
+        }
+
         if (message == WmMouseWheel)
         {
             // The wheel's position is in *screen* coordinates, unlike every

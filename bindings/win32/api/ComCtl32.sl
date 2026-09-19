@@ -240,6 +240,16 @@ public const byte BtnsCheck     = 2u;
 public const byte BtnsGroup     = 4u;
 public const byte BtnsDropDown  = 8u;
 public const byte BtnsAutoSize  = 16u;
+
+/// What `TBBUTTON.iBitmap` says for a button with no picture.
+///
+/// **`-1` is not that, and the difference is visible.** `I_IMAGECALLBACK` is
+/// -1 and means "ask me for it with `TBN_GETDISPINFO`", so a toolbar handed it
+/// leaves a picture's worth of space in every button, asks for a picture, and
+/// draws nothing when no one answers. `I_IMAGENONE` is the one that means the
+/// button is text alone.
+public const int IImageNone     = -2;
+public const int IImageCallback = -1;
 public const byte BtnsShowText  = 64u;
 
 /// Toolbar button states.

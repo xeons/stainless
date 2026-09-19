@@ -290,6 +290,28 @@ separate double. So Win32 raises both from the one message and GTK swallows the
 double as a press — and a control that counts presses and a control that wants
 the gesture each see the same thing on both.
 
+**A context menu is its own notification, and cannot be a right mouse-up.**
+`Control.ContextMenu` exists because the obvious spelling does not work: a
+Win32 tree view captures the mouse on `WM_RBUTTONDOWN` and runs a loop of its
+own watching for a right-drag, and it swallows the `WM_RBUTTONUP` that ends it.
+A handler on `MouseUp` therefore hears *nothing* on a first right-click, and
+something only on a second, which confuses the sequence enough to let one
+through — which is exactly how it was reported. `ListView` does the same.
+
+So Win32 raises it from `WM_CONTEXTMENU`, which the tree sends itself once its
+loop is done, and GTK raises it from a third-button press, where no such loop
+exists. A handler answers `Handled`: left false, the platform goes on to do
+what it would have — on Windows, offer the request to the parent window, which
+is how a form's own menu appears for a click on a child that has none.
+
+It is also the only notification a *keyboard* can raise. The menu key and
+Shift+F10 mean the same thing and reach no mouse handler at all, so
+`ContextMenuEventArgs.FromKeyboard` says which happened and a menu opened that
+way belongs at the selection rather than under a pointer that was not involved.
+GTK's half of that is not wired: it reports the menu key through `popup-menu`,
+whose handler answers a `gboolean`, and the plain signal connector here returns
+nothing — so it wants a connector of its own and does not have one yet.
+
 **Z-order and the pointer are asked for, not waited for.** `Control` carries
 two small methods that exist because a *docked* window needs them and nothing
 else in the library did: `BringToFront`, which raises a control above the

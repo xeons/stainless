@@ -172,6 +172,27 @@ public interface IControlNotify
     /// platforms agree.
     void OnPlatformDoubleClick();
 
+    /// The user asked for a context menu, at `at` in client coordinates.
+    ///
+    /// **Not derivable from a right mouse-up, which is why it exists.** A
+    /// Win32 tree view captures the mouse on `WM_RBUTTONDOWN` and runs its own
+    /// loop until the button comes back up, watching for a right-drag -- and
+    /// it swallows the `WM_RBUTTONUP` that ends it. A control layer listening
+    /// for the release therefore hears nothing at all on the first click and
+    /// something only when a second one confuses the sequence, which is
+    /// exactly how this was reported. The list view does the same.
+    ///
+    /// It is also the only notification that a *keyboard* can raise: the menu
+    /// key and Shift+F10 mean the same thing and reach no mouse handler.
+    /// `fromKeyboard` says which happened, because a menu opened from the
+    /// keyboard has no pointer to appear under and belongs at the selection
+    /// instead.
+    ///
+    /// Answer true when a menu was shown. False lets the platform do whatever
+    /// it would have done, which on Windows is to offer the request to the
+    /// parent window.
+    bool OnPlatformContextMenu(Point at, bool fromKeyboard);
+
     /// The control's own value changed by the user's doing -- text typed, an
     /// item selected. Never raised for a change the program itself made, which
     /// is what stops a two-way binding oscillating.

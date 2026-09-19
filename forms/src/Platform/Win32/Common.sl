@@ -84,7 +84,13 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     public int AddButton(String text, int image, ToolButtonKind kind)
     {
         ToolBarButton button;
-        button.Bitmap = image;
+
+        // A negative index means no picture, and it has to be said as
+        // `I_IMAGENONE`: -1 is `I_IMAGECALLBACK`, which reserves the space and
+        // then asks for a bitmap through `TBN_GETDISPINFO`. Nothing here
+        // answers that, so every text-only button carried a blank gap where
+        // its picture would have gone.
+        button.Bitmap = image >= 0 ? image : IImageNone;
         button.Command = NewCommandId();
         button.State = TbStateEnabled;
         button.Style = BtnsButton;

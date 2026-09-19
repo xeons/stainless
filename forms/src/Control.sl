@@ -141,10 +141,41 @@ public class CancelEventArgs
     public CancelEventArgs() => Cancel = false;
 }
 
+/// A context menu was asked for, and a handler says whether it showed one.
+///
+/// A class for the reason `CancelEventArgs` is one: the handler answers by
+/// writing to it, and a struct passed by value would carry the answer nowhere.
+///
+/// `Handled` matters rather than being bookkeeping. Left false, the platform
+/// goes on to do what it would have done -- on Windows, offer the request to
+/// the parent window, which is how a menu on a form appears for a click on a
+/// child that has none of its own.
+public class ContextMenuEventArgs
+{
+    /// Where the menu was asked for, in the control's client coordinates.
+    public Point Location { get; }
+
+    /// Whether the keyboard asked rather than the mouse -- the menu key, or
+    /// Shift+F10. `Location` is then the control's own top-left corner, since
+    /// there is no pointer to put it under.
+    public bool FromKeyboard { get; }
+
+    /// Set it to true when a menu was shown.
+    public bool Handled { get; set; }
+
+    public ContextMenuEventArgs(Point at, bool fromKeyboard)
+    {
+        Location = at;
+        FromKeyboard = fromKeyboard;
+        Handled = false;
+    }
+}
+
 // =================================================================== handlers
 
 public closure void EventHandler(Control sender);
 public closure void MouseEventHandler(Control sender, MouseEventArgs args);
+public closure void ContextMenuEventHandler(Control sender, ContextMenuEventArgs args);
 public closure void KeyEventHandler(Control sender, KeyEventArgs args);
 public closure void KeyPressEventHandler(Control sender, KeyPressEventArgs args);
 public closure void PaintEventHandler(Control sender, PaintEventArgs args);
@@ -629,6 +660,14 @@ public abstract class Control : IControlNotify
     public event MouseEventHandler MouseUp;
     public event MouseEventHandler MouseMove;
     public event MouseEventHandler MouseWheel;
+
+    /// A context menu was asked for, by the right button or by the keyboard.
+    ///
+    /// **Not `MouseUp` with the right button**, which is what this had to be
+    /// written to replace: a native tree or list swallows that release inside
+    /// its own drag-watching loop, so a handler on it never runs. The seam
+    /// says more about why.
+    public event ContextMenuEventHandler ContextMenu;
     public event KeyEventHandler KeyDown;
     public event KeyEventHandler KeyUp;
     public event KeyPressEventHandler KeyPress;
@@ -655,6 +694,7 @@ public abstract class Control : IControlNotify
     protected virtual void OnMouseUp(MouseEventArgs args) => MouseUp(this, args);
     protected virtual void OnMouseMove(MouseEventArgs args) => MouseMove(this, args);
     protected virtual void OnMouseWheel(MouseEventArgs args) => MouseWheel(this, args);
+    protected virtual void OnContextMenu(ContextMenuEventArgs args) => ContextMenu(this, args);
 
     protected virtual void OnKeyDown(KeyEventArgs args) => KeyDown(this, args);
     protected virtual void OnKeyUp(KeyEventArgs args) => KeyUp(this, args);
@@ -721,6 +761,13 @@ public abstract class Control : IControlNotify
 
     public void OnPlatformMouseEnter() => OnMouseEnter();
     public virtual void OnPlatformMouseLeave() => OnMouseLeave();
+
+    public bool OnPlatformContextMenu(Point at, bool fromKeyboard)
+    {
+        var args = new ContextMenuEventArgs(at, fromKeyboard);
+        OnContextMenu(args);
+        return args.Handled;
+    }
 
     public void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers)
     {

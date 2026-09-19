@@ -539,6 +539,23 @@ public class GtkPeer : IControlPeer
 
             ((IControlNotify)owner).OnPlatformMouseDown(
                 ButtonOf(event), PointOf(event), ModifiersOf(event));
+
+            // **On the press, which is where a GTK program shows a menu** --
+            // and unlike Win32 this needs no special message, because a GTK
+            // tree does not run a loop of its own that swallows the release.
+            // The notification is shared all the same: a control should not
+            // have to know which platform it is on to offer a menu.
+            //
+            // The keyboard's menu key is not here. GTK reports it through the
+            // `popup-menu` signal, whose handler answers a gboolean, and the
+            // plain connector in this file returns nothing -- so wiring it
+            // would put a garbage answer in the return register. It wants a
+            // connector of its own and does not have one yet.
+            if (ButtonOf(event) == MouseButton.Right)
+            {
+                if (((IControlNotify)owner).OnPlatformContextMenu(PointOf(event), false))
+                    return true;
+            }
             return false;
         });
 

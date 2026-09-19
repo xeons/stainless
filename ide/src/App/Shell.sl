@@ -298,7 +298,7 @@ public class Shell : Form
         _tree = new TreeView(solution);
         _tree.Dock = DockStyle.Fill;
         _tree.DoubleClick += this.OnTreeChosen;
-        _tree.MouseUp += this.OnTreeMouse;
+        _tree.ContextMenu += this.OnTreeContextMenu;
 
         var errors = _dock.Add(Panes.Errors, "Error List", DockEdge.Bottom);
         _errors = new ListView(errors);
@@ -1883,7 +1883,7 @@ public class Shell : Form
 
     // ------------------------------------------ the Solution Explorer's menu
 
-    /// A right-click in the tree.
+    /// A context menu was asked for in the tree.
     ///
     /// **The node under the pointer, not the selected one.** Neither platform
     /// moves the selection on a right-click, so a menu built from
@@ -1891,20 +1891,32 @@ public class Shell : Form
     /// Delete that removes a file nobody pointed at. `TreeView.NodeAt` answers
     /// what was actually clicked, and the selection is moved to follow it, so
     /// that what the menu is about is also what is highlighted while it is up.
-    void OnTreeMouse(Control sender, MouseEventArgs args)
+    ///
+    /// **Not `MouseUp` with the right button, which is what this was first
+    /// written as and did not work.** A Win32 tree captures the mouse on the
+    /// press and runs its own loop watching for a right-drag, swallowing the
+    /// release that ends it -- so the first right-click raised nothing at all
+    /// and only a second, which confuses the sequence, got a menu out of it.
+    /// `Control.ContextMenu` is the notification that actually arrives, and it
+    /// is the only one a keyboard can raise.
+    void OnTreeContextMenu(Control sender, ContextMenuEventArgs args)
     {
-        if (args.Button != MouseButton.Right)
-            return;
-
         TreeEntry? target = null;
-        var hit = _tree.NodeAt(args.Location);
+        Point where = args.Location;
+
+        // Asked for from the keyboard, there is no pointer to hit-test, so it
+        // is the selection that the menu is about -- and it belongs beside the
+        // selected row rather than in the control's corner.
+        var hit = args.FromKeyboard ? _tree.SelectedNode : _tree.NodeAt(where);
+
         if (hit != null)
         {
             _tree.SelectedNode = hit;
             target = EntryFor((TreeNode)hit);
         }
 
-        ShowTreeMenu(target, args.Location);
+        ShowTreeMenu(target, where);
+        args.Handled = true;
     }
 
     /// The context menu, built afresh every time it is shown.
