@@ -68,7 +68,22 @@ public IOError Rename(String from, String to)
 
 // ------------------------------------------------------------------ reading
 
+/// How much to ask for at a time once a file's own size has run out.
+///
+/// Only reached by a file that lied about its length, so the size is a
+/// compromise between one extra call for an ordinary file and many for a large
+/// `/proc` one.
+const nuint KeepReading = 65536u;
+
 /// The whole file as bytes.
+///
+/// **The reported size is a hint, not a promise.** A `/proc` or `/sys` file
+/// reports zero and then hands over kilobytes when read; a file another process
+/// is appending to reports less than it will give. So the size opens the array
+/// and reading to the end decides where it stops -- which is what "all bytes"
+/// has to mean for this to be usable on Linux at all. Trusting the size gave
+/// every `/proc/<pid>/maps` back as empty, which is a debugger that cannot find
+/// where a program was loaded.
 public Result<byte[], IOError> ReadAllBytes(String path)
 {
     var file = try FileStream.OpenRead(path);
@@ -82,6 +97,25 @@ public Result<byte[], IOError> ReadAllBytes(String path)
 
     var data = new byte[(nuint)size];
     nuint got = file.Read(data, 0, (nuint)size);
+
+    // Keep going while anything arrives. A read of zero is the end; anything
+    // else means the size was a hint and the file has more.
+    while (file.Error == IOError.None)
+    {
+        var more = new byte[KeepReading];
+        nuint arrived = file.Read(more, 0, KeepReading);
+        if (arrived == 0u)
+            break;
+
+        var grown = new byte[got + arrived];
+        for (nuint i = 0u; i < got; i++)
+            grown[i] = data[i];
+        for (nuint i = 0u; i < arrived; i++)
+            grown[got + i] = more[i];
+        data = grown;
+        got = got + arrived;
+    }
+
     var failure = file.Error;
     file.Close();
 
@@ -89,7 +123,7 @@ public Result<byte[], IOError> ReadAllBytes(String path)
         return Fail(failure);
 
     // A short read is not an error, but the array has to match what arrived.
-    if (got == (nuint)size)
+    if (got == data.Length)
         return Ok(data);
 
     var exact = new byte[got];

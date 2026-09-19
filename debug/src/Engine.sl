@@ -196,7 +196,21 @@ public class Engine
         var started = _target.Launch(path, arguments);
         if (!started.Ok)
             return Fail(started.Error);
-        return Ok(Continue());
+
+        // **Waiting, not continuing**, and the difference is the whole of why
+        // the two backends disagreed. `Continue` resumes first, which is right
+        // from a stop the caller has already been told about -- and a
+        // just-launched process has not been told about anything.
+        //
+        // On Windows resuming there is harmless: nothing has been reported, so
+        // the resume finds no event outstanding and does nothing. On Linux the
+        // launch has already reaped the `SIGTRAP` the kernel raises when the
+        // exec completes, so the very same call let the program run before its
+        // image base had been reported -- and a slide nobody learned is every
+        // breakpoint unplanted. The seam never said who consumes that first
+        // stop; now nothing has to, because nothing resumes before the first
+        // event is read.
+        return Ok(WaitForStop());
     }
 
     /// Runs until something stops it.

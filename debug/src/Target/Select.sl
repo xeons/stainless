@@ -40,11 +40,9 @@ public Result<ITarget, String> MakeTarget()
 {
 #if WINDOWS
     return Ok((ITarget)new Win32Target());
+#elif LINUX
+    return Ok((ITarget)new LinuxTarget());
 #else
-    // ptrace is 4f. The reading half of this engine -- the containers, the
-    // DWARF, the line table -- is complete on both platforms and is what
-    // `sldb sections`, `units`, `dies`, `lines`, `line` and `addr` use; only
-    // the commands that need a live process are missing here.
     return Fail("controlling a process is not implemented on this platform yet");
 #endif
 }
@@ -59,17 +57,23 @@ public uint BreakpointExceptionCode()
 #if WINDOWS
     return Win32.Kernel32.ExceptionBreakpoint;
 #else
-    return 5u;                                  // SIGTRAP, for the ptrace half
+    return 5u;                                  // SIGTRAP
 #endif
 }
 
+/// **These must differ, which on Linux takes inventing one of them.** Windows
+/// has two exception numbers; ptrace reports a planted trap and a finished
+/// single step as the same `SIGTRAP`, and tells them apart by what the tracer
+/// asked for. The target knows which it asked for, so it is the target that
+/// labels the stop -- and the label needs a number the breakpoint one is not.
 public uint StepExceptionCode()
 {
 #if WINDOWS
     return Win32.Kernel32.ExceptionSingleStep;
 #else
-    // ptrace reports a completed step as SIGTRAP too, and tells the two apart
-    // by what was asked for rather than by the number. 4f decides how.
-    return 5u;
+    // Not a signal number. `SIGTRAP` is 5 and this only has to be different
+    // from it; the engine compares against these two functions and never
+    // against a literal.
+    return 0x10005u;
 #endif
 }

@@ -685,6 +685,16 @@ int RunProgram(String path, String where)
         return 1;
     }
 
+    // Where the loader actually put it, which on a position-independent
+    // executable is never where it was linked -- and is the one number that
+    // makes every breakpoint land.
+    if (!engine.SlideKnown)
+        Console.WriteLine("note: the image base was never learned,"
+                          + " so no breakpoint is planted");
+    else if (engine.Slide != 0u)
+        Console.WriteLine("image slid by 0x"
+                          + FormatHexadecimal((ulong)engine.Slide));
+
     var stop = started.Value;
     while (true)
     {

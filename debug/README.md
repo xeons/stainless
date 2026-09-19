@@ -23,6 +23,7 @@ stainless build --project debug
 | `src/Dwarf/Lines.sl` | `.debug_line`, which is a bytecode and so an interpreter |
 | `src/Target.sl` | the seam: `ITarget`, and a `DebugEvent` variant |
 | `src/Target/Win32.sl` | the `DEBUG_EVENT` loop |
+| `src/Target/Linux.sl` | the `ptrace` loop |
 | `src/Target/Select.sl` | the one `#if` in the engine |
 | `src/Engine.sl` | breakpoints, the slide, run control and stepping |
 | `src/Stack.sl` | the frame-pointer walk |
@@ -279,10 +280,56 @@ debugger reading a local ever noticed. `DebugInfoTests` now follows the node
 number from a variable to what it points at, with two locals of one type
 because one would have passed.
 
+## Linux
+
+Everything above works identically under `ptrace`:
+
+```
+$ sldb run /home/brandon/spike/fp fixture.sl:41
+breakpoint at 0x1262  fixture.sl:41
+image slid by 0x5bc2ec101000
+stopped at /home/brandon/spike/fixture.sl:41
+      in Total                                  (four times, then exit 0)
+```
+
+**It was mostly a transcription, which is what the seam was for.** Four
+differences were real:
+
+- **Windows reports events; ptrace reports signals.** A planted trap and a
+  finished single step are both `SIGTRAP`, told apart only by what the tracer
+  asked for -- so the target remembers, and the engine never had to learn.
+- **The stop address is read, not reported.** Windows hands over the faulting
+  address; here the program counter is fetched, and for a breakpoint it is one
+  past the trap exactly as on Windows.
+- **Memory is a file.** `/proc/<pid>/mem` with positional reads, which beats
+  `PEEKDATA` a word at a time and is simpler -- the rare case of both. And no
+  instruction cache to flush: x86 keeps its own coherent with stores.
+- **There is no loader breakpoint to swallow.** The first stop is the `SIGTRAP`
+  the kernel raises when `execv` completes under a tracer, and that one *is*
+  the start of the session.
+
+**The seam had one real hole, and only the second platform could find it: it
+never said who consumes the first stop.** `Engine.Start` called `Continue`,
+which resumes before waiting -- harmless on Windows, where nothing has been
+reported and the resume finds no event outstanding. On Linux the launch has
+already reaped the exec's `SIGTRAP`, so the same call let the program run
+before its image base had been read, and a slide nobody learned is every
+breakpoint unplanted. Nothing resumes before the first event is read now.
+
+**A stdlib bug came with it.** `Standard.File.ReadAllBytes` trusted the size a
+file reports, and `/proc` reports zero and then hands over kilobytes -- so
+`/proc/<pid>/maps` came back empty and the loader base with it. It reads to the
+end now, which is what "all bytes" has to mean on Linux;
+`tests/cases/proc-files` pins it and fails without it.
+
+**`Attach` is not implemented and would ship untested if it were.** Under
+Linux's default `ptrace_scope` a process may trace its own child and nothing
+else, so every test here launches. That is said where it matters rather than
+left to be discovered.
+
 ## Still to come
 
-`ptrace`, which the seam exists to make a transcription job, and then the IDE
-surface -- kept thin, because everything in it comes from snapshot types this
+The IDE surface -- kept thin, because everything in it comes from snapshot types this
 console tool has already exercised.
 
 Named rather than done, in the value reader: a `struct` prints as its address

@@ -8,5 +8,8 @@
   "windows": {
     "sources": ["../bindings/win32"],
     "libraries": ["kernel32", "advapi32"]
+  },
+  "linux": {
+    "sources": ["../bindings/linux"]
   }
 }
