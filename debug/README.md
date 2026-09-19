@@ -17,6 +17,9 @@ stainless build --project debug
 | `src/Image.sl` | an executable reduced to its sections, and the sniff that picks a reader |
 | `src/Image/Pe.sl` | the COFF header structures |
 | `src/Image/Elf.sl` | the ELF header structures, section and program both |
+| `src/Dwarf/Constants.sl` | the tags, attributes and forms, and names for printing them |
+| `src/Dwarf/Abbrev.sl` | `.debug_abbrev`, and a skip rule for every form |
+| `src/Dwarf/Info.sl` | `.debug_info` as units and entries, indirections resolved |
 | `tests/sldb.sl` | the console debugger |
 
 ## Four decisions worth knowing before reading the code
@@ -81,11 +84,30 @@ zero is a valid entry in `.debug_addr` and `.debug_str_offsets`, and a unit
 header of zeros is a unit. Both were caught by comparing against
 `llvm-objdump -h`, which is the check to repeat whenever this changes.
 
+## How the DWARF reader is checked
+
+`sldb dies` prints the entry tree in the shape `llvm-dwarfdump --debug-info`
+prints it, so the two can be diffed rather than compared by eye. On the
+fixture in `docs/dwarf.md`:
+
+```
+                ELF          PE
+entries        9808         6226
+differing         0            0
+```
+
+-- every offset and every tag, across seventeen compilation units and every
+form the compiler emits. That is the check to repeat after any change here, and
+it is worth more than any number of assertions about individual fields.
+
+Two things it does not cover, and which the self test does instead: that every
+form this engine can *name* it can also *skip*, and that one it has never heard
+of is refused rather than skipped by zero bytes. Both are the same failure --
+losing position in a stream whose entries carry no length, and then producing
+entries that still look plausible.
+
 ## Still to come
 
-Process control (`ITarget`, the `DEBUG_EVENT` loop, `ptrace`), the DWARF and
-line-table readers on top of these sections, stack walking, values, and the
-IDE surface. The order is riskiest first, and it is why the container readers
-and a byte cursor are a commit of their own: nothing above them can be trusted
-until they agree with `llvm-objdump` on a real binary, and they now do, on both
-formats.
+The line-number program, so that a file and a line can be turned into an
+address and back; then process control (`ITarget`, the `DEBUG_EVENT` loop,
+`ptrace`), stack walking, values, and the IDE surface.

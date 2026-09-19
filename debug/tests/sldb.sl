@@ -27,6 +27,8 @@
 // here first, and every question this answers is one a scripted test can ask.
 //
 //   sldb sections <binary>     what the container holds
+//   sldb units <binary>        the compilation units, and what each covers
+//   sldb dies <binary> [name]  the entry tree, for diffing against dwarfdump
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -170,6 +172,38 @@ int SelfTest()
     ten.Leb();
     ok = Check(ok, "a LEB128 that never ends stops at ten bytes", ten.Offset == 10u);
 
+    // **Every named form must be a skippable form.** A form this engine can
+    // name but not step over is one that loses its place in the entry stream
+    // and keeps producing entries that look right -- so the constants are
+    // checked against the function rather than believed beside it.
+    uint[] forms = KnownForms();
+    bool everyForm = true;
+    for (nuint i = 0u; i < forms.Length; i++)
+    {
+        // Zeros make every length-prefixed form empty and every LEB zero,
+        // which is the shortest legal encoding of each. `DW_FORM_indirect`
+        // names its real form in the data, so it gets one that is not zero.
+        byte[] room = [0x0B, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0];
+        var over = new Cursor(room);
+        if (!SkipForm(over, forms[i], 8u, 4u))
+        {
+            Console.WriteLine("       no skip rule for form 0x"
+                              + Hexadecimal((ulong)forms[i]));
+            everyForm = false;
+        }
+    }
+    ok = Check(ok, "every form this engine names can also be skipped", everyForm);
+
+    // And the other half of the contract: a form it does not know is *refused*,
+    // not skipped by zero bytes. Answering true there would keep the reader
+    // running over an entry it has already lost.
+    byte[] spare = [0, 0, 0, 0, 0, 0, 0, 0];
+    var unknown = new Cursor(spare);
+    ok = Check(ok, "a form it has never heard of is refused rather than guessed",
+               !SkipForm(unknown, 0x7Fu, 8u, 4u));
+
     // The header structures, against the sizes their formats fix. Cheap, and
     // the only cover the 32-bit layouts have until a 32-bit binary is built
     // here -- the box this is developed on has no multilib.
@@ -183,12 +217,129 @@ int SelfTest()
     return ok ? 0 : 1;
 }
 
+/// Reads the binary and its DWARF, or prints why not.
+DwarfInfo? Load(String path)
+{
+    var read = Image.FromFile(path);
+    if (!read.Ok)
+    {
+        Console.WriteLine("sldb: " + read.Error);
+        return null;
+    }
+
+    var info = new DwarfInfo(read.Value);
+    if (info.IsEmpty)
+    {
+        Console.WriteLine("sldb: " + path + " carries no DWARF");
+        Console.WriteLine("      on Windows a -g build writes CodeView to a .pdb;");
+        Console.WriteLine("      see docs/dwarf.md for how to force DWARF instead");
+        return null;
+    }
+
+    String bad = info.Read();
+    if (bad.ByteLength() != 0u)
+    {
+        Console.WriteLine("sldb: " + bad);
+        return null;
+    }
+    return info;
+}
+
+int Units(String path)
+{
+    var info = Load(path);
+    if (info == null)
+        return 1;
+
+    var units = ((DwarfInfo)info).Units;
+    Console.WriteLine(Number(units.Count) + " unit(s)");
+    for (nuint i = 0u; i < units.Count; i++)
+    {
+        var unit = units[i];
+        Console.WriteLine("");
+        Console.WriteLine("  0x" + Hexadecimal((ulong)unit.Offset) + "  "
+                          + unit.Name);
+        Console.WriteLine("    version " + Number((nuint)unit.Version)
+                          + ", " + Number(unit.AddressSize) + "-byte addresses, "
+                          + Number(unit.Dies.Count) + " entries");
+        var root = unit.Root;
+        if (root != null)
+        {
+            String dir = ((Die)root).TextOf(AtCompDir);
+            if (dir.ByteLength() != 0u)
+                Console.WriteLine("    " + dir);
+        }
+    }
+    return 0;
+}
+
+/// The entry tree, indented, in the order the file has it.
+///
+/// **Shaped so it can be diffed against `llvm-dwarfdump --debug-info`**, which
+/// is the only way this reader was ever going to be trusted: the offsets and
+/// the tag names are the tool's, so a disagreement shows up as a line rather
+/// than as a feeling.
+int Dies(String path, String only)
+{
+    var info = Load(path);
+    if (info == null)
+        return 1;
+
+    var units = ((DwarfInfo)info).Units;
+    for (nuint u = 0u; u < units.Count; u++)
+    {
+        var unit = units[u];
+        for (nuint i = 0u; i < unit.Dies.Count; i++)
+        {
+            var die = unit.Dies[i];
+            if (only.ByteLength() != 0u && die.Name != only)
+                continue;
+
+            var line = new StringBuilder();
+            line.Append("0x");
+            line.Append(Hexadecimal((ulong)die.Offset));
+            line.Append(": ");
+            for (int pad = 0; pad < die.Depth; pad++)
+                line.Append("  ");
+            line.Append(TagName(die.Tag));
+            Console.WriteLine(line.ToText());
+
+            for (nuint a = 0u; a < die.Attributes.Count; a++)
+            {
+                var one = die.Attributes[a];
+                var text = new StringBuilder();
+                text.Append("      ");
+                for (int pad = 0; pad < die.Depth; pad++)
+                    text.Append("  ");
+                text.Append(AttributeName(one.At));
+                text.Append("\t");
+                text.Append(Describe(one));
+                Console.WriteLine(text.ToText());
+            }
+        }
+    }
+    return 0;
+}
+
+/// One attribute's value, in the shape `llvm-dwarfdump` prints it so the two
+/// can be compared without translating.
+String Describe(Attribute one)
+{
+    if (one.IsText)
+        return "(\"" + one.Text + "\")";
+    if (one.Block.Length != 0u)
+        return "(<0x" + Hexadecimal((ulong)one.Block.Length) + "> bytes)";
+    return "(0x" + Hexadecimal(one.Value) + ")";
+}
+
 int Usage()
 {
     Console.WriteLine("sldb -- the Stainless debugger");
     Console.WriteLine("");
-    Console.WriteLine("  sldb sections <binary>   what the container holds");
-    Console.WriteLine("  sldb --selftest          the checks that need no binary");
+    Console.WriteLine("  sldb sections <binary>     what the container holds");
+    Console.WriteLine("  sldb units <binary>        the compilation units");
+    Console.WriteLine("  sldb dies <binary> [name]  the entry tree");
+    Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
 }
 
@@ -203,6 +354,12 @@ int Main()
 
     if (args[0u] == "sections" && args.Length >= 2u)
         return Sections(args[1u]);
+
+    if (args[0u] == "units" && args.Length >= 2u)
+        return Units(args[1u]);
+
+    if (args[0u] == "dies" && args.Length >= 2u)
+        return Dies(args[1u], args.Length >= 3u ? args[2u] : "");
 
     return Usage();
 }
