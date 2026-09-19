@@ -102,6 +102,31 @@ were fixed — the IDE is what found every one of them.
 - **An Error List**, one row per diagnostic with severity, code, message, file
   and line, beside the raw Output. Double-clicking either goes to the same
   place, through one model rather than two.
+- **A context menu in the Solution Explorer** — Open, Add new file, Rename,
+  Delete, Reveal in Explorer and Refresh — acting on the node under the
+  *pointer* rather than the one that happened to be selected, since neither
+  Windows nor GTK moves the selection on a right-click. A new file is seeded
+  with the module its neighbours declare, because a directory here is a module
+  and a file that said nothing would fail to compile for a reason that has
+  nothing to do with what was being written.
+
+  There is no *Remove from project*, and that is the format rather than an
+  omission: a project names directories and the compiler compiles what is in
+  them, so there is no list a file can be taken out of. Delete is the honest
+  name for the only thing that works, and it asks.
+- **Output arrives as the compiler writes it**, a line at a time, rather than
+  in one piece when the build ends. Lines are reassembled before they are
+  shown: what a pipe hands over is a count of bytes and not of lines, so a
+  diagnostic routinely arrives in halves and showing each piece as it came
+  would leave the Error List holding half a JSON object.
+- **A toolbar** — Build, Rebuild, Clean, Run, Stop — and a **configuration
+  picker**. Debug builds `-g -O0` and Release `--no-debug -O2`, passed as flags
+  rather than written into `stainless.json`: the compiler takes a flag in
+  preference to the project's own `optimize` and `debug`, which is what makes
+  the choice possible without rewriting the file every time it changes. Stop is
+  pressable only while something is running, and kills rather than asks — a
+  compiler halfway through an object file has nothing to tidy that Clean will
+  not do better.
 
 ## What does not exist yet
 
@@ -114,9 +139,12 @@ Named honestly, since the point of the page is to say where the edges are.
   `--diagnostics json` is the first stone of it and already carries what a
   squiggle needs — a code, a place, and a length to underline — which is why
   the editor does not have to guess at any of that any more.
-- **No debugger.** The compiler already emits DWARF and CodeView under `-g`, so
-  the intended shape is gdb and lldb driven over the MI2 protocol rather than a
-  second debugger written here.
+- **No debugger.** The compiler already emits DWARF and CodeView under `-g`,
+  and the configuration picker asks for it, but nothing reads it back. The
+  intended shape is a debug engine written in Stainless against a `ptrace` and
+  a `DEBUG_EVENT` backend, not gdb or lldb over MI2: `lldb-mi` has not shipped
+  with LLVM for years, and every LLDB binary in the LLVM install this is
+  developed against fails to start at all.
 - **Panes do not float and cannot be dragged between edges.** A pane's edge is
   read from the layout file and honoured, so hand-editing
   `%APPDATA%/Stainless/ide/layout.json` moves one today — but there is no drag,
@@ -145,12 +173,11 @@ Named honestly, since the point of the page is to say where the edges are.
 - **No keyboard shortcut for text size.** `+` and `-` are OEM virtual keys and
   `Forms`' `Key` enum does not name them yet, so it is the menu or Ctrl and the
   wheel. Cut, copy and paste do have their usual keys.
-- **The build's output arrives all at once**, at the end. The build itself no
-  longer blocks the window — it runs on `Background.Run`, which is the thread
-  and the queue `Forms` has had for this all along — but `Process.Run` captures
-  both streams and answers when the child exits, so there is nothing to report
-  from as it goes. A build that streams wants a `Standard.Process` handing back
-  its pipes as they fill, which is a change below the IDE rather than in it.
+- **A configuration is Debug or Release and nothing else.** `stainless.json`
+  holds one `optimize` and one `debug` and has no notion of a named
+  configuration, so a picker offering a third would be offering something the
+  format cannot hold. Named configurations are a change to the project format
+  first and to this second.
 
 ---
 

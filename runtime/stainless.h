@@ -938,6 +938,23 @@ SL_API void   sl_process_args_free(void *handle);
 /* Runs to completion, appending both streams to the builders given. */
 SL_API int    sl_process_run(void *args, void *input, void *outText, void *errText, int *exitCode);
 
+/*
+ * Starts one with both output streams captured, and reads them as they fill.
+ *
+ * What sl_process_run is built from, and what it cannot offer: that one does
+ * not answer until the child has exited, so a build taking a minute says
+ * nothing for a minute. sl_process_pump appends whatever has arrived and
+ * answers 1 while more may come, so
+ *
+ *     while (sl_process_pump(handle, out, err)) { take what is in them }
+ *
+ * hands over every byte as it is written. The handle is then waited for with
+ * sl_process_wait and let go of with sl_process_release, exactly as one from
+ * sl_process_start is.
+ */
+SL_API void  *sl_process_open(void *args, void *input, int *error);
+SL_API _Bool  sl_process_pump(void *handle, void *outText, void *errText);
+
 /* Starts one and does not wait; its streams are this process's. */
 SL_API void  *sl_process_start(void *args, int *error);
 SL_API long   sl_process_id(void *handle);

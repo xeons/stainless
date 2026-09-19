@@ -719,6 +719,24 @@ public interface ITreeViewPeer : IControlPeer
     void Expand(ITreeNodeHandle node, bool expanded);
     void SelectNode(ITreeNodeHandle node);
     ITreeNodeHandle? GetSelectedNode();
+
+    /// Which node is under `at`, or null for none.
+    ///
+    /// **`at` is the point a mouse event reported**, not an arbitrary point in
+    /// the control's client area, and the difference is not pedantry: GTK
+    /// gives a button event its position inside the tree's scrolled *bin*
+    /// window, which is the coordinate space its own hit test wants, while the
+    /// widget's client area is a different origin once the view has been
+    /// scrolled. Both backends take what the event carried and neither
+    /// converts, so a caller that passes the point it was handed is right on
+    /// both and a caller that invents one is right on neither.
+    ///
+    /// **A right-click does not move the selection**, on either platform, so
+    /// this is the only way a context menu can know what it was opened on.
+    /// Building one from `GetSelectedNode` instead acts on whatever was
+    /// selected beforehand -- which is a menu that renames the wrong file.
+    ITreeNodeHandle? NodeAt(Point at);
+
     void Clear();
     void SetImages(IImageListBackend images);
 }

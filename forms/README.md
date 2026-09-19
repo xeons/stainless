@@ -118,7 +118,8 @@ src/Controls/Common.sl      ToolBar, StatusBar, ProgressBar, TrackBar,
                             CoolBar, CoolBand            (lcl/comctrls.pp)
 src/Controls/Drawn.sl       PaintBox, Shape, Bevel, Splitter (lcl/extctrls.pp)
 src/Controls/Dialogs.sl     OpenDialog, SaveDialog, FolderDialog, ColorDialog,
-                            FontDialog, Timer      (lcl/dialogs.pp, customtimer)
+                            FontDialog, InputDialog, Timer
+                                                   (lcl/dialogs.pp, customtimer)
 src/Controls/Groups.sl      RadioGroup, CheckGroup, LabeledEdit, Image,
                             SpinEdit, CheckListBox, HeaderControl,
                             ButtonPanel                 (lcl/buttonpanel.pas)
@@ -486,6 +487,7 @@ grouped by how much work it is rather than by where it lives.
 | `CustomControl` | `customcontrol` in `controls.pp` |
 | `Clipboard`, text only | `clipbrd.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
+| `InputDialog` | `InputQuery` in `dialogs.pp` |
 | `Timer` | `customtimer.pas` |
 | `RadioGroup`, `CheckGroup`, `LabeledEdit`, `Image` | `extctrls.pp` |
 | `SpinEdit` | `spin.pp` |

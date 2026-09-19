@@ -47,6 +47,9 @@ extern "C"
     int   sl_process_run(byte* args, String? input, StringBuilder outText,
                          StringBuilder errText, out int exitCode);
 
+    byte* sl_process_open(byte* args, String? input, out int error);
+    bool  sl_process_pump(byte* handle, StringBuilder outText, StringBuilder errText);
+
     byte* sl_process_start(byte* args, out int error);
     long  sl_process_id(byte* handle);
     int   sl_process_wait(byte* handle, out int exitCode);
@@ -247,6 +250,154 @@ public class Process
             return Fail(Coded(error));
         return Ok(new Process(started));
     }
+}
+
+// --------------------------------------------------------------- streaming
+
+/// A program running with both its output streams captured, read as they fill.
+///
+/// **What `Run` cannot do.** `Run` does not answer until the child has exited,
+/// so a build taking a minute says nothing for a minute and then says all of
+/// it at once. This hands over what has arrived so far, as often as it is
+/// asked -- which is what a window showing a build as it happens needs, and
+/// the only difference between the two.
+///
+///     var started = Open("stainless", ["build"]);
+///     if (started.Ok)
+///     {
+///         var child = started.Value;
+///         while (child.Read())
+///         {
+///             Show(child.TakeOutput());
+///             Complain(child.TakeErrors());
+///         }
+///         Console.WriteLine("exit " + Text.FromInteger(child.Wait().ValueOr(-1)));
+///     }
+///
+/// **`Read` waits**, and that is deliberate: it answers when there is
+/// something to hand over or when the child has closed both streams, and never
+/// immediately with nothing. So the loop above blocks rather than spinning,
+/// and belongs on a thread of its own when there is a window to keep painting.
+///
+/// **Both streams are watched together**, which is not a detail a caller could
+/// add afterwards. A pipe holds about 64KB, and a reader that drains one to
+/// the end while the child fills the other is waiting for a child that is
+/// waiting for the reader. That is why this hands back two strings rather than
+/// being two objects with a `Read` each.
+public class Running
+{
+    byte* _handle;
+    StringBuilder _output;
+    StringBuilder _errors;
+
+    /// Whether either stream may still produce something. False once the child
+    /// has closed both, which is what ends the loop.
+    bool _more;
+
+    /// Made by `Open` alone: the handle is the runtime's and there is no way
+    /// to come by a valid one otherwise.
+    Running(byte* started)
+    {
+        _handle = started;
+        _output = new StringBuilder();
+        _errors = new StringBuilder();
+        _more = true;
+    }
+
+    /// Reaped here if it was never waited for, and the pipes go with it -- a
+    /// read end left open is a child blocked forever on a full one.
+    ~Running() { sl_process_release(_handle); }
+
+    /// What the operating system calls it.
+    public long Id => sl_process_id(_handle);
+
+    /// Takes in whatever the child has written since the last call, and
+    /// answers whether there may be more after this one.
+    ///
+    /// False means both streams are closed and everything they held has
+    /// already been handed over, so the last `Take` before it is not missing
+    /// anything.
+    public bool Read()
+    {
+        if (!_more)
+            return false;
+        _more = sl_process_pump(_handle, _output, _errors);
+        return _more;
+    }
+
+    /// What the child wrote to its output since this was last asked, and
+    /// nothing at all the next time.
+    ///
+    /// **Taken rather than read.** The buffer is emptied, because a caller
+    /// showing output as it arrives wants each line once; `Run` is the one
+    /// that answers with the whole of it at the end.
+    public String TakeOutput()
+    {
+        var text = _output.ToText();
+        _output.Clear();
+        return text;
+    }
+
+    /// The same for what it wrote to its error stream.
+    public String TakeErrors()
+    {
+        var text = _errors.ToText();
+        _errors.Clear();
+        return text;
+    }
+
+    /// Waits for it to finish, and answers with the code it left.
+    ///
+    /// **After `Read` has answered false**, not before: waiting on a child
+    /// whose output pipe is full is the deadlock the pumping exists to avoid,
+    /// arriving from the other side. Asking twice is harmless and answers the
+    /// same both times.
+    public Result<int, ProcessError> Wait()
+    {
+        int status = sl_process_wait(_handle, out int exitCode);
+        if (status != 0)
+            return Fail(Coded(status));
+        return Ok(exitCode);
+    }
+
+    /// Asks it to stop, the way Ctrl-C would. It may decline.
+    public bool Stop() => sl_process_signal(_handle, false);
+
+    /// Makes it stop. It cannot decline, and gets no chance to tidy up.
+    public bool Kill() => sl_process_signal(_handle, true);
+}
+
+/// Starts a program with its output captured, to be read as it arrives.
+///
+/// `arguments` does **not** include the program's own name; that is `program`,
+/// and it is what a PATH lookup is done on when it has no separator in it --
+/// the same bargain `Run` makes.
+public Result<Running, ProcessError> Open(String program, String[] arguments)
+{
+    return Open(program, arguments, null);
+}
+
+/// The same, with something written to the program's input first.
+///
+/// The pipe is closed once `input` has been written, which is what makes a
+/// program reading to end-of-input stop rather than wait. It is written before
+/// any reading starts, so this is for input small enough to fit in a pipe --
+/// a child that will not read until it has answered, and an input larger than
+/// the buffer, would deadlock here exactly as it does under `Run`.
+public Result<Running, ProcessError> Open(
+    String program, String[] arguments, String? input
+)
+{
+    byte* args = Assemble(program, arguments);
+    if (args == null)
+        return Fail(ProcessError.NoResource);
+
+    byte* started = sl_process_open(args, input, out int error);
+    sl_process_args_free(args);
+
+    if (started == null)
+        return Fail(Coded(error));
+    return Ok(new Running(started));
 }
 
 // ----------------------------------------------------------------- signals

@@ -304,10 +304,15 @@ public sealed class Toolchain
         if (sources.Count == 0)
             throw new InvalidOperationException("the runtime is missing from the compiler assembly");
 
-        // A header change invalidates every object file, since any unit may include it.
-        bool headersChanged = false;
+        // A header change invalidates every object file, since any unit may
+        // include it -- so every object is checked against all of them below.
+        var headers = new List<string>();
         foreach (var (name, text) in sources.Where(s => s.Key.EndsWith(".h", StringComparison.Ordinal)))
-            headersChanged |= WriteIfChanged(Path.Combine(objectDirectory, name), text);
+        {
+            string header = Path.Combine(objectDirectory, name);
+            WriteIfChanged(header, text);
+            headers.Add(header);
+        }
 
         var objectFiles = new List<string>();
 
@@ -345,8 +350,20 @@ public sealed class Toolchain
             string objectFile = Path.ChangeExtension(source, suffix);
             objectFiles.Add(objectFile);
 
-            bool changed = WriteIfChanged(source, text);
-            if (!changed && !headersChanged && File.Exists(objectFile)) continue;
+            WriteIfChanged(source, text);
+
+            // **Compared by time, not by "did this call write it".** That was
+            // the test, and it is wrong the moment one object directory holds
+            // two builds: the suffix above gives debug, shared and each target
+            // an object of their own, but they all share the one `.c` on disk.
+            // So a debug build after a compiler upgrade rewrote `process.c`,
+            // rebuilt `process.g.o`, and left the release build to find an
+            // unchanged source beside its own stale `process.o` -- which it
+            // kept, and which the linker then reported as an undefined symbol
+            // in a function that plainly exists. Whether *this* object is
+            // older than the source is a question about this object, and
+            // survives another build having asked it first.
+            if (IsUpToDate(objectFile, [source, .. headers])) continue;
 
             List<string> arguments =
                 [.. TargetArguments,

@@ -138,6 +138,7 @@ internal static class Program
                                    to carry
               -O<0-3>              optimization level (default: -O2)
               -g, --debug          describe the program to a debugger
+              --no-debug           do not, whatever the project file says
               -D, --define <name>  define a symbol for '#if' to test
               -l, --library <name> link a library the linker finds by name
               --abi <microsoft|itanium>
@@ -720,7 +721,17 @@ internal static class Program
         public int Optimization { get; set; } = 2;
         public bool OptimizationGiven { get; set; }
         public bool Keep { get; set; }
-        public bool Debug { get; set; }
+        /// <summary>
+        /// Whether to describe the program to a debugger: true for -g, false
+        /// for --no-debug, and null for neither -- which leaves the project's
+        /// own `debug` standing.
+        ///
+        /// **Three states rather than two**, because a project file is where
+        /// this usually comes from and an override that could only turn the
+        /// flag on could not express a Release build of a project whose
+        /// `debug` is true.
+        /// </summary>
+        public bool? Debug { get; set; }
         public bool Shared { get; set; }
         public bool EmitIrOnly { get; set; }
         public bool StandardLibrary { get; set; }
@@ -739,7 +750,7 @@ internal static class Program
             OutputPath = Output,
             IntermediateDirectory = ObjectDirectory,
             OptimizationLevel = OptimizationGiven ? Optimization : null,
-            Debug = Debug ? true : null,
+            Debug = Debug,
             KeepIntermediates = Keep,
             EmitIrOnly = EmitIrOnly,
             Defines = Defines,
@@ -783,7 +794,7 @@ internal static class Program
             // the optimiser has rearranged is the usual first surprise. Say so
             // once, and leave an explicit -O alone: asking for both is a
             // legitimate thing to do.
-            if (Debug && Optimization > 0 && !OptimizationGiven)
+            if (Debug == true && Optimization > 0 && !OptimizationGiven)
                 Console.Error.WriteLine(
                     $"note: building at -O{Optimization} with -g; pass -O0 to step through the " +
                     "code as it was written");
@@ -808,7 +819,7 @@ internal static class Program
                 IntermediateDirectory = ObjectDirectory,
                 OptimizationLevel = Optimization,
                 KeepIntermediates = Keep,
-                Debug = Debug,
+                Debug = Debug ?? false,
                 Defines = Defines,
                 CppAbi = Abi,
                 Target = Target,
@@ -869,6 +880,10 @@ internal static class Program
 
                 case "-g" or "--debug":
                     arguments.Debug = true;
+                    continue;
+
+                case "--no-debug":
+                    arguments.Debug = false;
                     continue;
 
                 case "-D" or "--define":

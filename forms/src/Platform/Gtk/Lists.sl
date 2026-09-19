@@ -640,24 +640,26 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         gtk_tree_selection_select_iter(selection, &row);
     }
 
-    /// A *fresh* handle for whichever node is selected, which is why the seam
-    /// says two handles naming one node need not be the same object: this
-    /// looks the row up among the references rather than remembering which
-    /// handle it gave out.
-    public ITreeNodeHandle? GetSelectedNode()
+    /// A *fresh* handle for the node at a row path, which is why the seam says
+    /// two handles naming one node need not be the same object: this looks the
+    /// row up among the references rather than remembering which handle it
+    /// gave out. Null when no live node names that row.
+    ///
+    /// The path is borrowed -- the caller frees it.
+    ///
+    /// Paths are compared as strings rather than with `gtk_tree_path_compare`
+    /// because each reference has to be turned into a path to be looked at
+    /// either way, so the comparison is the cheap half of the loop whichever
+    /// way it is done.
+    ITreeNodeHandle? HandleForPath(gpointer path)
     {
-        GtkTreeIter row;
-        if (gtk_tree_selection_get_selected(selection, null, &row) == 0)
-            return null;
-
-        gpointer path = gtk_tree_model_get_path(model, &row);
         if (path == null)
             return null;
+
         gchar* raw = gtk_tree_path_to_string(path);
         var wanted = raw == null ? "" : Text.FromNullTerminated(raw);
         if (raw != null)
             g_free((gpointer)raw);
-        gtk_tree_path_free(path);
 
         foreach (var pair in _nodes)
         {
@@ -674,6 +676,41 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
                 return new GtkTreeNode(pair.Key);
         }
         return null;
+    }
+
+    public ITreeNodeHandle? GetSelectedNode()
+    {
+        GtkTreeIter row;
+        if (gtk_tree_selection_get_selected(selection, null, &row) == 0)
+            return null;
+
+        gpointer path = gtk_tree_model_get_path(model, &row);
+        if (path == null)
+            return null;
+
+        var found = HandleForPath(path);
+        gtk_tree_path_free(path);
+        return found;
+    }
+
+    /// The row under a point, with the point taken exactly as the button event
+    /// reported it -- see the seam, and `gtk_tree_view_get_path_at_pos`.
+    ///
+    /// A miss answers false *and* leaves the path null, so both are checked:
+    /// the documented contract is the flag, and the null is what the rest of
+    /// this method would otherwise dereference.
+    public ITreeNodeHandle? NodeAt(Forms.Drawing.Point at)
+    {
+        gpointer path = null;
+        if (gtk_tree_view_get_path_at_pos(inner, at.X, at.Y,
+                                          &path, null, null, null) == 0)
+            return null;
+        if (path == null)
+            return null;
+
+        var found = HandleForPath(path);
+        gtk_tree_path_free(path);
+        return found;
     }
 
     public void Clear()

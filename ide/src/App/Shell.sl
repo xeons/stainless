@@ -34,6 +34,7 @@ import Standard.Process;
 import Standard.Path;
 import Standard.Directory;
 import Standard.Env;
+import Standard.Threading;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
@@ -60,6 +61,42 @@ public class EditorTab
         Editor = editor;
     }
 }
+
+/// What a node of the Solution Explorer stands for on disk.
+///
+/// **A class beside the tree rather than a field on `TreeNode`**, for the
+/// reason the two parallel lists this replaces already gave: `TreeNode` carries
+/// no tag, and adding one would put a field on every node of every tree in
+/// `forms/` for the sake of this one window.
+///
+/// Two parallel lists became three the moment the context menu had to tell a
+/// directory from a file, which is where parallel arrays stop being the
+/// cheaper answer and start being three things that can fall out of step.
+public class TreeEntry
+{
+    public TreeNode Node;
+    public String FullPath;
+
+    /// Whether `FullPath` names a directory. A file opens, renames and
+    /// deletes; a directory is where a new file is added.
+    public bool IsFolder;
+
+    public TreeEntry(TreeNode node, String path, bool folder)
+    {
+        Node = node;
+        FullPath = path;
+        IsFolder = folder;
+    }
+}
+
+/// What a build is made for: something to step through, or something to ship.
+///
+/// **Two, not a list read from the project.** `stainless.json` has no notion of
+/// a named configuration -- it has an `optimize` and a `debug`, one of each --
+/// so a picker offering more than two would be offering something the format
+/// cannot hold. These are the two shapes anyone actually wants, and each is
+/// spelled as the flags it means rather than stored anywhere.
+public enum Configuration { Debug, Release }
 
 /// The main window.
 public class Shell : Form
@@ -106,10 +143,20 @@ public class Shell : Form
     /// two from ever disagreeing about where a double-click goes.
     List<nuint> _errorLines;
 
-    /// Every file the tree is showing, by node, so that a double-click knows
-    /// what to open. `TreeNode` carries no tag of its own.
-    List<TreeNode> _treeNodes;
-    List<String> _treePaths;
+    /// What every node of the tree stands for on disk, so that a double-click
+    /// knows what to open and the context menu knows what it was opened on.
+    List<TreeEntry> _treeItems;
+
+    /// What the Solution Explorer's context menu was opened on, held only for
+    /// as long as the menu is up.
+    ///
+    /// **`SelectedNode` is not an answer to that question.** A menu item's
+    /// handler is given the item and nothing else, and a right-click on no node
+    /// at all leaves the previous selection exactly where it was -- so a
+    /// handler reading the selection would act on a row the menu was never
+    /// about. Both backends raise the item before `Show` returns, so this lives
+    /// for the length of one call and is cleared after it.
+    TreeEntry? _menuTarget;
 
     /// The project in front, and the file it was read from. Null when the
     /// window is showing loose files, which is still a thing it does: a
@@ -123,6 +170,37 @@ public class Shell : Form
     /// failure that looks like a scatter of unrelated errors.
     bool _building;
 
+    /// The part of each of the compiler's streams that has arrived without the
+    /// newline that would end it.
+    ///
+    /// **A pump hands over bytes, not lines.** What has arrived when it
+    /// answers is however much had been written, which routinely ends halfway
+    /// through a line -- so showing each piece as it came would split a
+    /// diagnostic in two and leave the Error List holding half a JSON object.
+    /// The whole lines are shown and the remainder waits here for the rest of
+    /// itself, which never arrives for the last one: the end of the build
+    /// flushes whatever is left.
+    String _errorTail;
+    String _outputTail;
+
+    /// The strip across the top: the commands, and what they build for.
+    CoolBar _strip;
+    ToolBar _tools;
+    ComboBox _configuration;
+    ToolButton _stopButton;
+
+    /// The compiler, while it is running, so that Cancel has something to
+    /// stop.
+    ///
+    /// **Written on the UI thread and read there**, though the worker is what
+    /// creates it: the worker posts it across rather than assigning, so the
+    /// only thread that ever touches this field is the one Cancel runs on.
+    /// What genuinely does cross threads is the call into `Kill`, and that is
+    /// safe for the reason it is useful -- the worker is blocked in `Read`,
+    /// killing the child closes its pipes, and the read it was blocked in
+    /// comes back empty and ends the loop.
+    Running? _child;
+
     public Shell()
     {
         base(WindowBorder.Sizable);
@@ -132,12 +210,15 @@ public class Shell : Form
         _open = new List<EditorTab>();
         _messages = new List<BuildMessage>();
         _errorLines = new List<nuint>();
-        _treeNodes = new List<TreeNode>();
-        _treePaths = new List<String>();
+        _treeItems = new List<TreeEntry>();
+        _menuTarget = null;
         _project = null;
         _projectPath = "";
         _finder = null;
         _building = false;
+        _child = null;
+        _errorTail = "";
+        _outputTail = "";
         _compiler = FindCompiler();
         _textSize = 10;
         _dark = false;
@@ -153,6 +234,59 @@ public class Shell : Form
         _status.AddPanel(110);      // how many errors
         _status.AddPanel(0);        // where the caret is
 
+        // The commands, on a band shared with the configuration picker.
+        //
+        // **A `CoolBar` rather than a `ToolBar` alone**, because the picker is
+        // a `ComboBox` and a toolbar has no way to hold one: a band is a row
+        // entry pointing at an ordinary child, which is what puts two
+        // different controls on one row. `samples/forms/buttons.sl` is the
+        // same arrangement.
+        //
+        // Made before the dock host so that it takes its bite out of the
+        // client area first; the host fills what is left.
+        _strip = new CoolBar(this);
+        _strip.Dock = DockStyle.Top;
+
+        _configuration = new ComboBox(_strip);
+        _configuration.Height = 24;
+        _configuration.Add("Debug");
+        _configuration.Add("Release");
+        _configuration.SelectedIndex = 0;
+        _configuration.SelectedIndexChanged += this.OnConfigurationChanged;
+
+        // **The picker first, and the commands after it.** `CoolBar` draws the
+        // last band of a row out to the far edge whatever width it asked for,
+        // which is right for a rebar and wrong for a drop-down: a combo box
+        // stretched across half the window looks like a mistake. A toolbar
+        // does not mind, because its buttons sit at the left and the rest of
+        // the band is bar.
+        var chosen = new CoolBand(_strip);
+        chosen.Text = "Configuration";
+        chosen.Control = _configuration;
+        chosen.Width = 230;
+
+        _tools = new ToolBar(_strip);
+        _tools.Height = 26;
+        _tools.Add("Build").Click += this.OnBuild;
+        _tools.Add("Rebuild").Click += this.OnRebuild;
+        _tools.Add("Clean").Click += this.OnClean;
+        _tools.AddSeparator();
+        _tools.Add("Run").Click += this.OnRun;
+        _stopButton = _tools.Add("Stop");
+        _stopButton.Click += this.OnStop;
+
+        // No caption: the buttons already say what they do, and a band reading
+        // "Build" beside a button reading "Build" is twice the width for none
+        // of the information.
+        var commands = new CoolBand(_strip);
+        commands.Text = "";
+        commands.Break = false;     // share the row with the picker
+        commands.Control = _tools;
+        commands.Width = 380;
+
+        _strip.Height = _strip.PreferredSize.Height;
+        ShowWhatIsRunning();
+
         // The layout is read before anything is built, because where a pane
         // goes is decided as it is made -- a control's parent is fixed at
         // construction and `forms/` cannot move it afterwards.
@@ -164,6 +298,7 @@ public class Shell : Form
         _tree = new TreeView(solution);
         _tree.Dock = DockStyle.Fill;
         _tree.DoubleClick += this.OnTreeChosen;
+        _tree.MouseUp += this.OnTreeMouse;
 
         var errors = _dock.Add(Panes.Errors, "Error List", DockEdge.Bottom);
         _errors = new ListView(errors);
@@ -415,7 +550,9 @@ public class Shell : Form
 
         var build = _bar.Add("&Build");
         build.Add("&Build").Click += this.OnBuild;
+        build.Add("Re&build").Click += this.OnRebuild;
         build.Add("&Run").Click += this.OnRun;
+        build.Add("&Stop").Click += this.OnStop;
         build.Add(MenuItem.Separator());
         build.Add("&Clean").Click += this.OnClean;
         build.Add(MenuItem.Separator());
@@ -698,6 +835,16 @@ public class Shell : Form
         return "stainless";
     }
 
+    /// One line ending, as the compiler writes them on this platform.
+    String Newline()
+    {
+        #if WINDOWS
+        return "\r\n";
+        #else
+        return "\n";
+        #endif
+    }
+
     String Separator()
     {
         #if WINDOWS
@@ -720,7 +867,9 @@ public class Shell : Form
     }
 
     void OnBuild(MenuItem sender) => Compile(false);
+    void OnBuild(Control sender) => Compile(false);
     void OnRun(MenuItem sender) => Compile(true);
+    void OnRun(Control sender) => Compile(true);
 
     // ------------------------------------------------------------ the project
 
@@ -834,12 +983,11 @@ public class Shell : Form
     /// the thread and one that runs back on it with the answer, which is
     /// exactly this shape.
     ///
-    /// **The output still arrives all at once at the end.** `Process.Run`
-    /// captures both streams and answers when the child exits, so there is
-    /// nothing to stream from. Streaming wants a `Process` that hands back its
-    /// pipes as they fill, and that is a change to `Standard.Process` rather
-    /// than to this. What was actually wrong -- a window that stopped
-    /// repainting -- is fixed; a build that reports as it goes is not yet.
+    /// **And the output arrives as it is written**, which needed the change to
+    /// `Standard.Process` this comment used to ask for: `Open` hands back a
+    /// child whose two streams can be read while it is still writing them,
+    /// where `Run` answers only once it has exited. A build now says what it
+    /// is doing while it does it.
     void Compile(bool thenRun)
     {
         if (_building)
@@ -858,7 +1006,10 @@ public class Shell : Form
         Start(arguments, thenRun ? "Ran." : "Built.");
     }
 
-    void OnClean(MenuItem sender)
+    void OnClean(MenuItem sender) => Clean();
+    void OnClean(Control sender) => Clean();
+
+    void Clean()
     {
         if (_building)
         {
@@ -875,6 +1026,22 @@ public class Shell : Form
         ClearOutput();
         Say("Cleaning...");
 
+        if (CleanObjects())
+            Say("Cleaned.");
+    }
+
+    /// Removes the object directory, and answers whether it may be built into
+    /// again. False means something was refused and has already been said.
+    ///
+    /// Split out of `OnClean` so that Rebuild is a clean and then a build
+    /// rather than a second copy of the guard -- and the guard is the half
+    /// that matters, since what this deletes is a directory tree named by a
+    /// file a person edits.
+    bool CleanObjects()
+    {
+        if (_project == null)
+            return false;
+
         // `stainless` has no clean of its own: what a clean removes is the
         // object directory, and the build stamp inside it is what makes the
         // next build do all the work again. Removed here rather than by asking
@@ -886,18 +1053,67 @@ public class Shell : Form
         {
             Show("refusing to clean '" + rubbish + "', which is outside the project");
             Say("Clean refused.");
-            return;
+            return false;
         }
 
         if (!Directory.Exists(rubbish))
-        {
-            Say("Nothing to clean.");
-            return;
-        }
+            return true;
 
         nuint removed = RemoveTree(rubbish);
         Show("removed " + Standard.Text.FromInteger((long)removed) + " files from " + rubbish);
-        Say("Cleaned.");
+        return true;
+    }
+
+    /// Everything again from nothing: the object directory goes, and then the
+    /// whole program is compiled.
+    ///
+    /// **Not `Clean` followed by `Build` from the menu**, which would clear the
+    /// output pane twice and lose what the clean said.
+    void OnRebuild(MenuItem sender) => Rebuild();
+
+    void OnRebuild(Control sender) => Rebuild();
+
+    void Rebuild()
+    {
+        if (_building)
+        {
+            Say("A build is already running.");
+            return;
+        }
+
+        if (!SaveBeforeBuilding())
+            return;
+
+        ClearOutput();
+
+        if (_project != null && !CleanObjects())
+            return;
+
+        Say("Rebuilding...");
+        Start(BuildArguments(false), "Rebuilt.");
+    }
+
+    /// Stops the build that is running. Nothing to say when none is.
+    ///
+    /// **Killed rather than asked.** `Stop` is polite on Linux and cannot be
+    /// on Windows -- `Process.Stop`'s own comment says so -- and a compiler
+    /// halfway through writing an object file has nothing to tidy that a
+    /// rebuild will not do better. What this leaves behind is a partial object
+    /// directory, which is what Clean is for.
+    void OnStop(MenuItem sender) => Stop();
+    void OnStop(Control sender) => Stop();
+
+    void Stop()
+    {
+        var running = _child;
+        if (running == null)
+        {
+            Say("Nothing is building.");
+            return;
+        }
+
+        ((Running)running).Kill();
+        Say("Stopping...");
     }
 
     /// Whether a path the project named is somewhere this may delete.
@@ -1015,59 +1231,199 @@ public class Shell : Form
     }
 
     /// What the compiler is asked, which is the project when there is one.
+    /// Which configuration the picker is showing.
+    Configuration Chosen()
+    {
+        if (_configuration.SelectedIndex == 1)
+            return Configuration.Release;
+        return Configuration.Debug;
+    }
+
     String[] BuildArguments(bool thenRun)
     {
-        String verb = thenRun ? "run" : "build";
+        var arguments = new List<String>();
+        arguments.Add(thenRun ? "run" : "build");
 
         // JSON, because the alternative is reading a format meant for a person
         // and guessing which part of it was the file name. `BuildMessage` says
         // what that cost.
+        arguments.Add("--diagnostics");
+        arguments.Add("json");
+
+        // **The picker decides, and the project does not.** `stainless.json`
+        // holds one `optimize` and one `debug` and has no notion of a named
+        // configuration, so the only way to offer the choice without rewriting
+        // the file every time it changes is to pass the flags -- which the
+        // compiler takes in preference to the project's own, and which is what
+        // that precedence is for. A project saying `optimize: 3` is still
+        // built at -O0 in Debug, because that is what choosing Debug means.
+        //
+        // `--no-debug` exists because of this line: `-g` could only ever turn
+        // debug information on, so a Release build of a project whose `debug`
+        // is true had no way to say what it meant.
+        if (Chosen() == Configuration.Release)
+        {
+            arguments.Add("--no-debug");
+            arguments.Add("-O2");
+        }
+        else
+        {
+            arguments.Add("-g");
+            arguments.Add("-O0");
+        }
+
         if (_project != null)
-            return [verb, "--diagnostics", "json", "--project", _projectPath];
+        {
+            arguments.Add("--project");
+            arguments.Add(_projectPath);
+            return arguments.ToArray();
+        }
 
         var now = Current;
-        if (now == null)
-            return [verb, "--diagnostics", "json"];
-        return [verb, "--diagnostics", "json", ((CodeEditor)now).Contents.Location];
+        if (now != null)
+            arguments.Add(((CodeEditor)now).Contents.Location);
+        return arguments.ToArray();
     }
 
-    /// Runs the compiler on a thread and reports back on the UI one.
+    void OnConfigurationChanged(Control sender)
+    {
+        Say(Chosen() == Configuration.Release
+            ? "Release: optimised, and nothing for a debugger."
+            : "Debug: unoptimised, and described to a debugger.");
+    }
+
+    /// Enables what can be done now and disables what cannot.
+    ///
+    /// Stop is the one that matters: a Stop that is always pressable is one
+    /// that does nothing most of the time, and a toolbar is the place a person
+    /// looks to find out whether anything is happening.
+    void ShowWhatIsRunning()
+    {
+        _stopButton.Enabled = _building;
+    }
+
+    /// Runs the compiler on a thread and reports back on the UI one, in
+    /// pieces, as they arrive.
     ///
     /// **Everything the worker needs is read before it starts.** The closure
     /// captures two strings and an array, and touches no control: a control
     /// read from another thread is the bug this arrangement exists to avoid,
     /// and `Forms` says so where `Background.Run` is declared.
+    ///
+    /// **A thread of its own rather than `Background.Run`**, which is the only
+    /// reason this is not three lines: that posts one answer when the work is
+    /// done, and the whole point here is that there are many. `Application.Post`
+    /// is what it uses underneath, so this is the same mechanism with the loop
+    /// opened up rather than a second way of doing it.
     void Start(String[] arguments, String success)
     {
         _building = true;
+        ShowWhatIsRunning();
         String compiler = _compiler;
 
-        Background.Run(
-            () => Process.Run(compiler, arguments),
-            finished => Finished(finished, success));
+        var worker = new Thread(() =>
+        {
+            var opened = Open(compiler, arguments);
+            if (opened.Fail)
+            {
+                Application.Post(() => Failed());
+                return;
+            }
+
+            var child = opened.Value;
+
+            // Handed across rather than assigned, so that the field Cancel
+            // reads is only ever written by the thread Cancel runs on.
+            Application.Post(() => Holding(child));
+
+            while (child.Read())
+            {
+                // Taken here and captured by value, so each post carries its
+                // own piece: `Thread`'s doc comment is explicit that a closure
+                // holds a copy of what it named, which is what makes a loop
+                // that posts from inside itself safe.
+                String errors = child.TakeErrors();
+                String output = child.TakeOutput();
+                Application.Post(() => Arrived(errors, output));
+            }
+
+            int code = child.Wait().ValueOr(-1);
+            Application.Post(() => Ended(code, success));
+        });
+        worker.Detach();
     }
 
-    /// Back on the UI thread, with whatever the compiler said.
-    void Finished(Result<Completed, ProcessError> finished, String success)
+    /// The build's child, handed over by the worker that made it.
+    void Holding(Running child)
+    {
+        _child = child;
+        ShowWhatIsRunning();
+    }
+
+    /// The compiler could not be started at all, back on the UI thread.
+    void Failed()
     {
         _building = false;
+        _child = null;
+        ShowWhatIsRunning();
+        Show("could not start '" + _compiler + "' -- is it on the path?");
+        Say("The compiler could not be started.");
+    }
 
-        if (!finished.Ok)
+    /// A piece of each stream, on the UI thread.
+    ///
+    /// The compiler writes diagnostics to the error stream and the program's
+    /// own output to the other, so the two are read differently and shown in
+    /// that order -- which is the order they were written in when the build
+    /// fails, and near enough when it does not.
+    void Arrived(String errors, String output)
+    {
+        _errorTail = ShowComplete(_errorTail + errors, true);
+        _outputTail = ShowComplete(_outputTail + output, false);
+    }
+
+    /// Shows every whole line in `text`, and answers the part after the last
+    /// newline -- which is not a whole line yet, and waits for the rest.
+    String ShowComplete(String text, bool diagnostics)
+    {
+        if (text.ByteLength() == 0u)
+            return "";
+
+        String tidy = text.Replace("\r\n", "\n");
+        long cut = tidy.LastIndexOf("\n");
+        if (cut < 0)
+            return tidy;
+
+        foreach (var line in tidy.Substring(0u, (nuint)cut).Split("\n"))
         {
-            Show("could not start '" + _compiler + "' -- is it on the path?");
-            Say("The compiler could not be started.");
-            return;
+            if (diagnostics)
+                Show(line);
+            else
+                ShowRaw(line);
         }
+        return tidy.Substring((nuint)cut + 1u);
+    }
 
-        var result = finished.Value;
-        // The compiler writes diagnostics to the error stream and the program's
-        // own output to the other, so both are shown, in that order.
-        ShowAll(result.Errors, true);
-        ShowAll(result.Output, false);
+    /// The child has exited and every byte of it has been handed over.
+    void Ended(int code, String success)
+    {
+        _building = false;
+        _child = null;
+        ShowWhatIsRunning();
 
-        Say(result.ExitCode == 0
+        // Whatever came without a newline after it is still a line, and this
+        // is the last chance to say so: a compiler that does not end its
+        // output with one would otherwise have its final diagnostic dropped.
+        if (_errorTail.ByteLength() != 0u)
+            Show(_errorTail);
+        if (_outputTail.ByteLength() != 0u)
+            ShowRaw(_outputTail);
+        _errorTail = "";
+        _outputTail = "";
+
+        Say(code == 0
             ? success
-            : "Failed, with " + Standard.Text.FromInteger(result.ExitCode) + ".");
+            : "Failed, with " + Standard.Text.FromInteger(code) + ".");
         _status.SetPanelText(2, CountErrors());
     }
 
@@ -1122,6 +1478,8 @@ public class Shell : Form
         _errors.Clear();
         _messages.Clear();
         _errorLines.Clear();
+        _errorTail = "";
+        _outputTail = "";
     }
 
     /// One diagnostic as a row, remembering which output line it came from so
@@ -1401,8 +1759,7 @@ public class Shell : Form
     void ShowProjectTree()
     {
         _tree.Clear();
-        _treeNodes.Clear();
-        _treePaths.Clear();
+        _treeItems.Clear();
 
         if (_project == null)
         {
@@ -1421,11 +1778,12 @@ public class Shell : Form
 
             if (Directory.Exists(resolved))
             {
+                Remember(branch, resolved, true);
                 AddFiles(branch, resolved);
             }
             else if (File.Exists(resolved))
             {
-                Remember(branch, resolved);
+                Remember(branch, resolved, false);
             }
             branch.Expand();
         }
@@ -1458,6 +1816,7 @@ public class Shell : Form
             foreach (var inner in folders.Value)
             {
                 var below = branch.Add(NameOf(inner));
+                Remember(below, inner, true);
                 AddFiles(below, inner);
             }
         }
@@ -1469,20 +1828,30 @@ public class Shell : Form
         foreach (var file in files.Value)
         {
             if (file.EndsWith(".sl"))
-                Remember(branch.Add(NameOf(file)), file);
+                Remember(branch.Add(NameOf(file)), file, false);
         }
     }
 
-    /// Ties a node to the file it stands for.
+    /// Ties a node to the file or directory it stands for.
     ///
-    /// Two parallel lists rather than a field on the node, because `TreeNode`
-    /// carries no tag and adding one would put a `String` on every node of
-    /// every tree in `forms/` for the sake of this one. A handful of files is a
-    /// handful of entries, and the search is over in microseconds.
-    void Remember(TreeNode node, String path)
+    /// A list searched rather than a map, for the reason `TreeView.Lookup`
+    /// gives: a tree small enough to be usable is a tree small enough to walk,
+    /// and a handful of files is a search that is over in microseconds.
+    void Remember(TreeNode node, String path, bool folder)
     {
-        _treeNodes.Add(node);
-        _treePaths.Add(path);
+        _treeItems.Add(new TreeEntry(node, path, folder));
+    }
+
+    /// What a node stands for, or null for one that stands for nothing -- the
+    /// project root, the References branch and everything under it.
+    TreeEntry? EntryFor(TreeNode node)
+    {
+        foreach (var entry in _treeItems)
+        {
+            if (entry.Node == node)
+                return entry;
+        }
+        return null;
     }
 
     /// A node was double-clicked. A file opens; anything else does nothing.
@@ -1492,16 +1861,370 @@ public class Shell : Form
         if (chosen == null)
             return;
 
-        var node = (TreeNode)chosen;
-        for (nuint i = 0u; i < _treeNodes.Count; i++)
+        var entry = EntryFor((TreeNode)chosen);
+        if (entry == null || ((TreeEntry)entry).IsFolder)
+            return;
+
+        OpenEntry((TreeEntry)entry);
+    }
+
+    /// Opens what a node stands for.
+    ///
+    /// **Not named `Open`**, though that is what it does: `Standard.Process`
+    /// now has a module-level `Open`, and CLAUDE.md records what happens to a
+    /// method that shares a name with one of those -- it resolves to the free
+    /// function inside a lambda body and to the method everywhere else, which
+    /// is a bug that shows up in exactly one place and looks like nothing.
+    void OpenEntry(TreeEntry entry)
+    {
+        if (!OpenFile(entry.FullPath))
+            Say("Could not read " + entry.FullPath);
+    }
+
+    // ------------------------------------------ the Solution Explorer's menu
+
+    /// A right-click in the tree.
+    ///
+    /// **The node under the pointer, not the selected one.** Neither platform
+    /// moves the selection on a right-click, so a menu built from
+    /// `SelectedNode` would act on whatever was selected beforehand -- a
+    /// Delete that removes a file nobody pointed at. `TreeView.NodeAt` answers
+    /// what was actually clicked, and the selection is moved to follow it, so
+    /// that what the menu is about is also what is highlighted while it is up.
+    void OnTreeMouse(Control sender, MouseEventArgs args)
+    {
+        if (args.Button != MouseButton.Right)
+            return;
+
+        TreeEntry? target = null;
+        var hit = _tree.NodeAt(args.Location);
+        if (hit != null)
         {
-            if (_treeNodes[i] == node)
-            {
-                if (!OpenFile(_treePaths[i]))
-                    Say("Could not read " + _treePaths[i]);
-                return;
-            }
+            _tree.SelectedNode = hit;
+            target = EntryFor((TreeNode)hit);
         }
+
+        ShowTreeMenu(target, args.Location);
+    }
+
+    /// The context menu, built afresh every time it is shown.
+    ///
+    /// Building it each time is what `PopupMenu` is for -- its own doc comment
+    /// says the point is items decided by what is selected *now* rather than
+    /// kept in step from everywhere the selection can change.
+    ///
+    /// **There is no "remove from project", and that is not an omission.** A
+    /// Stainless project names directories and the compiler compiles what is
+    /// in them, which is why `ShowProjectTree` walks the disk rather than a
+    /// manifest: a file is in the build because it is in the directory, and
+    /// there is no list to take it out of. So the only honest way out of a
+    /// build is to move the file or delete it, the item says Delete, and it
+    /// asks first.
+    void ShowTreeMenu(TreeEntry? target, Point at)
+    {
+        _menuTarget = target;
+
+        bool isFile = target != null && !((TreeEntry)target).IsFolder;
+        String folder = FolderFor(target);
+
+        var menu = new PopupMenu();
+
+        if (isFile)
+        {
+            menu.Add("&Open").Click += this.OnTreeOpen;
+            menu.Add(MenuItem.Separator());
+        }
+
+        var added = menu.Add("Add &new file...");
+        added.Enabled = folder.ByteLength() != 0u;
+        added.Click += this.OnTreeAddFile;
+
+        var renamed = menu.Add("&Rename...");
+        renamed.Enabled = isFile;
+        renamed.Click += this.OnTreeRename;
+
+        var removed = menu.Add("&Delete");
+        removed.Enabled = isFile;
+        removed.Click += this.OnTreeDelete;
+
+        menu.Add(MenuItem.Separator());
+
+        var shown = menu.Add(RevealVerb());
+        shown.Enabled = target != null;
+        shown.Click += this.OnTreeReveal;
+
+        menu.Add("Re&fresh").Click += this.OnTreeRefresh;
+
+        // **Both backends raise the chosen item before this returns** -- Win32
+        // through `TPM_RETURNCMD`, GTK through a nested main loop -- so the
+        // target is still here when a handler asks for it, and clearing it on
+        // the next line cannot come too early.
+        menu.Show(_tree, at);
+        _menuTarget = null;
+    }
+
+    /// The directory a new file would go in: the one that was clicked, or the
+    /// one holding the file that was. Empty when neither, which is what
+    /// disables the item rather than offering somewhere arbitrary.
+    String FolderFor(TreeEntry? target)
+    {
+        if (target == null)
+            return "";
+
+        var entry = (TreeEntry)target;
+        if (entry.IsFolder)
+            return entry.FullPath;
+        return Path.DirectoryName(entry.FullPath);
+    }
+
+    /// What the "show me this on disk" item says.
+    ///
+    /// The file manager's own name on each platform rather than one generic
+    /// phrase, because people look for the word they already know.
+    String RevealVerb()
+    {
+        #if WINDOWS
+        return "Reveal in &Explorer";
+        #else
+        return "Open containing &folder";
+        #endif
+    }
+
+    void OnTreeOpen(MenuItem sender)
+    {
+        var target = _menuTarget;
+        if (target != null && !((TreeEntry)target).IsFolder)
+            OpenEntry((TreeEntry)target);
+    }
+
+    void OnTreeRefresh(MenuItem sender)
+    {
+        ShowProjectTree();
+        Say("Solution Explorer refreshed.");
+    }
+
+    void OnTreeAddFile(MenuItem sender)
+    {
+        String folder = FolderFor(_menuTarget);
+        if (folder.ByteLength() == 0u)
+            return;
+
+        var asked = InputDialog.Ask("Add file", "Name of the new file:", "");
+        if (asked is Some given)
+            AddFileNamed(folder, given.Value);
+    }
+
+    /// Makes the file, seeds it, and opens it.
+    ///
+    /// **The extension is added when it is missing**, because `.sl` is the only
+    /// thing the compiler reads out of a source directory and a file without it
+    /// would sit there being ignored.
+    void AddFileNamed(String folder, String typed)
+    {
+        String name = typed.Trim();
+        if (name.ByteLength() == 0u)
+            return;
+        if (!name.EndsWith(".sl"))
+            name = name + ".sl";
+
+        String path = Path.Join(folder, name);
+        if (File.Exists(path))
+        {
+            Application.Complain(name + " is already there.", "Add file");
+            return;
+        }
+
+        String seed = "";
+        String named = ModuleOf(folder);
+        if (named.ByteLength() != 0u)
+            seed = "module " + named + ";\n\n";
+
+        if (File.WriteAllText(path, seed) != IOError.None)
+        {
+            Application.Complain("Could not create " + path + ".", "Add file");
+            return;
+        }
+
+        ShowProjectTree();
+        OpenFile(path);
+        Say("Added " + path);
+    }
+
+    /// The module the `.sl` files in a directory declare, or `""` when they
+    /// declare none or disagree.
+    ///
+    /// **A new file is seeded with its neighbours' module**, because a
+    /// directory here is a module -- every file in `ide/src/App` says
+    /// `module Ide.App;` -- and a new one that said nothing would fail to
+    /// compile for a reason that has nothing to do with what was being
+    /// written.
+    ///
+    /// The first declaration wins and the rest are checked against it. A
+    /// directory whose files are split across modules is one where there is no
+    /// right answer, and seeding with either would be a guess wearing the
+    /// clothes of a fact -- so it seeds with nothing, and the empty file says
+    /// so plainly.
+    String ModuleOf(String folder)
+    {
+        var files = Directory.Files(folder);
+        if (!files.Ok)
+            return "";
+
+        String found = "";
+        foreach (var file in files.Value)
+        {
+            if (!file.EndsWith(".sl"))
+                continue;
+
+            String named = ModuleIn(file);
+            if (named.ByteLength() == 0u)
+                continue;
+            if (found.ByteLength() == 0u)
+            {
+                found = named;
+                continue;
+            }
+            if (found != named)
+                return "";
+        }
+        return found;
+    }
+
+    /// The module one file declares, or `""`.
+    ///
+    /// The first line beginning with `module` wins, which is what the language
+    /// requires anyway: a file has one module declaration, and it comes before
+    /// everything but the licence comment.
+    String ModuleIn(String path)
+    {
+        var lines = File.ReadAllLines(path);
+        if (!lines.Ok)
+            return "";
+
+        foreach (var line in lines.Value)
+        {
+            String text = line.Trim();
+            if (!text.StartsWith("module "))
+                continue;
+            return text.After("module ").Before(";").Trim();
+        }
+        return "";
+    }
+
+    void OnTreeRename(MenuItem sender)
+    {
+        var target = _menuTarget;
+        if (target == null)
+            return;
+
+        var entry = (TreeEntry)target;
+        if (entry.IsFolder)
+            return;
+
+        var asked = InputDialog.Ask("Rename", "New name:", NameOf(entry.FullPath));
+        if (asked is Some given)
+            RenameTo(entry, given.Value);
+    }
+
+    void RenameTo(TreeEntry entry, String typed)
+    {
+        String name = typed.Trim();
+        if (name.ByteLength() == 0u || name == NameOf(entry.FullPath))
+            return;
+
+        String path = Path.Join(Path.DirectoryName(entry.FullPath), name);
+        if (File.Exists(path))
+        {
+            Application.Complain(name + " is already there.", "Rename");
+            return;
+        }
+
+        if (File.Rename(entry.FullPath, path) != IOError.None)
+        {
+            Application.Complain("Could not rename " + entry.FullPath + ".", "Rename");
+            return;
+        }
+
+        // **A tab showing the file has to be told**, or it keeps the old path
+        // and the next save writes the file back into existence under the name
+        // it was just moved off.
+        var open = TabFor(entry.FullPath);
+        if (open != null)
+        {
+            var tab = (EditorTab)open;
+            tab.Editor.Contents.Location = path;
+            Relabel(tab);
+            Retitle();
+        }
+
+        ShowProjectTree();
+        Say("Renamed to " + name);
+    }
+
+    void OnTreeDelete(MenuItem sender)
+    {
+        var target = _menuTarget;
+        if (target == null)
+            return;
+
+        var entry = (TreeEntry)target;
+        if (entry.IsFolder)
+            return;
+
+        if (!Application.Ask("Delete " + NameOf(entry.FullPath) + "?\n\n"
+                             + entry.FullPath + "\n\nThis cannot be undone.",
+                             "Delete file"))
+            return;
+
+        if (File.Delete(entry.FullPath) != IOError.None)
+        {
+            Application.Complain("Could not delete " + entry.FullPath + ".",
+                                 "Delete file");
+            return;
+        }
+
+        // A tab showing a file that is no longer there is a tab that would
+        // write it back on the next save, so it goes with the file.
+        var open = TabFor(entry.FullPath);
+        if (open != null)
+            CloseTab((EditorTab)open);
+
+        ShowProjectTree();
+        Say("Deleted " + entry.FullPath);
+    }
+
+    void OnTreeReveal(MenuItem sender)
+    {
+        var target = _menuTarget;
+        if (target != null)
+            Reveal((TreeEntry)target);
+    }
+
+    /// Shows a file on disk, in whatever the platform's file manager is.
+    ///
+    /// **On a background thread**, for the same reason the build is: `Run` does
+    /// not answer until the child has exited, and a file manager that takes a
+    /// moment to come up would take this window with it. Nothing is done with
+    /// the answer -- there is nothing useful to say about a file manager that
+    /// declined to open, and the file is still right there in the tree.
+    void Reveal(TreeEntry entry)
+    {
+        #if WINDOWS
+        // `/select,<path>` is **one** argument, comma and all: Explorer parses
+        // the switch itself rather than taking the path as a second token.
+        String program = "explorer.exe";
+        String[] arguments = ["/select," + entry.FullPath];
+        if (entry.IsFolder)
+            arguments = [entry.FullPath];
+        #else
+        String program = "xdg-open";
+        String folder = entry.IsFolder ? entry.FullPath
+                                       : Path.DirectoryName(entry.FullPath);
+        String[] arguments = [folder];
+        #endif
+
+        Background.Run(() => Process.Run(program, arguments), finished => { });
+        Say("Showing " + entry.FullPath);
     }
 
     /// A row of the Error List was double-clicked, which goes to exactly where
@@ -2107,6 +2830,57 @@ public class Shell : Form
             }
         }
 
+        // Build output arriving in pieces, which is what a pump hands over.
+        //
+        // **The line is the unit and the chunk is not.** A pump answers with
+        // however many bytes the child had written, so a diagnostic routinely
+        // arrives in two halves -- and an Error List holding half a JSON
+        // object is exactly the failure the reassembly exists to prevent.
+        //
+        // Checked here rather than by building something: the seam is a string
+        // in and a string out, so it wants no compiler, no child process and
+        // no timing to exercise, which is the difference between a test that
+        // means something and one that passes on a fast machine.
+        {
+            ClearOutput();
+
+            // A chunk that stops mid-line shows the whole lines and keeps the
+            // rest. Nothing of "second ha" may reach the pane.
+            String left = ShowComplete("first line" + Newline() + "second ha", false);
+            if (left != "second ha" || _output.Count != 1u
+                || _output.ItemAt(0u) != "first line")
+            {
+                Console.WriteLine("FAIL: a split line was not held back: left='"
+                                  + left + "' shown="
+                                  + Standard.Text.FromInteger((long)_output.Count));
+                ok = false;
+            }
+
+            // And the rest of it completes the line rather than starting one.
+            left = ShowComplete(left + "lf" + Newline(), false);
+            if (left != "" || _output.Count != 2u
+                || _output.ItemAt(1u) != "second half")
+            {
+                Console.WriteLine("FAIL: a line split across two chunks came back as '"
+                                  + (_output.Count > 1u ? _output.ItemAt(1u) : "")
+                                  + "' with '" + left + "' left over");
+                ok = false;
+            }
+
+            // Windows line endings are the compiler's on this platform, and
+            // must not arrive as a stray carriage return on the end of a line.
+            ClearOutput();
+            ShowComplete("carried\r\n", false);
+            if (_output.Count != 1u || _output.ItemAt(0u) != "carried")
+            {
+                Console.WriteLine("FAIL: a CRLF line came back as '"
+                                  + (_output.Count == 0u ? "" : _output.ItemAt(0u)) + "'");
+                ok = false;
+            }
+
+            ClearOutput();
+        }
+
         // The project, which is what makes Build mean the program rather than
         // the file. Opening a file inside the fixture should find it without
         // anyone asking -- which is the behaviour, not just the reader.
@@ -2117,6 +2891,76 @@ public class Shell : Form
             {
                 Console.WriteLine("FAIL: opening a file did not find the project above it,"
                                   + " and answered '" + ProjectName() + "'");
+                ok = false;
+            }
+
+            // The Solution Explorer's model, which is what the context menu
+            // acts on.
+            //
+            // **Not that a menu appeared.** There is no pointer here, so what
+            // a self test can honestly say is that every node the menu can be
+            // opened on knows what it stands for, that a directory is told
+            // from a file, and that a node standing for nothing offers
+            // nothing -- which is the half that decides whether Delete removes
+            // the right file.
+            nuint folders = 0u;
+            nuint files = 0u;
+            foreach (var entry in _treeItems)
+            {
+                if (entry.IsFolder)
+                    folders++;
+                else
+                    files++;
+            }
+
+            if (files != 2u)
+            {
+                Console.WriteLine("FAIL: the tree holds "
+                                  + Standard.Text.FromInteger((long)files)
+                                  + " files, not the fixture's two");
+                ok = false;
+            }
+            if (folders == 0u)
+            {
+                Console.WriteLine("FAIL: the tree told no directory from a file");
+                ok = false;
+            }
+
+            foreach (var entry in _treeItems)
+            {
+                if (EntryFor(entry.Node) != entry)
+                {
+                    Console.WriteLine("FAIL: a tree node did not answer with its own"
+                                      + " entry: " + entry.FullPath);
+                    ok = false;
+                }
+
+                // A new file goes beside a file, and inside a directory.
+                String wanted = entry.IsFolder
+                              ? entry.FullPath
+                              : Path.DirectoryName(entry.FullPath);
+                if (FolderFor(entry) != wanted)
+                {
+                    Console.WriteLine("FAIL: a new file beside " + entry.FullPath
+                                      + " would go to '" + FolderFor(entry) + "'");
+                    ok = false;
+                }
+            }
+
+            if (FolderFor(null).ByteLength() != 0u)
+            {
+                Console.WriteLine("FAIL: a new file was offered a home with nothing"
+                                  + " clicked on");
+                ok = false;
+            }
+
+            // The module a new file would be seeded with. Both of the
+            // fixture's files declare `Fixture`, so a third belongs in it too.
+            String seeded = ModuleOf("ide/tests/fixture/src");
+            if (seeded != "Fixture")
+            {
+                Console.WriteLine("FAIL: a new file would be seeded with module '"
+                                  + seeded + "'");
                 ok = false;
             }
 
@@ -2136,6 +2980,41 @@ public class Shell : Form
             if (!Names(arguments, "--diagnostics") || !Names(arguments, "json"))
             {
                 Console.WriteLine("FAIL: a build did not ask for diagnostics it can read");
+                ok = false;
+            }
+
+            // The configuration picker, which is the only thing that decides
+            // what a build is optimised for -- a project's own `optimize` and
+            // `debug` are overridden rather than consulted, so what the picker
+            // says has to reach the command line or it says nothing at all.
+            if (!Names(arguments, "-g") || !Names(arguments, "-O0")
+                || Names(arguments, "--no-debug"))
+            {
+                Console.WriteLine("FAIL: a Debug build did not ask to be debuggable");
+                ok = false;
+            }
+
+            _configuration.SelectedIndex = 1;
+            if (Chosen() != Configuration.Release)
+            {
+                Console.WriteLine("FAIL: the picker did not move to Release");
+                ok = false;
+            }
+
+            var shipping = BuildArguments(false);
+            if (!Names(shipping, "--no-debug") || !Names(shipping, "-O2")
+                || Names(shipping, "-g") || Names(shipping, "-O0"))
+            {
+                Console.WriteLine("FAIL: a Release build asked to be debuggable");
+                ok = false;
+            }
+            _configuration.SelectedIndex = 0;
+
+            // Stop is pressable only while something is running, which is the
+            // whole of what the toolbar claims to know.
+            if (_stopButton.Enabled)
+            {
+                Console.WriteLine("FAIL: Stop was offered with nothing building");
                 ok = false;
             }
             foreach (var argument in arguments)

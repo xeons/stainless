@@ -112,6 +112,80 @@ public int Main()
         Console.WriteLine($"stopped  {child.Wait().Ok}");
     }
 
+    // ------------------------------------------------ read as it is written
+
+    // The same program, read while it runs rather than after it. `Run` cannot
+    // say anything until the child has exited; this hands over each piece as
+    // it arrives, which is what a window showing a build as it happens needs.
+    var opened = Open(Shell(), [Flag(), "echo streamed"]);
+    if (opened.Ok)
+    {
+        var child = opened.Value;
+        var text = new StringBuilder();
+
+        while (child.Read())
+        {
+            text.Append(child.TakeOutput());
+            text.Append(child.TakeErrors());
+        }
+        Console.WriteLine($"stream   [{text.ToText().Trim()}] code={child.Wait().ValueOr(-1)}");
+    }
+
+    // The two streams stay apart here too, which they would not if a caller
+    // could only be handed one buffer.
+#if UNIX
+    var apart = Open(Shell(), [Flag(), "echo out; echo err 1>&2"]);
+#else
+    var apart = Open(Shell(), [Flag(), "echo out& echo err 1>&2"]);
+#endif
+    if (apart.Ok)
+    {
+        var child = apart.Value;
+        var outText = new StringBuilder();
+        var errText = new StringBuilder();
+
+        while (child.Read())
+        {
+            outText.Append(child.TakeOutput());
+            errText.Append(child.TakeErrors());
+        }
+        Console.WriteLine($"apart    out=[{outText.ToText().Trim()}] err=[{errText.ToText().Trim()}]");
+    }
+
+    // **More than a pipe holds, and in pieces.** A pump answers as soon as it
+    // has anything, and reads at most a buffer from each stream before it
+    // does, so 200KB cannot arrive in one call -- which is what tells
+    // streaming apart from a `Run` wearing a loop, without depending on how
+    // fast anything runs.
+    //
+    // It is also the deadlock case from the other side: the child fills the
+    // pipe and stops, and only a reader that keeps reading lets it finish.
+#if UNIX
+    var flood = Open(Shell(), [Flag(), "head -c 200000 /dev/zero"]);
+#else
+    var flood = Open(Shell(), [Flag(), "for /L %i in (1,1,4000) do @echo tttttttttttttttttttttttttttttttttttttttttttttttttt"]);
+#endif
+    if (flood.Ok)
+    {
+        var child = flood.Value;
+        nuint total = 0u;
+        nuint pieces = 0u;
+
+        while (child.Read())
+        {
+            total = total + child.TakeOutput().ByteLength();
+            child.TakeErrors();
+            pieces++;
+        }
+        Console.WriteLine($"pieces   past a pipe: {total > 100000u} in pieces: {pieces > 1u}");
+    }
+
+    // A program that was never there is an error rather than an outcome, the
+    // same way it is for `Run` -- 1 is ProcessError.NotFound.
+    var nothing = Open("/no/such/program-that-exists", []);
+    if (nothing.Fail)
+        Console.WriteLine($"noopen   refused=true why={(int)nothing.Error}");
+
     // Interrupts are noticed rather than delivered, so this asks.
     Console.WriteLine($"signals  watching={Signals.Watch()} seen={Signals.Interrupted}");
     return 0;

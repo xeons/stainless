@@ -382,6 +382,18 @@ public struct NotifyTreeView
     public Point At;
 }
 
+/// `TVHITTESTINFO`: a point going in, and what was under it coming out.
+///
+/// The point is in the tree's own client coordinates, which is what every
+/// mouse message already carries -- so a right-click handler passes what it
+/// was given and nothing has to be converted.
+public struct TreeHitTest
+{
+    public Point At;
+    public uint Flags;
+    public HTREEITEM Item;
+}
+
 public const uint TvmInsertItemW  = 0x1132u;
 public const uint TvmDeleteItem   = 0x1101u;
 public const uint TvmExpand       = 0x1102u;
@@ -392,6 +404,7 @@ public const uint TvmSelectItem   = 0x110Bu;
 public const uint TvmGetCount     = 0x1105u;
 public const uint TvmSetImageList = 0x1109u;
 public const uint TvmEnsureVisible = 0x1114u;
+public const uint TvmHitTest      = 0x1111u;
 
 public const uint TvifText          = 0x0001u;
 public const uint TvifImage         = 0x0002u;
@@ -407,6 +420,23 @@ public const uint TvgnPrevious   = 0x0002u;
 public const uint TvgnParent     = 0x0003u;
 public const uint TvgnChild      = 0x0004u;
 public const uint TvgnCaret      = 0x0009u;
+
+/// Where a hit landed. `TvhtOnItem` is the three that mean "on the row's own
+/// content" -- the picture, the text, or the state picture beside them.
+///
+/// The ones left out matter as much as the ones in: a hit on the expand button
+/// or in the indent to the left of it is *not* on the item, and neither is one
+/// past the right-hand end of the label. Explorer shows no context menu for
+/// any of those, and a tree that did would be acting on a row the pointer was
+/// merely level with.
+public const uint TvhtNowhere        = 0x0001u;
+public const uint TvhtOnItemIcon     = 0x0002u;
+public const uint TvhtOnItemLabel    = 0x0004u;
+public const uint TvhtOnItemIndent   = 0x0008u;
+public const uint TvhtOnItemButton   = 0x0010u;
+public const uint TvhtOnItemRight    = 0x0020u;
+public const uint TvhtOnItemStateIcon = 0x0040u;
+public const uint TvhtOnItem = 0x0046u;   // icon | label | state icon
 
 public const uint TveCollapse = 0x0001u;
 public const uint TveExpand   = 0x0002u;

@@ -608,6 +608,26 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         return new TreeNodeHandle((HTREEITEM)(void*)(nuint)chosen);
     }
 
+    public ITreeNodeHandle? NodeAt(Forms.Drawing.Point at)
+    {
+        TreeHitTest probe;
+        probe.At.X = at.X;
+        probe.At.Y = at.Y;
+        probe.Flags = 0u;
+        probe.Item = null;
+
+        // The item comes back in the structure rather than in the return
+        // value, and it is filled even for a hit on the expand button or the
+        // indent -- so the flags decide, not whether `Item` is set.
+        SendMessageW(window, TvmHitTest, 0u, (long)(nuint)&probe);
+
+        if ((probe.Flags & TvhtOnItem) == 0u)
+            return null;
+        if (probe.Item == null)
+            return null;
+        return new TreeNodeHandle(probe.Item);
+    }
+
     public void Clear()
     {
         SendMessageW(window, TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());

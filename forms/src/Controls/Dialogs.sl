@@ -313,3 +313,113 @@ public class Timer : ITimerNotify
 /// What a timer's handler is given. Not `EventHandler`, because a timer is not
 /// a `Control`.
 public closure void TimerHandler(Timer sender);
+
+// ============================================================= asking for text
+
+/// A one-line question: a prompt, a box, OK and Cancel.
+///
+/// **The one dialog in this file the platform does not supply**, which is why
+/// it is a `Form` made of three controls rather than a seam method with two
+/// backends. Windows has no input box in its API at all -- `InputBox` is
+/// Visual Basic's runtime, not `user32` -- and GTK's is a `GtkDialog` the
+/// program assembles itself. A widget set asked to implement this would be
+/// implementing exactly what is written here, twice.
+///
+/// It answers an `Optional<String>` for the reason the file dialogs answer a
+/// `Result`: Cancel is *no answer*, and a caller that forgets to check should
+/// find nothing to read rather than a stale string left over from last time.
+///
+/// ```
+/// var name = InputDialog.Ask("Rename", "New name:", "old.sl");
+/// if (name is Some given)
+///     Rename(given.Value);
+/// ```
+public class InputDialog : Form
+{
+    Label _prompt;
+    TextBox _entry;
+    Button _ok;
+    Button _cancel;
+
+    /// What was typed, taken **inside** the OK handler.
+    ///
+    /// A `TextBox`'s text lives in the native control and goes with the
+    /// window, so reading it after `ShowModal` returns answers the empty
+    /// string. That is not a subtlety to be careful of; it is a bug that has
+    /// already been written once in this tree, and it wrote an empty project
+    /// file over a good one.
+    String _answer;
+    bool _accepted;
+
+    /// Made by `Ask` alone: a dialog whose answer is read through a field
+    /// should not be one a caller can hold and read at the wrong moment.
+    InputDialog(String caption, String question, String initial)
+    {
+        base(WindowBorder.Fixed);
+        Title = caption;
+        SetBounds(0, 0, 380, 148);
+        _answer = "";
+        _accepted = false;
+
+        _prompt = new Label(this);
+        _prompt.Text = question;
+        _prompt.SetBounds(12, 14, 352, 20);
+
+        _entry = new TextBox(this, false);
+        _entry.Text = initial;
+        _entry.SetBounds(12, 38, 352, 24);
+        _entry.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        _entry.KeyDown += this.OnKey;
+
+        _ok = new Button(this);
+        _ok.Text = "OK";
+        _ok.SetBounds(182, 78, 88, 28);
+        _ok.Anchors = AnchorStyles.Top | AnchorStyles.Right;
+        _ok.Click += this.OnOk;
+
+        _cancel = new Button(this);
+        _cancel.Text = "Cancel";
+        _cancel.SetBounds(276, 78, 88, 28);
+        _cancel.Anchors = AnchorStyles.Top | AnchorStyles.Right;
+        _cancel.Click += this.OnCancel;
+    }
+
+    /// Enter accepts, because a one-line box is a form someone types into and
+    /// presses Enter on. There is no default-button mechanism to hang this on:
+    /// `IsDialogMessageW` gives a modal window Tab between its controls, but a
+    /// default button needs a real dialog box with a `DEFPUSHBUTTON`, which
+    /// these are not. Escape is handled by the modal loop already.
+    void OnKey(Control sender, KeyEventArgs args)
+    {
+        if (args.Key == Key.Enter)
+            OnOk(sender);
+    }
+
+    void OnOk(Control sender)
+    {
+        _answer = _entry.Text;
+        _accepted = true;
+        Close();
+    }
+
+    void OnCancel(Control sender)
+    {
+        _accepted = false;
+        Close();
+    }
+
+    /// Asks, and answers what was typed -- or nothing, if it was not.
+    ///
+    /// `initial` is what the box starts with, which is the old name for a
+    /// rename and the empty string for a new one.
+    public static Optional<String> Ask(String caption, String question, String initial)
+    {
+        var dialog = new InputDialog(caption, question, initial);
+        dialog.ShowModal();
+
+        if (!dialog._accepted)
+            return None;
+        return Some(dialog._answer);
+    }
+}
+

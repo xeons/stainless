@@ -34,6 +34,7 @@ stainless restore              resolve dependencies and lock them
                          binaries meet, static everywhere else
   -O<0-3>                optimization level (default -O2)
   -g, --debug            describe the program to a debugger
+  --no-debug             do not, whatever the project file says
   -D, --define <name>    define a symbol for '#if' to test
   -l, --library <name>   link a library the linker finds by name
                          (a source file can name one itself, with

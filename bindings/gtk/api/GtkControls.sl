@@ -213,6 +213,21 @@ public extern "C"
 
     /// **Borrowed.**
     gpointer gtk_tree_view_get_selection(GtkWidget* view);
+
+    /// Which row is at a point, as a path the caller must free.
+    ///
+    /// **The point is in bin-window coordinates**, which is what a button
+    /// event on the tree already carries: the press lands on the scrolled
+    /// bin window rather than on the widget, so `event->x` and `event->y` are
+    /// in the space this wants. Converting them first is the mistake, not
+    /// skipping the conversion.
+    ///
+    /// Every out parameter may be null, and `column`, `cellX` and `cellY` are
+    /// passed so here because a hit test for a context menu wants the row and
+    /// nothing else.
+    gboolean gtk_tree_view_get_path_at_pos(GtkWidget* view, gint x, gint y,
+                                           gpointer* path, gpointer* column,
+                                           gint* cellX, gint* cellY);
 }
 
 /// `GtkTreeViewGridLines`.

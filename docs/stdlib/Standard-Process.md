@@ -20,9 +20,9 @@ child that writes more than that.
 
 ## Contents
 
-**Types** &nbsp; [Completed](#completed-struct) &middot; [Process](#process-class) &middot; [ProcessError](#processerror-enum) &middot; [Signals](#signals-class)
+**Types** &nbsp; [Completed](#completed-struct) &middot; [Process](#process-class) &middot; [ProcessError](#processerror-enum) &middot; [Running](#running-class) &middot; [Signals](#signals-class)
 
-**Functions** &nbsp; [Run](#run-function) &middot; [Run](#run-function)
+**Functions** &nbsp; [Open](#open-function) &middot; [Open](#open-function) &middot; [Run](#run-function) &middot; [Run](#run-function)
 
 ## Types
 
@@ -34,7 +34,7 @@ struct Completed
 
 What a finished program left behind.
 
-<sub>[stdlib/Process.sl:86](../../stdlib/Process.sl#L86)</sub>
+<sub>[stdlib/Process.sl:89](../../stdlib/Process.sl#L89)</sub>
 
 #### ExitCode *field*
 
@@ -45,7 +45,7 @@ int ExitCode
 Zero by convention means success; 128 + N means a signal killed it,
 which is what a shell reports too.
 
-<sub>[stdlib/Process.sl:90](../../stdlib/Process.sl#L90)</sub>
+<sub>[stdlib/Process.sl:93](../../stdlib/Process.sl#L93)</sub>
 
 #### Output *field*
 
@@ -55,7 +55,7 @@ String Output
 
 Everything it wrote to its output, as one String.
 
-<sub>[stdlib/Process.sl:93](../../stdlib/Process.sl#L93)</sub>
+<sub>[stdlib/Process.sl:96](../../stdlib/Process.sl#L96)</sub>
 
 #### Errors *field*
 
@@ -66,7 +66,7 @@ String Errors
 And to its error stream, kept separate so that a program which prints
 progress there does not corrupt what was being captured.
 
-<sub>[stdlib/Process.sl:97](../../stdlib/Process.sl#L97)</sub>
+<sub>[stdlib/Process.sl:100](../../stdlib/Process.sl#L100)</sub>
 
 #### Ok *method*
 
@@ -76,7 +76,7 @@ bool Ok()
 
 The usual question, spelled once.
 
-<sub>[stdlib/Process.sl:100](../../stdlib/Process.sl#L100)</sub>
+<sub>[stdlib/Process.sl:103](../../stdlib/Process.sl#L103)</sub>
 
 ### Process *class*
 
@@ -89,7 +89,7 @@ A program that was started and has not been waited for.
 Its streams are this process's own, so what it prints goes where this
 program's output goes. `Run` is the one that captures.
 
-<sub>[stdlib/Process.sl:189](../../stdlib/Process.sl#L189)</sub>
+<sub>[stdlib/Process.sl:192](../../stdlib/Process.sl#L192)</sub>
 
 #### Id *property*
 
@@ -99,7 +99,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:203](../../stdlib/Process.sl#L203)</sub>
+<sub>[stdlib/Process.sl:206](../../stdlib/Process.sl#L206)</sub>
 
 #### Wait *method*
 
@@ -111,7 +111,7 @@ Waits for it to finish, and answers with the code it left.
 
 Asking twice is harmless and answers the same both times.
 
-<sub>[stdlib/Process.sl:208](../../stdlib/Process.sl#L208)</sub>
+<sub>[stdlib/Process.sl:211](../../stdlib/Process.sl#L211)</sub>
 
 #### Finished *property*
 
@@ -123,7 +123,7 @@ The code it left, if it has finished, without waiting for it.
 
     while (child.Finished.IsEmpty) { DoSomethingElse(); }
 
-<sub>[stdlib/Process.sl:219](../../stdlib/Process.sl#L219)</sub>
+<sub>[stdlib/Process.sl:222](../../stdlib/Process.sl#L222)</sub>
 
 #### Stop *method*
 
@@ -133,7 +133,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:231](../../stdlib/Process.sl#L231)</sub>
+<sub>[stdlib/Process.sl:234](../../stdlib/Process.sl#L234)</sub>
 
 #### Kill *method*
 
@@ -143,7 +143,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:234](../../stdlib/Process.sl#L234)</sub>
+<sub>[stdlib/Process.sl:237](../../stdlib/Process.sl#L237)</sub>
 
 #### Start *method*
 
@@ -153,7 +153,7 @@ static Result<Process, ProcessError> Start(String program, String[] arguments)
 
 Starts a program without waiting for it.
 
-<sub>[stdlib/Process.sl:237](../../stdlib/Process.sl#L237)</sub>
+<sub>[stdlib/Process.sl:240](../../stdlib/Process.sl#L240)</sub>
 
 ### ProcessError *enum*
 
@@ -167,7 +167,7 @@ Only about *starting* it. A program that ran and failed is a `Completed`
 with a non-zero `ExitCode`, which is an outcome rather than an error --
 `grep` answering 1 for "no match" is the ordinary case, not a fault.
 
-<sub>[stdlib/Process.sl:67](../../stdlib/Process.sl#L67)</sub>
+<sub>[stdlib/Process.sl:70](../../stdlib/Process.sl#L70)</sub>
 
 #### None *case*
 
@@ -177,7 +177,7 @@ None
 
 It started.
 
-<sub>[stdlib/Process.sl:70](../../stdlib/Process.sl#L70)</sub>
+<sub>[stdlib/Process.sl:73](../../stdlib/Process.sl#L73)</sub>
 
 #### NotFound *case*
 
@@ -187,7 +187,7 @@ NotFound
 
 No such program, on the PATH or at the path given.
 
-<sub>[stdlib/Process.sl:73](../../stdlib/Process.sl#L73)</sub>
+<sub>[stdlib/Process.sl:76](../../stdlib/Process.sl#L76)</sub>
 
 #### Denied *case*
 
@@ -197,7 +197,7 @@ Denied
 
 It exists and this process may not run it.
 
-<sub>[stdlib/Process.sl:76](../../stdlib/Process.sl#L76)</sub>
+<sub>[stdlib/Process.sl:79](../../stdlib/Process.sl#L79)</sub>
 
 #### NoResource *case*
 
@@ -207,7 +207,7 @@ NoResource
 
 Out of processes, descriptors or memory.
 
-<sub>[stdlib/Process.sl:79](../../stdlib/Process.sl#L79)</sub>
+<sub>[stdlib/Process.sl:82](../../stdlib/Process.sl#L82)</sub>
 
 #### Failed *case*
 
@@ -217,7 +217,131 @@ Failed
 
 It did not start, for a reason none of the above names.
 
-<sub>[stdlib/Process.sl:82](../../stdlib/Process.sl#L82)</sub>
+<sub>[stdlib/Process.sl:85](../../stdlib/Process.sl#L85)</sub>
+
+### Running *class*
+
+```
+class Running
+```
+
+A program running with both its output streams captured, read as they fill.
+
+**What `Run` cannot do.** `Run` does not answer until the child has exited,
+so a build taking a minute says nothing for a minute and then says all of
+it at once. This hands over what has arrived so far, as often as it is
+asked -- which is what a window showing a build as it happens needs, and
+the only difference between the two.
+
+    var started = Open("stainless", ["build"]);
+    if (started.Ok)
+    {
+        var child = started.Value;
+        while (child.Read())
+        {
+            Show(child.TakeOutput());
+            Complain(child.TakeErrors());
+        }
+        Console.WriteLine("exit " + Text.FromInteger(child.Wait().ValueOr(-1)));
+    }
+
+**`Read` waits**, and that is deliberate: it answers when there is
+something to hand over or when the child has closed both streams, and never
+immediately with nothing. So the loop above blocks rather than spinning,
+and belongs on a thread of its own when there is a window to keep painting.
+
+**Both streams are watched together**, which is not a detail a caller could
+add afterwards. A pipe holds about 64KB, and a reader that drains one to
+the end while the child fills the other is waiting for a child that is
+waiting for the reader. That is why this hands back two strings rather than
+being two objects with a `Read` each.
+
+<sub>[stdlib/Process.sl:287](../../stdlib/Process.sl#L287)</sub>
+
+#### Id *property*
+
+```
+long Id { get; }
+```
+
+What the operating system calls it.
+
+<sub>[stdlib/Process.sl:312](../../stdlib/Process.sl#L312)</sub>
+
+#### Read *method*
+
+```
+bool Read()
+```
+
+Takes in whatever the child has written since the last call, and
+answers whether there may be more after this one.
+
+False means both streams are closed and everything they held has
+already been handed over, so the last `Take` before it is not missing
+anything.
+
+<sub>[stdlib/Process.sl:320](../../stdlib/Process.sl#L320)</sub>
+
+#### TakeOutput *method*
+
+```
+String TakeOutput()
+```
+
+What the child wrote to its output since this was last asked, and
+nothing at all the next time.
+
+**Taken rather than read.** The buffer is emptied, because a caller
+showing output as it arrives wants each line once; `Run` is the one
+that answers with the whole of it at the end.
+
+<sub>[stdlib/Process.sl:334](../../stdlib/Process.sl#L334)</sub>
+
+#### TakeErrors *method*
+
+```
+String TakeErrors()
+```
+
+The same for what it wrote to its error stream.
+
+<sub>[stdlib/Process.sl:342](../../stdlib/Process.sl#L342)</sub>
+
+#### Wait *method*
+
+```
+Result<int, ProcessError> Wait()
+```
+
+Waits for it to finish, and answers with the code it left.
+
+**After `Read` has answered false**, not before: waiting on a child
+whose output pipe is full is the deadlock the pumping exists to avoid,
+arriving from the other side. Asking twice is harmless and answers the
+same both times.
+
+<sub>[stdlib/Process.sl:355](../../stdlib/Process.sl#L355)</sub>
+
+#### Stop *method*
+
+```
+bool Stop()
+```
+
+Asks it to stop, the way Ctrl-C would. It may decline.
+
+<sub>[stdlib/Process.sl:364](../../stdlib/Process.sl#L364)</sub>
+
+#### Kill *method*
+
+```
+bool Kill()
+```
+
+Makes it stop. It cannot decline, and gets no chance to tidy up.
+
+<sub>[stdlib/Process.sl:367](../../stdlib/Process.sl#L367)</sub>
 
 ### Signals *class*
 
@@ -237,7 +361,7 @@ top of its own loop, where it can actually tidy up.
     while (!Signals.Interrupted) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
-<sub>[stdlib/Process.sl:265](../../stdlib/Process.sl#L265)</sub>
+<sub>[stdlib/Process.sl:416](../../stdlib/Process.sl#L416)</sub>
 
 #### Watch *method*
 
@@ -248,7 +372,7 @@ static bool Watch()
 Starts noticing interrupts. Until this is called they end the program,
 which is the right default for something that has nothing to tidy.
 
-<sub>[stdlib/Process.sl:269](../../stdlib/Process.sl#L269)</sub>
+<sub>[stdlib/Process.sl:420](../../stdlib/Process.sl#L420)</sub>
 
 #### Interrupted *property*
 
@@ -258,7 +382,7 @@ static bool Interrupted { get; }
 
 Whether one has arrived since the last `Clear`.
 
-<sub>[stdlib/Process.sl:272](../../stdlib/Process.sl#L272)</sub>
+<sub>[stdlib/Process.sl:423](../../stdlib/Process.sl#L423)</sub>
 
 #### Clear *method*
 
@@ -268,9 +392,39 @@ static void Clear()
 
 Forgets the one that arrived, for a program that means to carry on.
 
-<sub>[stdlib/Process.sl:275](../../stdlib/Process.sl#L275)</sub>
+<sub>[stdlib/Process.sl:426](../../stdlib/Process.sl#L426)</sub>
 
 ## Functions
+
+### Open *function*
+
+```
+Result<Running, ProcessError> Open(String program, String[] arguments)
+```
+
+Starts a program with its output captured, to be read as it arrives.
+
+`arguments` does **not** include the program's own name; that is `program`,
+and it is what a PATH lookup is done on when it has no separator in it --
+the same bargain `Run` makes.
+
+<sub>[stdlib/Process.sl:375](../../stdlib/Process.sl#L375)</sub>
+
+### Open *function*
+
+```
+Result<Running, ProcessError> Open(String program, String[] arguments, String? input)
+```
+
+The same, with something written to the program's input first.
+
+The pipe is closed once `input` has been written, which is what makes a
+program reading to end-of-input stop rather than wait. It is written before
+any reading starts, so this is for input small enough to fit in a pipe --
+a child that will not read until it has answered, and an input larger than
+the buffer, would deadlock here exactly as it does under `Run`.
+
+<sub>[stdlib/Process.sl:387](../../stdlib/Process.sl#L387)</sub>
 
 ### Run *function*
 
@@ -286,7 +440,7 @@ returned.
 `arguments` does **not** include the program's own name; that is `program`,
 and it is what a PATH lookup is done on when it has no separator in it.
 
-<sub>[stdlib/Process.sl:149](../../stdlib/Process.sl#L149)</sub>
+<sub>[stdlib/Process.sl:152](../../stdlib/Process.sl#L152)</sub>
 
 ### Run *function*
 
@@ -300,5 +454,5 @@ The pipe is closed once `input` has been written, which is what makes a
 program reading to end-of-input stop rather than wait. A child that exits
 without reading is not an error here: the write stops and the run goes on.
 
-<sub>[stdlib/Process.sl:159](../../stdlib/Process.sl#L159)</sub>
+<sub>[stdlib/Process.sl:162](../../stdlib/Process.sl#L162)</sub>
 

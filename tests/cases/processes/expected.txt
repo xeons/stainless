@@ -9,4 +9,8 @@ started  named=true waited=7
 again    7
 running  true
 stopped  true
+stream   [streamed] code=0
+apart    out=[out] err=[err]
+pieces   past a pipe: true in pieces: true
+noopen   refused=true why=1
 signals  watching=true seen=false

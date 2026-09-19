@@ -817,6 +817,22 @@ public class TreeView : WindowedControl
         }
     }
 
+    /// The node under a point, or null when the point is not on one.
+    ///
+    /// `at` is the position a mouse event reported, passed on unchanged --
+    /// the seam says why that distinction is load-bearing on GTK.
+    ///
+    /// **This is what a context menu is built from**, because neither platform
+    /// moves the selection on a right-click: a menu that asked `SelectedNode`
+    /// would act on whatever was selected before the click.
+    public TreeNode? NodeAt(Point at)
+    {
+        var found = _native.NodeAt(at);
+        if (found == null)
+            return null;
+        return Lookup((ITreeNodeHandle)found);
+    }
+
     /// The node a platform handle belongs to.
     ///
     /// **By identity, not by reference.** A backend asked which node is

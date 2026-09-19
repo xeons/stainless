@@ -79,8 +79,18 @@ typedef struct SlProcess {
 #ifdef _WIN32
     HANDLE handle;
     DWORD  id;
+    /* The read ends of the child's output, or NULL for a child whose streams
+     * are this process's own. Closed as each reports end of file, so that a
+     * pump can tell "nothing yet" from "nothing ever again". */
+    HANDLE out;
+    HANDLE err;
 #else
     pid_t  id;
+    /* The same, with -1 for absent -- which calloc does not give, so every
+     * place that makes one of these sets them. Zero would be this process's
+     * own standard input. */
+    int    out;
+    int    err;
 #endif
     int  exitCode;
     _Bool finished;
@@ -282,50 +292,6 @@ static wchar_t *commandLineFor(SlArgs *list)
 
 #else
 
-/*
- * Reads both pipes until each is closed, appending to the two builders.
- *
- * poll() rather than a read of one and then the other: reading stdout to the
- * end while the child fills stderr is the same deadlock in a different order.
- */
-static void drain(int out, int err, void *outText, void *errText)
-{
-    struct pollfd watched[2];
-    uint8_t buffer[4096];
-
-    watched[0].fd = out;
-    watched[0].events = POLLIN;
-    watched[1].fd = err;
-    watched[1].events = POLLIN;
-
-    while (watched[0].fd >= 0 || watched[1].fd >= 0) {
-        if (poll(watched, 2, -1) < 0) {
-            if (errno == EINTR) continue;
-            break;
-        }
-
-        for (int i = 0; i < 2; i += 1) {
-            if (watched[i].fd < 0) continue;
-            if ((watched[i].revents & (POLLIN | POLLHUP | POLLERR)) == 0) continue;
-
-            ssize_t got = read(watched[i].fd, buffer, sizeof buffer);
-
-            if (got > 0) {
-                sl_string_builder_append_bytes(
-                    i == 0 ? outText : errText, buffer, (size_t)got);
-                continue;
-            }
-
-            if (got < 0 && errno == EINTR) continue;
-
-            /* Zero is the write end closed; anything else has gone wrong and
-             * there is nothing further to read either way. */
-            close(watched[i].fd);
-            watched[i].fd = -1;
-        }
-    }
-}
-
 static int classify(int number)
 {
     switch (number) {
@@ -440,19 +406,22 @@ static pid_t spawn(char **argv, const int redirect[3], const int *toClose, int c
 }
 
 #endif
-
 /*
- * Starts a program, reads both its streams to the end, and waits for it.
+ * Starts a program with both its output streams captured, and its input
+ * written and closed.
  *
- * The two builders are the caller's; this appends to them and never reads
- * them, so the standard library keeps ownership of both.
+ * The read ends stay on the handle, which is the whole difference from
+ * sl_process_start: that one leaves the child with this process's streams and
+ * has nothing to read. Here they are kept so sl_process_pump can be called as
+ * often as a caller likes, and output arrives while the child is still writing
+ * rather than after it has exited.
  */
-int sl_process_run(void *args, void *input, void *outText, void *errText, int *exitCode)
+void *sl_process_open(void *args, void *input, int *error)
 {
     SlArgs *list = (SlArgs *)args;
-    if (list == NULL || list->count == 0) return SL_PROCESS_FAILED;
+    *error = SL_PROCESS_FAILED;
 
-    *exitCode = -1;
+    if (list == NULL || list->count == 0) return NULL;
 
 #ifdef _WIN32
     SECURITY_ATTRIBUTES shared;
@@ -464,19 +433,24 @@ int sl_process_run(void *args, void *input, void *outText, void *errText, int *e
     HANDLE outRead = NULL, outWrite = NULL;
     HANDLE errRead = NULL, errWrite = NULL;
 
-    if (!CreatePipe(&outRead, &outWrite, &shared, 0)) return classify(GetLastError());
+    if (!CreatePipe(&outRead, &outWrite, &shared, 0)) {
+        *error = classify(GetLastError());
+        return NULL;
+    }
 
     if (!CreatePipe(&errRead, &errWrite, &shared, 0)) {
         DWORD why = GetLastError();
         CloseHandle(outRead); CloseHandle(outWrite);
-        return classify(why);
+        *error = classify(why);
+        return NULL;
     }
 
     if (!CreatePipe(&inRead, &inWrite, &shared, 0)) {
         DWORD why = GetLastError();
         CloseHandle(outRead); CloseHandle(outWrite);
         CloseHandle(errRead); CloseHandle(errWrite);
-        return classify(why);
+        *error = classify(why);
+        return NULL;
     }
 
     privately(outRead);
@@ -504,15 +478,18 @@ int sl_process_run(void *args, void *input, void *outText, void *errText, int *e
 
     /* The parent's copies of the child's ends go now, whether or not it
      * started: while one is open the pipe still has a writer, and the reads
-     * below would never see the end of it. */
+     * later would never see the end of it. */
     CloseHandle(outWrite);
     CloseHandle(errWrite);
     CloseHandle(inRead);
 
     if (!started) {
         CloseHandle(outRead); CloseHandle(errRead); CloseHandle(inWrite);
-        return classify(why);
+        *error = classify(why);
+        return NULL;
     }
+
+    CloseHandle(information.hThread);
 
     if (input != NULL) {
         const uint8_t *bytes = sl_string_data((SlString *)input);
@@ -532,65 +509,46 @@ int sl_process_run(void *args, void *input, void *outText, void *errText, int *e
 
     CloseHandle(inWrite);
 
-    /* Both pipes are drained while the child runs, for the reason POSIX does
-     * it: a pipe holds about 64KB, and a child that fills one waits for a
-     * reader that would be waiting for the child. */
-    _Bool outOpen = 1, errOpen = 1;
-
-    while (outOpen || errOpen) {
-        if (outOpen) outOpen = sip(outRead, outText);
-        if (errOpen) errOpen = sip(errRead, errText);
-
-        if (!outOpen && !errOpen) break;
-
-        /* Nothing waiting on either: give the child the processor rather than
-         * spinning on Peek. */
-        DWORD waiting = 0;
-        _Bool idle =
-            (!outOpen || (PeekNamedPipe(outRead, NULL, 0, NULL, &waiting, NULL) && waiting == 0));
-
-        if (idle) {
-            DWORD other = 0;
-            idle = !errOpen ||
-                   (PeekNamedPipe(errRead, NULL, 0, NULL, &other, NULL) && other == 0);
-            if (idle) Sleep(1);
-        }
+    SlProcess *made = (SlProcess *)calloc(1, sizeof(SlProcess));
+    if (made == NULL) {
+        CloseHandle(outRead); CloseHandle(errRead);
+        TerminateProcess(information.hProcess, 1);
+        CloseHandle(information.hProcess);
+        *error = SL_PROCESS_NO_RESOURCE;
+        return NULL;
     }
 
-    CloseHandle(outRead);
-    CloseHandle(errRead);
-
-    WaitForSingleObject(information.hProcess, INFINITE);
-
-    DWORD code = 0;
-    GetExitCodeProcess(information.hProcess, &code);
-    *exitCode = (int)code;
-
-    CloseHandle(information.hProcess);
-    CloseHandle(information.hThread);
-    return SL_PROCESS_OK;
-#endif
-#ifndef _WIN32
+    made->handle = information.hProcess;
+    made->id = information.dwProcessId;
+    made->out = outRead;
+    made->err = errRead;
+    made->exitCode = -1;
+    *error = SL_PROCESS_OK;
+    return made;
+#else
     int inPipe[2] = { -1, -1 };
     int outPipe[2];
     int errPipe[2];
 
     size_t inputLength = input == NULL ? 0 : sl_string_byte_length(input);
 
-    if (input != NULL && pipe(inPipe) != 0) return classify(errno);
+    if (input != NULL && pipe(inPipe) != 0) {
+        *error = classify(errno);
+        return NULL;
+    }
 
     if (pipe(outPipe) != 0) {
-        int why = classify(errno);
+        *error = classify(errno);
         if (inPipe[0] >= 0) { close(inPipe[0]); close(inPipe[1]); }
-        return why;
+        return NULL;
     }
 
     if (pipe(errPipe) != 0) {
-        int why = classify(errno);
+        *error = classify(errno);
         if (inPipe[0] >= 0) { close(inPipe[0]); close(inPipe[1]); }
         close(outPipe[0]);
         close(outPipe[1]);
-        return why;
+        return NULL;
     }
 
     int redirect[3] = { inPipe[0], outPipe[1], errPipe[1] };
@@ -600,11 +558,11 @@ int sl_process_run(void *args, void *input, void *outText, void *errText, int *e
     pid_t child = spawn(list->items, redirect, toClose, 4, &why);
 
     if (child < 0) {
-        if (why == 0) why = classify(errno);
+        *error = why != 0 ? why : classify(errno);
         if (inPipe[0] >= 0) { close(inPipe[0]); close(inPipe[1]); }
         close(outPipe[0]); close(outPipe[1]);
         close(errPipe[0]); close(errPipe[1]);
-        return why;
+        return NULL;
     }
 
     if (inPipe[0] >= 0) close(inPipe[0]);
@@ -632,18 +590,148 @@ int sl_process_run(void *args, void *input, void *outText, void *errText, int *e
         signal(SIGPIPE, previous);
     }
 
-    drain(outPipe[0], errPipe[0], outText, errText);
-
-    int status = 0;
-    while (waitpid(child, &status, 0) < 0) {
-        if (errno != EINTR) return SL_PROCESS_FAILED;
+    SlProcess *started = (SlProcess *)calloc(1, sizeof(SlProcess));
+    if (started == NULL) {
+        close(outPipe[0]); close(errPipe[0]);
+        kill(child, SIGKILL);
+        waitpid(child, NULL, 0);
+        *error = SL_PROCESS_NO_RESOURCE;
+        return NULL;
     }
 
-    *exitCode = coded(status);
-    return SL_PROCESS_OK;
+    started->id = child;
+    started->out = outPipe[0];
+    started->err = errPipe[0];
+    started->exitCode = -1;
+    *error = SL_PROCESS_OK;
+    return started;
 #endif
 }
 
+/*
+ * Reads whatever the child has written, waiting until there is something.
+ *
+ * Answers 1 when it appended anything or a stream may still produce more, and
+ * 0 only once both are closed and there was nothing left -- so
+ *
+ *     while (sl_process_pump(handle, out, err)) { take what is in them }
+ *
+ * hands over every byte and then stops. Both pipes are watched together rather
+ * than one and then the other, for the reason the two builders exist at all: a
+ * pipe holds about 64KB, and a child that fills one waits for a reader that
+ * would be waiting for the child.
+ */
+_Bool sl_process_pump(void *handle, void *outText, void *errText)
+{
+    SlProcess *process = (SlProcess *)handle;
+    if (process == NULL) return 0;
+
+#ifdef _WIN32
+    for (;;) {
+        if (process->out == NULL && process->err == NULL) return 0;
+
+        size_t before = sl_string_builder_byte_length(outText)
+                      + sl_string_builder_byte_length(errText);
+
+        if (process->out != NULL && !sip(process->out, outText)) {
+            CloseHandle(process->out);
+            process->out = NULL;
+        }
+        if (process->err != NULL && !sip(process->err, errText)) {
+            CloseHandle(process->err);
+            process->err = NULL;
+        }
+
+        size_t after = sl_string_builder_byte_length(outText)
+                     + sl_string_builder_byte_length(errText);
+
+        if (after != before) return 1;
+        if (process->out == NULL && process->err == NULL) return 0;
+
+        /* Nothing waiting on either, and both still open: give the child the
+         * processor rather than spinning on Peek. */
+        Sleep(1);
+    }
+#else
+    for (;;) {
+        if (process->out < 0 && process->err < 0) return 0;
+
+        struct pollfd watched[2];
+
+        /* A negative fd is ignored and reports no events, which is what makes
+         * one closed stream harmless here rather than a second code path. */
+        watched[0].fd = process->out;
+        watched[0].events = POLLIN;
+        watched[1].fd = process->err;
+        watched[1].events = POLLIN;
+
+        if (poll(watched, 2, -1) < 0) {
+            if (errno == EINTR) continue;
+            return 0;
+        }
+
+        size_t before = sl_string_builder_byte_length(outText)
+                      + sl_string_builder_byte_length(errText);
+
+        for (int i = 0; i < 2; i += 1) {
+            int reading = i == 0 ? process->out : process->err;
+
+            if (reading < 0) continue;
+            if ((watched[i].revents & (POLLIN | POLLHUP | POLLERR)) == 0) continue;
+
+            uint8_t buffer[4096];
+            ssize_t got = read(reading, buffer, sizeof buffer);
+
+            if (got > 0) {
+                sl_string_builder_append_bytes(
+                    i == 0 ? outText : errText, buffer, (size_t)got);
+                continue;
+            }
+
+            if (got < 0 && errno == EINTR) continue;
+
+            /* Zero is the write end closed; anything else has gone wrong and
+             * there is nothing further to read either way. */
+            close(reading);
+            if (i == 0) process->out = -1; else process->err = -1;
+        }
+
+        size_t after = sl_string_builder_byte_length(outText)
+                     + sl_string_builder_byte_length(errText);
+
+        if (after != before) return 1;
+        if (process->out < 0 && process->err < 0) return 0;
+    }
+#endif
+}
+
+/*
+ * Starts a program, reads both its streams to the end, and waits for it.
+ *
+ * The two builders are the caller's; this appends to them and never reads
+ * them, so the standard library keeps ownership of both.
+ *
+ * **Written in terms of open and pump rather than beside them.** There were
+ * two copies of the pipe setup and the drain loop, one per platform in each,
+ * and the streaming half was the fourth. Four copies of "a pipe holds 64KB and
+ * a child that fills one deadlocks" is three too many for them all to stay
+ * right.
+ */
+int sl_process_run(void *args, void *input, void *outText, void *errText, int *exitCode)
+{
+    int error = SL_PROCESS_FAILED;
+
+    *exitCode = -1;
+
+    void *handle = sl_process_open(args, input, &error);
+    if (handle == NULL) return error;
+
+    while (sl_process_pump(handle, outText, errText)) { }
+
+    int status = sl_process_wait(handle, exitCode);
+    sl_process_release(handle);
+    return status;
+}
 /* Starts a program and does not wait. The streams are the parent's. */
 void *sl_process_start(void *args, int *error)
 {
@@ -682,6 +770,8 @@ void *sl_process_start(void *args, int *error)
 
     made->handle = information.hProcess;
     made->id = information.dwProcessId;
+    made->out = NULL;
+    made->err = NULL;
     made->exitCode = -1;
     *error = SL_PROCESS_OK;
     return made;
@@ -702,6 +792,8 @@ void *sl_process_start(void *args, int *error)
     if (started == NULL) { *error = SL_PROCESS_NO_RESOURCE; return NULL; }
 
     started->id = child;
+    started->out = -1;
+    started->err = -1;
     started->exitCode = -1;
     *error = SL_PROCESS_OK;
     return started;
@@ -817,8 +909,15 @@ void sl_process_release(void *handle)
     if (process == NULL) return;
 
 #ifdef _WIN32
+    /* A pipe the caller stopped reading partway through is still open, and a
+     * read end left open is a child blocked forever on a full pipe. */
+    if (process->out != NULL) CloseHandle(process->out);
+    if (process->err != NULL) CloseHandle(process->err);
     if (process->handle != NULL) CloseHandle(process->handle);
 #else
+    if (process->out >= 0) close(process->out);
+    if (process->err >= 0) close(process->err);
+
     if (!process->finished) {
         int status = 0;
         waitpid(process->id, &status, WNOHANG);
