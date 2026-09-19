@@ -744,4 +744,231 @@ public extern "C"
     int   QueryPerformanceFrequency(long* frequency);
 }
 
+// =============================================================== debugging
+//
+// What a debugger needs from the operating system: a process that reports what
+// happens to it, and the means to look inside one that has stopped.
+//
+// **Who may call these is not a detail.** `WaitForDebugEvent` and
+// `ContinueDebugEvent` must both run on the *thread that created the debuggee*
+// -- the debugging relationship belongs to a thread, not to a process -- so an
+// engine using these owns one dedicated thread for the whole session and does
+// every one of these calls on it. A wait from the wrong thread does not fail
+// usefully; it simply never returns an event.
+
+/// `CREATE_PROCESS_DEBUG_EVENT` and the rest, in the order the header gives
+/// them.
+public const uint ExceptionDebugEvent      = 1u;
+public const uint CreateThreadDebugEvent   = 2u;
+public const uint CreateProcessDebugEvent  = 3u;
+public const uint ExitThreadDebugEvent     = 4u;
+public const uint ExitProcessDebugEvent    = 5u;
+public const uint LoadDllDebugEvent        = 6u;
+public const uint UnloadDllDebugEvent      = 7u;
+public const uint OutputDebugStringEvent   = 8u;
+public const uint RipEvent                 = 9u;
+
+/// What a debugger answers an event with.
+///
+/// `DbgContinue` says the exception was dealt with and the program should carry
+/// on; `DbgExceptionNotHandled` hands it back, which for a real fault is what
+/// lets the program's own handler -- or its death -- happen normally.
+public const uint DbgContinue              = 0x00010002u;
+public const uint DbgExceptionNotHandled   = 0x80010001u;
+
+public const uint ExceptionBreakpoint      = 0x80000003u;
+public const uint ExceptionSingleStep      = 0x80000004u;
+public const uint ExceptionAccessViolation = 0xC0000005u;
+
+public const uint DebugProcess             = 0x00000001u;
+public const uint DebugOnlyThisProcess     = 0x00000002u;
+
+/// `EXCEPTION_RECORD` followed by `dwFirstChance`, which is the largest member
+/// of `DEBUG_EVENT`'s union and therefore what fixes its size.
+public struct ExceptionDebugInfo
+{
+    public uint    ExceptionCode;
+    public uint    ExceptionFlags;
+    public void*   NestedRecord;
+    public void*   ExceptionAddress;
+    public uint    NumberParameters;
+    public uint    Reserved;
+    public nuint[15] Information;
+
+    /// Zero on a *second* chance -- the program's own handlers have already
+    /// declined it and this is the last word before it dies.
+    public uint    FirstChance;
+}
+
+/// `CREATE_PROCESS_DEBUG_INFO`, as far as the field a debugger needs.
+///
+/// `BaseOfImage` is the whole reason this is read: it is where the loader
+/// actually put the executable, and subtracting the image's preferred base from
+/// it gives the slide every address from the DWARF has to be moved by.
+public struct CreateProcessDebugInfo
+{
+    public HANDLE File;
+    public HANDLE Process;
+    public HANDLE Thread;
+    public void*  BaseOfImage;
+    public uint   DebugInfoFileOffset;
+    public uint   DebugInfoSize;
+    public void*  ThreadLocalBase;
+    public void*  StartAddress;
+    public void*  ImageName;
+    public ushort Unicode;
+}
+
+/// `LOAD_DLL_DEBUG_INFO`, as far as the base address.
+public struct LoadDllDebugInfo
+{
+    public HANDLE File;
+    public void*  BaseOfDll;
+}
+
+/// `EXIT_PROCESS_DEBUG_INFO`, which is one number.
+public struct ExitProcessDebugInfo
+{
+    public uint ExitCode;
+}
+
+/// `DEBUG_EVENT`.
+///
+/// **The union is a byte array and that is deliberate.** This language has no
+/// union, and the honest way to carry one is the bytes plus a code that says
+/// how to read them -- which is what the structure already is. The alternative,
+/// declaring the largest member and reinterpreting its fields, is the same
+/// thing with a shape that lies about itself.
+///
+/// `Reserved` is not padding anybody invented: the three leading `DWORD`s end
+/// at twelve and the union is eight-aligned, so the four bytes between them are
+/// in the C layout too. Leaving them out puts every event's body four bytes
+/// early, and an exception code read from the wrong place is a plausible
+/// number.
+public struct DebugEventRaw
+{
+    public uint Code;
+    public uint ProcessId;
+    public uint ThreadId;
+    public uint Reserved;
+    public byte[160] Body;
+}
+
+/// `CONTEXT` for x86-64, as far as `Rip`, with the rest carried as bytes.
+///
+/// **Sixteen-byte alignment is required by the API**, not preferred:
+/// `GetThreadContext` fails outright on a structure that is merely
+/// eight-aligned, and the failure is a return of zero with
+/// `ERROR_NOACCESS`. `[Align(16)]` is exactly the cap this language has.
+///
+/// The floating-point save area and the vector registers are 976 bytes this
+/// engine has no use for. They are carried rather than described because the
+/// structure has to be the right *size* whatever is read from it -- the API
+/// checks, and a short one is refused.
+[Align(16)]
+public struct Context
+{
+    public ulong  P1Home;
+    public ulong  P2Home;
+    public ulong  P3Home;
+    public ulong  P4Home;
+    public ulong  P5Home;
+    public ulong  P6Home;
+
+    public uint   ContextFlags;
+    public uint   MxCsr;
+
+    public ushort SegCs;
+    public ushort SegDs;
+    public ushort SegEs;
+    public ushort SegFs;
+    public ushort SegGs;
+    public ushort SegSs;
+    public uint   EFlags;
+
+    public ulong  Dr0;
+    public ulong  Dr1;
+    public ulong  Dr2;
+    public ulong  Dr3;
+    public ulong  Dr6;
+    public ulong  Dr7;
+
+    public ulong  Rax;
+    public ulong  Rcx;
+    public ulong  Rdx;
+    public ulong  Rbx;
+    public ulong  Rsp;
+    public ulong  Rbp;
+    public ulong  Rsi;
+    public ulong  Rdi;
+    public ulong  R8;
+    public ulong  R9;
+    public ulong  R10;
+    public ulong  R11;
+    public ulong  R12;
+    public ulong  R13;
+    public ulong  R14;
+    public ulong  R15;
+    public ulong  Rip;
+
+    public byte[976] Rest;
+}
+
+/// Which parts of a `CONTEXT` a call is about. Asking for less is faster and,
+/// more to the point, is what says which fields are meaningful coming back.
+public const uint ContextAmd64    = 0x00100000u;
+public const uint ContextControl  = 0x00100001u;   // Rip, Rsp, SegCs, SegSs, EFlags
+public const uint ContextInteger  = 0x00100002u;   // the general-purpose registers
+public const uint ContextSegments = 0x00100004u;
+public const uint ContextFull     = 0x00100007u;
+
+/// The trap flag, which makes the processor raise a single-step exception after
+/// exactly one instruction. How stepping is done.
+public const uint EFlagsTrap = 0x00000100u;
+
+public const uint ThreadGetContext     = 0x0008u;
+public const uint ThreadSetContext     = 0x0010u;
+public const uint ThreadSuspendResume  = 0x0002u;
+public const uint ThreadQueryLimited   = 0x0800u;
+
+public extern "C"
+{
+    /// Attaches to a process already running. **Untestable under Linux's
+    /// default `ptrace_scope` on the other backend**, and worth the same
+    /// caution here: a process may be traced by its parent without ceremony
+    /// and by anything else only with privilege.
+    int    DebugActiveProcess(uint processId);
+    int    DebugActiveProcessStop(uint processId);
+
+    /// Whether the debuggee dies when the debugger does. The default is yes,
+    /// which is rarely what a program wants and never what a crashed one does.
+    int    DebugSetProcessKillOnExit(int kill);
+
+    /// **`Ex`, because the plain one mangles the exception record.**
+    /// `WaitForDebugEvent` converts a 32-bit debuggee's records on a 64-bit
+    /// host and loses information doing it; the `Ex` form does not, and is
+    /// what every current debugger calls.
+    int    WaitForDebugEventEx(DebugEventRaw* event, uint milliseconds);
+    int    ContinueDebugEvent(uint processId, uint threadId, uint status);
+
+    int    ReadProcessMemory(HANDLE process, void* address, void* into,
+                             nuint size, nuint* read);
+    int    WriteProcessMemory(HANDLE process, void* address, void* from,
+                              nuint size, nuint* written);
+
+    /// **Required after writing code**, not optional. A processor may hold the
+    /// old bytes in its instruction cache, so a breakpoint written and not
+    /// flushed is one that sometimes fires and sometimes does not.
+    int    FlushInstructionCache(HANDLE process, void* address, nuint size);
+
+    int    VirtualProtectEx(HANDLE process, void* address, nuint size,
+                            uint protect, uint* old);
+
+    int    GetThreadContext(HANDLE thread, Context* context);
+    int    SetThreadContext(HANDLE thread, Context* context);
+    HANDLE OpenThread(uint access, int inheritable, uint threadId);
+    uint   SuspendThread(HANDLE thread);
+    uint   ResumeThread(HANDLE thread);
+}
+
 #endif

@@ -4,5 +4,9 @@
   "kind": "executable",
   "sources": ["src", "tests"],
   "buildDirectory": "build",
-  "objectDirectory": "build/obj"
+  "objectDirectory": "build/obj",
+  "windows": {
+    "sources": ["../bindings/win32"],
+    "libraries": ["kernel32", "advapi32"]
+  }
 }

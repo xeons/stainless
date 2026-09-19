@@ -21,6 +21,10 @@ stainless build --project debug
 | `src/Dwarf/Abbrev.sl` | `.debug_abbrev`, and a skip rule for every form |
 | `src/Dwarf/Info.sl` | `.debug_info` as units and entries, indirections resolved |
 | `src/Dwarf/Lines.sl` | `.debug_line`, which is a bytecode and so an interpreter |
+| `src/Target.sl` | the seam: `ITarget`, and a `DebugEvent` variant |
+| `src/Target/Win32.sl` | the `DEBUG_EVENT` loop |
+| `src/Target/Select.sl` | the one `#if` in the engine |
+| `src/Engine.sl` | breakpoints, the slide, and run control |
 | `tests/sldb.sl` | the console debugger |
 
 ## Four decisions worth knowing before reading the code
@@ -137,7 +141,55 @@ $ sldb addr f0 0x122a
 that has some, which every debugger does; one that leaves the marker where it
 was asked for is the one that wastes an afternoon.
 
+## Running one
+
+```
+$ sldb run f0-dwarf.exe fixture.sl:41
+breakpoint at 0x140045b8d  fixture.sl:41
+stopped at ...ixture.sl:41
+      in Total
+stopped at ...ixture.sl:41
+      in Total
+stopped at ...ixture.sl:41
+      in Total
+stopped at ...ixture.sl:41
+      in Total
+exited with 0
+```
+
+Four stops because the array has four elements, and the program's own output is
+still right -- which is the check that matters, because it says the trap byte
+went back correctly every time.
+
+**The slide is the one thing the reading half could not know.** Everything in
+the DWARF is an address the linker chose; the loader may put the image
+elsewhere, and `CREATE_PROCESS_DEBUG_EVENT` is where the difference is learned.
+Forgetting it works perfectly on Windows, where the preferred base is usually
+honoured, and misses every breakpoint on a Linux position-independent
+executable, which never lands at zero.
+
+**Standing on a breakpoint is the case everyone gets wrong once.** Continuing
+from one means executing the instruction the trap replaced, so the trap cannot
+be there -- and putting it back means knowing when "afterwards" is. The answer
+is: rewind the program counter on to the instruction (the trap has already
+executed, so the counter is one byte past it), restore the byte, single-step
+exactly one instruction, re-plant, carry on. Get any part of it wrong and the
+first hit looks perfect while the second crashes.
+
+**The loader's breakpoint is not yours.** Every Windows process raises one when
+the loader finishes. Reporting it starts every session at an address in `ntdll`
+that no source line covers; handing it back to the program with
+`DBG_EXCEPTION_NOT_HANDLED` kills the program. It is swallowed exactly once.
+
 ## Still to come
 
-Process control -- `ITarget`, the `DEBUG_EVENT` loop, `ptrace` -- then stack
-walking, values, and the IDE surface.
+Stepping and the frame-pointer stack walk, then values -- locals, the type
+graph, `String` and arrays, and the runtime type out of an object header --
+and then `ptrace`, which the seam exists to make a transcription job. The IDE
+surface is last and is meant to be thin: everything in it comes from snapshot
+types this console tool has already exercised.
+
+**The Linux target is a stub that says so.** `MakeTarget` answers a `Result`,
+and on a platform without one it fails with a sentence rather than silently
+doing nothing -- the reading half of this engine is complete on both platforms
+and every command but `run` works there.

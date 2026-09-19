@@ -32,6 +32,7 @@
 //   sldb lines <binary>        the line table, row by row
 //   sldb line <binary> f:n     what address a source line begins at
 //   sldb addr <binary> 0xNNN   what source line an address came from
+//   sldb run <binary> [f:n]    run it, stopping at a line
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -617,6 +618,141 @@ bool PathEndsWith(String full, String tail)
     return before == (byte)47 || before == (byte)92;
 }
 
+/// Runs the program, stopping at a line if one was named.
+///
+/// The whole reading half meets the process here: an address comes from the
+/// line table, a breakpoint goes in at it, and where the process stops is
+/// turned back into a file and a line.
+int RunProgram(String path, String where)
+{
+    var made = MakeTarget();
+    if (!made.Ok)
+    {
+        Console.WriteLine("sldb: " + made.Error);
+        return 1;
+    }
+
+    var read = Image.FromFile(path);
+    if (!read.Ok)
+    {
+        Console.WriteLine("sldb: " + read.Error);
+        return 1;
+    }
+
+    var image = read.Value;
+    var info = new DwarfInfo(image);
+    String bad = info.Read();
+    if (bad.ByteLength() != 0u)
+    {
+        Console.WriteLine("sldb: " + bad);
+        return 1;
+    }
+
+    var tables = ReadEveryLineTable(info);
+    var engine = new Engine(made.Value, image, info, tables);
+
+    // Running without DWARF works and reports addresses rather than lines,
+    // which is a fair thing to do and a confusing thing to be given without
+    // warning -- a default `-g` build on Windows writes CodeView to a .pdb and
+    // carries no DWARF at all.
+    if (info.IsEmpty)
+        Console.WriteLine("note: no DWARF here, so stops are addresses only"
+                          + " (see docs/dwarf.md)");
+
+    if (where.ByteLength() != 0u)
+    {
+        nuint at = 0u;
+        uint chosen = 0u;
+        if (!FindLineAddress(tables, where, &at, &chosen))
+        {
+            Console.WriteLine("sldb: no code for " + where);
+            return 1;
+        }
+        engine.Add(at, where);
+        Console.WriteLine("breakpoint at 0x" + FormatHexadecimal((ulong)at)
+                          + "  " + where
+                          + (chosen != 0u ? "" : ""));
+    }
+
+    var started = engine.Start(path, "");
+    if (!started.Ok)
+    {
+        Console.WriteLine("sldb: " + started.Error);
+        return 1;
+    }
+
+    var stop = started.Value;
+    while (true)
+    {
+        switch (stop.Kind)
+        {
+            case StopKind.Breakpoint:
+            {
+                Console.WriteLine("stopped at " + engine.Describe(stop.Address));
+                String inside = engine.FunctionAt(stop.Address);
+                if (inside.ByteLength() != 0u)
+                    Console.WriteLine("      in " + inside);
+                break;
+            }
+
+            case StopKind.Fault:
+            {
+                Console.WriteLine("fault 0x" + FormatHexadecimal((ulong)stop.Code)
+                                  + " at " + engine.Describe(stop.Address));
+                engine.Terminate();
+                return 1;
+            }
+
+            case StopKind.Exited:
+            {
+                Console.WriteLine("exited with "
+                                  + Standard.Text.FromInteger((long)stop.ExitCode));
+                return 0;
+            }
+
+            default:
+                break;
+        }
+
+        stop = engine.Continue();
+    }
+}
+
+/// The address a `file:line` names, in link-time terms.
+bool FindLineAddress(List<LineTable> tables, String where, nuint* address,
+                     uint* chosen)
+{
+    nuint colon = 0u;
+    bool split = false;
+    for (nuint i = where.ByteLength(); i > 0u; i--)
+    {
+        if (where.ByteAt(i - 1u) == (byte)58)
+        {
+            colon = i - 1u;
+            split = true;
+            break;
+        }
+    }
+    if (!split)
+        return false;
+
+    String file = where.Substring(0u, colon);
+    uint line = (uint)ParseNumber(where.Substring(colon + 1u,
+                                  where.ByteLength() - colon - 1u));
+
+    for (nuint u = 0u; u < tables.Count; u++)
+    {
+        for (nuint f = 0u; f < tables[u].Files.Count; f++)
+        {
+            if (!PathEndsWith(tables[u].Files[f], file))
+                continue;
+            if (tables[u].AddressForLine(f, line, address, chosen))
+                return true;
+        }
+    }
+    return false;
+}
+
 int PrintUsage()
 {
     Console.WriteLine("sldb -- the Stainless debugger");
@@ -627,6 +763,7 @@ int PrintUsage()
     Console.WriteLine("  sldb lines <binary>        the line table, row by row");
     Console.WriteLine("  sldb line <binary> f:n     what address a line begins at");
     Console.WriteLine("  sldb addr <binary> 0xNNN   what line an address came from");
+    Console.WriteLine("  sldb run <binary> [f:n]    run it, stopping at a line");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
 }
@@ -657,6 +794,9 @@ int Main()
 
     if (args[0u] == "addr" && args.Length >= 3u)
         return PrintLineOfAddress(args[1u], args[2u]);
+
+    if (args[0u] == "run" && args.Length >= 2u)
+        return RunProgram(args[1u], args.Length >= 3u ? args[2u] : "");
 
     return PrintUsage();
 }
