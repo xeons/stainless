@@ -198,8 +198,42 @@ handler ran.
 
 ### Taking the screenshot
 
-On Linux there is no window manager on the test box, so the window is opened on
-a virtual screen and the screen is captured:
+On Windows there is a script for it, [screenshot.ps1](screenshot.ps1):
+
+```powershell
+.\forms\screenshot.ps1 -Program .\samples\forms\build\buttons.exe -Arguments 1
+.\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Out shots\ide.png
+.\forms\screenshot.ps1 -ProcessId 1234 -Shots 3 -Every 1500 -Keep
+.\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -List
+```
+
+It writes into `shots/`, which is ignored, and it **asks the window to draw
+itself** through `PrintWindow` with `PW_RENDERFULLCONTENT` rather than reading
+the screen. That is not a detail. `CopyFromScreen` answers black over a
+disconnected session; it also answers with whatever else the machine happens to
+be showing, which on somebody's own desktop is their business and does not
+belong in a bug report. Asking the window means it works with nothing visible,
+works with another window in front of it, and collects nothing but the program
+under test.
+
+Three switches earn their place:
+
+- `-Popups` adds the menus, drop-downs and dialogs the window *owns*. They are
+  top-level windows of their own and are not part of the main window's picture,
+  so a context menu is invisible without it. Ownership is the test rather than
+  the process: a GUI program started from a console shares a process with that
+  console, and "every window of this process" put a terminal in the picture.
+- `-Shots n -Every ms` takes a sequence, which is how a build was watched
+  filling its output pane while it ran.
+- `-List` prints the windows it can see and captures nothing, which is how the
+  console in the picture was found in the first place.
+
+It waits for the window rather than sleeping a fixed time, and then waits a
+further beat on purpose: a toolbar renders its buttons lazily and a capture
+taken the instant the window exists catches half of them.
+
+On Linux there is no equivalent, because the test box has no window manager: a
+program is opened on a virtual screen and the screen is captured.
 
 ```sh
 Xvfb :9 -screen 0 1024x768x24 &
@@ -207,19 +241,6 @@ DISPLAY=:9 ./buttons --page 1 &
 sleep 3
 DISPLAY=:9 import -window root shot.png          # ImageMagick
 ```
-
-On Windows, `CopyFromScreen` answers black over a disconnected session, so ask
-the window to draw itself instead. `PrintWindow` with `PW_RENDERFULLCONTENT`
-works with no visible desktop at all:
-
-```powershell
-$p = Start-Process .\build\buttons.exe -PassThru; Start-Sleep 3; $p.Refresh()
-# GetWindowRect for the size, then:
-#   PrintWindow($p.MainWindowHandle, $graphics.GetHdc(), 2)
-```
-
-Give it a second between the two: a toolbar renders its buttons lazily, and a
-capture taken too early catches half of them.
 
 ---
 

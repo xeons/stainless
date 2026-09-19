@@ -191,7 +191,21 @@ samples reads back what it set — a caption, an index, a count — so it passes
 whether or not a single pixel reached the screen. Both samples passed every
 check for months while a control inside a container was one pixel wide and the
 GTK backend drew nothing at all. Take a screenshot; it is the only thing that
-answers the question. The recipe is below.
+answers the question.
+
+```
+.\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Out shots\ide.png
+.\forms\screenshot.ps1 -Program .\samples\forms\build\common.exe -Popups
+.\forms\screenshot.ps1 -ProcessId 1234 -Shots 3 -Every 1500 -Keep
+```
+
+It asks the window to draw itself with `PrintWindow` and never reads the
+screen, so it works with nothing visible, works with another window in front,
+and takes in nothing but the program under test -- which matters on a real
+machine, where a screen grab collects whatever else that machine is showing.
+`-Popups` adds the menus and dialogs the window owns, which are top-level
+windows of their own and are invisible without it. `-List` prints what it can
+see and captures nothing. The Linux recipe is further down.
 
 **Lazarus's LCL is on this machine at `C:\lazarus\lcl`**, and `forms/` is a
 port of its architecture, so it is the reference for how something ought to

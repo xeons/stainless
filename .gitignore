@@ -28,5 +28,8 @@ ide/tests/fixture/build/
 # Screenshots pulled back from the Linux test box
 linux-shots/
 
+# Where forms/screenshot.ps1 writes by default
+shots/
+
 # The io test case writes its scratch files here when run from the repo root.
 stainless-io/
