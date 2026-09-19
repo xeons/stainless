@@ -1,0 +1,8 @@
+{
+  "name": "sldb",
+  "version": "0.1.0",
+  "kind": "executable",
+  "sources": ["src", "tests"],
+  "buildDirectory": "build",
+  "objectDirectory": "build/obj"
+}

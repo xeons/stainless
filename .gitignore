@@ -22,6 +22,9 @@ samples/**/build/
 # IDE build output
 ide/build/
 
+# The debug engine's build output
+debug/build/
+
 # What the IDE's fixture project builds when a test compiles it
 ide/tests/fixture/build/
 
