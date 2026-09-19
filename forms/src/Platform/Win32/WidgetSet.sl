@@ -513,6 +513,13 @@ public class WindowPeer : ControlPeer, IWindowPeer
             state = state | MenuItemState.Checked;
         if ((reported & OdsDefault) != 0u)
             state = state | MenuItemState.Default;
+
+        // `ODS_NOACCEL` is Windows answering the question for us. The
+        // alternative is `WM_QUERYUISTATE` on the window the menu belongs to,
+        // which is the same answer reached by asking somebody who was already
+        // telling us.
+        if ((reported & OdsNoAccel) != 0u)
+            state = state | MenuItemState.NoAccelerators;
         return state;
     }
 

@@ -657,6 +657,21 @@ public enum MenuItemState
     Checked    = 4,
     /// The default command, drawn bold.
     Default    = 8,
+
+    /// Draw the caption without its accelerator underline.
+    ///
+    /// **Windows hides these until Alt is pressed**, and a program that
+    /// underlines always is the one window on the desktop that does. Which way
+    /// round it is right now is the *window's* state rather than the item's --
+    /// it changes for every menu at once, the moment Alt goes down -- so no
+    /// renderer could work it out and none should try.
+    ///
+    /// The platform is asked for it rather than told: Windows already reports
+    /// it in the state word it sends with every owner-drawn item, so this
+    /// costs a bit and a branch. A backend with no such notion leaves it
+    /// clear, which underlines always -- the behaviour every desktop but this
+    /// one has.
+    NoAccelerators = 16,
 }
 
 public interface IMenuItemNotify

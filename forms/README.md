@@ -591,13 +591,21 @@ GTK answers `SetOwnerDrawn(false)` for both and goes on drawing its menus and
 toolbars through the desktop theme, which is the right answer there and is why
 the question is asked rather than settled by an `#if`.
 
-Two things are named rather than done. Accelerators are underlined always,
-where Windows hides them until Alt: `DrawTextW` wants `DT_HIDEPREFIX` and the
-window's current UI state, and the state belongs to a window a `Graphics` does
-not have. And a disabled button's picture is faded into its background rather
-than drawn as Office's greyscale emboss, which would need the pixels read back
-out of a `Bitmap` -- one can be made from pixels here and not turned back into
-them.
+**Accelerator underlines follow the window, and are drawn by not writing
+them.** Windows hides them until Alt is pressed, and which way round it is is
+the window's state rather than the item's -- it changes for every menu at once
+-- so `MenuItemState` carries a `NoAccelerators` flag and the platform fills it
+in. Windows answers it for free in the state word it already sends with every
+owner-drawn item, which is `ODS_NOACCEL`; nothing has to ask. Hiding the
+underline is then a matter of drawing a caption with no `&` in it, which needs
+no `DT_HIDEPREFIX`, no new field on `TextFormat` and no flag through the
+graphics seam -- and it is the same function every caption is measured with,
+which is why the width does not move when the underline appears.
+
+One thing is named rather than done: a disabled button's picture is faded into
+its background rather than drawn as Office's greyscale emboss, which would need
+the pixels read back out of a `Bitmap` -- one can be made from pixels here and
+not turned back into them.
 
 ### Worth having, and a week each
 

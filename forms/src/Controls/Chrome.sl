@@ -254,9 +254,20 @@ public class OfficeXpRenderer : ChromeRenderer
         bool disabled = state.HasFlag(MenuItemState.Disabled);
         bool selected = state.HasFlag(MenuItemState.Selected) && !disabled;
 
+        // **Hiding the underline is drawing a caption that has no `&` in it.**
+        // `DrawTextW` has a `DT_HIDEPREFIX` for this, and reaching it would
+        // mean a new field on `TextFormat`, a new flag through the graphics
+        // seam and an answer for a backend that has no such idea. Taking the
+        // marker out instead needs none of that, produces the same pixels, and
+        // is a function this renderer already has -- it is what every caption
+        // is measured with, which is also why the width does not move when the
+        // underline appears.
+        String caption = state.HasFlag(MenuItemState.NoAccelerators)
+                       ? Spoken(item.Text) : item.Text;
+
         if (item.OnMenuBar)
         {
-            DrawOnBar(surface, item, bounds, disabled, selected);
+            DrawOnBar(surface, caption, bounds, disabled, selected);
             return;
         }
 
@@ -297,7 +308,7 @@ public class OfficeXpRenderer : ChromeRenderer
         format.Vertical = VerticalAlignment.Middle;
         format.Wrap = false;
 
-        surface.DrawString(item.Text, Font,
+        surface.DrawString(caption, Font,
                            disabled ? DisabledText : TextColor, text, format);
 
         if (item.HasItems)
@@ -329,7 +340,7 @@ public class OfficeXpRenderer : ChromeRenderer
     /// and what makes the bar read as one row of words rather than as buttons.
     /// Windows reports an open heading as selected, so both arrive here the
     /// same way and neither needs telling apart.
-    void DrawOnBar(Graphics surface, MenuItem item, Rectangle bounds,
+    void DrawOnBar(Graphics surface, String caption, Rectangle bounds,
                    bool disabled, bool selected)
     {
         surface.FillRectangle(new Brush(BarBackground), bounds);
@@ -347,7 +358,7 @@ public class OfficeXpRenderer : ChromeRenderer
         format.Vertical = VerticalAlignment.Middle;
         format.Wrap = false;
 
-        surface.DrawString(item.Text, Font,
+        surface.DrawString(caption, Font,
                            disabled ? DisabledText : TextColor, bounds, format);
     }
 
