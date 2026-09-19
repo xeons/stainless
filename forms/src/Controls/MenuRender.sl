@@ -156,23 +156,36 @@ public class OfficeXpRenderer : MenuRenderer
         if (item.IsSeparator)
             return Size.Of(GutterWidth + 32, 3 + Padding);
 
-        var text = surface.MeasureString(item.Text, Font);
+        var text = surface.MeasureString(Spoken(item.Text), Font);
 
-        // A word on the bar: its own width and a little either side. No
-        // gutter, because there is nothing to put in one and a strip of
-        // gradient across the top of a window is not a menu bar.
+        // A word on the bar, and **nothing added to it**.
+        //
+        // Windows puts its own margin round a bar item -- measured at fourteen
+        // pixels on this scheme -- and adds it to whatever a `WM_MEASUREITEM`
+        // reports. Padding here as well is padding twice: `File` came out
+        // forty-eight pixels wide where the platform's own is thirty-two, and
+        // the bar read as airy for no reason a reader of this code could see.
+        // Reporting the text alone lands on exactly the platform's number.
+        //
+        // The height is reported and ignored: a bar is `SM_CYMENU` tall
+        // whatever an item asks for, which is why `File` came back nineteen
+        // when this asked for twenty-three.
         if (item.OnMenuBar)
-            return Size.Of(text.Width + Padding * 4, text.Height + Padding * 2);
+            return Size.Of(text.Width, text.Height);
 
         // Room for the caption, the gutter it sits beside, and a margin on the
-        // right.
+        // right for the arrow.
         //
         // **The arrow is ours to draw and ours to leave room for.** Windows
         // draws the little triangle on an item that opens a submenu -- until
         // the item is owner-drawn, at which point it draws nothing at all and
-        // the program has to. A margin that assumed otherwise is how a
-        // submenu ends up looking like a command.
-        return Size.Of(GutterWidth + text.Width + 32, text.Height + Padding * 2);
+        // the program has to.
+        //
+        // The margin is smaller than it looks because Windows adds its own
+        // check-mark column to what is reported here, the same way it adds a
+        // margin to a bar item. That cannot be measured from a menu nobody has
+        // opened, so unlike the bar above this is proportioned by eye.
+        return Size.Of(GutterWidth + text.Width + 18, text.Height + Padding * 2);
     }
 
     public override void Draw(Graphics surface, MenuItem item,
@@ -289,6 +302,51 @@ public class OfficeXpRenderer : MenuRenderer
 
         surface.DrawLine(ink, x - 2, y, x, y + 3);
         surface.DrawLine(ink, x, y + 3, x + 5, y - 4);
+    }
+
+    /// A caption with its accelerator markers taken out, which is the string
+    /// that actually reaches the screen.
+    ///
+    /// **Measuring `&File` and drawing `File` is how a menu bar ends up
+    /// airy.** The two calls underneath disagree on purpose: measuring goes
+    /// through `GetTextExtentPoint32W`, which counts every character it is
+    /// given, and drawing goes through `DrawTextW` without `DT_NOPREFIX`,
+    /// which eats the ampersand and underlines what follows. So every caption
+    /// measured one glyph wider than it drew, the item was padded to that
+    /// width, and the text sat centred in a gap the size of an ampersand --
+    /// twice over between any two items.
+    ///
+    /// `&&` is a literal ampersand and stays one, which is the same rule
+    /// `DrawTextW` follows.
+    static String Spoken(String caption)
+    {
+        if (!caption.Contains("&"))
+            return caption;
+
+        var plain = new StringBuilder();
+        nuint at = 0u;
+        nuint length = caption.ByteLength();
+
+        while (at < length)
+        {
+            byte here = caption.ByteAt(at);
+            if (here != (byte)38)                    // '&'
+            {
+                plain.AppendByte(here);
+                at++;
+                continue;
+            }
+
+            // A doubled one is a real ampersand; a single one marks the letter
+            // after it and is not drawn.
+            at++;
+            if (at < length && caption.ByteAt(at) == (byte)38)
+            {
+                plain.AppendByte((byte)38);
+                at++;
+            }
+        }
+        return plain.ToText();
     }
 
     /// `percent` of `a` over `b`.

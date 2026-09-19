@@ -571,6 +571,18 @@ public const int SmSmallIconHeight        = 50;
 public const int SmCursorWidth            = 13;
 public const int SmCursorHeight           = 14;
 public const int SmMenuHeight             = 15;
+
+/// The column a menu reserves for a check mark, and its height.
+///
+/// Worth knowing for an owner-drawn menu: Windows adds this width to whatever
+/// a `WM_MEASUREITEM` reports, so a renderer that also left room for a tick
+/// would leave room for two.
+public const int SmMenuCheckWidth         = 71;
+public const int SmMenuCheckHeight        = 72;
+
+/// The 3D edge, two pixels on every scheme that has one.
+public const int SmEdgeWidth              = 45;
+public const int SmEdgeHeight             = 46;
 public const int SmMouseButtons           = 43;
 public const int SmVirtualScreenX         = 76;
 public const int SmVirtualScreenY         = 77;
@@ -891,6 +903,13 @@ public extern "C"
     int   DestroyMenu(HMENU menu);
     int   SetMenu(HWND window, HMENU menu);
     HMENU GetMenu(HWND window);
+
+    /// Where one item of a menu is, in screen coordinates.
+    ///
+    /// Answers zero when the item is not on screen -- a dropdown that is not
+    /// open has no rectangle -- so a caller asking about a bar is asking about
+    /// the only menu that is always visible.
+    int GetMenuItemRect(HWND window, HMENU menu, uint item, Rect* into);
     int   DrawMenuBar(HWND window);
 
     int   AppendMenuW(HMENU menu, uint flags, nuint item, char16* text);
