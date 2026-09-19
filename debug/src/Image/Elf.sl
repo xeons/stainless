@@ -30,7 +30,7 @@
 // findable; the program headers say what the loader maps, and only those give
 // the address a runtime slide is measured from. Reading one and guessing the
 // other is a mistake that costs nothing until a live process exists -- see
-// `LoadBase`, which is where it was made.
+// `LowestLoadAddress`, which is where it was made.
 //
 // A stripped binary can have its section headers removed entirely and still
 // run perfectly, so a missing section table is "nothing to debug with" rather
@@ -171,7 +171,7 @@ Result<Image, String> ReadElf(String path, byte[] data)
 
     if (made.Is64)
     {
-        if (!Fits(data, 0u, (nuint)sizeof(Elf64Header)))
+        if (!BytesRemainAt(data, 0u, (nuint)sizeof(Elf64Header)))
             return Fail(path + ": the ELF header is truncated");
         var header = (Elf64Header*)&data[0u];
         made.Entry = (nuint)header->Entry;
@@ -185,7 +185,7 @@ Result<Image, String> ReadElf(String path, byte[] data)
     }
     else
     {
-        if (!Fits(data, 0u, (nuint)sizeof(Elf32Header)))
+        if (!BytesRemainAt(data, 0u, (nuint)sizeof(Elf32Header)))
             return Fail(path + ": the ELF header is truncated");
         var header = (Elf32Header*)&data[0u];
         made.Entry = (nuint)header->Entry;
@@ -211,8 +211,8 @@ Result<Image, String> ReadElf(String path, byte[] data)
     {
         nuint at = 0u;
         nuint size = 0u;
-        if (SectionSpan(data, made.Is64, sectionsAt + nameSection * headerSize,
-                        &at, &size) && Fits(data, at, size))
+        if (FindSectionSpan(data, made.Is64, sectionsAt + nameSection * headerSize,
+                        &at, &size) && BytesRemainAt(data, at, size))
         {
             var body = new Cursor(data, at);
             names = body.Take(size);
@@ -230,7 +230,7 @@ Result<Image, String> ReadElf(String path, byte[] data)
 
         if (made.Is64)
         {
-            if (!Fits(data, headerAt, (nuint)sizeof(Elf64SectionHeader)))
+            if (!BytesRemainAt(data, headerAt, (nuint)sizeof(Elf64SectionHeader)))
                 break;
             var header = (Elf64SectionHeader*)&data[headerAt];
             nameAt = (nuint)header->Name;
@@ -241,7 +241,7 @@ Result<Image, String> ReadElf(String path, byte[] data)
         }
         else
         {
-            if (!Fits(data, headerAt, (nuint)sizeof(Elf32SectionHeader)))
+            if (!BytesRemainAt(data, headerAt, (nuint)sizeof(Elf32SectionHeader)))
                 break;
             var header = (Elf32SectionHeader*)&data[headerAt];
             nameAt = (nuint)header->Name;
@@ -251,10 +251,10 @@ Result<Image, String> ReadElf(String path, byte[] data)
             size = (nuint)header->Size;
         }
 
-        String name = nameAt < names.Length ? TextAt(names, nameAt) : "";
+        String name = nameAt < names.Length ? ReadCStringAt(names, nameAt) : "";
 
         byte[] bytes = new byte[0u];
-        if (kind != ShtNoBits && size != 0u && Fits(data, at, size))
+        if (kind != ShtNoBits && size != 0u && BytesRemainAt(data, at, size))
         {
             var body = new Cursor(data, at);
             bytes = body.Take(size);
@@ -263,7 +263,7 @@ Result<Image, String> ReadElf(String path, byte[] data)
         made.Add(new Section(name, address, bytes));
     }
 
-    made.PreferredBase = LoadBase(data, made.Is64, segmentsAt, segmentSize,
+    made.PreferredBase = LowestLoadAddress(data, made.Is64, segmentsAt, segmentSize,
                                   segmentCount);
 
     if (made.Sections.Count == 0u)
@@ -273,11 +273,11 @@ Result<Image, String> ReadElf(String path, byte[] data)
 
 /// Where one section header's bytes are, for the one lookup that happens before
 /// the loop that would otherwise have done it.
-bool SectionSpan(byte[] data, bool is64, nuint headerAt, nuint* at, nuint* size)
+bool FindSectionSpan(byte[] data, bool is64, nuint headerAt, nuint* at, nuint* size)
 {
     if (is64)
     {
-        if (!Fits(data, headerAt, (nuint)sizeof(Elf64SectionHeader)))
+        if (!BytesRemainAt(data, headerAt, (nuint)sizeof(Elf64SectionHeader)))
             return false;
         var header = (Elf64SectionHeader*)&data[headerAt];
         *at = (nuint)header->Offset;
@@ -285,7 +285,7 @@ bool SectionSpan(byte[] data, bool is64, nuint headerAt, nuint* at, nuint* size)
         return true;
     }
 
-    if (!Fits(data, headerAt, (nuint)sizeof(Elf32SectionHeader)))
+    if (!BytesRemainAt(data, headerAt, (nuint)sizeof(Elf32SectionHeader)))
         return false;
     var header = (Elf32SectionHeader*)&data[headerAt];
     *at = (nuint)header->Offset;
@@ -306,7 +306,7 @@ bool SectionSpan(byte[] data, bool is64, nuint headerAt, nuint* at, nuint* size)
 ///
 /// Zero when there are no program headers at all, which is what a relocatable
 /// object has: nothing is loaded, so nothing slides.
-nuint LoadBase(byte[] data, bool is64, nuint at, nuint size, nuint count)
+nuint LowestLoadAddress(byte[] data, bool is64, nuint at, nuint size, nuint count)
 {
     if (at == 0u || count == 0u)
         return 0u;
@@ -325,7 +325,7 @@ nuint LoadBase(byte[] data, bool is64, nuint at, nuint size, nuint count)
 
         if (is64)
         {
-            if (!Fits(data, headerAt, (nuint)sizeof(Elf64ProgramHeader)))
+            if (!BytesRemainAt(data, headerAt, (nuint)sizeof(Elf64ProgramHeader)))
                 break;
             var header = (Elf64ProgramHeader*)&data[headerAt];
             kind = header->Type;
@@ -333,7 +333,7 @@ nuint LoadBase(byte[] data, bool is64, nuint at, nuint size, nuint count)
         }
         else
         {
-            if (!Fits(data, headerAt, (nuint)sizeof(Elf32ProgramHeader)))
+            if (!BytesRemainAt(data, headerAt, (nuint)sizeof(Elf32ProgramHeader)))
                 break;
             var header = (Elf32ProgramHeader*)&data[headerAt];
             kind = header->Type;

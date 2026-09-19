@@ -38,9 +38,9 @@ import Standard.Env;
 import Standard.Text;
 import Debugger;
 
-/// Hexadecimal, with a fixed width, because a column of addresses that do not
+/// FormatHexadecimal, with a fixed width, because a column of addresses that do not
 /// line up is a column nobody reads.
-String Hex(nuint value, int digits)
+String FormatHexPadded(nuint value, int digits)
 {
     var made = new StringBuilder();
     for (int shift = (digits - 1) * 4; shift >= 0; shift = shift - 4)
@@ -54,10 +54,10 @@ String Hex(nuint value, int digits)
     return made.ToText();
 }
 
-String Number(nuint value) => Standard.Text.FromInteger((long)value);
+String FormatNumber(nuint value) => Standard.Text.FromInteger((long)value);
 
 /// Pads on the right, for a column of names.
-String Wide(String text, nuint width)
+String PadRight(String text, nuint width)
 {
     var made = new StringBuilder();
     made.Append(text);
@@ -66,7 +66,7 @@ String Wide(String text, nuint width)
     return made.ToText();
 }
 
-int Sections(String path)
+int PrintSections(String path)
 {
     var read = Image.FromFile(path);
     if (!read.Ok)
@@ -79,19 +79,19 @@ int Sections(String path)
     Console.WriteLine(image.Path);
     Console.WriteLine("  format    " + (image.Kind == ImageKind.Pe ? "PE" : "ELF")
                       + (image.Is64 ? " 64-bit" : " 32-bit"));
-    Console.WriteLine("  base      0x" + Hex(image.PreferredBase, 16));
-    Console.WriteLine("  entry     0x" + Hex(image.Entry, 16));
+    Console.WriteLine("  base      0x" + FormatHexPadded(image.PreferredBase, 16));
+    Console.WriteLine("  entry     0x" + FormatHexPadded(image.Entry, 16));
     Console.WriteLine("  dwarf     " + (image.HasDwarf ? "yes" : "no"));
     Console.WriteLine("");
-    Console.WriteLine("  " + Wide("name", 20) + Wide("address", 20) + "size");
+    Console.WriteLine("  " + PadRight("name", 20) + PadRight("address", 20) + "size");
 
     var sections = image.Sections;
     for (nuint i = 0u; i < sections.Count; i++)
     {
         var section = sections[i];
-        Console.WriteLine("  " + Wide(section.Name, 20)
-                          + Wide("0x" + Hex(section.Address, 16), 20)
-                          + Number(section.Size));
+        Console.WriteLine("  " + PadRight(section.Name, 20)
+                          + PadRight("0x" + FormatHexPadded(section.Address, 16), 20)
+                          + FormatNumber(section.Size));
     }
     return 0;
 }
@@ -102,7 +102,7 @@ int Sections(String path)
 /// samples do it: a module-level flag is refused (SL0575 territory -- only
 /// `const` lives at module scope), and threading it reads better than a class
 /// that exists to hold one bool.
-bool Check(bool sofar, String what, bool ok)
+bool ReportCheck(bool sofar, String what, bool ok)
 {
     Console.WriteLine((ok ? "  ok   " : "  FAIL ") + what);
     return sofar && ok;
@@ -110,7 +110,7 @@ bool Check(bool sofar, String what, bool ok)
 
 /// The parts that need no binary on disk: the number reading everything else
 /// is built out of.
-int SelfTest()
+int RunSelfTest()
 {
     // LEB128, unsigned. 0xE5 0x8E 0x26 is the canonical 624485 from the DWARF
     // standard's own worked example, which is why it is the one used here.
@@ -118,59 +118,59 @@ int SelfTest()
 
     byte[] example = [0xE5, 0x8E, 0x26];
     var one = new Cursor(example);
-    ok = Check(ok, "an unsigned LEB128 reads the standard's own example",
+    ok = ReportCheck(ok, "an unsigned LEB128 reads the standard's own example",
                one.Leb() == 624485u);
 
     // And signed: 0xC0 0xBB 0x78 is -123456, the matching example.
     byte[] negative = [0xC0, 0xBB, 0x78];
     var two = new Cursor(negative);
-    ok = Check(ok, "a signed LEB128 reads its example too", two.SLeb() == -123456);
+    ok = ReportCheck(ok, "a signed LEB128 reads its example too", two.SLeb() == -123456);
 
     // A single byte with the sign bit set is negative, which is the case a
     // reader that forgets to smear the sign gets wrong and nothing notices
     // until an fbreg offset points the wrong way up the stack.
     byte[] minusOne = [0x7F];
     var three = new Cursor(minusOne);
-    ok = Check(ok, "a one-byte signed LEB128 is sign-extended", three.SLeb() == -1);
+    ok = ReportCheck(ok, "a one-byte signed LEB128 is sign-extended", three.SLeb() == -1);
 
     byte[] plus63 = [0x3F];
     var four = new Cursor(plus63);
-    ok = Check(ok, "and a positive one is not", four.SLeb() == 63);
+    ok = ReportCheck(ok, "and a positive one is not", four.SLeb() == 63);
 
     // Little-endian, which everything in both containers is.
     byte[] word = [0x78, 0x56, 0x34, 0x12, 0, 0, 0, 0];
     var five = new Cursor(word);
-    ok = Check(ok, "a u32 is little-endian", five.U32() == 0x12345678u);
+    ok = ReportCheck(ok, "a u32 is little-endian", five.U32() == 0x12345678u);
 
     byte[] wide = [1, 0, 0, 0, 0, 0, 0, 0x80];
     var six = new Cursor(wide);
-    ok = Check(ok, "a u64 uses its top byte", six.U64() == 0x8000000000000001u);
+    ok = ReportCheck(ok, "a u64 uses its top byte", six.U64() == 0x8000000000000001u);
 
     // **Running off the end answers rather than aborts**, which is the whole
     // contract: the input is a file somebody else wrote.
     byte[] tooShort = [1, 2];
     var seven = new Cursor(tooShort);
     seven.U32();
-    ok = Check(ok, "a read past the end is refused, not fatal", seven.Overran);
+    ok = ReportCheck(ok, "a read past the end is refused, not fatal", seven.Overran);
 
     byte[] terminated = [0x41, 0x42, 0, 0x43];
     var eight = new Cursor(terminated);
-    ok = Check(ok, "a C string stops at its NUL", eight.CString() == "AB");
-    ok = Check(ok, "and leaves the cursor after it", eight.Offset == 3u);
+    ok = ReportCheck(ok, "a C string stops at its NUL", eight.CString() == "AB");
+    ok = ReportCheck(ok, "and leaves the cursor after it", eight.Offset == 3u);
 
     // An unterminated string is still answered, because the bytes are probably
     // the name that was meant.
     byte[] unterminated = [0x41, 0x42];
     var nine = new Cursor(unterminated);
-    ok = Check(ok, "an unterminated string is answered anyway", nine.CString() == "AB");
-    ok = Check(ok, "and says it ran over", nine.Overran);
+    ok = ReportCheck(ok, "an unterminated string is answered anyway", nine.CString() == "AB");
+    ok = ReportCheck(ok, "and says it ran over", nine.Overran);
 
     // A run of continuation bytes must stop rather than walk the file.
     byte[] endless = [0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
                       0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80];
     var ten = new Cursor(endless);
     ten.Leb();
-    ok = Check(ok, "a LEB128 that never ends stops at ten bytes", ten.Offset == 10u);
+    ok = ReportCheck(ok, "a LEB128 that never ends stops at ten bytes", ten.Offset == 10u);
 
     // **Every named form must be a skippable form.** A form this engine can
     // name but not step over is one that loses its place in the entry stream
@@ -190,25 +190,25 @@ int SelfTest()
         if (!SkipForm(over, forms[i], 8u, 4u))
         {
             Console.WriteLine("       no skip rule for form 0x"
-                              + Hexadecimal((ulong)forms[i]));
+                              + FormatHexadecimal((ulong)forms[i]));
             everyForm = false;
         }
     }
-    ok = Check(ok, "every form this engine names can also be skipped", everyForm);
+    ok = ReportCheck(ok, "every form this engine names can also be skipped", everyForm);
 
     // And the other half of the contract: a form it does not know is *refused*,
     // not skipped by zero bytes. Answering true there would keep the reader
     // running over an entry it has already lost.
     byte[] spare = [0, 0, 0, 0, 0, 0, 0, 0];
     var unknown = new Cursor(spare);
-    ok = Check(ok, "a form it has never heard of is refused rather than guessed",
+    ok = ReportCheck(ok, "a form it has never heard of is refused rather than guessed",
                !SkipForm(unknown, 0x7Fu, 8u, 4u));
 
     // The header structures, against the sizes their formats fix. Cheap, and
     // the only cover the 32-bit layouts have until a 32-bit binary is built
     // here -- the box this is developed on has no multilib.
     String sizes = HeaderSizeProblem();
-    ok = Check(ok, "every header struct is the size its format says",
+    ok = ReportCheck(ok, "every header struct is the size its format says",
                sizes.IsEmpty);
     if (!sizes.IsEmpty)
         Console.WriteLine("       " + sizes);
@@ -218,7 +218,7 @@ int SelfTest()
 }
 
 /// Reads the binary and its DWARF, or prints why not.
-DwarfInfo? Load(String path)
+DwarfInfo? LoadDwarfOrComplain(String path)
 {
     var read = Image.FromFile(path);
     if (!read.Ok)
@@ -245,23 +245,23 @@ DwarfInfo? Load(String path)
     return info;
 }
 
-int Units(String path)
+int PrintUnits(String path)
 {
-    var info = Load(path);
+    var info = LoadDwarfOrComplain(path);
     if (info == null)
         return 1;
 
     var units = ((DwarfInfo)info).Units;
-    Console.WriteLine(Number(units.Count) + " unit(s)");
+    Console.WriteLine(FormatNumber(units.Count) + " unit(s)");
     for (nuint i = 0u; i < units.Count; i++)
     {
         var unit = units[i];
         Console.WriteLine("");
-        Console.WriteLine("  0x" + Hexadecimal((ulong)unit.Offset) + "  "
+        Console.WriteLine("  0x" + FormatHexadecimal((ulong)unit.Offset) + "  "
                           + unit.Name);
-        Console.WriteLine("    version " + Number((nuint)unit.Version)
-                          + ", " + Number(unit.AddressSize) + "-byte addresses, "
-                          + Number(unit.Dies.Count) + " entries");
+        Console.WriteLine("    version " + FormatNumber((nuint)unit.Version)
+                          + ", " + FormatNumber(unit.AddressSize) + "-byte addresses, "
+                          + FormatNumber(unit.Dies.Count) + " entries");
         var root = unit.Root;
         if (root != null)
         {
@@ -279,9 +279,9 @@ int Units(String path)
 /// is the only way this reader was ever going to be trusted: the offsets and
 /// the tag names are the tool's, so a disagreement shows up as a line rather
 /// than as a feeling.
-int Dies(String path, String only)
+int PrintDies(String path, String only)
 {
-    var info = Load(path);
+    var info = LoadDwarfOrComplain(path);
     if (info == null)
         return 1;
 
@@ -297,7 +297,7 @@ int Dies(String path, String only)
 
             var line = new StringBuilder();
             line.Append("0x");
-            line.Append(Hexadecimal((ulong)die.Offset));
+            line.Append(FormatHexadecimal((ulong)die.Offset));
             line.Append(": ");
             for (int pad = 0; pad < die.Depth; pad++)
                 line.Append("  ");
@@ -313,7 +313,7 @@ int Dies(String path, String only)
                     text.Append("  ");
                 text.Append(AttributeName(one.At));
                 text.Append("\t");
-                text.Append(Describe(one));
+                text.Append(FormatAttributeValue(one));
                 Console.WriteLine(text.ToText());
             }
         }
@@ -323,16 +323,16 @@ int Dies(String path, String only)
 
 /// One attribute's value, in the shape `llvm-dwarfdump` prints it so the two
 /// can be compared without translating.
-String Describe(Attribute one)
+String FormatAttributeValue(Attribute one)
 {
     if (one.IsText)
         return "(\"" + one.Text + "\")";
     if (one.Block.Length != 0u)
-        return "(<0x" + Hexadecimal((ulong)one.Block.Length) + "> bytes)";
-    return "(0x" + Hexadecimal(one.Value) + ")";
+        return "(<0x" + FormatHexadecimal((ulong)one.Block.Length) + "> bytes)";
+    return "(0x" + FormatHexadecimal(one.Value) + ")";
 }
 
-int Usage()
+int PrintUsage()
 {
     Console.WriteLine("sldb -- the Stainless debugger");
     Console.WriteLine("");
@@ -347,19 +347,19 @@ int Main()
 {
     var args = Standard.Env.Arguments();
     if (args.Length == 0u)
-        return Usage();
+        return PrintUsage();
 
     if (args[0u] == "--selftest")
-        return SelfTest();
+        return RunSelfTest();
 
     if (args[0u] == "sections" && args.Length >= 2u)
-        return Sections(args[1u]);
+        return PrintSections(args[1u]);
 
     if (args[0u] == "units" && args.Length >= 2u)
-        return Units(args[1u]);
+        return PrintUnits(args[1u]);
 
     if (args[0u] == "dies" && args.Length >= 2u)
-        return Dies(args[1u], args.Length >= 3u ? args[2u] : "");
+        return PrintDies(args[1u], args.Length >= 3u ? args[2u] : "");
 
-    return Usage();
+    return PrintUsage();
 }

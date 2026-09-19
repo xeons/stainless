@@ -146,6 +146,39 @@ short. What a single word must not be is *vague*: `Update`, `Process`,
 `Handle`, `Do`, `Run` name nothing a caller can predict, and each should say
 what it updates or what it handles.
 
+### 1.4a A name at module level carries no context, so it must supply its own
+
+A member of a class is read with the class in front of it: `Cursor.Take`,
+`Image.Find`, `Die.Range`. The type is half the name, and the short half is
+allowed to be short because of it.
+
+**A function at module level has no such half.** It is visible everywhere in
+the module, it is a candidate wherever member lookup fails, and it will be read
+at a call site with nothing beside it. So it has to say what it is on its own:
+
+```
+Fits(data, at, 40u)                      // fits what, inside what?
+BytesRemainAt(data, at, 40u)             // says it
+
+Hexadecimal(value)                       // of what, in what shape?
+FormatHexadecimal(value)                 // says it
+
+Load(path)                               // loads what, and answers what?
+LoadDwarfOrComplain(path)                // says it
+```
+
+The rule: **at module level, a name is a verb phrase with its object in it**,
+and a bare verb or a bare adjective is not enough. Inside a type the same name
+may well be right -- `Find`, `Take`, `Range` are fine as members, because the
+receiver supplies the noun.
+
+This is not only taste. [§1.5](#15-two-collisions-the-standard-library-sets-up)
+is the same problem with teeth: short module-level names are exactly the ones
+that collide with the standard library's free verbs, and the collision is
+silent. A module-level `Describe` in a file that also calls
+`Standard.IO.Describe` is a question the reader has to answer and the binder
+answers differently inside a lambda.
+
 ### 1.5 Two collisions the standard library sets up
 
 `import Standard.Collections` brings roughly twenty short verbs into scope at
@@ -336,6 +369,54 @@ returns the expression, and a `void` one evaluates it.
 
 Where the body is more than one expression, or is a statement that is not one —
 an `if`, a loop — the braces go on their own lines as anywhere else.
+
+### 3.3a A run of equality tests on one value is a `switch`
+
+**If three or more branches compare the same expression against constants, use
+a `switch`.** Not a chain of `if`s, and not a chain of `else if`s.
+
+```
+// No.
+if (form == FormData1) { reader.Skip(1u); return true; }
+if (form == FormData2) { reader.Skip(2u); return true; }
+if (form == FormData4 || form == FormRef4 || form == FormStrx4) { ... }
+
+// Yes.
+switch (form)
+{
+    case FormData1: reader.Skip(1u); return true;
+    case FormData2: reader.Skip(2u); return true;
+
+    case FormData4:
+    case FormRef4:
+    case FormStrx4:
+        reader.Skip(4u);
+        return true;
+}
+```
+
+Three reasons, in the order they matter:
+
+**It reads as the table it is.** A set of constants mapped to behaviour is a
+table, and a `switch` is how this language writes one. Labels that share a body
+stack above it, so the grouping is visible instead of living inside an `||`
+chain the reader has to parse. A missing case is then a gap in a table rather
+than a line that simply is not present.
+
+**It is a jump and not a walk.** A chain is O(n) comparisons at run time and the
+last case pays for all of them. That is invisible until the function is hot:
+`ReadAttribute` in [debug/src/Dwarf/Info.sl](../debug/src/Dwarf/Info.sl) runs
+once per attribute -- tens of thousands of times for one binary -- and its block
+forms had been sitting at the bottom of forty comparisons.
+
+**The compiler can see the set.** An `if` chain over constants is opaque; a
+`switch` is a shape the binder knows, which is what makes exhaustiveness
+checking possible at all -- see the variant switches in
+[§2 of the spec](spec/02-types.md), where leaving a case out is SL0436.
+
+The exception is a chain whose tests are not all the same question: ranges,
+different operands, or conditions with side conditions attached. A `switch` that
+has to be contorted into is worse than the chain it replaced.
 
 ### 3.4 Stepping by one
 

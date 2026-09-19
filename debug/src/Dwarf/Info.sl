@@ -245,7 +245,7 @@ public class DwarfInfo
             if (bad.ByteLength() != 0u)
                 return bad;
             if (next <= at)
-                return "a unit at 0x" + Hexadecimal((ulong)at) + " did not advance";
+                return "a unit at 0x" + FormatHexadecimal((ulong)at) + " did not advance";
             at = next;
         }
         return "";
@@ -290,7 +290,7 @@ public class DwarfInfo
         }
 
         if (unit.AddressSize == 0u || unit.AddressSize > 8u)
-            return "a unit at 0x" + Hexadecimal((ulong)at)
+            return "a unit at 0x" + FormatHexadecimal((ulong)at)
                  + " claims an address size of "
                  + Standard.Text.FromInteger((long)unit.AddressSize);
 
@@ -342,7 +342,7 @@ public class DwarfInfo
 
             var abbrev = abbrevs.Find(code);
             if (abbrev == null)
-                return "an entry at 0x" + Hexadecimal((ulong)dieAt)
+                return "an entry at 0x" + FormatHexadecimal((ulong)dieAt)
                      + " uses abbreviation " + Standard.Text.FromInteger((long)code)
                      + ", which its table does not define";
 
@@ -354,8 +354,8 @@ public class DwarfInfo
                 var wanted = shape.Attributes[i];
                 var made = ReadAttribute(reader, unit, wanted, &bases);
                 if (made == null)
-                    return "an entry at 0x" + Hexadecimal((ulong)dieAt)
-                         + " uses form 0x" + Hexadecimal((ulong)wanted.Form)
+                    return "an entry at 0x" + FormatHexadecimal((ulong)dieAt)
+                         + " uses form 0x" + FormatHexadecimal((ulong)wanted.Form)
                          + ", which this reader cannot skip";
                 die.Attributes.Add((Attribute)made);
             }
@@ -406,7 +406,7 @@ public class DwarfInfo
             if (wanted.Form == FormSecOffset
                 && (wanted.At == AtStrOffsetsBase || wanted.At == AtAddrBase))
             {
-                ulong value = ReadOffset(reader, unit.OffsetSize);
+                ulong value = ReadSectionOffset(reader, unit.OffsetSize);
                 if (wanted.At == AtStrOffsetsBase)
                     bases->StrOffsets = (nuint)value;
                 else
@@ -455,17 +455,17 @@ public class DwarfInfo
 
             case FormStrp:
             {
-                nuint offset = (nuint)ReadOffset(reader, offsetSize);
+                nuint offset = (nuint)ReadSectionOffset(reader, offsetSize);
                 made.Value = (ulong)offset;
-                made.Text = offset < _str.Length ? TextAt(_str, offset) : "";
+                made.Text = offset < _str.Length ? ReadCStringAt(_str, offset) : "";
                 return made;
             }
 
             case FormLineStrp:
             {
-                nuint offset = (nuint)ReadOffset(reader, offsetSize);
+                nuint offset = (nuint)ReadSectionOffset(reader, offsetSize);
                 made.Value = (ulong)offset;
-                made.Text = offset < _lineStr.Length ? TextAt(_lineStr, offset) : "";
+                made.Text = offset < _lineStr.Length ? ReadCStringAt(_lineStr, offset) : "";
                 return made;
             }
 
@@ -478,7 +478,7 @@ public class DwarfInfo
             case FormStrx4:
             {
                 ulong index = form == FormStrx ? reader.Leb()
-                            : ReadFixed(reader, WidthOfStrx(form));
+                            : ReadFixedWidth(reader, WidthOfStrx(form));
                 made.Value = index;
                 made.Text = StringAt(index, bases->StrOffsets, offsetSize);
                 return made;
@@ -487,7 +487,7 @@ public class DwarfInfo
             // ---------------------------------------------------- addresses
 
             case FormAddr:
-                made.Value = ReadFixed(reader, unit.AddressSize);
+                made.Value = ReadFixedWidth(reader, unit.AddressSize);
                 return made;
 
             case FormAddrx:
@@ -497,7 +497,7 @@ public class DwarfInfo
             case FormAddrx4:
             {
                 ulong index = form == FormAddrx ? reader.Leb()
-                            : ReadFixed(reader, WidthOfAddrx(form));
+                            : ReadFixedWidth(reader, WidthOfAddrx(form));
                 made.Value = AddressAt(index, bases->Addr, unit.AddressSize);
                 return made;
             }
@@ -535,7 +535,7 @@ public class DwarfInfo
                 return made;
 
             case FormSecOffset:
-                made.Value = ReadOffset(reader, offsetSize);
+                made.Value = ReadSectionOffset(reader, offsetSize);
                 return made;
 
             case FormLoclistx:
@@ -554,14 +554,14 @@ public class DwarfInfo
             case FormRefUdata:
             {
                 ulong relative = form == FormRefUdata ? reader.Leb()
-                               : ReadFixed(reader, WidthOfRef(form));
+                               : ReadFixedWidth(reader, WidthOfRef(form));
                 made.Value = (ulong)unit.Offset + relative;
                 return made;
             }
 
             case FormRefAddr:
             case FormStrpSup:
-                made.Value = ReadOffset(reader, offsetSize);
+                made.Value = ReadSectionOffset(reader, offsetSize);
                 return made;
 
             case FormRefSig8:
@@ -623,8 +623,8 @@ public class DwarfInfo
         if (at + offsetSize > _strOffsets.Length)
             return "";
         var reader = new Cursor(_strOffsets, at);
-        nuint offset = (nuint)ReadOffset(reader, offsetSize);
-        return offset < _str.Length ? TextAt(_str, offset) : "";
+        nuint offset = (nuint)ReadSectionOffset(reader, offsetSize);
+        return offset < _str.Length ? ReadCStringAt(_str, offset) : "";
     }
 
     ulong AddressAt(ulong index, nuint start, nuint addressSize)
@@ -633,7 +633,7 @@ public class DwarfInfo
         if (at + addressSize > _addr.Length)
             return 0u;
         var reader = new Cursor(_addr, at);
-        return ReadFixed(reader, addressSize);
+        return ReadFixedWidth(reader, addressSize);
     }
 }
 
@@ -647,12 +647,12 @@ struct UnitBases
     public nuint Addr;
 }
 
-ulong ReadOffset(Cursor reader, nuint size)
+ulong ReadSectionOffset(Cursor reader, nuint size)
     => size == 8u ? reader.U64() : (ulong)reader.U32();
 
 /// An unsigned number of an arbitrary width from one to eight bytes, which the
 /// three-byte forms are the only reason for.
-ulong ReadFixed(Cursor reader, nuint size)
+ulong ReadFixedWidth(Cursor reader, nuint size)
 {
     ulong answer = 0u;
     for (nuint i = 0u; i < size; i++)

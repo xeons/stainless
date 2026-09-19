@@ -182,37 +182,37 @@ public class Image
 /// caller wants to print and a bool is not.
 public String HeaderSizeProblem()
 {
-    String bad = Wrong("CoffHeader", (nuint)sizeof(CoffHeader), 20u);
+    String bad = ReportWrongSize("CoffHeader", (nuint)sizeof(CoffHeader), 20u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("PeOptional64", (nuint)sizeof(PeOptional64), 32u);
+    bad = ReportWrongSize("PeOptional64", (nuint)sizeof(PeOptional64), 32u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("PeOptional32", (nuint)sizeof(PeOptional32), 32u);
+    bad = ReportWrongSize("PeOptional32", (nuint)sizeof(PeOptional32), 32u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("PeSectionHeader", (nuint)sizeof(PeSectionHeader), 40u);
+    bad = ReportWrongSize("PeSectionHeader", (nuint)sizeof(PeSectionHeader), 40u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("Elf64Header", (nuint)sizeof(Elf64Header), 64u);
+    bad = ReportWrongSize("Elf64Header", (nuint)sizeof(Elf64Header), 64u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("Elf32Header", (nuint)sizeof(Elf32Header), 52u);
+    bad = ReportWrongSize("Elf32Header", (nuint)sizeof(Elf32Header), 52u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("Elf64SectionHeader", (nuint)sizeof(Elf64SectionHeader), 64u);
+    bad = ReportWrongSize("Elf64SectionHeader", (nuint)sizeof(Elf64SectionHeader), 64u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("Elf32SectionHeader", (nuint)sizeof(Elf32SectionHeader), 40u);
+    bad = ReportWrongSize("Elf32SectionHeader", (nuint)sizeof(Elf32SectionHeader), 40u);
     if (!bad.IsEmpty) return bad;
 
-    bad = Wrong("Elf64ProgramHeader", (nuint)sizeof(Elf64ProgramHeader), 56u);
+    bad = ReportWrongSize("Elf64ProgramHeader", (nuint)sizeof(Elf64ProgramHeader), 56u);
     if (!bad.IsEmpty) return bad;
 
-    return Wrong("Elf32ProgramHeader", (nuint)sizeof(Elf32ProgramHeader), 32u);
+    return ReportWrongSize("Elf32ProgramHeader", (nuint)sizeof(Elf32ProgramHeader), 32u);
 }
 
-String Wrong(String name, nuint got, nuint wanted)
+String ReportWrongSize(String name, nuint got, nuint wanted)
 {
     if (got == wanted)
         return "";

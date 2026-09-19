@@ -27,7 +27,7 @@
 // `Skip(4u) // TimeDateStamp` is a comment that can disagree with its own
 // arithmetic; a field called `TimeDateStamp` cannot. The one thing a cast still
 // owes the caller is a bounds check, since the input is a file somebody else
-// wrote -- `Fits` is that, once per header rather than once per field.
+// wrote -- `BytesRemainAt` is that, once per header rather than once per field.
 //
 // The byte cursor next door is for the variable-length half of this job: DWARF
 // is LEB128 and abbrev-driven attributes whose widths are decided at run time,
@@ -133,7 +133,7 @@ const nuint PeSymbolSize = 18u;
 /// The second test is not redundant. `at + size` is computed in `nuint` and a
 /// corrupt header can name an offset near the top of the range, so the sum
 /// wraps and a plain `<= Length` says yes to a read that starts past the end.
-bool Fits(byte[] data, nuint at, nuint size)
+bool BytesRemainAt(byte[] data, nuint at, nuint size)
     => at + size >= at && at + size <= data.Length;
 
 Result<Image, String> ReadPe(String path, byte[] data)
@@ -142,11 +142,11 @@ Result<Image, String> ReadPe(String path, byte[] data)
 
     // The DOS stub ends with the offset of the real header, at a fixed place
     // that has not moved since 1993.
-    if (!Fits(data, 0x3Cu, 4u))
+    if (!BytesRemainAt(data, 0x3Cu, 4u))
         return Fail(path + ": too short to hold a DOS header");
     nuint peAt = (nuint)(*(uint*)&data[0x3Cu]);
 
-    if (!Fits(data, peAt, 4u + (nuint)sizeof(CoffHeader)))
+    if (!BytesRemainAt(data, peAt, 4u + (nuint)sizeof(CoffHeader)))
         return Fail(path + ": the PE header offset points outside the file");
 
     var signature = (byte*)&data[peAt];
@@ -162,12 +162,12 @@ Result<Image, String> ReadPe(String path, byte[] data)
 
     // The optional header is optional in name only for an image; what varies is
     // its length, which the COFF header just gave.
-    if (optionalSize >= 2u && Fits(data, optionalAt, 2u))
+    if (optionalSize >= 2u && BytesRemainAt(data, optionalAt, 2u))
     {
         ushort magic = *(ushort*)&data[optionalAt];
         made.Is64 = magic == PeOptional64Magic;
 
-        if (made.Is64 && Fits(data, optionalAt, (nuint)sizeof(PeOptional64)))
+        if (made.Is64 && BytesRemainAt(data, optionalAt, (nuint)sizeof(PeOptional64)))
         {
             var optional = (PeOptional64*)&data[optionalAt];
             made.PreferredBase = (nuint)optional->ImageBase;
@@ -175,7 +175,7 @@ Result<Image, String> ReadPe(String path, byte[] data)
                        ? made.PreferredBase + (nuint)optional->AddressOfEntryPoint
                        : 0u;
         }
-        else if (!made.Is64 && Fits(data, optionalAt, (nuint)sizeof(PeOptional32)))
+        else if (!made.Is64 && BytesRemainAt(data, optionalAt, (nuint)sizeof(PeOptional32)))
         {
             var optional = (PeOptional32*)&data[optionalAt];
             made.PreferredBase = (nuint)optional->ImageBase;
@@ -196,11 +196,11 @@ Result<Image, String> ReadPe(String path, byte[] data)
 
     for (nuint i = 0u; i < (nuint)coff->SectionCount; i++)
     {
-        if (!Fits(data, at + i * stride, stride))
+        if (!BytesRemainAt(data, at + i * stride, stride))
             break;
         var header = (PeSectionHeader*)&data[at + i * stride];
 
-        String name = SectionName(data, &header->Name[0], strings);
+        String name = ResolveSectionName(data, &header->Name[0], strings);
 
         // **`SizeOfRawData` is rounded up to the file alignment and
         // `VirtualSize` is the truth.** For `.text` the difference is padding
@@ -223,7 +223,7 @@ Result<Image, String> ReadPe(String path, byte[] data)
         // an address inside it still resolves to a name.
         nuint rawAt = (nuint)header->PointerToRawData;
         byte[] bytes = new byte[0u];
-        if (rawAt != 0u && size != 0u && Fits(data, rawAt, size))
+        if (rawAt != 0u && size != 0u && BytesRemainAt(data, rawAt, size))
         {
             var body = new Cursor(data, rawAt);
             bytes = body.Take(size);
@@ -244,7 +244,7 @@ Result<Image, String> ReadPe(String path, byte[] data)
 /// Three shapes, and all three occur in one binary this was tested against:
 /// a short name with a NUL after it, a name of exactly eight characters with no
 /// terminator at all, and `/NNN` pointing into the string table.
-String SectionName(byte[] data, byte* raw, nuint strings)
+String ResolveSectionName(byte[] data, byte* raw, nuint strings)
 {
     if (raw[0] == (byte)0x2F && strings != 0u)        // '/'
     {
@@ -261,7 +261,7 @@ String SectionName(byte[] data, byte* raw, nuint strings)
             any = true;
         }
         if (any && strings + offset < data.Length)
-            return TextAt(data, strings + offset);
+            return ReadCStringAt(data, strings + offset);
     }
 
     var made = new StringBuilder();

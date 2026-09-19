@@ -17,8 +17,13 @@ and members, for the C# and the Stainless both. Read it before writing either.
 The short version: Allman braces; `_field`, `s_staticField`, `t_threadStatic`;
 `i++` and never `i += 1`; a one-statement body goes braceless on the next line,
 never packed onto one; a zero-argument side-effect-free getter is a property and
-not a method. The existing tree is still being brought to it, so match the
-document rather than the file you are looking at.
+not a method; **three or more branches comparing one value against constants is
+a `switch`, not a chain of `if`s**; and **a function at module level names its
+object** — `FormatHexadecimal`, not `Hexadecimal`; `BytesRemainAt`, not `Fits`
+— because it is read with nothing beside it and a bare verb there is also what
+collides with the standard library's free verbs. The existing tree is still
+being brought to it, so match the document rather than the file you are looking
+at.
 
 ## Commands
 

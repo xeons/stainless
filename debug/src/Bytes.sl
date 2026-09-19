@@ -44,7 +44,7 @@
 // disk that some other program wrote, and half the point of a reader like this
 // is to survive one that is truncated, corrupt, or simply a format it was not
 // expecting. A debugger that aborts on a bad binary is worse than one that says
-// the binary is bad. The struct readers buy the same guarantee with one `Fits`
+// the binary is bad. The struct readers buy the same guarantee with one `BytesRemainAt`
 // per header instead of one check per field.
 //
 // **The byte order is hardcoded little-endian, and that is not what the cursor
@@ -241,7 +241,7 @@ public class Cursor
 ///
 /// Both formats keep their names in one blob and index into it, so this is what
 /// a section-name lookup and a DWARF `.debug_str` read are both spelled as.
-public String TextAt(byte[] data, nuint at)
+public String ReadCStringAt(byte[] data, nuint at)
 {
     var reader = new Cursor(data, at);
     return reader.CString();

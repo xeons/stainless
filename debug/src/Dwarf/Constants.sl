@@ -167,7 +167,7 @@ public String TagName(uint tag)
         case TagSubprogram: return "DW_TAG_subprogram";
         case TagVariable: return "DW_TAG_variable";
         case TagVolatileType: return "DW_TAG_volatile_type";
-        default: return "DW_TAG_?(0x" + Hexadecimal((ulong)tag) + ")";
+        default: return "DW_TAG_?(0x" + FormatHexadecimal((ulong)tag) + ")";
     }
 }
 
@@ -203,13 +203,13 @@ public String AttributeName(uint at)
         case AtAddrBase: return "DW_AT_addr_base";
         case AtRnglistsBase: return "DW_AT_rnglists_base";
         case AtLoclistsBase: return "DW_AT_loclists_base";
-        default: return "DW_AT_?(0x" + Hexadecimal((ulong)at) + ")";
+        default: return "DW_AT_?(0x" + FormatHexadecimal((ulong)at) + ")";
     }
 }
 
 /// Lower-case hexadecimal with no padding, which is how DWARF numbers are
 /// written everywhere a person reads them.
-public String Hexadecimal(ulong value)
+public String FormatHexadecimal(ulong value)
 {
     if (value == 0u)
         return "0";
