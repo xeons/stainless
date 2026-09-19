@@ -374,6 +374,35 @@ public class GraphicsBackend : IGraphicsBackend
         Blit(picture, into, true);
     }
 
+    /// **The blend is used even for a picture with no alpha channel**, which
+    /// is the one case `Blit` would have sent through `BitBlt`. `AlphaFormat`
+    /// is what says whether the *source* carries per-pixel alpha;
+    /// `SourceConstantAlpha` applies either way, so a 24-bit bitmap fades
+    /// correctly with the format left at zero.
+    public void DrawBitmapFaded(IBitmapBackend picture, FPoint at, int opacity)
+    {
+        HBITMAP bitmap = (HBITMAP)(void*)picture.Handle;
+        if (bitmap == null)
+            return;
+
+        HDC memory = CreateCompatibleDC(_dc);
+        if (memory == null)
+            return;
+        HGDIOBJ was = SelectObject(memory, (HGDIOBJ)(void*)bitmap);
+
+        BlendFunction blend;
+        blend.Operation = BlendSourceOver;
+        blend.Flags = 0;
+        blend.SourceConstantAlpha = (byte)((opacity * 255) / 100);
+        blend.AlphaFormat = picture.HasAlpha ? BlendSourceAlpha : (byte)0;
+
+        GdiAlphaBlend(_dc, at.X, at.Y, picture.Width, picture.Height,
+                      memory, 0, 0, picture.Width, picture.Height, blend);
+
+        SelectObject(memory, was);
+        DeleteDC(memory);
+    }
+
     void Blit(IBitmapBackend picture, FRect into, bool scaled)
     {
         HBITMAP bitmap = (HBITMAP)(void*)picture.Handle;

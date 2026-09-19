@@ -557,6 +557,48 @@ is already bound.
 - **`FloatSpinEdit`** — `SpinEdit` is integers only, and `GtkSpinButton` and
   `UDM_SETRANGE32` both already carry doubles.
 
+### Chrome: menus and toolbars a program can draw
+
+`ChromeRenderer` is one object a program sets on a `Menu` and on a `ToolBar`,
+after WinForms' `ToolStripRenderer`. `SystemChromeRenderer` is the default and
+means "the platform's own", so nothing changes for a program that asks for
+nothing; `OfficeXpRenderer` is the flat 2001 look, taking its colours from the
+system scheme rather than shipping Office's own.
+
+**One renderer for both, deliberately.** A look is a palette and a set of
+rules, not a menu: the hot menu item and the hot toolbar button are the same
+wash of the same colour with the same one-pixel outline, and the toolbar sits
+on exactly the colour the menu bar does. Two renderers would be two copies of
+that to keep in step by hand.
+
+**The two are asked for down different seams**, which is the part worth knowing
+before reading the code. A menu item is *owner-drawn*: Windows is given
+`MF_OWNERDRAW` and sends `WM_MEASUREITEM` and `WM_DRAWITEM`, and the program
+answers both. A toolbar button is *custom-drawn*: comctl32 has no such flag and
+instead asks its parent through `WM_NOTIFY`, several times per paint, how much
+of its own drawing to keep -- so the answer is the return value of the parent's
+window procedure, which is why `ControlPeer.NotifiedBy` carries one.
+
+**The toolbar keeps its native layout and borrows only the paint.** comctl32
+knows the picture size, the caption, whether captions are shown and how a
+wrapped bar breaks; taking that over to change how a button is coloured would
+mean reimplementing it. So `ChromeRenderer` measures menu items and does not
+measure toolbar buttons -- it arranges a picture and a caption inside a
+rectangle it did not choose, by centring them, which lands on the platform's
+own arrangement without this code knowing the platform's padding.
+
+GTK answers `SetOwnerDrawn(false)` for both and goes on drawing its menus and
+toolbars through the desktop theme, which is the right answer there and is why
+the question is asked rather than settled by an `#if`.
+
+Two things are named rather than done. Accelerators are underlined always,
+where Windows hides them until Alt: `DrawTextW` wants `DT_HIDEPREFIX` and the
+window's current UI state, and the state belongs to a window a `Graphics` does
+not have. And a disabled button's picture is faded into its background rather
+than drawn as Office's greyscale emboss, which would need the pixels read back
+out of a `Bitmap` -- one can be made from pixels here and not turned back into
+them.
+
 ### Worth having, and a week each
 
 - **`DateTimePicker`, `Calendar`** (`calendar.pp`) — `comctl32` has both, and
@@ -565,9 +607,8 @@ is already bound.
   `DirectoryEdit`, `DateEdit`: an edit with a button that opens a dialog, which
   is why the dialogs come first.
 - **`ColorBox`, `ColorListBox`** (`colorbox.pas`) — owner-drawn lists.
-- **Owner drawing** across list, combo, menu and button. One mechanism
-  (`WM_DRAWITEM`, `WM_MEASUREITEM`) that half a dozen controls want, so it is
-  worth doing once and properly rather than per control.
+- **Owner drawing** across list, combo and button. Menus and toolbars have it
+  now -- see *Chrome* below -- and the rest want the same two messages.
 - **Accelerators.** `&O` underlines a letter and works while a menu is open, and
   `IsDialogMessage` now handles Tab, the arrows, Enter and Escape; `Ctrl+O`
   still needs an accelerator table and `TranslateAccelerator` in the loop.

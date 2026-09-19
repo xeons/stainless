@@ -65,6 +65,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
     /// index can be turned into an id and back.
     List<int> _commands;
     weak IControlNotify? owning;
+    bool _ownerDrawn;
 
     public ToolBarPeer(IControlNotify owner, IContainerPeer parent)
     {
@@ -73,6 +74,7 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
              owner, true);
         owning = owner;
         _commands = new List<int>();
+        _ownerDrawn = false;
 
         // Windows needs to be told how wide a `TBBUTTON` is before any is
         // added, because the structure grew between versions and this is how it
@@ -155,6 +157,105 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
             return false;
         ((IControlNotify)held).OnPlatformToolClicked(at);
         return true;
+    }
+
+    /// Windows will hand a toolbar's buttons over, so this only ever answers
+    /// what it was asked.
+    ///
+    /// **Custom draw, not owner draw**, which is the same request through a
+    /// different mechanism. A menu item is given a `MF_OWNERDRAW` flag and the
+    /// window is sent `WM_DRAWITEM`; a toolbar has no such flag -- comctl32
+    /// asks its parent through `WM_NOTIFY` on every paint whether to do its
+    /// own drawing, and a control that is never asked is one whose parent
+    /// never answered. So there is nothing to set here beyond remembering that
+    /// the answer is now yes.
+    public bool SetOwnerDrawn(bool drawn)
+    {
+        _ownerDrawn = drawn;
+        Invalidate();
+        return drawn;
+    }
+
+    /// comctl32 asking, several times per paint, how much of its own drawing
+    /// to keep.
+    ///
+    /// **`CDRF_NOTIFYITEMDRAW` at the first stage is what makes the rest
+    /// happen.** Without it the bar asks once about itself, is told nothing in
+    /// particular, and draws every button natively -- which looks exactly like
+    /// a renderer that was never set, and is the one mistake this mechanism
+    /// invites.
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
+    {
+        if (!_ownerDrawn || code != NmCustomDraw)
+            return false;
+
+        IControlNotify? held = owning;
+        if (held == null)
+            return false;
+        var asked = (CustomDraw*)raw;
+
+        if (asked->Stage == CddsPrePaint)
+        {
+            // **The client rectangle rather than the one the notification
+            // carries.** `CustomDraw.Box` at this stage is the region being
+            // repainted, which after a button changes state is that button and
+            // nothing else -- so filling it would leave the rest of the strip
+            // in whatever colour it happened to have. The background is the
+            // whole bar or it is a patch.
+            Rect client;
+            GetClientRect(window, &client);
+            var bounds = FromRect(client);
+            var surface = new Graphics(new GraphicsBackend(asked->Surface, bounds));
+            if (!((IControlNotify)held).OnPlatformDrawToolBackground(surface, bounds))
+                return false;
+
+            *answer = CdrfNotifyItemDraw;
+            return true;
+        }
+
+        if (asked->Stage == CddsItemPrePaint)
+        {
+            // A toolbar names a button by its command id here, not by its
+            // position -- the same numbering `WM_COMMAND` uses and the same
+            // map back.
+            int at = IndexOf((int)asked->Item);
+            if (at < 0)
+                return false;
+
+            var bounds = FromRect(asked->Box);
+            var surface = new Graphics(new GraphicsBackend(asked->Surface, bounds));
+            if (!((IControlNotify)held).OnPlatformDrawTool(surface, bounds, at,
+                                                           ToolStateOf(asked->State)))
+            {
+                // Handing one button back is allowed, and costs nothing: the
+                // answer is zero, which is `CDRF_DODEFAULT`.
+                return false;
+            }
+
+            *answer = CdrfSkipDefault;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// What comctl32 says a button looks like, in the control layer's terms.
+    ///
+    /// `CDIS_GRAYED` and `CDIS_DISABLED` both mean unavailable and a toolbar
+    /// sets them together, so either one is taken as the answer -- reading only
+    /// one of them is a disabled button drawn as though it could be pressed.
+    static ToolItemState ToolStateOf(uint reported)
+    {
+        var state = ToolItemState.None;
+        if ((reported & CdisHot) != 0u)
+            state = state | ToolItemState.Hot;
+        if ((reported & CdisSelected) != 0u)
+            state = state | ToolItemState.Pressed;
+        if ((reported & CdisChecked) != 0u)
+            state = state | ToolItemState.Checked;
+        if ((reported & (CdisDisabled | CdisGrayed)) != 0u)
+            state = state | ToolItemState.Disabled;
+        return state;
     }
 
     public nuint ButtonId(int index)
@@ -465,7 +566,7 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         SendMessageW(window, TcmSetImageList, 0u, (long)(nuint)images.Handle);
     }
 
-    protected override bool NotifiedBy(int code, void* raw)
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
     {
         if (code != TcnSelChange)
             return false;
@@ -644,7 +745,7 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         SendMessageW(window, TvmSetImageList, 0u, (long)(nuint)images.Handle);
     }
 
-    protected override bool NotifiedBy(int code, void* raw)
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
     {
         if (code != TvnSelChangedW)
             return false;
@@ -860,7 +961,7 @@ public class ListViewPeer : ControlPeer, IListViewPeer
     /// `LVN_ITEMCHANGED` fires for every change to every row, including the one
     /// losing the selection -- so the state mask is checked, or a single click
     /// raises two changes.
-    protected override bool NotifiedBy(int code, void* raw)
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
     {
         if (code != LvnItemChanged)
             return false;
@@ -1120,7 +1221,7 @@ public class CheckListPeer : ControlPeer, ICheckListPeer
 
     /// A tick and a selection both arrive as `LVN_ITEMCHANGED`; the state mask
     /// says which, and both are worth reporting.
-    protected override bool NotifiedBy(int code, void* raw)
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
     {
         if (code != LvnItemChanged)
             return false;
@@ -1225,7 +1326,7 @@ public class HeaderPeer : ControlPeer, IHeaderPeer
     }
 
     /// A section was dragged wider or narrower.
-    protected override bool NotifiedBy(int code, void* raw)
+    protected override bool NotifiedBy(int code, void* raw, long* answer)
     {
         if (code != HdnItemChangedW)
             return false;

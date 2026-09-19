@@ -536,6 +536,24 @@ public sealed class Graphics
         _backend.DrawBitmap(picture.Backend(), at);
     }
 
+    /// Draws a picture faded into its background: `opacity` percent of it,
+    /// and the rest whatever was already there.
+    ///
+    /// What a disabled icon is. 100 is `DrawBitmap` and takes that path, so a
+    /// caller working out its own opacity does not have to special-case the
+    /// ordinary one.
+    public void DrawBitmap(Bitmap picture, Point at, int opacity)
+    {
+        if (opacity >= 100)
+        {
+            _backend.DrawBitmap(picture.Backend(), at);
+            return;
+        }
+        if (opacity <= 0)
+            return;
+        _backend.DrawBitmapFaded(picture.Backend(), at, opacity);
+    }
+
     /// Draws it scaled to fill a rectangle.
     public void DrawBitmap(Bitmap picture, Rectangle into)
     {

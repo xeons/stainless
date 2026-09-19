@@ -163,7 +163,7 @@ public class MenuItem : IMenuItemNotify
     /// menu it is in -- and giving it one for this would be a back-pointer on
     /// every item of every menu for the sake of the few that are drawn by a
     /// program.
-    MenuRenderer? _renderer;
+    ChromeRenderer? _renderer;
 
     /// Whether this item sits on a menu bar rather than in something that
     /// drops down.
@@ -196,7 +196,7 @@ public class MenuItem : IMenuItemNotify
         var drawing = _renderer;
         if (drawing == null)
             return Size.Of(0, 0);
-        return ((MenuRenderer)drawing).Measure(surface, this);
+        return ((ChromeRenderer)drawing).Measure(surface, this);
     }
 
     public void OnPlatformDrawItem(Graphics surface, Rectangle bounds,
@@ -204,7 +204,7 @@ public class MenuItem : IMenuItemNotify
     {
         var drawing = _renderer;
         if (drawing != null)
-            ((MenuRenderer)drawing).Draw(surface, this, bounds, state);
+            ((ChromeRenderer)drawing).Draw(surface, this, bounds, state);
     }
 
     /// Gives this item and everything under it a renderer, and tells the
@@ -212,7 +212,7 @@ public class MenuItem : IMenuItemNotify
     ///
     /// Called when a menu is built and again whenever its renderer changes, so
     /// that a program may change how its menus look while they exist.
-    void Restyle(MenuRenderer renderer)
+    void Restyle(ChromeRenderer renderer)
     {
         _renderer = renderer;
 
@@ -245,7 +245,7 @@ public class MenuItem : IMenuItemNotify
     /// Depth first, because a submenu must exist before the item that opens it
     /// can be made -- which is the ordering this whole arrangement exists to
     /// make invisible.
-    void Realise(IMenuPeer into, MenuRenderer renderer, bool onBar)
+    void Realise(IMenuPeer into, ChromeRenderer renderer, bool onBar)
     {
         _renderer = renderer;
         OnMenuBar = onBar;
@@ -319,13 +319,13 @@ public abstract class Menu
 
     /// How this menu is drawn. The platform's own until a program says
     /// otherwise.
-    MenuRenderer _renderer;
+    ChromeRenderer _renderer;
 
     protected Menu()
     {
         peer = null;
         _items = new List<MenuItem>();
-        _renderer = new SystemMenuRenderer();
+        _renderer = new SystemChromeRenderer();
     }
 
     /// What draws this menu.
@@ -337,7 +337,7 @@ public abstract class Menu
     ///
     /// A renderer that the platform will not honour changes nothing:
     /// `SetOwnerDrawn` answers false on GTK and the menu stays native.
-    public MenuRenderer Renderer
+    public ChromeRenderer Renderer
     {
         get => _renderer;
         set

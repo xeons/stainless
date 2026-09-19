@@ -21,6 +21,17 @@ import Forms.Platform;
 
 public class CommonForm : Form
 {
+    /// One renderer for the menus and the toolbar both, which is the
+    /// arrangement `ChromeRenderer` exists to make possible -- Office XP's hot
+    /// menu item and its hot toolbar button are the same rectangle in the same
+    /// colour, and keeping two objects in step by hand is how they stop being.
+    ChromeRenderer _chrome;
+
+    /// One item off the menu, kept so the self test can ask whether *this*
+    /// platform draws its own chrome -- which is the only honest thing to
+    /// compare the toolbar's answer against.
+    MenuItem _anyMenuItem;
+
     ToolBar _tools;
     StatusBar _status;
     TabControl _tabs;
@@ -60,6 +71,7 @@ public class CommonForm : Form
         Ticks = 0;
         _clicks = 0;
 
+        _chrome = new OfficeXpRenderer();
         BuildMenu();
 
         // A toolbar docked to the top, which takes its bite out of the client
@@ -72,6 +84,21 @@ public class CommonForm : Form
         _tools.AddSeparator();
         BoldButton = _tools.AddToggle("Bold", -1);
         BoldButton.Click += this.OnBold;
+
+        // Ticked from the start, and a button beside it that cannot be
+        // pressed. **Both are here to be looked at rather than used.**
+        //
+        // A toolbar has five looks -- cold, hot, pressed, ticked and disabled
+        // -- and a screenshot taken with the pointer elsewhere can show three
+        // of them. Ticked and disabled are also the two this library draws
+        // least like the platform does, which makes them the two worth putting
+        // where a picture will catch them. Hot and pressed need a pointer and
+        // are checked by hand.
+        BoldButton.Checked = true;
+        _tools.Add("Locked").Enabled = false;
+
+        // The same object the menu was given.
+        _tools.Renderer = _chrome;
 
         // And a status bar at the bottom, which docks itself.
         _status = new StatusBar(this);
@@ -203,6 +230,7 @@ public class CommonForm : Form
     void BuildMenu()
     {
         var bar = new MainMenu();
+        bar.Renderer = _chrome;
 
         var file = bar.Add("&File");
         file.Add("&New").Click += this.OnNew;
@@ -214,6 +242,8 @@ public class CommonForm : Form
         WrapItem = view.Add("&Wrap captions");
         WrapItem.Checked = true;
         WrapItem.Click += this.OnToggleWrap;
+
+        _anyMenuItem = WrapItem;
 
         var gauge = view.Add("&Progress");
         gauge.Add("&Empty").Click += this.OnEmpty;
@@ -351,7 +381,28 @@ public class CommonForm : Form
     {
         bool ok = true;
 
-        ok = Check(ok, "toolbar has its buttons", _tools.Buttons.Count == 4u);
+        ok = Check(ok, "toolbar has its buttons", _tools.Buttons.Count == 5u);
+
+        // **This says the request was made and granted, and nothing whatever
+        // about the screen.** The menu bar passed a check shaped exactly like
+        // it for an afternoon while drawing nothing at all. What makes it
+        // worth keeping is the comparison rather than the value: a menu item
+        // and a toolbar on the same machine must give the same answer, and
+        // they reach it down two different seams -- `MF_OWNERDRAW` and
+        // `WM_MEASUREITEM` for one, `NM_CUSTOMDRAW` through `WM_NOTIFY` for
+        // the other. A platform that hands over one and not the other is a
+        // window with half a look, and no `#if` here had to know which
+        // platform this is.
+        ok = Check(ok, "the toolbar and the menus agree about this platform",
+                   _tools.IsOwnerDrawn == _anyMenuItem.IsOwnerDrawn);
+
+        ok = Check(ok, "a ticked toggle stays ticked", BoldButton.Checked);
+        ok = Check(ok, "a button can refuse to be pressed",
+                   !_tools.Buttons[4u].Enabled);
+        ok = Check(ok, "a separator knows it is one",
+                   _tools.Buttons[2u].IsSeparator);
+        ok = Check(ok, "a button remembers the caption it was given",
+                   _tools.Buttons[0u].Text == "New");
         ok = Check(ok, "status bar has its panels", _status.PanelCount == 3u);
         ok = Check(ok, "status panel text round-trips",
                    _status.PanelText(0) == "Ready.");

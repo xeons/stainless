@@ -1593,6 +1593,21 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         {
             ConnectPlain(item, "clicked", () =>
             {
+                // **A toggle set by the program emits this too**, which is the
+                // difference between the two backends and was a crash rather
+                // than a cosmetic bug: `gtk_toggle_tool_button_set_active`
+                // raises `clicked` synchronously, so `BoldButton.Checked =
+                // true` in a form's constructor ran the button's own handler
+                // before the rest of the form existed. Windows does not --
+                // `TB_CHECKBUTTON` notifies nobody -- so a program written and
+                // tested there met it for the first time on Linux.
+                //
+                // `this.Echoing`, never the bare field: a lambda captures a
+                // bare member read by value when it is made, so the field form
+                // tests what the flag said at connection time and guards
+                // nothing at all. See `GtkPeer.Echoing`.
+                if (this.Echoing)
+                    return;
                 var target2 = Owner;
                 if (target2 != null)
                 {
@@ -1626,7 +1641,13 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
             return;
         if (!_toggles[(nuint)index])
             return;
+
+        // Quiet, because this is the program speaking and not the user. The
+        // click that comes back out of this call is the one the handler above
+        // drops.
+        Echo(true);
         gtk_toggle_tool_button_set_active(_items[(nuint)index], checked ? 1 : 0);
+        Echo(false);
     }
 
     public bool GetButtonChecked(int index)
@@ -1657,6 +1678,16 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         var wanted = PreferredSize;
         gtk_widget_set_size_request(widget, bounds.Width, wanted.Height);
     }
+
+    /// No, and for the reason the menus say no: a GTK toolbar is drawn by the
+    /// desktop theme, and a program painting Office XP over it would be the
+    /// one application on the machine that ignored the user's choice of how
+    /// their desktop looks.
+    ///
+    /// The refusal is the whole point of the question being asked. A program
+    /// sets a renderer on both platforms and this one goes on being a GTK
+    /// toolbar, rather than the program having to know where it is running.
+    public bool SetOwnerDrawn(bool drawn) => false;
 }
 
 // ==================================================================== timer

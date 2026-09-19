@@ -803,6 +803,16 @@ public abstract class Control : IControlNotify
     /// toolbar, which is why the base does nothing with it.
     public virtual void OnPlatformToolClicked(int index) { }
 
+    /// A toolbar asked the program to fill its background. Answering false is
+    /// what every control that is not an owner-drawn toolbar means, and is why
+    /// the base can answer it for all of them.
+    public virtual bool OnPlatformDrawToolBackground(Graphics surface,
+                                                     Rectangle bounds) => false;
+
+    /// A toolbar asked the program to draw one of its buttons.
+    public virtual bool OnPlatformDrawTool(Graphics surface, Rectangle bounds,
+                                           int index, ToolItemState state) => false;
+
     /// Whether we are currently inside a platform notification, for a derived
     /// class whose setter must not answer one.
     protected bool IsEchoing => _echoing;

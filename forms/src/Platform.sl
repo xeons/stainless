@@ -201,7 +201,35 @@ public interface IControlNotify
     /// A button on a toolbar was pressed. Separate from `OnPlatformActivated`
     /// because a toolbar is one control with many buttons, so the report has to
     /// say which.
+    ///
+    /// **Never raised for a change the program itself made**, which is the
+    /// same rule `OnPlatformValueChanged` states and is stated again here
+    /// because one backend needs work to keep it: `TB_CHECKBUTTON` notifies
+    /// nobody, and `gtk_toggle_tool_button_set_active` emits `clicked`
+    /// synchronously. A backend that passes that on has every toggle set by a
+    /// constructor running its own handler against a half-built form.
     void OnPlatformToolClicked(int index);
+
+    /// Fill a toolbar's background, before any of its buttons are drawn.
+    ///
+    /// Raised only for a toolbar that asked for `SetOwnerDrawn(true)`, and
+    /// answering false leaves the platform to erase it as it always would.
+    ///
+    /// It is a separate notification rather than something the first button's
+    /// draw could do, because the gaps between buttons and the strip past the
+    /// last one belong to no button at all -- and on an Office XP bar those
+    /// gaps are most of what is seen.
+    bool OnPlatformDrawToolBackground(Graphics surface, Rectangle bounds);
+
+    /// Draw one toolbar button. `index` counts separators, as `ToolButton.Index`
+    /// does.
+    ///
+    /// Answering false gives the button back to the platform, which is how a
+    /// renderer can take the buttons it has an opinion about and leave the
+    /// rest -- a separator, most usefully, whose native drawing is already an
+    /// etched line in the right place.
+    bool OnPlatformDrawTool(Graphics surface, Rectangle bounds, int index,
+                            ToolItemState state);
 }
 
 /// What a top-level window additionally reports.
@@ -709,6 +737,31 @@ public interface IMenuPeer
 /// What kind of thing a toolbar button is.
 public enum ToolButtonKind { Button, Toggle, Separator }
 
+/// What the platform says about a toolbar button at the moment it is drawn.
+///
+/// The toolbar's half of what `MenuItemState` is for a menu, and separate from
+/// it for the same reason the two controls are separate: a menu item is
+/// `Selected` or not and a button is `Hot` *or* `Pressed`, which are different
+/// states that happen to look similar, and one enum spanning both would have a
+/// name that fits neither.
+///
+/// **`Hot` is the one nothing else can answer.** Where the pointer is now is
+/// the platform's to know, and it changes with no program involved. `Checked`
+/// and `Disabled` are here as well even though the `ToolButton` knows them,
+/// because during a draw the platform's word is the one that is current -- the
+/// same argument `MenuItemState` makes.
+[Flags]
+public enum ToolItemState
+{
+    None     = 0,
+    /// The pointer is over this button.
+    Hot      = 1,
+    /// Held down. A toggle that is merely ticked is `Checked`, not this.
+    Pressed  = 2,
+    Checked  = 4,
+    Disabled = 8,
+}
+
 public interface IToolBarPeer : IControlPeer
 {
     /// Adds a button and answers its index. `image` is a position in the
@@ -727,6 +780,13 @@ public interface IToolBarPeer : IControlPeer
     void SetTextVisible(bool visible);
     /// Sizes the bar to its buttons, which is what a docked toolbar wants.
     void ResizeToFit();
+
+    /// Asks the platform to hand each button's drawing back to the program.
+    ///
+    /// Answers whether it will, on the same terms as
+    /// `IMenuItemPeer.SetOwnerDrawn`: a backend that keeps its native toolbar
+    /// says false and the control asks no further.
+    bool SetOwnerDrawn(bool drawn);
 }
 
 public interface IStatusBarPeer : IControlPeer
@@ -902,6 +962,22 @@ public interface IGraphicsBackend
     /// decision on every frame.
     void DrawBitmap(IBitmapBackend picture, Point at);
     void DrawBitmapIn(IBitmapBackend picture, Rectangle into);
+
+    /// The same, at `opacity` percent.
+    ///
+    /// **This is what a disabled picture is made of**, and it is here rather
+    /// than in a renderer because neither backend can be asked to fade
+    /// something after it has been drawn: the fading happens during the blit
+    /// or not at all. Windows already sets up a `BLENDFUNCTION` whose
+    /// `SourceConstantAlpha` is this number and passes 255; cairo has
+    /// `cairo_paint_with_alpha`. So both platforms had it and neither could be
+    /// asked for it.
+    ///
+    /// An opacity of 100 must draw exactly what `DrawBitmap` draws, which is
+    /// why that one stays: a picture with no alpha channel goes through a
+    /// straight `BitBlt` there, and routing every draw through the blend for
+    /// the sake of one case would make every toolbar pay for it.
+    void DrawBitmapFaded(IBitmapBackend picture, Point at, int opacity);
 }
 
 // =============================================================== the factory

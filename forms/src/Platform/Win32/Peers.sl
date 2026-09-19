@@ -613,9 +613,11 @@ public class ControlPeer : IControlPeer
             var sender = PeerOf(header->From);
             if (sender != null)
             {
-                if (((ControlPeer)sender).NotifiedBy(header->Code, (void*)header))
+                long answer = 0;
+                if (((ControlPeer)sender).NotifiedBy(header->Code, (void*)header,
+                                                     &answer))
                 {
-                    return 0;
+                    return answer;
                 }
             }
         }
@@ -748,7 +750,19 @@ public class ControlPeer : IControlPeer
     /// with an `NotifyHeader` and continues with whatever that code implies --
     /// so a peer casts it to the longer type only once it has recognised the
     /// code, which is the whole of the convention.
-    protected virtual bool NotifiedBy(int code, void* raw) => false;
+    ///
+    /// **`answer` is what the parent's window procedure returns**, and it is a
+    /// parameter rather than the result because most notifications do not have
+    /// one: answering "handled" and answering "handled, with this value" are
+    /// different questions, and folding them into one number would leave no
+    /// way to say "handled, and the right answer happens to be zero".
+    /// `NM_CUSTOMDRAW` is the notification this exists for -- every stage of a
+    /// custom-drawn paint is a question whose reply is a `CDRF_*` value, and a
+    /// reply of zero means something quite specific.
+    ///
+    /// It starts at zero, so a peer that answers true and writes nothing has
+    /// said `CDRF_DODEFAULT` and every other notification's "I dealt with it".
+    protected virtual bool NotifiedBy(int code, void* raw, long* answer) => false;
 
     /// What this control wants to be drawn in, as `WM_CTLCOLOR*` wants it: the
     /// device context set up, and a brush returned for the background.

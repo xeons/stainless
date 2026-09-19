@@ -591,6 +591,16 @@ public class GtkGraphicsBackend : IGraphicsBackend
         cairo_restore(_cairo);
     }
 
+    public void DrawBitmapFaded(IBitmapBackend picture, Point at, int opacity)
+    {
+        var pixbuf = ((GtkBitmapBackend)picture).Pixbuf;
+        cairo_save(_cairo);
+        gdk_cairo_set_source_pixbuf(_cairo, (GdkPixbuf*)pixbuf,
+                                    (double)at.X, (double)at.Y);
+        cairo_paint_with_alpha(_cairo, (double)opacity / 100.0);
+        cairo_restore(_cairo);
+    }
+
     /// Scaled into a rectangle. The scaling is cairo's rather than
     /// `gdk_pixbuf_scale_simple`'s, because this happens per frame and a
     /// resampled copy per frame would be the expensive way round.

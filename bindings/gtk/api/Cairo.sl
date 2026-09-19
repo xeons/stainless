@@ -133,6 +133,9 @@ public extern "C"
     /// Paints the source over the whole clip region. What a draw handler calls
     /// first to clear its background.
     void cairo_paint(cairo_t* cr);
+    /// The same, letting `alpha` of what is already there show through.
+    /// 1.0 is `cairo_paint`.
+    void cairo_paint_with_alpha(cairo_t* cr, double alpha);
 
     void cairo_clip(cairo_t* cr);
     void cairo_reset_clip(cairo_t* cr);

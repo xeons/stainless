@@ -117,6 +117,75 @@ public const int NmKillFocus   = -8;
 public const int NmCustomDraw  = -12;
 public const int NmReleasedCapture = -16;
 
+// ================================================================ custom draw
+//
+// The common controls' answer to owner drawing, and a different mechanism from
+// the menus': a control that would otherwise draw itself asks its parent
+// first, several times per paint, and the parent says how much of the default
+// it wants to keep. The conversation runs through `WM_NOTIFY` with an
+// `NM_CUSTOMDRAW`, so the *return value of the parent's window procedure* is
+// the answer -- which is why the notification seam in `forms/` carries one.
+
+/// `NMCUSTOMDRAW`: which stage of the paint this is, where it is going, and
+/// what the item looks like at this moment.
+///
+/// **Every control's custom-draw structure begins with this one**, and each
+/// extends it: a toolbar's `NMTBCUSTOMDRAW` adds brushes and colours for a
+/// caller that wants to keep the default drawing and tint it. Nothing here
+/// reads past the common part -- a renderer that draws the whole button has no
+/// use for the colours the default would have used -- so only the common part
+/// is bound, rather than a longer structure whose extra fields would be
+/// offsets nobody ever checked.
+public struct CustomDraw
+{
+    public NotifyHeader Header;
+    public uint Stage;
+    public HDC Surface;
+    public Rect Box;
+
+    /// Which item. A toolbar puts the button's *command id* here, not its
+    /// index, so a caller has to map it back the same way `WM_COMMAND` does.
+    public nuint Item;
+    public uint State;
+    public long Data;
+}
+
+// Which stage of the paint the control is asking about. `Item` is the bit that
+// separates "the whole control" from "one piece of it", so `ItemPrePaint` is
+// genuinely `Item | PrePaint` and reads that way here.
+public const uint CddsPrePaint      = 0x00000001u;
+public const uint CddsPostPaint     = 0x00000002u;
+public const uint CddsPreErase      = 0x00000003u;
+public const uint CddsPostErase     = 0x00000004u;
+public const uint CddsItem          = 0x00010000u;
+public const uint CddsItemPrePaint  = 0x00010001u;
+public const uint CddsItemPostPaint = 0x00010002u;
+
+// What the parent answers. `DoDefault` is zero, which is what a window
+// procedure returns when it did not recognise the message at all -- so a
+// control whose notification goes unhandled draws itself normally, which is
+// the behaviour that wants no code.
+public const long CdrfDoDefault        = 0x00000000;
+public const long CdrfNewFont          = 0x00000002;
+public const long CdrfSkipDefault      = 0x00000004;
+public const long CdrfNotifyPostPaint  = 0x00000010;
+
+/// Asked once at `CddsPrePaint`, and without it the control never asks about
+/// its items at all -- which looks exactly like custom draw not working.
+public const long CdrfNotifyItemDraw   = 0x00000020;
+
+// What an item looks like right now, in `CustomDraw.State`. `Selected` is
+// pressed rather than chosen: a toolbar button has no selection.
+public const uint CdisSelected      = 0x0001u;
+public const uint CdisGrayed        = 0x0002u;
+public const uint CdisDisabled      = 0x0004u;
+public const uint CdisChecked       = 0x0008u;
+public const uint CdisFocus         = 0x0010u;
+public const uint CdisDefault       = 0x0020u;
+public const uint CdisHot           = 0x0040u;
+public const uint CdisMarked        = 0x0080u;
+public const uint CdisIndeterminate = 0x0100u;
+
 // ================================================================ image list
 
 public extern "C"

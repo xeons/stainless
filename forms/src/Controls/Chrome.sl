@@ -19,7 +19,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// How a menu is drawn, chosen by the program rather than by the widget set.
+// How a window's chrome -- its menus and its toolbars -- is drawn, chosen by
+// the program rather than by the widget set.
+//
+// **One renderer for both, which is the whole reason it is not `MenuRenderer`
+// any more.** A look is a palette and a set of rules, not a menu: Office XP's
+// hot item and its hot toolbar button are the same wash of the same colour
+// with the same one-pixel outline, and its toolbar sits on exactly the colour
+// its menu bar does. Two renderers would be two copies of that palette, kept
+// in step by hand, and the first divergence would be a toolbar that no longer
+// matched the bar above it. So a program sets one object on both.
+//
+// The two halves stay recognisably separate inside it -- a menu is measured
+// and drawn, a toolbar is only drawn, because comctl32 lays its own buttons
+// out and is better at it than this would be.
 //
 // **WinForms' `ToolStripRenderer`, not a themed widget set.** The difference
 // matters: a themed widget set restyles everything a program has, and is the
@@ -28,11 +41,18 @@
 // wants it, and a program that asks for nothing keeps the platform's own
 // drawing -- which on a GTK desktop is the only right answer anyway.
 //
-// The seam underneath is `IMenuItemPeer.SetOwnerDrawn`, which answers whether
-// the platform will hand an item over. Windows will; GTK says no and draws its
-// own menus through the desktop theme. So a renderer is asked, is told no, and
+// The seam underneath is `IMenuItemPeer.SetOwnerDrawn` and
+// `IToolBarPeer.SetOwnerDrawn`, which answer whether the platform will hand
+// the drawing over. Windows will; GTK says no and draws its own menus and
+// toolbars through the desktop theme. So a renderer is asked, is told no, and
 // nothing else happens -- rather than a program having to know which platform
 // it is on before it can ask.
+//
+// **The two platforms say no by different mechanisms, and that is the point of
+// asking.** A menu item is owner-drawn: Windows sends `WM_MEASUREITEM` and
+// `WM_DRAWITEM` and the program answers both. A toolbar button is custom-drawn:
+// comctl32 asks its parent, several times per paint, how much of its own
+// drawing to keep. Neither of those words appears above this line.
 module Forms;
 
 import Standard.Collections;
@@ -44,12 +64,12 @@ import Forms.Platform;
 /// A class rather than a set of closures, because the two questions are asked
 /// at different times about the same item and want the same state between
 /// them: how big is this, and later, draw it there.
-public abstract class MenuRenderer
+public abstract class ChromeRenderer
 {
     /// Whether this renderer wants the items handed to it.
     ///
     /// False leaves the platform drawing its own menus, which is what
-    /// `SystemMenuRenderer` is: turning owner drawing off is a thing a program
+    /// `SystemChromeRenderer` is: turning owner drawing off is a thing a program
     /// must be able to do, and a renderer that is asked for and then draws
     /// nothing would be a menu of empty rectangles.
     public abstract bool OwnerDrawn { get; }
@@ -61,6 +81,23 @@ public abstract class MenuRenderer
     /// owner-drawn item.
     public abstract void Draw(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state);
+
+    /// Fill the strip a toolbar's buttons sit on, before any of them is drawn.
+    ///
+    /// **A toolbar is not measured here and a menu is**, which is the one
+    /// place the two halves of this class differ in shape. comctl32 lays a
+    /// toolbar out itself -- it knows the picture size, the caption, whether
+    /// captions are shown at all, and how a wrapped bar breaks -- and taking
+    /// that over would mean reimplementing it to change how a button is
+    /// coloured. So the layout stays native and only the paint is borrowed.
+    public abstract void DrawToolBackground(Graphics surface, Rectangle bounds);
+
+    /// Draw one toolbar button, background included.
+    ///
+    /// `bounds` is the rectangle comctl32 decided on, so a renderer arranges
+    /// the picture and the caption inside a box it did not choose.
+    public abstract void DrawTool(Graphics surface, ToolButton button,
+                                  Rectangle bounds, ToolItemState state);
 }
 
 /// The platform's own drawing, which is what a menu has unless asked
@@ -69,7 +106,7 @@ public abstract class MenuRenderer
 /// `Measure` and `Draw` are never called: `OwnerDrawn` is false, so nothing is
 /// ever handed over. They are here because the base class declares them and an
 /// abstract method with no body is not a thing.
-public sealed class SystemMenuRenderer : MenuRenderer
+public sealed class SystemChromeRenderer : ChromeRenderer
 {
     public override bool OwnerDrawn => false;
 
@@ -77,6 +114,15 @@ public sealed class SystemMenuRenderer : MenuRenderer
 
     public override void Draw(Graphics surface, MenuItem item,
                               Rectangle bounds, MenuItemState state)
+    {
+    }
+
+    public override void DrawToolBackground(Graphics surface, Rectangle bounds)
+    {
+    }
+
+    public override void DrawTool(Graphics surface, ToolButton button,
+                                  Rectangle bounds, ToolItemState state)
     {
     }
 }
@@ -95,7 +141,7 @@ public sealed class SystemMenuRenderer : MenuRenderer
 /// is a departure from what Office actually did -- it shipped its colours --
 /// and it is the right one for a library: a program that wants Office's exact
 /// blue can set the properties.
-public class OfficeXpRenderer : MenuRenderer
+public class OfficeXpRenderer : ChromeRenderer
 {
     /// How wide the gutter is: the strip down the left where a tick or an icon
     /// goes.
@@ -104,10 +150,24 @@ public class OfficeXpRenderer : MenuRenderer
     /// Room above and below the text.
     public int Padding { get; set; }
 
+    /// The gap between a toolbar button's picture and its caption.
+    public int ToolGap { get; set; }
+
+    /// How much of a disabled button's picture is drawn, as a percentage.
+    ///
+    /// Office XP drew a greyscale emboss of the icon, which needs the picture's
+    /// pixels read back; a `Bitmap` here can be made from pixels and not turned
+    /// back into them, so this fades it into the background instead. It reads
+    /// as unavailable, which is the job, and it is what WinForms' own
+    /// `CreateDisabledImage` does for the alpha half of the same effect.
+    public int DisabledOpacity { get; set; }
+
     public OfficeXpRenderer()
     {
         GutterWidth = 24;
         Padding = 4;
+        ToolGap = 4;
+        DisabledOpacity = 35;
     }
 
     public override bool OwnerDrawn => true;
@@ -302,6 +362,142 @@ public class OfficeXpRenderer : MenuRenderer
 
         surface.DrawLine(ink, x - 2, y, x, y + 3);
         surface.DrawLine(ink, x, y + 3, x + 5, y - 4);
+    }
+
+    // ------------------------------------------------------------- toolbars
+
+    /// What a toolbar sits on: the window's own furniture colour, the same one
+    /// the menu bar uses. Deliberately the same -- a bar and the strip under it
+    /// in two shades of nearly-grey is the thing that reads as unfinished.
+    public virtual Color ToolBackground => BarBackground;
+
+    /// A button held down, and a ticked one under the pointer.
+    public virtual Color PressedFill => Blend(SystemColors.Highlight, SystemColors.Window, 45);
+
+    /// A toggle that is on while the pointer is somewhere else.
+    ///
+    /// **Deeper than hot, not fainter**, which is the opposite of the first
+    /// guess and the numbers are why. Fainter put it at 14 percent of the
+    /// highlight against hot's 20, and on this scheme that is 219 against 204
+    /// -- fifteen levels of grey apart, on two rectangles that are never side
+    /// by side. A toggle that is on was indistinguishable from the button the
+    /// pointer happened to be over.
+    ///
+    /// Deeper separates them by more than twice as much and says the right
+    /// thing as well: being on is a state the button is *in*, and looking
+    /// pressed is how a flat toolbar has spelled that since Office XP. Hot
+    /// stays where it is, because the menu shares it and the menu was
+    /// measured.
+    public virtual Color CheckedFill => Blend(SystemColors.Highlight, SystemColors.Window, 32);
+
+    /// The line between groups of buttons, well short of the full contrast:
+    /// `ControlDark` at full strength is a rule that shouts.
+    public virtual Color SeparatorInk => Blend(SystemColors.ControlDark, SystemColors.Control, 60);
+
+    public override void DrawToolBackground(Graphics surface, Rectangle bounds)
+    {
+        surface.FillRectangle(new Brush(ToolBackground), bounds);
+    }
+
+    public override void DrawTool(Graphics surface, ToolButton button,
+                                  Rectangle bounds, ToolItemState state)
+    {
+        if (button.IsSeparator)
+        {
+            // Down the middle and short of both edges, which is what makes it
+            // read as a divider rather than as a border.
+            int line = bounds.X + bounds.Width / 2;
+            surface.DrawLine(new Pen(SeparatorInk),
+                             line, bounds.Y + 3, line, bounds.Bottom - 4);
+            return;
+        }
+
+        bool disabled = state.HasFlag(ToolItemState.Disabled);
+        bool pressed  = state.HasFlag(ToolItemState.Pressed) && !disabled;
+        bool hot      = state.HasFlag(ToolItemState.Hot) && !disabled;
+        bool ticked   = state.HasFlag(ToolItemState.Checked);
+
+        // **A disabled button gets no wash at all**, not even a ticked one's.
+        // Colouring something that cannot be pressed is how a toolbar ends up
+        // looking like it is offering what it is refusing.
+        if (!disabled)
+        {
+            // A ticked button that is also hot reads as pressed, which is what
+            // it is about to become.
+            if (pressed || (ticked && hot))
+                Wash(surface, bounds, PressedFill);
+            else if (ticked)
+                Wash(surface, bounds, CheckedFill);
+            else if (hot)
+                Wash(surface, bounds, HotFill);
+        }
+
+        DrawToolContent(surface, button, bounds, disabled);
+    }
+
+    /// The picture and the caption, centred together in whatever box comctl32
+    /// decided on.
+    ///
+    /// **Centred rather than placed at a known offset**, which is the one
+    /// decision here worth explaining. comctl32 sized this button to fit its
+    /// own idea of the content plus its own padding, and that padding differs
+    /// with the toolbar's style, the system metrics and the theme. Measuring
+    /// the content and centring it lands on the platform's arrangement without
+    /// this code having to know any of those numbers -- and where it is wrong
+    /// it is wrong symmetrically, which is the failure a reader forgives.
+    void DrawToolContent(Graphics surface, ToolButton button, Rectangle bounds,
+                         bool disabled)
+    {
+        Bitmap? picture = button.Picture;
+        int pictureWidth = 0;
+        int pictureHeight = 0;
+        if (picture != null)
+        {
+            pictureWidth = ((Bitmap)picture).Width;
+            pictureHeight = ((Bitmap)picture).Height;
+        }
+
+        String caption = button.ShowsText ? button.Text : "";
+        var text = caption.IsEmpty ? Size.Of(0, 0)
+                                   : surface.MeasureString(Spoken(caption), Font);
+
+        int gap = pictureWidth > 0 && text.Width > 0 ? ToolGap : 0;
+        int at = bounds.X + (bounds.Width - (pictureWidth + gap + text.Width)) / 2;
+        int middle = bounds.Y + bounds.Height / 2;
+
+        if (picture != null)
+        {
+            surface.DrawBitmap((Bitmap)picture,
+                               Point.At(at, middle - pictureHeight / 2),
+                               disabled ? DisabledOpacity : 100);
+            at = at + pictureWidth + gap;
+        }
+
+        if (text.Width <= 0)
+            return;
+
+        TextFormat format;
+        format.Horizontal = HorizontalAlignment.Left;
+        format.Vertical = VerticalAlignment.Middle;
+        format.Wrap = false;
+
+        // The caption as written, not as measured: `DrawTextW` eats the
+        // ampersand, and `Spoken` above is what keeps the two in step.
+        surface.DrawString(caption, Font, disabled ? DisabledText : TextColor,
+                           Rectangle.Of(at, bounds.Y, text.Width, bounds.Height),
+                           format);
+    }
+
+    /// The Office XP rectangle: a wash of colour and a one-pixel line round it.
+    ///
+    /// Shared by the menu and the toolbar because it is the same rectangle --
+    /// the single shape the whole look is built out of.
+    void Wash(Graphics surface, Rectangle bounds, Color fill)
+    {
+        surface.FillRectangle(new Brush(fill), bounds);
+        surface.DrawRectangle(new Pen(HotBorder),
+                              Rectangle.Of(bounds.X, bounds.Y,
+                                           bounds.Width - 1, bounds.Height - 1));
     }
 
     /// A caption with its accelerator markers taken out, which is the string

@@ -186,6 +186,12 @@ public class Shell : Form
     /// The strip across the top: the commands, and what they build for.
     CoolBar _strip;
 
+    /// What draws the menus and the toolbar, which is deliberately **one**
+    /// object shared by both: Office XP's hot menu item and its hot toolbar
+    /// button are the same rectangle in the same colour, and two renderers
+    /// would be two copies of that to keep in step by hand.
+    ChromeRenderer _chrome;
+
     /// The toolbar's pictures, kept because the platform copied them but the
     /// list is what owns them. Null when the widget set refused, which leaves
     /// the buttons as captions and is not worth reporting.
@@ -270,6 +276,8 @@ public class Shell : Form
         //
         // Made before the dock host so that it takes its bite out of the
         // client area first; the host fills what is left.
+        _chrome = new OfficeXpRenderer();
+
         _strip = new CoolBar(this);
         _strip.Dock = DockStyle.Top;
 
@@ -293,6 +301,7 @@ public class Shell : Form
 
         _tools = new ToolBar(_strip);
         _tools.Height = 26;
+        _tools.Renderer = _chrome;
 
         // Drawn rather than loaded -- `Icons.sl` says why -- and null when the
         // widget set would not take them, in which case the buttons are their
@@ -562,7 +571,7 @@ public class Shell : Form
         // what somebody running that desktop wanted from them. There is no
         // `#if` here for the same reason there is none anywhere else in this
         // program -- the seam is what knows which platform it is on.
-        _bar.Renderer = new OfficeXpRenderer();
+        _bar.Renderer = _chrome;
 
         var file = _bar.Add("&File");
         file.Add("&New").Click += this.OnNew;

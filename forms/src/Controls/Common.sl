@@ -96,6 +96,21 @@ public class ImageList
     public int Count => _backend.Count;
     public Size ImageSize => _backend.ImageSize;
 
+    /// The picture at an index, or null if there is none there.
+    ///
+    /// **The list was already keeping these**, to stop a caller's `Bitmap`
+    /// being collected out from under a platform that copied the pixels. That
+    /// they can be handed back is what lets a renderer draw a toolbar button
+    /// itself: the alternative is reaching through `Backend().Handle` to an
+    /// `HIMAGELIST` and calling `ImageList_Draw`, which would put a Win32 call
+    /// in a class that is meant to have none.
+    public Bitmap? At(int index)
+    {
+        if (index < 0 || (nuint)index >= _kept.Count)
+            return null;
+        return _kept[(nuint)index];
+    }
+
     /// The platform's list, for the controls that take one.
     public IImageListBackend Backend() => _backend;
 }
@@ -113,18 +128,71 @@ public class ToolButton
 {
     weak ToolBar? bar;
     int _index;
+    String _text;
+    int _image;
+    ToolButtonKind _kind;
 
     bool _held;
 
-    public ToolButton(ToolBar owner, int at)
+    public ToolButton(ToolBar owner, int at, String text, int image,
+                      ToolButtonKind kind)
     {
         bar = owner;
         _index = at;
+        _text = text;
+        _image = image;
+        _kind = kind;
         _held = true;
     }
 
     /// Where it sits on the bar, counting separators.
     public int Index => _index;
+
+    /// The caption, exactly as it was given -- accelerator markers and all,
+    /// since it is the platform that eats those and the platform that draws
+    /// the underline.
+    ///
+    /// **Kept here as well as in the toolbar**, which is a duplicate worth
+    /// having: comctl32 owns the string it draws, and asking for it back means
+    /// `TB_GETBUTTONTEXTW` twice per button per paint -- once for the length
+    /// and once for the text -- into a buffer, during a paint.
+    public String Text => _text;
+
+    /// Which picture in the bar's image list, or -1 for none.
+    public int Image => _image;
+
+    /// A gap between groups rather than something that can be pressed.
+    public bool IsSeparator => _kind == ToolButtonKind.Separator;
+
+    /// This button's picture, or null if it has none or the bar has no list.
+    public Bitmap? Picture
+    {
+        get
+        {
+            if (_image < 0)
+                return null;
+            ToolBar? owner = bar;
+            if (owner == null)
+                return null;
+            ImageList? pictures = ((ToolBar)owner).Images;
+            if (pictures == null)
+                return null;
+            return ((ImageList)pictures).At(_image);
+        }
+    }
+
+    /// Whether the bar is drawing captions at all, which is the bar's setting
+    /// and not this button's.
+    public bool ShowsText
+    {
+        get
+        {
+            ToolBar? owner = bar;
+            if (owner == null)
+                return false;
+            return ((ToolBar)owner).ShowText;
+        }
+    }
 
     public bool Enabled
     {
@@ -185,6 +253,7 @@ public class ToolBar : WindowedControl
     List<ToolButton> _buttons;
     ImageList? _pictures;
     bool _captions;
+    ChromeRenderer _renderer;
 
     public ToolBar(WindowedControl parent)
     {
@@ -192,15 +261,45 @@ public class ToolBar : WindowedControl
         _buttons = new List<ToolButton>();
         _pictures = null;
         _captions = true;
+        _renderer = new SystemChromeRenderer();
         _native = WidgetSet.Current.CreateToolBar(this, ParentPeer());
         AttachPeer(_native);
     }
+
+    /// What draws the buttons. The platform's own, unless a program says
+    /// otherwise -- the same default, and the same reason for it, as
+    /// `Menu.Renderer`.
+    ///
+    /// Setting it is a request: a backend that will not hand its buttons over
+    /// says so, and the bar goes on being native. Whether it did is
+    /// `IsOwnerDrawn`.
+    public ChromeRenderer Renderer
+    {
+        get => _renderer;
+        set
+        {
+            _renderer = value;
+            _ownerDrawn = _native.SetOwnerDrawn(value.OwnerDrawn);
+            Invalidate();
+        }
+    }
+
+    bool _ownerDrawn;
+
+    /// Whether the platform actually handed the buttons over.
+    ///
+    /// **A renderer being set is not the same as it being used**, and the
+    /// difference is worth a property rather than an assumption: on GTK the
+    /// answer is always false. Read it in a self test and it says the request
+    /// was made and granted -- it does not say anything reached the screen,
+    /// which is what a screenshot is for.
+    public bool IsOwnerDrawn => _ownerDrawn;
 
     /// Adds a button and answers it, so a handler can be attached to the result.
     public ToolButton Add(String text, int image)
     {
         int at = _native.AddButton(text, image, ToolButtonKind.Button);
-        var made = new ToolButton(this, at);
+        var made = new ToolButton(this, at, text, image, ToolButtonKind.Button);
         _buttons.Add(made);
         _native.ResizeToFit();
         return made;
@@ -212,7 +311,7 @@ public class ToolBar : WindowedControl
     public ToolButton AddToggle(String text, int image)
     {
         int at = _native.AddButton(text, image, ToolButtonKind.Toggle);
-        var made = new ToolButton(this, at);
+        var made = new ToolButton(this, at, text, image, ToolButtonKind.Toggle);
         _buttons.Add(made);
         _native.ResizeToFit();
         return made;
@@ -223,7 +322,7 @@ public class ToolBar : WindowedControl
     public void AddSeparator()
     {
         int at = _native.AddButton("", -1, ToolButtonKind.Separator);
-        _buttons.Add(new ToolButton(this, at));
+        _buttons.Add(new ToolButton(this, at, "", -1, ToolButtonKind.Separator));
         _native.ResizeToFit();
     }
 
@@ -268,6 +367,24 @@ public class ToolBar : WindowedControl
         if (index < 0 || (nuint)index >= _buttons.Count)
             return;
         _buttons[(nuint)index].Raise(this);
+    }
+
+    public override bool OnPlatformDrawToolBackground(Graphics surface,
+                                                      Rectangle bounds)
+    {
+        if (!_ownerDrawn)
+            return false;
+        _renderer.DrawToolBackground(surface, bounds);
+        return true;
+    }
+
+    public override bool OnPlatformDrawTool(Graphics surface, Rectangle bounds,
+                                            int index, ToolItemState state)
+    {
+        if (!_ownerDrawn || index < 0 || (nuint)index >= _buttons.Count)
+            return false;
+        _renderer.DrawTool(surface, _buttons[(nuint)index], bounds, state);
+        return true;
     }
 }
 
