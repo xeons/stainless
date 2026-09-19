@@ -341,11 +341,55 @@ public class GtkGraphicsBackend : IGraphicsBackend
 
     public void FillRectangle(Brush brush, Rectangle bounds)
     {
-        Source(brush.Color);
+        cairo_pattern_t* ramp = null;
+
+        if (brush.IsGradient)
+        {
+            ramp = RampOver(brush, bounds);
+            cairo_set_source(_cairo, ramp);
+        }
+        else
+        {
+            Source(brush.Color);
+        }
+
         cairo_new_path(_cairo);
         cairo_rectangle(_cairo, (double)bounds.X, (double)bounds.Y,
                         (double)bounds.Width, (double)bounds.Height);
         cairo_fill(_cairo);
+
+        // After the fill, not before: `cairo_set_source` takes a reference of
+        // its own, but the source is what the fill just read and destroying it
+        // first would be destroying it while it was in use.
+        if (ramp != null)
+            cairo_pattern_destroy(ramp);
+    }
+
+    /// A linear pattern spanning the rectangle, down or across.
+    cairo_pattern_t* RampOver(Brush brush, Rectangle bounds)
+    {
+        double left = (double)bounds.X;
+        double top = (double)bounds.Y;
+        double right = (double)(bounds.X + bounds.Width);
+        double bottom = (double)(bounds.Y + bounds.Height);
+
+        var ramp = brush.Style == BrushStyle.HorizontalGradient
+                 ? cairo_pattern_create_linear(left, top, right, top)
+                 : cairo_pattern_create_linear(left, top, left, bottom);
+
+        AddStop(ramp, 0.0, brush.Color);
+        AddStop(ramp, 1.0, brush.EndColor);
+        return ramp;
+    }
+
+    /// One end of the ramp. Cairo takes components as 0 to 1, which is the
+    /// thing this file's header warns about.
+    static void AddStop(cairo_pattern_t* ramp, double at, Color colour)
+    {
+        cairo_pattern_add_color_stop_rgb(ramp, at,
+                                         (double)colour.R / 255.0,
+                                         (double)colour.G / 255.0,
+                                         (double)colour.B / 255.0);
     }
 
     /// An ellipse is a scaled circle, which is the only way cairo draws one.

@@ -336,14 +336,63 @@ public sealed class Pen
     public Pen(Color colour) => this(colour, 1, PenStyle.Solid);
 }
 
-/// The fill a `Graphics` draws with. Solid only for now; a hatch and a gradient
-/// are the two worth adding, and both are a new field here and a new case in
-/// each backend rather than a new type.
+/// How a `Brush` fills: one colour, or two with a ramp between them.
+///
+/// A hatch is the other one worth having and is not here. It would be a third
+/// case rather than a fourth type, exactly as these two are.
+public enum BrushStyle
+{
+    /// `Color` everywhere, and `EndColor` ignored.
+    Solid,
+    /// `Color` at the top, `EndColor` at the bottom.
+    VerticalGradient,
+    /// `Color` at the left, `EndColor` at the right.
+    HorizontalGradient,
+}
+
+/// The fill a `Graphics` draws with.
+///
+/// **A field rather than a type per kind**, which is what the note that used
+/// to be here asked for: a gradient brush that was its own class would mean
+/// every `FillRectangle` in every backend testing which it had been handed,
+/// and a `Brush` parameter that could no longer be passed on unexamined.
+///
+/// `EndColor` is `Color` for a solid one, so a backend's gradient path and its
+/// solid path can be the same code where that is convenient and the answer is
+/// right either way.
 public sealed class Brush
 {
     public Color Color { get; }
 
-    public Brush(Color colour) => Color = colour;
+    /// The colour the ramp reaches. The same as `Color` unless this is a
+    /// gradient.
+    public Color EndColor { get; }
+
+    public BrushStyle Style { get; }
+
+    public Brush(Color colour)
+    {
+        Color = colour;
+        EndColor = colour;
+        Style = BrushStyle.Solid;
+    }
+
+    /// A ramp from one colour to another, down or across.
+    ///
+    /// ```
+    /// var gutter = new Brush(SystemColors.Control, SystemColors.Window,
+    ///                        BrushStyle.HorizontalGradient);
+    /// ```
+    public Brush(Color from, Color to, BrushStyle style)
+    {
+        Color = from;
+        EndColor = to;
+        Style = style;
+    }
+
+    /// Whether this asks for a ramp at all, which is the question every
+    /// backend asks first.
+    public bool IsGradient => Style != BrushStyle.Solid;
 }
 
 // ================================================================= graphics

@@ -48,6 +48,14 @@ import Gtk.GLib;
 /// `cairo_t*`. Opaque.
 public using cairo_t = byte;
 
+/// `cairo_pattern_t*`. Opaque.
+///
+/// A source that is not a flat colour: a gradient, an image, a tile. The only
+/// one here is the linear gradient, and it is **owned** -- `cairo_set_source`
+/// takes a reference of its own, so the pattern is destroyed after the fill
+/// rather than left to the context.
+public using cairo_pattern_t = byte;
+
 /// `cairo_line_cap_t`.
 public const gint CAIRO_LINE_CAP_BUTT   = 0;
 public const gint CAIRO_LINE_CAP_ROUND  = 1;
@@ -79,6 +87,15 @@ public extern "C"
 
     /// Opaque colour. Components are 0.0 to 1.0.
     void cairo_set_source_rgb(cairo_t* cr, gdouble red, gdouble green, gdouble blue);
+
+    /// A ramp between two points. Colours are added to it as stops at 0 and 1.
+    cairo_pattern_t* cairo_pattern_create_linear(gdouble x0, gdouble y0,
+                                                  gdouble x1, gdouble y1);
+    void cairo_pattern_add_color_stop_rgb(cairo_pattern_t* pattern, gdouble offset,
+                                           gdouble red, gdouble green, gdouble blue);
+    /// Takes a reference; the caller still owns theirs and destroys it.
+    void cairo_set_source(cairo_t* cr, cairo_pattern_t* pattern);
+    void cairo_pattern_destroy(cairo_pattern_t* pattern);
     void cairo_set_source_rgba(cairo_t* cr, gdouble red, gdouble green,
                                gdouble blue, gdouble alpha);
 

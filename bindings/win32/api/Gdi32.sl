@@ -253,6 +253,49 @@ public extern "C"
 
 /// `AC_SRC_OVER`, the only blend operation there is.
 public const byte BlendSourceOver = 0;
+
+// ---------------------------------------------------------------- gradients
+
+/// `TRIVERTEX`: one corner of a gradient, with its colour and where it is.
+///
+/// **The channels are sixteen bits and the high byte is the one that shows.**
+/// A `COLOR16` runs 0 to 65535, so an ordinary 8-bit channel goes in shifted
+/// up by eight. Passing it unshifted gives a ramp between two almost-black
+/// corners, which reads as the call having failed rather than as a scale being
+/// wrong by a factor of 257.
+public struct TriVertex
+{
+    public int X;
+    public int Y;
+    public ushort Red;
+    public ushort Green;
+    public ushort Blue;
+    public ushort Alpha;
+}
+
+/// `GRADIENT_RECT`: which two of the vertices are one rectangle's corners.
+public struct GradientRect
+{
+    public uint UpperLeft;
+    public uint LowerRight;
+}
+
+/// `GRADIENT_FILL_RECT_H` and `_V`: across, and down.
+public const uint GradientFillRectH = 0u;
+public const uint GradientFillRectV = 1u;
+
+public extern "C"
+{
+    /// `GradientFill`, under the name gdi32 exports it by -- the same
+    /// arrangement `GdiAlphaBlend` above explains, and for the same reason:
+    /// the documented name is in `msimg32.dll`, which is forwarders and
+    /// nothing else.
+    ///
+    /// `meshes` is an array of `GradientRect` for the two rectangle modes and
+    /// of triangles for the third, which is why it is untyped here.
+    int GdiGradientFill(HDC target, TriVertex* vertices, uint vertexCount,
+                        void* meshes, uint meshCount, uint mode);
+}
 /// `AC_SRC_ALPHA`: the source carries a per-pixel alpha channel.
 public const byte BlendSourceAlpha = 1;
 

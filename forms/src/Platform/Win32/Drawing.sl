@@ -195,10 +195,52 @@ public class GraphicsBackend : IGraphicsBackend
 
     public void FillRectangle(Brush brush, FRect bounds)
     {
+        if (brush.IsGradient)
+        {
+            FillGradient(brush, bounds);
+            return;
+        }
+
         Rect r = ToRect(bounds);
         HBRUSH made = CreateSolidBrush(ToColorRef(brush.Color));
         FillRect(_dc, &r, made);
         DeleteObject((HGDIOBJ)(void*)made);
+    }
+
+    /// A two-corner ramp, across or down.
+    ///
+    /// `GdiGradientFill` wants the two opposite corners as vertices and a mesh
+    /// naming them, which for one rectangle is two of each -- more ceremony
+    /// than the call deserves, and the reason this is not written inline.
+    void FillGradient(Brush brush, FRect bounds)
+    {
+        TriVertex[2] corners;
+        corners[0u] = Corner(bounds.Left, bounds.Top, brush.Color);
+        corners[1u] = Corner(bounds.Right, bounds.Bottom, brush.EndColor);
+
+        GradientRect mesh;
+        mesh.UpperLeft = 0u;
+        mesh.LowerRight = 1u;
+
+        uint mode = brush.Style == BrushStyle.HorizontalGradient
+                  ? GradientFillRectH
+                  : GradientFillRectV;
+
+        GdiGradientFill(_dc, &corners[0u], 2u, (void*)&mesh, 1u, mode);
+    }
+
+    /// One corner, with an 8-bit colour widened to the sixteen bits a
+    /// `TRIVERTEX` holds -- see the note where it is declared.
+    static TriVertex Corner(int x, int y, Color colour)
+    {
+        TriVertex made;
+        made.X = x;
+        made.Y = y;
+        made.Red   = (ushort)((uint)colour.R << 8);
+        made.Green = (ushort)((uint)colour.G << 8);
+        made.Blue  = (ushort)((uint)colour.B << 8);
+        made.Alpha = (ushort)0;
+        return made;
     }
 
     public void DrawEllipse(Pen pen, FRect bounds)
