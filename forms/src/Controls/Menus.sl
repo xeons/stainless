@@ -157,6 +157,74 @@ public class MenuItem : IMenuItemNotify
     /// What the platform calls when the user picks this item.
     public void OnPlatformMenuClicked() => OnClick();
 
+    /// Which renderer drew this item, taken from the menu as it was built.
+    ///
+    /// Held rather than looked up, because an item has no reference to the
+    /// menu it is in -- and giving it one for this would be a back-pointer on
+    /// every item of every menu for the sake of the few that are drawn by a
+    /// program.
+    MenuRenderer? _renderer;
+
+    /// Whether this item sits on a menu bar rather than in something that
+    /// drops down.
+    ///
+    /// **A renderer needs it and the platform does not say.** `WM_DRAWITEM`
+    /// reports where the item is and what state it is in, and nothing about
+    /// which kind of menu it belongs to -- but a bar item and a dropdown item
+    /// look nothing alike: one is a word on the window's own background, the
+    /// other is a row with a gutter down its left. Drawing a gutter across the
+    /// top of a window is what this exists to stop, and it is what the first
+    /// version did.
+    ///
+    /// Set as the menu is built, because that is the moment the answer is
+    /// known: the top level of a `MainMenu` is a bar and everything else,
+    /// including every level of a `PopupMenu`, is not.
+    public bool OnMenuBar { get; private set; }
+
+    /// Whether the platform agreed to hand this item over to the renderer.
+    ///
+    /// **Asked rather than assumed**, and worth reading: `SetOwnerDrawn`
+    /// answers false on GTK for every item, and can answer false on Windows
+    /// for one the menu will not describe -- so an item drawn by the platform
+    /// inside a menu drawn by the program is a thing that can happen, and this
+    /// is how a test sees it rather than a person noticing one row that looks
+    /// wrong.
+    public bool IsOwnerDrawn { get; private set; }
+
+    public Size OnPlatformMeasureItem(Graphics surface)
+    {
+        var drawing = _renderer;
+        if (drawing == null)
+            return Size.Of(0, 0);
+        return ((MenuRenderer)drawing).Measure(surface, this);
+    }
+
+    public void OnPlatformDrawItem(Graphics surface, Rectangle bounds,
+                                   MenuItemState state)
+    {
+        var drawing = _renderer;
+        if (drawing != null)
+            ((MenuRenderer)drawing).Draw(surface, this, bounds, state);
+    }
+
+    /// Gives this item and everything under it a renderer, and tells the
+    /// platform whether to hand them over.
+    ///
+    /// Called when a menu is built and again whenever its renderer changes, so
+    /// that a program may change how its menus look while they exist.
+    void Restyle(MenuRenderer renderer)
+    {
+        _renderer = renderer;
+
+        var peer = _realised;
+        if (peer != null)
+            IsOwnerDrawn = ((IMenuItemPeer)peer).SetOwnerDrawn(renderer.OwnerDrawn)
+                        && renderer.OwnerDrawn;
+
+        foreach (var child in _children)
+            child.Restyle(renderer);
+    }
+
     /// What the platform calls this item, or zero before the menu is built.
     ///
     /// Here for the same reason `Control.Handle` is: a program that must reach
@@ -177,11 +245,28 @@ public class MenuItem : IMenuItemNotify
     /// Depth first, because a submenu must exist before the item that opens it
     /// can be made -- which is the ordering this whole arrangement exists to
     /// make invisible.
-    void Realise(IMenuPeer into)
+    void Realise(IMenuPeer into, MenuRenderer renderer, bool onBar)
     {
+        _renderer = renderer;
+        OnMenuBar = onBar;
+
         if (_divider)
         {
-            into.AddSeparator();
+            // **A separator is owner-drawn too, or it is not drawn at all.** A
+            // platform separator in a menu whose items are the program's is a
+            // grey line at the platform's height in the platform's colours,
+            // across a background nothing else uses -- so a renderer that
+            // draws the items has to draw these as well. `AddSeparator` is
+            // therefore only used where the platform is drawing.
+            if (!renderer.OwnerDrawn)
+            {
+                into.AddSeparator();
+                return;
+            }
+
+            var line = into.AddItem(this, "", null);
+            _realised = line;
+            IsOwnerDrawn = line.SetOwnerDrawn(true);
             return;
         }
 
@@ -190,7 +275,7 @@ public class MenuItem : IMenuItemNotify
         {
             var made = WidgetSet.Current.CreateMenu();
             foreach (var child in _children)
-                child.Realise(made);
+                child.Realise(made, renderer, false);
             submenu = made;
             _below = made;
         }
@@ -203,7 +288,10 @@ public class MenuItem : IMenuItemNotify
             peer.SetEnabled(false);
         if (_ticked)
             peer.SetChecked(true);
+        if (renderer.OwnerDrawn)
+            IsOwnerDrawn = peer.SetOwnerDrawn(true);
     }
+
 
     /// Forgets the platform side, so the tree can be built again into a new
     /// menu -- which is what happens when a form is given a second menu bar.
@@ -222,13 +310,42 @@ public class MenuItem : IMenuItemNotify
 /// they become a real menu.
 public abstract class Menu
 {
+    /// Whether this menu's own items sit on a bar. False for everything but
+    /// `MainMenu`, and it is what tells a renderer which shape to draw.
+    protected virtual bool IsBar => false;
+
     protected IMenuPeer? peer;
     List<MenuItem> _items;
+
+    /// How this menu is drawn. The platform's own until a program says
+    /// otherwise.
+    MenuRenderer _renderer;
 
     protected Menu()
     {
         peer = null;
         _items = new List<MenuItem>();
+        _renderer = new SystemMenuRenderer();
+    }
+
+    /// What draws this menu.
+    ///
+    /// Setting it restyles a menu that already exists, so a program may change
+    /// how its menus look at any point rather than only before the window is
+    /// built -- which matters for a theme a person chooses from a menu of its
+    /// own.
+    ///
+    /// A renderer that the platform will not honour changes nothing:
+    /// `SetOwnerDrawn` answers false on GTK and the menu stays native.
+    public MenuRenderer Renderer
+    {
+        get => _renderer;
+        set
+        {
+            _renderer = value;
+            foreach (var item in _items)
+                item.Restyle(value);
+        }
     }
 
     public List<MenuItem> Items => _items;
@@ -249,7 +366,7 @@ public abstract class Menu
         foreach (var item in _items)
         {
             item.Forget();
-            item.Realise(into);
+            item.Realise(into, _renderer, IsBar);
         }
         peer = into;
     }
@@ -268,6 +385,8 @@ public abstract class Menu
 public class MainMenu : Menu
 {
     public MainMenu() => base();
+
+    protected override bool IsBar => true;
 
     /// Builds the bar and gives it to a form. Called by `Form.Menu`, which is
     /// how a program attaches one.

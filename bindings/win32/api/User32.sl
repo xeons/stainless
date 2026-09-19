@@ -119,6 +119,11 @@ public const uint WmChar             = 0x0102u;
 public const uint WmSysKeyDown       = 0x0104u;
 public const uint WmSysKeyUp         = 0x0105u;
 public const uint WmCommand          = 0x0111u;
+
+/// Asked of the window that owns an owner-drawn menu item or control: how big
+/// is it, and draw it. Both name the thing by its command id and nothing else.
+public const uint WmDrawItem         = 0x002Bu;
+public const uint WmMeasureItem      = 0x002Cu;
 public const uint WmSysCommand       = 0x0112u;
 public const uint WmTimer            = 0x0113u;
 public const uint WmMouseMove        = 0x0200u;
@@ -936,9 +941,70 @@ public const uint MfsGrayed   = 0x00000003u;
 public const uint MfsChecked  = 0x00000008u;
 public const uint MfsDefault  = 0x00001000u;
 
+/// `MFT_OWNERDRAW`: the menu asks the window to measure and draw this item
+/// rather than drawing it itself.
+///
+/// The same number as `MfOwnerDraw` above, which is the `MF_` spelling of it.
+/// Both are here because the two families go in different fields -- `MF_` in
+/// the old `AppendMenu` flags word, `MFT_` in `MENUITEMINFO.Type` -- and a
+/// reader who found only one would be right to wonder whether it belonged.
+public const uint MftOwnerDraw = 0x00000100u;
+
 public const uint MftString    = 0x00000000u;
 public const uint MftSeparator = 0x00000800u;
 public const uint MftRadioCheck = 0x00000200u;
+
+// --------------------------------------------------------- owner drawing
+
+/// `MEASUREITEMSTRUCT`: the window is asked how big one item wants to be.
+///
+/// Asked once per item, before the menu is first shown. The two sizes are
+/// written back into this structure, which is how the answer is given.
+public struct MeasureItemStruct
+{
+    public uint ControlType;
+    public uint ControlId;
+    public uint ItemId;
+    public uint ItemWidth;
+    public uint ItemHeight;
+    public nuint ItemData;
+}
+
+/// `DRAWITEMSTRUCT`: the window is asked to draw one item.
+///
+/// `Dc` is the menu's own device context and `Item` the rectangle to draw
+/// inside, both already set up -- nothing has to be created or released.
+public struct DrawItemStruct
+{
+    public uint ControlType;
+    public uint ControlId;
+    public uint ItemId;
+    public uint ItemAction;
+    public uint ItemState;
+    public HWND ItemWindow;
+    public HDC Dc;
+    public Rect Item;
+    public nuint ItemData;
+}
+
+/// `ODT_*`: what kind of thing is being measured or drawn.
+public const uint OdtMenu     = 1u;
+public const uint OdtListBox  = 2u;
+public const uint OdtComboBox = 3u;
+public const uint OdtButton   = 4u;
+public const uint OdtStatic   = 5u;
+
+/// `ODS_*`: what state the item is in as it is drawn.
+public const uint OdsSelected     = 0x0001u;
+public const uint OdsGrayed       = 0x0002u;
+public const uint OdsDisabled     = 0x0004u;
+public const uint OdsChecked      = 0x0008u;
+public const uint OdsFocus        = 0x0010u;
+public const uint OdsDefault      = 0x0020u;
+public const uint OdsHotlight     = 0x0040u;
+public const uint OdsInactive     = 0x0080u;
+public const uint OdsNoAccel      = 0x0100u;
+public const uint OdsNoFocusRect  = 0x0200u;
 
 /// `TrackPopupMenu` flags.
 public const uint TpmLeftAlign  = 0x0000u;

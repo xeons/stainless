@@ -164,6 +164,15 @@ public class GtkMenuItemPeer : IMenuItemPeer
     /// approximating it with markup that would not match the theme.
     public void SetDefault(bool isDefault) { }
 
+    /// **No**, and that is the answer rather than a gap.
+    ///
+    /// GTK draws a menu through the desktop's own theme -- the background, the
+    /// padding, the arrow, the hover -- and there is no hook that hands a
+    /// program the item and gets out of the way. A renderer asks, is told no,
+    /// and leaves the menu looking like every other menu on the desktop, which
+    /// is what somebody running a GTK desktop wanted from it.
+    public bool SetOwnerDrawn(bool drawn) => false;
+
     public GtkWidget* Widget => _item;
 }
 

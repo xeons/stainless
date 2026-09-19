@@ -323,6 +323,54 @@ public class WindowPeer : ControlPeer, IWindowPeer
             }
         }
 
+        // ------------------------------------------------- owner drawing
+        //
+        // Both arrive at the *window* that owns the menu rather than at the
+        // menu, and name an item by its command id alone -- so the window
+        // turns the id back into an item and asks it. Neither is raised at all
+        // unless something asked for `SetOwnerDrawn(true)`.
+
+        if (message == WmMeasureItem)
+        {
+            MeasureItemStruct* asked = (MeasureItemStruct*)(void*)(nuint)lParam;
+            if (asked->ControlType != OdtMenu)
+                return Inherited(message, wParam, lParam);
+
+            var item = MenuItemFor((int)asked->ItemData);
+            if (item == null)
+                return Inherited(message, wParam, lParam);
+
+            // The menu's own device context, for measuring in the font the
+            // menu will draw with. `null` as the window is what asks for the
+            // screen's, which is what a menu is drawn against.
+            HDC screen = GetDC(null);
+            var surface = new Graphics(new GraphicsBackend(screen, Area(0, 0, 0, 0)));
+            var wanted = ((IMenuItemNotify)item).OnPlatformMeasureItem(surface);
+            ReleaseDC(null, screen);
+
+            asked->ItemWidth = (uint)(wanted.Width < 0 ? 0 : wanted.Width);
+            asked->ItemHeight = (uint)(wanted.Height < 0 ? 0 : wanted.Height);
+            return 1;
+        }
+
+        if (message == WmDrawItem)
+        {
+            DrawItemStruct* asked = (DrawItemStruct*)(void*)(nuint)lParam;
+            if (asked->ControlType != OdtMenu)
+                return Inherited(message, wParam, lParam);
+
+            var item = MenuItemFor((int)asked->ItemData);
+            if (item == null)
+                return Inherited(message, wParam, lParam);
+
+            // The context is the menu's and is already set up, so the wrapper
+            // owns nothing and releases nothing.
+            var surface = new Graphics(new GraphicsBackend(asked->Dc, FromRect(asked->Item)));
+            ((IMenuItemNotify)item).OnPlatformDrawItem(
+                surface, FromRect(asked->Item), StateOf(asked->ItemState));
+            return 1;
+        }
+
         if (message == WmActivate)
         {
             if (held != null)
@@ -413,6 +461,59 @@ public class WindowPeer : ControlPeer, IWindowPeer
         if (small != null)
             SendMessageW(window, WmSetIcon, IconSmallSize, (long)(nuint)small);
         return true;
+    }
+
+    /// The menu that is popped up over this window, for as long as it is.
+    ///
+    /// Set by `MenuPeer.ShowPopup` and cleared when it returns. A popup
+    /// belongs to no menu bar, so without this its items could not be found
+    /// from an id -- see the note there.
+    IMenuPeer? _poppedUp;
+
+    public void PoppedUp(IMenuPeer? menu) => _poppedUp = menu;
+
+    /// The item a command id names, looked for in the bar and then in whatever
+    /// is popped up over it.
+    ///
+    /// Ids come from one counter for the whole program, so the two cannot
+    /// disagree about which item a number means.
+    IMenuItemNotify? MenuItemFor(int id)
+    {
+        var bar = _menuBar;
+        if (bar is MenuPeer tree)
+        {
+            var found = tree.FindAny(id);
+            if (found != null)
+                return ((MenuItemPeer)found).Notify;
+        }
+
+        var over = _poppedUp;
+        if (over is MenuPeer popup)
+        {
+            var found = popup.FindAny(id);
+            if (found != null)
+                return ((MenuItemPeer)found).Notify;
+        }
+        return null;
+    }
+
+    /// What Windows says about an item, as the seam spells it.
+    ///
+    /// `ODS_GRAYED` and `ODS_DISABLED` both mean unusable and a menu sets the
+    /// first, so both map to the one flag rather than the seam carrying a
+    /// distinction only one platform makes.
+    static MenuItemState StateOf(uint reported)
+    {
+        var state = MenuItemState.None;
+        if ((reported & OdsSelected) != 0u)
+            state = state | MenuItemState.Selected;
+        if ((reported & (OdsGrayed | OdsDisabled)) != 0u)
+            state = state | MenuItemState.Disabled;
+        if ((reported & OdsChecked) != 0u)
+            state = state | MenuItemState.Checked;
+        if ((reported & OdsDefault) != 0u)
+            state = state | MenuItemState.Default;
+        return state;
     }
 
     public void SetMenu(IMenuPeer? menu)

@@ -556,6 +556,14 @@ public class Shell : Form
     {
         _bar = new MainMenu();
 
+        // **Office XP, on Windows, and nothing on GTK.** A renderer asks the
+        // platform to hand its items over and takes no for an answer: the GTK
+        // backend says no, so the menus there stay the desktop's own, which is
+        // what somebody running that desktop wanted from them. There is no
+        // `#if` here for the same reason there is none anywhere else in this
+        // program -- the seam is what knows which platform it is on.
+        _bar.Renderer = new OfficeXpRenderer();
+
         var file = _bar.Add("&File");
         file.Add("&New").Click += this.OnNew;
         file.Add("&Open...").Click += this.OnOpen;
@@ -867,6 +875,20 @@ public class Shell : Form
                 return beside;
         }
         return "stainless";
+    }
+
+    /// How many items at or below this one the platform kept for itself.
+    ///
+    /// Recursive rather than a `Walk` taking a closure, because a closure
+    /// captures by value in this language -- a visitor that set a flag would
+    /// be setting its own copy of it, and the check would pass whatever it
+    /// found.
+    nuint PlatformDrawn(MenuItem item)
+    {
+        nuint kept = item.IsOwnerDrawn ? 0u : 1u;
+        foreach (var child in item.Items)
+            kept = kept + PlatformDrawn(child);
+        return kept;
     }
 
     /// One line ending, as the compiler writes them on this platform.
@@ -2926,6 +2948,35 @@ public class Shell : Form
 
             ClearOutput();
         }
+
+        // Every item of the menu bar was handed to the renderer, submenu
+        // headings included.
+        //
+        // **This is the check that would have caught it.** An item that opens
+        // a submenu is appended with `MF_POPUP` and the submenu's handle in
+        // place of a command id, so it has none -- and every menu call
+        // addressed items by command. Turning owner drawing on for `View` and
+        // `Text size` therefore matched nothing, changed nothing and reported
+        // nothing, and Windows went on drawing those two rows inside a menu
+        // the program was drawing. One row looking wrong was the only symptom.
+        //
+        // Windows only: GTK refuses owner drawing outright and answers false
+        // for every item, which is right rather than a failure.
+        #if WINDOWS
+        {
+            nuint kept = 0u;
+            foreach (var item in _bar.Items)
+                kept = kept + PlatformDrawn(item);
+
+            if (kept != 0u)
+            {
+                Console.WriteLine("FAIL: the platform kept "
+                                  + Standard.Text.FromInteger((long)kept)
+                                  + " menu item(s) the renderer asked for");
+                ok = false;
+            }
+        }
+        #endif
 
         // The project, which is what makes Build mean the program rather than
         // the file. Opening a file inside the fixture should find it without

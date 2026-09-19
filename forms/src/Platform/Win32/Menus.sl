@@ -69,14 +69,38 @@ public class MenuItemPeer : IMenuItemPeer
 {
     HMENU _owner;
     int _id;
+
+    /// Where in the owning menu this item sits.
+    ///
+    /// **Every call below addresses the item by position, and that is a fix
+    /// rather than a preference.** An item that opens a submenu is appended
+    /// with `MF_POPUP` and the submenu's handle *in place of* a command id, so
+    /// it has none -- and `MF_BYCOMMAND` finds items by their id. Windows
+    /// documents this for `EnableMenuItem` and it is true of the whole family:
+    /// a by-command call naming a submenu heading matches nothing, changes
+    /// nothing, and reports nothing.
+    ///
+    /// So `SetText`, `SetEnabled`, `SetChecked` and `SetDefault` had all been
+    /// quietly doing nothing to every heading in every menu since they were
+    /// written, and it took owner drawing to show it: a renderer drew every
+    /// item except the ones with submenus, which Windows went on drawing
+    /// itself, and one row in a menu looked wrong.
+    ///
+    /// Positions are stable because a menu is only ever appended to and
+    /// cleared whole -- `AddItem` and `AddSeparator` both append, and `Clear`
+    /// empties everything.
+    int _at;
+
     weak IMenuItemNotify? target;
     /// The menu underneath it, kept so that a search for an id can descend.
     IMenuPeer? _below;
 
-    public MenuItemPeer(HMENU menu, int command, IMenuItemNotify? notify, IMenuPeer? submenu)
+    public MenuItemPeer(HMENU menu, int command, int position,
+                        IMenuItemNotify? notify, IMenuPeer? submenu)
     {
         _owner = menu;
         _id = command;
+        _at = position;
         target = notify;
         _below = submenu;
     }
@@ -104,18 +128,62 @@ public class MenuItemPeer : IMenuItemPeer
         Blank(&info);
         info.Mask = MiimString;
         info.TypeData = text.ToUtf16().ToPointer();
-        SetMenuItemInfoW(_owner, (uint)_id, 0, &info);
+        SetMenuItemInfoW(_owner, (uint)_at, 1, &info);
     }
 
     public void SetEnabled(bool enabled)
     {
-        EnableMenuItem(_owner, (uint)_id, MfByCommand | (enabled ? MfEnabled : MfGrayed));
+        EnableMenuItem(_owner, (uint)_at, MfByPosition | (enabled ? MfEnabled : MfGrayed));
     }
 
     public void SetChecked(bool checked)
     {
-        CheckMenuItem(_owner, (uint)_id, MfByCommand | (checked ? MfChecked : MfUnchecked));
+        CheckMenuItem(_owner, (uint)_at, MfByPosition | (checked ? MfChecked : MfUnchecked));
     }
+
+    /// Turns owner drawing on or off for this item.
+    ///
+    /// `MIIM_FTYPE` and not `MIIM_TYPE`: the older mask means the type *and*
+    /// the string together, so setting it with `TypeData` left null is how an
+    /// item loses its caption -- which is a long way from where anyone would
+    /// look for the cause.
+    ///
+    /// The caption stays either way, and a renderer needs it: an owner-drawn
+    /// item still knows what it says, and `GetText` on the control layer is
+    /// what a renderer asks rather than the menu.
+    public bool SetOwnerDrawn(bool drawn)
+    {
+        MenuItemInfo info;
+        Blank(&info);
+        info.Mask = MiimFType;
+
+        // Read what the type is now, so that a separator does not quietly
+        // become a command by being written back without its flag.
+        if (GetMenuItemInfoW(_owner, (uint)_at, 1, &info) == 0)
+            return false;
+
+        info.Type = drawn ? (info.Type | MftOwnerDraw)
+                          : (info.Type & ~MftOwnerDraw);
+
+        // **The id goes in `MIIM_DATA`, and that is not belt and braces.**
+        // `WM_MEASUREITEM` and `WM_DRAWITEM` name an item by its command id --
+        // and an item that opens a submenu has none, which is the same fact
+        // that made the by-command calls above fail. So a window could turn
+        // every *leaf* item back into an object and no heading, answered the
+        // default size for those, and a menu bar of nothing but headings
+        // collapsed to no height at all.
+        //
+        // `itemData` is carried through both messages untouched, so the item
+        // says who it is rather than being asked. A plain integer, because a
+        // reference handed to Windows is a reference nothing is counting.
+        info.Mask = MiimFType | MiimData;
+        info.ItemData = drawn ? (nuint)_id : 0u;
+        return SetMenuItemInfoW(_owner, (uint)_at, 1, &info) != 0;
+    }
+
+    /// What the item is notified through, for a window that has resolved an id
+    /// and needs to ask it to draw.
+    public IMenuItemNotify? Notify => target;
 
     public void SetDefault(bool isDefault)
     {
@@ -123,7 +191,7 @@ public class MenuItemPeer : IMenuItemPeer
         Blank(&info);
         info.Mask = MiimState;
         info.State = isDefault ? MfsDefault : MfsEnabled;
-        SetMenuItemInfoW(_owner, (uint)_id, 0, &info);
+        SetMenuItemInfoW(_owner, (uint)_at, 1, &info);
     }
 }
 
@@ -193,6 +261,11 @@ public class MenuPeer : IMenuPeer
     public IMenuItemPeer AddItem(IMenuItemNotify owner, String text, IMenuPeer? submenu)
     {
         int id = NewCommandId();
+
+        // Read before the append, so it is this item's index rather than the
+        // count afterwards. Separators are appended too and take a position,
+        // which is why this asks the menu rather than counting `_items`.
+        int at = GetMenuItemCount(_menu);
         if (submenu == null)
         {
             AppendMenuW(_menu, MfString, (nuint)id, text.ToUtf16().ToPointer());
@@ -210,7 +283,7 @@ public class MenuPeer : IMenuPeer
             }
         }
 
-        var made = new MenuItemPeer(_menu, id, owner, submenu);
+        var made = new MenuItemPeer(_menu, id, at, owner, submenu);
         _items.Add(made);
         return made;
     }
@@ -260,6 +333,41 @@ public class MenuPeer : IMenuPeer
         return null;
     }
 
+    /// The item with this command id, heading or not.
+    ///
+    /// **The other question, and `Find` above can only answer one of them.**
+    /// That one is asked by `WM_COMMAND` routing, where a heading must *not*
+    /// match: an item with a submenu raises no command, and letting its id
+    /// match would run a handler nothing could have raised.
+    ///
+    /// Drawing asks the opposite. `WM_DRAWITEM` for a heading is Windows
+    /// asking the program to draw that very item, and a lookup that skipped it
+    /// answered null -- so the window fell back to the default size, every
+    /// heading came out no pixels wide, and a menu bar made only of headings
+    /// disappeared. One method was answering two questions and could only be
+    /// right about one.
+    public MenuItemPeer? FindAny(int id)
+    {
+        foreach (var item in _items)
+        {
+            if (item.Command == id)
+                return item;
+
+            var under = item.Submenu;
+            if (under != null)
+            {
+                IMenuPeer held = (IMenuPeer)under;
+                if (held is MenuPeer below)
+                {
+                    var deeper = below.FindAny(id);
+                    if (deeper != null)
+                        return deeper;
+                }
+            }
+        }
+        return null;
+    }
+
     /// Shows this menu at a point and waits.
     ///
     /// `TPM_RETURNCMD` makes it answer the chosen id rather than posting
@@ -272,9 +380,25 @@ public class MenuPeer : IMenuPeer
         // owning window is foreground first; without this the menu can be left
         // on screen with nothing able to close it.
         SetForegroundWindow(window);
+
+        // **The window has to be told this menu exists.** `WM_MEASUREITEM` and
+        // `WM_DRAWITEM` arrive at the window rather than at the menu, naming
+        // an item by its command id and nothing else -- and a popup belongs to
+        // no menu bar, so the window would have nowhere to look the id up. It
+        // is told for exactly as long as the menu is on screen.
+        WindowPeer? host = null;
+        if (owner is WindowPeer named)
+            host = named;
+        if (host != null)
+            ((WindowPeer)host).PoppedUp(this);
+
         int chosen = TrackPopupMenu(_menu, TpmLeftAlign | TpmTopAlign
                                         | TpmRightButton | TpmReturnCmd,
                                     atScreen.X, atScreen.Y, 0, window, null);
+
+        if (host != null)
+            ((WindowPeer)host).PoppedUp(null);
+
         if (chosen == 0)
             return;
         var item = Find(chosen);

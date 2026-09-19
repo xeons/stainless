@@ -606,9 +606,52 @@ public interface IImageListBackend
 // ------------------------------------------------------------------- menus
 
 /// What a menu item tells the program.
+/// What the platform says about a menu item at the moment it is drawn.
+///
+/// Only what the *platform* owns. Whether an item is ticked or enabled is
+/// something the item itself knows, and the two agree -- but during a draw the
+/// platform's word is the one that is current, and a renderer reading two
+/// sources would eventually draw a tick that was not there.
+///
+/// `Selected` is the one nothing else can answer: it is where the pointer or
+/// the keyboard is *now*, and it changes without the program being told.
+///
+/// **Whether an item opens a submenu is not here**, though it was for an
+/// afternoon. No platform reports it in this state word, so the flag was
+/// always clear and a renderer reading it drew no arrows at all. The item
+/// knows -- `MenuItem.HasItems` -- and a renderer asks that.
+[Flags]
+public enum MenuItemState
+{
+    None       = 0,
+    Selected   = 1,
+    Disabled   = 2,
+    Checked    = 4,
+    /// The default command, drawn bold.
+    Default    = 8,
+}
+
 public interface IMenuItemNotify
 {
     void OnPlatformMenuClicked();
+
+    /// How big the item wants to be, asked once before it is first drawn.
+    ///
+    /// Raised only for an item that asked for `SetOwnerDrawn(true)`, so a
+    /// program that never does is never asked and never has to answer.
+    ///
+    /// The `Graphics` is the menu's own, for measuring text in the font the
+    /// menu will actually use. It must not be drawn on: the window is being
+    /// asked a question, and the drawing happens later against a different
+    /// device context.
+    Size OnPlatformMeasureItem(Graphics surface);
+
+    /// Draw the item inside `bounds`, in the state the platform reports.
+    ///
+    /// The surface is the menu's, already clipped, and the rectangle is in its
+    /// coordinates. Nothing is drawn underneath first -- an owner-drawn item
+    /// is responsible for its whole rectangle, background included.
+    void OnPlatformDrawItem(Graphics surface, Rectangle bounds, MenuItemState state);
 }
 
 /// One item: a command, a separator, or something with a submenu under it.
@@ -626,6 +669,19 @@ public interface IMenuItemPeer
     void SetChecked(bool checked);
     /// Draws it as the default -- bold, and what a double-click would do.
     void SetDefault(bool isDefault);
+
+    /// Asks the platform to have the program draw this item instead of drawing
+    /// it itself, and answers whether it will.
+    ///
+    /// **False is a real answer and not a failure.** GTK draws its menus
+    /// through its own theme and has no equivalent, so it says no and stays
+    /// native -- which is what a program wanting the desktop's own look should
+    /// get anyway. A renderer asks, and does nothing more where the answer is
+    /// no.
+    ///
+    /// Turning it back off restores the platform's drawing, so a program may
+    /// change its mind about how its menus look while they exist.
+    bool SetOwnerDrawn(bool drawn);
 }
 
 /// A menu: the bar across a window, or one that drops down, or one that pops up
