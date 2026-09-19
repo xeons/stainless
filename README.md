@@ -215,6 +215,7 @@ together.
 | **[The command line](docs/cli.md)** | Every command and flag, projects, and building libraries. |
 | **[Standard library reference](docs/stdlib/index.md)** | One page per module, generated from the source. |
 | **[ABI notes](docs/abi.md)** | Layout, object headers, mangling, calling convention. |
+| **[Debug information](docs/dwarf.md)** | What `-g` actually emits, measured rather than assumed. |
 | **[Concurrency](docs/concurrency.md)** | Threading as it is, and where it is going. |
 | **[Packages](docs/packages.md)** | `stainless.json`, versions, resolution and the lock file. |
 | **[Building and internals](docs/internals.md)** | Building, testing, and how the compiler works. |
