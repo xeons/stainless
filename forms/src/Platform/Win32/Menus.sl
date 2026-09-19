@@ -470,16 +470,26 @@ public class ImageListBackend : IImageListBackend
         }
     }
 
-    /// Adds a picture, treating magenta as the part not to draw.
+    /// Adds a picture: by its alpha channel where it has one, and by magenta
+    /// where it does not.
     ///
-    /// A mask colour rather than an alpha channel, because a `.bmp` has no
-    /// alpha and magenta is the colour every toolbar bitmap has used for this
-    /// since Windows 95.
+    /// **Both, because the two kinds of picture arrive here.** A `.bmp` read
+    /// by the platform's loader has no alpha -- its fourth byte is zero, which
+    /// is what "invisible" is spelled as -- and magenta is the colour every
+    /// toolbar bitmap has keyed on since Windows 95. A picture the program
+    /// generated or decoded carries a real channel, and `ImageList_AddMasked`
+    /// would throw it away and then key on a magenta that is not there,
+    /// leaving every soft edge as a hard one against the wrong colour.
+    ///
+    /// `HasAlpha` is what tells them apart, and it answers true only where the
+    /// pixels came from somewhere that says what the channel means.
     public int Add(IBitmapBackend picture)
     {
         if (picture is BitmapBackend native)
         {
-            int at = ImageList_AddMasked(_list, native.Native, 0x00FF00FFu);
+            int at = native.HasAlpha
+                   ? ImageList_Add(_list, native.Native, null)
+                   : ImageList_AddMasked(_list, native.Native, 0x00FF00FFu);
             if (at >= 0)
                 _held = _held + 1;
             return at;

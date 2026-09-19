@@ -185,6 +185,11 @@ public class Shell : Form
 
     /// The strip across the top: the commands, and what they build for.
     CoolBar _strip;
+
+    /// The toolbar's pictures, kept because the platform copied them but the
+    /// list is what owns them. Null when the widget set refused, which leaves
+    /// the buttons as captions and is not worth reporting.
+    ImageList? _icons;
     ToolBar _tools;
     ComboBox _configuration;
     ToolButton _stopButton;
@@ -200,6 +205,15 @@ public class Shell : Form
     /// killing the child closes its pipes, and the read it was blocked in
     /// comes back empty and ends the loop.
     Running? _child;
+
+    /// Where each icon sits in the list `BuildIcons` makes, in the order it
+    /// adds them. Named rather than counted at the call site: a toolbar whose
+    /// pictures are off by one is a toolbar where Clean says Run.
+    static readonly int IconBuild   = 0;
+    static readonly int IconRebuild = 1;
+    static readonly int IconClean   = 2;
+    static readonly int IconRun     = 3;
+    static readonly int IconStop    = 4;
 
     public Shell()
     {
@@ -217,6 +231,7 @@ public class Shell : Form
         _finder = null;
         _building = false;
         _child = null;
+        _icons = null;
         _errorTail = "";
         _outputTail = "";
         _compiler = FindCompiler();
@@ -267,12 +282,20 @@ public class Shell : Form
 
         _tools = new ToolBar(_strip);
         _tools.Height = 26;
-        _tools.Add("Build").Click += this.OnBuild;
-        _tools.Add("Rebuild").Click += this.OnRebuild;
-        _tools.Add("Clean").Click += this.OnClean;
+
+        // Drawn rather than loaded -- `Icons.sl` says why -- and null when the
+        // widget set would not take them, in which case the buttons are their
+        // captions alone and nothing else changes.
+        _icons = BuildIcons();
+        if (_icons != null)
+            _tools.Images = _icons;
+
+        _tools.Add("Build", IconBuild).Click += this.OnBuild;
+        _tools.Add("Rebuild", IconRebuild).Click += this.OnRebuild;
+        _tools.Add("Clean", IconClean).Click += this.OnClean;
         _tools.AddSeparator();
-        _tools.Add("Run").Click += this.OnRun;
-        _stopButton = _tools.Add("Stop");
+        _tools.Add("Run", IconRun).Click += this.OnRun;
+        _stopButton = _tools.Add("Stop", IconStop);
         _stopButton.Click += this.OnStop;
 
         // No caption: the buttons already say what they do, and a band reading
