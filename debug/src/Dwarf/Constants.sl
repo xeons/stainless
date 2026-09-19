@@ -144,61 +144,67 @@ public const uint FormAddrx4        = 0x2Cu;
 /// name for it.
 public String TagName(uint tag)
 {
-    if (tag == TagArrayType)       return "DW_TAG_array_type";
-    if (tag == TagClassType)       return "DW_TAG_class_type";
-    if (tag == TagEnumerationType) return "DW_TAG_enumeration_type";
-    if (tag == TagFormalParameter) return "DW_TAG_formal_parameter";
-    if (tag == TagLexicalBlock)    return "DW_TAG_lexical_block";
-    if (tag == TagMember)          return "DW_TAG_member";
-    if (tag == TagPointerType)     return "DW_TAG_pointer_type";
-    if (tag == TagReferenceType)   return "DW_TAG_reference_type";
-    if (tag == TagCompileUnit)     return "DW_TAG_compile_unit";
-    if (tag == TagStructureType)   return "DW_TAG_structure_type";
-    if (tag == TagSubroutineType)  return "DW_TAG_subroutine_type";
-    if (tag == TagTypedef)         return "DW_TAG_typedef";
-    if (tag == TagUnionType)       return "DW_TAG_union_type";
-    if (tag == TagInheritance)     return "DW_TAG_inheritance";
-    if (tag == TagSubrangeType)    return "DW_TAG_subrange_type";
-    if (tag == TagBaseType)        return "DW_TAG_base_type";
-    if (tag == TagConstType)       return "DW_TAG_const_type";
-    if (tag == TagEnumerator)      return "DW_TAG_enumerator";
-    if (tag == TagSubprogram)      return "DW_TAG_subprogram";
-    if (tag == TagVariable)        return "DW_TAG_variable";
-    if (tag == TagVolatileType)    return "DW_TAG_volatile_type";
-    return "DW_TAG_?(0x" + Hexadecimal((ulong)tag) + ")";
+    switch (tag)
+    {
+        case TagArrayType: return "DW_TAG_array_type";
+        case TagClassType: return "DW_TAG_class_type";
+        case TagEnumerationType: return "DW_TAG_enumeration_type";
+        case TagFormalParameter: return "DW_TAG_formal_parameter";
+        case TagLexicalBlock: return "DW_TAG_lexical_block";
+        case TagMember: return "DW_TAG_member";
+        case TagPointerType: return "DW_TAG_pointer_type";
+        case TagReferenceType: return "DW_TAG_reference_type";
+        case TagCompileUnit: return "DW_TAG_compile_unit";
+        case TagStructureType: return "DW_TAG_structure_type";
+        case TagSubroutineType: return "DW_TAG_subroutine_type";
+        case TagTypedef: return "DW_TAG_typedef";
+        case TagUnionType: return "DW_TAG_union_type";
+        case TagInheritance: return "DW_TAG_inheritance";
+        case TagSubrangeType: return "DW_TAG_subrange_type";
+        case TagBaseType: return "DW_TAG_base_type";
+        case TagConstType: return "DW_TAG_const_type";
+        case TagEnumerator: return "DW_TAG_enumerator";
+        case TagSubprogram: return "DW_TAG_subprogram";
+        case TagVariable: return "DW_TAG_variable";
+        case TagVolatileType: return "DW_TAG_volatile_type";
+        default: return "DW_TAG_?(0x" + Hexadecimal((ulong)tag) + ")";
+    }
 }
 
 public String AttributeName(uint at)
 {
-    if (at == AtLocation)       return "DW_AT_location";
-    if (at == AtName)           return "DW_AT_name";
-    if (at == AtByteSize)       return "DW_AT_byte_size";
-    if (at == AtStmtList)       return "DW_AT_stmt_list";
-    if (at == AtLowPc)          return "DW_AT_low_pc";
-    if (at == AtHighPc)         return "DW_AT_high_pc";
-    if (at == AtLanguage)       return "DW_AT_language";
-    if (at == AtCompDir)        return "DW_AT_comp_dir";
-    if (at == AtConstValue)     return "DW_AT_const_value";
-    if (at == AtUpperBound)     return "DW_AT_upper_bound";
-    if (at == AtProducer)       return "DW_AT_producer";
-    if (at == AtAbstractOrigin) return "DW_AT_abstract_origin";
-    if (at == AtCount)          return "DW_AT_count";
-    if (at == AtDataMemberLoc)  return "DW_AT_data_member_location";
-    if (at == AtDeclFile)       return "DW_AT_decl_file";
-    if (at == AtDeclLine)       return "DW_AT_decl_line";
-    if (at == AtDeclaration)    return "DW_AT_declaration";
-    if (at == AtEncoding)       return "DW_AT_encoding";
-    if (at == AtExternal)       return "DW_AT_external";
-    if (at == AtFrameBase)      return "DW_AT_frame_base";
-    if (at == AtSpecification)  return "DW_AT_specification";
-    if (at == AtType)           return "DW_AT_type";
-    if (at == AtRanges)         return "DW_AT_ranges";
-    if (at == AtLinkageName)    return "DW_AT_linkage_name";
-    if (at == AtStrOffsetsBase) return "DW_AT_str_offsets_base";
-    if (at == AtAddrBase)       return "DW_AT_addr_base";
-    if (at == AtRnglistsBase)   return "DW_AT_rnglists_base";
-    if (at == AtLoclistsBase)   return "DW_AT_loclists_base";
-    return "DW_AT_?(0x" + Hexadecimal((ulong)at) + ")";
+    switch (at)
+    {
+        case AtLocation: return "DW_AT_location";
+        case AtName: return "DW_AT_name";
+        case AtByteSize: return "DW_AT_byte_size";
+        case AtStmtList: return "DW_AT_stmt_list";
+        case AtLowPc: return "DW_AT_low_pc";
+        case AtHighPc: return "DW_AT_high_pc";
+        case AtLanguage: return "DW_AT_language";
+        case AtCompDir: return "DW_AT_comp_dir";
+        case AtConstValue: return "DW_AT_const_value";
+        case AtUpperBound: return "DW_AT_upper_bound";
+        case AtProducer: return "DW_AT_producer";
+        case AtAbstractOrigin: return "DW_AT_abstract_origin";
+        case AtCount: return "DW_AT_count";
+        case AtDataMemberLoc: return "DW_AT_data_member_location";
+        case AtDeclFile: return "DW_AT_decl_file";
+        case AtDeclLine: return "DW_AT_decl_line";
+        case AtDeclaration: return "DW_AT_declaration";
+        case AtEncoding: return "DW_AT_encoding";
+        case AtExternal: return "DW_AT_external";
+        case AtFrameBase: return "DW_AT_frame_base";
+        case AtSpecification: return "DW_AT_specification";
+        case AtType: return "DW_AT_type";
+        case AtRanges: return "DW_AT_ranges";
+        case AtLinkageName: return "DW_AT_linkage_name";
+        case AtStrOffsetsBase: return "DW_AT_str_offsets_base";
+        case AtAddrBase: return "DW_AT_addr_base";
+        case AtRnglistsBase: return "DW_AT_rnglists_base";
+        case AtLoclistsBase: return "DW_AT_loclists_base";
+        default: return "DW_AT_?(0x" + Hexadecimal((ulong)at) + ")";
+    }
 }
 
 /// Lower-case hexadecimal with no padding, which is how DWARF numbers are

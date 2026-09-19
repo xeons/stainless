@@ -179,123 +179,129 @@ public uint[] KnownForms()
 /// to skip nothing and carry on reading rubbish.
 public bool SkipForm(Cursor reader, uint form, nuint addressSize, nuint offsetSize)
 {
-    // Fixed widths.
-    if (form == FormFlagPresent || form == FormImplicitConst)
-        return true;                                  // no bytes at all
-
-    if (form == FormData1 || form == FormRef1 || form == FormFlag
-        || form == FormStrx1 || form == FormAddrx1 || form == FormBlock1)
+    switch (form)
     {
-        // The block forms carry a length and then that many bytes; the others
-        // are one byte and done.
-        if (form == FormBlock1)
+        // No bytes at all. `flag_present` is the flag, and an implicit
+        // constant keeps its value in the abbreviation.
+        case FormFlagPresent:
+        case FormImplicitConst:
+            return true;
+
+        // Fixed widths, grouped by the width -- which is the shape the
+        // specification's own table has, and the reason this is a switch.
+        case FormData1:
+        case FormRef1:
+        case FormFlag:
+        case FormStrx1:
+        case FormAddrx1:
+            reader.Skip(1u);
+            return true;
+
+        case FormData2:
+        case FormRef2:
+        case FormStrx2:
+        case FormAddrx2:
+            reader.Skip(2u);
+            return true;
+
+        case FormStrx3:
+        case FormAddrx3:
+            reader.Skip(3u);
+            return true;
+
+        case FormData4:
+        case FormRef4:
+        case FormStrx4:
+        case FormAddrx4:
+        case FormRefSup4:
+            reader.Skip(4u);
+            return true;
+
+        case FormData8:
+        case FormRef8:
+        case FormRefSig8:
+        case FormRefSup8:
+            reader.Skip(8u);
+            return true;
+
+        case FormData16:
+            reader.Skip(16u);
+            return true;
+
+        // Widths the unit decides.
+        case FormAddr:
+            reader.Skip(addressSize);
+            return true;
+
+        case FormStrp:
+        case FormLineStrp:
+        case FormSecOffset:
+        case FormRefAddr:
+        case FormStrpSup:
+            reader.Skip(offsetSize);
+            return true;
+
+        // Variable lengths.
+        case FormSdata:
+            reader.SLeb();
+            return true;
+
+        case FormUdata:
+        case FormRefUdata:
+        case FormStrx:
+        case FormAddrx:
+        case FormLoclistx:
+        case FormRnglistx:
+            reader.Leb();
+            return true;
+
+        case FormString:
+            reader.CString();
+            return true;
+
+        // A length and then that many bytes, differing only in how the length
+        // is written.
+        case FormBlock1:
         {
             nuint size = (nuint)reader.U8();
             reader.Skip(size);
             return true;
         }
-        reader.Skip(1u);
-        return true;
-    }
 
-    if (form == FormData2 || form == FormRef2 || form == FormStrx2
-        || form == FormAddrx2)
-    {
-        reader.Skip(2u);
-        return true;
-    }
+        case FormBlock2:
+        {
+            nuint size = (nuint)reader.U16();
+            reader.Skip(size);
+            return true;
+        }
 
-    if (form == FormStrx3 || form == FormAddrx3)
-    {
-        reader.Skip(3u);
-        return true;
-    }
+        case FormBlock4:
+        {
+            nuint size = (nuint)reader.U32();
+            reader.Skip(size);
+            return true;
+        }
 
-    if (form == FormData4 || form == FormRef4 || form == FormStrx4
-        || form == FormAddrx4 || form == FormRefSup4)
-    {
-        reader.Skip(4u);
-        return true;
-    }
+        case FormBlock:
+        case FormExprloc:
+        {
+            nuint size = (nuint)reader.Leb();
+            reader.Skip(size);
+            return true;
+        }
 
-    if (form == FormData8 || form == FormRef8 || form == FormRefSig8
-        || form == FormRefSup8)
-    {
-        reader.Skip(8u);
-        return true;
-    }
+        // **`DW_FORM_indirect` names its real form in the data**, which is the
+        // one case where the abbreviation does not settle the shape. Rare, and
+        // the reason this recurses exactly one step.
+        case FormIndirect:
+        {
+            uint real = (uint)reader.Leb();
+            if (real == FormIndirect)
+                return false;             // an indirect indirect is nonsense
+            return SkipForm(reader, real, addressSize, offsetSize);
+        }
 
-    if (form == FormData16)
-    {
-        reader.Skip(16u);
-        return true;
+        default:
+            return false;
     }
-
-    // Widths that follow the unit.
-    if (form == FormAddr)
-    {
-        reader.Skip(addressSize);
-        return true;
-    }
-
-    if (form == FormStrp || form == FormLineStrp || form == FormSecOffset
-        || form == FormRefAddr || form == FormStrpSup)
-    {
-        reader.Skip(offsetSize);
-        return true;
-    }
-
-    // Variable lengths.
-    if (form == FormSdata)
-    {
-        reader.SLeb();
-        return true;
-    }
-
-    if (form == FormUdata || form == FormRefUdata || form == FormStrx
-        || form == FormAddrx || form == FormLoclistx || form == FormRnglistx)
-    {
-        reader.Leb();
-        return true;
-    }
-
-    if (form == FormString)
-    {
-        reader.CString();
-        return true;
-    }
-
-    if (form == FormBlock2)
-    {
-        nuint size = (nuint)reader.U16();
-        reader.Skip(size);
-        return true;
-    }
-
-    if (form == FormBlock4)
-    {
-        nuint size = (nuint)reader.U32();
-        reader.Skip(size);
-        return true;
-    }
-
-    if (form == FormBlock || form == FormExprloc)
-    {
-        nuint size = (nuint)reader.Leb();
-        reader.Skip(size);
-        return true;
-    }
-
-    // **`DW_FORM_indirect` names its real form in the data**, which is the one
-    // case where the abbreviation does not settle the shape. Rare, and the
-    // reason this is a loop-free recursion of exactly one step.
-    if (form == FormIndirect)
-    {
-        uint real = (uint)reader.Leb();
-        if (real == FormIndirect)
-            return false;                 // an indirect indirect is nonsense
-        return SkipForm(reader, real, addressSize, offsetSize);
-    }
-
-    return false;
 }

@@ -435,181 +435,183 @@ public class DwarfInfo
 
         nuint offsetSize = unit.OffsetSize;
 
-        if (form == FormImplicitConst)
+        switch (form)
         {
-            made.Value = (ulong)wanted.Implicit;
-            return made;
-        }
+            // ------------------------------------------------ no bytes read
 
-        if (form == FormFlagPresent)
-        {
-            made.Value = 1u;
-            return made;
-        }
+            case FormImplicitConst:
+                made.Value = (ulong)wanted.Implicit;
+                return made;
 
-        // ---------------------------------------------------------- strings
+            case FormFlagPresent:
+                made.Value = 1u;
+                return made;
 
-        if (form == FormString)
-        {
-            made.Text = reader.CString();
-            return made;
-        }
+            // ------------------------------------------------------ strings
 
-        if (form == FormStrp)
-        {
-            nuint offset = (nuint)ReadOffset(reader, offsetSize);
-            made.Value = (ulong)offset;
-            made.Text = offset < _str.Length ? TextAt(_str, offset) : "";
-            return made;
-        }
+            case FormString:
+                made.Text = reader.CString();
+                return made;
 
-        if (form == FormLineStrp)
-        {
-            nuint offset = (nuint)ReadOffset(reader, offsetSize);
-            made.Value = (ulong)offset;
-            made.Text = offset < _lineStr.Length ? TextAt(_lineStr, offset) : "";
-            return made;
-        }
+            case FormStrp:
+            {
+                nuint offset = (nuint)ReadOffset(reader, offsetSize);
+                made.Value = (ulong)offset;
+                made.Text = offset < _str.Length ? TextAt(_str, offset) : "";
+                return made;
+            }
 
-        if (form == FormStrx || form == FormStrx1 || form == FormStrx2
-            || form == FormStrx3 || form == FormStrx4)
-        {
-            ulong index = form == FormStrx ? reader.Leb()
-                        : ReadFixed(reader, WidthOfStrx(form));
-            made.Value = index;
-            made.Text = StringAt(index, bases->StrOffsets, offsetSize);
-            return made;
-        }
+            case FormLineStrp:
+            {
+                nuint offset = (nuint)ReadOffset(reader, offsetSize);
+                made.Value = (ulong)offset;
+                made.Text = offset < _lineStr.Length ? TextAt(_lineStr, offset) : "";
+                return made;
+            }
 
-        // -------------------------------------------------------- addresses
+            // An index into this unit's slice of `.debug_str_offsets`, and from
+            // there into `.debug_str`.
+            case FormStrx:
+            case FormStrx1:
+            case FormStrx2:
+            case FormStrx3:
+            case FormStrx4:
+            {
+                ulong index = form == FormStrx ? reader.Leb()
+                            : ReadFixed(reader, WidthOfStrx(form));
+                made.Value = index;
+                made.Text = StringAt(index, bases->StrOffsets, offsetSize);
+                return made;
+            }
 
-        if (form == FormAddr)
-        {
-            made.Value = ReadFixed(reader, unit.AddressSize);
-            return made;
-        }
+            // ---------------------------------------------------- addresses
 
-        if (form == FormAddrx || form == FormAddrx1 || form == FormAddrx2
-            || form == FormAddrx3 || form == FormAddrx4)
-        {
-            ulong index = form == FormAddrx ? reader.Leb()
-                        : ReadFixed(reader, WidthOfAddrx(form));
-            made.Value = AddressAt(index, bases->Addr, unit.AddressSize);
-            return made;
-        }
+            case FormAddr:
+                made.Value = ReadFixed(reader, unit.AddressSize);
+                return made;
 
-        // --------------------------------------------------------- numbers
+            case FormAddrx:
+            case FormAddrx1:
+            case FormAddrx2:
+            case FormAddrx3:
+            case FormAddrx4:
+            {
+                ulong index = form == FormAddrx ? reader.Leb()
+                            : ReadFixed(reader, WidthOfAddrx(form));
+                made.Value = AddressAt(index, bases->Addr, unit.AddressSize);
+                return made;
+            }
 
-        if (form == FormData1 || form == FormFlag)
-        {
-            made.Value = (ulong)reader.U8();
-            return made;
-        }
-        if (form == FormData2)
-        {
-            made.Value = (ulong)reader.U16();
-            return made;
-        }
-        if (form == FormData4)
-        {
-            made.Value = (ulong)reader.U32();
-            return made;
-        }
-        if (form == FormData8)
-        {
-            made.Value = reader.U64();
-            return made;
-        }
-        if (form == FormData16)
-        {
+            // ------------------------------------------------------ numbers
+
+            case FormData1:
+            case FormFlag:
+                made.Value = (ulong)reader.U8();
+                return made;
+
+            case FormData2:
+                made.Value = (ulong)reader.U16();
+                return made;
+
+            case FormData4:
+                made.Value = (ulong)reader.U32();
+                return made;
+
+            case FormData8:
+                made.Value = reader.U64();
+                return made;
+
             // Sixteen bytes is an MD5 and never a number; kept whole.
-            made.Block = reader.Take(16u);
-            return made;
-        }
-        if (form == FormUdata)
-        {
-            made.Value = reader.Leb();
-            return made;
-        }
-        if (form == FormSdata)
-        {
-            made.Value = (ulong)reader.SLeb();
-            return made;
-        }
-        if (form == FormSecOffset)
-        {
-            made.Value = ReadOffset(reader, offsetSize);
-            return made;
-        }
-        if (form == FormLoclistx || form == FormRnglistx)
-        {
-            made.Value = reader.Leb();
-            return made;
-        }
+            case FormData16:
+                made.Block = reader.Take(16u);
+                return made;
 
-        // ------------------------------------------------------ references
+            case FormUdata:
+                made.Value = reader.Leb();
+                return made;
 
-        if (form == FormRef1 || form == FormRef2 || form == FormRef4
-            || form == FormRef8 || form == FormRefUdata)
-        {
-            ulong relative = form == FormRefUdata ? reader.Leb()
-                           : ReadFixed(reader, WidthOfRef(form));
+            case FormSdata:
+                made.Value = (ulong)reader.SLeb();
+                return made;
+
+            case FormSecOffset:
+                made.Value = ReadOffset(reader, offsetSize);
+                return made;
+
+            case FormLoclistx:
+            case FormRnglistx:
+                made.Value = reader.Leb();
+                return made;
+
+            // --------------------------------------------------- references
+
             // Relative to the unit, and stored absolute -- a consumer that has
             // to remember which unit an offset came from eventually forgets.
-            made.Value = (ulong)unit.Offset + relative;
-            return made;
-        }
+            case FormRef1:
+            case FormRef2:
+            case FormRef4:
+            case FormRef8:
+            case FormRefUdata:
+            {
+                ulong relative = form == FormRefUdata ? reader.Leb()
+                               : ReadFixed(reader, WidthOfRef(form));
+                made.Value = (ulong)unit.Offset + relative;
+                return made;
+            }
 
-        if (form == FormRefAddr || form == FormStrpSup)
-        {
-            made.Value = ReadOffset(reader, offsetSize);
-            return made;
-        }
+            case FormRefAddr:
+            case FormStrpSup:
+                made.Value = ReadOffset(reader, offsetSize);
+                return made;
 
-        if (form == FormRefSig8 || form == FormRefSup8)
-        {
-            made.Value = reader.U64();
-            return made;
-        }
+            case FormRefSig8:
+            case FormRefSup8:
+                made.Value = reader.U64();
+                return made;
 
-        if (form == FormRefSup4)
-        {
-            made.Value = (ulong)reader.U32();
-            return made;
-        }
+            case FormRefSup4:
+                made.Value = (ulong)reader.U32();
+                return made;
 
-        // ----------------------------------------------------------- blocks
+            // -------------------------------------------------------- blocks
 
-        if (form == FormExprloc || form == FormBlock)
-        {
-            nuint size = (nuint)reader.Leb();
-            made.Block = reader.Take(size);
-            return made;
-        }
-        if (form == FormBlock1)
-        {
-            nuint size = (nuint)reader.U8();
-            made.Block = reader.Take(size);
-            return made;
-        }
-        if (form == FormBlock2)
-        {
-            nuint size = (nuint)reader.U16();
-            made.Block = reader.Take(size);
-            return made;
-        }
-        if (form == FormBlock4)
-        {
-            nuint size = (nuint)reader.U32();
-            made.Block = reader.Take(size);
-            return made;
-        }
+            case FormExprloc:
+            case FormBlock:
+            {
+                nuint size = (nuint)reader.Leb();
+                made.Block = reader.Take(size);
+                return made;
+            }
 
-        // Anything left is a form this reader has no value for but may still be
-        // able to step over, which is enough to keep the rest of the unit.
-        if (SkipForm(reader, form, unit.AddressSize, offsetSize))
-            return made;
-        return null;
+            case FormBlock1:
+            {
+                nuint size = (nuint)reader.U8();
+                made.Block = reader.Take(size);
+                return made;
+            }
+
+            case FormBlock2:
+            {
+                nuint size = (nuint)reader.U16();
+                made.Block = reader.Take(size);
+                return made;
+            }
+
+            case FormBlock4:
+            {
+                nuint size = (nuint)reader.U32();
+                made.Block = reader.Take(size);
+                return made;
+            }
+
+            // Anything left is a form this reader has no value for but may
+            // still be able to step over, which is enough to keep the rest of
+            // the unit.
+            default:
+                if (SkipForm(reader, form, unit.AddressSize, offsetSize))
+                    return made;
+                return null;
+        }
     }
 
     /// The string at an index, through `.debug_str_offsets` and then
@@ -660,24 +662,33 @@ ulong ReadFixed(Cursor reader, nuint size)
 
 nuint WidthOfStrx(uint form)
 {
-    if (form == FormStrx1) return 1u;
-    if (form == FormStrx2) return 2u;
-    if (form == FormStrx3) return 3u;
-    return 4u;
+    switch (form)
+    {
+        case FormStrx1: return 1u;
+        case FormStrx2: return 2u;
+        case FormStrx3: return 3u;
+        default: return 4u;
+    }
 }
 
 nuint WidthOfAddrx(uint form)
 {
-    if (form == FormAddrx1) return 1u;
-    if (form == FormAddrx2) return 2u;
-    if (form == FormAddrx3) return 3u;
-    return 4u;
+    switch (form)
+    {
+        case FormAddrx1: return 1u;
+        case FormAddrx2: return 2u;
+        case FormAddrx3: return 3u;
+        default: return 4u;
+    }
 }
 
 nuint WidthOfRef(uint form)
 {
-    if (form == FormRef1) return 1u;
-    if (form == FormRef2) return 2u;
-    if (form == FormRef4) return 4u;
-    return 8u;
+    switch (form)
+    {
+        case FormRef1: return 1u;
+        case FormRef2: return 2u;
+        case FormRef4: return 4u;
+        default: return 8u;
+    }
 }
