@@ -291,10 +291,7 @@ public class OfficeXpRenderer : ChromeRenderer
         {
             // Over the gutter as well, which is what makes a hot item read as
             // one strip rather than as two rectangles side by side.
-            surface.FillRectangle(new Brush(HotFill), bounds);
-            surface.DrawRectangle(new Pen(HotBorder),
-                                  Rectangle.Of(bounds.X, bounds.Y,
-                                               bounds.Width - 1, bounds.Height - 1));
+            Wash(surface, bounds, HotFill);
         }
 
         if (state.HasFlag(MenuItemState.Checked))
@@ -347,10 +344,7 @@ public class OfficeXpRenderer : ChromeRenderer
 
         if (selected)
         {
-            surface.FillRectangle(new Brush(HotFill), bounds);
-            surface.DrawRectangle(new Pen(HotBorder),
-                                  Rectangle.Of(bounds.X, bounds.Y,
-                                               bounds.Width - 1, bounds.Height - 1));
+            Wash(surface, bounds, HotFill);
         }
 
         TextFormat format;
