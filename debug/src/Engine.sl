@@ -102,6 +102,22 @@ public class Stop
     }
 }
 
+/// A function, with the unit it was described in.
+///
+/// Both together because neither is useful alone: a local's type is a reference
+/// form, and a reference only resolves through its own unit's table.
+public class Subprogram
+{
+    public Unit InUnit;
+    public Die Die;
+
+    public Subprogram(Unit unit, Die die)
+    {
+        InUnit = unit;
+        Die = die;
+    }
+}
+
 /// A debugging session: an image, its DWARF, and the process it is running.
 public class Engine
 {
@@ -579,6 +595,31 @@ public class Engine
             return done;
         }
         return stop;
+    }
+
+    /// The subprogram containing an address, and the unit it belongs to.
+    ///
+    /// Both, because an entry is only meaningful beside its unit: a reference
+    /// form resolves through the unit's table, and the type of a local is a
+    /// reference.
+    public Subprogram? SubprogramAt(nuint runtimeAddress)
+    {
+        nuint linked = ToLinked(runtimeAddress);
+        for (nuint u = 0u; u < _info.Units.Count; u++)
+        {
+            var one = _info.Units[u];
+            for (nuint i = 0u; i < one.Dies.Count; i++)
+            {
+                var each = one.Dies[i];
+                if (each.Tag != TagSubprogram)
+                    continue;
+                nuint from = 0u;
+                nuint to = 0u;
+                if (each.Range(&from, &to) && linked >= from && linked < to)
+                    return new Subprogram(one, each);
+            }
+        }
+        return null;
     }
 
     /// The runtime address range of the function containing an address.

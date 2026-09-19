@@ -36,6 +36,7 @@
 //   sldb stack <binary> f:n    the call stack where it stops
 //   sldb step <binary> f:n [k] step k lines from there, into calls
 //   sldb next <binary> f:n [k] the same, over them
+//   sldb locals <binary> f:n   the parameters and locals in scope there
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -822,6 +823,13 @@ int RunToBreakpointThen(String path, String where, String what, int times)
         return 0;
     }
 
+    if (what == "locals")
+    {
+        PrintLocals(target, engine, stop.Thread, stop.Address);
+        engine.Terminate();
+        return 0;
+    }
+
     for (int i = 0; i < times; i++)
     {
         var moved = what == "next" ? engine.StepOver(stop.Thread)
@@ -845,6 +853,54 @@ int RunToBreakpointThen(String path, String where, String what, int times)
 
     engine.Terminate();
     return 0;
+}
+
+/// Every parameter and local of the function stopped in.
+///
+/// **All of them, including ones not yet reached**, because the compiler emits
+/// no lexical blocks: a variable declared inside a loop belongs to the
+/// function's scope as far as DWARF is concerned, so it is in this list from
+/// the function's first line holding whatever its stack slot contained. Saying
+/// so is better than filtering by `DW_AT_decl_line`, which would be the
+/// debugger guessing at something the compiler knows and could emit.
+void PrintLocals(ITarget target, Engine engine, uint thread, nuint pc)
+{
+    var found = engine.SubprogramAt(pc);
+    if (found == null)
+    {
+        Console.WriteLine("  (no function here)");
+        return;
+    }
+
+    var where = (Subprogram)found;
+    Registers frame;
+    frame.Pc = 0u;
+    frame.StackPointer = 0u;
+    frame.FramePointer = 0u;
+    if (!target.ReadRegisters(thread, &frame))
+    {
+        Console.WriteLine("  (registers unreadable)");
+        return;
+    }
+
+    var children = ChildrenOf(where.InUnit, where.Die);
+    bool any = false;
+    for (nuint i = 0u; i < children.Count; i++)
+    {
+        var one = children[i];
+        if (one.Tag != TagFormalParameter && one.Tag != TagVariable)
+            continue;
+
+        var described = DescribeType(where.InUnit, one);
+        String value = ReadValue(engine, target, where.InUnit, one,
+                                 where.Die, frame);
+        Console.WriteLine("  " + PadRight(one.Name, 12)
+                          + PadRight(described.Name, 24) + value
+                          + (one.Tag == TagFormalParameter ? "   (parameter)" : ""));
+        any = true;
+    }
+    if (!any)
+        Console.WriteLine("  (none)");
 }
 
 void PrintCallStack(ITarget target, Engine engine, uint thread)
@@ -882,6 +938,7 @@ int PrintUsage()
     Console.WriteLine("  sldb stack <binary> f:n    the call stack where it stops");
     Console.WriteLine("  sldb step <binary> f:n [k] step k lines, into calls");
     Console.WriteLine("  sldb next <binary> f:n [k] the same, over them");
+    Console.WriteLine("  sldb locals <binary> f:n   the variables in scope there");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
 }
@@ -918,6 +975,9 @@ int Main()
 
     if (args[0u] == "stack" && args.Length >= 3u)
         return RunToBreakpointThen(args[1u], args[2u], "stack", 0);
+
+    if (args[0u] == "locals" && args.Length >= 3u)
+        return RunToBreakpointThen(args[1u], args[2u], "locals", 0);
 
     if ((args[0u] == "step" || args[0u] == "next") && args.Length >= 3u)
     {

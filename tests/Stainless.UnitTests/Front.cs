@@ -289,6 +289,105 @@ public static class Front
     }
 
     /// <summary>
+    /// The same, with debug information, which is what makes the metadata
+    /// graph inspectable from a unit test.
+    /// </summary>
+    public static string ModuleDebugIr(string body, CppAbi abi = CppAbi.Microsoft)
+    {
+        var source = Text("module Test;\n" + body);
+        var diagnostics = new DiagnosticBag();
+        var unit = new Parser(source, diagnostics, Symbols).ParseCompilationUnit();
+        var units = Library.Value.Append(unit).ToList();
+        var program = new Binder(diagnostics, requireEntryPoint: false, cppAbi: abi)
+            .Bind(units);
+
+        if (diagnostics.HasErrors)
+            throw new InvalidOperationException(
+                "the source did not bind: " + string.Join("; ", diagnostics.Items
+                    .Where(d => d.Severity == Severity.Error)
+                    .Select(d => d.Code + " " + d.Message)));
+
+        var debug = new DebugInfo(source, "Stainless tests", codeView: false);
+        return new LlvmEmitter(forSharedLibrary: true, abi: abi, debug: debug)
+            .Emit(program)
+            .ReplaceLineEndings("\n");
+    }
+
+    /// <summary>
+    /// The metadata node of a given number, as the emitter wrote it.
+    /// </summary>
+    public static string MetadataNode(string ir, int id)
+    {
+        string prefix = "!" + id + " = ";
+        foreach (string line in ir.Split('\n'))
+        {
+            if (line.StartsWith(prefix, StringComparison.Ordinal))
+                return line;
+        }
+        return "";
+    }
+
+    /// <summary>
+    /// The node number a local of <paramref name="variable"/> gives as its
+    /// type, inside the test's own <paramref name="function"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>The function has to be named, and that is not tidiness.</b> The
+    /// standard library is bound into the same module text, so a search for a
+    /// variable called <c>first</c> or <c>here</c> finds one in
+    /// <c>Standard.Collections</c> long before it reaches anything a test
+    /// wrote — which is the trap <c>CLAUDE.md</c> records <c>AbiTests</c>
+    /// falling into, and which this fell into in exactly the same way. The
+    /// subprogram is found by its mangled name, and only locals scoped to it
+    /// are considered.
+    /// </remarks>
+    public static int LocalVariableTypeNode(string ir, string function,
+                                            string variable)
+    {
+        string mangled = $"_SL4Test{function.Length}{function}";
+        int subprogram = -1;
+
+        foreach (string line in ir.Split('\n'))
+        {
+            if (!line.Contains("!DISubprogram(", StringComparison.Ordinal)
+                || !line.Contains("linkageName: \"" + mangled, StringComparison.Ordinal))
+                continue;
+            subprogram = NodeNumberOf(line);
+            break;
+        }
+
+        if (subprogram < 0)
+            return -1;
+
+        string scope = "scope: !" + subprogram + ",";
+        foreach (string line in ir.Split('\n'))
+        {
+            if (!line.Contains("!DILocalVariable(name: \"" + variable + "\"",
+                               StringComparison.Ordinal))
+                continue;
+            if (!line.Contains(scope, StringComparison.Ordinal))
+                continue;
+
+            int at = line.LastIndexOf("type: !", StringComparison.Ordinal);
+            if (at < 0)
+                return -1;
+            string digits = new string(line[(at + 7)..]
+                .TakeWhile(char.IsDigit).ToArray());
+            return digits.Length == 0 ? -1 : int.Parse(digits);
+        }
+        return -1;
+    }
+
+    /// <summary>The number a metadata line defines, or -1.</summary>
+    private static int NodeNumberOf(string line)
+    {
+        if (line.Length < 2 || line[0] != '!')
+            return -1;
+        string digits = new string(line[1..].TakeWhile(char.IsDigit).ToArray());
+        return digits.Length == 0 ? -1 : int.Parse(digits);
+    }
+
+    /// <summary>
     /// One function of the test's own module, by its Stainless name.
     ///
     /// The prefix is built rather than matched loosely because the standard

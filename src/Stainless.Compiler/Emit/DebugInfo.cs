@@ -285,7 +285,8 @@ public sealed class DebugInfo
             }
 
             case StructTypeSymbol structType:
-                return _types[type] = Composite(structType, structType.Size, headerBytes: 0);
+                return Composite(structType, structType.Size, headerBytes: 0,
+                                 asBody: false);
 
             case DelegateTypeSymbol delegateType:
                 return _types[type] = DelegateType(delegateType);
@@ -396,15 +397,42 @@ public sealed class DebugInfo
     private int Body(ClassTypeSymbol classType) =>
         _bodies.TryGetValue(classType, out int found)
             ? found
-            : _bodies[classType] =
-                Composite(classType, classType.InstanceSize, ClassTypeSymbol.HeaderSize);
+            : Composite(classType, classType.InstanceSize,
+                        ClassTypeSymbol.HeaderSize, asBody: true);
 
     private readonly Dictionary<NamedTypeSymbol, int> _bodies = [];
 
-    private int Composite(NamedTypeSymbol type, int size, int headerBytes)
+    /// <summary>
+    /// A structure node, registered where a later lookup of the same type will
+    /// find it: in <c>_types</c> for a value type, whose node *is* the type,
+    /// and in <c>_bodies</c> for a class, whose type is a pointer to this.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Registering before filling is the recursion guard</b> — a type that
+    /// contains a reference to itself would otherwise descend for ever — and
+    /// registering in the <i>wrong</i> map is a bug that hides behind it.
+    /// Writing <c>_types[type]</c> unconditionally meant a class body
+    /// overwrote the pointer node its caller had just put there, so the first
+    /// reference to a class got the pointer and every one after it got the
+    /// struct. A local declared as a class then had a type 40 bytes wide
+    /// sitting in a slot holding an 8-byte reference, and a debugger reading
+    /// it saw the object's first five words instead of the object.
+    /// </para>
+    /// <para>
+    /// It survived because nothing read it: the IR verifies either way, and
+    /// <c>debug.txt</c> checked that the nodes exist rather than which one a
+    /// variable points at. <c>tests/cases/debug-info</c> now pins the shape.
+    /// </para>
+    /// </remarks>
+    private int Composite(NamedTypeSymbol type, int size, int headerBytes,
+                          bool asBody)
     {
         int id = Reserve();
-        _types[type] = id;
+        if (asBody)
+            _bodies[(ClassTypeSymbol)type] = id;
+        else
+            _types[type] = id;
 
         string where = Position(type.Span);
         var members = new List<int>();

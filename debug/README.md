@@ -26,6 +26,7 @@ stainless build --project debug
 | `src/Target/Select.sl` | the one `#if` in the engine |
 | `src/Engine.sl` | breakpoints, the slide, run control and stepping |
 | `src/Stack.sl` | the frame-pointer walk |
+| `src/Values.sl` | a location and a type, read out of the process |
 | `tests/sldb.sl` | the console debugger |
 
 ## Four decisions worth knowing before reading the code
@@ -238,11 +239,58 @@ proving it is inside this function is `0xCC` written into somebody else's code
 -- which is exactly what happened, and what the wild addresses in the output
 were. Worth doing, worth doing carefully, and not done here.
 
+## Values
+
+```
+$ sldb locals fp-dwarf.exe fixture.sl:65
+  numbers     int[]                   4 elements at 0x17ede8fe2a0
+  sum         int                     10
+  s           Fixture.Shape           Fixture.Shape (Fixture.Circle) at 0x...
+  label       Standard.Text.String    "circle"
+```
+
+**`Fixture.Shape (Fixture.Circle)` needs no reflection metadata.** Every object
+carries a 24-byte header whether or not it carries field tables, and `type` at
++16 is an `SlTypeInfo*` whose `name` is at +16 of that -- so two pointer reads
+turn a variable declared as a base class into one that shows what it actually
+is. `strong` at +0 being zero means the object is dead, which turns the stale
+weak reference `docs/abi.md` warns about from a lie into `(dead)`.
+
+**An array and a `String` are described as far as their length and no
+further**, because DWARF can only express an array whose bound it knows
+statically. `length` is at offset 24 and the elements at **32** -- the length
+is a word of its own, and a reader that puts them at 24 gets the length as its
+first element.
+
+**Every local of the function is listed, including ones not reached yet**,
+because the compiler emits no lexical blocks. A variable declared inside a loop
+belongs to the function's scope as far as DWARF is concerned, so it is in the
+list from the first line holding whatever its slot contained. Filtering by
+`DW_AT_decl_line` would be the debugger guessing at something the compiler
+knows and could emit.
+
+**A compiler bug came out of this, and it is the kind that hides.** A class
+reference is described as a pointer to the class body -- except that building
+the body registered *itself* under the class's own entry in the type map,
+overwriting the pointer its caller had just put there. So the first reference
+to any class got the pointer and every one after it got the 40-byte structure,
+sitting in a slot holding an 8-byte reference. It verified, it ran, and only a
+debugger reading a local ever noticed. `DebugInfoTests` now follows the node
+number from a variable to what it points at, with two locals of one type
+because one would have passed.
+
 ## Still to come
 
-Values -- locals, the type graph, `String` and arrays, and the runtime type out
-of an object header -- and then `ptrace`, which the seam exists to make a
-transcription job. The IDE
+`ptrace`, which the seam exists to make a transcription job, and then the IDE
+surface -- kept thin, because everything in it comes from snapshot types this
+console tool has already exercised.
+
+Named rather than done, in the value reader: a `struct` prints as its address
+and size rather than member by member; a `double` prints its bits, because
+reinterpreting eight bytes as a float needs a cast this does not have yet; and
+a variant prints nothing useful, because the cases are numbered in declaration
+order while DWARF gets a member only for the ones carrying a payload -- the
+k-th member is not tag k, and twelve lines of compiler would fix it properly. The IDE
 surface is last and is meant to be thin: everything in it comes from snapshot
 types this console tool has already exercised.
 
