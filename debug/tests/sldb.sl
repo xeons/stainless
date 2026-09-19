@@ -29,6 +29,9 @@
 //   sldb sections <binary>     what the container holds
 //   sldb units <binary>        the compilation units, and what each covers
 //   sldb dies <binary> [name]  the entry tree, for diffing against dwarfdump
+//   sldb lines <binary>        the line table, row by row
+//   sldb line <binary> f:n     what address a source line begins at
+//   sldb addr <binary> 0xNNN   what source line an address came from
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -171,6 +174,56 @@ int RunSelfTest()
     var ten = new Cursor(endless);
     ten.Leb();
     ok = ReportCheck(ok, "a LEB128 that never ends stops at ten bytes", ten.Offset == 10u);
+
+    // ------------------------------------------------- the line-table lookups
+    //
+    // Diffing the whole table against `llvm-dwarfdump` proves the *rows*, and
+    // says nothing about the two searches over them -- which is where the
+    // subtlety is. Two sequences with a gap between them is the shape that
+    // catches it.
+    var table = new LineTable();
+    table.Files.Add("one.sl");
+    //                          addr    file line col stmt  end    pro    epi
+    table.Rows.Add(new LineRow(0x1000u, 0u, 10u, 1u, true,  false, false, false));
+    table.Rows.Add(new LineRow(0x1010u, 0u, 11u, 1u, true,  false, false, false));
+    table.Rows.Add(new LineRow(0x1020u, 0u, 11u, 1u, false, true,  false, false));
+    table.Rows.Add(new LineRow(0x2000u, 0u, 20u, 1u, true,  false, false, false));
+    table.Rows.Add(new LineRow(0x2010u, 0u, 20u, 1u, false, true,  false, false));
+
+    var first = table.RowCovering(0x1000u);
+    ok = ReportCheck(ok, "an address at a row's start is that row",
+                     first != null && ((LineRow)first).Line == 10u);
+
+    var middle = table.RowCovering(0x1015u);
+    ok = ReportCheck(ok, "an address inside a row belongs to it",
+                     middle != null && ((LineRow)middle).Line == 11u);
+
+    // **The end of a sequence covers nothing.** Its address is one past the
+    // last instruction, so treating it as a row that reaches the next sequence
+    // reports the previous function for every address in the gap -- an answer
+    // plausible enough to act on.
+    ok = ReportCheck(ok, "the address a sequence ends at belongs to no row",
+                     table.RowCovering(0x1020u) == null);
+    ok = ReportCheck(ok, "and neither does the gap after it",
+                     table.RowCovering(0x1500u) == null);
+
+    var second = table.RowCovering(0x2000u);
+    ok = ReportCheck(ok, "the next sequence starts cleanly",
+                     second != null && ((LineRow)second).Line == 20u);
+
+    nuint found = 0u;
+    uint chosen = 0u;
+    ok = ReportCheck(ok, "a line with code gives its own address",
+                     table.AddressForLine(0u, 11u, &found, &chosen)
+                     && found == 0x1010u && chosen == 11u);
+
+    // A line with no code binds forward, and the caller is told where to.
+    ok = ReportCheck(ok, "a line with none moves to the next that has some",
+                     table.AddressForLine(0u, 12u, &found, &chosen)
+                     && found == 0x2000u && chosen == 20u);
+
+    ok = ReportCheck(ok, "and past the last line there is nothing",
+                     !table.AddressForLine(0u, 99u, &found, &chosen));
 
     // **Every named form must be a skippable form.** A form this engine can
     // name but not step over is one that loses its place in the entry stream
@@ -332,6 +385,238 @@ String FormatAttributeValue(Attribute one)
     return "(0x" + FormatHexadecimal(one.Value) + ")";
 }
 
+/// Every unit's line table, read once.
+///
+/// A unit points at its table with `DW_AT_stmt_list`, and several units can
+/// point at the same one, so this is per unit rather than per section.
+List<LineTable> ReadEveryLineTable(DwarfInfo info)
+{
+    var made = new List<LineTable>();
+    for (nuint i = 0u; i < info.Units.Count; i++)
+    {
+        var root = info.Units[i].Root;
+        if (root == null || !((Die)root).Has(AtStmtList))
+        {
+            made.Add(new LineTable());
+            continue;
+        }
+        nuint at = (nuint)((Die)root).NumberOf(AtStmtList, 0u);
+        made.Add(ReadLineTable(info.LineSection, at, info.LineStrSection,
+                               info.StrSection));
+    }
+    return made;
+}
+
+int PrintLines(String path)
+{
+    var info = LoadDwarfOrComplain(path);
+    if (info == null)
+        return 1;
+
+    var held = (DwarfInfo)info;
+    var tables = ReadEveryLineTable(held);
+    for (nuint u = 0u; u < tables.Count; u++)
+    {
+        var table = tables[u];
+        if (table.Rows.Count == 0u)
+            continue;
+
+        Console.WriteLine("");
+        Console.WriteLine(held.Units[u].Name + "  ("
+                          + FormatNumber(table.Rows.Count) + " rows, "
+                          + FormatNumber(table.Files.Count) + " files)");
+
+        for (nuint i = 0u; i < table.Rows.Count; i++)
+        {
+            var row = table.Rows[i];
+            var line = new StringBuilder();
+            line.Append("  0x");
+            line.Append(FormatHexPadded(row.Address, 16));
+            line.Append(" ");
+            line.Append(PadRight(FormatNumber((nuint)row.Line), 7));
+            line.Append(PadRight(FormatNumber((nuint)row.Column), 7));
+            line.Append(PadRight(FormatNumber(row.File), 7));
+            if (row.IsStmt)        line.Append(" is_stmt");
+            if (row.PrologueEnd)   line.Append(" prologue_end");
+            if (row.EpilogueBegin) line.Append(" epilogue_begin");
+            if (row.EndSequence)   line.Append(" end_sequence");
+            Console.WriteLine(line.ToText());
+        }
+    }
+    return 0;
+}
+
+/// `file:line` to an address -- what planting a breakpoint is.
+int PrintAddressOfLine(String path, String where)
+{
+    nuint colon = 0u;
+    bool found = false;
+    for (nuint i = where.ByteLength(); i > 0u; i--)
+    {
+        if (where.ByteAt(i - 1u) == (byte)58)         // ':'
+        {
+            colon = i - 1u;
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        Console.WriteLine("sldb: expected file:line, got " + where);
+        return 2;
+    }
+
+    String wantedFile = where.Substring(0u, colon);
+    uint wantedLine = (uint)ParseNumber(where.Substring(colon + 1u,
+                                        where.ByteLength() - colon - 1u));
+
+    var info = LoadDwarfOrComplain(path);
+    if (info == null)
+        return 1;
+
+    var held = (DwarfInfo)info;
+    var tables = ReadEveryLineTable(held);
+
+    for (nuint u = 0u; u < tables.Count; u++)
+    {
+        var table = tables[u];
+        for (nuint f = 0u; f < table.Files.Count; f++)
+        {
+            if (!PathEndsWith(table.Files[f], wantedFile))
+                continue;
+
+            nuint address = 0u;
+            uint chosen = 0u;
+            if (!table.AddressForLine(f, wantedLine, &address, &chosen))
+                continue;
+
+            Console.WriteLine("0x" + FormatHexadecimal((ulong)address)
+                              + "  " + table.Files[f] + ":"
+                              + FormatNumber((nuint)chosen));
+
+            // **Say so when the breakpoint moved.** A line with no code binds
+            // to the next one that has some, and a marker that silently sits
+            // where it was asked for is the one that wastes an afternoon.
+            if (chosen != wantedLine)
+                Console.WriteLine("      (line " + FormatNumber((nuint)wantedLine)
+                                  + " has no code; moved to "
+                                  + FormatNumber((nuint)chosen) + ")");
+            return 0;
+        }
+    }
+
+    Console.WriteLine("sldb: no code for " + where);
+    return 1;
+}
+
+/// An address back to a source line -- what reporting a stop is.
+int PrintLineOfAddress(String path, String text)
+{
+    nuint address = (nuint)ParseNumber(text);
+
+    var info = LoadDwarfOrComplain(path);
+    if (info == null)
+        return 1;
+
+    var held = (DwarfInfo)info;
+    var tables = ReadEveryLineTable(held);
+
+    for (nuint u = 0u; u < tables.Count; u++)
+    {
+        var row = tables[u].RowCovering(address);
+        if (row == null)
+            continue;
+
+        var here = (LineRow)row;
+        Console.WriteLine(tables[u].FileName(here.File) + ":"
+                          + FormatNumber((nuint)here.Line)
+                          + "  (0x" + FormatHexadecimal((ulong)here.Address)
+                          + (here.IsStmt ? ", a statement)" : ")"));
+
+        // The function it fell in, which is what a person actually wanted.
+        var unit = held.Units[u];
+        for (nuint i = 0u; i < unit.Dies.Count; i++)
+        {
+            var die = unit.Dies[i];
+            if (die.Tag != TagSubprogram)
+                continue;
+            nuint low = 0u;
+            nuint high = 0u;
+            if (die.Range(&low, &high) && address >= low && address < high)
+            {
+                Console.WriteLine("      in " + die.Name + " at +"
+                                  + FormatNumber(address - low));
+                break;
+            }
+        }
+        return 0;
+    }
+
+    Console.WriteLine("sldb: no line covers 0x" + FormatHexadecimal((ulong)address));
+    return 1;
+}
+
+/// Decimal, or hexadecimal behind an `0x`.
+ulong ParseNumber(String text)
+{
+    nuint length = text.ByteLength();
+    nuint at = 0u;
+    ulong radix = 10u;
+
+    if (length >= 2u && text.ByteAt(0u) == (byte)48
+        && (text.ByteAt(1u) == (byte)120 || text.ByteAt(1u) == (byte)88))
+    {
+        at = 2u;
+        radix = 16u;
+    }
+
+    ulong answer = 0u;
+    for (nuint i = at; i < length; i++)
+    {
+        byte here = text.ByteAt(i);
+        ulong digit = 16u;
+        if (here >= (byte)48 && here <= (byte)57)
+            digit = (ulong)(here - (byte)48);
+        else if (here >= (byte)97 && here <= (byte)102)
+            digit = (ulong)(here - (byte)97) + 10u;
+        else if (here >= (byte)65 && here <= (byte)70)
+            digit = (ulong)(here - (byte)65) + 10u;
+        if (digit >= radix)
+            break;
+        answer = answer * radix + digit;
+    }
+    return answer;
+}
+
+/// Whether a full path ends with the piece a person typed.
+///
+/// A debugger is told `fixture.sl`, not
+/// `/home/brandon/spike/fixture.sl`, so matching is on the tail at a separator
+/// boundary -- and both separators count, because a line table written by a
+/// Windows cross-compiler mixes them inside one string.
+bool PathEndsWith(String full, String tail)
+{
+    nuint a = full.ByteLength();
+    nuint b = tail.ByteLength();
+    if (b == 0u || b > a)
+        return false;
+
+    for (nuint i = 0u; i < b; i++)
+    {
+        byte left = full.ByteAt(a - b + i);
+        byte right = tail.ByteAt(i);
+        if (left == (byte)92) left = (byte)47;
+        if (right == (byte)92) right = (byte)47;
+        if (left != right)
+            return false;
+    }
+
+    if (b == a)
+        return true;
+    byte before = full.ByteAt(a - b - 1u);
+    return before == (byte)47 || before == (byte)92;
+}
+
 int PrintUsage()
 {
     Console.WriteLine("sldb -- the Stainless debugger");
@@ -339,6 +624,9 @@ int PrintUsage()
     Console.WriteLine("  sldb sections <binary>     what the container holds");
     Console.WriteLine("  sldb units <binary>        the compilation units");
     Console.WriteLine("  sldb dies <binary> [name]  the entry tree");
+    Console.WriteLine("  sldb lines <binary>        the line table, row by row");
+    Console.WriteLine("  sldb line <binary> f:n     what address a line begins at");
+    Console.WriteLine("  sldb addr <binary> 0xNNN   what line an address came from");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
 }
@@ -360,6 +648,15 @@ int Main()
 
     if (args[0u] == "dies" && args.Length >= 2u)
         return PrintDies(args[1u], args.Length >= 3u ? args[2u] : "");
+
+    if (args[0u] == "lines" && args.Length >= 2u)
+        return PrintLines(args[1u]);
+
+    if (args[0u] == "line" && args.Length >= 3u)
+        return PrintAddressOfLine(args[1u], args[2u]);
+
+    if (args[0u] == "addr" && args.Length >= 3u)
+        return PrintLineOfAddress(args[1u], args[2u]);
 
     return PrintUsage();
 }

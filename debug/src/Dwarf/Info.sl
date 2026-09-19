@@ -216,8 +216,12 @@ public class DwarfInfo
     byte[] _strOffsets;
     byte[] _addr;
 
-    /// The line-number section, kept for `Lines.sl` rather than used here.
+    /// The sections the line-number reader needs, kept here because this is
+    /// what already opened the image. `Lines.sl` uses all three and this file
+    /// uses only the last two.
     public byte[] LineSection;
+    public byte[] LineStrSection => _lineStr;
+    public byte[] StrSection => _str;
 
     public DwarfInfo(Image image)
     {

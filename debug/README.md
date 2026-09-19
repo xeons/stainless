@@ -20,6 +20,7 @@ stainless build --project debug
 | `src/Dwarf/Constants.sl` | the tags, attributes and forms, and names for printing them |
 | `src/Dwarf/Abbrev.sl` | `.debug_abbrev`, and a skip rule for every form |
 | `src/Dwarf/Info.sl` | `.debug_info` as units and entries, indirections resolved |
+| `src/Dwarf/Lines.sl` | `.debug_line`, which is a bytecode and so an interpreter |
 | `tests/sldb.sl` | the console debugger |
 
 ## Four decisions worth knowing before reading the code
@@ -93,21 +94,50 @@ fixture in `docs/dwarf.md`:
 ```
                 ELF          PE
 entries        9808         6226
+line rows     21964        15507
 differing         0            0
 ```
 
--- every offset and every tag, across seventeen compilation units and every
-form the compiler emits. That is the check to repeat after any change here, and
-it is worth more than any number of assertions about individual fields.
+-- every entry offset and tag, and every line row's address, line, column, file
+and flags, across seventeen compilation units and every form the compiler
+emits. That is the check to repeat after any change here, and it is worth more
+than any number of assertions about individual fields.
 
-Two things it does not cover, and which the self test does instead: that every
-form this engine can *name* it can also *skip*, and that one it has never heard
-of is refused rather than skipped by zero bytes. Both are the same failure --
-losing position in a stream whose entries carry no length, and then producing
-entries that still look plausible.
+Three things it does not cover, and which the self test does instead.
+
+That every form this engine can *name* it can also *skip*, and that one it has
+never heard of is refused rather than skipped by zero bytes -- both the same
+failure, losing position in a stream whose entries carry no length and then
+producing entries that still look plausible.
+
+And **the two searches over the line rows**, which a diff of the rows says
+nothing about. The subtle one is that a sequence's last row covers nothing: its
+address is one past the last instruction, so treating it as a row reaching the
+next sequence reports the previous function for every address in the gap.
+
+## What it can answer
+
+The two questions the reading half exists for, neither of which needs a
+process:
+
+```
+$ sldb line f0 fixture.sl:38
+0x1211  /home/brandon/spike/fixture.sl:38
+
+$ sldb line f0 fixture.sl:34
+0x1200  /home/brandon/spike/fixture.sl:35
+      (line 34 has no code; moved to 35)
+
+$ sldb addr f0 0x122a
+/home/brandon/spike/fixture.sl:40  (0x122a, a statement)
+      in Total at +42
+```
+
+**A breakpoint that moves says so.** A line with no code binds to the next one
+that has some, which every debugger does; one that leaves the marker where it
+was asked for is the one that wastes an afternoon.
 
 ## Still to come
 
-The line-number program, so that a file and a line can be turned into an
-address and back; then process control (`ITarget`, the `DEBUG_EVENT` loop,
-`ptrace`), stack walking, values, and the IDE surface.
+Process control -- `ITarget`, the `DEBUG_EVENT` loop, `ptrace` -- then stack
+walking, values, and the IDE surface.
