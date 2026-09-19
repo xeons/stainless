@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: 0BSD
+//
+// What the IDE carries beyond what every Forms program does.
+//
+// The manifest and the string table come from `samples/forms/forms.rc`, which
+// this program also compiles; a build may name more than one script and the
+// compiler keeps them apart by name. This one holds the thing that is the
+// IDE's own and nobody else's.
+//
+// `llvm-rc` resolves a relative path against this script's own directory, so
+// `stainless.ico` is found whichever directory the build was started from.
+
+// ------------------------------------------------------------------- icon
+//
+// **Id 1, and the number is the whole of how Windows finds it.** An executable
+// has no field naming its icon: the shell shows whichever `RT_GROUP_ICON` has
+// the lowest id, so 1 is not a convention here but the mechanism. It is what
+// Explorer draws, what the taskbar pins and what the Alt+Tab list shows, and
+// none of it needs a line of code.
+//
+// The window's own icon does need one -- `Form.UseIconResource(1)` -- because
+// a window is given its icon rather than found to have one. Windows only: a
+// GTK program's icon comes from the desktop's icon theme, keyed by the name in
+// its `.desktop` file, so the same bytes cannot serve there and the method
+// answers false.
+//
+// The file holds 16, 24, 32, 48, 64 and 256 pixel images. The small ones are
+// drawn rather than scaled from the large: a 16-pixel hexagon resampled from
+// 256 is a grey blob, and the sizes Windows actually asks for are the small
+// ones.
+1 ICON "stainless.ico"

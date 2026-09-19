@@ -2,7 +2,7 @@
   "name": "stainless-ide",
   "version": "0.1.0",
   "kind": "executable",
-  "sources": ["src", "../forms/src", "../samples/forms/forms.rc"],
+  "sources": ["src", "../forms/src", "../samples/forms/forms.rc", "res/stainless-ide.rc"],
   "windows": {
     "sources": ["../bindings/win32"],
     "libraries": [

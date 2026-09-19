@@ -209,6 +209,10 @@ public class Shell : Form
     /// Where each icon sits in the list `BuildIcons` makes, in the order it
     /// adds them. Named rather than counted at the call site: a toolbar whose
     /// pictures are off by one is a toolbar where Clean says Run.
+    /// The icon id `res/stainless-ide.rc` gives the program: a hex bolt with
+    /// an S on it. One, because the shell shows the lowest-numbered one.
+    static readonly int ProgramIcon = 1;
+
     static readonly int IconBuild   = 0;
     static readonly int IconRebuild = 1;
     static readonly int IconClean   = 2;
@@ -237,6 +241,13 @@ public class Shell : Form
         _compiler = FindCompiler();
         _textSize = 10;
         _dark = false;
+
+        // The window's own icon, which is separate from the one Explorer
+        // draws: the shell finds that by picking the lowest-numbered icon in
+        // the binary, and a window has to be handed one. False on GTK, where
+        // an icon comes from the desktop theme rather than from the program,
+        // and there is nothing useful to do about that here.
+        UseIconResource(ProgramIcon);
 
         _status = new StatusBar(this);
         _status.Dock = DockStyle.Bottom;

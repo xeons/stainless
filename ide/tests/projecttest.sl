@@ -378,8 +378,32 @@ void Platforms(Harness harness)
     harness.Check("the IDE's own project reads", mine.Ok);
     if (mine.Ok)
     {
-        harness.Check("and names a binding directory per platform",
-                      mine.Value.SourcesFor("windows").Length == 4u
-                      && mine.Value.SourcesFor("linux").Length == 4u);
+        // **By what is in them rather than by how many there are.** This
+        // counted four sources per platform and broke the day the IDE gained
+        // a resource script of its own, which is the test being about the
+        // wrong thing rather than the change being wrong: what the overlay
+        // exists to do is add the right binding directory, and a count says
+        // nothing about which one arrived.
+        harness.Check("and names the Windows bindings",
+                      Names(mine.Value.SourcesFor("windows"), "../bindings/win32"));
+        harness.Check("and the GTK ones on Linux",
+                      Names(mine.Value.SourcesFor("linux"), "../bindings/gtk"));
+
+        // Neither platform's list may carry the other's, which is the half a
+        // merge can get wrong without anything else noticing.
+        harness.Check("and neither carries the other's",
+                      !Names(mine.Value.SourcesFor("windows"), "../bindings/gtk")
+                      && !Names(mine.Value.SourcesFor("linux"), "../bindings/win32"));
     }
+}
+
+/// Whether a list holds exactly this entry.
+bool Names(String[] all, String wanted)
+{
+    foreach (var one in all)
+    {
+        if (one == wanted)
+            return true;
+    }
+    return false;
 }
