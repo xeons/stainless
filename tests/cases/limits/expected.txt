@@ -1,0 +1,28 @@
+sbyte -128 127
+short -32768 32767
+int -2147483648 2147483647
+long -9223372036854775808 9223372036854775807
+byte 0 255
+ushort 0 65535
+uint 0 4294967295
+ulong 0 18446744073709551615
+int/over yes
+int/under yes
+long/over yes
+long/under yes
+uint/over yes
+uint/under yes
+ulong/over yes
+ulong/under yes
+sbyte/over yes
+byte/over yes
+short/over yes
+ushort/over yes
+nuint/width yes
+nint/width yes
+double/finite yes
+double/over yes
+double/sign yes
+double/small yes
+float/sign yes
+float/small yes

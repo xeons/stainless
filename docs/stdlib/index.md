@@ -20,6 +20,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.File](Standard-File.md) | Whole-file operations. |
 | [Standard.IO](Standard-IO.md) | Streams, and the vocabulary the rest of the I/O modules share. |
 | [Standard.Json](Standard-Json.md) | JSON, in two layers. |
+| [Standard.Limits](Standard-Limits.md) | What each number type holds. |
 | [Standard.Math](Standard-Math.md) | Arithmetic that is not an operator. |
 | [Standard.Media.Audio](Standard-Media-Audio.md) | Sound out of the machine, and sound into it. |
 | [Standard.Net](Standard-Net.md) | Sockets, the same on every platform. |

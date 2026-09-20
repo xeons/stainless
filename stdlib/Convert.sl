@@ -34,6 +34,7 @@ module Standard.Convert;
 
 import Standard.Text;
 import Standard.Ascii;
+import Standard.Limits;
 
 // Correctly rounded, which a walk over the digits here cannot be.
 extern "C" double sl_parse_double(byte* text, nuint count);
@@ -87,13 +88,13 @@ public Result<long, ConvertError> ToLong(String text, uint radix)
             return Fail(ConvertError.Empty);
     }
 
-    // Accumulated as unsigned so that long.MinValue, whose magnitude does not
-    // fit in a long, is still reachable -- which is the one value a naive
+    // Accumulated as unsigned so that the smallest long, whose magnitude does
+    // not fit in a long, is still reachable -- which is the one value a naive
     // signed accumulator always gets wrong.
     ulong magnitude = 0;
-    ulong limit = 9223372036854775807u;
+    ulong limit = (ulong)MaxLong;
     if (negative)
-        limit = 9223372036854775808u;
+        limit = (ulong)MaxLong + 1u;
 
     for (nuint i = at; i < size; i++)
     {
@@ -129,7 +130,7 @@ public Result<int, ConvertError> ToInt(String text, uint radix)
     switch (wide)
     {
         case Ok ok:
-            if (ok.Value < -2147483648 || ok.Value > 2147483647)
+            if (ok.Value < MinInt || ok.Value > MaxInt)
             {
                 return Fail(ConvertError.OutOfRange);
             }
