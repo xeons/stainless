@@ -2577,6 +2577,18 @@ public sealed class Parser
 
         if (At(TokenKind.OpenParen))
         {
+            // `(byte)'.'` is a cast and so a constant; `(Circle or Square)` is
+            // a parenthesised pattern. The cast head is the whole of the
+            // difference, and speculating on it consumes it where it is there,
+            // so the operand is read from after it -- exactly as the expression
+            // parser does with the same two shapes.
+            if (Speculate(TryParseCastHead, out var castType) && castType is not null)
+            {
+                var operand = ParseUnary();
+                return new ConstantPatternSyntax(SpanFrom(start),
+                    new CastSyntax(SpanFrom(start), castType, operand));
+            }
+
             Advance();
             var inner = ParsePattern();
             Expect(TokenKind.CloseParen);

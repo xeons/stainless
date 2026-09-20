@@ -103,6 +103,19 @@ String Nested(int outer)
     return text.ToText();
 }
 
+// A cast in a label, which is the only way to write a byte against the
+// character it is: the value is a `byte` and `'.'` is a `char`.
+String Punctuation(byte here)
+{
+    switch (here)
+    {
+        case (byte)'.': return "stop";
+        case (byte)',': return "pause";
+        case (byte)'?': return "ask";
+        default:        return "other";
+    }
+}
+
 int Main()
 {
     printf("levels=%s %s %s %s\n",
@@ -132,6 +145,10 @@ int Main()
         case 'b': printf("char=second\n"); break;
         default:  printf("char=other\n"); break;
     }
+
+    printf("punctuation=%s %s %s\n",
+        Punctuation((byte)'.').ToPointer(), Punctuation((byte)'?').ToPointer(),
+        Punctuation((byte)'x').ToPointer());
 
     bool flag = true;
     switch (flag)

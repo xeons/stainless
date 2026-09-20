@@ -4,5 +4,6 @@ rank=1 2 3
 count=312
 nested=012| other
 char=second
+punctuation=stop ask other
 flag=yes
 done
