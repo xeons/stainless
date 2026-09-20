@@ -83,6 +83,16 @@ if ($Test) {
     if ($LASTEXITCODE -ne 0) { Fail "the docking tests failed" }
 
     Write-Host ""
+    Write-Host "breakpoints" -ForegroundColor Cyan
+    # Two files rather than either directory. `Ide.Debugging` is two files and
+    # the other one launches a process; `debug/src` is sixteen and most of them
+    # need a platform binding.
+    & $compiler run (Join-Path $PSScriptRoot "tests\debugtest.sl") `
+        (Join-Path $PSScriptRoot "src\Debug\Breakpoints.sl") `
+        (Join-Path $repository "debug\src\Paths.sl")
+    if ($LASTEXITCODE -ne 0) { Fail "the breakpoint tests failed" }
+
+    Write-Host ""
     Write-Host "the window" -ForegroundColor Cyan
     & $exe --selftest
     if ($LASTEXITCODE -ne 0) { Fail "the IDE self test failed" }

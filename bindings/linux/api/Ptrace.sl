@@ -57,6 +57,14 @@ public const int PtraceOptionExitKill = 0x00100000;
 public const int SignalTrap = 5;
 public const int SignalKill = 9;
 
+/// `SIGSTOP`, which interrupts a running tracee.
+///
+/// It cannot be caught, blocked or ignored, so a program with handlers of its
+/// own still stops. It arrives at the tracer through `waitpid` like any other
+/// signal-stop. A resume MUST NOT deliver it onwards, or the process stops
+/// again the moment it runs.
+public const int SignalStop = 19;
+
 /// `struct user_regs_struct` for x86-64, in the kernel's order.
 ///
 /// **The order is the kernel's and is not the architecture's**: `r15` first and

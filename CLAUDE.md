@@ -21,9 +21,17 @@ not a method; **three or more branches comparing one value against constants is
 a `switch`, not a chain of `if`s**; and **a function at module level names its
 object** — `FormatHexadecimal`, not `Hexadecimal`; `BytesRemainAt`, not `Fits`
 — because it is read with nothing beside it and a bare verb there is also what
-collides with the standard library's free verbs. The existing tree is still
-being brought to it, so match the document rather than the file you are looking
-at.
+collides with the standard library's free verbs.
+
+**Comments are terse and they are not narration.** Short sentences. Write one
+only where the code needs clarification, never to restate the line under it.
+An obligation uses the RFC 2119 keyword in capitals — MUST, MUST NOT, SHOULD,
+MAY. Never describe a bug that was fixed or a version the code used to be:
+that belongs in `git log`, attached to the change. §4 of the style document
+is the whole rule.
+
+The existing tree is still being brought to all of this, so match the document
+rather than the file you are looking at.
 
 ## Commands
 
@@ -183,11 +191,12 @@ them (`Take`, `Skip`, `Map`, `Filter`, `Find`, `Any`, `All`, `ForEach`, …):
   everywhere. A method named `Fail` will silently never be called — the only
   sign is SL0222, "this expression has no effect".
 
-**Match the surrounding prose.** Documentation and commit messages here explain
-*why*, name the alternative that was rejected, and say what a thing costs. A
-`///` block states what a caller must know before using the declaration; a `//`
-note beside a line describes that line. Commit messages are a sentence-shaped
-subject and then paragraphs of reasoning — read `git log` before writing one.
+**A commit subject is imperative and names the change** — *Read a file to its
+end rather than to its length* — and is under 72 characters. The body carries
+only what the diff cannot show: a measurement, a platform constraint, a
+rejected alternative and why. Most commits need no body. Prose in the
+documentation says what a thing is, what it costs, and what was rejected; it
+does not narrate how it came to be that way.
 
 ## Working on `forms/`
 

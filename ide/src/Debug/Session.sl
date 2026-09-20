@@ -1,0 +1,423 @@
+// Stainless - an experimental general-purpose language.
+// Copyright (C) 2026 Brandon Scott
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// The thread that owns the debuggee, and the queue the window reaches it
+// through.
+//
+// One thread owns the whole session. Windows requires `WaitForDebugEvent` and
+// `ContinueDebugEvent` on the thread that created the debuggee; `ptrace`
+// requires every request from the thread that attached. So the engine is
+// built, driven and torn down on that one thread, and the window MUST NOT
+// touch it.
+//
+// What crosses is small:
+//
+//     window  -> session     a command in a queue
+//     session -> window      a `Snapshot`, through `Application.Post`
+//
+// `Pause`, and the waking half of `Stop`, are the exception: they call
+// `Engine.RequestBreak` from the window's thread, because the session's thread
+// is blocked inside `Continue` and cannot be asked for anything. That call is
+// safe for the reason `ITarget.RequestBreak` gives.
+module Ide.Debugging;
+
+import Standard.Collections;
+import Standard.Text;
+import Standard.Threading;
+import Standard.Path;
+import Forms;
+import Debugger;
+
+/// What the window has asked the session to do next.
+public enum DebugCommand
+{
+    /// Nothing; only a reason to have woken up.
+    Settle,
+    Continue,
+    StepIn,
+    StepOver,
+    StepOut,
+    /// Kill it and end the session.
+    Stop,
+}
+
+/// Told about each stop, on the window's thread.
+public closure void SnapshotHandler(Snapshot taken);
+
+/// Told about each line the session or the program produced, on the window's
+/// thread.
+public closure void OutputHandler(String line);
+
+/// Told which line a breakpoint bound to, on the window's thread. A
+/// `boundLine` of zero means no code was found for it.
+public closure void BindingHandler(String file, uint line, uint boundLine);
+
+/// What the two threads share.
+class CommandQueue
+{
+    public List<DebugCommand> Pending;
+
+    /// True once the session has finished. Nothing more is accepted.
+    public bool Closed;
+
+    public CommandQueue()
+    {
+        Pending = new List<DebugCommand>();
+        Closed = false;
+    }
+}
+
+/// A debugging session: one process, one thread, one engine.
+public class DebugSession
+{
+    Monitor<CommandQueue> _commands;
+
+    SnapshotHandler _onSnapshot;
+    OutputHandler _onOutput;
+    BindingHandler _onBinding;
+
+    /// The engine, once the session's thread has handed it across.
+    ///
+    /// Posted rather than assigned, so the only thread that writes this field
+    /// is the one that reads it. `RequestBreak` is the only call made on it
+    /// from here.
+    Engine? _engine;
+
+    /// What the window believes is going on. Written on the window's thread
+    /// only, by `Start` and by each arriving snapshot.
+    RunState _state;
+
+    public DebugSession(SnapshotHandler onSnapshot, OutputHandler onOutput,
+                        BindingHandler onBinding)
+    {
+        _commands = new Monitor<CommandQueue>(new CommandQueue());
+        _onSnapshot = onSnapshot;
+        _onOutput = onOutput;
+        _onBinding = onBinding;
+        _engine = null;
+        _state = RunState.Idle;
+    }
+
+    public RunState State => _state;
+
+    public bool IsActive => _state == RunState.Running
+                         || _state == RunState.Stopped;
+
+    public bool IsStopped => _state == RunState.Stopped;
+
+    // -------------------------------------------------------------- starting
+
+    /// Launches `path` under the debugger with these breakpoints.
+    ///
+    /// The breakpoints are copied into two plain lists first. Everything the
+    /// worker needs MUST be read on the thread that starts it; a
+    /// `BreakpointStore` read from two threads is the bug this file exists to
+    /// prevent. Which ones bound comes back through the binding handler.
+    public bool Start(String path, List<SourceBreakpoint> breakpoints)
+    {
+        if (IsActive)
+            return false;
+
+        var files = new List<String>();
+        var lines = new List<uint>();
+        for (nuint i = 0u; i < breakpoints.Count; i++)
+        {
+            if (!breakpoints[i].Enabled)
+                continue;
+            files.Add(breakpoints[i].File);
+            lines.Add(breakpoints[i].Line);
+        }
+
+        _state = RunState.Running;
+        _engine = null;
+        Reopen();
+
+        var worker = new Thread(() => Session(path, files, lines));
+        worker.Detach();
+        return true;
+    }
+
+    // ------------------------------------------------- what the window asks for
+
+    public void Resume() => Ask(DebugCommand.Continue);
+    public void StepIn() => Ask(DebugCommand.StepIn);
+    public void StepOver() => Ask(DebugCommand.StepOver);
+    public void StepOut() => Ask(DebugCommand.StepOut);
+
+    /// Interrupts a running program.
+    ///
+    /// Nothing is queued. The session's thread is waiting for an event, and
+    /// the stop this produces is that event; it arrives as an ordinary
+    /// snapshot.
+    public bool Pause()
+    {
+        var engine = _engine;
+        if (engine == null || _state != RunState.Running)
+            return false;
+        return ((Engine)engine).RequestBreak();
+    }
+
+    /// Ends the session, whether the program is stopped or running.
+    ///
+    /// Killing it is an engine call, so it belongs to the session's thread.
+    /// When the program is running that thread is blocked in a wait, so the
+    /// command goes into the queue and the program is interrupted to bring the
+    /// thread back to read it.
+    public void Stop()
+    {
+        if (!IsActive)
+            return;
+        bool wasRunning = _state == RunState.Running;
+        Ask(DebugCommand.Stop);
+        if (wasRunning)
+            Pause();
+    }
+
+    void Ask(DebugCommand what)
+    {
+        var held = _commands.Lock();
+        if (held.Value.Closed)
+            return;
+        held.Value.Pending.Add(what);
+        held.Pulse();
+    }
+
+    void Reopen()
+    {
+        var held = _commands.Lock();
+        held.Value.Pending.Clear();
+        held.Value.Closed = false;
+    }
+
+    // ------------------------------------------ arriving on the window's thread
+
+    /// Each snapshot, before the window's own handler sees it, so `State` is
+    /// already right when that handler reads it.
+    void Arrived(Snapshot taken)
+    {
+        _state = taken.State;
+        if (taken.State == RunState.Ended)
+            _engine = null;
+        _onSnapshot(taken);
+    }
+
+    void Holding(Engine engine) => _engine = engine;
+
+    void Wrote(String line) => _onOutput(line);
+
+    void BoundTo(String file, uint line, uint chosen)
+        => _onBinding(file, line, chosen);
+
+    // ---------------------------------------------- the session's own thread
+
+    /// Everything below here runs on the session's thread, and nothing above
+    /// it does.
+    void Session(String path, List<String> files, List<uint> lines)
+    {
+        var made = MakeTarget();
+        if (!made.Ok)
+        {
+            Fell("could not start a debugger: " + made.Error);
+            return;
+        }
+
+        // Qualified: `Image` alone is the Forms picture control, and both
+        // modules are imported here.
+        var read = Debugger.Image.FromFile(path);
+        if (!read.Ok)
+        {
+            Fell("could not read " + path + ": " + read.Error);
+            return;
+        }
+
+        var image = read.Value;
+        var info = new DwarfInfo(image);
+        String bad = info.Read();
+        if (bad.ByteLength() != 0u)
+        {
+            Fell("could not read the debug information: " + bad);
+            return;
+        }
+
+        var target = made.Value;
+        var tables = ReadEveryLineTable(info);
+        var engine = new Engine(target, image, info, tables);
+        Application.Post(() => Holding(engine));
+
+        // A program with no DWARF still runs, stopping at addresses rather
+        // than lines. On Windows an ordinary `-g` build writes CodeView into a
+        // .pdb and carries no DWARF, which is a misconfigured build rather
+        // than a broken debugger.
+        if (info.IsEmpty)
+            Say("this binary carries no DWARF, so there are no lines."
+                + " Build it with --debug-format dwarf.");
+
+        PlantEach(engine, tables, files, lines);
+
+        var started = engine.Start(path, "");
+        if (!started.Ok)
+        {
+            Fell("could not launch " + path + ": " + started.Error);
+            return;
+        }
+
+        if (engine.SlideKnown && engine.Slide != 0u)
+            Say("image slid by 0x" + FormatHexadecimal((ulong)engine.Slide));
+
+        var stop = started.Value;
+        while (true)
+        {
+            Drain(engine);
+            Report(engine, target, stop);
+
+            if (stop.Kind == StopKind.Exited || stop.Kind == StopKind.NotRunning)
+                break;
+
+            var next = TakeCommand();
+            if (next == DebugCommand.Stop)
+            {
+                engine.Terminate();
+                Say("Debugging stopped.");
+                Ended(0);
+                break;
+            }
+
+            stop = Perform(engine, next, stop.Thread);
+        }
+
+        Close();
+    }
+
+    /// Does one command, and answers where the program ended up.
+    Stop Perform(Engine engine, DebugCommand what, uint thread)
+    {
+        switch (what)
+        {
+            case DebugCommand.StepIn:
+                return engine.StepIn(thread);
+
+            case DebugCommand.StepOver:
+                return engine.StepOver(thread);
+
+            case DebugCommand.StepOut:
+                return engine.StepOut(thread);
+
+            case DebugCommand.Continue:
+                return engine.Continue();
+
+            default:
+            {
+                // `Settle` and anything unrecognised report where the program
+                // already is. An unmatched command MUST NOT move it.
+                var still = new Stop(StopKind.Paused);
+                still.Thread = thread;
+                return still;
+            }
+        }
+    }
+
+    /// Blocks until the window asks for something.
+    DebugCommand TakeCommand()
+    {
+        var held = _commands.Lock();
+
+        // In a loop: both platforms permit a spurious wake, and a pulse says
+        // only that something changed.
+        while (held.Value.Pending.IsEmpty && !held.Value.Closed)
+            held.Wait();
+
+        if (held.Value.Pending.IsEmpty)
+            return DebugCommand.Stop;
+
+        var next = held.Value.Pending[0u];
+        held.Value.Pending.RemoveAt(0u);
+        return next;
+    }
+
+    /// Finds code for each breakpoint, plants it, and reports where it landed.
+    void PlantEach(Engine engine, List<LineTable> tables, List<String> files,
+                   List<uint> lines)
+    {
+        for (nuint i = 0u; i < files.Count; i++)
+        {
+            String file = files[i];
+            uint line = lines[i];
+
+            nuint at = 0u;
+            uint chosen = 0u;
+            if (!FindLineAddress(tables, file, line, &at, &chosen))
+            {
+                Say("no code for " + Standard.Path.FileName(file) + ":"
+                    + Standard.Text.FromInteger((long)line)
+                    + ", so it will not be hit.");
+                Application.Post(() => BoundTo(file, line, 0u));
+                continue;
+            }
+
+            engine.Add(at, Standard.Path.FileName(file) + ":"
+                           + Standard.Text.FromInteger((long)line));
+            Application.Post(() => BoundTo(file, line, chosen));
+        }
+    }
+
+    /// What the program has written, one line at a time.
+    void Drain(Engine engine)
+    {
+        var wrote = engine.TakeOutput();
+        for (nuint i = 0u; i < wrote.Count; i++)
+        {
+            // Taken into a local so each post carries its own copy.
+            String line = wrote[i];
+            Application.Post(() => Wrote(line));
+        }
+    }
+
+    /// Takes a snapshot and sends it across.
+    void Report(Engine engine, ITarget target, Stop stop)
+    {
+        var taken = TakeSnapshot(engine, target, stop);
+        Application.Post(() => Arrived(taken));
+    }
+
+    /// The session could not be set up at all.
+    void Fell(String why)
+    {
+        Say(why);
+        Ended(-1);
+        Close();
+    }
+
+    void Ended(int code)
+    {
+        var over = new Snapshot(RunState.Ended);
+        over.Kind = StopKind.Exited;
+        over.ExitCode = code;
+        Application.Post(() => Arrived(over));
+    }
+
+    void Say(String line)
+    {
+        Application.Post(() => Wrote(line));
+    }
+
+    /// Stops anything further being queued, and wakes anyone waiting.
+    void Close()
+    {
+        var held = _commands.Lock();
+        held.Value.Closed = true;
+        held.PulseAll();
+    }
+}

@@ -39,6 +39,10 @@ import Standard.IO;
 import Standard.File;
 import Ide.Lang;
 
+/// Told that lines were added or removed. `first` is the lowest row affected,
+/// counting from zero; `delta` is how many, negative for a removal.
+public closure void LineShiftHandler(nuint first, int delta);
+
 // ==================================================================== a line
 
 /// One line of the file, and what it lexed to.
@@ -212,6 +216,17 @@ public class Document
     public bool Edited => _savedAt < 0 || (nuint)_savedAt != _done.Count;
 
     /// Whether there is anything to undo, or to redo.
+    /// Lines were added or removed.
+    ///
+    /// Raised by `Insert` and `Delete`, which every edit goes through -- undo
+    /// and redo included, since `Apply` calls the same two. A listener MUST
+    /// treat it as advisory about position only: it says nothing about what
+    /// the text now is.
+    public event LineShiftHandler LinesShifted;
+
+    protected virtual void OnLinesShifted(nuint first, int delta)
+        => LinesShifted(first, delta);
+
     public bool CanUndo => !_done.IsEmpty;
     public bool CanRedo => !_undone.IsEmpty;
 
@@ -295,6 +310,7 @@ public class Document
     /// are all this call with a different string.
     public Position Insert(Position at, String text)
     {
+        nuint was = _lines.Count;
         nuint row = Clamp(at.Row, _lines.Count - 1u);
         nuint column = Clamp(at.Column, _lines[row].Text.ByteLength());
 
@@ -332,6 +348,10 @@ public class Document
 
         var ended = Position.At(landed, parts[parts.Length - 1u].ByteLength());
         Record(true, Position.At(row, column), ended, text);
+
+        // From the row after, because a line inserted at `row` pushes down
+        // what was below it and leaves `row` where it was.
+        OnLinesShifted(row + 1u, (int)(_lines.Count - was));
         return ended;
     }
 
@@ -371,6 +391,10 @@ public class Document
         _edited = true;
 
         Record(false, startAt, endAt, removed);
+
+        // From the row after the one the deletion collapsed into.
+        if (lastRow > firstRow)
+            OnLinesShifted(firstRow + 1u, -(int)(lastRow - firstRow));
         return Position.At(firstRow, firstColumn);
     }
 

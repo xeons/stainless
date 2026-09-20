@@ -217,7 +217,12 @@ wrong thing with a `_SL`-mangled name.
 
 The compiler-side changes a debugger needs are unchanged by this, except that
 the frame pointer is now measured rather than assumed and is the one that
-unblocks call stacks. Two more are worth adding to them: emit
-`DW_AT_language` as something that is not C++, and decide whether the
-`--debug-format` switch also rebuilds the C runtime with DWARF on Windows,
-because today choosing DWARF there silently narrows what can be stepped.
+unblocks call stacks.
+
+`--debug-format` exists now, and with it the format follows the **target**
+rather than the machine the compiler is running on --
+[docs/cli.md](cli.md#which-debugger-reads-it) is the page. What it does not yet
+do is rebuild the C runtime with DWARF on Windows, so choosing DWARF there
+still narrows what can be stepped to the Stainless module, exactly as measured
+above. And `DW_AT_language` is still `DW_LANG_C_plus_plus`, which is still
+wrong.

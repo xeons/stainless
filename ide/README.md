@@ -128,6 +128,31 @@ were fixed — the IDE is what found every one of them.
   compiler halfway through an object file has nothing to tidy that Clean will
   not do better.
 
+- **A debugger.** F9 sets a breakpoint, F5 starts, F10 and F11 step, Shift+F5
+  stops. The margin draws a disc beside each breakpoint and an arrow beside the
+  line the program is stopped on; Locals, Call Stack, Breakpoints and Debug
+  Output are four more panes in the bottom well.
+
+  **A breakpoint that binds elsewhere says so.** A line with no code on it --
+  a blank, a comment, a brace -- resolves to the first statement at or after
+  it, and the glyph moves to the line chosen. The Breakpoints pane reads
+  `fixture.sl, line 40 (asked for 39)`.
+
+  **Breakpoints are a file and a line, so they outlive the process.** They
+  survive Stop, Restart and a rebuild that moved everything, and they can be
+  set before anything has been compiled.
+
+  The engine is `debug/`, which has no idea a window exists -- see
+  [debug/README.md](../debug/README.md). What crosses between it and this
+  window is a `Snapshot`: numbers and text, read while the program was stopped.
+  The window never calls into the engine, because every call into a debuggee
+  must come from the one thread that launched it.
+
+  **Debug builds pass `--debug-format dwarf`.** The engine reads DWARF, and an
+  ordinary `-g` build on Windows writes CodeView into a `.pdb`. The cost is
+  that `.pdb`, so Visual Studio, WinDbg, minidumps and Windows Error Reporting
+  see an unsymbolised binary; build Release when that matters.
+
 ## What does not exist yet
 
 Named honestly, since the point of the page is to say where the edges are.
@@ -139,12 +164,21 @@ Named honestly, since the point of the page is to say where the edges are.
   `--diagnostics json` is the first stone of it and already carries what a
   squiggle needs — a code, a place, and a length to underline — which is why
   the editor does not have to guess at any of that any more.
-- **No debugger.** The compiler already emits DWARF and CodeView under `-g`,
-  and the configuration picker asks for it, but nothing reads it back. The
-  intended shape is a debug engine written in Stainless against a `ptrace` and
-  a `DEBUG_EVENT` backend, not gdb or lldb over MI2: `lldb-mi` has not shipped
-  with LLVM for years, and every LLDB binary in the LLVM install this is
-  developed against fails to start at all.
+- **No watch expressions, and no hover values.** Locals shows what is in scope
+  and nothing evaluates an expression: that wants a parser for a small
+  expression subset, which is the next piece of `debug/`.
+- **The debugger needs a project.** A loose file is compiled to a path the
+  compiler chooses and this window never learns, so F5 asks for a project to be
+  opened first.
+- **Nothing shows another frame's variables.** Double-clicking a call-stack row
+  goes to its line; Locals still shows the frame the program is in. Reading
+  another frame's locals needs its frame base, which only the session's own
+  thread may ask for.
+- **No Threads pane.** The target seam does not enumerate threads, and a
+  Stainless program has one unless it starts more.
+- **The function keys need an editor to have the focus.** `forms/` has no menu
+  shortcuts, so F5 and F9 are handled by the editor and passed up. The Debug
+  menu works from anywhere.
 - **Panes do not float and cannot be dragged between edges.** A pane's edge is
   read from the layout file and honoured, so hand-editing
   `%APPDATA%/Stainless/ide/layout.json` moves one today — but there is no drag,
@@ -196,19 +230,22 @@ ide/src/Shell/DockHost.sl   the wells, the splitters and the auto-hide strips
 ide/src/App/Shell.sl        the window: menu, panes, editors, status
 ide/src/App/FindDialog.sl   find and replace, over whichever tab is in front
 ide/src/App/ProjectDialog.sl stainless.json, edited in four pages
+ide/src/Debug/Breakpoints.sl where to stop, as files and lines -- no controls
+ide/src/Debug/Session.sl    the thread that owns the debuggee, and its queue
 ide/src/Main.sl             the command line
 ide/tests/lextest.sl        the scanner, on lines that are awkward on purpose
 ide/tests/buildtest.sl      the diagnostic reader, on real compiler output
 ide/tests/projecttest.sl    the project reader, on files that are awkward
 ide/tests/docktest.sl       the layout model, on files a newer build wrote
+ide/tests/debugtest.sl      breakpoints: toggling, binding, paths, and edits
 ide/tests/fixture/          a two-file project, which is the smallest thing
                             that fails if Build ever compiles one file again
 ```
 
-**Four of those are modules rather than parts of the window**, and the reason is
-the same each time: `Ide.Project`, `Ide.Build` and `Ide.Shell`'s `Layout.sl`
-mention no control, so a console harness can test them without linking a widget
-set or opening a display. `BuildMessage` was a struct at the bottom of
+**Five of those are modules rather than parts of the window**, and the reason is
+the same each time: `Ide.Project`, `Ide.Build`, `Ide.Shell`'s `Layout.sl` and
+`Ide.Debugging`'s `Breakpoints.sl` mention no control, so a console harness can
+test them without linking a widget set or opening a display. `BuildMessage` was a struct at the bottom of
 `Shell.sl` and moving it is what made `buildtest.sl` possible at all.
 
 `Ide.Shell` is deliberately split down that line rather than by subject: a

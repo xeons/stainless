@@ -197,6 +197,57 @@ public bool IsRooted(String path)
 #endif
 }
 
+/// Whether two paths name the same file, as text.
+///
+/// It settles the two differences the platform itself creates: Windows accepts
+/// `/` and `\` interchangeably and matches names without regard to case,
+/// Linux does neither. A compiler joining a directory to a file name writes
+/// `C:\src\obj/Text.sl`, one separator from each half, and `==` says that is
+/// a different file from `C:\src\obj\Text.sl`.
+///
+/// Nothing is opened, followed or resolved. A caller that needs `..` or a
+/// relative path resolved MUST do that first.
+///
+/// Only ASCII letters are case-folded. Windows folds more, with a table that
+/// has changed between releases, so two paths differing only in the case of a
+/// non-ASCII letter are reported as different.
+public bool SamePath(String left, String right)
+{
+    if (left.ByteLength() != right.ByteLength())
+        return false;
+
+    var a = left.ToPointer();
+    var b = right.ToPointer();
+    nuint size = left.ByteLength();
+
+    for (nuint i = 0u; i < size; i++)
+    {
+        if (a[i] == b[i])
+            continue;
+        if (!SameByteInAPath(a[i], b[i]))
+            return false;
+    }
+    return true;
+}
+
+#if WINDOWS
+
+/// Two bytes that differ but do not make two paths differ.
+bool SameByteInAPath(byte left, byte right)
+{
+    return (IsSeparator(left) && IsSeparator(right))
+        || LowerAscii(left) == LowerAscii(right);
+}
+
+byte LowerAscii(byte value) => value >= 65 && value <= 90 ? (byte)(value + 32) : value;
+
+#else
+
+/// Outside Windows a path is bytes: two that differ differ.
+bool SameByteInAPath(byte left, byte right) => false;
+
+#endif
+
 /// The parts, with the separators dropped and empty parts skipped.
 public List<String> Split(String path)
 {

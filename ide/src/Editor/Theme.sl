@@ -51,6 +51,30 @@ public class Theme
     /// The rule down the right-hand side.
     public Color Margin;
 
+    // ------------------------------------------------------------ debugging
+
+    /// The breakpoint disc, and its outline.
+    ///
+    /// **Red, and the same red in both themes.** A breakpoint is a mark on the
+    /// program rather than a piece of syntax, and the one thing a person looks
+    /// for while scrolling; a dark theme that made it politer would make it
+    /// harder to find, which is the opposite of what it is for.
+    public Color BreakpointFill;
+    public Color BreakpointEdge;
+
+    /// A breakpoint the last build found no code for, drawn hollow. The colour
+    /// is the same -- what says it did not bind is that it is not filled in.
+    public Color BreakpointHollow;
+
+    /// The line the program is stopped on, and the arrow in the margin beside
+    /// it.
+    public Color CurrentStatement;
+    public Color CurrentStatementArrow;
+
+    /// The line a selected stack frame is on, when it is not the top one.
+    /// Paler, because that frame is not where the program will resume.
+    public Color CalledFrom;
+
     /// The light theme, which is the one a first run gets.
     ///
     /// **Not chosen for looks alone.** A reader scanning code is looking for
@@ -81,6 +105,14 @@ public class Theme
         theme.Selection     = Color.FromRgb(181, 213, 255);
         theme.SelectionText = Color.FromRgb( 24,  24,  28);
         theme.Margin        = Color.FromRgb(232, 232, 238);
+
+        theme.BreakpointFill   = Color.FromRgb(197,  34,  31);
+        theme.BreakpointEdge   = Color.FromRgb(150,  20,  18);
+        theme.BreakpointHollow = Color.FromRgb(197,  34,  31);
+
+        theme.CurrentStatement      = Color.FromRgb(255, 241, 170);
+        theme.CurrentStatementArrow = Color.FromRgb(216, 170,  16);
+        theme.CalledFrom            = Color.FromRgb(230, 230, 190);
         return theme;
     }
 
@@ -107,38 +139,57 @@ public class Theme
         theme.Selection     = Color.FromRgb( 38,  79, 120);
         theme.SelectionText = Color.FromRgb(235, 235, 240);
         theme.Margin        = Color.FromRgb( 52,  52,  58);
+
+        theme.BreakpointFill   = Color.FromRgb(224,  60,  56);
+        theme.BreakpointEdge   = Color.FromRgb(140,  24,  22);
+        theme.BreakpointHollow = Color.FromRgb(224,  60,  56);
+
+        theme.CurrentStatement      = Color.FromRgb( 74,  66,  28);
+        theme.CurrentStatementArrow = Color.FromRgb(232, 194,  70);
+        theme.CalledFrom            = Color.FromRgb( 54,  52,  36);
         return theme;
     }
 
     /// What a token of this kind is drawn in.
+    ///
+    /// A table, and written as one: which kinds share a colour is the whole
+    /// content of this method, and stacked labels say it where a run of `if`s
+    /// hid it inside the order they happened to be in.
     public Color ColorFor(TokenKind kind)
     {
-        if (kind == TokenKind.Comment)
-            return Comment;
-        if (kind == TokenKind.BlockComment)
-            return Comment;
-        if (kind == TokenKind.DocComment)
-            return DocComment;
-        if (kind == TokenKind.Keyword)
-            return Keyword;
-        if (kind == TokenKind.ContextualKeyword)
-            return Keyword;
-        if (kind == TokenKind.TypeName)
-            return TypeName;
-        if (kind == TokenKind.Number)
-            return Number;
-        if (kind == TokenKind.Text)
-            return Literal;
-        if (kind == TokenKind.Character)
-            return Literal;
-        if (kind == TokenKind.Directive)
-            return Directive;
-        if (kind == TokenKind.Attribute)
-            return TypeName;
-        if (kind == TokenKind.Operator)
-            return Operator;
-        if (kind == TokenKind.Bracket)
-            return Operator;
-        return Text;
+        switch (kind)
+        {
+            case TokenKind.Comment:
+            case TokenKind.BlockComment:
+                return Comment;
+
+            case TokenKind.DocComment:
+                return DocComment;
+
+            case TokenKind.Keyword:
+            case TokenKind.ContextualKeyword:
+                return Keyword;
+
+            case TokenKind.TypeName:
+            case TokenKind.Attribute:
+                return TypeName;
+
+            case TokenKind.Number:
+                return Number;
+
+            case TokenKind.Text:
+            case TokenKind.Character:
+                return Literal;
+
+            case TokenKind.Directive:
+                return Directive;
+
+            case TokenKind.Operator:
+            case TokenKind.Bracket:
+                return Operator;
+
+            default:
+                return Text;
+        }
     }
 }

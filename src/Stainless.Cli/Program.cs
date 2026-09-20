@@ -16,6 +16,7 @@
 
 using System.Diagnostics;
 using Stainless.Driver;
+using Stainless.Emit;
 
 namespace Stainless.Cli;
 
@@ -139,6 +140,14 @@ internal static class Program
               -O<0-3>              optimization level (default: -O2)
               -g, --debug          describe the program to a debugger
               --no-debug           do not, whatever the project file says
+              --debug-format <dwarf|codeview|both>
+                                   which debugger's format to describe it in.
+                                   The default follows the target: CodeView on
+                                   Windows, DWARF everywhere else. 'dwarf' on
+                                   Windows drops the .pdb, so Visual Studio,
+                                   WinDbg, minidumps and Windows Error Reporting
+                                   all see an unsymbolised binary; 'both' keeps
+                                   them, at roughly double the debug data
               -D, --define <name>  define a symbol for '#if' to test
               -l, --library <name> link a library the linker finds by name
               --abi <microsoft|itanium>
@@ -732,6 +741,12 @@ internal static class Program
         /// `debug` is true.
         /// </summary>
         public bool? Debug { get; set; }
+
+        /// <summary>
+        /// Which debugger's format, or null for what the target reads.
+        /// </summary>
+        public DebugFormat? DebugFormat { get; set; }
+
         public bool Shared { get; set; }
         public bool EmitIrOnly { get; set; }
         public bool StandardLibrary { get; set; }
@@ -751,6 +766,7 @@ internal static class Program
             IntermediateDirectory = ObjectDirectory,
             OptimizationLevel = OptimizationGiven ? Optimization : null,
             Debug = Debug,
+            DebugFormat = DebugFormat,
             KeepIntermediates = Keep,
             EmitIrOnly = EmitIrOnly,
             Defines = Defines,
@@ -820,6 +836,7 @@ internal static class Program
                 OptimizationLevel = Optimization,
                 KeepIntermediates = Keep,
                 Debug = Debug ?? false,
+                DebugFormat = DebugFormat,
                 Defines = Defines,
                 CppAbi = Abi,
                 Target = Target,
@@ -884,6 +901,28 @@ internal static class Program
 
                 case "--no-debug":
                     arguments.Debug = false;
+                    continue;
+
+                case "--debug-format":
+                    if (++i >= args.Length)
+                    {
+                        Error("'--debug-format' needs dwarf, codeview or both");
+                        return false;
+                    }
+                    switch (args[i].ToLowerInvariant())
+                    {
+                        case "dwarf": arguments.DebugFormat = DebugFormat.Dwarf; break;
+                        case "codeview": arguments.DebugFormat = DebugFormat.CodeView; break;
+                        case "both": arguments.DebugFormat = DebugFormat.Both; break;
+                        default:
+                            Error($"'{args[i]}' is not a debug format; it is dwarf, " +
+                                  "codeview or both");
+                            return false;
+                    }
+
+                    // A format with no description in it is never what was
+                    // meant.
+                    arguments.Debug ??= true;
                     continue;
 
                 case "-D" or "--define":

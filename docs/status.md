@@ -612,10 +612,14 @@ last person to edit it -- the suite is the authority.
   [docs/packages.md](packages.md)
 - Attributes and opt-in reflection: field names, offsets, kinds and attribute
   values readable at run time, from `const` tables in the binary
-- `-g`: debug information, in CodeView on Windows and DWARF elsewhere. Every
-  instruction carries a source location, every function is named as it was
-  written and as the linker sees it, and every local and parameter is described
-  with its type and its stack slot. The standard library is written to
+- `-g`: debug information, and `--debug-format dwarf|codeview|both` says in
+  whose format. The default follows the **target** -- CodeView for Windows,
+  DWARF for everything else -- so a Linux binary cross-compiled from Windows
+  gets DWARF. Every instruction carries a source location, every function is
+  named as it was written and as the linker sees it, and every local and
+  parameter is described with its type and its stack slot. Definitions carry
+  `"frame-pointer"="all"`, without which LLVM omits the frame pointer at every
+  level and no debugger can walk a stack. The standard library is written to
   `obj/stdlib/` and the runtime's C compiled `-O0 -g`, so a stack trace through
   `List.Add` and into `sl_retain` names real files and real lines rather than
   addresses. See [§7 of the ABI notes](abi.md)
@@ -809,6 +813,15 @@ Being straight about the edges, roughly in the order they are worth adding:
   there is none — and it puts every local in the function's scope rather than in
   the block it was declared in, so a debugger will show one that is not in scope
   yet. Neither is a lie about a value; both are less than a C compiler emits.
+
+  Three more are measured in [docs/dwarf.md](dwarf.md) and are worth knowing
+  before reading any of it back: a variant's tag cannot be mapped to a case,
+  because DWARF gets a member only for the cases carrying a payload;
+  `isOptimized:` is hardcoded false and is a lie at `-O2`; and `DW_AT_language`
+  is `DW_LANG_C_plus_plus`, which will mislead any consumer that demangles by
+  language. A DWARF build on Windows also describes the Stainless module alone,
+  because the C runtime's objects are compiled for the MSVC target and carry
+  CodeView.
 - **A variant does not cross a library boundary or carry `[Reflect]`.** Both
   are reported where they are written (SL0441, SL0442) rather than left to be
   discovered. The metadata describes layouts and the reflection tables describe

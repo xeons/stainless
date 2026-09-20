@@ -1,0 +1,2 @@
+# Built to an object file for Windows and not run, for the reason its pair
+# gives: the format is the subject, and the program's output is not.

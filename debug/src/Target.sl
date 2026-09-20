@@ -124,6 +124,18 @@ public interface ITarget
     /// time" is the only shape both can implement.
     bool SetSingleStep(uint thread, bool on);
 
+    /// Asks a running program to stop. Answers whether the ask was made.
+    ///
+    /// The one method here that MAY be called from another thread. It touches
+    /// nothing the tracing relationship owns: Windows creates a thread inside
+    /// the target that executes an `int3`, Linux sends the target a signal.
+    /// Each arrives at the session's own thread as an ordinary event.
+    ///
+    /// What arrives is a stop at an address nothing was planted at.
+    /// Distinguishing it from a fault needs the knowledge that it was asked
+    /// for, so callers MUST go through `Engine.RequestBreak`.
+    bool RequestBreak();
+
     /// Kills it. Safe to call when it has already gone.
     void Terminate();
 

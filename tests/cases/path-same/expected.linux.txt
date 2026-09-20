@@ -1,0 +1,5 @@
+mixed separators: different
+case: different
+different names: different
+different lengths: different
+unresolved: different

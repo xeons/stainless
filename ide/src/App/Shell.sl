@@ -26,6 +26,7 @@ module Ide.App;
 
 import Standard.Console;
 import Standard.Text;
+import Standard.Convert;
 import Standard.Collections;
 import Standard.IO;
 import Standard.File;
@@ -43,6 +44,8 @@ import Ide.Editor;
 import Ide.Project;
 import Ide.Build;
 import Ide.Shell;
+import Ide.Debugging;
+import Debugger;
 
 /// One open file: the tab it is behind, and the editor on it.
 ///
@@ -113,6 +116,40 @@ public class Shell : Form
     ListBox _output;
     ListView _errors;
     TreeView _tree;
+
+    // ------------------------------------------------------------ debugging
+
+    /// Every breakpoint, by file and line. Outlives each session.
+    BreakpointStore _breakpoints;
+
+    /// The session, or null when nothing is being debugged.
+    DebugSession? _session;
+
+    /// The last stop. Null when the program is running or gone.
+    ///
+    /// The panes are filled from it, and a hover reads its locals rather than
+    /// asking the process: the values were true at the stop and nothing has
+    /// run since.
+    Snapshot? _stopped;
+
+    ListView _stack;
+    ListView _locals;
+    ListView _breakList;
+    ListBox _debugOutput;
+
+    /// The frame the Call Stack has selected. Zero is where the program is.
+    nuint _frame;
+
+    /// Whether the next stop is this session's first.
+    bool _firstStop;
+
+    ToolBar _debugTools;
+    ToolButton _startButton;
+    ToolButton _pauseButton;
+    ToolButton _stopDebugButton;
+    ToolButton _stepIntoButton;
+    ToolButton _stepOverButton;
+    ToolButton _stepOutButton;
     StatusBar _status;
     MainMenu _bar;
 
@@ -225,6 +262,14 @@ public class Shell : Form
     static readonly int IconRun     = 3;
     static readonly int IconStop    = 4;
 
+    static readonly int IconStart     = 5;
+    static readonly int IconPause     = 6;
+    static readonly int IconStopDebug = 7;
+    static readonly int IconStepInto  = 8;
+    static readonly int IconStepOver  = 9;
+    static readonly int IconStepOut   = 10;
+    static readonly int IconRestart   = 11;
+
     public Shell()
     {
         base(WindowBorder.Sizable);
@@ -244,6 +289,11 @@ public class Shell : Form
         _icons = null;
         _errorTail = "";
         _outputTail = "";
+        _breakpoints = new BreakpointStore();
+        _session = null;
+        _stopped = null;
+        _frame = 0u;
+        _firstStop = true;
         _compiler = FindCompiler();
         _textSize = 10;
         _dark = false;
@@ -327,6 +377,36 @@ public class Shell : Form
         commands.Control = _tools;
         commands.Width = 380;
 
+        // The debug commands on a row of their own. Start Debugging and Run
+        // are both a green triangle; separating the rows is what tells them
+        // apart, and is how Visual Studio's own two bands read.
+        _debugTools = new ToolBar(_strip);
+        _debugTools.Height = 26;
+        _debugTools.Renderer = _chrome;
+        if (_icons != null)
+            _debugTools.Images = _icons;
+
+        _startButton = _debugTools.Add("Start", IconStart);
+        _startButton.Click += this.OnStartDebugging;
+        _pauseButton = _debugTools.Add("Break", IconPause);
+        _pauseButton.Click += this.OnBreakAll;
+        _stopDebugButton = _debugTools.Add("Stop", IconStopDebug);
+        _stopDebugButton.Click += this.OnStopDebugging;
+        _debugTools.Add("Restart", IconRestart).Click += this.OnRestartDebugging;
+        _debugTools.AddSeparator();
+        _stepIntoButton = _debugTools.Add("Into", IconStepInto);
+        _stepIntoButton.Click += this.OnStepInto;
+        _stepOverButton = _debugTools.Add("Over", IconStepOver);
+        _stepOverButton.Click += this.OnStepOver;
+        _stepOutButton = _debugTools.Add("Out", IconStepOut);
+        _stepOutButton.Click += this.OnStepOut;
+
+        var debugging = new CoolBand(_strip);
+        debugging.Text = "Debug";
+        debugging.Break = true;     // its own row
+        debugging.Control = _debugTools;
+        debugging.Width = 420;
+
         _strip.Height = _strip.PreferredSize.Height;
         ShowWhatIsRunning();
 
@@ -364,6 +444,39 @@ public class Shell : Form
         _output.Dock = DockStyle.Fill;
         _output.DoubleClick += this.OnOutputChosen;
 
+        var locals = _dock.Add(Panes.Locals, "Locals", DockEdge.Bottom);
+        _locals = new ListView(locals);
+        _locals.Dock = DockStyle.Fill;
+        _locals.View = ListViewStyle.Details;
+        _locals.SetFullRowSelect(true, true);
+        _locals.AddColumn("Name", 130);
+        _locals.AddColumn("Value", 260);
+        _locals.AddColumn("Type", 170);
+
+        var stack = _dock.Add(Panes.CallStack, "Call Stack", DockEdge.Bottom);
+        _stack = new ListView(stack);
+        _stack.Dock = DockStyle.Fill;
+        _stack.View = ListViewStyle.Details;
+        _stack.SetFullRowSelect(true, true);
+        _stack.AddColumn("", 22);
+        _stack.AddColumn("Function", 220);
+        _stack.AddColumn("Line", 320);
+        _stack.DoubleClick += this.OnFrameChosen;
+
+        var points = _dock.Add(Panes.Breakpoints, "Breakpoints", DockEdge.Bottom);
+        _breakList = new ListView(points);
+        _breakList.Dock = DockStyle.Fill;
+        _breakList.View = ListViewStyle.Details;
+        _breakList.SetFullRowSelect(true, true);
+        _breakList.AddColumn("", 22);
+        _breakList.AddColumn("Where", 300);
+        _breakList.AddColumn("State", 120);
+        _breakList.DoubleClick += this.OnBreakpointChosen;
+
+        var trace = _dock.Add(Panes.DebugOutput, "Debug Output", DockEdge.Bottom);
+        _debugOutput = new ListBox(trace);
+        _debugOutput.Dock = DockStyle.Fill;
+
         _book = new TabControl(_dock.Documents);
         _book.Dock = DockStyle.Fill;
         _book.SelectedIndexChanged += this.OnTabChanged;
@@ -375,6 +488,7 @@ public class Shell : Form
         BuildMenu();
         NewFile();
         ShowProjectTree();
+        ShowWhatDebuggingAllows();
         Say("Ready.");
     }
 
@@ -433,6 +547,18 @@ public class Shell : Form
         editor.Palette = _dark ? Theme.Dark() : Theme.Light();
         editor.CaretMoved += this.OnCaretMoved;
         editor.Edited += this.OnEdited;
+        editor.KeyDown += this.OnEditorKey;
+
+        // The margin asks per painted line rather than being handed a list, so
+        // one store answers for every tab and nothing is copied.
+        editor.MarginClicked += this.OnMarginClicked;
+        editor.ShowMarginMarks((row) => MarkFor(editor, row));
+
+        // A breakpoint is anchored to a line number, and typing above one
+        // moves that line. Without this the glyph stays beside code that has
+        // moved on, which reads as a debugger ignoring where it was put.
+        document.LinesShifted += (first, delta)
+            => ShiftBreakpoints(editor, first, delta);
 
         var tab = new EditorTab(page, editor);
         _open.Add(tab);
@@ -609,6 +735,22 @@ public class Shell : Form
         build.Add(MenuItem.Separator());
         build.Add("&Clear output").Click += this.OnClearOutput;
 
+        var debug = _bar.Add("&Debug");
+        debug.Add("&Start debugging\tF5").Click += this.OnStartDebugging;
+        debug.Add("Start &without debugging\tCtrl+F5").Click += this.OnRun;
+        debug.Add("&Restart\tCtrl+Shift+F5").Click += this.OnRestartDebugging;
+        debug.Add("Stop &debugging\tShift+F5").Click += this.OnStopDebugging;
+        debug.Add(MenuItem.Separator());
+        debug.Add("Break &all").Click += this.OnBreakAll;
+        debug.Add("&Continue\tF5").Click += this.OnContinue;
+        debug.Add(MenuItem.Separator());
+        debug.Add("Step &into\tF11").Click += this.OnStepInto;
+        debug.Add("Step &over\tF10").Click += this.OnStepOver;
+        debug.Add("Step o&ut\tShift+F11").Click += this.OnStepOut;
+        debug.Add(MenuItem.Separator());
+        debug.Add("Toggle &breakpoint\tF9").Click += this.OnToggleBreakpoint;
+        debug.Add("Delete all brea&kpoints").Click += this.OnClearBreakpoints;
+
         var view = _bar.Add("&View");
         // The panes first, which is where Visual Studio puts them and where
         // someone goes after closing one by accident -- a closed pane is hidden
@@ -617,6 +759,10 @@ public class Shell : Form
         view.Add("&Solution Explorer").Click += this.OnShowSolution;
         view.Add("&Error List").Click += this.OnShowErrors;
         view.Add("&Output").Click += this.OnShowOutput;
+        view.Add("&Locals").Click += this.OnShowLocals;
+        view.Add("&Call Stack").Click += this.OnShowCallStack;
+        view.Add("&Breakpoints").Click += this.OnShowBreakpoints;
+        view.Add("&Debug Output").Click += this.OnShowDebugOutput;
         view.Add(MenuItem.Separator());
         view.Add("&Reset layout").Click += this.OnResetLayout;
         view.Add(MenuItem.Separator());
@@ -1335,6 +1481,16 @@ public class Shell : Form
         {
             arguments.Add("-g");
             arguments.Add("-O0");
+
+            // DWARF, because that is what this program's own debugger reads.
+            // Without it a Windows build describes itself in CodeView, into a
+            // .pdb, and F5 finds a binary with no lines in it.
+            //
+            // The cost is the .pdb, so Visual Studio, WinDbg, minidumps and
+            // Windows Error Reporting see an unsymbolised binary. Release is
+            // what to build when that matters.
+            arguments.Add("--debug-format");
+            arguments.Add("dwarf");
         }
 
         if (_project != null)
@@ -1753,6 +1909,11 @@ public class Shell : Form
     void OnShowSolution(MenuItem sender) => ShowPane(Panes.Solution, "Solution Explorer");
     void OnShowErrors(MenuItem sender) => ShowPane(Panes.Errors, "Error List");
     void OnShowOutput(MenuItem sender) => ShowPane(Panes.Output, "Output");
+    void OnShowLocals(MenuItem sender) => ShowPane(Panes.Locals, "Locals");
+    void OnShowCallStack(MenuItem sender) => ShowPane(Panes.CallStack, "Call Stack");
+    void OnShowBreakpoints(MenuItem sender) => ShowPane(Panes.Breakpoints, "Breakpoints");
+    void OnShowDebugOutput(MenuItem sender)
+        => ShowPane(Panes.DebugOutput, "Debug Output");
 
     void ShowPane(String name, String title)
     {
@@ -2315,6 +2476,656 @@ public class Shell : Form
         GoToMessage(_errorLines[(nuint)row]);
     }
 
+    // --------------------------------------------------------- debugging
+
+    /// The function keys, which reach here because the editor passes on
+    /// everything it does not use itself.
+    ///
+    /// `forms/` has no menu shortcuts, so this is where they live. They work
+    /// while an editor has the focus, which is where a person pressing F10
+    /// nearly always is.
+    void OnEditorKey(Control sender, KeyEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case Key.F5:
+            {
+                if (args.Control)
+                    Compile(true);
+                else if (args.Shift)
+                    StopDebugging();
+                else
+                    StartOrContinue();
+                break;
+            }
+
+            case Key.F9:
+                ToggleBreakpointAtCaret();
+                break;
+
+            case Key.F10:
+                Step(DebugCommand.StepOver);
+                break;
+
+            case Key.F11:
+                Step(args.Shift ? DebugCommand.StepOut : DebugCommand.StepIn);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    // ------------------------------------------------------- breakpoints
+
+    /// Sets a breakpoint at `file:line` and starts debugging.
+    ///
+    /// For `--break`, which exists so that a stopped session can be
+    /// photographed. It does what a person would do with F9 and F5, and adds
+    /// nothing the menu cannot reach.
+    public bool DebugFrom(String where)
+    {
+        nuint colon = 0u;
+        bool split = false;
+        for (nuint i = where.ByteLength(); i > 0u; i--)
+        {
+            if (where.ByteAt(i - 1u) == (byte)58)
+            {
+                colon = i - 1u;
+                split = true;
+                break;
+            }
+        }
+        if (!split)
+        {
+            Say("--break wants file:line.");
+            return false;
+        }
+
+        String file = where.Substring(0u, colon);
+        var number = Standard.Convert.ToInt(
+            where.Substring(colon + 1u, where.ByteLength() - colon - 1u));
+        uint line = number.Ok && number.Value > 0 ? (uint)number.Value : 0u;
+        if (line == 0u)
+        {
+            Say("--break wants a line number.");
+            return false;
+        }
+
+        if (TabFor(file) == null && TabMatching(file) == null)
+            OpenFile(file);
+
+        var tab = TabMatching(file);
+        String path = tab == null ? file
+                                  : ((EditorTab)tab).Editor.Contents.Location;
+        _breakpoints.Toggle(path, line);
+        ShowBreakpointList();
+        RepaintEditors();
+        return StartDebugging();
+    }
+
+    void OnToggleBreakpoint(MenuItem sender) => ToggleBreakpointAtCaret();
+
+    void ToggleBreakpointAtCaret()
+    {
+        var now = Current;
+        if (now == null)
+            return;
+        var editor = (CodeEditor)now;
+
+        String path = editor.Contents.Location;
+        if (path.ByteLength() == 0u)
+        {
+            Say("Save the file before setting a breakpoint in it.");
+            return;
+        }
+
+        uint line = (uint)(editor.CaretPosition.Row + 1u);
+        var made = _breakpoints.Toggle(path, line);
+        Say(made == null
+            ? "Breakpoint removed from line "
+              + Standard.Text.FromInteger((long)line) + "."
+            : "Breakpoint set on line "
+              + Standard.Text.FromInteger((long)line) + ".");
+
+        if (_session != null)
+            Say("It takes effect when debugging is restarted.");
+
+        ShowBreakpointList();
+        editor.Invalidate();
+    }
+
+    /// A click in an editor's margin.
+    void OnMarginClicked(Control sender, RowEventArgs args)
+    {
+        if (sender is CodeEditor editor)
+        {
+            String path = editor.Contents.Location;
+            if (path.ByteLength() == 0u)
+            {
+                Say("Save the file before setting a breakpoint in it.");
+                return;
+            }
+
+            // A click on a bound breakpoint's glyph removes that breakpoint,
+            // not whatever was asked for on the line clicked: the glyph may
+            // have moved.
+            var shown = _breakpoints.ShownAt(path, (uint)(args.Row + 1u));
+            if (shown != null)
+                _breakpoints.Remove((SourceBreakpoint)shown);
+            else
+                _breakpoints.Toggle(path, (uint)(args.Row + 1u));
+
+            ShowBreakpointList();
+            editor.Invalidate();
+        }
+    }
+
+    /// Moves the breakpoints of an edited file.
+    void ShiftBreakpoints(CodeEditor editor, nuint first, int delta)
+    {
+        String path = editor.Contents.Location;
+        if (path.ByteLength() == 0u || !_breakpoints.Touches(path))
+            return;
+
+        _breakpoints.Shift(path, (uint)(first + 1u), delta);
+        ShowBreakpointList();
+        editor.Invalidate();
+    }
+
+    /// What the margin draws beside one line of one editor.
+    LineMark MarkFor(CodeEditor editor, nuint row)
+    {
+        String path = editor.Contents.Location;
+        if (path.ByteLength() == 0u || _breakpoints.IsEmpty)
+            return LineMark.None;
+
+        var found = _breakpoints.ShownAt(path, (uint)(row + 1u));
+        if (found == null)
+            return LineMark.None;
+
+        var one = (SourceBreakpoint)found;
+        if (!one.Enabled)
+            return LineMark.BreakpointDisabled;
+
+        // Unbound only once a session has had the chance to bind it. Before
+        // that, hollow would say the build found no code when nothing has been
+        // built.
+        if (_session != null && !one.Bound)
+            return LineMark.BreakpointUnbound;
+        return LineMark.Breakpoint;
+    }
+
+    void OnClearBreakpoints(MenuItem sender)
+    {
+        if (_breakpoints.IsEmpty)
+        {
+            Say("There are no breakpoints.");
+            return;
+        }
+        _breakpoints.Clear();
+        ShowBreakpointList();
+        RepaintEditors();
+        Say("Breakpoints deleted.");
+    }
+
+    /// Goes to the breakpoint that was double-clicked.
+    void OnBreakpointChosen(Control sender)
+    {
+        int row = _breakList.SelectedIndex;
+        if (row < 0 || (nuint)row >= _breakpoints.Count)
+            return;
+        var one = _breakpoints.All[(nuint)row];
+        GoTo(one.File, one.ShownLine);
+    }
+
+    void ShowBreakpointList()
+    {
+        _breakList.Clear();
+        for (nuint i = 0u; i < _breakpoints.Count; i++)
+        {
+            var one = _breakpoints.All[i];
+            int row = _breakList.AddRow(one.Enabled ? "*" : "o");
+            _breakList.SetCell(row, 1, one.Describe());
+            _breakList.SetCell(row, 2, StateOf(one));
+        }
+    }
+
+    String StateOf(SourceBreakpoint one)
+    {
+        if (!one.Enabled)
+            return "disabled";
+        if (_session == null)
+            return "pending";
+        return one.Bound ? "bound" : "no code";
+    }
+
+    // --------------------------------------------------------- run control
+
+    void OnStartDebugging(MenuItem sender) => StartOrContinue();
+    void OnStartDebugging(Control sender) => StartOrContinue();
+
+    /// F5: start if nothing is running, continue if something is stopped.
+    void StartOrContinue()
+    {
+        var running = _session;
+        if (running != null && ((DebugSession)running).IsStopped)
+        {
+            Resume();
+            return;
+        }
+        if (running != null)
+        {
+            Say("It is already running. Break to stop it.");
+            return;
+        }
+        StartDebugging();
+    }
+
+    void OnContinue(MenuItem sender) => Resume();
+
+    void Resume()
+    {
+        var running = _session;
+        if (running == null || !((DebugSession)running).IsStopped)
+        {
+            Say("Nothing is stopped.");
+            return;
+        }
+        ClearStopMarks();
+        ((DebugSession)running).Resume();
+        ShowRunning("Running...");
+    }
+
+    void OnStepInto(MenuItem sender) => Step(DebugCommand.StepIn);
+    void OnStepInto(Control sender) => Step(DebugCommand.StepIn);
+    void OnStepOver(MenuItem sender) => Step(DebugCommand.StepOver);
+    void OnStepOver(Control sender) => Step(DebugCommand.StepOver);
+    void OnStepOut(MenuItem sender) => Step(DebugCommand.StepOut);
+    void OnStepOut(Control sender) => Step(DebugCommand.StepOut);
+
+    void Step(DebugCommand how)
+    {
+        var running = _session;
+        if (running == null || !((DebugSession)running).IsStopped)
+        {
+            Say("Nothing is stopped.");
+            return;
+        }
+
+        var session = (DebugSession)running;
+        switch (how)
+        {
+            case DebugCommand.StepIn: session.StepIn(); break;
+            case DebugCommand.StepOut: session.StepOut(); break;
+            default: session.StepOver(); break;
+        }
+
+        ClearStopMarks();
+        ShowRunning("Stepping...");
+    }
+
+    void OnBreakAll(MenuItem sender) => BreakAll();
+    void OnBreakAll(Control sender) => BreakAll();
+
+    void BreakAll()
+    {
+        var running = _session;
+        if (running == null || ((DebugSession)running).State != RunState.Running)
+        {
+            Say("Nothing is running.");
+            return;
+        }
+        if (((DebugSession)running).Pause())
+            Say("Breaking...");
+        else
+            Say("It could not be interrupted.");
+    }
+
+    void OnStopDebugging(MenuItem sender) => StopDebugging();
+    void OnStopDebugging(Control sender) => StopDebugging();
+
+    void StopDebugging()
+    {
+        var running = _session;
+        if (running == null)
+        {
+            Say("Nothing is being debugged.");
+            return;
+        }
+        ((DebugSession)running).Stop();
+        Say("Stopping...");
+    }
+
+    /// Stops what is running and starts it again with the same breakpoints.
+    ///
+    /// The breakpoints survive because they live in the store rather than in
+    /// the session. So do the open tabs and the layout.
+    void OnRestartDebugging(MenuItem sender) => RestartDebugging();
+    void OnRestartDebugging(Control sender) => RestartDebugging();
+
+    void RestartDebugging()
+    {
+        var running = _session;
+        if (running != null)
+        {
+            // Synchronous would mean waiting on the session's thread from the
+            // one that paints. `Stop` is asynchronous, so the restart is the
+            // next thing the person does.
+            ((DebugSession)running).Stop();
+            Say("Stopping. Press F5 to start again.");
+            return;
+        }
+        StartDebugging();
+    }
+
+    /// Launches the built program under the debugger.
+    bool StartDebugging()
+    {
+        if (_building)
+        {
+            Say("A build is running.");
+            return false;
+        }
+
+        String program = DebuggeePath();
+        if (program.ByteLength() == 0u)
+        {
+            Say("Open a project to debug. A loose file has no output path.");
+            return false;
+        }
+
+        if (!Standard.File.Exists(program))
+        {
+            Say("Build it first: " + program + " is not there.");
+            return false;
+        }
+
+        if (Chosen() == Configuration.Release)
+            ShowTrace("note: Release is optimised and has no debug information."
+                      + " Switch to Debug and rebuild to step through it.");
+
+        _breakpoints.Unbind();
+        _stopped = null;
+        _frame = 0u;
+        _firstStop = true;
+        _debugOutput.Clear();
+        ClearDebugPanes();
+
+        var session = new DebugSession((taken) => this.OnProgramStopped(taken),
+                                       (line) => ShowTrace(line),
+                                       (file, line, bound)
+                                           => BoundBreakpoint(file, line, bound));
+        _session = session;
+
+        if (!session.Start(program, _breakpoints.All))
+        {
+            _session = null;
+            Say("The session would not start.");
+            return false;
+        }
+
+        ShowTrace("Starting " + program);
+        ShowRunning("Debugging...");
+        _dock.Reveal(Panes.DebugOutput);
+        return true;
+    }
+
+    /// Where the program to debug is.
+    ///
+    /// Empty when there is no project. A loose file is compiled to a path the
+    /// compiler chooses and this window never learns.
+    String DebuggeePath()
+    {
+        if (_project == null)
+            return "";
+        return ((ProjectFile)_project).OutputPath();
+    }
+
+    // ------------------------------------------- what comes back from a stop
+
+    /// One line from the session or from the program.
+    void ShowTrace(String line)
+    {
+        _debugOutput.Add(line);
+        if (_debugOutput.Count > 0u)
+            _debugOutput.SelectedIndex = (int)_debugOutput.Count - 1;
+    }
+
+    /// A breakpoint's binding, once a session has looked for code for it.
+    void BoundBreakpoint(String file, uint line, uint bound)
+    {
+        _breakpoints.Bind(file, line, bound);
+        ShowBreakpointList();
+        RepaintEditors();
+    }
+
+    /// The program stopped, or ended.
+    ///
+    /// A method here MUST NOT be named `Stopped`: `DebugEvent.Stopped` is a
+    /// case constructor of the engine's and is in scope everywhere, and inside
+    /// a lambda body it wins. See `docs/style.md` §1.5.
+    void OnProgramStopped(Snapshot taken)
+    {
+        _stopped = taken;
+        _frame = 0u;
+
+        if (taken.State == RunState.Ended)
+        {
+            Finished(taken);
+            return;
+        }
+
+        ShowLocals(taken);
+        ShowCallStack(taken);
+        ShowWhatDebuggingAllows();
+
+        // Locals comes forward on the first stop and not on any after it.
+        // Every stop would take the pane away from whoever had chosen another.
+        if (_firstStop)
+        {
+            _firstStop = false;
+            _dock.Reveal(Panes.Locals);
+        }
+
+        if (taken.HasSource)
+            GoTo(taken.File, taken.Line);
+        RepaintEditors();
+
+        switch (taken.Kind)
+        {
+            case StopKind.Breakpoint:
+                Say("Stopped at " + Placed(taken) + ".");
+                break;
+
+            case StopKind.Paused:
+                Say("Broken at " + Placed(taken) + ".");
+                break;
+
+            case StopKind.Fault:
+            {
+                String what = "Faulted (0x"
+                            + FormatHexadecimal((ulong)taken.FaultCode)
+                            + ") at " + Placed(taken) + ".";
+                Say(what);
+                ShowTrace(what);
+                break;
+            }
+
+            default:
+                Say(Placed(taken));
+                break;
+        }
+    }
+
+    /// The session is over.
+    void Finished(Snapshot taken)
+    {
+        String note = "Exited with "
+                    + Standard.Text.FromInteger((long)taken.ExitCode) + ".";
+        ShowTrace(note);
+        Say(note);
+
+        _session = null;
+        _stopped = null;
+        _breakpoints.Unbind();
+        ClearDebugPanes();
+        ClearStopMarks();
+        ShowBreakpointList();
+        ShowWhatDebuggingAllows();
+        RepaintEditors();
+    }
+
+    String Placed(Snapshot taken)
+    {
+        String where = taken.HasSource
+            ? NameOf(taken.File) + ":"
+              + Standard.Text.FromInteger((long)taken.Line)
+            : "0x" + FormatHexadecimal((ulong)taken.Address);
+        return taken.Function.ByteLength() == 0u
+            ? where : where + " in " + taken.Function;
+    }
+
+    void ShowLocals(Snapshot taken)
+    {
+        _locals.Clear();
+        for (nuint i = 0u; i < taken.Locals.Count; i++)
+        {
+            var one = taken.Locals[i];
+            int row = _locals.AddRow(one.Name);
+            _locals.SetCell(row, 1, one.Value);
+            _locals.SetCell(row, 2, one.TypeName
+                                    + (one.IsParameter ? "  (parameter)" : ""));
+        }
+    }
+
+    void ShowCallStack(Snapshot taken)
+    {
+        _stack.Clear();
+        for (nuint i = 0u; i < taken.Frames.Count; i++)
+        {
+            var frame = taken.Frames[i];
+            int row = _stack.AddRow(i == 0u ? ">" : "");
+            _stack.SetCell(row, 1, frame.Function.ByteLength() != 0u
+                                   ? frame.Function : "??");
+            _stack.SetCell(row, 2, frame.HasSource
+                ? NameOf(frame.File) + ", line "
+                  + Standard.Text.FromInteger((long)frame.Line)
+                : "0x" + FormatHexadecimal((ulong)frame.Pc));
+        }
+        if (!taken.Frames.IsEmpty)
+            _stack.SelectedIndex = 0;
+    }
+
+    /// A frame was double-clicked: show where it is.
+    ///
+    /// Only the source position changes. The Locals pane still shows frame
+    /// zero, because reading another frame's variables needs its own frame
+    /// base, and that MUST come from the session's thread.
+    void OnFrameChosen(Control sender)
+    {
+        var taken = _stopped;
+        if (taken == null)
+            return;
+
+        int row = _stack.SelectedIndex;
+        if (row < 0 || (nuint)row >= ((Snapshot)taken).Frames.Count)
+            return;
+
+        _frame = (nuint)row;
+        var frame = ((Snapshot)taken).Frames[_frame];
+        if (!frame.HasSource)
+        {
+            Say("That frame has no source.");
+            return;
+        }
+
+        GoTo(frame.File, frame.Line);
+        RepaintEditors();
+    }
+
+    void ClearDebugPanes()
+    {
+        _locals.Clear();
+        _stack.Clear();
+    }
+
+    /// Takes the current-statement highlight off every tab.
+    void ClearStopMarks()
+    {
+        foreach (var tab in _open)
+            tab.Editor.ClearStatement();
+    }
+
+    void RepaintEditors()
+    {
+        foreach (var tab in _open)
+            tab.Editor.Invalidate();
+    }
+
+    /// Opens a file if it is not open, and puts the statement mark on a line.
+    void GoTo(String file, uint line)
+    {
+        var tab = TabFor(file);
+        if (tab == null)
+        {
+            // The debugger's path may be spelled differently from the editor's:
+            // a compiler joining a directory to a file name mixes separators.
+            tab = TabMatching(file);
+        }
+        if (tab == null)
+        {
+            if (!OpenFile(file))
+            {
+                Say("Could not open " + file);
+                return;
+            }
+            tab = TabFor(file);
+            if (tab == null)
+                return;
+        }
+
+        var found = (EditorTab)tab;
+        _book.SelectedIndex = found.Page.Index;
+        found.Editor.ShowStatementAt(line - 1u, _frame == 0u);
+        OnCaretMoved(this);
+    }
+
+    /// The tab holding a file, compared the way the debugger compares paths.
+    EditorTab? TabMatching(String path)
+    {
+        foreach (var tab in _open)
+        {
+            String open = tab.Editor.Contents.Location;
+            if (open.ByteLength() != 0u && IsTheSameSourceFile(open, path))
+                return tab;
+        }
+        return null;
+    }
+
+    /// Enables what can be done now.
+    void ShowWhatDebuggingAllows()
+    {
+        var running = _session;
+        bool live = running != null;
+        bool stopped = live && ((DebugSession)running).IsStopped;
+
+        _startButton.Enabled = !live || stopped;
+        _pauseButton.Enabled = live && !stopped;
+        _stopDebugButton.Enabled = live;
+        _stepIntoButton.Enabled = stopped;
+        _stepOverButton.Enabled = stopped;
+        _stepOutButton.Enabled = stopped;
+    }
+
+    /// The program is on the move, so nothing may be read from it.
+    void ShowRunning(String what)
+    {
+        Say(what);
+        ClearDebugPanes();
+        ShowWhatDebuggingAllows();
+    }
+
     // -------------------------------------------------------------- the rest
 
     void OnCaretMoved(Control sender)
@@ -2820,9 +3631,10 @@ public class Shell : Form
         // it landed on the edge the layout asked for, and that closing and
         // reopening one is the same object rather than a new empty tree.
         {
-            if (_dock.PaneCount != 3u)
+            // Three from Phase 1 and four the debugger added.
+            if (_dock.PaneCount != 7u)
             {
-                Console.WriteLine("FAIL: expected three panes, found "
+                Console.WriteLine("FAIL: expected seven panes, found "
                                   + Standard.Text.FromInteger(_dock.PaneCount));
                 ok = false;
             }
@@ -2836,6 +3648,15 @@ public class Shell : Form
                 || _dock.EdgeOf(Panes.Output) != DockEdge.Bottom)
             {
                 Console.WriteLine("FAIL: the build's panes are not in the bottom well");
+                ok = false;
+            }
+
+            if (_dock.EdgeOf(Panes.Locals) != DockEdge.Bottom
+                || _dock.EdgeOf(Panes.CallStack) != DockEdge.Bottom
+                || _dock.EdgeOf(Panes.Breakpoints) != DockEdge.Bottom
+                || _dock.EdgeOf(Panes.DebugOutput) != DockEdge.Bottom)
+            {
+                Console.WriteLine("FAIL: the debugger's panes are not in the bottom well");
                 ok = false;
             }
 
@@ -2903,6 +3724,102 @@ public class Shell : Form
             {
                 Console.WriteLine("FAIL: the saved left width is out of range at "
                                   + Standard.Text.FromInteger((long)written.LeftWidth));
+                ok = false;
+            }
+        }
+
+        // Breakpoints against a live editor.
+        //
+        // `ide/tests/debugtest.sl` checks the store with no window at all.
+        // What only this can check is the wiring: that toggling reaches the
+        // store from a tab, and that typing above a breakpoint moves it --
+        // which is one event raised by `Document` and one handler here, and
+        // is invisible to a test that has neither.
+        {
+            var pad = AddTab(new Document());
+            pad.Editor.Contents.Location = "selftest-breakpoints.sl";
+            _breakpoints.Clear();
+
+            pad.Editor.Type("one" + Newline() + "two" + Newline() + "three");
+            pad.Editor.GoTo(2u, 0u);
+            ToggleBreakpointAtCaret();
+
+            if (_breakpoints.At("selftest-breakpoints.sl", 3u) == null)
+            {
+                Console.WriteLine("FAIL: F9 did not set a breakpoint on line 3");
+                ok = false;
+            }
+            if (MarkFor(pad.Editor, 2u) != LineMark.Breakpoint)
+            {
+                Console.WriteLine("FAIL: the margin does not show it");
+                ok = false;
+            }
+            if (MarkFor(pad.Editor, 1u) != LineMark.None)
+            {
+                Console.WriteLine("FAIL: the margin shows one on a line with none");
+                ok = false;
+            }
+
+            // Two lines typed above it push it from 3 to 5.
+            pad.Editor.GoTo(0u, 0u);
+            pad.Editor.Type("a" + Newline() + "b" + Newline());
+            Application.DoEvents();
+
+            if (_breakpoints.At("selftest-breakpoints.sl", 5u) == null)
+            {
+                Console.WriteLine("FAIL: typing above a breakpoint did not move it");
+                ok = false;
+            }
+
+            // And taking those two lines out again brings it back to 3.
+            //
+            // Deleted rather than undone: undo would keep going past this,
+            // and a document with nothing left in it says nothing about
+            // whether a breakpoint follows an edit.
+            pad.Editor.Contents.Delete(Position.At(0u, 0u), Position.At(2u, 0u));
+
+            // The caret is put back before anything paints: the document was
+            // edited behind the editor's back, so the caret is where those
+            // lines used to be.
+            pad.Editor.GoTo(0u, 0u);
+            Application.DoEvents();
+
+            if (_breakpoints.At("selftest-breakpoints.sl", 3u) == null)
+            {
+                Console.WriteLine("FAIL: deleting above a breakpoint did not move it back");
+                ok = false;
+            }
+
+            // A deletion that swallows it leaves it at the cut rather than
+            // losing it.
+            pad.Editor.Contents.Delete(Position.At(1u, 0u), Position.At(2u, 5u));
+            pad.Editor.GoTo(0u, 0u);
+            Application.DoEvents();
+
+            if (_breakpoints.Count != 1u
+                || _breakpoints.At("selftest-breakpoints.sl", 2u) == null)
+            {
+                Console.WriteLine("FAIL: a breakpoint inside a deletion was lost");
+                ok = false;
+            }
+
+            ToggleBreakpointAtCaret();
+            _breakpoints.Clear();
+            CloseTab(_open[_open.Count - 1u]);
+            Application.DoEvents();
+        }
+
+        // Nothing is being debugged, so every run-control command says so
+        // rather than doing something.
+        {
+            if (_session != null)
+            {
+                Console.WriteLine("FAIL: a session exists before anything started one");
+                ok = false;
+            }
+            if (DebuggeePath().ByteLength() == 0u && _project != null)
+            {
+                Console.WriteLine("FAIL: a project gave no path to debug");
                 ok = false;
             }
         }

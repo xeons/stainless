@@ -9,6 +9,11 @@ stainless build --project debug
 .\debug\build\sldb sections <binary>
 ```
 
+**A binary to debug MUST carry DWARF.** On Windows an ordinary `-g` build
+writes CodeView into a `.pdb`, which this reads none of, so build with
+`--debug-format dwarf -O0`. Without it `sldb` says so rather than quietly
+reporting addresses that have no lines.
+
 ## What is here
 
 | | |
@@ -26,6 +31,8 @@ stainless build --project debug
 | `src/Target/Linux.sl` | the `ptrace` loop |
 | `src/Target/Select.sl` | the one `#if` in the engine |
 | `src/Engine.sl` | breakpoints, the slide, run control and stepping |
+| `src/Paths.sl` | whether two spellings name one source file |
+| `src/Session.sl` | a stop, read into a `Snapshot` a window can hold |
 | `src/Stack.sl` | the frame-pointer walk |
 | `src/Values.sl` | a location and a type, read out of the process |
 | `tests/sldb.sl` | the console debugger |
@@ -327,21 +334,60 @@ Linux's default `ptrace_scope` a process may trace its own child and nothing
 else, so every test here launches. That is said where it matters rather than
 left to be discovered.
 
+## What the window gets
+
+A `Snapshot`: where the program stopped, its call stack, and every local in
+scope, read on the session's thread while the program was stopped and numbers
+and text afterwards. `src/Session.sl` builds it and `sldb snapshot` prints it.
+
+```
+$ sldb snapshot demo.exe fixture.sl:41
+state    stopped
+stop     breakpoint
+where    ...\demo/fixture.sl:41
+function Total
+frames
+  #0  Total                   ...\demo/fixture.sl:41
+  #1  Main                    ...\demo/fixture.sl:61
+locals
+  values      int[]                   4 elements at 0x2d0b4451e60   (parameter)
+  sum         int                     0
+  i           nuint                   0
+  here        int                     1
+```
+
+**A pane MUST NOT show more than a snapshot holds.** Anything the IDE needs is
+a field added here first, so that `sldb snapshot` covers it headlessly. The
+window never calls into the engine at all: every call into a debuggee must come
+from the one thread that launched it, and by the time a pane paints that thread
+is busy.
+
+The two exceptions are `Engine.RequestBreak` and `ITarget.RequestBreak`, which
+another thread MAY call. Neither touches the tracing relationship: Windows
+creates a thread inside the target that executes an `int3`, Linux sends
+`SIGSTOP`, and each arrives at the session's thread as an ordinary event. Only
+the engine can tell the result from a fault, because only the engine knows it
+asked -- which is what `StopKind.Paused` is.
+
 ## Still to come
 
-The IDE surface -- kept thin, because everything in it comes from snapshot types this
-console tool has already exercised.
+**Watch expressions.** `a`, `a.b.c`, `a[3]`, `*p` and integer literals, and the
+six comparisons after that for conditional breakpoints. No arithmetic, no
+casts, and never a call into the debuggee: calling into an ARC'd runtime from a
+process stopped inside the allocator's lock deadlocks the thing being
+inspected.
+
+**Real unwind info**, for `-O2` and for frames through the C runtime. The
+frame-pointer walk is right at `-O0` and answers one frame where there is no
+frame pointer. `.eh_frame` on ELF and `.pdata` on PE are already in every
+binary this compiler produces.
 
 Named rather than done, in the value reader: a `struct` prints as its address
 and size rather than member by member; a `double` prints its bits, because
 reinterpreting eight bytes as a float needs a cast this does not have yet; and
 a variant prints nothing useful, because the cases are numbered in declaration
 order while DWARF gets a member only for the ones carrying a payload -- the
-k-th member is not tag k, and twelve lines of compiler would fix it properly. The IDE
-surface is last and is meant to be thin: everything in it comes from snapshot
-types this console tool has already exercised.
+k-th member is not tag k, and twelve lines of compiler would fix it properly.
 
-**The Linux target is a stub that says so.** `MakeTarget` answers a `Result`,
-and on a platform without one it fails with a sentence rather than silently
-doing nothing -- the reading half of this engine is complete on both platforms
-and every command but `run` works there.
+Step-in stops at the callee's first instruction rather than at `prologue_end`,
+so the first step into a function lands before its locals have slots.

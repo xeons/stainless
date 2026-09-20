@@ -940,6 +940,14 @@ public extern "C"
     int    DebugActiveProcess(uint processId);
     int    DebugActiveProcessStop(uint processId);
 
+    /// Interrupts a running debuggee.
+    ///
+    /// The one call here that MAY come from a thread other than the one that
+    /// created the debuggee. It creates a thread inside the target which
+    /// executes an `int3`; the trap arrives at whichever thread is waiting for
+    /// debug events, at an address no breakpoint was planted at.
+    int    DebugBreakProcess(HANDLE process);
+
     /// Whether the debuggee dies when the debugger does. The default is yes,
     /// which is rarely what a program wants and never what a crashed one does.
     int    DebugSetProcessKillOnExit(int kill);

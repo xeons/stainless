@@ -19,6 +19,12 @@
 //   stainless-ide                 open with nothing in it
 //   stainless-ide path/to/file.sl open that
 //   stainless-ide --selftest      build the window, check what can be checked
+//   stainless-ide --break f.sl:12 -- set a breakpoint and start debugging
+//
+// `--break` exists so the debugger can be photographed. A screenshot is the
+// only thing that says a pane drew, and a debugging session cannot be reached
+// from a command line without it -- there is nothing to capture until
+// something has stopped. See forms/screenshot.ps1.
 module Ide;
 
 import Standard.Console;
@@ -36,6 +42,7 @@ int Main()
     var window = new Shell();
 
     bool testing = false;
+    String stopAt = "";
     var arguments = Env.Arguments();
     // From zero: `Env.Arguments` is what `Main(String[] args)` would have been
     // handed, which does not include the program's own name.
@@ -49,6 +56,12 @@ int Main()
         if (argument == "--selftest")
         {
             testing = true;
+            continue;
+        }
+        if (argument == "--break" && i + 1u < arguments.Length)
+        {
+            stopAt = arguments[i + 1u];
+            i++;
             continue;
         }
         if (argument.StartsWith("-"))
@@ -73,6 +86,12 @@ int Main()
 
     window.CenterOnScreen();
     window.Show();
+
+    // After the window is up: starting a session posts back to this thread,
+    // and there has to be a loop for those posts to arrive on.
+    if (stopAt.ByteLength() != 0u)
+        window.DebugFrom(stopAt);
+
     Application.Run();
     return 0;
 }

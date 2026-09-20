@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Stainless.Emit;
 using Xunit;
 
 namespace Stainless.UnitTests;
@@ -134,5 +135,28 @@ public class DebugInfoTests
         string node = Front.MetadataNode(ir, Front.LocalVariableTypeNode(ir, "Use", "here"));
         Assert.Contains("DW_TAG_structure_type", node);
         Assert.DoesNotContain("DW_TAG_pointer_type", node);
+    }
+
+    /// <summary>
+    /// Which module flag each format asks for.
+    /// </summary>
+    /// <remarks>
+    /// <c>tests/cases/debug-format-*</c> pins that the default follows the
+    /// target. This pins what each choice emits. <c>Both</c> is reachable
+    /// nowhere else: the harness cannot pass a flag and no project file
+    /// carries one.
+    /// </remarks>
+    [Theory]
+    [InlineData(DebugFormat.Dwarf, true, false)]
+    [InlineData(DebugFormat.CodeView, false, true)]
+    [InlineData(DebugFormat.Both, true, true)]
+    public void TheFormatDecidesWhichModuleFlagsAreAskedFor(
+        DebugFormat format, bool dwarf, bool codeView)
+    {
+        string ir = Front.ModuleDebugIr("public void Use() { int a = 1; }",
+                                        format: format);
+
+        Assert.Equal(dwarf, ir.Contains("!\"Dwarf Version\"", StringComparison.Ordinal));
+        Assert.Equal(codeView, ir.Contains("!\"CodeView\"", StringComparison.Ordinal));
     }
 }

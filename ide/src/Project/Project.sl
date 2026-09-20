@@ -265,6 +265,32 @@ public class ProjectFile
         }
     }
 
+    /// Where the built binary lands.
+    ///
+    /// Mirrors `ProjectFile.OutputPath` in the compiler's driver. The two MUST
+    /// agree: this is what the debugger launches, and a debugger launching a
+    /// different file from the one just built finds stale code.
+    public String OutputPath()
+    {
+        if (Output.ByteLength() != 0u)
+            return Resolve(Output);
+
+        String name = IsLibrary ? SharedLibraryFileName(Name)
+                                : Name + ExecutableExtension;
+        return Combine(Resolve(BuildDirectory), name);
+    }
+
+    #if WINDOWS
+    static String ExecutableExtension => ".exe";
+    static String SharedLibraryFileName(String name) => name + ".dll";
+    #elif MACOS
+    static String ExecutableExtension => "";
+    static String SharedLibraryFileName(String name) => "lib" + name + ".dylib";
+    #else
+    static String ExecutableExtension => "";
+    static String SharedLibraryFileName(String name) => "lib" + name + ".so";
+    #endif
+
     String[] Both(String[] shared, String[] extra)
     {
         if (extra.Length == 0u)

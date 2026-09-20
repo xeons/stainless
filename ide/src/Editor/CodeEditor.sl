@@ -41,6 +41,39 @@ import Ide.Lang;
 /// How far a tab reaches: to the next multiple of this.
 const nuint TabWidth = 4u;
 
+/// How wide the breakpoint margin is, in character cells.
+///
+/// Cells rather than pixels, so it scales with the text size.
+const int MarginCells = 2;
+
+/// What the margin draws beside one line.
+public enum LineMark
+{
+    None,
+    /// A breakpoint with code behind it.
+    Breakpoint,
+    /// One the build found no code for. Drawn hollow.
+    BreakpointUnbound,
+    /// One that is switched off. Drawn hollow.
+    BreakpointDisabled,
+}
+
+/// Asked what to draw beside a line, while the editor is painting.
+///
+/// `row` counts from zero. Implementations MUST be cheap: this is called once
+/// per visible line per paint.
+public closure LineMark MarkAsker(nuint row);
+
+/// Which line something happened on. Rows count from zero.
+public class RowEventArgs
+{
+    public nuint Row;
+
+    public RowEventArgs(nuint row) => Row = row;
+}
+
+public closure void RowEventHandler(Control sender, RowEventArgs args);
+
 /// The column the right-hand rule is drawn at. 80, because that is what the
 /// sources this is written to edit are wrapped to.
 const nuint RightMargin = 80u;
@@ -91,8 +124,27 @@ public class CodeEditor : CustomControl
     /// is a `Graphics` to measure with.
     int _cell;
     int _lineHeight;
-    /// The width of the line-number gutter, including the gap after it.
+    /// The width of the line-number gutter, including the breakpoint margin
+    /// before it and the gap after it.
     int _gutter;
+
+    /// The breakpoint margin's width. Zero when nothing has asked for one.
+    int _margin;
+
+    /// Who to ask what a line is marked with.
+    ///
+    /// A closure is a value and cannot be null, so `_showMargin` is what says
+    /// whether anyone has asked. Until then this answers `None`.
+    MarkAsker _marks;
+    bool _showMargin;
+
+    /// The line the program is stopped on, and whether there is one.
+    nuint _statement;
+    bool _hasStatement;
+
+    /// False when the statement belongs to a frame further up the stack than
+    /// the one the program is in.
+    bool _statementIsTop;
 
     /// True while the mouse is down, so that moving it extends the selection.
     bool _dragging;
@@ -126,6 +178,12 @@ public class CodeEditor : CustomControl
         _cell = 0;
         _lineHeight = 0;
         _gutter = 0;
+        _margin = 0;
+        _marks = (row) => LineMark.None;
+        _showMargin = false;
+        _statement = 0u;
+        _hasStatement = false;
+        _statementIsTop = true;
         _dragging = false;
         _ready = false;
 
@@ -206,6 +264,46 @@ public class CodeEditor : CustomControl
     /// property that hid it would be two different things under one name in a
     /// type that has both.
     public Document Contents => _doc;
+
+    // --------------------------------------------------------- the margin
+
+    /// Shows the breakpoint margin, and says who to ask about each line.
+    ///
+    /// The asker is called for visible lines only, so the cost is the height
+    /// of the control rather than the length of the file.
+    public void ShowMarginMarks(MarkAsker asker)
+    {
+        _marks = asker;
+        _showMargin = true;
+        Invalidate();
+    }
+
+    /// The margin was clicked. Carries the row.
+    public event RowEventHandler MarginClicked;
+
+    /// Puts the current-statement highlight on a line, and scrolls to it.
+    ///
+    /// `top` is false for a stack frame the program is not in. That gets a
+    /// paler highlight, because it is not where execution resumes.
+    public void ShowStatementAt(nuint row, bool top)
+    {
+        _statement = row;
+        _hasStatement = true;
+        _statementIsTop = top;
+        GoTo(row, 0u);
+        Invalidate();
+    }
+
+    public void ClearStatement()
+    {
+        if (!_hasStatement)
+            return;
+        _hasStatement = false;
+        Invalidate();
+    }
+
+    public bool HasStatement => _hasStatement;
+    public nuint StatementRow => _statement;
 
     public Theme Palette
     {
@@ -493,6 +591,7 @@ public class CodeEditor : CustomControl
             Rescrolled();
         }
 
+        _margin = _showMargin ? MarginCells * _cell : 0;
         _gutter = GutterWidth(canvas);
 
         var area = ClientBounds;
@@ -533,7 +632,7 @@ public class CodeEditor : CustomControl
         }
         if (digits < 3)
             digits = 3;
-        return (digits + 2) * _cell;
+        return _margin + (digits + 2) * _cell;
     }
 
     void PaintLine(Graphics canvas, nuint row, int y, int width)
@@ -541,13 +640,26 @@ public class CodeEditor : CustomControl
         var line = _doc.LineAt(row);
         bool current = row == _caret.Row;
 
-        if (current && !HasSelection)
+        // The statement highlight wins over the caret line's. Both would paint
+        // the same rectangle, and the stopped line must stay visible under the
+        // caret.
+        bool stopped = _hasStatement && row == _statement;
+        if (stopped)
+        {
+            canvas.FillRectangle(new Brush(_statementIsTop
+                                           ? _palette.CurrentStatement
+                                           : _palette.CalledFrom),
+                                 Rectangle.Of(_gutter, y, width - _gutter,
+                                              _lineHeight));
+        }
+        else if (current && !HasSelection)
         {
             canvas.FillRectangle(new Brush(_palette.CurrentLine),
                                  Rectangle.Of(_gutter, y, width - _gutter, _lineHeight));
         }
 
         PaintSelection(canvas, row, y, width);
+        PaintMargin(canvas, row, y, stopped);
 
         // The number, right-aligned in the gutter.
         String number = Standard.Text.FromInteger(row + 1u);
@@ -575,6 +687,67 @@ public class CodeEditor : CustomControl
             String piece = line.Text.Substring(token.Start, token.Length);
             canvas.DrawString(piece, Font, _palette.ColorFor(token.Kind), x, y);
         }
+    }
+
+    /// The breakpoint disc and the current-statement arrow.
+    ///
+    /// Drawn rather than loaded, for the reason `Icons.sl` gives: two shapes
+    /// at any text size is less to carry than a bitmap per size.
+    void PaintMargin(Graphics canvas, nuint row, int y, bool stopped)
+    {
+        if (_margin <= 0)
+            return;
+
+        // Arrow first, disc over it. A breakpoint on the stopped line is still
+        // a breakpoint.
+        if (stopped && _statementIsTop)
+            PaintStatementArrow(canvas, y);
+
+        var mark = _marks(row);
+        if (mark == LineMark.None)
+            return;
+
+        // A fifth of a cell of clearance above and below, at every text size.
+        int inset = _lineHeight / 5;
+        int size = _lineHeight - inset * 2;
+        if (size < 4)
+            size = 4;
+        var disc = Rectangle.Of((_margin - size) / 2, y + inset, size, size);
+
+        switch (mark)
+        {
+            case LineMark.Breakpoint:
+                canvas.FillEllipse(new Brush(_palette.BreakpointFill), disc);
+                canvas.DrawEllipse(new Pen(_palette.BreakpointEdge), disc);
+                break;
+
+            default:
+                // Unbound or disabled. Hollow rather than absent: an absent
+                // glyph reads as a breakpoint that was never set.
+                canvas.DrawEllipse(new Pen(_palette.BreakpointHollow), disc);
+                break;
+        }
+    }
+
+    /// The arrow beside the line the program is stopped on.
+    void PaintStatementArrow(Graphics canvas, int y)
+    {
+        int middle = y + _lineHeight / 2;
+        int high = _lineHeight / 4;
+        int left = _cell / 3;
+        int right = _margin - _cell / 3;
+        int stem = left + (right - left) / 2;
+
+        var arrow = new Point[7];
+        arrow[0u] = Point.At(left, middle - high / 2);
+        arrow[1u] = Point.At(stem, middle - high / 2);
+        arrow[2u] = Point.At(stem, middle - high);
+        arrow[3u] = Point.At(right, middle);
+        arrow[4u] = Point.At(stem, middle + high);
+        arrow[5u] = Point.At(stem, middle + high / 2);
+        arrow[6u] = Point.At(left, middle + high / 2);
+
+        canvas.FillPolygon(new Brush(_palette.CurrentStatementArrow), arrow);
     }
 
     /// The highlight behind whatever of this line is selected.
@@ -808,6 +981,15 @@ public class CodeEditor : CustomControl
         if (!_ready)
             return;
         Focus();
+
+        // A margin click MUST NOT move the caret. Setting several breakpoints
+        // in a row would otherwise lose the caret's place each time.
+        if (_margin > 0 && args.X < _margin)
+        {
+            MarginClicked(this, new RowEventArgs(RowAt(args.Y)));
+            return;
+        }
+
         var hit = PositionAt(args.X, args.Y);
         _caret = hit;
         if (!args.Modifiers.HasFlag(ModifierKeys.Shift))
@@ -955,17 +1137,25 @@ public class CodeEditor : CustomControl
         base.OnMouseWheel(args);
     }
 
+    /// Which row a y coordinate is over, clamped to the document.
+    nuint RowAt(int y)
+    {
+        if (_lineHeight <= 0)
+            return 0u;
+        int row = y / _lineHeight + (int)_topLine;
+        if (row < 0)
+            row = 0;
+        nuint highest = _doc.LineCount - 1u;
+        return (nuint)row > highest ? highest : (nuint)row;
+    }
+
     /// What position a point in the control is over.
     Position PositionAt(int x, int y)
     {
         if (_lineHeight <= 0 || _cell <= 0)
             return Position.At(0u, 0u);
 
-        int row = y / _lineHeight + (int)_topLine;
-        if (row < 0)
-            row = 0;
-        nuint highest = _doc.LineCount - 1u;
-        nuint line = (nuint)row > highest ? highest : (nuint)row;
+        nuint line = RowAt(y);
 
         int column = (x - _gutter) / _cell + (int)_leftColumn;
         if (column < 0)

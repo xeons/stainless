@@ -21,6 +21,22 @@ using Stainless.Source;
 namespace Stainless.Emit;
 
 /// <summary>
+/// Which debugger's format the description is written in.
+/// </summary>
+/// <remarks>
+/// It is a property of the target, not of the host. Windows debuggers --
+/// Visual Studio, WinDbg, the minidump reader, Windows Error Reporting -- read
+/// CodeView and nothing else. Everything else reads DWARF.
+/// <see cref="Both"/> emits each, at roughly double the debug data.
+/// </remarks>
+public enum DebugFormat
+{
+    Dwarf,
+    CodeView,
+    Both,
+}
+
+/// <summary>
 /// The debug metadata graph: files, types, functions and source locations, in
 /// the form LLVM writes them into DWARF or CodeView.
 ///
@@ -46,7 +62,7 @@ public sealed class DebugInfo
     private readonly Dictionary<string, int> _basicTypes = new(StringComparer.Ordinal);
 
     private readonly int _compileUnit;
-    private readonly bool _codeView;
+    private readonly DebugFormat _format;
     private readonly string _producer;
 
     /// <summary>
@@ -54,10 +70,10 @@ public sealed class DebugInfo
     /// DWARF wants one even though a Stainless program has no single root file,
     /// so the first source given on the command line stands for the program.
     /// </summary>
-    public DebugInfo(SourceText mainFile, string producer, bool codeView)
+    public DebugInfo(SourceText mainFile, string producer, DebugFormat format)
     {
         _producer = producer;
-        _codeView = codeView;
+        _format = format;
 
         _compileUnit = Reserve();
         int file = File(mainFile);
@@ -595,11 +611,12 @@ public sealed class DebugInfo
             Add("!{i32 2, !\"Debug Info Version\", i32 3}"),
         };
 
-        // Windows debuggers read CodeView, and clang emits it only when the
-        // module asks; everywhere else the format is DWARF.
-        flags.Add(_codeView
-            ? Add("!{i32 2, !\"CodeView\", i32 1}")
-            : Add("!{i32 7, !\"Dwarf Version\", i32 5}"));
+        // Clang emits each only when the module asks. Asking for both is
+        // legitimate: the two go into different sections.
+        if (_format != DebugFormat.CodeView)
+            flags.Add(Add("!{i32 7, !\"Dwarf Version\", i32 5}"));
+        if (_format != DebugFormat.Dwarf)
+            flags.Add(Add("!{i32 2, !\"CodeView\", i32 1}"));
 
         int ident = Add($"!{{{MdString(_producer)}}}");
 

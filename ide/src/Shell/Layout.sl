@@ -246,6 +246,11 @@ public static class Panes
     public static readonly String Properties = "properties";
     public static readonly String Errors = "errors";
     public static readonly String Output = "output";
+
+    public static readonly String Locals = "locals";
+    public static readonly String CallStack = "callstack";
+    public static readonly String Breakpoints = "breakpoints";
+    public static readonly String DebugOutput = "debugoutput";
 }
 
 // ===================================================================== naming

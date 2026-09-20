@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// The toolbar's icons: five PNGs that travel inside the binary.
+// The toolbar's icons: PNGs that travel inside the binary.
 //
 // **`[Embed]` rather than a resource script, and not for the reason that first
 // suggests itself.** Resources are not Windows-only here: the compiler
@@ -71,10 +71,33 @@ public static class IconFiles
 
     [Embed("icons/stop.png")]
     public static readonly byte[] Stop;
+
+    [Embed("icons/start.png")]
+    public static readonly byte[] Start;
+
+    [Embed("icons/pause.png")]
+    public static readonly byte[] Pause;
+
+    [Embed("icons/stopdebug.png")]
+    public static readonly byte[] StopDebug;
+
+    [Embed("icons/stepinto.png")]
+    public static readonly byte[] StepInto;
+
+    [Embed("icons/stepover.png")]
+    public static readonly byte[] StepOver;
+
+    [Embed("icons/stepout.png")]
+    public static readonly byte[] StepOut;
+
+    [Embed("icons/restart.png")]
+    public static readonly byte[] Restart;
 }
 
-/// The five icons as a list a toolbar can be given, or null if they could not
-/// be decoded.
+/// Every icon as one list, or null if they could not be decoded.
+///
+/// The order MUST match the `Icon*` constants in `Shell.sl`. A toolbar whose
+/// pictures are off by one is a toolbar where Clean says Run.
 ///
 /// Null rather than an error: a toolbar with no pictures is the toolbar there
 /// was before, and a message about a missing imaging library belongs nowhere a
@@ -83,11 +106,18 @@ public ImageList? BuildIcons()
 {
     var list = new ImageList(16, 16);
 
-    if (!AddIcon(list, IconFiles.Build))   return null;
-    if (!AddIcon(list, IconFiles.Rebuild)) return null;
-    if (!AddIcon(list, IconFiles.Clean))   return null;
-    if (!AddIcon(list, IconFiles.Run))     return null;
-    if (!AddIcon(list, IconFiles.Stop))    return null;
+    if (!AddIcon(list, IconFiles.Build))     return null;
+    if (!AddIcon(list, IconFiles.Rebuild))   return null;
+    if (!AddIcon(list, IconFiles.Clean))     return null;
+    if (!AddIcon(list, IconFiles.Run))       return null;
+    if (!AddIcon(list, IconFiles.Stop))      return null;
+    if (!AddIcon(list, IconFiles.Start))     return null;
+    if (!AddIcon(list, IconFiles.Pause))     return null;
+    if (!AddIcon(list, IconFiles.StopDebug)) return null;
+    if (!AddIcon(list, IconFiles.StepInto))  return null;
+    if (!AddIcon(list, IconFiles.StepOver))  return null;
+    if (!AddIcon(list, IconFiles.StepOut))   return null;
+    if (!AddIcon(list, IconFiles.Restart))   return null;
 
     return list;
 }

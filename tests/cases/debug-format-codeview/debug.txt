@@ -1,0 +1,2 @@
+# CodeView, because the target is Windows.
+!{i32 2, !"CodeView", i32 1}

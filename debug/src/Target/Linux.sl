@@ -217,6 +217,15 @@ public class LinuxTarget : ITarget
             return Stopped((uint)_pid, pc - 1u, BreakpointExceptionCode(), true);
         }
 
+        // `SIGSTOP` is never the program's: nothing here sends it but
+        // `RequestBreak`. Holding it pending would re-deliver it on the resume
+        // and stop the process again the instant it ran.
+        if (signal == SignalStop)
+        {
+            _pendingSignal = 0;
+            return Stopped((uint)_pid, pc, (uint)signal, true);
+        }
+
         // Anything else is the program's own and is delivered back to it when
         // the engine resumes, which is what lets a real fault kill it normally.
         _pendingSignal = signal;
@@ -297,6 +306,18 @@ public class LinuxTarget : ITarget
     {
         _stepping = on;
         return true;
+    }
+
+    /// `SIGSTOP`, which stops the program wherever it is.
+    ///
+    /// A signal is addressed to a process, not to a tracing relationship, so
+    /// `kill` need not come from the thread that attached. See
+    /// `ITarget.RequestBreak`.
+    public bool RequestBreak()
+    {
+        if (!_running || _pid <= 0 || _stopped)
+            return false;
+        return kill(_pid, SignalStop) == 0;
     }
 
     public void Terminate()

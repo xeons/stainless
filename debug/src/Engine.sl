@@ -77,6 +77,12 @@ public enum StopKind
     Fault,
     /// It ran to the end.
     Exited,
+    /// Break All: somebody asked it to stop while it was running.
+    ///
+    /// The platform cannot tell this from a fault. An injected `int3` and a
+    /// `SIGSTOP` both arrive as a stop at an address nothing was planted at;
+    /// only the engine knows it asked.
+    Paused,
 }
 
 /// What the engine was doing when it stopped.
@@ -99,6 +105,28 @@ public class Stop
         Code = 0u;
         ExitCode = 0;
         At = null;
+    }
+}
+
+/// A place in the source, as the line table gave it.
+///
+/// A pair rather than a formatted `file.sl:41`. Splitting one back apart means
+/// guessing which colon separates them, and a Windows drive letter has an
+/// opinion about that.
+public class SourcePosition
+{
+    public String File;
+    public uint Line;
+
+    /// False when the address has no line at all, which is what says the code
+    /// belongs to the runtime rather than to the program.
+    public bool Known;
+
+    public SourcePosition(String file, uint line, bool known)
+    {
+        File = file;
+        Line = line;
+        Known = known;
     }
 }
 
@@ -144,14 +172,26 @@ public class Engine
 
     /// Whether the single step now in flight is one somebody asked for.
     ///
-    /// **Getting off a breakpoint is a step too**, and it is the same
-    /// mechanism: a trap is lifted, one instruction runs, the trap goes back.
-    /// So the step that resumes from a breakpoint and the step a user asked
-    /// for arrive as the same event, and only this says which. Without it the
-    /// first `step` after a breakpoint is swallowed as housekeeping and the
-    /// program runs to the end -- which looks exactly like stepping not being
-    /// implemented.
+    /// Getting off a breakpoint is a step too, by the same mechanism: the trap
+    /// is lifted, one instruction runs, the trap goes back. Both arrive as the
+    /// same event, and only this says which.
     bool _stepIsWanted;
+
+    /// Whether the next unexplained stop is one `RequestBreak` asked for.
+    ///
+    /// Written by whichever thread called Break All, read by the session's own.
+    /// See `RequestBreak` for why that needs no lock.
+    bool _breakWanted;
+
+    /// What the program has written through `OutputDebugString`, or its
+    /// platform equivalent, since anybody last asked.
+    ///
+    /// Collected rather than handed to a callback: a callback would run with
+    /// the process stopped, where a debugger must do as little as possible.
+    ///
+    /// The program's own stdout and stderr do not arrive here. Redirecting
+    /// those needs the target seam to set up pipes.
+    List<String> _output;
 
     public Engine(ITarget target, Image image, DwarfInfo info,
                   List<LineTable> tables)
@@ -166,6 +206,17 @@ public class Engine
         _steppingOver = null;
         _steppingThread = 0u;
         _stepIsWanted = false;
+        _breakWanted = false;
+        _output = new List<String>();
+    }
+
+    /// Everything the program has written since this was last called, and
+    /// empties the list.
+    public List<String> TakeOutput()
+    {
+        var so_far = _output;
+        _output = new List<String>();
+        return so_far;
     }
 
     public List<Breakpoint> Breakpoints => _breakpoints;
@@ -197,31 +248,42 @@ public class Engine
         if (!started.Ok)
             return Fail(started.Error);
 
-        // **Waiting, not continuing**, and the difference is the whole of why
-        // the two backends disagreed. `Continue` resumes first, which is right
-        // from a stop the caller has already been told about -- and a
-        // just-launched process has not been told about anything.
-        //
-        // On Windows resuming there is harmless: nothing has been reported, so
-        // the resume finds no event outstanding and does nothing. On Linux the
-        // launch has already reaped the `SIGTRAP` the kernel raises when the
-        // exec completes, so the very same call let the program run before its
-        // image base had been reported -- and a slide nobody learned is every
-        // breakpoint unplanted. The seam never said who consumes that first
-        // stop; now nothing has to, because nothing resumes before the first
-        // event is read.
+        // Waits rather than continuing. `Continue` resumes first, which is
+        // right from a stop the caller has been told about; a just-launched
+        // process has not been told about anything. Under ptrace the launch
+        // has already reaped the exec's SIGTRAP, so resuming here would let
+        // the program run before its image base was read.
         return Ok(WaitForStop());
+    }
+
+    /// Asks a running program to stop, from a thread that is not this one.
+    ///
+    /// The only method on this class another thread MAY call. The session's
+    /// own thread is blocked inside `Continue` and cannot be asked for
+    /// anything.
+    ///
+    /// The flag is set before the target is asked, and the order matters. The
+    /// stop cannot arrive before the system call that causes it, and that call
+    /// is a barrier on both platforms, so a thread that sees the stop has
+    /// already seen the flag. No lock is needed.
+    public bool RequestBreak()
+    {
+        if (!_target.IsRunning)
+            return false;
+        _breakWanted = true;
+        if (_target.RequestBreak())
+            return true;
+
+        // Nothing was interrupted, so nothing will arrive to clear it.
+        _breakWanted = false;
+        return false;
     }
 
     /// Runs until something stops it.
     ///
-    /// **Resuming is not optional and was, for one afternoon, conditional.**
-    /// A stopped target is waiting for a `Resume` that answers the event it
-    /// reported; without one it simply does not run, and the next wait sits
-    /// until it times out. Written so that only the step-off path resumed,
-    /// this worked perfectly from a breakpoint -- which always takes that path
-    /// -- and cost a full timeout every time it was reached from anywhere
-    /// else. The symptom was a step-over that appeared to hang.
+    /// Every path here MUST resume. A stopped target waits for a `Resume` that
+    /// answers the event it reported; without one it does not run and the next
+    /// wait sits until it times out.
     public Stop Continue()
     {
         // A breakpoint the process is standing on has to be stepped off before
@@ -259,6 +321,11 @@ public class Engine
                 return InterpretStop(where.thread, where.address, where.code,
                                      where.firstChance);
 
+            case Output wrote:
+                _output.Add(wrote.text);
+                _target.Resume(true);
+                return null;
+
             case Nothing:
                 // A timeout, or an event this engine does not act on. Either
                 // way the process is waiting to be let go.
@@ -274,6 +341,18 @@ public class Engine
     Stop? InterpretStop(uint thread, nuint address, uint code,
                         bool firstChance)
     {
+        // Asked for, so not a fault. Tested before the breakpoint cases: a
+        // program interrupted while sitting on a planted trap is a real race,
+        // and the answer there is still that it paused.
+        if (_breakWanted)
+        {
+            _breakWanted = false;
+            var paused = new Stop(StopKind.Paused);
+            paused.Thread = thread;
+            paused.Address = address;
+            return paused;
+        }
+
         // A single step, which this engine only ever asks for in order to get
         // off a breakpoint it is standing on.
         if (code == StepExceptionCode())
@@ -679,40 +758,43 @@ public class Engine
         return stop;
     }
 
+    /// Which source line an address is on.
+    public SourcePosition PositionAt(nuint runtimeAddress)
+    {
+        nuint linked = ToLinked(runtimeAddress);
+        for (nuint u = 0u; u < _tables.Count; u++)
+        {
+            var row = _tables[u].RowCovering(linked);
+            if (row == null)
+                continue;
+            var here = (LineRow)row;
+            return new SourcePosition(_tables[u].FileName(here.File),
+                                      here.Line, true);
+        }
+        return new SourcePosition("", 0u, false);
+    }
+
     /// A file and line as one string, for telling two positions apart.
     ///
     /// Empty when the address has no line at all, which is what says a function
     /// belongs to the runtime rather than to the program.
     String LineKeyAt(nuint runtimeAddress)
     {
-        nuint linked = ToLinked(runtimeAddress);
-        for (nuint u = 0u; u < _tables.Count; u++)
-        {
-            var row = _tables[u].RowCovering(linked);
-            if (row == null)
-                continue;
-            var here = (LineRow)row;
-            return _tables[u].FileName(here.File) + ":"
-                 + Standard.Text.FromInteger((long)here.Line);
-        }
-        return "";
+        var here = PositionAt(runtimeAddress);
+        if (!here.Known)
+            return "";
+        return here.File + ":" + Standard.Text.FromInteger((long)here.Line);
     }
 
     /// Where a stop happened, as a source line -- the whole point of the
     /// reading half being here.
     public String Describe(nuint runtimeAddress)
     {
-        nuint linked = ToLinked(runtimeAddress);
-        for (nuint u = 0u; u < _tables.Count; u++)
-        {
-            var row = _tables[u].RowCovering(linked);
-            if (row == null)
-                continue;
-            var here = (LineRow)row;
-            return _tables[u].FileName(here.File) + ":"
-                 + Standard.Text.FromInteger((long)here.Line);
-        }
-        return "0x" + FormatHexadecimal((ulong)linked) + " (no line)";
+        var here = PositionAt(runtimeAddress);
+        if (here.Known)
+            return here.File + ":" + Standard.Text.FromInteger((long)here.Line);
+        return "0x" + FormatHexadecimal((ulong)ToLinked(runtimeAddress))
+             + " (no line)";
     }
 
     /// The function an address fell in, or "".

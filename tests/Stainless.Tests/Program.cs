@@ -61,7 +61,9 @@ namespace Stainless.Tests;
 /// A case containing debug.txt is additionally built with debug information, and
 /// every line of that file must appear somewhere in the generated IR. Linking at
 /// all is most of the test: clang runs LLVM's verifier over the metadata, so a
-/// malformed description fails the build rather than producing a quiet lie.
+/// malformed description fails the build rather than producing a quiet lie. It
+/// pairs with assemble.txt to pin a description written for a target this
+/// machine is not.
 ///
 /// A case containing ir.txt has every line of that file matched against the
 /// generated IR, the same way debug.txt is but without asking for debug
@@ -464,6 +466,12 @@ internal static class Program
             return (false, "compilation failed:\n" + detail);
         }
 
+        // Before the assemble-only branch returns: such a case may carry a
+        // debug.txt, and checking it after that return would never run.
+        if (debug && MissingFromIr(debugPath, result.Ir) is { Count: > 0 } absentEarly)
+            return (false, "the debug metadata is missing:" + Environment.NewLine + "  " +
+                           string.Join(Environment.NewLine + "  ", absentEarly));
+
         // A case for a target this machine cannot link for stops at the object
         // file: clang reads the module, LLVM verifies it, and the back end
         // lowers it to that machine's instructions. ir.txt is then what says
@@ -483,10 +491,12 @@ internal static class Program
                                assembled.StandardError.TrimEnd());
 
             string pinned = Path.Combine(directory, "ir.txt");
-            if (!File.Exists(pinned))
-                return (false, "an assemble-only case needs ir.txt: nothing else looks at it");
+            if (!File.Exists(pinned) && !debug)
+                return (false, "an assemble-only case needs ir.txt or debug.txt: " +
+                               "nothing else looks at it");
 
-            if (MissingFromIr(pinned, result.Ir) is { Count: > 0 } absent)
+            if (File.Exists(pinned)
+                && MissingFromIr(pinned, result.Ir) is { Count: > 0 } absent)
                 return (false, "the generated IR is missing:" + Environment.NewLine + "  " +
                                string.Join(Environment.NewLine + "  ", absent));
 
@@ -501,10 +511,6 @@ internal static class Program
             if (built.Error is not null) return (false, built.Error);
             executable = built.Path!;
         }
-
-        if (debug && MissingFromIr(debugPath, result.Ir) is { Count: > 0 } absentDebug)
-            return (false, "the debug metadata is missing:" + Environment.NewLine + "  " +
-                           string.Join(Environment.NewLine + "  ", absentDebug));
 
         string irPath = Path.Combine(directory, "ir.txt");
         if (File.Exists(irPath) && MissingFromIr(irPath, result.Ir) is { Count: > 0 } absentIr)

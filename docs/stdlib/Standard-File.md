@@ -23,7 +23,7 @@ IOError AppendText(String path, String text)
 
 Adds `text` to the end, creating the file if it is not there.
 
-<sub>[stdlib/File.sl:171](../../stdlib/File.sl#L171)</sub>
+<sub>[stdlib/File.sl:205](../../stdlib/File.sl#L205)</sub>
 
 ### Copy *function*
 
@@ -34,7 +34,7 @@ IOError Copy(String from, String to)
 Copies a file. Reads it whole, so this is for ordinary files rather than
 for something that will not fit in memory.
 
-<sub>[stdlib/File.sl:187](../../stdlib/File.sl#L187)</sub>
+<sub>[stdlib/File.sl:221](../../stdlib/File.sl#L221)</sub>
 
 ### Delete *function*
 
@@ -75,7 +75,15 @@ Result<byte[], IOError> ReadAllBytes(String path)
 
 The whole file as bytes.
 
-<sub>[stdlib/File.sl:72](../../stdlib/File.sl#L72)</sub>
+**The reported size is a hint, not a promise.** A `/proc` or `/sys` file
+reports zero and then hands over kilobytes when read; a file another process
+is appending to reports less than it will give. So the size opens the array
+and reading to the end decides where it stops -- which is what "all bytes"
+has to mean for this to be usable on Linux at all. Trusting the size gave
+every `/proc/<pid>/maps` back as empty, which is a debugger that cannot find
+where a program was loaded.
+
+<sub>[stdlib/File.sl:87](../../stdlib/File.sl#L87)</sub>
 
 ### ReadAllLines *function*
 
@@ -86,7 +94,7 @@ Result<List<String>, IOError> ReadAllLines(String path)
 The file's lines, with either line ending accepted and a trailing newline
 producing no final empty line.
 
-<sub>[stdlib/File.sl:113](../../stdlib/File.sl#L113)</sub>
+<sub>[stdlib/File.sl:147](../../stdlib/File.sl#L147)</sub>
 
 ### ReadAllText *function*
 
@@ -96,7 +104,7 @@ Result<String, IOError> ReadAllText(String path)
 
 The whole file as text, read as UTF-8.
 
-<sub>[stdlib/File.sl:102](../../stdlib/File.sl#L102)</sub>
+<sub>[stdlib/File.sl:136](../../stdlib/File.sl#L136)</sub>
 
 ### Rename *function*
 
@@ -127,7 +135,7 @@ IOError WriteAllBytes(String path, byte[] data)
 
 Replaces the file with `data`, creating it if needed.
 
-<sub>[stdlib/File.sl:121](../../stdlib/File.sl#L121)</sub>
+<sub>[stdlib/File.sl:155](../../stdlib/File.sl#L155)</sub>
 
 ### WriteAllLines *function*
 
@@ -137,7 +145,7 @@ IOError WriteAllLines(String path, IReadOnlyList<String> lines)
 
 Writes the lines, each followed by a newline.
 
-<sub>[stdlib/File.sl:151](../../stdlib/File.sl#L151)</sub>
+<sub>[stdlib/File.sl:185](../../stdlib/File.sl#L185)</sub>
 
 ### WriteAllText *function*
 
@@ -147,5 +155,5 @@ IOError WriteAllText(String path, String text)
 
 Replaces the file with `text`, written as UTF-8.
 
-<sub>[stdlib/File.sl:136](../../stdlib/File.sl#L136)</sub>
+<sub>[stdlib/File.sl:170](../../stdlib/File.sl#L170)</sub>
 

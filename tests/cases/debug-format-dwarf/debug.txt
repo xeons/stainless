@@ -1,0 +1,7 @@
+# DWARF, because the target is Linux.
+#
+# The CodeView flag is not named here and cannot be: this file says what must be
+# present and has no way to say what must be absent. It does not need one -- the
+# compiler writes exactly one of the two unless '--debug-format both' asks for
+# both, so requiring this line is requiring the other's absence.
+!{i32 7, !"Dwarf Version", i32 5}

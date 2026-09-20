@@ -35,6 +35,9 @@ stainless restore              resolve dependencies and lock them
   -O<0-3>                optimization level (default -O2)
   -g, --debug            describe the program to a debugger
   --no-debug             do not, whatever the project file says
+  --debug-format <dwarf|codeview|both>
+                         which debugger's format. The default follows the
+                         target: CodeView on Windows, DWARF everywhere else
   -D, --define <name>    define a symbol for '#if' to test
   -l, --library <name>   link a library the linker finds by name
                          (a source file can name one itself, with
@@ -86,6 +89,36 @@ expected output and no `#if` in it. What does not travel is the *operating
 system*: a manifest, an icon and a dialog template are carried and readable
 elsewhere and inert, and SL0700 names them when a program has any. See
 [§2.3 of packages.md](packages.md#23-resources).
+
+## Which debugger reads it
+
+`-g` describes the program, and `--debug-format` says in whose format. There
+are two formats and they do not overlap: Windows debuggers — Visual Studio,
+WinDbg, the minidump reader, Windows Error Reporting — read **CodeView** and
+nothing else, and everything else reads **DWARF**.
+
+**The default follows the target, not the machine doing the building.** A
+Windows target gets CodeView, anything else gets DWARF, and a Linux binary
+cross-compiled from Windows gets DWARF like any other Linux binary. It asked
+which machine the *compiler* was running on until `--debug-format` existed,
+which put a CodeView flag on an ELF — a description in a format nothing on
+that platform reads.
+
+Naming a format turns `-g` on, because a format with no description in it is
+never what was meant.
+
+| | |
+|---|---|
+| `dwarf` | what `sldb` and the IDE's debugger read, and what `gdb`, `lldb` and `perf` read |
+| `codeview` | what the Windows tools read, in a `.pdb` beside the binary |
+| `both` | both, at roughly double the debug data |
+
+**`--debug-format dwarf` on Windows costs the `.pdb`**, so Visual Studio,
+WinDbg, minidumps and Windows Error Reporting all see an unsymbolised binary.
+`both` is there for when that matters. And a DWARF build on Windows describes
+the Stainless module alone: the C runtime's objects are compiled for the MSVC
+target and carry CodeView, so stepping into `sl_retain` there is not a thing
+that can be switched on — see [docs/dwarf.md](dwarf.md), which measured it.
 
 ## Diagnostics for a tool
 

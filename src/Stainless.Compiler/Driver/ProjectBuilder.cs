@@ -32,6 +32,14 @@ public sealed record BuildOverrides
     public string? IntermediateDirectory { get; init; }
     public int? OptimizationLevel { get; init; }
     public bool? Debug { get; init; }
+
+    /// <summary>
+    /// Which debugger's format, or null for what the target reads. No project
+    /// field backs this: the format is a property of the reader, not of the
+    /// program.
+    /// </summary>
+    public Emit.DebugFormat? DebugFormat { get; init; }
+
     public bool KeepIntermediates { get; init; }
     public bool EmitIrOnly { get; init; }
     public IReadOnlyList<string> Defines { get; init; } = [];
@@ -333,6 +341,10 @@ public sealed class ProjectBuilder(
         parts.AddRange([
             (overrides.OptimizationLevel ?? root.Optimize).ToString(),
             (overrides.Debug ?? root.Debug) ? "debug" : "",
+
+            // Two builds differing only in the format produce different
+            // objects and MUST NOT look alike to a stamp.
+            overrides.DebugFormat?.ToString() ?? "target",
             (overrides.CppAbi ?? (root.Abi is null ? null : ProjectFile.ParseAbi(root.Abi)))
                 ?.ToString() ?? "host",
             (overrides.SharedRuntime ?? (root.Runtime switch
@@ -551,7 +563,12 @@ public sealed class ProjectBuilder(
         bool isRoot = ReferenceEquals(project, root);
         if (isRoot) paths.AddRange(overrides.ExtraPaths);
 
-        var sources = Compilation.CollectSourceFiles(paths);
+        // Where this build puts what it writes, so that scanning `"."` does not
+        // feed the last build's output back in.
+        var sources = Compilation.CollectSourceFiles(paths, [
+            BuildDirectory(overrides),
+            IntermediateDirectory(overrides),
+        ]);
         if (sources.Errors.Count > 0)
         {
             _error = string.Join("\n", sources.Errors);
@@ -591,6 +608,7 @@ public sealed class ProjectBuilder(
             IntermediateDirectory = intermediate ?? IntermediateDirectory(overrides),
             OptimizationLevel = overrides.OptimizationLevel ?? root.Optimize,
             Debug = overrides.Debug ?? root.Debug,
+            DebugFormat = overrides.DebugFormat,
             KeepIntermediates = overrides.KeepIntermediates,
             EmitIrOnly = overrides.EmitIrOnly && isRoot,
             DocumentationPath = isRoot ? overrides.DocumentationPath : null,

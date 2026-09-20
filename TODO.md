@@ -41,6 +41,69 @@ at all: that prose lives in `///`, which is where it belongs.
 
 ## Next
 
+### Bring the comments to §4
+
+[docs/style.md](docs/style.md) §4 is new and most of the tree predates it.
+Three things it now forbids are everywhere:
+
+- **Narration.** Bold lead-ins, rhetorical questions, and paragraphs arguing a
+  case that the declaration under them already makes.
+- **History.** Comments describing a bug that was fixed, an earlier shape of
+  the code, or how long something took to find. That belongs in `git log`,
+  attached to the change, where nobody has to keep it true.
+- **Obligations in plain words.** "must be called from the thread that
+  attached" rather than "MUST be called from the thread that attached", which
+  is the difference between a remark and a rule.
+
+It wants reading rather than a script: deciding whether a comment earns its
+place is the part a regular expression cannot do, and §4.1's own rule is that
+a comment restating the code is worse than none. One module at a time, each
+its own commit, so that a rewrite never travels with a change of behaviour.
+
+`debug/`, `ide/src/Debug/`, `stdlib/Path.sl` and the `--debug-format` changes
+are written to it already.
+
+### What the debugger still wants from the compiler
+
+`debug/` reads what `-g` emits and five things it does not emit are now
+measured rather than guessed. [docs/dwarf.md](docs/dwarf.md) has the numbers.
+
+- **`DILexicalBlock`.** Every local sits in the function's scope, so a debugger
+  shows one that is not in scope yet, holding whatever its stack slot
+  contained. The pairing is with `PushScope`/`PopScopeWithoutRelease` in
+  `LlvmEmitter.Statements.cs`. Filtering by `DW_AT_decl_line` in the engine
+  would be guessing at something the compiler knows.
+- **An element type on `T[]` and `String`.** Both describe `__header` and
+  `length` and stop; elements begin at byte 24 and nothing says of what. The
+  fix is a third member typed as a `DW_TAG_array_type` with
+  `DISubrange(count: 0)` -- the flexible-array-member idiom, which names the
+  element and its stride without claiming a bound.
+- **A variant's tag as an enumeration.** Cases are numbered in declaration
+  order and DWARF gets a member only for the ones carrying a payload, so the
+  k-th member is not tag k and no consumer can map one to the other. An
+  anonymous `DW_TAG_enumeration_type` on the tag, one `DIEnumerator` per case
+  at its real value, names the case *and* says which overlapping member is
+  live.
+- **`isOptimized:` follows the real level.** It is hardcoded false and `-O2` is
+  the default, so it is a lie in the common case -- and a debugger reads it to
+  decide whether to warn that a value may be stale.
+- **`DW_AT_language` is `DW_LANG_C_plus_plus`.** We are not C++, and a consumer
+  that demangles by language does the wrong thing with a `_SL` name.
+
+Two more, neither in the emitter:
+
+- **The compile unit's main file is picked twice and differently.**
+  `Compilation.cs` uses the last unit, `DebugInfo.cs` says the first. Cosmetic,
+  and the kind of disagreement that later reads as a bug.
+- **`--debug-format dwarf` on Windows does not rebuild the C runtime.** Its
+  objects are compiled for the MSVC target and carry CodeView, so a DWARF PE
+  describes the Stainless module alone and stepping into `sl_retain` there is
+  not a thing that can be switched on.
+
+*Touches:* `src/Stainless.Compiler/Emit/DebugInfo.cs`,
+`src/Stainless.Compiler/Driver/Compilation.cs`. Each wants its own commit and a
+`debug.txt` case.
+
 ### `stainless format`
 
 [docs/style.md](docs/style.md) is the house style and there is nothing that

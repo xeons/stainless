@@ -19,7 +19,7 @@ platforms, and it says which rather than picking one.
 
 ## Contents
 
-**Functions** &nbsp; [DirectoryName](#directoryname-function) &middot; [Extension](#extension-function) &middot; [FileName](#filename-function) &middot; [IsRooted](#isrooted-function) &middot; [Join](#join-function) &middot; [Join](#join-function) &middot; [Split](#split-function) &middot; [WithExtension](#withextension-function) &middot; [WithoutExtension](#withoutextension-function)
+**Functions** &nbsp; [DirectoryName](#directoryname-function) &middot; [Extension](#extension-function) &middot; [FileName](#filename-function) &middot; [IsRooted](#isrooted-function) &middot; [Join](#join-function) &middot; [Join](#join-function) &middot; [SamePath](#samepath-function) &middot; [Split](#split-function) &middot; [WithExtension](#withextension-function) &middot; [WithoutExtension](#withoutextension-function)
 
 **Constants** &nbsp; [AltSeparator](#altseparator-constant) &middot; [Separator](#separator-constant)
 
@@ -93,6 +93,36 @@ Three parts joined left to right, with the same rule at each step.
 
 <sub>[stdlib/Path.sl:114](../../stdlib/Path.sl#L114)</sub>
 
+### SamePath *function*
+
+```
+bool SamePath(String left, String right)
+```
+
+Whether two paths name the same file, as text.
+
+**As text and never as files.** Nothing here opens anything, follows a
+link, or resolves `..` or a relative part against a working directory, so
+two spellings of one file that differ by more than this knows about are two
+different paths. What it does settle is the pair of differences that are
+not the caller's fault, because the platform itself created them: Windows
+accepts `/` and `\` interchangeably and matches names without regard to
+case, and Linux does neither.
+
+It exists because tools routinely hold one file under two spellings without
+anybody choosing to. A compiler that joins a directory to a file name
+writes `C:\src\obj/Text.sl`, with a backslash from one half and a slash
+from the other; a debugger then has to decide whether that is the file the
+editor has open, and `==` says no.
+
+Only ASCII letters are case-folded. Windows folds far more than that, using
+a table that has changed between releases, and a path comparison that is
+right for Turkish is not something to infer -- so this is the conservative
+answer, and two paths differing only in the case of a non-ASCII letter are
+reported as different on a system that would treat them as one.
+
+<sub>[stdlib/Path.sl:221](../../stdlib/Path.sl#L221)</sub>
+
 ### Split *function*
 
 ```
@@ -101,7 +131,7 @@ List<String> Split(String path)
 
 The parts, with the separators dropped and empty parts skipped.
 
-<sub>[stdlib/Path.sl:201](../../stdlib/Path.sl#L201)</sub>
+<sub>[stdlib/Path.sl:259](../../stdlib/Path.sl#L259)</sub>
 
 ### WithExtension *function*
 

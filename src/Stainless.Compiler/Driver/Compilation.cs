@@ -158,6 +158,16 @@ public sealed record CompilationOptions
     public bool Debug { get; init; }
 
     /// <summary>
+    /// Which debugger's format to describe it in, or null for what the target
+    /// reads: CodeView for Windows, DWARF everywhere else.
+    ///
+    /// The default follows the target and MUST NOT follow the host. A build
+    /// cross-compiled from Windows to Linux needs DWARF, which is what the
+    /// resulting ELF's own debuggers read.
+    /// </summary>
+    public Emit.DebugFormat? DebugFormat { get; init; }
+
+    /// <summary>
     /// Symbols <c>#if</c> tests, from <c>-D</c>. The compiler adds the ones that
     /// describe the target on top of these, so a program never has to be told
     /// what machine it is being built for.
@@ -393,8 +403,32 @@ public sealed class Compilation
     /// Where a file sits has no bearing on which module it joins; that is stated
     /// in the file. Folders are for people, not for the compiler.
     /// </summary>
-    public static SourceSet CollectSourceFiles(IEnumerable<string> paths)
+    /// <summary>
+    /// Every source a set of paths names, with the directories in
+    /// <paramref name="excluded"/> left out of any scan.
+    /// </summary>
+    /// <remarks>
+    /// <b>A project scans its own output.</b> With <c>sources</c> of
+    /// <c>"."</c> the build directory and the object directory are both under
+    /// the scan, and a <c>-g</c> build writes the standard library into
+    /// <c>obj/stdlib/</c> -- so the second build compiles a second copy of it
+    /// and every module of <c>Standard</c> is declared twice. The project says
+    /// where its output goes, so the caller that has a project passes those
+    /// directories here rather than anything guessing by name.
+    ///
+    /// A path named outright is still taken as given: a guess about what
+    /// belongs is what this excludes, and a path somebody typed is not a
+    /// guess.
+    /// </remarks>
+    public static SourceSet CollectSourceFiles(
+        IEnumerable<string> paths, IReadOnlyList<string>? excluded = null)
     {
+        var away = excluded is null
+            ? []
+            : excluded.Select(d => Path.GetFullPath(d).TrimEnd(
+                Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+                .ToList();
+
         var files = new List<string>();
         var nativeInputs = new List<string>();
         var resourceScripts = new List<string>();
@@ -421,6 +455,7 @@ public sealed class Compilation
                 var found = all
                     .Where(f => Path.GetExtension(f)
                         .Equals(SourceExtension, StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !IsUnder(f, away))
                     .ToList();
 
                 if (found.Count == 0)
@@ -435,14 +470,16 @@ public sealed class Compilation
                 // a scan is a guess about what belongs, and feeding a stale
                 // object file back into the next link is the way that guess
                 // goes wrong. A path somebody typed is not a guess.
-                nativeInputs.AddRange(all.Where(f => IsNativeInput(f) && !IsBuildArtifact(f)));
+                nativeInputs.AddRange(all.Where(
+                    f => IsNativeInput(f) && !IsBuildArtifact(f) && !IsUnder(f, away)));
 
                 // A resource script beside the sources belongs to the program
                 // for the same reason a C source does. What a previous build
                 // wrote is left out here too: the .res it produced sits under
                 // obj, and feeding that back in would embed every resource
                 // twice.
-                resourceScripts.AddRange(all.Where(f => IsResourceScript(f) && !IsBuildArtifact(f)));
+                resourceScripts.AddRange(all.Where(
+                    f => IsResourceScript(f) && !IsBuildArtifact(f) && !IsUnder(f, away)));
             }
             else if (File.Exists(path))
             {
@@ -464,14 +501,18 @@ public sealed class Compilation
     }
 
     /// <summary>
-    /// True for files a previous build produced. Without this, scanning a directory
-    /// would feed stale object files back into the next link.
-    ///
-    /// <c>build</c> is here alongside <c>obj</c> and <c>bin</c> because it is
-    /// where a project puts its output by default, and a project whose sources
-    /// are <c>"."</c> scans its own output otherwise -- so the second build of
-    /// a library would link the import library the first one wrote.
+    /// True for files a previous build produced, judged by the directory they
+    /// sit in.
     /// </summary>
+    /// <remarks>
+    /// A guess by name, and applied only to the files a scan picks up
+    /// <i>beside</i> the sources -- C, C++ and .rc. It MUST NOT be used on
+    /// <c>.sl</c> files: <c>ide/src/Build/</c> is a module of the IDE's, and a
+    /// rule that reads a directory called <c>Build</c> as output would drop
+    /// it. What a project's own output directories are is a thing the project
+    /// says, and <see cref="CollectSourceFiles"/> takes them as
+    /// <c>excluded</c>.
+    /// </remarks>
     private static bool IsBuildArtifact(string path)
     {
         string? directory = Path.GetFileName(Path.GetDirectoryName(path));
@@ -479,6 +520,20 @@ public sealed class Compilation
         return string.Equals(directory, "obj", StringComparison.OrdinalIgnoreCase)
             || string.Equals(directory, "bin", StringComparison.OrdinalIgnoreCase)
             || string.Equals(directory, "build", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Whether <paramref name="path"/> sits under any of them.</summary>
+    private static bool IsUnder(string path, IReadOnlyList<string> directories)
+    {
+        foreach (string directory in directories)
+        {
+            if (path.StartsWith(directory, StringComparison.OrdinalIgnoreCase)
+                && path.Length > directory.Length
+                && (path[directory.Length] == Path.DirectorySeparatorChar
+                    || path[directory.Length] == Path.AltDirectorySeparatorChar))
+                return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -735,7 +790,7 @@ public sealed class Compilation
             ? new DebugInfo(
                 units[^1].Span.File,
                 "Stainless " + typeof(Compilation).Assembly.GetName().Version?.ToString(3),
-                codeView: OperatingSystem.IsWindows())
+                options.DebugFormat ?? DefaultDebugFormat(target))
             : null;
 
         var emitter = new LlvmEmitter(
@@ -913,6 +968,10 @@ public sealed class Compilation
     /// walk. What no other target has is an operating system that reads them --
     /// see SL0700.
     /// </summary>
+    /// <summary>What a target's own debuggers read.</summary>
+    private static Emit.DebugFormat DefaultDebugFormat(Binding.TargetPlatform target) =>
+        target.IsWindows ? Emit.DebugFormat.CodeView : Emit.DebugFormat.Dwarf;
+
     private static IReadOnlyList<string> CompileResources(
         Toolchain toolchain, CompilationOptions options, Binding.TargetPlatform target,
         string intermediate, out string error)

@@ -316,6 +316,17 @@ public class Win32Target : ITarget
         return ok != 0;
     }
 
+    /// `DebugBreakProcess`, which puts an `int3` into the target.
+    ///
+    /// Not bound by the one-thread rule the rest of this class is; see
+    /// `ITarget.RequestBreak`.
+    public bool RequestBreak()
+    {
+        if (_process == null || !_running || _pending)
+            return false;
+        return DebugBreakProcess(_process) != 0;
+    }
+
     public void Terminate()
     {
         if (_process != null && _running)

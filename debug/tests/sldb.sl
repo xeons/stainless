@@ -394,24 +394,6 @@ String FormatAttributeValue(Attribute one)
 ///
 /// A unit points at its table with `DW_AT_stmt_list`, and several units can
 /// point at the same one, so this is per unit rather than per section.
-List<LineTable> ReadEveryLineTable(DwarfInfo info)
-{
-    var made = new List<LineTable>();
-    for (nuint i = 0u; i < info.Units.Count; i++)
-    {
-        var root = info.Units[i].Root;
-        if (root == null || !((Die)root).Has(AtStmtList))
-        {
-            made.Add(new LineTable());
-            continue;
-        }
-        nuint at = (nuint)((Die)root).NumberOf(AtStmtList, 0u);
-        made.Add(ReadLineTable(info.LineSection, at, info.LineStrSection,
-                               info.StrSection));
-    }
-    return made;
-}
-
 int PrintLines(String path)
 {
     var info = LoadDwarfOrComplain(path);
@@ -487,7 +469,7 @@ int PrintAddressOfLine(String path, String where)
         var table = tables[u];
         for (nuint f = 0u; f < table.Files.Count; f++)
         {
-            if (!PathEndsWith(table.Files[f], wantedFile))
+            if (!IsTheSameSourceFile(table.Files[f], wantedFile))
                 continue;
 
             nuint address = 0u;
@@ -593,35 +575,6 @@ ulong ParseNumber(String text)
     return answer;
 }
 
-/// Whether a full path ends with the piece a person typed.
-///
-/// A debugger is told `fixture.sl`, not
-/// `/home/brandon/spike/fixture.sl`, so matching is on the tail at a separator
-/// boundary -- and both separators count, because a line table written by a
-/// Windows cross-compiler mixes them inside one string.
-bool PathEndsWith(String full, String tail)
-{
-    nuint a = full.ByteLength();
-    nuint b = tail.ByteLength();
-    if (b == 0u || b > a)
-        return false;
-
-    for (nuint i = 0u; i < b; i++)
-    {
-        byte left = full.ByteAt(a - b + i);
-        byte right = tail.ByteAt(i);
-        if (left == (byte)92) left = (byte)47;
-        if (right == (byte)92) right = (byte)47;
-        if (left != right)
-            return false;
-    }
-
-    if (b == a)
-        return true;
-    byte before = full.ByteAt(a - b - 1u);
-    return before == (byte)47 || before == (byte)92;
-}
-
 /// Runs the program, stopping at a line if one was named.
 ///
 /// The whole reading half meets the process here: an address comes from the
@@ -667,7 +620,7 @@ int RunProgram(String path, String where)
     {
         nuint at = 0u;
         uint chosen = 0u;
-        if (!FindLineAddress(tables, where, &at, &chosen))
+        if (!FindAddressOfWhere(tables, where, &at, &chosen))
         {
             Console.WriteLine("sldb: no code for " + where);
             return 1;
@@ -733,8 +686,13 @@ int RunProgram(String path, String where)
 }
 
 /// The address a `file:line` names, in link-time terms.
-bool FindLineAddress(List<LineTable> tables, String where, nuint* address,
-                     uint* chosen)
+///
+/// The splitting is this tool's, because `file:line` is a thing a command line
+/// says and not a thing a debugger knows about; the lookup itself is
+/// `Debugger.FindLineAddress`, shared with the window so that the two cannot
+/// disagree about which file a path names.
+bool FindAddressOfWhere(List<LineTable> tables, String where, nuint* address,
+                        uint* chosen)
 {
     nuint colon = 0u;
     bool split = false;
@@ -753,18 +711,7 @@ bool FindLineAddress(List<LineTable> tables, String where, nuint* address,
     String file = where.Substring(0u, colon);
     uint line = (uint)ParseNumber(where.Substring(colon + 1u,
                                   where.ByteLength() - colon - 1u));
-
-    for (nuint u = 0u; u < tables.Count; u++)
-    {
-        for (nuint f = 0u; f < tables[u].Files.Count; f++)
-        {
-            if (!PathEndsWith(tables[u].Files[f], file))
-                continue;
-            if (tables[u].AddressForLine(f, line, address, chosen))
-                return true;
-        }
-    }
-    return false;
+    return FindLineAddress(tables, file, line, address, chosen);
 }
 
 /// Runs to a breakpoint and then does something there.
@@ -802,7 +749,7 @@ int RunToBreakpointThen(String path, String where, String what, int times)
 
     nuint at = 0u;
     uint chosen = 0u;
-    if (!FindLineAddress(tables, where, &at, &chosen))
+    if (!FindAddressOfWhere(tables, where, &at, &chosen))
     {
         Console.WriteLine("sldb: no code for " + where);
         return 1;
@@ -826,16 +773,29 @@ int RunToBreakpointThen(String path, String where, String what, int times)
 
     Console.WriteLine("stopped at " + engine.Describe(stop.Address));
 
-    if (what == "stack")
+    // **Through a snapshot, which is the point rather than a convenience.**
+    // The IDE cannot ask the engine anything -- the one thread allowed to read
+    // the process is busy -- so what a window shows is whatever `TakeSnapshot`
+    // put in a snapshot. Printing from the same object is what makes these
+    // commands a test of what the window will show, instead of a second route
+    // to the same data that can quietly diverge from it.
+    if (what == "stack" || what == "locals" || what == "snapshot")
     {
-        PrintCallStack(target, engine, stop.Thread);
-        engine.Terminate();
-        return 0;
-    }
+        var taken = TakeSnapshot(engine, target, stop);
+        switch (what)
+        {
+            case "stack":
+                PrintFrames(taken);
+                break;
 
-    if (what == "locals")
-    {
-        PrintLocals(target, engine, stop.Thread, stop.Address);
+            case "locals":
+                PrintValues(taken);
+                break;
+
+            default:
+                PrintWholeSnapshot(taken);
+                break;
+        }
         engine.Terminate();
         return 0;
     }
@@ -865,72 +825,89 @@ int RunToBreakpointThen(String path, String where, String what, int times)
     return 0;
 }
 
-/// Every parameter and local of the function stopped in.
-///
-/// **All of them, including ones not yet reached**, because the compiler emits
-/// no lexical blocks: a variable declared inside a loop belongs to the
-/// function's scope as far as DWARF is concerned, so it is in this list from
-/// the function's first line holding whatever its stack slot contained. Saying
-/// so is better than filtering by `DW_AT_decl_line`, which would be the
-/// debugger guessing at something the compiler knows and could emit.
-void PrintLocals(ITarget target, Engine engine, uint thread, nuint pc)
+/// The locals a snapshot holds, one to a line.
+void PrintValues(Snapshot taken)
 {
-    var found = engine.SubprogramAt(pc);
-    if (found == null)
+    if (taken.Locals.IsEmpty)
     {
-        Console.WriteLine("  (no function here)");
-        return;
-    }
-
-    var where = (Subprogram)found;
-    Registers frame;
-    frame.Pc = 0u;
-    frame.StackPointer = 0u;
-    frame.FramePointer = 0u;
-    if (!target.ReadRegisters(thread, &frame))
-    {
-        Console.WriteLine("  (registers unreadable)");
-        return;
-    }
-
-    var children = ChildrenOf(where.InUnit, where.Die);
-    bool any = false;
-    for (nuint i = 0u; i < children.Count; i++)
-    {
-        var one = children[i];
-        if (one.Tag != TagFormalParameter && one.Tag != TagVariable)
-            continue;
-
-        var described = DescribeType(where.InUnit, one);
-        String value = ReadValue(engine, target, where.InUnit, one,
-                                 where.Die, frame);
-        Console.WriteLine("  " + PadRight(one.Name, 12)
-                          + PadRight(described.Name, 24) + value
-                          + (one.Tag == TagFormalParameter ? "   (parameter)" : ""));
-        any = true;
-    }
-    if (!any)
         Console.WriteLine("  (none)");
+        return;
+    }
+
+    for (nuint i = 0u; i < taken.Locals.Count; i++)
+    {
+        var one = taken.Locals[i];
+        Console.WriteLine("  " + PadRight(one.Name, 12)
+                          + PadRight(one.TypeName, 24) + one.Value
+                          + (one.IsParameter ? "   (parameter)" : ""));
+    }
 }
 
-void PrintCallStack(ITarget target, Engine engine, uint thread)
+/// The call stack a snapshot holds.
+void PrintFrames(Snapshot taken)
 {
-    var frames = WalkStack(target, thread);
-    for (nuint i = 0u; i < frames.Count; i++)
+    for (nuint i = 0u; i < taken.Frames.Count; i++)
     {
-        var frame = frames[i];
-        String name = engine.FunctionAt(frame.Pc);
-
-        // **Every frame above the first is a return address**, which is the
-        // instruction *after* the call. Asked about that address directly, the
-        // line table answers the line the call returns to -- which is usually
-        // the same line and occasionally the next one. Stepping back one byte
-        // asks about the call itself.
-        nuint asking = i == 0u ? frame.Pc : frame.Pc - 1u;
-
+        var frame = taken.Frames[i];
         Console.WriteLine("  #" + FormatNumber(i) + "  "
-                          + PadRight(name.ByteLength() != 0u ? name : "??", 24)
-                          + engine.Describe(asking));
+                          + PadRight(frame.Function.ByteLength() != 0u
+                                     ? frame.Function : "??", 24)
+                          + FormatWhere(frame.File, frame.Line, frame.HasSource,
+                                        frame.Pc));
+    }
+}
+
+/// Everything in a snapshot, which is everything a window is given.
+///
+/// Its own command rather than a debugging aid: what this prints is exactly
+/// the surface the IDE's panes are built on, so a field that grows here and is
+/// never printed is a field no headless test covers.
+void PrintWholeSnapshot(Snapshot taken)
+{
+    Console.WriteLine("state    " + StateName(taken.State));
+    Console.WriteLine("stop     " + KindName(taken.Kind));
+    Console.WriteLine("where    " + FormatWhere(taken.File, taken.Line,
+                                                taken.HasSource, taken.Address));
+    Console.WriteLine("function " + (taken.Function.ByteLength() != 0u
+                                     ? taken.Function : "??"));
+    if (taken.Note.ByteLength() != 0u)
+        Console.WriteLine("note     " + taken.Note);
+
+    Console.WriteLine("frames");
+    PrintFrames(taken);
+    Console.WriteLine("locals");
+    PrintValues(taken);
+}
+
+/// A file and a line, or the address when there is no line.
+String FormatWhere(String file, uint line, bool known, nuint address)
+{
+    if (known)
+        return file + ":" + Standard.Text.FromInteger((long)line);
+    return "0x" + FormatHexadecimal((ulong)address) + " (no line)";
+}
+
+String StateName(RunState state)
+{
+    switch (state)
+    {
+        case RunState.Idle: return "idle";
+        case RunState.Running: return "running";
+        case RunState.Stopped: return "stopped";
+        default: return "ended";
+    }
+}
+
+String KindName(StopKind kind)
+{
+    switch (kind)
+    {
+        case StopKind.Breakpoint: return "breakpoint";
+        case StopKind.Step: return "step";
+        case StopKind.Fault: return "fault";
+        case StopKind.Exited: return "exited";
+        case StopKind.Paused: return "paused";
+        default: return "not running";
     }
 }
 
@@ -949,6 +926,7 @@ int PrintUsage()
     Console.WriteLine("  sldb step <binary> f:n [k] step k lines, into calls");
     Console.WriteLine("  sldb next <binary> f:n [k] the same, over them");
     Console.WriteLine("  sldb locals <binary> f:n   the variables in scope there");
+    Console.WriteLine("  sldb snapshot <binary> f:n everything a window is given");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
 }
@@ -988,6 +966,9 @@ int Main()
 
     if (args[0u] == "locals" && args.Length >= 3u)
         return RunToBreakpointThen(args[1u], args[2u], "locals", 0);
+
+    if (args[0u] == "snapshot" && args.Length >= 3u)
+        return RunToBreakpointThen(args[1u], args[2u], "snapshot", 0);
 
     if ((args[0u] == "step" || args[0u] == "next") && args.Length >= 3u)
     {

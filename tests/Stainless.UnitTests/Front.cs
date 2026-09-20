@@ -292,7 +292,8 @@ public static class Front
     /// The same, with debug information, which is what makes the metadata
     /// graph inspectable from a unit test.
     /// </summary>
-    public static string ModuleDebugIr(string body, CppAbi abi = CppAbi.Microsoft)
+    public static string ModuleDebugIr(string body, CppAbi abi = CppAbi.Microsoft,
+                                       DebugFormat format = DebugFormat.Dwarf)
     {
         var source = Text("module Test;\n" + body);
         var diagnostics = new DiagnosticBag();
@@ -307,7 +308,7 @@ public static class Front
                     .Where(d => d.Severity == Severity.Error)
                     .Select(d => d.Code + " " + d.Message)));
 
-        var debug = new DebugInfo(source, "Stainless tests", codeView: false);
+        var debug = new DebugInfo(source, "Stainless tests", format);
         return new LlvmEmitter(forSharedLibrary: true, abi: abi, debug: debug)
             .Emit(program)
             .ReplaceLineEndings("\n");
