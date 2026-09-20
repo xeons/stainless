@@ -617,6 +617,11 @@ not turned back into them.
 - **`ColorBox`, `ColorListBox`** (`colorbox.pas`) — owner-drawn lists.
 - **Owner drawing** across list, combo and button. Menus and toolbars have it
   now -- see *Chrome* below -- and the rest want the same two messages.
+- **`ToolTip`.** Win32 has `TOOLTIPS_CLASS` and GTK has
+  `gtk_widget_set_tooltip_text`, so it is a seam method and two
+  implementations rather than a control. The IDE wants one: a hover over a
+  local while the program is stopped says its value on the status line
+  because there is nowhere better to put it.
 - **Accelerators.** `&O` underlines a letter and works while a menu is open, and
   `IsDialogMessage` now handles Tab, the arrows, Enter and Escape; `Ctrl+O`
   still needs an accelerator table and `TranslateAccelerator` in the loop.
