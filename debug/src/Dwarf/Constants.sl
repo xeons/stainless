@@ -90,6 +90,7 @@ public const uint AtLinkageName     = 0x6Eu;
 public const uint AtStrOffsetsBase  = 0x72u;
 public const uint AtAddrBase        = 0x73u;
 public const uint AtRnglistsBase    = 0x74u;
+public const uint AtAlignment       = 0x88u;
 public const uint AtLoclistsBase    = 0x8Cu;
 
 // ------------------------------------------------------------------ forms
@@ -202,6 +203,7 @@ public String AttributeName(uint at)
         case AtStrOffsetsBase: return "DW_AT_str_offsets_base";
         case AtAddrBase: return "DW_AT_addr_base";
         case AtRnglistsBase: return "DW_AT_rnglists_base";
+        case AtAlignment: return "DW_AT_alignment";
         case AtLoclistsBase: return "DW_AT_loclists_base";
         default: return "DW_AT_?(0x" + FormatHexadecimal((ulong)at) + ")";
     }

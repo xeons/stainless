@@ -1248,11 +1248,18 @@ prints as the pointer it is, including after the object it named has died —
 `sl_weak_load` is what makes it read as null, and a debugger does not call it.
 
 **An array knows where its length is and not how long it is.** `T[]` is
-described as the object header, then the `length` field at offset 24. The
-elements live inline after that, and DWARF can only express an array whose bound
-it knows statically, so they are left undescribed rather than described wrongly.
-`String` is the same shape and the same story. Reading either means taking the
-address and the length and going from there.
+described as the object header, the `length` field at offset 24, and an
+`elements` member after it whose type is an array of the element type claiming
+no bound — C's flexible array member. DWARF can only express a bound it knows
+statically and this one is the word in front of the elements, so the count is
+written as zero: an unknown bound invites a debugger to print until something
+stops it, while zero says the count is not here. What the member does carry is
+the element type and its stride, which is what indexing one needs.
+
+`String` and `Utf16String` are the same shape, under the names
+`runtime/stainless.h` gives them: `byteLength` and `bytes`, `unitCount` and
+`units` (§2.6). They declare no fields here — the storage is the runtime's — so
+without this the description stopped at the header.
 
 **The standard library is written out to be stepped into.** It is compiled from
 inside the compiler's own assembly, so with `-g` the driver writes its sources to

@@ -501,6 +501,28 @@ public sealed class DebugInfo
                 $"offset: {(headerBytes + field.Offset) * 8})"));
         }
 
+        // The runtime owns `String` and `Utf16String`, so they declare no fields
+        // here and the description stopped at the header. Their units follow a
+        // length inline, exactly as an array's elements do (docs/abi.md §2.6) --
+        // so they are described that way too, and a debugger reading one needs
+        // no table of offsets it was told rather than shown.
+        if (TextShapeOf(type) is { } shape)
+        {
+            int word = TargetPlatform.Current.PointerWidth;
+
+            members.Add(Add(
+                $"!DIDerivedType(tag: DW_TAG_member, name: {Quote(shape.Length)}, {where}" +
+                $"baseType: !{Type(PrimitiveTypeSymbol.NUInt)}, size: {word * 8}, " +
+                $"offset: {headerBytes * 8})"));
+
+            members.Add(Add(
+                $"!DIDerivedType(tag: DW_TAG_member, name: {Quote(shape.Units)}, {where}" +
+                $"baseType: !{Unbounded(shape.Unit)}, size: 0, " +
+                $"offset: {(headerBytes + word) * 8})"));
+
+            size = headerBytes + word;
+        }
+
         Fill(id,
             $"!DICompositeType(tag: DW_TAG_structure_type, name: {Quote(type.QualifiedName)}, " +
             $"{where}size: {size * 8}, align: {type.Alignment * 8}, " +
@@ -508,6 +530,27 @@ public sealed class DebugInfo
 
         return id;
     }
+
+    /// <summary>
+    /// The two classes whose storage is the runtime's rather than this
+    /// compiler's: what their length word is called, what the units after it are
+    /// called, and what one unit is. Null for everything else.
+    /// </summary>
+    /// <remarks>
+    /// The names are the ones <c>runtime/stainless.h</c> gives them, because a
+    /// watch expression naming a field should reach the same field the C header
+    /// does. <c>StringBuilder</c> is intrinsic too and is not here: its bytes are
+    /// a separate allocation rather than inline, so it has nothing of this shape.
+    /// </remarks>
+    private static (string Length, string Units, TypeSymbol Unit)? TextShapeOf(
+        NamedTypeSymbol type) => type switch
+    {
+        ClassTypeSymbol { IsIntrinsic: true, SimpleName: "String" } =>
+            ("byteLength", "bytes", PrimitiveTypeSymbol.Byte),
+        ClassTypeSymbol { IsIntrinsic: true, SimpleName: "Utf16String" } =>
+            ("unitCount", "units", PrimitiveTypeSymbol.UShort),
+        _ => null,
+    };
 
     /// <summary>
     /// A variant: the tag, then every case's payload described at the one offset
@@ -555,27 +598,59 @@ public sealed class DebugInfo
     }
 
     /// <summary>
-    /// What a <c>T[]</c> points at: the object header, then the length.
+    /// What a <c>T[]</c> points at: the object header, the length, and the
+    /// elements inline after it.
     ///
-    /// The elements themselves live inline after it and are deliberately not
-    /// described. DWARF can only express an array whose bound it knows, and this
-    /// one's is the field beside it — so a debugger is told where the length is
-    /// and left to read the elements from the address.
+    /// The elements are a flexible array member, which is what C calls the same
+    /// shape: an array type claiming no bound, because the real bound is the
+    /// <c>length</c> word in front of it and DWARF has no way to point at a
+    /// sibling field. That is enough for a debugger to know the element type and
+    /// its stride, which is what an <c>a[i]</c> in a watch expression needs.
     /// </summary>
     private int ArrayBody(ArrayTypeSymbol array)
     {
-        int length = Add(
-            "!DIDerivedType(tag: DW_TAG_member, name: \"length\", " +
-            $"baseType: !{Type(PrimitiveTypeSymbol.NUInt)}, size: 64, offset: 192)");
+        int word = TargetPlatform.Current.PointerWidth;
 
         int header = Add(
             "!DIDerivedType(tag: DW_TAG_member, name: \"__header\", " +
-            $"baseType: !{Type(PrimitiveTypeSymbol.Byte)}, size: 192, offset: 0)");
+            $"baseType: !{Type(PrimitiveTypeSymbol.Byte)}, " +
+            $"size: {ClassTypeSymbol.HeaderSize * 8}, offset: 0)");
+
+        int length = Add(
+            "!DIDerivedType(tag: DW_TAG_member, name: \"length\", " +
+            $"baseType: !{Type(PrimitiveTypeSymbol.NUInt)}, size: {word * 8}, " +
+            $"offset: {ClassTypeSymbol.HeaderSize * 8})");
+
+        int elements = Add(
+            "!DIDerivedType(tag: DW_TAG_member, name: \"elements\", " +
+            $"baseType: !{Unbounded(array.Element)}, size: 0, " +
+            $"offset: {ArrayTypeSymbol.HeaderSize * 8})");
 
         return Add(
             $"!DICompositeType(tag: DW_TAG_structure_type, name: {Quote(array.Name)}, " +
-            $"size: {ArrayTypeSymbol.HeaderSize * 8}, align: 64, " +
-            $"elements: !{Tuple([header, length])})");
+            $"size: {ArrayTypeSymbol.HeaderSize * 8}, align: {word * 8}, " +
+            $"elements: !{Tuple([header, length, elements])})");
+    }
+
+    /// <summary>
+    /// An array of <paramref name="element"/> claiming no bound — C's flexible
+    /// array member, and the only shape DWARF has for a run of elements whose
+    /// count is not in the type.
+    /// </summary>
+    /// <remarks>
+    /// <c>count: 0</c> rather than an unknown bound, and the difference matters
+    /// to a debugger that knows nothing about this language: an unknown bound
+    /// invites it to print until something stops it, while zero says the count
+    /// is not here. The count is the word in front of the elements, and a reader
+    /// that wants the elements reads that first.
+    /// </remarks>
+    private int Unbounded(TypeSymbol element)
+    {
+        int range = Add("!DISubrange(count: 0)");
+        return Add(
+            $"!DICompositeType(tag: DW_TAG_array_type, baseType: !{Type(element)}, " +
+            $"size: 0, align: {element.Alignment * 8}, " +
+            $"elements: !{Add($"!{{!{range}}}")})");
     }
 
     private int DelegateType(DelegateTypeSymbol delegateType)
