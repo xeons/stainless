@@ -101,27 +101,20 @@ bool SamePath(String left, String right)
 
 Whether two paths name the same file, as text.
 
-**As text and never as files.** Nothing here opens anything, follows a
-link, or resolves `..` or a relative part against a working directory, so
-two spellings of one file that differ by more than this knows about are two
-different paths. What it does settle is the pair of differences that are
-not the caller's fault, because the platform itself created them: Windows
-accepts `/` and `\` interchangeably and matches names without regard to
-case, and Linux does neither.
+It settles the two differences the platform itself creates: Windows accepts
+`/` and `\` interchangeably and matches names without regard to case,
+Linux does neither. A compiler joining a directory to a file name writes
+`C:\src\obj/Text.sl`, one separator from each half, and `==` says that is
+a different file from `C:\src\obj\Text.sl`.
 
-It exists because tools routinely hold one file under two spellings without
-anybody choosing to. A compiler that joins a directory to a file name
-writes `C:\src\obj/Text.sl`, with a backslash from one half and a slash
-from the other; a debugger then has to decide whether that is the file the
-editor has open, and `==` says no.
+Nothing is opened, followed or resolved. A caller that needs `..` or a
+relative path resolved MUST do that first.
 
-Only ASCII letters are case-folded. Windows folds far more than that, using
-a table that has changed between releases, and a path comparison that is
-right for Turkish is not something to infer -- so this is the conservative
-answer, and two paths differing only in the case of a non-ASCII letter are
-reported as different on a system that would treat them as one.
+Only ASCII letters are case-folded. Windows folds more, with a table that
+has changed between releases, so two paths differing only in the case of a
+non-ASCII letter are reported as different.
 
-<sub>[stdlib/Path.sl:221](../../stdlib/Path.sl#L221)</sub>
+<sub>[stdlib/Path.sl:214](../../stdlib/Path.sl#L214)</sub>
 
 ### Split *function*
 
@@ -131,7 +124,7 @@ List<String> Split(String path)
 
 The parts, with the separators dropped and empty parts skipped.
 
-<sub>[stdlib/Path.sl:259](../../stdlib/Path.sl#L259)</sub>
+<sub>[stdlib/Path.sl:252](../../stdlib/Path.sl#L252)</sub>
 
 ### WithExtension *function*
 
