@@ -123,7 +123,6 @@ public sealed class Builtins
 
     public ClassTypeSymbol String { get; }
     public ClassTypeSymbol Utf16String { get; }
-    public ClassTypeSymbol StringBuilder { get; }
 
     public FunctionSymbol StringConcat { get; }
 
@@ -287,21 +286,8 @@ public sealed class Builtins
         };
         Utf16String.SetLayout(0, TargetPlatform.Current.PointerWidth);
 
-        // Mutable text. Its bytes are a separate growable allocation, so `new`
-        // goes through a runtime factory rather than the usual sl_alloc.
-        StringBuilder = new ClassTypeSymbol
-        {
-            SimpleName = "StringBuilder",
-            ModuleName = TextModuleName,
-            IsPublic = true,
-            IsIntrinsic = true,
-            RuntimeFactory = "sl_string_builder_new",
-        };
-        StringBuilder.SetLayout(0, TargetPlatform.Current.PointerWidth);
-
         Text.Types[String.SimpleName] = String;
         Text.Types[Utf16String.SimpleName] = Utf16String;
-        Text.Types[StringBuilder.SimpleName] = StringBuilder;
 
         // Declared after String, because its three fields are Strings. It is
         // never laid out -- nothing makes one -- but a size is what every other
@@ -338,41 +324,6 @@ public sealed class Builtins
         Method(Utf16String, "ToPointer", Char16Pointer, "sl_utf16_pointer");
         Method(Utf16String, "ToText", String, "sl_utf16_to_string");
 
-        // --- StringBuilder methods ------------------------------------------
-        Method(StringBuilder, "Append", PrimitiveTypeSymbol.Void, "sl_string_builder_append",
-            ("text", String));
-        Method(StringBuilder, "AppendLine", PrimitiveTypeSymbol.Void, "sl_string_builder_append_line",
-            ("text", String));
-        Method(StringBuilder, "AppendInteger", PrimitiveTypeSymbol.Void,
-            "sl_string_builder_append_integer", ("value", PrimitiveTypeSymbol.Long));
-        Method(StringBuilder, "AppendDouble", PrimitiveTypeSymbol.Void,
-            "sl_string_builder_append_double", ("value", PrimitiveTypeSymbol.Double));
-
-        // One byte. A scanner appending what it just looked at had to build a
-        // one-element array to call AppendBytes with. A whole code point was
-        // already `AppendCodePoint`, in Text.sl.
-        Method(StringBuilder, "AppendByte", PrimitiveTypeSymbol.Void,
-            "sl_string_builder_append_byte", ("value", PrimitiveTypeSymbol.Byte));
-        Method(StringBuilder, "ByteLength", PrimitiveTypeSymbol.NUInt,
-            "sl_string_builder_byte_length");
-        Property(StringBuilder, "IsEmpty", PrimitiveTypeSymbol.Bool, "sl_string_builder_is_empty");
-        Method(StringBuilder, "Clear", PrimitiveTypeSymbol.Void, "sl_string_builder_clear");
-
-        // Reading and editing what is already there. A builder's bytes move as
-        // it grows, so there is no pointer to hand out the way String has one:
-        // these go through the runtime one byte at a time, and the rest of the
-        // API is built on them in stdlib/Text.sl.
-        Method(StringBuilder, "ByteAt", PrimitiveTypeSymbol.Byte, "sl_string_builder_byte_at",
-            ("index", PrimitiveTypeSymbol.NUInt));
-        Method(StringBuilder, "SetByteAt", PrimitiveTypeSymbol.Void,
-            "sl_string_builder_set_byte_at",
-            ("index", PrimitiveTypeSymbol.NUInt), ("value", PrimitiveTypeSymbol.Byte));
-        Method(StringBuilder, "Insert", PrimitiveTypeSymbol.Void, "sl_string_builder_insert",
-            ("at", PrimitiveTypeSymbol.NUInt), ("text", String));
-        Method(StringBuilder, "Remove", PrimitiveTypeSymbol.Void, "sl_string_builder_remove",
-            ("at", PrimitiveTypeSymbol.NUInt), ("count", PrimitiveTypeSymbol.NUInt));
-
-        Method(StringBuilder, "ToText", String, "sl_string_builder_to_string");
 
         // --- Standard.Com ----------------------------------------------------
         //
@@ -562,7 +513,7 @@ public sealed class Builtins
     /// <para>
     /// This is what <c>docs/style.md</c> §2.1 was waiting for: <c>IsEmpty</c>
     /// was the one question in that section still answered by a method, and only
-    /// because <c>String</c> and <c>StringBuilder</c> get theirs from here.
+    /// because <c>String</c> gets its from here.
     /// </para>
     /// </remarks>
     private PropertySymbol Property(

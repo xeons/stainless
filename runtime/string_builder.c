@@ -22,12 +22,17 @@
  */
 
 /*
- * StringBuilder: the mutable counterpart to String.
+ * A growable byte buffer, for the runtime's own use.
  *
- * Unlike String, the bytes are a separate growable allocation, because the
- * object must outlive any particular capacity. Appending is amortised O(1),
- * which is the whole reason this type exists: building text by repeated String
- * concatenation is O(n^2).
+ * The bytes are a separate allocation from the object, because the object must
+ * outlive any particular capacity. Appending is amortised O(1), which is the
+ * whole reason the type exists: building text by repeated String concatenation
+ * is O(n^2).
+ *
+ * `Standard.Text.StringBuilder` is not this. That one is Stainless, in
+ * stdlib/Text.sl, and shares nothing with this but the idea. What is left here
+ * is what env.c and process.c build their text with -- an environment block and
+ * a Windows command line, both assembled before any Stainless code could run.
  */
 
 #include "stainless.h"
@@ -42,7 +47,7 @@ static void sl_string_builder_destroy(void *object)
 }
 
 const SlTypeInfo sl_string_builder_type_info = {
-    sizeof(SlStringBuilder), sl_string_builder_destroy, "Standard.Text.StringBuilder", NULL,
+    sizeof(SlStringBuilder), sl_string_builder_destroy, "sl_string_builder", NULL,
     0, NULL, 0, NULL
 };
 
@@ -88,99 +93,9 @@ void sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t b
     builder->length += byteLength;
 }
 
-void sl_string_builder_append(void *pointer, void *stringPointer)
-{
-    SlString *string = (SlString *)stringPointer;
-    if (string == NULL) return;
-    sl_string_builder_append_bytes(pointer, sl_string_data(string), string->byteLength);
-}
-
-void sl_string_builder_append_line(void *pointer, void *stringPointer)
-{
-    static const uint8_t newline = 0x0A;
-    sl_string_builder_append(pointer, stringPointer);
-    sl_string_builder_append_bytes(pointer, &newline, 1);
-}
-
-void sl_string_builder_append_integer(void *pointer, long long value)
-{
-    char buffer[32];
-    int  written = snprintf(buffer, sizeof buffer, "%lld", value);
-    if (written > 0) sl_string_builder_append_bytes(pointer, (const uint8_t *)buffer, (size_t)written);
-}
-
-void sl_string_builder_append_double(void *pointer, double value)
-{
-    char   buffer[64];
-    size_t written = sl_format_double(buffer, sizeof buffer, value);
-    if (written > 0) sl_string_builder_append_bytes(pointer, (const uint8_t *)buffer, written);
-}
-
 size_t sl_string_builder_byte_length(void *pointer)
 {
     return ((SlStringBuilder *)pointer)->length;
-}
-
-_Bool sl_string_builder_is_empty(void *pointer)
-{
-    return ((SlStringBuilder *)pointer)->length == 0;
-}
-
-void sl_string_builder_clear(void *pointer)
-{
-    ((SlStringBuilder *)pointer)->length = 0;
-}
-
-/*
- * Reading and editing what has been built.
- *
- * The bytes are a growable allocation that moves, so nothing here hands one
- * out: a `byte*` into a builder would dangle at the next append, which is the
- * one thing String's own pointer can never do. A call per byte is the price,
- * and a builder is not where a program spends its time reading.
- */
-uint8_t sl_string_builder_byte_at(void *pointer, size_t index)
-{
-    SlStringBuilder *builder = (SlStringBuilder *)pointer;
-    if (index >= builder->length) sl_array_bounds_fail(index, builder->length);
-    return builder->bytes[index];
-}
-
-void sl_string_builder_set_byte_at(void *pointer, size_t index, uint8_t value)
-{
-    SlStringBuilder *builder = (SlStringBuilder *)pointer;
-    if (index >= builder->length) sl_array_bounds_fail(index, builder->length);
-    builder->bytes[index] = value;
-}
-
-/* Inserting at the length is appending, which is why `at == length` is legal. */
-void sl_string_builder_insert(void *pointer, size_t at, void *stringPointer)
-{
-    SlStringBuilder *builder = (SlStringBuilder *)pointer;
-    SlString *string = (SlString *)stringPointer;
-
-    if (string == NULL || string->byteLength == 0) return;
-    if (at > builder->length) sl_array_bounds_fail(at, builder->length + 1);
-
-    size_t count = string->byteLength;
-    sl_string_builder_reserve(builder, count);
-
-    memmove(builder->bytes + at + count, builder->bytes + at, builder->length - at);
-    memcpy(builder->bytes + at, sl_string_data(string), count);
-    builder->length += count;
-}
-
-/* Removing more than is there removes to the end rather than failing. */
-void sl_string_builder_remove(void *pointer, size_t at, size_t count)
-{
-    SlStringBuilder *builder = (SlStringBuilder *)pointer;
-
-    if (at >= builder->length || count == 0) return;
-    if (count > builder->length - at) count = builder->length - at;
-
-    memmove(builder->bytes + at, builder->bytes + at + count,
-            builder->length - at - count);
-    builder->length -= count;
 }
 
 /* Snapshots the builder; the builder stays usable afterwards. */
@@ -189,14 +104,3 @@ void *sl_string_builder_to_string(void *pointer)
     SlStringBuilder *builder = (SlStringBuilder *)pointer;
     return sl_string_from_bytes(builder->bytes, builder->length);
 }
-
-/*
- * One byte, for a scanner appending what it just looked at. The builder holds
- * bytes, so nothing here validates: a caller writing half a character has
- * written half a character, exactly as sl_string_builder_append_bytes lets it.
- */
-void sl_string_builder_append_byte(void *pointer, uint8_t value)
-{
-    sl_string_builder_append_bytes(pointer, &value, 1);
-}
-

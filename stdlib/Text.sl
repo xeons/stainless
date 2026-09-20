@@ -47,6 +47,8 @@
 /// documented here.
 module Standard.Text;
 
+import Standard.Limits;
+
 /// The byte a search returns when it found nothing.
 ///
 /// Searches answer with a `long` rather than a `nuint` for exactly this: a
@@ -711,10 +713,252 @@ public using string = String;
 /// The declaration is the runtime's, as `String`'s is, and the appending is
 /// here. Call `ToString` for the text; the builder stays usable afterwards and
 /// the string does not change when it is appended to again.
+// What a growable buffer needs, and the two ways to stop.
+extern "C"
+{
+    void* realloc(void* block, nuint size);
+    void  free(void* block);
+    byte* memcpy(byte* to, byte* from, nuint count);
+    byte* memmove(byte* to, byte* from, nuint count);
+
+    void sl_fail(byte* message);
+    void sl_array_bounds_fail(nuint index, nuint length);
+}
+
 public class StringBuilder
 {
+    /// The bytes, their count, and the room there is for them.
+    ///
+    /// A growable allocation rather than a `byte[]`, because the buffer is
+    /// rewritten in place on every append and an array would be bounds-checked
+    /// per byte for no gain -- nothing outside this class can reach it.
+    byte* _bytes;
+    nuint _length;
+    nuint _capacity;
+
+    /// Nothing is allocated until the first append, so a builder that is made
+    /// and never used costs one object.
+    public StringBuilder()
+    {
+        _bytes = null;
+        _length = 0u;
+        _capacity = 0u;
+    }
+
+    /// The buffer is this object's, and ARC frees the object rather than what
+    /// it points at.
+    ~StringBuilder()
+    {
+        free((void*)_bytes);
+    }
+
+    // -------------------------------------------------------------- the room
+
+    /// Room for `extra` bytes beyond what is already here, doubling so that
+    /// appending stays amortised O(1) -- which is the whole reason this type
+    /// exists, since building text by repeated concatenation is O(n^2).
+    ///
+    /// Capacity outlives any particular length, so `Clear` keeps it.
+    void Reserve(nuint extra)
+    {
+        // Both of these would wrap rather than fail: the size wanted, and the
+        // doubling that reaches for it -- which on wrapping to zero would loop
+        // for ever rather than merely allocate too little.
+        if (extra > MaxNUInt - _length)
+            sl_fail("string is too large to build");
+
+        nuint wanted = _length + extra;
+        if (wanted <= _capacity)
+            return;
+
+        nuint capacity = _capacity == 0u ? 32u : _capacity;
+        while (capacity < wanted)
+        {
+            if (capacity > MaxNUInt / 2u)
+            {
+                capacity = wanted;
+                break;
+            }
+            capacity = capacity * 2u;
+        }
+
+        byte* bytes = (byte*)realloc((void*)_bytes, capacity);
+        if (bytes == null)
+            sl_fail("out of memory");
+
+        _bytes = bytes;
+        _capacity = capacity;
+    }
+
+    /// The one place bytes enter the buffer. Everything that appends comes
+    /// through here.
+    void Write(byte* data, nuint byteLength)
+    {
+        if (byteLength == 0u || data == null)
+            return;
+
+        this.Reserve(byteLength);
+        memcpy(_bytes + _length, data, byteLength);
+        _length = _length + byteLength;
+    }
 
     // ------------------------------------------------------------ appending
+
+    /// Text, as its bytes.
+    public void Append(String text)
+    {
+        this.Write(text.ToPointer(), text.ByteLength());
+    }
+
+    /// Text and a newline.
+    public void AppendLine(String text)
+    {
+        this.Append(text);
+        this.AppendByte(0x0A);
+    }
+
+    /// A signed integer in base ten.
+    ///
+    /// Written into the buffer a digit at a time rather than through
+    /// `FromInteger`, because a builder appending numbers in a loop should not
+    /// allocate a `String` per number.
+    public void AppendInteger(long value)
+    {
+        // The magnitude as unsigned, so that the smallest long -- whose
+        // magnitude is not itself a long -- survives being negated.
+        bool negative = value < 0;
+        ulong magnitude = negative ? (ulong)(-(value + 1)) + 1u : (ulong)value;
+
+        // Twenty digits is every ulong there is; the sign is written apart.
+        byte[20] digits;
+        nuint written = 0u;
+
+        if (magnitude == 0u)
+        {
+            digits[0] = 0x30;
+            written = 1u;
+        }
+        else
+        {
+            while (magnitude > 0u)
+            {
+                digits[written] = (byte)(0x30u + (uint)(magnitude % 10u));
+                written++;
+                magnitude = magnitude / 10u;
+            }
+        }
+
+        this.Reserve(written + 1u);
+        if (negative)
+        {
+            _bytes[_length] = 0x2D;
+            _length++;
+        }
+
+        // The digits came out least significant first.
+        for (nuint i = written; i > 0u; i--)
+        {
+            _bytes[_length] = digits[i - 1u];
+            _length++;
+        }
+    }
+
+    /// The shortest text that reads back as the same number.
+    ///
+    /// This one does allocate a `String` first: shortest round-trip formatting
+    /// is the runtime's, and there is nothing to gain by copying it here.
+    public void AppendDouble(double value)
+    {
+        this.Append(FromDouble(value));
+    }
+
+    /// One byte.
+    ///
+    /// The builder holds bytes, so nothing here validates: a caller writing
+    /// half a character has written half a character.
+    public void AppendByte(byte value)
+    {
+        this.Reserve(1u);
+        _bytes[_length] = value;
+        _length++;
+    }
+
+    // --------------------------------------------------------------- reading
+
+    /// How many bytes have been built. Not a character count.
+    public nuint ByteLength() => _length;
+
+    /// Whether nothing has been appended, or everything has been cleared.
+    public bool IsEmpty => _length == 0u;
+
+    /// Throws the length away and keeps the room, so a builder reused in a
+    /// loop allocates once.
+    public void Clear()
+    {
+        _length = 0u;
+    }
+
+    /// One byte by position.
+    ///
+    /// A call rather than a pointer, because the buffer moves as it grows and
+    /// a `byte*` into it would dangle at the next append -- the one thing
+    /// `String`'s own pointer can never do.
+    public byte ByteAt(nuint index)
+    {
+        if (index >= _length)
+            sl_array_bounds_fail(index, _length);
+        return _bytes[index];
+    }
+
+    /// Replaces one byte by position.
+    public void SetByteAt(nuint index, byte value)
+    {
+        if (index >= _length)
+            sl_array_bounds_fail(index, _length);
+        _bytes[index] = value;
+    }
+
+    // --------------------------------------------------------------- editing
+
+    /// Text put in at a position. Inserting at the length is appending, which
+    /// is why `at == ByteLength()` is allowed.
+    public void Insert(nuint at, String text)
+    {
+        if (text.ByteLength() == 0u)
+            return;
+        if (at > _length)
+            sl_array_bounds_fail(at, _length + 1u);
+
+        nuint count = text.ByteLength();
+        this.Reserve(count);
+
+        memmove(_bytes + at + count, _bytes + at, _length - at);
+        memcpy(_bytes + at, text.ToPointer(), count);
+        _length = _length + count;
+    }
+
+    /// Bytes taken out from a position. Removing more than is there removes to
+    /// the end rather than failing.
+    public void Remove(nuint at, nuint count)
+    {
+        if (at >= _length || count == 0u)
+            return;
+        if (count > _length - at)
+            count = _length - at;
+
+        memmove(_bytes + at, _bytes + at + count, _length - at - count);
+        _length = _length - count;
+    }
+
+    /// What has been built, as text. The builder stays usable afterwards and
+    /// the string does not change when it is appended to again.
+    public String ToText()
+    {
+        if (_length == 0u)
+            return "";
+        return FromBytes(_bytes, _length);
+    }
+
 
     /// One Unicode scalar, encoded as UTF-8.
     ///
@@ -785,10 +1029,9 @@ public class StringBuilder
     /// decides whether what comes out is text.
     public void AppendBytes(byte[] data)
     {
-        for (nuint i = 0; i < data.Length; i++)
-        {
-            this.Append(FromBytes(&data[i], 1));
-        }
+        if (data.Length == 0)
+            return;
+        this.Write(&data[0], data.Length);
     }
 
     /// `parts` with `separator` between them.

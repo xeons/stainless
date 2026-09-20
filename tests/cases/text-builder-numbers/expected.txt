@@ -1,0 +1,10 @@
+numbers agree
+grown 100
+head 012345678901
+tail 890123456789
+cleared empty
+reused after
+edited >hello<
+trimmed >h
+empty []
+empty length 0
