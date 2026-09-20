@@ -694,6 +694,13 @@ public class String
     }
 }
 
+/// `String`, spelled the way the primitives are.
+///
+/// `int` and `double` are keywords and lowercase, and a type that is just as
+/// built in has no reason to look different. It is an alias and not a second
+/// type, so a diagnostic says `String` whichever one was written.
+public using string = String;
+
 /// Text assembled a piece at a time.
 ///
 /// Reach for this where a loop would otherwise write `text = text + more`: a

@@ -1,0 +1,8 @@
+hello, world
+world
+5
+WORLD
+a person called ada
+grace
+edsger
+1 = one

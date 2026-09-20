@@ -17,7 +17,17 @@ String subject  = "Stainless";
 
 String message = greeting + ", " + subject + "!";
 bool   matched = message == "Hello, Stainless!";   // compares by value, not identity
+
+string same = message;              // `string` is the same type
 ```
+
+**`string` is `String`.** `Standard.Text` declares it as an alias
+([§1.5](01-modules.md#15-aliases)) and that module is imported into every file
+([§1.7](01-modules.md#17-what-is-automatic)), so either spelling works anywhere
+with nothing to import. An alias and not a keyword, which is what makes it free:
+there is one type, no conversion, and a diagnostic names `String` whichever the
+source wrote. The lowercase spelling is there because `int` and `double` have it
+and a type just as built in has no reason to look different.
 
 ## 3.1 Representation
 
