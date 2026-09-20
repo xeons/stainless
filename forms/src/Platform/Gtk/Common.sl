@@ -54,6 +54,7 @@ module Forms.Platform.Gtk;
 
 import Standard.Collections;
 import Standard.Text;
+import Standard.Console;
 import Forms.Drawing;
 import Forms.Platform;
 #if UNIX
@@ -415,6 +416,10 @@ public class GtkPeer : IControlPeer
     /// top-level window never is.
     protected GtkWidget* placedIn;
 
+    /// Whether `placedIn` is a `GtkLayout` rather than a `GtkFixed`. The two
+    /// take different calls to move a child and each rejects the other's.
+    protected bool placedInLayout;
+
     protected weak IControlNotify? target;
 
     /// Where the control layer last put it. Kept because GTK has no
@@ -444,6 +449,7 @@ public class GtkPeer : IControlPeer
         widget = (GtkWidget*)g_object_ref_sink((gpointer)made);
         inner = made;
         placedIn = null;
+        placedInLayout = false;
         target = owner;
         bounds = Area(0, 0, 0, 0);
         styling = null;
@@ -496,7 +502,11 @@ public class GtkPeer : IControlPeer
 
     /// Remembers the container that placed this peer. Called by
     /// `GtkContainerPeer.AddChild` and by nothing else.
-    public void PlacedInto(GtkWidget* fixed) => placedIn = fixed;
+    public void PlacedInto(GtkWidget* container, bool isLayout)
+    {
+        placedIn = container;
+        placedInLayout = isLayout;
+    }
 
     // ---------------------------------------------------------- the input
 
@@ -739,18 +749,20 @@ public class GtkPeer : IControlPeer
 
     // ------------------------------------------------------- IControlPeer
 
-    /// Moves and sizes the widget within the `GtkFixed` its parent gave it.
+    /// Moves and sizes the widget within the container its parent gave it.
     ///
-    /// **A size request is a minimum, not a size.** A widget asked for less
-    /// than it insists on keeps its minimum and overflows what the layout
-    /// allowed. GTK's minimums are larger than Win32's for the same controls:
-    /// a combo box is around 34 pixels tall where a program asks for 24.
+    /// **A size request is a minimum, and a container is free to ignore it.**
+    /// Asked for less than it insists on, a widget keeps its own minimum and
+    /// overflows what the layout allowed -- GTK's minimums are larger than
+    /// Win32's for the same controls, so a combo box given 24 pixels draws 34
+    /// and hangs out of the band holding it.
     ///
-    /// So what is reported back is the size the widget will really occupy,
-    /// rather than the size it was asked for. A layout that reads
-    /// `Control.Height` then sees the truth and can make room. Nothing else
-    /// can tell it: a child's allocation is decided by this call, so GTK
-    /// raises no event of its own.
+    /// So the rectangle is *allocated* rather than requested, which is what
+    /// the LCL's GTK3 widgetset does in `TGtk3Widget.SetBounds`: a library
+    /// that has already computed a layout must not leave the last word to a
+    /// container. The preferred size is asked for first because GTK 3 asserts
+    /// on an allocation to a widget it has not measured -- the LCL's comment
+    /// there reads "fixes gtk3 assertion".
     public virtual void SetBounds(FRect wanted)
     {
         bool moved = wanted.X != bounds.X || wanted.Y != bounds.Y;
@@ -759,7 +771,10 @@ public class GtkPeer : IControlPeer
 
         if (placedIn != null)
         {
-            gtk_fixed_move(placedIn, widget, wanted.X, wanted.Y);
+            if (placedInLayout)
+                gtk_layout_move(placedIn, widget, wanted.X, wanted.Y);
+            else
+                gtk_fixed_move(placedIn, widget, wanted.X, wanted.Y);
         }
 
         // Clamped, because a layout can compute a negative height for a
@@ -767,9 +782,10 @@ public class GtkPeer : IControlPeer
         // GTK answers a negative size request with a `g_critical` and keeps
         // the old size, which is a warning on the terminal and a control in
         // the wrong place.
-        gtk_widget_set_size_request(widget,
-            wanted.Width < 0 ? 0 : wanted.Width,
-            wanted.Height < 0 ? 0 : wanted.Height);
+        int wide = wanted.Width < 0 ? 0 : wanted.Width;
+        int high = wanted.Height < 0 ? 0 : wanted.Height;
+
+        gtk_widget_set_size_request(widget, wide, high);
 
         // Reported from here rather than from a `size-allocate` handler,
         // because for a child the layout is what decided and GTK would only
@@ -781,24 +797,29 @@ public class GtkPeer : IControlPeer
             if (moved)
                 ((IControlNotify)owner).OnPlatformMoved(At(wanted.X, wanted.Y));
             if (sized)
-                ((IControlNotify)owner).OnPlatformResized(Insisted(wanted));
+                ((IControlNotify)owner).OnPlatformResized(Insisted(wide, high));
         }
     }
 
-    /// The size the widget will really occupy: what was asked for, raised to
+    /// The size the widget will really occupy: what it was given, raised to
     /// whatever it refuses to go below.
-    FSize Insisted(FRect wanted)
+    ///
+    /// A container is free to give a child its own minimum instead of the
+    /// size requested, so a layout reading `Control.Height` afterwards MUST be
+    /// told what the widget settled on. Nothing else can tell it: a child's
+    /// allocation is decided by the call above, so GTK raises no event.
+    FSize Insisted(int wide, int high)
     {
-        gint leastHigh = 0;
-        gint wantsHigh = 0;
-        gtk_widget_get_preferred_height(widget, &leastHigh, &wantsHigh);
-
         gint leastWide = 0;
         gint wantsWide = 0;
         gtk_widget_get_preferred_width(widget, &leastWide, &wantsWide);
 
-        return Extent(wanted.Width < leastWide ? leastWide : wanted.Width,
-                      wanted.Height < leastHigh ? leastHigh : wanted.Height);
+        gint leastHigh = 0;
+        gint wantsHigh = 0;
+        gtk_widget_get_preferred_height(widget, &leastHigh, &wantsHigh);
+
+        return Extent(wide < leastWide ? leastWide : wide,
+                      high < leastHigh ? leastHigh : high);
     }
 
     public virtual void SetVisible(bool visible)
@@ -1039,6 +1060,10 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
 {
     protected GtkWidget* content;
 
+    /// Whether `content` is a `GtkLayout`. A form's client area is one; every
+    /// other container here is a `GtkFixed`. See `GtkWindowPeer`.
+    protected bool contentIsLayout;
+
     /// The first radio button put in this container, which every later one
     /// joins. Null until there is one, and a container with no radios never
     /// has one.
@@ -1096,8 +1121,11 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     public virtual void AddChild(IControlPeer child)
     {
         var peer = (GtkPeer)child;
-        gtk_fixed_put(content, peer.Widget, 0, 0);
-        peer.PlacedInto(content);
+        if (contentIsLayout)
+            gtk_layout_put(content, peer.Widget, 0, 0);
+        else
+            gtk_fixed_put(content, peer.Widget, 0, 0);
+        peer.PlacedInto(content, contentIsLayout);
 
         // **Radio buttons are grouped by their container**, which is where the
         // seam leaves the question: `CreateCheck(owner, parent, radio)` says a
@@ -1131,7 +1159,7 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
     {
         var peer = (GtkPeer)child;
         gtk_container_remove(content, peer.Widget);
-        peer.PlacedInto(null);
+        peer.PlacedInto(null, false);
     }
 }
 

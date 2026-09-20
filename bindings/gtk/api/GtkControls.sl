@@ -146,6 +146,14 @@ public extern "C"
     /// a button, a toggle and a separator alike.
     void gtk_toolbar_insert(GtkWidget* toolbar, GtkWidget* item, gint position);
     void gtk_toolbar_set_style(GtkWidget* toolbar, gint style);
+
+    /// Whether items that do not fit move into a drop-down at the end.
+    ///
+    /// **It decides how small the toolbar may be made.** With it off the
+    /// toolbar insists on room for every item -- 880 pixels for seven of them
+    /// -- and a container that gave it less is pushed wider instead of the
+    /// toolbar being made smaller.
+    void gtk_toolbar_set_show_arrow(GtkWidget* toolbar, int show);
     gint gtk_toolbar_get_n_items(GtkWidget* toolbar);
 
     /// **Borrowed.**

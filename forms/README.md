@@ -704,6 +704,24 @@ What the exercise cost, and it is worth knowing before the next backend:
   controls, and a layout reading `Control.Height` has to see the truth to make
   room. A control whose *content* wants more room still overflows rather than
   clipping; a label ellipsizes to cover it.
+- **A form's client area is a `GtkLayout` inside a `GtkScrolledWindow`**, and
+  that is the LCL's arrangement rather than an invention: `TGtk3Window`'s
+  `CreateWidget` builds a box, a scrolled window with both policies `NEVER`,
+  and a `GtkLayout` with a window of its own.
+
+  It is not decoration. A `GtkFixed` reports a minimum as wide as the furthest
+  right edge of any child, so with children placed absolutely a control that
+  insists on two pixels more than the layout gave it makes the *window's*
+  minimum wider than the window. A window manager obliges, the form lays out
+  against the new width, the control lands further right, and round it goes --
+  two pixels a turn, several turns a second, until the window is twenty
+  thousand pixels wide and nothing has had time to paint. A `GtkLayout` asks
+  for no room of its own, so where its children sit reaches nothing. Geometry
+  hints do not help: GTK takes the larger of the hint and what the contents
+  ask for.
+
+  Notebook pages and custom controls stay `GtkFixed` with
+  `set_has_window(True)`, which is what the LCL uses for those.
 - **A draw handler must clip to its own widget.** GTK hands one a context
   clipped to whatever region is being redrawn, which is an ancestor's area:
   an editor 755x396 was given `-247,-134 1002x530`. Most drawing is bounded by
@@ -844,6 +862,14 @@ here at all. Where one is a backend's rather than the library's, it says so.
   button with more text than room does not. What the layout is told is the
   size the widget settled on, so a container can make room for it -- `CoolBar`
   does, which is why a combo box in a band no longer hangs out of it.
+- **A window manager is part of the test.** Under `Xvfb` there is none, so
+  nothing decorates, nothing takes the focus from one, and nothing obliges a
+  window that asks to grow. Every one of those hides a real fault: the runaway
+  above was invisible headless and made the IDE unusable on a desktop. `marco`
+  -- MATE's, which is installed on the Linux box -- runs on a spare display
+  with `--no-composite`, and `xwininfo -root -children` reads the window's size
+  back so that a fault which is a *ratchet* rather than a snapshot can be seen
+  at all.
 - **Text measurement is the platform's, and a layout pass has no surface.**
   `CoolBar` estimated a caption at seven pixels a byte, which is near enough
   for the Windows UI font and too narrow for GTK's -- the band's control was

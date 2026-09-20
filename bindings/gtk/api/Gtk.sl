@@ -451,6 +451,17 @@ public extern "C"
     /// wants.
     GtkWidget* gtk_scrolled_window_new(gpointer horizontal, gpointer vertical);
 
+    /// A container that places children at coordinates, like `GtkFixed`, and
+    /// unlike it asks for **no room of its own**: its extent is
+    /// `gtk_layout_set_size` and nothing else, so where its children sit does
+    /// not reach whatever holds it.
+    ///
+    /// The two arguments are the adjustments it scrolls by, and null lets it
+    /// make its own.
+    GtkWidget* gtk_layout_new(gpointer horizontal, gpointer vertical);
+    void gtk_layout_put(GtkWidget* layout, GtkWidget* child, gint x, gint y);
+    void gtk_layout_move(GtkWidget* layout, GtkWidget* child, gint x, gint y);
+
     void gtk_scrolled_window_set_policy(GtkWidget* scrolled, gint horizontal, gint vertical);
 }
 

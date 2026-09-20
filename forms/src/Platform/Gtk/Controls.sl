@@ -59,6 +59,11 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
     /// The vertical box between the window and its client area, which exists
     /// only so that a menu bar has somewhere to go.
     GtkWidget* _stack;
+
+    /// Between the box and the client area. It scrolls nothing and shows no
+    /// scrollbars; it is there so that the client area's size request cannot
+    /// reach the window. See where it is made.
+    GtkWidget* _scroller;
     /// The menu bar currently in that box, so that replacing one can take the
     /// old one out first.
     GtkWidget* _bar;
@@ -90,19 +95,49 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
 
     public GtkWindowPeer(IWindowNotify owner, WindowBorder border)
     {
-        base(gtk_window_new(GTK_WINDOW_TOPLEVEL), (IControlNotify)owner, gtk_fixed_new());
+        base(gtk_window_new(GTK_WINDOW_TOPLEVEL), (IControlNotify)owner,
+             gtk_layout_new(null, null));
         window = owner;
         _bar = null;
+        _scroller = null;
         _modal = false;
         _laidOut = false;
         _pending = false;
         _skipped = 0;
         _requested = Area(0, 0, 0, 0);
 
+        // **A window's size MUST NOT be decided by what is in it**, and this
+        // is the arrangement the LCL's GTK3 widgetset uses for a form:
+        // `TGtk3Window.CreateWidget` builds a box, a `GtkScrolledWindow` with
+        // both policies `NEVER`, and a `GtkLayout` with a window of its own.
+        //
+        // A `GtkFixed` reports a minimum as wide as the furthest right edge of
+        // any child. This library places children absolutely, so a control
+        // insisting on a couple of pixels more than the layout gave it makes
+        // the window's minimum wider than the window: a window manager
+        // obliges, the form lays out against the new width, the control lands
+        // further right, and round it goes -- two pixels a turn, several turns
+        // a second, until the window is twenty thousand pixels wide. Under
+        // `Xvfb` there is no window manager to oblige, which is why every
+        // headless run looked right.
+        //
+        // A `GtkLayout` asks for no room of its own, so where its children sit
+        // reaches nothing. Geometry hints do not do this: GTK takes the larger
+        // of the hint and what the contents ask for.
+        contentIsLayout = true;
+        gtk_widget_set_has_window(content, 1);
+
         _stack = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         gtk_container_add(widget, _stack);
-        gtk_box_pack_start(_stack, content, 1, 1, 0);
+
+        _scroller = gtk_scrolled_window_new(null, null);
+        gtk_scrolled_window_set_policy(_scroller, GTK_POLICY_NEVER,
+                                       GTK_POLICY_NEVER);
+        gtk_container_add(_scroller, content);
+
+        gtk_box_pack_end(_stack, _scroller, 1, 1, 0);
         gtk_widget_show(_stack);
+        gtk_widget_show(_scroller);
         gtk_widget_show(content);
         ReportPaints();
 
@@ -1329,7 +1364,7 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
         {
             var peer = (GtkPeer)held;
             gtk_fixed_put(page, peer.Widget, 0, 0);
-            peer.PlacedInto(page);
+            peer.PlacedInto(page, false);
             _waiting = null;
         }
         return index;
@@ -1555,6 +1590,12 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         _pictures = null;
         _captions = false;
         gtk_toolbar_set_style(widget, GTK_TOOLBAR_ICONS);
+
+        // Items that do not fit go into a drop-down at the end, which is what
+        // lets the toolbar be made smaller than the sum of its items. Without
+        // it the toolbar insists on room for all of them and whatever holds it
+        // is pushed wider.
+        gtk_toolbar_set_show_arrow(widget, 1);
     }
 
     public int AddButton(String text, int image, ToolButtonKind kind)

@@ -264,9 +264,19 @@ broadwayd :5 &                                  # GTK 3 in a browser, no X at al
 GDK_BACKEND=broadway BROADWAY_DISPLAY=:5 ./Program
 ```
 
-Xvfb has no window manager, so nothing is decorated and nothing gets focus from
-one — a control can still be given the focus programmatically, but a test that
-expects the window manager's behaviour will not see it.
+Xvfb has no window manager, so nothing is decorated, nothing gets focus from
+one, and **nothing obliges a window that asks to grow**. That last one hides
+real faults: a window whose minimum size exceeds its size grows without bound
+on a desktop and sits still here. `marco` is installed and is MATE's window
+manager, so a run that needs one gets one:
+
+```sh
+setsid -f marco --display=:9 --no-composite     # compositing captures black
+DISPLAY=:9 xwininfo -root -children             # read the window's size back
+```
+
+Read the size twice, a few seconds apart. A fault that is a ratchet rather than
+a snapshot is invisible in a screenshot and obvious in two numbers.
 
 **Watch stderr.** GTK reports a bad signal name or a failed cast there and
 nowhere else, so a clean stderr is most of what a headless run is worth. And a
