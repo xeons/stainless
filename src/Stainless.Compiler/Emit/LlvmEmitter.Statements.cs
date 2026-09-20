@@ -17,6 +17,7 @@
 using System.Globalization;
 using System.Text;
 using Stainless.Binding;
+using Stainless.Source;
 using Stainless.Syntax;
 
 namespace Stainless.Emit;
@@ -61,10 +62,35 @@ public sealed partial class LlvmEmitter
 
     private void EmitBlock(BoundBlock block)
     {
+        int? enclosing = OpenDebugScope(block.Span);
+
         PushScope();
         foreach (var statement in block.Statements) EmitStatement(statement);
         if (!_blockTerminated) ReleaseCurrentScope();
         PopScopeWithoutRelease();
+
+        _debugScope = enclosing;
+    }
+
+    /// <summary>
+    /// Describes a <c>{ }</c> as a scope of its own, and answers the scope it
+    /// is inside so a caller can put that back.
+    /// </summary>
+    /// <remarks>
+    /// The scope is a field rather than a stack because a block restores what
+    /// it found: the nesting is the call stack's already, and a second one
+    /// beside it is a second thing to keep in step.
+    /// </remarks>
+    private int? OpenDebugScope(SourceSpan span)
+    {
+        int? enclosing = _debugScope;
+        bool body = _atFunctionBody;
+        _atFunctionBody = false;
+
+        if (!body && debug is not null && _debugScope is { } outer)
+            _debugScope = debug.LexicalBlock(span, outer);
+
+        return enclosing;
     }
 
     private void EmitLocalDeclaration(BoundLocalDeclaration declaration)
@@ -305,6 +331,10 @@ public sealed partial class LlvmEmitter
 
     private void EmitFor(BoundFor statement)
     {
+        // The loop is a scope of its own, because `for (int i = ...)` declares
+        // `i` in it: a debugger stopped after the loop MUST NOT be shown one.
+        int? enclosing = OpenDebugScope(statement.Span);
+
         PushScope();
         if (statement.Initializer is not null) EmitStatement(statement.Initializer);
 
@@ -345,6 +375,8 @@ public sealed partial class LlvmEmitter
         Label(endLabel);
         if (!_blockTerminated) ReleaseCurrentScope();
         PopScopeWithoutRelease();
+
+        _debugScope = enclosing;
     }
 
     /// <summary>

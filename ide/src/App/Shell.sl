@@ -3026,12 +3026,7 @@ public class Shell : Form
         }
     }
 
-    /// The watches a stop answered.
-    ///
-    /// A watch that could not be read keeps its row and shows why. Half of
-    /// them are out of scope at any moment, and a pane that dropped those
-    /// would lie about how many watches there are -- and would move the rows
-    /// under the pointer every time the program stepped into another function.
+    /// The watches a stop answered, one row each. See `WatchLine`.
     void ShowWatches(Snapshot taken)
     {
         _watchList.Clear();
@@ -3045,11 +3040,8 @@ public class Shell : Form
     }
 
     /// The watches with no session behind them: the expressions, and nothing
-    /// to say about any of them.
-    ///
-    /// Shown rather than left empty so that a watch added before the program
-    /// starts is visibly there, and so that the list does not appear to have
-    /// been forgotten when the program exits.
+    /// to say about any of them. A watch added before the program starts is
+    /// visibly there, and the list survives the program exiting.
     void ShowWatchNames()
     {
         _watchList.Clear();
@@ -3064,15 +3056,11 @@ public class Shell : Form
 
     /// Adds a watch, and answers why it was not added.
     ///
-    /// **It says rather than shows.** Telling the caller is what lets the
-    /// self test ask whether something that is not an expression was kept
-    /// without a modal box appearing on the screen -- which is a test that
-    /// stops the suite and waits for a person.
+    /// It MUST answer rather than show: a dialog raised from here reaches the
+    /// self test, which then waits for somebody to press OK.
     ///
     /// The expression is checked here as well as by the session, because a
-    /// session may not exist yet, and because a typing mistake caught beside
-    /// the box it was typed in is the only place it is still obvious what was
-    /// meant.
+    /// session may not exist yet.
     String AddWatch(String expression)
     {
         String wanted = expression.Trim();

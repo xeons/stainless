@@ -293,7 +293,8 @@ public static class Front
     /// graph inspectable from a unit test.
     /// </summary>
     public static string ModuleDebugIr(string body, CppAbi abi = CppAbi.Microsoft,
-                                       DebugFormat format = DebugFormat.Dwarf)
+                                       DebugFormat format = DebugFormat.Dwarf,
+                                       bool optimized = false)
     {
         var source = Text("module Test;\n" + body);
         var diagnostics = new DiagnosticBag();
@@ -308,7 +309,7 @@ public static class Front
                     .Where(d => d.Severity == Severity.Error)
                     .Select(d => d.Code + " " + d.Message)));
 
-        var debug = new DebugInfo(source, "Stainless tests", format);
+        var debug = new DebugInfo(source, "Stainless tests", format, optimized);
         return new LlvmEmitter(forSharedLibrary: true, abi: abi, debug: debug)
             .Emit(program)
             .ReplaceLineEndings("\n");
@@ -377,6 +378,74 @@ public static class Front
             return digits.Length == 0 ? -1 : int.Parse(digits);
         }
         return -1;
+    }
+
+    /// <summary>
+    /// The node a local's <c>scope:</c> names, for a local of the test's own
+    /// <paramref name="function"/> — the subprogram itself for one in the
+    /// function body, a <c>DILexicalBlock</c> for one inside a <c>{ }</c>.
+    /// </summary>
+    /// <remarks>
+    /// The scope chain is walked up to the subprogram rather than compared
+    /// against it, for the reason <see cref="LocalVariableTypeNode"/> gives:
+    /// the standard library is in the same module text and has locals of every
+    /// ordinary name.
+    /// </remarks>
+    public static int LocalVariableScopeNode(string ir, string function,
+                                             string variable)
+    {
+        string mangled = $"_SL4Test{function.Length}{function}";
+        int subprogram = -1;
+        var blocks = new Dictionary<int, int>();
+        var scopes = new List<(int Variable, int Scope)>();
+
+        foreach (string line in ir.Split('\n'))
+        {
+            if (line.Contains("!DISubprogram(", StringComparison.Ordinal)
+                && line.Contains("linkageName: \"" + mangled, StringComparison.Ordinal))
+            {
+                subprogram = NodeNumberOf(line);
+                continue;
+            }
+
+            if (line.Contains("!DILexicalBlock(", StringComparison.Ordinal))
+            {
+                blocks[NodeNumberOf(line)] = ScopeOf(line);
+                continue;
+            }
+
+            if (line.Contains("!DILocalVariable(name: \"" + variable + "\"",
+                              StringComparison.Ordinal))
+                scopes.Add((NodeNumberOf(line), ScopeOf(line)));
+        }
+
+        if (subprogram < 0)
+            return -1;
+
+        foreach (var (_, scope) in scopes)
+        {
+            // Up through the blocks. A chain deeper than this is a bug in the
+            // emitter rather than a nesting anyone wrote.
+            int at = scope;
+            for (int step = 0; step < 32 && at >= 0; step++)
+            {
+                if (at == subprogram)
+                    return scope;
+                if (!blocks.TryGetValue(at, out at))
+                    break;
+            }
+        }
+        return -1;
+    }
+
+    /// <summary>The number a node's <c>scope:</c> names, or -1.</summary>
+    private static int ScopeOf(string line)
+    {
+        int at = line.IndexOf("scope: !", StringComparison.Ordinal);
+        if (at < 0)
+            return -1;
+        string digits = new string(line[(at + 8)..].TakeWhile(char.IsDigit).ToArray());
+        return digits.Length == 0 ? -1 : int.Parse(digits);
     }
 
     /// <summary>The number a metadata line defines, or -1.</summary>

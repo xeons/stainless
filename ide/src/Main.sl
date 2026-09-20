@@ -65,9 +65,6 @@ int Main()
             i++;
             continue;
         }
-        // `--watch`, beside `--break` and for the same reason: a pane with
-        // values in it is the one thing no self test can prove, so there has
-        // to be a way to reach one from a command line and photograph it.
         // Repeatable, in the order given.
         if (argument == "--watch" && i + 1u < arguments.Length)
         {

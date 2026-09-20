@@ -271,12 +271,17 @@ statically. `length` is at offset 24 and the elements at **32** -- the length
 is a word of its own, and a reader that puts them at 24 gets the length as its
 first element.
 
-**Every local of the function is listed, including ones not reached yet**,
-because the compiler emits no lexical blocks. A variable declared inside a loop
-belongs to the function's scope as far as DWARF is concerned, so it is in the
-list from the first line holding whatever its slot contained. Filtering by
-`DW_AT_decl_line` would be the debugger guessing at something the compiler
-knows and could emit.
+**What is listed is what is in scope**, which is not what the function
+declares: a `{ }` and a `for` are each a `DW_TAG_lexical_block` with its own
+address range, and a block that does not cover the stop declares nothing that
+exists yet. Inside one, a local is listed from that block's first instruction,
+so one shown above its declaration line holds whatever its slot contained --
+filtering by `DW_AT_decl_line` would be the debugger guessing at something the
+compiler could emit and does not.
+
+A block described by `DW_AT_ranges` rather than a low and a high address is
+entered anyway. That happens at `-O2`, and showing a variable that might not
+be in scope is a smaller fault than hiding one that is.
 
 **A compiler bug came out of this, and it is the kind that hides.** A class
 reference is described as a pointer to the class body -- except that building

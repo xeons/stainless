@@ -65,31 +65,20 @@ are written to it already.
 
 ### What the debugger still wants from the compiler
 
-`debug/` reads what `-g` emits and four things it does not emit are now
+`debug/` reads what `-g` emits and two things it does not emit are now
 measured rather than guessed. [docs/dwarf.md](docs/dwarf.md) has the numbers.
 
-- **`DILexicalBlock`.** Every local sits in the function's scope, so a debugger
-  shows one that is not in scope yet, holding whatever its stack slot
-  contained. The pairing is with `PushScope`/`PopScopeWithoutRelease` in
-  `LlvmEmitter.Statements.cs`. Filtering by `DW_AT_decl_line` in the engine
-  would be guessing at something the compiler knows.
 - **A variant's tag as an enumeration.** Cases are numbered in declaration
   order and DWARF gets a member only for the ones carrying a payload, so the
   k-th member is not tag k and no consumer can map one to the other. An
   anonymous `DW_TAG_enumeration_type` on the tag, one `DIEnumerator` per case
   at its real value, names the case *and* says which overlapping member is
   live.
-- **`isOptimized:` follows the real level.** It is hardcoded false and `-O2` is
-  the default, so it is a lie in the common case -- and a debugger reads it to
-  decide whether to warn that a value may be stale.
 - **`DW_AT_language` is `DW_LANG_C_plus_plus`.** We are not C++, and a consumer
   that demangles by language does the wrong thing with a `_SL` name.
 
-Two more, neither in the emitter:
+One more, not in the emitter:
 
-- **The compile unit's main file is picked twice and differently.**
-  `Compilation.cs` uses the last unit, `DebugInfo.cs` says the first. Cosmetic,
-  and the kind of disagreement that later reads as a bug.
 - **`--debug-format dwarf` on Windows does not rebuild the C runtime.** Its
   objects are compiled for the MSVC target and carry CodeView, so a DWARF PE
   describes the Stainless module alone and stepping into `sl_retain` there is

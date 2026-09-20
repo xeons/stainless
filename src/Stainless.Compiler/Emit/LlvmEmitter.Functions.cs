@@ -183,7 +183,9 @@ public sealed partial class LlvmEmitter
         // and the binder has already made sure every label is at that depth.
         _bodyScopeDepth = _scopes.Count + 1;
 
+        _atFunctionBody = true;
         EmitStatement(function.Body);
+        _atFunctionBody = false;
 
         // Fall off the end: void returns implicitly, everything else was already
         // checked by the binder, so this is only reached for unreachable tails.

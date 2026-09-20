@@ -45,6 +45,11 @@ distinct !DICompileUnit(language: DW_LANG_C_plus_plus
 # A void pointer, whose base type is written as null rather than left out.
 !DIDerivedType(tag: DW_TAG_pointer_type, baseType: null
 
+# A block is a scope of its own. Which block a local belongs to is pinned by
+# DebugInfoTests; what this says is that they are emitted at all.
+distinct !DILexicalBlock(
+!DILocalVariable(name: "hidden"
+
 # Instructions carry locations, and a variable is tied to its slot.
 call void @llvm.dbg.declare(
 

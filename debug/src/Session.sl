@@ -63,8 +63,9 @@ public class ValueLine
 ///
 /// A watch that could not be read is one of these too, with `Ok` false and the
 /// reason in `Value`. Half the watches in a session are out of scope at any
-/// moment; dropping those rows would make the pane lie about how many watches
-/// there are.
+/// moment, so every reader of these MUST keep the row and show the reason: a
+/// list that drops them says there are fewer watches than there are, and moves
+/// the rest under the pointer at every step.
 public class WatchLine
 {
     /// What was typed, unchanged. It is the row's identity.
@@ -238,13 +239,11 @@ void FillFrames(Snapshot into, Engine engine, ITarget target, uint thread)
     }
 }
 
-/// Every parameter and local of the function stopped in.
+/// Every parameter and local in scope where the program stopped.
 ///
-/// Includes ones not yet reached. The compiler emits no lexical blocks, so a
-/// variable declared inside a loop belongs to the function's scope in DWARF
-/// and appears here from the function's first line, holding whatever its stack
-/// slot contained. Filtering by `DW_AT_decl_line` would be guessing at
-/// something the compiler knows and could emit.
+/// In scope, not merely declared in the function: a variable inside a loop or a
+/// bare `{ }` sits in a `DW_TAG_lexical_block`, and a block whose code does not
+/// cover the stop declares nothing that exists yet.
 void FillLocals(Snapshot into, Engine engine, ITarget target, uint thread,
                 nuint pc)
 {
@@ -261,13 +260,11 @@ void FillLocals(Snapshot into, Engine engine, ITarget target, uint thread,
     if (!target.ReadRegisters(thread, &frame))
         return;
 
-    var children = ChildrenOf(where.InUnit, where.Die);
+    var children = VariablesInScopeAt(where.InUnit, where.Die,
+                                      engine.ToLinked(pc));
     for (nuint i = 0u; i < children.Count; i++)
     {
         var one = children[i];
-        if (one.Tag != TagFormalParameter && one.Tag != TagVariable)
-            continue;
-
         var described = DescribeType(where.InUnit, one);
         into.Locals.Add(new ValueLine(
             one.Name, described.Name,
@@ -278,9 +275,7 @@ void FillLocals(Snapshot into, Engine engine, ITarget target, uint thread,
 
 /// Every watch expression, read in the frame the program stopped in.
 ///
-/// One line per watch whether or not it could be read, because a pane that
-/// silently drops what it could not evaluate is a pane that lies about how
-/// many watches there are.
+/// One line per watch whether or not it could be read. See `WatchLine`.
 void FillWatches(Snapshot into, Engine engine, ITarget target, uint thread,
                  nuint pc)
 {

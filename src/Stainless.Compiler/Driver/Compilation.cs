@@ -788,9 +788,10 @@ public sealed class Compilation
         // --- emit --------------------------------------------------------
         var debug = options.Debug
             ? new DebugInfo(
-                units[^1].Span.File,
+                programSpan.File,
                 "Stainless " + typeof(Compilation).Assembly.GetName().Version?.ToString(3),
-                options.DebugFormat ?? DefaultDebugFormat(target))
+                options.DebugFormat ?? DefaultDebugFormat(target),
+                optimized: options.OptimizationLevel > 0)
             : null;
 
         var emitter = new LlvmEmitter(

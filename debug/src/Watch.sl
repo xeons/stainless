@@ -931,13 +931,9 @@ WatchArray? ArrayShapeOf(Unit unit, Die body)
 
 /// Reads one watch expression where the program is stopped.
 ///
-/// The answer is text either way: a value, or the reason there is none. A
-/// watch that cannot be read is a line in the pane saying so rather than an
-/// error a session has to handle -- half the watches in a debugging session
-/// are out of scope at any moment, and that is not a failure.
-///
-/// MUST be called on the session's own thread, like everything else that reads
-/// a target.
+/// The answer is a `WatchLine` either way: a value, or the reason there is
+/// none. MUST be called on the session's own thread, like everything else that
+/// reads a target.
 public WatchLine ReadWatch(Engine engine, ITarget target, Unit unit, Die owner,
                            Registers frame, String expression)
 {

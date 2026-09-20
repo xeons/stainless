@@ -165,6 +165,18 @@ public sealed partial class LlvmEmitter(
     private int? _debugScope;
     private int? _debugLocation;
 
+    /// <summary>
+    /// True while the next block emitted is a function's own body, which the
+    /// subprogram already scopes.
+    /// </summary>
+    /// <remarks>
+    /// Clang scopes a body's locals to the <c>DISubprogram</c> too. A lexical
+    /// block there would be one more entry per function saying what
+    /// <c>DW_TAG_subprogram</c> already says, over every function in the
+    /// standard library as well as the program's own.
+    /// </remarks>
+    private bool _atFunctionBody;
+
     /// <summary>Owned locals per lexical scope, released on the way out.</summary>
     private readonly List<List<(string Slot, TypeSymbol Type)>> _scopes = [];
 

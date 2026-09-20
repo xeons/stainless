@@ -77,6 +77,13 @@ int Main()
     int cell = 5;
     void* anything = (void*)&cell;
 
+    // A block is a scope, so `hidden` is described as being in scope here
+    // rather than from the first line of Main.
+    {
+        int hidden = 6;
+        cell = cell + hidden;
+    }
+
     Console.WriteLine(Text.FromInteger((long)(nuint)anything != 0 ? 1 : 0));
     Console.WriteLine(Text.FromInteger(node.Doubled()));
     Console.WriteLine(Text.FromInteger(Sum(numbers)));

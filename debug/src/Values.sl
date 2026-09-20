@@ -299,9 +299,9 @@ public DescribedType DescribeType(Unit unit, Die carrier)
             answer.Name = PointeeName(unit, die);
 
         // **A pointer's width is usually not written down.** LLVM leaves
-        // `DW_AT_byte_size` off a pointer that is the unit's address size,
-        // which is every pointer this compiler emits -- and a size of zero is
-        // a stride of zero, so `names[1]` is `names[0]` and nothing says why.
+        // `DW_AT_byte_size` off a pointer whose width is the unit's address
+        // size, which is every pointer this compiler emits, so the unit is
+        // what answers when the entry does not.
         if (answer.Size == 0u && die.Tag == TagPointerType)
             answer.Size = unit.AddressSize;
 
@@ -606,6 +606,53 @@ bool EndsWithBrackets(String name)
     nuint length = name.ByteLength();
     return length >= 2u && name.ByteAt(length - 2u) == (byte)91
         && name.ByteAt(length - 1u) == (byte)93;
+}
+
+/// Every parameter and local in scope at an address, in declaration order.
+///
+/// The subprogram's own children, then the children of each `DW_TAG_lexical_block`
+/// whose code covers the address. A block that does not cover it declares
+/// nothing that exists yet.
+///
+/// **A block whose range cannot be read is entered anyway.** At `-O2` a block
+/// may be described by `DW_AT_ranges` rather than a low and a high address, and
+/// showing a variable that might not be in scope is a smaller fault than hiding
+/// one that is.
+public List<Die> VariablesInScopeAt(Unit unit, Die owner, nuint linked)
+{
+    var found = new List<Die>();
+    GatherVariables(found, unit, owner, linked, 0);
+    return found;
+}
+
+void GatherVariables(List<Die> into, Unit unit, Die owner, nuint linked,
+                     int depth)
+{
+    // A tree this deep is a corrupt file rather than a nested block.
+    if (depth > 32)
+        return;
+
+    var children = ChildrenOf(unit, owner);
+    for (nuint i = 0u; i < children.Count; i++)
+    {
+        var one = children[i];
+
+        if (one.Tag == TagFormalParameter || one.Tag == TagVariable)
+        {
+            into.Add(one);
+            continue;
+        }
+
+        if (one.Tag != TagLexicalBlock)
+            continue;
+
+        nuint from = 0u;
+        nuint to = 0u;
+        if (one.Range(&from, &to) && (linked < from || linked >= to))
+            continue;
+
+        GatherVariables(into, unit, one, linked, depth + 1);
+    }
 }
 
 /// The entries directly under one, in the order the file had them.

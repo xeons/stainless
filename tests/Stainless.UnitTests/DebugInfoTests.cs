@@ -159,4 +159,96 @@ public class DebugInfoTests
         Assert.Equal(dwarf, ir.Contains("!\"Dwarf Version\"", StringComparison.Ordinal));
         Assert.Equal(codeView, ir.Contains("!\"CodeView\"", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// A local declared inside a <c>{ }</c> is scoped to that block.
+    /// </summary>
+    /// <remarks>
+    /// Which is what stops a debugger showing it on every line of the
+    /// function, holding whatever its stack slot happened to contain.
+    /// </remarks>
+    [Fact]
+    public void ALocalInsideABlockIsScopedToIt()
+    {
+        string ir = Front.ModuleDebugIr("""
+            public void Use()
+            {
+                int throughout = 1;
+                {
+                    int onlyHere = 2;
+                    throughout = onlyHere;
+                }
+            }
+            """);
+
+        int inner = Front.LocalVariableScopeNode(ir, "Use", "onlyHere");
+        Assert.True(inner >= 0, "no DILocalVariable for 'onlyHere'");
+        Assert.Contains("DILexicalBlock", Front.MetadataNode(ir, inner));
+    }
+
+    /// <summary>
+    /// And one in the function body is scoped to the subprogram itself.
+    /// </summary>
+    /// <remarks>
+    /// A lexical block for a function body would be an entry per function
+    /// saying what <c>DW_TAG_subprogram</c> already says.
+    /// </remarks>
+    [Fact]
+    public void ALocalInTheFunctionBodyIsScopedToTheFunction()
+    {
+        string ir = Front.ModuleDebugIr("""
+            public void Use()
+            {
+                int throughout = 1;
+                {
+                    int onlyHere = 2;
+                    throughout = onlyHere;
+                }
+            }
+            """);
+
+        int outer = Front.LocalVariableScopeNode(ir, "Use", "throughout");
+        Assert.True(outer >= 0, "no DILocalVariable for 'throughout'");
+        Assert.Contains("DISubprogram", Front.MetadataNode(ir, outer));
+    }
+
+    /// <summary>
+    /// A <c>for</c> is a scope of its own, so its counter is not in scope
+    /// after it.
+    /// </summary>
+    [Fact]
+    public void AForLoopScopesItsOwnCounter()
+    {
+        string ir = Front.ModuleDebugIr("""
+            public void Use()
+            {
+                int total = 0;
+                for (int step = 0; step < 3; step++)
+                    total = total + step;
+            }
+            """);
+
+        int loop = Front.LocalVariableScopeNode(ir, "Use", "step");
+        Assert.True(loop >= 0, "no DILocalVariable for 'step'");
+        Assert.Contains("DILexicalBlock", Front.MetadataNode(ir, loop));
+    }
+
+    /// <summary>
+    /// The compile unit says whether the code it describes was optimized.
+    /// </summary>
+    /// <remarks>
+    /// It was hardcoded false while <c>-O2</c> is the default, so it was a lie
+    /// in the common case — and a debugger reads it to decide whether to warn
+    /// that a value may be stale, which makes it a lie that is acted on.
+    /// </remarks>
+    [Theory]
+    [InlineData(false, "isOptimized: false")]
+    [InlineData(true, "isOptimized: true")]
+    public void TheCompileUnitSaysWhetherItWasOptimized(bool optimized, string expected)
+    {
+        string ir = Front.ModuleDebugIr("public void Use() { int a = 1; }",
+                                        optimized: optimized);
+
+        Assert.Contains(expected, Front.MetadataNode(ir, 0));
+    }
 }

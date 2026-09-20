@@ -1235,6 +1235,11 @@ debugger can match a frame to a source line either way. Locations sit at
 statement granularity: an expression spread over four lines belongs to the
 statement a debugger stops on.
 
+**A local is described in the block it was declared in.** A `{ }` and a `for`
+are each a `DW_TAG_lexical_block` with its own address range, so a debugger
+stopped before one shows nothing declared inside it. A function's own body is
+not a block of its own: the subprogram scopes it, as it does in C.
+
 **A class body includes its header.** A field's offset is measured from the
 start of the fields area (§2), and DWARF wants it measured from the start of the
 allocation, so the 24 bytes in front are described as a member named `__header`

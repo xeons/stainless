@@ -359,11 +359,10 @@ public class DebugSession
 
     /// Does one command, and answers where the program ended up.
     ///
-    /// A command that does not move the program answers the stop it was given,
-    /// so the loop re-reports the same place: a watch that was added while
-    /// stopped fills its row without the caret jumping anywhere. Returning a
-    /// bare `Paused` instead loses the address, and a snapshot taken at zero
-    /// empties every pane.
+    /// A command that does not move the program MUST answer the stop it was
+    /// given, so that the loop re-reports the same place: a watch added while
+    /// stopped fills its row without the caret moving. A fresh `Paused` carries
+    /// no address, and a snapshot taken at one empties every pane.
     Stop Perform(Engine engine, PendingCommand next, Stop stop)
     {
         switch (next.What)

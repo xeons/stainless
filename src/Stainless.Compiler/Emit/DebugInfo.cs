@@ -68,9 +68,15 @@ public sealed class DebugInfo
     /// <summary>
     /// <paramref name="mainFile"/> is the file the compile unit is named after.
     /// DWARF wants one even though a Stainless program has no single root file,
-    /// so the first source given on the command line stands for the program.
+    /// so the program's own first source stands for it — never the standard
+    /// library's, which is what <c>units[0]</c> is.
     /// </summary>
-    public DebugInfo(SourceText mainFile, string producer, DebugFormat format)
+    /// <remarks>
+    /// <paramref name="optimized"/> MUST follow the real level: a debugger
+    /// reads it to decide whether to warn that a value may be stale.
+    /// </remarks>
+    public DebugInfo(SourceText mainFile, string producer, DebugFormat format,
+                     bool optimized)
     {
         _producer = producer;
         _format = format;
@@ -83,8 +89,9 @@ public sealed class DebugInfo
         // a debugger can see.
         Fill(_compileUnit,
             $"distinct !DICompileUnit(language: DW_LANG_C_plus_plus, file: !{file}, " +
-            $"producer: {Quote(producer)}, isOptimized: false, runtimeVersion: 0, " +
-            "emissionKind: FullDebug, splitDebugInlining: false, nameTableKind: None)");
+            $"producer: {Quote(producer)}, isOptimized: {(optimized ? "true" : "false")}, " +
+            "runtimeVersion: 0, emissionKind: FullDebug, splitDebugInlining: false, " +
+            "nameTableKind: None)");
     }
 
     // ============================================================ nodes
@@ -154,6 +161,21 @@ public sealed class DebugInfo
         int id = Add($"!DILocation(line: {line}, column: {column}, scope: !{scope})");
         _locations[key] = id;
         return id;
+    }
+
+    /// <summary>
+    /// A <c>{ }</c> inside a function, so that a local is described as being in
+    /// scope where it was declared rather than from the function's first line.
+    /// </summary>
+    /// <remarks>
+    /// <c>distinct</c>, or two blocks at one position would be uniqued into
+    /// one node and a debugger would have a scope covering both.
+    /// </remarks>
+    public int LexicalBlock(SourceSpan span, int scope)
+    {
+        var (line, column) = span.File.GetLineColumn(span.Start);
+        return Add($"distinct !DILexicalBlock(scope: !{scope}, " +
+                   $"file: !{File(span.File)}, line: {line}, column: {column})");
     }
 
     // ============================================================ functions
@@ -502,10 +524,11 @@ public sealed class DebugInfo
         }
 
         // The runtime owns `String` and `Utf16String`, so they declare no fields
-        // here and the description stopped at the header. Their units follow a
-        // length inline, exactly as an array's elements do (docs/abi.md §2.6) --
-        // so they are described that way too, and a debugger reading one needs
-        // no table of offsets it was told rather than shown.
+        // here and nothing else would describe their storage. Their units
+        // follow a length inline, exactly as an array's elements do
+        // (docs/abi.md §2.6), so they are described the same way -- and a
+        // debugger reading one needs no table of offsets it was told rather
+        // than shown.
         if (TextShapeOf(type) is { } shape)
         {
             int word = TargetPlatform.Current.PointerWidth;
