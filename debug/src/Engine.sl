@@ -193,6 +193,13 @@ public class Engine
     /// those needs the target seam to set up pipes.
     List<String> _output;
 
+    /// The watch expressions, in the order they were added.
+    ///
+    /// Held by the engine rather than by whatever is watching, because a
+    /// snapshot is taken on the session's thread and a pane may show only what
+    /// a snapshot holds. Every method here MUST be called on that thread.
+    List<String> _watches;
+
     public Engine(ITarget target, Image image, DwarfInfo info,
                   List<LineTable> tables)
     {
@@ -208,6 +215,7 @@ public class Engine
         _stepIsWanted = false;
         _breakWanted = false;
         _output = new List<String>();
+        _watches = new List<String>();
     }
 
     /// Everything the program has written since this was last called, and
@@ -220,6 +228,31 @@ public class Engine
     }
 
     public List<Breakpoint> Breakpoints => _breakpoints;
+
+    public List<String> Watches => _watches;
+
+    /// Adds a watch, refusing one that is not an expression.
+    ///
+    /// Answers why it was refused, or "". Checked here rather than at the next
+    /// stop so that a typing mistake is a message beside the box it was typed
+    /// in, which is the only place it is still obvious what was meant.
+    public String AddWatch(String expression)
+    {
+        String problem = ParseWatch(expression).Problem;
+        if (problem.ByteLength() != 0u)
+            return problem;
+        _watches.Add(expression);
+        return "";
+    }
+
+    /// Forgets one watch. An index past the end is nothing to do rather than a
+    /// failure: the pane and this list are on two threads.
+    public void RemoveWatchAt(nuint index)
+    {
+        if (index < _watches.Count)
+            _watches.RemoveAt(index);
+    }
+
     public nuint Slide => _slide;
     public bool SlideKnown => _slideKnown;
 

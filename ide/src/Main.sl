@@ -20,11 +20,12 @@
 //   stainless-ide path/to/file.sl open that
 //   stainless-ide --selftest      build the window, check what can be checked
 //   stainless-ide --break f.sl:12 -- set a breakpoint and start debugging
+//   stainless-ide --watch a.b     -- and watch an expression there
 //
-// `--break` exists so the debugger can be photographed. A screenshot is the
-// only thing that says a pane drew, and a debugging session cannot be reached
-// from a command line without it -- there is nothing to capture until
-// something has stopped. See forms/screenshot.ps1.
+// `--break` and `--watch` exist so the debugger can be photographed. A
+// screenshot is the only thing that says a pane drew, and a debugging session
+// cannot be reached from a command line without them -- there is nothing to
+// capture until something has stopped. See forms/screenshot.ps1.
 module Ide;
 
 import Standard.Console;
@@ -61,6 +62,16 @@ int Main()
         if (argument == "--break" && i + 1u < arguments.Length)
         {
             stopAt = arguments[i + 1u];
+            i++;
+            continue;
+        }
+        // `--watch`, beside `--break` and for the same reason: a pane with
+        // values in it is the one thing no self test can prove, so there has
+        // to be a way to reach one from a command line and photograph it.
+        // Repeatable, in the order given.
+        if (argument == "--watch" && i + 1u < arguments.Length)
+        {
+            window.Watch(arguments[i + 1u]);
             i++;
             continue;
         }

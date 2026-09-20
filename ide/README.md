@@ -130,8 +130,8 @@ were fixed — the IDE is what found every one of them.
 
 - **A debugger.** F9 sets a breakpoint, F5 starts, F10 and F11 step, Shift+F5
   stops. The margin draws a disc beside each breakpoint and an arrow beside the
-  line the program is stopped on; Locals, Call Stack, Breakpoints and Debug
-  Output are four more panes in the bottom well.
+  line the program is stopped on; Locals, Watch, Call Stack, Breakpoints and
+  Debug Output are five more panes in the bottom well.
 
   **A breakpoint that binds elsewhere says so.** A line with no code on it --
   a blank, a comment, a brace -- resolves to the first statement at or after
@@ -141,6 +141,17 @@ were fixed — the IDE is what found every one of them.
   **Breakpoints are a file and a line, so they outlive the process.** They
   survive Stop, Restart and a rebuild that moved everything, and they can be
   set before anything has been compiled.
+
+  **Watch takes `a`, `a.b.c`, `a[3]`, `a[i]`, `*p` and a number**, and nothing
+  else: no arithmetic, no casts, and never a call into the program being
+  debugged. Add one from the Debug menu or the pane's own menu; double-click a
+  row to correct it. A watch outlives the session the way a breakpoint does,
+  and one that is out of scope keeps its row and says so rather than
+  disappearing and coming back as the program steps.
+
+  The expression is turned down where it was typed rather than at the next
+  stop, because parsing one needs no process -- which is also what lets
+  `sldb --selftest` cover the grammar with no binary at all.
 
   The engine is `debug/`, which has no idea a window exists -- see
   [debug/README.md](../debug/README.md). What crosses between it and this
@@ -164,9 +175,10 @@ Named honestly, since the point of the page is to say where the edges are.
   `--diagnostics json` is the first stone of it and already carries what a
   squiggle needs — a code, a place, and a length to underline — which is why
   the editor does not have to guess at any of that any more.
-- **No watch expressions, and no hover values.** Locals shows what is in scope
-  and nothing evaluates an expression: that wants a parser for a small
-  expression subset, which is the next piece of `debug/`.
+- **No hover values.** Watch evaluates an expression and Locals shows what is
+  in scope, but pointing at an identifier in the editor says nothing. That
+  wants the editor to know which run of bytes under the pointer is a whole
+  expression, which the painting lexer does not answer.
 - **The debugger needs a project.** A loose file is compiled to a path the
   compiler chooses and this window never learns, so F5 asks for a project to be
   opened first.

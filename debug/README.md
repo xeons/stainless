@@ -35,6 +35,7 @@ reporting addresses that have no lines.
 | `src/Session.sl` | a stop, read into a `Snapshot` a window can hold |
 | `src/Stack.sl` | the frame-pointer walk |
 | `src/Values.sl` | a location and a type, read out of the process |
+| `src/Watch.sl` | a watch expression, parsed and then walked |
 | `tests/sldb.sl` | the console debugger |
 
 ## Four decisions worth knowing before reading the code
@@ -287,6 +288,57 @@ debugger reading a local ever noticed. `DebugInfoTests` now follows the node
 number from a variable to what it points at, with two locals of one type
 because one would have passed.
 
+## Watch expressions
+
+```
+$ sldb watch fixture.exe fixture.sl:52 numbers[i] head.Next.Label names[2]
+stopped at .../fixture.sl:52
+  numbers[i]          int                     33
+  head.Next.Label     Standard.Text.String    "tail"
+  names[2]                                    -- index 2 is past the end of
+                                                 String[], which has 2 elements
+```
+
+`a`, `a.b.c`, `a[3]`, `a[i]`, `*p` and a number, decimal or hexadecimal. No
+arithmetic, no casts, no parentheses, and **never a call into the debuggee**:
+calling into an ARC'd runtime from a process stopped inside the allocator's
+lock deadlocks the thing being inspected, and it is where `fpdebug`'s hardest
+bugs live. `fppascalparser.pas` is 263 KB because Lazarus promises that a watch
+is a whole Pascal expression. The promise here is much smaller and is kept.
+
+**Parsing and evaluating are separate passes**, which is what makes the grammar
+testable: a malformed expression is a question with no process, no binary and
+no frame in it, so `sldb --selftest` covers every refusal and the IDE can turn
+one down in the box it was typed into rather than at the next stop.
+
+**Every refusal names what was wrong.** `a.b` on something with no `b` says so
+and says what it did have; an index past the end says how many there are; a
+stray byte is quoted back. A watch is typed by a person, and "invalid
+expression" tells them nothing about which half.
+
+**`.` goes through a reference by itself**, so `head.Next.Label` reads the way
+it is written. Postfix binds tighter than `*`, as in C, so `*p.next` follows
+`p.next` and the other grouping cannot be written -- that is what parentheses
+would be for.
+
+**An array is indexed from the DWARF rather than from a table of offsets
+here.** The compiler describes an array object's elements as a flexible array
+member -- the element type, claiming no bound, because the bound is the `length`
+word in front of it -- and `String` and `Utf16String` carry the same shape under
+the names `runtime/stainless.h` gives them. So the element type, the stride and
+the length all come out of the file, and `bytes`, `units` and `elements` are one
+case rather than three.
+
+Two things are refused rather than guessed. A bit field is a run of bits inside
+a word it shares, and reading it from its byte would answer whatever its
+neighbours hold. And an index that is negative is refused rather than widened:
+an `int` holding -1 read as an unsigned index is four billion elements along,
+which passes every bounds check that compares the wrong way.
+
+Half the watches in a session are out of scope at any moment, so a watch that
+cannot be read is a line saying why rather than a missing row -- a pane that
+drops what it could not evaluate lies about how many watches there are.
+
 ## Linux
 
 Everything above works identically under `ptrace`:
@@ -354,6 +406,8 @@ locals
   sum         int                     0
   i           nuint                   0
   here        int                     1
+watches
+  (none)
 ```
 
 **A pane MUST NOT show more than a snapshot holds.** Anything the IDE needs is
@@ -371,11 +425,8 @@ asked -- which is what `StopKind.Paused` is.
 
 ## Still to come
 
-**Watch expressions.** `a`, `a.b.c`, `a[3]`, `*p` and integer literals, and the
-six comparisons after that for conditional breakpoints. No arithmetic, no
-casts, and never a call into the debuggee: calling into an ARC'd runtime from a
-process stopped inside the allocator's lock deadlocks the thing being
-inspected.
+**The six comparisons**, which is what a conditional breakpoint needs and the
+only part of the watch grammar deliberately left out of it.
 
 **Real unwind info**, for `-O2` and for frames through the C runtime. The
 frame-pointer walk is right at `-O0` and answers one frame where there is no

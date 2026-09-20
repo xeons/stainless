@@ -59,6 +59,34 @@ public class ValueLine
     }
 }
 
+/// One watch expression, already read and already formatted.
+///
+/// A watch that could not be read is one of these too, with `Ok` false and the
+/// reason in `Value`. Half the watches in a session are out of scope at any
+/// moment; dropping those rows would make the pane lie about how many watches
+/// there are.
+public class WatchLine
+{
+    /// What was typed, unchanged. It is the row's identity.
+    public String Expression;
+
+    /// What the type is called, or "" when there is no value.
+    public String TypeName;
+
+    /// The value, formatted -- or why there is none.
+    public String Value;
+
+    public bool Ok;
+
+    public WatchLine(String expression, String typeName, String value, bool ok)
+    {
+        Expression = expression;
+        TypeName = typeName;
+        Value = value;
+        Ok = ok;
+    }
+}
+
 /// One frame of the call stack.
 public class FrameLine
 {
@@ -129,6 +157,10 @@ public class Snapshot
     public List<FrameLine> Frames;
     public List<ValueLine> Locals;
 
+    /// The watch expressions, in the order they were added, every one of them
+    /// answered.
+    public List<WatchLine> Watches;
+
     /// Something worth saying that is not a failure -- that a program carries
     /// no DWARF, that the image base was never learned. Empty when there is
     /// nothing to say.
@@ -148,6 +180,7 @@ public class Snapshot
         FaultCode = 0u;
         Frames = new List<FrameLine>();
         Locals = new List<ValueLine>();
+        Watches = new List<WatchLine>();
         Note = "";
     }
 }
@@ -181,6 +214,7 @@ public Snapshot TakeSnapshot(Engine engine, ITarget target, Stop stop)
 
     FillFrames(taken, engine, target, stop.Thread);
     FillLocals(taken, engine, target, stop.Thread, stop.Address);
+    FillWatches(taken, engine, target, stop.Thread, stop.Address);
     return taken;
 }
 
@@ -240,6 +274,39 @@ void FillLocals(Snapshot into, Engine engine, ITarget target, uint thread,
             ReadValue(engine, target, where.InUnit, one, where.Die, frame),
             one.Tag == TagFormalParameter));
     }
+}
+
+/// Every watch expression, read in the frame the program stopped in.
+///
+/// One line per watch whether or not it could be read, because a pane that
+/// silently drops what it could not evaluate is a pane that lies about how
+/// many watches there are.
+void FillWatches(Snapshot into, Engine engine, ITarget target, uint thread,
+                 nuint pc)
+{
+    var watches = engine.Watches;
+    if (watches.IsEmpty)
+        return;
+
+    var found = engine.SubprogramAt(pc);
+
+    Registers frame;
+    frame.Pc = 0u;
+    frame.StackPointer = 0u;
+    frame.FramePointer = 0u;
+
+    if (found == null || !target.ReadRegisters(thread, &frame))
+    {
+        for (nuint i = 0u; i < watches.Count; i++)
+            into.Watches.Add(new WatchLine(watches[i], "",
+                "there is no frame here to read it in", false));
+        return;
+    }
+
+    var where = (Subprogram)found;
+    for (nuint i = 0u; i < watches.Count; i++)
+        into.Watches.Add(ReadWatch(engine, target, where.InUnit, where.Die,
+                                   frame, watches[i]));
 }
 
 // ====================================================== setting a session up

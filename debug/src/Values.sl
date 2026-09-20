@@ -297,11 +297,53 @@ public DescribedType DescribeType(Unit unit, Die carrier)
         // `String` and array cases below unable to recognise themselves.
         if (die.Tag == TagPointerType && answer.Name.ByteLength() == 0u)
             answer.Name = PointeeName(unit, die);
+
+        // **A pointer's width is usually not written down.** LLVM leaves
+        // `DW_AT_byte_size` off a pointer that is the unit's address size,
+        // which is every pointer this compiler emits -- and a size of zero is
+        // a stride of zero, so `names[1]` is `names[0]` and nothing says why.
+        if (answer.Size == 0u && die.Tag == TagPointerType)
+            answer.Size = unit.AddressSize;
+
         return answer;
     }
 
     answer.Name = outermost.ByteLength() != 0u ? outermost : "?";
     return answer;
+}
+
+/// What a `DW_AT_type` points at, with the qualifiers stepped through.
+///
+/// The entry rather than a description of it, for a caller that wants the
+/// members of what it found -- which `DescribedType` carries only for the
+/// outermost entry.
+Die? TypeEntryOf(Unit unit, Die carrier)
+{
+    var reference = carrier.Find(AtType);
+    if (reference == null)
+        return null;
+
+    nuint at = (nuint)((Attribute)reference).Value;
+
+    // Bounded for the same reason the walk in `DescribeType` is: a cycle here
+    // is a corrupt file, and following it for ever is worse than saying so.
+    for (int step = 0; step < 32; step++)
+    {
+        var found = unit.At(at);
+        if (found == null)
+            return null;
+
+        var die = (Die)found;
+        if (die.Tag != TagTypedef && die.Tag != TagConstType
+            && die.Tag != TagVolatileType)
+            return die;
+
+        var inner = die.Find(AtType);
+        if (inner == null)
+            return null;
+        at = (nuint)((Attribute)inner).Value;
+    }
+    return null;
 }
 
 /// What a pointer points at, by name.

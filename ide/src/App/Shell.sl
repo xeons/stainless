@@ -134,8 +134,14 @@ public class Shell : Form
 
     ListView _stack;
     ListView _locals;
+    ListView _watchList;
     ListView _breakList;
     ListBox _debugOutput;
+
+    /// The watch expressions, which outlive each session the way breakpoints
+    /// do -- a debugger that forgets what you were watching when the program
+    /// exits is one you retype the same three expressions into.
+    List<String> _watches;
 
     /// The frame the Call Stack has selected. Zero is where the program is.
     nuint _frame;
@@ -290,6 +296,7 @@ public class Shell : Form
         _errorTail = "";
         _outputTail = "";
         _breakpoints = new BreakpointStore();
+        _watches = new List<String>();
         _session = null;
         _stopped = null;
         _frame = 0u;
@@ -452,6 +459,17 @@ public class Shell : Form
         _locals.AddColumn("Name", 130);
         _locals.AddColumn("Value", 260);
         _locals.AddColumn("Type", 170);
+
+        var watches = _dock.Add(Panes.Watch, "Watch", DockEdge.Bottom);
+        _watchList = new ListView(watches);
+        _watchList.Dock = DockStyle.Fill;
+        _watchList.View = ListViewStyle.Details;
+        _watchList.SetFullRowSelect(true, true);
+        _watchList.AddColumn("Name", 180);
+        _watchList.AddColumn("Value", 260);
+        _watchList.AddColumn("Type", 120);
+        _watchList.ContextMenu += this.OnWatchContextMenu;
+        _watchList.DoubleClick += this.OnWatchChosen;
 
         var stack = _dock.Add(Panes.CallStack, "Call Stack", DockEdge.Bottom);
         _stack = new ListView(stack);
@@ -750,6 +768,8 @@ public class Shell : Form
         debug.Add(MenuItem.Separator());
         debug.Add("Toggle &breakpoint\tF9").Click += this.OnToggleBreakpoint;
         debug.Add("Delete all brea&kpoints").Click += this.OnClearBreakpoints;
+        debug.Add(MenuItem.Separator());
+        debug.Add("Add &watch...").Click += this.OnAddWatch;
 
         var view = _bar.Add("&View");
         // The panes first, which is where Visual Studio puts them and where
@@ -760,6 +780,7 @@ public class Shell : Form
         view.Add("&Error List").Click += this.OnShowErrors;
         view.Add("&Output").Click += this.OnShowOutput;
         view.Add("&Locals").Click += this.OnShowLocals;
+        view.Add("&Watch").Click += this.OnShowWatch;
         view.Add("&Call Stack").Click += this.OnShowCallStack;
         view.Add("&Breakpoints").Click += this.OnShowBreakpoints;
         view.Add("&Debug Output").Click += this.OnShowDebugOutput;
@@ -1910,6 +1931,7 @@ public class Shell : Form
     void OnShowErrors(MenuItem sender) => ShowPane(Panes.Errors, "Error List");
     void OnShowOutput(MenuItem sender) => ShowPane(Panes.Output, "Output");
     void OnShowLocals(MenuItem sender) => ShowPane(Panes.Locals, "Locals");
+    void OnShowWatch(MenuItem sender) => ShowPane(Panes.Watch, "Watch");
     void OnShowCallStack(MenuItem sender) => ShowPane(Panes.CallStack, "Call Stack");
     void OnShowBreakpoints(MenuItem sender) => ShowPane(Panes.Breakpoints, "Breakpoints");
     void OnShowDebugOutput(MenuItem sender)
@@ -2858,7 +2880,7 @@ public class Shell : Form
                                            => BoundBreakpoint(file, line, bound));
         _session = session;
 
-        if (!session.Start(program, _breakpoints.All))
+        if (!session.Start(program, _breakpoints.All, _watches))
         {
             _session = null;
             Say("The session would not start.");
@@ -2917,15 +2939,20 @@ public class Shell : Form
         }
 
         ShowLocals(taken);
+        ShowWatches(taken);
         ShowCallStack(taken);
         ShowWhatDebuggingAllows();
 
-        // Locals comes forward on the first stop and not on any after it.
-        // Every stop would take the pane away from whoever had chosen another.
+        // One pane comes forward on the first stop and on none after it. Every
+        // stop would take the pane away from whoever had chosen another.
+        //
+        // Watch when there are watches, because a watch is there on purpose
+        // and Locals is what to show someone who has not said what they are
+        // interested in.
         if (_firstStop)
         {
             _firstStop = false;
-            _dock.Reveal(Panes.Locals);
+            _dock.Reveal(_watches.IsEmpty ? Panes.Locals : Panes.Watch);
         }
 
         if (taken.HasSource)
@@ -2999,6 +3026,173 @@ public class Shell : Form
         }
     }
 
+    /// The watches a stop answered.
+    ///
+    /// A watch that could not be read keeps its row and shows why. Half of
+    /// them are out of scope at any moment, and a pane that dropped those
+    /// would lie about how many watches there are -- and would move the rows
+    /// under the pointer every time the program stepped into another function.
+    void ShowWatches(Snapshot taken)
+    {
+        _watchList.Clear();
+        for (nuint i = 0u; i < taken.Watches.Count; i++)
+        {
+            var one = taken.Watches[i];
+            int row = _watchList.AddRow(one.Expression);
+            _watchList.SetCell(row, 1, one.Value);
+            _watchList.SetCell(row, 2, one.TypeName);
+        }
+    }
+
+    /// The watches with no session behind them: the expressions, and nothing
+    /// to say about any of them.
+    ///
+    /// Shown rather than left empty so that a watch added before the program
+    /// starts is visibly there, and so that the list does not appear to have
+    /// been forgotten when the program exits.
+    void ShowWatchNames()
+    {
+        _watchList.Clear();
+        for (nuint i = 0u; i < _watches.Count; i++)
+        {
+            int row = _watchList.AddRow(_watches[i]);
+            _watchList.SetCell(row, 1, _session == null
+                                       ? "(not running)" : "(running)");
+            _watchList.SetCell(row, 2, "");
+        }
+    }
+
+    /// Adds a watch, and answers why it was not added.
+    ///
+    /// **It says rather than shows.** Telling the caller is what lets the
+    /// self test ask whether something that is not an expression was kept
+    /// without a modal box appearing on the screen -- which is a test that
+    /// stops the suite and waits for a person.
+    ///
+    /// The expression is checked here as well as by the session, because a
+    /// session may not exist yet, and because a typing mistake caught beside
+    /// the box it was typed in is the only place it is still obvious what was
+    /// meant.
+    String AddWatch(String expression)
+    {
+        String wanted = expression.Trim();
+        if (wanted.ByteLength() == 0u)
+            return "there is nothing here to watch";
+
+        String problem = ParseWatch(wanted).Problem;
+        if (problem.ByteLength() != 0u)
+            return problem;
+
+        _watches.Add(wanted);
+
+        var running = _session;
+        if (running != null && ((DebugSession)running).IsStopped)
+            ((DebugSession)running).Watch(wanted);
+        else
+            ShowWatchNames();
+
+        _dock.Reveal(Panes.Watch);
+        return "";
+    }
+
+    /// Asks for an expression and adds it, saying why when it cannot.
+    ///
+    /// Blank is not a refusal worth a dialog: someone who pressed OK on an
+    /// empty box has already changed their mind.
+    void AskForWatch(String initial)
+    {
+        var asked = InputDialog.Ask("Add Watch", "Expression to watch:", initial);
+        if (asked is Some given)
+        {
+            if (given.Value.Trim().ByteLength() == 0u)
+                return;
+
+            String problem = AddWatch(given.Value);
+            if (problem.ByteLength() != 0u)
+                Application.Complain("That is not a watch expression: " + problem,
+                                     "Add Watch");
+        }
+    }
+
+    void OnAddWatch(MenuItem sender) => AskForWatch("");
+
+    /// Adds a watch from outside the window -- the command line's `--watch`.
+    ///
+    /// Answers whether it was kept, and says why on the status line when it
+    /// was not: there is nobody at a dialog when a program is being started by
+    /// a script.
+    public bool Watch(String expression)
+    {
+        String problem = AddWatch(expression);
+        if (problem.ByteLength() == 0u)
+            return true;
+        Say(expression + ": " + problem);
+        return false;
+    }
+
+    /// Double-clicking a row edits the expression, which is how a watch is
+    /// corrected without deleting it and typing the whole of it again.
+    void OnWatchChosen(Control sender)
+    {
+        int row = _watchList.SelectedIndex;
+        if (row < 0 || (nuint)row >= _watches.Count)
+            return;
+
+        String was = _watches[(nuint)row];
+        RemoveWatchAt((nuint)row);
+        AskForWatch(was);
+    }
+
+    void OnWatchContextMenu(Control sender, ContextMenuEventArgs args)
+    {
+        var menu = new PopupMenu();
+        menu.Add("&Add watch...").Click += this.OnAddWatch;
+
+        int row = _watchList.SelectedIndex;
+        bool onOne = row >= 0 && (nuint)row < _watches.Count;
+
+        var removed = menu.Add("&Delete watch");
+        removed.Enabled = onOne;
+        removed.Click += this.OnDeleteWatch;
+
+        var cleared = menu.Add("Delete &all watches");
+        cleared.Enabled = !_watches.IsEmpty;
+        cleared.Click += this.OnClearWatches;
+
+        menu.Show(_watchList, args.Location);
+        args.Handled = true;
+    }
+
+    void OnDeleteWatch(MenuItem sender)
+    {
+        int row = _watchList.SelectedIndex;
+        if (row >= 0)
+            RemoveWatchAt((nuint)row);
+    }
+
+    void OnClearWatches(MenuItem sender)
+    {
+        // Backwards, so each removal leaves the rows below it where the
+        // session still expects them.
+        for (nuint i = _watches.Count; i > 0u; i--)
+            RemoveWatchAt(i - 1u);
+    }
+
+    /// Stops watching one row, here and in the session both.
+    void RemoveWatchAt(nuint row)
+    {
+        if (row >= _watches.Count)
+            return;
+
+        _watches.RemoveAt(row);
+
+        var running = _session;
+        if (running != null && ((DebugSession)running).IsStopped)
+            ((DebugSession)running).Unwatch(row);
+        else
+            ShowWatchNames();
+    }
+
     void ShowCallStack(Snapshot taken)
     {
         _stack.Clear();
@@ -3048,6 +3242,7 @@ public class Shell : Form
     {
         _locals.Clear();
         _stack.Clear();
+        ShowWatchNames();
     }
 
     /// Takes the current-statement highlight off every tab.
@@ -3631,10 +3826,10 @@ public class Shell : Form
         // it landed on the edge the layout asked for, and that closing and
         // reopening one is the same object rather than a new empty tree.
         {
-            // Three from Phase 1 and four the debugger added.
-            if (_dock.PaneCount != 7u)
+            // Three from Phase 1 and five the debugger added.
+            if (_dock.PaneCount != 8u)
             {
-                Console.WriteLine("FAIL: expected seven panes, found "
+                Console.WriteLine("FAIL: expected eight panes, found "
                                   + Standard.Text.FromInteger(_dock.PaneCount));
                 ok = false;
             }
@@ -3652,6 +3847,7 @@ public class Shell : Form
             }
 
             if (_dock.EdgeOf(Panes.Locals) != DockEdge.Bottom
+                || _dock.EdgeOf(Panes.Watch) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.CallStack) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.Breakpoints) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.DebugOutput) != DockEdge.Bottom)
@@ -3724,6 +3920,54 @@ public class Shell : Form
             {
                 Console.WriteLine("FAIL: the saved left width is out of range at "
                                   + Standard.Text.FromInteger((long)written.LeftWidth));
+                ok = false;
+            }
+        }
+
+        // The watch list, with no session behind it.
+        //
+        // What this can honestly say is that the window keeps what it was
+        // asked to keep and turns down what is not an expression -- the
+        // reading of one is `sldb --selftest` and `sldb watch`, which have a
+        // process to read. A pane with rows in it proves neither.
+        {
+            nuint kept = _watches.Count;
+
+            AddWatch("head.Next.Value");
+            AddWatch("   ");
+            if (_watches.Count != kept + 1u)
+            {
+                Console.WriteLine("FAIL: a watch was not kept, or blank space was");
+                ok = false;
+            }
+
+            // Refused where it is typed rather than at the next stop, which is
+            // the whole reason parsing is a pass of its own.
+            if (AddWatch("a + 1").IsEmpty)
+            {
+                Console.WriteLine("FAIL: 'a + 1' was not refused");
+                ok = false;
+            }
+            if (_watches.Count != kept + 1u)
+            {
+                Console.WriteLine("FAIL: something that is not an expression was kept");
+                ok = false;
+            }
+
+            if ((nuint)_watchList.Count != _watches.Count)
+            {
+                Console.WriteLine("FAIL: the pane shows "
+                                  + Standard.Text.FromInteger((long)_watchList.Count)
+                                  + " rows for "
+                                  + Standard.Text.FromInteger((long)_watches.Count)
+                                  + " watches");
+                ok = false;
+            }
+
+            RemoveWatchAt(kept);
+            if (_watches.Count != kept || _watchList.Count != 0u)
+            {
+                Console.WriteLine("FAIL: removing a watch left it behind");
                 ok = false;
             }
         }

@@ -52,6 +52,32 @@ public enum DebugCommand
     StepOut,
     /// Kill it and end the session.
     Stop,
+    /// Start watching an expression, or stop watching one.
+    AddWatch,
+    RemoveWatch,
+}
+
+/// One thing the window has asked for, and what it was about.
+///
+/// A class rather than the enum alone because a watch command carries either
+/// the expression or the row it is about, and a queue of bare enums has
+/// nowhere to put it.
+class PendingCommand
+{
+    public DebugCommand What;
+
+    /// The expression, for `AddWatch`.
+    public String Text;
+
+    /// The row, for `RemoveWatch`.
+    public nuint Which;
+
+    public PendingCommand(DebugCommand what, String text, nuint which)
+    {
+        What = what;
+        Text = text;
+        Which = which;
+    }
 }
 
 /// Told about each stop, on the window's thread.
@@ -68,14 +94,14 @@ public closure void BindingHandler(String file, uint line, uint boundLine);
 /// What the two threads share.
 class CommandQueue
 {
-    public List<DebugCommand> Pending;
+    public List<PendingCommand> Pending;
 
     /// True once the session has finished. Nothing more is accepted.
     public bool Closed;
 
     public CommandQueue()
     {
-        Pending = new List<DebugCommand>();
+        Pending = new List<PendingCommand>();
         Closed = false;
     }
 }
@@ -122,11 +148,16 @@ public class DebugSession
 
     /// Launches `path` under the debugger with these breakpoints.
     ///
-    /// The breakpoints are copied into two plain lists first. Everything the
-    /// worker needs MUST be read on the thread that starts it; a
+    /// The breakpoints and the watches are copied into plain lists first.
+    /// Everything the worker needs MUST be read on the thread that starts it; a
     /// `BreakpointStore` read from two threads is the bug this file exists to
     /// prevent. Which ones bound comes back through the binding handler.
-    public bool Start(String path, List<SourceBreakpoint> breakpoints)
+    ///
+    /// The watches are seeded rather than queued so that the first stop already
+    /// has them: queueing would answer the first snapshot with an empty pane
+    /// and fill it on the second.
+    public bool Start(String path, List<SourceBreakpoint> breakpoints,
+                      List<String> watches)
     {
         if (IsActive)
             return false;
@@ -141,11 +172,15 @@ public class DebugSession
             lines.Add(breakpoints[i].Line);
         }
 
+        var wanted = new List<String>();
+        for (nuint i = 0u; i < watches.Count; i++)
+            wanted.Add(watches[i]);
+
         _state = RunState.Running;
         _engine = null;
         Reopen();
 
-        var worker = new Thread(() => Session(path, files, lines));
+        var worker = new Thread(() => Session(path, files, lines, wanted));
         worker.Detach();
         return true;
     }
@@ -156,6 +191,17 @@ public class DebugSession
     public void StepIn() => Ask(DebugCommand.StepIn);
     public void StepOver() => Ask(DebugCommand.StepOver);
     public void StepOut() => Ask(DebugCommand.StepOut);
+
+    /// Starts watching an expression, from the next snapshot on.
+    ///
+    /// Queued rather than done here: the engine belongs to the session's
+    /// thread, and a watch that is refused is refused there. A stopped session
+    /// answers with a fresh snapshot without moving the program, so the row
+    /// appears at once.
+    public void Watch(String expression) => Ask2(DebugCommand.AddWatch,
+                                                 expression, 0u);
+
+    public void Unwatch(nuint which) => Ask2(DebugCommand.RemoveWatch, "", which);
 
     /// Interrupts a running program.
     ///
@@ -186,12 +232,14 @@ public class DebugSession
             Pause();
     }
 
-    void Ask(DebugCommand what)
+    void Ask(DebugCommand what) => Ask2(what, "", 0u);
+
+    void Ask2(DebugCommand what, String text, nuint which)
     {
         var held = _commands.Lock();
         if (held.Value.Closed)
             return;
-        held.Value.Pending.Add(what);
+        held.Value.Pending.Add(new PendingCommand(what, text, which));
         held.Pulse();
     }
 
@@ -225,7 +273,8 @@ public class DebugSession
 
     /// Everything below here runs on the session's thread, and nothing above
     /// it does.
-    void Session(String path, List<String> files, List<uint> lines)
+    void Session(String path, List<String> files, List<uint> lines,
+                 List<String> watches)
     {
         var made = MakeTarget();
         if (!made.Ok)
@@ -267,6 +316,13 @@ public class DebugSession
 
         PlantEach(engine, tables, files, lines);
 
+        for (nuint i = 0u; i < watches.Count; i++)
+        {
+            String problem = engine.AddWatch(watches[i]);
+            if (problem.ByteLength() != 0u)
+                Say(watches[i] + ": " + problem);
+        }
+
         var started = engine.Start(path, "");
         if (!started.Ok)
         {
@@ -287,7 +343,7 @@ public class DebugSession
                 break;
 
             var next = TakeCommand();
-            if (next == DebugCommand.Stop)
+            if (next.What == DebugCommand.Stop)
             {
                 engine.Terminate();
                 Say("Debugging stopped.");
@@ -295,42 +351,56 @@ public class DebugSession
                 break;
             }
 
-            stop = Perform(engine, next, stop.Thread);
+            stop = Perform(engine, next, stop);
         }
 
         Close();
     }
 
     /// Does one command, and answers where the program ended up.
-    Stop Perform(Engine engine, DebugCommand what, uint thread)
+    ///
+    /// A command that does not move the program answers the stop it was given,
+    /// so the loop re-reports the same place: a watch that was added while
+    /// stopped fills its row without the caret jumping anywhere. Returning a
+    /// bare `Paused` instead loses the address, and a snapshot taken at zero
+    /// empties every pane.
+    Stop Perform(Engine engine, PendingCommand next, Stop stop)
     {
-        switch (what)
+        switch (next.What)
         {
             case DebugCommand.StepIn:
-                return engine.StepIn(thread);
+                return engine.StepIn(stop.Thread);
 
             case DebugCommand.StepOver:
-                return engine.StepOver(thread);
+                return engine.StepOver(stop.Thread);
 
             case DebugCommand.StepOut:
-                return engine.StepOut(thread);
+                return engine.StepOut(stop.Thread);
 
             case DebugCommand.Continue:
                 return engine.Continue();
 
-            default:
+            case DebugCommand.AddWatch:
             {
+                String problem = engine.AddWatch(next.Text);
+                if (problem.ByteLength() != 0u)
+                    Say(next.Text + ": " + problem);
+                return stop;
+            }
+
+            case DebugCommand.RemoveWatch:
+                engine.RemoveWatchAt(next.Which);
+                return stop;
+
+            default:
                 // `Settle` and anything unrecognised report where the program
                 // already is. An unmatched command MUST NOT move it.
-                var still = new Stop(StopKind.Paused);
-                still.Thread = thread;
-                return still;
-            }
+                return stop;
         }
     }
 
     /// Blocks until the window asks for something.
-    DebugCommand TakeCommand()
+    PendingCommand TakeCommand()
     {
         var held = _commands.Lock();
 
@@ -340,7 +410,7 @@ public class DebugSession
             held.Wait();
 
         if (held.Value.Pending.IsEmpty)
-            return DebugCommand.Stop;
+            return new PendingCommand(DebugCommand.Stop, "", 0u);
 
         var next = held.Value.Pending[0u];
         held.Value.Pending.RemoveAt(0u);

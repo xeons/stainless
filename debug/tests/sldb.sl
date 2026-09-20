@@ -37,6 +37,7 @@
 //   sldb step <binary> f:n [k] step k lines from there, into calls
 //   sldb next <binary> f:n [k] the same, over them
 //   sldb locals <binary> f:n   the parameters and locals in scope there
+//   sldb watch <binary> f:n e  what an expression is worth there
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -261,6 +262,66 @@ int RunSelfTest()
     var unknown = new Cursor(spare);
     ok = ReportCheck(ok, "a form it has never heard of is refused rather than guessed",
                !SkipForm(unknown, 0x7Fu, 8u, 4u));
+
+    // ------------------------------------------------ watch expressions
+    //
+    // The grammar, which needs no process, no binary and no frame -- which is
+    // why parsing is its own pass. A watch that is refused is refused the same
+    // way here as it is in the box it was typed into.
+    var plain = ParseWatch("a");
+    ok = ReportCheck(ok, "a bare name is an expression",
+                     plain.Problem.IsEmpty && plain.Root == "a"
+                     && plain.Steps.IsEmpty && plain.Stars == 0);
+
+    var chain = ParseWatch("a.b.c");
+    ok = ReportCheck(ok, "a chain of fields is one step each",
+                     chain.Problem.IsEmpty && chain.Steps.Count == 2u
+                     && chain.Steps[0u].IsField && chain.Steps[0u].Field == "b"
+                     && chain.Steps[1u].Field == "c");
+
+    var constant = ParseWatch("a[3]");
+    var index = constant.Steps.IsEmpty ? null : constant.Steps[0u].Index;
+    ok = ReportCheck(ok, "an index is an expression of its own",
+                     constant.Problem.IsEmpty && constant.Steps.Count == 1u
+                     && !constant.Steps[0u].IsField
+                     && index != null && ((WatchExpression)index).IsLiteral
+                     && ((WatchExpression)index).Literal == 3u);
+
+    var variable = ParseWatch("a[i]");
+    var inner = variable.Steps.IsEmpty ? null : variable.Steps[0u].Index;
+    ok = ReportCheck(ok, "and so an index may be a variable",
+                     variable.Problem.IsEmpty && inner != null
+                     && ((WatchExpression)inner).Root == "i");
+
+    var followed = ParseWatch("**p");
+    ok = ReportCheck(ok, "stars are counted rather than nested",
+                     followed.Problem.IsEmpty && followed.Stars == 2
+                     && followed.Root == "p");
+
+    var hex = ParseWatch("0x2A");
+    ok = ReportCheck(ok, "a number may be written in hexadecimal",
+                     hex.Problem.IsEmpty && hex.IsLiteral && hex.Literal == 42u);
+
+    // **Every refusal names what was wrong**, because a watch is typed by a
+    // person and "invalid expression" tells them nothing about which half.
+    ok = ReportCheck(ok, "an empty expression is refused",
+                     !ParseWatch("").Problem.IsEmpty);
+    ok = ReportCheck(ok, "a '.' with no field after it is refused",
+                     !ParseWatch("a.").Problem.IsEmpty);
+    ok = ReportCheck(ok, "a '[' with no ']' is refused",
+                     !ParseWatch("a[3").Problem.IsEmpty);
+    ok = ReportCheck(ok, "two expressions in a row are refused",
+                     !ParseWatch("a b").Problem.IsEmpty);
+
+    // A byte that means nothing here is carried into the message, which is
+    // the whole reason the scanner keeps it rather than dropping it.
+    ok = ReportCheck(ok, "and a stray byte is named in the refusal",
+                     ParseWatch("a $ b").Problem.Contains("$"));
+
+    // An arithmetic expression is not a small expression, and saying so is
+    // better than half-evaluating one.
+    ok = ReportCheck(ok, "arithmetic is not part of the promise",
+                     !ParseWatch("a + 1").Problem.IsEmpty);
 
     // The header structures, against the sizes their formats fix. Cheap, and
     // the only cover the 32-bit layouts have until a 32-bit binary is built
@@ -718,7 +779,8 @@ bool FindAddressOfWhere(List<LineTable> tables, String where, nuint* address,
 ///
 /// The three commands below differ only in what that something is, so the
 /// launching, the breakpoint and the reporting are written once.
-int RunToBreakpointThen(String path, String where, String what, int times)
+int RunToBreakpointThen(String path, String where, String what, int times,
+                        String[] watches)
 {
     var made = MakeTarget();
     if (!made.Ok)
@@ -756,6 +818,19 @@ int RunToBreakpointThen(String path, String where, String what, int times)
     }
     engine.Add(at, where);
 
+    // Before the program starts, because a watch is a property of the session
+    // rather than of a stop -- and because a refusal here names the expression
+    // that was wrong rather than appearing as a row in a pane.
+    for (nuint i = 0u; i < watches.Length; i++)
+    {
+        String problem = engine.AddWatch(watches[i]);
+        if (problem.ByteLength() != 0u)
+        {
+            Console.WriteLine("sldb: " + watches[i] + ": " + problem);
+            return 1;
+        }
+    }
+
     var started = engine.Start(path, "");
     if (!started.Ok)
     {
@@ -779,7 +854,8 @@ int RunToBreakpointThen(String path, String where, String what, int times)
     // put in a snapshot. Printing from the same object is what makes these
     // commands a test of what the window will show, instead of a second route
     // to the same data that can quietly diverge from it.
-    if (what == "stack" || what == "locals" || what == "snapshot")
+    if (what == "stack" || what == "locals" || what == "snapshot"
+        || what == "watch")
     {
         var taken = TakeSnapshot(engine, target, stop);
         switch (what)
@@ -790,6 +866,10 @@ int RunToBreakpointThen(String path, String where, String what, int times)
 
             case "locals":
                 PrintValues(taken);
+                break;
+
+            case "watch":
+                PrintWatches(taken);
                 break;
 
             default:
@@ -843,6 +923,27 @@ void PrintValues(Snapshot taken)
     }
 }
 
+/// The watches a snapshot holds, one to a line.
+///
+/// A watch that could not be read is a line too, marked so that a value and a
+/// refusal cannot be mistaken for each other in a column of text.
+void PrintWatches(Snapshot taken)
+{
+    if (taken.Watches.IsEmpty)
+    {
+        Console.WriteLine("  (none)");
+        return;
+    }
+
+    for (nuint i = 0u; i < taken.Watches.Count; i++)
+    {
+        var one = taken.Watches[i];
+        Console.WriteLine("  " + PadRight(one.Expression, 20)
+                          + PadRight(one.TypeName, 24)
+                          + (one.Ok ? one.Value : "-- " + one.Value));
+    }
+}
+
 /// The call stack a snapshot holds.
 void PrintFrames(Snapshot taken)
 {
@@ -877,6 +978,8 @@ void PrintWholeSnapshot(Snapshot taken)
     PrintFrames(taken);
     Console.WriteLine("locals");
     PrintValues(taken);
+    Console.WriteLine("watches");
+    PrintWatches(taken);
 }
 
 /// A file and a line, or the address when there is no line.
@@ -911,6 +1014,15 @@ String KindName(StopKind kind)
     }
 }
 
+/// The arguments from `from` onwards, as their own array.
+String[] ArgumentsFrom(String[] args, nuint from)
+{
+    String[] rest = new String[args.Length - from];
+    for (nuint i = from; i < args.Length; i++)
+        rest[i - from] = args[i];
+    return rest;
+}
+
 int PrintUsage()
 {
     Console.WriteLine("sldb -- the Stainless debugger");
@@ -926,6 +1038,7 @@ int PrintUsage()
     Console.WriteLine("  sldb step <binary> f:n [k] step k lines, into calls");
     Console.WriteLine("  sldb next <binary> f:n [k] the same, over them");
     Console.WriteLine("  sldb locals <binary> f:n   the variables in scope there");
+    Console.WriteLine("  sldb watch <binary> f:n e  what an expression is worth");
     Console.WriteLine("  sldb snapshot <binary> f:n everything a window is given");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
@@ -961,19 +1074,27 @@ int Main()
     if (args[0u] == "run" && args.Length >= 2u)
         return RunProgram(args[1u], args.Length >= 3u ? args[2u] : "");
 
+    String[] none = new String[0];
+
     if (args[0u] == "stack" && args.Length >= 3u)
-        return RunToBreakpointThen(args[1u], args[2u], "stack", 0);
+        return RunToBreakpointThen(args[1u], args[2u], "stack", 0, none);
 
     if (args[0u] == "locals" && args.Length >= 3u)
-        return RunToBreakpointThen(args[1u], args[2u], "locals", 0);
+        return RunToBreakpointThen(args[1u], args[2u], "locals", 0, none);
+
+    if (args[0u] == "watch" && args.Length >= 4u)
+        return RunToBreakpointThen(args[1u], args[2u], "watch", 0,
+                                   ArgumentsFrom(args, 3u));
 
     if (args[0u] == "snapshot" && args.Length >= 3u)
-        return RunToBreakpointThen(args[1u], args[2u], "snapshot", 0);
+        return RunToBreakpointThen(args[1u], args[2u], "snapshot", 0,
+                                   args.Length >= 4u ? ArgumentsFrom(args, 3u)
+                                                     : none);
 
     if ((args[0u] == "step" || args[0u] == "next") && args.Length >= 3u)
     {
         int times = args.Length >= 4u ? (int)ParseNumber(args[3u]) : 1;
-        return RunToBreakpointThen(args[1u], args[2u], args[0u], times);
+        return RunToBreakpointThen(args[1u], args[2u], args[0u], times, none);
     }
 
     return PrintUsage();

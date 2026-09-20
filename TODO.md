@@ -65,7 +65,7 @@ are written to it already.
 
 ### What the debugger still wants from the compiler
 
-`debug/` reads what `-g` emits and five things it does not emit are now
+`debug/` reads what `-g` emits and four things it does not emit are now
 measured rather than guessed. [docs/dwarf.md](docs/dwarf.md) has the numbers.
 
 - **`DILexicalBlock`.** Every local sits in the function's scope, so a debugger
@@ -73,11 +73,6 @@ measured rather than guessed. [docs/dwarf.md](docs/dwarf.md) has the numbers.
   contained. The pairing is with `PushScope`/`PopScopeWithoutRelease` in
   `LlvmEmitter.Statements.cs`. Filtering by `DW_AT_decl_line` in the engine
   would be guessing at something the compiler knows.
-- **An element type on `T[]` and `String`.** Both describe `__header` and
-  `length` and stop; elements begin at byte 24 and nothing says of what. The
-  fix is a third member typed as a `DW_TAG_array_type` with
-  `DISubrange(count: 0)` -- the flexible-array-member idiom, which names the
-  element and its stride without claiming a bound.
 - **A variant's tag as an enumeration.** Cases are numbered in declaration
   order and DWARF gets a member only for the ones carrying a payload, so the
   k-th member is not tag k and no consumer can map one to the other. An
