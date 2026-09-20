@@ -254,9 +254,34 @@ were. Worth doing, worth doing carefully, and not done here.
 $ sldb locals fp-dwarf.exe fixture.sl:65
   numbers     int[]                   4 elements at 0x17ede8fe2a0
   sum         int                     10
-  s           Fixture.Shape           Fixture.Shape (Fixture.Circle) at 0x...
+  where       Fixture.Point           { X = 1.5, Y = 2.5 }
+  shape       Fixture.Shape           Circle { radius = 7 }
+  flags       Fixture.Flags           { Kind = 5, Count = 300, Delta = -7 }
   label       Standard.Text.String    "circle"
+  node        Fixture.Node            Fixture.Node (Fixture.Leaf) at 0x...
 ```
+
+**A struct is printed member by member, two levels deep.** The third is
+`{...}`: it is rarely what was asked for and always what makes a line too long
+to read. Twelve members are shown and the rest are `...`, for the same reason.
+
+**A variant prints the case it is holding.** The tag carries an anonymous
+enumeration naming each case at its real value, which is the only thing that
+maps a tag to a case: DWARF gets a member only for a case that carries a
+payload, so the k-th member is not tag k. The same enumeration says which of
+the overlapping members is the live one.
+
+**A bit field is a run of bits inside the word it shares**, so it is loaded,
+shifted and masked rather than read from a byte of its own -- which it does not
+have. `DW_AT_data_bit_offset` is absolute, counted from the start of the
+structure, and a signed one is extended from its own width so that -7 in six
+bits is -7 and not 57.
+
+**A pointer is only read as an object when it points at one**, decided by the
+`__header` the compiler puts in front of a class body, an array body and the
+two text classes and nothing else (docs/abi.md §2). A `Point*` and a `void*`
+point at memory with no header, and reading a strong count out of one answers
+somebody's field.
 
 **`Fixture.Shape (Fixture.Circle)` needs no reflection metadata.** Every object
 carries a 24-byte header whether or not it carries field tables, and `type` at
@@ -437,13 +462,6 @@ only part of the watch grammar deliberately left out of it.
 frame-pointer walk is right at `-O0` and answers one frame where there is no
 frame pointer. `.eh_frame` on ELF and `.pdata` on PE are already in every
 binary this compiler produces.
-
-Named rather than done, in the value reader: a `struct` prints as its address
-and size rather than member by member; a `double` prints its bits, because
-reinterpreting eight bytes as a float needs a cast this does not have yet; and
-a variant prints nothing useful, because the cases are numbered in declaration
-order while DWARF gets a member only for the ones carrying a payload -- the
-k-th member is not tag k, and twelve lines of compiler would fix it properly.
 
 Step-in stops at the callee's first instruction rather than at `prologue_end`,
 so the first step into a function lands before its locals have slots.

@@ -298,6 +298,11 @@ public DescribedType DescribeType(Unit unit, Die carrier)
         if (die.Tag == TagPointerType && answer.Name.ByteLength() == 0u)
             answer.Name = PointeeName(unit, die);
 
+        // DWARF spells `void*` as a pointer with no target type at all, which
+        // leaves nothing to name it after.
+        if (die.Tag == TagPointerType && answer.Name.ByteLength() == 0u)
+            answer.Name = "void*";
+
         // **A pointer's width is usually not written down.** LLVM leaves
         // `DW_AT_byte_size` off a pointer whose width is the unit's address
         // size, which is every pointer this compiler emits, so the unit is
@@ -346,6 +351,30 @@ Die? TypeEntryOf(Unit unit, Die carrier)
     return null;
 }
 
+/// Whether a pointer is a reference to an object rather than a raw address.
+///
+/// By the `__header` member, which the compiler emits on a class body, an
+/// array body and the two text classes and on nothing else (docs/abi.md §2).
+/// A `Point*` and a `void*` point at memory with no header in front of it, and
+/// reading one as an object answers a strong count that is somebody's field.
+bool PointsAtAnObject(Unit unit, DescribedType pointer)
+{
+    var definition = pointer.Definition;
+    if (definition == null)
+        return false;
+
+    var pointee = TypeEntryOf(unit, (Die)definition);
+    if (pointee == null)
+        return false;
+
+    var body = (Die)pointee;
+    if (body.Tag != TagStructureType && body.Tag != TagClassType)
+        return false;
+
+    var members = ChildrenOf(unit, body);
+    return !members.IsEmpty && members[0u].Name == "__header";
+}
+
 /// What a pointer points at, by name.
 String PointeeName(Unit unit, Die pointer)
 {
@@ -374,8 +403,20 @@ String PointeeName(Unit unit, Die pointer)
 }
 
 /// Reads and formats a value of a described type at an address.
-String FormatAt(Engine engine, ITarget target, Unit unit,
-                DescribedType described, nuint at)
+public String FormatAt(Engine engine, ITarget target, Unit unit,
+                       DescribedType described, nuint at)
+    => FormatValueAt(engine, target, unit, described, at, 0);
+
+/// How far a value may be printed into. A struct inside a struct is shown, and
+/// one inside that is `{...}`: the third level is rarely what was asked for and
+/// always what makes a line too long to read.
+const int WatchDepthLimit = 2;
+
+/// How many members of one aggregate are shown before the rest are `...`.
+const nuint MembersShown = 12u;
+
+String FormatValueAt(Engine engine, ITarget target, Unit unit,
+                     DescribedType described, nuint at, int depth)
 {
     switch (described.Tag)
     {
@@ -389,6 +430,8 @@ String FormatAt(Engine engine, ITarget target, Unit unit,
                 return "<unreadable>";
             if (pointer == 0u)
                 return "null";
+            if (!PointsAtAnObject(unit, described))
+                return "0x" + FormatHexadecimal((ulong)pointer);
             return FormatObject(target, described, pointer);
         }
 
@@ -399,11 +442,8 @@ String FormatAt(Engine engine, ITarget target, Unit unit,
         case TagClassType:
             // A value of class type is reached through a pointer everywhere in
             // this language, so an aggregate here is a `struct` laid out in
-            // place -- shown as its address and size until member-by-member
-            // printing lands.
-            return described.Name + " at 0x" + FormatHexadecimal((ulong)at)
-                 + " (" + Standard.Text.FromInteger((long)described.Size)
-                 + " bytes)";
+            // place -- or a variant, which is a struct with a tag.
+            return FormatStructure(engine, target, unit, described, at, depth);
 
         default:
         {
@@ -414,19 +454,208 @@ String FormatAt(Engine engine, ITarget target, Unit unit,
     }
 }
 
+/// A struct laid out in place, member by member -- or the live case, when the
+/// struct is a variant.
+String FormatStructure(Engine engine, ITarget target, Unit unit,
+                       DescribedType described, nuint at, int depth)
+{
+    var definition = described.Definition;
+    if (definition == null)
+        return described.Name + " at 0x" + FormatHexadecimal((ulong)at);
+
+    if (depth >= WatchDepthLimit)
+        return "{...}";
+
+    var members = ChildrenOf(unit, (Die)definition);
+
+    var live = LiveCaseOf(target, unit, members, at);
+    if (live != null)
+        return FormatCase(engine, target, unit, members, (VariantCase)live, at,
+                          depth);
+
+    return FormatMembers(engine, target, unit, members, at, depth, "");
+}
+
+/// Which case of a variant is in the storage, by name.
+public class VariantCase
+{
+    public String Name;
+
+    public VariantCase(String name)
+    {
+        Name = name;
+    }
+}
+
+/// The live case of a variant, or null when this is an ordinary struct.
+///
+/// A variant is a struct whose first member is called `tag` and is typed as an
+/// enumeration -- which is how the compiler describes one, and how the k-th
+/// member stops being mistaken for tag k: DWARF gets a member only for a case
+/// that carries a payload.
+VariantCase? LiveCaseOf(ITarget target, Unit unit, List<Die> members, nuint at)
+{
+    if (members.IsEmpty)
+        return null;
+
+    var first = members[0u];
+    if (first.Tag != TagMember || first.Name != "tag")
+        return null;
+
+    var numbering = TypeEntryOf(unit, first);
+    if (numbering == null || ((Die)numbering).Tag != TagEnumerationType)
+        return null;
+
+    var counted = (Die)numbering;
+    nuint size = (nuint)counted.NumberOf(AtByteSize, 1u);
+    ulong raw = 0u;
+    if (!ReadNumber(target, at + (nuint)first.NumberOf(AtDataMemberLoc, 0u),
+                    size, &raw))
+        return null;
+
+    var cases = ChildrenOf(unit, counted);
+    for (nuint i = 0u; i < cases.Count; i++)
+    {
+        if (cases[i].Tag == TagEnumerator
+            && cases[i].NumberOf(AtConstValue, 0u) == raw)
+            return new VariantCase(cases[i].Name);
+    }
+
+    // A tag no case claims is a variant that was never assigned, or storage
+    // being read as something it is not. Naming the number is the honest
+    // answer to both.
+    return new VariantCase("tag " + Standard.Text.FromInteger((long)raw));
+}
+
+/// The live case, and its payload if it has one.
+String FormatCase(Engine engine, ITarget target, Unit unit, List<Die> members,
+                  VariantCase live, nuint at, int depth)
+{
+    for (nuint i = 1u; i < members.Count; i++)
+    {
+        var one = members[i];
+        if (one.Tag != TagMember || one.Name != live.Name)
+            continue;
+
+        var described = DescribeType(unit, one);
+        nuint where = at + (nuint)one.NumberOf(AtDataMemberLoc, 0u);
+        return live.Name + " "
+             + FormatValueAt(engine, target, unit, described, where, depth);
+    }
+
+    // No member of that name: the case carries nothing, which is most of them.
+    return live.Name;
+}
+
+/// `{ X = 1, Y = 2 }`, for however many members are worth showing.
+String FormatMembers(Engine engine, ITarget target, Unit unit,
+                     List<Die> members, nuint at, int depth, String skip)
+{
+    var made = new StringBuilder();
+    made.Append("{ ");
+
+    nuint shown = 0u;
+    for (nuint i = 0u; i < members.Count; i++)
+    {
+        var one = members[i];
+        if (one.Tag != TagMember || one.Name == skip)
+            continue;
+
+        if (shown == MembersShown)
+        {
+            made.Append(", ...");
+            break;
+        }
+        if (shown != 0u)
+            made.Append(", ");
+        shown++;
+
+        made.Append(one.Name);
+        made.Append(" = ");
+        made.Append(FormatMember(engine, target, unit, one, at, depth));
+    }
+
+    if (shown == 0u)
+        return "{ }";
+
+    made.Append(" }");
+    return made.ToText();
+}
+
+/// One member of an aggregate, at its own offset.
+String FormatMember(Engine engine, ITarget target, Unit unit, Die member,
+                    nuint at, int depth)
+{
+    var described = DescribeType(unit, member);
+
+    ulong bits = 0u;
+    if (ReadBitField(target, member, described, at, &bits))
+    {
+        return IsSignedEncoding(described.Encoding)
+             ? Standard.Text.FromInteger(SignExtendedFrom(bits, BitsOf(member)))
+             : Standard.Text.FromInteger((long)bits);
+    }
+
+    nuint where = at + (nuint)member.NumberOf(AtDataMemberLoc, 0u);
+    return FormatValueAt(engine, target, unit, described, where, depth + 1);
+}
+
+/// A run of bits inside the word it shares, when that is what a member is.
+///
+/// Answers false for an ordinary member, which is most of them. A bit field is
+/// `DW_AT_bit_size` bits beginning `DW_AT_data_bit_offset` bits into the
+/// structure -- an absolute offset, so nothing here needs the member's byte
+/// offset, which a bit field does not carry.
+public bool ReadBitField(ITarget target, Die member, DescribedType described,
+                         nuint at, ulong* value)
+{
+    nuint width = BitsOf(member);
+    if (width == 0u || width > 64u)
+        return false;
+
+    nuint start = (nuint)member.NumberOf(AtDataBitOffset, 0u);
+
+    // The eight bytes the field begins in. A field the compiler emits never
+    // straddles the unit it was given, so eight from there always hold it.
+    nuint word = (start / 64u) * 8u;
+    nuint shift = start - word * 8u;
+    if (shift + width > 64u)
+        return false;
+
+    ulong raw = 0u;
+    if (!ReadNumber(target, at + word, 8u, &raw))
+        return false;
+
+    ulong mask = width == 64u ? ~0u : (1u << (int)width) - 1u;
+    *value = (raw >> (int)shift) & mask;
+    return true;
+}
+
+/// How many bits a member is, or zero when it is a whole one.
+public nuint BitsOf(Die member) => (nuint)member.NumberOf(AtBitSize, 0u);
+
+/// Sign-extends a value read in `width` bits.
+long SignExtendedFrom(ulong raw, nuint width)
+{
+    if (width >= 64u)
+        return (long)raw;
+    int spare = (int)(64u - width);
+    return ((long)(raw << spare)) >> spare;
+}
+
+/// Whether a base type's bytes are a signed number.
+public bool IsSignedEncoding(ulong encoding)
+    => encoding == EncodingSigned || encoding == EncodingSignedChar;
+
 String FormatBaseType(ITarget target, DescribedType described, nuint at)
 {
     nuint size = described.Size != 0u ? described.Size : 8u;
     if (size > 8u)
         size = 8u;
 
-    byte[] bytes = new byte[8];
-    if (!target.ReadMemory(at, bytes, size))
-        return "<unreadable>";
-
     ulong raw = 0u;
-    for (nuint i = 0u; i < size; i++)
-        raw = raw | ((ulong)bytes[i] << (int)(i * 8u));
+    if (!ReadNumber(target, at, size, &raw))
+        return "<unreadable>";
 
     switch (described.Encoding)
     {
@@ -435,41 +664,61 @@ String FormatBaseType(ITarget target, DescribedType described, nuint at)
 
         case EncodingSigned:
         case EncodingSignedChar:
-        {
-            // Sign-extend from the type's own width, which is what makes a
-            // negative `int` in eight bytes read as negative rather than as
-            // four billion.
-            long signed2 = (long)raw;
-            if (size < 8u)
-            {
-                int spare = (int)((8u - size) * 8u);
-                signed2 = ((long)(raw << spare)) >> spare;
-            }
-            return Standard.Text.FromInteger(signed2);
-        }
+            return Standard.Text.FromInteger(SignExtended(raw, size));
 
         case EncodingFloat:
-            // Shown as its bits: turning eight bytes into a `double` needs a
-            // reinterpreting cast this reader does not have yet, and a wrong
-            // number is worse than an honest one.
-            return "0x" + FormatHexadecimal(raw) + " (float bits)";
+            return FormatFloat(raw, size);
 
         default:
             return Standard.Text.FromInteger((long)raw);
     }
 }
 
-String FormatEnumeration(ITarget target, Unit unit, DescribedType described,
-                         nuint at)
+/// Sign-extends a value read in `size` bytes.
+///
+/// Without it a negative `int` read into eight bytes is four billion.
+long SignExtended(ulong raw, nuint size) => SignExtendedFrom(raw, size * 8u);
+
+/// The bits of an IEEE value, as the number they are.
+///
+/// The bytes are read as an integer and reinterpreted, which is the only way
+/// round: a `double` cannot be loaded out of a `byte[]` without going through
+/// something the size of one.
+String FormatFloat(ulong raw, nuint size)
 {
-    nuint size = described.Size != 0u ? described.Size : 4u;
+    if (size == 4u)
+    {
+        uint narrow = (uint)raw;
+        return Standard.Text.FromDouble((double)(*(float*)&narrow));
+    }
+    return Standard.Text.FromDouble(*(double*)&raw);
+}
+
+/// Up to eight bytes out of the target, little-endian.
+bool ReadNumber(ITarget target, nuint at, nuint size, ulong* value)
+{
+    if (size == 0u || size > 8u)
+        return false;
+
     byte[] bytes = new byte[8];
     if (!target.ReadMemory(at, bytes, size))
-        return "<unreadable>";
+        return false;
 
     ulong raw = 0u;
     for (nuint i = 0u; i < size; i++)
         raw = raw | ((ulong)bytes[i] << (int)(i * 8u));
+
+    *value = raw;
+    return true;
+}
+
+String FormatEnumeration(ITarget target, Unit unit, DescribedType described,
+                         nuint at)
+{
+    nuint size = described.Size != 0u ? described.Size : 4u;
+    ulong raw = 0u;
+    if (!ReadNumber(target, at, size, &raw))
+        return "<unreadable>";
 
     var definition = described.Definition;
     if (definition != null)

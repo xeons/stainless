@@ -21,6 +21,14 @@ public enum Level : byte
     Loud  = 7,
 }
 
+// A variant's tag carries an enumeration naming each case, which is the only
+// thing that maps one to the other: a case with no payload gets no member.
+public variant Shape
+{
+    Empty;
+    Circle(int radius);
+}
+
 public class Node
 {
     public int Value;
@@ -74,6 +82,11 @@ int Main()
     // A `void*`: DWARF spells it as a pointer with no base type, and LLVM
     // still wants the field written -- as `null` -- or the node does not
     // verify.
+    Shape round = Shape.Circle(3);
+    int radius = 0;
+    if (round is Circle only)
+        radius = only.radius;
+
     int cell = 5;
     void* anything = (void*)&cell;
 
@@ -89,6 +102,7 @@ int Main()
     Console.WriteLine(Text.FromInteger(Sum(numbers)));
     Console.WriteLine(Text.FromInteger((int)raw));
     Console.WriteLine(Text.FromInteger(boxed.Get()));
+    Console.WriteLine(Text.FromInteger(radius));
     Console.WriteLine(named.Get());
     return 0;
 }

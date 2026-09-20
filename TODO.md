@@ -65,15 +65,9 @@ are written to it already.
 
 ### What the debugger still wants from the compiler
 
-`debug/` reads what `-g` emits and two things it does not emit are now
-measured rather than guessed. [docs/dwarf.md](docs/dwarf.md) has the numbers.
+`debug/` reads what `-g` emits. One thing it does not emit is measured rather
+than guessed; [docs/dwarf.md](docs/dwarf.md) has the numbers.
 
-- **A variant's tag as an enumeration.** Cases are numbered in declaration
-  order and DWARF gets a member only for the ones carrying a payload, so the
-  k-th member is not tag k and no consumer can map one to the other. An
-  anonymous `DW_TAG_enumeration_type` on the tag, one `DIEnumerator` per case
-  at its real value, names the case *and* says which overlapping member is
-  live.
 - **`DW_AT_language` is `DW_LANG_C_plus_plus`.** We are not C++, and a consumer
   that demangles by language does the wrong thing with a `_SL` name.
 

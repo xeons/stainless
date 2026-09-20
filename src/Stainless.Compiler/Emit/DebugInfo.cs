@@ -391,6 +391,31 @@ public sealed class DebugInfo
         return id;
     }
 
+    /// <summary>
+    /// The tag's values, named: one enumerator per case at the number the
+    /// binder gave it.
+    /// </summary>
+    /// <remarks>
+    /// Without it a tag is a number nothing can map to a case. The members
+    /// beside it are no help — DWARF gets one only for a case that carries a
+    /// payload, so the k-th member is not tag k — and this says both which case
+    /// is live and which of the overlapping members is the real one.
+    ///
+    /// Anonymous, because the type has no name in the source: it is how one
+    /// field of one variant is spelt, not something a program can declare.
+    /// </remarks>
+    private int CaseNumbering(VariantTypeSymbol variant)
+    {
+        var cases = variant.Cases
+            .Select(c => Add($"!DIEnumerator(name: {Quote(c.Name)}, value: {c.Tag})"))
+            .ToList();
+
+        return Add(
+            $"!DICompositeType(tag: DW_TAG_enumeration_type, {Position(variant.Span)}" +
+            $"baseType: !{Type(PrimitiveTypeSymbol.Byte)}, size: 8, align: 8, " +
+            $"elements: !{Tuple(cases)})");
+    }
+
     private int EnumerationType(EnumTypeSymbol enumType)
     {
         int id = Reserve();
@@ -594,7 +619,7 @@ public sealed class DebugInfo
         var members = new List<int>
         {
             Add($"!DIDerivedType(tag: DW_TAG_member, name: \"tag\", {where}" +
-                $"baseType: !{Type(PrimitiveTypeSymbol.Byte)}, size: 8, offset: 0)"),
+                $"baseType: !{CaseNumbering(variant)}, size: 8, offset: 0)"),
         };
 
         if (variant.PayloadField is { } payload)

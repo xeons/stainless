@@ -1240,6 +1240,11 @@ are each a `DW_TAG_lexical_block` with its own address range, so a debugger
 stopped before one shows nothing declared inside it. A function's own body is
 not a block of its own: the subprogram scopes it, as it does in C.
 
+**A variant's tag names its cases.** The `tag` member is typed as an anonymous
+`DW_TAG_enumeration_type` with one enumerator per case at the number the binder
+gave it. Nothing else maps a tag to a case: DWARF gets a member only for a case
+that carries a payload, so the k-th member is not tag k.
+
 **A class body includes its header.** A field's offset is measured from the
 start of the fields area (§2), and DWARF wants it measured from the start of the
 allocation, so the 24 bytes in front are described as a member named `__header`

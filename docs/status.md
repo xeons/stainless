@@ -813,13 +813,11 @@ Being straight about the edges, roughly in the order they are worth adding:
   member claiming no bound — DWARF wants a static bound and the real one is the
   length beside them, so what is described is the element type and its stride.
 
-  Two are measured in [docs/dwarf.md](dwarf.md) and are worth knowing before
-  reading any of it back: a variant's tag cannot be mapped to a case, because
-  DWARF gets a member only for the cases carrying a payload; and
-  `DW_AT_language` is `DW_LANG_C_plus_plus`, which will mislead any consumer
-  that demangles by language. A DWARF build on Windows also describes the
-  Stainless module alone, because the C runtime's objects are compiled for the
-  MSVC target and carry CodeView.
+  One is worth knowing before reading any of it back: `DW_AT_language` is
+  `DW_LANG_C_plus_plus`, which will mislead any consumer that demangles by
+  language. A DWARF build on Windows also describes the Stainless module
+  alone, because the C runtime's objects are compiled for the MSVC target and
+  carry CodeView.
 - **A variant does not cross a library boundary or carry `[Reflect]`.** Both
   are reported where they are written (SL0441, SL0442) rather than left to be
   discovered. The metadata describes layouts and the reflection tables describe

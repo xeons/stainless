@@ -42,6 +42,10 @@ distinct !DICompileUnit(language: DW_LANG_C_plus_plus
 !DICompositeType(tag: DW_TAG_structure_type, name: "Debug.Box<int>"
 !DICompositeType(tag: DW_TAG_structure_type, name: "Debug.Box<String>"
 
+# A variant's tag is an enumeration naming every case, payload or not.
+!DIEnumerator(name: "Empty", value: 0)
+!DIEnumerator(name: "Circle", value: 1)
+
 # A void pointer, whose base type is written as null rather than left out.
 !DIDerivedType(tag: DW_TAG_pointer_type, baseType: null
 

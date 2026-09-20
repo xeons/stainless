@@ -495,7 +495,12 @@ class WatchReader
         described.Name = "nuint";
         described.Size = 8u;
         described.Encoding = EncodingUnsigned;
+        return NumberPlace(described, number);
+    }
 
+    /// A value that is not anywhere: a literal, or a bit field taken apart.
+    Place NumberPlace(DescribedType described, ulong number)
+    {
         var made = new Place(_unit, described, 0u);
         made.Addressed = false;
         made.Number = number;
@@ -554,6 +559,12 @@ class WatchReader
     /// `*` per step.
     Place? MemberOf(Place value, String name)
     {
+        if (!value.Addressed)
+        {
+            Refuse("a bit field is a run of bits, with no fields in it");
+            return null;
+        }
+
         nuint at = value.Address;
         Die? structure = value.Type.Definition;
 
@@ -591,19 +602,27 @@ class WatchReader
         }
 
         var member = (WatchMember)found;
+        var described = DescribeType(value.InUnit, member.Entry);
 
-        // A bit field is a run of bits inside a word it shares, so reading it
-        // means loading the word and shifting. Refused rather than read from
-        // its byte, which would answer whatever its neighbours hold.
-        if (member.Entry.Has(AtBitSize) || member.Entry.Has(AtDataBitOffset))
+        // A bit field has no byte of its own, so it is read here and carried as
+        // a number. Nothing further can be done to it -- there is nothing to
+        // index or to follow inside a run of bits -- and the steps after this
+        // one say so.
+        ulong bits = 0u;
+        if (ReadBitField(_target, member.Entry, described, at, &bits))
         {
-            Refuse("'" + name + "' is a bit field, which a watch cannot read yet");
+            nuint width = BitsOf(member.Entry);
+            return NumberPlace(described,
+                               IsSignedEncoding(described.Encoding)
+                               ? (ulong)SignExtendedFrom(bits, width) : bits);
+        }
+        if (member.Entry.Has(AtBitSize))
+        {
+            Refuse("'" + name + "' is a bit field this reader cannot take apart");
             return null;
         }
 
-        return new Place(value.InUnit,
-                         DescribeType(value.InUnit, member.Entry),
-                         at + member.Offset);
+        return new Place(value.InUnit, described, at + member.Offset);
     }
 
     /// One element of an inline array, of an array object, or of a pointer.
@@ -616,6 +635,12 @@ class WatchReader
         ulong which = 0u;
         if (!NumberFrom((Place)read, &which))
             return null;
+
+        if (!value.Addressed)
+        {
+            Refuse("a bit field is a run of bits, with nothing in it to index");
+            return null;
+        }
 
         switch (value.Type.Tag)
         {
@@ -727,6 +752,12 @@ class WatchReader
     /// `*p`: what a pointer points at.
     Place? Dereferenced(Place value)
     {
+        if (!value.Addressed)
+        {
+            Refuse("that is a number, not a pointer");
+            return null;
+        }
+
         if (value.Type.Tag != TagPointerType)
         {
             Refuse(value.Type.Name + " is not a pointer, so it cannot be followed");
@@ -804,7 +835,7 @@ class WatchReader
         // -1 read as an unsigned index is four billion elements along, which
         // passes every bounds check that compares the wrong way and reads
         // somebody else's memory.
-        if (IsSignedWatchEncoding(value.Type.Encoding))
+        if (IsSignedEncoding(value.Type.Encoding))
         {
             long signed2 = (long)raw;
             if (size < 8u)
@@ -824,9 +855,6 @@ class WatchReader
         return true;
     }
 }
-
-bool IsSignedWatchEncoding(ulong encoding)
-    => encoding == EncodingSigned || encoding == EncodingSignedChar;
 
 String WatchNumberText(ulong value) => Standard.Text.FromInteger((long)value);
 
