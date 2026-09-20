@@ -241,12 +241,21 @@ hang or like a step that ran to the end of the program. Getting off a
 breakpoint is itself a step, so a flag has to say whether the single step now
 in flight is housekeeping or the thing somebody asked for.
 
-**Stepping in stops at the callee's first instruction, not at its
-`prologue_end`.** Running to the marker means a temporary breakpoint, and a
-temporary breakpoint at an address taken from the line table without first
-proving it is inside this function is `0xCC` written into somebody else's code
--- which is exactly what happened, and what the wild addresses in the output
-were. Worth doing, worth doing carefully, and not done here.
+**Stepping in stops at the callee's `prologue_end`.** A `call` lands on the
+first instruction of a function, before the frame pointer is set up, so every
+local reads out of a slot that does not exist yet and the frame above is still
+the caller's. The line table says where that stops being true.
+
+It is **single-stepped rather than run to**. Running to the marker means a
+temporary breakpoint, and an address taken from the line table and not proved
+to be inside this function is `0xCC` written into somebody else's code. A
+prologue is a handful of instructions, so stepping there costs nothing and
+cannot land anywhere it should not.
+
+**Line zero is DWARF saying there is no line**, not a line numbered zero. It
+covers a compiler's own code -- a thunk, a spill, the tail of a call sequence.
+Reported as a line it is a place in a file that nobody wrote, and a step that
+treats it as one stops on it, which is a step that appears to go nowhere.
 
 ## Values
 
@@ -463,5 +472,3 @@ frame-pointer walk is right at `-O0` and answers one frame where there is no
 frame pointer. `.eh_frame` on ELF and `.pdata` on PE are already in every
 binary this compiler produces.
 
-Step-in stops at the callee's first instruction rather than at `prologue_end`,
-so the first step into a function lands before its locals have slots.

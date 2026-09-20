@@ -546,6 +546,94 @@ public class Engine
         return WaitForStop();
     }
 
+    /// Carries a step-in past the callee's prologue.
+    ///
+    /// A `call` lands on the first instruction of a function, which is before
+    /// the frame pointer is set up -- so every local reads out of a slot that
+    /// does not exist yet and the frame above is the caller's. `prologue_end`
+    /// is the line table saying where that stops being true, and is where
+    /// every other debugger puts you.
+    ///
+    /// **Single-stepped rather than run to.** Running there means a temporary
+    /// breakpoint, and an address taken from the line table and not proved to
+    /// be inside this function is `0xCC` written into somebody else's code. A
+    /// prologue is a handful of instructions, so stepping costs nothing and
+    /// cannot land anywhere it should not.
+    Stop AtPrologueEnd(uint thread, Stop arrival, nuint entry)
+    {
+        nuint low = 0u;
+        nuint high = 0u;
+        if (!FunctionRangeAt(entry, &low, &high))
+            return AtLine(arrival, entry);
+
+        nuint marker = 0u;
+        if (!PrologueEndOf(low, high, &marker) || marker <= entry
+            || marker >= high)
+            return AtLine(arrival, entry);
+
+        // A bound on the work: a prologue this long is a function this engine
+        // has the wrong range for, and stepping to the end of the program is
+        // worse than stopping early.
+        for (int guard = 0; guard < 256; guard++)
+        {
+            Registers now;
+            now.Pc = 0u;
+            now.StackPointer = 0u;
+            now.FramePointer = 0u;
+            if (!_target.ReadRegisters(thread, &now))
+                return AtLine(arrival, entry);
+
+            if (now.Pc == marker)
+                return AtLine(arrival, now.Pc);
+
+            // Out of the function before the marker: a prologue that calls
+            // something, or a range that was not this function's after all.
+            if (now.Pc < low || now.Pc >= high)
+                return AtLine(arrival, now.Pc);
+
+            var stepped = StepInstruction(thread);
+            if (stepped.Kind != StopKind.Step)
+                return stepped;
+        }
+
+        return AtLine(arrival, marker);
+    }
+
+    /// The first address in a function that the line table marks
+    /// `prologue_end`, as the running process sees it.
+    ///
+    /// Both bounds are runtime addresses, as `FunctionRangeAt` answers them.
+    public bool PrologueEndOf(nuint low, nuint high, nuint* at)
+    {
+        nuint from = ToLinked(low);
+        nuint to = ToLinked(high);
+        bool found = false;
+        nuint earliest = 0u;
+
+        for (nuint u = 0u; u < _tables.Count; u++)
+        {
+            var rows = _tables[u].Rows;
+            for (nuint i = 0u; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                if (!row.PrologueEnd || row.EndSequence)
+                    continue;
+                if (row.Address < from || row.Address >= to)
+                    continue;
+                if (!found || row.Address < earliest)
+                {
+                    earliest = row.Address;
+                    found = true;
+                }
+            }
+        }
+
+        if (!found)
+            return false;
+        *at = ToRuntime(earliest);
+        return true;
+    }
+
     /// Runs until one of this engine's breakpoints or something worse.
     Stop WaitForStop()
     {
@@ -631,18 +719,9 @@ public class Engine
                             return ran;
                         continue;
                     }
-                    // Stepping in, and the callee has lines: the step ends at
-                    // its first instruction.
-                    //
-                    // **Not at its `prologue_end`**, which is where a
-                    // breakpoint on the function belongs and is a different
-                    // question. Running there means a temporary breakpoint,
-                    // and a temporary breakpoint at an address chosen from the
-                    // line table without proving it is inside this function is
-                    // 0xCC written into somebody else's code. It is worth
-                    // doing and worth doing carefully; see the note in
-                    // `debug/README.md`.
-                    return AtLine(stop, now.Pc);
+                    // Stepping in, and the callee has lines: the step ends
+                    // where its locals have somewhere to live.
+                    return AtPrologueEnd(thread, stop, now.Pc);
                 }
 
                 // Shallower, or sideways with no range to judge by: the frame
@@ -792,6 +871,12 @@ public class Engine
     }
 
     /// Which source line an address is on.
+    ///
+    /// **Line zero is DWARF saying there is no line**, not a line numbered
+    /// zero. It covers a compiler's own code -- a thunk, a spill, the tail of
+    /// a call sequence -- and a caller told that address 0x1234 is `f.sl:0`
+    /// will show it as a place in a file. A step that treats it as a line
+    /// stops on it, which is a step that appears to go nowhere.
     public SourcePosition PositionAt(nuint runtimeAddress)
     {
         nuint linked = ToLinked(runtimeAddress);
@@ -801,6 +886,8 @@ public class Engine
             if (row == null)
                 continue;
             var here = (LineRow)row;
+            if (here.Line == 0u)
+                return new SourcePosition("", 0u, false);
             return new SourcePosition(_tables[u].FileName(here.File),
                                       here.Line, true);
         }
