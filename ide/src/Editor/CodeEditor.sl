@@ -74,6 +74,9 @@ public class RowEventArgs
 
 public closure void RowEventHandler(Control sender, RowEventArgs args);
 
+/// Told which word the pointer came to rest over, or "" when it left one.
+public closure void HoverHandler(String word);
+
 /// The column the right-hand rule is drawn at. 80, because that is what the
 /// sources this is written to edit are wrapped to.
 const nuint RightMargin = 80u;
@@ -185,6 +188,7 @@ public class CodeEditor : CustomControl
         _hasStatement = false;
         _statementIsTop = true;
         _dragging = false;
+        _hovering = "";
         _ready = false;
 
         Border = ControlBorder.Sunken;
@@ -373,6 +377,18 @@ public class CodeEditor : CustomControl
 
     /// Raised whenever the caret moves, so a status bar can say where it is.
     public event EventHandler CaretMoved;
+
+    /// The pointer came to rest over a word, or left the one it was over.
+    ///
+    /// The word itself rather than a position, because what wants it is a
+    /// debugger asking what that name is worth, and an empty one is the
+    /// pointer leaving.
+    public event HoverHandler Hovered;
+
+    /// The word the pointer was last over, so that moving inside one asks
+    /// nothing. A value is read out of a stopped process; asking per pixel
+    /// would read it a hundred times across one identifier.
+    String _hovering;
     protected virtual void OnCaretMoved() => CaretMoved(this);
 
     /// Raised whenever the text changes.
@@ -1089,7 +1105,58 @@ public class CodeEditor : CustomControl
             Invalidate();
             OnCaretMoved();
         }
+        else
+        {
+            ReportHover(args.X, args.Y);
+        }
         base.OnMouseMove(args);
+    }
+
+    /// Says which word the pointer is over, when it changes.
+    ///
+    /// Only over the text: the gutter is line numbers and breakpoint glyphs,
+    /// and a number there is not a name.
+    void ReportHover(int x, int y)
+    {
+        String word = x < _gutter ? "" : WordAt(PositionAt(x, y));
+        if (word == _hovering)
+            return;
+
+        _hovering = word;
+        Hovered(word);
+    }
+
+    /// The word a position is inside, or "".
+    ///
+    /// A word and nothing else: a run of spaces or of punctuation is not a
+    /// name, and answering one would have a debugger evaluating `=>`.
+    public String WordAt(Position where)
+    {
+        if (where.Row >= _doc.LineCount)
+            return "";
+
+        String line = _doc.TextAt(where.Row);
+        nuint size = line.ByteLength();
+        if (size == 0u || where.Column >= size)
+            return "";
+
+        if (!IsWord(line.ByteAt(where.Column)))
+            return "";
+
+        nuint start = where.Column;
+        while (start > 0u)
+        {
+            nuint back = StepLeft(line, start);
+            if (!IsWord(line.ByteAt(back)))
+                break;
+            start = back;
+        }
+
+        nuint end = where.Column;
+        while (end < size && IsWord(line.ByteAt(end)))
+            end = line.NextCodePoint(end);
+
+        return line.Substring(start, end - start);
     }
 
     protected override void OnMouseUp(MouseEventArgs args)

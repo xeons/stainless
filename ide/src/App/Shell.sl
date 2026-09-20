@@ -321,7 +321,8 @@ public class Shell : Form
         _status.AddPanel(420);      // the path
         _status.AddPanel(200);      // what just happened
         _status.AddPanel(110);      // how many errors
-        _status.AddPanel(0);        // where the caret is
+        _status.AddPanel(110);      // where the caret is
+        _status.AddPanel(0);        // what the pointer is over, while stopped
 
         // The commands, on a band shared with the configuration picker.
         //
@@ -571,6 +572,7 @@ public class Shell : Form
         // The margin asks per painted line rather than being handed a list, so
         // one store answers for every tab and nothing is copied.
         editor.MarginClicked += this.OnMarginClicked;
+        editor.Hovered += (word) => this.OnHovered(word);
         editor.ShowMarginMarks((row) => MarkFor(editor, row));
 
         // A breakpoint is anchored to a line number, and typing above one
@@ -3340,6 +3342,42 @@ public class Shell : Form
         RepaintEditors();
     }
 
+    /// The pointer came to rest over a word: say what it is worth.
+    ///
+    /// **Answered out of the stop already in hand**, never by asking the
+    /// engine: the thread that may read a debuggee is the session's, and it is
+    /// busy. `Snapshot.Locals` was read while the program was stopped and
+    /// nothing has run since, so a local is already here -- and only a local:
+    /// a field or an element would want an expression, and the pointer has not
+    /// selected one.
+    ///
+    /// Not a tooltip, which `forms/` has no control for. The status line is
+    /// where this window says what is under the pointer.
+    void OnHovered(String word)
+    {
+        var taken = _stopped;
+        if (taken == null)
+            return;
+
+        if (word.ByteLength() == 0u)
+        {
+            ShowHover("");
+            return;
+        }
+
+        var stop = (Snapshot)taken;
+        for (nuint i = 0u; i < stop.Locals.Count; i++)
+        {
+            var one = stop.Locals[i];
+            if (one.Name != word)
+                continue;
+            ShowHover(one.Name + " = " + one.Value + "   (" + one.TypeName + ")");
+            return;
+        }
+
+        ShowHover("");
+    }
+
     void ClearDebugPanes()
     {
         _locals.Clear();
@@ -3469,6 +3507,10 @@ public class Shell : Form
     }
 
     void Say(String what) => _status.SetPanelText(1, what);
+
+    /// What the pointer is over, or "" to clear it. Its own panel, so a
+    /// hover does not take away what the window last said.
+    void ShowHover(String what) => _status.SetPanelText(4, what);
 
     /// Whether a list of arguments holds one.
     static bool Names(String[] arguments, String wanted)
@@ -3739,6 +3781,34 @@ public class Shell : Form
             {
                 Console.WriteLine("FAIL: on punctuation it selected '"
                                   + pad.SelectedText + "'");
+                ok = false;
+            }
+
+            // What the pointer is over, which a debugger asks about. Only a
+            // word: a run of spaces or of punctuation is not a name, and
+            // answering one has a debugger looking up `//`.
+            if (pad.WordAt(Position.At(0u, 5u)) != "total"
+                || pad.WordAt(Position.At(0u, 4u)) != "total"
+                || pad.WordAt(Position.At(0u, 0u)) != "var")
+            {
+                Console.WriteLine("FAIL: the word under the pointer was read wrongly");
+                ok = false;
+            }
+
+            if (pad.WordAt(Position.At(0u, 23u)).ByteLength() != 0u
+                || pad.WordAt(Position.At(0u, 26u)).ByteLength() != 0u)
+            {
+                Console.WriteLine("FAIL: spaces or punctuation were read as a word");
+                ok = false;
+            }
+
+            // Past the end of the line, where the pointer spends most of its
+            // time, and past the last line. Neither is a word and neither may
+            // fault.
+            if (pad.WordAt(Position.At(0u, 200u)).ByteLength() != 0u
+                || pad.WordAt(Position.At(50u, 0u)).ByteLength() != 0u)
+            {
+                Console.WriteLine("FAIL: a point off the text was read as a word");
                 ok = false;
             }
 

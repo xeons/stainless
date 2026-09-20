@@ -142,6 +142,12 @@ were fixed — the IDE is what found every one of them.
   survive Stop, Restart and a rebuild that moved everything, and they can be
   set before anything has been compiled.
 
+  **A hover says what a local is worth.** Point at one while the program is
+  stopped and its value is on the status line. It is answered out of the stop
+  the window is already holding — the thread that may read a debuggee is the
+  session's, and it is busy — so it costs nothing and cannot be asked for
+  anything the Locals pane does not have.
+
   **Watch takes `a`, `a.b.c`, `a[3]`, `a[i]`, `*p` and a number**, and nothing
   else: no arithmetic, no casts, and never a call into the program being
   debugged. Add one from the Debug menu or the pane's own menu; double-click a
@@ -183,10 +189,12 @@ Named honestly, since the point of the page is to say where the edges are.
   `--diagnostics json` is the first stone of it and already carries what a
   squiggle needs — a code, a place, and a length to underline — which is why
   the editor does not have to guess at any of that any more.
-- **No hover values.** Watch evaluates an expression and Locals shows what is
-  in scope, but pointing at an identifier in the editor says nothing. That
-  wants the editor to know which run of bytes under the pointer is a whole
-  expression, which the painting lexer does not answer.
+- **A hover reads the status line, not a tooltip.** Pointing at a local while
+  the program is stopped shows its value in the status bar's last panel.
+  `forms/` has no tooltip control, and one is a control on two backends rather
+  than a debugger feature. It answers a local and nothing else: a field or an
+  element is an expression, and the pointer has not selected one — put it in
+  Watch.
 - **The debugger needs a project.** A loose file is compiled to a path the
   compiler chooses and this window never learns, so F5 asks for a project to be
   opened first.
