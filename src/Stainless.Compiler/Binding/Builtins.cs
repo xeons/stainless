@@ -24,9 +24,15 @@ namespace Stainless.Binding;
 /// modules so that name resolution, visibility and overloading need no special
 /// cases.
 ///
-/// Their bodies live in runtime/stainless_rt.c. Each one is declared with C
-/// linkage and a fixed runtime symbol, so a call to <c>text.ByteLength()</c>
-/// lowers to exactly <c>call @sl_string_byte_length(ptr)</c> and nothing more.
+/// Most of their bodies are C, in runtime/, declared with C linkage and a fixed
+/// runtime symbol: a call to <c>text.ByteLength()</c> lowers to exactly
+/// <c>call @sl_string_byte_length(ptr)</c> and nothing more.
+///
+/// <para>
+/// The rest are Stainless, in stdlib/, and this class only finds them — see
+/// <see cref="Found"/>. A built-in moves that way when nothing about it needs
+/// the compiler: what is left behind is the name, not the code.
+/// </para>
 /// </summary>
 public sealed class Builtins
 {
@@ -131,14 +137,44 @@ public sealed class Builtins
     /// <c>CompareTo</c> and <c>HashCode</c> on one anyway and lowers each to
     /// one of these, which is what lets <c>Sort(numbers)</c> work on a
     /// <c>List&lt;int&gt;</c> without the language growing operator constraints.
+    ///
+    /// <para>
+    /// <b>These seven are found rather than declared.</b> Their bodies are
+    /// Stainless, in <c>stdlib/Standard.sl</c>, and what is here is a lookup by
+    /// name and signature run the first time the binder needs one -- which is
+    /// during body binding, long after the standard library's own names were
+    /// declared. Nothing else is required to move a built-in into the language:
+    /// the call the binder builds is an ordinary call to an ordinary function.
+    /// </para>
     /// </summary>
-    public FunctionSymbol CompareLong { get; }
-    public FunctionSymbol CompareULong { get; }
-    public FunctionSymbol CompareDouble { get; }
-    public FunctionSymbol CompareText { get; }
-    public FunctionSymbol HashInteger { get; }
-    public FunctionSymbol HashDouble { get; }
-    public FunctionSymbol HashText { get; }
+    public FunctionSymbol CompareLong => Found(ref _compareLong, "CompareLong",
+        PrimitiveTypeSymbol.Int, PrimitiveTypeSymbol.Long, PrimitiveTypeSymbol.Long);
+
+    public FunctionSymbol CompareULong => Found(ref _compareULong, "CompareULong",
+        PrimitiveTypeSymbol.Int, PrimitiveTypeSymbol.ULong, PrimitiveTypeSymbol.ULong);
+
+    public FunctionSymbol CompareDouble => Found(ref _compareDouble, "CompareDouble",
+        PrimitiveTypeSymbol.Int, PrimitiveTypeSymbol.Double, PrimitiveTypeSymbol.Double);
+
+    public FunctionSymbol CompareText => Found(ref _compareText, "CompareText",
+        PrimitiveTypeSymbol.Int, String, String);
+
+    public FunctionSymbol HashInteger => Found(ref _hashInteger, "HashInteger",
+        PrimitiveTypeSymbol.NUInt, PrimitiveTypeSymbol.ULong);
+
+    public FunctionSymbol HashDouble => Found(ref _hashDouble, "HashDouble",
+        PrimitiveTypeSymbol.NUInt, PrimitiveTypeSymbol.Double);
+
+    public FunctionSymbol HashText => Found(ref _hashText, "HashText",
+        PrimitiveTypeSymbol.NUInt, String);
+
+    private FunctionSymbol? _compareLong;
+    private FunctionSymbol? _compareULong;
+    private FunctionSymbol? _compareDouble;
+    private FunctionSymbol? _compareText;
+    private FunctionSymbol? _hashInteger;
+    private FunctionSymbol? _hashDouble;
+    private FunctionSymbol? _hashText;
 
     private static readonly SourceText BuiltinSource = new("<builtin>", "");
     private static readonly SourceSpan BuiltinSpan = new(BuiltinSource, 0, 0);
@@ -444,24 +480,6 @@ public sealed class Builtins
         StringEquals = Function(Text, "Equals", PrimitiveTypeSymbol.Bool, "sl_string_equals",
             ("left", String), ("right", String));
 
-        // --- ordering and hashing --------------------------------------------
-        // Hidden: they live in the auto-imported Standard module but are not
-        // public, so nothing can name them and the emitter still declares them.
-        CompareLong = Hidden("CompareLong", PrimitiveTypeSymbol.Int, "sl_compare_long",
-            ("left", PrimitiveTypeSymbol.Long), ("right", PrimitiveTypeSymbol.Long));
-        CompareULong = Hidden("CompareULong", PrimitiveTypeSymbol.Int, "sl_compare_ulong",
-            ("left", PrimitiveTypeSymbol.ULong), ("right", PrimitiveTypeSymbol.ULong));
-        CompareDouble = Hidden("CompareDouble", PrimitiveTypeSymbol.Int, "sl_compare_double",
-            ("left", PrimitiveTypeSymbol.Double), ("right", PrimitiveTypeSymbol.Double));
-        CompareText = Hidden("CompareText", PrimitiveTypeSymbol.Int, "sl_string_compare",
-            ("left", String), ("right", String));
-
-        HashInteger = Hidden("HashInteger", PrimitiveTypeSymbol.NUInt, "sl_hash_integer",
-            ("value", PrimitiveTypeSymbol.ULong));
-        HashDouble = Hidden("HashDouble", PrimitiveTypeSymbol.NUInt, "sl_hash_double",
-            ("value", PrimitiveTypeSymbol.Double));
-        HashText = Hidden("HashText", PrimitiveTypeSymbol.NUInt, "sl_string_hash",
-            ("value", String));
     }
 
     public bool IsString(TypeSymbol type) => ReferenceEquals(type, String);
@@ -540,18 +558,45 @@ public sealed class Builtins
     }
 
     /// <summary>
-    /// A runtime function the binder calls but no source can name: it goes into
-    /// the module so the emitter declares it, and is not public so lookup skips
-    /// it.
+    /// The standard library's declaration of a function the compiler calls for
+    /// itself, resolved by name and signature on first use and then kept.
     /// </summary>
-    private FunctionSymbol Hidden(
+    /// <remarks>
+    /// <para>
+    /// The signature is matched rather than assumed, so that an overload added
+    /// beside one of these later cannot silently take its place.
+    /// </para>
+    /// <para>
+    /// The throw is an assertion about the compiler and not a diagnostic about
+    /// the program. <c>stdlib/</c> is an embedded resource inside this binary,
+    /// so a declaration that is missing or reshaped means the compiler itself
+    /// was built wrong, and every compilation it goes on to perform is wrong
+    /// too. There is nothing a program could write to reach it.
+    /// </para>
+    /// </remarks>
+    private FunctionSymbol Found(
+        ref FunctionSymbol? kept,
         string name,
         TypeSymbol returnType,
-        string runtimeSymbol,
-        params (string Name, TypeSymbol Type)[] parameters)
+        params TypeSymbol[] parameters)
     {
-        var symbol = Declare(Standard, name, returnType, runtimeSymbol, null, parameters, isPublic: false);
-        return symbol;
+        if (kept is not null) return kept;
+
+        foreach (var candidate in Standard.FindFunctions(name))
+        {
+            if (!candidate.ReturnType.Equals(returnType)) continue;
+            if (candidate.Parameters.Count != parameters.Length) continue;
+
+            bool matched = true;
+            for (int i = 0; i < parameters.Length && matched; i++)
+                matched = candidate.Parameters[i].Type.Equals(parameters[i]);
+
+            if (matched) return kept = candidate;
+        }
+
+        throw new InvalidOperationException(
+            $"the embedded standard library does not declare {StandardModuleName}.{name}(" +
+            string.Join(", ", parameters.Select(p => p.Name)) + ")");
     }
 
     /// <summary>

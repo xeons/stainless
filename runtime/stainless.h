@@ -640,23 +640,6 @@ SL_API int32_t sl_socket_resolve(const char *host, int32_t family, char *out,
 SL_API int32_t sl_socket_wait(size_t handle, int32_t forWriting,
                               int32_t milliseconds, int32_t *error);
 
-/* ------------------------------------------------- ordering and hashing */
-
-/*
- * What a primitive, an enum or a String uses in place of implementing
- * IComparable and IHashable, which it cannot: the compiler recognises
- * CompareTo and HashCode on those types and lowers them to these. See
- * hashing.c.
- */
-SL_API int32_t sl_compare_long(int64_t left, int64_t right);
-SL_API int32_t sl_compare_ulong(uint64_t left, uint64_t right);
-SL_API int32_t sl_compare_double(double left, double right);
-SL_API int32_t sl_string_compare(void *left, void *right);
-
-SL_API size_t sl_hash_integer(uint64_t value);
-SL_API size_t sl_hash_double(double value);
-SL_API size_t sl_string_hash(void *pointer);
-
 /* ------------------------------------------------------------ Utf16String */
 
 typedef struct SlUtf16String {
