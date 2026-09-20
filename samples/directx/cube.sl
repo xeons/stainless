@@ -830,6 +830,10 @@ int Main()
     }
 
     ShowWindow(window, SwShowNormal);
+
+    // A window whose process was started from a console does not reliably take
+    // the foreground, and sits behind the terminal that launched it.
+    SetForegroundWindow(window);
     UpdateWindow(window);
 
     // ------------------------------------------------------------ the device
