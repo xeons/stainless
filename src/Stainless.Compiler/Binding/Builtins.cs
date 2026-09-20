@@ -133,11 +133,26 @@ public sealed class Builtins
     /// signed and unsigned versions of FromInteger and the binder already
     /// knows which it means.
     /// </summary>
-    public FunctionSymbol TextFromLong { get; }
-    public FunctionSymbol TextFromULong { get; }
-    public FunctionSymbol TextFromBool { get; }
-    public FunctionSymbol TextFromChar { get; }
-    public FunctionSymbol TextFromDouble { get; }
+    public FunctionSymbol TextFromLong => Found(ref _textFromLong, Text, "FromInteger",
+        String, PrimitiveTypeSymbol.Long);
+
+    public FunctionSymbol TextFromULong => Found(ref _textFromULong, Text, "FromInteger",
+        String, PrimitiveTypeSymbol.ULong);
+
+    public FunctionSymbol TextFromBool => Found(ref _textFromBool, Text, "FromBool",
+        String, PrimitiveTypeSymbol.Bool);
+
+    public FunctionSymbol TextFromChar => Found(ref _textFromChar, Text, "FromChar",
+        String, PrimitiveTypeSymbol.Char32);
+
+    public FunctionSymbol TextFromDouble => Found(ref _textFromDouble, Text, "FromDouble",
+        String, PrimitiveTypeSymbol.Double);
+
+    private FunctionSymbol? _textFromLong;
+    private FunctionSymbol? _textFromULong;
+    private FunctionSymbol? _textFromBool;
+    private FunctionSymbol? _textFromChar;
+    private FunctionSymbol? _textFromDouble;
     public FunctionSymbol StringEquals { get; }
 
     /// <summary>
@@ -158,25 +173,25 @@ public sealed class Builtins
     /// the call the binder builds is an ordinary call to an ordinary function.
     /// </para>
     /// </summary>
-    public FunctionSymbol CompareLong => Found(ref _compareLong, "CompareLong",
+    public FunctionSymbol CompareLong => Found(ref _compareLong, Standard, "CompareLong",
         PrimitiveTypeSymbol.Int, PrimitiveTypeSymbol.Long, PrimitiveTypeSymbol.Long);
 
-    public FunctionSymbol CompareULong => Found(ref _compareULong, "CompareULong",
+    public FunctionSymbol CompareULong => Found(ref _compareULong, Standard, "CompareULong",
         PrimitiveTypeSymbol.Int, PrimitiveTypeSymbol.ULong, PrimitiveTypeSymbol.ULong);
 
-    public FunctionSymbol CompareDouble => Found(ref _compareDouble, "CompareDouble",
+    public FunctionSymbol CompareDouble => Found(ref _compareDouble, Standard, "CompareDouble",
         PrimitiveTypeSymbol.Int, PrimitiveTypeSymbol.Double, PrimitiveTypeSymbol.Double);
 
-    public FunctionSymbol CompareText => Found(ref _compareText, "CompareText",
+    public FunctionSymbol CompareText => Found(ref _compareText, Standard, "CompareText",
         PrimitiveTypeSymbol.Int, String, String);
 
-    public FunctionSymbol HashInteger => Found(ref _hashInteger, "HashInteger",
+    public FunctionSymbol HashInteger => Found(ref _hashInteger, Standard, "HashInteger",
         PrimitiveTypeSymbol.NUInt, PrimitiveTypeSymbol.ULong);
 
-    public FunctionSymbol HashDouble => Found(ref _hashDouble, "HashDouble",
+    public FunctionSymbol HashDouble => Found(ref _hashDouble, Standard, "HashDouble",
         PrimitiveTypeSymbol.NUInt, PrimitiveTypeSymbol.Double);
 
-    public FunctionSymbol HashText => Found(ref _hashText, "HashText",
+    public FunctionSymbol HashText => Found(ref _hashText, Standard, "HashText",
         PrimitiveTypeSymbol.NUInt, String);
 
     private FunctionSymbol? _compareLong;
@@ -446,46 +461,6 @@ public sealed class Builtins
         // the count.
         Function(Com, "CanUnloadNow", PrimitiveTypeSymbol.Int, "sl_com_can_unload_here");
 
-        // --- Standard.Text free functions -----------------------------------
-        TextFromLong = Function(Text, "FromInteger", String, "sl_string_from_integer",
-            ("value", PrimitiveTypeSymbol.Long));
-        // A separate runtime entry point rather than the signed one: a `ulong`
-        // past 2^63 formatted through "%lld" prints as a negative number.
-        TextFromULong = Function(Text, "FromInteger", String, "sl_string_from_unsigned",
-            ("value", PrimitiveTypeSymbol.ULong));
-
-        // And one for `nuint`, which is a `size_t` in C and so cannot share the
-        // `unsigned long long` entry point: this was once the only unsigned
-        // overload, declared as taking a `nuint` and bound to the 64-bit
-        // function, and on a 32-bit target the runtime read four bytes of
-        // argument and four of whatever was next on the stack. `$"{n}"` printed
-        // 8612659968337772549 for 5. It stays an overload of its own rather than
-        // leaving a `nuint` to widen, so that the call a `nuint` makes is to an
-        // entry point declared with its own width on every target.
-        Function(Text, "FromInteger", String, "sl_string_from_size",
-            ("value", PrimitiveTypeSymbol.NUInt));
-        TextFromBool = Function(Text, "FromBool", String, "sl_string_from_bool",
-            ("value", PrimitiveTypeSymbol.Bool));
-
-        // A code point as the character it names, not as its number. `Text.
-        // FromInteger((long)c)` is how to ask for the number.
-        TextFromChar = Function(Text, "FromChar", String, "sl_string_from_char",
-            ("value", PrimitiveTypeSymbol.Char32));
-        TextFromDouble = Function(Text, "FromDouble", String, "sl_string_from_double",
-            ("value", PrimitiveTypeSymbol.Double));
-        Function(Text, "FromBytes", String, "sl_string_from_bytes",
-            ("data", BytePointer), ("byteLength", PrimitiveTypeSymbol.NUInt));
-        Function(Text, "FromNullTerminated", String, "sl_string_from_null_terminated",
-            ("text", BytePointer));
-
-        // The way back from a platform that speaks UTF-16. A wide API writes into
-        // a buffer the caller owns, so what comes back is a pointer and a length
-        // rather than a Utf16String, and the pair is what these two take.
-        Function(Text, "FromUtf16", String, "sl_string_from_utf16",
-            ("units", Char16Pointer), ("unitCount", PrimitiveTypeSymbol.NUInt));
-        Function(Text, "FromNullTerminatedUtf16", String,
-            "sl_string_from_null_terminated_utf16", ("units", Char16Pointer));
-
         // Operators. These are resolved by the binder, not written by hand.
         StringConcat = Function(Text, "Concat", String, "sl_string_concat",
             ("left", String), ("right", String));
@@ -628,13 +603,14 @@ public sealed class Builtins
     /// </remarks>
     private FunctionSymbol Found(
         ref FunctionSymbol? kept,
+        ModuleSymbol module,
         string name,
         TypeSymbol returnType,
         params TypeSymbol[] parameters)
     {
         if (kept is not null) return kept;
 
-        foreach (var candidate in Standard.FindFunctions(name))
+        foreach (var candidate in module.FindFunctions(name))
         {
             if (!candidate.ReturnType.Equals(returnType)) continue;
             if (candidate.Parameters.Count != parameters.Length) continue;
@@ -647,7 +623,7 @@ public sealed class Builtins
         }
 
         throw new InvalidOperationException(
-            $"the embedded standard library does not declare {StandardModuleName}.{name}(" +
+            $"the embedded standard library does not declare {module.Name}.{name}(" +
             string.Join(", ", parameters.Select(p => p.Name)) + ")");
     }
 

@@ -33,6 +33,8 @@ documented here.
 
 **Types** &nbsp; [String](#string-class) &middot; [StringBuilder](#stringbuilder-class) &middot; [Utf16String](#utf16string-class) &middot; [string](#string-alias)
 
+**Functions** &nbsp; [FromBool](#frombool-function) &middot; [FromBytes](#frombytes-function) &middot; [FromChar](#fromchar-function) &middot; [FromDouble](#fromdouble-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromInteger](#frominteger-function) &middot; [FromNullTerminated](#fromnullterminated-function) &middot; [FromNullTerminatedUtf16](#fromnullterminatedutf16-function) &middot; [FromUtf16](#fromutf16-function)
+
 **Constants** &nbsp; [NotFound](#notfound-constant)
 
 ## Types
@@ -719,6 +721,121 @@ built in has no reason to look different. It is an alias and not a second
 type, so a diagnostic says `String` whichever one was written.
 
 <sub>[stdlib/Text.sl:702](../../stdlib/Text.sl#L702)</sub>
+
+## Functions
+
+### FromBool *function*
+
+```
+String FromBool(bool value)
+```
+
+`"true"` or `"false"`.
+
+<sub>[stdlib/Text.sl:1122](../../stdlib/Text.sl#L1122)</sub>
+
+### FromBytes *function*
+
+```
+String FromBytes(byte* data, nuint byteLength)
+```
+
+A copy of `byteLength` bytes, taken to be UTF-8.
+
+<sub>[stdlib/Text.sl:1129](../../stdlib/Text.sl#L1129)</sub>
+
+### FromChar *function*
+
+```
+String FromChar(char32 value)
+```
+
+One code point as the character it names, not as its number.
+`Text.FromInteger((long)c)` is how to ask for the number.
+
+<sub>[stdlib/Text.sl:1126](../../stdlib/Text.sl#L1126)</sub>
+
+### FromDouble *function*
+
+```
+String FromDouble(double value)
+```
+
+The shortest text that reads back as the same number.
+
+<sub>[stdlib/Text.sl:1119](../../stdlib/Text.sl#L1119)</sub>
+
+### FromInteger *function*
+
+```
+String FromInteger(long value)
+```
+
+A signed integer in base ten.
+
+<sub>[stdlib/Text.sl:1102](../../stdlib/Text.sl#L1102)</sub>
+
+### FromInteger *function*
+
+```
+String FromInteger(ulong value)
+```
+
+An unsigned integer in base ten.
+
+A separate entry point rather than letting the signed one take it: a
+`ulong` past 2^63 formatted as signed prints as a negative number.
+
+<sub>[stdlib/Text.sl:1108](../../stdlib/Text.sl#L1108)</sub>
+
+### FromInteger *function*
+
+```
+String FromInteger(nuint value)
+```
+
+A `nuint` in base ten.
+
+Its own overload rather than a widening, because a `nuint` is a `size_t`
+and cannot share the 64-bit entry point: on a 32-bit target the runtime
+would read four bytes of argument and four of whatever was next on the
+stack, and `$"{n}"` printed 8612659968337772549 for 5.
+
+<sub>[stdlib/Text.sl:1116](../../stdlib/Text.sl#L1116)</sub>
+
+### FromNullTerminated *function*
+
+```
+String FromNullTerminated(byte* text)
+```
+
+A copy of the bytes up to the first NUL, taken to be UTF-8. What a C
+function that answers with a `char*` hands back.
+
+<sub>[stdlib/Text.sl:1134](../../stdlib/Text.sl#L1134)</sub>
+
+### FromNullTerminatedUtf16 *function*
+
+```
+String FromNullTerminatedUtf16(char16* units)
+```
+
+UTF-16 up to the first NUL unit, transcoded to UTF-8.
+
+<sub>[stdlib/Text.sl:1144](../../stdlib/Text.sl#L1144)</sub>
+
+### FromUtf16 *function*
+
+```
+String FromUtf16(char16* units, nuint unitCount)
+```
+
+UTF-16 transcoded to UTF-8.
+
+A pointer and a count rather than a `Utf16String`, because a wide platform
+API writes into a buffer the caller owns and that pair is what comes back.
+
+<sub>[stdlib/Text.sl:1140](../../stdlib/Text.sl#L1140)</sub>
 
 ## Constants
 

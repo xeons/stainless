@@ -1075,3 +1075,71 @@ bool Matches(byte* left, byte* right, nuint count)
     }
     return true;
 }
+
+// ============================================================== conversions
+
+// Making a `String` out of something that is not one. The runtime allocates
+// and fills it -- the layout is its, as `String`'s declaration is ([§1.2.1](../docs/spec/01-modules.md#121-and-so-may-a-type))
+// -- and what is here is the names a program calls and the widths they cross
+// on.
+extern "C"
+{
+    String sl_string_from_integer(long value);
+    String sl_string_from_unsigned(ulong value);
+    String sl_string_from_size(nuint value);
+    String sl_string_from_double(double value);
+    String sl_string_from_bool(bool value);
+    String sl_string_from_char(char32 codePoint);
+
+    String sl_string_from_bytes(byte* data, nuint byteLength);
+    String sl_string_from_null_terminated(byte* text);
+
+    String sl_string_from_utf16(char16* units, nuint unitCount);
+    String sl_string_from_null_terminated_utf16(char16* units);
+}
+
+/// A signed integer in base ten.
+public String FromInteger(long value) => sl_string_from_integer(value);
+
+/// An unsigned integer in base ten.
+///
+/// A separate entry point rather than letting the signed one take it: a
+/// `ulong` past 2^63 formatted as signed prints as a negative number.
+public String FromInteger(ulong value) => sl_string_from_unsigned(value);
+
+/// A `nuint` in base ten.
+///
+/// Its own overload rather than a widening, because a `nuint` is a `size_t`
+/// and cannot share the 64-bit entry point: on a 32-bit target the runtime
+/// would read four bytes of argument and four of whatever was next on the
+/// stack, and `$"{n}"` printed 8612659968337772549 for 5.
+public String FromInteger(nuint value) => sl_string_from_size(value);
+
+/// The shortest text that reads back as the same number.
+public String FromDouble(double value) => sl_string_from_double(value);
+
+/// `"true"` or `"false"`.
+public String FromBool(bool value) => sl_string_from_bool(value);
+
+/// One code point as the character it names, not as its number.
+/// `Text.FromInteger((long)c)` is how to ask for the number.
+public String FromChar(char32 value) => sl_string_from_char(value);
+
+/// A copy of `byteLength` bytes, taken to be UTF-8.
+public String FromBytes(byte* data, nuint byteLength) =>
+    sl_string_from_bytes(data, byteLength);
+
+/// A copy of the bytes up to the first NUL, taken to be UTF-8. What a C
+/// function that answers with a `char*` hands back.
+public String FromNullTerminated(byte* text) => sl_string_from_null_terminated(text);
+
+/// UTF-16 transcoded to UTF-8.
+///
+/// A pointer and a count rather than a `Utf16String`, because a wide platform
+/// API writes into a buffer the caller owns and that pair is what comes back.
+public String FromUtf16(char16* units, nuint unitCount) =>
+    sl_string_from_utf16(units, unitCount);
+
+/// UTF-16 up to the first NUL unit, transcoded to UTF-8.
+public String FromNullTerminatedUtf16(char16* units) =>
+    sl_string_from_null_terminated_utf16(units);
