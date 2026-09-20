@@ -761,11 +761,24 @@ public class GroupPeer : ControlPeer, IGroupPeer
 /// panel.
 public class PanelPeer : ControlPeer, IPanelPeer
 {
+    /// A window of this library's own class rather than a system control, for
+    /// the reasons `EnsurePanelClass` gives -- the short one being that a
+    /// container has to receive the mouse messages its windowless children are
+    /// found from, and a `STATIC` hands them to its parent.
     public PanelPeer(IControlNotify owner, IContainerPeer parent)
     {
-        base(MakeChild("STATIC", WindowOf(parent),
-                       (ChildStyle() & ~WsTabStop) | WsClipChildren, 0u),
-             owner, true);
+        base(MakePanel(WindowOf(parent)), owner, false);
+    }
+
+    /// Made before `base(...)`, which needs the window to bind its peer to.
+    static HWND MakePanel(HWND parent)
+    {
+        EnsurePanelClass();
+        return CreateWindowExW(0u, PanelClassName.ToUtf16().ToPointer(),
+                               "".ToUtf16().ToPointer(),
+                               (ChildStyle() & ~WsTabStop) | WsClipChildren,
+                               0, 0, 0, 0, parent, null,
+                               GetModuleHandleW(null), null);
     }
 
     public void AddChild(IControlPeer child)

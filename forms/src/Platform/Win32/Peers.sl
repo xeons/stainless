@@ -291,6 +291,14 @@ public class ControlPeer : IControlPeer
     /// class cursor, which is what `Default` leaves in place.
     protected HCURSOR pointer;
     protected CursorKind shape;
+    /// The tooltip window this control's tip lives in, made the first time one
+    /// is asked for and destroyed with the control. Null until then: a control
+    /// with no tip should cost no window.
+    protected HWND tip;
+    /// What the tip says, so that setting the same text twice does nothing --
+    /// which matters, because the caller is a pointer moving over text and
+    /// asks on every pixel.
+    protected String tipText;
 
     protected ControlPeer(HWND made, IControlNotify owner, bool subclass)
     {
@@ -307,6 +315,8 @@ public class ControlPeer : IControlPeer
         destroyed = false;
         pointer = null;
         shape = CursorKind.Default;
+        tip = null;
+        tipText = "";
 
         BindPeer(made, this);
         if (subclass)
@@ -854,6 +864,105 @@ public class ControlPeer : IControlPeer
         // Windows asks again on the next move, so there is nothing to redraw.
     }
 
+    /// The tip Windows shows when the pointer rests here.
+    ///
+    /// **`TTF_SUBCLASS` is what makes this a few lines rather than a message
+    /// pump.** Without it the tool's owner must hand every mouse message to
+    /// the tooltip through `TTM_RELAYEVENT`; with it `comctl32` subclasses the
+    /// control and relays them itself.
+    ///
+    /// **An empty text is how a tip is taken away, and the tool stays active.**
+    /// `TTM_ACTIVATE` off while the pointer is inside the tool needs the
+    /// pointer to leave and come back before anything is shown again -- and a
+    /// pointer moving from one word to the next never leaves. A tool whose
+    /// text is empty shows nothing, which is the same result with none of
+    /// that.
+    public void SetToolTip(String text)
+    {
+        if (text == tipText)
+            return;
+        tipText = text;
+
+        if (tip == null)
+        {
+            // Nothing to show and no window yet: a control that never has a
+            // tip never pays for one.
+            if (text.ByteLength() == 0u)
+                return;
+            if (!MakeToolTip())
+                return;
+        }
+
+        var info = ToolFor(tipText);
+        SendMessageW(tip, TtmUpdateTipTextW, 0u, (nint)(void*)&info);
+
+        if (text.ByteLength() == 0u)
+        {
+            // Take down one that is showing. The next word the pointer rests
+            // on brings another, on the platform's own reshow delay.
+            SendMessageW(tip, TtmPop, 0u, 0);
+            return;
+        }
+
+        // A tip already on screen keeps saying what it said until the pointer
+        // leaves the control. `TTM_UPDATE` is what re-reads the text under one
+        // that is showing.
+        SendMessageW(tip, TtmUpdate, 0u, 0);
+    }
+
+    /// Makes the tooltip window and registers this control as its one tool.
+    ///
+    /// Owned by this control's own window rather than by the top-level: a
+    /// tooltip is a popup and is not clipped by its owner, so the owner only
+    /// decides what it is destroyed with.
+    bool MakeToolTip()
+    {
+        tip = CreateWindowExW(0u, "tooltips_class32".ToUtf16().ToPointer(),
+                              null, WsPopup | TtsAlwaysTip | TtsNoPrefix,
+                              0, 0, 0, 0, window, null,
+                              GetModuleHandleW(null), null);
+        if (tip == null)
+            return false;
+
+        var info = ToolFor(tipText);
+        if (SendMessageW(tip, TtmAddToolW, 0u, (nint)(void*)&info) == 0)
+        {
+            DestroyWindow(tip);
+            tip = null;
+            return false;
+        }
+
+        // A value long enough to be read. The default cuts a tip off at about
+        // three hundred pixels with no wrapping at all, which turns a value
+        // into its first few characters.
+        SendMessageW(tip, TtmSetMaxTipWidth, 0u, 600);
+        return true;
+    }
+
+    /// The tool this control is, as `TOOLINFOW`.
+    ///
+    /// `TTF_IDISHWND` means the id *is* the window, so the tool covers the
+    /// whole control and its rectangle is ignored -- which is right here:
+    /// what the tip says is decided by the caller, not by where in the control
+    /// the pointer is.
+    ToolInfo ToolFor(String text)
+    {
+        ToolInfo info;
+        info.Size = ToolInfoV1Size;
+        info.Flags = TtfIdIsHwnd | TtfSubclass;
+        info.Window = window;
+        info.Id = (nuint)(void*)window;
+        info.Bounds.Left = 0;
+        info.Bounds.Top = 0;
+        info.Bounds.Right = 0;
+        info.Bounds.Bottom = 0;
+        info.Instance = null;
+        info.Text = text.ToUtf16().ToPointer();
+        info.Parameter = 0;
+        info.Reserved = null;
+        return info;
+    }
+
     public void SetCapture(bool captured)
     {
         if (captured)
@@ -949,6 +1058,12 @@ public class ControlPeer : IControlPeer
         {
             DeleteObject((HGDIOBJ)(void*)backBrush);
             backBrush = null;
+        }
+        // Before the control, because the tool it holds names that window.
+        if (tip != null)
+        {
+            DestroyWindow(tip);
+            tip = null;
         }
         if (window != null)
         {

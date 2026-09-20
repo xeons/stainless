@@ -178,6 +178,53 @@ void EnsureCustomClass()
     customClassRegistered = true;
 }
 
+/// The window class a `Panel` is an instance of.
+///
+/// **A container is not a system control**, and making one out of `STATIC` was
+/// the shape of a bug worth remembering: a static control answers
+/// `HTTRANSPARENT` to a hit test unless it carries `SS_NOTIFY`, so Windows
+/// hands every mouse message over it to the *parent* -- and a windowless child
+/// of the panel, which is reached by hit-testing the panel's own messages, is
+/// unreachable. Lazarus registers one class of its own and uses it for every
+/// `TWinControl` that is not a system control; `lcl/interfaces/win32/` is the
+/// reference here as elsewhere.
+///
+/// **No `CS_HREDRAW` or `CS_VREDRAW`**, which is where this differs from the
+/// form's class and the custom control's. Those invalidate the whole window on
+/// every resize, and a container's pixels are its children -- which repaint
+/// themselves. Asking for the lot is a flicker on every drag of a splitter.
+/// The LCL's class has neither, for the same reason.
+///
+/// Null cursor, so `WM_SETCURSOR` reaches the peer and a windowless child's
+/// cursor can win; null background, so `WM_ERASEBKGND` reaches it and the
+/// panel's own back colour decides.
+static readonly String PanelClassName = "StainlessFormsPanel";
+static bool panelClassRegistered = false;
+
+void EnsurePanelClass()
+{
+    if (panelClassRegistered)
+        return;
+
+    var name = PanelClassName.ToUtf16();
+    WindowClass windowClass;
+    windowClass.Size = (uint)sizeof(WindowClass);
+    windowClass.Style = ClassStyleDoubleClicks;
+    windowClass.Procedure = StainlessProc;
+    windowClass.ClassExtra = 0;
+    windowClass.WindowExtra = 0;
+    windowClass.Instance = GetModuleHandleW(null);
+    windowClass.Icon = null;
+    windowClass.Cursor = null;
+    windowClass.Background = null;
+    windowClass.MenuName = null;
+    windowClass.ClassName = name.ToPointer();
+    windowClass.SmallIcon = null;
+
+    RegisterClassExW(&windowClass);
+    panelClassRegistered = true;
+}
+
 /// `SPI_GETWORKAREA`: the screen minus the task bar.
 const uint SpiGetWorkArea = 0x0030u;
 

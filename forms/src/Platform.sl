@@ -315,6 +315,19 @@ public interface IControlPeer
     /// What the pointer looks like over this control.
     void SetCursor(CursorKind cursor);
 
+    /// What the platform shows when the pointer rests over this control, or
+    /// "" for nothing.
+    ///
+    /// **The platform's own tip, not a window this library draws.** Both have
+    /// one, both place it where that desktop places tips, and both decide the
+    /// delays -- which is the whole of what makes a tip look like the system's
+    /// rather than like a program's idea of one.
+    ///
+    /// Set as often as the answer changes. A tip already on screen is refreshed
+    /// rather than left saying what it said, which is what a caller answering
+    /// per word under the pointer needs.
+    void SetToolTip(String text);
+
     /// Takes or gives up the mouse, so that a drag keeps being reported after
     /// the pointer has left the control. What every drag needs and what nothing
     /// else does.

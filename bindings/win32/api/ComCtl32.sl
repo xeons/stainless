@@ -340,6 +340,65 @@ public const uint CcsBottom        = 0x00000003u;
 
 public const uint TbExtendedDrawDdArrows = 0x00000001u;
 
+// =================================================================== tooltip
+
+/// A tooltip is a window of its own, owned by nothing and shown over
+/// everything, and a control does not have one: a control is *registered with*
+/// one, as a tool. One tooltip window may carry many tools, and a tool is
+/// identified by the window it covers.
+///
+/// **`TTF_SUBCLASS` is what makes it work without a message loop of our own.**
+/// Without it the owner must relay every mouse message to the tooltip by hand
+/// through `TTM_RELAYEVENT`; with it `comctl32` subclasses the tool's window
+/// and does the relaying itself.
+public const uint TtsAlwaysTip   = 0x01u;
+public const uint TtsNoPrefix    = 0x02u;
+public const uint TtsBalloon     = 0x40u;
+
+public const uint TtfIdIsHwnd    = 0x0001u;
+public const uint TtfCentreTip   = 0x0002u;
+public const uint TtfSubclass    = 0x0010u;
+
+public const uint TtmActivate       = 0x0401u;   // WM_USER + 1
+public const uint TtmSetDelayTime   = 0x0403u;   // WM_USER + 3
+public const uint TtmAddToolW       = 0x0432u;   // WM_USER + 50
+public const uint TtmDelToolW       = 0x0433u;   // WM_USER + 51
+public const uint TtmUpdateTipTextW = 0x0439u;   // WM_USER + 57
+public const uint TtmUpdate         = 0x041Du;   // WM_USER + 29
+public const uint TtmSetMaxTipWidth = 0x0418u;   // WM_USER + 24
+public const uint TtmPop            = 0x041Cu;   // WM_USER + 28
+
+/// Which of the four delays `TTM_SETDELAYTIME` is setting.
+public const uint TtdtAutomatic  = 0u;
+public const uint TtdtReshow     = 1u;
+public const uint TtdtAutoPop    = 2u;
+public const uint TtdtInitial    = 3u;
+
+/// `TOOLINFOW`, in the shape every version of the library agrees on plus the
+/// two fields later ones added.
+///
+/// **`Size` decides which version is being passed**, which is why it is a
+/// field rather than something the call works out: a structure declared here
+/// with fields a version 5 library has never heard of is refused outright
+/// unless the size says to stop before them. `ToolInfoV1Size` is the value
+/// that works everywhere and is all this needs.
+public struct ToolInfo
+{
+    public uint Size;
+    public uint Flags;
+    public HWND Window;
+    public nuint Id;
+    public Rect Bounds;
+    public HINSTANCE Instance;
+    public char16* Text;
+    public nint Parameter;
+    public void* Reserved;
+}
+
+/// Up to and including `Text`, which is the last field a version 5 library
+/// knows about.
+public const uint ToolInfoV1Size = 56u;
+
 // ================================================================ status bar
 
 public const uint SbSetText     = 0x040Bu;   // SB_SETTEXTW

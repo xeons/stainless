@@ -83,6 +83,12 @@ public abstract class GraphicControl : Control
             ((WindowedControl)parent).RefreshCursor();
     }
 
+    /// **A graphic control cannot have a tip of its own**, and the parent's
+    /// would be wrong: a tool is a window, and this control does not have one,
+    /// so the tip would cover the whole parent. Saying nothing is the honest
+    /// answer until `forms/` has a tool that is a rectangle.
+    protected override void ApplyToolTip() { }
+
     /// Repainting a graphic control means repainting the part of the parent it
     /// sits on, because the parent is what will draw it.
     public override void Invalidate()
@@ -378,6 +384,13 @@ public abstract class WindowedControl : Control
             ((IControlPeer)mine).SetCursor(Cursor);
     }
 
+    protected override void ApplyToolTip()
+    {
+        var mine = _platform;
+        if (mine != null)
+            ((IControlPeer)mine).SetToolTip(ToolTip);
+    }
+
     public override void CaptureMouse(bool captured)
     {
         var mine = _platform;
@@ -443,9 +456,23 @@ public abstract class WindowedControl : Control
             ((IControlPeer)mine).SetCapture(child != null);
     }
 
-    /// Re-asks the platform what the pointer should look like, after a graphic
-    /// child changed its mind about it.
-    void RefreshCursor() { }
+    /// What the pointer should look like, given which windowless child it is
+    /// over.
+    ///
+    /// **The platform never asks a graphic control**, because there is no
+    /// window to ask about. It asks this one, so this one answers for whichever
+    /// windowless child the pointer is over and for itself when it is over
+    /// none -- which is what puts a resize cursor over a splitter.
+    void RefreshCursor()
+    {
+        var mine = _platform;
+        if (mine == null)
+            return;
+
+        var over = _hovered;
+        ((IControlPeer)mine).SetCursor(over == null
+                                       ? Cursor : ((Control)over).Cursor);
+    }
 
     /// Where a point in this control's coordinates is in a child's.
     Point Within(Control child, Point at)
@@ -505,6 +532,10 @@ public abstract class WindowedControl : Control
             _hovered = target;
             if (target != null)
                 ((GraphicControl)target).OnPlatformMouseEnter();
+
+            // The cursor belongs to whatever the pointer is over, and a
+            // windowless child is only ever discovered here.
+            RefreshCursor();
         }
 
         if (target != null)

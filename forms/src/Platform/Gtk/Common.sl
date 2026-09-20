@@ -909,6 +909,21 @@ public class GtkPeer : IControlPeer
         }
     }
 
+    /// GTK keeps the text on the widget and shows it itself, delays and
+    /// placement included. A null takes the tip away; an empty string would
+    /// leave an empty one that still pops up.
+    public void SetToolTip(String text)
+    {
+        gtk_widget_set_tooltip_text(inner,
+            text.ByteLength() == 0u ? null : text.ToPointer());
+
+        // A tip already on screen keeps saying what it said until the pointer
+        // leaves. Asking for it again is what refreshes one whose text has
+        // just changed, which is what a caller answering per word needs.
+        if (text.ByteLength() != 0u && gtk_widget_get_realized(inner) != 0)
+            gtk_widget_trigger_tooltip_query(inner);
+    }
+
     void ApplyCursor()
     {
         gpointer window = gtk_widget_get_window(inner);

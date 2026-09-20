@@ -239,6 +239,7 @@ public abstract class Control : IControlNotify
     /// replaces the LCL's `csLoading`/`csUpdating` pair for this layer's needs.
     bool _echoing;
     CursorKind _pointer;
+    String _toolTip;
 
     protected Control()
     {
@@ -256,6 +257,7 @@ public abstract class Control : IControlNotify
         _foregroundSet = false;
         _echoing = false;
         _pointer = CursorKind.Default;
+        _toolTip = "";
         Name = "";
     }
 
@@ -603,6 +605,27 @@ public abstract class Control : IControlNotify
     }
 
     protected virtual void ApplyCursor() { }
+
+    /// What the desktop shows when the pointer rests over this control, or ""
+    /// for nothing.
+    ///
+    /// The platform's own tip: it decides the delays, the placement and the
+    /// look, which is what makes it look like the system's rather than like
+    /// this program's idea of one.
+    ///
+    /// May be set as often as the answer changes -- a tip already on screen is
+    /// refreshed rather than left saying what it said.
+    public String ToolTip
+    {
+        get => _toolTip;
+        set
+        {
+            _toolTip = value;
+            ApplyToolTip();
+        }
+    }
+
+    protected virtual void ApplyToolTip() { }
 
     /// Takes the mouse, so that a drag keeps being reported after the pointer
     /// has left this control -- which is what every drag needs and nothing else

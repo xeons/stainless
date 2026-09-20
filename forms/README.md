@@ -617,11 +617,12 @@ not turned back into them.
 - **`ColorBox`, `ColorListBox`** (`colorbox.pas`) — owner-drawn lists.
 - **Owner drawing** across list, combo and button. Menus and toolbars have it
   now -- see *Chrome* below -- and the rest want the same two messages.
-- **`ToolTip`.** Win32 has `TOOLTIPS_CLASS` and GTK has
-  `gtk_widget_set_tooltip_text`, so it is a seam method and two
-  implementations rather than a control. The IDE wants one: a hover over a
-  local while the program is stopped says its value on the status line
-  because there is nowhere better to put it.
+- **A tip on a windowless control.** `Control.ToolTip` is the platform's own
+  tip, and a tool is a *window* -- so a graphic control, which has none,
+  cannot have one and says nothing rather than covering its parent. Both
+  platforms can attach a tip to a rectangle instead (`TTF_IDISHWND` off on
+  Win32, `gtk_widget_set_tooltip_text` with a `query-tooltip` handler on
+  GTK), which is what a splitter or a toolbar button would want.
 - **Accelerators.** `&O` underlines a letter and works while a menu is open, and
   `IsDialogMessage` now handles Tab, the arrows, Enter and Escape; `Ctrl+O`
   still needs an accelerator table and `TranslateAccelerator` in the loop.
@@ -753,8 +754,56 @@ What the exercise cost, and it is worth knowing before the next backend:
 
 ### What running it found
 
-Six faults, none of which any self-test could see. Each is fixed; each is here
-because the *shape* of it recurs.
+Eight faults, none of which any self-test could see. Each is fixed; each is
+here because the *shape* of it recurs.
+
+- **A panel was a hole.** `Panel` was made out of `STATIC`, and a static
+  control answers `HTTRANSPARENT` to a hit test unless it carries
+  `SS_NOTIFY` -- so Windows handed every mouse message over it to the
+  *parent*. A windowless child of a panel is reached by hit-testing the
+  panel's own messages, so every one of them was unreachable: no enter, no
+  leave, no cursor, no drag. The IDE's dock splitters are windowless
+  children of a panel, and not one of them could be dragged.
+
+  **The fix is a window class of our own**, which is what the LCL does:
+  `TWin32WSCustomPanel` is an empty class, so a panel is created by
+  `TWin32WSWinControl.CreateHandle` as an instance of the one class the
+  widgetset registers. Adding `SS_NOTIFY` would have stopped the symptom
+  and left a container built out of a control that answers `WM_SETTEXT`,
+  reserves the `SS_*` style bits, and is themed as a label. A container is
+  not a system control.
+
+  `LabelPeer` had carried the `SS_NOTIFY` note since it was written. The
+  knowledge was in the file next door and the panel did not have it.
+
+  Nothing could see it. The splitters existed, were visible, had correct
+  rectangles, and their handlers were right; what was missing was the
+  pointer ever arriving. `screenshot.ps1 -Drag` is what found it and is the
+  only thing that could: **an interaction is proved by performing it**, not
+  by calling the handler that would have run.
+
+  **Two of it are not fixed.** A divider drags, and it drags imprecisely --
+  the well does not land where the pointer is -- and the pointer still does
+  not change shape over one. Neither is understood: `RefreshCursor` now
+  pushes the hovered child's cursor to the peer, the peer answers
+  `WM_SETCURSOR` with it, `CursorFor` maps `SizeWestEast`, and none of that
+  is enough. Whatever is wrong is in the routing between the panel's window
+  and the windowless child, and finding it needs a pointer rather than a
+  reading.
+
+  **The LCL makes a splitter a window**, which is the other half of its
+  answer: `TCustomSplitter` descends from `TCustomControl`, so the platform
+  routes the mouse and the cursor to it directly and no parent has to
+  hit-test anything. `forms/` keeps its splitter windowless -- the
+  machinery is needed for every other graphic control anyway -- but a
+  windowed one would also be able to carry a tooltip, which a windowless
+  control cannot.
+- **A windowless control's cursor was never applied.** `RefreshCursor` on the
+  containing window was an empty method, so a splitter asking for a resize
+  cursor changed nothing -- the platform only ever asks the window, and the
+  window answered for itself. It answers for whichever windowless child the
+  pointer is over now, which is the knowledge the enter and leave events
+  already had.
 
 - **An event box painted over everything a program drew.** A handler connected
   to `draw` runs before the class handler, and `GtkEventBox`'s class handler

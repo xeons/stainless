@@ -211,6 +211,10 @@ Named honestly, since the point of the page is to say where the edges are.
 - **The function keys need an editor to have the focus.** `forms/` has no menu
   shortcuts, so F5 and F9 are handled by the editor and passed up. The Debug
   menu works from anywhere.
+- **A divider drags, imprecisely, and shows no cursor.** The well does not
+  land where the pointer is, and the pointer does not change shape over a
+  divider to say it can be dragged. Both are in `forms/`, where a splitter
+  is a windowless control on a panel -- see *What running it found* there.
 - **Panes do not float and cannot be dragged between edges.** A pane's edge is
   read from the layout file and honoured, so hand-editing
   `%APPDATA%/Stainless/ide/layout.json` moves one today — but there is no drag,

@@ -238,6 +238,11 @@ public extern "C"
     void gtk_widget_set_has_window(GtkWidget* widget, gboolean has);
 
     void gtk_widget_set_tooltip_text(GtkWidget* widget, gchar* text);
+
+    /// Makes GTK ask the widget for its tip again. A tip already on screen
+    /// keeps saying what it said until the pointer leaves, so a caller whose
+    /// text has just changed has to ask.
+    void gtk_widget_trigger_tooltip_query(GtkWidget* widget);
     void gtk_widget_set_name(GtkWidget* widget, gchar* name);
 
     /// Marks the widget as needing redrawing. The only correct way to ask for

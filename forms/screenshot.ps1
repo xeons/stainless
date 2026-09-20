@@ -4,6 +4,8 @@
 #   .\forms\screenshot.ps1 -Program .\samples\forms\build\buttons.exe -Arguments 1
 #   .\forms\screenshot.ps1 -ProcessId 1234 -Out shots\now.png -Keep
 #   .\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Shots 3 -Every 1500
+#   .\forms\screenshot.ps1 -ProcessId 1234 -Hover 400,260 -Popups
+#   .\forms\screenshot.ps1 -Program .\ide\build\stainless-ide.exe -Drag 62,300 -DragTo 320,300
 #
 # **It asks the window to draw itself and never reads the screen.** That is the
 # whole point of the tool and it buys three things at once:
@@ -64,6 +66,37 @@ param(
     # with "permission denied" and report it as a compiler bug.
     [switch] $Keep,
 
+    # Put the pointer at this point of the window's client area before
+    # capturing, and wait -Rest milliseconds there.
+    #
+    # **The only way to photograph a hover.** A tooltip appears because the
+    # pointer is over something and after the desktop's own delay, so there is
+    # nothing to capture until both are true. Use it with -Popups: a tooltip is
+    # a window of its own and is not part of the main window's picture.
+    #
+    # The pointer is put back where it was afterwards, because this is somebody
+    # else's machine as often as it is a test one.
+    [int[]] $Hover = @(),
+    [int] $Rest = 1500,
+
+    # Press the left button at this point of the window's client area, drag to
+    # -DragTo, and release -- then capture.
+    #
+    # **The only way to test a drag is to perform one.** A splitter, a scroll
+    # bar's thumb, a rubber band: none of them can be exercised by asking the
+    # window anything, and a self test that calls the handler directly proves
+    # the handler and not that the pointer ever reaches it. This drove out a
+    # panel that answered `HTTRANSPARENT`, where every windowless child was
+    # unreachable and every check still passed.
+    [int[]] $Drag = @(),
+    [int[]] $DragTo = @(),
+
+    # Wait this many milliseconds after the window appears before doing
+    # anything else. For a program that is still getting where it is going --
+    # the IDE launching a debug session and running to a breakpoint -- where
+    # pointing at it too early photographs the window before it arrived.
+    [int] $Wait = 0,
+
     # Print the windows found and capture nothing.
     [switch] $List
 )
@@ -93,6 +126,14 @@ public static class WindowShot
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern int GetWindowTextW(IntPtr w, StringBuilder text, int max);
     [DllImport("user32.dll")] public static extern IntPtr GetWindow(IntPtr w, uint kind);
+    [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr w, ref POINT p);
+    [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+    [DllImport("user32.dll")] public static extern bool GetCursorPos(out POINT p);
+    [DllImport("user32.dll")] public static extern IntPtr SetForegroundWindow(IntPtr w);
+    [DllImport("user32.dll")] public static extern void mouse_event(uint flags, int dx, int dy, uint data, UIntPtr extra);
+
+    public const uint LeftDown = 0x0002;   // MOUSEEVENTF_LEFTDOWN
+    public const uint LeftUp   = 0x0004;   // MOUSEEVENTF_LEFTUP
 
     public const uint Owner = 4;   // GW_OWNER
 
@@ -122,6 +163,9 @@ public static class WindowShot
 
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT { public int Left, Top, Right, Bottom; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT { public int X, Y; }
 
     // PW_RENDERFULLCONTENT. Without it a window whose content is composited
     // rather than painted in the old way comes back blank.
@@ -362,6 +406,92 @@ function Capture([string] $path)
     Write-Host "wrote $path  (${width}x${height}, $($windows.Count) window(s))"
 }
 
+if ($Wait -gt 0)
+{
+    Start-Sleep -Milliseconds $Wait
+}
+
+# The pointer, for a hover or a drag. Moved after the window has settled and
+# before the first capture, and put back at the end.
+$wasAt = New-Object WindowShot+POINT
+$moved = $false
+
+# A point of the window's client area, on screen.
+function ScreenPoint($x, $y)
+{
+    $at = New-Object WindowShot+POINT
+    $at.X = $x
+    $at.Y = $y
+    [void][WindowShot]::ClientToScreen($handle, [ref]$at)
+    return $at
+}
+
+if ($Drag.Count -eq 2 -and $DragTo.Count -eq 2)
+{
+    [void][WindowShot]::GetCursorPos([ref]$wasAt)
+    $moved = $true
+
+    $from = ScreenPoint $Drag[0] $Drag[1]
+    $to = ScreenPoint $DragTo[0] $DragTo[1]
+
+    # Foreground first: a window that is not active is not told the pointer is
+    # over it, and a drag captured without this is a drag that never happened.
+    [void][WindowShot]::SetForegroundWindow($handle)
+    Start-Sleep -Milliseconds 250
+
+    Write-Host "dragging $($from.X),$($from.Y) to $($to.X),$($to.Y)"
+
+    [void][WindowShot]::SetCursorPos($from.X, $from.Y)
+    Start-Sleep -Milliseconds 150
+    [WindowShot]::mouse_event([WindowShot]::LeftDown, 0, 0, 0, [UIntPtr]::Zero)
+    Start-Sleep -Milliseconds 120
+
+    # In steps, because what is being dragged follows the pointer and one jump
+    # is one move -- which a control that tracks the pointer may ignore as a
+    # jump to somewhere it was never over.
+    for ($step = 1; $step -le 12; $step++)
+    {
+        $x = $from.X + [int](($to.X - $from.X) * $step / 12)
+        $y = $from.Y + [int](($to.Y - $from.Y) * $step / 12)
+        [void][WindowShot]::SetCursorPos($x, $y)
+        Start-Sleep -Milliseconds 35
+    }
+
+    Start-Sleep -Milliseconds 150
+    [WindowShot]::mouse_event([WindowShot]::LeftUp, 0, 0, 0, [UIntPtr]::Zero)
+    Start-Sleep -Milliseconds 350
+}
+
+if ($Hover.Count -eq 2)
+{
+    [void][WindowShot]::GetCursorPos([ref]$wasAt)
+
+    $at = New-Object WindowShot+POINT
+    $at.X = $Hover[0]
+    $at.Y = $Hover[1]
+    [void][WindowShot]::ClientToScreen($handle, [ref]$at)
+
+    # Foreground first. A tooltip belongs to the window under the pointer and
+    # an inactive window is not told the pointer is over it at all, so a hover
+    # captured without this is a hover that never happened.
+    [void][WindowShot]::SetForegroundWindow($handle)
+    Start-Sleep -Milliseconds 200
+
+    # Approached in steps rather than jumped to. A tooltip appears on the
+    # pointer coming to *rest*, and a control decides what is under the pointer
+    # from the moves it is sent -- one jump is one move, and a control that
+    # was never told the pointer arrived has nothing to show a tip about.
+    for ($step = 6; $step -ge 0; $step--)
+    {
+        [void][WindowShot]::SetCursorPos($at.X - $step * 6, $at.Y)
+        Start-Sleep -Milliseconds 60
+    }
+    $moved = $true
+
+    Write-Host "hovering at $($at.X), $($at.Y) for $Rest ms"
+    Start-Sleep -Milliseconds $Rest
+}
+
 for ($i = 1; $i -le $Shots; $i++)
 {
     $path = $Out
@@ -374,6 +504,11 @@ for ($i = 1; $i -le $Shots; $i++)
 
     Capture $path
     if ($i -lt $Shots) { Start-Sleep -Milliseconds $Every }
+}
+
+if ($moved)
+{
+    [void][WindowShot]::SetCursorPos($wasAt.X, $wasAt.Y)
 }
 
 # ---------------------------------------------------------------- tidying up
