@@ -67,6 +67,7 @@
 module Standard.Security.Cryptography;
 
 import Standard.Text;
+import Standard.Bits;
 
 extern "C"
 {
@@ -168,16 +169,6 @@ void PutBigDoubleWord(byte[] into, nuint at, ulong value)
     PutBigWord(into, at, (uint)((value >> 32) & 0xFFFFFFFFu));
     PutBigWord(into, at + 4u, (uint)(value & 0xFFFFFFFFu));
 }
-
-/// A 32-bit rotate left. The shift count is reduced modulo the width
-/// (§9.12), so a rotation of zero would answer zero from the second half;
-/// nothing here rotates by zero, and this says why it need not.
-uint RotateLeft(uint value, uint by) =>
-    (value << by) | (value >> (32u - by));
-
-/// A 64-bit rotate right, which is the direction SHA-512 is written in.
-ulong RotateRight(ulong value, uint by) =>
-    (value >> by) | (value << (64u - by));
 
 // ================================================================== hashing
 
@@ -484,7 +475,7 @@ public sealed class Md5 : HashAlgorithm
             a = d;
             d = c;
             c = b;
-            b = b + RotateLeft(rotated, _shifts[step]);
+            b = b + RotateLeft(rotated, (int)_shifts[step]);
         }
 
         _a += a;
@@ -551,7 +542,7 @@ public sealed class Sha1 : HashAlgorithm
         {
             uint mixed = schedule[i - 3u] ^ schedule[i - 8u] ^
                          schedule[i - 14u] ^ schedule[i - 16u];
-            schedule[i] = RotateLeft(mixed, 1u);
+            schedule[i] = RotateLeft(mixed, 1);
         }
 
         uint a = _state[0u];
@@ -586,10 +577,10 @@ public sealed class Sha1 : HashAlgorithm
                 constant = 0xCA62C1D6u;
             }
 
-            uint next = RotateLeft(a, 5u) + mixed + e + constant + schedule[i];
+            uint next = RotateLeft(a, 5) + mixed + e + constant + schedule[i];
             e = d;
             d = c;
-            c = RotateLeft(b, 30u);
+            c = RotateLeft(b, 30);
             b = a;
             a = next;
         }
@@ -674,8 +665,8 @@ public sealed class Sha256 : HashAlgorithm
         {
             uint previous = schedule[i - 15u];
             uint recent = schedule[i - 2u];
-            uint small = RotateLeft(previous, 25u) ^ RotateLeft(previous, 14u) ^ (previous >> 3);
-            uint large = RotateLeft(recent, 15u) ^ RotateLeft(recent, 13u) ^ (recent >> 10);
+            uint small = RotateLeft(previous, 25) ^ RotateLeft(previous, 14) ^ (previous >> 3);
+            uint large = RotateLeft(recent, 15) ^ RotateLeft(recent, 13) ^ (recent >> 10);
             schedule[i] = schedule[i - 16u] + small + schedule[i - 7u] + large;
         }
 
@@ -690,10 +681,10 @@ public sealed class Sha256 : HashAlgorithm
 
         for (nuint i = 0u; i < 64u; i++)
         {
-            uint sum1 = RotateLeft(e, 26u) ^ RotateLeft(e, 21u) ^ RotateLeft(e, 7u);
+            uint sum1 = RotateLeft(e, 26) ^ RotateLeft(e, 21) ^ RotateLeft(e, 7);
             uint choose = (e & f) ^ (~e & g);
             uint first = h + sum1 + choose + _constants[i] + schedule[i];
-            uint sum0 = RotateLeft(a, 30u) ^ RotateLeft(a, 19u) ^ RotateLeft(a, 10u);
+            uint sum0 = RotateLeft(a, 30) ^ RotateLeft(a, 19) ^ RotateLeft(a, 10);
             uint majority = (a & b) ^ (a & c) ^ (b & c);
             uint second = sum0 + majority;
 
@@ -781,8 +772,8 @@ public abstract class Sha2Wide : HashAlgorithm
         {
             ulong previous = schedule[i - 15u];
             ulong recent = schedule[i - 2u];
-            ulong small = RotateRight(previous, 1u) ^ RotateRight(previous, 8u) ^ (previous >> 7);
-            ulong large = RotateRight(recent, 19u) ^ RotateRight(recent, 61u) ^ (recent >> 6);
+            ulong small = RotateRight(previous, 1) ^ RotateRight(previous, 8) ^ (previous >> 7);
+            ulong large = RotateRight(recent, 19) ^ RotateRight(recent, 61) ^ (recent >> 6);
             schedule[i] = schedule[i - 16u] + small + schedule[i - 7u] + large;
         }
 
@@ -797,10 +788,10 @@ public abstract class Sha2Wide : HashAlgorithm
 
         for (nuint i = 0u; i < 80u; i++)
         {
-            ulong sum1 = RotateRight(e, 14u) ^ RotateRight(e, 18u) ^ RotateRight(e, 41u);
+            ulong sum1 = RotateRight(e, 14) ^ RotateRight(e, 18) ^ RotateRight(e, 41);
             ulong choose = (e & f) ^ (~e & g);
             ulong first = h + sum1 + choose + _constants[i] + schedule[i];
-            ulong sum0 = RotateRight(a, 28u) ^ RotateRight(a, 34u) ^ RotateRight(a, 39u);
+            ulong sum0 = RotateRight(a, 28) ^ RotateRight(a, 34) ^ RotateRight(a, 39);
             ulong majority = (a & b) ^ (a & c) ^ (b & c);
             ulong second = sum0 + majority;
 

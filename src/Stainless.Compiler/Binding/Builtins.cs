@@ -48,6 +48,16 @@ public sealed class Builtins
     public const string ComModuleName = "Standard.Com";
 
     /// <summary>
+    /// Where the instructions that are not operators live: counting bits, and
+    /// rotating them.
+    ///
+    /// Not auto-imported, and nothing in it is public. What this module holds
+    /// is the target's instructions; stdlib/Bits.sl declares the same module a
+    /// second time and puts the API a program calls on top of them.
+    /// </summary>
+    public const string BitsModuleName = "Standard.Bits";
+
+    /// <summary>
     /// Markers the language itself understands, rather than a library feature
     /// to opt into. It is auto-imported, because needing an import to say
     /// <c>[Flags]</c> would make a rule about enums look like a dependency.
@@ -57,6 +67,7 @@ public sealed class Builtins
     public ModuleSymbol Text { get; }
     public ModuleSymbol Standard { get; }
     public ModuleSymbol Com { get; }
+    public ModuleSymbol Bits { get; }
 
     /// <summary>
     /// <c>Guid</c>: 16 bytes, laid out as every existing COM header lays one
@@ -194,6 +205,7 @@ public sealed class Builtins
         Text = new ModuleSymbol(TextModuleName);
         Standard = new ModuleSymbol(StandardModuleName);
         Com = new ModuleSymbol(ComModuleName);
+        Bits = new ModuleSymbol(BitsModuleName);
 
         Flags = new AttributeTypeSymbol
         {
@@ -480,6 +492,45 @@ public sealed class Builtins
         StringEquals = Function(Text, "Equals", PrimitiveTypeSymbol.Bool, "sl_string_equals",
             ("left", String), ("right", String));
 
+        // --- Standard.Bits ---------------------------------------------------
+        //
+        // Declared with the signature the intrinsic itself has rather than the
+        // one a caller would want: the same width in and out, ctlz and cttz
+        // taking the immediate that says whether zero is poison, and a rotate
+        // spelled as the funnel shift it is. Written that way they need nothing
+        // from the emitter -- a runtime symbol of "llvm.ctpop.i64" emits
+        // `call i64 @llvm.ctpop.i64(i64 %x)`, which is what a runtime symbol
+        // has always emitted.
+        var uint32 = PrimitiveTypeSymbol.UInt;
+        var uint64 = PrimitiveTypeSymbol.ULong;
+        var flag = PrimitiveTypeSymbol.Bool;
+
+        Intrinsic("CountOneBits", uint32, "llvm.ctpop.i32", ("value", uint32));
+        Intrinsic("CountOneBits", uint64, "llvm.ctpop.i64", ("value", uint64));
+
+        // The second argument is `immarg` and must be a constant at the call,
+        // which a `false` written in Stainless already is.
+        Intrinsic("CountLeadingZeroBits", uint32, "llvm.ctlz.i32",
+            ("value", uint32), ("zeroIsPoison", flag));
+        Intrinsic("CountLeadingZeroBits", uint64, "llvm.ctlz.i64",
+            ("value", uint64), ("zeroIsPoison", flag));
+
+        Intrinsic("CountTrailingZeroBits", uint32, "llvm.cttz.i32",
+            ("value", uint32), ("zeroIsPoison", flag));
+        Intrinsic("CountTrailingZeroBits", uint64, "llvm.cttz.i64",
+            ("value", uint64), ("zeroIsPoison", flag));
+
+        // A funnel shift over one value twice is a rotate, and unlike a pair of
+        // shifts it is defined for a count of zero.
+        Intrinsic("FunnelShiftLeft", uint32, "llvm.fshl.i32",
+            ("high", uint32), ("low", uint32), ("by", uint32));
+        Intrinsic("FunnelShiftLeft", uint64, "llvm.fshl.i64",
+            ("high", uint64), ("low", uint64), ("by", uint64));
+
+        Intrinsic("FunnelShiftRight", uint32, "llvm.fshr.i32",
+            ("high", uint32), ("low", uint32), ("by", uint32));
+        Intrinsic("FunnelShiftRight", uint64, "llvm.fshr.i64",
+            ("high", uint64), ("low", uint64), ("by", uint64));
     }
 
     public bool IsString(TypeSymbol type) => ReferenceEquals(type, String);
@@ -490,6 +541,7 @@ public sealed class Builtins
         modules[Text.Name] = Text;
         modules[Standard.Name] = Standard;
         modules[Com.Name] = Com;
+        modules[Bits.Name] = Bits;
     }
 
     /// <summary>
@@ -659,6 +711,22 @@ public sealed class Builtins
         string runtimeSymbol,
         params (string Name, TypeSymbol Type)[] parameters) =>
         Declare(module, name, returnType, runtimeSymbol, containingType: null, parameters);
+
+    /// <summary>
+    /// One LLVM intrinsic, declared in <c>Standard.Bits</c> and not public.
+    ///
+    /// An intrinsic is called exactly as a runtime function is, so the only
+    /// thing separating this from <see cref="Function"/> is that the
+    /// declaration must match the intrinsic's own signature rather than a
+    /// convenient one. Getting that wrong is caught by LLVM's verifier.
+    /// </summary>
+    private void Intrinsic(
+        string name,
+        TypeSymbol returnType,
+        string intrinsic,
+        params (string Name, TypeSymbol Type)[] parameters) =>
+        Declare(Bits, name, returnType, intrinsic, containingType: null, parameters,
+                isPublic: false);
 
     /// <summary>A public constant of a built-in module.</summary>
     private static void Constant(ModuleSymbol module, string name, TypeSymbol type, object value) =>

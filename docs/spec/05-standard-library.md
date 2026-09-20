@@ -38,6 +38,7 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Concurrent` | the containers several threads may share | on request |
 | `Standard.Threading` | `Mutex<T>`, atomics, the job pool | on request |
 | `Standard.Math` | arithmetic that is not an operator | on request |
+| `Standard.Bits` | counting bits and rotating them, as the target's own instructions | on request |
 | `Standard.Reflection` | `[Reflect]`, `typeof`, the field tables | on request |
 | `Standard.IO` | streams and `IOError` | on request |
 | `Standard.File` | whole-file operations | on request |
