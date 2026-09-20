@@ -55,12 +55,25 @@ public class Breakpoint
     /// What a person asked for, kept so a report can name it.
     public String Where;
 
+    /// What has to hold for this to be a stop, or null for every hit.
+    ///
+    /// Parsed once, where it was typed, rather than at every hit: a trap that
+    /// fires in a loop is a trap that fires thousands of times, and parsing is
+    /// the only part of answering it that need not happen there.
+    public WatchExpression? Condition;
+
+    /// Set when a condition could not be answered, so the stop it forced can
+    /// say why. Cleared when it is read.
+    public String ConditionProblem;
+
     public Breakpoint(nuint address, String where)
     {
         Address = address;
         Original = 0;
         Planted = false;
         Where = where;
+        Condition = null;
+        ConditionProblem = "";
     }
 }
 
@@ -274,6 +287,28 @@ public class Engine
         return made;
     }
 
+    /// Makes a breakpoint conditional, or answers why the condition is not one.
+    ///
+    /// An empty condition takes one off, which is how a person clears the box
+    /// they typed it into.
+    public String Condition(Breakpoint one, String condition)
+    {
+        if (condition.Trim().ByteLength() == 0u)
+        {
+            one.Condition = null;
+            return "";
+        }
+
+        var parsed = ParseWatch(condition);
+        if (parsed.Problem.ByteLength() != 0u)
+            return parsed.Problem;
+        if (!parsed.IsCondition)
+            return "a condition has to compare two things: 'i == 3', not 'i'";
+
+        one.Condition = parsed;
+        return "";
+    }
+
     /// Starts the program and runs it to its first stop.
     public Result<Stop, String> Start(String path, String arguments)
     {
@@ -286,7 +321,7 @@ public class Engine
         // process has not been told about anything. Under ptrace the launch
         // has already reaped the exec's SIGTRAP, so resuming here would let
         // the program run before its image base was read.
-        return Ok(WaitForStop());
+        return Ok(RunUntilReported(false));
     }
 
     /// Asks a running program to stop, from a thread that is not this one.
@@ -317,15 +352,78 @@ public class Engine
     /// Every path here MUST resume. A stopped target waits for a `Resume` that
     /// answers the event it reported; without one it does not run and the next
     /// wait sits until it times out.
-    public Stop Continue()
+    public Stop Continue() => RunUntilReported(true);
+
+    /// Waits for a stop worth reporting, skipping past every conditional
+    /// breakpoint whose condition is false.
+    ///
+    /// `resumeFirst` is false only for a just-launched process, which has not
+    /// been told about anything yet and so has nothing to resume from.
+    Stop RunUntilReported(bool resumeFirst)
     {
-        // A breakpoint the process is standing on has to be stepped off before
-        // anything can run, and that resumes as part of doing it.
-        if (_steppingOver != null)
-            StepOffBreakpoint();
-        else
-            _target.Resume(true);
-        return WaitForStop();
+        bool resume = resumeFirst;
+
+        // A bound on the work rather than on the answer: a condition that is
+        // never true is a program run to its end, and this many hits of one
+        // trap is long enough to be sure the answer is not coming.
+        for (int guard = 0; guard < 1000000; guard++)
+        {
+            if (resume)
+            {
+                // A breakpoint the process is standing on has to be stepped
+                // off before anything can run, and that resumes as part of
+                // doing it.
+                if (_steppingOver != null)
+                    StepOffBreakpoint();
+                else
+                    _target.Resume(true);
+            }
+            resume = true;
+
+            var stop = WaitForStop();
+            if (ShouldReport(stop))
+                return stop;
+        }
+
+        return new Stop(StopKind.NotRunning);
+    }
+
+    /// Whether a stop is one to hand back, or one to carry on from.
+    ///
+    /// The only stop that is not is a conditional breakpoint whose condition
+    /// is false. Everything else -- a step, a fault, an exit, a breakpoint
+    /// with no condition -- is somebody's.
+    bool ShouldReport(Stop stop)
+    {
+        if (stop.Kind != StopKind.Breakpoint)
+            return true;
+
+        var at = stop.At;
+        if (at == null)
+            return true;
+
+        var one = (Breakpoint)at;
+        var condition = one.Condition;
+        if (condition == null)
+            return true;
+
+        var found = SubprogramAt(stop.Address);
+        if (found == null)
+            return true;
+
+        var where = (Subprogram)found;
+
+        Registers frame;
+        frame.Pc = 0u;
+        frame.StackPointer = 0u;
+        frame.FramePointer = 0u;
+        if (!_target.ReadRegisters(stop.Thread, &frame))
+            return true;
+
+        var answer = ConditionHolds(this, _target, where.InUnit, where.Die,
+                                    frame, (WatchExpression)condition);
+        one.ConditionProblem = answer.Problem;
+        return answer.Holds;
     }
 
     /// Turns one platform event into a stop, or null to keep going.

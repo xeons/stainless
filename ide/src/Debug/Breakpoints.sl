@@ -53,6 +53,13 @@ public class SourceBreakpoint
     /// breakpoint that binds elsewhere without saying so wastes an afternoon.
     public uint BoundLine;
 
+    /// What has to hold for it to stop, as it was typed. Empty for every hit.
+    ///
+    /// Text rather than a parsed expression: this outlives every session, and
+    /// the engine is what parses one -- in the session's own thread, where
+    /// everything that reads a debuggee lives.
+    public String Condition;
+
     public SourceBreakpoint(String file, uint line)
     {
         File = file;
@@ -60,6 +67,7 @@ public class SourceBreakpoint
         Enabled = true;
         Bound = false;
         BoundLine = line;
+        Condition = "";
     }
 
     /// Where the glyph goes: the bound line once there is one.
@@ -73,6 +81,8 @@ public class SourceBreakpoint
         if (Bound && BoundLine != Line)
             where = where + " (asked for "
                   + Standard.Text.FromInteger((long)Line) + ")";
+        if (Condition.ByteLength() != 0u)
+            where = where + "  when " + Condition;
         return where;
     }
 }

@@ -21,6 +21,7 @@
 //   stainless-ide --selftest      build the window, check what can be checked
 //   stainless-ide --break f.sl:12 -- set a breakpoint and start debugging
 //   stainless-ide --watch a.b     -- and watch an expression there
+//   stainless-ide --when i == 3   -- and stop only when that holds
 //
 // `--break` and `--watch` exist so the debugger can be photographed. A
 // screenshot is the only thing that says a pane drew, and a debugging session
@@ -44,6 +45,7 @@ int Main()
 
     bool testing = false;
     String stopAt = "";
+    String onlyWhen = "";
     var arguments = Env.Arguments();
     // From zero: `Env.Arguments` is what `Main(String[] args)` would have been
     // handed, which does not include the program's own name.
@@ -62,6 +64,12 @@ int Main()
         if (argument == "--break" && i + 1u < arguments.Length)
         {
             stopAt = arguments[i + 1u];
+            i++;
+            continue;
+        }
+        if (argument == "--when" && i + 1u < arguments.Length)
+        {
+            onlyWhen = arguments[i + 1u];
             i++;
             continue;
         }
@@ -98,7 +106,7 @@ int Main()
     // After the window is up: starting a session posts back to this thread,
     // and there has to be a loop for those posts to arrive on.
     if (stopAt.ByteLength() != 0u)
-        window.DebugFrom(stopAt);
+        window.DebugFrom(stopAt, onlyWhen);
 
     Application.Run();
     return 0;

@@ -153,6 +153,14 @@ were fixed — the IDE is what found every one of them.
   stop, because parsing one needs no process -- which is also what lets
   `sldb --selftest` cover the grammar with no binary at all.
 
+  **A breakpoint may carry a condition**, which is one comparison: `i == 7`,
+  `total > 100`, `node.Next != 0`. Set it from the Debug menu or the
+  Breakpoints pane's own menu; the pane shows it beside the line. It is read
+  when the breakpoint is planted, so a condition changed mid-session takes
+  effect next time you start, and the window says so. A condition that cannot
+  be read where it fires stops anyway and says why -- losing a stop is worse
+  than an extra one.
+
   The engine is `debug/`, which has no idea a window exists -- see
   [debug/README.md](../debug/README.md). What crosses between it and this
   window is a `Snapshot`: numbers and text, read while the program was stopped.

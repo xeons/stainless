@@ -178,7 +178,14 @@ elseif ($Program -ne "")
 
     if ($Arguments.Count -gt 0)
     {
-        $process = Start-Process $Program -ArgumentList $Arguments -PassThru
+        # Start-Process joins the list with spaces and quotes nothing, so an
+        # argument with a space in it arrives at the program as several. Quoted
+        # here rather than at every call site, because a caller that has to
+        # know this is a caller that will one day forget.
+        $quoted = $Arguments | ForEach-Object {
+            if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ }
+        }
+        $process = Start-Process $Program -ArgumentList $quoted -PassThru
     }
     else
     {

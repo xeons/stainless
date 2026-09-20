@@ -490,6 +490,7 @@ public class Shell : Form
         _breakList.AddColumn("Where", 300);
         _breakList.AddColumn("State", 120);
         _breakList.DoubleClick += this.OnBreakpointChosen;
+        _breakList.ContextMenu += this.OnBreakpointContextMenu;
 
         var trace = _dock.Add(Panes.DebugOutput, "Debug Output", DockEdge.Bottom);
         _debugOutput = new ListBox(trace);
@@ -767,6 +768,7 @@ public class Shell : Form
         debug.Add("Step o&ut\tShift+F11").Click += this.OnStepOut;
         debug.Add(MenuItem.Separator());
         debug.Add("Toggle &breakpoint\tF9").Click += this.OnToggleBreakpoint;
+        debug.Add("Brea&kpoint condition...").Click += this.OnBreakpointCondition;
         debug.Add("Delete all brea&kpoints").Click += this.OnClearBreakpoints;
         debug.Add(MenuItem.Separator());
         debug.Add("Add &watch...").Click += this.OnAddWatch;
@@ -2545,7 +2547,7 @@ public class Shell : Form
     /// For `--break`, which exists so that a stopped session can be
     /// photographed. It does what a person would do with F9 and F5, and adds
     /// nothing the menu cannot reach.
-    public bool DebugFrom(String where)
+    public bool DebugFrom(String where, String condition)
     {
         nuint colon = 0u;
         bool split = false;
@@ -2580,7 +2582,10 @@ public class Shell : Form
         var tab = TabMatching(file);
         String path = tab == null ? file
                                   : ((EditorTab)tab).Editor.Contents.Location;
-        _breakpoints.Toggle(path, line);
+        var made = _breakpoints.Toggle(path, line);
+        if (made != null && condition.ByteLength() != 0u)
+            ((SourceBreakpoint)made).Condition = condition;
+
         ShowBreakpointList();
         RepaintEditors();
         return StartDebugging();
@@ -2699,6 +2704,115 @@ public class Shell : Form
             return;
         var one = _breakpoints.All[(nuint)row];
         GoTo(one.File, one.ShownLine);
+    }
+
+    void OnBreakpointContextMenu(Control sender, ContextMenuEventArgs args)
+    {
+        int row = _breakList.SelectedIndex;
+        bool onOne = row >= 0 && (nuint)row < _breakpoints.Count;
+
+        var menu = new PopupMenu();
+
+        var asked = menu.Add("&Condition...");
+        asked.Enabled = onOne;
+        asked.Click += this.OnBreakpointCondition;
+
+        var toggled = menu.Add("&Enabled");
+        toggled.Enabled = onOne;
+        toggled.Click += this.OnToggleBreakpointEnabled;
+
+        menu.Add(MenuItem.Separator());
+
+        var removed = menu.Add("&Delete");
+        removed.Enabled = onOne;
+        removed.Click += this.OnDeleteBreakpoint;
+
+        var cleared = menu.Add("Delete &all");
+        cleared.Enabled = !_breakpoints.IsEmpty;
+        cleared.Click += this.OnClearBreakpoints;
+
+        menu.Show(_breakList, args.Location);
+        args.Handled = true;
+    }
+
+    /// Asks what has to hold for the selected breakpoint to stop.
+    ///
+    /// A blank answer takes the condition off, which is how somebody clears
+    /// the box they typed it into. The expression is checked here as well as by
+    /// the session, because a session may not exist yet.
+    void OnBreakpointCondition(MenuItem sender)
+    {
+        int row = _breakList.SelectedIndex;
+        if (row < 0 || (nuint)row >= _breakpoints.Count)
+        {
+            Say("Select a breakpoint first.");
+            return;
+        }
+
+        var one = _breakpoints.All[(nuint)row];
+        var asked = InputDialog.Ask("Breakpoint Condition",
+                                    "Stop only when this holds:", one.Condition);
+        if (asked is Some given)
+        {
+            String wanted = given.Value.Trim();
+            if (wanted.ByteLength() != 0u)
+            {
+                var parsed = ParseWatch(wanted);
+                if (parsed.Problem.ByteLength() != 0u)
+                {
+                    Application.Complain("That is not a condition: "
+                                         + parsed.Problem,
+                                         "Breakpoint Condition");
+                    return;
+                }
+                if (!parsed.IsCondition)
+                {
+                    Application.Complain(
+                        "A condition has to compare two things, as 'i == 3'"
+                        + " does.", "Breakpoint Condition");
+                    return;
+                }
+            }
+
+            one.Condition = wanted;
+            ShowBreakpointList();
+            Say(wanted.ByteLength() == 0u
+                ? "The breakpoint will stop every time."
+                : "The breakpoint will stop when " + wanted + ".");
+            SayConditionTakesEffect();
+        }
+    }
+
+    /// A condition is read where a breakpoint is planted, which is when a
+    /// session starts.
+    void SayConditionTakesEffect()
+    {
+        if (_session != null)
+            ShowTrace("Breakpoint conditions take effect next time you start.");
+    }
+
+    void OnToggleBreakpointEnabled(MenuItem sender)
+    {
+        int row = _breakList.SelectedIndex;
+        if (row < 0 || (nuint)row >= _breakpoints.Count)
+            return;
+
+        var one = _breakpoints.All[(nuint)row];
+        one.Enabled = !one.Enabled;
+        ShowBreakpointList();
+        RepaintEditors();
+    }
+
+    void OnDeleteBreakpoint(MenuItem sender)
+    {
+        int row = _breakList.SelectedIndex;
+        if (row < 0 || (nuint)row >= _breakpoints.Count)
+            return;
+
+        var one = _breakpoints.All[(nuint)row];
+        _breakpoints.Toggle(one.File, one.Line);
+        ShowBreakpointList();
+        RepaintEditors();
     }
 
     void ShowBreakpointList()

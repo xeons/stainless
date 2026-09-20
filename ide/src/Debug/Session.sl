@@ -164,12 +164,14 @@ public class DebugSession
 
         var files = new List<String>();
         var lines = new List<uint>();
+        var conditions = new List<String>();
         for (nuint i = 0u; i < breakpoints.Count; i++)
         {
             if (!breakpoints[i].Enabled)
                 continue;
             files.Add(breakpoints[i].File);
             lines.Add(breakpoints[i].Line);
+            conditions.Add(breakpoints[i].Condition);
         }
 
         var wanted = new List<String>();
@@ -180,7 +182,8 @@ public class DebugSession
         _engine = null;
         Reopen();
 
-        var worker = new Thread(() => Session(path, files, lines, wanted));
+        var worker = new Thread(() => Session(path, files, lines, conditions,
+                                              wanted));
         worker.Detach();
         return true;
     }
@@ -274,7 +277,7 @@ public class DebugSession
     /// Everything below here runs on the session's thread, and nothing above
     /// it does.
     void Session(String path, List<String> files, List<uint> lines,
-                 List<String> watches)
+                 List<String> conditions, List<String> watches)
     {
         var made = MakeTarget();
         if (!made.Ok)
@@ -314,7 +317,7 @@ public class DebugSession
             Say("this binary carries no DWARF, so there are no lines."
                 + " Build it with --debug-format dwarf.");
 
-        PlantEach(engine, tables, files, lines);
+        PlantEach(engine, tables, files, lines, conditions);
 
         for (nuint i = 0u; i < watches.Count; i++)
         {
@@ -418,12 +421,13 @@ public class DebugSession
 
     /// Finds code for each breakpoint, plants it, and reports where it landed.
     void PlantEach(Engine engine, List<LineTable> tables, List<String> files,
-                   List<uint> lines)
+                   List<uint> lines, List<String> conditions)
     {
         for (nuint i = 0u; i < files.Count; i++)
         {
             String file = files[i];
             uint line = lines[i];
+            String condition = conditions[i];
 
             nuint at = 0u;
             uint chosen = 0u;
@@ -436,8 +440,17 @@ public class DebugSession
                 continue;
             }
 
-            engine.Add(at, Standard.Path.FileName(file) + ":"
-                           + Standard.Text.FromInteger((long)line));
+            var planted = engine.Add(at, Standard.Path.FileName(file) + ":"
+                                         + Standard.Text.FromInteger((long)line));
+
+            String problem = engine.Condition(planted, condition);
+            if (problem.ByteLength() != 0u)
+            {
+                Say(Standard.Path.FileName(file) + ":"
+                    + Standard.Text.FromInteger((long)line) + ": " + condition
+                    + ": " + problem + " -- it will stop every time.");
+            }
+
             Application.Post(() => BoundTo(file, line, chosen));
         }
     }

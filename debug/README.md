@@ -338,8 +338,9 @@ stopped at .../fixture.sl:52
                                                  String[], which has 2 elements
 ```
 
-`a`, `a.b.c`, `a[3]`, `a[i]`, `*p` and a number, decimal or hexadecimal. No
-arithmetic, no casts, no parentheses, and **never a call into the debuggee**:
+`a`, `a.b.c`, `a[3]`, `a[i]`, `*p`, a number in decimal or hexadecimal, and
+one comparison between two of those. No arithmetic, no casts, no parentheses,
+and **never a call into the debuggee**:
 calling into an ARC'd runtime from a process stopped inside the allocator's
 lock deadlocks the thing being inspected, and it is where `fpdebug`'s hardest
 bugs live. `fppascalparser.pas` is 263 KB because Lazarus promises that a watch
@@ -377,6 +378,42 @@ which passes every bounds check that compares the wrong way.
 Half the watches in a session are out of scope at any moment, so a watch that
 cannot be read is a line saying why rather than a missing row -- a pane that
 drops what it could not evaluate lies about how many watches there are.
+
+## Conditional breakpoints
+
+```
+$ sldb when loopfix.exe fixture.sl:11 "i == 7"
+stopped at fixture.sl:11
+  total       int                     42
+  i           int                     7
+  doubled     int                     12
+
+$ sldb when loopfix.exe fixture.sl:11 "i == 99"
+90
+sldb: never reached fixture.sl:11
+```
+
+A condition is one comparison -- `==`, `!=`, `<`, `<=`, `>`, `>=` -- and the
+six exist for this. `a == 1 && b > 2` is the beginning of a language and is
+not on offer.
+
+**Parsed where it is typed, not where it fires.** A trap inside a loop fires
+thousands of times, and parsing is the only part of answering it that need not
+happen there. `Engine.Condition` turns down anything that is not a comparison,
+so `i` alone is refused with the reason rather than quietly meaning something.
+
+**A condition that cannot be read still stops.** Out of scope, unreadable
+memory, a name that is not there: a debugger that runs past a breakpoint
+because it could not answer the question is a debugger that loses the stop
+somebody waited three minutes for. The reason comes back beside the stop, and
+`sldb` prints it.
+
+Both sides are read as numbers, which is what a comparison this small can
+promise: an address, an integer, an enumerator, a tag. Two `String`s compare as
+the pointers they are -- which answers whether they are the same object, and
+there is no way to ask for more without calling into the debuggee. A signed
+comparison needs both sides signed; anything else is unsigned, because every
+count and every address in this language is.
 
 ## Linux
 
@@ -463,9 +500,6 @@ the engine can tell the result from a fault, because only the engine knows it
 asked -- which is what `StopKind.Paused` is.
 
 ## Still to come
-
-**The six comparisons**, which is what a conditional breakpoint needs and the
-only part of the watch grammar deliberately left out of it.
 
 **Real unwind info**, for `-O2` and for frames through the C runtime. The
 frame-pointer walk is right at `-O0` and answers one frame where there is no

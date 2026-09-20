@@ -38,6 +38,7 @@
 //   sldb next <binary> f:n [k] the same, over them
 //   sldb locals <binary> f:n   the parameters and locals in scope there
 //   sldb watch <binary> f:n e  what an expression is worth there
+//   sldb when <binary> f:n c    stop at a line only when c holds
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -322,6 +323,29 @@ int RunSelfTest()
     // better than half-evaluating one.
     ok = ReportCheck(ok, "arithmetic is not part of the promise",
                      !ParseWatch("a + 1").Problem.IsEmpty);
+
+    // One comparison, which is what a conditional breakpoint is.
+    var asked = ParseWatch("count >= 3");
+    ok = ReportCheck(ok, "a comparison is an expression with a right side",
+                     asked.Problem.IsEmpty && asked.IsCondition
+                     && asked.Root == "count" && asked.Against != null
+                     && ((WatchExpression)asked.Against).IsLiteral
+                     && ((WatchExpression)asked.Against).Literal == 3u);
+
+    ok = ReportCheck(ok, "and a plain expression is not a condition",
+                     !ParseWatch("count").IsCondition);
+
+    ok = ReportCheck(ok, "both sides may be expressions",
+                     ParseWatch("a.b[1] != *p").Problem.IsEmpty);
+
+    // A chain is the beginning of a language, and the promise is smaller.
+    ok = ReportCheck(ok, "a chain of comparisons is refused",
+                     !ParseWatch("a < b < c").Problem.IsEmpty);
+
+    // `=` is what somebody meant to type as `==`, and saying which is the
+    // whole reason the scanner keeps the byte.
+    ok = ReportCheck(ok, "a single '=' is named as the mistake it is",
+                     ParseWatch("a = 1").Problem.Contains("=="));
 
     // The header structures, against the sizes their formats fix. Cheap, and
     // the only cover the 32-bit layouts have until a 32-bit binary is built
@@ -780,7 +804,7 @@ bool FindAddressOfWhere(List<LineTable> tables, String where, nuint* address,
 /// The three commands below differ only in what that something is, so the
 /// launching, the breakpoint and the reporting are written once.
 int RunToBreakpointThen(String path, String where, String what, int times,
-                        String[] watches)
+                        String[] watches, String condition)
 {
     var made = MakeTarget();
     if (!made.Ok)
@@ -816,7 +840,17 @@ int RunToBreakpointThen(String path, String where, String what, int times,
         Console.WriteLine("sldb: no code for " + where);
         return 1;
     }
-    engine.Add(at, where);
+    var planted = engine.Add(at, where);
+
+    if (condition.ByteLength() != 0u)
+    {
+        String bad2 = engine.Condition(planted, condition);
+        if (bad2.ByteLength() != 0u)
+        {
+            Console.WriteLine("sldb: " + condition + ": " + bad2);
+            return 1;
+        }
+    }
 
     // Before the program starts, because a watch is a property of the session
     // rather than of a stop -- and because a refusal here names the expression
@@ -848,6 +882,12 @@ int RunToBreakpointThen(String path, String where, String what, int times,
 
     Console.WriteLine("stopped at " + engine.Describe(stop.Address));
 
+    // A condition that could not be answered still stops, and says so: a
+    // breakpoint silently skipped is the stop somebody waited three minutes
+    // for, gone.
+    if (planted.ConditionProblem.ByteLength() != 0u)
+        Console.WriteLine("      condition: " + planted.ConditionProblem);
+
     // **Through a snapshot, which is the point rather than a convenience.**
     // The IDE cannot ask the engine anything -- the one thread allowed to read
     // the process is busy -- so what a window shows is whatever `TakeSnapshot`
@@ -855,7 +895,7 @@ int RunToBreakpointThen(String path, String where, String what, int times,
     // commands a test of what the window will show, instead of a second route
     // to the same data that can quietly diverge from it.
     if (what == "stack" || what == "locals" || what == "snapshot"
-        || what == "watch")
+        || what == "watch" || what == "when")
     {
         var taken = TakeSnapshot(engine, target, stop);
         switch (what)
@@ -870,6 +910,10 @@ int RunToBreakpointThen(String path, String where, String what, int times,
 
             case "watch":
                 PrintWatches(taken);
+                break;
+
+            case "when":
+                PrintValues(taken);
                 break;
 
             default:
@@ -1039,6 +1083,7 @@ int PrintUsage()
     Console.WriteLine("  sldb next <binary> f:n [k] the same, over them");
     Console.WriteLine("  sldb locals <binary> f:n   the variables in scope there");
     Console.WriteLine("  sldb watch <binary> f:n e  what an expression is worth");
+    Console.WriteLine("  sldb when <binary> f:n c   stop there only when c holds");
     Console.WriteLine("  sldb snapshot <binary> f:n everything a window is given");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
@@ -1077,24 +1122,28 @@ int Main()
     String[] none = new String[0];
 
     if (args[0u] == "stack" && args.Length >= 3u)
-        return RunToBreakpointThen(args[1u], args[2u], "stack", 0, none);
+        return RunToBreakpointThen(args[1u], args[2u], "stack", 0, none, "");
 
     if (args[0u] == "locals" && args.Length >= 3u)
-        return RunToBreakpointThen(args[1u], args[2u], "locals", 0, none);
+        return RunToBreakpointThen(args[1u], args[2u], "locals", 0, none, "");
 
     if (args[0u] == "watch" && args.Length >= 4u)
         return RunToBreakpointThen(args[1u], args[2u], "watch", 0,
-                                   ArgumentsFrom(args, 3u));
+                                   ArgumentsFrom(args, 3u), "");
+
+    if (args[0u] == "when" && args.Length >= 4u)
+        return RunToBreakpointThen(args[1u], args[2u], "when", 0, none,
+                                   args[3u]);
 
     if (args[0u] == "snapshot" && args.Length >= 3u)
         return RunToBreakpointThen(args[1u], args[2u], "snapshot", 0,
                                    args.Length >= 4u ? ArgumentsFrom(args, 3u)
-                                                     : none);
+                                                     : none, "");
 
     if ((args[0u] == "step" || args[0u] == "next") && args.Length >= 3u)
     {
         int times = args.Length >= 4u ? (int)ParseNumber(args[3u]) : 1;
-        return RunToBreakpointThen(args[1u], args[2u], args[0u], times, none);
+        return RunToBreakpointThen(args[1u], args[2u], args[0u], times, none, "");
     }
 
     return PrintUsage();

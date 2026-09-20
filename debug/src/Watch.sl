@@ -19,7 +19,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// A watch expression: `a`, `a.b.c`, `a[3]`, `a[i]`, `*p`, and a number.
+// A watch expression: `a`, `a.b.c`, `a[3]`, `a[i]`, `*p`, a number, and one
+// comparison between two of those.
 //
 // **It is this small on purpose.** `fppascalparser.pas` is 263 KB because
 // Lazarus promises that a watch is a whole Pascal expression; the promise here
@@ -27,6 +28,9 @@
 // particular **never a call into the debuggee**: calling into an ARC'd runtime
 // from a process stopped inside the allocator's lock deadlocks the thing being
 // inspected, which is where `fpdebug`'s hardest bugs live.
+//
+// One comparison and not a chain of them: `a == 1` is what a conditional
+// breakpoint is for, and `a == 1 && b > 2` is the beginning of a language.
 //
 // **Parsing and evaluating are separate**, which is worth the extra type: a
 // malformed expression is then a question that can be asked with no process,
@@ -62,8 +66,22 @@ enum WatchKind
     Open,
     Close,
     Star,
+    /// `==`, `!=`, `<`, `<=`, `>`, `>=`. Which one is in the token's number.
+    Compare,
     /// A byte that means nothing here, carried so the reader can name it.
     Bad,
+}
+
+/// The six, numbered so a token can carry which it is.
+enum Comparison
+{
+    None,
+    Equal,
+    NotEqual,
+    Less,
+    LessOrEqual,
+    Greater,
+    GreaterOrEqual,
 }
 
 /// One token, with whichever of the two payloads its kind uses.
@@ -145,6 +163,25 @@ List<WatchWord> ScanWatch(String text)
             continue;
         }
 
+        // Two bytes before one: `<=` is not `<` followed by something the
+        // scanner has never heard of.
+        var twice = TwoByteComparison(text, at, size);
+        if (twice != Comparison.None)
+        {
+            words.Add(new WatchWord(WatchKind.Compare, "", (ulong)twice));
+            at = at + 2u;
+            continue;
+        }
+
+        var once = OneByteComparison(here);
+        if (once != Comparison.None)
+        {
+            words.Add(new WatchWord(WatchKind.Compare, OneByteText(here),
+                                    (ulong)once));
+            at++;
+            continue;
+        }
+
         var kind = WatchKindOfByte(here);
         words.Add(new WatchWord(kind, OneByteText(here), 0u));
         at++;
@@ -163,6 +200,77 @@ WatchKind WatchKindOfByte(byte here)
         case (byte)']': return WatchKind.Close;
         case (byte)'*': return WatchKind.Star;
         default: return WatchKind.Bad;
+    }
+}
+
+/// `==`, `!=`, `<=` or `>=` at `at`, or `None`.
+Comparison TwoByteComparison(String text, nuint at, nuint size)
+{
+    if (at + 1u >= size || text.ByteAt(at + 1u) != (byte)'=')
+        return Comparison.None;
+
+    switch (text.ByteAt(at))
+    {
+        case (byte)'=': return Comparison.Equal;
+        case (byte)'!': return Comparison.NotEqual;
+        case (byte)'<': return Comparison.LessOrEqual;
+        case (byte)'>': return Comparison.GreaterOrEqual;
+        default: return Comparison.None;
+    }
+}
+
+/// `<` or `>`, which are the only comparisons one byte long.
+///
+/// A single `=` is not one. It is what somebody meant to type as `==`, and
+/// answering `None` is what lets the refusal say so rather than calling it a
+/// byte that means nothing.
+Comparison OneByteComparison(byte here)
+{
+    switch (here)
+    {
+        case (byte)'<': return Comparison.Less;
+        case (byte)'>': return Comparison.Greater;
+        default: return Comparison.None;
+    }
+}
+
+/// How a comparison is written, for a refusal that has to name it.
+String ComparisonText(Comparison which)
+{
+    switch (which)
+    {
+        case Comparison.Equal: return "==";
+        case Comparison.NotEqual: return "!=";
+        case Comparison.Less: return "<";
+        case Comparison.LessOrEqual: return "<=";
+        case Comparison.Greater: return ">";
+        default: return ">=";
+    }
+}
+
+bool SignedHolds(Comparison which, long a, long b)
+{
+    switch (which)
+    {
+        case Comparison.Equal: return a == b;
+        case Comparison.NotEqual: return a != b;
+        case Comparison.Less: return a < b;
+        case Comparison.LessOrEqual: return a <= b;
+        case Comparison.Greater: return a > b;
+        default: return a >= b;
+    }
+}
+
+bool UnsignedHolds(Comparison which, ulong a, ulong b)
+{
+    switch (which)
+    {
+        case Comparison.Equal: return a == b;
+        case Comparison.NotEqual: return a != b;
+        case Comparison.Less: return a < b;
+        case Comparison.LessOrEqual: return a <= b;
+        case Comparison.Greater: return a > b;
+        default: return a >= b;
     }
 }
 
@@ -244,7 +352,8 @@ public class WatchStep
     }
 }
 
-/// A parsed watch expression: some stars, a root, and a chain of steps.
+/// A parsed watch expression: some stars, a root, and a chain of steps -- and
+/// at most one comparison against another of those.
 ///
 /// Flat rather than a tree of nodes because the grammar is flat. The steps are
 /// applied to the root left to right and the stars afterwards, which is what
@@ -262,6 +371,12 @@ public class WatchExpression
 
     public List<WatchStep> Steps;
 
+    /// The comparison this is the left side of, or `None`.
+    public Comparison Compares;
+
+    /// What it is compared against. Null unless `Compares` says otherwise.
+    public WatchExpression? Against;
+
     /// Why it is not an expression. Empty when it is one.
     public String Problem;
 
@@ -272,8 +387,14 @@ public class WatchExpression
         IsLiteral = false;
         Literal = 0u;
         Steps = new List<WatchStep>();
+        Compares = Comparison.None;
+        Against = null;
         Problem = "";
     }
+
+    /// Whether this asks a question rather than naming a value. What a
+    /// conditional breakpoint needs and a watch row does not.
+    public bool IsCondition => Compares != Comparison.None;
 }
 
 /// Reads one expression, whole.
@@ -285,19 +406,45 @@ public WatchExpression ParseWatch(String text)
     var words = new WatchWords(ScanWatch(text));
     var parsed = ParseWatchFrom(words);
 
+    if (parsed.Problem.ByteLength() == 0u
+        && words.Here.Kind == WatchKind.Compare)
+    {
+        var which = (Comparison)words.Here.Number;
+        words.Step();
+
+        var right = ParseWatchFrom(words);
+        if (right.Problem.ByteLength() != 0u)
+            parsed.Problem = right.Problem;
+        else if (words.Here.Kind == WatchKind.Compare)
+            parsed.Problem = "one comparison, not a chain of them";
+        else
+        {
+            parsed.Compares = which;
+            parsed.Against = right;
+        }
+    }
+
     // What is left over says which refusal this is: a byte that means nothing
     // here is named, and anything else is a second expression. "Invalid
     // expression" would tell the person who typed it nothing about which half.
     if (parsed.Problem.ByteLength() == 0u && words.Here.Kind != WatchKind.End)
     {
         parsed.Problem = words.Here.Kind == WatchKind.Bad
-                       ? "'" + words.Here.Text
-                         + "' means nothing in a watch expression"
+                       ? BadTokenProblem(words.Here)
                        : "there is more here than one expression";
     }
 
     return parsed;
 }
+
+/// What to say about a byte the grammar has no use for.
+///
+/// A lone `=` is what somebody meant to type as `==`, and naming that is worth
+/// more than telling them the byte means nothing.
+String BadTokenProblem(WatchWord word)
+    => word.Text == "="
+     ? "'=' is not a comparison here; '==' is"
+     : "'" + word.Text + "' means nothing in a watch expression";
 
 WatchExpression ParseWatchFrom(WatchWords words)
 {
@@ -323,8 +470,7 @@ WatchExpression ParseWatchFrom(WatchWords words)
             break;
 
         case WatchKind.Bad:
-            made.Problem = "'" + words.Here.Text
-                         + "' means nothing in a watch expression";
+            made.Problem = BadTokenProblem(words.Here);
             return made;
 
         case WatchKind.End:
@@ -447,6 +593,10 @@ class WatchReader
     Die _owner;
     Registers _frame;
 
+    /// Where the program stopped, as the file has it. What says which lexical
+    /// blocks a name may be looked up in.
+    nuint _linked;
+
     /// Why there is no answer. Empty while there still might be one.
     public String Problem;
 
@@ -458,6 +608,7 @@ class WatchReader
         _unit = unit;
         _owner = owner;
         _frame = frame;
+        _linked = engine.ToLinked(frame.Pc);
         Problem = "";
     }
 
@@ -515,14 +666,11 @@ class WatchReader
     /// that picks wrong half the time.
     Place? VariableNamed(String name)
     {
-        var locals = ChildrenOf(_unit, _owner);
+        var locals = VariablesInScopeAt(_unit, _owner, _linked);
         for (nuint i = 0u; i < locals.Count; i++)
         {
-            var one = locals[i];
-            if (one.Tag != TagFormalParameter && one.Tag != TagVariable)
-                continue;
-            if (one.Name == name)
-                return Located(one);
+            if (locals[i].Name == name)
+                return Located(locals[i]);
         }
 
         var root = _unit.Root;
@@ -803,6 +951,43 @@ class WatchReader
         return true;
     }
 
+    /// Whether a comparison holds.
+    ///
+    /// Both sides are read as numbers, because that is what a comparison this
+    /// small can promise: an address, an integer, an enumerator or a tag. Two
+    /// `String`s compare as the pointers they are, which is honest -- it
+    /// answers whether they are the same object, and there is no way to ask
+    /// for more without calling into the debuggee.
+    public bool Holds(WatchExpression expression, bool* answer)
+    {
+        var against = expression.Against;
+        if (against == null)
+            return false;
+
+        var left = Read(expression);
+        if (left == null)
+            return false;
+
+        var right = Read((WatchExpression)against);
+        if (right == null)
+            return false;
+
+        ulong a = 0u;
+        ulong b = 0u;
+        if (!NumberFrom((Place)left, &a) || !NumberFrom((Place)right, &b))
+            return false;
+
+        // Signed against signed is a signed comparison. Anything else is not:
+        // an address is unsigned and so is every count in this language, and
+        // reading one as negative is how a bounds check goes the wrong way.
+        bool signed2 = IsSignedEncoding(((Place)left).Type.Encoding)
+                    && IsSignedEncoding(((Place)right).Type.Encoding);
+
+        *answer = signed2 ? SignedHolds(expression.Compares, (long)a, (long)b)
+                          : UnsignedHolds(expression.Compares, a, b);
+        return true;
+    }
+
     /// A place as a number, which is what an index has to be.
     bool NumberFrom(Place value, ulong* number)
     {
@@ -970,15 +1155,18 @@ public WatchLine ReadWatch(Engine engine, ITarget target, Unit unit, Die owner,
         return new WatchLine(expression, "", parsed.Problem, false);
 
     var reader = new WatchReader(engine, target, unit, owner, frame);
-    var value = reader.Read(parsed);
 
-    if (value == null)
+    if (parsed.IsCondition)
     {
-        String why = reader.Problem.ByteLength() != 0u
-                   ? reader.Problem
-                   : "it could not be read";
-        return new WatchLine(expression, "", why, false);
+        bool holds = false;
+        if (!reader.Holds(parsed, &holds))
+            return new WatchLine(expression, "", ProblemIn(reader), false);
+        return new WatchLine(expression, "bool", holds ? "true" : "false", true);
     }
+
+    var value = reader.Read(parsed);
+    if (value == null)
+        return new WatchLine(expression, "", ProblemIn(reader), false);
 
     var place = (Place)value;
     if (!place.Addressed)
@@ -989,4 +1177,42 @@ public WatchLine ReadWatch(Engine engine, ITarget target, Unit unit, Die owner,
                          FormatAt(engine, target, place.InUnit, place.Type,
                                   place.Address),
                          true);
+}
+
+String ProblemIn(WatchReader reader)
+    => reader.Problem.ByteLength() != 0u ? reader.Problem : "it could not be read";
+
+/// What a breakpoint's condition answered.
+public class ConditionResult
+{
+    public bool Holds;
+
+    /// Empty when the condition was answered. Otherwise why it was not.
+    public String Problem;
+
+    public ConditionResult(bool holds, String problem)
+    {
+        Holds = holds;
+        Problem = problem;
+    }
+}
+
+/// Whether a condition holds where the program stopped.
+///
+/// **A condition that cannot be read holds.** A breakpoint whose condition is
+/// out of scope MUST still stop: a debugger that runs past one because it
+/// could not answer the question is a debugger that loses the stop somebody
+/// waited three minutes for. The reason comes back beside it so the caller can
+/// say so.
+public ConditionResult ConditionHolds(Engine engine, ITarget target, Unit unit,
+                                      Die owner, Registers frame,
+                                      WatchExpression condition)
+{
+    var reader = new WatchReader(engine, target, unit, owner, frame);
+
+    bool holds = false;
+    if (reader.Holds(condition, &holds))
+        return new ConditionResult(holds, "");
+
+    return new ConditionResult(true, ProblemIn(reader));
 }
