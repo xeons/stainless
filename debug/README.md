@@ -33,7 +33,10 @@ reporting addresses that have no lines.
 | `src/Engine.sl` | breakpoints, the slide, run control and stepping |
 | `src/Paths.sl` | whether two spellings name one source file |
 | `src/Session.sl` | a stop, read into a `Snapshot` a window can hold |
-| `src/Stack.sl` | the frame-pointer walk |
+| `src/Stack.sl` | the stack walk, and the frame-pointer fallback |
+| `src/Unwind.sl` | the seam: one frame in, its caller out |
+| `src/Unwind/Cfi.sl` | `.eh_frame`, which is a bytecode and so an interpreter |
+| `src/Unwind/Xdata.sl` | `.pdata` and `UNWIND_INFO`, a prologue to undo |
 | `src/Values.sl` | a location and a type, read out of the process |
 | `src/Watch.sl` | a watch expression, parsed and then walked |
 | `tests/sldb.sl` | the console debugger |
@@ -212,14 +215,48 @@ $ sldb next fp-dwarf.exe fixture.sl:61 3      # over it
   -> .../fixture.sl:65   Main
 ```
 
-**The stack walk is two loads per frame, and only because the compiler emits a
-frame pointer.** It does that under `-g` and nowhere else -- one attribute
-group, `"frame-pointer"="all"`, added because LLVM omits the frame pointer at
-every optimisation level unless asked, `-O0` included. Without it
-`DW_AT_frame_base` describes RSP, which is correct and describes a frame
-nothing can unwind. It is not an unwinder: at `-O2`, or through the C runtime,
-the real answer is `.eh_frame` and `.pdata`, both of which every binary already
-carries.
+**The stack walk reads the unwind information, and falls back to the frame
+pointer.** `.eh_frame` on ELF and `.pdata` on PE describe every frame in the
+binary. They are not debug information: they exist so an exception can be
+thrown through a frame, which is why they cover the C runtime as well and why
+they survive `-O2`, where there is no frame pointer at all.
+
+```
+$ sldb unwind opt-O2.exe fixture.sl:14
+unwind   .pdata
+
+with the unwind information
+  #0  main                0x7ff6d5b911df  +0x1401011df
+  #1  ??                  0x7ff6d5b91bff  +0x140101bff
+  #2  ??                  0x7ffb06277374
+
+frame pointer only
+  #0  main                0x7ff6d5b911df  +0x1401011df
+```
+
+**The fallback is not a remnant.** Unwind information runs out: a frame in
+another module, a CFA described by a DWARF expression, a rule naming a
+callee-saved register this engine does not carry. Where it does, the two-load
+walk is what there is, and under `-g` it is exactly right -- the compiler emits
+`"frame-pointer"="all"`, one attribute group, added because LLVM omits the
+frame pointer at every optimisation level unless asked, `-O0` included, so
+every function begins `push rbp; mov rbp, rsp`. Without it `DW_AT_frame_base`
+describes RSP, which is correct and describes a frame nothing can unwind.
+
+**A guess that lands in our own code is thrown away.** Everything in the image
+that is really code is covered by its unwind information, so an address inside
+the image that nothing describes is not a return address -- it is where a
+chain wandered after leaving a frame that never had a frame pointer.
+
+**Three columns are enough**, which is why there are three and not sixteen: the
+CFA, the return address, and the frame pointer the next frame's own rule is
+usually written against. A rule naming any other register is carried as far as
+refusing it, never as far as answering with a register that is somebody else's.
+
+`sldb cfi` prints what the unwind information claims to cover, for diffing
+against `llvm-dwarfdump --eh-frame` and `llvm-readobj --unwind`. That is the
+only check that catches a pointer encoding read wrongly: the entries still
+parse, and the ranges they claim are plausible and somewhere else.
 
 **Every frame above the first is a return address**, so the line table is asked
 about the byte *before* it. Asked about the return address directly it answers
@@ -501,8 +538,16 @@ asked -- which is what `StopKind.Paused` is.
 
 ## Still to come
 
-**Real unwind info**, for `-O2` and for frames through the C runtime. The
-frame-pointer walk is right at `-O0` and answers one frame where there is no
-frame pointer. `.eh_frame` on ELF and `.pdata` on PE are already in every
-binary this compiler produces.
+**Another module's unwind information.** What is read is the executable's own,
+so a frame in a shared library -- `libc`, `kernel32` -- falls back to the frame
+pointer. Reading theirs means enumerating the loaded modules and mapping each,
+which the target seam does not do.
+
+**Another frame's variables.** Reading one needs that frame's own frame base,
+and only the session's thread may ask for it. The walk now carries a stack
+pointer and a frame pointer per frame, which is most of what that would want.
+
+**A CFA that is a DWARF expression.** `DW_CFA_def_cfa_expression` is refused
+rather than run. Nothing this compiler emits uses one; the system's libraries
+do, and they are the previous entry as well.
 

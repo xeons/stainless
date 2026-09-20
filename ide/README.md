@@ -194,6 +194,10 @@ Named honestly, since the point of the page is to say where the edges are.
   goes to its line; Locals still shows the frame the program is in. Reading
   another frame's locals needs its frame base, which only the session's own
   thread may ask for.
+- **A frame in a shared library is a guess.** The call stack is walked from the
+  program's own unwind information, which covers the program and not `libc` or
+  `kernel32`; above those the frame pointer is what there is, and a frame
+  recovered that way is marked in `sldb unwind` and not in the pane.
 - **No Threads pane.** The target seam does not enumerate threads, and a
   Stainless program has one unless it starts more.
 - **The function keys need an editor to have the focus.** `forms/` has no menu

@@ -1278,6 +1278,12 @@ inside the compiler's own assembly, so with `-g` the driver writes its sources t
 `-O0 -g` for the same reason, so `sl_retain` and `sl_release` are steppable
 frames rather than addresses.
 
+**The C entry point is described too**, though nobody wrote it. A call with no
+debug location, inlined into a function with no subprogram, takes the callee's
+locations with it — and `-O2` inlines `Main` into the shim, so without a
+subprogram there the program's own code ends up described by nothing at all.
+It is marked `DIFlagArtificial` and positioned at the entry point it calls.
+
 **`-O2` is still the default.** Debug information survives optimization, but the
 code it describes has been rearranged, and stepping through it is confusing in
 the ordinary way. The driver says so once and builds what was asked for; `-O0`

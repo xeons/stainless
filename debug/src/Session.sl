@@ -222,7 +222,7 @@ public Snapshot TakeSnapshot(Engine engine, ITarget target, Stop stop)
 /// The call stack, one line per frame.
 void FillFrames(Snapshot into, Engine engine, ITarget target, uint thread)
 {
-    var frames = WalkStack(target, thread);
+    var frames = WalkStack(target, thread, engine.Unwinder, engine.Slide);
     for (nuint i = 0u; i < frames.Count; i++)
     {
         var frame = frames[i];

@@ -206,6 +206,12 @@ public class Engine
     /// those needs the target seam to set up pipes.
     List<String> _output;
 
+    /// What the binary says about unwinding, read once.
+    ///
+    /// Built here rather than at each stop: it is a property of the file, and
+    /// a stack walk is the last place to be parsing a section.
+    Unwinder _unwinder;
+
     /// The watch expressions, in the order they were added.
     ///
     /// Held by the engine rather than by whatever is watching, because a
@@ -229,6 +235,7 @@ public class Engine
         _breakWanted = false;
         _output = new List<String>();
         _watches = new List<String>();
+        _unwinder = new Unwinder(image);
     }
 
     /// Everything the program has written since this was last called, and
@@ -243,6 +250,9 @@ public class Engine
     public List<Breakpoint> Breakpoints => _breakpoints;
 
     public List<String> Watches => _watches;
+
+    /// What describes this binary's frames, for whoever walks the stack.
+    public Unwinder Unwinder => _unwinder;
 
     /// Adds a watch, refusing one that is not an expression.
     ///
@@ -838,7 +848,7 @@ public class Engine
     /// Runs to the end of the current function.
     public Stop StepOut(uint thread)
     {
-        var frames = WalkStack(_target, thread);
+        var frames = WalkStack(_target, thread, _unwinder, _slide);
         if (frames.Count < 2u)
         {
             // Nothing above this frame: running out of it is running to the

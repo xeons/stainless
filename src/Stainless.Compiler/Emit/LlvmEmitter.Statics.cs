@@ -243,14 +243,28 @@ public sealed partial class LlvmEmitter
     private void EmitEntryPoint(FunctionSymbol entry)
     {
         _nextTemp = 0;
+
+        // **The shim is described too**, though nobody wrote it and nothing
+        // steps through it. A call with no debug location, inlined into a
+        // function with no subprogram, takes the callee's locations with it --
+        // so at -O2, where `Main` is inlined into this, the program's own code
+        // would be described by nothing at all.
+        int? scope = debug?.EntryPoint(entry.Span);
+        string at = scope is { } where && debug is not null
+            ? $", !dbg !{debug.Location(entry.Span, where)}"
+            : "";
+
         _module.AppendLine("define i32 @main(i32 %argc, ptr %argv)"
-                           + FrameAttributes + " {");
+                           + FrameAttributes
+                           + (scope is { } attached ? $" !dbg !{attached}" : "")
+                           + " {");
         _module.AppendLine("entry:");
-        _module.AppendLine("  call void @sl_args_set(i32 %argc, ptr %argv)");
+        _module.AppendLine($"  call void @sl_args_set(i32 %argc, ptr %argv){at}");
 
         // Statics first, in dependency order, before any user code runs. After
         // the arguments, so that a static initializer may read them.
-        if (_hasStatics) _module.AppendLine($"  call void @{StaticInitializerName}()");
+        if (_hasStatics)
+            _module.AppendLine($"  call void @{StaticInitializerName}(){at}");
 
         // `Main(String[] args)`. The runtime builds the array, because the
         // TypeInfo that says how to destroy it belongs to this module and a
@@ -262,23 +276,23 @@ public sealed partial class LlvmEmitter
         if (entry.Parameters.Count == 1 && entry.Parameters[0].Type is ArrayTypeSymbol array)
         {
             _module.AppendLine(
-                $"  %args = call ptr @sl_args_array(ptr @{ArrayTypeInfoName(array)})");
+                $"  %args = call ptr @sl_args_array(ptr @{ArrayTypeInfoName(array)}){at}");
             arguments = "ptr %args";
         }
 
         if (entry.ReturnType.IsVoid())
         {
-            _module.AppendLine($"  call void {Symbol(entry)}({arguments})");
+            _module.AppendLine($"  call void {Symbol(entry)}({arguments}){at}");
             if (arguments.Length > 0)
-                _module.AppendLine("  call void @sl_release(ptr %args)");
-            _module.AppendLine("  ret i32 0");
+                _module.AppendLine($"  call void @sl_release(ptr %args){at}");
+            _module.AppendLine($"  ret i32 0{at}");
         }
         else
         {
-            _module.AppendLine($"  %code = call i32 {Symbol(entry)}({arguments})");
+            _module.AppendLine($"  %code = call i32 {Symbol(entry)}({arguments}){at}");
             if (arguments.Length > 0)
-                _module.AppendLine("  call void @sl_release(ptr %args)");
-            _module.AppendLine("  ret i32 %code");
+                _module.AppendLine($"  call void @sl_release(ptr %args){at}");
+            _module.AppendLine($"  ret i32 %code{at}");
         }
 
         _module.AppendLine("}");

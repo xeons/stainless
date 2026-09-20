@@ -39,6 +39,8 @@
 //   sldb locals <binary> f:n   the parameters and locals in scope there
 //   sldb watch <binary> f:n e  what an expression is worth there
 //   sldb when <binary> f:n c    stop at a line only when c holds
+//   sldb unwind <binary> f:n    the stack both ways, for comparing them
+//   sldb cfi <binary>           what the unwind information covers
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -346,6 +348,80 @@ int RunSelfTest()
     // whole reason the scanner keeps the byte.
     ok = ReportCheck(ok, "a single '=' is named as the mistake it is",
                      ParseWatch("a = 1").Problem.Contains("=="));
+
+    // --------------------------------------------------- unwind information
+    //
+    // The two readers, against tables written by hand. Neither needs a binary
+    // or a process, which is the half of an unwinder that can be checked that
+    // way -- what it does with a real stack is `sldb unwind`, which walks the
+    // same stack twice and prints both.
+
+    // **A `.pdata` record is found by binary search**, and the search is the
+    // part with an off-by-one in it: three functions, and every address in
+    // each of them, plus the gaps between.
+    byte[] pdata = [
+        0x00, 0x10, 0x00, 0x00, 0x20, 0x10, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00,
+        0x30, 0x10, 0x00, 0x00, 0x40, 0x10, 0x00, 0x00, 0x08, 0x20, 0x00, 0x00,
+        0x50, 0x10, 0x00, 0x00, 0x60, 0x10, 0x00, 0x00, 0x10, 0x20, 0x00, 0x00,
+    ];
+
+    ok = ReportCheck(ok, "the first byte of a function is in it",
+                     RuntimeFunctionIndexAt(pdata, 0x1000u) == 0);
+    ok = ReportCheck(ok, "and the last",
+                     RuntimeFunctionIndexAt(pdata, 0x101Fu) == 0);
+    ok = ReportCheck(ok, "the byte one past it is not",
+                     RuntimeFunctionIndexAt(pdata, 0x1020u) < 0);
+    ok = ReportCheck(ok, "the one in the middle is found",
+                     RuntimeFunctionIndexAt(pdata, 0x1035u) == 1);
+    ok = ReportCheck(ok, "and the last one",
+                     RuntimeFunctionIndexAt(pdata, 0x105Fu) == 2);
+    ok = ReportCheck(ok, "below the first is nothing",
+                     RuntimeFunctionIndexAt(pdata, 0x0FFFu) < 0);
+    ok = ReportCheck(ok, "past the last is nothing",
+                     RuntimeFunctionIndexAt(pdata, 0x2000u) < 0);
+
+    // **Every unwind code has a length**, and a reader that gets one wrong
+    // reads the next code from the middle of this one -- which still produces
+    // codes, and they are nonsense that looks like a prologue.
+    ok = ReportCheck(ok, "an alloc-large in units is two slots",
+                     UnwindCodeSlots(1u, 0u) == 2u);
+    ok = ReportCheck(ok, "and in bytes is three",
+                     UnwindCodeSlots(1u, 1u) == 3u);
+    ok = ReportCheck(ok, "a push is one",
+                     UnwindCodeSlots(0u, 5u) == 1u);
+    ok = ReportCheck(ok, "saving a register is two",
+                     UnwindCodeSlots(4u, 3u) == 2u);
+    ok = ReportCheck(ok, "and saving it far is three",
+                     UnwindCodeSlots(5u, 3u) == 3u);
+
+    // The CFI pointer encodings, which are where an `.eh_frame` reader goes
+    // wrong quietly: the entries still parse and the ranges they claim are
+    // plausible and somewhere else.
+    byte[] encoded = [0x08, 0x00, 0x00, 0x00, 0xF8, 0xFF, 0xFF, 0xFF];
+
+    nuint place = 0u;
+    nuint value = 0u;
+    ok = ReportCheck(ok, "an sdata4 pcrel pointer is relative to itself",
+                     ReadEncodedPointer(encoded, 0x2000u, 0x1Bu, &place, &value)
+                     && value == 0x2008u && place == 4u);
+
+    place = 4u;
+    ok = ReportCheck(ok, "and a negative one goes backwards",
+                     ReadEncodedPointer(encoded, 0x2000u, 0x1Bu, &place, &value)
+                     && value == 0x1FFCu);
+
+    place = 0u;
+    ok = ReportCheck(ok, "a udata4 with no application is itself",
+                     ReadEncodedPointer(encoded, 0x2000u, 0x03u, &place, &value)
+                     && value == 8u);
+
+    place = 0u;
+    ok = ReportCheck(ok, "an omitted pointer is refused",
+                     !ReadEncodedPointer(encoded, 0u, 0xFFu, &place, &value));
+
+    place = 0u;
+    ok = ReportCheck(ok, "and so is an indirect one, which needs the process",
+                     !ReadEncodedPointer(encoded, 0u, 0x9Bu, &place, &value));
 
     // The header structures, against the sizes their formats fix. Cheap, and
     // the only cover the 32-bit layouts have until a 32-bit binary is built
@@ -949,6 +1025,175 @@ int RunToBreakpointThen(String path, String where, String what, int times,
     return 0;
 }
 
+/// What the unwind information says it covers.
+///
+/// Diffable against `llvm-dwarfdump --eh-frame` and `llvm-readobj
+/// --unwind`, which is the only thing that catches a pointer encoding read
+/// wrongly: the entries still parse, and the ranges they claim are plausible
+/// and somewhere else.
+int PrintUnwindTable(String path)
+{
+    var read = Debugger.Image.FromFile(path);
+    if (!read.Ok)
+    {
+        Console.WriteLine("sldb: " + read.Error);
+        return 1;
+    }
+
+    var table = new Unwinder(read.Value);
+    Console.WriteLine(read.Value.Path);
+    Console.WriteLine("  format  " + table.Format);
+
+    if (table.IsEmpty)
+    {
+        Console.WriteLine("  nothing describes this binary's frames");
+        return 1;
+    }
+
+    if (table.Format == ".pdata")
+    {
+        nuint count = table.Pdata.Length / 12u;
+        Console.WriteLine("  " + FormatNumber(count) + " function(s)");
+        Console.WriteLine("");
+        for (nuint i = 0u; i < count; i++)
+        {
+            nuint at = i * 12u;
+            Console.WriteLine("  0x" + FormatHexPadded(
+                                  (nuint)LittleEndianAt(table.Pdata, at, 4u), 8)
+                              + "  0x" + FormatHexPadded(
+                                  (nuint)LittleEndianAt(table.Pdata, at + 4u, 4u), 8)
+                              + "  info 0x" + FormatHexPadded(
+                                  (nuint)LittleEndianAt(table.Pdata, at + 8u, 4u), 8));
+        }
+        return 0;
+    }
+
+    var entries = UnwindEntries(table);
+    nuint fdes = 0u;
+    for (nuint i = 0u; i < entries.Count; i++)
+    {
+        if (!entries[i].IsCie)
+            fdes++;
+    }
+
+    Console.WriteLine("  " + FormatNumber(entries.Count) + " entries, "
+                      + FormatNumber(fdes) + " of them FDEs");
+    Console.WriteLine("");
+
+    for (nuint i = 0u; i < entries.Count; i++)
+    {
+        var one = entries[i];
+        if (one.IsCie)
+        {
+            Console.WriteLine("  0x" + FormatHexPadded(one.Offset, 6) + "  CIE");
+            continue;
+        }
+        if (one.Problem.ByteLength() != 0u)
+        {
+            Console.WriteLine("  0x" + FormatHexPadded(one.Offset, 6)
+                              + "  FDE  -- " + one.Problem);
+            continue;
+        }
+        Console.WriteLine("  0x" + FormatHexPadded(one.Offset, 6)
+                          + "  FDE  0x" + FormatHexPadded(one.Begin, 12)
+                          + " .. 0x" + FormatHexPadded(one.Begin + one.Range, 12));
+    }
+    return 0;
+}
+
+/// The stack walked with the unwind information and again without it.
+///
+/// **What proves the unwinder is a difference, not an assertion.** The frame
+/// pointer walk is right wherever there is a frame pointer, so on a `-g -O0`
+/// binary the two agree all the way down and that is the answer: nothing was
+/// broken. Where they part is where the unwind information was worth reading.
+int PrintBothWalks(String path, String where)
+{
+    var made = MakeTarget();
+    if (!made.Ok)
+    {
+        Console.WriteLine("sldb: " + made.Error);
+        return 1;
+    }
+
+    var read = Debugger.Image.FromFile(path);
+    if (!read.Ok)
+    {
+        Console.WriteLine("sldb: " + read.Error);
+        return 1;
+    }
+
+    var image = read.Value;
+    var info = new DwarfInfo(image);
+    String bad = info.Read();
+    if (bad.ByteLength() != 0u)
+    {
+        Console.WriteLine("sldb: " + bad);
+        return 1;
+    }
+
+    var tables = ReadEveryLineTable(info);
+    var target = made.Value;
+    var engine = new Engine(target, image, info, tables);
+
+    nuint at = 0u;
+    uint chosen = 0u;
+    if (!FindAddressOfWhere(tables, where, &at, &chosen))
+    {
+        Console.WriteLine("sldb: no code for " + where);
+        return 1;
+    }
+    engine.Add(at, where);
+
+    var started = engine.Start(path, "");
+    if (!started.Ok)
+    {
+        Console.WriteLine("sldb: " + started.Error);
+        return 1;
+    }
+
+    var stop = started.Value;
+    if (stop.Kind != StopKind.Breakpoint)
+    {
+        Console.WriteLine("sldb: never reached " + where);
+        engine.Terminate();
+        return 1;
+    }
+
+    Console.WriteLine("stopped at " + engine.Describe(stop.Address));
+    Console.WriteLine("unwind   " + engine.Unwinder.Format);
+    Console.WriteLine("");
+
+    Console.WriteLine("with the unwind information");
+    PrintWalk(engine, WalkStack(target, stop.Thread, engine.Unwinder,
+                                engine.Slide));
+
+    Console.WriteLine("");
+    Console.WriteLine("frame pointer only");
+    PrintWalk(engine, WalkStack(target, stop.Thread, null, engine.Slide));
+
+    engine.Terminate();
+    return 0;
+}
+
+void PrintWalk(Engine engine, List<Frame> frames)
+{
+    var table = engine.Unwinder;
+    for (nuint i = 0u; i < frames.Count; i++)
+    {
+        var frame = frames[i];
+        String named = engine.FunctionAt(i == 0u ? frame.Pc : frame.Pc - 1u);
+        nuint linked = engine.ToLinked(frame.Pc);
+
+        Console.WriteLine("  #" + FormatNumber(i) + "  "
+                          + PadRight(named.ByteLength() != 0u ? named : "??", 20)
+                          + "0x" + FormatHexPadded(frame.Pc, 12)
+                          + (table.InImage(linked)
+                             ? "  +0x" + FormatHexadecimal((ulong)linked) : "")
+                          + (frame.Unwound ? "" : "   (frame pointer)"));
+    }
+}
+
 /// The locals a snapshot holds, one to a line.
 void PrintValues(Snapshot taken)
 {
@@ -1084,6 +1329,8 @@ int PrintUsage()
     Console.WriteLine("  sldb locals <binary> f:n   the variables in scope there");
     Console.WriteLine("  sldb watch <binary> f:n e  what an expression is worth");
     Console.WriteLine("  sldb when <binary> f:n c   stop there only when c holds");
+    Console.WriteLine("  sldb unwind <binary> f:n   the stack both ways");
+    Console.WriteLine("  sldb cfi <binary>          what the unwind info covers");
     Console.WriteLine("  sldb snapshot <binary> f:n everything a window is given");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
@@ -1130,6 +1377,12 @@ int Main()
     if (args[0u] == "watch" && args.Length >= 4u)
         return RunToBreakpointThen(args[1u], args[2u], "watch", 0,
                                    ArgumentsFrom(args, 3u), "");
+
+    if (args[0u] == "cfi" && args.Length >= 2u)
+        return PrintUnwindTable(args[1u]);
+
+    if (args[0u] == "unwind" && args.Length >= 3u)
+        return PrintBothWalks(args[1u], args[2u]);
 
     if (args[0u] == "when" && args.Length >= 4u)
         return RunToBreakpointThen(args[1u], args[2u], "when", 0, none,

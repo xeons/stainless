@@ -57,6 +57,12 @@ distinct !DILexicalBlock(
 # Instructions carry locations, and a variable is tied to its slot.
 call void @llvm.dbg.declare(
 
+# The C entry point is described too, though nobody wrote it: a call with no
+# location, inlined into a function with no subprogram, takes the callee's
+# locations with it, and -O2 inlines Main into this.
+!DISubprogram(name: "main", linkageName: "main"
+DIFlagArtificial
+
 # The frame pointer, which a debugger cannot walk a stack without. LLVM omits
 # it at every level unless asked -- at -O0 too, because clang's own default
 # comes from clang passing this, not from the optimisation level -- and without

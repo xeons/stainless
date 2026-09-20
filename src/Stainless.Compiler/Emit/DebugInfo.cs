@@ -184,6 +184,34 @@ public sealed class DebugInfo
     /// The node describing a function, or null for one this program does not
     /// define. A declaration has no body to step through and no line to sit on.
     /// </summary>
+    /// <summary>
+    /// The C entry point, which no symbol describes because no programmer
+    /// wrote it.
+    /// </summary>
+    /// <remarks>
+    /// <b>It needs one all the same, and not for stepping.</b> A call with no
+    /// debug location, inlined into a function with no subprogram, loses the
+    /// callee's locations with it — so at <c>-O2</c>, where <c>Main</c> is
+    /// inlined into this, the program's own code ends up described by nothing
+    /// at all: no subprogram, no inlined subroutine, no line rows.
+    ///
+    /// Positioned at the entry point it calls, which is the nearest thing to a
+    /// place it has, and marked artificial so a debugger knows nobody wrote it.
+    /// </remarks>
+    public int EntryPoint(SourceSpan span)
+    {
+        int file = File(span.File);
+        var (line, _) = span.File.GetLineColumn(span.Start);
+
+        int type = Add($"!DISubroutineType(types: !{Add("!{null}")})");
+
+        return Add(
+            $"distinct !DISubprogram(name: \"main\", linkageName: \"main\", " +
+            $"scope: !{file}, file: !{file}, line: {line}, type: !{type}, " +
+            $"scopeLine: {line}, flags: DIFlagArtificial | DIFlagPrototyped, " +
+            $"spFlags: DISPFlagDefinition, unit: !{_compileUnit})");
+    }
+
     public int? Subprogram(FunctionSymbol symbol, string linkageName)
     {
         if (_subprograms.TryGetValue(symbol, out int existing)) return existing;
