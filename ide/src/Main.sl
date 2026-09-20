@@ -22,6 +22,7 @@
 //   stainless-ide --break f.sl:12 -- set a breakpoint and start debugging
 //   stainless-ide --watch a.b     -- and watch an expression there
 //   stainless-ide --when i == 3   -- and stop only when that holds
+//   stainless-ide --show threads  -- and bring that pane forward
 //
 // `--break` and `--watch` exist so the debugger can be photographed. A
 // screenshot is the only thing that says a pane drew, and a debugging session
@@ -46,6 +47,7 @@ int Main()
     bool testing = false;
     String stopAt = "";
     String onlyWhen = "";
+    String showing = "";
     var arguments = Env.Arguments();
     // From zero: `Env.Arguments` is what `Main(String[] args)` would have been
     // handed, which does not include the program's own name.
@@ -64,6 +66,12 @@ int Main()
         if (argument == "--break" && i + 1u < arguments.Length)
         {
             stopAt = arguments[i + 1u];
+            i++;
+            continue;
+        }
+        if (argument == "--show" && i + 1u < arguments.Length)
+        {
+            showing = arguments[i + 1u];
             i++;
             continue;
         }
@@ -107,6 +115,11 @@ int Main()
     // and there has to be a loop for those posts to arrive on.
     if (stopAt.ByteLength() != 0u)
         window.DebugFrom(stopAt, onlyWhen);
+
+    // After the session, because a stop brings its own pane forward and this
+    // has to be what is showing when the picture is taken.
+    if (showing.ByteLength() != 0u)
+        window.ShowPaneNamed(showing);
 
     Application.Run();
     return 0;

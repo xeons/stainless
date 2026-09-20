@@ -1136,6 +1136,17 @@ public class DockHost : Panel
 
     public bool Holds(String name) => WellHolding(name) != null;
 
+    /// The rectangle the splitter for an edge occupies, in this host's own
+    /// coordinates.
+    ///
+    /// **A splitter is windowless**, so nothing about it is visible to the
+    /// platform: whether it can be grabbed is entirely whether this rectangle
+    /// is where the pointer is. An empty one is a divider nobody can drag and
+    /// a cursor that never changes, which is invisible to every other check.
+    public Rectangle SplitterBounds(DockEdge edge) => SplitFor(edge).Bounds;
+
+    public bool SplitterShowing(DockEdge edge) => SplitFor(edge).Visible;
+
     /// Which edge a pane is actually on, as opposed to what the file asked for.
     public DockEdge EdgeOf(String name)
     {

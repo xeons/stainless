@@ -250,6 +250,7 @@ public static class Panes
     public static readonly String Locals = "locals";
     public static readonly String Watch = "watch";
     public static readonly String CallStack = "callstack";
+    public static readonly String Threads = "threads";
     public static readonly String Breakpoints = "breakpoints";
     public static readonly String DebugOutput = "debugoutput";
 }

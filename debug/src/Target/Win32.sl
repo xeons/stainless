@@ -46,6 +46,9 @@ public class Win32Target : ITarget
     HANDLE _thread;
     uint _processId;
     uint _threadId;
+
+    /// Every thread of the debuggee, in the order Windows reported them.
+    List<uint> _threads;
     nuint _imageBase;
     bool _running;
 
@@ -71,6 +74,7 @@ public class Win32Target : ITarget
         _thread = null;
         _processId = 0u;
         _threadId = 0u;
+        _threads = new List<uint>();
         _imageBase = 0u;
         _running = false;
         _loaderBreakpointSeen = false;
@@ -154,6 +158,7 @@ public class Win32Target : ITarget
                     _process = info->Process;
                 if (info->Thread != null)
                     _thread = info->Thread;
+                Remember(raw.ThreadId);
                 return Started(_imageBase, raw.ThreadId);
             }
 
@@ -181,9 +186,11 @@ public class Win32Target : ITarget
             }
 
             case CreateThreadDebugEvent:
+                Remember(raw.ThreadId);
                 return ThreadCreated(raw.ThreadId);
 
             case ExitThreadDebugEvent:
+                Forget(raw.ThreadId);
                 return ThreadExited(raw.ThreadId);
 
             case LoadDllDebugEvent:
@@ -332,6 +339,39 @@ public class Win32Target : ITarget
         if (_process != null && _running)
             TerminateProcess(_process, 1u);
         _running = false;
+    }
+
+    /// Every thread, in the order Windows reported them.
+    ///
+    /// **Windows tells a debugger about each one**, so this is the whole list
+    /// and not a guess: a thread exists between its create event and its exit
+    /// event and at no other time.
+    public List<uint> Threads() => _threads;
+
+    /// All of them, because a debugger may open any thread of a process it is
+    /// debugging.
+    public bool CanRead(uint thread) => true;
+
+    void Remember(uint thread)
+    {
+        for (nuint i = 0u; i < _threads.Count; i++)
+        {
+            if (_threads[i] == thread)
+                return;
+        }
+        _threads.Add(thread);
+    }
+
+    void Forget(uint thread)
+    {
+        for (nuint i = 0u; i < _threads.Count; i++)
+        {
+            if (_threads[i] == thread)
+            {
+                _threads.RemoveAt(i);
+                return;
+            }
+        }
     }
 
     /// The main thread's handle when the id matches, and a borrowed one

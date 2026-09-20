@@ -49,7 +49,10 @@
 module Debugger;
 
 import Standard.Collections;
+import Standard.Convert;
+import Standard.Directory;
 import Standard.File;
+import Standard.Path;
 import Standard.Text;
 #if LINUX
 import Linux.Ptrace;
@@ -319,6 +322,45 @@ public class LinuxTarget : ITarget
             return false;
         return kill(_pid, SignalStop) == 0;
     }
+
+    /// Every thread of the process, from `/proc/<pid>/task`.
+    ///
+    /// **Listed, not traced.** The launch put one thread under
+    /// `PTRACE_TRACEME` and that is the one this engine drives; a thread the
+    /// program started since is in the directory and is not ours, so its
+    /// registers and its stack cannot be read. `CanRead` says which is which.
+    ///
+    /// Tracing them all means `PTRACE_O_TRACECLONE`, a `waitpid` over the
+    /// whole group rather than one pid, and a stopped-or-running state per
+    /// thread -- a different event loop, not a longer one.
+    public List<uint> Threads()
+    {
+        var found = new List<uint>();
+        if (!_running)
+            return found;
+
+        // Ours first, whatever order the directory is in: it is the one a
+        // caller can do anything with.
+        found.Add((uint)_pid);
+
+        String tasks = "/proc/" + Standard.Text.FromInteger((long)_pid) + "/task";
+        var read = Standard.Directory.Directories(tasks);
+        if (!read.Ok)
+            return found;
+
+        var names = read.Value;
+        for (nuint i = 0u; i < names.Count; i++)
+        {
+            var number = Standard.Convert.ToInt(Standard.Path.FileName(names[i]));
+            if (!number.Ok || number.Value == (long)_pid)
+                continue;
+            found.Add((uint)number.Value);
+        }
+        return found;
+    }
+
+    /// Only the thread that was launched under the tracer. See `Threads`.
+    public bool CanRead(uint thread) => thread == (uint)_pid;
 
     public void Terminate()
     {

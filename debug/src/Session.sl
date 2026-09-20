@@ -117,6 +117,41 @@ public class FrameLine
     }
 }
 
+/// One thread of the debuggee.
+public class ThreadLine
+{
+    public uint Id;
+
+    /// Whether this is the thread the stop was reported on, and the one every
+    /// other pane is about.
+    public bool IsCurrent;
+
+    /// Whether the engine can read this thread at all. False for a thread the
+    /// platform lists but does not let a debugger touch -- on Linux, every one
+    /// the program started after the launch.
+    public bool CanRead;
+
+    /// Where it is, when it could be read. `Function` is "" for an address in
+    /// code nothing describes.
+    public String Function;
+    public String File;
+    public uint Line;
+    public bool HasSource;
+    public nuint Pc;
+
+    public ThreadLine(uint id, bool isCurrent, bool canRead)
+    {
+        Id = id;
+        IsCurrent = isCurrent;
+        CanRead = canRead;
+        Function = "";
+        File = "";
+        Line = 0u;
+        HasSource = false;
+        Pc = 0u;
+    }
+}
+
 /// What a session is doing, as far as anything watching it can tell.
 public enum RunState
 {
@@ -162,6 +197,9 @@ public class Snapshot
     /// answered.
     public List<WatchLine> Watches;
 
+    /// Every thread of the debuggee, the current one first.
+    public List<ThreadLine> Threads;
+
     /// Something worth saying that is not a failure -- that a program carries
     /// no DWARF, that the image base was never learned. Empty when there is
     /// nothing to say.
@@ -182,6 +220,7 @@ public class Snapshot
         Frames = new List<FrameLine>();
         Locals = new List<ValueLine>();
         Watches = new List<WatchLine>();
+        Threads = new List<ThreadLine>();
         Note = "";
     }
 }
@@ -216,6 +255,7 @@ public Snapshot TakeSnapshot(Engine engine, ITarget target, Stop stop)
     FillFrames(taken, engine, target, stop.Thread);
     FillLocals(taken, engine, target, stop.Thread, stop.Address);
     FillWatches(taken, engine, target, stop.Thread, stop.Address);
+    FillThreads(taken, engine, target, stop.Thread);
     return taken;
 }
 
@@ -302,6 +342,92 @@ void FillWatches(Snapshot into, Engine engine, ITarget target, uint thread,
     for (nuint i = 0u; i < watches.Count; i++)
         into.Watches.Add(ReadWatch(engine, target, where.InUnit, where.Die,
                                    frame, watches[i]));
+}
+
+/// Every thread, and where each of them is.
+///
+/// **Where a thread is costs one read of its registers**, which is the one
+/// thing worth having about a thread that is not the current one: an id on its
+/// own says a program has four threads and nothing about what any of them is
+/// doing.
+void FillThreads(Snapshot into, Engine engine, ITarget target, uint current)
+{
+    var threads = target.Threads();
+    for (nuint i = 0u; i < threads.Count; i++)
+    {
+        uint id = threads[i];
+        var line = new ThreadLine(id, id == current, target.CanRead(id));
+
+        if (!line.CanRead)
+        {
+            into.Threads.Add(line);
+            continue;
+        }
+
+        Registers registers;
+        registers.Pc = 0u;
+        registers.StackPointer = 0u;
+        registers.FramePointer = 0u;
+        if (!target.ReadRegisters(id, &registers))
+        {
+            // Listed and readable a moment ago, and gone now. A thread may end
+            // between being counted and being asked about.
+            line.CanRead = false;
+            into.Threads.Add(line);
+            continue;
+        }
+
+        line.Pc = registers.Pc;
+        DescribeThread(line, engine, target, id, registers.Pc);
+        into.Threads.Add(line);
+    }
+}
+
+/// Where a thread is, in terms of the program rather than of the system.
+///
+/// **A waiting thread is inside the system, not inside the program**, and its
+/// program counter says `ntdll` or `libc`. A thread pane that reports that
+/// reports the same address for every idle thread in every program. So the
+/// stack is walked to the first frame that has a source line, which is the
+/// line of the program's own code the thread is waiting at.
+///
+/// The raw address is still what `Pc` holds: it is where the thread actually
+/// is, and a caller wanting that should not have to undo this.
+void DescribeThread(ThreadLine line, Engine engine, ITarget target, uint id,
+                    nuint pc)
+{
+    var here = engine.PositionAt(pc);
+    if (here.Known)
+    {
+        line.File = here.File;
+        line.Line = here.Line;
+        line.HasSource = true;
+        line.Function = engine.FunctionAt(pc);
+        return;
+    }
+
+    var frames = WalkStack(target, id, engine.Unwinder, engine.Slide);
+    for (nuint i = 0u; i < frames.Count; i++)
+    {
+        // Every frame above the first holds a return address, so the line
+        // table is asked about the byte before it -- the call, not what it
+        // comes back to.
+        nuint asking = i == 0u ? frames[i].Pc : frames[i].Pc - 1u;
+
+        var at = engine.PositionAt(asking);
+        if (!at.Known)
+            continue;
+
+        line.File = at.File;
+        line.Line = at.Line;
+        line.HasSource = true;
+        line.Function = engine.FunctionAt(asking);
+        return;
+    }
+
+    // Nothing in the whole stack is code this program was built from, which is
+    // a thread the system started for its own reasons.
+    line.Function = engine.FunctionAt(pc);
 }
 
 // ====================================================== setting a session up

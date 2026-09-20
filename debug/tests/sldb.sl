@@ -41,6 +41,7 @@
 //   sldb when <binary> f:n c    stop at a line only when c holds
 //   sldb unwind <binary> f:n    the stack both ways, for comparing them
 //   sldb cfi <binary>           what the unwind information covers
+//   sldb threads <binary> f:n   every thread, and where each of them is
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -971,7 +972,7 @@ int RunToBreakpointThen(String path, String where, String what, int times,
     // commands a test of what the window will show, instead of a second route
     // to the same data that can quietly diverge from it.
     if (what == "stack" || what == "locals" || what == "snapshot"
-        || what == "watch" || what == "when")
+        || what == "watch" || what == "when" || what == "threads")
     {
         var taken = TakeSnapshot(engine, target, stop);
         switch (what)
@@ -990,6 +991,10 @@ int RunToBreakpointThen(String path, String where, String what, int times,
 
             case "when":
                 PrintValues(taken);
+                break;
+
+            case "threads":
+                PrintThreads(taken);
                 break;
 
             default:
@@ -1233,6 +1238,34 @@ void PrintWatches(Snapshot taken)
     }
 }
 
+/// The threads a snapshot holds, one to a line.
+///
+/// A thread the platform lists and will not let a debugger read says so rather
+/// than being left out: a program with four threads has four, and a pane that
+/// showed one would be answering a different question.
+void PrintThreads(Snapshot taken)
+{
+    if (taken.Threads.IsEmpty)
+    {
+        Console.WriteLine("  (none)");
+        return;
+    }
+
+    for (nuint i = 0u; i < taken.Threads.Count; i++)
+    {
+        var one = taken.Threads[i];
+        String where = !one.CanRead
+                     ? "(not traced)"
+                     : FormatWhere(one.File, one.Line, one.HasSource, one.Pc);
+
+        Console.WriteLine("  " + (one.IsCurrent ? "> " : "  ")
+                          + PadRight(FormatNumber((nuint)one.Id), 10)
+                          + PadRight(one.Function.ByteLength() != 0u
+                                     ? one.Function : "??", 24)
+                          + where);
+    }
+}
+
 /// The call stack a snapshot holds.
 void PrintFrames(Snapshot taken)
 {
@@ -1269,6 +1302,8 @@ void PrintWholeSnapshot(Snapshot taken)
     PrintValues(taken);
     Console.WriteLine("watches");
     PrintWatches(taken);
+    Console.WriteLine("threads");
+    PrintThreads(taken);
 }
 
 /// A file and a line, or the address when there is no line.
@@ -1331,6 +1366,7 @@ int PrintUsage()
     Console.WriteLine("  sldb when <binary> f:n c   stop there only when c holds");
     Console.WriteLine("  sldb unwind <binary> f:n   the stack both ways");
     Console.WriteLine("  sldb cfi <binary>          what the unwind info covers");
+    Console.WriteLine("  sldb threads <binary> f:n  every thread, and where it is");
     Console.WriteLine("  sldb snapshot <binary> f:n everything a window is given");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
@@ -1373,6 +1409,9 @@ int Main()
 
     if (args[0u] == "locals" && args.Length >= 3u)
         return RunToBreakpointThen(args[1u], args[2u], "locals", 0, none, "");
+
+    if (args[0u] == "threads" && args.Length >= 3u)
+        return RunToBreakpointThen(args[1u], args[2u], "threads", 0, none, "");
 
     if (args[0u] == "watch" && args.Length >= 4u)
         return RunToBreakpointThen(args[1u], args[2u], "watch", 0,

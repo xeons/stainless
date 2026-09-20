@@ -133,6 +133,7 @@ public class Shell : Form
     Snapshot? _stopped;
 
     ListView _stack;
+    ListView _threadList;
     ListView _locals;
     ListView _watchList;
     ListView _breakList;
@@ -148,6 +149,10 @@ public class Shell : Form
 
     /// Whether the next stop is this session's first.
     bool _firstStop;
+
+    /// The pane `--show` asked for, which stays in front of the one a stop
+    /// would otherwise bring forward. Empty when nobody asked.
+    String _preferredPane;
 
     ToolBar _debugTools;
     ToolButton _startButton;
@@ -301,6 +306,7 @@ public class Shell : Form
         _stopped = null;
         _frame = 0u;
         _firstStop = true;
+        _preferredPane = "";
         _compiler = FindCompiler();
         _textSize = 10;
         _dark = false;
@@ -481,6 +487,17 @@ public class Shell : Form
         _stack.AddColumn("Function", 220);
         _stack.AddColumn("Line", 320);
         _stack.DoubleClick += this.OnFrameChosen;
+
+        var threads = _dock.Add(Panes.Threads, "Threads", DockEdge.Bottom);
+        _threadList = new ListView(threads);
+        _threadList.Dock = DockStyle.Fill;
+        _threadList.View = ListViewStyle.Details;
+        _threadList.SetFullRowSelect(true, true);
+        _threadList.AddColumn("", 22);
+        _threadList.AddColumn("Id", 80);
+        _threadList.AddColumn("Function", 220);
+        _threadList.AddColumn("Location", 240);
+        _threadList.DoubleClick += this.OnThreadChosen;
 
         var points = _dock.Add(Panes.Breakpoints, "Breakpoints", DockEdge.Bottom);
         _breakList = new ListView(points);
@@ -786,6 +803,7 @@ public class Shell : Form
         view.Add("&Locals").Click += this.OnShowLocals;
         view.Add("&Watch").Click += this.OnShowWatch;
         view.Add("&Call Stack").Click += this.OnShowCallStack;
+        view.Add("T&hreads").Click += this.OnShowThreads;
         view.Add("&Breakpoints").Click += this.OnShowBreakpoints;
         view.Add("&Debug Output").Click += this.OnShowDebugOutput;
         view.Add(MenuItem.Separator());
@@ -1936,6 +1954,25 @@ public class Shell : Form
     void OnShowOutput(MenuItem sender) => ShowPane(Panes.Output, "Output");
     void OnShowLocals(MenuItem sender) => ShowPane(Panes.Locals, "Locals");
     void OnShowWatch(MenuItem sender) => ShowPane(Panes.Watch, "Watch");
+    void OnShowThreads(MenuItem sender) => ShowPane(Panes.Threads, "Threads");
+
+    /// Brings a pane forward by the name the layout file calls it, and keeps
+    /// it in front when the first stop arrives.
+    ///
+    /// The command line's `--show`, which exists so that a pane can be
+    /// photographed without somebody clicking its tab. Remembered as well as
+    /// revealed because a stop brings its own pane forward, and it arrives
+    /// after this.
+    public bool ShowPaneNamed(String name)
+    {
+        if (!_dock.Reveal(name))
+        {
+            Say("There is no pane called '" + name + "'.");
+            return false;
+        }
+        _preferredPane = name;
+        return true;
+    }
     void OnShowCallStack(MenuItem sender) => ShowPane(Panes.CallStack, "Call Stack");
     void OnShowBreakpoints(MenuItem sender) => ShowPane(Panes.Breakpoints, "Breakpoints");
     void OnShowDebugOutput(MenuItem sender)
@@ -3057,6 +3094,7 @@ public class Shell : Form
         ShowLocals(taken);
         ShowWatches(taken);
         ShowCallStack(taken);
+        ShowThreads(taken);
         ShowWhatDebuggingAllows();
 
         // One pane comes forward on the first stop and on none after it. Every
@@ -3068,7 +3106,9 @@ public class Shell : Form
         if (_firstStop)
         {
             _firstStop = false;
-            _dock.Reveal(_watches.IsEmpty ? Panes.Locals : Panes.Watch);
+            _dock.Reveal(_preferredPane.ByteLength() != 0u
+                         ? _preferredPane
+                         : (_watches.IsEmpty ? Panes.Locals : Panes.Watch));
         }
 
         if (taken.HasSource)
@@ -3297,6 +3337,64 @@ public class Shell : Form
             ShowWatchNames();
     }
 
+    /// Every thread of the program, and where each of them is.
+    ///
+    /// A thread the platform will not let a debugger read keeps its row and
+    /// says so: a program with four threads has four, whatever this can see of
+    /// them.
+    void ShowThreads(Snapshot taken)
+    {
+        _threadList.Clear();
+        for (nuint i = 0u; i < taken.Threads.Count; i++)
+        {
+            var one = taken.Threads[i];
+            int row = _threadList.AddRow(one.IsCurrent ? ">" : "");
+            _threadList.SetCell(row, 1, Standard.Text.FromInteger((long)one.Id));
+            _threadList.SetCell(row, 2, one.Function.ByteLength() != 0u
+                                        ? one.Function : "??");
+            _threadList.SetCell(row, 3, ThreadWhere(one));
+        }
+    }
+
+    String ThreadWhere(ThreadLine one)
+    {
+        if (!one.CanRead)
+            return "not traced";
+        if (one.HasSource)
+            return NameOf(one.File) + ", line "
+                 + Standard.Text.FromInteger((long)one.Line);
+        return "0x" + FormatHexadecimal((ulong)one.Pc);
+    }
+
+    /// A thread was double-clicked: show where it is.
+    ///
+    /// Only the source position changes. Locals and the Call Stack still show
+    /// the thread the stop was reported on -- switching which thread those are
+    /// about means reading another one, and only the session's own thread may
+    /// do that.
+    void OnThreadChosen(Control sender)
+    {
+        var taken = _stopped;
+        if (taken == null)
+            return;
+
+        int row = _threadList.SelectedIndex;
+        if (row < 0 || (nuint)row >= ((Snapshot)taken).Threads.Count)
+            return;
+
+        var one = ((Snapshot)taken).Threads[(nuint)row];
+        if (!one.HasSource)
+        {
+            Say(one.CanRead ? "That thread is not in code this program was built"
+                              + " from."
+                            : "That thread cannot be read.");
+            return;
+        }
+
+        GoTo(one.File, one.Line);
+        RepaintEditors();
+    }
+
     void ShowCallStack(Snapshot taken)
     {
         _stack.Clear();
@@ -3351,21 +3449,18 @@ public class Shell : Form
     /// a field or an element would want an expression, and the pointer has not
     /// selected one.
     ///
-    /// Not a tooltip, which `forms/` has no control for. The status line is
-    /// where this window says what is under the pointer.
+    /// In the tip and on the status line both. The tip is where a person looks
+    /// and waits half a second for; the status line is there at once and stays
+    /// while the pointer is moved away to read it.
     void OnHovered(String word)
     {
-        var taken = _stopped;
-        if (taken == null)
-            return;
-
-        if (word.ByteLength() == 0u)
+        if (_stopped == null || word.ByteLength() == 0u)
         {
             ShowHover("");
             return;
         }
 
-        var stop = (Snapshot)taken;
+        var stop = (Snapshot)_stopped;
         for (nuint i = 0u; i < stop.Locals.Count; i++)
         {
             var one = stop.Locals[i];
@@ -3382,6 +3477,7 @@ public class Shell : Form
     {
         _locals.Clear();
         _stack.Clear();
+        _threadList.Clear();
         ShowWatchNames();
     }
 
@@ -3508,9 +3604,19 @@ public class Shell : Form
 
     void Say(String what) => _status.SetPanelText(1, what);
 
-    /// What the pointer is over, or "" to clear it. Its own panel, so a
-    /// hover does not take away what the window last said.
-    void ShowHover(String what) => _status.SetPanelText(4, what);
+    /// What the pointer is over, or "" to clear it.
+    ///
+    /// The status bar's own panel, so a hover does not take away what the
+    /// window last said -- and the editor's tip, which is where somebody
+    /// pointing at a name is looking.
+    void ShowHover(String what)
+    {
+        _status.SetPanelText(4, what);
+
+        var now = Current;
+        if (now != null)
+            ((CodeEditor)now).ToolTip = what;
+    }
 
     /// Whether a list of arguments holds one.
     static bool Names(String[] arguments, String wanted)
@@ -3998,10 +4104,10 @@ public class Shell : Form
         // it landed on the edge the layout asked for, and that closing and
         // reopening one is the same object rather than a new empty tree.
         {
-            // Three from Phase 1 and five the debugger added.
-            if (_dock.PaneCount != 8u)
+            // Three from Phase 1 and six the debugger added.
+            if (_dock.PaneCount != 9u)
             {
-                Console.WriteLine("FAIL: expected eight panes, found "
+                Console.WriteLine("FAIL: expected nine panes, found "
                                   + Standard.Text.FromInteger(_dock.PaneCount));
                 ok = false;
             }
@@ -4021,10 +4127,41 @@ public class Shell : Form
             if (_dock.EdgeOf(Panes.Locals) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.Watch) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.CallStack) != DockEdge.Bottom
+                || _dock.EdgeOf(Panes.Threads) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.Breakpoints) != DockEdge.Bottom
                 || _dock.EdgeOf(Panes.DebugOutput) != DockEdge.Bottom)
             {
                 Console.WriteLine("FAIL: the debugger's panes are not in the bottom well");
+                ok = false;
+            }
+
+            // **A divider has to be somewhere a pointer can be.** A splitter
+            // is windowless, so whether it can be dragged is entirely whether
+            // its rectangle covers real pixels between the well and the
+            // documents -- and nothing else here would notice an empty one.
+            var leftSplit = _dock.SplitterBounds(DockEdge.Left);
+            if (!_dock.SplitterShowing(DockEdge.Left)
+                || leftSplit.Width <= 0 || leftSplit.Height <= 0)
+            {
+                Console.WriteLine("FAIL: the left divider is "
+                                  + Standard.Text.FromInteger((long)leftSplit.Width)
+                                  + " by "
+                                  + Standard.Text.FromInteger((long)leftSplit.Height)
+                                  + " at " + Standard.Text.FromInteger((long)leftSplit.X)
+                                  + "," + Standard.Text.FromInteger((long)leftSplit.Y)
+                                  + (_dock.SplitterShowing(DockEdge.Left)
+                                     ? "" : " and is not showing"));
+                ok = false;
+            }
+
+            var bottomSplit = _dock.SplitterBounds(DockEdge.Bottom);
+            if (!_dock.SplitterShowing(DockEdge.Bottom)
+                || bottomSplit.Width <= 0 || bottomSplit.Height <= 0)
+            {
+                Console.WriteLine("FAIL: the bottom divider is "
+                                  + Standard.Text.FromInteger((long)bottomSplit.Width)
+                                  + " by "
+                                  + Standard.Text.FromInteger((long)bottomSplit.Height));
                 ok = false;
             }
 

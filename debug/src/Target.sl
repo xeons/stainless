@@ -136,6 +136,20 @@ public interface ITarget
     /// for, so callers MUST go through `Engine.RequestBreak`.
     bool RequestBreak();
 
+    /// Every thread of the debuggee, by id, with the one this engine is
+    /// driving first.
+    ///
+    /// **Not every one of these can be read.** Windows reports each thread as
+    /// it is created and a debugger may read any of them; Linux lists them in
+    /// `/proc`, and only the one that was launched under `PTRACE_TRACEME` is
+    /// traced -- the rest can be counted and named and nothing else.
+    /// `CanRead` is what says which, so a caller never has to know which
+    /// platform it is on.
+    List<uint> Threads();
+
+    /// Whether this thread's registers and stack can be read at a stop.
+    bool CanRead(uint thread);
+
     /// Kills it. Safe to call when it has already gone.
     void Terminate();
 
