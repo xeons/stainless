@@ -10,6 +10,7 @@ One page per module. Each lists every public type, function, property, case and 
 | [Standard.Ascii](Standard-Ascii.md) | Asking what a byte is, when the answer is allowed to be an ASCII one. |
 | [Standard.Collections](Standard-Collections.md) | The Stainless standard collections. |
 | [Standard.Concurrent](Standard-Concurrent.md) | Collections more than one thread may hold at once. |
+| [Standard.Console](Standard-Console.md) | Standard input and output, as text. |
 | [Standard.Convert](Standard-Convert.md) | Turning things into other things: bytes into text, text into numbers. |
 | [Standard.Directory](Standard-Directory.md) | Directories: making them, removing them, and looking inside. |
 | [Standard.Drawing](Standard-Drawing.md) | Raster images: reading them, drawing on them, and writing them back. |

@@ -31,7 +31,6 @@ namespace Stainless.Binding;
 public sealed class Builtins
 {
     public const string TextModuleName = "Standard.Text";
-    public const string ConsoleModuleName = "Standard.Console";
 
     /// <summary>
     /// Where <c>Guid</c> and <c>IUnknown</c> live.
@@ -50,7 +49,6 @@ public sealed class Builtins
     public const string StandardModuleName = "Standard";
 
     public ModuleSymbol Text { get; }
-    public ModuleSymbol Console { get; }
     public ModuleSymbol Standard { get; }
     public ModuleSymbol Com { get; }
 
@@ -158,7 +156,6 @@ public sealed class Builtins
     public Builtins()
     {
         Text = new ModuleSymbol(TextModuleName);
-        Console = new ModuleSymbol(ConsoleModuleName);
         Standard = new ModuleSymbol(StandardModuleName);
         Com = new ModuleSymbol(ComModuleName);
 
@@ -465,23 +462,6 @@ public sealed class Builtins
             ("value", PrimitiveTypeSymbol.Double));
         HashText = Hidden("HashText", PrimitiveTypeSymbol.NUInt, "sl_string_hash",
             ("value", String));
-
-        // --- Standard.Console ------------------------------------------------
-        Function(Console, "Write", PrimitiveTypeSymbol.Void, "sl_console_write",
-            ("text", String));
-        Function(Console, "WriteLine", PrimitiveTypeSymbol.Void, "sl_console_write_line",
-            ("text", String));
-        Function(Console, "WriteError", PrimitiveTypeSymbol.Void, "sl_console_write_error",
-            ("text", String));
-
-        // One line without its terminator, and null at end of input -- a blank
-        // line and no line at all are different answers, and a loop that reads
-        // until there is nothing left needs to tell them apart.
-        Function(Console, "Flush", PrimitiveTypeSymbol.Void, "sl_console_flush");
-
-        Function(Console, "ReadLine", new OptionalTypeSymbol(String), "sl_console_read_line");
-        Function(Console, "ReadToEnd", String, "sl_console_read_all");
-        Function(Console, "AtEnd", PrimitiveTypeSymbol.Bool, "sl_console_at_end");
     }
 
     public bool IsString(TypeSymbol type) => ReferenceEquals(type, String);
@@ -490,7 +470,6 @@ public sealed class Builtins
     public void RegisterInto(Dictionary<string, ModuleSymbol> modules)
     {
         modules[Text.Name] = Text;
-        modules[Console.Name] = Console;
         modules[Standard.Name] = Standard;
         modules[Com.Name] = Com;
     }
@@ -498,11 +477,10 @@ public sealed class Builtins
     /// <summary>
     /// Standard.Text is visible in every file without an import, because string
     /// literals produce a <c>String</c> whether the program asked for one or not.
-    /// Standard.Console is not: printing is a choice.
     /// </summary>
     public void AutoImportInto(FileScope scope)
     {
-        if (scope.Module == Text || scope.Module == Console) return;
+        if (scope.Module == Text) return;
         scope.Imports[TextModuleName] = Text;
         scope.Imports["Text"] = Text;
         scope.Imports[StandardModuleName] = Standard;
