@@ -698,9 +698,20 @@ What the exercise cost, and it is worth knowing before the next backend:
 
 - **Absolute placement.** Every GTK container computes a layout and `forms/`
   has computed one already, so every container peer's children go into a
-  `GtkFixed`. A size request is a *minimum* there, so a control whose content
-  wants more room than the layout allowed overflows rather than clips; a label
-  ellipsizes to cover it, and the general case is open.
+  `GtkFixed`. A size request is a *minimum* there, so what the peer reports
+  back after a `SetBounds` is the size the widget will really occupy, not the
+  size it was asked for -- GTK's minimums are larger than Win32's for the same
+  controls, and a layout reading `Control.Height` has to see the truth to make
+  room. A control whose *content* wants more room still overflows rather than
+  clipping; a label ellipsizes to cover it.
+- **A draw handler must clip to its own widget.** GTK hands one a context
+  clipped to whatever region is being redrawn, which is an ancestor's area:
+  an editor 755x396 was given `-247,-134 1002x530`. Most drawing is bounded by
+  its own coordinates and survives that. `Graphics.Clear` is `cairo_paint`,
+  which fills the entire clip, so one control calling it wiped every control
+  painted before it in the same frame -- the IDE's toolbars and Solution
+  Explorer disappeared, and the editor was the only control in the tree that
+  calls `Clear`.
 - **A resize is a request.** `MoveWindow` has resized the window by the time it
   returns and `gtk_window_resize` has only asked, so the events already in
   flight describe the size before the request. The window peer drops those
@@ -830,7 +841,15 @@ here at all. Where one is a backend's rather than the library's, it says so.
 - **A size request is a minimum.** A control in a `GtkFixed` is given its
   natural size when that is larger than the layout allowed, so a long caption
   overflows rather than clipping. A label ellipsizes and an entry scrolls; a
-  button with more text than room does not.
+  button with more text than room does not. What the layout is told is the
+  size the widget settled on, so a container can make room for it -- `CoolBar`
+  does, which is why a combo box in a band no longer hangs out of it.
+- **Text measurement is the platform's, and a layout pass has no surface.**
+  `CoolBar` estimated a caption at seven pixels a byte, which is near enough
+  for the Windows UI font and too narrow for GTK's -- the band's control was
+  placed over the last letter of its caption. The measurement is taken where
+  the caption is drawn and used by the pass after it, which is the same
+  arrangement `CodeEditor` uses for its character cell.
 - **Text is cairo's toy API**, so there is no shaping, no bidirectional text
   and no font fallback -- a label in Arabic is drawn wrong. Pango is the fix
   and is a binding of its own.

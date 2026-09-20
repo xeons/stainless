@@ -715,16 +715,42 @@ public class GtkPeer : IControlPeer
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
+    /// Clips a `draw` context to the widget being drawn, and saves the state
+    /// so the caller can restore it.
+    ///
+    /// **A draw handler MUST do this before the control paints.** GTK hands a
+    /// widget a context whose clip covers whatever region is being redrawn,
+    /// which is an ancestor's area and not the widget's -- an editor 755x396
+    /// was given a clip of `-247,-134 1002x530`. Most drawing is bounded by
+    /// its own coordinates and survives that; `Graphics.Clear` is
+    /// `cairo_paint`, which fills the entire clip, so one control calling it
+    /// wiped everything painted before it in the same frame.
+    ///
+    /// Every caller MUST pair this with `cairo_restore`.
+    protected void ClipToSelf(cairo_t* context, GtkWidget* drawn)
+    {
+        cairo_save(context);
+        cairo_new_path(context);
+        cairo_rectangle(context, 0.0, 0.0,
+                        (gdouble)gtk_widget_get_allocated_width(drawn),
+                        (gdouble)gtk_widget_get_allocated_height(drawn));
+        cairo_clip(context);
+    }
+
     // ------------------------------------------------------- IControlPeer
 
     /// Moves and sizes the widget within the `GtkFixed` its parent gave it.
     ///
-    /// **A size request is a minimum, not a size.** Inside a `GtkFixed` a
-    /// child is given its natural size unless the request is larger, so a
-    /// control whose content wants more room than the layout allowed will
-    /// overflow rather than clip. It is the same trade the LCL's GTK
-    /// widgetset makes, and the mitigations are per control -- a label
-    /// ellipsizes, an entry scrolls.
+    /// **A size request is a minimum, not a size.** A widget asked for less
+    /// than it insists on keeps its minimum and overflows what the layout
+    /// allowed. GTK's minimums are larger than Win32's for the same controls:
+    /// a combo box is around 34 pixels tall where a program asks for 24.
+    ///
+    /// So what is reported back is the size the widget will really occupy,
+    /// rather than the size it was asked for. A layout that reads
+    /// `Control.Height` then sees the truth and can make room. Nothing else
+    /// can tell it: a child's allocation is decided by this call, so GTK
+    /// raises no event of its own.
     public virtual void SetBounds(FRect wanted)
     {
         bool moved = wanted.X != bounds.X || wanted.Y != bounds.Y;
@@ -755,11 +781,24 @@ public class GtkPeer : IControlPeer
             if (moved)
                 ((IControlNotify)owner).OnPlatformMoved(At(wanted.X, wanted.Y));
             if (sized)
-            {
-                ((IControlNotify)owner).OnPlatformResized(
-                    Extent(wanted.Width, wanted.Height));
-            }
+                ((IControlNotify)owner).OnPlatformResized(Insisted(wanted));
         }
+    }
+
+    /// The size the widget will really occupy: what was asked for, raised to
+    /// whatever it refuses to go below.
+    FSize Insisted(FRect wanted)
+    {
+        gint leastHigh = 0;
+        gint wantsHigh = 0;
+        gtk_widget_get_preferred_height(widget, &leastHigh, &wantsHigh);
+
+        gint leastWide = 0;
+        gint wantsWide = 0;
+        gtk_widget_get_preferred_width(widget, &leastWide, &wantsWide);
+
+        return Extent(wanted.Width < leastWide ? leastWide : wanted.Width,
+                      wanted.Height < leastHigh ? leastHigh : wanted.Height);
     }
 
     public virtual void SetVisible(bool visible)
@@ -1043,8 +1082,11 @@ public class GtkContainerPeer : GtkPeer, IContainerPeer
             var owner = Owner;
             if (owner == null)
                 return false;
+
+            ClipToSelf((cairo_t*)carried, content);
             var surface = new GtkGraphicsBackend(carried);
             ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
+            cairo_restore((cairo_t*)carried);
             return false;
         });
     }

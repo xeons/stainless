@@ -1929,11 +1929,15 @@ public class GtkCustomPeer : GtkContainerPeer, ICustomPeer
         if (owner == null)
             return false;
 
+        ClipToSelf((cairo_t*)carried, content);
+
         var surface = new GtkGraphicsBackend(carried);
         ((IControlNotify)owner).OnPlatformPaint(new Graphics(surface));
 
         if (!_caret.IsEmpty && _blinkOn && Focused)
             DrawCaret((cairo_t*)carried);
+
+        cairo_restore((cairo_t*)carried);
         return false;
     }
 

@@ -672,6 +672,14 @@ public extern "C"
     /// needs and is only meaningful once the widget has been laid out.
     gint gtk_widget_get_allocated_width(GtkWidget* widget);
     gint gtk_widget_get_allocated_height(GtkWidget* widget);
+
+    /// What the widget insists on, and what it would like. A size request
+    /// below the minimum is not honoured: GTK gives the widget its minimum and
+    /// lets it overflow whatever the layout allowed.
+    void gtk_widget_get_preferred_height(GtkWidget* widget, gint* minimum,
+                                         gint* natural);
+    void gtk_widget_get_preferred_width(GtkWidget* widget, gint* minimum,
+                                        gint* natural);
 }
 
 // ===================================================================== entry

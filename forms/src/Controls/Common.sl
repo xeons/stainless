@@ -1161,6 +1161,13 @@ public class CoolBand
 
     /// Where the layout pass put it. Read-only to a program, as in the LCL --
     /// a band's position is the cool bar's business.
+    /// How wide the caption came out when it was last drawn, or -1 before
+    /// anything has drawn it.
+    ///
+    /// A layout pass has no surface to measure with, so the measurement is
+    /// taken while painting and used by the pass after it.
+    int _measuredText;
+
     int _placedLeft;
     int _placedTop;
     int _placedHeight;
@@ -1170,6 +1177,7 @@ public class CoolBand
 
     public CoolBand(CoolBar owner)
     {
+        _measuredText = -1;
         bar = owner;
         _held = null;
         _caption = "";
@@ -1199,8 +1207,34 @@ public class CoolBand
         set
         {
             _held = value;
+
+            // A band is as tall as what it holds, and a widget set MAY decide
+            // that for itself -- GTK reports a combo box taller than the
+            // height it was given. Laying the bands out once, from the height
+            // that was asked for, leaves the control standing outside its
+            // band.
+            if (value != null)
+                ((Control)value).Resize += this.OnHeldResized;
+
             Refresh();
         }
+    }
+
+    /// What the caption measured, or -1 if it has not been drawn yet.
+    /// Written by `CoolBar.OnPaint`.
+    public int MeasuredText
+    {
+        get => _measuredText;
+        set => _measuredText = value;
+    }
+
+    void OnHeldResized(Control sender)
+    {
+        // A weak reference is never narrowed, so it goes into a strong local
+        // first.
+        CoolBar? owner = bar;
+        if (owner != null)
+            ((CoolBar)owner).Relayout();
     }
 
     /// The caption drawn after the grab handle, when `CoolBar.ShowText` is on.
@@ -1558,7 +1592,7 @@ public class CoolBar : CustomControl
         int bare = at;
         if (_text && !band.Text.IsEmpty)
         {
-            at = at + TextWidth(band.Text) + _acrossGap;
+            at = at + TextWidth(band) + _acrossGap;
         }
         // A band with no caption still gets one gap, so its control does not
         // sit against the handle.
@@ -1576,7 +1610,18 @@ public class CoolBar : CustomControl
     /// caption a few pixels from where the control starts, and the cost of
     /// being right would be keeping a measuring surface alive for the life of
     /// the control.
-    int TextWidth(String caption) => (int)caption.ByteLength() * 7;
+    /// How wide a caption is.
+    ///
+    /// Measured where it was drawn, because a layout pass has no surface to
+    /// measure with. Seven pixels a byte is the estimate used until the first
+    /// paint: it is close for the Windows UI font and too narrow for GTK's,
+    /// where an unmeasured caption is drawn over by the band's control.
+    int TextWidth(CoolBand band)
+    {
+        if (band.MeasuredText >= 0)
+            return band.MeasuredText;
+        return (int)band.Text.ByteLength() * 7;
+    }
 
     /// How tall one band wants to be: its own minimum, its control plus the
     /// vertical spacing, and the caption -- whichever is largest.
@@ -1703,6 +1748,24 @@ public class CoolBar : CustomControl
         Invalidate();
     }
 
+    /// Lays the bands out again, and grows the bar to what they now need.
+    ///
+    /// For a band whose control turned out to be a different size from the one
+    /// it was given. The bar's own height is set here as well as the bands',
+    /// because a bar docked to an edge keeps whatever height it was given and
+    /// would otherwise clip the room it has just made.
+    public void Relayout()
+    {
+        if (_bands == null)
+            return;
+
+        int was = _rowsHigh;
+        Rebuild();
+
+        if (_rowsHigh != was && _rowsHigh > 0)
+            Height = _rowsHigh;
+    }
+
     /// A resize changes where the rows wrap, so the whole layout is redone.
     ///
     /// The null test is the trap the composites all have: the base constructor
@@ -1736,6 +1799,7 @@ public class CoolBar : CustomControl
         var showing = Showing;
         var light = new Pen(SystemColors.ControlLight);
         var dark = new Pen(SystemColors.ControlDark);
+        bool remeasured = false;
 
         for (nuint i = 0u; i < showing.Count; i++)
         {
@@ -1755,6 +1819,14 @@ public class CoolBar : CustomControl
                 var measured = surface.MeasureString(band.Text, Font);
                 int y = band.Top + (band.Height - measured.Height) / 2;
                 surface.DrawString(band.Text, Font, ForeColor, x, y);
+
+                // The one place there is a surface to measure with. A pass
+                // that ran on the estimate is redone once, with the truth.
+                if (band.MeasuredText != measured.Width)
+                {
+                    band.MeasuredText = measured.Width;
+                    remeasured = true;
+                }
             }
 
             bool last = i + 1u >= showing.Count;
@@ -1777,6 +1849,13 @@ public class CoolBar : CustomControl
                                  band.Top + band.Height - 1);
             }
         }
+
+        // A caption measured for the first time, or measured differently
+        // after a font change. The pass that placed these bands ran on the
+        // estimate, so it is run again and the result painted next time.
+        // Once: the second pass measures the same widths and stops.
+        if (remeasured)
+            Rebuild();
 
         base.OnPaint(args);
     }
