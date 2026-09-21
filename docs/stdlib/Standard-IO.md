@@ -809,15 +809,13 @@ class StreamReader : TextReader
 
 A reader over a stream, decoding as it goes.
 
-**It decodes the whole stream at the first read.** `IEncoding` converts a
-whole array at a time and keeps no state between calls, so there is no way
-to stop at a character boundary partway through a buffer and carry the
-remainder -- and for UTF-16 or UTF-32 a byte-wise search for a terminator
-would find one inside a character. Reading it all is the answer that is
-correct for every encoding rather than for the convenient ones; a stream
-larger than memory wants `ReadToEnd` on the bytes and its own decoding.
+It reads a buffer at a time and decodes each one through an `IDecoder`,
+which keeps the bytes a buffer ended in the middle of and finishes the
+character when the next buffer arrives. That is what makes this a stream
+reader rather than a way of spelling `ReadToEnd`: a log being followed, or
+a file larger than memory, works.
 
-<sub>[stdlib/TextIO.sl:132](../../stdlib/TextIO.sl#L132)</sub>
+<sub>[stdlib/TextIO.sl:130](../../stdlib/TextIO.sl#L130)</sub>
 
 #### Encoding *property*
 
@@ -827,7 +825,7 @@ IEncoding Encoding { get; }
 
 The encoding the text is being read as.
 
-<sub>[stdlib/TextIO.sl:159](../../stdlib/TextIO.sl#L159)</sub>
+<sub>[stdlib/TextIO.sl:177](../../stdlib/TextIO.sl#L177)</sub>
 
 #### ReadLine *method*
 
@@ -837,7 +835,7 @@ override String? ReadLine()
 
 *No documentation.*
 
-<sub>[stdlib/TextIO.sl:188](../../stdlib/TextIO.sl#L188)</sub>
+<sub>[stdlib/TextIO.sl:223](../../stdlib/TextIO.sl#L223)</sub>
 
 #### ReadToEnd *method*
 
@@ -847,7 +845,7 @@ override String ReadToEnd()
 
 *No documentation.*
 
-<sub>[stdlib/TextIO.sl:195](../../stdlib/TextIO.sl#L195)</sub>
+<sub>[stdlib/TextIO.sl:261](../../stdlib/TextIO.sl#L261)</sub>
 
 #### Close *method*
 
@@ -858,7 +856,7 @@ override void Close()
 Closes the stream under it as well, which is what a reader owning one
 is for.
 
-<sub>[stdlib/TextIO.sl:204](../../stdlib/TextIO.sl#L204)</sub>
+<sub>[stdlib/TextIO.sl:291](../../stdlib/TextIO.sl#L291)</sub>
 
 ### StreamWriter *class*
 
@@ -871,7 +869,7 @@ A writer over a stream, encoding as it goes.
 Unlike the reader this is genuinely incremental: every encoding here is
 stateless, so each piece of text can be encoded and written on its own.
 
-<sub>[stdlib/TextIO.sl:289](../../stdlib/TextIO.sl#L289)</sub>
+<sub>[stdlib/TextIO.sl:376](../../stdlib/TextIO.sl#L376)</sub>
 
 #### Encoding *property*
 
@@ -881,7 +879,7 @@ IEncoding Encoding { get; }
 
 The encoding the text is being written in.
 
-<sub>[stdlib/TextIO.sl:312](../../stdlib/TextIO.sl#L312)</sub>
+<sub>[stdlib/TextIO.sl:399](../../stdlib/TextIO.sl#L399)</sub>
 
 #### WritePreamble *method*
 
@@ -892,7 +890,7 @@ void WritePreamble()
 The bytes that mark this encoding, written at the position the stream
 is at. Call it before anything else or not at all.
 
-<sub>[stdlib/TextIO.sl:316](../../stdlib/TextIO.sl#L316)</sub>
+<sub>[stdlib/TextIO.sl:403](../../stdlib/TextIO.sl#L403)</sub>
 
 #### Write *method*
 
@@ -902,7 +900,7 @@ override void Write(String text)
 
 *No documentation.*
 
-<sub>[stdlib/TextIO.sl:323](../../stdlib/TextIO.sl#L323)</sub>
+<sub>[stdlib/TextIO.sl:410](../../stdlib/TextIO.sl#L410)</sub>
 
 #### Flush *method*
 
@@ -912,7 +910,7 @@ override void Flush()
 
 *No documentation.*
 
-<sub>[stdlib/TextIO.sl:333](../../stdlib/TextIO.sl#L333)</sub>
+<sub>[stdlib/TextIO.sl:420](../../stdlib/TextIO.sl#L420)</sub>
 
 #### Close *method*
 
@@ -922,7 +920,7 @@ override void Close()
 
 Flushes and closes the stream under it.
 
-<sub>[stdlib/TextIO.sl:340](../../stdlib/TextIO.sl#L340)</sub>
+<sub>[stdlib/TextIO.sl:427](../../stdlib/TextIO.sl#L427)</sub>
 
 ### StringReader *class*
 
@@ -973,7 +971,7 @@ class StringWriter : TextWriter
 A writer that keeps what it is given, for a caller that wanted a
 `TextWriter` and a string rather than a file.
 
-<sub>[stdlib/TextIO.sl:260](../../stdlib/TextIO.sl#L260)</sub>
+<sub>[stdlib/TextIO.sl:347](../../stdlib/TextIO.sl#L347)</sub>
 
 #### Write *method*
 
@@ -983,7 +981,7 @@ override void Write(String text)
 
 *No documentation.*
 
-<sub>[stdlib/TextIO.sl:269](../../stdlib/TextIO.sl#L269)</sub>
+<sub>[stdlib/TextIO.sl:356](../../stdlib/TextIO.sl#L356)</sub>
 
 #### Flush *method*
 
@@ -993,7 +991,7 @@ override void Flush()
 
 Nothing is held anywhere else, so this does nothing.
 
-<sub>[stdlib/TextIO.sl:275](../../stdlib/TextIO.sl#L275)</sub>
+<sub>[stdlib/TextIO.sl:362](../../stdlib/TextIO.sl#L362)</sub>
 
 #### Close *method*
 
@@ -1004,7 +1002,7 @@ override void Close()
 Nothing is held anywhere else, so this does nothing either. What was
 written stays readable.
 
-<sub>[stdlib/TextIO.sl:279](../../stdlib/TextIO.sl#L279)</sub>
+<sub>[stdlib/TextIO.sl:366](../../stdlib/TextIO.sl#L366)</sub>
 
 #### ToText *method*
 
@@ -1014,7 +1012,7 @@ String ToText()
 
 What has been written so far. The writer stays usable afterwards.
 
-<sub>[stdlib/TextIO.sl:282](../../stdlib/TextIO.sl#L282)</sub>
+<sub>[stdlib/TextIO.sl:369](../../stdlib/TextIO.sl#L369)</sub>
 
 ### TextReader *class*
 
@@ -1077,7 +1075,7 @@ abstract class TextWriter
 
 Text going somewhere, a piece at a time.
 
-<sub>[stdlib/TextIO.sl:216](../../stdlib/TextIO.sl#L216)</sub>
+<sub>[stdlib/TextIO.sl:303](../../stdlib/TextIO.sl#L303)</sub>
 
 #### Write *method*
 
@@ -1087,7 +1085,7 @@ abstract void Write(String text)
 
 Text, with nothing after it.
 
-<sub>[stdlib/TextIO.sl:222](../../stdlib/TextIO.sl#L222)</sub>
+<sub>[stdlib/TextIO.sl:309](../../stdlib/TextIO.sl#L309)</sub>
 
 #### Flush *method*
 
@@ -1097,7 +1095,7 @@ abstract void Flush()
 
 Pushes whatever is held onward.
 
-<sub>[stdlib/TextIO.sl:225](../../stdlib/TextIO.sl#L225)</sub>
+<sub>[stdlib/TextIO.sl:312](../../stdlib/TextIO.sl#L312)</sub>
 
 #### Close *method*
 
@@ -1107,7 +1105,7 @@ abstract void Close()
 
 Flushes and releases what the writer holds.
 
-<sub>[stdlib/TextIO.sl:228](../../stdlib/TextIO.sl#L228)</sub>
+<sub>[stdlib/TextIO.sl:315](../../stdlib/TextIO.sl#L315)</sub>
 
 #### NewLine *property*
 
@@ -1117,7 +1115,7 @@ String NewLine { get; set; }
 
 What ends a line here.
 
-<sub>[stdlib/TextIO.sl:231](../../stdlib/TextIO.sl#L231)</sub>
+<sub>[stdlib/TextIO.sl:318](../../stdlib/TextIO.sl#L318)</sub>
 
 #### WriteLine *method*
 
@@ -1127,7 +1125,7 @@ void WriteLine(String text)
 
 Text and a line ending.
 
-<sub>[stdlib/TextIO.sl:238](../../stdlib/TextIO.sl#L238)</sub>
+<sub>[stdlib/TextIO.sl:325](../../stdlib/TextIO.sl#L325)</sub>
 
 #### WriteLine *method*
 
@@ -1137,7 +1135,7 @@ void WriteLine()
 
 A line ending on its own.
 
-<sub>[stdlib/TextIO.sl:245](../../stdlib/TextIO.sl#L245)</sub>
+<sub>[stdlib/TextIO.sl:332](../../stdlib/TextIO.sl#L332)</sub>
 
 #### WriteLines *method*
 
@@ -1147,7 +1145,7 @@ void WriteLines(String[] lines)
 
 Each of `lines`, each ended.
 
-<sub>[stdlib/TextIO.sl:251](../../stdlib/TextIO.sl#L251)</sub>
+<sub>[stdlib/TextIO.sl:338](../../stdlib/TextIO.sl#L338)</sub>
 
 ## Functions
 

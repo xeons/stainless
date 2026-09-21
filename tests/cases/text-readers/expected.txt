@@ -18,3 +18,14 @@ stream2 [third]
 utf16lines 2
 utf16first [世界]
 utf16second [second]
+utf8/1021 intact
+utf8/1022 intact
+utf8/1023 intact
+utf8/astral intact
+utf16/plain intact
+utf16/pair intact
+utf16be/pair intact
+utf32 intact
+longlines 2
+longfirst 1030
+longsecond [after]

@@ -84,6 +84,199 @@ public interface IEncoding
 
     /// Whether this encoding can write that scalar at all.
     bool CanRepresent(char32 scalar);
+
+    /// A converter that remembers what a buffer ended in the middle of.
+    ///
+    /// `GetString` takes whole text and cannot help a caller reading a stream
+    /// in pieces, because a character may straddle two of them. This is .NET's
+    /// `Encoding.GetDecoder`, and it exists for exactly that: the decoder holds
+    /// the trailing bytes of an unfinished character and finishes it when the
+    /// next piece arrives.
+    IDecoder GetDecoder();
+}
+
+/// A decode in progress, across as many pieces as the bytes arrive in.
+///
+/// .NET's `Decoder`, narrowed to what this language needs: it answers with a
+/// `String` rather than filling a `char` buffer, so there is no count to ask
+/// for first and no `GetCharCount` beside it.
+///
+/// An encoder has no counterpart here. .NET needs one because a caller can
+/// write half a surrogate pair; a caller here writes a `String`, which is
+/// whole by construction, so there is never anything for a writer to hold.
+public interface IDecoder
+{
+    /// The text that `count` bytes from `index` complete, with any unfinished
+    /// character at the end kept back for the next call.
+    ///
+    /// `flush` says no more bytes are coming, so anything still held is
+    /// malformed and becomes U+FFFD rather than waiting for the rest.
+    String GetString(byte[] bytes, nuint index, nuint count, bool flush);
+
+    /// Forgets what is held, for a decoder being pointed at something new.
+    void Reset();
+}
+
+// ------------------------------------------------------------------ decoding
+
+/// What every decoder does except decide where a character was cut.
+///
+/// The held bytes and the new ones are joined, everything complete is handed
+/// to the encoding it belongs to, and the remainder is kept. Only
+/// `IncompleteTail` differs between encodings, and it is the one thing that
+/// needs to know how the encoding is shaped.
+abstract class TailDecoder : IDecoder
+{
+    IEncoding _encoding;
+
+    /// Four bytes is the longest unfinished character any encoding here has:
+    /// three of a UTF-8 sequence, or an odd byte and a high surrogate.
+    byte[] _held;
+    nuint _heldCount;
+
+    protected TailDecoder(IEncoding encoding)
+    {
+        _encoding = encoding;
+        _held = new byte[4];
+        _heldCount = 0u;
+    }
+
+    /// How many bytes at the end begin a character that is not finished.
+    protected abstract nuint IncompleteTail(byte[] data, nuint length);
+
+    public String GetString(byte[] bytes, nuint index, nuint count, bool flush)
+    {
+        nuint total = _heldCount + count;
+        if (total == 0u)
+            return "";
+
+        var joined = new byte[total];
+        for (nuint i = 0u; i < _heldCount; i++)
+            joined[i] = _held[i];
+        for (nuint i = 0u; i < count; i++)
+            joined[_heldCount + i] = bytes[index + i];
+
+        // Nothing is held back on a flush: what is unfinished then is never
+        // going to be finished, and the encoding turns it into U+FFFD.
+        nuint tail = flush ? 0u : this.IncompleteTail(joined, total);
+        if (tail > 4u)
+            tail = 4u;
+
+        nuint usable = total - tail;
+
+        _heldCount = tail;
+        for (nuint i = 0u; i < tail; i++)
+            _held[i] = joined[usable + i];
+
+        if (usable == 0u)
+            return "";
+
+        var ready = new byte[usable];
+        for (nuint i = 0u; i < usable; i++)
+            ready[i] = joined[i];
+
+        return _encoding.GetString(ready);
+    }
+
+    public void Reset()
+    {
+        _heldCount = 0u;
+    }
+}
+
+/// For an encoding where one byte is one character, so nothing is ever cut.
+class WholeDecoder : IDecoder
+{
+    IEncoding _encoding;
+
+    public WholeDecoder(IEncoding encoding) => _encoding = encoding;
+
+    public String GetString(byte[] bytes, nuint index, nuint count, bool flush)
+    {
+        if (count == 0u)
+            return "";
+
+        var ready = new byte[count];
+        for (nuint i = 0u; i < count; i++)
+            ready[i] = bytes[index + i];
+        return _encoding.GetString(ready);
+    }
+
+    public void Reset() { }
+}
+
+/// UTF-8, where a lead byte says how many follow it.
+class Utf8Decoder : TailDecoder
+{
+    public Utf8Decoder(IEncoding encoding) { base(encoding); }
+
+    protected override nuint IncompleteTail(byte[] data, nuint length)
+    {
+        // A sequence is at most four bytes, so a lead byte further back than
+        // that cannot be waiting on anything here.
+        nuint back = length < 4u ? length : 4u;
+
+        for (nuint i = 1u; i <= back; i++)
+        {
+            byte lead = data[length - i];
+            if ((lead & 0xC0) == 0x80)
+                continue;
+
+            nuint wanted = 1u;
+            if ((lead & 0xE0) == 0xC0)
+                wanted = 2u;
+            else if ((lead & 0xF0) == 0xE0)
+                wanted = 3u;
+            else if ((lead & 0xF8) == 0xF0)
+                wanted = 4u;
+
+            return i < wanted ? i : 0u;
+        }
+
+        // Four continuation bytes and no lead: malformed rather than cut, and
+        // the encoding says so better than holding them would.
+        return 0u;
+    }
+}
+
+/// UTF-16, where a unit is two bytes and a high surrogate wants a second unit.
+class Utf16Decoder : TailDecoder
+{
+    bool _bigEndian;
+
+    public Utf16Decoder(IEncoding encoding, bool big)
+    {
+        base(encoding);
+        _bigEndian = big;
+    }
+
+    protected override nuint IncompleteTail(byte[] data, nuint length)
+    {
+        nuint odd = length % 2u;
+        nuint whole = length - odd;
+
+        if (whole >= 2u)
+        {
+            nuint at = whole - 2u;
+            uint unit = _bigEndian
+                ? ((uint)data[at] << 8) | (uint)data[at + 1u]
+                : ((uint)data[at + 1u] << 8) | (uint)data[at];
+
+            // A high surrogate is half a character until its low one arrives.
+            if (unit >= 0xD800u && unit <= 0xDBFFu)
+                return odd + 2u;
+        }
+
+        return odd;
+    }
+}
+
+/// UTF-32, where every character is four bytes and nothing else can be cut.
+class Utf32Decoder : TailDecoder
+{
+    public Utf32Decoder(IEncoding encoding) { base(encoding); }
+
+    protected override nuint IncompleteTail(byte[] data, nuint length) => length % 4u;
 }
 
 // ------------------------------------------------------------------ choosing
@@ -169,6 +362,10 @@ public class Utf8Encoding : IEncoding
 
     /// Every scalar; that is what UTF-8 is for.
     public bool CanRepresent(char32 scalar) => true;
+
+    /// A decoder that holds the first bytes of a sequence whose rest has
+    /// not arrived.
+    public IDecoder GetDecoder() => new Utf8Decoder(this);
 
     /// `bytes` validated, with each malformed byte replaced by U+FFFD.
     ///
@@ -263,6 +460,10 @@ public class Utf16Encoding : IEncoding
 
     /// Every scalar, in one unit or two.
     public bool CanRepresent(char32 scalar) => true;
+
+    /// A decoder that holds an odd byte, and a high surrogate waiting for
+    /// its low one.
+    public IDecoder GetDecoder() => new Utf16Decoder(this, _bigEndian);
 
     /// Two bytes per unit, so four for a scalar outside the basic plane.
     /// Costs a transcode to count, which is what `GetBytes` then does again.
@@ -400,6 +601,9 @@ public class Utf32Encoding : IEncoding
     /// Every scalar, in exactly four bytes.
     public bool CanRepresent(char32 scalar) => true;
 
+    /// A decoder that holds whatever is left of a four-byte group.
+    public IDecoder GetDecoder() => new Utf32Decoder(this);
+
     /// Four bytes per scalar. Costs a pass to count the scalars.
     public nuint GetByteCount(String text) => text.CodePointCount() * 4;
 
@@ -511,6 +715,9 @@ public abstract class SingleByteEncoding : IEncoding
     /// Whether the table has a byte for that scalar. Most of Unicode is not in
     /// any of these tables, so this is false far more often than it is true.
     public bool CanRepresent(char32 scalar) => this.FromScalar(scalar) >= 0;
+
+    /// One byte is one character here, so a decoder has nothing to hold.
+    public IDecoder GetDecoder() => new WholeDecoder(this);
 
     /// One byte per scalar, always -- so the count is the scalar count, not
     /// the text's byte length.

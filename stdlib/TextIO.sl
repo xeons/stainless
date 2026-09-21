@@ -122,18 +122,28 @@ public class StringReader : TextReader
 
 /// A reader over a stream, decoding as it goes.
 ///
-/// **It decodes the whole stream at the first read.** `IEncoding` converts a
-/// whole array at a time and keeps no state between calls, so there is no way
-/// to stop at a character boundary partway through a buffer and carry the
-/// remainder -- and for UTF-16 or UTF-32 a byte-wise search for a terminator
-/// would find one inside a character. Reading it all is the answer that is
-/// correct for every encoding rather than for the convenient ones; a stream
-/// larger than memory wants `ReadToEnd` on the bytes and its own decoding.
+/// It reads a buffer at a time and decodes each one through an `IDecoder`,
+/// which keeps the bytes a buffer ended in the middle of and finishes the
+/// character when the next buffer arrives. That is what makes this a stream
+/// reader rather than a way of spelling `ReadToEnd`: a log being followed, or
+/// a file larger than memory, works.
 public class StreamReader : TextReader
 {
+    /// What .NET reads at a time, and for the same reason: large enough that
+    /// the syscall is not the cost, small enough to be nothing on a small file.
+    const nuint BufferSize = 1024;
+
     IStream _stream;
     IEncoding _encoding;
-    StringReader? _text;
+    IDecoder _decoder;
+
+    byte[] _bytes;
+
+    /// Text decoded and not yet handed back, and how far into it that is.
+    StringBuilder _ready;
+    nuint _at;
+
+    bool _ended;
     bool _closed;
 
     /// UTF-8, which is what a file without a preamble almost always is.
@@ -141,7 +151,11 @@ public class StreamReader : TextReader
     {
         _stream = stream;
         _encoding = Utf8();
-        _text = null;
+        _decoder = _encoding.GetDecoder();
+        _bytes = new byte[BufferSize];
+        _ready = new StringBuilder();
+        _at = 0u;
+        _ended = false;
         _closed = false;
     }
 
@@ -151,52 +165,125 @@ public class StreamReader : TextReader
     {
         _stream = stream;
         _encoding = encoding;
-        _text = null;
+        _decoder = encoding.GetDecoder();
+        _bytes = new byte[BufferSize];
+        _ready = new StringBuilder();
+        _at = 0u;
+        _ended = false;
         _closed = false;
     }
 
     /// The encoding the text is being read as.
     public IEncoding Encoding => _encoding;
 
-    /// Decodes on the first call and does nothing afterwards.
-    ///
-    /// The bytes are gathered here rather than through this module's own
-    /// `ReadToEnd`, because this class has a method of that name and its own
-    /// wins -- which is the collision the standard library's free verbs set up
-    /// for anything that names a method after one.
-    StringReader Decoded()
+    /// Reads one buffer and decodes it, answering whether anything new
+    /// arrived. False means the stream is finished and the decoder flushed.
+    bool Fill()
     {
-        if (_text != null)
-            return (StringReader)_text;
+        if (_ended)
+            return false;
 
-        var all = new MemoryStream();
-        var chunk = new byte[4096];
-
-        while (true)
+        nuint got = _stream.Read(_bytes, 0u, BufferSize);
+        if (got == 0u)
         {
-            nuint got = _stream.Read(chunk, 0u, 4096u);
-            if (got == 0u)
-                break;
-            all.Write(chunk, 0u, got);
+            _ended = true;
+
+            // The flush turns anything the decoder still holds into U+FFFD: a
+            // file that stops mid-character is malformed, not unfinished.
+            String last = _decoder.GetString(_bytes, 0u, 0u, true);
+            if (last.IsEmpty)
+                return false;
+
+            _ready.Append(last);
+            return true;
         }
 
-        var made = new StringReader(_encoding.GetString(all.ToArray()));
-        _text = made;
-        return made;
+        String more = _decoder.GetString(_bytes, 0u, got, false);
+
+        // A whole buffer can complete no character at all -- one scalar of
+        // UTF-32 split across two reads, say -- so this says nothing arrived
+        // rather than that the stream ended.
+        if (more.IsEmpty)
+            return true;
+
+        _ready.Append(more);
+        return true;
+    }
+
+    /// Drops what has already been handed back, so a long read does not keep
+    /// growing the buffer it is reading from.
+    void Compact()
+    {
+        if (_at == 0u)
+            return;
+        _ready.Remove(0u, _at);
+        _at = 0u;
     }
 
     public override String? ReadLine()
     {
         if (_closed)
             return null;
-        return this.Decoded().ReadLine();
+
+        while (true)
+        {
+            // The terminator is looked for in what is decoded, which is UTF-8
+            // whatever the stream was: 0x0A there is never part of a character.
+            for (nuint i = _at; i < _ready.ByteLength(); i++)
+            {
+                if (_ready.ByteAt(i) != 0x0A)
+                    continue;
+
+                nuint end = i;
+                if (end > _at && _ready.ByteAt(end - 1u) == 0x0D)
+                    end--;
+
+                String line = Between(_at, end);
+                _at = i + 1u;
+                this.Compact();
+                return line;
+            }
+
+            if (!this.Fill())
+                break;
+        }
+
+        // Whatever is left with no terminator after it is still a line.
+        if (_at >= _ready.ByteLength())
+            return null;
+
+        String rest = Between(_at, _ready.ByteLength());
+        _at = _ready.ByteLength();
+        this.Compact();
+        return rest;
     }
 
     public override String ReadToEnd()
     {
         if (_closed)
             return "";
-        return this.Decoded().ReadToEnd();
+
+        while (this.Fill()) { }
+
+        if (_at >= _ready.ByteLength())
+            return "";
+
+        String rest = Between(_at, _ready.ByteLength());
+        _at = _ready.ByteLength();
+        this.Compact();
+        return rest;
+    }
+
+    /// The decoded text between two byte positions.
+    String Between(nuint from, nuint to)
+    {
+        if (to <= from)
+            return "";
+
+        var piece = new StringBuilder();
+        for (nuint i = from; i < to; i++)
+            piece.AppendByte(_ready.ByteAt(i));
+        return piece.ToText();
     }
 
     /// Closes the stream under it as well, which is what a reader owning one

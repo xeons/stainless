@@ -7,10 +7,10 @@
 // character, a blank line is a line, and text that stops without a terminator
 // still ends with a line.
 //
-// The last case is the one that decided the design. `StreamReader` decodes the
-// whole stream before splitting it, rather than scanning bytes for a newline,
-// because in UTF-16 the byte 0x0A occurs inside ordinary characters -- so a
-// byte-wise reader would cut "世" in half.
+// The second half is the buffering. `StreamReader` reads 1024 bytes at a time
+// and decodes each buffer through an `IDecoder` that keeps whatever character
+// the buffer ended in the middle of, so what is checked there is a character
+// placed across that boundary on purpose, in every encoding that can cut one.
 module TextReaders;
 
 import Standard.Console;
@@ -95,5 +95,65 @@ int Main()
     Say("utf16first", wideLines[0u]);
     Say("utf16second", wideLines[1u]);
 
+    // ------------------------------------------------------ across a buffer
+
+    // Three bytes, at each offset the boundary can fall inside them.
+    Intact("utf8/1021", Utf8(), 1021u, "世");
+    Intact("utf8/1022", Utf8(), 1022u, "世");
+    Intact("utf8/1023", Utf8(), 1023u, "世");
+
+    // Four bytes: a scalar outside the basic plane.
+    Intact("utf8/astral", Utf8(), 1022u, "𝄞");
+
+    // UTF-16 cuts at an odd byte, and between the halves of a surrogate pair.
+    Intact("utf16/plain", Utf16(), 511u, "世");
+    Intact("utf16/pair", Utf16(), 510u, "𝄞");
+    Intact("utf16be/pair", Utf16BigEndian(), 511u, "𝄞");
+
+    // UTF-32 puts four bytes on every scalar, so every boundary cuts one.
+    Intact("utf32", Utf32(), 255u, "世");
+
+    // And a line longer than the buffer is still one line.
+    var spanning = new MemoryStream();
+    var spanningWriter = new StreamWriter(spanning);
+    spanningWriter.WriteLine(Padded(1023u, "世"));
+    spanningWriter.WriteLine("after");
+    spanningWriter.Flush();
+
+    spanning.Seek(0, SeekOrigin.Start);
+    var spanningLines = new StreamReader(spanning).ReadLines();
+    Count("longlines", spanningLines.Length);
+    Count("longfirst", spanningLines[0u].ByteLength());
+    Say("longsecond", spanningLines[1u]);
+
     return 0;
+}
+
+/// `pad` ASCII bytes, then `middle`, then a marker -- so that `middle` lands
+/// across the reader's buffer boundary rather than safely inside a buffer.
+String Padded(nuint pad, String middle)
+{
+    var built = new StringBuilder();
+    for (nuint i = 0u; i < pad; i++)
+        built.AppendByte(0x61);
+    built.Append(middle);
+    built.Append("|end");
+    return built.ToText();
+}
+
+/// Writes that text in an encoding, reads it back, and says whether the
+/// character that straddled the boundary came through whole.
+void Intact(String what, IEncoding encoding, nuint pad, String middle)
+{
+    String wanted = Padded(pad, middle);
+
+    var stream = new MemoryStream();
+    var writer = new StreamWriter(stream, encoding);
+    writer.Write(wanted);
+    writer.Flush();
+
+    stream.Seek(0, SeekOrigin.Start);
+    String got = new StreamReader(stream, encoding).ReadToEnd();
+
+    Console.WriteLine(what + " " + (got == wanted ? "intact" : "MANGLED"));
 }
