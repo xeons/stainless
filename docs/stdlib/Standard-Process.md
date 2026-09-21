@@ -34,7 +34,7 @@ struct Completed
 
 What a finished program left behind.
 
-<sub>[stdlib/Process.sl:89](../../stdlib/Process.sl#L89)</sub>
+<sub>[stdlib/Process.sl:91](../../stdlib/Process.sl#L91)</sub>
 
 #### ExitCode *field*
 
@@ -45,7 +45,7 @@ int ExitCode
 Zero by convention means success; 128 + N means a signal killed it,
 which is what a shell reports too.
 
-<sub>[stdlib/Process.sl:93](../../stdlib/Process.sl#L93)</sub>
+<sub>[stdlib/Process.sl:95](../../stdlib/Process.sl#L95)</sub>
 
 #### Output *field*
 
@@ -55,7 +55,7 @@ String Output
 
 Everything it wrote to its output, as one String.
 
-<sub>[stdlib/Process.sl:96](../../stdlib/Process.sl#L96)</sub>
+<sub>[stdlib/Process.sl:98](../../stdlib/Process.sl#L98)</sub>
 
 #### Errors *field*
 
@@ -66,7 +66,7 @@ String Errors
 And to its error stream, kept separate so that a program which prints
 progress there does not corrupt what was being captured.
 
-<sub>[stdlib/Process.sl:100](../../stdlib/Process.sl#L100)</sub>
+<sub>[stdlib/Process.sl:102](../../stdlib/Process.sl#L102)</sub>
 
 #### Ok *method*
 
@@ -76,7 +76,7 @@ bool Ok()
 
 The usual question, spelled once.
 
-<sub>[stdlib/Process.sl:103](../../stdlib/Process.sl#L103)</sub>
+<sub>[stdlib/Process.sl:105](../../stdlib/Process.sl#L105)</sub>
 
 ### Process *class*
 
@@ -167,7 +167,7 @@ Only about *starting* it. A program that ran and failed is a `Completed`
 with a non-zero `ExitCode`, which is an outcome rather than an error --
 `grep` answering 1 for "no match" is the ordinary case, not a fault.
 
-<sub>[stdlib/Process.sl:70](../../stdlib/Process.sl#L70)</sub>
+<sub>[stdlib/Process.sl:72](../../stdlib/Process.sl#L72)</sub>
 
 #### None *case*
 
@@ -177,7 +177,7 @@ None
 
 It started.
 
-<sub>[stdlib/Process.sl:73](../../stdlib/Process.sl#L73)</sub>
+<sub>[stdlib/Process.sl:75](../../stdlib/Process.sl#L75)</sub>
 
 #### NotFound *case*
 
@@ -187,7 +187,7 @@ NotFound
 
 No such program, on the PATH or at the path given.
 
-<sub>[stdlib/Process.sl:76](../../stdlib/Process.sl#L76)</sub>
+<sub>[stdlib/Process.sl:78](../../stdlib/Process.sl#L78)</sub>
 
 #### Denied *case*
 
@@ -197,7 +197,7 @@ Denied
 
 It exists and this process may not run it.
 
-<sub>[stdlib/Process.sl:79](../../stdlib/Process.sl#L79)</sub>
+<sub>[stdlib/Process.sl:81](../../stdlib/Process.sl#L81)</sub>
 
 #### NoResource *case*
 
@@ -207,7 +207,7 @@ NoResource
 
 Out of processes, descriptors or memory.
 
-<sub>[stdlib/Process.sl:82](../../stdlib/Process.sl#L82)</sub>
+<sub>[stdlib/Process.sl:84](../../stdlib/Process.sl#L84)</sub>
 
 #### Failed *case*
 
@@ -217,7 +217,7 @@ Failed
 
 It did not start, for a reason none of the above names.
 
-<sub>[stdlib/Process.sl:85](../../stdlib/Process.sl#L85)</sub>
+<sub>[stdlib/Process.sl:87](../../stdlib/Process.sl#L87)</sub>
 
 ### Running *class*
 
@@ -266,7 +266,7 @@ long Id { get; }
 
 What the operating system calls it.
 
-<sub>[stdlib/Process.sl:312](../../stdlib/Process.sl#L312)</sub>
+<sub>[stdlib/Process.sl:308](../../stdlib/Process.sl#L308)</sub>
 
 #### Read *method*
 
@@ -281,7 +281,7 @@ False means both streams are closed and everything they held has
 already been handed over, so the last `Take` before it is not missing
 anything.
 
-<sub>[stdlib/Process.sl:320](../../stdlib/Process.sl#L320)</sub>
+<sub>[stdlib/Process.sl:316](../../stdlib/Process.sl#L316)</sub>
 
 #### TakeOutput *method*
 
@@ -296,7 +296,7 @@ nothing at all the next time.
 showing output as it arrives wants each line once; `Run` is the one
 that answers with the whole of it at the end.
 
-<sub>[stdlib/Process.sl:334](../../stdlib/Process.sl#L334)</sub>
+<sub>[stdlib/Process.sl:330](../../stdlib/Process.sl#L330)</sub>
 
 #### TakeErrors *method*
 
@@ -306,7 +306,7 @@ String TakeErrors()
 
 The same for what it wrote to its error stream.
 
-<sub>[stdlib/Process.sl:342](../../stdlib/Process.sl#L342)</sub>
+<sub>[stdlib/Process.sl:333](../../stdlib/Process.sl#L333)</sub>
 
 #### Wait *method*
 
@@ -321,7 +321,7 @@ whose output pipe is full is the deadlock the pumping exists to avoid,
 arriving from the other side. Asking twice is harmless and answers the
 same both times.
 
-<sub>[stdlib/Process.sl:355](../../stdlib/Process.sl#L355)</sub>
+<sub>[stdlib/Process.sl:341](../../stdlib/Process.sl#L341)</sub>
 
 #### Stop *method*
 
@@ -331,7 +331,7 @@ bool Stop()
 
 Asks it to stop, the way Ctrl-C would. It may decline.
 
-<sub>[stdlib/Process.sl:364](../../stdlib/Process.sl#L364)</sub>
+<sub>[stdlib/Process.sl:350](../../stdlib/Process.sl#L350)</sub>
 
 #### Kill *method*
 
@@ -341,7 +341,7 @@ bool Kill()
 
 Makes it stop. It cannot decline, and gets no chance to tidy up.
 
-<sub>[stdlib/Process.sl:367](../../stdlib/Process.sl#L367)</sub>
+<sub>[stdlib/Process.sl:353](../../stdlib/Process.sl#L353)</sub>
 
 ### Signals *class*
 
@@ -361,7 +361,7 @@ top of its own loop, where it can actually tidy up.
     while (!Signals.Interrupted) { DoAPieceOfWork(); }
     Console.WriteLine("stopping");
 
-<sub>[stdlib/Process.sl:416](../../stdlib/Process.sl#L416)</sub>
+<sub>[stdlib/Process.sl:402](../../stdlib/Process.sl#L402)</sub>
 
 #### Watch *method*
 
@@ -372,7 +372,7 @@ static bool Watch()
 Starts noticing interrupts. Until this is called they end the program,
 which is the right default for something that has nothing to tidy.
 
-<sub>[stdlib/Process.sl:420](../../stdlib/Process.sl#L420)</sub>
+<sub>[stdlib/Process.sl:406](../../stdlib/Process.sl#L406)</sub>
 
 #### Interrupted *property*
 
@@ -382,7 +382,7 @@ static bool Interrupted { get; }
 
 Whether one has arrived since the last `Clear`.
 
-<sub>[stdlib/Process.sl:423](../../stdlib/Process.sl#L423)</sub>
+<sub>[stdlib/Process.sl:409](../../stdlib/Process.sl#L409)</sub>
 
 #### Clear *method*
 
@@ -392,7 +392,7 @@ static void Clear()
 
 Forgets the one that arrived, for a program that means to carry on.
 
-<sub>[stdlib/Process.sl:426](../../stdlib/Process.sl#L426)</sub>
+<sub>[stdlib/Process.sl:412](../../stdlib/Process.sl#L412)</sub>
 
 ## Functions
 
@@ -408,7 +408,7 @@ Starts a program with its output captured, to be read as it arrives.
 and it is what a PATH lookup is done on when it has no separator in it --
 the same bargain `Run` makes.
 
-<sub>[stdlib/Process.sl:375](../../stdlib/Process.sl#L375)</sub>
+<sub>[stdlib/Process.sl:361](../../stdlib/Process.sl#L361)</sub>
 
 ### Open *function*
 
@@ -424,7 +424,7 @@ any reading starts, so this is for input small enough to fit in a pipe --
 a child that will not read until it has answered, and an input larger than
 the buffer, would deadlock here exactly as it does under `Run`.
 
-<sub>[stdlib/Process.sl:387](../../stdlib/Process.sl#L387)</sub>
+<sub>[stdlib/Process.sl:373](../../stdlib/Process.sl#L373)</sub>
 
 ### Run *function*
 
@@ -440,7 +440,7 @@ returned.
 `arguments` does **not** include the program's own name; that is `program`,
 and it is what a PATH lookup is done on when it has no separator in it.
 
-<sub>[stdlib/Process.sl:152](../../stdlib/Process.sl#L152)</sub>
+<sub>[stdlib/Process.sl:154](../../stdlib/Process.sl#L154)</sub>
 
 ### Run *function*
 
@@ -454,5 +454,5 @@ The pipe is closed once `input` has been written, which is what makes a
 program reading to end-of-input stop rather than wait. A child that exits
 without reading is not an error here: the write stops and the run goes on.
 
-<sub>[stdlib/Process.sl:162](../../stdlib/Process.sl#L162)</sub>
+<sub>[stdlib/Process.sl:164](../../stdlib/Process.sl#L164)</sub>
 

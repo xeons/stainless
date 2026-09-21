@@ -1,0 +1,20 @@
+first [alpha]
+crlf [beta]
+last [gamma]
+past [<null>]
+ragged 2
+blanks 3
+blank0 []
+blank2 [a]
+empty 0
+rest [tail rest]
+restagain []
+bytes 26
+lines 2
+streambytes 18
+streamlines 3
+stream0 [first]
+stream2 [third]
+utf16lines 2
+utf16first [世界]
+utf16second [second]

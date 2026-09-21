@@ -41,7 +41,7 @@ is the measure of how completely the compiler is leaving the job to the linker.
 | `Standard.Bits` | counting bits and rotating them, as the target's own instructions | on request |
 | `Standard.Limits` | what each number type holds, named rather than spelled | on request |
 | `Standard.Reflection` | `[Reflect]`, `typeof`, the field tables | on request |
-| `Standard.IO` | streams and `IOError` | on request |
+| `Standard.IO` | streams, `IOError`, and the readers and writers over them | on request |
 | `Standard.File` | whole-file operations | on request |
 | `Standard.Directory` | making, removing and listing | on request |
 | `Standard.Path` | taking paths apart, by the platform's rules | on request |
