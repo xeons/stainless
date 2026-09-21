@@ -1198,6 +1198,13 @@ public sealed class ComInterfaceTypeSymbol : NamedTypeSymbol
 
 public sealed class ClassTypeSymbol : NamedTypeSymbol
 {
+    /// <summary>
+    /// A record's positional parameters, in order; empty for a class that was
+    /// written out. It is what <c>with</c> reads to know that this type's
+    /// constructor takes, in order, the values of properties with these names.
+    /// </summary>
+    public IReadOnlyList<string> RecordParameters { get; init; } = [];
+
     /// <summary>Also searches base classes, nearest first.</summary>
     public override EventSymbol? FindEvent(string name)
     {

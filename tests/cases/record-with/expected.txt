@@ -1,0 +1,14 @@
+one 3,9
+first 8,4
+both 1,2
+none 3,4
+original 3,4
+equal yes
+changed no
+hash yes
+middle alpha 7 true
+last alpha 1 false
+chained 5,6
+computed 3,7
+calls 1
+fromcall 10,99

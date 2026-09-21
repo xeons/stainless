@@ -75,6 +75,7 @@ public sealed partial class Binder
                         IsPublic = isPublic,
                         Span = declaration.Span,
                         Documentation = declaration.Documentation,
+                        RecordParameters = declaration.RecordParameters,
                     },
 
                     // `com interface` is its own symbol rather than a flag on

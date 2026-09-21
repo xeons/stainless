@@ -625,6 +625,17 @@ public sealed record TypeDeclSyntax(
 
     /// <summary>True for one written with no body at all: <c>struct HWND__;</c>.</summary>
     public bool IsOpaque { get; init; }
+
+    /// <summary>
+    /// A record's positional parameters, in order, and empty for every other
+    /// declaration.
+    ///
+    /// The members they stand for are generated in the parser, so by binding
+    /// time a record is a class like any other -- except to <c>with</c>, which
+    /// has to know the constructor's parameters correspond to readable
+    /// properties of the same names. This is what tells it.
+    /// </summary>
+    public IReadOnlyList<string> RecordParameters { get; init; } = [];
 }
 
 /// <summary>
@@ -1036,6 +1047,24 @@ public sealed record SpawnExpressionSyntax(SourceSpan Span, ExpressionSyntax Ope
     : ExpressionSyntax(Span);
 
 public sealed record ThisSyntax(SourceSpan Span) : ExpressionSyntax(Span);
+
+/// <summary>
+/// One <c>Name = value</c> inside a <c>with</c>.
+/// </summary>
+public sealed record WithAssignmentSyntax(
+    SourceSpan Span, string Name, ExpressionSyntax Value) : SyntaxNode(Span);
+
+/// <summary>
+/// <c>point with { Y = 5 }</c> — a record again, with some of it different.
+///
+/// The target is evaluated once and everything not named is carried over, so
+/// this is the record's constructor called with a mixture of the old values
+/// and the new ones.
+/// </summary>
+public sealed record WithSyntax(
+    SourceSpan Span,
+    ExpressionSyntax Target,
+    IReadOnlyList<WithAssignmentSyntax> Assignments) : ExpressionSyntax(Span);
 
 public sealed record UnarySyntax(SourceSpan Span, TokenKind Operator, ExpressionSyntax Operand)
     : ExpressionSyntax(Span);

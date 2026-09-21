@@ -811,6 +811,52 @@ fills one in
 keyword only where a type declaration can begin and the next word is `class`,
 `struct`, or the type's name. `int record = 7;` stays legal.
 
+### 2.4.2 `with` — a record again, with some of it changed
+
+```csharp
+var point = new Point(3, 4);
+var moved = point with { Y = 9 };       // Point(3, 9)
+var copy  = point with { };             // a copy, which is a thing to want
+```
+
+It is the record's constructor, called with the values that were named and the
+ones that were not carried over from the target. Nothing is mutated: `point` is
+what it was, and what comes out is an ordinary record — equal by value, usable
+as a key, and itself a target for another `with`.
+
+**The target is evaluated once.** It is read once per parameter the caller did
+not supply, so a `with` that named it each time would call whatever produced it
+once per field:
+
+```csharp
+var made = Compute() with { Y = 99 };   // Compute() runs once, not twice
+```
+
+That is the whole reason this is not a rewrite of the source into a
+constructor call: an expression has nowhere to put the temporary such a rewrite
+would need.
+
+A value on the right is any expression, including one that reads the target:
+
+```csharp
+var summed = point with { Y = point.X + point.Y };
+```
+
+Three things are refused:
+
+```
+error[SL0735]: 'with' makes a copy of a record with some of it changed, and
+'Plain' is not a record; give it positional parameters, or write out the
+construction this would have made
+error[SL0736]: 'Point' has no parameter named 'Z', so there is nothing for this
+to change; it takes 'X', 'Y'
+error[SL0737]: 'X' is given a value twice here, and the second would silently be
+the one that counted
+```
+
+**`with` is contextual too**, read as a keyword only when a `{` follows it,
+which nothing else in that position does.
+
 ## 2.5 Pointers and nullability
 
 | Syntax | Meaning |

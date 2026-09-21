@@ -81,6 +81,7 @@ public sealed partial class Binder
         SliceSyntax slice => BindSlice(slice),
         IndexSyntax index => BindIndex(index),
         NewSyntax newExpression => BindNew(newExpression),
+        WithSyntax changed => BindWith(changed),
         NewArraySyntax newArray => BindNewArray(newArray),
         ConditionalSyntax conditional => BindConditional(conditional),
         LambdaSyntax lambda => new BoundLambda(lambda.Span, LambdaType.Instance, lambda),
@@ -387,6 +388,96 @@ public sealed partial class Binder
             _ => PrimitiveTypeSymbol.ULong,
         };
     }
+
+    /// <summary>
+    /// <c>point with { Y = 5 }</c>: the record's constructor, called with the
+    /// values that were named and the ones that were not carried over.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The target is held in a <see cref="BoundLet"/> and read from there. It
+    /// is named once per field the caller did not give a value for, and
+    /// <c>Compute() with { X = 1 }</c> must call <c>Compute</c> once however
+    /// many fields the record has.
+    /// </para>
+    /// <para>
+    /// This is the one part of records that could not be done in the parser.
+    /// Everything else a record generates is a member somebody could have
+    /// written; this needs a temporary, and there is nowhere in an expression
+    /// to put a statement.
+    /// </para>
+    /// </remarks>
+    private BoundExpression BindWith(WithSyntax syntax)
+    {
+        var target = BindExpression(syntax.Target);
+        if (target.Type.IsError()) return new BoundErrorExpression(syntax.Span);
+
+        if (target.Type is not ClassTypeSymbol { RecordParameters.Count: > 0 } record)
+        {
+            diagnostics.Error("SL0735", syntax.Span,
+                $"'with' makes a copy of a record with some of it changed, and " +
+                $"'{target.Type.Name}' is not a record; give it positional parameters, or " +
+                "write out the construction this would have made");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        // Which parameter each name stands for, so that a misspelling is
+        // caught here rather than becoming an argument in the wrong position.
+        var given = new Dictionary<string, BoundExpression>(StringComparer.Ordinal);
+
+        foreach (var assignment in syntax.Assignments)
+        {
+            if (!record.RecordParameters.Contains(assignment.Name, StringComparer.Ordinal))
+            {
+                diagnostics.Error("SL0736", assignment.Span,
+                    $"'{record.Name}' has no parameter named '{assignment.Name}', so there is " +
+                    $"nothing for this to change; it takes {Listed(record.RecordParameters)}");
+                continue;
+            }
+
+            if (!given.TryAdd(assignment.Name, BindExpression(assignment.Value)))
+                diagnostics.Error("SL0737", assignment.Span,
+                    $"'{assignment.Name}' is given a value twice here, and the second would " +
+                    "silently be the one that counted");
+        }
+
+        if (diagnostics.HasErrors) return new BoundErrorExpression(syntax.Span);
+
+        // Held once, and read from for every field the caller left alone.
+        var held = new LocalSymbol(SyntheticName("changed"), record, isConst: false);
+
+        var arguments = new List<BoundExpression>(record.RecordParameters.Count);
+        foreach (string name in record.RecordParameters)
+        {
+            if (given.TryGetValue(name, out var value))
+            {
+                arguments.Add(value);
+                continue;
+            }
+
+            if (record.FindProperty(name) is not { } property)
+            {
+                diagnostics.Error("SL0735", syntax.Span,
+                    $"'{record.Name}.{name}' cannot be read, so 'with' has nothing to carry " +
+                    "over for it");
+                return new BoundErrorExpression(syntax.Span);
+            }
+
+            arguments.Add(BindPropertyRead(
+                syntax.Target.Span, new BoundLocalAccess(syntax.Target.Span, held), property));
+        }
+
+        var chosen = ResolveOverload(
+            record.Constructors, arguments, syntax.Span, record.Name);
+        if (chosen is null) return new BoundErrorExpression(syntax.Span);
+
+        return new BoundLet(syntax.Span, held, target,
+            new BoundNew(syntax.Span, record, chosen, arguments));
+    }
+
+    /// <summary>Names in a list, for a diagnostic that offers them.</summary>
+    private static string Listed(IReadOnlyList<string> names) =>
+        names.Count == 1 ? $"'{names[0]}'" : string.Join(", ", names.Select(n => $"'{n}'"));
 
     private BoundExpression BindLiteral(LiteralSyntax syntax) => syntax.Kind switch
     {

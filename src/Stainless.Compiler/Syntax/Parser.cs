@@ -851,23 +851,32 @@ public sealed class Parser
 
         // The two interfaces those members satisfy, so that a record is a
         // dictionary key and a set element without anybody saying so.
+        // Written out in full, so that a record needs no import to be one: the
+        // two interfaces are the standard library's, and a program that never
+        // says `Standard.Collections` still gets a record that is a key.
         var implements = new List<TypeSyntax>(declared.Implements)
         {
-            Interface(declared.Span, "IEquatable", Named(declared.Span, declared.Name)),
-            Interface(declared.Span, "IHashable"),
+            Interface(declared.Span, ["Standard", "Collections", "IEquatable"],
+                      Named(declared.Span, declared.Name)),
+            Interface(declared.Span, ["Standard", "Collections", "IHashable"]),
         };
 
-        return declared with { Members = members, Implements = implements };
+        return declared with
+        {
+            Members = members,
+            Implements = implements,
+            RecordParameters = positional.Select(parameter => parameter.Name).ToList(),
+        };
     }
 
     /// <summary>A bare name as a type.</summary>
     private static NamedTypeSyntax Named(SourceSpan span, string name) =>
         new(span, new QualifiedName(span, [name]));
 
-    /// <summary>One of the two interfaces a record implements.</summary>
+    /// <summary>One of the two interfaces a record implements, named in full.</summary>
     private static NamedTypeSyntax Interface(
-        SourceSpan span, string name, params TypeSyntax[] arguments) =>
-        new(span, new QualifiedName(span, [name]), arguments);
+        SourceSpan span, string[] parts, params TypeSyntax[] arguments) =>
+        new(span, new QualifiedName(span, parts), arguments);
 
     /// <summary>A reference to <c>this.Name</c>.</summary>
     private static MemberAccessSyntax Mine(SourceSpan span, string name) =>
@@ -3324,6 +3333,13 @@ public sealed class Parser
                 continue;
             }
 
+            if (At(TokenKind.Identifier) && Current.Text == "with" &&
+                Peek(1).Kind == TokenKind.OpenBrace)
+            {
+                expression = ParseWithSuffix(start, expression);
+                continue;
+            }
+
             if (At(TokenKind.OpenBracket))
             {
                 Advance();
@@ -3450,6 +3466,34 @@ public sealed class Parser
         };
         statements.AddRange(body.Statements);
         return new BlockSyntax(body.Span, statements);
+    }
+
+    /// <summary>
+    /// <c>point with { Y = 5 }</c>, applied to whatever was just parsed.
+    /// </summary>
+    /// <remarks>
+    /// <c>with</c> is contextual, as <c>record</c> is: it is read as one only
+    /// when a <c>{</c> follows, which no expression does in this position.
+    /// </remarks>
+    private ExpressionSyntax ParseWithSuffix(int start, ExpressionSyntax target)
+    {
+        Advance();
+        Expect(TokenKind.OpenBrace);
+
+        var assignments = new List<WithAssignmentSyntax>();
+        while (!At(TokenKind.CloseBrace) && !At(TokenKind.EndOfFile))
+        {
+            int at = _pos;
+            string name = ExpectIdentifier();
+            Expect(TokenKind.Equals);
+            var value = ParseExpression();
+            assignments.Add(new WithAssignmentSyntax(SpanFrom(at), name, value));
+
+            if (!Match(TokenKind.Comma)) break;
+        }
+
+        Expect(TokenKind.CloseBrace);
+        return new WithSyntax(SpanFrom(start), target, assignments);
     }
 
     private List<ExpressionSyntax> ParseArgumentList()
