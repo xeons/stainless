@@ -450,31 +450,6 @@ public class WindowPeer : ControlPeer, IWindowPeer
             return 0;
         }
 
-        // A child scroll bar's movement arrives here, not at the scroll bar.
-        if (message == WmVerticalScroll || message == WmHorizontalScroll)
-        {
-            var bar = PeerOf((HWND)(void*)(nuint)lParam);
-            if (bar != null)
-            {
-                // The binding form of `is` has to be the whole condition, so
-                // the null test above is a statement of its own rather than
-                // the left half of an `&&`.
-                if (bar is ScrollBarPeer scroller)
-                {
-                    scroller.Scrolled((uint)(wParam & 0xFFFFu),
-                                      (int)((wParam >> 16) & 0xFFFFu));
-                    return 0;
-                }
-                // A slider reports the same way, and says nothing about how far
-                // it moved -- the position is asked of it afterwards.
-                if (bar is TrackBarPeer slider)
-                {
-                    slider.Scrolled();
-                    return 0;
-                }
-            }
-        }
-
         return base.Dispatch(message, wParam, lParam);
     }
 

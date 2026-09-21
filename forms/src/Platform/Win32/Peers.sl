@@ -375,6 +375,33 @@ public class ControlPeer : IControlPeer
             return Inherited(message, wParam, lParam);
         }
 
+        // A child scroll bar or slider reports to its *parent*, so every peer
+        // MUST route it: that parent is a form, a panel, or a custom control
+        // drawing its own content beside bars of its own.
+        if (message == WmVerticalScroll || message == WmHorizontalScroll)
+        {
+            var bar = PeerOf((HWND)(void*)(nuint)lParam);
+            if (bar != null)
+            {
+                // The binding form of `is` has to be the whole condition, so
+                // the null test above is a statement of its own rather than
+                // the left half of an `&&`.
+                if (bar is ScrollBarPeer scroller)
+                {
+                    scroller.Scrolled((uint)(wParam & 0xFFFFu),
+                                      (int)((wParam >> 16) & 0xFFFFu));
+                    return 0;
+                }
+                // A slider reports the same way, and says nothing about how far
+                // it moved -- the position is asked of it afterwards.
+                if (bar is TrackBarPeer slider)
+                {
+                    slider.Scrolled();
+                    return 0;
+                }
+            }
+        }
+
         if (owner == null)
             return Inherited(message, wParam, lParam);
         var control = (IControlNotify)owner;

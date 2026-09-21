@@ -825,7 +825,7 @@ public class PanelPeer : ControlPeer, IPanelPeer
 ///
 /// The position arrives at the *parent* as `WM_VSCROLL` or `WM_HSCROLL` with
 /// this control's handle in `LPARAM`, which is why the scroll handling is in
-/// `WindowPeer` and reaches back here.
+/// `ControlPeer` -- every peer is some bar's parent -- and reaches back here.
 public class ScrollBarPeer : ControlPeer, IScrollBarPeer
 {
     public ScrollBarPeer(IControlNotify owner, IContainerPeer parent, bool vertical)

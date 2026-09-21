@@ -754,7 +754,7 @@ What the exercise cost, and it is worth knowing before the next backend:
 
 ### What running it found
 
-Eight faults, none of which any self-test could see. Each is fixed; each is
+Nine faults, none of which any self-test could see. Each is fixed; each is
 here because the *shape* of it recurs.
 
 - **A panel was a hole.** `Panel` was made out of `STATIC`, and a static
@@ -804,6 +804,19 @@ here because the *shape* of it recurs.
   window answered for itself. It answers for whichever windowless child the
   pointer is over now, which is the knowledge the enter and leave events
   already had.
+- **A scroll bar reported to a parent that was not listening.** A child
+  `SCROLLBAR` sends `WM_VSCROLL` to its *parent*, and only `WindowPeer` routed
+  it -- so a bar on a form worked and a bar on anything else did nothing. The
+  IDE's editor is a `CustomControl` and owns both of its bars, so its thumb,
+  its arrows and its trough had never moved the text by a line. The routing is
+  on `ControlPeer` now, because every peer is some bar's parent.
+
+  **Nothing could see it, and a reading would have agreed with itself.** The
+  bar was drawn, its thumb was sized from the document, and Windows tracked
+  that thumb under the pointer whether or not anybody acted on the message --
+  so the control looked right, answered right, and scrolled nothing. The
+  keyboard and the wheel go straight to the editor and always worked, which is
+  what kept the hole from being obvious.
 
 - **An event box painted over everything a program drew.** A handler connected
   to `draw` runs before the class handler, and `GtkEventBox`'s class handler
