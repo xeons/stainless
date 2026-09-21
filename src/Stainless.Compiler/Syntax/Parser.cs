@@ -454,6 +454,11 @@ public sealed class Parser
             Advance();
             var ctorParams = ParseParameterList(out bool ctorVariadic);
 
+            // `Point(int x) : base(x) { ... }`, which is the same call the body
+            // could have made as its first statement and is written here
+            // instead. See ParseConstructorChain.
+            var ctorChain = ParseConstructorChain();
+
             // `Point(int x) => _x = x;`. A constructor returns nothing, so the
             // arrow evaluates its expression exactly as a `void` function's
             // does. `base(...)` is a call like any other and may be the one.
@@ -466,6 +471,17 @@ public sealed class Parser
             else
             {
                 ctorBody = ParseBlock();
+            }
+
+            if (ctorChain is not null)
+            {
+                if (ChainCallIn(ctorBody) is { } twice)
+                    _diagnostics.Error("SL0733", twice.Span,
+                        "this constructor already chains after its parameters, so the body " +
+                        "must not chain again; the two spellings are one call and a " +
+                        "constructor makes it once");
+                else
+                    ctorBody = WithChainFirst(ctorBody, ctorChain);
             }
 
             if (ctorVariadic)
@@ -3073,6 +3089,83 @@ public sealed class Parser
         }
 
         return expression;
+    }
+
+    /// <summary>
+    /// <c>: base(args)</c> or <c>: this(args)</c> after a constructor's
+    /// parameters, or null when neither is written.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The call it parses is the one the body could have written as its first
+    /// statement, and <see cref="WithChainFirst"/> puts it exactly there. So
+    /// the binder sees what it has always seen and needed no part of this:
+    /// the two spellings are one construct, and only one of them is a place
+    /// where a reader might miss it among the statements.
+    /// </para>
+    /// </remarks>
+    private CallSyntax? ParseConstructorChain()
+    {
+        if (!At(TokenKind.Colon)) return null;
+
+        int start = _pos;
+        Advance();
+
+        bool toBase = At(TokenKind.BaseKeyword);
+        if (!toBase && !At(TokenKind.ThisKeyword))
+        {
+            _diagnostics.Error("SL0732", SpanFrom(start),
+                "a constructor may be followed by ': base(...)' or ': this(...)' and nothing " +
+                "else; there are no initializer lists here, because a field is initialized " +
+                "where it is declared or in the body");
+
+            // Past whatever was written, to the body. Without this the body is
+            // parsed as though it began at the offending token, and one
+            // mistake in one constructor takes the rest of the file with it.
+            while (!At(TokenKind.OpenBrace) && !At(TokenKind.EqualsGreater) &&
+                   !At(TokenKind.Semicolon) && !At(TokenKind.EndOfFile))
+                Advance();
+
+            return null;
+        }
+
+        int keyword = _pos;
+        Advance();
+
+        ExpressionSyntax callee = toBase
+            ? new BaseSyntax(SpanFrom(keyword))
+            : new ThisSyntax(SpanFrom(keyword));
+
+        var arguments = At(TokenKind.OpenParen) ? ParseArgumentList() : [];
+        return new CallSyntax(SpanFrom(start), callee, arguments);
+    }
+
+    /// <summary>
+    /// The body's own <c>base(...)</c> or <c>this(...)</c>, if it opens with
+    /// one, so that a constructor writing both can be told rather than left to
+    /// read a diagnostic about the second one not being first.
+    /// </summary>
+    private static CallSyntax? ChainCallIn(BlockSyntax body)
+    {
+        if (body.Statements.Count == 0) return null;
+        if (body.Statements[0] is not ExpressionStatementSyntax first) return null;
+        if (first.Expression is not CallSyntax call) return null;
+
+        return call.Callee is BaseSyntax or ThisSyntax ? call : null;
+    }
+
+    /// <summary>
+    /// The body with the chained call put in front of it, which is where the
+    /// binder looks for one.
+    /// </summary>
+    private static BlockSyntax WithChainFirst(BlockSyntax body, CallSyntax chain)
+    {
+        var statements = new List<StatementSyntax>(body.Statements.Count + 1)
+        {
+            new ExpressionStatementSyntax(chain.Span, chain),
+        };
+        statements.AddRange(body.Statements);
+        return new BlockSyntax(body.Span, statements);
     }
 
     private List<ExpressionSyntax> ParseArgumentList()

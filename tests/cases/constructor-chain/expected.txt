@@ -1,0 +1,6 @@
+braced square 4 2.5
+arrow whole 7
+delegated square 1
+twohops square 1
+statement triangle 3
+order root/middle/leaf

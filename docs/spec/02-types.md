@@ -524,17 +524,44 @@ pedantic — an override written the obvious way,
 public override int Value { get => base.Value; }
 ```
 
-would otherwise call itself for ever. `base(...)` runs the base constructor, and only as the very
-first statement of a constructor: the base is built before this class's body
-runs, and a body that had already run would be reading fields nothing had set.
-Left out, the base's constructor taking no arguments is called for you, and
-there being none is an error rather than a class that skips it.
+would otherwise call itself for ever. `base(...)` runs the base constructor, before this class's body: the base is
+built first, and a body that had already run would be reading fields nothing
+had set. Left out, the base's constructor taking no arguments is called for
+you, and there being none is an error rather than a class that skips it.
+
+**It is written in one of two places**, and they mean the same thing:
+
+```csharp
+public Square(double side) : base(4)     // after the parameters, as in C#
+{
+    _side = side;
+}
+
+public Square(double side)
+{
+    base(4);                             // or as the very first statement
+    _side = side;
+}
+```
+
+The clause is the one to reach for — a reader looking at a constructor's
+signature sees what it builds without reading into the body — but the statement
+form is not going anywhere, and most of this repository still writes it.
+
+A constructor writes the call once, in one place or the other, and nothing may
+follow the `:` but these two calls:
 
 ```
 error[SL0516]: 'base(...)' has to be the first statement of the constructor
 error[SL0517]: 'Shape' has no constructor that takes no arguments, so 'Circle'
 has to say which one to run: write 'base(...)' as the first statement of its
 constructor
+error[SL0732]: a constructor may be followed by ': base(...)' or ': this(...)'
+and nothing else; there are no initializer lists here, because a field is
+initialized where it is declared or in the body
+error[SL0733]: this constructor already chains after its parameters, so the
+body must not chain again; the two spellings are one call and a constructor
+makes it once
 ```
 
 **Hiding is refused.** A method with the same name and parameters as one it
@@ -554,8 +581,8 @@ of the same name taking different ones is a new method and needs no word.
 nearest constructor up the chain that takes no arguments, and a class with no
 such constructor to reach says so where it is declared rather than at each `new`.
 
-**`this(...)` delegates to another constructor of the same class**, again as the
-first statement. The one it delegates to builds the base, so no base
+**`this(...)` delegates to another constructor of the same class**, in either
+of the same two places. The one it delegates to builds the base, so no base
 construction is inserted alongside it — inserting one would build the base twice
 and the second pass would overwrite what the first had set. A ring of
 constructors that delegate to each other never builds anything, and is refused:
