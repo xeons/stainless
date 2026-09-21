@@ -1,0 +1,19 @@
+point 3,4
+named widget 1.5
+equalto yes
+differs no
+operator yes
+notoperator yes
+notidentity yes
+hashagrees yes
+hashdiffers yes
+onefield yes
+onefieldhash yes
+allfields yes
+lastfield no
+middlefield no
+firstfield no
+lookup one
+missing <missing>
+count 2
+replaced again 2

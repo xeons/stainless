@@ -737,6 +737,80 @@ test followed by a conversion would ask twice and could be told two different
 things. `(IThing)x` asks once, and ends the program if the answer was no —
 which is the same bargain a binding `is` refuses for the same reason (SL0587).
 
+## 2.4.1 `record` — a class written as its constructor
+
+```csharp
+public record Point(int X, int Y);
+
+public record class Named(String Label, double Weight)
+{
+    public String Describe() { return Label + " " + Text.FromDouble(Weight); }
+}
+```
+
+A `record` is a `class`. The parameters after its name become get-only
+properties and the constructor that fills them, and the type gets value
+equality and a hash over all of them. A bare `record` means `record class`, as
+in C#; the long spelling is there for the reader who wants it said.
+
+What is generated is what could have been written out:
+
+```csharp
+public class Point : IEquatable<Point>, IHashable
+{
+    public int X { get; }
+    public int Y { get; }
+
+    public Point(int X, int Y) { this.X = X; this.Y = Y; }
+
+    public bool EqualTo(Point other) { return X.EqualTo(other.X) && Y.EqualTo(other.Y); }
+    public nuint HashCode()          { return X.HashCode() * 31u + Y.HashCode(); }
+
+    public static bool operator ==(Point left, Point right) { return left.EqualTo(right); }
+    public static bool operator !=(Point left, Point right) { return !left.EqualTo(right); }
+}
+```
+
+**`EqualTo` and `HashCode`, not `Equals` and `GetHashCode`.** Those are the
+names [`IEquatable<T>` and `IHashable`](05-standard-library.md) declare, and
+the pair a `Dictionary` probes a key with — so a record is a key, and a set
+element, without saying anything. That is most of what the form is for.
+
+```csharp
+var seen = new Dictionary<Point, String>();
+seen.Set(new Point(1, 1), "one");
+seen.GetOr(new Point(1, 1), "");        // "one" — a different object, the same value
+```
+
+**Equality is by value, which is the whole difference from a class.**
+`new Point(1, 2) == new Point(1, 2)` is true where two `new Thing()` of an
+ordinary class are two objects and compare as two objects. A record says its
+identity is its contents.
+
+The body is optional and ordinary: members written in it are members, and they
+sit beside the generated ones rather than in place of them.
+
+**There is no generated `ToString`.** This language has no `ToString` that
+every type owes ([§3.7](03-text.md#37-conversions)), and a record is not the
+place to invent one — every class would then owe an implementation, for a
+default that printed a type name.
+
+**There is no `record struct`.** A record is its constructor and a struct has
+none: a struct is a plain C value, which is what lets one cross to C at all
+([§2.2](#22-struct--value-type-c-layout)). Giving structs constructors is a
+decision about structs rather than a consequence of wanting records, so it has
+not been made.
+
+```
+error[SL0734]: a struct is a plain C value and has no constructor, so there is
+no 'record struct'; write 'record' for a class, or a struct and a function that
+fills one in
+```
+
+**`record` is contextual**, as `closure` and `where` are: it is read as a
+keyword only where a type declaration can begin and the next word is `class`,
+`struct`, or the type's name. `int record = 7;` stays legal.
+
 ## 2.5 Pointers and nullability
 
 | Syntax | Meaning |

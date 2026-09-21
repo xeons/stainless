@@ -392,6 +392,16 @@ public sealed class Parser
             return ParseLinkageDeclaration(start, modifiers);
         }
 
+        if (AtRecord())
+        {
+            var hoisted = new List<Declaration>();
+            var declared = ParseRecordDeclaration(start, modifiers, attributes, hoisted);
+
+            var withRecord = new List<Declaration> { declared };
+            withRecord.AddRange(hoisted);
+            return withRecord;
+        }
+
         if (AtAny(TokenKind.ClassKeyword, TokenKind.StructKeyword,
                   TokenKind.InterfaceKeyword, TokenKind.AttributeKeyword,
                   TokenKind.VariantKeyword, TokenKind.UnionKeyword))
@@ -768,24 +778,292 @@ public sealed class Parser
     /// keeps an ordinary field of it, marked anonymous, which is what carries
     /// the layout; only name lookup knows the difference.
     /// </summary>
+    /// <summary>
+    /// Whether a record declaration starts here: the word <c>record</c>
+    /// followed by something that can only continue one.
+    /// </summary>
+    /// <remarks>
+    /// <c>record</c> is contextual, as <c>closure</c> and <c>where</c> are, so
+    /// a variable called <c>record</c> stays legal. What tells the two apart is
+    /// the token after it -- a declaration says <c>class</c>, <c>struct</c> or
+    /// the type's own name, and an expression says anything else.
+    /// </remarks>
+    private bool AtRecord()
+    {
+        if (!At(TokenKind.Identifier) || Current.Text != "record") return false;
+
+        var next = Peek(1).Kind;
+        return next is TokenKind.ClassKeyword or TokenKind.StructKeyword
+                    or TokenKind.Identifier;
+    }
+
+    /// <summary>
+    /// <c>record Point(int X, int Y);</c> and its <c>class</c> and
+    /// <c>struct</c> spellings.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A bare <c>record</c> is a class, as in C#. What it parses to is an
+    /// ordinary type declaration whose members include the ones the positional
+    /// parameters stand for, so nothing past the parser knows a record from a
+    /// class somebody wrote out.
+    /// </para>
+    /// </remarks>
+    private TypeDeclSyntax ParseRecordDeclaration(
+        int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes,
+        List<Declaration> hoisted)
+    {
+        Advance();
+
+        var kind = TypeDeclKind.Class;
+        if (At(TokenKind.StructKeyword))
+        {
+            // A record is its constructor and a struct has none: a struct is a
+            // plain C value, which is what lets one cross to C at all. Giving
+            // structs constructors is a decision about structs rather than a
+            // consequence of this one, so it is not made here.
+            _diagnostics.Error("SL0734", SpanFrom(_pos),
+                "a struct is a plain C value and has no constructor, so there is no " +
+                "'record struct'; write 'record' for a class, or a struct and a function " +
+                "that fills one in");
+            Advance();
+        }
+        else if (At(TokenKind.ClassKeyword))
+        {
+            Advance();
+        }
+
+        var positional = new List<ParameterSyntax>();
+        var declared = ParseTypeDeclaration(
+            start, modifiers, attributes, hoisted, generatedName: null,
+            forcedKind: kind, positional: positional);
+
+        if (positional.Count == 0)
+            return declared;
+
+        var members = new List<Declaration>(declared.Members);
+        members.AddRange(PropertiesFor(positional));
+        members.Add(ConstructorFor(declared.Name, positional));
+        members.Add(EqualToFor(declared.Name, positional));
+        members.Add(HashCodeFor(positional));
+        members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.EqualsEquals));
+        members.Add(EqualityOperatorFor(declared.Name, positional, TokenKind.BangEquals));
+
+        // The two interfaces those members satisfy, so that a record is a
+        // dictionary key and a set element without anybody saying so.
+        var implements = new List<TypeSyntax>(declared.Implements)
+        {
+            Interface(declared.Span, "IEquatable", Named(declared.Span, declared.Name)),
+            Interface(declared.Span, "IHashable"),
+        };
+
+        return declared with { Members = members, Implements = implements };
+    }
+
+    /// <summary>A bare name as a type.</summary>
+    private static NamedTypeSyntax Named(SourceSpan span, string name) =>
+        new(span, new QualifiedName(span, [name]));
+
+    /// <summary>One of the two interfaces a record implements.</summary>
+    private static NamedTypeSyntax Interface(
+        SourceSpan span, string name, params TypeSyntax[] arguments) =>
+        new(span, new QualifiedName(span, [name]), arguments);
+
+    /// <summary>A reference to <c>this.Name</c>.</summary>
+    private static MemberAccessSyntax Mine(SourceSpan span, string name) =>
+        new(span, new ThisSyntax(span), name);
+
+    /// <summary>A reference to a parameter or local by name.</summary>
+    private static NameSyntax Named(SourceSpan span, QualifiedName name) => new(span, name);
+
+    /// <summary>
+    /// <c>bool EqualTo(T other)</c>: every field equal to the matching one.
+    ///
+    /// Written as <c>EqualTo</c> rather than as <c>Equals</c> because that is
+    /// the name <c>IEquatable</c> declares and the one a dictionary probes
+    /// with, which is most of what a record is for.
+    /// </summary>
+    private static FunctionDeclSyntax EqualToFor(string name, List<ParameterSyntax> positional)
+    {
+        var span = positional[0].Span;
+
+        ExpressionSyntax? test = null;
+        foreach (var parameter in positional)
+        {
+            var other = new MemberAccessSyntax(
+                span, Named(span, new QualifiedName(span, ["other"])), parameter.Name);
+
+            ExpressionSyntax one = new CallSyntax(
+                span, new MemberAccessSyntax(span, Mine(span, parameter.Name), "EqualTo"),
+                [other]);
+
+            test = test is null ? one : new BinarySyntax(span, test, TokenKind.AmpAmp, one);
+        }
+
+        var body = new BlockSyntax(span, [new ReturnSyntax(span, test)]);
+
+        return new FunctionDeclSyntax(
+            span, Modifiers.Public, LinkageKind.Stainless,
+            new PrimitiveTypeSyntax(span, TokenKind.BoolKeyword), "EqualTo", [], [],
+            [new ParameterSyntax(span, Named(span, name), "other")], false, body);
+    }
+
+    /// <summary>
+    /// <c>nuint HashCode()</c>: the fields' hashes folded together.
+    ///
+    /// Each field's own hash is already mixed -- that is what
+    /// <c>Standard.HashInteger</c> does for it -- so the fold only has to keep
+    /// the fields apart, and multiplying by an odd number does that.
+    /// </summary>
+    private static FunctionDeclSyntax HashCodeFor(List<ParameterSyntax> positional)
+    {
+        var span = positional[0].Span;
+
+        ExpressionSyntax? hash = null;
+        foreach (var parameter in positional)
+        {
+            ExpressionSyntax one = new CallSyntax(
+                span, new MemberAccessSyntax(span, Mine(span, parameter.Name), "HashCode"), []);
+
+            if (hash is null)
+            {
+                hash = one;
+                continue;
+            }
+
+            var scaled = new BinarySyntax(
+                span, hash, TokenKind.Star,
+                new LiteralSyntax(span, TokenKind.IntLiteral, 31UL, "31u"));
+            hash = new BinarySyntax(span, scaled, TokenKind.Plus, one);
+        }
+
+        var body = new BlockSyntax(span, [new ReturnSyntax(span, hash)]);
+
+        return new FunctionDeclSyntax(
+            span, Modifiers.Public, LinkageKind.Stainless,
+            new PrimitiveTypeSyntax(span, TokenKind.NUIntKeyword), "HashCode", [], [],
+            [], false, body);
+    }
+
+    /// <summary>
+    /// <c>a == b</c> and <c>a != b</c>, both over <c>EqualTo</c>.
+    ///
+    /// Neither takes a nullable, so neither has C#'s problem of an operator
+    /// that must answer for a null operand: comparing a <c>T?</c> is a
+    /// different expression and the compiler says so.
+    /// </summary>
+    private static FunctionDeclSyntax EqualityOperatorFor(
+        string name, List<ParameterSyntax> positional, TokenKind which)
+    {
+        var span = positional[0].Span;
+        var type = Named(span, name);
+
+        ExpressionSyntax test = new CallSyntax(
+            span,
+            new MemberAccessSyntax(
+                span, Named(span, new QualifiedName(span, ["left"])), "EqualTo"),
+            [Named(span, new QualifiedName(span, ["right"]))]);
+
+        if (which == TokenKind.BangEquals)
+            test = new UnarySyntax(span, TokenKind.Bang, test);
+
+        var body = new BlockSyntax(span, [new ReturnSyntax(span, test)]);
+
+        return new FunctionDeclSyntax(
+            span, Modifiers.Public | Modifiers.Static, LinkageKind.Stainless,
+            new PrimitiveTypeSyntax(span, TokenKind.BoolKeyword),
+            OperatorNames.For(which), [], [],
+            [new ParameterSyntax(span, type, "left"), new ParameterSyntax(span, type, "right")],
+            false, body)
+        {
+            IsOperator = true,
+            OperatorToken = which,
+        };
+    }
+
+    /// <summary>
+    /// One <c>public T Name { get; }</c> per positional parameter: readable by
+    /// anyone, set by the constructor, fixed after it.
+    /// </summary>
+    private static List<Declaration> PropertiesFor(List<ParameterSyntax> positional)
+    {
+        var properties = new List<Declaration>(positional.Count);
+
+        foreach (var parameter in positional)
+        {
+            var getter = new AccessorSyntax(parameter.Span, Modifiers.None, true, null);
+            properties.Add(new PropertyDeclSyntax(
+                parameter.Span, Modifiers.Public, parameter.Type, parameter.Name,
+                [getter], []));
+        }
+
+        return properties;
+    }
+
+    /// <summary>
+    /// The constructor the parameters describe, assigning each to the property
+    /// of the same name.
+    /// </summary>
+    /// <remarks>
+    /// <c>this.X = X</c> rather than <c>X = X</c>: the parameter and the
+    /// property share a name, which is what makes the form read well and what
+    /// makes the qualification necessary.
+    /// </remarks>
+    private static ConstructorDeclSyntax ConstructorFor(
+        string name, List<ParameterSyntax> positional)
+    {
+        var statements = new List<StatementSyntax>(positional.Count);
+
+        foreach (var parameter in positional)
+        {
+            var span = parameter.Span;
+            var target = new MemberAccessSyntax(span, new ThisSyntax(span), parameter.Name);
+            var value = new NameSyntax(span, new QualifiedName(span, [parameter.Name]));
+
+            statements.Add(new ExpressionStatementSyntax(
+                span, new AssignmentSyntax(span, target, TokenKind.Equals, value)));
+        }
+
+        var span2 = positional[0].Span;
+        return new ConstructorDeclSyntax(
+            span2, Modifiers.Public, name, positional, new BlockSyntax(span2, statements));
+    }
+
     private TypeDeclSyntax ParseTypeDeclaration(
         int start, Modifiers modifiers, IReadOnlyList<AttributeSyntax> attributes,
-        List<Declaration> hoisted, string? generatedName = null)
+        List<Declaration> hoisted, string? generatedName = null,
+        TypeDeclKind? forcedKind = null, List<ParameterSyntax>? positional = null)
     {
-        var kind = Current.Kind switch
+        TypeDeclKind kind;
+        if (forcedKind is { } given)
         {
-            TokenKind.ClassKeyword => TypeDeclKind.Class,
-            TokenKind.InterfaceKeyword => TypeDeclKind.Interface,
-            TokenKind.AttributeKeyword => TypeDeclKind.Attribute,
-            TokenKind.VariantKeyword => TypeDeclKind.Variant,
-            TokenKind.UnionKeyword => TypeDeclKind.Union,
-            _ => TypeDeclKind.Struct,
-        };
-        Advance();
+            // A record's keyword was read by ParseRecordDeclaration, which is
+            // sitting on the name.
+            kind = given;
+        }
+        else
+        {
+            kind = Current.Kind switch
+            {
+                TokenKind.ClassKeyword => TypeDeclKind.Class,
+                TokenKind.InterfaceKeyword => TypeDeclKind.Interface,
+                TokenKind.AttributeKeyword => TypeDeclKind.Attribute,
+                TokenKind.VariantKeyword => TypeDeclKind.Variant,
+                TokenKind.UnionKeyword => TypeDeclKind.Union,
+                _ => TypeDeclKind.Struct,
+            };
+            Advance();
+        }
 
         // A nameless member has no identifier to read; its name was made for it.
         string name = generatedName ?? ExpectIdentifier();
         var typeParameters = generatedName is null ? ParseTypeParameterList() : [];
+
+        // `record Point(int X, int Y)`: the parameters are the type's members
+        // as well as its constructor's, which is the whole of what the form
+        // buys over writing both out.
+        if (positional is not null && At(TokenKind.OpenParen))
+            positional.AddRange(ParseParameterList(out _));
 
         // `class Circle : Shape, Comparable<Circle>` -- a list of interfaces,
         // which may themselves be generic, so these are full types not bare names.
@@ -805,7 +1083,13 @@ public sealed class Parser
         if (Match(TokenKind.Semicolon))
             return new TypeDeclSyntax(
                 SpanFrom(start), modifiers, kind, name, typeParameters,
-                constraints, implements, [], attributes) { IsOpaque = true };
+                constraints, implements, [], attributes)
+            {
+                // `record Point(int X, int Y);` ends the same way and means the
+                // opposite: the parameters are the body, so the type is laid
+                // out and only the braces were unnecessary.
+                IsOpaque = positional is not { Count: > 0 },
+            };
 
         Expect(TokenKind.OpenBrace);
 
