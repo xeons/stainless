@@ -75,6 +75,66 @@
  * the class that holds it lives in the standard library and the runtime has no
  * way to name one. Its destructor calls sl_process_release.
  */
+/*
+ * A growable byte buffer, private to this file.
+ *
+ * Not an object and not the language's StringBuilder. A child's output has no
+ * size to know in advance, so something here has to grow -- but it belongs to
+ * the process rather than to the caller, which is what keeps a Stainless
+ * object from crossing into C to be written through a layout agreed in two
+ * places.
+ */
+typedef struct Buffer {
+    uint8_t *bytes;
+    size_t   length;
+    size_t   capacity;
+} Buffer;
+
+static void buffer_append(Buffer *buffer, const uint8_t *data, size_t byteLength)
+{
+    if (byteLength == 0 || data == NULL) return;
+
+    /* Both of these would wrap rather than fail: the size wanted, and the
+     * doubling that reaches for it -- which on wrapping to zero would loop for
+     * ever rather than merely allocate too little. */
+    if (byteLength > SIZE_MAX - buffer->length) sl_fail("output is too large to hold");
+
+    size_t wanted = buffer->length + byteLength;
+    if (wanted > buffer->capacity) {
+        size_t capacity = buffer->capacity == 0 ? 4096 : buffer->capacity;
+        while (capacity < wanted) {
+            if (capacity > SIZE_MAX / 2) { capacity = wanted; break; }
+            capacity *= 2;
+        }
+
+        uint8_t *bytes = (uint8_t *)realloc(buffer->bytes, capacity);
+        if (bytes == NULL) sl_fail("out of memory");
+
+        buffer->bytes    = bytes;
+        buffer->capacity = capacity;
+    }
+
+    memcpy(buffer->bytes + buffer->length, data, byteLength);
+    buffer->length += byteLength;
+}
+
+/* What is in it, as a String, and the buffer emptied. The room is kept: a
+ * reader taking a line at a time would otherwise reallocate on every call. */
+static void *buffer_take(Buffer *buffer)
+{
+    void *text = sl_string_from_bytes(buffer->bytes, buffer->length);
+    buffer->length = 0;
+    return text;
+}
+
+static void buffer_free(Buffer *buffer)
+{
+    free(buffer->bytes);
+    buffer->bytes    = NULL;
+    buffer->length   = 0;
+    buffer->capacity = 0;
+}
+
 typedef struct SlProcess {
 #ifdef _WIN32
     HANDLE handle;
@@ -94,6 +154,11 @@ typedef struct SlProcess {
 #endif
     int  exitCode;
     _Bool finished;
+
+    /* What the child has written and the caller has not taken yet. Zeroed by
+     * the calloc that makes one of these. */
+    Buffer outText;
+    Buffer errText;
 } SlProcess;
 
 /* --------------------------------------------------------------- argv */
@@ -175,7 +240,7 @@ void sl_process_args_free(void *handle)
  * run it belongs to are doubled. That is the rule that makes `C:\dir\` inside
  * quotes come out as a directory rather than as an escaped quote.
  */
-static void quote(SlStringBuilder *line, const char *argument)
+static void quote(Buffer *line, const char *argument)
 {
     size_t length = strlen(argument);
     _Bool plain = length > 0;
@@ -184,11 +249,11 @@ static void quote(SlStringBuilder *line, const char *argument)
         if (argument[i] == ' ' || argument[i] == '\t' || argument[i] == '"') plain = 0;
 
     if (plain) {
-        sl_string_builder_append_bytes(line, (const uint8_t *)argument, length);
+        buffer_append(line, (const uint8_t *)argument, length);
         return;
     }
 
-    sl_string_builder_append_bytes(line, (const uint8_t *)"\"", 1);
+    buffer_append(line, (const uint8_t *)"\"", 1);
 
     for (size_t i = 0; i < length; i += 1) {
         size_t slashes = 0;
@@ -197,22 +262,22 @@ static void quote(SlStringBuilder *line, const char *argument)
         if (i == length) {
             /* Trailing: doubled, because the closing quote follows. */
             for (size_t n = 0; n < slashes * 2; n += 1)
-                sl_string_builder_append_bytes(line, (const uint8_t *)"\\", 1);
+                buffer_append(line, (const uint8_t *)"\\", 1);
             break;
         }
 
         if (argument[i] == '"') {
             for (size_t n = 0; n < slashes * 2 + 1; n += 1)
-                sl_string_builder_append_bytes(line, (const uint8_t *)"\\", 1);
+                buffer_append(line, (const uint8_t *)"\\", 1);
         } else {
             for (size_t n = 0; n < slashes; n += 1)
-                sl_string_builder_append_bytes(line, (const uint8_t *)"\\", 1);
+                buffer_append(line, (const uint8_t *)"\\", 1);
         }
 
-        sl_string_builder_append_bytes(line, (const uint8_t *)&argument[i], 1);
+        buffer_append(line, (const uint8_t *)&argument[i], 1);
     }
 
-    sl_string_builder_append_bytes(line, (const uint8_t *)"\"", 1);
+    buffer_append(line, (const uint8_t *)"\"", 1);
 }
 
 static int classify(DWORD number)
@@ -249,7 +314,7 @@ static _Bool privately(HANDLE handle)
  * which is the deadlock this whole arrangement exists to avoid, arriving from
  * the other direction. Answers 0 when the writer is gone.
  */
-static _Bool sip(HANDLE pipe, void *text)
+static _Bool sip(HANDLE pipe, Buffer *into)
 {
     DWORD waiting = 0;
 
@@ -262,31 +327,25 @@ static _Bool sip(HANDLE pipe, void *text)
     if (waiting > sizeof buffer) waiting = sizeof buffer;
     if (!ReadFile(pipe, buffer, waiting, &got, NULL) || got == 0) return 0;
 
-    sl_string_builder_append_bytes(text, buffer, (size_t)got);
+    buffer_append(into, buffer, (size_t)got);
     return 1;
 }
 
 /* The command line CreateProcessW wants, as wide characters the caller frees. */
 static wchar_t *commandLineFor(SlArgs *list)
 {
-    SlStringBuilder *line = (SlStringBuilder *)sl_string_builder_new();
+    Buffer line = { NULL, 0, 0 };
 
     for (size_t i = 0; i < list->count; i += 1) {
-        if (i > 0) sl_string_builder_append_bytes(line, (const uint8_t *)" ", 1);
-        quote(line, list->items[i]);
+        if (i > 0) buffer_append(&line, (const uint8_t *)" ", 1);
+        quote(&line, list->items[i]);
     }
 
-    void *text = sl_string_builder_to_string(line);
-    size_t length = sl_string_byte_length(text);
+    /* sl_widen wants a NUL, and the buffer holds none. */
+    buffer_append(&line, (const uint8_t *)"", 1);
 
-    char *narrow = (char *)malloc(length + 1);
-    if (narrow == NULL) return NULL;
-
-    memcpy(narrow, sl_string_data((SlString *)text), length);
-    narrow[length] = '\0';
-
-    wchar_t *wide = sl_widen(narrow);
-    free(narrow);
+    wchar_t *wide = sl_widen((const char *)line.bytes);
+    buffer_free(&line);
     return wide;
 }
 
@@ -621,7 +680,7 @@ void *sl_process_open(void *args, void *input, int *error)
  * pipe holds about 64KB, and a child that fills one waits for a reader that
  * would be waiting for the child.
  */
-_Bool sl_process_pump(void *handle, void *outText, void *errText)
+_Bool sl_process_pump(void *handle)
 {
     SlProcess *process = (SlProcess *)handle;
     if (process == NULL) return 0;
@@ -630,20 +689,18 @@ _Bool sl_process_pump(void *handle, void *outText, void *errText)
     for (;;) {
         if (process->out == NULL && process->err == NULL) return 0;
 
-        size_t before = sl_string_builder_byte_length(outText)
-                      + sl_string_builder_byte_length(errText);
+        size_t before = process->outText.length + process->errText.length;
 
-        if (process->out != NULL && !sip(process->out, outText)) {
+        if (process->out != NULL && !sip(process->out, &process->outText)) {
             CloseHandle(process->out);
             process->out = NULL;
         }
-        if (process->err != NULL && !sip(process->err, errText)) {
+        if (process->err != NULL && !sip(process->err, &process->errText)) {
             CloseHandle(process->err);
             process->err = NULL;
         }
 
-        size_t after = sl_string_builder_byte_length(outText)
-                     + sl_string_builder_byte_length(errText);
+        size_t after = process->outText.length + process->errText.length;
 
         if (after != before) return 1;
         if (process->out == NULL && process->err == NULL) return 0;
@@ -670,8 +727,7 @@ _Bool sl_process_pump(void *handle, void *outText, void *errText)
             return 0;
         }
 
-        size_t before = sl_string_builder_byte_length(outText)
-                      + sl_string_builder_byte_length(errText);
+        size_t before = process->outText.length + process->errText.length;
 
         for (int i = 0; i < 2; i += 1) {
             int reading = i == 0 ? process->out : process->err;
@@ -683,8 +739,8 @@ _Bool sl_process_pump(void *handle, void *outText, void *errText)
             ssize_t got = read(reading, buffer, sizeof buffer);
 
             if (got > 0) {
-                sl_string_builder_append_bytes(
-                    i == 0 ? outText : errText, buffer, (size_t)got);
+                buffer_append(
+                    i == 0 ? &process->outText : &process->errText, buffer, (size_t)got);
                 continue;
             }
 
@@ -696,8 +752,7 @@ _Bool sl_process_pump(void *handle, void *outText, void *errText)
             if (i == 0) process->out = -1; else process->err = -1;
         }
 
-        size_t after = sl_string_builder_byte_length(outText)
-                     + sl_string_builder_byte_length(errText);
+        size_t after = process->outText.length + process->errText.length;
 
         if (after != before) return 1;
         if (process->out < 0 && process->err < 0) return 0;
@@ -717,20 +772,42 @@ _Bool sl_process_pump(void *handle, void *outText, void *errText)
  * a child that fills one deadlocks" is three too many for them all to stay
  * right.
  */
-int sl_process_run(void *args, void *input, void *outText, void *errText, int *exitCode)
+int sl_process_run(void *args, void *input, void **outText, void **errText, int *exitCode)
 {
     int error = SL_PROCESS_FAILED;
 
-    *exitCode = -1;
+    *exitCode  = -1;
+    *outText   = NULL;
+    *errText   = NULL;
 
     void *handle = sl_process_open(args, input, &error);
     if (handle == NULL) return error;
 
-    while (sl_process_pump(handle, outText, errText)) { }
+    while (sl_process_pump(handle)) { }
 
     int status = sl_process_wait(handle, exitCode);
+
+    /* Taken before the handle goes, since the buffers go with it. */
+    *outText = sl_process_take_output(handle);
+    *errText = sl_process_take_errors(handle);
+
     sl_process_release(handle);
     return status;
+}
+
+/* What the child wrote since this was last asked, and nothing the next time. */
+void *sl_process_take_output(void *handle)
+{
+    SlProcess *process = (SlProcess *)handle;
+    if (process == NULL) return sl_string_from_bytes(NULL, 0);
+    return buffer_take(&process->outText);
+}
+
+void *sl_process_take_errors(void *handle)
+{
+    SlProcess *process = (SlProcess *)handle;
+    if (process == NULL) return sl_string_from_bytes(NULL, 0);
+    return buffer_take(&process->errText);
 }
 /* Starts a program and does not wait. The streams are the parent's. */
 void *sl_process_start(void *args, int *error)
@@ -907,6 +984,9 @@ void sl_process_release(void *handle)
 {
     SlProcess *process = (SlProcess *)handle;
     if (process == NULL) return;
+
+    buffer_free(&process->outText);
+    buffer_free(&process->errText);
 
 #ifdef _WIN32
     /* A pipe the caller stopped reading partway through is still open, and a

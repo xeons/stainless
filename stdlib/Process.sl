@@ -44,11 +44,13 @@ extern "C"
     bool  sl_process_args_add(byte* args, String text);
     void  sl_process_args_free(byte* args);
 
-    int   sl_process_run(byte* args, String? input, StringBuilder outText,
-                         StringBuilder errText, out int exitCode);
+    int   sl_process_run(byte* args, String? input, out String outText,
+                         out String errText, out int exitCode);
 
     byte* sl_process_open(byte* args, String? input, out int error);
-    bool  sl_process_pump(byte* handle, StringBuilder outText, StringBuilder errText);
+    bool  sl_process_pump(byte* handle);
+    String sl_process_take_output(byte* handle);
+    String sl_process_take_errors(byte* handle);
 
     byte* sl_process_start(byte* args, out int error);
     long  sl_process_id(byte* handle);
@@ -167,10 +169,8 @@ public Result<Completed, ProcessError> Run(
     if (args == null)
         return Fail(ProcessError.NoResource);
 
-    var output = new StringBuilder();
-    var errors = new StringBuilder();
-
-    int status = sl_process_run(args, input, output, errors, out int exitCode);
+    int status = sl_process_run(
+        args, input, out String output, out String errors, out int exitCode);
     sl_process_args_free(args);
 
     if (status != 0)
@@ -178,8 +178,8 @@ public Result<Completed, ProcessError> Run(
 
     Completed done;
     done.ExitCode = exitCode;
-    done.Output = output.ToText();
-    done.Errors = errors.ToText();
+    done.Output = output;
+    done.Errors = errors;
     return Ok(done);
 }
 
@@ -287,8 +287,6 @@ public class Process
 public class Running
 {
     byte* _handle;
-    StringBuilder _output;
-    StringBuilder _errors;
 
     /// Whether either stream may still produce something. False once the child
     /// has closed both, which is what ends the loop.
@@ -299,8 +297,6 @@ public class Running
     Running(byte* started)
     {
         _handle = started;
-        _output = new StringBuilder();
-        _errors = new StringBuilder();
         _more = true;
     }
 
@@ -321,7 +317,7 @@ public class Running
     {
         if (!_more)
             return false;
-        _more = sl_process_pump(_handle, _output, _errors);
+        _more = sl_process_pump(_handle);
         return _more;
     }
 
@@ -331,20 +327,10 @@ public class Running
     /// **Taken rather than read.** The buffer is emptied, because a caller
     /// showing output as it arrives wants each line once; `Run` is the one
     /// that answers with the whole of it at the end.
-    public String TakeOutput()
-    {
-        var text = _output.ToText();
-        _output.Clear();
-        return text;
-    }
+    public String TakeOutput() => sl_process_take_output(_handle);
 
     /// The same for what it wrote to its error stream.
-    public String TakeErrors()
-    {
-        var text = _errors.ToText();
-        _errors.Clear();
-        return text;
-    }
+    public String TakeErrors() => sl_process_take_errors(_handle);
 
     /// Waits for it to finish, and answers with the code it left.
     ///

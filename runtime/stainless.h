@@ -658,19 +658,7 @@ SL_API void           *sl_utf16_to_string(void *pointer);
 
 /* ---------------------------------------------------------- StringBuilder */
 
-typedef struct SlStringBuilder {
-    SlObject  base;
-    uint8_t  *bytes;
-    size_t    length;
-    size_t    capacity;
-} SlStringBuilder;
 
-SL_API extern const SlTypeInfo sl_string_builder_type_info;
-
-SL_API void  *sl_string_builder_new(void);
-SL_API void   sl_string_builder_append_bytes(void *pointer, const uint8_t *data, size_t byteLength);
-SL_API size_t sl_string_builder_byte_length(void *pointer);
-SL_API void  *sl_string_builder_to_string(void *pointer);
 
 /* ------------------------------------------------------------------ Array */
 
@@ -903,7 +891,8 @@ SL_API _Bool  sl_process_args_add(void *handle, void *text);
 SL_API void   sl_process_args_free(void *handle);
 
 /* Runs to completion, appending both streams to the builders given. */
-SL_API int    sl_process_run(void *args, void *input, void *outText, void *errText, int *exitCode);
+SL_API int sl_process_run(void *args, void *input, void **outText, void **errText,
+                          int *exitCode);
 
 /*
  * Starts one with both output streams captured, and reads them as they fill.
@@ -920,7 +909,9 @@ SL_API int    sl_process_run(void *args, void *input, void *outText, void *errTe
  * sl_process_start is.
  */
 SL_API void  *sl_process_open(void *args, void *input, int *error);
-SL_API _Bool  sl_process_pump(void *handle, void *outText, void *errText);
+SL_API _Bool sl_process_pump(void *handle);
+SL_API void  *sl_process_take_output(void *handle);
+SL_API void  *sl_process_take_errors(void *handle);
 
 /* Starts one and does not wait; its streams are this process's. */
 SL_API void  *sl_process_start(void *args, int *error);
