@@ -5,6 +5,11 @@
 > editor with real syntax highlighting, a project tree, a build that runs the
 > compiler, and an error line that takes you to the line it names.
 
+It editing its own source, on each backend, is in
+[the root README](../README.md#what-it-is-far-enough-along-to-build) —
+[Windows](../docs/images/ide-windows.png) and
+[Linux](../docs/images/ide-linux.png).
+
 ```
 dotnet build Stainless.slnx      # the compiler, which the IDE drives
 stainless build --project ide    # the IDE, on either system
