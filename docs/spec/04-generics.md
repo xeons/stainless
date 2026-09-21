@@ -3,12 +3,13 @@
 # 4. Generics
 
 ```csharp
-public class Box<T> {
+public class Box<T>
+{
     T value;
 
     public Box(T initial) { value = initial; }
 
-    public T Get() { return value; }
+    public T Get() => value;
     public void Set(T next) { value = next; }
 }
 
@@ -20,8 +21,10 @@ Functions may be generic too, and their type arguments are **inferred from the
 arguments passed**:
 
 ```csharp
-T Pick<T>(T a, T b, bool first) {
-    if (first) { return a; }
+T Pick<T>(T a, T b, bool first)
+{
+    if (first)
+        return a;
     return b;
 }
 
@@ -63,14 +66,18 @@ interfaces it must implement. It goes after the parameter list and after any
 base list, as in C#:
 
 ```csharp
-public interface IComparable<T> {
+public interface IComparable<T>
+{
     int CompareTo(T other);
 }
 
-T Largest<T>(T[] values) where T : IComparable<T> {
+T Largest<T>(T[] values) where T : IComparable<T>
+{
     var best = values[0];
-    for (nuint i = 1; i < values.Length; i++) {
-        if (values[i].CompareTo(best) > 0) { best = values[i]; }
+    for (nuint i = 1; i < values.Length; i++)
+    {
+        if (values[i].CompareTo(best) > 0)
+            best = values[i];
     }
     return best;
 }
@@ -98,7 +105,8 @@ or a property name, which matters because it is an ordinary English noun that
 turns up in exactly those positions:
 
 ```csharp
-String Describe<T>(T thing, String where) where T : IDescribable {
+String Describe<T>(T thing, String where) where T : IDescribable
+{
     return thing.Describe() + "@" + where;
 }
 ```
@@ -174,10 +182,11 @@ the enclosing type's arguments are already fixed and only the method's own are
 inferred:
 
 ```csharp
-public class Pair<A> {
+public class Pair<A>
+{
     A left;
     public Pair(A initial) { left = initial; }
-    public A KeepLeft<B>(B other) { return left; }
+    public A KeepLeft<B>(B other) => left;
 }
 
 var pair = new Pair<String>("outer");
@@ -230,28 +239,33 @@ Not yet:
 ## 4.5 A worked example
 
 ```csharp
-public class List<T> {
+public class List<T>
+{
     T[] items;
     nuint count;
 
-    public List() {
+    public List()
+    {
         items = new T[2];
         count = 0;
     }
 
     public nuint Count => count;
 
-    public void Add(T item) {
-        if (count == items.Length) {
+    public void Add(T item)
+    {
+        if (count == items.Length)
+        {
             var bigger = new T[count * 2];
-            for (nuint i = 0; i < count; i++) { bigger[i] = items[i]; }
+            for (nuint i = 0; i < count; i++)
+                bigger[i] = items[i];
             items = bigger;
         }
         items[count] = item;
         count++;
     }
 
-    public T At(nuint index) { return items[index]; }
+    public T At(nuint index) => items[index];
 }
 ```
 

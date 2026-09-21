@@ -22,19 +22,22 @@ import App.Math;
 extern "C" int printf(byte* format, ...);
 
 // A value type. Copied by assignment, laid out exactly like the C struct.
-public struct Point {
+public struct Point
+{
     public double X;
     public double Y;
 
-    public double Length2() { return X * X + Y * Y; }
+    public double Length2() => X * X + Y * Y;
 }
 
 // A reference type. Heap allocated, reference counted, destroyed at zero.
-public class Buffer {
+public class Buffer
+{
     byte* data;
     nuint length;
 
-    public Buffer(nuint n) {
+    public Buffer(nuint n)
+    {
         data = Allocate(n);
         length = n;
     }
@@ -45,7 +48,8 @@ public class Buffer {
 }
 
 // Callable from C as plain `sl_scale`.
-export "C" Point sl_scale(Point p, double factor) {
+export "C" Point sl_scale(Point p, double factor)
+{
     Point result;
     result.X = p.X * factor;
     result.Y = p.Y * factor;
@@ -60,14 +64,17 @@ room for the widest case, with the payloads overlapping — so nothing allocates
 and `Shape` below is 24 bytes rather than 32.
 
 ```csharp
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
 }
 
-double Area(Shape shape) {
-    switch (shape) {
+double Area(Shape shape)
+{
+    switch (shape)
+    {
         case Circle c: return 3.14159 * c.Radius * c.Radius;
         case Rect r:   return r.Width * r.Height;
         case Empty:    return 0.0;
@@ -98,7 +105,8 @@ by the time the payload is read — so `is` puts what a test found under a name,
 evaluating the thing tested once:
 
 ```csharp
-if (node.Payload is Circle c) { return c.Radius; }
+if (node.Payload is Circle c)
+    return c.Radius;
 ```
 
 Reference counting asks the tag too. A case may hold a `String`, a class or an
@@ -113,7 +121,8 @@ return type, and the compiler will not let the answer be read before the
 question is asked.
 
 ```csharp
-Result<Config, IOError> Load(String path) {
+Result<Config, IOError> Load(String path)
+{
     var text = File.ReadAllText(path);
     if (!text.Ok) { return Fail(text.Error); }     // now the rest holds a value
     return Ok(Parse(text.Value));
@@ -139,7 +148,8 @@ A caller that would rather carry on writes `ValueOr(fallback)` and needs no
 check at all.
 
 ```csharp
-public Result<List<String>, IOError> ReadAllLines(String path) {
+public Result<List<String>, IOError> ReadAllLines(String path)
+{
     return Ok(IO.SplitLines(try ReadAllText(path)));
 }
 ```
@@ -228,7 +238,8 @@ means: `(char32)c` for the character, `(long)c` for the number.
 var numbers = new int[5];
 numbers[2] = 9;                     // bounds checked, unsigned compare
 
-public class Box<T> {
+public class Box<T>
+{
     T value;
     public Box(T initial) { value = initial; }
     public T Value => value;
@@ -251,10 +262,10 @@ public class Money : IComparable<Money> { ... }
 T Largest<T>(T[] values) where T : IComparable<T> { ... }
 public class Ranked<T> where T : IComparable<T>, IDescribable { ... }
 
-T Fresh<T>(T old) where T : new() { return new T(); }
-T Copied<T>(T value) where T : struct { return value; }
-String Says<T>(T animal) where T : Animal { return animal.Says(); }
-String Both<T, U>(T a, U b) where T : U where U : INamed { return b.Name; }
+T Fresh<T>(T old) where T : new() => new T();
+T Copied<T>(T value) where T : struct => value;
+String Says<T>(T animal) where T : Animal => animal.Says();
+String Both<T, U>(T a, U b) where T : U where U : INamed => b.Name;
 ```
 
 `new()` means a **class** here, unlike C#: `new` allocates, and a struct is
@@ -293,7 +304,8 @@ array the way any struct field holds a reference. **A slice cannot dangle**: wha
 it points into is alive for as long as it is.
 
 ```csharp
-Trace[:] Middle() {
+Trace[:] Middle()
+{
     var traces = new Trace[3];
     ...
     return traces[1:2];           // the array outlives the function
@@ -313,7 +325,8 @@ what is implemented.
 ```csharp
 import Standard.Collections;
 
-public class Money : IComparable<Money>, IEquatable<Money> {
+public class Money : IComparable<Money>, IEquatable<Money>
+{
     public int  CompareTo(Money other) { ... }
     public bool EqualTo(Money other)   { ... }
 }
@@ -335,7 +348,8 @@ var ages = new Dictionary<String, int>();
 ages["ada"] = 36;
 ages["grace"] = None;                   // None removes
 
-if (ages["ada"] is Some found) { Use(found.Value); }
+if (ages["ada"] is Some found)
+    Use(found.Value);
 int guess = ages["nobody"].ValueOr(0);
 
 var numbers = new List<int>();
@@ -360,7 +374,7 @@ storage and may write it; `in` passes the same storage and promises not to.
 
 ```csharp
 void Bump(ref int n) { n++; }
-double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
+double LengthSquared(in Point p) => p.X * p.X + p.Y * p.Y;
 
 int count = 1;
 Bump(ref count);              // count is 2
@@ -392,7 +406,8 @@ public attribute JsonName { String Name; }
 public attribute JsonIgnore { }
 
 [Reflect]
-public class Person {
+public class Person
+{
     [JsonName("full_name")] public String Name;
     [JsonName("age")]       public int    Years;
                             public bool   Active;
@@ -405,11 +420,14 @@ public class Person {
 reflected type:
 
 ```csharp
-public String ToJson<T>(T value) {
+public String ToJson<T>(T value)
+{
     var type = typeof(T);
-    for (nuint i = 0; i < type.FieldCount; i++) {
+    for (nuint i = 0; i < type.FieldCount; i++)
+    {
         var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore")) { continue; }
+        if (field.Has("JsonIgnore"))
+            continue;
         ...
     }
 }
@@ -425,7 +443,8 @@ Types without `[Reflect]` emit nothing, and `typeof` on them is an error.
 ### Properties
 
 ```csharp
-public class Person {
+public class Person
+{
     public String Name { get; set; }         // automatic: the compiler owns the storage
     public int Visits { get; private set; }  // read anywhere, write in this module
     public int Id { get; }                   // set by a constructor, then fixed
@@ -449,7 +468,8 @@ Written out, an accessor names storage the type already has, with a block body
 or `=>` and an expression:
 
 ```csharp
-public int Fahrenheit {
+public int Fahrenheit
+{
     get { return celsius * 9 / 5 + 32; }
     set { celsius = (value - 32) * 5 / 9; }
 }
@@ -458,7 +478,8 @@ public int Fahrenheit {
 ### Statics
 
 ```csharp
-public class Small {
+public class Small
+{
     int value;
     static int made = 0;                           // mutable storage
 
@@ -468,7 +489,8 @@ public class Small {
     public static int Made { get { return made; } }
 }
 
-public static class Defaults {
+public static class Defaults
+{
     public static int Retries = 3;
 }
 
@@ -499,22 +521,25 @@ constructors.
 ### Operators and indexers
 
 ```csharp
-public struct Money {
+public struct Money
+{
     public long Cents;
 
     public static Money Of(long cents) { Money m; m.Cents = cents; return m; }
 
-    public static Money operator +(Money a, Money b) { return Of(a.Cents + b.Cents); }
-    public static Money operator *(long by, Money a) { return Of(a.Cents * by); }
+    public static Money operator +(Money a, Money b) => Of(a.Cents + b.Cents);
+    public static Money operator *(long by, Money a) => Of(a.Cents * by);
 
-    public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
-    public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
+    public static bool operator ==(Money a, Money b) => a.Cents == b.Cents;
+    public static bool operator !=(Money a, Money b) => a.Cents != b.Cents;
 }
 
-public class Grid {
+public class Grid
+{
     int[] cells;
 
-    public int this[nuint at] {
+    public int this[nuint at]
+    {
         get { return cells[at]; }
         set { cells[at] = value; }
     }
@@ -539,7 +564,8 @@ not overloaded separately either: `a += b` is `a = a + b` and picks up whatever
 ### Inheritance
 
 ```csharp
-public abstract class Shape {
+public abstract class Shape
+{
     protected int sides;
 
     Shape(int howMany) { sides = howMany; }
@@ -548,19 +574,22 @@ public abstract class Shape {
     public virtual String Name => "shape";
 }
 
-public class Polygon : Shape {
+public class Polygon : Shape
+{
     double width;
 
-    Polygon(int howMany, double w) {
+    Polygon(int howMany, double w)
+    {
         base(howMany);                  // the first statement, always
         width = w;
     }
 
-    public override double Area() { return width * width; }
+    public override double Area() => width * width;
     public override String Name => "polygon";
 }
 
-public sealed class Square : Polygon {
+public sealed class Square : Polygon
+{
     Square(double side) { base(4, side); }
 
     public sealed override String Name => "square";
@@ -569,7 +598,8 @@ public sealed class Square : Polygon {
 Shape shape = new Square(3.0);
 String name = shape.Name;               // "square" — three loads and a call
 
-if (shape is Square) {
+if (shape is Square)
+{
     Square square = (Square)shape;      // checked; there is no exception to throw
 }
 
@@ -602,21 +632,23 @@ has nothing to say it about.
 ### Interfaces
 
 ```csharp
-public interface IShape {
+public interface IShape
+{
     double Area();
     String Describe();
     String Name { get; }        // one vtable slot per accessor
 }
 
-public class Circle : IShape {
+public class Circle : IShape
+{
     double radius;
     public Circle(double r) { radius = r; }
-    public double Area() { return 3.14159 * radius * radius; }
-    public String Describe() { return "circle"; }
+    public double Area() => 3.14159 * radius * radius;
+    public String Describe() => "circle";
     public String Name { get; set; }
 }
 
-double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
+double TotalArea(IShape a, IShape b) => a.Area() + b.Area();
 ```
 
 An interface reference **is an ordinary object pointer** — the vtable is reached
@@ -701,7 +733,8 @@ field offset against what the target's C compiler makes of that header.
 A field may be some of the bits of its type.
 
 ```csharp
-public struct Header {
+public struct Header
+{
     public uint Version : 4;
     public uint Kind    : 4;
     public uint Length  : 24;
@@ -727,7 +760,8 @@ C's, and here for the reason `extern "C"` is here: a great many headers describe
 a value that is one of several things and record the choice somewhere else.
 
 ```csharp
-public union Word {
+public union Word
+{
     public int Signed;
     public uint Unsigned;
     public float Real;
@@ -744,8 +778,10 @@ belonged to the type outside, so an access path matches the one the header
 documents:
 
 ```csharp
-public struct SystemInfo {
-    public union {
+public struct SystemInfo
+{
+    public union
+    {
         public uint OemId;
         public struct { public ushort Architecture; public ushort Reserved; }
     }
@@ -809,7 +845,8 @@ the declarations**, spelled as Windows spells them:
 ```csharp
 import Win32.User32;
 
-long Procedure(HWND window, uint message, ulong wParam, long lParam) {
+long Procedure(HWND window, uint message, ulong wParam, long lParam)
+{
     if (message == WmDestroy) { PostQuitMessage(0); return 0; }
     return DefWindowProcW(window, message, wParam, lParam);
 }

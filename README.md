@@ -22,7 +22,8 @@ module Hello;
 
 extern "C" int puts(byte* text);
 
-int Main() {
+int Main()
+{
     puts("Hello from Stainless.");
     return 0;
 }
@@ -87,11 +88,12 @@ its relatives do exist, as in C#, because choosing between two platforms is a
 different question from finding a declaration.
 
 ```csharp
-int Main() {
+int Main()
+{
     return Later();     // fine; Later is declared below
 }
 
-int Later() { return 0; }
+int Later() => 0;
 ```
 
 Modules work like C# namespaces. Every file names its own with `module
@@ -107,10 +109,10 @@ clang. Startup cost is a C program's startup cost.
 
 **3. ARC, not GC.** `class` types are reference counted and destroyed
 deterministically. No collector, no pauses, no tracing thread — the entire
-runtime is [sixteen small C files](runtime/): reference counting, text, UTF-16,
-a string builder, arrays, reflection metadata, console output, threads,
-ordering and hashing, files, sockets, processes, the environment, time, random
-numbers and COM.
+runtime is [fourteen small C files](runtime/): reference counting, text, UTF-16,
+arrays, reflection metadata, console output, threads, files, sockets,
+processes, the program's arguments, time, random numbers and COM. Everything
+else the standard library does is written in Stainless.
 
 **4. C and C++ ABI compatible.** A `struct` of plain data *is* a C struct, byte
 for byte. `extern "C"` calls into C and `export "C"` exposes functions back,
@@ -133,20 +135,23 @@ linker instead of an assembly loader.
 module App.Shapes;
 
 // A value type. Copied by assignment, laid out exactly like the C struct.
-public struct Point {
+public struct Point
+{
     public double X;
     public double Y;
 }
 
 // A value that is exactly one of its cases, and says which. 24 bytes, not 32:
 // the payloads overlap, and nothing allocates.
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
 }
 
-double Area(Shape shape) {
+double Area(Shape shape)
+{
     switch (shape) {                      // covers every case, so no 'default'
         case Circle c: return 3.14159 * c.Radius * c.Radius;
         case Rect r:   return r.Width * r.Height;
@@ -156,12 +161,14 @@ double Area(Shape shape) {
 
 // No 'throw' and no unwinding. A function that can fail says so, and the
 // answer cannot be read before the question is asked.
-Result<Config, IOError> Load(String path) {
+Result<Config, IOError> Load(String path)
+{
     return Ok(Parse(try File.ReadAllText(path)));
 }
 
 // Callable from C as plain 'sl_scale'.
-export "C" Point sl_scale(Point p, double factor) {
+export "C" Point sl_scale(Point p, double factor)
+{
     Point result;
     result.X = p.X * factor;
     result.Y = p.Y * factor;
@@ -184,8 +191,8 @@ Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 
 ```
 dotnet build Stainless.slnx
-dotnet run --project tests/Stainless.Tests      # 352 end-to-end tests
-dotnet test tests/Stainless.UnitTests           # 1,337 compiler unit tests
+dotnet run --project tests/Stainless.Tests      # 367 end-to-end tests
+dotnet test tests/Stainless.UnitTests           # 1,374 compiler unit tests
 ```
 
 Then run something:

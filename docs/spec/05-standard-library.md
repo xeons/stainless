@@ -75,7 +75,8 @@ import Standard.Threading;
 static readonly Mutex<List<String>> Registry =
     new Mutex<List<String>>(new List<String>());
 
-void Record(String name) {
+void Record(String name)
+{
     var guard = Registry.Lock();
     guard.Value.Add(name);
 }                                   // ~Guard() unlocks, including on a return
@@ -157,7 +158,8 @@ public interface IHashable         { nuint HashCode(); }
 
 public interface IReadOnlyList<T>  { nuint Count { get; } T At(nuint index); }
 
-public interface IList<T> : IReadOnlyList<T> {
+public interface IList<T> : IReadOnlyList<T>
+{
     void Add(T item);
     void Set(nuint index, T item);
     void Clear();
@@ -215,7 +217,8 @@ between a value to return and a reason to stop. An indexer returning `TValue` wo
 have to stop, and `map[key]` carries no verb to warn anyone that it might.
 
 ```csharp
-if (settings["timeout"] is Some found) { Use(found.Value); }
+if (settings["timeout"] is Some found)
+    Use(found.Value);
 int port = settings["port"].ValueOr(8080);
 ```
 
@@ -275,7 +278,8 @@ var first = line.AddLast("a");
 line.AddLast("c");
 line.InsertAfter(first, "b");
 
-for (nint at = line.First(); at >= 0; at = line.After(at)) {
+for (nint at = line.First(); at >= 0; at = line.After(at))
+{
     Console.WriteLine(line.ValueAt(at));
 }
 ```
@@ -301,7 +305,8 @@ constrained to what it actually needs:
 ```csharp
 import Standard.Collections;
 
-public class Money : IComparable<Money>, IEquatable<Money> {
+public class Money : IComparable<Money>, IEquatable<Money>
+{
     int cents;
     public int CompareTo(Money other) { ... }
     public bool EqualTo(Money other)  { ... }
@@ -397,7 +402,8 @@ other, and now that `out` exists neither has to pretend otherwise.
 **A program reads its command line through `Main`.**
 
 ```csharp
-int Main(String[] args) {
+int Main(String[] args)
+{
     if (args.Length < 1u) { Console.WriteError("usage: wc <file>"); return 2; }
     ...
 }
@@ -485,13 +491,15 @@ rounding C# uses by default.
 import Standard.Concurrent;
 
 var work = new ConcurrentQueue<int>();
-parallel {
+parallel
+{
     spawn Fill(work, 0, 500);
     spawn Fill(work, 500, 1000);
 }
 
 var got = work.TryDequeue();
-if (got.Ok) { Console.WriteLine(Text.FromInteger(got.Value)); }
+if (got.Ok)
+    Console.WriteLine(Text.FromInteger(got.Value));
 ```
 
 `ConcurrentQueue<T>`, `ConcurrentStack<T>`, `ConcurrentDictionary<TKey, TValue>` and
@@ -591,7 +599,8 @@ else.
 
 ```csharp
 var done = try Run("git", ["rev-parse", "HEAD"]);
-if (done.Ok()) { Console.WriteLine(done.Output.Trim()); }
+if (done.Ok())
+    Console.WriteLine(done.Output.Trim());
 ```
 
 Running another program, on both platforms, with the same answers.
@@ -643,7 +652,8 @@ where a program can act on it:
 
 ```csharp
 Signals.Watch();
-while (!Signals.Interrupted) { DoAPieceOfWork(); }
+while (!Signals.Interrupted)
+    DoAPieceOfWork();
 ```
 
 ## 5.10 `Standard.Json` and `Standard.Xml`
@@ -657,7 +667,8 @@ an `XmlNode`. Reading the wrong case is a compile error rather than a null:
 ```csharp
 var parsed = try Json.Parse(text);
 
-switch (parsed) {
+switch (parsed)
+{
     case Object held: Console.WriteLine(Json.TextOr(held.Members.Find("name"), "?")); break;
     default: break;
 }
@@ -734,7 +745,8 @@ A picture in memory: read from a PNG, drawn on, written back.
 
 ```csharp
 var loaded = Image.FromFile("logo.png");
-if (!loaded.Ok) { return; }
+if (!loaded.Ok)
+    return;
 
 var logo = loaded.Value;
 logo.FillRectangle(Rgba.Rgb(200, 30, 30), 8, 8, 64, 24);

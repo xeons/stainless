@@ -32,4 +32,6 @@ inherits=square:9:9:true
 literals=4 beta 9 2 60
 lookup=36:0:1:1:2:8080-1
 numbers=3.141592653589793:0.1:60:round-trips
+records=9 equal one widget 1.5
+lowercase=Hello, Stainless!
 done

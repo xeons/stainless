@@ -104,7 +104,8 @@ produces is a declaration's storage rather than the value of an expression.
 ## 9.1 `switch`
 
 ```csharp
-switch (level) {
+switch (level)
+{
     case Level.Low:     return "low";
     case Level.Warning: return "warning";
     case Level.Severe:  return "severe";
@@ -124,7 +125,8 @@ kind that may be exhaustive, and then needs no `default`; it is also the one
 where a label may bind what the case carries.
 
 ```csharp
-switch (shape) {
+switch (shape)
+{
     case Circle c: return c.Radius;     // binds the payload
     case Rect:     return shape.Width;  // narrows the switched value
     case Empty:    return 0.0;
@@ -150,8 +152,10 @@ leaves the switch and not the loop. With no enclosing loop, `continue` in a
 switch has nothing to continue and is rejected.
 
 ```csharp
-for (nuint i = 0; i < values.Length; i++) {
-    switch (values[i]) {
+for (nuint i = 0; i < values.Length; i++)
+{
+    switch (values[i])
+    {
         case -1: continue;      // next iteration, skipping the rest of the body
         case 0:  break;         // out of the switch, into the rest of the body
         default: total = total + values[i]; break;
@@ -184,7 +188,8 @@ switch a jump table; the rest ask something a constant cannot.
 | and a condition on any of them | `case Circle c when c.Radius > 10.0:` |
 
 ```csharp
-switch (node) {
+switch (node)
+{
     case Leaf leaf when leaf.Value > 3: return "big leaf";
     case Leaf leaf:                     return "leaf";
     case Twig:                          return "twig";
@@ -216,8 +221,10 @@ switch that covers a case only under a `when` still needs the case or a
 ### 9.1.2 `switch` as an expression
 
 ```csharp
-String Describe(int n) {
-    return n switch {
+String Describe(int n)
+{
+    return n switch
+    {
         < 0     => "negative",
         0       => "zero",
         1 or 2  => "small",
@@ -225,8 +232,10 @@ String Describe(int n) {
     };
 }
 
-double Area(Shape shape) {
-    return shape switch {
+double Area(Shape shape)
+{
+    return shape switch
+    {
         Circle c => 3.14159 * c.Radius * c.Radius,
         Rect r   => r.Width * r.Height,
         Empty    => 0.0,
@@ -260,7 +269,8 @@ rather than into a copy of the rest.
 int left  = 0;
 int right = 0;
 
-parallel {
+parallel
+{
     left  = spawn Sum(values, 0, half);
     right = spawn Sum(values, half, count);
 }                       // every spawned job has finished here
@@ -293,8 +303,10 @@ A `spawn` may appear anywhere inside the block, including in a loop, and each
 one gets its own copy of the arguments:
 
 ```csharp
-parallel {
-    for (int i = 0; i < 8; i++) {
+parallel
+{
+    for (int i = 0; i < 8; i++)
+    {
         squares[i] = spawn Square(i);
     }
 }
@@ -306,7 +318,8 @@ it is written — open a fork-join scope — and the loop stays a loop with a
 modifier on it:
 
 ```csharp
-for parallel (nuint i = 0u; i < pixels.Length; i++) {
+for parallel (nuint i = 0u; i < pixels.Length; i++)
+{
     pixels[i] = Shade(pixels[i]);
 }
 ```
@@ -342,10 +355,12 @@ thing in both. Inside a type it is named `Type.Name` from outside and without
 the prefix from within, and a derived class sees what its base declared:
 
 ```csharp
-public sealed class Aes {
+public sealed class Aes
+{
     public const nuint BlockSize = 16u;
 
-    void AddRoundKey(byte[] block, nuint round) {
+    void AddRoundKey(byte[] block, nuint round)
+    {
         nuint at = round * BlockSize;           // no prefix inside the type
     }
 }
@@ -439,8 +454,10 @@ type that is not counted, so `static int Counter = 0;` is allowed and a
 ## 9.4 `foreach`
 
 ```csharp
-foreach (int n in numbers) { total = total + n; }
-foreach (var item in list) { Console.WriteLine(item.Name); }
+foreach (int n in numbers)
+    total = total + n;
+foreach (var item in list)
+    Console.WriteLine(item.Name);
 ```
 
 An **array** iterates by index, with no allocation and no dispatch. Anything
@@ -449,11 +466,13 @@ interface**, so a type can be iterated without `Standard.Collections` appearing
 anywhere in the program:
 
 ```csharp
-class Countdown {
-    public CountdownCursor GetEnumerator() { return new CountdownCursor(3); }
+class Countdown
+{
+    public CountdownCursor GetEnumerator() => new CountdownCursor(3);
 }
 
-class CountdownCursor {
+class CountdownCursor
+{
     public bool MoveNext() { ... }
     public int Current => ...;
 }
@@ -493,7 +512,8 @@ A `struct` is as safe as what is inside it, so one holding only primitives and
 `threadsafe` is a word on the declaration, and an **assertion, not a proof**:
 
 ```csharp
-threadsafe class Accumulator {
+threadsafe class Accumulator
+{
     AtomicLong total;
     public void Contribute(int amount) { total.Add(amount); }
 }
@@ -590,8 +610,10 @@ is the whole of what follows, which is what it looks like.
 ## 9.8 `default(T)`
 
 ```csharp
-T FirstOrNothing<T>(T[:] items) {
-    if (items.Length == 0u) { return default(T); }
+T FirstOrNothing<T>(T[:] items)
+{
+    if (items.Length == 0u)
+        return default(T);
     return items[0u];
 }
 ```
@@ -622,8 +644,10 @@ again", not "start over".
 ## 9.10 `goto`
 
 ```csharp
-for (int a = 0; a < n; a++) {
-    for (int b = 0; b < n; b++) {
+for (int a = 0; a < n; a++)
+{
+    for (int b = 0; b < n; b++)
+    {
         if (Found(a, b)) { answer = a; goto done; }
     }
 }

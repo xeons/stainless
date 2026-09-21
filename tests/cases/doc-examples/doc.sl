@@ -586,6 +586,43 @@ String Numbers()
     return built.ToText();
 }
 
+// --- spec 2.4.1 record, 2.4.2 with ---------------------------------------
+
+public record Point(int X, int Y);
+
+public record class Named(String Label, double Weight)
+{
+    public String Describe() { return Label + " " + Text.FromDouble(Weight); }
+}
+
+String Records()
+{
+    var point = new Point(3, 4);
+    var moved = point with { Y = 9 };
+    var copy = point with { };
+
+    var named = new Named("widget", 1.5);
+
+    var seen = new Dictionary<Point, String>();
+    seen.Set(new Point(1, 1), "one");
+
+    // A different object with the same values finds what the first put there.
+    String found = seen.GetOr(new Point(1, 1), "<missing>");
+
+    return Text.FromInteger((long)moved.Y) + " " +
+           (copy == point ? "equal" : "differs") + " " +
+           found + " " + named.Describe();
+}
+
+// --- spec 3, `string` ----------------------------------------------------
+
+String Lowercase()
+{
+    String message = "Hello, Stainless!";
+    string same = message;                  // `string` is the same type
+    return same;
+}
+
 int Main()
 {
     Record("first");
@@ -675,6 +712,8 @@ int Main()
     printf("literals=%s\n", Literals().ToPointer());
     printf("lookup=%s\n", Lookup().ToPointer());
     printf("numbers=%s\n", Numbers().ToPointer());
+    printf("records=%s\n", Records().ToPointer());
+    printf("lowercase=%s\n", Lowercase().ToPointer());
     printf("done\n");
     return 0;
 }

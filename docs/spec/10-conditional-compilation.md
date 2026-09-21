@@ -45,7 +45,7 @@ only.
 
 | Symbol | When |
 |---|---|
-| `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD` | the operating system — still the host's, since `--target` does not change it yet |
+| `WINDOWS`, `LINUX`, `MACOS`, `FREEBSD` | the operating system being built for, which `--target` does change; the host's when no target is named |
 | `UNIX` | any of the above but Windows |
 | `X64`, `ARM64`, `X86` | the architecture being built for, which `--target` does change |
 | `STAINLESS` | always |

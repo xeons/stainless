@@ -78,11 +78,12 @@ them. It is only each other they refuse.
 ## 2.2 `struct` — value type, C layout
 
 ```csharp
-public struct Point {
+public struct Point
+{
     public double X;
     public double Y;
 
-    public double LengthSquared() { return X * X + Y * Y; }
+    public double LengthSquared() => X * X + Y * Y;
 }
 ```
 
@@ -96,7 +97,8 @@ where the field after it begins.
 **A struct may also hold a reference**, and `Result<T, TError>` is the reason it may:
 
 ```csharp
-public struct Holder {
+public struct Holder
+{
     public String Text;
     public int Tag;
 }
@@ -185,7 +187,8 @@ the Stainless source does.
 ### 2.2.2 A type declared inside another
 
 ```csharp
-public struct Rect {
+public struct Rect
+{
     public struct Point { public int X; public int Y; }
 
     public Point TopLeft;          // the short name, from inside
@@ -216,7 +219,8 @@ instantiation — so a field of type `T` in it is a `T` that is not in scope. Sa
 what it holds, or take the parameter again:
 
 ```csharp
-public class Cache<T> {
+public class Cache<T>
+{
     public struct Entry { public nuint Age; }        // fine: mentions no T
 }
 ```
@@ -224,7 +228,8 @@ public class Cache<T> {
 ### 2.2.3 `(int, String)` — a tuple
 
 ```csharp
-(int, int) MinMax(int[:] numbers) {
+(int, int) MinMax(int[:] numbers)
+{
     ...
     return (low, high);
 }
@@ -320,7 +325,8 @@ offset against what the target's C compiler makes of it.
 A field may be some of the bits of its type rather than all of them.
 
 ```csharp
-public struct Header {
+public struct Header
+{
     public uint Version : 4;
     public uint Kind    : 4;
     public uint Length  : 24;
@@ -358,11 +364,13 @@ and a bit-field has not got one.
 ## 2.4 `class` — reference type, ARC managed
 
 ```csharp
-public class Buffer {
+public class Buffer
+{
     byte* data;
     nuint length;
 
-    public Buffer(nuint n) {
+    public Buffer(nuint n)
+    {
         data = Malloc(n);
         length = n;
     }
@@ -384,7 +392,8 @@ a count of 1.
 ### 2.4.1 A field with a value
 
 ```csharp
-public class Panel {
+public class Panel
+{
     public int Width = 80;
     public String Title = "untitled";
     public bool Visible { get; set; } = true;
@@ -453,32 +462,36 @@ A class may derive from **one** other class, written first in the list after the
 colon, before any interfaces:
 
 ```csharp
-public abstract class Shape : INamed {
+public abstract class Shape : INamed
+{
     protected int sides;
 
     Shape(int howMany) { sides = howMany; }
 
     public abstract double Area();
-    public virtual String Describe() { return Name() + " of " + Text.FromDouble(Area()); }
-    public virtual String Name() { return "shape"; }
+    public virtual String Describe() => Name() + " of " + Text.FromDouble(Area());
+    public virtual String Name() => "shape";
 }
 
-public class Polygon : Shape {
+public class Polygon : Shape
+{
     protected double width;
 
-    Polygon(int howMany, double w) {
+    Polygon(int howMany, double w)
+    {
         base(howMany);                      // first statement, always
         width = w;
     }
 
-    public override double Area() { return width * width; }
-    public override String Describe() { return "a " + base.Describe(); }
+    public override double Area() => width * width;
+    public override String Describe() => "a " + base.Describe();
 }
 
-public sealed class Square : Polygon {
+public sealed class Square : Polygon
+{
     Square(double side) { base(4, side); }
 
-    public sealed override String Name() { return "square"; }
+    public sealed override String Name() => "square";
 }
 ```
 
@@ -496,7 +509,8 @@ the methods, so an `abstract` property declares two abstract accessors and an
 does.
 
 ```csharp
-public abstract class Node {
+public abstract class Node
+{
     public abstract int    Weight { get; }
     public abstract String Tag    { get; set; }
 }
@@ -588,7 +602,8 @@ and the second pass would overwrite what the first had set. A ring of
 constructors that delegate to each other never builds anything, and is refused:
 
 ```csharp
-public class Pair {
+public class Pair
+{
     int a;
     int b;
 
@@ -635,7 +650,8 @@ is asked of the object:
 ```csharp
 Shape shape = new Square(3.0);
 
-if (shape is Square) {
+if (shape is Square)
+{
     Square square = (Square)shape;      // checked; aborts if it were not one
     ...
 }
@@ -653,7 +669,8 @@ is how the question is asked first.
 scope where the test succeeded:
 
 ```csharp
-if (shape is Square square) {
+if (shape is Square square)
+{
     ...                                 // 'square' is a Square here
 }
 ```
@@ -744,7 +761,7 @@ public record Point(int X, int Y);
 
 public record class Named(String Label, double Weight)
 {
-    public String Describe() { return Label + " " + Text.FromDouble(Weight); }
+    public String Describe() => Label + " " + Text.FromDouble(Weight);
 }
 ```
 
@@ -763,11 +780,11 @@ public class Point : IEquatable<Point>, IHashable
 
     public Point(int X, int Y) { this.X = X; this.Y = Y; }
 
-    public bool EqualTo(Point other) { return X.EqualTo(other.X) && Y.EqualTo(other.Y); }
-    public nuint HashCode()          { return X.HashCode() * 31u + Y.HashCode(); }
+    public bool EqualTo(Point other) => X.EqualTo(other.X) && Y.EqualTo(other.Y);
+    public nuint HashCode()          => X.HashCode() * 31u + Y.HashCode();
 
-    public static bool operator ==(Point left, Point right) { return left.EqualTo(right); }
-    public static bool operator !=(Point left, Point right) { return !left.EqualTo(right); }
+    public static bool operator ==(Point left, Point right) => left.EqualTo(right);
+    public static bool operator !=(Point left, Point right) => !left.EqualTo(right);
 }
 ```
 
@@ -877,11 +894,13 @@ running. Making one direction weak is the whole of the answer, and it is why
 the conversion is implicit: there is no second option to choose between.
 
 ```csharp
-class Child {
+class Child
+{
     public weak Parent? Owner;      // up, weakly
 }
 
-class Parent {
+class Parent
+{
     public Child? Kid;              // down, strongly
 }
 ```
@@ -895,7 +914,8 @@ it be used as the other, and nothing is emitted for the conversion:
 
 ```csharp
 Node? at = head;
-while (at != null) {
+while (at != null)
+{
     Print(at.Value);            // `at` is a Node here
     at = at.Next;               // and a Node? here, because a check said what
 }                               // it held, not what it may be given next
@@ -916,7 +936,8 @@ the same machinery and the same table:
 away, and, inside a loop, an assignment anywhere in the body does:
 
 ```csharp
-if (x != null) {
+if (x != null)
+{
     x = Next();
     x.Value                     // error[SL0248]: the proof was about the old value
 }
@@ -936,7 +957,8 @@ The other fix is `is` with a name ([§2.4.4](#244-is-as-and-casting-down)), whic
 names what came out of it:
 
 ```csharp
-if (node.Next is Node n) { return n.Value; }
+if (node.Next is Node n)
+    return n.Value;
 ```
 
 **A `weak C?` is never narrowed.** It may die between the check and the use,
@@ -949,7 +971,8 @@ only in what they refuse: an arrow says a pointer was expected, so writing one
 over a value is reported rather than quietly meaning the same thing.
 
 ```csharp
-int Sum(Point* p) {
+int Sum(Point* p)
+{
     return p->X + p->Y;             // and `p.X` means exactly this
 }
 ```
@@ -967,7 +990,8 @@ A `variant` is the choice between its cases. Each case has a name and the fields
 it carries, and a value is exactly one of them and says which.
 
 ```csharp
-public variant Shape {
+public variant Shape
+{
     Circle(double Radius);
     Rect(double Width, double Height);
     Empty;
@@ -1027,8 +1051,10 @@ for the reason given in [§2.8](#28-resultt-terror--how-a-function-fails).
 answers with a fallback needs no `switch`:
 
 ```csharp
-double RadiusOr(Shape shape, double fallback) {
-    if (shape.Circle) { return shape.Radius; }
+double RadiusOr(Shape shape, double fallback)
+{
+    if (shape.Circle)
+        return shape.Radius;
     return fallback;
 }
 ```
@@ -1041,7 +1067,8 @@ guard clause wants: `if (!shape.Circle) { return fallback; }`.
 about:
 
 ```csharp
-if (node.Payload is Circle c) { return c.Radius; }
+if (node.Payload is Circle c)
+    return c.Radius;
 ```
 
 A field or a call result carries no narrowing (SL0285), because either could be
@@ -1057,8 +1084,10 @@ question there.
 no `default` once they are all there:
 
 ```csharp
-double Area(Shape shape) {
-    switch (shape) {
+double Area(Shape shape)
+{
+    switch (shape)
+    {
         case Circle c: return 3.14159 * c.Radius * c.Radius;
         case Rect r:   return r.Width * r.Height;
         case Empty:    return 0.0;
@@ -1110,7 +1139,8 @@ choice somewhere else — a tag in the enclosing struct, a length, a protocol �
 and none of them can be bound without a type of this shape.
 
 ```csharp
-public union Word {
+public union Word
+{
     public int Signed;
     public uint Unsigned;
     public float Real;
@@ -1141,7 +1171,8 @@ The usual C shape — a tag and a union together — works as it reads:
 ```csharp
 public enum Kind : int { AsInt = 0, AsReal = 1 }
 
-public struct Tagged {
+public struct Tagged
+{
     public Kind Which;
     public Word Value;
 }
@@ -1161,10 +1192,13 @@ Windows headers lean on it: `SYSTEM_INFO`, `OVERLAPPED` and `LARGE_INTEGER` all
 begin with one.
 
 ```csharp
-public struct SystemInfo {
-    public union {
+public struct SystemInfo
+{
+    public union
+    {
         public uint OemId;
-        public struct {
+        public struct
+        {
             public ushort Architecture;
             public ushort Reserved;
         }
@@ -1203,9 +1237,11 @@ never mentioned it is the opposite of what the rest of the language does.
 A function that can fail says so in its return type instead:
 
 ```csharp
-Result<Config, IOError> Load(String path) {
+Result<Config, IOError> Load(String path)
+{
     var text = File.ReadAllText(path);
-    if (!text.Ok) { return Fail(text.Error); }
+    if (!text.Ok)
+        return Fail(text.Error);
     return Ok(Parse(text.Value));
 }
 ```
@@ -1214,7 +1250,8 @@ Result<Config, IOError> Load(String path) {
 is imported everywhere:
 
 ```csharp
-public variant Result<T, TError> {
+public variant Result<T, TError>
+{
     Ok(T Value);
     Fail(TError Error);
 }
@@ -1235,7 +1272,8 @@ and says nothing about `TError`. So the compiler reads the type being returned,
 assigned into, or passed as an argument, exactly as it does for a lambda:
 
 ```csharp
-Result<int, Why> Doubled(int n) {
+Result<int, Why> Doubled(int n)
+{
     if (n < 0) { return Fail(Why.TooSmall); }   // TError from the return type
     return Ok(n * 2);                           // T from the return type
 }
@@ -1273,7 +1311,8 @@ everything after it.
 
 ```csharp
 var raw = File.ReadAllText(path);
-if (!raw.Ok) { return Fail(raw.Error); }
+if (!raw.Ok)
+    return Fail(raw.Error);
 Console.Write(raw.Value);                    // proved by the line above
 ```
 
@@ -1282,7 +1321,8 @@ assignment to it, and, inside a loop, an assignment anywhere in the body:
 
 ```csharp
 var r = Get();
-if (!r.Ok) { return 0; }
+if (!r.Ok)
+    return 0;
 r = Get();
 return r.Value;               // error[SL0286]: the proof was about the old value
 ```
@@ -1320,7 +1360,8 @@ anything at all.
 **`try` passes a failure to the caller.**
 
 ```csharp
-public Result<List<String>, IOError> ReadAllLines(String path) {
+public Result<List<String>, IOError> ReadAllLines(String path)
+{
     return Ok(IO.SplitLines(try ReadAllText(path)));
 }
 ```
@@ -1361,7 +1402,8 @@ agreeing to read that as "not there".
 `Optional<T>` is that said properly, and it is an ordinary variant:
 
 ```csharp
-public variant Optional<T> {
+public variant Optional<T>
+{
     None;
     Some(T Value);
 }
@@ -1372,14 +1414,16 @@ only where the case has been established, and every rule it appears to have is
 a rule variants have:
 
 ```csharp
-if (found.Some) { return values[found.Value]; }
+if (found.Some)
+    return values[found.Value];
 return fallback;
 ```
 
 A call result carries no narrowing, so a lookup is read with a name:
 
 ```csharp
-if (map.IndexOf(key) is Some found) { return values[found.Value]; }
+if (map.IndexOf(key) is Some found)
+    return values[found.Value];
 return fallback;
 ```
 
@@ -1477,23 +1521,25 @@ there is nowhere else to put it.
 ## 2.10 `interface` — a contract, dispatched dynamically
 
 ```csharp
-public interface IShape {
+public interface IShape
+{
     double Area();
     String Describe();
     String Name { get; }
 }
 
-public class Circle : IShape {
+public class Circle : IShape
+{
     double radius;
 
     public Circle(double r) { radius = r; }
 
-    public double Area() { return 3.14159 * radius * radius; }
-    public String Describe() { return "circle"; }
+    public double Area() => 3.14159 * radius * radius;
+    public String Describe() => "circle";
     public String Name { get; set; }
 }
 
-double TotalArea(IShape a, IShape b) { return a.Area() + b.Area(); }
+double TotalArea(IShape a, IShape b) => a.Area() + b.Area();
 ```
 
 An interface declares method and property signatures and nothing else: no
@@ -1541,7 +1587,8 @@ each interface it implements gets its own table:
 ```csharp
 public interface IEq<T> { bool Same(T other); }
 
-public class Both : IEq<int>, IEq<String> {
+public class Both : IEq<int>, IEq<String>
+{
     public bool Same(int other)    { ... }
     public bool Same(String other) { ... }
 }
@@ -1559,7 +1606,8 @@ interface, since that is one slot.
 
 ```csharp
 var numbers = new int[5];
-for (int i = 0; i < (int)numbers.Length; i = i + 1) {
+for (int i = 0; i < (int)numbers.Length; i++)
+{
     numbers[i] = i * i;
 }
 ```
@@ -1623,7 +1671,8 @@ references retains every one — `[a, b]` outlives the locals `a` and `b`.
 ### 2.11.2 `T[N]` — an inline array
 
 ```csharp
-public struct FindData {
+public struct FindData
+{
     public uint            Attributes;
     public ushort[260]     FileName;
     public ushort[14]      AlternateName;
@@ -1706,7 +1755,8 @@ way any struct field holds a reference: **a slice cannot dangle**, because what
 it points into is alive for as long as it is.
 
 ```csharp
-Trace[:] Middle() {
+Trace[:] Middle()
+{
     var traces = new Trace[3];
     ...
     return traces[1:2];       // the array outlives the function
@@ -1774,7 +1824,8 @@ is not, because adding two colours means nothing.
 
 ```csharp
 [Flags]
-public enum Access : byte {
+public enum Access : byte
+{
     None = 0, Read = 1, Write = 2, Execute = 4, All = 7,
 }
 
@@ -1802,7 +1853,7 @@ into, unlike `[Reflect]`, which comes with the subsystem it belongs to.
 ```csharp
 public delegate int Transform(int value);
 
-int Double(int value) { return value * 2; }
+int Double(int value) => value * 2;
 
 Transform t = Double;
 int result = t(21);                     // 42
@@ -1825,8 +1876,8 @@ Which overload a bare name refers to is decided by the delegate it is stored
 in, since that is the only context a name on its own has:
 
 ```csharp
-int  Pick(int value)    { return value + 1; }
-double Pick(double value) { return value + 1.0; }
+int  Pick(int value)    => value + 1;
+double Pick(double value) => value + 1.0;
 
 Transform picked = Pick;      // the int one
 ```
@@ -1911,7 +1962,8 @@ which was written for closures.
 **The receiver is kept alive** for as long as the closure is:
 
 ```csharp
-Notify Escaping() {
+Notify Escaping()
+{
     var counter = new Counter();
     return counter.Add;            // the closure holds the counter
 }
@@ -1993,7 +2045,8 @@ something at the head of a declaration and is an ordinary name everywhere else.
 ```csharp
 public closure void ChangeHandler(Source sender, Change what);
 
-public class Source {
+public class Source
+{
     public event ChangeHandler Changed;
 
     public void Announce(int code) { Changed(this, new Change(code)); }
@@ -2050,7 +2103,8 @@ subscribers that were there when it began run, none of them twice, and the next
 raise sees the change.
 
 ```csharp
-public void Once(Source sender, Change what) {
+public void Once(Source sender, Change what)
+{
     source.Changed -= this.Once;       // safe: this raise still finishes
 }
 ```
@@ -2136,7 +2190,8 @@ copy and buys the thing that matters: a closure may outlive the scope that built
 it, with no lifetime question to answer.
 
 ```csharp
-ITransform MakeAdder(int amount) {
+ITransform MakeAdder(int amount)
+{
     return value => value + amount;     // fine; `amount` was copied
 }
 ```
@@ -2147,10 +2202,11 @@ is captured differs between them, which is the one part of this section to read
 twice:
 
 ```csharp
-class Scaler {
+class Scaler
+{
     public int Factor;
 
-    int Triple(int n) { return n * 3; }
+    int Triple(int n) => n * 3;
 
     public ITransform ByField()  { return value => value * Factor; }
     public ITransform ByThis()   { return value => value * this.Factor; }
@@ -2186,17 +2242,20 @@ from a lambda; pass what the lambda needs as a parameter instead.
 the rule above reads like the opposite of itself at the one place it matters:
 
 ```csharp
-class Peer {
+class Peer
+{
     bool busy;
 
-    public Peer() {
+    public Peer()
+    {
         OnChanged(() => {
             if (busy) { return; }       // SL0610: `busy` is a copy
             Report();
         });
     }
 
-    public void Set(int value) {
+    public void Set(int value)
+    {
         busy = true;                    // this is what makes it a warning
         Write(value);
         busy = false;
@@ -2216,7 +2275,7 @@ answer — `if (this.busy)`. A method that reads the field does the same thing
 for the same reason, and reads better where the test is worth a name:
 
 ```csharp
-bool Busy() { return busy; }
+bool Busy() => busy;
 ```
 
 **Capturing `this` keeps the object alive**, which makes an object that stores

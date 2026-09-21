@@ -106,7 +106,8 @@ than merely fast. A position the *caller* invents is its own business, and
 `CodePointAt` with `NextCodePoint` is the way to walk:
 
 ```csharp
-for (nuint at = 0; at < s.ByteLength(); at = s.NextCodePoint(at)) {
+for (nuint at = 0; at < s.ByteLength(); at = s.NextCodePoint(at))
+{
     char32 c = s.CodePointAt(at);
 }
 ```
@@ -139,7 +140,10 @@ is a difference nobody looks for.
 `Contains`) and edits (`Insert`, `Remove`, `Truncate`, `SetByteAt`,
 `ReplaceFirst`, `ReplaceAll`). Unlike `String` it hands out no pointer: its
 bytes are a growable allocation that moves, so a `byte*` into it would dangle at
-the next append. Reading goes through the runtime a byte at a time instead.
+the next append. Reading is a call per byte instead.
+
+`StringBuilder` is itself written in Stainless, in `stdlib/Text.sl`: three
+fields and a destructor over a buffer it grows by doubling.
 
 `Standard.Console` is *not* automatic and provides `Write`, `WriteLine` and
 `WriteError`.
@@ -225,7 +229,8 @@ wide call that failed leaves the caller holding one.
 
 ```csharp
 var builder = new StringBuilder();
-for (int i = 0; i < 5; i = i + 1) {
+for (int i = 0; i < 5; i++)
+{
     builder.AppendInteger(i);
     builder.Append(",");
 }
@@ -318,7 +323,8 @@ values that have to leave as them.
 import Standard.Convert;
 
 var port = Convert.ToInt(text);
-switch (port) {
+switch (port)
+{
     case Ok ok:  Listen(ok.Value); break;
     case Fail:   Complain(); break;
 }

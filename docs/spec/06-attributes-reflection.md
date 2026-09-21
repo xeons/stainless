@@ -77,7 +77,8 @@ statics either — there is no instance to read one from.
 
 ```csharp
 [Reflect]
-public class Person {
+public class Person
+{
     [JsonName("full_name")] public String Name;
     [JsonName("age")]       public int    Years;
     [JsonIgnore]            public int    Internal;
@@ -130,13 +131,16 @@ Because `T` is concrete by the time a generic is compiled, `typeof(T)` inside
 one is still a constant:
 
 ```csharp
-public String ToJson<T>(T value) {
+public String ToJson<T>(T value)
+{
     var type = typeof(T);
     var text = new StringBuilder();
     ...
-    for (nuint i = 0; i < type.FieldCount; i++) {
+    for (nuint i = 0; i < type.FieldCount; i++)
+    {
         var field = type.FieldAt(i);
-        if (field.Has("JsonIgnore")) { continue; }
+        if (field.Has("JsonIgnore"))
+            continue;
         ...
     }
 }
@@ -197,7 +201,8 @@ the other direction, and it is a search:
 
 ```csharp
 var type = FindType("App.Button");        // the qualified name
-if (type.Exists) {
+if (type.Exists)
+{
     byte* made = Make(type);
     SetInteger(made, type.FindProperty("Left"), 40);
 }
@@ -272,7 +277,8 @@ one possible without knowing `T` at compile time:
 ```csharp
 byte* array = Reflection.ReadArray(raw, field);
 
-for (nuint i = 0u; i < Reflection.ArrayLength(array); i++) {
+for (nuint i = 0u; i < Reflection.ArrayLength(array); i++)
+{
     byte* at = Reflection.ElementAt(array, field, i);
     Console.WriteLine(Reflection.ReadTextAt(at));
 }

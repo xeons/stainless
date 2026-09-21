@@ -41,7 +41,8 @@ String Decorate(String text) { ... }        // not public
 // Catalog/Subscriptions.sl
 module Shop.Catalog;
 
-public class Subscription {
+public class Subscription
+{
     public String Label() { return Decorate(name); }   // sees it; same module
 }
 ```
@@ -59,11 +60,13 @@ A type may be declared more than once inside its own module, and the
 declarations are one type:
 
 ```csharp
-public class Shape {
+public class Shape
+{
     public int Sides;                       // the shape
 }
 
-public class Shape {
+public class Shape
+{
     public int Corners() { return Sides; }  // and the behaviour
 }
 ```
@@ -212,11 +215,12 @@ Not within a file, and not across them. The compiler resolves every name in the
 program before checking any body, so these are all fine:
 
 ```csharp
-int Main() {
+int Main()
+{
     return Later();          // declared below
 }
 
-int Later() { return 0; }
+int Later() => 0;
 ```
 
 A module may be compiled before the module it depends on, and files may be

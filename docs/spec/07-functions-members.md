@@ -51,10 +51,11 @@ functions. A return type alone does not distinguish two of them, because a call
 does not always say what it wants back:
 
 ```csharp
-class Printer {
-    public String Show(int n)    { return "int"; }
-    public String Show(String s) { return "text"; }
-    public String Show(double d) { return "double"; }
+class Printer
+{
+    public String Show(int n)    => "int";
+    public String Show(String s) => "text";
+    public String Show(double d) => "double";
 }
 ```
 
@@ -188,7 +189,7 @@ what separates them is who may write to it and who must.
 
 ```csharp
 void Bump(ref int n) { n++; }
-double LengthSquared(in Point p) { return p.X * p.X + p.Y * p.Y; }
+double LengthSquared(in Point p) => p.X * p.X + p.Y * p.Y;
 
 int count = 1;
 Bump(ref count);              // count is 2
@@ -238,7 +239,8 @@ is the symbol a C++ `void geometry::scale(double*, int)` calls.
 ### 7.2.1 `out`
 
 ```csharp
-bool TryHalve(int n, out int half) {
+bool TryHalve(int n, out int half)
+{
     if (n % 2 != 0) { half = 0; return false; }
     half = n / 2;
     return true;
@@ -317,7 +319,8 @@ constructor rather than a declaration, so there is nothing for a name to match.
 ## 7.3 Properties
 
 ```csharp
-public class Person {
+public class Person
+{
     public String Name { get; set; }         // automatic: the compiler owns the storage
     public int Visits { get; private set; }  // read anywhere, write in this module
     public int Id { get; }                   // set by a constructor, then fixed
@@ -341,15 +344,18 @@ because the property is that name.
 **Written accessors own nothing.**
 
 ```csharp
-public class Thermostat {
+public class Thermostat
+{
     int celsius;
 
-    public int Fahrenheit {
+    public int Fahrenheit
+    {
         get { return celsius * 9 / 5 + 32; }
         set { celsius = (value - 32) * 5 / 9; }
     }
 
-    public int Kelvin {
+    public int Kelvin
+    {
         get => celsius + 273;
         set => celsius = value - 273;
     }
@@ -380,7 +386,8 @@ property has nothing to assign to at all, and the error says so.
 **On an interface**
 
 ```csharp
-public interface INamed {
+public interface INamed
+{
     String Name { get; }
     int Rank { get; set; }
 }
@@ -406,21 +413,23 @@ automatic or written makes no difference to the caller.
 ## 7.4 Operators
 
 ```csharp
-public struct Money {
+public struct Money
+{
     public long Cents;
 
-    public static Money Of(long cents) {
+    public static Money Of(long cents)
+    {
         Money made;
         made.Cents = cents;
         return made;
     }
 
-    public static Money operator +(Money a, Money b) { return Of(a.Cents + b.Cents); }
-    public static Money operator *(Money a, long by)  { return Of(a.Cents * by); }
-    public static Money operator *(long by, Money a)  { return Of(a.Cents * by); }
+    public static Money operator +(Money a, Money b) => Of(a.Cents + b.Cents);
+    public static Money operator *(Money a, long by)  => Of(a.Cents * by);
+    public static Money operator *(long by, Money a)  => Of(a.Cents * by);
 
-    public static bool operator ==(Money a, Money b) { return a.Cents == b.Cents; }
-    public static bool operator !=(Money a, Money b) { return a.Cents != b.Cents; }
+    public static bool operator ==(Money a, Money b) => a.Cents == b.Cents;
+    public static bool operator !=(Money a, Money b) => a.Cents != b.Cents;
 }
 ```
 
@@ -478,11 +487,12 @@ error at some type with no `+`, reported against the use that asked for it.
 ### 7.4.1 `implicit` and `explicit operator`
 
 ```csharp
-public struct Money {
+public struct Money
+{
     public long Cents;
 
-    public static implicit operator Money(long cents) { return Of(cents); }
-    public static explicit operator long(Money value) { return value.Cents; }
+    public static implicit operator Money(long cents) => Of(cents);
+    public static explicit operator long(Money value) => value.Cents;
 }
 
 Money price = 250L;             // implicit: nothing was lost
@@ -536,10 +546,12 @@ not what it converts to.
 ## 7.5 Indexers
 
 ```csharp
-public class Grid {
+public class Grid
+{
     int[] cells;
 
-    public int this[nuint at] {
+    public int this[nuint at]
+    {
         get { return cells[at]; }
         set { cells[at] = value; }
     }
@@ -573,12 +585,14 @@ A method written `static` belongs to the type rather than to a value of it.
 The whole of the difference is the missing receiver:
 
 ```csharp
-public class Small {
+public class Small
+{
     int value;
 
     Small(int checked) { value = checked; }        // private
 
-    public static Result<Small, ParseError> Parse(String text) {
+    public static Result<Small, ParseError> Parse(String text)
+    {
         // ... check, then use the constructor nothing outside can reach
         return Ok(new Small(total));
     }
@@ -619,7 +633,8 @@ from within.
 instead of the module ([§9.3](09-statements-expressions.md#93-const-and-static)). It may be mutable, and it needs an initializer:
 
 ```csharp
-public class Registry {
+public class Registry
+{
     static int made = 0;                        // private to the type
     public static String Kind = "registry";
     public static readonly String Version = "1";
@@ -645,9 +660,10 @@ what it buys is no guard, no per-access cost, and a compile error on a cycle.
 **A static class** holds static members and has no instances:
 
 ```csharp
-public static class Defaults {
+public static class Defaults
+{
     public static int Retries = 3;
-    public static int Doubled() { return Retries * 2; }
+    public static int Doubled() => Retries * 2;
 }
 ```
 

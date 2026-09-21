@@ -20,6 +20,8 @@ last person to edit it -- the suite is the authority.
 - Modules like C# namespaces: several files may share one, imports are per file,
   `public` exports and an unmarked declaration is module-wide
 - Aliases, qualified names without an import, full order independence
+- `string` as a second spelling of `String`, declared as an alias in the
+  auto-imported `Standard.Text`, so it needs no import and costs nothing
 - Type aliases: `using Handle = void*;`, module-level, public or not, naming
   another alias or a type from another module. An alias is the type it names, so
   it costs nothing and converts nothing; a ring of them is refused whether or
@@ -115,8 +117,18 @@ last person to edit it -- the suite is the authority.
   `QueryInterface` is a call that would be made twice
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
+- `record`: a class written as its constructor. The positional parameters
+  become get-only properties and the constructor that fills them, and the type
+  gets `EqualTo`, `HashCode`, `==`, `!=` and the `IEquatable`/`IHashable` those
+  satisfy -- so a record is a dictionary key with nothing said, which is most
+  of what the form is for. `point with { Y = 9 }` makes a changed copy,
+  evaluating its target once. There is no generated `ToString`, because the
+  language has none for any type, and no `record struct`, because a struct is a
+  plain C value with no constructor to generate
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
-  `sealed`, `protected`, `base(...)` chaining and `base.M()`. A virtual call is
+  `sealed`, `protected`, `base.M()`, and `base(...)` chaining written either
+  after the parameters as C# writes it -- `Square(double side) : base(4)` --
+  or as the first statement of the body. A virtual call is
   three constant-offset loads and an indirect call — one fewer than an interface
   call, because there is no interface id to look up. Fields are laid out after
   the base's, destructors chain derived-first, interfaces and their tables are
@@ -559,6 +571,18 @@ last person to edit it -- the suite is the authority.
   `Result`, because there is no exception to throw and no `out` to fill
 - `Standard.Text` (imported everywhere), `Standard.Ascii`, `Standard.Console`,
   `Standard.Reflection`
+- `Standard.Bits`: `PopCount`, `LeadingZeroCount`, `TrailingZeroCount`,
+  `RotateLeft`, `RotateRight`, `Log2`, `IsPowerOfTwo` and
+  `RoundUpToPowerOfTwo`, over the target's own instructions. A rotate is
+  defined for a count of zero, which the pair of shifts it replaces is not
+- `Standard.Limits`: what each number type holds, named rather than spelled --
+  `MaxInt`, `MinLong`, `MaxNUInt` and the rest, the pointer-width ones written
+  per target
+- `Standard.IO`'s readers and writers: `TextReader` and `TextWriter` with
+  `StringReader`, `StreamReader`, `StringWriter` and `StreamWriter` under them.
+  `StreamReader` decodes a buffer at a time through an `IDecoder` that keeps
+  whatever character the buffer ended in the middle of, so it streams rather
+  than reading the whole thing
 - Raw pointers, `sizeof`, `alignof`, `offsetof`, `typeof`, casts, `new`, `this`.
   The three layout questions answer exactly what C's do, which is how a binding
   checks itself against a header; `offsetof` on a class counts from the

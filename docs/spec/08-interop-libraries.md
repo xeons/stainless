@@ -5,7 +5,8 @@
 ```csharp
 extern "C" int puts(byte* s);
 
-extern "C" {
+extern "C"
+{
     byte* malloc(nuint n);
     void  free(byte* p);
 }
@@ -16,7 +17,7 @@ convention. Conversely, a Stainless function marked `export "C"` is emitted
 with an unmangled name so C and C++ can call it:
 
 ```csharp
-export "C" int stainless_add(int a, int b) { return a + b; }
+export "C" int stainless_add(int a, int b) => a + b;
 ```
 
 **A declaration joins the module it was written in**, as an ordinary member,
@@ -25,7 +26,8 @@ library is made of: a module of `public extern "C"` declarations is one another
 module can call by the real names, with no forwarding layer in between.
 
 ```csharp
-public extern "C" {
+public extern "C"
+{
     int   GetSystemMetrics(int index);
     void* CreateWindowExW(uint extendedStyle, char16* className, /* ... */);
 }
@@ -143,8 +145,8 @@ compiler does, with no shim and no `extern "C"` on either side:
 extern "C++" int cpp_add(int a, int b);
 extern "C++" double geometry::area(double w, double h);
 
-export "C++" int Doubled(int n) { return n * 2; }
-export "C++" double shapes::Perimeter(double w, double h) { return 2.0 * (w + h); }
+export "C++" int Doubled(int n) => n * 2;
+export "C++" double shapes::Perimeter(double w, double h) => 2.0 * (w + h);
 ```
 
 A namespace is written on the declaration with `::`. It decides the linker name
@@ -302,7 +304,8 @@ still passed as an ordinary input.
 ```csharp
 import Library.Shapes;                  // a module this compilation has no source for
 
-int Main() {
+int Main()
+{
     var counter = new Counter("clicks", tally);
     counter.Step = 3;                   // properties, fields and methods all work
     counter.Bump();
@@ -378,7 +381,8 @@ apartments, marshalling. None of that is in the language.
 
 ```csharp
 [Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
-public com interface IShellItem {
+public com interface IShellItem
+{
     int BindToHandler(byte* bindContext, Guid* handler, Guid* iid, byte** result);
     int GetParent(byte** parent);
     int GetDisplayName(uint kind, char16** name);
@@ -428,7 +432,8 @@ already knows where every reference is born, copied and dropped — so it emits
 the calls:
 
 ```csharp
-IShellItem Parent(IShellItem item) {
+IShellItem Parent(IShellItem item)
+{
     byte* raw = null;
     if (item.GetParent(&raw) < 0) { ... }
     return (IShellItem)raw;             // adopts; nothing else to write
@@ -443,7 +448,8 @@ the caller holds, and the release is emitted at the end of the scope.
 ### `is` and a cast are `QueryInterface`
 
 ```csharp
-if (item is IShellItem2) {
+if (item is IShellItem2)
+{
     IShellItem2 richer = (IShellItem2)item;
     ...
 }
@@ -464,7 +470,8 @@ adds is absent.
 
 ```csharp
 [NoUnknown]
-public com interface IXAudio2Voice {
+public com interface IXAudio2Voice
+{
     void GetVoiceDetails(VoiceDetails* details);       // slot 0, not slot 3
     int  SetOutputVoices(VoiceSends* sends);
     ...
@@ -510,15 +517,17 @@ voice.DestroyVoice();                  // the library's rule, written out
 
 ```csharp
 [Guid("2cd90691-12e2-11dc-9fed-001143a055f9")]
-public com interface ILoudGreeter {
+public com interface ILoudGreeter
+{
     int Greet(int times);
     int Shout();
 }
 
-public com class Greeter : ILoudGreeter {
+public com class Greeter : ILoudGreeter
+{
     int count;
     public int Greet(int times) { count = count + times; return count; }
-    public int Shout() { return count; }
+    public int Shout() => count;
 }
 ```
 
@@ -579,7 +588,8 @@ object. `[Guid]` on a `com class` is what makes the second possible:
 [Guid("5a1c8e30-2b47-4d16-a9f3-c04e7b81d629")]
 public com class Greeter : IGreeter, ICounter { ... }
 
-export "C" int DllGetClassObject(Guid* clsid, Guid* iid, byte** result) {
+export "C" int DllGetClassObject(Guid* clsid, Guid* iid, byte** result)
+{
     return Com.GetClassObject(clsid, iid, result);
 }
 ```

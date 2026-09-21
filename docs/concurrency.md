@@ -149,7 +149,8 @@ colour entirely:
 int left  = 0;
 int right = 0;
 
-parallel {
+parallel
+{
     left  = spawn Sum(values, 0, half);
     right = spawn Sum(values, half, count);
 }                                                // the join
@@ -333,7 +334,8 @@ this language is otherwise built to make fast. Rejected on that basis alone.
 ```csharp
 static readonly Mutex<List<String>> Registry = new Mutex<List<String>>(new List<String>());
 
-void Record(String name) {
+void Record(String name)
+{
     var guard = Registry.Lock();      // Guard<List<String>>
     guard.Value.Add(name);
 }                                     // ~Guard() unlocks
@@ -411,7 +413,8 @@ and the join counters that make `parallel` blocks work.
 ## 6. Data parallelism
 
 ```csharp
-for parallel (nuint i = 0u; i < pixels.Length; i++) {
+for parallel (nuint i = 0u; i < pixels.Length; i++)
+{
     pixels[i] = Shade(pixels[i]);
 }
 ```
@@ -489,7 +492,8 @@ Cooperative cancellation, with the `AtomicBool` from §4:
 ```csharp
 var stop = new AtomicBool(false);
 
-parallel {
+parallel
+{
     foundLeft  = spawn Search(data, 0, half, stop);
     foundRight = spawn Search(data, half, count, stop);
 }
