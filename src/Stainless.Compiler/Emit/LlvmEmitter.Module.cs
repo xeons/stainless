@@ -382,8 +382,6 @@ public sealed partial class LlvmEmitter
             $"@sl_string_type_info = {runtimeConstant} %SlTypeInfo");
         Declare("sl_utf16_string_type_info",
             $"@sl_utf16_string_type_info = {runtimeConstant} %SlTypeInfo");
-        Declare("sl_string_builder_type_info",
-            $"@sl_string_builder_type_info = {runtimeConstant} %SlTypeInfo");
         // sl_array_alloc(const SlTypeInfo*, size_t length, size_t elementSize)
         Declare("sl_array_alloc",
             $"declare noalias ptr @sl_array_alloc(ptr, {Word}, {Word}) nounwind");

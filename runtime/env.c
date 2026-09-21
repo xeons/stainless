@@ -22,27 +22,18 @@
  */
 
 /*
- * The environment: variables, the working directory, and the arguments the
- * program was started with.
+ * The arguments the program was started with.
  *
- * Everything here speaks UTF-8, which on Windows means going through the wide
- * API and converting. The narrow one would hand back whatever the active code
- * page says, and a String is UTF-8 by definition -- a path with a name outside
- * the code page would arrive as question marks rather than as itself.
+ * Only the arguments. Variables and the working directory are Stainless, in
+ * stdlib/Env.sl, which calls the platform for itself. These stay because the
+ * entry point hands them over before any Stainless code could run, and there
+ * is nowhere earlier for a Stainless function to stand.
  */
 
 #include "stainless.h"
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#  define WIN32_LEAN_AND_MEAN
-#  include <windows.h>
-#else
-#  include <unistd.h>
-extern char **environ;
-#endif
 
 /* --------------------------------------------------------------- arguments */
 
@@ -105,179 +96,4 @@ void *sl_args_program(void)
         return sl_string_from_null_terminated("");
 
     return sl_string_from_null_terminated(argumentValues[0]);
-}
-
-/* -------------------------------------------------------------- variables */
-
-/*
- * The value of a variable, or NULL when it is not set.
- *
- * "Not set" and "set to nothing" are different answers, and both platforms can
- * tell them apart -- so this does too, and the library turns the first into a
- * null String rather than an empty one.
- */
-void *sl_env_get(void *name)
-{
-    const char *wanted = (const char *)sl_string_pointer(name);
-    if (wanted == NULL) return NULL;
-
-#ifdef _WIN32
-    wchar_t *wide = sl_widen(wanted);
-    if (wide == NULL) return NULL;
-
-    /* Asked twice: once for the length, once for the value. A variable that
-     * grew in between would be truncated, so the second call's own answer is
-     * what is trusted. */
-    DWORD units = GetEnvironmentVariableW(wide, NULL, 0);
-    if (units == 0) { free(wide); return NULL; }
-
-    wchar_t *value = (wchar_t *)malloc((size_t)units * sizeof(wchar_t));
-    if (value == NULL) { free(wide); sl_fail("out of memory"); }
-
-    DWORD written = GetEnvironmentVariableW(wide, value, units);
-    free(wide);
-
-    if (written == 0 || written >= units) { free(value); return NULL; }
-
-    char *text = sl_narrow(value);
-    free(value);
-    if (text == NULL) return NULL;
-
-    void *result = sl_string_from_null_terminated(text);
-    free(text);
-    return result;
-#else
-    const char *value = getenv(wanted);
-    return value == NULL ? NULL : sl_string_from_null_terminated(value);
-#endif
-}
-
-/* Sets a variable for this process, or removes it when the value is null. */
-_Bool sl_env_set(void *name, void *value)
-{
-    const char *wanted = (const char *)sl_string_pointer(name);
-    if (wanted == NULL) return 0;
-
-    const char *text = value == NULL ? NULL : (const char *)sl_string_pointer(value);
-
-#ifdef _WIN32
-    wchar_t *wideName = sl_widen(wanted);
-    if (wideName == NULL) return 0;
-
-    wchar_t *wideValue = text == NULL ? NULL : sl_widen(text);
-    _Bool ok = SetEnvironmentVariableW(wideName, wideValue) != 0;
-
-    free(wideName);
-    free(wideValue);
-    return ok;
-#else
-    if (text == NULL) return unsetenv(wanted) == 0;
-    return setenv(wanted, text, 1) == 0;
-#endif
-}
-
-/* The builder's text, and the builder let go. It was allocated +1. */
-static void *builder_result(SlStringBuilder *builder)
-{
-    void *text = sl_string_builder_to_string(builder);
-    sl_release(builder);
-    return text;
-}
-
-/*
- * Every variable's name, as one String with a newline after each.
- *
- * One String rather than an array because the runtime has no convenient way to
- * build a Stainless array of references, and the library splits it in a line
- * of Stainless. A name cannot contain a newline on either platform, so nothing
- * is lost in the round trip.
- */
-void *sl_env_names(void)
-{
-    SlStringBuilder *names = (SlStringBuilder *)sl_string_builder_new();
-
-#ifdef _WIN32
-    wchar_t *block = GetEnvironmentStringsW();
-    if (block == NULL) return builder_result(names);
-
-    for (wchar_t *at = block; *at != L'\0'; ) {
-        size_t length = wcslen(at);
-
-        /* A name beginning with '=' is Windows' per-drive working directory
-         * ("=C:"), which is not a variable anybody set. */
-        if (*at != L'=') {
-            wchar_t *equals = wcschr(at, L'=');
-            if (equals != NULL) {
-                *equals = L'\0';
-                char *text = sl_narrow(at);
-                *equals = L'=';
-
-                if (text != NULL) {
-                    sl_string_builder_append_bytes(names, (const uint8_t *)text, strlen(text));
-                    sl_string_builder_append_bytes(names, (const uint8_t *)"\n", 1);
-                    free(text);
-                }
-            }
-        }
-
-        at += length + 1;
-    }
-
-    FreeEnvironmentStringsW(block);
-#else
-    for (char **at = environ; at != NULL && *at != NULL; at += 1) {
-        const char *equals = strchr(*at, '=');
-        if (equals == NULL) continue;
-
-        sl_string_builder_append_bytes(names, (const uint8_t *)*at, (size_t)(equals - *at));
-        sl_string_builder_append_bytes(names, (const uint8_t *)"\n", 1);
-    }
-#endif
-
-    return builder_result(names);
-}
-
-/* ------------------------------------------------------ working directory */
-
-void *sl_env_current_directory(void)
-{
-#ifdef _WIN32
-    DWORD units = GetCurrentDirectoryW(0, NULL);
-    if (units == 0) return sl_string_from_null_terminated("");
-
-    wchar_t *wide = (wchar_t *)malloc((size_t)units * sizeof(wchar_t));
-    if (wide == NULL) sl_fail("out of memory");
-
-    DWORD written = GetCurrentDirectoryW(units, wide);
-    if (written == 0 || written >= units) { free(wide); return sl_string_from_null_terminated(""); }
-
-    char *text = sl_narrow(wide);
-    free(wide);
-    if (text == NULL) return sl_string_from_null_terminated("");
-
-    void *result = sl_string_from_null_terminated(text);
-    free(text);
-    return result;
-#else
-    char buffer[4096];
-    if (getcwd(buffer, sizeof buffer) == NULL) return sl_string_from_null_terminated("");
-    return sl_string_from_null_terminated(buffer);
-#endif
-}
-
-_Bool sl_env_set_current_directory(void *path)
-{
-    const char *text = (const char *)sl_string_pointer(path);
-    if (text == NULL) return 0;
-
-#ifdef _WIN32
-    wchar_t *wide = sl_widen(text);
-    if (wide == NULL) return 0;
-
-    _Bool ok = SetCurrentDirectoryW(wide) != 0;
-    free(wide);
-    return ok;
-#else
-    return chdir(text) == 0;
-#endif
 }

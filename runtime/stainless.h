@@ -880,15 +880,10 @@ SL_API void  *sl_args_program(void);
 /* NULL for a variable that is not set, which is not the same as one set to
  * nothing. Windows goes through the wide API, so a value outside the active
  * code page survives. */
-SL_API void  *sl_env_get(void *name);
-SL_API _Bool  sl_env_set(void *name, void *value);
 
 /* Every name, newline-separated, as one String -- the runtime has no tidy way
  * to build an array of references, and splitting is one line of Stainless. */
-SL_API void  *sl_env_names(void);
 
-SL_API void  *sl_env_current_directory(void);
-SL_API _Bool  sl_env_set_current_directory(void *path);
 
 /* --------------------------------------------------------- other programs */
 
