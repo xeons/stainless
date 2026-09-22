@@ -1,0 +1,16 @@
+utf8-overlong-slash 65533 65533
+utf8-overlong-dot 65533 65533 65533
+utf8-overlong-nul 65533 65533
+utf8-overlong-4 65533 65533 65533 65533
+utf8-surrogate 65533 65533 65533 65
+utf8-past-max 65533 65533 65533 65533
+utf8-edges 128 55295 1114111
+cp1252-can-fffd false
+cp1252-fffd [2] 65 63
+cp1252-81 65533
+latin1-loose [2] 65 63
+latin1-loose-count 2
+utf32-loose [8] 65 0 0 0 253 255 0 0
+utf32-loose-count 8
+utf32-cut [12] 253 255 0 0 65 0 0 0 253 255 0 0
+utf32-tail 65 65533

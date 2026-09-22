@@ -370,7 +370,8 @@ public class Utf8Encoding : IEncoding
     /// `bytes` validated, with each malformed byte replaced by U+FFFD.
     ///
     /// One replacement per bad byte rather than per bad sequence, so a run of
-    /// rubbish is as many U+FFFDs as it is bytes.
+    /// rubbish is as many U+FFFDs as it is bytes. Malformed means what
+    /// `TryGetString` refuses, overlong forms and surrogates included.
     public String GetString(byte[] bytes)
     {
         var built = new StringBuilder();
@@ -387,7 +388,15 @@ public class Utf8Encoding : IEncoding
                 continue;
             }
 
-            built.AppendCodePoint(Utf8Scalar(bytes, at, width));
+            char32 scalar = Utf8Scalar(bytes, at, width);
+            if (!IsScalarSpelledOnce((uint)scalar, width))
+            {
+                built.AppendCodePoint((char32)0xFFFD);
+                at++;
+                continue;
+            }
+
+            built.AppendCodePoint(scalar);
             at = at + width;
         }
         return built.ToText();
@@ -414,15 +423,7 @@ public class Utf8Encoding : IEncoding
             if (!Continues(bytes, at, width))
                 return Fail(EncodingError.Invalid);
 
-            // An overlong sequence, a surrogate or a value past U+10FFFF are
-            // each a different way of spelling something that is not a scalar,
-            // and a strict decoder refuses all three.
-            uint scalar = (uint)Utf8Scalar(bytes, at, width);
-            if (Overlong(scalar, width))
-                return Fail(EncodingError.Invalid);
-            if (scalar > 0x10FFFF)
-                return Fail(EncodingError.Invalid);
-            if (scalar >= 0xD800 && scalar <= 0xDFFF)
+            if (!IsScalarSpelledOnce((uint)Utf8Scalar(bytes, at, width), width))
                 return Fail(EncodingError.Invalid);
 
             at = at + width;
@@ -637,7 +638,7 @@ public class Utf32Encoding : IEncoding
 
     /// `bytes` read as UTF-32, with a value that is not a scalar -- a
     /// surrogate, or anything past U+10FFFF -- becoming U+FFFD. Trailing bytes
-    /// that do not make a whole four are dropped.
+    /// that do not make a whole four are one more U+FFFD.
     public String GetString(byte[] bytes)
     {
         var built = new StringBuilder();
@@ -815,12 +816,15 @@ public class Windows1252Encoding : SingleByteEncoding
     }
 
     /// The Latin-1 byte where there is one, else a scan of the 32-entry
-    /// punctuation table, else -1.
+    /// punctuation table, else -1. U+FFFD is -1: it marks the table's
+    /// unassigned bytes and is written by none of them.
     public override int FromScalar(char32 scalar)
     {
         uint value = (uint)scalar;
         if (value < 0x80 || (value >= 0xA0 && value < 0x100))
             return (int)value;
+        if (value == 0xFFFD)
+            return -1;
 
         for (nuint i = 0; i < 32; i++)
         {
@@ -900,6 +904,15 @@ bool Overlong(uint scalar, nuint width)
     if (width == 4)
         return scalar < 0x10000;
     return false;
+}
+
+/// Whether a decoded sequence is a scalar in its one legal spelling: not
+/// overlong, not a surrogate and not past U+10FFFF.
+bool IsScalarSpelledOnce(uint scalar, nuint width)
+{
+    if (Overlong(scalar, width) || scalar > 0x10FFFF)
+        return false;
+    return scalar < 0xD800 || scalar > 0xDFFF;
 }
 
 // -------------------------------------------------------------------- arrays
