@@ -845,6 +845,8 @@ public const uint CbInsertString  = 0x014Au;
 public const uint CbResetContent  = 0x014Bu;
 public const uint CbSetCurSel     = 0x014Eu;
 public const uint CbShowDropDown  = 0x014Fu;
+public const uint CbGetDroppedControlRect = 0x0152u;
+public const uint CbGetItemHeight = 0x0154u;
 public const uint CbGetDroppedState = 0x0157u;
 
 public const uint CbsSimple         = 0x0001u;

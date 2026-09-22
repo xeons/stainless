@@ -636,19 +636,50 @@ public class ListPeer : ControlPeer, IListPeer
 
 /// A `COMBOBOX`, either a drop-down list or one that can also be typed into.
 ///
-/// **The height passed at creation is the *dropped* height**, not the closed
-/// one: a combo box created 24 pixels tall has a list with no room in it and
-/// looks broken in a way nothing about the call says. `SetBounds` here adds
-/// room for the list, which is the one place this backend does not pass the
-/// control layer's bounds through unchanged.
+/// **The height a combo box is given is its height dropped down**, not the
+/// closed one: one made 24 pixels tall has a list with no room in it and looks
+/// broken in a way nothing about the call says. `SetBounds` here adds room for
+/// the list, which is the one place this backend does not pass the control
+/// layer's bounds through unchanged. Windows keeps the closed field at the
+/// height its font needs, whatever it is given.
 public class ComboPeer : ControlPeer, IComboPeer
 {
+    /// Where the control layer put it, so the list's room can follow the
+    /// number of items.
+    FRect _placed;
+
+    /// The most rows the list shows before it scrolls, which is the LCL's
+    /// `DropDownCount`.
+    const int VisibleRows = 8;
+
     public ComboPeer(IControlNotify owner, IContainerPeer parent)
     {
         base(MakeChild("COMBOBOX", WindowOf(parent),
-                       ChildStyle() | CbsDropDownList | CbsHasStrings
-                                    | CbsNoIntegralHeight | WsVerticalScroll, 0u),
+                       ChildStyle() | CbsDropDownList | CbsHasStrings | WsVerticalScroll,
+                       0u),
              owner, true);
+        _placed = Area(0, 0, 0, 0);
+    }
+
+    public override void SetBounds(FRect bounds)
+    {
+        _placed = bounds;
+        Refit();
+    }
+
+    /// The closed field, and a row for each item up to `VisibleRows`.
+    void Refit()
+    {
+        Rect closed;
+        GetClientRect(window, &closed);
+        int rows = ItemCount;
+        if (rows < 1)
+            rows = 1;
+        if (rows > VisibleRows)
+            rows = VisibleRows;
+        int row = (int)SendMessageW(window, CbGetItemHeight, 0u, 0);
+        int dropped = closed.Bottom - closed.Top + rows * row + 2;
+        MoveWindow(window, _placed.X, _placed.Y, _placed.Width, dropped, 1);
     }
 
     protected override bool Notified(uint code, int id)
@@ -669,14 +700,20 @@ public class ComboPeer : ControlPeer, IComboPeer
     {
         SendMessageW(window, CbInsertString, (ulong)index,
                      (long)(nuint)text.ToUtf16().ToPointer());
+        Refit();
     }
 
     public void RemoveItem(int index)
     {
         SendMessageW(window, CbDeleteString, (ulong)index, 0);
+        Refit();
     }
 
-    public void ClearItems() => SendMessageW(window, CbResetContent, 0u, 0);
+    public void ClearItems()
+    {
+        SendMessageW(window, CbResetContent, 0u, 0);
+        Refit();
+    }
 
     public int ItemCount => (int)SendMessageW(window, CbGetCount, 0u, 0);
 
@@ -697,12 +734,10 @@ public class ComboPeer : ControlPeer, IComboPeer
 // ============================================================== group box
 
 /// **Stops a list sizing itself.** By default a `LISTBOX` rounds its height
-/// down to a whole number of rows and a `COMBOBOX` its drop-down likewise, so a
-/// control given 220 pixels quietly becomes 214 and every anchor measured
-/// against it is then measured against a number nobody chose. The LCL sets
-/// these for the same reason.
+/// down to a whole number of rows, so a control given 220 pixels quietly
+/// becomes 214 and every anchor measured against it is then measured against a
+/// number nobody chose. The LCL sets this for the same reason.
 const uint LbsNoIntegralHeight = 0x0100u;
-const uint CbsNoIntegralHeight = 0x0400u;
 
 /// How much of a group box's own rectangle its caption occupies.
 const int CaptionHeight = 16;
