@@ -71,7 +71,7 @@ public const double Tau = 6.28318530717958623200;
 public const double E = 2.71828182845904509080;
 
 /// The smallest step between 1.0 and the next representable double.
-public const double Epsilon = 0.00000000000000022204;
+public const double Epsilon = 2.220446049250313080847263336181640625e-16;
 
 // ------------------------------------------------------ floating point
 
@@ -181,7 +181,7 @@ public double Max(double a, double b) => a > b ? a : b;
 /// wrong way round; it simply returns `low`.
 public double Clamp(double x, double low, double high)
 {
-    if (x < low)
+    if (x < low || low > high)
         return low;
     if (x > high)
         return high;
@@ -269,17 +269,17 @@ public nuint Max(nuint a, nuint b) => a > b ? a : b;
 /// rather than an error, as in the `double` form.
 public int Clamp(int x, int low, int high)
 {
-    if (x < low)
+    if (x < low || low > high)
         return low;
     if (x > high)
         return high;
     return x;
 }
 
-/// `x`, brought within [low, high].
+/// `x`, brought within [low, high]. Bounds the wrong way round give `low`.
 public long Clamp(long x, long low, long high)
 {
-    if (x < low)
+    if (x < low || low > high)
         return low;
     if (x > high)
         return high;
@@ -287,10 +287,11 @@ public long Clamp(long x, long low, long high)
 }
 
 /// `x`, brought within [low, high]. Unsigned, so there is no negative side to
-/// clamp against and `low` of zero is the natural floor.
+/// clamp against and `low` of zero is the natural floor. Bounds the wrong way
+/// round give `low`.
 public nuint Clamp(nuint x, nuint low, nuint high)
 {
-    if (x < low)
+    if (x < low || low > high)
         return low;
     if (x > high)
         return high;
@@ -327,20 +328,27 @@ public nuint DivideCeiling(nuint a, nuint b)
     return (a - 1) / b + 1;
 }
 
-/// The greatest common divisor, by Euclid.
+/// The greatest common divisor, by Euclid. Never negative, but for one case.
+///
+/// Zero with zero answers zero. The answer is 2^63 when both arguments are the
+/// most negative `long`, or one is and the other is zero; no `long` holds that,
+/// so it answers `MinLong`, whose magnitude it is, as `Abs` does.
 public long GreatestCommonDivisor(long a, long b)
 {
-    a = Abs(a);
-    b = Abs(b);
+    ulong left = LongMagnitude(a);
+    ulong right = LongMagnitude(b);
 
-    while (b != 0)
+    while (right != 0)
     {
-        long next = a % b;
-        a = b;
-        b = next;
+        ulong next = left % right;
+        left = right;
+        right = next;
     }
-    return a;
+    return (long)left;
 }
+
+/// The magnitude of a `long` as a `ulong`, which holds every one.
+ulong LongMagnitude(long x) => x < 0 ? (ulong)0 - (ulong)x : (ulong)x;
 
 /// The least common multiple. Zero when either argument is zero.
 ///

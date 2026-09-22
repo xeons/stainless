@@ -120,5 +120,5 @@ public ulong RoundUpToPowerOfTwo(ulong value)
 {
     if (value <= 1u)
         return 1u;
-    return 2u << Log2(value - 1u);
+    return (ulong)2u << Log2(value - 1u);
 }
