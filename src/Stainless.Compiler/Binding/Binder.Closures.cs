@@ -43,6 +43,21 @@ public sealed partial class Binder
 
         public Dictionary<string, FieldSymbol> Captured { get; } = new(StringComparer.Ordinal);
         public List<(FieldSymbol Field, BoundExpression Value)> Captures { get; } = [];
+
+        /// <summary>
+        /// Whether a captured <c>this</c> is held weakly: true for a lambda
+        /// that is the handler of a <c>+=</c>, so that it cannot keep alive
+        /// the object that subscribed it.
+        /// </summary>
+        public bool WeakThis { get; init; }
+
+        /// <summary>
+        /// The local the body reads a weakly captured <c>this</c> through,
+        /// loaded once at the top; null until something captures it.
+        /// </summary>
+        public LocalSymbol? WeakSelf { get; set; }
+
+        public FieldSymbol? WeakSelfField { get; set; }
     }
 
     private readonly List<ClosureContext> _closures = [];
@@ -403,6 +418,9 @@ public sealed partial class Binder
     {
         var closure = _closures[index];
 
+        if (closure.WeakSelf is { } alive)
+            return ReadWeakSelf(span, alive);
+
         if (closure.Captured.TryGetValue(ThisCaptureName, out var already))
             return new BoundFieldAccess(
                 span, new BoundThis(span, closure.Type!, closure.This!), already);
@@ -427,6 +445,24 @@ public sealed partial class Binder
             return new BoundErrorExpression(span);
         }
 
+        // A subscribed lambda holds the object weakly, and the body reads it
+        // through a local loaded once at the top, which ends the call early
+        // when the object has gone. See BindLambdaAsMethodPointer.
+        if (closure.WeakThis && outer.Type is NamedTypeSymbol { IsReferenceType: true } referenced)
+        {
+            var weakField = new FieldSymbol(
+                ThisCaptureName, new WeakTypeSymbol(referenced), closure.Type, closure.Type.Fields.Count);
+            closure.Type.Fields.Add(weakField);
+            closure.Captured[ThisCaptureName] = weakField;
+            closure.Captures.Add((weakField, new BoundConversion(
+                span, weakField.Type, outer, ConversionKind.ReferenceToWeak)));
+
+            closure.WeakSelfField = weakField;
+            closure.WeakSelf = new LocalSymbol(WeakSelfName, new OptionalTypeSymbol(referenced),
+                isConst: false);
+            return ReadWeakSelf(span, closure.WeakSelf);
+        }
+
         var field = new FieldSymbol(
             ThisCaptureName, outer.Type, closure.Type, closure.Type.Fields.Count);
         closure.Type.Fields.Add(field);
@@ -435,6 +471,20 @@ public sealed partial class Binder
 
         return new BoundFieldAccess(span, new BoundThis(span, closure.Type, closure.This!), field);
     }
+
+    /// <summary>
+    /// The local a weakly captured <c>this</c> is read through, as the class
+    /// it names. The body runs only once the prologue has checked it.
+    /// </summary>
+    private static BoundExpression ReadWeakSelf(SourceSpan span, LocalSymbol alive) =>
+        new BoundConversion(span, ((OptionalTypeSymbol)alive.Type).Element,
+            new BoundLocalAccess(span, alive), ConversionKind.PointerCast);
+
+    /// <summary>
+    /// The local a weakly captured <c>this</c> lands in. No source identifier
+    /// can be this, for the reason <see cref="ThisCaptureName"/> gives.
+    /// </summary>
+    private const string WeakSelfName = "this?";
 
     /// <summary>
     /// The closure field a captured <c>this</c> lands in. It is spelled as the
@@ -750,15 +800,45 @@ public sealed partial class Binder
 
         closureType.Methods.Add(symbol);
 
+        // Consumed here so that a lambda nested inside this one is bound as an
+        // ordinary lambda.
+        bool subscribed = _subscribingLambda && target.ReturnType.IsVoid();
+        _subscribingLambda = false;
+
         var context = new ClosureContext
         {
             Type = closureType,
             This = self,
             OuterScopes = [.. _scopes],
             OuterFunction = _currentFunction,
+            WeakThis = subscribed,
         };
 
         var body = BindLambdaBody(syntax, symbol, context);
+
+        // A subscribed lambda that uses `this` begins by loading it, and does
+        // nothing once it has gone -- which is well defined, since a handler
+        // returns nothing:
+        //
+        //     Outer? this? = (Outer?)this.this;
+        //     if (this? == null) return;
+        if (context.WeakSelf is { } alive && context.WeakSelfField is { } weakField)
+        {
+            var prologue = new BoundBlock(span, [
+                new BoundLocalDeclaration(span, alive, new BoundConversion(span, alive.Type,
+                    new BoundFieldAccess(span, new BoundThis(span, closureType, self), weakField),
+                    ConversionKind.ReferenceToOptional)),
+                new BoundIf(span,
+                    new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                        new BoundLocalAccess(span, alive), BoundBinaryOp.Equal,
+                        new BoundNullLiteral(span, alive.Type)),
+                    new BoundReturn(span, null),
+                    null),
+                body,
+            ]);
+            prologue.Locals.Add(alive);
+            body = prologue;
+        }
 
         ComputeLayout(closureType, []);
         _classes.Add(closureType);

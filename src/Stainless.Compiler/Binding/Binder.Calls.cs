@@ -43,6 +43,8 @@ public sealed partial class Binder
         if (syntax.Callee is BaseSyntax) return BindBaseConstruction(syntax, arguments);
         if (syntax.Callee is ThisSyntax) return BindThisConstruction(syntax, arguments);
 
+        if (TryBindEventClear(syntax, arguments) is { } cleared) return cleared;
+
         // A bare `Ok(x)` builds a variant rather than calling anything. It has
         // to be decided here, before the name is looked up, because a draft has
         // no type yet and overload resolution has nothing to resolve against.
@@ -922,6 +924,50 @@ public sealed partial class Binder
     /// declared member always wins, because this runs only after lookup on a
     /// named type has failed.
     /// </summary>
+    /// <summary>
+    /// <c>Fired.Clear()</c> inside the type that declared <c>Fired</c>: drops
+    /// every subscriber at once.
+    ///
+    /// The declaring type's alone, for the reason only it may raise the event:
+    /// a subscriber that could clear the list could throw away everybody
+    /// else's subscriptions. The publisher can, and a publisher that is being
+    /// taken apart -- a control removed from its form -- is the one that
+    /// knows its subscribers are no longer wanted.
+    /// </summary>
+    private BoundExpression? TryBindEventClear(CallSyntax syntax, List<BoundExpression> arguments)
+    {
+        if (syntax.Callee is not MemberAccessSyntax
+            {
+                Member: "Clear", Conditional: false, Target: NameSyntax { Name.Parts.Count: 1 } named,
+            })
+            return null;
+        if (LookupLocal(named.Name.Last) is not null) return null;
+        if (_currentFunction?.ContainingType is not { } owner) return null;
+        if (owner.FindEvent(named.Name.Last) is not { } cleared) return null;
+        if (cleared.ContainingType != owner || cleared.BackingField is not { } field) return null;
+
+        if (arguments.Count != 0)
+        {
+            diagnostics.Error("SL0412", syntax.Span,
+                $"'{cleared.Name}.Clear' takes no arguments, but {Given(arguments.Count)}");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        if (BindImplicitThis(syntax.Span) is not { } receiver)
+        {
+            diagnostics.Error("SL0553", syntax.Span,
+                $"'{cleared.Name}' is an event and belongs to an instance, so it cannot be " +
+                "reached from a static method");
+            return new BoundErrorExpression(syntax.Span);
+        }
+
+        var array = ArrayOf(cleared.Type);
+        return new BoundAssignment(syntax.Span,
+            new BoundFieldAccess(syntax.Span, receiver, field),
+            new BoundNewArray(syntax.Span, array,
+                new BoundLiteral(syntax.Span, PrimitiveTypeSymbol.NUInt, 0UL)));
+    }
+
     private BoundExpression? TryBindIntrinsicMember(
         CallSyntax syntax, MemberAccessSyntax member, BoundExpression receiver,
         List<BoundExpression> arguments)

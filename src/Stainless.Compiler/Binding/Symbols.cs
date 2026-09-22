@@ -387,6 +387,24 @@ public sealed class EventSymbol
     public FunctionSymbol? Remove { get; set; }
 
     /// <summary>
+    /// <c>addweak_Name</c>: what <c>+=</c> calls when the subscriber is the
+    /// object doing the subscribing. It holds that object weakly, so a form
+    /// subscribed to its own button does not keep itself alive through it.
+    /// Null for an event loaded from a library that predates it, where
+    /// <c>+=</c> falls back to <see cref="Add"/>.
+    /// </summary>
+    public FunctionSymbol? AddWeak { get; set; }
+
+    /// <summary>
+    /// <c>weakcall_Name</c>: the function a weak subscription's closure holds.
+    /// It loads the subscriber through the runtime's cell and calls it only if
+    /// it is alive. Private and static; it never crosses a library boundary,
+    /// because the accessors that compare against its address are declared
+    /// alongside it.
+    /// </summary>
+    public FunctionSymbol? WeakCall { get; set; }
+
+    /// <summary>
     /// The method a raise lowers to, holding the loop over the subscribers.
     ///
     /// A method rather than a loop inlined at each site, so that "what raising

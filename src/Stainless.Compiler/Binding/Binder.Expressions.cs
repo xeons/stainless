@@ -2157,13 +2157,56 @@ public sealed partial class Binder
         var accessor = adding ? subscribed.Add : subscribed.Remove;
         if (accessor is null) return new BoundErrorExpression(syntax.Span);
 
+        // A lambda subscribed here holds the object it was written in weakly,
+        // for the reason `addweak_` exists; see BindLambdaAsMethodPointer.
+        // Only a lambda that is the whole handler: one passed to a call that
+        // builds the handler is that call's business.
+        _subscribingLambda = adding && subscribed.AddWeak is not null && syntax.Value is LambdaSyntax;
+
         // The handler is converted to the event's closure type, which is what
         // lets `sub.OnFired` be written bare: a method group has no type of its
         // own, and the event is the context that gives it one.
         var handler = BindConversion(BindExpression(syntax.Value), subscribed.Type, syntax.Value.Span);
+        _subscribingLambda = false;
         if (handler.Type.IsError()) return new BoundErrorExpression(syntax.Span);
 
+        // **An object never keeps itself alive through its own subscriptions.**
+        // A form subscribing to its own button would otherwise be a cycle ARC
+        // cannot free: the form holds the button, the button's event holds the
+        // closure, and the closure holds the form.
+        if (adding && subscribed.AddWeak is { } weak && IsBoundToThis(handler))
+            accessor = weak;
+
         return new BoundCall(syntax.Span, accessor, receiver, [handler]);
+    }
+
+    /// <summary>
+    /// Set while the handler of a <c>+=</c> is bound, when that handler is a
+    /// lambda; read and cleared by the one lambda it describes.
+    /// </summary>
+    private bool _subscribingLambda;
+
+    /// <summary>
+    /// Whether a closure is a method bound to the object doing the binding:
+    /// <c>this.OnClick</c>, a bare <c>OnClick</c>, or either inside a lambda,
+    /// where <c>this</c> is the one the lambda captured.
+    /// </summary>
+    private bool IsBoundToThis(BoundExpression handler)
+    {
+        if (handler is not BoundClosureCreate { Receiver: { } bound }) return false;
+
+        while (bound is BoundConversion { Kind: ConversionKind.Upcast or ConversionKind.Identity } cast)
+            bound = cast.Operand;
+
+        return bound switch
+        {
+            BoundThis self => _closures.Count == 0 && self.Parameter.IsThis
+                              && self.Parameter == _currentFunction?.Parameters.FirstOrDefault(p => p.IsThis),
+            BoundFieldAccess { Field.Name: ThisCaptureName, Receiver: BoundThis } => _closures.Count > 0,
+            BoundConversion { Kind: ConversionKind.PointerCast, Operand: BoundLocalAccess local }
+                => _closures.Count > 0 && local.Local.Name == WeakSelfName,
+            _ => false,
+        };
     }
 
     private BoundExpression BindAssignment(AssignmentSyntax syntax)

@@ -193,6 +193,30 @@ public sealed class Builtins
     public FunctionSymbol HashText => Found(ref _hashText, Standard, "HashText",
         PrimitiveTypeSymbol.NUInt, String);
 
+    // The runtime's weak subscription cell, which the accessors and thunks
+    // written for every event call. See runtime/arc.c.
+
+    public FunctionSymbol WeakCellNew => Found(ref _weakCellNew, Standard, "sl_weak_cell_new",
+        BytePointer, BytePointer, BytePointer);
+
+    public FunctionSymbol WeakCellLoad => Found(ref _weakCellLoad, Standard, "sl_weak_cell_load",
+        BytePointer, BytePointer, new PointerTypeSymbol(BytePointer));
+
+    public FunctionSymbol WeakCellMatches => Found(ref _weakCellMatches, Standard,
+        "sl_weak_cell_matches", PrimitiveTypeSymbol.Int, BytePointer, BytePointer, BytePointer);
+
+    public FunctionSymbol WeakCellIsDead => Found(ref _weakCellIsDead, Standard,
+        "sl_weak_cell_is_dead", PrimitiveTypeSymbol.Int, BytePointer);
+
+    public FunctionSymbol ReleaseObject => Found(ref _releaseObject, Standard, "sl_release",
+        PrimitiveTypeSymbol.Void, BytePointer);
+
+    private FunctionSymbol? _weakCellNew;
+    private FunctionSymbol? _weakCellLoad;
+    private FunctionSymbol? _weakCellMatches;
+    private FunctionSymbol? _weakCellIsDead;
+    private FunctionSymbol? _releaseObject;
+
     private FunctionSymbol? _compareLong;
     private FunctionSymbol? _compareULong;
     private FunctionSymbol? _compareDouble;

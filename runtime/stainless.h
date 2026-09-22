@@ -263,6 +263,10 @@ SL_API void  sl_release(void *pointer);
 SL_API void  sl_weak_retain(void *pointer);
 SL_API void  sl_weak_release(void *pointer);
 SL_API void *sl_weak_load(void *pointer);
+SL_API void *sl_weak_cell_new(void *function, void *target);
+SL_API void *sl_weak_cell_load(void *cell, void **function);
+SL_API int32_t sl_weak_cell_matches(void *cell, void *function, void *target);
+SL_API int32_t sl_weak_cell_is_dead(void *cell);
 
 /* Initialises a header the runtime allocated itself, outside sl_alloc. */
 SL_API void  sl_object_init(void *pointer, const SlTypeInfo *type);

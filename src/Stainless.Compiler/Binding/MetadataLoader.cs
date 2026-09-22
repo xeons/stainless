@@ -353,6 +353,10 @@ public sealed class MetadataLoader(
             var add = symbol.Methods.FirstOrDefault(m => m.Name == "add_" + described_.Name);
             var remove = symbol.Methods.FirstOrDefault(m => m.Name == "remove_" + described_.Name);
 
+            // Absent from a library built before weak subscriptions, where
+            // `+=` falls back to `add_`.
+            var addWeak = symbol.Methods.FirstOrDefault(m => m.Name == "addweak_" + described_.Name);
+
             if (backing is null || add is null || remove is null)
             {
                 diagnostics.Error("SL0557", ReferencedSpan,
@@ -373,10 +377,12 @@ public sealed class MetadataLoader(
                 BackingField = backing,
                 Add = add,
                 Remove = remove,
+                AddWeak = addWeak,
             };
 
             add.Event = declared;
             remove.Event = declared;
+            if (addWeak is not null) addWeak.Event = declared;
 
             symbol.Events.Add(declared);
         }

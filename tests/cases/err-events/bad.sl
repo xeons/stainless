@@ -40,6 +40,7 @@ int Main()
     p.Fired(1);                                   // SL0554: only Publisher may raise it
     Notify held = p.Fired;                        // SL0555: an event has no value to read
     p.Fired = s.On;                               // SL0556: '=' would replace the whole list
+    p.Fired.Clear();                              // SL0555: only Publisher may clear it
 
     return 0;
 }

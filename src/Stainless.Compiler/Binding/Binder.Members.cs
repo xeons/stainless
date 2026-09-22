@@ -887,6 +887,8 @@ public sealed partial class Binder
         symbol.Add = DeclareEventAccessor(scope, type, symbol, adding: true);
         symbol.Remove = DeclareEventAccessor(scope, type, symbol, adding: false);
         symbol.Raise = DeclareEventRaiser(scope, type, symbol);
+        symbol.AddWeak = DeclareEventWeakAdd(scope, type, symbol);
+        symbol.WeakCall = DeclareEventWeakCall(scope, type, symbol);
 
         type.Events.Add(symbol);
         _eventNames.Add(symbol.Name);
@@ -933,6 +935,82 @@ public sealed partial class Binder
         type.Methods.Add(accessor);
         scope.Module.Functions.Add(accessor);
         return accessor;
+    }
+
+    /// <summary>
+    /// <c>addweak_Name</c>: <c>add_Name</c> for a subscriber that is the object
+    /// subscribing, held weakly. Public on the same terms as <c>add_</c>, so
+    /// it crosses a library boundary as one more ordinary method.
+    ///
+    /// The prefix cannot collide with <c>add_</c> of any event: <c>add_</c>
+    /// followed by a name never begins <c>addw</c>.
+    /// </summary>
+    private FunctionSymbol? DeclareEventWeakAdd(
+        FileScope scope, NamedTypeSymbol type, EventSymbol symbol)
+    {
+        string name = "addweak_" + symbol.Name;
+        if (type.Methods.Any(m => m.Name == name)) return null;
+
+        var accessor = new FunctionSymbol
+        {
+            Name = name,
+            ModuleName = type.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            ContainingType = type,
+            Span = symbol.Span,
+            IsPublic = symbol.IsPublic,
+            IsProtected = symbol.IsProtected,
+            IsEventAdd = true,
+        };
+
+        accessor.Event = symbol;
+        accessor.Parameters.Add(new ParameterSymbol("this", type, 0) { IsThis = true });
+        accessor.Parameters.Add(new ParameterSymbol("handler", symbol.Type, 1));
+
+        type.Methods.Add(accessor);
+        scope.Module.Functions.Add(accessor);
+        return accessor;
+    }
+
+    /// <summary>
+    /// <c>weakcall_Name</c>: the thunk a weak subscription calls through. It
+    /// takes the runtime's cell where a method takes its receiver, then the
+    /// event's own parameters, so a closure holding it calls it exactly as it
+    /// would call the subscriber's method.
+    /// </summary>
+    private FunctionSymbol? DeclareEventWeakCall(
+        FileScope scope, NamedTypeSymbol type, EventSymbol symbol)
+    {
+        string name = "weakcall_" + symbol.Name;
+        if (type.Methods.Any(m => m.Name == name)) return null;
+
+        var thunk = new FunctionSymbol
+        {
+            Name = name,
+            ModuleName = type.ModuleName,
+            ReturnType = PrimitiveTypeSymbol.Void,
+            Linkage = LinkageKind.Stainless,
+            ContainingType = type,
+            Span = symbol.Span,
+            IsPublic = false,
+            IsStatic = true,
+        };
+
+        thunk.Event = symbol;
+        thunk.Parameters.Add(new ParameterSymbol(
+            "cell", new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), 0));
+
+        int index = 1;
+        foreach (var parameter in symbol.Type.Signature)
+            thunk.Parameters.Add(new ParameterSymbol(parameter.Name, parameter.Type, index++)
+            {
+                Mode = parameter.Mode,
+            });
+
+        type.Methods.Add(thunk);
+        scope.Module.Functions.Add(thunk);
+        return thunk;
     }
 
     /// <summary>

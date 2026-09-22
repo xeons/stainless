@@ -105,6 +105,17 @@ public closure int Comparer<T>(T left, T right);
 /// something it does not have.
 extern "C" void sl_fail(byte* message);
 
+/// A subscription that does not keep its subscriber alive; see runtime/arc.c.
+/// Called only from the accessors and thunks the compiler writes for an event.
+extern "C"
+{
+    byte* sl_weak_cell_new(byte* function, byte* target);
+    byte* sl_weak_cell_load(byte* cell, byte** function);
+    int   sl_weak_cell_matches(byte* cell, byte* function, byte* target);
+    int   sl_weak_cell_is_dead(byte* cell);
+    void  sl_release(byte* pointer);
+}
+
 /// A value, or none -- for the types `T?` cannot describe.
 ///
 /// `C?` is a nullable reference: the null is the pointer, so it costs nothing

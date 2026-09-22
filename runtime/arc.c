@@ -244,3 +244,66 @@ void *sl_weak_load(void *pointer)
             return object;
     }
 }
+
+/*
+ * A subscription that does not keep its subscriber alive.
+ *
+ * An object subscribing itself to an event of something it owns -- a form to
+ * its own button -- would otherwise be a cycle: the form holds the button, the
+ * button's event holds the closure, the closure holds the form. The event holds
+ * one of these instead, as the receiver of a closure whose function is a thunk
+ * the compiler writes per event: the thunk loads the subscriber through the
+ * cell, calls the method it names if the subscriber is alive, and does nothing
+ * if it is not.
+ *
+ * The target is held weakly, so its memory outlives it for as long as the cell
+ * does. That is what lets `sl_weak_cell_matches` compare addresses without the
+ * address ever naming something else.
+ */
+typedef struct SlWeakCell {
+    SlObject header;
+    void    *function;
+    void    *target;
+} SlWeakCell;
+
+static void sl_weak_cell_destroy(void *pointer)
+{
+    SlWeakCell *cell = (SlWeakCell *)pointer;
+    sl_weak_release(cell->target);
+}
+
+static const SlTypeInfo sl_weak_cell_type = {
+    sizeof(SlWeakCell), sl_weak_cell_destroy, "WeakSubscription",
+};
+
+void *sl_weak_cell_new(void *function, void *target)
+{
+    SlWeakCell *cell = (SlWeakCell *)sl_alloc(&sl_weak_cell_type);
+    cell->function = function;
+    cell->target = target;
+    sl_weak_retain(target);
+    return cell;
+}
+
+/* A +1 reference to the subscriber, or NULL once it has gone. */
+void *sl_weak_cell_load(void *pointer, void **function)
+{
+    SlWeakCell *cell = (SlWeakCell *)pointer;
+    *function = cell->function;
+    return sl_weak_load(cell->target);
+}
+
+int32_t sl_weak_cell_matches(void *pointer, void *function, void *target)
+{
+    SlWeakCell *cell = (SlWeakCell *)pointer;
+    return cell->function == function && cell->target == target;
+}
+
+int32_t sl_weak_cell_is_dead(void *pointer)
+{
+    SlWeakCell *cell = (SlWeakCell *)pointer;
+    if (cell->target == NULL) return 0;
+
+    SlObject *target = (SlObject *)cell->target;
+    return __atomic_load_n(&target->strong, __ATOMIC_RELAXED) == 0;
+}

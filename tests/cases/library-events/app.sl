@@ -19,6 +19,40 @@ public class Log
     }
 }
 
+static int s_monitorsFreed = 0;
+
+/// Owns a sensor from the library and subscribes itself to it, which holds it
+/// weakly across the boundary as it does within one compilation.
+public class Monitor
+{
+    Sensor _sensor;
+
+    public Monitor()
+    {
+        _sensor = new Sensor("m");
+        _sensor.Read += this.OnRead;
+    }
+
+    ~Monitor() { s_monitorsFreed++; }
+
+    public void Take(int value) => _sensor.Measure(value);
+
+    public void StopListening() { _sensor.Read -= this.OnRead; }
+
+    public void OnRead(Sensor sender, int value)
+    {
+        Console.WriteLine("monitor " + Text.FromInteger(value));
+    }
+}
+
+void WatchBriefly()
+{
+    var monitor = new Monitor();
+    monitor.Take(6);
+    monitor.StopListening();
+    monitor.Take(7);
+}
+
 int Main()
 {
     var sensor = new Sensor("s");
@@ -49,6 +83,12 @@ int Main()
 
     sensor.Read -= b.OnRead;
     sensor.Measure(5);
+
+    WatchBriefly();
+    var owned = new Monitor();
+    owned.Take(8);
+    owned = new Monitor();
+    Console.WriteLine("monitors freed " + Text.FromInteger((long)s_monitorsFreed));
 
     return 0;
 }

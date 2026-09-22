@@ -438,6 +438,18 @@ public sealed partial class Binder
             return;
         }
 
+        if (ReferenceEquals(accessor, accessor.Event.WeakCall))
+        {
+            BindEventWeakCall(accessor);
+            return;
+        }
+
+        if (ReferenceEquals(accessor, accessor.Event.AddWeak))
+        {
+            BindEventWeakAdd(accessor, field);
+            return;
+        }
+
         var span = accessor.Span;
         var closure = accessor.Event.Type;
         var array = ArrayOf(closure);
@@ -531,6 +543,29 @@ public sealed partial class Binder
         // and the first match wins because later ones see it already set.
         var found = Declare("found", count, new BoundLocalAccess(span, length));
 
+        // A weak subscription is the same subscriber behind a cell, so it
+        // matches the handler that made it: the thunk in the function word,
+        // and the handler's method and object in the cell.
+        BoundExpression Matches(LocalSymbol index)
+        {
+            BoundExpression same = new BoundClosureEqual(span, closure, At(was, index), handler,
+                negated: false);
+            if (accessor.Event.WeakCall is not { } thunk) return same;
+
+            return new BoundBinary(span, PrimitiveTypeSymbol.Bool, same, BoundBinaryOp.LogicalOr,
+                new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                    IsWeakEntry(span, closure, At(was, index), thunk),
+                    BoundBinaryOp.LogicalAnd,
+                    new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                        new BoundCall(span, _builtins.WeakCellMatches, null, [
+                            ReceiverAsPointer(span, closure, At(was, index)),
+                            new BoundFieldAccess(span, handler, closure.Function!),
+                            ReceiverAsPointer(span, closure, handler),
+                        ]),
+                        BoundBinaryOp.NotEqual,
+                        new BoundLiteral(span, PrimitiveTypeSymbol.Int, 0UL))));
+        }
+
         statements.Add(Walk(length, i => new BoundIf(
             span,
             new BoundBinary(
@@ -538,7 +573,7 @@ public sealed partial class Binder
                 Compare(new BoundLocalAccess(span, found), BoundBinaryOp.Equal,
                     new BoundLocalAccess(span, length)),
                 BoundBinaryOp.LogicalAnd,
-                new BoundClosureEqual(span, closure, At(was, i), handler, negated: false)),
+                Matches(i)),
             new BoundExpressionStatement(span, new BoundAssignment(
                 span, new BoundLocalAccess(span, found), new BoundLocalAccess(span, i))),
             null)));
@@ -648,6 +683,210 @@ public sealed partial class Binder
         block.Locals.Add(was);
 
         _functions.Add(new BoundFunction(raiser, block));
+    }
+
+    /// <summary>A closure's receiver word, as the runtime's <c>byte*</c>.</summary>
+    private static BoundExpression ReceiverAsPointer(
+        SourceSpan span, ClosureTypeSymbol closure, BoundExpression value) =>
+        new BoundConversion(span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte),
+            new BoundFieldAccess(span, value, closure.Receiver!), ConversionKind.PointerCast);
+
+    /// <summary>Whether a stored subscriber is a weak one: its function is the thunk.</summary>
+    private static BoundExpression IsWeakEntry(
+        SourceSpan span, ClosureTypeSymbol closure, BoundExpression value, FunctionSymbol thunk) =>
+        new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+            new BoundFieldAccess(span, value, closure.Function!),
+            BoundBinaryOp.Equal,
+            new BoundFunctionReference(span, new PointerTypeSymbol(PrimitiveTypeSymbol.Byte), thunk));
+
+    /// <summary>
+    /// Supplies the body of <c>weakcall_Name</c>, the function a weak
+    /// subscription holds:
+    ///
+    /// <code>
+    /// byte* method = null;
+    /// byte* target = sl_weak_cell_load(cell, &amp;method);
+    /// if (target == null) return;
+    /// Closure call;                      // the event's own closure type
+    /// call.$function = method;
+    /// call.$receiver = (Object)target;   // retained by the store
+    /// sl_release(target);
+    /// call(arguments);
+    /// </code>
+    ///
+    /// A subscriber that has died is skipped, which is always well defined:
+    /// an event's handlers return nothing, so there is no value to invent.
+    /// </summary>
+    private void BindEventWeakCall(FunctionSymbol thunk)
+    {
+        var span = thunk.Span;
+        var closure = thunk.Event!.Type;
+        var bytes = new PointerTypeSymbol(PrimitiveTypeSymbol.Byte);
+
+        var method = new LocalSymbol("method", bytes, isConst: false);
+        var target = new LocalSymbol("target", bytes, isConst: false);
+        var call = new LocalSymbol("call", closure, isConst: false);
+
+        var arguments = thunk.Parameters
+            .Skip(1)
+            .Select(BoundExpression (p) => new BoundParameterAccess(span, p))
+            .ToList();
+
+        var block = new BoundBlock(span, [
+            new BoundLocalDeclaration(span, method, new BoundNullLiteral(span, bytes)),
+            new BoundLocalDeclaration(span, target, new BoundCall(span, _builtins.WeakCellLoad, null, [
+                new BoundParameterAccess(span, thunk.Parameters[0]),
+                new BoundAddressOf(span, new PointerTypeSymbol(bytes), new BoundLocalAccess(span, method)),
+            ])),
+            new BoundIf(span,
+                new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                    new BoundLocalAccess(span, target), BoundBinaryOp.Equal,
+                    new BoundNullLiteral(span, bytes)),
+                new BoundReturn(span, null),
+                null),
+            new BoundLocalDeclaration(span, call, null),
+            new BoundExpressionStatement(span, new BoundAssignment(span,
+                new BoundFieldAccess(span, new BoundLocalAccess(span, call), closure.Function!),
+                new BoundLocalAccess(span, method))),
+            new BoundExpressionStatement(span, new BoundAssignment(span,
+                new BoundFieldAccess(span, new BoundLocalAccess(span, call), closure.Receiver!),
+                new BoundConversion(span, closure.Receiver!.Type,
+                    new BoundLocalAccess(span, target), ConversionKind.PointerCast))),
+            new BoundExpressionStatement(span, new BoundCall(span, _builtins.ReleaseObject, null,
+                [new BoundLocalAccess(span, target)])),
+            new BoundExpressionStatement(span, new BoundClosureCall(span, closure,
+                new BoundLocalAccess(span, call), arguments)),
+        ]);
+
+        block.Locals.AddRange([method, target, call]);
+        _functions.Add(new BoundFunction(thunk, block));
+    }
+
+    /// <summary>
+    /// Supplies the body of <c>addweak_Name</c>: the handler's method and
+    /// object go into a cell that holds the object weakly, and the event is
+    /// given a closure of the thunk and the cell.
+    ///
+    /// Subscribers that have died are dropped first, so an event on a
+    /// long-lived object that transient ones keep subscribing to holds only
+    /// the living.
+    /// </summary>
+    private void BindEventWeakAdd(FunctionSymbol accessor, FieldSymbol field)
+    {
+        var span = accessor.Span;
+        var closure = accessor.Event!.Type;
+        var thunk = accessor.Event.WeakCall!;
+        var array = ArrayOf(closure);
+        var count = PrimitiveTypeSymbol.NUInt;
+        var bytes = new PointerTypeSymbol(PrimitiveTypeSymbol.Byte);
+
+        var receiver = Receiver(span, accessor.Parameters[0]);
+        var handler = new BoundParameterAccess(span, accessor.Parameters[1]);
+
+        BoundExpression Storage() => new BoundFieldAccess(span, receiver, field);
+        BoundExpression Local(LocalSymbol local) => new BoundLocalAccess(span, local);
+        BoundExpression Number(ulong value) => new BoundLiteral(span, count, value);
+
+        BoundExpression At(LocalSymbol source, LocalSymbol index) =>
+            new BoundIndex(span, closure, Local(source), Local(index));
+
+        BoundExpression IsLiving(LocalSymbol source, LocalSymbol index) =>
+            new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                    new BoundFieldAccess(span, At(source, index), closure.Function!),
+                    BoundBinaryOp.NotEqual,
+                    new BoundFunctionReference(span, bytes, thunk)),
+                BoundBinaryOp.LogicalOr,
+                new BoundBinary(span, PrimitiveTypeSymbol.Bool,
+                    new BoundCall(span, _builtins.WeakCellIsDead, null,
+                        [ReceiverAsPointer(span, closure, At(source, index))]),
+                    BoundBinaryOp.Equal,
+                    new BoundLiteral(span, PrimitiveTypeSymbol.Int, 0UL)));
+
+        BoundStatement Walk(LocalSymbol limit, Func<LocalSymbol, BoundStatement> body)
+        {
+            var index = new LocalSymbol("i", count, isConst: false);
+            var loop = new BoundFor(span,
+                new BoundLocalDeclaration(span, index, Number(0)),
+                new BoundBinary(span, PrimitiveTypeSymbol.Bool, Local(index), BoundBinaryOp.Less,
+                    Local(limit)),
+                new BoundIncrement(span, Local(index), isPrefix: false, isIncrement: true),
+                body(index));
+            var block = new BoundBlock(span, [loop]);
+            block.Locals.Add(index);
+            return block;
+        }
+
+        var was = new LocalSymbol("was", array, isConst: false);
+        var length = new LocalSymbol("length", count, isConst: false);
+        var living = new LocalSymbol("living", count, isConst: false);
+        var kept = new LocalSymbol("kept", array, isConst: false);
+        var at = new LocalSymbol("at", count, isConst: false);
+        var cell = new LocalSymbol("cell", bytes, isConst: false);
+        var wrapped = new LocalSymbol("wrapped", closure, isConst: false);
+
+        BoundStatement BuildPrune()
+        {
+            var prune = new BoundBlock(span, [
+                new BoundLocalDeclaration(span, kept, new BoundNewArray(span, array, Local(living))),
+                new BoundLocalDeclaration(span, at, Number(0)),
+                Walk(length, i => new BoundIf(span,
+                    IsLiving(was, i),
+                    new BoundBlock(span, [
+                        new BoundExpressionStatement(span, new BoundAssignment(span,
+                            new BoundIndex(span, closure, Local(kept), Local(at)), At(was, i))),
+                        new BoundExpressionStatement(span,
+                            new BoundIncrement(span, Local(at), isPrefix: false, isIncrement: true)),
+                    ]),
+                    null)),
+                new BoundExpressionStatement(span, new BoundAssignment(span, Storage(), Local(kept))),
+            ]);
+            prune.Locals.AddRange([kept, at]);
+            return prune;
+        }
+
+        var statements = new List<BoundStatement>
+        {
+            new BoundLocalDeclaration(span, was, Storage()),
+            new BoundLocalDeclaration(span, length, new BoundArrayLength(span, count, Local(was))),
+
+            // Count the living, then copy them across in order only if any died.
+            new BoundLocalDeclaration(span, living, Number(0)),
+            Walk(length, i => new BoundIf(span,
+                IsLiving(was, i),
+                new BoundExpressionStatement(span,
+                    new BoundIncrement(span, Local(living), isPrefix: false, isIncrement: true)),
+                null)),
+            new BoundIf(span,
+                new BoundBinary(span, PrimitiveTypeSymbol.Bool, Local(living), BoundBinaryOp.NotEqual,
+                    Local(length)),
+                BuildPrune(),
+                null),
+
+            new BoundLocalDeclaration(span, cell, new BoundCall(span, _builtins.WeakCellNew, null, [
+                new BoundFieldAccess(span, handler, closure.Function!),
+                ReceiverAsPointer(span, closure, handler),
+            ])),
+            new BoundLocalDeclaration(span, wrapped, null),
+            new BoundExpressionStatement(span, new BoundAssignment(span,
+                new BoundFieldAccess(span, Local(wrapped), closure.Function!),
+                new BoundFunctionReference(span, bytes, thunk))),
+            new BoundExpressionStatement(span, new BoundAssignment(span,
+                new BoundFieldAccess(span, Local(wrapped), closure.Receiver!),
+                new BoundConversion(span, closure.Receiver!.Type, Local(cell),
+                    ConversionKind.PointerCast))),
+
+            // The store retained the cell, so the reference the runtime made
+            // it with is given back.
+            new BoundExpressionStatement(span, new BoundCall(span, _builtins.ReleaseObject, null,
+                [Local(cell)])),
+            new BoundExpressionStatement(span, new BoundCall(span, accessor.Event.Add!, receiver,
+                [Local(wrapped)])),
+        };
+
+        var block = new BoundBlock(span, statements);
+        block.Locals.AddRange([was, length, living, cell, wrapped]);
+        _functions.Add(new BoundFunction(accessor, block));
     }
 
     // ============================================================ variants

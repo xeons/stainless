@@ -2109,20 +2109,56 @@ public void Once(Source sender, Change what)
 }
 ```
 
+**An object never keeps itself alive through its own subscriptions.** A form
+that subscribes to its own button is the common case of an event, and under
+plain reference counting it is a cycle nothing can free: the form holds the
+button, the button's event holds the closure, and the closure holds the form.
+So when the subscriber is the object doing the subscribing, the event holds it
+weakly:
+
+```csharp
+public Editor()
+{
+    _save = new Button(this);
+    _save.Click += this.OnSave;                 // weak: the editor is `this`
+    _save.Click += (sender) => { Save(); };     // weak: the lambda's `this`
+    _save.Click += _log.OnClick;                // strong, as before
+}
+```
+
+A method bound to `this` — `this.OnSave`, or a bare `OnSave` — is held
+through a weak reference. A lambda that is the whole handler of a `+=` holds
+the `this` it captures weakly, while everything else it captures stays
+strong. Raising the event skips a subscriber that has died, which is always
+well defined: a handler returns nothing, so there is no value to invent. Every
+other subscription is strong, so `x.Changed += logger.OnChanged` still keeps
+`logger` alive for as long as the event does, and an object that must stay
+alive for its subscription is one something else holds.
+
+**`Name.Clear()` drops every subscriber**, and only inside the declaring type:
+a subscriber that could clear the list could throw away everybody else's. A
+publisher that is being taken apart is the one that knows its subscribers are
+no longer wanted.
+
 **Events are not static** (SL0550): the subscribers would outlive every object
 that added one, and nothing would ever take them off.
 
-An event lowers to a hidden array of subscribers and three methods —
-`add_Name`, `remove_Name` and `raise_Name` — the way a property lowers to
-`get_Name` and `set_Name`. The array is replaced rather than changed by each
-subscription, which is what the paragraph above rests on.
+An event lowers to a hidden array of subscribers and four methods —
+`add_Name`, `remove_Name`, `raise_Name`, and `addweak_Name` for a subscription
+by `this` — the way a property lowers to `get_Name` and `set_Name`. A weak
+subscription is a closure of a private thunk and a runtime cell holding the
+subscriber weakly, which `remove_Name` recognises by the thunk; `addweak_Name`
+also drops subscribers that have died. The array is replaced rather than
+changed by each subscription, which is what the paragraph above rests on.
 
 **An event crosses a library boundary.** A consumer subscribes to and
 unsubscribes from an event declared in a library it has no source for, with
 handlers of its own, and the library raises them. What crosses is the closure
 type, the two methods, and the storage; `raise_Name` is private and does not —
 so "only the declaring type may raise it" holds across the boundary by
-construction rather than by a check on the far side.
+construction rather than by a check on the far side. `addweak_Name` crosses as
+one more public method; a library built without it gets strong subscriptions
+from `+=`, as it always did.
 
 ## 2.15 Lambdas and closures
 

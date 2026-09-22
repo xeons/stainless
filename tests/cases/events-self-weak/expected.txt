@@ -1,0 +1,8 @@
+ok   a form subscribed to its own button by method runs its handler
+ok   and is freed when dropped
+ok   by a lambda using this, it runs too
+ok   and is freed too
+ok   -= removes a weak subscription
+ok   another object's subscription still keeps it alive
+ok   Clear drops every subscriber, and releases them
+ok   a button that outlives its form raises harmlessly

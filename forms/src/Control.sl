@@ -224,10 +224,9 @@ public enum AnchorStyles
 /// back the size it asked for.
 ///
 /// **The parent is held weakly** and the children strongly, so a form and
-/// everything on it are freed together once nothing else holds the form.
-/// An event handler is a closure, and one that names the form -- the usual
-/// `child.Click += this.OnClick` -- holds the form from inside its own child.
-/// That form is not freed until the handler is removed with `-=`.
+/// everything on it are freed together once nothing else holds the form. The
+/// usual `child.Click += this.OnClick` does not hold it either: an object's
+/// subscription of itself is weak (spec §2.14.2).
 public abstract class Control : IControlNotify
 {
     weak WindowedControl? _owner;
