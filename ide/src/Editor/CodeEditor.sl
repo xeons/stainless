@@ -26,9 +26,9 @@
 // this paragraph.
 //
 // What that leaves is a tab, which is not one cell wide. Tabs expand to the
-// next multiple of `TabWidth`, and the two functions that know it -- `ColumnOf`
-// and `OffsetOfColumn` -- are the only places in this file where a byte offset
-// and a screen column are not the same number.
+// next multiple of `TabWidth`, and the two functions that know it --
+// `GetColumnOfOffset` and `GetOffsetOfColumn` -- are the only places in this
+// file where a byte offset and a screen column are not the same number.
 module Ide.Editor;
 
 import Standard.Text;
@@ -93,17 +93,18 @@ public const int DefaultTextSize = 10;
 /// A text editor with syntax highlighting.
 public class CodeEditor : CustomControl
 {
-    Document _doc;
+    Document _contents;
     Theme _palette;
 
     /// Where the caret is, and where a selection started.
     ///
-    /// **A selection is two positions, not a flag and a range.** `anchor` is
-    /// where the selection began and `caret` is where it has got to, so the two
-    /// may be in either order -- which is what a drag upwards is -- and there
-    /// is no selection exactly when they are equal. A range plus a direction
-    /// flag says the same thing in a way that has to be kept consistent.
-    Position _caret;
+    /// **A selection is two positions, not a flag and a range.** `_anchor` is
+    /// where the selection began and `_caretPosition` is where it has got to,
+    /// so the two may be in either order -- which is what a drag upwards is --
+    /// and there is no selection exactly when they are equal. A range plus a
+    /// direction flag says the same thing in a way that has to be kept
+    /// consistent.
+    Position _caretPosition;
     Position _anchor;
 
     /// The column the caret would like to be in when it moves up or down.
@@ -112,37 +113,37 @@ public class CodeEditor : CustomControl
     /// Moving down from column 40 through a short line and on to a long one
     /// puts the caret back at 40, which is what every editor does and what
     /// nobody notices until it is missing.
-    nuint _wanted;
-    bool _keepWanted;
+    nuint _wantedColumn;
+    bool _keepsWantedColumn;
 
     /// The first line shown, and the first column.
     nuint _topLine;
     nuint _leftColumn;
 
-    ScrollBar _down;
-    ScrollBar _across;
+    ScrollBar _verticalScroll;
+    ScrollBar _horizontalScroll;
 
     /// The width of one character and the height of one line, measured once
     /// from the font. Zero until the first paint, which is the first time there
     /// is a `Graphics` to measure with.
-    int _cell;
+    int _cellWidth;
     int _lineHeight;
     /// The width of the line-number gutter, including the breakpoint margin
     /// before it and the gap after it.
-    int _gutter;
+    int _gutterWidth;
 
     /// The breakpoint margin's width. Zero when nothing has asked for one.
-    int _margin;
+    int _marginWidth;
 
     /// Who to ask what a line is marked with.
     ///
-    /// A closure is a value and cannot be null, so `_showMargin` is what says
-    /// whether anyone has asked. Until then this answers `None`.
-    MarkAsker _marks;
-    bool _showMargin;
+    /// A closure is a value and cannot be null, so `_isMarginShown` is what
+    /// says whether anyone has asked. Until then this answers `None`.
+    MarkAsker _markAsker;
+    bool _isMarginShown;
 
     /// The line the program is stopped on, and whether there is one.
-    nuint _statement;
+    nuint _statementRow;
     bool _hasStatement;
 
     /// False when the statement belongs to a frame further up the stack than
@@ -150,7 +151,7 @@ public class CodeEditor : CustomControl
     bool _statementIsTop;
 
     /// True while the mouse is down, so that moving it extends the selection.
-    bool _dragging;
+    bool _isDragging;
 
     /// Whether the constructor has finished.
     ///
@@ -165,44 +166,44 @@ public class CodeEditor : CustomControl
     /// So every handler that touches a field of this class checks this first.
     /// A `Control` cannot opt out of being notified before it is finished, and
     /// this is what a control does about it.
-    bool _ready;
+    bool _isReady;
 
     public CodeEditor(WindowedControl parent)
     {
         base(parent);
-        _doc = new Document();
-        _palette = Theme.Light();
-        _caret = Position.At(0u, 0u);
-        _anchor = _caret;
-        _wanted = 0u;
-        _keepWanted = false;
+        _contents = new Document();
+        _palette = Theme.CreateLight();
+        _caretPosition = Position.Create(0u, 0u);
+        _anchor = _caretPosition;
+        _wantedColumn = 0u;
+        _keepsWantedColumn = false;
         _topLine = 0u;
         _leftColumn = 0u;
-        _cell = 0;
+        _cellWidth = 0;
         _lineHeight = 0;
-        _gutter = 0;
-        _margin = 0;
-        _marks = (row) => LineMark.None;
-        _showMargin = false;
-        _statement = 0u;
+        _gutterWidth = 0;
+        _marginWidth = 0;
+        _markAsker = (row) => LineMark.None;
+        _isMarginShown = false;
+        _statementRow = 0u;
         _hasStatement = false;
         _statementIsTop = true;
-        _dragging = false;
-        _hovering = "";
-        _ready = false;
+        _isDragging = false;
+        _hoveredWord = "";
+        _isReady = false;
 
         Border = ControlBorder.Sunken;
         Font = new Font(MonospaceFamily, DefaultTextSize);
         BackColor = _palette.Background;
         Cursor = CursorKind.Text;
 
-        _down = new ScrollBar(this, true);
-        _down.ValueChanged += this.OnScrolledDown;
-        _across = new ScrollBar(this, false);
-        _across.ValueChanged += this.OnScrolledAcross;
+        _verticalScroll = new ScrollBar(this, true);
+        _verticalScroll.ValueChanged += this.OnScrolledDown;
+        _horizontalScroll = new ScrollBar(this, false);
+        _horizontalScroll.ValueChanged += this.OnScrolledAcross;
 
-        _ready = true;
-        Rescrolled();
+        _isReady = true;
+        UpdateScrollBars();
     }
 
     /// The size of the text, in points.
@@ -230,13 +231,13 @@ public class CodeEditor : CustomControl
 
     /// The font changed, so nothing measured from the old one is true.
     ///
-    /// **`cell` back to zero rather than a remeasure here.** There is no
+    /// **`_cellWidth` back to zero rather than a remeasure here.** There is no
     /// `Graphics` outside a paint, and the next paint begins by measuring
-    /// whenever `cell` is zero -- so this says "unknown" and the one place that
-    /// knows how to find out does the work.
+    /// whenever `_cellWidth` is zero -- so this says "unknown" and the one
+    /// place that knows how to find out does the work.
     protected override void OnFontChanged()
     {
-        _cell = 0;
+        _cellWidth = 0;
         _lineHeight = 0;
         Invalidate();
         base.OnFontChanged();
@@ -267,7 +268,7 @@ public class CodeEditor : CustomControl
     /// Not `Text`: a `Control` already has one, meaning its caption, and a
     /// property that hid it would be two different things under one name in a
     /// type that has both.
-    public Document Contents => _doc;
+    public Document Contents => _contents;
 
     // --------------------------------------------------------- the margin
 
@@ -277,8 +278,8 @@ public class CodeEditor : CustomControl
     /// of the control rather than the length of the file.
     public void ShowMarginMarks(MarkAsker asker)
     {
-        _marks = asker;
-        _showMargin = true;
+        _markAsker = asker;
+        _isMarginShown = true;
         Invalidate();
     }
 
@@ -291,10 +292,10 @@ public class CodeEditor : CustomControl
     /// paler highlight, because it is not where execution resumes.
     public void ShowStatementAt(nuint row, bool top)
     {
-        _statement = row;
+        _statementRow = row;
         _hasStatement = true;
         _statementIsTop = top;
-        GoTo(row, 0u);
+        MoveCaretTo(row, 0u);
         Invalidate();
     }
 
@@ -307,7 +308,7 @@ public class CodeEditor : CustomControl
     }
 
     public bool HasStatement => _hasStatement;
-    public nuint StatementRow => _statement;
+    public nuint StatementRow => _statementRow;
 
     public Theme Palette
     {
@@ -321,7 +322,7 @@ public class CodeEditor : CustomControl
     }
 
     /// Where the caret is.
-    public Position CaretPosition => _caret;
+    public Position CaretPosition => _caretPosition;
 
     /// The first line showing, counting from zero.
     public nuint TopLine => _topLine;
@@ -330,7 +331,7 @@ public class CodeEditor : CustomControl
     public int VisibleLineCount => VisibleLines;
 
     /// Whether anything is selected.
-    public bool HasSelection => !_caret.SameAs(_anchor);
+    public bool HasSelection => !_caretPosition.IsSameAs(_anchor);
 
     /// The selected text, or `""`.
     public String SelectedText
@@ -339,19 +340,19 @@ public class CodeEditor : CustomControl
         {
             if (!HasSelection)
                 return "";
-            return _doc.TextBetween(_anchor, _caret);
+            return _contents.GetTextBetween(_anchor, _caretPosition);
         }
     }
 
     /// Replaces the document. The caret goes to the top and the view with it.
     public void SetDocument(Document replacement)
     {
-        _doc = replacement;
-        _caret = Position.At(0u, 0u);
-        _anchor = _caret;
+        _contents = replacement;
+        _caretPosition = Position.Create(0u, 0u);
+        _anchor = _caretPosition;
         _topLine = 0u;
         _leftColumn = 0u;
-        Rescrolled();
+        UpdateScrollBars();
         Invalidate();
         OnCaretMoved();
     }
@@ -360,17 +361,17 @@ public class CodeEditor : CustomControl
     ///
     /// What an error in the output pane does when it is double-clicked, and the
     /// reason this is public.
-    public void GoTo(nuint row, nuint column)
+    public void MoveCaretTo(nuint row, nuint column)
     {
-        nuint line = row >= _doc.LineCount ? _doc.LineCount - 1u : row;
-        _caret = Position.At(line, ClampColumn(line, column));
-        _anchor = _caret;
+        nuint line = row >= _contents.LineCount ? _contents.LineCount - 1u : row;
+        _caretPosition = Position.Create(line, ClampColumn(line, column));
+        _anchor = _caretPosition;
         // Roughly a third of the way down, rather than at the very top: an
         // error is nearly always about the lines above it as well.
         nuint visible = (nuint)VisibleLines;
         _topLine = line > visible / 3u ? line - visible / 3u : 0u;
-        Rescrolled();
-        ShowCaret();
+        UpdateScrollBars();
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
     }
@@ -388,7 +389,7 @@ public class CodeEditor : CustomControl
     /// The word the pointer was last over, so that moving inside one asks
     /// nothing. A value is read out of a stopped process; asking per pixel
     /// would read it a hundred times across one identifier.
-    String _hovering;
+    String _hoveredWord;
     protected virtual void OnCaretMoved() => CaretMoved(this);
 
     /// Raised whenever the text changes.
@@ -401,7 +402,7 @@ public class CodeEditor : CustomControl
     ///
     /// One of the two places in this file where a byte offset and a column
     /// differ. Walks the line, which is O(its length) -- and a line is short.
-    public nuint ColumnOf(String line, nuint offset)
+    public nuint GetColumnOfOffset(String line, nuint offset)
     {
         nuint column = 0u;
         nuint at = 0u;
@@ -427,7 +428,7 @@ public class CodeEditor : CustomControl
     /// A column inside an expanded tab lands on the tab itself, and a column
     /// past the end of the line lands at the end of it, because a caret may not
     /// be somewhere there is no text.
-    public nuint OffsetOfColumn(String line, nuint column)
+    public nuint GetOffsetOfColumn(String line, nuint column)
     {
         nuint at = 0u;
         nuint seen = 0u;
@@ -453,12 +454,17 @@ public class CodeEditor : CustomControl
         return size;
     }
 
+    /// The screen column the caret is in.
+    nuint MeasureCaretColumn()
+        => GetColumnOfOffset(_contents.GetLineText(_caretPosition.Row),
+                             _caretPosition.Column);
+
     /// How wide a line is, in columns.
-    nuint WidthOf(String line) => ColumnOf(line, line.ByteLength());
+    nuint GetLineWidth(String line) => GetColumnOfOffset(line, line.ByteLength());
 
     nuint ClampColumn(nuint row, nuint column)
     {
-        nuint size = _doc.LengthAt(row);
+        nuint size = _contents.GetLineLength(row);
         return column > size ? size : column;
     }
 
@@ -482,10 +488,10 @@ public class CodeEditor : CustomControl
     {
         get
         {
-            if (_cell <= 0)
+            if (_cellWidth <= 0)
                 return 1;
-            int width = ClientBounds.Width - _gutter - ScrollThickness;
-            int fits = width / _cell;
+            int width = ClientBounds.Width - _gutterWidth - ScrollThickness;
+            int fits = width / _cellWidth;
             return fits < 1 ? 1 : fits;
         }
     }
@@ -494,21 +500,21 @@ public class CodeEditor : CustomControl
 
     /// Puts the scroll bars where they belong and tells them what they are
     /// scrolling. Called on every resize and after every edit.
-    void Rescrolled()
+    void UpdateScrollBars()
     {
-        if (!_ready)
+        if (!_isReady)
             return;
         var area = ClientBounds;
         int bar = ScrollThickness;
 
-        _down.SetBounds(area.Width - bar, 0, bar, area.Height - bar);
-        _across.SetBounds(0, area.Height - bar, area.Width - bar, bar);
+        _verticalScroll.SetBounds(area.Width - bar, 0, bar, area.Height - bar);
+        _horizontalScroll.SetBounds(0, area.Height - bar, area.Width - bar, bar);
 
-        int lines = (int)_doc.LineCount;
+        int lines = (int)_contents.LineCount;
         int page = VisibleLines;
-        _down.Maximum = lines > page ? lines - 1 : 0;
-        _down.PageSize = page;
-        _down.Value = (int)_topLine;
+        _verticalScroll.Maximum = lines > page ? lines - 1 : 0;
+        _verticalScroll.PageSize = page;
+        _verticalScroll.Value = (int)_topLine;
 
         // The widest line on screen, rather than in the file: scanning every
         // line of a large file on every keystroke to find the longest is the
@@ -516,30 +522,30 @@ public class CodeEditor : CustomControl
         // horizontal thumb of exactly the right size.
         int widest = 0;
         nuint last = _topLine + (nuint)page;
-        if (last > _doc.LineCount)
-            last = _doc.LineCount;
+        if (last > _contents.LineCount)
+            last = _contents.LineCount;
         for (nuint i = _topLine; i < last; i++)
         {
-            int width = (int)WidthOf(_doc.TextAt(i));
+            int width = (int)GetLineWidth(_contents.GetLineText(i));
             if (width > widest)
                 widest = width;
         }
         int columns = VisibleColumns;
-        _across.Maximum = widest > columns ? widest - 1 : 0;
-        _across.PageSize = columns;
-        _across.Value = (int)_leftColumn;
+        _horizontalScroll.Maximum = widest > columns ? widest - 1 : 0;
+        _horizontalScroll.PageSize = columns;
+        _horizontalScroll.Value = (int)_leftColumn;
     }
 
     protected override void OnResize()
     {
-        if (_ready)
-            Rescrolled();
+        if (_isReady)
+            UpdateScrollBars();
         base.OnResize();
     }
 
     void OnScrolledDown(Control sender)
     {
-        nuint to = (nuint)_down.Value;
+        nuint to = (nuint)_verticalScroll.Value;
         if (to == _topLine)
             return;
         _topLine = to;
@@ -548,7 +554,7 @@ public class CodeEditor : CustomControl
 
     void OnScrolledAcross(Control sender)
     {
-        nuint to = (nuint)_across.Value;
+        nuint to = (nuint)_horizontalScroll.Value;
         if (to == _leftColumn)
             return;
         _leftColumn = to;
@@ -558,19 +564,19 @@ public class CodeEditor : CustomControl
     /// Scrolls so the caret is on screen. Does nothing when it already is,
     /// which is the common case and the reason typing does not repaint the
     /// whole control.
-    void ShowCaret()
+    void ScrollToCaret()
     {
         nuint lines = (nuint)VisibleLines;
-        if (_caret.Row < _topLine)
+        if (_caretPosition.Row < _topLine)
         {
-            _topLine = _caret.Row;
+            _topLine = _caretPosition.Row;
         }
-        else if (_caret.Row >= _topLine + lines)
+        else if (_caretPosition.Row >= _topLine + lines)
         {
-            _topLine = _caret.Row - lines + 1u;
+            _topLine = _caretPosition.Row - lines + 1u;
         }
 
-        nuint column = ColumnOf(_doc.TextAt(_caret.Row), _caret.Column);
+        nuint column = MeasureCaretColumn();
         nuint columns = (nuint)VisibleColumns;
         if (column < _leftColumn)
         {
@@ -581,48 +587,48 @@ public class CodeEditor : CustomControl
             _leftColumn = column - columns + 1u;
         }
 
-        Rescrolled();
+        UpdateScrollBars();
     }
 
     // -------------------------------------------------------------- drawing
 
     protected override void OnPaint(PaintEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
         var canvas = args.Graphics;
 
         // Measured once, from the font, the first time there is something to
         // measure with. `M` rather than a space: a space is the one character a
         // few fixed-width faces still report as narrower than the rest.
-        if (_cell <= 0)
+        if (_cellWidth <= 0)
         {
             var size = canvas.MeasureString("M", Font);
-            _cell = size.Width;
+            _cellWidth = size.Width;
             _lineHeight = size.Height;
-            if (_cell <= 0)
-                _cell = 8;
+            if (_cellWidth <= 0)
+                _cellWidth = 8;
             if (_lineHeight <= 0)
                 _lineHeight = 14;
-            Rescrolled();
+            UpdateScrollBars();
         }
 
-        _margin = _showMargin ? MarginCells * _cell : 0;
-        _gutter = GutterWidth(canvas);
+        _marginWidth = _isMarginShown ? MarginCells * _cellWidth : 0;
+        _gutterWidth = MeasureGutterWidth(canvas);
 
         var area = ClientBounds;
         canvas.Clear(_palette.Background);
         canvas.FillRectangle(new Brush(_palette.GutterBack),
-                             Rectangle.Of(0, 0, _gutter, area.Height));
+                             Rectangle.Of(0, 0, _gutterWidth, area.Height));
 
         // The rule at column 80, drawn under the text rather than over it.
-        int rule = _gutter + (int)(RightMargin - _leftColumn) * _cell;
-        if (rule > _gutter && rule < area.Width)
+        int rule = _gutterWidth + (int)(RightMargin - _leftColumn) * _cellWidth;
+        if (rule > _gutterWidth && rule < area.Width)
         {
             canvas.DrawLine(new Pen(_palette.Margin), rule, 0, rule, area.Height);
         }
 
-        nuint lines = _doc.LineCount;
+        nuint lines = _contents.LineCount;
         nuint last = _topLine + (nuint)VisibleLines + 1u;
         if (last > lines)
             last = lines;
@@ -637,9 +643,9 @@ public class CodeEditor : CustomControl
     }
 
     /// How wide the gutter is: room for the largest line number, and a gap.
-    int GutterWidth(Graphics canvas)
+    int MeasureGutterWidth(Graphics canvas)
     {
-        nuint count = _doc.LineCount;
+        nuint count = _contents.LineCount;
         int digits = 1;
         while (count >= 10u)
         {
@@ -648,30 +654,30 @@ public class CodeEditor : CustomControl
         }
         if (digits < 3)
             digits = 3;
-        return _margin + (digits + 2) * _cell;
+        return _marginWidth + (digits + 2) * _cellWidth;
     }
 
     void PaintLine(Graphics canvas, nuint row, int y, int width)
     {
-        var line = _doc.LineAt(row);
-        bool current = row == _caret.Row;
+        var line = _contents.GetLine(row);
+        bool current = row == _caretPosition.Row;
 
         // The statement highlight wins over the caret line's. Both would paint
         // the same rectangle, and the stopped line must stay visible under the
         // caret.
-        bool stopped = _hasStatement && row == _statement;
+        bool stopped = _hasStatement && row == _statementRow;
         if (stopped)
         {
             canvas.FillRectangle(new Brush(_statementIsTop
                                            ? _palette.CurrentStatement
                                            : _palette.CalledFrom),
-                                 Rectangle.Of(_gutter, y, width - _gutter,
+                                 Rectangle.Of(_gutterWidth, y, width - _gutterWidth,
                                               _lineHeight));
         }
         else if (current && !HasSelection)
         {
             canvas.FillRectangle(new Brush(_palette.CurrentLine),
-                                 Rectangle.Of(_gutter, y, width - _gutter, _lineHeight));
+                                 Rectangle.Of(_gutterWidth, y, width - _gutterWidth, _lineHeight));
         }
 
         PaintSelection(canvas, row, y, width);
@@ -679,7 +685,7 @@ public class CodeEditor : CustomControl
 
         // The number, right-aligned in the gutter.
         String number = Standard.Text.FromInteger(row + 1u);
-        int numberX = _gutter - _cell - (int)number.ByteLength() * _cell;
+        int numberX = _gutterWidth - _cellWidth - (int)number.ByteLength() * _cellWidth;
         canvas.DrawString(number, Font,
                           current ? _palette.GutterCurrent : _palette.GutterText,
                           numberX, y);
@@ -692,16 +698,16 @@ public class CodeEditor : CustomControl
             if (token.Kind == TokenKind.Whitespace)
                 continue;
 
-            nuint column = ColumnOf(line.Text, token.Start);
+            nuint column = GetColumnOfOffset(line.Text, token.Start);
             if (column + token.Length < _leftColumn)
                 continue;
 
-            int x = _gutter + (int)(column - _leftColumn) * _cell;
+            int x = _gutterWidth + (int)(column - _leftColumn) * _cellWidth;
             if (x > width)
                 break;
 
             String piece = line.Text.Substring(token.Start, token.Length);
-            canvas.DrawString(piece, Font, _palette.ColorFor(token.Kind), x, y);
+            canvas.DrawString(piece, Font, _palette.GetColorFor(token.Kind), x, y);
         }
     }
 
@@ -711,7 +717,7 @@ public class CodeEditor : CustomControl
     /// at any text size is less to carry than a bitmap per size.
     void PaintMargin(Graphics canvas, nuint row, int y, bool stopped)
     {
-        if (_margin <= 0)
+        if (_marginWidth <= 0)
             return;
 
         // Arrow first, disc over it. A breakpoint on the stopped line is still
@@ -719,7 +725,7 @@ public class CodeEditor : CustomControl
         if (stopped && _statementIsTop)
             PaintStatementArrow(canvas, y);
 
-        var mark = _marks(row);
+        var mark = _markAsker(row);
         if (mark == LineMark.None)
             return;
 
@@ -728,7 +734,7 @@ public class CodeEditor : CustomControl
         int size = _lineHeight - inset * 2;
         if (size < 4)
             size = 4;
-        var disc = Rectangle.Of((_margin - size) / 2, y + inset, size, size);
+        var disc = Rectangle.Of((_marginWidth - size) / 2, y + inset, size, size);
 
         switch (mark)
         {
@@ -750,8 +756,8 @@ public class CodeEditor : CustomControl
     {
         int middle = y + _lineHeight / 2;
         int high = _lineHeight / 4;
-        int left = _cell / 3;
-        int right = _margin - _cell / 3;
+        int left = _cellWidth / 3;
+        int right = _marginWidth - _cellWidth / 3;
         int stem = left + (right - left) / 2;
 
         var arrow = new Point[7];
@@ -773,18 +779,18 @@ public class CodeEditor : CustomControl
             return;
 
         var start = _anchor;
-        var end = _caret;
-        if (end.Before(start))
+        var end = _caretPosition;
+        if (end.IsBefore(start))
         {
-            start = _caret;
+            start = _caretPosition;
             end = _anchor;
         }
         if (row < start.Row || row > end.Row)
             return;
 
-        String text = _doc.TextAt(row);
-        nuint from = row == start.Row ? ColumnOf(text, start.Column) : 0u;
-        nuint to = row == end.Row ? ColumnOf(text, end.Column) : WidthOf(text) + 1u;
+        String text = _contents.GetLineText(row);
+        nuint from = row == start.Row ? GetColumnOfOffset(text, start.Column) : 0u;
+        nuint to = row == end.Row ? GetColumnOfOffset(text, end.Column) : GetLineWidth(text) + 1u;
 
         // A line wholly inside the selection is highlighted one column past its
         // end, which is what shows that the line break is selected too.
@@ -793,8 +799,8 @@ public class CodeEditor : CustomControl
         if (from < _leftColumn)
             from = _leftColumn;
 
-        int x = _gutter + (int)(from - _leftColumn) * _cell;
-        int span = (int)(to - from) * _cell;
+        int x = _gutterWidth + (int)(from - _leftColumn) * _cellWidth;
+        int span = (int)(to - from) * _cellWidth;
         if (x + span > width)
             span = width - x;
         if (span <= 0)
@@ -808,19 +814,20 @@ public class CodeEditor : CustomControl
     /// it has scrolled off.
     void PlaceCaret()
     {
-        if (_caret.Row < _topLine || _caret.Row >= _topLine + (nuint)VisibleLines + 1u)
+        if (_caretPosition.Row < _topLine
+            || _caretPosition.Row >= _topLine + (nuint)VisibleLines + 1u)
         {
             Caret = Rectangle.Empty;
             return;
         }
-        nuint column = ColumnOf(_doc.TextAt(_caret.Row), _caret.Column);
+        nuint column = MeasureCaretColumn();
         if (column < _leftColumn)
         {
             Caret = Rectangle.Empty;
             return;
         }
-        int x = _gutter + (int)(column - _leftColumn) * _cell;
-        int y = (int)(_caret.Row - _topLine) * _lineHeight;
+        int x = _gutterWidth + (int)(column - _leftColumn) * _cellWidth;
+        int y = (int)(_caretPosition.Row - _topLine) * _lineHeight;
         Caret = Rectangle.Of(x, y, 2, _lineHeight);
     }
 
@@ -845,17 +852,17 @@ public class CodeEditor : CustomControl
     /// what Replace All wants so that it terminates.
     public bool FindNext(String needle, bool matchCase, bool wrap)
     {
-        if (!_ready || needle.ByteLength() == 0u || _doc.LineCount == 0u)
+        if (!_isReady || needle.ByteLength() == 0u || _contents.LineCount == 0u)
             return false;
 
-        var from = _caret.Before(_anchor) ? _anchor : _caret;
+        var from = _caretPosition.IsBefore(_anchor) ? _anchor : _caretPosition;
         String wanted = matchCase ? needle : needle.ToLowerAscii();
 
         // The line the caret is on, from the caret; then every line after it;
         // then, if wrapping, from the top back to and including this one -- so
         // a match earlier on the caret's own line is found last rather than
         // skipped, which is the off-by-one this shape exists to avoid.
-        nuint rows = _doc.LineCount;
+        nuint rows = _contents.LineCount;
         for (nuint step = 0u; step <= rows; step++)
         {
             nuint row = from.Row + step;
@@ -867,7 +874,7 @@ public class CodeEditor : CustomControl
                 row = row - rows;
             }
 
-            String line = _doc.TextAt(row);
+            String line = _contents.GetLineText(row);
             String hay = matchCase ? line : line.ToLowerAscii();
 
             // Only the first line of the sweep starts part-way in.
@@ -901,7 +908,7 @@ public class CodeEditor : CustomControl
     /// silently edits a place nobody looked at.
     public bool ReplaceCurrent(String needle, String with, bool matchCase)
     {
-        if (!_ready || needle.ByteLength() == 0u)
+        if (!_isReady || needle.ByteLength() == 0u)
             return false;
 
         String chosen = SelectedText;
@@ -915,16 +922,16 @@ public class CodeEditor : CustomControl
             return false;
         }
 
-        var start = _caret.Before(_anchor) ? _caret : _anchor;
-        var end = _caret.Before(_anchor) ? _anchor : _caret;
+        var start = _caretPosition.IsBefore(_anchor) ? _caretPosition : _anchor;
+        var end = _caretPosition.IsBefore(_anchor) ? _anchor : _caretPosition;
 
-        _doc.Delete(start, end);
-        var landed = _doc.Insert(start, with);
-        _caret = landed;
+        _contents.DeleteText(start, end);
+        var landed = _contents.InsertText(start, with);
+        _caretPosition = landed;
         _anchor = landed;
-        _keepWanted = false;
+        _keepsWantedColumn = false;
 
-        ShowCaret();
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
         OnEdited();
@@ -942,27 +949,27 @@ public class CodeEditor : CustomControl
     /// everything above it.
     public nuint ReplaceAll(String needle, String with, bool matchCase)
     {
-        if (!_ready || needle.ByteLength() == 0u)
+        if (!_isReady || needle.ByteLength() == 0u)
             return 0u;
 
-        _caret = Position.At(0u, 0u);
-        _anchor = _caret;
+        _caretPosition = Position.Create(0u, 0u);
+        _anchor = _caretPosition;
 
         nuint done = 0u;
         while (FindNext(needle, matchCase, false))
         {
-            var start = _caret.Before(_anchor) ? _caret : _anchor;
-            var end = _caret.Before(_anchor) ? _anchor : _caret;
+            var start = _caretPosition.IsBefore(_anchor) ? _caretPosition : _anchor;
+            var end = _caretPosition.IsBefore(_anchor) ? _anchor : _caretPosition;
 
-            _doc.Delete(start, end);
-            var landed = _doc.Insert(start, with);
-            _caret = landed;
+            _contents.DeleteText(start, end);
+            var landed = _contents.InsertText(start, with);
+            _caretPosition = landed;
             _anchor = landed;
             done++;
         }
 
-        _keepWanted = false;
-        ShowCaret();
+        _keepsWantedColumn = false;
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
         if (done > 0u)
@@ -973,19 +980,19 @@ public class CodeEditor : CustomControl
     /// Selects a run on one line and scrolls it into view.
     void SelectRange(nuint row, nuint from, nuint to)
     {
-        _anchor = Position.At(row, from);
-        _caret = Position.At(row, to);
-        _keepWanted = false;
+        _anchor = Position.Create(row, from);
+        _caretPosition = Position.Create(row, to);
+        _keepsWantedColumn = false;
 
-        // Into view the way `GoTo` does it, rather than only far enough: a
-        // match found at the bottom of the file should not sit on the last
-        // visible line with no context under it.
+        // Into view the way `MoveCaretTo` does it, rather than only far
+        // enough: a match found at the bottom of the file should not sit on the
+        // last visible line with no context under it.
         nuint visible = (nuint)VisibleLines;
         if (row < _topLine || row >= _topLine + visible)
             _topLine = row > visible / 3u ? row - visible / 3u : 0u;
 
-        Rescrolled();
-        ShowCaret();
+        UpdateScrollBars();
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
     }
@@ -994,26 +1001,26 @@ public class CodeEditor : CustomControl
 
     protected override void OnMouseDown(MouseEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
         Focus();
 
         // A margin click MUST NOT move the caret. Setting several breakpoints
         // in a row would otherwise lose the caret's place each time.
-        if (_margin > 0 && args.X < _margin)
+        if (_marginWidth > 0 && args.X < _marginWidth)
         {
-            MarginClicked(this, new RowEventArgs(RowAt(args.Y)));
+            MarginClicked(this, new RowEventArgs(GetRowAt(args.Y)));
             return;
         }
 
-        var hit = PositionAt(args.X, args.Y);
-        _caret = hit;
+        var hit = GetPositionAt(args.X, args.Y);
+        _caretPosition = hit;
         if (!args.Modifiers.HasFlag(ModifierKeys.Shift))
             _anchor = hit;
-        _dragging = true;
+        _isDragging = true;
         CaptureMouse(true);
-        _keepWanted = false;
-        ShowCaret();
+        _keepsWantedColumn = false;
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
         base.OnMouseDown(args);
@@ -1027,11 +1034,11 @@ public class CodeEditor : CustomControl
     /// to the word's edges from where it already is.
     ///
     /// **Both edges are found by scanning from the caret**, rather than by
-    /// reusing `WordLeft` and `WordRight`. Those two are keyboard movement:
-    /// they cross runs of spaces, because Ctrl+Left from the start of a word
-    /// must reach the previous one. A double-click on a space should select
-    /// that run of spaces and stop, and a double-click inside a word should
-    /// take the word and not the gap after it.
+    /// reusing `FindPreviousWordStart` and `FindNextWordStart`. Those two are
+    /// keyboard movement: they cross runs of spaces, because Ctrl+Left from
+    /// the start of a word must reach the previous one. A double-click on a
+    /// space should select that run of spaces and stop, and a double-click
+    /// inside a word should take the word and not the gap after it.
     protected override void OnDoubleClick()
     {
         base.OnDoubleClick();
@@ -1044,64 +1051,64 @@ public class CodeEditor : CustomControl
     /// has no mouse.
     public void SelectWord()
     {
-        if (!_ready)
+        if (!_isReady)
             return;
 
-        String line = _doc.TextAt(_caret.Row);
+        String line = _contents.GetLineText(_caretPosition.Row);
         nuint size = line.ByteLength();
         if (size == 0u)
             return;
 
-        nuint at = _caret.Column;
+        nuint at = _caretPosition.Column;
         if (at >= size)
-            at = StepLeft(line, size);
+            at = FindPreviousCharacter(line, size);
 
         // Which run the byte under the pointer belongs to. A word, a run of
         // spaces, or a run of punctuation -- three cases rather than two, so
         // that double-clicking `=>` takes both characters instead of one.
         byte here = line.ByteAt(at);
-        bool wordly = IsWord(here);
-        bool spacey = IsSpace(here);
+        bool wordly = IsWordByte(here);
+        bool spacey = IsSpaceByte(here);
 
         nuint start = at;
         while (start > 0u)
         {
-            nuint back = StepLeft(line, start);
-            if (!SameRun(line.ByteAt(back), wordly, spacey))
+            nuint back = FindPreviousCharacter(line, start);
+            if (!IsInSameRun(line.ByteAt(back), wordly, spacey))
                 break;
             start = back;
         }
 
         nuint end = at;
-        while (end < size && SameRun(line.ByteAt(end), wordly, spacey))
+        while (end < size && IsInSameRun(line.ByteAt(end), wordly, spacey))
             end = line.NextCodePoint(end);
 
-        _anchor = Position.At(_caret.Row, start);
-        _caret = Position.At(_caret.Row, end);
-        _keepWanted = false;
-        ShowCaret();
+        _anchor = Position.Create(_caretPosition.Row, start);
+        _caretPosition = Position.Create(_caretPosition.Row, end);
+        _keepsWantedColumn = false;
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
     }
 
     /// Whether a byte belongs to the same run as the one double-clicked.
-    bool SameRun(byte c, bool wordly, bool spacey)
+    bool IsInSameRun(byte c, bool wordly, bool spacey)
     {
         if (wordly)
-            return IsWord(c);
+            return IsWordByte(c);
         if (spacey)
-            return IsSpace(c);
-        return !IsWord(c) && !IsSpace(c);
+            return IsSpaceByte(c);
+        return !IsWordByte(c) && !IsSpaceByte(c);
     }
 
     protected override void OnMouseMove(MouseEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
-        if (_dragging)
+        if (_isDragging)
         {
-            _caret = PositionAt(args.X, args.Y);
-            ShowCaret();
+            _caretPosition = GetPositionAt(args.X, args.Y);
+            ScrollToCaret();
             Invalidate();
             OnCaretMoved();
         }
@@ -1118,11 +1125,11 @@ public class CodeEditor : CustomControl
     /// and a number there is not a name.
     void ReportHover(int x, int y)
     {
-        String word = x < _gutter ? "" : WordAt(PositionAt(x, y));
-        if (word == _hovering)
+        String word = x < _gutterWidth ? "" : GetWordAt(GetPositionAt(x, y));
+        if (word == _hoveredWord)
             return;
 
-        _hovering = word;
+        _hoveredWord = word;
         Hovered(word);
     }
 
@@ -1130,30 +1137,30 @@ public class CodeEditor : CustomControl
     ///
     /// A word and nothing else: a run of spaces or of punctuation is not a
     /// name, and answering one would have a debugger evaluating `=>`.
-    public String WordAt(Position where)
+    public String GetWordAt(Position where)
     {
-        if (where.Row >= _doc.LineCount)
+        if (where.Row >= _contents.LineCount)
             return "";
 
-        String line = _doc.TextAt(where.Row);
+        String line = _contents.GetLineText(where.Row);
         nuint size = line.ByteLength();
         if (size == 0u || where.Column >= size)
             return "";
 
-        if (!IsWord(line.ByteAt(where.Column)))
+        if (!IsWordByte(line.ByteAt(where.Column)))
             return "";
 
         nuint start = where.Column;
         while (start > 0u)
         {
-            nuint back = StepLeft(line, start);
-            if (!IsWord(line.ByteAt(back)))
+            nuint back = FindPreviousCharacter(line, start);
+            if (!IsWordByte(line.ByteAt(back)))
                 break;
             start = back;
         }
 
         nuint end = where.Column;
-        while (end < size && IsWord(line.ByteAt(end)))
+        while (end < size && IsWordByte(line.ByteAt(end)))
             end = line.NextCodePoint(end);
 
         return line.Substring(start, end - start);
@@ -1161,11 +1168,11 @@ public class CodeEditor : CustomControl
 
     protected override void OnMouseUp(MouseEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
-        if (_dragging)
+        if (_isDragging)
         {
-            _dragging = false;
+            _isDragging = false;
             CaptureMouse(false);
         }
         base.OnMouseUp(args);
@@ -1173,7 +1180,7 @@ public class CodeEditor : CustomControl
 
     protected override void OnMouseWheel(MouseEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
         // Three lines a notch, as every platform's own setting defaults to.
         int notches = args.Delta / 120;
@@ -1193,48 +1200,48 @@ public class CodeEditor : CustomControl
         int to = (int)_topLine - notches * 3;
         if (to < 0)
             to = 0;
-        int highest = (int)_doc.LineCount - 1;
+        int highest = (int)_contents.LineCount - 1;
         if (to > highest)
             to = highest;
         if ((nuint)to == _topLine)
             return;
         _topLine = (nuint)to;
-        Rescrolled();
+        UpdateScrollBars();
         Invalidate();
         base.OnMouseWheel(args);
     }
 
     /// Which row a y coordinate is over, clamped to the document.
-    nuint RowAt(int y)
+    nuint GetRowAt(int y)
     {
         if (_lineHeight <= 0)
             return 0u;
         int row = y / _lineHeight + (int)_topLine;
         if (row < 0)
             row = 0;
-        nuint highest = _doc.LineCount - 1u;
+        nuint highest = _contents.LineCount - 1u;
         return (nuint)row > highest ? highest : (nuint)row;
     }
 
     /// What position a point in the control is over.
-    Position PositionAt(int x, int y)
+    Position GetPositionAt(int x, int y)
     {
-        if (_lineHeight <= 0 || _cell <= 0)
-            return Position.At(0u, 0u);
+        if (_lineHeight <= 0 || _cellWidth <= 0)
+            return Position.Create(0u, 0u);
 
-        nuint line = RowAt(y);
+        nuint line = GetRowAt(y);
 
-        int column = (x - _gutter) / _cell + (int)_leftColumn;
+        int column = (x - _gutterWidth) / _cellWidth + (int)_leftColumn;
         if (column < 0)
             column = 0;
-        return Position.At(line, OffsetOfColumn(_doc.TextAt(line), (nuint)column));
+        return Position.Create(line, GetOffsetOfColumn(_contents.GetLineText(line), (nuint)column));
     }
 
     // --------------------------------------------------------- the keyboard
 
     protected override void OnKeyDown(KeyEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
         bool shift = args.Shift;
         bool control = args.Control;
@@ -1242,35 +1249,35 @@ public class CodeEditor : CustomControl
 
         if (args.Key == Key.Left)
         {
-            MoveLeft(shift, control);
+            MoveCaretLeft(shift, control);
         }
         else if (args.Key == Key.Right)
         {
-            MoveRight(shift, control);
+            MoveCaretRight(shift, control);
         }
         else if (args.Key == Key.Up)
         {
-            MoveVertically(-1, shift);
+            MoveCaretVertically(-1, shift);
         }
         else if (args.Key == Key.Down)
         {
-            MoveVertically(1, shift);
+            MoveCaretVertically(1, shift);
         }
         else if (args.Key == Key.PageUp)
         {
-            MoveVertically(-VisibleLines, shift);
+            MoveCaretVertically(-VisibleLines, shift);
         }
         else if (args.Key == Key.PageDown)
         {
-            MoveVertically(VisibleLines, shift);
+            MoveCaretVertically(VisibleLines, shift);
         }
         else if (args.Key == Key.Home)
         {
-            MoveHome(shift, control);
+            MoveCaretHome(shift, control);
         }
         else if (args.Key == Key.End)
         {
-            MoveEnd(shift, control);
+            MoveCaretEnd(shift, control);
         }
         else if (args.Key == Key.C && control)
         {
@@ -1320,7 +1327,7 @@ public class CodeEditor : CustomControl
         }
         else if (args.Key == Key.Backspace)
         {
-            DeleteBack();
+            DeleteBackward();
             moved = false;
         }
         else if (args.Key == Key.Delete)
@@ -1330,12 +1337,12 @@ public class CodeEditor : CustomControl
         }
         else if (args.Key == Key.Enter)
         {
-            Type("\n");
+            TypeText("\n");
             moved = false;
         }
         else if (args.Key == Key.Tab)
         {
-            Indent(shift);
+            IndentSelection(shift);
             moved = false;
         }
         else
@@ -1347,7 +1354,7 @@ public class CodeEditor : CustomControl
 
         if (moved)
         {
-            ShowCaret();
+            ScrollToCaret();
             Invalidate();
             OnCaretMoved();
         }
@@ -1356,7 +1363,7 @@ public class CodeEditor : CustomControl
 
     protected override void OnKeyPress(KeyPressEventArgs args)
     {
-        if (!_ready)
+        if (!_isReady)
             return;
         // Everything below a space is a control code, and each one that means
         // something has already been dealt with as a key. Ctrl+V arrives here a
@@ -1364,100 +1371,104 @@ public class CodeEditor : CustomControl
         // range and not a list of the ones we happen to have thought of. DEL
         // is one too, and is what Ctrl+Backspace types on Windows.
         if (args.KeyChar >= ' ' && args.KeyChar != '\x7F')
-            Type(Standard.Text.FromChar(args.KeyChar));
+            TypeText(Standard.Text.FromChar(args.KeyChar));
         base.OnKeyPress(args);
     }
 
     // ------------------------------------------------------------- movement
 
     /// Collapses the selection unless the shift key is holding it open.
-    void Settle(bool shift)
+    void CollapseSelection(bool shift)
     {
         if (!shift)
-            _anchor = _caret;
-        if (!_keepWanted)
-            _wanted = ColumnOf(_doc.TextAt(_caret.Row), _caret.Column);
-        _keepWanted = false;
+            _anchor = _caretPosition;
+        if (!_keepsWantedColumn)
+            _wantedColumn = MeasureCaretColumn();
+        _keepsWantedColumn = false;
     }
 
-    void MoveLeft(bool shift, bool word)
+    void MoveCaretLeft(bool shift, bool word)
     {
         // An unheld selection collapses to its near end rather than moving,
         // which is what every editor does and what makes Left after a drag
         // predictable.
         if (!shift && HasSelection)
         {
-            _caret = _anchor.Before(_caret) ? _anchor : _caret;
-            _anchor = _caret;
-            Settle(false);
+            _caretPosition = _anchor.IsBefore(_caretPosition) ? _anchor : _caretPosition;
+            _anchor = _caretPosition;
+            CollapseSelection(false);
             return;
         }
 
-        if (_caret.Column > 0u)
+        if (_caretPosition.Column > 0u)
         {
-            String line = _doc.TextAt(_caret.Row);
-            _caret = Position.At(_caret.Row,
-                                word ? WordLeft(line, _caret.Column) : StepLeft(line, _caret.Column));
+            String line = _contents.GetLineText(_caretPosition.Row);
+            _caretPosition = Position.Create(_caretPosition.Row,
+                word ? FindPreviousWordStart(line, _caretPosition.Column)
+                     : FindPreviousCharacter(line, _caretPosition.Column));
         }
-        else if (_caret.Row > 0u)
+        else if (_caretPosition.Row > 0u)
         {
-            _caret = Position.At(_caret.Row - 1u, _doc.LengthAt(_caret.Row - 1u));
+            nuint above = _caretPosition.Row - 1u;
+            _caretPosition = Position.Create(above, _contents.GetLineLength(above));
         }
-        Settle(shift);
+        CollapseSelection(shift);
     }
 
-    void MoveRight(bool shift, bool word)
+    void MoveCaretRight(bool shift, bool word)
     {
         if (!shift && HasSelection)
         {
-            _caret = _anchor.Before(_caret) ? _caret : _anchor;
-            _anchor = _caret;
-            Settle(false);
+            _caretPosition = _anchor.IsBefore(_caretPosition) ? _caretPosition : _anchor;
+            _anchor = _caretPosition;
+            CollapseSelection(false);
             return;
         }
 
-        String line = _doc.TextAt(_caret.Row);
-        if (_caret.Column < line.ByteLength())
+        String line = _contents.GetLineText(_caretPosition.Row);
+        if (_caretPosition.Column < line.ByteLength())
         {
-            _caret = Position.At(_caret.Row,
-                                word ? WordRight(line, _caret.Column) : line.NextCodePoint(_caret.Column));
+            _caretPosition = Position.Create(_caretPosition.Row,
+                word ? FindNextWordStart(line, _caretPosition.Column)
+                     : line.NextCodePoint(_caretPosition.Column));
         }
-        else if (_caret.Row + 1u < _doc.LineCount)
+        else if (_caretPosition.Row + 1u < _contents.LineCount)
         {
-            _caret = Position.At(_caret.Row + 1u, 0u);
+            _caretPosition = Position.Create(_caretPosition.Row + 1u, 0u);
         }
-        Settle(shift);
+        CollapseSelection(shift);
     }
 
-    void MoveVertically(int by, bool shift)
+    void MoveCaretVertically(int by, bool shift)
     {
-        int row = (int)_caret.Row + by;
+        int row = (int)_caretPosition.Row + by;
         if (row < 0)
             row = 0;
-        int highest = (int)_doc.LineCount - 1;
+        int highest = (int)_contents.LineCount - 1;
         if (row > highest)
             row = highest;
 
         // The column the caret would like to be in is remembered across a run
         // of vertical movements, so a short line in the middle does not drag it
         // permanently left.
-        _caret = Position.At((nuint)row, OffsetOfColumn(_doc.TextAt((nuint)row), _wanted));
-        _keepWanted = true;
-        Settle(shift);
+        String text = _contents.GetLineText((nuint)row);
+        _caretPosition = Position.Create((nuint)row, GetOffsetOfColumn(text, _wantedColumn));
+        _keepsWantedColumn = true;
+        CollapseSelection(shift);
     }
 
     /// Home goes to the first non-blank of the line, and to column zero when it
     /// is already there. The one movement whose two meanings are both wanted.
-    void MoveHome(bool shift, bool document)
+    void MoveCaretHome(bool shift, bool document)
     {
         if (document)
         {
-            _caret = Position.At(0u, 0u);
-            Settle(shift);
+            _caretPosition = Position.Create(0u, 0u);
+            CollapseSelection(shift);
             return;
         }
 
-        String line = _doc.TextAt(_caret.Row);
+        String line = _contents.GetLineText(_caretPosition.Row);
         nuint first = 0u;
         while (first < line.ByteLength())
         {
@@ -1466,25 +1477,27 @@ public class CodeEditor : CustomControl
                 break;
             first++;
         }
-        _caret = Position.At(_caret.Row, _caret.Column == first ? 0u : first);
-        Settle(shift);
+        nuint column = _caretPosition.Column == first ? 0u : first;
+        _caretPosition = Position.Create(_caretPosition.Row, column);
+        CollapseSelection(shift);
     }
 
-    void MoveEnd(bool shift, bool document)
+    void MoveCaretEnd(bool shift, bool document)
     {
         if (document)
         {
-            nuint end = _doc.LineCount - 1u;
-            _caret = Position.At(end, _doc.LengthAt(end));
+            nuint end = _contents.LineCount - 1u;
+            _caretPosition = Position.Create(end, _contents.GetLineLength(end));
         }
         else
         {
-            _caret = Position.At(_caret.Row, _doc.LengthAt(_caret.Row));
+            nuint row = _caretPosition.Row;
+            _caretPosition = Position.Create(row, _contents.GetLineLength(row));
         }
-        Settle(shift);
+        CollapseSelection(shift);
     }
 
-    nuint StepLeft(String line, nuint offset)
+    nuint FindPreviousCharacter(String line, nuint offset)
     {
         nuint at = 0u;
         nuint last = 0u;
@@ -1498,32 +1511,32 @@ public class CodeEditor : CustomControl
 
     /// The start of the word to the left: past any run of spaces, then past the
     /// run of word bytes before that.
-    nuint WordLeft(String line, nuint offset)
+    nuint FindPreviousWordStart(String line, nuint offset)
     {
-        nuint at = StepLeft(line, offset);
-        while (at > 0u && IsSpace(line.ByteAt(at)))
-            at = StepLeft(line, at);
+        nuint at = FindPreviousCharacter(line, offset);
+        while (at > 0u && IsSpaceByte(line.ByteAt(at)))
+            at = FindPreviousCharacter(line, at);
         if (at == 0u)
             return 0u;
-        if (!IsWord(line.ByteAt(at)))
+        if (!IsWordByte(line.ByteAt(at)))
             return at;
         while (at > 0u)
         {
-            nuint back = StepLeft(line, at);
-            if (!IsWord(line.ByteAt(back)))
+            nuint back = FindPreviousCharacter(line, at);
+            if (!IsWordByte(line.ByteAt(back)))
                 return at;
             at = back;
         }
         return 0u;
     }
 
-    nuint WordRight(String line, nuint offset)
+    nuint FindNextWordStart(String line, nuint offset)
     {
         nuint size = line.ByteLength();
         nuint at = offset;
-        if (at < size && IsWord(line.ByteAt(at)))
+        if (at < size && IsWordByte(line.ByteAt(at)))
         {
-            while (at < size && IsWord(line.ByteAt(at)))
+            while (at < size && IsWordByte(line.ByteAt(at)))
             {
                 at = line.NextCodePoint(at);
             }
@@ -1532,14 +1545,14 @@ public class CodeEditor : CustomControl
         {
             at = line.NextCodePoint(at);
         }
-        while (at < size && IsSpace(line.ByteAt(at)))
+        while (at < size && IsSpaceByte(line.ByteAt(at)))
             at = line.NextCodePoint(at);
         return at;
     }
 
-    bool IsSpace(byte c) => c == (byte)' ' || c == (byte)'\t';
+    bool IsSpaceByte(byte c) => c == (byte)' ' || c == (byte)'\t';
 
-    bool IsWord(byte c)
+    bool IsWordByte(byte c)
     {
         return (c >= (byte)'a' && c <= (byte)'z')
             || (c >= (byte)'A' && c <= (byte)'Z')
@@ -1549,7 +1562,6 @@ public class CodeEditor : CustomControl
 
     // -------------------------------------------------------------- editing
 
-    /// Selects the whole file.
     /// Puts the last edit back and goes to where it was.
     ///
     /// The selection is dropped rather than restored. What was selected before
@@ -1557,11 +1569,11 @@ public class CodeEditor : CustomControl
     /// stale selection would put the next keystroke somewhere surprising.
     public bool Undo()
     {
-        if (_doc.Undo() is Some at)
+        if (_contents.Undo() is Some at)
         {
-            _caret = at.Value;
-            _anchor = _caret;
-            AfterEdit();
+            _caretPosition = at.Value;
+            _anchor = _caretPosition;
+            FinishEdit();
             return true;
         }
         return false;
@@ -1570,25 +1582,26 @@ public class CodeEditor : CustomControl
     /// Does the last undone edit again.
     public bool Redo()
     {
-        if (_doc.Redo() is Some at)
+        if (_contents.Redo() is Some at)
         {
-            _caret = at.Value;
-            _anchor = _caret;
-            AfterEdit();
+            _caretPosition = at.Value;
+            _anchor = _caretPosition;
+            FinishEdit();
             return true;
         }
         return false;
     }
 
-    public bool CanUndo => _doc.CanUndo;
-    public bool CanRedo => _doc.CanRedo;
+    public bool CanUndo => _contents.CanUndo;
+    public bool CanRedo => _contents.CanRedo;
 
+    /// Selects the whole file.
     public void SelectAll()
     {
-        _anchor = Position.At(0u, 0u);
-        nuint end = _doc.LineCount - 1u;
-        _caret = Position.At(end, _doc.LengthAt(end));
-        _keepWanted = false;
+        _anchor = Position.Create(0u, 0u);
+        nuint end = _contents.LineCount - 1u;
+        _caretPosition = Position.Create(end, _contents.GetLineLength(end));
+        _keepsWantedColumn = false;
         Invalidate();
         OnCaretMoved();
     }
@@ -1613,9 +1626,9 @@ public class CodeEditor : CustomControl
     {
         if (!Copy())
             return false;
-        _caret = _doc.Delete(_anchor, _caret);
-        _anchor = _caret;
-        AfterEdit();
+        _caretPosition = _contents.DeleteText(_anchor, _caretPosition);
+        _anchor = _caretPosition;
+        FinishEdit();
         return true;
     }
 
@@ -1627,65 +1640,69 @@ public class CodeEditor : CustomControl
         String text = Clipboard.GetText();
         if (text.ByteLength() == 0u)
             return false;
-        Type(text);
+        TypeText(text);
         return true;
     }
 
     /// Puts text in, replacing the selection if there is one.
-    public void Type(String text)
+    public void TypeText(String text)
     {
         if (HasSelection)
-            _caret = _doc.Delete(_anchor, _caret);
-        _caret = _doc.Insert(_caret, text);
-        _anchor = _caret;
-        AfterEdit();
+            _caretPosition = _contents.DeleteText(_anchor, _caretPosition);
+        _caretPosition = _contents.InsertText(_caretPosition, text);
+        _anchor = _caretPosition;
+        FinishEdit();
     }
 
-    void DeleteBack()
+    void DeleteBackward()
     {
         if (HasSelection)
         {
-            _caret = _doc.Delete(_anchor, _caret);
+            _caretPosition = _contents.DeleteText(_anchor, _caretPosition);
         }
-        else if (_caret.Column > 0u)
+        else if (_caretPosition.Column > 0u)
         {
-            nuint back = StepLeft(_doc.TextAt(_caret.Row), _caret.Column);
-            _caret = _doc.Delete(Position.At(_caret.Row, back), _caret);
+            nuint row = _caretPosition.Row;
+            nuint back = FindPreviousCharacter(_contents.GetLineText(row), _caretPosition.Column);
+            _caretPosition = _contents.DeleteText(Position.Create(row, back), _caretPosition);
         }
-        else if (_caret.Row > 0u)
+        else if (_caretPosition.Row > 0u)
         {
-            var joinAt = Position.At(_caret.Row - 1u, _doc.LengthAt(_caret.Row - 1u));
-            _caret = _doc.Delete(joinAt, _caret);
+            nuint above = _caretPosition.Row - 1u;
+            var joinAt = Position.Create(above, _contents.GetLineLength(above));
+            _caretPosition = _contents.DeleteText(joinAt, _caretPosition);
         }
         else
         {
             return;
         }
-        _anchor = _caret;
-        AfterEdit();
+        _anchor = _caretPosition;
+        FinishEdit();
     }
 
     void DeleteForward()
     {
         if (HasSelection)
         {
-            _caret = _doc.Delete(_anchor, _caret);
+            _caretPosition = _contents.DeleteText(_anchor, _caretPosition);
         }
-        else if (_caret.Column < _doc.LengthAt(_caret.Row))
+        else if (_caretPosition.Column < _contents.GetLineLength(_caretPosition.Row))
         {
-            nuint next = _doc.TextAt(_caret.Row).NextCodePoint(_caret.Column);
-            _caret = _doc.Delete(_caret, Position.At(_caret.Row, next));
+            nuint row = _caretPosition.Row;
+            nuint next = _contents.GetLineText(row).NextCodePoint(_caretPosition.Column);
+            _caretPosition = _contents.DeleteText(_caretPosition, Position.Create(row, next));
         }
-        else if (_caret.Row + 1u < _doc.LineCount)
+        else if (_caretPosition.Row + 1u < _contents.LineCount)
         {
-            _caret = _doc.Delete(_caret, Position.At(_caret.Row + 1u, 0u));
+            var below = Position.Create(_caretPosition.Row + 1u, 0u);
+            _caretPosition = _contents.DeleteText(_caretPosition, below);
         }
         else
         {
             return;
         }
-        _anchor = _caret;
-        AfterEdit();
+        _anchor = _caretPosition;
+        FinishEdit();
     }
 
     /// Tab, which means two different things and the selection says which.
@@ -1694,27 +1711,27 @@ public class CodeEditor : CustomControl
     /// rather than a tab, because that is what the sources this edits use, and
     /// an editor that inserted the other kind would make every file it touched
     /// inconsistent with itself.
-    void Indent(bool back)
+    void IndentSelection(bool back)
     {
         if (!HasSelection && !back)
         {
-            nuint column = ColumnOf(_doc.TextAt(_caret.Row), _caret.Column);
+            nuint column = MeasureCaretColumn();
             nuint spaces = TabWidth - column % TabWidth;
-            Type(" ".Repeat(spaces));
+            TypeText(" ".Repeat(spaces));
             return;
         }
 
         var start = _anchor;
-        var end = _caret;
-        if (end.Before(start))
+        var end = _caretPosition;
+        if (end.IsBefore(start))
         {
-            start = _caret;
+            start = _caretPosition;
             end = _anchor;
         }
 
         for (nuint row = start.Row; row <= end.Row; row++)
         {
-            String line = _doc.TextAt(row);
+            String line = _contents.GetLineText(row);
             if (back)
             {
                 nuint strip = 0u;
@@ -1725,27 +1742,27 @@ public class CodeEditor : CustomControl
                 }
                 if (strip > 0u)
                 {
-                    _doc.Delete(Position.At(row, 0u), Position.At(row, strip));
+                    _contents.DeleteText(Position.Create(row, 0u), Position.Create(row, strip));
                 }
             }
             else if (line.ByteLength() > 0u)
             {
-                _doc.Insert(Position.At(row, 0u), " ".Repeat(TabWidth));
+                _contents.InsertText(Position.Create(row, 0u), " ".Repeat(TabWidth));
             }
         }
 
         // The selection keeps covering the same lines, whole.
-        _anchor = Position.At(start.Row, 0u);
-        _caret = Position.At(end.Row, _doc.LengthAt(end.Row));
-        AfterEdit();
+        _anchor = Position.Create(start.Row, 0u);
+        _caretPosition = Position.Create(end.Row, _contents.GetLineLength(end.Row));
+        FinishEdit();
     }
 
-    void AfterEdit()
+    void FinishEdit()
     {
-        _keepWanted = false;
-        _wanted = ColumnOf(_doc.TextAt(_caret.Row), _caret.Column);
-        Rescrolled();
-        ShowCaret();
+        _keepsWantedColumn = false;
+        _wantedColumn = MeasureCaretColumn();
+        UpdateScrollBars();
+        ScrollToCaret();
         Invalidate();
         OnCaretMoved();
         OnEdited();

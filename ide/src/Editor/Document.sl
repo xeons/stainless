@@ -58,20 +58,20 @@ public class Line
 
     /// Whether it has ever been lexed.
     ///
-    /// **What stops `Rescan` from stopping too early.** Its rule is that an
+    /// **What stops `RescanFrom` from stopping too early.** Its rule is that an
     /// unchanged outgoing state means nothing below has changed -- which is
     /// true only of a line that already had a state. A line that has just been
     /// inserted has `Normal` because it was born with it, not because anything
     /// lexed it, and a rescan that took that for agreement would leave every
     /// line of a pasted block with no tokens at all.
-    public bool Scanned;
+    public bool IsScanned;
 
     public Line(String text)
     {
         Text = text;
         Tokens = new List<Token>();
         After = ScanState.Normal;
-        Scanned = false;
+        IsScanned = false;
     }
 }
 
@@ -86,7 +86,7 @@ public struct Position
     public nuint Row;
     public nuint Column;
 
-    public static Position At(nuint row, nuint column)
+    public static Position Create(nuint row, nuint column)
     {
         Position p;
         p.Row = row;
@@ -94,14 +94,14 @@ public struct Position
         return p;
     }
 
-    public bool Before(Position other)
+    public bool IsBefore(Position other)
     {
         if (Row != other.Row)
             return Row < other.Row;
         return Column < other.Column;
     }
 
-    public bool SameAs(Position other)
+    public bool IsSameAs(Position other)
     {
         return Row == other.Row && Column == other.Column;
     }
@@ -130,7 +130,7 @@ public enum LineEnding
 public struct Edit
 {
     /// True for an insertion, false for a deletion.
-    public bool Inserted;
+    public bool IsInsertion;
 
     /// Where it began, and where it ended. For a deletion these are the two
     /// ends of what was taken out, measured before it went.
@@ -164,7 +164,7 @@ public class Document
     /// Set while an undo or a redo is being applied, so the edit it makes is
     /// not itself recorded. Without it the first undo pushes its own inverse
     /// and the second undoes the undo, for ever.
-    bool _applying;
+    bool _isApplying;
 
     /// How many edits had been done when the file was last read or written.
     ///
@@ -186,21 +186,21 @@ public class Document
         _endings = LineEnding.Lf;
         _done = new List<Edit>();
         _undone = new List<Edit>();
-        _applying = false;
+        _isApplying = false;
         _savedAt = 0;
         _lines.Add(new Line(""));
-        Rescan(0u);
+        RescanFrom(0u);
     }
 
     /// How many lines there are. Never zero: a file with nothing in it is one
     /// empty line, because a caret has to be somewhere.
     public nuint LineCount => _lines.Count;
 
-    public Line LineAt(nuint row) => _lines[row];
+    public Line GetLine(nuint row) => _lines[row];
 
-    public String TextAt(nuint row) => _lines[row].Text;
+    public String GetLineText(nuint row) => _lines[row].Text;
 
-    public nuint LengthAt(nuint row) => _lines[row].Text.ByteLength();
+    public nuint GetLineLength(nuint row) => _lines[row].Text.ByteLength();
 
     /// Where the file came from, or `""` for one that has never been saved.
     public String Location
@@ -215,18 +215,18 @@ public class Document
     /// the last save says the file is unmodified again.
     public bool Edited => _savedAt < 0 || (nuint)_savedAt != _done.Count;
 
-    /// Whether there is anything to undo, or to redo.
     /// Lines were added or removed.
     ///
-    /// Raised by `Insert` and `Delete`, which every edit goes through -- undo
-    /// and redo included, since `Apply` calls the same two. A listener MUST
-    /// treat it as advisory about position only: it says nothing about what
-    /// the text now is.
+    /// Raised by `InsertText` and `DeleteText`, which every edit goes through
+    /// -- undo and redo included, since `ApplyEdit` calls the same two. A
+    /// listener MUST treat it as advisory about position only: it says nothing
+    /// about what the text now is.
     public event LineShiftHandler LinesShifted;
 
     protected virtual void OnLinesShifted(nuint first, int delta)
         => LinesShifted(first, delta);
 
+    /// Whether there is anything to undo, or to redo.
     public bool CanUndo => !_done.IsEmpty;
     public bool CanRedo => !_undone.IsEmpty;
 
@@ -259,7 +259,7 @@ public class Document
         if (_lines.Count == 0u)
             _lines.Add(new Line(""));
 
-        Rescan(0u);
+        RescanFrom(0u);
         _edited = false;
     }
 
@@ -279,7 +279,7 @@ public class Document
 
     /// Reads a file in. False when it could not be read, and the document is
     /// left alone.
-    public bool Load(String path)
+    public bool LoadFile(String path)
     {
         var read = File.ReadAllText(path);
         if (!read.Ok)
@@ -291,7 +291,7 @@ public class Document
 
     /// Writes it out. False when it could not be written, and the document
     /// still counts as edited.
-    public bool Save(String path)
+    public bool SaveFile(String path)
     {
         var error = File.WriteAllText(path, GetText());
         if (error != IOError.None)
@@ -308,11 +308,11 @@ public class Document
     /// `text` may contain newlines, which is what makes this the whole of
     /// insertion: typing a character, pasting a paragraph and pressing Return
     /// are all this call with a different string.
-    public Position Insert(Position at, String text)
+    public Position InsertText(Position at, String text)
     {
         nuint was = _lines.Count;
-        nuint row = Clamp(at.Row, _lines.Count - 1u);
-        nuint column = Clamp(at.Column, _lines[row].Text.ByteLength());
+        nuint row = ClampIndex(at.Row, _lines.Count - 1u);
+        nuint column = ClampIndex(at.Column, _lines[row].Text.ByteLength());
 
         String existing = _lines[row].Text;
         String before = existing.Substring(0u, column);
@@ -321,18 +321,18 @@ public class Document
         var parts = text.Replace("\r\n", "\n").Split("\n");
         if (parts.Length == 1u)
         {
-            Replace(row, before + parts[0] + after);
-            Rescan(row);
+            ReplaceLine(row, before + parts[0] + after);
+            RescanFrom(row);
             _edited = true;
 
-            var landedHere = Position.At(row, column + parts[0].ByteLength());
-            Record(true, Position.At(row, column), landedHere, text);
+            var landedHere = Position.Create(row, column + parts[0].ByteLength());
+            RecordEdit(true, Position.Create(row, column), landedHere, text);
             return landedHere;
         }
 
         // Several lines: the first joins what was before the caret, the last
         // joins what was after it, and the rest go in between.
-        Replace(row, before + parts[0]);
+        ReplaceLine(row, before + parts[0]);
         nuint landed = row;
         for (nuint i = 1u; i < parts.Length; i++)
         {
@@ -343,11 +343,11 @@ public class Document
             _lines.Insert(landed, new Line(piece));
         }
 
-        Rescan(row);
+        RescanFrom(row);
         _edited = true;
 
-        var ended = Position.At(landed, parts[parts.Length - 1u].ByteLength());
-        Record(true, Position.At(row, column), ended, text);
+        var ended = Position.Create(landed, parts[parts.Length - 1u].ByteLength());
+        RecordEdit(true, Position.Create(row, column), ended, text);
 
         // From the row after, because a line inserted at `row` pushes down
         // what was below it and leaves `row` where it was.
@@ -357,26 +357,26 @@ public class Document
 
     /// Takes out everything between two positions, and answers where the caret
     /// ends up -- which is always the earlier of the two.
-    public Position Delete(Position from, Position to)
+    public Position DeleteText(Position from, Position to)
     {
         var start = from;
         var end = to;
-        if (end.Before(start))
+        if (end.IsBefore(start))
         {
             start = to;
             end = from;
         }
 
-        nuint firstRow = Clamp(start.Row, _lines.Count - 1u);
-        nuint lastRow = Clamp(end.Row, _lines.Count - 1u);
-        nuint firstColumn = Clamp(start.Column, _lines[firstRow].Text.ByteLength());
-        nuint lastColumn = Clamp(end.Column, _lines[lastRow].Text.ByteLength());
+        nuint firstRow = ClampIndex(start.Row, _lines.Count - 1u);
+        nuint lastRow = ClampIndex(end.Row, _lines.Count - 1u);
+        nuint firstColumn = ClampIndex(start.Column, _lines[firstRow].Text.ByteLength());
+        nuint lastColumn = ClampIndex(end.Column, _lines[lastRow].Text.ByteLength());
 
         // Read before anything is removed: this is what an undo puts back, and
         // afterwards there is nothing left to read it from.
-        var startAt = Position.At(firstRow, firstColumn);
-        var endAt = Position.At(lastRow, lastColumn);
-        String removed = _applying ? "" : TextBetween(startAt, endAt);
+        var startAt = Position.Create(firstRow, firstColumn);
+        var endAt = Position.Create(lastRow, lastColumn);
+        String removed = _isApplying ? "" : GetTextBetween(startAt, endAt);
 
         String head = _lines[firstRow].Text.Substring(0u, firstColumn);
         String tail = _lines[lastRow].Text.Substring(lastColumn);
@@ -385,17 +385,17 @@ public class Document
         // whose remainder has just been joined on to the first.
         for (nuint i = lastRow; i > firstRow; i--)
             _lines.RemoveAt(i);
-        Replace(firstRow, head + tail);
+        ReplaceLine(firstRow, head + tail);
 
-        Rescan(firstRow);
+        RescanFrom(firstRow);
         _edited = true;
 
-        Record(false, startAt, endAt, removed);
+        RecordEdit(false, startAt, endAt, removed);
 
         // From the row after the one the deletion collapsed into.
         if (lastRow > firstRow)
             OnLinesShifted(firstRow + 1u, -(int)(lastRow - firstRow));
-        return Position.At(firstRow, firstColumn);
+        return Position.Create(firstRow, firstColumn);
     }
 
     // ------------------------------------------------------------ undoing
@@ -404,7 +404,7 @@ public class Document
     /// one action.
     ///
     /// **Typing a word is one undo, not seven.** Every character is its own
-    /// call to `Insert`, and an undo stack that kept them apart would make
+    /// call to `InsertText`, and an undo stack that kept them apart would make
     /// undo useless for the thing it is used for most. Two insertions merge
     /// when the second starts exactly where the first ended and neither
     /// carries a newline -- so typing runs together, and pressing Return,
@@ -412,9 +412,9 @@ public class Document
     ///
     /// Backspacing runs together the same way, by the opposite test: the
     /// second deletion ends exactly where the first began.
-    void Record(bool inserted, Position from, Position to, String text)
+    void RecordEdit(bool inserted, Position from, Position to, String text)
     {
-        if (_applying)
+        if (_isApplying)
             return;
 
         // Any new edit makes a redo meaningless: what was undone was recorded
@@ -426,11 +426,11 @@ public class Document
         if (_savedAt > (long)_done.Count)
             _savedAt = -1;
 
-        if (Merge(inserted, from, to, text))
+        if (MergeIntoLastEdit(inserted, from, to, text))
             return;
 
         Edit made;
-        made.Inserted = inserted;
+        made.IsInsertion = inserted;
         made.From = from;
         made.To = to;
         made.Text = text;
@@ -440,19 +440,19 @@ public class Document
 
     /// Extends the last edit rather than adding one, where the two read as a
     /// single action. False when they do not.
-    bool Merge(bool inserted, Position from, Position to, String text)
+    bool MergeIntoLastEdit(bool inserted, Position from, Position to, String text)
     {
         if (_done.IsEmpty || text.Contains("\n") || text.Contains("\r"))
             return false;
 
         var last = _done[_done.Count - 1u];
-        if (last.Inserted != inserted || last.Text.Contains("\n"))
+        if (last.IsInsertion != inserted || last.Text.Contains("\n"))
             return false;
 
         if (inserted)
         {
             // Typed on: this insertion begins where the last one ended.
-            if (!last.To.SameAs(from))
+            if (!last.To.IsSameAs(from))
                 return false;
 
             last.Text = last.Text + text;
@@ -463,7 +463,7 @@ public class Document
 
         // Backspaced on: this deletion ends where the last one began, so the
         // text belongs in front of what is already recorded.
-        if (!last.From.SameAs(to))
+        if (!last.From.IsSameAs(to))
             return false;
 
         last.Text = text + last.Text;
@@ -485,7 +485,7 @@ public class Document
         _done.RemoveAt(_done.Count - 1u);
         _undone.Add(last);
 
-        return Apply(!last.Inserted, last);
+        return ApplyEdit(!last.IsInsertion, last);
     }
 
     /// Does the last undone edit again.
@@ -498,43 +498,43 @@ public class Document
         _undone.RemoveAt(_undone.Count - 1u);
         _done.Add(last);
 
-        return Apply(last.Inserted, last);
+        return ApplyEdit(last.IsInsertion, last);
     }
 
     /// Applies an edit in one direction or the other.
     ///
-    /// `_applying` is what keeps this from recording itself: `Insert` and
-    /// `Delete` are the only way to change the text, and they are the same two
-    /// calls whether a person or an undo is asking.
-    Optional<Position> Apply(bool insert, Edit edit)
+    /// `_isApplying` is what keeps this from recording itself: `InsertText`
+    /// and `DeleteText` are the only way to change the text, and they are the
+    /// same two calls whether a person or an undo is asking.
+    Optional<Position> ApplyEdit(bool insert, Edit edit)
     {
-        _applying = true;
+        _isApplying = true;
 
         Position caret;
         if (insert)
-            caret = Insert(edit.From, edit.Text);
+            caret = InsertText(edit.From, edit.Text);
         else
-            caret = Delete(edit.From, edit.To);
+            caret = DeleteText(edit.From, edit.To);
 
-        _applying = false;
+        _isApplying = false;
         return Some(caret);
     }
 
     /// Everything between two positions, as a string.
-    public String TextBetween(Position from, Position to)
+    public String GetTextBetween(Position from, Position to)
     {
         var start = from;
         var end = to;
-        if (end.Before(start))
+        if (end.IsBefore(start))
         {
             start = to;
             end = from;
         }
 
-        nuint firstRow = Clamp(start.Row, _lines.Count - 1u);
-        nuint lastRow = Clamp(end.Row, _lines.Count - 1u);
-        nuint firstColumn = Clamp(start.Column, _lines[firstRow].Text.ByteLength());
-        nuint lastColumn = Clamp(end.Column, _lines[lastRow].Text.ByteLength());
+        nuint firstRow = ClampIndex(start.Row, _lines.Count - 1u);
+        nuint lastRow = ClampIndex(end.Row, _lines.Count - 1u);
+        nuint firstColumn = ClampIndex(start.Column, _lines[firstRow].Text.ByteLength());
+        nuint lastColumn = ClampIndex(end.Column, _lines[lastRow].Text.ByteLength());
 
         if (firstRow == lastRow)
         {
@@ -559,11 +559,11 @@ public class Document
     /// Every caller rescans immediately afterwards; clearing the flag here as
     /// well is what makes that a rule the type keeps rather than one every
     /// caller has to remember.
-    void Replace(nuint row, String text)
+    void ReplaceLine(nuint row, String text)
     {
         var line = _lines[row];
         line.Text = text;
-        line.Scanned = false;
+        line.IsScanned = false;
     }
 
     // ------------------------------------------------------------ scanning
@@ -576,18 +576,18 @@ public class Document
     /// line. Typing `/*` at the top of a file rescans all of it, once, and
     /// typing the `*/` rescans it back -- which is the worst case and is the
     /// one people notice least, because they are looking at what they typed.
-    public void Rescan(nuint row)
+    public void RescanFrom(nuint row)
     {
-        nuint from = Clamp(row, _lines.Count - 1u);
+        nuint from = ClampIndex(row, _lines.Count - 1u);
         var state = from == 0u ? ScanState.Normal : _lines[from - 1u].After;
 
         for (nuint i = from; i < _lines.Count; i++)
         {
             var line = _lines[i];
             var was = line.After;
-            bool knew = line.Scanned;
+            bool knew = line.IsScanned;
             line.After = _scanner.ScanLine(line.Text, state, line.Tokens);
-            line.Scanned = true;
+            line.IsScanned = true;
 
             // The line below this one is affected only through the state, so an
             // unchanged state means nothing below has changed. Not on the line
@@ -599,7 +599,7 @@ public class Document
         }
     }
 
-    nuint Clamp(nuint value, nuint highest)
+    nuint ClampIndex(nuint value, nuint highest)
     {
         return value > highest ? highest : value;
     }

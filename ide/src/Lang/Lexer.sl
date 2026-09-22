@@ -106,7 +106,7 @@ public struct Token
 
     public nuint End => Start + Length;
 
-    public static Token Of(TokenKind kind, nuint start, nuint length)
+    public static Token Create(TokenKind kind, nuint start, nuint length)
     {
         Token token;
         token.Kind = kind;
@@ -149,7 +149,7 @@ public class Scanner
         _keywords = new Dictionary<String, bool>();
         _contextual = new Dictionary<String, bool>();
         _primitives = new Dictionary<String, bool>();
-        Fill();
+        FillKeywordTables();
     }
 
     /// The reserved words, taken from the compiler's own table.
@@ -158,7 +158,7 @@ public class Scanner
     /// program and its keyword list is a C# enum, so there is no file for this
     /// to load; what keeps the two together is the test that lexes a sample and
     /// checks every word the compiler calls a keyword arrives as one here.
-    void Fill()
+    void FillKeywordTables()
     {
         String[] reserved = [
             "abstract", "alignof", "as", "asm", "attribute", "base", "break", "case",
@@ -215,10 +215,10 @@ public class Scanner
             if (close == NotClosed)
             {
                 if (size > 0u)
-                    into.Add(Token.Of(TokenKind.BlockComment, 0u, size));
+                    into.Add(Token.Create(TokenKind.BlockComment, 0u, size));
                 return ScanState.InBlockComment;
             }
-            into.Add(Token.Of(TokenKind.BlockComment, 0u, close));
+            into.Add(Token.Create(TokenKind.BlockComment, 0u, close));
             at = close;
             state = ScanState.Normal;
         }
@@ -231,8 +231,8 @@ public class Scanner
             if (first < size && line.ByteAt(first) == (byte)'#')
             {
                 if (first > 0u)
-                    into.Add(Token.Of(TokenKind.Whitespace, 0u, first));
-                into.Add(Token.Of(TokenKind.Directive, first, size - first));
+                    into.Add(Token.Create(TokenKind.Whitespace, 0u, first));
+                into.Add(Token.Create(TokenKind.Directive, first, size - first));
                 return state;
             }
         }
@@ -244,7 +244,7 @@ public class Scanner
             if (c == (byte)' ' || c == (byte)'\t')
             {
                 nuint run = SkipSpaces(line, at);
-                into.Add(Token.Of(TokenKind.Whitespace, at, run - at));
+                into.Add(Token.Create(TokenKind.Whitespace, at, run - at));
                 at = run;
                 continue;
             }
@@ -259,7 +259,7 @@ public class Scanner
                     // it as an ordinary comment.
                     bool doc = at + 2u < size && line.ByteAt(at + 2u) == (byte)'/'
                             && !(at + 3u < size && line.ByteAt(at + 3u) == (byte)'/');
-                    into.Add(Token.Of(doc ? TokenKind.DocComment : TokenKind.Comment,
+                    into.Add(Token.Create(doc ? TokenKind.DocComment : TokenKind.Comment,
                                       at, size - at));
                     return state;
                 }
@@ -268,10 +268,10 @@ public class Scanner
                     nuint close = FindBlockEnd(line, at + 2u);
                     if (close == NotClosed)
                     {
-                        into.Add(Token.Of(TokenKind.BlockComment, at, size - at));
+                        into.Add(Token.Create(TokenKind.BlockComment, at, size - at));
                         return ScanState.InBlockComment;
                     }
-                    into.Add(Token.Of(TokenKind.BlockComment, at, close - at));
+                    into.Add(Token.Create(TokenKind.BlockComment, at, close - at));
                     at = close;
                     continue;
                 }
@@ -287,7 +287,7 @@ public class Scanner
             {
                 // The `$` belongs to the string, and what is inside the holes is
                 // lexed as ordinary code by `ScanText`.
-                into.Add(Token.Of(TokenKind.Text, at, 1u));
+                into.Add(Token.Create(TokenKind.Text, at, 1u));
                 at = ScanText(line, at + 1u, into);
                 continue;
             }
@@ -312,7 +312,7 @@ public class Scanner
 
             if (IsBracket(c))
             {
-                into.Add(Token.Of(TokenKind.Bracket, at, 1u));
+                into.Add(Token.Create(TokenKind.Bracket, at, 1u));
                 at++;
                 continue;
             }
@@ -322,7 +322,7 @@ public class Scanner
                 nuint run = at;
                 while (run < size && IsOperator(line.ByteAt(run)))
                     run++;
-                into.Add(Token.Of(TokenKind.Operator, at, run - at));
+                into.Add(Token.Create(TokenKind.Operator, at, run - at));
                 at = run;
                 continue;
             }
@@ -332,7 +332,7 @@ public class Scanner
             // continuations, which is ugly and harmless -- nothing colours
             // `Unknown` differently, and a stray non-ASCII byte in code is
             // already a mistake the compiler will name.
-            into.Add(Token.Of(TokenKind.Unknown, at, 1u));
+            into.Add(Token.Create(TokenKind.Unknown, at, 1u));
             at++;
         }
 
@@ -368,7 +368,7 @@ public class Scanner
             kind = TokenKind.TypeName;
         }
 
-        into.Add(Token.Of(kind, at, run - at));
+        into.Add(Token.Create(kind, at, run - at));
         return run;
     }
 
@@ -426,7 +426,7 @@ public class Scanner
                     run += 2u;
                     continue;
                 }
-                into.Add(Token.Of(TokenKind.Text, textStart, run - textStart + 1u));
+                into.Add(Token.Create(TokenKind.Text, textStart, run - textStart + 1u));
                 run = ScanHole(line, run + 1u, into);
                 textStart = run;
                 continue;
@@ -434,7 +434,7 @@ public class Scanner
 
             if (c == (byte)'"')
             {
-                into.Add(Token.Of(TokenKind.Text, textStart, run - textStart + 1u));
+                into.Add(Token.Create(TokenKind.Text, textStart, run - textStart + 1u));
                 return run + 1u;
             }
 
@@ -442,7 +442,7 @@ public class Scanner
         }
 
         if (run > textStart)
-            into.Add(Token.Of(TokenKind.Text, textStart, run - textStart));
+            into.Add(Token.Create(TokenKind.Text, textStart, run - textStart));
         return run;
     }
 
@@ -482,7 +482,7 @@ public class Scanner
             ScanLine(line.Substring(at, run - at), ScanState.Normal, inner);
             foreach (var token in inner)
             {
-                into.Add(Token.Of(token.Kind, at + token.Start, token.Length));
+                into.Add(Token.Create(token.Kind, at + token.Start, token.Length));
             }
         }
         return run;
@@ -509,7 +509,7 @@ public class Scanner
             }
             run++;
         }
-        into.Add(Token.Of(TokenKind.Character, at, run - at));
+        into.Add(Token.Create(TokenKind.Character, at, run - at));
         return run;
     }
 
@@ -550,7 +550,7 @@ public class Scanner
             break;
         }
 
-        into.Add(Token.Of(TokenKind.Number, at, run - at));
+        into.Add(Token.Create(TokenKind.Number, at, run - at));
         return run;
     }
 

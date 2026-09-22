@@ -83,7 +83,7 @@ public class Theme
     /// stay close to the body text. Comments are the one deliberate exception:
     /// green and low-contrast, so that prose beside code reads as an aside
     /// rather than competing with it.
-    public static Theme Light()
+    public static Theme CreateLight()
     {
         var theme = new Theme();
         theme.Background    = Color.FromRgb(255, 255, 255);
@@ -117,7 +117,7 @@ public class Theme
     }
 
     /// The dark theme.
-    public static Theme Dark()
+    public static Theme CreateDark()
     {
         var theme = new Theme();
         theme.Background    = Color.FromRgb( 30,  30,  34);
@@ -155,7 +155,7 @@ public class Theme
     /// A table, and written as one: which kinds share a colour is the whole
     /// content of this method, and stacked labels say it where a run of `if`s
     /// hid it inside the order they happened to be in.
-    public Color ColorFor(TokenKind kind)
+    public Color GetColorFor(TokenKind kind)
     {
         switch (kind)
         {

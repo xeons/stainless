@@ -581,7 +581,7 @@ public class Shell : Form
         editor.Dock = DockStyle.Fill;
         editor.SetDocument(document);
         editor.FontSize = _textSize;
-        editor.Palette = _dark ? Theme.Dark() : Theme.Light();
+        editor.Palette = _dark ? Theme.CreateDark() : Theme.CreateLight();
         editor.CaretMoved += this.OnCaretMoved;
         editor.Edited += this.OnEdited;
         editor.KeyDown += this.OnEditorKey;
@@ -637,7 +637,7 @@ public class Shell : Form
         }
 
         var document = new Document();
-        if (!document.Load(path))
+        if (!document.LoadFile(path))
             return false;
 
         // An untouched, unnamed, empty first tab is a placeholder rather than a
@@ -665,7 +665,7 @@ public class Shell : Form
         return editor.Contents.Location.ByteLength() == 0u
             && !editor.Contents.Edited
             && editor.Contents.LineCount == 1u
-            && editor.Contents.LengthAt(0u) == 0u;
+            && editor.Contents.GetLineLength(0u) == 0u;
     }
 
     void NewFile()
@@ -944,7 +944,7 @@ public class Shell : Form
             target = chosen.Value;
         }
 
-        if (!editor.Contents.Save(target))
+        if (!editor.Contents.SaveFile(target))
         {
             Say("Could not write " + target);
             return false;
@@ -1025,7 +1025,7 @@ public class Shell : Form
     {
         _dark = !_themeItem.Checked;
         _themeItem.Checked = _dark;
-        var palette = _dark ? Theme.Dark() : Theme.Light();
+        var palette = _dark ? Theme.CreateDark() : Theme.CreateLight();
         foreach (var tab in _open)
             tab.Editor.Palette = palette;
     }
@@ -1445,7 +1445,7 @@ public class Shell : Form
             if (!SaveTo(editor, ""))
                 return false;
         }
-        else if (editor.Contents.Edited && !editor.Contents.Save(path))
+        else if (editor.Contents.Edited && !editor.Contents.SaveFile(path))
         {
             Say("Could not write " + path);
             return false;
@@ -1474,7 +1474,7 @@ public class Shell : Form
             if (path.ByteLength() == 0u)
                 continue;
 
-            if (!editor.Contents.Save(path))
+            if (!editor.Contents.SaveFile(path))
             {
                 Say("Could not write " + path);
                 return false;
@@ -1816,7 +1816,7 @@ public class Shell : Form
 
         var found = (EditorTab)tab;
         _book.SelectedIndex = found.Page.Index;
-        found.Editor.GoTo(message.Line - 1u,
+        found.Editor.MoveCaretTo(message.Line - 1u,
                           message.Column > 0u ? message.Column - 1u : 0u);
         found.Editor.Focus();
     }
@@ -3566,10 +3566,10 @@ public class Shell : Form
             return;
         var editor = (CodeEditor)now;
         var at = editor.CaretPosition;
-        String line = editor.Contents.TextAt(at.Row);
+        String line = editor.Contents.GetLineText(at.Row);
         _status.SetPanelText(3,
             "Ln " + Standard.Text.FromInteger(at.Row + 1u)
-          + ", Col " + Standard.Text.FromInteger(editor.ColumnOf(line, at.Column) + 1u));
+          + ", Col " + Standard.Text.FromInteger(editor.GetColumnOfOffset(line, at.Column) + 1u));
     }
 
     void OnEdited(Control sender)
@@ -3644,21 +3644,21 @@ public class Shell : Form
             ok = false;
         }
 
-        editor.Type("int Main() { return 0; }");
-        if (editor.Contents.TextAt(0u) != "int Main() { return 0; }")
+        editor.TypeText("int Main() { return 0; }");
+        if (editor.Contents.GetLineText(0u) != "int Main() { return 0; }")
         {
             Console.WriteLine("FAIL: typing");
             ok = false;
         }
-        if (editor.Contents.LineAt(0u).Tokens.Count == 0u)
+        if (editor.Contents.GetLine(0u).Tokens.Count == 0u)
         {
             Console.WriteLine("FAIL: the line did not lex");
             ok = false;
         }
 
-        editor.Type("\nint Second() { return 1; }");
+        editor.TypeText("\nint Second() { return 1; }");
         if (editor.Contents.LineCount != 2u
-            || editor.Contents.LineAt(1u).Tokens.Count == 0u)
+            || editor.Contents.GetLine(1u).Tokens.Count == 0u)
         {
             Console.WriteLine("FAIL: a second line");
             ok = false;
@@ -3681,7 +3681,7 @@ public class Shell : Form
         }
 
         nuint lines = editor.Contents.LineCount;
-        editor.GoTo(lines - 1u, editor.Contents.LengthAt(lines - 1u));
+        editor.MoveCaretTo(lines - 1u, editor.Contents.GetLineLength(lines - 1u));
         if (!editor.Paste())
         {
             Console.WriteLine("FAIL: paste did nothing");
@@ -3776,8 +3776,8 @@ public class Shell : Form
             pad.Focus();
             Application.DoEvents();
 
-            pad.Type("hello");
-            if (pad.Contents.TextAt(0u) != "hello")
+            pad.TypeText("hello");
+            if (pad.Contents.GetLineText(0u) != "hello")
             {
                 Console.WriteLine("FAIL: undo setup");
                 ok = false;
@@ -3786,15 +3786,15 @@ public class Shell : Form
             // Typing a word is one undo and not five, which is the whole
             // reason the stack coalesces.
             pad.Undo();
-            if (pad.Contents.TextAt(0u) != "")
+            if (pad.Contents.GetLineText(0u) != "")
             {
                 Console.WriteLine("FAIL: one undo did not take back a typed word, leaving '"
-                                  + pad.Contents.TextAt(0u) + "'");
+                                  + pad.Contents.GetLineText(0u) + "'");
                 ok = false;
             }
 
             pad.Redo();
-            if (pad.Contents.TextAt(0u) != "hello")
+            if (pad.Contents.GetLineText(0u) != "hello")
             {
                 Console.WriteLine("FAIL: redo did not put it back");
                 ok = false;
@@ -3804,11 +3804,11 @@ public class Shell : Form
             // Three calls, because that is what three keystrokes are --
             // one Type of the whole string is one insertion and rightly
             // one undo.
-            pad.Type("\n");
-            pad.Type("w");
-            pad.Type("orld");
+            pad.TypeText("\n");
+            pad.TypeText("w");
+            pad.TypeText("orld");
             pad.Undo();
-            if (pad.Contents.LineCount != 2u || pad.Contents.TextAt(1u) != "")
+            if (pad.Contents.LineCount != 2u || pad.Contents.GetLineText(1u) != "")
             {
                 Console.WriteLine("FAIL: undo crossed a line it should not have");
                 ok = false;
@@ -3822,7 +3822,7 @@ public class Shell : Form
                 Console.WriteLine("FAIL: undoing back to the start left the file modified");
                 ok = false;
             }
-            if (pad.Contents.TextAt(0u) != "" || pad.Contents.LineCount != 1u)
+            if (pad.Contents.GetLineText(0u) != "" || pad.Contents.LineCount != 1u)
             {
                 Console.WriteLine("FAIL: undoing everything did not empty the document");
                 ok = false;
@@ -3847,10 +3847,10 @@ public class Shell : Form
             var pad = AddTab(new Document()).Editor;
             pad.Focus();
             Application.DoEvents();
-            pad.Type("var total = count + 1;   // sum");
+            pad.TypeText("var total = count + 1;   // sum");
 
             // Inside a word takes the word and not the space after it.
-            pad.GoTo(0u, 5u);
+            pad.MoveCaretTo(0u, 5u);
             pad.SelectWord();
             if (pad.SelectedText != "total")
             {
@@ -3860,7 +3860,7 @@ public class Shell : Form
             }
 
             // At the first byte of a word, which is where a click usually lands.
-            pad.GoTo(0u, 0u);
+            pad.MoveCaretTo(0u, 0u);
             pad.SelectWord();
             if (pad.SelectedText != "var")
             {
@@ -3870,7 +3870,7 @@ public class Shell : Form
             }
 
             // A run of spaces is its own run, and stops at the word either side.
-            pad.GoTo(0u, 23u);
+            pad.MoveCaretTo(0u, 23u);
             pad.SelectWord();
             if (pad.SelectedText != "   ")
             {
@@ -3881,7 +3881,7 @@ public class Shell : Form
 
             // Punctuation is the third run, so `//` comes out whole rather than
             // one slash -- which is the case two runs would get wrong.
-            pad.GoTo(0u, 26u);
+            pad.MoveCaretTo(0u, 26u);
             pad.SelectWord();
             if (pad.SelectedText != "//")
             {
@@ -3893,16 +3893,16 @@ public class Shell : Form
             // What the pointer is over, which a debugger asks about. Only a
             // word: a run of spaces or of punctuation is not a name, and
             // answering one has a debugger looking up `//`.
-            if (pad.WordAt(Position.At(0u, 5u)) != "total"
-                || pad.WordAt(Position.At(0u, 4u)) != "total"
-                || pad.WordAt(Position.At(0u, 0u)) != "var")
+            if (pad.GetWordAt(Position.Create(0u, 5u)) != "total"
+                || pad.GetWordAt(Position.Create(0u, 4u)) != "total"
+                || pad.GetWordAt(Position.Create(0u, 0u)) != "var")
             {
                 Console.WriteLine("FAIL: the word under the pointer was read wrongly");
                 ok = false;
             }
 
-            if (pad.WordAt(Position.At(0u, 23u)).ByteLength() != 0u
-                || pad.WordAt(Position.At(0u, 26u)).ByteLength() != 0u)
+            if (pad.GetWordAt(Position.Create(0u, 23u)).ByteLength() != 0u
+                || pad.GetWordAt(Position.Create(0u, 26u)).ByteLength() != 0u)
             {
                 Console.WriteLine("FAIL: spaces or punctuation were read as a word");
                 ok = false;
@@ -3911,8 +3911,8 @@ public class Shell : Form
             // Past the end of the line, where the pointer spends most of its
             // time, and past the last line. Neither is a word and neither may
             // fault.
-            if (pad.WordAt(Position.At(0u, 200u)).ByteLength() != 0u
-                || pad.WordAt(Position.At(50u, 0u)).ByteLength() != 0u)
+            if (pad.GetWordAt(Position.Create(0u, 200u)).ByteLength() != 0u
+                || pad.GetWordAt(Position.Create(50u, 0u)).ByteLength() != 0u)
             {
                 Console.WriteLine("FAIL: a point off the text was read as a word");
                 ok = false;
@@ -3921,7 +3921,7 @@ public class Shell : Form
             // Past the end of the line, where a click in the empty space to the
             // right of the text lands. It must select the last run, not reach
             // past the line and not fault.
-            pad.GoTo(0u, 200u);
+            pad.MoveCaretTo(0u, 200u);
             pad.SelectWord();
             if (pad.SelectedText != "sum")
             {
@@ -3932,7 +3932,7 @@ public class Shell : Form
 
             // An empty line has no run at all, and must not select anything or
             // walk off the front of a zero-length string.
-            pad.Type("\n");
+            pad.TypeText("\n");
             pad.SelectWord();
             if (pad.HasSelection)
             {
@@ -3980,9 +3980,9 @@ public class Shell : Form
             var pad = AddTab(new Document()).Editor;
             pad.Focus();
             Application.DoEvents();
-            pad.Type("one two one\nthree ONE four\none");
+            pad.TypeText("one two one\nthree ONE four\none");
 
-            pad.GoTo(0u, 0u);
+            pad.MoveCaretTo(0u, 0u);
             if (!pad.FindNext("one", true, true) || pad.SelectedText != "one"
                 || pad.CaretPosition.Row != 0u)
             {
@@ -4015,7 +4015,7 @@ public class Shell : Form
             }
 
             // Ignoring case reaches `ONE`, which the pass above walked past.
-            pad.GoTo(1u, 0u);
+            pad.MoveCaretTo(1u, 0u);
             if (!pad.FindNext("one", false, true) || pad.CaretPosition.Row != 1u
                 || pad.SelectedText != "ONE")
             {
@@ -4033,7 +4033,7 @@ public class Shell : Form
 
             // Replace acts on a selection that already matches, and otherwise
             // only finds -- the first press selects, the second replaces.
-            pad.GoTo(0u, 0u);
+            pad.MoveCaretTo(0u, 0u);
             if (pad.ReplaceCurrent("two", "2", true))
             {
                 Console.WriteLine("FAIL: replace changed something without a match selected");
@@ -4044,10 +4044,10 @@ public class Shell : Form
                 Console.WriteLine("FAIL: replace did not take the selected match");
                 ok = false;
             }
-            if (pad.Contents.TextAt(0u) != "one 2 one")
+            if (pad.Contents.GetLineText(0u) != "one 2 one")
             {
                 Console.WriteLine("FAIL: after replace line one reads '"
-                                  + pad.Contents.TextAt(0u) + "'");
+                                  + pad.Contents.GetLineText(0u) + "'");
                 ok = false;
             }
 
@@ -4060,34 +4060,34 @@ public class Shell : Form
                                   + Standard.Text.FromInteger(changed) + " rather than 3");
                 ok = false;
             }
-            if (pad.Contents.TextAt(0u) != "1 2 1"
-                || pad.Contents.TextAt(1u) != "three ONE four"
-                || pad.Contents.TextAt(2u) != "1")
+            if (pad.Contents.GetLineText(0u) != "1 2 1"
+                || pad.Contents.GetLineText(1u) != "three ONE four"
+                || pad.Contents.GetLineText(2u) != "1")
             {
-                Console.WriteLine("FAIL: replace all left '" + pad.Contents.TextAt(0u)
-                                  + "' / '" + pad.Contents.TextAt(1u)
-                                  + "' / '" + pad.Contents.TextAt(2u) + "'");
+                Console.WriteLine("FAIL: replace all left '" + pad.Contents.GetLineText(0u)
+                                  + "' / '" + pad.Contents.GetLineText(1u)
+                                  + "' / '" + pad.Contents.GetLineText(2u) + "'");
                 ok = false;
             }
 
             // The replacement containing the needle is the case that never
             // terminates if the sweep wraps. It must replace each once.
             nuint grown = pad.ReplaceAll("1", "11", true);
-            if (grown != 3u || pad.Contents.TextAt(0u) != "11 2 11")
+            if (grown != 3u || pad.Contents.GetLineText(0u) != "11 2 11")
             {
                 Console.WriteLine("FAIL: a replacement containing the needle gave "
                                   + Standard.Text.FromInteger(grown) + " and '"
-                                  + pad.Contents.TextAt(0u) + "'");
+                                  + pad.Contents.GetLineText(0u) + "'");
                 ok = false;
             }
 
             // And the whole thing is one undo per replacement rather than a
             // document that cannot be put back.
             while (pad.Undo()) { }
-            if (pad.Contents.TextAt(0u) != "")
+            if (pad.Contents.GetLineText(0u) != "")
             {
                 Console.WriteLine("FAIL: undoing every replacement left '"
-                                  + pad.Contents.TextAt(0u) + "'");
+                                  + pad.Contents.GetLineText(0u) + "'");
                 ok = false;
             }
 
@@ -4293,8 +4293,8 @@ public class Shell : Form
             pad.Editor.Contents.Location = "selftest-breakpoints.sl";
             _breakpoints.Clear();
 
-            pad.Editor.Type("one" + Newline() + "two" + Newline() + "three");
-            pad.Editor.GoTo(2u, 0u);
+            pad.Editor.TypeText("one" + Newline() + "two" + Newline() + "three");
+            pad.Editor.MoveCaretTo(2u, 0u);
             ToggleBreakpointAtCaret();
 
             if (_breakpoints.At("selftest-breakpoints.sl", 3u) == null)
@@ -4314,8 +4314,8 @@ public class Shell : Form
             }
 
             // Two lines typed above it push it from 3 to 5.
-            pad.Editor.GoTo(0u, 0u);
-            pad.Editor.Type("a" + Newline() + "b" + Newline());
+            pad.Editor.MoveCaretTo(0u, 0u);
+            pad.Editor.TypeText("a" + Newline() + "b" + Newline());
             Application.DoEvents();
 
             if (_breakpoints.At("selftest-breakpoints.sl", 5u) == null)
@@ -4329,12 +4329,12 @@ public class Shell : Form
             // Deleted rather than undone: undo would keep going past this,
             // and a document with nothing left in it says nothing about
             // whether a breakpoint follows an edit.
-            pad.Editor.Contents.Delete(Position.At(0u, 0u), Position.At(2u, 0u));
+            pad.Editor.Contents.DeleteText(Position.Create(0u, 0u), Position.Create(2u, 0u));
 
             // The caret is put back before anything paints: the document was
             // edited behind the editor's back, so the caret is where those
             // lines used to be.
-            pad.Editor.GoTo(0u, 0u);
+            pad.Editor.MoveCaretTo(0u, 0u);
             Application.DoEvents();
 
             if (_breakpoints.At("selftest-breakpoints.sl", 3u) == null)
@@ -4345,8 +4345,8 @@ public class Shell : Form
 
             // A deletion that swallows it leaves it at the cut rather than
             // losing it.
-            pad.Editor.Contents.Delete(Position.At(1u, 0u), Position.At(2u, 5u));
-            pad.Editor.GoTo(0u, 0u);
+            pad.Editor.Contents.DeleteText(Position.Create(1u, 0u), Position.Create(2u, 5u));
+            pad.Editor.MoveCaretTo(0u, 0u);
             Application.DoEvents();
 
             if (_breakpoints.Count != 1u
