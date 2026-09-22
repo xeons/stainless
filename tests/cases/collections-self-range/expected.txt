@@ -1,0 +1,3 @@
+ok   a list added to itself doubles
+ok   and inserted into itself, in order
+ok   an empty range changes nothing

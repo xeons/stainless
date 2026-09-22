@@ -296,13 +296,10 @@ public class List<T> : IList<T>, IEnumerable<T>
     }
 
     /// Appends every item of another sequence, in its order.
-    public void AddRange(IEnumerable<T> items)
-    {
-        foreach (var item in items)
-        {
-            Add(item);
-        }
-    }
+    ///
+    /// The items are collected before any is added, so a list given itself
+    /// doubles rather than chasing its own growing end.
+    public void AddRange(IEnumerable<T> items) => InsertRange(_count, items);
 
     /// Inserts at a position, moving everything after it up one.
     ///
@@ -531,14 +528,34 @@ public class List<T> : IList<T>, IEnumerable<T>
     public List<T> Slice(nuint index, nuint count) => GetRange(index, count);
 
     /// Inserts every item of another sequence at `index`, in its order.
+    ///
+    /// Collected first, for the reason `AddRange` gives, and then moved into
+    /// place with one shift of the tail rather than one per item.
     public void InsertRange(nuint index, IEnumerable<T> items)
     {
-        nuint at = index;
+        if (index > _count)
+            sl_array_bounds_fail(index, _count);
+
+        var added = new List<T>();
         foreach (var item in items)
         {
-            Insert(at, item);
-            at++;
+            added.Add(item);
         }
+
+        nuint count = added._count;
+        if (count == 0u)
+            return;
+        // Doubling, as `Add` grows, so a loop of small ranges stays linear.
+        nuint needed = _count + count;
+        if (needed > _items.Length)
+            Resize(needed > _items.Length * 2u ? needed : _items.Length * 2u);
+
+        // Backwards, so a slot is read before the copy that overwrites it.
+        for (nuint i = _count; i > index; i--)
+            _items[i - 1u + count] = _items[i - 1u];
+        for (nuint i = 0u; i < count; i++)
+            _items[index + i] = added._items[i];
+        _count = _count + count;
     }
 
     /// This list seen as something that cannot be changed through it.
@@ -853,7 +870,7 @@ void MergeBy<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
 }
 
 /// Where `wanted` is in an already-ordered slice, or the length when it is not
-/// there -- the same convention `IndexOf` follows, so the two read alike.
+/// there.
 ///
 /// Two functions rather than one with a found flag, because the language has
 /// no `out` and a caller that wants the insertion point usually does not want
