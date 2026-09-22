@@ -730,15 +730,20 @@ public class TabControl : WindowedControl
     /// an insertion quietly did nothing.
     public int TabCount => _native.TabCount;
 
-    /// Which page is showing.
+    /// Which page is showing. An index naming no page is ignored.
     public int SelectedIndex
     {
         get => _native.GetSelectedTab();
         set
         {
+            if (value < 0 || (nuint)value >= _pages.Count)
+                return;
+            int was = _native.GetSelectedTab();
             _native.SetSelectedTab(value);
-            ShowOnly(value);
-            OnSelectedIndexChanged();
+            int now = _native.GetSelectedTab();
+            ShowOnly(now);
+            if (now != was)
+                OnSelectedIndexChanged();
         }
     }
 
