@@ -394,6 +394,7 @@ public sealed partial class LlvmEmitter
             $"declare noalias ptr @sl_string_join(ptr, {Word}) nounwind");
 
         Declare("sl_args_set", "declare void @sl_args_set(i32, ptr) nounwind");
+        Declare("sl_console_start", "declare void @sl_console_start() nounwind");
 
         // Links this binary's reflected-type table into the runtime's chain.
         // Called once, from a module initializer, before anything else runs.

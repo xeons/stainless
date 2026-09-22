@@ -27,6 +27,9 @@
 /// wrong for a Windows console typed into by hand, where the active code page
 /// arrives instead. Reading typed non-ASCII there wants `ReadConsoleW`.
 ///
+/// A Windows console also keeps the C runtime's text mode, where Ctrl-Z ends
+/// typed input and LF is shown as CR LF. A pipe or a file does not.
+///
 /// This module is not imported automatically. Printing is a choice, and a
 /// program that never prints has no reason to carry `Write` in scope.
 module Standard.Console;

@@ -10,6 +10,9 @@ to be UTF-8 -- which is what a program piped a UTF-8 file needs, and is
 wrong for a Windows console typed into by hand, where the active code page
 arrives instead. Reading typed non-ASCII there wants `ReadConsoleW`.
 
+A Windows console also keeps the C runtime's text mode, where Ctrl-Z ends
+typed input and LF is shown as CR LF. A pipe or a file does not.
+
 This module is not imported automatically. Printing is a choice, and a
 program that never prints has no reason to carry `Write` in scope.
 
@@ -30,7 +33,7 @@ Whether stdin has reached its end.
 It reads a byte to find out and pushes it back, so it answers only when
 the stream has something to say: on one that is open and idle it waits.
 
-<sub>[stdlib/Console.sl:88](../../stdlib/Console.sl#L88)</sub>
+<sub>[stdlib/Console.sl:91](../../stdlib/Console.sl#L91)</sub>
 
 ### Flush *function*
 
@@ -45,7 +48,7 @@ program whose output another program is reading may so far have written
 nothing the reader can see. A process killed rather than returned from
 loses whatever is still held.
 
-<sub>[stdlib/Console.sl:70](../../stdlib/Console.sl#L70)</sub>
+<sub>[stdlib/Console.sl:73](../../stdlib/Console.sl#L73)</sub>
 
 ### ReadLine *function*
 
@@ -59,7 +62,7 @@ Null rather than empty, because a blank line and no line at all are
 different answers and a loop reading until there is nothing left has to
 tell them apart.
 
-<sub>[stdlib/Console.sl:79](../../stdlib/Console.sl#L79)</sub>
+<sub>[stdlib/Console.sl:82](../../stdlib/Console.sl#L82)</sub>
 
 ### ReadToEnd *function*
 
@@ -69,7 +72,7 @@ String ReadToEnd()
 
 Everything left on stdin, as one string.
 
-<sub>[stdlib/Console.sl:82](../../stdlib/Console.sl#L82)</sub>
+<sub>[stdlib/Console.sl:85](../../stdlib/Console.sl#L85)</sub>
 
 ### Write *function*
 
@@ -79,7 +82,7 @@ void Write(String text)
 
 Text, with nothing after it.
 
-<sub>[stdlib/Console.sl:52](../../stdlib/Console.sl#L52)</sub>
+<sub>[stdlib/Console.sl:55](../../stdlib/Console.sl#L55)</sub>
 
 ### WriteError *function*
 
@@ -93,7 +96,7 @@ The newline is not optional here as it is for stdout. A diagnostic is a
 whole line by the time anything reads it, and stderr is unbuffered, so a
 partial one would interleave with whatever wrote next.
 
-<sub>[stdlib/Console.sl:62](../../stdlib/Console.sl#L62)</sub>
+<sub>[stdlib/Console.sl:65](../../stdlib/Console.sl#L65)</sub>
 
 ### WriteLine *function*
 
@@ -103,5 +106,5 @@ void WriteLine(String text)
 
 Text and a newline.
 
-<sub>[stdlib/Console.sl:55](../../stdlib/Console.sl#L55)</sub>
+<sub>[stdlib/Console.sl:58](../../stdlib/Console.sl#L58)</sub>
 

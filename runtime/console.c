@@ -40,6 +40,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+#  include <fcntl.h>
+#  include <io.h>
+#endif
+
+/*
+ * Puts the standard streams that are a pipe or a file into binary mode.
+ *
+ * The Windows C runtime starts all three in text mode, which writes LF as
+ * CR LF, reads CR LF as LF, and ends input at the first Ctrl-Z. A pipe or a
+ * file MUST carry the bytes unchanged. A console keeps text mode: there Ctrl-Z
+ * is how a user types the end of input.
+ *
+ * Asked of the handle rather than of the descriptor, because a program with
+ * no console has none behind 0, 1 and 2, and the C runtime's answer to a
+ * question about a descriptor that is not open is to end the process.
+ */
+void sl_console_start(void)
+{
+#ifdef _WIN32
+    static const DWORD standard[3] = { STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE };
+
+    for (int fd = 0; fd < 3; fd++) {
+        HANDLE handle = GetStdHandle(standard[fd]);
+        if (handle == NULL || handle == INVALID_HANDLE_VALUE) continue;
+
+        DWORD type = GetFileType(handle);
+        if (type == FILE_TYPE_DISK || type == FILE_TYPE_PIPE) _setmode(fd, _O_BINARY);
+    }
+#endif
+}
+
 void sl_console_write(void *pointer)
 {
     SlString *string = (SlString *)pointer;

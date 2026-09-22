@@ -259,6 +259,8 @@ public sealed partial class LlvmEmitter
                            + (scope is { } attached ? $" !dbg !{attached}" : "")
                            + " {");
         _module.AppendLine("entry:");
+        // The streams are set up before anything could touch them.
+        _module.AppendLine($"  call void @sl_console_start(){at}");
         _module.AppendLine($"  call void @sl_args_set(i32 %argc, ptr %argv){at}");
 
         // Statics first, in dependency order, before any user code runs. After

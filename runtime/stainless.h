@@ -861,6 +861,9 @@ SL_API void *sl_console_read_line(void);
 SL_API void *sl_console_read_all(void);
 SL_API _Bool sl_console_at_end(void);
 
+/* Called by the entry point, before anything reads or writes the streams. */
+SL_API void sl_console_start(void);
+
 /* ------------------------------------------------------- the environment */
 
 /*
