@@ -335,8 +335,7 @@ public class ToolBar : WindowedControl
         set
         {
             _pictures = value;
-            if (value != null)
-                _native.SetImages(((ImageList)value).Backend());
+            _native.SetImages(value == null ? null : ((ImageList)value).Backend());
             _native.ResizeToFit();
         }
     }
@@ -812,8 +811,7 @@ public class TabControl : WindowedControl
         set
         {
             _pictures = value;
-            if (value != null)
-                _native.SetImages(((ImageList)value).Backend());
+            _native.SetImages(value == null ? null : ((ImageList)value).Backend());
         }
     }
 
@@ -1032,8 +1030,7 @@ public class TreeView : WindowedControl
         set
         {
             _pictures = value;
-            if (value != null)
-                _native.SetImages(((ImageList)value).Backend());
+            _native.SetImages(value == null ? null : ((ImageList)value).Backend());
         }
     }
 
@@ -1153,8 +1150,7 @@ public class ListView : WindowedControl
         set
         {
             _pictures = value;
-            if (value != null)
-                _native.SetImages(((ImageList)value).Backend());
+            _native.SetImages(value == null ? null : ((ImageList)value).Backend());
         }
     }
 

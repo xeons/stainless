@@ -1580,7 +1580,7 @@ public class GtkTabControlPeer : GtkContainerPeer, ITabControlPeer
 
     /// A tab's picture would be an image packed beside its label. Left until
     /// image lists are, so that a tab and a toolbar get pictures the same way.
-    public void SetImages(IImageListBackend images) { }
+    public void SetImages(IImageListBackend? images) { }
 }
 
 // =============================================================== status bar
@@ -1775,9 +1775,9 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         return gtk_toggle_tool_button_get_active(_items[(nuint)index]) != 0;
     }
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        _pictures = (GtkImageListBackend)images;
+        _pictures = images == null ? null : (GtkImageListBackend)images;
     }
 
     public void SetTextVisible(bool visible)

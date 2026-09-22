@@ -57,6 +57,11 @@ import Win32.ComCtl32;
 /// control, decides where it goes.
 uint StaysPut() => CcsNoResize | CcsNoParentAlign | CcsNoDivider;
 
+/// An image list's handle, or null for none, which every `*_SETIMAGELIST`
+/// takes as "no pictures".
+nuint ImageListHandle(IImageListBackend? images) =>
+    images == null ? 0u : ((IImageListBackend)images).Handle;
+
 // ================================================================== toolbar
 
 public class ToolBarPeer : ControlPeer, IToolBarPeer
@@ -290,9 +295,9 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         return SendMessageW(window, TbIsButtonChecked, (ulong)command, 0) != 0;
     }
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, TbSetImageList, 0u, (long)(nuint)images.Handle);
+        SendMessageW(window, TbSetImageList, 0u, (long)ImageListHandle(images));
     }
 
     /// `TBSTYLE_LIST` puts the caption beside the picture; without it there is
@@ -561,9 +566,9 @@ public class TabControlPeer : ControlPeer, ITabControlPeer
         }
     }
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, TcmSetImageList, 0u, (long)(nuint)images.Handle);
+        SendMessageW(window, TcmSetImageList, 0u, (long)ImageListHandle(images));
     }
 
     protected override bool NotifiedBy(int code, void* raw, long* answer)
@@ -740,9 +745,9 @@ public class TreeViewPeer : ControlPeer, ITreeViewPeer
         SendMessageW(window, TvmDeleteItem, 0u, (long)(nuint)(void*)TreeRoot());
     }
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, TvmSetImageList, 0u, (long)(nuint)images.Handle);
+        SendMessageW(window, TvmSetImageList, 0u, (long)ImageListHandle(images));
     }
 
     protected override bool NotifiedBy(int code, void* raw, long* answer)
@@ -942,9 +947,9 @@ public class ListViewPeer : ControlPeer, IListViewPeer
         SendMessageW(window, LvmEnsureVisible, (ulong)row, 0);
     }
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        SendMessageW(window, LvmSetImageList, 1u, (long)(nuint)images.Handle);
+        SendMessageW(window, LvmSetImageList, 1u, (long)ImageListHandle(images));
     }
 
     public void SetFullRowSelect(bool full, bool gridLines)

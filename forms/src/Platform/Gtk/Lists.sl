@@ -719,9 +719,9 @@ public class GtkTreePeer : GtkModelPeer, ITreeViewPeer
         gtk_tree_store_clear(model);
     }
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        _pictures = (GtkImageListBackend)images;
+        _pictures = images == null ? null : (GtkImageListBackend)images;
     }
 }
 
@@ -862,9 +862,9 @@ public class GtkListViewPeer : GtkModelPeer, IListViewPeer
     public int  GetSelectedRow() => SelectedRow;
     public void SetSelectedRow(int row) => SelectRow(row);
 
-    public void SetImages(IImageListBackend images)
+    public void SetImages(IImageListBackend? images)
     {
-        _pictures = (GtkImageListBackend)images;
+        _pictures = images == null ? null : (GtkImageListBackend)images;
     }
 
     /// **A GTK row is always selected whole**, so the first half of this is

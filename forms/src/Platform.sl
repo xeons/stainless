@@ -810,7 +810,7 @@ public interface IToolBarPeer : IControlPeer
     void SetButtonEnabled(int index, bool enabled);
     void SetButtonChecked(int index, bool checked);
     bool GetButtonChecked(int index);
-    void SetImages(IImageListBackend images);
+    void SetImages(IImageListBackend? images);
     /// Shows a caption beside each button rather than only its picture.
     void SetTextVisible(bool visible);
     /// Sizes the bar to its buttons, which is what a docked toolbar wants.
@@ -864,7 +864,7 @@ public interface ITabControlPeer : IContainerPeer
     /// The area inside the tabs, where a page's controls go. Not the client
     /// area: the tabs themselves are part of that.
     Rectangle PageArea { get; }
-    void SetImages(IImageListBackend images);
+    void SetImages(IImageListBackend? images);
 }
 
 /// A place in a tree. Opaque, because a tree is a linked structure and an index
@@ -910,7 +910,7 @@ public interface ITreeViewPeer : IControlPeer
     ITreeNodeHandle? NodeAt(Point at);
 
     void Clear();
-    void SetImages(IImageListBackend images);
+    void SetImages(IImageListBackend? images);
 }
 
 /// How a list shows what it holds.
@@ -931,7 +931,7 @@ public interface IListViewPeer : IControlPeer
     int RowCount { get; }
     int  GetSelectedRow();
     void SetSelectedRow(int row);
-    void SetImages(IImageListBackend images);
+    void SetImages(IImageListBackend? images);
     /// Whether a click anywhere on a row selects the whole of it, and whether
     /// the grid is drawn. Both are the same call because Windows makes them one
     /// extended style word.
