@@ -1361,9 +1361,10 @@ public class CodeEditor : CustomControl
         // Everything below a space is a control code, and each one that means
         // something has already been dealt with as a key. Ctrl+V arrives here a
         // second time as character 22, which is exactly why that test is a
-        // range and not a list of the ones we happen to have thought of.
-        if (args.KeyChar >= ' ')
-            Type(Standard.Text.FromChar((char32)args.KeyChar));
+        // range and not a list of the ones we happen to have thought of. DEL
+        // is one too, and is what Ctrl+Backspace types on Windows.
+        if (args.KeyChar >= ' ' && args.KeyChar != '\x7F')
+            Type(Standard.Text.FromChar(args.KeyChar));
         base.OnKeyPress(args);
     }
 

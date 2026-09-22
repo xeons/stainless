@@ -148,7 +148,10 @@ public interface IControlNotify
     /// One typed character, after the platform has applied the keyboard layout
     /// and any dead keys -- which is why it is a separate notification from
     /// `OnPlatformKeyDown` and not derivable from it.
-    void OnPlatformKeyPress(char typed);
+    ///
+    /// A whole Unicode scalar. A backend whose platform delivers UTF-16 MUST
+    /// join a surrogate pair into one call rather than report either half.
+    void OnPlatformKeyPress(char32 typed);
 
     void OnPlatformGotFocus();
     void OnPlatformLostFocus();

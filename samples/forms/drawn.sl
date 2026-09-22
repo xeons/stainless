@@ -26,6 +26,10 @@ import Standard.Collections;
 import Forms;
 import Forms.Drawing;
 import Forms.Platform;
+#if WINDOWS
+import Win32.Handles;
+import Win32.User32;
+#endif
 
 /// A one-line text field, drawn rather than delegated.
 ///
@@ -136,12 +140,13 @@ public class Scratch : CustomControl
     protected override void OnKeyPress(KeyPressEventArgs args)
     {
         // Backspace and Return arrive here as characters as well, and neither
-        // is one to insert. Everything below a space is a control code.
-        if (args.KeyChar >= ' ')
+        // is one to insert. Everything below a space is a control code, and
+        // so is DEL.
+        if (args.KeyChar >= ' ' && args.KeyChar != '\x7F')
         {
             // Qualified, because `Text` inside a `Control` is the control's
             // own caption property and not the module the function is in.
-            String typed = Standard.Text.FromChar((char32)args.KeyChar);
+            String typed = Standard.Text.FromChar(args.KeyChar);
             _text = _text.Substring(0u, _at) + typed + _text.Substring(_at);
             Move(_at + typed.ByteLength());
         }
@@ -292,9 +297,28 @@ public class DrawnForm : Form
             ok = false;
         }
 
+        // A letter past ASCII and one past U+FFFF, which Windows sends as two
+        // `WM_CHAR`s. On Windows they go through the window procedure, so the
+        // backend's joining is what is tested.
+#if WINDOWS
+        HWND window = (HWND)(void*)_field.Handle;
+        SendMessageW(window, WmChar, 0x0444u, 0);
+        SendMessageW(window, WmChar, 0xD83Du, 0);
+        SendMessageW(window, WmChar, 0xDE00u, 0);
+#else
+        _field.OnPlatformKeyPress('ф');
+        _field.OnPlatformKeyPress('\U0001F600');
+#endif
+        if (_field.Content != "ф😀ac")
+        {
+            Console.WriteLine("FAIL: typing past ASCII gave '" + _field.Content
+                              + "', not 'ф😀ac'");
+            ok = false;
+        }
+
         if (ok)
         {
-            Console.WriteLine("  focus, caret, typing, movement and deletion");
+            Console.WriteLine("  focus, caret, typing, movement, deletion and Unicode");
         }
         return ok;
     }

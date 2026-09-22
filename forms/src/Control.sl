@@ -99,9 +99,11 @@ public struct KeyEventArgs
 /// One character the user typed.
 public struct KeyPressEventArgs
 {
-    public char KeyChar;
+    /// A whole Unicode scalar, so a character outside ASCII arrives as one.
+    /// `Standard.Text.FromChar` turns it into the UTF-8 a `String` holds.
+    public char32 KeyChar;
 
-    public static KeyPressEventArgs Of(char typed)
+    public static KeyPressEventArgs Of(char32 typed)
     {
         KeyPressEventArgs args;
         args.KeyChar = typed;
@@ -807,7 +809,7 @@ public abstract class Control : IControlNotify
         OnKeyUp(KeyEventArgs.Of(key, modifiers));
     }
 
-    public void OnPlatformKeyPress(char typed)
+    public void OnPlatformKeyPress(char32 typed)
     {
         OnKeyPress(KeyPressEventArgs.Of(typed));
     }

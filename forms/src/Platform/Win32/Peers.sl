@@ -302,6 +302,8 @@ public class ControlPeer : IControlPeer
     /// request, so entering has to ask again each time.
     protected bool tracking;
     protected bool inside;
+    /// The first half of a surrogate pair `WM_CHAR` delivered, or zero.
+    protected uint highSurrogate;
     protected bool destroyed;
     /// The cursor this control asks for, and which shape it is. Null means the
     /// class cursor, which is what `Default` leaves in place.
@@ -328,6 +330,7 @@ public class ControlPeer : IControlPeer
         foreSet = false;
         tracking = false;
         inside = false;
+        highSurrogate = 0u;
         destroyed = false;
         pointer = null;
         shape = CursorKind.Default;
@@ -620,7 +623,23 @@ public class ControlPeer : IControlPeer
         }
         if (message == WmChar)
         {
-            control.OnPlatformKeyPress((char)(uint)wParam);
+            // UTF-16: a character past U+FFFF arrives as two messages, and
+            // only the pair is a character.
+            uint unit = (uint)(wParam & 0xFFFFu);
+            if (unit >= 0xD800u && unit <= 0xDBFFu)
+            {
+                highSurrogate = unit;
+                return Inherited(message, wParam, lParam);
+            }
+            uint typed = unit;
+            if (unit >= 0xDC00u && unit <= 0xDFFFu)
+            {
+                if (highSurrogate == 0u)
+                    return Inherited(message, wParam, lParam);
+                typed = 0x10000u + ((highSurrogate - 0xD800u) << 10) + (unit - 0xDC00u);
+            }
+            highSurrogate = 0u;
+            control.OnPlatformKeyPress((char32)typed);
             return Inherited(message, wParam, lParam);
         }
 

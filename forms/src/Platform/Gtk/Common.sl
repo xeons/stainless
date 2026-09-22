@@ -657,7 +657,7 @@ public class GtkPeer : IControlPeer
             guint typed = gdk_keyval_to_unicode(keyval);
             if (typed >= 32u && typed != 127u)
             {
-                ((IControlNotify)owner).OnPlatformKeyPress((char)typed);
+                ((IControlNotify)owner).OnPlatformKeyPress((char32)typed);
             }
             return false;
         });
