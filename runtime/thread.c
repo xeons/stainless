@@ -46,7 +46,6 @@
 #  include <errno.h>
 #  include <pthread.h>
 #  include <sched.h>
-#  include <limits.h>
 #  include <time.h>
 #  include <unistd.h>
 #endif
@@ -245,8 +244,8 @@ _Bool sl_condition_wait_for(SlCondition *condition, SlMutex *mutex,
     return GetLastError() != ERROR_TIMEOUT;
 #else
     /*
-     * An absolute deadline on the clock sl_condition_init chose. One past what
-     * time_t can hold is clamped to its largest value, so a very long wait
+     * An absolute deadline on the clock sl_condition_init chose. A deadline past
+     * what time_t can hold is clamped to its largest value, so a very long wait
      * waits a very long time rather than none.
      */
     struct timespec deadline;
