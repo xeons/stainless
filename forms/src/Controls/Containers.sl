@@ -124,24 +124,39 @@ public class ScrollBar : WindowedControl
     /// Whether it scrolls up and down rather than left and right.
     public bool IsVertical => _vertical;
 
+    /// Raises `Maximum` when set above it.
     public int Minimum
     {
         get => _minimum;
         set
         {
             _minimum = value;
-            _native.SetRange(_minimum, _maximum, _page);
+            if (_maximum < value)
+                _maximum = value;
+            ApplyRange();
         }
     }
 
+    /// Lowers `Minimum` when set below it.
     public int Maximum
     {
         get => _maximum;
         set
         {
             _maximum = value;
-            _native.SetRange(_minimum, _maximum, _page);
+            if (_minimum > value)
+                _minimum = value;
+            ApplyRange();
         }
+    }
+
+    void ApplyRange()
+    {
+        _native.SetRange(_minimum, _maximum, _page);
+        int now = _native.GetValue();
+        int kept = ClampToRange(now, _minimum, _maximum);
+        if (kept != now)
+            _native.SetValue(kept);
     }
 
     /// How much one page-down moves by, and how large the thumb is drawn -- the
@@ -157,14 +172,15 @@ public class ScrollBar : WindowedControl
         }
     }
 
-    /// Where the thumb is.
+    /// Where the thumb is. Kept inside the range.
     public int Value
     {
         get => _native.GetValue();
-        set => _native.SetValue(value);
+        set => _native.SetValue(ClampToRange(value, _minimum, _maximum));
     }
 
-    /// The thumb moved, whoever moved it.
+    /// The user moved the thumb. Setting `Value` raises nothing, as the seam's
+    /// `OnPlatformValueChanged` says.
     public event EventHandler ValueChanged;
 
     protected virtual void OnValueChanged() => ValueChanged(this);

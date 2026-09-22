@@ -620,33 +620,50 @@ public class SpinEdit : WindowedControl
         AttachPeer(_native);
     }
 
+    /// Raises `Maximum` when set above it.
     public int Minimum
     {
         get => _low;
         set
         {
             _low = value;
-            _native.SetRange(_low, _high);
+            if (_high < value)
+                _high = value;
+            ApplyRange();
         }
     }
 
+    /// Lowers `Minimum` when set below it.
     public int Maximum
     {
         get => _high;
         set
         {
             _high = value;
-            _native.SetRange(_low, _high);
+            if (_low > value)
+                _low = value;
+            ApplyRange();
         }
     }
 
+    /// Kept inside the range.
     public int Value
     {
         get => _native.GetValue();
-        set => _native.SetValue(value);
+        set => _native.SetValue(ClampToRange(value, _low, _high));
     }
 
-    /// The number changed, by the arrows or by typing.
+    void ApplyRange()
+    {
+        _native.SetRange(_low, _high);
+        int now = _native.GetValue();
+        int kept = ClampToRange(now, _low, _high);
+        if (kept != now)
+            _native.SetValue(kept);
+    }
+
+    /// The user changed the number, by the arrows or by typing. Setting
+    /// `Value` raises nothing.
     public event EventHandler ValueChanged;
 
     protected virtual void OnValueChanged() => ValueChanged(this);

@@ -469,6 +469,18 @@ public class StatusBar : WindowedControl
 
 // ============================================================= progress bar
 
+/// `value` pulled into `low` to `high`. What every control with a range does
+/// to a value set outside it, since the platforms differ about whether they
+/// do it themselves.
+int ClampToRange(int value, int low, int high)
+{
+    if (value < low)
+        return low;
+    if (value > high)
+        return high;
+    return value;
+}
+
 /// How far along something is.
 public class ProgressBar : WindowedControl
 {
@@ -487,30 +499,46 @@ public class ProgressBar : WindowedControl
         AttachPeer(_native);
     }
 
+    /// Raises `Maximum` when set above it.
     public int Minimum
     {
         get => _low;
         set
         {
             _low = value;
-            _native.SetRange(_low, _high);
+            if (_high < value)
+                _high = value;
+            ApplyRange();
         }
     }
 
+    /// Lowers `Minimum` when set below it.
     public int Maximum
     {
         get => _high;
         set
         {
             _high = value;
-            _native.SetRange(_low, _high);
+            if (_low > value)
+                _low = value;
+            ApplyRange();
         }
     }
 
+    /// Kept inside the range.
     public int Value
     {
         get => _native.GetValue();
-        set => _native.SetValue(value);
+        set => _native.SetValue(ClampToRange(value, _low, _high));
+    }
+
+    void ApplyRange()
+    {
+        _native.SetRange(_low, _high);
+        int now = _native.GetValue();
+        int kept = ClampToRange(now, _low, _high);
+        if (kept != now)
+            _native.SetValue(kept);
     }
 
     /// A bar that moves without saying how far along it is, for work whose
@@ -548,30 +576,46 @@ public class TrackBar : WindowedControl
 
     public TrackBar(WindowedControl parent) => this(parent, false);
 
+    /// Raises `Maximum` when set above it.
     public int Minimum
     {
         get => _low;
         set
         {
             _low = value;
-            _native.SetRange(_low, _high);
+            if (_high < value)
+                _high = value;
+            ApplyRange();
         }
     }
 
+    /// Lowers `Minimum` when set below it.
     public int Maximum
     {
         get => _high;
         set
         {
             _high = value;
-            _native.SetRange(_low, _high);
+            if (_low > value)
+                _low = value;
+            ApplyRange();
         }
     }
 
+    /// Kept inside the range.
     public int Value
     {
         get => _native.GetValue();
-        set => _native.SetValue(value);
+        set => _native.SetValue(ClampToRange(value, _low, _high));
+    }
+
+    void ApplyRange()
+    {
+        _native.SetRange(_low, _high);
+        int now = _native.GetValue();
+        int kept = ClampToRange(now, _low, _high);
+        if (kept != now)
+            _native.SetValue(kept);
     }
 
     /// How often a tick is drawn beneath the slider.
@@ -585,7 +629,8 @@ public class TrackBar : WindowedControl
         }
     }
 
-    /// The slider moved, whoever moved it.
+    /// The user moved the slider. Setting `Value` raises nothing, as the seam's
+    /// `OnPlatformValueChanged` says.
     public event EventHandler ValueChanged;
 
     protected virtual void OnValueChanged() => ValueChanged(this);
