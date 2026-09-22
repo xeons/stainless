@@ -1,0 +1,16 @@
+sent empty 0 no error
+received empty 0 no error
+  from 127.0.0.1
+truncated 4 no error
+  first A last D from 127.0.0.1
+into nothing 0 no error
+timed out 0 it timed out
+  from '' 0
+read nothing 0 connected true can read true
+send past the end 0 that request made no sense
+receive past the end 0 that request made no sense
+offset past the end 0 that request made no sense
+offset past the end with a count 0 that request made no sense
+read 2 still connected true
+connect started true
+writable false the connection was refused

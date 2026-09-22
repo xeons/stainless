@@ -483,13 +483,13 @@ public class Socket
             Note(SocketError.Closed);
             return 0;
         }
-        if (count == 0)
-            return 0;
-        if (offset + count > buffer.Length)
+        if (!RangeLiesWithin(buffer, offset, count))
         {
             Note(SocketError.Invalid);
             return 0;
         }
+        if (count == 0)
+            return 0;
 
         int code = 0;
         nuint sent = sl_socket_send(_handle, &buffer[offset], count, &code);
@@ -544,13 +544,13 @@ public class Socket
             Note(SocketError.Closed);
             return 0;
         }
-        if (count == 0)
-            return 0;
-        if (offset + count > buffer.Length)
+        if (!RangeLiesWithin(buffer, offset, count))
         {
             Note(SocketError.Invalid);
             return 0;
         }
+        if (count == 0)
+            return 0;
 
         int code = 0;
         nuint read = sl_socket_receive(_handle, &buffer[offset], count, &code);
@@ -570,7 +570,7 @@ public class Socket
         }
 
         int code = 0;
-        nuint sent = sl_socket_send_to(_handle, &buffer[0], buffer.Length,
+        nuint sent = sl_socket_send_to(_handle, FirstByteAddressOrNull(buffer), buffer.Length,
                                        target.Host.ToPointer(), target.Port,
                                        (int)_family, &code);
         Note((SocketError)code);
@@ -581,7 +581,9 @@ public class Socket
     ///
     /// A datagram longer than the buffer is truncated and the rest is gone,
     /// which is what a datagram is: there is no second read to get the rest of
-    /// one.
+    /// one. The count is what fitted, and it is not an error.
+    ///
+    /// When the read fails, `from` is an empty host and port 0.
     public nuint ReceiveFrom(byte[] buffer, ref EndPoint from)
     {
         if (_closed)
@@ -594,7 +596,8 @@ public class Socket
         ushort port = 0;
         int code = 0;
 
-        nuint read = sl_socket_receive_from(_handle, &buffer[0], buffer.Length,
+        host[0] = 0;
+        nuint read = sl_socket_receive_from(_handle, FirstByteAddressOrNull(buffer), buffer.Length,
                                             &host[0], AddressSize, &port, &code);
         Note((SocketError)code);
 
@@ -678,7 +681,8 @@ public class Socket
     public bool WaitToRead(int milliseconds) => Wait(false, milliseconds);
 
     /// Waits until there is room to write. On a socket that is connecting
-    /// without blocking, this is also how the connection finishing is seen.
+    /// without blocking, this is also how the connection finishing is seen:
+    /// a connect that failed answers false, and `Error` says why.
     public bool WaitToWrite(int milliseconds) => Wait(true, milliseconds);
 
     // -------------------------------------------------------------- private
@@ -744,6 +748,22 @@ public class Socket
         _error = code;
         return code;
     }
+}
+
+// Whether `count` bytes from `offset` lie inside `buffer`, asked so that the
+// sum cannot wrap.
+bool RangeLiesWithin(byte[] buffer, nuint offset, nuint count)
+{
+    return offset <= buffer.Length && count <= buffer.Length - offset;
+}
+
+// An empty array has no first element to take the address of, and an empty
+// datagram is still one to send or receive.
+byte* FirstByteAddressOrNull(byte[] buffer)
+{
+    if (buffer.Length == 0u)
+        return null;
+    return &buffer[0];
 }
 
 // ------------------------------------------------------------- TCP listener
@@ -995,6 +1015,9 @@ public class TcpClient : IStream
     /// that from a failure.
     public nuint Read(byte[] buffer, nuint offset, nuint count)
     {
+        if (count == 0u)
+            return 0u;
+
         nuint read = _socket.Receive(buffer, offset, count);
         if (read == 0 && _socket.Error == SocketError.None)
             _finished = true;

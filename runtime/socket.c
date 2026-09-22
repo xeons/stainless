@@ -57,6 +57,7 @@
 
 #include "stainless.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -115,17 +116,11 @@ enum {
 enum { SL_NET_IPV4 = 4, SL_NET_IPV6 = 6 };
 enum { SL_NET_STREAM = 1, SL_NET_DATAGRAM = 2 };
 
-/*
- * The last error, translated.
- *
- * Read immediately after the call that failed and never speculatively: on
- * Windows WSAGetLastError is thread-local and on POSIX errno is, but both are
- * clobbered by the next call that sets them, including ones that succeeded.
- */
-static int sl_net_last(void)
+/* A platform error code, translated. */
+static int sl_net_translate(int native)
 {
 #ifdef _WIN32
-    switch (WSAGetLastError()) {
+    switch (native) {
         case WSAEWOULDBLOCK:  return SL_NET_WOULD_BLOCK;
         case WSAEINPROGRESS:  return SL_NET_WOULD_BLOCK;
         case WSAEALREADY:     return SL_NET_WOULD_BLOCK;
@@ -134,6 +129,7 @@ static int sl_net_last(void)
         case WSAEHOSTUNREACH: return SL_NET_UNREACHABLE;
         case WSAENETUNREACH:  return SL_NET_UNREACHABLE;
         case WSAEADDRINUSE:   return SL_NET_ADDRESS_IN_USE;
+        case WSAEADDRNOTAVAIL: return SL_NET_ADDRESS_IN_USE;
         case WSAENOTCONN:     return SL_NET_NOT_CONNECTED;
         case WSAECONNRESET:   return SL_NET_RESET;
         case WSAECONNABORTED: return SL_NET_RESET;
@@ -143,11 +139,12 @@ static int sl_net_last(void)
         case WSAEACCES:       return SL_NET_ACCESS_DENIED;
         case WSAEINVAL:       return SL_NET_INVALID;
         case WSAEAFNOSUPPORT: return SL_NET_INVALID;
+        case WSAEMSGSIZE:     return SL_NET_INVALID;
         case 0:               return SL_NET_OK;
         default:              return SL_NET_UNKNOWN;
     }
 #else
-    switch (errno) {
+    switch (native) {
         case EWOULDBLOCK:   return SL_NET_WOULD_BLOCK;
 #  if EAGAIN != EWOULDBLOCK
         case EAGAIN:        return SL_NET_WOULD_BLOCK;
@@ -171,9 +168,26 @@ static int sl_net_last(void)
         case EPERM:         return SL_NET_ACCESS_DENIED;
         case EINVAL:        return SL_NET_INVALID;
         case EAFNOSUPPORT:  return SL_NET_INVALID;
+        case EMSGSIZE:      return SL_NET_INVALID;
         case 0:             return SL_NET_OK;
         default:            return SL_NET_UNKNOWN;
     }
+#endif
+}
+
+/*
+ * The last error, translated.
+ *
+ * Read immediately after the call that failed and never speculatively: on
+ * Windows WSAGetLastError is thread-local and on POSIX errno is, but both are
+ * clobbered by the next call that sets them, including ones that succeeded.
+ */
+static int sl_net_last(void)
+{
+#ifdef _WIN32
+    return sl_net_translate(WSAGetLastError());
+#else
+    return sl_net_translate(errno);
 #endif
 }
 
@@ -185,6 +199,49 @@ static void sl_net_report(int *error, int code)
 static void sl_net_failed(int *error)
 {
     sl_net_report(error, sl_net_last());
+}
+
+/*
+ * The same for a call that moves data or waits for a peer. An expired
+ * SO_RCVTIMEO or SO_SNDTIMEO is EAGAIN on POSIX, which on a blocking socket
+ * means the timeout rather than a socket that does not block. Windows already
+ * says WSAETIMEDOUT.
+ */
+static void sl_net_transfer_failed(SlNative handle, int *error)
+{
+    int code = sl_net_last();
+#ifndef _WIN32
+    if (code == SL_NET_WOULD_BLOCK) {
+        int flags = fcntl(handle, F_GETFL, 0);
+        if (flags >= 0 && (flags & O_NONBLOCK) == 0) code = SL_NET_TIMED_OUT;
+    }
+#else
+    (void)handle;
+#endif
+    sl_net_report(error, code);
+}
+
+/* Winsock counts in int. A longer transfer moves INT_MAX, and callers loop. */
+#ifdef _WIN32
+static int sl_net_count(size_t count)
+{
+    return count > (size_t)INT_MAX ? INT_MAX : (int)count;
+}
+#endif
+
+/*
+ * Writing to a closed peer is an error to return, not a signal that kills the
+ * process. MSG_NOSIGNAL says so per call where it exists; where it does not,
+ * SO_NOSIGPIPE says so once, on every socket made here.
+ */
+static void sl_net_no_sigpipe(SlNative handle)
+{
+#if !defined(_WIN32) && !defined(MSG_NOSIGNAL) && defined(SO_NOSIGPIPE)
+    int on = 1;
+    setsockopt(handle, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof on);
+#else
+    (void)handle;
+#endif
 }
 
 /* ------------------------------------------------------------------ startup */
@@ -299,6 +356,7 @@ size_t sl_socket_open(int family, int kind, int *error)
         sl_net_failed(error);
         return (size_t)-1;
     }
+    sl_net_no_sigpipe(handle);
     return (size_t)handle;
 }
 
@@ -359,11 +417,12 @@ size_t sl_socket_accept(size_t handle, int *error)
 {
     SlNative accepted = accept((SlNative)handle, NULL, NULL);
 
-    sl_net_report(error, SL_NET_OK);
     if (accepted == SL_BAD_SOCKET) {
-        sl_net_failed(error);
+        sl_net_transfer_failed((SlNative)handle, error);
         return (size_t)-1;
     }
+    sl_net_report(error, SL_NET_OK);
+    sl_net_no_sigpipe(accepted);
     return (size_t)accepted;
 }
 
@@ -386,7 +445,7 @@ int sl_socket_connect(size_t handle, const char *host, uint16_t port, int family
     if (!sl_net_lookup(host, port, family, kind, 0, &found, error)) return 0;
 
     ok = connect((SlNative)handle, found->ai_addr, (SlLength)found->ai_addrlen) == 0;
-    if (!ok) sl_net_failed(error);
+    if (!ok) sl_net_transfer_failed((SlNative)handle, error);
 
     freeaddrinfo(found);
     return ok;
@@ -427,10 +486,11 @@ size_t sl_socket_open_connected(const char *host, uint16_t port, int family,
         if (connect(handle, step->ai_addr, (SlLength)step->ai_addrlen) == 0) {
             freeaddrinfo(found);
             sl_net_report(error, SL_NET_OK);
+            sl_net_no_sigpipe(handle);
             return (size_t)handle;
         }
 
-        sl_net_failed(error);
+        sl_net_transfer_failed(handle, error);
         sl_close_native(handle);
     }
 
@@ -452,11 +512,9 @@ size_t sl_socket_send(size_t handle, const uint8_t *data, size_t count, int *err
     if (count == 0) return 0;
 
 #ifdef _WIN32
-    moved = send((SlNative)handle, (const char *)data, (int)count, 0);
+    moved = send((SlNative)handle, (const char *)data, sl_net_count(count), 0);
 #else
-    /* MSG_NOSIGNAL where it exists: writing to a closed peer is an error to
-       return, not a signal that kills the process. macOS uses SO_NOSIGPIPE at
-       open time instead, which is set in sl_socket_open's caller path. */
+    /* See sl_net_no_sigpipe. */
 #  ifdef MSG_NOSIGNAL
     moved = send((SlNative)handle, data, count, MSG_NOSIGNAL);
 #  else
@@ -465,7 +523,7 @@ size_t sl_socket_send(size_t handle, const uint8_t *data, size_t count, int *err
 #endif
 
     if (moved < 0) {
-        sl_net_failed(error);
+        sl_net_transfer_failed((SlNative)handle, error);
         return 0;
     }
     return (size_t)moved;
@@ -483,13 +541,13 @@ size_t sl_socket_receive(size_t handle, uint8_t *data, size_t count, int *error)
     if (count == 0) return 0;
 
 #ifdef _WIN32
-    moved = recv((SlNative)handle, (char *)data, (int)count, 0);
+    moved = recv((SlNative)handle, (char *)data, sl_net_count(count), 0);
 #else
     moved = recv((SlNative)handle, data, count, 0);
 #endif
 
     if (moved < 0) {
-        sl_net_failed(error);
+        sl_net_transfer_failed((SlNative)handle, error);
         return 0;
     }
     return (size_t)moved;      /* zero is the peer having finished, not an error */
@@ -509,19 +567,19 @@ size_t sl_socket_send_to(size_t handle, const uint8_t *data, size_t count,
     if (!sl_net_lookup(host, port, family, SL_NET_DATAGRAM, 0, &found, error)) return 0;
 
 #ifdef _WIN32
-    moved = sendto((SlNative)handle, (const char *)data, (int)count, 0,
+    moved = sendto((SlNative)handle, (const char *)data, sl_net_count(count), 0,
                    found->ai_addr, (SlLength)found->ai_addrlen);
 #else
     moved = sendto((SlNative)handle, data, count, 0,
                    found->ai_addr, (SlLength)found->ai_addrlen);
 #endif
 
-    freeaddrinfo(found);
-
     if (moved < 0) {
-        sl_net_failed(error);
+        sl_net_transfer_failed((SlNative)handle, error);
+        freeaddrinfo(found);
         return 0;
     }
+    freeaddrinfo(found);
     return (size_t)moved;
 }
 
@@ -537,17 +595,24 @@ size_t sl_socket_receive_from(size_t handle, uint8_t *data, size_t count,
 #endif
 
     sl_net_report(error, SL_NET_OK);
+    if (host != NULL && hostSize > 0) host[0] = '\0';
+    if (port != NULL) *port = 0;
 
 #ifdef _WIN32
-    moved = recvfrom((SlNative)handle, (char *)data, (int)count, 0,
+    moved = recvfrom((SlNative)handle, (char *)data, sl_net_count(count), 0,
                      (struct sockaddr *)&from, &length);
+
+    /* A datagram longer than the buffer fills it and the rest is dropped, as
+       it is on POSIX, which reports the truncated datagram as a success. */
+    if (moved < 0 && WSAGetLastError() == WSAEMSGSIZE)
+        moved = sl_net_count(count);
 #else
     moved = recvfrom((SlNative)handle, data, count, 0,
                      (struct sockaddr *)&from, &length);
 #endif
 
     if (moved < 0) {
-        sl_net_failed(error);
+        sl_net_transfer_failed((SlNative)handle, error);
         return 0;
     }
 
@@ -724,11 +789,33 @@ int sl_socket_resolve(const char *host, int family, char *out, size_t size, int 
 /* --------------------------------------------------------------- waiting */
 
 /*
+ * The error pending on a socket, which is how a connect that did not block
+ * reports how it ended. Reading it clears it.
+ */
+static int sl_net_pending(SlNative handle)
+{
+    int pending = 0;
+    SlLength length = (SlLength)sizeof pending;
+
+#ifdef _WIN32
+    if (getsockopt(handle, SOL_SOCKET, SO_ERROR, (char *)&pending, &length) != 0)
+#else
+    if (getsockopt(handle, SOL_SOCKET, SO_ERROR, &pending, &length) != 0)
+#endif
+        return sl_net_last();
+    return sl_net_translate(pending);
+}
+
+/*
  * Waits until the socket is ready, or the time runs out.
  *
  * poll where there is one and select on Windows, which has poll only under a
  * different name and with a different history. A negative timeout waits
  * forever; the answer is 1 for ready, 0 for the timeout, -1 for an error.
+ *
+ * Waiting to write is how a connect that did not block is seen to finish, so
+ * a socket that failed instead answers -1 with the connect's own error.
+ * Windows reports that failure only through the exception set.
  */
 int sl_socket_wait(size_t handle, int forWriting, int milliseconds, int *error)
 {
@@ -737,11 +824,14 @@ int sl_socket_wait(size_t handle, int forWriting, int milliseconds, int *error)
 #ifdef _WIN32
     {
         fd_set set;
+        fd_set failed;
         struct timeval limit;
         int ready;
 
         FD_ZERO(&set);
         FD_SET((SlNative)handle, &set);
+        FD_ZERO(&failed);
+        FD_SET((SlNative)handle, &failed);
 
         limit.tv_sec = milliseconds / 1000;
         limit.tv_usec = (milliseconds % 1000) * 1000;
@@ -749,11 +839,18 @@ int sl_socket_wait(size_t handle, int forWriting, int milliseconds, int *error)
         ready = select(0,
                        forWriting ? NULL : &set,
                        forWriting ? &set : NULL,
-                       NULL,
+                       forWriting ? &failed : NULL,
                        milliseconds < 0 ? NULL : &limit);
 
         if (ready < 0) { sl_net_failed(error); return -1; }
-        return ready > 0 ? 1 : 0;
+        if (ready == 0) return 0;
+
+        if (forWriting && FD_ISSET((SlNative)handle, &failed)) {
+            int code = sl_net_pending((SlNative)handle);
+            sl_net_report(error, code == SL_NET_OK ? SL_NET_UNKNOWN : code);
+            return -1;
+        }
+        return 1;
     }
 #else
     {
@@ -766,7 +863,16 @@ int sl_socket_wait(size_t handle, int forWriting, int milliseconds, int *error)
 
         ready = poll(&entry, 1, milliseconds);
         if (ready < 0) { sl_net_failed(error); return -1; }
-        return ready > 0 ? 1 : 0;
+        if (ready == 0) return 0;
+
+        if (forWriting && (entry.revents & (POLLERR | POLLHUP)) != 0) {
+            int code = sl_net_pending((SlNative)handle);
+            if (code != SL_NET_OK) {
+                sl_net_report(error, code);
+                return -1;
+            }
+        }
+        return 1;
     }
 #endif
 }
