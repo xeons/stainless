@@ -25,7 +25,7 @@
 /// object it belongs to. That means both of these work, and mean the same
 /// thing:
 ///
-///     Filter(names, (n) => n.ByteLength() > 3u);   // a lambda that captures
+///     Where(names, (n) => n.ByteLength() > 3u); // a lambda that captures
 ///     ForEach(names, report.Add);                  // a method bound to an object
 ///
 /// The second is what the older shape could not do. These were one-method
@@ -34,7 +34,7 @@
 /// whose only reason to exist was to carry it.
 ///
 /// **Eager, not lazy.** Every one of these walks its input to the end and
-/// returns a `List<T>`, so `Filter(...)` then `Map(...)` builds two lists. Lazy
+/// returns a `List<T>`, so `Where(...)` then `Select(...)` builds two lists. Lazy
 /// chaining wants generators -- a `yield` that suspends a function mid-body --
 /// and Stainless has none. Saying so is better than implying otherwise with a
 /// name borrowed from a language that does.
@@ -48,7 +48,7 @@ module Standard.Collections;
 /// The elements the predicate keeps, in the order they were in.
 ///
 /// An array converts to a slice of the whole of itself, so this takes both.
-public List<T> Filter<T>(T[:] items, Predicate<T> keep)
+public List<T> Where<T>(T[:] items, Predicate<T> keep)
 {
     var kept = new List<T>();
     foreach (var item in items)
@@ -61,12 +61,12 @@ public List<T> Filter<T>(T[:] items, Predicate<T> keep)
 
 /// Every element put through the transform.
 ///
-///     var spelled = Map(numbers, n => Text.FromInteger((long)n));
+///     var spelled = Select(numbers, n => Text.FromInteger((long)n));
 ///
 /// `R` appears nowhere but in the transform's result, so working it out means
 /// binding the lambda's body -- which cannot happen until `T` has given the
 /// lambda its parameter type. The compiler does the two in that order.
-public List<R> Map<T, R>(T[:] items, Func<T, R> transform)
+public List<R> Select<T, R>(T[:] items, Func<T, R> transform)
 {
     var mapped = new List<R>();
     foreach (var item in items)
@@ -77,8 +77,8 @@ public List<R> Map<T, R>(T[:] items, Func<T, R> transform)
 /// Everything folded into one value, left to right. The seed decides the
 /// result type, so `A` is settled before the lambda is looked at.
 ///
-///     long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
-public A Reduce<T, A>(T[:] items, A seed, Fold<A, T> combine)
+///     long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
+public A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
 {
     var total = seed;
     foreach (var item in items)
@@ -110,7 +110,7 @@ public bool All<T>(T[:] items, Predicate<T> test)
 }
 
 /// How many satisfy the predicate.
-public nuint CountWhere<T>(T[:] items, Predicate<T> test)
+public nuint Count<T>(T[:] items, Predicate<T> test)
 {
     nuint found = 0u;
     foreach (var item in items)
@@ -126,7 +126,7 @@ public nuint CountWhere<T>(T[:] items, Predicate<T> test)
 /// The reader that needs no check, because it supplies its own answer. `Find`
 /// is the one to reach for when "there was none" is a different outcome rather
 /// than a different value.
-public T FirstOr<T>(T[:] items, Predicate<T> test, T fallback)
+public T FirstOrDefault<T>(T[:] items, Predicate<T> test, T fallback)
 {
     foreach (var item in items)
     {
@@ -154,7 +154,7 @@ public Optional<T> Find<T>(T[:] items, Predicate<T> test)
 }
 
 /// Where the first element satisfying the predicate is, if it is there.
-public Optional<nuint> IndexWhere<T>(T[:] items, Predicate<T> test)
+public Optional<nuint> FindIndex<T>(T[:] items, Predicate<T> test)
 {
     for (nuint i = 0u; i < items.Length; i++)
     {
@@ -195,7 +195,7 @@ public List<T> Skip<T>(T[:] items, nuint count)
 /// The same, for anything with a `GetEnumerator()` that names its shape --
 /// `List<T>`, `Queue<T>`, `Stack<T>`, `LinkedList<T>`, `HashSet<T>` and
 /// `SortedList<K, V>` all do.
-public List<T> Filter<T>(IEnumerable<T> items, Predicate<T> keep)
+public List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
 {
     var kept = new List<T>();
     foreach (var item in items)
@@ -207,7 +207,7 @@ public List<T> Filter<T>(IEnumerable<T> items, Predicate<T> keep)
 }
 
 /// Every element put through the transform, over any sequence.
-public List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform)
+public List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
 {
     var mapped = new List<R>();
     foreach (var item in items)
@@ -216,7 +216,7 @@ public List<R> Map<T, R>(IEnumerable<T> items, Func<T, R> transform)
 }
 
 /// Everything folded into one value, left to right, over any sequence.
-public A Reduce<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
+public A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
 {
     var total = seed;
     foreach (var item in items)
@@ -249,7 +249,7 @@ public bool All<T>(IEnumerable<T> items, Predicate<T> test)
 }
 
 /// How many satisfy the predicate, over any sequence. Walks all of it.
-public nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test)
+public nuint Count<T>(IEnumerable<T> items, Predicate<T> test)
 {
     nuint found = 0u;
     foreach (var item in items)
@@ -264,7 +264,7 @@ public nuint CountWhere<T>(IEnumerable<T> items, Predicate<T> test)
 /// over any sequence. A fallback equal to a real element is indistinguishable
 /// from a miss; `Find` is the overload that tells them apart, and it takes a
 /// slice rather than a sequence.
-public T FirstOr<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
+public T FirstOrDefault<T>(IEnumerable<T> items, Predicate<T> test, T fallback)
 {
     foreach (var item in items)
     {
@@ -410,72 +410,4 @@ public List<T> Skip<T>(IEnumerable<T> items, nuint count)
         seen++;
     }
     return kept;
-}
-
-// ----------------------------------------------------------- other names
-
-// The same work under the names C# gave it, for a reader arriving from LINQ.
-//
-// Each body is written out rather than calling the original: `Map(items,
-// transform)` cannot infer `R` from a `Func<T, R>` value, because the
-// inference reads a lambda's body and there is no lambda here.
-
-/// `Filter`, spelled as LINQ spells it.
-public List<T> Where<T>(T[:] items, Predicate<T> keep)
-{
-    var kept = new List<T>();
-    foreach (var item in items)
-    {
-        if (keep(item))
-            kept.Add(item);
-    }
-    return kept;
-}
-
-/// `Filter` over any sequence, spelled as LINQ spells it.
-public List<T> Where<T>(IEnumerable<T> items, Predicate<T> keep)
-{
-    var kept = new List<T>();
-    foreach (var item in items)
-    {
-        if (keep(item))
-            kept.Add(item);
-    }
-    return kept;
-}
-
-/// `Map`, spelled as LINQ spells it.
-public List<R> Select<T, R>(T[:] items, Func<T, R> transform)
-{
-    var made = new List<R>();
-    foreach (var item in items)
-        made.Add(transform(item));
-    return made;
-}
-
-/// `Map` over any sequence, spelled as LINQ spells it.
-public List<R> Select<T, R>(IEnumerable<T> items, Func<T, R> transform)
-{
-    var made = new List<R>();
-    foreach (var item in items)
-        made.Add(transform(item));
-    return made;
-}
-
-/// `Reduce`, spelled as LINQ spells it.
-public A Aggregate<T, A>(T[:] items, A seed, Fold<A, T> combine)
-{
-    var total = seed;
-    foreach (var item in items)
-        total = combine(total, item);
-    return total;
-}
-
-/// `Reduce` over any sequence, spelled as LINQ spells it.
-public A Aggregate<T, A>(IEnumerable<T> items, A seed, Fold<A, T> combine)
-{
-    var total = seed;
-    foreach (var item in items)
-        total = combine(total, item);
-    return total;
 }

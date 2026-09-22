@@ -795,8 +795,8 @@ element, without saying anything. That is most of what the form is for.
 
 ```csharp
 var seen = new Dictionary<Point, String>();
-seen.Set(new Point(1, 1), "one");
-seen.GetOr(new Point(1, 1), "");        // "one" — a different object, the same value
+seen.SetValue(new Point(1, 1), "one");
+seen.GetValueOrDefault(new Point(1, 1), "");   // "one" — a different object, the same value
 ```
 
 **Equality is by value, which is the whole difference from a class.**
@@ -1334,7 +1334,7 @@ both the fix and what the code wanted to say. A caller with a sensible default
 needs no proof at all:
 
 ```csharp
-int port = ParsePort(text).ValueOr(8080);
+int port = ParsePort(text).GetValueOrDefault(8080);
 ```
 
 **What this is not.** A Result is for a failure a caller can do something
@@ -1350,10 +1350,10 @@ output that led up to the failure is there to read: the moment a program's
 account of itself is worth most is the moment it stops.
 
 Every abort in the library is one a caller could have avoided by asking, and
-each says so where it is declared. `Dictionary.Get` and `SortedList.Get` have
-`ContainsKey` and `GetOr`; `Queue`, `Stack` and `LinkedList` have `Count` and
-`IsEmpty`; `Optional.Get` has `ValueOr` and `is Some x`; `Env.ArgumentAt` has
-`ArgumentCount`. The rest of what aborts is the runtime running out — memory,
+each says so where it is declared. `Dictionary.GetValue` and
+`SortedList.GetValue` have `ContainsKey` and `GetValueOrDefault`; `Queue`,
+`Stack` and `LinkedList` have `Count` and `IsEmpty`; `Optional.GetValue` has
+`GetValueOrDefault` and `is Some x`; `Env.GetArgument` has `ArgumentCount`. The rest of what aborts is the runtime running out — memory,
 a thread, a mutex — where the function that failed has no way to return
 anything at all.
 
@@ -1381,7 +1381,7 @@ Three rules:
 
 - Only inside a function returning a `Result` (SL0570). There is nowhere else
   for the failure to go, and aborting instead would be a decision the caller
-  never made. A caller with a sensible default wants `ValueOr`.
+  never made. A caller with a sensible default wants `GetValueOrDefault`.
 - The operand must be a `Result` (SL0569).
 - **The error types must match** (SL0571). `try` passes a failure on unchanged;
   converting one error type to another is a decision about what the failure
@@ -1453,20 +1453,20 @@ overload resolution. An `Optional<T>` assigned to an `Optional<Optional<T>>`
 | | |
 |---|---|
 | `HasValue`, `IsEmpty` | whether there is one |
-| `Get()` | the value, **aborting** when there is none — the bargain `Dictionary.Get` makes |
-| `ValueOr(fallback)` | the value, or something the caller supplies |
-| `Or(other)` | this one if it holds anything, else `other` |
-| `Map(f)` | the value put through `f`, or none — `Optional<R>` |
-| `FlatMap(f)` | the same, for an `f` that answers with an optional of its own |
-| `Filter(p)` | this one if `p` accepts what it holds, else none |
-| `IfPresent(a)` | runs `a` on the value, if there is one |
+| `GetValue()` | the value, **aborting** when there is none — the bargain `Dictionary.GetValue` makes |
+| `GetValueOrDefault(fallback)` | the value, or something the caller supplies |
+| `Coalesce(other)` | this one if it holds anything, else `other` |
+| `Select(f)` | the value put through `f`, or none — `Optional<R>` |
+| `SelectMany(f)` | the same, for an `f` that answers with an optional of its own |
+| `Where(p)` | this one if `p` accepts what it holds, else none |
+| `InvokeIfPresent(a)` | runs `a` on the value, if there is one |
 
-`Map`, `FlatMap`, `Filter` and `IfPresent` take `Func`, `Predicate` and
+`Select`, `SelectMany`, `Where` and `InvokeIfPresent` take `Func`, `Predicate` and
 `Action` ([§5.5](05-standard-library.md#55-doing-something-to-every-element)) — generic closures, so a lambda or a bound method is what gets
 written at them:
 
 ```csharp
-Optional<String> name = index.IndexOf(id).Map(i => people[i].Name);
+Optional<String> name = index.IndexOf(id).Select(i => people[i].Name);
 ```
 
 `Or` takes a value rather than something that produces one on demand, unlike
@@ -1994,7 +1994,7 @@ public closure String Shout(String text);
 String Upper(String s) => s.ToUpperAscii();
 
 Shout loud = Upper;
-var shouted = names.Map(Upper);           // R is String, read off Upper
+var shouted = names.Select(Upper);        // R is String, read off Upper
 ```
 
 It has no object, so the receiver word is null and the function word is a thunk

@@ -172,7 +172,7 @@ public class Scanner
             "using", "var", "variant", "virtual", "weak", "where", "while",
         ];
         foreach (var word in reserved)
-            _keywords.Set(word, true);
+            _keywords.SetValue(word, true);
 
         // Keywords only where one is already expected, and ordinary
         // identifiers everywhere else. Coloured as keywords regardless, which
@@ -181,7 +181,7 @@ public class Scanner
         // parser this does not have.
         String[] soft = ["closure", "event", "get", "set", "value"];
         foreach (var word in soft)
-            _contextual.Set(word, true);
+            _contextual.SetValue(word, true);
 
         // The built-in types. `Keyword` in the compiler's table -- these are
         // reserved words -- but a separate colour here, because a type is the
@@ -192,7 +192,7 @@ public class Scanner
             "ushort", "void",
         ];
         foreach (var word in built)
-            _primitives.Set(word, true);
+            _primitives.SetValue(word, true);
     }
 
     /// Lexes one line, appending to `into`, and answers what it leaves open.

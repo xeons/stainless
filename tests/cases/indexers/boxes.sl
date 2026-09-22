@@ -108,7 +108,7 @@ int Main()
     map["a"] = 1;
     map["a"] = map["a"].ValueOr(0) + 4;
     Console.WriteLine("map " + N((long)map["a"].ValueOr(-1)) + " " +
-        N((long)map.Get("a")) + " " +
+        N((long)map.GetValue("a")) + " " +
         N((long)map["absent"].ValueOr(-1)) + " " + N((long)map.Count));
 
     return 0;

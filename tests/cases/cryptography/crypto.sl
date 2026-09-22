@@ -26,7 +26,7 @@ byte[] Repeat(byte value, nuint count)
 }
 
 // The cipher factories report a bad key length, and every key here is a good
-// one; `ValueOr` supplies a cipher that is never reached.
+// one; `GetValueOrDefault` supplies a cipher that is never reached.
 Aes Cipher(byte[] key) => Aes.FromKey(key).ValueOr(Aes.Create());
 
 void Check(String label, String actual, String expected)

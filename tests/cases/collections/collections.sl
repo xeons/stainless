@@ -53,8 +53,8 @@ int Main()
     // A List<Money> is accepted wherever an IReadOnlyList<Money> is wanted.
     Console.WriteLine("items    = " + Describe(prices));
 
-    Console.WriteLine("largest  = " + Largest(prices).Show());
-    Console.WriteLine("smallest = " + Smallest(prices).Show());
+    Console.WriteLine("largest  = " + Max(prices).Show());
+    Console.WriteLine("smallest = " + Min(prices).Show());
     // `IndexOf` answers with an `Optional<nuint>`: a list's length standing in
     // for "not there" is the sentinel that type exists to retire.
     Console.WriteLine($"index of 999c = {IndexOf(prices, new Money(999)).ValueOr(99u)}");

@@ -197,14 +197,14 @@ receiver supplies the noun.
 This is not only taste. [§1.5](#15-two-collisions-the-standard-library-sets-up)
 is the same problem with teeth: short module-level names are exactly the ones
 that collide with the standard library's free verbs, and the collision is
-silent. A module-level `Describe` in a file that also calls
-`Standard.IO.Describe` is a question the reader has to answer and the binder
+silent. A module-level `Take` in a file that also imports
+`Standard.Collections` is a question the reader has to answer and the binder
 answers differently inside a lambda.
 
 ### 1.5 Two collisions the standard library sets up
 
 `import Standard.Collections` brings roughly twenty short verbs into scope at
-module level — `Take`, `Skip`, `Map`, `Filter`, `Find`, `Any`, `All`,
+module level — `Take`, `Skip`, `Select`, `Where`, `Find`, `Any`, `All`,
 `ForEach`. Because a free function is a candidate wherever member lookup fails,
 two mistakes are easy and neither is loud:
 
@@ -501,8 +501,8 @@ indented once, or breaks between chained calls with each `.` at the same
 indent:
 
 ```csharp
-names.Filter((n) => n.ByteLength() > 3u)
-     .Map(Upper)
+names.Where((n) => n.ByteLength() > 3u)
+     .Select(Upper)
      .ToArray()
 ```
 

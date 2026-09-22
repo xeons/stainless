@@ -205,9 +205,9 @@ Not yet:
   and does work, because a lambda's body is something to read a type off:
 
   ```csharp
-  public List<R> Map<T, R>(T[:] items, Func<T, R> transform) { ... }
+  public List<R> Select<T, R>(T[:] items, Func<T, R> transform) { ... }
 
-  var spelled = Map(numbers, n => Text.FromInteger((long)n));   // R is String
+  var spelled = Select(numbers, n => Text.FromInteger((long)n));   // R is String
   ```
 
   The order is what makes it possible. `T` comes from `numbers`; that gives the
@@ -222,7 +222,7 @@ Not yet:
   differ only in where the signature is written down.
 
   A **function passed by name** is read the same way, off its declaration
-  instead of a body: in `Map(names, Upper)`, `T` is `String` from `names`, so
+  instead of a body: in `Select(names, Upper)`, `T` is `String` from `names`, so
   the `Upper` meant is the one taking a `String`, and what it returns is `R`.
   Where the parameter types are not known yet, a name with exactly one function
   of the right arity settles them too. An overloaded name that the known types

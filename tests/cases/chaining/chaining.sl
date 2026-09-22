@@ -6,8 +6,8 @@
 // the library's free functions into a pipeline: the same functions, read left
 // to right instead of inside out.
 //
-//     Map(Filter(names, keep), change)      // before
-//     names.Filter(keep).Map(change)        // and after
+//     Select(Where(names, keep), change)    // before
+//     names.Where(keep).Select(change)      // and after
 //
 // It is uniform call syntax rather than C#'s extension methods, because this
 // language has what C# was working around. A module is a scope here, so a
@@ -70,7 +70,7 @@ public int Main()
 
     // The same functions written the old way, to show they are the same.
     var same = ToArray(OrderBy(
-        Distinct(Filter(words, (w) => w.ByteLength() > 1u)),
+        Distinct(Where(words, (w) => w.ByteLength() > 1u)),
         (a, b) => (int)a.ByteLength() - (int)b.ByteLength()));
 
     Console.WriteLine($"agree  {same.Length == picked.Length}");

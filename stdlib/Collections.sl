@@ -205,7 +205,7 @@ public interface IList<T> : IReadOnlyList<T>
 ///   [docs/style.md](docs/style.md) is the reason it is a property and not a
 ///   method: a zero-argument side-effect-free getter is a property here.
 /// - **The members that compare two `T`s are free functions below**, not
-///   methods. `Contains`, `IndexOf`, `Remove`, `Sort` and `BinarySearch` all
+///   methods. `Contains`, `IndexOf`, `RemoveFirst`, `Sort` and `BinarySearch` all
 ///   need `T : IEquatable<T>` or `IComparable<T>`, and this class constrains
 ///   `T` not at all -- a `List<Control>` has to stay possible. A class cannot
 ///   demand of one method's type parameter what it does not demand of every
@@ -254,7 +254,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         {
             if (value < _count || value == _items.Length)
                 return;
-            Resize(value < 1u ? 1u : value);
+            ResizeStorage(value < 1u ? 1u : value);
         }
     }
 
@@ -290,7 +290,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     public void Add(T item)
     {
         if (_count == _items.Length)
-            Grow();
+            GrowStorage();
         _items[_count] = item;
         _count++;
     }
@@ -310,7 +310,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         if (index > _count)
             sl_array_bounds_fail(index, _count);
         if (_count == _items.Length)
-            Grow();
+            GrowStorage();
 
         // Backwards, so a slot is read before the copy that overwrites it.
         for (nuint i = _count; i > index; i--)
@@ -512,7 +512,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     public nuint EnsureCapacity(nuint capacity)
     {
         if (capacity > _items.Length)
-            Resize(capacity);
+            ResizeStorage(capacity);
         return _items.Length;
     }
 
@@ -520,7 +520,7 @@ public class List<T> : IList<T>, IEnumerable<T>
     public void TrimExcess()
     {
         if (_count < _items.Length)
-            Resize(_count < 1u ? 1u : _count);
+            ResizeStorage(_count < 1u ? 1u : _count);
     }
 
     /// `count` items from `index`, as a new list. .NET's name for `GetRange`
@@ -548,7 +548,7 @@ public class List<T> : IList<T>, IEnumerable<T>
         // Doubling, as `Add` grows, so a loop of small ranges stays linear.
         nuint needed = _count + count;
         if (needed > _items.Length)
-            Resize(needed > _items.Length * 2u ? needed : _items.Length * 2u);
+            ResizeStorage(needed > _items.Length * 2u ? needed : _items.Length * 2u);
 
         // Backwards, so a slot is read before the copy that overwrites it.
         for (nuint i = _count; i > index; i--)
@@ -580,9 +580,9 @@ public class List<T> : IList<T>, IEnumerable<T>
         _count = 0;
     }
 
-    void Grow() => Resize(_items.Length * 2u);
+    void GrowStorage() => ResizeStorage(_items.Length * 2u);
 
-    void Resize(nuint room)
+    void ResizeStorage(nuint room)
     {
         var bigger = new T[room];
         for (nuint i = 0; i < _count; i++)
@@ -594,7 +594,7 @@ public class List<T> : IList<T>, IEnumerable<T>
 // ---------------------------------------------------------------- algorithms
 
 /// The largest item, by its own ordering. The list must not be empty.
-public T Largest<T>(IReadOnlyList<T> items) where T : IComparable<T>
+public T Max<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
     if (items.Count == 0)
         sl_array_bounds_fail(0, 0);
@@ -609,7 +609,7 @@ public T Largest<T>(IReadOnlyList<T> items) where T : IComparable<T>
 }
 
 /// The smallest item, by its own ordering. The list must not be empty.
-public T Smallest<T>(IReadOnlyList<T> items) where T : IComparable<T>
+public T Min<T>(IReadOnlyList<T> items) where T : IComparable<T>
 {
     if (items.Count == 0)
         sl_array_bounds_fail(0, 0);
@@ -731,7 +731,7 @@ public void Sort<T>(T[:] items) where T : IComparable<T>
         nuint stop = start + SmallRun;
         if (stop > items.Length)
             stop = items.Length;
-        InsertionSort(items, start, stop);
+        SortRunByInsertion(items, start, stop);
     }
 
     for (nuint width = SmallRun; width < items.Length; width *= 2u)
@@ -742,13 +742,13 @@ public void Sort<T>(T[:] items) where T : IComparable<T>
             nuint high = middle + width;
             if (high > items.Length)
                 high = items.Length;
-            Merge(items, scratch, low, middle, high);
+            MergeRuns(items, scratch, low, middle, high);
         }
     }
 }
 
 /// Orders `[start, stop)` by insertion, which is what a short run wants.
-void InsertionSort<T>(T[:] items, nuint start, nuint stop) where T : IComparable<T>
+void SortRunByInsertion<T>(T[:] items, nuint start, nuint stop) where T : IComparable<T>
 {
     for (nuint i = start + 1u; i < stop; i++)
     {
@@ -770,7 +770,7 @@ void InsertionSort<T>(T[:] items, nuint start, nuint stop) where T : IComparable
 /// `>` rather than `>=` when choosing the right half is what makes this
 /// stable: on a tie the left element goes first, and the left element is the
 /// one that was there first.
-void Merge<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
+void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high)
         where T : IComparable<T>
 {
     nuint left = low;
@@ -812,7 +812,7 @@ public void Sort<T>(T[:] items, Comparer<T> order)
         nuint stop = start + SmallRun;
         if (stop > items.Length)
             stop = items.Length;
-        InsertionSortBy(items, start, stop, order);
+        SortRunByInsertion(items, start, stop, order);
     }
 
     for (nuint width = SmallRun; width < items.Length; width *= 2u)
@@ -823,12 +823,12 @@ public void Sort<T>(T[:] items, Comparer<T> order)
             nuint high = middle + width;
             if (high > items.Length)
                 high = items.Length;
-            MergeBy(items, scratch, low, middle, high, order);
+            MergeRuns(items, scratch, low, middle, high, order);
         }
     }
 }
 
-void InsertionSortBy<T>(T[:] items, nuint start, nuint stop, Comparer<T> order)
+void SortRunByInsertion<T>(T[:] items, nuint start, nuint stop, Comparer<T> order)
 {
     for (nuint i = start + 1u; i < stop; i++)
     {
@@ -845,7 +845,7 @@ void InsertionSortBy<T>(T[:] items, nuint start, nuint stop, Comparer<T> order)
     }
 }
 
-void MergeBy<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
+void MergeRuns<T>(T[:] items, T[:] scratch, nuint low, nuint middle, nuint high,
                 Comparer<T> order)
 {
     nuint left = low;
@@ -903,7 +903,7 @@ public nuint BinarySearch<T>(T[:] items, T wanted) where T : IComparable<T>
 /// The first index at which `wanted` could be inserted and leave the slice
 /// ordered: the length when it belongs at the end, and the index of the first
 /// equal element when there is one.
-public nuint LowerBound<T>(T[:] items, T wanted) where T : IComparable<T>
+public nuint FindLowerBound<T>(T[:] items, T wanted) where T : IComparable<T>
 {
     nuint low = 0u;
     nuint high = items.Length;
@@ -1015,10 +1015,10 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     public nuint Count => _keys.Count;
 
     /// The key at a position, in insertion order.
-    public TKey KeyAt(nuint index) => _keys[index];
+    public TKey GetKeyAt(nuint index) => _keys[index];
 
     /// The value at a position, in insertion order.
-    public TValue ValueAt(nuint index) => _values[index];
+    public TValue GetValueAt(nuint index) => _values[index];
 
     /// Where a key is, or `None`.
     ///
@@ -1037,14 +1037,14 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
     }
 
     /// Whether the key is there at all. A scan, like everything else here, so
-    /// `IndexOf` once beats `Has` followed by a lookup.
-    public bool Has(TKey key) => IndexOf(key).HasValue;
+    /// `IndexOf` once beats `ContainsKey` followed by a lookup.
+    public bool ContainsKey(TKey key) => IndexOf(key).HasValue;
 
     /// Appends, without looking for the key first.
     ///
     /// A repeated key is kept rather than replaced, because a document that
     /// contains one said so and dropping either half would be this collection
-    /// deciding what the document meant. `Set` is the one that replaces.
+    /// deciding what the document meant. `SetValue` is the one that replaces.
     public void Add(TKey key, TValue value)
     {
         _keys.Add(key);
@@ -1053,7 +1053,7 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
     /// Replaces the value of a key, or appends it. A replaced key keeps the
     /// position it had, which is the point of the collection.
-    public void Set(TKey key, TValue value)
+    public void SetValue(TKey key, TValue value)
     {
         if (IndexOf(key) is Some at)
         {
@@ -1067,7 +1067,7 @@ public class OrderedDictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
     /// The value of a key, or the fallback. There is no overload that aborts:
     /// a caller that wants to know writes `IndexOf`.
-    public TValue Find(TKey key, TValue fallback)
+    public TValue GetValueOrDefault(TKey key, TValue fallback)
     {
         if (IndexOf(key) is Some at)
             return _values[at.Value];

@@ -196,7 +196,7 @@ String Held()
 String Roster()
 {
     var ages = new Dictionary<String, int>();
-    ages.Set("ada", 36);
+    ages.SetValue("ada", 36);
 
     var numbers = new List<int>();
     numbers.Add(9); numbers.Add(2); numbers.Add(5);
@@ -208,13 +208,13 @@ String Roster()
     line.InsertAfter(first, "b");
 
     var text = new StringBuilder();
-    text.AppendInteger(ages.Get("ada"));
+    text.AppendInteger(ages.GetValue("ada"));
     text.Append(":");
     for (nuint i = 0; i < numbers.Count; i = i + 1)
         text.AppendInteger(numbers[i]);
     text.Append(":");
-    for (nint at = line.First(); at >= 0; at = line.After(at))
-        text.Append(line.ValueAt(at));
+    for (nint at = line.First; at >= 0; at = line.GetNext(at))
+        text.Append(line.GetValueAt(at));
     return text.ToText();
 }
 
@@ -604,10 +604,10 @@ String Records()
     var named = new Named("widget", 1.5);
 
     var seen = new Dictionary<Point, String>();
-    seen.Set(new Point(1, 1), "one");
+    seen.SetValue(new Point(1, 1), "one");
 
     // A different object with the same values finds what the first put there.
-    String found = seen.GetOr(new Point(1, 1), "<missing>");
+    String found = seen.GetValueOrDefault(new Point(1, 1), "<missing>");
 
     return Text.FromInteger((long)moved.Y) + " " +
            (copy == point ? "equal" : "differs") + " " +

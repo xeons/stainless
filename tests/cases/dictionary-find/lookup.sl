@@ -30,18 +30,18 @@ String Describe(Dictionary<String, int> settings, String name)
 int Main()
 {
     var settings = new Dictionary<String, int>();
-    settings.Set("timeout", 30);
-    settings.Set("retries", 0);
+    settings.SetValue("timeout", 30);
+    settings.SetValue("retries", 0);
 
     Console.WriteLine(Describe(settings, "timeout"));
     Console.WriteLine(Describe(settings, "retries"));
     Console.WriteLine(Describe(settings, "absent"));
 
-    // `GetOr` cannot tell a missing key from one mapped to the fallback;
+    // `GetValueOrDefault` cannot tell a missing key from one mapped to the fallback;
     // `Find` can, which is the reason it exists beside it. Both keys below
-    // answer 0 to `GetOr` and different things to `Find`.
-    Console.WriteLine("or " + N((long)settings.GetOr("retries", 0)) + " " +
-        N((long)settings.GetOr("absent", 0)));
+    // answer 0 to `GetValueOrDefault` and different things to `Find`.
+    Console.WriteLine("or " + N((long)settings.GetValueOrDefault("retries", 0)) + " " +
+        N((long)settings.GetValueOrDefault("absent", 0)));
     Console.WriteLine("told apart " +
         (settings.Find("retries").HasValue ? "set" : "unset") + " " +
         (settings.Find("absent").HasValue ? "set" : "unset"));
@@ -51,11 +51,11 @@ int Main()
     Console.WriteLine("empty " + (settings.Find("absent").IsEmpty ? "y" : "n"));
 
     // A key that is there by construction: `Get` is honest here.
-    Console.WriteLine("asserted " + N((long)settings.Get("timeout")));
+    Console.WriteLine("asserted " + N((long)settings.GetValue("timeout")));
 
     // Over a reference type, so the miss has a counted value to not return.
     var names = new Dictionary<int, String>();
-    names.Set(1, "one");
+    names.SetValue(1, "one");
     Console.WriteLine("ref " + names.Find(1).ValueOr("?") + " " +
         names.Find(2).ValueOr("?"));
 
@@ -85,7 +85,7 @@ int Main()
 
     // A sorted map answers the same four ways.
     var prices = new SortedList<String, int>();
-    prices.Set("apple", 5);
+    prices.SetValue("apple", 5);
     Console.WriteLine("sorted " + N((long)prices.Find("apple").ValueOr(-1)) + " " +
         N((long)prices.Find("pear").ValueOr(-1)));
 

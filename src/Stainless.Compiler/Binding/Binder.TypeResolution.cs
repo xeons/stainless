@@ -623,8 +623,8 @@ public sealed partial class Binder
     /// Works out the type parameters that appear only in a lambda's result.
     ///
     /// The order matters, and is why this is a second pass rather than part of
-    /// the first. Given <c>Map&lt;T, R&gt;(T[:] items, IFunc&lt;T, R&gt; f)</c> and
-    /// <c>Map(numbers, n =&gt; n * 2)</c>: T comes from <c>numbers</c>, which
+    /// the first. Given <c>Select&lt;T, R&gt;(T[:] items, IFunc&lt;T, R&gt; f)</c> and
+    /// <c>Select(numbers, n =&gt; n * 2)</c>: T comes from <c>numbers</c>, which
     /// makes the lambda's target <c>IFunc&lt;int, R&gt;</c>, which gives the lambda
     /// its parameter type, which lets its body be bound, which is what says
     /// what R is. No step in that chain can be taken earlier.
@@ -733,7 +733,7 @@ public sealed partial class Binder
     /// declaration instead.
     ///
     /// Which overload is meant is settled by the parameter types already
-    /// inferred: <c>Map(names, Upper)</c> knows T is String, and so wants the
+    /// inferred: <c>Select(names, Upper)</c> knows T is String, and so wants the
     /// <c>Upper</c> that takes one. Where those are not known yet, a name with
     /// exactly one function of the right arity is that function, and its
     /// parameters are what settles them. Anything less certain says nothing,

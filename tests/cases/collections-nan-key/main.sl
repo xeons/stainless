@@ -14,9 +14,9 @@ int Main()
 {
     double nan = 0.0 / 0.0;
     var map = new Dictionary<double, int>();
-    map.Set(nan, 1);
-    map.Set(nan, 2);
-    Say("NaN is one key", map.Count == 1u && map.ContainsKey(nan) && map.GetOr(nan, 0) == 2);
+    map.SetValue(nan, 1);
+    map.SetValue(nan, 2);
+    Say("NaN is one key", map.Count == 1u && map.ContainsKey(nan) && map.GetValueOrDefault(nan, 0) == 2);
     Say("and can be removed", map.Remove(nan) && map.Count == 0u);
 
     var set = new HashSet<double>();

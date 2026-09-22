@@ -19,7 +19,7 @@ void Produce(ConcurrentQueue<int> queue, int from, int upto)
 void Record(ConcurrentDictionary<int, int> map, int from, int upto)
 {
     for (int i = from; i < upto; i = i + 1)
-        map.Set(i, i * 2);
+        map.SetValue(i, i * 2);
 }
 
 void Stack(ConcurrentStack<int> stack, int from, int upto)
@@ -64,7 +64,7 @@ int Main()
     // 0 + 1 + ... + 3999
     printf("drained=%lld empty=%d again=%d\n",
         sum, queue.IsEmpty ? 1 : 0, queue.TryDequeue().Ok ? 1 : 0);
-    printf("fallback=%d\n", queue.DequeueOr(-1));
+    printf("fallback=%d\n", queue.DequeueOrDefault(-1));
 
     // ------------------------------------------------------------ stack
     var stack = new ConcurrentStack<int>();
@@ -81,7 +81,7 @@ int Main()
         stacked = stacked + (long)popped.Value;
         popped = stack.TryPop();
     }
-    printf("stacked=%lld empty=%d or=%d\n", stacked, stack.IsEmpty ? 1 : 0, stack.PopOr(-7));
+    printf("stacked=%lld empty=%d or=%d\n", stacked, stack.IsEmpty ? 1 : 0, stack.PopOrDefault(-7));
 
     // ------------------------------------------------------- dictionary
     var map = new ConcurrentDictionary<int, int>();
@@ -92,17 +92,17 @@ int Main()
         spawn Record(map, 1000, 1500);
         spawn Record(map, 1500, 2000);
     }
-    printf("mapped=%llu at777=%d\n", map.Count, map.GetOr(777, -1));
+    printf("mapped=%llu at777=%d\n", map.Count, map.GetValueOrDefault(777, -1));
 
     // Add is the operation ContainsKey-then-Set cannot be, since another
     // thread can insert between the two.
     printf("add=%d dup=%d\n", map.Add(9999, 1) ? 1 : 0, map.Add(777, 1) ? 1 : 0);
 
-    var found = map.TryGet(1234);
+    var found = map.TryGetValue(1234);
     printf("get=%d %d absent=%d\n",
-        found.Ok ? 1 : 0, found.Value, map.TryGet(-1).Ok ? 1 : 0);
+        found.Ok ? 1 : 0, found.Value, map.TryGetValue(-1).Ok ? 1 : 0);
     printf("remove=%d gone=%d keys=%llu\n",
-        map.Remove(9999) ? 1 : 0, map.Remove(9999) ? 1 : 0, map.Keys().Count);
+        map.Remove(9999) ? 1 : 0, map.Remove(9999) ? 1 : 0, map.GetKeys().Count);
 
     // ---------------------------------------------------------- channel
     // One producer, three consumers, and a close that wakes all of them.

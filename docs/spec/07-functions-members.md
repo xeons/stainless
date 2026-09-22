@@ -90,14 +90,14 @@ matter, and it works — see [§2.10](02-types.md#210-interface--a-contract-disp
 ### 7.1.1 `x.F(y)` is `F(x, y)`
 
 ```csharp
-names.Filter((n) => n.ByteLength() > 3u)
-     .Map((n) => n.ToUpperAscii())
+names.Where((n) => n.ByteLength() > 3u)
+     .Select((n) => n.ToUpperAscii())
      .ToArray()
 ```
 
 **A call written on a value reaches a free function when the value has no such
-member.** The same functions either way — `Filter(names, keep)` and
-`names.Filter(keep)` bind to one symbol — so a library of free functions is a
+member.** The same functions either way — `Where(names, keep)` and
+`names.Where(keep)` bind to one symbol — so a library of free functions is a
 pipeline without being written twice.
 
 This is uniform call syntax rather than C#'s extension methods, and the reason

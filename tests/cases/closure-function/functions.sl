@@ -75,10 +75,10 @@ int Main()
     // And passed by name to a generic function, whose result type is read off
     // the function's declaration -- in both spellings of the call.
     String[] names = ["alpha", "be", "gamma"];
-    var longer = names.Filter((name) => name.ByteLength() > 2u).Map(Upper).ToArray();
+    var longer = names.Where((name) => name.ByteLength() > 2u).Select(Upper).ToArray();
     Console.WriteLine(longer[0u] + " " + longer[1u]);
 
-    var all = Map(names, Upper);
+    var all = Select(names, Upper);
     Console.WriteLine(all[1u]);
 
     return 0;

@@ -22,11 +22,11 @@ int Main()
     Console.WriteLine("two");
 
     var map = new Dictionary<String, int>();
-    map.Set("here", 1);
+    map.SetValue("here", 1);
 
-    // Asking for a key that is not there. `ContainsKey` and `GetOr` are how a
-    // caller asks when a miss is ordinary; this is the bargain `Get` makes.
-    var missing = map.Get("absent");
+    // Asking for a key that is not there. `ContainsKey` and `GetValueOrDefault` are how
+    // a caller asks when a miss is ordinary; this is the bargain `GetValue` makes.
+    var missing = map.GetValue("absent");
 
     Console.WriteLine("unreachable");
     return 0;

@@ -94,23 +94,23 @@ public int Main()
     map.Add("third", 3);
 
     Say("count", Text.FromInteger((long)map.Count));
-    Say("order", map.KeyAt(0u) + "," + map.KeyAt(1u) + "," + map.KeyAt(2u));
-    Say("find", Text.FromInteger((long)map.Find("second", -1)));
-    Say("missing", Text.FromInteger((long)map.Find("nope", -1)));
-    Say("has", Text.FromBool(map.Has("third")) + "/" + Text.FromBool(map.Has("nope")));
+    Say("order", map.GetKeyAt(0u) + "," + map.GetKeyAt(1u) + "," + map.GetKeyAt(2u));
+    Say("find", Text.FromInteger((long)map.GetValueOrDefault("second", -1)));
+    Say("missing", Text.FromInteger((long)map.GetValueOrDefault("nope", -1)));
+    Say("has", Text.FromBool(map.ContainsKey("third")) + "/" + Text.FromBool(map.ContainsKey("nope")));
     Say("index", Describe(map.IndexOf("third")) + "/" + Describe(map.IndexOf("nope")));
 
     // Replacing keeps the position, which is the point of the collection.
-    map.Set("first", 10);
-    Say("replaced", map.KeyAt(0u) + "=" + Text.FromInteger((long)map.ValueAt(0u)));
+    map.SetValue("first", 10);
+    Say("replaced", map.GetKeyAt(0u) + "=" + Text.FromInteger((long)map.GetValueAt(0u)));
 
     // Setting something absent appends.
-    map.Set("fourth", 4);
-    Say("appended", map.KeyAt(3u) + "=" + Text.FromInteger((long)map.ValueAt(3u)));
+    map.SetValue("fourth", 4);
+    Say("appended", map.GetKeyAt(3u) + "=" + Text.FromInteger((long)map.GetValueAt(3u)));
 
     // Removing closes the gap and keeps the rest in order.
     Say("removed", Text.FromBool(map.Remove("second")));
-    Say("after-remove", map.KeyAt(0u) + "," + map.KeyAt(1u) + "," + map.KeyAt(2u));
+    Say("after-remove", map.GetKeyAt(0u) + "," + map.GetKeyAt(1u) + "," + map.GetKeyAt(2u));
     Say("remove-missing", Text.FromBool(map.Remove("nope")));
 
     // A repeated key is kept rather than replaced: that is what `Add` says and
@@ -119,7 +119,7 @@ public int Main()
     repeated.Add("x", 1);
     repeated.Add("x", 2);
     Say("repeated", Text.FromInteger((long)repeated.Count)
-        + "/" + Text.FromInteger((long)repeated.Find("x", 0)));
+        + "/" + Text.FromInteger((long)repeated.GetValueOrDefault("x", 0)));
 
     // ------------------------------------------------------ List edits
     var list = new List<String>();

@@ -69,9 +69,9 @@ int Main()
 
     // A generic over a hashed table: every probe is a `nuint`.
     var counts = new Dictionary<String, int>();
-    counts.Set("one", 1);
-    counts.Set("two", 2);
-    counts.Set("three", 3);
+    counts.SetValue("one", 1);
+    counts.SetValue("two", 2);
+    counts.SetValue("three", 3);
 
     Console.WriteLine("entries   " + Text.FromInteger((long)counts.Count));
     if (counts.Find("two") is Some found)

@@ -138,7 +138,7 @@ public threadsafe class ConcurrentQueue<T>
 
     /// Takes the front item, or `fallback` when there is none. The same as
     /// `TryDequeue` without the allocation, for when a sentinel will do.
-    public T DequeueOr(T fallback)
+    public T DequeueOrDefault(T fallback)
     {
         sl_mutex_lock(_gate);
 
@@ -230,7 +230,7 @@ public threadsafe class ConcurrentStack<T>
     /// Takes the top item, or `fallback` when there is none. The same as
     /// `TryPop` without the allocation, for when a sentinel will do -- which
     /// it will not if `fallback` is a value the stack might hold.
-    public T PopOr(T fallback)
+    public T PopOrDefault(T fallback)
     {
         sl_mutex_lock(_gate);
 
@@ -293,15 +293,15 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
 
     /// Sets the value of a key, whether or not it was there. `Add` is the one
     /// that refuses to overwrite.
-    public void Set(TKey key, TValue value)
+    public void SetValue(TKey key, TValue value)
     {
         sl_mutex_lock(_gate);
-        _entries.Set(key, value);
+        _entries.SetValue(key, value);
         sl_mutex_unlock(_gate);
     }
 
     /// Adds the key only if it is absent, reporting whether it did. This is the
-    /// operation `ContainsKey` followed by `Set` cannot be: between those two
+    /// operation `ContainsKey` followed by `SetValue` cannot be: between those two
     /// another thread can insert.
     public bool Add(TKey key, TValue value)
     {
@@ -314,7 +314,7 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
     /// The value for `key` if it is there. One lock rather than two, which is
     /// what makes it different from `ContainsKey` followed by a lookup:
     /// between those two another thread can remove the key.
-    public Taken<TValue> TryGet(TKey key)
+    public Taken<TValue> TryGetValue(TKey key)
     {
         sl_mutex_lock(_gate);
 
@@ -324,7 +324,7 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
             return new Taken<TValue>(false, _blank[0]);
         }
 
-        var value = _entries.Get(key);
+        var value = _entries.GetValue(key);
         sl_mutex_unlock(_gate);
         return new Taken<TValue>(true, value);
     }
@@ -332,17 +332,17 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
     /// The value for `key`, or `fallback` when it is absent. No allocation,
     /// at the cost of being unable to tell an absent key from one whose value
     /// happens to equal the fallback.
-    public TValue GetOr(TKey key, TValue fallback)
+    public TValue GetValueOrDefault(TKey key, TValue fallback)
     {
         sl_mutex_lock(_gate);
-        var value = _entries.GetOr(key, fallback);
+        var value = _entries.GetValueOrDefault(key, fallback);
         sl_mutex_unlock(_gate);
         return value;
     }
 
     /// Whether the key is there *now*. True here does not mean the next
-    /// `TryGet` succeeds -- another thread may remove it in between -- so this
-    /// is for reporting, and `TryGet` is for acting.
+    /// `TryGetValue` succeeds -- another thread may remove it in between -- so this
+    /// is for reporting, and `TryGetValue` is for acting.
     public bool ContainsKey(TKey key)
     {
         sl_mutex_lock(_gate);
@@ -386,22 +386,22 @@ public threadsafe class ConcurrentDictionary<TKey, TValue> where TKey : IEquatab
 
     /// A snapshot of the keys. Out of date the moment it is returned, which is
     /// why it is a copy rather than a view.
-    public List<TKey> Keys()
+    public List<TKey> GetKeys()
     {
         sl_mutex_lock(_gate);
-        var copy = _entries.Keys();
+        var copy = _entries.GetKeys();
         sl_mutex_unlock(_gate);
         return copy;
     }
 
-    /// A snapshot of the values, in the same order as `Keys` when neither is
+    /// A snapshot of the values, in the same order as `GetKeys` when neither is
     /// interleaved with a write. Out of date the moment it is returned, and
     /// pairing the two lists after the fact is not safe -- iterate the map if
     /// the pairing matters.
-    public List<TValue> Values()
+    public List<TValue> GetValues()
     {
         sl_mutex_lock(_gate);
-        var copy = _entries.Values();
+        var copy = _entries.GetValues();
         sl_mutex_unlock(_gate);
         return copy;
     }

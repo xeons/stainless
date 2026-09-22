@@ -144,7 +144,7 @@ established that 'read' is 'Ok'; check 'if (read.Ok)' first, or switch over
 ```
 
 The check can be an `if`, an early return, a ternary arm, an `&&`, or a switch.
-A caller that would rather carry on writes `ValueOr(fallback)` and needs no
+A caller that would rather carry on writes `GetValueOrDefault(fallback)` and needs no
 check at all.
 
 ```csharp
@@ -335,7 +335,7 @@ var prices = new List<Money>();
 prices.Add(new Money(250));
 
 Sort(prices);              // where T : IComparable<T>
-Largest(prices);           // takes an IReadOnlyList<T>, so it cannot mutate
+Max(prices);               // takes an IReadOnlyList<T>, so it cannot mutate
 ```
 
 `List<T>`, `Dictionary<TKey, TValue>`, `HashSet<T>`, `Queue<T>`, `Stack<T>`,
@@ -350,7 +350,7 @@ ages["grace"] = None;                   // None removes
 
 if (ages["ada"] is Some found)
     Use(found.Value);
-int guess = ages["nobody"].ValueOr(0);
+int guess = ages["nobody"].GetValueOrDefault(0);
 
 var numbers = new List<int>();
 numbers.Add(1);

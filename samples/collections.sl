@@ -53,8 +53,8 @@ int Main()
     // A List<Money> is accepted wherever an IReadOnlyList<Money> is wanted.
     Console.WriteLine($"items    = {DescribePrices(prices)}");
 
-    Console.WriteLine($"largest  = {Largest(prices).ToText()}");
-    Console.WriteLine($"smallest = {Smallest(prices).ToText()}");
+    Console.WriteLine($"largest  = {Max(prices).ToText()}");
+    Console.WriteLine($"smallest = {Min(prices).ToText()}");
 
     // `IndexOf` answers with an `Optional<nuint>`. A list's length standing in
     // for "not there" is exactly the sentinel that type exists to retire.

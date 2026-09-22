@@ -5,7 +5,7 @@
 // The point being proved twice over: a lambda becomes a single-method
 // interface, so combinators need no function type in the language; and a type
 // parameter that appears only in a lambda's *result* is worked out by binding
-// the body, which is what makes `Map` writable at all.
+// the body, which is what makes `Select` writable at all.
 module Sequences;
 
 import Standard.Console;
@@ -40,35 +40,35 @@ int Main()
 
     // T from the array; R from the body of the lambda, which can only be bound
     // once T has given it a parameter type.
-    var doubled = Map(numbers, n => n * 2);
-    var spelled = Map(numbers, n => "<" + Text.FromInteger((long)n) + ">");
-    var halved = Map(numbers, n => (double)n / 2.0);
+    var doubled = Select(numbers, n => n * 2);
+    var spelled = Select(numbers, n => "<" + Text.FromInteger((long)n) + ">");
+    var halved = Select(numbers, n => (double)n / 2.0);
 
     printf("doubled  = %d %d\n", doubled[0u], doubled[1u]);
     Show("spelled ", spelled[0u] + spelled[1u]);
     printf("halved   = %.1f\n", halved[0u]);
 
     // A from the seed, so the fold's lambda has everything it needs up front.
-    long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
-    String run = Reduce(numbers, "", (text, n) => text + Text.FromInteger((long)n));
+    long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
+    String run = Aggregate(numbers, "", (text, n) => text + Text.FromInteger((long)n));
 
     printf("total    = %lld\n", total);
     Show("run     ", run);
 
     // ---------------------------------------------------------- the rest
 
-    var odd = Filter(numbers, n => n % 2 == 1);
+    var odd = Where(numbers, n => n % 2 == 1);
     printf("odd      = %llu\n", (ulong)odd.Count);
 
     printf("any>8    = %d\n", Any(numbers, n => n > 8));
     printf("any>9    = %d\n", Any(numbers, n => n > 9));
     printf("all>0    = %d\n", All(numbers, n => n > 0));
     printf("all>3    = %d\n", All(numbers, n => n > 3));
-    printf("count<5  = %llu\n", (ulong)CountWhere(numbers, n => n < 5));
-    printf("first>4  = %d\n", FirstOr(numbers, n => n > 4, -1));
-    printf("first>99 = %d\n", FirstOr(numbers, n => n > 99, -1));
-    printf("index>8  = %llu\n", (ulong)IndexWhere(numbers, n => n > 8).ValueOr(99u));
-    printf("index>99 = %d\n", IndexWhere(numbers, n => n > 99).IsEmpty);
+    printf("count<5  = %llu\n", (ulong)Count(numbers, n => n < 5));
+    printf("first>4  = %d\n", FirstOrDefault(numbers, n => n > 4, -1));
+    printf("first>99 = %d\n", FirstOrDefault(numbers, n => n > 99, -1));
+    printf("index>8  = %llu\n", (ulong)FindIndex(numbers, n => n > 8).ValueOr(99u));
+    printf("index>99 = %d\n", FindIndex(numbers, n => n > 99).IsEmpty);
     printf("find>4   = %d\n", Find(numbers, n => n > 4).ValueOr(-1));
 
     printf("take3    = %llu\n", (ulong)Take(numbers, 3u).Count);
@@ -110,14 +110,14 @@ int Main()
     ];
 
     Sort(people, (a, b) => a.Age - b.Age);
-    Show("byAge   ", Reduce(people, "", (text, p) => text + p.Name + " "));
+    Show("byAge   ", Aggregate(people, "", (text, p) => text + p.Name + " "));
 
     // Stability, which is the property worth paying a scratch array for:
     // sorting by team now must leave each team's people in the age order the
     // previous sort put them in. Sorting by two keys is exactly this, and it
     // only works if the second sort does not disturb the first.
     Sort(people, (a, b) => a.Team.CompareTo(b.Team));
-    Show("byTeam  ", Reduce(people, "", (text, p) => text + p.Name + " "));
+    Show("byTeam  ", Aggregate(people, "", (text, p) => text + p.Name + " "));
 
     // Descending, which is the same comparer the other way round.
     var counted = [5, 3, 9, 1, 7];
@@ -146,9 +146,9 @@ int Main()
     printf("find10   = %llu\n", (ulong)BinarySearch(ordered, 10));
     printf("find50   = %llu\n", (ulong)BinarySearch(ordered, 50));
     printf("find35   = %llu\n", (ulong)BinarySearch(ordered, 35));
-    printf("bound35  = %llu\n", (ulong)LowerBound(ordered, 35));
-    printf("bound0   = %llu\n", (ulong)LowerBound(ordered, 0));
-    printf("bound99  = %llu\n", (ulong)LowerBound(ordered, 99));
+    printf("bound35  = %llu\n", (ulong)FindLowerBound(ordered, 35));
+    printf("bound0   = %llu\n", (ulong)FindLowerBound(ordered, 0));
+    printf("bound99  = %llu\n", (ulong)FindLowerBound(ordered, 99));
 
     // ---------------------------------------------------- over a sequence
 
@@ -156,11 +156,11 @@ int Main()
     var names = new List<String>();
     names.Add("alpha"); names.Add("be"); names.Add("gamma");
 
-    printf("longNames = %llu\n", (ulong)Filter(names, n => n.ByteLength() > 2u).Count);
-    Show("upper    ", Reduce(names, "", (text, n) => text + n.ToUpperAscii() + " "));
+    printf("longNames = %llu\n", (ulong)Where(names, n => n.ByteLength() > 2u).Count);
+    Show("upper    ", Aggregate(names, "", (text, n) => text + n.ToUpperAscii() + " "));
     printf("anyShort  = %d\n", Any(names, n => n.ByteLength() < 3u));
 
-    var lengths = Map(names, n => (long)n.ByteLength());
+    var lengths = Select(names, n => (long)n.ByteLength());
     printf("lengths   = %lld %lld\n", lengths[0u], lengths[1u]);
 
     // ------------------------------------------------------------- cursors
@@ -170,31 +170,31 @@ int Main()
 
     var queue = new Queue<int>();
     queue.Enqueue(1); queue.Enqueue(2); queue.Enqueue(3);
-    Show("queue   ", Reduce(ToList(queue), "", (text, n) => text + Text.FromInteger((long)n)));
+    Show("queue   ", Aggregate(ToList(queue), "", (text, n) => text + Text.FromInteger((long)n)));
 
     // Dequeuing first moves the ring's head off zero, which is the case a
     // cursor that walked the array rather than the ring would get wrong.
     queue.Dequeue();
     queue.Enqueue(4);
-    Show("wrapped ", Reduce(ToList(queue), "", (text, n) => text + Text.FromInteger((long)n)));
+    Show("wrapped ", Aggregate(ToList(queue), "", (text, n) => text + Text.FromInteger((long)n)));
 
     var stack = new Stack<int>();
     stack.Push(1); stack.Push(2); stack.Push(3);
-    Show("stack   ", Reduce(ToList(stack), "", (text, n) => text + Text.FromInteger((long)n)));
+    Show("stack   ", Aggregate(ToList(stack), "", (text, n) => text + Text.FromInteger((long)n)));
 
     var chain = new LinkedList<int>();
     chain.AddLast(1); chain.AddLast(2); chain.AddFirst(0);
-    Show("chain   ", Reduce(ToList(chain), "", (text, n) => text + Text.FromInteger((long)n)));
+    Show("chain   ", Aggregate(ToList(chain), "", (text, n) => text + Text.FromInteger((long)n)));
 
     // A set has no order to promise, so the total is what is checked.
     var set = new HashSet<int>();
     set.Add(4); set.Add(9); set.Add(4); set.Add(16);
     printf("setCount  = %llu\n", (ulong)ToList(set).Count);
-    printf("setTotal  = %lld\n", Reduce(ToList(set), (long)0, (sum, n) => sum + (long)n));
+    printf("setTotal  = %lld\n", Aggregate(ToList(set), (long)0, (sum, n) => sum + (long)n));
 
     var byKey = new SortedList<int, String>();
-    byKey.Set(3, "c"); byKey.Set(1, "a"); byKey.Set(2, "b");
-    Show("sorted  ", Reduce(ToList(byKey), "", (text, p) => text + p.Value));
+    byKey.SetValue(3, "c"); byKey.SetValue(1, "a"); byKey.SetValue(2, "b");
+    Show("sorted  ", Aggregate(ToList(byKey), "", (text, p) => text + p.Value));
 
     printf("done\n");
     return 0;

@@ -174,7 +174,7 @@ int Main(String[] args)
 
     var shuffler = new Random(99);
     shuffler.Shuffle(deck);
-    printf("shuffled  = %lld\n", Reduce(deck, (long)0, (sum, n) => sum + n));
+    printf("shuffled  = %lld\n", Aggregate(deck, (long)0, (sum, n) => sum + n));
 
     var again = new long[8];
     for (nuint i = 0u; i < again.Length; i++)

@@ -276,7 +276,7 @@ public sealed partial class Binder
                     ? "'try' passes a failure to the caller, so it belongs in a function"
                     : $"'{_currentFunction.Name}' returns '{_currentFunction.ReturnType.Name}', " +
                       "so a failure has nowhere to go. A function containing 'try' returns a " +
-                      "'Result'; use 'ValueOr' for a caller that has a sensible default");
+                      "'Result'; use 'GetValueOrDefault' for a caller that has a sensible default");
             return new BoundErrorExpression(syntax.Span);
         }
 

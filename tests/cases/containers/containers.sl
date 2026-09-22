@@ -34,17 +34,17 @@ int Main()
 {
     // ---------------------------------------------------------- dictionary
     var ages = new Dictionary<String, int>();
-    ages.Set("ada", 36);
-    ages.Set("grace", 45);
-    ages.Set("alan", 41);
+    ages.SetValue("ada", 36);
+    ages.SetValue("grace", 45);
+    ages.SetValue("alan", 41);
 
     printf("dict=%llu ada=%d absent=%d\n",
-        ages.Count, ages.Get("ada"), ages.GetOr("nobody", -1));
+        ages.Count, ages.GetValue("ada"), ages.GetValueOrDefault("nobody", -1));
     printf("has=%d %d\n",
         ages.ContainsKey("alan") ? 1 : 0, ages.ContainsKey("bob") ? 1 : 0);
 
-    ages.Set("ada", 37);
-    printf("replaced=%d count=%llu\n", ages.Get("ada"), ages.Count);
+    ages.SetValue("ada", 37);
+    printf("replaced=%d count=%llu\n", ages.GetValue("ada"), ages.Count);
     printf("add=%d dup=%d\n", ages.Add("bob", 1) ? 1 : 0, ages.Add("ada", 9) ? 1 : 0);
     printf("remove=%d gone=%d left=%llu\n",
         ages.Remove("grace") ? 1 : 0, ages.Remove("grace") ? 1 : 0, ages.Count);
@@ -53,21 +53,21 @@ int Main()
     // deletion shifts clusters back, so every survivor is still reachable.
     var squares = new Dictionary<int, int>();
     for (int i = 0; i < 200; i = i + 1)
-        squares.Set(i, i * i);
+        squares.SetValue(i, i * i);
     printf("grown=%llu capacity=%llu at150=%d\n",
-        squares.Count, squares.Capacity, squares.Get(150));
+        squares.Count, squares.Capacity, squares.GetValue(150));
 
     int sum = 0;
     foreach (var pair in squares)
         sum = sum + pair.Key;
-    printf("keys-sum=%d listed=%llu\n", sum, squares.Keys().Count);
+    printf("keys-sum=%d listed=%llu\n", sum, squares.GetKeys().Count);
 
     for (int i = 0; i < 200; i = i + 2)
         squares.Remove(i);
     int survivors = 0;
     for (int i = 1; i < 200; i = i + 2)
     {
-        if (squares.Get(i) == i * i)
+        if (squares.GetValue(i) == i * i)
             survivors = survivors + 1;
     }
     printf("halved=%llu survivors=%d evens=%d\n",
@@ -75,12 +75,12 @@ int Main()
 
     // An enum and a class both work as keys.
     var bySuit = new Dictionary<Suit, String>();
-    bySuit.Set(Suit.Hearts, "red");
-    bySuit.Set(Suit.Spades, "black");
+    bySuit.SetValue(Suit.Hearts, "red");
+    bySuit.SetValue(Suit.Spades, "black");
     var byCard = new Dictionary<Card, int>();
-    byCard.Set(new Card(7), 700);
+    byCard.SetValue(new Card(7), 700);
     printf("enum-key=%s class-key=%d\n",
-        bySuit.Get(Suit.Hearts).ToPointer(), byCard.Get(new Card(7)));
+        bySuit.GetValue(Suit.Hearts).ToPointer(), byCard.GetValue(new Card(7)));
 
     // ------------------------------------------------------------- hash set
     var seen = new HashSet<String>();
@@ -134,15 +134,15 @@ int Main()
     chain.AddFirst("a");
 
     var forwards = new StringBuilder();
-    for (nint at = chain.First(); at >= 0; at = chain.After(at))
+    for (nint at = chain.First; at >= 0; at = chain.GetNext(at))
     {
-        forwards.Append(chain.ValueAt(at));
+        forwards.Append(chain.GetValueAt(at));
     }
 
     var backwards = new StringBuilder();
-    for (nint at = chain.Last(); at >= 0; at = chain.Before(at))
+    for (nint at = chain.Last; at >= 0; at = chain.GetPrevious(at))
     {
-        backwards.Append(chain.ValueAt(at));
+        backwards.Append(chain.GetValueAt(at));
     }
     printf("chain=%s reversed=%s count=%llu\n",
         forwards.ToText().ToPointer(), backwards.ToText().ToPointer(), chain.Count);
@@ -158,29 +158,29 @@ int Main()
 
     // ----------------------------------------------------------- sorted list
     var prices = new SortedList<String, int>();
-    prices.Set("pear", 3);
-    prices.Set("apple", 1);
-    prices.Set("fig", 2);
-    prices.Set("apple", 9);
-    printf("sorted=%llu apple=%d\n", prices.Count, prices.Get("apple"));
+    prices.SetValue("pear", 3);
+    prices.SetValue("apple", 1);
+    prices.SetValue("fig", 2);
+    prices.SetValue("apple", 9);
+    printf("sorted=%llu apple=%d\n", prices.Count, prices.GetValue("apple"));
     foreach (var pair in prices)
         printf("  %s=%d\n", pair.Key.ToPointer(), pair.Value);
     printf("drop=%d still=%d absent=%d\n",
         prices.Remove("fig") ? 1 : 0, prices.ContainsKey("pear") ? 1 : 0,
-        prices.GetOr("nope", -1));
+        prices.GetValueOrDefault("nope", -1));
 
     var ordered = new SortedList<int, int>();
     for (int i = 50; i > 0; i = i - 1)
-        ordered.Set(i, i * 2);
+        ordered.SetValue(i, i * 2);
     printf("ordered=%d %d %d of %llu\n",
-        ordered.KeyAt(0), ordered.KeyAt(25), ordered.KeyAt(49), ordered.Count);
+        ordered.GetKeyAt(0), ordered.GetKeyAt(25), ordered.GetKeyAt(49), ordered.Count);
 
     // -------------------------------------------------------------- lifetime
     printf("lifetime\n");
     {
         var held = new Dictionary<String, Tag>();
-        held.Set("one", new Tag("one"));
-        held.Set("two", new Tag("two"));
+        held.SetValue("one", new Tag("one"));
+        held.SetValue("two", new Tag("two"));
 
         var stacked = new Stack<Tag>();
         stacked.Push(new Tag("stacked"));

@@ -230,10 +230,10 @@ void ShowLibrary()
     PrintValue("List", $"{list.Count} items, first {list[0u]}");
 
     var map = new Dictionary<String, int>();
-    map.Set("one", 1);
-    map.Set("two", 2);
-    PrintValue("Dictionary", (long)map.GetOr("two", -1));
-    PrintValue("missing", (long)map.GetOr("three", -1));
+    map.SetValue("one", 1);
+    map.SetValue("two", 2);
+    PrintValue("Dictionary", (long)map.GetValueOrDefault("two", -1));
+    PrintValue("missing", (long)map.GetValueOrDefault("three", -1));
 
     var set = new HashSet<int>();
     set.Add(1);
@@ -257,9 +257,9 @@ void ShowLibrary()
     PrintValue("LinkedList", (long)chain.Count);
 
     var sorted = new SortedList<int, String>();
-    sorted.Set(2, "two");
-    sorted.Set(1, "one");
-    PrintValue("SortedList", sorted.ValueAt(0u));
+    sorted.SetValue(2, "two");
+    sorted.SetValue(1, "one");
+    PrintValue("SortedList", sorted.GetValueAt(0u));
 
     // ------------------------------------------------------------ sequences
     //
@@ -281,9 +281,9 @@ void ShowLibrary()
 
     PrintValue("map / reduce", (long)values.Select(n => n * 2).Aggregate(0, (t, n) => t + n));
     PrintValue("any / all", $"{values.Any(n => n > 8)} {values.All(n => n > 0)}");
-    PrintValue("count where", (long)values.CountWhere(n => n == 3));
+    PrintValue("count where", (long)values.Count(n => n == 3));
     PrintValue("find", (long)values.Find(n => n > 4).ValueOr(-1));
-    PrintValue("index where", (long)values.IndexWhere(n => n == 9).ValueOr(0u));
+    PrintValue("index where", (long)values.FindIndex(n => n == 9).ValueOr(0u));
 
     Sort(values);
     PrintValue("sorted", (long)values[0u]);

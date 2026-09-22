@@ -670,7 +670,7 @@ public class BinderTests
         "int Main() { var util = new Util(); return util.Middle(1, 2); }")]
     [InlineData(
         "import Standard.Collections;\n" +
-        "int Main() { int[] numbers = [3]; return FirstOr(numbers, n => n > 1, 99, 1); }")]
+        "int Main() { int[] numbers = [3]; return FirstOrDefault(numbers, n => n > 1, 99, 1); }")]
     public void AGenericCallWithTooManyArgumentsIsAnArityError(string body)
     {
         Front.Bind("module Test;\n" + body, out var diagnostics);

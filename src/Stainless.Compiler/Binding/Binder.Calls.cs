@@ -381,7 +381,7 @@ public sealed partial class Binder
         if (viable.Count == 1) return BuildCall(call, viable[0], receiver: null, whole);
 
         // Nothing fits and nothing is ambiguous, so try the generic templates.
-        // Almost everything worth chaining is one -- `Filter`, `Map`, `Sort`
+        // Almost everything worth chaining is one -- `Where`, `Select`, `Sort`
         // are all generic -- so this is the common path rather than the
         // fallback it looks like.
         if (viable.Count > 1) return null;

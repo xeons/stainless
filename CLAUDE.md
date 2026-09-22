@@ -182,7 +182,7 @@ precedence has no business deciding what an expression meant.
 
 **Two name collisions are easy to walk into**, because the standard library puts
 short verbs at module level and `import Standard.Collections` brings in twenty of
-them (`Take`, `Skip`, `Map`, `Filter`, `Find`, `Any`, `All`, `ForEach`, …):
+them (`Take`, `Skip`, `Select`, `Where`, `Find`, `Any`, `All`, `ForEach`, …):
 
 - A method of your own named after one of them resolves to the free function
   **inside a lambda body** and to your method everywhere else. Writing `this.`

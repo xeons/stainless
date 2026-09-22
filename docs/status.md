@@ -97,7 +97,7 @@ last person to edit it -- the suite is the authority.
   assigned into, the way a lambda does. `Value` and `Error` are readable only
   where the compiler has already seen which case is there — after `if (r.Ok)`,
   in the arm of a ternary, after an early `if (!r.Ok) { return ...; }`, or in a
-  `switch` arm — and `ValueOr(fallback)` needs no proof because it supplies one
+  `switch` arm — and `GetValueOrDefault(fallback)` needs no proof because it supplies one
 - Flow narrowing, for a variant's case and for `C?` alike: `if (x != null)`
   makes `x` a `C`, through an `if`, a `!`, `&&`, `||`, a ternary, an early
   return and a `switch`. Only for a local or a parameter, and never for a
@@ -405,9 +405,9 @@ last person to edit it -- the suite is the authority.
   rather than copying into a list first
 - **`Sort` is a stable merge sort**, over a `T[:]` or an `IList<T>`, by
   `IComparable<T>` or by a `Comparer<T>` you pass. Stability is what lets a
-  multi-key order be built by sorting twice. Alongside it: `Largest`,
-  `Smallest`, `IndexOf`, `RemoveFirst`, `RemoveWhere`, `Reverse`,
-  `BinarySearch` and `LowerBound`
+  multi-key order be built by sorting twice. Alongside it: `Max`,
+  `Min`, `IndexOf`, `RemoveFirst`, `RemoveWhere`, `Reverse`,
+  `BinarySearch` and `FindLowerBound`
 - **`x.F(y)` is `F(x, y)`** when `x` has no member `F`, which is what makes the
   library chain:
 
@@ -419,19 +419,18 @@ last person to edit it -- the suite is the authority.
   so a function need not be wrapped in a static class to exist and there is
   nothing a `this` modifier would add. A member always wins, so nothing a type
   declares can be shadowed by somebody else's function
-- **Combinators**, over an array, a slice or any `IEnumerable<T>`: `Map`,
-  `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `Find`, `FirstOr`,
-  `IndexWhere`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
-  `ToArray`, plus `Where`, `Select`, `Aggregate` under the names LINQ gave
-  them. Each takes a generic
+- **Combinators**, over an array, a slice or any `IEnumerable<T>`: `Select`,
+  `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
+  `FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
+  `ToArray`, under the names LINQ gave them. Each takes a generic
   `closure` — `Func<T, R>`, `Predicate<T>`, `Action<T>`, `Fold<A, T>`,
   `Comparer<T>` — so a lambda and a method that already exists are the same
   thing:
 
   ```csharp
-  var adults = Filter(people, p => p.Age >= 18);
-  var names  = Map(adults, p => p.Name);
-  long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
+  var adults = Where(people, p => p.Age >= 18);
+  var names  = Select(adults, p => p.Name);
+  long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
 
   ForEach(lines, report.Note);        // a method bound to an object
   Sort(people, (a, b) => a.Age - b.Age);
@@ -444,7 +443,7 @@ last person to edit it -- the suite is the authority.
 
   Eager, not lazy: each returns a `List<T>`, because lazy chaining wants
   generators and the language has no `yield`
-- **"Not there" is an `Optional`**, not a sentinel. `IndexOf`, `IndexWhere`,
+- **"Not there" is an `Optional`**, not a sentinel. `IndexOf`, `FindIndex`,
   `Find` and a dictionary's `map[key]` answer with one, so a length, a magic
   number or a crash never stands in for a miss. A value converts implicitly to
   the `Optional<T>` holding it, as it does to a `T?` in Swift and C#, which is
@@ -556,7 +555,7 @@ last person to edit it -- the suite is the authority.
   what `IndexOf` answers with instead of a magic number. Not a second meaning
   for `?`: a pointer for a class and a tagged pair for a value would have been
   two representations behind one spelling. It reads like Java's — `HasValue`,
-  `IsEmpty`, `Get`, `ValueOr`, `Or`, `Map`, `FlatMap`, `Filter`, `IfPresent` —
+  `IsEmpty`, `GetValue`, `GetValueOrDefault`, `Coalesce`, `Select`, `SelectMany`, `Where`, `InvokeIfPresent` —
   over machinery that is all variant: `if (found is Some at)` is what every one
   of them is written in terms of
 - `OrderedDictionary<TKey, TValue>`: a dictionary that keeps the order its keys were
@@ -716,7 +715,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   cannot be generic at all, since dispatch gives it one slot. A parameter that
   appears only in a *lambda's* result is a different case and is inferred, by
   binding the body once the other arguments have given it its parameter types —
-  which is what makes `Map(numbers, n => n * 2)` work. The same ambiguity is
+  which is what makes `Select(numbers, n => n * 2)` work. The same ambiguity is
   why an instantiation cannot be *named* in expression position either:
   `new Box<int>(...)` reads, because a type is what is expected after `new`,
   but `Box<int>.Of(2)` and `Box<int>.Count` do not. A generic type's static

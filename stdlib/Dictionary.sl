@@ -92,7 +92,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
 
     /// The slot holding `key`, or the first free slot it would take. Which one
     /// it is, is what `filled` at that index says.
-    nuint Probe(TKey key)
+    nuint FindSlot(TKey key)
     {
         nuint mask = _keys.Length - 1;
         nuint i = key.HashCode() & mask;
@@ -109,8 +109,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// Whether `key` is there.
     ///
     /// One probe, but reach for `Find` when the value is what is wanted:
-    /// `ContainsKey` and then `Get` probes twice for one answer.
-    public bool ContainsKey(TKey key) => _filled[Probe(key)];
+    /// `ContainsKey` and then `GetValue` probes twice for one answer.
+    public bool ContainsKey(TKey key) => _filled[FindSlot(key)];
 
     /// The value for `key`, or `None` when there is none.
     ///
@@ -122,11 +122,11 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     ///
     ///     if (settings.Find(name) is Some value) { Use(value); }
     ///
-    /// One probe, where `ContainsKey` followed by `Get` is two, and no sentinel
-    /// to collide with a real value the way `GetOr` has.
+    /// One probe, where `ContainsKey` followed by `GetValue` is two, and no sentinel
+    /// to collide with a real value the way `GetValueOrDefault` has.
     public Optional<TValue> Find(TKey key)
     {
-        nuint i = Probe(key);
+        nuint i = FindSlot(key);
         if (!_filled[i])
             return None;
         return Some(_values[i]);
@@ -136,22 +136,22 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     ///
     /// The asserting form, and it asserts: use it only where the key is there
     /// by construction -- one set two lines above, or a name this code chose
-    /// itself. `Get` means the same thing here as on `Optional`, which is that
+    /// itself. `GetValue` means the same thing here as on `Optional`, which is that
     /// the caller is claiming the value exists and would rather stop than
     /// carry on if it does not. For a key that came from anywhere else, `Find`
     /// is the question and this is not.
-    public TValue Get(TKey key)
+    public TValue GetValue(TKey key)
     {
-        nuint i = Probe(key);
+        nuint i = FindSlot(key);
         if (!_filled[i])
-            sl_fail("Dictionary.Get: no such key");
+            sl_fail("Dictionary.GetValue: no such key");
         return _values[i];
     }
 
     /// The value for `key`, or `fallback` when there is none.
-    public TValue GetOr(TKey key, TValue fallback)
+    public TValue GetValueOrDefault(TKey key, TValue fallback)
     {
-        nuint i = Probe(key);
+        nuint i = FindSlot(key);
         if (!_filled[i])
             return fallback;
         return _values[i];
@@ -166,7 +166,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// shape a reader trusts without thinking.
     ///
     ///     if (settings["timeout"] is Some found) { Use(found.Value); }
-    ///     int port = settings["port"].ValueOr(8080);
+    ///     int port = settings["port"].GetValueOrDefault(8080);
     ///
     /// A getter and a setter share one type (§7.5), so the setter takes an
     /// `Optional<TValue>` too -- and that turns out to say something rather than
@@ -179,7 +179,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     ///
     /// What this cannot do is `map[key] += 1`, because there is no value to
     /// add to when the key is absent. That is not a limitation so much as the
-    /// question being asked out loud: `map[key] = map[key].ValueOr(0) + 1`
+    /// question being asked out loud: `map[key] = map[key].GetValueOrDefault(0) + 1`
     /// says what should happen, and Swift's `dict[key, default: 0] += 1`
     /// exists for the same reason.
     public Optional<TValue> this[TKey key]
@@ -189,7 +189,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
         {
             if (value is Some held)
             {
-                Set(key, held.Value);
+                SetValue(key, held.Value);
             }
             else
             {
@@ -199,9 +199,9 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     }
 
     /// Adds the key or replaces what it maps to.
-    public void Set(TKey key, TValue value)
+    public void SetValue(TKey key, TValue value)
     {
-        nuint i = Probe(key);
+        nuint i = FindSlot(key);
         if (_filled[i])
         {
             _values[i] = value;
@@ -211,8 +211,8 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
         // Growing moves every entry, so the slot has to be found again after it.
         if ((_count + 1) * 4 > _keys.Length * 3)
         {
-            Grow();
-            i = Probe(key);
+            GrowTable();
+            i = FindSlot(key);
         }
 
         _keys[i] = key;
@@ -224,16 +224,16 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     /// Adds the key, or reports that it was already there and changes nothing.
     public bool Add(TKey key, TValue value)
     {
-        if (_filled[Probe(key)])
+        if (_filled[FindSlot(key)])
             return false;
-        Set(key, value);
+        SetValue(key, value);
         return true;
     }
 
     /// Removes the key, reporting whether it was there.
     public bool Remove(TKey key)
     {
-        nuint i = Probe(key);
+        nuint i = FindSlot(key);
         if (!_filled[i])
             return false;
 
@@ -284,9 +284,9 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     ///
     /// A fresh list, so changing it changes nothing here, and building it is a
     /// scan of every slot rather than of every entry -- O(capacity), not
-    /// O(count). Pairs with `Values` position for position as long as nothing
+    /// O(count). Pairs with `GetValues` position for position as long as nothing
     /// is written in between.
-    public List<TKey> Keys()
+    public List<TKey> GetKeys()
     {
         var result = new List<TKey>();
         for (nuint i = 0; i < _filled.Length; i++)
@@ -297,10 +297,10 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
         return result;
     }
 
-    /// Every value, in the same order `Keys` gives.
+    /// Every value, in the same order `GetKeys` gives.
     ///
     /// Values are not distinct: a value stored under two keys appears twice.
-    public List<TValue> Values()
+    public List<TValue> GetValues()
     {
         var result = new List<TValue>();
         for (nuint i = 0; i < _filled.Length; i++)
@@ -325,11 +325,11 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
     // What the enumerator needs and nothing else does: a slot's state, and the
     // entry in it. Not public, so the shape of the table stays inside the
     // module that has to keep it consistent.
-    bool Occupied(nuint slot) => _filled[slot];
+    bool IsOccupied(nuint slot) => _filled[slot];
 
-    Pair<TKey, TValue> PairAt(nuint slot) => new Pair<TKey, TValue>(_keys[slot], _values[slot]);
+    Pair<TKey, TValue> GetPairAt(nuint slot) => new Pair<TKey, TValue>(_keys[slot], _values[slot]);
 
-    void Grow()
+    void GrowTable()
     {
         var oldKeys = _keys;
         var oldValues = _values;
@@ -345,7 +345,7 @@ public class Dictionary<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
             if (!oldFilled[i])
                 continue;
 
-            nuint j = Probe(oldKeys[i]);
+            nuint j = FindSlot(oldKeys[i]);
             _keys[j] = oldKeys[i];
             _values[j] = oldValues[i];
             _filled[j] = true;
@@ -384,14 +384,14 @@ public class DictionaryEnumerator<TKey, TValue> : IEnumerator<Pair<TKey, TValue>
         {
             _at = _scanned;
             _scanned++;
-            if (_source.Occupied(_at))
+            if (_source.IsOccupied(_at))
                 return true;
         }
         return false;
     }
 
     /// The entry the last `MoveNext` landed on, as a freshly built `Pair`.
-    public Pair<TKey, TValue> Current => _source.PairAt(_at);
+    public Pair<TKey, TValue> Current => _source.GetPairAt(_at);
 }
 
 // ----------------------------------------------------------------- hash set
@@ -425,7 +425,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// is reduced with a mask rather than a division.
     public nuint Capacity => _items.Length;
 
-    nuint Probe(T item)
+    nuint FindSlot(T item)
     {
         nuint mask = _items.Length - 1;
         nuint i = item.HashCode() & mask;
@@ -441,19 +441,19 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
 
     /// Whether `item` is in the set. One probe, and the question the whole
     /// collection exists to answer.
-    public bool Contains(T item) => _filled[Probe(item)];
+    public bool Contains(T item) => _filled[FindSlot(item)];
 
     /// Adds the item, reporting whether it was new.
     public bool Add(T item)
     {
-        nuint i = Probe(item);
+        nuint i = FindSlot(item);
         if (_filled[i])
             return false;
 
         if ((_count + 1) * 4 > _items.Length * 3)
         {
-            Grow();
-            i = Probe(item);
+            GrowTable();
+            i = FindSlot(item);
         }
 
         _items[i] = item;
@@ -465,7 +465,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// Removes the item, reporting whether it was there.
     public bool Remove(T item)
     {
-        nuint i = Probe(item);
+        nuint i = FindSlot(item);
         if (!_filled[i])
             return false;
 
@@ -548,15 +548,15 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
     /// The two a cursor needs to walk the table: how many slots there are, and
     /// what is in one. A set has no index of its own, so neither is public.
     nuint SlotCount => _filled.Length;
-    bool SlotFilled(nuint slot) => _filled[slot];
-    T SlotValue(nuint slot) => _items[slot];
+    bool IsSlotFilled(nuint slot) => _filled[slot];
+    T GetSlotValue(nuint slot) => _items[slot];
 
     /// A cursor over the items, for `foreach`. Allocates nothing beyond the
     /// cursor itself, unlike `ToList`. Adding or removing during a walk
     /// invalidates it.
     public IEnumerator<T> GetEnumerator() => new HashSetCursor<T>(this);
 
-    void Grow()
+    void GrowTable()
     {
         var oldItems = _items;
         var oldFilled = _filled;
@@ -570,7 +570,7 @@ public class HashSet<T> : IEnumerable<T> where T : IEquatable<T>, IHashable
             if (!oldFilled[i])
                 continue;
 
-            nuint j = Probe(oldItems[i]);
+            nuint j = FindSlot(oldItems[i]);
             _items[j] = oldItems[i];
             _filled[j] = true;
             _count++;
@@ -605,12 +605,12 @@ public class HashSetCursor<T> : IEnumerator<T> where T : IEquatable<T>, IHashabl
         {
             _at = _scanned;
             _scanned++;
-            if (_source.SlotFilled(_at))
+            if (_source.IsSlotFilled(_at))
                 return true;
         }
         return false;
     }
 
     /// The item the last `MoveNext` landed on.
-    public T Current => _source.SlotValue(_at);
+    public T Current => _source.GetSlotValue(_at);
 }

@@ -525,9 +525,9 @@ public sealed partial class Binder
     /// What a lambda's body would produce, given types for its parameters --
     /// asked before anything has settled what the lambda is going to become.
     ///
-    /// This exists for one case, and it is the case that makes `Map` writable:
+    /// This exists for one case, and it is the case that makes `Select` writable:
     /// a type parameter that appears nowhere but in the result of a lambda.
-    /// `Map&lt;T, R&gt;(T[:], IFunc&lt;T, R&gt;)` can work out T from the array, and then
+    /// `Select&lt;T, R&gt;(T[:], IFunc&lt;T, R&gt;)` can work out T from the array, and then
     /// nothing else mentions R -- so R has to come from the body, and the body
     /// cannot be bound until T has given it its parameter types. That ordering
     /// is the whole of the trick.
@@ -673,7 +673,7 @@ public sealed partial class Binder
         }
 
         // The body, bound once against those parameter types and thrown away.
-        // This is the same trial `Map(numbers, n => n * 2)` already makes to
+        // This is the same trial `Select(numbers, n => n * 2)` already makes to
         // work out a type parameter that appears only in a lambda's result.
         if (ProbeLambdaResult(syntax, parameterTypes) is not { } result) return null;
         if (result.IsError()) return null;

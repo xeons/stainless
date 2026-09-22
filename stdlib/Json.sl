@@ -126,17 +126,17 @@ public class JsonObject
     public nuint Count => _members.Count;
 
     /// The name at a position, in the order the document wrote them.
-    public String NameAt(nuint index) => _members.KeyAt(index);
+    public String NameAt(nuint index) => _members.GetKeyAt(index);
 
     /// The value at a position, pairing with `NameAt` at the same index.
-    public JsonValue ValueAt(nuint index) => _members.ValueAt(index);
+    public JsonValue ValueAt(nuint index) => _members.GetValueAt(index);
 
     /// Adds a member. A repeated name is kept rather than replaced, because
     /// that is what the document said; `Find` answers with the first.
     public void Add(String name, JsonValue value) => _members.Add(name, value);
 
     /// Replaces the value of a name, or adds it.
-    public void Set(String name, JsonValue value) => _members.Set(name, value);
+    public void Set(String name, JsonValue value) => _members.SetValue(name, value);
 
     /// Where a name is, or `None`. One lookup rather than the two that asking
     /// whether it is there and then asking for it would cost.
@@ -144,12 +144,12 @@ public class JsonObject
 
     /// Whether a member of that name is there. A scan, so `IndexOf` once
     /// beats this followed by a lookup.
-    public bool Has(String name) => _members.Has(name);
+    public bool Has(String name) => _members.ContainsKey(name);
 
     /// The value of a name, or `Null` when it is not there. A document that
     /// does not mention a field and one that says `null` are the same thing to
     /// a reader that has a default already.
-    public JsonValue Find(String name) => _members.Find(name, JsonValue.Null);
+    public JsonValue Find(String name) => _members.GetValueOrDefault(name, JsonValue.Null);
 
     /// Removes the first member of that name, answering whether there was one.
     public bool Remove(String name) => _members.Remove(name);

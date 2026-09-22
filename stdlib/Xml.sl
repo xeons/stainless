@@ -131,10 +131,10 @@ public class XmlAttributes
     public nuint Count => _entries.Count;
 
     /// The name at a position, in the order they were written.
-    public String NameAt(nuint index) => _entries.KeyAt(index);
+    public String NameAt(nuint index) => _entries.GetKeyAt(index);
 
     /// The value at a position, pairing with `NameAt` at the same index.
-    public String ValueAt(nuint index) => _entries.ValueAt(index);
+    public String ValueAt(nuint index) => _entries.GetValueAt(index);
 
     /// Appends an attribute without looking for the name first. A parsed
     /// document cannot reach here with a repeat -- that is
@@ -143,16 +143,16 @@ public class XmlAttributes
 
     /// Sets the value of a name, adding it if it is new. A replaced name keeps
     /// the position it had.
-    public void Set(String name, String value) => _entries.Set(name, value);
+    public void Set(String name, String value) => _entries.SetValue(name, value);
 
     /// Where a name is, or `None`.
     public Optional<nuint> IndexOf(String name) => _entries.IndexOf(name);
 
     /// Whether an attribute of that name is there.
-    public bool Has(String name) => _entries.Has(name);
+    public bool Has(String name) => _entries.ContainsKey(name);
 
     /// The value of an attribute, or the fallback when it is not there.
-    public String Find(String name, String fallback) => _entries.Find(name, fallback);
+    public String Find(String name, String fallback) => _entries.GetValueOrDefault(name, fallback);
 
     /// Removes an attribute, answering whether it was there.
     public bool Remove(String name) => _entries.Remove(name);

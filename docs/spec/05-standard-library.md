@@ -182,7 +182,7 @@ var numbers = new List<int>();
 Sort(numbers);                          // int satisfies IComparable<int>
 
 var ages = new Dictionary<String, int>();
-ages.Set("ada", 36);                    // String satisfies IEquatable + IHashable
+ages.SetValue("ada", 36);               // String satisfies IEquatable + IHashable
 
 3.CompareTo(5);                         // -1
 "apple".CompareTo("banana");            // -1, by bytes, which for UTF-8 is by code point
@@ -224,7 +224,7 @@ have to stop, and `map[key]` carries no verb to warn anyone that it might.
 ```csharp
 if (settings["timeout"] is Some found)
     Use(found.Value);
-int port = settings["port"].ValueOr(8080);
+int port = settings["port"].GetValueOrDefault(8080);
 ```
 
 A getter and a setter share one type ([§7.5](07-functions-members.md#75-indexers)), so the setter takes an
@@ -239,7 +239,7 @@ settings["retries"] = None;          // remove
 
 What it cannot do is `map[key] += 1`, because there is nothing to add to when
 the key is absent. That is the question being asked out loud rather than a
-limitation: `map[key] = map[key].ValueOr(0) + 1` says what should happen, and
+limitation: `map[key] = map[key].GetValueOrDefault(0) + 1` says what should happen, and
 Swift's `dict[key, default: 0] += 1` exists for the same reason.
 
 The named forms remain, each saying which question it asks:
@@ -247,12 +247,12 @@ The named forms remain, each saying which question it asks:
 | | |
 |---|---|
 | `map[key]`, `Find(key)` | `Optional<TValue>`, and **what to reach for** |
-| `GetOr(key, fallback)` | the value or a default |
+| `GetValueOrDefault(key, fallback)` | the value or a default |
 | `ContainsKey(key)` | whether it is there |
-| `Get(key)` | the value, **aborting** when there is none |
+| `GetValue(key)` | the value, **aborting** when there is none |
 
-`Find` costs one probe where `ContainsKey` then `Get` costs two, and it has no
-sentinel to collide with a real value the way `GetOr` does. `Get` is the
+`Find` costs one probe where `ContainsKey` then `GetValue` costs two, and it has no
+sentinel to collide with a real value the way `GetValueOrDefault` does. `GetValue` is the
 asserting form and it asserts: use it where the key is there by construction.
 `SortedList<TKey, TValue>` answers the same ways, minus the indexer.
 
@@ -283,9 +283,9 @@ var first = line.AddLast("a");
 line.AddLast("c");
 line.InsertAfter(first, "b");
 
-for (nint at = line.First(); at >= 0; at = line.After(at))
+for (nint at = line.First; at >= 0; at = line.GetNext(at))
 {
-    Console.WriteLine(line.ValueAt(at));
+    Console.WriteLine(line.GetValueAt(at));
 }
 ```
 
@@ -298,13 +298,13 @@ large enough for O(n) lookup to hurt wants a `Dictionary` beside it as an
 index. `Standard.Json`'s object members and `Standard.Xml`'s attributes are
 both one of these.
 
-Asking a container for something it does not have — `Get` with an absent key,
+Asking a container for something it does not have — `GetValue` with an absent key,
 `Dequeue` on an empty queue — aborts, the same way an out-of-range index does.
-Use `GetOr`, `ContainsKey` or `IsEmpty` where a miss is an ordinary outcome.
+Use `GetValueOrDefault`, `ContainsKey` or `IsEmpty` where a miss is an ordinary outcome.
 `OrderedDictionary.IndexOf` answers with an `Optional<nuint>` ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)), which is
 the one that needs no rule to be remembered.
 
-Alongside the containers are `Largest`, `Smallest`, `IndexOf` and `Sort`, each
+Alongside the containers are `Max`, `Min`, `IndexOf` and `Sort`, each
 constrained to what it actually needs:
 
 ```csharp
@@ -322,10 +322,10 @@ prices.Add(new Money(250));
 prices.Add(new Money(40));
 
 Sort(prices);                       // needs IComparable<Money>
-Largest(prices);                    // and works on any IReadOnlyList
+Max(prices);                        // and works on any IReadOnlyList
 ```
 
-`Sort` takes an `IList<T>`; `Largest`, `Smallest` and `IndexOf` take an
+`Sort` takes an `IList<T>`; `Max`, `Min` and `IndexOf` take an
 `IReadOnlyList<T>`, so they accept a mutable list without being able to change
 it.
 
@@ -344,7 +344,7 @@ public closure int  Comparer<T>(T left, T right);
 
 These five are declared in `Standard` rather than here, so they need no import:
 they are what [§2.15](02-types.md#215-lambdas-and-closures) says a lambda may become, rather than anything a collection
-owns, and `Optional.Map` ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)) wants them too.
+owns, and `Optional.Select` ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)) wants them too.
 
 **They were one-method interfaces until a closure could be generic**, and the
 difference is not cosmetic. An interface needs an object that implements it, so
@@ -360,23 +360,23 @@ Both are the same two words ([§2.14.1](02-types.md#2141-closure--a-method-and-t
 it.
 
 ```csharp
-var adults = Filter(people, p => p.Age >= 18);
-var names  = Map(adults, p => p.Name);
-long total = Reduce(numbers, (long)0, (sum, n) => sum + (long)n);
+var adults = Where(people, p => p.Age >= 18);
+var names  = Select(adults, p => p.Name);
+long total = Aggregate(numbers, (long)0, (sum, n) => sum + (long)n);
 
 Sort(people, (a, b) => a.Age - b.Age);
 ```
 
-`Map`, `Filter`, `Reduce`, `Any`, `All`, `CountWhere`, `Find`, `FirstOr`,
-`IndexWhere`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
+`Select`, `Where`, `Aggregate`, `Any`, `All`, `Count`, `Find`, `FirstOrDefault`,
+`FindIndex`, `ForEach`, `Take`, `Skip`, `Distinct`, `OrderBy`, `ToList` and
 `ToArray`, each over a `T[:]` — which an array converts to — and over any
 `IEnumerable<T>`. `Select`, `Where` and `Aggregate` are `Map`, `Filter` and
 `Reduce` spelled as LINQ spells them.
 
-**`Find` and `IndexWhere` answer with an `Optional`** ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)), and so does
+**`Find` and `FindIndex` answer with an `Optional`** ([§2.8.1](02-types.md#281-optionalt--a-value-or-none)), and so does
 `Collections.IndexOf`: a length standing in for "not there" is the sentinel
 that type exists to retire, and `Optional`'s own documentation names `IndexOf`
-as the example. `FirstOr` is still there for the caller who has a sensible
+as the example. `FirstOrDefault` is still there for the caller who has a sensible
 default and nothing to check.
 
 `RemoveWhere(list, predicate)` removes every item the predicate accepts.
@@ -386,7 +386,7 @@ could not be removed from at all before this. `RemoveFirst(list, value)` is the
 `IEquatable` version beside it.
 
 **Eager, not lazy.** Every one walks its input to the end and returns a
-`List<T>`, so `Filter` then `Map` builds two lists. Lazy chaining wants
+`List<T>`, so `Where` then `Select` builds two lists. Lazy chaining wants
 generators, and there is no `yield` here; a name borrowed from a language that
 has one would imply otherwise.
 
@@ -398,7 +398,7 @@ leaves equal elements where the first put them. An in-place quicksort would
 save the allocation and lose that.
 
 `BinarySearch` finds a value in an ordered slice, returning the length when it
-is absent. `LowerBound` returns where it would go instead — two functions
+is absent. `FindLowerBound` returns where it would go instead — two functions
 rather than one with a flag, because a caller usually wants one answer or the
 other, and now that `out` exists neither has to pretend otherwise.
 
@@ -513,7 +513,7 @@ if (got.Ok)
 Every operation that can fail returns a `Taken<T>` — whether there was
 anything, and what it was — rather than answering in two calls. There is no
 `Peek` and then `Dequeue`, because between the two another thread may have
-taken it. `DequeueOr(fallback)` is the same answer without the allocation.
+taken it. `DequeueOrDefault(fallback)` is the same answer without the allocation.
 
 `Channel<T>` is the producer-consumer hand-off: `Take` **blocks** until
 something arrives or the channel is closed, and `Close` wakes every waiter.
@@ -558,7 +558,7 @@ comes back as a value, in one of three shapes:
 Three shapes rather than one is deliberate: a single shape makes the common
 cases read worse than the rare one. There is no failed value to read by
 mistake — `Value` does not compile until the check has happened — and a caller
-that would rather carry on writes `read.ValueOr("")`.
+that would rather carry on writes `read.GetValueOrDefault("")`.
 
 **Streams.** `IStream` is `Read`/`Write`/`Seek`/`Length`/`Position`/`Flush`/
 `Close` plus `CanRead`/`CanWrite`/`CanSeek` and `Error`. `FileStream` and `MemoryStream`
