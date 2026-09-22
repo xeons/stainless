@@ -96,15 +96,51 @@ _Bool sl_string_is_empty(void *pointer)
     return ((SlString *)pointer)->byteLength == 0;
 }
 
-/* Counts scalars, not bytes: every byte that is not a UTF-8 continuation byte. */
+/*
+ * Unicode's Table 3-7. The lead narrows the second byte's range, which is what
+ * rules out overlong forms, surrogates and values past U+10FFFF. String's
+ * WellFormedWidth in stdlib/Text.sl MUST give the same answers.
+ */
+size_t sl_utf8_well_formed_width(const uint8_t *bytes, size_t length, size_t index)
+{
+    uint8_t lead = bytes[index];
+    if (lead < 0x80) return 1;
+    if (lead < 0xC2 || lead > 0xF4) return 0;
+
+    size_t width = lead < 0xE0 ? 2 : lead < 0xF0 ? 3 : 4;
+    if (length - index < width) return 0;
+
+    uint8_t low  = 0x80;
+    uint8_t high = 0xBF;
+    switch (lead) {
+    case 0xE0: low  = 0xA0; break;
+    case 0xED: high = 0x9F; break;
+    case 0xF0: low  = 0x90; break;
+    case 0xF4: high = 0x8F; break;
+    }
+
+    uint8_t second = bytes[index + 1];
+    if (second < low || second > high) return 0;
+
+    for (size_t i = 2; i < width; i++)
+        if ((bytes[index + i] & 0xC0) != 0x80) return 0;
+
+    return width;
+}
+
+/* Counts the steps String.NextCodePoint takes: one per well-formed sequence,
+ * and one per byte of anything else. */
 size_t sl_string_code_point_count(void *pointer)
 {
     SlString      *string = (SlString *)pointer;
     const uint8_t *bytes  = sl_string_data(string);
+    size_t         length = string->byteLength;
     size_t         count  = 0;
 
-    for (size_t i = 0; i < string->byteLength; i++)
-        if ((bytes[i] & 0xC0) != 0x80) count += 1;
+    for (size_t i = 0; i < length; count++) {
+        size_t width = sl_utf8_well_formed_width(bytes, length, i);
+        i += width == 0 ? 1 : width;
+    }
 
     return count;
 }

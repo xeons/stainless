@@ -575,7 +575,8 @@ public class String
     ///
     /// `index` must be the start of a character; one that lands inside a
     /// sequence gives U+FFFD, which is what a decoder does with a byte that
-    /// cannot begin one.
+    /// cannot begin one. So does a sequence that is not well formed: one cut
+    /// short, an overlong form, a surrogate or a value past U+10FFFF.
     public char32 CodePointAt(nuint index)
     {
         nuint size = this.ByteLength();
@@ -583,23 +584,17 @@ public class String
             return (char32)0xFFFD;
 
         var mine = this.ToPointer();
-        byte lead = mine[index];
-
-        if (lead < 0x80)
-            return (char32)(uint)lead;
-
-        nuint width = SequenceWidth(lead);
-        if (width == 0 || index + width > size)
+        nuint width = WellFormedWidth(mine, index, size);
+        if (width == 0)
             return (char32)0xFFFD;
+
+        byte lead = mine[index];
+        if (width == 1)
+            return (char32)(uint)lead;
 
         uint scalar = (uint)(lead & (byte)(0x7F >> (int)width));
         for (nuint i = 1; i < width; i++)
-        {
-            byte next = mine[index + i];
-            if ((next & 0xC0) != 0x80)
-                return (char32)0xFFFD;
-            scalar = (scalar << 6) | (uint)(next & 0x3F);
-        }
+            scalar = (scalar << 6) | (uint)(mine[index + i] & 0x3F);
         return (char32)scalar;
     }
 
@@ -612,17 +607,18 @@ public class String
     ///     var c = s.CodePointAt(at);
     /// }
     /// ```
+    ///
+    /// A sequence that is not well formed is stepped over one byte at a time,
+    /// each byte reading as U+FFFD. `CodePointCount` counts the same steps.
     public nuint NextCodePoint(nuint index)
     {
         nuint size = this.ByteLength();
         if (index >= size)
             return size;
 
-        nuint width = SequenceWidth(this.ToPointer()[index]);
+        nuint width = WellFormedWidth(this.ToPointer(), index, size);
         if (width == 0)
             width = 1;
-        if (index + width > size)
-            return size;
         return index + width;
     }
 
@@ -1222,10 +1218,15 @@ public class Utf16String
         if (index >= count)
             return count;
 
-        uint first = (uint)this.ToPointer()[index];
-        if (first >= 0xD800 && first <= 0xDBFF && index + 1 < count)
-            return index + 2;
-        return index + 1;
+        var units = this.ToPointer();
+        uint first = (uint)units[index];
+        if (first < 0xD800 || first > 0xDBFF || index + 1 >= count)
+            return index + 1;
+
+        uint second = (uint)units[index + 1];
+        if (second < 0xDC00 || second > 0xDFFF)
+            return index + 1;
+        return index + 2;
     }
 
     /// True when the two hold the same units.
@@ -1293,19 +1294,51 @@ byte LowerByte(byte value)
     return value;
 }
 
-/// How many bytes the UTF-8 sequence starting with this byte occupies, or 0
-/// when it cannot start one.
-nuint SequenceWidth(byte lead)
+/// How many bytes the well-formed UTF-8 sequence at `index` occupies, or 0
+/// when the bytes there are not one.
+///
+/// Well formed is Unicode's Table 3-7: every continuation byte present, and no
+/// overlong form, surrogate or value past U+10FFFF. The runtime's
+/// `sl_utf8_well_formed_width` MUST give the same answers.
+nuint WellFormedWidth(byte* bytes, nuint index, nuint size)
 {
+    byte lead = bytes[index];
     if (lead < 0x80)
         return 1;
-    if ((lead & 0xE0) == 0xC0)
-        return 2;
-    if ((lead & 0xF0) == 0xE0)
-        return 3;
-    if ((lead & 0xF8) == 0xF0)
-        return 4;
-    return 0;
+    if (lead < 0xC2 || lead > 0xF4)
+        return 0;
+
+    nuint width = 4;
+    if (lead < 0xE0)
+        width = 2;
+    else if (lead < 0xF0)
+        width = 3;
+
+    if (index + width > size)
+        return 0;
+
+    // The lead narrows the second byte's range, which is what rules out the
+    // overlong forms, the surrogates and everything past U+10FFFF.
+    byte low = 0x80;
+    byte high = 0xBF;
+    switch (lead)
+    {
+        case 0xE0: low = 0xA0; break;
+        case 0xED: high = 0x9F; break;
+        case 0xF0: low = 0x90; break;
+        case 0xF4: high = 0x8F; break;
+    }
+
+    byte second = bytes[index + 1];
+    if (second < low || second > high)
+        return 0;
+
+    for (nuint i = 2; i < width; i++)
+    {
+        if ((bytes[index + i] & 0xC0) != 0x80)
+            return 0;
+    }
+    return width;
 }
 
 /// Whether `count` bytes at two addresses are the same.

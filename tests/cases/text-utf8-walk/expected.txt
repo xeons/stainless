@@ -1,0 +1,21 @@
+valid 104 233 8364 | 3 3
+astral 128512 65 | 2 2
+bad-continuation 65533 65 66 | 3 3
+truncated 120 65533 65 | 3 3
+truncated-end 120 65533 | 2 2
+stray 65 65533 66 | 3 3
+surrogate 65533 65533 65533 65 | 4 4
+past-max 65533 65533 65533 65533 | 4 4
+overlong-2 65533 65533 | 2 2
+overlong-3 65533 65533 65533 | 3 3
+overlong-4 65533 65533 65533 65533 | 4 4
+f5-lead 65533 65533 65533 65533 | 4 4
+edge-low 128 2048 65536 | 3 3
+edge-high 55295 57344 1114111 | 3 3
+utf16-lone-high 65533 65 65 66
+utf16-pair 128512 65
+to-utf16-truncated 120 65533 65
+to-utf16-surrogate 65533 65533 65533 65
+to-utf16-overlong 65533 65533
+to-utf16-past-max 65533 65533 65533 65533
+to-utf16-astral 128512

@@ -56,30 +56,22 @@ static SlUtf16String *sl_utf16_new(size_t unitCount)
     return string;
 }
 
-/* Decodes one UTF-8 scalar, replacing anything malformed with U+FFFD. */
+/* Decodes one UTF-8 scalar. A byte that does not begin a well-formed sequence
+ * is one U+FFFD, the same step String.NextCodePoint takes. */
 static uint32_t sl_utf8_next(const uint8_t *bytes, size_t length, size_t *index)
 {
-    uint8_t  lead      = bytes[*index];
-    size_t   remaining = length - *index;
-    uint32_t scalar;
-    size_t   extra;
+    uint8_t lead  = bytes[*index];
+    size_t  width = sl_utf8_well_formed_width(bytes, length, *index);
 
-    if (lead < 0x80)                { *index += 1; return lead; }
-    else if ((lead & 0xE0) == 0xC0) { scalar = lead & 0x1F; extra = 1; }
-    else if ((lead & 0xF0) == 0xE0) { scalar = lead & 0x0F; extra = 2; }
-    else if ((lead & 0xF8) == 0xF0) { scalar = lead & 0x07; extra = 3; }
-    else                            { *index += 1; return 0xFFFD; }
+    if (width == 0) { *index += 1; return 0xFFFD; }
+    if (width == 1) { *index += 1; return lead; }
 
-    if (remaining <= extra) { *index = length; return 0xFFFD; }
+    uint32_t scalar = lead & (0x7F >> width);
+    for (size_t i = 1; i < width; i++)
+        scalar = (scalar << 6) | (uint32_t)(bytes[*index + i] & 0x3F);
 
-    for (size_t i = 1; i <= extra; i++) {
-        uint8_t continuation = bytes[*index + i];
-        if ((continuation & 0xC0) != 0x80) { *index += 1; return 0xFFFD; }
-        scalar = (scalar << 6) | (uint32_t)(continuation & 0x3F);
-    }
-
-    *index += extra + 1;
-    return scalar > 0x10FFFF ? 0xFFFD : scalar;
+    *index += width;
+    return scalar;
 }
 
 void *sl_string_to_utf16(void *pointer)

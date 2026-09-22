@@ -503,6 +503,13 @@ SL_API void  *sl_string_from_bytes(const uint8_t *data, size_t byteLength);
  * answering how many it wrote. Anything that is not a scalar becomes U+FFFD.
  */
 SL_API size_t sl_utf8_encode(uint32_t codePoint, uint8_t *into);
+
+/*
+ * How many bytes the well-formed UTF-8 sequence at `index` occupies, or 0 when
+ * the bytes there are not one: cut short, overlong, a surrogate or past
+ * U+10FFFF. A walk steps one byte over anything that answers 0.
+ */
+SL_API size_t sl_utf8_well_formed_width(const uint8_t *bytes, size_t length, size_t index);
 SL_API void  *sl_string_from_null_terminated(const char *text);
 SL_API void  *sl_string_from_integer(long long value);
 SL_API void  *sl_string_from_unsigned(unsigned long long value);
